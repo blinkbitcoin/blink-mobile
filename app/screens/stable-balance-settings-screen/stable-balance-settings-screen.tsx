@@ -2,26 +2,19 @@ import React, { useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { Screen } from "@app/components/screen"
 import { Switch } from "@app/components/atomic/switch"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import {
-  activateStableBalance,
-  deactivateStableBalance,
-} from "@app/self-custodial/bridge"
-import { SparkToken } from "@app/self-custodial/config"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { WalletCurrency } from "@app/graphql/generated"
 import { formatUsdInDisplay } from "@app/utils/amounts"
 import { testProps } from "@app/utils/testProps"
-import { toastShow } from "@app/utils/toast"
 
 import { StableBalanceConfirmModal } from "./stable-balance-confirm-modal"
-import { useStableBalanceToggleQuote } from "./hooks"
+import { useStableBalanceToggle, useStableBalanceToggleQuote } from "./hooks"
 
 const ToggleDirection = {
   Activate: "activate",
@@ -44,12 +37,15 @@ export const StableBalanceSettingsScreen: React.FC = () => {
     refreshWallets,
     refreshStableBalanceActive,
   } = useSelfCustodialWallet()
-  const [busy, setBusy] = useState(false)
-  const [pendingValue, setPendingValue] = useState<boolean | null>(null)
-  const [switchKey, setSwitchKey] = useState(0)
   const [pendingDirection, setPendingDirection] = useState<ToggleDirection | null>(null)
 
-  const resyncSwitch = () => setSwitchKey((k) => k + 1)
+  const { busy, displayValue, switchKey, apply, resyncSwitch } = useStableBalanceToggle({
+    sdk,
+    isStableBalanceActive,
+    refreshWallets,
+    refreshStableBalanceActive,
+    LL,
+  })
 
   const btcBalanceAmount =
     wallets.find((w) => w.walletCurrency === WalletCurrency.Btc)?.balance.amount ?? 0
@@ -67,34 +63,6 @@ export const StableBalanceSettingsScreen: React.FC = () => {
     sourceBalance,
     enabled: pendingDirection !== null,
   })
-
-  const apply = async (activate: boolean) => {
-    if (!sdk || busy) return
-    setBusy(true)
-    setPendingValue(activate)
-    try {
-      if (activate) {
-        await activateStableBalance(sdk, SparkToken.Label)
-      } else {
-        await deactivateStableBalance(sdk)
-      }
-      await refreshStableBalanceActive()
-      await refreshWallets()
-    } catch (err) {
-      crashlytics().recordError(
-        err instanceof Error ? err : new Error(`Stable Balance toggle failed: ${err}`),
-      )
-      toastShow({
-        message: (tr) => tr.StableBalance.toggleFailedToast(),
-        LL,
-        type: "error",
-      })
-      resyncSwitch()
-    } finally {
-      setBusy(false)
-      setPendingValue(null)
-    }
-  }
 
   const handleToggle = (next: boolean) => {
     if (next && !hasBtcBalance) {
@@ -115,12 +83,10 @@ export const StableBalanceSettingsScreen: React.FC = () => {
 
   const handleConfirmModal = async () => {
     const activate = pendingDirection === ToggleDirection.Activate
-    setPendingValue(activate)
     setPendingDirection(null)
     await apply(activate)
   }
 
-  const displayValue = pendingValue ?? isStableBalanceActive
   const showFeeRow = sourceBalance > 0
 
   return (
