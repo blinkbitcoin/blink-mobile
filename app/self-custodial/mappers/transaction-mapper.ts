@@ -171,7 +171,10 @@ export const mapSelfCustodialTransaction = (payment: Payment): NormalizedTransac
     status: mapStatus(payment.status),
     timestamp: toNumber(payment.timestamp),
     paymentType: mapPaymentMethod(payment.method, payment.details),
-    fee: toWalletMoneyAmount(Math.abs(toNumber(payment.fees)), WalletCurrency.Btc),
+    fee: toWalletMoneyAmount(
+      toDisplayAmount(Math.abs(toNumber(payment.fees)), currency, tokenDecimals),
+      currency,
+    ),
     sourceAccountType: AccountType.SelfCustodial,
   }
 }

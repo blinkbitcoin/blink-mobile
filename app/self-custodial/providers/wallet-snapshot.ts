@@ -14,6 +14,7 @@ import { toWalletId, type WalletState } from "@app/types/wallet.types"
 
 import { findUsdbToken, getWalletInfo, listPayments } from "../bridge"
 import { requireSparkTokenIdentifier } from "../config"
+import { recordErrorOnce } from "../logging"
 import { mapSelfCustodialTransactions } from "../mappers/transaction-mapper"
 
 const TRANSACTIONS_PER_PAGE = 20
@@ -28,7 +29,16 @@ const getStableBalance = (info: GetInfoResponse): number => {
 const isKnownPayment = (payment: Payment): boolean => {
   if (payment.method !== PaymentMethod.Token) return true
   if (!payment.details || !PaymentDetails.Token.instanceOf(payment.details)) return false
-  return payment.details.inner.metadata.identifier === requireSparkTokenIdentifier()
+  const expectedIdentifier = requireSparkTokenIdentifier()
+  const observedIdentifier = payment.details.inner.metadata.identifier
+  if (observedIdentifier === expectedIdentifier) return true
+  recordErrorOnce(
+    `spark-unknown-token-payment:${observedIdentifier}`,
+    new Error(
+      `Unknown token payment dropped: id=${observedIdentifier} expected=${expectedIdentifier}`,
+    ),
+  )
+  return false
 }
 
 type PaymentsPage = {
