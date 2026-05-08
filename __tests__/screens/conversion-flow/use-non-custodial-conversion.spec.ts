@@ -213,4 +213,58 @@ describe("useNonCustodialConversion", () => {
       message: "Generic error",
     })
   })
+
+  it("snapshots the first Ready quote and stops re-quoting on price ticks", async () => {
+    const quote = makeQuote()
+    mockGetQuote.mockResolvedValue(quote)
+
+    const { result, rerender } = renderHook(() =>
+      useNonCustodialConversion(defaultParams),
+    )
+
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+    expect(mockGetQuote).toHaveBeenCalledTimes(1)
+
+    // Simulate a realtime-price tick: the price-conversion hook returns a new
+    // identity for convertMoneyAmount, so liveQuoteParams would change.
+    mockConvertMoneyAmount.mockImplementation(
+      (amount: { amount: number }, currency: WalletCurrency) =>
+        currency === WalletCurrency.Btc
+          ? toBtcMoneyAmount(amount.amount * 101)
+          : toUsdMoneyAmount(amount.amount),
+    )
+    rerender({})
+
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 600)
+    })
+    expect(mockGetQuote).toHaveBeenCalledTimes(1)
+  })
+
+  it("re-quotes when moneyAmount changes and execute() runs the latest quote", async () => {
+    const firstQuote = makeQuote({ execute: jest.fn() })
+    const secondQuote = makeQuote({
+      execute: jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
+    })
+    mockGetQuote.mockResolvedValueOnce(firstQuote).mockResolvedValueOnce(secondQuote)
+
+    const { result, rerender } = renderHook(
+      (params: typeof defaultParams) => useNonCustodialConversion(params),
+      { initialProps: defaultParams },
+    )
+
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    rerender({ ...defaultParams, moneyAmount: toUsdMoneyAmount(700) })
+
+    await waitFor(() => expect(mockGetQuote).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    await act(async () => {
+      await result.current.execute()
+    })
+
+    expect(secondQuote.execute).toHaveBeenCalledTimes(1)
+    expect(firstQuote.execute).not.toHaveBeenCalled()
+  })
 })
