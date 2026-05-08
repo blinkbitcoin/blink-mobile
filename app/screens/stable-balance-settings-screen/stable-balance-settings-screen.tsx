@@ -15,8 +15,8 @@ import {
 } from "@app/self-custodial/bridge"
 import { SparkToken } from "@app/self-custodial/config"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
-import { DisplayCurrency, toUsdMoneyAmount } from "@app/types/amounts"
 import { WalletCurrency } from "@app/graphql/generated"
+import { formatUsdInDisplay } from "@app/utils/amounts"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
@@ -57,14 +57,6 @@ export const StableBalanceSettingsScreen: React.FC = () => {
     wallets.find((w) => w.walletCurrency === WalletCurrency.Usd)?.balance.amount ?? 0
   const hasUsdBalance = usdBalanceAmount > 0
   const hasBtcBalance = btcBalanceAmount > 0
-
-  const formatUsdBalanceForDisplay = (cents: number): string => {
-    const usdAmount = toUsdMoneyAmount(cents)
-    if (!convertMoneyAmount) return formatMoneyAmount({ moneyAmount: usdAmount })
-    return formatMoneyAmount({
-      moneyAmount: convertMoneyAmount(usdAmount, DisplayCurrency),
-    })
-  }
 
   const isActivating = pendingDirection === ToggleDirection.Activate
   const sourceBalance = isActivating ? btcBalanceAmount : usdBalanceAmount
@@ -173,7 +165,10 @@ export const StableBalanceSettingsScreen: React.FC = () => {
         deactivationWarning={
           pendingDirection === ToggleDirection.Deactivate && hasUsdBalance
             ? LL.StableBalance.deactivateWarningBody({
-                amount: formatUsdBalanceForDisplay(usdBalanceAmount),
+                amount: formatUsdInDisplay(usdBalanceAmount, {
+                  formatMoneyAmount,
+                  convertMoneyAmount,
+                }),
               })
             : undefined
         }
