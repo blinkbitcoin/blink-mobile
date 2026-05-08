@@ -56,14 +56,26 @@ describe("SparkConfig", () => {
     expect(SparkConfig.storageDir).toBe("/test/documents/breez-sdk-spark-regtest")
   })
 
-  it("reads apiKey and tokenIdentifier from env", () => {
-    const { SparkConfig } = loadConfig({
-      BREEZ_API_KEY: "my-key",
+  it("reads apiKey from env", () => {
+    const { SparkConfig } = loadConfig({ BREEZ_API_KEY: "my-key" })
+
+    expect(SparkConfig.apiKey).toBe("my-key")
+  })
+
+  it("requireSparkTokenIdentifier returns the configured identifier", () => {
+    const { requireSparkTokenIdentifier } = loadConfig({
       SPARK_TOKEN_IDENTIFIER: "my-token",
     })
 
-    expect(SparkConfig.apiKey).toBe("my-key")
-    expect(SparkConfig.tokenIdentifier).toBe("my-token")
+    expect(requireSparkTokenIdentifier()).toBe("my-token")
+  })
+
+  it("requireSparkTokenIdentifier throws a clear error when env is missing", () => {
+    const { requireSparkTokenIdentifier } = loadConfig({ SPARK_TOKEN_IDENTIFIER: "" })
+
+    expect(() => requireSparkTokenIdentifier()).toThrow(
+      "SPARK_TOKEN_IDENTIFIER is not configured for this build",
+    )
   })
 
   it("exports SparkNetworkLabel as 'mainnet' for mainnet", () => {

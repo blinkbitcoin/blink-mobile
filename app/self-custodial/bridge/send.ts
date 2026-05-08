@@ -13,7 +13,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { centsToTokenBaseUnits } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 
-import { SparkConfig, SparkToken } from "../config"
+import { requireSparkTokenIdentifier, SparkToken } from "../config"
 
 const speedFeeTotal = (quote: SendOnchainSpeedFeeQuote): number =>
   toNumber(quote.userFeeSat) + toNumber(quote.l1BroadcastFeeSat)
@@ -85,7 +85,7 @@ export const toSdkSendAmount = (
 export const resolveSendTokenIdentifier = (
   currency: WalletCurrency,
 ): string | undefined =>
-  currency === WalletCurrency.Usd ? SparkConfig.tokenIdentifier || undefined : undefined
+  currency === WalletCurrency.Usd ? requireSparkTokenIdentifier() : undefined
 
 export const executeSend = (
   sdk: BreezSdkInterface,

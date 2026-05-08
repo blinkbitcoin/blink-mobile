@@ -4,7 +4,8 @@ import {
 } from "@app/self-custodial/bridge/token-balance"
 
 jest.mock("@app/self-custodial/config", () => ({
-  SparkConfig: { tokenIdentifier: "test-token-id" },
+  SparkConfig: {},
+  requireSparkTokenIdentifier: () => "test-token-id",
   SparkToken: { DefaultDecimals: 6, Label: "USDB", Ticker: "USDB" },
 }))
 

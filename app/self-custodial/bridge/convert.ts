@@ -22,7 +22,7 @@ import {
 import { centsToTokenBaseUnits } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 
-import { SparkConfig } from "../config"
+import { requireSparkTokenIdentifier, SparkConfig } from "../config"
 
 import { buildConversionType, fetchConversionLimits } from "./limits"
 import { fetchUsdbDecimals } from "./token-balance"
@@ -126,6 +126,7 @@ const prepareConversion = async (
   }
 
   const isBtcToUsd = direction === ConvertDirection.BtcToUsd
+  const tokenIdentifier = isBtcToUsd ? requireSparkTokenIdentifier() : undefined
   const destinationAmount = isBtcToUsd
     ? BigInt(centsToTokenBaseUnits(toAmount.amount, tokenDecimals))
     : BigInt(toAmount.amount)
@@ -133,14 +134,14 @@ const prepareConversion = async (
   const paymentRequest = await createOwnSparkInvoice(
     sdk,
     destinationAmount,
-    isBtcToUsd ? SparkConfig.tokenIdentifier : undefined,
+    tokenIdentifier,
   )
 
   const prepared = await sdk.prepareSendPayment(
     PrepareSendPaymentRequest.create({
       paymentRequest,
       amount: destinationAmount,
-      tokenIdentifier: isBtcToUsd ? SparkConfig.tokenIdentifier : undefined,
+      tokenIdentifier,
       conversionOptions: buildConversionOptions(direction),
     }),
   )

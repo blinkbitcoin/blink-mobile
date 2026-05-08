@@ -25,7 +25,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
-  SparkConfig: { tokenIdentifier: "usdb-token-id" },
+  SparkConfig: {},
+  requireSparkTokenIdentifier: () => "usdb-token-id",
   SparkToken: { Label: "USDB", Ticker: "USDB", DefaultDecimals: 6 },
 }))
 

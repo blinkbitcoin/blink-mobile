@@ -4,6 +4,7 @@ import { ConvertDirection, ConvertErrorCode } from "@app/types/payment.types"
 import { createConvert } from "@app/self-custodial/bridge/convert"
 
 const mockFetchLimits = jest.fn()
+const mockRequireTokenId = jest.fn(() => "usdb-token-id")
 
 jest.mock("@app/self-custodial/bridge/limits", () => {
   const actual = jest.requireActual("@app/self-custodial/bridge/limits")
@@ -14,7 +15,8 @@ jest.mock("@app/self-custodial/bridge/limits", () => {
 })
 
 jest.mock("@app/self-custodial/config", () => ({
-  SparkConfig: { tokenIdentifier: "usdb-token-id", maxSlippageBps: 50 },
+  SparkConfig: { maxSlippageBps: 50 },
+  requireSparkTokenIdentifier: () => mockRequireTokenId(),
   SparkToken: { Label: "USDB", DefaultDecimals: 6 },
 }))
 
@@ -177,5 +179,26 @@ describe("createConvert — error handling", () => {
 
     expect(result.status).toBe("failed")
     expect(result.errors?.[0].message).toBe("send failed")
+  })
+
+  it("propagates the configuration error when SPARK_TOKEN_IDENTIFIER is missing", async () => {
+    mockFetchLimits.mockResolvedValue({ minFromAmount: 0, minToAmount: 0 })
+    mockRequireTokenId.mockImplementationOnce(() => {
+      throw new Error("SPARK_TOKEN_IDENTIFIER is not configured for this build")
+    })
+    const sdk = createSdk()
+
+    const result = await createConvert(sdk as never)({
+      fromAmount: toBtcMoneyAmount(5000),
+      toAmount: toUsdMoneyAmount(137),
+      direction: ConvertDirection.BtcToUsd,
+    })
+
+    expect(result.status).toBe("failed")
+    expect(result.errors?.[0].message).toBe(
+      "SPARK_TOKEN_IDENTIFIER is not configured for this build",
+    )
+    expect(sdk.prepareSendPayment).not.toHaveBeenCalled()
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
   })
 })
