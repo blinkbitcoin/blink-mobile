@@ -134,7 +134,7 @@
     "react-native-keychain": "^10.0.0",
     "react-native-linear-gradient": "^2.8.2",
     "react-native-localize": "^3.1.0",
-    "react-native-maps": "^1.14.0",
+    "react-native-maps": "1.26.0",
     "react-native-modal": "^13.0.0",
     "react-native-nfc-manager": "^3.14.14",
     "react-native-nitro-modules": "0.35.2",
