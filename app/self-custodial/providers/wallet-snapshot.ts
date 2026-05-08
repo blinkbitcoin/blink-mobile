@@ -13,7 +13,7 @@ import { type NormalizedTransaction } from "@app/types/transaction.types"
 import { toWalletId, type WalletState } from "@app/types/wallet.types"
 
 import { findUsdbToken, getWalletInfo, listPayments } from "../bridge"
-import { SparkConfig } from "../config"
+import { requireSparkTokenIdentifier } from "../config"
 import { mapSelfCustodialTransactions } from "../mappers/transaction-mapper"
 
 const TRANSACTIONS_PER_PAGE = 20
@@ -28,7 +28,7 @@ const getStableBalance = (info: GetInfoResponse): number => {
 const isKnownPayment = (payment: Payment): boolean => {
   if (payment.method !== PaymentMethod.Token) return true
   if (!payment.details || !PaymentDetails.Token.instanceOf(payment.details)) return false
-  return payment.details.inner.metadata.identifier === SparkConfig.tokenIdentifier
+  return payment.details.inner.metadata.identifier === requireSparkTokenIdentifier()
 }
 
 type PaymentsPage = {

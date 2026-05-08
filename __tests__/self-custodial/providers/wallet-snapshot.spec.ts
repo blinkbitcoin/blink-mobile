@@ -11,7 +11,8 @@ import {
 
 jest.mock("@app/self-custodial/config", () => ({
   SparkToken: { Label: "USDB", Ticker: "USDB" },
-  SparkConfig: { tokenIdentifier: "test-token-id" },
+  SparkConfig: {},
+  requireSparkTokenIdentifier: () => "test-token-id",
 }))
 
 const createMockSdk = (overrides = {}) => ({

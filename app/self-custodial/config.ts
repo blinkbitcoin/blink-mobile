@@ -32,6 +32,13 @@ export const SparkConfig = {
   network: SparkNetwork,
   storageDir: `${DocumentDirectoryPath}/breez-sdk-spark-${SparkNetworkLabel}`,
   maxSlippageBps: 50,
-  tokenIdentifier: Config.SPARK_TOKEN_IDENTIFIER ?? "",
   apiKey: Config.BREEZ_API_KEY ?? "",
 } as const
+
+export const requireSparkTokenIdentifier = (): string => {
+  const id = Config.SPARK_TOKEN_IDENTIFIER
+  if (!id) {
+    throw new Error("SPARK_TOKEN_IDENTIFIER is not configured for this build")
+  }
+  return id
+}

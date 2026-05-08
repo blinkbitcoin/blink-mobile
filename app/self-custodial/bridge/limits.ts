@@ -7,7 +7,7 @@ import { ConvertDirection, type ConversionLimits } from "@app/types/payment.type
 import { tokenBaseUnitsToCents } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 
-import { SparkConfig } from "../config"
+import { requireSparkTokenIdentifier } from "../config"
 
 import { fetchUsdbDecimals } from "./token-balance"
 
@@ -15,7 +15,7 @@ export const buildConversionType = (direction: ConvertDirection) =>
   direction === ConvertDirection.BtcToUsd
     ? new ConversionType.FromBitcoin()
     : new ConversionType.ToBitcoin({
-        fromTokenIdentifier: SparkConfig.tokenIdentifier,
+        fromTokenIdentifier: requireSparkTokenIdentifier(),
       })
 
 const toWalletUnit = (
@@ -37,7 +37,7 @@ export const fetchConversionLimits = async (
   const isBtcToUsd = direction === ConvertDirection.BtcToUsd
   const response = await sdk.fetchConversionLimits({
     conversionType: buildConversionType(direction),
-    tokenIdentifier: isBtcToUsd ? SparkConfig.tokenIdentifier : undefined,
+    tokenIdentifier: isBtcToUsd ? requireSparkTokenIdentifier() : undefined,
   })
 
   const tokenDecimals = tokenDecimalsHint ?? (await fetchUsdbDecimals(sdk))

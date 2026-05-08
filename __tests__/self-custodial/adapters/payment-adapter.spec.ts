@@ -59,7 +59,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
-  SparkConfig: { tokenIdentifier: "test-token-id", maxSlippageBps: 50 },
+  SparkConfig: { maxSlippageBps: 50 },
+  requireSparkTokenIdentifier: () => "test-token-id",
   SparkToken: { Label: "USDB", DefaultDecimals: 6 },
 }))
 

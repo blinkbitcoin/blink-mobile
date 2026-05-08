@@ -1,8 +1,11 @@
 import { fetchConversionLimits } from "@app/self-custodial/bridge/limits"
 import { ConvertDirection } from "@app/types/payment.types"
 
+const mockRequireTokenId = jest.fn(() => "usdb-token-id")
+
 jest.mock("@app/self-custodial/config", () => ({
-  SparkConfig: { tokenIdentifier: "usdb-token-id" },
+  SparkConfig: {},
+  requireSparkTokenIdentifier: () => mockRequireTokenId(),
 }))
 
 const mockGetInfo = jest.fn().mockResolvedValue({
@@ -81,5 +84,23 @@ describe("fetchConversionLimits", () => {
     )
 
     expect(result).toEqual({ minFromAmount: null, minToAmount: null })
+  })
+
+  it("propagates the configuration error when SPARK_TOKEN_IDENTIFIER is missing", async () => {
+    mockRequireTokenId.mockImplementationOnce(() => {
+      throw new Error("SPARK_TOKEN_IDENTIFIER is not configured for this build")
+    })
+    const fetchConversionLimitsFn = jest.fn()
+
+    await expect(
+      fetchConversionLimits(
+        {
+          fetchConversionLimits: fetchConversionLimitsFn,
+          getInfo: mockGetInfo,
+        } as never,
+        ConvertDirection.BtcToUsd,
+      ),
+    ).rejects.toThrow("SPARK_TOKEN_IDENTIFIER is not configured for this build")
+    expect(fetchConversionLimitsFn).not.toHaveBeenCalled()
   })
 })
