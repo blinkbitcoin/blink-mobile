@@ -422,8 +422,9 @@ describe("SelfCustodialWalletProvider", () => {
     resolveFirst!()
 
     await waitFor(() => {
-      // Initial refresh + event-triggered coalesced refresh
-      // (>=2 because rollout-and-hardening's backoff retry may add 1)
+      // Initial refresh + event-triggered coalesced refresh. The lifecycle hook
+      // may also schedule a backoff/poll-driven refresh, so assert >= 2 rather
+      // than exact 2 to keep the coalescing contract decoupled from retry plumbing.
       expect(getSelfCustodialWalletSnapshot.mock.calls.length).toBeGreaterThanOrEqual(2)
     })
   })
@@ -851,6 +852,8 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
       { wallets: [], hasMore: false },
     )
     const snapshot = getWalletSnapshotMocks()
+    // Keep all retries failing too so the backoff retry from rollout-and-hardening
+    // doesn't flip status back to Ready before the assertion lands.
     snapshot.getSelfCustodialWalletSnapshot.mockRejectedValue(
       new Error("snapshot failed"),
     )
