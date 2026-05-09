@@ -86,6 +86,11 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   },
 }))
 
+const mockSyncSelfCustodialWallet = jest.fn().mockResolvedValue(undefined)
+jest.mock("@app/self-custodial/bridge", () => ({
+  syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
+}))
+
 type ListenerSdk = {
   getPayment: jest.Mock
   listPayments: jest.Mock
@@ -490,6 +495,30 @@ describe("useAutoConvertListener — live trigger", () => {
       sdk,
       expect.objectContaining({ isStableBalanceActive: false }),
     )
+  })
+
+  it("triggers a background syncWallet so the SDK materializes token balances before the convert reads them (Critical #10)", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1sync") }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1sync",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({ paymentRequest: "lnbc1sync" }),
+    )
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalled()
+    })
+    expect(mockSyncSelfCustodialWallet).toHaveBeenCalledWith(sdk)
   })
 })
 

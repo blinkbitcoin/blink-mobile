@@ -32,6 +32,7 @@ import {
   type PendingAutoConvert,
   type WaitForPaymentOptions,
 } from "../auto-convert"
+import { syncSelfCustodialWallet } from "../bridge"
 import { useSelfCustodialWallet } from "../providers/wallet-provider"
 
 /**
@@ -113,6 +114,12 @@ type RunAutoConvertParams = {
   claimedConversionIds: ReadonlySet<string>
 }
 
+const triggerBackgroundSync = (sdk: BreezSdkInterface): void => {
+  syncSelfCustodialWallet(sdk).catch((err) => {
+    reportError(err, "auto-convert-listener syncWallet")
+  })
+}
+
 const runAutoConvert = async ({
   sdk,
   record,
@@ -130,6 +137,8 @@ const runAutoConvert = async ({
     await removePendingAutoConvert(record.paymentRequest)
     return
   }
+
+  triggerBackgroundSync(sdk)
 
   const settled = await waitForPaymentCompleted(sdk, paymentId, waitOptions)
   if (!settled) return

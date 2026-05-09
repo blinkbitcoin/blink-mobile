@@ -6,7 +6,12 @@ export {
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
 } from "./lifecycle"
-export { getWalletInfo, listPayments, getUserSettings } from "./wallet"
+export {
+  getWalletInfo,
+  listPayments,
+  getUserSettings,
+  syncSelfCustodialWallet,
+} from "./wallet"
 export { getSparkStatus } from "./status"
 export { activateStableBalance, deactivateStableBalance } from "./stable-balance"
 export { createReceiveLightning, createReceiveOnchain } from "./receive"
