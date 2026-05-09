@@ -88,6 +88,8 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     }
     refreshingRef.current = true
 
+    const isStale = () => sdkRef.current !== sdk
+
     const runOnce = async () => {
       try {
         const snapshot = await withTimeout(
@@ -95,6 +97,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
           STATUS_TIMEOUT_MS,
           "wallet snapshot",
         )
+        if (isStale()) return
         setWallets(snapshot.wallets)
         setHasMoreTransactions(snapshot.hasMore)
         rawTxOffsetRef.current = snapshot.rawTransactionCount // eslint-disable-line require-atomic-updates
@@ -106,6 +109,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
           err instanceof Error ? err : new Error(`Refresh failed: ${err}`),
         )
         const onlineState = await getOnlineState()
+        if (isStale()) return
         setStatus((prev) => {
           if (OFFLINE_EXEMPT_STATUSES.includes(prev)) return prev
           if (onlineState === OnlineState.Offline) return ActiveWalletStatus.Offline

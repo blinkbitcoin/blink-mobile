@@ -1286,3 +1286,69 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     })
   })
 })
+
+describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockGetMnemonic.mockResolvedValue(null)
+    mockGetMnemonicNetwork.mockResolvedValue("regtest")
+    mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
+    mockDisconnectSdk.mockResolvedValue(undefined)
+    mockAddSdkEventListener.mockResolvedValue("listener-id")
+    mockGetUserSettings.mockResolvedValue({
+      stableBalanceActiveLabel: undefined,
+      sparkPrivateModeEnabled: false,
+    })
+  })
+
+  it("ignores a stale snapshot that resolves after the SDK was replaced", async () => {
+    setupConnectedWallet(
+      {
+        getMnemonic: mockGetMnemonic,
+        initSdk: mockInitSdk,
+        addSdkEventListener: mockAddSdkEventListener,
+      },
+      { wallets: [], hasMore: false },
+    )
+    const snapshot = getWalletSnapshotMocks()
+
+    type StaleResolver = (value: {
+      wallets: unknown[]
+      hasMore: boolean
+      rawTransactionCount: number
+    }) => void
+    let resolveStale: StaleResolver | null = null
+    snapshot.getSelfCustodialWalletSnapshot.mockImplementationOnce(
+      () =>
+        new Promise<never>((resolve) => {
+          resolveStale = resolve as unknown as StaleResolver
+        }),
+    )
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => expect(mockAddSdkEventListener).toHaveBeenCalled())
+
+    act(() => {
+      result.current.retry()
+    })
+
+    await waitFor(() => expect(mockDisconnectSdk).toHaveBeenCalled())
+
+    snapshot.getSelfCustodialWalletSnapshot.mockResolvedValue({
+      wallets: [],
+      hasMore: false,
+      rawTransactionCount: 0,
+    })
+
+    await act(async () => {
+      resolveStale?.({
+        wallets: [{ id: "stale" }],
+        hasMore: true,
+        rawTransactionCount: 99,
+      })
+    })
+
+    expect(result.current.hasMoreTransactions).toBe(false)
+  })
+})
