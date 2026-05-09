@@ -5,6 +5,7 @@ import {
   getServiceStatus,
   isOnline,
   isOnlineStatus,
+  STATUS_TIMEOUT_MS,
 } from "@app/self-custodial/providers/is-online"
 
 const mockGetSparkStatus = jest.fn()
@@ -26,6 +27,12 @@ const loadFreshIsOnlineModule = () => {
   })
   return mod!
 }
+
+describe("STATUS_TIMEOUT_MS", () => {
+  it("exposes the shared spark-status timeout for callers that share the budget", () => {
+    expect(STATUS_TIMEOUT_MS).toBe(5000)
+  })
+})
 
 describe("getServiceStatus", () => {
   beforeEach(() => {

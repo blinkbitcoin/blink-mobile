@@ -8,6 +8,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet.types"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { toastShow } from "@app/utils/toast"
+import { withTimeout } from "@app/utils/with-timeout"
 
 import { addSdkEventListener, disconnectSdk, getUserSettings, initSdk } from "../bridge"
 import { logSdkEvent, SdkLogLevel } from "../logging"
@@ -15,7 +16,7 @@ import { logSdkEvent, SdkLogLevel } from "../logging"
 import { detectBalanceStale } from "./detect-balance-stale"
 import { extractPaymentId, PAYMENT_RECEIVED_EVENTS, REFRESH_EVENTS } from "./sdk-events"
 import { validateStoredNetwork } from "./validate-network"
-import { getOnlineState, OnlineState } from "./is-online"
+import { getOnlineState, OnlineState, STATUS_TIMEOUT_MS } from "./is-online"
 import {
   appendTransactions,
   getSelfCustodialWalletSnapshot,
@@ -89,7 +90,11 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
 
     const runOnce = async () => {
       try {
-        const snapshot = await getSelfCustodialWalletSnapshot(sdk, rawTxOffsetRef.current)
+        const snapshot = await withTimeout(
+          getSelfCustodialWalletSnapshot(sdk, rawTxOffsetRef.current),
+          STATUS_TIMEOUT_MS,
+          "wallet snapshot",
+        )
         setWallets(snapshot.wallets)
         setHasMoreTransactions(snapshot.hasMore)
         rawTxOffsetRef.current = snapshot.rawTransactionCount // eslint-disable-line require-atomic-updates
