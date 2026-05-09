@@ -7,6 +7,12 @@ jest.mock("@app/hooks/use-backup-nudge-state", () => ({
   }),
 }))
 
+const mockUseIsAuthed = jest.fn(() => true)
+jest.mock("@app/graphql/is-authed-context", () => ({
+  ...jest.requireActual("@app/graphql/is-authed-context"),
+  useIsAuthed: () => mockUseIsAuthed(),
+}))
+
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
 import { act, fireEvent, render, screen, within } from "@testing-library/react-native"
@@ -553,5 +559,51 @@ describe("Settings Screen", () => {
     )
 
     expect(screen.queryByTestId("Recovery method-group")).toBeNull()
+  })
+
+  it("skips the unread-notifications query when not authenticated", async () => {
+    mockUseIsAuthed.mockReturnValue(false)
+    const generated = jest.requireMock("@app/graphql/generated")
+    generated.useUnacknowledgedNotificationCountQuery.mockClear()
+
+    render(
+      <ContextForScreen>
+        <SettingsScreen />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(generated.useUnacknowledgedNotificationCountQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ skip: true }),
+    )
+  })
+
+  it("runs the unread-notifications query when authenticated", async () => {
+    mockUseIsAuthed.mockReturnValue(true)
+    const generated = jest.requireMock("@app/graphql/generated")
+    generated.useUnacknowledgedNotificationCountQuery.mockClear()
+
+    render(
+      <ContextForScreen>
+        <SettingsScreen />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(generated.useUnacknowledgedNotificationCountQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ skip: false }),
+    )
   })
 })
