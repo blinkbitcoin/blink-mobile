@@ -473,3 +473,85 @@ describe("SendBitcoinConfirmationScreen — Critical #4 fee-currency conversion"
     expect(screen.getByText(/exceeds your balance/i)).toBeTruthy()
   })
 })
+
+describe("SendBitcoinConfirmationScreen — Critical #5 skipBalanceCheck matrix", () => {
+  beforeEach(() => {
+    // Settlement $11.00 (1100 cents) is always over the $10.00 (1000 cents) balance.
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 0,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 1000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+  })
+
+  it("(isSendingMax=false, hasAttemptedSend=false) over balance — slider disabled + amountExceed shown", async () => {
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(1100)} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.getByText(/exceeds your balance/i)).toBeTruthy()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
+  })
+
+  it("(isSendingMax=true, hasAttemptedSend=false) over balance — slider enabled + no error", async () => {
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(1100, { isSendingMax: true })} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+
+  it("(isSendingMax=false, hasAttemptedSend=true) over balance — slider disabled + no error", async () => {
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: true,
+      sendPayment: sendPaymentMock,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(1100)} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
+  })
+})
