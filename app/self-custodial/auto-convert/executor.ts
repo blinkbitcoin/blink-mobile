@@ -35,6 +35,8 @@ export type ExecuteAutoConvertParams = {
    * amount. Defaults to {@link DEFAULT_AMOUNT_MATCH_TOLERANCE_BPS}.
    */
   amountMatchToleranceBps?: number
+  /** Conversion paymentIds already paired with another receive; excluded from amount-tolerance dedup. */
+  claimedConversionIds?: ReadonlySet<string>
 }
 
 const sleep = (ms: number): Promise<void> =>
@@ -119,6 +121,7 @@ type PriorConversionMatch = {
   satsAmount: number
   recordCreatedAtMs: number
   toleranceBps: number
+  claimedConversionIds: ReadonlySet<string>
 }
 
 const hasAlreadyConverted = async (
@@ -132,12 +135,41 @@ const hasAlreadyConverted = async (
     return response.payments.some((payment) => {
       const details = payment.conversionDetails
       if (!details || details.status !== ConversionStatus.Completed) return false
+
+      if (match.claimedConversionIds.has(payment.id)) return false
+
       const paymentMs = Number(payment.timestamp) * 1000
       if (paymentMs < match.recordCreatedAtMs) return false
+
       return matchesConversionAmount(payment, match.satsAmount, match.toleranceBps)
     })
   } catch {
     return false
+  }
+}
+
+/** Picks the most recent unclaimed completed conversion within tolerance, for pairing. */
+export const findRecentConversionId = async (
+  sdk: BreezSdkInterface,
+  match: {
+    satsAmount: number
+    toleranceBps: number
+    claimedConversionIds: ReadonlySet<string>
+  },
+): Promise<string | undefined> => {
+  try {
+    const response = await sdk.listPayments(
+      ListPaymentsRequest.create({ offset: 0, limit: 50 }),
+    )
+    const candidate = response.payments.find((payment) => {
+      const details = payment.conversionDetails
+      if (!details || details.status !== ConversionStatus.Completed) return false
+      if (match.claimedConversionIds.has(payment.id)) return false
+      return matchesConversionAmount(payment, match.satsAmount, match.toleranceBps)
+    })
+    return candidate?.id
+  } catch {
+    return undefined
   }
 }
 
@@ -160,6 +192,7 @@ export const executeAutoConvert = async (
     satsAmount: params.satsAmount,
     recordCreatedAtMs: params.recordCreatedAtMs,
     toleranceBps,
+    claimedConversionIds: params.claimedConversionIds ?? new Set(),
   })
   if (alreadyConverted) {
     return { status: AutoConvertStatus.AlreadyConverted }

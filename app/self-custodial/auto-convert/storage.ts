@@ -1,12 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import crashlytics from "@react-native-firebase/crashlytics"
 
-import type { PendingAutoConvert } from "./types"
+import type { AutoConvertPairing, PendingAutoConvert } from "./types"
 
 const PENDING_STORAGE_KEY = "selfCustodialAutoConvertPending"
+const PAIRINGS_STORAGE_KEY = "selfCustodialAutoConvertPairings"
 
 /** Exceeds the default 12h Bolt11 expiry so invoices aren't dropped early. */
 const RECORD_TTL_MS = 24 * 60 * 60 * 1000
+
+/** Long enough for orphan replays; bounded so the persisted set stays small. */
+const PAIRING_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
 const reportError = (err: unknown, context: string): void => {
   crashlytics().recordError(err instanceof Error ? err : new Error(`${context}: ${err}`))
@@ -122,4 +126,57 @@ export const pruneExpiredAutoConverts = (nowMs: number): Promise<void> =>
     const fresh = records.filter((r) => nowMs - r.createdAtMs < RECORD_TTL_MS)
     if (fresh.length === records.length) return
     await writeAll(fresh)
+  })
+
+const isAutoConvertPairing = (value: unknown): value is AutoConvertPairing => {
+  if (!value || typeof value !== "object") return false
+  const candidate = value as Record<string, unknown>
+  return (
+    typeof candidate.receivePaymentId === "string" &&
+    typeof candidate.conversionPaymentId === "string" &&
+    typeof candidate.pairedAtMs === "number"
+  )
+}
+
+const readPairings = async (): Promise<AutoConvertPairing[]> => {
+  try {
+    const raw = await AsyncStorage.getItem(PAIRINGS_STORAGE_KEY)
+    if (!raw) return []
+    const parsed: unknown = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter(isAutoConvertPairing)
+  } catch (err) {
+    reportError(err, "auto-convert-storage: readPairings failed")
+    return []
+  }
+}
+
+const writePairings = async (pairings: AutoConvertPairing[]): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(PAIRINGS_STORAGE_KEY, JSON.stringify(pairings))
+  } catch (err) {
+    reportError(err, "auto-convert-storage: writePairings failed")
+  }
+}
+
+export const listAutoConvertPairings = (): Promise<AutoConvertPairing[]> => readPairings()
+
+export const markAutoConvertPairing = (pairing: AutoConvertPairing): Promise<void> =>
+  withWriteLock(async () => {
+    const pairings = await readPairings()
+    const deduplicated = pairings.filter(
+      (p) =>
+        p.receivePaymentId !== pairing.receivePaymentId &&
+        p.conversionPaymentId !== pairing.conversionPaymentId,
+    )
+    deduplicated.push(pairing)
+    await writePairings(deduplicated)
+  })
+
+export const pruneExpiredAutoConvertPairings = (nowMs: number): Promise<void> =>
+  withWriteLock(async () => {
+    const pairings = await readPairings()
+    const fresh = pairings.filter((p) => nowMs - p.pairedAtMs < PAIRING_TTL_MS)
+    if (fresh.length === pairings.length) return
+    await writePairings(fresh)
   })

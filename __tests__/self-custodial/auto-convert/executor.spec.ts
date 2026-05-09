@@ -3,6 +3,7 @@ import { ConvertErrorCode, PaymentResultStatus } from "@app/types/payment.types"
 import {
   executeAutoConvert,
   fetchAutoConvertMinSats,
+  findRecentConversionId,
   waitForPaymentCompleted,
 } from "@app/self-custodial/auto-convert/executor"
 
@@ -287,5 +288,140 @@ describe("executeAutoConvert", () => {
 
     expect(outcome).toEqual({ status: "converted" })
     await flushPromises()
+  })
+
+  it("excludes already-claimed conversion ids from the prior-match check (Critical #2)", async () => {
+    mockGetConversionQuote.mockResolvedValue(successQuote())
+
+    // The only matching payment in history is already paired to another receive,
+    // so the executor must not treat it as a prior conversion for THIS receive.
+    const outcome = await executeAutoConvert(
+      sdkWith([
+        {
+          id: "conv-paired-elsewhere",
+          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          timestamp: 2000n,
+        },
+      ]),
+      { ...baseParams, claimedConversionIds: new Set(["conv-paired-elsewhere"]) },
+    )
+
+    expect(outcome).toEqual({ status: "converted" })
+    expect(mockGetConversionQuote).toHaveBeenCalled()
+  })
+
+  it("still detects an unclaimed prior conversion when other ids are claimed", async () => {
+    const outcome = await executeAutoConvert(
+      sdkWith([
+        {
+          id: "conv-paired-elsewhere",
+          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          timestamp: 2000n,
+        },
+        {
+          id: "conv-unclaimed",
+          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+          timestamp: 2000n,
+        },
+      ]),
+      { ...baseParams, claimedConversionIds: new Set(["conv-paired-elsewhere"]) },
+    )
+
+    expect(outcome).toEqual({ status: "already-converted" })
+    expect(mockGetConversionQuote).not.toHaveBeenCalled()
+  })
+})
+
+describe("findRecentConversionId", () => {
+  const sdkWith = (payments: unknown[]) =>
+    ({
+      listPayments: jest.fn().mockResolvedValue({ payments }),
+    }) as never
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("returns the id of the first completed conversion within tolerance", async () => {
+    const id = await findRecentConversionId(
+      sdkWith([
+        {
+          id: "conv-1",
+          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+        },
+      ]),
+      { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
+    )
+
+    expect(id).toBe("conv-1")
+  })
+
+  it("skips conversions already claimed by another receive", async () => {
+    const id = await findRecentConversionId(
+      sdkWith([
+        {
+          id: "conv-claimed",
+          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+        },
+        {
+          id: "conv-fresh",
+          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+        },
+      ]),
+      {
+        satsAmount: 5000,
+        toleranceBps: 500,
+        claimedConversionIds: new Set(["conv-claimed"]),
+      },
+    )
+
+    expect(id).toBe("conv-fresh")
+  })
+
+  it("ignores non-completed and non-conversion payments", async () => {
+    const id = await findRecentConversionId(
+      sdkWith([
+        { id: "p-no-conversion", conversionDetails: undefined },
+        {
+          id: "p-pending",
+          conversionDetails: { status: "Pending", from: { amount: 5000n } },
+        },
+        {
+          id: "conv-real",
+          conversionDetails: { status: "Completed", from: { amount: 5000n } },
+        },
+      ]),
+      { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
+    )
+
+    expect(id).toBe("conv-real")
+  })
+
+  it("returns undefined when no conversion matches within tolerance", async () => {
+    const id = await findRecentConversionId(
+      sdkWith([
+        {
+          id: "conv-far",
+          conversionDetails: { status: "Completed", from: { amount: 10_000n } },
+        },
+      ]),
+      { satsAmount: 5000, toleranceBps: 500, claimedConversionIds: new Set() },
+    )
+
+    expect(id).toBeUndefined()
+  })
+
+  it("returns undefined when listPayments fails (fail-open for the caller)", async () => {
+    const sdk = {
+      listPayments: jest.fn().mockRejectedValue(new Error("network")),
+    }
+
+    const id = await findRecentConversionId(sdk as never, {
+      satsAmount: 5000,
+      toleranceBps: 500,
+      claimedConversionIds: new Set(),
+    })
+
+    expect(id).toBeUndefined()
   })
 })
