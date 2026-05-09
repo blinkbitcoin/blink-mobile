@@ -24,7 +24,7 @@ type SdkLifecycleState = {
   wallets: WalletState[]
   status: ActiveWalletStatus
   sdk: BreezSdkInterface | null
-  isStableBalanceActive: boolean
+  isStableBalanceActive?: boolean
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
   loadingMore: boolean
@@ -41,7 +41,7 @@ const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
 export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
-  const [isStableBalanceActive, setIsStableBalanceActive] = useState(false)
+  const [isStableBalanceActive, setIsStableBalanceActive] = useState<boolean>()
   const [lastReceivedPaymentId, setLastReceivedPaymentId] = useState<string | null>(null)
   const [hasMoreTransactions, setHasMoreTransactions] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)

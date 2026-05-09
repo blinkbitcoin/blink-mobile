@@ -41,7 +41,7 @@ export const StableBalanceSettingsScreen: React.FC = () => {
 
   const { busy, displayValue, switchKey, apply, resyncSwitch } = useStableBalanceToggle({
     sdk,
-    isStableBalanceActive,
+    isStableBalanceActive: isStableBalanceActive ?? false,
     refreshWallets,
     refreshStableBalanceActive,
     LL,

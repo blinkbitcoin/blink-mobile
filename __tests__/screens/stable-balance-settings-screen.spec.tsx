@@ -170,6 +170,13 @@ describe("StableBalanceSettingsScreen", () => {
     expect(getByText("Holding USD")).toBeTruthy()
   })
 
+  it("renders without crashing when isStableBalanceActive is undefined (Critical #7 boot-window)", () => {
+    mockWallet.mockReturnValue({ ...baseContext, isStableBalanceActive: undefined })
+    const { getByText } = renderScreen()
+
+    expect(getByText("Stable Balance")).toBeTruthy()
+  })
+
   it("activates directly when BTC balance is zero (no conversion needed)", async () => {
     const { getByTestId, queryByTestId } = renderScreen()
 

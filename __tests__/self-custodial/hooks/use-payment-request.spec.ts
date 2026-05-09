@@ -84,6 +84,7 @@ describe("usePaymentRequest", () => {
       assetMode: "bitcoin",
       setAssetMode: jest.fn(),
       isToggleDisabled: false,
+      loading: false,
     })
   })
 
@@ -498,6 +499,7 @@ describe("usePaymentRequest", () => {
         assetMode: "dollar",
         setAssetMode: jest.fn(),
         isToggleDisabled: true,
+        loading: false,
       })
 
       const { result } = renderHook(() => usePaymentRequest())
@@ -507,6 +509,57 @@ describe("usePaymentRequest", () => {
       })
 
       expect(result.current?.isAssetToggleDisabled).toBe(true)
+    })
+  })
+
+  describe("Critical #7 — defers invoice generation while settings are loading", () => {
+    it("does not call the receive adapter while useReceiveAssetMode reports loading", async () => {
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "bitcoin",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: false,
+        loading: true,
+      })
+
+      renderHook(() => usePaymentRequest())
+
+      // Give any pending microtasks a chance to flush.
+      await new Promise((resolve) => {
+        setTimeout(resolve, 10)
+      })
+
+      expect(mockReceiveLightning).not.toHaveBeenCalled()
+      expect(mockAddPendingAutoConvert).not.toHaveBeenCalled()
+    })
+
+    it("generates the invoice once loading flips to false", async () => {
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "dollar",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: true,
+        loading: true,
+      })
+
+      const { rerender } = renderHook(() => usePaymentRequest())
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, 10)
+      })
+      expect(mockReceiveLightning).not.toHaveBeenCalled()
+      expect(mockAddPendingAutoConvert).not.toHaveBeenCalled()
+
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "dollar",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: true,
+        loading: false,
+      })
+      rerender({})
+
+      await waitFor(() => {
+        expect(mockReceiveLightning).toHaveBeenCalled()
+      })
+      expect(mockAddPendingAutoConvert).toHaveBeenCalled()
     })
   })
 })

@@ -57,6 +57,69 @@ describe("useReceiveAssetMode", () => {
     })
   })
 
+  describe("loading flag (Critical #7 boot window)", () => {
+    it("is true while isStableBalanceActive is undefined and assetMode placeholder is Bitcoin", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: undefined })
+      const { result } = renderHook(() => useReceiveAssetMode())
+      expect(result.current.loading).toBe(true)
+      expect(result.current.assetMode).toBe("bitcoin")
+      expect(result.current.isToggleDisabled).toBe(false)
+    })
+
+    it("flips to false and re-aligns to Dollar when settings resolve to active", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: undefined })
+      const { result, rerender } = renderHook(() => useReceiveAssetMode())
+
+      expect(result.current.loading).toBe(true)
+      expect(result.current.assetMode).toBe("bitcoin")
+
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: true })
+      rerender({})
+
+      expect(result.current.loading).toBe(false)
+      expect(result.current.assetMode).toBe("dollar")
+      expect(result.current.isToggleDisabled).toBe(true)
+    })
+
+    it("flips to false and keeps Bitcoin when settings resolve to inactive", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: undefined })
+      const { result, rerender } = renderHook(() => useReceiveAssetMode())
+
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
+      rerender({})
+
+      expect(result.current.loading).toBe(false)
+      expect(result.current.assetMode).toBe("bitcoin")
+      expect(result.current.isToggleDisabled).toBe(false)
+    })
+
+    it("exposes both modes on Lightning while loading (no premature restriction)", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: undefined })
+      const { result } = renderHook(() => useReceiveAssetMode())
+      expect(result.current.availableModesForRail("lightning")).toEqual([
+        "bitcoin",
+        "dollar",
+      ])
+    })
+
+    it("restricts the Onchain rail to Bitcoin even while loading", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: undefined })
+      const { result } = renderHook(() => useReceiveAssetMode())
+      expect(result.current.availableModesForRail("onchain")).toEqual(["bitcoin"])
+    })
+
+    it("setAssetMode applies during loading so the user can pre-select", () => {
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: undefined })
+      const { result } = renderHook(() => useReceiveAssetMode())
+
+      expect(result.current.assetMode).toBe("bitcoin")
+      act(() => {
+        result.current.setAssetMode("dollar")
+      })
+      expect(result.current.assetMode).toBe("dollar")
+    })
+  })
+
   describe("availableModesForRail", () => {
     it("restricts the Onchain rail to Bitcoin regardless of asset mode", () => {
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })

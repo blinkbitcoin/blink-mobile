@@ -464,6 +464,33 @@ describe("useAutoConvertListener — live trigger", () => {
     })
     expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
   })
+
+  it("coerces undefined isStableBalanceActive to false so the executor still runs (Critical #7 boot-window)", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1boot", 5000n) }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1boot",
+      isStableBalanceActive: undefined,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({ paymentRequest: "lnbc1boot" }),
+    )
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
+    expect(mockExecuteAutoConvert).toHaveBeenCalledWith(
+      sdk,
+      expect.objectContaining({ isStableBalanceActive: false }),
+    )
+  })
 })
 
 describe("useAutoConvertListener — mount replay", () => {
