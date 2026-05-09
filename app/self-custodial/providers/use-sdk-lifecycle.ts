@@ -113,6 +113,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
             crashlytics().log(
               `[SparkSDK] connectivity check failed; preserving previous status`,
             )
+            if (prev === ActiveWalletStatus.Loading) return ActiveWalletStatus.Error
             return prev
           }
           if (prev === ActiveWalletStatus.Ready || prev === ActiveWalletStatus.Offline) {

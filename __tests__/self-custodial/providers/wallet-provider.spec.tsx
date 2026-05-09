@@ -635,6 +635,32 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     jest.useRealTimers()
   })
 
+  it("transitions out of Loading to Error when both snapshot and connectivity check fail (Critical #4)", async () => {
+    const isOnline = jest.requireMock("@app/self-custodial/providers/is-online")
+    isOnline.getOnlineState.mockResolvedValueOnce("unknown")
+
+    setupConnectedWallet(
+      {
+        getMnemonic: mockGetMnemonic,
+        initSdk: mockInitSdk,
+        addSdkEventListener: mockAddSdkEventListener,
+      },
+      { wallets: [], hasMore: false },
+    )
+    const snapshot = getWalletSnapshotMocks()
+    snapshot.getSelfCustodialWalletSnapshot.mockRejectedValueOnce(
+      new Error("snapshot failed"),
+    )
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Error)
+    })
+
+    expect(result.current.status).not.toBe(ActiveWalletStatus.Loading)
+  })
+
   it("loadMore calls loadMoreTransactions and appends via appendTransactions", async () => {
     setupConnectedWallet(
       {
