@@ -53,12 +53,14 @@ export const useBackupConfirm = ({
 
   useEffect(() => {
     if (disabled) return undefined
-    if (allCorrect && !hasCompleted.current) {
-      hasCompleted.current = true
-      const timer = setTimeout(onComplete, AUTO_NAVIGATE_DELAY_MS)
-      return () => clearTimeout(timer)
+    if (!allCorrect) {
+      hasCompleted.current = false
+      return undefined
     }
-    return undefined
+    if (hasCompleted.current) return undefined
+    hasCompleted.current = true
+    const timer = setTimeout(onComplete, AUTO_NAVIGATE_DELAY_MS)
+    return () => clearTimeout(timer)
   }, [allCorrect, disabled, onComplete])
 
   return {
