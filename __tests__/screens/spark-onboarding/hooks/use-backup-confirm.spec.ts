@@ -187,4 +187,21 @@ describe("useBackupConfirm", () => {
 
     expect(mockOnComplete).toHaveBeenCalledTimes(1)
   })
+
+  it("re-arms the auto-advance timer after a de-correct then re-correct sequence (Critical #6)", () => {
+    const { result } = renderHook(() =>
+      useBackupConfirm({ challenges, onComplete: mockOnComplete }),
+    )
+
+    act(() => result.current.selectSuggestion(0, "youth"))
+    act(() => result.current.selectSuggestion(1, "bundle"))
+    act(() => result.current.selectSuggestion(2, "harvest"))
+
+    act(() => result.current.updateInput(2, "wrong"))
+
+    act(() => result.current.selectSuggestion(2, "harvest"))
+    act(() => jest.advanceTimersByTime(500))
+
+    expect(mockOnComplete).toHaveBeenCalledTimes(1)
+  })
 })
