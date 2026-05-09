@@ -7523,6 +7523,10 @@ type RootTranslation = {
 		 */
 		notifications: string
 		/**
+		 * R​e​c​o​v​e​r​y​ ​m​e​t​h​o​d
+		 */
+		recoveryMethod: string
+		/**
 		 * S​e​t​t​i​n​g​s
 		 */
 		title: string
@@ -11557,7 +11561,7 @@ type RootTranslation = {
 			}
 			Phrase: {
 				/**
-				 * Y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+				 * B​a​c​k​u​p​ ​p​h​r​a​s​e
 				 */
 				headerTitle: string
 				/**
@@ -11611,6 +11615,10 @@ type RootTranslation = {
 				 * C​o​n​f​i​r​m
 				 */
 				confirm: string
+				/**
+				 * I​n​c​o​r​r​e​c​t​ ​w​o​r​d​,​ ​p​l​e​a​s​e​ ​c​h​e​c​k​ ​t​h​e​ ​o​r​d​e​r
+				 */
+				incorrectWord: string
 			}
 			Success: {
 				/**
@@ -11726,7 +11734,7 @@ type RootTranslation = {
 		 */
 		enterWord: string
 		/**
-		 * I​n​v​a​l​i​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​w​o​r​d​s​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 * I​n​v​a​l​i​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​i​f​ ​t​h​e​ ​w​o​r​d​ ​o​r​d​e​r​ ​i​s​ ​c​o​r​r​e​c​t​.
 		 */
 		invalidMnemonic: string
 		/**
@@ -19531,6 +19539,10 @@ export type TranslationFunctions = {
 		 */
 		notifications: () => LocalizedString
 		/**
+		 * Recovery method
+		 */
+		recoveryMethod: () => LocalizedString
+		/**
 		 * Settings
 		 */
 		title: () => LocalizedString
@@ -23494,7 +23506,7 @@ export type TranslationFunctions = {
 			}
 			Phrase: {
 				/**
-				 * Your backup phrase
+				 * Backup phrase
 				 */
 				headerTitle: () => LocalizedString
 				/**
@@ -23547,6 +23559,10 @@ export type TranslationFunctions = {
 				 * Confirm
 				 */
 				confirm: () => LocalizedString
+				/**
+				 * Incorrect word, please check the order
+				 */
+				incorrectWord: () => LocalizedString
 			}
 			Success: {
 				/**
@@ -23662,7 +23678,7 @@ export type TranslationFunctions = {
 		 */
 		enterWord: () => LocalizedString
 		/**
-		 * Invalid backup phrase. Please check your words and try again.
+		 * Invalid backup phrase. Please check if the word order is correct.
 		 */
 		invalidMnemonic: () => LocalizedString
 		/**

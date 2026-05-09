@@ -2329,6 +2329,7 @@
     "addressScreen": "Engeri y'okusasulwa",
     "tapUserName": "Koona okuteeka erinnya ly'omukozesa",
     "notifications": "Okumanyisibwa",
+    "recoveryMethod": "Engeri y'okuzzaawo",
     "title": "Ensengeka",
     "darkMode": "Endabika Y'ekizikiza",
     "setToDark": "Endabika: y'ekizikiza.",
@@ -3470,7 +3471,7 @@
         "check3": "Tewali muntu ansaba ebikwata ku bino ku bubaka oba ku ssimu"
       },
       "Phrase": {
-        "headerTitle": "Ekigambo kyo eky'okukoppa",
+        "headerTitle": "Ebigambo by'enkalakkalira",
         "sparkCompatible": "Ekigambo kino eky'okukoppa kikola mu {sparkCompatibleLink} yonna",
         "sparkCompatibleLink": "nsawo eyekuvaanyizibwa ne Spark",
         "copiedToast": "Ekigambo eky'okukoppa kiwanduukuliddwa ku lutimbe",
@@ -3484,7 +3485,8 @@
         "subtitle": "Okukebera mangu oba wakiwandiika bulungi",
         "enterWord": "Yingiza ekigambo",
         "enterWords": "Yingiza ebigambo",
-        "confirm": "Kakasa"
+        "confirm": "Kakasa",
+        "incorrectWord": "Ekigambo si kituufu, tunuulira enkola"
       },
       "Success": {
         "title": "Tukulabiriza ku Blink etali ya kuzibika"
@@ -3542,7 +3544,7 @@
     "nextWords": "Ebigambo 6 ebiddako",
     "paste": "Teeka",
     "enterWord": "Ekigambo",
-    "invalidMnemonic": "Ekigambo ky'okukuuma si kituufu. Kebera ebigambo byo oddemu.",
+    "invalidMnemonic": "Ebigambo by'enkalakkalira tebituufu. Kakasa nti omulongo gw'ebigambo gwa kituufu.",
     "restoring": "Ezzaawo wallet yo...",
     "restoreSuccess": "Wallet eddiziddwamu bulungi",
     "restoreFailed": "Okuzzaawo wallet kulemye. Gezaako nate.",

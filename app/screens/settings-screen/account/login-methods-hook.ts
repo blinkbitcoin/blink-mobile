@@ -1,7 +1,12 @@
 import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
 
 export const useLoginMethods = () => {
-  const { data } = useSettingsScreenQuery({ fetchPolicy: "cache-and-network" })
+  const isAuthed = useIsAuthed()
+  const { data } = useSettingsScreenQuery({
+    skip: !isAuthed,
+    fetchPolicy: "cache-and-network",
+  })
 
   const email = data?.me?.email?.address || undefined
   const emailVerified = Boolean(email && data?.me?.email?.verified)

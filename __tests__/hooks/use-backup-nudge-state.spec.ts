@@ -21,6 +21,18 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => mockRemoteConfig(),
 }))
 
+const SATS_PER_USD_CENT = 10
+
+jest.mock("@app/components/balance-header/use-total-balance", () => ({
+  useTotalBalance: (wallets: Array<{ walletCurrency: string; balance: number }>) => ({
+    satsBalance: wallets.reduce((sum, w) => {
+      if (w.walletCurrency === "BTC") return sum + w.balance
+      if (w.walletCurrency === "USD") return sum + w.balance * 10
+      return sum
+    }, 0),
+  }),
+}))
+
 jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: (...args: string[]) => mockGetItem(...args),
   setItem: (...args: string[]) => mockSetItem(...args),
@@ -30,11 +42,11 @@ const defaultBackupState = { backupState: { status: "none", method: null } }
 const completedBackupState = { backupState: { status: "completed", method: "manual" } }
 const selfCustodialWallet = {
   accountType: "self-custodial",
-  wallets: [{ walletCurrency: "BTC", balance: { amount: 3000 } }],
+  wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 3000 } }],
 }
 const custodialWallet = {
   accountType: "custodial",
-  wallets: [{ walletCurrency: "BTC", balance: { amount: 50000 } }],
+  wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 50000 } }],
 }
 const defaultConfig = {
   backupNudgeBannerThreshold: 2100,
@@ -51,14 +63,21 @@ describe("useBackupNudgeState", () => {
     mockSetItem.mockResolvedValue(undefined)
   })
 
-  it("returns false for all flags before loaded resolves", () => {
+  it("hides banner and modal while dismissal-load is pending", () => {
     mockGetItem.mockReturnValue(new Promise(() => {}))
 
     const { result } = renderHook(() => useBackupNudgeState())
 
     expect(result.current.shouldShowBanner).toBe(false)
     expect(result.current.shouldShowModal).toBe(false)
-    expect(result.current.shouldShowSettingsBanner).toBe(false)
+  })
+
+  it("shows settings banner without waiting for dismissal-load", () => {
+    mockGetItem.mockReturnValue(new Promise(() => {}))
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    expect(result.current.shouldShowSettingsBanner).toBe(true)
   })
 
   it("shows banner when balance >= banner threshold and not backed up", async () => {
@@ -73,7 +92,7 @@ describe("useBackupNudgeState", () => {
   it("shows modal when balance >= modal threshold", async () => {
     mockActiveWallet.mockReturnValue({
       accountType: "self-custodial",
-      wallets: [{ walletCurrency: "BTC", balance: { amount: 22000 } }],
+      wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 22000 } }],
     })
 
     const { result } = renderHook(() => useBackupNudgeState())
@@ -146,5 +165,49 @@ describe("useBackupNudgeState", () => {
     await act(async () => {})
 
     expect(result.current.shouldShowBanner).toBe(true)
+  })
+
+  it("triggers banner when USD weight pushes combined balance over the threshold", async () => {
+    const btcAmount = 1_000
+    const usdCentsAmount = 200
+    const combinedSats = btcAmount + usdCentsAmount * SATS_PER_USD_CENT
+    expect(btcAmount).toBeLessThan(defaultConfig.backupNudgeBannerThreshold)
+    expect(combinedSats).toBeGreaterThanOrEqual(defaultConfig.backupNudgeBannerThreshold)
+
+    mockActiveWallet.mockReturnValue({
+      accountType: "self-custodial",
+      wallets: [
+        { id: "btc-1", walletCurrency: "BTC", balance: { amount: btcAmount } },
+        { id: "usd-1", walletCurrency: "USD", balance: { amount: usdCentsAmount } },
+      ],
+    })
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+
+    expect(result.current.shouldShowBanner).toBe(true)
+  })
+
+  it("triggers modal when USD weight pushes combined balance over the modal threshold", async () => {
+    const btcAmount = 1_000
+    const usdCentsAmount = 2_200
+    const combinedSats = btcAmount + usdCentsAmount * SATS_PER_USD_CENT
+    expect(btcAmount).toBeLessThan(defaultConfig.backupNudgeModalThreshold)
+    expect(combinedSats).toBeGreaterThanOrEqual(defaultConfig.backupNudgeModalThreshold)
+
+    mockActiveWallet.mockReturnValue({
+      accountType: "self-custodial",
+      wallets: [
+        { id: "btc-1", walletCurrency: "BTC", balance: { amount: btcAmount } },
+        { id: "usd-1", walletCurrency: "USD", balance: { amount: usdCentsAmount } },
+      ],
+    })
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+
+    expect(result.current.shouldShowModal).toBe(true)
   })
 })

@@ -2329,6 +2329,7 @@
         "addressScreen": "Zahlungsmöglichkeiten",
         "tapUserName": "Antippen um einen Benutzernamen festzulegen",
         "notifications": "Benachrichtigungen",
+        "recoveryMethod": "Wiederherstellungsmethode",
         "title": "Einstellungen",
         "darkMode": "Dark Mode",
         "setToDark": "Bildschirm: abgedunkelt",
@@ -3458,7 +3459,7 @@
                 "check3": "Niemand fragt mich nach diesen Informationen per Nachricht oder Anruf"
             },
             "Phrase": {
-                "headerTitle": "Deine Sicherungswörter",
+                "headerTitle": "Backup-Phrase",
                 "sparkCompatible": "Diese Sicherungswörter funktionieren in jeder {sparkCompatibleLink}",
                 "sparkCompatibleLink": "Spark-kompatiblen Wallet",
                 "copiedToast": "Sicherungswörter in die Zwischenablage kopiert",
@@ -3472,7 +3473,8 @@
                 "subtitle": "Eine kurze Überprüfung, ob du sie richtig aufgeschrieben hast",
                 "enterWord": "Wort eingeben",
                 "enterWords": "Wörter eingeben",
-                "confirm": "Bestätigen"
+                "confirm": "Bestätigen",
+                "incorrectWord": "Falsches Wort, bitte überprüfe die Reihenfolge"
             },
             "Success": {
                 "title": "Willkommen bei nicht-verwaltetem Blink"
@@ -3530,7 +3532,7 @@
         "nextWords": "Nächste 6 Wörter",
         "paste": "Einfügen",
         "enterWord": "Wort",
-        "invalidMnemonic": "Ungültige Sicherungsphrase. Bitte überprüfe deine Wörter und versuche es erneut.",
+        "invalidMnemonic": "Ungültige Backup-Phrase. Bitte überprüfe, ob die Wortreihenfolge korrekt ist.",
         "restoring": "Wallet wird wiederhergestellt...",
         "restoreSuccess": "Wallet erfolgreich wiederhergestellt",
         "restoreFailed": "Wallet-Wiederherstellung fehlgeschlagen. Bitte versuche es erneut.",

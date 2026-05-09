@@ -5,6 +5,7 @@ import {
   getServiceStatus,
   isOnline,
   isOnlineStatus,
+  STATUS_TIMEOUT_MS,
 } from "@app/self-custodial/providers/is-online"
 
 const mockGetSparkStatus = jest.fn()
@@ -16,7 +17,7 @@ jest.mock("@react-native-firebase/crashlytics", () => ({
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  getSparkStatus: () => mockGetSparkStatus(),
+  getSparkStatus: (signal?: AbortSignal) => mockGetSparkStatus(signal),
 }))
 
 const loadFreshIsOnlineModule = () => {
@@ -26,6 +27,12 @@ const loadFreshIsOnlineModule = () => {
   })
   return mod!
 }
+
+describe("STATUS_TIMEOUT_MS", () => {
+  it("exposes the shared spark-status timeout for callers that share the budget", () => {
+    expect(STATUS_TIMEOUT_MS).toBe(5000)
+  })
+})
 
 describe("getServiceStatus", () => {
   beforeEach(() => {
@@ -52,6 +59,36 @@ describe("getServiceStatus", () => {
     mockGetSparkStatus.mockRejectedValue(new Error("network down"))
 
     expect(await getServiceStatus()).toBe(ServiceStatus.Major)
+  })
+
+  it("forwards an AbortSignal to getSparkStatus", async () => {
+    mockGetSparkStatus.mockResolvedValue({
+      status: ServiceStatus.Operational,
+      lastUpdated: BigInt(0),
+    })
+
+    await getServiceStatus()
+
+    const signal = mockGetSparkStatus.mock.calls[0][0]
+    expect(signal).toBeInstanceOf(AbortSignal)
+    expect(signal.aborted).toBe(false)
+  })
+
+  it("aborts and returns Major when the SDK call hangs past the timeout", async () => {
+    jest.useFakeTimers()
+    mockGetSparkStatus.mockImplementation(
+      (signal: AbortSignal) =>
+        new Promise((_, reject) => {
+          signal.addEventListener("abort", () => reject(new Error("aborted")))
+        }),
+    )
+
+    const promise = getServiceStatus()
+    jest.runAllTimers()
+    const result = await promise
+
+    expect(result).toBe(ServiceStatus.Major)
+    jest.useRealTimers()
   })
 })
 
@@ -154,6 +191,36 @@ describe("getOnlineState (3-state, Critical #4)", () => {
     mockGetSparkStatus.mockRejectedValue(new Error("auth failed"))
 
     expect(await getOnlineState()).toBe("unknown")
+  })
+
+  it("forwards an AbortSignal to getSparkStatus (Critical #3)", async () => {
+    mockGetSparkStatus.mockResolvedValue({
+      status: ServiceStatus.Operational,
+      lastUpdated: BigInt(0),
+    })
+
+    await getOnlineState()
+
+    const signal = mockGetSparkStatus.mock.calls[0][0]
+    expect(signal).toBeInstanceOf(AbortSignal)
+    expect(signal.aborted).toBe(false)
+  })
+
+  it("aborts and returns 'unknown' when the SDK call hangs past the timeout (Critical #3)", async () => {
+    jest.useFakeTimers()
+    mockGetSparkStatus.mockImplementation(
+      (signal: AbortSignal) =>
+        new Promise((_, reject) => {
+          signal.addEventListener("abort", () => reject(new Error("aborted")))
+        }),
+    )
+
+    const promise = getOnlineState()
+    jest.runAllTimers()
+    const result = await promise
+
+    expect(result).toBe("unknown")
+    jest.useRealTimers()
   })
 })
 

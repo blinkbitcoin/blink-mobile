@@ -2329,6 +2329,7 @@
     "addressScreen": "Modalități de a fi plătit",
     "tapUserName": "Atingeți pentru a seta numele de utilizator",
     "notifications": "Notificări",
+    "recoveryMethod": "Metodă de recuperare",
     "title": "Setări",
     "darkMode": "Mod întunecat",
     "setToDark": "Mod: întunecat",
@@ -3470,7 +3471,7 @@
         "check3": "Nimeni nu îmi cere aceste informații prin mesaj sau apel"
       },
       "Phrase": {
-        "headerTitle": "Fraza ta de backup",
+        "headerTitle": "Frază de backup",
         "sparkCompatible": "Această frază de backup funcționează în orice {sparkCompatibleLink}",
         "sparkCompatibleLink": "portofel compatibil Spark",
         "copiedToast": "Fraza de backup copiată în clipboard",
@@ -3484,7 +3485,8 @@
         "subtitle": "O verificare rapidă dacă ai scris-o corect",
         "enterWord": "Introdu cuvântul",
         "enterWords": "Introdu cuvintele",
-        "confirm": "Confirmă"
+        "confirm": "Confirmă",
+        "incorrectWord": "Cuvânt incorect, verificați ordinea"
       },
       "Success": {
         "title": "Bun venit la Blink non-custodial"
@@ -3542,7 +3544,7 @@
     "nextWords": "Următoarele 6 cuvinte",
     "paste": "Lipește",
     "enterWord": "Cuvânt",
-    "invalidMnemonic": "Frază de backup invalidă. Verificați cuvintele și încercați din nou.",
+    "invalidMnemonic": "Frază de backup invalidă. Verificați dacă ordinea cuvintelor este corectă.",
     "restoring": "Se restaurează portofelul...",
     "restoreSuccess": "Portofel restaurat cu succes",
     "restoreFailed": "Restaurarea a eșuat. Încercați din nou.",

@@ -3,8 +3,8 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import { useTotalBalance } from "@app/components/balance-header/use-total-balance"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { WalletCurrency } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import {
   BackupStatus,
@@ -49,28 +49,33 @@ export const useBackupNudgeState = (): BackupNudgeState => {
   const isBackedUp = backupState.status === BackupStatus.Completed
   const isSelfCustodial = activeWallet.accountType === AccountType.SelfCustodial
 
-  const btcBalance = useMemo(() => {
-    const btcWallet = activeWallet.wallets.find(
-      (w) => w.walletCurrency === WalletCurrency.Btc,
-    )
-    return btcWallet?.balance.amount ?? 0
-  }, [activeWallet.wallets])
+  const walletsForTotal = useMemo(
+    () =>
+      activeWallet.wallets.map((w) => ({
+        id: w.id,
+        balance: w.balance.amount,
+        walletCurrency: w.walletCurrency,
+      })),
+    [activeWallet.wallets],
+  )
+
+  const { satsBalance } = useTotalBalance(walletsForTotal)
 
   const isDismissedRecently =
     dismissedAt !== null && Date.now() - dismissedAt < DISMISSAL_COOLDOWN_MS
 
   const shouldShowModal =
-    !isBackedUp && isSelfCustodial && loaded && btcBalance >= backupNudgeModalThreshold
+    !isBackedUp && isSelfCustodial && loaded && satsBalance >= backupNudgeModalThreshold
 
   const shouldShowBanner =
     !isBackedUp &&
     isSelfCustodial &&
     loaded &&
-    btcBalance >= backupNudgeBannerThreshold &&
+    satsBalance >= backupNudgeBannerThreshold &&
     !shouldShowModal &&
     !isDismissedRecently
 
-  const shouldShowSettingsBanner = !isBackedUp && isSelfCustodial && loaded
+  const shouldShowSettingsBanner = !isBackedUp && isSelfCustodial
 
   return {
     shouldShowBanner,

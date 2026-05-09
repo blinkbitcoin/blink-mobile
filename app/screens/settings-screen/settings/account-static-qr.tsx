@@ -4,6 +4,7 @@ import { Linking } from "react-native"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { QrCodeIcon } from "phosphor-react-native"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
@@ -18,8 +19,9 @@ export const AccountStaticQR: React.FC = () => {
   const posUrl = appConfig.galoyInstance.posUrl
 
   const { LL } = useI18nContext()
+  const isAuthed = useIsAuthed()
 
-  const { data, loading } = useSettingsScreenQuery()
+  const { data, loading } = useSettingsScreenQuery({ skip: !isAuthed })
   if (!data?.me?.username) return <></>
 
   const qrUrl = `${posUrl}/${data.me.username}/print`

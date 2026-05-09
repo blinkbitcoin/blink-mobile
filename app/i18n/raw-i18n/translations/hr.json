@@ -2346,6 +2346,7 @@
     "addressScreen": "Načini plaćanja",
     "tapUserName": "Dodirnite za postavljanje korisničkog imena",
     "notifications": "Obavijesti",
+    "recoveryMethod": "Način oporavka",
     "title": "Postavke",
     "darkMode": "Tamni način rada",
     "setToDark": "Način rada: tamno.",
@@ -3511,7 +3512,7 @@
         "check3": "Nitko me ne traži ove informacije putem poruke ili poziva"
       },
       "Phrase": {
-        "headerTitle": "Vaša sigurnosna fraza",
+        "headerTitle": "Pričuvna fraza",
         "sparkCompatible": "Ova sigurnosna fraza radi u svakom {sparkCompatibleLink}",
         "sparkCompatibleLink": "novčaniku kompatibilnom sa Spark",
         "copiedToast": "Sigurnosna fraza kopirana u međuspremnik",
@@ -3525,7 +3526,8 @@
         "subtitle": "Brza provjera jeste li je ispravno zapisali",
         "enterWord": "Unesite riječ",
         "enterWords": "Unesite riječi",
-        "confirm": "Potvrdi"
+        "confirm": "Potvrdi",
+        "incorrectWord": "Pogrešna riječ, provjerite redoslijed"
       },
       "Success": {
         "title": "Dobrodošli u Blink bez skrbništva"
@@ -3583,7 +3585,7 @@
     "nextWords": "Sljedećih 6 riječi",
     "paste": "Zalijepi",
     "enterWord": "Riječ",
-    "invalidMnemonic": "Nevažeća sigurnosna fraza. Provjerite svoje riječi i pokušajte ponovo.",
+    "invalidMnemonic": "Neispravna pričuvna fraza. Provjerite je li redoslijed riječi točan.",
     "restoring": "Obnavljanje vašeg novčanika...",
     "restoreSuccess": "Novčanik uspješno obnovljen",
     "restoreFailed": "Obnova novčanika nije uspjela. Pokušajte ponovo.",

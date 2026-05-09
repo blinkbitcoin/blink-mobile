@@ -124,4 +124,84 @@ describe("useBackupConfirm", () => {
 
     expect(mockOnComplete).not.toHaveBeenCalled()
   })
+
+  it("requests focus on next index when correct word is typed", () => {
+    const { result } = renderHook(() =>
+      useBackupConfirm({ challenges, onComplete: mockOnComplete }),
+    )
+
+    act(() => result.current.updateInput(0, "youth"))
+
+    expect(result.current.focusRequest).toBe(1)
+  })
+
+  it("does not request focus past the last challenge", () => {
+    const { result } = renderHook(() =>
+      useBackupConfirm({ challenges, onComplete: mockOnComplete }),
+    )
+
+    act(() => result.current.updateInput(2, "harvest"))
+
+    expect(result.current.focusRequest).toBeNull()
+  })
+
+  it("does not request focus when typed word is wrong", () => {
+    const { result } = renderHook(() =>
+      useBackupConfirm({ challenges, onComplete: mockOnComplete }),
+    )
+
+    act(() => result.current.updateInput(0, "young"))
+
+    expect(result.current.focusRequest).toBeNull()
+  })
+
+  it("clearFocusRequest resets focusRequest", () => {
+    const { result } = renderHook(() =>
+      useBackupConfirm({ challenges, onComplete: mockOnComplete }),
+    )
+
+    act(() => result.current.updateInput(0, "youth"))
+    expect(result.current.focusRequest).toBe(1)
+
+    act(() => result.current.clearFocusRequest())
+
+    expect(result.current.focusRequest).toBeNull()
+  })
+
+  it("does not auto-complete while disabled, then fires once unlocked (Critical #1)", () => {
+    const { result, rerender } = renderHook(
+      ({ disabled }: { disabled: boolean }) =>
+        useBackupConfirm({ challenges, onComplete: mockOnComplete, disabled }),
+      { initialProps: { disabled: true } },
+    )
+
+    act(() => result.current.selectSuggestion(0, "youth"))
+    act(() => result.current.selectSuggestion(1, "bundle"))
+    act(() => result.current.selectSuggestion(2, "harvest"))
+
+    act(() => jest.advanceTimersByTime(500))
+    expect(mockOnComplete).not.toHaveBeenCalled()
+
+    rerender({ disabled: false })
+    act(() => jest.advanceTimersByTime(500))
+
+    expect(mockOnComplete).toHaveBeenCalledTimes(1)
+  })
+
+  it("re-arms the auto-advance timer after a de-correct then re-correct sequence (Critical #6)", () => {
+    const { result } = renderHook(() =>
+      useBackupConfirm({ challenges, onComplete: mockOnComplete }),
+    )
+
+    act(() => result.current.selectSuggestion(0, "youth"))
+    act(() => result.current.selectSuggestion(1, "bundle"))
+    act(() => result.current.selectSuggestion(2, "harvest"))
+
+    act(() => result.current.updateInput(2, "wrong"))
+
+    act(() => result.current.selectSuggestion(2, "harvest"))
+    act(() => jest.advanceTimersByTime(500))
+
+    expect(mockOnComplete).toHaveBeenCalledTimes(1)
+  })
 })

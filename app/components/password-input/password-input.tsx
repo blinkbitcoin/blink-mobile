@@ -9,6 +9,7 @@ type PasswordInputProps = {
   label: string
   value: string
   onChangeText: (text: string) => void
+  onBlur?: () => void
   placeholder?: string
   error?: string
 }
@@ -17,6 +18,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   label,
   value,
   onChangeText,
+  onBlur,
   placeholder,
   error,
 }) => {
@@ -34,6 +36,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           style={styles.input}
           value={value}
           onChangeText={onChangeText}
+          onBlur={onBlur}
           placeholder={placeholder}
           placeholderTextColor={colors.grey2}
           accessibilityLabel={label}

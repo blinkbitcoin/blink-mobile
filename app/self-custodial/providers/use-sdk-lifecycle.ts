@@ -8,6 +8,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet.types"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { toastShow } from "@app/utils/toast"
+import { withTimeout } from "@app/utils/with-timeout"
 
 import { addSdkEventListener, disconnectSdk, getUserSettings, initSdk } from "../bridge"
 import { logSdkEvent, SdkLogLevel } from "../logging"
@@ -15,7 +16,7 @@ import { logSdkEvent, SdkLogLevel } from "../logging"
 import { detectBalanceStale } from "./detect-balance-stale"
 import { extractPaymentId, PAYMENT_RECEIVED_EVENTS, REFRESH_EVENTS } from "./sdk-events"
 import { validateStoredNetwork } from "./validate-network"
-import { getOnlineState, OnlineState } from "./is-online"
+import { getOnlineState, OnlineState, STATUS_TIMEOUT_MS } from "./is-online"
 import {
   appendTransactions,
   getSelfCustodialWalletSnapshot,
@@ -87,35 +88,39 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     }
     refreshingRef.current = true
 
+    const isStale = () => sdkRef.current !== sdk
+
     const runOnce = async () => {
       try {
-        const onlineState = await getOnlineState()
-        if (onlineState === OnlineState.Offline) {
-          setStatus((prev) =>
-            OFFLINE_EXEMPT_STATUSES.includes(prev) ? prev : ActiveWalletStatus.Offline,
-          )
-          return
-        }
-        if (onlineState === OnlineState.Unknown) {
-          crashlytics().log(
-            `[SparkSDK] connectivity check failed; preserving previous status`,
-          )
-          return
-        }
-
-        const snapshot = await getSelfCustodialWalletSnapshot(sdk, rawTxOffsetRef.current)
+        const snapshot = await withTimeout(
+          getSelfCustodialWalletSnapshot(sdk, rawTxOffsetRef.current),
+          STATUS_TIMEOUT_MS,
+          "wallet snapshot",
+        )
+        if (isStale()) return
         setWallets(snapshot.wallets)
         setHasMoreTransactions(snapshot.hasMore)
         rawTxOffsetRef.current = snapshot.rawTransactionCount // eslint-disable-line require-atomic-updates
+        // Snapshot success implies network reach; we skip a second `getServiceStatus()` here.
         setStatus(ActiveWalletStatus.Ready)
-
         updateBalanceStale(detectBalanceStale(snapshot.wallets))
       } catch (err) {
         logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
         crashlytics().recordError(
           err instanceof Error ? err : new Error(`Refresh failed: ${err}`),
         )
+        const onlineState = await getOnlineState()
+        if (isStale()) return
         setStatus((prev) => {
+          if (OFFLINE_EXEMPT_STATUSES.includes(prev)) return prev
+          if (onlineState === OnlineState.Offline) return ActiveWalletStatus.Offline
+          if (onlineState === OnlineState.Unknown) {
+            crashlytics().log(
+              `[SparkSDK] connectivity check failed; preserving previous status`,
+            )
+            if (prev === ActiveWalletStatus.Loading) return ActiveWalletStatus.Error
+            return prev
+          }
           if (prev === ActiveWalletStatus.Ready || prev === ActiveWalletStatus.Offline) {
             return ActiveWalletStatus.Offline
           }

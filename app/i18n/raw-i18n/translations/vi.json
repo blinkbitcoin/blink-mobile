@@ -2346,6 +2346,7 @@
     "addressScreen": "Ways to get paid",
     "tapUserName": "Nhấn để đặt tên người dùng",
     "notifications": "Notifications",
+    "recoveryMethod": "Phương thức khôi phục",
     "title": "Cài đặt",
     "darkMode": "Dark Mode",
     "setToDark": "Mode: dark.",
@@ -3508,7 +3509,7 @@
         "check3": "Không ai yêu cầu tôi cung cấp thông tin này qua tin nhắn hoặc cuộc gọi"
       },
       "Phrase": {
-        "headerTitle": "Cụm từ sao lưu của bạn",
+        "headerTitle": "Cụm từ sao lưu",
         "sparkCompatible": "Cụm từ sao lưu này hoạt động trong bất kỳ {sparkCompatibleLink} nào",
         "sparkCompatibleLink": "ví tương thích Spark",
         "copiedToast": "Đã sao chép cụm từ sao lưu vào bộ nhớ tạm",
@@ -3522,7 +3523,8 @@
         "subtitle": "Kiểm tra nhanh xem bạn đã ghi đúng chưa",
         "enterWord": "Nhập từ",
         "enterWords": "Nhập các từ",
-        "confirm": "Xác nhận"
+        "confirm": "Xác nhận",
+        "incorrectWord": "Sai từ, vui lòng kiểm tra thứ tự"
       },
       "Success": {
         "title": "Chào mừng đến với Blink tự quản lý"
@@ -3580,7 +3582,7 @@
     "nextWords": "6 từ tiếp theo",
     "paste": "Dán",
     "enterWord": "Từ",
-    "invalidMnemonic": "Cụm từ sao lưu không hợp lệ. Vui lòng kiểm tra các từ và thử lại.",
+    "invalidMnemonic": "Cụm từ sao lưu không hợp lệ. Vui lòng kiểm tra xem thứ tự các từ có chính xác không.",
     "restoring": "Đang khôi phục ví...",
     "restoreSuccess": "Khôi phục ví thành công",
     "restoreFailed": "Khôi phục ví thất bại. Vui lòng thử lại.",

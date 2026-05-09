@@ -2346,6 +2346,7 @@
     "addressScreen": "Kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanman",
     "tapUserName": "Yachanakuyta sutichinaqinmi kaniyta ruchiykachkanki",
     "notifications": "Notifications",
+    "recoveryMethod": "Kutirichiy ñan",
     "title": "Rikch'a",
     "darkMode": "Tuta kaniy",
     "setToDark": "Chaynamanta kaniy: tuta.",
@@ -3508,7 +3509,7 @@
         "check3": "Pipas mana kay willakuykunata mañawanchu willaypi utaq waqyaypi"
       },
       "Phrase": {
-        "headerTitle": "Waqaychay rimaykikunata",
+        "headerTitle": "Waqaychana rimay",
         "sparkCompatible": "Kay waqaychay rimaykunaqa {sparkCompatibleLink} llamkan",
         "sparkCompatibleLink": "Spark wallitakunapi",
         "copiedToast": "Waqaychay rimay kopiyasqa",
@@ -3522,7 +3523,8 @@
         "subtitle": "Usqhay qhaway allinta qillqasqaykita",
         "enterWord": "Rimayta yaykuchiy",
         "enterWords": "Rimaykunata yaykuchiy",
-        "confirm": "Takyachiy"
+        "confirm": "Takyachiy",
+        "incorrectWord": "Mana allin simi, kawariy patmanta"
       },
       "Success": {
         "title": "Blink mana waqaychisqaman haykuy"
@@ -3580,7 +3582,7 @@
     "nextWords": "Hamuq 6 simikuna",
     "paste": "Taqay",
     "enterWord": "Simi",
-    "invalidMnemonic": "Mana allin backup frase. Simiykikunata qhaway hinaspa watiqmanta ruway.",
+    "invalidMnemonic": "Mana allin waqaychana rimay. Simikunaq ñiqinta kawariy.",
     "restoring": "Walletniykita kutichichkani...",
     "restoreSuccess": "Wallet allinmi kutichimusqa",
     "restoreFailed": "Mana atinichu walletta kutichiy. Watiqmanta ruway.",
