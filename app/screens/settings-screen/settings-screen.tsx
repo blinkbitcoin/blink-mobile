@@ -109,8 +109,7 @@ export const SettingsScreen: React.FC = () => {
       ThemeSetting,
       StableBalanceSetting,
     ],
-    securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting],
-    recoveryMethod: [ViewBackupPhraseSetting],
+    securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting, ViewBackupPhraseSetting],
     advanced: [ExportCsvSetting, ApiAccessSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],
   }
@@ -165,10 +164,6 @@ export const SettingsScreen: React.FC = () => {
         <SettingsGroup
           name={LL.common.securityAndPrivacy()}
           items={items.securityAndPrivacy}
-        />
-        <SettingsGroup
-          name={LL.SettingsScreen.recoveryMethod()}
-          items={items.recoveryMethod}
         />
         <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
         <SettingsGroup name={LL.common.support()} items={items.community} />
