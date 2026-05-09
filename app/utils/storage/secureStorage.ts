@@ -1,4 +1,15 @@
+import crashlytics from "@react-native-firebase/crashlytics"
 import RNSecureKeyStore, { ACCESSIBLE } from "react-native-secure-key-store"
+
+const safeRemoveKey = async (key: string, label: string): Promise<boolean> => {
+  try {
+    await RNSecureKeyStore.remove(key)
+    return true
+  } catch (err) {
+    crashlytics().recordError(err instanceof Error ? err : new Error(`${label}: ${err}`))
+    return false
+  }
+}
 
 export default class KeyStoreWrapper {
   private static readonly IS_BIOMETRICS_ENABLED = "isBiometricsEnabled"
@@ -166,13 +177,16 @@ export default class KeyStoreWrapper {
   }
 
   public static async deleteMnemonic(): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.remove(KeyStoreWrapper.MNEMONIC)
-      await RNSecureKeyStore.remove(KeyStoreWrapper.MNEMONIC_NETWORK).catch(() => {})
-      return true
-    } catch {
-      return false
-    }
+    const primaryOk = await safeRemoveKey(
+      KeyStoreWrapper.MNEMONIC,
+      "Failed to delete MNEMONIC key",
+    )
+    if (!primaryOk) return false
+    await safeRemoveKey(
+      KeyStoreWrapper.MNEMONIC_NETWORK,
+      "Failed to delete MNEMONIC_NETWORK key",
+    )
+    return true
   }
 
   public static async getMnemonicNetwork(): Promise<string | null> {
