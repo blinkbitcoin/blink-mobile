@@ -34,7 +34,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
 
   const { wallets } = useActiveWallet()
   const { backupState, setBackupCompleted } = useBackupState()
-  const { checkpoint } = useMigrationCheckpoint()
+  const { checkpoint, loading: checkpointLoading } = useMigrationCheckpoint()
   const alreadyBackedUp = backupState.status === BackupStatus.Completed
   const isMigrating = checkpoint !== null && !alreadyBackedUp
   const hasFunds = wallets.some((w) => w.balance.amount > 0)
@@ -61,7 +61,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
     isWordWrong,
     focusRequest,
     clearFocusRequest,
-  } = useBackupConfirm({ challenges, onComplete })
+  } = useBackupConfirm({ challenges, onComplete, disabled: checkpointLoading })
 
   const anyWrong = challenges.some((_, i) => isWordWrong(i))
 
@@ -148,7 +148,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
                 ? LL.BackupScreen.ManualBackup.Confirm.confirm()
                 : LL.BackupScreen.ManualBackup.Confirm.enterWords()
             }
-            disabled={!allCorrect}
+            disabled={!allCorrect || checkpointLoading}
             onPress={onComplete}
             {...testProps("backup-confirm-button")}
           />

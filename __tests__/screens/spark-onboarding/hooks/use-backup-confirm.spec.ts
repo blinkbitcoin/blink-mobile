@@ -167,4 +167,24 @@ describe("useBackupConfirm", () => {
 
     expect(result.current.focusRequest).toBeNull()
   })
+
+  it("does not auto-complete while disabled, then fires once unlocked (Critical #1)", () => {
+    const { result, rerender } = renderHook(
+      ({ disabled }: { disabled: boolean }) =>
+        useBackupConfirm({ challenges, onComplete: mockOnComplete, disabled }),
+      { initialProps: { disabled: true } },
+    )
+
+    act(() => result.current.selectSuggestion(0, "youth"))
+    act(() => result.current.selectSuggestion(1, "bundle"))
+    act(() => result.current.selectSuggestion(2, "harvest"))
+
+    act(() => jest.advanceTimersByTime(500))
+    expect(mockOnComplete).not.toHaveBeenCalled()
+
+    rerender({ disabled: false })
+    act(() => jest.advanceTimersByTime(500))
+
+    expect(mockOnComplete).toHaveBeenCalledTimes(1)
+  })
 })
