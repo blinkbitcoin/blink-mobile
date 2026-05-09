@@ -101,6 +101,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
         setWallets(snapshot.wallets)
         setHasMoreTransactions(snapshot.hasMore)
         rawTxOffsetRef.current = snapshot.rawTransactionCount // eslint-disable-line require-atomic-updates
+        // Snapshot success implies network reach; we skip a second `getServiceStatus()` here.
         setStatus(ActiveWalletStatus.Ready)
         updateBalanceStale(detectBalanceStale(snapshot.wallets))
       } catch (err) {
