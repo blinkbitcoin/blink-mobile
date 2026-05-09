@@ -175,11 +175,11 @@ const runAutoConvert = async ({
     return
   }
 
-  // Terminal non-success outcomes drop silently; Failed falls through
-  // so the next trigger retries until the attempt cap.
+  // Terminal non-success outcomes drop silently; Failed and
+  // SkippedStableBalanceActive fall through so the next trigger retries
+  // until the attempt cap (preserves receive-time intent across toggles).
   if (
     outcome.status === AutoConvertStatus.AlreadyConverted ||
-    outcome.status === AutoConvertStatus.SkippedStableBalanceActive ||
     outcome.status === AutoConvertStatus.SkippedBelowMin
   ) {
     await removePendingAutoConvert(record.paymentRequest)
