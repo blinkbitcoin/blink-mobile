@@ -70,7 +70,11 @@
         "receivingAccount": "Conto deposito",
         "infoBitcoin": "L'importo in Bitcoin è solo approssimativo. Può variare leggermente.",
         "infoDollar": "L'importo in dollari è solo approssimativo. Può variare leggermente.",
-        "transferButtonText": "Trasferisci {fromWallet} a {toWallet}"
+        "transferButtonText": "Trasferisci {fromWallet} a {toWallet}",
+        "feeLabel": "Commissione di conversione",
+        "feeError": "Impossibile recuperare la commissione di conversione",
+        "amountFloored": "Importo aumentato per raggiungere il minimo di conversione.",
+        "amountDustBumped": "Importo aumentato per convertire l'intero saldo."
     },
     "ConversionSuccessScreen": {
         "message": "Conversione riuscita",
@@ -3551,7 +3555,34 @@
     },
     "StableBalance": {
         "title": "Saldo stabile",
-        "description": "Mantieni un saldo in USD alimentato da USDB su Spark."
+        "description": "Mantieni un saldo in USD alimentato da USDB su Spark.",
+        "balanceLabelBtc": "Saldo · SATS",
+        "balanceLabelUsd": "Saldo · USD",
+        "settingsRowTitle": "Saldo Stabile",
+        "settingsTitle": "Saldo Stabile",
+        "settingsDescription": "Mantieni parte del tuo portafoglio in USD. Converti tra BTC e USD manualmente in qualsiasi momento con l'azione Converti.",
+        "activationLabel": "Attivo",
+        "activeHint": "Il tuo portafoglio detiene USD tramite USDB.",
+        "inactiveHint": "Il tuo portafoglio detiene solo BTC.",
+        "deactivateWarningBody": "Hai ancora {amount:string}. Converti prima in BTC, altrimenti il tuo saldo in USD sarà nascosto fino a quando non riattiverai Stable Balance.",
+        "toggleFailedToast": "Impossibile aggiornare Stable Balance. Riprova.",
+        "toggleModal": {
+            "activateTitle": "Attiva saldo stabile",
+            "activateBody": "Il tuo saldo in BTC sarà convertito in USDB. Questa è la commissione di conversione stimata.",
+            "activateConfirm": "Attiva",
+            "deactivateTitle": "Disattiva saldo stabile",
+            "deactivateBody": "Il tuo saldo in USDB sarà riconvertito in BTC. Questa è la commissione di conversione stimata.",
+            "deactivateConfirm": "Disattiva",
+            "cancel": "Annulla"
+        },
+        "firstTimeModal": {
+            "title": "Informazioni sulla Conversione",
+            "dualBalance": "BTC e USD sono due saldi indipendenti nel tuo portafoglio. Usa Convert in qualsiasi momento per spostare fondi tra di essi.",
+            "trustDisclosure": "La modalità USD utilizza token USDB su Spark. I presupposti di fiducia sono diversi dal detenere BTC direttamente. USDB si affida all'emittente di token di Spark.",
+            "acknowledge": "Ho capito"
+        },
+        "minimumConversion": "Conversione minima: {amount:string}",
+        "conversionUnavailable": "La conversione è temporaneamente non disponibile. Riprova."
     },
     "BackendFeatureGate": {
         "title": "Funzione non disponibile",
@@ -3580,6 +3611,10 @@
         "title": "Il portafoglio è offline",
         "description": "Il tuo portafoglio non custodito non può raggiungere la rete in questo momento. Riprova quando sarai di nuovo online.",
         "retry": "Riprova"
+    },
+    "SelfCustodialBalance": {
+        "staleLabel": "OBSOLETO",
+        "syncFailedToast": "Sincronizzazione del saldo non riuscita. Il tuo saldo potrebbe essere obsoleto."
     },
     "UnclaimedDeposit": {
         "title": "Hai {count} deposito/i non reclamato/i",

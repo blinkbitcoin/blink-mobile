@@ -2,8 +2,8 @@ import {
   PaymentDetails,
   PaymentMethod,
   type BreezSdkInterface,
+  type GetInfoResponse,
   type Payment,
-  type TokenBalance,
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
@@ -12,37 +12,38 @@ import { toWalletMoneyAmount } from "@app/types/amounts"
 import { type NormalizedTransaction } from "@app/types/transaction.types"
 import { toWalletId, type WalletState } from "@app/types/wallet.types"
 
-import { getWalletInfo, listPayments } from "../bridge"
-import { SparkConfig, SparkToken } from "../config"
+import { findUsdbToken, getWalletInfo, listPayments } from "../bridge"
+import { requireSparkTokenIdentifier } from "../config"
+import { recordErrorOnce } from "../logging"
 import { mapSelfCustodialTransactions } from "../mappers/transaction-mapper"
 
 const TRANSACTIONS_PER_PAGE = 20
 
-const getStableBalance = (
-  tokenBalances: Map<string, TokenBalance> | Record<string, TokenBalance>,
-): number => {
-  const entries: [string, TokenBalance][] =
-    tokenBalances instanceof Map
-      ? [...tokenBalances.entries()]
-      : Object.entries(tokenBalances)
-
-  const match = entries.find(
-    ([, token]) => token.tokenMetadata?.ticker === SparkToken.Ticker,
-  )
-  if (!match) return 0
-
-  const decimals = match[1].tokenMetadata?.decimals ?? 0
-  return tokenBaseUnitsToCents(Number(match[1].balance), decimals)
+const getStableBalance = (info: GetInfoResponse): number => {
+  const token = findUsdbToken(info)
+  if (!token) return 0
+  const decimals = token.tokenMetadata?.decimals ?? 0
+  return tokenBaseUnitsToCents(Number(token.balance), decimals)
 }
 
 const isKnownPayment = (payment: Payment): boolean => {
   if (payment.method !== PaymentMethod.Token) return true
   if (!payment.details || !PaymentDetails.Token.instanceOf(payment.details)) return false
-  return payment.details.inner.metadata.identifier === SparkConfig.tokenIdentifier
+  const expectedIdentifier = requireSparkTokenIdentifier()
+  const observedIdentifier = payment.details.inner.metadata.identifier
+  if (observedIdentifier === expectedIdentifier) return true
+  recordErrorOnce(
+    `spark-unknown-token-payment:${observedIdentifier}`,
+    new Error(
+      `Unknown token payment dropped: id=${observedIdentifier} expected=${expectedIdentifier}`,
+    ),
+  )
+  return false
 }
 
 type PaymentsPage = {
   transactions: NormalizedTransaction[]
+  rawCount: number
   hasMore: boolean
 }
 
@@ -51,8 +52,12 @@ const fetchAndMapPayments = async (
   offset: number,
 ): Promise<PaymentsPage> => {
   const response = await listPayments(sdk, offset, TRANSACTIONS_PER_PAGE)
+  const transactions = mapSelfCustodialTransactions(
+    response.payments.filter(isKnownPayment),
+  )
   return {
-    transactions: mapSelfCustodialTransactions(response.payments.filter(isKnownPayment)),
+    transactions,
+    rawCount: response.payments.length,
     hasMore: response.payments.length >= TRANSACTIONS_PER_PAGE,
   }
 }
@@ -84,24 +89,42 @@ const buildWallets = (
 export type WalletSnapshot = {
   wallets: WalletState[]
   hasMore: boolean
+  rawTransactionCount: number
 }
 
 export const getSelfCustodialWalletSnapshot = async (
   sdk: BreezSdkInterface,
+  targetRawCount: number = TRANSACTIONS_PER_PAGE,
 ): Promise<WalletSnapshot> => {
   const info = await getWalletInfo(sdk)
-  const page = await fetchAndMapPayments(sdk, 0)
+  const minRawCount = Math.max(targetRawCount, TRANSACTIONS_PER_PAGE)
+
+  const transactions: NormalizedTransaction[] = []
+  let rawTransactionCount = 0
+  let hasMore = false
+
+  while (rawTransactionCount < minRawCount) {
+    const page = await fetchAndMapPayments(sdk, rawTransactionCount)
+    if (page.rawCount === 0) break
+
+    transactions.push(...page.transactions)
+    rawTransactionCount += page.rawCount
+    hasMore = page.hasMore
+
+    if (!hasMore) break
+  }
 
   return {
     wallets: buildWallets(
       {
         identityPubkey: info.identityPubkey,
         btcBalance: Number(info.balanceSats),
-        stableBalance: getStableBalance(info.tokenBalances),
+        stableBalance: getStableBalance(info),
       },
-      page.transactions,
+      transactions,
     ),
-    hasMore: page.hasMore,
+    hasMore,
+    rawTransactionCount,
   }
 }
 
@@ -117,5 +140,5 @@ export const appendTransactions = (
 
 export const loadMoreTransactions = async (
   sdk: BreezSdkInterface,
-  currentCount: number,
-): Promise<PaymentsPage> => fetchAndMapPayments(sdk, currentCount)
+  rawOffset: number,
+): Promise<PaymentsPage> => fetchAndMapPayments(sdk, rawOffset)

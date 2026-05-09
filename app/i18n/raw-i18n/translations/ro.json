@@ -70,7 +70,11 @@
     "receivingAccount": "Cont de primire",
     "infoBitcoin": "Suma în Bitcoin este doar aproximativă. Poate varia cu o mică diferență.",
     "infoDollar": "Suma în dolari este doar aproximativă. Poate varia cu o mică diferență.",
-    "transferButtonText": "Transferă {fromWallet} către {toWallet}"
+    "transferButtonText": "Transferă {fromWallet} către {toWallet}",
+    "feeLabel": "Comision de conversie",
+    "feeError": "Nu s-a putut obține comisionul de conversie",
+    "amountFloored": "Suma a fost mărită pentru a atinge minimul de conversie.",
+    "amountDustBumped": "Suma a fost mărită pentru a converti întregul sold."
   },
   "ConversionSuccessScreen": {
     "message": "Conversie reușită",
@@ -3563,7 +3567,34 @@
   },
   "StableBalance": {
     "title": "Sold stabil",
-    "description": "Păstrați un sold în USD alimentat de USDB pe Spark."
+    "description": "Păstrați un sold în USD alimentat de USDB pe Spark.",
+    "balanceLabelBtc": "Sold · SATS",
+    "balanceLabelUsd": "Sold · USD",
+    "settingsRowTitle": "Sold Stabil",
+    "settingsTitle": "Sold Stabil",
+    "settingsDescription": "Păstrează o parte din portofelul tău în USD. Convertește între BTC și USD manual oricând folosind acțiunea Convertire.",
+    "activationLabel": "Activ",
+    "activeHint": "Portofelul tău păstrează USD prin USDB.",
+    "inactiveHint": "Portofelul tău păstrează doar BTC.",
+    "deactivateWarningBody": "Mai ai {amount:string}. Convertește mai întâi în BTC, altfel soldul în USD va fi ascuns până reactivezi Stable Balance.",
+    "toggleFailedToast": "Nu am putut actualiza Stable Balance. Încearcă din nou.",
+    "toggleModal": {
+      "activateTitle": "Activează soldul stabil",
+      "activateBody": "Soldul tău în BTC va fi convertit în USDB. Acesta este comisionul de conversie estimat.",
+      "activateConfirm": "Activează",
+      "deactivateTitle": "Dezactivează soldul stabil",
+      "deactivateBody": "Soldul tău în USDB va fi convertit înapoi în BTC. Acesta este comisionul de conversie estimat.",
+      "deactivateConfirm": "Dezactivează",
+      "cancel": "Anulează"
+    },
+    "firstTimeModal": {
+      "title": "Despre Conversie",
+      "dualBalance": "BTC și USD sunt două solduri independente în portofelul tău. Folosește Convert oricând pentru a muta fonduri între ele.",
+      "trustDisclosure": "Modul USD folosește tokenuri USDB pe Spark. Presupunerile de încredere diferă de păstrarea BTC direct. USDB se bazează pe emitentul de tokenuri Spark.",
+      "acknowledge": "Am înțeles"
+    },
+    "minimumConversion": "Conversie minimă: {amount:string}",
+    "conversionUnavailable": "Conversia este temporar indisponibilă. Încearcă din nou."
   },
   "BackendFeatureGate": {
     "title": "Funcție indisponibilă",
@@ -3592,6 +3623,10 @@
     "title": "Portofelul este offline",
     "description": "Portofelul tău non-custodial nu poate ajunge la rețea în acest moment. Încearcă din nou când ești online.",
     "retry": "Încearcă din nou"
+  },
+  "SelfCustodialBalance": {
+    "staleLabel": "ÎNVECHIT",
+    "syncFailedToast": "Sincronizarea soldului a eșuat. Soldul tău poate fi învechit."
   },
   "UnclaimedDeposit": {
     "title": "Ai {count} depozit(e) nerevendicate",

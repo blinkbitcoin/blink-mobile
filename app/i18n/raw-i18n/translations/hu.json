@@ -70,7 +70,11 @@
     "receivingAccount": "Fogadó számla",
     "infoBitcoin": "A Bitcoin összeg csak hozzávetőleges. Kis mértékben változhat.",
     "infoDollar": "A dollár összeg csak hozzávetőleges. Kis mértékben változhat.",
-    "transferButtonText": "Átutalás {fromWallet}-ból/ből {toWallet}-ba/be"
+    "transferButtonText": "Átutalás {fromWallet}-ból/ből {toWallet}-ba/be",
+    "feeLabel": "Átváltási díj",
+    "feeError": "Nem sikerült lekérni az átváltási díjat",
+    "amountFloored": "Az összeget megemeltük az átváltási minimum eléréséhez.",
+    "amountDustBumped": "Az összeget megemeltük a teljes egyenleg átváltásához."
   },
   "ConversionSuccessScreen": {
     "message": "Sikeres átváltás",
@@ -3563,7 +3567,34 @@
   },
   "StableBalance": {
     "title": "Stabil egyenleg",
-    "description": "Tartson USD egyenleget USDB-vel a Sparkon."
+    "description": "Tartson USD egyenleget USDB-vel a Sparkon.",
+    "balanceLabelBtc": "Egyenleg · SATS",
+    "balanceLabelUsd": "Egyenleg · USD",
+    "settingsRowTitle": "Stabil egyenleg",
+    "settingsTitle": "Stabil egyenleg",
+    "settingsDescription": "Tartsa pénztárcája egy részét USD-ben. BTC és USD között manuálisan válthat bármikor a Konvertálás művelettel.",
+    "activationLabel": "Aktív",
+    "activeHint": "A pénztárcád USD-t tart USDB-n keresztül.",
+    "inactiveHint": "A pénztárcád csak BTC-t tart.",
+    "deactivateWarningBody": "Még van {amount:string}-od. Először konvertáld BTC-re, különben az USD egyenleged rejtett marad, amíg újra nem aktiválod a Stable Balance-t.",
+    "toggleFailedToast": "A Stable Balance frissítése nem sikerült. Próbáld újra.",
+    "toggleModal": {
+      "activateTitle": "Stabil egyenleg aktiválása",
+      "activateBody": "A BTC egyenlegét USDB-re váltjuk át. Ez a becsült átváltási díj.",
+      "activateConfirm": "Aktiválás",
+      "deactivateTitle": "Stabil egyenleg kikapcsolása",
+      "deactivateBody": "Az USDB egyenlegét visszaváltjuk BTC-re. Ez a becsült átváltási díj.",
+      "deactivateConfirm": "Kikapcsolás",
+      "cancel": "Mégse"
+    },
+    "firstTimeModal": {
+      "title": "A Konverzióról",
+      "dualBalance": "A BTC és az USD két független egyenleg a pénztárcádban. Használd a Convert funkciót bármikor, hogy pénzt mozgass közöttük.",
+      "trustDisclosure": "Az USD mód USDB tokeneket használ a Sparkon. A bizalmi feltételezések eltérnek a közvetlen BTC tartástól. Az USDB a Spark tokenkibocsátójára támaszkodik.",
+      "acknowledge": "Megértettem"
+    },
+    "minimumConversion": "Minimum konverzió: {amount:string}",
+    "conversionUnavailable": "A konverzió ideiglenesen nem érhető el. Próbáld újra."
   },
   "BackendFeatureGate": {
     "title": "Funkció nem elérhető",
@@ -3592,6 +3623,10 @@
     "title": "A pénztárca offline",
     "description": "A nem letétbe helyezett pénztárcája jelenleg nem tudja elérni a hálózatot. Próbálja újra, amikor ismét online lesz.",
     "retry": "Próbáld újra"
+  },
+  "SelfCustodialBalance": {
+    "staleLabel": "ELAVULT",
+    "syncFailedToast": "Az egyenleg szinkronizálása sikertelen. Az egyenleged elavult lehet."
   },
   "UnclaimedDeposit": {
     "title": "{count} nem igényelt befizetésed van",

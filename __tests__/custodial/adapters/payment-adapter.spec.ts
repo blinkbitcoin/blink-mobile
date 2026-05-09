@@ -174,7 +174,8 @@ describe("createCustodialClaimDeposit", () => {
 describe("createCustodialConvert", () => {
   it("returns failed status", async () => {
     const result = await createCustodialConvert({
-      amount: { amount: 1000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      fromAmount: { amount: 1000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      toAmount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
       direction: ConvertDirection.BtcToUsd,
     })
 

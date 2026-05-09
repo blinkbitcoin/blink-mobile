@@ -72,7 +72,11 @@
     "receivingAccount": "Рачун прималац",
     "infoBitcoin": "Биткоин износ је само приближан. Може варирати за мали износ.",
     "infoDollar": "Доларски износ је само приближан. Може варирати за мали износ.",
-    "transferButtonText": "Пренеси {fromWallet} на {toWallet}"
+    "transferButtonText": "Пренеси {fromWallet} на {toWallet}",
+    "feeLabel": "Накнада за конверзију",
+    "feeError": "Није било могуће преузети накнаду за конверзију",
+    "amountFloored": "Износ увећан да би се испунио минимум за конверзију.",
+    "amountDustBumped": "Износ увећан да се конвертује цео салдо."
   },
   "ConversionSuccessScreen": {
     "message": "Конверзија успешна",
@@ -3601,7 +3605,34 @@
   },
   "StableBalance": {
     "title": "Стабилан салдо",
-    "description": "Држите салдо у USD покретан USDB на Spark."
+    "description": "Држите салдо у USD покретан USDB на Spark.",
+    "balanceLabelBtc": "Стање · SATS",
+    "balanceLabelUsd": "Стање · USD",
+    "settingsRowTitle": "Стабилно стање",
+    "settingsTitle": "Стабилно стање",
+    "settingsDescription": "Задржите део свог новчаника у USD. Конвертујте BTC и USD ручно у било које време користећи радњу Конвертуј.",
+    "activationLabel": "Активно",
+    "activeHint": "Твој новчаник држи USD преко USDB.",
+    "inactiveHint": "Твој новчаник држи само BTC.",
+    "deactivateWarningBody": "Још имаш {amount:string}. Прво пребаци у BTC, иначе ће твој USD биланс бити сакривен док поново не активираш Stable Balance.",
+    "toggleFailedToast": "Није могуће ажурирати Stable Balance. Покушајте поново.",
+    "toggleModal": {
+      "activateTitle": "Активирај стабилни салдо",
+      "activateBody": "Ваш BTC салдо ће бити конвертован у USDB. Ово је процењена накнада за конверзију.",
+      "activateConfirm": "Активирај",
+      "deactivateTitle": "Деактивирај стабилни салдо",
+      "deactivateBody": "Ваш USDB салдо ће бити враћен у BTC. Ово је процењена накнада за конверзију.",
+      "deactivateConfirm": "Деактивирај",
+      "cancel": "Откажи"
+    },
+    "firstTimeModal": {
+      "title": "О конверзији",
+      "dualBalance": "BTC и USD су два независна салда у вашем новчанику. Користите Convert било кад за премештање средстава између њих.",
+      "trustDisclosure": "USD режим користи USDB токене на Sparku. Претпоставке поверења разликују се од директног држања BTC-а. USDB се ослања на Sparkovog издаваоца токена.",
+      "acknowledge": "Разумем"
+    },
+    "minimumConversion": "Минимална конверзија: {amount:string}",
+    "conversionUnavailable": "Конверзија тренутно није доступна. Покушајте поново."
   },
   "BackendFeatureGate": {
     "title": "Функција недоступна",
@@ -3630,6 +3661,10 @@
     "title": "Новчаник је ван мреже",
     "description": "Ваш нестаратељски новчаник тренутно не може да приступи мрежи. Покушајте поново када се вратите на мрежу.",
     "retry": "Покушај поново"
+  },
+  "SelfCustodialBalance": {
+    "staleLabel": "ЗАСТАРЕЛО",
+    "syncFailedToast": "Синхронизација стања није успела. Ваше стање можда није ажурно."
   },
   "UnclaimedDeposit": {
     "title": "Имате {count} незатражен(их) депозит(а)",

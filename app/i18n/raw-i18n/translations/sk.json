@@ -70,7 +70,11 @@
     "receivingAccount": "Prijímajúci účet",
     "infoBitcoin": "Suma v Bitcoin je len približná. Môže sa mierne líšiť.",
     "infoDollar": "Suma v dolároch je len približná. Môže sa mierne líšiť.",
-    "transferButtonText": "Previesť {fromWallet} na {toWallet}"
+    "transferButtonText": "Previesť {fromWallet} na {toWallet}",
+    "feeLabel": "Poplatok za konverziu",
+    "feeError": "Nepodarilo sa načítať poplatok za konverziu",
+    "amountFloored": "Suma zvýšená na minimum konverzie.",
+    "amountDustBumped": "Suma zvýšená na konverziu celého zostatku."
   },
   "ConversionSuccessScreen": {
     "message": "Úspešná konverzia",
@@ -3563,7 +3567,34 @@
   },
   "StableBalance": {
     "title": "Stabilný zostatok",
-    "description": "Udržiavajte zostatok v USD poháňaný USDB na Spark."
+    "description": "Udržiavajte zostatok v USD poháňaný USDB na Spark.",
+    "balanceLabelBtc": "Zostatok · SATS",
+    "balanceLabelUsd": "Zostatok · USD",
+    "settingsRowTitle": "Stabilný zostatok",
+    "settingsTitle": "Stabilný zostatok",
+    "settingsDescription": "Časť peňaženky si udržujte v USD. BTC a USD si kedykoľvek ručne konvertujte pomocou akcie Konvertovať.",
+    "activationLabel": "Aktívny",
+    "activeHint": "Peňaženka drží USD cez USDB.",
+    "inactiveHint": "Peňaženka drží iba BTC.",
+    "deactivateWarningBody": "Máš ešte {amount:string}. Najprv previesť na BTC, inak bude USD zostatok skrytý, kým znovu neaktivuješ Stable Balance.",
+    "toggleFailedToast": "Stabilný zostatok sa nepodarilo aktualizovať. Skúste to znova.",
+    "toggleModal": {
+      "activateTitle": "Aktivovať stabilný zostatok",
+      "activateBody": "Váš zostatok v BTC bude prevedený na USDB. Toto je odhadovaný poplatok za prevod.",
+      "activateConfirm": "Aktivovať",
+      "deactivateTitle": "Deaktivovať stabilný zostatok",
+      "deactivateBody": "Váš zostatok v USDB bude prevedený späť na BTC. Toto je odhadovaný poplatok za prevod.",
+      "deactivateConfirm": "Deaktivovať",
+      "cancel": "Zrušiť"
+    },
+    "firstTimeModal": {
+      "title": "O konverzii",
+      "dualBalance": "BTC a USD sú dva nezávislé zostatky vo vašej peňaženke. Kedykoľvek použite Convert na presun prostriedkov medzi nimi.",
+      "trustDisclosure": "Režim USD používa tokeny USDB na Sparku. Predpoklady dôvery sa líšia od priameho držania BTC. USDB sa spolieha na Sparkovho emitenta tokenov.",
+      "acknowledge": "Rozumiem"
+    },
+    "minimumConversion": "Minimálna konverzia: {amount:string}",
+    "conversionUnavailable": "Konverzia je dočasne nedostupná. Skúste to znova."
   },
   "BackendFeatureGate": {
     "title": "Funkcia nedostupná",
@@ -3592,6 +3623,10 @@
     "title": "Peňaženka je offline",
     "description": "Vaša nekustodiálna peňaženka momentálne nemôže dosiahnuť sieť. Skúste to znova, keď budete online.",
     "retry": "Skúsiť znova"
+  },
+  "SelfCustodialBalance": {
+    "staleLabel": "ZASTARALÝ",
+    "syncFailedToast": "Synchronizácia zostatku zlyhala. Váš zostatok môže byť neaktuálny."
   },
   "UnclaimedDeposit": {
     "title": "Máte {count} nevyzdvihnutý(ch) vklad(ov)",

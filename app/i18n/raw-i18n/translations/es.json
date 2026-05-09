@@ -70,7 +70,11 @@
         "receivingAccount": "Cuenta destino",
         "infoBitcoin": "La cantidad de Bitcoin es solo aproximada. Puede variar en una pequeña cantidad.",
         "infoDollar": "La cantidad de Dólares es solo aproximada. Puede variar en una pequeña cantidad.",
-        "transferButtonText": "Transferir {fromWallet} a {toWallet}"
+        "transferButtonText": "Transferir {fromWallet} a {toWallet}",
+        "feeLabel": "Comisión de conversión",
+        "feeError": "No se pudo obtener la comisión de conversión",
+        "amountFloored": "Monto aumentado para cumplir el mínimo de conversión.",
+        "amountDustBumped": "Monto aumentado para convertir todo tu saldo."
     },
     "ConversionSuccessScreen": {
         "message": "Transferencia exitosa"
@@ -3551,7 +3555,34 @@
     },
     "StableBalance": {
         "title": "Balance estable",
-        "description": "Mantén un balance en USD impulsado por USDB en Spark."
+        "description": "Mantén un balance en USD impulsado por USDB en Spark.",
+        "balanceLabelBtc": "Saldo · SATS",
+        "balanceLabelUsd": "Saldo · USD",
+        "settingsRowTitle": "Saldo Estable",
+        "settingsTitle": "Saldo Estable",
+        "settingsDescription": "Mantén parte de tu billetera en USD. Convierte entre BTC y USD manualmente cuando quieras con la acción Convertir.",
+        "activationLabel": "Activo",
+        "activeHint": "Tu billetera mantiene USD vía USDB.",
+        "inactiveHint": "Tu billetera solo mantiene BTC.",
+        "deactivateWarningBody": "Todavía tienes {amount:string}. Conviértelos a BTC primero, o tu saldo en USD quedará oculto hasta que reactives Saldo Estable.",
+        "toggleFailedToast": "No se pudo actualizar Stable Balance. Inténtalo de nuevo.",
+        "toggleModal": {
+            "activateTitle": "Activar saldo estable",
+            "activateBody": "Tu saldo en BTC se convertirá a USDB. Esta es la comisión de conversión estimada.",
+            "activateConfirm": "Activar",
+            "deactivateTitle": "Desactivar saldo estable",
+            "deactivateBody": "Tu saldo en USDB se convertirá de nuevo a BTC. Esta es la comisión de conversión estimada.",
+            "deactivateConfirm": "Desactivar",
+            "cancel": "Cancelar"
+        },
+        "firstTimeModal": {
+            "title": "Sobre Convertir",
+            "dualBalance": "BTC y USD son dos saldos independientes en tu billetera. Usa Convert en cualquier momento para mover fondos entre ellos.",
+            "trustDisclosure": "El modo USD usa tokens USDB en Spark. Las suposiciones de confianza son distintas a mantener BTC directamente. USDB depende del emisor de tokens de Spark.",
+            "acknowledge": "Entiendo"
+        },
+        "minimumConversion": "Conversión mínima: {amount:string}",
+        "conversionUnavailable": "La conversión no está disponible temporalmente. Inténtalo de nuevo."
     },
     "BackendFeatureGate": {
         "title": "Función no disponible",
@@ -3580,6 +3611,10 @@
         "title": "La billetera está sin conexión",
         "description": "Tu billetera no custodial no puede alcanzar la red en este momento. Inténtalo de nuevo cuando vuelvas a estar en línea.",
         "retry": "Intentar de nuevo"
+    },
+    "SelfCustodialBalance": {
+        "staleLabel": "DESACTUALIZADO",
+        "syncFailedToast": "Error al sincronizar el balance. Tu balance puede estar desactualizado."
     },
     "UnclaimedDeposit": {
         "title": "Tienes {count} depósito(s) sin reclamar",

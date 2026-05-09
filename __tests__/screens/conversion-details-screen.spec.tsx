@@ -24,6 +24,7 @@ import {
 import { APPROXIMATE_PREFIX } from "@app/config"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import TypesafeI18n from "@app/i18n/i18n-react"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
 import { createCache } from "@app/graphql/cache"
 import { DisplayCurrency as DisplayCurrencyType } from "@app/types/amounts"
@@ -36,6 +37,44 @@ jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     navigate: mockNavigate,
+  }),
+}))
+
+const mockUseActiveWallet = jest.fn()
+const mockUseNonCustodialConversionLimits = jest.fn()
+
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => mockUseActiveWallet(),
+}))
+
+jest.mock("@app/self-custodial/hooks", () => ({
+  useNonCustodialConversionLimits: (...args: unknown[]) =>
+    mockUseNonCustodialConversionLimits(...args),
+  usePaymentRequest: jest.fn(),
+}))
+
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () => ({
+    wallets: [],
+    status: "Unavailable",
+    accountType: "SelfCustodial",
+    retry: () => {},
+    sdk: null,
+    isStableBalanceActive: false,
+    isBalanceStale: false,
+    lastReceivedPaymentId: null,
+    hasMoreTransactions: false,
+    loadingMore: false,
+    loadMore: async () => {},
+    refreshWallets: async () => {},
+  }),
+}))
+
+jest.mock("@app/hooks/use-stable-balance-first-time", () => ({
+  useStableBalanceFirstTime: () => ({
+    shouldShow: false,
+    markAsShown: jest.fn(),
+    loaded: true,
   }),
 }))
 
@@ -547,8 +586,23 @@ afterAll(() => {
   consoleErrorSpy = null
 })
 
+const defaultActiveWallet = {
+  isSelfCustodial: false,
+  isReady: false,
+  needsBackendAuth: true,
+  wallets: [],
+  status: "Unavailable",
+  accountType: "Custodial",
+}
+
+const defaultLimits = { limits: null, loading: false, error: null }
+
+loadLocale("en")
+
 beforeEach(() => {
   jest.clearAllMocks()
+  mockUseActiveWallet.mockReturnValue(defaultActiveWallet)
+  mockUseNonCustodialConversionLimits.mockReturnValue(defaultLimits)
 })
 
 describe("Initial render with both wallets having balance", () => {
@@ -1895,5 +1949,80 @@ describe("Conversion calculation verification", () => {
     const backToSats = calculateExpectedSatsFromUsd(expectedUsdCents)
     const tolerance = Math.abs(sats - backToSats) / sats
     expect(tolerance).toBeLessThan(0.11)
+  })
+})
+
+describe("Self-custodial conversion limits gating", () => {
+  const scActiveWallet = {
+    isSelfCustodial: true,
+    isReady: true,
+    needsBackendAuth: false,
+    wallets: [
+      {
+        id: "sc-btc-id",
+        walletCurrency: WalletCurrency.Btc,
+        balance: { amount: 200000, currency: WalletCurrency.Btc },
+        transactions: [],
+      },
+      {
+        id: "sc-usd-id",
+        walletCurrency: WalletCurrency.Usd,
+        balance: { amount: 50000, currency: WalletCurrency.Usd },
+        transactions: [],
+      },
+    ],
+    status: "Ready",
+    accountType: "SelfCustodial",
+  }
+
+  const buildMocks = () => createGraphQLMocks({ btcBalance: 200000, usdBalance: 50000 })
+
+  it("disables Next and surfaces the unavailable message when limits fail to load", async () => {
+    mockUseActiveWallet.mockReturnValue(scActiveWallet)
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: new Error("limits load failed"),
+    })
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+    await waitFor(() => {
+      expect(getByTestId("amount-field-error").props.children).toContain(
+        "Conversion is temporarily unavailable",
+      )
+    })
+  })
+
+  it("keeps Next disabled while limits load successfully but amount is below the minimum", async () => {
+    mockUseActiveWallet.mockReturnValue(scActiveWallet)
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: { minFromAmount: 1_000_000, minToAmount: null },
+      loading: false,
+      error: null,
+    })
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
   })
 })

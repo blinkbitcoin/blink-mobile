@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 
 import { Wallet } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -58,12 +58,12 @@ export const useConvertMoneyDetails = (params?: UseConvertMoneyDetailsParams) =>
   const [moneyAmount, setMoneyAmount] =
     React.useState<MoneyAmount<WalletOrDisplayCurrency>>(zeroDisplayAmount)
 
-  const setWallets = (wallets: {
-    fromWallet: WalletFragment
-    toWallet: WalletFragment
-  }) => {
-    _setWallets(wallets)
-  }
+  const setWallets = useCallback(
+    (wallets: { fromWallet: WalletFragment; toWallet: WalletFragment }) => {
+      _setWallets(wallets)
+    },
+    [],
+  )
 
   if (!wallets || !convertMoneyAmount || !convertMoneyAmountWithRounding) {
     return {

@@ -201,23 +201,22 @@ describe("toTransactionFragment", () => {
       fractionDigits: 2,
     })
 
-    // First call converts the settlement amount in USD cents
-    expect(convertMoneyAmount).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        amount: 512, // |signedAmount| = settlement (500) + fee (12) for a Send
-        currency: WalletCurrency.Usd,
-        currencyCode: WalletCurrency.Usd,
-      }),
-      "USD",
-    )
-    // Second call converts the fee in BTC sats — NOT mixed in with the USD amount
-    expect(convertMoneyAmount).toHaveBeenNthCalledWith(
-      2,
+    // The BTC fee is converted via convertMoneyAmount with currency: BTC — never
+    // mixed in raw with the USD settlement amount. That's the mixed-unit guard.
+    expect(convertMoneyAmount).toHaveBeenCalledWith(
       expect.objectContaining({
         amount: 12,
         currency: WalletCurrency.Btc,
         currencyCode: WalletCurrency.Btc,
+      }),
+      "USD",
+    )
+    // The settlement amount stays in USD cents for the display conversion.
+    expect(convertMoneyAmount).toHaveBeenCalledWith(
+      expect.objectContaining({
+        amount: 501,
+        currency: WalletCurrency.Usd,
+        currencyCode: WalletCurrency.Usd,
       }),
       "USD",
     )
@@ -232,5 +231,37 @@ describe("toTransactionFragments", () => {
     expect(results).toHaveLength(2)
     expect(results[0].id).toBe("tx-1")
     expect(results[1].id).toBe("tx-2")
+  })
+
+  it("keeps a USD fee in raw cents when settlementCurrency is USD instead of converting it through BTC pricing", () => {
+    const tx = createTx({
+      direction: TransactionDirection.Send,
+      paymentType: PaymentType.Lightning,
+      amount: {
+        amount: 500,
+        currency: WalletCurrency.Usd,
+        currencyCode: WalletCurrency.Usd,
+      },
+      fee: {
+        amount: 7,
+        currency: WalletCurrency.Usd,
+        currencyCode: WalletCurrency.Usd,
+      },
+    })
+
+    const convertMoneyAmount = jest.fn(({ amount }) => ({
+      amount,
+      currency: "USD",
+      currencyCode: "USD",
+    }))
+
+    const result = toTransactionFragment(tx, {
+      displayCurrency: "USD",
+      convertMoneyAmount: convertMoneyAmount as never,
+      fractionDigits: 2,
+    })
+
+    expect(result.settlementFee).toBe(7)
+    expect(result.settlementCurrency).toBe(WalletCurrency.Usd)
   })
 })

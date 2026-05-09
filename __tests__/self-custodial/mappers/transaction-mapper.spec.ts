@@ -134,10 +134,11 @@ describe("mapSelfCustodialTransaction", () => {
     expect(result.sourceAccountType).toBe(AccountType.SelfCustodial)
   })
 
-  it("fees always use BTC currency", () => {
+  it("scales token payment fees from base units to USD cents and tags them as USD", () => {
     const result = mapSelfCustodialTransaction(
       createPayment({
         method: 2,
+        fees: BigInt(1_500_000),
         details: {
           tag: "Token",
           inner: { metadata: { ticker: "USDB", decimals: 6, identifier: "test" } },
@@ -145,7 +146,21 @@ describe("mapSelfCustodialTransaction", () => {
       }),
     )
 
+    expect(result.fee?.currency).toBe(WalletCurrency.Usd)
+    expect(result.fee?.amount).toBe(150)
+  })
+
+  it("keeps BTC payment fees in sats and tags them as BTC", () => {
+    const result = mapSelfCustodialTransaction(
+      createPayment({
+        method: 0,
+        fees: BigInt(42),
+        details: { tag: "Lightning", inner: {} },
+      }),
+    )
+
     expect(result.fee?.currency).toBe(WalletCurrency.Btc)
+    expect(result.fee?.amount).toBe(42)
   })
 })
 

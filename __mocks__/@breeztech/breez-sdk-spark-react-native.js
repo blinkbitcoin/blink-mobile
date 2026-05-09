@@ -70,7 +70,32 @@ module.exports = {
   Seed: { Mnemonic: jest.fn().mockImplementation((args) => args) },
   StableBalanceActiveLabel: {
     Set: jest.fn().mockImplementation((args) => ({ tag: "Set", inner: args })),
-    Unset: jest.fn().mockReturnValue({ tag: "Unset" }),
+    Unset: jest.fn().mockImplementation(() => ({ tag: "Unset" })),
+  },
+  ConversionType: {
+    FromBitcoin: jest.fn().mockImplementation(() => ({ tag: "FromBitcoin" })),
+    ToBitcoin: jest
+      .fn()
+      .mockImplementation((args) => ({ tag: "ToBitcoin", inner: args })),
+  },
+  AmountAdjustmentReason: {
+    FlooredToMinLimit: "FlooredToMinLimit",
+    IncreasedToAvoidDust: "IncreasedToAvoidDust",
+  },
+  PrepareSendPaymentRequest: { create: (p) => p },
+  SendPaymentRequest: { create: (p) => p },
+  ReceivePaymentRequest: { create: (p) => p },
+  ReceivePaymentMethod: {
+    SparkAddress: jest.fn().mockImplementation(() => ({ tag: "SparkAddress" })),
+    SparkInvoice: jest
+      .fn()
+      .mockImplementation((args) => ({ tag: "SparkInvoice", inner: args })),
+    Bolt11Invoice: jest
+      .fn()
+      .mockImplementation((args) => ({ tag: "Bolt11Invoice", inner: args })),
+    BitcoinAddress: jest
+      .fn()
+      .mockImplementation((args) => ({ tag: "BitcoinAddress", inner: args })),
   },
   SdkEvent_Tags,
   PaymentMethod: {

@@ -72,7 +72,11 @@
     "receivingAccount": "Ontvangsrekening",
     "infoBitcoin": "Bitcoin-bedrag is slegs 'n skatting. Dit kan met 'n klein bedrag wissel.",
     "infoDollar": "Dollar-bedrag is slegs 'n skatting. Dit kan met 'n klein bedrag wissel.",
-    "transferButtonText": "Dra {fromWallet} oor na {toWallet}"
+    "transferButtonText": "Dra {fromWallet} oor na {toWallet}",
+    "feeLabel": "Omskakelingsfooi",
+    "feeError": "Kon nie die omskakelingsfooi haal nie",
+    "amountFloored": "Bedrag verhoog om die omskakelingsminimum te haal.",
+    "amountDustBumped": "Bedrag verhoog om jou volle saldo om te skakel."
   },
   "ConversionSuccessScreen": {
     "message": "Omskakeling suksesvol",
@@ -3604,7 +3608,34 @@
   },
   "StableBalance": {
     "title": "Stabiele balans",
-    "description": "Hou 'n USD-balans aangedryf deur USDB op Spark."
+    "description": "Hou 'n USD-balans aangedryf deur USDB op Spark.",
+    "balanceLabelBtc": "Balans · SATS",
+    "balanceLabelUsd": "Balans · USD",
+    "settingsRowTitle": "Stabiele Balans",
+    "settingsTitle": "Stabiele Balans",
+    "settingsDescription": "Hou 'n deel van jou beursie in USD. Skakel BTC en USD enige tyd handmatig om met die Skakel-aksie.",
+    "activationLabel": "Aktief",
+    "activeHint": "Jou beursie hou USD via USDB.",
+    "inactiveHint": "Jou beursie hou net BTC.",
+    "deactivateWarningBody": "Jy het nog {amount:string}. Skakel eers om na BTC, anders word jou USD-saldo versteek totdat jy Stabiele Balans heractiveer.",
+    "toggleFailedToast": "Kon nie Stabiele Balans bywerk nie. Probeer asseblief weer.",
+    "toggleModal": {
+      "activateTitle": "Aktiveer Stabiele Saldo",
+      "activateBody": "Jou BTC-saldo sal na USDB omgeskakel word. Dit is die geskatte omskakelingsfooi.",
+      "activateConfirm": "Aktiveer",
+      "deactivateTitle": "Deaktiveer Stabiele Saldo",
+      "deactivateBody": "Jou USDB-saldo sal terug na BTC omgeskakel word. Dit is die geskatte omskakelingsfooi.",
+      "deactivateConfirm": "Deaktiveer",
+      "cancel": "Kanselleer"
+    },
+    "firstTimeModal": {
+      "title": "Oor Omskakeling",
+      "dualBalance": "BTC en USD is twee onafhanklike saldo's in jou beursie. Gebruik Convert enige tyd om fondse tussen hulle te skuif.",
+      "trustDisclosure": "USD-modus gebruik USDB-tokens op Spark. Die vertroue-aannames is anders as om BTC direk te hou. USDB steun op Spark se token-uitreiker.",
+      "acknowledge": "Ek verstaan"
+    },
+    "minimumConversion": "Minimum omskakeling: {amount:string}",
+    "conversionUnavailable": "Omskakeling is tydelik onbeskikbaar. Probeer asseblief weer."
   },
   "BackendFeatureGate": {
     "title": "Funksie nie beskikbaar nie",
@@ -3633,6 +3664,10 @@
     "title": "Beursie is vanlyn",
     "description": "Jou nie-bewaarderbeursie kan nie die netwerk nou bereik nie. Probeer weer wanneer jy aanlyn is.",
     "retry": "Probeer weer"
+  },
+  "SelfCustodialBalance": {
+    "staleLabel": "VEROUDERD",
+    "syncFailedToast": "Balans sinkronisasie het misluk. Jou balans is dalk verouderd."
   },
   "UnclaimedDeposit": {
     "title": "Jy het {count} onopgeëiste deposito('s)",

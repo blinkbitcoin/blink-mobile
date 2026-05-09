@@ -3,11 +3,7 @@ import {
   createSendPayment,
   createGetFee,
 } from "@app/self-custodial/adapters/payment-adapter"
-import {
-  createReceiveLightning,
-  createReceiveOnchain,
-  createConvert,
-} from "@app/self-custodial/bridge"
+import { createReceiveLightning, createReceiveOnchain } from "@app/self-custodial/bridge"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
@@ -40,6 +36,15 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   ReceivePaymentMethod: {
     Bolt11Invoice: jest.fn((args: unknown) => ({ tag: "Bolt11Invoice", inner: args })),
     BitcoinAddress: jest.fn((args: unknown) => ({ tag: "BitcoinAddress", inner: args })),
+    SparkInvoice: jest.fn((args: unknown) => ({ tag: "SparkInvoice", inner: args })),
+  },
+  ConversionType: {
+    FromBitcoin: jest.fn(() => ({ tag: "FromBitcoin" })),
+    ToBitcoin: jest.fn((args: unknown) => ({ tag: "ToBitcoin", inner: args })),
+  },
+  AmountAdjustmentReason: {
+    FlooredToMinLimit: "FlooredToMinLimit",
+    IncreasedToAvoidDust: "IncreasedToAvoidDust",
   },
   ListUnclaimedDepositsRequest: {
     create: (args: unknown) => args,
@@ -50,16 +55,28 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
-  SparkConfig: { tokenIdentifier: "test-token-id" },
-  SparkToken: { Label: "USDB", Ticker: "USDB", DefaultDecimals: 6 },
+  SparkConfig: { maxSlippageBps: 50 },
+  requireSparkTokenIdentifier: () => "test-token-id",
+  SparkToken: { Label: "USDB", DefaultDecimals: 6 },
 }))
+
+jest.mock("@app/self-custodial/bridge/limits", () => {
+  const actual = jest.requireActual("@app/self-custodial/bridge/limits")
+  return {
+    ...actual,
+    fetchConversionLimits: jest
+      .fn()
+      .mockResolvedValue({ minFromAmount: null, minToAmount: null }),
+  }
+})
 
 const createMockSdk = () => ({
   prepareSendPayment: jest.fn(),
   sendPayment: jest.fn(),
-  receivePayment: jest.fn(),
+  receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own" }),
   listUnclaimedDeposits: jest.fn(),
   claimDeposit: jest.fn(),
+  getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
 })
 
 describe("self-custodial payment adapters", () => {
@@ -359,38 +376,6 @@ describe("self-custodial payment adapters", () => {
       const result = await receive()
 
       expect(result.errors?.[0].message).toBe("no address")
-    })
-  })
-
-  describe("createConvert", () => {
-    it("prepares and sends conversion", async () => {
-      const sdk = createMockSdk()
-      sdk.prepareSendPayment.mockResolvedValue({ amount: BigInt(100) })
-      sdk.sendPayment.mockResolvedValue({})
-
-      const convert = createConvert(sdk as never)
-      const result = await convert({
-        amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
-        direction: "btc_to_usd",
-      })
-
-      expect(result.status).toBe("success")
-      expect(sdk.prepareSendPayment).toHaveBeenCalledWith(
-        expect.objectContaining({ tokenIdentifier: "test-token-id" }),
-      )
-    })
-
-    it("returns failed on error", async () => {
-      const sdk = createMockSdk()
-      sdk.prepareSendPayment.mockRejectedValue(new Error("slippage"))
-
-      const convert = createConvert(sdk as never)
-      const result = await convert({
-        amount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
-        direction: "btc_to_usd",
-      })
-
-      expect(result.status).toBe("failed")
     })
   })
 })

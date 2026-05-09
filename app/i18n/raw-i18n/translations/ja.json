@@ -72,7 +72,11 @@
         "receivingAccount": "受金ウォレット",
         "infoBitcoin": "Bitcoin金額は概算です。少額の変動が生じる場合があります。",
         "infoDollar": "ドル金額は概算です。少額の変動が生じる場合があります。",
-        "transferButtonText": "{fromWallet}から{toWallet}へ振替"
+        "transferButtonText": "{fromWallet}から{toWallet}へ振替",
+        "feeLabel": "変換手数料",
+        "feeError": "変換手数料を取得できませんでした",
+        "amountFloored": "変換の最小額に達するよう金額を引き上げました。",
+        "amountDustBumped": "全残高を変換するため金額を引き上げました。"
     },
     "ConversionSuccessScreen": {
         "message": "両替が完了しました",
@@ -3592,7 +3596,34 @@
     },
     "StableBalance": {
         "title": "ステーブルバランス",
-        "description": "Spark上のUSDBによるUSD残高を保持します。"
+        "description": "Spark上のUSDBによるUSD残高を保持します。",
+        "balanceLabelBtc": "残高 · SATS",
+        "balanceLabelUsd": "残高 · USD",
+        "settingsRowTitle": "安定残高",
+        "settingsTitle": "安定残高",
+        "settingsDescription": "ウォレットの一部をUSDで保持します。Convertアクションを使用して、いつでも手動でBTCとUSDの間で変換できます。",
+        "activationLabel": "有効",
+        "activeHint": "ウォレットはUSDB経由でUSDを保持しています。",
+        "inactiveHint": "ウォレットはBTCのみを保持しています。",
+        "deactivateWarningBody": "まだ {amount:string} あります。先にBTCに変換してください。そうしないと、Stable Balanceを再度有効にするまでUSD残高は非表示になります。",
+        "toggleFailedToast": "Stable Balanceを更新できませんでした。もう一度お試しください。",
+        "toggleModal": {
+            "activateTitle": "安定残高を有効化",
+            "activateBody": "BTC残高はUSDBに変換されます。これは推定される変換手数料です。",
+            "activateConfirm": "有効化",
+            "deactivateTitle": "安定残高を無効化",
+            "deactivateBody": "USDB残高はBTCに戻されます。これは推定される変換手数料です。",
+            "deactivateConfirm": "無効化",
+            "cancel": "キャンセル"
+        },
+        "firstTimeModal": {
+            "title": "変換について",
+            "dualBalance": "BTCとUSDは、ウォレット内の独立した2つの残高です。いつでもConvertを使って、それらの間で資金を移動できます。",
+            "trustDisclosure": "USDモードはSpark上のUSDBトークンを使用します。信頼の前提はBTCを直接保有することとは異なります. USDBはSparkのトークン発行者に依存しています。",
+            "acknowledge": "理解しました"
+        },
+        "minimumConversion": "最小変換額: {amount:string}",
+        "conversionUnavailable": "変換は一時的に利用できません。もう一度お試しください。"
     },
     "BackendFeatureGate": {
         "title": "機能が利用できません",
@@ -3621,6 +3652,10 @@
         "title": "ウォレットはオフラインです",
         "description": "非保管型ウォレットは現在ネットワークに接続できません。オンラインに戻ったら再試行してください。",
         "retry": "再試行"
+    },
+    "SelfCustodialBalance": {
+        "staleLabel": "古い",
+        "syncFailedToast": "残高の同期に失敗しました。残高が最新でない可能性があります。"
     },
     "UnclaimedDeposit": {
         "title": "{count}件の未請求デポジットがあります",

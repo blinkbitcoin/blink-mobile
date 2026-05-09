@@ -29,7 +29,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
     getClaimFee: jest.fn(),
     claimDeposit: jest.fn(),
   }),
-  createConvert: jest.fn().mockReturnValue(jest.fn()),
+  createGetConversionQuote: jest.fn().mockReturnValue(jest.fn()),
 }))
 
 jest.mock("@app/custodial/adapters/payment-adapter", () => ({
@@ -65,12 +65,6 @@ describe("usePayments", () => {
     expect(result.current.claimDeposit).toBeDefined()
     expect(result.current.claimDeposit!.getClaimFee).toBeDefined()
     expect(result.current.claimDeposit!.claimDeposit).toBeDefined()
-  })
-
-  it("returns convert adapter", () => {
-    const { result } = renderHook(() => usePayments())
-
-    expect(result.current.convert).toBeDefined()
   })
 
   it("returns sendPayment as undefined (not wired yet)", () => {
@@ -143,5 +137,38 @@ describe("usePayments", () => {
     expect(result.current.listPendingDeposits).toBeUndefined()
     expect(result.current.claimDeposit).toBeUndefined()
     expect(result.current.convert).toBeUndefined()
+  })
+
+  it("exposes getConversionQuote only on the SC path with an SDK", () => {
+    mockActiveAccount.mockReturnValue({
+      id: "sc-default",
+      type: AccountType.SelfCustodial,
+    })
+    mockSelfCustodialWallet.mockReturnValue({ sdk: mockSdk })
+
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.getConversionQuote).toBeDefined()
+  })
+
+  it("does not expose getConversionQuote on the custodial path", () => {
+    mockActiveAccount.mockReturnValue({ id: "custodial-default", type: "custodial" })
+    mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })
+
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.getConversionQuote).toBeUndefined()
+  })
+
+  it("does not expose getConversionQuote for a SC account missing its SDK", () => {
+    mockActiveAccount.mockReturnValue({
+      id: "sc-default",
+      type: AccountType.SelfCustodial,
+    })
+    mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })
+
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.getConversionQuote).toBeUndefined()
   })
 })
