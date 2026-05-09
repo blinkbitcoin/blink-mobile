@@ -111,4 +111,22 @@ describe("classifySdkError", () => {
       SelfCustodialErrorCode.Generic,
     )
   })
+
+  it("refines InvalidInput using its inner string (Critical #9)", () => {
+    expect(classifySdkError(sdkError("InvalidInput", ["amount below minimum"]))).toBe(
+      SelfCustodialErrorCode.BelowMinimum,
+    )
+  })
+
+  it("refines InsufficientFunds using its inner string (Critical #9)", () => {
+    expect(
+      classifySdkError(sdkError("InsufficientFunds", ["amount below minimum"])),
+    ).toBe(SelfCustodialErrorCode.BelowMinimum)
+  })
+
+  it("falls back to the tag mapping for InvalidInput when no inner hint matches", () => {
+    expect(classifySdkError(sdkError("InvalidInput", ["some other failure"]))).toBe(
+      SelfCustodialErrorCode.InvalidInput,
+    )
+  })
 })
