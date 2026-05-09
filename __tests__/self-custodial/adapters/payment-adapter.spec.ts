@@ -5,6 +5,13 @@ import {
 } from "@app/self-custodial/adapters/payment-adapter"
 import { createReceiveLightning, createReceiveOnchain } from "@app/self-custodial/bridge"
 
+const mockRecordError = jest.fn()
+
+jest.mock("@react-native-firebase/crashlytics", () => ({
+  __esModule: true,
+  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+}))
+
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
   InputType_Tags: { SparkAddress: "SparkAddress" },
@@ -179,6 +186,18 @@ describe("self-custodial payment adapters", () => {
       const result = await getFee({ destination: "lnbc1..." })
 
       expect(result).toBeNull()
+    })
+
+    it("records the rejection to crashlytics so the failure is queryable, not just a breadcrumb (Important #2)", async () => {
+      const sdk = createMockSdk()
+      sdk.prepareSendPayment.mockRejectedValue(new Error("fee quote boom"))
+      mockRecordError.mockClear()
+
+      const getFee = createGetFee(sdk as never)
+      await getFee({ destination: "lnbc1..." })
+
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockRecordError.mock.calls[0][0].message).toContain("fee quote boom")
     })
 
     it("prepares with tokenIdentifier + USDB-scaled amount when currency is USD", async () => {
