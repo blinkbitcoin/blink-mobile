@@ -594,6 +594,47 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     })
   })
 
+  it("recovers from a snapshot that hangs past the timeout instead of staying in Loading (Critical #2)", async () => {
+    jest.useFakeTimers()
+    setupConnectedWallet(
+      {
+        getMnemonic: mockGetMnemonic,
+        initSdk: mockInitSdk,
+        addSdkEventListener: mockAddSdkEventListener,
+      },
+      { wallets: [], hasMore: false },
+    )
+    const snapshot = getWalletSnapshotMocks()
+    snapshot.getSelfCustodialWalletSnapshot.mockImplementation(
+      () =>
+        new Promise(() => {
+          // never resolves; should be aborted by the 5s timeout race
+        }),
+    )
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockInitSdk).toHaveBeenCalled()
+    })
+
+    await act(async () => {
+      jest.advanceTimersByTime(5_001)
+    })
+
+    await waitFor(() => {
+      expect(result.current.status).not.toBe(ActiveWalletStatus.Loading)
+    })
+
+    expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("wallet snapshot timed out"),
+      }),
+    )
+
+    jest.useRealTimers()
+  })
+
   it("loadMore calls loadMoreTransactions and appends via appendTransactions", async () => {
     setupConnectedWallet(
       {

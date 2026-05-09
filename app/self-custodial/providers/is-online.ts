@@ -8,7 +8,7 @@ const ONLINE_STATUSES: readonly ServiceStatus[] = [
   ServiceStatus.Degraded,
 ]
 
-const STATUS_TIMEOUT_MS = 5000
+export const STATUS_TIMEOUT_MS = 5000
 
 const reportSparkStatusFailure = (err: unknown): void => {
   recordErrorOnce(
