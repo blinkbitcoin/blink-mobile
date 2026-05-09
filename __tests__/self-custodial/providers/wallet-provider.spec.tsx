@@ -707,7 +707,11 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     jest.useFakeTimers()
     setupConnectedWallet(
       {
-        getMnemonic: mockGetMnemonic,
+        getMnemonicForAccount: mockGetMnemonicForAccount,
+        listSelfCustodialAccounts: mockListSelfCustodialAccounts,
+        setActiveAccountId: (id: string) => {
+          mockState.activeAccountId = id
+        },
         initSdk: mockInitSdk,
         addSdkEventListener: mockAddSdkEventListener,
       },
@@ -750,7 +754,11 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
 
     setupConnectedWallet(
       {
-        getMnemonic: mockGetMnemonic,
+        getMnemonicForAccount: mockGetMnemonicForAccount,
+        listSelfCustodialAccounts: mockListSelfCustodialAccounts,
+        setActiveAccountId: (id: string) => {
+          mockState.activeAccountId = id
+        },
         initSdk: mockInitSdk,
         addSdkEventListener: mockAddSdkEventListener,
       },
@@ -812,7 +820,7 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
           resolveInit = resolve
         }),
     )
-    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
+    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
     const fakeSdk = { id: "fake-sdk" }
 
     const { unmount } = renderHook(() => useSelfCustodialWallet(), { wrapper })
@@ -837,7 +845,11 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
   it("preserves the loadMore cursor across refresh by passing the current raw offset to the snapshot (Critical #8)", async () => {
     const { listener } = setupConnectedWallet(
       {
-        getMnemonic: mockGetMnemonic,
+        getMnemonicForAccount: mockGetMnemonicForAccount,
+        listSelfCustodialAccounts: mockListSelfCustodialAccounts,
+        setActiveAccountId: (id: string) => {
+          mockState.activeAccountId = id
+        },
         initSdk: mockInitSdk,
         addSdkEventListener: mockAddSdkEventListener,
       },
@@ -1236,8 +1248,8 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
 describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGetMnemonic.mockResolvedValue(null)
-    mockGetMnemonicNetwork.mockResolvedValue("regtest")
+    mockGetMnemonicForAccount.mockResolvedValue(null)
+    mockGetMnemonicNetworkForAccount.mockResolvedValue("regtest")
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
@@ -1250,7 +1262,11 @@ describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () 
   it("ignores a stale snapshot that resolves after the SDK was replaced", async () => {
     setupConnectedWallet(
       {
-        getMnemonic: mockGetMnemonic,
+        getMnemonicForAccount: mockGetMnemonicForAccount,
+        listSelfCustodialAccounts: mockListSelfCustodialAccounts,
+        setActiveAccountId: (id: string) => {
+          mockState.activeAccountId = id
+        },
         initSdk: mockInitSdk,
         addSdkEventListener: mockAddSdkEventListener,
       },
