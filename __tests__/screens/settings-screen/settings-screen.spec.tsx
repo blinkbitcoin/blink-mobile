@@ -537,4 +537,21 @@ describe("Settings Screen", () => {
 
     expect(screen.getByText("Move to non-custodial")).toBeTruthy()
   })
+
+  it("does not render a standalone Recovery method group (Critical #7)", async () => {
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.queryByTestId("Recovery method-group")).toBeNull()
+  })
 })
