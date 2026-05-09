@@ -39,6 +39,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     assetMode,
     setAssetMode,
     isToggleDisabled: isAssetToggleDisabled,
+    loading: isAssetModeLoading,
   } = useReceiveAssetMode()
 
   const btcWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
@@ -79,7 +80,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   )
 
   const generateRequest = useCallback(async () => {
-    if (!sdk || !isReady || type === Invoice.OnChain) return
+    if (!sdk || !isReady || isAssetModeLoading || type === Invoice.OnChain) return
     setRequestState(PaymentRequestState.Loading)
 
     try {
@@ -122,7 +123,16 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
       )
       setRequestState(PaymentRequestState.Error)
     }
-  }, [sdk, isReady, type, memo, amount, convertMoneyAmount, assetMode])
+  }, [
+    sdk,
+    isReady,
+    isAssetModeLoading,
+    type,
+    memo,
+    amount,
+    convertMoneyAmount,
+    assetMode,
+  ])
 
   const setMemo = useCallback(() => {
     setMemoState(memoChangeText || "")

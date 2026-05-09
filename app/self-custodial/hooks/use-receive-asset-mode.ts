@@ -14,6 +14,7 @@ export type UseReceiveAssetModeResult = {
   setAssetMode: (mode: ReceiveAssetMode) => void
   isToggleDisabled: boolean
   availableModesForRail: (rail: ReceiveRail) => readonly ReceiveAssetMode[]
+  loading: boolean
 }
 
 const ALL_MODES = [ReceiveAssetMode.Bitcoin, ReceiveAssetMode.Dollar] as const
@@ -27,7 +28,7 @@ export const useReceiveAssetMode = (): UseReceiveAssetModeResult => {
     isStableBalanceActive ? ReceiveAssetMode.Dollar : ReceiveAssetMode.Bitcoin,
   )
 
-  // Re-align to Dollar if stable balance toggles ON mid-session.
+  // Re-align to Dollar when stable balance becomes active.
   useEffect(() => {
     if (isStableBalanceActive && assetMode !== ReceiveAssetMode.Dollar) {
       setAssetMode(ReceiveAssetMode.Dollar)
@@ -46,7 +47,8 @@ export const useReceiveAssetMode = (): UseReceiveAssetModeResult => {
   return {
     assetMode,
     setAssetMode,
-    isToggleDisabled: isStableBalanceActive,
+    isToggleDisabled: Boolean(isStableBalanceActive),
     availableModesForRail,
+    loading: isStableBalanceActive === undefined,
   }
 }

@@ -213,7 +213,10 @@ const findPaidAmountForInvoice = async (
 }
 
 export const useAutoConvertListener = (): void => {
-  const { sdk, lastReceivedPaymentId, isStableBalanceActive } = useSelfCustodialWallet()
+  const wallet = useSelfCustodialWallet()
+  const { sdk, lastReceivedPaymentId } = wallet
+  // Defaults unknown to not-active so existing records still process.
+  const isStableBalanceActive = wallet.isStableBalanceActive ?? false
   const { convertMoneyAmount } = usePriceConversion()
   const { LL } = useI18nContext()
   const {
