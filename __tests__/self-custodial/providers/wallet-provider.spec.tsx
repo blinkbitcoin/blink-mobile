@@ -632,11 +632,7 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
           resolveInit = resolve
         }),
     )
-    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
-    mockListSelfCustodialAccounts.mockResolvedValue([
-      { id: "test-sc-uuid", lightningAddress: null },
-    ])
-    mockState.activeAccountId = "test-sc-uuid"
+    mockGetMnemonic.mockResolvedValue("word1 word2 word3")
     const fakeSdk = { id: "fake-sdk" }
 
     const { unmount } = renderHook(() => useSelfCustodialWallet(), { wrapper })
@@ -661,11 +657,7 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
   it("preserves the loadMore cursor across refresh by passing the current raw offset to the snapshot (Critical #8)", async () => {
     const { listener } = setupConnectedWallet(
       {
-        getMnemonicForAccount: mockGetMnemonicForAccount,
-        listSelfCustodialAccounts: mockListSelfCustodialAccounts,
-        setActiveAccountId: (id: string) => {
-          mockState.activeAccountId = id
-        },
+        getMnemonic: mockGetMnemonic,
         initSdk: mockInitSdk,
         addSdkEventListener: mockAddSdkEventListener,
       },
