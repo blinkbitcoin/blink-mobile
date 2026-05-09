@@ -12,10 +12,12 @@ jest.mock("react-native-inappbrowser-reborn", () => ({
 }))
 
 const mockCheckpoint = jest.fn<string | null, []>()
+const mockCheckpointLoading = jest.fn<boolean, []>()
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
     saveCheckpoint: jest.fn(),
     checkpoint: mockCheckpoint(),
+    loading: mockCheckpointLoading(),
   }),
   MigrationCheckpoint: {
     BackupMethod: "backupMethod",
@@ -79,6 +81,7 @@ describe("SparkBackupConfirmScreen", () => {
     jest.clearAllMocks()
     jest.useFakeTimers()
     mockCheckpoint.mockReturnValue(null)
+    mockCheckpointLoading.mockReturnValue(false)
     mockBackupStateValue.mockReturnValue({
       backupState: { status: "none", method: null },
       setBackupCompleted: mockSetBackupCompleted,
@@ -267,5 +270,32 @@ describe("SparkBackupConfirmScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen", {
       reBackup: false,
     })
+  })
+
+  it("does not auto-navigate while the migration checkpoint is still loading (Critical #1)", () => {
+    mockCheckpoint.mockReturnValue(null)
+    mockCheckpointLoading.mockReturnValue(true)
+
+    const { getByPlaceholderText, rerender } = render(
+      <ContextForScreen>
+        <SparkBackupConfirmScreen />
+      </ContextForScreen>,
+    )
+
+    fillAllChallenges(getByPlaceholderText)
+    jest.advanceTimersByTime(500)
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+
+    mockCheckpoint.mockReturnValue("backupAlerts")
+    mockCheckpointLoading.mockReturnValue(false)
+    rerender(
+      <ContextForScreen>
+        <SparkBackupConfirmScreen />
+      </ContextForScreen>,
+    )
+    jest.advanceTimersByTime(500)
+
+    expect(mockNavigate).toHaveBeenCalledWith("sparkMigrationTransferringFunds")
   })
 })

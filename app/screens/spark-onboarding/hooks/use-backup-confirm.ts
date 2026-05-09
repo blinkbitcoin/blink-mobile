@@ -7,11 +7,16 @@ type Challenge = { index: number; word: string }
 type UseBackupConfirmParams = {
   challenges: readonly Challenge[]
   onComplete: () => void
+  disabled?: boolean
 }
 
 const AUTO_NAVIGATE_DELAY_MS = 400
 
-export const useBackupConfirm = ({ challenges, onComplete }: UseBackupConfirmParams) => {
+export const useBackupConfirm = ({
+  challenges,
+  onComplete,
+  disabled = false,
+}: UseBackupConfirmParams) => {
   const [inputs, setInputs] = useState<string[]>(() => challenges.map(() => ""))
   const [activeIndex, setActiveIndex] = useState<number | undefined>()
   const [focusRequest, setFocusRequest] = useState<number | null>(null)
@@ -47,13 +52,14 @@ export const useBackupConfirm = ({ challenges, onComplete }: UseBackupConfirmPar
       : getBip39Suggestions(inputs[activeIndex], { maxResults: 3 })
 
   useEffect(() => {
+    if (disabled) return undefined
     if (allCorrect && !hasCompleted.current) {
       hasCompleted.current = true
       const timer = setTimeout(onComplete, AUTO_NAVIGATE_DELAY_MS)
       return () => clearTimeout(timer)
     }
     return undefined
-  }, [allCorrect, onComplete])
+  }, [allCorrect, disabled, onComplete])
 
   return {
     inputs,
