@@ -192,6 +192,36 @@ describe("getOnlineState (3-state, Critical #4)", () => {
 
     expect(await getOnlineState()).toBe("unknown")
   })
+
+  it("forwards an AbortSignal to getSparkStatus (Critical #3)", async () => {
+    mockGetSparkStatus.mockResolvedValue({
+      status: ServiceStatus.Operational,
+      lastUpdated: BigInt(0),
+    })
+
+    await getOnlineState()
+
+    const signal = mockGetSparkStatus.mock.calls[0][0]
+    expect(signal).toBeInstanceOf(AbortSignal)
+    expect(signal.aborted).toBe(false)
+  })
+
+  it("aborts and returns 'unknown' when the SDK call hangs past the timeout (Critical #3)", async () => {
+    jest.useFakeTimers()
+    mockGetSparkStatus.mockImplementation(
+      (signal: AbortSignal) =>
+        new Promise((_, reject) => {
+          signal.addEventListener("abort", () => reject(new Error("aborted")))
+        }),
+    )
+
+    const promise = getOnlineState()
+    jest.runAllTimers()
+    const result = await promise
+
+    expect(result).toBe("unknown")
+    jest.useRealTimers()
+  })
 })
 
 describe("crashlytics reporting on Spark status failures (I4)", () => {
