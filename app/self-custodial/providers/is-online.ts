@@ -46,11 +46,15 @@ export const OnlineState = {
 export type OnlineState = (typeof OnlineState)[keyof typeof OnlineState]
 
 export const getOnlineState = async (): Promise<OnlineState> => {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), STATUS_TIMEOUT_MS)
   try {
-    const { status } = await getSparkStatus()
+    const { status } = await getSparkStatus(controller.signal)
     return isOnlineStatus(status) ? OnlineState.Online : OnlineState.Offline
   } catch (err) {
     reportSparkStatusFailure(err)
     return OnlineState.Unknown
+  } finally {
+    clearTimeout(timer)
   }
 }
