@@ -23,14 +23,23 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   },
 }))
 
+const mockBackupNudgeState = {
+  shouldShowBanner: false,
+  shouldShowModal: false,
+  shouldShowSettingsBanner: false,
+  dismissBanner: jest.fn(),
+}
 jest.mock("@app/hooks/use-backup-nudge-state", () => ({
-  useBackupNudgeState: () => ({
-    shouldShowBanner: false,
-    shouldShowModal: false,
-    shouldShowSettingsBanner: false,
-    dismissBanner: jest.fn(),
-  }),
+  useBackupNudgeState: () => mockBackupNudgeState,
 }))
+
+type NudgeModalProps = { isVisible: boolean; onClose: () => void }
+const mockBackupNudgeModal = jest.fn<null, [NudgeModalProps]>(() => null)
+jest.mock("@app/components/backup-nudge-modal", () => ({
+  BackupNudgeModal: (props: NudgeModalProps) => mockBackupNudgeModal(props),
+}))
+
+let mockIsFocused = true
 
 jest.mock("@app/screens/spark-onboarding/trust-model-screen", () => ({
   SparkTrustModelScreen: () => null,
@@ -164,6 +173,7 @@ jest.mock("@react-navigation/native", () => {
       ...actual.useNavigation?.(),
       navigate: mockNavigate,
     }),
+    useIsFocused: () => mockIsFocused,
   }
 })
 
@@ -588,6 +598,81 @@ describe("HomeScreen", () => {
       fireEvent.press(toggle)
 
       expect(mockToggleBalanceMode).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("BackupNudgeModal focus gating", () => {
+    const lastIsVisible = (): boolean => {
+      const calls = mockBackupNudgeModal.mock.calls
+      expect(calls.length).toBeGreaterThan(0)
+      return calls[calls.length - 1][0].isVisible
+    }
+
+    beforeEach(() => {
+      mockBackupNudgeModal.mockClear()
+      mockBackupNudgeState.shouldShowModal = false
+      mockIsFocused = true
+    })
+
+    afterEach(() => {
+      mockBackupNudgeState.shouldShowModal = false
+      mockIsFocused = true
+    })
+
+    it("passes isVisible=true only when both isFocused and shouldShowModal are true", async () => {
+      mockBackupNudgeState.shouldShowModal = true
+      mockIsFocused = true
+
+      render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(lastIsVisible()).toBe(true)
+    })
+
+    it("passes isVisible=false when the home tab is not focused", async () => {
+      mockBackupNudgeState.shouldShowModal = true
+      mockIsFocused = false
+
+      render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(lastIsVisible()).toBe(false)
+    })
+
+    it("passes isVisible=false when the nudge state says it should not be shown", async () => {
+      mockBackupNudgeState.shouldShowModal = false
+      mockIsFocused = true
+
+      render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(lastIsVisible()).toBe(false)
+    })
+
+    it("passes isVisible=false when neither condition is met", async () => {
+      mockBackupNudgeState.shouldShowModal = false
+      mockIsFocused = false
+
+      render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(lastIsVisible()).toBe(false)
     })
   })
 })
