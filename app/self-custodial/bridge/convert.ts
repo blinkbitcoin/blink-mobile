@@ -252,15 +252,10 @@ const prepareConversion = async (
   const initialTarget = (discoveryAmountOut * inputAmount) / discoveryAmountIn
   if (initialTarget <= 0n) return { prepared: discovery, tokenDecimals }
 
-  let prepared: PrepareSendPaymentResponse
-  try {
-    prepared = await prepareConversionWithDestination(sdk, {
-      direction: params.direction,
-      destinationAmount: initialTarget,
-    })
-  } catch {
-    return { prepared: discovery, tokenDecimals }
-  }
+  const prepared = await prepareConversionWithDestination(sdk, {
+    direction: params.direction,
+    destinationAmount: initialTarget,
+  })
 
   const finalAmountIn = BigInt(toNumber(prepared.conversionEstimate?.amountIn ?? 0n))
   if (finalAmountIn <= inputAmount) return { prepared, tokenDecimals }
@@ -268,15 +263,12 @@ const prepareConversion = async (
   // Final overshoots: shrink by the observed ratio and re-quote once.
   const correctedTarget = (initialTarget * inputAmount) / finalAmountIn
   if (correctedTarget <= 0n) return { prepared: discovery, tokenDecimals }
-  try {
-    const corrected = await prepareConversionWithDestination(sdk, {
-      direction: params.direction,
-      destinationAmount: correctedTarget,
-    })
-    return { prepared: corrected, tokenDecimals }
-  } catch {
-    return { prepared: discovery, tokenDecimals }
-  }
+
+  const corrected = await prepareConversionWithDestination(sdk, {
+    direction: params.direction,
+    destinationAmount: correctedTarget,
+  })
+  return { prepared: corrected, tokenDecimals }
 }
 
 const executePrepared = async (

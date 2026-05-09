@@ -232,6 +232,58 @@ describe("createGetConversionQuote — error handling", () => {
     expect(mockRecordError).toHaveBeenCalled()
   })
 
+  it("rethrows when the corrected re-quote rejects after an overshoot, never executing the discovery quote (Critical #3)", async () => {
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
+    const sdk = {
+      prepareSendPayment: jest
+        .fn()
+        .mockResolvedValueOnce({
+          paymentMethod: {},
+          conversionEstimate: {
+            amountIn: BigInt(2500),
+            amountOut: BigInt(60),
+            fee: BigInt(50),
+            amountAdjustment: undefined,
+          },
+        })
+        .mockResolvedValueOnce({
+          paymentMethod: {},
+          conversionEstimate: {
+            amountIn: BigInt(7500),
+            amountOut: BigInt(180),
+            fee: BigInt(50),
+            amountAdjustment: undefined,
+          },
+        })
+        .mockRejectedValueOnce(new Error("corrected quote rejected")),
+      sendPayment: jest.fn(),
+      receivePayment: jest
+        .fn()
+        .mockResolvedValue({ paymentRequest: "sp1own-spark-address" }),
+      getInfo: jest.fn().mockResolvedValue({
+        balanceSats: BigInt(1_000_000_000),
+        tokenBalances: {
+          "usdb-token-id": {
+            balance: BigInt(1_000_000_000),
+            tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
+          },
+        },
+      }),
+    }
+
+    await expect(
+      createGetConversionQuote(sdk as never)({
+        fromAmount: toBtcMoneyAmount(5000),
+        toAmount: toUsdMoneyAmount(180),
+        direction: ConvertDirection.BtcToUsd,
+      }),
+    ).rejects.toThrow("corrected quote rejected")
+
+    expect(sdk.prepareSendPayment).toHaveBeenCalledTimes(3)
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
   it("propagates the configuration error when SPARK_TOKEN_IDENTIFIER is missing", async () => {
     mockFetchLimits.mockResolvedValue({ minFromAmount: 0, minToAmount: 0 })
     mockRequireTokenId.mockImplementationOnce(() => {
