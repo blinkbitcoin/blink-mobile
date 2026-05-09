@@ -32,6 +32,8 @@ const TAG_TO_CODE: Record<SdkErrorTags, SelfCustodialErrorCode> = {
 const INNER_REFINEMENT_TAGS: ReadonlySet<SdkErrorTags> = new Set([
   SdkErrorTags.SparkError,
   SdkErrorTags.Generic,
+  SdkErrorTags.InvalidInput,
+  SdkErrorTags.InsufficientFunds,
 ])
 
 const INNER_HINTS: Array<[string, SelfCustodialErrorCode]> = [
