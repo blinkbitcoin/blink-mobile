@@ -12,7 +12,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     Unknown: 3,
     Major: 4,
   },
-  getSparkStatus: () => mockBreezGetSparkStatus(),
+  getSparkStatus: (...args: unknown[]) => mockBreezGetSparkStatus(...args),
 }))
 
 describe("getSparkStatus (bridge)", () => {
@@ -36,5 +36,28 @@ describe("getSparkStatus (bridge)", () => {
     mockBreezGetSparkStatus.mockRejectedValue(new Error("network"))
 
     await expect(getSparkStatus()).rejects.toThrow("network")
+  })
+
+  it("forwards an AbortSignal to the SDK when provided (Important #8)", async () => {
+    mockBreezGetSparkStatus.mockResolvedValue({
+      status: ServiceStatus.Operational,
+      lastUpdated: BigInt(0),
+    })
+    const controller = new AbortController()
+
+    await getSparkStatus(controller.signal)
+
+    expect(mockBreezGetSparkStatus).toHaveBeenCalledWith({ signal: controller.signal })
+  })
+
+  it("calls the SDK without arguments when no signal is provided", async () => {
+    mockBreezGetSparkStatus.mockResolvedValue({
+      status: ServiceStatus.Operational,
+      lastUpdated: BigInt(0),
+    })
+
+    await getSparkStatus()
+
+    expect(mockBreezGetSparkStatus).toHaveBeenCalledWith()
   })
 })
