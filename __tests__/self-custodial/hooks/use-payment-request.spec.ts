@@ -8,10 +8,16 @@ const mockReceiveOnchain = jest.fn()
 const mockSelfCustodialWallet = jest.fn()
 const mockActiveWallet = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
+const mockRecordError = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   createReceiveLightning: () => mockReceiveLightning,
   createReceiveOnchain: () => mockReceiveOnchain,
+}))
+
+jest.mock("@react-native-firebase/crashlytics", () => ({
+  __esModule: true,
+  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
 }))
 
 jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
@@ -119,6 +125,20 @@ describe("usePaymentRequest", () => {
     await waitFor(() => {
       expect(result.current?.state).toBe("Error")
     })
+  })
+
+  it("records the rejection to crashlytics when the receive adapter throws (Important #4)", async () => {
+    mockReceiveLightning.mockRejectedValue(new Error("invoice generation boom"))
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Error")
+    })
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "invoice generation boom" }),
+    )
   })
 
   it("does not call the receive adapter while active wallet is not ready", () => {
