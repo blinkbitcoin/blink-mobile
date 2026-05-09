@@ -125,11 +125,11 @@ const runAutoConvert = async ({
     return
   }
 
-  // Stamp first so a crash mid-convert is detectable as an orphan.
-  await recordAutoConvertAttempt(record.paymentRequest, Date.now())
-
   const settled = await waitForPaymentCompleted(sdk, paymentId, waitOptions)
   if (!settled) return
+
+  // Stamp the attempt for retry cooldown and orphan detection.
+  await recordAutoConvertAttempt(record.paymentRequest, Date.now())
 
   const usdCentsAmount = convertSatsToUsdCents(satsReceived, convert)
   const outcome = await executeAutoConvert(sdk, {
