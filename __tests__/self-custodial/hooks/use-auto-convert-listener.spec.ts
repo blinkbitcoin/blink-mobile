@@ -5,8 +5,12 @@ import { useAutoConvertListener } from "@app/self-custodial/hooks/use-auto-conve
 const mockExecuteAutoConvert = jest.fn()
 const mockWaitForPaymentCompleted = jest.fn()
 const mockFindPendingAutoConvert = jest.fn()
+const mockFindRecentConversionId = jest.fn()
 const mockListPendingAutoConverts = jest.fn()
+const mockListAutoConvertPairings = jest.fn()
+const mockMarkAutoConvertPairing = jest.fn()
 const mockPruneExpiredAutoConverts = jest.fn()
+const mockPruneExpiredAutoConvertPairings = jest.fn()
 const mockRecordAutoConvertAttempt = jest.fn()
 const mockRemovePendingAutoConvert = jest.fn()
 const mockUseSelfCustodialWallet = jest.fn()
@@ -24,7 +28,12 @@ jest.mock("@app/self-custodial/auto-convert", () => ({
   },
   executeAutoConvert: (...args: unknown[]) => mockExecuteAutoConvert(...args),
   findPendingAutoConvert: (...args: unknown[]) => mockFindPendingAutoConvert(...args),
+  findRecentConversionId: (...args: unknown[]) => mockFindRecentConversionId(...args),
+  listAutoConvertPairings: (...args: unknown[]) => mockListAutoConvertPairings(...args),
   listPendingAutoConverts: (...args: unknown[]) => mockListPendingAutoConverts(...args),
+  markAutoConvertPairing: (...args: unknown[]) => mockMarkAutoConvertPairing(...args),
+  pruneExpiredAutoConvertPairings: (...args: unknown[]) =>
+    mockPruneExpiredAutoConvertPairings(...args),
   pruneExpiredAutoConverts: (...args: unknown[]) => mockPruneExpiredAutoConverts(...args),
   recordAutoConvertAttempt: (...args: unknown[]) => mockRecordAutoConvertAttempt(...args),
   removePendingAutoConvert: (...args: unknown[]) => mockRemovePendingAutoConvert(...args),
@@ -120,8 +129,12 @@ const setupDefaults = (sdk: ListenerSdk) => {
     convertMoneyAmount: (a: { amount: number }) => ({ amount: a.amount }),
   })
   mockPruneExpiredAutoConverts.mockResolvedValue(undefined)
+  mockPruneExpiredAutoConvertPairings.mockResolvedValue(undefined)
   mockListPendingAutoConverts.mockResolvedValue([])
+  mockListAutoConvertPairings.mockResolvedValue([])
+  mockMarkAutoConvertPairing.mockResolvedValue(undefined)
   mockFindPendingAutoConvert.mockResolvedValue(undefined)
+  mockFindRecentConversionId.mockResolvedValue(undefined)
   mockRecordAutoConvertAttempt.mockResolvedValue(undefined)
   mockRemovePendingAutoConvert.mockResolvedValue(undefined)
   mockWaitForPaymentCompleted.mockResolvedValue(true)
@@ -361,6 +374,95 @@ describe("useAutoConvertListener — live trigger", () => {
       maxAttempts: 9,
       intervalMs: 1500,
     })
+  })
+
+  it("persists a receive→conversion pairing after a successful convert (Critical #2)", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1B", 5000n) }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1B",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(makeRecord({ paymentRequest: "lnbc1B" }))
+    mockFindRecentConversionId.mockResolvedValue("conv-pid-B")
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockMarkAutoConvertPairing).toHaveBeenCalledTimes(1)
+    })
+
+    expect(mockMarkAutoConvertPairing).toHaveBeenCalledWith({
+      receivePaymentId: "pid-lnbc1B",
+      conversionPaymentId: "conv-pid-B",
+      pairedAtMs: expect.any(Number),
+    })
+  })
+
+  it("excludes already-paired conversions from the executor's amount-tolerance check (Critical #2)", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1B", 5000n) }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1B",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(makeRecord({ paymentRequest: "lnbc1B" }))
+    mockListAutoConvertPairings.mockResolvedValue([
+      {
+        receivePaymentId: "pid-lnbc1A",
+        conversionPaymentId: "conv-pid-A",
+        pairedAtMs: 100,
+      },
+    ])
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
+
+    const passedClaimedSet = mockExecuteAutoConvert.mock.calls[0][1]
+      .claimedConversionIds as ReadonlySet<string>
+    expect(passedClaimedSet.has("conv-pid-A")).toBe(true)
+  })
+
+  it("skips and removes the record when this receive is already paired (Critical #2 — replay safety)", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1B", 5000n) }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1B",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(makeRecord({ paymentRequest: "lnbc1B" }))
+    mockListAutoConvertPairings.mockResolvedValue([
+      {
+        receivePaymentId: "pid-lnbc1B",
+        conversionPaymentId: "conv-pid-B",
+        pairedAtMs: 100,
+      },
+    ])
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1B")
+    })
+    expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
   })
 })
 

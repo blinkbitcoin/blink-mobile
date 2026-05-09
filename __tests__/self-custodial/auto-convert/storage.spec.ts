@@ -1,7 +1,10 @@
 import {
   addPendingAutoConvert,
   findPendingAutoConvert,
+  listAutoConvertPairings,
   listPendingAutoConverts,
+  markAutoConvertPairing,
+  pruneExpiredAutoConvertPairings,
   pruneExpiredAutoConverts,
   recordAutoConvertAttempt,
   removePendingAutoConvert,
@@ -191,6 +194,80 @@ describe("auto-convert storage", () => {
       await addPendingAutoConvert(makeRecord())
       expect(mockGetItem).toHaveBeenCalledWith(STORAGE_KEY)
       expect(mockSetItem.mock.calls[0][0]).toBe(STORAGE_KEY)
+    })
+  })
+
+  describe("AutoConvertPairings (Critical #2 dedup correlation)", () => {
+    const PAIRINGS_KEY = "selfCustodialAutoConvertPairings"
+
+    const makePairing = (overrides: Partial<Record<string, unknown>> = {}) => ({
+      receivePaymentId: "pid-recv",
+      conversionPaymentId: "pid-conv",
+      pairedAtMs: 1_700_000_000_000,
+      ...overrides,
+    })
+
+    const writtenPairings = (): Record<string, unknown>[] => {
+      const call = mockSetItem.mock.calls.find((c) => (c[0] as string) === PAIRINGS_KEY)
+      if (!call) throw new Error("setItem was not called for pairings key")
+      return JSON.parse(call[1] as string)
+    }
+
+    it("listAutoConvertPairings returns [] when storage has no entry", async () => {
+      mockGetItem.mockResolvedValue(null)
+      expect(await listAutoConvertPairings()).toEqual([])
+    })
+
+    it("listAutoConvertPairings filters out malformed entries", async () => {
+      mockGetItem.mockResolvedValue(
+        JSON.stringify([
+          makePairing(),
+          { receivePaymentId: 1, conversionPaymentId: "x", pairedAtMs: 0 },
+          { receivePaymentId: "x", pairedAtMs: 0 },
+        ]),
+      )
+      const pairings = await listAutoConvertPairings()
+      expect(pairings).toHaveLength(1)
+      expect(pairings[0].receivePaymentId).toBe("pid-recv")
+    })
+
+    it("markAutoConvertPairing appends a new pairing", async () => {
+      mockGetItem.mockResolvedValue(null)
+      await markAutoConvertPairing(makePairing())
+      const stored = writtenPairings()
+      expect(stored).toHaveLength(1)
+      expect(stored[0]).toMatchObject({
+        receivePaymentId: "pid-recv",
+        conversionPaymentId: "pid-conv",
+      })
+    })
+
+    it("markAutoConvertPairing dedupes by receivePaymentId or conversionPaymentId", async () => {
+      mockGetItem.mockResolvedValue(
+        JSON.stringify([
+          makePairing({ receivePaymentId: "recv-A", conversionPaymentId: "conv-A" }),
+        ]),
+      )
+      await markAutoConvertPairing(
+        makePairing({ receivePaymentId: "recv-A", conversionPaymentId: "conv-A2" }),
+      )
+      const stored = writtenPairings()
+      expect(stored).toHaveLength(1)
+      expect(stored[0]).toMatchObject({ conversionPaymentId: "conv-A2" })
+    })
+
+    it("pruneExpiredAutoConvertPairings drops entries older than 7 days", async () => {
+      const sevenDays = 7 * 24 * 60 * 60 * 1000
+      mockGetItem.mockResolvedValue(
+        JSON.stringify([
+          makePairing({ receivePaymentId: "old", pairedAtMs: 0 }),
+          makePairing({ receivePaymentId: "fresh", pairedAtMs: sevenDays - 1 }),
+        ]),
+      )
+      await pruneExpiredAutoConvertPairings(sevenDays + 1)
+      const stored = writtenPairings()
+      expect(stored).toHaveLength(1)
+      expect(stored[0].receivePaymentId).toBe("fresh")
     })
   })
 })

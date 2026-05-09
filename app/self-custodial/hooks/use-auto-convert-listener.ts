@@ -20,7 +20,11 @@ import {
   AutoConvertStatus,
   executeAutoConvert,
   findPendingAutoConvert,
+  findRecentConversionId,
+  listAutoConvertPairings,
   listPendingAutoConverts,
+  markAutoConvertPairing,
+  pruneExpiredAutoConvertPairings,
   pruneExpiredAutoConverts,
   recordAutoConvertAttempt,
   removePendingAutoConvert,
@@ -106,6 +110,7 @@ type RunAutoConvertParams = {
   maxAttempts: number
   waitOptions: WaitForPaymentOptions
   amountMatchToleranceBps: number
+  claimedConversionIds: ReadonlySet<string>
 }
 
 const runAutoConvert = async ({
@@ -119,6 +124,7 @@ const runAutoConvert = async ({
   maxAttempts,
   waitOptions,
   amountMatchToleranceBps,
+  claimedConversionIds,
 }: RunAutoConvertParams): Promise<void> => {
   if (record.attempts >= maxAttempts) {
     await removePendingAutoConvert(record.paymentRequest)
@@ -138,9 +144,23 @@ const runAutoConvert = async ({
     isStableBalanceActive,
     recordCreatedAtMs: record.createdAtMs,
     amountMatchToleranceBps,
+    claimedConversionIds,
   })
 
   if (outcome.status === AutoConvertStatus.Converted) {
+    const conversionId = await findRecentConversionId(sdk, {
+      satsAmount: satsReceived,
+      toleranceBps: amountMatchToleranceBps,
+      claimedConversionIds,
+    })
+    if (conversionId) {
+      await markAutoConvertPairing({
+        receivePaymentId: paymentId,
+        conversionPaymentId: conversionId,
+        pairedAtMs: Date.now(),
+      })
+    }
+
     await removePendingAutoConvert(record.paymentRequest)
     showConvertedToast(satsReceived, LL)
     return
@@ -155,6 +175,21 @@ const runAutoConvert = async ({
   ) {
     await removePendingAutoConvert(record.paymentRequest)
   }
+}
+
+const buildClaimedConversionIds = async (): Promise<{
+  claimedConversionIds: ReadonlySet<string>
+  pairedReceiveIds: ReadonlySet<string>
+}> => {
+  const pairings = await listAutoConvertPairings()
+  const claimedConversionIds = new Set<string>()
+  const pairedReceiveIds = new Set<string>()
+  pairings.forEach((p) => {
+    claimedConversionIds.add(p.conversionPaymentId)
+    pairedReceiveIds.add(p.receivePaymentId)
+  })
+
+  return { claimedConversionIds, pairedReceiveIds }
 }
 
 const findPaidAmountForInvoice = async (
@@ -219,6 +254,13 @@ export const useAutoConvertListener = (): void => {
 
       if (inFlightInvoicesRef.current.has(invoice)) return
       if (!isRetryableNow(record, Date.now())) return
+
+      const { claimedConversionIds, pairedReceiveIds } = await buildClaimedConversionIds()
+      if (pairedReceiveIds.has(lastReceivedPaymentId)) {
+        await removePendingAutoConvert(invoice)
+        return
+      }
+
       inFlightInvoicesRef.current.add(invoice)
       try {
         await runAutoConvert({
@@ -232,6 +274,7 @@ export const useAutoConvertListener = (): void => {
           maxAttempts: autoConvertMaxAttempts,
           waitOptions,
           amountMatchToleranceBps: autoConvertAmountMatchToleranceBps,
+          claimedConversionIds,
         })
       } finally {
         inFlightInvoicesRef.current.delete(invoice)
@@ -259,7 +302,10 @@ export const useAutoConvertListener = (): void => {
 
     const replay = async () => {
       const nowMs = Date.now()
-      await pruneExpiredAutoConverts(nowMs)
+      await Promise.all([
+        pruneExpiredAutoConverts(nowMs),
+        pruneExpiredAutoConvertPairings(nowMs),
+      ])
       const records = await listPendingAutoConverts()
       if (records.length === 0) return
 
@@ -269,6 +315,13 @@ export const useAutoConvertListener = (): void => {
 
         const paid = await findPaidAmountForInvoice(sdk, record.paymentRequest)
         if (!paid) return
+
+        const { claimedConversionIds, pairedReceiveIds } =
+          await buildClaimedConversionIds()
+        if (pairedReceiveIds.has(paid.paymentId)) {
+          await removePendingAutoConvert(record.paymentRequest)
+          return
+        }
 
         inFlightInvoicesRef.current.add(record.paymentRequest)
         try {
@@ -283,6 +336,7 @@ export const useAutoConvertListener = (): void => {
             maxAttempts: autoConvertMaxAttempts,
             waitOptions,
             amountMatchToleranceBps: autoConvertAmountMatchToleranceBps,
+            claimedConversionIds,
           })
         } finally {
           inFlightInvoicesRef.current.delete(record.paymentRequest)

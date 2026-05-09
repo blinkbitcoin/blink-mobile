@@ -40,3 +40,10 @@ export type AutoConvertOutcome =
   | { status: typeof AutoConvertStatus.SkippedBelowMin }
   | { status: typeof AutoConvertStatus.SkippedStableBalanceActive }
   | { status: typeof AutoConvertStatus.Failed }
+
+/** Links a receive paymentId to the conversion paymentId performed for it. */
+export type AutoConvertPairing = {
+  receivePaymentId: string
+  conversionPaymentId: string
+  pairedAtMs: number
+}
