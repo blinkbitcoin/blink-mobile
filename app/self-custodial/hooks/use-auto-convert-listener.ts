@@ -326,7 +326,16 @@ export const useAutoConvertListener = (): void => {
         if (!isRetryableNow(record, nowMs)) return
 
         const paid = await findPaidAmountForInvoice(sdk, record.paymentRequest)
-        if (!paid) return
+        // Bound the replay loop on busy wallets where the matching payment has
+        // aged off the recent listPayments page.
+        if (!paid) {
+          if (record.attempts + 1 >= autoConvertMaxAttempts) {
+            await removePendingAutoConvert(record.paymentRequest)
+            return
+          }
+          await recordAutoConvertAttempt(record.paymentRequest, nowMs)
+          return
+        }
 
         const { claimedConversionIds, pairedReceiveIds } =
           await buildClaimedConversionIds()
