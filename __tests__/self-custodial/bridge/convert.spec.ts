@@ -36,10 +36,13 @@ const createSdk = () => ({
     },
   }),
   sendPayment: jest.fn().mockResolvedValue(undefined),
+  syncWallet: jest.fn().mockResolvedValue(undefined),
   receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-spark-address" }),
   getInfo: jest.fn().mockResolvedValue({
+    balanceSats: 1_000_000_000n,
     tokenBalances: {
       "usdb-token-id": {
+        balance: 1_000_000_000n,
         tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
       },
     },
@@ -63,9 +66,11 @@ describe("createGetConversionQuote — BTC → USD", () => {
 
     expect(quote).not.toBeNull()
     expect(sdk.receivePayment).toHaveBeenCalled()
+    // Exact-input algorithm runs at least one prepare call (discovery); the
+    // destination amount is dynamic based on rate, so we only assert the
+    // SDK contract (token id + conversion options) is wired correctly.
     const prepArg = sdk.prepareSendPayment.mock.calls[0][0]
     expect(prepArg.paymentRequest).toBe("sp1own-spark-address")
-    expect(prepArg.amount).toBe(BigInt(1_370_000))
     expect(prepArg.tokenIdentifier).toBe("usdb-token-id")
     expect(prepArg.conversionOptions.conversionType).toEqual({ tag: "FromBitcoin" })
     expect(prepArg.conversionOptions.maxSlippageBps).toBe(50)
@@ -165,7 +170,6 @@ describe("createGetConversionQuote — USD → BTC", () => {
     expect(quote).not.toBeNull()
     const arg = sdk.prepareSendPayment.mock.calls[0][0]
     expect(arg.paymentRequest).toBe("sp1own-spark-address")
-    expect(arg.amount).toBe(BigInt(1300))
     expect(arg.tokenIdentifier).toBeUndefined()
     expect(arg.conversionOptions.conversionType).toEqual({
       tag: "ToBitcoin",
