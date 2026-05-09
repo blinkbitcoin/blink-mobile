@@ -85,7 +85,12 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
       baselinePaymentIdRef.current = lastPaymentIdRef.current
       setPaymentRequest(result.invoice)
       setRequestState(PaymentRequestState.Created)
-    } catch {
+    } catch (err) {
+      crashlytics().recordError(
+        err instanceof Error
+          ? err
+          : new Error(`Self-custodial invoice generation failed: ${err}`),
+      )
       setRequestState(PaymentRequestState.Error)
     }
   }, [sdk, isReady, type, memo, amount, convertMoneyAmount])
