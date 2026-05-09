@@ -562,6 +562,40 @@ describe("useAutoConvertListener — mount replay", () => {
     expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
   })
 
+  it("stamps an attempt when the matching payment is missing so the cap eventually evicts (Critical #6)", async () => {
+    const sdk = makeSdk({ listPayments: jest.fn().mockResolvedValue({ payments: [] }) })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbc1unseen", attempts: 0 }),
+    ])
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockRecordAutoConvertAttempt).toHaveBeenCalledWith(
+        "lnbc1unseen",
+        expect.any(Number),
+      )
+    })
+    expect(mockRemovePendingAutoConvert).not.toHaveBeenCalled()
+  })
+
+  it("removes the record on the no-payment branch once attempts reach the cap (Critical #6)", async () => {
+    const sdk = makeSdk({ listPayments: jest.fn().mockResolvedValue({ payments: [] }) })
+    setupDefaults(sdk)
+    // baseRemoteConfig.autoConvertMaxAttempts === 3; stamp would make it 3, hitting cap.
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbc1capped", attempts: 2 }),
+    ])
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1capped")
+    })
+    expect(mockRecordAutoConvertAttempt).not.toHaveBeenCalled()
+  })
+
   it("skips replay entirely when the pending list is empty", async () => {
     const sdk = makeSdk()
     setupDefaults(sdk)
