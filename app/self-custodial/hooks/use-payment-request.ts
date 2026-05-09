@@ -86,6 +86,9 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
       setPaymentRequest(result.invoice)
       setRequestState(PaymentRequestState.Created)
     } catch (err) {
+      crashlytics().log(
+        `[Self-custodial] Lightning invoice generation failed (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
+      )
       crashlytics().recordError(
         err instanceof Error
           ? err
