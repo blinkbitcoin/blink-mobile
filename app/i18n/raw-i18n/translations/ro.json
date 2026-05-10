@@ -2402,6 +2402,7 @@
     "level": "Nivel {level: string}",
     "switchAccount": "Schimbă contul",
     "pleaseWait": "Te rog să aștepți.",
+    "probeBalanceFailed": "Nu s-a putut verifica soldul portofelului. Te rugăm să încerci din nou.",
     "accountLevel": "Nivel de cont",
     "upgrade": "Upgrade la cont",
     "logOutAndDeleteLocalData": "Deconectați-vă și ștergeți toate datele locale",

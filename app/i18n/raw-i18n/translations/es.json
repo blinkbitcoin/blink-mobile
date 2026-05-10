@@ -2401,6 +2401,7 @@
         "level": "Nivel {level: string}",
         "switchAccount": "Cambiar de cuenta",
         "pleaseWait": "Por favor, espere.",
+        "probeBalanceFailed": "No se pudo verificar el saldo de la cartera. Por favor, inténtalo de nuevo.",
         "accountLevel": "Nivel de cuenta",
         "upgrade": "Actualiza tu cuenta",
         "logOutAndDeleteLocalData": "Cerrar sesión y borrar todos los datos locales",

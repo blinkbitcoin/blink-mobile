@@ -2405,6 +2405,7 @@
     "level": "Niveau {level: string}",
     "switchAccount": "Skift konto",
     "pleaseWait": "Vent venligst.",
+    "probeBalanceFailed": "Kunne ikke bekræfte tegnebogens saldo. Prøv venligst igen.",
     "accountLevel": "Kontoniveau",
     "upgrade": "Opgrader din konto",
     "logOutAndDeleteLocalData": "Log ud og slet alle lokale data",

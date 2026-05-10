@@ -2419,6 +2419,7 @@
         "level": "レベル {level: string}",
         "switchAccount": "アカウントを切り替える",
         "pleaseWait": "お待ちください。",
+        "probeBalanceFailed": "ウォレットの残高を確認できませんでした。もう一度お試しください。",
         "accountLevel": "ウォレットレベル",
         "upgrade": "ウォレットをアップグレードする",
         "logOutAndDeleteLocalData": "ログアウトしてすべてのローカルデータをクリアする",

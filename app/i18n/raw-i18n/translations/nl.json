@@ -2419,6 +2419,7 @@
     "level": "Niveau {level: string}",
     "switchAccount": "Wissel van account",
     "pleaseWait": "Even geduld.",
+    "probeBalanceFailed": "Kan het saldo van de portemonnee niet verifiëren. Probeer het opnieuw.",
     "accountLevel": "Account Niveau",
     "upgrade": "Je account upgraden",
     "logOutAndDeleteLocalData": "Log uit en wis alle lokale gegevens",

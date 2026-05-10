@@ -2476,6 +2476,7 @@ const en: BaseTranslation = {
     level: "Level {level: string}",
     switchAccount: "Switch account",
     pleaseWait: "Please Wait.",
+    probeBalanceFailed: "Couldn't verify the wallet's balance. Please try again.",
     accountLevel: "Account Level",
     upgrade: "Upgrade your account",
     logOutAndDeleteLocalData: "Log out and clear all local data",

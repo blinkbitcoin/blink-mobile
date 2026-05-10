@@ -2402,6 +2402,7 @@
     "level": "Nivell {level: string}",
     "switchAccount": "Canvia de compte",
     "pleaseWait": "Si us plau, espera.",
+    "probeBalanceFailed": "No s'ha pogut verificar el saldo de la cartera. Torna-ho a provar.",
     "accountLevel": "Nivell de compte",
     "upgrade": "Millora el teu compte",
     "logOutAndDeleteLocalData": "Tancar la sessió i borrar totes les dades locals",

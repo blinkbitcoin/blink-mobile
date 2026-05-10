@@ -2420,6 +2420,7 @@
     "level": "Մակարդակ {level: string}",
     "switchAccount": "Փոխել հաշիվը",
     "pleaseWait": "Խնդրում ենք սպասել։",
+    "probeBalanceFailed": "Չհաջողվեց ստուգել դրամապանակի մնացորդը: Խնդրում ենք կրկին փորձել:",
     "accountLevel": "Հաշվի մակարդակ",
     "upgrade": "Թարմացրել Ձեր հաշիվը",
     "logOutAndDeleteLocalData": "Դուրս գալ և ջնջել բոլոր տվյալները",

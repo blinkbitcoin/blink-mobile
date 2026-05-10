@@ -2419,6 +2419,7 @@
     "level": "Tahap {level: string}",
     "switchAccount": "Tukar akaun",
     "pleaseWait": "Sila Tunggu.",
+    "probeBalanceFailed": "Tidak dapat mengesahkan baki dompet. Sila cuba lagi.",
     "accountLevel": "Peringkat akaun",
     "upgrade": "Naik taraf akaun anda",
     "logOutAndDeleteLocalData": "Log keluar, dan hapus semua data",

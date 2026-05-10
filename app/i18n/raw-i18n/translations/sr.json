@@ -2419,6 +2419,7 @@
     "level": "Ниво {level: string}",
     "switchAccount": "Промени налог",
     "pleaseWait": "Молимо сачекајте.",
+    "probeBalanceFailed": "Није могуће проверити стање новчаника. Покушајте поново.",
     "accountLevel": "Ниво налога",
     "upgrade": "Надоградите свој налог",
     "logOutAndDeleteLocalData": "Одјавите се и обришите све локалне податке",

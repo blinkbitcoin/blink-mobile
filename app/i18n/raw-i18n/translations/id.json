@@ -2402,6 +2402,7 @@
     "level": "Level {level: string}",
     "switchAccount": "Ganti akun",
     "pleaseWait": "Harap Tunggu.",
+    "probeBalanceFailed": "Tidak dapat memverifikasi saldo dompet. Silakan coba lagi.",
     "accountLevel": "Level Akun",
     "upgrade": "Tingkatkan akun Anda",
     "logOutAndDeleteLocalData": "Keluar dan hapus semua data lokal",

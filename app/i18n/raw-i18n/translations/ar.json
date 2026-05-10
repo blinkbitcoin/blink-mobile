@@ -2419,6 +2419,7 @@
     "level": "المستوى {level: string}",
     "switchAccount": "تبديل الحساب",
     "pleaseWait": "يرجى الانتظار.",
+    "probeBalanceFailed": "تعذر التحقق من رصيد المحفظة. يرجى المحاولة مرة أخرى.",
     "accountLevel": "Account Level",
     "upgrade": "Upgrade your account",
     "logOutAndDeleteLocalData": "Log out and clear all local data",

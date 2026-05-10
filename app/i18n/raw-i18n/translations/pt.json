@@ -2402,6 +2402,7 @@
         "level": "Nível {level: string}",
         "switchAccount": "Trocar conta",
         "pleaseWait": "Aguarde.",
+        "probeBalanceFailed": "Não foi possível verificar o saldo da carteira. Por favor, tente novamente.",
         "accountLevel": "Nível da Conta",
         "upgrade": "Atualize a sua conta",
         "logOutAndDeleteLocalData": "Sair da conta e apagar toda a informação local",
