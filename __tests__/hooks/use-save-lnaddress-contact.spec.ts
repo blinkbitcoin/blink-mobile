@@ -5,6 +5,10 @@ import { ContactType } from "@app/graphql/generated"
 import { useSaveLnAddressContact } from "@app/screens/send-bitcoin-screen/use-save-lnaddress-contact"
 
 const mockContactCreate = jest.fn()
+const mockBridgeAddContact = jest.fn()
+const mockCrashlyticsLog = jest.fn()
+let mockIsSelfCustodial = false
+let mockSdk: { id: string } | null = null
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
@@ -12,16 +16,27 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ isSelfCustodial: false }),
+  useActiveWallet: () => ({ isSelfCustodial: mockIsSelfCustodial }),
 }))
 
 jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
-  useSelfCustodialWallet: () => ({ sdk: null }),
+  useSelfCustodialWallet: () => ({ sdk: mockSdk }),
+}))
+
+jest.mock("@app/self-custodial/bridge", () => ({
+  addContact: (...args: unknown[]) => mockBridgeAddContact(...args),
+}))
+
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  log: mockCrashlyticsLog,
+  recordError: jest.fn(),
 }))
 
 describe("useSaveLnAddressContact", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsSelfCustodial = false
+    mockSdk = null
   })
 
   it("should save contact for valid lnurl payment (non-merchant)", async () => {
@@ -83,5 +98,81 @@ describe("useSaveLnAddressContact", () => {
 
     expect(response.saved).toBe(false)
     expect(mockContactCreate).not.toHaveBeenCalled()
+  })
+
+  describe("self-custodial branch (Important #6)", () => {
+    it("saves the contact through the bridge when sdk is available", async () => {
+      mockIsSelfCustodial = true
+      mockSdk = { id: "sdk" }
+      mockBridgeAddContact.mockResolvedValue(undefined)
+
+      const { result } = renderHook(() => useSaveLnAddressContact())
+
+      const response = await result.current({
+        paymentType: PaymentType.Lnurl,
+        destination: "alice@spark.tips",
+        isMerchant: false,
+      })
+
+      expect(response).toEqual({ saved: true, handle: "alice@spark.tips" })
+      expect(mockBridgeAddContact).toHaveBeenCalledWith(mockSdk, {
+        name: "alice@spark.tips",
+        paymentIdentifier: "alice@spark.tips",
+      })
+      expect(mockContactCreate).not.toHaveBeenCalled()
+    })
+
+    it("returns saved=false with the handle and logs to crashlytics when bridgeAddContact rejects (silent swallow)", async () => {
+      mockIsSelfCustodial = true
+      mockSdk = { id: "sdk" }
+      mockBridgeAddContact.mockRejectedValue(new Error("contact upsert failed"))
+
+      const { result } = renderHook(() => useSaveLnAddressContact())
+
+      const response = await result.current({
+        paymentType: PaymentType.Lnurl,
+        destination: "alice@spark.tips",
+        isMerchant: false,
+      })
+
+      expect(response).toEqual({ saved: false, handle: "alice@spark.tips" })
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        expect.stringContaining("alice@spark.tips"),
+      )
+      expect(mockContactCreate).not.toHaveBeenCalled()
+    })
+
+    it("returns saved=false without a handle when sdk is null (no bridge call, no Apollo fallback)", async () => {
+      mockIsSelfCustodial = true
+      mockSdk = null
+
+      const { result } = renderHook(() => useSaveLnAddressContact())
+
+      const response = await result.current({
+        paymentType: PaymentType.Lnurl,
+        destination: "alice@spark.tips",
+        isMerchant: false,
+      })
+
+      expect(response).toEqual({ saved: false })
+      expect(mockBridgeAddContact).not.toHaveBeenCalled()
+      expect(mockContactCreate).not.toHaveBeenCalled()
+    })
+
+    it("does not call the Apollo mutation when self-custodial is active even on the happy path", async () => {
+      mockIsSelfCustodial = true
+      mockSdk = { id: "sdk" }
+      mockBridgeAddContact.mockResolvedValue(undefined)
+
+      const { result } = renderHook(() => useSaveLnAddressContact())
+
+      await result.current({
+        paymentType: PaymentType.Lnurl,
+        destination: "user@blink.sv",
+        isMerchant: false,
+      })
+
+      expect(mockContactCreate).not.toHaveBeenCalled()
+    })
   })
 })
