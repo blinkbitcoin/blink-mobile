@@ -22,18 +22,41 @@ describe("useSelfCustodialConversionLimits", () => {
     jest.clearAllMocks()
   })
 
-  it("stays in loading=true and skips fetches when sdk is null", () => {
+  it("flips to loading=false with an unavailable-error and skips fetches when sdk is null (Important #3: no infinite spinner offline)", async () => {
     mockUseSelfCustodialWallet.mockReturnValue({ sdk: null })
 
     const { result } = renderHook(() => useSelfCustodialConversionLimits())
 
-    expect(result.current).toEqual({
-      btcToUsd: null,
-      usdToBtc: null,
-      loading: true,
-      error: null,
-    })
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.btcToUsd).toBeNull()
+    expect(result.current.usdToBtc).toBeNull()
+    expect(result.current.error).toBeInstanceOf(Error)
+    expect(result.current.error?.message).toBe("Self-custodial wallet unavailable")
     expect(mockFetchConversionLimits).not.toHaveBeenCalled()
+  })
+
+  it("flips back to loading=true and clears the unavailable-error when sdk transitions from null to a value", async () => {
+    const btcToUsd = { minFromAmount: 1000, minToAmount: 50 }
+    const usdToBtc = { minFromAmount: 25, minToAmount: 500 }
+    mockUseSelfCustodialWallet.mockReturnValue({ sdk: null })
+
+    const { result, rerender } = renderHook(() => useSelfCustodialConversionLimits())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.error).not.toBeNull()
+
+    mockUseSelfCustodialWallet.mockReturnValue({ sdk: mockSdk })
+    mockFetchConversionLimits
+      .mockResolvedValueOnce(btcToUsd)
+      .mockResolvedValueOnce(usdToBtc)
+    rerender(undefined)
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.btcToUsd).toBe(btcToUsd)
+    expect(result.current.usdToBtc).toBe(usdToBtc)
+    expect(result.current.error).toBeNull()
   })
 
   it("populates both directions on success", async () => {

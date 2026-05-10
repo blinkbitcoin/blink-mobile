@@ -23,7 +23,17 @@ export const useSelfCustodialConversionLimits = (): ConversionLimitsState => {
   const [state, setState] = useState<ConversionLimitsState>(initialState)
 
   useEffect(() => {
-    if (!sdk) return
+    if (!sdk) {
+      setState({
+        btcToUsd: null,
+        usdToBtc: null,
+        loading: false,
+        error: new Error("Self-custodial wallet unavailable"),
+      })
+      return
+    }
+
+    setState((prev) => ({ ...prev, loading: true, error: null }))
 
     let mounted = true
     const load = async () => {

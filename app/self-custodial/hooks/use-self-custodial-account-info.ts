@@ -22,7 +22,17 @@ export const useSelfCustodialAccountInfo = (): AccountInfo => {
   const [info, setInfo] = useState<AccountInfo>(initialInfo)
 
   useEffect(() => {
-    if (!sdk) return
+    if (!sdk) {
+      setInfo({
+        identityPubkey: "",
+        lightningAddress: null,
+        loading: false,
+        error: new Error("Self-custodial wallet unavailable"),
+      })
+      return
+    }
+
+    setInfo((prev) => ({ ...prev, loading: true, error: null }))
 
     let mounted = true
     const load = async () => {
