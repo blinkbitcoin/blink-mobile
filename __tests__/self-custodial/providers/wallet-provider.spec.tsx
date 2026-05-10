@@ -49,13 +49,15 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   },
 }))
 
+const mockGetLightningAddress = jest.fn().mockResolvedValue(null)
+
 jest.mock("@app/self-custodial/bridge", () => ({
   initSdk: (...args: unknown[]) => mockInitSdk(...args),
   disconnectSdk: (...args: unknown[]) => mockDisconnectSdk(...args),
   addSdkEventListener: (...args: unknown[]) => mockAddSdkEventListener(...args),
   removeSdkEventListener: (...args: unknown[]) => mockRemoveSdkEventListener(...args),
   getUserSettings: (...args: unknown[]) => mockGetUserSettings(...args),
-  getLightningAddress: jest.fn().mockResolvedValue(null),
+  getLightningAddress: (...args: unknown[]) => mockGetLightningAddress(...args),
 }))
 
 const mockListSelfCustodialAccounts = jest.fn().mockResolvedValue([])
@@ -176,6 +178,8 @@ describe("SelfCustodialWalletProvider", () => {
     mockListSelfCustodialAccounts.mockResolvedValue([
       { id: "test-sc-uuid", lightningAddress: null },
     ])
+    mockGetLightningAddress.mockResolvedValue(null)
+    mockSetSelfCustodialLightningAddress.mockResolvedValue(undefined)
   })
 
   it("renders children", () => {
@@ -1383,5 +1387,83 @@ describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () 
     })
 
     expect(result.current.hasMoreTransactions).toBe(false)
+  })
+
+  describe("resolveAndPersist LN-address path (Important #14)", () => {
+    beforeEach(() => {
+      mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+      mockInitSdk.mockResolvedValue({ id: "sdk" })
+    })
+
+    it("persists the resolved LN address and reloads the registry on success", async () => {
+      mockGetLightningAddress.mockResolvedValue({
+        lightningAddress: "alice@blink.sv",
+      })
+
+      renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => {
+        expect(mockSetSelfCustodialLightningAddress).toHaveBeenCalledWith(
+          "test-sc-uuid",
+          "alice@blink.sv",
+        )
+      })
+      await waitFor(() => {
+        expect(mockListSelfCustodialAccounts).toHaveBeenCalledTimes(2)
+      })
+    })
+
+    it("skips both persist and reload when getLightningAddress resolves to null", async () => {
+      mockGetLightningAddress.mockResolvedValue(null)
+
+      renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => {
+        expect(mockGetLightningAddress).toHaveBeenCalled()
+      })
+      await new Promise((resolve) => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(mockSetSelfCustodialLightningAddress).not.toHaveBeenCalled()
+      expect(mockListSelfCustodialAccounts).toHaveBeenCalledTimes(1)
+    })
+
+    it("swallows getLightningAddress rejection without persisting or reloading", async () => {
+      mockGetLightningAddress.mockRejectedValue(new Error("LN lookup down"))
+
+      renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => {
+        expect(mockGetLightningAddress).toHaveBeenCalled()
+      })
+      await new Promise((resolve) => {
+        setTimeout(resolve, 20)
+      })
+
+      expect(mockSetSelfCustodialLightningAddress).not.toHaveBeenCalled()
+      expect(mockListSelfCustodialAccounts).toHaveBeenCalledTimes(1)
+    })
+
+    it("still reloads the registry when setSelfCustodialLightningAddress rejects (current swallow-and-chain behaviour)", async () => {
+      mockGetLightningAddress.mockResolvedValue({
+        lightningAddress: "alice@blink.sv",
+      })
+      mockSetSelfCustodialLightningAddress.mockRejectedValue(
+        new Error("storage write-locked"),
+      )
+
+      renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => {
+        expect(mockSetSelfCustodialLightningAddress).toHaveBeenCalledWith(
+          "test-sc-uuid",
+          "alice@blink.sv",
+        )
+      })
+      await waitFor(() => {
+        expect(mockListSelfCustodialAccounts).toHaveBeenCalledTimes(2)
+      })
+    })
   })
 })
