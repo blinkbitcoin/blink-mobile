@@ -19,10 +19,11 @@ export const useSelfCustodialRollback = ({
   accounts,
   setActiveAccountId,
 }: RollbackDeps): RollbackResult => {
-  const { nonCustodialEnabled } = useFeatureFlags()
+  const { nonCustodialEnabled, remoteConfigReady } = useFeatureFlags()
   const hasCustodialAccount = useHasCustodialAccount()
 
   useEffect(() => {
+    if (!remoteConfigReady) return
     if (nonCustodialEnabled) return
     if (activeAccount?.type !== AccountType.SelfCustodial) return
 
@@ -30,10 +31,18 @@ export const useSelfCustodialRollback = ({
     if (!fallback) return
 
     setActiveAccountId(fallback.id)
-  }, [nonCustodialEnabled, activeAccount, accounts, setActiveAccountId])
+  }, [
+    remoteConfigReady,
+    nonCustodialEnabled,
+    activeAccount,
+    accounts,
+    setActiveAccountId,
+  ])
+
+  const isLockedOutOfSelfCustodial = remoteConfigReady && !nonCustodialEnabled
 
   const shouldShowUnavailable =
-    !nonCustodialEnabled &&
+    isLockedOutOfSelfCustodial &&
     activeAccount?.type === AccountType.SelfCustodial &&
     !hasCustodialAccount
 
