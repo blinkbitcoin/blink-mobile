@@ -29,6 +29,11 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
 }))
 
+const mockRecordError = jest.fn()
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: (...args: readonly unknown[]) => mockRecordError(...args),
+}))
+
 jest.mock("@app/utils/crypto", () => ({
   deriveKeyFromPassword: () => ({
     key: "abcd1234abcd1234abcd1234abcd1234",
@@ -158,7 +163,7 @@ describe("useCloudBackup", () => {
   })
 
   it("shows error toast on upload failure", async () => {
-    mockUpload.mockResolvedValue({ success: false, error: "403: Forbidden" })
+    mockUpload.mockResolvedValue({ success: false, reason: "auth" })
 
     const { result } = renderHook(() =>
       useCloudBackup({ isEncrypted: false, password: "" }),
@@ -172,6 +177,35 @@ describe("useCloudBackup", () => {
       expect.objectContaining({ message: "Upload failed" }),
     )
     expect(mockNavigate).not.toHaveBeenCalledWith("sparkBackupSuccessScreen")
+  })
+
+  it("does not double-report to crashlytics on upload failure — the inner hook owns Drive error telemetry (Critical #8)", async () => {
+    mockUpload.mockResolvedValue({ success: false, reason: "transient" })
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("still reports to crashlytics on sign-in failure — that path is owned by use-cloud-backup, not the Drive hook (Critical #8)", async () => {
+    const signInError = new Error("DEVELOPER_ERROR")
+    mockStartSession.mockRejectedValue(signInError)
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockRecordError).toHaveBeenCalledWith(signInError)
   })
 
   it("shows error toast on sign-in failure", async () => {
