@@ -1,7 +1,6 @@
 import { Platform } from "react-native"
 
-import crashlytics from "@react-native-firebase/crashlytics"
-
+import { reportError } from "@app/utils/error-logging"
 import { loadJson, remove, saveJson } from "@app/utils/storage"
 
 // Values are persisted to AsyncStorage — do not rename
@@ -81,9 +80,7 @@ export const loadCheckpoint = async (
 
     return parsed
   } catch (err) {
-    crashlytics().recordError(
-      err instanceof Error ? err : new Error(`Checkpoint load failed: ${err}`),
-    )
+    reportError("Checkpoint load", err)
     await remove(storageKey).catch(() => {})
     return null
   }
@@ -96,9 +93,7 @@ export const saveCheckpointToStorage = async (
   try {
     await saveJson(storageKey, { step, savedAt: Date.now() })
   } catch (err) {
-    crashlytics().recordError(
-      err instanceof Error ? err : new Error(`Checkpoint save failed: ${err}`),
-    )
+    reportError("Checkpoint save", err)
   }
 }
 

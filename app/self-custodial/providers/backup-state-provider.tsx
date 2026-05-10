@@ -8,10 +8,10 @@ import React, {
 } from "react"
 
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { AccountType } from "@app/types/wallet.types"
+import { reportError } from "@app/utils/error-logging"
 
 const BACKUP_STATE_KEY_PREFIX = "backupState"
 
@@ -118,9 +118,7 @@ export const BackupStateProvider: React.FC<React.PropsWithChildren> = ({ childre
         backupStateKeyFor(activeSelfCustodialAccountId),
         JSON.stringify(state),
       ).catch((err) => {
-        crashlytics().recordError(
-          err instanceof Error ? err : new Error(`Backup state persist failed: ${err}`),
-        )
+        reportError("Backup state persist", err)
       })
     },
     [activeSelfCustodialAccountId],

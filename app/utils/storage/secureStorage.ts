@@ -1,12 +1,13 @@
-import crashlytics from "@react-native-firebase/crashlytics"
 import RNSecureKeyStore, { ACCESSIBLE } from "react-native-secure-key-store"
+
+import { reportError } from "../error-logging"
 
 const safeRemoveKey = async (key: string, label: string): Promise<boolean> => {
   try {
     await RNSecureKeyStore.remove(key)
     return true
   } catch (err) {
-    crashlytics().recordError(err instanceof Error ? err : new Error(`${label}: ${err}`))
+    reportError(label, err)
     return false
   }
 }

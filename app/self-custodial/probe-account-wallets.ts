@@ -1,6 +1,7 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
 import { type WalletState } from "@app/types/wallet.types"
+import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import { disconnectSdk, initSdk } from "./bridge"
@@ -45,6 +46,10 @@ export const probeSelfCustodialAccountWallets = async (
   } catch (err) {
     return toProbeFailed(err)
   } finally {
-    if (sdk) await disconnectSdk(sdk).catch(() => undefined)
+    if (sdk) {
+      await disconnectSdk(sdk).catch((err) => {
+        reportError("Probe SDK disconnect", err)
+      })
+    }
   }
 }

@@ -2,7 +2,6 @@ import { useCallback } from "react"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { getSparkDriveBackupFilename } from "@app/config/appinfo"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
@@ -13,6 +12,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { confirmDialog } from "@app/utils/confirm-dialog"
 import { buildBackupPayload } from "@app/utils/backup-payload"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
 import { getCloudProviderName } from "../utils"
@@ -55,9 +55,7 @@ export const useCloudBackup = ({
     try {
       session = await startSession(filename)
     } catch (err) {
-      crashlytics().recordError(
-        err instanceof Error ? err : new Error(`Cloud backup sign-in failed: ${err}`),
-      )
+      reportError("Cloud backup sign-in", err)
       toastShow({ message: LL.BackupScreen.CloudBackup.signInFailed(), LL })
       return
     }

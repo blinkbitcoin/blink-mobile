@@ -11,6 +11,7 @@ import {
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { toUsdMoneyAmount } from "@app/types/amounts"
+import { reportError } from "@app/utils/error-logging"
 import {
   ConvertAmountAdjustment,
   ConvertDirection,
@@ -47,9 +48,7 @@ const recordConvertError = (err: unknown, params: ConvertParams, where: string):
   crashlytics().log(
     `[Convert] ${where} failed (direction=${params.direction}, fromAmount=${params.fromAmount.amount}, toAmount=${params.toAmount.amount})`,
   )
-  crashlytics().recordError(
-    err instanceof Error ? err : new Error(`${where} failed: ${err}`),
-  )
+  reportError(where, err)
 }
 
 const mapAmountAdjustment = (
@@ -279,9 +278,7 @@ const executePrepared = async (
   try {
     await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
     sdk.syncWallet(SyncWalletRequest.create({})).catch((err) => {
-      crashlytics().recordError(
-        err instanceof Error ? err : new Error(`convert: post-send syncWallet: ${err}`),
-      )
+      reportError("convert: post-send syncWallet", err)
     })
     return { status: PaymentResultStatus.Success }
   } catch (err) {
