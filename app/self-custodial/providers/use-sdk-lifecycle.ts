@@ -16,6 +16,7 @@ import {
   removeSdkEventListener,
 } from "../bridge"
 import { storageDirFor } from "../config"
+import { useBackoffRetry } from "../hooks/use-backoff-retry"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 
 import { extractPaymentId, PAYMENT_RECEIVED_EVENTS, REFRESH_EVENTS } from "./sdk-events"
@@ -80,8 +81,8 @@ export const useSdkLifecycle = (
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
   const rawTxOffsetRef = useRef(0)
-  const failureCountRef = useRef(0)
-  const backoffTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const { schedule: scheduleBackoffRetry, reset: resetBackoff } =
+    useBackoffRetry(RECONNECT_BACKOFF_MS)
 
   // `refreshingRef` linearizes concurrent refreshes (10s poll, AppState change,
   // SDK events): only one runOnce executes at a time, and any overlapping call
@@ -116,11 +117,7 @@ export const useSdkLifecycle = (
             ? ActiveWalletStatus.Degraded
             : ActiveWalletStatus.Ready,
         )
-        failureCountRef.current = 0
-        if (backoffTimerRef.current) {
-          clearTimeout(backoffTimerRef.current)
-          backoffTimerRef.current = null
-        }
+        resetBackoff()
       } catch (err) {
         logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
         crashlytics().recordError(
@@ -143,16 +140,9 @@ export const useSdkLifecycle = (
           }
           return prev === ActiveWalletStatus.Loading ? ActiveWalletStatus.Error : prev
         })
-        const attempt = failureCountRef.current
-        if (attempt < RECONNECT_BACKOFF_MS.length) {
-          const delay = RECONNECT_BACKOFF_MS[attempt]
-          failureCountRef.current = attempt + 1
-          if (backoffTimerRef.current) clearTimeout(backoffTimerRef.current)
-          backoffTimerRef.current = setTimeout(() => {
-            backoffTimerRef.current = null
-            if (sdkRef.current) refreshWallets()
-          }, delay)
-        }
+        scheduleBackoffRetry(() => {
+          if (sdkRef.current) refreshWallets()
+        })
       }
     }
 
@@ -164,7 +154,7 @@ export const useSdkLifecycle = (
     } finally {
       refreshingRef.current = false // eslint-disable-line require-atomic-updates
     }
-  }, [])
+  }, [resetBackoff, scheduleBackoffRetry])
 
   useEffect(() => {
     if (!activeSelfCustodialAccountId) {
@@ -245,10 +235,7 @@ export const useSdkLifecycle = (
     return () => {
       mounted = false
       abortRef.current = true
-      if (backoffTimerRef.current) {
-        clearTimeout(backoffTimerRef.current)
-        backoffTimerRef.current = null
-      }
+      resetBackoff()
 
       const sdk = sdkRef.current
       const listenerId = listenerIdRef.current
@@ -264,7 +251,7 @@ export const useSdkLifecycle = (
         )
       })
     }
-  }, [retryCount, refreshWallets, activeSelfCustodialAccountId])
+  }, [retryCount, refreshWallets, activeSelfCustodialAccountId, resetBackoff])
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
