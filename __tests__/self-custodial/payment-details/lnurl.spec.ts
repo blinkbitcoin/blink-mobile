@@ -58,6 +58,13 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   AesSuccessActionDataResult_Tags: { Decrypted: "Decrypted", ErrorStatus: "ErrorStatus" },
   FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
   SuccessActionProcessed_Tags: { Aes: "Aes", Message: "Message", Url: "Url" },
+  PaymentDetails: {
+    Lightning: {
+      instanceOf: (obj: { tag?: string } | undefined) => obj?.tag === "Lightning",
+    },
+    Spark: { instanceOf: (obj: { tag?: string } | undefined) => obj?.tag === "Spark" },
+    Token: { instanceOf: (obj: { tag?: string } | undefined) => obj?.tag === "Token" },
+  },
 }))
 
 const baseLnurlParams = (overrides: Partial<LnUrlPayServiceResponse> = {}) =>
@@ -263,6 +270,23 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
         expect.objectContaining({ comment: undefined }),
       )
     })
+
+    it("omits the comment when commentAllowed > 0 but memo is empty", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          lnurlParams: baseLnurlParams({ commentAllowed: 200 }),
+          senderSpecifiedMemo: "",
+        }),
+      )
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      await detail.getFee({} as never)
+
+      expect(mockPrepareLnurl).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({ comment: undefined }),
+      )
+    })
   })
 
   describe("getFee", () => {
@@ -274,6 +298,25 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       const result = await detail.getFee({} as never)
       expect(result.amount?.amount).toBe(5)
       expect(result.amount?.currency).toBe(WalletCurrency.Btc)
+    })
+
+    it("returns currency: Btc regardless of the sending wallet generic (USD wallet)", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      mockExtractLnurlFee.mockReturnValue(50)
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+          unitOfAccountAmount: {
+            amount: 100,
+            currency: WalletCurrency.Usd,
+            currencyCode: "USD",
+          },
+        }),
+      )
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      const result = await detail.getFee({} as never)
+      expect(result.amount?.currency).toBe(WalletCurrency.Btc)
+      expect(result.amount?.amount).toBe(50)
     })
 
     it("returns undefined amount when prepareLnurl throws", async () => {
@@ -374,6 +417,62 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       const result = await detail.sendPaymentMutation({} as never)
       expect(result.status).toBe(PaymentSendResult.Failure)
       expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.InvalidInput)
+    })
+
+    it("classifies NetworkError tag with the network-error code", async () => {
+      mockPrepareLnurl.mockRejectedValue({ tag: "NetworkError", inner: ["timeout"] })
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      const result = await detail.sendPaymentMutation({} as never)
+      expect(result.status).toBe(PaymentSendResult.Failure)
+      expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.NetworkError)
+    })
+
+    it("classifies a generic (untagged) error with the generic code", async () => {
+      mockPrepareLnurl.mockRejectedValue(new Error("boom"))
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      const result = await detail.sendPaymentMutation({} as never)
+      expect(result.status).toBe(PaymentSendResult.Failure)
+      expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.Generic)
+    })
+
+    it("propagates preimage from Lightning htlcDetails and createdAt from payment.timestamp on success", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      mockExecuteLnurl.mockResolvedValue({
+        payment: {
+          id: "p1",
+          timestamp: BigInt(1747691078),
+          details: {
+            tag: "Lightning",
+            inner: { htlcDetails: { preimage: "deadbeef-preimage" } },
+          },
+        },
+        successAction: undefined,
+      })
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      const result = await detail.sendPaymentMutation({} as never)
+      expect(result.status).toBe(PaymentSendResult.Success)
+      expect(result.extraInfo?.preimage).toBe("deadbeef-preimage")
+      expect(result.transaction?.createdAt).toBe(1747691078)
+    })
+
+    it("returns undefined preimage when payment.details is non-Lightning", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      mockExecuteLnurl.mockResolvedValue({
+        payment: {
+          id: "p1",
+          timestamp: BigInt(1747691078),
+          details: { tag: "Spark", inner: {} },
+        },
+        successAction: undefined,
+      })
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      const result = await detail.sendPaymentMutation({} as never)
+      expect(result.extraInfo?.preimage).toBeUndefined()
+      expect(result.transaction?.createdAt).toBe(1747691078)
     })
   })
 

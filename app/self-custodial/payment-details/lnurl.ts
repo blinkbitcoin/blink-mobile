@@ -1,9 +1,11 @@
 import {
   AesSuccessActionDataResult_Tags as AesResultTag,
   FeePolicy,
+  PaymentDetails,
   SuccessActionProcessed_Tags as SuccessActionTag,
   type BreezSdkInterface,
   type LnurlPayRequestDetails,
+  type LnurlPayResponse,
   type SuccessActionProcessed,
 } from "@breeztech/breez-sdk-spark-react-native"
 import { PaymentType } from "@blinkbitcoin/blink-client"
@@ -63,6 +65,12 @@ const lnurlParamsToPayRequest = (
   allowsNostr: undefined,
   nostrPubkey: undefined,
 })
+
+const extractPreimage = (response: LnurlPayResponse): string | undefined => {
+  const details = response.payment.details
+  if (!details || !PaymentDetails.Lightning.instanceOf(details)) return undefined
+  return details.inner.htlcDetails.preimage
+}
 
 const sdkSuccessActionToLib = (
   sa: SuccessActionProcessed | undefined,
@@ -196,7 +204,9 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
             const result = await executeLnurl(sdk, prepared, idempotencyKey)
             return {
               status: PaymentSendResult.Success,
+              transaction: { createdAt: Number(result.payment.timestamp) },
               extraInfo: {
+                preimage: extractPreimage(result),
                 successAction: sdkSuccessActionToLib(result.successAction),
               },
             }
