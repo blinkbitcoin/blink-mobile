@@ -205,6 +205,20 @@ describe("selfCustodialRestoreWallet (I14)", () => {
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
   })
 
+  it("normalises tabs and newlines before validating the mnemonic", async () => {
+    await selfCustodialRestoreWallet("test-account", "\talpha\tbeta\ngamma\r\n")
+
+    expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
+    expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
+  })
+
+  it("normalises mixed whitespace runs before validating the mnemonic", async () => {
+    await selfCustodialRestoreWallet("test-account", "  alpha\t\tbeta \n gamma  ")
+
+    expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
+    expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
+  })
+
   it("throws and skips storage when BIP39 validation fails", async () => {
     mockValidateMnemonic.mockReturnValueOnce(false)
 

@@ -10,6 +10,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 import { generateMnemonic, validateMnemonic } from "bip39"
 import Crypto from "react-native-quick-crypto"
 
+import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import {
@@ -88,17 +89,17 @@ export const selfCustodialRestoreWallet = async (
   accountId: string,
   mnemonic: string,
 ): Promise<void> => {
-  const trimmed = mnemonic.trim().replace(/\s+/g, " ")
-  if (!validateMnemonic(trimmed)) {
+  const normalized = normalizeMnemonic(mnemonic)
+  if (!validateMnemonic(normalized)) {
     throw new Error("Invalid BIP39 mnemonic")
   }
 
-  const stored = await KeyStoreWrapper.setMnemonicForAccount(accountId, trimmed)
+  const stored = await KeyStoreWrapper.setMnemonicForAccount(accountId, normalized)
   if (!stored) throw new Error("Failed to store mnemonic")
 
   try {
     await KeyStoreWrapper.setMnemonicNetworkForAccount(accountId, SparkNetworkLabel)
-    const sdk = await initSdk(trimmed, storageDirFor(accountId))
+    const sdk = await initSdk(normalized, storageDirFor(accountId))
     await disconnectSdk(sdk)
     await addSelfCustodialAccountId(accountId)
   } catch (err) {
