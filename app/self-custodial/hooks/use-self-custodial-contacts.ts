@@ -9,7 +9,7 @@ import {
 
 import { mapSelfCustodialTransactions } from "@app/self-custodial/mappers/transaction-mapper"
 import {
-  addContact as bridgeAddContact,
+  findOrCreateContact as bridgeFindOrCreateContact,
   deleteContact as bridgeDeleteContact,
   listContacts as bridgeListContacts,
   listPayments as bridgeListPayments,
@@ -89,10 +89,7 @@ export const useSelfCustodialContacts = (): ContactAdapter & {
       input: Omit<Contact, "id" | "transactionsCount" | "sourceAccountType">,
     ): Promise<ContactListResult> => {
       await sdkRequired(sdk, (s) =>
-        bridgeAddContact(s, {
-          name: input.displayName,
-          paymentIdentifier: input.paymentIdentifier,
-        }),
+        bridgeFindOrCreateContact(s, input.paymentIdentifier, input.displayName),
       )
       const updated = await refresh()
       return { contacts: updated }

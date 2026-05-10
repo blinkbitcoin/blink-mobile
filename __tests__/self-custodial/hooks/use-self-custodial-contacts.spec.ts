@@ -5,7 +5,7 @@ import { AccountType } from "@app/types/wallet.types"
 import { useSelfCustodialContacts } from "@app/self-custodial/hooks/use-self-custodial-contacts"
 
 const mockListContacts = jest.fn()
-const mockAddContact = jest.fn()
+const mockFindOrCreateContact = jest.fn()
 const mockUpdateContact = jest.fn()
 const mockDeleteContact = jest.fn()
 const mockListPayments = jest.fn()
@@ -20,7 +20,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 
 jest.mock("@app/self-custodial/bridge", () => ({
   listContacts: (...args: unknown[]) => mockListContacts(...args),
-  addContact: (...args: unknown[]) => mockAddContact(...args),
+  findOrCreateContact: (...args: unknown[]) => mockFindOrCreateContact(...args),
   updateContact: (...args: unknown[]) => mockUpdateContact(...args),
   deleteContact: (...args: unknown[]) => mockDeleteContact(...args),
   listPayments: (...args: unknown[]) => mockListPayments(...args),
@@ -62,7 +62,7 @@ describe("useSelfCustodialContacts", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockListContacts.mockResolvedValue(sdkContacts)
-    mockAddContact.mockResolvedValue(undefined)
+    mockFindOrCreateContact.mockResolvedValue(undefined)
     mockUpdateContact.mockResolvedValue(undefined)
     mockDeleteContact.mockResolvedValue(undefined)
     mockListPayments.mockResolvedValue({ payments: [] })
@@ -110,10 +110,11 @@ describe("useSelfCustodialContacts", () => {
       } as never)
     })
 
-    expect(mockAddContact).toHaveBeenCalledWith(mockSdk, {
-      name: "Carol",
-      paymentIdentifier: "carol@blink.sv",
-    })
+    expect(mockFindOrCreateContact).toHaveBeenCalledWith(
+      mockSdk,
+      "carol@blink.sv",
+      "Carol",
+    )
     expect(mockListContacts).toHaveBeenCalledTimes(2) // initial + refresh after add
   })
 

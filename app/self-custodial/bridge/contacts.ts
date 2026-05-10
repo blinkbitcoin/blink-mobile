@@ -1,5 +1,4 @@
 import {
-  type AddContactRequest,
   type BreezSdkInterface,
   type Contact,
   type ListContactsRequest,
@@ -28,17 +27,36 @@ const findContactByPaymentIdentifier = async (
   return contacts.find((c) => normalizeString(c.paymentIdentifier) === target)
 }
 
-export const addContact = async (
+export const FindOrCreateContactStatus = {
+  Created: "created",
+  Deduped: "deduped",
+} as const
+
+export type FindOrCreateContactStatus =
+  (typeof FindOrCreateContactStatus)[keyof typeof FindOrCreateContactStatus]
+
+export type FindOrCreateContactResult =
+  | { status: typeof FindOrCreateContactStatus.Created; contact: Contact }
+  | { status: typeof FindOrCreateContactStatus.Deduped; existing: Contact }
+
+export const findOrCreateContact = async (
   sdk: BreezSdkInterface,
-  request: AddContactRequest,
-): Promise<Contact> => {
-  const existing = await findContactByPaymentIdentifier(sdk, request.paymentIdentifier)
-  if (!existing) return sdk.addContact(request)
-  return sdk.updateContact({
+  paymentIdentifier: string,
+  fallbackName: string,
+): Promise<FindOrCreateContactResult> => {
+  const existing = await findContactByPaymentIdentifier(sdk, paymentIdentifier)
+  if (!existing) {
+    const contact = await sdk.addContact({ name: fallbackName, paymentIdentifier })
+    return { status: FindOrCreateContactStatus.Created, contact }
+  }
+
+  await sdk.updateContact({
     id: existing.id,
     name: existing.name,
     paymentIdentifier: existing.paymentIdentifier,
   })
+
+  return { status: FindOrCreateContactStatus.Deduped, existing }
 }
 
 export const updateContact = (sdk: BreezSdkInterface, request: UpdateContactRequest) =>

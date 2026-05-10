@@ -1,6 +1,7 @@
 import {
-  addContact,
   deleteContact,
+  findOrCreateContact,
+  FindOrCreateContactStatus,
   listContacts,
   updateContact,
 } from "@app/self-custodial/bridge/contacts"
@@ -36,22 +37,27 @@ describe("listContacts", () => {
   })
 })
 
-describe("addContact", () => {
-  it("creates the contact when no existing one shares the payment identifier", async () => {
+describe("findOrCreateContact", () => {
+  it("returns status='created' with the new contact when no existing one shares the payment identifier", async () => {
     const sdk = createMockSdk()
-    const request = { name: "Alice", paymentIdentifier: "alice@blink.sv" }
 
-    const result = await addContact(sdk as never, request as never)
+    const result = await findOrCreateContact(sdk as never, "alice@blink.sv", "Alice")
 
-    expect(sdk.addContact).toHaveBeenCalledWith(request)
-    expect(result).toEqual({
-      id: "new",
+    expect(sdk.addContact).toHaveBeenCalledWith({
       name: "Alice",
       paymentIdentifier: "alice@blink.sv",
     })
+    expect(result).toEqual({
+      status: FindOrCreateContactStatus.Created,
+      contact: {
+        id: "new",
+        name: "Alice",
+        paymentIdentifier: "alice@blink.sv",
+      },
+    })
   })
 
-  it("touches the existing contact via update so its updatedAt bumps, instead of creating a duplicate", async () => {
+  it("returns status='deduped' with the existing contact when the payment identifier already exists (Critical #5)", async () => {
     const sdk = createMockSdk()
     const existing = {
       id: "c1",
@@ -60,23 +66,17 @@ describe("addContact", () => {
     }
     sdk.listContacts.mockResolvedValueOnce([existing])
 
-    await addContact(
+    const result = await findOrCreateContact(
       sdk as never,
-      {
-        name: "Alice (paid)",
-        paymentIdentifier: "alice@blink.sv",
-      } as never,
+      "alice@blink.sv",
+      "Alice (paid)",
     )
 
+    expect(result).toEqual({ status: FindOrCreateContactStatus.Deduped, existing })
     expect(sdk.addContact).not.toHaveBeenCalled()
-    expect(sdk.updateContact).toHaveBeenCalledWith({
-      id: existing.id,
-      name: existing.name,
-      paymentIdentifier: existing.paymentIdentifier,
-    })
   })
 
-  it("preserves the existing name when touching a duplicate (does not overwrite user edits)", async () => {
+  it("bumps existing.updatedAt via updateContact without overwriting the stored name (Critical #5)", async () => {
     const sdk = createMockSdk()
     const existing = {
       id: "c1",
@@ -85,16 +85,15 @@ describe("addContact", () => {
     }
     sdk.listContacts.mockResolvedValueOnce([existing])
 
-    await addContact(
-      sdk as never,
-      {
-        name: "alice@blink.sv",
-        paymentIdentifier: "alice@blink.sv",
-      } as never,
-    )
+    await findOrCreateContact(sdk as never, "alice@blink.sv", "alice@blink.sv")
 
-    expect(sdk.updateContact).toHaveBeenCalledWith(
-      expect.objectContaining({ name: "Alice (custom)" }),
+    expect(sdk.updateContact).toHaveBeenCalledWith({
+      id: existing.id,
+      name: existing.name,
+      paymentIdentifier: existing.paymentIdentifier,
+    })
+    expect(sdk.updateContact).not.toHaveBeenCalledWith(
+      expect.objectContaining({ name: "alice@blink.sv" }),
     )
   })
 
@@ -107,35 +106,25 @@ describe("addContact", () => {
     }
     sdk.listContacts.mockResolvedValueOnce([existing])
 
-    await addContact(
-      sdk as never,
-      {
-        name: "Alice",
-        paymentIdentifier: "  alice@blink.sv  ",
-      } as never,
-    )
+    const result = await findOrCreateContact(sdk as never, "  alice@blink.sv  ", "Alice")
 
     expect(sdk.addContact).not.toHaveBeenCalled()
+    expect(result).toEqual({ status: FindOrCreateContactStatus.Deduped, existing })
     expect(sdk.updateContact).toHaveBeenCalledWith(
       expect.objectContaining({ id: "c1", paymentIdentifier: "Alice@Blink.sv" }),
     )
   })
 
-  it("creates the contact when the existing list has no matching identifier", async () => {
+  it("returns status='created' when the existing list has no matching identifier", async () => {
     const sdk = createMockSdk()
     sdk.listContacts.mockResolvedValueOnce([
       { id: "c1", name: "Bob", paymentIdentifier: "bob@blink.sv" },
     ])
 
-    await addContact(
-      sdk as never,
-      {
-        name: "Alice",
-        paymentIdentifier: "alice@blink.sv",
-      } as never,
-    )
+    const result = await findOrCreateContact(sdk as never, "alice@blink.sv", "Alice")
 
     expect(sdk.addContact).toHaveBeenCalledTimes(1)
+    expect(result.status).toBe(FindOrCreateContactStatus.Created)
   })
 })
 
