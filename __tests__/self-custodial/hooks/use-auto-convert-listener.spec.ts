@@ -240,6 +240,31 @@ describe("useAutoConvertListener — live trigger", () => {
     expect(mockToastShow).not.toHaveBeenCalled()
   })
 
+  it("re-reads attempts from storage so concurrent invocations agree on the cap (Important #2)", async () => {
+    const sdk = makeSdk({
+      getPayment: jest.fn().mockResolvedValue({ payment: makeLightningPayment("lnbc1") }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1",
+      isStableBalanceActive: false,
+    })
+    // Snapshot the listener loaded shows attempts:2 (one below the cap of 3).
+    // By the time runAutoConvert reads live storage, a sibling invocation has
+    // already stamped, so live attempts:3 — runAutoConvert must evict, not run.
+    mockFindPendingAutoConvert
+      .mockResolvedValueOnce(makeRecord({ paymentRequest: "lnbc1", attempts: 2 }))
+      .mockResolvedValueOnce(makeRecord({ paymentRequest: "lnbc1", attempts: 3 }))
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1")
+    })
+    expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
+  })
+
   it("leaves the record pending when Failed so a later trigger retries", async () => {
     const sdk = makeSdk({
       getPayment: jest.fn().mockResolvedValue({ payment: makeLightningPayment("lnbc1") }),
