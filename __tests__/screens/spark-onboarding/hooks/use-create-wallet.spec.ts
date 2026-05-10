@@ -174,4 +174,36 @@ describe("useCreateWallet", () => {
     expect(mockReinitSdk).not.toHaveBeenCalled()
     expect(mockResetBackupState).not.toHaveBeenCalled()
   })
+
+  it("ignores reentrant create while one is already in flight (Critical #5)", async () => {
+    let resolveFirst: () => void
+    mockCreateWallet.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveFirst = resolve
+        }),
+    )
+
+    const { result } = renderHook(() => useCreateWallet())
+
+    act(() => {
+      result.current.create()
+    })
+
+    expect(result.current.status).toBe(CreationStatus.Creating)
+
+    await act(async () => {
+      await result.current.create()
+    })
+
+    expect(mockCreateWallet).toHaveBeenCalledTimes(1)
+    expect(mockUpdateState).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
+    expect(mockReinitSdk).not.toHaveBeenCalled()
+    expect(mockResetBackupState).not.toHaveBeenCalled()
+
+    await act(async () => {
+      resolveFirst!()
+    })
+  })
 })
