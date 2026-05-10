@@ -97,12 +97,12 @@ const sdkSuccessActionToLib = (
     const decrypted = result.inner.data
     return {
       tag: "aes",
-      message: null,
+      message: decrypted.plaintext,
       description: decrypted.description,
       url: null,
       ciphertext: null,
       iv: null,
-      decipher: () => decrypted.plaintext,
+      decipher: () => null,
     }
   }
 

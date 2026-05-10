@@ -274,6 +274,46 @@ describe("SendBitcoinCompletedScreen", () => {
     expect(screen.getByText(LL.common.share())).toBeTruthy()
   })
 
+  it("renders self-custodial AES plaintext from `message` (no ciphertext/iv)", async () => {
+    const plaintext = "redeem-code-XYZ"
+    const description = "Here is your AES secret"
+    const selfCustodialAesRoute = {
+      key: "sendBitcoinCompleted",
+      name: "sendBitcoinCompleted",
+      params: {
+        status: "SUCCESS",
+        successAction: {
+          tag: "aes",
+          message: plaintext,
+          description,
+          url: null,
+          ciphertext: null,
+          iv: null,
+          decipher: () => null,
+        },
+        preimage: undefined,
+        currencyAmount: "$0.03",
+        satAmount: "25 SAT",
+        currencyFeeAmount: "$0.00",
+        satFeeAmount: "0 SAT",
+        destination: "alice@blink.sv",
+        paymentType: "lightning",
+        createdAt: 1747691078,
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <SuccessAction route={selfCustodialAesRoute} />
+      </ContextForScreen>,
+    )
+    act(() => {
+      jest.advanceTimersByTime(2300)
+    })
+
+    expect(screen.getByText(`${plaintext} ${description}`)).toBeTruthy()
+  })
+
   describe("ViewShot background color for screenshot", () => {
     const successRoute = {
       key: "sendBitcoinCompleted",
