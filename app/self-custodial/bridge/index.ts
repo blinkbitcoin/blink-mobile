@@ -22,8 +22,11 @@ export {
   extractLightningFee,
   toSdkSendAmount,
   resolveSendTokenIdentifier,
+  prepareLnurl,
+  executeLnurl,
+  extractLnurlFee,
 } from "./send"
-export type { OnchainFeeTiers, PrepareSendOptions } from "./send"
+export type { OnchainFeeTiers, PrepareSendOptions, PrepareLnurlOptions } from "./send"
 export { listDeposits, claimDeposit, refundDeposit, getRecommendedFees } from "./deposits"
 export type { MappedDeposit, NetworkFeeRates } from "./deposits"
 export { createGetConversionQuote } from "./convert"
