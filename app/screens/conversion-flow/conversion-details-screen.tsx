@@ -45,6 +45,7 @@ import {
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
 import { convertDirectionFromCurrency } from "@app/types/payment.types"
+import { AccountType } from "@app/types/wallet.types"
 
 import {
   useConversionFormatting,
@@ -86,7 +87,13 @@ export const ConversionDetailsScreen = () => {
 
   useRealtimePriceQuery({ fetchPolicy: "network-only" })
 
-  const { isSelfCustodial, wallets: activeWallets } = useActiveWallet()
+  const {
+    isSelfCustodial,
+    isReady,
+    accountType,
+    wallets: activeWallets,
+  } = useActiveWallet()
+  const isSelfCustodialBooting = accountType === AccountType.SelfCustodial && !isReady
 
   const { data } = useConversionScreenQuery({
     fetchPolicy: "cache-and-network",
@@ -746,7 +753,9 @@ export const ConversionDetailsScreen = () => {
             belowMinimum ||
             scLimitsUnavailable ||
             quoteBlocking ||
-            conversionGuard.isQuoting
+            conversionGuard.isQuoting ||
+            conversionGuard.hasQuoteError ||
+            isSelfCustodialBooting
           }
           onPress={moveToNextScreen}
           testID="next-button"
