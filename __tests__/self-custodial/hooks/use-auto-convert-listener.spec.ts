@@ -17,6 +17,7 @@ const mockUseSelfCustodialWallet = jest.fn()
 const mockUseRemoteConfig = jest.fn()
 const mockUsePriceConversion = jest.fn()
 const mockRefreshWallets = jest.fn()
+const mockSyncSelfCustodialWallet = jest.fn().mockResolvedValue(undefined)
 
 jest.mock("@app/self-custodial/auto-convert", () => ({
   AutoConvertStatus: {
