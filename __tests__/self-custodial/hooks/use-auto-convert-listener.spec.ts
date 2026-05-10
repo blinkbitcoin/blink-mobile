@@ -90,11 +90,6 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   },
 }))
 
-const mockSyncSelfCustodialWallet = jest.fn().mockResolvedValue(undefined)
-jest.mock("@app/self-custodial/bridge", () => ({
-  syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
-}))
-
 type ListenerSdk = {
   getPayment: jest.Mock
   listPayments: jest.Mock

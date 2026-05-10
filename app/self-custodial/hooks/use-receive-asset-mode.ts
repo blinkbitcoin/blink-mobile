@@ -40,7 +40,7 @@ export const useReceiveAssetMode = (): UseReceiveAssetModeResult => {
   const defaultCurrency = getSelfCustodialDefaultCurrency(persistentState)
 
   const [assetMode, setAssetMode] = useState<ReceiveAssetMode>(
-    resolveInitialMode(isStableBalanceActive, defaultCurrency),
+    resolveInitialMode(isStableBalanceActive === true, defaultCurrency),
   )
 
   // Re-align to Dollar when stable balance becomes active.
