@@ -90,6 +90,9 @@ describe("createGetConversionQuote — BTC → USD", () => {
 
     expect(result.status).toBe("success")
     expect(sdk.sendPayment).toHaveBeenCalled()
+    // Post-send syncWallet is load-bearing: until Breez materializes token balances
+    // on payment insert, getInfo stays misaligned with the convert result without it.
+    expect(sdk.syncWallet).toHaveBeenCalled()
   })
 
   it("exposes the estimated fee converted to a USD MoneyAmount in cents", async () => {

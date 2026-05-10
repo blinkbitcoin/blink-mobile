@@ -274,7 +274,10 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
     const prepareParams = mockCreateSendMutation.mock.calls[0][0]
     expect(prepareParams.conversionOptions).toEqual(
       expect.objectContaining({
-        conversionType: expect.objectContaining({ tag: "ToBitcoin" }),
+        conversionType: expect.objectContaining({
+          tag: "ToBitcoin",
+          inner: expect.objectContaining({ fromTokenIdentifier: "usdb-token-id" }),
+        }),
       }),
     )
   })
