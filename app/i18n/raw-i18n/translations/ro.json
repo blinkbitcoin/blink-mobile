@@ -3557,7 +3557,8 @@
     "descriptionSelected": "Vă rugăm alegeți tipul de cont.",
     "chooseMethod": "Alegeți metoda",
     "restoreComingSoonTitle": "În curând",
-    "restoreComingSoonDescription": "Funcția de restaurare va fi disponibilă într-o actualizare viitoare."
+    "restoreComingSoonDescription": "Funcția de restaurare va fi disponibilă într-o actualizare viitoare.",
+    "createFailed": "Crearea portofelului a eșuat. Vă rugăm să încercați din nou."
   },
   "RestoreScreen": {
     "title": "Restaurare portofel",

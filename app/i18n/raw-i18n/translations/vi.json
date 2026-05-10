@@ -3595,7 +3595,8 @@
     "descriptionSelected": "Vui lòng chọn loại tài khoản.",
     "chooseMethod": "Chọn phương thức",
     "restoreComingSoonTitle": "Sắp ra mắt",
-    "restoreComingSoonDescription": "Tính năng khôi phục sẽ có trong bản cập nhật tương lai."
+    "restoreComingSoonDescription": "Tính năng khôi phục sẽ có trong bản cập nhật tương lai.",
+    "createFailed": "Không thể tạo ví. Vui lòng thử lại."
   },
   "RestoreScreen": {
     "title": "Khôi phục ví",

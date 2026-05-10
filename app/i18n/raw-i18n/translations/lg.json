@@ -3557,7 +3557,8 @@
     "descriptionSelected": "Londa ekika ky'akawunti.",
     "chooseMethod": "Londa enkola",
     "restoreComingSoonTitle": "Kijja mangu",
-    "restoreComingSoonDescription": "Enkola y'okuzzaawo ejja kubeera mu update ejja."
+    "restoreComingSoonDescription": "Enkola y'okuzzaawo ejja kubeera mu update ejja.",
+    "createFailed": "Tekisobose okukola wallet. Tugezeeyo nate."
   },
   "RestoreScreen": {
     "title": "Zzaawo wallet",

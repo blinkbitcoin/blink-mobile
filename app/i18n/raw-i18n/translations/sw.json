@@ -3557,7 +3557,8 @@
     "descriptionSelected": "Tafadhali chagua aina ya akaunti.",
     "chooseMethod": "Chagua njia",
     "restoreComingSoonTitle": "Inakuja hivi karibuni",
-    "restoreComingSoonDescription": "Kipengele cha kurejesha kitapatikana katika sasisho la baadaye."
+    "restoreComingSoonDescription": "Kipengele cha kurejesha kitapatikana katika sasisho la baadaye.",
+    "createFailed": "Imeshindwa kuunda mkoba. Tafadhali jaribu tena."
   },
   "RestoreScreen": {
     "title": "Rejesha mkoba",

@@ -3575,7 +3575,8 @@
     "descriptionSelected": "Vælg venligst kontotype.",
     "chooseMethod": "Vælg metode",
     "restoreComingSoonTitle": "Kommer snart",
-    "restoreComingSoonDescription": "Gendannelsesfunktionen vil være tilgængelig i en fremtidig opdatering."
+    "restoreComingSoonDescription": "Gendannelsesfunktionen vil være tilgængelig i en fremtidig opdatering.",
+    "createFailed": "Kunne ikke oprette tegnebog. Prøv venligst igen."
   },
   "RestoreScreen": {
     "title": "Gendan tegnebog",

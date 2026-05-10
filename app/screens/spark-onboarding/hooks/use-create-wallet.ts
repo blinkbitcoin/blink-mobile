@@ -6,11 +6,13 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { selfCustodialCreateWallet } from "@app/self-custodial/bridge"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { reportError } from "@app/utils/error-logging"
+import { toastShow } from "@app/utils/toast"
 
 export const CreationStatus = {
   Idle: "idle",
@@ -25,6 +27,7 @@ export const useCreateWallet = () => {
   const { updateState } = usePersistentStateContext()
   const { retry: reinitSdk } = useSelfCustodialWallet()
   const { reloadSelfCustodialAccounts } = useAccountRegistry()
+  const { LL } = useI18nContext()
   const [status, setStatus] = useState<CreationStatus>(CreationStatus.Idle)
   const guard = useInFlightGuard()
 
@@ -46,9 +49,10 @@ export const useCreateWallet = () => {
       } catch (err) {
         reportError("Wallet creation", err)
         setStatus(CreationStatus.Error)
+        toastShow({ message: LL.AccountTypeSelectionScreen.createFailed(), LL })
       }
     })
-  }, [guard, navigation, updateState, reinitSdk, reloadSelfCustodialAccounts])
+  }, [guard, navigation, updateState, reinitSdk, reloadSelfCustodialAccounts, LL])
 
   return { status, create }
 }

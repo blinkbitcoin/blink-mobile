@@ -3557,7 +3557,8 @@
     "descriptionSelected": "Lütfen hesap türünü seçin.",
     "chooseMethod": "Yöntem seçin",
     "restoreComingSoonTitle": "Yakında",
-    "restoreComingSoonDescription": "Geri yükleme özelliği gelecek bir güncellemede kullanılabilir olacaktır."
+    "restoreComingSoonDescription": "Geri yükleme özelliği gelecek bir güncellemede kullanılabilir olacaktır.",
+    "createFailed": "Cüzdan oluşturulamadı. Lütfen tekrar deneyin."
   },
   "RestoreScreen": {
     "title": "Cüzdanı geri yükle",

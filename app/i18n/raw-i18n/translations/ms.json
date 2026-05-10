@@ -3598,7 +3598,8 @@
     "descriptionSelected": "Sila pilih jenis akaun.",
     "chooseMethod": "Pilih kaedah",
     "restoreComingSoonTitle": "Akan datang",
-    "restoreComingSoonDescription": "Ciri pemulihan akan tersedia dalam kemas kini akan datang."
+    "restoreComingSoonDescription": "Ciri pemulihan akan tersedia dalam kemas kini akan datang.",
+    "createFailed": "Gagal mencipta dompet. Sila cuba lagi."
   },
   "RestoreScreen": {
     "title": "Pulihkan dompet",

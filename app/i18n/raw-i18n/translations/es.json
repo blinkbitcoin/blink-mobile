@@ -3545,7 +3545,8 @@
         "descriptionSelected": "Por favor elige tipo de cuenta.",
         "chooseMethod": "Elegir método",
         "restoreComingSoonTitle": "Próximamente",
-        "restoreComingSoonDescription": "La función de restauración estará disponible en una actualización futura."
+        "restoreComingSoonDescription": "La función de restauración estará disponible en una actualización futura.",
+        "createFailed": "Error al crear la billetera. Por favor intenta de nuevo."
     },
     "RestoreScreen": {
         "title": "Restaurar billetera",

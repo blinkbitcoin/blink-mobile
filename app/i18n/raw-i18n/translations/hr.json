@@ -3598,7 +3598,8 @@
     "descriptionSelected": "Molimo odaberite vrstu računa.",
     "chooseMethod": "Odaberite metodu",
     "restoreComingSoonTitle": "Uskoro dostupno",
-    "restoreComingSoonDescription": "Funkcija vraćanja bit će dostupna u budućem ažuriranju."
+    "restoreComingSoonDescription": "Funkcija vraćanja bit će dostupna u budućem ažuriranju.",
+    "createFailed": "Neuspjelo stvaranje novčanika. Molimo pokušajte ponovno."
   },
   "RestoreScreen": {
     "title": "Vraćanje novčanika",

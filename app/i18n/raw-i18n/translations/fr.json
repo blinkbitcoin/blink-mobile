@@ -3586,7 +3586,8 @@
         "descriptionSelected": "Veuillez choisir le type de compte.",
         "chooseMethod": "Choisir la méthode",
         "restoreComingSoonTitle": "Bientôt disponible",
-        "restoreComingSoonDescription": "La fonction de restauration sera disponible dans une mise à jour future."
+        "restoreComingSoonDescription": "La fonction de restauration sera disponible dans une mise à jour future.",
+        "createFailed": "Échec de la création du portefeuille. Veuillez réessayer."
     },
     "RestoreScreen": {
         "title": "Restaurer le portefeuille",

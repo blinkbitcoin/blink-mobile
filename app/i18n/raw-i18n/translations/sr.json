@@ -3595,7 +3595,8 @@
     "descriptionSelected": "Молимо изаберите тип налога.",
     "chooseMethod": "Изаберите метод",
     "restoreComingSoonTitle": "Ускоро доступно",
-    "restoreComingSoonDescription": "Функција враћања биће доступна у будућем ажурирању."
+    "restoreComingSoonDescription": "Функција враћања биће доступна у будућем ажурирању.",
+    "createFailed": "Није успело креирање новчаника. Молимо покушајте поново."
   },
   "RestoreScreen": {
     "title": "Враћање новчаника",

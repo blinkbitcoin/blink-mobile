@@ -3604,7 +3604,8 @@
     "descriptionSelected": "Nceda ukhethe uhlobo lwe-akhawunti.",
     "chooseMethod": "Khetha indlela",
     "restoreComingSoonTitle": "Iyeza kungekudala",
-    "restoreComingSoonDescription": "Isici sokubuyisela siya kufumaneka kwisashintsho elizayo."
+    "restoreComingSoonDescription": "Isici sokubuyisela siya kufumaneka kwisashintsho elizayo.",
+    "createFailed": "Ayikwazanga ukudala iwallet. Nceda zama kwakhona."
   },
   "RestoreScreen": {
     "title": "Buyisela isikhwama",

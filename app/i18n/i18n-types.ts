@@ -11794,6 +11794,10 @@ type RootTranslation = {
 		 * R​e​s​t​o​r​e​ ​f​l​o​w​ ​w​i​l​l​ ​b​e​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​a​ ​f​u​t​u​r​e​ ​u​p​d​a​t​e​.
 		 */
 		restoreComingSoonDescription: string
+		/**
+		 * F​a​i​l​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​w​a​l​l​e​t​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		createFailed: string
 	}
 	RestoreScreen: {
 		/**
@@ -23914,6 +23918,10 @@ export type TranslationFunctions = {
 		 * Restore flow will be available in a future update.
 		 */
 		restoreComingSoonDescription: () => LocalizedString
+		/**
+		 * Failed to create wallet. Please try again.
+		 */
+		createFailed: () => LocalizedString
 	}
 	RestoreScreen: {
 		/**

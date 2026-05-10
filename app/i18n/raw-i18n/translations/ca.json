@@ -3557,7 +3557,8 @@
     "descriptionSelected": "Si us plau, trieu el tipus de compte.",
     "chooseMethod": "Trieu mètode",
     "restoreComingSoonTitle": "Properament",
-    "restoreComingSoonDescription": "La funció de restauració estarà disponible en una actualització futura."
+    "restoreComingSoonDescription": "La funció de restauració estarà disponible en una actualització futura.",
+    "createFailed": "No s'ha pogut crear la cartera. Si us plau, torna-ho a provar."
   },
   "RestoreScreen": {
     "title": "Restaura la cartera",

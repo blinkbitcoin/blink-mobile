@@ -11,6 +11,7 @@ const mockDispatch = jest.fn()
 const mockRecordError = jest.fn()
 const mockReinitSdk = jest.fn()
 const mockReloadSelfCustodialAccounts = jest.fn()
+const mockToastShow = jest.fn()
 
 const TEST_ACCOUNT_ID = "test-account-id-123"
 
@@ -47,6 +48,20 @@ jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: Error[]) => mockRecordError(...args),
+}))
+
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
+}))
+
+jest.mock("@app/i18n/i18n-react", () => ({
+  useI18nContext: () => ({
+    LL: {
+      AccountTypeSelectionScreen: {
+        createFailed: () => "Failed to create wallet. Please try again.",
+      },
+    },
+  }),
 }))
 
 describe("useCreateWallet", () => {
@@ -137,6 +152,22 @@ describe("useCreateWallet", () => {
     })
 
     expect(result.current.status).toBe(CreationStatus.Error)
+  })
+
+  it("shows a toast with the createFailed message on failure (Important #8)", async () => {
+    mockCreateWallet.mockRejectedValue(new Error("creation failed"))
+
+    const { result } = renderHook(() => useCreateWallet())
+
+    await act(async () => {
+      await result.current.create()
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Failed to create wallet. Please try again.",
+      }),
+    )
   })
 
   it("wraps non-Error rejection for crashlytics", async () => {
