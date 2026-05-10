@@ -162,6 +162,38 @@ describe("usePaymentRequest", () => {
     )
   })
 
+  it("records the silent failure to crashlytics when the adapter resolves without an invoice (Important #7)", async () => {
+    mockReceiveLightning.mockResolvedValue({} as unknown as { invoice: string })
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Error")
+    })
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Self-custodial invoice adapter returned no invoice field",
+      }),
+    )
+  })
+
+  it("records the silent failure to crashlytics when the adapter resolves with an empty invoice string (Important #7)", async () => {
+    mockReceiveLightning.mockResolvedValue({ invoice: "" })
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Error")
+    })
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Self-custodial invoice adapter returned no invoice field",
+      }),
+    )
+  })
+
   it("does not call the receive adapter while active wallet is not ready", () => {
     mockActiveWallet.mockReturnValue({
       wallets: [btcWallet, usdWallet],
