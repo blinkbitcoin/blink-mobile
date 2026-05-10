@@ -800,3 +800,149 @@ describe("useAutoConvertListener — mount replay", () => {
     expect(mockToastShow).not.toHaveBeenCalled()
   })
 })
+
+describe("useAutoConvertListener — isRetryableNow gate (Important #11)", () => {
+  const FIXED_NOW = 2_000_000_000_000
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers()
+    jest.setSystemTime(FIXED_NOW)
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it("blocks the live-trigger run when lastAttemptAtMs is within the 30s cooldown", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1cool") }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1cool",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({
+        paymentRequest: "lnbc1cool",
+        attempts: 1,
+        lastAttemptAtMs: FIXED_NOW - 5_000,
+      }),
+    )
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockFindPendingAutoConvert).toHaveBeenCalled()
+    })
+    await Promise.resolve()
+
+    expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
+    expect(mockRecordAutoConvertAttempt).not.toHaveBeenCalled()
+  })
+
+  it("allows the live-trigger run once the 30s cooldown has elapsed", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1past") }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1past",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({
+        paymentRequest: "lnbc1past",
+        attempts: 1,
+        lastAttemptAtMs: FIXED_NOW - 35_000,
+      }),
+    )
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("recovers an orphan record on the live-trigger when lastAttemptAtMs is past the 2-minute timeout", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1orph") }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1orph",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({
+        paymentRequest: "lnbc1orph",
+        attempts: 1,
+        lastAttemptAtMs: FIXED_NOW - 3 * 60 * 1000,
+      }),
+    )
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("blocks the mount-replay run when lastAttemptAtMs is within the 30s cooldown", async () => {
+    const sdk = makeSdk({
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [makeLightningPayment("lnbc1replaycool")],
+      }),
+    })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({
+        paymentRequest: "lnbc1replaycool",
+        attempts: 1,
+        lastAttemptAtMs: FIXED_NOW - 5_000,
+      }),
+    ])
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockListPendingAutoConverts).toHaveBeenCalled()
+    })
+    await Promise.resolve()
+
+    expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
+  })
+
+  it("allows the mount-replay run when the 2-minute orphan timeout has elapsed", async () => {
+    const sdk = makeSdk({
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [makeLightningPayment("lnbc1replayorph")],
+      }),
+    })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({
+        paymentRequest: "lnbc1replayorph",
+        attempts: 1,
+        lastAttemptAtMs: FIXED_NOW - 3 * 60 * 1000,
+      }),
+    ])
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
+  })
+})
