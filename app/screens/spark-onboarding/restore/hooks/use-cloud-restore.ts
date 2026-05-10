@@ -129,6 +129,10 @@ export const useCloudRestore = () => {
           setStep(STEP_FOR_REASON[result.reason])
           return
         }
+        if (!parseBackupMetadata(result.content)) {
+          setStep(CloudStep.NotFound)
+          return
+        }
         await proceedWithBackup(result.content)
         return
       }
@@ -143,7 +147,7 @@ export const useCloudRestore = () => {
                 : { kind: "failure" }
             }
             const metadata = parseBackupMetadata(result.content)
-            if (!metadata) return { kind: "failure" }
+            if (!metadata) return { kind: "not-found" }
             return {
               kind: "success",
               backup: {

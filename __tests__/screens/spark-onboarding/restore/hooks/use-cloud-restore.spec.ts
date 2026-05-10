@@ -342,7 +342,7 @@ describe("useCloudRestore", () => {
     expect(result.current.isNotFound).toBe(false)
   })
 
-  it("falls to Error when ALL per-file downloads succeed but metadata fails to parse (Critical #8)", async () => {
+  it("falls to NotFound when ALL per-file downloads succeed but metadata fails to parse (Critical #9)", async () => {
     mockListBackups.mockResolvedValue({
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
@@ -358,9 +358,63 @@ describe("useCloudRestore", () => {
     const { result } = renderHook(() => useCloudRestore())
 
     await waitFor(() => {
-      expect(result.current.hasError).toBe(true)
+      expect(result.current.isNotFound).toBe(true)
     })
-    expect(result.current.isNotFound).toBe(false)
+    expect(result.current.hasError).toBe(false)
+  })
+
+  it("falls to NotFound on single-file path when downloaded content fails parseBackupMetadata (Critical #9)", async () => {
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: "garbage{",
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isNotFound).toBe(true)
+    })
+    expect(result.current.hasError).toBe(false)
+    expect(mockRestore).not.toHaveBeenCalled()
+  })
+
+  it("does not call restore on single-file path when content lacks walletIdentifier (Critical #9)", async () => {
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: JSON.stringify({ version: 1, mnemonic: "words but no identifier" }),
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isNotFound).toBe(true)
+    })
+    expect(mockRestore).not.toHaveBeenCalled()
+  })
+
+  it("proceeds with the backup on single-file path when metadata parses successfully (Critical #9)", async () => {
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: buildPlainBackup("pubkey1", "valid words"),
+    })
+
+    renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(mockRestore).toHaveBeenCalledWith("valid words")
+    })
   })
 
   it("reports per-file exceptions to crashlytics during picker assembly (Critical #8)", async () => {
