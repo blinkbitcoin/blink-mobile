@@ -724,4 +724,79 @@ describe("useAutoConvertListener — mount replay", () => {
     })
     expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
   })
+
+  it("processes pending records sequentially via reduce, not in parallel (Important #3)", async () => {
+    const sdk = makeSdk({
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [
+          {
+            id: "pid-A",
+            amount: 5000n,
+            details: { tag: "Lightning", inner: { invoice: "lnbc1A" } },
+          },
+          {
+            id: "pid-B",
+            amount: 5000n,
+            details: { tag: "Lightning", inner: { invoice: "lnbc1B" } },
+          },
+        ],
+      }),
+    })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbc1A" }),
+      makeRecord({ paymentRequest: "lnbc1B" }),
+    ])
+
+    let resolveFirst!: (value: boolean) => void
+    const firstSettled = new Promise<boolean>((resolve) => {
+      resolveFirst = resolve
+    })
+    mockWaitForPaymentCompleted
+      .mockImplementationOnce(() => firstSettled)
+      .mockResolvedValueOnce(true)
+
+    renderHook(() => useAutoConvertListener())
+
+    // The reduce chain awaits the first record's processing before starting
+    // the second; until we resolve the first, the second must not have started.
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10)
+    })
+    expect(mockWaitForPaymentCompleted).toHaveBeenCalledTimes(1)
+
+    resolveFirst(true)
+
+    await waitFor(() => {
+      expect(mockWaitForPaymentCompleted).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  it("removes the record on SkippedBelowMin without firing the success toast (Important #7)", async () => {
+    const sdk = makeSdk({
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [
+          {
+            id: "pid-low",
+            amount: 100n,
+            details: { tag: "Lightning", inner: { invoice: "lnbc1low" } },
+          },
+        ],
+      }),
+    })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbc1low" }),
+    ])
+    mockExecuteAutoConvert.mockResolvedValue({
+      status: AutoConvertStatus.SkippedBelowMin,
+    })
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockRemovePendingAutoConvert).toHaveBeenCalledWith("lnbc1low")
+    })
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
 })

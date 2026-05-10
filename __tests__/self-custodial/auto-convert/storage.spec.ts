@@ -195,6 +195,22 @@ describe("auto-convert storage", () => {
       expect(mockGetItem).toHaveBeenCalledWith(STORAGE_KEY)
       expect(mockSetItem.mock.calls[0][0]).toBe(STORAGE_KEY)
     })
+
+    it("withWriteLock keeps draining when a prior write rejects (Important #6)", async () => {
+      // First setItem rejects; the chain must absorb the rejection so the
+      // next write still gets through instead of deadlocking the queue.
+      mockSetItem
+        .mockRejectedValueOnce(new Error("storage transient"))
+        .mockResolvedValue(undefined)
+      mockGetItem.mockResolvedValue(null)
+
+      await addPendingAutoConvert(makeRecord({ paymentRequest: "lnbc1A" }))
+      await addPendingAutoConvert(makeRecord({ paymentRequest: "lnbc1B" }))
+
+      // Two writes attempted (both reached AsyncStorage.setItem); the chain
+      // didn't get stuck on the first rejection.
+      expect(mockSetItem).toHaveBeenCalledTimes(2)
+    })
   })
 
   describe("AutoConvertPairings (Critical #2 dedup correlation)", () => {

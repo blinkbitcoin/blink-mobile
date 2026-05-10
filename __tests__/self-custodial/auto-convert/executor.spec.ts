@@ -97,6 +97,22 @@ describe("waitForPaymentCompleted", () => {
     expect(settled).toBe(true)
     expect(sdk.getPayment).toHaveBeenCalledTimes(2)
   })
+
+  it("does not sleep when maxAttempts is 1 (Important #9)", async () => {
+    const setTimeoutSpy = jest.spyOn(global, "setTimeout")
+    setTimeoutSpy.mockClear()
+    const sdk = {
+      getPayment: jest.fn().mockResolvedValue({ payment: { status: "Pending" } }),
+    }
+
+    await waitForPaymentCompleted(sdk as never, "pid", { maxAttempts: 1, intervalMs: 10 })
+
+    // The `if (attempt < options.maxAttempts - 1)` guard prevents the sleep
+    // on the final attempt, so the degenerate single-attempt case has no
+    // setTimeout call at all.
+    expect(setTimeoutSpy).not.toHaveBeenCalled()
+    setTimeoutSpy.mockRestore()
+  })
 })
 
 describe("fetchAutoConvertMinSats", () => {

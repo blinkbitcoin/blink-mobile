@@ -153,6 +153,23 @@ describe("createGetConversionQuote — BTC → USD", () => {
 
     expect(quote).not.toBeNull()
   })
+
+  it("clamps the discovery destination up to minToAmount when it dominates (Important #8)", async () => {
+    // Target=2000 cents → halfDestination=1000; minFromAmount=0 → fromMin=0;
+    // minToAmount=1500 dominates the Math.max so the discovery destination
+    // is the to-side floor (1500 cents → 15_000_000 token base units at 6 decimals).
+    mockFetchLimits.mockResolvedValue({ minFromAmount: 0, minToAmount: 1500 })
+    const sdk = createSdk()
+
+    await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(5000),
+      toAmount: toUsdMoneyAmount(2000),
+      direction: ConvertDirection.BtcToUsd,
+    })
+
+    const prepArg = sdk.prepareSendPayment.mock.calls[0][0]
+    expect(prepArg.amount).toBe(BigInt(1500 * 10 ** 4))
+  })
 })
 
 describe("createGetConversionQuote — USD → BTC", () => {
