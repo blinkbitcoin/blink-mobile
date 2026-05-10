@@ -317,7 +317,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       expect(result.extraInfo?.successAction?.description).toBe("Receipt")
     })
 
-    it("exposes the decrypted plaintext via decipher() for AES successAction", async () => {
+    it("carries the decrypted plaintext on `message` (not via decipher) for AES Decrypted", async () => {
       mockPrepareLnurl.mockResolvedValue({})
       mockExecuteLnurl.mockResolvedValue({
         payment: { id: "p1" },
@@ -334,8 +334,37 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       const detail = createSelfCustodialLnurlPaymentDetails(createParams())
       if (!detail.canSendPayment) throw new Error("expected canSendPayment")
       const result = await detail.sendPaymentMutation({} as never)
-      expect(result.extraInfo?.successAction?.tag).toBe("aes")
-      expect(result.extraInfo?.successAction?.decipher("any-preimage")).toBe("secret123")
+      const successAction = result.extraInfo?.successAction
+      expect(successAction?.tag).toBe("aes")
+      expect(successAction?.message).toBe("secret123")
+      expect(successAction?.description).toBe("AES desc")
+      expect(successAction?.ciphertext).toBeNull()
+      expect(successAction?.iv).toBeNull()
+      expect(successAction?.decipher("any-preimage")).toBeNull()
+    })
+
+    it("maps AES ErrorStatus to description with no plaintext leakage", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      mockExecuteLnurl.mockResolvedValue({
+        payment: { id: "p1" },
+        successAction: {
+          tag: "Aes",
+          inner: {
+            result: {
+              tag: "ErrorStatus",
+              inner: { reason: "Could not decrypt: bad key" },
+            },
+          },
+        },
+      })
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      const result = await detail.sendPaymentMutation({} as never)
+      const successAction = result.extraInfo?.successAction
+      expect(successAction?.tag).toBe("aes")
+      expect(successAction?.message).toBeNull()
+      expect(successAction?.description).toBe("Could not decrypt: bad key")
+      expect(successAction?.decipher("any-preimage")).toBeNull()
     })
 
     it("returns Failure with classifier code on SDK error", async () => {
