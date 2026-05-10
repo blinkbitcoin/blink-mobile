@@ -212,4 +212,67 @@ describe("useDeleteSelfCustodial", () => {
     expect(result.current.error?.message).toBe("storage error")
     expect(mockReportError).toHaveBeenCalled()
   })
+
+  it("switches the active account BEFORE disconnecting the SDK so useSdkLifecycle does not poll a stale ref (Important #2)", async () => {
+    const remaining = {
+      ...activeSelfCustodialAccount,
+      id: "other-sc-id",
+      selected: false,
+    }
+    mockUseAccountRegistry.mockReturnValue({
+      accounts: [activeSelfCustodialAccount, remaining],
+      activeAccount: activeSelfCustodialAccount,
+      setActiveAccountId: mockSetActiveAccountId,
+      reloadSelfCustodialAccounts: mockReloadSelfCustodialAccounts,
+    })
+
+    const { result } = renderHook(() => useDeleteSelfCustodial())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockSetActiveAccountId).toHaveBeenCalledWith("other-sc-id")
+    expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
+
+    const setActiveOrder = mockSetActiveAccountId.mock.invocationCallOrder[0]
+    const disconnectOrder = mockDisconnectSdk.mock.invocationCallOrder[0]
+    const deleteOrder = mockDeleteMnemonicForAccount.mock.invocationCallOrder[0]
+
+    expect(setActiveOrder).toBeLessThan(disconnectOrder)
+    expect(disconnectOrder).toBeLessThan(deleteOrder)
+  })
+
+  it("clears activeAccountId BEFORE disconnecting when no fallback exists (Important #2 — getStarted path)", async () => {
+    const { result } = renderHook(() => useDeleteSelfCustodial())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockUpdateState).toHaveBeenCalled()
+    expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
+
+    const updateOrder = mockUpdateState.mock.invocationCallOrder[0]
+    const disconnectOrder = mockDisconnectSdk.mock.invocationCallOrder[0]
+
+    expect(updateOrder).toBeLessThan(disconnectOrder)
+  })
+
+  it("switches to the custodial account BEFORE disconnecting (Important #2 — custodial-fallback path)", async () => {
+    mockUseHasCustodialAccount.mockReturnValue(true)
+    const { result } = renderHook(() => useDeleteSelfCustodial())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockSetActiveAccountId).toHaveBeenCalledWith(DefaultAccountId.Custodial)
+    expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
+
+    const setActiveOrder = mockSetActiveAccountId.mock.invocationCallOrder[0]
+    const disconnectOrder = mockDisconnectSdk.mock.invocationCallOrder[0]
+
+    expect(setActiveOrder).toBeLessThan(disconnectOrder)
+  })
 })
