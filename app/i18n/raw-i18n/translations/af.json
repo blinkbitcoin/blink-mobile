@@ -3598,7 +3598,8 @@
     "descriptionSelected": "Kies asseblief rekeningtipe.",
     "chooseMethod": "Kies metode",
     "restoreComingSoonTitle": "Binnekort beskikbaar",
-    "restoreComingSoonDescription": "Herstelfunksie sal in 'n toekomstige opdatering beskikbaar wees."
+    "restoreComingSoonDescription": "Herstelfunksie sal in 'n toekomstige opdatering beskikbaar wees.",
+    "createFailed": "Kon nie tronk skep nie. Probeer asseblief weer."
   },
   "RestoreScreen": {
     "title": "Herstel beursie",

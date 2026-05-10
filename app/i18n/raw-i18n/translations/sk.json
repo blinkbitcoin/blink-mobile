@@ -3557,7 +3557,8 @@
     "descriptionSelected": "Vyberte prosím typ účtu.",
     "chooseMethod": "Vyberte metódu",
     "restoreComingSoonTitle": "Čoskoro dostupné",
-    "restoreComingSoonDescription": "Funkcia obnovenia bude dostupná v budúcej aktualizácii."
+    "restoreComingSoonDescription": "Funkcia obnovenia bude dostupná v budúcej aktualizácii.",
+    "createFailed": "Nepodarilo sa vytvoriť peňaženku. Skúste to znova."
   },
   "RestoreScreen": {
     "title": "Obnoviť peňaženku",

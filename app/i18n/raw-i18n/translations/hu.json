@@ -3557,7 +3557,8 @@
     "descriptionSelected": "Kérjük, válassza ki a fiók típusát.",
     "chooseMethod": "Válasszon módszert",
     "restoreComingSoonTitle": "Hamarosan elérhető",
-    "restoreComingSoonDescription": "A visszaállítási funkció egy jövőbeli frissítésben lesz elérhető."
+    "restoreComingSoonDescription": "A visszaállítási funkció egy jövőbeli frissítésben lesz elérhető.",
+    "createFailed": "Nem sikerült létrehozni a pénztárcát. Kérjük, próbáld újra."
   },
   "RestoreScreen": {
     "title": "Tárca visszaállítása",

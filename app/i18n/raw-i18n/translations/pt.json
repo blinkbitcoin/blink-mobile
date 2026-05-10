@@ -3545,7 +3545,8 @@
         "descriptionSelected": "Por favor, escolha o tipo de conta.",
         "chooseMethod": "Escolher método",
         "restoreComingSoonTitle": "Em breve",
-        "restoreComingSoonDescription": "A função de restauração estará disponível em uma atualização futura."
+        "restoreComingSoonDescription": "A função de restauração estará disponível em uma atualização futura.",
+        "createFailed": "Falha ao criar a carteira. Por favor, tente novamente."
     },
     "RestoreScreen": {
         "title": "Restaurar carteira",

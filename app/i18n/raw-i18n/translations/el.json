@@ -3557,7 +3557,8 @@
     "descriptionSelected": "Παρακαλώ επιλέξτε τύπο λογαριασμού.",
     "chooseMethod": "Επιλέξτε μέθοδο",
     "restoreComingSoonTitle": "Σύντομα διαθέσιμο",
-    "restoreComingSoonDescription": "Η λειτουργία επαναφοράς θα είναι διαθέσιμη σε μελλοντική ενημέρωση."
+    "restoreComingSoonDescription": "Η λειτουργία επαναφοράς θα είναι διαθέσιμη σε μελλοντική ενημέρωση.",
+    "createFailed": "Αποτυχία δημιουργίας πορτοφολιού. Παρακαλώ δοκιμάστε ξανά."
   },
   "RestoreScreen": {
     "title": "Επαναφορά πορτοφολιού",

@@ -3595,7 +3595,8 @@
     "descriptionSelected": "Cuenta laya aklliy.",
     "chooseMethod": "Ñan aklliy",
     "restoreComingSoonTitle": "Qayllamuchkan",
-    "restoreComingSoonDescription": "Kutichiy ruway hamuq actualizaciónpi kanqa."
+    "restoreComingSoonDescription": "Kutichiy ruway hamuq actualizaciónpi kanqa.",
+    "createFailed": "Manan walletta paqarichiyta atinkuchu. Allinta llamk'apuy."
   },
   "RestoreScreen": {
     "title": "Walleta kutichiy",

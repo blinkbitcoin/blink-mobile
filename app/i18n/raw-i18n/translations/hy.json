@@ -3599,7 +3599,8 @@
     "descriptionSelected": "Խնդրում ենք ընտրել հաշվի տեսակը։",
     "chooseMethod": "Ընտրեք եղանակը",
     "restoreComingSoonTitle": "Շուտով",
-    "restoreComingSoonDescription": "Վերականգնման գործառույթը հասանելի կլինի ապագա թարմացման մեջ։"
+    "restoreComingSoonDescription": "Վերականգնման գործառույթը հասանելի կլինի ապագա թարմացման մեջ։",
+    "createFailed": "Չհաջողվեց ստեղծել դրամապանակը: Խնդրում ենք կրկին փորձել:"
   },
   "RestoreScreen": {
     "title": "Վերականգնել դրամապանակը",

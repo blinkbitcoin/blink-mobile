@@ -3595,7 +3595,8 @@
     "descriptionSelected": "กรุณาเลือกประเภทบัญชี",
     "chooseMethod": "เลือกวิธี",
     "restoreComingSoonTitle": "เร็วๆ นี้",
-    "restoreComingSoonDescription": "ฟีเจอร์กู้คืนจะพร้อมใช้งานในการอัปเดตในอนาคต"
+    "restoreComingSoonDescription": "ฟีเจอร์กู้คืนจะพร้อมใช้งานในการอัปเดตในอนาคต",
+    "createFailed": "สร้างกระเป๋าเงินไม่สำเร็จ กรุณาลองอีกครั้ง"
   },
   "RestoreScreen": {
     "title": "กู้คืนกระเป๋าเงิน",

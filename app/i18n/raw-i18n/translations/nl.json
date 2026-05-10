@@ -3598,7 +3598,8 @@
     "descriptionSelected": "Kies accounttype.",
     "chooseMethod": "Kies methode",
     "restoreComingSoonTitle": "Binnenkort beschikbaar",
-    "restoreComingSoonDescription": "De herstelfunctie wordt beschikbaar in een toekomstige update."
+    "restoreComingSoonDescription": "De herstelfunctie wordt beschikbaar in een toekomstige update.",
+    "createFailed": "Kon portemonnee niet aanmaken. Probeer het opnieuw."
   },
   "RestoreScreen": {
     "title": "Portemonnee herstellen",

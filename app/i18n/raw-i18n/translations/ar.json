@@ -3595,7 +3595,8 @@
     "descriptionSelected": "يرجى اختيار نوع الحساب.",
     "chooseMethod": "اختر الطريقة",
     "restoreComingSoonTitle": "قريباً",
-    "restoreComingSoonDescription": "ستكون ميزة الاستعادة متاحة في تحديث مستقبلي."
+    "restoreComingSoonDescription": "ستكون ميزة الاستعادة متاحة في تحديث مستقبلي.",
+    "createFailed": "فشل في إنشاء المحفظة. يرجى المحاولة مرة أخرى."
   },
   "RestoreScreen": {
     "title": "استعادة المحفظة",

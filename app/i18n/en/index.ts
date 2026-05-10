@@ -3717,6 +3717,7 @@ const en: BaseTranslation = {
     restoreComingSoonTitle: "Coming soon",
     restoreComingSoonDescription:
       "Restore flow will be available in a future update.",
+    createFailed: "Failed to create wallet. Please try again.",
   },
   RestoreScreen: {
     title: "Restore wallet",

@@ -3586,7 +3586,8 @@
         "descriptionSelected": "アカウントタイプを選択してください。",
         "chooseMethod": "方法を選択",
         "restoreComingSoonTitle": "近日公開",
-        "restoreComingSoonDescription": "復元機能は将来のアップデートで利用可能になります。"
+        "restoreComingSoonDescription": "復元機能は将来のアップデートで利用可能になります。",
+        "createFailed": "ウォレットの作成に失敗しました。もう一度お試しください。"
     },
     "RestoreScreen": {
         "title": "ウォレットを復元",

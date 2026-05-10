@@ -3557,7 +3557,8 @@
     "descriptionSelected": "Silakan pilih jenis akun.",
     "chooseMethod": "Pilih metode",
     "restoreComingSoonTitle": "Segera hadir",
-    "restoreComingSoonDescription": "Fitur pemulihan akan tersedia dalam pembaruan mendatang."
+    "restoreComingSoonDescription": "Fitur pemulihan akan tersedia dalam pembaruan mendatang.",
+    "createFailed": "Gagal membuat dompet. Silakan coba lagi."
   },
   "RestoreScreen": {
     "title": "Pulihkan dompet",
