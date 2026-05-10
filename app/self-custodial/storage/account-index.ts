@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
+import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 const ACCOUNT_INDEX_KEY = "selfCustodialAccountIndex"
@@ -87,11 +88,11 @@ export const setSelfCustodialLightningAddress = async (
 export const findSelfCustodialAccountByMnemonic = async (
   mnemonic: string,
 ): Promise<string | null> => {
-  const trimmed = mnemonic.trim()
+  const normalized = normalizeMnemonic(mnemonic)
   const entries = await readIndex()
   for (const entry of entries) {
     const stored = await KeyStoreWrapper.getMnemonicForAccount(entry.id)
-    if (stored?.trim() === trimmed) return entry.id
+    if (stored && normalizeMnemonic(stored) === normalized) return entry.id
   }
   return null
 }
