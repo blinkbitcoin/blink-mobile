@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useTotalBalance } from "@app/components/balance-header/use-total-balance"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
@@ -12,6 +11,7 @@ import {
   useBackupState,
 } from "@app/self-custodial/providers/backup-state-provider"
 import { AccountType } from "@app/types/wallet.types"
+import { reportError } from "@app/utils/error-logging"
 
 const DISMISSAL_COOLDOWN_MS = 24 * 60 * 60 * 1000
 const DISMISSAL_KEY_PREFIX = "backupNudgeDismissedAt"
@@ -58,9 +58,7 @@ export const useBackupNudgeState = (): BackupNudgeState => {
       dismissalKeyFor(activeSelfCustodialAccountId),
       String(now),
     ).catch((err) => {
-      crashlytics().recordError(
-        err instanceof Error ? err : new Error(`Nudge dismiss write failed: ${err}`),
-      )
+      reportError("Nudge dismiss write", err)
     })
   }, [activeSelfCustodialAccountId])
 

@@ -31,6 +31,11 @@ jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
   getSelfCustodialWalletSnapshot: (...args: unknown[]) => mockGetSnapshot(...args),
 }))
 
+const mockRecordError = jest.fn()
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: (...args: unknown[]) => mockRecordError(...args),
+}))
+
 const TEST_ACCOUNT_ID = "account-123"
 const TEST_MNEMONIC = "abandon abandon abandon abandon abandon abandon"
 const FAKE_SDK = { id: "sdk-instance" }
@@ -158,5 +163,40 @@ describe("probeSelfCustodialAccountWallets", () => {
       status: ProbeAccountWalletsStatus.Ok,
       wallets: sampleWallets,
     })
+  })
+
+  it("records the disconnect failure to crashlytics so leaking SDK instances are observable (Important #14)", async () => {
+    mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
+    mockInitSdk.mockResolvedValue(FAKE_SDK)
+    mockGetSnapshot.mockResolvedValue({
+      wallets: sampleWallets,
+      hasMore: false,
+      rawTransactionCount: 0,
+    })
+    const disconnectError = new Error("SQLite handle locked")
+    mockDisconnectSdk.mockRejectedValueOnce(disconnectError)
+
+    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+
+    expect(mockRecordError).toHaveBeenCalledWith(disconnectError)
+  })
+
+  it("wraps a non-Error disconnect rejection into an Error before recording it (Important #14)", async () => {
+    mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
+    mockInitSdk.mockResolvedValue(FAKE_SDK)
+    mockGetSnapshot.mockResolvedValue({
+      wallets: sampleWallets,
+      hasMore: false,
+      rawTransactionCount: 0,
+    })
+    mockDisconnectSdk.mockRejectedValueOnce("native handle invalid")
+
+    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("Probe SDK disconnect failed"),
+      }),
+    )
   })
 })

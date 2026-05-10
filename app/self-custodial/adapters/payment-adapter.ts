@@ -1,5 +1,4 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { toBtcMoneyAmount } from "@app/types/amounts"
@@ -13,6 +12,7 @@ import {
   type PaymentAdapterResult,
   type SendPaymentAdapter,
 } from "@app/types/payment.types"
+import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
 
 import {
@@ -86,9 +86,7 @@ export const createGetFee = (sdk: BreezSdkInterface): GetFeeAdapter => {
         feeAmount: toBtcMoneyAmount(0),
       }
     } catch (err) {
-      crashlytics().recordError(
-        err instanceof Error ? err : new Error(`[SparkSDK] Fee quote failed: ${err}`),
-      )
+      reportError("[SparkSDK] Fee quote", err)
       return null
     }
   }

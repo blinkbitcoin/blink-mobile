@@ -8,6 +8,7 @@ import {
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet.types"
+import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { withTimeout } from "@app/utils/with-timeout"
 
@@ -127,9 +128,7 @@ export const useSdkLifecycle = (
         resetBackoff()
       } catch (err) {
         logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
-        crashlytics().recordError(
-          err instanceof Error ? err : new Error(`Refresh failed: ${err}`),
-        )
+        reportError("Refresh", err)
         const onlineState = await getOnlineState()
         if (isStale()) return
         setStatus((prev) => {
@@ -248,9 +247,7 @@ export const useSdkLifecycle = (
 
     initialize().catch((err) => {
       logSdkEvent(SdkLogLevel.Error, `SDK init failed: ${err}`)
-      crashlytics().recordError(
-        err instanceof Error ? err : new Error(`SDK init failed: ${err}`),
-      )
+      reportError("SDK init", err)
       if (mounted) setStatus(ActiveWalletStatus.Error)
     })
 
@@ -268,9 +265,7 @@ export const useSdkLifecycle = (
 
       if (!sdk) return
       teardownSdk(sdk, listenerId).catch((err) => {
-        crashlytics().recordError(
-          err instanceof Error ? err : new Error(`SDK cleanup failed: ${err}`),
-        )
+        reportError("SDK cleanup", err)
       })
     }
   }, [retryCount, refreshWallets, activeSelfCustodialAccountId, resetBackoff])
@@ -279,9 +274,7 @@ export const useSdkLifecycle = (
     const subscription = AppState.addEventListener("change", (state) => {
       if (state !== "active") return
       refreshWallets().catch((err) => {
-        crashlytics().recordError(
-          err instanceof Error ? err : new Error(`AppState refresh failed: ${err}`),
-        )
+        reportError("AppState refresh", err)
       })
     })
     return () => subscription.remove()
@@ -293,9 +286,7 @@ export const useSdkLifecycle = (
       if (!sdkRef.current) return
       if (AppState.currentState !== "active") return
       refreshWallets().catch((err) => {
-        crashlytics().recordError(
-          err instanceof Error ? err : new Error(`Polling refresh failed: ${err}`),
-        )
+        reportError("Polling refresh", err)
       })
     }, CONNECTIVITY_POLL_MS)
     return () => clearInterval(interval)
@@ -323,9 +314,7 @@ export const useSdkLifecycle = (
       setSdkStableBalanceActive(settings.stableBalanceActiveLabel !== undefined)
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to refresh user settings: ${err}`)
-      crashlytics().recordError(
-        err instanceof Error ? err : new Error(`Refresh user settings failed: ${err}`),
-      )
+      reportError("Refresh user settings", err)
     }
   }, [])
 

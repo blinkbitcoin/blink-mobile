@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import crashlytics from "@react-native-firebase/crashlytics"
-
 import { getSparkDriveBackupFilenamePrefix } from "@app/config/appinfo"
 import { useAppConfig, useGoogleDriveBackup } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -14,6 +12,7 @@ import {
   parseBackupPayload,
   parseEncryptedBackupPayload,
 } from "@app/utils/backup-payload"
+import { reportError } from "@app/utils/error-logging"
 import { DriveErrorReason } from "@app/utils/google-drive-client"
 
 import { RestoreWalletStatus, useRestoreWallet } from "./use-restore-wallet"
@@ -48,16 +47,12 @@ type FileOutcome =
   | { kind: "failure" }
 
 const RestoreErrorContext = {
-  CloudDownload: "Cloud download failed",
-  PerFileDownload: "Per-file download failed",
-  Decrypt: "Backup decrypt failed",
+  CloudDownload: "Cloud download",
+  PerFileDownload: "Per-file download",
+  Decrypt: "Backup decrypt",
 } as const
 
 type RestoreErrorContext = (typeof RestoreErrorContext)[keyof typeof RestoreErrorContext]
-
-const reportRestoreError = (context: RestoreErrorContext, err: unknown): void => {
-  crashlytics().recordError(err instanceof Error ? err : new Error(`${context}: ${err}`))
-}
 
 export const useCloudRestore = () => {
   const { LL } = useI18nContext()
@@ -102,7 +97,7 @@ export const useCloudRestore = () => {
         }
         await proceedWithBackup(result.content)
       } catch (err) {
-        reportRestoreError(RestoreErrorContext.CloudDownload, err)
+        reportError(RestoreErrorContext.CloudDownload, err)
         setStep(CloudStep.Error)
       }
     },
@@ -159,7 +154,7 @@ export const useCloudRestore = () => {
               },
             }
           } catch (err) {
-            reportRestoreError(RestoreErrorContext.PerFileDownload, err)
+            reportError(RestoreErrorContext.PerFileDownload, err)
             return { kind: "failure" }
           }
         }),
@@ -181,7 +176,7 @@ export const useCloudRestore = () => {
       setEntries(downloaded.map((item) => item.entry))
       setStep(CloudStep.Picker)
     } catch (err) {
-      reportRestoreError(RestoreErrorContext.CloudDownload, err)
+      reportError(RestoreErrorContext.CloudDownload, err)
       setStep(CloudStep.Error)
     }
   }, [appConfig.galoyInstance.name, listBackups, downloadById, proceedWithBackup])
@@ -207,7 +202,7 @@ export const useCloudRestore = () => {
         setPasswordError(LL.RestoreScreen.wrongPassword())
         return
       }
-      reportRestoreError(RestoreErrorContext.Decrypt, err)
+      reportError(RestoreErrorContext.Decrypt, err)
       setStep(CloudStep.Error)
       return
     }
