@@ -46,6 +46,30 @@ export const useDeleteSelfCustodial = (): DeleteSelfCustodialResult => {
           activeAccount?.type === AccountType.SelfCustodial &&
           activeAccount.id === accountId
 
+        const remainingSelfCustodial = accounts.find(
+          (a) => a.type === AccountType.SelfCustodial && a.id !== accountId,
+        )
+
+        /**
+         * Switch the active account before disconnecting the SDK so
+         * useSdkLifecycle tears down via its own effect cleanup. Disconnecting
+         * first leaves the lifecycle's stale sdkRef in place and lets the 10s
+         * poll and backoff retries hammer it, flipping wallet status to Offline
+         * mid-delete.
+         */
+        if (isActive && remainingSelfCustodial) {
+          setActiveAccountId(remainingSelfCustodial.id)
+        }
+        if (isActive && !remainingSelfCustodial && hasCustodialAccount) {
+          setActiveAccountId(DefaultAccountId.Custodial)
+        }
+        if (isActive && !remainingSelfCustodial && !hasCustodialAccount) {
+          updateState((prev) => {
+            if (!prev) return prev
+            return { ...prev, activeAccountId: undefined }
+          })
+        }
+
         if (isActive && sdk) {
           await disconnectSdk(sdk).catch((err) => {
             crashlytics().log(`[self-custodial delete] disconnect failed: ${err}`)
@@ -68,17 +92,12 @@ export const useDeleteSelfCustodial = (): DeleteSelfCustodialResult => {
           return
         }
 
-        const remainingSelfCustodial = accounts.find(
-          (a) => a.type === AccountType.SelfCustodial && a.id !== accountId,
-        )
         if (remainingSelfCustodial) {
-          setActiveAccountId(remainingSelfCustodial.id)
           setState("idle")
           return
         }
 
         if (hasCustodialAccount) {
-          setActiveAccountId(DefaultAccountId.Custodial)
           navigation.dispatch(
             CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
           )
@@ -86,10 +105,6 @@ export const useDeleteSelfCustodial = (): DeleteSelfCustodialResult => {
           return
         }
 
-        updateState((prev) => {
-          if (!prev) return prev
-          return { ...prev, activeAccountId: undefined }
-        })
         navigation.dispatch(
           CommonActions.reset({ index: 0, routes: [{ name: "getStarted" }] }),
         )
