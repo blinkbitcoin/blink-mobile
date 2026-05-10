@@ -93,6 +93,7 @@ export const useDeleteSelfCustodial = (): DeleteSelfCustodialResult => {
         }
 
         if (remainingSelfCustodial) {
+          navigation.navigate("Primary")
           setState("idle")
           return
         }

@@ -21,8 +21,12 @@ const mockUseAccountRegistry = jest.fn()
 const mockCrashlyticsLog = jest.fn()
 const mockReportError = jest.fn()
 
+const mockNavigationNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ dispatch: mockNavigationDispatch }),
+  useNavigation: () => ({
+    dispatch: mockNavigationDispatch,
+    navigate: mockNavigationNavigate,
+  }),
   CommonActions: { reset: (args: unknown) => ({ type: "reset", payload: args }) },
 }))
 
@@ -150,7 +154,7 @@ describe("useDeleteSelfCustodial", () => {
     })
   })
 
-  it("switches to a remaining self-custodial account when one is left", async () => {
+  it("switches to a remaining self-custodial account and navigates to Primary when one is left", async () => {
     const remaining = {
       ...activeSelfCustodialAccount,
       id: "other-sc-id",
@@ -170,7 +174,7 @@ describe("useDeleteSelfCustodial", () => {
     })
 
     expect(mockSetActiveAccountId).toHaveBeenCalledWith("other-sc-id")
-    expect(mockNavigationDispatch).not.toHaveBeenCalled()
+    expect(mockNavigationNavigate).toHaveBeenCalledWith("Primary")
   })
 
   it("skips disconnect when sdk is null but still wipes the mnemonic and navigates", async () => {
