@@ -117,6 +117,12 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
         memo: memo || undefined,
       })
       if (!("invoice" in result) || !result.invoice) {
+        crashlytics().log(
+          `[Self-custodial] Lightning adapter returned no invoice (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
+        )
+        crashlytics().recordError(
+          new Error("Self-custodial invoice adapter returned no invoice field"),
+        )
         setRequestState(PaymentRequestState.Error)
         return
       }
