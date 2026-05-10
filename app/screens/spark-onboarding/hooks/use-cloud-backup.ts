@@ -83,7 +83,6 @@ export const useCloudBackup = ({
 
     const result = await upload(payload, filename, session)
     if (!result.success) {
-      crashlytics().recordError(new Error(`Cloud backup upload failed: ${result.error}`))
       toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
       return
     }

@@ -12,6 +12,7 @@ import {
   parseBackupPayload,
   parseEncryptedBackupPayload,
 } from "@app/utils/backup-payload"
+import { DriveErrorReason } from "@app/utils/google-drive-client"
 
 import { RestoreWalletStatus, useRestoreWallet } from "./use-restore-wallet"
 
@@ -25,9 +26,34 @@ const CloudStep = {
 
 type CloudStep = (typeof CloudStep)[keyof typeof CloudStep]
 
+const STEP_FOR_REASON: Readonly<Record<DriveErrorReason, CloudStep>> = {
+  [DriveErrorReason.NotFound]: CloudStep.NotFound,
+  [DriveErrorReason.Auth]: CloudStep.Error,
+  [DriveErrorReason.Transient]: CloudStep.Error,
+  [DriveErrorReason.Unknown]: CloudStep.Error,
+}
+
 export type CloudBackupEntry = {
   fileId: string
   metadata: BackupMetadata
+}
+
+type DownloadedBackup = { entry: CloudBackupEntry; content: string }
+
+type FileOutcome =
+  | { kind: "success"; backup: DownloadedBackup }
+  | { kind: "not-found" }
+  | { kind: "failure" }
+
+const RestoreErrorContext = {
+  CloudDownload: "Cloud download failed",
+  PerFileDownload: "Per-file download failed",
+} as const
+
+type RestoreErrorContext = (typeof RestoreErrorContext)[keyof typeof RestoreErrorContext]
+
+const reportRestoreError = (context: RestoreErrorContext, err: unknown): void => {
+  crashlytics().recordError(err instanceof Error ? err : new Error(`${context}: ${err}`))
 }
 
 export const useCloudRestore = () => {
@@ -68,14 +94,12 @@ export const useCloudRestore = () => {
       try {
         const result = await downloadById(entry.fileId, accessToken)
         if (!result.success) {
-          setStep(CloudStep.Error)
+          setStep(STEP_FOR_REASON[result.reason])
           return
         }
         await proceedWithBackup(result.content)
       } catch (err) {
-        crashlytics().recordError(
-          err instanceof Error ? err : new Error(`Cloud download failed: ${err}`),
-        )
+        reportRestoreError(RestoreErrorContext.CloudDownload, err)
         setStep(CloudStep.Error)
       }
     },
@@ -102,36 +126,43 @@ export const useCloudRestore = () => {
       if (files.length === 1) {
         const result = await downloadById(files[0].id, token)
         if (!result.success) {
-          setStep(CloudStep.NotFound)
+          setStep(STEP_FOR_REASON[result.reason])
           return
         }
         await proceedWithBackup(result.content)
         return
       }
 
-      type DownloadedBackup = { entry: CloudBackupEntry; content: string }
-
-      const downloaded = (
-        await Promise.all(
-          files.map(async (file): Promise<DownloadedBackup | null> => {
-            try {
-              const result = await downloadById(file.id, token)
-              if (!result.success) return null
-              const metadata = parseBackupMetadata(result.content)
-              if (!metadata) return null
-              return {
+      const outcomes: ReadonlyArray<FileOutcome> = await Promise.all(
+        files.map(async (file): Promise<FileOutcome> => {
+          try {
+            const result = await downloadById(file.id, token)
+            if (!result.success) {
+              return result.reason === DriveErrorReason.NotFound
+                ? { kind: "not-found" }
+                : { kind: "failure" }
+            }
+            const metadata = parseBackupMetadata(result.content)
+            if (!metadata) return { kind: "failure" }
+            return {
+              kind: "success",
+              backup: {
                 entry: { fileId: file.id, metadata },
                 content: result.content,
-              }
-            } catch {
-              return null
+              },
             }
-          }),
-        )
-      ).filter((item): item is DownloadedBackup => item !== null)
+          } catch (err) {
+            reportRestoreError(RestoreErrorContext.PerFileDownload, err)
+            return { kind: "failure" }
+          }
+        }),
+      )
+
+      const downloaded = outcomes.flatMap((o) => (o.kind === "success" ? [o.backup] : []))
+      const hasNonNotFoundFailure = outcomes.some((o) => o.kind === "failure")
 
       if (downloaded.length === 0) {
-        setStep(CloudStep.NotFound)
+        setStep(hasNonNotFoundFailure ? CloudStep.Error : CloudStep.NotFound)
         return
       }
 
@@ -143,9 +174,7 @@ export const useCloudRestore = () => {
       setEntries(downloaded.map((item) => item.entry))
       setStep(CloudStep.Picker)
     } catch (err) {
-      crashlytics().recordError(
-        err instanceof Error ? err : new Error(`Cloud download failed: ${err}`),
-      )
+      reportRestoreError(RestoreErrorContext.CloudDownload, err)
       setStep(CloudStep.Error)
     }
   }, [appConfig.galoyInstance.name, listBackups, downloadById, proceedWithBackup])
