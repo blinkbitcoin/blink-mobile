@@ -8,6 +8,7 @@ import React, {
 } from "react"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
@@ -20,6 +21,25 @@ import {
 } from "@app/types/wallet.types"
 
 import { useSdkLifecycle } from "./use-sdk-lifecycle"
+
+const LightningAddressOperation = {
+  Resolve: "resolve",
+  Persist: "persist",
+  Refresh: "refresh",
+} as const
+
+type LightningAddressOperation =
+  (typeof LightningAddressOperation)[keyof typeof LightningAddressOperation]
+
+const reportLightningAddressError = (
+  operation: LightningAddressOperation,
+  err: unknown,
+): void => {
+  const message = err instanceof Error ? err.message : String(err)
+  crashlytics().recordError(
+    new Error(`Lightning address ${operation} failed: ${message}`),
+  )
+}
 
 type SelfCustodialWalletContextValue = ActiveWalletState & {
   retry: () => void
@@ -103,10 +123,12 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
         const resolved = info?.lightningAddress ?? null
         setLightningAddress(resolved)
         if (!resolved) return
-        await setSelfCustodialLightningAddress(accountId, resolved).catch(() => {})
+        await setSelfCustodialLightningAddress(accountId, resolved).catch((err) => {
+          reportLightningAddressError(LightningAddressOperation.Persist, err)
+        })
         if (mounted) await reloadSelfCustodialAccounts()
-      } catch {
-        // opportunistic; swallow errors
+      } catch (err) {
+        reportLightningAddressError(LightningAddressOperation.Resolve, err)
       }
     }
 
@@ -125,8 +147,8 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       setLightningAddress(resolved)
       await setSelfCustodialLightningAddress(connectedAccountId, resolved)
       await reloadSelfCustodialAccounts()
-    } catch {
-      // opportunistic refresh; swallow errors
+    } catch (err) {
+      reportLightningAddressError(LightningAddressOperation.Refresh, err)
     }
   }, [sdk, connectedAccountId, reloadSelfCustodialAccounts])
 
