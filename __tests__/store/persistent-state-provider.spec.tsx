@@ -10,10 +10,17 @@ import { defaultPersistentState } from "@app/store/persistent-state/state-migrat
 
 const mockLoadJson = jest.fn()
 const mockSaveJson = jest.fn()
+const mockSaveString = jest.fn()
 
 jest.mock("@app/utils/storage", () => ({
   loadJson: (...args: unknown[]) => mockLoadJson(...args),
   saveJson: (...args: unknown[]) => mockSaveJson(...args),
+  saveString: (...args: unknown[]) => mockSaveString(...args),
+}))
+
+const mockRecordError = jest.fn()
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: (...args: unknown[]) => mockRecordError(...args),
 }))
 
 const TestConsumer: React.FC = () => {
@@ -41,6 +48,7 @@ describe("PersistentStateProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSaveJson.mockResolvedValue(true)
+    mockSaveString.mockResolvedValue(true)
   })
 
   it("renders nothing (null) while state is loading", async () => {
@@ -186,5 +194,128 @@ describe("PersistentStateProvider", () => {
       "persistentState",
       expect.objectContaining(defaultPersistentState),
     )
+  })
+
+  describe("migration failure handling (Critical #3)", () => {
+    const corruptedState3 = {
+      schemaVersion: 3,
+      hasShownStableSatsWelcome: false,
+      isUsdDisabled: false,
+      galoyInstance: { id: "Main", name: "DefinitelyNotARealInstance" },
+      galoyAuthToken: "token-v3",
+      isAnalyticsEnabled: true,
+    }
+
+    it("reports the migration error to crashlytics instead of silently logging to console", async () => {
+      mockLoadJson.mockResolvedValue(corruptedState3)
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockRecordError.mock.calls[0][0]).toBeInstanceOf(Error)
+      expect(mockRecordError.mock.calls[0][0].message).toContain(
+        "Galoy instance not found",
+      )
+    })
+
+    it("quarantines the raw input under a timestamped backup key before falling back to defaults", async () => {
+      mockLoadJson.mockResolvedValue(corruptedState3)
+      const before = Date.now()
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+      const after = Date.now()
+
+      expect(mockSaveString).toHaveBeenCalledTimes(1)
+      const [key, payload] = mockSaveString.mock.calls[0]
+      expect(key).toMatch(/^persistentStateQuarantine\.\d+$/)
+      const timestamp = Number(key.split(".").pop())
+      expect(timestamp).toBeGreaterThanOrEqual(before)
+      expect(timestamp).toBeLessThanOrEqual(after)
+      expect(JSON.parse(payload)).toEqual(corruptedState3)
+
+      // Provider must still mount with defaults so the app can launch.
+      expect(screen.getByTestId("token").props.children).toBe(
+        defaultPersistentState.galoyAuthToken,
+      )
+    })
+
+    it("records a second error when the quarantine write itself fails, but still mounts with defaults", async () => {
+      mockLoadJson.mockResolvedValue(corruptedState3)
+      mockSaveString.mockResolvedValueOnce(false)
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      // First recordError = the migration throw; second = the quarantine write
+      // failure. Both surfaced to crashlytics — neither silent.
+      expect(mockRecordError).toHaveBeenCalledTimes(2)
+      expect(mockRecordError.mock.calls[1][0].message).toContain(
+        "Quarantine write failed",
+      )
+      expect(screen.getByTestId("token").props.children).toBe(
+        defaultPersistentState.galoyAuthToken,
+      )
+    })
+
+    it("does NOT touch crashlytics or the quarantine key on a successful migration", async () => {
+      mockLoadJson.mockResolvedValue({
+        schemaVersion: 6,
+        galoyInstance: { id: "Main" },
+        galoyAuthToken: "saved",
+      })
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      expect(mockRecordError).not.toHaveBeenCalled()
+      expect(mockSaveString).not.toHaveBeenCalled()
+    })
+
+    it("does NOT touch crashlytics or the quarantine key for null persisted data", async () => {
+      mockLoadJson.mockResolvedValue(null)
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      expect(mockRecordError).not.toHaveBeenCalled()
+      expect(mockSaveString).not.toHaveBeenCalled()
+    })
   })
 })

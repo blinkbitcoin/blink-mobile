@@ -1,19 +1,42 @@
 import { createContext, useContext, PropsWithChildren } from "react"
 import * as React from "react"
 
-import { loadJson, saveJson } from "@app/utils/storage"
+import crashlytics from "@react-native-firebase/crashlytics"
+
+import { loadJson, saveJson, saveString } from "@app/utils/storage"
 
 import {
   defaultPersistentState,
-  migrateAndGetPersistentState,
+  migratePersistentState,
+  MigrationStatus,
   PersistentState,
 } from "./state-migrations"
 
 const PERSISTENT_STATE_KEY = "persistentState"
+const PERSISTENT_STATE_QUARANTINE_PREFIX = "persistentStateQuarantine"
 
-const loadPersistentState = async (): Promise<PersistentState> => {
+const quarantineRawState = async (rawData: unknown): Promise<void> => {
+  const key = `${PERSISTENT_STATE_QUARANTINE_PREFIX}.${Date.now()}`
+  const ok = await saveString(key, JSON.stringify(rawData))
+  if (!ok) {
+    crashlytics().recordError(new Error(`Quarantine write failed for key ${key}`))
+  }
+}
+
+export const loadPersistentState = async (): Promise<PersistentState> => {
   const data = await loadJson(PERSISTENT_STATE_KEY)
-  return migrateAndGetPersistentState(data)
+  const result = await migratePersistentState(data)
+
+  switch (result.status) {
+    case MigrationStatus.Ok:
+      return result.state
+    case MigrationStatus.NoData:
+      return defaultPersistentState
+    case MigrationStatus.Failed:
+      crashlytics().recordError(result.error)
+      await quarantineRawState(result.rawData)
+      return defaultPersistentState
+  }
 }
 
 const savePersistentState = async (state: PersistentState) => {
