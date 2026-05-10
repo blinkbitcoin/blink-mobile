@@ -611,6 +611,34 @@ describe("useAutoConvertListener — mount replay", () => {
     expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
   })
 
+  it("matches the Lightning payment case-insensitively (Important #4)", async () => {
+    // SDK normalisation could return the invoice with different casing than
+    // the record persisted; Bolt11 is case-insensitive so the match must be too.
+    const recordInvoice = "lnbc1MIXEDcase"
+    const sdkInvoice = "lnbc1mixedcase"
+    const sdk = makeSdk({
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [
+          {
+            id: "pid-mixed",
+            amount: 5000n,
+            details: { tag: "Lightning", inner: { invoice: sdkInvoice } },
+          },
+        ],
+      }),
+    })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: recordInvoice }),
+    ])
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalled()
+    })
+  })
+
   it("stamps an attempt when the matching payment is missing so the cap eventually evicts (Critical #6)", async () => {
     const sdk = makeSdk({ listPayments: jest.fn().mockResolvedValue({ payments: [] }) })
     setupDefaults(sdk)

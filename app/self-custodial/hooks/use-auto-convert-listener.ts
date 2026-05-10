@@ -214,8 +214,11 @@ const findPaidAmountForInvoice = async (
     const payments = await sdk.listPayments(
       ListPaymentsRequest.create({ offset: 0, limit: 50 }),
     )
+    // Bolt11 invoices are case-insensitive; lowercase both sides so SDK
+    // normalization (e.g. case folding) doesn't break the replay match.
+    const target = paymentRequest.toLowerCase()
     const match = payments.payments.find(
-      (p) => extractLightningInvoiceFromPayment(p) === paymentRequest,
+      (p) => extractLightningInvoiceFromPayment(p)?.toLowerCase() === target,
     )
     if (!match) return undefined
     return { paymentId: match.id, amount: toNumber(match.amount) }
