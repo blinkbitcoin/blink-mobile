@@ -35,11 +35,17 @@ export const AccountScreen: React.FC = () => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true)
-    const work = isSelfCustodial
-      ? Promise.all([refreshSelfCustodialWallets(), updateCurrentSelfCustodialAccount()])
-      : updateCurrentProfile()
-    await work
-    setRefreshing(false)
+    try {
+      const work = isSelfCustodial
+        ? Promise.all([
+            refreshSelfCustodialWallets(),
+            updateCurrentSelfCustodialAccount(),
+          ])
+        : updateCurrentProfile()
+      await work
+    } finally {
+      setRefreshing(false)
+    }
   }, [
     isSelfCustodial,
     refreshSelfCustodialWallets,

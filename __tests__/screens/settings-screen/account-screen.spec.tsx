@@ -45,7 +45,10 @@ jest.mock("@app/components/screen", () => ({
     React.createElement("Screen", null, children),
 }))
 
-const captureRefreshControl: { onRefresh?: () => void | Promise<void> } = {}
+const captureRefreshControl: {
+  onRefresh?: () => void | Promise<void>
+  refreshing?: boolean
+} = {}
 jest.mock("react-native-gesture-handler", () => {
   const RNs = jest.requireActual<typeof import("react-native")>("react-native")
   const ReactNs = jest.requireActual<typeof import("react")>("react")
@@ -57,8 +60,15 @@ jest.mock("react-native-gesture-handler", () => {
       children?: React.ReactNode
       refreshControl?: React.ReactNode
     }) => ReactNs.createElement(RNs.View, null, refreshControl, children),
-    RefreshControl: ({ onRefresh }: { onRefresh?: () => void | Promise<void> }) => {
+    RefreshControl: ({
+      onRefresh,
+      refreshing,
+    }: {
+      onRefresh?: () => void | Promise<void>
+      refreshing?: boolean
+    }) => {
       captureRefreshControl.onRefresh = onRefresh
+      captureRefreshControl.refreshing = refreshing
       return null
     },
     TouchableOpacity: RNs.TouchableOpacity,
@@ -228,6 +238,16 @@ describe("AccountScreen", () => {
       expect(mockUpdateCurrentProfile).not.toHaveBeenCalled()
     })
 
+    it("clears the refreshing flag even when the SC refresh rejects (Important #3)", async () => {
+      mockRefreshSelfCustodialWallets.mockRejectedValueOnce(new Error("offline"))
+
+      render(<AccountScreen />)
+
+      await Promise.resolve(captureRefreshControl.onRefresh?.()).catch(() => undefined)
+
+      expect(captureRefreshControl.refreshing).toBe(false)
+    })
+
     it("hides the Lightning address field when the wallet has no LN address yet", () => {
       mockUseAccountInfo.mockReturnValue({
         identityPubkey: "abc",
@@ -254,6 +274,16 @@ describe("AccountScreen", () => {
 
       expect(mockUpdateCurrentProfile).toHaveBeenCalledTimes(1)
       expect(mockRefreshSelfCustodialWallets).not.toHaveBeenCalled()
+    })
+
+    it("clears the refreshing flag even when updateCurrentProfile rejects (Important #3)", async () => {
+      mockUpdateCurrentProfile.mockRejectedValueOnce(new Error("offline"))
+
+      render(<AccountScreen />)
+
+      await Promise.resolve(captureRefreshControl.onRefresh?.()).catch(() => undefined)
+
+      expect(captureRefreshControl.refreshing).toBe(false)
     })
 
     it("renders the existing custodial layout (AccountId + upgrade rows)", () => {
