@@ -57,7 +57,7 @@ describe("state-migrations schema 10", () => {
     expect(result.activeAccountId).toBeUndefined()
   })
 
-  it("preserves legacy single-account currency from schema 9 as fallback", async () => {
+  it("moves legacy single-account currency into the active SC slot and clears the legacy field (Critical #7)", async () => {
     const state9 = {
       schemaVersion: 9,
       galoyInstance: { id: "Main" },
@@ -69,8 +69,10 @@ describe("state-migrations schema 10", () => {
     const result = await migrateAndGetPersistentState(state9)
 
     expect(result.schemaVersion).toBe(11)
-    expect(result.selfCustodialDefaultWalletCurrency).toBe("USD")
-    expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
+    expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
+    expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
+      "sc-id": "USD",
+    })
   })
 
   it("preserves schema 10 per-account currency map as-is", async () => {
@@ -215,7 +217,7 @@ describe("state-migrations schema 10", () => {
     ).toBeUndefined()
   })
 
-  it("preserves selfCustodialDefaultWalletCurrency='USD' across schema 8 → current (Important #4)", async () => {
+  it("attributes legacy 'USD' from schema 8 to the active SC slot and clears the legacy field (Critical #7)", async () => {
     const state8 = {
       schemaVersion: 8,
       galoyInstance: { id: "Main" },
@@ -227,11 +229,14 @@ describe("state-migrations schema 10", () => {
     const result = await migrateAndGetPersistentState(state8)
 
     expect(result.schemaVersion).toBe(11)
-    expect(result.selfCustodialDefaultWalletCurrency).toBe("USD")
+    expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
+    expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
+      "sc-id": "USD",
+    })
     expect(result.activeAccountId).toBe("sc-id")
   })
 
-  it("preserves selfCustodialDefaultWalletCurrency='BTC' across schema 8 → current (Important #4)", async () => {
+  it("attributes legacy 'BTC' from schema 8 to the active SC slot and clears the legacy field (Critical #7)", async () => {
     const state8 = {
       schemaVersion: 8,
       galoyInstance: { id: "Main" },
@@ -243,7 +248,10 @@ describe("state-migrations schema 10", () => {
     const result = await migrateAndGetPersistentState(state8)
 
     expect(result.schemaVersion).toBe(11)
-    expect(result.selfCustodialDefaultWalletCurrency).toBe("BTC")
+    expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
+    expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
+      "sc-id": "BTC",
+    })
   })
 
   it("leaves selfCustodialDefaultWalletCurrency undefined when absent from schema 8 (Important #4)", async () => {
@@ -257,21 +265,61 @@ describe("state-migrations schema 10", () => {
 
     expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
+    expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
   })
 
-  it("preserves selfCustodialDefaultWalletCurrency on a schema 9 round-trip (Important #4)", async () => {
+  it("clears the legacy field on schema 9 → 11 even when no active account is set (Critical #7)", async () => {
     const state9 = {
       schemaVersion: 9,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "token",
-      activeAccountId: "sc-id",
       selfCustodialDefaultWalletCurrency: "USD",
     }
 
     const result = await migrateAndGetPersistentState(state9)
 
     expect(result.schemaVersion).toBe(11)
-    expect(result.selfCustodialDefaultWalletCurrency).toBe("USD")
+    expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
+    expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
+  })
+
+  it("clears the legacy field when active is custodial — preference cannot be attributed (Critical #7)", async () => {
+    const state10 = {
+      schemaVersion: 10,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "custodial-default",
+      selfCustodialDefaultWalletCurrency: "USD",
+    }
+
+    const result = await migrateAndGetPersistentState(state10)
+
+    expect(result.schemaVersion).toBe(11)
+    expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
+    expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
+  })
+
+  it("does NOT overwrite an existing per-account entry with the legacy value (Critical #7)", async () => {
+    const state10 = {
+      schemaVersion: 10,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "sc-id-1",
+      selfCustodialDefaultWalletCurrency: "USD",
+      selfCustodialDefaultWalletCurrencyByAccountId: {
+        "sc-id-1": "BTC",
+        "sc-id-2": "USD",
+      },
+    }
+
+    const result = await migrateAndGetPersistentState(state10)
+
+    expect(result.schemaVersion).toBe(11)
+    expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
+    expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
+      "sc-id-1": "BTC",
+      "sc-id-2": "USD",
+    })
   })
 
   describe("migratePersistentState — discriminated result (Critical #3)", () => {
