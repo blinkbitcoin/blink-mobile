@@ -685,4 +685,43 @@ describe("useAutoConvertListener — mount replay", () => {
     })
     expect(sdk.listPayments).not.toHaveBeenCalled()
   })
+
+  it("dedups live and replay racing the same paymentRequest via inFlightInvoicesRef (Important #1)", async () => {
+    // Both effects fire on mount; both target the same invoice. Only one
+    // convert must run — the second path should see the inFlight ref populated
+    // by the first and skip cleanly.
+    const sdk = makeSdk({
+      getPayment: jest.fn().mockResolvedValue({ payment: makeLightningPayment("lnbc1") }),
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [
+          {
+            id: "pid-lnbc1",
+            amount: 5000n,
+            details: { tag: "Lightning", inner: { invoice: "lnbc1" } },
+          },
+        ],
+      }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1",
+      isStableBalanceActive: false,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(makeRecord({ paymentRequest: "lnbc1" }))
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbc1" }),
+    ])
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalled()
+    })
+    // Give any pending replay-path microtasks a chance to flush.
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10)
+    })
+    expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+  })
 })
