@@ -1479,6 +1479,20 @@ describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () 
       expect(mockListSelfCustodialAccounts).toHaveBeenCalledTimes(1)
     })
 
+    it("reports the resolve-side rejection to crashlytics with operation context (Important #6)", async () => {
+      mockGetLightningAddress.mockRejectedValue(new Error("LN lookup down"))
+
+      renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => {
+        expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: expect.stringContaining("Lightning address resolve failed"),
+          }),
+        )
+      })
+    })
+
     it("still reloads the registry when setSelfCustodialLightningAddress rejects (current swallow-and-chain behaviour)", async () => {
       mockGetLightningAddress.mockResolvedValue({
         lightningAddress: "alice@blink.sv",
@@ -1498,6 +1512,47 @@ describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () 
       await waitFor(() => {
         expect(mockListSelfCustodialAccounts).toHaveBeenCalledTimes(2)
       })
+    })
+
+    it("reports the persist-side rejection to crashlytics with operation context (Important #6)", async () => {
+      mockGetLightningAddress.mockResolvedValue({
+        lightningAddress: "alice@blink.sv",
+      })
+      mockSetSelfCustodialLightningAddress.mockRejectedValue(
+        new Error("storage write-locked"),
+      )
+
+      renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => {
+        expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: expect.stringContaining("Lightning address persist failed"),
+          }),
+        )
+      })
+    })
+
+    it("reports the refresh-side rejection to crashlytics when updateCurrentSelfCustodialAccount fails (Important #6)", async () => {
+      mockGetLightningAddress.mockResolvedValueOnce({ lightningAddress: null })
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => {
+        expect(result.current.updateCurrentSelfCustodialAccount).toBeDefined()
+      })
+
+      mockGetLightningAddress.mockRejectedValueOnce(new Error("refresh failed"))
+
+      await act(async () => {
+        await result.current.updateCurrentSelfCustodialAccount()
+      })
+
+      expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining("Lightning address refresh failed"),
+        }),
+      )
     })
   })
 })
