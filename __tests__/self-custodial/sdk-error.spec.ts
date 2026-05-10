@@ -129,4 +129,23 @@ describe("classifySdkError", () => {
       SelfCustodialErrorCode.InvalidInput,
     )
   })
+
+  it("locks INNER_HINTS precedence: 'minimum' wins over 'insufficient' when both match", () => {
+    // The order in INNER_HINTS is load-bearing: "minimum" precedes "insufficient",
+    // so an SDK error like "amount below minimum due to insufficient funds" classifies
+    // as BelowMinimum (record-deleting) rather than InsufficientFunds (record-retrying).
+    expect(
+      classifySdkError(
+        sdkError("SparkError", ["amount below minimum due to insufficient funds"]),
+      ),
+    ).toBe(SelfCustodialErrorCode.BelowMinimum)
+  })
+
+  it("falls through to tag mapping when inner is an empty string", () => {
+    // The `if (inner)` falsy-check in classifySdkError treats "" the same as
+    // missing inner: tag-level mapping, no refinement.
+    expect(classifySdkError(sdkError("SparkError", [""]))).toBe(
+      SelfCustodialErrorCode.Generic,
+    )
+  })
 })

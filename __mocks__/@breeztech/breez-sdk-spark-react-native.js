@@ -84,6 +84,7 @@ module.exports = {
   },
   PrepareSendPaymentRequest: { create: (p) => p },
   SendPaymentRequest: { create: (p) => p },
+  SyncWalletRequest: { create: (p) => p },
   ReceivePaymentRequest: { create: (p) => p },
   ReceivePaymentMethod: {
     SparkAddress: jest.fn().mockImplementation(() => ({ tag: "SparkAddress" })),
