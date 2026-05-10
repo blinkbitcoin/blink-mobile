@@ -8,7 +8,13 @@ import { ActiveWalletStatus, type WalletState } from "@app/types/wallet.types"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { withTimeout } from "@app/utils/with-timeout"
 
-import { addSdkEventListener, disconnectSdk, getUserSettings, initSdk } from "../bridge"
+import {
+  addSdkEventListener,
+  disconnectSdk,
+  getUserSettings,
+  initSdk,
+  removeSdkEventListener,
+} from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 
@@ -48,6 +54,14 @@ const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
 
 const RECONNECT_BACKOFF_MS: readonly number[] = [1000, 3000, 9000]
 
+const teardownSdk = async (
+  sdk: BreezSdkInterface,
+  listenerId: string | null,
+): Promise<void> => {
+  if (listenerId) await removeSdkEventListener(sdk, listenerId)
+  await disconnectSdk(sdk)
+}
+
 export const useSdkLifecycle = (
   activeSelfCustodialAccountId: string | null,
   retryCount: number,
@@ -61,6 +75,8 @@ export const useSdkLifecycle = (
   const [sdk, setSdk] = useState<BreezSdkInterface | null>(null)
   const [connectedAccountId, setConnectedAccountId] = useState<string | null>(null)
   const sdkRef = useRef<BreezSdkInterface | null>(null)
+  const listenerIdRef = useRef<string | null>(null)
+  const abortRef = useRef(false)
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
   const rawTxOffsetRef = useRef(0)
@@ -157,12 +173,13 @@ export const useSdkLifecycle = (
     }
 
     let mounted = true
+    abortRef.current = false
     const accountId = activeSelfCustodialAccountId
 
     const connectAndListen = async (mnemonic: string) => {
       const connectedSdk = await initSdk(mnemonic, storageDirFor(accountId))
-      if (!mounted) {
-        await disconnectSdk(connectedSdk)
+      if (abortRef.current || !mounted) {
+        await teardownSdk(connectedSdk, null)
         return
       }
 
@@ -170,7 +187,7 @@ export const useSdkLifecycle = (
       setSdk(connectedSdk)
       setConnectedAccountId(accountId)
 
-      await addSdkEventListener(connectedSdk, async (event) => {
+      const listenerId = await addSdkEventListener(connectedSdk, async (event) => {
         if (!mounted) return
         if (!REFRESH_EVENTS.has(event.tag)) return
 
@@ -180,7 +197,11 @@ export const useSdkLifecycle = (
         }
         await refreshWallets()
       })
-      if (!mounted) return
+      if (abortRef.current || !mounted) {
+        await teardownSdk(connectedSdk, listenerId)
+        return
+      }
+      listenerIdRef.current = listenerId
 
       refreshWallets()
 
@@ -223,16 +244,25 @@ export const useSdkLifecycle = (
 
     return () => {
       mounted = false
+      abortRef.current = true
       if (backoffTimerRef.current) {
         clearTimeout(backoffTimerRef.current)
         backoffTimerRef.current = null
       }
-      if (sdkRef.current) {
-        disconnectSdk(sdkRef.current)
-        sdkRef.current = null
-        setSdk(null)
-        setConnectedAccountId(null)
-      }
+
+      const sdk = sdkRef.current
+      const listenerId = listenerIdRef.current
+      sdkRef.current = null
+      listenerIdRef.current = null
+      setSdk(null)
+      setConnectedAccountId(null)
+
+      if (!sdk) return
+      teardownSdk(sdk, listenerId).catch((err) => {
+        crashlytics().recordError(
+          err instanceof Error ? err : new Error(`SDK cleanup failed: ${err}`),
+        )
+      })
     }
   }, [retryCount, refreshWallets, activeSelfCustodialAccountId])
 

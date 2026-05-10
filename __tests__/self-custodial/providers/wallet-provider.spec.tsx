@@ -38,6 +38,7 @@ const mockGetMnemonicNetworkForAccount = jest.fn()
 const mockInitSdk = jest.fn()
 const mockDisconnectSdk = jest.fn()
 const mockAddSdkEventListener = jest.fn()
+const mockRemoveSdkEventListener = jest.fn()
 const mockGetUserSettings = jest.fn()
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
@@ -52,6 +53,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   initSdk: (...args: unknown[]) => mockInitSdk(...args),
   disconnectSdk: (...args: unknown[]) => mockDisconnectSdk(...args),
   addSdkEventListener: (...args: unknown[]) => mockAddSdkEventListener(...args),
+  removeSdkEventListener: (...args: unknown[]) => mockRemoveSdkEventListener(...args),
   getUserSettings: (...args: unknown[]) => mockGetUserSettings(...args),
   getLightningAddress: jest.fn().mockResolvedValue(null),
 }))
@@ -165,6 +167,7 @@ describe("SelfCustodialWalletProvider", () => {
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
+    mockRemoveSdkEventListener.mockResolvedValue(undefined)
     mockGetUserSettings.mockResolvedValue({
       stableBalanceActiveLabel: undefined,
       sparkPrivateModeEnabled: false,
@@ -411,7 +414,7 @@ describe("SelfCustodialWalletProvider", () => {
     })
   })
 
-  it("disconnects SDK on unmount", async () => {
+  it("removes the SDK event listener and disconnects on unmount", async () => {
     const mockSdk = {
       addEventListener: jest.fn().mockResolvedValue("listener-id"),
       disconnect: jest.fn(),
@@ -422,12 +425,78 @@ describe("SelfCustodialWalletProvider", () => {
     const { unmount } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
     await waitFor(() => {
-      expect(mockInitSdk).toHaveBeenCalled()
+      expect(mockAddSdkEventListener).toHaveBeenCalled()
     })
 
     unmount()
 
-    expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
+    await waitFor(() => {
+      expect(mockRemoveSdkEventListener).toHaveBeenCalledWith(mockSdk, "listener-id")
+      expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
+    })
+  })
+
+  it("aborts a late-resolving initSdk if unmount happens before it lands (Critical #2)", async () => {
+    const mockSdk = {
+      addEventListener: jest.fn().mockResolvedValue("listener-id"),
+      disconnect: jest.fn(),
+    }
+    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+
+    let resolveInit: ((sdk: typeof mockSdk) => void) | undefined
+    mockInitSdk.mockImplementationOnce(
+      () =>
+        new Promise<typeof mockSdk>((resolve) => {
+          resolveInit = resolve
+        }),
+    )
+
+    const { unmount } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockInitSdk).toHaveBeenCalled()
+    })
+
+    unmount()
+    resolveInit?.(mockSdk)
+
+    await waitFor(() => {
+      expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
+    })
+    // The late-resolved SDK never registered a listener — abort kicked in
+    // before addSdkEventListener was called against the stale account.
+    expect(mockAddSdkEventListener).not.toHaveBeenCalled()
+  })
+
+  it("removes the listener and disconnects when abort fires after listener registration but before refs land (Critical #2)", async () => {
+    const mockSdk = {
+      addEventListener: jest.fn(),
+      disconnect: jest.fn(),
+    }
+    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue(mockSdk)
+
+    let resolveAddListener: ((id: string) => void) | undefined
+    mockAddSdkEventListener.mockImplementationOnce(
+      () =>
+        new Promise<string>((resolve) => {
+          resolveAddListener = resolve
+        }),
+    )
+
+    const { unmount } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await waitFor(() => {
+      expect(mockAddSdkEventListener).toHaveBeenCalled()
+    })
+
+    unmount()
+    resolveAddListener?.("listener-id-late")
+
+    await waitFor(() => {
+      expect(mockRemoveSdkEventListener).toHaveBeenCalledWith(mockSdk, "listener-id-late")
+      expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
+    })
   })
 
   it("updates lastReceivedPaymentId when a PaymentSucceeded event carries a payment id", async () => {
@@ -697,6 +766,7 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
+    mockRemoveSdkEventListener.mockResolvedValue(undefined)
     mockGetUserSettings.mockResolvedValue({
       stableBalanceActiveLabel: undefined,
       sparkPrivateModeEnabled: false,
@@ -1253,6 +1323,7 @@ describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () 
     mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
+    mockRemoveSdkEventListener.mockResolvedValue(undefined)
     mockGetUserSettings.mockResolvedValue({
       stableBalanceActiveLabel: undefined,
       sparkPrivateModeEnabled: false,
