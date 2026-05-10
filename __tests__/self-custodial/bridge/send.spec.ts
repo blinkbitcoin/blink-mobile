@@ -381,7 +381,7 @@ describe("extractLnurlFee", () => {
     expect(extractLnurlFee({ feeSats: BigInt(7) } as never)).toBe(7)
   })
 
-  it("returns 0 when feeSats is zero", () => {
+  it("returns 0 when feeSats is zero (legitimate USD FeesIncluded path)", () => {
     expect(extractLnurlFee({ feeSats: BigInt(0) } as never)).toBe(0)
   })
 })
