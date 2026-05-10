@@ -26,6 +26,7 @@ export const SparkBackupMethodScreen: React.FC = () => {
   const { saveCheckpoint } = useMigrationCheckpoint()
   const {
     isDriveBackupAvailable,
+    isCredentialBackupAvailable,
     credentialLoading,
     handleCredentialBackup,
     handleCloudBackup,
@@ -53,12 +54,14 @@ export const SparkBackupMethodScreen: React.FC = () => {
               {LL.BackupScreen.BackupMethod.iOSComingSoon()}
             </Text>
           )}
-          <GaloySecondaryButton
-            title={LL.BackupScreen.BackupMethod.passwordManager()}
-            onPress={handleCredentialBackup}
-            loading={credentialLoading}
-            {...testProps("backup-credential-button")}
-          />
+          {isCredentialBackupAvailable && (
+            <GaloySecondaryButton
+              title={LL.BackupScreen.BackupMethod.passwordManager()}
+              onPress={handleCredentialBackup}
+              loading={credentialLoading}
+              {...testProps("backup-credential-button")}
+            />
+          )}
           <GaloySecondaryButton
             title={LL.BackupScreen.BackupMethod.manualBackup()}
             onPress={handleManualBackup}

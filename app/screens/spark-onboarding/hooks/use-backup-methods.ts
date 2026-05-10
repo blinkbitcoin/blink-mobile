@@ -5,6 +5,8 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { CredentialError, useCredentialBackup } from "@app/hooks"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { isCredentialBackupAvailable } from "@app/hooks/use-credential-backup"
 import { useWalletMnemonic } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
@@ -46,7 +48,11 @@ export const useBackupMethods = () => {
   const mnemonic = useWalletMnemonic()
   const { identityPubkey } = useSelfCustodialAccountInfo()
   const { setBackupCompleted } = useBackupState()
+  const { selfCustodialEntries } = useAccountRegistry()
   const isDriveBackupAvailable = Platform.OS !== "ios"
+  const credentialBackupAvailable = isCredentialBackupAvailable(
+    selfCustodialEntries.length,
+  )
 
   const { save, loading: credentialLoading } = useCredentialBackup()
 
@@ -91,6 +97,7 @@ export const useBackupMethods = () => {
 
   return {
     isDriveBackupAvailable,
+    isCredentialBackupAvailable: credentialBackupAvailable,
     credentialLoading,
     handleCredentialBackup,
     handleCloudBackup,
