@@ -28,6 +28,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
 jest.mock("@app/self-custodial/storage/account-index", () => ({
   findSelfCustodialAccountByMnemonic: (...args: string[]) =>
     mockFindSelfCustodialAccountByMnemonic(...args),
+  StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -78,7 +79,7 @@ describe("useRestoreWallet", () => {
     jest.clearAllMocks()
     mockRestore.mockResolvedValue(undefined)
     mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
-    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue(null)
+    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({ status: "ok", id: null })
   })
 
   it("starts with idle status", () => {
@@ -103,7 +104,10 @@ describe("useRestoreWallet", () => {
   })
 
   it("activates an existing account when the mnemonic is already imported", async () => {
-    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue("existing-id")
+    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
+      status: "ok",
+      id: "existing-id",
+    })
 
     const { result } = renderHook(() => useRestoreWallet())
 
@@ -115,6 +119,29 @@ describe("useRestoreWallet", () => {
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
+  })
+
+  it("aborts restore (Critical #4) when the index lookup fails — never duplicates an existing account", async () => {
+    // Repro: a transient AsyncStorage failure during the dedup lookup used to
+    // surface as `null`, causing the restore flow to create a fresh account
+    // and orphan the existing one.
+    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
+      status: "read-failed",
+      error: new Error("AsyncStorage unavailable"),
+    })
+
+    const { result } = renderHook(() => useRestoreWallet())
+
+    await act(async () => {
+      await result.current.restore("word1 word2 word3").catch(() => {})
+    })
+
+    expect(mockRestore).not.toHaveBeenCalled()
+    expect(mockUpdateState).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(result.current.status).toBe(RestoreWalletStatus.Error)
+    expect(mockRecordError).toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalled()
   })
 
   it("sets error status and reports on failure", async () => {

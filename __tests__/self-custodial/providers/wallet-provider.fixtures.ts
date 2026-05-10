@@ -49,9 +49,10 @@ export const setupConnectedWallet = (
   )
   mocks.getMnemonicForAccount.mockResolvedValue("word1 word2 word3")
   mocks.initSdk.mockResolvedValue({})
-  mocks.listSelfCustodialAccounts.mockResolvedValue([
-    { id: TEST_SC_ACCOUNT_ID, lightningAddress: null },
-  ])
+  mocks.listSelfCustodialAccounts.mockResolvedValue({
+    status: "ok",
+    entries: [{ id: TEST_SC_ACCOUNT_ID, lightningAddress: null }],
+  })
   mocks.setActiveAccountId(TEST_SC_ACCOUNT_ID)
 
   return { listener }

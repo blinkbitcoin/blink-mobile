@@ -54,6 +54,7 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
 const mockListSelfCustodialAccounts = jest.fn()
 jest.mock("@app/self-custodial/storage/account-index", () => ({
   listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
+  StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
 }))
 
 let mockNonCustodialEnabled = false
@@ -72,7 +73,7 @@ describe("useAccountRegistry", () => {
     mockNonCustodialEnabled = false
     mockActiveAccountId = undefined
     mockGaloyAuthToken = "token"
-    mockListSelfCustodialAccounts.mockResolvedValue([])
+    mockListSelfCustodialAccounts.mockResolvedValue({ status: "ok", entries: [] })
     mockGetSessionProfiles.mockResolvedValue([])
   })
 
@@ -127,9 +128,10 @@ describe("useAccountRegistry", () => {
   it("includes self-custodial accounts loaded from the index", async () => {
     mockUseIsAuthed.mockReturnValue(true)
     mockNonCustodialEnabled = true
-    mockListSelfCustodialAccounts.mockResolvedValue([
-      { id: "sc-uuid-1", lightningAddress: null },
-    ])
+    mockListSelfCustodialAccounts.mockResolvedValue({
+      status: "ok",
+      entries: [{ id: "sc-uuid-1", lightningAddress: null }],
+    })
 
     const { result } = renderHook(() => useAccountRegistry())
     await flushAsyncEffects()
@@ -154,9 +156,10 @@ describe("useAccountRegistry", () => {
     mockUseIsAuthed.mockReturnValue(true)
     mockNonCustodialEnabled = true
     mockActiveAccountId = "sc-uuid-1"
-    mockListSelfCustodialAccounts.mockResolvedValue([
-      { id: "sc-uuid-1", lightningAddress: null },
-    ])
+    mockListSelfCustodialAccounts.mockResolvedValue({
+      status: "ok",
+      entries: [{ id: "sc-uuid-1", lightningAddress: null }],
+    })
 
     const { result } = renderHook(() => useAccountRegistry())
     await flushAsyncEffects()
@@ -178,6 +181,27 @@ describe("useAccountRegistry", () => {
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     const updater = mockUpdateState.mock.calls[0][0]
     expect(updater({ activeAccountId: "old" })).toEqual({ activeAccountId: "sc-uuid-1" })
+  })
+
+  it("does NOT clobber seeded self-custodial entries when the index read fails (Critical #4)", async () => {
+    // Repro: a transient AsyncStorage failure used to surface as `[]` from
+    // listSelfCustodialAccounts, which clobbered the seeded entry — every SC
+    // account vanished from the registry until next reload.
+    mockUseIsAuthed.mockReturnValue(false)
+    mockNonCustodialEnabled = true
+    mockActiveAccountId = "sc-uuid-1"
+    mockListSelfCustodialAccounts.mockResolvedValue({
+      status: "read-failed",
+      error: new Error("AsyncStorage unavailable"),
+    })
+
+    const { result } = renderHook(() => useAccountRegistry())
+    await flushAsyncEffects()
+
+    expect(result.current.selfCustodialEntries).toEqual([
+      { id: "sc-uuid-1", lightningAddress: null },
+    ])
+    expect(result.current.activeAccount?.id).toBe("sc-uuid-1")
   })
 
   it("setActiveAccountId is a single state mutation (no token rewrite)", async () => {
