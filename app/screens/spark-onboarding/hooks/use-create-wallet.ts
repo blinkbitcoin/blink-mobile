@@ -8,7 +8,6 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { selfCustodialCreateWallet } from "@app/self-custodial/bridge"
-import { useBackupState } from "@app/self-custodial/providers/backup-state-provider"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { reportError } from "@app/utils/error-logging"
@@ -26,7 +25,6 @@ export const useCreateWallet = () => {
   const { updateState } = usePersistentStateContext()
   const { retry: reinitSdk } = useSelfCustodialWallet()
   const { reloadSelfCustodialAccounts } = useAccountRegistry()
-  const { resetBackupState } = useBackupState()
   const [status, setStatus] = useState<CreationStatus>(CreationStatus.Idle)
   const guard = useInFlightGuard()
 
@@ -38,7 +36,6 @@ export const useCreateWallet = () => {
         await selfCustodialCreateWallet(accountId)
         await reloadSelfCustodialAccounts()
         reinitSdk()
-        resetBackupState()
         updateState((prev) => {
           if (!prev) return prev
           return { ...prev, activeAccountId: accountId }
@@ -51,14 +48,7 @@ export const useCreateWallet = () => {
         setStatus(CreationStatus.Error)
       }
     })
-  }, [
-    guard,
-    navigation,
-    updateState,
-    reinitSdk,
-    reloadSelfCustodialAccounts,
-    resetBackupState,
-  ])
+  }, [guard, navigation, updateState, reinitSdk, reloadSelfCustodialAccounts])
 
   return { status, create }
 }
