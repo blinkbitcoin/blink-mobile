@@ -121,4 +121,63 @@ describe("state-migrations schema 9", () => {
     expect(defaultPersistentState.schemaVersion).toBe(9)
     expect(defaultPersistentState.activeAccountId).toBeUndefined()
   })
+
+  it("preserves selfCustodialDefaultWalletCurrency='USD' across schema 8 → 9 (Important #4)", async () => {
+    const state8 = {
+      schemaVersion: 8,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "sc-id",
+      selfCustodialDefaultWalletCurrency: "USD",
+    }
+
+    const result = await migrateAndGetPersistentState(state8)
+
+    expect(result.schemaVersion).toBe(9)
+    expect(result.selfCustodialDefaultWalletCurrency).toBe("USD")
+    expect(result.activeAccountId).toBe("sc-id")
+  })
+
+  it("preserves selfCustodialDefaultWalletCurrency='BTC' across schema 8 → 9 (Important #4)", async () => {
+    const state8 = {
+      schemaVersion: 8,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "sc-id",
+      selfCustodialDefaultWalletCurrency: "BTC",
+    }
+
+    const result = await migrateAndGetPersistentState(state8)
+
+    expect(result.schemaVersion).toBe(9)
+    expect(result.selfCustodialDefaultWalletCurrency).toBe("BTC")
+  })
+
+  it("leaves selfCustodialDefaultWalletCurrency undefined when absent from schema 8 (Important #4)", async () => {
+    const state8 = {
+      schemaVersion: 8,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+    }
+
+    const result = await migrateAndGetPersistentState(state8)
+
+    expect(result.schemaVersion).toBe(9)
+    expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
+  })
+
+  it("preserves selfCustodialDefaultWalletCurrency on a schema 9 round-trip (Important #4)", async () => {
+    const state9 = {
+      schemaVersion: 9,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "token",
+      activeAccountId: "sc-id",
+      selfCustodialDefaultWalletCurrency: "USD",
+    }
+
+    const result = await migrateAndGetPersistentState(state9)
+
+    expect(result.schemaVersion).toBe(9)
+    expect(result.selfCustodialDefaultWalletCurrency).toBe("USD")
+  })
 })
