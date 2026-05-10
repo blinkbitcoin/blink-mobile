@@ -5,6 +5,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   listSelfCustodialAccounts,
+  StorageReadStatus,
   type SelfCustodialAccountEntry,
 } from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
@@ -74,8 +75,10 @@ export const useAccountRegistry = (): AccountRegistryResult => {
   const [hasStoredCustodialProfile, setHasStoredCustodialProfile] = useState(isAuthed)
 
   const reloadSelfCustodialAccounts = useCallback(async () => {
-    const entries = await listSelfCustodialAccounts()
-    setSelfCustodialEntries(entries)
+    const result = await listSelfCustodialAccounts()
+    if (result.status === StorageReadStatus.Ok) {
+      setSelfCustodialEntries(result.entries)
+    }
   }, [])
 
   useEffect(() => {

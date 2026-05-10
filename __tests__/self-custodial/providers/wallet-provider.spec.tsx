@@ -64,12 +64,15 @@ jest.mock("@app/self-custodial/bridge", () => ({
   syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
 }))
 
-const mockListSelfCustodialAccounts = jest.fn().mockResolvedValue([])
+const mockListSelfCustodialAccounts = jest
+  .fn()
+  .mockResolvedValue({ status: "ok", entries: [] })
 const mockSetSelfCustodialLightningAddress = jest.fn().mockResolvedValue(undefined)
 jest.mock("@app/self-custodial/storage/account-index", () => ({
   listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
   setSelfCustodialLightningAddress: (...args: unknown[]) =>
     mockSetSelfCustodialLightningAddress(...args),
+  StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
 }))
 
 const mockUseIsAuthed = jest.fn().mockReturnValue(false)

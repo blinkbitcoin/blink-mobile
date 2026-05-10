@@ -14,7 +14,10 @@ import {
   markBackupCompletedFor,
 } from "@app/self-custodial/providers/backup-state-provider"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
-import { findSelfCustodialAccountByMnemonic } from "@app/self-custodial/storage/account-index"
+import {
+  findSelfCustodialAccountByMnemonic,
+  StorageReadStatus,
+} from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { logSelfCustodialRestoreCompleted } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
@@ -52,17 +55,21 @@ export const useRestoreWallet = () => {
       await guard.run(async () => {
         setStatus(RestoreWalletStatus.Restoring)
         try {
-          const existingId = await findSelfCustodialAccountByMnemonic(mnemonic)
-          if (existingId) {
-            activateAccount(existingId)
+          const lookup = await findSelfCustodialAccountByMnemonic(mnemonic)
+          if (lookup.status === StorageReadStatus.ReadFailed) throw lookup.error
+
+          if (lookup.id) {
+            activateAccount(lookup.id)
             reinitSdk()
             navigation.navigate("sparkBackupSuccessScreen")
             return
           }
+
           const accountId = Crypto.randomUUID()
           await selfCustodialRestoreWallet(accountId, mnemonic)
           await markBackupCompletedFor(accountId, BackupMethod.Manual)
           await reloadSelfCustodialAccounts()
+
           activateAccount(accountId)
           reinitSdk()
           logSelfCustodialRestoreCompleted()
