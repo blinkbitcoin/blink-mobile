@@ -205,7 +205,7 @@ describe("state-migrations schema 10", () => {
     ).toBeUndefined()
   })
 
-  it("preserves selfCustodialDefaultWalletCurrency='USD' across schema 8 → 9 (Important #4)", async () => {
+  it("preserves selfCustodialDefaultWalletCurrency='USD' across schema 8 → current (Important #4)", async () => {
     const state8 = {
       schemaVersion: 8,
       galoyInstance: { id: "Main" },
@@ -216,12 +216,12 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state8)
 
-    expect(result.schemaVersion).toBe(9)
+    expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrency).toBe("USD")
     expect(result.activeAccountId).toBe("sc-id")
   })
 
-  it("preserves selfCustodialDefaultWalletCurrency='BTC' across schema 8 → 9 (Important #4)", async () => {
+  it("preserves selfCustodialDefaultWalletCurrency='BTC' across schema 8 → current (Important #4)", async () => {
     const state8 = {
       schemaVersion: 8,
       galoyInstance: { id: "Main" },
@@ -232,7 +232,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state8)
 
-    expect(result.schemaVersion).toBe(9)
+    expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrency).toBe("BTC")
   })
 
@@ -245,7 +245,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state8)
 
-    expect(result.schemaVersion).toBe(9)
+    expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
   })
 
@@ -260,7 +260,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state9)
 
-    expect(result.schemaVersion).toBe(9)
+    expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrency).toBe("USD")
   })
 })
