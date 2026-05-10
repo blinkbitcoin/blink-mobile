@@ -7,6 +7,8 @@ import { useAppConfig, useGoogleDriveBackup } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   type BackupMetadata,
+  BackupPayloadError,
+  BackupPayloadErrorReason,
   isEncryptedBackup,
   parseBackupMetadata,
   parseBackupPayload,
@@ -48,6 +50,7 @@ type FileOutcome =
 const RestoreErrorContext = {
   CloudDownload: "Cloud download failed",
   PerFileDownload: "Per-file download failed",
+  Decrypt: "Backup decrypt failed",
 } as const
 
 type RestoreErrorContext = (typeof RestoreErrorContext)[keyof typeof RestoreErrorContext]
@@ -193,12 +196,23 @@ export const useCloudRestore = () => {
     if (!backupContent) return
     setPasswordError(null)
 
+    let mnemonic: string
     try {
-      const { mnemonic } = parseEncryptedBackupPayload(backupContent, password)
-      await restore(mnemonic)
-    } catch {
-      setPasswordError(LL.RestoreScreen.wrongPassword())
+      mnemonic = parseEncryptedBackupPayload(backupContent, password).mnemonic
+    } catch (err) {
+      if (
+        err instanceof BackupPayloadError &&
+        err.reason === BackupPayloadErrorReason.WrongPassword
+      ) {
+        setPasswordError(LL.RestoreScreen.wrongPassword())
+        return
+      }
+      reportRestoreError(RestoreErrorContext.Decrypt, err)
+      setStep(CloudStep.Error)
+      return
     }
+
+    await restore(mnemonic).catch(() => undefined)
   }, [backupContent, password, restore, LL])
 
   const isLoading =

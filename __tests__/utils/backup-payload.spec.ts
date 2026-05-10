@@ -18,6 +18,8 @@ jest.mock("react-native-quick-crypto", () => {
 })
 
 import {
+  BackupPayloadError,
+  BackupPayloadErrorReason,
   buildBackupPayload,
   isEncryptedBackup,
   parseBackupMetadata,
@@ -78,13 +80,181 @@ describe("spark backup format", () => {
     expect(Buffer.from(payload.iv, "base64")).toHaveLength(12)
   })
 
-  it("fails to decrypt encrypted payload with wrong password", () => {
+  it("throws BackupPayloadError with reason='wrong-password' on AES-GCM auth tag mismatch (Critical #10)", () => {
     const raw = buildBackupPayload(mnemonic, {
       walletIdentifier,
       password: "ValidPass1234!",
     })
 
-    expect(() => parseEncryptedBackupPayload(raw, "WrongPassword!1")).toThrow()
+    expect(() => parseEncryptedBackupPayload(raw, "WrongPassword!1")).toThrow(
+      BackupPayloadError,
+    )
+    try {
+      parseEncryptedBackupPayload(raw, "WrongPassword!1")
+    } catch (err) {
+      expect(err).toBeInstanceOf(BackupPayloadError)
+      expect((err as BackupPayloadError).reason).toBe(
+        BackupPayloadErrorReason.WrongPassword,
+      )
+    }
+  })
+
+  it("throws BackupPayloadError with reason='missing-crypto-fields' and names the salt field when salt is absent (Critical #10)", () => {
+    const raw = JSON.stringify({
+      version: 1,
+      walletIdentifier,
+      createdAt: 1,
+      encrypted: true,
+      cipher: "AES-128-GCM",
+      kdf: {
+        name: "PBKDF2",
+        iterations: 600_000,
+        digest: "SHA-256",
+        keyLen: 16,
+      },
+      data: "ZW5jcnlwdGVk",
+      iv: "aXY=",
+    })
+
+    try {
+      parseEncryptedBackupPayload(raw, "anyPassword")
+      throw new Error("should have thrown")
+    } catch (err) {
+      expect(err).toBeInstanceOf(BackupPayloadError)
+      expect((err as BackupPayloadError).reason).toBe(
+        BackupPayloadErrorReason.MissingCryptoFields,
+      )
+      expect((err as BackupPayloadError).message).toContain("salt")
+    }
+  })
+
+  it("throws BackupPayloadError with reason='missing-crypto-fields' and names the iv field when iv is empty (Critical #10)", () => {
+    const raw = JSON.stringify({
+      version: 1,
+      walletIdentifier,
+      createdAt: 1,
+      encrypted: true,
+      cipher: "AES-128-GCM",
+      data: "ZW5jcnlwdGVk",
+      iv: "",
+      salt: "c2FsdA==",
+    })
+
+    try {
+      parseEncryptedBackupPayload(raw, "anyPassword")
+      throw new Error("should have thrown")
+    } catch (err) {
+      expect(err).toBeInstanceOf(BackupPayloadError)
+      expect((err as BackupPayloadError).reason).toBe(
+        BackupPayloadErrorReason.MissingCryptoFields,
+      )
+      expect((err as BackupPayloadError).message).toContain("iv")
+    }
+  })
+
+  it("throws BackupPayloadError with reason='missing-crypto-fields' and names the data field when data is absent (Critical #10)", () => {
+    const raw = JSON.stringify({
+      version: 1,
+      walletIdentifier,
+      createdAt: 1,
+      encrypted: true,
+      cipher: "AES-128-GCM",
+      iv: "aXY=",
+      salt: "c2FsdA==",
+    })
+
+    try {
+      parseEncryptedBackupPayload(raw, "anyPassword")
+      throw new Error("should have thrown")
+    } catch (err) {
+      expect(err).toBeInstanceOf(BackupPayloadError)
+      expect((err as BackupPayloadError).reason).toBe(
+        BackupPayloadErrorReason.MissingCryptoFields,
+      )
+      expect((err as BackupPayloadError).message).toContain("data")
+    }
+  })
+
+  it("throws BackupPayloadError with reason='unsupported-cipher' on unknown cipher (Critical #10)", () => {
+    const raw = JSON.stringify({
+      version: 1,
+      walletIdentifier,
+      createdAt: 1,
+      encrypted: true,
+      cipher: "AES-256-CBC",
+      data: "ZW5jcnlwdGVk",
+      iv: "aXY=",
+      salt: "c2FsdA==",
+    })
+
+    try {
+      parseEncryptedBackupPayload(raw, "anyPassword")
+      throw new Error("should have thrown")
+    } catch (err) {
+      expect(err).toBeInstanceOf(BackupPayloadError)
+      expect((err as BackupPayloadError).reason).toBe(
+        BackupPayloadErrorReason.UnsupportedCipher,
+      )
+    }
+  })
+
+  it("throws BackupPayloadError with reason='invalid-mnemonic' when plain payload has empty mnemonic (Critical #10)", () => {
+    const raw = JSON.stringify({
+      version: 1,
+      walletIdentifier,
+      createdAt: 1,
+      encrypted: false,
+      mnemonic: "",
+    })
+
+    try {
+      parseBackupPayload(raw)
+      throw new Error("should have thrown")
+    } catch (err) {
+      expect(err).toBeInstanceOf(BackupPayloadError)
+      expect((err as BackupPayloadError).reason).toBe(
+        BackupPayloadErrorReason.InvalidMnemonic,
+      )
+    }
+  })
+
+  it("throws BackupPayloadError with reason='invalid-mnemonic' when plain payload has no mnemonic field (Critical #10)", () => {
+    const raw = JSON.stringify({
+      version: 1,
+      walletIdentifier,
+      createdAt: 1,
+      encrypted: false,
+    })
+
+    try {
+      parseBackupPayload(raw)
+      throw new Error("should have thrown")
+    } catch (err) {
+      expect(err).toBeInstanceOf(BackupPayloadError)
+      expect((err as BackupPayloadError).reason).toBe(
+        BackupPayloadErrorReason.InvalidMnemonic,
+      )
+    }
+  })
+
+  it("throws BackupPayloadError with reason='invalid-mnemonic' when plain payload has non-string mnemonic (Critical #10)", () => {
+    const raw = JSON.stringify({
+      version: 1,
+      walletIdentifier,
+      createdAt: 1,
+      encrypted: false,
+      mnemonic: 42,
+    })
+
+    try {
+      parseBackupPayload(raw)
+      throw new Error("should have thrown")
+    } catch (err) {
+      expect(err).toBeInstanceOf(BackupPayloadError)
+      expect((err as BackupPayloadError).reason).toBe(
+        BackupPayloadErrorReason.InvalidMnemonic,
+      )
+    }
   })
 
   it("produces different encrypted payload content across runs", () => {
@@ -122,12 +292,21 @@ describe("spark backup format", () => {
     expect(isEncryptedBackup("not json {{{")).toBe(false)
   })
 
-  it("parseBackupPayload throws on encrypted payload", () => {
+  it("parseBackupPayload throws BackupPayloadError with reason='encrypted-requires-password' on encrypted payload (Critical #10)", () => {
     const raw = buildBackupPayload(mnemonic, {
       walletIdentifier,
       password: "ValidPass1234!",
     })
-    expect(() => parseBackupPayload(raw)).toThrow("Encrypted payload requires password")
+
+    try {
+      parseBackupPayload(raw)
+      throw new Error("should have thrown")
+    } catch (err) {
+      expect(err).toBeInstanceOf(BackupPayloadError)
+      expect((err as BackupPayloadError).reason).toBe(
+        BackupPayloadErrorReason.EncryptedRequiresPassword,
+      )
+    }
   })
 
   it("parseEncryptedBackupPayload handles unencrypted payload", () => {

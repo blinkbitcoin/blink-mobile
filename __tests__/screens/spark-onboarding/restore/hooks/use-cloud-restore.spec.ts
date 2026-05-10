@@ -23,46 +23,54 @@ jest.mock("@app/config/appinfo", () => ({
     `blink-spark-backup-${name.toLowerCase()}-`,
 }))
 
-jest.mock("@app/utils/backup-payload", () => ({
-  isEncryptedBackup: (content: string) => {
-    try {
-      return JSON.parse(content)?.encrypted === true
-    } catch {
-      return false
-    }
-  },
-  parseBackupPayload: (content: string) => {
-    const parsed = JSON.parse(content) as { mnemonic: string }
-    return { mnemonic: parsed.mnemonic }
-  },
-  parseBackupMetadata: (content: string) => {
-    try {
-      const parsed = JSON.parse(content) as {
-        version?: number
-        walletIdentifier?: string
-        lightningAddress?: string
-        encrypted?: boolean
-        createdAt?: number
+jest.mock("@app/utils/backup-payload", () => {
+  const actual = jest.requireActual("@app/utils/backup-payload")
+  return {
+    ...actual,
+    isEncryptedBackup: (content: string) => {
+      try {
+        return JSON.parse(content)?.encrypted === true
+      } catch {
+        return false
       }
-      if (typeof parsed.walletIdentifier !== "string" || !parsed.walletIdentifier) {
+    },
+    parseBackupPayload: (content: string) => {
+      const parsed = JSON.parse(content) as { mnemonic: string }
+      return { mnemonic: parsed.mnemonic }
+    },
+    parseBackupMetadata: (content: string) => {
+      try {
+        const parsed = JSON.parse(content) as {
+          version?: number
+          walletIdentifier?: string
+          lightningAddress?: string
+          encrypted?: boolean
+          createdAt?: number
+        }
+        if (typeof parsed.walletIdentifier !== "string" || !parsed.walletIdentifier) {
+          return null
+        }
+        return {
+          version: parsed.version ?? 1,
+          walletIdentifier: parsed.walletIdentifier,
+          lightningAddress: parsed.lightningAddress,
+          createdAt: parsed.createdAt ?? 0,
+          encrypted: parsed.encrypted === true,
+        }
+      } catch {
         return null
       }
-      return {
-        version: parsed.version ?? 1,
-        walletIdentifier: parsed.walletIdentifier,
-        lightningAddress: parsed.lightningAddress,
-        createdAt: parsed.createdAt ?? 0,
-        encrypted: parsed.encrypted === true,
-      }
-    } catch {
-      return null
-    }
-  },
-  parseEncryptedBackupPayload: jest.fn((content: string, _password: string) => {
-    const parsed = JSON.parse(content) as { mnemonic: string }
-    return { mnemonic: parsed.mnemonic }
-  }),
-}))
+    },
+    parseEncryptedBackupPayload: jest.fn((content: string, _password: string) => {
+      const parsed = JSON.parse(content) as { mnemonic: string }
+      return { mnemonic: parsed.mnemonic }
+    }),
+  }
+})
+
+const { BackupPayloadError, BackupPayloadErrorReason } = jest.requireActual(
+  "@app/utils/backup-payload",
+) as typeof import("@app/utils/backup-payload")
 
 jest.mock("@app/screens/spark-onboarding/restore/hooks/use-restore-wallet", () => ({
   RestoreWalletStatus: { Idle: "idle", Restoring: "restoring", Error: "error" },
@@ -108,6 +116,7 @@ const buildEncryptedBackup = (walletIdentifier: string, mnemonic: string) =>
 describe("useCloudRestore", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockRestore.mockResolvedValue(undefined)
   })
 
   it("shows not-found when no backups are listed", async () => {
@@ -467,12 +476,15 @@ describe("useCloudRestore", () => {
     expect(mockRestore).toHaveBeenCalledWith("decrypted words")
   })
 
-  it("shows password error on decrypt failure", async () => {
+  it("shows password error only when the decrypt failure is reason='wrong-password' (Critical #10)", async () => {
     const mockParseEncrypted = jest.requireMock(
       "@app/utils/backup-payload",
     ).parseEncryptedBackupPayload
     mockParseEncrypted.mockImplementationOnce(() => {
-      throw new Error("decrypt failed")
+      throw new BackupPayloadError(
+        BackupPayloadErrorReason.WrongPassword,
+        "AES-GCM decrypt failed: auth tag mismatch",
+      )
     })
 
     mockListBackups.mockResolvedValue({
@@ -495,6 +507,135 @@ describe("useCloudRestore", () => {
     })
 
     expect(result.current.passwordError).toBe("Wrong password")
+    expect(result.current.hasError).toBe(false)
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("falls to Error (not wrong-password) when decrypt fails with reason='missing-crypto-fields' (Critical #10)", async () => {
+    const mockParseEncrypted = jest.requireMock(
+      "@app/utils/backup-payload",
+    ).parseEncryptedBackupPayload
+    mockParseEncrypted.mockImplementationOnce(() => {
+      throw new BackupPayloadError(
+        BackupPayloadErrorReason.MissingCryptoFields,
+        "Encrypted payload missing salt, iv, or data",
+      )
+    })
+
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: buildEncryptedBackup("pubkey1", "x"),
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isPassword).toBe(true)
+    })
+
+    await waitFor(async () => {
+      await result.current.handleDecrypt()
+    })
+
+    expect(result.current.hasError).toBe(true)
+    expect(result.current.passwordError).toBeNull()
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  it("falls to Error (not wrong-password) when decrypt fails with reason='unsupported-cipher' (Critical #10)", async () => {
+    const mockParseEncrypted = jest.requireMock(
+      "@app/utils/backup-payload",
+    ).parseEncryptedBackupPayload
+    mockParseEncrypted.mockImplementationOnce(() => {
+      throw new BackupPayloadError(
+        BackupPayloadErrorReason.UnsupportedCipher,
+        "Unsupported cipher: AES-256-CBC",
+      )
+    })
+
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: buildEncryptedBackup("pubkey1", "x"),
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isPassword).toBe(true)
+    })
+
+    await waitFor(async () => {
+      await result.current.handleDecrypt()
+    })
+
+    expect(result.current.hasError).toBe(true)
+    expect(result.current.passwordError).toBeNull()
+  })
+
+  it("falls to Error (not wrong-password) when decrypt fails with reason='invalid-mnemonic' (Critical #10)", async () => {
+    const mockParseEncrypted = jest.requireMock(
+      "@app/utils/backup-payload",
+    ).parseEncryptedBackupPayload
+    mockParseEncrypted.mockImplementationOnce(() => {
+      throw new BackupPayloadError(
+        BackupPayloadErrorReason.InvalidMnemonic,
+        "Backup payload yielded empty or non-string mnemonic",
+      )
+    })
+
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: buildEncryptedBackup("pubkey1", "x"),
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isPassword).toBe(true)
+    })
+
+    await waitFor(async () => {
+      await result.current.handleDecrypt()
+    })
+
+    expect(result.current.hasError).toBe(true)
+    expect(result.current.passwordError).toBeNull()
+  })
+
+  it("does not classify a restore-side failure as 'wrong password' after a successful decrypt (Critical #10)", async () => {
+    mockListBackups.mockResolvedValue({
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: buildEncryptedBackup("pubkey1", "decrypted words"),
+    })
+    mockRestore.mockRejectedValueOnce(new Error("Wallet restore failed"))
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isPassword).toBe(true)
+    })
+
+    await waitFor(async () => {
+      await result.current.handleDecrypt()
+    })
+
+    expect(result.current.passwordError).toBeNull()
   })
 
   it("does not fire loadCloudBackups twice on rerender", async () => {
