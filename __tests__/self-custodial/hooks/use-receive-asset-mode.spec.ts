@@ -55,6 +55,22 @@ describe("useReceiveAssetMode", () => {
       expect(result.current.assetMode).toBe("dollar")
       expect(result.current.isToggleDisabled).toBe(true)
     })
+
+    it("does NOT reset Dollar to Bitcoin when stable balance toggles OFF (Important #5)", () => {
+      // Asymmetry is intentional: ON re-aligns to Dollar to enforce the new
+      // sweep policy, but OFF preserves the user's last explicit choice so a
+      // future "fix" that resets to BTC would silently regress receive intent.
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: true })
+      const { result, rerender } = renderHook(() => useReceiveAssetMode())
+
+      expect(result.current.assetMode).toBe("dollar")
+
+      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
+      rerender({})
+
+      expect(result.current.assetMode).toBe("dollar")
+      expect(result.current.isToggleDisabled).toBe(false)
+    })
   })
 
   describe("loading flag (Critical #7 boot window)", () => {
