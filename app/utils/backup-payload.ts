@@ -98,6 +98,49 @@ export const buildBackupPayload = (mnemonic: string, opts: BuildOptions): string
   return JSON.stringify(payload)
 }
 
+export const BackupPayloadErrorReason = {
+  WrongPassword: "wrong-password",
+  MissingCryptoFields: "missing-crypto-fields",
+  UnsupportedCipher: "unsupported-cipher",
+  InvalidMnemonic: "invalid-mnemonic",
+  EncryptedRequiresPassword: "encrypted-requires-password",
+} as const
+
+export type BackupPayloadErrorReason =
+  (typeof BackupPayloadErrorReason)[keyof typeof BackupPayloadErrorReason]
+
+export class BackupPayloadError extends Error {
+  constructor(
+    readonly reason: BackupPayloadErrorReason,
+    message: string,
+  ) {
+    super(message)
+    this.name = "BackupPayloadError"
+  }
+}
+
+const ensureValidMnemonic = (mnemonic: unknown): string => {
+  if (typeof mnemonic !== "string" || !mnemonic) {
+    throw new BackupPayloadError(
+      BackupPayloadErrorReason.InvalidMnemonic,
+      "Backup payload yielded empty or non-string mnemonic",
+    )
+  }
+  return mnemonic
+}
+
+const REQUIRED_CRYPTO_FIELDS = ["salt", "iv", "data"] as const
+
+type RequiredCryptoField = (typeof REQUIRED_CRYPTO_FIELDS)[number]
+
+const findMissingCryptoField = (
+  parsed: EncryptedBackupPayload,
+): RequiredCryptoField | undefined =>
+  REQUIRED_CRYPTO_FIELDS.find((f) => {
+    const v = parsed[f]
+    return typeof v !== "string" || !v
+  })
+
 export const isEncryptedBackup = (raw: string): boolean => {
   try {
     const parsed = JSON.parse(raw)
@@ -128,11 +171,14 @@ export const parseBackupMetadata = (raw: string): BackupMetadata | null => {
 export const parseBackupPayload = (raw: string): { mnemonic: string } => {
   const parsed = JSON.parse(raw) as BackupPayload
 
-  if (!parsed.encrypted) {
-    return { mnemonic: parsed.mnemonic }
+  if (parsed.encrypted) {
+    throw new BackupPayloadError(
+      BackupPayloadErrorReason.EncryptedRequiresPassword,
+      "Encrypted payload requires password — use parseEncryptedBackupPayload",
+    )
   }
 
-  throw new Error("Encrypted payload requires password — use parseEncryptedBackupPayload")
+  return { mnemonic: ensureValidMnemonic(parsed.mnemonic) }
 }
 
 export const parseEncryptedBackupPayload = (
@@ -142,10 +188,35 @@ export const parseEncryptedBackupPayload = (
   const parsed = JSON.parse(raw) as BackupPayload
 
   if (!parsed.encrypted) {
-    return { mnemonic: parsed.mnemonic }
+    return { mnemonic: ensureValidMnemonic(parsed.mnemonic) }
+  }
+
+  const missingField = findMissingCryptoField(parsed)
+  if (missingField) {
+    throw new BackupPayloadError(
+      BackupPayloadErrorReason.MissingCryptoFields,
+      `Encrypted payload missing or empty field: ${missingField}`,
+    )
+  }
+
+  if (parsed.cipher !== CIPHER) {
+    throw new BackupPayloadError(
+      BackupPayloadErrorReason.UnsupportedCipher,
+      `Unsupported cipher: ${String(parsed.cipher)}`,
+    )
   }
 
   const { key } = deriveKeyFromPassword(password, parsed.salt)
-  const mnemonic = decryptAesGcm({ data: parsed.data, key, iv: parsed.iv })
-  return { mnemonic }
+
+  let mnemonic: string
+  try {
+    mnemonic = decryptAesGcm({ data: parsed.data, key, iv: parsed.iv })
+  } catch (err) {
+    throw new BackupPayloadError(
+      BackupPayloadErrorReason.WrongPassword,
+      `AES-GCM decrypt failed: ${err instanceof Error ? err.message : String(err)}`,
+    )
+  }
+
+  return { mnemonic: ensureValidMnemonic(mnemonic) }
 }
