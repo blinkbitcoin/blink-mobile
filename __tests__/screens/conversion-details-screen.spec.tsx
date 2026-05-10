@@ -92,13 +92,11 @@ jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
   }),
 }))
 
+const mockUseNonCustodialConversionGuard = jest.fn()
 jest.mock(
   "@app/screens/conversion-flow/hooks/use-non-custodial-conversion-guard",
   () => ({
-    useNonCustodialConversionGuard: () => ({
-      isQuoting: false,
-      blockingReason: null,
-    }),
+    useNonCustodialConversionGuard: () => mockUseNonCustodialConversionGuard(),
   }),
 )
 
@@ -627,6 +625,11 @@ beforeEach(() => {
   jest.clearAllMocks()
   mockUseActiveWallet.mockReturnValue(defaultActiveWallet)
   mockUseNonCustodialConversionLimits.mockReturnValue(defaultLimits)
+  mockUseNonCustodialConversionGuard.mockReturnValue({
+    isQuoting: false,
+    hasQuoteError: false,
+    blockingReason: null,
+  })
 })
 
 describe("Initial render with both wallets having balance", () => {
@@ -2034,6 +2037,55 @@ describe("Self-custodial conversion limits gating", () => {
       limits: { minFromAmount: 1_000_000, minToAmount: null },
       loading: false,
       error: null,
+    })
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+  })
+
+  it("disables Next when the conversion guard reports hasQuoteError (Critical #6)", async () => {
+    mockUseActiveWallet.mockReturnValue(scActiveWallet)
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: { minFromAmount: 0, minToAmount: null },
+      loading: false,
+      error: null,
+    })
+    mockUseNonCustodialConversionGuard.mockReturnValue({
+      isQuoting: false,
+      hasQuoteError: true,
+      blockingReason: null,
+    })
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+  })
+
+  it("disables Next during the SC SDK boot window — accountType=SelfCustodial + isReady=false (Critical #6)", async () => {
+    mockUseActiveWallet.mockReturnValue({
+      ...scActiveWallet,
+      isSelfCustodial: false,
+      isReady: false,
+      status: "Unavailable",
     })
 
     const Wrapper = createTestWrapper(buildMocks())

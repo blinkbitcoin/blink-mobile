@@ -18,6 +18,7 @@ export type UseNonCustodialConversionGuardParams = {
 
 export type NonCustodialConversionGuard = {
   isQuoting: boolean
+  hasQuoteError: boolean
   blockingReason: ConvertAmountAdjustment | null
 }
 
@@ -49,7 +50,7 @@ export const useNonCustodialConversionGuard = ({
     return buildConvertParams(primary, fromCurrency, convertMoneyAmount)
   }, [enabled, convertMoneyAmount, amountInSourceCurrency, fromCurrency])
 
-  const { isQuoting, amountAdjustment } = useConversionQuote(quoteParams)
+  const { isQuoting, hasQuoteError, amountAdjustment } = useConversionQuote(quoteParams)
 
   const blockingReason = useMemo(
     () =>
@@ -57,5 +58,5 @@ export const useNonCustodialConversionGuard = ({
     [amountAdjustment, amountInSourceCurrency, fromWalletBalance],
   )
 
-  return { isQuoting, blockingReason }
+  return { isQuoting, hasQuoteError, blockingReason }
 }

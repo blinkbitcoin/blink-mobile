@@ -210,12 +210,53 @@ describe("useNonCustodialConversionGuard", () => {
     expect(result.current.isQuoting).toBe(false)
   })
 
-  it("returns null blockingReason when the quote fails", async () => {
+  it("surfaces hasQuoteError=true and keeps blockingReason null when the quote rejects (Critical #6)", async () => {
     mockGetQuote.mockRejectedValue(new Error("pools unavailable"))
 
     const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))
 
-    await waitFor(() => expect(result.current.isQuoting).toBe(false))
+    await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
+    expect(result.current.isQuoting).toBe(false)
     expect(result.current.blockingReason).toBeNull()
+  })
+
+  it("surfaces hasQuoteError=true when the SDK returns a null quote (Critical #6)", async () => {
+    mockGetQuote.mockResolvedValue(null)
+
+    const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))
+
+    await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
+    expect(result.current.blockingReason).toBeNull()
+  })
+
+  it("keeps hasQuoteError=false on the success path", async () => {
+    mockGetQuote.mockResolvedValue(buildQuote(ConvertAmountAdjustment.FlooredToMin))
+
+    const { result } = renderHook(() =>
+      useNonCustodialConversionGuard({ ...defaultParams, amountInSourceCurrency: 50 }),
+    )
+
+    await waitFor(() =>
+      expect(result.current.blockingReason).toBe(ConvertAmountAdjustment.FlooredToMin),
+    )
+    expect(result.current.hasQuoteError).toBe(false)
+  })
+
+  it("keeps hasQuoteError=false while the quote is in flight", async () => {
+    mockGetQuote.mockImplementation(() => new Promise<ConvertQuote>(() => {}))
+
+    const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))
+
+    await waitFor(() => expect(result.current.isQuoting).toBe(true))
+    expect(result.current.hasQuoteError).toBe(false)
+  })
+
+  it("keeps hasQuoteError=false in the disabled and idle paths", async () => {
+    const { result } = renderHook(() =>
+      useNonCustodialConversionGuard({ ...defaultParams, enabled: false }),
+    )
+
+    await waitFor(() => expect(result.current.isQuoting).toBe(false))
+    expect(result.current.hasQuoteError).toBe(false)
   })
 })
