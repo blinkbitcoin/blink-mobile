@@ -133,7 +133,11 @@ const runAutoConvert = async ({
   amountMatchToleranceBps,
   claimedConversionIds,
 }: RunAutoConvertParams): Promise<void> => {
-  if (record.attempts >= maxAttempts) {
+  // Re-read storage so concurrent invocations agree on the cap state instead
+  // of each trusting their own (potentially pre-stamp) snapshot of `attempts`.
+  const liveRecord = await findPendingAutoConvert(record.paymentRequest)
+  const liveAttempts = liveRecord?.attempts ?? record.attempts
+  if (liveAttempts >= maxAttempts) {
     await removePendingAutoConvert(record.paymentRequest)
     return
   }
