@@ -121,6 +121,27 @@ describe("wrapDestination", () => {
     expect(mockCreateLightning).not.toHaveBeenCalled()
   })
 
+  it("falls back to 0 sats when lnurlParams.min is undefined (still has callback + max)", () => {
+    const result = createValidResult(PaymentType.Lnurl, {
+      lnurl: "lnurl1nomin",
+      isMerchant: false,
+      lnurlParams: {
+        callback: "https://example.com/cb",
+        max: 1000,
+        commentAllowed: 0,
+      },
+    })
+
+    const wrapped = wrapDestination(result, mockSdk)
+    callCreatePaymentDetail(wrapped)
+
+    expect(mockCreateLnurl).toHaveBeenCalledWith(
+      expect.objectContaining({
+        unitOfAccountAmount: expect.objectContaining({ amount: 0 }),
+      }),
+    )
+  })
+
   it("propagates isMerchant=true for merchant Lnurl destinations", () => {
     const result = createValidResult(PaymentType.Lnurl, {
       lnurl: "lnurl1merchant",
