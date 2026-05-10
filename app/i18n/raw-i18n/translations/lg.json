@@ -2402,6 +2402,7 @@
     "level": "Omutendera {level: string}",
     "switchAccount": "Kyusa akawunti",
     "pleaseWait": "Nsaba Olinde.",
+    "probeBalanceFailed": "Tetwasobola kukakasa ssente za walletu. Wadde nga, gerageza nate.",
     "accountLevel": "Omutendera gwa Akawunti",
     "upgrade": "Linyisa omutindo gwa akawunti yo",
     "logOutAndDeleteLocalData": "Log out oggyewo ne bwino yenna",

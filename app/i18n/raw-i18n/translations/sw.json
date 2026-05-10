@@ -2402,6 +2402,7 @@
     "level": "Kiwango {level: string}",
     "switchAccount": "Badilisha akaunti",
     "pleaseWait": "Tafadhali Subiri.",
+    "probeBalanceFailed": "Imeshindwa kuthibitisha salio la pochi. Tafadhali jaribu tena.",
     "accountLevel": "Kiwango cha Akaunti",
     "upgrade": "Boresha akaunti yako",
     "logOutAndDeleteLocalData": "Toka nje na futa data zote za kwenye kifaa chako",

@@ -2402,6 +2402,7 @@
         "level": "Livello {level: string}",
         "switchAccount": "Cambia account",
         "pleaseWait": "Attendere prego.",
+        "probeBalanceFailed": "Impossibile verificare il saldo del portafoglio. Riprova.",
         "accountLevel": "Livello account",
         "upgrade": "Aggiorna il tuo account",
         "logOutAndDeleteLocalData": "Esci e cancella tutti i dati locali",

@@ -2402,6 +2402,7 @@
     "level": "Szint {level: string}",
     "switchAccount": "Fiókváltás",
     "pleaseWait": "Kérlek várj.",
+    "probeBalanceFailed": "Nem sikerült ellenőrizni a tárca egyenlegét. Kérjük, próbáld újra.",
     "accountLevel": "felhasználói fiók szintje",
     "upgrade": "Váltás magasabb szintű felhasználói fiókra",
     "logOutAndDeleteLocalData": "Kijelentkezés és helyi adatok törlése",

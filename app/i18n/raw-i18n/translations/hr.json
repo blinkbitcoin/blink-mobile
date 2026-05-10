@@ -2419,6 +2419,7 @@
     "level": "Razina {level: string}",
     "switchAccount": "Promijeni račun",
     "pleaseWait": "Molimo pričekajte.",
+    "probeBalanceFailed": "Nije moguće provjeriti stanje novčanika. Pokušajte ponovno.",
     "accountLevel": "Razina računa",
     "upgrade": "Nadogradite svoj račun",
     "logOutAndDeleteLocalData": "Odjavi se i izbriši sve lokalne podatke",

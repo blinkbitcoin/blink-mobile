@@ -2402,6 +2402,7 @@
         "level": "Level {level: string}",
         "switchAccount": "Konto wechseln",
         "pleaseWait": "Bitte warten.",
+        "probeBalanceFailed": "Das Guthaben des Wallets konnte nicht überprüft werden. Bitte versuche es erneut.",
         "accountLevel": "Account Level",
         "upgrade": "Deinen Account upgraden",
         "logOutAndDeleteLocalData": "Ausloggen und alle lokalen Daten löschen",

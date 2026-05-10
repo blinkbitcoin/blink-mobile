@@ -155,6 +155,11 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 const mockProbeWallets = jest.fn()
 jest.mock("@app/self-custodial/probe-account-wallets", () => ({
   probeSelfCustodialAccountWallets: (...args: unknown[]) => mockProbeWallets(...args),
+  ProbeAccountWalletsStatus: {
+    Ok: "ok",
+    NoMnemonic: "no-mnemonic",
+    ProbeFailed: "probe-failed",
+  },
 }))
 
 jest.mock("@app/utils/error-logging", () => ({
@@ -181,6 +186,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       AccountScreen: {
         pleaseWait: () => "Please wait",
+        probeBalanceFailed: () => "Couldn't verify the wallet's balance.",
       },
       common: {
         anonymousUser: () => "Anonymous user",
@@ -196,8 +202,8 @@ describe("SelfCustodialProfileRow", () => {
     jest.clearAllMocks()
     lastConfirmModalProps.isVisible = undefined
     lastWarningModalProps.isVisible = undefined
-    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
-    mockProbeWallets.mockResolvedValue([])
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null, wallets: [] })
+    mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
     mockUseDeleteSelfCustodial.mockReturnValue({
       state: "idle",
       deleteWallet: mockDeleteWallet,
@@ -269,7 +275,7 @@ describe("SelfCustodialProfileRow", () => {
   })
 
   it("opens the confirm-removal modal when the probe returns no funds", async () => {
-    mockProbeWallets.mockResolvedValue([])
+    mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
 
     const { getByTestId, queryByTestId, findByTestId } = render(
       <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
@@ -285,7 +291,7 @@ describe("SelfCustodialProfileRow", () => {
   })
 
   it("calls deleteWallet with the entry id and closes the modal when the user confirms", async () => {
-    mockProbeWallets.mockResolvedValue([])
+    mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
     const entry = { id: TEST_ENTRY_ID, lightningAddress: null }
     const { getByTestId, queryByTestId, findByTestId, rerender } = render(
       <SelfCustodialProfileRow entry={entry} />,
@@ -302,14 +308,17 @@ describe("SelfCustodialProfileRow", () => {
   })
 
   it("opens the has-funds warning when the probe returns a positive balance", async () => {
-    mockProbeWallets.mockResolvedValue([
-      {
-        id: "btc-1",
-        walletCurrency: "BTC",
-        balance: { amount: 9999, currency: "BTC", currencyCode: "BTC" },
-        transactions: [],
-      },
-    ])
+    mockProbeWallets.mockResolvedValue({
+      status: "ok",
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 9999, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+    })
 
     const { getByTestId, queryByTestId, findByTestId } = render(
       <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
@@ -322,14 +331,17 @@ describe("SelfCustodialProfileRow", () => {
   })
 
   it("opens the confirm modal when the probe returns a zero balance", async () => {
-    mockProbeWallets.mockResolvedValue([
-      {
-        id: "btc-1",
-        walletCurrency: "BTC",
-        balance: { amount: 0, currency: "BTC", currencyCode: "BTC" },
-        transactions: [],
-      },
-    ])
+    mockProbeWallets.mockResolvedValue({
+      status: "ok",
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 0, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+    })
 
     const { getByTestId, queryByTestId, findByTestId } = render(
       <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
@@ -340,16 +352,105 @@ describe("SelfCustodialProfileRow", () => {
     expect(queryByTestId("warning-modal")).toBeNull()
   })
 
-  it("falls back to the confirm modal when the probe rejects", async () => {
-    mockProbeWallets.mockRejectedValue(new Error("probe failed"))
+  it("does NOT open the confirm modal when the probe fails — surfaces an error toast instead (Critical #1)", async () => {
+    mockProbeWallets.mockResolvedValue({
+      status: "probe-failed",
+      error: new Error("probe failed"),
+    })
 
-    const { getByTestId, queryByTestId, findByTestId } = render(
+    const { getByTestId, queryByTestId } = render(
+      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 20)
+    })
+
+    expect(queryByTestId("delete-modal")).toBeNull()
+    expect(queryByTestId("warning-modal")).toBeNull()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "error",
+        message: "Couldn't verify the wallet's balance.",
+      }),
+    )
+  })
+
+  it("opens the confirm modal directly when the probe reports no-mnemonic (defensive)", async () => {
+    mockProbeWallets.mockResolvedValue({ status: "no-mnemonic" })
+
+    const { getByTestId, findByTestId } = render(
       <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
     fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
-    expect(queryByTestId("warning-modal")).toBeNull()
+  })
+
+  it("short-circuits the probe when the row is the active SC account, reading live wallets from useSelfCustodialWallet (Critical #1)", async () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: {
+        id: TEST_ENTRY_ID,
+        type: AccountType.SelfCustodial,
+        label: "Spark",
+        selected: true,
+        status: AccountStatus.RequiresRestore,
+      },
+      setActiveAccountId,
+    })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: null,
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1234, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+    })
+
+    const { getByTestId, findByTestId } = render(
+      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+
+    expect(await findByTestId("warning-modal")).toBeTruthy()
+    expect(mockProbeWallets).not.toHaveBeenCalled()
+    expect(lastWarningModalProps.wallets?.[0]?.balance.amount).toBe(1234)
+  })
+
+  it("opens the confirm modal directly on the active SC account when live wallets are zero-balance (Critical #1)", async () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: {
+        id: TEST_ENTRY_ID,
+        type: AccountType.SelfCustodial,
+        label: "Spark",
+        selected: true,
+        status: AccountStatus.RequiresRestore,
+      },
+      setActiveAccountId,
+    })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: null,
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 0, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+    })
+
+    const { getByTestId, findByTestId } = render(
+      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+
+    expect(await findByTestId("delete-modal")).toBeTruthy()
+    expect(mockProbeWallets).not.toHaveBeenCalled()
   })
 
   it("shows a spinner on the row while probing and hides the close icon", async () => {
@@ -369,7 +470,7 @@ describe("SelfCustodialProfileRow", () => {
     expect(getByTestId(`self-custodial-probe-spinner-${TEST_ENTRY_ID}`)).toBeTruthy()
     expect(queryByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`)).toBeNull()
 
-    resolveProbe([])
+    resolveProbe({ status: "ok", wallets: [] })
     await findByTestId("delete-modal")
     expect(queryByTestId(`self-custodial-probe-spinner-${TEST_ENTRY_ID}`)).toBeNull()
   })

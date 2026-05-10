@@ -2419,6 +2419,7 @@
     "level": "Vlak {level: string}",
     "switchAccount": "Wissel rekening",
     "pleaseWait": "Wag asseblief.",
+    "probeBalanceFailed": "Kon nie die beursie se saldo verifieer nie. Probeer asseblief weer.",
     "accountLevel": "Rekeningvlak",
     "upgrade": "Opgradeer jou rekening",
     "logOutAndDeleteLocalData": "Teken uit en verwyder alle plaaslike data",

@@ -12,7 +12,10 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DeleteAccountConfirmModal } from "@app/screens/settings-screen/self-custodial/delete-account-confirm-modal"
 import { DeleteAccountHasFundsModal } from "@app/screens/settings-screen/self-custodial/delete-account-has-funds-modal"
-import { probeSelfCustodialAccountWallets } from "@app/self-custodial/probe-account-wallets"
+import {
+  probeSelfCustodialAccountWallets,
+  ProbeAccountWalletsStatus,
+} from "@app/self-custodial/probe-account-wallets"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { type SelfCustodialAccountEntry } from "@app/self-custodial/storage/account-index"
 import { AccountType, type WalletState } from "@app/types/wallet.types"
@@ -40,7 +43,8 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { activeAccount, setActiveAccountId } = useAccountRegistry()
-  const { lightningAddress: liveLightningAddress } = useSelfCustodialWallet()
+  const { lightningAddress: liveLightningAddress, wallets: liveWallets } =
+    useSelfCustodialWallet()
   const { state: deleteState, deleteWallet } = useDeleteSelfCustodial()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
@@ -67,23 +71,46 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
     navigation.navigate("Primary")
   }
 
+  const openModalForWallets = (wallets: ReadonlyArray<WalletState>) => {
+    const hasFunds = wallets.some((w) => w.balance.amount > 0)
+    if (hasFunds) {
+      setWarningWallets(wallets)
+      setHasFundsWarningVisible(true)
+      return
+    }
+    setConfirmVisible(true)
+  }
+
+  const surfaceProbeFailure = (err: Error) => {
+    reportError("self-custodial-profile-row probeBalance", err)
+    toastShow({
+      type: "error",
+      message: LL.AccountScreen.probeBalanceFailed(),
+      LL,
+    })
+  }
+
   const handleRemovePress = async () => {
     if (probingBalance) return
+
+    if (isActive) {
+      openModalForWallets(liveWallets ?? [])
+      return
+    }
+
     setProbingBalance(true)
-    try {
-      const wallets = (await probeSelfCustodialAccountWallets(accountId)) ?? []
-      const hasFunds = wallets.some((w) => w.balance.amount > 0)
-      if (hasFunds) {
-        setWarningWallets(wallets)
-        setHasFundsWarningVisible(true)
+    const result = await probeSelfCustodialAccountWallets(accountId)
+    setProbingBalance(false)
+
+    switch (result.status) {
+      case ProbeAccountWalletsStatus.Ok:
+        openModalForWallets(result.wallets)
         return
-      }
-      setConfirmVisible(true)
-    } catch (err) {
-      reportError("self-custodial-profile-row probeBalance", err)
-      setConfirmVisible(true)
-    } finally {
-      setProbingBalance(false)
+      case ProbeAccountWalletsStatus.NoMnemonic:
+        setConfirmVisible(true)
+        return
+      case ProbeAccountWalletsStatus.ProbeFailed:
+        surfaceProbeFailure(result.error)
     }
   }
 

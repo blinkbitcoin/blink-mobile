@@ -2419,6 +2419,7 @@
     "level": "ระดับ {level: string}",
     "switchAccount": "สลับบัญชี",
     "pleaseWait": "กรุณารอสักครู่",
+    "probeBalanceFailed": "ไม่สามารถตรวจสอบยอดเงินในกระเป๋าเงินได้ โปรดลองอีกครั้ง",
     "accountLevel": "Account Level",
     "upgrade": "Upgrade your account",
     "logOutAndDeleteLocalData": "Log out and clear all local data",

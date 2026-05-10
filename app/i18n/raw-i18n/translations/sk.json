@@ -2402,6 +2402,7 @@
     "level": "Úroveň {level: string}",
     "switchAccount": "Prepnúť účet",
     "pleaseWait": "Prosím čakajte.",
+    "probeBalanceFailed": "Nepodarilo sa overiť zostatok peňaženky. Skúste to prosím znova.",
     "accountLevel": "Úroveň účtu",
     "upgrade": "Upgradovať účet",
     "logOutAndDeleteLocalData": "Odhlásiť sa a vymazať všetky lokálne údaje",

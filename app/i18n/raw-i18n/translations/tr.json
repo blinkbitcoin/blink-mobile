@@ -2402,6 +2402,7 @@
     "level": "Seviye {level: string}",
     "switchAccount": "Hesap değiştir",
     "pleaseWait": "Lütfen Bekleyin.",
+    "probeBalanceFailed": "Cüzdan bakiyesi doğrulanamadı. Lütfen tekrar deneyin.",
     "accountLevel": "Hesap Seviyesi",
     "upgrade": "Hesabınızı güncelleyin",
     "logOutAndDeleteLocalData": "Çıkış yap ve yerel tüm dosyaları sil",

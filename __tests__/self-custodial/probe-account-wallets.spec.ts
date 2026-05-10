@@ -1,4 +1,7 @@
-import { probeSelfCustodialAccountWallets } from "@app/self-custodial/probe-account-wallets"
+import {
+  probeSelfCustodialAccountWallets,
+  ProbeAccountWalletsStatus,
+} from "@app/self-custodial/probe-account-wallets"
 import { WalletCurrency } from "@app/graphql/generated"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { toWalletId } from "@app/types/wallet.types"
@@ -52,17 +55,17 @@ describe("probeSelfCustodialAccountWallets", () => {
     jest.clearAllMocks()
   })
 
-  it("returns null and does not init the SDK when no mnemonic is stored", async () => {
+  it("returns no-mnemonic without initializing the SDK when no mnemonic is stored", async () => {
     mockGetMnemonic.mockResolvedValue(null)
 
     const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
 
-    expect(result).toBeNull()
+    expect(result).toEqual({ status: ProbeAccountWalletsStatus.NoMnemonic })
     expect(mockInitSdk).not.toHaveBeenCalled()
     expect(mockDisconnectSdk).not.toHaveBeenCalled()
   })
 
-  it("connects with the account's mnemonic and storage dir, returns the snapshot wallets", async () => {
+  it("connects with the account's mnemonic and storage dir, returns ok with snapshot wallets", async () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockResolvedValue({
@@ -78,7 +81,10 @@ describe("probeSelfCustodialAccountWallets", () => {
       `/storage/spark/${TEST_ACCOUNT_ID}`,
     )
     expect(mockGetSnapshot).toHaveBeenCalledWith(FAKE_SDK)
-    expect(result).toEqual(sampleWallets)
+    expect(result).toEqual({
+      status: ProbeAccountWalletsStatus.Ok,
+      wallets: sampleWallets,
+    })
   })
 
   it("disconnects the SDK after a successful snapshot read", async () => {
@@ -95,30 +101,48 @@ describe("probeSelfCustodialAccountWallets", () => {
     expect(mockDisconnectSdk).toHaveBeenCalledWith(FAKE_SDK)
   })
 
-  it("disconnects the SDK even when the snapshot fetch throws", async () => {
+  it("returns probe-failed (not ok) when the snapshot fetch throws, but still disconnects the SDK (Critical #1)", async () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockRejectedValue(new Error("getInfo failed"))
 
-    await expect(probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)).rejects.toThrow(
-      "getInfo failed",
-    )
+    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
 
+    expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
+    if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
+      expect(result.error.message).toBe("getInfo failed")
+    }
     expect(mockDisconnectSdk).toHaveBeenCalledWith(FAKE_SDK)
   })
 
-  it("propagates a connect failure without trying to disconnect", async () => {
+  it("returns probe-failed (not ok) when the connect step fails, and never attempts to disconnect (Critical #1)", async () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockRejectedValue(new Error("connect failed"))
 
-    await expect(probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)).rejects.toThrow(
-      "connect failed",
-    )
+    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
 
+    expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
+    if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
+      expect(result.error.message).toBe("connect failed")
+    }
     expect(mockDisconnectSdk).not.toHaveBeenCalled()
   })
 
-  it("swallows disconnect errors so the snapshot read still succeeds", async () => {
+  it("wraps a non-Error rejection from the snapshot fetch into an Error (Critical #1)", async () => {
+    mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
+    mockInitSdk.mockResolvedValue(FAKE_SDK)
+    mockGetSnapshot.mockRejectedValue("opaque string failure")
+
+    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+
+    expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
+    if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
+      expect(result.error).toBeInstanceOf(Error)
+      expect(result.error.message).toContain("opaque string failure")
+    }
+  })
+
+  it("swallows disconnect errors so the snapshot read still resolves to ok", async () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockResolvedValue({
@@ -130,6 +154,9 @@ describe("probeSelfCustodialAccountWallets", () => {
 
     const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
 
-    expect(result).toEqual(sampleWallets)
+    expect(result).toEqual({
+      status: ProbeAccountWalletsStatus.Ok,
+      wallets: sampleWallets,
+    })
   })
 })

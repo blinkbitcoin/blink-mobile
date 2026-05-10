@@ -7776,6 +7776,10 @@ type RootTranslation = {
 		 */
 		pleaseWait: string
 		/**
+		 * C​o​u​l​d​n​'​t​ ​v​e​r​i​f​y​ ​t​h​e​ ​w​a​l​l​e​t​'​s​ ​b​a​l​a​n​c​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		probeBalanceFailed: string
+		/**
 		 * A​c​c​o​u​n​t​ ​L​e​v​e​l
 		 */
 		accountLevel: string
@@ -19960,6 +19964,10 @@ export type TranslationFunctions = {
 		 * Please Wait.
 		 */
 		pleaseWait: () => LocalizedString
+		/**
+		 * Couldn't verify the wallet's balance. Please try again.
+		 */
+		probeBalanceFailed: () => LocalizedString
 		/**
 		 * Account Level
 		 */
