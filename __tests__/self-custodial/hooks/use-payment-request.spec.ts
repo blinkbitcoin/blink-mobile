@@ -9,6 +9,9 @@ const mockSelfCustodialWallet = jest.fn()
 const mockActiveWallet = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
 const mockRecordError = jest.fn()
+const mockAddPendingAutoConvert = jest.fn()
+const mockFetchAutoConvertMinSats = jest.fn()
+const mockUseReceiveAssetMode = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   createReceiveLightning: () => mockReceiveLightning,
@@ -18,6 +21,16 @@ jest.mock("@app/self-custodial/bridge", () => ({
 jest.mock("@react-native-firebase/crashlytics", () => ({
   __esModule: true,
   default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+}))
+
+jest.mock("@app/self-custodial/auto-convert", () => ({
+  addPendingAutoConvert: (...args: unknown[]) => mockAddPendingAutoConvert(...args),
+  fetchAutoConvertMinSats: (...args: unknown[]) => mockFetchAutoConvertMinSats(...args),
+  ReceiveAssetMode: { Bitcoin: "bitcoin", Dollar: "dollar" },
+}))
+
+jest.mock("@app/self-custodial/hooks/use-receive-asset-mode", () => ({
+  useReceiveAssetMode: () => mockUseReceiveAssetMode(),
 }))
 
 jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
@@ -65,6 +78,14 @@ describe("usePaymentRequest", () => {
         currencyCode: currency,
       }),
     )
+    mockAddPendingAutoConvert.mockResolvedValue(undefined)
+    mockFetchAutoConvertMinSats.mockResolvedValue(undefined)
+    mockUseReceiveAssetMode.mockReturnValue({
+      assetMode: "bitcoin",
+      setAssetMode: jest.fn(),
+      isToggleDisabled: false,
+      loading: false,
+    })
   })
 
   it("returns null when sdk is unavailable", () => {
@@ -384,7 +405,6 @@ describe("usePaymentRequest", () => {
         expect(result.current?.onchainAddress).toBe("bc1qfirst...")
       })
 
-      // Simulate SDK reconnect: provider hands back a new sdk identity.
       mockSelfCustodialWallet.mockReturnValue({
         sdk: { id: "different-sdk" },
         lastReceivedPaymentId: null,
@@ -395,6 +415,151 @@ describe("usePaymentRequest", () => {
       await waitFor(() => {
         expect(result.current?.onchainAddress).toBe("bc1qsecond...")
       })
+    })
+  })
+
+  describe("Dollar-mode auto-convert integration", () => {
+    it("persists a pending auto-convert record when the invoice is flagged Dollar", async () => {
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "dollar",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: false,
+      })
+      mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1dollar..." })
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.state).toBe("Created")
+      })
+
+      expect(mockAddPendingAutoConvert).toHaveBeenCalledTimes(1)
+      const record = mockAddPendingAutoConvert.mock.calls[0][0]
+      expect(record.paymentRequest).toBe("lnbc1dollar...")
+      expect(record.attempts).toBe(0)
+      expect(record.lastAttemptAtMs).toBeUndefined()
+      expect(typeof record.createdAtMs).toBe("number")
+    })
+
+    it("does NOT create a pending auto-convert record when invoice is in Bitcoin mode", async () => {
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.state).toBe("Created")
+      })
+
+      expect(mockAddPendingAutoConvert).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("auto-convert minimum warning flags", () => {
+    it("exposes shouldShowAutoConvertMinWarning=true when amount is below the pool minimum", async () => {
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "dollar",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: false,
+      })
+      mockFetchAutoConvertMinSats.mockResolvedValue(1000)
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.autoConvertMinSats).toBe(1000)
+      })
+
+      act(() => {
+        result.current?.setAmount({
+          amount: 500,
+          currency: WalletCurrency.Btc,
+          currencyCode: "BTC",
+        })
+      })
+
+      await waitFor(() => {
+        expect(result.current?.shouldShowAutoConvertMinWarning).toBe(true)
+      })
+    })
+
+    it("exposes shouldShowAutoConvertMinWarning=false in Bitcoin mode", async () => {
+      mockFetchAutoConvertMinSats.mockResolvedValue(1000)
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.autoConvertMinSats).toBe(1000)
+      })
+
+      expect(result.current?.shouldShowAutoConvertMinWarning).toBe(false)
+    })
+  })
+
+  describe("asset toggle state from useReceiveAssetMode", () => {
+    it("surfaces the toggle-disabled state", async () => {
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "dollar",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: true,
+        loading: false,
+      })
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.state).toBe("Created")
+      })
+
+      expect(result.current?.isAssetToggleDisabled).toBe(true)
+    })
+  })
+
+  describe("Critical #7 — defers invoice generation while settings are loading", () => {
+    it("does not call the receive adapter while useReceiveAssetMode reports loading", async () => {
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "bitcoin",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: false,
+        loading: true,
+      })
+
+      renderHook(() => usePaymentRequest())
+
+      // Give any pending microtasks a chance to flush.
+      await new Promise((resolve) => {
+        setTimeout(resolve, 10)
+      })
+
+      expect(mockReceiveLightning).not.toHaveBeenCalled()
+      expect(mockAddPendingAutoConvert).not.toHaveBeenCalled()
+    })
+
+    it("generates the invoice once loading flips to false", async () => {
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "dollar",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: true,
+        loading: true,
+      })
+
+      const { rerender } = renderHook(() => usePaymentRequest())
+
+      await new Promise((resolve) => {
+        setTimeout(resolve, 10)
+      })
+      expect(mockReceiveLightning).not.toHaveBeenCalled()
+      expect(mockAddPendingAutoConvert).not.toHaveBeenCalled()
+
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "dollar",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: true,
+        loading: false,
+      })
+      rerender({})
+
+      await waitFor(() => {
+        expect(mockReceiveLightning).toHaveBeenCalled()
+      })
+      expect(mockAddPendingAutoConvert).toHaveBeenCalled()
     })
   })
 })

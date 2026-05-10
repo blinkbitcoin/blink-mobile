@@ -2164,7 +2164,10 @@
         "lightningAddress": "Dirección lightning",
         "lightningInvoice": "Factura lightning",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "Comisión de depósito: {fee} SAT para montos menores a {threshold} SAT o {overFee} SAT para depósitos mayores a {threshold} SAT"
+        "depositFee": "Comisión de depósito: {fee} SAT para montos menores a {threshold} SAT o {overFee} SAT para depósitos mayores a {threshold} SAT",
+        "autoConvertMinAmount": "Los montos por debajo de {minSats: number} sats no pueden convertirse a Dólar automáticamente. Recibirás Bitcoin.",
+        "autoConvertSuccess": "Se recibieron {amount: number} sats, convertidos a Dólar.",
+        "autoConvertFailed": "Pago recibido pero la conversión falló."
     },
     "RedeemBitcoinScreen": {
         "title": "Canjear Bitcoin",
@@ -3614,9 +3617,12 @@
         "description": "Tu billetera no custodial no puede alcanzar la red en este momento. Inténtalo de nuevo cuando vuelvas a estar en línea.",
         "retry": "Intentar de nuevo"
     },
-    "SelfCustodialBalance": {
-        "staleLabel": "DESACTUALIZADO",
-        "syncFailedToast": "Error al sincronizar el balance. Tu balance puede estar desactualizado."
+    "SelfCustodialError": {
+        "insufficientFunds": "Fondos insuficientes para cubrir el monto y las comisiones de red. Prueba con un monto menor.",
+        "belowMinimum": "El monto está por debajo del mínimo requerido para este pago. Prueba con un monto mayor.",
+        "networkError": "Problema de conexión de red. Verifica tu conexión e inténtalo de nuevo.",
+        "invalidInput": "Los datos del pago parecen inválidos. Por favor revísalos e inténtalo de nuevo.",
+        "generic": "El pago no pudo completarse. Inténtalo en un momento, o usa un monto menor."
     },
     "UnclaimedDeposit": {
         "title": "Tienes {count} depósito(s) sin reclamar",

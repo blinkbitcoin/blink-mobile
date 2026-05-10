@@ -2164,7 +2164,10 @@
     "lightningAddress": "Lightning adresi",
     "lightningInvoice": "Lightning faturası",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Yatırma ücreti: {threshold} SAT altındaki tutarlar için {fee} SAT veya {threshold} SAT üzerindeki yatırmalar için {overFee} SAT"
+    "depositFee": "Yatırma ücreti: {threshold} SAT altındaki tutarlar için {fee} SAT veya {threshold} SAT üzerindeki yatırmalar için {overFee} SAT",
+    "autoConvertMinAmount": "{minSats: number} sats altındaki tutarlar otomatik olarak Dolara çevrilemez. Bunun yerine Bitcoin alacaksınız.",
+    "autoConvertSuccess": "{amount: number} sats alındı, Dolara çevrildi.",
+    "autoConvertFailed": "Ödeme alındı ancak dönüşüm başarısız oldu."
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin olarak kullan",
@@ -3626,9 +3629,12 @@
     "description": "Gözetimsiz cüzdanınız şu anda ağa ulaşamıyor. Tekrar çevrimiçi olduğunuzda tekrar deneyin.",
     "retry": "Tekrar dene"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ESKİMİŞ",
-    "syncFailedToast": "Bakiye senkronizasyonu başarısız. Bakiyeniz güncel olmayabilir."
+  "SelfCustodialError": {
+    "insufficientFunds": "Tutarı ve ağ ücretlerini karşılamak için yeterli fon yok. Daha küçük bir tutar deneyin.",
+    "belowMinimum": "Tutar bu ödeme için gereken minimumun altında. Daha büyük bir tutar deneyin.",
+    "networkError": "Ağ bağlantısı sorunu. Bağlantınızı kontrol edip tekrar deneyin.",
+    "invalidInput": "Ödeme bilgileri geçersiz görünüyor. Lütfen gözden geçirip tekrar deneyin.",
+    "generic": "Ödeme tamamlanamadı. Bir an sonra tekrar deneyin veya daha küçük bir tutar kullanın."
   },
   "UnclaimedDeposit": {
     "title": "{count} talep edilmemiş yatırmanız var",

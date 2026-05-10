@@ -2171,7 +2171,10 @@
     "lightningAddress": "Địa chỉ lightning",
     "lightningInvoice": "Hóa đơn lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Phí nạp tiền: {fee} SAT cho số tiền dưới {threshold} SAT hoặc {overFee} SAT cho các khoản nạp trên {threshold} SAT"
+    "depositFee": "Phí nạp tiền: {fee} SAT cho số tiền dưới {threshold} SAT hoặc {overFee} SAT cho các khoản nạp trên {threshold} SAT",
+    "autoConvertMinAmount": "Số tiền dưới {minSats: number} sats không thể chuyển đổi tự động sang Đô la. Bạn sẽ nhận Bitcoin thay thế.",
+    "autoConvertSuccess": "Đã nhận {amount: number} sats, đã chuyển đổi sang Đô la.",
+    "autoConvertFailed": "Đã nhận thanh toán nhưng chuyển đổi thất bại."
   },
   "RedeemBitcoinScreen": {
     "title": "Đổi lấy Bitcoin",
@@ -3664,9 +3667,12 @@
     "description": "Ví không lưu ký của bạn hiện không thể kết nối với mạng. Vui lòng thử lại khi bạn kết nối trở lại.",
     "retry": "Thử lại"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "CŨ",
-    "syncFailedToast": "Đồng bộ số dư thất bại. Số dư của bạn có thể không còn cập nhật."
+  "SelfCustodialError": {
+    "insufficientFunds": "Không đủ tiền để thanh toán số tiền và phí mạng. Hãy thử số tiền nhỏ hơn.",
+    "belowMinimum": "Số tiền dưới mức tối thiểu cần thiết cho khoản thanh toán này. Hãy thử số tiền lớn hơn.",
+    "networkError": "Sự cố kết nối mạng. Kiểm tra kết nối và thử lại.",
+    "invalidInput": "Chi tiết thanh toán có vẻ không hợp lệ. Vui lòng xem lại và thử lại.",
+    "generic": "Không thể hoàn tất thanh toán. Hãy thử lại sau một lát, hoặc dùng số tiền nhỏ hơn."
   },
   "UnclaimedDeposit": {
     "title": "Bạn có {count} khoản gửi chưa được yêu cầu",

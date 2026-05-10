@@ -2171,7 +2171,10 @@
     "lightningAddress": "ที่อยู่ lightning",
     "lightningInvoice": "ใบแจ้งหนี้ lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT"
+    "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT",
+    "autoConvertMinAmount": "จำนวนต่ำกว่า {minSats: number} satoshi ไม่สามารถแปลงเป็นดอลลาร์อัตโนมัติได้ คุณจะได้รับ Bitcoin แทน",
+    "autoConvertSuccess": "ได้รับ {amount: number} satoshi แปลงเป็นดอลลาร์แล้ว",
+    "autoConvertFailed": "รับการชำระเงินแล้ว แต่การแปลงล้มเหลว"
   },
   "RedeemBitcoinScreen": {
     "title": "แลกรับบิตคอยน์",
@@ -3664,9 +3667,12 @@
     "description": "กระเป๋าเงินที่ไม่ใช่การรับฝากของคุณไม่สามารถเข้าถึงเครือข่ายได้ในขณะนี้ ลองอีกครั้งเมื่อคุณกลับมาออนไลน์",
     "retry": "ลองอีกครั้ง"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ล้าสมัย",
-    "syncFailedToast": "การซิงค์ยอดคงเหลือล้มเหลว ยอดคงเหลือของคุณอาจไม่เป็นปัจจุบัน"
+  "SelfCustodialError": {
+    "insufficientFunds": "เงินไม่เพียงพอสำหรับครอบคลุมจำนวนและค่าธรรมเนียมเครือข่าย ลองจำนวนที่น้อยลง",
+    "belowMinimum": "จำนวนต่ำกว่าขั้นต่ำที่จำเป็นสำหรับการชำระเงินนี้ ลองจำนวนที่มากขึ้น",
+    "networkError": "ปัญหาการเชื่อมต่อเครือข่าย ตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
+    "invalidInput": "รายละเอียดการชำระเงินดูไม่ถูกต้อง โปรดตรวจสอบและลองอีกครั้ง",
+    "generic": "ไม่สามารถดำเนินการชำระเงินให้เสร็จสมบูรณ์ได้ ลองอีกครั้งในอีกสักครู่ หรือใช้จำนวนที่น้อยลง"
   },
   "UnclaimedDeposit": {
     "title": "คุณมี {count} รายการฝากที่ยังไม่ได้เรียกร้อง",

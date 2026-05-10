@@ -2188,7 +2188,10 @@
     "lightningAddress": "Idilesi ye-lightning",
     "lightningInvoice": "I-invoyisi ye-lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Imali yokufaka: {fee} SAT kwimali engaphantsi kwe-{threshold} SAT okanye {overFee} SAT kwimali efakwe engaphezulu kwe-{threshold} SAT"
+    "depositFee": "Imali yokufaka: {fee} SAT kwimali engaphantsi kwe-{threshold} SAT okanye {overFee} SAT kwimali efakwe engaphezulu kwe-{threshold} SAT",
+    "autoConvertMinAmount": "Amaxabiso angaphantsi kwe-{minSats: number} sats awanakho ukuguqulelwa ngokuzenzekelayo kwi-Dollar. Uya kufumana i-Bitcoin endaweni yoko.",
+    "autoConvertSuccess": "Kufumene {amount: number} sats, kuguqulelwe kwi-Dollar.",
+    "autoConvertFailed": "Intlawulo ifumenekile kodwa ukuguqulwa kusilele."
   },
   "RedeemBitcoinScreen": {
     "title": "Sebenzisa i-Bitcoin",
@@ -3673,9 +3676,12 @@
     "description": "Ingxowa-mali yakho engekho kugcino ayinakufikelela kwinethiwekhi ngoku. Zama kwakhona xa ubuyela kwi-intanethi.",
     "retry": "Zama kwakhona"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ENDALA",
-    "syncFailedToast": "Ukuhambelanisa ibhalansi kuhlulekile. Ibhalansi yakho inokuba ayihambi nexesha."
+  "SelfCustodialError": {
+    "insufficientFunds": "Akukho mali yaneleyo ukugubungela isixa kunye neentlawulo zothungelwano. Zama isixa esincinci.",
+    "belowMinimum": "Isixa singaphantsi kweminimum efunekayo kule ntlawulo. Zama isixa esikhulu.",
+    "networkError": "Ingxaki yoqhagamshelwano kwithungelwano. Khangela uqhagamshelwano lwakho uphinde uzame.",
+    "invalidInput": "Iinkcukacha zentlawulo zibonakala zingafanelekanga. Nceda uphinde ujonge uphinde uzame.",
+    "generic": "Intlawulo ayizange igqibekise. Zama kwakhona kwakamsinya, okanye usebenzise isixa esincinci."
   },
   "UnclaimedDeposit": {
     "title": "Unama-{count} edipozithi engabangwayo",

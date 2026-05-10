@@ -2164,7 +2164,10 @@
     "lightningAddress": "Endagiriro ya lightning",
     "lightningInvoice": "Invoisi ya lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Ssente z'okuteekawo: {fee} SAT ku muwendo gw'okuwandiika {threshold} SAT oba {overFee} SAT ku biteekawo ebisukka {threshold} SAT"
+    "depositFee": "Ssente z'okuteekawo: {fee} SAT ku muwendo gw'okuwandiika {threshold} SAT oba {overFee} SAT ku biteekawo ebisukka {threshold} SAT",
+    "autoConvertMinAmount": "Omuwendo ogutasukka mu {minSats: number} sats tegusobola kukyusibwa mu Doola nga byekka. Ojja kufuna Bitcoin.",
+    "autoConvertSuccess": "Ofunye {amount: number} sats, bakyusiddwa mu Doola.",
+    "autoConvertFailed": "Okusasula kutuuse naye okukyusa kulemye."
   },
   "RedeemBitcoinScreen": {
     "title": "Nunula Bitcoin",
@@ -3626,9 +3629,12 @@
     "description": "Envalopu yo etesigibwamu tesobola kutuuka ku yintaneeti kati. Gezaako nate ng'oddayo ku yintaneeti.",
     "retry": "Gezaako nate"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "KIKADDE",
-    "syncFailedToast": "Okugoberera akawungeezi tekusobose. Akawungeezi ko ka yinza okuba nga kakadde."
+  "SelfCustodialError": {
+    "insufficientFunds": "Sente teziikira kubikka muwendo n'ebisale by'omukutu. Gezaako omuwendo omutono.",
+    "belowMinimum": "Omuwendo guli wansi w'omuwendo omutono ogwetagisa eby'okusasula kuno. Gezaako omuwendo omunene.",
+    "networkError": "Ekizibu ky'okuyungibwa ku mukutu. Kebera enkolagana yo oddemu ogezeeko.",
+    "invalidInput": "Ebikwata ku kusasula bifaanana nga si bituufu. Wonna obyebibebule oddemu ogezeeko.",
+    "generic": "Okusasula tekuyinzizza kuwedwa. Ddamu ogezeeko mu kaseera, oba kozesa omuwendo omutono."
   },
   "UnclaimedDeposit": {
     "title": "Olina {count} ebitateekeddwa",

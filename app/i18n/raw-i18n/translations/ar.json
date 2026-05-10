@@ -2171,7 +2171,10 @@
     "lightningAddress": "عنوان lightning",
     "lightningInvoice": "فاتورة lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "رسوم الإيداع: {fee} SAT للمبالغ تحت {threshold} SAT أو {overFee} SAT للإيداعات فوق {threshold} SAT"
+    "depositFee": "رسوم الإيداع: {fee} SAT للمبالغ تحت {threshold} SAT أو {overFee} SAT للإيداعات فوق {threshold} SAT",
+    "autoConvertMinAmount": "لا يمكن تحويل المبالغ الأقل من {minSats: number} ساتوشي إلى دولار تلقائيًا. ستتلقى بيتكوين بدلاً من ذلك.",
+    "autoConvertSuccess": "تم استلام {amount: number} ساتوشي وتحويلها إلى دولار.",
+    "autoConvertFailed": "تم استلام الدفعة لكن فشل التحويل."
   },
   "RedeemBitcoinScreen": {
     "title": "حرر البيتكوين",
@@ -3664,9 +3667,12 @@
     "description": "محفظتك غير المحتجزة لا يمكنها الوصول إلى الشبكة الآن. حاول مرة أخرى عندما تكون متصلاً بالإنترنت.",
     "retry": "حاول مرة أخرى"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "قديم",
-    "syncFailedToast": "فشل تزامن الرصيد. قد يكون رصيدك قديماً."
+  "SelfCustodialError": {
+    "insufficientFunds": "أموال غير كافية لتغطية المبلغ ورسوم الشبكة. حاول بمبلغ أصغر.",
+    "belowMinimum": "المبلغ أقل من الحد الأدنى المطلوب لهذه الدفعة. حاول بمبلغ أكبر.",
+    "networkError": "مشكلة في اتصال الشبكة. تحقق من اتصالك وحاول مرة أخرى.",
+    "invalidInput": "تبدو تفاصيل الدفع غير صالحة. يرجى المراجعة والمحاولة مرة أخرى.",
+    "generic": "تعذر إكمال الدفع. حاول مرة أخرى بعد لحظة، أو استخدم مبلغًا أصغر."
   },
   "UnclaimedDeposit": {
     "title": "لديك {count} إيداع(ات) غير مطالب بها",

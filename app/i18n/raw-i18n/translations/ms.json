@@ -2171,7 +2171,10 @@
     "lightningAddress": "Alamat lightning",
     "lightningInvoice": "Invois lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Yuran deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit melebihi {threshold} SAT"
+    "depositFee": "Yuran deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit melebihi {threshold} SAT",
+    "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats tidak boleh ditukar kepada Dolar secara automatik. Anda akan menerima Bitcoin.",
+    "autoConvertSuccess": "Menerima {amount: number} sats, ditukar kepada Dolar.",
+    "autoConvertFailed": "Pembayaran diterima tetapi penukaran gagal."
   },
   "RedeemBitcoinScreen": {
     "title": "Tebus bitcoin",
@@ -3667,9 +3670,12 @@
     "description": "Dompet bukan kustodian anda tidak dapat mencapai rangkaian sekarang. Cuba lagi apabila anda dalam talian semula.",
     "retry": "Cuba lagi"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "LAPUK",
-    "syncFailedToast": "Penyegerakan baki gagal. Baki anda mungkin sudah lapuk."
+  "SelfCustodialError": {
+    "insufficientFunds": "Tidak cukup dana untuk menampung jumlah dan yuran rangkaian. Cuba jumlah yang lebih kecil.",
+    "belowMinimum": "Jumlah berada di bawah minimum yang diperlukan untuk pembayaran ini. Cuba jumlah yang lebih besar.",
+    "networkError": "Masalah sambungan rangkaian. Semak sambungan anda dan cuba lagi.",
+    "invalidInput": "Butiran pembayaran kelihatan tidak sah. Sila semak dan cuba lagi.",
+    "generic": "Pembayaran tidak dapat diselesaikan. Cuba lagi sekejap, atau gunakan jumlah yang lebih kecil."
   },
   "UnclaimedDeposit": {
     "title": "Anda mempunyai {count} deposit yang belum dituntut",

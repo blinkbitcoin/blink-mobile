@@ -2171,7 +2171,10 @@
     "lightningAddress": "Lightning-adres",
     "lightningInvoice": "Lightning-faktuur",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Deposito-fooi: {fee} SAT vir bedrae onder {threshold} SAT of {overFee} SAT vir deposito's oor {threshold} SAT"
+    "depositFee": "Deposito-fooi: {fee} SAT vir bedrae onder {threshold} SAT of {overFee} SAT vir deposito's oor {threshold} SAT",
+    "autoConvertMinAmount": "Bedrae onder {minSats: number} sats kan nie outomaties na Dollar omgeskakel word nie. Jy sal eerder Bitcoin ontvang.",
+    "autoConvertSuccess": "{amount: number} sats ontvang, na Dollar omgeskakel.",
+    "autoConvertFailed": "Betaling ontvang maar die omskakeling het misluk."
   },
   "RedeemBitcoinScreen": {
     "title": "Verkry Bitcoin",
@@ -3667,9 +3670,12 @@
     "description": "Jou nie-bewaarderbeursie kan nie die netwerk nou bereik nie. Probeer weer wanneer jy aanlyn is.",
     "retry": "Probeer weer"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "VEROUDERD",
-    "syncFailedToast": "Balans sinkronisasie het misluk. Jou balans is dalk verouderd."
+  "SelfCustodialError": {
+    "insufficientFunds": "Nie genoeg fondse om die bedrag en netwerkkostes te dek nie. Probeer 'n kleiner bedrag.",
+    "belowMinimum": "Bedrag is onder die minimum vereis vir hierdie betaling. Probeer 'n groter bedrag.",
+    "networkError": "Netwerkverbindingsprobleem. Kyk jou verbinding en probeer weer.",
+    "invalidInput": "Die betaalbesonderhede lyk ongeldig. Kyk asseblief en probeer weer.",
+    "generic": "Die betaling kon nie voltooi word nie. Probeer oor 'n oomblik weer, of gebruik 'n kleiner bedrag."
   },
   "UnclaimedDeposit": {
     "title": "Jy het {count} onopgeëiste deposito('s)",

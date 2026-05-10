@@ -42,6 +42,8 @@ jest.mock("@react-navigation/native", () => ({
 
 const mockUseActiveWallet = jest.fn()
 const mockUseNonCustodialConversionLimits = jest.fn()
+const mockUseSelfCustodialWallet = jest.fn()
+const mockUseStableBalanceFirstTime = jest.fn()
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
@@ -54,29 +56,32 @@ jest.mock("@app/self-custodial/hooks", () => ({
 }))
 
 jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
-  useSelfCustodialWallet: () => ({
-    wallets: [],
-    status: "Unavailable",
-    accountType: "SelfCustodial",
-    retry: () => {},
-    sdk: null,
-    isStableBalanceActive: false,
-    isBalanceStale: false,
-    lastReceivedPaymentId: null,
-    hasMoreTransactions: false,
-    loadingMore: false,
-    loadMore: async () => {},
-    refreshWallets: async () => {},
-  }),
+  useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 
 jest.mock("@app/hooks/use-stable-balance-first-time", () => ({
-  useStableBalanceFirstTime: () => ({
-    shouldShow: false,
-    markAsShown: jest.fn(),
-    loaded: true,
-  }),
+  useStableBalanceFirstTime: () => mockUseStableBalanceFirstTime(),
 }))
+
+const defaultSelfCustodialWallet = {
+  wallets: [],
+  status: "Unavailable",
+  accountType: "SelfCustodial",
+  retry: () => {},
+  sdk: null,
+  isStableBalanceActive: false,
+  lastReceivedPaymentId: null,
+  hasMoreTransactions: false,
+  loadingMore: false,
+  loadMore: async () => {},
+  refreshWallets: async () => {},
+}
+
+const defaultStableBalanceFirstTime = {
+  shouldShow: false,
+  markAsShown: jest.fn(),
+  loaded: true,
+}
 
 type CurrencyPillProps = {
   currency?: WalletCurrency | "ALL"
@@ -603,6 +608,8 @@ beforeEach(() => {
   jest.clearAllMocks()
   mockUseActiveWallet.mockReturnValue(defaultActiveWallet)
   mockUseNonCustodialConversionLimits.mockReturnValue(defaultLimits)
+  mockUseSelfCustodialWallet.mockReturnValue(defaultSelfCustodialWallet)
+  mockUseStableBalanceFirstTime.mockReturnValue(defaultStableBalanceFirstTime)
 })
 
 describe("Initial render with both wallets having balance", () => {
@@ -2024,5 +2031,79 @@ describe("Self-custodial conversion limits gating", () => {
     })
 
     expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+  })
+})
+
+describe("StableBalanceFirstTimeModal — Critical #7 boot-window coercion", () => {
+  const scActiveWallet = {
+    isSelfCustodial: true,
+    isReady: true,
+    needsBackendAuth: false,
+    wallets: [
+      {
+        id: "sc-btc-id",
+        walletCurrency: WalletCurrency.Btc,
+        balance: { amount: 200000, currency: WalletCurrency.Btc },
+        transactions: [],
+      },
+      {
+        id: "sc-usd-id",
+        walletCurrency: WalletCurrency.Usd,
+        balance: { amount: 50000, currency: WalletCurrency.Usd },
+        transactions: [],
+      },
+    ],
+    status: "Ready",
+    accountType: "SelfCustodial",
+  }
+
+  const buildMocks = () => createGraphQLMocks({ btcBalance: 200000, usdBalance: 50000 })
+
+  it("renders the modal when stable balance is active and shouldShow is true", async () => {
+    mockUseActiveWallet.mockReturnValue(scActiveWallet)
+    mockUseStableBalanceFirstTime.mockReturnValue({
+      ...defaultStableBalanceFirstTime,
+      shouldShow: true,
+    })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      ...defaultSelfCustodialWallet,
+      isStableBalanceActive: true,
+    })
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { queryByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(queryByTestId("stable-balance-first-time-modal")).not.toBeNull()
+    })
+  })
+
+  it("hides the modal during boot window when isStableBalanceActive is undefined", async () => {
+    mockUseActiveWallet.mockReturnValue(scActiveWallet)
+    mockUseStableBalanceFirstTime.mockReturnValue({
+      ...defaultStableBalanceFirstTime,
+      shouldShow: true,
+    })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      ...defaultSelfCustodialWallet,
+      isStableBalanceActive: undefined,
+    })
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { queryByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(queryByTestId("next-button")).toBeTruthy()
+    })
+
+    expect(queryByTestId("stable-balance-first-time-modal")).toBeNull()
   })
 })

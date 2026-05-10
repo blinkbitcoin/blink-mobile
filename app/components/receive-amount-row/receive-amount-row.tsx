@@ -129,7 +129,7 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
           ) : null}
         </Pressable>
         <Pressable
-          style={[styles.walletSection, !canToggleWallet && styles.textDisabled]}
+          style={styles.walletSection}
           onPress={() => {
             triggerSpin()
             onToggleWallet()
@@ -140,7 +140,7 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
           accessibilityRole="button"
           accessibilityLabel="Toggle wallet"
         >
-          <Animated.View style={spinStyle}>
+          <Animated.View style={[spinStyle, !canToggleWallet && styles.iconHidden]}>
             <GaloyIcon name="refresh" size={16} color={colors.grey1} />
           </Animated.View>
           <CurrencyPill
@@ -182,6 +182,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   textDisabled: {
     opacity: 0.5,
+  },
+  iconHidden: {
+    opacity: 0,
   },
   amountSection: {
     flex: 1,

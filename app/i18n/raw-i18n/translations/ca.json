@@ -2164,7 +2164,10 @@
     "lightningAddress": "Adreça lightning",
     "lightningInvoice": "Factura lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Comissió de dipòsit: {fee} SAT per a imports inferiors a {threshold} SAT o {overFee} SAT per a dipòsits superiors a {threshold} SAT"
+    "depositFee": "Comissió de dipòsit: {fee} SAT per a imports inferiors a {threshold} SAT o {overFee} SAT per a dipòsits superiors a {threshold} SAT",
+    "autoConvertMinAmount": "Les quantitats inferiors a {minSats: number} sats no es poden convertir a Dòlar automàticament. Rebràs Bitcoin.",
+    "autoConvertSuccess": "Rebuts {amount: number} sats, convertits a Dòlar.",
+    "autoConvertFailed": "Pagament rebut però la conversió ha fallat."
   },
   "RedeemBitcoinScreen": {
     "title": "Bescanviar Bitcoin",
@@ -3626,9 +3629,12 @@
     "description": "La teva cartera no custodial no pot arribar a la xarxa ara mateix. Torna-ho a provar quan estiguis connectat.",
     "retry": "Torna-ho a provar"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "OBSOLET",
-    "syncFailedToast": "No s'ha pogut sincronitzar el saldo. El teu saldo pot estar desactualitzat."
+  "SelfCustodialError": {
+    "insufficientFunds": "No hi ha fons suficients per cobrir l'import i les comissions de xarxa. Prova un import més petit.",
+    "belowMinimum": "L'import és inferior al mínim requerit per a aquest pagament. Prova un import més gran.",
+    "networkError": "Problema de connexió de xarxa. Comprova la teva connexió i torna-ho a provar.",
+    "invalidInput": "Els detalls del pagament semblen invàlids. Si us plau, revisa'ls i torna-ho a provar.",
+    "generic": "No s'ha pogut completar el pagament. Torna-ho a provar en un moment, o utilitza un import més petit."
   },
   "UnclaimedDeposit": {
     "title": "Tens {count} dipòsit(s) no reclamat(s)",

@@ -2171,7 +2171,10 @@
         "lightningAddress": "Lightningアドレス",
         "lightningInvoice": "Lightningインボイス",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT"
+        "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT",
+        "autoConvertMinAmount": "{minSats: number} sats未満の金額はドルに自動変換できません。代わりにビットコインを受け取ります。",
+        "autoConvertSuccess": "{amount: number} satsを受け取り、ドルに変換しました。",
+        "autoConvertFailed": "支払いは受け取りましたが、変換に失敗しました。"
     },
     "RedeemBitcoinScreen": {
         "title": "ビットコインを換金する",
@@ -3655,9 +3658,12 @@
         "description": "非保管型ウォレットは現在ネットワークに接続できません。オンラインに戻ったら再試行してください。",
         "retry": "再試行"
     },
-    "SelfCustodialBalance": {
-        "staleLabel": "古い",
-        "syncFailedToast": "残高の同期に失敗しました。残高が最新でない可能性があります。"
+    "SelfCustodialError": {
+        "insufficientFunds": "金額とネットワーク手数料を賄う資金が不足しています。より少ない金額をお試しください。",
+        "belowMinimum": "金額がこの支払いの最低額を下回っています。より大きい金額をお試しください。",
+        "networkError": "ネットワーク接続の問題です。接続を確認してもう一度お試しください。",
+        "invalidInput": "支払いの詳細が無効のようです。確認してもう一度お試しください。",
+        "generic": "支払いを完了できませんでした。少し経ってからもう一度お試しいただくか、より少ない金額をお使いください。"
     },
     "UnclaimedDeposit": {
         "title": "{count}件の未請求デポジットがあります",

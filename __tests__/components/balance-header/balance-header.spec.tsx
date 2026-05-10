@@ -23,10 +23,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
         balanceLabelBtc: () => "Balance · SATS",
         balanceLabelUsd: () => "Balance · USD",
       },
-      SelfCustodialBalance: {
-        staleLabel: () => "STALE",
-        staleRetryHint: () => "Balance may be out of date. Tap to refresh.",
-      },
     },
   }),
 }))

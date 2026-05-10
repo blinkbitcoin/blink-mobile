@@ -2164,7 +2164,10 @@
     "lightningAddress": "Adresă lightning",
     "lightningInvoice": "Factură lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Taxă de depunere: {fee} SAT pentru sume sub {threshold} SAT sau {overFee} SAT pentru depuneri peste {threshold} SAT"
+    "depositFee": "Taxă de depunere: {fee} SAT pentru sume sub {threshold} SAT sau {overFee} SAT pentru depuneri peste {threshold} SAT",
+    "autoConvertMinAmount": "Sumele sub {minSats: number} sats nu pot fi convertite automat în Dolari. Veți primi Bitcoin în schimb.",
+    "autoConvertSuccess": "Primit {amount: number} sats, convertiți în Dolari.",
+    "autoConvertFailed": "Plata primită, dar conversia a eșuat."
   },
   "RedeemBitcoinScreen": {
     "title": "Răscumpărați Bitcoin",
@@ -3626,9 +3629,12 @@
     "description": "Portofelul tău non-custodial nu poate ajunge la rețea în acest moment. Încearcă din nou când ești online.",
     "retry": "Încearcă din nou"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ÎNVECHIT",
-    "syncFailedToast": "Sincronizarea soldului a eșuat. Soldul tău poate fi învechit."
+  "SelfCustodialError": {
+    "insufficientFunds": "Fonduri insuficiente pentru a acoperi suma și taxele de rețea. Încearcă o sumă mai mică.",
+    "belowMinimum": "Suma este sub minimul necesar pentru această plată. Încearcă o sumă mai mare.",
+    "networkError": "Problemă de conexiune la rețea. Verifică conexiunea și încearcă din nou.",
+    "invalidInput": "Detaliile plății par invalide. Te rog verifică și încearcă din nou.",
+    "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică."
   },
   "UnclaimedDeposit": {
     "title": "Ai {count} depozit(e) nerevendicate",

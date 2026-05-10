@@ -2171,7 +2171,10 @@
     "lightningAddress": "Lightning adresa",
     "lightningInvoice": "Lightning račun",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Naknada za polog: {fee} SAT za iznose ispod {threshold} SAT ili {overFee} SAT za pologe iznad {threshold} SAT"
+    "depositFee": "Naknada za polog: {fee} SAT za iznose ispod {threshold} SAT ili {overFee} SAT za pologe iznad {threshold} SAT",
+    "autoConvertMinAmount": "Iznosi manji od {minSats: number} satoshija ne mogu se automatski pretvoriti u Dolare. Primit ćete Bitcoin.",
+    "autoConvertSuccess": "Primljeno {amount: number} satoshija, pretvoreno u Dolare.",
+    "autoConvertFailed": "Uplata primljena, ali konverzija nije uspjela."
   },
   "RedeemBitcoinScreen": {
     "title": "Povuci bitcoin",
@@ -3667,9 +3670,12 @@
     "description": "Vaš ne-skrbnički novčanik trenutno ne može pristupiti mreži. Pokušajte ponovno kada se vratite na mrežu.",
     "retry": "Pokušaj ponovno"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ZASTARJELO",
-    "syncFailedToast": "Sinkronizacija stanja nije uspjela. Vaše stanje možda nije ažurno."
+  "SelfCustodialError": {
+    "insufficientFunds": "Nedovoljno sredstava za pokrivanje iznosa i mrežnih naknada. Pokušajte s manjim iznosom.",
+    "belowMinimum": "Iznos je ispod minimuma potrebnog za ovo plaćanje. Pokušajte s većim iznosom.",
+    "networkError": "Problem s mrežnom vezom. Provjerite vezu i pokušajte ponovno.",
+    "invalidInput": "Detalji plaćanja izgledaju nevažeći. Molimo provjerite i pokušajte ponovno.",
+    "generic": "Plaćanje nije moglo biti dovršeno. Pokušajte ponovno za trenutak ili upotrijebite manji iznos."
   },
   "UnclaimedDeposit": {
     "title": "Imate {count} nezatraženi(h) polog(a)",

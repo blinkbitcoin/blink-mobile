@@ -133,23 +133,38 @@ jest.mock("@app/screens/send-bitcoin-screen/use-save-lnaddress-contact", () => (
 }))
 
 const sendPaymentMock = jest.fn()
+const mockUseSendPayment = jest.fn()
 jest.mock("@app/screens/send-bitcoin-screen/use-send-payment", () => ({
-  useSendPayment: () => ({
-    loading: false,
-    hasAttemptedSend: false,
-    sendPayment: sendPaymentMock,
-  }),
+  useSendPayment: () => mockUseSendPayment(),
+}))
+
+const mockUseFee = jest.fn()
+jest.mock("@app/screens/send-bitcoin-screen/use-fee", () => ({
+  __esModule: true,
+  default: () => mockUseFee(),
+}))
+
+const mockUseSendBalances = jest.fn()
+jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => ({
+  ...jest.requireActual("@app/screens/send-bitcoin-screen/hooks/use-send-wallets"),
+  useSendBalances: () => mockUseSendBalances(),
 }))
 
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
-  type Props = { onSwipe: () => void; testID?: string; initialText?: string }
+  type Props = {
+    onSwipe: () => void
+    testID?: string
+    initialText?: string
+    disabled?: boolean
+  }
 
   const MockGaloySliderButton = ({
     onSwipe,
     testID = "slider",
     initialText = "Slide",
+    disabled = false,
   }: Props) => (
-    <TouchableOpacity testID={testID} onPress={onSwipe}>
+    <TouchableOpacity testID={testID} onPress={onSwipe} accessibilityState={{ disabled }}>
       <Text>{initialText}</Text>
     </TouchableOpacity>
   )
@@ -164,6 +179,28 @@ describe("SendBitcoinConfirmationScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     LL = i18nObject("en")
+
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 10000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
   })
 
   it("Send Screen Confirmation - Intraledger Payment", async () => {
@@ -321,5 +358,200 @@ describe("SendBitcoinConfirmationScreen", () => {
       destination: merchantParams.lnurl,
       isMerchant: true,
     })
+  })
+})
+
+// 1 BTC at $20,000 → 50 sats per USD cent.
+const SATS_PER_USD_CENT = 50
+
+const usdBtcConvert: ConvertMoneyAmount = (amount, currency) => {
+  if (amount.currency === currency) {
+    return { amount: amount.amount, currency, currencyCode: currency }
+  }
+  if (amount.currency === WalletCurrency.Btc && currency === WalletCurrency.Usd) {
+    return {
+      amount: Math.floor(amount.amount / SATS_PER_USD_CENT),
+      currency,
+      currencyCode: currency,
+    }
+  }
+  if (amount.currency === WalletCurrency.Usd && currency === WalletCurrency.Btc) {
+    return {
+      amount: amount.amount * SATS_PER_USD_CENT,
+      currency,
+      currencyCode: currency,
+    }
+  }
+  return {
+    amount: amount.amount,
+    currency,
+    currencyCode: currency === DisplayCurrency ? "NGN" : (currency as string),
+  }
+}
+
+const buildUsdSettlementRoute = (
+  unitOfAccountUsdCents: number,
+  overrides?: { isSendingMax?: boolean },
+) => {
+  const usdDescriptor = { currency: WalletCurrency.Usd, id: "usd-wallet-id" } as const
+  const params: PaymentDetails.CreateIntraledgerPaymentDetailsParams<WalletCurrency> = {
+    handle: "test",
+    recipientWalletId: "testid",
+    convertMoneyAmount: usdBtcConvert,
+    sendingWalletDescriptor: usdDescriptor,
+    unitOfAccountAmount: toUsdMoneyAmount(unitOfAccountUsdCents),
+  }
+  const detail = PaymentDetails.createIntraledgerPaymentDetails(params)
+  const merged = overrides ? { ...detail, ...overrides } : detail
+  return {
+    key: "sendBitcoinConfirmationScreen",
+    name: "sendBitcoinConfirmation",
+    params: { paymentDetail: merged },
+  } as const
+}
+
+describe("SendBitcoinConfirmationScreen — Critical #4 fee-currency conversion", () => {
+  beforeEach(() => {
+    // Balance: $10.00 = 1000 cents.
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 0,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 1000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  it("USD($9.99) settlement + BTC(50 sats) fee at $10.00 balance — does not show amountExceed", async () => {
+    // 50 sats / 50 = 1 cent. Total = 999 + 1 = 1000 ≤ 1000 (balance) → valid.
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 50, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(999)} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
+  })
+
+  it("USD($9.99) settlement + BTC(500 sats) fee at $10.00 balance — renders amountExceed", async () => {
+    // 500 sats / 50 = 10 cents. Total = 999 + 10 = 1009 > 1000 (balance) → invalid.
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 500, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(999)} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.getByText(/exceeds your balance/i)).toBeTruthy()
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — Critical #5 skipBalanceCheck matrix", () => {
+  beforeEach(() => {
+    // Settlement $11.00 (1100 cents) is always over the $10.00 (1000 cents) balance.
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 0,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 1000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+  })
+
+  it("(isSendingMax=false, hasAttemptedSend=false) over balance — slider disabled + amountExceed shown", async () => {
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(1100)} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.getByText(/exceeds your balance/i)).toBeTruthy()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
+  })
+
+  it("(isSendingMax=true, hasAttemptedSend=false) over balance — slider enabled + no error", async () => {
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(1100, { isSendingMax: true })} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+
+  it("(isSendingMax=false, hasAttemptedSend=true) over balance — slider disabled + no error", async () => {
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: true,
+      sendPayment: sendPaymentMock,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(1100)} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
   })
 })

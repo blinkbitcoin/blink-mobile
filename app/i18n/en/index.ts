@@ -2206,6 +2206,11 @@ const en: BaseTranslation = {
     bitcoinOnchain: "Bitcoin onchain",
     depositFee:
       "Deposit fee: {fee: string} SAT for amounts under {threshold: string} SAT or {overFee: string} SAT for deposits over {threshold} SAT",
+    autoConvertMinAmount:
+      "Amounts below {minSats: number} sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
+    autoConvertSuccess:
+      "Received {amount: number} sats, converted to Dollar.",
+    autoConvertFailed: "Payment received but the conversion failed.",
   },
   RedeemBitcoinScreen: {
     title: "Redeem Bitcoin",
@@ -3732,9 +3737,16 @@ const en: BaseTranslation = {
       "Your non-custodial wallet can't reach the network right now. Try again when you're back online.",
     retry: "Try again",
   },
-  SelfCustodialBalance: {
-    staleLabel: "STALE",
-    syncFailedToast: "Balance sync failed. Your balance may be out of date.",
+  SelfCustodialError: {
+    insufficientFunds:
+      "Not enough funds to cover the amount and network fees. Try a smaller amount.",
+    belowMinimum:
+      "Amount is below the minimum required for this payment. Try a larger amount.",
+    networkError:
+      "Network connection problem. Check your connection and try again.",
+    invalidInput: "The payment details look invalid. Please review and try again.",
+    generic:
+      "The payment could not be completed. Try again in a moment, or use a smaller amount.",
   },
   UnclaimedDeposit: {
     screenTitle: "Unclaimed Deposits",

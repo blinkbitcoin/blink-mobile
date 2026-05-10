@@ -2171,7 +2171,10 @@
     "lightningAddress": "Lightning adresa",
     "lightningInvoice": "Lightning faktura",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Poplatek za vklad: {fee} SAT pro částky pod {threshold} SAT nebo {overFee} SAT pro vklady nad {threshold} SAT"
+    "depositFee": "Poplatek za vklad: {fee} SAT pro částky pod {threshold} SAT nebo {overFee} SAT pro vklady nad {threshold} SAT",
+    "autoConvertMinAmount": "Částky pod {minSats: number} satoshi nelze automaticky převést na dolary. Obdržíte místo toho Bitcoin.",
+    "autoConvertSuccess": "Přijato {amount: number} satoshi, převedeno na dolary.",
+    "autoConvertFailed": "Platba přijata, ale konverze selhala."
   },
   "RedeemBitcoinScreen": {
     "title": "Směnit Bitcoin",
@@ -3667,9 +3670,12 @@
     "description": "Vaše nesvěřenská peněženka momentálně nemůže dosáhnout sítě. Zkuste to znovu, až budete online.",
     "retry": "Zkusit znovu"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ZASTARALÝ",
-    "syncFailedToast": "Synchronizace zůstatku se nezdařila. Váš zůstatek může být neaktuální."
+  "SelfCustodialError": {
+    "insufficientFunds": "Nedostatek prostředků na pokrytí částky a síťových poplatků. Zkuste menší částku.",
+    "belowMinimum": "Částka je pod minimem požadovaným pro tuto platbu. Zkuste větší částku.",
+    "networkError": "Problém se síťovým připojením. Zkontrolujte připojení a zkuste to znovu.",
+    "invalidInput": "Detaily platby vypadají neplatně. Zkontrolujte je a zkuste to znovu.",
+    "generic": "Platbu nebylo možné dokončit. Zkuste to za chvíli znovu nebo použijte menší částku."
   },
   "UnclaimedDeposit": {
     "title": "Máte {count} nevyzvednutý(ch) vklad(ů)",
