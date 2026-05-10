@@ -41,6 +41,7 @@ type FeatureFlags = {
   deviceAccountEnabled: boolean
   nonCustodialEnabled: boolean
   stableBalanceEnabled: boolean
+  remoteConfigReady: boolean
 }
 
 type RemoteConfig = {
@@ -102,6 +103,7 @@ const defaultFeatureFlags: FeatureFlags = {
   deviceAccountEnabled: false,
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
+  remoteConfigReady: false,
 }
 
 remoteConfigInstance().setDefaults({
@@ -264,6 +266,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     nonCustodialEnabled: remoteConfig.nonCustodialEnabled,
     stableBalanceEnabled:
       remoteConfig.nonCustodialEnabled && remoteConfig.stableBalanceEnabled,
+    remoteConfigReady,
   }
 
   useEffect(() => {
