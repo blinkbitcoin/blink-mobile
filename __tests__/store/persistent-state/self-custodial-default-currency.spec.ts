@@ -51,7 +51,7 @@ describe("getSelfCustodialDefaultCurrency", () => {
     ).toBe("BTC")
   })
 
-  it("falls back to legacy single-account field when map missing the active id", () => {
+  it("returns BTC when map missing the active id, ignoring the legacy field (Critical #7)", () => {
     const state: PersistentState = {
       ...baseState,
       activeAccountId: "sc-new",
@@ -59,20 +59,20 @@ describe("getSelfCustodialDefaultCurrency", () => {
       selfCustodialDefaultWalletCurrencyByAccountId: { "sc-other": "BTC" },
     }
 
-    expect(getSelfCustodialDefaultCurrency(state)).toBe("USD")
+    expect(getSelfCustodialDefaultCurrency(state)).toBe("BTC")
   })
 
-  it("falls back to legacy when map is absent entirely", () => {
+  it("returns BTC when map is absent entirely, ignoring the legacy field (Critical #7)", () => {
     const state: PersistentState = {
       ...baseState,
       activeAccountId: "sc-1",
       selfCustodialDefaultWalletCurrency: "USD",
     }
 
-    expect(getSelfCustodialDefaultCurrency(state)).toBe("USD")
+    expect(getSelfCustodialDefaultCurrency(state)).toBe("BTC")
   })
 
-  it("returns legacy value when active is custodial", () => {
+  it("returns BTC when active is custodial, ignoring the legacy field (Critical #7)", () => {
     const state: PersistentState = {
       ...baseState,
       activeAccountId: DefaultAccountId.Custodial,
@@ -80,7 +80,7 @@ describe("getSelfCustodialDefaultCurrency", () => {
       selfCustodialDefaultWalletCurrencyByAccountId: { "sc-1": "BTC" },
     }
 
-    expect(getSelfCustodialDefaultCurrency(state)).toBe("USD")
+    expect(getSelfCustodialDefaultCurrency(state)).toBe("BTC")
   })
 
   it("returns BTC when active is custodial and nothing is set", () => {

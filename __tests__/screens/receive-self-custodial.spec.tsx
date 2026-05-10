@@ -426,7 +426,13 @@ describe("ReceiveScreen — self-custodial", () => {
 
   describe("USD as Default account preference", () => {
     it("opens on Lightning invoice (Dollar) instead of PayCode", async () => {
-      setupSelfCustodial({}, { selfCustodialDefaultWalletCurrency: "USD" })
+      setupSelfCustodial(
+        {},
+        {
+          activeAccountId: "sc-id",
+          selfCustodialDefaultWalletCurrencyByAccountId: { "sc-id": "USD" },
+        },
+      )
 
       render(
         <ContextForScreen>
@@ -450,7 +456,10 @@ describe("ReceiveScreen — self-custodial", () => {
     it("forces Dollar Lightning even when BTC is the user's preference", async () => {
       setupSelfCustodial(
         { isStableBalanceActive: true },
-        { selfCustodialDefaultWalletCurrency: "BTC" },
+        {
+          activeAccountId: "sc-id",
+          selfCustodialDefaultWalletCurrencyByAccountId: { "sc-id": "BTC" },
+        },
       )
 
       render(
@@ -529,7 +538,13 @@ describe("ReceiveScreen — self-custodial", () => {
     })
 
     it("USD Lightning → toggle to BTC reverts to PayCode when state is clean", async () => {
-      setupSelfCustodial({}, { selfCustodialDefaultWalletCurrency: "USD" })
+      setupSelfCustodial(
+        {},
+        {
+          activeAccountId: "sc-id",
+          selfCustodialDefaultWalletCurrencyByAccountId: { "sc-id": "USD" },
+        },
+      )
 
       render(
         <ContextForScreen>

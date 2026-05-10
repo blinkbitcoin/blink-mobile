@@ -1,4 +1,5 @@
 import { GALOY_INSTANCES, GaloyInstance, GaloyInstanceInput } from "@app/config"
+import { DefaultAccountId } from "@app/types/wallet.types"
 
 type PersistentState_3 = {
   schemaVersion: 3
@@ -77,8 +78,29 @@ type PersistentState_11 = {
 const migrate11ToCurrent = (state: PersistentState_11): Promise<PersistentState> =>
   Promise.resolve(state)
 
+const migrateLegacyDefaultCurrencyToActiveAccount = (
+  state: PersistentState_10,
+): PersistentState_10 => {
+  const { selfCustodialDefaultWalletCurrency: legacy, ...withoutLegacy } = state
+  if (!legacy) return state
+
+  const id = state.activeAccountId
+  if (!id || id === DefaultAccountId.Custodial) return withoutLegacy
+
+  const map = state.selfCustodialDefaultWalletCurrencyByAccountId
+  if (map && id in map) return withoutLegacy
+
+  return {
+    ...withoutLegacy,
+    selfCustodialDefaultWalletCurrencyByAccountId: { ...map, [id]: legacy },
+  }
+}
+
 const migrate10ToCurrent = (state: PersistentState_10): Promise<PersistentState> =>
-  migrate11ToCurrent({ ...state, schemaVersion: 11 })
+  migrate11ToCurrent({
+    ...migrateLegacyDefaultCurrencyToActiveAccount(state),
+    schemaVersion: 11,
+  })
 
 const migrate9ToCurrent = (state: PersistentState_9): Promise<PersistentState> =>
   migrate10ToCurrent({ ...state, schemaVersion: 10 })

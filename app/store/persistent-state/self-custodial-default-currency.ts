@@ -14,10 +14,8 @@ export const getSelfCustodialDefaultCurrency = (
   state: PersistentState,
 ): SelfCustodialDefaultCurrency => {
   const id = resolveActiveSelfCustodialId(state)
-  const fromMap = id
-    ? state.selfCustodialDefaultWalletCurrencyByAccountId?.[id]
-    : undefined
-  return fromMap ?? state.selfCustodialDefaultWalletCurrency ?? "BTC"
+  if (!id) return "BTC"
+  return state.selfCustodialDefaultWalletCurrencyByAccountId?.[id] ?? "BTC"
 }
 
 export const withSelfCustodialDefaultCurrency = (
