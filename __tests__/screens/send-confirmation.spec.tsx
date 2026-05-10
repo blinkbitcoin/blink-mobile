@@ -162,6 +162,17 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => useActiveWalletMock(),
 }))
 
+const navigationDispatchMock = jest.fn()
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => ({
+    dispatch: navigationDispatchMock,
+    navigate: jest.fn(),
+    goBack: jest.fn(),
+    setOptions: jest.fn(),
+  }),
+}))
+
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
   type Props = {
     onSwipe: () => void
@@ -414,6 +425,92 @@ describe("SendBitcoinConfirmationScreen", () => {
       paymentType: "lnurl",
       destination: merchantParams.lnurl,
       isMerchant: true,
+    })
+  })
+
+  describe("successAction precedence on completion-screen navigation", () => {
+    const findCompletedRouteParams = () => {
+      const reducerCalls = navigationDispatchMock.mock.calls
+        .map(([reducer]) => reducer)
+        .filter(
+          (reducer): reducer is (state: unknown) => unknown =>
+            typeof reducer === "function",
+        )
+      for (const reducer of reducerCalls) {
+        const action = reducer({ index: 0, routes: [] }) as {
+          payload?: { routes?: Array<{ name: string; params?: unknown }> }
+          routes?: Array<{ name: string; params?: unknown }>
+        }
+        const routes = action.payload?.routes ?? action.routes ?? []
+        const completed = routes.find((r) => r.name === "sendBitcoinCompleted")
+        if (completed) return completed.params as { successAction?: unknown }
+      }
+      throw new Error("sendBitcoinCompleted route was not dispatched")
+    }
+
+    it("forwards extraInfo.successAction to the completed screen when present", async () => {
+      const extraInfoSuccessAction = {
+        tag: "message",
+        message: "extra-info wins",
+        description: null,
+        url: null,
+        ciphertext: null,
+        iv: null,
+        decipher: () => null,
+      }
+      const { createLnurlPaymentDetails } = PaymentDetailsLightning
+      const paymentDetailLightning = createLnurlPaymentDetails(defaultLightningParams)
+      const routeLnurl = {
+        key: "sendBitcoinConfirmationScreen",
+        name: "sendBitcoinConfirmation",
+        params: { paymentDetail: paymentDetailLightning },
+      } as const
+
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "SUCCESS",
+        extraInfo: { preimage: "p", successAction: extraInfoSuccessAction },
+      })
+
+      render(
+        <ContextForScreen>
+          <LightningLnURL route={routeLnurl} />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      const params = findCompletedRouteParams()
+      expect(params.successAction).toEqual(extraInfoSuccessAction)
+    })
+
+    it("falls back to paymentDetail.successAction when extraInfo.successAction is undefined", async () => {
+      const { createLnurlPaymentDetails } = PaymentDetailsLightning
+      const paymentDetailLightning = createLnurlPaymentDetails(defaultLightningParams)
+      const routeLnurl = {
+        key: "sendBitcoinConfirmationScreen",
+        name: "sendBitcoinConfirmation",
+        params: { paymentDetail: paymentDetailLightning },
+      } as const
+
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "SUCCESS",
+        extraInfo: { preimage: "p" },
+      })
+
+      render(
+        <ContextForScreen>
+          <LightningLnURL route={routeLnurl} />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      const params = findCompletedRouteParams()
+      expect(params.successAction).toEqual(successActionMessageMock)
     })
   })
 })

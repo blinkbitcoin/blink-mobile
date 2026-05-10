@@ -108,6 +108,36 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }))
 
+const activeWalletWallets = [
+  {
+    id: "btc-wallet-id",
+    walletCurrency: "BTC",
+    balance: { currency: "BTC", currencyCode: "BTC", amount: 0 },
+  },
+]
+const useActiveWalletMock = jest.fn(() => ({
+  isSelfCustodial: false,
+  isReady: true,
+  needsBackendAuth: false,
+  wallets: activeWalletWallets,
+  status: "ready",
+  accountType: "Custodial",
+}))
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => useActiveWalletMock(),
+}))
+
+const useSelfCustodialWalletMock = jest.fn(() => ({ sdk: undefined }))
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () => useSelfCustodialWalletMock(),
+}))
+
+jest.mock("@app/self-custodial/payment-details/wrap-destination", () => ({
+  wrapDestination: jest.fn(
+    (result: ParseDestinationResult): ParseDestinationResult => result,
+  ),
+}))
+
 const sendBitcoinDestination = {
   name: "sendBitcoinDestination",
   key: "sendBitcoinDestination",
@@ -138,6 +168,15 @@ describe("SendBitcoinDestinationScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     LL = i18nObject("en")
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: false,
+      isReady: true,
+      needsBackendAuth: false,
+      wallets: activeWalletWallets,
+      status: "ready",
+      accountType: "Custodial",
+    })
+    useSelfCustodialWalletMock.mockReturnValue({ sdk: undefined })
     mockedDestinationData = {
       globals: { network: "mainnet" },
       me: {
@@ -926,5 +965,87 @@ describe("SendBitcoinDestinationScreen paste buttons", () => {
     await flushAsync()
 
     expect(screen.getByLabelText("telephoneNumber").props.value).toBeTruthy()
+  })
+
+  describe("lnurlDomains gate by active wallet type", () => {
+    beforeEach(() => {
+      // mockReturnValue overrides survive jest.clearAllMocks(); reset to default.
+      useActiveWalletMock.mockReturnValue({
+        isSelfCustodial: false,
+        isReady: true,
+        needsBackendAuth: false,
+        wallets: activeWalletWallets,
+        status: "ready",
+        accountType: "Custodial",
+      })
+      useSelfCustodialWalletMock.mockReturnValue({ sdk: undefined })
+    })
+
+    const triggerParseDestination = async () => {
+      jest.mocked(Clipboard.getString).mockResolvedValueOnce("alice@example.com")
+      const searchResponder = getResponderByLabel(LL.SendBitcoinScreen.placeholder())
+      const pasteButton = within(searchResponder).getByText(LL.common.paste())
+      fireEvent.press(pasteButton)
+      await flushAsync()
+      await flushAsync()
+    }
+
+    it("passes empty lnurlDomains when active wallet is self-custodial", async () => {
+      useActiveWalletMock.mockReturnValue({
+        isSelfCustodial: true,
+        isReady: true,
+        needsBackendAuth: false,
+        wallets: activeWalletWallets,
+        status: "ready",
+        accountType: "SelfCustodial",
+      })
+      parseDestinationMock.mockResolvedValue({
+        valid: false,
+        invalidReason: InvalidDestinationReason.UsernameDoesNotExist,
+        invalidPaymentDestination: {
+          valid: false,
+          paymentType: PaymentType.Intraledger,
+          invalidReason: InvalidIntraledgerReason.WrongDomain,
+          handle: "alice@example.com",
+        },
+      })
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+        </ContextForScreen>,
+      )
+      await triggerParseDestination()
+
+      expect(parseDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ lnurlDomains: [] }),
+      )
+    })
+
+    it("passes [lnAddressHostname, ...LNURL_DOMAINS] when active wallet is custodial", async () => {
+      parseDestinationMock.mockResolvedValue({
+        valid: false,
+        invalidReason: InvalidDestinationReason.UsernameDoesNotExist,
+        invalidPaymentDestination: {
+          valid: false,
+          paymentType: PaymentType.Intraledger,
+          invalidReason: InvalidIntraledgerReason.WrongDomain,
+          handle: "alice@example.com",
+        },
+      })
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+        </ContextForScreen>,
+      )
+      await triggerParseDestination()
+
+      expect(parseDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lnurlDomains: ["blink.sv", "blink.sv", "pay.blink.sv", "pay.bbw.sv"],
+        }),
+      )
+    })
   })
 })
