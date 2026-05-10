@@ -187,24 +187,38 @@ export const defaultPersistentState: PersistentState = {
   galoyAuthToken: "",
 }
 
-export const migrateAndGetPersistentState = async (
+export const MigrationStatus = {
+  Ok: "ok",
+  NoData: "no-data",
+  Failed: "failed",
+} as const
+
+export type MigrationStatus = (typeof MigrationStatus)[keyof typeof MigrationStatus]
+
+export type MigrationResult =
+  | { status: typeof MigrationStatus.Ok; state: PersistentState }
+  | { status: typeof MigrationStatus.NoData }
+  | { status: typeof MigrationStatus.Failed; error: Error; rawData: unknown }
+
+export const migratePersistentState = async (
   // TODO: pass the correct type.
   // this is especially important given this is migration code and it's hard to test manually
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
-): Promise<PersistentState> => {
-  if (Boolean(data) && data.schemaVersion in stateMigrations) {
-    const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 = data.schemaVersion
-    try {
-      const migration = stateMigrations[schemaVersion]
-      const persistentState = await migration(data)
-      if (persistentState) {
-        return persistentState
-      }
-    } catch (err) {
-      console.error({ err }, "error migrating persistent state")
+): Promise<MigrationResult> => {
+  if (!data || !(data.schemaVersion in stateMigrations)) {
+    return { status: MigrationStatus.NoData }
+  }
+  const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 = data.schemaVersion
+  try {
+    const migration = stateMigrations[schemaVersion]
+    const state = await migration(data)
+    return { status: MigrationStatus.Ok, state }
+  } catch (err) {
+    return {
+      status: MigrationStatus.Failed,
+      error: err instanceof Error ? err : new Error(String(err)),
+      rawData: data,
     }
   }
-
-  return defaultPersistentState
 }

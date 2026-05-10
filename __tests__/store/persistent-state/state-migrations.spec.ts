@@ -1,7 +1,17 @@
 import {
   defaultPersistentState,
-  migrateAndGetPersistentState,
+  migratePersistentState,
+  MigrationStatus,
+  type PersistentState,
 } from "@app/store/persistent-state/state-migrations"
+
+// Backwards-compat shim for the existing happy-path tests: prior signature
+// returned the migrated state directly, falling back to defaults. New API
+// returns a discriminated result; this shim mirrors the old getter.
+const migrateAndGetPersistentState = async (data: unknown): Promise<PersistentState> => {
+  const result = await migratePersistentState(data)
+  return result.status === MigrationStatus.Ok ? result.state : defaultPersistentState
+}
 
 describe("state-migrations schema 10", () => {
   it("migrates schema 6 to current with activeAccountId undefined", async () => {
@@ -262,5 +272,57 @@ describe("state-migrations schema 10", () => {
 
     expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrency).toBe("USD")
+  })
+
+  describe("migratePersistentState — discriminated result (Critical #3)", () => {
+    it("returns status='failed' with the thrown Error and the original rawData when a migration throws", async () => {
+      // Schema 3 with a galoyInstance.name not in GALOY_INSTANCES triggers
+      // migrate3ToCurrent's `throw new Error("Galoy instance not found")`.
+      const corruptedState3 = {
+        schemaVersion: 3,
+        hasShownStableSatsWelcome: false,
+        isUsdDisabled: false,
+        galoyInstance: { id: "Main", name: "DefinitelyNotARealInstance" },
+        galoyAuthToken: "token-v3",
+        isAnalyticsEnabled: true,
+      }
+
+      const result = await migratePersistentState(corruptedState3)
+
+      expect(result.status).toBe(MigrationStatus.Failed)
+      if (result.status === MigrationStatus.Failed) {
+        expect(result.error).toBeInstanceOf(Error)
+        expect(result.error.message).toContain("Galoy instance not found")
+        expect(result.rawData).toEqual(corruptedState3)
+      }
+    })
+
+    it("returns status='no-data' for an unknown schemaVersion (no error, no rawData payload)", async () => {
+      const result = await migratePersistentState({ schemaVersion: 999 })
+      expect(result).toEqual({ status: MigrationStatus.NoData })
+    })
+
+    it("returns status='no-data' for null input", async () => {
+      const result = await migratePersistentState(null)
+      expect(result).toEqual({ status: MigrationStatus.NoData })
+    })
+
+    it("wraps a non-Error rejection into an Error when a migration throws a primitive", async () => {
+      const state = {
+        schemaVersion: 3,
+        hasShownStableSatsWelcome: false,
+        isUsdDisabled: false,
+        galoyInstance: { id: "Main", name: "definitely-not-real" },
+        galoyAuthToken: "token",
+        isAnalyticsEnabled: false,
+      }
+
+      const result = await migratePersistentState(state)
+
+      expect(result.status).toBe(MigrationStatus.Failed)
+      if (result.status === MigrationStatus.Failed) {
+        expect(result.error).toBeInstanceOf(Error)
+      }
+    })
   })
 })
