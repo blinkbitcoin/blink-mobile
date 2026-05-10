@@ -16,10 +16,12 @@ const mockHandleCloudBackup = jest.fn()
 const mockHandleManualBackup = jest.fn()
 let mockKeychainLoading = false
 let mockIsCloudBackupAvailable = true
+let mockIsCredentialBackupAvailable = true
 
 jest.mock("@app/screens/spark-onboarding/hooks", () => ({
   useBackupMethods: () => ({
     isDriveBackupAvailable: mockIsCloudBackupAvailable,
+    isCredentialBackupAvailable: mockIsCredentialBackupAvailable,
     credentialLoading: mockKeychainLoading,
     handleCredentialBackup: mockHandleKeychainBackup,
     handleCloudBackup: mockHandleCloudBackup,
@@ -83,6 +85,7 @@ describe("SparkBackupMethodScreen", () => {
     jest.clearAllMocks()
     mockKeychainLoading = false
     mockIsCloudBackupAvailable = true
+    mockIsCredentialBackupAvailable = true
   })
 
   it("renders title and subtitle", () => {
@@ -148,6 +151,19 @@ describe("SparkBackupMethodScreen", () => {
     })
 
     expect(mockHandleKeychainBackup).toHaveBeenCalled()
+  })
+
+  it("hides the password manager button when credential backup is unavailable (Critical #2: iOS multi-account)", () => {
+    mockIsCredentialBackupAvailable = false
+
+    const { queryByText } = render(
+      <ContextForScreen>
+        <SparkBackupMethodScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText(LL.BackupScreen.BackupMethod.passwordManager())).toBeNull()
+    expect(queryByText(LL.BackupScreen.BackupMethod.manualBackup())).toBeTruthy()
   })
 
   it("disables cloud backup and shows coming soon text when unavailable", () => {

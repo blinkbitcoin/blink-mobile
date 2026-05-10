@@ -26,6 +26,13 @@ jest.mock("@app/hooks", () => ({
   }),
 }))
 
+const { isCredentialBackupAvailable: actualIsCredentialBackupAvailable } =
+  jest.requireActual("@app/hooks/use-credential-backup")
+jest.mock("@app/hooks/use-credential-backup", () => ({
+  isCredentialBackupAvailable: (count: number) =>
+    actualIsCredentialBackupAvailable(count),
+}))
+
 const mockToastShow = jest.fn()
 jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
@@ -70,6 +77,13 @@ jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
   }),
 }))
 
+let mockSelfCustodialEntries: Array<{ id: string; lightningAddress: string | null }> = []
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    selfCustodialEntries: mockSelfCustodialEntries,
+  }),
+}))
+
 describe("useBackupMethods", () => {
   const originalPlatform = Platform.OS
 
@@ -77,6 +91,7 @@ describe("useBackupMethods", () => {
     jest.clearAllMocks()
     mockLoading = false
     mockIdentityPubkey = "test-pubkey-1234"
+    mockSelfCustodialEntries = [{ id: "sc-1", lightningAddress: null }]
     Object.defineProperty(Platform, "OS", { configurable: true, value: originalPlatform })
   })
 
@@ -216,6 +231,51 @@ describe("useBackupMethods", () => {
       })
 
       expect(mockNavigate).toHaveBeenCalledWith("sparkBackupAlertsScreen")
+    })
+  })
+
+  describe("isCredentialBackupAvailable (Critical #2: iOS multi-account gate)", () => {
+    it("is true on Android regardless of how many SC accounts exist", () => {
+      Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
+      mockSelfCustodialEntries = [
+        { id: "sc-1", lightningAddress: null },
+        { id: "sc-2", lightningAddress: null },
+        { id: "sc-3", lightningAddress: null },
+      ]
+
+      const { result } = renderHook(() => useBackupMethods())
+
+      expect(result.current.isCredentialBackupAvailable).toBe(true)
+    })
+
+    it("is true on iOS when this is the only SC account in the registry", () => {
+      Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
+      mockSelfCustodialEntries = [{ id: "sc-1", lightningAddress: null }]
+
+      const { result } = renderHook(() => useBackupMethods())
+
+      expect(result.current.isCredentialBackupAvailable).toBe(true)
+    })
+
+    it("is true on iOS when the registry is empty (defensive — pre-add window)", () => {
+      Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
+      mockSelfCustodialEntries = []
+
+      const { result } = renderHook(() => useBackupMethods())
+
+      expect(result.current.isCredentialBackupAvailable).toBe(true)
+    })
+
+    it("is false on iOS when 2+ SC accounts exist (multi-account Keychain bug guard)", () => {
+      Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
+      mockSelfCustodialEntries = [
+        { id: "sc-1", lightningAddress: null },
+        { id: "sc-2", lightningAddress: null },
+      ]
+
+      const { result } = renderHook(() => useBackupMethods())
+
+      expect(result.current.isCredentialBackupAvailable).toBe(false)
     })
   })
 })

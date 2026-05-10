@@ -1,7 +1,11 @@
 import { act, renderHook } from "@testing-library/react-native"
 import { Platform } from "react-native"
 
-import { CredentialError, useCredentialBackup } from "@app/hooks/use-credential-backup"
+import {
+  CredentialError,
+  isCredentialBackupAvailable,
+  useCredentialBackup,
+} from "@app/hooks/use-credential-backup"
 
 const mockSignUpWithPassword = jest.fn()
 const mockSignIn = jest.fn()
@@ -408,5 +412,33 @@ describe("useCredentialBackup", () => {
       })
       expect(result.current.loading).toBe(false)
     })
+  })
+})
+
+describe("isCredentialBackupAvailable (Critical #2)", () => {
+  const originalPlatform = Platform.OS
+
+  afterAll(() => {
+    setPlatform(originalPlatform)
+  })
+
+  it("is true on Android regardless of count (Credential Manager handles multi-account)", () => {
+    setPlatform("android")
+    expect(isCredentialBackupAvailable(0)).toBe(true)
+    expect(isCredentialBackupAvailable(1)).toBe(true)
+    expect(isCredentialBackupAvailable(2)).toBe(true)
+    expect(isCredentialBackupAvailable(10)).toBe(true)
+  })
+
+  it("is true on iOS at the empty / single-account boundary", () => {
+    setPlatform("ios")
+    expect(isCredentialBackupAvailable(0)).toBe(true)
+    expect(isCredentialBackupAvailable(1)).toBe(true)
+  })
+
+  it("is false on iOS once a second account would write under the same domain", () => {
+    setPlatform("ios")
+    expect(isCredentialBackupAvailable(2)).toBe(false)
+    expect(isCredentialBackupAvailable(7)).toBe(false)
   })
 })
