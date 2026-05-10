@@ -274,14 +274,17 @@ export const useAutoConvertListener = (): void => {
       if (inFlightInvoicesRef.current.has(invoice)) return
       if (!isRetryableNow(record, Date.now())) return
 
-      const { claimedConversionIds, pairedReceiveIds } = await buildClaimedConversionIds()
-      if (pairedReceiveIds.has(lastReceivedPaymentId)) {
-        await removePendingAutoConvert(invoice)
-        return
-      }
-
+      // Reserve the invoice synchronously so the replay path can't race past
+      // the `has` check during the awaits below.
       inFlightInvoicesRef.current.add(invoice)
       try {
+        const { claimedConversionIds, pairedReceiveIds } =
+          await buildClaimedConversionIds()
+        if (pairedReceiveIds.has(lastReceivedPaymentId)) {
+          await removePendingAutoConvert(invoice)
+          return
+        }
+
         await runAutoConvert({
           sdk,
           record,
@@ -332,27 +335,29 @@ export const useAutoConvertListener = (): void => {
         if (inFlightInvoicesRef.current.has(record.paymentRequest)) return
         if (!isRetryableNow(record, nowMs)) return
 
-        const paid = await findPaidAmountForInvoice(sdk, record.paymentRequest)
-        // Bound the replay loop on busy wallets where the matching payment has
-        // aged off the recent listPayments page.
-        if (!paid) {
-          if (record.attempts + 1 >= autoConvertMaxAttempts) {
+        // Reserve the invoice synchronously so the live path can't race past
+        // the `has` check during the awaits below.
+        inFlightInvoicesRef.current.add(record.paymentRequest)
+        try {
+          const paid = await findPaidAmountForInvoice(sdk, record.paymentRequest)
+          // Bound the replay loop on busy wallets where the matching payment has
+          // aged off the recent listPayments page.
+          if (!paid) {
+            if (record.attempts + 1 >= autoConvertMaxAttempts) {
+              await removePendingAutoConvert(record.paymentRequest)
+              return
+            }
+            await recordAutoConvertAttempt(record.paymentRequest, nowMs)
+            return
+          }
+
+          const { claimedConversionIds, pairedReceiveIds } =
+            await buildClaimedConversionIds()
+          if (pairedReceiveIds.has(paid.paymentId)) {
             await removePendingAutoConvert(record.paymentRequest)
             return
           }
-          await recordAutoConvertAttempt(record.paymentRequest, nowMs)
-          return
-        }
 
-        const { claimedConversionIds, pairedReceiveIds } =
-          await buildClaimedConversionIds()
-        if (pairedReceiveIds.has(paid.paymentId)) {
-          await removePendingAutoConvert(record.paymentRequest)
-          return
-        }
-
-        inFlightInvoicesRef.current.add(record.paymentRequest)
-        try {
           await runAutoConvert({
             sdk,
             record,
