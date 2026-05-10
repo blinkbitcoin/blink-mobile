@@ -377,6 +377,102 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
   })
 
+  describe("idempotency key forwarding", () => {
+    let randomUUIDMock: jest.SpyInstance
+
+    beforeEach(() => {
+      let counter = 0
+      // Override the global mock so each call returns a fresh UUID; the global
+      // mock returns the same string and would mask a missing thread-through.
+      randomUUIDMock = jest
+        .spyOn(
+          jest.requireMock("react-native-quick-crypto").default as {
+            randomUUID: () => string
+          },
+          "randomUUID",
+        )
+        .mockImplementation(() => {
+          counter += 1
+          return `uuid-${counter}`
+        })
+    })
+
+    afterEach(() => {
+      randomUUIDMock.mockRestore()
+    })
+
+    it("forwards a defined idempotency key to executeLnurl on every send", async () => {
+      mockPrepareLnurl.mockResolvedValue({ feeSats: BigInt(0) })
+      mockExecuteLnurl.mockResolvedValue({
+        payment: { id: "p1" },
+        successAction: undefined,
+      })
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+
+      await detail.sendPaymentMutation({} as never)
+
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+      const idempotencyKey = mockExecuteLnurl.mock.calls[0][2]
+      expect(typeof idempotencyKey).toBe("string")
+      expect(idempotencyKey.length).toBeGreaterThan(0)
+    })
+
+    it("reuses the same idempotency key across retries within the same paymentDetail", async () => {
+      mockPrepareLnurl.mockResolvedValue({ feeSats: BigInt(0) })
+      mockExecuteLnurl.mockResolvedValue({
+        payment: { id: "p1" },
+        successAction: undefined,
+      })
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+
+      await detail.sendPaymentMutation({} as never)
+      await detail.sendPaymentMutation({} as never)
+
+      const firstKey = mockExecuteLnurl.mock.calls[0][2]
+      const secondKey = mockExecuteLnurl.mock.calls[1][2]
+      expect(firstKey).toBe(secondKey)
+    })
+
+    it("preserves the idempotency key across setMemo / setAmount / setSendingWalletDescriptor recreations", async () => {
+      mockPrepareLnurl.mockResolvedValue({ feeSats: BigInt(0) })
+      mockExecuteLnurl.mockResolvedValue({
+        payment: { id: "p1" },
+        successAction: undefined,
+      })
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      if (!detail.canSetAmount) throw new Error("expected canSetAmount")
+      if (!detail.canSetMemo) throw new Error("expected canSetMemo")
+      await detail.sendPaymentMutation({} as never)
+      const originalKey = mockExecuteLnurl.mock.calls[0][2]
+
+      const reMemoed = detail.setMemo("new memo")
+      if (!reMemoed.canSendPayment) throw new Error("expected canSendPayment")
+      await reMemoed.sendPaymentMutation({} as never)
+      expect(mockExecuteLnurl.mock.calls[1][2]).toBe(originalKey)
+
+      if (!reMemoed.canSetAmount) throw new Error("expected canSetAmount")
+      const reAmounted = reMemoed.setAmount({
+        amount: 2000,
+        currency: WalletCurrency.Btc,
+        currencyCode: WalletCurrency.Btc,
+      })
+      if (!reAmounted.canSendPayment) throw new Error("expected canSendPayment")
+      await reAmounted.sendPaymentMutation({} as never)
+      expect(mockExecuteLnurl.mock.calls[2][2]).toBe(originalKey)
+
+      const reWalleted = reAmounted.setSendingWalletDescriptor({
+        id: "w-btc-2",
+        currency: WalletCurrency.Btc,
+      })
+      if (!reWalleted.canSendPayment) throw new Error("expected canSendPayment")
+      await reWalleted.sendPaymentMutation({} as never)
+      expect(mockExecuteLnurl.mock.calls[3][2]).toBe(originalKey)
+    })
+  })
+
   describe("metadataStr preservation (LUD-06 description hash)", () => {
     it("uses the raw metadata string from lnurlParams.rawData when available", async () => {
       mockPrepareLnurl.mockResolvedValue({})

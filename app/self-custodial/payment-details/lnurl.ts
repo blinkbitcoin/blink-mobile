@@ -8,6 +8,7 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 import { LnUrlPayServiceResponse, LNURLPaySuccessAction } from "lnurl-pay"
+import Crypto from "react-native-quick-crypto"
 
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import {
@@ -128,6 +129,7 @@ type CreateSCLnurlParams<T extends WalletCurrency> = {
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   successAction?: LNURLPaySuccessAction
   isMerchant: boolean
+  idempotencyKey?: string
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>(
@@ -145,6 +147,9 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     successAction,
     isMerchant,
   } = params
+
+  const idempotencyKey = params.idempotencyKey ?? Crypto.randomUUID()
+  const paramsWithKey: CreateSCLnurlParams<T> = { ...params, idempotencyKey }
 
   const destinationSpecifiedAmount =
     lnurlParams.max === lnurlParams.min ? toBtcMoneyAmount(lnurlParams.max) : undefined
@@ -188,7 +193,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
         sendPaymentMutation: async () => {
           try {
             const prepared = await prepareLnurl(sdk, prepareOptions)
-            const result = await executeLnurl(sdk, prepared)
+            const result = await executeLnurl(sdk, prepared, idempotencyKey)
             return {
               status: PaymentSendResult.Success,
               extraInfo: {
@@ -214,32 +219,32 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     canSetMemo: true,
     setMemo: (newMemo) =>
       createSelfCustodialLnurlPaymentDetails({
-        ...params,
+        ...paramsWithKey,
         senderSpecifiedMemo: newMemo,
       }),
   }
 
   const setAmount: SetAmount<T> = (newAmount) =>
     createSelfCustodialLnurlPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       unitOfAccountAmount: newAmount,
     })
 
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
     createSelfCustodialLnurlPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       sendingWalletDescriptor: desc,
     })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
-    createSelfCustodialLnurlPaymentDetails({ ...params, convertMoneyAmount: fn })
+    createSelfCustodialLnurlPaymentDetails({ ...paramsWithKey, convertMoneyAmount: fn })
 
   const setInvoice: SetInvoice<T> = () =>
-    createSelfCustodialLnurlPaymentDetails({ ...params })
+    createSelfCustodialLnurlPaymentDetails({ ...paramsWithKey })
 
   const setSuccessAction: SetSuccessAction<T> = (newSuccessAction) =>
     createSelfCustodialLnurlPaymentDetails({
-      ...params,
+      ...paramsWithKey,
       successAction: newSuccessAction,
     })
 

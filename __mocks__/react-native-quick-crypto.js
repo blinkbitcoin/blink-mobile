@@ -15,6 +15,7 @@ module.exports = {
   __esModule: true,
   default: {
     randomBytes: jest.fn((size) => Buffer.alloc(size, 0xab)),
+    randomUUID: jest.fn(() => "00000000-0000-4000-8000-000000000000"),
     publicEncrypt: jest.fn().mockReturnValue(Buffer.from("rsa-encrypted-data")),
     createCipheriv: jest.fn().mockReturnValue(mockCipher),
     createDecipheriv: jest.fn().mockReturnValue(mockDecipher),
