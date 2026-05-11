@@ -32,7 +32,7 @@ import {
   type WaitForPaymentOptions,
 } from "../auto-convert"
 import { syncSelfCustodialWallet } from "../bridge"
-import { useAutoConvertStatusActions } from "../providers/auto-convert-status-provider"
+import { useAutoConvertStatusActions } from "../providers/auto-convert-status"
 import { useSelfCustodialWallet } from "../providers/wallet-provider"
 
 /**

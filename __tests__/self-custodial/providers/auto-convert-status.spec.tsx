@@ -6,7 +6,7 @@ import {
   AutoConvertStatusProvider,
   useAutoConvertStatus,
   useAutoConvertStatusActions,
-} from "@app/self-custodial/providers/auto-convert-status-provider"
+} from "@app/self-custodial/providers/auto-convert-status"
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <AutoConvertStatusProvider>{children}</AutoConvertStatusProvider>
