@@ -3553,6 +3553,9 @@
       "signInFailed": "Kunne ikke logge ind på Google",
       "existingBackupTitle": "Sikkerhedskopi fundet",
       "existingBackupMessage": "Der findes allerede en sikkerhedskopi i din {provider}. Vil du overskrive den?",
+      "existingBackupMessageWithDetails": "Der findes allerede en sikkerhedskopi på din {provider}.\n\nLightning-adresse: {address}\nOprettet: {createdAt}\n\nVil du overskrive den?",
+      "existingBackupUnknownAddress": "Ikke tilgængelig",
+      "existingBackupUnknownCreatedAt": "Ukendt",
       "overwrite": "Overskriv"
     }
   },

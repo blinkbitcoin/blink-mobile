@@ -3535,6 +3535,9 @@
       "signInFailed": "Bejelentkezés a Google-be sikertelen",
       "existingBackupTitle": "Biztonsági mentés találva",
       "existingBackupMessage": "Már létezik biztonsági mentés a {provider} tárhelyeden. Felül szeretnéd írni?",
+      "existingBackupMessageWithDetails": "A {provider} már tartalmaz biztonsági mentést.\n\nLightning cím: {address}\nLétrehozva: {createdAt}\n\nFelül szeretnéd írni?",
+      "existingBackupUnknownAddress": "Nem elérhető",
+      "existingBackupUnknownCreatedAt": "Ismeretlen",
       "overwrite": "Felülírás"
     }
   },

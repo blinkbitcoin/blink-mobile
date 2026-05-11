@@ -3573,6 +3573,9 @@
       "signInFailed": "ลงชื่อเข้าใช้ Google ไม่สำเร็จ",
       "existingBackupTitle": "พบข้อมูลสำรอง",
       "existingBackupMessage": "มีข้อมูลสำรองอยู่แล้วใน {provider} ของคุณ คุณต้องการเขียนทับหรือไม่?",
+      "existingBackupMessageWithDetails": "มีการสำรองข้อมูลอยู่แล้วใน {provider} ของคุณ\n\nที่อยู่ Lightning: {address}\nสร้างเมื่อ: {createdAt}\n\nคุณต้องการเขียนทับหรือไม่?",
+      "existingBackupUnknownAddress": "ไม่พร้อมใช้งาน",
+      "existingBackupUnknownCreatedAt": "ไม่ทราบ",
       "overwrite": "เขียนทับ"
     }
   },

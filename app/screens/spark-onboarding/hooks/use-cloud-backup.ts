@@ -9,15 +9,37 @@ import { useBackupState } from "@app/self-custodial/providers/backup-state-provi
 import { useAppConfig, useGoogleDriveBackup } from "@app/hooks"
 import { useWalletMnemonic } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { confirmDialog } from "@app/utils/confirm-dialog"
-import { buildBackupPayload } from "@app/utils/backup-payload"
+import {
+  buildBackupPayload,
+  type BackupMetadata,
+  parseBackupMetadata,
+} from "@app/utils/backup-payload"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
 import { getCloudProviderName } from "../utils"
 
 const DEFAULT_BACKUP_VERSION = 1
+
+const buildExistingBackupMessage = (
+  metadata: BackupMetadata | null,
+  provider: string,
+  LL: TranslationFunctions,
+): string => {
+  const t = LL.BackupScreen.CloudBackup
+  if (!metadata) return t.existingBackupMessage({ provider })
+
+  const address = metadata.lightningAddress ?? t.existingBackupUnknownAddress()
+  const createdAt =
+    metadata.createdAt > 0
+      ? new Date(metadata.createdAt).toLocaleString()
+      : t.existingBackupUnknownCreatedAt()
+
+  return t.existingBackupMessageWithDetails({ provider, address, createdAt })
+}
 
 type UseCloudBackupParams = {
   isEncrypted: boolean
@@ -33,7 +55,7 @@ export const useCloudBackup = ({
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { appConfig } = useAppConfig()
-  const { startSession, upload, loading } = useGoogleDriveBackup()
+  const { startSession, upload, downloadById, loading } = useGoogleDriveBackup()
   const mnemonic = useWalletMnemonic()
   const { identityPubkey, lightningAddress } = useSelfCustodialAccountInfo()
   const { setBackupCompleted } = useBackupState()
@@ -61,9 +83,17 @@ export const useCloudBackup = ({
     }
 
     if (session.existingFileId) {
+      const downloadResult = await downloadById(
+        session.existingFileId,
+        session.accessToken,
+      )
+      const metadata = downloadResult.success
+        ? parseBackupMetadata(downloadResult.content)
+        : null
+
       const confirmed = await confirmDialog({
         title: LL.BackupScreen.CloudBackup.existingBackupTitle(),
-        message: LL.BackupScreen.CloudBackup.existingBackupMessage({ provider }),
+        message: buildExistingBackupMessage(metadata, provider, LL),
         labels: {
           cancel: LL.common.cancel(),
           confirm: LL.BackupScreen.CloudBackup.overwrite(),
@@ -98,6 +128,7 @@ export const useCloudBackup = ({
     version,
     startSession,
     upload,
+    downloadById,
     navigation,
     LL,
     appConfig.galoyInstance.name,

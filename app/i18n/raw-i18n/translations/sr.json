@@ -3573,6 +3573,9 @@
       "signInFailed": "Пријава на Google није успела",
       "existingBackupTitle": "Резервна копија пронађена",
       "existingBackupMessage": "Резервна копија већ постоји у вашем {provider}. Желите ли да је препишете?",
+      "existingBackupMessageWithDetails": "Резервна копија већ постоји на вашем {provider}.\n\nLightning адреса: {address}\nКреирано: {createdAt}\n\nДа ли желите да је препишете?",
+      "existingBackupUnknownAddress": "Није доступно",
+      "existingBackupUnknownCreatedAt": "Непознато",
       "overwrite": "Препиши"
     }
   },

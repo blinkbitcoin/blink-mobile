@@ -3523,6 +3523,9 @@
             "signInFailed": "Error al iniciar sesión en Google",
             "existingBackupTitle": "Respaldo encontrado",
             "existingBackupMessage": "Ya existe un respaldo en tu {provider}. ¿Deseas sobrescribirlo?",
+            "existingBackupMessageWithDetails": "Ya existe un respaldo en tu {provider}.\n\nDirección Lightning: {address}\nCreado: {createdAt}\n\n¿Deseas sobrescribirlo?",
+            "existingBackupUnknownAddress": "No disponible",
+            "existingBackupUnknownCreatedAt": "Desconocido",
             "overwrite": "Sobrescribir"
         }
     },

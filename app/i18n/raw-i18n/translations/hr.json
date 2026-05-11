@@ -3576,6 +3576,9 @@
       "signInFailed": "Prijava na Google nije uspjela",
       "existingBackupTitle": "Sigurnosna kopija pronađena",
       "existingBackupMessage": "Sigurnosna kopija već postoji u vašem {provider}. Želite li je prebrisati?",
+      "existingBackupMessageWithDetails": "Sigurnosna kopija već postoji na vašem {provider}.\n\nLightning adresa: {address}\nIzrađeno: {createdAt}\n\nŽelite li ju prebrisati?",
+      "existingBackupUnknownAddress": "Nije dostupno",
+      "existingBackupUnknownCreatedAt": "Nepoznato",
       "overwrite": "Prebriši"
     }
   },

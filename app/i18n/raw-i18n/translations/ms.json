@@ -3576,6 +3576,9 @@
       "signInFailed": "Gagal log masuk ke Google",
       "existingBackupTitle": "Sandaran ditemui",
       "existingBackupMessage": "Sandaran sudah wujud di {provider} anda. Adakah anda mahu menimpanya?",
+      "existingBackupMessageWithDetails": "Sandaran sudah wujud pada {provider} anda.\n\nAlamat Lightning: {address}\nDicipta: {createdAt}\n\nAdakah anda mahu menulis ganti?",
+      "existingBackupUnknownAddress": "Tidak tersedia",
+      "existingBackupUnknownCreatedAt": "Tidak diketahui",
       "overwrite": "Tulis ganti"
     }
   },

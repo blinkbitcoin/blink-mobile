@@ -3576,6 +3576,9 @@
       "signInFailed": "Přihlášení ke Google se nezdařilo",
       "existingBackupTitle": "Záloha nalezena",
       "existingBackupMessage": "Ve vašem {provider} již existuje záloha. Chcete ji přepsat?",
+      "existingBackupMessageWithDetails": "Na vašem {provider} již existuje záloha.\n\nLightning adresa: {address}\nVytvořeno: {createdAt}\n\nChcete ji přepsat?",
+      "existingBackupUnknownAddress": "Není k dispozici",
+      "existingBackupUnknownCreatedAt": "Neznámé",
       "overwrite": "Přepsat"
     }
   },

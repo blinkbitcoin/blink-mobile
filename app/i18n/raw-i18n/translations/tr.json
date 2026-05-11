@@ -3535,6 +3535,9 @@
       "signInFailed": "Google'a giriş yapılamadı",
       "existingBackupTitle": "Yedek bulundu",
       "existingBackupMessage": "{provider} hesabınızda zaten bir yedek var. Üzerine yazmak ister misiniz?",
+      "existingBackupMessageWithDetails": "{provider} hesabınızda zaten bir yedek mevcut.\n\nLightning adresi: {address}\nOluşturuldu: {createdAt}\n\nÜzerine yazmak ister misiniz?",
+      "existingBackupUnknownAddress": "Mevcut değil",
+      "existingBackupUnknownCreatedAt": "Bilinmiyor",
       "overwrite": "Üzerine yaz"
     }
   },

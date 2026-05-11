@@ -11,12 +11,14 @@ jest.mock("@react-navigation/native", () => ({
 
 const mockStartSession = jest.fn()
 const mockUpload = jest.fn()
+const mockDownloadById = jest.fn()
 let mockLoading = false
 
 jest.mock("@app/hooks", () => ({
   useGoogleDriveBackup: () => ({
     startSession: mockStartSession,
     upload: mockUpload,
+    downloadById: mockDownloadById,
     loading: mockLoading,
   }),
   useAppConfig: () => ({
@@ -62,6 +64,7 @@ jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
 }))
 
 jest.mock("@app/utils/backup-payload", () => ({
+  ...jest.requireActual("@app/utils/backup-payload"),
   buildBackupPayload: jest.fn(
     (
       _mnemonic: string,
@@ -101,7 +104,20 @@ jest.mock("@app/i18n/i18n-react", () => ({
           uploadFailed: () => "Upload failed",
           signInFailed: () => "Sign in failed",
           existingBackupTitle: () => "Backup found",
-          existingBackupMessage: () => "Overwrite?",
+          existingBackupMessage: ({ provider }: { provider: string }) =>
+            `A backup exists in ${provider}. Overwrite?`,
+          existingBackupMessageWithDetails: ({
+            provider,
+            address,
+            createdAt,
+          }: {
+            provider: string
+            address: string
+            createdAt: string
+          }) =>
+            `Existing on ${provider} — Lightning address: ${address} / Created: ${createdAt}`,
+          existingBackupUnknownAddress: () => "Not available",
+          existingBackupUnknownCreatedAt: () => "Unknown",
           overwrite: () => "Overwrite",
         },
       },
@@ -119,6 +135,7 @@ describe("useCloudBackup", () => {
     mockIdentityPubkey = "test-pubkey-1234"
     mockLightningAddress = null
     mockStartSession.mockResolvedValue(noExistingFile)
+    mockDownloadById.mockResolvedValue({ success: false, reason: "not-found" })
   })
 
   it("uploads unencrypted backup and navigates to success", async () => {
@@ -249,6 +266,134 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       withExistingFile,
     )
+  })
+
+  it("shows lightning address and createdAt in the confirmation when metadata is available (Important #15)", async () => {
+    mockStartSession.mockResolvedValue(withExistingFile)
+    const createdAtMs = Date.UTC(2026, 4, 10, 18, 42, 0)
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: JSON.stringify({
+        version: 1,
+        walletIdentifier: "test-pubkey-1234",
+        lightningAddress: "alice@blink.sv",
+        createdAt: createdAtMs,
+        encrypted: false,
+        mnemonic: "youth indicate void",
+      }),
+    })
+    mockUpload.mockResolvedValue({ success: true })
+    mockConfirmDialog.mockResolvedValue(true)
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockDownloadById).toHaveBeenCalledWith("file-123", "token")
+    expect(mockConfirmDialog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("alice@blink.sv"),
+      }),
+    )
+    expect(mockConfirmDialog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("Lightning address"),
+      }),
+    )
+  })
+
+  it("falls back to the generic confirmation message when metadata download fails (Important #15)", async () => {
+    mockStartSession.mockResolvedValue(withExistingFile)
+    mockDownloadById.mockResolvedValue({ success: false, reason: "transient" })
+    mockConfirmDialog.mockResolvedValue(false)
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockDownloadById).toHaveBeenCalledTimes(1)
+    expect(mockConfirmDialog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "A backup exists in Apple iCloud. Overwrite?",
+      }),
+    )
+  })
+
+  it("falls back to the generic message when the existing file payload cannot be parsed (Important #15)", async () => {
+    mockStartSession.mockResolvedValue(withExistingFile)
+    mockDownloadById.mockResolvedValue({ success: true, content: "not-json" })
+    mockConfirmDialog.mockResolvedValue(false)
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockConfirmDialog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "A backup exists in Apple iCloud. Overwrite?",
+      }),
+    )
+  })
+
+  it("uses placeholders when lightningAddress is missing and createdAt is zero (Important #15)", async () => {
+    mockStartSession.mockResolvedValue(withExistingFile)
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: JSON.stringify({
+        version: 1,
+        walletIdentifier: "test-pubkey-1234",
+        createdAt: 0,
+        encrypted: false,
+        mnemonic: "youth indicate void",
+      }),
+    })
+    mockConfirmDialog.mockResolvedValue(false)
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockConfirmDialog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("Not available"),
+      }),
+    )
+    expect(mockConfirmDialog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("Unknown"),
+      }),
+    )
+  })
+
+  it("does not fetch the existing backup when there is nothing to overwrite (Important #15)", async () => {
+    mockUpload.mockResolvedValue({ success: true })
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockDownloadById).not.toHaveBeenCalled()
+    expect(mockConfirmDialog).not.toHaveBeenCalled()
   })
 
   it("does not upload when user cancels overwrite", async () => {

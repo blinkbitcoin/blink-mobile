@@ -11606,6 +11606,26 @@ type RootTranslation = {
 			 */
 			existingBackupMessage: RequiredParams<'provider'>
 			/**
+			 * A​ ​b​a​c​k​u​p​ ​a​l​r​e​a​d​y​ ​e​x​i​s​t​s​ ​i​n​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.​
+		​
+		​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​:​ ​{​a​d​d​r​e​s​s​}​
+		​C​r​e​a​t​e​d​:​ ​{​c​r​e​a​t​e​d​A​t​}​
+		​
+		​D​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​o​v​e​r​w​r​i​t​e​ ​i​t​?
+			 * @param {string} address
+			 * @param {string} createdAt
+			 * @param {string} provider
+			 */
+			existingBackupMessageWithDetails: RequiredParams<'address' | 'createdAt' | 'provider'>
+			/**
+			 * N​o​t​ ​a​v​a​i​l​a​b​l​e
+			 */
+			existingBackupUnknownAddress: string
+			/**
+			 * U​n​k​n​o​w​n
+			 */
+			existingBackupUnknownCreatedAt: string
+			/**
 			 * O​v​e​r​w​r​i​t​e
 			 */
 			overwrite: string
@@ -23731,6 +23751,23 @@ export type TranslationFunctions = {
 			 * A backup already exists in your {provider}. Do you want to overwrite it?
 			 */
 			existingBackupMessage: (arg: { provider: string }) => LocalizedString
+			/**
+			 * A backup already exists in your {provider}.
+	
+		Lightning address: {address}
+		Created: {createdAt}
+	
+		Do you want to overwrite it?
+			 */
+			existingBackupMessageWithDetails: (arg: { address: string, createdAt: string, provider: string }) => LocalizedString
+			/**
+			 * Not available
+			 */
+			existingBackupUnknownAddress: () => LocalizedString
+			/**
+			 * Unknown
+			 */
+			existingBackupUnknownCreatedAt: () => LocalizedString
 			/**
 			 * Overwrite
 			 */

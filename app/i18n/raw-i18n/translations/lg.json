@@ -3535,6 +3535,9 @@
       "signInFailed": "Okuyingira mu Google tekwagenda bulungi",
       "existingBackupTitle": "Kopi efuniddwa",
       "existingBackupMessage": "Waliwo kopi mu {provider} yo. Oyagala okugisimbulira?",
+      "existingBackupMessageWithDetails": "Waliwo ekkopi ku {provider} yo.\n\nEndagiriro ya Lightning: {address}\nEkoleddwa: {createdAt}\n\nOyagala kugiwandiikako?",
+      "existingBackupUnknownAddress": "Tekiriiwo",
+      "existingBackupUnknownCreatedAt": "Tekimanyiddwa",
       "overwrite": "Simbulira"
     }
   },

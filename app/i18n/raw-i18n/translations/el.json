@@ -3535,6 +3535,9 @@
       "signInFailed": "Αποτυχία σύνδεσης στο Google",
       "existingBackupTitle": "Βρέθηκε αντίγραφο ασφαλείας",
       "existingBackupMessage": "Υπάρχει ήδη αντίγραφο ασφαλείας στο {provider} σας. Θέλετε να το αντικαταστήσετε;",
+      "existingBackupMessageWithDetails": "Υπάρχει ήδη ένα αντίγραφο ασφαλείας στο {provider} σας.\n\nΔιεύθυνση Lightning: {address}\nΔημιουργήθηκε: {createdAt}\n\nΘέλετε να το αντικαταστήσετε;",
+      "existingBackupUnknownAddress": "Μη διαθέσιμο",
+      "existingBackupUnknownCreatedAt": "Άγνωστο",
       "overwrite": "Αντικατάσταση"
     }
   },

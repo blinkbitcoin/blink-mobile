@@ -3573,6 +3573,9 @@
       "signInFailed": "Google nisqaman yaykuy mana atikurqanchu",
       "existingBackupTitle": "Waqaychay tarikusqa",
       "existingBackupMessage": "{provider} nisqaykipi huknin waqaychay kachkanña. Qawariyta munankichu?",
+      "existingBackupMessageWithDetails": "{provider}-pi waqaychay kashanña.\n\nLightning kaynin: {address}\nKamarisqa: {createdAt}\n\nMusuqmanta qillqaytachu munanki?",
+      "existingBackupUnknownAddress": "Mana kanchu",
+      "existingBackupUnknownCreatedAt": "Mana yachakuq",
       "overwrite": "Hawamanta qillqay"
     }
   },

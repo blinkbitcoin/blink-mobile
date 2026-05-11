@@ -3535,6 +3535,9 @@
       "signInFailed": "Conectarea la Google a eșuat",
       "existingBackupTitle": "Copie de siguranță găsită",
       "existingBackupMessage": "Există deja o copie de siguranță în {provider} tău. Vrei să o suprascrii?",
+      "existingBackupMessageWithDetails": "Există deja o copie de rezervă pe {provider}.\n\nAdresă Lightning: {address}\nCreată: {createdAt}\n\nDoriți să o suprascrieți?",
+      "existingBackupUnknownAddress": "Nu este disponibil",
+      "existingBackupUnknownCreatedAt": "Necunoscut",
       "overwrite": "Suprascrie"
     }
   },

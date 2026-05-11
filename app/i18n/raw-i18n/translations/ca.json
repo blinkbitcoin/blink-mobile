@@ -3535,6 +3535,9 @@
       "signInFailed": "Error en iniciar sessió a Google",
       "existingBackupTitle": "Còpia de seguretat trobada",
       "existingBackupMessage": "Ja existeix una còpia de seguretat al teu {provider}. Vols sobreescriure-la?",
+      "existingBackupMessageWithDetails": "Ja existeix una còpia de seguretat al teu {provider}.\n\nAdreça Lightning: {address}\nCreada: {createdAt}\n\nVols sobreescriure-la?",
+      "existingBackupUnknownAddress": "No disponible",
+      "existingBackupUnknownCreatedAt": "Desconegut",
       "overwrite": "Sobreescriure"
     }
   },

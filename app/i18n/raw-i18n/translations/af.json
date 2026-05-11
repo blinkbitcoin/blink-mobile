@@ -3576,6 +3576,9 @@
       "signInFailed": "Kon nie by Google aanmeld nie",
       "existingBackupTitle": "Rugsteun gevind",
       "existingBackupMessage": "'n Rugsteun bestaan reeds in jou {provider}. Wil jy dit oorskryf?",
+      "existingBackupMessageWithDetails": "Daar bestaan reeds 'n rugsteun op jou {provider}.\n\nLightning-adres: {address}\nGeskep: {createdAt}\n\nWil jy dit oorskryf?",
+      "existingBackupUnknownAddress": "Nie beskikbaar nie",
+      "existingBackupUnknownCreatedAt": "Onbekend",
       "overwrite": "Oorskryf"
     }
   },
