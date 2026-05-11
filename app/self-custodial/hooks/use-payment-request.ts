@@ -27,10 +27,7 @@ import {
   ReceiveAssetMode,
 } from "../auto-convert"
 import { createReceiveLightning, createReceiveOnchain } from "../bridge"
-import {
-  AutoConvertStatus,
-  useAutoConvertStatus,
-} from "../providers/auto-convert-status-provider"
+import { AutoConvertStatus, useAutoConvertStatus } from "../providers/auto-convert-status"
 import { useSelfCustodialWallet } from "../providers/wallet-provider"
 
 import { useReceiveAssetMode } from "./use-receive-asset-mode"
