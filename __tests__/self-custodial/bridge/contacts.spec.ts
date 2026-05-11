@@ -1,3 +1,8 @@
+const mockRecordError = jest.fn()
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: (...args: unknown[]) => mockRecordError(...args),
+}))
+
 import {
   deleteContact,
   findOrCreateContact,
@@ -125,6 +130,98 @@ describe("findOrCreateContact", () => {
 
     expect(sdk.addContact).toHaveBeenCalledTimes(1)
     expect(result.status).toBe(FindOrCreateContactStatus.Created)
+  })
+
+  it("paginates beyond the first 100 contacts to find a match past the page boundary (Important #13)", async () => {
+    const sdk = createMockSdk()
+    const firstPage = Array.from({ length: 100 }, (_, i) => ({
+      id: `c${i}`,
+      name: `Contact ${i}`,
+      paymentIdentifier: `contact${i}@blink.sv`,
+    }))
+    const matchOnSecondPage = {
+      id: "c150",
+      name: "Alice",
+      paymentIdentifier: "alice@blink.sv",
+    }
+    sdk.listContacts
+      .mockResolvedValueOnce(firstPage)
+      .mockResolvedValueOnce([matchOnSecondPage])
+
+    const result = await findOrCreateContact(sdk as never, "alice@blink.sv", "Alice")
+
+    expect(sdk.listContacts).toHaveBeenCalledWith({ offset: 0, limit: 100 })
+    expect(sdk.listContacts).toHaveBeenCalledWith({ offset: 100, limit: 100 })
+    expect(sdk.addContact).not.toHaveBeenCalled()
+    expect(result).toEqual({
+      status: FindOrCreateContactStatus.Deduped,
+      existing: matchOnSecondPage,
+    })
+  })
+
+  it("stops paginating once a page returns fewer than 100 entries (Important #13)", async () => {
+    const sdk = createMockSdk()
+    const firstPage = Array.from({ length: 100 }, (_, i) => ({
+      id: `c${i}`,
+      name: `Contact ${i}`,
+      paymentIdentifier: `contact${i}@blink.sv`,
+    }))
+    const partialSecondPage = Array.from({ length: 30 }, (_, i) => ({
+      id: `c${100 + i}`,
+      name: `Contact ${100 + i}`,
+      paymentIdentifier: `contact${100 + i}@blink.sv`,
+    }))
+    sdk.listContacts
+      .mockResolvedValueOnce(firstPage)
+      .mockResolvedValueOnce(partialSecondPage)
+
+    await findOrCreateContact(sdk as never, "alice@blink.sv", "Alice")
+
+    expect(sdk.listContacts).toHaveBeenCalledTimes(2)
+    expect(sdk.addContact).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not page past the first call when the first page is short (Important #13)", async () => {
+    const sdk = createMockSdk()
+    sdk.listContacts.mockResolvedValueOnce([
+      { id: "c1", name: "Bob", paymentIdentifier: "bob@blink.sv" },
+    ])
+
+    await findOrCreateContact(sdk as never, "alice@blink.sv", "Alice")
+
+    expect(sdk.listContacts).toHaveBeenCalledTimes(1)
+  })
+
+  it("caps the pagination at 100 pages so a pathological list cannot loop forever (Important #13)", async () => {
+    const sdk = createMockSdk()
+    const fullPage = Array.from({ length: 100 }, (_, i) => ({
+      id: `c${i}`,
+      name: `Contact ${i}`,
+      paymentIdentifier: `contact${i}@blink.sv`,
+    }))
+    sdk.listContacts.mockResolvedValue(fullPage)
+
+    await findOrCreateContact(sdk as never, "alice@blink.sv", "Alice")
+
+    expect(sdk.listContacts).toHaveBeenCalledTimes(100)
+  })
+
+  it("reports to crashlytics when the page cap is reached so SDK pagination bugs are observable (Important #13)", async () => {
+    const sdk = createMockSdk()
+    const fullPage = Array.from({ length: 100 }, (_, i) => ({
+      id: `c${i}`,
+      name: `Contact ${i}`,
+      paymentIdentifier: `contact${i}@blink.sv`,
+    }))
+    sdk.listContacts.mockResolvedValue(fullPage)
+
+    await findOrCreateContact(sdk as never, "alice@blink.sv", "Alice")
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("safety cap"),
+      }),
+    )
   })
 })
 
