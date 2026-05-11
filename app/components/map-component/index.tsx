@@ -6,7 +6,11 @@ import { PermissionStatus, RESULTS, request } from "react-native-permissions"
 
 import { useApolloClient } from "@apollo/client"
 import { updateMapLastCoords } from "@app/graphql/client-only-query"
-import { BusinessMapMarkersQuery, MapMarker } from "@app/graphql/generated"
+import {
+  MerchantMapMarker,
+  getMarkerKey,
+  isBtcMapMarker,
+} from "@app/screens/map-screen/btc-map"
 import { LOCATION_PERMISSION, getUserRegion } from "@app/screens/map-screen/functions"
 import { isIOS } from "@rn-vui/base"
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -17,15 +21,16 @@ import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
 
 type Props = {
-  data?: BusinessMapMarkersQuery
+  data?: readonly MerchantMapMarker[]
   userLocation?: Region
   permissionsStatus?: PermissionStatus
   setPermissionsStatus: (_: PermissionStatus) => void
   handleMapPress: () => void
-  handleMarkerPress: (_: MapMarker) => void
-  focusedMarker: MapMarker | null
+  handleMarkerPress: (_: MerchantMapMarker, _ref?: MapMarkerType) => void
+  focusedMarker: MerchantMapMarker | null
   focusedMarkerRef: React.MutableRefObject<MapMarkerType | null>
-  handleCalloutPress: (_: MapMarker) => void
+  handleCalloutPress: (_: MerchantMapMarker) => void
+  handleRegionChangeComplete: (_: Region) => void
   alertOnLocationError: () => void
 }
 
@@ -39,6 +44,7 @@ export default function MapComponent({
   focusedMarker,
   focusedMarkerRef,
   handleCalloutPress,
+  handleRegionChangeComplete,
   alertOnLocationError,
 }: Props) {
   const {
@@ -119,6 +125,7 @@ export default function MapComponent({
         customMapStyle={themeMode === "dark" ? MapStyles.dark : MapStyles.light}
         onPress={handleMapPress}
         onRegionChange={debouncedHandleRegionChange}
+        onRegionChangeComplete={handleRegionChangeComplete}
         onMarkerSelect={(e) => {
           // react-native-maps has a very annoying error on iOS
           // When two markers are almost on top of each other onSelect will get called for a nearby Marker
@@ -136,14 +143,16 @@ export default function MapComponent({
           }
         }}
       >
-        {(data?.businessMapMarkers ?? []).map((item: MapMarker) => (
+        {(data ?? []).map((item) => (
           <MapMarkerComponent
-            key={item.username}
+            key={getMarkerKey(item)}
             item={item}
-            color={colors._orange}
+            color={isBtcMapMarker(item) ? colors._green : colors._orange}
             handleCalloutPress={handleCalloutPress}
             handleMarkerPress={handleMarkerPress}
-            isFocused={focusedMarker?.username === item.username}
+            isFocused={
+              focusedMarker ? getMarkerKey(focusedMarker) === getMarkerKey(item) : false
+            }
           />
         ))}
       </MapView>

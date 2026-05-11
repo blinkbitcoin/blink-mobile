@@ -7,8 +7,8 @@ import {
   Marker,
 } from "react-native-maps"
 
-import { MapMarker } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { MerchantMapMarker, isBtcMapMarker } from "@app/screens/map-screen/btc-map"
 import { isIos } from "@app/utils/helper"
 import { Text, makeStyles } from "@rn-vui/themed"
 
@@ -19,10 +19,10 @@ import { Text, makeStyles } from "@rn-vui/themed"
 */
 
 type Props = {
-  item: MapMarker
+  item: MerchantMapMarker
   color: string
-  handleMarkerPress: (_item: MapMarker, _ref?: MapMarkerType) => void
-  handleCalloutPress: (item: MapMarker) => void
+  handleMarkerPress: (_item: MerchantMapMarker, _ref?: MapMarkerType) => void
+  handleCalloutPress: (item: MerchantMapMarker) => void
   isFocused: boolean
 }
 
@@ -36,6 +36,7 @@ export default function MapMarkerComponent({
   const ref = useRef<MapMarkerType>(null)
   const { LL } = useI18nContext()
   const styles = useStyles()
+  const actionText = isBtcMapMarker(item) ? "Open in BTC Map" : LL.MapScreen.payBusiness()
 
   useEffect(() => {
     if (isFocused && ref.current) {
@@ -45,7 +46,7 @@ export default function MapMarkerComponent({
 
   return (
     <Marker
-      id={item.username}
+      id={isBtcMapMarker(item) ? item.id : item.username}
       ref={ref}
       coordinate={item.mapInfo.coordinates}
       pinColor={color}
@@ -61,15 +62,20 @@ export default function MapMarkerComponent({
               <Text type="h1" style={styles.title} numberOfLines={2} ellipsizeMode="tail">
                 {item.mapInfo.title}
               </Text>
+              {isBtcMapMarker(item) && item.address && (
+                <Text style={styles.subtitle} numberOfLines={2} ellipsizeMode="tail">
+                  {item.address}
+                </Text>
+              )}
               {isIos ? (
                 <CalloutSubview onPress={() => handleCalloutPress(item)}>
                   <View style={styles.pseudoButton}>
-                    <Text style={styles.text}>{LL.MapScreen.payBusiness()}</Text>
+                    <Text style={styles.text}>{actionText}</Text>
                   </View>
                 </CalloutSubview>
               ) : (
                 <View style={styles.pseudoButton}>
-                  <Text style={styles.text}>{LL.MapScreen.payBusiness()}</Text>
+                  <Text style={styles.text}>{actionText}</Text>
                 </View>
               )}
             </View>
@@ -110,6 +116,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 
   title: { color: colors.black, textAlign: "center" },
+
+  subtitle: {
+    color: colors.grey2,
+    fontSize: 14,
+    lineHeight: 18,
+    textAlign: "center",
+  },
 
   text: {
     fontSize: 20,
