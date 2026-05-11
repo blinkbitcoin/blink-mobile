@@ -120,6 +120,48 @@ describe("useEffectiveDisplayCurrency", () => {
 
       expect(mockUpdateState).not.toHaveBeenCalled()
     })
+
+    it("uses cache-first fetchPolicy when authed (Important #5)", () => {
+      renderHook(() => useEffectiveDisplayCurrency())
+
+      expect(mockUseDisplayCurrencyQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: false, fetchPolicy: "cache-first" }),
+      )
+    })
+  })
+
+  describe("logged-out custodial path (Important #5)", () => {
+    beforeEach(() => {
+      mockUseIsAuthed.mockReturnValue(false)
+      mockUseAccountRegistry.mockReturnValue({
+        activeAccount: { type: AccountType.Custodial },
+      })
+    })
+
+    it("does NOT skip the query — reads the cached preference instead of falling to USD", () => {
+      renderHook(() => useEffectiveDisplayCurrency())
+
+      expect(mockUseDisplayCurrencyQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: false, fetchPolicy: "cache-only" }),
+      )
+    })
+
+    it("returns the cached preference when Apollo has it on disk after logout", () => {
+      mockUseDisplayCurrencyQuery.mockReturnValue({
+        data: { me: { defaultAccount: { displayCurrency: "EUR" } } },
+        loading: false,
+      })
+
+      const { result } = renderHook(() => useEffectiveDisplayCurrency())
+
+      expect(result.current.displayCurrency).toBe("EUR")
+    })
+
+    it("falls back to USD only when the Apollo cache is empty", () => {
+      const { result } = renderHook(() => useEffectiveDisplayCurrency())
+
+      expect(result.current.displayCurrency).toBe("USD")
+    })
   })
 
   describe("self-custodial path", () => {
