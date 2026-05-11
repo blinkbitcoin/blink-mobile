@@ -16,6 +16,15 @@ const mockReinitSdk = jest.fn()
 const mockMarkBackupCompletedFor = jest.fn()
 const mockReloadSelfCustodialAccounts = jest.fn()
 const mockFindSelfCustodialAccountByMnemonic = jest.fn()
+const mockValidateMnemonic = jest.fn().mockReturnValue(true)
+
+jest.mock("bip39", () => ({
+  validateMnemonic: (...args: string[]) => mockValidateMnemonic(...args),
+}))
+
+jest.mock("@app/utils/mnemonic", () => ({
+  normalizeMnemonic: (m: string) => m.trim().toLowerCase().replace(/\s+/g, " "),
+}))
 
 jest.mock("react-native-quick-crypto", () => ({
   randomUUID: () => "test-account-id-123",
@@ -69,6 +78,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       RestoreScreen: {
         restoreSuccess: () => "Restored",
         restoreFailed: () => "Failed",
+        invalidMnemonic: () => "Invalid recovery phrase",
       },
     },
   }),
@@ -80,6 +90,7 @@ describe("useRestoreWallet", () => {
     mockRestore.mockResolvedValue(undefined)
     mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
     mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({ status: "ok", id: null })
+    mockValidateMnemonic.mockReturnValue(true)
   })
 
   it("starts with idle status", () => {
@@ -142,6 +153,46 @@ describe("useRestoreWallet", () => {
     expect(result.current.status).toBe(RestoreWalletStatus.Error)
     expect(mockRecordError).toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalled()
+  })
+
+  it("shows the invalid-mnemonic toast (NOT generic restoreFailed) when validation fails (Important #10)", async () => {
+    mockValidateMnemonic.mockReturnValue(false)
+
+    const { result } = renderHook(() => useRestoreWallet())
+
+    await act(async () => {
+      await result.current.restore("not a real bip39 phrase")
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Invalid recovery phrase" }),
+    )
+    expect(result.current.status).toBe(RestoreWalletStatus.Error)
+    expect(mockRestore).not.toHaveBeenCalled()
+    expect(mockFindSelfCustodialAccountByMnemonic).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("does NOT report invalid-mnemonic to crashlytics — it's a user input error (Important #10)", async () => {
+    mockValidateMnemonic.mockReturnValue(false)
+
+    const { result } = renderHook(() => useRestoreWallet())
+
+    await act(async () => {
+      await result.current.restore("not a real bip39 phrase")
+    })
+
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("normalizes the mnemonic before validation so leading whitespace doesn't trip the check (Important #10)", async () => {
+    const { result } = renderHook(() => useRestoreWallet())
+
+    await act(async () => {
+      await result.current.restore("  WORD1   WORD2 word3  ")
+    })
+
+    expect(mockValidateMnemonic).toHaveBeenCalledWith("word1 word2 word3")
   })
 
   it("sets error status and reports on failure", async () => {

@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react"
+import { validateMnemonic } from "bip39"
 import Crypto from "react-native-quick-crypto"
 
 import { useNavigation } from "@react-navigation/native"
@@ -21,6 +22,7 @@ import {
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { logSelfCustodialRestoreCompleted } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
+import { normalizeMnemonic } from "@app/utils/mnemonic"
 import { toastShow } from "@app/utils/toast"
 
 const RestoreWalletStatus = {
@@ -54,8 +56,16 @@ export const useRestoreWallet = () => {
     async (mnemonic: string) => {
       await guard.run(async () => {
         setStatus(RestoreWalletStatus.Restoring)
+
+        const normalized = normalizeMnemonic(mnemonic)
+        if (!validateMnemonic(normalized)) {
+          setStatus(RestoreWalletStatus.Error)
+          toastShow({ message: LL.RestoreScreen.invalidMnemonic(), LL })
+          return
+        }
+
         try {
-          const lookup = await findSelfCustodialAccountByMnemonic(mnemonic)
+          const lookup = await findSelfCustodialAccountByMnemonic(normalized)
           if (lookup.status === StorageReadStatus.ReadFailed) throw lookup.error
 
           if (lookup.id) {
@@ -66,7 +76,7 @@ export const useRestoreWallet = () => {
           }
 
           const accountId = Crypto.randomUUID()
-          await selfCustodialRestoreWallet(accountId, mnemonic)
+          await selfCustodialRestoreWallet(accountId, normalized)
           await markBackupCompletedFor(accountId, BackupMethod.Manual)
           await reloadSelfCustodialAccounts()
 
