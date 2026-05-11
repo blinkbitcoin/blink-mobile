@@ -29,7 +29,8 @@ export const useEffectiveDisplayCurrency = (): EffectiveDisplayCurrencyReturn =>
   const { persistentState, updateState } = usePersistentStateContext()
 
   const { data, loading: queryLoading } = useDisplayCurrencyQuery({
-    skip: !isAuthed || isSelfCustodial,
+    skip: isSelfCustodial,
+    fetchPolicy: isAuthed ? "cache-first" : "cache-only",
   })
   const [updateDisplayCurrencyMutation, { loading: mutationLoading }] =
     useAccountUpdateDisplayCurrencyMutation()
