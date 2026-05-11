@@ -26,6 +26,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { getAppCheckToken } from "@app/screens/get-started-screen/use-device-token"
 import { getLanguageFromString, getLocaleFromLanguage } from "@app/utils/locale-detector"
 
+import { useApolloRebuildLifecycle } from "./use-apollo-rebuild-lifecycle"
 import { useEffectiveAuthToken } from "./use-effective-auth-token"
 import { ensureLocaleLoaded } from "@app/i18n/lazy-locale-loader"
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -89,6 +90,8 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
     client: ApolloClient<NormalizedCacheObject>
     isAuthed: boolean
   }>()
+
+  const { registerActiveClient } = useApolloRebuildLifecycle(effectiveToken)
 
   useEffect(() => {
     ;(async () => {
@@ -307,6 +310,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         client.onClearStore(persistor.purge)
       }
 
+      registerActiveClient(client)
       setApolloClient({
         client,
         isAuthed: Boolean(token),
@@ -315,7 +319,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
 
       return () => client.cache.reset()
     })()
-  }, [effectiveToken, appConfig.galoyInstance, clearNetworkError])
+  }, [effectiveToken, appConfig.galoyInstance, clearNetworkError, registerActiveClient])
 
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background
