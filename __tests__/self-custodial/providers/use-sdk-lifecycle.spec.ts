@@ -75,9 +75,11 @@ jest.mock("@app/self-custodial/config", () => ({
   storageDirFor: (id: string) => `/tmp/${id}`,
 }))
 
+const mockRecordError = jest.fn()
+const mockCrashlyticsLog = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
-  recordError: jest.fn(),
-  log: jest.fn(),
+  recordError: (...args: unknown[]) => mockRecordError(...args),
+  log: (...args: unknown[]) => mockCrashlyticsLog(...args),
 }))
 
 type SdkEventListener = (event: { tag: string; inner?: unknown }) => Promise<void>
@@ -206,6 +208,56 @@ describe("useSdkLifecycle", () => {
       })
 
       expect(result.current.lastReceivedPaymentId).toBe("p1")
+    })
+  })
+
+  describe("post-connect sync rejection (Important #9)", () => {
+    it("records the rejection as a non-fatal crashlytics error instead of a buried breadcrumb", async () => {
+      const syncError = new Error("network down")
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+      mockSyncSelfCustodialWallet.mockRejectedValue(syncError)
+      captureListener()
+
+      renderHook(() => useSdkLifecycle("acct-1", 0))
+
+      await waitFor(() => {
+        expect(mockRecordError).toHaveBeenCalledWith(syncError)
+      })
+      expect(mockCrashlyticsLog).not.toHaveBeenCalledWith(
+        expect.stringContaining("post-connect sync failed"),
+      )
+    })
+
+    it("does not force Ready when sync rejects — wallet waits for the Synced event before flipping status", async () => {
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+      mockSyncSelfCustodialWallet.mockRejectedValue(new Error("post-connect sync failed"))
+      const listener = captureListener()
+      const snapshotsBefore = mockGetSnapshot.mock.calls.length
+
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+
+      await waitFor(() => {
+        expect(mockRecordError).toHaveBeenCalled()
+      })
+      await waitFor(() => {
+        expect(listener.current).not.toBeNull()
+      })
+
+      // The sync rejection alone must not transition the wallet to Ready.
+      expect(result.current.status).not.toBe(ActiveWalletStatus.Ready)
+
+      // A subsequent Synced event is what actually flips status to Ready.
+      await act(async () => {
+        await listener.current?.({ tag: "Synced" })
+      })
+
+      await waitFor(() => {
+        expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+      })
+
+      // refreshWallets() from the .finally branch is gone — only the listener-driven
+      // snapshots should be triggered after the rejection.
+      expect(mockGetSnapshot.mock.calls.length).toBeGreaterThan(snapshotsBefore)
     })
   })
 
