@@ -55,7 +55,7 @@ describe("ViewBackupPhraseSetting", () => {
     expect(getByTestId("settings-row")).toBeTruthy()
   })
 
-  it("navigates to the view-backup-phrase screen on press", () => {
+  it("navigates to the view-backup-alerts screen on press — the phrase is gated behind the 3-checks confirmation", () => {
     mockActiveAccount.mockReturnValue({
       type: AccountType.SelfCustodial,
     })
@@ -64,7 +64,19 @@ describe("ViewBackupPhraseSetting", () => {
     const { getByTestId } = render(<ViewBackupPhraseSetting />)
     fireEvent.press(getByTestId("settings-row"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("sparkViewBackupPhraseScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("sparkViewBackupAlertsScreen")
+  })
+
+  it("never bypasses the alerts gate — pressing the row must not jump straight to the phrase screen", () => {
+    mockActiveAccount.mockReturnValue({
+      type: AccountType.SelfCustodial,
+    })
+    mockBackupState.mockReturnValue({ status: "completed" })
+
+    const { getByTestId } = render(<ViewBackupPhraseSetting />)
+    fireEvent.press(getByTestId("settings-row"))
+
+    expect(mockNavigate).not.toHaveBeenCalledWith("sparkViewBackupPhraseScreen")
   })
 
   it("returns null when custodial account", () => {
