@@ -256,8 +256,14 @@ const prepareConversion = async (
     destinationAmount: initialTarget,
   })
 
-  const finalAmountIn = BigInt(toNumber(prepared.conversionEstimate?.amountIn ?? 0n))
+  const finalEstimate = prepared.conversionEstimate
+  const finalAmountIn = BigInt(toNumber(finalEstimate?.amountIn ?? 0n))
   if (finalAmountIn <= inputAmount) return { prepared, tokenDecimals }
+
+  /** SDK forced full-balance to avoid dust; correcting would swap the user's typed amount for the pool minimum. */
+  if (finalEstimate?.amountAdjustment === AmountAdjustmentReason.IncreasedToAvoidDust) {
+    return { prepared, tokenDecimals }
+  }
 
   // Final overshoots: shrink by the observed ratio and re-quote once.
   const correctedTarget = (initialTarget * inputAmount) / finalAmountIn
