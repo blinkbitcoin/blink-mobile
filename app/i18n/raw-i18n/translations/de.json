@@ -3523,6 +3523,9 @@
             "signInFailed": "Anmeldung bei Google fehlgeschlagen",
             "existingBackupTitle": "Sicherung gefunden",
             "existingBackupMessage": "Es existiert bereits eine Sicherung in Ihrem {provider}. Möchten Sie sie überschreiben?",
+            "existingBackupMessageWithDetails": "Auf deinem {provider} existiert bereits ein Backup.\n\nLightning-Adresse: {address}\nErstellt: {createdAt}\n\nMöchtest du es überschreiben?",
+            "existingBackupUnknownAddress": "Nicht verfügbar",
+            "existingBackupUnknownCreatedAt": "Unbekannt",
             "overwrite": "Überschreiben"
         }
     },

@@ -3577,6 +3577,9 @@
       "signInFailed": "Google-ի մուտքը ձախողվեց",
       "existingBackupTitle": "Պահուստային պատճեն գտնվել է",
       "existingBackupMessage": "Ձեր {provider}-ում արդեն պահուստային պատճեն կա: Ուզում եք վերագրե՞լ:",
+      "existingBackupMessageWithDetails": "Ձեր {provider}-ում արդեն կա պահուստ։\n\nLightning հասցե՝ {address}\nՍտեղծվել է՝ {createdAt}\n\nՑանկանու՞մ եք վերագրել այն։",
+      "existingBackupUnknownAddress": "Հասանելի չէ",
+      "existingBackupUnknownCreatedAt": "Անհայտ",
       "overwrite": "Վերագրել"
     }
   },

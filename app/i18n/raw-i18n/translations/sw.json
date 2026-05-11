@@ -3535,6 +3535,9 @@
       "signInFailed": "Imeshindwa kuingia kwenye Google",
       "existingBackupTitle": "Nakala imepatikana",
       "existingBackupMessage": "Tayari kuna nakala kwenye {provider} yako. Je, ungependa kuibadilisha?",
+      "existingBackupMessageWithDetails": "Hifadhi tayari ipo katika {provider} yako.\n\nAnwani ya Lightning: {address}\nIliundwa: {createdAt}\n\nUnataka kuandika juu yake?",
+      "existingBackupUnknownAddress": "Haipatikani",
+      "existingBackupUnknownCreatedAt": "Haijulikani",
       "overwrite": "Badilisha"
     }
   },

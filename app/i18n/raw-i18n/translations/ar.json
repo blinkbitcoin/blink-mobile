@@ -3573,6 +3573,9 @@
       "signInFailed": "فشل تسجيل الدخول إلى Google",
       "existingBackupTitle": "تم العثور على نسخة احتياطية",
       "existingBackupMessage": "توجد نسخة احتياطية بالفعل في {provider} الخاص بك. هل تريد استبدالها؟",
+      "existingBackupMessageWithDetails": "توجد نسخة احتياطية بالفعل في {provider}.\n\nعنوان Lightning: {address}\nتم الإنشاء: {createdAt}\n\nهل تريد استبدالها؟",
+      "existingBackupUnknownAddress": "غير متوفر",
+      "existingBackupUnknownCreatedAt": "غير معروف",
       "overwrite": "استبدال"
     }
   },

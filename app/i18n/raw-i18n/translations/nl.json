@@ -3576,6 +3576,9 @@
       "signInFailed": "Inloggen bij Google mislukt",
       "existingBackupTitle": "Back-up gevonden",
       "existingBackupMessage": "Er bestaat al een back-up in je {provider}. Wil je deze overschrijven?",
+      "existingBackupMessageWithDetails": "Er bestaat al een back-up op je {provider}.\n\nLightning-adres: {address}\nAangemaakt: {createdAt}\n\nWil je deze overschrijven?",
+      "existingBackupUnknownAddress": "Niet beschikbaar",
+      "existingBackupUnknownCreatedAt": "Onbekend",
       "overwrite": "Overschrijven"
     }
   },

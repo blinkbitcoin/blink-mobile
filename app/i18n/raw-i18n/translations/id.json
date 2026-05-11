@@ -3535,6 +3535,9 @@
       "signInFailed": "Gagal masuk ke Google",
       "existingBackupTitle": "Cadangan ditemukan",
       "existingBackupMessage": "Cadangan sudah ada di {provider} Anda. Apakah Anda ingin menimpanya?",
+      "existingBackupMessageWithDetails": "Cadangan sudah ada di {provider} Anda.\n\nAlamat Lightning: {address}\nDibuat: {createdAt}\n\nApakah Anda ingin menimpanya?",
+      "existingBackupUnknownAddress": "Tidak tersedia",
+      "existingBackupUnknownCreatedAt": "Tidak diketahui",
       "overwrite": "Timpa"
     }
   },

@@ -3564,6 +3564,9 @@
             "signInFailed": "Échec de la connexion à Google",
             "existingBackupTitle": "Sauvegarde trouvée",
             "existingBackupMessage": "Une sauvegarde existe déjà dans votre {provider}. Voulez-vous la remplacer ?",
+            "existingBackupMessageWithDetails": "Une sauvegarde existe déjà sur votre {provider}.\n\nAdresse Lightning : {address}\nCréée : {createdAt}\n\nVoulez-vous l'écraser ?",
+            "existingBackupUnknownAddress": "Non disponible",
+            "existingBackupUnknownCreatedAt": "Inconnu",
             "overwrite": "Remplacer"
         }
     },

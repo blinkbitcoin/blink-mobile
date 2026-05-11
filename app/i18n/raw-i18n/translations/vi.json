@@ -3573,6 +3573,9 @@
       "signInFailed": "Không thể đăng nhập vào Google",
       "existingBackupTitle": "Đã tìm thấy bản sao lưu",
       "existingBackupMessage": "Đã có bản sao lưu trong {provider} của bạn. Bạn có muốn ghi đè không?",
+      "existingBackupMessageWithDetails": "Đã tồn tại bản sao lưu trên {provider} của bạn.\n\nĐịa chỉ Lightning: {address}\nĐã tạo: {createdAt}\n\nBạn có muốn ghi đè không?",
+      "existingBackupUnknownAddress": "Không có",
+      "existingBackupUnknownCreatedAt": "Không xác định",
       "overwrite": "Ghi đè"
     }
   },

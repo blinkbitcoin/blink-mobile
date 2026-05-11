@@ -3523,6 +3523,9 @@
             "signInFailed": "Falha ao entrar no Google",
             "existingBackupTitle": "Backup encontrado",
             "existingBackupMessage": "Já existe um backup no seu {provider}. Deseja sobrescrevê-lo?",
+            "existingBackupMessageWithDetails": "Já existe um backup no seu {provider}.\n\nEndereço Lightning: {address}\nCriado: {createdAt}\n\nDeseja sobrescrevê-lo?",
+            "existingBackupUnknownAddress": "Não disponível",
+            "existingBackupUnknownCreatedAt": "Desconhecido",
             "overwrite": "Sobrescrever"
         }
     },

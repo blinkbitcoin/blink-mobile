@@ -3582,6 +3582,9 @@
       "signInFailed": "Ukungena kwi-Google akuphumelelanga",
       "existingBackupTitle": "Ikopi ifunyenwe",
       "existingBackupMessage": "Sele kukho ikopi kwi-{provider} yakho. Ungathanda ukuyibhala phezu kwayo?",
+      "existingBackupMessageWithDetails": "Sele ikhona ikopi yokugcina kwi-{provider} yakho.\n\nIdilesi ye-Lightning: {address}\nYenziwe: {createdAt}\n\nUyafuna ukuyibhala?",
+      "existingBackupUnknownAddress": "Ayifumaneki",
+      "existingBackupUnknownCreatedAt": "Ayaziwa",
       "overwrite": "Bhala phezu kwayo"
     }
   },

@@ -3653,6 +3653,10 @@ const en: BaseTranslation = {
       existingBackupTitle: "Backup found",
       existingBackupMessage:
         "A backup already exists in your {provider: string}. Do you want to overwrite it?",
+      existingBackupMessageWithDetails:
+        "A backup already exists in your {provider: string}.\n\nLightning address: {address: string}\nCreated: {createdAt: string}\n\nDo you want to overwrite it?",
+      existingBackupUnknownAddress: "Not available",
+      existingBackupUnknownCreatedAt: "Unknown",
       overwrite: "Overwrite",
       uploadSuccess: "Backup saved to {provider: string}",
       uploadFailed: "Failed to upload backup",

@@ -3564,6 +3564,9 @@
             "signInFailed": "Googleへのログインに失敗しました",
             "existingBackupTitle": "バックアップが見つかりました",
             "existingBackupMessage": "{provider}にバックアップが既に存在します。上書きしますか？",
+            "existingBackupMessageWithDetails": "{provider}にすでにバックアップが存在します。\n\nLightningアドレス: {address}\n作成日時: {createdAt}\n\n上書きしますか？",
+            "existingBackupUnknownAddress": "利用不可",
+            "existingBackupUnknownCreatedAt": "不明",
             "overwrite": "上書き"
         }
     },
