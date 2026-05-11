@@ -7,6 +7,10 @@ import React, {
   useState,
 } from "react"
 
+import { insertBounded } from "@app/utils/bounded-collections"
+
+const MAX_TRACKED_INVOICES = 100
+
 export const AutoConvertStatus = {
   Converting: "converting",
   Settled: "settled",
@@ -40,7 +44,7 @@ export const AutoConvertStatusProvider: React.FC<PropsWithChildren> = ({ childre
     setStatusByInvoice((prev) => {
       if (prev.get(invoice) === status) return prev
       const next = new Map(prev)
-      next.set(invoice, status)
+      insertBounded(next, [invoice, status], MAX_TRACKED_INVOICES)
       return next
     })
   }, [])
