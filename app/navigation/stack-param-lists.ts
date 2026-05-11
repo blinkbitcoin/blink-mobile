@@ -187,6 +187,7 @@ export type RootStackParamList = {
   sparkCloudBackupScreen: undefined
   sparkBackupAlertsScreen: undefined
   sparkBackupPhraseScreen: { step: PhraseStep }
+  sparkViewBackupAlertsScreen: undefined
   sparkViewBackupPhraseScreen: undefined
   sparkBackupConfirmScreen: {
     challenges: Array<{ index: number; word: string }>

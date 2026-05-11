@@ -1,10 +1,11 @@
+import { readFileSync } from "fs"
+
 import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
-import { PhraseStep } from "@app/navigation/stack-param-lists"
-import { SparkBackupAlertsScreen } from "@app/screens/spark-onboarding/manual-backup/backup-alerts-screen"
+import { SparkViewBackupAlertsScreen } from "@app/screens/spark-onboarding/manual-backup/view-backup-alerts-screen"
 
 import { ContextForScreen } from "../helper"
 
@@ -12,14 +13,6 @@ const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
-}))
-
-const mockSaveCheckpoint = jest.fn()
-jest.mock("@app/screens/account-migration/hooks", () => ({
-  useMigrationCheckpoint: () => ({
-    saveCheckpoint: mockSaveCheckpoint,
-  }),
-  MigrationCheckpoint: { BackupAlerts: "backupAlerts" },
 }))
 
 jest.mock("@app/components/icon-hero", () => {
@@ -35,7 +28,7 @@ const LL = i18nObject("en")
 const renderScreen = () =>
   render(
     <ContextForScreen>
-      <SparkBackupAlertsScreen />
+      <SparkViewBackupAlertsScreen />
     </ContextForScreen>,
   )
 
@@ -45,20 +38,36 @@ const tickAllChecks = (getByText: ReturnType<typeof render>["getByText"]) => {
   fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check3()))
 }
 
-describe("SparkBackupAlertsScreen — onboarding flow", () => {
+describe("SparkViewBackupAlertsScreen — Settings flow", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  it("renders the security checks content (delegates UI to BackupPhraseSecurityChecks)", () => {
+  it("renders the same alerts content as the onboarding flow (shared component)", () => {
     const { getByText } = renderScreen()
     expect(getByText(LL.BackupScreen.ManualBackup.Alerts.title())).toBeTruthy()
     expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check1())).toBeTruthy()
   })
 
-  it("saves BackupAlerts migration checkpoint on mount — onboarding-only concern", () => {
-    renderScreen()
-    expect(mockSaveCheckpoint).toHaveBeenCalledWith("backupAlerts")
+  it("does not depend on the migration-checkpoint hook — that responsibility belongs to the onboarding screen alone", () => {
+    /** Static guarantee: the screen source must not pull in `@app/screens/account-migration/hooks`. */
+    const source = readFileSync(
+      require.resolve(
+        "@app/screens/spark-onboarding/manual-backup/view-backup-alerts-screen",
+      ),
+      "utf8",
+    )
+    expect(source).not.toContain("account-migration")
+    expect(source).not.toContain("useMigrationCheckpoint")
+  })
+
+  it("is registered in root-navigator under the matching route name — a missing registration would crash the Settings entry at runtime with no compile error", () => {
+    const navigatorSource = readFileSync(
+      require.resolve("@app/navigation/root-navigator"),
+      "utf8",
+    )
+    expect(navigatorSource).toContain("SparkViewBackupAlertsScreen")
+    expect(navigatorSource).toContain('name="sparkViewBackupAlertsScreen"')
   })
 
   it("Continue does not navigate while any check is missing", () => {
@@ -67,23 +76,20 @@ describe("SparkBackupAlertsScreen — onboarding flow", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("Continue navigates to the onboarding phrase screen on PhraseStep.First once all three are checked", () => {
+  it("Continue navigates to the Settings view-phrase screen (no PhraseStep) once all three are checked", () => {
     const { getByText } = renderScreen()
     tickAllChecks(getByText)
     fireEvent.press(getByText(LL.common.continue()))
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupPhraseScreen", {
-      step: PhraseStep.First,
-    })
+    expect(mockNavigate).toHaveBeenCalledWith("sparkViewBackupPhraseScreen")
   })
 
-  it("never navigates to the Settings view-phrase screen — onboarding stays separate from the Settings flow", () => {
+  it("never navigates to the onboarding phrase screen — Settings stays separate from the onboarding flow", () => {
     const { getByText } = renderScreen()
     tickAllChecks(getByText)
     fireEvent.press(getByText(LL.common.continue()))
     expect(mockNavigate).not.toHaveBeenCalledWith(
-      "sparkViewBackupPhraseScreen",
+      "sparkBackupPhraseScreen",
       expect.anything(),
     )
-    expect(mockNavigate).not.toHaveBeenCalledWith("sparkViewBackupPhraseScreen")
   })
 })
