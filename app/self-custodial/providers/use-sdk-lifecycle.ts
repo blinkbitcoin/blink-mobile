@@ -205,15 +205,15 @@ export const useSdkLifecycle = (
       refreshWallets()
 
       // Force token balances to materialize. Whichever fires first — the
-      // `Synced` event or this promise settling — releases the loading state.
+      // `Synced` event or this promise resolving — releases the loading state.
       syncSelfCustodialWallet(connectedSdk)
-        .catch((err) => {
-          crashlytics().log(`[SparkSDK] post-connect sync failed: ${err}`)
-        })
-        .finally(() => {
+        .then(() => {
           if (!mounted || initialSyncCompletedRef.current) return
           initialSyncCompletedRef.current = true
           refreshWallets().catch(() => {})
+        })
+        .catch((err) => {
+          reportError("Post-connect sync", err)
         })
 
       getUserSettings(connectedSdk)
