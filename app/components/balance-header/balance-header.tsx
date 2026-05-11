@@ -51,6 +51,7 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
                 style={styles.primaryBalanceText}
                 allowFontScaling
                 adjustsFontSizeToFit
+                numberOfLines={1}
               >
                 {formattedBalance}
               </Text>
