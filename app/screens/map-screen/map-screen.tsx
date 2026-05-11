@@ -1,17 +1,13 @@
 import { CountryCode } from "libphonenumber-js/mobile"
 import * as React from "react"
 // eslint-disable-next-line react-native/split-platform-components
-import { Alert, Dimensions } from "react-native"
+import { Alert, Dimensions, Linking } from "react-native"
 import { Region, MapMarker as MapMarkerType } from "react-native-maps"
 import { check, PermissionStatus, RESULTS } from "react-native-permissions"
 
 import { gql } from "@apollo/client"
 import MapComponent from "@app/components/map-component"
-import {
-  MapMarker,
-  useBusinessMapMarkersQuery,
-  useRegionQuery,
-} from "@app/graphql/generated"
+import { useBusinessMapMarkersQuery, useRegionQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -23,7 +19,9 @@ import countryCodes from "../../../utils/countryInfo.json"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { toastShow } from "../../utils/toast"
+import { MerchantMapMarker, isBtcMapMarker, mergeMapMarkers } from "./btc-map"
 import { LOCATION_PERMISSION, getUserRegion } from "./functions"
+import { useBtcMapMarkers } from "./use-btc-map-markers"
 
 const EL_ZONTE_COORDS = {
   latitude: 13.496743,
@@ -77,10 +75,17 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
   const focusedMarkerRef = React.useRef<MapMarkerType | null>(null)
 
   const [initialLocation, setInitialLocation] = React.useState<Region>()
+  const [visibleRegion, setVisibleRegion] = React.useState<Region>()
   const [isRefreshed, setIsRefreshed] = React.useState(false)
-  const [focusedMarker, setFocusedMarker] = React.useState<MapMarker | null>(null)
+  const [focusedMarker, setFocusedMarker] = React.useState<MerchantMapMarker | null>(null)
   const [isInitializing, setInitializing] = React.useState(true)
   const [permissionsStatus, setPermissionsStatus] = React.useState<PermissionStatus>()
+  const { markers: btcMapMarkers, error: btcMapError } = useBtcMapMarkers(visibleRegion)
+
+  const mapMarkers = React.useMemo(
+    () => mergeMapMarkers(data?.businessMapMarkers ?? [], btcMapMarkers),
+    [data?.businessMapMarkers, btcMapMarkers],
+  )
 
   useFocusEffect(() => {
     if (!isRefreshed) {
@@ -91,6 +96,10 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
 
   if (error) {
     toastShow({ message: error.message, LL })
+  }
+
+  if (btcMapError) {
+    toastShow({ message: btcMapError.message, LL })
   }
 
   // On screen load, check (NOT request) if location permissions are given
@@ -120,9 +129,16 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
     if (lastRegionError) {
       setInitializing(false)
       setInitialLocation(EL_ZONTE_COORDS)
+      setVisibleRegion(EL_ZONTE_COORDS)
       alertOnLocationError()
     }
   }, [lastRegionError, alertOnLocationError])
+
+  React.useEffect(() => {
+    if (initialLocation && !visibleRegion) {
+      setVisibleRegion(initialLocation)
+    }
+  }, [initialLocation, visibleRegion])
 
   // Flow when location permissions are denied
   React.useEffect(() => {
@@ -137,6 +153,7 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
           longitudeDelta,
         }
         setInitialLocation(region)
+        setVisibleRegion(region)
         // User is using maps for the first time, so we center on the center of their IP's country
       } else {
         // JSON 'hashmap' with every countrys' code listed with their lat and lng
@@ -153,15 +170,24 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
             longitudeDelta: LONGITUDE_DELTA,
           }
           setInitialLocation(region)
+          setVisibleRegion(region)
           // backup if country code is not recognized
         } else {
           setInitialLocation(EL_ZONTE_COORDS)
+          setVisibleRegion(EL_ZONTE_COORDS)
         }
       }
     }
   }, [isInitializing, countryCode, lastRegion, loading, initialLocation])
 
-  const handleCalloutPress = (item: MapMarker) => {
+  const handleCalloutPress = (item: MerchantMapMarker) => {
+    if (isBtcMapMarker(item)) {
+      Linking.openURL(item.btcMapUrl).catch(() =>
+        toastShow({ message: item.btcMapUrl, LL }),
+      )
+      return
+    }
+
     if (isAuthed) {
       navigation.navigate("sendBitcoinDestination", { username: item.username })
     } else {
@@ -169,7 +195,7 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
     }
   }
 
-  const handleMarkerPress = (item: MapMarker, ref?: MapMarkerType) => {
+  const handleMarkerPress = (item: MerchantMapMarker, ref?: MapMarkerType) => {
     setFocusedMarker(item)
     if (ref) {
       focusedMarkerRef.current = ref
@@ -185,8 +211,9 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
     <Screen>
       {initialLocation && (
         <MapComponent
-          data={data}
+          data={mapMarkers}
           userLocation={initialLocation}
+          handleRegionChangeComplete={setVisibleRegion}
           permissionsStatus={permissionsStatus}
           setPermissionsStatus={setPermissionsStatus}
           handleMapPress={handleMapPress}
