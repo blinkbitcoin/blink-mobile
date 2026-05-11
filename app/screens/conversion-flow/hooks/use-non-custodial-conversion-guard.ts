@@ -27,10 +27,8 @@ const resolveBlockingReason = (
   amountInSourceCurrency: number,
   fromWalletBalance: number | undefined,
 ): ConvertAmountAdjustment | null => {
-  if (amountAdjustment === null) return null
-  if (amountAdjustment !== ConvertAmountAdjustment.IncreasedToAvoidDust) {
-    return amountAdjustment
-  }
+  /** Only the dust gate blocks; `FlooredToMin` is a benign SDK floor and proceeds normally. */
+  if (amountAdjustment !== ConvertAmountAdjustment.IncreasedToAvoidDust) return null
   if (fromWalletBalance === undefined) return amountAdjustment
   return amountInSourceCurrency >= fromWalletBalance ? null : amountAdjustment
 }

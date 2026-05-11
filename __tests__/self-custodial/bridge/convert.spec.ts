@@ -1,5 +1,11 @@
+import { AmountAdjustmentReason } from "@breeztech/breez-sdk-spark-react-native"
+
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { ConvertDirection, ConvertErrorCode } from "@app/types/payment.types"
+import {
+  ConvertAmountAdjustment,
+  ConvertDirection,
+  ConvertErrorCode,
+} from "@app/types/payment.types"
 import { WalletCurrency } from "@app/graphql/generated"
 
 import { createGetConversionQuote } from "@app/self-custodial/bridge/convert"
@@ -250,6 +256,56 @@ describe("createGetConversionQuote — error handling", () => {
     expect(result.status).toBe("failed")
     expect(result.errors?.[0].message).toBe("send failed")
     expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  it("bails out of the correction step when the SDK signals IncreasedToAvoidDust on the final quote, surfacing the all-balance quote unchanged (Bug #2)", async () => {
+    mockFetchLimits.mockResolvedValue({ minFromAmount: 50, minToAmount: null })
+    const balance = BigInt(2_996_706)
+    const sdk = {
+      prepareSendPayment: jest
+        .fn()
+        .mockResolvedValueOnce({
+          paymentMethod: {},
+          conversionEstimate: {
+            amountIn: BigInt(1_251_471),
+            amountOut: BigInt(1_524),
+            fee: BigInt(1_252),
+            amountAdjustment: undefined,
+          },
+        })
+        .mockResolvedValueOnce({
+          paymentMethod: {},
+          conversionEstimate: {
+            amountIn: balance,
+            amountOut: BigInt(3_651),
+            fee: BigInt(2_998),
+            amountAdjustment: AmountAdjustmentReason.IncreasedToAvoidDust,
+          },
+        }),
+      sendPayment: jest.fn().mockResolvedValue(undefined),
+      syncWallet: jest.fn().mockResolvedValue(undefined),
+      receivePayment: jest
+        .fn()
+        .mockResolvedValue({ paymentRequest: "sp1own-spark-address" }),
+      getInfo: jest.fn().mockResolvedValue({
+        balanceSats: 0n,
+        tokenBalances: {
+          "usdb-token-id": {
+            balance,
+            tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
+          },
+        },
+      }),
+    }
+
+    const quote = await createGetConversionQuote(sdk as never)({
+      fromAmount: toUsdMoneyAmount(249),
+      toAmount: toBtcMoneyAmount(3_032),
+      direction: ConvertDirection.UsdToBtc,
+    })
+
+    expect(sdk.prepareSendPayment).toHaveBeenCalledTimes(2)
+    expect(quote?.amountAdjustment).toBe(ConvertAmountAdjustment.IncreasedToAvoidDust)
   })
 
   it("rethrows when the corrected re-quote rejects after an overshoot, never executing the discovery quote (Critical #3)", async () => {

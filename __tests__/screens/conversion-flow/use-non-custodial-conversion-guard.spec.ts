@@ -87,7 +87,7 @@ describe("useNonCustodialConversionGuard", () => {
     expect(mockGetQuote).not.toHaveBeenCalled()
   })
 
-  it("forwards FlooredToMin as blockingReason regardless of balance", async () => {
+  it("returns null blockingReason for FlooredToMin — benign SDK floor must not block Review (Bug #2)", async () => {
     mockGetQuote.mockResolvedValue(buildQuote(ConvertAmountAdjustment.FlooredToMin))
 
     const { result } = renderHook(() =>
@@ -97,9 +97,9 @@ describe("useNonCustodialConversionGuard", () => {
       }),
     )
 
-    await waitFor(() =>
-      expect(result.current.blockingReason).toBe(ConvertAmountAdjustment.FlooredToMin),
-    )
+    await waitFor(() => expect(mockGetQuote).toHaveBeenCalled())
+    await waitFor(() => expect(result.current.isQuoting).toBe(false))
+    expect(result.current.blockingReason).toBeNull()
   })
 
   it("forwards IncreasedToAvoidDust when amount is below balance", async () => {
@@ -188,7 +188,7 @@ describe("useNonCustodialConversionGuard", () => {
     expect(result.current.blockingReason).toBeNull()
   })
 
-  it("reports isQuoting=true while the quote is in flight", async () => {
+  it("reports isQuoting=true while the quote is in flight, then clears once the quote resolves", async () => {
     let resolveQuote: (value: ConvertQuote) => void = () => {}
     mockGetQuote.mockImplementation(
       () =>
@@ -202,10 +202,12 @@ describe("useNonCustodialConversionGuard", () => {
     await waitFor(() => expect(result.current.isQuoting).toBe(true))
     expect(result.current.blockingReason).toBeNull()
 
-    resolveQuote(buildQuote(ConvertAmountAdjustment.FlooredToMin))
+    resolveQuote(buildQuote(ConvertAmountAdjustment.IncreasedToAvoidDust))
 
     await waitFor(() =>
-      expect(result.current.blockingReason).toBe(ConvertAmountAdjustment.FlooredToMin),
+      expect(result.current.blockingReason).toBe(
+        ConvertAmountAdjustment.IncreasedToAvoidDust,
+      ),
     )
     expect(result.current.isQuoting).toBe(false)
   })
@@ -230,15 +232,13 @@ describe("useNonCustodialConversionGuard", () => {
   })
 
   it("keeps hasQuoteError=false on the success path", async () => {
-    mockGetQuote.mockResolvedValue(buildQuote(ConvertAmountAdjustment.FlooredToMin))
+    mockGetQuote.mockResolvedValue(buildQuote())
 
-    const { result } = renderHook(() =>
-      useNonCustodialConversionGuard({ ...defaultParams, amountInSourceCurrency: 50 }),
-    )
+    const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))
 
-    await waitFor(() =>
-      expect(result.current.blockingReason).toBe(ConvertAmountAdjustment.FlooredToMin),
-    )
+    await waitFor(() => expect(mockGetQuote).toHaveBeenCalled())
+    await waitFor(() => expect(result.current.isQuoting).toBe(false))
+    expect(result.current.blockingReason).toBeNull()
     expect(result.current.hasQuoteError).toBe(false)
   })
 
