@@ -2355,7 +2355,8 @@
         "logoutOneAccountAlertContent": "{identifier: string}にリンクされたセッションからログアウトします。\n今後再度ログインできることを確認してください。",
         "logoutOneAccountConfirm": "了解しました。ログアウトしてください。",
         "receiveCurrency": "受取通貨",
-        "displayCurrency": "表示通貨"
+        "displayCurrency": "表示通貨",
+        "nostrWalletConnect": "Nostr Wallet Connect"
     },
     "NotificationSettingsScreen": {
         "title": "通知設定",
@@ -3458,5 +3459,24 @@
                 "buttonText": "閉じる"
             }
         }
+    },
+    "NostrWalletConnect": {
+        "emptyStateHeadline": "NWCでBlinkを他のアプリに接続",
+        "newConnection": "新しい接続",
+        "connectWallet": "ウォレットを接続",
+        "appNameLabel": "接続するアプリの名前",
+        "appNamePlaceholder": "アプリ名",
+        "dailyBudget": "日次予算",
+        "connectionCreated": "接続が作成されました",
+        "nwcConnectionString": "NWC接続文字列",
+        "copyInstruction": "この文字列をコピーして、接続するアプリに貼り付けてください。",
+        "nwcStringCopied": "NWC接続文字列がクリップボードにコピーされました",
+        "done": "完了",
+        "connectedApps": "接続済みアプリ",
+        "budget": "予算: {amount}",
+        "doNotNotifyBelow": "以下の取引は通知しない",
+        "deleteConfirmTitle": "よろしいですか？",
+        "deleteConfirmBody": "{appName}への接続を本当に取り消しますか？",
+        "dismiss": "閉じる"
     }
 }

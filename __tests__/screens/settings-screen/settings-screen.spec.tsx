@@ -494,6 +494,23 @@ describe("Settings Screen", () => {
     expect(subtitleNode.props.ellipsizeMode).toBe("tail")
   })
 
+  it("renders Nostr Wallet Connect option in Advanced section", async () => {
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.getByText("Nostr Wallet Connect")).toBeTruthy()
+  })
+
   it("truncates long title and subtitle together", () => {
     const longTitle = "Another very long settings row title that should truncate"
     const longSubtitle = "Another very long subtitle that should truncate"

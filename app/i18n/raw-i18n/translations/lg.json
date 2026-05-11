@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "Ojja kufulumizibwa ku kizindaalo ekikwatagana ne {identifier: string}.\nKakasa nti olina engeri ey'okuyingira nate mu biseera eby'omu maaso.",
     "logoutOneAccountConfirm": "Ntegedde. Nsaba onfulumye.",
     "receiveCurrency": "Ssente z'okufuna",
-    "displayCurrency": "Ssente ez'okulaga"
+    "displayCurrency": "Ssente ez'okulaga",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Enteekateeka Ezitegeeza",
@@ -3429,5 +3430,24 @@
         "buttonText": "Ggala"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Yungiza Blink ku pulogulamu endala okuyita mu NWC",
+    "newConnection": "Okuyunga okupya",
+    "connectWallet": "Yunga ssente",
+    "appNameLabel": "Erinnya ly'epulogulamu gy'oyagala okuyunga",
+    "appNamePlaceholder": "Erinnya ly'epulogulamu",
+    "dailyBudget": "Bajeti ya buli lunaku",
+    "connectionCreated": "Okuyunga kutondeddwa",
+    "nwcConnectionString": "Ennyiriri y'okuyunga NWC",
+    "copyInstruction": "Koppa ennyiriri eno ogitiike mu pulogulamu gy'oyagala okuyunga.",
+    "nwcStringCopied": "Ennyiriri y'okuyunga NWC ekoppiddwa",
+    "done": "Biwedde",
+    "connectedApps": "Pulogulamu eziyungiddwa",
+    "budget": "Bajeti: {amount}",
+    "doNotNotifyBelow": "Tobuulira ku bikolwa ebiri wansi wa",
+    "deleteConfirmTitle": "Oli mukakafu?",
+    "deleteConfirmBody": "Ddala oyagala okusazaamu okuyunga eri {appName}?",
+    "dismiss": "Ggalawo"
   }
 }

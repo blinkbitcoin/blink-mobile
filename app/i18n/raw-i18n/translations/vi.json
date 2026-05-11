@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "Bạn sẽ bị đăng xuất khỏi phiên liên kết với {identifier: string}.\nHãy đảm bảo bạn có quyền truy cập để đăng nhập lại trong tương lai.",
     "logoutOneAccountConfirm": "Tôi hiểu. Vui lòng đăng xuất.",
     "receiveCurrency": "Tiền tệ nhận",
-    "displayCurrency": "Tiền tệ hiển thị"
+    "displayCurrency": "Tiền tệ hiển thị",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Cài đặt thông báo",
@@ -3467,5 +3468,24 @@
         "buttonText": "Đóng"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Kết nối Blink với các ứng dụng khác qua NWC",
+    "newConnection": "Kết nối mới",
+    "connectWallet": "Kết nối ví",
+    "appNameLabel": "Tên ứng dụng bạn muốn kết nối",
+    "appNamePlaceholder": "Tên ứng dụng",
+    "dailyBudget": "Ngân sách hàng ngày",
+    "connectionCreated": "Đã tạo kết nối",
+    "nwcConnectionString": "Chuỗi kết nối NWC",
+    "copyInstruction": "Sao chép chuỗi này và dán vào ứng dụng bạn muốn kết nối.",
+    "nwcStringCopied": "Đã sao chép chuỗi kết nối NWC vào bộ nhớ tạm",
+    "done": "Xong",
+    "connectedApps": "Ứng dụng đã kết nối",
+    "budget": "Ngân sách: {amount}",
+    "doNotNotifyBelow": "Không thông báo cho giao dịch dưới",
+    "deleteConfirmTitle": "Bạn có chắc không?",
+    "deleteConfirmBody": "Bạn có thực sự muốn thu hồi kết nối với {appName} không?",
+    "dismiss": "Đóng"
   }
 }

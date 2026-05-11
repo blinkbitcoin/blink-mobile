@@ -2338,7 +2338,8 @@
         "logoutOneAccountAlertContent": "Verrai disconnesso dalla sessione collegata a {identifier: string}.\nAssicurati di avere accesso per effettuare nuovamente l'accesso in futuro.",
         "logoutOneAccountConfirm": "Ho capito. Procedi con la disconnessione.",
         "receiveCurrency": "Valuta di ricezione",
-        "displayCurrency": "Valuta di visualizzazione"
+        "displayCurrency": "Valuta di visualizzazione",
+        "nostrWalletConnect": "Nostr Wallet Connect"
     },
     "NotificationSettingsScreen": {
         "title": "Impostazioni di notifica",
@@ -3417,5 +3418,24 @@
                 "buttonText": "Chiudi"
             }
         }
+    },
+    "NostrWalletConnect": {
+        "emptyStateHeadline": "Connetti Blink ad altre app tramite NWC",
+        "newConnection": "Nuova connessione",
+        "connectWallet": "Connetti portafoglio",
+        "appNameLabel": "Nome dell'app che desideri connettere",
+        "appNamePlaceholder": "Nome dell'app",
+        "dailyBudget": "Budget giornaliero",
+        "connectionCreated": "Connessione creata",
+        "nwcConnectionString": "Stringa di connessione NWC",
+        "copyInstruction": "Copia questa stringa e incollala nell'app che desideri connettere.",
+        "nwcStringCopied": "Stringa di connessione NWC copiata negli appunti",
+        "done": "Fatto",
+        "connectedApps": "App connesse",
+        "budget": "Budget: {amount}",
+        "doNotNotifyBelow": "Non notificare transazioni inferiori a",
+        "deleteConfirmTitle": "Sei sicuro?",
+        "deleteConfirmBody": "Vuoi davvero revocare la connessione a {appName}?",
+        "dismiss": "Annulla"
     }
 }
