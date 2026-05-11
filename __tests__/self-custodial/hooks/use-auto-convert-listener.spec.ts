@@ -65,6 +65,18 @@ jest.mock("@app/self-custodial/bridge", () => ({
   syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
 }))
 
+const mockAddBounded = jest.fn()
+jest.mock("@app/utils/bounded-collections", () => {
+  const actual = jest.requireActual("@app/utils/bounded-collections")
+  return {
+    ...actual,
+    addBounded: (...args: unknown[]) => {
+      mockAddBounded(...args)
+      return actual.addBounded(...args)
+    },
+  }
+})
+
 // Regression guard: the listener must stay silent. If anyone re-introduces a
 // toast on auto-convert outcomes, this mock crashes the test loudly.
 jest.mock("@app/utils/toast", () => ({
@@ -1064,6 +1076,58 @@ describe("useAutoConvertListener — isRetryableNow gate (Important #11)", () =>
 
     await waitFor(() => {
       expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
+  })
+})
+
+describe("useAutoConvertListener — bounded Sets (Important #12)", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("routes processedPaymentIdsRef additions through addBounded with the 200-entry cap", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1", 5000n) }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1",
+      isStableBalanceActive: false,
+      refreshWallets: mockRefreshWallets,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(undefined)
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockAddBounded).toHaveBeenCalledWith(expect.any(Set), "pid-lnbc1", 200)
+    })
+  })
+
+  it("routes inFlightInvoicesRef additions through addBounded with the 50-entry cap", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc-bounded", 5000n) }),
+    })
+    setupDefaults(sdk)
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-bounded",
+      isStableBalanceActive: false,
+      refreshWallets: mockRefreshWallets,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({ paymentRequest: "lnbc-bounded" }),
+    )
+
+    renderHook(() => useAutoConvertListener())
+
+    await waitFor(() => {
+      expect(mockAddBounded).toHaveBeenCalledWith(expect.any(Set), "lnbc-bounded", 50)
     })
   })
 })

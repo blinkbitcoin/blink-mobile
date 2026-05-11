@@ -163,6 +163,48 @@ describe("AutoConvertStatusProvider", () => {
     })
   })
 
+  describe("bounded map size (Important #11)", () => {
+    it("evicts the oldest invoice when the tracked-invoice cap is exceeded", () => {
+      const { result } = renderHook(
+        () => ({
+          oldest: useAutoConvertStatus("invoice-0"),
+          newest: useAutoConvertStatus("invoice-100"),
+          actions: useAutoConvertStatusActions(),
+        }),
+        { wrapper },
+      )
+
+      act(() => {
+        for (let i = 0; i < 101; i += 1) {
+          result.current.actions.markConverting(`invoice-${i}`)
+        }
+      })
+
+      expect(result.current.oldest).toBeUndefined()
+      expect(result.current.newest).toBe(AutoConvertStatus.Converting)
+    })
+
+    it("refreshes an invoice's position when re-marked, so it survives later eviction sweeps", () => {
+      const { result } = renderHook(
+        () => ({
+          refreshed: useAutoConvertStatus("invoice-0"),
+          actions: useAutoConvertStatusActions(),
+        }),
+        { wrapper },
+      )
+
+      act(() => {
+        for (let i = 0; i < 100; i += 1) {
+          result.current.actions.markConverting(`invoice-${i}`)
+        }
+        result.current.actions.markSettled("invoice-0")
+        result.current.actions.markConverting("invoice-100")
+      })
+
+      expect(result.current.refreshed).toBe(AutoConvertStatus.Settled)
+    })
+  })
+
   describe("useAutoConvertStatusActions stability", () => {
     it("returns stable markConverting and markSettled references across renders", () => {
       const { result, rerender } = renderHook(() => useAutoConvertStatusActions(), {

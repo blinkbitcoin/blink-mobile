@@ -11,6 +11,7 @@ import {
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { addBounded } from "@app/utils/bounded-collections"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
 
@@ -45,6 +46,9 @@ const RETRY_COOLDOWN_MS = 30_000
 
 /** Long enough to not race a slow convert; short enough to recover crashes. */
 const ORPHAN_TIMEOUT_MS = 2 * 60 * 1000
+
+const MAX_PROCESSED_PAYMENT_IDS = 200
+const MAX_IN_FLIGHT_INVOICES = 50
 
 type ConvertMoneyAmount = NonNullable<
   ReturnType<typeof usePriceConversion>["convertMoneyAmount"]
@@ -268,7 +272,11 @@ export const useAutoConvertListener = (): void => {
     }): Promise<void> => {
       const { record } = params
       if (inFlightInvoicesRef.current.has(record.paymentRequest)) return
-      inFlightInvoicesRef.current.add(record.paymentRequest)
+      addBounded(
+        inFlightInvoicesRef.current,
+        record.paymentRequest,
+        MAX_IN_FLIGHT_INVOICES,
+      )
       try {
         await runAutoConvert({
           sdk: params.sdk,
@@ -304,7 +312,11 @@ export const useAutoConvertListener = (): void => {
     if (!sdk || !convertMoneyAmount) return
     if (!lastReceivedPaymentId) return
     if (processedPaymentIdsRef.current.has(lastReceivedPaymentId)) return
-    processedPaymentIdsRef.current.add(lastReceivedPaymentId)
+    addBounded(
+      processedPaymentIdsRef.current,
+      lastReceivedPaymentId,
+      MAX_PROCESSED_PAYMENT_IDS,
+    )
 
     const run = async () => {
       const payment = await fetchPaymentById(sdk, lastReceivedPaymentId)
