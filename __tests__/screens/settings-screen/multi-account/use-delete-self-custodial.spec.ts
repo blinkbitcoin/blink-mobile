@@ -47,11 +47,11 @@ jest.mock("@app/self-custodial/config", () => ({
   storageDirFor: (id: string) => `/tmp/${id}`,
 }))
 
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
   removeBackupStateFor: (...args: unknown[]) => mockRemoveBackupStateFor(...args),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 

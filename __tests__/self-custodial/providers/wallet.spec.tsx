@@ -7,9 +7,9 @@ import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 import {
   SelfCustodialWalletProvider,
   useSelfCustodialWallet,
-} from "@app/self-custodial/providers/wallet-provider"
+} from "@app/self-custodial/providers/wallet"
 
-import { getWalletSnapshotMocks, setupConnectedWallet } from "./wallet-provider.fixtures"
+import { getWalletSnapshotMocks, setupConnectedWallet } from "./wallet.fixtures"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   Network: { Mainnet: 0, Regtest: 1 },

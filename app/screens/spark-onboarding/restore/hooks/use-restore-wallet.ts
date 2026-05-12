@@ -13,8 +13,8 @@ import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
 import {
   BackupMethod,
   markBackupCompletedFor,
-} from "@app/self-custodial/providers/backup-state-provider"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+} from "@app/self-custodial/providers/backup-state"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   findSelfCustodialAccountByMnemonic,
   StorageReadStatus,

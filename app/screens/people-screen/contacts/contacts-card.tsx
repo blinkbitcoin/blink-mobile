@@ -17,7 +17,7 @@ import {
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { listContacts as bridgeListContacts } from "@app/self-custodial/bridge"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 import { toastShow } from "@app/utils/toast"
 import { useAppConfig } from "@app/hooks"

@@ -118,7 +118,7 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 
 const mockRefreshSelfCustodialWallets = jest.fn().mockResolvedValue(undefined)
 const mockSelfCustodialLoadMore = jest.fn().mockResolvedValue(undefined)
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({
     loadMore: mockSelfCustodialLoadMore,
     refreshWallets: mockRefreshSelfCustodialWallets,

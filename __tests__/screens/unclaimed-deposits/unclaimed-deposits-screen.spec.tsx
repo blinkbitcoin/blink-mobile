@@ -51,7 +51,7 @@ jest.mock("@app/screens/unclaimed-deposits/hooks/use-recommended-fee-tiers", () 
   }
 })
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ sdk: { id: "sdk" } }),
 }))
 

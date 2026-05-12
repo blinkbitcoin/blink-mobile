@@ -12,10 +12,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
-import {
-  BackupMethod,
-  useBackupState,
-} from "@app/self-custodial/providers/backup-state-provider"
+import { BackupMethod, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { toastShow } from "@app/utils/toast"
 
 const showBackupErrorToast = (error: CredentialError, LL: TranslationFunctions): void => {

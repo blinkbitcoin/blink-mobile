@@ -6,7 +6,7 @@ import {
   useBackupState,
   BackupStatus,
   removeBackupStateFor,
-} from "@app/self-custodial/providers/backup-state-provider"
+} from "@app/self-custodial/providers/backup-state"
 import { AccountType, AccountStatus } from "@app/types/wallet"
 
 const TEST_SC_ACCOUNT_ID = "test-sc-uuid"

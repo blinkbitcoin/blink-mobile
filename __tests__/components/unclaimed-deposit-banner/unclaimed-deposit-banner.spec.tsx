@@ -24,7 +24,7 @@ jest.mock("@app/hooks/use-payments", () => ({
   usePayments: () => ({ listPendingDeposits: mockListPendingDepositsImpl }),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ wallets: mockWallets }),
 }))
 

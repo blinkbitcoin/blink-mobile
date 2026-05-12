@@ -3,7 +3,7 @@ import React from "react"
 import { render } from "@testing-library/react-native"
 
 import { AccountScreen } from "@app/screens/settings-screen/account/account-screen"
-import { BackupStatus } from "@app/self-custodial/providers/backup-state-provider"
+import { BackupStatus } from "@app/self-custodial/providers/backup-state"
 import { AccountType } from "@app/types/wallet"
 
 jest.mock("@rn-vui/themed", () => {
@@ -92,7 +92,7 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
 }))
 
 const mockUseBackupState = jest.fn()
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupStatus: { None: "none", Pending: "pending", Completed: "completed" },
   useBackupState: () => mockUseBackupState(),
 }))
@@ -130,7 +130,7 @@ jest.mock("@app/graphql/generated", () => ({
 
 const mockRefreshSelfCustodialWallets = jest.fn().mockResolvedValue(undefined)
 const mockUpdateCurrentSelfCustodialAccount = jest.fn().mockResolvedValue(undefined)
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({
     lightningAddress: "satoshi@blink.sv",
     refreshWallets: mockRefreshSelfCustodialWallets,

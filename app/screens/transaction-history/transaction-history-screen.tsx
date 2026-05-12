@@ -24,7 +24,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { getTransactionDescription } from "@app/self-custodial/mappers/transaction-description"
 import { toTransactionFragments } from "@app/self-custodial/mappers/to-transaction-fragment"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   WalletFilterDropdown,
   WalletValues,

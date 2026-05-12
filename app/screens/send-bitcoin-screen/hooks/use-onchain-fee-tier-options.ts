@@ -5,7 +5,7 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import {

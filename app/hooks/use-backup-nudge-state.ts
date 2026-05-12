@@ -6,10 +6,7 @@ import { useTotalBalance } from "@app/components/balance-header/use-total-balanc
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import {
-  BackupStatus,
-  useBackupState,
-} from "@app/self-custodial/providers/backup-state-provider"
+import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 

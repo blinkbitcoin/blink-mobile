@@ -36,7 +36,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useScanContext } from "@app/hooks/use-scan-context"
 import { useSelfCustodialContactList } from "@app/hooks/use-self-custodial-contact-list"
 import { ActiveWalletStatus } from "@app/types/wallet"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 
 import { toWalletBalances } from "./hooks/use-send-wallets"
 import { testProps } from "../../utils/testProps"

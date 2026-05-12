@@ -65,7 +65,7 @@ jest.mock("@app/self-custodial/auto-convert", () => ({
   ReceiveRail: { Lightning: "lightning", Onchain: "onchain" },
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
 

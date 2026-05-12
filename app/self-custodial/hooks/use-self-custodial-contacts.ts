@@ -15,7 +15,7 @@ import {
   listPayments as bridgeListPayments,
   updateContact as bridgeUpdateContact,
 } from "@app/self-custodial/bridge"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   type Contact,
   type ContactAdapter,

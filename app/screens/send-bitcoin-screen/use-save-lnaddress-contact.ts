@@ -7,7 +7,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 import { ContactType, useContactCreateMutation } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { findOrCreateContact as bridgeFindOrCreateContact } from "@app/self-custodial/bridge"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 
 gql`
   mutation contactCreate($input: ContactCreateInput!) {

@@ -42,7 +42,7 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ retry: mockReinitSdk }),
 }))
 

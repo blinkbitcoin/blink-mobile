@@ -5,7 +5,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import { getSparkDriveBackupFilename } from "@app/config/appinfo"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
-import { useBackupState } from "@app/self-custodial/providers/backup-state-provider"
+import { useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useAppConfig, useGoogleDriveBackup } from "@app/hooks"
 import { useWalletMnemonic } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"

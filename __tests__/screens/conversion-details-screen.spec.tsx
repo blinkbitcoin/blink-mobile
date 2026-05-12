@@ -76,7 +76,7 @@ jest.mock("@app/self-custodial/hooks", () => ({
   usePaymentRequest: jest.fn(),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({
     wallets: [],
     status: "Unavailable",

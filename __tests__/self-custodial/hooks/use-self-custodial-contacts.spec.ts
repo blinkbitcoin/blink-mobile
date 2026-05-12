@@ -30,7 +30,7 @@ jest.mock("@app/self-custodial/mappers/transaction-mapper", () => ({
   mapSelfCustodialTransactions: (...args: unknown[]) => mockMapTransactions(...args),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 

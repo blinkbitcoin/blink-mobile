@@ -63,7 +63,7 @@ jest.mock("@app/self-custodial/config", () => ({
   SparkToken: { Label: "USDB", Ticker: "USDB" },
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockWallet(),
 }))
 
