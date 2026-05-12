@@ -20,6 +20,13 @@ jest.mock("@app/utils/toast")
 jest.mock("@react-navigation/native")
 jest.mock("@app/utils/storage/secureStorage")
 
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => ({
+    isSelfCustodial: false,
+    activeWalletId: "current-custodial-id",
+  }),
+}))
+
 const mockClearNetworkError = jest.fn()
 const mockToastShow = toastShow as jest.Mock
 const mockLogout = jest.fn()

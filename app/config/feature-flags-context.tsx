@@ -1,8 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react"
+import React, { createContext, useContext, useEffect, useRef, useState } from "react"
 import remoteConfigInstance from "@react-native-firebase/remote-config"
 
 import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
+import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
+import { logSelfCustodialRolloutExposed } from "@app/utils/analytics"
 
 const DeviceAccountEnabledKey = "deviceAccountEnabledRestAuth"
 const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
@@ -39,6 +41,7 @@ type FeatureFlags = {
   deviceAccountEnabled: boolean
   nonCustodialEnabled: boolean
   stableBalanceEnabled: boolean
+  remoteConfigReady: boolean
 }
 
 type RemoteConfig = {
@@ -100,6 +103,7 @@ const defaultFeatureFlags: FeatureFlags = {
   deviceAccountEnabled: false,
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
+  remoteConfigReady: false,
 }
 
 remoteConfigInstance().setDefaults({
@@ -121,10 +125,12 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
 
   const { currentLevel } = useLevel()
   const [remoteConfigReady, setRemoteConfigReady] = useState(false)
+  const rolloutLoggedRef = useRef(false)
 
   const {
     appConfig: { galoyInstance },
   } = useAppConfig()
+  const hasCustodialAccount = useHasCustodialAccount()
 
   useEffect(() => {
     ;(async () => {
@@ -260,7 +266,24 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     nonCustodialEnabled: remoteConfig.nonCustodialEnabled,
     stableBalanceEnabled:
       remoteConfig.nonCustodialEnabled && remoteConfig.stableBalanceEnabled,
+    remoteConfigReady,
   }
+
+  useEffect(() => {
+    if (!remoteConfigReady) return
+    if (rolloutLoggedRef.current) return
+    rolloutLoggedRef.current = true
+    logSelfCustodialRolloutExposed({
+      nonCustodialEnabled: featureFlags.nonCustodialEnabled,
+      stableBalanceEnabled: featureFlags.stableBalanceEnabled,
+      hasCustodialAccount,
+    })
+  }, [
+    remoteConfigReady,
+    featureFlags.nonCustodialEnabled,
+    featureFlags.stableBalanceEnabled,
+    hasCustodialAccount,
+  ])
 
   if (!remoteConfigReady && currentLevel === "NonAuth") {
     return null

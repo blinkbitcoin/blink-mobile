@@ -4,6 +4,7 @@ import { Alert } from "react-native"
 import useLogout from "@app/hooks/use-logout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAppConfig } from "@app/hooks"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -21,6 +22,7 @@ export const NetworkErrorComponent: React.FC = () => {
   const { logout } = useLogout()
   const { appConfig } = useAppConfig()
   const { switchToNextProfile } = useSwitchToNextProfile()
+  const { isSelfCustodial: isSelfCustodialActive } = useActiveWallet()
 
   const [showedAlert, setShowedAlert] = useState(false)
   const isHandlingTokenExpiry = useRef(false)
@@ -39,6 +41,8 @@ export const NetworkErrorComponent: React.FC = () => {
     try {
       const currentToken = appConfig.token
       if (!currentToken) {
+        // Stale 401 from in-flight queries while the user is on self-custodial.
+        if (isSelfCustodialActive) return
         await logout()
         navigation.reset({
           index: 0,
@@ -59,6 +63,9 @@ export const NetworkErrorComponent: React.FC = () => {
       if (nextProfile) {
         return
       }
+
+      // Custodial session is dead but the user is on self-custodial; skip re-login modal.
+      if (isSelfCustodialActive) return
 
       if (!showedAlert) {
         setShowedAlert(true)
@@ -88,6 +95,7 @@ export const NetworkErrorComponent: React.FC = () => {
     }
   }, [
     appConfig.token,
+    isSelfCustodialActive,
     logout,
     LL,
     navigation,

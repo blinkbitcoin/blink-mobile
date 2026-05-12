@@ -51,3 +51,6 @@ export const requireSparkTokenIdentifier = (): string => {
   cachedTokenIdentifier = id
   return id
 }
+
+export const storageDirFor = (accountId: string): string =>
+  `${SparkConfig.storageDir}/${accountId}`

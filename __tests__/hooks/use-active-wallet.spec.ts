@@ -109,4 +109,65 @@ describe("useActiveWallet", () => {
     expect(result.current.isReady).toBe(false)
     expect(result.current.needsBackendAuth).toBe(true)
   })
+
+  it("treats Degraded self-custodial as isReady=true so payments stay available (Important #5)", () => {
+    mockActiveAccount.mockReturnValue({
+      id: "sc-default",
+      type: AccountType.SelfCustodial,
+    })
+    mockSelfCustodialState.mockReturnValue({
+      wallets: [],
+      status: ActiveWalletStatus.Degraded,
+      accountType: AccountType.SelfCustodial,
+    })
+
+    const { result } = renderHook(() => useActiveWallet())
+
+    expect(result.current.status).toBe(ActiveWalletStatus.Degraded)
+    expect(result.current.isReady).toBe(true)
+    expect(result.current.isSelfCustodial).toBe(true)
+  })
+
+  it("treats Degraded custodial as isReady=true (Important #5)", () => {
+    mockActiveAccount.mockReturnValue({
+      id: "custodial-default",
+      type: AccountType.Custodial,
+    })
+    mockCustodialState.mockReturnValue({
+      wallets: [],
+      status: ActiveWalletStatus.Degraded,
+      accountType: AccountType.Custodial,
+    })
+
+    const { result } = renderHook(() => useActiveWallet())
+
+    expect(result.current.status).toBe(ActiveWalletStatus.Degraded)
+    expect(result.current.isReady).toBe(true)
+  })
+
+  const nonReadyStatuses: ActiveWalletStatus[] = [
+    ActiveWalletStatus.Loading,
+    ActiveWalletStatus.Error,
+    ActiveWalletStatus.Offline,
+    ActiveWalletStatus.Unavailable,
+  ]
+
+  for (const status of nonReadyStatuses) {
+    it(`flips isReady=false for non-Ready, non-Degraded status '${status}' (Important #5)`, () => {
+      mockActiveAccount.mockReturnValue({
+        id: "sc-default",
+        type: AccountType.SelfCustodial,
+      })
+      mockSelfCustodialState.mockReturnValue({
+        wallets: [],
+        status,
+        accountType: AccountType.SelfCustodial,
+      })
+
+      const { result } = renderHook(() => useActiveWallet())
+
+      expect(result.current.status).toBe(status)
+      expect(result.current.isReady).toBe(false)
+    })
+  }
 })

@@ -5,17 +5,35 @@ import {
   RestoreWalletStatus,
 } from "@app/screens/spark-onboarding/restore/hooks/use-restore-wallet"
 
+const TEST_ACCOUNT_ID = "test-account-id-123"
+
 const mockRestore = jest.fn()
 const mockUpdateState = jest.fn()
 const mockNavigate = jest.fn()
-const mockDeleteMnemonic = jest.fn()
 const mockRecordError = jest.fn()
 const mockToastShow = jest.fn()
 const mockReinitSdk = jest.fn()
 const mockSetBackupCompleted = jest.fn()
+const mockReloadSelfCustodialAccounts = jest.fn()
+const mockFindSelfCustodialAccountByMnemonic = jest.fn()
+
+jest.mock("react-native-quick-crypto", () => ({
+  randomUUID: () => "test-account-id-123",
+}))
 
 jest.mock("@app/self-custodial/bridge", () => ({
   selfCustodialRestoreWallet: (...args: string[]) => mockRestore(...args),
+}))
+
+jest.mock("@app/self-custodial/storage/account-index", () => ({
+  findSelfCustodialAccountByMnemonic: (...args: string[]) =>
+    mockFindSelfCustodialAccountByMnemonic(...args),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    reloadSelfCustodialAccounts: mockReloadSelfCustodialAccounts,
+  }),
 }))
 
 jest.mock("@app/store/persistent-state", () => ({
@@ -29,11 +47,6 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: Error[]) => mockRecordError(...args),
-}))
-
-jest.mock("@app/utils/storage/secureStorage", () => ({
-  __esModule: true,
-  default: { deleteMnemonic: () => mockDeleteMnemonic() },
 }))
 
 jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
@@ -64,7 +77,8 @@ describe("useRestoreWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockRestore.mockResolvedValue(undefined)
-    mockDeleteMnemonic.mockResolvedValue(true)
+    mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
+    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue(null)
   })
 
   it("starts with idle status", () => {
@@ -73,21 +87,37 @@ describe("useRestoreWallet", () => {
     expect(result.current.status).toBe(RestoreWalletStatus.Idle)
   })
 
-  it("restores wallet and navigates on success", async () => {
+  it("restores wallet with new account id and navigates on success", async () => {
     const { result } = renderHook(() => useRestoreWallet())
 
     await act(async () => {
       await result.current.restore("word1 word2 word3")
     })
 
-    expect(mockRestore).toHaveBeenCalledWith("word1 word2 word3")
+    expect(mockRestore).toHaveBeenCalledWith(TEST_ACCOUNT_ID, "word1 word2 word3")
+    expect(mockReloadSelfCustodialAccounts).toHaveBeenCalledTimes(1)
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
     expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
   })
 
-  it("sets error status and cleans up on failure", async () => {
+  it("activates an existing account when the mnemonic is already imported", async () => {
+    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue("existing-id")
+
+    const { result } = renderHook(() => useRestoreWallet())
+
+    await act(async () => {
+      await result.current.restore("word1 word2 word3")
+    })
+
+    expect(mockRestore).not.toHaveBeenCalled()
+    expect(mockUpdateState).toHaveBeenCalledTimes(1)
+    expect(mockReinitSdk).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
+  })
+
+  it("sets error status and reports on failure", async () => {
     mockRestore.mockRejectedValue(new Error("restore failed"))
 
     const { result } = renderHook(() => useRestoreWallet())
@@ -97,7 +127,6 @@ describe("useRestoreWallet", () => {
     })
 
     expect(result.current.status).toBe(RestoreWalletStatus.Error)
-    expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
     expect(mockRecordError).toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalled()
   })
@@ -116,7 +145,7 @@ describe("useRestoreWallet", () => {
     )
   })
 
-  it("second restore call while first is in-flight still calls bridge", async () => {
+  it("ignores reentrant restore while one is already in flight", async () => {
     let resolveFirst: () => void
     mockRestore.mockImplementationOnce(
       () =>
@@ -137,7 +166,7 @@ describe("useRestoreWallet", () => {
       await result.current.restore("mnemonic2")
     })
 
-    expect(mockRestore).toHaveBeenCalledTimes(2)
+    expect(mockRestore).toHaveBeenCalledTimes(1)
 
     await act(async () => {
       resolveFirst!()

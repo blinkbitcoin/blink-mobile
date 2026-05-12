@@ -48,6 +48,11 @@ jest.mock("@app/hooks/use-app-config", () => ({
   }),
 }))
 
+const mockListSelfCustodialAccounts = jest.fn()
+jest.mock("@app/self-custodial/storage/account-index", () => ({
+  listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
+}))
+
 let mockNonCustodialEnabled = false
 let mockActiveAccountId: string | undefined
 
@@ -56,6 +61,7 @@ describe("useAccountRegistry", () => {
     jest.clearAllMocks()
     mockNonCustodialEnabled = false
     mockActiveAccountId = undefined
+    mockListSelfCustodialAccounts.mockResolvedValue([])
   })
 
   it("returns custodial account when authenticated", () => {
@@ -78,15 +84,22 @@ describe("useAccountRegistry", () => {
     expect(result.current.activeAccount).toBeUndefined()
   })
 
-  it("includes self-custodial account when flag enabled", () => {
+  it("includes self-custodial accounts loaded from the index", async () => {
     mockUseIsAuthed.mockReturnValue(true)
     mockNonCustodialEnabled = true
+    mockListSelfCustodialAccounts.mockResolvedValue([
+      { id: "sc-uuid-1", lightningAddress: null },
+    ])
 
     const { result } = renderHook(() => useAccountRegistry())
 
+    await act(async () => {
+      await Promise.resolve()
+    })
+
     expect(result.current.accounts).toHaveLength(2)
     expect(result.current.accounts[1].type).toBe(AccountType.SelfCustodial)
-    expect(result.current.accounts[1].label).toBe("Spark")
+    expect(result.current.accounts[1].id).toBe("sc-uuid-1")
     expect(result.current.accounts[1].status).toBe(AccountStatus.RequiresRestore)
   })
 
@@ -99,14 +112,21 @@ describe("useAccountRegistry", () => {
     expect(result.current.activeAccount?.selected).toBe(true)
   })
 
-  it("selects account matching activeAccountId", () => {
+  it("selects account matching activeAccountId", async () => {
     mockUseIsAuthed.mockReturnValue(true)
     mockNonCustodialEnabled = true
-    mockActiveAccountId = "self-custodial-default"
+    mockActiveAccountId = "sc-uuid-1"
+    mockListSelfCustodialAccounts.mockResolvedValue([
+      { id: "sc-uuid-1", lightningAddress: null },
+    ])
 
     const { result } = renderHook(() => useAccountRegistry())
 
-    expect(result.current.activeAccount?.id).toBe("self-custodial-default")
+    await act(async () => {
+      await Promise.resolve()
+    })
+
+    expect(result.current.activeAccount?.id).toBe("sc-uuid-1")
     expect(result.current.activeAccount?.type).toBe(AccountType.SelfCustodial)
   })
 
@@ -134,14 +154,21 @@ describe("useAccountRegistry", () => {
     expect(mockSaveToken).toHaveBeenCalledWith("token")
   })
 
-  it("setActiveAccountId does not call saveToken for self-custodial", () => {
+  it("setActiveAccountId does not call saveToken for self-custodial", async () => {
     mockUseIsAuthed.mockReturnValue(true)
     mockNonCustodialEnabled = true
+    mockListSelfCustodialAccounts.mockResolvedValue([
+      { id: "sc-uuid-1", lightningAddress: null },
+    ])
 
     const { result } = renderHook(() => useAccountRegistry())
 
+    await act(async () => {
+      await Promise.resolve()
+    })
+
     act(() => {
-      result.current.setActiveAccountId("self-custodial-default")
+      result.current.setActiveAccountId("sc-uuid-1")
     })
 
     expect(mockSaveToken).not.toHaveBeenCalled()
@@ -162,9 +189,9 @@ describe("createCustodialDescriptor", () => {
 
 describe("createSelfCustodialDescriptor", () => {
   it("creates a self-custodial descriptor with correct defaults", () => {
-    const desc = createSelfCustodialDescriptor("Spark")
+    const desc = createSelfCustodialDescriptor("sc-id-1", "Spark")
 
-    expect(desc.id).toBe(DefaultAccountId.SelfCustodial)
+    expect(desc.id).toBe("sc-id-1")
     expect(desc.type).toBe(AccountType.SelfCustodial)
     expect(desc.label).toBe("Spark")
     expect(desc.selected).toBe(false)
@@ -175,11 +202,11 @@ describe("createSelfCustodialDescriptor", () => {
 describe("markSelected", () => {
   const accounts = [
     createCustodialDescriptor("Blink"),
-    createSelfCustodialDescriptor("Spark"),
+    createSelfCustodialDescriptor("sc-id-1", "Spark"),
   ]
 
   it("marks account matching activeId as selected", () => {
-    const result = markSelected(accounts, DefaultAccountId.SelfCustodial)
+    const result = markSelected(accounts, "sc-id-1")
 
     expect(result[0].selected).toBe(false)
     expect(result[1].selected).toBe(true)

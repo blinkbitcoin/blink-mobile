@@ -10,10 +10,22 @@ const mockUpdateState = jest.fn()
 const mockDispatch = jest.fn()
 const mockRecordError = jest.fn()
 const mockReinitSdk = jest.fn()
-const mockResetBackupState = jest.fn()
+const mockReloadSelfCustodialAccounts = jest.fn()
+
+const TEST_ACCOUNT_ID = "test-account-id-123"
+
+jest.mock("react-native-quick-crypto", () => ({
+  randomUUID: () => "test-account-id-123",
+}))
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  selfCustodialCreateWallet: () => mockCreateWallet(),
+  selfCustodialCreateWallet: (accountId: string) => mockCreateWallet(accountId),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    reloadSelfCustodialAccounts: mockReloadSelfCustodialAccounts,
+  }),
 }))
 
 jest.mock("@app/store/persistent-state", () => ({
@@ -33,10 +45,6 @@ jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
   useSelfCustodialWallet: () => ({ retry: mockReinitSdk }),
 }))
 
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
-  useBackupState: () => ({ resetBackupState: mockResetBackupState }),
-}))
-
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: Error[]) => mockRecordError(...args),
 }))
@@ -44,7 +52,8 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 describe("useCreateWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockCreateWallet.mockResolvedValue("word1 word2 word3")
+    mockCreateWallet.mockResolvedValue(undefined)
+    mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
   })
 
   it("starts with idle status", () => {
@@ -87,11 +96,11 @@ describe("useCreateWallet", () => {
     expect(updater(null)).toBeNull()
     expect(updater({ galoyAuthToken: "t" })).toEqual({
       galoyAuthToken: "t",
-      activeAccountId: "self-custodial-default",
+      activeAccountId: TEST_ACCOUNT_ID,
     })
   })
 
-  it("reinits SDK and resets backup state on success", async () => {
+  it("reinits SDK on success", async () => {
     const { result } = renderHook(() => useCreateWallet())
 
     await act(async () => {
@@ -99,7 +108,6 @@ describe("useCreateWallet", () => {
     })
 
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
-    expect(mockResetBackupState).toHaveBeenCalledTimes(1)
   })
 
   it("navigates to Primary on success", async () => {
@@ -158,6 +166,36 @@ describe("useCreateWallet", () => {
     expect(mockUpdateState).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(mockReinitSdk).not.toHaveBeenCalled()
-    expect(mockResetBackupState).not.toHaveBeenCalled()
+  })
+
+  it("ignores reentrant create while one is already in flight (Critical #5)", async () => {
+    let resolveFirst: () => void
+    mockCreateWallet.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveFirst = resolve
+        }),
+    )
+
+    const { result } = renderHook(() => useCreateWallet())
+
+    act(() => {
+      result.current.create()
+    })
+
+    expect(result.current.status).toBe(CreationStatus.Creating)
+
+    await act(async () => {
+      await result.current.create()
+    })
+
+    expect(mockCreateWallet).toHaveBeenCalledTimes(1)
+    expect(mockUpdateState).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
+    expect(mockReinitSdk).not.toHaveBeenCalled()
+
+    await act(async () => {
+      resolveFirst!()
+    })
   })
 })

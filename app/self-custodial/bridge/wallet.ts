@@ -23,3 +23,5 @@ export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: numb
   })
 
 export const getUserSettings = (sdk: BreezSdkInterface) => sdk.getUserSettings()
+
+export const getLightningAddress = (sdk: BreezSdkInterface) => sdk.getLightningAddress()

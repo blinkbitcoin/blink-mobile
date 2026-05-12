@@ -21,13 +21,19 @@ type WalletSnapshotMocks = {
 export const getWalletSnapshotMocks = (): WalletSnapshotMocks =>
   jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
 
+export const TEST_SC_ACCOUNT_ID = "test-sc-uuid"
+
+type SetupMocks = {
+  getMnemonicForAccount: jest.Mock
+  initSdk: jest.Mock
+  addSdkEventListener: jest.Mock
+  listSelfCustodialAccounts: jest.Mock
+  setActiveAccountId: (id: string) => void
+}
+
 /** Minimal connected SDK mock: `initSdk` resolves, snapshot returns empty wallets. */
 export const setupConnectedWallet = (
-  mocks: {
-    getMnemonic: jest.Mock
-    initSdk: jest.Mock
-    addSdkEventListener: jest.Mock
-  },
+  mocks: SetupMocks,
   snapshot: WalletSnapshot = { wallets: [], hasMore: false },
 ): { listener: CapturedListenerRef } => {
   const listener: CapturedListenerRef = { current: null }
@@ -41,8 +47,12 @@ export const setupConnectedWallet = (
       return Promise.resolve("id")
     },
   )
-  mocks.getMnemonic.mockResolvedValue("word1 word2 word3")
+  mocks.getMnemonicForAccount.mockResolvedValue("word1 word2 word3")
   mocks.initSdk.mockResolvedValue({})
+  mocks.listSelfCustodialAccounts.mockResolvedValue([
+    { id: TEST_SC_ACCOUNT_ID, lightningAddress: null },
+  ])
+  mocks.setActiveAccountId(TEST_SC_ACCOUNT_ID)
 
   return { listener }
 }

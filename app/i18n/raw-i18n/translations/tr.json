@@ -2330,6 +2330,7 @@
     "setYourLightningAddress": "Lightning Adresinizi Ayarlayın",
     "activated": "Aktive edildi",
     "addressScreen": "Ödeme alma yolları",
+    "nonCustodialAccount": "Saklamasız hesap",
     "tapUserName": "Kullanıcı adını ayarlamak için tıkla",
     "notifications": "Bildirimler",
     "recoveryMethod": "Kurtarma yöntemi",
@@ -2357,7 +2358,30 @@
     "logoutOneAccountAlertContent": "{identifier: string} ile bağlantılı oturumdan çıkış yapılacak.\nGelecekte tekrar giriş yapabilmek için erişiminizin olduğundan emin olun.",
     "logoutOneAccountConfirm": "Anlıyorum. Lütfen çıkış yap.",
     "receiveCurrency": "Alış para birimi",
-    "displayCurrency": "Görüntülenen para birimi"
+    "displayCurrency": "Görüntülenen para birimi",
+    "AccountInformation": {
+      "accountTypeLabel": "Account type",
+      "identityLabel": "Wallet identifier",
+      "backupStatusLabel": "Backup status",
+      "backupStatusCompleted": "Backup complete",
+      "backupStatusNotCompleted": "Backup not complete",
+      "loadError": "Could not load your account information."
+    },
+    "TransactionLimits": {
+      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
+      "btcToUsdTitle": "Bitcoin to Dollars",
+      "usdToBtcTitle": "Dollars to Bitcoin",
+      "minFromLabel": "Minimum sent",
+      "minToLabel": "Minimum received",
+      "loadError": "Could not load conversion limits."
+    },
+    "WaysToGetPaid": {
+      "lightningAddressTitle": "Lightning address",
+      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
+      "onchainTitle": "Bitcoin deposit address",
+      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
+      "loadError": "Could not load your payment details."
+    }
   },
   "NotificationSettingsScreen": {
     "title": "Bildirim Ayarları",
@@ -2684,6 +2708,8 @@
     "accountInformation": "Hesap Bilgileri",
     "trialAccount": "Deneme Hesabı",
     "blinkUser": "Blink Kullanıcısı",
+    "anonymous": "Anonim",
+    "anonymousUser": "Anonim kullanıcı",
     "blinkToBlink": "Blink'ten Blink'e",
     "transactionLimits": "İşlem Limitleri",
     "activateWallet": "Cüzdanı aktive et",
@@ -3603,7 +3629,14 @@
   },
   "BackendFeatureGate": {
     "title": "Özellik kullanılamıyor",
-    "description": "Bu özellik bir saklama hesabı gerektiriyor."
+    "description": "Bu özellik bir saklama hesabı gerektiriyor.",
+    "signInTitle": "Sign in required",
+    "signInDescription": "Sign in to your custodial account to use {featureName}.",
+    "noAccountTitle": "Custodial account required",
+    "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "featureCircles": "Circles",
+    "featureEarn": "Earn",
+    "featureCard": "Card"
   },
   "SparkWalletCreationScreen": {
     "creating": "Cüzdanınız oluşturuluyor...",
@@ -3670,5 +3703,21 @@
     "badgeFeeIssue": "Fee issue",
     "badgeError": "Hata",
     "badgeRefunded": "İade edildi"
+  },
+  "FeatureUnavailable": {
+    "SelfCustodial": {
+      "title": "Temporarily unavailable",
+      "description": "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later."
+    }
+  },
+  "NetworkStatus": {
+    "degradedBanner": "Spark network is currently degraded. Payments may take longer."
+  },
+  "SelfCustodialDelete": {
+    "title": "Delete self-custodial wallet",
+    "warning": "This will remove this wallet from this device.",
+    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
+    "backupBadgeCompleted": "Backup complete",
+    "backupBadgeMissing": "Backup not complete"
   }
 }

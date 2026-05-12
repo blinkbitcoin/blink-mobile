@@ -7,12 +7,12 @@ import {
   type BreezSdkInterface,
   type Payment,
 } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
 import { toastShow } from "@app/utils/toast"
 
@@ -53,10 +53,6 @@ type ConvertMoneyAmount = NonNullable<
 
 type LL = ReturnType<typeof useI18nContext>["LL"]
 
-const reportError = (err: unknown, context: string): void => {
-  crashlytics().recordError(err instanceof Error ? err : new Error(`${context}: ${err}`))
-}
-
 const extractLightningInvoiceFromPayment = (payment: Payment): string | undefined => {
   if (!payment.details) return undefined
   if (!PaymentDetails.Lightning.instanceOf(payment.details)) return undefined
@@ -71,7 +67,7 @@ const fetchPaymentById = async (
     const response = await sdk.getPayment(GetPaymentRequest.create({ paymentId }))
     return response.payment
   } catch (err) {
-    reportError(err, "auto-convert-listener: getPayment failed")
+    reportError("auto-convert-listener getPayment", err)
     return undefined
   }
 }
@@ -223,7 +219,7 @@ const findPaidAmountForInvoice = async (
     if (!match) return undefined
     return { paymentId: match.id, amount: toNumber(match.amount) }
   } catch (err) {
-    reportError(err, "auto-convert-listener: findPaidAmountForInvoice failed")
+    reportError("auto-convert-listener findPaidAmountForInvoice", err)
     return undefined
   }
 }
@@ -303,7 +299,7 @@ export const useAutoConvertListener = (): void => {
       }
     }
 
-    run().catch((err) => reportError(err, "auto-convert-listener: live run failed"))
+    run().catch((err) => reportError("auto-convert-listener live run", err))
   }, [
     sdk,
     lastReceivedPaymentId,
@@ -382,7 +378,7 @@ export const useAutoConvertListener = (): void => {
       )
     }
 
-    replay().catch((err) => reportError(err, "auto-convert-listener: replay failed"))
+    replay().catch((err) => reportError("auto-convert-listener replay", err))
   }, [
     sdk,
     convertMoneyAmount,
