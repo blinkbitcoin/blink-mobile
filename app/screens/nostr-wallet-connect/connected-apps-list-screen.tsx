@@ -18,17 +18,6 @@ import { toBtcMoneyAmount } from "@app/types/amounts"
 
 import { useNwcConnections } from "./hooks"
 
-// TODO: remove when backend integration is ready
-const MOCK_CONNECTIONS = [
-  {
-    id: "mock-1",
-    appName: "BTCpayserver",
-    dailyBudgetSats: 10_000,
-    connectionString: "nostr+walletconnect://mock",
-    createdAt: Date.now(),
-  },
-]
-
 export const NwcConnectedAppsListScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -37,9 +26,8 @@ export const NwcConnectedAppsListScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { formatMoneyAmount } = useDisplayCurrency()
-  const { connections: hookConnections, removeConnection } = useNwcConnections()
+  const { connections, removeConnection } = useNwcConnections()
 
-  const connections = hookConnections.length > 0 ? hookConnections : MOCK_CONNECTIONS
   const [threshold, setThreshold] = useState(1)
   const [deleteTarget, setDeleteTarget] = useState<string | undefined>()
   const targetConnection = connections.find((c) => c.id === deleteTarget)
@@ -56,7 +44,7 @@ export const NwcConnectedAppsListScreen: React.FC = () => {
     if (!deleteTarget) return
     removeConnection(deleteTarget)
     setDeleteTarget(undefined)
-    if (connections.length - 1 <= 0) {
+    if (connections.length === 1) {
       navigation.replace("nwcEmptyState")
     }
   }

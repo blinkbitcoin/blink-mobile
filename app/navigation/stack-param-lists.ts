@@ -10,6 +10,10 @@ import {
   ReceiveDestination,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
+import type {
+  NwcBudgetPeriod,
+  NwcGraphqlPermission,
+} from "@app/screens/nostr-wallet-connect/nwc-types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
@@ -178,8 +182,23 @@ export type RootStackParamList = {
   cardOnboardingApprovedScreen: undefined
   nwcEmptyState: undefined
   nwcNewConnection: undefined
-  nwcConnectionCreated: { connectionString: string; appName: string }
+  nwcConnectionCreated: {
+    connectionString: string
+    appName: string
+    successMode?: "manual" | "authorization"
+    permissions?: ReadonlyArray<NwcGraphqlPermission>
+    budget?: {
+      amountSats: number
+      period: NwcBudgetPeriod
+    }
+    budgets?: ReadonlyArray<{
+      amountSats: number
+      period: NwcBudgetPeriod
+    }>
+    returnUrl?: string
+  }
   nwcConnectedApps: undefined
+  nwcAuthorization: { uri: string }
 }
 
 export type OnboardingStackParamList = {

@@ -39,6 +39,8 @@ import { MessagingContainer } from "./messaging"
 import { NetworkErrorContextProvider } from "./network-error-context"
 
 const noRetryOperations = [
+  "nwcConnectionCreate",
+
   "intraLedgerPaymentSend",
   "intraLedgerUsdPaymentSend",
 
