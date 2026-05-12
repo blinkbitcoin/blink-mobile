@@ -1,17 +1,5 @@
 import RNSecureKeyStore, { ACCESSIBLE } from "react-native-secure-key-store"
 
-import { reportError } from "../error-logging"
-
-const safeRemoveKey = async (key: string, label: string): Promise<boolean> => {
-  try {
-    await RNSecureKeyStore.remove(key)
-    return true
-  } catch (err) {
-    reportError(label, err)
-    return false
-  }
-}
-
 export default class KeyStoreWrapper {
   private static readonly IS_BIOMETRICS_ENABLED = "isBiometricsEnabled"
   private static readonly PIN = "PIN"
@@ -145,66 +133,6 @@ export default class KeyStoreWrapper {
       await RNSecureKeyStore.remove(KeyStoreWrapper.SESSION_PROFILES)
       return true
     } catch (err) {
-      return false
-    }
-  }
-
-  public static async hasMnemonic(): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.get(KeyStoreWrapper.MNEMONIC)
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  public static async getMnemonic(): Promise<string | null> {
-    try {
-      return await RNSecureKeyStore.get(KeyStoreWrapper.MNEMONIC)
-    } catch {
-      return null
-    }
-  }
-
-  public static async setMnemonic(mnemonic: string): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.set(KeyStoreWrapper.MNEMONIC, mnemonic, {
-        accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-      })
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  public static async deleteMnemonic(): Promise<boolean> {
-    const primaryOk = await safeRemoveKey(
-      KeyStoreWrapper.MNEMONIC,
-      "Failed to delete MNEMONIC key",
-    )
-    if (!primaryOk) return false
-    await safeRemoveKey(
-      KeyStoreWrapper.MNEMONIC_NETWORK,
-      "Failed to delete MNEMONIC_NETWORK key",
-    )
-    return true
-  }
-
-  public static async getMnemonicNetwork(): Promise<string | null> {
-    try {
-      return await RNSecureKeyStore.get(KeyStoreWrapper.MNEMONIC_NETWORK)
-    } catch {
-      return null
-    }
-  }
-
-  public static async setMnemonicNetwork(network: string): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.set(KeyStoreWrapper.MNEMONIC_NETWORK, network, {
-        accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-      })
-      return true
-    } catch {
       return false
     }
   }
