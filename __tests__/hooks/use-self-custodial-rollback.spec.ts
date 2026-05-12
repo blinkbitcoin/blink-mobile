@@ -133,7 +133,7 @@ describe("useSelfCustodialRollback", () => {
     expect(mockSetActiveAccountId).toHaveBeenCalledWith("custodial-default")
   })
 
-  describe("cold-start race (Critical #1)", () => {
+  describe("cold-start race", () => {
     it("does not roll back while remoteConfigReady is false, even with the default flag value", () => {
       mockRemoteConfigReady = false
       mockNonCustodialEnabled = false
@@ -192,7 +192,7 @@ describe("useSelfCustodialRollback", () => {
     })
   })
 
-  describe("shouldShowUnavailable matrix (Critical #6)", () => {
+  describe("shouldShowUnavailable matrix", () => {
     type AnyAccount = typeof selfCustodialAccount | typeof custodialAccount
     const renderWith = (overrides: {
       activeAccount?: AnyAccount

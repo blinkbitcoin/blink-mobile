@@ -600,7 +600,7 @@ const buildUsdSettlementRoute = (
   } as const
 }
 
-describe("SendBitcoinConfirmationScreen — Critical #4 fee-currency conversion", () => {
+describe("SendBitcoinConfirmationScreen — fee-currency conversion", () => {
   beforeEach(() => {
     // Balance: $10.00 = 1000 cents.
     mockUseSendBalances.mockReturnValue({
@@ -664,7 +664,7 @@ describe("SendBitcoinConfirmationScreen — Critical #4 fee-currency conversion"
   })
 })
 
-describe("SendBitcoinConfirmationScreen — Critical #5 skipBalanceCheck matrix", () => {
+describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
   beforeEach(() => {
     // Settlement $11.00 (1100 cents) is always over the $10.00 (1000 cents) balance.
     mockUseSendBalances.mockReturnValue({

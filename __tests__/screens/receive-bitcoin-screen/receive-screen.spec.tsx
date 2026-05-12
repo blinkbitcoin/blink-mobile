@@ -148,7 +148,7 @@ describe("ReceiveScreen — routing", () => {
     expect(toJSON()).toBeNull()
   })
 
-  it("invokes BOTH custodial and self-custodial payment-request hooks regardless of mode (current behaviour, related to I6)", () => {
+  it("invokes BOTH custodial and self-custodial payment-request hooks regardless of mode (current behaviour, related to)", () => {
     mockUseActiveWallet.mockReturnValue({
       isSelfCustodial: true,
       status: ActiveWalletStatus.Ready,

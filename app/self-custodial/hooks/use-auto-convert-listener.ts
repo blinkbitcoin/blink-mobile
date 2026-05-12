@@ -146,7 +146,7 @@ const runAutoConvert = async ({
     if (!settled) return
 
     // Stamp the attempt only after the convert had a chance to run — phantom
-    // poll-exhaustion failures must not consume the retry budget (Critical #1).
+    // poll-exhaustion failures must not consume the retry budget.
     await recordAutoConvertAttempt(record.paymentRequest, Date.now())
 
     const usdCentsAmount = convertSatsToUsdCents(satsReceived, convert)
@@ -367,7 +367,7 @@ export const useAutoConvertListener = (): void => {
 
         const paid = await findPaidAmountForInvoice(sdk, record.paymentRequest)
         // Bound the replay loop on busy wallets where the matching payment has
-        // aged off the recent listPayments page (Critical #6).
+        // aged off the recent listPayments page.
         if (!paid) {
           if (record.attempts + 1 >= autoConvertMaxAttempts) {
             await removePendingAutoConvert(record.paymentRequest)

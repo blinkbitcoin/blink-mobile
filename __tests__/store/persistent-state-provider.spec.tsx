@@ -196,7 +196,7 @@ describe("PersistentStateProvider", () => {
     )
   })
 
-  describe("migration failure handling (Critical #3)", () => {
+  describe("migration failure handling", () => {
     const corruptedState3 = {
       schemaVersion: 3,
       hasShownStableSatsWelcome: false,

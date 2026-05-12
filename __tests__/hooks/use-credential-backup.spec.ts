@@ -415,7 +415,7 @@ describe("useCredentialBackup", () => {
   })
 })
 
-describe("isCredentialBackupAvailable (Critical #2)", () => {
+describe("isCredentialBackupAvailable", () => {
   const originalPlatform = Platform.OS
 
   afterAll(() => {

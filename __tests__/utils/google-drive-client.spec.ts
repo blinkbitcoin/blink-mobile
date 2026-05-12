@@ -49,7 +49,7 @@ describe("google drive client", () => {
     )
   })
 
-  it("throws DriveError with reason='auth' on 401 (Critical #8)", async () => {
+  it("throws DriveError with reason='auth' on 401", async () => {
     ;(global.fetch as jest.Mock).mockResolvedValue({
       ok: false,
       status: 401,
@@ -63,7 +63,7 @@ describe("google drive client", () => {
     })
   })
 
-  it("throws DriveError with reason='auth' on 403 (Critical #8)", async () => {
+  it("throws DriveError with reason='auth' on 403", async () => {
     ;(global.fetch as jest.Mock).mockResolvedValue({
       ok: false,
       status: 403,
@@ -75,7 +75,7 @@ describe("google drive client", () => {
     })
   })
 
-  it("throws DriveError with reason='transient' on 429 (Critical #8)", async () => {
+  it("throws DriveError with reason='transient' on 429", async () => {
     ;(global.fetch as jest.Mock).mockResolvedValue({
       ok: false,
       status: 429,
@@ -87,7 +87,7 @@ describe("google drive client", () => {
     })
   })
 
-  it("throws DriveError with reason='transient' on 503 (Critical #8)", async () => {
+  it("throws DriveError with reason='transient' on 503", async () => {
     ;(global.fetch as jest.Mock).mockResolvedValue({
       ok: false,
       status: 503,
@@ -99,7 +99,7 @@ describe("google drive client", () => {
     })
   })
 
-  it("throws DriveError with reason='transient' on the 500 boundary (Critical #8)", async () => {
+  it("throws DriveError with reason='transient' on the 500 boundary", async () => {
     ;(global.fetch as jest.Mock).mockResolvedValue({
       ok: false,
       status: 500,
@@ -111,7 +111,7 @@ describe("google drive client", () => {
     })
   })
 
-  it("throws DriveError with reason='transient' when fetch itself rejects (network failure) (Critical #8)", async () => {
+  it("throws DriveError with reason='transient' when fetch itself rejects (network failure)", async () => {
     ;(global.fetch as jest.Mock).mockRejectedValue(
       new TypeError("Network request failed"),
     )
@@ -256,7 +256,7 @@ describe("google drive client", () => {
       )
     })
 
-    it("throws DriveError with reason='auth' when list returns 401 (Critical #8)", async () => {
+    it("throws DriveError with reason='auth' when list returns 401", async () => {
       ;(global.fetch as jest.Mock).mockResolvedValue({
         ok: false,
         status: 401,
@@ -270,7 +270,7 @@ describe("google drive client", () => {
     })
   })
 
-  it("downloadAppDataFile throws DriveError with reason='not-found' on 404 (Critical #8)", async () => {
+  it("downloadAppDataFile throws DriveError with reason='not-found' on 404", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 404,
@@ -283,7 +283,7 @@ describe("google drive client", () => {
     })
   })
 
-  it("downloadAppDataFile throws DriveError with reason='unknown' on 418 (Critical #8)", async () => {
+  it("downloadAppDataFile throws DriveError with reason='unknown' on 418", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 418,

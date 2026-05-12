@@ -212,7 +212,7 @@ describe("useNonCustodialConversionGuard", () => {
     expect(result.current.isQuoting).toBe(false)
   })
 
-  it("surfaces hasQuoteError=true and keeps blockingReason null when the quote rejects (Critical #6)", async () => {
+  it("surfaces hasQuoteError=true and keeps blockingReason null when the quote rejects", async () => {
     mockGetQuote.mockRejectedValue(new Error("pools unavailable"))
 
     const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))
@@ -222,7 +222,7 @@ describe("useNonCustodialConversionGuard", () => {
     expect(result.current.blockingReason).toBeNull()
   })
 
-  it("surfaces hasQuoteError=true when the SDK returns a null quote (Critical #6)", async () => {
+  it("surfaces hasQuoteError=true when the SDK returns a null quote", async () => {
     mockGetQuote.mockResolvedValue(null)
 
     const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))

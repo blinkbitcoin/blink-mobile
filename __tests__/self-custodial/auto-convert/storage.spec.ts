@@ -196,7 +196,7 @@ describe("auto-convert storage", () => {
       expect(mockSetItem.mock.calls[0][0]).toBe(STORAGE_KEY)
     })
 
-    it("withWriteLock keeps draining when a prior write rejects (Important #6)", async () => {
+    it("withWriteLock keeps draining when a prior write rejects", async () => {
       // First setItem rejects; the chain must absorb the rejection so the
       // next write still gets through instead of deadlocking the queue.
       mockSetItem
@@ -213,7 +213,7 @@ describe("auto-convert storage", () => {
     })
   })
 
-  describe("AutoConvertPairings (Critical #2 dedup correlation)", () => {
+  describe("AutoConvertPairings (dedup correlation)", () => {
     const PAIRINGS_KEY = "selfCustodialAutoConvertPairings"
 
     const makePairing = (overrides: Partial<Record<string, unknown>> = {}) => ({

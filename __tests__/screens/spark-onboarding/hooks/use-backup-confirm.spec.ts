@@ -168,7 +168,7 @@ describe("useBackupConfirm", () => {
     expect(result.current.focusRequest).toBeNull()
   })
 
-  it("does not auto-complete while disabled, then fires once unlocked (Critical #1)", () => {
+  it("does not auto-complete while disabled, then fires once unlocked", () => {
     const { result, rerender } = renderHook(
       ({ disabled }: { disabled: boolean }) =>
         useBackupConfirm({ challenges, onComplete: mockOnComplete, disabled }),
@@ -188,7 +188,7 @@ describe("useBackupConfirm", () => {
     expect(mockOnComplete).toHaveBeenCalledTimes(1)
   })
 
-  it("re-arms the auto-advance timer after a de-correct then re-correct sequence (Critical #6)", () => {
+  it("re-arms the auto-advance timer after a de-correct then re-correct sequence", () => {
     const { result } = renderHook(() =>
       useBackupConfirm({ challenges, onComplete: mockOnComplete }),
     )

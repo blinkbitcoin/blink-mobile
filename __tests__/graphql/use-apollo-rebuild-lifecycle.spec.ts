@@ -16,13 +16,13 @@ describe("useApolloRebuildLifecycle", () => {
     jest.clearAllMocks()
   })
 
-  it("does nothing on first mount — there is no previous client to clean up (Important #2)", () => {
+  it("does nothing on first mount — there is no previous client to clean up", () => {
     renderHook(() => useApolloRebuildLifecycle("token-a"))
 
     expect(mockCrashlyticsLog).not.toHaveBeenCalled()
   })
 
-  it("records a breadcrumb and stops the registered client when the token changes (Important #2)", () => {
+  it("records a breadcrumb and stops the registered client when the token changes", () => {
     const stop = jest.fn()
     const clientA = buildClient("a", stop)
 
@@ -62,7 +62,7 @@ describe("useApolloRebuildLifecycle", () => {
     )
   })
 
-  it("swallows failures from stop() and reports them so the new client's construction is never blocked (Important #2)", () => {
+  it("swallows failures from stop() and reports them so the new client's construction is never blocked", () => {
     const stopError = new Error("link teardown failed")
     const throwingClient = buildClient("a", () => {
       throw stopError

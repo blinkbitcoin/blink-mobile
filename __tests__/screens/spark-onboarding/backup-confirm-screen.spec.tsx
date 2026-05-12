@@ -319,7 +319,7 @@ describe("SparkBackupConfirmScreen", () => {
     )
   })
 
-  it("does not auto-navigate while the migration checkpoint is still loading (Critical #1)", () => {
+  it("does not auto-navigate while the migration checkpoint is still loading", () => {
     mockCheckpoint.mockReturnValue(null)
     mockCheckpointLoading.mockReturnValue(true)
 

@@ -186,7 +186,7 @@ describe("selfCustodialCreateWallet", () => {
   })
 })
 
-describe("selfCustodialRestoreWallet (I14)", () => {
+describe("selfCustodialRestoreWallet", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockSetMnemonic.mockResolvedValue(true)

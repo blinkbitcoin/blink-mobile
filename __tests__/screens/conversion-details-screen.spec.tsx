@@ -2053,7 +2053,7 @@ describe("Self-custodial conversion limits gating", () => {
     expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
   })
 
-  it("disables Next when the conversion guard reports hasQuoteError (Critical #6)", async () => {
+  it("disables Next when the conversion guard reports hasQuoteError", async () => {
     mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
     mockUseNonCustodialConversionLimits.mockReturnValue({
       limits: { minFromAmount: 0, minToAmount: null },
@@ -2080,7 +2080,7 @@ describe("Self-custodial conversion limits gating", () => {
     expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
   })
 
-  it("disables Next during the self-custodial SDK boot window — accountType=SelfCustodial + isReady=false (Critical #6)", async () => {
+  it("disables Next during the self-custodial SDK boot window — accountType=SelfCustodial + isReady=false", async () => {
     mockUseActiveWallet.mockReturnValue({
       ...selfCustodialActiveWallet,
       isSelfCustodial: false,

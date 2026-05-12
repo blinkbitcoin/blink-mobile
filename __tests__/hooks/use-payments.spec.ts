@@ -107,7 +107,7 @@ describe("usePayments", () => {
     expect(result.current.receiveOnchain).toBeDefined()
   })
 
-  it("returns no adapters while a self-custodial account is loading its SDK (regression Critical #5)", () => {
+  it("returns no adapters while a self-custodial account is loading its SDK (regression)", () => {
     mockActiveAccount.mockReturnValue({
       id: "self-custodial-default",
       type: AccountType.SelfCustodial,

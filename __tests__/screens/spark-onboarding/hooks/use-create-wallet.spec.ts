@@ -154,7 +154,7 @@ describe("useCreateWallet", () => {
     expect(result.current.status).toBe(CreationStatus.Error)
   })
 
-  it("shows a toast with the createFailed message on failure (Important #8)", async () => {
+  it("shows a toast with the createFailed message on failure", async () => {
     mockCreateWallet.mockRejectedValue(new Error("creation failed"))
 
     const { result } = renderHook(() => useCreateWallet())
@@ -199,7 +199,7 @@ describe("useCreateWallet", () => {
     expect(mockReinitSdk).not.toHaveBeenCalled()
   })
 
-  it("ignores reentrant create while one is already in flight (Critical #5)", async () => {
+  it("ignores reentrant create while one is already in flight", async () => {
     let resolveFirst: () => void
     mockCreateWallet.mockImplementationOnce(
       () =>

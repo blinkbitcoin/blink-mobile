@@ -111,7 +111,7 @@ const setAddress = (utils: ReturnType<typeof renderScreen>, address: string) => 
   fireEvent.changeText(utils.getByTestId("refund-address-input"), address)
 }
 
-describe("UnclaimedDepositsScreen — refund fee gating (Critical #2)", () => {
+describe("UnclaimedDepositsScreen — refund fee gating", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockDeposits = [claimableDeposit]
@@ -159,7 +159,7 @@ describe("UnclaimedDepositsScreen — refund fee gating (Critical #2)", () => {
     expect(utils.queryByText("Couldn't load network fees")).toBeNull()
   })
 
-  it("disables Refund now when selected tier rate is 0 (regression for Critical #2)", () => {
+  it("disables Refund now when selected tier rate is 0 (regression)", () => {
     mockFeeTiers = {
       [FeeTierOption.Fast]: { feeSats: 0, etaMinutes: 10 },
       [FeeTierOption.Medium]: { feeSats: 0, etaMinutes: 30 },

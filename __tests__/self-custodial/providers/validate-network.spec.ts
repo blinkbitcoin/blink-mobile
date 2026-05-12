@@ -51,7 +51,7 @@ describe("validateStoredNetwork", () => {
     expect(await validateStoredNetwork("test-account-id")).toBe(false)
   })
 
-  it("records the mismatch to crashlytics with the wallet/config networks in the message (Important #9)", async () => {
+  it("records the mismatch to crashlytics with the wallet/config networks in the message", async () => {
     mockGetMnemonicNetworkForAccount.mockResolvedValue("mainnet")
 
     await validateStoredNetwork("test-account-id")
@@ -64,7 +64,7 @@ describe("validateStoredNetwork", () => {
     expect(recordedError.message).toContain("config=regtest")
   })
 
-  it("emits an SDK log event at Error level with the mismatch message (Important #9)", async () => {
+  it("emits an SDK log event at Error level with the mismatch message", async () => {
     mockGetMnemonicNetworkForAccount.mockResolvedValue("mainnet")
 
     await validateStoredNetwork("test-account-id")

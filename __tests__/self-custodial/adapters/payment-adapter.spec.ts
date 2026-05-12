@@ -192,7 +192,7 @@ describe("self-custodial payment adapters", () => {
       expect(result).toBeNull()
     })
 
-    it("records the rejection to crashlytics so the failure is queryable, not just a breadcrumb (Important #2)", async () => {
+    it("records the rejection to crashlytics so the failure is queryable, not just a breadcrumb", async () => {
       const sdk = createMockSdk()
       sdk.prepareSendPayment.mockRejectedValue(new Error("fee quote boom"))
       mockRecordError.mockClear()
@@ -238,7 +238,7 @@ describe("self-custodial payment adapters", () => {
       )
     })
 
-    it("returns onchain quote with feeTier, confirmationEtaMinutes and totalDebited (Tier 2: previously unasserted)", async () => {
+    it("returns onchain quote with feeTier, confirmationEtaMinutes and totalDebited (previously unasserted)", async () => {
       const sdk = createMockSdk()
       sdk.prepareSendPayment.mockResolvedValue({
         amount: BigInt(50000),
@@ -272,7 +272,7 @@ describe("self-custodial payment adapters", () => {
       expect(result.totalDebited.amount).toBe(50800)
     })
 
-    it("honours the requested feeTier (medium) instead of always picking fast (regression I9)", async () => {
+    it("honours the requested feeTier (medium) instead of always picking fast(regression)", async () => {
       const sdk = createMockSdk()
       sdk.prepareSendPayment.mockResolvedValue({
         amount: BigInt(50000),

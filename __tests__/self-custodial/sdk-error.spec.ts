@@ -112,13 +112,13 @@ describe("classifySdkError", () => {
     )
   })
 
-  it("refines InvalidInput using its inner string (Critical #9)", () => {
+  it("refines InvalidInput using its inner string", () => {
     expect(classifySdkError(sdkError("InvalidInput", ["amount below minimum"]))).toBe(
       SelfCustodialErrorCode.BelowMinimum,
     )
   })
 
-  it("refines InsufficientFunds using its inner string (Critical #9)", () => {
+  it("refines InsufficientFunds using its inner string", () => {
     expect(
       classifySdkError(sdkError("InsufficientFunds", ["amount below minimum"])),
     ).toBe(SelfCustodialErrorCode.BelowMinimum)

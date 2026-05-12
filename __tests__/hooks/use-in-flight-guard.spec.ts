@@ -2,7 +2,7 @@ import { renderHook, act } from "@testing-library/react-native"
 
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 
-describe("useInFlightGuard (Critical #5)", () => {
+describe("useInFlightGuard", () => {
   it("resolves to the operation's result on first call", async () => {
     const { result } = renderHook(() => useInFlightGuard())
 

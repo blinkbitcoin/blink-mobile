@@ -185,7 +185,7 @@ describe("useAccountRegistry", () => {
     })
   })
 
-  it("does NOT clobber seeded self-custodial entries when the index read fails (Critical #4)", async () => {
+  it("does NOT clobber seeded self-custodial entries when the index read fails", async () => {
     // Repro: a transient AsyncStorage failure used to surface as `[]` from
     // listSelfCustodialAccounts, which clobbered the seeded entry — every self-custodial
     // account vanished from the registry until next reload.
