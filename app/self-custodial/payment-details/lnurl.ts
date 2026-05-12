@@ -259,7 +259,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     })
 
   return {
-    destination: lnurl,
+    destination: lnurlParams.identifier || lnurl,
     memo,
     convertMoneyAmount,
     setConvertMoneyAmount,

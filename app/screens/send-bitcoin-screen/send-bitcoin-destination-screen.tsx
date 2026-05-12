@@ -11,12 +11,10 @@ import { FlatList } from "react-native-gesture-handler"
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
-import { LNURL_DOMAINS } from "@app/config"
 import { useAppConfig } from "@app/hooks"
 import {
   UserContact,
   useAccountDefaultWalletLazyQuery,
-  useHomeUnauthedQuery,
   useRealtimePriceQuery,
   useSendBitcoinDestinationQuery,
 } from "@app/graphql/generated"
@@ -35,17 +33,16 @@ import { SearchBar } from "@rn-vui/base"
 import { makeStyles, useTheme, Text, ListItem } from "@rn-vui/themed"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useScanContext } from "@app/hooks/use-scan-context"
 import { useSelfCustodialContactList } from "@app/hooks/use-self-custodial-contact-list"
 import { ActiveWalletStatus } from "@app/types/wallet.types"
-import { parseSparkAddress } from "@app/self-custodial/bridge"
-import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 
 import { toWalletBalances } from "./hooks/use-send-wallets"
 import { testProps } from "../../utils/testProps"
 import { ConfirmDestinationModal } from "./confirm-destination-modal"
 import { DestinationInformation } from "./destination-information"
-import { parseDestination, resolveSparkDestination } from "./payment-destination"
+import { resolveDestination } from "./payment-destination/resolve-destination"
 import {
   DestinationDirection,
   InvalidDestinationReason,
@@ -186,7 +183,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     skip: !isAuthed || isSelfCustodial,
   })
 
-  const { data: unauthedData } = useHomeUnauthedQuery({ fetchPolicy: "cache-first" })
+  const { myWalletIds, bitcoinNetwork, lnurlDomains } = useScanContext()
 
   // forcing price refresh
   useRealtimePriceQuery({
@@ -200,11 +197,6 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     }
     return data?.me?.defaultAccount.wallets
   }, [isSelfCustodial, activeWallet.wallets, data?.me?.defaultAccount.wallets])
-
-  const bitcoinNetwork = useMemo(
-    () => data?.globals?.network ?? unauthedData?.globals?.network,
-    [data?.globals?.network, unauthedData?.globals?.network],
-  )
   const selfCustodialContacts = useSelfCustodialContactList(isSelfCustodial)
   const contacts = useMemo(
     () => (isSelfCustodial ? selfCustodialContacts : data?.me?.contacts ?? []),
@@ -347,41 +339,17 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         }
       }
 
-      if (isSelfCustodial && sdk) {
-        const sparkParsed = await parseSparkAddress(sdk, rawInput)
-        if (sparkParsed) {
-          const sparkDest = resolveSparkDestination(sparkParsed)
-          logParseDestinationResult(sparkDest)
-
-          if (!sparkDest.valid) {
-            dispatchDestinationStateAction({
-              type: SendBitcoinActions.SetInvalid,
-              payload: { invalidDestination: sparkDest, unparsedDestination: rawInput },
-            })
-            return
-          }
-
-          const wrapped = wrapDestination(sparkDest, sdk)
-          if (!wrapped.valid) return
-          dispatchDestinationStateAction({
-            type: SendBitcoinActions.SetValid,
-            payload: { validDestination: wrapped, unparsedDestination: rawInput },
-          })
-          return
-        }
-      }
-
-      const destination = await parseDestination({
-        rawInput,
-        myWalletIds: wallets.map(({ id }) => id),
-        bitcoinNetwork,
-        lnurlDomains: isSelfCustodial ? [] : [lnAddressHostname, ...LNURL_DOMAINS],
-        accountDefaultWalletQuery,
-      })
-      logParseDestinationResult(destination)
-
-      const wrappedDestination =
-        isSelfCustodial && sdk ? wrapDestination(destination, sdk) : destination
+      const wrappedDestination = await resolveDestination(
+        {
+          rawInput,
+          myWalletIds,
+          bitcoinNetwork,
+          lnurlDomains,
+          accountDefaultWalletQuery,
+        },
+        sdk,
+      )
+      logParseDestinationResult(wrappedDestination)
 
       if (wrappedDestination.valid === false) {
         if (wrappedDestination.invalidReason === InvalidDestinationReason.SelfPayment) {
@@ -475,12 +443,12 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       dispatchDestinationStateAction,
       destinationState,
       contactHandleSet,
+      myWalletIds,
       bitcoinNetwork,
+      lnurlDomains,
       wallets,
       contacts,
       parseValidPhone,
-      lnAddressHostname,
-      isSelfCustodial,
       sdk,
     ],
   )
