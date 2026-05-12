@@ -23,10 +23,9 @@ import {
 } from "@app/types/contact.types"
 import { type NormalizedTransaction } from "@app/types/transaction.types"
 import { AccountType } from "@app/types/wallet.types"
+import { normalizeString } from "@app/utils/helper"
 
 const MATCHED_PAYMENTS_LIMIT = 100
-
-const normalize = (value: string): string => value.trim().toLowerCase()
 
 const mapSdkContact = (c: SdkContact): Contact => ({
   id: c.id,
@@ -46,7 +45,7 @@ const sdkRequired = <T>(
   return fn(sdk)
 }
 
-export const useSelfCustodialContactAdapter = (): ContactAdapter & {
+export const useSelfCustodialContacts = (): ContactAdapter & {
   loading: boolean
 } => {
   const { sdk } = useSelfCustodialWallet()
@@ -137,16 +136,19 @@ export const useSelfCustodialContactAdapter = (): ContactAdapter & {
       const target = contacts.find((c) => c.id === contactId)
       if (!target) return []
 
-      const normalizedIdentifier = normalize(target.paymentIdentifier)
+      const normalizedIdentifier = normalizeString(target.paymentIdentifier)
       const response = await bridgeListPayments(sdk, 0, MATCHED_PAYMENTS_LIMIT)
 
       const matched = response.payments.filter((payment) => {
         if (payment.paymentType !== SdkPaymentType.Send) return false
+
         const details = payment.details
         if (!details || details.tag !== PaymentDetailsTags.Lightning) return false
+
         const lnAddress = details.inner.lnurlPayInfo?.lnAddress
         if (!lnAddress) return false
-        return normalize(lnAddress) === normalizedIdentifier
+
+        return normalizeString(lnAddress) === normalizedIdentifier
       })
 
       return mapSelfCustodialTransactions(matched)

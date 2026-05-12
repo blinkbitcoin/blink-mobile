@@ -16,8 +16,8 @@ jest.mock("@app/custodial/contact-adapter", () => ({
   useCustodialContactAdapter: () => mockUseCustodialAdapter(),
 }))
 
-jest.mock("@app/self-custodial/contact-adapter", () => ({
-  useSelfCustodialContactAdapter: () => mockUseSelfCustodialAdapter(),
+jest.mock("@app/self-custodial/hooks/use-self-custodial-contacts", () => ({
+  useSelfCustodialContacts: () => mockUseSelfCustodialAdapter(),
 }))
 
 describe("useContacts", () => {
