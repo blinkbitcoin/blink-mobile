@@ -11321,12 +11321,34 @@ type RootTranslation = {
 		 * C​u​s​t​o​m​ ​b​u​d​g​e​t
 		 */
 		customBudgetLabel: string
+		/**
+		 * S​e​t​ ​b​u​d​g​e​t
+		 */
 		setBudget: string
+		/**
+		 * N​o​ ​b​u​d​g​e​t​ ​l​i​m​i​t​s​ ​s​e​t
+		 */
 		noBudgetLimits: string
+		/**
+		 * {​c​o​u​n​t​}​ ​b​u​d​g​e​t​ ​l​i​m​i​t​(​s​)​ ​s​e​t
+		 * @param {number} count
+		 */
 		budgetLimitsSet: RequiredParams<'count'>
+		/**
+		 * P​e​r​m​i​s​s​i​o​n​s
+		 */
 		permissions: string
+		/**
+		 * R​e​c​e​i​v​e​-​o​n​l​y
+		 */
 		permissionReceiveOnly: string
+		/**
+		 * R​e​a​d​ ​h​i​s​t​o​r​y
+		 */
 		permissionReadHistory: string
+		/**
+		 * M​a​k​e​ ​p​a​y​m​e​n​t​s
+		 */
 		permissionMakePayments: string
 		/**
 		 * C​o​n​n​e​c​t​i​o​n​ ​c​r​e​a​t​e​d
@@ -11465,6 +11487,9 @@ type RootTranslation = {
 		 * M​o​n​t​h​l​y
 		 */
 		periodMonthly: string
+		/**
+		 * A​n​n​u​a​l​l​y
+		 */
 		periodAnnually: string
 		/**
 		 * N​e​v​e​r
@@ -22731,7 +22756,7 @@ export type TranslationFunctions = {
 		 */
 		noBudgetLimits: () => LocalizedString
 		/**
-		 * {count} budget limit{s} set
+		 * {count} budget limit(s) set
 		 */
 		budgetLimitsSet: (arg: { count: number }) => LocalizedString
 		/**
@@ -22865,7 +22890,7 @@ export type TranslationFunctions = {
 		/**
 		 * {amount} per {period}
 		 */
-		budgetPreview: (arg: { amount: string; period: string }) => LocalizedString
+		budgetPreview: (arg: { amount: string, period: string }) => LocalizedString
 		/**
 		 * This budget is higher than your current Bitcoin balance.
 		 */
