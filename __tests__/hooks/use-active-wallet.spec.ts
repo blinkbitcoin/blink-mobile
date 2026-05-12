@@ -26,7 +26,7 @@ jest.mock("@app/custodial/providers/wallet-provider", () => ({
   useCustodialWallet: () => mockCustodialState(),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialState(),
 }))
 

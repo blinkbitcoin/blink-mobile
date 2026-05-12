@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
 import { getLightningAddress, getWalletInfo } from "@app/self-custodial/bridge"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 
 type AccountInfo = {
   identityPubkey: string

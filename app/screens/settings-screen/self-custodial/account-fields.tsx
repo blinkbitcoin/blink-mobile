@@ -7,10 +7,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
-import {
-  BackupStatus,
-  useBackupState,
-} from "@app/self-custodial/providers/backup-state-provider"
+import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { testProps } from "@app/utils/testProps"
 
 type FieldProps = {

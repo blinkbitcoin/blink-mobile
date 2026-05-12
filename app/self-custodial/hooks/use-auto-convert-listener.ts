@@ -33,7 +33,7 @@ import {
 } from "../auto-convert"
 import { syncSelfCustodialWallet } from "../bridge"
 import { useAutoConvertStatusActions } from "../providers/auto-convert-status"
-import { useSelfCustodialWallet } from "../providers/wallet-provider"
+import { useSelfCustodialWallet } from "../providers/wallet"
 
 /**
  * Drives BTC->USDB auto-convert for Lightning invoices flagged Dollar:

@@ -8,7 +8,7 @@ import { SelfCustodialPaymentOfflineNotice } from "@app/components/self-custodia
 
 const mockRefreshWallets = jest.fn()
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({
     refreshWallets: mockRefreshWallets,
   }),

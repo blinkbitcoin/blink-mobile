@@ -59,11 +59,11 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: Error[]) => mockRecordError(...args),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ retry: mockReinitSdk }),
 }))
 
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
   markBackupCompletedFor: (...args: unknown[]) => mockMarkBackupCompletedFor(...args),
   BackupMethod: { Manual: "manual", Recovery: "recovery" },
 }))

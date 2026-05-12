@@ -5,7 +5,7 @@ import { useReceiveAssetMode } from "@app/self-custodial/hooks/use-receive-asset
 const mockSelfCustodialWallet = jest.fn()
 const mockPersistentState = jest.fn()
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
 

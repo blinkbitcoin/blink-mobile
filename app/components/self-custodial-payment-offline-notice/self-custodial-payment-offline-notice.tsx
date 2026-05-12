@@ -7,7 +7,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { testProps } from "@app/utils/testProps"
 
 export const SelfCustodialPaymentOfflineNotice: React.FC = () => {

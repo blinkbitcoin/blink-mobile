@@ -9,7 +9,7 @@ const mockAccountRegistry = jest.fn()
 const mockGetItem = jest.fn()
 const mockSetItem = jest.fn()
 
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupStatus: { None: "none", Completed: "completed" },
   useBackupState: () => mockBackupState(),
 }))

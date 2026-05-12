@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
 import { fetchConversionLimits } from "@app/self-custodial/bridge"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection, type ConversionLimits } from "@app/types/payment"
 
 type ConversionLimitsState = {

@@ -28,7 +28,7 @@ import {
 } from "../auto-convert"
 import { createReceiveLightning, createReceiveOnchain } from "../bridge"
 import { AutoConvertStatus, useAutoConvertStatus } from "../providers/auto-convert-status"
-import { useSelfCustodialWallet } from "../providers/wallet-provider"
+import { useSelfCustodialWallet } from "../providers/wallet"
 
 import { useReceiveAssetMode } from "./use-receive-asset-mode"
 import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"

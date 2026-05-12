@@ -11,7 +11,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   getLightningAddress: (...args: unknown[]) => mockGetLightningAddress(...args),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 

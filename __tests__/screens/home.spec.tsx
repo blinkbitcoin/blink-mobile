@@ -83,7 +83,7 @@ jest.mock("@app/config/feature-flags-context", () => {
   }
 })
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () =>
     mockSelfCustodialWalletOverride ?? {
       sdk: null,

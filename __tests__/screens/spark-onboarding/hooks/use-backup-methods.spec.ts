@@ -66,7 +66,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 const mockSetBackupCompleted = jest.fn()
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupMethod: {
     Cloud: "cloud",
     Keychain: "keychain",

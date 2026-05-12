@@ -9,7 +9,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { usePayments } from "@app/hooks/use-payments"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { DepositStatus } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
 

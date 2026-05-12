@@ -67,7 +67,7 @@ jest.mock("@app/hooks/use-scan-context", () => ({
 }))
 
 const mockSelfCustodialWallet = jest.fn()
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
 

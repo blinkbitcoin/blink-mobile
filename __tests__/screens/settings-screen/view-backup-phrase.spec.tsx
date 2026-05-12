@@ -12,7 +12,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount() }),
 }))
 
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupStatus: { None: "none", Completed: "completed" },
   useBackupState: () => ({ backupState: mockBackupState() }),
 }))

@@ -14,10 +14,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { logSelfCustodialBackupCompleted } from "@app/utils/analytics"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
-import {
-  BackupStatus,
-  useBackupState,
-} from "@app/self-custodial/providers/backup-state-provider"
+import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { testProps } from "@app/utils/testProps"
 
 import { useBackupConfirm } from "../hooks"

@@ -18,7 +18,7 @@ import {
   createReceiveLightning,
   createReceiveOnchain,
 } from "@app/self-custodial/bridge"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   type ClaimDepositAdapter,
   type ConvertAdapter,

@@ -140,7 +140,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 const mockUseSelfCustodialWallet = jest.fn()
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 

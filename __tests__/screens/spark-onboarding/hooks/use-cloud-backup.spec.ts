@@ -57,7 +57,7 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
   }),
 }))
 
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
   useBackupState: () => ({
     setBackupCompleted: jest.fn(),
   }),

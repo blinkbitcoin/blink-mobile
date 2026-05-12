@@ -14,7 +14,7 @@ let mockFeeTiers = {
 }
 let mockFeeError: SdkFeeError | null = null
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ sdk: mockSdk }),
 }))
 

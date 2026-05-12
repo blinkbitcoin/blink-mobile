@@ -66,7 +66,7 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   }),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({
     loadMore: jest.fn(),
     hasMoreTransactions: false,

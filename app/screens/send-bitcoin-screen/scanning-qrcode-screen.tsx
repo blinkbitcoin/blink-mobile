@@ -22,7 +22,7 @@ import {
 } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useScanContext } from "@app/hooks/use-scan-context"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { logParseDestinationResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
