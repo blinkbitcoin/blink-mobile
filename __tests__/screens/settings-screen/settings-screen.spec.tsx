@@ -545,7 +545,7 @@ describe("Settings Screen", () => {
     expect(screen.queryByText("Move to non-custodial")).toBeNull()
   })
 
-  it("does not render a standalone Recovery method group (Critical #7)", async () => {
+  it("does not render a standalone Recovery method group", async () => {
     render(
       <ContextForScreen>
         <LoggedInWithUsername mock={mocksWithUsername} />

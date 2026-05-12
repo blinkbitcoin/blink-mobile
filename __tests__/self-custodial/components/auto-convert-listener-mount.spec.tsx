@@ -24,7 +24,7 @@ describe("AutoConvertListenerMount", () => {
     expect(toJSON()).toBeNull()
   })
 
-  it("does not swallow errors thrown by the listener hook (Important #10)", () => {
+  it("does not swallow errors thrown by the listener hook", () => {
     // The wrapper has no try/catch around the hook; a crash must propagate
     // to React rather than be silently absorbed by the wrapper.
     mockListener.mockImplementationOnce(() => {

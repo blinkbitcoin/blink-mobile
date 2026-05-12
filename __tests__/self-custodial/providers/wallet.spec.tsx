@@ -457,7 +457,7 @@ describe("SelfCustodialWalletProvider", () => {
     })
   })
 
-  it("aborts a late-resolving initSdk if unmount happens before it lands (Critical #2)", async () => {
+  it("aborts a late-resolving initSdk if unmount happens before it lands", async () => {
     const mockSdk = {
       addEventListener: jest.fn().mockResolvedValue("listener-id"),
       disconnect: jest.fn(),
@@ -489,7 +489,7 @@ describe("SelfCustodialWalletProvider", () => {
     expect(mockAddSdkEventListener).not.toHaveBeenCalled()
   })
 
-  it("removes the listener and disconnects when abort fires after listener registration but before refs land (Critical #2)", async () => {
+  it("removes the listener and disconnects when abort fires after listener registration but before refs land", async () => {
     const mockSdk = {
       addEventListener: jest.fn(),
       disconnect: jest.fn(),
@@ -607,7 +607,7 @@ describe("SelfCustodialWalletProvider", () => {
     })
   })
 
-  it("logs to crashlytics and transitions to Error when initial refresh fails (regression Critical #7)", async () => {
+  it("logs to crashlytics and transitions to Error when initial refresh fails (regression)", async () => {
     setupConnectedWallet({
       getMnemonicForAccount: mockGetMnemonicForAccount,
       listSelfCustodialAccounts: mockListSelfCustodialAccounts,
@@ -639,7 +639,7 @@ describe("SelfCustodialWalletProvider", () => {
     )
   })
 
-  it("transitions Ready→Offline on refresh failure and records error to crashlytics (Critical #7)", async () => {
+  it("transitions Ready→Offline on refresh failure and records error to crashlytics", async () => {
     const { listener } = setupConnectedWallet({
       getMnemonicForAccount: mockGetMnemonicForAccount,
       listSelfCustodialAccounts: mockListSelfCustodialAccounts,
@@ -679,7 +679,7 @@ describe("SelfCustodialWalletProvider", () => {
     )
   })
 
-  it("logs to crashlytics when getUserSettings fails (no longer silent — Critical #7)", async () => {
+  it("logs to crashlytics when getUserSettings fails (no longer silent)", async () => {
     setupConnectedWallet({
       getMnemonicForAccount: mockGetMnemonicForAccount,
       listSelfCustodialAccounts: mockListSelfCustodialAccounts,
@@ -702,7 +702,7 @@ describe("SelfCustodialWalletProvider", () => {
     })
   })
 
-  it("preserves Ready status when connectivity is 'unknown' (regression Critical #4)", async () => {
+  it("preserves Ready status when connectivity is 'unknown' (regression)", async () => {
     const { listener } = setupConnectedWallet({
       getMnemonicForAccount: mockGetMnemonicForAccount,
       listSelfCustodialAccounts: mockListSelfCustodialAccounts,
@@ -796,7 +796,7 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     })
   })
 
-  it("recovers from a snapshot that hangs past the timeout instead of staying in Loading (Critical #2)", async () => {
+  it("recovers from a snapshot that hangs past the timeout instead of staying in Loading", async () => {
     jest.useFakeTimers()
     setupConnectedWallet(
       {
@@ -841,7 +841,7 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     jest.useRealTimers()
   })
 
-  it("transitions out of Loading to Error when both snapshot and connectivity check fail (Critical #4)", async () => {
+  it("transitions out of Loading to Error when both snapshot and connectivity check fail", async () => {
     const isOnline = jest.requireMock("@app/self-custodial/providers/is-online")
     isOnline.getOnlineState.mockResolvedValueOnce("unknown")
 
@@ -907,7 +907,7 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     expect(result.current.hasMoreTransactions).toBe(false)
   })
 
-  it("disconnects the SDK and skips listener registration when the provider unmounts before initSdk resolves (I11)", async () => {
+  it("disconnects the SDK and skips listener registration when the provider unmounts before initSdk resolves", async () => {
     let resolveInit: (sdk: unknown) => void = () => {}
     mockInitSdk.mockImplementation(
       () =>
@@ -937,7 +937,7 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     expect(mockAddSdkEventListener).not.toHaveBeenCalled()
   })
 
-  it("preserves the loadMore cursor across refresh by passing the current raw offset to the snapshot (Critical #8)", async () => {
+  it("preserves the loadMore cursor across refresh by passing the current raw offset to the snapshot", async () => {
     const { listener } = setupConnectedWallet(
       {
         getMnemonicForAccount: mockGetMnemonicForAccount,
@@ -1356,7 +1356,7 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
   })
 })
 
-describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () => {
+describe("SelfCustodialWalletProvider — stale-write safety", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockGetMnemonicForAccount.mockResolvedValue(null)
@@ -1426,7 +1426,7 @@ describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () 
     expect(result.current.hasMoreTransactions).toBe(false)
   })
 
-  describe("resolveAndPersist LN-address path (Important #14)", () => {
+  describe("resolveAndPersist LN-address path", () => {
     beforeEach(() => {
       mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
       mockInitSdk.mockResolvedValue({ id: "sdk" })
@@ -1482,7 +1482,7 @@ describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () 
       expect(mockListSelfCustodialAccounts).toHaveBeenCalledTimes(1)
     })
 
-    it("reports the resolve-side rejection to crashlytics with operation context (Important #6)", async () => {
+    it("reports the resolve-side rejection to crashlytics with operation context", async () => {
       mockGetLightningAddress.mockRejectedValue(new Error("LN lookup down"))
 
       renderHook(() => useSelfCustodialWallet(), { wrapper })
@@ -1517,7 +1517,7 @@ describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () 
       })
     })
 
-    it("reports the persist-side rejection to crashlytics with operation context (Important #6)", async () => {
+    it("reports the persist-side rejection to crashlytics with operation context", async () => {
       mockGetLightningAddress.mockResolvedValue({
         lightningAddress: "alice@blink.sv",
       })
@@ -1536,7 +1536,7 @@ describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () 
       })
     })
 
-    it("reports the refresh-side rejection to crashlytics when updateCurrentSelfCustodialAccount fails (Important #6)", async () => {
+    it("reports the refresh-side rejection to crashlytics when updateCurrentSelfCustodialAccount fails", async () => {
       mockGetLightningAddress.mockResolvedValueOnce({ lightningAddress: null })
 
       const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })

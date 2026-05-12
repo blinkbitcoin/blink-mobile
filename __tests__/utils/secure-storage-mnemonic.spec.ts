@@ -125,7 +125,7 @@ describe("KeyStoreWrapper mnemonic methods", () => {
       expect(result).toBe(false)
     })
 
-    it("records crashlytics when the primary mnemonic removal fails (Important #5)", async () => {
+    it("records crashlytics when the primary mnemonic removal fails", async () => {
       mockRemove.mockRejectedValue(new Error("keystore unavailable"))
 
       await KeyStoreWrapper.deleteMnemonic()
@@ -134,7 +134,7 @@ describe("KeyStoreWrapper mnemonic methods", () => {
       expect(mockRecordError.mock.calls[0][0].message).toContain("keystore unavailable")
     })
 
-    it("records crashlytics for the network-key removal failure but still returns true (Important #5)", async () => {
+    it("records crashlytics for the network-key removal failure but still returns true", async () => {
       mockRemove
         .mockResolvedValueOnce(undefined)
         .mockRejectedValueOnce(new Error("network key write-locked"))
@@ -198,7 +198,7 @@ describe("KeyStoreWrapper mnemonic methods", () => {
   })
 })
 
-describe("KeyStoreWrapper per-account mnemonic methods (Critical #4)", () => {
+describe("KeyStoreWrapper per-account mnemonic methods", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })

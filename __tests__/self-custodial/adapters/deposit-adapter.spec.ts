@@ -158,7 +158,7 @@ describe("createClaimDeposit", () => {
     expect(result.errors?.[0].message).toContain("refund failed")
   })
 
-  describe("malformed depositId guards (I10)", () => {
+  describe("malformed depositId guards", () => {
     beforeEach(() => jest.clearAllMocks())
 
     const malformed = [
@@ -226,7 +226,7 @@ describe("createClaimDeposit", () => {
   })
 })
 
-describe("parseDepositId (I10)", () => {
+describe("parseDepositId", () => {
   it("parses a well-formed txid:vout pair", () => {
     expect(parseDepositId("abc123:0")).toEqual({ txid: "abc123", vout: 0 })
   })

@@ -29,7 +29,7 @@ describe("getLightningAddress", () => {
   })
 })
 
-describe("extractLightningAddressUsername (Important #15)", () => {
+describe("extractLightningAddressUsername", () => {
   it("returns the username portion before the @", () => {
     expect(extractLightningAddressUsername("alice@blink.sv")).toBe("alice")
   })

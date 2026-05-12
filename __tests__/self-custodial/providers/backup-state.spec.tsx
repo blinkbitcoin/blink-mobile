@@ -146,7 +146,7 @@ describe("BackupStateProvider", () => {
     expect(result.current.backupState.method).toBeNull()
   })
 
-  describe("account-switch transition (Important #10)", () => {
+  describe("account-switch transition", () => {
     it("reloads the new account's persisted state when activeAccount.id changes", async () => {
       mockGetItem.mockImplementation((key: string) => {
         if (key === BACKUP_KEY) {
@@ -248,7 +248,7 @@ describe("BackupStateProvider", () => {
     })
   })
 
-  describe("removeBackupStateFor (Important #10)", () => {
+  describe("removeBackupStateFor", () => {
     it("removes the persisted backup state for the given accountId", async () => {
       await removeBackupStateFor(TEST_SC_ACCOUNT_ID)
 

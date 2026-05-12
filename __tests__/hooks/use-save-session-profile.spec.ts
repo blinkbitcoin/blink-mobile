@@ -79,7 +79,7 @@ describe("useSaveSessionProfile", () => {
     mockSaveSessionProfiles.mockResolvedValue(true)
   })
 
-  describe("saveProfile (Important #13)", () => {
+  describe("saveProfile", () => {
     it("returns without writing when token is empty", async () => {
       const { result } = renderHook(() => useSaveSessionProfile())
 

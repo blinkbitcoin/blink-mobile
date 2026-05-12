@@ -196,7 +196,7 @@ describe("useCloudBackup", () => {
     expect(mockNavigate).not.toHaveBeenCalledWith("sparkBackupSuccessScreen")
   })
 
-  it("does not double-report to crashlytics on upload failure — the inner hook owns Drive error telemetry (Critical #8)", async () => {
+  it("does not double-report to crashlytics on upload failure — the inner hook owns Drive error telemetry", async () => {
     mockUpload.mockResolvedValue({ success: false, reason: "transient" })
 
     const { result } = renderHook(() =>
@@ -210,7 +210,7 @@ describe("useCloudBackup", () => {
     expect(mockRecordError).not.toHaveBeenCalled()
   })
 
-  it("still reports to crashlytics on sign-in failure — that path is owned by use-cloud-backup, not the Drive hook (Critical #8)", async () => {
+  it("still reports to crashlytics on sign-in failure — that path is owned by use-cloud-backup, not the Drive hook", async () => {
     const signInError = new Error("DEVELOPER_ERROR")
     mockStartSession.mockRejectedValue(signInError)
 
@@ -268,7 +268,7 @@ describe("useCloudBackup", () => {
     )
   })
 
-  it("shows lightning address and createdAt in the confirmation when metadata is available (Important #15)", async () => {
+  it("shows lightning address and createdAt in the confirmation when metadata is available", async () => {
     mockStartSession.mockResolvedValue(withExistingFile)
     const createdAtMs = Date.UTC(2026, 4, 10, 18, 42, 0)
     mockDownloadById.mockResolvedValue({
@@ -306,7 +306,7 @@ describe("useCloudBackup", () => {
     )
   })
 
-  it("falls back to the generic confirmation message when metadata download fails (Important #15)", async () => {
+  it("falls back to the generic confirmation message when metadata download fails", async () => {
     mockStartSession.mockResolvedValue(withExistingFile)
     mockDownloadById.mockResolvedValue({ success: false, reason: "transient" })
     mockConfirmDialog.mockResolvedValue(false)
@@ -327,7 +327,7 @@ describe("useCloudBackup", () => {
     )
   })
 
-  it("falls back to the generic message when the existing file payload cannot be parsed (Important #15)", async () => {
+  it("falls back to the generic message when the existing file payload cannot be parsed", async () => {
     mockStartSession.mockResolvedValue(withExistingFile)
     mockDownloadById.mockResolvedValue({ success: true, content: "not-json" })
     mockConfirmDialog.mockResolvedValue(false)
@@ -347,7 +347,7 @@ describe("useCloudBackup", () => {
     )
   })
 
-  it("uses placeholders when lightningAddress is missing and createdAt is zero (Important #15)", async () => {
+  it("uses placeholders when lightningAddress is missing and createdAt is zero", async () => {
     mockStartSession.mockResolvedValue(withExistingFile)
     mockDownloadById.mockResolvedValue({
       success: true,
@@ -381,7 +381,7 @@ describe("useCloudBackup", () => {
     )
   })
 
-  it("does not fetch the existing backup when there is nothing to overwrite (Important #15)", async () => {
+  it("does not fetch the existing backup when there is nothing to overwrite", async () => {
     mockUpload.mockResolvedValue({ success: true })
 
     const { result } = renderHook(() =>

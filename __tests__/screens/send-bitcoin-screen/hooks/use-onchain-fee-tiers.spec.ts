@@ -81,7 +81,7 @@ describe("useOnchainFeeTiers", () => {
     expect(result.current.tiers[FeeTierOption.Slow].etaMinutes).toBe(60)
   })
 
-  it("classifies plain wrapped errors as Generic (no fragile message-string matching, I1)", async () => {
+  it("classifies plain wrapped errors as Generic (no fragile message-string matching)", async () => {
     // After I1: a thrown Error whose .message happens to contain a tag name
     // does NOT short-circuit classification — only typed SdkError instances
     // do. Everything else collapses to Generic.
@@ -129,7 +129,7 @@ describe("useOnchainFeeTiers", () => {
     })
   })
 
-  it("surfaces Generic error when extractOnchainFees returns null (regression Critical #3)", async () => {
+  it("surfaces Generic error when extractOnchainFees returns null (regression)", async () => {
     mockPrepareSend.mockResolvedValue({})
     mockExtractOnchainFees.mockReturnValue(null)
 
@@ -197,7 +197,7 @@ describe("useOnchainFeeTiers", () => {
     })
   })
 
-  it("ignores stale prepareSend resolutions when dependencies change mid-flight (regression I12)", async () => {
+  it("ignores stale prepareSend resolutions when dependencies change mid-flight (regression)", async () => {
     let resolveStale: (value: unknown) => void = () => {}
     const stalePrepared = new Promise((resolve) => {
       resolveStale = resolve

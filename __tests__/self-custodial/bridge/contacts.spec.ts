@@ -62,7 +62,7 @@ describe("findOrCreateContact", () => {
     })
   })
 
-  it("returns status='deduped' with the existing contact when the payment identifier already exists (Critical #5)", async () => {
+  it("returns status='deduped' with the existing contact when the payment identifier already exists", async () => {
     const sdk = createMockSdk()
     const existing = {
       id: "c1",
@@ -81,7 +81,7 @@ describe("findOrCreateContact", () => {
     expect(sdk.addContact).not.toHaveBeenCalled()
   })
 
-  it("bumps existing.updatedAt via updateContact without overwriting the stored name (Critical #5)", async () => {
+  it("bumps existing.updatedAt via updateContact without overwriting the stored name", async () => {
     const sdk = createMockSdk()
     const existing = {
       id: "c1",
@@ -132,7 +132,7 @@ describe("findOrCreateContact", () => {
     expect(result.status).toBe(FindOrCreateContactStatus.Created)
   })
 
-  it("paginates beyond the first 100 contacts to find a match past the page boundary (Important #13)", async () => {
+  it("paginates beyond the first 100 contacts to find a match past the page boundary", async () => {
     const sdk = createMockSdk()
     const firstPage = Array.from({ length: 100 }, (_, i) => ({
       id: `c${i}`,
@@ -159,7 +159,7 @@ describe("findOrCreateContact", () => {
     })
   })
 
-  it("stops paginating once a page returns fewer than 100 entries (Important #13)", async () => {
+  it("stops paginating once a page returns fewer than 100 entries", async () => {
     const sdk = createMockSdk()
     const firstPage = Array.from({ length: 100 }, (_, i) => ({
       id: `c${i}`,
@@ -181,7 +181,7 @@ describe("findOrCreateContact", () => {
     expect(sdk.addContact).toHaveBeenCalledTimes(1)
   })
 
-  it("does not page past the first call when the first page is short (Important #13)", async () => {
+  it("does not page past the first call when the first page is short", async () => {
     const sdk = createMockSdk()
     sdk.listContacts.mockResolvedValueOnce([
       { id: "c1", name: "Bob", paymentIdentifier: "bob@blink.sv" },
@@ -192,7 +192,7 @@ describe("findOrCreateContact", () => {
     expect(sdk.listContacts).toHaveBeenCalledTimes(1)
   })
 
-  it("caps the pagination at 100 pages so a pathological list cannot loop forever (Important #13)", async () => {
+  it("caps the pagination at 100 pages so a pathological list cannot loop forever", async () => {
     const sdk = createMockSdk()
     const fullPage = Array.from({ length: 100 }, (_, i) => ({
       id: `c${i}`,
@@ -206,7 +206,7 @@ describe("findOrCreateContact", () => {
     expect(sdk.listContacts).toHaveBeenCalledTimes(100)
   })
 
-  it("reports to crashlytics when the page cap is reached so SDK pagination bugs are observable (Important #13)", async () => {
+  it("reports to crashlytics when the page cap is reached so SDK pagination bugs are observable", async () => {
     const sdk = createMockSdk()
     const fullPage = Array.from({ length: 100 }, (_, i) => ({
       id: `c${i}`,

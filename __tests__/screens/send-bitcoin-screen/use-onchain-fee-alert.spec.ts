@@ -26,7 +26,7 @@ const buildOnchainPaymentDetail = (settlementSats = 100): PaymentDetail<WalletCu
     }),
   }) as unknown as PaymentDetail<WalletCurrency>
 
-describe("useOnchainFeeAlert (Critical #6 — self-custodial gate)", () => {
+describe("useOnchainFeeAlert (self-custodial gate)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockGetOnChainTxFee.mockResolvedValue({ data: { onChainTxFee: { amount: 5000 } } })

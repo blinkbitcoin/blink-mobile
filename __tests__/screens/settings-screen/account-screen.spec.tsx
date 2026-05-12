@@ -238,7 +238,7 @@ describe("AccountScreen", () => {
       expect(mockUpdateCurrentProfile).not.toHaveBeenCalled()
     })
 
-    it("clears the refreshing flag even when the self-custodial refresh rejects (Important #3)", async () => {
+    it("clears the refreshing flag even when the self-custodial refresh rejects", async () => {
       mockRefreshSelfCustodialWallets.mockRejectedValueOnce(new Error("offline"))
 
       render(<AccountScreen />)
@@ -276,7 +276,7 @@ describe("AccountScreen", () => {
       expect(mockRefreshSelfCustodialWallets).not.toHaveBeenCalled()
     })
 
-    it("clears the refreshing flag even when updateCurrentProfile rejects (Important #3)", async () => {
+    it("clears the refreshing flag even when updateCurrentProfile rejects", async () => {
       mockUpdateCurrentProfile.mockRejectedValueOnce(new Error("offline"))
 
       render(<AccountScreen />)

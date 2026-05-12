@@ -195,7 +195,7 @@ describe("mapCurrency", () => {
   })
 })
 
-describe("mapper exhaustiveness (Critical #8)", () => {
+describe("mapper exhaustiveness", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })

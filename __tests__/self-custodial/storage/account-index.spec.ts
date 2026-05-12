@@ -130,7 +130,7 @@ describe("self-custodial account-index", () => {
     })
   })
 
-  describe("listSelfCustodialAccounts — read failure (Critical #4)", () => {
+  describe("listSelfCustodialAccounts — read failure", () => {
     it("returns read-failed and reports to crashlytics when AsyncStorage rejects", async () => {
       const transientError = new Error("AsyncStorage unavailable")
       mockGetItem.mockRejectedValueOnce(transientError)
@@ -355,7 +355,7 @@ describe("self-custodial account-index", () => {
       expect(result).toEqual({ status: StorageReadStatus.Ok, id: null })
     })
 
-    it("returns read-failed (Critical #4) when the underlying index read fails — never silently 'no match'", async () => {
+    it("returns read-failed when the underlying index read fails — never silently 'no match'", async () => {
       mockGetItem.mockRejectedValueOnce(new Error("AsyncStorage unavailable"))
 
       const result = await findSelfCustodialAccountByMnemonic(STORED)

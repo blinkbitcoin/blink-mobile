@@ -51,7 +51,7 @@ describe("getSelfCustodialDefaultCurrency", () => {
     ).toBe("BTC")
   })
 
-  it("returns BTC when map missing the active id, ignoring the legacy field (Critical #7)", () => {
+  it("returns BTC when map missing the active id, ignoring the legacy field", () => {
     const state: PersistentState = {
       ...baseState,
       activeAccountId: "self-custodial-new",
@@ -62,7 +62,7 @@ describe("getSelfCustodialDefaultCurrency", () => {
     expect(getSelfCustodialDefaultCurrency(state)).toBe("BTC")
   })
 
-  it("returns BTC when map is absent entirely, ignoring the legacy field (Critical #7)", () => {
+  it("returns BTC when map is absent entirely, ignoring the legacy field", () => {
     const state: PersistentState = {
       ...baseState,
       activeAccountId: "self-custodial-1",
@@ -72,7 +72,7 @@ describe("getSelfCustodialDefaultCurrency", () => {
     expect(getSelfCustodialDefaultCurrency(state)).toBe("BTC")
   })
 
-  it("returns BTC when active is custodial, ignoring the legacy field (Critical #7)", () => {
+  it("returns BTC when active is custodial, ignoring the legacy field", () => {
     const state: PersistentState = {
       ...baseState,
       activeAccountId: DefaultAccountId.Custodial,

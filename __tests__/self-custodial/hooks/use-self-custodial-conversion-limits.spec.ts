@@ -22,7 +22,7 @@ describe("useSelfCustodialConversionLimits", () => {
     jest.clearAllMocks()
   })
 
-  it("flips to loading=false with an unavailable-error and skips fetches when sdk is null (Important #3: no infinite spinner offline)", async () => {
+  it("flips to loading=false with an unavailable-error and skips fetches when sdk is null (no infinite spinner offline)", async () => {
     mockUseSelfCustodialWallet.mockReturnValue({ sdk: null })
 
     const { result } = renderHook(() => useSelfCustodialConversionLimits())

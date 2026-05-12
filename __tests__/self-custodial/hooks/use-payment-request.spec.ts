@@ -148,7 +148,7 @@ describe("usePaymentRequest", () => {
     })
   })
 
-  it("records the rejection to crashlytics when the receive adapter throws (Important #4)", async () => {
+  it("records the rejection to crashlytics when the receive adapter throws", async () => {
     mockReceiveLightning.mockRejectedValue(new Error("invoice generation boom"))
 
     const { result } = renderHook(() => usePaymentRequest())
@@ -162,7 +162,7 @@ describe("usePaymentRequest", () => {
     )
   })
 
-  it("records the silent failure to crashlytics when the adapter resolves without an invoice (Important #7)", async () => {
+  it("records the silent failure to crashlytics when the adapter resolves without an invoice", async () => {
     mockReceiveLightning.mockResolvedValue({} as unknown as { invoice: string })
 
     const { result } = renderHook(() => usePaymentRequest())
@@ -178,7 +178,7 @@ describe("usePaymentRequest", () => {
     )
   })
 
-  it("records the silent failure to crashlytics when the adapter resolves with an empty invoice string (Important #7)", async () => {
+  it("records the silent failure to crashlytics when the adapter resolves with an empty invoice string", async () => {
     mockReceiveLightning.mockResolvedValue({ invoice: "" })
 
     const { result } = renderHook(() => usePaymentRequest())
@@ -396,7 +396,7 @@ describe("usePaymentRequest", () => {
     expect(uri).toBe("bitcoin:bc1qtest...")
   })
 
-  describe("onchain adapter rejection (regression I7)", () => {
+  describe("onchain adapter rejection (regression)", () => {
     it("does not crash the hook when createReceiveOnchain rejects", async () => {
       mockReceiveOnchain.mockRejectedValueOnce(new Error("onchain receive boom"))
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
@@ -544,7 +544,7 @@ describe("usePaymentRequest", () => {
     })
   })
 
-  describe("Critical #7 — defers invoice generation while settings are loading", () => {
+  describe("defers invoice generation while settings are loading", () => {
     it("does not call the receive adapter while useReceiveAssetMode reports loading", async () => {
       mockUseReceiveAssetMode.mockReturnValue({
         assetMode: "bitcoin",

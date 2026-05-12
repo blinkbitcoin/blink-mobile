@@ -217,7 +217,7 @@ describe("useDeleteSelfCustodial", () => {
     expect(mockReportError).toHaveBeenCalled()
   })
 
-  it("switches the active account BEFORE disconnecting the SDK so useSdkLifecycle does not poll a stale ref (Important #2)", async () => {
+  it("switches the active account BEFORE disconnecting the SDK so useSdkLifecycle does not poll a stale ref", async () => {
     const remaining = {
       ...activeSelfCustodialAccount,
       id: "other-self-custodial-id",
@@ -247,7 +247,7 @@ describe("useDeleteSelfCustodial", () => {
     expect(disconnectOrder).toBeLessThan(deleteOrder)
   })
 
-  it("clears activeAccountId BEFORE disconnecting when no fallback exists (Important #2 — getStarted path)", async () => {
+  it("clears activeAccountId BEFORE disconnecting when no fallback exists (getStarted path)", async () => {
     const { result } = renderHook(() => useDeleteSelfCustodial())
 
     await act(async () => {
@@ -263,7 +263,7 @@ describe("useDeleteSelfCustodial", () => {
     expect(updateOrder).toBeLessThan(disconnectOrder)
   })
 
-  it("switches to the custodial account BEFORE disconnecting (Important #2 — custodial-fallback path)", async () => {
+  it("switches to the custodial account BEFORE disconnecting (custodial-fallback path)", async () => {
     mockUseHasCustodialAccount.mockReturnValue(true)
     const { result } = renderHook(() => useDeleteSelfCustodial())
 

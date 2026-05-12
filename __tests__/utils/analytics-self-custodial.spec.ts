@@ -12,7 +12,7 @@ jest.mock("@react-native-firebase/analytics", () => () => ({
   logEvent: (...args: unknown[]) => mockLogEvent(...args),
 }))
 
-describe("self-custodial analytics helpers (Important #15)", () => {
+describe("self-custodial analytics helpers", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })

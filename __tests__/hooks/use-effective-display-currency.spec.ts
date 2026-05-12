@@ -121,7 +121,7 @@ describe("useEffectiveDisplayCurrency", () => {
       expect(mockUpdateState).not.toHaveBeenCalled()
     })
 
-    it("uses cache-first fetchPolicy when authed (Important #5)", () => {
+    it("uses cache-first fetchPolicy when authed", () => {
       renderHook(() => useEffectiveDisplayCurrency())
 
       expect(mockUseDisplayCurrencyQuery).toHaveBeenCalledWith(
@@ -130,7 +130,7 @@ describe("useEffectiveDisplayCurrency", () => {
     })
   })
 
-  describe("logged-out custodial path (Important #5)", () => {
+  describe("logged-out custodial path", () => {
     beforeEach(() => {
       mockUseIsAuthed.mockReturnValue(false)
       mockUseAccountRegistry.mockReturnValue({

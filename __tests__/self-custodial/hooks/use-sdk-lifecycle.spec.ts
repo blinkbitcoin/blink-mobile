@@ -139,7 +139,7 @@ describe("useSdkLifecycle", () => {
       expect(mockInitSdk).not.toHaveBeenCalled()
     })
 
-    it("falls to Error when the stored network does not match the current build (Critical #11)", async () => {
+    it("falls to Error when the stored network does not match the current build", async () => {
       mockValidateStoredNetwork.mockResolvedValue(false)
 
       const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
@@ -150,7 +150,7 @@ describe("useSdkLifecycle", () => {
       expect(mockInitSdk).not.toHaveBeenCalled()
     })
 
-    it("falls to Error when initSdk throws (Critical #11)", async () => {
+    it("falls to Error when initSdk throws", async () => {
       mockInitSdk.mockRejectedValue(new Error("connect failed"))
 
       const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
@@ -162,7 +162,7 @@ describe("useSdkLifecycle", () => {
   })
 
   describe("happy path", () => {
-    it("loads the mnemonic, validates the network, initializes the SDK, and reaches Ready after the Synced event (Critical #11)", async () => {
+    it("loads the mnemonic, validates the network, initializes the SDK, and reaches Ready after the Synced event", async () => {
       const sdk = buildSdk("sdk-1")
       mockInitSdk.mockResolvedValue(sdk)
       const listener = captureListener()
@@ -190,7 +190,7 @@ describe("useSdkLifecycle", () => {
       })
     })
 
-    it("surfaces the lastReceivedPaymentId when a PaymentSucceeded event fires (Critical #11)", async () => {
+    it("surfaces the lastReceivedPaymentId when a PaymentSucceeded event fires", async () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       const listener = captureListener()
 
@@ -211,7 +211,7 @@ describe("useSdkLifecycle", () => {
     })
   })
 
-  describe("post-connect sync rejection (Important #9)", () => {
+  describe("post-connect sync rejection", () => {
     it("records the rejection as a non-fatal crashlytics error instead of a buried breadcrumb", async () => {
       const syncError = new Error("network down")
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
@@ -261,7 +261,7 @@ describe("useSdkLifecycle", () => {
     })
   })
 
-  describe("account-switch disconnect ordering (Critical #11)", () => {
+  describe("account-switch disconnect ordering", () => {
     it("disconnects the previous SDK when the active account changes", async () => {
       const sdkA = buildSdk("sdk-A")
       const sdkB = buildSdk("sdk-B")
@@ -289,7 +289,7 @@ describe("useSdkLifecycle", () => {
       expect(mockRemoveSdkEventListener).toHaveBeenCalledWith(sdkA, "listener-id")
     })
 
-    it("disconnects the SDK on unmount (Critical #11)", async () => {
+    it("disconnects the SDK on unmount", async () => {
       const sdk = buildSdk("sdk-1")
       mockInitSdk.mockResolvedValue(sdk)
       captureListener()
@@ -307,7 +307,7 @@ describe("useSdkLifecycle", () => {
       })
     })
 
-    it("flips status to Unavailable when accountId transitions to null after being active (Critical #11)", async () => {
+    it("flips status to Unavailable when accountId transitions to null after being active", async () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       captureListener()
 
@@ -329,7 +329,7 @@ describe("useSdkLifecycle", () => {
     })
   })
 
-  describe("listener event filtering (Critical #11)", () => {
+  describe("listener event filtering", () => {
     it("ignores events whose tag is not in REFRESH_EVENTS", async () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       const listener = captureListener()
@@ -368,7 +368,7 @@ describe("useSdkLifecycle", () => {
     })
   })
 
-  describe("loadMore (Critical #11)", () => {
+  describe("loadMore", () => {
     it("appends loaded transactions and advances the raw offset", async () => {
       const sdk = buildSdk("sdk-1")
       mockInitSdk.mockResolvedValue(sdk)
@@ -440,7 +440,7 @@ describe("useSdkLifecycle", () => {
     })
   })
 
-  describe("refreshStableBalanceActive (Critical #11)", () => {
+  describe("refreshStableBalanceActive", () => {
     it("reads user settings and flips sdkStableBalanceActive when a label exists", async () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       captureListener()
@@ -472,7 +472,7 @@ describe("useSdkLifecycle", () => {
     })
   })
 
-  describe("refreshWallets re-entrancy (Critical #11)", () => {
+  describe("refreshWallets re-entrancy", () => {
     it("coalesces concurrent refresh calls via pendingRefreshRef so runOnce drains the pending flag", async () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       const listener = captureListener()
@@ -521,7 +521,7 @@ describe("useSdkLifecycle", () => {
     })
   })
 
-  describe("offline / degraded transitions (Critical #11)", () => {
+  describe("offline / degraded transitions", () => {
     it("flips status to Offline when snapshot fails and connectivity is Offline", async () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       const listener = captureListener()
@@ -592,7 +592,7 @@ describe("useSdkLifecycle", () => {
     })
   })
 
-  describe("retryCount as effect dependency (Critical #11)", () => {
+  describe("retryCount as effect dependency", () => {
     it("retries the entire init flow when retryCount changes", async () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       captureListener()

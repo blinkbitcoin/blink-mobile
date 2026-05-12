@@ -106,7 +106,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     expect(mockDisconnectSdk).toHaveBeenCalledWith(FAKE_SDK)
   })
 
-  it("returns probe-failed (not ok) when the snapshot fetch throws, but still disconnects the SDK (Critical #1)", async () => {
+  it("returns probe-failed (not ok) when the snapshot fetch throws, but still disconnects the SDK", async () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockRejectedValue(new Error("getInfo failed"))
@@ -120,7 +120,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     expect(mockDisconnectSdk).toHaveBeenCalledWith(FAKE_SDK)
   })
 
-  it("returns probe-failed (not ok) when the connect step fails, and never attempts to disconnect (Critical #1)", async () => {
+  it("returns probe-failed (not ok) when the connect step fails, and never attempts to disconnect", async () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockRejectedValue(new Error("connect failed"))
 
@@ -133,7 +133,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     expect(mockDisconnectSdk).not.toHaveBeenCalled()
   })
 
-  it("wraps a non-Error rejection from the snapshot fetch into an Error (Critical #1)", async () => {
+  it("wraps a non-Error rejection from the snapshot fetch into an Error", async () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockRejectedValue("opaque string failure")
@@ -165,7 +165,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     })
   })
 
-  it("records the disconnect failure to crashlytics so leaking SDK instances are observable (Important #14)", async () => {
+  it("records the disconnect failure to crashlytics so leaking SDK instances are observable", async () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockResolvedValue({
@@ -181,7 +181,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     expect(mockRecordError).toHaveBeenCalledWith(disconnectError)
   })
 
-  it("wraps a non-Error disconnect rejection into an Error before recording it (Important #14)", async () => {
+  it("wraps a non-Error disconnect rejection into an Error before recording it", async () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockResolvedValue({

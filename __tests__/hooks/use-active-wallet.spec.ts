@@ -110,7 +110,7 @@ describe("useActiveWallet", () => {
     expect(result.current.needsBackendAuth).toBe(true)
   })
 
-  it("treats Degraded self-custodial as isReady=true so payments stay available (Important #5)", () => {
+  it("treats Degraded self-custodial as isReady=true so payments stay available", () => {
     mockActiveAccount.mockReturnValue({
       id: "self-custodial-default",
       type: AccountType.SelfCustodial,
@@ -128,7 +128,7 @@ describe("useActiveWallet", () => {
     expect(result.current.isSelfCustodial).toBe(true)
   })
 
-  it("treats Degraded custodial as isReady=true (Important #5)", () => {
+  it("treats Degraded custodial as isReady=true", () => {
     mockActiveAccount.mockReturnValue({
       id: "custodial-default",
       type: AccountType.Custodial,
@@ -153,7 +153,7 @@ describe("useActiveWallet", () => {
   ]
 
   for (const status of nonReadyStatuses) {
-    it(`flips isReady=false for non-Ready, non-Degraded status '${status}' (Important #5)`, () => {
+    it(`flips isReady=false for non-Ready, non-Degraded status '${status}'`, () => {
       mockActiveAccount.mockReturnValue({
         id: "self-custodial-default",
         type: AccountType.SelfCustodial,

@@ -222,7 +222,7 @@ describe("useCloudRestore", () => {
     })
   })
 
-  it("falls to NotFound when the single download returns reason='not-found' (Critical #8)", async () => {
+  it("falls to NotFound when the single download returns reason='not-found'", async () => {
     mockListBackups.mockResolvedValue({
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
@@ -239,7 +239,7 @@ describe("useCloudRestore", () => {
     })
   })
 
-  it("falls to Error (not NotFound) when the single download fails with auth (Critical #8)", async () => {
+  it("falls to Error (not NotFound) when the single download fails with auth", async () => {
     mockListBackups.mockResolvedValue({
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
@@ -257,7 +257,7 @@ describe("useCloudRestore", () => {
     expect(result.current.isNotFound).toBe(false)
   })
 
-  it("falls to Error (not NotFound) when the single download fails with transient (Critical #8)", async () => {
+  it("falls to Error (not NotFound) when the single download fails with transient", async () => {
     mockListBackups.mockResolvedValue({
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
@@ -275,7 +275,7 @@ describe("useCloudRestore", () => {
     expect(result.current.isNotFound).toBe(false)
   })
 
-  it("falls to Error (not NotFound) when the single download fails with unknown (Critical #8)", async () => {
+  it("falls to Error (not NotFound) when the single download fails with unknown", async () => {
     mockListBackups.mockResolvedValue({
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
@@ -293,7 +293,7 @@ describe("useCloudRestore", () => {
     expect(result.current.isNotFound).toBe(false)
   })
 
-  it("falls to Error in the picker flow when ALL per-file downloads fail with non-not-found reasons (Critical #8)", async () => {
+  it("falls to Error in the picker flow when ALL per-file downloads fail with non-not-found reasons", async () => {
     mockListBackups.mockResolvedValue({
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
@@ -311,7 +311,7 @@ describe("useCloudRestore", () => {
     expect(result.current.isNotFound).toBe(false)
   })
 
-  it("falls to NotFound only when ALL per-file downloads return not-found (Critical #8)", async () => {
+  it("falls to NotFound only when ALL per-file downloads return not-found", async () => {
     mockListBackups.mockResolvedValue({
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
@@ -328,7 +328,7 @@ describe("useCloudRestore", () => {
     })
   })
 
-  it("falls to Error when a per-file download mixes not-found with a non-not-found failure (Critical #8)", async () => {
+  it("falls to Error when a per-file download mixes not-found with a non-not-found failure", async () => {
     mockListBackups.mockResolvedValue({
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
@@ -351,7 +351,7 @@ describe("useCloudRestore", () => {
     expect(result.current.isNotFound).toBe(false)
   })
 
-  it("falls to NotFound when ALL per-file downloads succeed but metadata fails to parse (Critical #9)", async () => {
+  it("falls to NotFound when ALL per-file downloads succeed but metadata fails to parse", async () => {
     mockListBackups.mockResolvedValue({
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
@@ -372,7 +372,7 @@ describe("useCloudRestore", () => {
     expect(result.current.hasError).toBe(false)
   })
 
-  it("falls to NotFound on single-file path when downloaded content fails parseBackupMetadata (Critical #9)", async () => {
+  it("falls to NotFound on single-file path when downloaded content fails parseBackupMetadata", async () => {
     mockListBackups.mockResolvedValue({
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
@@ -391,7 +391,7 @@ describe("useCloudRestore", () => {
     expect(mockRestore).not.toHaveBeenCalled()
   })
 
-  it("does not call restore on single-file path when content lacks walletIdentifier (Critical #9)", async () => {
+  it("does not call restore on single-file path when content lacks walletIdentifier", async () => {
     mockListBackups.mockResolvedValue({
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
@@ -409,7 +409,7 @@ describe("useCloudRestore", () => {
     expect(mockRestore).not.toHaveBeenCalled()
   })
 
-  it("proceeds with the backup on single-file path when metadata parses successfully (Critical #9)", async () => {
+  it("proceeds with the backup on single-file path when metadata parses successfully", async () => {
     mockListBackups.mockResolvedValue({
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
@@ -426,7 +426,7 @@ describe("useCloudRestore", () => {
     })
   })
 
-  it("reports per-file exceptions to crashlytics during picker assembly (Critical #8)", async () => {
+  it("reports per-file exceptions to crashlytics during picker assembly", async () => {
     mockListBackups.mockResolvedValue({
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
@@ -476,7 +476,7 @@ describe("useCloudRestore", () => {
     expect(mockRestore).toHaveBeenCalledWith("decrypted words")
   })
 
-  it("shows password error only when the decrypt failure is reason='wrong-password' (Critical #10)", async () => {
+  it("shows password error only when the decrypt failure is reason='wrong-password'", async () => {
     const mockParseEncrypted = jest.requireMock(
       "@app/utils/backup-payload",
     ).parseEncryptedBackupPayload
@@ -511,7 +511,7 @@ describe("useCloudRestore", () => {
     expect(mockRecordError).not.toHaveBeenCalled()
   })
 
-  it("falls to Error (not wrong-password) when decrypt fails with reason='missing-crypto-fields' (Critical #10)", async () => {
+  it("falls to Error (not wrong-password) when decrypt fails with reason='missing-crypto-fields'", async () => {
     const mockParseEncrypted = jest.requireMock(
       "@app/utils/backup-payload",
     ).parseEncryptedBackupPayload
@@ -546,7 +546,7 @@ describe("useCloudRestore", () => {
     expect(mockRecordError).toHaveBeenCalled()
   })
 
-  it("falls to Error (not wrong-password) when decrypt fails with reason='unsupported-cipher' (Critical #10)", async () => {
+  it("falls to Error (not wrong-password) when decrypt fails with reason='unsupported-cipher'", async () => {
     const mockParseEncrypted = jest.requireMock(
       "@app/utils/backup-payload",
     ).parseEncryptedBackupPayload
@@ -580,7 +580,7 @@ describe("useCloudRestore", () => {
     expect(result.current.passwordError).toBeNull()
   })
 
-  it("falls to Error (not wrong-password) when decrypt fails with reason='invalid-mnemonic' (Critical #10)", async () => {
+  it("falls to Error (not wrong-password) when decrypt fails with reason='invalid-mnemonic'", async () => {
     const mockParseEncrypted = jest.requireMock(
       "@app/utils/backup-payload",
     ).parseEncryptedBackupPayload
@@ -614,7 +614,7 @@ describe("useCloudRestore", () => {
     expect(result.current.passwordError).toBeNull()
   })
 
-  it("does not classify a restore-side failure as 'wrong password' after a successful decrypt (Critical #10)", async () => {
+  it("does not classify a restore-side failure as 'wrong password' after a successful decrypt", async () => {
     mockListBackups.mockResolvedValue({
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",

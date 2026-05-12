@@ -132,7 +132,7 @@ describe("useRestoreWallet", () => {
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
   })
 
-  it("aborts restore (Critical #4) when the index lookup fails — never duplicates an existing account", async () => {
+  it("aborts restore when the index lookup fails — never duplicates an existing account", async () => {
     // Repro: a transient AsyncStorage failure during the dedup lookup used to
     // surface as `null`, causing the restore flow to create a fresh account
     // and orphan the existing one.
@@ -155,7 +155,7 @@ describe("useRestoreWallet", () => {
     expect(mockToastShow).toHaveBeenCalled()
   })
 
-  it("shows the invalid-mnemonic toast (NOT generic restoreFailed) when validation fails (Important #10)", async () => {
+  it("shows the invalid-mnemonic toast (NOT generic restoreFailed) when validation fails", async () => {
     mockValidateMnemonic.mockReturnValue(false)
 
     const { result } = renderHook(() => useRestoreWallet())
@@ -173,7 +173,7 @@ describe("useRestoreWallet", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("does NOT report invalid-mnemonic to crashlytics — it's a user input error (Important #10)", async () => {
+  it("does NOT report invalid-mnemonic to crashlytics — it's a user input error", async () => {
     mockValidateMnemonic.mockReturnValue(false)
 
     const { result } = renderHook(() => useRestoreWallet())
@@ -185,7 +185,7 @@ describe("useRestoreWallet", () => {
     expect(mockRecordError).not.toHaveBeenCalled()
   })
 
-  it("normalizes the mnemonic before validation so leading whitespace doesn't trip the check (Important #10)", async () => {
+  it("normalizes the mnemonic before validation so leading whitespace doesn't trip the check", async () => {
     const { result } = renderHook(() => useRestoreWallet())
 
     await act(async () => {

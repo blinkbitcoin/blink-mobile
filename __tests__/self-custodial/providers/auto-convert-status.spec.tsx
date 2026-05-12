@@ -62,7 +62,7 @@ describe("AutoConvertStatusProvider", () => {
     })
   })
 
-  describe("multi-invoice isolation (Critical #11)", () => {
+  describe("multi-invoice isolation", () => {
     it("keeps statuses independent across invoices when one is marked Converting", () => {
       const { result } = renderHook(
         () => ({
@@ -115,7 +115,7 @@ describe("AutoConvertStatusProvider", () => {
     })
   })
 
-  describe("identity preservation on no-op updates (Critical #11)", () => {
+  describe("identity preservation on no-op updates", () => {
     it("does not re-render readers when an invoice is marked with the same status twice", () => {
       let renderCount = 0
       const { result } = renderHook(
@@ -163,7 +163,7 @@ describe("AutoConvertStatusProvider", () => {
     })
   })
 
-  describe("bounded map size (Important #11)", () => {
+  describe("bounded map size", () => {
     it("evicts the oldest invoice when the tracked-invoice cap is exceeded", () => {
       const { result } = renderHook(
         () => ({

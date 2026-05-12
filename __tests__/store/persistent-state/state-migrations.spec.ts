@@ -57,7 +57,7 @@ describe("state-migrations schema 10", () => {
     expect(result.activeAccountId).toBeUndefined()
   })
 
-  it("moves legacy single-account currency into the active self-custodial slot and clears the legacy field (Critical #7)", async () => {
+  it("moves legacy single-account currency into the active self-custodial slot and clears the legacy field", async () => {
     const state9 = {
       schemaVersion: 9,
       galoyInstance: { id: "Main" },
@@ -217,7 +217,7 @@ describe("state-migrations schema 10", () => {
     ).toBeUndefined()
   })
 
-  it("attributes legacy 'USD' from schema 8 to the active self-custodial slot and clears the legacy field (Critical #7)", async () => {
+  it("attributes legacy 'USD' from schema 8 to the active self-custodial slot and clears the legacy field", async () => {
     const state8 = {
       schemaVersion: 8,
       galoyInstance: { id: "Main" },
@@ -236,7 +236,7 @@ describe("state-migrations schema 10", () => {
     expect(result.activeAccountId).toBe("self-custodial-id")
   })
 
-  it("attributes legacy 'BTC' from schema 8 to the active self-custodial slot and clears the legacy field (Critical #7)", async () => {
+  it("attributes legacy 'BTC' from schema 8 to the active self-custodial slot and clears the legacy field", async () => {
     const state8 = {
       schemaVersion: 8,
       galoyInstance: { id: "Main" },
@@ -254,7 +254,7 @@ describe("state-migrations schema 10", () => {
     })
   })
 
-  it("leaves selfCustodialDefaultWalletCurrency undefined when absent from schema 8 (Important #4)", async () => {
+  it("leaves selfCustodialDefaultWalletCurrency undefined when absent from schema 8", async () => {
     const state8 = {
       schemaVersion: 8,
       galoyInstance: { id: "Main" },
@@ -268,7 +268,7 @@ describe("state-migrations schema 10", () => {
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
   })
 
-  it("clears the legacy field on schema 9 → 11 even when no active account is set (Critical #7)", async () => {
+  it("clears the legacy field on schema 9 → 11 even when no active account is set", async () => {
     const state9 = {
       schemaVersion: 9,
       galoyInstance: { id: "Main" },
@@ -283,7 +283,7 @@ describe("state-migrations schema 10", () => {
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
   })
 
-  it("clears the legacy field when active is custodial — preference cannot be attributed (Critical #7)", async () => {
+  it("clears the legacy field when active is custodial — preference cannot be attributed", async () => {
     const state10 = {
       schemaVersion: 10,
       galoyInstance: { id: "Main" },
@@ -299,7 +299,7 @@ describe("state-migrations schema 10", () => {
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
   })
 
-  it("does NOT overwrite an existing per-account entry with the legacy value (Critical #7)", async () => {
+  it("does NOT overwrite an existing per-account entry with the legacy value", async () => {
     const state10 = {
       schemaVersion: 10,
       galoyInstance: { id: "Main" },
@@ -322,7 +322,7 @@ describe("state-migrations schema 10", () => {
     })
   })
 
-  describe("migratePersistentState — discriminated result (Critical #3)", () => {
+  describe("migratePersistentState — discriminated result", () => {
     it("returns status='failed' with the thrown Error and the original rawData when a migration throws", async () => {
       // Schema 3 with a galoyInstance.name not in GALOY_INSTANCES triggers
       // migrate3ToCurrent's `throw new Error("Galoy instance not found")`.

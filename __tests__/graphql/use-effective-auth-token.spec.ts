@@ -69,7 +69,7 @@ describe("useEffectiveAuthToken", () => {
     expect(result.current).toBe("")
   })
 
-  it("does not consult the self-custodial index when the active account is the custodial sentinel (Important #1)", () => {
+  it("does not consult the self-custodial index when the active account is the custodial sentinel", () => {
     mockActiveAccountId = DefaultAccountId.Custodial
 
     renderHook(() => useEffectiveAuthToken())
@@ -77,7 +77,7 @@ describe("useEffectiveAuthToken", () => {
     expect(mockListSelfCustodialAccounts).not.toHaveBeenCalled()
   })
 
-  it("keeps the empty token once the self-custodial index confirms the active account is a real self-custodial entry (Important #1)", async () => {
+  it("keeps the empty token once the self-custodial index confirms the active account is a real self-custodial entry", async () => {
     mockActiveAccountId = "self-custodial-uuid-1"
     mockListSelfCustodialAccounts.mockResolvedValue({
       status: "ok",
@@ -92,7 +92,7 @@ describe("useEffectiveAuthToken", () => {
     expect(result.current).toBe("")
   })
 
-  it("falls back to the live custodial token when the active account id is an orphan not present in the self-custodial index (Important #1)", async () => {
+  it("falls back to the live custodial token when the active account id is an orphan not present in the self-custodial index", async () => {
     // Repro: a stale activeAccountId (legacy migration, corrupted index, etc.)
     // pointing at a UUID that no longer maps to any self-custodial entry would silently
     // strip Apollo auth — BackendFeatureGate then locks the user out with no
@@ -111,7 +111,7 @@ describe("useEffectiveAuthToken", () => {
     })
   })
 
-  it("keeps the optimistic empty-token state when the self-custodial index read fails (Important #1)", async () => {
+  it("keeps the optimistic empty-token state when the self-custodial index read fails", async () => {
     // Read failures must not flip the user back to custodial — that would be
     // the same data-leak that the empty-token guard exists to prevent. The
     // hook stays optimistic about self-custodial until the index can be consulted.
@@ -129,7 +129,7 @@ describe("useEffectiveAuthToken", () => {
     expect(result.current).toBe("")
   })
 
-  it("re-queries the self-custodial index when the active account id changes (Important #1)", async () => {
+  it("re-queries the self-custodial index when the active account id changes", async () => {
     mockActiveAccountId = "self-custodial-uuid-1"
     mockListSelfCustodialAccounts.mockResolvedValue({
       status: "ok",

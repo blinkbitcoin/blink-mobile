@@ -145,7 +145,7 @@ describe("useGoogleDriveBackup", () => {
       )
     })
 
-    it("returns auth reason on upload 403 (Critical #8)", async () => {
+    it("returns auth reason on upload 403", async () => {
       mockUploadAppDataFile.mockRejectedValueOnce(
         new DriveError(DriveErrorReason.Auth, "Drive upload failed (403): Forbidden"),
       )
@@ -186,7 +186,7 @@ describe("useGoogleDriveBackup", () => {
       expect(mockRecordError).toHaveBeenCalledTimes(1)
     })
 
-    it("reports a DriveError to crashlytics as-is, preserving the original instance (Critical #8)", async () => {
+    it("reports a DriveError to crashlytics as-is, preserving the original instance", async () => {
       const original = new DriveError(
         DriveErrorReason.Transient,
         "Drive upload failed (503): Service unavailable",
@@ -202,7 +202,7 @@ describe("useGoogleDriveBackup", () => {
       expect(mockRecordError).toHaveBeenCalledWith(original)
     })
 
-    it("wraps a generic Error with the upload operation context when reporting (Critical #8)", async () => {
+    it("wraps a generic Error with the upload operation context when reporting", async () => {
       mockUploadAppDataFile.mockRejectedValueOnce(new Error("plain JS error"))
 
       const { result } = renderHook(() => useGoogleDriveBackup())
@@ -218,7 +218,7 @@ describe("useGoogleDriveBackup", () => {
       )
     })
 
-    it("wraps a non-Error rejection with the upload operation context when reporting (Critical #8)", async () => {
+    it("wraps a non-Error rejection with the upload operation context when reporting", async () => {
       mockUploadAppDataFile.mockRejectedValueOnce("string rejection")
 
       const { result } = renderHook(() => useGoogleDriveBackup())
@@ -307,7 +307,7 @@ describe("useGoogleDriveBackup", () => {
       })
     })
 
-    it("returns not-found reason on 404 (Critical #8)", async () => {
+    it("returns not-found reason on 404", async () => {
       mockDownloadAppDataFile.mockRejectedValueOnce(
         new DriveError(DriveErrorReason.NotFound, "Drive download failed (404)"),
       )
@@ -328,7 +328,7 @@ describe("useGoogleDriveBackup", () => {
       expect(mockRecordError).toHaveBeenCalledTimes(1)
     })
 
-    it("returns auth reason on 401 (Critical #8)", async () => {
+    it("returns auth reason on 401", async () => {
       mockDownloadAppDataFile.mockRejectedValueOnce(
         new DriveError(DriveErrorReason.Auth, "Drive download failed (401)"),
       )
@@ -348,7 +348,7 @@ describe("useGoogleDriveBackup", () => {
       })
     })
 
-    it("returns transient reason on network failure (Critical #8)", async () => {
+    it("returns transient reason on network failure", async () => {
       mockDownloadAppDataFile.mockRejectedValueOnce(
         new DriveError(DriveErrorReason.Transient, "Drive network error: offline"),
       )
@@ -368,7 +368,7 @@ describe("useGoogleDriveBackup", () => {
       })
     })
 
-    it("wraps a generic Error with the download operation context when reporting (Critical #8)", async () => {
+    it("wraps a generic Error with the download operation context when reporting", async () => {
       mockDownloadAppDataFile.mockRejectedValueOnce(new Error("plain JS error"))
 
       const { result } = renderHook(() => useGoogleDriveBackup())

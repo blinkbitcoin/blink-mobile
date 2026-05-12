@@ -234,7 +234,7 @@ describe("useBackupMethods", () => {
     })
   })
 
-  describe("isCredentialBackupAvailable (Critical #2: iOS multi-account gate)", () => {
+  describe("isCredentialBackupAvailable (iOS multi-account gate)", () => {
     it("is true on Android regardless of how many self-custodial accounts exist", () => {
       Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
       mockSelfCustodialEntries = [

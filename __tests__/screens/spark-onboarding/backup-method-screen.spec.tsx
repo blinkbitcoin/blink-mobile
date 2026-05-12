@@ -153,7 +153,7 @@ describe("SparkBackupMethodScreen", () => {
     expect(mockHandleKeychainBackup).toHaveBeenCalled()
   })
 
-  it("hides the password manager button when credential backup is unavailable (Critical #2: iOS multi-account)", () => {
+  it("hides the password manager button when credential backup is unavailable (iOS multi-account)", () => {
     mockIsCredentialBackupAvailable = false
 
     const { queryByText } = render(

@@ -80,7 +80,7 @@ describe("spark backup format", () => {
     expect(Buffer.from(payload.iv, "base64")).toHaveLength(12)
   })
 
-  it("throws BackupPayloadError with reason='wrong-password' on AES-GCM auth tag mismatch (Critical #10)", () => {
+  it("throws BackupPayloadError with reason='wrong-password' on AES-GCM auth tag mismatch", () => {
     const raw = buildBackupPayload(mnemonic, {
       walletIdentifier,
       password: "ValidPass1234!",
@@ -99,7 +99,7 @@ describe("spark backup format", () => {
     }
   })
 
-  it("throws BackupPayloadError with reason='missing-crypto-fields' and names the salt field when salt is absent (Critical #10)", () => {
+  it("throws BackupPayloadError with reason='missing-crypto-fields' and names the salt field when salt is absent", () => {
     const raw = JSON.stringify({
       version: 1,
       walletIdentifier,
@@ -128,7 +128,7 @@ describe("spark backup format", () => {
     }
   })
 
-  it("throws BackupPayloadError with reason='missing-crypto-fields' and names the iv field when iv is empty (Critical #10)", () => {
+  it("throws BackupPayloadError with reason='missing-crypto-fields' and names the iv field when iv is empty", () => {
     const raw = JSON.stringify({
       version: 1,
       walletIdentifier,
@@ -152,7 +152,7 @@ describe("spark backup format", () => {
     }
   })
 
-  it("throws BackupPayloadError with reason='missing-crypto-fields' and names the data field when data is absent (Critical #10)", () => {
+  it("throws BackupPayloadError with reason='missing-crypto-fields' and names the data field when data is absent", () => {
     const raw = JSON.stringify({
       version: 1,
       walletIdentifier,
@@ -175,7 +175,7 @@ describe("spark backup format", () => {
     }
   })
 
-  it("throws BackupPayloadError with reason='unsupported-cipher' on unknown cipher (Critical #10)", () => {
+  it("throws BackupPayloadError with reason='unsupported-cipher' on unknown cipher", () => {
     const raw = JSON.stringify({
       version: 1,
       walletIdentifier,
@@ -198,7 +198,7 @@ describe("spark backup format", () => {
     }
   })
 
-  it("throws BackupPayloadError with reason='invalid-mnemonic' when plain payload has empty mnemonic (Critical #10)", () => {
+  it("throws BackupPayloadError with reason='invalid-mnemonic' when plain payload has empty mnemonic", () => {
     const raw = JSON.stringify({
       version: 1,
       walletIdentifier,
@@ -218,7 +218,7 @@ describe("spark backup format", () => {
     }
   })
 
-  it("throws BackupPayloadError with reason='invalid-mnemonic' when plain payload has no mnemonic field (Critical #10)", () => {
+  it("throws BackupPayloadError with reason='invalid-mnemonic' when plain payload has no mnemonic field", () => {
     const raw = JSON.stringify({
       version: 1,
       walletIdentifier,
@@ -237,7 +237,7 @@ describe("spark backup format", () => {
     }
   })
 
-  it("throws BackupPayloadError with reason='invalid-mnemonic' when plain payload has non-string mnemonic (Critical #10)", () => {
+  it("throws BackupPayloadError with reason='invalid-mnemonic' when plain payload has non-string mnemonic", () => {
     const raw = JSON.stringify({
       version: 1,
       walletIdentifier,
@@ -292,7 +292,7 @@ describe("spark backup format", () => {
     expect(isEncryptedBackup("not json {{{")).toBe(false)
   })
 
-  it("parseBackupPayload throws BackupPayloadError with reason='encrypted-requires-password' on encrypted payload (Critical #10)", () => {
+  it("parseBackupPayload throws BackupPayloadError with reason='encrypted-requires-password' on encrypted payload", () => {
     const raw = buildBackupPayload(mnemonic, {
       walletIdentifier,
       password: "ValidPass1234!",

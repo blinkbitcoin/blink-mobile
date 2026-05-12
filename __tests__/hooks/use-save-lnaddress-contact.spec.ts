@@ -100,7 +100,7 @@ describe("useSaveLnAddressContact", () => {
     expect(mockContactCreate).not.toHaveBeenCalled()
   })
 
-  describe("self-custodial branch (Important #6)", () => {
+  describe("self-custodial branch", () => {
     it("saves the contact through the bridge when sdk is available", async () => {
       mockIsSelfCustodial = true
       mockSdk = { id: "sdk" }

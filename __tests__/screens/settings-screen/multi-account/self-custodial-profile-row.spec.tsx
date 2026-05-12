@@ -352,7 +352,7 @@ describe("SelfCustodialProfileRow", () => {
     expect(queryByTestId("warning-modal")).toBeNull()
   })
 
-  it("does NOT open the confirm modal when the probe fails — surfaces an error toast instead (Critical #1)", async () => {
+  it("does NOT open the confirm modal when the probe fails — surfaces an error toast instead", async () => {
     mockProbeWallets.mockResolvedValue({
       status: "probe-failed",
       error: new Error("probe failed"),
@@ -388,7 +388,7 @@ describe("SelfCustodialProfileRow", () => {
     expect(await findByTestId("delete-modal")).toBeTruthy()
   })
 
-  it("short-circuits the probe when the row is the active self-custodial account, reading live wallets from useSelfCustodialWallet (Critical #1)", async () => {
+  it("short-circuits the probe when the row is the active self-custodial account, reading live wallets from useSelfCustodialWallet", async () => {
     mockUseAccountRegistry.mockReturnValue({
       activeAccount: {
         id: TEST_ENTRY_ID,
@@ -421,7 +421,7 @@ describe("SelfCustodialProfileRow", () => {
     expect(lastWarningModalProps.wallets?.[0]?.balance.amount).toBe(1234)
   })
 
-  it("opens the confirm modal directly on the active self-custodial account when live wallets are zero-balance (Critical #1)", async () => {
+  it("opens the confirm modal directly on the active self-custodial account when live wallets are zero-balance", async () => {
     mockUseAccountRegistry.mockReturnValue({
       activeAccount: {
         id: TEST_ENTRY_ID,
