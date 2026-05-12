@@ -121,8 +121,17 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     expect(detail.paymentType).toBe(PaymentType.Lnurl)
   })
 
-  it("sets destination to the lnurl string", () => {
+  it("uses the LN address identifier as the display destination when present", () => {
     const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+    expect(detail.destination).toBe("user@example.com")
+  })
+
+  it("falls back to the bech32 lnurl when no identifier is present (raw LNURL pay)", () => {
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        lnurlParams: baseLnurlParams({ identifier: "" }),
+      }),
+    )
     expect(detail.destination).toBe("lnurl1abc")
   })
 
