@@ -3,7 +3,6 @@ import { ServiceStatus } from "@breeztech/breez-sdk-spark-react-native"
 import {
   getOnlineState,
   getServiceStatus,
-  isOnline,
   isOnlineStatus,
   STATUS_TIMEOUT_MS,
 } from "@app/self-custodial/providers/is-online"
@@ -111,45 +110,6 @@ describe("isOnlineStatus", () => {
     it(`returns false for ${label}`, () => {
       expect(isOnlineStatus(status)).toBe(false)
     })
-  })
-})
-
-describe("isOnline", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("returns true when status is Operational", async () => {
-    mockGetSparkStatus.mockResolvedValue({
-      status: ServiceStatus.Operational,
-      lastUpdated: BigInt(0),
-    })
-
-    expect(await isOnline()).toBe(true)
-  })
-
-  it("returns true when status is Degraded", async () => {
-    mockGetSparkStatus.mockResolvedValue({
-      status: ServiceStatus.Degraded,
-      lastUpdated: BigInt(0),
-    })
-
-    expect(await isOnline()).toBe(true)
-  })
-
-  it("returns false when status is Major", async () => {
-    mockGetSparkStatus.mockResolvedValue({
-      status: ServiceStatus.Major,
-      lastUpdated: BigInt(0),
-    })
-
-    expect(await isOnline()).toBe(false)
-  })
-
-  it("returns false when getSparkStatus throws", async () => {
-    mockGetSparkStatus.mockRejectedValue(new Error("net down"))
-
-    expect(await isOnline()).toBe(false)
   })
 })
 
