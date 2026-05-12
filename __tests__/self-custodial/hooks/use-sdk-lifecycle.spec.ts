@@ -1,7 +1,7 @@
 import { renderHook, act, waitFor } from "@testing-library/react-native"
 
 import { ActiveWalletStatus } from "@app/types/wallet"
-import { useSdkLifecycle } from "@app/self-custodial/providers/use-sdk-lifecycle"
+import { useSdkLifecycle } from "@app/self-custodial/hooks/use-sdk-lifecycle"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   // eslint-disable-next-line camelcase
