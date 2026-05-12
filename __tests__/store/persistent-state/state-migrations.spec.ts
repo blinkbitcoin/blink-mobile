@@ -57,12 +57,12 @@ describe("state-migrations schema 10", () => {
     expect(result.activeAccountId).toBeUndefined()
   })
 
-  it("moves legacy single-account currency into the active SC slot and clears the legacy field (Critical #7)", async () => {
+  it("moves legacy single-account currency into the active self-custodial slot and clears the legacy field (Critical #7)", async () => {
     const state9 = {
       schemaVersion: 9,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "token",
-      activeAccountId: "sc-id",
+      activeAccountId: "self-custodial-id",
       selfCustodialDefaultWalletCurrency: "USD",
     }
 
@@ -71,7 +71,7 @@ describe("state-migrations schema 10", () => {
     expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
-      "sc-id": "USD",
+      "self-custodial-id": "USD",
     })
   })
 
@@ -80,10 +80,10 @@ describe("state-migrations schema 10", () => {
       schemaVersion: 10,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "token",
-      activeAccountId: "sc-id-1",
+      activeAccountId: "self-custodial-id-1",
       selfCustodialDefaultWalletCurrencyByAccountId: {
-        "sc-id-1": "USD",
-        "sc-id-2": "BTC",
+        "self-custodial-id-1": "USD",
+        "self-custodial-id-2": "BTC",
       },
     }
 
@@ -91,8 +91,8 @@ describe("state-migrations schema 10", () => {
 
     expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
-      "sc-id-1": "USD",
-      "sc-id-2": "BTC",
+      "self-custodial-id-1": "USD",
+      "self-custodial-id-2": "BTC",
     })
   })
 
@@ -115,14 +115,14 @@ describe("state-migrations schema 10", () => {
       schemaVersion: 11,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "token",
-      activeAccountId: "sc-id-1",
+      activeAccountId: "self-custodial-id-1",
       selfCustodialDisplayCurrencyByAccountId: {
-        "sc-id-1": "EUR",
-        "sc-id-2": "JPY",
+        "self-custodial-id-1": "EUR",
+        "self-custodial-id-2": "JPY",
       },
       selfCustodialLanguageByAccountId: {
-        "sc-id-1": "es",
-        "sc-id-2": "fr",
+        "self-custodial-id-1": "es",
+        "self-custodial-id-2": "fr",
       },
     }
 
@@ -130,12 +130,12 @@ describe("state-migrations schema 10", () => {
 
     expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDisplayCurrencyByAccountId).toEqual({
-      "sc-id-1": "EUR",
-      "sc-id-2": "JPY",
+      "self-custodial-id-1": "EUR",
+      "self-custodial-id-2": "JPY",
     })
     expect(result.selfCustodialLanguageByAccountId).toEqual({
-      "sc-id-1": "es",
-      "sc-id-2": "fr",
+      "self-custodial-id-1": "es",
+      "self-custodial-id-2": "fr",
     })
   })
 
@@ -217,12 +217,12 @@ describe("state-migrations schema 10", () => {
     ).toBeUndefined()
   })
 
-  it("attributes legacy 'USD' from schema 8 to the active SC slot and clears the legacy field (Critical #7)", async () => {
+  it("attributes legacy 'USD' from schema 8 to the active self-custodial slot and clears the legacy field (Critical #7)", async () => {
     const state8 = {
       schemaVersion: 8,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "token",
-      activeAccountId: "sc-id",
+      activeAccountId: "self-custodial-id",
       selfCustodialDefaultWalletCurrency: "USD",
     }
 
@@ -231,17 +231,17 @@ describe("state-migrations schema 10", () => {
     expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
-      "sc-id": "USD",
+      "self-custodial-id": "USD",
     })
-    expect(result.activeAccountId).toBe("sc-id")
+    expect(result.activeAccountId).toBe("self-custodial-id")
   })
 
-  it("attributes legacy 'BTC' from schema 8 to the active SC slot and clears the legacy field (Critical #7)", async () => {
+  it("attributes legacy 'BTC' from schema 8 to the active self-custodial slot and clears the legacy field (Critical #7)", async () => {
     const state8 = {
       schemaVersion: 8,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "token",
-      activeAccountId: "sc-id",
+      activeAccountId: "self-custodial-id",
       selfCustodialDefaultWalletCurrency: "BTC",
     }
 
@@ -250,7 +250,7 @@ describe("state-migrations schema 10", () => {
     expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
-      "sc-id": "BTC",
+      "self-custodial-id": "BTC",
     })
   })
 
@@ -304,11 +304,11 @@ describe("state-migrations schema 10", () => {
       schemaVersion: 10,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "token",
-      activeAccountId: "sc-id-1",
+      activeAccountId: "self-custodial-id-1",
       selfCustodialDefaultWalletCurrency: "USD",
       selfCustodialDefaultWalletCurrencyByAccountId: {
-        "sc-id-1": "BTC",
-        "sc-id-2": "USD",
+        "self-custodial-id-1": "BTC",
+        "self-custodial-id-2": "USD",
       },
     }
 
@@ -317,8 +317,8 @@ describe("state-migrations schema 10", () => {
     expect(result.schemaVersion).toBe(11)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
-      "sc-id-1": "BTC",
-      "sc-id-2": "USD",
+      "self-custodial-id-1": "BTC",
+      "self-custodial-id-2": "USD",
     })
   })
 

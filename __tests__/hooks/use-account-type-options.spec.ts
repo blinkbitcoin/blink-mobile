@@ -90,7 +90,7 @@ describe("useAccountTypeOptions", () => {
     expect(result.current.selfCustodialTemporarilyDisabled).toBe(true)
   })
 
-  it("returns no options when the country code is undefined and SC is off", () => {
+  it("returns no options when the country code is undefined and self-custodial is off", () => {
     mockUseFeatureFlags.mockReturnValue({ nonCustodialEnabled: false })
     mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: false })
 

@@ -112,21 +112,36 @@ describe("useScanContext", () => {
       mockActiveWallet.mockReturnValue({
         isSelfCustodial: true,
         wallets: [
-          { id: "sc-btc", walletCurrency: "BTC", balance: {}, transactions: [] },
-          { id: "sc-usd", walletCurrency: "USD", balance: {}, transactions: [] },
+          {
+            id: "self-custodial-btc",
+            walletCurrency: "BTC",
+            balance: {},
+            transactions: [],
+          },
+          {
+            id: "self-custodial-usd",
+            walletCurrency: "USD",
+            balance: {},
+            transactions: [],
+          },
         ],
       })
 
       const { result } = renderHook(() => useScanContext())
 
-      expect(result.current.myWalletIds).toEqual(["sc-btc", "sc-usd"])
+      expect(result.current.myWalletIds).toEqual([
+        "self-custodial-btc",
+        "self-custodial-usd",
+      ])
       expect(result.current.bitcoinNetwork).toBe(Network.Mainnet)
     })
 
     it("exposes lnurlDomains as [] (intraledger lookup disabled)", () => {
       mockActiveWallet.mockReturnValue({
         isSelfCustodial: true,
-        wallets: [{ id: "sc", walletCurrency: "BTC", balance: {}, transactions: [] }],
+        wallets: [
+          { id: "self-custodial", walletCurrency: "BTC", balance: {}, transactions: [] },
+        ],
       })
 
       const { result } = renderHook(() => useScanContext())
@@ -138,7 +153,12 @@ describe("useScanContext", () => {
       mockActiveWallet.mockReturnValue({
         isSelfCustodial: true,
         wallets: [
-          { id: "sc-only", walletCurrency: "BTC", balance: {}, transactions: [] },
+          {
+            id: "self-custodial-only",
+            walletCurrency: "BTC",
+            balance: {},
+            transactions: [],
+          },
         ],
       })
       mockScanningQuery.mockReturnValue({
@@ -153,7 +173,7 @@ describe("useScanContext", () => {
 
       const { result } = renderHook(() => useScanContext())
 
-      expect(result.current.myWalletIds).toEqual(["sc-only"])
+      expect(result.current.myWalletIds).toEqual(["self-custodial-only"])
     })
   })
 })

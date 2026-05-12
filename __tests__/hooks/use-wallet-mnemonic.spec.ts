@@ -22,7 +22,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => mockUseAccountRegistry(),
 }))
 
-const ACCOUNT_ID = "sc-uuid-1"
+const ACCOUNT_ID = "self-custodial-uuid-1"
 
 const setActiveSelfCustodial = (): void => {
   mockUseActiveWallet.mockReturnValue({ isSelfCustodial: true })

@@ -9,8 +9,8 @@ import {
 } from "@app/self-custodial/providers/backup-state"
 import { AccountType, AccountStatus } from "@app/types/wallet"
 
-const TEST_SC_ACCOUNT_ID = "test-sc-uuid"
-const OTHER_SC_ACCOUNT_ID = "other-sc-uuid"
+const TEST_SC_ACCOUNT_ID = "test-self-custodial-uuid"
+const OTHER_SC_ACCOUNT_ID = "other-self-custodial-uuid"
 const BACKUP_KEY = `backupState:${TEST_SC_ACCOUNT_ID}`
 const OTHER_BACKUP_KEY = `backupState:${OTHER_SC_ACCOUNT_ID}`
 

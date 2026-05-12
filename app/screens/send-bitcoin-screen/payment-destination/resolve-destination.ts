@@ -7,7 +7,7 @@ import { parseDestination } from "./index"
 import { type ParseDestinationParams, type ParseDestinationResult } from "./index.types"
 import { resolveSparkDestination } from "./spark"
 
-/** parseDestination + SC-aware wrap when an SDK is connected. */
+/** parseDestination + self-custodial-aware wrap when an SDK is connected. */
 export const resolveDestination = async (
   params: ParseDestinationParams,
   sdk: BreezSdkInterface | null,

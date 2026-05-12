@@ -73,7 +73,7 @@ describe("useActiveWallet", () => {
 
   it("returns self-custodial state when active account is self-custodial", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialState.mockReturnValue(selfCustodialReady)
@@ -89,7 +89,7 @@ describe("useActiveWallet", () => {
 
   it("isSelfCustodial is false when self-custodial but unavailable", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialState.mockReturnValue(selfCustodialUnavailable)
@@ -112,7 +112,7 @@ describe("useActiveWallet", () => {
 
   it("treats Degraded self-custodial as isReady=true so payments stay available (Important #5)", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialState.mockReturnValue({
@@ -155,7 +155,7 @@ describe("useActiveWallet", () => {
   for (const status of nonReadyStatuses) {
     it(`flips isReady=false for non-Ready, non-Degraded status '${status}' (Important #5)`, () => {
       mockActiveAccount.mockReturnValue({
-        id: "sc-default",
+        id: "self-custodial-default",
         type: AccountType.SelfCustodial,
       })
       mockSelfCustodialState.mockReturnValue({

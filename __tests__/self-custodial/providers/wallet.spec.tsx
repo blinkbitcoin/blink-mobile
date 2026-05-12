@@ -186,9 +186,9 @@ describe("SelfCustodialWalletProvider", () => {
       stableBalanceActiveLabel: undefined,
       sparkPrivateModeEnabled: false,
     })
-    mockState.activeAccountId = "test-sc-uuid"
+    mockState.activeAccountId = "test-self-custodial-uuid"
     mockListSelfCustodialAccounts.mockResolvedValue([
-      { id: "test-sc-uuid", lightningAddress: null },
+      { id: "test-self-custodial-uuid", lightningAddress: null },
     ])
     mockGetLightningAddress.mockResolvedValue(null)
     mockSetSelfCustodialLightningAddress.mockResolvedValue(undefined)
@@ -315,7 +315,10 @@ describe("SelfCustodialWalletProvider", () => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     })
 
-    expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3", "/tmp/test-sc-uuid")
+    expect(mockInitSdk).toHaveBeenCalledWith(
+      "word1 word2 word3",
+      "/tmp/test-self-custodial-uuid",
+    )
   })
 
   it("handles refresh error gracefully", async () => {
@@ -1438,7 +1441,7 @@ describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () 
 
       await waitFor(() => {
         expect(mockSetSelfCustodialLightningAddress).toHaveBeenCalledWith(
-          "test-sc-uuid",
+          "test-self-custodial-uuid",
           "alice@blink.sv",
         )
       })
@@ -1505,7 +1508,7 @@ describe("SelfCustodialWalletProvider — stale-write safety (Critical #5)", () 
 
       await waitFor(() => {
         expect(mockSetSelfCustodialLightningAddress).toHaveBeenCalledWith(
-          "test-sc-uuid",
+          "test-self-custodial-uuid",
           "alice@blink.sv",
         )
       })

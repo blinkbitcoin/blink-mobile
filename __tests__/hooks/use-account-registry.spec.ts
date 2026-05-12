@@ -130,7 +130,7 @@ describe("useAccountRegistry", () => {
     mockNonCustodialEnabled = true
     mockListSelfCustodialAccounts.mockResolvedValue({
       status: "ok",
-      entries: [{ id: "sc-uuid-1", lightningAddress: null }],
+      entries: [{ id: "self-custodial-uuid-1", lightningAddress: null }],
     })
 
     const { result } = renderHook(() => useAccountRegistry())
@@ -138,7 +138,7 @@ describe("useAccountRegistry", () => {
 
     expect(result.current.accounts).toHaveLength(2)
     expect(result.current.accounts[1].type).toBe(AccountType.SelfCustodial)
-    expect(result.current.accounts[1].id).toBe("sc-uuid-1")
+    expect(result.current.accounts[1].id).toBe("self-custodial-uuid-1")
     expect(result.current.accounts[1].status).toBe(AccountStatus.RequiresRestore)
   })
 
@@ -155,16 +155,16 @@ describe("useAccountRegistry", () => {
   it("selects account matching activeAccountId", async () => {
     mockUseIsAuthed.mockReturnValue(true)
     mockNonCustodialEnabled = true
-    mockActiveAccountId = "sc-uuid-1"
+    mockActiveAccountId = "self-custodial-uuid-1"
     mockListSelfCustodialAccounts.mockResolvedValue({
       status: "ok",
-      entries: [{ id: "sc-uuid-1", lightningAddress: null }],
+      entries: [{ id: "self-custodial-uuid-1", lightningAddress: null }],
     })
 
     const { result } = renderHook(() => useAccountRegistry())
     await flushAsyncEffects()
 
-    expect(result.current.activeAccount?.id).toBe("sc-uuid-1")
+    expect(result.current.activeAccount?.id).toBe("self-custodial-uuid-1")
     expect(result.current.activeAccount?.type).toBe(AccountType.SelfCustodial)
   })
 
@@ -175,21 +175,23 @@ describe("useAccountRegistry", () => {
     await flushAsyncEffects()
 
     act(() => {
-      result.current.setActiveAccountId("sc-uuid-1")
+      result.current.setActiveAccountId("self-custodial-uuid-1")
     })
 
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     const updater = mockUpdateState.mock.calls[0][0]
-    expect(updater({ activeAccountId: "old" })).toEqual({ activeAccountId: "sc-uuid-1" })
+    expect(updater({ activeAccountId: "old" })).toEqual({
+      activeAccountId: "self-custodial-uuid-1",
+    })
   })
 
   it("does NOT clobber seeded self-custodial entries when the index read fails (Critical #4)", async () => {
     // Repro: a transient AsyncStorage failure used to surface as `[]` from
-    // listSelfCustodialAccounts, which clobbered the seeded entry — every SC
+    // listSelfCustodialAccounts, which clobbered the seeded entry — every self-custodial
     // account vanished from the registry until next reload.
     mockUseIsAuthed.mockReturnValue(false)
     mockNonCustodialEnabled = true
-    mockActiveAccountId = "sc-uuid-1"
+    mockActiveAccountId = "self-custodial-uuid-1"
     mockListSelfCustodialAccounts.mockResolvedValue({
       status: "read-failed",
       error: new Error("AsyncStorage unavailable"),
@@ -199,9 +201,9 @@ describe("useAccountRegistry", () => {
     await flushAsyncEffects()
 
     expect(result.current.selfCustodialEntries).toEqual([
-      { id: "sc-uuid-1", lightningAddress: null },
+      { id: "self-custodial-uuid-1", lightningAddress: null },
     ])
-    expect(result.current.activeAccount?.id).toBe("sc-uuid-1")
+    expect(result.current.activeAccount?.id).toBe("self-custodial-uuid-1")
   })
 
   it("setActiveAccountId is a single state mutation (no token rewrite)", async () => {
@@ -235,9 +237,9 @@ describe("createCustodialDescriptor", () => {
 
 describe("createSelfCustodialDescriptor", () => {
   it("creates a self-custodial descriptor with correct defaults", () => {
-    const desc = createSelfCustodialDescriptor("sc-id-1", "Spark")
+    const desc = createSelfCustodialDescriptor("self-custodial-id-1", "Spark")
 
-    expect(desc.id).toBe("sc-id-1")
+    expect(desc.id).toBe("self-custodial-id-1")
     expect(desc.type).toBe(AccountType.SelfCustodial)
     expect(desc.label).toBe("Spark")
     expect(desc.selected).toBe(false)
@@ -248,11 +250,11 @@ describe("createSelfCustodialDescriptor", () => {
 describe("markSelected", () => {
   const accounts = [
     createCustodialDescriptor("Blink"),
-    createSelfCustodialDescriptor("sc-id-1", "Spark"),
+    createSelfCustodialDescriptor("self-custodial-id-1", "Spark"),
   ]
 
   it("marks account matching activeId as selected", () => {
-    const result = markSelected(accounts, "sc-id-1")
+    const result = markSelected(accounts, "self-custodial-id-1")
 
     expect(result[0].selected).toBe(false)
     expect(result[1].selected).toBe(true)

@@ -135,7 +135,7 @@ describe("useSendWallets", () => {
     expect(result.current.defaultWallet?.walletCurrency).toBe(WalletCurrency.Btc)
   })
 
-  it("honors the per-account SC default currency from persistent state", () => {
+  it("honors the per-account self-custodial default currency from persistent state", () => {
     mockActiveWallet.mockReturnValue({
       isSelfCustodial: true,
       isReady: true,
@@ -144,8 +144,8 @@ describe("useSendWallets", () => {
     mockIsAuthed.mockReturnValue(false)
     mockDetailsQuery.mockReturnValue({ data: undefined, loading: false })
     mockPersistentState.mockReturnValue({
-      activeAccountId: "sc-id",
-      selfCustodialDefaultWalletCurrencyByAccountId: { "sc-id": "USD" },
+      activeAccountId: "self-custodial-id",
+      selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "USD" },
     })
 
     const { result } = renderHook(() => useSendWallets())
@@ -162,8 +162,8 @@ describe("useSendWallets", () => {
     mockIsAuthed.mockReturnValue(false)
     mockDetailsQuery.mockReturnValue({ data: undefined, loading: false })
     mockPersistentState.mockReturnValue({
-      activeAccountId: "sc-id",
-      selfCustodialDefaultWalletCurrencyByAccountId: { "sc-id": "USD" },
+      activeAccountId: "self-custodial-id",
+      selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "USD" },
     })
 
     const { result } = renderHook(() => useSendWallets())

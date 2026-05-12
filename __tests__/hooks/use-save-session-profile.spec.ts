@@ -136,7 +136,7 @@ describe("useSaveSessionProfile", () => {
       expect(saveTokenOrder).toBeLessThan(updateStateOrder)
     })
 
-    it("calls updateState BEFORE the profile fetch so an SC-active user lands on Custodial even if /me fails", async () => {
+    it("calls updateState BEFORE the profile fetch so an self-custodial-active user lands on Custodial even if /me fails", async () => {
       mockFetchUsername.mockRejectedValue(new Error("network down"))
 
       const { result } = renderHook(() => useSaveSessionProfile())

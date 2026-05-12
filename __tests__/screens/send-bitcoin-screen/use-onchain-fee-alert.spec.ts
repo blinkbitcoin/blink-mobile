@@ -26,7 +26,7 @@ const buildOnchainPaymentDetail = (settlementSats = 100): PaymentDetail<WalletCu
     }),
   }) as unknown as PaymentDetail<WalletCurrency>
 
-describe("useOnchainFeeAlert (Critical #6 — SC gate)", () => {
+describe("useOnchainFeeAlert (Critical #6 — self-custodial gate)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockGetOnChainTxFee.mockResolvedValue({ data: { onChainTxFee: { amount: 5000 } } })
@@ -43,7 +43,7 @@ describe("useOnchainFeeAlert (Critical #6 — SC gate)", () => {
     )
 
     expect(result.current).toBe(false)
-    // Effect runs synchronously in renderHook; if SC gate works, fetcher never called.
+    // Effect runs synchronously in renderHook; if self-custodial gate works, fetcher never called.
     await Promise.resolve()
     expect(mockGetOnChainTxFee).not.toHaveBeenCalled()
   })

@@ -91,7 +91,7 @@ describe("useBackupMethods", () => {
     jest.clearAllMocks()
     mockLoading = false
     mockIdentityPubkey = "test-pubkey-1234"
-    mockSelfCustodialEntries = [{ id: "sc-1", lightningAddress: null }]
+    mockSelfCustodialEntries = [{ id: "self-custodial-1", lightningAddress: null }]
     Object.defineProperty(Platform, "OS", { configurable: true, value: originalPlatform })
   })
 
@@ -235,12 +235,12 @@ describe("useBackupMethods", () => {
   })
 
   describe("isCredentialBackupAvailable (Critical #2: iOS multi-account gate)", () => {
-    it("is true on Android regardless of how many SC accounts exist", () => {
+    it("is true on Android regardless of how many self-custodial accounts exist", () => {
       Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
       mockSelfCustodialEntries = [
-        { id: "sc-1", lightningAddress: null },
-        { id: "sc-2", lightningAddress: null },
-        { id: "sc-3", lightningAddress: null },
+        { id: "self-custodial-1", lightningAddress: null },
+        { id: "self-custodial-2", lightningAddress: null },
+        { id: "self-custodial-3", lightningAddress: null },
       ]
 
       const { result } = renderHook(() => useBackupMethods())
@@ -248,9 +248,9 @@ describe("useBackupMethods", () => {
       expect(result.current.isCredentialBackupAvailable).toBe(true)
     })
 
-    it("is true on iOS when this is the only SC account in the registry", () => {
+    it("is true on iOS when this is the only self-custodial account in the registry", () => {
       Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
-      mockSelfCustodialEntries = [{ id: "sc-1", lightningAddress: null }]
+      mockSelfCustodialEntries = [{ id: "self-custodial-1", lightningAddress: null }]
 
       const { result } = renderHook(() => useBackupMethods())
 
@@ -266,11 +266,11 @@ describe("useBackupMethods", () => {
       expect(result.current.isCredentialBackupAvailable).toBe(true)
     })
 
-    it("is false on iOS when 2+ SC accounts exist (multi-account Keychain bug guard)", () => {
+    it("is false on iOS when 2+ self-custodial accounts exist (multi-account Keychain bug guard)", () => {
       Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
       mockSelfCustodialEntries = [
-        { id: "sc-1", lightningAddress: null },
-        { id: "sc-2", lightningAddress: null },
+        { id: "self-custodial-1", lightningAddress: null },
+        { id: "self-custodial-2", lightningAddress: null },
       ]
 
       const { result } = renderHook(() => useBackupMethods())

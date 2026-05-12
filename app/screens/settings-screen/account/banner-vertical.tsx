@@ -34,7 +34,7 @@ export const AccountBannerVertical: React.FC = () => {
 
   const { currentLevel } = useLevel()
   const { activeAccount } = useAccountRegistry()
-  const { lightningAddress: scLightningAddress } = useSelfCustodialWallet()
+  const { lightningAddress: selfCustodialLightningAddress } = useSelfCustodialWallet()
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
   const isUserLoggedIn = currentLevel !== AccountLevel.NonAuth
 
@@ -50,7 +50,7 @@ export const AccountBannerVertical: React.FC = () => {
 
   if (isSelfCustodial) {
     const subtitle = LL.SettingsScreen.nonCustodialAccount()
-    const avatarChar = (scLightningAddress ?? subtitle).charAt(0)
+    const avatarChar = (selfCustodialLightningAddress ?? subtitle).charAt(0)
     return (
       <View style={styles.outer}>
         <Avatar
@@ -61,7 +61,9 @@ export const AccountBannerVertical: React.FC = () => {
           titleStyle={styles.titleStyle}
         />
         <View style={styles.textContainer}>
-          {scLightningAddress ? <Text type="p2">{scLightningAddress}</Text> : null}
+          {selfCustodialLightningAddress ? (
+            <Text type="p2">{selfCustodialLightningAddress}</Text>
+          ) : null}
           <Text type="p2">{subtitle}</Text>
         </View>
       </View>

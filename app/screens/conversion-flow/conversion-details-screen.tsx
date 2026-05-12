@@ -110,29 +110,33 @@ export const ConversionDetailsScreen = () => {
   } = useDisplayCurrency()
   const styles = useStyles(displayCurrency !== WalletCurrency.Usd)
 
-  const scWalletsForConvert = useMemo(() => {
+  const selfCustodialWalletsForConvert = useMemo(() => {
     if (!isSelfCustodial) return null
-    const scBtc = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
-    const scUsd = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Usd)
-    if (!scBtc || !scUsd) return null
+    const selfCustodialBtc = activeWallets.find(
+      (w) => w.walletCurrency === WalletCurrency.Btc,
+    )
+    const selfCustodialUsd = activeWallets.find(
+      (w) => w.walletCurrency === WalletCurrency.Usd,
+    )
+    if (!selfCustodialBtc || !selfCustodialUsd) return null
     return {
       btc: {
-        id: scBtc.id,
-        balance: scBtc.balance.amount,
-        walletCurrency: scBtc.walletCurrency,
+        id: selfCustodialBtc.id,
+        balance: selfCustodialBtc.balance.amount,
+        walletCurrency: selfCustodialBtc.walletCurrency,
       },
       usd: {
-        id: scUsd.id,
-        balance: scUsd.balance.amount,
-        walletCurrency: scUsd.walletCurrency,
+        id: selfCustodialUsd.id,
+        balance: selfCustodialUsd.balance.amount,
+        walletCurrency: selfCustodialUsd.walletCurrency,
       },
     }
   }, [isSelfCustodial, activeWallets])
 
   const btcWallet =
-    scWalletsForConvert?.btc ?? getBtcWallet(data?.me?.defaultAccount?.wallets)
+    selfCustodialWalletsForConvert?.btc ?? getBtcWallet(data?.me?.defaultAccount?.wallets)
   const usdWallet =
-    scWalletsForConvert?.usd ?? getUsdWallet(data?.me?.defaultAccount?.wallets)
+    selfCustodialWalletsForConvert?.usd ?? getUsdWallet(data?.me?.defaultAccount?.wallets)
 
   const {
     fromWallet,
@@ -155,12 +159,13 @@ export const ConversionDetailsScreen = () => {
     isSelfCustodial && fromWallet
       ? convertDirectionFromCurrency(fromWallet.walletCurrency)
       : undefined
-  const { limits: scConversionLimits, error: scLimitsError } =
+  const { limits: selfCustodialConversionLimits, error: selfCustodialLimitsError } =
     useNonCustodialConversionLimits(convertDirection)
-  const scMinFromAmount = isSelfCustodial
-    ? scConversionLimits?.minFromAmount ?? null
+  const selfCustodialMinFromAmount = isSelfCustodial
+    ? selfCustodialConversionLimits?.minFromAmount ?? null
     : null
-  const scLimitsUnavailable = isSelfCustodial && scLimitsError !== null
+  const selfCustodialLimitsUnavailable =
+    isSelfCustodial && selfCustodialLimitsError !== null
 
   const conversionGuard = useNonCustodialConversionGuard({
     fromCurrency: fromWallet?.walletCurrency,
@@ -488,20 +493,20 @@ export const ConversionDetailsScreen = () => {
 
   const belowMinimum =
     isSelfCustodial &&
-    scMinFromAmount !== null &&
+    selfCustodialMinFromAmount !== null &&
     settlementSendAmount.amount > 0 &&
-    settlementSendAmount.amount < scMinFromAmount
+    settlementSendAmount.amount < selfCustodialMinFromAmount
 
   const amountFieldError: string | undefined = (() => {
     if (exceedsBalance) {
       return LL.SendBitcoinScreen.amountExceed({ balance: fromWalletBalanceFormatted })
     }
-    if (scLimitsUnavailable) {
+    if (selfCustodialLimitsUnavailable) {
       return LL.StableBalance.conversionUnavailable()
     }
-    if (belowMinimum && scMinFromAmount !== null) {
+    if (belowMinimum && selfCustodialMinFromAmount !== null) {
       const minMoneyAmount = toWalletMoneyAmount(
-        scMinFromAmount,
+        selfCustodialMinFromAmount,
         fromWallet.walletCurrency,
       )
       return LL.StableBalance.minimumConversion({
@@ -751,7 +756,7 @@ export const ConversionDetailsScreen = () => {
             isTyping ||
             Boolean(loadingPercent) ||
             belowMinimum ||
-            scLimitsUnavailable ||
+            selfCustodialLimitsUnavailable ||
             quoteBlocking ||
             conversionGuard.isQuoting ||
             conversionGuard.hasQuoteError ||

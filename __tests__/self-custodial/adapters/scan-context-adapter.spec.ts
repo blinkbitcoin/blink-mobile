@@ -16,11 +16,11 @@ const buildWallet = (id: string): WalletState => ({
 describe("createSelfCustodialScanContext", () => {
   it("maps wallet ids from the active self-custodial wallets", () => {
     const adapter = createSelfCustodialScanContext([
-      buildWallet("sc-btc"),
-      buildWallet("sc-usd"),
+      buildWallet("self-custodial-btc"),
+      buildWallet("self-custodial-usd"),
     ])
 
-    expect(adapter.myWalletIds).toEqual(["sc-btc", "sc-usd"])
+    expect(adapter.myWalletIds).toEqual(["self-custodial-btc", "self-custodial-usd"])
   })
 
   it("returns bitcoinNetwork equal to SparkNetworkLabel from config", () => {
@@ -35,7 +35,7 @@ describe("createSelfCustodialScanContext", () => {
     expect(adapter.myWalletIds).toEqual([])
   })
 
-  it("returns an empty lnurlDomains list (intraledger lookup is disabled in SC)", () => {
+  it("returns an empty lnurlDomains list (intraledger lookup is disabled in self-custodial)", () => {
     const adapter = createSelfCustodialScanContext([])
 
     expect(adapter.lnurlDomains).toEqual([])

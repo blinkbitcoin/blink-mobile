@@ -13,7 +13,7 @@ const baseState: PersistentState = {
 
 describe("getSelfCustodialDefaultCurrency", () => {
   it("returns BTC as the ultimate default", () => {
-    const state: PersistentState = { ...baseState, activeAccountId: "sc-1" }
+    const state: PersistentState = { ...baseState, activeAccountId: "self-custodial-1" }
 
     expect(getSelfCustodialDefaultCurrency(state)).toBe("BTC")
   })
@@ -21,10 +21,10 @@ describe("getSelfCustodialDefaultCurrency", () => {
   it("returns the per-account map value when set for the active id", () => {
     const state: PersistentState = {
       ...baseState,
-      activeAccountId: "sc-1",
+      activeAccountId: "self-custodial-1",
       selfCustodialDefaultWalletCurrencyByAccountId: {
-        "sc-1": "USD",
-        "sc-2": "BTC",
+        "self-custodial-1": "USD",
+        "self-custodial-2": "BTC",
       },
     }
 
@@ -32,12 +32,12 @@ describe("getSelfCustodialDefaultCurrency", () => {
   })
 
   it("isolates currency per active account", () => {
-    const map = { "sc-1": "USD", "sc-2": "BTC" } as const
+    const map = { "self-custodial-1": "USD", "self-custodial-2": "BTC" } as const
 
     expect(
       getSelfCustodialDefaultCurrency({
         ...baseState,
-        activeAccountId: "sc-1",
+        activeAccountId: "self-custodial-1",
         selfCustodialDefaultWalletCurrencyByAccountId: map,
       }),
     ).toBe("USD")
@@ -45,7 +45,7 @@ describe("getSelfCustodialDefaultCurrency", () => {
     expect(
       getSelfCustodialDefaultCurrency({
         ...baseState,
-        activeAccountId: "sc-2",
+        activeAccountId: "self-custodial-2",
         selfCustodialDefaultWalletCurrencyByAccountId: map,
       }),
     ).toBe("BTC")
@@ -54,9 +54,9 @@ describe("getSelfCustodialDefaultCurrency", () => {
   it("returns BTC when map missing the active id, ignoring the legacy field (Critical #7)", () => {
     const state: PersistentState = {
       ...baseState,
-      activeAccountId: "sc-new",
+      activeAccountId: "self-custodial-new",
       selfCustodialDefaultWalletCurrency: "USD",
-      selfCustodialDefaultWalletCurrencyByAccountId: { "sc-other": "BTC" },
+      selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-other": "BTC" },
     }
 
     expect(getSelfCustodialDefaultCurrency(state)).toBe("BTC")
@@ -65,7 +65,7 @@ describe("getSelfCustodialDefaultCurrency", () => {
   it("returns BTC when map is absent entirely, ignoring the legacy field (Critical #7)", () => {
     const state: PersistentState = {
       ...baseState,
-      activeAccountId: "sc-1",
+      activeAccountId: "self-custodial-1",
       selfCustodialDefaultWalletCurrency: "USD",
     }
 
@@ -77,7 +77,7 @@ describe("getSelfCustodialDefaultCurrency", () => {
       ...baseState,
       activeAccountId: DefaultAccountId.Custodial,
       selfCustodialDefaultWalletCurrency: "USD",
-      selfCustodialDefaultWalletCurrencyByAccountId: { "sc-1": "BTC" },
+      selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-1": "BTC" },
     }
 
     expect(getSelfCustodialDefaultCurrency(state)).toBe("BTC")
@@ -99,48 +99,48 @@ describe("getSelfCustodialDefaultCurrency", () => {
 
 describe("withSelfCustodialDefaultCurrency", () => {
   it("writes the currency under the active self-custodial id", () => {
-    const state: PersistentState = { ...baseState, activeAccountId: "sc-1" }
+    const state: PersistentState = { ...baseState, activeAccountId: "self-custodial-1" }
 
     const next = withSelfCustodialDefaultCurrency(state, "USD")
 
     expect(next.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
-      "sc-1": "USD",
+      "self-custodial-1": "USD",
     })
   })
 
   it("preserves entries for other accounts when writing", () => {
     const state: PersistentState = {
       ...baseState,
-      activeAccountId: "sc-2",
-      selfCustodialDefaultWalletCurrencyByAccountId: { "sc-1": "USD" },
+      activeAccountId: "self-custodial-2",
+      selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-1": "USD" },
     }
 
     const next = withSelfCustodialDefaultCurrency(state, "BTC")
 
     expect(next.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
-      "sc-1": "USD",
-      "sc-2": "BTC",
+      "self-custodial-1": "USD",
+      "self-custodial-2": "BTC",
     })
   })
 
   it("overwrites the existing value for the active id", () => {
     const state: PersistentState = {
       ...baseState,
-      activeAccountId: "sc-1",
-      selfCustodialDefaultWalletCurrencyByAccountId: { "sc-1": "USD" },
+      activeAccountId: "self-custodial-1",
+      selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-1": "USD" },
     }
 
     const next = withSelfCustodialDefaultCurrency(state, "BTC")
 
     expect(next.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
-      "sc-1": "BTC",
+      "self-custodial-1": "BTC",
     })
   })
 
   it("does not touch the legacy field", () => {
     const state: PersistentState = {
       ...baseState,
-      activeAccountId: "sc-1",
+      activeAccountId: "self-custodial-1",
       selfCustodialDefaultWalletCurrency: "USD",
     }
 
