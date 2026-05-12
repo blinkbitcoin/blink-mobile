@@ -4,7 +4,7 @@ import {
   TransactionDirection,
   TransactionStatus,
   type NormalizedTransaction,
-} from "@app/types/transaction.types"
+} from "@app/types/transaction"
 
 import { mapCustodialWalletToWalletState } from "@app/custodial/adapters/wallet-adapter"
 

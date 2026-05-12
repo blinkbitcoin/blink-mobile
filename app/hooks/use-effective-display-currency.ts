@@ -13,7 +13,7 @@ import {
   getSelfCustodialDisplayCurrency,
   withSelfCustodialDisplayCurrency,
 } from "@app/store/persistent-state/self-custodial-display-currency"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 type EffectiveDisplayCurrencyReturn = {
   displayCurrency: string

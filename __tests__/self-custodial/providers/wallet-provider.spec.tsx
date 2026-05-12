@@ -2,7 +2,7 @@ import React from "react"
 import { Text } from "react-native"
 import { act, render, renderHook, waitFor } from "@testing-library/react-native"
 
-import { AccountType, ActiveWalletStatus } from "@app/types/wallet.types"
+import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 
 import {
   SelfCustodialWalletProvider,

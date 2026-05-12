@@ -1,7 +1,7 @@
 import { type Contact as SdkContact } from "@breeztech/breez-sdk-spark-react-native"
 
 import { UserContact } from "@app/graphql/generated"
-import { type Contact } from "@app/types/contact.types"
+import { type Contact } from "@app/types/contact"
 
 export const unifiedContactToUserContact = (contact: Contact): UserContact => ({
   __typename: "UserContact",

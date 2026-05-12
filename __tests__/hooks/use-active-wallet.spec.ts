@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { AccountType, ActiveWalletStatus } from "@app/types/wallet.types"
+import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 

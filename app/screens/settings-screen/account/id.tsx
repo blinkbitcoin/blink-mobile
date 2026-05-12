@@ -6,7 +6,7 @@ import { useClipboard } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { SettingsGroup } from "../group"
 import { SettingsRow } from "../row"

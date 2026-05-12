@@ -3,7 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react-native"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useStableBalanceToggleQuote } from "@app/screens/stable-balance-settings-screen/hooks/use-stable-balance-toggle-quote"
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { ConvertDirection, PaymentResultStatus } from "@app/types/payment.types"
+import { ConvertDirection, PaymentResultStatus } from "@app/types/payment"
 
 const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn()

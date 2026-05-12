@@ -1,7 +1,7 @@
 import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
 
-import { AccountStatus, AccountType } from "@app/types/wallet.types"
+import { AccountStatus, AccountType } from "@app/types/wallet"
 
 import { SelfCustodialProfileRow } from "@app/screens/settings-screen/account/multi-account/self-custodial-profile-row"
 

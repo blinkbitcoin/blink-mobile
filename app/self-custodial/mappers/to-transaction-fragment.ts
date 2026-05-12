@@ -14,7 +14,7 @@ import {
   TransactionStatus,
   PaymentType,
   type NormalizedTransaction,
-} from "@app/types/transaction.types"
+} from "@app/types/transaction"
 
 type ConvertFn = (
   amount: MoneyAmount<WalletOrDisplayCurrency>,

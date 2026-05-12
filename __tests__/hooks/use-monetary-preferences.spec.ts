@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { RatesStatus, useMonetaryPreferences } from "@app/hooks/use-monetary-preferences"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 const mockConvertMoneyAmount = jest.fn()
 

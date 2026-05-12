@@ -14,7 +14,7 @@ import {
   AccountType,
   DefaultAccountId,
   type AccountDescriptor,
-} from "@app/types/wallet.types"
+} from "@app/types/wallet"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 export const createCustodialDescriptor = (label: string): AccountDescriptor => ({

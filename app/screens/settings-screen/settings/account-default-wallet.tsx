@@ -11,7 +11,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { SettingsRow } from "../row"
 

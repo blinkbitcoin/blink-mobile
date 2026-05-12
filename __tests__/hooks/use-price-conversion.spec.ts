@@ -1,7 +1,7 @@
 // sort-imports-ignore
 
 import { useRealtimePriceQuery } from "@app/graphql/generated"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 type MockUseRealtimePriceResponse = Pick<ReturnType<typeof useRealtimePriceQuery>, "data">
 const mockUseRealtimePriceQuery = jest.fn<

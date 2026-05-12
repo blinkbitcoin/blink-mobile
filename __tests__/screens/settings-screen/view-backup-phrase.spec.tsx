@@ -2,7 +2,7 @@ import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { ViewBackupPhraseSetting } from "@app/screens/settings-screen/settings/view-backup-phrase"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 const mockActiveAccount = jest.fn()
 const mockBackupState = jest.fn()

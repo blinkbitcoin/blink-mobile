@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
-import { ConvertDirection } from "@app/types/payment.types"
+import { ConvertDirection } from "@app/types/payment"
 
 import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks/use-non-custodial-conversion-limits"
 

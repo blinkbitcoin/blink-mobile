@@ -4,7 +4,7 @@ import {
   type ConvertParams,
   convertDirectionFromCurrency,
   oppositeWalletCurrency,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 
 type ConvertMoneyAmountFn = <T extends WalletOrDisplayCurrency>(
   moneyAmount: MoneyAmount<WalletOrDisplayCurrency>,

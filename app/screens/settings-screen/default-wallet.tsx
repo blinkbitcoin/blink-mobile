@@ -19,7 +19,7 @@ import {
   getSelfCustodialDefaultCurrency,
   withSelfCustodialDefaultCurrency,
 } from "@app/store/persistent-state/self-custodial-default-currency"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { Screen } from "../../components/screen"
 import { testProps } from "../../utils/testProps"

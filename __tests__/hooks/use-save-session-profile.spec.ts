@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { DefaultAccountId } from "@app/types/wallet.types"
+import { DefaultAccountId } from "@app/types/wallet"
 
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 

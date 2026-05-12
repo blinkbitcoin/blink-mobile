@@ -27,7 +27,7 @@ import {
   WalletAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
-import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction.types"
+import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 import { WalletDescriptor } from "@app/types/wallets"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 

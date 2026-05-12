@@ -20,9 +20,9 @@ import {
   type Contact,
   type ContactAdapter,
   type ContactListResult,
-} from "@app/types/contact.types"
-import { type NormalizedTransaction } from "@app/types/transaction.types"
-import { AccountType } from "@app/types/wallet.types"
+} from "@app/types/contact"
+import { type NormalizedTransaction } from "@app/types/transaction"
+import { AccountType } from "@app/types/wallet"
 import { normalizeString } from "@app/utils/helper"
 
 const MATCHED_PAYMENTS_LIMIT = 100

@@ -18,7 +18,7 @@ import {
   AccountType,
   ActiveWalletStatus,
   type ActiveWalletState,
-} from "@app/types/wallet.types"
+} from "@app/types/wallet"
 
 import { useSdkLifecycle } from "./use-sdk-lifecycle"
 

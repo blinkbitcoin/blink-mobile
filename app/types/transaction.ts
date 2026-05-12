@@ -1,7 +1,7 @@
 import { WalletCurrency } from "@app/graphql/generated"
 
 import { MoneyAmount } from "./amounts"
-import { AccountType } from "./wallet.types"
+import { AccountType } from "./wallet"
 
 export const PaymentType = {
   Lightning: "lightning",

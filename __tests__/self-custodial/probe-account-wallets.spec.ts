@@ -4,7 +4,7 @@ import {
 } from "@app/self-custodial/probe-account-wallets"
 import { WalletCurrency } from "@app/graphql/generated"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { toWalletId } from "@app/types/wallet.types"
+import { toWalletId } from "@app/types/wallet"
 
 const mockGetMnemonic = jest.fn()
 jest.mock("@app/utils/storage/secureStorage", () => ({

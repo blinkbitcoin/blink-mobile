@@ -28,8 +28,8 @@ import {
   type ReceiveLightningAdapter,
   type ReceiveOnchainAdapter,
   type SendPaymentAdapter,
-} from "@app/types/payment.types"
-import { AccountType } from "@app/types/wallet.types"
+} from "@app/types/payment"
+import { AccountType } from "@app/types/wallet"
 
 import { useAccountRegistry } from "./use-account-registry"
 

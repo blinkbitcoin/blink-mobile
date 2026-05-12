@@ -18,7 +18,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useUnacknowledgedNotificationCountQuery } from "@app/graphql/generated"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { AccountBanner } from "./account/banner"
 import { EmailSetting } from "./account/settings/email"

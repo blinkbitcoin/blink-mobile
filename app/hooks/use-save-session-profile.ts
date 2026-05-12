@@ -5,7 +5,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 import { updateDeviceSessionCount } from "@app/graphql/client-only-query"
 import { useGetUsernamesLazyQuery } from "@app/graphql/generated"
 import { usePersistentStateContext } from "@app/store/persistent-state"
-import { DefaultAccountId } from "@app/types/wallet.types"
+import { DefaultAccountId } from "@app/types/wallet"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { useI18nContext } from "@app/i18n/i18n-react"
 

@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { usePayments } from "@app/hooks/use-payments"
 

@@ -16,8 +16,8 @@ import {
   TransactionDirection,
   TransactionStatus,
   type NormalizedTransaction,
-} from "@app/types/transaction.types"
-import { AccountType } from "@app/types/wallet.types"
+} from "@app/types/transaction"
+import { AccountType } from "@app/types/wallet"
 import { toNumber } from "@app/utils/helper"
 
 const reportUnhandledEnum = <T>(scope: string, unhandled: unknown, fallback: T): T => {

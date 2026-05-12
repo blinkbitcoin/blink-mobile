@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { useAccountRegistry } from "./use-account-registry"
 import { useDisplayCurrency } from "./use-display-currency"

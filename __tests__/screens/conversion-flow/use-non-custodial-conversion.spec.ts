@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from "@testing-library/react-native"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useNonCustodialConversion } from "@app/screens/conversion-flow/hooks/use-non-custodial-conversion"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { ConvertDirection, PaymentResultStatus } from "@app/types/payment.types"
+import { ConvertDirection, PaymentResultStatus } from "@app/types/payment"
 
 const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn()

@@ -3,7 +3,7 @@ import { render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
-import { ActiveWalletStatus } from "@app/types/wallet.types"
+import { ActiveWalletStatus } from "@app/types/wallet"
 
 const mockUseActiveWallet = jest.fn()
 const mockUsePaymentRequest = jest.fn()

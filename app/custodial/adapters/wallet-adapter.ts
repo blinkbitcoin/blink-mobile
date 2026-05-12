@@ -1,8 +1,8 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import { type WalletBalance } from "@app/graphql/wallets-utils"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { type NormalizedTransaction } from "@app/types/transaction.types"
-import { toWalletId, type WalletState } from "@app/types/wallet.types"
+import { type NormalizedTransaction } from "@app/types/transaction"
+import { toWalletId, type WalletState } from "@app/types/wallet"
 
 const toBalance = (amount: number, currency: WalletCurrency) => {
   if (currency === WalletCurrency.Btc) return toBtcMoneyAmount(amount)

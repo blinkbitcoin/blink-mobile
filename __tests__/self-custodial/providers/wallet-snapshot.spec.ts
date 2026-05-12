@@ -1,7 +1,7 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import { toWalletMoneyAmount } from "@app/types/amounts"
-import type { NormalizedTransaction } from "@app/types/transaction.types"
-import { AccountType, toWalletId, type WalletState } from "@app/types/wallet.types"
+import type { NormalizedTransaction } from "@app/types/transaction"
+import { AccountType, toWalletId, type WalletState } from "@app/types/wallet"
 
 import {
   appendTransactions,

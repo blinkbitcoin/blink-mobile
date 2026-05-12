@@ -14,7 +14,7 @@ import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { removeSelfCustodialAccountId } from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
-import { AccountType, DefaultAccountId } from "@app/types/wallet.types"
+import { AccountType, DefaultAccountId } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 

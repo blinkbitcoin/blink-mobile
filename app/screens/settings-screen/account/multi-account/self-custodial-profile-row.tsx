@@ -18,7 +18,7 @@ import {
 } from "@app/self-custodial/probe-account-wallets"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { type SelfCustodialAccountEntry } from "@app/self-custodial/storage/account-index"
-import { AccountType, type WalletState } from "@app/types/wallet.types"
+import { AccountType, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"

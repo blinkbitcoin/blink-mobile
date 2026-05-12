@@ -1,5 +1,5 @@
 import { WalletCurrency } from "@app/graphql/generated"
-import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction.types"
+import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 
 import { createSelfCustodialSparkPaymentDetails } from "@app/self-custodial/payment-details/spark"
 

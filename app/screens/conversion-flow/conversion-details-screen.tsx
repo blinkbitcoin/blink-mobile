@@ -44,8 +44,8 @@ import {
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
-import { convertDirectionFromCurrency } from "@app/types/payment.types"
-import { AccountType } from "@app/types/wallet.types"
+import { convertDirectionFromCurrency } from "@app/types/payment"
+import { AccountType } from "@app/types/wallet"
 
 import {
   useConversionFormatting,

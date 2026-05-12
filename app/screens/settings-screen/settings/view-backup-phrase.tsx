@@ -10,7 +10,7 @@ import {
   BackupStatus,
   useBackupState,
 } from "@app/self-custodial/providers/backup-state-provider"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { SettingsRow } from "../row"
 

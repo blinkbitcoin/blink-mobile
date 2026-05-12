@@ -1,6 +1,6 @@
 import { renderHook, act, waitFor } from "@testing-library/react-native"
 
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { useSelfCustodialContacts } from "@app/self-custodial/hooks/use-self-custodial-contacts"
 

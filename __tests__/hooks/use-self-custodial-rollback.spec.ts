@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { AccountStatus, AccountType } from "@app/types/wallet.types"
+import { AccountStatus, AccountType } from "@app/types/wallet"
 
 import { useSelfCustodialRollback } from "@app/hooks/use-self-custodial-rollback"
 

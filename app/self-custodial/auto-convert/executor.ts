@@ -12,7 +12,7 @@ import {
   ConvertErrorCode,
   PaymentResultStatus,
   type ConvertParams,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
 

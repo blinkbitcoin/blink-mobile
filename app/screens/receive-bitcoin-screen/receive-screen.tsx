@@ -22,7 +22,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
 import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
-import { ActiveWalletStatus } from "@app/types/wallet.types"
+import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 
 import { NfcHeaderButton } from "./nfc-header-button"

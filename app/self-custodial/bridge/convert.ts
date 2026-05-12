@@ -21,7 +21,7 @@ import {
   type ConvertQuote,
   type GetConversionQuoteAdapter,
   type PaymentAdapterResult,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 

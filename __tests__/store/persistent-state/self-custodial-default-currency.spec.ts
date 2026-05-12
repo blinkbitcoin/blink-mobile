@@ -3,7 +3,7 @@ import {
   withSelfCustodialDefaultCurrency,
 } from "@app/store/persistent-state/self-custodial-default-currency"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
-import { DefaultAccountId } from "@app/types/wallet.types"
+import { DefaultAccountId } from "@app/types/wallet"
 
 const baseState: PersistentState = {
   schemaVersion: 11,

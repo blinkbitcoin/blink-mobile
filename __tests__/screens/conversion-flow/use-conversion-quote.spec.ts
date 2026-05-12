@@ -8,7 +8,7 @@ import {
   PaymentResultStatus,
   type ConvertParams,
   type ConvertQuote,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 
 const mockGetQuote = jest.fn()

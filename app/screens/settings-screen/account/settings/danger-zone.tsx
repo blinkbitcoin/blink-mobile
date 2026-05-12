@@ -7,7 +7,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { Delete } from "./delete"
 import { LogOut } from "./logout"

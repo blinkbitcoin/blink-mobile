@@ -2,7 +2,7 @@ import { useEffect } from "react"
 
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
-import { AccountType, type AccountDescriptor } from "@app/types/wallet.types"
+import { AccountType, type AccountDescriptor } from "@app/types/wallet"
 
 type RollbackDeps = {
   activeAccount?: AccountDescriptor
