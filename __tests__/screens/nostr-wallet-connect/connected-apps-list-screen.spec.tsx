@@ -24,7 +24,7 @@ jest.mock("@react-navigation/native", () => {
 })
 
 const mockRemoveConnection = jest.fn()
-const mockConnections = [
+const defaultMockConnections = [
   {
     id: "conn-1",
     appName: "Amethyst",
@@ -40,12 +40,13 @@ const mockConnections = [
     createdAt: 1700000001000,
   },
 ]
+let mockConnections = defaultMockConnections
 
 jest.mock("@app/screens/nostr-wallet-connect/hooks", () => ({
   useNwcConnections: () => ({
     connections: mockConnections,
     removeConnection: mockRemoveConnection,
-    hasConnections: true,
+    hasConnections: mockConnections.length > 0,
   }),
 }))
 
@@ -96,6 +97,7 @@ describe("NwcConnectedAppsListScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    mockConnections = defaultMockConnections
   })
 
   it("renders connection cards", async () => {
@@ -109,6 +111,20 @@ describe("NwcConnectedAppsListScreen", () => {
 
     expect(getByText("Amethyst")).toBeTruthy()
     expect(getByText("Damus")).toBeTruthy()
+  })
+
+  it("does not render a mock fallback when there are no connections", async () => {
+    mockConnections = []
+
+    const { queryByText } = render(
+      <ContextForScreen>
+        <NwcConnectedAppsListScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(queryByText("BTCpayserver")).toBeNull()
   })
 
   it("renders budget for each connection", async () => {
@@ -163,6 +179,31 @@ describe("NwcConnectedAppsListScreen", () => {
     })
 
     expect(mockRemoveConnection).toHaveBeenCalledWith("conn-1")
+  })
+
+  it("returns to the empty state after deleting the last connection", async () => {
+    mockConnections = [defaultMockConnections[0]]
+
+    const { getByTestId, getAllByTestId } = render(
+      <ContextForScreen>
+        <NwcConnectedAppsListScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    const closeIcons = getAllByTestId("icon-close")
+    await act(async () => {
+      fireEvent.press(closeIcons[0])
+    })
+
+    const confirmButton = getByTestId("confirm-delete")
+    await act(async () => {
+      fireEvent.press(confirmButton)
+    })
+
+    expect(mockRemoveConnection).toHaveBeenCalledWith("conn-1")
+    expect(mockReplace).toHaveBeenCalledWith("nwcEmptyState")
   })
 
   it("renders threshold field", async () => {

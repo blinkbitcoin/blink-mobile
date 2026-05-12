@@ -2,6 +2,7 @@ import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
+import QRCode from "react-native-qrcode-svg"
 
 import { NwcConnectionCreatedScreen } from "@app/screens/nostr-wallet-connect/connection-created-screen"
 import { ContextForScreen } from "../helper"
@@ -10,7 +11,12 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
-const mockReset = jest.fn()
+const mockDispatch = jest.fn()
+let mockRouteParams: Record<string, unknown> = {
+  connectionString:
+    "nostr+walletconnect://testpubkey?relay=wss%3A%2F%2Frelay.blink.sv&secret=testsecret&lud16=TestApp",
+  appName: "TestApp",
+}
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -18,14 +24,10 @@ jest.mock("@react-navigation/native", () => {
     ...actualNav,
     useNavigation: () => ({
       navigate: mockNavigate,
-      reset: mockReset,
+      dispatch: mockDispatch,
     }),
     useRoute: () => ({
-      params: {
-        connectionString:
-          "nostr+walletconnect://testpubkey?relay=wss%3A%2F%2Frelay.blink.sv&secret=testsecret&lud16=TestApp",
-        appName: "TestApp",
-      },
+      params: mockRouteParams,
     }),
   }
 })
@@ -38,13 +40,21 @@ jest.mock("@app/hooks/use-clipboard", () => ({
   }),
 }))
 
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({
+    formatMoneyAmount: ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
+      `${moneyAmount.amount} SAT`,
+  }),
+}))
+
 jest.mock("react-native-qrcode-svg", () => {
   const { View: RNView } = jest.requireActual("react-native")
+
   return {
     __esModule: true,
-    default: (props: { value: string }) => (
+    default: jest.fn((props: { value: string }) => (
       <RNView testID="qr-code" accessibilityLabel={props.value} />
-    ),
+    )),
   }
 })
 
@@ -52,6 +62,11 @@ describe("NwcConnectionCreatedScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    mockRouteParams = {
+      connectionString:
+        "nostr+walletconnect://testpubkey?relay=wss%3A%2F%2Frelay.blink.sv&secret=testsecret&lud16=TestApp",
+      appName: "TestApp",
+    }
   })
 
   it("renders the QR code section", async () => {
@@ -64,6 +79,13 @@ describe("NwcConnectionCreatedScreen", () => {
     await act(async () => {})
 
     expect(getByTestId("qr-code")).toBeTruthy()
+    expect(QRCode).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ecl: "H",
+        logoSize: 32,
+      }),
+      {},
+    )
   })
 
   it("renders the connection string label", async () => {
@@ -117,7 +139,7 @@ describe("NwcConnectionCreatedScreen", () => {
     })
   })
 
-  it("navigates on Done button press with reset", async () => {
+  it("navigates on Done button press with reset dispatch", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <NwcConnectionCreatedScreen />
@@ -131,9 +153,49 @@ describe("NwcConnectionCreatedScreen", () => {
       fireEvent.press(doneButton)
     })
 
-    expect(mockReset).toHaveBeenCalledWith({
-      index: 0,
-      routes: [{ name: "Primary" }, { name: "nwcConnectedApps" }],
+    expect(mockDispatch).toHaveBeenCalledWith(expect.any(Function))
+
+    const dispatchCallback = mockDispatch.mock.calls[0][0]
+    const action = dispatchCallback({
+      index: 2,
+      routes: [
+        { name: "Primary", key: "primary-key" },
+        { name: "nwcNewConnection", key: "new-key" },
+        { name: "nwcConnectionCreated", key: "created-key" },
+      ],
     })
+
+    expect(action.payload.index).toBe(1)
+    expect(action.payload.routes).toEqual([
+      { name: "Primary", key: "primary-key" },
+      { name: "nwcConnectedApps" },
+    ])
+  })
+
+  it("renders authorization success summary without exposing the connection string", async () => {
+    mockRouteParams = {
+      connectionString: "nostr+walletconnect://secret",
+      appName: "Amethyst",
+      successMode: "authorization",
+      permissions: ["GET_INFO", "PAY_INVOICE"],
+      budgets: [{ amountSats: 10_000, period: "WEEKLY" }],
+    }
+
+    const { getByText, queryByText, queryByTestId } = render(
+      <ContextForScreen>
+        <NwcConnectionCreatedScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(
+      getByText(LL.NostrWalletConnect.authorizationSuccessTitle({ appName: "Amethyst" })),
+    ).toBeTruthy()
+    expect(getByText(LL.NostrWalletConnect.authorizationSummary())).toBeTruthy()
+    expect(getByText(LL.NostrWalletConnect.permissionPayInvoice())).toBeTruthy()
+    expect(getByText("10000 SAT per Weekly")).toBeTruthy()
+    expect(queryByText("nostr+walletconnect://secret")).toBeNull()
+    expect(queryByTestId("qr-code")).toBeNull()
   })
 })
