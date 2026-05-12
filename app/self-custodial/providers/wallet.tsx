@@ -12,15 +12,15 @@ import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { getLightningAddress } from "@app/self-custodial/bridge"
-import { setSelfCustodialLightningAddress } from "@app/self-custodial/storage/account-index"
 import {
   AccountType,
   ActiveWalletStatus,
   type ActiveWalletState,
 } from "@app/types/wallet"
 
-import { useSdkLifecycle } from "./use-sdk-lifecycle"
+import { getLightningAddress } from "../bridge"
+import { useSdkLifecycle } from "../hooks/use-sdk-lifecycle"
+import { setSelfCustodialLightningAddress } from "../storage/account-index"
 
 const LightningAddressOperation = {
   Resolve: "resolve",

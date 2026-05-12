@@ -21,23 +21,27 @@ import {
   syncSelfCustodialWallet,
 } from "../bridge"
 import { storageDirFor } from "../config"
-import { useBackoffRetry } from "../hooks/use-backoff-retry"
 import { logSdkEvent, SdkLogLevel } from "../logging"
-
-import { extractPaymentId, PAYMENT_RECEIVED_EVENTS, REFRESH_EVENTS } from "./sdk-events"
-import { validateStoredNetwork } from "./validate-network"
+import {
+  extractPaymentId,
+  PAYMENT_RECEIVED_EVENTS,
+  REFRESH_EVENTS,
+} from "../providers/sdk-events"
+import { validateStoredNetwork } from "../providers/validate-network"
 import {
   getOnlineState,
   getServiceStatus,
   isDegradedStatus,
   OnlineState,
   STATUS_TIMEOUT_MS,
-} from "./is-online"
+} from "../providers/is-online"
 import {
   appendTransactions,
   getSelfCustodialWalletSnapshot,
   loadMoreTransactions,
-} from "./wallet-snapshot"
+} from "../providers/wallet-snapshot"
+
+import { useBackoffRetry } from "./use-backoff-retry"
 
 type SdkLifecycleState = {
   wallets: WalletState[]
