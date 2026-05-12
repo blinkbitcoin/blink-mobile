@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet.types"
+import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet"
 
 import {
   createCustodialDescriptor,

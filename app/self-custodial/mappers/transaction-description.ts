@@ -3,7 +3,7 @@ import {
   PaymentType,
   TransactionDirection,
   type NormalizedTransaction,
-} from "@app/types/transaction.types"
+} from "@app/types/transaction"
 
 const TICKER_DISPLAY: Record<string, string> = {
   USDB: "USD",

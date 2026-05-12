@@ -9,7 +9,7 @@ import {
   getSelfCustodialLanguage,
   withSelfCustodialLanguage,
 } from "@app/store/persistent-state/self-custodial-language"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 type EffectiveLanguageReturn = {
   language: string

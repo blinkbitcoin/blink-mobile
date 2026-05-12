@@ -17,7 +17,7 @@ import {
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
-import { type WalletState } from "@app/types/wallet.types"
+import { type WalletState } from "@app/types/wallet"
 
 export const toWalletBalances = (wallets: WalletState[]): WalletBalance[] =>
   wallets.map(({ id, balance, walletCurrency }) => ({

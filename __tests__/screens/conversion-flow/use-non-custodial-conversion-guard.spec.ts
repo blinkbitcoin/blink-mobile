@@ -7,7 +7,7 @@ import {
   ConvertAmountAdjustment,
   PaymentResultStatus,
   type ConvertQuote,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 
 const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn()

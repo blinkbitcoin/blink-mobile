@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 const mockUseIsAuthed = jest.fn()
 const mockUseAccountRegistry = jest.fn()

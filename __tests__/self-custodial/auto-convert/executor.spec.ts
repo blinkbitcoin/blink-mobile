@@ -1,4 +1,4 @@
-import { ConvertErrorCode, PaymentResultStatus } from "@app/types/payment.types"
+import { ConvertErrorCode, PaymentResultStatus } from "@app/types/payment"
 
 import {
   executeAutoConvert,

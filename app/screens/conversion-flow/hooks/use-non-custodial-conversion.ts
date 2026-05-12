@@ -8,7 +8,7 @@ import {
   oppositeWalletCurrency,
   PaymentResultStatus,
   type ConvertParams,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { logConversionAttempt } from "@app/utils/analytics"
 
 import { buildConvertParams } from "../build-convert-params"

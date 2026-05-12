@@ -8,7 +8,7 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useEffectiveDisplayCurrency } from "@app/hooks/use-effective-display-currency"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 import {
   createToDisplayAmount,
   DisplayCurrency,

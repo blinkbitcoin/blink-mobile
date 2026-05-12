@@ -14,7 +14,7 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
-import { AccountTypeMode } from "@app/types/account.types"
+import { AccountTypeMode } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 

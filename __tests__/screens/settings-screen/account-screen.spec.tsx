@@ -4,7 +4,7 @@ import { render } from "@testing-library/react-native"
 
 import { AccountScreen } from "@app/screens/settings-screen/account/account-screen"
 import { BackupStatus } from "@app/self-custodial/providers/backup-state-provider"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {

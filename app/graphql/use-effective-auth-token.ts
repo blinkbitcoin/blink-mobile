@@ -6,7 +6,7 @@ import {
   StorageReadStatus,
 } from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
-import { DefaultAccountId } from "@app/types/wallet.types"
+import { DefaultAccountId } from "@app/types/wallet"
 
 const resolveActiveIsCustodial = (
   activeAccountId: string | undefined,

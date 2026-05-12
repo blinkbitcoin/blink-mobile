@@ -7,7 +7,7 @@ import {
   DepositStatus,
   PaymentResultStatus,
   type PendingDeposit,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { toastShow } from "@app/utils/toast"
 
 const DepositActionType = {

@@ -1,6 +1,6 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
-import { type WalletState } from "@app/types/wallet.types"
+import { type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 

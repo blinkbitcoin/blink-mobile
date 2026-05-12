@@ -4,7 +4,7 @@ import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
 import { StableBalanceSetting } from "@app/screens/settings-screen/settings/stable-balance"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 const mockNavigate = jest.fn()
 const mockUseFeatureFlags = jest.fn()

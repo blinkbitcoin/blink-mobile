@@ -3,7 +3,7 @@ import { useMemo } from "react"
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { toWalletMoneyAmount } from "@app/types/amounts"
-import { ConvertAmountAdjustment } from "@app/types/payment.types"
+import { ConvertAmountAdjustment } from "@app/types/payment"
 
 import { buildConvertParams } from "../build-convert-params"
 

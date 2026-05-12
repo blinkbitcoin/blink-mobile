@@ -6,7 +6,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { ActiveWalletStatus } from "@app/types/wallet.types"
+import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 
 export const NetworkStatusBanner: React.FC = () => {

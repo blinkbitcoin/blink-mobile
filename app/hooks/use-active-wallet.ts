@@ -6,7 +6,7 @@ import {
   AccountType,
   ActiveWalletStatus,
   type ActiveWalletState,
-} from "@app/types/wallet.types"
+} from "@app/types/wallet"
 
 import { useAccountRegistry } from "./use-account-registry"
 import { useSelfCustodialRollback } from "./use-self-custodial-rollback"

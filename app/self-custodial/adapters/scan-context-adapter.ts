@@ -1,5 +1,5 @@
 import { type ScanContextAdapter } from "@app/types/scan-context"
-import { type WalletState } from "@app/types/wallet.types"
+import { type WalletState } from "@app/types/wallet"
 
 import { SparkNetworkLabel } from "../config"
 

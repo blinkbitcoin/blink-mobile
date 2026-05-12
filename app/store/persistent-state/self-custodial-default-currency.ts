@@ -1,4 +1,4 @@
-import { DefaultAccountId } from "@app/types/wallet.types"
+import { DefaultAccountId } from "@app/types/wallet"
 
 import { PersistentState } from "./state-migrations"
 

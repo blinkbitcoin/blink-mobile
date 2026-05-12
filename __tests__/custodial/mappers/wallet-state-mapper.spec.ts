@@ -1,5 +1,5 @@
 import { TxDirection, TxStatus, WalletCurrency } from "@app/graphql/generated"
-import { AccountType, ActiveWalletStatus } from "@app/types/wallet.types"
+import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 
 import { mapHomeDataToWalletState } from "@app/custodial/mappers/wallet-state-mapper"
 

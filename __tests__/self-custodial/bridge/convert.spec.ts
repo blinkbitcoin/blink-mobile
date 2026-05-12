@@ -5,7 +5,7 @@ import {
   ConvertAmountAdjustment,
   ConvertDirection,
   ConvertErrorCode,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
 import { createGetConversionQuote } from "@app/self-custodial/bridge/convert"

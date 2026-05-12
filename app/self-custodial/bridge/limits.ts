@@ -3,7 +3,7 @@ import {
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { ConvertDirection, type ConversionLimits } from "@app/types/payment.types"
+import { ConvertDirection, type ConversionLimits } from "@app/types/payment"
 import { tokenBaseUnitsToCentsCeil } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 

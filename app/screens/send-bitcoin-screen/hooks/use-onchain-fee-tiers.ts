@@ -7,7 +7,7 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { extractOnchainFees, prepareSend } from "@app/self-custodial/bridge"
-import { FEE_TIER_ETA_MINUTES } from "@app/types/payment.types"
+import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
 
 import { FeeTierOption, type FeeTierInfo } from "./fee-tiers.types"
 

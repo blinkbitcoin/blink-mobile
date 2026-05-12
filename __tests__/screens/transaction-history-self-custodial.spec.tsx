@@ -5,7 +5,7 @@ import { render, waitFor } from "@testing-library/react-native"
 import { InteractionManager, SectionList } from "react-native"
 
 import { TransactionHistoryScreen } from "@app/screens/transaction-history"
-import { ActiveWalletStatus, AccountType } from "@app/types/wallet.types"
+import { ActiveWalletStatus, AccountType } from "@app/types/wallet"
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {

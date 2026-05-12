@@ -1,7 +1,7 @@
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { isCustodialAllowedForCountry } from "@app/config/custodial-eligibility"
 import useDeviceLocation from "@app/hooks/use-device-location"
-import { AccountTypeMode } from "@app/types/account.types"
+import { AccountTypeMode } from "@app/types/account"
 
 export const AccountOption = {
   Custodial: "custodial",

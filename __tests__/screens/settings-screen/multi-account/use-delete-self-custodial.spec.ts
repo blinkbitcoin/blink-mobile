@@ -1,6 +1,6 @@
 import { renderHook, act, waitFor } from "@testing-library/react-native"
 
-import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet.types"
+import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet"
 
 import { useDeleteSelfCustodial } from "@app/screens/settings-screen/account/multi-account/hooks/use-delete-self-custodial"
 

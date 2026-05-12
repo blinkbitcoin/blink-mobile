@@ -7,7 +7,7 @@ import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { SelfCustodialAccountFields } from "@app/screens/settings-screen/self-custodial/account-fields"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles } from "@rn-vui/themed"
 

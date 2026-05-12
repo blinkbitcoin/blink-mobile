@@ -3,7 +3,7 @@ import { Text } from "react-native"
 import { render, renderHook } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { AccountType, ActiveWalletStatus } from "@app/types/wallet.types"
+import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 
 import {
   CustodialWalletProvider,

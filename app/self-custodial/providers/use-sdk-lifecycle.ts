@@ -7,7 +7,7 @@ import {
 } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
-import { ActiveWalletStatus, type WalletState } from "@app/types/wallet.types"
+import { ActiveWalletStatus, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { withTimeout } from "@app/utils/with-timeout"

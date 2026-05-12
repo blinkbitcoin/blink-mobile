@@ -7,7 +7,7 @@ import {
   DepositErrorReason,
   DepositStatus,
   type PendingDeposit,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 
 import { DepositErrorMessage } from "@app/screens/unclaimed-deposits/deposit-error-message"
 

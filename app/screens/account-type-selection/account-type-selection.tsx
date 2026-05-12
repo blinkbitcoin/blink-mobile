@@ -11,7 +11,7 @@ import { AccountOption, useAccountTypeOptions } from "@app/hooks/use-account-typ
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
-import { AccountTypeMode } from "@app/types/account.types"
+import { AccountTypeMode } from "@app/types/account"
 import { testProps } from "@app/utils/testProps"
 
 export const AccountTypeSelectionScreen: React.FC = () => {

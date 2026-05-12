@@ -10,8 +10,8 @@ import {
   TransactionDirection,
   TransactionStatus,
   type NormalizedTransaction,
-} from "@app/types/transaction.types"
-import { AccountType } from "@app/types/wallet.types"
+} from "@app/types/transaction"
+import { AccountType } from "@app/types/wallet"
 
 const mapDirection = (direction: TxDirection): TransactionDirection => {
   if (direction === TxDirection.Send) return TransactionDirection.Send

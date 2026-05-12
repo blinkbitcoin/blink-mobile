@@ -4,7 +4,7 @@ import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner/unclaimed-deposit-banner"
-import { DepositStatus, type PendingDeposit } from "@app/types/payment.types"
+import { DepositStatus, type PendingDeposit } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
 const mockNavigate = jest.fn()

@@ -1,7 +1,7 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction.types"
+import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 import {
   ConvertMoneyAmount,
   PaymentDetail,

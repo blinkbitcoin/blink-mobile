@@ -1,5 +1,5 @@
 import { typeDisplay } from "@app/screens/transaction-detail-screen/transaction-detail-screen"
-import { PaymentType } from "@app/types/transaction.types"
+import { PaymentType } from "@app/types/transaction"
 
 const settlement = <T extends string>(typename: T) => ({ __typename: typename }) as never
 

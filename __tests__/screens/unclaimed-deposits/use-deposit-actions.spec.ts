@@ -6,7 +6,7 @@ import {
   DepositStatus,
   PaymentResultStatus,
   type PendingDeposit,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
 const mockListPendingDeposits = jest.fn()

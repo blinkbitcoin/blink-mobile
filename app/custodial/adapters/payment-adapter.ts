@@ -12,7 +12,7 @@ import {
   type ReceiveLightningAdapter,
   type ReceiveOnchainAdapter,
   type SendPaymentAdapter,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 
 export class UnsupportedOperationError extends Error {
   constructor(operation: string) {

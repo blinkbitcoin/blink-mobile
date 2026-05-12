@@ -10,7 +10,7 @@ import {
   BackupStatus,
   useBackupState,
 } from "@app/self-custodial/providers/backup-state-provider"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 
 const DISMISSAL_COOLDOWN_MS = 24 * 60 * 60 * 1000

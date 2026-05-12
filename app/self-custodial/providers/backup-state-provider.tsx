@@ -10,7 +10,7 @@ import React, {
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 
 const BACKUP_STATE_KEY_PREFIX = "backupState"

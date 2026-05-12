@@ -30,7 +30,7 @@ import {
   ActiveWalletStatus,
   toWalletId,
   type WalletState,
-} from "@app/types/wallet.types"
+} from "@app/types/wallet"
 
 import { ContextForScreen } from "./helper"
 

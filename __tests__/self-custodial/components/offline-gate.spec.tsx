@@ -2,7 +2,7 @@ import React from "react"
 import { Text } from "react-native"
 import { render } from "@testing-library/react-native"
 
-import { ActiveWalletStatus } from "@app/types/wallet.types"
+import { ActiveWalletStatus } from "@app/types/wallet"
 
 import { OfflineGate } from "@app/self-custodial/components/offline-gate"
 

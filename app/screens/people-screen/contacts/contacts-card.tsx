@@ -18,7 +18,7 @@ import {
 } from "@app/navigation/stack-param-lists"
 import { listContacts as bridgeListContacts } from "@app/self-custodial/bridge"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 import { toastShow } from "@app/utils/toast"
 import { useAppConfig } from "@app/hooks"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"

@@ -1,9 +1,5 @@
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
-import {
-  ConvertDirection,
-  FeeQuoteType,
-  PaymentResultStatus,
-} from "@app/types/payment.types"
+import { ConvertDirection, FeeQuoteType, PaymentResultStatus } from "@app/types/payment"
 
 import {
   UnsupportedOperationError,

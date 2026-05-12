@@ -6,7 +6,7 @@ import { useAppConfig, useClipboard } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { SettingsRow } from "../row"
 

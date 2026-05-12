@@ -7,7 +7,7 @@ import {
   ConvertAmountAdjustment,
   type ConvertParams,
   type ConvertQuote,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { formatUsdInDisplay } from "@app/utils/amounts"
 
 const QuoteStatus = {

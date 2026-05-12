@@ -2,7 +2,7 @@ import React from "react"
 
 import { SelfCustodialPaymentOfflineNotice } from "@app/components/self-custodial-payment-offline-notice"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { ActiveWalletStatus } from "@app/types/wallet.types"
+import { ActiveWalletStatus } from "@app/types/wallet"
 
 type Props = {
   children: React.ReactNode

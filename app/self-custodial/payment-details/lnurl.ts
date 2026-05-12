@@ -30,7 +30,7 @@ import {
   type WalletAmount,
   type WalletOrDisplayCurrency,
 } from "@app/types/amounts"
-import { ConvertDirection } from "@app/types/payment.types"
+import { ConvertDirection } from "@app/types/payment"
 
 import {
   buildConversionType,

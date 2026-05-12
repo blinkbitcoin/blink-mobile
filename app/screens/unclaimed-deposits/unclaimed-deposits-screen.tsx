@@ -15,7 +15,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { buildFeeTierOptions } from "@app/screens/send-bitcoin-screen/fee-tier-options"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
-import { DepositStatus } from "@app/types/payment.types"
+import { DepositStatus } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
 
 import { DepositErrorMessage } from "./deposit-error-message"

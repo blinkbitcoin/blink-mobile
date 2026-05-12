@@ -9,7 +9,7 @@ import {
   type ListPendingDepositsAdapter,
   type PaymentAdapterResult,
   type PendingDeposit,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 
 import { claimDeposit, listDeposits, refundDeposit, type MappedDeposit } from "../bridge"
 

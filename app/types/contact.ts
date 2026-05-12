@@ -1,5 +1,5 @@
-import { NormalizedTransaction } from "./transaction.types"
-import { AccountType } from "./wallet.types"
+import { NormalizedTransaction } from "./transaction"
+import { AccountType } from "./wallet"
 
 export type Contact = {
   id: string
