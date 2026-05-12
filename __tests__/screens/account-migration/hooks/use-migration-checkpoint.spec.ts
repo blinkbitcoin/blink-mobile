@@ -8,6 +8,7 @@ import {
 const mockLoadCheckpoint = jest.fn()
 const mockSaveCheckpointToStorage = jest.fn()
 const mockClearCheckpointFromStorage = jest.fn()
+const mockReportError = jest.fn()
 
 jest.mock("@app/screens/account-migration/utils/migration-checkpoint-storage", () => ({
   ...jest.requireActual(
@@ -19,6 +20,10 @@ jest.mock("@app/screens/account-migration/utils/migration-checkpoint-storage", (
   clearCheckpointFromStorage: (...args: readonly unknown[]) =>
     mockClearCheckpointFromStorage(...args),
   getStorageKey: (env: string) => `migrationCheckpoint_${env.toLowerCase()}`,
+}))
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
 jest.mock("@app/hooks/use-app-config", () => ({
@@ -80,6 +85,31 @@ describe("useMigrationCheckpoint", () => {
     expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
       "migrationCheckpoint_main",
       MigrationCheckpoint.BackupMethod,
+    )
+  })
+
+  it("reports the error and finishes loading when loadCheckpoint rejects", async () => {
+    mockLoadCheckpoint.mockRejectedValue(new Error("corrupt"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(mockReportError).toHaveBeenCalledWith("Checkpoint load", expect.any(Error))
+    expect(result.current.checkpoint).toBeNull()
+  })
+
+  it("reports the error when saveCheckpointToStorage rejects", async () => {
+    mockSaveCheckpointToStorage.mockRejectedValue(new Error("disk full"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+    })
+
+    await waitFor(() =>
+      expect(mockReportError).toHaveBeenCalledWith("Checkpoint save", expect.any(Error)),
     )
   })
 

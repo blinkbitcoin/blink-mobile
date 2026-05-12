@@ -170,11 +170,10 @@ describe("migration-checkpoint-storage", () => {
       expect(result).toBeNull()
     })
 
-    it("returns null and clears on storage error", async () => {
+    it("clears the key and re-throws on storage error so the caller can report", async () => {
       mockLoadJson.mockRejectedValue(new Error("corrupt"))
 
-      const result = await loadCheckpoint("test-key")
-      expect(result).toBeNull()
+      await expect(loadCheckpoint("test-key")).rejects.toThrow("corrupt")
       expect(mockRemove).toHaveBeenCalledWith("test-key")
     })
 

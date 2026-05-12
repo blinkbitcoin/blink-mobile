@@ -1,6 +1,5 @@
 import { Platform } from "react-native"
 
-import { reportError } from "@app/utils/error-logging"
 import { loadJson, remove, saveJson } from "@app/utils/storage"
 
 // Values are persisted to AsyncStorage — do not rename
@@ -80,9 +79,8 @@ export const loadCheckpoint = async (
 
     return parsed
   } catch (err) {
-    reportError("Checkpoint load", err)
     await remove(storageKey).catch(() => {})
-    return null
+    throw err
   }
 }
 
@@ -90,11 +88,7 @@ export const saveCheckpointToStorage = async (
   storageKey: string,
   step: MigrationCheckpoint,
 ): Promise<void> => {
-  try {
-    await saveJson(storageKey, { step, savedAt: Date.now() })
-  } catch (err) {
-    reportError("Checkpoint save", err)
-  }
+  await saveJson(storageKey, { step, savedAt: Date.now() })
 }
 
 export const clearCheckpointFromStorage = async (storageKey: string): Promise<void> => {
