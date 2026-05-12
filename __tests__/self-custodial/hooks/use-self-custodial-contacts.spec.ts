@@ -2,7 +2,7 @@ import { renderHook, act, waitFor } from "@testing-library/react-native"
 
 import { AccountType } from "@app/types/wallet.types"
 
-import { useSelfCustodialContactAdapter } from "@app/self-custodial/contact-adapter"
+import { useSelfCustodialContacts } from "@app/self-custodial/hooks/use-self-custodial-contacts"
 
 const mockListContacts = jest.fn()
 const mockAddContact = jest.fn()
@@ -58,7 +58,7 @@ const expectedContacts = [
 
 const mockSdk = { id: "sdk" }
 
-describe("useSelfCustodialContactAdapter", () => {
+describe("useSelfCustodialContacts", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockListContacts.mockResolvedValue(sdkContacts)
@@ -71,7 +71,7 @@ describe("useSelfCustodialContactAdapter", () => {
   })
 
   it("loads contacts from the SDK on mount and exposes them via list()", async () => {
-    const { result } = renderHook(() => useSelfCustodialContactAdapter())
+    const { result } = renderHook(() => useSelfCustodialContacts())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
@@ -81,7 +81,7 @@ describe("useSelfCustodialContactAdapter", () => {
 
   it("stops loading and skips the SDK call when sdk is null", async () => {
     mockUseSelfCustodialWallet.mockReturnValue({ sdk: null })
-    const { result } = renderHook(() => useSelfCustodialContactAdapter())
+    const { result } = renderHook(() => useSelfCustodialContacts())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
@@ -89,7 +89,7 @@ describe("useSelfCustodialContactAdapter", () => {
   })
 
   it("exposes full write capabilities", async () => {
-    const { result } = renderHook(() => useSelfCustodialContactAdapter())
+    const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(result.current.capabilities).toEqual({
@@ -100,7 +100,7 @@ describe("useSelfCustodialContactAdapter", () => {
   })
 
   it("forwards add() to the SDK and refreshes the list", async () => {
-    const { result } = renderHook(() => useSelfCustodialContactAdapter())
+    const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     await act(async () => {
@@ -119,7 +119,7 @@ describe("useSelfCustodialContactAdapter", () => {
 
   it("rejects add() when the SDK is unavailable", async () => {
     mockUseSelfCustodialWallet.mockReturnValue({ sdk: null })
-    const { result } = renderHook(() => useSelfCustodialContactAdapter())
+    const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     await expect(
@@ -128,7 +128,7 @@ describe("useSelfCustodialContactAdapter", () => {
   })
 
   it("update() merges existing values when changes omit fields", async () => {
-    const { result } = renderHook(() => useSelfCustodialContactAdapter())
+    const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     await act(async () => {
@@ -143,7 +143,7 @@ describe("useSelfCustodialContactAdapter", () => {
   })
 
   it("update() rejects when the contact id is unknown", async () => {
-    const { result } = renderHook(() => useSelfCustodialContactAdapter())
+    const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     await expect(result.current.update("missing", { displayName: "x" })).rejects.toThrow(
@@ -152,7 +152,7 @@ describe("useSelfCustodialContactAdapter", () => {
   })
 
   it("delete() forwards the id to the SDK", async () => {
-    const { result } = renderHook(() => useSelfCustodialContactAdapter())
+    const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     await act(async () => {
@@ -163,7 +163,7 @@ describe("useSelfCustodialContactAdapter", () => {
   })
 
   it("getTransactions() returns an empty list when the contact id is unknown", async () => {
-    const { result } = renderHook(() => useSelfCustodialContactAdapter())
+    const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     const txs = await result.current.getTransactions("missing")
@@ -195,7 +195,7 @@ describe("useSelfCustodialContactAdapter", () => {
       payments: [matchingPayment, nonMatchingPayment, sparkPayment],
     })
 
-    const { result } = renderHook(() => useSelfCustodialContactAdapter())
+    const { result } = renderHook(() => useSelfCustodialContacts())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     await result.current.getTransactions("c1")
