@@ -389,15 +389,15 @@ describe("conversion-confirmation-screen", () => {
 describe("conversion-confirmation-screen — self-custodial submit path", () => {
   let LL: ReturnType<typeof i18nObject>
   const dispatchMock = jest.fn()
-  const scWallets = [
+  const selfCustodialWallets = [
     {
-      id: "sc-btc-wallet",
+      id: "self-custodial-btc-wallet",
       walletCurrency: WalletCurrency.Btc,
       balance: { amount: 100000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
       transactions: [],
     },
     {
-      id: "sc-usd-wallet",
+      id: "self-custodial-usd-wallet",
       walletCurrency: WalletCurrency.Usd,
       balance: { amount: 50000, currency: WalletCurrency.Usd, currencyCode: "USD" },
       transactions: [],
@@ -412,10 +412,13 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
     LL = i18nObject("en")
     jest.clearAllMocks()
     ;(useNavigation as jest.Mock).mockReturnValue({ dispatch: dispatchMock })
-    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: true, wallets: scWallets })
+    mockUseActiveWallet.mockReturnValue({
+      isSelfCustodial: true,
+      wallets: selfCustodialWallets,
+    })
   })
 
-  it("renders the SC fee row with the feeText returned by useNonCustodialConversion", () => {
+  it("renders the self-custodial fee row with the feeText returned by useNonCustodialConversion", () => {
     mockNonCustodialConversion.mockReturnValue({
       isQuoting: false,
       hasQuoteError: false,

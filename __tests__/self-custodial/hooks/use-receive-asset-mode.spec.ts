@@ -40,8 +40,8 @@ describe("useReceiveAssetMode", () => {
     it("starts on Dollar when default account preference is USD", () => {
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
       mockPersistentState.mockReturnValue({
-        activeAccountId: "sc-id",
-        selfCustodialDefaultWalletCurrencyByAccountId: { "sc-id": "USD" },
+        activeAccountId: "self-custodial-id",
+        selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "USD" },
       })
       const { result } = renderHook(() => useReceiveAssetMode())
       expect(result.current.assetMode).toBe("dollar")
@@ -51,8 +51,8 @@ describe("useReceiveAssetMode", () => {
     it("starts on Bitcoin when default account preference is BTC", () => {
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
       mockPersistentState.mockReturnValue({
-        activeAccountId: "sc-id",
-        selfCustodialDefaultWalletCurrencyByAccountId: { "sc-id": "BTC" },
+        activeAccountId: "self-custodial-id",
+        selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "BTC" },
       })
       const { result } = renderHook(() => useReceiveAssetMode())
       expect(result.current.assetMode).toBe("bitcoin")
@@ -61,8 +61,8 @@ describe("useReceiveAssetMode", () => {
     it("stable-balance active overrides default account preference", () => {
       mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: true })
       mockPersistentState.mockReturnValue({
-        activeAccountId: "sc-id",
-        selfCustodialDefaultWalletCurrencyByAccountId: { "sc-id": "BTC" },
+        activeAccountId: "self-custodial-id",
+        selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "BTC" },
       })
       const { result } = renderHook(() => useReceiveAssetMode())
       expect(result.current.assetMode).toBe("dollar")

@@ -267,13 +267,13 @@ jest.mock("@app/screens/receive-bitcoin-screen/qr-view", () => {
 // ---------- fixtures ----------
 
 const btcWallet: WalletState = {
-  id: toWalletId("sc-btc"),
+  id: toWalletId("self-custodial-btc"),
   walletCurrency: WalletCurrency.Btc,
   balance: { amount: 0, currency: WalletCurrency.Btc, currencyCode: "BTC" },
   transactions: [],
 }
 const usdWallet: WalletState = {
-  id: toWalletId("sc-usd"),
+  id: toWalletId("self-custodial-usd"),
   walletCurrency: WalletCurrency.Usd,
   balance: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
   transactions: [],
@@ -429,8 +429,8 @@ describe("ReceiveScreen — self-custodial", () => {
       setupSelfCustodial(
         {},
         {
-          activeAccountId: "sc-id",
-          selfCustodialDefaultWalletCurrencyByAccountId: { "sc-id": "USD" },
+          activeAccountId: "self-custodial-id",
+          selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "USD" },
         },
       )
 
@@ -457,8 +457,8 @@ describe("ReceiveScreen — self-custodial", () => {
       setupSelfCustodial(
         { isStableBalanceActive: true },
         {
-          activeAccountId: "sc-id",
-          selfCustodialDefaultWalletCurrencyByAccountId: { "sc-id": "BTC" },
+          activeAccountId: "self-custodial-id",
+          selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "BTC" },
         },
       )
 
@@ -541,8 +541,8 @@ describe("ReceiveScreen — self-custodial", () => {
       setupSelfCustodial(
         {},
         {
-          activeAccountId: "sc-id",
-          selfCustodialDefaultWalletCurrencyByAccountId: { "sc-id": "USD" },
+          activeAccountId: "self-custodial-id",
+          selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "USD" },
         },
       )
 

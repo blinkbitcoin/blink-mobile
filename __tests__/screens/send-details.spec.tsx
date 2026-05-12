@@ -240,7 +240,7 @@ describe("SendBitcoinDetailsScreen — LNURL requestInvoice gate", () => {
     loadLocale("en")
   })
 
-  it("does NOT call lnurl-pay requestInvoice when paymentDetail.sendPaymentMutation is set (SC path)", async () => {
+  it("does NOT call lnurl-pay requestInvoice when paymentDetail.sendPaymentMutation is set (self-custodial path)", async () => {
     const detail = buildLnurlPaymentDetail({ withSendMutation: true })
     const LL = i18nObject("en")
 

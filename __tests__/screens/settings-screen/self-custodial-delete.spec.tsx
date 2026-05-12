@@ -6,7 +6,7 @@ import { AccountStatus, AccountType } from "@app/types/wallet"
 
 import { SelfCustodialDelete } from "@app/screens/settings-screen/account/settings/self-custodial-delete"
 
-const TEST_SC_ACCOUNT_ID = "test-sc-uuid"
+const TEST_SC_ACCOUNT_ID = "test-self-custodial-uuid"
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {

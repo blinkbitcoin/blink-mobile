@@ -168,16 +168,18 @@ describe("useEffectiveDisplayCurrency", () => {
     beforeEach(() => {
       mockUseIsAuthed.mockReturnValue(false)
       mockUseAccountRegistry.mockReturnValue({
-        activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },
+        activeAccount: { id: "self-custodial-1", type: AccountType.SelfCustodial },
       })
       mockPersistentState = {
         ...mockPersistentState,
-        activeAccountId: "sc-1",
+        activeAccountId: "self-custodial-1",
       }
     })
 
     it("reads displayCurrency from the per-account persistent map", () => {
-      mockPersistentState.selfCustodialDisplayCurrencyByAccountId = { "sc-1": "JPY" }
+      mockPersistentState.selfCustodialDisplayCurrencyByAccountId = {
+        "self-custodial-1": "JPY",
+      }
 
       const { result } = renderHook(() => useEffectiveDisplayCurrency())
 
@@ -208,7 +210,9 @@ describe("useEffectiveDisplayCurrency", () => {
       expect(mockUpdateState).toHaveBeenCalledTimes(1)
       const updater = mockUpdateState.mock.calls[0][0]
       const next = updater(mockPersistentState)
-      expect(next.selfCustodialDisplayCurrencyByAccountId).toEqual({ "sc-1": "JPY" })
+      expect(next.selfCustodialDisplayCurrencyByAccountId).toEqual({
+        "self-custodial-1": "JPY",
+      })
     })
 
     it("setDisplayCurrency does not call the GraphQL mutation", async () => {
@@ -230,24 +234,27 @@ describe("useEffectiveDisplayCurrency", () => {
     })
   })
 
-  it("isolates per-account currency when switching active SC accounts", () => {
+  it("isolates per-account currency when switching active self-custodial accounts", () => {
     mockUseIsAuthed.mockReturnValue(false)
     mockUseAccountRegistry.mockReturnValue({
-      activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },
+      activeAccount: { id: "self-custodial-1", type: AccountType.SelfCustodial },
     })
     mockPersistentState = {
       ...mockPersistentState,
-      activeAccountId: "sc-1",
-      selfCustodialDisplayCurrencyByAccountId: { "sc-1": "EUR", "sc-2": "JPY" },
+      activeAccountId: "self-custodial-1",
+      selfCustodialDisplayCurrencyByAccountId: {
+        "self-custodial-1": "EUR",
+        "self-custodial-2": "JPY",
+      },
     }
 
     const { result: a } = renderHook(() => useEffectiveDisplayCurrency())
     expect(a.current.displayCurrency).toBe("EUR")
 
     mockUseAccountRegistry.mockReturnValue({
-      activeAccount: { id: "sc-2", type: AccountType.SelfCustodial },
+      activeAccount: { id: "self-custodial-2", type: AccountType.SelfCustodial },
     })
-    mockPersistentState = { ...mockPersistentState, activeAccountId: "sc-2" }
+    mockPersistentState = { ...mockPersistentState, activeAccountId: "self-custodial-2" }
 
     const { result: b } = renderHook(() => useEffectiveDisplayCurrency())
     expect(b.current.displayCurrency).toBe("JPY")

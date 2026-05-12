@@ -34,7 +34,7 @@ const custodialAccount = {
   status: AccountStatus.Available,
 }
 const selfCustodialAccount = {
-  id: "sc-default",
+  id: "self-custodial-default",
   type: AccountType.SelfCustodial,
   label: "Self-custodial",
   selected: true,
@@ -206,7 +206,7 @@ describe("useSelfCustodialRollback", () => {
         }),
       )
 
-    it("flag=disabled, active=SC, no custodial available → true (locks user out)", () => {
+    it("flag=disabled, active=self-custodial, no custodial available → true (locks user out)", () => {
       mockNonCustodialEnabled = false
       mockHasCustodialAccount = false
 
@@ -215,7 +215,7 @@ describe("useSelfCustodialRollback", () => {
       expect(result.current.shouldShowUnavailable).toBe(true)
     })
 
-    it("flag=disabled, active=SC, custodial available → false (rollback handles it)", () => {
+    it("flag=disabled, active=self-custodial, custodial available → false (rollback handles it)", () => {
       mockNonCustodialEnabled = false
       mockHasCustodialAccount = true
 

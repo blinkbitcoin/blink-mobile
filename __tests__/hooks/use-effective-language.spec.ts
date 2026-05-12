@@ -116,16 +116,16 @@ describe("useEffectiveLanguage", () => {
     beforeEach(() => {
       mockUseIsAuthed.mockReturnValue(false)
       mockUseAccountRegistry.mockReturnValue({
-        activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },
+        activeAccount: { id: "self-custodial-1", type: AccountType.SelfCustodial },
       })
       mockPersistentState = {
         ...mockPersistentState,
-        activeAccountId: "sc-1",
+        activeAccountId: "self-custodial-1",
       }
     })
 
     it("reads language from the per-account persistent map", () => {
-      mockPersistentState.selfCustodialLanguageByAccountId = { "sc-1": "ja" }
+      mockPersistentState.selfCustodialLanguageByAccountId = { "self-custodial-1": "ja" }
 
       const { result } = renderHook(() => useEffectiveLanguage())
 
@@ -156,7 +156,7 @@ describe("useEffectiveLanguage", () => {
       expect(mockUpdateState).toHaveBeenCalledTimes(1)
       const updater = mockUpdateState.mock.calls[0][0]
       const next = updater(mockPersistentState)
-      expect(next.selfCustodialLanguageByAccountId).toEqual({ "sc-1": "ja" })
+      expect(next.selfCustodialLanguageByAccountId).toEqual({ "self-custodial-1": "ja" })
     })
 
     it("setLanguage does not call the GraphQL mutation", async () => {
@@ -178,24 +178,27 @@ describe("useEffectiveLanguage", () => {
     })
   })
 
-  it("isolates per-account language when switching active SC accounts", () => {
+  it("isolates per-account language when switching active self-custodial accounts", () => {
     mockUseIsAuthed.mockReturnValue(false)
     mockUseAccountRegistry.mockReturnValue({
-      activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },
+      activeAccount: { id: "self-custodial-1", type: AccountType.SelfCustodial },
     })
     mockPersistentState = {
       ...mockPersistentState,
-      activeAccountId: "sc-1",
-      selfCustodialLanguageByAccountId: { "sc-1": "es", "sc-2": "fr" },
+      activeAccountId: "self-custodial-1",
+      selfCustodialLanguageByAccountId: {
+        "self-custodial-1": "es",
+        "self-custodial-2": "fr",
+      },
     }
 
     const { result: a } = renderHook(() => useEffectiveLanguage())
     expect(a.current.language).toBe("es")
 
     mockUseAccountRegistry.mockReturnValue({
-      activeAccount: { id: "sc-2", type: AccountType.SelfCustodial },
+      activeAccount: { id: "self-custodial-2", type: AccountType.SelfCustodial },
     })
-    mockPersistentState = { ...mockPersistentState, activeAccountId: "sc-2" }
+    mockPersistentState = { ...mockPersistentState, activeAccountId: "self-custodial-2" }
 
     const { result: b } = renderHook(() => useEffectiveLanguage())
     expect(b.current.language).toBe("fr")

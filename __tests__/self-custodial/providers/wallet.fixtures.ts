@@ -21,7 +21,7 @@ type WalletSnapshotMocks = {
 export const getWalletSnapshotMocks = (): WalletSnapshotMocks =>
   jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
 
-export const TEST_SC_ACCOUNT_ID = "test-sc-uuid"
+export const TEST_SC_ACCOUNT_ID = "test-self-custodial-uuid"
 
 type SetupMocks = {
   getMnemonicForAccount: jest.Mock

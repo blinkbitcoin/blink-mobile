@@ -144,7 +144,7 @@ describe("ScanningQRCodeScreen", () => {
   })
 
   it("calls resolveDestination with the SDK when active wallet is self-custodial", async () => {
-    const sdk = { id: "sc-sdk" }
+    const sdk = { id: "self-custodial-sdk" }
     mockScanContext.mockReturnValue(selfCustodialScanContext)
     mockSelfCustodialWallet.mockReturnValue({ sdk })
     mockResolveDestination.mockResolvedValue({
@@ -165,7 +165,7 @@ describe("ScanningQRCodeScreen", () => {
 
   it("forwards adapter lnurlDomains=[] to resolveDestination in self-custodial mode (avoids intraledger lookup)", async () => {
     mockScanContext.mockReturnValue(selfCustodialScanContext)
-    mockSelfCustodialWallet.mockReturnValue({ sdk: { id: "sc-sdk" } })
+    mockSelfCustodialWallet.mockReturnValue({ sdk: { id: "self-custodial-sdk" } })
     mockResolveDestination.mockResolvedValue({
       valid: true,
       destinationDirection: DestinationDirection.Send,
@@ -255,7 +255,7 @@ describe("ScanningQRCodeScreen", () => {
     expect(mockReplace).not.toHaveBeenCalled()
   })
 
-  it("skips processing when bitcoinNetwork is unavailable (SC not ready)", async () => {
+  it("skips processing when bitcoinNetwork is unavailable (self-custodial not ready)", async () => {
     mockScanContext.mockReturnValue({
       myWalletIds: [],
       bitcoinNetwork: null,

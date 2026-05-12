@@ -174,7 +174,7 @@ describe("usePriceConversion", () => {
 
     it("unauthed query uses cache-and-network so currency changes refresh", () => {
       mockUseAccountRegistry.mockReturnValue({
-        activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },
+        activeAccount: { id: "self-custodial-1", type: AccountType.SelfCustodial },
       })
       mockUseRealtimePriceQuery.mockReturnValue({ data: undefined })
 
@@ -189,7 +189,7 @@ describe("usePriceConversion", () => {
   describe("self-custodial isolation", () => {
     beforeEach(() => {
       mockUseAccountRegistry.mockReturnValue({
-        activeAccount: { id: "sc-1", type: AccountType.SelfCustodial },
+        activeAccount: { id: "self-custodial-1", type: AccountType.SelfCustodial },
       })
     })
 

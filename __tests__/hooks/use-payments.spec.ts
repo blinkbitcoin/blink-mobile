@@ -139,9 +139,9 @@ describe("usePayments", () => {
     expect(result.current.convert).toBeUndefined()
   })
 
-  it("exposes getConversionQuote only on the SC path with an SDK", () => {
+  it("exposes getConversionQuote only on the self-custodial path with an SDK", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialWallet.mockReturnValue({ sdk: mockSdk })
@@ -160,9 +160,9 @@ describe("usePayments", () => {
     expect(result.current.getConversionQuote).toBeUndefined()
   })
 
-  it("does not expose getConversionQuote for a SC account missing its SDK", () => {
+  it("does not expose getConversionQuote for a self-custodial account missing its SDK", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })

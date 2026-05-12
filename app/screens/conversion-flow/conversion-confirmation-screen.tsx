@@ -60,7 +60,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const { fromWalletCurrency, moneyAmount } = route.params
   const [errorMessage, setErrorMessage] = useState<string | undefined>()
-  const [scConverting, setScConverting] = useState(false)
+  const [selfCustodialConverting, setSelfCustodialConverting] = useState(false)
   const isAuthed = useIsAuthed()
   const { isSelfCustodial, wallets: activeWallets } = useActiveWallet()
 
@@ -69,7 +69,9 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
   const [intraLedgerUsdPaymentSend, { loading: intraLedgerUsdPaymentSendLoading }] =
     useIntraLedgerUsdPaymentSendMutation()
   const isLoading =
-    intraLedgerPaymentSendLoading || intraLedgerUsdPaymentSendLoading || scConverting
+    intraLedgerPaymentSendLoading ||
+    intraLedgerUsdPaymentSendLoading ||
+    selfCustodialConverting
   const { LL } = useI18nContext()
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
@@ -78,20 +80,24 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     skip: !isAuthed || isSelfCustodial,
   })
 
-  const scBtcWallet = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
-  const scUsdWallet = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Usd)
+  const selfCustodialBtcWallet = activeWallets.find(
+    (w) => w.walletCurrency === WalletCurrency.Btc,
+  )
+  const selfCustodialUsdWallet = activeWallets.find(
+    (w) => w.walletCurrency === WalletCurrency.Usd,
+  )
   const btcWallet = isSelfCustodial
-    ? scBtcWallet && {
-        id: scBtcWallet.id,
-        balance: scBtcWallet.balance.amount,
-        walletCurrency: scBtcWallet.walletCurrency,
+    ? selfCustodialBtcWallet && {
+        id: selfCustodialBtcWallet.id,
+        balance: selfCustodialBtcWallet.balance.amount,
+        walletCurrency: selfCustodialBtcWallet.walletCurrency,
       }
     : getBtcWallet(data?.me?.defaultAccount?.wallets)
   const usdWallet = isSelfCustodial
-    ? scUsdWallet && {
-        id: scUsdWallet.id,
-        balance: scUsdWallet.balance.amount,
-        walletCurrency: scUsdWallet.walletCurrency,
+    ? selfCustodialUsdWallet && {
+        id: selfCustodialUsdWallet.id,
+        balance: selfCustodialUsdWallet.balance.amount,
+        walletCurrency: selfCustodialUsdWallet.walletCurrency,
       }
     : getUsdWallet(data?.me?.defaultAccount?.wallets)
 
@@ -199,7 +205,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
   }
 
   const paySelfCustodial = async () => {
-    setScConverting(true)
+    setSelfCustodialConverting(true)
     try {
       const outcome = await nonCustodialConversion.execute()
       logConversionResult({
@@ -237,7 +243,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
         handlePaymentError(err)
       }
     } finally {
-      setScConverting(false)
+      setSelfCustodialConverting(false)
     }
   }
 

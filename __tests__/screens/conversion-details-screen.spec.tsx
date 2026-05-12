@@ -1980,19 +1980,19 @@ describe("Conversion calculation verification", () => {
 })
 
 describe("Self-custodial conversion limits gating", () => {
-  const scActiveWallet = {
+  const selfCustodialActiveWallet = {
     isSelfCustodial: true,
     isReady: true,
     needsBackendAuth: false,
     wallets: [
       {
-        id: "sc-btc-id",
+        id: "self-custodial-btc-id",
         walletCurrency: WalletCurrency.Btc,
         balance: { amount: 200000, currency: WalletCurrency.Btc },
         transactions: [],
       },
       {
-        id: "sc-usd-id",
+        id: "self-custodial-usd-id",
         walletCurrency: WalletCurrency.Usd,
         balance: { amount: 50000, currency: WalletCurrency.Usd },
         transactions: [],
@@ -2005,7 +2005,7 @@ describe("Self-custodial conversion limits gating", () => {
   const buildMocks = () => createGraphQLMocks({ btcBalance: 200000, usdBalance: 50000 })
 
   it("disables Next and surfaces the unavailable message when limits fail to load", async () => {
-    mockUseActiveWallet.mockReturnValue(scActiveWallet)
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
     mockUseNonCustodialConversionLimits.mockReturnValue({
       limits: null,
       loading: false,
@@ -2032,7 +2032,7 @@ describe("Self-custodial conversion limits gating", () => {
   })
 
   it("keeps Next disabled while limits load successfully but amount is below the minimum", async () => {
-    mockUseActiveWallet.mockReturnValue(scActiveWallet)
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
     mockUseNonCustodialConversionLimits.mockReturnValue({
       limits: { minFromAmount: 1_000_000, minToAmount: null },
       loading: false,
@@ -2054,7 +2054,7 @@ describe("Self-custodial conversion limits gating", () => {
   })
 
   it("disables Next when the conversion guard reports hasQuoteError (Critical #6)", async () => {
-    mockUseActiveWallet.mockReturnValue(scActiveWallet)
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
     mockUseNonCustodialConversionLimits.mockReturnValue({
       limits: { minFromAmount: 0, minToAmount: null },
       loading: false,
@@ -2080,9 +2080,9 @@ describe("Self-custodial conversion limits gating", () => {
     expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
   })
 
-  it("disables Next during the SC SDK boot window — accountType=SelfCustodial + isReady=false (Critical #6)", async () => {
+  it("disables Next during the self-custodial SDK boot window — accountType=SelfCustodial + isReady=false (Critical #6)", async () => {
     mockUseActiveWallet.mockReturnValue({
-      ...scActiveWallet,
+      ...selfCustodialActiveWallet,
       isSelfCustodial: false,
       isReady: false,
       status: "Unavailable",

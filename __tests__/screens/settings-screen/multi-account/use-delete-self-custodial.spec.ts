@@ -4,7 +4,7 @@ import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet"
 
 import { useDeleteSelfCustodial } from "@app/screens/settings-screen/account/multi-account/hooks/use-delete-self-custodial"
 
-const TEST_SC_ACCOUNT_ID = "test-sc-uuid"
+const TEST_SC_ACCOUNT_ID = "test-self-custodial-uuid"
 
 const mockNavigationDispatch = jest.fn()
 const mockDisconnectSdk = jest.fn()
@@ -157,7 +157,7 @@ describe("useDeleteSelfCustodial", () => {
   it("switches to a remaining self-custodial account and navigates to Primary when one is left", async () => {
     const remaining = {
       ...activeSelfCustodialAccount,
-      id: "other-sc-id",
+      id: "other-self-custodial-id",
       selected: false,
     }
     mockUseAccountRegistry.mockReturnValue({
@@ -173,7 +173,7 @@ describe("useDeleteSelfCustodial", () => {
       await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
     })
 
-    expect(mockSetActiveAccountId).toHaveBeenCalledWith("other-sc-id")
+    expect(mockSetActiveAccountId).toHaveBeenCalledWith("other-self-custodial-id")
     expect(mockNavigationNavigate).toHaveBeenCalledWith("Primary")
   })
 
@@ -220,7 +220,7 @@ describe("useDeleteSelfCustodial", () => {
   it("switches the active account BEFORE disconnecting the SDK so useSdkLifecycle does not poll a stale ref (Important #2)", async () => {
     const remaining = {
       ...activeSelfCustodialAccount,
-      id: "other-sc-id",
+      id: "other-self-custodial-id",
       selected: false,
     }
     mockUseAccountRegistry.mockReturnValue({
@@ -236,7 +236,7 @@ describe("useDeleteSelfCustodial", () => {
       await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
     })
 
-    expect(mockSetActiveAccountId).toHaveBeenCalledWith("other-sc-id")
+    expect(mockSetActiveAccountId).toHaveBeenCalledWith("other-self-custodial-id")
     expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
 
     const setActiveOrder = mockSetActiveAccountId.mock.invocationCallOrder[0]

@@ -91,7 +91,7 @@ const custodialQueryWithData = {
   loading: false,
 }
 
-const scQueryEmpty = {
+const selfCustodialQueryEmpty = {
   data: undefined,
   previousData: undefined,
   error: undefined,
@@ -194,7 +194,7 @@ const setActiveWallet = (isSelfCustodial: boolean) => {
     needsBackendAuth: !isSelfCustodial,
   })
   mockUseTransactionListQuery.mockReturnValue(
-    isSelfCustodial ? scQueryEmpty : custodialQueryWithData,
+    isSelfCustodial ? selfCustodialQueryEmpty : custodialQueryWithData,
   )
 }
 
@@ -223,7 +223,7 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
     interactionsSpy.mockRestore()
   })
 
-  it("custodial pull-to-refresh calls Apollo refetch and not SC refresh", async () => {
+  it("custodial pull-to-refresh calls Apollo refetch and not self-custodial refresh", async () => {
     setActiveWallet(false)
 
     const { UNSAFE_getByType } = render(<TransactionHistoryScreen route={route} />)
@@ -281,14 +281,14 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
       isSelfCustodial: true,
       needsBackendAuth: false,
     })
-    mockUseTransactionListQuery.mockReturnValue(scQueryEmpty)
+    mockUseTransactionListQuery.mockReturnValue(selfCustodialQueryEmpty)
 
     render(<TransactionHistoryScreen route={route} />)
 
     expect(mockCacheBatch).toHaveBeenCalled()
   })
 
-  it("custodial mode never triggers cache.batch (no SC fragment work)", () => {
+  it("custodial mode never triggers cache.batch (no self-custodial fragment work)", () => {
     setActiveWallet(false)
 
     render(<TransactionHistoryScreen route={route} />)

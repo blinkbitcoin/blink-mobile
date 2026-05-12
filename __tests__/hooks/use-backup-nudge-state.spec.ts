@@ -58,7 +58,7 @@ const defaultConfig = {
   backupNudgeModalThreshold: 21000,
 }
 
-const selfCustodialAccount = { type: "self-custodial", id: "test-sc-uuid" }
+const selfCustodialAccount = { type: "self-custodial", id: "test-self-custodial-uuid" }
 
 describe("useBackupNudgeState", () => {
   beforeEach(() => {
@@ -153,7 +153,7 @@ describe("useBackupNudgeState", () => {
 
     expect(result.current.shouldShowBanner).toBe(false)
     expect(mockSetItem).toHaveBeenCalledWith(
-      "backupNudgeDismissedAt:test-sc-uuid",
+      "backupNudgeDismissedAt:test-self-custodial-uuid",
       expect.any(String),
     )
   })

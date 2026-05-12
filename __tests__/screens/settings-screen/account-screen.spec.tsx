@@ -229,7 +229,7 @@ describe("AccountScreen", () => {
       )
     })
 
-    it("pull-to-refresh refreshes the SC wallets and never hits updateCurrentProfile", async () => {
+    it("pull-to-refresh refreshes the self-custodial wallets and never hits updateCurrentProfile", async () => {
       render(<AccountScreen />)
 
       await captureRefreshControl.onRefresh?.()
@@ -238,7 +238,7 @@ describe("AccountScreen", () => {
       expect(mockUpdateCurrentProfile).not.toHaveBeenCalled()
     })
 
-    it("clears the refreshing flag even when the SC refresh rejects (Important #3)", async () => {
+    it("clears the refreshing flag even when the self-custodial refresh rejects (Important #3)", async () => {
       mockRefreshSelfCustodialWallets.mockRejectedValueOnce(new Error("offline"))
 
       render(<AccountScreen />)
