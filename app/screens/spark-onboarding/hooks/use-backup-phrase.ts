@@ -7,12 +7,13 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useClipboard, useCountdown } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
+import { splitWords } from "@app/utils/bip39-wordlist"
 import { formatDuration } from "@app/utils/date"
 import { openExternalUrl } from "@app/utils/external"
 
 import { buildConfirmChallenges } from "../utils"
 
-import { useWalletMnemonicWords } from "./use-wallet-mnemonic"
+import { useWalletMnemonic } from "./use-wallet-mnemonic"
 
 const WORDS_PER_STEP = 6
 const WORDS_PER_CARD = 3
@@ -24,7 +25,8 @@ export const useBackupPhrase = (step: PhraseStep) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
   const { sparkCompatibleWalletsUrl } = useRemoteConfig()
-  const words = useWalletMnemonicWords()
+  const mnemonic = useWalletMnemonic()
+  const words = useMemo(() => (mnemonic ? splitWords(mnemonic) : []), [mnemonic])
 
   const expiresAt = useRef(new Date(Date.now() + COUNTDOWN_SECONDS * 1000)).current
   const { remainingSeconds, isExpired } = useCountdown(expiresAt)

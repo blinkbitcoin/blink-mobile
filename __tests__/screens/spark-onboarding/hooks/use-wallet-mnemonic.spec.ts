@@ -1,9 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
-import {
-  useWalletMnemonic,
-  useWalletMnemonicWords,
-} from "@app/screens/spark-onboarding/hooks/use-wallet-mnemonic"
+import { useWalletMnemonic } from "@app/screens/spark-onboarding/hooks/use-wallet-mnemonic"
 import { AccountType } from "@app/types/wallet"
 
 const mockGetMnemonicForAccount = jest.fn()
@@ -75,30 +72,5 @@ describe("useWalletMnemonic", () => {
     })
 
     expect(result.current).toBe("")
-  })
-})
-
-describe("useWalletMnemonicWords", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("returns empty array when no mnemonic", () => {
-    setNoActiveAccount()
-
-    const { result } = renderHook(() => useWalletMnemonicWords())
-
-    expect(result.current).toEqual([])
-  })
-
-  it("splits mnemonic into words", async () => {
-    setActiveSelfCustodial()
-    mockGetMnemonicForAccount.mockResolvedValue("alpha beta gamma")
-
-    const { result } = renderHook(() => useWalletMnemonicWords())
-
-    await waitFor(() => {
-      expect(result.current).toEqual(["alpha", "beta", "gamma"])
-    })
   })
 })
