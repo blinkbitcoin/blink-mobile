@@ -7,7 +7,6 @@ import { getSparkDriveBackupFilename } from "@app/config/appinfo"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useAppConfig, useGoogleDriveBackup } from "@app/hooks"
-import { useWalletMnemonic } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -21,6 +20,8 @@ import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
 import { getCloudProviderName } from "../utils"
+
+import { useWalletMnemonic } from "./use-wallet-mnemonic"
 
 const DEFAULT_BACKUP_VERSION = 1
 

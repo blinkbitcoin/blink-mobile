@@ -5,7 +5,6 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useWalletMnemonic } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -18,6 +17,7 @@ import {
   isCredentialBackupAvailable,
   useCredentialBackup,
 } from "./use-credential-backup"
+import { useWalletMnemonic } from "./use-wallet-mnemonic"
 
 const showBackupErrorToast = (error: CredentialError, LL: TranslationFunctions): void => {
   switch (error) {

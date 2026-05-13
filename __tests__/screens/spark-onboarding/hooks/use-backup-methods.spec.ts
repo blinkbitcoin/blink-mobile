@@ -35,7 +35,7 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
 }))
 
-jest.mock("@app/hooks/use-wallet-mnemonic", () => ({
+jest.mock("@app/screens/spark-onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () => "youth indicate void",
 }))
 

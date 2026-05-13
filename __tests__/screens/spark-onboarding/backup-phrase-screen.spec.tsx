@@ -27,7 +27,7 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
-jest.mock("@app/hooks/use-wallet-mnemonic", () => ({
+jest.mock("@app/screens/spark-onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonicWords: () =>
     "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain".split(
       " ",

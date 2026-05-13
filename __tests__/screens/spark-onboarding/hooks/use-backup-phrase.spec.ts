@@ -36,7 +36,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-jest.mock("@app/hooks/use-wallet-mnemonic", () => ({
+jest.mock("@app/screens/spark-onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonicWords: () =>
     "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain".split(
       " ",

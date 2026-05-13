@@ -5,13 +5,14 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useClipboard, useCountdown } from "@app/hooks"
-import { useWalletMnemonicWords } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatDuration } from "@app/utils/date"
 import { openExternalUrl } from "@app/utils/external"
 
 import { buildConfirmChallenges } from "../utils"
+
+import { useWalletMnemonicWords } from "./use-wallet-mnemonic"
 
 const WORDS_PER_STEP = 6
 const WORDS_PER_CARD = 3
