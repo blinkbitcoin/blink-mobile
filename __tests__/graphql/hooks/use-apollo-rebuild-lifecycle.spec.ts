@@ -7,7 +7,7 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
 }))
 
-import { useApolloRebuildLifecycle } from "@app/graphql/use-apollo-rebuild-lifecycle"
+import { useApolloRebuildLifecycle } from "@app/graphql/hooks/use-apollo-rebuild-lifecycle"
 
 const buildClient = (id: string, stop: () => void = jest.fn()) => ({ id, stop }) as never
 
