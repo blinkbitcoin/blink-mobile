@@ -8,6 +8,11 @@ import { SelfCustodialDelete } from "@app/screens/settings-screen/account/settin
 
 const TEST_SC_ACCOUNT_ID = "test-self-custodial-uuid"
 
+jest.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({ dispatch: jest.fn(), navigate: jest.fn() }),
+  CommonActions: { reset: (args: unknown) => ({ type: "reset", payload: args }) },
+}))
+
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
     grey5: "#f5f5f5",
@@ -103,16 +108,13 @@ jest.mock(
 )
 
 const mockDeleteWallet = jest.fn().mockResolvedValue(undefined)
-jest.mock(
-  "@app/screens/settings-screen/account/multi-account/hooks/use-delete-self-custodial",
-  () => ({
-    useDeleteSelfCustodial: () => ({
-      state: "idle",
-      error: null,
-      deleteWallet: mockDeleteWallet,
-    }),
+jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
+  useDeleteAccount: () => ({
+    state: "idle",
+    error: null,
+    deleteWallet: mockDeleteWallet,
   }),
-)
+}))
 
 const mockUseSelfCustodialWallet = jest.fn()
 jest.mock("@app/self-custodial/providers/wallet", () => ({

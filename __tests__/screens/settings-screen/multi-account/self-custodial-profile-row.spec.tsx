@@ -167,13 +167,10 @@ jest.mock("@app/utils/error-logging", () => ({
 }))
 
 const mockDeleteWallet = jest.fn().mockResolvedValue(undefined)
-const mockUseDeleteSelfCustodial = jest.fn()
-jest.mock(
-  "@app/screens/settings-screen/account/multi-account/hooks/use-delete-self-custodial",
-  () => ({
-    useDeleteSelfCustodial: () => mockUseDeleteSelfCustodial(),
-  }),
-)
+const mockUseDeleteAccount = jest.fn()
+jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
+  useDeleteAccount: () => mockUseDeleteAccount(),
+}))
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
@@ -204,7 +201,7 @@ describe("SelfCustodialProfileRow", () => {
     lastWarningModalProps.isVisible = undefined
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null, wallets: [] })
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
-    mockUseDeleteSelfCustodial.mockReturnValue({
+    mockUseDeleteAccount.mockReturnValue({
       state: "idle",
       deleteWallet: mockDeleteWallet,
     })
@@ -476,7 +473,7 @@ describe("SelfCustodialProfileRow", () => {
   })
 
   it("renders the deleting overlay when the delete hook is in deleting state", () => {
-    mockUseDeleteSelfCustodial.mockReturnValue({
+    mockUseDeleteAccount.mockReturnValue({
       state: "deleting",
       deleteWallet: mockDeleteWallet,
     })

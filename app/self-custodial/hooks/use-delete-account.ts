@@ -1,13 +1,10 @@
 import { useCallback, useState } from "react"
 
-import { useNavigation, CommonActions } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
 import crashlytics from "@react-native-firebase/crashlytics"
 import RNFS from "react-native-fs"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { disconnectSdk } from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
@@ -20,14 +17,19 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 type DeleteState = "idle" | "deleting" | "error"
 
-type DeleteSelfCustodialResult = {
+export type DeleteAccountOutcome =
+  | "remained"
+  | "switched-to-self-custodial"
+  | "switched-to-custodial"
+  | "logged-out"
+
+type DeleteAccountResult = {
   state: DeleteState
   error: Error | null
-  deleteWallet: (accountId: string) => Promise<void>
+  deleteWallet: (accountId: string) => Promise<DeleteAccountOutcome | undefined>
 }
 
-export const useDeleteSelfCustodial = (): DeleteSelfCustodialResult => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+export const useDeleteAccount = (): DeleteAccountResult => {
   const { sdk } = useSelfCustodialWallet()
   const { accounts, activeAccount, setActiveAccountId, reloadSelfCustodialAccounts } =
     useAccountRegistry()
@@ -38,7 +40,7 @@ export const useDeleteSelfCustodial = (): DeleteSelfCustodialResult => {
   const [error, setError] = useState<Error | null>(null)
 
   const deleteWallet = useCallback(
-    async (accountId: string) => {
+    async (accountId: string): Promise<DeleteAccountOutcome | undefined> => {
       setState("deleting")
       setError(null)
       try {
@@ -84,37 +86,18 @@ export const useDeleteSelfCustodial = (): DeleteSelfCustodialResult => {
         await removeBackupStateFor(accountId)
         await reloadSelfCustodialAccounts()
 
-        if (!isActive) {
-          setState("idle")
-          navigation.dispatch(
-            CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
-          )
-          return
-        }
-
-        if (remainingSelfCustodial) {
-          navigation.navigate("Primary")
-          setState("idle")
-          return
-        }
-
-        if (hasCustodialAccount) {
-          navigation.dispatch(
-            CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
-          )
-          setState("idle")
-          return
-        }
-
-        navigation.dispatch(
-          CommonActions.reset({ index: 0, routes: [{ name: "getStarted" }] }),
-        )
         setState("idle")
+
+        if (!isActive) return "remained"
+        if (remainingSelfCustodial) return "switched-to-self-custodial"
+        if (hasCustodialAccount) return "switched-to-custodial"
+        return "logged-out"
       } catch (err) {
         const wrapped = err instanceof Error ? err : new Error(String(err))
         reportError("Self-custodial wallet delete", wrapped)
         setState("error")
         setError(wrapped)
+        return undefined
       }
     },
     [
@@ -125,7 +108,6 @@ export const useDeleteSelfCustodial = (): DeleteSelfCustodialResult => {
       reloadSelfCustodialAccounts,
       updateState,
       hasCustodialAccount,
-      navigation,
     ],
   )
 
