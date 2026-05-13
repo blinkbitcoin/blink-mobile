@@ -69,7 +69,7 @@ const backupStatusText = (
   return LL.SettingsScreen.AccountInformation.backupStatusNotCompleted()
 }
 
-export const SelfCustodialAccountFields: React.FC = () => {
+export const AccountFields: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const { identityPubkey, lightningAddress, loading, error } =

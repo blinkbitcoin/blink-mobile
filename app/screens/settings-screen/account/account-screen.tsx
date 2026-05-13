@@ -12,7 +12,7 @@ import { AccountType } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 
 import { SettingsGroup } from "../group"
-import { SelfCustodialAccountFields } from "../self-custodial/account-fields"
+import { AccountFields } from "../self-custodial/account-fields"
 
 import { AccountDeleteContextProvider } from "./account-delete-context"
 import { AccountBannerVertical } from "./banner-vertical"
@@ -69,7 +69,7 @@ export const AccountScreen: React.FC = () => {
         >
           <AccountBannerVertical />
           {isSelfCustodial ? (
-            <SelfCustodialAccountFields />
+            <AccountFields />
           ) : (
             <>
               <UpgradeTrialAccount />
