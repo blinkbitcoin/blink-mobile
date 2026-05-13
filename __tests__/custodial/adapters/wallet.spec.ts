@@ -6,7 +6,7 @@ import {
   type NormalizedTransaction,
 } from "@app/types/transaction"
 
-import { mapCustodialWalletToWalletState } from "@app/custodial/adapters/wallet-adapter"
+import { mapCustodialWalletToWalletState } from "@app/custodial/adapters/wallet"
 
 describe("mapCustodialWalletToWalletState", () => {
   const mockTransactions: NormalizedTransaction[] = []

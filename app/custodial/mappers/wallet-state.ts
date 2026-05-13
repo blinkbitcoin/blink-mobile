@@ -6,11 +6,8 @@ import {
   type ActiveWalletState,
 } from "@app/types/wallet"
 
-import { mapCustodialWalletToWalletState } from "../adapters/wallet-adapter"
-import {
-  filterTransactionsByCurrency,
-  mapCustodialTransactions,
-} from "./transaction-mapper"
+import { mapCustodialWalletToWalletState } from "../adapters/wallet"
+import { filterTransactionsByCurrency, mapCustodialTransactions } from "./transaction"
 
 const createState = (
   status: ActiveWalletStatus,

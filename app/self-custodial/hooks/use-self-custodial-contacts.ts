@@ -23,7 +23,7 @@ import {
   listPayments as bridgeListPayments,
   updateContact as bridgeUpdateContact,
 } from "../bridge"
-import { mapSelfCustodialTransactions } from "../mappers/transaction-mapper"
+import { mapSelfCustodialTransactions } from "../mappers/transaction"
 import { useSelfCustodialWallet } from "../providers/wallet"
 
 const MATCHED_PAYMENTS_LIMIT = 100

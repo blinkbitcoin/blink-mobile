@@ -32,7 +32,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   createGetConversionQuote: jest.fn().mockReturnValue(jest.fn()),
 }))
 
-jest.mock("@app/custodial/adapters/payment-adapter", () => ({
+jest.mock("@app/custodial/adapters/payment", () => ({
   createCustodialListPendingDeposits: jest.fn().mockResolvedValue({ deposits: [] }),
   createCustodialClaimDeposit: {
     getClaimFee: jest.fn(),

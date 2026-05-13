@@ -1,6 +1,6 @@
 import { Network, type ScanningQrCodeScreenQuery } from "@app/graphql/generated"
 
-import { createCustodialScanContext } from "@app/custodial/adapters/scan-context-adapter"
+import { createCustodialScanContext } from "@app/custodial/adapters/scan-context"
 
 const buildQueryData = (overrides: {
   network?: Network

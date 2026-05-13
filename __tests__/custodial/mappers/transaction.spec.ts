@@ -10,7 +10,7 @@ import {
   filterTransactionsByCurrency,
   mapCustodialTransaction,
   mapCustodialTransactions,
-} from "@app/custodial/mappers/transaction-mapper"
+} from "@app/custodial/mappers/transaction"
 
 const baseTx = {
   __typename: "Transaction" as const,

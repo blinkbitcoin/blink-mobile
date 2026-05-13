@@ -1,12 +1,12 @@
 import { useMemo } from "react"
 
-import { createCustodialScanContext } from "@app/custodial/adapters/scan-context-adapter"
+import { createCustodialScanContext } from "@app/custodial/adapters/scan-context"
 import {
   useHomeUnauthedQuery,
   useScanningQrCodeScreenQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { createSelfCustodialScanContext } from "@app/self-custodial/adapters/scan-context-adapter"
+import { createSelfCustodialScanContext } from "@app/self-custodial/adapters/scan-context"
 import { type ScanContextAdapter } from "@app/types/scan-context"
 
 import { useActiveWallet } from "./use-active-wallet"
