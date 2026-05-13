@@ -3,12 +3,13 @@ import { View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 
-import { Screen } from "@app/components/screen"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
+
+import { Screen } from "../screen"
 
 type BackendFeatureGateProps = {
   featureName: string

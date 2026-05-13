@@ -6,7 +6,6 @@ import {
   useDisplayCurrencyQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
   DEFAULT_DISPLAY_CURRENCY,
@@ -14,6 +13,8 @@ import {
   withSelfCustodialDisplayCurrency,
 } from "@app/store/persistent-state/self-custodial-display-currency"
 import { AccountType } from "@app/types/wallet"
+
+import { useAccountRegistry } from "./use-account-registry"
 
 type EffectiveDisplayCurrencyReturn = {
   displayCurrency: string

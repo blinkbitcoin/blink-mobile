@@ -1,17 +1,18 @@
 import React, { useState, useCallback } from "react"
 import { ScrollView, RefreshControl } from "react-native-gesture-handler"
 
+import { makeStyles } from "@rn-vui/themed"
+
 import { Screen } from "@app/components/screen"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { SelfCustodialAccountFields } from "@app/screens/settings-screen/self-custodial/account-fields"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
-import { makeStyles } from "@rn-vui/themed"
 
 import { SettingsGroup } from "../group"
+import { SelfCustodialAccountFields } from "../self-custodial/account-fields"
 
 import { AccountDeleteContextProvider } from "./account-delete-context"
 import { AccountBannerVertical } from "./banner-vertical"

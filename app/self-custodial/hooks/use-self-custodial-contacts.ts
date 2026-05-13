@@ -7,15 +7,6 @@ import {
   type Contact as SdkContact,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { mapSelfCustodialTransactions } from "@app/self-custodial/mappers/transaction-mapper"
-import {
-  findOrCreateContact as bridgeFindOrCreateContact,
-  deleteContact as bridgeDeleteContact,
-  listContacts as bridgeListContacts,
-  listPayments as bridgeListPayments,
-  updateContact as bridgeUpdateContact,
-} from "@app/self-custodial/bridge"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   type Contact,
   type ContactAdapter,
@@ -24,6 +15,16 @@ import {
 import { type NormalizedTransaction } from "@app/types/transaction"
 import { AccountType } from "@app/types/wallet"
 import { normalizeString } from "@app/utils/helper"
+
+import {
+  findOrCreateContact as bridgeFindOrCreateContact,
+  deleteContact as bridgeDeleteContact,
+  listContacts as bridgeListContacts,
+  listPayments as bridgeListPayments,
+  updateContact as bridgeUpdateContact,
+} from "../bridge"
+import { mapSelfCustodialTransactions } from "../mappers/transaction-mapper"
+import { useSelfCustodialWallet } from "../providers/wallet"
 
 const MATCHED_PAYMENTS_LIMIT = 100
 

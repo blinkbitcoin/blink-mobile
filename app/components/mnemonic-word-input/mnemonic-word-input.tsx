@@ -3,8 +3,9 @@ import { TextInput, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
+
+import { GaloyIcon } from "../atomic/galoy-icon"
 
 type MnemonicWordInputProps = {
   index: number

@@ -1,14 +1,13 @@
 import { useMemo } from "react"
 
+import crashlytics from "@react-native-firebase/crashlytics"
+
 import {
   useRealtimePriceQuery,
   useRealtimePriceUnauthedQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useEffectiveDisplayCurrency } from "@app/hooks/use-effective-display-currency"
-import { AccountType } from "@app/types/wallet"
 import {
   createToDisplayAmount,
   DisplayCurrency,
@@ -16,7 +15,10 @@ import {
   moneyAmountIsCurrencyType,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { AccountType } from "@app/types/wallet"
+
+import { useAccountRegistry } from "./use-account-registry"
+import { useEffectiveDisplayCurrency } from "./use-effective-display-currency"
 
 export const SATS_PER_BTC = 100000000
 

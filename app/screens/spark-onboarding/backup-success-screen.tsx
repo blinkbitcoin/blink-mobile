@@ -12,7 +12,8 @@ import { Screen } from "@app/components/screen"
 import { SuccessScreenLayout } from "@app/components/success-screen-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
+
+import { useMigrationCheckpoint } from "../account-migration/hooks"
 
 type SuccessRouteProp = RouteProp<RootStackParamList, "sparkBackupSuccessScreen">
 
