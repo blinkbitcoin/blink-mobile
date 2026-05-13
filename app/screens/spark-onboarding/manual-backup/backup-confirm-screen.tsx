@@ -11,10 +11,11 @@ import { Screen } from "@app/components/screen"
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { logSelfCustodialBackupCompleted } from "@app/utils/analytics"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
+import { logSelfCustodialBackupCompleted } from "@app/utils/analytics"
+import { hasFunds } from "@app/utils/has-funds"
 import { testProps } from "@app/utils/testProps"
 
 import { useBackupConfirm } from "../hooks"
@@ -36,12 +37,12 @@ export const SparkBackupConfirmScreen: React.FC = () => {
   const alreadyBackedUp = backupState.status === BackupStatus.Completed
   // Migration only applies on a custodial account; self-custodial backups are standalone.
   const isMigrating = !isSelfCustodial && checkpoint !== null && !alreadyBackedUp
-  const hasFunds = wallets.some((w) => w.balance.amount > 0)
+  const walletsHaveFunds = hasFunds(wallets)
 
   const onComplete = useCallback(() => {
     setBackupCompleted("manual")
     logSelfCustodialBackupCompleted({ backupMethod: "manual" })
-    if (isMigrating && hasFunds) {
+    if (isMigrating && walletsHaveFunds) {
       navigation.navigate("sparkMigrationTransferringFunds")
       return
     }
@@ -52,7 +53,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
   }, [
     navigation,
     isMigrating,
-    hasFunds,
+    walletsHaveFunds,
     alreadyBackedUp,
     setBackupCompleted,
     successMessage,

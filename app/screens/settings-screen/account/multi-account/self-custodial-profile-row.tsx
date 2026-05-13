@@ -20,6 +20,7 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { type SelfCustodialAccountEntry } from "@app/self-custodial/storage/account-index"
 import { AccountType, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
+import { hasFunds } from "@app/utils/has-funds"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
@@ -72,8 +73,7 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
   }
 
   const openModalForWallets = (wallets: ReadonlyArray<WalletState>) => {
-    const hasFunds = wallets.some((w) => w.balance.amount > 0)
-    if (hasFunds) {
+    if (hasFunds(wallets)) {
       setWarningWallets(wallets)
       setHasFundsWarningVisible(true)
       return
