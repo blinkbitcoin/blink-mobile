@@ -34,8 +34,23 @@ describe("useNwcConnections", () => {
     expect(connection!.budgets).toEqual([])
     expect(connection!.permissions).toEqual([])
     expect(connection!.id).toBeTruthy()
-    expect(connection!.connectionString).toContain("nostr+walletconnect://")
     expect(connection!.createdAt).toBeGreaterThan(0)
+  })
+
+  it("uses the backend id as the local id when available", () => {
+    const { result } = renderHook(() => useNwcConnections(), { wrapper })
+
+    let connection: ReturnType<typeof result.current.addConnection>
+
+    act(() => {
+      connection = result.current.addConnection({
+        backendId: "backend-connection-id",
+        appName: "Amethyst",
+        dailyBudgetSats: 10_000,
+      })
+    })
+
+    expect(connection!.id).toBe("backend-connection-id")
   })
 
   it("addConnection adds the connection to the list", () => {
@@ -135,6 +150,7 @@ describe("useNwcConnections", () => {
     const { result } = renderHook(() => useNwcConnections(), { wrapper })
 
     jest.spyOn(Date, "now").mockReturnValue(1000)
+    jest.spyOn(Math, "random").mockReturnValueOnce(0.1).mockReturnValueOnce(0.2)
 
     let firstId = ""
     let secondId = ""

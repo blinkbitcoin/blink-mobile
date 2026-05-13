@@ -7,6 +7,21 @@ export const NWC_AUTH_LINKING_PATH = "nwc-auth"
 const NWC_AUTH_LINKING_URL = `blink://${NWC_AUTH_LINKING_PATH}`
 
 const PUBKEY_REGEX = /^[0-9a-f]{64}$/i
+const JAVASCRIPT_PROTOCOL = ["java", "script:"].join("")
+const BLOCKED_RETURN_URL_PROTOCOLS = new Set([
+  "about:",
+  "blob:",
+  "data:",
+  "file:",
+  "ftp:",
+  JAVASCRIPT_PROTOCOL,
+  "mailto:",
+  "sms:",
+  "tel:",
+])
+const ALLOWED_RETURN_URL_PROTOCOLS = new Set(["https:", "satsback:"])
+const DEV_RETURN_URL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"])
+const URL_PROTOCOL_REGEX = /^[a-z][a-z0-9+.-]*:$/
 
 export type NwcUriError =
   | "invalid-uri"
@@ -39,6 +54,32 @@ export const isNwcUri = (input: string | undefined | null) =>
 
 export const getNwcAuthorizationLinkingUrl = (uri: string) =>
   `${NWC_AUTH_LINKING_URL}?uri=${encodeURIComponent(uri)}`
+
+export const getSafeNwcReturnUrl = (returnUrl: string | undefined) => {
+  if (!returnUrl) return undefined
+
+  const rawReturnUrl = returnUrl.trim()
+  if (!rawReturnUrl) return undefined
+
+  try {
+    const url = new URL(rawReturnUrl)
+    const protocol = url.protocol.toLowerCase()
+
+    if (!URL_PROTOCOL_REGEX.test(protocol)) return undefined
+    if (BLOCKED_RETURN_URL_PROTOCOLS.has(protocol)) return undefined
+
+    if (protocol === "http:" || protocol === "https:") {
+      if (protocol === "https:") return url.toString()
+      return __DEV__ && DEV_RETURN_URL_HOSTS.has(url.hostname)
+        ? url.toString()
+        : undefined
+    }
+
+    return ALLOWED_RETURN_URL_PROTOCOLS.has(protocol) ? url.toString() : undefined
+  } catch (_) {
+    return undefined
+  }
+}
 
 const isValidRelayUrl = (relay: string) => {
   try {
@@ -114,8 +155,9 @@ export const parseNwcUri = (input: string): ParsedNwcUri => {
   }
 
   const appName = url.searchParams.get("lud16") ?? undefined
-  const returnUrl =
+  const unsafeReturnUrl =
     url.searchParams.get("return_to") ?? url.searchParams.get("return_url") ?? undefined
+  const returnUrl = getSafeNwcReturnUrl(unsafeReturnUrl)
   const { permissions, hasUnsupportedPermissions } = parsePermissions(url)
 
   if (hasUnsupportedPermissions || permissions.length === 0) {

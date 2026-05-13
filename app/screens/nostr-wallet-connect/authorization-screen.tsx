@@ -219,7 +219,6 @@ export const NwcAuthorizationScreen: React.FC = () => {
     }
 
     navigation.navigate("nwcConnectionCreated", {
-      connectionString: result.connectionUri,
       appName: result.connection.appName,
       successMode: "authorization",
       permissions: createInput.permissions as ReadonlyArray<NwcGraphqlPermission>,

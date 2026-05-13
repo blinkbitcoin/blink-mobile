@@ -3,7 +3,9 @@ import React, {
   PropsWithChildren,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react"
 
@@ -18,8 +20,6 @@ export type NwcConnection = {
   budgetPeriod?: NwcBudgetPeriod
   budgets: ReadonlyArray<NwcBudgetInput>
   permissions: ReadonlyArray<NwcGraphqlPermission>
-  connectionString: string
-  sourceNwcUri?: string
   appPubkey?: string
   createdAt: number
 }
@@ -31,8 +31,6 @@ export type AddNwcConnectionInput = {
   budgetPeriod?: NwcBudgetPeriod
   budgets?: ReadonlyArray<NwcBudgetInput>
   permissions?: ReadonlyArray<NwcGraphqlPermission>
-  connectionString?: string
-  sourceNwcUri?: string
   appPubkey?: string
 }
 
@@ -40,19 +38,12 @@ type NwcConnectionsContextValue = {
   connections: ReadonlyArray<NwcConnection>
   addConnection: (input: AddNwcConnectionInput) => NwcConnection
   removeConnection: (id: string) => void
+  getConnectionByAppPubkey: (appPubkey: string) => NwcConnection | undefined
   hasConnections: boolean
 }
 
-// TODO: replace with the GraphQL-backed adapter when the NWC schema is generated.
-const MOCK_CONNECTION_STRING =
-  "nostr+walletconnect://a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2?relay=wss%3A%2F%2Frelay.blink.sv&secret=f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5"
-
-let connectionIdSequence = 0
-
-const createConnectionId = (now: number) => {
-  connectionIdSequence += 1
-  return `${now}-${connectionIdSequence}`
-}
+const createConnectionId = (input: AddNwcConnectionInput, now: number) =>
+  input.backendId ?? `${now}-${Math.random().toString(36).slice(2)}`
 
 const NwcConnectionsContext = createContext<NwcConnectionsContextValue | undefined>(
   undefined,
@@ -60,35 +51,64 @@ const NwcConnectionsContext = createContext<NwcConnectionsContextValue | undefin
 
 export const NwcConnectionsProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [connections, setConnections] = useState<ReadonlyArray<NwcConnection>>([])
+  const connectionsRef = useRef(connections)
+
+  useEffect(() => {
+    connectionsRef.current = connections
+  }, [connections])
 
   const addConnection = useCallback((input: AddNwcConnectionInput): NwcConnection => {
     const now = Date.now()
     const connection: NwcConnection = {
-      id: createConnectionId(now),
+      id: createConnectionId(input, now),
       backendId: input.backendId,
       appName: input.appName,
       dailyBudgetSats: input.dailyBudgetSats,
       budgetPeriod: input.budgetPeriod,
       budgets: input.budgets ?? [],
       permissions: input.permissions ?? [],
-      connectionString: input.connectionString ?? MOCK_CONNECTION_STRING,
-      sourceNwcUri: input.sourceNwcUri,
       appPubkey: input.appPubkey,
       createdAt: now,
     }
-    setConnections((prev) => [...prev, connection])
+    setConnections((prev) => {
+      const next = [...prev, connection]
+      connectionsRef.current = next
+      return next
+    })
     return connection
   }, [])
 
   const removeConnection = useCallback((id: string) => {
-    setConnections((prev) => prev.filter((c) => c.id !== id))
+    setConnections((prev) => {
+      const next = prev.filter((c) => c.id !== id)
+      connectionsRef.current = next
+      return next
+    })
   }, [])
+
+  const getConnectionByAppPubkey = useCallback(
+    (appPubkey: string) =>
+      connectionsRef.current.find((connection) => connection.appPubkey === appPubkey),
+    [],
+  )
 
   const hasConnections = connections.length > 0
 
   const value = useMemo(
-    () => ({ connections, addConnection, removeConnection, hasConnections }),
-    [addConnection, connections, hasConnections, removeConnection],
+    () => ({
+      connections,
+      addConnection,
+      removeConnection,
+      getConnectionByAppPubkey,
+      hasConnections,
+    }),
+    [
+      addConnection,
+      connections,
+      getConnectionByAppPubkey,
+      hasConnections,
+      removeConnection,
+    ],
   )
 
   return React.createElement(NwcConnectionsContext.Provider, { value }, children)

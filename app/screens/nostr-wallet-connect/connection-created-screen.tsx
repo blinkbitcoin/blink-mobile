@@ -23,6 +23,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 
 import type { NwcBudgetPeriod, NwcGraphqlPermission } from "./nwc-types"
+import { getSafeNwcReturnUrl } from "./nwc-uri"
 
 export const NwcConnectionCreatedScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -32,20 +33,20 @@ export const NwcConnectionCreatedScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "nwcConnectionCreated">>()
-  const {
-    connectionString,
-    appName,
-    budget,
-    budgets,
-    permissions,
-    returnUrl,
-    successMode,
-  } = route.params
+  const { appName, successMode } = route.params
+  const connectionString =
+    "connectionString" in route.params ? route.params.connectionString : undefined
+  const budget = "budget" in route.params ? route.params.budget : undefined
+  const budgets = "budgets" in route.params ? route.params.budgets : undefined
+  const permissions = "permissions" in route.params ? route.params.permissions : undefined
+  const returnUrl = "returnUrl" in route.params ? route.params.returnUrl : undefined
   const { formatMoneyAmount } = useDisplayCurrency()
   const { copyToClipboard } = useClipboard()
   const isAuthorizationSuccess = successMode === "authorization"
 
   const handleCopy = () => {
+    if (!connectionString) return
+
     copyToClipboard({
       content: connectionString,
       message: LL.NostrWalletConnect.nwcStringCopied(),
@@ -72,8 +73,13 @@ export const NwcConnectionCreatedScreen: React.FC = () => {
 
   const handleDone = () => {
     if (isAuthorizationSuccess) {
-      if (returnUrl) {
-        Linking.openURL(returnUrl).catch(() => resetAfterDone("home"))
+      const safeReturnUrl = getSafeNwcReturnUrl(returnUrl)
+      if (safeReturnUrl) {
+        Linking.canOpenURL(safeReturnUrl)
+          .then((canOpen) =>
+            canOpen ? Linking.openURL(safeReturnUrl) : resetAfterDone("home"),
+          )
+          .catch(() => resetAfterDone("home"))
         return
       }
 
@@ -94,6 +100,10 @@ export const NwcConnectionCreatedScreen: React.FC = () => {
     }),
   )
   const isSatsback = appName.toLowerCase().includes("satsback")
+
+  if (!isAuthorizationSuccess && !connectionString) {
+    return null
+  }
 
   if (isAuthorizationSuccess) {
     return (

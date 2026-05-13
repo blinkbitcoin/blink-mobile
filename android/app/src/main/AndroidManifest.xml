@@ -7,6 +7,10 @@
         <action android:name="android.intent.action.VIEW" />
         <data android:scheme="tg" />
       </intent>
+      <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="satsback" />
+      </intent>
     </queries>
 
     <uses-permission android:name="android.permission.INTERNET" />

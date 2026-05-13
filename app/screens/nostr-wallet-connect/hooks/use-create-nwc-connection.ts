@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
 import { useApolloClient } from "@apollo/client"
 import { parse } from "graphql"
@@ -167,20 +167,30 @@ const createErrorsFromUnknown = (
 }
 
 export const useCreateNwcConnection = () => {
-  const { addConnection, connections, removeConnection } = useNwcConnections()
+  const { addConnection, getConnectionByAppPubkey, removeConnection } =
+    useNwcConnections()
   const client = useApolloClient()
+  const inFlightAppPubkeysRef = useRef(new Set<string>())
+  const loadingCountRef = useRef(0)
   const [loading, setLoading] = useState(false)
+
+  const startLoading = useCallback(() => {
+    loadingCountRef.current += 1
+    setLoading(true)
+  }, [])
+
+  const stopLoading = useCallback(() => {
+    loadingCountRef.current = Math.max(loadingCountRef.current - 1, 0)
+    setLoading(loadingCountRef.current > 0)
+  }, [])
 
   const createNwcConnection = useCallback(
     async (input: CreateNwcConnectionInput) => {
-      setLoading(true)
+      startLoading()
+      let trackedInFlight = false
 
       try {
-        const duplicateConnection = connections.find(
-          (connection) =>
-            connection.sourceNwcUri === input.nwcUri ||
-            (input.appPubkey && connection.appPubkey === input.appPubkey),
-        )
+        const duplicateConnection = getConnectionByAppPubkey(input.appPubkey)
 
         if (duplicateConnection && !input.replaceExisting) {
           const error: NwcConnectionCreateError = {
@@ -195,6 +205,27 @@ export const useCreateNwcConnection = () => {
             connectionUri: undefined,
           }
         }
+
+        if (
+          !duplicateConnection &&
+          inFlightAppPubkeysRef.current.has(input.appPubkey) &&
+          !input.replaceExisting
+        ) {
+          const error: NwcConnectionCreateError = {
+            code: "DUPLICATE_CONNECTION",
+            message: "Connection is already being created",
+            replaceable: true,
+          }
+
+          return {
+            errors: [error],
+            connection: undefined,
+            connectionUri: undefined,
+          }
+        }
+
+        inFlightAppPubkeysRef.current.add(input.appPubkey)
+        trackedInFlight = true
 
         const createBudgets = input.budgets?.length ? input.budgets : undefined
         const primaryBudget =
@@ -262,15 +293,13 @@ export const useCreateNwcConnection = () => {
           budgetPeriod: primaryBudget?.period,
           budgets: createBudgets ?? [],
           permissions: input.permissions,
-          connectionString: payload.connectionUri,
-          sourceNwcUri: input.nwcUri,
           appPubkey: payload.connection.appPubkey ?? input.appPubkey,
         })
 
         return {
           errors: [],
           connection,
-          connectionUri: connection.connectionString,
+          connectionUri: payload.connectionUri,
         }
       } catch (error) {
         console.warn("NWC create failed", error)
@@ -281,15 +310,25 @@ export const useCreateNwcConnection = () => {
           connectionUri: undefined,
         }
       } finally {
-        setLoading(false)
+        if (trackedInFlight) {
+          inFlightAppPubkeysRef.current.delete(input.appPubkey)
+        }
+        stopLoading()
       }
     },
-    [addConnection, client, connections, removeConnection],
+    [
+      addConnection,
+      client,
+      getConnectionByAppPubkey,
+      removeConnection,
+      startLoading,
+      stopLoading,
+    ],
   )
 
   const createManualNwcConnection = useCallback(
     async ({ appName, budgets = [], permissions }: CreateManualNwcConnectionInput) => {
-      setLoading(true)
+      startLoading()
 
       try {
         const result = await client.query<NwcServiceInfoQueryData>({
@@ -332,7 +371,7 @@ export const useCreateNwcConnection = () => {
         const selectedPermissions =
           permissions ?? DEFAULT_NWC_PERMISSIONS.map(toNwcGraphqlPermission)
 
-        return createNwcConnection({
+        return await createNwcConnection({
           nwcUri,
           alias: appName,
           appName,
@@ -349,10 +388,10 @@ export const useCreateNwcConnection = () => {
           connectionUri: undefined,
         }
       } finally {
-        setLoading(false)
+        stopLoading()
       }
     },
-    [client, createNwcConnection],
+    [client, createNwcConnection, startLoading, stopLoading],
   )
 
   return {

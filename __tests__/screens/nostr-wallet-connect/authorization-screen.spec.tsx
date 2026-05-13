@@ -68,7 +68,6 @@ describe("NwcAuthorizationScreen", () => {
         id: "conn-1",
         appName: "Amethyst",
         dailyBudgetSats: 10_000,
-        connectionString: "nostr+walletconnect://created",
         createdAt: 1700000000000,
       },
     })
@@ -119,7 +118,6 @@ describe("NwcAuthorizationScreen", () => {
       replaceExisting: false,
     })
     expect(mockNavigate).toHaveBeenCalledWith("nwcConnectionCreated", {
-      connectionString: "nostr+walletconnect://created",
       appName: "Amethyst",
       successMode: "authorization",
       permissions: ["GET_INFO", "GET_BALANCE", "PAY_INVOICE"],

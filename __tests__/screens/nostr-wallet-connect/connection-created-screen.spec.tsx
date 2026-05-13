@@ -1,4 +1,5 @@
 import React from "react"
+import { Linking } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -12,6 +13,7 @@ const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
 const mockDispatch = jest.fn()
+const SCRIPT_RETURN_URL = ["java", "script:alert(1)"].join("")
 let mockRouteParams: Record<string, unknown> = {
   connectionString:
     "nostr+walletconnect://testpubkey?relay=wss%3A%2F%2Frelay.blink.sv&secret=testsecret&lud16=TestApp",
@@ -62,6 +64,8 @@ describe("NwcConnectionCreatedScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
+    jest.spyOn(Linking, "canOpenURL").mockResolvedValue(true)
+    jest.spyOn(Linking, "openURL").mockResolvedValue({} as never)
     mockRouteParams = {
       connectionString:
         "nostr+walletconnect://testpubkey?relay=wss%3A%2F%2Frelay.blink.sv&secret=testsecret&lud16=TestApp",
@@ -174,7 +178,6 @@ describe("NwcConnectionCreatedScreen", () => {
 
   it("renders authorization success summary without exposing the connection string", async () => {
     mockRouteParams = {
-      connectionString: "nostr+walletconnect://secret",
       appName: "Amethyst",
       successMode: "authorization",
       permissions: ["GET_INFO", "PAY_INVOICE"],
@@ -197,5 +200,54 @@ describe("NwcConnectionCreatedScreen", () => {
     expect(getByText("10000 SAT per Weekly")).toBeTruthy()
     expect(queryByText("nostr+walletconnect://secret")).toBeNull()
     expect(queryByTestId("qr-code")).toBeNull()
+  })
+
+  it("opens a safe return URL after authorization success", async () => {
+    mockRouteParams = {
+      appName: "Satsback",
+      successMode: "authorization",
+      permissions: ["GET_INFO"],
+      returnUrl: "satsback://nwc/success",
+    }
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <NwcConnectionCreatedScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText(LL.NostrWalletConnect.done()))
+    })
+
+    expect(Linking.canOpenURL).toHaveBeenCalledWith("satsback://nwc/success")
+    expect(Linking.openURL).toHaveBeenCalledWith("satsback://nwc/success")
+    expect(mockDispatch).not.toHaveBeenCalled()
+  })
+
+  it("falls back home when the authorization return URL is unsafe", async () => {
+    mockRouteParams = {
+      appName: "Amethyst",
+      successMode: "authorization",
+      permissions: ["GET_INFO"],
+      returnUrl: SCRIPT_RETURN_URL,
+    }
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <NwcConnectionCreatedScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText(LL.NostrWalletConnect.done()))
+    })
+
+    expect(Linking.openURL).not.toHaveBeenCalled()
+    expect(mockDispatch).toHaveBeenCalledWith(expect.any(Function))
   })
 })

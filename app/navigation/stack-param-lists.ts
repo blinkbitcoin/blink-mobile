@@ -182,21 +182,26 @@ export type RootStackParamList = {
   cardOnboardingApprovedScreen: undefined
   nwcEmptyState: undefined
   nwcNewConnection: undefined
-  nwcConnectionCreated: {
-    connectionString: string
-    appName: string
-    successMode?: "manual" | "authorization"
-    permissions?: ReadonlyArray<NwcGraphqlPermission>
-    budget?: {
-      amountSats: number
-      period: NwcBudgetPeriod
-    }
-    budgets?: ReadonlyArray<{
-      amountSats: number
-      period: NwcBudgetPeriod
-    }>
-    returnUrl?: string
-  }
+  nwcConnectionCreated:
+    | {
+        connectionString: string
+        appName: string
+        successMode?: "manual"
+      }
+    | {
+        appName: string
+        successMode: "authorization"
+        permissions?: ReadonlyArray<NwcGraphqlPermission>
+        budget?: {
+          amountSats: number
+          period: NwcBudgetPeriod
+        }
+        budgets?: ReadonlyArray<{
+          amountSats: number
+          period: NwcBudgetPeriod
+        }>
+        returnUrl?: string
+      }
   nwcConnectedApps: undefined
   nwcAuthorization: { uri: string }
 }

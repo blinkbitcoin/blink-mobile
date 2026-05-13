@@ -1,5 +1,6 @@
 import {
   getNwcAuthorizationLinkingUrl,
+  getSafeNwcReturnUrl,
   isNwcUri,
   parseNwcUri,
 } from "@app/screens/nostr-wallet-connect/nwc-uri"
@@ -8,6 +9,7 @@ import { DEFAULT_NWC_PERMISSIONS } from "@app/screens/nostr-wallet-connect/nwc-t
 const PUBKEY = "a".repeat(64)
 const SECRET = "b".repeat(64)
 const VALID_URI = `nostr+walletconnect://${PUBKEY}?relay=wss%3A%2F%2Frelay.blink.sv&secret=${SECRET}&lud16=Amethyst`
+const SCRIPT_RETURN_URL = ["java", "script:alert(1)"].join("")
 
 describe("nwc-uri", () => {
   it("detects nostr wallet connect URIs", () => {
@@ -42,6 +44,28 @@ describe("nwc-uri", () => {
         "make_invoice",
         "notifications:payment_received",
       ])
+    }
+  })
+
+  it("parses safe return URLs", () => {
+    const result = parseNwcUri(
+      `${VALID_URI}&return_to=${encodeURIComponent("satsback://nwc/success")}`,
+    )
+
+    expect(result.valid).toBe(true)
+    if (result.valid) {
+      expect(result.returnUrl).toBe("satsback://nwc/success")
+    }
+  })
+
+  it("drops unsafe return URLs without invalidating the NWC URI", () => {
+    const result = parseNwcUri(
+      `${VALID_URI}&return_to=${encodeURIComponent(SCRIPT_RETURN_URL)}`,
+    )
+
+    expect(result.valid).toBe(true)
+    if (result.valid) {
+      expect(result.returnUrl).toBeUndefined()
     }
   })
 
@@ -99,5 +123,17 @@ describe("nwc-uri", () => {
     expect(getNwcAuthorizationLinkingUrl(VALID_URI)).toBe(
       `blink://nwc-auth?uri=${encodeURIComponent(VALID_URI)}`,
     )
+  })
+
+  it("allows allowlisted app, https, and local dev return URLs only", () => {
+    expect(getSafeNwcReturnUrl("satsback://nwc/success")).toBe("satsback://nwc/success")
+    expect(getSafeNwcReturnUrl("https://example.com/done")).toBe(
+      "https://example.com/done",
+    )
+    expect(getSafeNwcReturnUrl("http://localhost:3000/done")).toBe(
+      "http://localhost:3000/done",
+    )
+    expect(getSafeNwcReturnUrl("amethyst://nwc/success")).toBeUndefined()
+    expect(getSafeNwcReturnUrl(SCRIPT_RETURN_URL)).toBeUndefined()
   })
 })
