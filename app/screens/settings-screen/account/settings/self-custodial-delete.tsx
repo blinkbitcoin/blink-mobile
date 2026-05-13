@@ -8,6 +8,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
+import { hasFunds } from "@app/utils/has-funds"
 import { testProps } from "@app/utils/testProps"
 
 import { DeleteAccountConfirmModal } from "../../self-custodial/delete-account-confirm-modal"
@@ -28,10 +29,8 @@ export const SelfCustodialDelete: React.FC = () => {
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [warningVisible, setWarningVisible] = useState(false)
 
-  const hasFunds = wallets.some((w) => w.balance.amount > 0)
-
   const handleDeletePress = () => {
-    if (hasFunds) {
+    if (hasFunds(wallets)) {
       setWarningVisible(true)
       return
     }

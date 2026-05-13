@@ -2,7 +2,7 @@ import React from "react"
 import { render } from "@testing-library/react-native"
 
 import { DeleteAccountHasFundsModal } from "@app/screens/settings-screen/self-custodial/delete-account-has-funds-modal"
-import { toBtcMoneyAmount } from "@app/types/amounts"
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 
 const lastBodyArgs: { balance?: string } = {}
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -84,5 +84,21 @@ describe("DeleteAccountHasFundsModal", () => {
 
     expect(getByTestId("custom-modal")).toBeTruthy()
     expect(lastBodyArgs.balance).toBe("522 SAT")
+  })
+
+  it("joins multiple funded wallets with ' + ' and skips zero balances", () => {
+    render(
+      <DeleteAccountHasFundsModal
+        isVisible={true}
+        onClose={() => {}}
+        wallets={[
+          { balance: toBtcMoneyAmount(522) },
+          { balance: toUsdMoneyAmount(0) },
+          { balance: toUsdMoneyAmount(987) },
+        ]}
+      />,
+    )
+
+    expect(lastBodyArgs.balance).toBe("522 SAT + 987 SAT")
   })
 })
