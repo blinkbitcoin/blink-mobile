@@ -20,7 +20,7 @@ jest.mock("@react-navigation/native", () => ({
 const mockRead = jest.fn()
 let mockLoading = false
 
-jest.mock("@app/hooks", () => ({
+jest.mock("@app/screens/spark-onboarding/hooks/use-credential-backup", () => ({
   CredentialError: {
     NoProvider: "no-provider",
     UserCancelled: "user-cancelled",

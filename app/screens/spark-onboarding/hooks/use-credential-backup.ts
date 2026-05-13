@@ -29,8 +29,10 @@ export type UseCredentialBackupReturn = {
   loading: boolean
 }
 
-// iOS Keychain Internet Password keys without `kSecAttrAccount` collapse
-// multiple matches to one OS-picked entry, silently stranding wallets.
+/**
+ * iOS Keychain Internet Password keys without `kSecAttrAccount` collapse
+ * multiple matches to one OS-picked entry, silently stranding wallets.
+ */
 export const isCredentialBackupAvailable = (existingAccountCount: number): boolean =>
   Platform.OS !== "ios" || existingAccountCount <= 1
 

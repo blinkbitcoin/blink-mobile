@@ -5,7 +5,7 @@ import {
   CredentialError,
   isCredentialBackupAvailable,
   useCredentialBackup,
-} from "@app/hooks/use-credential-backup"
+} from "@app/screens/spark-onboarding/hooks/use-credential-backup"
 
 const mockSignUpWithPassword = jest.fn()
 const mockSignIn = jest.fn()
