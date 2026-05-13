@@ -1,11 +1,14 @@
 import React, { useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 
+import { useNavigation, type NavigationProp } from "@react-navigation/native"
 import { makeStyles, Overlay, Text, useTheme } from "@rn-vui/themed"
 
 import { InfoCard } from "@app/components/card-screen"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { type RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 import { hasFunds } from "@app/utils/has-funds"
@@ -13,8 +16,8 @@ import { testProps } from "@app/utils/testProps"
 
 import { DeleteAccountConfirmModal } from "../../self-custodial/delete-account-confirm-modal"
 import { DeleteAccountHasFundsModal } from "../../self-custodial/delete-account-has-funds-modal"
+import { navigateAfterAccountDelete } from "../../self-custodial/navigate-after-account-delete"
 import { SettingsButton } from "../../button"
-import { useDeleteSelfCustodial } from "../multi-account/hooks/use-delete-self-custodial"
 
 export const SelfCustodialDelete: React.FC = () => {
   const styles = useStyles()
@@ -22,8 +25,9 @@ export const SelfCustodialDelete: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
-  const { state, deleteWallet } = useDeleteSelfCustodial()
+  const { state, deleteWallet } = useDeleteAccount()
   const { wallets } = useSelfCustodialWallet()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
@@ -40,7 +44,8 @@ export const SelfCustodialDelete: React.FC = () => {
   const handleConfirm = async () => {
     if (activeAccount?.type !== AccountType.SelfCustodial) return
     setConfirmVisible(false)
-    await deleteWallet(activeAccount.id)
+    const outcome = await deleteWallet(activeAccount.id)
+    if (outcome) navigateAfterAccountDelete(navigation, outcome)
   }
 
   const bulletItems = [

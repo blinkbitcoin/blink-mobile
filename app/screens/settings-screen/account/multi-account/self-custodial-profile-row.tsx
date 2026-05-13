@@ -24,7 +24,9 @@ import { hasFunds } from "@app/utils/has-funds"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
-import { useDeleteSelfCustodial } from "./hooks/use-delete-self-custodial"
+import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
+
+import { navigateAfterAccountDelete } from "../../self-custodial/navigate-after-account-delete"
 
 type SelfCustodialProfileRowProps = {
   entry: SelfCustodialAccountEntry
@@ -46,7 +48,7 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
   const { activeAccount, setActiveAccountId } = useAccountRegistry()
   const { lightningAddress: liveLightningAddress, wallets: liveWallets } =
     useSelfCustodialWallet()
-  const { state: deleteState, deleteWallet } = useDeleteSelfCustodial()
+  const { state: deleteState, deleteWallet } = useDeleteAccount()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [hasFundsWarningVisible, setHasFundsWarningVisible] = useState(false)
@@ -116,7 +118,8 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
 
   const handleConfirm = async () => {
     setConfirmVisible(false)
-    await deleteWallet(accountId)
+    const outcome = await deleteWallet(accountId)
+    if (outcome) navigateAfterAccountDelete(navigation, outcome)
   }
 
   const dismissHasFundsWarning = () => {
