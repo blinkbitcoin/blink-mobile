@@ -36,10 +36,8 @@ jest.mock("@app/utils/external", () => ({
 }))
 
 jest.mock("@app/screens/spark-onboarding/hooks/use-wallet-mnemonic", () => ({
-  useWalletMnemonicWords: () =>
-    "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain".split(
-      " ",
-    ),
+  useWalletMnemonic: () =>
+    "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain",
 }))
 
 describe("useViewBackupPhrase", () => {

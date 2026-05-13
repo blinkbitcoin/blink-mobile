@@ -26,9 +26,3 @@ export const useWalletMnemonic = (): string => {
 
   return mnemonic
 }
-
-export const useWalletMnemonicWords = (): readonly string[] => {
-  const mnemonic = useWalletMnemonic()
-  if (!mnemonic) return []
-  return mnemonic.split(" ")
-}
