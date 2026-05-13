@@ -2,8 +2,6 @@ import { DefaultAccountId } from "@app/types/wallet"
 
 import { PersistentState } from "./state-migrations"
 
-export const DEFAULT_DISPLAY_CURRENCY = "USD"
-
 const resolveActiveSelfCustodialId = (state: PersistentState): string | null => {
   const id = state.activeAccountId
   if (!id || id === DefaultAccountId.Custodial) return null
@@ -12,8 +10,8 @@ const resolveActiveSelfCustodialId = (state: PersistentState): string | null => 
 
 export const getSelfCustodialDisplayCurrency = (state: PersistentState): string => {
   const id = resolveActiveSelfCustodialId(state)
-  if (!id) return DEFAULT_DISPLAY_CURRENCY
-  return state.selfCustodialDisplayCurrencyByAccountId?.[id] ?? DEFAULT_DISPLAY_CURRENCY
+  if (!id) return "USD"
+  return state.selfCustodialDisplayCurrencyByAccountId?.[id] ?? "USD"
 }
 
 export const withSelfCustodialDisplayCurrency = (

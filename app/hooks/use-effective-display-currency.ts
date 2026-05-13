@@ -8,7 +8,6 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
-  DEFAULT_DISPLAY_CURRENCY,
   getSelfCustodialDisplayCurrency,
   withSelfCustodialDisplayCurrency,
 } from "@app/store/persistent-state/self-custodial-display-currency"
@@ -62,8 +61,7 @@ export const useEffectiveDisplayCurrency = (): EffectiveDisplayCurrencyReturn =>
   }
 
   return {
-    displayCurrency:
-      data?.me?.defaultAccount?.displayCurrency ?? DEFAULT_DISPLAY_CURRENCY,
+    displayCurrency: data?.me?.defaultAccount?.displayCurrency ?? "USD",
     setDisplayCurrency: setDisplayCurrencyCustodial,
     loading: queryLoading || mutationLoading,
   }
