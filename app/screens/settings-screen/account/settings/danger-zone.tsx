@@ -9,9 +9,10 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { AccountType } from "@app/types/wallet"
 
+import { DeleteAccount } from "../../self-custodial/delete-account"
+
 import { Delete } from "./delete"
 import { LogOut } from "./logout"
-import { SelfCustodialDelete } from "./self-custodial-delete"
 
 export const DangerZoneSettings: React.FC = () => {
   const { LL } = useI18nContext()
@@ -34,7 +35,7 @@ export const DangerZoneSettings: React.FC = () => {
         </Text>
       </TouchableOpacity>
       {isSelfCustodial
-        ? expanded && <SelfCustodialDelete />
+        ? expanded && <DeleteAccount />
         : expanded && (
             <>
               {isAtLeastLevelOne && <LogOut />}

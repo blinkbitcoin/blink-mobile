@@ -14,12 +14,13 @@ import { AccountType } from "@app/types/wallet"
 import { hasFunds } from "@app/utils/has-funds"
 import { testProps } from "@app/utils/testProps"
 
-import { DeleteAccountConfirmModal } from "../../self-custodial/delete-account-confirm-modal"
-import { DeleteAccountHasFundsModal } from "../../self-custodial/delete-account-has-funds-modal"
-import { navigateAfterAccountDelete } from "../../self-custodial/navigate-after-account-delete"
-import { SettingsButton } from "../../button"
+import { SettingsButton } from "../button"
 
-export const SelfCustodialDelete: React.FC = () => {
+import { DeleteAccountConfirmModal } from "./delete-account-confirm-modal"
+import { DeleteAccountHasFundsModal } from "./delete-account-has-funds-modal"
+import { navigateAfterAccountDelete } from "./navigate-after-account-delete"
+
+export const DeleteAccount: React.FC = () => {
   const styles = useStyles()
   const {
     theme: { colors },
