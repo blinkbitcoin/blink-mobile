@@ -3,15 +3,15 @@ import { View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { testProps } from "@app/utils/testProps"
 
-import { GaloyIcon } from "../atomic/galoy-icon"
-import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
-import { Screen } from "../screen"
+import { useSelfCustodialWallet } from "../providers/wallet"
 
-export const SelfCustodialPaymentOfflineNotice: React.FC = () => {
+export const PaymentOfflineNotice: React.FC = () => {
   const styles = useStyles()
   const {
     theme: { colors },
@@ -25,10 +25,7 @@ export const SelfCustodialPaymentOfflineNotice: React.FC = () => {
 
   return (
     <Screen>
-      <View
-        style={styles.container}
-        {...testProps("self-custodial-payment-offline-notice")}
-      >
+      <View style={styles.container} {...testProps("payment-offline-notice")}>
         <View style={styles.iconWrapper}>
           <GaloyIcon name="warning" size={48} color={colors.warning} />
         </View>
@@ -42,7 +39,7 @@ export const SelfCustodialPaymentOfflineNotice: React.FC = () => {
           title={LL.SelfCustodialOffline.retry()}
           onPress={handleRetry}
           containerStyle={styles.retryButton}
-          {...testProps("self-custodial-payment-offline-retry")}
+          {...testProps("payment-offline-retry")}
         />
       </View>
     </Screen>
