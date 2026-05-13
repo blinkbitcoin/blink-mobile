@@ -10,8 +10,8 @@ import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { DeleteAccountConfirmModal } from "@app/screens/settings-screen/self-custodial/delete-account-confirm-modal"
-import { DeleteAccountHasFundsModal } from "@app/screens/settings-screen/self-custodial/delete-account-has-funds-modal"
+import { DeleteAccountConfirmModal } from "./delete-account-confirm-modal"
+import { DeleteAccountHasFundsModal } from "./delete-account-has-funds-modal"
 import {
   probeSelfCustodialAccountWallets,
   ProbeAccountWalletsStatus,
@@ -26,17 +26,14 @@ import { toastShow } from "@app/utils/toast"
 
 import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
 
-import { navigateAfterAccountDelete } from "../../self-custodial/navigate-after-account-delete"
+import { navigateAfterAccountDelete } from "./navigate-after-account-delete"
 
-type SelfCustodialProfileRowProps = {
+type ProfileRowProps = {
   entry: SelfCustodialAccountEntry
   isFirstItem?: boolean
 }
 
-export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = ({
-  entry,
-  isFirstItem,
-}) => {
+export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) => {
   const { id: accountId, lightningAddress: persistedLightningAddress } = entry
   const styles = useStyles()
   const {
@@ -84,7 +81,7 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
   }
 
   const surfaceProbeFailure = (err: Error) => {
-    reportError("self-custodial-profile-row probeBalance", err)
+    reportError("profile-row probeBalance", err)
     toastShow({
       type: "error",
       message: LL.AccountScreen.probeBalanceFailed(),
@@ -129,10 +126,7 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
 
   return (
     <>
-      <TouchableOpacity
-        onPress={handleSwitch}
-        {...testProps(`self-custodial-profile-row-${accountId}`)}
-      >
+      <TouchableOpacity onPress={handleSwitch} {...testProps(`profile-row-${accountId}`)}>
         <ListItem
           bottomDivider
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
@@ -154,7 +148,7 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
             <ActivityIndicator
               size="small"
               color={colors.primary}
-              {...testProps(`self-custodial-probe-spinner-${accountId}`)}
+              {...testProps(`probe-spinner-${accountId}`)}
             />
           ) : (
             <GaloyIconButton
@@ -162,7 +156,7 @@ export const SelfCustodialProfileRow: React.FC<SelfCustodialProfileRowProps> = (
               size="small"
               onPress={handleRemovePress}
               backgroundColor={colors.grey4}
-              {...testProps(`self-custodial-delete-button-${accountId}`)}
+              {...testProps(`delete-button-${accountId}`)}
             />
           )}
         </ListItem>

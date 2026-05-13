@@ -3,7 +3,7 @@ import { fireEvent, render } from "@testing-library/react-native"
 
 import { AccountStatus, AccountType } from "@app/types/wallet"
 
-import { SelfCustodialProfileRow } from "@app/screens/settings-screen/account/multi-account/self-custodial-profile-row"
+import { ProfileRow } from "@app/screens/settings-screen/self-custodial/profile-row"
 
 const TEST_ENTRY_ID = "test-account-id"
 
@@ -194,7 +194,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 
 const setActiveAccountId = jest.fn()
 
-describe("SelfCustodialProfileRow", () => {
+describe("ProfileRow", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     lastConfirmModalProps.isVisible = undefined
@@ -219,9 +219,7 @@ describe("SelfCustodialProfileRow", () => {
 
   it("renders the lightning address as the row title when one is set", () => {
     const { getByText } = render(
-      <SelfCustodialProfileRow
-        entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@example.com" }}
-      />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@example.com" }} />,
     )
 
     expect(getByText("alice@example.com")).toBeTruthy()
@@ -229,7 +227,7 @@ describe("SelfCustodialProfileRow", () => {
 
   it("falls back to anonymous user label when no lightning address is set", () => {
     const { getByText } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
 
     expect(getByText("Anonymous user")).toBeTruthy()
@@ -237,10 +235,10 @@ describe("SelfCustodialProfileRow", () => {
 
   it("switches to the entry's account id when the row is pressed", () => {
     const { getByTestId } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
 
-    fireEvent.press(getByTestId(`self-custodial-profile-row-${TEST_ENTRY_ID}`))
+    fireEvent.press(getByTestId(`profile-row-${TEST_ENTRY_ID}`))
 
     expect(setActiveAccountId).toHaveBeenCalledWith(TEST_ENTRY_ID)
     expect(mockToastShow).toHaveBeenCalledWith(
@@ -262,10 +260,10 @@ describe("SelfCustodialProfileRow", () => {
     })
 
     const { getByTestId } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
 
-    fireEvent.press(getByTestId(`self-custodial-profile-row-${TEST_ENTRY_ID}`))
+    fireEvent.press(getByTestId(`profile-row-${TEST_ENTRY_ID}`))
 
     expect(setActiveAccountId).not.toHaveBeenCalled()
     expect(mockToastShow).not.toHaveBeenCalled()
@@ -275,12 +273,12 @@ describe("SelfCustodialProfileRow", () => {
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
 
     const { getByTestId, queryByTestId, findByTestId } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
 
     expect(queryByTestId("delete-modal")).toBeNull()
 
-    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
     expect(mockProbeWallets).toHaveBeenCalledWith(TEST_ENTRY_ID)
@@ -291,13 +289,13 @@ describe("SelfCustodialProfileRow", () => {
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
     const entry = { id: TEST_ENTRY_ID, lightningAddress: null }
     const { getByTestId, queryByTestId, findByTestId, rerender } = render(
-      <SelfCustodialProfileRow entry={entry} />,
+      <ProfileRow entry={entry} />,
     )
-    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
     await findByTestId("delete-modal")
 
     await lastConfirmModalProps.onConfirm?.()
-    rerender(<SelfCustodialProfileRow entry={entry} />)
+    rerender(<ProfileRow entry={entry} />)
 
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
     expect(mockDeleteWallet).toHaveBeenCalledWith(TEST_ENTRY_ID)
@@ -318,9 +316,9 @@ describe("SelfCustodialProfileRow", () => {
     })
 
     const { getByTestId, queryByTestId, findByTestId } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
-    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("warning-modal")).toBeTruthy()
     expect(queryByTestId("delete-modal")).toBeNull()
@@ -341,9 +339,9 @@ describe("SelfCustodialProfileRow", () => {
     })
 
     const { getByTestId, queryByTestId, findByTestId } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
-    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
     expect(queryByTestId("warning-modal")).toBeNull()
@@ -356,9 +354,9 @@ describe("SelfCustodialProfileRow", () => {
     })
 
     const { getByTestId, queryByTestId } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
-    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     await new Promise((resolve) => {
       setTimeout(resolve, 20)
@@ -378,9 +376,9 @@ describe("SelfCustodialProfileRow", () => {
     mockProbeWallets.mockResolvedValue({ status: "no-mnemonic" })
 
     const { getByTestId, findByTestId } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
-    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
   })
@@ -409,9 +407,9 @@ describe("SelfCustodialProfileRow", () => {
     })
 
     const { getByTestId, findByTestId } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
-    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("warning-modal")).toBeTruthy()
     expect(mockProbeWallets).not.toHaveBeenCalled()
@@ -442,9 +440,9 @@ describe("SelfCustodialProfileRow", () => {
     })
 
     const { getByTestId, findByTestId } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
-    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
     expect(mockProbeWallets).not.toHaveBeenCalled()
@@ -460,16 +458,16 @@ describe("SelfCustodialProfileRow", () => {
     )
 
     const { getByTestId, queryByTestId, findByTestId } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
-    fireEvent.press(getByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`))
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
-    expect(getByTestId(`self-custodial-probe-spinner-${TEST_ENTRY_ID}`)).toBeTruthy()
-    expect(queryByTestId(`self-custodial-delete-button-${TEST_ENTRY_ID}`)).toBeNull()
+    expect(getByTestId(`probe-spinner-${TEST_ENTRY_ID}`)).toBeTruthy()
+    expect(queryByTestId(`delete-button-${TEST_ENTRY_ID}`)).toBeNull()
 
     resolveProbe({ status: "ok", wallets: [] })
     await findByTestId("delete-modal")
-    expect(queryByTestId(`self-custodial-probe-spinner-${TEST_ENTRY_ID}`)).toBeNull()
+    expect(queryByTestId(`probe-spinner-${TEST_ENTRY_ID}`)).toBeNull()
   })
 
   it("renders the deleting overlay when the delete hook is in deleting state", () => {
@@ -479,7 +477,7 @@ describe("SelfCustodialProfileRow", () => {
     })
 
     const { getByTestId } = render(
-      <SelfCustodialProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
 
     expect(getByTestId("delete-overlay")).toBeTruthy()
@@ -502,9 +500,7 @@ describe("SelfCustodialProfileRow", () => {
     })
 
     const { getByText } = render(
-      <SelfCustodialProfileRow
-        entry={{ id: TEST_ENTRY_ID, lightningAddress: "stale@example.com" }}
-      />,
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "stale@example.com" }} />,
     )
 
     expect(getByText("magentamouse1845@breez.tips")).toBeTruthy()
@@ -517,7 +513,7 @@ describe("SelfCustodialProfileRow", () => {
     })
 
     const { getByText } = render(
-      <SelfCustodialProfileRow
+      <ProfileRow
         entry={{ id: TEST_ENTRY_ID, lightningAddress: "stored@example.com" }}
       />,
     )
