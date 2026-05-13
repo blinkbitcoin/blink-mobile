@@ -31,6 +31,7 @@ import { AppStateWrapper } from "./navigation/app-state"
 import { NavigationContainerWrapper } from "./navigation/navigation-container-wrapper"
 import { RootStack } from "./navigation/root-navigator"
 import { ErrorScreen } from "./screens/error-screen"
+import { NwcConnectionsProvider } from "./screens/nostr-wallet-connect"
 import { PersistentStateProvider } from "./store/persistent-state"
 import { detectDefaultLocale } from "./utils/locale-detector"
 import "./utils/logs"
@@ -62,7 +63,9 @@ export const App = () => (
                         <NotificationsProvider>
                           <AppStateWrapper />
                           <PushNotificationComponent />
-                          <RootStack />
+                          <NwcConnectionsProvider>
+                            <RootStack />
+                          </NwcConnectionsProvider>
                           <NetworkErrorComponent />
                           <ActionModals />
                         </NotificationsProvider>

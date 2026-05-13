@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "Anda akan dilog keluar dari sesi yang dikaitkan dengan {identifier: string}.\nPastikan anda mempunyai akses untuk log masuk semula pada masa hadapan.",
     "logoutOneAccountConfirm": "Saya faham. Sila log keluar.",
     "receiveCurrency": "Mata wang penerimaan",
-    "displayCurrency": "Mata wang paparan"
+    "displayCurrency": "Mata wang paparan",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Tetapan Notifikasi",
@@ -3470,5 +3471,24 @@
         "buttonText": "Tutup"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Sambungkan Blink ke aplikasi lain melalui NWC",
+    "newConnection": "Sambungan baharu",
+    "connectWallet": "Sambungkan dompet",
+    "appNameLabel": "Nama aplikasi yang ingin anda sambungkan",
+    "appNamePlaceholder": "Nama aplikasi",
+    "dailyBudget": "Bajet harian",
+    "connectionCreated": "Sambungan dibuat",
+    "nwcConnectionString": "Rentetan sambungan NWC",
+    "copyInstruction": "Salin rentetan ini dan tampalkan ke dalam aplikasi yang ingin anda sambungkan.",
+    "nwcStringCopied": "Rentetan sambungan NWC disalin ke papan keratan",
+    "done": "Selesai",
+    "connectedApps": "Aplikasi bersambung",
+    "budget": "Bajet: {amount}",
+    "doNotNotifyBelow": "Jangan maklumkan untuk transaksi di bawah",
+    "deleteConfirmTitle": "Adakah anda pasti?",
+    "deleteConfirmBody": "Adakah anda benar-benar mahu membatalkan sambungan ke {appName}?",
+    "dismiss": "Tolak"
   }
 }

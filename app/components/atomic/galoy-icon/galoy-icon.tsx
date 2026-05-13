@@ -102,6 +102,10 @@ import QrCode from "@app/assets/icons-redesign/qr-code.svg"
 import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
 import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
 import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
+import AppGridCircle from "@app/assets/icons/app-grid-circle.svg"
+import BlinkBitcoinCircle from "@app/assets/icons/blink-bitcoin-circle.svg"
+import Chain from "@app/assets/icons/chain.svg"
+import NostrWalletConnect from "@app/assets/icons/nostr-wallet-connect.svg"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -226,6 +230,10 @@ const customSvgMap = {
   "btc-hand": BtcHand,
   "check-badge": CheckBadge,
   "heart-outline": HeartOutline,
+  "app-grid-circle": AppGridCircle,
+  "blink-bitcoin-circle": BlinkBitcoinCircle,
+  "chain": Chain,
+  "nostr-wallet-connect": NostrWalletConnect,
 } as const
 
 export const icons = { ...phosphorIconMap, ...customSvgMap } as const

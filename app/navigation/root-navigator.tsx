@@ -117,6 +117,13 @@ import {
   CardApprovedScreen,
 } from "@app/screens/card-screen/onboarding"
 import {
+  NwcEmptyStateScreen,
+  NwcNewConnectionFormScreen,
+  NwcConnectionCreatedScreen,
+  NwcConnectedAppsListScreen,
+  NwcAuthorizationScreen,
+} from "@app/screens/nostr-wallet-connect"
+import {
   WelcomeLevel1Screen,
   EmailBenefitsScreen,
   LightningBenefitsScreen,
@@ -689,6 +696,31 @@ export const RootStack = () => {
           title: LL.CardFlow.CardStatus.title(),
           headerRight: headerCloseControl(),
         }}
+      />
+      <RootNavigator.Screen
+        name="nwcEmptyState"
+        component={NwcEmptyStateScreen}
+        options={{ title: LL.SettingsScreen.nostrWalletConnect() }}
+      />
+      <RootNavigator.Screen
+        name="nwcNewConnection"
+        component={NwcNewConnectionFormScreen}
+        options={{ title: LL.SettingsScreen.nostrWalletConnect() }}
+      />
+      <RootNavigator.Screen
+        name="nwcConnectionCreated"
+        component={NwcConnectionCreatedScreen}
+        options={{ title: LL.SettingsScreen.nostrWalletConnect() }}
+      />
+      <RootNavigator.Screen
+        name="nwcConnectedApps"
+        component={NwcConnectedAppsListScreen}
+        options={{ title: LL.SettingsScreen.nostrWalletConnect() }}
+      />
+      <RootNavigator.Screen
+        name="nwcAuthorization"
+        component={NwcAuthorizationScreen}
+        options={{ title: LL.SettingsScreen.nostrWalletConnect() }}
       />
     </RootNavigator.Navigator>
   )

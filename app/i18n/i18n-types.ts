@@ -7427,6 +7427,10 @@ type RootTranslation = {
 		 */
 		apiAcess: string
 		/**
+		 * N​o​s​t​r​ ​W​a​l​l​e​t​ ​C​o​n​n​e​c​t
+		 */
+		nostrWalletConnect: string
+		/**
 		 * A​P​I​ ​d​o​c​u​m​e​n​t​a​t​i​o​n
 		 */
 		apiDocumentation: string
@@ -11283,6 +11287,288 @@ type RootTranslation = {
 		 * Y​o​u​ ​d​o​n​'​t​ ​h​a​v​e​ ​a​n​y​ ​n​o​t​i​f​i​c​a​t​i​o​n​s​ ​r​i​g​h​t​ ​n​o​w
 		 */
 		noNotifications: string
+	}
+	NostrWalletConnect: {
+		/**
+		 * C​o​n​n​e​c​t​ ​B​l​i​n​k​ ​t​o​ ​o​t​h​e​r​ ​a​p​p​s​ ​v​i​a​ ​N​W​C
+		 */
+		emptyStateHeadline: string
+		/**
+		 * N​e​w​ ​c​o​n​n​e​c​t​i​o​n
+		 */
+		newConnection: string
+		/**
+		 * C​o​n​n​e​c​t​ ​w​a​l​l​e​t
+		 */
+		connectWallet: string
+		/**
+		 * N​a​m​e​ ​o​f​ ​a​p​p​ ​y​o​u​ ​w​i​s​h​ ​t​o​ ​c​o​n​n​e​c​t
+		 */
+		appNameLabel: string
+		/**
+		 * A​p​p​ ​n​a​m​e
+		 */
+		appNamePlaceholder: string
+		/**
+		 * D​a​i​l​y​ ​b​u​d​g​e​t
+		 */
+		dailyBudget: string
+		/**
+		 * C​u​s​t​o​m
+		 */
+		customBudget: string
+		/**
+		 * C​u​s​t​o​m​ ​b​u​d​g​e​t
+		 */
+		customBudgetLabel: string
+		/**
+		 * S​e​t​ ​b​u​d​g​e​t
+		 */
+		setBudget: string
+		/**
+		 * N​o​ ​b​u​d​g​e​t​ ​l​i​m​i​t​s​ ​s​e​t
+		 */
+		noBudgetLimits: string
+		/**
+		 * {​c​o​u​n​t​}​ ​b​u​d​g​e​t​ ​l​i​m​i​t​(​s​)​ ​s​e​t
+		 * @param {number} count
+		 */
+		budgetLimitsSet: RequiredParams<'count'>
+		/**
+		 * P​e​r​m​i​s​s​i​o​n​s
+		 */
+		permissions: string
+		/**
+		 * R​e​c​e​i​v​e​-​o​n​l​y
+		 */
+		permissionReceiveOnly: string
+		/**
+		 * R​e​a​d​ ​h​i​s​t​o​r​y
+		 */
+		permissionReadHistory: string
+		/**
+		 * M​a​k​e​ ​p​a​y​m​e​n​t​s
+		 */
+		permissionMakePayments: string
+		/**
+		 * C​o​n​n​e​c​t​i​o​n​ ​c​r​e​a​t​e​d
+		 */
+		connectionCreated: string
+		/**
+		 * N​W​C​ ​c​o​n​n​e​c​t​i​o​n​ ​s​t​r​i​n​g
+		 */
+		nwcConnectionString: string
+		/**
+		 * C​o​p​y​ ​t​h​i​s​ ​s​t​r​i​n​g​ ​a​n​d​ ​p​a​s​t​e​ ​i​t​ ​i​n​t​o​ ​t​h​e​ ​a​p​p​ ​y​o​u​ ​w​i​s​h​ ​t​o​ ​c​o​n​n​e​c​t​ ​t​o​.
+		 */
+		copyInstruction: string
+		/**
+		 * N​W​C​ ​c​o​n​n​e​c​t​i​o​n​ ​s​t​r​i​n​g​ ​c​o​p​i​e​d​ ​i​n​t​o​ ​c​l​i​p​b​o​a​r​d
+		 */
+		nwcStringCopied: string
+		/**
+		 * D​o​n​e
+		 */
+		done: string
+		/**
+		 * C​o​n​n​e​c​t​e​d​ ​a​p​p​s
+		 */
+		connectedApps: string
+		/**
+		 * B​u​d​g​e​t​:​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		budget: RequiredParams<'amount'>
+		/**
+		 * D​o​ ​n​o​t​ ​n​o​t​i​f​y​ ​f​o​r​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​b​e​l​o​w
+		 */
+		doNotNotifyBelow: string
+		/**
+		 * A​r​e​ ​y​o​u​ ​s​u​r​e​?
+		 */
+		deleteConfirmTitle: string
+		/**
+		 * D​o​ ​y​o​u​ ​r​e​a​l​l​y​ ​w​a​n​t​ ​t​o​ ​r​e​v​o​k​e​ ​c​o​n​n​e​c​t​i​o​n​ ​t​o​ ​{​a​p​p​N​a​m​e​}​?
+		 * @param {string} appName
+		 */
+		deleteConfirmBody: RequiredParams<'appName'>
+		/**
+		 * D​i​s​m​i​s​s
+		 */
+		dismiss: string
+		/**
+		 * C​o​n​n​e​c​t​ ​{​a​p​p​N​a​m​e​}
+		 * @param {string} appName
+		 */
+		authorizationAppTitle: RequiredParams<'appName'>
+		/**
+		 * A​p​p​ ​i​d​e​n​t​i​f​i​e​r
+		 */
+		appIdentifier: string
+		/**
+		 * W​i​l​l​ ​b​e​ ​a​b​l​e​ ​t​o
+		 */
+		willBeAbleTo: string
+		/**
+		 * W​i​l​l​ ​N​O​T​ ​b​e​ ​a​b​l​e​ ​t​o
+		 */
+		willNotBeAbleTo: string
+		/**
+		 * R​e​q​u​e​s​t​ ​w​a​l​l​e​t​ ​i​n​f​o
+		 */
+		permissionGetInfo: string
+		/**
+		 * V​i​e​w​ ​y​o​u​r​ ​b​a​l​a​n​c​e
+		 */
+		permissionGetBalance: string
+		/**
+		 * C​r​e​a​t​e​ ​i​n​v​o​i​c​e​s
+		 */
+		permissionMakeInvoice: string
+		/**
+		 * P​a​y​ ​i​n​v​o​i​c​e​s​ ​f​r​o​m​ ​y​o​u​r​ ​w​a​l​l​e​t
+		 */
+		permissionPayInvoice: string
+		/**
+		 * L​o​o​k​ ​u​p​ ​i​n​v​o​i​c​e​s
+		 */
+		permissionLookupInvoice: string
+		/**
+		 * V​i​e​w​ ​t​r​a​n​s​a​c​t​i​o​n​s
+		 */
+		permissionListTransactions: string
+		/**
+		 * R​e​c​e​i​v​e​ ​p​a​y​m​e​n​t​ ​s​e​n​t​ ​n​o​t​i​f​i​c​a​t​i​o​n​s
+		 */
+		permissionNotificationsPaymentSent: string
+		/**
+		 * R​e​c​e​i​v​e​ ​p​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d​ ​n​o​t​i​f​i​c​a​t​i​o​n​s
+		 */
+		permissionNotificationsPaymentReceived: string
+		/**
+		 * A​c​c​e​s​s​ ​y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​p​h​r​a​s​e​ ​o​r​ ​p​r​i​v​a​t​e​ ​k​e​y​s
+		 */
+		permissionNoKeys: string
+		/**
+		 * C​h​a​n​g​e​ ​y​o​u​r​ ​B​l​i​n​k​ ​s​e​c​u​r​i​t​y​ ​s​e​t​t​i​n​g​s
+		 */
+		permissionNoSecurityChanges: string
+		/**
+		 * S​p​e​n​d​ ​a​b​o​v​e​ ​t​h​e​ ​b​u​d​g​e​t​ ​y​o​u​ ​s​e​t
+		 */
+		permissionNoOverBudget: string
+		/**
+		 * B​u​d​g​e​t​ ​a​m​o​u​n​t
+		 */
+		budgetAmount: string
+		/**
+		 * B​u​d​g​e​t​ ​p​e​r​i​o​d
+		 */
+		budgetPeriod: string
+		/**
+		 * {​a​m​o​u​n​t​}​ ​p​e​r​ ​{​p​e​r​i​o​d​}
+		 * @param {string} amount
+		 * @param {string} period
+		 */
+		budgetPreview: RequiredParams<'amount' | 'period'>
+		/**
+		 * T​h​i​s​ ​b​u​d​g​e​t​ ​i​s​ ​h​i​g​h​e​r​ ​t​h​a​n​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​B​i​t​c​o​i​n​ ​b​a​l​a​n​c​e​.
+		 */
+		budgetExceedsBalanceWarning: string
+		/**
+		 * D​a​i​l​y
+		 */
+		periodDaily: string
+		/**
+		 * W​e​e​k​l​y
+		 */
+		periodWeekly: string
+		/**
+		 * M​o​n​t​h​l​y
+		 */
+		periodMonthly: string
+		/**
+		 * A​n​n​u​a​l​l​y
+		 */
+		periodAnnually: string
+		/**
+		 * N​e​v​e​r
+		 */
+		periodNever: string
+		/**
+		 * A​u​t​h​o​r​i​z​e
+		 */
+		authorize: string
+		/**
+		 * I​n​v​a​l​i​d​ ​c​o​n​n​e​c​t​i​o​n​ ​r​e​q​u​e​s​t
+		 */
+		invalidConnectionRequest: string
+		/**
+		 * T​h​i​s​ ​N​o​s​t​r​ ​W​a​l​l​e​t​ ​C​o​n​n​e​c​t​ ​l​i​n​k​ ​i​s​ ​m​a​l​f​o​r​m​e​d​.
+		 */
+		invalidNwcUri: string
+		/**
+		 * T​h​i​s​ ​c​o​n​n​e​c​t​i​o​n​ ​r​e​q​u​e​s​t​ ​h​a​s​ ​a​n​ ​i​n​v​a​l​i​d​ ​w​a​l​l​e​t​ ​p​u​b​k​e​y​.
+		 */
+		invalidNwcPubkey: string
+		/**
+		 * T​h​i​s​ ​c​o​n​n​e​c​t​i​o​n​ ​r​e​q​u​e​s​t​ ​i​s​ ​m​i​s​s​i​n​g​ ​a​ ​r​e​l​a​y​.
+		 */
+		missingNwcRelay: string
+		/**
+		 * T​h​i​s​ ​c​o​n​n​e​c​t​i​o​n​ ​r​e​q​u​e​s​t​ ​h​a​s​ ​a​n​ ​i​n​v​a​l​i​d​ ​r​e​l​a​y​.
+		 */
+		invalidNwcRelay: string
+		/**
+		 * T​h​i​s​ ​c​o​n​n​e​c​t​i​o​n​ ​r​e​q​u​e​s​t​ ​i​s​ ​m​i​s​s​i​n​g​ ​a​ ​s​e​c​r​e​t​.
+		 */
+		missingNwcSecret: string
+		/**
+		 * T​h​i​s​ ​c​o​n​n​e​c​t​i​o​n​ ​r​e​q​u​e​s​t​ ​i​n​c​l​u​d​e​s​ ​p​e​r​m​i​s​s​i​o​n​s​ ​B​l​i​n​k​ ​d​o​e​s​ ​n​o​t​ ​s​u​p​p​o​r​t​ ​y​e​t​.
+		 */
+		unsupportedNwcPermissions: string
+		/**
+		 * T​h​i​s​ ​a​p​p​ ​i​s​ ​a​l​r​e​a​d​y​ ​c​o​n​n​e​c​t​e​d​.
+		 */
+		connectionAlreadyExists: string
+		/**
+		 * C​a​n​n​o​t​ ​r​e​a​c​h​ ​c​o​n​n​e​c​t​i​o​n​ ​s​e​r​v​e​r​.​ ​C​h​e​c​k​ ​i​n​t​e​r​n​e​t​.
+		 */
+		connectionRelayUnreachable: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​c​o​n​n​e​c​t​ ​r​i​g​h​t​ ​n​o​w​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		connectionNetworkError: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​c​r​e​a​t​e​ ​t​h​i​s​ ​c​o​n​n​e​c​t​i​o​n​.​ ​T​r​y​ ​a​g​a​i​n​.
+		 */
+		connectionCreateFailed: string
+		/**
+		 * R​e​t​r​y
+		 */
+		retry: string
+		/**
+		 * R​e​p​l​a​c​e​ ​c​o​n​n​e​c​t​i​o​n
+		 */
+		replaceConnection: string
+		/**
+		 * {​a​p​p​N​a​m​e​}​ ​i​s​ ​c​o​n​n​e​c​t​e​d
+		 * @param {string} appName
+		 */
+		authorizationSuccessTitle: RequiredParams<'appName'>
+		/**
+		 * {​a​p​p​N​a​m​e​}​ ​c​a​n​ ​n​o​w​ ​u​s​e​ ​t​h​e​ ​p​e​r​m​i​s​s​i​o​n​s​ ​y​o​u​ ​a​p​p​r​o​v​e​d​.
+		 * @param {string} appName
+		 */
+		authorizationSuccessBody: RequiredParams<'appName'>
+		/**
+		 * A​u​t​h​o​r​i​z​e​d​ ​s​u​m​m​a​r​y
+		 */
+		authorizationSummary: string
+		/**
+		 * Y​o​u​'​r​e​ ​r​e​a​d​y​ ​t​o​ ​e​a​r​n​ ​r​e​w​a​r​d​s​!
+		 */
+		satsbackReady: string
 	}
 }
 
@@ -18629,6 +18915,10 @@ export type TranslationFunctions = {
 		 */
 		apiAcess: () => LocalizedString
 		/**
+		 * Nostr Wallet Connect
+		 */
+		nostrWalletConnect: () => LocalizedString
+		/**
 		 * API documentation
 		 */
 		apiDocumentation: () => LocalizedString
@@ -22423,6 +22713,280 @@ export type TranslationFunctions = {
 		 * You don't have any notifications right now
 		 */
 		noNotifications: () => LocalizedString
+	}
+	NostrWalletConnect: {
+		/**
+		 * Connect Blink to other apps via NWC
+		 */
+		emptyStateHeadline: () => LocalizedString
+		/**
+		 * New connection
+		 */
+		newConnection: () => LocalizedString
+		/**
+		 * Connect wallet
+		 */
+		connectWallet: () => LocalizedString
+		/**
+		 * Name of app you wish to connect
+		 */
+		appNameLabel: () => LocalizedString
+		/**
+		 * App name
+		 */
+		appNamePlaceholder: () => LocalizedString
+		/**
+		 * Daily budget
+		 */
+		dailyBudget: () => LocalizedString
+		/**
+		 * Custom
+		 */
+		customBudget: () => LocalizedString
+		/**
+		 * Custom budget
+		 */
+		customBudgetLabel: () => LocalizedString
+		/**
+		 * Set budget
+		 */
+		setBudget: () => LocalizedString
+		/**
+		 * No budget limits set
+		 */
+		noBudgetLimits: () => LocalizedString
+		/**
+		 * {count} budget limit(s) set
+		 */
+		budgetLimitsSet: (arg: { count: number }) => LocalizedString
+		/**
+		 * Permissions
+		 */
+		permissions: () => LocalizedString
+		/**
+		 * Receive-only
+		 */
+		permissionReceiveOnly: () => LocalizedString
+		/**
+		 * Read history
+		 */
+		permissionReadHistory: () => LocalizedString
+		/**
+		 * Make payments
+		 */
+		permissionMakePayments: () => LocalizedString
+		/**
+		 * Connection created
+		 */
+		connectionCreated: () => LocalizedString
+		/**
+		 * NWC connection string
+		 */
+		nwcConnectionString: () => LocalizedString
+		/**
+		 * Copy this string and paste it into the app you wish to connect to.
+		 */
+		copyInstruction: () => LocalizedString
+		/**
+		 * NWC connection string copied into clipboard
+		 */
+		nwcStringCopied: () => LocalizedString
+		/**
+		 * Done
+		 */
+		done: () => LocalizedString
+		/**
+		 * Connected apps
+		 */
+		connectedApps: () => LocalizedString
+		/**
+		 * Budget: {amount}
+		 */
+		budget: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Do not notify for transactions below
+		 */
+		doNotNotifyBelow: () => LocalizedString
+		/**
+		 * Are you sure?
+		 */
+		deleteConfirmTitle: () => LocalizedString
+		/**
+		 * Do you really want to revoke connection to {appName}?
+		 */
+		deleteConfirmBody: (arg: { appName: string }) => LocalizedString
+		/**
+		 * Dismiss
+		 */
+		dismiss: () => LocalizedString
+		/**
+		 * Connect {appName}
+		 */
+		authorizationAppTitle: (arg: { appName: string }) => LocalizedString
+		/**
+		 * App identifier
+		 */
+		appIdentifier: () => LocalizedString
+		/**
+		 * Will be able to
+		 */
+		willBeAbleTo: () => LocalizedString
+		/**
+		 * Will NOT be able to
+		 */
+		willNotBeAbleTo: () => LocalizedString
+		/**
+		 * Request wallet info
+		 */
+		permissionGetInfo: () => LocalizedString
+		/**
+		 * View your balance
+		 */
+		permissionGetBalance: () => LocalizedString
+		/**
+		 * Create invoices
+		 */
+		permissionMakeInvoice: () => LocalizedString
+		/**
+		 * Pay invoices from your wallet
+		 */
+		permissionPayInvoice: () => LocalizedString
+		/**
+		 * Look up invoices
+		 */
+		permissionLookupInvoice: () => LocalizedString
+		/**
+		 * View transactions
+		 */
+		permissionListTransactions: () => LocalizedString
+		/**
+		 * Receive payment sent notifications
+		 */
+		permissionNotificationsPaymentSent: () => LocalizedString
+		/**
+		 * Receive payment received notifications
+		 */
+		permissionNotificationsPaymentReceived: () => LocalizedString
+		/**
+		 * Access your recovery phrase or private keys
+		 */
+		permissionNoKeys: () => LocalizedString
+		/**
+		 * Change your Blink security settings
+		 */
+		permissionNoSecurityChanges: () => LocalizedString
+		/**
+		 * Spend above the budget you set
+		 */
+		permissionNoOverBudget: () => LocalizedString
+		/**
+		 * Budget amount
+		 */
+		budgetAmount: () => LocalizedString
+		/**
+		 * Budget period
+		 */
+		budgetPeriod: () => LocalizedString
+		/**
+		 * {amount} per {period}
+		 */
+		budgetPreview: (arg: { amount: string, period: string }) => LocalizedString
+		/**
+		 * This budget is higher than your current Bitcoin balance.
+		 */
+		budgetExceedsBalanceWarning: () => LocalizedString
+		/**
+		 * Daily
+		 */
+		periodDaily: () => LocalizedString
+		/**
+		 * Weekly
+		 */
+		periodWeekly: () => LocalizedString
+		/**
+		 * Monthly
+		 */
+		periodMonthly: () => LocalizedString
+		/**
+		 * Annually
+		 */
+		periodAnnually: () => LocalizedString
+		/**
+		 * Never
+		 */
+		periodNever: () => LocalizedString
+		/**
+		 * Authorize
+		 */
+		authorize: () => LocalizedString
+		/**
+		 * Invalid connection request
+		 */
+		invalidConnectionRequest: () => LocalizedString
+		/**
+		 * This Nostr Wallet Connect link is malformed.
+		 */
+		invalidNwcUri: () => LocalizedString
+		/**
+		 * This connection request has an invalid wallet pubkey.
+		 */
+		invalidNwcPubkey: () => LocalizedString
+		/**
+		 * This connection request is missing a relay.
+		 */
+		missingNwcRelay: () => LocalizedString
+		/**
+		 * This connection request has an invalid relay.
+		 */
+		invalidNwcRelay: () => LocalizedString
+		/**
+		 * This connection request is missing a secret.
+		 */
+		missingNwcSecret: () => LocalizedString
+		/**
+		 * This connection request includes permissions Blink does not support yet.
+		 */
+		unsupportedNwcPermissions: () => LocalizedString
+		/**
+		 * This app is already connected.
+		 */
+		connectionAlreadyExists: () => LocalizedString
+		/**
+		 * Cannot reach connection server. Check internet.
+		 */
+		connectionRelayUnreachable: () => LocalizedString
+		/**
+		 * Unable to connect right now. Check your connection and try again.
+		 */
+		connectionNetworkError: () => LocalizedString
+		/**
+		 * Unable to create this connection. Try again.
+		 */
+		connectionCreateFailed: () => LocalizedString
+		/**
+		 * Retry
+		 */
+		retry: () => LocalizedString
+		/**
+		 * Replace connection
+		 */
+		replaceConnection: () => LocalizedString
+		/**
+		 * {appName} is connected
+		 */
+		authorizationSuccessTitle: (arg: { appName: string }) => LocalizedString
+		/**
+		 * {appName} can now use the permissions you approved.
+		 */
+		authorizationSuccessBody: (arg: { appName: string }) => LocalizedString
+		/**
+		 * Authorized summary
+		 */
+		authorizationSummary: () => LocalizedString
+		/**
+		 * You're ready to earn rewards!
+		 */
+		satsbackReady: () => LocalizedString
 	}
 }
 

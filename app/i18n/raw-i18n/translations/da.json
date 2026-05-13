@@ -2341,7 +2341,8 @@
     "logoutOneAccountAlertContent": "Du vil blive logget ud af sessionen knyttet til {identifier: string}.\nSørg for, at du har adgang til at logge ind igen i fremtiden.",
     "logoutOneAccountConfirm": "Jeg forstår. Log venligst ud.",
     "receiveCurrency": "Modtagevaluta",
-    "displayCurrency": "Visningsvaluta"
+    "displayCurrency": "Visningsvaluta",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Notifikationsindstillinger",
@@ -3447,5 +3448,24 @@
         "buttonText": "Luk"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Forbind Blink til andre apps via NWC",
+    "newConnection": "Ny forbindelse",
+    "connectWallet": "Forbind tegnebog",
+    "appNameLabel": "Navn på appen du ønsker at forbinde",
+    "appNamePlaceholder": "Appnavn",
+    "dailyBudget": "Dagligt budget",
+    "connectionCreated": "Forbindelse oprettet",
+    "nwcConnectionString": "NWC-forbindelsesstreng",
+    "copyInstruction": "Kopiér denne streng og indsæt den i appen du ønsker at forbinde.",
+    "nwcStringCopied": "NWC-forbindelsesstreng kopieret til udklipsholder",
+    "done": "Færdig",
+    "connectedApps": "Forbundne apps",
+    "budget": "Budget: {amount}",
+    "doNotNotifyBelow": "Underret ikke for transaktioner under",
+    "deleteConfirmTitle": "Er du sikker?",
+    "deleteConfirmBody": "Vil du virkelig tilbagekalde forbindelsen til {appName}?",
+    "dismiss": "Afvis"
   }
 }

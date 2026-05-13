@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "Budete odhlášeni z relace propojené s {identifier: string}.\nUjistěte se, že máte přístup k opětovnému přihlášení v budoucnu.",
     "logoutOneAccountConfirm": "Rozumím. Prosím odhlaste mě.",
     "receiveCurrency": "Měna příjmu",
-    "displayCurrency": "Měna zobrazení"
+    "displayCurrency": "Měna zobrazení",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Nastavení oznámení",
@@ -3470,5 +3471,24 @@
         "buttonText": "Zavřít"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Připojte Blink k dalším aplikacím přes NWC",
+    "newConnection": "Nové připojení",
+    "connectWallet": "Připojit peněženku",
+    "appNameLabel": "Název aplikace, kterou chcete připojit",
+    "appNamePlaceholder": "Název aplikace",
+    "dailyBudget": "Denní rozpočet",
+    "connectionCreated": "Připojení vytvořeno",
+    "nwcConnectionString": "Řetězec připojení NWC",
+    "copyInstruction": "Zkopírujte tento řetězec a vložte ho do aplikace, kterou chcete připojit.",
+    "nwcStringCopied": "Řetězec připojení NWC zkopírován do schránky",
+    "done": "Hotovo",
+    "connectedApps": "Připojené aplikace",
+    "budget": "Rozpočet: {amount}",
+    "doNotNotifyBelow": "Neupozorňovat na transakce nižší než",
+    "deleteConfirmTitle": "Jste si jistí?",
+    "deleteConfirmBody": "Opravdu chcete zrušit připojení k {appName}?",
+    "dismiss": "Zrušit"
   }
 }
