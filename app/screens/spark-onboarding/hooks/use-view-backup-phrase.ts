@@ -5,10 +5,11 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useClipboard } from "@app/hooks"
-import { useWalletMnemonicWords } from "@app/hooks/use-wallet-mnemonic"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { openExternalUrl } from "@app/utils/external"
+
+import { useWalletMnemonicWords } from "./use-wallet-mnemonic"
 
 import { buildConfirmChallenges } from "../utils"
 

@@ -1,6 +1,9 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
-import { useWalletMnemonic, useWalletMnemonicWords } from "@app/hooks/use-wallet-mnemonic"
+import {
+  useWalletMnemonic,
+  useWalletMnemonicWords,
+} from "@app/screens/spark-onboarding/hooks/use-wallet-mnemonic"
 import { AccountType } from "@app/types/wallet"
 
 const mockGetMnemonicForAccount = jest.fn()

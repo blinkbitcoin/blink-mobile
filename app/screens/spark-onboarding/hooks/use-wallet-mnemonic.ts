@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react"
 
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
-
-import { useAccountRegistry } from "./use-account-registry"
-import { useActiveWallet } from "./use-active-wallet"
 
 export const useWalletMnemonic = (): string => {
   const [mnemonic, setMnemonic] = useState("")

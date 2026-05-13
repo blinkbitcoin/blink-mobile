@@ -35,7 +35,7 @@ jest.mock("@app/utils/external", () => ({
   openExternalUrl: (...args: unknown[]) => mockOpenExternalUrl(...args),
 }))
 
-jest.mock("@app/hooks/use-wallet-mnemonic", () => ({
+jest.mock("@app/screens/spark-onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonicWords: () =>
     "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain".split(
       " ",

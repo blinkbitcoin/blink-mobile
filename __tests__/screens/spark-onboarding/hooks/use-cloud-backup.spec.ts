@@ -44,7 +44,7 @@ jest.mock("@app/utils/crypto", () => ({
   encryptAesGcm: () => ({ data: "ZW5jcnlwdGVk", iv: "aXY=" }),
 }))
 
-jest.mock("@app/hooks/use-wallet-mnemonic", () => ({
+jest.mock("@app/screens/spark-onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () => "youth indicate void",
 }))
 
