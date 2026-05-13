@@ -4,7 +4,6 @@ import { useLanguageQuery, useUserUpdateLanguageMutation } from "@app/graphql/ge
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
-  DEFAULT_LANGUAGE,
   getSelfCustodialLanguage,
   withSelfCustodialLanguage,
 } from "@app/store/persistent-state/self-custodial-language"
@@ -55,7 +54,7 @@ export const useEffectiveLanguage = (): EffectiveLanguageReturn => {
   }
 
   return {
-    language: data?.me?.language ?? DEFAULT_LANGUAGE,
+    language: data?.me?.language ?? "DEFAULT",
     setLanguage: setLanguageCustodial,
     loading: queryLoading || mutationLoading,
   }
