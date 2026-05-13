@@ -6,7 +6,7 @@ import {
   createCustodialClaimDeposit,
   createCustodialConvert,
   createCustodialListPendingDeposits,
-} from "@app/custodial/adapters/payment-adapter"
+} from "@app/custodial/adapters/payment"
 
 describe("createCustodialListPendingDeposits", () => {
   it("returns empty deposits", async () => {

@@ -8,7 +8,7 @@ import {
   type ActiveWalletState,
 } from "@app/types/wallet"
 
-import { mapHomeDataToWalletState } from "../mappers/wallet-state-mapper"
+import { mapHomeDataToWalletState } from "../mappers/wallet-state"
 
 const defaultState: ActiveWalletState = {
   wallets: [],

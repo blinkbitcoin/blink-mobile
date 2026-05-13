@@ -4,15 +4,12 @@ import {
   createCustodialClaimDeposit,
   createCustodialConvert,
   createCustodialListPendingDeposits,
-} from "@app/custodial/adapters/payment-adapter"
+} from "@app/custodial/adapters/payment"
 import {
   createClaimDeposit,
   createListPendingDeposits,
-} from "@app/self-custodial/adapters/deposit-adapter"
-import {
-  createGetFee,
-  createSendPayment,
-} from "@app/self-custodial/adapters/payment-adapter"
+} from "@app/self-custodial/adapters/deposit"
+import { createGetFee, createSendPayment } from "@app/self-custodial/adapters/payment"
 import {
   createGetConversionQuote,
   createReceiveLightning,

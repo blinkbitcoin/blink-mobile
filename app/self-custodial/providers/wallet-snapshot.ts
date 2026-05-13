@@ -15,7 +15,7 @@ import { toWalletId, type WalletState } from "@app/types/wallet"
 import { findUsdbToken, getWalletInfo, listPayments } from "../bridge"
 import { requireSparkTokenIdentifier } from "../config"
 import { recordErrorOnce } from "../logging"
-import { mapSelfCustodialTransactions } from "../mappers/transaction-mapper"
+import { mapSelfCustodialTransactions } from "../mappers/transaction"
 
 const TRANSACTIONS_PER_PAGE = 20
 

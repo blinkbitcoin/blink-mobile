@@ -22,7 +22,7 @@ jest.mock("@app/hooks/use-self-custodial-rollback", () => ({
   useSelfCustodialRollback: jest.fn(),
 }))
 
-jest.mock("@app/custodial/providers/wallet-provider", () => ({
+jest.mock("@app/custodial/providers/wallet", () => ({
   useCustodialWallet: () => mockCustodialState(),
 }))
 

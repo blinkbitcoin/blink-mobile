@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 
-import { useCustodialWallet } from "@app/custodial/providers/wallet-provider"
+import { useCustodialWallet } from "@app/custodial/providers/wallet"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   AccountType,

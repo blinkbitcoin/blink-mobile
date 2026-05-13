@@ -1,8 +1,5 @@
 /* eslint-disable camelcase */
-import {
-  createSendPayment,
-  createGetFee,
-} from "@app/self-custodial/adapters/payment-adapter"
+import { createSendPayment, createGetFee } from "@app/self-custodial/adapters/payment"
 import { createReceiveLightning, createReceiveOnchain } from "@app/self-custodial/bridge"
 
 const mockRecordError = jest.fn()

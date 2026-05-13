@@ -10,7 +10,7 @@ import {
   mapCurrency,
   mapSelfCustodialTransaction,
   mapSelfCustodialTransactions,
-} from "@app/self-custodial/mappers/transaction-mapper"
+} from "@app/self-custodial/mappers/transaction"
 
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({

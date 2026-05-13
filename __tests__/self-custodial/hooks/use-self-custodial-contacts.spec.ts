@@ -26,7 +26,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   listPayments: (...args: unknown[]) => mockListPayments(...args),
 }))
 
-jest.mock("@app/self-custodial/mappers/transaction-mapper", () => ({
+jest.mock("@app/self-custodial/mappers/transaction", () => ({
   mapSelfCustodialTransactions: (...args: unknown[]) => mockMapTransactions(...args),
 }))
 

@@ -2,7 +2,7 @@ import {
   createClaimDeposit,
   createListPendingDeposits,
   parseDepositId,
-} from "@app/self-custodial/adapters/deposit-adapter"
+} from "@app/self-custodial/adapters/deposit"
 
 const mockListDeposits = jest.fn()
 const mockClaimDeposit = jest.fn()

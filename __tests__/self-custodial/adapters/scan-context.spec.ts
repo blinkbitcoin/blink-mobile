@@ -1,5 +1,5 @@
 import { Network as GaloyNetwork, WalletCurrency } from "@app/graphql/generated"
-import { createSelfCustodialScanContext } from "@app/self-custodial/adapters/scan-context-adapter"
+import { createSelfCustodialScanContext } from "@app/self-custodial/adapters/scan-context"
 import { type WalletState, toWalletId } from "@app/types/wallet"
 
 jest.mock("@app/self-custodial/config", () => ({

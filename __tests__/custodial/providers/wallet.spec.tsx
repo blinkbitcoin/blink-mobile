@@ -8,7 +8,7 @@ import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 import {
   CustodialWalletProvider,
   useCustodialWallet,
-} from "@app/custodial/providers/wallet-provider"
+} from "@app/custodial/providers/wallet"
 
 const mockUseIsAuthed = jest.fn()
 const mockUseHomeAuthedQuery = jest.fn()
