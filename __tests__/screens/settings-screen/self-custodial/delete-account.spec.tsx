@@ -4,7 +4,7 @@ import { fireEvent, render } from "@testing-library/react-native"
 
 import { AccountStatus, AccountType } from "@app/types/wallet"
 
-import { SelfCustodialDelete } from "@app/screens/settings-screen/account/settings/self-custodial-delete"
+import { DeleteAccount } from "@app/screens/settings-screen/self-custodial/delete-account"
 
 const TEST_SC_ACCOUNT_ID = "test-self-custodial-uuid"
 
@@ -170,7 +170,7 @@ const fundedWallet = (id: string, currency: "BTC" | "USD", amount: number) => ({
   transactions: [],
 })
 
-describe("SelfCustodialDelete", () => {
+describe("DeleteAccount", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     lastWarningProps.isVisible = undefined
@@ -182,7 +182,7 @@ describe("SelfCustodialDelete", () => {
       wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
     })
 
-    const { getByTestId, queryByTestId } = render(<SelfCustodialDelete />)
+    const { getByTestId, queryByTestId } = render(<DeleteAccount />)
     fireEvent.press(getByTestId("danger-zone-delete-button"))
 
     expect(getByTestId("confirm-modal")).toBeTruthy()
@@ -194,7 +194,7 @@ describe("SelfCustodialDelete", () => {
       wallets: [fundedWallet("btc", "BTC", 21000), emptyWallet("usd", "USD")],
     })
 
-    const { getByTestId, queryByTestId } = render(<SelfCustodialDelete />)
+    const { getByTestId, queryByTestId } = render(<DeleteAccount />)
     fireEvent.press(getByTestId("danger-zone-delete-button"))
 
     expect(getByTestId("warning-modal")).toBeTruthy()
@@ -207,7 +207,7 @@ describe("SelfCustodialDelete", () => {
       wallets: [emptyWallet("btc", "BTC"), fundedWallet("usd", "USD", 500)],
     })
 
-    const { getByTestId, queryByTestId } = render(<SelfCustodialDelete />)
+    const { getByTestId, queryByTestId } = render(<DeleteAccount />)
     fireEvent.press(getByTestId("danger-zone-delete-button"))
 
     expect(getByTestId("warning-modal")).toBeTruthy()
@@ -219,12 +219,12 @@ describe("SelfCustodialDelete", () => {
       wallets: [fundedWallet("btc", "BTC", 1), emptyWallet("usd", "USD")],
     })
 
-    const { getByTestId, queryByTestId, rerender } = render(<SelfCustodialDelete />)
+    const { getByTestId, queryByTestId, rerender } = render(<DeleteAccount />)
     fireEvent.press(getByTestId("danger-zone-delete-button"))
     expect(getByTestId("warning-modal")).toBeTruthy()
 
     lastWarningProps.onClose?.()
-    rerender(<SelfCustodialDelete />)
+    rerender(<DeleteAccount />)
 
     expect(queryByTestId("warning-modal")).toBeNull()
     expect(mockDeleteWallet).not.toHaveBeenCalled()
@@ -235,11 +235,11 @@ describe("SelfCustodialDelete", () => {
       wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
     })
 
-    const { getByTestId, queryByTestId, rerender } = render(<SelfCustodialDelete />)
+    const { getByTestId, queryByTestId, rerender } = render(<DeleteAccount />)
     fireEvent.press(getByTestId("danger-zone-delete-button"))
 
     await lastConfirmProps.onConfirm?.()
-    rerender(<SelfCustodialDelete />)
+    rerender(<DeleteAccount />)
 
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
     expect(mockDeleteWallet).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
