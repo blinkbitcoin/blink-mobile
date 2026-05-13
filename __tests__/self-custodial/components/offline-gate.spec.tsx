@@ -12,8 +12,8 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
-jest.mock("@app/components/self-custodial-payment-offline-notice", () => ({
-  SelfCustodialPaymentOfflineNotice: () => {
+jest.mock("@app/self-custodial/components/payment-offline-notice", () => ({
+  PaymentOfflineNotice: () => {
     const { Text: RnText } = jest.requireActual("react-native")
     return <RnText testID="offline-notice">offline</RnText>
   },
