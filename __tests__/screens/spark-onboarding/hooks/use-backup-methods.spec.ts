@@ -12,7 +12,9 @@ jest.mock("@react-navigation/native", () => ({
 const mockSave = jest.fn()
 let mockLoading = false
 
-jest.mock("@app/hooks", () => ({
+const { isCredentialBackupAvailable: actualIsCredentialBackupAvailable } =
+  jest.requireActual("@app/screens/spark-onboarding/hooks/use-credential-backup")
+jest.mock("@app/screens/spark-onboarding/hooks/use-credential-backup", () => ({
   CredentialError: {
     NoProvider: "no-provider",
     UserCancelled: "user-cancelled",
@@ -24,11 +26,6 @@ jest.mock("@app/hooks", () => ({
     read: jest.fn(),
     loading: mockLoading,
   }),
-}))
-
-const { isCredentialBackupAvailable: actualIsCredentialBackupAvailable } =
-  jest.requireActual("@app/hooks/use-credential-backup")
-jest.mock("@app/hooks/use-credential-backup", () => ({
   isCredentialBackupAvailable: (count: number) =>
     actualIsCredentialBackupAvailable(count),
 }))
