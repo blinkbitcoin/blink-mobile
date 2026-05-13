@@ -31,19 +31,19 @@ export type NwcGraphqlPermission =
   | "NOTIFICATIONS_PAYMENT_SENT"
   | "NOTIFICATIONS_PAYMENT_RECEIVED"
 
-const NWC_GRAPHQL_PERMISSION_BY_NIP47_PERMISSION = new Map<
+const NWC_GRAPHQL_PERMISSION_BY_NIP47_PERMISSION: Record<
   NwcPermission,
   NwcGraphqlPermission
->([
-  ["get_info", "GET_INFO"],
-  ["get_balance", "GET_BALANCE"],
-  ["make_invoice", "MAKE_INVOICE"],
-  ["pay_invoice", "PAY_INVOICE"],
-  ["lookup_invoice", "LOOKUP_INVOICE"],
-  ["list_transactions", "LIST_TRANSACTIONS"],
-  ["notifications:payment_sent", "NOTIFICATIONS_PAYMENT_SENT"],
-  ["notifications:payment_received", "NOTIFICATIONS_PAYMENT_RECEIVED"],
-])
+> = {
+  "get_info": "GET_INFO",
+  "get_balance": "GET_BALANCE",
+  "make_invoice": "MAKE_INVOICE",
+  "pay_invoice": "PAY_INVOICE",
+  "lookup_invoice": "LOOKUP_INVOICE",
+  "list_transactions": "LIST_TRANSACTIONS",
+  "notifications:payment_sent": "NOTIFICATIONS_PAYMENT_SENT",
+  "notifications:payment_received": "NOTIFICATIONS_PAYMENT_RECEIVED",
+}
 
 export const toNwcGraphqlPermission = (permission: NwcPermission) =>
-  NWC_GRAPHQL_PERMISSION_BY_NIP47_PERMISSION.get(permission)!
+  NWC_GRAPHQL_PERMISSION_BY_NIP47_PERMISSION[permission]

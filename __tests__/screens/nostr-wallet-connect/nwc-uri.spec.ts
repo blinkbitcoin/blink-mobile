@@ -47,6 +47,19 @@ describe("nwc-uri", () => {
     }
   })
 
+  it("allows local dev ws relays", () => {
+    const result = parseNwcUri(
+      `nostr+walletconnect://${PUBKEY}?relay=${encodeURIComponent(
+        "ws://localhost:3334",
+      )}&secret=${SECRET}`,
+    )
+
+    expect(result.valid).toBe(true)
+    if (result.valid) {
+      expect(result.relay).toBe("ws://localhost:3334")
+    }
+  })
+
   it("parses safe return URLs", () => {
     const result = parseNwcUri(
       `${VALID_URI}&return_to=${encodeURIComponent("satsback://nwc/success")}`,
@@ -99,6 +112,16 @@ describe("nwc-uri", () => {
     )
     expect(
       parseNwcUri(`nostr+walletconnect://${PUBKEY}?relay=https://relay&secret=${SECRET}`),
+    ).toMatchObject({
+      valid: false,
+      error: "invalid-relay",
+    })
+    expect(
+      parseNwcUri(
+        `nostr+walletconnect://${PUBKEY}?relay=${encodeURIComponent(
+          "ws://relay.example",
+        )}&secret=${SECRET}`,
+      ),
     ).toMatchObject({
       valid: false,
       error: "invalid-relay",

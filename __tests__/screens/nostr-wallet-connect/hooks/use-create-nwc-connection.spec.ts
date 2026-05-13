@@ -7,12 +7,16 @@ import { NwcConnectionsProvider } from "@app/screens/nostr-wallet-connect/hooks/
 const mockMutate = jest.fn()
 const mockQuery = jest.fn()
 
-jest.mock("@apollo/client", () => ({
-  useApolloClient: () => ({
-    mutate: mockMutate,
-    query: mockQuery,
-  }),
-}))
+jest.mock("@apollo/client", () => {
+  const actual = jest.requireActual("@apollo/client")
+  return {
+    ...actual,
+    useApolloClient: () => ({
+      mutate: mockMutate,
+      query: mockQuery,
+    }),
+  }
+})
 
 const wrapper = ({ children }: PropsWithChildren) =>
   React.createElement(NwcConnectionsProvider, undefined, children)

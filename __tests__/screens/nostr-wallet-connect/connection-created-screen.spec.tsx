@@ -202,6 +202,32 @@ describe("NwcConnectionCreatedScreen", () => {
     expect(queryByTestId("qr-code")).toBeNull()
   })
 
+  it("renders the non-resetting budget period as annually", async () => {
+    mockRouteParams = {
+      appName: "Amethyst",
+      successMode: "authorization",
+      permissions: ["GET_INFO"],
+      budgets: [{ amountSats: 10_000, period: "NEVER" }],
+    }
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <NwcConnectionCreatedScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(
+      getByText(
+        LL.NostrWalletConnect.budgetPreview({
+          amount: "10000 SAT",
+          period: LL.NostrWalletConnect.periodAnnually(),
+        }),
+      ),
+    ).toBeTruthy()
+  })
+
   it("opens a safe return URL after authorization success", async () => {
     mockRouteParams = {
       appName: "Satsback",

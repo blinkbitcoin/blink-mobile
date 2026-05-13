@@ -23,6 +23,8 @@ const ALLOWED_RETURN_URL_PROTOCOLS = new Set(["https:", "satsback:"])
 const DEV_RETURN_URL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"])
 const URL_PROTOCOL_REGEX = /^[a-z][a-z0-9+.-]*:$/
 
+const isLocalDevHost = (hostname: string) => DEV_RETURN_URL_HOSTS.has(hostname)
+
 export type NwcUriError =
   | "invalid-uri"
   | "invalid-scheme"
@@ -70,9 +72,7 @@ export const getSafeNwcReturnUrl = (returnUrl: string | undefined) => {
 
     if (protocol === "http:" || protocol === "https:") {
       if (protocol === "https:") return url.toString()
-      return __DEV__ && DEV_RETURN_URL_HOSTS.has(url.hostname)
-        ? url.toString()
-        : undefined
+      return __DEV__ && isLocalDevHost(url.hostname) ? url.toString() : undefined
     }
 
     return ALLOWED_RETURN_URL_PROTOCOLS.has(protocol) ? url.toString() : undefined
@@ -84,10 +84,9 @@ export const getSafeNwcReturnUrl = (returnUrl: string | undefined) => {
 const isValidRelayUrl = (relay: string) => {
   try {
     const relayUrl = new URL(relay)
-    return (
-      (relayUrl.protocol === "wss:" || relayUrl.protocol === "ws:") &&
-      relayUrl.hostname.length > 0
-    )
+    if (relayUrl.hostname.length === 0) return false
+    if (relayUrl.protocol === "wss:") return true
+    return relayUrl.protocol === "ws:" && __DEV__ && isLocalDevHost(relayUrl.hostname)
   } catch (_) {
     return false
   }

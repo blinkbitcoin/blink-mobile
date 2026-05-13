@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react"
 import { ScrollView, View } from "react-native"
 
-import { useApolloClient } from "@apollo/client"
+import { gql as createGraphqlDocument, useApolloClient } from "@apollo/client"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
-import { parse } from "graphql"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
@@ -21,11 +20,8 @@ import { toBtcMoneyAmount } from "@app/types/amounts"
 import { ellipsizeMiddle } from "@app/utils/helper"
 
 import { useCreateNwcConnection, useNwcBtcBalance } from "./hooks"
-import {
-  buildNwcConnectionCreateInput,
-  NwcConnectionCreateError,
-  NwcConnectionCreateErrorCode,
-} from "./nwc-service"
+import { buildNwcConnectionCreateInput, NwcConnectionCreateError } from "./nwc-service"
+import { createNwcConnectionErrorMessage } from "./nwc-errors"
 import {
   NwcBudgetPeriod,
   NWC_BUDGET_PERIODS,
@@ -36,7 +32,9 @@ import { NwcUriError, parseNwcUri } from "./nwc-uri"
 
 const DEFAULT_AUTH_BUDGET = "10000"
 
-const NWC_KNOWN_APP_QUERY = parse(`
+const createNwcGraphqlDocument = (source: string) => createGraphqlDocument(source)
+
+const NWC_KNOWN_APP_QUERY = createNwcGraphqlDocument(`
   query NwcKnownAppForAuthorization($pubkey: String!) {
     nwcKnownApp(pubkey: $pubkey) {
       name
@@ -54,23 +52,18 @@ const usePermissionLabel = () => {
   const { LL } = useI18nContext()
 
   return useMemo(
-    () =>
-      new Map<NwcPermission, string>([
-        ["get_info", LL.NostrWalletConnect.permissionGetInfo()],
-        ["get_balance", LL.NostrWalletConnect.permissionGetBalance()],
-        ["make_invoice", LL.NostrWalletConnect.permissionMakeInvoice()],
-        ["pay_invoice", LL.NostrWalletConnect.permissionPayInvoice()],
-        ["lookup_invoice", LL.NostrWalletConnect.permissionLookupInvoice()],
-        ["list_transactions", LL.NostrWalletConnect.permissionListTransactions()],
-        [
-          "notifications:payment_sent",
-          LL.NostrWalletConnect.permissionNotificationsPaymentSent(),
-        ],
-        [
-          "notifications:payment_received",
-          LL.NostrWalletConnect.permissionNotificationsPaymentReceived(),
-        ],
-      ]),
+    (): Record<NwcPermission, string> => ({
+      "get_info": LL.NostrWalletConnect.permissionGetInfo(),
+      "get_balance": LL.NostrWalletConnect.permissionGetBalance(),
+      "make_invoice": LL.NostrWalletConnect.permissionMakeInvoice(),
+      "pay_invoice": LL.NostrWalletConnect.permissionPayInvoice(),
+      "lookup_invoice": LL.NostrWalletConnect.permissionLookupInvoice(),
+      "list_transactions": LL.NostrWalletConnect.permissionListTransactions(),
+      "notifications:payment_sent":
+        LL.NostrWalletConnect.permissionNotificationsPaymentSent(),
+      "notifications:payment_received":
+        LL.NostrWalletConnect.permissionNotificationsPaymentReceived(),
+    }),
     [LL],
   )
 }
@@ -96,7 +89,8 @@ const useKnownNwcAppName = (pubkey: string | undefined) => {
       .then((result) => {
         if (active) setKnownAppName(result.data?.nwcKnownApp?.name ?? undefined)
       })
-      .catch(() => {
+      .catch((error) => {
+        if (__DEV__) console.warn("NWC known app lookup failed", error)
         if (active) setKnownAppName(undefined)
       })
 
@@ -146,7 +140,7 @@ export const NwcAuthorizationScreen: React.FC = () => {
           DAILY: LL.NostrWalletConnect.periodDaily(),
           WEEKLY: LL.NostrWalletConnect.periodWeekly(),
           MONTHLY: LL.NostrWalletConnect.periodMonthly(),
-          NEVER: LL.NostrWalletConnect.periodNever(),
+          NEVER: LL.NostrWalletConnect.periodAnnually(),
         }[period],
       })),
     [LL],
@@ -160,7 +154,7 @@ export const NwcAuthorizationScreen: React.FC = () => {
       DAILY: LL.NostrWalletConnect.periodDaily(),
       WEEKLY: LL.NostrWalletConnect.periodWeekly(),
       MONTHLY: LL.NostrWalletConnect.periodMonthly(),
-      NEVER: LL.NostrWalletConnect.periodNever(),
+      NEVER: LL.NostrWalletConnect.periodAnnually(),
     })[period]
 
   const appName = parsed.valid
@@ -174,7 +168,7 @@ export const NwcAuthorizationScreen: React.FC = () => {
     : ""
 
   const createErrorMessage = createError
-    ? createConnectionErrorMessage(createError.code, LL, createError.message)
+    ? createNwcConnectionErrorMessage(createError.code, LL, createError.message)
     : undefined
 
   const budgetPreview =
@@ -267,7 +261,7 @@ export const NwcAuthorizationScreen: React.FC = () => {
               key={permission}
               iconName="check-circle"
               iconColor={colors._green}
-              label={permissionLabel.get(permission)!}
+              label={permissionLabel[permission]}
             />
           ))}
         </PermissionSection>
@@ -398,28 +392,6 @@ const errorMessage = (
       return LL.NostrWalletConnect.missingNwcSecret()
     case "unsupported-permissions":
       return LL.NostrWalletConnect.unsupportedNwcPermissions()
-  }
-}
-
-const createConnectionErrorMessage = (
-  errorCode: NwcConnectionCreateErrorCode,
-  LL: ReturnType<typeof useI18nContext>["LL"],
-  fallbackMessage?: string,
-) => {
-  switch (errorCode) {
-    case "DUPLICATE_CONNECTION":
-      return LL.NostrWalletConnect.connectionAlreadyExists()
-    case "NETWORK_ERROR":
-      if (__DEV__ && fallbackMessage) return fallbackMessage
-      return LL.NostrWalletConnect.connectionNetworkError()
-    case "RELAY_UNREACHABLE":
-      if (__DEV__ && fallbackMessage) return fallbackMessage
-      return LL.NostrWalletConnect.connectionRelayUnreachable()
-    case "UNSUPPORTED_PERMISSIONS":
-      return LL.NostrWalletConnect.unsupportedNwcPermissions()
-    case "UNKNOWN_ERROR":
-      if (__DEV__ && fallbackMessage) return fallbackMessage
-      return LL.NostrWalletConnect.connectionCreateFailed()
   }
 }
 

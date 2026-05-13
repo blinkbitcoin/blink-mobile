@@ -23,7 +23,7 @@ import {
   useCreateNwcConnection,
   useNewConnection,
 } from "./hooks"
-import { NwcConnectionCreateErrorCode } from "./nwc-service"
+import { createNwcConnectionErrorMessage } from "./nwc-errors"
 import { NwcBudgetPeriod } from "./nwc-types"
 
 const AnimatedLine = Animated.createAnimatedComponent(Line)
@@ -78,7 +78,7 @@ export const NwcNewConnectionFormScreen: React.FC = () => {
       const firstError = result.errors[0]
       setCreateError(
         firstError
-          ? createConnectionErrorMessage(firstError.code, LL, firstError.message)
+          ? createNwcConnectionErrorMessage(firstError.code, LL, firstError.message)
           : LL.NostrWalletConnect.connectionCreateFailed(),
       )
       return
@@ -276,28 +276,6 @@ const budgetPeriodLabel = (
     MONTHLY: LL.NostrWalletConnect.periodMonthly(),
     NEVER: LL.NostrWalletConnect.periodAnnually(),
   })[period]
-
-const createConnectionErrorMessage = (
-  errorCode: NwcConnectionCreateErrorCode,
-  LL: ReturnType<typeof useI18nContext>["LL"],
-  fallbackMessage?: string,
-) => {
-  switch (errorCode) {
-    case "DUPLICATE_CONNECTION":
-      return LL.NostrWalletConnect.connectionAlreadyExists()
-    case "NETWORK_ERROR":
-      if (__DEV__ && fallbackMessage) return fallbackMessage
-      return LL.NostrWalletConnect.connectionNetworkError()
-    case "RELAY_UNREACHABLE":
-      if (__DEV__ && fallbackMessage) return fallbackMessage
-      return LL.NostrWalletConnect.connectionRelayUnreachable()
-    case "UNSUPPORTED_PERMISSIONS":
-      return LL.NostrWalletConnect.unsupportedNwcPermissions()
-    case "UNKNOWN_ERROR":
-      if (__DEV__ && fallbackMessage) return fallbackMessage
-      return LL.NostrWalletConnect.connectionCreateFailed()
-  }
-}
 
 const useStyles = makeStyles(({ colors }) => ({
   body: {

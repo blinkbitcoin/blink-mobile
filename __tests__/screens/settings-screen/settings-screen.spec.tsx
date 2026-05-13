@@ -97,6 +97,7 @@ const updateNotificationCount = (next: number) => {
 }
 
 const mockNavigate = jest.fn()
+let mockHasNwcConnections = false
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -118,6 +119,12 @@ jest.mock("@react-navigation/native", () => ({
     },
   }),
   useIsFocused: () => true,
+}))
+
+jest.mock("@app/screens/nostr-wallet-connect/hooks", () => ({
+  useNwcConnections: () => ({
+    hasConnections: mockHasNwcConnections,
+  }),
 }))
 
 jest.mock("@apollo/client", () => {
@@ -240,6 +247,8 @@ const mocksWithUsername = [
 describe("Settings Screen", () => {
   beforeEach(() => {
     loadLocale("en")
+    mockNavigate.mockClear()
+    mockHasNwcConnections = false
     testState = createTestState()
   })
 
@@ -509,6 +518,46 @@ describe("Settings Screen", () => {
     )
 
     expect(screen.getByText("Nostr Wallet Connect")).toBeTruthy()
+  })
+
+  it("opens the NWC empty state from Settings when there are no connections", async () => {
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    fireEvent.press(screen.getByTestId("Nostr Wallet Connect"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("nwcEmptyState")
+  })
+
+  it("opens the connected apps list from Settings when connections exist", async () => {
+    mockHasNwcConnections = true
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    fireEvent.press(screen.getByTestId("Nostr Wallet Connect"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("nwcConnectedApps")
   })
 
   it("truncates long title and subtitle together", () => {

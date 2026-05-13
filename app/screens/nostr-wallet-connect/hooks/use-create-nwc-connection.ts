@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from "react"
 
-import { useApolloClient } from "@apollo/client"
-import { parse } from "graphql"
+import { gql as createGraphqlDocument, useApolloClient } from "@apollo/client"
 
 import {
   buildNwcConnectionUri,
@@ -67,7 +66,9 @@ type ApolloResultWithErrors = {
   errors?: ReadonlyArray<NwcGraphqlError>
 }
 
-const NWC_CONNECTION_CREATE_MUTATION = parse(`
+const createNwcGraphqlDocument = (source: string) => createGraphqlDocument(source)
+
+const NWC_CONNECTION_CREATE_MUTATION = createNwcGraphqlDocument(`
   mutation nwcConnectionCreate($input: NwcConnectionCreateInput!) {
     nwcConnectionCreate(input: $input) {
       errors {
@@ -85,7 +86,7 @@ const NWC_CONNECTION_CREATE_MUTATION = parse(`
   }
 `)
 
-const NWC_SERVICE_INFO_QUERY = parse(`
+const NWC_SERVICE_INFO_QUERY = createNwcGraphqlDocument(`
   query NwcServiceInfoForCreate {
     nwcServiceInfo {
       serverPubkey
