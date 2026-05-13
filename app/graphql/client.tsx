@@ -32,8 +32,8 @@ import { getLanguageFromString, getLocaleFromLanguage } from "@app/utils/locale-
 import { isIos } from "../utils/helper"
 import { loadString, saveString } from "../utils/storage"
 
-import { useApolloRebuildLifecycle } from "./use-apollo-rebuild-lifecycle"
-import { useEffectiveAuthToken } from "./use-effective-auth-token"
+import { useApolloRebuildLifecycle } from "./hooks/use-apollo-rebuild-lifecycle"
+import { useEffectiveAuthToken } from "./hooks/use-effective-auth-token"
 import { AnalyticsContainer } from "./analytics"
 import { createCache } from "./cache"
 import { useRealtimePriceQuery } from "./generated"

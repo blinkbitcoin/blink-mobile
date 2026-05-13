@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
-import { useEffectiveAuthToken } from "@app/graphql/use-effective-auth-token"
+import { useEffectiveAuthToken } from "@app/graphql/hooks/use-effective-auth-token"
 import { DefaultAccountId } from "@app/types/wallet"
 
 let mockToken = "live-token"
