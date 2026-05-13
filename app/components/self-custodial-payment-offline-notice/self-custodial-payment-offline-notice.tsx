@@ -3,12 +3,13 @@ import { View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { testProps } from "@app/utils/testProps"
+
+import { GaloyIcon } from "../atomic/galoy-icon"
+import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
+import { Screen } from "../screen"
 
 export const SelfCustodialPaymentOfflineNotice: React.FC = () => {
   const styles = useStyles()

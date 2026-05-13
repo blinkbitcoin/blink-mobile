@@ -5,8 +5,9 @@ import { makeStyles, Text } from "@rn-vui/themed"
 
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { ConversionFeeRow } from "@app/screens/conversion-flow/conversion-fee-row"
 import { testProps } from "@app/utils/testProps"
+
+import { ConversionFeeRow } from "../conversion-flow/conversion-fee-row"
 
 type Props = {
   isVisible: boolean

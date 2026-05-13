@@ -6,11 +6,9 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import {
-  MigrationCheckpoint,
-  useMigrationCheckpoint,
-} from "@app/screens/account-migration/hooks"
 import { testProps } from "@app/utils/testProps"
+
+import { MigrationCheckpoint, useMigrationCheckpoint } from "../account-migration/hooks"
 
 import { useBackupMethods } from "./hooks"
 import { OnboardingScreenLayout } from "./layouts"

@@ -3,7 +3,7 @@ import { Pressable, TextInput, View } from "react-native"
 
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { GaloyIcon } from "../atomic/galoy-icon"
 
 type PasswordInputProps = {
   label: string

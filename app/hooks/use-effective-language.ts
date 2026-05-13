@@ -2,7 +2,6 @@ import { useCallback } from "react"
 
 import { useLanguageQuery, useUserUpdateLanguageMutation } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
   DEFAULT_LANGUAGE,
@@ -10,6 +9,8 @@ import {
   withSelfCustodialLanguage,
 } from "@app/store/persistent-state/self-custodial-language"
 import { AccountType } from "@app/types/wallet"
+
+import { useAccountRegistry } from "./use-account-registry"
 
 type EffectiveLanguageReturn = {
   language: string

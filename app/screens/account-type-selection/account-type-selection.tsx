@@ -10,9 +10,10 @@ import { Screen } from "@app/components/screen"
 import { AccountOption, useAccountTypeOptions } from "@app/hooks/use-account-type-options"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
 import { AccountTypeMode } from "@app/types/account"
 import { testProps } from "@app/utils/testProps"
+
+import { PhoneLoginInitiateType } from "../phone-auth-screen"
 
 export const AccountTypeSelectionScreen: React.FC = () => {
   const styles = useStyles()
