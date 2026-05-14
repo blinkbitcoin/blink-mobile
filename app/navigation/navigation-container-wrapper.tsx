@@ -156,7 +156,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         cardOnboardingProcessingScreen: "card/onboarding/processing",
         cardOnboardingPreapprovedScreen: "card/onboarding/preapproved",
         cardOnboardingApprovedScreen: "card/onboarding/approved",
-        sparkBackupMethodScreen: "spark/backup-method",
+        selfCustodialBackupMethod: "self-custodial/backup-method",
         transactionDetail: {
           path: "transaction/:txid",
         },

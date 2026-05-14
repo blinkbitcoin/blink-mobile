@@ -183,17 +183,17 @@ export type RootStackParamList = {
   cardOnboardingPreapprovedScreen: undefined
   cardOnboardingProcessingScreen: undefined
   cardOnboardingApprovedScreen: undefined
-  sparkBackupMethodScreen: undefined
-  sparkCloudBackupScreen: undefined
+  selfCustodialBackupMethod: undefined
+  selfCustodialCloudBackup: undefined
   sparkBackupAlertsScreen: undefined
-  sparkBackupPhraseScreen: { step: PhraseStep }
+  selfCustodialBackupPhrase: { step: PhraseStep }
   sparkViewBackupAlertsScreen: undefined
   sparkViewBackupPhraseScreen: undefined
   sparkBackupConfirmScreen: {
     challenges: Array<{ index: number; word: string }>
     successMessage?: string
   }
-  sparkBackupSuccessScreen: { reBackup?: boolean; message?: string } | undefined
+  selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
   sparkMigrationExplainer: undefined
   sparkMigrationTransferringFunds: undefined
   sparkRestorePhraseScreen: { step: PhraseStep; words?: string[] }

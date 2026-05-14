@@ -46,7 +46,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
       navigation.navigate("sparkMigrationTransferringFunds")
       return
     }
-    navigation.navigate("sparkBackupSuccessScreen", {
+    navigation.navigate("selfCustodialBackupSuccess", {
       reBackup: alreadyBackedUp,
       message: successMessage,
     })

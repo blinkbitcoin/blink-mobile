@@ -78,7 +78,7 @@ export const useBackupMethods = () => {
       type: "success",
       LL,
     })
-    navigation.navigate("sparkBackupSuccessScreen")
+    navigation.navigate("selfCustodialBackupSuccess")
   }, [save, navigation, LL, mnemonic, identityPubkey, setBackupCompleted])
 
   const handleCloudBackup = useCallback(() => {
@@ -89,7 +89,7 @@ export const useBackupMethods = () => {
       })
       return
     }
-    navigation.navigate("sparkCloudBackupScreen")
+    navigation.navigate("selfCustodialCloudBackup")
   }, [isDriveBackupAvailable, navigation, LL])
 
   const handleManualBackup = useCallback(() => {

@@ -57,7 +57,7 @@ export const useBackupPhrase = (step: PhraseStep) => {
 
   const handleContinue = useCallback(() => {
     if (isStep1) {
-      navigation.navigate("sparkBackupPhraseScreen", { step: PhraseStep.Second })
+      navigation.navigate("selfCustodialBackupPhrase", { step: PhraseStep.Second })
       return
     }
     const challenges = buildConfirmChallenges(words, 3)

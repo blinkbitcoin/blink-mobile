@@ -71,7 +71,7 @@ describe("SparkBackupAlertsScreen — onboarding flow", () => {
     const { getByText } = renderScreen()
     tickAllChecks(getByText)
     fireEvent.press(getByText(LL.common.continue()))
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupPhraseScreen", {
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupPhrase", {
       step: PhraseStep.First,
     })
   })

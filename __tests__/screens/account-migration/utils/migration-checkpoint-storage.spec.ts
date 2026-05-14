@@ -105,7 +105,7 @@ describe("migration-checkpoint-storage", () => {
 
     it("returns correct route for BackupMethod", () => {
       expect(resolveCheckpointRoute(MigrationCheckpoint.BackupMethod)).toBe(
-        "sparkBackupMethodScreen",
+        "selfCustodialBackupMethod",
       )
     })
 
@@ -120,7 +120,7 @@ describe("migration-checkpoint-storage", () => {
       Object.defineProperty(Platform, "OS", { value: "android" })
 
       expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toBe(
-        "sparkCloudBackupScreen",
+        "selfCustodialCloudBackup",
       )
 
       Object.defineProperty(Platform, "OS", { value: original })

@@ -151,7 +151,7 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.getRouteForCheckpoint()).toBe("sparkBackupMethodScreen")
+    expect(result.current.getRouteForCheckpoint()).toBe("selfCustodialBackupMethod")
   })
 
   it("resumes from checkpoint after unmount and remount", async () => {

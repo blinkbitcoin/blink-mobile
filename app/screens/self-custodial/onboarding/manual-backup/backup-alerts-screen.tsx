@@ -22,7 +22,7 @@ export const SparkBackupAlertsScreen: React.FC = () => {
   return (
     <BackupPhraseSecurityChecks
       onContinue={() =>
-        navigation.navigate("sparkBackupPhraseScreen", { step: PhraseStep.First })
+        navigation.navigate("selfCustodialBackupPhrase", { step: PhraseStep.First })
       }
     />
   )

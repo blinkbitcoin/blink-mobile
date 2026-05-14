@@ -151,7 +151,7 @@ export const SettingsScreen: React.FC = () => {
           <SettingsCard
             title={LL.BackupNudge.title()}
             description={LL.BackupNudge.settingsWarning()}
-            onPress={() => navigation.navigate("sparkBackupMethodScreen")}
+            onPress={() => navigation.navigate("selfCustodialBackupMethod")}
             borderColor="primary"
             titleColor="primary"
           />

@@ -5,7 +5,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 
 import { IconHero } from "@app/components/icon-hero"
 import { InfoBanner } from "@app/components/info-banner"
-import { SparkCloudBackupScreen } from "@app/screens/self-custodial/onboarding/cloud-backup-screen"
+import { CloudBackupScreen } from "@app/screens/self-custodial/onboarding/cloud-backup-screen"
 import theme from "@app/rne-theme/theme"
 import { ContextForScreen } from "../../helper"
 
@@ -64,7 +64,7 @@ jest.mock("@app/components/info-banner", () => {
 loadLocale("en")
 const LL = i18nObject("en")
 
-describe("SparkCloudBackupScreen", () => {
+describe("CloudBackupScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockLoading = false
@@ -75,7 +75,7 @@ describe("SparkCloudBackupScreen", () => {
   it("renders title and subtitle", () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkCloudBackupScreen />
+        <CloudBackupScreen />
       </ContextForScreen>,
     )
 
@@ -85,7 +85,7 @@ describe("SparkCloudBackupScreen", () => {
   it("renders checkbox and continue button", () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkCloudBackupScreen />
+        <CloudBackupScreen />
       </ContextForScreen>,
     )
 
@@ -96,7 +96,7 @@ describe("SparkCloudBackupScreen", () => {
   it("does not show password fields when encryption is off", () => {
     const { queryByText } = render(
       <ContextForScreen>
-        <SparkCloudBackupScreen />
+        <CloudBackupScreen />
       </ContextForScreen>,
     )
 
@@ -108,7 +108,7 @@ describe("SparkCloudBackupScreen", () => {
 
     const { getByText } = render(
       <ContextForScreen>
-        <SparkCloudBackupScreen />
+        <CloudBackupScreen />
       </ContextForScreen>,
     )
 
@@ -120,7 +120,7 @@ describe("SparkCloudBackupScreen", () => {
   it("calls handleBackup on continue press", () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkCloudBackupScreen />
+        <CloudBackupScreen />
       </ContextForScreen>,
     )
 
@@ -133,7 +133,7 @@ describe("SparkCloudBackupScreen", () => {
 
     render(
       <ContextForScreen>
-        <SparkCloudBackupScreen />
+        <CloudBackupScreen />
       </ContextForScreen>,
     )
 
@@ -148,7 +148,7 @@ describe("SparkCloudBackupScreen", () => {
   it("renders the hero icon with the success color", () => {
     render(
       <ContextForScreen>
-        <SparkCloudBackupScreen />
+        <CloudBackupScreen />
       </ContextForScreen>,
     )
 

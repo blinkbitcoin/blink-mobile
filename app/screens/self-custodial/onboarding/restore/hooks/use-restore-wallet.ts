@@ -71,7 +71,7 @@ export const useRestoreWallet = () => {
           if (lookup.id) {
             activateAccount(lookup.id)
             reinitSdk()
-            navigation.navigate("sparkBackupSuccessScreen")
+            navigation.navigate("selfCustodialBackupSuccess")
             return
           }
 
@@ -83,7 +83,7 @@ export const useRestoreWallet = () => {
           activateAccount(accountId)
           reinitSdk()
           logSelfCustodialRestoreCompleted()
-          navigation.navigate("sparkBackupSuccessScreen")
+          navigation.navigate("selfCustodialBackupSuccess")
         } catch (err) {
           reportError("Wallet restore", err)
           setStatus(RestoreWalletStatus.Error)

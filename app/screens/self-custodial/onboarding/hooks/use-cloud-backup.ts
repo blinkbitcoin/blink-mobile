@@ -122,7 +122,7 @@ export const useCloudBackup = ({
       type: "success",
       LL,
     })
-    navigation.navigate("sparkBackupSuccessScreen")
+    navigation.navigate("selfCustodialBackupSuccess")
   }, [
     isEncrypted,
     password,

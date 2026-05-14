@@ -136,7 +136,7 @@ describe("BackupNudgeModal", () => {
     fireEvent.press(getByTestId("secure-button"))
 
     expect(onClose).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupMethodScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
   })
 
   it("uses primary color for warning icon", () => {

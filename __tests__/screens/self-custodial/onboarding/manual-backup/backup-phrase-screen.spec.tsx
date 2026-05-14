@@ -3,7 +3,7 @@ import { render, fireEvent, waitFor } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
-import { SparkBackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-screen"
+import { BackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-screen"
 import { ContextForScreen } from "../../../helper"
 
 const mockNavigate = jest.fn()
@@ -53,7 +53,7 @@ jest.mock("@app/screens/settings-screen/group", () => {
 loadLocale("en")
 const LL = i18nObject("en")
 
-describe("SparkBackupPhraseScreen", () => {
+describe("BackupPhraseScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockStep = 1
@@ -64,7 +64,7 @@ describe("SparkBackupPhraseScreen", () => {
     it("renders first 6 words", async () => {
       const { getByText, queryByText } = render(
         <ContextForScreen>
-          <SparkBackupPhraseScreen />
+          <BackupPhraseScreen />
         </ContextForScreen>,
       )
 
@@ -76,7 +76,7 @@ describe("SparkBackupPhraseScreen", () => {
     it("shows Continue button when timer expired", () => {
       const { getByText } = render(
         <ContextForScreen>
-          <SparkBackupPhraseScreen />
+          <BackupPhraseScreen />
         </ContextForScreen>,
       )
 
@@ -86,12 +86,12 @@ describe("SparkBackupPhraseScreen", () => {
     it("navigates to step 2 on continue press", () => {
       const { getByText } = render(
         <ContextForScreen>
-          <SparkBackupPhraseScreen />
+          <BackupPhraseScreen />
         </ContextForScreen>,
       )
 
       fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.continueButton()))
-      expect(mockNavigate).toHaveBeenCalledWith("sparkBackupPhraseScreen", { step: 2 })
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 2 })
     })
 
     it("shows countdown in button when timer is active", () => {
@@ -99,7 +99,7 @@ describe("SparkBackupPhraseScreen", () => {
 
       const { getByText } = render(
         <ContextForScreen>
-          <SparkBackupPhraseScreen />
+          <BackupPhraseScreen />
         </ContextForScreen>,
       )
 
@@ -113,7 +113,7 @@ describe("SparkBackupPhraseScreen", () => {
 
       const { getByText } = render(
         <ContextForScreen>
-          <SparkBackupPhraseScreen />
+          <BackupPhraseScreen />
         </ContextForScreen>,
       )
 
@@ -132,7 +132,7 @@ describe("SparkBackupPhraseScreen", () => {
     it("renders last 6 words", async () => {
       const { getByText, queryByText } = render(
         <ContextForScreen>
-          <SparkBackupPhraseScreen />
+          <BackupPhraseScreen />
         </ContextForScreen>,
       )
 
@@ -144,7 +144,7 @@ describe("SparkBackupPhraseScreen", () => {
     it("shows I have saved it button", () => {
       const { getByText } = render(
         <ContextForScreen>
-          <SparkBackupPhraseScreen />
+          <BackupPhraseScreen />
         </ContextForScreen>,
       )
 
@@ -154,7 +154,7 @@ describe("SparkBackupPhraseScreen", () => {
     it("navigates to confirm screen on button press", async () => {
       const { getByText } = render(
         <ContextForScreen>
-          <SparkBackupPhraseScreen />
+          <BackupPhraseScreen />
         </ContextForScreen>,
       )
 
@@ -178,7 +178,7 @@ describe("SparkBackupPhraseScreen", () => {
     it("renders copy button", () => {
       const { getByText } = render(
         <ContextForScreen>
-          <SparkBackupPhraseScreen />
+          <BackupPhraseScreen />
         </ContextForScreen>,
       )
 
@@ -188,7 +188,7 @@ describe("SparkBackupPhraseScreen", () => {
     it("calls copyToClipboard when copy button is pressed", async () => {
       const { getByText } = render(
         <ContextForScreen>
-          <SparkBackupPhraseScreen />
+          <BackupPhraseScreen />
         </ContextForScreen>,
       )
 
@@ -205,7 +205,7 @@ describe("SparkBackupPhraseScreen", () => {
     it("renders spark compatible link", () => {
       const { getByText } = render(
         <ContextForScreen>
-          <SparkBackupPhraseScreen />
+          <BackupPhraseScreen />
         </ContextForScreen>,
       )
 

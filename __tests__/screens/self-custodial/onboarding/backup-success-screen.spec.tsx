@@ -3,7 +3,7 @@ import { render } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
-import { SparkBackupSuccessScreen } from "@app/screens/self-custodial/onboarding/backup-success-screen"
+import { BackupSuccessScreen } from "@app/screens/self-custodial/onboarding/backup-success-screen"
 import { ContextForScreen } from "../../helper"
 
 jest.mock("@app/components/success-animation/success-icon-animation", () => {
@@ -58,7 +58,7 @@ jest.mock("@react-navigation/native", () => ({
 loadLocale("en")
 const LL = i18nObject("en")
 
-describe("SparkBackupSuccessScreen", () => {
+describe("BackupSuccessScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockRouteParams.mockReturnValue(undefined)
@@ -67,7 +67,7 @@ describe("SparkBackupSuccessScreen", () => {
   it("renders success message", () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkBackupSuccessScreen />
+        <BackupSuccessScreen />
       </ContextForScreen>,
     )
 
@@ -79,7 +79,7 @@ describe("SparkBackupSuccessScreen", () => {
 
     const { getByText, queryByText } = render(
       <ContextForScreen>
-        <SparkBackupSuccessScreen />
+        <BackupSuccessScreen />
       </ContextForScreen>,
     )
 
@@ -95,7 +95,7 @@ describe("SparkBackupSuccessScreen", () => {
 
     const { getByText, queryByText } = render(
       <ContextForScreen>
-        <SparkBackupSuccessScreen />
+        <BackupSuccessScreen />
       </ContextForScreen>,
     )
 
@@ -108,7 +108,7 @@ describe("SparkBackupSuccessScreen", () => {
 
     const { getByText } = render(
       <ContextForScreen>
-        <SparkBackupSuccessScreen />
+        <BackupSuccessScreen />
       </ContextForScreen>,
     )
 
@@ -118,7 +118,7 @@ describe("SparkBackupSuccessScreen", () => {
   it("renders without crashing", () => {
     const { toJSON } = render(
       <ContextForScreen>
-        <SparkBackupSuccessScreen />
+        <BackupSuccessScreen />
       </ContextForScreen>,
     )
 
@@ -128,7 +128,7 @@ describe("SparkBackupSuccessScreen", () => {
   it("navigates to home after animation completes", async () => {
     render(
       <ContextForScreen>
-        <SparkBackupSuccessScreen />
+        <BackupSuccessScreen />
       </ContextForScreen>,
     )
 
@@ -147,7 +147,7 @@ describe("SparkBackupSuccessScreen", () => {
   it("clears migration checkpoint on navigation", async () => {
     render(
       <ContextForScreen>
-        <SparkBackupSuccessScreen />
+        <BackupSuccessScreen />
       </ContextForScreen>,
     )
 
