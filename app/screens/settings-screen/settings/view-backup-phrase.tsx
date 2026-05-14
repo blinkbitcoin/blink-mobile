@@ -24,7 +24,7 @@ export const ViewBackupPhraseSetting: React.FC = () => {
     <SettingsRow
       title={LL.BackupScreen.ManualBackup.Phrase.headerTitle()}
       leftGaloyIcon="key-outline"
-      action={() => navigate("sparkViewBackupAlertsScreen")}
+      action={() => navigate("selfCustodialViewBackupSecurityChecks")}
     />
   )
 }

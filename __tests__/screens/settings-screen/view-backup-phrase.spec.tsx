@@ -64,7 +64,7 @@ describe("ViewBackupPhraseSetting", () => {
     const { getByTestId } = render(<ViewBackupPhraseSetting />)
     fireEvent.press(getByTestId("settings-row"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("sparkViewBackupAlertsScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialViewBackupSecurityChecks")
   })
 
   it("never bypasses the alerts gate — pressing the row must not jump straight to the phrase screen", () => {

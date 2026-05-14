@@ -227,7 +227,7 @@ describe("useBackupMethods", () => {
         result.current.handleManualBackup()
       })
 
-      expect(mockNavigate).toHaveBeenCalledWith("sparkBackupAlertsScreen")
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSecurityChecks")
     })
   })
 

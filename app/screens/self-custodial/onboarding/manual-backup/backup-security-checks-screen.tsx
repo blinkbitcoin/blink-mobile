@@ -11,7 +11,7 @@ import {
 
 import { BackupPhraseSecurityChecks } from "./backup-phrase-security-checks"
 
-export const SparkBackupAlertsScreen: React.FC = () => {
+export const BackupSecurityChecksScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { saveCheckpoint } = useMigrationCheckpoint()
 

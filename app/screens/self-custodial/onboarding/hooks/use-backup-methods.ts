@@ -93,7 +93,7 @@ export const useBackupMethods = () => {
   }, [isDriveBackupAvailable, navigation, LL])
 
   const handleManualBackup = useCallback(() => {
-    navigation.navigate("sparkBackupAlertsScreen")
+    navigation.navigate("selfCustodialBackupSecurityChecks")
   }, [navigation])
 
   return {
