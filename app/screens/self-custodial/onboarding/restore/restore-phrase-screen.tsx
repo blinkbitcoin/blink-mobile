@@ -20,9 +20,9 @@ import { OnboardingScreenLayout } from "../layouts"
 
 import { RestoreStatus, useRestorePhrase } from "./hooks/use-restore-phrase"
 
-type RestorePhraseRouteProp = RouteProp<RootStackParamList, "sparkRestorePhraseScreen">
+type RestorePhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialRestorePhrase">
 
-export const SparkRestorePhraseScreen: React.FC = () => {
+export const RestorePhraseScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {

@@ -100,7 +100,7 @@ describe("useRestorePhrase", () => {
       result.current.handleContinue()
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("sparkRestorePhraseScreen", {
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestorePhrase", {
       step: PhraseStep.Second,
       words: Array(12).fill(""),
     })
@@ -130,7 +130,7 @@ describe("useRestorePhrase", () => {
     })
 
     expect(returned).toBe(true)
-    expect(mockNavigate).toHaveBeenCalledWith("sparkRestorePhraseScreen", {
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestorePhrase", {
       step: PhraseStep.Second,
       words: fullPhrase.split(" "),
     })

@@ -42,7 +42,7 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
 
       const parsed = splitWords(text)
       if (parsed.length === WORD_COUNT && validateMnemonic(parsed.join(" "))) {
-        navigation.navigate("sparkRestorePhraseScreen", {
+        navigation.navigate("selfCustodialRestorePhrase", {
           step: PhraseStep.Second,
           words: parsed,
         })
@@ -63,7 +63,7 @@ export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) =>
   }, [bip39.words, bip39.allFilled])
 
   const handleContinue = useCallback(() => {
-    navigation.navigate("sparkRestorePhraseScreen", {
+    navigation.navigate("selfCustodialRestorePhrase", {
       step: PhraseStep.Second,
       words: bip39.words,
     })

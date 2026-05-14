@@ -141,8 +141,8 @@ import {
   SparkWalletCreationScreen,
 } from "@app/screens/self-custodial/onboarding"
 import {
-  SparkRestoreMethodScreen,
-  SparkRestorePhraseScreen,
+  RestoreMethodScreen,
+  RestorePhraseScreen,
   SparkCloudRestoreScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
 import {
@@ -823,13 +823,13 @@ export const RootStack = () => {
         options={{ headerShown: false }}
       />
       <RootNavigator.Screen
-        name="sparkRestoreMethodScreen"
-        component={SparkRestoreMethodScreen}
+        name="selfCustodialRestoreMethod"
+        component={RestoreMethodScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
-        name="sparkRestorePhraseScreen"
-        component={SparkRestorePhraseScreen}
+        name="selfCustodialRestorePhrase"
+        component={RestorePhraseScreen}
         options={{ title: LL.RestoreScreen.phraseTitle(), headerRight: () => null }}
       />
       <RootNavigator.Screen

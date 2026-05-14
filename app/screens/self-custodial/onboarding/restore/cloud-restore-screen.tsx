@@ -62,7 +62,7 @@ export const SparkCloudRestoreScreen: React.FC = () => {
             <GaloyPrimaryButton
               title={LL.RestoreScreen.restore()}
               onPress={() =>
-                navigation.navigate("sparkRestorePhraseScreen", {
+                navigation.navigate("selfCustodialRestorePhrase", {
                   step: PhraseStep.First,
                 })
               }
