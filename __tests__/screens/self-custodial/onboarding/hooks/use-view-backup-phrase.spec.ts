@@ -83,7 +83,7 @@ describe("useViewBackupPhrase", () => {
     act(() => result.current.handleTestBackup())
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      "sparkBackupConfirmScreen",
+      "selfCustodialBackupPhraseConfirm",
       expect.objectContaining({
         challenges: expect.arrayContaining([
           expect.objectContaining({

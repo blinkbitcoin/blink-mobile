@@ -20,9 +20,9 @@ import { testProps } from "@app/utils/testProps"
 
 import { useBackupConfirm } from "../hooks"
 
-type ConfirmRouteProp = RouteProp<RootStackParamList, "sparkBackupConfirmScreen">
+type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
 
-export const SparkBackupConfirmScreen: React.FC = () => {
+export const BackupPhraseConfirmScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {

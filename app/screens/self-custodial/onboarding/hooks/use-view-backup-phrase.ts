@@ -39,7 +39,7 @@ export const useViewBackupPhrase = () => {
 
   const handleTestBackup = useCallback(() => {
     const challenges = buildConfirmChallenges(words, CHALLENGE_COUNT)
-    navigation.navigate("sparkBackupConfirmScreen", {
+    navigation.navigate("selfCustodialBackupPhraseConfirm", {
       challenges,
       successMessage: LL.BackupScreen.ManualBackup.Success.testSuccess(),
     })

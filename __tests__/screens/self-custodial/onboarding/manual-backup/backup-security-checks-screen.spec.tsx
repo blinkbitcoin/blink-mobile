@@ -81,9 +81,9 @@ describe("BackupSecurityChecksScreen — onboarding flow", () => {
     tickAllChecks(getByText)
     fireEvent.press(getByText(LL.common.continue()))
     expect(mockNavigate).not.toHaveBeenCalledWith(
-      "sparkViewBackupPhraseScreen",
+      "selfCustodialViewBackupPhrase",
       expect.anything(),
     )
-    expect(mockNavigate).not.toHaveBeenCalledWith("sparkViewBackupPhraseScreen")
+    expect(mockNavigate).not.toHaveBeenCalledWith("selfCustodialViewBackupPhrase")
   })
 })

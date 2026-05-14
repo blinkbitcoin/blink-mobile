@@ -80,7 +80,7 @@ describe("ViewBackupSecurityChecksScreen — Settings flow", () => {
     const { getByText } = renderScreen()
     tickAllChecks(getByText)
     fireEvent.press(getByText(LL.common.continue()))
-    expect(mockNavigate).toHaveBeenCalledWith("sparkViewBackupPhraseScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialViewBackupPhrase")
   })
 
   it("never navigates to the onboarding phrase screen — Settings stays separate from the onboarding flow", () => {

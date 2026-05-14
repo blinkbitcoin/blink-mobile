@@ -14,7 +14,7 @@ import { testProps } from "@app/utils/testProps"
 
 import { useViewBackupPhrase } from "../hooks"
 
-export const SparkViewBackupPhraseScreen: React.FC = () => {
+export const ViewBackupPhraseScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
 
