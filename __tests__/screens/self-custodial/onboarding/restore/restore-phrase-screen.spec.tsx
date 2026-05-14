@@ -1,7 +1,7 @@
 import React from "react"
 import { render } from "@testing-library/react-native"
 
-import { SparkRestorePhraseScreen } from "@app/screens/self-custodial/onboarding/restore/restore-phrase-screen"
+import { RestorePhraseScreen } from "@app/screens/self-custodial/onboarding/restore/restore-phrase-screen"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
@@ -72,11 +72,11 @@ const defaultHookReturn = {
 const renderScreen = () =>
   render(
     <ContextForScreen>
-      <SparkRestorePhraseScreen />
+      <RestorePhraseScreen />
     </ContextForScreen>,
   )
 
-describe("SparkRestorePhraseScreen", () => {
+describe("RestorePhraseScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseRestorePhrase.mockReturnValue(defaultHookReturn)

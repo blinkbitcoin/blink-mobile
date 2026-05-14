@@ -6,7 +6,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
 import { IconHero } from "@app/components/icon-hero"
-import { SparkRestoreMethodScreen } from "@app/screens/self-custodial/onboarding/restore/restore-method-screen"
+import { RestoreMethodScreen } from "@app/screens/self-custodial/onboarding/restore/restore-method-screen"
 import theme from "@app/rne-theme/theme"
 
 import { ContextForScreen } from "../../../helper"
@@ -75,7 +75,7 @@ jest.mock("@app/components/icon-hero", () => ({
 loadLocale("en")
 const LL = i18nObject("en")
 
-describe("SparkRestoreMethodScreen", () => {
+describe("RestoreMethodScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockLoading = false
@@ -84,7 +84,7 @@ describe("SparkRestoreMethodScreen", () => {
   it("renders the hero icon with the success color", () => {
     render(
       <ContextForScreen>
-        <SparkRestoreMethodScreen />
+        <RestoreMethodScreen />
       </ContextForScreen>,
     )
 
@@ -98,7 +98,7 @@ describe("SparkRestoreMethodScreen", () => {
   it("navigates to the cloud restore screen when the cloud button is pressed", () => {
     const { getByTestId } = render(
       <ContextForScreen>
-        <SparkRestoreMethodScreen />
+        <RestoreMethodScreen />
       </ContextForScreen>,
     )
 
@@ -109,14 +109,14 @@ describe("SparkRestoreMethodScreen", () => {
   it("navigates to the manual restore screen when the manual button is pressed", () => {
     const { getByTestId } = render(
       <ContextForScreen>
-        <SparkRestoreMethodScreen />
+        <RestoreMethodScreen />
       </ContextForScreen>,
     )
 
     fireEvent.press(
       getByTestId(`secondary-${LL.BackupScreen.BackupMethod.manualBackup()}`),
     )
-    expect(mockNavigate).toHaveBeenCalledWith("sparkRestorePhraseScreen", {
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestorePhrase", {
       step: 1,
     })
   })
@@ -135,7 +135,7 @@ describe("SparkRestoreMethodScreen", () => {
 
       const { getByTestId } = render(
         <ContextForScreen>
-          <SparkRestoreMethodScreen />
+          <RestoreMethodScreen />
         </ContextForScreen>,
       )
 
@@ -152,7 +152,7 @@ describe("SparkRestoreMethodScreen", () => {
 
       const { getByTestId } = render(
         <ContextForScreen>
-          <SparkRestoreMethodScreen />
+          <RestoreMethodScreen />
         </ContextForScreen>,
       )
 
@@ -169,7 +169,7 @@ describe("SparkRestoreMethodScreen", () => {
 
       const { getByTestId } = render(
         <ContextForScreen>
-          <SparkRestoreMethodScreen />
+          <RestoreMethodScreen />
         </ContextForScreen>,
       )
 
@@ -188,7 +188,7 @@ describe("SparkRestoreMethodScreen", () => {
 
       const { getByTestId } = render(
         <ContextForScreen>
-          <SparkRestoreMethodScreen />
+          <RestoreMethodScreen />
         </ContextForScreen>,
       )
 
@@ -206,7 +206,7 @@ describe("SparkRestoreMethodScreen", () => {
 
       const { getByTestId } = render(
         <ContextForScreen>
-          <SparkRestoreMethodScreen />
+          <RestoreMethodScreen />
         </ContextForScreen>,
       )
 

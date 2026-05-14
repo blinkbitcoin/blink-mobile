@@ -176,7 +176,7 @@ describe("AccountTypeSelectionScreen", () => {
     fireEvent.press(getByTestId("self-custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("sparkRestoreMethodScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestoreMethod")
   })
 
   it("does not navigate when nothing selected", () => {

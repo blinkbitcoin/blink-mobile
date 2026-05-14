@@ -40,7 +40,7 @@ const showRestoreErrorToast = (
   }
 }
 
-export const SparkRestoreMethodScreen: React.FC = () => {
+export const RestoreMethodScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const {
     theme: { colors },
@@ -77,7 +77,7 @@ export const SparkRestoreMethodScreen: React.FC = () => {
           <GaloySecondaryButton
             title={LL.BackupScreen.BackupMethod.manualBackup()}
             onPress={() =>
-              navigation.navigate("sparkRestorePhraseScreen", {
+              navigation.navigate("selfCustodialRestorePhrase", {
                 step: PhraseStep.First,
               })
             }

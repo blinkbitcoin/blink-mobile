@@ -57,7 +57,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
       return
     }
 
-    navigation.navigate("sparkRestoreMethodScreen")
+    navigation.navigate("selfCustodialRestoreMethod")
   }
 
   const isSelected = (option: AccountOption) => selected === option
