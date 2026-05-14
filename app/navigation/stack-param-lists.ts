@@ -185,9 +185,9 @@ export type RootStackParamList = {
   cardOnboardingApprovedScreen: undefined
   selfCustodialBackupMethod: undefined
   selfCustodialCloudBackup: undefined
-  sparkBackupAlertsScreen: undefined
+  selfCustodialBackupSecurityChecks: undefined
   selfCustodialBackupPhrase: { step: PhraseStep }
-  sparkViewBackupAlertsScreen: undefined
+  selfCustodialViewBackupSecurityChecks: undefined
   sparkViewBackupPhraseScreen: undefined
   sparkBackupConfirmScreen: {
     challenges: Array<{ index: number; word: string }>

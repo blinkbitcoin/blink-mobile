@@ -132,9 +132,9 @@ import {
 import {
   BackupMethodScreen,
   CloudBackupScreen,
-  SparkBackupAlertsScreen,
+  BackupSecurityChecksScreen,
   BackupPhraseScreen,
-  SparkViewBackupAlertsScreen,
+  ViewBackupSecurityChecksScreen,
   SparkViewBackupPhraseScreen,
   SparkBackupConfirmScreen,
   BackupSuccessScreen,
@@ -767,8 +767,8 @@ export const RootStack = () => {
         options={{ title: "" }}
       />
       <RootNavigator.Screen
-        name="sparkBackupAlertsScreen"
-        component={SparkBackupAlertsScreen}
+        name="selfCustodialBackupSecurityChecks"
+        component={BackupSecurityChecksScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
@@ -779,8 +779,8 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
-        name="sparkViewBackupAlertsScreen"
-        component={SparkViewBackupAlertsScreen}
+        name="selfCustodialViewBackupSecurityChecks"
+        component={ViewBackupSecurityChecksScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen

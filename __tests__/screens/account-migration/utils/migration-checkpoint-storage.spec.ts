@@ -111,7 +111,7 @@ describe("migration-checkpoint-storage", () => {
 
     it("returns correct route for BackupAlerts", () => {
       expect(resolveCheckpointRoute(MigrationCheckpoint.BackupAlerts)).toBe(
-        "sparkBackupAlertsScreen",
+        "selfCustodialBackupSecurityChecks",
       )
     })
 

@@ -183,7 +183,9 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result2.current.loading).toBe(false))
 
     expect(result2.current.checkpoint).toBe(MigrationCheckpoint.BackupAlerts)
-    expect(result2.current.getRouteForCheckpoint()).toBe("sparkBackupAlertsScreen")
+    expect(result2.current.getRouteForCheckpoint()).toBe(
+      "selfCustodialBackupSecurityChecks",
+    )
   })
 
   it("does not update state after unmount", async () => {
