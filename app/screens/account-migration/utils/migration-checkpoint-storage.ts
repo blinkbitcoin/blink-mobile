@@ -15,7 +15,7 @@ type StoredCheckpoint = {
 }
 
 type ResumeRoute =
-  | "sparkMigrationExplainer"
+  | "accountMigrationExplainer"
   | "selfCustodialBackupMethod"
   | "selfCustodialCloudBackup"
   | "selfCustodialBackupSecurityChecks"
@@ -30,7 +30,7 @@ const CHECKPOINT_ROUTE_MAP: Record<MigrationCheckpoint, ResumeRoute> = {
   [MigrationCheckpoint.BackupAlerts]: "selfCustodialBackupSecurityChecks",
 }
 
-const DEFAULT_ROUTE: ResumeRoute = "sparkMigrationExplainer"
+const DEFAULT_ROUTE: ResumeRoute = "accountMigrationExplainer"
 
 export const getStorageKey = (environment: string): string =>
   `${STORAGE_KEY_PREFIX}_${environment.toLowerCase()}`

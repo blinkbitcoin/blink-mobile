@@ -2,7 +2,7 @@ import React from "react"
 import { render, screen, fireEvent } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
-import { SparkMigrationExplainerScreen } from "@app/screens/account-migration/to-non-custodial/explainer-screen"
+import { MigrationExplainerScreen } from "@app/screens/account-migration/to-non-custodial/explainer-screen"
 import { ContextForScreen } from "../../helper"
 
 loadLocale("en")
@@ -33,7 +33,7 @@ jest.mock("@app/components/icon-hero", () => ({
   },
 }))
 
-describe("SparkMigrationExplainerScreen", () => {
+describe("MigrationExplainerScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
@@ -42,7 +42,7 @@ describe("SparkMigrationExplainerScreen", () => {
   it("renders the explainer title", () => {
     render(
       <ContextForScreen>
-        <SparkMigrationExplainerScreen />
+        <MigrationExplainerScreen />
       </ContextForScreen>,
     )
 
@@ -52,7 +52,7 @@ describe("SparkMigrationExplainerScreen", () => {
   it("renders all three steps", () => {
     render(
       <ContextForScreen>
-        <SparkMigrationExplainerScreen />
+        <MigrationExplainerScreen />
       </ContextForScreen>,
     )
 
@@ -64,7 +64,7 @@ describe("SparkMigrationExplainerScreen", () => {
   it("renders learn more link", () => {
     render(
       <ContextForScreen>
-        <SparkMigrationExplainerScreen />
+        <MigrationExplainerScreen />
       </ContextForScreen>,
     )
 
@@ -76,7 +76,7 @@ describe("SparkMigrationExplainerScreen", () => {
 
     render(
       <ContextForScreen>
-        <SparkMigrationExplainerScreen />
+        <MigrationExplainerScreen />
       </ContextForScreen>,
     )
 
@@ -89,7 +89,7 @@ describe("SparkMigrationExplainerScreen", () => {
   it("renders Let's move button", () => {
     render(
       <ContextForScreen>
-        <SparkMigrationExplainerScreen />
+        <MigrationExplainerScreen />
       </ContextForScreen>,
     )
 
@@ -99,7 +99,7 @@ describe("SparkMigrationExplainerScreen", () => {
   it("navigates to backup method on button press", () => {
     render(
       <ContextForScreen>
-        <SparkMigrationExplainerScreen />
+        <MigrationExplainerScreen />
       </ContextForScreen>,
     )
 

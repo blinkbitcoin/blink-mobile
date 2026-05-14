@@ -43,7 +43,7 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
     setBackupCompleted("manual")
     logSelfCustodialBackupCompleted({ backupMethod: "manual" })
     if (isMigrating && walletsHaveFunds) {
-      navigation.navigate("sparkMigrationTransferringFunds")
+      navigation.navigate("accountMigrationTransferringFunds")
       return
     }
     navigation.navigate("selfCustodialBackupSuccess", {

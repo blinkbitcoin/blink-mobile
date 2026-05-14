@@ -194,8 +194,8 @@ export type RootStackParamList = {
     successMessage?: string
   }
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
-  sparkMigrationExplainer: undefined
-  sparkMigrationTransferringFunds: undefined
+  accountMigrationExplainer: undefined
+  accountMigrationTransferringFunds: undefined
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined
   selfCustodialCloudRestore: undefined

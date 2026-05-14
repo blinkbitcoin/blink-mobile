@@ -100,7 +100,7 @@ describe("migration-checkpoint-storage", () => {
 
   describe("resolveCheckpointRoute", () => {
     it("returns default for null checkpoint", () => {
-      expect(resolveCheckpointRoute(null)).toBe("sparkMigrationExplainer")
+      expect(resolveCheckpointRoute(null)).toBe("accountMigrationExplainer")
     })
 
     it("returns correct route for BackupMethod", () => {
@@ -131,7 +131,7 @@ describe("migration-checkpoint-storage", () => {
       Object.defineProperty(Platform, "OS", { value: "ios" })
 
       expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toBe(
-        "sparkMigrationExplainer",
+        "accountMigrationExplainer",
       )
 
       Object.defineProperty(Platform, "OS", { value: original })
