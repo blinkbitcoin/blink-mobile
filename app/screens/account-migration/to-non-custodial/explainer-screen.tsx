@@ -11,7 +11,7 @@ import { openExternalUrl } from "@app/utils/external"
 
 import { MigrationExplainerLayout } from "../migration-explainer-layout"
 
-export const SparkMigrationExplainerScreen: React.FC = () => {
+export const MigrationExplainerScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const {
     theme: { colors },

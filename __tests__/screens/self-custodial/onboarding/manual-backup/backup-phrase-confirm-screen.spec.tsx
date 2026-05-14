@@ -222,7 +222,7 @@ describe("BackupPhraseConfirmScreen", () => {
     jest.advanceTimersByTime(500)
 
     expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
-    expect(mockNavigate).toHaveBeenCalledWith("sparkMigrationTransferringFunds")
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
   })
 
   it("routes to backup success screen with reBackup=true when re-backing-up from settings", () => {
@@ -280,7 +280,7 @@ describe("BackupPhraseConfirmScreen", () => {
     fillAllChallenges(getByPlaceholderText)
     jest.advanceTimersByTime(500)
 
-    expect(mockNavigate).not.toHaveBeenCalledWith("sparkMigrationTransferringFunds")
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationTransferringFunds")
     expect(mockNavigate).toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
       expect.objectContaining({ reBackup: false }),
@@ -343,6 +343,6 @@ describe("BackupPhraseConfirmScreen", () => {
     )
     jest.advanceTimersByTime(500)
 
-    expect(mockNavigate).toHaveBeenCalledWith("sparkMigrationTransferringFunds")
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
   })
 })

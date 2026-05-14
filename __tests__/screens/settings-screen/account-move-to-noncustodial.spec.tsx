@@ -19,7 +19,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
     loading: false,
-    getRouteForCheckpoint: () => "sparkMigrationExplainer",
+    getRouteForCheckpoint: () => "accountMigrationExplainer",
   }),
 }))
 

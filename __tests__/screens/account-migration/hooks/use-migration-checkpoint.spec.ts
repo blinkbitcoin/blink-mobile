@@ -138,7 +138,7 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.getRouteForCheckpoint()).toBe("sparkMigrationExplainer")
+    expect(result.current.getRouteForCheckpoint()).toBe("accountMigrationExplainer")
   })
 
   it("returns correct route for checkpoint", async () => {

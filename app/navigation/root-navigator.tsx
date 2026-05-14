@@ -146,7 +146,7 @@ import {
   CloudRestoreScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
 import {
-  SparkMigrationExplainerScreen,
+  MigrationExplainerScreen,
   TransferringFundsScreen,
 } from "@app/screens/account-migration"
 import {
@@ -813,12 +813,12 @@ export const RootStack = () => {
         options={{ title: LL.StableBalance.settingsTitle() }}
       />
       <RootNavigator.Screen
-        name="sparkMigrationExplainer"
-        component={SparkMigrationExplainerScreen}
+        name="accountMigrationExplainer"
+        component={MigrationExplainerScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
-        name="sparkMigrationTransferringFunds"
+        name="accountMigrationTransferringFunds"
         component={TransferringFundsScreen}
         options={{ headerShown: false }}
       />
