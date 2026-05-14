@@ -139,12 +139,12 @@ import {
   SparkBackupConfirmScreen,
   SparkBackupSuccessScreen,
   SparkWalletCreationScreen,
-} from "@app/screens/spark-onboarding"
+} from "@app/screens/self-custodial/onboarding"
 import {
   SparkRestoreMethodScreen,
   SparkRestorePhraseScreen,
   SparkCloudRestoreScreen,
-} from "@app/screens/spark-onboarding/restore"
+} from "@app/screens/self-custodial/onboarding/restore"
 import {
   SparkMigrationExplainerScreen,
   TransferringFundsScreen,
