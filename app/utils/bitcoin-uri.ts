@@ -16,9 +16,6 @@ type BuildBitcoinUriParams = {
   prefix?: boolean
 }
 
-export const buildLightningUri = (paymentRequest: string, prefix = true): string =>
-  prefix ? `lightning:${paymentRequest}` : paymentRequest
-
 export const buildBitcoinUri = ({
   address,
   amountSats,

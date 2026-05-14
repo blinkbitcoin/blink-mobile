@@ -64,7 +64,8 @@
     "title": "Конвертуј",
     "transfer": "Пренос",
     "percentageToConvert": "% конвертовати",
-    "reviewTransfer": "Преглед преноса"
+    "reviewTransfer": "Преглед преноса",
+    "dustError": "Мора се пренети цео салдо."
   },
   "ConversionConfirmationScreen": {
     "title": "Преглед конверзије",
@@ -74,9 +75,7 @@
     "infoDollar": "Доларски износ је само приближан. Може варирати за мали износ.",
     "transferButtonText": "Пренеси {fromWallet} на {toWallet}",
     "feeLabel": "Накнада за конверзију",
-    "feeError": "Није било могуће преузети накнаду за конверзију",
-    "amountFloored": "Износ увећан да би се испунио минимум за конверзију.",
-    "amountDustBumped": "Износ увећан да се конвертује цео салдо."
+    "feeError": "Није било могуће преузети накнаду за конверзију"
   },
   "ConversionSuccessScreen": {
     "message": "Конверзија успешна",
@@ -2173,8 +2172,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Накнада за депозит: {fee} SAT за износе испод {threshold} SAT или {overFee} SAT за депозите преко {threshold} SAT",
     "autoConvertMinAmount": "Износи мањи од {minSats: number} сатошија не могу се аутоматски конвертовати у Доларе. Добићете Биткоин уместо тога.",
-    "autoConvertSuccess": "Примљено {amount: number} сатошија, конвертовано у Доларе.",
-    "autoConvertFailed": "Уплата примљена, али конверзија није успела."
+    "autoConvertFailed": "Уплата примљена, али конверзија није успела.",
+    "pleaseWaitForConversion": "Сачекајте док се конверзија не заврши"
   },
   "RedeemBitcoinScreen": {
     "title": "Откупи Биткоин",
@@ -2350,7 +2349,6 @@
     "nonCustodialAccount": "Не-кастодијални налог",
     "tapUserName": "Додирните да бисте поставили корисничко име",
     "notifications": "Notifications",
-    "recoveryMethod": "Метод опоравка",
     "title": "Подешавања",
     "darkMode": "Тамни режим",
     "setToDark": "Режим: таман.",
@@ -2377,27 +2375,11 @@
     "receiveCurrency": "Валута за пријем",
     "displayCurrency": "Валута за приказ",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
       "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -2437,6 +2419,7 @@
     "level": "Ниво {level: string}",
     "switchAccount": "Промени налог",
     "pleaseWait": "Молимо сачекајте.",
+    "probeBalanceFailed": "Није могуће проверити стање новчаника. Покушајте поново.",
     "accountLevel": "Ниво налога",
     "upgrade": "Надоградите свој налог",
     "logOutAndDeleteLocalData": "Одјавите се и обришите све локалне податке",
@@ -2476,6 +2459,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "ID налога",
+    "publicKey": "Јавни кључ",
+    "copiedPublicKey": "Јавни кључ копиран у међуспремник",
     "copy": "Copy",
     "identityVerification": "Верификација идентитета"
   },
@@ -2506,7 +2491,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Подразумевани рачун за пријем",
-    "info": "Ваш „Биткоин“ Рачун је за сакупљање сатова, где се USD вредност креће са тржиштем. Ваш „Долар“ Рачун покреће Stablesats — држи Bitcoin заштићен да остане стабилан у USD вредности. Увек држите Bitcoin, али доларска вредност се не мења."
+    "info": "Ваш „Биткоин“ Рачун је за сакупљање сатова, где се USD вредност креће са тржиштем. Ваш „Долар“ Рачун покреће Stablesats — држи Bitcoin заштићен да остане стабилан у USD вредности. Увек држите Bitcoin, али доларска вредност се не мења.",
+    "titleSelfCustodial": "Подразумевани налог",
+    "infoSelfCustodial": "Овај налог ће се користити подразумевано приликом примања и слања. Можете променити у било ком тренутку."
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2524,7 +2511,10 @@
     "header": "Ваш „Долар“ Рачун покреће Stablesats",
     "body": "„Долар“ Рачун користи Stablesats технологију за одржавање Bitcoin-а стабилним на USD цени. Увек држите Bitcoin — не праве доларе — али USD вредност не флуктуира. Можете слати и примати Bitcoin као и обично, али није компатибилан са традиционалним банкарским системом.",
     "termsAndConditions": "Прочитајте услове коришћења",
-    "learnMore": "Сазнајте више о Стејблсатсу"
+    "learnMore": "Сазнајте више о Стејблсатсу",
+      "headerSelfCustodial": "Ваш Долар налог садржи стабилкоине",
+      "bodySelfCustodial": "На Долар налогу држите стабилкоине. Токени подржани имовином чија се вредност одржава стабилном у односу на USD. Стабилкоине још увек не можете да шаљете и примате. Када шаљете са Долар налога, ваши стабилкоини се размењују и шаљу као Биткоин примаоцу.",
+      "learnMoreSelfCustodial": "Сазнајте више"
   },
   "SplashScreen": {
     "update": "Ваша апликација је застарела. Потребно је извршити ажурирање пре него што се апликација може користити.\n\nОво можете урадити са Плеј продавнице за Андроид и Тестфлајт за „iOS“"
@@ -2804,6 +2794,7 @@
     "submit": "Submit",
     "success": "Успех!",
     "dollarStablesats": "Долар (Stablesats)",
+    "dollarStablecoin": "Долар (Stablecoin)",
     "to": "За",
     "total": "Укупно",
     "transactions": "Трансакције",
@@ -3526,8 +3517,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Менаџер лозинки",
       "manualBackup": "Ручна резервна копија",
-      "keychainSaved": "Резервна копија сачувана у менаџеру лозинки",
-      "keychainFailed": "Чување резервне копије није успело",
+      "passwordManagerBackupSaved": "Резервна копија сачувана у менаџеру лозинки",
+      "passwordManagerBackupFailed": "Чување резервне копије није успело",
+      "passwordManagerUnavailable": "На овом уређају није доступан управљач лозинкама. Користите Drive резервну копију или ручно сачувајте своју фразу од 12 речи.",
       "iOSComingSoon": "iCloud резервна копија ускоро стиже"
     },
     "ManualBackup": {
@@ -3545,7 +3537,9 @@
         "saveItNow": "Сачувајте сада",
         "savedConfirm": "Сачувао сам је",
         "copy": "Копирај",
-        "continueButton": "Настави"
+        "continueButton": "Настави",
+        "selfCustodialDisabled": "Не-старатељство је привремено недоступно.",
+        "testBackup": "Тестирајте резервну копију"
       },
       "Confirm": {
         "headerTitle": "Потврдите резервну фразу",
@@ -3556,7 +3550,8 @@
         "incorrectWord": "Погрешна реч, проверите редослед"
       },
       "Success": {
-        "title": "Добродошли у Blink без скрбништва"
+        "title": "Добродошли у Blink без скрбништва",
+        "testSuccess": "Ваша резервна фраза је тачна"
       }
     },
     "CloudBackup": {
@@ -3578,6 +3573,9 @@
       "signInFailed": "Пријава на Google није успела",
       "existingBackupTitle": "Резервна копија пронађена",
       "existingBackupMessage": "Резервна копија већ постоји у вашем {provider}. Желите ли да је препишете?",
+      "existingBackupMessageWithDetails": "Резервна копија већ постоји на вашем {provider}.\n\nLightning адреса: {address}\nКреирано: {createdAt}\n\nДа ли желите да је препишете?",
+      "existingBackupUnknownAddress": "Није доступно",
+      "existingBackupUnknownCreatedAt": "Непознато",
       "overwrite": "Препиши"
     }
   },
@@ -3591,8 +3589,8 @@
     "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Под старатељством",
+    "selfCustodialLabel": "Без старатељства",
     "custodialDescription": "Ми чувамо средства у ваше име",
     "selfCustodialDescription": "Само ви можете приступити средствима",
     "continueButton": "Настави",
@@ -3600,7 +3598,8 @@
     "descriptionSelected": "Молимо изаберите тип налога.",
     "chooseMethod": "Изаберите метод",
     "restoreComingSoonTitle": "Ускоро доступно",
-    "restoreComingSoonDescription": "Функција враћања биће доступна у будућем ажурирању."
+    "restoreComingSoonDescription": "Функција враћања биће доступна у будућем ажурирању.",
+    "createFailed": "Није успело креирање новчаника. Молимо покушајте поново."
   },
   "RestoreScreen": {
     "title": "Враћање новчаника",
@@ -3619,7 +3618,9 @@
     "noBackupFound": "Резервна копија није пронађена",
     "noBackupDescription": "Нисмо пронашли резервну копију. Можете унети безбедносну фразу ручно.",
     "enterPassword": "Унесите лозинку за шифровање",
-    "wrongPassword": "Нетачна лозинка. Покушајте поново."
+    "wrongPassword": "Нетачна лозинка. Покушајте поново.",
+    "pickBackupTitle": "Изаберите новчаник",
+    "pickBackupDescription": "Изаберите резервну копију за враћање"
   },
   "BackupNudge": {
     "title": "Vaša sredstva su u opasnosti",
@@ -3628,11 +3629,7 @@
     "settingsWarning": "Направите резервну копију. Ако изгубите уређај, изгубићете средства.",
     "modalTitle": "Obezbedite svoja sredstva",
     "modalDescription": "Preporučujemo da napravite rezervnu kopiju novčanika kako biste sprečili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
-    "secureMe": "Obezbedi novčanik",
-    "trustModelTitle": "Ви имате контролу",
-    "trustModelDescription": "Ваши кључеви контролишу ваша средства. Трансакције обрађују Spark оператери, не директно на Bitcoin L1.",
-    "trustModelWarning": "Врло мали салди можда неће бити економични за повраћај на Bitcoin базни ланац.",
-    "trustModelDismiss": "Разумем"
+    "secureMe": "Obezbedi novčanik"
   },
   "StableBalance": {
     "title": "Стабилан салдо",
@@ -3656,12 +3653,6 @@
       "deactivateConfirm": "Деактивирај",
       "cancel": "Откажи"
     },
-    "firstTimeModal": {
-      "title": "О конверзији",
-      "dualBalance": "BTC и USD су два независна салда у вашем новчанику. Користите Convert било кад за премештање средстава између њих.",
-      "trustDisclosure": "USD режим користи USDB токене на Sparku. Претпоставке поверења разликују се од директног држања BTC-а. USDB се ослања на Sparkovog издаваоца токена.",
-      "acknowledge": "Разумем"
-    },
     "minimumConversion": "Минимална конверзија: {amount:string}",
     "conversionUnavailable": "Конверзија тренутно није доступна. Покушајте поново."
   },
@@ -3676,7 +3667,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Креирање новчаника...",
     "errorTitle": "Креирање новчаника није успело",
     "errorDescription": "Нешто је пошло по злу. Покушајте поново.",
@@ -3752,10 +3743,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Важно",
+    "dangerZoneBulletReinstated": "Обрисани налог се не може вратити",
+    "dangerZoneBulletPermanent": "Брисање налога је трајно",
+    "dangerZoneBulletEmpty": "Уверите се да је налог празан",
+    "dangerZoneDeleteButton": "Обриши налог и податке",
+    "confirmModalTitle": "Потврди брисање налога",
+    "confirmModalTypeToConfirm": "Унесите \"{delete: string}\" за потврду",
+    "hasFundsWarningTitle": "Упозорење",
+    "hasFundsWarningBody": "Ваш новчаник има стање од {balance}. Због ваше безбедности, не дозвољавамо брисање налога са средствима.",
+    "hasFundsWarningHelper": "Да бисте наставили са брисањем, испразните свој налог или донирајте циркуларним економијама.",
+    "hasFundsWarningButton": "Назад"
   }
 }

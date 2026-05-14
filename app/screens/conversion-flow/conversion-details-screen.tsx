@@ -41,17 +41,16 @@ import {
   AmountInputScreen,
   ConvertInputType,
 } from "@app/components/transfer-amount-input"
-import { StableBalanceFirstTimeModal } from "@app/components/stable-balance-first-time-modal"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
-import { useStableBalanceFirstTime } from "@app/hooks/use-stable-balance-first-time"
-import { convertDirectionFromCurrency } from "@app/types/payment.types"
+import { convertDirectionFromCurrency } from "@app/types/payment"
+import { AccountType } from "@app/types/wallet"
 
 import {
   useConversionFormatting,
   useConversionOverlayFocus,
+  useNonCustodialConversionGuard,
   useSyncedInputValues,
 } from "./hooks"
 import { BTC_SUFFIX, findBtcSuffixIndex } from "./btc-format"
@@ -88,8 +87,13 @@ export const ConversionDetailsScreen = () => {
 
   useRealtimePriceQuery({ fetchPolicy: "network-only" })
 
-  const { isSelfCustodial, wallets: activeWallets } = useActiveWallet()
-  const { isStableBalanceActive } = useSelfCustodialWallet()
+  const {
+    isSelfCustodial,
+    isReady,
+    accountType,
+    wallets: activeWallets,
+  } = useActiveWallet()
+  const isSelfCustodialBooting = accountType === AccountType.SelfCustodial && !isReady
 
   const { data } = useConversionScreenQuery({
     fetchPolicy: "cache-and-network",
@@ -106,37 +110,33 @@ export const ConversionDetailsScreen = () => {
   } = useDisplayCurrency()
   const styles = useStyles(displayCurrency !== WalletCurrency.Usd)
 
-  const {
-    shouldShow: shouldShowStableBalanceFirstTime,
-    markAsShown: markStableBalanceFirstTimeShown,
-  } = useStableBalanceFirstTime()
-  const showStableBalanceFirstTimeModal = Boolean(
-    shouldShowStableBalanceFirstTime && isSelfCustodial && isStableBalanceActive,
-  )
-
-  const scWalletsForConvert = useMemo(() => {
+  const selfCustodialWalletsForConvert = useMemo(() => {
     if (!isSelfCustodial) return null
-    const scBtc = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
-    const scUsd = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Usd)
-    if (!scBtc || !scUsd) return null
+    const selfCustodialBtc = activeWallets.find(
+      (w) => w.walletCurrency === WalletCurrency.Btc,
+    )
+    const selfCustodialUsd = activeWallets.find(
+      (w) => w.walletCurrency === WalletCurrency.Usd,
+    )
+    if (!selfCustodialBtc || !selfCustodialUsd) return null
     return {
       btc: {
-        id: scBtc.id,
-        balance: scBtc.balance.amount,
-        walletCurrency: scBtc.walletCurrency,
+        id: selfCustodialBtc.id,
+        balance: selfCustodialBtc.balance.amount,
+        walletCurrency: selfCustodialBtc.walletCurrency,
       },
       usd: {
-        id: scUsd.id,
-        balance: scUsd.balance.amount,
-        walletCurrency: scUsd.walletCurrency,
+        id: selfCustodialUsd.id,
+        balance: selfCustodialUsd.balance.amount,
+        walletCurrency: selfCustodialUsd.walletCurrency,
       },
     }
   }, [isSelfCustodial, activeWallets])
 
   const btcWallet =
-    scWalletsForConvert?.btc ?? getBtcWallet(data?.me?.defaultAccount?.wallets)
+    selfCustodialWalletsForConvert?.btc ?? getBtcWallet(data?.me?.defaultAccount?.wallets)
   const usdWallet =
-    scWalletsForConvert?.usd ?? getUsdWallet(data?.me?.defaultAccount?.wallets)
+    selfCustodialWalletsForConvert?.usd ?? getUsdWallet(data?.me?.defaultAccount?.wallets)
 
   const {
     fromWallet,
@@ -159,12 +159,21 @@ export const ConversionDetailsScreen = () => {
     isSelfCustodial && fromWallet
       ? convertDirectionFromCurrency(fromWallet.walletCurrency)
       : undefined
-  const { limits: scConversionLimits, error: scLimitsError } =
+  const { limits: selfCustodialConversionLimits, error: selfCustodialLimitsError } =
     useNonCustodialConversionLimits(convertDirection)
-  const scMinFromAmount = isSelfCustodial
-    ? scConversionLimits?.minFromAmount ?? null
+  const selfCustodialMinFromAmount = isSelfCustodial
+    ? selfCustodialConversionLimits?.minFromAmount ?? null
     : null
-  const scLimitsUnavailable = isSelfCustodial && scLimitsError !== null
+  const selfCustodialLimitsUnavailable =
+    isSelfCustodial && selfCustodialLimitsError !== null
+
+  const conversionGuard = useNonCustodialConversionGuard({
+    fromCurrency: fromWallet?.walletCurrency,
+    amountInSourceCurrency: settlementSendAmount?.amount ?? 0,
+    fromWalletBalance: fromWallet?.balance,
+    enabled: isSelfCustodial,
+  })
+  const quoteBlocking = conversionGuard.blockingReason !== null
 
   const [focusedInputValues, setFocusedInputValues] = useState<InputField | null>(null)
   const [initialAmount, setInitialAmount] =
@@ -484,25 +493,28 @@ export const ConversionDetailsScreen = () => {
 
   const belowMinimum =
     isSelfCustodial &&
-    scMinFromAmount !== null &&
+    selfCustodialMinFromAmount !== null &&
     settlementSendAmount.amount > 0 &&
-    settlementSendAmount.amount < scMinFromAmount
+    settlementSendAmount.amount < selfCustodialMinFromAmount
 
   const amountFieldError: string | undefined = (() => {
     if (exceedsBalance) {
       return LL.SendBitcoinScreen.amountExceed({ balance: fromWalletBalanceFormatted })
     }
-    if (scLimitsUnavailable) {
+    if (selfCustodialLimitsUnavailable) {
       return LL.StableBalance.conversionUnavailable()
     }
-    if (belowMinimum && scMinFromAmount !== null) {
+    if (belowMinimum && selfCustodialMinFromAmount !== null) {
       const minMoneyAmount = toWalletMoneyAmount(
-        scMinFromAmount,
+        selfCustodialMinFromAmount,
         fromWallet.walletCurrency,
       )
       return LL.StableBalance.minimumConversion({
         amount: formatMoneyAmount({ moneyAmount: minMoneyAmount }),
       })
+    }
+    if (quoteBlocking) {
+      return LL.ConversionDetailsScreen.dustError()
     }
   })()
 
@@ -510,6 +522,7 @@ export const ConversionDetailsScreen = () => {
 
   const setAmountToBalancePercentage = (percentage: number) => {
     if (uiLocked) return
+    setLockFormattingInputId(null)
     setUiLocked(true)
     setLoadingPercent(percentage)
 
@@ -530,10 +543,6 @@ export const ConversionDetailsScreen = () => {
 
   return (
     <Screen preset="fixed">
-      <StableBalanceFirstTimeModal
-        isVisible={showStableBalanceFirstTimeModal}
-        onAcknowledge={markStableBalanceFirstTimeShown}
-      />
       <View style={styles.styleWalletContainer}>
         <View
           style={[
@@ -747,7 +756,11 @@ export const ConversionDetailsScreen = () => {
             isTyping ||
             Boolean(loadingPercent) ||
             belowMinimum ||
-            scLimitsUnavailable
+            selfCustodialLimitsUnavailable ||
+            quoteBlocking ||
+            conversionGuard.isQuoting ||
+            conversionGuard.hasQuoteError ||
+            isSelfCustodialBooting
           }
           onPress={moveToNextScreen}
           testID="next-button"

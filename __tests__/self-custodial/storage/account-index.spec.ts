@@ -17,11 +17,16 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   },
 }))
 
+const mockRecordError = jest.fn()
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: (...args: unknown[]) => mockRecordError(...args),
+}))
+
 import {
   addSelfCustodialAccountId,
   findSelfCustodialAccountByMnemonic,
-  listSelfCustodialAccountIds,
   listSelfCustodialAccounts,
+  StorageReadStatus,
   removeSelfCustodialAccountId,
   setSelfCustodialLightningAddress,
   type SelfCustodialAccountEntry,
@@ -54,18 +59,21 @@ describe("self-custodial account-index", () => {
   })
 
   describe("listSelfCustodialAccounts", () => {
-    it("returns parsed entries from the canonical index", async () => {
+    it("returns ok with parsed entries from the canonical index", async () => {
       setIndex([
         { id: "a1", lightningAddress: null },
         { id: "a2", lightningAddress: "alice@blink.sv" },
       ])
 
-      const entries = await listSelfCustodialAccounts()
+      const result = await listSelfCustodialAccounts()
 
-      expect(entries).toEqual([
-        { id: "a1", lightningAddress: null },
-        { id: "a2", lightningAddress: "alice@blink.sv" },
-      ])
+      expect(result).toEqual({
+        status: StorageReadStatus.Ok,
+        entries: [
+          { id: "a1", lightningAddress: null },
+          { id: "a2", lightningAddress: "alice@blink.sv" },
+        ],
+      })
     })
 
     it("filters out malformed entries", async () => {
@@ -78,31 +86,29 @@ describe("self-custodial account-index", () => {
         ]),
       )
 
-      const entries = await listSelfCustodialAccounts()
+      const result = await listSelfCustodialAccounts()
 
-      expect(entries).toEqual([
-        { id: "a1", lightningAddress: null },
-        { id: "a2", lightningAddress: "alice" },
-      ])
-    })
-
-    it("returns an empty array on JSON parse error", async () => {
-      mockGetItem.mockResolvedValueOnce("not-json")
-
-      const entries = await listSelfCustodialAccounts()
-
-      expect(entries).toEqual([])
+      expect(result.status).toBe(StorageReadStatus.Ok)
+      if (result.status === StorageReadStatus.Ok) {
+        expect(result.entries).toEqual([
+          { id: "a1", lightningAddress: null },
+          { id: "a2", lightningAddress: "alice" },
+        ])
+      }
     })
 
     it("migrates legacy id-only list and persists the canonical index", async () => {
       setLegacyOnly(["legacy-a", "legacy-b"])
 
-      const entries = await listSelfCustodialAccounts()
+      const result = await listSelfCustodialAccounts()
 
-      expect(entries).toEqual([
-        { id: "legacy-a", lightningAddress: null },
-        { id: "legacy-b", lightningAddress: null },
-      ])
+      expect(result).toEqual({
+        status: StorageReadStatus.Ok,
+        entries: [
+          { id: "legacy-a", lightningAddress: null },
+          { id: "legacy-b", lightningAddress: null },
+        ],
+      })
       expect(mockSetItem).toHaveBeenCalledWith(
         ACCOUNT_INDEX_KEY,
         JSON.stringify([
@@ -115,22 +121,54 @@ describe("self-custodial account-index", () => {
     it("ignores non-string entries from the legacy list", async () => {
       setLegacyOnly(["legacy-a", 99, null, "legacy-b"] as never)
 
-      const entries = await listSelfCustodialAccounts()
+      const result = await listSelfCustodialAccounts()
 
-      expect(entries.map((e) => e.id)).toEqual(["legacy-a", "legacy-b"])
+      expect(result.status).toBe(StorageReadStatus.Ok)
+      if (result.status === StorageReadStatus.Ok) {
+        expect(result.entries.map((e) => e.id)).toEqual(["legacy-a", "legacy-b"])
+      }
     })
   })
 
-  describe("listSelfCustodialAccountIds", () => {
-    it("returns the id array projection", async () => {
-      setIndex([
-        { id: "a1", lightningAddress: null },
-        { id: "a2", lightningAddress: "alice@blink.sv" },
-      ])
+  describe("listSelfCustodialAccounts — read failure", () => {
+    it("returns read-failed and reports to crashlytics when AsyncStorage rejects", async () => {
+      const transientError = new Error("AsyncStorage unavailable")
+      mockGetItem.mockRejectedValueOnce(transientError)
 
-      const ids = await listSelfCustodialAccountIds()
+      const result = await listSelfCustodialAccounts()
 
-      expect(ids).toEqual(["a1", "a2"])
+      expect(result).toEqual({
+        status: StorageReadStatus.ReadFailed,
+        error: transientError,
+      })
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockRecordError.mock.calls[0][0]).toBe(transientError)
+    })
+
+    it("returns read-failed and reports to crashlytics when JSON.parse throws on the canonical key", async () => {
+      mockGetItem.mockResolvedValueOnce("not-json")
+
+      const result = await listSelfCustodialAccounts()
+
+      expect(result.status).toBe(StorageReadStatus.ReadFailed)
+      if (result.status === StorageReadStatus.ReadFailed) {
+        expect(result.error).toBeInstanceOf(Error)
+      }
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+    })
+
+    it("wraps a non-Error rejection (string) into an Error and reports it", async () => {
+      // eslint-disable-next-line prefer-promise-reject-errors
+      mockGetItem.mockImplementationOnce(() => Promise.reject("boom"))
+
+      const result = await listSelfCustodialAccounts()
+
+      expect(result.status).toBe(StorageReadStatus.ReadFailed)
+      if (result.status === StorageReadStatus.ReadFailed) {
+        expect(result.error).toBeInstanceOf(Error)
+        expect(result.error.message).toContain("boom")
+      }
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -156,6 +194,15 @@ describe("self-custodial account-index", () => {
 
       expect(mockSetItem).not.toHaveBeenCalled()
     })
+
+    it("does NOT write (preserving the registry) when the underlying read fails", async () => {
+      mockGetItem.mockRejectedValueOnce(new Error("AsyncStorage unavailable"))
+
+      await addSelfCustodialAccountId("new-id")
+
+      expect(mockSetItem).not.toHaveBeenCalled()
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe("removeSelfCustodialAccountId", () => {
@@ -179,6 +226,15 @@ describe("self-custodial account-index", () => {
       await removeSelfCustodialAccountId("missing")
 
       expect(mockSetItem).not.toHaveBeenCalled()
+    })
+
+    it("does NOT write (preserving the registry) when the underlying read fails", async () => {
+      mockGetItem.mockRejectedValueOnce(new Error("AsyncStorage unavailable"))
+
+      await removeSelfCustodialAccountId("a1")
+
+      expect(mockSetItem).not.toHaveBeenCalled()
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -220,9 +276,18 @@ describe("self-custodial account-index", () => {
         JSON.stringify([{ id: "a1", lightningAddress: null }]),
       )
     })
+
+    it("does NOT write (preserving the registry) when the underlying read fails", async () => {
+      mockGetItem.mockRejectedValueOnce(new Error("AsyncStorage unavailable"))
+
+      await setSelfCustodialLightningAddress("a1", "alice@blink.sv")
+
+      expect(mockSetItem).not.toHaveBeenCalled()
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+    })
   })
 
-  describe("findSelfCustodialAccountByMnemonic (Critical #3)", () => {
+  describe("findSelfCustodialAccountByMnemonic", () => {
     const STORED = "alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu"
 
     beforeEach(() => {
@@ -232,14 +297,14 @@ describe("self-custodial account-index", () => {
       ])
     })
 
-    it("matches the same mnemonic on exact whitespace", async () => {
+    it("returns ok with the matching id on exact whitespace", async () => {
       mockGetMnemonicForAccount.mockImplementation((id: string) =>
         Promise.resolve(id === "a2" ? STORED : "other words"),
       )
 
-      const id = await findSelfCustodialAccountByMnemonic(STORED)
+      const result = await findSelfCustodialAccountByMnemonic(STORED)
 
-      expect(id).toBe("a2")
+      expect(result).toEqual({ status: StorageReadStatus.Ok, id: "a2" })
     })
 
     it("matches on input with leading and trailing whitespace", async () => {
@@ -247,9 +312,9 @@ describe("self-custodial account-index", () => {
         Promise.resolve(id === "a2" ? STORED : "other words"),
       )
 
-      const id = await findSelfCustodialAccountByMnemonic(`  ${STORED}  `)
+      const result = await findSelfCustodialAccountByMnemonic(`  ${STORED}  `)
 
-      expect(id).toBe("a2")
+      expect(result).toEqual({ status: StorageReadStatus.Ok, id: "a2" })
     })
 
     it("matches on input with collapsed-runs of internal whitespace (tabs, multi-space)", async () => {
@@ -258,9 +323,9 @@ describe("self-custodial account-index", () => {
       )
 
       const noisy = STORED.replace(/ /g, "  \t  ")
-      const id = await findSelfCustodialAccountByMnemonic(noisy)
+      const result = await findSelfCustodialAccountByMnemonic(noisy)
 
-      expect(id).toBe("a2")
+      expect(result).toEqual({ status: StorageReadStatus.Ok, id: "a2" })
     })
 
     it("matches when the stored value itself has noisy whitespace (legacy data)", async () => {
@@ -269,25 +334,39 @@ describe("self-custodial account-index", () => {
         Promise.resolve(id === "a2" ? storedNoisy : "other words"),
       )
 
-      const id = await findSelfCustodialAccountByMnemonic(STORED)
+      const result = await findSelfCustodialAccountByMnemonic(STORED)
 
-      expect(id).toBe("a2")
+      expect(result).toEqual({ status: StorageReadStatus.Ok, id: "a2" })
     })
 
-    it("returns null when no entry has the matching mnemonic", async () => {
+    it("returns ok with id=null when no entry has the matching mnemonic", async () => {
       mockGetMnemonicForAccount.mockResolvedValue("totally different words")
 
-      const id = await findSelfCustodialAccountByMnemonic(STORED)
+      const result = await findSelfCustodialAccountByMnemonic(STORED)
 
-      expect(id).toBeNull()
+      expect(result).toEqual({ status: StorageReadStatus.Ok, id: null })
     })
 
-    it("returns null when an entry has no stored mnemonic", async () => {
+    it("returns ok with id=null when an entry has no stored mnemonic", async () => {
       mockGetMnemonicForAccount.mockResolvedValue(null)
 
-      const id = await findSelfCustodialAccountByMnemonic(STORED)
+      const result = await findSelfCustodialAccountByMnemonic(STORED)
 
-      expect(id).toBeNull()
+      expect(result).toEqual({ status: StorageReadStatus.Ok, id: null })
+    })
+
+    it("returns read-failed when the underlying index read fails — never silently 'no match'", async () => {
+      mockGetItem.mockRejectedValueOnce(new Error("AsyncStorage unavailable"))
+
+      const result = await findSelfCustodialAccountByMnemonic(STORED)
+
+      expect(result.status).toBe(StorageReadStatus.ReadFailed)
+      if (result.status === StorageReadStatus.ReadFailed) {
+        expect(result.error).toBeInstanceOf(Error)
+        expect(result.error.message).toContain("AsyncStorage unavailable")
+      }
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockGetMnemonicForAccount).not.toHaveBeenCalled()
     })
   })
 })

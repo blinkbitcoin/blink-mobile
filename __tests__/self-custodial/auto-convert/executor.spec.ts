@@ -1,4 +1,4 @@
-import { ConvertErrorCode, PaymentResultStatus } from "@app/types/payment.types"
+import { ConvertErrorCode, PaymentResultStatus } from "@app/types/payment"
 
 import {
   executeAutoConvert,
@@ -98,7 +98,7 @@ describe("waitForPaymentCompleted", () => {
     expect(sdk.getPayment).toHaveBeenCalledTimes(2)
   })
 
-  it("does not sleep when maxAttempts is 1 (Important #9)", async () => {
+  it("does not sleep when maxAttempts is 1", async () => {
     const setTimeoutSpy = jest.spyOn(global, "setTimeout")
     setTimeoutSpy.mockClear()
     const sdk = {
@@ -306,7 +306,7 @@ describe("executeAutoConvert", () => {
     await flushPromises()
   })
 
-  it("excludes already-claimed conversion ids from the prior-match check (Critical #2)", async () => {
+  it("excludes already-claimed conversion ids from the prior-match check", async () => {
     mockGetConversionQuote.mockResolvedValue(successQuote())
 
     // The only matching payment in history is already paired to another receive,

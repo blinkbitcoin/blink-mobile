@@ -64,7 +64,8 @@
     "title": "Wisselen",
     "transfer": "Overschrijven",
     "percentageToConvert": "% om te wisselen",
-    "reviewTransfer": "Overschrijving controleren"
+    "reviewTransfer": "Overschrijving controleren",
+    "dustError": "Het volledige saldo moet worden overgemaakt."
   },
   "ConversionConfirmationScreen": {
     "title": "Bevestig wissel",
@@ -74,9 +75,7 @@
     "infoDollar": "Het dollarbedrag is slechts een schatting. Het kan enigszins afwijken.",
     "transferButtonText": "Overschrijven van {fromWallet} naar {toWallet}",
     "feeLabel": "Conversiekosten",
-    "feeError": "Kon de conversiekosten niet ophalen",
-    "amountFloored": "Bedrag verhoogd om aan het conversieminimum te voldoen.",
-    "amountDustBumped": "Bedrag verhoogd om je volledige saldo te converteren."
+    "feeError": "Kon de conversiekosten niet ophalen"
   },
   "ConversionSuccessScreen": {
     "message": "Wissel geslaagd",
@@ -2173,8 +2172,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Stortingskosten: {fee} SAT voor bedragen onder {threshold} SAT of {overFee} SAT voor stortingen boven {threshold} SAT",
     "autoConvertMinAmount": "Bedragen onder {minSats: number} sats kunnen niet automatisch worden omgezet naar Dollar. Je ontvangt Bitcoin in plaats daarvan.",
-    "autoConvertSuccess": "{amount: number} sats ontvangen, omgezet naar Dollar.",
-    "autoConvertFailed": "Betaling ontvangen maar de conversie is mislukt."
+    "autoConvertFailed": "Betaling ontvangen maar de conversie is mislukt.",
+    "pleaseWaitForConversion": "Wacht tot de omzetting is voltooid"
   },
   "RedeemBitcoinScreen": {
     "title": "Wissel Bitcoin",
@@ -2350,7 +2349,6 @@
     "nonCustodialAccount": "Niet-bewaarde rekening",
     "tapUserName": "Click om gebruikersnaam in te stellen",
     "notifications": "Meldingen",
-    "recoveryMethod": "Herstelmethode",
     "title": "Instellingen",
     "darkMode": "Donkere modus",
     "setToDark": "Modus: donker.",
@@ -2377,27 +2375,11 @@
     "receiveCurrency": "Ontvangstvaluta",
     "displayCurrency": "Weergavevaluta",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
       "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -2437,6 +2419,7 @@
     "level": "Niveau {level: string}",
     "switchAccount": "Wissel van account",
     "pleaseWait": "Even geduld.",
+    "probeBalanceFailed": "Kan het saldo van de portemonnee niet verifiëren. Probeer het opnieuw.",
     "accountLevel": "Account Niveau",
     "upgrade": "Je account upgraden",
     "logOutAndDeleteLocalData": "Log uit en wis alle lokale gegevens",
@@ -2476,6 +2459,8 @@
     "copiedAccountId": "Uw account-ID naar het klembord gekopieerd",
     "yourAccountId": "Uw account-ID",
     "accountId": "Account-ID",
+    "publicKey": "Publieke sleutel",
+    "copiedPublicKey": "Publieke sleutel gekopieerd naar klembord",
     "copy": "Kopiëren",
     "identityVerification": "Identiteitsverificatie"
   },
@@ -2506,7 +2491,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Standaard ontvangstrekening",
-    "info": "Je Bitcoin-rekening is voor het stapelen van sats, waar de USD-waarde meebeweegt met de markt. Je Dollar-rekening wordt aangedreven door Stablesats — het bevat Bitcoin die is afgedekt om stabiel te blijven in USD-waarde. Je houdt altijd Bitcoin, maar de dollarwaarde verandert niet."
+    "info": "Je Bitcoin-rekening is voor het stapelen van sats, waar de USD-waarde meebeweegt met de markt. Je Dollar-rekening wordt aangedreven door Stablesats — het bevat Bitcoin die is afgedekt om stabiel te blijven in USD-waarde. Je houdt altijd Bitcoin, maar de dollarwaarde verandert niet.",
+    "titleSelfCustodial": "Standaardrekening",
+    "infoSelfCustodial": "Deze rekening wordt standaard gebruikt bij ontvangen en verzenden. Je kunt op elk moment wisselen."
   },
   "ThemeScreen": {
     "title": "Thema",
@@ -2524,7 +2511,10 @@
     "header": "Je Dollar-rekening wordt aangedreven door Stablesats",
     "body": "De Dollar-rekening gebruikt Stablesats-technologie om Bitcoin stabiel te houden op de USD-prijs. Je houdt altijd Bitcoin — geen echte dollars — maar de USD-waarde fluctueert niet. Je kunt Bitcoin versturen en ontvangen zoals gewoonlijk, maar het is niet compatibel met het traditionele banksysteem.",
     "termsAndConditions": "Lees de Algemene voorwaarden",
-    "learnMore": "Meer informatie over Stablesats"
+    "learnMore": "Meer informatie over Stablesats",
+      "headerSelfCustodial": "Je Dollar-account bevat stablecoins",
+      "bodySelfCustodial": "In het Dollar-account houd je stablecoins. Tokens die gedekt worden door activa en waarvan de waarde stabiel wordt gehouden ten opzichte van de USD. Je kunt nog geen stablecoins versturen en ontvangen. Wanneer je vanaf het Dollar-account stuurt, worden je stablecoins omgewisseld en als Bitcoin naar de ontvanger gestuurd.",
+      "learnMoreSelfCustodial": "Meer informatie"
   },
   "SplashScreen": {
     "update": "Je app is verouderd. Er is een update nodig voordat de app kan worden gebruikt.\n\nDit kan vanuit de PlayStore voor Android en AppStore voor iOS"
@@ -2804,6 +2794,7 @@
     "submit": "Indienen",
     "success": "Success!",
     "dollarStablesats": "dollar (Stablesats)",
+    "dollarStablecoin": "dollar (Stablecoin)",
     "to": "Naar",
     "total": "Totaal",
     "transactions": "Transacties",
@@ -3529,8 +3520,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Wachtwoordbeheerder",
       "manualBackup": "Handmatige back-up",
-      "keychainSaved": "Back-up opgeslagen in wachtwoordbeheerder",
-      "keychainFailed": "Back-up opslaan mislukt",
+      "passwordManagerBackupSaved": "Back-up opgeslagen in wachtwoordbeheerder",
+      "passwordManagerBackupFailed": "Back-up opslaan mislukt",
+      "passwordManagerUnavailable": "Geen wachtwoordbeheerder beschikbaar op dit apparaat. Gebruik Drive-back-up of bewaar je 12-woord-frase handmatig.",
       "iOSComingSoon": "iCloud-back-up komt binnenkort"
     },
     "ManualBackup": {
@@ -3548,7 +3540,9 @@
         "saveItNow": "Sla het nu op",
         "savedConfirm": "Ik heb het opgeslagen",
         "copy": "Kopiëren",
-        "continueButton": "Doorgaan"
+        "continueButton": "Doorgaan",
+        "selfCustodialDisabled": "Niet-bewaard is tijdelijk niet beschikbaar.",
+        "testBackup": "Test je back-up"
       },
       "Confirm": {
         "headerTitle": "Bevestig back-upzin",
@@ -3559,7 +3553,8 @@
         "incorrectWord": "Onjuist woord, controleer de volgorde"
       },
       "Success": {
-        "title": "Welkom bij non-custodial Blink"
+        "title": "Welkom bij non-custodial Blink",
+        "testSuccess": "Je back-upzin is correct"
       }
     },
     "CloudBackup": {
@@ -3581,6 +3576,9 @@
       "signInFailed": "Inloggen bij Google mislukt",
       "existingBackupTitle": "Back-up gevonden",
       "existingBackupMessage": "Er bestaat al een back-up in je {provider}. Wil je deze overschrijven?",
+      "existingBackupMessageWithDetails": "Er bestaat al een back-up op je {provider}.\n\nLightning-adres: {address}\nAangemaakt: {createdAt}\n\nWil je deze overschrijven?",
+      "existingBackupUnknownAddress": "Niet beschikbaar",
+      "existingBackupUnknownCreatedAt": "Onbekend",
       "overwrite": "Overschrijven"
     }
   },
@@ -3594,8 +3592,8 @@
     "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Bewaard",
+    "selfCustodialLabel": "Zelfbeheerd",
     "custodialDescription": "Wij bewaren de fondsen namens u",
     "selfCustodialDescription": "Alleen jij hebt toegang tot de fondsen",
     "continueButton": "Doorgaan",
@@ -3603,7 +3601,8 @@
     "descriptionSelected": "Kies accounttype.",
     "chooseMethod": "Kies methode",
     "restoreComingSoonTitle": "Binnenkort beschikbaar",
-    "restoreComingSoonDescription": "De herstelfunctie wordt beschikbaar in een toekomstige update."
+    "restoreComingSoonDescription": "De herstelfunctie wordt beschikbaar in een toekomstige update.",
+    "createFailed": "Kon portemonnee niet aanmaken. Probeer het opnieuw."
   },
   "RestoreScreen": {
     "title": "Portemonnee herstellen",
@@ -3622,7 +3621,9 @@
     "noBackupFound": "Geen back-up gevonden",
     "noBackupDescription": "We konden geen back-up vinden. Je kunt je back-upfrase handmatig invoeren.",
     "enterPassword": "Voer je versleutelingswachtwoord in",
-    "wrongPassword": "Onjuist wachtwoord. Probeer opnieuw."
+    "wrongPassword": "Onjuist wachtwoord. Probeer opnieuw.",
+    "pickBackupTitle": "Kies een wallet",
+    "pickBackupDescription": "Kies een back-up om te herstellen"
   },
   "BackupNudge": {
     "title": "Uw fondsen lopen gevaar",
@@ -3631,11 +3632,7 @@
     "settingsWarning": "Maak een back-up van je portemonnee. Als je dit apparaat verliest, verlies je je tegoeden.",
     "modalTitle": "Beveilig uw fondsen",
     "modalDescription": "We raden u ten zeerste aan om een back-up van uw portemonnee te maken om volledig verlies van fondsen te voorkomen als u dit apparaat kwijtraakt.",
-    "secureMe": "Portemonnee beveiligen",
-    "trustModelTitle": "Jij hebt de controle",
-    "trustModelDescription": "Jouw sleutels beheren je tegoeden. Transacties worden verwerkt door Spark-operators, niet direct gevalideerd op Bitcoin L1.",
-    "trustModelWarning": "Zeer kleine saldi zijn mogelijk niet economisch om te herstellen naar de Bitcoin-basisketen.",
-    "trustModelDismiss": "Ik begrijp het"
+    "secureMe": "Portemonnee beveiligen"
   },
   "StableBalance": {
     "title": "Stabiel saldo",
@@ -3659,12 +3656,6 @@
       "deactivateConfirm": "Deactiveren",
       "cancel": "Annuleren"
     },
-    "firstTimeModal": {
-      "title": "Over Converteren",
-      "dualBalance": "BTC en USD zijn twee onafhankelijke saldi in je portemonnee. Gebruik Convert op elk moment om geld tussen beide te verplaatsen.",
-      "trustDisclosure": "De USD-modus gebruikt USDB-tokens op Spark. De vertrouwensaannames verschillen van het direct aanhouden van BTC. USDB steunt op de token-uitgever van Spark.",
-      "acknowledge": "Ik begrijp het"
-    },
     "minimumConversion": "Minimale conversie: {amount:string}",
     "conversionUnavailable": "Conversie is tijdelijk niet beschikbaar. Probeer het opnieuw."
   },
@@ -3679,7 +3670,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Portemonnee aanmaken...",
     "errorTitle": "Aanmaken portemonnee mislukt",
     "errorDescription": "Er is iets misgegaan. Probeer het opnieuw.",
@@ -3755,10 +3746,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Belangrijk",
+    "dangerZoneBulletReinstated": "Een verwijderd account kan niet worden hersteld",
+    "dangerZoneBulletPermanent": "Account verwijderen is permanent",
+    "dangerZoneBulletEmpty": "Zorg dat het account leeg is",
+    "dangerZoneDeleteButton": "Account en gegevens verwijderen",
+    "confirmModalTitle": "Account verwijderen bevestigen",
+    "confirmModalTypeToConfirm": "Typ \"{delete: string}\" om te bevestigen",
+    "hasFundsWarningTitle": "Waarschuwing",
+    "hasFundsWarningBody": "Je portemonnee heeft een saldo van {balance}. Voor je veiligheid staan we het verwijderen van accounts met geld er nog op niet toe.",
+    "hasFundsWarningHelper": "Om door te gaan met verwijderen, maak je account leeg of doneer aan circulaire economieën.",
+    "hasFundsWarningButton": "Terug"
   }
 }

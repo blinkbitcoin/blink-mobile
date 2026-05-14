@@ -5,12 +5,13 @@ import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { type MoneyAmount, type WalletOrDisplayCurrency } from "@app/types/amounts"
 import {
-  convertDirectionFromCurrency,
   oppositeWalletCurrency,
   PaymentResultStatus,
   type ConvertParams,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { logConversionAttempt } from "@app/utils/analytics"
+
+import { buildConvertParams } from "../build-convert-params"
 
 import { useConversionQuote } from "./use-conversion-quote"
 
@@ -28,7 +29,6 @@ export type NonCustodialConversionFlow = {
   isQuoting: boolean
   hasQuoteError: boolean
   feeText: string
-  adjustmentText: string | null
   canExecute: boolean
   execute: () => Promise<NonCustodialConversionOutcome>
 }
@@ -43,12 +43,8 @@ export const useNonCustodialConversion = ({
 
   const liveQuoteParams = useMemo(() => {
     if (!enabled || !convertMoneyAmount) return null
-    const toCurrency = oppositeWalletCurrency(fromCurrency)
-    return {
-      fromAmount: convertMoneyAmount(moneyAmount, fromCurrency),
-      toAmount: convertMoneyAmount(moneyAmount, toCurrency),
-      direction: convertDirectionFromCurrency(fromCurrency),
-    }
+    const fromAmount = convertMoneyAmount(moneyAmount, fromCurrency)
+    return buildConvertParams(fromAmount, fromCurrency, convertMoneyAmount)
   }, [enabled, convertMoneyAmount, moneyAmount, fromCurrency])
 
   const [snapshotParams, setSnapshotParams] = useState<ConvertParams | null>(null)
@@ -59,8 +55,7 @@ export const useNonCustodialConversion = ({
 
   const quoteParams = snapshotParams ?? liveQuoteParams
 
-  const { isQuoting, hasQuoteError, quote, feeText, adjustmentText } =
-    useConversionQuote(quoteParams)
+  const { isQuoting, hasQuoteError, quote, feeText } = useConversionQuote(quoteParams)
 
   useEffect(() => {
     if (quote && !snapshotParams && liveQuoteParams) {
@@ -90,7 +85,6 @@ export const useNonCustodialConversion = ({
     isQuoting,
     hasQuoteError,
     feeText,
-    adjustmentText,
     canExecute: quote !== null,
     execute,
   }

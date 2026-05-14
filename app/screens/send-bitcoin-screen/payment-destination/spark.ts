@@ -1,5 +1,5 @@
 import { type ParsedSparkAddress } from "@app/self-custodial/bridge"
-import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction.types"
+import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 
 import {
   DestinationDirection,

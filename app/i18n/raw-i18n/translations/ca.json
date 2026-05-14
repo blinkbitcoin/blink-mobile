@@ -62,7 +62,8 @@
     "title": "Converteix",
     "transfer": "Transferència",
     "percentageToConvert": "% a convertir",
-    "reviewTransfer": "Revisa la transferència"
+    "reviewTransfer": "Revisa la transferència",
+    "dustError": "S'ha de transferir el saldo complet."
   },
   "ConversionConfirmationScreen": {
     "title": "Revisa la conversió",
@@ -72,9 +73,7 @@
     "infoDollar": "La quantitat en dòlars és només aproximada. Pot variar lleugerament.",
     "transferButtonText": "Transferir {fromWallet} a {toWallet}",
     "feeLabel": "Comissió de conversió",
-    "feeError": "No s'ha pogut obtenir la comissió de conversió",
-    "amountFloored": "Import augmentat per complir el mínim de conversió.",
-    "amountDustBumped": "Import augmentat per convertir tot el teu saldo."
+    "feeError": "No s'ha pogut obtenir la comissió de conversió"
   },
   "ConversionSuccessScreen": {
     "message": "Conversió efectuada amb èxit",
@@ -2166,8 +2165,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Comissió de dipòsit: {fee} SAT per a imports inferiors a {threshold} SAT o {overFee} SAT per a dipòsits superiors a {threshold} SAT",
     "autoConvertMinAmount": "Les quantitats inferiors a {minSats: number} sats no es poden convertir a Dòlar automàticament. Rebràs Bitcoin.",
-    "autoConvertSuccess": "Rebuts {amount: number} sats, convertits a Dòlar.",
-    "autoConvertFailed": "Pagament rebut però la conversió ha fallat."
+    "autoConvertFailed": "Pagament rebut però la conversió ha fallat.",
+    "pleaseWaitForConversion": "Si us plau, espera fins que la conversió s'hagi completat"
   },
   "RedeemBitcoinScreen": {
     "title": "Bescanviar Bitcoin",
@@ -2333,7 +2332,6 @@
     "nonCustodialAccount": "Compte no custodi",
     "tapUserName": "Toca per definir el nom d'usuari",
     "notifications": "Notificacions",
-    "recoveryMethod": "Mètode de recuperació",
     "title": "Configuració",
     "darkMode": "Mode fosc",
     "setToDark": "Mode: fosc",
@@ -2360,27 +2358,11 @@
     "receiveCurrency": "Moneda de recepció",
     "displayCurrency": "Moneda de visualització",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
       "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -2420,6 +2402,7 @@
     "level": "Nivell {level: string}",
     "switchAccount": "Canvia de compte",
     "pleaseWait": "Si us plau, espera.",
+    "probeBalanceFailed": "No s'ha pogut verificar el saldo de la cartera. Torna-ho a provar.",
     "accountLevel": "Nivell de compte",
     "upgrade": "Millora el teu compte",
     "logOutAndDeleteLocalData": "Tancar la sessió i borrar totes les dades locals",
@@ -2459,6 +2442,8 @@
     "copiedAccountId": "S'ha copiat l'identificador del teu compte al porta-retalls",
     "yourAccountId": "La ID del teu compte",
     "accountId": "ID del compte",
+    "publicKey": "Clau pública",
+    "copiedPublicKey": "Clau pública copiada al porta-retalls",
     "copy": "Copiar",
     "identityVerification": "Verificació d'identitat"
   },
@@ -2489,7 +2474,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Compte de recepció predeterminat",
-    "info": "El teu Compte Bitcoin és per acumular sats, on el valor USD es mou amb el mercat. El teu Compte Dòlar està impulsat per Stablesats — conté Bitcoin cobert per mantenir-se estable en termes USD. Sempre tens Bitcoin, però el valor en dòlars no canvia."
+    "info": "El teu Compte Bitcoin és per acumular sats, on el valor USD es mou amb el mercat. El teu Compte Dòlar està impulsat per Stablesats — conté Bitcoin cobert per mantenir-se estable en termes USD. Sempre tens Bitcoin, però el valor en dòlars no canvia.",
+    "titleSelfCustodial": "Compte per defecte",
+    "infoSelfCustodial": "Aquest compte s'utilitzarà per defecte en rebre i enviar. Pots canviar en qualsevol moment."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2507,7 +2494,10 @@
     "header": "El teu Compte Dòlar està impulsat per Stablesats",
     "body": "Compte Dòlar utilitza la tecnologia Stablesats per mantenir Bitcoin estable al preu USD. Sempre tens Bitcoin — no dòlars reals — però el valor USD no fluctua. Pots enviar i rebre Bitcoin com de costum, però no és compatible amb el sistema bancari tradicional.",
     "termsAndConditions": "Llegeix els Termes i Condicions",
-    "learnMore": "Apren més sobre els Stablesats"
+    "learnMore": "Apren més sobre els Stablesats",
+      "headerSelfCustodial": "El teu compte Dòlar té stablecoins",
+      "bodySelfCustodial": "Al compte Dòlar tens stablecoins. Tokens recolzats per actius amb el valor estable respecte al dòlar. Encara no pots enviar ni rebre stablecoins. Quan enviïs des del compte Dòlar, canviaràs els teus stablecoins i els enviaràs com a Bitcoin al destinatari.",
+      "learnMoreSelfCustodial": "Més informació"
   },
   "SplashScreen": {
     "update": "La teva apliació esta obsoleta. Es necessari actulitzar l'aplicació abans d'utilitzar-la.\n\nEs pot actualitzar a la PlayStore per Android o Testflight per iOS"
@@ -2787,6 +2777,7 @@
     "submit": "Enviar",
     "success": "Èxit!",
     "dollarStablesats": "Dòlar (Stablesats)",
+    "dollarStablecoin": "Dòlar (Stablecoin)",
     "to": "a",
     "total": "Total",
     "transactions": "Transaccions",
@@ -3488,8 +3479,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Gestor de contrasenyes",
       "manualBackup": "Còpia de seguretat manual",
-      "keychainSaved": "Còpia de seguretat desada al gestor de contrasenyes",
-      "keychainFailed": "No s’ha pogut desar la còpia de seguretat",
+      "passwordManagerBackupSaved": "Còpia de seguretat desada al gestor de contrasenyes",
+      "passwordManagerBackupFailed": "No s’ha pogut desar la còpia de seguretat",
+      "passwordManagerUnavailable": "No hi ha cap gestor de contrasenyes disponible en aquest dispositiu. Utilitza la còpia de seguretat de Drive o desa la teva frase de 12 paraules manualment.",
       "iOSComingSoon": "La còpia de seguretat a l’iCloud arribarà aviat"
     },
     "ManualBackup": {
@@ -3507,7 +3499,9 @@
         "saveItNow": "Desa-la ara",
         "savedConfirm": "Ja l'he desat",
         "copy": "Copiar",
-        "continueButton": "Continua"
+        "continueButton": "Continua",
+        "selfCustodialDisabled": "El no custodial no està disponible temporalment.",
+        "testBackup": "Prova la teva còpia de seguretat"
       },
       "Confirm": {
         "headerTitle": "Confirma la frase de còpia de seguretat",
@@ -3518,7 +3512,8 @@
         "incorrectWord": "Paraula incorrecta, comprova l'ordre"
       },
       "Success": {
-        "title": "Benvingut a Blink sense custòdia"
+        "title": "Benvingut a Blink sense custòdia",
+        "testSuccess": "La teva frase de còpia de seguretat és correcta"
       }
     },
     "CloudBackup": {
@@ -3540,6 +3535,9 @@
       "signInFailed": "Error en iniciar sessió a Google",
       "existingBackupTitle": "Còpia de seguretat trobada",
       "existingBackupMessage": "Ja existeix una còpia de seguretat al teu {provider}. Vols sobreescriure-la?",
+      "existingBackupMessageWithDetails": "Ja existeix una còpia de seguretat al teu {provider}.\n\nAdreça Lightning: {address}\nCreada: {createdAt}\n\nVols sobreescriure-la?",
+      "existingBackupUnknownAddress": "No disponible",
+      "existingBackupUnknownCreatedAt": "Desconegut",
       "overwrite": "Sobreescriure"
     }
   },
@@ -3553,8 +3551,8 @@
     "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Custodiat",
+    "selfCustodialLabel": "No custodiat",
     "custodialDescription": "Nosaltres custodiem els fons per tu",
     "selfCustodialDescription": "Només tu pots accedir als fons",
     "continueButton": "Continuar",
@@ -3562,7 +3560,8 @@
     "descriptionSelected": "Si us plau, trieu el tipus de compte.",
     "chooseMethod": "Trieu mètode",
     "restoreComingSoonTitle": "Properament",
-    "restoreComingSoonDescription": "La funció de restauració estarà disponible en una actualització futura."
+    "restoreComingSoonDescription": "La funció de restauració estarà disponible en una actualització futura.",
+    "createFailed": "No s'ha pogut crear la cartera. Si us plau, torna-ho a provar."
   },
   "RestoreScreen": {
     "title": "Restaura la cartera",
@@ -3581,7 +3580,9 @@
     "noBackupFound": "No s'ha trobat cap còpia de seguretat",
     "noBackupDescription": "No hem pogut trobar una còpia de seguretat. Pots introduir la teva frase de recuperació manualment.",
     "enterPassword": "Introdueix la teva contrasenya de xifratge",
-    "wrongPassword": "Contrasenya incorrecta. Si us plau, torna-ho a provar."
+    "wrongPassword": "Contrasenya incorrecta. Si us plau, torna-ho a provar.",
+    "pickBackupTitle": "Tria una cartera",
+    "pickBackupDescription": "Selecciona una còpia de seguretat per restaurar"
   },
   "BackupNudge": {
     "title": "Els teus fons estan en risc",
@@ -3590,11 +3591,7 @@
     "settingsWarning": "Fes una còpia de seguretat de la teva cartera. Si perds aquest dispositiu, perdràs els teus fons.",
     "modalTitle": "Assegura els teus fons",
     "modalDescription": "Et recomanem fermament que facis una còpia de seguretat de la teva cartera per evitar una pèrdua total de fons en cas que perdis aquest dispositiu.",
-    "secureMe": "Assegurar cartera",
-    "trustModelTitle": "Tu tens el control",
-    "trustModelDescription": "Les teves claus controlen els teus fons. Les transaccions són processades pels operadors de Spark, no es validen directament a Bitcoin L1.",
-    "trustModelWarning": "Els balanços molt petits poden no ser econòmics de recuperar a la cadena base de Bitcoin.",
-    "trustModelDismiss": "Ho entenc"
+    "secureMe": "Assegurar cartera"
   },
   "StableBalance": {
     "title": "Balanç estable",
@@ -3618,12 +3615,6 @@
       "deactivateConfirm": "Desactivar",
       "cancel": "Cancel·la"
     },
-    "firstTimeModal": {
-      "title": "Sobre Convertir",
-      "dualBalance": "BTC i USD són dos saldos independents a la teva cartera. Utilitza Convert en qualsevol moment per moure fons entre ells.",
-      "trustDisclosure": "El mode USD utilitza tokens USDB a Spark. Les suposicions de confiança són diferents a guardar BTC directament. USDB depèn de l'emissor de tokens de Spark.",
-      "acknowledge": "Ho entenc"
-    },
     "minimumConversion": "Conversió mínima: {amount:string}",
     "conversionUnavailable": "La conversió no està disponible temporalment. Torna-ho a provar."
   },
@@ -3638,7 +3629,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Creant la teva cartera...",
     "errorTitle": "Error en crear la cartera",
     "errorDescription": "Alguna cosa ha anat malament. Si us plau, torna-ho a intentar.",
@@ -3714,10 +3705,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Important",
+    "dangerZoneBulletReinstated": "El compte eliminat no es pot restablir",
+    "dangerZoneBulletPermanent": "L'eliminació del compte és permanent",
+    "dangerZoneBulletEmpty": "Assegura't que el compte estigui buit",
+    "dangerZoneDeleteButton": "Eliminar compte i dades",
+    "confirmModalTitle": "Confirma l'eliminació del compte",
+    "confirmModalTypeToConfirm": "Escriu \"{delete: string}\" per confirmar",
+    "hasFundsWarningTitle": "Atenció",
+    "hasFundsWarningBody": "La teva cartera té un saldo de {balance}. Per la teva seguretat, no permetem eliminar comptes amb fons.",
+    "hasFundsWarningHelper": "Per continuar amb l'eliminació, buida el teu compte o fes una donació a economies circulars.",
+    "hasFundsWarningButton": "Tornar"
   }
 }

@@ -5,8 +5,10 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAppConfig } from "@app/hooks"
+import { useAccountTypeOptions } from "@app/hooks/use-account-type-options"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
+import { AccountTypeMode } from "@app/types/account"
 import { logGetStartedAction } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
 
@@ -43,17 +45,21 @@ export const GetStartedScreen: React.FC = () => {
   const { LL } = useI18nContext()
 
   const { deviceAccountEnabled, nonCustodialEnabled } = useFeatureFlags()
+  const { options, loading: detectingCountry } = useAccountTypeOptions()
+  const canCreateAccount = options.length > 0
 
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
 
   const handleCreateAccount = () => {
+    if (!canCreateAccount) return
+
     logGetStartedAction({
       action: "create_device_account",
       createDeviceAccountEnabled: Boolean(appCheckToken),
     })
 
     if (nonCustodialEnabled) {
-      navigation.navigate("accountTypeSelection", { mode: "create" })
+      navigation.navigate("accountTypeSelection", { mode: AccountTypeMode.Create })
       return
     }
 
@@ -67,7 +73,7 @@ export const GetStartedScreen: React.FC = () => {
     })
 
     if (nonCustodialEnabled) {
-      navigation.navigate("accountTypeSelection", { mode: "restore" })
+      navigation.navigate("accountTypeSelection", { mode: AccountTypeMode.Restore })
       return
     }
 
@@ -108,6 +114,7 @@ export const GetStartedScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.GetStartedScreen.createAccount()}
             onPress={handleCreateAccount}
+            disabled={!canCreateAccount || detectingCountry}
           />
           <GaloySecondaryButton
             title={

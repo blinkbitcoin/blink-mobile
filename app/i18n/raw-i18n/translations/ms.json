@@ -64,7 +64,8 @@
     "title": "Penukaran",
     "transfer": "Pindahan",
     "percentageToConvert": "% untuk penukaran",
-    "reviewTransfer": "Semak pindahan"
+    "reviewTransfer": "Semak pindahan",
+    "dustError": "Keseluruhan baki mesti dipindahkan."
   },
   "ConversionConfirmationScreen": {
     "title": "Semak penukaran",
@@ -74,9 +75,7 @@
     "infoDollar": "Jumlah Dolar hanyalah anggaran. Ia mungkin berbeza sedikit.",
     "transferButtonText": "Pindahkan {fromWallet} ke {toWallet}",
     "feeLabel": "Yuran pertukaran",
-    "feeError": "Tidak dapat mendapatkan yuran pertukaran",
-    "amountFloored": "Jumlah dinaikkan untuk memenuhi minimum pertukaran.",
-    "amountDustBumped": "Jumlah dinaikkan untuk menukar keseluruhan baki anda."
+    "feeError": "Tidak dapat mendapatkan yuran pertukaran"
   },
   "ConversionSuccessScreen": {
     "message": "Penukaran telah berjaya",
@@ -2173,8 +2172,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Yuran deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit melebihi {threshold} SAT",
     "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats tidak boleh ditukar kepada Dolar secara automatik. Anda akan menerima Bitcoin.",
-    "autoConvertSuccess": "Menerima {amount: number} sats, ditukar kepada Dolar.",
-    "autoConvertFailed": "Pembayaran diterima tetapi penukaran gagal."
+    "autoConvertFailed": "Pembayaran diterima tetapi penukaran gagal.",
+    "pleaseWaitForConversion": "Sila tunggu sehingga penukaran selesai"
   },
   "RedeemBitcoinScreen": {
     "title": "Tebus bitcoin",
@@ -2350,7 +2349,6 @@
     "nonCustodialAccount": "Akaun bukan kustodial",
     "tapUserName": "Tekan untuk tetapkan ID pengguna",
     "notifications": "Notifikasi",
-    "recoveryMethod": "Kaedah pemulihan",
     "title": "Tetapan",
     "darkMode": "Mode Gelap",
     "setToDark": "Mode: gelap",
@@ -2377,27 +2375,11 @@
     "receiveCurrency": "Mata wang penerimaan",
     "displayCurrency": "Mata wang paparan",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
       "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -2437,6 +2419,7 @@
     "level": "Tahap {level: string}",
     "switchAccount": "Tukar akaun",
     "pleaseWait": "Sila Tunggu.",
+    "probeBalanceFailed": "Tidak dapat mengesahkan baki dompet. Sila cuba lagi.",
     "accountLevel": "Peringkat akaun",
     "upgrade": "Naik taraf akaun anda",
     "logOutAndDeleteLocalData": "Log keluar, dan hapus semua data",
@@ -2476,6 +2459,8 @@
     "copiedAccountId": "Akaun ID anda telah disalin ke dalam papan klip",
     "yourAccountId": "ID akaun anda",
     "accountId": "ID Akaun",
+    "publicKey": "Kunci awam",
+    "copiedPublicKey": "Kunci awam disalin ke papan klip",
     "copy": "Salin",
     "identityVerification": "Pengesahan Identiti"
   },
@@ -2506,7 +2491,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Akaun penerima lalai",
-    "info": "Akaun Bitcoin anda untuk mengumpul sats, di mana nilai USD bergerak mengikut pasaran. Akaun Dolar anda dikuasakan oleh Stablesats — menyimpan Bitcoin yang dilindung nilai untuk kekal stabil dalam nilai USD. Anda sentiasa memegang Bitcoin, tetapi nilai dolar tidak berubah."
+    "info": "Akaun Bitcoin anda untuk mengumpul sats, di mana nilai USD bergerak mengikut pasaran. Akaun Dolar anda dikuasakan oleh Stablesats — menyimpan Bitcoin yang dilindung nilai untuk kekal stabil dalam nilai USD. Anda sentiasa memegang Bitcoin, tetapi nilai dolar tidak berubah.",
+    "titleSelfCustodial": "Akaun lalai",
+    "infoSelfCustodial": "Akaun ini akan digunakan secara lalai semasa menerima dan menghantar. Anda boleh tukar bila-bila masa."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2524,7 +2511,10 @@
     "header": "Akaun Dolar anda dikuasakan oleh Stablesats",
     "body": "Akaun Dolar menggunakan teknologi Stablesats untuk mengekalkan Bitcoin stabil pada harga USD. Anda sentiasa memegang Bitcoin — bukan dolar sebenar — tetapi nilai USD tidak turun naik. Anda boleh menghantar dan menerima Bitcoin seperti biasa, tetapi ia tidak serasi dengan sistem perbankan tradisional.",
     "termsAndConditions": "Baca terma & syarat",
-    "learnMore": "Ketahui lebih lanjut tentang stablesats"
+    "learnMore": "Ketahui lebih lanjut tentang stablesats",
+      "headerSelfCustodial": "Akaun Dolar anda menyimpan stablecoin",
+      "bodySelfCustodial": "Dalam akaun Dolar anda menyimpan stablecoin. Token yang disokong oleh aset dengan nilai dikekalkan stabil terhadap USD. Anda belum boleh menghantar dan menerima stablecoin. Apabila anda menghantar dari akaun Dolar, stablecoin anda akan ditukar dan dihantar sebagai Bitcoin kepada penerima.",
+      "learnMoreSelfCustodial": "Ketahui lebih lanjut"
   },
   "SplashScreen": {
     "update": "Aplikasi anda bukan versi terkini. Kemaskini diperlukan sebelum aplikasi dapat digunakan\n\nKemaskini boleh dilakukan dsri PlayStore untuk Android dan Testflight untuk iOS"
@@ -2804,6 +2794,7 @@
     "submit": "Hantar",
     "success": "Berjaya!",
     "dollarStablesats": "Dolar (Stablesats)",
+    "dollarStablecoin": "Dolar (Stablecoin)",
     "to": "Kepada",
     "total": "Jumlah keseluruhan",
     "transactions": "Transaksi",
@@ -3529,8 +3520,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Pengurus kata laluan",
       "manualBackup": "Sandaran manual",
-      "keychainSaved": "Sandaran disimpan ke pengurus kata laluan",
-      "keychainFailed": "Gagal menyimpan sandaran",
+      "passwordManagerBackupSaved": "Sandaran disimpan ke pengurus kata laluan",
+      "passwordManagerBackupFailed": "Gagal menyimpan sandaran",
+      "passwordManagerUnavailable": "Tiada pengurus kata laluan tersedia pada peranti ini. Gunakan sandaran Drive atau simpan frasa 12 perkataan anda secara manual.",
       "iOSComingSoon": "Sandaran iCloud akan datang tidak lama lagi"
     },
     "ManualBackup": {
@@ -3548,7 +3540,9 @@
         "saveItNow": "Simpan sekarang",
         "savedConfirm": "Saya telah menyimpannya",
         "copy": "Salin",
-        "continueButton": "Teruskan"
+        "continueButton": "Teruskan",
+        "selfCustodialDisabled": "Bukan kustodian tidak tersedia buat sementara.",
+        "testBackup": "Uji sandaran anda"
       },
       "Confirm": {
         "headerTitle": "Sahkan frasa sandaran",
@@ -3559,7 +3553,8 @@
         "incorrectWord": "Perkataan salah, sila semak susunan"
       },
       "Success": {
-        "title": "Selamat datang ke Blink bukan jagaan"
+        "title": "Selamat datang ke Blink bukan jagaan",
+        "testSuccess": "Frasa sandaran anda betul"
       }
     },
     "CloudBackup": {
@@ -3581,6 +3576,9 @@
       "signInFailed": "Gagal log masuk ke Google",
       "existingBackupTitle": "Sandaran ditemui",
       "existingBackupMessage": "Sandaran sudah wujud di {provider} anda. Adakah anda mahu menimpanya?",
+      "existingBackupMessageWithDetails": "Sandaran sudah wujud pada {provider} anda.\n\nAlamat Lightning: {address}\nDicipta: {createdAt}\n\nAdakah anda mahu menulis ganti?",
+      "existingBackupUnknownAddress": "Tidak tersedia",
+      "existingBackupUnknownCreatedAt": "Tidak diketahui",
       "overwrite": "Tulis ganti"
     }
   },
@@ -3594,8 +3592,8 @@
     "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Kustodian",
+    "selfCustodialLabel": "Bukan kustodian",
     "custodialDescription": "Kami menyimpan dana bagi pihak anda",
     "selfCustodialDescription": "Hanya anda boleh mengakses dana",
     "continueButton": "Teruskan",
@@ -3603,7 +3601,8 @@
     "descriptionSelected": "Sila pilih jenis akaun.",
     "chooseMethod": "Pilih kaedah",
     "restoreComingSoonTitle": "Akan datang",
-    "restoreComingSoonDescription": "Ciri pemulihan akan tersedia dalam kemas kini akan datang."
+    "restoreComingSoonDescription": "Ciri pemulihan akan tersedia dalam kemas kini akan datang.",
+    "createFailed": "Gagal mencipta dompet. Sila cuba lagi."
   },
   "RestoreScreen": {
     "title": "Pulihkan dompet",
@@ -3622,7 +3621,9 @@
     "noBackupFound": "Tiada sandaran ditemui",
     "noBackupDescription": "Kami tidak dapat menemui sandaran. Anda boleh memasukkan frasa sandaran secara manual.",
     "enterPassword": "Masukkan kata laluan penyulitan anda",
-    "wrongPassword": "Kata laluan salah. Sila cuba lagi."
+    "wrongPassword": "Kata laluan salah. Sila cuba lagi.",
+    "pickBackupTitle": "Pilih dompet",
+    "pickBackupDescription": "Pilih sandaran untuk dipulihkan"
   },
   "BackupNudge": {
     "title": "Dana anda dalam bahaya",
@@ -3631,11 +3632,7 @@
     "settingsWarning": "Sandarkan dompet anda. Jika anda kehilangan peranti ini, anda akan kehilangan dana anda.",
     "modalTitle": "Lindungi dana anda",
     "modalDescription": "Kami sangat mengesyorkan anda membuat sandaran dompet anda untuk mengelakkan kehilangan dana sepenuhnya sekiranya anda kehilangan peranti ini.",
-    "secureMe": "Lindungi dompet",
-    "trustModelTitle": "Anda yang mengawal",
-    "trustModelDescription": "Kunci anda mengawal dana anda. Transaksi diproses oleh operator Spark, bukan disahkan terus di Bitcoin L1.",
-    "trustModelWarning": "Baki yang sangat kecil mungkin tidak ekonomik untuk dipulihkan ke rantai asas Bitcoin.",
-    "trustModelDismiss": "Saya faham"
+    "secureMe": "Lindungi dompet"
   },
   "StableBalance": {
     "title": "Baki stabil",
@@ -3659,12 +3656,6 @@
       "deactivateConfirm": "Nyahaktifkan",
       "cancel": "Batal"
     },
-    "firstTimeModal": {
-      "title": "Mengenai Penukaran",
-      "dualBalance": "BTC dan USD ialah dua baki bebas dalam dompet anda. Gunakan Convert pada bila-bila masa untuk memindahkan dana antara keduanya.",
-      "trustDisclosure": "Mod USD menggunakan token USDB di Spark. Andaian kepercayaan berbeza daripada memegang BTC secara langsung. USDB bergantung pada penerbit token Spark.",
-      "acknowledge": "Saya faham"
-    },
     "minimumConversion": "Penukaran minimum: {amount:string}",
     "conversionUnavailable": "Penukaran tidak tersedia buat sementara waktu. Sila cuba lagi."
   },
@@ -3679,7 +3670,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Mencipta dompet anda...",
     "errorTitle": "Penciptaan dompet gagal",
     "errorDescription": "Sesuatu telah berlaku. Sila cuba lagi.",
@@ -3755,10 +3746,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Penting",
+    "dangerZoneBulletReinstated": "Akaun yang dipadam tidak boleh dikembalikan",
+    "dangerZoneBulletPermanent": "Pemadaman akaun adalah kekal",
+    "dangerZoneBulletEmpty": "Pastikan akaun kosong",
+    "dangerZoneDeleteButton": "Padam akaun dan data",
+    "confirmModalTitle": "Sahkan pemadaman akaun",
+    "confirmModalTypeToConfirm": "Taip \"{delete: string}\" untuk mengesahkan",
+    "hasFundsWarningTitle": "Amaran",
+    "hasFundsWarningBody": "Dompet anda mempunyai baki sebanyak {balance}. Demi keselamatan anda, kami tidak membenarkan pemadaman akaun yang mempunyai dana.",
+    "hasFundsWarningHelper": "Untuk meneruskan pemadaman, kosongkan akaun anda atau dermakan kepada ekonomi pekeliling.",
+    "hasFundsWarningButton": "Kembali"
   }
 }

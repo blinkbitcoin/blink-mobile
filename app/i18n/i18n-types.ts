@@ -258,6 +258,10 @@ type RootTranslation = {
 		 * R​e​v​i​e​w​ ​t​r​a​n​s​f​e​r
 		 */
 		reviewTransfer: string
+		/**
+		 * F​u​l​l​ ​b​a​l​a​n​c​e​ ​h​a​s​ ​t​o​ ​b​e​ ​t​r​a​n​s​f​e​r​r​e​d​.
+		 */
+		dustError: string
 	}
 	ConversionConfirmationScreen: {
 		/**
@@ -294,14 +298,6 @@ type RootTranslation = {
 		 * C​o​u​l​d​n​'​t​ ​f​e​t​c​h​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e
 		 */
 		feeError: string
-		/**
-		 * A​m​o​u​n​t​ ​i​n​c​r​e​a​s​e​d​ ​t​o​ ​m​e​e​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​m​i​n​i​m​u​m​.
-		 */
-		amountFloored: string
-		/**
-		 * A​m​o​u​n​t​ ​i​n​c​r​e​a​s​e​d​ ​t​o​ ​c​o​n​v​e​r​t​ ​y​o​u​r​ ​f​u​l​l​ ​b​a​l​a​n​c​e​.
-		 */
-		amountDustBumped: string
 	}
 	ConversionSuccessScreen: {
 		/**
@@ -6875,14 +6871,13 @@ type RootTranslation = {
 		 */
 		autoConvertMinAmount: RequiredParams<'minSats'>
 		/**
-		 * R​e​c​e​i​v​e​d​ ​{​a​m​o​u​n​t​}​ ​s​a​t​s​,​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​.
-		 * @param {number} amount
-		 */
-		autoConvertSuccess: RequiredParams<'amount'>
-		/**
 		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d​ ​b​u​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​a​i​l​e​d​.
 		 */
 		autoConvertFailed: string
+		/**
+		 * P​l​e​a​s​e​ ​w​a​i​t​ ​u​n​t​i​l​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​i​s​ ​d​o​n​e
+		 */
+		pleaseWaitForConversion: string
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -7541,10 +7536,6 @@ type RootTranslation = {
 		 */
 		notifications: string
 		/**
-		 * R​e​c​o​v​e​r​y​ ​m​e​t​h​o​d
-		 */
-		recoveryMethod: string
-		/**
 		 * S​e​t​t​i​n​g​s
 		 */
 		title: string
@@ -7649,10 +7640,6 @@ type RootTranslation = {
 		displayCurrency: string
 		AccountInformation: {
 			/**
-			 * A​c​c​o​u​n​t​ ​t​y​p​e
-			 */
-			accountTypeLabel: string
-			/**
 			 * W​a​l​l​e​t​ ​i​d​e​n​t​i​f​i​e​r
 			 */
 			identityLabel: string
@@ -7674,54 +7661,6 @@ type RootTranslation = {
 			backupStatusNotCompleted: string
 			/**
 			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​n​f​o​r​m​a​t​i​o​n​.
-			 */
-			loadError: string
-		}
-		TransactionLimits: {
-			/**
-			 * L​i​g​h​t​n​i​n​g​ ​a​n​d​ ​o​n​-​c​h​a​i​n​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​f​o​l​l​o​w​ ​B​i​t​c​o​i​n​ ​p​r​o​t​o​c​o​l​ ​l​i​m​i​t​s​.​ ​C​o​n​v​e​r​s​i​o​n​ ​l​i​m​i​t​s​ ​b​e​l​o​w​ ​a​r​e​ ​e​n​f​o​r​c​e​d​ ​b​y​ ​t​h​e​ ​S​p​a​r​k​ ​n​e​t​w​o​r​k​.
-			 */
-			protocolNote: string
-			/**
-			 * B​i​t​c​o​i​n​ ​t​o​ ​D​o​l​l​a​r​s
-			 */
-			btcToUsdTitle: string
-			/**
-			 * D​o​l​l​a​r​s​ ​t​o​ ​B​i​t​c​o​i​n
-			 */
-			usdToBtcTitle: string
-			/**
-			 * M​i​n​i​m​u​m​ ​s​e​n​t
-			 */
-			minFromLabel: string
-			/**
-			 * M​i​n​i​m​u​m​ ​r​e​c​e​i​v​e​d
-			 */
-			minToLabel: string
-			/**
-			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​c​o​n​v​e​r​s​i​o​n​ ​l​i​m​i​t​s​.
-			 */
-			loadError: string
-		}
-		WaysToGetPaid: {
-			/**
-			 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
-			 */
-			lightningAddressTitle: string
-			/**
-			 * S​h​a​r​e​ ​t​h​i​s​ ​a​d​d​r​e​s​s​ ​t​o​ ​r​e​c​e​i​v​e​ ​L​i​g​h​t​n​i​n​g​ ​p​a​y​m​e​n​t​s​ ​i​n​s​t​a​n​t​l​y​.
-			 */
-			lightningAddressDescription: string
-			/**
-			 * B​i​t​c​o​i​n​ ​d​e​p​o​s​i​t​ ​a​d​d​r​e​s​s
-			 */
-			onchainTitle: string
-			/**
-			 * S​h​a​r​e​ ​t​h​i​s​ ​a​d​d​r​e​s​s​ ​t​o​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​o​n​-​c​h​a​i​n​.
-			 */
-			onchainDescription: string
-			/**
-			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​p​a​y​m​e​n​t​ ​d​e​t​a​i​l​s​.
 			 */
 			loadError: string
 		}
@@ -7836,6 +7775,10 @@ type RootTranslation = {
 		 * P​l​e​a​s​e​ ​W​a​i​t​.
 		 */
 		pleaseWait: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​v​e​r​i​f​y​ ​t​h​e​ ​w​a​l​l​e​t​'​s​ ​b​a​l​a​n​c​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		probeBalanceFailed: string
 		/**
 		 * A​c​c​o​u​n​t​ ​L​e​v​e​l
 		 */
@@ -8002,6 +7945,14 @@ type RootTranslation = {
 		 */
 		accountId: string
 		/**
+		 * P​u​b​l​i​c​ ​k​e​y
+		 */
+		publicKey: string
+		/**
+		 * C​o​p​i​e​d​ ​y​o​u​r​ ​p​u​b​l​i​c​ ​k​e​y​ ​t​o​ ​c​l​i​p​b​o​a​r​d
+		 */
+		copiedPublicKey: string
+		/**
 		 * C​o​p​y
 		 */
 		copy: string
@@ -8091,9 +8042,17 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
+		 * D​e​f​a​u​l​t​ ​a​c​c​o​u​n​t
+		 */
+		titleSelfCustodial: string
+		/**
 		 * Y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​i​s​ ​f​o​r​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s​,​ ​w​h​e​r​e​ ​t​h​e​ ​U​S​D​ ​v​a​l​u​e​ ​m​o​v​e​s​ ​w​i​t​h​ ​t​h​e​ ​m​a​r​k​e​t​.​ ​Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s​ ​—​ ​i​t​ ​h​o​l​d​s​ ​B​i​t​c​o​i​n​ ​t​h​a​t​ ​i​s​ ​h​e​d​g​e​d​ ​t​o​ ​s​t​a​y​ ​s​t​a​b​l​e​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​Y​o​u​'​r​e​ ​a​l​w​a​y​s​ ​h​o​l​d​i​n​g​ ​B​i​t​c​o​i​n​,​ ​b​u​t​ ​t​h​e​ ​d​o​l​l​a​r​ ​v​a​l​u​e​ ​d​o​e​s​n​'​t​ ​c​h​a​n​g​e​.
 		 */
 		info: string
+		/**
+		 * T​h​i​s​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​u​s​e​d​ ​b​y​ ​d​e​f​a​u​l​t​ ​w​h​e​n​ ​r​e​c​e​i​v​i​n​g​ ​a​n​d​ ​s​e​n​d​i​n​g​.​ ​Y​o​u​ ​c​a​n​ ​s​w​i​t​c​h​ ​a​n​y​ ​t​i​m​e​.
+		 */
+		infoSelfCustodial: string
 	}
 	ThemeScreen: {
 		/**
@@ -8148,6 +8107,18 @@ type RootTranslation = {
 		 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​S​t​a​b​l​e​s​a​t​s
 		 */
 		learnMore: string
+		/**
+		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​h​o​l​d​s​ ​s​t​a​b​l​e​c​o​i​n​s
+		 */
+		headerSelfCustodial: string
+		/**
+		 * I​n​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​y​o​u​ ​h​o​l​d​ ​s​t​a​b​l​e​c​o​i​n​s​.​ ​T​o​k​e​n​s​ ​b​a​c​k​e​d​ ​b​y​ ​a​s​s​e​t​s​ ​w​i​t​h​ ​v​a​l​u​e​ ​h​e​l​d​ ​s​t​a​b​l​e​ ​t​o​ ​t​h​e​ ​U​S​D​.​ ​Y​o​u​ ​c​a​n​'​t​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​s​t​a​b​l​e​c​o​i​n​s​ ​(​y​e​t​)​.​ ​W​h​e​n​ ​y​o​u​ ​s​e​n​d​ ​f​r​o​m​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​,​ ​y​o​u​ ​w​i​l​l​ ​s​w​a​p​ ​y​o​u​r​ ​s​t​a​b​l​e​c​o​i​n​s​ ​a​n​d​ ​s​e​n​d​ ​a​s​ ​B​i​t​c​o​i​n​ ​t​o​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​.
+		 */
+		bodySelfCustodial: string
+		/**
+		 * L​e​a​r​n​ ​m​o​r​e
+		 */
+		learnMoreSelfCustodial: string
 	}
 	SplashScreen: {
 		/**
@@ -9189,6 +9160,10 @@ type RootTranslation = {
 		 * D​o​l​l​a​r​ ​(​S​t​a​b​l​e​s​a​t​s​)
 		 */
 		dollarStablesats: string
+		/**
+		 * D​o​l​l​a​r​ ​(​S​t​a​b​l​e​c​o​i​n​)
+		 */
+		dollarStablecoin: string
 		/**
 		 * T​o
 		 */
@@ -11552,11 +11527,15 @@ type RootTranslation = {
 			/**
 			 * B​a​c​k​u​p​ ​s​a​v​e​d​ ​t​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
 			 */
-			keychainSaved: string
+			passwordManagerBackupSaved: string
 			/**
 			 * F​a​i​l​e​d​ ​t​o​ ​s​a​v​e​ ​b​a​c​k​u​p
 			 */
-			keychainFailed: string
+			passwordManagerBackupFailed: string
+			/**
+			 * N​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​U​s​e​ ​D​r​i​v​e​ ​b​a​c​k​u​p​ ​o​r​ ​s​a​v​e​ ​y​o​u​r​ ​1​2​-​w​o​r​d​ ​p​h​r​a​s​e​ ​m​a​n​u​a​l​l​y​.
+			 */
+			passwordManagerUnavailable: string
 			/**
 			 * i​C​l​o​u​d​ ​b​a​c​k​u​p​ ​c​o​m​i​n​g​ ​s​o​o​n
 			 */
@@ -11626,6 +11605,26 @@ type RootTranslation = {
 			 * @param {string} provider
 			 */
 			existingBackupMessage: RequiredParams<'provider'>
+			/**
+			 * A​ ​b​a​c​k​u​p​ ​a​l​r​e​a​d​y​ ​e​x​i​s​t​s​ ​i​n​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.​
+		​
+		​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​:​ ​{​a​d​d​r​e​s​s​}​
+		​C​r​e​a​t​e​d​:​ ​{​c​r​e​a​t​e​d​A​t​}​
+		​
+		​D​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​o​v​e​r​w​r​i​t​e​ ​i​t​?
+			 * @param {string} address
+			 * @param {string} createdAt
+			 * @param {string} provider
+			 */
+			existingBackupMessageWithDetails: RequiredParams<'address' | 'createdAt' | 'provider'>
+			/**
+			 * N​o​t​ ​a​v​a​i​l​a​b​l​e
+			 */
+			existingBackupUnknownAddress: string
+			/**
+			 * U​n​k​n​o​w​n
+			 */
+			existingBackupUnknownCreatedAt: string
 			/**
 			 * O​v​e​r​w​r​i​t​e
 			 */
@@ -11697,6 +11696,10 @@ type RootTranslation = {
 				 * C​o​p​y
 				 */
 				copy: string
+				/**
+				 * T​e​s​t​ ​y​o​u​r​ ​b​a​c​k​u​p
+				 */
+				testBackup: string
 			}
 			Confirm: {
 				/**
@@ -11729,6 +11732,10 @@ type RootTranslation = {
 				 * W​e​l​c​o​m​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​B​l​i​n​k
 				 */
 				title: string
+				/**
+				 * Y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​i​s​ ​c​o​r​r​e​c​t
+				 */
+				testSuccess: string
 			}
 		}
 	}
@@ -11796,6 +11803,10 @@ type RootTranslation = {
 		 */
 		continueButton: string
 		/**
+		 * N​o​n​-​c​u​s​t​o​d​i​a​l​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.
+		 */
+		selfCustodialDisabled: string
+		/**
 		 * C​o​m​i​n​g​ ​s​o​o​n
 		 */
 		restoreComingSoonTitle: string
@@ -11803,6 +11814,10 @@ type RootTranslation = {
 		 * R​e​s​t​o​r​e​ ​f​l​o​w​ ​w​i​l​l​ ​b​e​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​a​ ​f​u​t​u​r​e​ ​u​p​d​a​t​e​.
 		 */
 		restoreComingSoonDescription: string
+		/**
+		 * F​a​i​l​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​w​a​l​l​e​t​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		createFailed: string
 	}
 	RestoreScreen: {
 		/**
@@ -11873,6 +11888,14 @@ type RootTranslation = {
 		 * I​n​c​o​r​r​e​c​t​ ​p​a​s​s​w​o​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
 		 */
 		wrongPassword: string
+		/**
+		 * C​h​o​o​s​e​ ​a​ ​w​a​l​l​e​t
+		 */
+		pickBackupTitle: string
+		/**
+		 * S​e​l​e​c​t​ ​a​ ​b​a​c​k​u​p​ ​t​o​ ​r​e​s​t​o​r​e
+		 */
+		pickBackupDescription: string
 	}
 	BackupNudge: {
 		/**
@@ -11903,22 +11926,6 @@ type RootTranslation = {
 		 * S​e​c​u​r​e​ ​w​a​l​l​e​t
 		 */
 		secureMe: string
-		/**
-		 * Y​o​u​ ​a​r​e​ ​i​n​ ​c​o​n​t​r​o​l
-		 */
-		trustModelTitle: string
-		/**
-		 * Y​o​u​r​ ​k​e​y​s​ ​c​o​n​t​r​o​l​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​T​r​a​n​s​a​c​t​i​o​n​s​ ​a​r​e​ ​p​r​o​c​e​s​s​e​d​ ​b​y​ ​S​p​a​r​k​ ​o​p​e​r​a​t​o​r​s​,​ ​n​o​t​ ​v​a​l​i​d​a​t​e​d​ ​d​i​r​e​c​t​l​y​ ​o​n​ ​B​i​t​c​o​i​n​ ​L​1​.
-		 */
-		trustModelDescription: string
-		/**
-		 * V​e​r​y​ ​s​m​a​l​l​ ​b​a​l​a​n​c​e​s​ ​m​a​y​ ​n​o​t​ ​b​e​ ​e​c​o​n​o​m​i​c​a​l​ ​t​o​ ​r​e​c​o​v​e​r​ ​t​o​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​b​a​s​e​ ​c​h​a​i​n​.
-		 */
-		trustModelWarning: string
-		/**
-		 * I​ ​u​n​d​e​r​s​t​a​n​d
-		 */
-		trustModelDismiss: string
 	}
 	SelfCustodialOffline: {
 		/**
@@ -12158,24 +12165,6 @@ type RootTranslation = {
 			 */
 			cancel: string
 		}
-		firstTimeModal: {
-			/**
-			 * A​b​o​u​t​ ​C​o​n​v​e​r​t
-			 */
-			title: string
-			/**
-			 * B​T​C​ ​a​n​d​ ​U​S​D​ ​a​r​e​ ​t​w​o​ ​i​n​d​e​p​e​n​d​e​n​t​ ​b​a​l​a​n​c​e​s​ ​i​n​ ​y​o​u​r​ ​w​a​l​l​e​t​.​ ​U​s​e​ ​C​o​n​v​e​r​t​ ​a​n​y​ ​t​i​m​e​ ​t​o​ ​m​o​v​e​ ​f​u​n​d​s​ ​b​e​t​w​e​e​n​ ​t​h​e​m​.
-			 */
-			dualBalance: string
-			/**
-			 * U​S​D​ ​m​o​d​e​ ​u​s​e​s​ ​U​S​D​B​ ​t​o​k​e​n​s​ ​o​n​ ​S​p​a​r​k​.​ ​T​h​e​ ​t​r​u​s​t​ ​a​s​s​u​m​p​t​i​o​n​s​ ​a​r​e​ ​d​i​f​f​e​r​e​n​t​ ​f​r​o​m​ ​h​o​l​d​i​n​g​ ​B​T​C​ ​d​i​r​e​c​t​l​y​.​ ​U​S​D​B​ ​r​e​l​i​e​s​ ​o​n​ ​S​p​a​r​k​'​s​ ​t​o​k​e​n​ ​i​s​s​u​e​r​.
-			 */
-			trustDisclosure: string
-			/**
-			 * I​ ​u​n​d​e​r​s​t​a​n​d
-			 */
-			acknowledge: string
-		}
 		/**
 		 * M​i​n​i​m​u​m​ ​c​o​n​v​e​r​s​i​o​n​:​ ​{​a​m​o​u​n​t​}
 		 * @param {string} amount
@@ -12186,7 +12175,7 @@ type RootTranslation = {
 		 */
 		conversionUnavailable: string
 	}
-	SparkWalletCreationScreen: {
+	WalletCreationScreen: {
 		/**
 		 * C​r​e​a​t​i​n​g​ ​y​o​u​r​ ​w​a​l​l​e​t​.​.​.
 		 */
@@ -12264,25 +12253,51 @@ type RootTranslation = {
 	}
 	SelfCustodialDelete: {
 		/**
-		 * D​e​l​e​t​e​ ​s​e​l​f​-​c​u​s​t​o​d​i​a​l​ ​w​a​l​l​e​t
+		 * I​m​p​o​r​t​a​n​t
 		 */
-		title: string
+		dangerZoneImportantTitle: string
 		/**
-		 * T​h​i​s​ ​w​i​l​l​ ​r​e​m​o​v​e​ ​t​h​i​s​ ​w​a​l​l​e​t​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​.
+		 * D​e​l​e​t​e​d​ ​a​c​c​o​u​n​t​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​i​n​s​t​a​t​e​d
 		 */
-		warning: string
+		dangerZoneBulletReinstated: string
 		/**
-		 * I​f​ ​y​o​u​ ​h​a​v​e​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​s​a​v​e​d​ ​y​o​u​ ​c​a​n​ ​r​e​s​t​o​r​e​ ​t​h​i​s​ ​w​a​l​l​e​t​ ​o​n​ ​a​n​y​ ​d​e​v​i​c​e​.​ ​I​f​ ​y​o​u​ ​d​o​n​'​t​,​ ​y​o​u​ ​w​i​l​l​ ​l​o​s​e​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​f​u​n​d​s​.
+		 * A​c​c​o​u​n​t​ ​d​e​l​e​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t
 		 */
-		recoveryNote: string
+		dangerZoneBulletPermanent: string
 		/**
-		 * B​a​c​k​u​p​ ​c​o​m​p​l​e​t​e
+		 * M​a​k​e​ ​s​u​r​e​ ​a​c​c​o​u​n​t​ ​i​s​ ​e​m​p​t​y
 		 */
-		backupBadgeCompleted: string
+		dangerZoneBulletEmpty: string
 		/**
-		 * B​a​c​k​u​p​ ​n​o​t​ ​c​o​m​p​l​e​t​e
+		 * D​e​l​e​t​e​ ​a​c​c​o​u​n​t​ ​a​n​d​ ​d​a​t​a
 		 */
-		backupBadgeMissing: string
+		dangerZoneDeleteButton: string
+		/**
+		 * C​o​n​f​i​r​m​ ​a​c​c​o​u​n​t​ ​r​e​m​o​v​a​l
+		 */
+		confirmModalTitle: string
+		/**
+		 * T​y​p​e​ ​"​{​d​e​l​e​t​e​}​"​ ​t​o​ ​c​o​n​f​i​r​m
+		 * @param {string} delete
+		 */
+		confirmModalTypeToConfirm: RequiredParams<'delete'>
+		/**
+		 * W​a​r​n​i​n​g
+		 */
+		hasFundsWarningTitle: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​h​a​s​ ​a​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.​ ​F​o​r​ ​y​o​u​r​ ​s​a​f​e​t​y​,​ ​w​e​ ​d​o​n​t​ ​a​l​l​o​w​ ​d​e​l​e​t​i​o​n​ ​o​f​ ​a​c​c​o​u​n​t​s​ ​w​i​t​h​ ​f​u​n​d​s​.
+		 * @param {string} balance
+		 */
+		hasFundsWarningBody: RequiredParams<'balance'>
+		/**
+		 * T​o​ ​p​r​o​c​e​e​d​ ​w​i​t​h​ ​d​e​l​e​t​i​o​n​,​ ​e​i​t​h​e​r​ ​e​m​p​t​y​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​o​r​ ​d​o​n​a​t​e​ ​t​o​ ​c​i​r​c​u​l​a​r​ ​e​c​o​n​o​m​i​e​s​.
+		 */
+		hasFundsWarningHelper: string
+		/**
+		 * G​o​ ​b​a​c​k
+		 */
+		hasFundsWarningButton: string
 	}
 }
 
@@ -12502,6 +12517,10 @@ export type TranslationFunctions = {
 		 * Review transfer
 		 */
 		reviewTransfer: () => LocalizedString
+		/**
+		 * Full balance has to be transferred.
+		 */
+		dustError: () => LocalizedString
 	}
 	ConversionConfirmationScreen: {
 		/**
@@ -12536,14 +12555,6 @@ export type TranslationFunctions = {
 		 * Couldn't fetch the conversion fee
 		 */
 		feeError: () => LocalizedString
-		/**
-		 * Amount increased to meet the conversion minimum.
-		 */
-		amountFloored: () => LocalizedString
-		/**
-		 * Amount increased to convert your full balance.
-		 */
-		amountDustBumped: () => LocalizedString
 	}
 	ConversionSuccessScreen: {
 		/**
@@ -19103,13 +19114,13 @@ export type TranslationFunctions = {
 		 */
 		autoConvertMinAmount: (arg: { minSats: number }) => LocalizedString
 		/**
-		 * Received {amount} sats, converted to Dollar.
-		 */
-		autoConvertSuccess: (arg: { amount: number }) => LocalizedString
-		/**
 		 * Payment received but the conversion failed.
 		 */
 		autoConvertFailed: () => LocalizedString
+		/**
+		 * Please wait until the conversion is done
+		 */
+		pleaseWaitForConversion: () => LocalizedString
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -19741,10 +19752,6 @@ export type TranslationFunctions = {
 		 */
 		notifications: () => LocalizedString
 		/**
-		 * Recovery method
-		 */
-		recoveryMethod: () => LocalizedString
-		/**
 		 * Settings
 		 */
 		title: () => LocalizedString
@@ -19847,10 +19854,6 @@ export type TranslationFunctions = {
 		displayCurrency: () => LocalizedString
 		AccountInformation: {
 			/**
-			 * Account type
-			 */
-			accountTypeLabel: () => LocalizedString
-			/**
 			 * Wallet identifier
 			 */
 			identityLabel: () => LocalizedString
@@ -19872,54 +19875,6 @@ export type TranslationFunctions = {
 			backupStatusNotCompleted: () => LocalizedString
 			/**
 			 * Could not load your account information.
-			 */
-			loadError: () => LocalizedString
-		}
-		TransactionLimits: {
-			/**
-			 * Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.
-			 */
-			protocolNote: () => LocalizedString
-			/**
-			 * Bitcoin to Dollars
-			 */
-			btcToUsdTitle: () => LocalizedString
-			/**
-			 * Dollars to Bitcoin
-			 */
-			usdToBtcTitle: () => LocalizedString
-			/**
-			 * Minimum sent
-			 */
-			minFromLabel: () => LocalizedString
-			/**
-			 * Minimum received
-			 */
-			minToLabel: () => LocalizedString
-			/**
-			 * Could not load conversion limits.
-			 */
-			loadError: () => LocalizedString
-		}
-		WaysToGetPaid: {
-			/**
-			 * Lightning address
-			 */
-			lightningAddressTitle: () => LocalizedString
-			/**
-			 * Share this address to receive Lightning payments instantly.
-			 */
-			lightningAddressDescription: () => LocalizedString
-			/**
-			 * Bitcoin deposit address
-			 */
-			onchainTitle: () => LocalizedString
-			/**
-			 * Share this address to receive Bitcoin on-chain.
-			 */
-			onchainDescription: () => LocalizedString
-			/**
-			 * Could not load your payment details.
 			 */
 			loadError: () => LocalizedString
 		}
@@ -20033,6 +19988,10 @@ export type TranslationFunctions = {
 		 * Please Wait.
 		 */
 		pleaseWait: () => LocalizedString
+		/**
+		 * Couldn't verify the wallet's balance. Please try again.
+		 */
+		probeBalanceFailed: () => LocalizedString
 		/**
 		 * Account Level
 		 */
@@ -20193,6 +20152,14 @@ export type TranslationFunctions = {
 		 */
 		accountId: () => LocalizedString
 		/**
+		 * Public key
+		 */
+		publicKey: () => LocalizedString
+		/**
+		 * Copied your public key to clipboard
+		 */
+		copiedPublicKey: () => LocalizedString
+		/**
 		 * Copy
 		 */
 		copy: () => LocalizedString
@@ -20281,9 +20248,17 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
+		 * Default account
+		 */
+		titleSelfCustodial: () => LocalizedString
+		/**
 		 * Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change.
 		 */
 		info: () => LocalizedString
+		/**
+		 * This account will be used by default when receiving and sending. You can switch any time.
+		 */
+		infoSelfCustodial: () => LocalizedString
 	}
 	ThemeScreen: {
 		/**
@@ -20338,6 +20313,18 @@ export type TranslationFunctions = {
 		 * Learn more about Stablesats
 		 */
 		learnMore: () => LocalizedString
+		/**
+		 * Your Dollar account holds stablecoins
+		 */
+		headerSelfCustodial: () => LocalizedString
+		/**
+		 * In the Dollar account you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from the Dollar account, you will swap your stablecoins and send as Bitcoin to the recipient.
+		 */
+		bodySelfCustodial: () => LocalizedString
+		/**
+		 * Learn more
+		 */
+		learnMoreSelfCustodial: () => LocalizedString
 	}
 	SplashScreen: {
 		/**
@@ -21358,6 +21345,10 @@ export type TranslationFunctions = {
 		 * Dollar (Stablesats)
 		 */
 		dollarStablesats: () => LocalizedString
+		/**
+		 * Dollar (Stablecoin)
+		 */
+		dollarStablecoin: () => LocalizedString
 		/**
 		 * To
 		 */
@@ -23685,11 +23676,15 @@ export type TranslationFunctions = {
 			/**
 			 * Backup saved to password manager
 			 */
-			keychainSaved: () => LocalizedString
+			passwordManagerBackupSaved: () => LocalizedString
 			/**
 			 * Failed to save backup
 			 */
-			keychainFailed: () => LocalizedString
+			passwordManagerBackupFailed: () => LocalizedString
+			/**
+			 * No password manager available on this device. Use Drive backup or save your 12-word phrase manually.
+			 */
+			passwordManagerUnavailable: () => LocalizedString
 			/**
 			 * iCloud backup coming soon
 			 */
@@ -23756,6 +23751,23 @@ export type TranslationFunctions = {
 			 * A backup already exists in your {provider}. Do you want to overwrite it?
 			 */
 			existingBackupMessage: (arg: { provider: string }) => LocalizedString
+			/**
+			 * A backup already exists in your {provider}.
+	
+		Lightning address: {address}
+		Created: {createdAt}
+	
+		Do you want to overwrite it?
+			 */
+			existingBackupMessageWithDetails: (arg: { address: string, createdAt: string, provider: string }) => LocalizedString
+			/**
+			 * Not available
+			 */
+			existingBackupUnknownAddress: () => LocalizedString
+			/**
+			 * Unknown
+			 */
+			existingBackupUnknownCreatedAt: () => LocalizedString
 			/**
 			 * Overwrite
 			 */
@@ -23825,6 +23837,10 @@ export type TranslationFunctions = {
 				 * Copy
 				 */
 				copy: () => LocalizedString
+				/**
+				 * Test your backup
+				 */
+				testBackup: () => LocalizedString
 			}
 			Confirm: {
 				/**
@@ -23857,6 +23873,10 @@ export type TranslationFunctions = {
 				 * Welcome to non-custodial Blink
 				 */
 				title: () => LocalizedString
+				/**
+				 * Your backup phrase is correct
+				 */
+				testSuccess: () => LocalizedString
 			}
 		}
 	}
@@ -23924,6 +23944,10 @@ export type TranslationFunctions = {
 		 */
 		continueButton: () => LocalizedString
 		/**
+		 * Non-custodial is temporarily unavailable.
+		 */
+		selfCustodialDisabled: () => LocalizedString
+		/**
 		 * Coming soon
 		 */
 		restoreComingSoonTitle: () => LocalizedString
@@ -23931,6 +23955,10 @@ export type TranslationFunctions = {
 		 * Restore flow will be available in a future update.
 		 */
 		restoreComingSoonDescription: () => LocalizedString
+		/**
+		 * Failed to create wallet. Please try again.
+		 */
+		createFailed: () => LocalizedString
 	}
 	RestoreScreen: {
 		/**
@@ -24001,6 +24029,14 @@ export type TranslationFunctions = {
 		 * Incorrect password. Please try again.
 		 */
 		wrongPassword: () => LocalizedString
+		/**
+		 * Choose a wallet
+		 */
+		pickBackupTitle: () => LocalizedString
+		/**
+		 * Select a backup to restore
+		 */
+		pickBackupDescription: () => LocalizedString
 	}
 	BackupNudge: {
 		/**
@@ -24031,22 +24067,6 @@ export type TranslationFunctions = {
 		 * Secure wallet
 		 */
 		secureMe: () => LocalizedString
-		/**
-		 * You are in control
-		 */
-		trustModelTitle: () => LocalizedString
-		/**
-		 * Your keys control your funds. Transactions are processed by Spark operators, not validated directly on Bitcoin L1.
-		 */
-		trustModelDescription: () => LocalizedString
-		/**
-		 * Very small balances may not be economical to recover to the Bitcoin base chain.
-		 */
-		trustModelWarning: () => LocalizedString
-		/**
-		 * I understand
-		 */
-		trustModelDismiss: () => LocalizedString
 	}
 	SelfCustodialOffline: {
 		/**
@@ -24273,24 +24293,6 @@ export type TranslationFunctions = {
 			 */
 			cancel: () => LocalizedString
 		}
-		firstTimeModal: {
-			/**
-			 * About Convert
-			 */
-			title: () => LocalizedString
-			/**
-			 * BTC and USD are two independent balances in your wallet. Use Convert any time to move funds between them.
-			 */
-			dualBalance: () => LocalizedString
-			/**
-			 * USD mode uses USDB tokens on Spark. The trust assumptions are different from holding BTC directly. USDB relies on Spark's token issuer.
-			 */
-			trustDisclosure: () => LocalizedString
-			/**
-			 * I understand
-			 */
-			acknowledge: () => LocalizedString
-		}
 		/**
 		 * Minimum conversion: {amount}
 		 */
@@ -24300,7 +24302,7 @@ export type TranslationFunctions = {
 		 */
 		conversionUnavailable: () => LocalizedString
 	}
-	SparkWalletCreationScreen: {
+	WalletCreationScreen: {
 		/**
 		 * Creating your wallet...
 		 */
@@ -24376,25 +24378,49 @@ export type TranslationFunctions = {
 	}
 	SelfCustodialDelete: {
 		/**
-		 * Delete self-custodial wallet
+		 * Important
 		 */
-		title: () => LocalizedString
+		dangerZoneImportantTitle: () => LocalizedString
 		/**
-		 * This will remove this wallet from this device.
+		 * Deleted account cannot be reinstated
 		 */
-		warning: () => LocalizedString
+		dangerZoneBulletReinstated: () => LocalizedString
 		/**
-		 * If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.
+		 * Account deletion is permanent
 		 */
-		recoveryNote: () => LocalizedString
+		dangerZoneBulletPermanent: () => LocalizedString
 		/**
-		 * Backup complete
+		 * Make sure account is empty
 		 */
-		backupBadgeCompleted: () => LocalizedString
+		dangerZoneBulletEmpty: () => LocalizedString
 		/**
-		 * Backup not complete
+		 * Delete account and data
 		 */
-		backupBadgeMissing: () => LocalizedString
+		dangerZoneDeleteButton: () => LocalizedString
+		/**
+		 * Confirm account removal
+		 */
+		confirmModalTitle: () => LocalizedString
+		/**
+		 * Type "{delete}" to confirm
+		 */
+		confirmModalTypeToConfirm: (arg: { delete: string }) => LocalizedString
+		/**
+		 * Warning
+		 */
+		hasFundsWarningTitle: () => LocalizedString
+		/**
+		 * Your wallet has a balance of {balance}. For your safety, we dont allow deletion of accounts with funds.
+		 */
+		hasFundsWarningBody: (arg: { balance: string }) => LocalizedString
+		/**
+		 * To proceed with deletion, either empty your account or donate to circular economies.
+		 */
+		hasFundsWarningHelper: () => LocalizedString
+		/**
+		 * Go back
+		 */
+		hasFundsWarningButton: () => LocalizedString
 	}
 }
 

@@ -62,7 +62,8 @@
     "title": "Μετατρέψτε ",
     "transfer": "Μεταφορά",
     "percentageToConvert": "% για μετατροπή",
-    "reviewTransfer": "Έλεγχος μεταφοράς"
+    "reviewTransfer": "Έλεγχος μεταφοράς",
+    "dustError": "Πρέπει να μεταφερθεί ολόκληρο το υπόλοιπο."
   },
   "ConversionConfirmationScreen": {
     "title": "Έλεγχος μετατροπής",
@@ -72,9 +73,7 @@
     "infoDollar": "Το ποσό σε δολάρια είναι κατά προσέγγιση. Μπορεί να διαφέρει ελαφρώς.",
     "transferButtonText": "Μεταφορά {fromWallet} σε {toWallet}",
     "feeLabel": "Χρέωση μετατροπής",
-    "feeError": "Δεν ήταν δυνατή η ανάκτηση της χρέωσης μετατροπής",
-    "amountFloored": "Το ποσό αυξήθηκε για να ικανοποιήσει το ελάχιστο μετατροπής.",
-    "amountDustBumped": "Το ποσό αυξήθηκε για να μετατραπεί όλο το υπόλοιπό σου."
+    "feeError": "Δεν ήταν δυνατή η ανάκτηση της χρέωσης μετατροπής"
   },
   "ConversionSuccessScreen": {
     "message": "Επιτυχής μετατροπή",
@@ -2166,8 +2165,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Χρέωση κατάθεσης: {fee} SAT για ποσά κάτω από {threshold} SAT ή {overFee} SAT για καταθέσεις πάνω από {threshold} SAT",
     "autoConvertMinAmount": "Ποσά κάτω από {minSats: number} sats δεν μπορούν να μετατραπούν αυτόματα σε Δολάρια. Θα λάβετε Bitcoin.",
-    "autoConvertSuccess": "Ελήφθησαν {amount: number} sats, μετατράπηκαν σε Δολάρια.",
-    "autoConvertFailed": "Η πληρωμή ελήφθη αλλά η μετατροπή απέτυχε."
+    "autoConvertFailed": "Η πληρωμή ελήφθη αλλά η μετατροπή απέτυχε.",
+    "pleaseWaitForConversion": "Παρακαλούμε περιμένετε μέχρι να ολοκληρωθεί η μετατροπή"
   },
   "RedeemBitcoinScreen": {
     "title": "Εξαργύρωση Bitcoin",
@@ -2333,7 +2332,6 @@
     "nonCustodialAccount": "Λογαριασμός μη φύλαξης",
     "tapUserName": "Πατήστε για να ορίσετε το όνομα χρήστη",
     "notifications": "Ειδοποιήσεις",
-    "recoveryMethod": "Μέθοδος ανάκτησης",
     "title": "Ρυθμίσεις",
     "darkMode": "Σκοτεινή λειτουργία",
     "setToDark": "Λειτουργία: Σκοτεινή.",
@@ -2360,27 +2358,11 @@
     "receiveCurrency": "Νόμισμα λήψης",
     "displayCurrency": "Νόμισμα εμφάνισης",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
       "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -2420,6 +2402,7 @@
     "level": "Επίπεδο {level: string}",
     "switchAccount": "Εναλλαγή λογαριασμού",
     "pleaseWait": "Παρακαλούμε Περιμένετε.",
+    "probeBalanceFailed": "Δεν ήταν δυνατή η επαλήθευση του υπολοίπου του πορτοφολιού. Παρακαλώ δοκιμάστε ξανά.",
     "accountLevel": "Επίπεδο λογαριασμού",
     "upgrade": "Αναβαθμίστε τον λογαριασμό σας",
     "logOutAndDeleteLocalData": "Αποσυνδέστε και καθάρισε όλα τα τοπικά δεδομένα",
@@ -2459,6 +2442,8 @@
     "copiedAccountId": "Αντιγραφή της ταυτότητας του λογαριασμού σας στο πρόχειρο",
     "yourAccountId": "Η ταυτότητα του λογαριασμού σας",
     "accountId": "Η ταυτότητα του λογαριασμού σας",
+    "publicKey": "Δημόσιο κλειδί",
+    "copiedPublicKey": "Το δημόσιο κλειδί αντιγράφηκε στο πρόχειρο",
     "copy": "Αντιγραφή",
     "identityVerification": "Επαλήθευση Ταυτότητας"
   },
@@ -2489,7 +2474,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Προεπιλεγμένος λογαριασμός λήψης",
-    "info": "Ο Λογαριασμός Bitcoin σου είναι για συσσώρευση sats, όπου η αξία USD κινείται με την αγορά. Ο Λογαριασμός Δολαρίου σου λειτουργεί με τεχνολογία Stablesats — κρατά Bitcoin αντισταθμισμένο ώστε να παραμένει σταθερό σε αξία USD. Πάντα κρατάς Bitcoin, αλλά η αξία σε δολάρια δεν αλλάζει."
+    "info": "Ο Λογαριασμός Bitcoin σου είναι για συσσώρευση sats, όπου η αξία USD κινείται με την αγορά. Ο Λογαριασμός Δολαρίου σου λειτουργεί με τεχνολογία Stablesats — κρατά Bitcoin αντισταθμισμένο ώστε να παραμένει σταθερό σε αξία USD. Πάντα κρατάς Bitcoin, αλλά η αξία σε δολάρια δεν αλλάζει.",
+    "titleSelfCustodial": "Προεπιλεγμένος λογαριασμός",
+    "infoSelfCustodial": "Αυτός ο λογαριασμός θα χρησιμοποιηθεί ως προεπιλογή κατά τη λήψη και αποστολή. Μπορείτε να αλλάξετε ανά πάσα στιγμή."
   },
   "ThemeScreen": {
     "title": "Θέμα",
@@ -2507,7 +2494,10 @@
     "header": "Ο Λογαριασμός Δολαρίου σου λειτουργεί με τεχνολογία Stablesats",
     "body": "Το Λογαριασμός Δολαρίου χρησιμοποιεί τεχνολογία Stablesats για να κρατά το Bitcoin σταθερό στην τιμή USD. Πάντα κρατάς Bitcoin — όχι πραγματικά δολάρια — αλλά η αξία USD δεν διακυμαίνεται. Μπορείς να στέλνεις και να λαμβάνεις Bitcoin κανονικά, αλλά δεν είναι συμβατό με το παραδοσιακό τραπεζικό σύστημα.",
     "termsAndConditions": "Διαβάστε τους Όρους & Προϋποθέσεις",
-    "learnMore": "Μάθετε περισσότερα σχετικά με τα Stablesats"
+    "learnMore": "Μάθετε περισσότερα σχετικά με τα Stablesats",
+      "headerSelfCustodial": "Ο λογαριασμός σου σε δολάρια κρατά stablecoins",
+      "bodySelfCustodial": "Στον λογαριασμό σε δολάρια κρατάς stablecoins. Tokens με αντίκρισμα σε περιουσιακά στοιχεία και αξία σταθερή έναντι του USD. Δεν μπορείς (ακόμα) να στείλεις και να λάβεις stablecoins. Όταν στέλνεις από τον λογαριασμό σε δολάρια, τα stablecoins σου ανταλλάσσονται και αποστέλλονται ως Bitcoin στον παραλήπτη.",
+      "learnMoreSelfCustodial": "Μάθε περισσότερα"
   },
   "SplashScreen": {
     "update": "Η εφαρμογή σας είναι ξεπερασμένη. Χρειάζεται ενημέρωση για να μπορέσετε να χρησιμοποιήσετε την εφαρμογή.\n\nΑυτό μπορεί να γίνει από το PlayStore για Android και το Testflight για iOS."
@@ -2787,6 +2777,7 @@
     "submit": "Υποβολή",
     "success": "Επιτυχία!",
     "dollarStablesats": "Δολάριο (Stablesats)",
+    "dollarStablecoin": "Δολάριο (Stablecoin)",
     "to": "Προς",
     "total": "Σύνολο",
     "transactions": "Συναλλαγές",
@@ -3488,8 +3479,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Διαχειριστής κωδικών",
       "manualBackup": "Χειροκίνητο αντίγραφο ασφαλείας",
-      "keychainSaved": "Αντίγραφο ασφαλείας αποθηκεύτηκε στον διαχειριστή κωδικών",
-      "keychainFailed": "Αποτυχία αποθήκευσης αντιγράφου ασφαλείας",
+      "passwordManagerBackupSaved": "Αντίγραφο ασφαλείας αποθηκεύτηκε στον διαχειριστή κωδικών",
+      "passwordManagerBackupFailed": "Αποτυχία αποθήκευσης αντιγράφου ασφαλείας",
+      "passwordManagerUnavailable": "Δεν υπάρχει διαθέσιμος διαχειριστής κωδικών πρόσβασης σε αυτή τη συσκευή. Χρησιμοποιήστε το αντίγραφο ασφαλείας Drive ή αποθηκεύστε τη φράση 12 λέξεών σας χειροκίνητα.",
       "iOSComingSoon": "Η δημιουργία αντιγράφου ασφαλείας στο iCloud έρχεται σύντομα"
     },
     "ManualBackup": {
@@ -3507,7 +3499,9 @@
         "saveItNow": "Αποθηκεύστε τώρα",
         "savedConfirm": "Την αποθήκευσα",
         "copy": "Αντιγραφή",
-        "continueButton": "Συνέχεια"
+        "continueButton": "Συνέχεια",
+        "selfCustodialDisabled": "Το μη-επιμελούμενο είναι προσωρινά μη διαθέσιμο.",
+        "testBackup": "Δοκιμάστε το αντίγραφο ασφαλείας"
       },
       "Confirm": {
         "headerTitle": "Επιβεβαίωση φράσης",
@@ -3518,7 +3512,8 @@
         "incorrectWord": "Λάθος λέξη, παρακαλώ ελέγξτε τη σειρά"
       },
       "Success": {
-        "title": "Καλώς ήρθατε στο μη φυλασσόμενο Blink"
+        "title": "Καλώς ήρθατε στο μη φυλασσόμενο Blink",
+        "testSuccess": "Η φράση αντιγράφου ασφαλείας σου είναι σωστή"
       }
     },
     "CloudBackup": {
@@ -3540,6 +3535,9 @@
       "signInFailed": "Αποτυχία σύνδεσης στο Google",
       "existingBackupTitle": "Βρέθηκε αντίγραφο ασφαλείας",
       "existingBackupMessage": "Υπάρχει ήδη αντίγραφο ασφαλείας στο {provider} σας. Θέλετε να το αντικαταστήσετε;",
+      "existingBackupMessageWithDetails": "Υπάρχει ήδη ένα αντίγραφο ασφαλείας στο {provider} σας.\n\nΔιεύθυνση Lightning: {address}\nΔημιουργήθηκε: {createdAt}\n\nΘέλετε να το αντικαταστήσετε;",
+      "existingBackupUnknownAddress": "Μη διαθέσιμο",
+      "existingBackupUnknownCreatedAt": "Άγνωστο",
       "overwrite": "Αντικατάσταση"
     }
   },
@@ -3553,8 +3551,8 @@
     "transferringFunds": "Μεταφορά των κεφαλαίων σας. Θα ολοκληρωθεί σε λίγα δευτερόλεπτα."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Με θεματοφυλακή",
+    "selfCustodialLabel": "Χωρίς θεματοφυλακή",
     "custodialDescription": "Κρατάμε τα κεφάλαια για λογαριασμό σας",
     "selfCustodialDescription": "Μόνο εσείς έχετε πρόσβαση στα κεφάλαια",
     "continueButton": "Συνέχεια",
@@ -3562,7 +3560,8 @@
     "descriptionSelected": "Παρακαλώ επιλέξτε τύπο λογαριασμού.",
     "chooseMethod": "Επιλέξτε μέθοδο",
     "restoreComingSoonTitle": "Σύντομα διαθέσιμο",
-    "restoreComingSoonDescription": "Η λειτουργία επαναφοράς θα είναι διαθέσιμη σε μελλοντική ενημέρωση."
+    "restoreComingSoonDescription": "Η λειτουργία επαναφοράς θα είναι διαθέσιμη σε μελλοντική ενημέρωση.",
+    "createFailed": "Αποτυχία δημιουργίας πορτοφολιού. Παρακαλώ δοκιμάστε ξανά."
   },
   "RestoreScreen": {
     "title": "Επαναφορά πορτοφολιού",
@@ -3581,7 +3580,9 @@
     "noBackupFound": "Δεν βρέθηκε αντίγραφο ασφαλείας",
     "noBackupDescription": "Δεν βρήκαμε αντίγραφο ασφαλείας. Μπορείτε να εισάγετε τη φράση ανάκτησης χειροκίνητα.",
     "enterPassword": "Εισάγετε τον κωδικό κρυπτογράφησης",
-    "wrongPassword": "Λανθασμένος κωδικός. Δοκιμάστε ξανά."
+    "wrongPassword": "Λανθασμένος κωδικός. Δοκιμάστε ξανά.",
+    "pickBackupTitle": "Επιλέξτε πορτοφόλι",
+    "pickBackupDescription": "Επιλέξτε ένα αντίγραφο ασφαλείας για επαναφορά"
   },
   "BackupNudge": {
     "title": "Τα κεφάλαιά σας κινδυνεύουν",
@@ -3590,11 +3591,7 @@
     "settingsWarning": "Δημιούργησε αντίγραφο ασφαλείας. Αν χάσεις αυτή τη συσκευή, θα χάσεις τα κεφάλαιά σου.",
     "modalTitle": "Ασφαλίστε τα κεφάλαιά σας",
     "modalDescription": "Σας συνιστούμε ανεπιφύλακτα να δημιουργήσετε αντίγραφο ασφαλείας του πορτοφολιού σας για να αποτρέψετε πλήρη απώλεια κεφαλαίων σε περίπτωση που χάσετε αυτήν τη συσκευή.",
-    "secureMe": "Ασφάλιση πορτοφολιού",
-    "trustModelTitle": "Εσύ έχεις τον έλεγχο",
-    "trustModelDescription": "Τα κλειδιά σου ελέγχουν τα κεφάλαιά σου. Οι συναλλαγές επεξεργάζονται από τους χειριστές Spark, όχι απευθείας στο Bitcoin L1.",
-    "trustModelWarning": "Πολύ μικρά υπόλοιπα μπορεί να μην είναι οικονομικά να ανακτηθούν στη βασική αλυσίδα Bitcoin.",
-    "trustModelDismiss": "Κατανοώ"
+    "secureMe": "Ασφάλιση πορτοφολιού"
   },
   "StableBalance": {
     "title": "Σταθερό υπόλοιπο",
@@ -3618,12 +3615,6 @@
       "deactivateConfirm": "Απενεργοποίηση",
       "cancel": "Ακύρωση"
     },
-    "firstTimeModal": {
-      "title": "Σχετικά με τη Μετατροπή",
-      "dualBalance": "Το BTC και το USD είναι δύο ανεξάρτητα υπόλοιπα στο πορτοφόλι σας. Χρησιμοποιήστε το Convert οποιαδήποτε στιγμή για να μεταφέρετε χρήματα μεταξύ τους.",
-      "trustDisclosure": "Η λειτουργία USD χρησιμοποιεί tokens USDB στο Spark. Οι παραδοχές εμπιστοσύνης είναι διαφορετικές από το να κρατάτε BTC απευθείας. το USDB βασίζεται στον εκδότη tokens του Spark.",
-      "acknowledge": "Καταλαβαίνω"
-    },
     "minimumConversion": "Ελάχιστη μετατροπή: {amount:string}",
     "conversionUnavailable": "Η μετατροπή δεν είναι διαθέσιμη προσωρινά. Δοκιμάστε ξανά."
   },
@@ -3638,7 +3629,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Δημιουργία πορτοφολιού...",
     "errorTitle": "Αποτυχία δημιουργίας πορτοφολιού",
     "errorDescription": "Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά.",
@@ -3714,10 +3705,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Σημαντικό",
+    "dangerZoneBulletReinstated": "Ο διαγραμμένος λογαριασμός δεν μπορεί να επαναφερθεί",
+    "dangerZoneBulletPermanent": "Η διαγραφή του λογαριασμού είναι μόνιμη",
+    "dangerZoneBulletEmpty": "Βεβαιώσου ότι ο λογαριασμός είναι άδειος",
+    "dangerZoneDeleteButton": "Διαγραφή λογαριασμού και δεδομένων",
+    "confirmModalTitle": "Επιβεβαίωση διαγραφής λογαριασμού",
+    "confirmModalTypeToConfirm": "Πληκτρολογήστε \"{delete: string}\" για επιβεβαίωση",
+    "hasFundsWarningTitle": "Προσοχή",
+    "hasFundsWarningBody": "Το πορτοφόλι σου έχει υπόλοιπο {balance}. Για την ασφάλειά σου, δεν επιτρέπουμε τη διαγραφή λογαριασμών με κεφάλαια.",
+    "hasFundsWarningHelper": "Για να συνεχίσεις με τη διαγραφή, άδειασε τον λογαριασμό σου ή δώρισε σε κυκλικές οικονομίες.",
+    "hasFundsWarningButton": "Πίσω"
   }
 }

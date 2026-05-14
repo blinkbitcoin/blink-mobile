@@ -64,7 +64,8 @@
     "title": "แลกเปลี่ยน",
     "transfer": "โอน",
     "percentageToConvert": "% ที่ต้องการแลกเปลี่ยน",
-    "reviewTransfer": "ตรวจสอบการโอน"
+    "reviewTransfer": "ตรวจสอบการโอน",
+    "dustError": "ต้องโอนยอดคงเหลือทั้งหมด"
   },
   "ConversionConfirmationScreen": {
     "title": "ตรวจสอบการแลกเปลี่ยน",
@@ -74,9 +75,7 @@
     "infoDollar": "จำนวนดอลลาร์เป็นเพียงค่าประมาณ อาจเปลี่ยนแปลงเล็กน้อยได้",
     "transferButtonText": "โอนจาก {fromWallet} ไป {toWallet}",
     "feeLabel": "ค่าธรรมเนียมการแปลง",
-    "feeError": "ไม่สามารถดึงค่าธรรมเนียมการแปลงได้",
-    "amountFloored": "จำนวนเงินเพิ่มขึ้นเพื่อให้ถึงขั้นต่ำในการแปลง",
-    "amountDustBumped": "จำนวนเงินเพิ่มขึ้นเพื่อแปลงยอดคงเหลือทั้งหมดของคุณ"
+    "feeError": "ไม่สามารถดึงค่าธรรมเนียมการแปลงได้"
   },
   "ConversionSuccessScreen": {
     "message": "การแลกเปลี่ยนสำเร็จแล้ว",
@@ -2173,8 +2172,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT",
     "autoConvertMinAmount": "จำนวนต่ำกว่า {minSats: number} satoshi ไม่สามารถแปลงเป็นดอลลาร์อัตโนมัติได้ คุณจะได้รับ Bitcoin แทน",
-    "autoConvertSuccess": "ได้รับ {amount: number} satoshi แปลงเป็นดอลลาร์แล้ว",
-    "autoConvertFailed": "รับการชำระเงินแล้ว แต่การแปลงล้มเหลว"
+    "autoConvertFailed": "รับการชำระเงินแล้ว แต่การแปลงล้มเหลว",
+    "pleaseWaitForConversion": "โปรดรอจนกว่าการแปลงจะเสร็จสิ้น"
   },
   "RedeemBitcoinScreen": {
     "title": "แลกรับบิตคอยน์",
@@ -2350,7 +2349,6 @@
     "nonCustodialAccount": "บัญชีแบบไม่ฝากดูแล",
     "tapUserName": "กดเพื่อตั้งชื่อผู้ใช้",
     "notifications": "Notifications",
-    "recoveryMethod": "วิธีการกู้คืน",
     "title": "การตั้งค่า",
     "darkMode": "Dark Mode",
     "setToDark": "Mode: dark.",
@@ -2377,27 +2375,11 @@
     "receiveCurrency": "สกุลเงินรับ",
     "displayCurrency": "สกุลเงินแสดงผล",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
       "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -2437,6 +2419,7 @@
     "level": "ระดับ {level: string}",
     "switchAccount": "สลับบัญชี",
     "pleaseWait": "กรุณารอสักครู่",
+    "probeBalanceFailed": "ไม่สามารถตรวจสอบยอดเงินในกระเป๋าเงินได้ โปรดลองอีกครั้ง",
     "accountLevel": "Account Level",
     "upgrade": "Upgrade your account",
     "logOutAndDeleteLocalData": "Log out and clear all local data",
@@ -2476,6 +2459,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "รหัสบัญชี",
+    "publicKey": "คีย์สาธารณะ",
+    "copiedPublicKey": "คัดลอกคีย์สาธารณะไปยังคลิปบอร์ดแล้ว",
     "copy": "Copy",
     "identityVerification": "การยืนยันตัวตน"
   },
@@ -2506,7 +2491,9 @@
   },
   "DefaultWalletScreen": {
     "title": "บัญชีรับเริ่มต้น",
-    "info": "บัญชีบิตคอยน์ ของคุณสำหรับสะสม sats ซึ่งมูลค่า USD เคลื่อนไหวตามตลาด บัญชีเงินดอลล่าร์ ของคุณขับเคลื่อนโดย Stablesats — เก็บ Bitcoin ที่ป้องกันความเสี่ยงเพื่อรักษาเสถียรภาพในมูลค่า USD คุณถือ Bitcoin ตลอดเวลา แต่มูลค่าดอลลาร์ไม่เปลี่ยนแปลง"
+    "info": "บัญชีบิตคอยน์ ของคุณสำหรับสะสม sats ซึ่งมูลค่า USD เคลื่อนไหวตามตลาด บัญชีเงินดอลล่าร์ ของคุณขับเคลื่อนโดย Stablesats — เก็บ Bitcoin ที่ป้องกันความเสี่ยงเพื่อรักษาเสถียรภาพในมูลค่า USD คุณถือ Bitcoin ตลอดเวลา แต่มูลค่าดอลลาร์ไม่เปลี่ยนแปลง",
+    "titleSelfCustodial": "บัญชีเริ่มต้น",
+    "infoSelfCustodial": "บัญชีนี้จะถูกใช้เป็นค่าเริ่มต้นเมื่อรับและส่ง คุณสามารถสลับได้ตลอดเวลา"
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2524,7 +2511,10 @@
     "header": "บัญชีเงินดอลล่าร์ ของคุณขับเคลื่อนโดย Stablesats",
     "body": "บัญชีเงินดอลล่าร์ ใช้เทคโนโลยี Stablesats เพื่อรักษา Bitcoin ให้มีเสถียรภาพตามราคา USD คุณถือ Bitcoin ตลอดเวลา — ไม่ใช่ดอลลาร์จริง — แต่มูลค่า USD ไม่ผันผวน คุณสามารถส่งและรับ Bitcoin ได้ตามปกติ แต่ไม่รองรับระบบธนาคารแบบดั้งเดิม",
     "termsAndConditions": "อ่านข้อกำหนดและเงื่อนไข",
-    "learnMore": "เรียนรู้เพิ่มเติมเกี่ยวกับ Stablesats"
+    "learnMore": "เรียนรู้เพิ่มเติมเกี่ยวกับ Stablesats",
+      "headerSelfCustodial": "บัญชีดอลลาร์ของคุณถือ stablecoins",
+      "bodySelfCustodial": "ในบัญชีดอลลาร์คุณถือ stablecoins โทเคนที่หนุนด้วยสินทรัพย์ซึ่งมีมูลค่าคงที่เทียบกับดอลลาร์สหรัฐ คุณยังไม่สามารถส่งและรับ stablecoins ได้ เมื่อคุณส่งจากบัญชีดอลลาร์ stablecoins ของคุณจะถูกสลับและส่งเป็น Bitcoin ไปยังผู้รับ",
+      "learnMoreSelfCustodial": "เรียนรู้เพิ่มเติม"
   },
   "SplashScreen": {
     "update": "แอปของคุณเป็นเวอร์ชั่นที่เก่าเกินไป จะต้องอัพเดทก่อนจึงจะใช้งานได้\n\nหากใช้แอนดรอยด์ คุณสามารถอัพเดทได้ที่ PlayStore หรือหากใช้ iOS สามารถอัพเดทได้ที่ Testflight"
@@ -2804,6 +2794,7 @@
     "submit": "Submit",
     "success": "สำเร็จ!",
     "dollarStablesats": "ดอลลาร์ (Stablesats)",
+    "dollarStablecoin": "ดอลลาร์ (Stablecoin)",
     "to": "ถึง",
     "total": "รวม",
     "transactions": "ธุรกรรม",
@@ -3526,8 +3517,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "ตัวจัดการรหัสผ่าน",
       "manualBackup": "สำรองข้อมูลด้วยตนเอง",
-      "keychainSaved": "บันทึกสำรองไปยังตัวจัดการรหัสผ่านแล้ว",
-      "keychainFailed": "ไม่สามารถบันทึกสำรองได้",
+      "passwordManagerBackupSaved": "บันทึกสำรองไปยังตัวจัดการรหัสผ่านแล้ว",
+      "passwordManagerBackupFailed": "ไม่สามารถบันทึกสำรองได้",
+      "passwordManagerUnavailable": "ไม่มีตัวจัดการรหัสผ่านที่ใช้ได้บนอุปกรณ์นี้ ใช้การสำรองข้อมูล Drive หรือบันทึกวลี 12 คำของคุณด้วยตนเอง",
       "iOSComingSoon": "การสำรองข้อมูลไปยัง iCloud จะมาเร็ว ๆ นี้"
     },
     "ManualBackup": {
@@ -3545,7 +3537,9 @@
         "saveItNow": "บันทึกตอนนี้",
         "savedConfirm": "ฉันบันทึกแล้ว",
         "copy": "คัดลอก",
-        "continueButton": "ดำเนินการต่อ"
+        "continueButton": "ดำเนินการต่อ",
+        "selfCustodialDisabled": "ไม่ฝากดูแลไม่พร้อมใช้งานชั่วคราว",
+        "testBackup": "ทดสอบข้อมูลสำรองของคุณ"
       },
       "Confirm": {
         "headerTitle": "ยืนยันวลีสำรอง",
@@ -3556,7 +3550,8 @@
         "incorrectWord": "คำไม่ถูกต้อง โปรดตรวจสอบลำดับ"
       },
       "Success": {
-        "title": "ยินดีต้อนรับสู่ Blink แบบไม่มีผู้ดูแล"
+        "title": "ยินดีต้อนรับสู่ Blink แบบไม่มีผู้ดูแล",
+        "testSuccess": "วลีสำรองของคุณถูกต้อง"
       }
     },
     "CloudBackup": {
@@ -3578,6 +3573,9 @@
       "signInFailed": "ลงชื่อเข้าใช้ Google ไม่สำเร็จ",
       "existingBackupTitle": "พบข้อมูลสำรอง",
       "existingBackupMessage": "มีข้อมูลสำรองอยู่แล้วใน {provider} ของคุณ คุณต้องการเขียนทับหรือไม่?",
+      "existingBackupMessageWithDetails": "มีการสำรองข้อมูลอยู่แล้วใน {provider} ของคุณ\n\nที่อยู่ Lightning: {address}\nสร้างเมื่อ: {createdAt}\n\nคุณต้องการเขียนทับหรือไม่?",
+      "existingBackupUnknownAddress": "ไม่พร้อมใช้งาน",
+      "existingBackupUnknownCreatedAt": "ไม่ทราบ",
       "overwrite": "เขียนทับ"
     }
   },
@@ -3591,8 +3589,8 @@
     "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที"
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "ควบคุมโดยผู้ดูแล",
+    "selfCustodialLabel": "ควบคุมด้วยตัวเอง",
     "custodialDescription": "เราดูแลเงินทุนในนามของคุณ",
     "selfCustodialDescription": "คุณเท่านั้นที่สามารถเข้าถึงเงินทุน",
     "continueButton": "ดำเนินการต่อ",
@@ -3600,7 +3598,8 @@
     "descriptionSelected": "กรุณาเลือกประเภทบัญชี",
     "chooseMethod": "เลือกวิธี",
     "restoreComingSoonTitle": "เร็วๆ นี้",
-    "restoreComingSoonDescription": "ฟีเจอร์กู้คืนจะพร้อมใช้งานในการอัปเดตในอนาคต"
+    "restoreComingSoonDescription": "ฟีเจอร์กู้คืนจะพร้อมใช้งานในการอัปเดตในอนาคต",
+    "createFailed": "สร้างกระเป๋าเงินไม่สำเร็จ กรุณาลองอีกครั้ง"
   },
   "RestoreScreen": {
     "title": "กู้คืนกระเป๋าเงิน",
@@ -3619,7 +3618,9 @@
     "noBackupFound": "ไม่พบข้อมูลสำรอง",
     "noBackupDescription": "ไม่พบข้อมูลสำรอง คุณสามารถป้อนวลีสำรองข้อมูลด้วยตนเอง",
     "enterPassword": "ป้อนรหัสผ่านการเข้ารหัสของคุณ",
-    "wrongPassword": "รหัสผ่านไม่ถูกต้อง โปรดลองอีกครั้ง"
+    "wrongPassword": "รหัสผ่านไม่ถูกต้อง โปรดลองอีกครั้ง",
+    "pickBackupTitle": "เลือกกระเป๋าเงิน",
+    "pickBackupDescription": "เลือกการสำรองข้อมูลเพื่อกู้คืน"
   },
   "BackupNudge": {
     "title": "เงินของคุณมีความเสี่ยง",
@@ -3628,11 +3629,7 @@
     "settingsWarning": "สำรองข้อมูลกระเป๋าเงินของคุณ หากคุณสูญเสียอุปกรณ์นี้ คุณจะสูญเสียเงินของคุณ",
     "modalTitle": "รักษาความปลอดภัยเงินของคุณ",
     "modalDescription": "เราขอแนะนำอย่างยิ่งให้คุณสำรองข้อมูลกระเป๋าเงินเพื่อป้องกันการสูญเสียเงินทั้งหมดในกรณีที่คุณทำอุปกรณ์นี้หาย",
-    "secureMe": "รักษาความปลอดภัยกระเป๋าเงิน",
-    "trustModelTitle": "คุณเป็นผู้ควบคุม",
-    "trustModelDescription": "กุญแจของคุณควบคุมเงินของคุณ ธุรกรรมถูกประมวลผลโดยผู้ดำเนินการ Spark ไม่ได้ตรวจสอบโดยตรงบน Bitcoin L1",
-    "trustModelWarning": "ยอดเงินที่น้อยมากอาจไม่คุ้มค่าทางเศรษฐกิจในการกู้คืนไปยัง Bitcoin base chain",
-    "trustModelDismiss": "ฉันเข้าใจ"
+    "secureMe": "รักษาความปลอดภัยกระเป๋าเงิน"
   },
   "StableBalance": {
     "title": "ยอดคงเหลือมั่นคง",
@@ -3656,12 +3653,6 @@
       "deactivateConfirm": "ปิดใช้",
       "cancel": "ยกเลิก"
     },
-    "firstTimeModal": {
-      "title": "เกี่ยวกับการแปลง",
-      "dualBalance": "BTC และ USD เป็นยอดคงเหลือที่เป็นอิสระสองรายการในกระเป๋าของคุณ ใช้ Convert เมื่อใดก็ได้เพื่อย้ายเงินระหว่างกัน",
-      "trustDisclosure": "โหมด USD ใช้โทเค็น USDB บน Spark ข้อสันนิษฐานด้านความเชื่อถือต่างจากการถือ BTC โดยตรง. USDB พึ่งพาผู้ออกโทเค็นของ Spark",
-      "acknowledge": "เข้าใจแล้ว"
-    },
     "minimumConversion": "จำนวนขั้นต่ำที่แปลงได้: {amount:string}",
     "conversionUnavailable": "ขณะนี้ไม่สามารถแปลงได้ โปรดลองอีกครั้ง"
   },
@@ -3676,7 +3667,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "กำลังสร้างกระเป๋าเงิน...",
     "errorTitle": "สร้างกระเป๋าเงินล้มเหลว",
     "errorDescription": "มีบางอย่างผิดพลาด กรุณาลองอีกครั้ง",
@@ -3752,10 +3743,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "สำคัญ",
+    "dangerZoneBulletReinstated": "บัญชีที่ถูกลบไม่สามารถกู้คืนได้",
+    "dangerZoneBulletPermanent": "การลบบัญชีเป็นการถาวร",
+    "dangerZoneBulletEmpty": "ตรวจสอบให้แน่ใจว่าบัญชีว่างเปล่า",
+    "dangerZoneDeleteButton": "ลบบัญชีและข้อมูล",
+    "confirmModalTitle": "ยืนยันการลบบัญชี",
+    "confirmModalTypeToConfirm": "พิมพ์ \"{delete: string}\" เพื่อยืนยัน",
+    "hasFundsWarningTitle": "คำเตือน",
+    "hasFundsWarningBody": "กระเป๋าเงินของคุณมียอดคงเหลือ {balance} เพื่อความปลอดภัยของคุณ เราจึงไม่อนุญาตให้ลบบัญชีที่ยังมีเงินอยู่",
+    "hasFundsWarningHelper": "หากต้องการดำเนินการลบต่อ โปรดถอนเงินออกจากบัญชีของคุณหรือบริจาคให้กับ circular economies",
+    "hasFundsWarningButton": "ย้อนกลับ"
   }
 }

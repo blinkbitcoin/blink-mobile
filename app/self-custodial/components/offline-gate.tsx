@@ -1,14 +1,15 @@
 import React from "react"
 
-import { SelfCustodialPaymentOfflineNotice } from "@app/components/self-custodial-payment-offline-notice"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { ActiveWalletStatus } from "@app/types/wallet.types"
+import { ActiveWalletStatus } from "@app/types/wallet"
+
+import { PaymentOfflineNotice } from "./payment-offline-notice"
 
 type Props = {
   children: React.ReactNode
 }
 
-const SC_BLOCKED_STATUSES: readonly ActiveWalletStatus[] = [
+const SELF_CUSTODIAL_BLOCKED_STATUSES: readonly ActiveWalletStatus[] = [
   ActiveWalletStatus.Offline,
   ActiveWalletStatus.Error,
   ActiveWalletStatus.Unavailable,
@@ -16,8 +17,8 @@ const SC_BLOCKED_STATUSES: readonly ActiveWalletStatus[] = [
 
 export const OfflineGate: React.FC<Props> = ({ children }) => {
   const { isSelfCustodial, status } = useActiveWallet()
-  if (isSelfCustodial && SC_BLOCKED_STATUSES.includes(status)) {
-    return <SelfCustodialPaymentOfflineNotice />
+  if (isSelfCustodial && SELF_CUSTODIAL_BLOCKED_STATUSES.includes(status)) {
+    return <PaymentOfflineNotice />
   }
   return <>{children}</>
 }

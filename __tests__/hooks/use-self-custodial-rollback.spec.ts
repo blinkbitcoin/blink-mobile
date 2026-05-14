@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { AccountStatus, AccountType } from "@app/types/wallet.types"
+import { AccountStatus, AccountType } from "@app/types/wallet"
 
 import { useSelfCustodialRollback } from "@app/hooks/use-self-custodial-rollback"
 
@@ -34,7 +34,7 @@ const custodialAccount = {
   status: AccountStatus.Available,
 }
 const selfCustodialAccount = {
-  id: "sc-default",
+  id: "self-custodial-default",
   type: AccountType.SelfCustodial,
   label: "Self-custodial",
   selected: true,
@@ -133,7 +133,7 @@ describe("useSelfCustodialRollback", () => {
     expect(mockSetActiveAccountId).toHaveBeenCalledWith("custodial-default")
   })
 
-  describe("cold-start race (Critical #1)", () => {
+  describe("cold-start race", () => {
     it("does not roll back while remoteConfigReady is false, even with the default flag value", () => {
       mockRemoteConfigReady = false
       mockNonCustodialEnabled = false
@@ -192,7 +192,7 @@ describe("useSelfCustodialRollback", () => {
     })
   })
 
-  describe("shouldShowUnavailable matrix (Critical #6)", () => {
+  describe("shouldShowUnavailable matrix", () => {
     type AnyAccount = typeof selfCustodialAccount | typeof custodialAccount
     const renderWith = (overrides: {
       activeAccount?: AnyAccount
@@ -206,7 +206,7 @@ describe("useSelfCustodialRollback", () => {
         }),
       )
 
-    it("flag=disabled, active=SC, no custodial available → true (locks user out)", () => {
+    it("flag=disabled, active=self-custodial, no custodial available → true (locks user out)", () => {
       mockNonCustodialEnabled = false
       mockHasCustodialAccount = false
 
@@ -215,7 +215,7 @@ describe("useSelfCustodialRollback", () => {
       expect(result.current.shouldShowUnavailable).toBe(true)
     })
 
-    it("flag=disabled, active=SC, custodial available → false (rollback handles it)", () => {
+    it("flag=disabled, active=self-custodial, custodial available → false (rollback handles it)", () => {
       mockNonCustodialEnabled = false
       mockHasCustodialAccount = true
 

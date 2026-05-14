@@ -10,7 +10,7 @@ import {
   type ParseDestinationResult,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { toBtcMoneyAmount } from "@app/types/amounts"
-import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction.types"
+import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 
 import { createSelfCustodialLightningPaymentDetails } from "./lightning"
 import { createSelfCustodialLnurlPaymentDetails } from "./lnurl"

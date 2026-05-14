@@ -64,7 +64,8 @@
     "title": "Převod",
     "transfer": "Převod",
     "percentageToConvert": "% k převodu",
-    "reviewTransfer": "Zkontrolovat převod"
+    "reviewTransfer": "Zkontrolovat převod",
+    "dustError": "Musí se převést celý zůstatek."
   },
   "ConversionConfirmationScreen": {
     "title": "Přezkoumat převod",
@@ -74,9 +75,7 @@
     "infoDollar": "Částka v dolarech je pouze přibližná. Může se mírně lišit.",
     "transferButtonText": "Převést {fromWallet} na {toWallet}",
     "feeLabel": "Poplatek za konverzi",
-    "feeError": "Nepodařilo se načíst poplatek za konverzi",
-    "amountFloored": "Částka zvýšena na minimum konverze.",
-    "amountDustBumped": "Částka zvýšena pro konverzi celého zůstatku."
+    "feeError": "Nepodařilo se načíst poplatek za konverzi"
   },
   "ConversionSuccessScreen": {
     "message": "Úspěšný převod",
@@ -2173,8 +2172,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Poplatek za vklad: {fee} SAT pro částky pod {threshold} SAT nebo {overFee} SAT pro vklady nad {threshold} SAT",
     "autoConvertMinAmount": "Částky pod {minSats: number} satoshi nelze automaticky převést na dolary. Obdržíte místo toho Bitcoin.",
-    "autoConvertSuccess": "Přijato {amount: number} satoshi, převedeno na dolary.",
-    "autoConvertFailed": "Platba přijata, ale konverze selhala."
+    "autoConvertFailed": "Platba přijata, ale konverze selhala.",
+    "pleaseWaitForConversion": "Počkejte, prosím, dokud se převod nedokončí"
   },
   "RedeemBitcoinScreen": {
     "title": "Směnit Bitcoin",
@@ -2350,7 +2349,6 @@
     "nonCustodialAccount": "Nesvěřenský účet",
     "tapUserName": "Klepnutím na nastavíte uživatelské jméno",
     "notifications": "Notifications",
-    "recoveryMethod": "Metoda obnovy",
     "title": "Nastavení",
     "darkMode": "Tmavý režim",
     "setToDark": "Režim: tmavý",
@@ -2377,27 +2375,11 @@
     "receiveCurrency": "Měna příjmu",
     "displayCurrency": "Měna zobrazení",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
       "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -2437,6 +2419,7 @@
     "level": "Úroveň {level: string}",
     "switchAccount": "Přepnout účet",
     "pleaseWait": "Prosím čekejte.",
+    "probeBalanceFailed": "Nepodařilo se ověřit zůstatek peněženky. Zkuste to prosím znovu.",
     "accountLevel": "Úroveň účtu",
     "upgrade": "Upgradujte svůj účet",
     "logOutAndDeleteLocalData": "Odhlásit se a vymazat všechna místní data",
@@ -2476,6 +2459,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "ID účtu",
+    "publicKey": "Veřejný klíč",
+    "copiedPublicKey": "Veřejný klíč zkopírován do schránky",
     "copy": "Kopírovat",
     "identityVerification": "Ověření totožnosti"
   },
@@ -2506,7 +2491,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Výchozí účet pro příjem",
-    "info": "Váš Bitcoin Účet je pro hromadění satů, kde se hodnota USD pohybuje s trhem. Váš Dolarový účet je poháněný technologií Stablesats — drží Bitcoin zajištěný tak, aby zůstal stabilní v hodnotě USD. Vždy držíte Bitcoin, ale dolarová hodnota se nemění."
+    "info": "Váš Bitcoin Účet je pro hromadění satů, kde se hodnota USD pohybuje s trhem. Váš Dolarový účet je poháněný technologií Stablesats — drží Bitcoin zajištěný tak, aby zůstal stabilní v hodnotě USD. Vždy držíte Bitcoin, ale dolarová hodnota se nemění.",
+    "titleSelfCustodial": "Výchozí účet",
+    "infoSelfCustodial": "Tento účet bude použit jako výchozí pro příjem a odesílání. Kdykoli můžete přepnout."
   },
   "ThemeScreen": {
     "title": "Motiv",
@@ -2524,7 +2511,10 @@
     "header": "Váš Dolarový účet je poháněný technologií Stablesats",
     "body": "Dolarový účet využívá technologii Stablesats k udržení Bitcoinu stabilního na ceně USD. Vždy držíte Bitcoin — ne skutečné dolary — ale hodnota USD nekolísá. Můžete odesílat a přijímat Bitcoin jako obvykle, ale není to kompatibilní s tradičním bankovním systémem.",
     "termsAndConditions": "Přečtěte si smluvní podmínky",
-    "learnMore": "Zjistěte více o Stablesats"
+    "learnMore": "Zjistěte více o Stablesats",
+      "headerSelfCustodial": "Váš dolarový účet drží stablecoiny",
+      "bodySelfCustodial": "Na dolarovém účtu držíte stablecoiny. Tokeny kryté aktivy s hodnotou udržovanou stabilní vůči USD. Stablecoiny zatím nemůžete odesílat ani přijímat. Když odešlete z dolarového účtu, vaše stablecoiny budou převedeny a odeslány jako Bitcoin příjemci.",
+      "learnMoreSelfCustodial": "Zjistit více"
   },
   "SplashScreen": {
     "update": "Vaše aplikace je zastaralá. Před použitím aplikace je nutná aktualizace.\n\nTo lze provést v obchodě PlayStore pro systém Android a Testflight pro systém iOS."
@@ -2804,6 +2794,7 @@
     "submit": "Odeslat",
     "success": "Úspěch!",
     "dollarStablesats": "Dolar (Stablesats)",
+    "dollarStablecoin": "Dolar (Stablecoin)",
     "to": "Komu",
     "total": "Celkem",
     "transactions": "Transakce",
@@ -3529,8 +3520,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Správce hesel",
       "manualBackup": "Ruční zálohování",
-      "keychainSaved": "Záloha uložena do správce hesel",
-      "keychainFailed": "Nepodařilo se uložit zálohu",
+      "passwordManagerBackupSaved": "Záloha uložena do správce hesel",
+      "passwordManagerBackupFailed": "Nepodařilo se uložit zálohu",
+      "passwordManagerUnavailable": "Na tomto zařízení není k dispozici žádný správce hesel. Použijte zálohu Drive nebo uložte svou 12slovnou frázi ručně.",
       "iOSComingSoon": "Zálohování na iCloud bude již brzy k dispozici"
     },
     "ManualBackup": {
@@ -3548,7 +3540,9 @@
         "saveItNow": "Uložte ji nyní",
         "savedConfirm": "Už jsem ji uložil",
         "copy": "Kopírovat",
-        "continueButton": "Pokračovat"
+        "continueButton": "Pokračovat",
+        "selfCustodialDisabled": "Nesvěřenectví je dočasně nedostupné.",
+        "testBackup": "Otestujte zálohu"
       },
       "Confirm": {
         "headerTitle": "Potvrďte záložní frázi",
@@ -3559,7 +3553,8 @@
         "incorrectWord": "Nesprávné slovo, zkontroluj prosím pořadí"
       },
       "Success": {
-        "title": "Vítejte v necustodial Blink"
+        "title": "Vítejte v necustodial Blink",
+        "testSuccess": "Vaše záložní fráze je správná"
       }
     },
     "CloudBackup": {
@@ -3581,6 +3576,9 @@
       "signInFailed": "Přihlášení ke Google se nezdařilo",
       "existingBackupTitle": "Záloha nalezena",
       "existingBackupMessage": "Ve vašem {provider} již existuje záloha. Chcete ji přepsat?",
+      "existingBackupMessageWithDetails": "Na vašem {provider} již existuje záloha.\n\nLightning adresa: {address}\nVytvořeno: {createdAt}\n\nChcete ji přepsat?",
+      "existingBackupUnknownAddress": "Není k dispozici",
+      "existingBackupUnknownCreatedAt": "Neznámé",
       "overwrite": "Přepsat"
     }
   },
@@ -3594,8 +3592,8 @@
     "transferringFunds": "Převádíme vaše prostředky. Mělo by to být hotové za několik sekund."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Spravovaný",
+    "selfCustodialLabel": "Vlastní správa",
     "custodialDescription": "Prostředky držíme za vás",
     "selfCustodialDescription": "Pouze vy máte přístup k prostředkům",
     "continueButton": "Pokračovat",
@@ -3603,7 +3601,8 @@
     "descriptionSelected": "Vyberte prosím typ účtu.",
     "chooseMethod": "Vyberte metodu",
     "restoreComingSoonTitle": "Již brzy",
-    "restoreComingSoonDescription": "Funkce obnovení bude dostupná v budoucí aktualizaci."
+    "restoreComingSoonDescription": "Funkce obnovení bude dostupná v budoucí aktualizaci.",
+    "createFailed": "Nepodařilo se vytvořit peněženku. Zkuste to prosím znovu."
   },
   "RestoreScreen": {
     "title": "Obnovit peněženku",
@@ -3622,7 +3621,9 @@
     "noBackupFound": "Záloha nenalezena",
     "noBackupDescription": "Nepodařilo se najít zálohu. Můžete zadat zálohovací frázi ručně.",
     "enterPassword": "Zadejte heslo šifrování",
-    "wrongPassword": "Nesprávné heslo. Zkuste to prosím znovu."
+    "wrongPassword": "Nesprávné heslo. Zkuste to prosím znovu.",
+    "pickBackupTitle": "Vyberte peněženku",
+    "pickBackupDescription": "Vyberte zálohu k obnovení"
   },
   "BackupNudge": {
     "title": "Vaše prostředky jsou v ohrožení",
@@ -3631,11 +3632,7 @@
     "settingsWarning": "Zálohujte svou peněženku. Pokud ztratíte toto zařízení, přijdete o své prostředky.",
     "modalTitle": "Zabezpečte své prostředky",
     "modalDescription": "Důrazně doporučujeme zálohovat peněženku, abyste předešli úplné ztrátě prostředků v případě ztráty tohoto zařízení.",
-    "secureMe": "Zabezpečit peněženku",
-    "trustModelTitle": "Máte kontrolu",
-    "trustModelDescription": "Vaše klíče řídí vaše prostředky. Transakce zpracovávají operátoři Spark, nikoliv přímo na Bitcoin L1.",
-    "trustModelWarning": "Obnova velmi malých zůstatků na základní řetězec Bitcoinu nemusí být ekonomická.",
-    "trustModelDismiss": "Rozumím"
+    "secureMe": "Zabezpečit peněženku"
   },
   "StableBalance": {
     "title": "Stabilní zůstatek",
@@ -3659,12 +3656,6 @@
       "deactivateConfirm": "Deaktivovat",
       "cancel": "Zrušit"
     },
-    "firstTimeModal": {
-      "title": "O převodu",
-      "dualBalance": "BTC a USD jsou dva nezávislé zůstatky ve vaší peněžence. Kdykoli použijte Convert k přesunu prostředků mezi nimi.",
-      "trustDisclosure": "Režim USD používá tokeny USDB na Sparku. Předpoklady důvěry jsou jiné než držení BTC přímo. USDB spoléhá na emitenta tokenů Sparku.",
-      "acknowledge": "Rozumím"
-    },
     "minimumConversion": "Minimální převod: {amount:string}",
     "conversionUnavailable": "Konverze je dočasně nedostupná. Zkuste to znovu."
   },
@@ -3679,7 +3670,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Vytváření peněženky...",
     "errorTitle": "Vytvoření peněženky selhalo",
     "errorDescription": "Něco se pokazilo. Zkuste to prosím znovu.",
@@ -3755,10 +3746,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Důležité",
+    "dangerZoneBulletReinstated": "Smazaný účet nelze obnovit",
+    "dangerZoneBulletPermanent": "Smazání účtu je trvalé",
+    "dangerZoneBulletEmpty": "Ujistěte se, že je účet prázdný",
+    "dangerZoneDeleteButton": "Smazat účet a data",
+    "confirmModalTitle": "Potvrdit smazání účtu",
+    "confirmModalTypeToConfirm": "Zadejte \"{delete: string}\" pro potvrzení",
+    "hasFundsWarningTitle": "Upozornění",
+    "hasFundsWarningBody": "Vaše peněženka má zůstatek {balance}. Pro vaši bezpečnost neumožňujeme smazání účtů s prostředky.",
+    "hasFundsWarningHelper": "Chcete-li pokračovat ve smazání, vyprázdněte svůj účet nebo darujte do cirkulárních ekonomik.",
+    "hasFundsWarningButton": "Zpět"
   }
 }

@@ -3,9 +3,9 @@ import {
   TransactionDirection,
   TransactionStatus,
   type NormalizedTransaction,
-} from "@app/types/transaction.types"
+} from "@app/types/transaction"
 import { WalletCurrency } from "@app/graphql/generated"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { getTransactionDescription } from "@app/self-custodial/mappers/transaction-description"
 

@@ -2,11 +2,16 @@ import { useCallback, useState } from "react"
 import { Platform } from "react-native"
 
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
+import crashlytics from "@react-native-firebase/crashlytics"
 
 import {
   findAppDataFile,
+  listAppDataFiles,
   uploadAppDataFile,
   downloadAppDataFile,
+  DriveError,
+  DriveErrorReason,
+  type AppDataFileEntry,
 } from "@app/utils/google-drive-client"
 
 const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata"
@@ -28,10 +33,29 @@ const signIn = async (): Promise<string> => {
   return accessToken
 }
 
-type UploadResult = { success: true } | { success: false; error: string }
+const DriveOperation = {
+  Upload: "upload",
+  Download: "download",
+} as const
+
+type DriveOperation = (typeof DriveOperation)[keyof typeof DriveOperation]
+
+const reasonFromError = (err: unknown): DriveErrorReason =>
+  err instanceof DriveError ? err.reason : DriveErrorReason.Unknown
+
+const reportDriveError = (operation: DriveOperation, err: unknown): void => {
+  if (err instanceof DriveError) {
+    crashlytics().recordError(err)
+    return
+  }
+  const message = err instanceof Error ? err.message : String(err)
+  crashlytics().recordError(new Error(`Drive ${operation} failed: ${message}`))
+}
+
+type UploadResult = { success: true } | { success: false; reason: DriveErrorReason }
 type DownloadResult =
   | { success: true; content: string }
-  | { success: false; error: string }
+  | { success: false; reason: DriveErrorReason }
 
 type DriveSession = {
   accessToken: string
@@ -63,9 +87,8 @@ export const useGoogleDriveBackup = () => {
         })
         return { success: true }
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Unknown error"
-        console.error("[GoogleDrive] Upload error:", message)
-        return { success: false, error: message }
+        reportDriveError(DriveOperation.Upload, err)
+        return { success: false, reason: reasonFromError(err) }
       } finally {
         setLoading(false)
       }
@@ -73,25 +96,32 @@ export const useGoogleDriveBackup = () => {
     [],
   )
 
-  const download = useCallback(async (session: DriveSession): Promise<DownloadResult> => {
-    setLoading(true)
-    try {
-      if (!session.existingFileId) {
-        return { success: false, error: "no-backup-found" }
+  const downloadById = useCallback(
+    async (fileId: string, accessToken: string): Promise<DownloadResult> => {
+      setLoading(true)
+      try {
+        const content = await downloadAppDataFile(fileId, accessToken)
+        return { success: true, content }
+      } catch (err) {
+        reportDriveError(DriveOperation.Download, err)
+        return { success: false, reason: reasonFromError(err) }
+      } finally {
+        setLoading(false)
       }
-      const content = await downloadAppDataFile(
-        session.existingFileId,
-        session.accessToken,
-      )
-      return { success: true, content }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error"
-      console.error("[GoogleDrive] Download error:", message)
-      return { success: false, error: message }
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+    },
+    [],
+  )
 
-  return { startSession, upload, download, loading }
+  const listBackups = useCallback(
+    async (
+      filenamePrefix: string,
+    ): Promise<{ entries: ReadonlyArray<AppDataFileEntry>; accessToken: string }> => {
+      const accessToken = await signIn()
+      const entries = await listAppDataFiles(filenamePrefix, accessToken)
+      return { entries, accessToken }
+    },
+    [],
+  )
+
+  return { startSession, upload, downloadById, listBackups, loading }
 }

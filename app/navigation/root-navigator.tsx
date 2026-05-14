@@ -5,7 +5,6 @@ import LearnIcon from "@app/assets/icons/learn.svg"
 import MapIcon from "@app/assets/icons/map.svg"
 import ScanIcon from "@app/assets/icons/scan.svg"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { usePersistentStateContext } from "@app/store/persistent-state"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   ConversionConfirmationScreen,
@@ -40,13 +39,6 @@ import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bi
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
-import { OfflineGate } from "@app/self-custodial/components"
-import { StableBalanceSettingsScreen } from "@app/screens/stable-balance-settings-screen"
-import { SelfCustodialAccountInformationScreen } from "@app/screens/settings-screen/self-custodial/account-information-screen"
-import { SelfCustodialBitcoinDepositScreen } from "@app/screens/settings-screen/self-custodial/bitcoin-deposit-screen"
-import { SelfCustodialTransactionLimitsScreen } from "@app/screens/settings-screen/self-custodial/transaction-limits-screen"
-import { TemporarilyUnavailableScreen } from "@app/screens/feature-unavailable/temporarily-unavailable-screen"
-import { useSelfCustodialUnavailable } from "@app/hooks/use-self-custodial-unavailable"
 import { SetLightningAddressScreen } from "@app/screens/lightning-address-screen/set-lightning-address-screen"
 import { AccountScreen, SwitchAccount } from "@app/screens/settings-screen/account"
 import { DefaultWalletScreen } from "@app/screens/settings-screen/default-wallet"
@@ -93,9 +85,14 @@ import { LanguageScreen } from "../screens/settings-screen/language-screen"
 import { SelectionScreen } from "../screens/settings-screen/selection-screen"
 import { SecurityScreen } from "../screens/settings-screen/security-screen"
 import { TransactionDetailScreen } from "../screens/transaction-detail-screen"
+import { TemporarilyUnavailableScreen } from "../screens/feature-unavailable/temporarily-unavailable-screen"
+import { StableBalanceSettingsScreen } from "../screens/stable-balance-settings-screen"
 import { TransactionHistoryScreen } from "../screens/transaction-history/transaction-history-screen"
 import { UnclaimedDepositsScreen } from "../screens/unclaimed-deposits/unclaimed-deposits-screen"
 
+import { useSelfCustodialUnavailable } from "@app/hooks/use-self-custodial-unavailable"
+import { OfflineGate } from "@app/self-custodial/components"
+import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { headerCloseControl } from "@app/components/header-close-control"
@@ -133,21 +130,23 @@ import {
   SupportOnboardingScreen,
 } from "@app/screens/onboarding-screen"
 import {
-  SparkBackupMethodScreen,
-  SparkCloudBackupScreen,
-  SparkBackupAlertsScreen,
-  SparkBackupPhraseScreen,
-  SparkBackupConfirmScreen,
-  SparkBackupSuccessScreen,
-  SparkWalletCreationScreen,
-} from "@app/screens/spark-onboarding"
+  BackupMethodScreen,
+  CloudBackupScreen,
+  BackupSecurityChecksScreen,
+  BackupPhraseScreen,
+  ViewBackupSecurityChecksScreen,
+  ViewBackupPhraseScreen,
+  BackupPhraseConfirmScreen,
+  BackupSuccessScreen,
+  WalletCreationScreen,
+} from "@app/screens/self-custodial/onboarding"
 import {
-  SparkRestoreMethodScreen,
-  SparkRestorePhraseScreen,
-  SparkCloudRestoreScreen,
-} from "@app/screens/spark-onboarding/restore"
+  RestoreMethodScreen,
+  RestorePhraseScreen,
+  CloudRestoreScreen,
+} from "@app/screens/self-custodial/onboarding/restore"
 import {
-  SparkMigrationExplainerScreen,
+  MigrationExplainerScreen,
   TransferringFundsScreen,
 } from "@app/screens/account-migration"
 import {
@@ -758,42 +757,54 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
-        name="sparkBackupMethodScreen"
-        component={SparkBackupMethodScreen}
+        name="selfCustodialBackupMethod"
+        component={BackupMethodScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
-        name="sparkCloudBackupScreen"
-        component={SparkCloudBackupScreen}
+        name="selfCustodialCloudBackup"
+        component={CloudBackupScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
-        name="sparkBackupAlertsScreen"
-        component={SparkBackupAlertsScreen}
+        name="selfCustodialBackupSecurityChecks"
+        component={BackupSecurityChecksScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
-        name="sparkBackupPhraseScreen"
-        component={SparkBackupPhraseScreen}
+        name="selfCustodialBackupPhrase"
+        component={BackupPhraseScreen}
         options={{
           title: LL.BackupScreen.ManualBackup.Phrase.headerTitle(),
         }}
       />
       <RootNavigator.Screen
-        name="sparkBackupConfirmScreen"
-        component={SparkBackupConfirmScreen}
+        name="selfCustodialViewBackupSecurityChecks"
+        component={ViewBackupSecurityChecksScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialViewBackupPhrase"
+        component={ViewBackupPhraseScreen}
+        options={{
+          title: LL.BackupScreen.ManualBackup.Phrase.headerTitle(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialBackupPhraseConfirm"
+        component={BackupPhraseConfirmScreen}
         options={{
           title: LL.BackupScreen.ManualBackup.Confirm.headerTitle(),
         }}
       />
       <RootNavigator.Screen
-        name="sparkBackupSuccessScreen"
-        component={SparkBackupSuccessScreen}
+        name="selfCustodialBackupSuccess"
+        component={BackupSuccessScreen}
         options={{ headerShown: false }}
       />
       <RootNavigator.Screen
-        name="sparkWalletCreation"
-        component={SparkWalletCreationScreen}
+        name="selfCustodialWalletCreation"
+        component={WalletCreationScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
@@ -802,43 +813,28 @@ export const RootStack = () => {
         options={{ title: LL.StableBalance.settingsTitle() }}
       />
       <RootNavigator.Screen
-        name="selfCustodialAccountInformationScreen"
-        component={SelfCustodialAccountInformationScreen}
-        options={{ title: LL.common.accountInformation() }}
-      />
-      <RootNavigator.Screen
-        name="selfCustodialTransactionLimitsScreen"
-        component={SelfCustodialTransactionLimitsScreen}
-        options={{ title: LL.common.transactionLimits() }}
-      />
-      <RootNavigator.Screen
-        name="selfCustodialBitcoinDepositScreen"
-        component={SelfCustodialBitcoinDepositScreen}
-        options={{ title: LL.SettingsScreen.WaysToGetPaid.onchainTitle() }}
-      />
-      <RootNavigator.Screen
-        name="sparkMigrationExplainer"
-        component={SparkMigrationExplainerScreen}
+        name="accountMigrationExplainer"
+        component={MigrationExplainerScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
-        name="sparkMigrationTransferringFunds"
+        name="accountMigrationTransferringFunds"
         component={TransferringFundsScreen}
         options={{ headerShown: false }}
       />
       <RootNavigator.Screen
-        name="sparkRestoreMethodScreen"
-        component={SparkRestoreMethodScreen}
+        name="selfCustodialRestoreMethod"
+        component={RestoreMethodScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
-        name="sparkRestorePhraseScreen"
-        component={SparkRestorePhraseScreen}
+        name="selfCustodialRestorePhrase"
+        component={RestorePhraseScreen}
         options={{ title: LL.RestoreScreen.phraseTitle(), headerRight: () => null }}
       />
       <RootNavigator.Screen
-        name="sparkCloudRestoreScreen"
-        component={SparkCloudRestoreScreen}
+        name="selfCustodialCloudRestore"
+        component={CloudRestoreScreen}
         options={{ title: "" }}
       />
     </RootNavigator.Navigator>

@@ -64,7 +64,8 @@
     "title": "Chuyển đổi",
     "transfer": "Chuyển khoản",
     "percentageToConvert": "% chuyển đổi",
-    "reviewTransfer": "Xem lại chuyển khoản"
+    "reviewTransfer": "Xem lại chuyển khoản",
+    "dustError": "Phải chuyển toàn bộ số dư."
   },
   "ConversionConfirmationScreen": {
     "title": "Xem lại sự chuyển đổi",
@@ -74,9 +75,7 @@
     "infoDollar": "Số tiền Đô la chỉ là gần đúng. Nó có thể thay đổi một lượng nhỏ.",
     "transferButtonText": "Chuyển {fromWallet} sang {toWallet}",
     "feeLabel": "Phí chuyển đổi",
-    "feeError": "Không thể lấy phí chuyển đổi",
-    "amountFloored": "Số tiền đã được tăng để đạt mức tối thiểu chuyển đổi.",
-    "amountDustBumped": "Số tiền đã được tăng để chuyển đổi toàn bộ số dư của bạn."
+    "feeError": "Không thể lấy phí chuyển đổi"
   },
   "ConversionSuccessScreen": {
     "message": "Chuyễn đổi đã thành công",
@@ -2173,8 +2172,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Phí nạp tiền: {fee} SAT cho số tiền dưới {threshold} SAT hoặc {overFee} SAT cho các khoản nạp trên {threshold} SAT",
     "autoConvertMinAmount": "Số tiền dưới {minSats: number} sats không thể chuyển đổi tự động sang Đô la. Bạn sẽ nhận Bitcoin thay thế.",
-    "autoConvertSuccess": "Đã nhận {amount: number} sats, đã chuyển đổi sang Đô la.",
-    "autoConvertFailed": "Đã nhận thanh toán nhưng chuyển đổi thất bại."
+    "autoConvertFailed": "Đã nhận thanh toán nhưng chuyển đổi thất bại.",
+    "pleaseWaitForConversion": "Vui lòng đợi cho đến khi quá trình chuyển đổi hoàn tất"
   },
   "RedeemBitcoinScreen": {
     "title": "Đổi lấy Bitcoin",
@@ -2350,7 +2349,6 @@
     "nonCustodialAccount": "Tài khoản không lưu ký",
     "tapUserName": "Nhấn để đặt tên người dùng",
     "notifications": "Notifications",
-    "recoveryMethod": "Phương thức khôi phục",
     "title": "Cài đặt",
     "darkMode": "Dark Mode",
     "setToDark": "Mode: dark.",
@@ -2377,27 +2375,11 @@
     "receiveCurrency": "Tiền tệ nhận",
     "displayCurrency": "Tiền tệ hiển thị",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
       "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -2437,6 +2419,7 @@
     "level": "Cấp {level: string}",
     "switchAccount": "Chuyển tài khoản",
     "pleaseWait": "Vui lòng chờ.",
+    "probeBalanceFailed": "Không thể xác minh số dư của ví. Vui lòng thử lại.",
     "accountLevel": "Account Level",
     "upgrade": "Upgrade your account",
     "logOutAndDeleteLocalData": "Log out and clear all local data",
@@ -2476,6 +2459,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "Mã Tài khoản",
+    "publicKey": "Khóa công khai",
+    "copiedPublicKey": "Đã sao chép khóa công khai vào bộ nhớ tạm",
     "copy": "Copy",
     "identityVerification": "Xác minh Danh tính"
   },
@@ -2506,7 +2491,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Tài khoản nhận mặc định",
-    "info": "Tài khoản Bitcoin của bạn dùng để tích lũy sats, nơi giá trị USD biến động theo thị trường. Tài khoản Đô la của bạn được hỗ trợ bởi Stablesats — giữ Bitcoin được bảo hiểm để duy trì ổn định theo giá trị USD. Bạn luôn nắm giữ Bitcoin, nhưng giá trị đô la không thay đổi."
+    "info": "Tài khoản Bitcoin của bạn dùng để tích lũy sats, nơi giá trị USD biến động theo thị trường. Tài khoản Đô la của bạn được hỗ trợ bởi Stablesats — giữ Bitcoin được bảo hiểm để duy trì ổn định theo giá trị USD. Bạn luôn nắm giữ Bitcoin, nhưng giá trị đô la không thay đổi.",
+    "titleSelfCustodial": "Tài khoản mặc định",
+    "infoSelfCustodial": "Tài khoản này sẽ được sử dụng mặc định khi nhận và gửi. Bạn có thể chuyển đổi bất cứ lúc nào."
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2524,7 +2511,10 @@
     "header": "Tài khoản Đô la của bạn được hỗ trợ bởi Stablesats",
     "body": "Tài khoản Đô la sử dụng công nghệ Stablesats để giữ Bitcoin ổn định theo giá USD. Bạn luôn nắm giữ Bitcoin — không phải đô la thật — nhưng giá trị USD không biến động. Bạn có thể gửi và nhận Bitcoin như bình thường, nhưng không tương thích với hệ thống ngân hàng truyền thống.",
     "termsAndConditions": "Đọc các Điều khoản & Điều kiện",
-    "learnMore": "Tìm hiểu thêm về Stablesats"
+    "learnMore": "Tìm hiểu thêm về Stablesats",
+      "headerSelfCustodial": "Tài khoản Đô la của bạn giữ stablecoin",
+      "bodySelfCustodial": "Trong tài khoản Đô la, bạn nắm giữ stablecoin. Token được bảo đảm bởi tài sản với giá trị giữ ổn định so với USD. Bạn chưa thể gửi và nhận stablecoin. Khi bạn gửi từ tài khoản Đô la, stablecoin của bạn sẽ được hoán đổi và gửi dưới dạng Bitcoin cho người nhận.",
+      "learnMoreSelfCustodial": "Tìm hiểu thêm"
   },
   "SplashScreen": {
     "update": "Ứng dụng của bạn đã lỗi thời. Cần cập nhật ứng dụng để chạy ứng dụng.\n\nĐiều này có thể được thực hiện từ PlayStore cho Android và Testflight cho iOS"
@@ -2804,6 +2794,7 @@
     "submit": "Submit",
     "success": "Thành công!",
     "dollarStablesats": "Đô la (Stablesats)",
+    "dollarStablecoin": "Đô la (Stablecoin)",
     "to": "Tới",
     "total": "Tổng cộng",
     "transactions": "Các giao dịch",
@@ -3526,8 +3517,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Trình quản lý mật khẩu",
       "manualBackup": "Sao lưu thủ công",
-      "keychainSaved": "Đã lưu bản sao lưu vào trình quản lý mật khẩu",
-      "keychainFailed": "Không thể lưu bản sao lưu",
+      "passwordManagerBackupSaved": "Đã lưu bản sao lưu vào trình quản lý mật khẩu",
+      "passwordManagerBackupFailed": "Không thể lưu bản sao lưu",
+      "passwordManagerUnavailable": "Không có trình quản lý mật khẩu nào khả dụng trên thiết bị này. Hãy sử dụng bản sao lưu Drive hoặc lưu cụm từ 12 chữ của bạn theo cách thủ công.",
       "iOSComingSoon": "Sao lưu iCloud sắp ra mắt"
     },
     "ManualBackup": {
@@ -3545,7 +3537,9 @@
         "saveItNow": "Lưu ngay",
         "savedConfirm": "Tôi đã lưu",
         "copy": "Sao chép",
-        "continueButton": "Tiếp tục"
+        "continueButton": "Tiếp tục",
+        "selfCustodialDisabled": "Không lưu ký tạm thời không khả dụng.",
+        "testBackup": "Kiểm tra bản sao lưu của bạn"
       },
       "Confirm": {
         "headerTitle": "Xác nhận cụm từ sao lưu",
@@ -3556,7 +3550,8 @@
         "incorrectWord": "Sai từ, vui lòng kiểm tra thứ tự"
       },
       "Success": {
-        "title": "Chào mừng đến với Blink tự quản lý"
+        "title": "Chào mừng đến với Blink tự quản lý",
+        "testSuccess": "Cụm từ sao lưu của bạn là chính xác"
       }
     },
     "CloudBackup": {
@@ -3578,6 +3573,9 @@
       "signInFailed": "Không thể đăng nhập vào Google",
       "existingBackupTitle": "Đã tìm thấy bản sao lưu",
       "existingBackupMessage": "Đã có bản sao lưu trong {provider} của bạn. Bạn có muốn ghi đè không?",
+      "existingBackupMessageWithDetails": "Đã tồn tại bản sao lưu trên {provider} của bạn.\n\nĐịa chỉ Lightning: {address}\nĐã tạo: {createdAt}\n\nBạn có muốn ghi đè không?",
+      "existingBackupUnknownAddress": "Không có",
+      "existingBackupUnknownCreatedAt": "Không xác định",
       "overwrite": "Ghi đè"
     }
   },
@@ -3591,8 +3589,8 @@
     "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Lưu ký",
+    "selfCustodialLabel": "Phi lưu ký",
     "custodialDescription": "Chúng tôi giữ tiền thay mặt bạn",
     "selfCustodialDescription": "Chỉ bạn mới có thể truy cập tiền",
     "continueButton": "Tiếp tục",
@@ -3600,7 +3598,8 @@
     "descriptionSelected": "Vui lòng chọn loại tài khoản.",
     "chooseMethod": "Chọn phương thức",
     "restoreComingSoonTitle": "Sắp ra mắt",
-    "restoreComingSoonDescription": "Tính năng khôi phục sẽ có trong bản cập nhật tương lai."
+    "restoreComingSoonDescription": "Tính năng khôi phục sẽ có trong bản cập nhật tương lai.",
+    "createFailed": "Không thể tạo ví. Vui lòng thử lại."
   },
   "RestoreScreen": {
     "title": "Khôi phục ví",
@@ -3619,7 +3618,9 @@
     "noBackupFound": "Không tìm thấy bản sao lưu",
     "noBackupDescription": "Chúng tôi không tìm thấy bản sao lưu. Bạn có thể nhập cụm từ sao lưu thủ công.",
     "enterPassword": "Nhập mật khẩu mã hóa của bạn",
-    "wrongPassword": "Mật khẩu không đúng. Vui lòng thử lại."
+    "wrongPassword": "Mật khẩu không đúng. Vui lòng thử lại.",
+    "pickBackupTitle": "Chọn một ví",
+    "pickBackupDescription": "Chọn bản sao lưu để khôi phục"
   },
   "BackupNudge": {
     "title": "Tiền của bạn đang gặp rủi ro",
@@ -3628,11 +3629,7 @@
     "settingsWarning": "Sao lưu ví của bạn. Nếu bạn mất thiết bị này, bạn sẽ mất tiền.",
     "modalTitle": "Bảo mật tiền của bạn",
     "modalDescription": "Chúng tôi khuyến nghị bạn sao lưu ví để ngăn chặn mất hoàn toàn tiền trong trường hợp bạn mất thiết bị này.",
-    "secureMe": "Bảo mật ví",
-    "trustModelTitle": "Bạn nắm quyền kiểm soát",
-    "trustModelDescription": "Khóa của bạn kiểm soát tiền của bạn. Giao dịch được xử lý bởi các nhà điều hành Spark, không được xác thực trực tiếp trên Bitcoin L1.",
-    "trustModelWarning": "Số dư rất nhỏ có thể không kinh tế để khôi phục về chuỗi cơ sở Bitcoin.",
-    "trustModelDismiss": "Tôi hiểu"
+    "secureMe": "Bảo mật ví"
   },
   "StableBalance": {
     "title": "Số dư ổn định",
@@ -3656,12 +3653,6 @@
       "deactivateConfirm": "Tắt",
       "cancel": "Hủy"
     },
-    "firstTimeModal": {
-      "title": "Về Chuyển đổi",
-      "dualBalance": "BTC và USD là hai số dư độc lập trong ví của bạn. Sử dụng Convert bất cứ lúc nào để chuyển tiền giữa chúng.",
-      "trustDisclosure": "Chế độ USD sử dụng token USDB trên Spark. Các giả định tin cậy khác với việc giữ BTC trực tiếp. USDB phụ thuộc vào nhà phát hành token của Spark.",
-      "acknowledge": "Tôi hiểu"
-    },
     "minimumConversion": "Chuyển đổi tối thiểu: {amount:string}",
     "conversionUnavailable": "Chuyển đổi tạm thời không khả dụng. Vui lòng thử lại."
   },
@@ -3676,7 +3667,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Đang tạo ví của bạn...",
     "errorTitle": "Tạo ví thất bại",
     "errorDescription": "Đã xảy ra lỗi. Vui lòng thử lại.",
@@ -3752,10 +3743,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Quan trọng",
+    "dangerZoneBulletReinstated": "Tài khoản đã xóa không thể khôi phục",
+    "dangerZoneBulletPermanent": "Xóa tài khoản là vĩnh viễn",
+    "dangerZoneBulletEmpty": "Đảm bảo tài khoản trống",
+    "dangerZoneDeleteButton": "Xóa tài khoản và dữ liệu",
+    "confirmModalTitle": "Xác nhận xóa tài khoản",
+    "confirmModalTypeToConfirm": "Nhập \"{delete: string}\" để xác nhận",
+    "hasFundsWarningTitle": "Cảnh báo",
+    "hasFundsWarningBody": "Ví của bạn có số dư là {balance}. Vì sự an toàn của bạn, chúng tôi không cho phép xóa tài khoản còn tiền.",
+    "hasFundsWarningHelper": "Để tiếp tục xóa, hãy làm trống tài khoản hoặc quyên góp cho các nền kinh tế tuần hoàn.",
+    "hasFundsWarningButton": "Quay lại"
   }
 }

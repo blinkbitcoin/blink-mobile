@@ -246,7 +246,7 @@ describe("createGetFeeOnchain", () => {
     expect(result.amount?.amount).toBe(800)
   })
 
-  it("returns undefined amount when extractOnchainFees returns null (regression Critical #3)", async () => {
+  it("returns undefined amount when extractOnchainFees returns null (regression)", async () => {
     mockPrepareSendPayment.mockResolvedValue({
       amount: BigInt(50000),
       paymentMethod: { tag: "Bolt11Invoice", inner: {} },
@@ -340,7 +340,7 @@ describe("createSendMutation", () => {
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.Generic)
   })
 
-  it("records send failures to crashlytics with a scoped Error (regression I8)", async () => {
+  it("records send failures to crashlytics with a scoped Error (regression)", async () => {
     mockRecordError.mockClear()
     mockPrepareSendPayment.mockRejectedValue(new Error("payment refused"))
 
@@ -356,7 +356,7 @@ describe("createSendMutation", () => {
     )
   })
 
-  it("records non-Error throws as a scoped Error so Sentry never gets a bare string (I8)", async () => {
+  it("records non-Error throws as a scoped Error so Sentry never gets a bare string", async () => {
     mockRecordError.mockClear()
     mockPrepareSendPayment.mockRejectedValue("network blip")
 

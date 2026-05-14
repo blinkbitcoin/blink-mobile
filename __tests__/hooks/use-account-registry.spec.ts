@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet.types"
+import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet"
 
 import {
   createCustodialDescriptor,
@@ -11,7 +11,7 @@ import {
 
 const mockUseIsAuthed = jest.fn()
 const mockUpdateState = jest.fn()
-const mockSaveToken = jest.fn()
+const mockGetSessionProfiles = jest.fn()
 
 jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockUseIsAuthed(),
@@ -36,38 +36,52 @@ jest.mock("@app/config/feature-flags-context", () => ({
 
 jest.mock("@app/store/persistent-state", () => ({
   usePersistentStateContext: () => ({
-    persistentState: { activeAccountId: mockActiveAccountId, galoyAuthToken: "token" },
+    persistentState: {
+      activeAccountId: mockActiveAccountId,
+      galoyAuthToken: mockGaloyAuthToken,
+    },
     updateState: mockUpdateState,
   }),
 }))
 
-jest.mock("@app/hooks/use-app-config", () => ({
-  useAppConfig: () => ({
-    saveToken: mockSaveToken,
-    appConfig: { token: "token", galoyInstance: { id: "Main" } },
-  }),
+jest.mock("@app/utils/storage/secureStorage", () => ({
+  __esModule: true,
+  default: {
+    getSessionProfiles: () => mockGetSessionProfiles(),
+  },
 }))
 
 const mockListSelfCustodialAccounts = jest.fn()
 jest.mock("@app/self-custodial/storage/account-index", () => ({
   listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
+  StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
 }))
 
 let mockNonCustodialEnabled = false
 let mockActiveAccountId: string | undefined
+let mockGaloyAuthToken = "token"
+
+const flushAsyncEffects = async () => {
+  await act(async () => {
+    await Promise.resolve()
+  })
+}
 
 describe("useAccountRegistry", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockNonCustodialEnabled = false
     mockActiveAccountId = undefined
-    mockListSelfCustodialAccounts.mockResolvedValue([])
+    mockGaloyAuthToken = "token"
+    mockListSelfCustodialAccounts.mockResolvedValue({ status: "ok", entries: [] })
+    mockGetSessionProfiles.mockResolvedValue([])
   })
 
-  it("returns custodial account when authenticated", () => {
+  it("returns custodial account when authenticated", async () => {
     mockUseIsAuthed.mockReturnValue(true)
 
     const { result } = renderHook(() => useAccountRegistry())
+    await flushAsyncEffects()
 
     expect(result.current.accounts).toHaveLength(1)
     expect(result.current.accounts[0].type).toBe(AccountType.Custodial)
@@ -75,103 +89,137 @@ describe("useAccountRegistry", () => {
     expect(result.current.accounts[0].status).toBe(AccountStatus.Available)
   })
 
-  it("returns empty accounts when not authenticated", () => {
+  it("returns empty accounts when not authenticated and KeyStore empty", async () => {
     mockUseIsAuthed.mockReturnValue(false)
 
     const { result } = renderHook(() => useAccountRegistry())
+    await flushAsyncEffects()
 
     expect(result.current.accounts).toHaveLength(0)
     expect(result.current.activeAccount).toBeUndefined()
   })
 
-  it("includes self-custodial accounts loaded from the index", async () => {
-    mockUseIsAuthed.mockReturnValue(true)
-    mockNonCustodialEnabled = true
-    mockListSelfCustodialAccounts.mockResolvedValue([
-      { id: "sc-uuid-1", lightningAddress: null },
+  it("includes custodial descriptor when KeyStore has a saved profile even if token is empty", async () => {
+    // Repro of the asymmetry where switch-account showed custodial but home did not.
+    mockUseIsAuthed.mockReturnValue(false)
+    mockGaloyAuthToken = ""
+    mockGetSessionProfiles.mockResolvedValue([
+      { token: "stale", identifier: "esau", lnAddressHostname: "blink.sv" },
     ])
 
     const { result } = renderHook(() => useAccountRegistry())
+    await flushAsyncEffects()
 
-    await act(async () => {
-      await Promise.resolve()
+    expect(result.current.accounts).toHaveLength(1)
+    expect(result.current.accounts[0].type).toBe(AccountType.Custodial)
+  })
+
+  it("excludes custodial descriptor when both token and KeyStore are empty", async () => {
+    mockUseIsAuthed.mockReturnValue(false)
+    mockGaloyAuthToken = ""
+    mockGetSessionProfiles.mockResolvedValue([])
+
+    const { result } = renderHook(() => useAccountRegistry())
+    await flushAsyncEffects()
+
+    expect(result.current.accounts).toHaveLength(0)
+  })
+
+  it("includes self-custodial accounts loaded from the index", async () => {
+    mockUseIsAuthed.mockReturnValue(true)
+    mockNonCustodialEnabled = true
+    mockListSelfCustodialAccounts.mockResolvedValue({
+      status: "ok",
+      entries: [{ id: "self-custodial-uuid-1", lightningAddress: null }],
     })
+
+    const { result } = renderHook(() => useAccountRegistry())
+    await flushAsyncEffects()
 
     expect(result.current.accounts).toHaveLength(2)
     expect(result.current.accounts[1].type).toBe(AccountType.SelfCustodial)
-    expect(result.current.accounts[1].id).toBe("sc-uuid-1")
+    expect(result.current.accounts[1].id).toBe("self-custodial-uuid-1")
     expect(result.current.accounts[1].status).toBe(AccountStatus.RequiresRestore)
   })
 
-  it("selects first account by default when no activeAccountId", () => {
+  it("selects first account by default when no activeAccountId", async () => {
     mockUseIsAuthed.mockReturnValue(true)
 
     const { result } = renderHook(() => useAccountRegistry())
+    await flushAsyncEffects()
 
-    expect(result.current.activeAccount?.id).toBe("custodial-default")
+    expect(result.current.activeAccount?.id).toBe(DefaultAccountId.Custodial)
     expect(result.current.activeAccount?.selected).toBe(true)
   })
 
   it("selects account matching activeAccountId", async () => {
     mockUseIsAuthed.mockReturnValue(true)
     mockNonCustodialEnabled = true
-    mockActiveAccountId = "sc-uuid-1"
-    mockListSelfCustodialAccounts.mockResolvedValue([
-      { id: "sc-uuid-1", lightningAddress: null },
-    ])
-
-    const { result } = renderHook(() => useAccountRegistry())
-
-    await act(async () => {
-      await Promise.resolve()
+    mockActiveAccountId = "self-custodial-uuid-1"
+    mockListSelfCustodialAccounts.mockResolvedValue({
+      status: "ok",
+      entries: [{ id: "self-custodial-uuid-1", lightningAddress: null }],
     })
 
-    expect(result.current.activeAccount?.id).toBe("sc-uuid-1")
+    const { result } = renderHook(() => useAccountRegistry())
+    await flushAsyncEffects()
+
+    expect(result.current.activeAccount?.id).toBe("self-custodial-uuid-1")
     expect(result.current.activeAccount?.type).toBe(AccountType.SelfCustodial)
   })
 
-  it("setActiveAccountId calls updateState", () => {
+  it("setActiveAccountId calls updateState with the new id", async () => {
     mockUseIsAuthed.mockReturnValue(true)
 
     const { result } = renderHook(() => useAccountRegistry())
+    await flushAsyncEffects()
 
     act(() => {
-      result.current.setActiveAccountId("custodial-default")
+      result.current.setActiveAccountId("self-custodial-uuid-1")
     })
 
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
-  })
-
-  it("setActiveAccountId calls saveToken when switching to custodial", () => {
-    mockUseIsAuthed.mockReturnValue(true)
-
-    const { result } = renderHook(() => useAccountRegistry())
-
-    act(() => {
-      result.current.setActiveAccountId("custodial-default")
+    const updater = mockUpdateState.mock.calls[0][0]
+    expect(updater({ activeAccountId: "old" })).toEqual({
+      activeAccountId: "self-custodial-uuid-1",
     })
-
-    expect(mockSaveToken).toHaveBeenCalledWith("token")
   })
 
-  it("setActiveAccountId does not call saveToken for self-custodial", async () => {
-    mockUseIsAuthed.mockReturnValue(true)
+  it("does NOT clobber seeded self-custodial entries when the index read fails", async () => {
+    // Repro: a transient AsyncStorage failure used to surface as `[]` from
+    // listSelfCustodialAccounts, which clobbered the seeded entry — every self-custodial
+    // account vanished from the registry until next reload.
+    mockUseIsAuthed.mockReturnValue(false)
     mockNonCustodialEnabled = true
-    mockListSelfCustodialAccounts.mockResolvedValue([
-      { id: "sc-uuid-1", lightningAddress: null },
-    ])
+    mockActiveAccountId = "self-custodial-uuid-1"
+    mockListSelfCustodialAccounts.mockResolvedValue({
+      status: "read-failed",
+      error: new Error("AsyncStorage unavailable"),
+    })
 
     const { result } = renderHook(() => useAccountRegistry())
+    await flushAsyncEffects()
 
-    await act(async () => {
-      await Promise.resolve()
-    })
+    expect(result.current.selfCustodialEntries).toEqual([
+      { id: "self-custodial-uuid-1", lightningAddress: null },
+    ])
+    expect(result.current.activeAccount?.id).toBe("self-custodial-uuid-1")
+  })
+
+  it("setActiveAccountId is a single state mutation (no token rewrite)", async () => {
+    // Regression: a previous version of setActiveAccountId called
+    // saveToken(persistentState.galoyAuthToken) when switching to custodial,
+    // which used a stale closure value and reverted in-flight token swaps.
+    mockUseIsAuthed.mockReturnValue(true)
+
+    const { result } = renderHook(() => useAccountRegistry())
+    await flushAsyncEffects()
 
     act(() => {
-      result.current.setActiveAccountId("sc-uuid-1")
+      result.current.setActiveAccountId(DefaultAccountId.Custodial)
     })
 
-    expect(mockSaveToken).not.toHaveBeenCalled()
+    expect(mockUpdateState).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -189,9 +237,9 @@ describe("createCustodialDescriptor", () => {
 
 describe("createSelfCustodialDescriptor", () => {
   it("creates a self-custodial descriptor with correct defaults", () => {
-    const desc = createSelfCustodialDescriptor("sc-id-1", "Spark")
+    const desc = createSelfCustodialDescriptor("self-custodial-id-1", "Spark")
 
-    expect(desc.id).toBe("sc-id-1")
+    expect(desc.id).toBe("self-custodial-id-1")
     expect(desc.type).toBe(AccountType.SelfCustodial)
     expect(desc.label).toBe("Spark")
     expect(desc.selected).toBe(false)
@@ -202,11 +250,11 @@ describe("createSelfCustodialDescriptor", () => {
 describe("markSelected", () => {
   const accounts = [
     createCustodialDescriptor("Blink"),
-    createSelfCustodialDescriptor("sc-id-1", "Spark"),
+    createSelfCustodialDescriptor("self-custodial-id-1", "Spark"),
   ]
 
   it("marks account matching activeId as selected", () => {
-    const result = markSelected(accounts, "sc-id-1")
+    const result = markSelected(accounts, "self-custodial-id-1")
 
     expect(result[0].selected).toBe(false)
     expect(result[1].selected).toBe(true)

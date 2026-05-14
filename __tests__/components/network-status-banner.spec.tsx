@@ -1,7 +1,7 @@
 import React from "react"
 import { render } from "@testing-library/react-native"
 
-import { ActiveWalletStatus } from "@app/types/wallet.types"
+import { ActiveWalletStatus } from "@app/types/wallet"
 
 import { NetworkStatusBanner } from "@app/components/network-status-banner/network-status-banner"
 

@@ -1,12 +1,12 @@
 import { useMemo } from "react"
 
-import { useCustodialWallet } from "@app/custodial/providers/wallet-provider"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useCustodialWallet } from "@app/custodial/providers/wallet"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   AccountType,
   ActiveWalletStatus,
   type ActiveWalletState,
-} from "@app/types/wallet.types"
+} from "@app/types/wallet"
 
 import { useAccountRegistry } from "./use-account-registry"
 import { useSelfCustodialRollback } from "./use-self-custodial-rollback"

@@ -6,7 +6,7 @@ import {
   DepositStatus,
   PaymentResultStatus,
   type PendingDeposit,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
 const mockListPendingDeposits = jest.fn()
@@ -68,7 +68,7 @@ describe("useDepositActions", () => {
   })
 
   describe("handleRefund — fee rate validation", () => {
-    it("rejects when feeRateSatPerVb is 0 (regression for Critical #2)", async () => {
+    it("rejects when feeRateSatPerVb is 0 (regression)", async () => {
       const { result } = renderHook(() => useDepositActions())
       const deposit = buildDeposit()
 

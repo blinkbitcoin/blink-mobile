@@ -4,11 +4,12 @@ import { Pressable, TouchableOpacity, View, Text } from "react-native"
 
 import { makeStyles } from "@rn-vui/themed"
 
-import { StatusPill, type StatusPillVariant } from "@app/components/status-pill"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
-import { useI18nContext } from "@app/i18n/i18n-react"
 import { BalanceMode } from "@app/hooks/use-balance-mode"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
+
+import { StatusPill, type StatusPillVariant } from "../status-pill"
 
 const Loader = () => {
   const styles = useStyles()

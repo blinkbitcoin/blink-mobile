@@ -22,7 +22,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
 import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
-import { ActiveWalletStatus } from "@app/types/wallet.types"
+import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 
 import { NfcHeaderButton } from "./nfc-header-button"
@@ -164,6 +164,8 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     }, [openTrialModal]),
   )
 
+  const isConverting = requestState.state === PaymentRequestState.Converting
+
   useEffect(() => {
     if (requestState.state !== PaymentRequestState.Paid) return
     const id = setTimeout(() => navigation.goBack(), AUTO_DISMISS_DELAY)
@@ -194,6 +196,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             getFullUri={requestState.info?.data?.getFullUriFn}
             loading={requestState.state === PaymentRequestState.Loading}
             completed={requestState.state === PaymentRequestState.Paid}
+            converting={isConverting}
             err={
               requestState.state === PaymentRequestState.Error
                 ? LL.ReceiveScreen.error()
@@ -213,6 +216,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             getFullUri={onchain.getFullUriFn}
             loading={onchain.loading}
             completed={requestState.state === PaymentRequestState.Paid}
+            converting={isConverting}
             err=""
             expired={false}
             regenerateInvoiceFn={requestState.regenerateInvoice}

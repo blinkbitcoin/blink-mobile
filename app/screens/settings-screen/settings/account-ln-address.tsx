@@ -8,15 +8,17 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig, useClipboard } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
-import { AccountType } from "@app/types/wallet.types"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { AccountType } from "@app/types/wallet"
 
 import { SettingsRow } from "../row"
 
 export const AccountLNAddress: React.FC = () => {
   const { activeAccount } = useAccountRegistry()
+  const { lightningAddress: selfCustodialLightningAddress } = useSelfCustodialWallet()
 
   if (activeAccount?.type === AccountType.SelfCustodial) {
+    if (!selfCustodialLightningAddress) return null
     return <SelfCustodialLightningAddressRow />
   }
   return <CustodialLightningAddressRow />

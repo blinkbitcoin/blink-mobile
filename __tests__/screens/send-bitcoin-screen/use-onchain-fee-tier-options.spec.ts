@@ -14,7 +14,7 @@ let mockFeeTiers = {
 }
 let mockFeeError: SdkFeeError | null = null
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ sdk: mockSdk }),
 }))
 
@@ -110,7 +110,7 @@ describe("useOnchainFeeTierOptions", () => {
     expect(result.current.feeTier).toBe(FeeTierOption.Medium)
   })
 
-  it("isOnchain is true only when SC + onchain payment type", () => {
+  it("isOnchain is true only when self-custodial + onchain payment type", () => {
     const { result, rerender } = renderHook(
       (props: Parameters<typeof useOnchainFeeTierOptions>[0]) =>
         useOnchainFeeTierOptions(props),

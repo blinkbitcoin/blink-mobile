@@ -64,7 +64,8 @@
     "title": "Tukuyta",
     "transfer": "Apachimuq",
     "percentageToConvert": "Tukuyta llump'an kay %",
-    "reviewTransfer": "Apachimuqta qhaway"
+    "reviewTransfer": "Apachimuqta qhaway",
+    "dustError": "Llapa qullqi apachina kanan."
   },
   "ConversionConfirmationScreen": {
     "title": "Tukuyta unanchay",
@@ -74,9 +75,7 @@
     "infoDollar": "Dólar yupaynin asllata t'aqwirisqa kachkan. Asllata tikrakuyta atinmi.",
     "transferButtonText": "{fromWallet} manta {toWallet} man apachimuq",
     "feeLabel": "Conversionpa pagon",
-    "feeError": "Conversionpa pagon mana apaykachay atinchu",
-    "amountFloored": "Qullqi yapayqa conversion minimumman chayanapaq.",
-    "amountDustBumped": "Qullqi yapayqa llapan qullqikipi conversion ruwanapaq."
+    "feeError": "Conversionpa pagon mana apaykachay atinchu"
   },
   "ConversionSuccessScreen": {
     "message": "Unanchayninmi kamarichik",
@@ -2173,8 +2172,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Waqaychay qullqi: {fee} SAT {threshold} SAT uray kaqkunapaq utaq {overFee} SAT {threshold} SAT hawapi waqaychaykunapaq",
     "autoConvertMinAmount": "{minSats: number} sats manta pisi kaqkunaqa mana automatikumantachu Dólarman tikrasqa kanman. Bitcointa chaskinki.",
-    "autoConvertSuccess": "{amount: number} sats chaskikun, Dólarman tikrakun.",
-    "autoConvertFailed": "Qullqi chaskikun ichaqa tikrachiymi mana allintachu ruwakurqan."
+    "autoConvertFailed": "Qullqi chaskikun ichaqa tikrachiymi mana allintachu ruwakurqan.",
+    "pleaseWaitForConversion": "Ama hina kaspa, tikrachiy tukukunankama suyay"
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin kawsayniyta qillqa",
@@ -2350,7 +2349,6 @@
     "nonCustodialAccount": "Mana waqaychasqa kuenta",
     "tapUserName": "Yachanakuyta sutichinaqinmi kaniyta ruchiykachkanki",
     "notifications": "Notifications",
-    "recoveryMethod": "Kutirichiy ñan",
     "title": "Rikch'a",
     "darkMode": "Tuta kaniy",
     "setToDark": "Chaynamanta kaniy: tuta.",
@@ -2377,27 +2375,11 @@
     "receiveCurrency": "Chaskiy qullqi laya",
     "displayCurrency": "Rikuchiy qullqi laya",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
       "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -2437,6 +2419,7 @@
     "level": "Nivel {level: string}",
     "switchAccount": "Huk cuentaman tikray",
     "pleaseWait": "Ama hina kaspa suyay.",
+    "probeBalanceFailed": "Mana atinchu walletpa qullqinta tantiyayta. Ama hina kaspa, watiqmanta atipay.",
     "accountLevel": "Account Level",
     "upgrade": "Upgrade your account",
     "logOutAndDeleteLocalData": "Log out and clear all local data",
@@ -2476,6 +2459,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "Cuenta ID",
+    "publicKey": "Tukuypaq llave",
+    "copiedPublicKey": "Tukuypaq llaveqa portapapelman copiyasqa karqa",
     "copy": "Copy",
     "identityVerification": "Piqpa kasqan chiqapchay"
   },
@@ -2506,7 +2491,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Ñawpaq chaskiy cuenta",
-    "info": "Bitcoin qillqa sutiyuq-niyki sats huñunampaq, maypichus USD chanin qhatuman kuyun. Dolar qillqay-niyki Stablesats-wan llamk'achisqa — Bitcoin-ta waqaychin USD chaniman sayasqa kanampaq. Wiñaypaq Bitcoin-ta hap'inki, ichaqa dólar chanin mana tikrakunchu."
+    "info": "Bitcoin qillqa sutiyuq-niyki sats huñunampaq, maypichus USD chanin qhatuman kuyun. Dolar qillqay-niyki Stablesats-wan llamk'achisqa — Bitcoin-ta waqaychin USD chaniman sayasqa kanampaq. Wiñaypaq Bitcoin-ta hap'inki, ichaqa dólar chanin mana tikrakunchu.",
+    "titleSelfCustodial": "Saqisqa cuenta",
+    "infoSelfCustodial": "Kay cuenta saqisqaman jina kanqa chaskichkaspa imapas apachichkaspapas. Mayllapipas tikrayta atikun."
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2524,7 +2511,10 @@
     "header": "Dolar qillqay-niyki Stablesats-wan llamk'achisqa",
     "body": "Dolar qillqay Stablesats yachaykunata llamk'achin Bitcoin-ta USD chaniman sayasqata waqaychispa. Wiñaypaq Bitcoin-ta hap'inki — mana chiqap dólar-tachu — ichaqa USD chanin mana kuyunchu. Bitcoin-ta apachiy hinaspa chaskiy atikunki imaynatachus, ichaqa mana banco kay pachap sistemanwan tupanchu.",
     "termsAndConditions": "Qillqata sutichinaqinmi t'ikrayninmi yachanakuyta munayniyta rikuchiy",
-    "learnMore": "Stablesat kawsayniyta tukuyta yachanakuyta munanki"
+    "learnMore": "Stablesat kawsayniyta tukuyta yachanakuyta munanki",
+      "headerSelfCustodial": "Dólar cuentaykipi stablecoinkuna kachkanku",
+      "bodySelfCustodial": "Dólar cuentapi stablecoinkunata waqaychanki. Tokenkuna activokunawan saywanachasqa, USDwan kuska valormi takyan. Manaraqmi stablecoinkunata apachiyta nitaq chaskiyta atinkichu. Dólar cuentamanta apachiqtiykiqa, stablecoinkunaykita trukaspa Bitcoin hina chaskiqman apachisun.",
+      "learnMoreSelfCustodial": "Astawan yachay"
   },
   "SplashScreen": {
     "update": "Ñuqaqmi app qatichkanmi kaniyta rikuchiy, chaymanta app qillqata sutichinaqinmi kaniyta munanki. Chaymi PlayStore Androidmanta Testflight iOSmanta kaniyta rikuchiy"
@@ -2804,6 +2794,7 @@
     "submit": "Submit",
     "success": "Yawar wañusqa!",
     "dollarStablesats": "Dólar (Stablesats)",
+    "dollarStablecoin": "Dólar (Stablecoin)",
     "to": "Kawsayman",
     "total": "Suma",
     "transactions": "Willanakuy ",
@@ -3526,8 +3517,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Yaykuna rimay kamachiq",
       "manualBackup": "Makiwan waqaychay",
-      "keychainSaved": "Waqaychay yaykuna rimay kamachiqpi waqaychasqa",
-      "keychainFailed": "Mana atikurqachu waqaychayta",
+      "passwordManagerBackupSaved": "Waqaychay yaykuna rimay kamachiqpi waqaychasqa",
+      "passwordManagerBackupFailed": "Mana atikurqachu waqaychayta",
+      "passwordManagerUnavailable": "Kay laqacheqpiqa manan kanchu password kamachiq. Drive backup-ta apaykachay icha 12 simi rimayniykita makillaykiwan waqaychay.",
       "iOSComingSoon": "iCloudpi waqaychayqa utqayman hamunqa"
     },
     "ManualBackup": {
@@ -3545,7 +3537,9 @@
         "saveItNow": "Waqaychay kunan",
         "savedConfirm": "Ñam waqaychani",
         "copy": "Kopiyay",
-        "continueButton": "Hinaspa"
+        "continueButton": "Hinaspa",
+        "selfCustodialDisabled": "Mana qhawasqaqa ratulla mana atikunchu.",
+        "testBackup": "Bakuyniykita pruwaspay"
       },
       "Confirm": {
         "headerTitle": "Waqaychay rimayta takyachiy",
@@ -3556,7 +3550,8 @@
         "incorrectWord": "Mana allin simi, kawariy patmanta"
       },
       "Success": {
-        "title": "Blink mana waqaychisqaman haykuy"
+        "title": "Blink mana waqaychisqaman haykuy",
+        "testSuccess": "Bakuy rimasqaykiqa allinmi"
       }
     },
     "CloudBackup": {
@@ -3578,6 +3573,9 @@
       "signInFailed": "Google nisqaman yaykuy mana atikurqanchu",
       "existingBackupTitle": "Waqaychay tarikusqa",
       "existingBackupMessage": "{provider} nisqaykipi huknin waqaychay kachkanña. Qawariyta munankichu?",
+      "existingBackupMessageWithDetails": "{provider}-pi waqaychay kashanña.\n\nLightning kaynin: {address}\nKamarisqa: {createdAt}\n\nMusuqmanta qillqaytachu munanki?",
+      "existingBackupUnknownAddress": "Mana kanchu",
+      "existingBackupUnknownCreatedAt": "Mana yachakuq",
       "overwrite": "Hawamanta qillqay"
     }
   },
@@ -3591,8 +3589,8 @@
     "transferringFunds": "Qullqiykita apachkaniku. Iskay kinsa sikundullapi tukurunqa."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Waqaychasqa",
+    "selfCustodialLabel": "Mana waqaychasqa",
     "custodialDescription": "Ñuqayku qullqiykita waqaychayku",
     "selfCustodialDescription": "Qamlla qullqiykiman yaykuyta atinki",
     "continueButton": "Hinaspa",
@@ -3600,7 +3598,8 @@
     "descriptionSelected": "Cuenta laya aklliy.",
     "chooseMethod": "Ñan aklliy",
     "restoreComingSoonTitle": "Qayllamuchkan",
-    "restoreComingSoonDescription": "Kutichiy ruway hamuq actualizaciónpi kanqa."
+    "restoreComingSoonDescription": "Kutichiy ruway hamuq actualizaciónpi kanqa.",
+    "createFailed": "Manan walletta paqarichiyta atinkuchu. Allinta llamk'apuy."
   },
   "RestoreScreen": {
     "title": "Walleta kutichiy",
@@ -3619,7 +3618,9 @@
     "noBackupFound": "Mana backup tarikunchu",
     "noBackupDescription": "Mana backup tarikuyta atinichu. Makiykiwan backup frase qillqayta atinki.",
     "enterPassword": "Cifrado contraseñaykita qillqay",
-    "wrongPassword": "Mana allin contraseña. Watiqmanta ruway."
+    "wrongPassword": "Mana allin contraseña. Watiqmanta ruway.",
+    "pickBackupTitle": "Akllay wallet",
+    "pickBackupDescription": "Akllay huk waqaychasqa kutichinaykipaq"
   },
   "BackupNudge": {
     "title": "Qullqiykikuna sasachakuypi kachkan",
@@ -3628,11 +3629,7 @@
     "settingsWarning": "Walletniykita backup ruray. Kay aparatuta chinkachispaqa, qullqiykita chinkachinki.",
     "modalTitle": "Waqaychay qullqiykikunata",
     "modalDescription": "Ñuqayku mayt'a kunaykiku wallitaykita waqaychayta ama tukuy qullqiyki chinkananpaq kay aparatuykita chinkachispayki.",
-    "secureMe": "Waqaychay wallita",
-    "trustModelTitle": "Qammi kamachkanki",
-    "trustModelDescription": "Llaviykikuna qullqiykita kamachin. Transacciones Spark operadorkuna ruranku, mana Bitcoin L1 pi.",
-    "trustModelWarning": "Ancha uchuy saldokuna mana allinchu Bitcoin cadena base man kutichiy.",
-    "trustModelDismiss": "Entiendeni"
+    "secureMe": "Waqaychay wallita"
   },
   "StableBalance": {
     "title": "Saldo sinchi",
@@ -3656,12 +3653,6 @@
       "deactivateConfirm": "Wañuchiy",
       "cancel": "T'akuy"
     },
-    "firstTimeModal": {
-      "title": "Tikrana hawalla",
-      "dualBalance": "BTC-wan USD-wan qillqasapaykipi iskay saqisqa qullqikunam. Haykaqpas Convert-ta ruray paykunapura qullqita astanapaq.",
-      "trustDisclosure": "USD modoqa Sparkpi USDB tokenkunata apaykachan. Iñiy suposikuykunaqa wakjina kan BTC-ta direkto hapishaptikimanta. USDB Sparkpa token tuqyachisqanman tiyan.",
-      "acknowledge": "Entiendechkani"
-    },
     "minimumConversion": "Aswan aslla tikray: {amount:string}",
     "conversionUnavailable": "Tikrachiy mana atikuyniyuqchu kachkan. Yapamanta intentay."
   },
@@ -3676,7 +3667,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Walletaykita ruwachkanku...",
     "errorTitle": "Wallet ruway mana allinchu",
     "errorDescription": "Imapas mana allinchu. Watiqmanta ruway.",
@@ -3752,10 +3743,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Anchaq allin",
+    "dangerZoneBulletReinstated": "Pichasqa cuenta mana kutichinachu",
+    "dangerZoneBulletPermanent": "Cuenta pichaykuy wiñaypaqmi",
+    "dangerZoneBulletEmpty": "Cuentaqa ch'usaq kanan",
+    "dangerZoneDeleteButton": "Cuentata datakunatapas pichay",
+    "confirmModalTitle": "Cuentata pichana sutichay",
+    "confirmModalTypeToConfirm": "Sut'inchanapaq \"{delete: string}\" qillqay",
+    "hasFundsWarningTitle": "Yuyay",
+    "hasFundsWarningBody": "Wallet-niykipi {balance} kachkan. Allin kawsayniykipaq, qullqi kapuq cuentakunata mana pichaykachiykuchu.",
+    "hasFundsWarningHelper": "Pichayta qatipayta munaspaqa, cuentaykita ch'usaqyachiy utaq circular economies-man qullqita qoy.",
+    "hasFundsWarningButton": "Kutiy"
   }
 }

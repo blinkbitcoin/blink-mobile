@@ -2,18 +2,27 @@ import * as React from "react"
 import { View, TouchableOpacity } from "react-native"
 
 import { gql } from "@apollo/client"
+import { Divider, Text, makeStyles, useTheme, ListItem, Icon } from "@rn-vui/themed"
+
+import { GaloyInfo } from "@app/components/atomic/galoy-info"
 import {
   useAccountUpdateDefaultWalletIdMutation,
   useSetDefaultWalletScreenQuery,
+  WalletCurrency,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Divider, Text, makeStyles, useTheme, ListItem, Icon } from "@rn-vui/themed"
+import { usePersistentStateContext } from "@app/store/persistent-state"
+import {
+  getSelfCustodialDefaultCurrency,
+  withSelfCustodialDefaultCurrency,
+} from "@app/store/persistent-state/self-custodial-default-currency"
+import { AccountType } from "@app/types/wallet"
 
 import { Screen } from "../../components/screen"
 import { testProps } from "../../utils/testProps"
-import { GaloyInfo } from "@app/components/atomic/galoy-info"
 
 gql`
   mutation accountUpdateDefaultWalletId($input: AccountUpdateDefaultWalletIdInput!) {
@@ -44,80 +53,40 @@ gql`
   }
 `
 
-export const DefaultWalletScreen: React.FC = () => {
-  const { LL } = useI18nContext()
+type WalletOption = {
+  key: string
+  name: string
+  isSelected: boolean
+  onSelect: () => void
+}
+
+type DefaultWalletPickerProps = {
+  options: ReadonlyArray<WalletOption>
+  info: string
+}
+
+const DefaultWalletPicker: React.FC<DefaultWalletPickerProps> = ({ options, info }) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-  const isAuthed = useIsAuthed()
-
-  const [newDefaultWalletId, setNewDefaultWalletId] = React.useState("")
-
-  const { data } = useSetDefaultWalletScreenQuery({
-    fetchPolicy: "cache-first",
-    skip: !isAuthed,
-  })
-
-  const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
-  const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
-
-  const btcWalletId = btcWallet?.id
-  const usdWalletId = usdWallet?.id
-
-  const defaultWalletId = data?.me?.defaultAccount?.defaultWalletId
-
-  const [accountUpdateDefaultWallet, { loading }] =
-    useAccountUpdateDefaultWalletIdMutation()
-
-  if (!usdWalletId || !btcWalletId) {
-    return <Text>{"missing walletIds"}</Text>
-  }
-
-  const handleSetDefaultWallet = async (id: string) => {
-    if (loading) return
-    if (id !== defaultWalletId) {
-      await accountUpdateDefaultWallet({
-        variables: {
-          input: {
-            walletId: id,
-          },
-        },
-      })
-      setNewDefaultWalletId(id)
-    }
-  }
-
-  const Wallets = [
-    {
-      name: LL.common.bitcoin(),
-      id: btcWalletId,
-    },
-    {
-      name: LL.common.dollarStablesats(),
-      id: usdWalletId,
-    },
-  ] as const
-
-  const selectedWalletId = newDefaultWalletId || defaultWalletId || ""
 
   return (
-    <Screen preset="scroll">
+    <>
       <View style={styles.walletsContainer}>
-        {Wallets.map(({ name, id }, index) => {
-          const isLast = index === Wallets.length - 1
-          const isSelected = selectedWalletId === id
+        {options.map((option, index) => {
+          const isLast = index === options.length - 1
           return (
-            <React.Fragment key={id}>
+            <React.Fragment key={option.key}>
               <Divider color={colors.grey4} />
               <TouchableOpacity
-                onPress={() => handleSetDefaultWallet(id)}
+                onPress={option.onSelect}
                 activeOpacity={0.7}
-                {...testProps(name)}
+                {...testProps(option.name)}
               >
                 <ListItem containerStyle={styles.listItemContainer}>
                   <View>
-                    {isSelected ? (
+                    {option.isSelected ? (
                       <Icon
                         name="checkmark-circle"
                         size={20}
@@ -125,12 +94,12 @@ export const DefaultWalletScreen: React.FC = () => {
                         type="ionicon"
                       />
                     ) : (
-                      <View style={styles.listSeparator}></View>
+                      <View style={styles.listSeparator} />
                     )}
                   </View>
                   <ListItem.Content>
                     <ListItem.Title style={styles.itemTitle}>
-                      <Text type="p2">{name}</Text>
+                      <Text type="p2">{option.name}</Text>
                     </ListItem.Title>
                   </ListItem.Content>
                 </ListItem>
@@ -141,8 +110,100 @@ export const DefaultWalletScreen: React.FC = () => {
         })}
       </View>
       <View style={styles.containerInfo}>
-        <GaloyInfo>{LL.DefaultWalletScreen.info()}</GaloyInfo>
+        <GaloyInfo>{info}</GaloyInfo>
       </View>
+    </>
+  )
+}
+
+const CustodialDefaultWallet: React.FC = () => {
+  const { LL } = useI18nContext()
+  const isAuthed = useIsAuthed()
+
+  const [newDefaultWalletId, setNewDefaultWalletId] = React.useState("")
+
+  const { data } = useSetDefaultWalletScreenQuery({
+    fetchPolicy: "cache-first",
+    skip: !isAuthed,
+  })
+
+  const btcWalletId = getBtcWallet(data?.me?.defaultAccount?.wallets)?.id
+  const usdWalletId = getUsdWallet(data?.me?.defaultAccount?.wallets)?.id
+  const defaultWalletId = data?.me?.defaultAccount?.defaultWalletId
+
+  const [accountUpdateDefaultWallet, { loading }] =
+    useAccountUpdateDefaultWalletIdMutation()
+
+  if (!usdWalletId || !btcWalletId) {
+    return <Text>{"missing walletIds"}</Text>
+  }
+
+  const handleSetDefaultWallet = async (id: string) => {
+    if (loading || id === defaultWalletId) return
+    await accountUpdateDefaultWallet({ variables: { input: { walletId: id } } })
+    setNewDefaultWalletId(id)
+  }
+
+  const selectedWalletId = newDefaultWalletId || defaultWalletId || ""
+
+  const options: ReadonlyArray<WalletOption> = [
+    {
+      key: btcWalletId,
+      name: LL.common.bitcoin(),
+      isSelected: selectedWalletId === btcWalletId,
+      onSelect: () => handleSetDefaultWallet(btcWalletId),
+    },
+    {
+      key: usdWalletId,
+      name: LL.common.dollarStablesats(),
+      isSelected: selectedWalletId === usdWalletId,
+      onSelect: () => handleSetDefaultWallet(usdWalletId),
+    },
+  ]
+
+  return <DefaultWalletPicker options={options} info={LL.DefaultWalletScreen.info()} />
+}
+
+const SelfCustodialDefaultWallet: React.FC = () => {
+  const { LL } = useI18nContext()
+  const { persistentState, updateState } = usePersistentStateContext()
+
+  const selectedCurrency = getSelfCustodialDefaultCurrency(persistentState)
+
+  const setCurrency = (currency: "BTC" | "USD") => {
+    updateState((prev) => prev && withSelfCustodialDefaultCurrency(prev, currency))
+  }
+
+  const options: ReadonlyArray<WalletOption> = [
+    {
+      key: WalletCurrency.Btc,
+      name: LL.common.bitcoin(),
+      isSelected: selectedCurrency === WalletCurrency.Btc,
+      onSelect: () => setCurrency(WalletCurrency.Btc),
+    },
+    {
+      key: WalletCurrency.Usd,
+      name: LL.common.dollarStablecoin(),
+      isSelected: selectedCurrency === WalletCurrency.Usd,
+      onSelect: () => setCurrency(WalletCurrency.Usd),
+    },
+  ]
+
+  return (
+    <DefaultWalletPicker
+      options={options}
+      info={LL.DefaultWalletScreen.infoSelfCustodial()}
+    />
+  )
+}
+
+export const DefaultWalletScreen: React.FC = () => {
+  const { activeAccount } = useAccountRegistry()
+  const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
+
+  return (
+    <Screen preset="scroll">
+      {isSelfCustodial ? <SelfCustodialDefaultWallet /> : <CustodialDefaultWallet />}
     </Screen>
   )
 }

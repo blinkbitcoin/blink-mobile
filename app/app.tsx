@@ -22,10 +22,11 @@ import { GaloyToast } from "./components/galoy-toast"
 import { NotificationsProvider } from "./components/notifications/index"
 import { PushNotificationComponent } from "./components/push-notification"
 import { FeatureFlagContextProvider } from "./config/feature-flags-context"
-import { CustodialWalletProvider } from "./custodial/providers/wallet-provider"
+import { CustodialWalletProvider } from "./custodial/providers/wallet"
 import { AutoConvertListenerMount } from "./self-custodial/components"
-import { BackupStateProvider } from "./self-custodial/providers/backup-state-provider"
-import { SelfCustodialWalletProvider } from "./self-custodial/providers/wallet-provider"
+import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
+import { BackupStateProvider } from "./self-custodial/providers/backup-state"
+import { SelfCustodialWalletProvider } from "./self-custodial/providers/wallet"
 import { GaloyClient } from "./graphql/client"
 import { NetworkErrorComponent } from "./graphql/network-error-component"
 import TypesafeI18n from "./i18n/i18n-react"
@@ -61,25 +62,27 @@ export const App = () => (
               <CustodialWalletProvider>
                 <SelfCustodialWalletProvider>
                   <BackupStateProvider>
-                    <ActionsProvider>
-                      <NavigationContainerWrapper>
-                        <ErrorBoundary FallbackComponent={ErrorScreen}>
-                          <RootSiblingParent>
-                            <BottomSheetModalProvider>
-                              <NotificationsProvider>
-                                <AppStateWrapper />
-                                <PushNotificationComponent />
-                                <AutoConvertListenerMount />
-                                <RootStack />
-                                <NetworkErrorComponent />
-                                <ActionModals />
-                              </NotificationsProvider>
-                              <GaloyToast />
-                            </BottomSheetModalProvider>
-                          </RootSiblingParent>
-                        </ErrorBoundary>
-                      </NavigationContainerWrapper>
-                    </ActionsProvider>
+                    <AutoConvertStatusProvider>
+                      <ActionsProvider>
+                        <NavigationContainerWrapper>
+                          <ErrorBoundary FallbackComponent={ErrorScreen}>
+                            <RootSiblingParent>
+                              <BottomSheetModalProvider>
+                                <NotificationsProvider>
+                                  <AppStateWrapper />
+                                  <PushNotificationComponent />
+                                  <AutoConvertListenerMount />
+                                  <RootStack />
+                                  <NetworkErrorComponent />
+                                  <ActionModals />
+                                </NotificationsProvider>
+                                <GaloyToast />
+                              </BottomSheetModalProvider>
+                            </RootSiblingParent>
+                          </ErrorBoundary>
+                        </NavigationContainerWrapper>
+                      </ActionsProvider>
+                    </AutoConvertStatusProvider>
                   </BackupStateProvider>
                 </SelfCustodialWalletProvider>
               </CustodialWalletProvider>

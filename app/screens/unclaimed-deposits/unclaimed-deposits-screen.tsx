@@ -7,19 +7,20 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { CheckboxRow } from "@app/components/checkbox-row"
 import { Screen } from "@app/components/screen"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { DepositStatus } from "@app/types/payment"
+import { testProps } from "@app/utils/testProps"
+
+import { buildFeeTierOptions } from "../send-bitcoin-screen/fee-tier-options"
+import { FeeTierOption } from "../send-bitcoin-screen/hooks/fee-tiers.types"
+
+import { DepositErrorMessage } from "./deposit-error-message"
+import { useDepositActions } from "./hooks/use-deposit-actions"
 import {
   getFeeRateSatPerVb,
   useRecommendedFeeTiers,
 } from "./hooks/use-recommended-fee-tiers"
-import { useI18nContext } from "@app/i18n/i18n-react"
-import { buildFeeTierOptions } from "@app/screens/send-bitcoin-screen/fee-tier-options"
-import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
-import { DepositStatus } from "@app/types/payment.types"
-import { testProps } from "@app/utils/testProps"
-
-import { DepositErrorMessage } from "./deposit-error-message"
-import { useDepositActions } from "./hooks/use-deposit-actions"
 import { ADDRESS_PLACEHOLDER, openMempoolTx } from "./utils"
 
 export const UnclaimedDepositsScreen: React.FC = () => {

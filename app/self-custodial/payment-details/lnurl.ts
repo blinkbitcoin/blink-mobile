@@ -30,7 +30,7 @@ import {
   type WalletAmount,
   type WalletOrDisplayCurrency,
 } from "@app/types/amounts"
-import { ConvertDirection } from "@app/types/payment.types"
+import { ConvertDirection } from "@app/types/payment"
 
 import {
   buildConversionType,
@@ -259,7 +259,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     })
 
   return {
-    destination: lnurl,
+    destination: lnurlParams.identifier || lnurl,
     memo,
     convertMoneyAmount,
     setConvertMoneyAmount,

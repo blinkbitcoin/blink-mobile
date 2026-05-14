@@ -28,12 +28,19 @@ jest.mock("@app/i18n/i18n-react", () => ({
         custodialDescription: () => "We hold the funds on your behalf",
         selfCustodialDescription: () => "Only you can access funds",
         continueButton: () => "Continue",
+        selfCustodialDisabled: () => "Non-custodial is temporarily unavailable.",
         restoreComingSoonTitle: () => "Coming soon",
         restoreComingSoonDescription: () =>
           "Restore flow will be available in a future update.",
       },
     },
   }),
+}))
+
+const mockUseAccountTypeOptions = jest.fn()
+jest.mock("@app/hooks/use-account-type-options", () => ({
+  AccountOption: { Custodial: "custodial", SelfCustodial: "selfCustodial" },
+  useAccountTypeOptions: (mode: string) => mockUseAccountTypeOptions(mode),
 }))
 
 const mockCardDefaultBg = "#1d1d1d"
@@ -97,6 +104,12 @@ describe("AccountTypeSelectionScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockMode.mockReturnValue("create")
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["selfCustodial", "custodial"],
+      defaultSelected: null,
+      selfCustodialTemporarilyDisabled: false,
+      loading: false,
+    })
   })
 
   it("renders title and description", () => {
@@ -163,7 +176,7 @@ describe("AccountTypeSelectionScreen", () => {
     fireEvent.press(getByTestId("self-custodial-option"))
     fireEvent.press(getByTestId("continue-button"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("sparkRestoreMethodScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestoreMethod")
   })
 
   it("does not navigate when nothing selected", () => {
@@ -201,5 +214,89 @@ describe("AccountTypeSelectionScreen", () => {
         }),
       ]),
     )
+  })
+
+  it("hides custodial card when the country does not allow custodial", () => {
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["selfCustodial"],
+      defaultSelected: "selfCustodial",
+      selfCustodialTemporarilyDisabled: false,
+      loading: false,
+    })
+
+    const { queryByTestId } = render(<AccountTypeSelectionScreen />)
+
+    expect(queryByTestId("custodial-option")).toBeNull()
+    expect(queryByTestId("self-custodial-option")).toBeTruthy()
+  })
+
+  it("pre-selects the only available option and enables the continue button", () => {
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["selfCustodial"],
+      defaultSelected: "selfCustodial",
+      selfCustodialTemporarilyDisabled: false,
+      loading: false,
+    })
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+
+    fireEvent.press(getByTestId("continue-button"))
+    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+      flow: "selfCustodial",
+    })
+  })
+
+  it("hides self-custodial card and shows the disabled banner when feature flag is off", () => {
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["custodial"],
+      defaultSelected: "custodial",
+      selfCustodialTemporarilyDisabled: true,
+      loading: false,
+    })
+
+    const { queryByTestId, getByTestId } = render(<AccountTypeSelectionScreen />)
+
+    expect(queryByTestId("self-custodial-option")).toBeNull()
+    expect(queryByTestId("custodial-option")).toBeTruthy()
+    expect(getByTestId("self-custodial-disabled-banner")).toBeTruthy()
+  })
+
+  it("shows a loader and disables the continue button while detecting the country", () => {
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: [],
+      defaultSelected: null,
+      selfCustodialTemporarilyDisabled: false,
+      loading: true,
+    })
+
+    const { queryByTestId, getByTestId } = render(<AccountTypeSelectionScreen />)
+
+    expect(queryByTestId("custodial-option")).toBeNull()
+    expect(queryByTestId("self-custodial-option")).toBeNull()
+    fireEvent.press(getByTestId("continue-button"))
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("forwards the route mode argument to useAccountTypeOptions", () => {
+    mockMode.mockReturnValue("restore")
+
+    render(<AccountTypeSelectionScreen />)
+
+    expect(mockUseAccountTypeOptions).toHaveBeenCalledWith("restore")
+  })
+
+  it("renders both options on restore even when running from a country blocked for custodial creation", () => {
+    mockMode.mockReturnValue("restore")
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["selfCustodial", "custodial"],
+      defaultSelected: null,
+      selfCustodialTemporarilyDisabled: false,
+      loading: false,
+    })
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+
+    expect(getByTestId("custodial-option")).toBeTruthy()
+    expect(getByTestId("self-custodial-option")).toBeTruthy()
   })
 })

@@ -64,7 +64,8 @@
         "title": "両替",
         "transfer": "振替",
         "percentageToConvert": "%を換える",
-        "reviewTransfer": "振替内容を確認"
+        "reviewTransfer": "振替内容を確認",
+        "dustError": "残高をすべて送金する必要があります。"
     },
     "ConversionConfirmationScreen": {
         "title": "ご確認ください",
@@ -74,9 +75,7 @@
         "infoDollar": "ドル金額は概算です。少額の変動が生じる場合があります。",
         "transferButtonText": "{fromWallet}から{toWallet}へ振替",
         "feeLabel": "変換手数料",
-        "feeError": "変換手数料を取得できませんでした",
-        "amountFloored": "変換の最小額に達するよう金額を引き上げました。",
-        "amountDustBumped": "全残高を変換するため金額を引き上げました。"
+        "feeError": "変換手数料を取得できませんでした"
     },
     "ConversionSuccessScreen": {
         "message": "両替が完了しました",
@@ -2173,8 +2172,8 @@
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT",
         "autoConvertMinAmount": "{minSats: number} sats未満の金額はドルに自動変換できません。代わりにビットコインを受け取ります。",
-        "autoConvertSuccess": "{amount: number} satsを受け取り、ドルに変換しました。",
-        "autoConvertFailed": "支払いは受け取りましたが、変換に失敗しました。"
+        "autoConvertFailed": "支払いは受け取りましたが、変換に失敗しました。",
+        "pleaseWaitForConversion": "変換が完了するまでお待ちください"
     },
     "RedeemBitcoinScreen": {
         "title": "ビットコインを換金する",
@@ -2350,7 +2349,6 @@
         "nonCustodialAccount": "非カストディアルアカウント",
         "tapUserName": "タップしてユーザー名を設定する",
         "notifications": "通知",
-        "recoveryMethod": "復元方法",
         "title": "設定",
         "darkMode": "ダークモード",
         "setToDark": "モード：ダーク",
@@ -2377,27 +2375,11 @@
         "receiveCurrency": "受取通貨",
         "displayCurrency": "表示通貨",
         "AccountInformation": {
-            "accountTypeLabel": "Account type",
             "identityLabel": "Wallet identifier",
             "backupStatusLabel": "Backup status",
             "backupStatusCompleted": "Backup complete",
             "backupStatusNotCompleted": "Backup not complete",
             "loadError": "Could not load your account information."
-        },
-        "TransactionLimits": {
-            "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-            "btcToUsdTitle": "Bitcoin to Dollars",
-            "usdToBtcTitle": "Dollars to Bitcoin",
-            "minFromLabel": "Minimum sent",
-            "minToLabel": "Minimum received",
-            "loadError": "Could not load conversion limits."
-        },
-        "WaysToGetPaid": {
-            "lightningAddressTitle": "Lightning address",
-            "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-            "onchainTitle": "Bitcoin deposit address",
-            "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-            "loadError": "Could not load your payment details."
         }
     },
     "NotificationSettingsScreen": {
@@ -2437,6 +2419,7 @@
         "level": "レベル {level: string}",
         "switchAccount": "アカウントを切り替える",
         "pleaseWait": "お待ちください。",
+        "probeBalanceFailed": "ウォレットの残高を確認できませんでした。もう一度お試しください。",
         "accountLevel": "ウォレットレベル",
         "upgrade": "ウォレットをアップグレードする",
         "logOutAndDeleteLocalData": "ログアウトしてすべてのローカルデータをクリアする",
@@ -2476,6 +2459,8 @@
         "copiedAccountId": "アカウントIDをクリップボードにコピーする",
         "yourAccountId": "あなたのアカウントID",
         "accountId": "アカウントID",
+        "publicKey": "公開鍵",
+        "copiedPublicKey": "公開鍵をクリップボードにコピーしました",
         "copy": "コピー",
         "identityVerification": "本人確認"
     },
@@ -2506,7 +2491,9 @@
     },
     "DefaultWalletScreen": {
         "title": "デフォルトの受取アカウント",
-        "info": "ビットコインウォレットはサトシを積み立てるためのもので、USD価値は市場と連動します。ドルウォレットはStablesatsで動いています。USD価値で安定するようにヘッジされたBitcoinを保有します。常にBitcoinを保有していますが、ドル価値は変動しません。"
+        "info": "ビットコインウォレットはサトシを積み立てるためのもので、USD価値は市場と連動します。ドルウォレットはStablesatsで動いています。USD価値で安定するようにヘッジされたBitcoinを保有します。常にBitcoinを保有していますが、ドル価値は変動しません。",
+        "titleSelfCustodial": "デフォルトアカウント",
+        "infoSelfCustodial": "このアカウントは受信と送信時に既定で使用されます。いつでも切り替え可能です。"
     },
     "ThemeScreen": {
         "title": "テーマ",
@@ -2524,7 +2511,10 @@
         "header": "あなたのドルウォレットはStablesatsで動いています",
         "body": "ドルウォレットはStablesats技術を使用してBitcoinをUSD価格で安定させます。常にBitcoinを保有しています — 実際のドルではありません — がUSD価値は変動しません。通常どおりBitcoinの送受信ができますが、従来の銀行システムとは互換性がありません。",
         "termsAndConditions": "利用規約を読む",
-        "learnMore": "ステーブル satsについて詳しく見る"
+        "learnMore": "ステーブル satsについて詳しく見る",
+        "headerSelfCustodial": "ドル口座にはステーブルコインが保管されています",
+        "bodySelfCustodial": "ドル口座ではステーブルコインを保有しています。資産に裏付けられ、米ドルに対して価値を安定させたトークンです。ステーブルコインの送受信はまだできません。ドル口座から送金すると、ステーブルコインが交換され、ビットコインとして受取人に送られます。",
+        "learnMoreSelfCustodial": "詳しく見る"
     },
     "SplashScreen": {
         "update": "旧バージョンのアプリです。 アプリを使用するには更新してください。\n\nAndroidの場合はPlayStoreから、iOSの場合はTestflightから実行できます。"
@@ -2805,6 +2795,7 @@
         "submit": "提出する",
         "success": "成功！",
         "dollarStablesats": "ドル（Stablesats）",
+        "dollarStablecoin": "ドル（Stablecoin）",
         "to": "送金先",
         "total": "合計",
         "transactions": "トランザクション",
@@ -3517,8 +3508,9 @@
             "appleICloud": "Apple iCloud",
             "passwordManager": "パスワードマネージャー",
             "manualBackup": "手動バックアップ",
-            "keychainSaved": "バックアップがパスワードマネージャーに保存されました",
-            "keychainFailed": "バックアップの保存に失敗しました",
+            "passwordManagerBackupSaved": "バックアップがパスワードマネージャーに保存されました",
+            "passwordManagerBackupFailed": "バックアップの保存に失敗しました",
+            "passwordManagerUnavailable": "このデバイスでは利用可能なパスワードマネージャーがありません。Driveバックアップを使用するか、12単語のフレーズを手動で保存してください。",
             "iOSComingSoon": "iCloudバックアップは近日公開予定です"
         },
         "ManualBackup": {
@@ -3536,7 +3528,9 @@
                 "saveItNow": "今すぐ保存",
                 "savedConfirm": "保存しました",
                 "copy": "コピー",
-                "continueButton": "続行"
+                "continueButton": "続行",
+                "selfCustodialDisabled": "ノンカストディアルは一時的に利用できません。",
+                "testBackup": "バックアップをテスト"
             },
             "Confirm": {
                 "headerTitle": "バックアップフレーズの確認",
@@ -3547,7 +3541,8 @@
                 "incorrectWord": "正しくない単語です。順番を確認してください"
             },
             "Success": {
-                "title": "ノンカストディアルBlinkへようこそ"
+                "title": "ノンカストディアルBlinkへようこそ",
+                "testSuccess": "バックアップフレーズは正しいです"
             }
         },
         "CloudBackup": {
@@ -3569,6 +3564,9 @@
             "signInFailed": "Googleへのログインに失敗しました",
             "existingBackupTitle": "バックアップが見つかりました",
             "existingBackupMessage": "{provider}にバックアップが既に存在します。上書きしますか？",
+            "existingBackupMessageWithDetails": "{provider}にすでにバックアップが存在します。\n\nLightningアドレス: {address}\n作成日時: {createdAt}\n\n上書きしますか？",
+            "existingBackupUnknownAddress": "利用不可",
+            "existingBackupUnknownCreatedAt": "不明",
             "overwrite": "上書き"
         }
     },
@@ -3582,8 +3580,8 @@
         "transferringFunds": "資金を転送中です。数秒で完了するはずです。"
     },
     "AccountTypeSelectionScreen": {
-        "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark",
+        "custodialLabel": "カストディアル",
+        "selfCustodialLabel": "ノンカストディアル",
         "custodialDescription": "お客様に代わって資金を保管します",
         "selfCustodialDescription": "あなただけが資金にアクセスできます",
         "continueButton": "続行",
@@ -3591,7 +3589,8 @@
         "descriptionSelected": "アカウントタイプを選択してください。",
         "chooseMethod": "方法を選択",
         "restoreComingSoonTitle": "近日公開",
-        "restoreComingSoonDescription": "復元機能は将来のアップデートで利用可能になります。"
+        "restoreComingSoonDescription": "復元機能は将来のアップデートで利用可能になります。",
+        "createFailed": "ウォレットの作成に失敗しました。もう一度お試しください。"
     },
     "RestoreScreen": {
         "title": "ウォレットを復元",
@@ -3610,7 +3609,9 @@
         "noBackupFound": "バックアップが見つかりません",
         "noBackupDescription": "バックアップが見つかりませんでした。バックアップフレーズを手動で入力できます。",
         "enterPassword": "暗号化パスワードを入力してください",
-        "wrongPassword": "パスワードが正しくありません。再試行してください."
+        "wrongPassword": "パスワードが正しくありません。再試行してください.",
+        "pickBackupTitle": "ウォレットを選択",
+        "pickBackupDescription": "復元するバックアップを選択"
     },
     "BackupNudge": {
         "title": "あなたの資金が危険にさらされています",
@@ -3619,11 +3620,7 @@
         "settingsWarning": "ウォレットをバックアップしてください。このデバイスを紛失すると、資金を失います。",
         "modalTitle": "資金を保護してください",
         "modalDescription": "このデバイスを紛失した場合の資金の完全な喪失を防ぐために、ウォレットのバックアップを強くお勧めします。",
-        "secureMe": "ウォレットを保護",
-        "trustModelTitle": "あなたが管理しています",
-        "trustModelDescription": "あなたの鍵があなたの資金を管理しています。トランザクションはSparkオペレーターによって処理され、Bitcoin L1で直接検証されません。",
-        "trustModelWarning": "非常に少額の残高は、Bitcoinベースチェーンへの復元が経済的でない場合があります。",
-        "trustModelDismiss": "理解しました"
+        "secureMe": "ウォレットを保護"
     },
     "StableBalance": {
         "title": "ステーブルバランス",
@@ -3647,12 +3644,6 @@
             "deactivateConfirm": "無効化",
             "cancel": "キャンセル"
         },
-        "firstTimeModal": {
-            "title": "変換について",
-            "dualBalance": "BTCとUSDは、ウォレット内の独立した2つの残高です。いつでもConvertを使って、それらの間で資金を移動できます。",
-            "trustDisclosure": "USDモードはSpark上のUSDBトークンを使用します。信頼の前提はBTCを直接保有することとは異なります. USDBはSparkのトークン発行者に依存しています。",
-            "acknowledge": "理解しました"
-        },
         "minimumConversion": "最小変換額: {amount:string}",
         "conversionUnavailable": "変換は一時的に利用できません。もう一度お試しください。"
     },
@@ -3667,7 +3658,7 @@
         "featureEarn": "Earn",
         "featureCard": "Card"
     },
-    "SparkWalletCreationScreen": {
+    "WalletCreationScreen": {
         "creating": "ウォレットを作成中...",
         "errorTitle": "ウォレットの作成に失敗しました",
         "errorDescription": "エラーが発生しました。もう一度お試しください。",
@@ -3743,10 +3734,16 @@
         "degradedBanner": "Spark network is currently degraded. Payments may take longer."
     },
     "SelfCustodialDelete": {
-        "title": "Delete self-custodial wallet",
-        "warning": "This will remove this wallet from this device.",
-        "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-        "backupBadgeCompleted": "Backup complete",
-        "backupBadgeMissing": "Backup not complete"
+        "dangerZoneImportantTitle": "重要",
+        "dangerZoneBulletReinstated": "削除したアカウントは復元できません",
+        "dangerZoneBulletPermanent": "アカウントの削除は永久的です",
+        "dangerZoneBulletEmpty": "アカウントが空であることを確認してください",
+        "dangerZoneDeleteButton": "アカウントとデータを削除",
+        "confirmModalTitle": "アカウント削除の確認",
+        "confirmModalTypeToConfirm": "確認するには \"{delete: string}\" と入力してください",
+        "hasFundsWarningTitle": "警告",
+        "hasFundsWarningBody": "ウォレットには{balance}の残高があります。安全のため、残高のあるアカウントの削除は許可されていません。",
+        "hasFundsWarningHelper": "削除を続行するには、アカウントを空にするか、循環経済へ寄付してください。",
+        "hasFundsWarningButton": "戻る"
     }
 }

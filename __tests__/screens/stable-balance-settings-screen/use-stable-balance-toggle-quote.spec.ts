@@ -3,11 +3,7 @@ import { renderHook, waitFor } from "@testing-library/react-native"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useStableBalanceToggleQuote } from "@app/screens/stable-balance-settings-screen/hooks/use-stable-balance-toggle-quote"
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import {
-  ConvertAmountAdjustment,
-  ConvertDirection,
-  PaymentResultStatus,
-} from "@app/types/payment.types"
+import { ConvertDirection, PaymentResultStatus } from "@app/types/payment"
 
 const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
@@ -35,20 +31,8 @@ jest.mock("@react-native-firebase/crashlytics", () => {
   }
 })
 
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      ConversionConfirmationScreen: {
-        amountFloored: () => "Amount increased to meet the conversion minimum.",
-        amountDustBumped: () => "Amount increased to convert your full balance.",
-      },
-    },
-  }),
-}))
-
-const makeQuote = (amountAdjustment?: ConvertAmountAdjustment) => ({
+const makeQuote = () => ({
   feeAmount: toUsdMoneyAmount(5),
-  amountAdjustment,
   execute: jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
 })
 
@@ -160,43 +144,5 @@ describe("useStableBalanceToggleQuote", () => {
     )
 
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
-  })
-
-  it("maps FlooredToMin adjustment to the correct text", async () => {
-    mockGetQuote.mockResolvedValue(makeQuote(ConvertAmountAdjustment.FlooredToMin))
-
-    const { result } = renderHook(() =>
-      useStableBalanceToggleQuote({
-        fromCurrency: WalletCurrency.Btc,
-        sourceBalance: 5_000,
-        enabled: true,
-      }),
-    )
-
-    await waitFor(() =>
-      expect(result.current.adjustmentText).toBe(
-        "Amount increased to meet the conversion minimum.",
-      ),
-    )
-  })
-
-  it("maps IncreasedToAvoidDust adjustment to the correct text", async () => {
-    mockGetQuote.mockResolvedValue(
-      makeQuote(ConvertAmountAdjustment.IncreasedToAvoidDust),
-    )
-
-    const { result } = renderHook(() =>
-      useStableBalanceToggleQuote({
-        fromCurrency: WalletCurrency.Btc,
-        sourceBalance: 5_000,
-        enabled: true,
-      }),
-    )
-
-    await waitFor(() =>
-      expect(result.current.adjustmentText).toBe(
-        "Amount increased to convert your full balance.",
-      ),
-    )
   })
 })

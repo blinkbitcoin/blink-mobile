@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Pressable, View } from "react-native"
+import React, { useEffect, useState } from "react"
+import { ActivityIndicator, Pressable, View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -7,22 +7,13 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
+import { AccountOption, useAccountTypeOptions } from "@app/hooks/use-account-type-options"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
+import { AccountTypeMode } from "@app/types/account"
 import { testProps } from "@app/utils/testProps"
 
-const AccountOption = {
-  Custodial: "custodial",
-  SelfCustodial: "selfCustodial",
-} as const
-
-type AccountOption = (typeof AccountOption)[keyof typeof AccountOption]
-
-const SelectionMode = {
-  Create: "create",
-  Restore: "restore",
-} as const
+import { PhoneLoginInitiateType } from "../phone-auth-screen"
 
 export const AccountTypeSelectionScreen: React.FC = () => {
   const styles = useStyles()
@@ -33,13 +24,23 @@ export const AccountTypeSelectionScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "accountTypeSelection">>()
   const { mode } = route.params
-  const [selected, setSelected] = useState<AccountOption | null>(null)
+  const {
+    options,
+    defaultSelected,
+    selfCustodialTemporarilyDisabled,
+    loading: detectingCountry,
+  } = useAccountTypeOptions(mode)
+  const [selected, setSelected] = useState<AccountOption | null>(defaultSelected)
+
+  useEffect(() => {
+    if (defaultSelected && !selected) setSelected(defaultSelected)
+  }, [defaultSelected, selected])
 
   const handleContinue = () => {
     if (!selected) return
 
     if (selected === AccountOption.Custodial) {
-      if (mode === SelectionMode.Create) {
+      if (mode === AccountTypeMode.Create) {
         navigation.navigate("acceptTermsAndConditions", { flow: "trial" })
         return
       }
@@ -49,73 +50,93 @@ export const AccountTypeSelectionScreen: React.FC = () => {
       return
     }
 
-    if (mode === SelectionMode.Create) {
+    if (mode === AccountTypeMode.Create) {
       navigation.navigate("acceptTermsAndConditions", {
         flow: "selfCustodial",
       })
       return
     }
 
-    navigation.navigate("sparkRestoreMethodScreen")
+    navigation.navigate("selfCustodialRestoreMethod")
   }
 
   const isSelected = (option: AccountOption) => selected === option
+  const showSelfCustodial = options.includes(AccountOption.SelfCustodial)
+  const showCustodial = options.includes(AccountOption.Custodial)
 
   return (
     <Screen>
       <View style={styles.wrapper}>
         <View style={styles.body}>
           <Text style={styles.description}>
-            {mode === SelectionMode.Create
+            {mode === AccountTypeMode.Create
               ? LL.AccountTypeSelectionScreen.descriptionDefault()
               : LL.AccountTypeSelectionScreen.descriptionSelected()}
           </Text>
 
-          <View style={styles.grid}>
-            <Pressable
-              style={[
-                styles.card,
-                isSelected(AccountOption.Custodial) && {
-                  borderColor: colors.primary,
-                  backgroundColor: colors.grey6,
-                },
-              ]}
-              onPress={() => setSelected(AccountOption.Custodial)}
-              {...testProps("custodial-option")}
-            >
-              <View style={styles.iconContainer}>
-                <GaloyIcon name="cloud" size={20} />
-              </View>
-              <Text style={styles.cardTitle}>
-                {LL.AccountTypeSelectionScreen.custodialLabel()}
+          {selfCustodialTemporarilyDisabled && (
+            <View style={styles.banner} {...testProps("self-custodial-disabled-banner")}>
+              <Text style={styles.bannerText}>
+                {LL.AccountTypeSelectionScreen.selfCustodialDisabled()}
               </Text>
-              <Text style={styles.cardDescription}>
-                {LL.AccountTypeSelectionScreen.custodialDescription()}
-              </Text>
-            </Pressable>
+            </View>
+          )}
 
-            <Pressable
-              style={[
-                styles.card,
-                isSelected(AccountOption.SelfCustodial) && {
-                  borderColor: colors.primary,
-                  backgroundColor: colors.grey6,
-                },
-              ]}
-              onPress={() => setSelected(AccountOption.SelfCustodial)}
-              {...testProps("self-custodial-option")}
-            >
-              <View style={styles.iconContainer}>
-                <GaloyIcon name="key-outline" size={20} />
-              </View>
-              <Text style={styles.cardTitle}>
-                {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
-              </Text>
-              <Text style={styles.cardDescription}>
-                {LL.AccountTypeSelectionScreen.selfCustodialDescription()}
-              </Text>
-            </Pressable>
-          </View>
+          {detectingCountry ? (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator color={colors.primary} />
+            </View>
+          ) : (
+            <View style={styles.grid}>
+              {showCustodial && (
+                <Pressable
+                  style={[
+                    styles.card,
+                    isSelected(AccountOption.Custodial) && {
+                      borderColor: colors.primary,
+                      backgroundColor: colors.grey6,
+                    },
+                  ]}
+                  onPress={() => setSelected(AccountOption.Custodial)}
+                  {...testProps("custodial-option")}
+                >
+                  <View style={styles.iconContainer}>
+                    <GaloyIcon name="cloud" size={20} />
+                  </View>
+                  <Text style={styles.cardTitle}>
+                    {LL.AccountTypeSelectionScreen.custodialLabel()}
+                  </Text>
+                  <Text style={styles.cardDescription}>
+                    {LL.AccountTypeSelectionScreen.custodialDescription()}
+                  </Text>
+                </Pressable>
+              )}
+
+              {showSelfCustodial && (
+                <Pressable
+                  style={[
+                    styles.card,
+                    isSelected(AccountOption.SelfCustodial) && {
+                      borderColor: colors.primary,
+                      backgroundColor: colors.grey6,
+                    },
+                  ]}
+                  onPress={() => setSelected(AccountOption.SelfCustodial)}
+                  {...testProps("self-custodial-option")}
+                >
+                  <View style={styles.iconContainer}>
+                    <GaloyIcon name="key-outline" size={20} />
+                  </View>
+                  <Text style={styles.cardTitle}>
+                    {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
+                  </Text>
+                  <Text style={styles.cardDescription}>
+                    {LL.AccountTypeSelectionScreen.selfCustodialDescription()}
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+          )}
         </View>
 
         <View style={styles.ctaContainer}>
@@ -126,7 +147,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
                 : LL.AccountTypeSelectionScreen.chooseMethod()
             }
             onPress={handleContinue}
-            disabled={!selected}
+            disabled={!selected || detectingCountry}
             {...testProps("continue-button")}
           />
         </View>
@@ -150,12 +171,30 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.black,
     marginBottom: 20,
   },
+  banner: {
+    backgroundColor: colors.grey5,
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginBottom: 16,
+  },
+  bannerText: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.grey1,
+    textAlign: "center",
+  },
+  loaderContainer: {
+    paddingVertical: 40,
+    alignItems: "center",
+  },
   grid: {
     flexDirection: "row",
     gap: 10,
   },
   card: {
     flex: 1,
+    maxWidth: "50%",
     backgroundColor: colors.grey5,
     borderRadius: 8,
     borderWidth: 1,

@@ -29,6 +29,29 @@ import theme from "@app/rne-theme/theme"
 import { createCache } from "@app/graphql/cache"
 import { DisplayCurrency as DisplayCurrencyType } from "@app/types/amounts"
 
+jest.mock("@app/store/persistent-state", () => ({
+  ...jest.requireActual("@app/store/persistent-state"),
+  usePersistentStateContext: () => ({
+    persistentState: {
+      schemaVersion: 11,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+    },
+    updateState: jest.fn(),
+    resetState: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    accounts: [],
+    activeAccount: undefined,
+    selfCustodialEntries: [],
+    setActiveAccountId: jest.fn(),
+    reloadSelfCustodialAccounts: jest.fn(),
+  }),
+}))
+
 const mockNavigate = jest.fn()
 const originalConsoleError = console.error
 let consoleErrorSpy: jest.SpyInstance | null = null
@@ -42,8 +65,6 @@ jest.mock("@react-navigation/native", () => ({
 
 const mockUseActiveWallet = jest.fn()
 const mockUseNonCustodialConversionLimits = jest.fn()
-const mockUseSelfCustodialWallet = jest.fn()
-const mockUseStableBalanceFirstTime = jest.fn()
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
@@ -55,33 +76,29 @@ jest.mock("@app/self-custodial/hooks", () => ({
   usePaymentRequest: jest.fn(),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
-  useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => ({
+    wallets: [],
+    status: "Unavailable",
+    accountType: "SelfCustodial",
+    retry: () => {},
+    sdk: null,
+    isStableBalanceActive: false,
+    lastReceivedPaymentId: null,
+    hasMoreTransactions: false,
+    loadingMore: false,
+    loadMore: async () => {},
+    refreshWallets: async () => {},
+  }),
 }))
 
-jest.mock("@app/hooks/use-stable-balance-first-time", () => ({
-  useStableBalanceFirstTime: () => mockUseStableBalanceFirstTime(),
-}))
-
-const defaultSelfCustodialWallet = {
-  wallets: [],
-  status: "Unavailable",
-  accountType: "SelfCustodial",
-  retry: () => {},
-  sdk: null,
-  isStableBalanceActive: false,
-  lastReceivedPaymentId: null,
-  hasMoreTransactions: false,
-  loadingMore: false,
-  loadMore: async () => {},
-  refreshWallets: async () => {},
-}
-
-const defaultStableBalanceFirstTime = {
-  shouldShow: false,
-  markAsShown: jest.fn(),
-  loaded: true,
-}
+const mockUseNonCustodialConversionGuard = jest.fn()
+jest.mock(
+  "@app/screens/conversion-flow/hooks/use-non-custodial-conversion-guard",
+  () => ({
+    useNonCustodialConversionGuard: () => mockUseNonCustodialConversionGuard(),
+  }),
+)
 
 type CurrencyPillProps = {
   currency?: WalletCurrency | "ALL"
@@ -608,8 +625,11 @@ beforeEach(() => {
   jest.clearAllMocks()
   mockUseActiveWallet.mockReturnValue(defaultActiveWallet)
   mockUseNonCustodialConversionLimits.mockReturnValue(defaultLimits)
-  mockUseSelfCustodialWallet.mockReturnValue(defaultSelfCustodialWallet)
-  mockUseStableBalanceFirstTime.mockReturnValue(defaultStableBalanceFirstTime)
+  mockUseNonCustodialConversionGuard.mockReturnValue({
+    isQuoting: false,
+    hasQuoteError: false,
+    blockingReason: null,
+  })
 })
 
 describe("Initial render with both wallets having balance", () => {
@@ -1960,19 +1980,19 @@ describe("Conversion calculation verification", () => {
 })
 
 describe("Self-custodial conversion limits gating", () => {
-  const scActiveWallet = {
+  const selfCustodialActiveWallet = {
     isSelfCustodial: true,
     isReady: true,
     needsBackendAuth: false,
     wallets: [
       {
-        id: "sc-btc-id",
+        id: "self-custodial-btc-id",
         walletCurrency: WalletCurrency.Btc,
         balance: { amount: 200000, currency: WalletCurrency.Btc },
         transactions: [],
       },
       {
-        id: "sc-usd-id",
+        id: "self-custodial-usd-id",
         walletCurrency: WalletCurrency.Usd,
         balance: { amount: 50000, currency: WalletCurrency.Usd },
         transactions: [],
@@ -1985,7 +2005,7 @@ describe("Self-custodial conversion limits gating", () => {
   const buildMocks = () => createGraphQLMocks({ btcBalance: 200000, usdBalance: 50000 })
 
   it("disables Next and surfaces the unavailable message when limits fail to load", async () => {
-    mockUseActiveWallet.mockReturnValue(scActiveWallet)
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
     mockUseNonCustodialConversionLimits.mockReturnValue({
       limits: null,
       loading: false,
@@ -2012,7 +2032,7 @@ describe("Self-custodial conversion limits gating", () => {
   })
 
   it("keeps Next disabled while limits load successfully but amount is below the minimum", async () => {
-    mockUseActiveWallet.mockReturnValue(scActiveWallet)
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
     mockUseNonCustodialConversionLimits.mockReturnValue({
       limits: { minFromAmount: 1_000_000, minToAmount: null },
       loading: false,
@@ -2032,78 +2052,53 @@ describe("Self-custodial conversion limits gating", () => {
 
     expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
   })
-})
 
-describe("StableBalanceFirstTimeModal — Critical #7 boot-window coercion", () => {
-  const scActiveWallet = {
-    isSelfCustodial: true,
-    isReady: true,
-    needsBackendAuth: false,
-    wallets: [
-      {
-        id: "sc-btc-id",
-        walletCurrency: WalletCurrency.Btc,
-        balance: { amount: 200000, currency: WalletCurrency.Btc },
-        transactions: [],
-      },
-      {
-        id: "sc-usd-id",
-        walletCurrency: WalletCurrency.Usd,
-        balance: { amount: 50000, currency: WalletCurrency.Usd },
-        transactions: [],
-      },
-    ],
-    status: "Ready",
-    accountType: "SelfCustodial",
-  }
-
-  const buildMocks = () => createGraphQLMocks({ btcBalance: 200000, usdBalance: 50000 })
-
-  it("renders the modal when stable balance is active and shouldShow is true", async () => {
-    mockUseActiveWallet.mockReturnValue(scActiveWallet)
-    mockUseStableBalanceFirstTime.mockReturnValue({
-      ...defaultStableBalanceFirstTime,
-      shouldShow: true,
+  it("disables Next when the conversion guard reports hasQuoteError", async () => {
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: { minFromAmount: 0, minToAmount: null },
+      loading: false,
+      error: null,
     })
-    mockUseSelfCustodialWallet.mockReturnValue({
-      ...defaultSelfCustodialWallet,
-      isStableBalanceActive: true,
+    mockUseNonCustodialConversionGuard.mockReturnValue({
+      isQuoting: false,
+      hasQuoteError: true,
+      blockingReason: null,
     })
 
     const Wrapper = createTestWrapper(buildMocks())
-    const { queryByTestId } = render(
+    const { getByTestId } = render(
       <Wrapper>
         <ConversionDetailsScreen />
       </Wrapper>,
     )
 
     await waitFor(() => {
-      expect(queryByTestId("stable-balance-first-time-modal")).not.toBeNull()
+      expect(getByTestId("next-button")).toBeTruthy()
     })
+
+    expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
   })
 
-  it("hides the modal during boot window when isStableBalanceActive is undefined", async () => {
-    mockUseActiveWallet.mockReturnValue(scActiveWallet)
-    mockUseStableBalanceFirstTime.mockReturnValue({
-      ...defaultStableBalanceFirstTime,
-      shouldShow: true,
-    })
-    mockUseSelfCustodialWallet.mockReturnValue({
-      ...defaultSelfCustodialWallet,
-      isStableBalanceActive: undefined,
+  it("disables Next during the self-custodial SDK boot window — accountType=SelfCustodial + isReady=false", async () => {
+    mockUseActiveWallet.mockReturnValue({
+      ...selfCustodialActiveWallet,
+      isSelfCustodial: false,
+      isReady: false,
+      status: "Unavailable",
     })
 
     const Wrapper = createTestWrapper(buildMocks())
-    const { queryByTestId } = render(
+    const { getByTestId } = render(
       <Wrapper>
         <ConversionDetailsScreen />
       </Wrapper>,
     )
 
     await waitFor(() => {
-      expect(queryByTestId("next-button")).toBeTruthy()
+      expect(getByTestId("next-button")).toBeTruthy()
     })
 
-    expect(queryByTestId("stable-balance-first-time-modal")).toBeNull()
+    expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
   })
 })

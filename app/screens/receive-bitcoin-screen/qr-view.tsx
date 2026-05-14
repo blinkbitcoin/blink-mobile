@@ -49,6 +49,7 @@ type Props = {
   getFullUri: GetFullUriFn | undefined
   loading: boolean
   completed: boolean
+  converting?: boolean
   err: string
   style?: StyleProp<ViewStyle>
   expired: boolean
@@ -64,6 +65,7 @@ const QRViewBase: React.FC<Props> = ({
   getFullUri,
   loading,
   completed,
+  converting = false,
   err,
   style,
   expired,
@@ -80,7 +82,11 @@ const QRViewBase: React.FC<Props> = ({
 
   const isReady = (!isPayCodeAndCanUsePayCode || Boolean(getFullUri)) && !loading && !err
   const displayingQR =
-    !completed && isReady && !expired && (!isPayCode || isPayCodeAndCanUsePayCode)
+    !completed &&
+    !converting &&
+    isReady &&
+    !expired &&
+    (!isPayCode || isPayCodeAndCanUsePayCode)
 
   const styles = useStyles()
   const { width, scale } = useWindowDimensions()
@@ -121,6 +127,19 @@ const QRViewBase: React.FC<Props> = ({
           <SuccessIconAnimation>
             <GaloyIcon name="payment-success" size={128} />
           </SuccessIconAnimation>
+        </View>
+      )
+    }
+
+    if (converting) {
+      return (
+        <View {...testProps("Converting")} style={[styles.container, style]}>
+          <View style={styles.convertingContent}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text type="p2" style={styles.convertingText}>
+              {LL.ReceiveScreen.pleaseWaitForConversion()}
+            </Text>
+          </View>
         </View>
       )
     }
@@ -236,6 +255,14 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   cantUsePayCodeText: {
     marginBottom: 10,
+  },
+  convertingContent: {
+    alignItems: "center",
+    rowGap: 12,
+  },
+  convertingText: {
+    color: colors._black,
+    textAlign: "center",
   },
   logoOverlay: {
     ...StyleSheet.absoluteFillObject,

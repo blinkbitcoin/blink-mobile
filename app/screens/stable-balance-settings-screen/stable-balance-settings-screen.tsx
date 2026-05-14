@@ -8,7 +8,7 @@ import { Switch } from "@app/components/atomic/switch"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { WalletCurrency } from "@app/graphql/generated"
 import { formatUsdInDisplay } from "@app/utils/amounts"
 import { testProps } from "@app/utils/testProps"
@@ -124,7 +124,6 @@ export const StableBalanceSettingsScreen: React.FC = () => {
         isVisible={pendingDirection !== null}
         isActivating={isActivating}
         feeText={toggleQuote.feeText}
-        adjustmentText={toggleQuote.adjustmentText}
         isLoading={toggleQuote.isQuoting}
         hasError={toggleQuote.hasQuoteError}
         showFeeRow={showFeeRow}

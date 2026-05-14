@@ -73,6 +73,7 @@ const en: BaseTranslation = {
     transfer: "Transfer",
     percentageToConvert: "% to convert",
     reviewTransfer: "Review transfer",
+    dustError: "Full balance has to be transferred.",
   },
   ConversionConfirmationScreen: {
     title: "Confirm transfer",
@@ -83,8 +84,6 @@ const en: BaseTranslation = {
     transferButtonText: "Transfer {fromWallet} to {toWallet}",
     feeLabel: "Conversion fee",
     feeError: "Couldn't fetch the conversion fee",
-    amountFloored: "Amount increased to meet the conversion minimum.",
-    amountDustBumped: "Amount increased to convert your full balance.",
   },
   ConversionSuccessScreen: {
     message: "Transfer successful",
@@ -2208,9 +2207,8 @@ const en: BaseTranslation = {
       "Deposit fee: {fee: string} SAT for amounts under {threshold: string} SAT or {overFee: string} SAT for deposits over {threshold} SAT",
     autoConvertMinAmount:
       "Amounts below {minSats: number} sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
-    autoConvertSuccess:
-      "Received {amount: number} sats, converted to Dollar.",
     autoConvertFailed: "Payment received but the conversion failed.",
+    pleaseWaitForConversion: "Please wait until the conversion is done",
   },
   RedeemBitcoinScreen: {
     title: "Redeem Bitcoin",
@@ -2403,7 +2401,6 @@ const en: BaseTranslation = {
     nonCustodialAccount: "Non-custodial account",
     tapUserName: "Tap to set username",
     notifications: "Notifications",
-    recoveryMethod: "Recovery method",
     title: "Settings",
     darkMode: "Dark Mode",
     setToDark: "Mode: dark.",
@@ -2433,30 +2430,12 @@ const en: BaseTranslation = {
     receiveCurrency: "Receive currency",
     displayCurrency: "Display currency",
     AccountInformation: {
-      accountTypeLabel: "Account type",
       identityLabel: "Wallet identifier",
       lightningAddressLabel: "Lightning address",
       backupStatusLabel: "Backup status",
       backupStatusCompleted: "Backup complete",
       backupStatusNotCompleted: "Backup not complete",
       loadError: "Could not load your account information.",
-    },
-    TransactionLimits: {
-      protocolNote:
-        "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      btcToUsdTitle: "Bitcoin to Dollars",
-      usdToBtcTitle: "Dollars to Bitcoin",
-      minFromLabel: "Minimum sent",
-      minToLabel: "Minimum received",
-      loadError: "Could not load conversion limits.",
-    },
-    WaysToGetPaid: {
-      lightningAddressTitle: "Lightning address",
-      lightningAddressDescription:
-        "Share this address to receive Lightning payments instantly.",
-      onchainTitle: "Bitcoin deposit address",
-      onchainDescription: "Share this address to receive Bitcoin on-chain.",
-      loadError: "Could not load your payment details.",
     },
   },
   NotificationSettingsScreen: {
@@ -2497,6 +2476,7 @@ const en: BaseTranslation = {
     level: "Level {level: string}",
     switchAccount: "Switch account",
     pleaseWait: "Please Wait.",
+    probeBalanceFailed: "Couldn't verify the wallet's balance. Please try again.",
     accountLevel: "Account Level",
     upgrade: "Upgrade your account",
     logOutAndDeleteLocalData: "Log out and clear all local data",
@@ -2544,6 +2524,8 @@ const en: BaseTranslation = {
     copiedAccountId: "Copied your account ID to clipboard",
     yourAccountId: "Your Account ID",
     accountId: "Account ID",
+    publicKey: "Public key",
+    copiedPublicKey: "Copied your public key to clipboard",
     copy: "Copy",
     identityVerification: "Identity Verification",
   },
@@ -2578,7 +2560,9 @@ const en: BaseTranslation = {
   },
   DefaultWalletScreen: {
     title: "Default receive account",
+    titleSelfCustodial: "Default account",
     info: "Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change.",
+    infoSelfCustodial: "This account will be used by default when receiving and sending. You can switch any time.",
   },
   ThemeScreen: {
     title: "Theme",
@@ -2597,6 +2581,10 @@ const en: BaseTranslation = {
     body: "The Dollar account uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.",
     termsAndConditions: "Read the Terms & Conditions.",
     learnMore: "Learn more about Stablesats",
+    headerSelfCustodial: "Your Dollar account holds stablecoins",
+    bodySelfCustodial:
+      "In the Dollar account you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from the Dollar account, you will swap your stablecoins and send as Bitcoin to the recipient.",
+    learnMoreSelfCustodial: "Learn more",
   },
   SplashScreen: {
     update:
@@ -2906,6 +2894,7 @@ const en: BaseTranslation = {
     submit: "Submit",
     success: "Success!",
     dollarStablesats: "Dollar (Stablesats)",
+    dollarStablecoin: "Dollar (Stablecoin)",
     to: "To",
     total: "Total",
     transactions: "Transactions",
@@ -3639,8 +3628,10 @@ const en: BaseTranslation = {
       appleICloud: "Apple iCloud",
       passwordManager: "Password manager",
       manualBackup: "Manual backup",
-      keychainSaved: "Backup saved to password manager",
-      keychainFailed: "Failed to save backup",
+      passwordManagerBackupSaved: "Backup saved to password manager",
+      passwordManagerBackupFailed: "Failed to save backup",
+      passwordManagerUnavailable:
+        "No password manager available on this device. Use Drive backup or save your 12-word phrase manually.",
       iOSComingSoon: "iCloud backup coming soon",
     },
     CloudBackup: {
@@ -3662,6 +3653,10 @@ const en: BaseTranslation = {
       existingBackupTitle: "Backup found",
       existingBackupMessage:
         "A backup already exists in your {provider: string}. Do you want to overwrite it?",
+      existingBackupMessageWithDetails:
+        "A backup already exists in your {provider: string}.\n\nLightning address: {address: string}\nCreated: {createdAt: string}\n\nDo you want to overwrite it?",
+      existingBackupUnknownAddress: "Not available",
+      existingBackupUnknownCreatedAt: "Unknown",
       overwrite: "Overwrite",
       uploadSuccess: "Backup saved to {provider: string}",
       uploadFailed: "Failed to upload backup",
@@ -3685,6 +3680,7 @@ const en: BaseTranslation = {
         continueButton: "Continue",
         savedConfirm: "I have saved it",
         copy: "Copy",
+        testBackup: "Test your backup",
       },
       Confirm: {
         headerTitle: "Confirm backup phrase",
@@ -3696,6 +3692,7 @@ const en: BaseTranslation = {
       },
       Success: {
         title: "Welcome to non-custodial Blink",
+        testSuccess: "Your backup phrase is correct",
       },
     },
   },
@@ -3720,9 +3717,11 @@ const en: BaseTranslation = {
     selfCustodialDescription: "Only you can access funds",
     chooseMethod: "Choose method",
     continueButton: "Continue",
+    selfCustodialDisabled: "Non-custodial is temporarily unavailable.",
     restoreComingSoonTitle: "Coming soon",
     restoreComingSoonDescription:
       "Restore flow will be available in a future update.",
+    createFailed: "Failed to create wallet. Please try again.",
   },
   RestoreScreen: {
     title: "Restore wallet",
@@ -3743,6 +3742,8 @@ const en: BaseTranslation = {
       "We couldn't find a backup. You can enter your backup phrase manually instead.",
     enterPassword: "Enter your encryption password",
     wrongPassword: "Incorrect password. Please try again.",
+    pickBackupTitle: "Choose a wallet",
+    pickBackupDescription: "Select a backup to restore",
   },
   BackupNudge: {
     title: "Your funds are at risk",
@@ -3753,12 +3754,6 @@ const en: BaseTranslation = {
     modalDescription:
       "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
     secureMe: "Secure wallet",
-    trustModelTitle: "You are in control",
-    trustModelDescription:
-      "Your keys control your funds. Transactions are processed by Spark operators, not validated directly on Bitcoin L1.",
-    trustModelWarning:
-      "Very small balances may not be economical to recover to the Bitcoin base chain.",
-    trustModelDismiss: "I understand",
   },
   SelfCustodialOffline: {
     title: "Wallet is offline",
@@ -3833,18 +3828,10 @@ const en: BaseTranslation = {
       deactivateConfirm: "Deactivate",
       cancel: "Cancel",
     },
-    firstTimeModal: {
-      title: "About Convert",
-      dualBalance:
-        "BTC and USD are two independent balances in your wallet. Use Convert any time to move funds between them.",
-      trustDisclosure:
-        "USD mode uses USDB tokens on Spark. The trust assumptions are different from holding BTC directly. USDB relies on Spark's token issuer.",
-      acknowledge: "I understand",
-    },
     minimumConversion: "Minimum conversion: {amount:string}",
     conversionUnavailable: "Conversion is temporarily unavailable. Please try again.",
   },
-  SparkWalletCreationScreen: {
+  WalletCreationScreen: {
     creating: "Creating your wallet...",
     errorTitle: "Wallet creation failed",
     errorDescription: "Something went wrong. Please try again.",
@@ -3875,12 +3862,19 @@ const en: BaseTranslation = {
       "Spark network is currently degraded. Payments may take longer.",
   },
   SelfCustodialDelete: {
-    title: "Delete self-custodial wallet",
-    warning: "This will remove this wallet from this device.",
-    recoveryNote:
-      "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    backupBadgeCompleted: "Backup complete",
-    backupBadgeMissing: "Backup not complete",
+    dangerZoneImportantTitle: "Important",
+    dangerZoneBulletReinstated: "Deleted account cannot be reinstated",
+    dangerZoneBulletPermanent: "Account deletion is permanent",
+    dangerZoneBulletEmpty: "Make sure account is empty",
+    dangerZoneDeleteButton: "Delete account and data",
+    confirmModalTitle: "Confirm account removal",
+    confirmModalTypeToConfirm: 'Type "{delete: string}" to confirm',
+    hasFundsWarningTitle: "Warning",
+    hasFundsWarningBody:
+      "Your wallet has a balance of {balance: string}. For your safety, we dont allow deletion of accounts with funds.",
+    hasFundsWarningHelper:
+      "To proceed with deletion, either empty your account or donate to circular economies.",
+    hasFundsWarningButton: "Go back",
   },
 }
 

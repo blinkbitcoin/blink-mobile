@@ -4,21 +4,18 @@ import {
   createCustodialClaimDeposit,
   createCustodialConvert,
   createCustodialListPendingDeposits,
-} from "@app/custodial/adapters/payment-adapter"
-import {
-  createGetFee,
-  createSendPayment,
-} from "@app/self-custodial/adapters/payment-adapter"
+} from "@app/custodial/adapters/payment"
 import {
   createClaimDeposit,
   createListPendingDeposits,
-} from "@app/self-custodial/adapters/deposit-adapter"
+} from "@app/self-custodial/adapters/deposit"
+import { createGetFee, createSendPayment } from "@app/self-custodial/adapters/payment"
 import {
   createGetConversionQuote,
   createReceiveLightning,
   createReceiveOnchain,
 } from "@app/self-custodial/bridge"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   type ClaimDepositAdapter,
   type ConvertAdapter,
@@ -28,8 +25,8 @@ import {
   type ReceiveLightningAdapter,
   type ReceiveOnchainAdapter,
   type SendPaymentAdapter,
-} from "@app/types/payment.types"
-import { AccountType } from "@app/types/wallet.types"
+} from "@app/types/payment"
+import { AccountType } from "@app/types/wallet"
 
 import { useAccountRegistry } from "./use-account-registry"
 

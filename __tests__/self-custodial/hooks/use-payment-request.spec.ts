@@ -33,7 +33,7 @@ jest.mock("@app/self-custodial/hooks/use-receive-asset-mode", () => ({
   useReceiveAssetMode: () => mockUseReceiveAssetMode(),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
 
@@ -148,7 +148,7 @@ describe("usePaymentRequest", () => {
     })
   })
 
-  it("records the rejection to crashlytics when the receive adapter throws (Important #4)", async () => {
+  it("records the rejection to crashlytics when the receive adapter throws", async () => {
     mockReceiveLightning.mockRejectedValue(new Error("invoice generation boom"))
 
     const { result } = renderHook(() => usePaymentRequest())
@@ -159,6 +159,38 @@ describe("usePaymentRequest", () => {
 
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: "invoice generation boom" }),
+    )
+  })
+
+  it("records the silent failure to crashlytics when the adapter resolves without an invoice", async () => {
+    mockReceiveLightning.mockResolvedValue({} as unknown as { invoice: string })
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Error")
+    })
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Self-custodial invoice adapter returned no invoice field",
+      }),
+    )
+  })
+
+  it("records the silent failure to crashlytics when the adapter resolves with an empty invoice string", async () => {
+    mockReceiveLightning.mockResolvedValue({ invoice: "" })
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Error")
+    })
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Self-custodial invoice adapter returned no invoice field",
+      }),
     )
   })
 
@@ -364,7 +396,7 @@ describe("usePaymentRequest", () => {
     expect(uri).toBe("bitcoin:bc1qtest...")
   })
 
-  describe("onchain adapter rejection (regression I7)", () => {
+  describe("onchain adapter rejection (regression)", () => {
     it("does not crash the hook when createReceiveOnchain rejects", async () => {
       mockReceiveOnchain.mockRejectedValueOnce(new Error("onchain receive boom"))
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
@@ -512,7 +544,7 @@ describe("usePaymentRequest", () => {
     })
   })
 
-  describe("Critical #7 — defers invoice generation while settings are loading", () => {
+  describe("defers invoice generation while settings are loading", () => {
     it("does not call the receive adapter while useReceiveAssetMode reports loading", async () => {
       mockUseReceiveAssetMode.mockReturnValue({
         assetMode: "bitcoin",
@@ -560,6 +592,104 @@ describe("usePaymentRequest", () => {
         expect(mockReceiveLightning).toHaveBeenCalled()
       })
       expect(mockAddPendingAutoConvert).toHaveBeenCalled()
+    })
+  })
+
+  describe("PayCode (lightning address QR by default) for self-custodial", () => {
+    const setupWithLightningAddress = (lightningAddress: string) => {
+      mockSelfCustodialWallet.mockReturnValue({
+        sdk: mockSdk,
+        lastReceivedPaymentId: null,
+        lightningAddress,
+      })
+    }
+
+    it("opens with PayCode type when LN address is available and asset mode is Bitcoin", async () => {
+      setupWithLightningAddress("alice@spark.tips")
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.type).toBe("PayCode")
+      })
+      expect(mockReceiveLightning).not.toHaveBeenCalled()
+      expect(result.current?.state).toBe("Idle")
+    })
+
+    it("stays on Lightning when LN address is available but asset mode is Dollar", async () => {
+      setupWithLightningAddress("alice@spark.tips")
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "dollar",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: false,
+        loading: false,
+      })
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.state).toBe("Created")
+      })
+      expect(result.current?.type).toBe("Lightning")
+      expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
+    })
+
+    it("surfaces canUsePaycode and lnAddressHostname when LN address is available", async () => {
+      setupWithLightningAddress("alice@spark.tips")
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.canUsePaycode).toBe(true)
+      })
+      expect(result.current?.lnAddressHostname).toBe("spark.tips")
+    })
+
+    it("returns canUsePaycode=false and empty lnAddressHostname when no LN address", async () => {
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.state).toBe("Created")
+      })
+      expect(result.current?.canUsePaycode).toBe(false)
+      expect(result.current?.lnAddressHostname).toBe("")
+    })
+
+    it("info.data carries PayCode shape with username when on PayCode", async () => {
+      setupWithLightningAddress("alice@spark.tips")
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.type).toBe("PayCode")
+      })
+      const data = result.current?.info?.data
+      expect(data?.invoiceType).toBe("PayCode")
+      expect(data?.username).toBe("alice")
+      expect(data?.getFullUriFn({ uppercase: false })).toBe("alice@spark.tips")
+      expect(data?.getFullUriFn({ uppercase: true })).toBe("ALICE@SPARK.TIPS")
+      expect(data?.getCopyableInvoiceFn()).toBe("alice@spark.tips")
+    })
+
+    it("switches to Lightning and generates an invoice when setType(Lightning) is called", async () => {
+      setupWithLightningAddress("alice@spark.tips")
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.type).toBe("PayCode")
+      })
+      expect(mockReceiveLightning).not.toHaveBeenCalled()
+
+      act(() => {
+        result.current?.setType("Lightning")
+      })
+
+      await waitFor(() => {
+        expect(result.current?.state).toBe("Created")
+      })
+      expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
+      expect(result.current?.info?.data?.invoiceType).toBe("Lightning")
     })
   })
 })

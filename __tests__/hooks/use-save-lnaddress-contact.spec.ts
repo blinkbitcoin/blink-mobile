@@ -5,7 +5,7 @@ import { ContactType } from "@app/graphql/generated"
 import { useSaveLnAddressContact } from "@app/screens/send-bitcoin-screen/use-save-lnaddress-contact"
 
 const mockContactCreate = jest.fn()
-const mockBridgeAddContact = jest.fn()
+const mockBridgeFindOrCreateContact = jest.fn()
 const mockCrashlyticsLog = jest.fn()
 let mockIsSelfCustodial = false
 let mockSdk: { id: string } | null = null
@@ -19,12 +19,12 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ isSelfCustodial: mockIsSelfCustodial }),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ sdk: mockSdk }),
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  addContact: (...args: unknown[]) => mockBridgeAddContact(...args),
+  findOrCreateContact: (...args: unknown[]) => mockBridgeFindOrCreateContact(...args),
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
@@ -100,11 +100,11 @@ describe("useSaveLnAddressContact", () => {
     expect(mockContactCreate).not.toHaveBeenCalled()
   })
 
-  describe("self-custodial branch (Important #6)", () => {
+  describe("self-custodial branch", () => {
     it("saves the contact through the bridge when sdk is available", async () => {
       mockIsSelfCustodial = true
       mockSdk = { id: "sdk" }
-      mockBridgeAddContact.mockResolvedValue(undefined)
+      mockBridgeFindOrCreateContact.mockResolvedValue(undefined)
 
       const { result } = renderHook(() => useSaveLnAddressContact())
 
@@ -115,17 +115,18 @@ describe("useSaveLnAddressContact", () => {
       })
 
       expect(response).toEqual({ saved: true, handle: "alice@spark.tips" })
-      expect(mockBridgeAddContact).toHaveBeenCalledWith(mockSdk, {
-        name: "alice@spark.tips",
-        paymentIdentifier: "alice@spark.tips",
-      })
+      expect(mockBridgeFindOrCreateContact).toHaveBeenCalledWith(
+        mockSdk,
+        "alice@spark.tips",
+        "alice@spark.tips",
+      )
       expect(mockContactCreate).not.toHaveBeenCalled()
     })
 
-    it("returns saved=false with the handle and logs to crashlytics when bridgeAddContact rejects (silent swallow)", async () => {
+    it("returns saved=false with the handle and logs to crashlytics when bridgeFindOrCreateContact rejects (silent swallow)", async () => {
       mockIsSelfCustodial = true
       mockSdk = { id: "sdk" }
-      mockBridgeAddContact.mockRejectedValue(new Error("contact upsert failed"))
+      mockBridgeFindOrCreateContact.mockRejectedValue(new Error("contact upsert failed"))
 
       const { result } = renderHook(() => useSaveLnAddressContact())
 
@@ -155,14 +156,14 @@ describe("useSaveLnAddressContact", () => {
       })
 
       expect(response).toEqual({ saved: false })
-      expect(mockBridgeAddContact).not.toHaveBeenCalled()
+      expect(mockBridgeFindOrCreateContact).not.toHaveBeenCalled()
       expect(mockContactCreate).not.toHaveBeenCalled()
     })
 
     it("does not call the Apollo mutation when self-custodial is active even on the happy path", async () => {
       mockIsSelfCustodial = true
       mockSdk = { id: "sdk" }
-      mockBridgeAddContact.mockResolvedValue(undefined)
+      mockBridgeFindOrCreateContact.mockResolvedValue(undefined)
 
       const { result } = renderHook(() => useSaveLnAddressContact())
 

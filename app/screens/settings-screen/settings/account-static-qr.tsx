@@ -6,6 +6,7 @@ import { QrCodeIcon } from "phosphor-react-native"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig } from "@app/hooks"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import { SettingsRow } from "../row"
@@ -20,9 +21,11 @@ export const AccountStaticQR: React.FC = () => {
 
   const { LL } = useI18nContext()
   const isAuthed = useIsAuthed()
+  const { isSelfCustodial } = useActiveWallet()
 
   const { data, loading } = useSettingsScreenQuery({ skip: !isAuthed })
-  if (!data?.me?.username) return <></>
+  if (isSelfCustodial) return null
+  if (!data?.me?.username) return null
 
   const qrUrl = `${posUrl}/${data.me.username}/print`
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 
 import {
   GetPaymentRequest,
@@ -11,10 +11,9 @@ import {
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
-import { useI18nContext } from "@app/i18n/i18n-react"
+import { addBounded } from "@app/utils/bounded-collections"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
-import { toastShow } from "@app/utils/toast"
 
 import {
   AutoConvertStatus,
@@ -33,12 +32,13 @@ import {
   type WaitForPaymentOptions,
 } from "../auto-convert"
 import { syncSelfCustodialWallet } from "../bridge"
-import { useSelfCustodialWallet } from "../providers/wallet-provider"
+import { useAutoConvertStatusActions } from "../providers/auto-convert-status"
+import { useSelfCustodialWallet } from "../providers/wallet"
 
 /**
  * Drives BTC->USDB auto-convert for Lightning invoices flagged Dollar:
- * wait for payment completion, run convert under a retry+cooldown
- * policy, surface only the success toast (failures are silent).
+ * wait for payment completion, run convert under a retry+cooldown policy.
+ * Outcome surfacing is handled by the receiving screen, not by this hook.
  */
 
 /** Deduplicates concurrent triggers (live event + sync + mount replay). */
@@ -47,11 +47,12 @@ const RETRY_COOLDOWN_MS = 30_000
 /** Long enough to not race a slow convert; short enough to recover crashes. */
 const ORPHAN_TIMEOUT_MS = 2 * 60 * 1000
 
+const MAX_PROCESSED_PAYMENT_IDS = 200
+const MAX_IN_FLIGHT_INVOICES = 50
+
 type ConvertMoneyAmount = NonNullable<
   ReturnType<typeof usePriceConversion>["convertMoneyAmount"]
 >
-
-type LL = ReturnType<typeof useI18nContext>["LL"]
 
 const extractLightningInvoiceFromPayment = (payment: Payment): string | undefined => {
   if (!payment.details) return undefined
@@ -88,14 +89,6 @@ const isRetryableNow = (record: PendingAutoConvert, nowMs: number): boolean => {
   return elapsed >= RETRY_COOLDOWN_MS
 }
 
-const showConvertedToast = (satsReceived: number, LL: LL): void => {
-  toastShow({
-    message: (tr) => tr.ReceiveScreen.autoConvertSuccess({ amount: satsReceived }),
-    LL,
-    type: "success",
-  })
-}
-
 type RunAutoConvertParams = {
   sdk: BreezSdkInterface
   record: PendingAutoConvert
@@ -103,16 +96,18 @@ type RunAutoConvertParams = {
   satsReceived: number
   isStableBalanceActive: boolean
   convert: ConvertMoneyAmount
-  LL: LL
   maxAttempts: number
   waitOptions: WaitForPaymentOptions
   amountMatchToleranceBps: number
   claimedConversionIds: ReadonlySet<string>
+  onConverting?: (invoice: string) => void
+  onSettled?: (invoice: string) => void
+  onConverted?: () => void
 }
 
 const triggerBackgroundSync = (sdk: BreezSdkInterface): void => {
   syncSelfCustodialWallet(sdk).catch((err) => {
-    reportError(err, "auto-convert-listener syncWallet")
+    reportError("auto-convert-listener syncWallet", err)
   })
 }
 
@@ -123,11 +118,13 @@ const runAutoConvert = async ({
   satsReceived,
   isStableBalanceActive,
   convert,
-  LL,
   maxAttempts,
   waitOptions,
   amountMatchToleranceBps,
   claimedConversionIds,
+  onConverting,
+  onSettled,
+  onConverted,
 }: RunAutoConvertParams): Promise<void> => {
   // Re-read storage so concurrent invocations agree on the cap state instead
   // of each trusting their own (potentially pre-stamp) snapshot of `attempts`.
@@ -138,51 +135,61 @@ const runAutoConvert = async ({
     return
   }
 
-  triggerBackgroundSync(sdk)
+  onConverting?.(record.paymentRequest)
+  try {
+    // Run sync in parallel with the bounded poll: by the time
+    // `waitForPaymentCompleted` resolves, the SDK has typically materialized
+    // the just-received token balance.
+    triggerBackgroundSync(sdk)
 
-  const settled = await waitForPaymentCompleted(sdk, paymentId, waitOptions)
-  if (!settled) return
+    const settled = await waitForPaymentCompleted(sdk, paymentId, waitOptions)
+    if (!settled) return
 
-  // Stamp the attempt for retry cooldown and orphan detection.
-  await recordAutoConvertAttempt(record.paymentRequest, Date.now())
+    // Stamp the attempt only after the convert had a chance to run — phantom
+    // poll-exhaustion failures must not consume the retry budget.
+    await recordAutoConvertAttempt(record.paymentRequest, Date.now())
 
-  const usdCentsAmount = convertSatsToUsdCents(satsReceived, convert)
-  const outcome = await executeAutoConvert(sdk, {
-    satsAmount: satsReceived,
-    usdCentsAmount,
-    isStableBalanceActive,
-    recordCreatedAtMs: record.createdAtMs,
-    amountMatchToleranceBps,
-    claimedConversionIds,
-  })
-
-  if (outcome.status === AutoConvertStatus.Converted) {
-    const conversionId = await findRecentConversionId(sdk, {
+    const usdCentsAmount = convertSatsToUsdCents(satsReceived, convert)
+    const outcome = await executeAutoConvert(sdk, {
       satsAmount: satsReceived,
-      toleranceBps: amountMatchToleranceBps,
+      usdCentsAmount,
+      isStableBalanceActive,
+      recordCreatedAtMs: record.createdAtMs,
+      amountMatchToleranceBps,
       claimedConversionIds,
     })
-    if (conversionId) {
-      await markAutoConvertPairing({
-        receivePaymentId: paymentId,
-        conversionPaymentId: conversionId,
-        pairedAtMs: Date.now(),
+
+    if (outcome.status === AutoConvertStatus.Converted) {
+      const conversionId = await findRecentConversionId(sdk, {
+        satsAmount: satsReceived,
+        toleranceBps: amountMatchToleranceBps,
+        claimedConversionIds,
       })
+      if (conversionId) {
+        await markAutoConvertPairing({
+          receivePaymentId: paymentId,
+          conversionPaymentId: conversionId,
+          pairedAtMs: Date.now(),
+        })
+      }
+
+      await removePendingAutoConvert(record.paymentRequest)
+      onConverted?.()
+      return
     }
 
-    await removePendingAutoConvert(record.paymentRequest)
-    showConvertedToast(satsReceived, LL)
-    return
-  }
-
-  // Terminal non-success outcomes drop silently; Failed and
-  // SkippedStableBalanceActive fall through so the next trigger retries
-  // until the attempt cap (preserves receive-time intent across toggles).
-  if (
-    outcome.status === AutoConvertStatus.AlreadyConverted ||
-    outcome.status === AutoConvertStatus.SkippedBelowMin
-  ) {
-    await removePendingAutoConvert(record.paymentRequest)
+    // Terminal non-success outcomes drop silently; Failed and
+    // SkippedStableBalanceActive fall through so the next trigger retries
+    // until the attempt cap (preserves receive-time intent across toggles).
+    if (
+      outcome.status === AutoConvertStatus.AlreadyConverted ||
+      outcome.status === AutoConvertStatus.SkippedBelowMin
+    ) {
+      await removePendingAutoConvert(record.paymentRequest)
+      onConverted?.()
+    }
+  } finally {
+    onSettled?.(record.paymentRequest)
   }
 }
 
@@ -226,17 +233,21 @@ const findPaidAmountForInvoice = async (
 
 export const useAutoConvertListener = (): void => {
   const wallet = useSelfCustodialWallet()
-  const { sdk, lastReceivedPaymentId } = wallet
+  const { sdk, lastReceivedPaymentId, refreshWallets } = wallet
   // Defaults unknown to not-active so existing records still process.
   const isStableBalanceActive = wallet.isStableBalanceActive ?? false
   const { convertMoneyAmount } = usePriceConversion()
-  const { LL } = useI18nContext()
   const {
     autoConvertMaxAttempts,
     autoConvertPollMaxAttempts,
     autoConvertPollIntervalMs,
     autoConvertAmountMatchToleranceBps,
   } = useRemoteConfig()
+  const { markConverting, markSettled } = useAutoConvertStatusActions()
+
+  const handleConverted = useCallback(() => {
+    refreshWallets().catch((err) => reportError("auto-convert-listener refresh", err))
+  }, [refreshWallets])
 
   const processedPaymentIdsRef = useRef<Set<string>>(new Set())
   const inFlightInvoicesRef = useRef<Set<string>>(new Set())
@@ -250,12 +261,62 @@ export const useAutoConvertListener = (): void => {
     [autoConvertPollMaxAttempts, autoConvertPollIntervalMs],
   )
 
-  // Live: reacts when a new payment id arrives while the app is open.
+  const processWithInFlightLock = useCallback(
+    async (params: {
+      sdk: BreezSdkInterface
+      record: PendingAutoConvert
+      paymentId: string
+      satsReceived: number
+      convert: ConvertMoneyAmount
+      claimedConversionIds: ReadonlySet<string>
+    }): Promise<void> => {
+      const { record } = params
+      if (inFlightInvoicesRef.current.has(record.paymentRequest)) return
+      addBounded(
+        inFlightInvoicesRef.current,
+        record.paymentRequest,
+        MAX_IN_FLIGHT_INVOICES,
+      )
+      try {
+        await runAutoConvert({
+          sdk: params.sdk,
+          record,
+          paymentId: params.paymentId,
+          satsReceived: params.satsReceived,
+          isStableBalanceActive,
+          convert: params.convert,
+          maxAttempts: autoConvertMaxAttempts,
+          waitOptions,
+          amountMatchToleranceBps: autoConvertAmountMatchToleranceBps,
+          claimedConversionIds: params.claimedConversionIds,
+          onConverting: markConverting,
+          onSettled: markSettled,
+          onConverted: handleConverted,
+        })
+      } finally {
+        inFlightInvoicesRef.current.delete(record.paymentRequest)
+      }
+    },
+    [
+      isStableBalanceActive,
+      autoConvertMaxAttempts,
+      waitOptions,
+      autoConvertAmountMatchToleranceBps,
+      markConverting,
+      markSettled,
+      handleConverted,
+    ],
+  )
+
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return
     if (!lastReceivedPaymentId) return
     if (processedPaymentIdsRef.current.has(lastReceivedPaymentId)) return
-    processedPaymentIdsRef.current.add(lastReceivedPaymentId)
+    addBounded(
+      processedPaymentIdsRef.current,
+      lastReceivedPaymentId,
+      MAX_PROCESSED_PAYMENT_IDS,
+    )
 
     const run = async () => {
       const payment = await fetchPaymentById(sdk, lastReceivedPaymentId)
@@ -266,53 +327,27 @@ export const useAutoConvertListener = (): void => {
 
       const record = await findPendingAutoConvert(invoice)
       if (!record) return
-
-      if (inFlightInvoicesRef.current.has(invoice)) return
       if (!isRetryableNow(record, Date.now())) return
 
-      // Reserve the invoice synchronously so the replay path can't race past
-      // the `has` check during the awaits below.
-      inFlightInvoicesRef.current.add(invoice)
-      try {
-        const { claimedConversionIds, pairedReceiveIds } =
-          await buildClaimedConversionIds()
-        if (pairedReceiveIds.has(lastReceivedPaymentId)) {
-          await removePendingAutoConvert(invoice)
-          return
-        }
-
-        await runAutoConvert({
-          sdk,
-          record,
-          paymentId: lastReceivedPaymentId,
-          satsReceived: toNumber(payment.amount),
-          isStableBalanceActive,
-          convert: convertMoneyAmount,
-          LL,
-          maxAttempts: autoConvertMaxAttempts,
-          waitOptions,
-          amountMatchToleranceBps: autoConvertAmountMatchToleranceBps,
-          claimedConversionIds,
-        })
-      } finally {
-        inFlightInvoicesRef.current.delete(invoice)
+      const { claimedConversionIds, pairedReceiveIds } = await buildClaimedConversionIds()
+      if (pairedReceiveIds.has(lastReceivedPaymentId)) {
+        await removePendingAutoConvert(invoice)
+        return
       }
+
+      await processWithInFlightLock({
+        sdk,
+        record,
+        paymentId: lastReceivedPaymentId,
+        satsReceived: toNumber(payment.amount),
+        convert: convertMoneyAmount,
+        claimedConversionIds,
+      })
     }
 
     run().catch((err) => reportError("auto-convert-listener live run", err))
-  }, [
-    sdk,
-    lastReceivedPaymentId,
-    isStableBalanceActive,
-    convertMoneyAmount,
-    LL,
-    autoConvertMaxAttempts,
-    waitOptions,
-    autoConvertAmountMatchToleranceBps,
-  ])
+  }, [sdk, lastReceivedPaymentId, convertMoneyAmount, processWithInFlightLock])
 
-  // Replay on mount: handles payments that settled while closed, plus
-  // orphans from attempts the previous run abandoned mid-way.
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return
     if (initialReplayDoneRef.current) return
@@ -328,48 +363,35 @@ export const useAutoConvertListener = (): void => {
       if (records.length === 0) return
 
       const processRecord = async (record: PendingAutoConvert): Promise<void> => {
-        if (inFlightInvoicesRef.current.has(record.paymentRequest)) return
         if (!isRetryableNow(record, nowMs)) return
 
-        // Reserve the invoice synchronously so the live path can't race past
-        // the `has` check during the awaits below.
-        inFlightInvoicesRef.current.add(record.paymentRequest)
-        try {
-          const paid = await findPaidAmountForInvoice(sdk, record.paymentRequest)
-          // Bound the replay loop on busy wallets where the matching payment has
-          // aged off the recent listPayments page.
-          if (!paid) {
-            if (record.attempts + 1 >= autoConvertMaxAttempts) {
-              await removePendingAutoConvert(record.paymentRequest)
-              return
-            }
-            await recordAutoConvertAttempt(record.paymentRequest, nowMs)
-            return
-          }
-
-          const { claimedConversionIds, pairedReceiveIds } =
-            await buildClaimedConversionIds()
-          if (pairedReceiveIds.has(paid.paymentId)) {
+        const paid = await findPaidAmountForInvoice(sdk, record.paymentRequest)
+        // Bound the replay loop on busy wallets where the matching payment has
+        // aged off the recent listPayments page.
+        if (!paid) {
+          if (record.attempts + 1 >= autoConvertMaxAttempts) {
             await removePendingAutoConvert(record.paymentRequest)
             return
           }
-
-          await runAutoConvert({
-            sdk,
-            record,
-            paymentId: paid.paymentId,
-            satsReceived: paid.amount,
-            isStableBalanceActive,
-            convert: convertMoneyAmount,
-            LL,
-            maxAttempts: autoConvertMaxAttempts,
-            waitOptions,
-            amountMatchToleranceBps: autoConvertAmountMatchToleranceBps,
-            claimedConversionIds,
-          })
-        } finally {
-          inFlightInvoicesRef.current.delete(record.paymentRequest)
+          await recordAutoConvertAttempt(record.paymentRequest, nowMs)
+          return
         }
+
+        const { claimedConversionIds, pairedReceiveIds } =
+          await buildClaimedConversionIds()
+        if (pairedReceiveIds.has(paid.paymentId)) {
+          await removePendingAutoConvert(record.paymentRequest)
+          return
+        }
+
+        await processWithInFlightLock({
+          sdk,
+          record,
+          paymentId: paid.paymentId,
+          satsReceived: paid.amount,
+          convert: convertMoneyAmount,
+          claimedConversionIds,
+        })
       }
 
       await records.reduce<Promise<void>>(
@@ -379,13 +401,5 @@ export const useAutoConvertListener = (): void => {
     }
 
     replay().catch((err) => reportError("auto-convert-listener replay", err))
-  }, [
-    sdk,
-    convertMoneyAmount,
-    isStableBalanceActive,
-    LL,
-    autoConvertMaxAttempts,
-    waitOptions,
-    autoConvertAmountMatchToleranceBps,
-  ])
+  }, [sdk, convertMoneyAmount, processWithInFlightLock, autoConvertMaxAttempts])
 }

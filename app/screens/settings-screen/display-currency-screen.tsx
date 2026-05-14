@@ -3,14 +3,8 @@ import { useCallback } from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { gql } from "@apollo/client"
 import { MenuSelect, MenuSelectItem } from "@app/components/menu-select"
-import {
-  Currency,
-  RealtimePriceDocument,
-  useAccountUpdateDisplayCurrencyMutation,
-  useCurrencyListQuery,
-  useDisplayCurrencyQuery,
-} from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { Currency, useCurrencyListQuery } from "@app/graphql/generated"
+import { useEffectiveDisplayCurrency } from "@app/hooks/use-effective-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, SearchBar, Text } from "@rn-vui/themed"
@@ -35,16 +29,11 @@ export const DisplayCurrencyScreen: React.FC = () => {
   const styles = useStyles()
 
   const { LL } = useI18nContext()
-  const isAuthed = useIsAuthed()
 
-  const { data: dataAuthed } = useDisplayCurrencyQuery({ skip: !isAuthed })
-  const displayCurrency = dataAuthed?.me?.defaultAccount?.displayCurrency
-
-  const [updateDisplayCurrency] = useAccountUpdateDisplayCurrencyMutation()
+  const { displayCurrency, setDisplayCurrency } = useEffectiveDisplayCurrency()
 
   const { data, loading } = useCurrencyListQuery({
     fetchPolicy: "cache-and-network",
-    skip: !isAuthed,
   })
 
   const [newCurrency, setNewCurrency] = React.useState("")
@@ -107,10 +96,7 @@ export const DisplayCurrencyScreen: React.FC = () => {
 
   const handleCurrencyChange = async (currencyId: string) => {
     if (loading) return
-    await updateDisplayCurrency({
-      variables: { input: { currency: currencyId } },
-      refetchQueries: [RealtimePriceDocument],
-    })
+    await setDisplayCurrency(currencyId)
     setNewCurrency(currencyId)
   }
 

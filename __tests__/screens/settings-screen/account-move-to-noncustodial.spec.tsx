@@ -2,7 +2,7 @@ import React from "react"
 import { render } from "@testing-library/react-native"
 
 import { MoveToNonCustodialSetting } from "@app/screens/settings-screen/settings/account-move-to-noncustodial"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 const mockNavigate = jest.fn()
 const mockActiveAccount = jest.fn()
@@ -19,7 +19,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
     loading: false,
-    getRouteForCheckpoint: () => "sparkMigrationExplainer",
+    getRouteForCheckpoint: () => "accountMigrationExplainer",
   }),
 }))
 

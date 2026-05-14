@@ -143,7 +143,6 @@ export default function MapComponent({
             color={colors._orange}
             handleCalloutPress={handleCalloutPress}
             handleMarkerPress={handleMarkerPress}
-            isFocused={focusedMarker?.username === item.username}
           />
         ))}
       </MapView>

@@ -6,15 +6,14 @@ import {
   type BreezSdkInterface,
   type Payment,
 } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
-
 import { WalletCurrency } from "@app/graphql/generated"
 import {
   ConvertDirection,
   ConvertErrorCode,
   PaymentResultStatus,
   type ConvertParams,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
+import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
 
 import { createGetConversionQuote } from "../bridge/convert"
@@ -85,9 +84,7 @@ export const fetchAutoConvertMinSats = async (
     )
     return limits.minFromAmount ?? undefined
   } catch (err) {
-    crashlytics().recordError(
-      err instanceof Error ? err : new Error(`fetchAutoConvertMinSats: ${err}`),
-    )
+    reportError("fetchAutoConvertMinSats", err)
     return undefined
   }
 }

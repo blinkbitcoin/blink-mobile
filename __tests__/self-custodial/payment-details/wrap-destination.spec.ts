@@ -93,7 +93,7 @@ describe("wrapDestination", () => {
     )
   })
 
-  it("wraps Lnurl destination through the SC lnurl detail (not the lightning detail)", () => {
+  it("wraps Lnurl destination through the self-custodial lnurl detail (not the lightning detail)", () => {
     const result = createValidResult(PaymentType.Lnurl, {
       lnurl: "lnurl1...",
       isMerchant: false,

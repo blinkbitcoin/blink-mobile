@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { AccountType, ActiveWalletStatus } from "@app/types/wallet.types"
+import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 
@@ -22,11 +22,11 @@ jest.mock("@app/hooks/use-self-custodial-rollback", () => ({
   useSelfCustodialRollback: jest.fn(),
 }))
 
-jest.mock("@app/custodial/providers/wallet-provider", () => ({
+jest.mock("@app/custodial/providers/wallet", () => ({
   useCustodialWallet: () => mockCustodialState(),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialState(),
 }))
 
@@ -73,7 +73,7 @@ describe("useActiveWallet", () => {
 
   it("returns self-custodial state when active account is self-custodial", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialState.mockReturnValue(selfCustodialReady)
@@ -89,7 +89,7 @@ describe("useActiveWallet", () => {
 
   it("isSelfCustodial is false when self-custodial but unavailable", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialState.mockReturnValue(selfCustodialUnavailable)
@@ -110,9 +110,9 @@ describe("useActiveWallet", () => {
     expect(result.current.needsBackendAuth).toBe(true)
   })
 
-  it("treats Degraded self-custodial as isReady=true so payments stay available (Important #5)", () => {
+  it("treats Degraded self-custodial as isReady=true so payments stay available", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialState.mockReturnValue({
@@ -128,7 +128,7 @@ describe("useActiveWallet", () => {
     expect(result.current.isSelfCustodial).toBe(true)
   })
 
-  it("treats Degraded custodial as isReady=true (Important #5)", () => {
+  it("treats Degraded custodial as isReady=true", () => {
     mockActiveAccount.mockReturnValue({
       id: "custodial-default",
       type: AccountType.Custodial,
@@ -153,9 +153,9 @@ describe("useActiveWallet", () => {
   ]
 
   for (const status of nonReadyStatuses) {
-    it(`flips isReady=false for non-Ready, non-Degraded status '${status}' (Important #5)`, () => {
+    it(`flips isReady=false for non-Ready, non-Degraded status '${status}'`, () => {
       mockActiveAccount.mockReturnValue({
-        id: "sc-default",
+        id: "self-custodial-default",
         type: AccountType.SelfCustodial,
       })
       mockSelfCustodialState.mockReturnValue({

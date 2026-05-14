@@ -1,4 +1,4 @@
-import { buildBitcoinUri, buildLightningUri, satsToBtc } from "@app/utils/bitcoin-uri"
+import { buildBitcoinUri, satsToBtc } from "@app/utils/bitcoin-uri"
 
 describe("satsToBtc", () => {
   it("converts sats to BTC", () => {
@@ -11,16 +11,6 @@ describe("satsToBtc", () => {
 
   it("returns 0 for 0 sats", () => {
     expect(satsToBtc(0)).toBe(0)
-  })
-})
-
-describe("buildLightningUri", () => {
-  it("adds lightning: prefix by default", () => {
-    expect(buildLightningUri("lnbc1...")).toBe("lightning:lnbc1...")
-  })
-
-  it("returns raw invoice when prefix is false", () => {
-    expect(buildLightningUri("lnbc1...", false)).toBe("lnbc1...")
   })
 })
 

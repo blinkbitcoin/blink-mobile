@@ -39,10 +39,8 @@ import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
-import { TrustModelModal } from "@app/components/trust-model-modal"
-import { useTrustModelSeen } from "@app/screens/spark-onboarding/trust-model-screen"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
@@ -188,11 +186,6 @@ export const HomeScreen: React.FC = () => {
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
-  const {
-    seen: trustModelSeen,
-    loaded: trustModelLoaded,
-    markAsSeen: markTrustModelSeen,
-  } = useTrustModelSeen()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -527,15 +520,13 @@ export const HomeScreen: React.FC = () => {
     navigation.navigate("profileScreen")
   }
 
-  const showTrustModel =
-    isSelfCustodial && trustModelLoaded && !trustModelSeen && satsBalance > 0
-
   return (
     <Screen headerShown={false}>
       {AccountCreationNeededModal}
       <StableSatsModal
         isVisible={isStablesatModalVisible}
         setIsVisible={setIsStablesatModalVisible}
+        variant={isSelfCustodial ? "selfCustodial" : "custodial"}
       />
       <TrialAccountLimitsModal
         isVisible={isUpgradeModalVisible}
@@ -649,7 +640,6 @@ export const HomeScreen: React.FC = () => {
         isVisible={shouldShowModal && isFocused}
         onClose={dismissBanner}
       />
-      <TrustModelModal isVisible={showTrustModel} onDismiss={markTrustModelSeen} />
     </Screen>
   )
 }

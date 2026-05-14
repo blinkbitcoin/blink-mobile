@@ -1,7 +1,9 @@
 import React from "react"
 import { Pressable, View } from "react-native"
+
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+
+import { GaloyIcon } from "../atomic/galoy-icon"
 
 type CheckboxRowProps = {
   label: string

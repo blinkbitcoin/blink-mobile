@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
-import { ConvertDirection } from "@app/types/payment.types"
+import { ConvertDirection } from "@app/types/payment"
 
 import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks/use-non-custodial-conversion-limits"
 
@@ -11,7 +11,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   fetchConversionLimits: (...args: unknown[]) => mockFetchConversionLimits(...args),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 

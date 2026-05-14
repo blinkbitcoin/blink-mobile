@@ -1,4 +1,4 @@
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import {
   sdkContactToUserContact,

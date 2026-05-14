@@ -38,7 +38,7 @@ describe("getSparkStatus (bridge)", () => {
     await expect(getSparkStatus()).rejects.toThrow("network")
   })
 
-  it("forwards an AbortSignal to the SDK when provided (Important #8)", async () => {
+  it("forwards an AbortSignal to the SDK when provided", async () => {
     mockBreezGetSparkStatus.mockResolvedValue({
       status: ServiceStatus.Operational,
       lastUpdated: BigInt(0),

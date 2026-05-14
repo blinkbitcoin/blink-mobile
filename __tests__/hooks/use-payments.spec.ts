@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 import { usePayments } from "@app/hooks/use-payments"
 
@@ -15,7 +15,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 const mockSdk = {}
 const mockSelfCustodialWallet = jest.fn()
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
 
@@ -32,7 +32,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   createGetConversionQuote: jest.fn().mockReturnValue(jest.fn()),
 }))
 
-jest.mock("@app/custodial/adapters/payment-adapter", () => ({
+jest.mock("@app/custodial/adapters/payment", () => ({
   createCustodialListPendingDeposits: jest.fn().mockResolvedValue({ deposits: [] }),
   createCustodialClaimDeposit: {
     getClaimFee: jest.fn(),
@@ -107,7 +107,7 @@ describe("usePayments", () => {
     expect(result.current.receiveOnchain).toBeDefined()
   })
 
-  it("returns no adapters while a self-custodial account is loading its SDK (regression Critical #5)", () => {
+  it("returns no adapters while a self-custodial account is loading its SDK (regression)", () => {
     mockActiveAccount.mockReturnValue({
       id: "self-custodial-default",
       type: AccountType.SelfCustodial,
@@ -139,9 +139,9 @@ describe("usePayments", () => {
     expect(result.current.convert).toBeUndefined()
   })
 
-  it("exposes getConversionQuote only on the SC path with an SDK", () => {
+  it("exposes getConversionQuote only on the self-custodial path with an SDK", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialWallet.mockReturnValue({ sdk: mockSdk })
@@ -160,9 +160,9 @@ describe("usePayments", () => {
     expect(result.current.getConversionQuote).toBeUndefined()
   })
 
-  it("does not expose getConversionQuote for a SC account missing its SDK", () => {
+  it("does not expose getConversionQuote for a self-custodial account missing its SDK", () => {
     mockActiveAccount.mockReturnValue({
-      id: "sc-default",
+      id: "self-custodial-default",
       type: AccountType.SelfCustodial,
     })
     mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })

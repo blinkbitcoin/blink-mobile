@@ -64,7 +64,8 @@
     "title": "Konverter",
     "transfer": "Overfør",
     "percentageToConvert": "% som skal konverteres",
-    "reviewTransfer": "Gennemgå overførsel"
+    "reviewTransfer": "Gennemgå overførsel",
+    "dustError": "Hele saldoen skal overføres."
   },
   "ConversionConfirmationScreen": {
     "title": "Gennemgå konvertering",
@@ -74,9 +75,7 @@
     "infoDollar": "Dollar-beløbet er kun omtrentligt. Det kan variere med et lille beløb.",
     "transferButtonText": "Overfør {fromWallet} til {toWallet}",
     "feeLabel": "Konverteringsgebyr",
-    "feeError": "Kunne ikke hente konverteringsgebyret",
-    "amountFloored": "Beløb forøget for at opfylde konverteringsminimum.",
-    "amountDustBumped": "Beløb forøget for at konvertere hele din saldo."
+    "feeError": "Kunne ikke hente konverteringsgebyret"
   },
   "ConversionSuccessScreen": {
     "message": "Konvertering vel afsluttet",
@@ -2169,8 +2168,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Indbetalingsgebyr: {fee} SAT for beløb under {threshold} SAT eller {overFee} SAT for indbetalinger over {threshold} SAT",
     "autoConvertMinAmount": "Beløb under {minSats: number} sats kan ikke automatisk konverteres til Dollar. Du modtager Bitcoin i stedet.",
-    "autoConvertSuccess": "Modtog {amount: number} sats, konverteret til Dollar.",
-    "autoConvertFailed": "Betaling modtaget, men konverteringen mislykkedes."
+    "autoConvertFailed": "Betaling modtaget, men konverteringen mislykkedes.",
+    "pleaseWaitForConversion": "Vent venligst, indtil konverteringen er færdig"
   },
   "RedeemBitcoinScreen": {
     "title": "Indløs Bitcoin",
@@ -2336,7 +2335,6 @@
     "nonCustodialAccount": "Ikke-depotkonto",
     "tapUserName": "Tryk for at indstille brugernavn",
     "notifications": "Notifikationer",
-    "recoveryMethod": "Gendannelsesmetode",
     "title": "Indstillinger",
     "darkMode": "Mørk tilstand",
     "setToDark": "Tilstand: mørk.",
@@ -2363,27 +2361,11 @@
     "receiveCurrency": "Modtagevaluta",
     "displayCurrency": "Visningsvaluta",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
       "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -2423,6 +2405,7 @@
     "level": "Niveau {level: string}",
     "switchAccount": "Skift konto",
     "pleaseWait": "Vent venligst.",
+    "probeBalanceFailed": "Kunne ikke bekræfte tegnebogens saldo. Prøv venligst igen.",
     "accountLevel": "Kontoniveau",
     "upgrade": "Opgrader din konto",
     "logOutAndDeleteLocalData": "Log ud og slet alle lokale data",
@@ -2462,6 +2445,8 @@
     "copiedAccountId": "Dit konto ID er kopieret til udklipsholderen",
     "yourAccountId": "Dit konto ID",
     "accountId": "Konto-ID",
+    "publicKey": "Offentlig nøgle",
+    "copiedPublicKey": "Offentlig nøgle kopieret til udklipsholder",
     "copy": "Kopier",
     "identityVerification": "Identitetsbekræftelse"
   },
@@ -2492,7 +2477,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Standard modtagekonto",
-    "info": "Din Bitcoin-konto er til at samle sats, hvor USD-værdien bevæger sig med markedet. Din Dollar-konto er drevet af Stablesats — den holder Bitcoin, der er sikret til at forblive stabil i USD-værdi. Du holder altid Bitcoin, men dollarværdien ændrer sig ikke."
+    "info": "Din Bitcoin-konto er til at samle sats, hvor USD-værdien bevæger sig med markedet. Din Dollar-konto er drevet af Stablesats — den holder Bitcoin, der er sikret til at forblive stabil i USD-værdi. Du holder altid Bitcoin, men dollarværdien ændrer sig ikke.",
+    "titleSelfCustodial": "Standardkonto",
+    "infoSelfCustodial": "Denne konto vil blive brugt som standard ved modtagelse og afsendelse. Du kan skifte når som helst."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2510,7 +2497,10 @@
     "header": "Din Dollar-konto er drevet af Stablesats",
     "body": "Dollar-konto bruger Stablesats-teknologi til at holde Bitcoin stabil på USD-prisen. Du holder altid Bitcoin — ikke rigtige dollars — men USD-værdien svinger ikke. Du kan sende og modtage Bitcoin som normalt, men det er ikke kompatibelt med det traditionelle banksystem.",
     "termsAndConditions": "Læs vilkårene",
-    "learnMore": "Læs mere om Stablesats"
+    "learnMore": "Læs mere om Stablesats",
+      "headerSelfCustodial": "Din Dollar-konto indeholder stablecoins",
+      "bodySelfCustodial": "På Dollar-kontoen holder du stablecoins. Tokens, der er bakket op af aktiver, hvis værdi holdes stabil i forhold til USD. Du kan endnu ikke sende og modtage stablecoins. Når du sender fra Dollar-kontoen, ombyttes dine stablecoins og sendes som Bitcoin til modtageren.",
+      "learnMoreSelfCustodial": "Lær mere"
   },
   "SplashScreen": {
     "update": "Din app er forældet. En opdatering er nødvendig, før appen kan bruges.\n\nDette kan gøres fra PlayStore for Android og Testflight for iOS"
@@ -2790,6 +2780,7 @@
     "submit": "Indsend",
     "success": "Succes!",
     "dollarStablesats": "dollar (Stablesats)",
+    "dollarStablecoin": "dollar (Stablecoin)",
     "to": "Til",
     "total": "Total",
     "transactions": "Transaktioner",
@@ -3506,8 +3497,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Adgangskodeadministrator",
       "manualBackup": "Manuel backup",
-      "keychainSaved": "Backup gemt i adgangskodeadministrator",
-      "keychainFailed": "Kunne ikke gemme backup",
+      "passwordManagerBackupSaved": "Backup gemt i adgangskodeadministrator",
+      "passwordManagerBackupFailed": "Kunne ikke gemme backup",
+      "passwordManagerUnavailable": "Ingen adgangskodeadministrator er tilgængelig på denne enhed. Brug Drive-backup eller gem din 12-ord-frase manuelt.",
       "iOSComingSoon": "iCloud-sikkerhedskopi kommer snart"
     },
     "ManualBackup": {
@@ -3525,7 +3517,9 @@
         "saveItNow": "Gem den nu",
         "savedConfirm": "Jeg har gemt den",
         "copy": "Kopiér",
-        "continueButton": "Fortsæt"
+        "continueButton": "Fortsæt",
+        "selfCustodialDisabled": "Ikke-forvaring er midlertidigt utilgængelig.",
+        "testBackup": "Test din backup"
       },
       "Confirm": {
         "headerTitle": "Bekræft backup-sætning",
@@ -3536,7 +3530,8 @@
         "incorrectWord": "Forkert ord, kontroller venligst rækkefølgen"
       },
       "Success": {
-        "title": "Velkommen til non-custodial Blink"
+        "title": "Velkommen til non-custodial Blink",
+        "testSuccess": "Din backup-frase er korrekt"
       }
     },
     "CloudBackup": {
@@ -3558,6 +3553,9 @@
       "signInFailed": "Kunne ikke logge ind på Google",
       "existingBackupTitle": "Sikkerhedskopi fundet",
       "existingBackupMessage": "Der findes allerede en sikkerhedskopi i din {provider}. Vil du overskrive den?",
+      "existingBackupMessageWithDetails": "Der findes allerede en sikkerhedskopi på din {provider}.\n\nLightning-adresse: {address}\nOprettet: {createdAt}\n\nVil du overskrive den?",
+      "existingBackupUnknownAddress": "Ikke tilgængelig",
+      "existingBackupUnknownCreatedAt": "Ukendt",
       "overwrite": "Overskriv"
     }
   },
@@ -3571,8 +3569,8 @@
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Forvaltet",
+    "selfCustodialLabel": "Selvforvaltet",
     "custodialDescription": "Vi opbevarer midlerne på dine vegne",
     "selfCustodialDescription": "Kun du har adgang til midlerne",
     "continueButton": "Fortsæt",
@@ -3580,7 +3578,8 @@
     "descriptionSelected": "Vælg venligst kontotype.",
     "chooseMethod": "Vælg metode",
     "restoreComingSoonTitle": "Kommer snart",
-    "restoreComingSoonDescription": "Gendannelsesfunktionen vil være tilgængelig i en fremtidig opdatering."
+    "restoreComingSoonDescription": "Gendannelsesfunktionen vil være tilgængelig i en fremtidig opdatering.",
+    "createFailed": "Kunne ikke oprette tegnebog. Prøv venligst igen."
   },
   "RestoreScreen": {
     "title": "Gendan tegnebog",
@@ -3599,7 +3598,9 @@
     "noBackupFound": "Ingen sikkerhedskopi fundet",
     "noBackupDescription": "Vi kunne ikke finde en sikkerhedskopi. Du kan indtaste din sikkerhedsfrase manuelt.",
     "enterPassword": "Indtast din krypteringsadgangskode",
-    "wrongPassword": "Forkert adgangskode. Prøv venligst igen."
+    "wrongPassword": "Forkert adgangskode. Prøv venligst igen.",
+    "pickBackupTitle": "Vælg en tegnebog",
+    "pickBackupDescription": "Vælg en sikkerhedskopi at gendanne"
   },
   "BackupNudge": {
     "title": "Dine midler er i fare",
@@ -3608,11 +3609,7 @@
     "settingsWarning": "Sikkerhedskopiér din tegnebog. Hvis du mister denne enhed, mister du dine midler.",
     "modalTitle": "Sikr dine midler",
     "modalDescription": "Vi anbefaler stærkt, at du sikkerhedskopierer din tegnebog for at forhindre et fuldstændigt tab af midler, hvis du mister denne enhed.",
-    "secureMe": "Sikr tegnebog",
-    "trustModelTitle": "Du har kontrollen",
-    "trustModelDescription": "Dine nøgler styrer dine midler. Transaktioner behandles af Spark-operatører, ikke direkte valideret på Bitcoin L1.",
-    "trustModelWarning": "Meget små saldi er muligvis ikke økonomiske at gendanne til Bitcoin-basiskæden.",
-    "trustModelDismiss": "Jeg forstår"
+    "secureMe": "Sikr tegnebog"
   },
   "StableBalance": {
     "title": "Stabil saldo",
@@ -3636,12 +3633,6 @@
       "deactivateConfirm": "Deaktivér",
       "cancel": "Annullér"
     },
-    "firstTimeModal": {
-      "title": "Om Konvertering",
-      "dualBalance": "BTC og USD er to uafhængige saldi i din tegnebog. Brug Convert når som helst til at flytte midler mellem dem.",
-      "trustDisclosure": "USD-tilstand bruger USDB-tokens på Spark. Tillidsantagelserne er anderledes end at holde BTC direkte. USDB er afhængig af Sparks tokenudsteder.",
-      "acknowledge": "Jeg forstår"
-    },
     "minimumConversion": "Minimum konvertering: {amount:string}",
     "conversionUnavailable": "Konvertering er midlertidigt utilgængelig. Prøv igen."
   },
@@ -3656,7 +3647,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Opretter din tegnebog...",
     "errorTitle": "Oprettelse af tegnebog mislykkedes",
     "errorDescription": "Noget gik galt. Prøv venligst igen.",
@@ -3732,10 +3723,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Vigtigt",
+    "dangerZoneBulletReinstated": "Slettet konto kan ikke gendannes",
+    "dangerZoneBulletPermanent": "Sletning af kontoen er permanent",
+    "dangerZoneBulletEmpty": "Sørg for, at kontoen er tom",
+    "dangerZoneDeleteButton": "Slet konto og data",
+    "confirmModalTitle": "Bekræft sletning af konto",
+    "confirmModalTypeToConfirm": "Skriv \"{delete: string}\" for at bekræfte",
+    "hasFundsWarningTitle": "Advarsel",
+    "hasFundsWarningBody": "Din tegnebog har en saldo på {balance}. For din sikkerhed tillader vi ikke sletning af konti med midler.",
+    "hasFundsWarningHelper": "For at fortsætte med sletningen skal du tømme din konto eller donere til cirkulære økonomier.",
+    "hasFundsWarningButton": "Tilbage"
   }
 }

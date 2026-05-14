@@ -3,7 +3,7 @@ import { render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
-import { ActiveWalletStatus } from "@app/types/wallet.types"
+import { ActiveWalletStatus } from "@app/types/wallet"
 
 const mockUseActiveWallet = jest.fn()
 const mockUsePaymentRequest = jest.fn()
@@ -114,7 +114,7 @@ describe("ReceiveScreen — routing", () => {
     mockUseSelfCustodialPaymentRequest.mockReturnValue({ state: "ready" })
   })
 
-  it("renders nothing when SC wallet is in Error status", () => {
+  it("renders nothing when self-custodial wallet is in Error status", () => {
     mockUseActiveWallet.mockReturnValue({
       isSelfCustodial: true,
       status: ActiveWalletStatus.Error,
@@ -125,7 +125,7 @@ describe("ReceiveScreen — routing", () => {
     expect(toJSON()).toBeNull()
   })
 
-  it("renders nothing when SC wallet is in Unavailable status", () => {
+  it("renders nothing when self-custodial wallet is in Unavailable status", () => {
     mockUseActiveWallet.mockReturnValue({
       isSelfCustodial: true,
       status: ActiveWalletStatus.Unavailable,
@@ -148,7 +148,7 @@ describe("ReceiveScreen — routing", () => {
     expect(toJSON()).toBeNull()
   })
 
-  it("invokes BOTH custodial and SC payment-request hooks regardless of mode (current behaviour, related to I6)", () => {
+  it("invokes BOTH custodial and self-custodial payment-request hooks regardless of mode (current behaviour, related to)", () => {
     mockUseActiveWallet.mockReturnValue({
       isSelfCustodial: true,
       status: ActiveWalletStatus.Ready,

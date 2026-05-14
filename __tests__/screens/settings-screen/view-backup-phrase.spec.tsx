@@ -1,8 +1,8 @@
 import React from "react"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 
 import { ViewBackupPhraseSetting } from "@app/screens/settings-screen/settings/view-backup-phrase"
-import { AccountType } from "@app/types/wallet.types"
+import { AccountType } from "@app/types/wallet"
 
 const mockActiveAccount = jest.fn()
 const mockBackupState = jest.fn()
@@ -12,7 +12,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount() }),
 }))
 
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupStatus: { None: "none", Completed: "completed" },
   useBackupState: () => ({ backupState: mockBackupState() }),
 }))
@@ -35,8 +35,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 jest.mock("@app/screens/settings-screen/row", () => ({
-  SettingsRow: ({ title }: { title: string }) =>
-    React.createElement("Text", { testID: "settings-row" }, title),
+  SettingsRow: ({ title, action }: { title: string; action?: () => void }) =>
+    React.createElement("Text", { testID: "settings-row", onPress: action }, title),
 }))
 
 describe("ViewBackupPhraseSetting", () => {
@@ -53,6 +53,30 @@ describe("ViewBackupPhraseSetting", () => {
     const { getByTestId } = render(<ViewBackupPhraseSetting />)
 
     expect(getByTestId("settings-row")).toBeTruthy()
+  })
+
+  it("navigates to the view-backup-alerts screen on press — the phrase is gated behind the 3-checks confirmation", () => {
+    mockActiveAccount.mockReturnValue({
+      type: AccountType.SelfCustodial,
+    })
+    mockBackupState.mockReturnValue({ status: "completed" })
+
+    const { getByTestId } = render(<ViewBackupPhraseSetting />)
+    fireEvent.press(getByTestId("settings-row"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialViewBackupSecurityChecks")
+  })
+
+  it("never bypasses the alerts gate — pressing the row must not jump straight to the phrase screen", () => {
+    mockActiveAccount.mockReturnValue({
+      type: AccountType.SelfCustodial,
+    })
+    mockBackupState.mockReturnValue({ status: "completed" })
+
+    const { getByTestId } = render(<ViewBackupPhraseSetting />)
+    fireEvent.press(getByTestId("settings-row"))
+
+    expect(mockNavigate).not.toHaveBeenCalledWith("selfCustodialViewBackupPhrase")
   })
 
   it("returns null when custodial account", () => {

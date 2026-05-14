@@ -62,7 +62,8 @@
     "title": "Badilisha",
     "transfer": "Hamisha",
     "percentageToConvert": "Asilimia ya kubadilishwa.",
-    "reviewTransfer": "Kagua uhamisho"
+    "reviewTransfer": "Kagua uhamisho",
+    "dustError": "Salio lote lazima lihamishwe."
   },
   "ConversionConfirmationScreen": {
     "title": "Hakikisha ubadilishaji",
@@ -72,9 +73,7 @@
     "infoDollar": "Kiasi cha Dola ni takriban tu. Kinaweza kubadilika kwa kiasi kidogo.",
     "transferButtonText": "Hamisha {fromWallet} kwenda {toWallet}",
     "feeLabel": "Ada ya ubadilishaji",
-    "feeError": "Imeshindikana kupata ada ya ubadilishaji",
-    "amountFloored": "Kiasi kimeongezwa ili kufikia kima cha chini cha ubadilishaji.",
-    "amountDustBumped": "Kiasi kimeongezwa ili kubadilisha salio lako lote."
+    "feeError": "Imeshindikana kupata ada ya ubadilishaji"
   },
   "ConversionSuccessScreen": {
     "message": "Ubadilishaji umekamilika",
@@ -2166,8 +2165,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ada ya amana: {fee} SAT kwa kiasi chini ya {threshold} SAT au {overFee} SAT kwa amana zaidi ya {threshold} SAT",
     "autoConvertMinAmount": "Viwango vilivyo chini ya sats {minSats: number} haviwezi kubadilishwa kwa Dola kiotomatiki. Utapokea Bitcoin badala yake.",
-    "autoConvertSuccess": "Imepokelewa sats {amount: number}, zimebadilishwa kwa Dola.",
-    "autoConvertFailed": "Malipo yamepokelewa lakini ubadilishaji umeshindwa."
+    "autoConvertFailed": "Malipo yamepokelewa lakini ubadilishaji umeshindwa.",
+    "pleaseWaitForConversion": "Tafadhali subiri hadi ubadilishaji ukamilike"
   },
   "RedeemBitcoinScreen": {
     "title": "Badilisha Bitcoin",
@@ -2333,7 +2332,6 @@
     "nonCustodialAccount": "Akaunti isiyo ya udhamini",
     "tapUserName": "Guza ili kuandikisha jina la mtumiaji",
     "notifications": "Arifa",
-    "recoveryMethod": "Mbinu ya kurejesha",
     "title": "Mipangilio",
     "darkMode": "Njia ya Giza",
     "setToDark": "Njia: giza.",
@@ -2360,27 +2358,11 @@
     "receiveCurrency": "Sarafu ya kupokea",
     "displayCurrency": "Sarafu ya kuonyesha",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
       "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
     }
   },
   "NotificationSettingsScreen": {
@@ -2420,6 +2402,7 @@
     "level": "Kiwango {level: string}",
     "switchAccount": "Badilisha akaunti",
     "pleaseWait": "Tafadhali Subiri.",
+    "probeBalanceFailed": "Imeshindwa kuthibitisha salio la pochi. Tafadhali jaribu tena.",
     "accountLevel": "Kiwango cha Akaunti",
     "upgrade": "Boresha akaunti yako",
     "logOutAndDeleteLocalData": "Toka nje na futa data zote za kwenye kifaa chako",
@@ -2459,6 +2442,8 @@
     "copiedAccountId": "Imeakiliwa ID ya akaunti yako kwenye ubao wa kunakili",
     "yourAccountId": "ID ya Akaunti Yako",
     "accountId": "Kitambulisho cha Akaunti",
+    "publicKey": "Ufunguo wa umma",
+    "copiedPublicKey": "Ufunguo wa umma umenakiliwa kwenye ubao wa kunakili",
     "copy": "Nakili",
     "identityVerification": "Uthibitishaji wa Utambulisho"
   },
@@ -2489,7 +2474,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Akaunti ya kupokea chaguo-msingi",
-    "info": "Akaunti ya Bitcoin yako ni ya kukusanya sats, ambapo thamani ya USD inasogea na soko. Akaunti ya Dola yako inaendeshwa na Stablesats — inashikilia Bitcoin iliyolindwa ili ibaki thabiti kwa thamani ya USD. Daima unashikilia Bitcoin, lakini thamani ya dola haibadiliki."
+    "info": "Akaunti ya Bitcoin yako ni ya kukusanya sats, ambapo thamani ya USD inasogea na soko. Akaunti ya Dola yako inaendeshwa na Stablesats — inashikilia Bitcoin iliyolindwa ili ibaki thabiti kwa thamani ya USD. Daima unashikilia Bitcoin, lakini thamani ya dola haibadiliki.",
+    "titleSelfCustodial": "Akaunti chaguomsingi",
+    "infoSelfCustodial": "Akaunti hii itatumika kwa chaguomsingi wakati wa kupokea na kutuma. Unaweza kubadilisha wakati wowote."
   },
   "ThemeScreen": {
     "title": "Mandhari",
@@ -2507,7 +2494,10 @@
     "header": "Akaunti ya Dola yako inaendeshwa na Stablesats",
     "body": "Akaunti ya Dola inatumia teknolojia ya Stablesats kushikilia Bitcoin thabiti kwa bei ya USD. Daima unashikilia Bitcoin — si dola halisi — lakini thamani ya USD haisumbui. Unaweza kutuma na kupokea Bitcoin kama kawaida, lakini haiendani na mfumo wa benki wa jadi.",
     "termsAndConditions": "Soma Sheria na Masharti",
-    "learnMore": "Soma zaidi kuhusu Stablesats"
+    "learnMore": "Soma zaidi kuhusu Stablesats",
+      "headerSelfCustodial": "Akaunti yako ya Dola inashika stablecoins",
+      "bodySelfCustodial": "Katika akaunti ya Dola unashika stablecoins. Tokeni zinazoungwa mkono na rasilimali zenye thamani inayodumishwa imara dhidi ya USD. Bado huwezi kutuma na kupokea stablecoins. Unapotuma kutoka kwenye akaunti ya Dola, stablecoins zako zitabadilishwa na kutumwa kama Bitcoin kwa mpokeaji.",
+      "learnMoreSelfCustodial": "Jifunze zaidi"
   },
   "SplashScreen": {
     "update": "Aplikisheni yako imepitwa na wakati. Sahihisho linahitajika kabla aplikisheni inaweza kutumiwa.\n\nHii inaweza kufanywa kutoka kwenye PlayStore kwa Android na Testflight kwa iOS"
@@ -2787,6 +2777,7 @@
     "submit": "Wasilisha",
     "success": "Fanaka!",
     "dollarStablesats": "Dola (Stablesats)",
+    "dollarStablecoin": "Dola (Stablecoin)",
     "to": "Kwa",
     "total": "Jumla",
     "transactions": "Malipo",
@@ -3488,8 +3479,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Kidhibiti cha nywila",
       "manualBackup": "Nakala ya mkono",
-      "keychainSaved": "Nakala imehifadhiwa kwenye kidhibiti cha nywila",
-      "keychainFailed": "Imeshindwa kuhifadhi nakala",
+      "passwordManagerBackupSaved": "Nakala imehifadhiwa kwenye kidhibiti cha nywila",
+      "passwordManagerBackupFailed": "Imeshindwa kuhifadhi nakala",
+      "passwordManagerUnavailable": "Hakuna kidhibiti cha nenosiri kinachopatikana kwenye kifaa hiki. Tumia nakala rudufu ya Drive au hifadhi maneno yako 12 mwenyewe.",
       "iOSComingSoon": "Hifadhi nakala ya iCloud inakuja hivi karibuni"
     },
     "ManualBackup": {
@@ -3507,7 +3499,9 @@
         "saveItNow": "Hifadhi sasa",
         "savedConfirm": "Nimehifadhi",
         "copy": "Nakili",
-        "continueButton": "Endelea"
+        "continueButton": "Endelea",
+        "selfCustodialDisabled": "Isiyo ya udhamini haipatikani kwa muda.",
+        "testBackup": "Jaribu hifadhi yako"
       },
       "Confirm": {
         "headerTitle": "Thibitisha maneno ya nakala",
@@ -3518,7 +3512,8 @@
         "incorrectWord": "Neno si sahihi, tafadhali kagua mpangilio"
       },
       "Success": {
-        "title": "Karibu kwa Blink isiyo na uhifadhi"
+        "title": "Karibu kwa Blink isiyo na uhifadhi",
+        "testSuccess": "Maneno yako ya hifadhi ni sahihi"
       }
     },
     "CloudBackup": {
@@ -3540,6 +3535,9 @@
       "signInFailed": "Imeshindwa kuingia kwenye Google",
       "existingBackupTitle": "Nakala imepatikana",
       "existingBackupMessage": "Tayari kuna nakala kwenye {provider} yako. Je, ungependa kuibadilisha?",
+      "existingBackupMessageWithDetails": "Hifadhi tayari ipo katika {provider} yako.\n\nAnwani ya Lightning: {address}\nIliundwa: {createdAt}\n\nUnataka kuandika juu yake?",
+      "existingBackupUnknownAddress": "Haipatikani",
+      "existingBackupUnknownCreatedAt": "Haijulikani",
       "overwrite": "Badilisha"
     }
   },
@@ -3553,8 +3551,8 @@
     "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Iliyohifadhiwa",
+    "selfCustodialLabel": "Isiyohifadhiwa",
     "custodialDescription": "Tunashikilia fedha kwa niaba yako",
     "selfCustodialDescription": "Wewe peke yako unaweza kufikia fedha",
     "continueButton": "Endelea",
@@ -3562,7 +3560,8 @@
     "descriptionSelected": "Tafadhali chagua aina ya akaunti.",
     "chooseMethod": "Chagua njia",
     "restoreComingSoonTitle": "Inakuja hivi karibuni",
-    "restoreComingSoonDescription": "Kipengele cha kurejesha kitapatikana katika sasisho la baadaye."
+    "restoreComingSoonDescription": "Kipengele cha kurejesha kitapatikana katika sasisho la baadaye.",
+    "createFailed": "Imeshindwa kuunda mkoba. Tafadhali jaribu tena."
   },
   "RestoreScreen": {
     "title": "Rejesha mkoba",
@@ -3581,7 +3580,9 @@
     "noBackupFound": "Hakuna hifadhi iliyopatikana",
     "noBackupDescription": "Hatukupata hifadhi. Unaweza kuingiza msemo wako wa hifadhi kwa mkono.",
     "enterPassword": "Ingiza nenosiri lako la usimbaji",
-    "wrongPassword": "Nenosiri si sahihi. Tafadhali jaribu tena."
+    "wrongPassword": "Nenosiri si sahihi. Tafadhali jaribu tena.",
+    "pickBackupTitle": "Chagua pochi",
+    "pickBackupDescription": "Chagua nakala rudufu ya kurejesha"
   },
   "BackupNudge": {
     "title": "Fedha zako ziko hatarini",
@@ -3590,11 +3591,7 @@
     "settingsWarning": "Hifadhi mkoba wako. Ukipoteza kifaa hiki, utapoteza fedha zako.",
     "modalTitle": "Linda fedha zako",
     "modalDescription": "Tunakushauri sana uhifadhi pochi yako ili kuzuia kupoteza fedha zako zote iwapo utapoteza kifaa hiki.",
-    "secureMe": "Linda pochi",
-    "trustModelTitle": "Wewe ndiye unayedhibiti",
-    "trustModelDescription": "Funguo zako zinadhibiti fedha zako. Miamala inashughulikiwa na waendeshaji wa Spark, si moja kwa moja kwenye Bitcoin L1.",
-    "trustModelWarning": "Salio ndogo sana huenda zisifae kiuchumi kurejesha kwenye mnyororo wa msingi wa Bitcoin.",
-    "trustModelDismiss": "Naelewa"
+    "secureMe": "Linda pochi"
   },
   "StableBalance": {
     "title": "Salio thabiti",
@@ -3618,12 +3615,6 @@
       "deactivateConfirm": "Zima",
       "cancel": "Futa"
     },
-    "firstTimeModal": {
-      "title": "Kuhusu Ubadilishaji",
-      "dualBalance": "BTC na USD ni salio mbili huru katika mkoba wako. Tumia Convert wakati wowote kuhamisha fedha kati yao.",
-      "trustDisclosure": "Modi ya USD hutumia tokeni za USDB kwenye Spark. Mawazo ya kuaminika ni tofauti na kushikilia BTC moja kwa moja. USDB inategemea mtoaji wa tokeni wa Spark.",
-      "acknowledge": "Naelewa"
-    },
     "minimumConversion": "Ubadilishaji mdogo zaidi: {amount:string}",
     "conversionUnavailable": "Ubadilishaji haupatikani kwa muda. Tafadhali jaribu tena."
   },
@@ -3638,7 +3629,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Kuunda mkoba wako...",
     "errorTitle": "Kuunda mkoba kumeshindikana",
     "errorDescription": "Kuna kitu kimekwenda vibaya. Tafadhali jaribu tena.",
@@ -3714,10 +3705,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Muhimu",
+    "dangerZoneBulletReinstated": "Akaunti iliyofutwa haiwezi kurejeshwa",
+    "dangerZoneBulletPermanent": "Kufuta akaunti ni kwa kudumu",
+    "dangerZoneBulletEmpty": "Hakikisha akaunti haina chochote",
+    "dangerZoneDeleteButton": "Futa akaunti na data",
+    "confirmModalTitle": "Thibitisha kufuta akaunti",
+    "confirmModalTypeToConfirm": "Andika \"{delete: string}\" kuthibitisha",
+    "hasFundsWarningTitle": "Onyo",
+    "hasFundsWarningBody": "Pochi yako ina salio la {balance}. Kwa usalama wako, hatukuruhusu kufuta akaunti zenye fedha.",
+    "hasFundsWarningHelper": "Ili kuendelea na kufutwa, futa fedha kwenye akaunti yako au changia kwa uchumi wa mzunguko.",
+    "hasFundsWarningButton": "Rudi nyuma"
   }
 }

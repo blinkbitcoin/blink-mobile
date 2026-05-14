@@ -64,7 +64,8 @@
         "title": "Convertir",
         "transfer": "Transférer",
         "percentageToConvert": "% à convertir",
-        "reviewTransfer": "Vérifier le transfert"
+        "reviewTransfer": "Vérifier le transfert",
+        "dustError": "La totalité du solde doit être transférée."
     },
     "ConversionConfirmationScreen": {
         "title": "Vérifier la conversion",
@@ -74,9 +75,7 @@
         "infoDollar": "Le montant en dollars est approximatif. Il peut varier légèrement.",
         "transferButtonText": "Transférer de {fromWallet} vers {toWallet}",
         "feeLabel": "Frais de conversion",
-        "feeError": "Impossible de récupérer les frais de conversion",
-        "amountFloored": "Montant augmenté pour atteindre le minimum de conversion.",
-        "amountDustBumped": "Montant augmenté pour convertir la totalité de votre solde."
+        "feeError": "Impossible de récupérer les frais de conversion"
     },
     "ConversionSuccessScreen": {
         "message": "Conversion réussie",
@@ -2173,8 +2172,8 @@
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Frais de dépôt : {fee} SAT pour les montants inférieurs à {threshold} SAT ou {overFee} SAT pour les dépôts supérieurs à {threshold} SAT",
         "autoConvertMinAmount": "Les montants inférieurs à {minSats: number} sats ne peuvent pas être convertis en Dollar automatiquement. Vous recevrez des Bitcoins.",
-        "autoConvertSuccess": "{amount: number} sats reçus, convertis en Dollars.",
-        "autoConvertFailed": "Paiement reçu mais la conversion a échoué."
+        "autoConvertFailed": "Paiement reçu mais la conversion a échoué.",
+        "pleaseWaitForConversion": "Veuillez patienter jusqu'à ce que la conversion soit terminée"
     },
     "RedeemBitcoinScreen": {
         "title": "Échanger des Bitcoin",
@@ -2350,7 +2349,6 @@
         "nonCustodialAccount": "Compte non-custodial",
         "tapUserName": "Appuyez pour définir l’identifiant",
         "notifications": "Notifications",
-        "recoveryMethod": "Méthode de récupération",
         "title": "Réglages",
         "darkMode": "Mode sombre",
         "setToDark": "Mode : sombre.",
@@ -2377,27 +2375,11 @@
         "receiveCurrency": "Devise de réception",
         "displayCurrency": "Devise d'affichage",
         "AccountInformation": {
-            "accountTypeLabel": "Type de compte",
             "identityLabel": "Identifiant du portefeuille",
             "backupStatusLabel": "État de la sauvegarde",
             "backupStatusCompleted": "Sauvegarde terminée",
             "backupStatusNotCompleted": "Sauvegarde incomplète",
             "loadError": "Impossible de charger les informations de votre compte."
-        },
-        "TransactionLimits": {
-            "protocolNote": "Les transactions Lightning et on-chain suivent les limites du protocole Bitcoin. Les limites de conversion ci-dessous sont appliquées par le réseau Spark.",
-            "btcToUsdTitle": "Bitcoin vers dollars",
-            "usdToBtcTitle": "Dollars vers Bitcoin",
-            "minFromLabel": "Minimum envoyé",
-            "minToLabel": "Minimum reçu",
-            "loadError": "Impossible de charger les limites de conversion."
-        },
-        "WaysToGetPaid": {
-            "lightningAddressTitle": "Adresse Lightning",
-            "lightningAddressDescription": "Partagez cette adresse pour recevoir des paiements Lightning instantanément.",
-            "onchainTitle": "Adresse de dépôt Bitcoin",
-            "onchainDescription": "Partagez cette adresse pour recevoir des Bitcoin on-chain.",
-            "loadError": "Impossible de charger vos coordonnées de paiement."
         }
     },
     "NotificationSettingsScreen": {
@@ -2437,6 +2419,7 @@
         "level": "Niveau {level: string}",
         "switchAccount": "Changer de compte",
         "pleaseWait": "Veuillez patienter.",
+        "probeBalanceFailed": "Impossible de vérifier le solde du portefeuille. Veuillez réessayer.",
         "accountLevel": "Niveau du compte",
         "upgrade": "Mettre à jour votre compte",
         "logOutAndDeleteLocalData": "Se déconnecter et effacer toutes les données locales",
@@ -2476,6 +2459,8 @@
         "copiedAccountId": "Copier votre identifiant de compte dans le presse-papiers",
         "yourAccountId": "Votre identifiant de compte",
         "accountId": "Identifiant du compte",
+        "publicKey": "Clé publique",
+        "copiedPublicKey": "Clé publique copiée dans le presse-papiers",
         "copy": "Copier",
         "identityVerification": "Vérification d'identité"
     },
@@ -2506,7 +2491,9 @@
     },
     "DefaultWalletScreen": {
         "title": "Compte de réception par défaut",
-        "info": "Votre Compte Bitcoin est pour accumuler des sats, où la valeur USD évolue avec le marché. Votre Compte dollar est propulsé par Stablesats — il détient du Bitcoin couvert pour rester stable en valeur USD. Vous détenez toujours du Bitcoin, mais la valeur en dollars ne change pas."
+        "info": "Votre Compte Bitcoin est pour accumuler des sats, où la valeur USD évolue avec le marché. Votre Compte dollar est propulsé par Stablesats — il détient du Bitcoin couvert pour rester stable en valeur USD. Vous détenez toujours du Bitcoin, mais la valeur en dollars ne change pas.",
+        "titleSelfCustodial": "Compte par défaut",
+        "infoSelfCustodial": "Ce compte sera utilisé par défaut lors de la réception et de l'envoi. Vous pouvez changer à tout moment."
     },
     "ThemeScreen": {
         "title": "Thème",
@@ -2524,7 +2511,10 @@
         "header": "Votre Compte dollar est propulsé par Stablesats",
         "body": "Compte dollar utilise la technologie Stablesats pour maintenir le Bitcoin stable au prix USD. Vous détenez toujours du Bitcoin — pas de vrais dollars — mais la valeur USD ne fluctue pas. Vous pouvez envoyer et recevoir du Bitcoin normalement, mais ce n'est pas compatible avec le système bancaire traditionnel.",
         "termsAndConditions": "Lire les Termes & Conditions",
-        "learnMore": "En savoir plus sur Stablesats"
+        "learnMore": "En savoir plus sur Stablesats",
+        "headerSelfCustodial": "Votre compte Dollar contient des stablecoins",
+        "bodySelfCustodial": "Dans le compte Dollar, vous détenez des stablecoins. Des jetons adossés à des actifs et dont la valeur est maintenue stable par rapport au dollar américain. Vous ne pouvez pas encore envoyer ni recevoir de stablecoins. Lorsque vous envoyez depuis le compte Dollar, vos stablecoins sont échangés et envoyés en Bitcoin au destinataire.",
+        "learnMoreSelfCustodial": "En savoir plus"
     },
     "SplashScreen": {
         "update": "Votre application n’est plus à jour. Une mise à jour est nécessaire avant que l’application puisse être utilisée.\n\nCela peut être fait depuis le PlayStore pour Android et Testflight pour iOS"
@@ -2805,6 +2795,7 @@
         "submit": "Soumettre ",
         "success": "Succès !",
         "dollarStablesats": "dollar (Stablesats)",
+        "dollarStablecoin": "dollar (Stablecoin)",
         "to": "À",
         "total": "Total",
         "transactions": "Transactions",
@@ -3517,8 +3508,9 @@
             "appleICloud": "Apple iCloud",
             "passwordManager": "Gestionnaire de mots de passe",
             "manualBackup": "Sauvegarde manuelle",
-            "keychainSaved": "Sauvegarde enregistrée dans le gestionnaire de mots de passe",
-            "keychainFailed": "Échec de l’enregistrement de la sauvegarde",
+            "passwordManagerBackupSaved": "Sauvegarde enregistrée dans le gestionnaire de mots de passe",
+            "passwordManagerBackupFailed": "Échec de l’enregistrement de la sauvegarde",
+            "passwordManagerUnavailable": "Aucun gestionnaire de mots de passe n'est disponible sur cet appareil. Utilisez la sauvegarde Drive ou enregistrez votre phrase de 12 mots manuellement.",
             "iOSComingSoon": "La sauvegarde iCloud arrive bientôt"
         },
         "ManualBackup": {
@@ -3536,7 +3528,9 @@
                 "saveItNow": "Enregistrez-la maintenant",
                 "savedConfirm": "Je l'ai sauvegardée",
                 "copy": "Copier",
-                "continueButton": "Continuer"
+                "continueButton": "Continuer",
+                "selfCustodialDisabled": "Non-custodial est temporairement indisponible.",
+                "testBackup": "Tester votre sauvegarde"
             },
             "Confirm": {
                 "headerTitle": "Confirmer la phrase de sauvegarde",
@@ -3547,7 +3541,8 @@
                 "incorrectWord": "Mot incorrect, veuillez vérifier l'ordre"
             },
             "Success": {
-                "title": "Bienvenue sur Blink non-custodial"
+                "title": "Bienvenue sur Blink non-custodial",
+                "testSuccess": "Votre phrase de sauvegarde est correcte"
             }
         },
         "CloudBackup": {
@@ -3569,6 +3564,9 @@
             "signInFailed": "Échec de la connexion à Google",
             "existingBackupTitle": "Sauvegarde trouvée",
             "existingBackupMessage": "Une sauvegarde existe déjà dans votre {provider}. Voulez-vous la remplacer ?",
+            "existingBackupMessageWithDetails": "Une sauvegarde existe déjà sur votre {provider}.\n\nAdresse Lightning : {address}\nCréée : {createdAt}\n\nVoulez-vous l'écraser ?",
+            "existingBackupUnknownAddress": "Non disponible",
+            "existingBackupUnknownCreatedAt": "Inconnu",
             "overwrite": "Remplacer"
         }
     },
@@ -3582,8 +3580,8 @@
         "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes."
     },
     "AccountTypeSelectionScreen": {
-        "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark",
+        "custodialLabel": "Sous garde",
+        "selfCustodialLabel": "Sans garde",
         "custodialDescription": "Nous gardons les fonds en votre nom",
         "selfCustodialDescription": "Vous seul pouvez accéder aux fonds",
         "continueButton": "Continuer",
@@ -3591,7 +3589,8 @@
         "descriptionSelected": "Veuillez choisir le type de compte.",
         "chooseMethod": "Choisir la méthode",
         "restoreComingSoonTitle": "Bientôt disponible",
-        "restoreComingSoonDescription": "La fonction de restauration sera disponible dans une mise à jour future."
+        "restoreComingSoonDescription": "La fonction de restauration sera disponible dans une mise à jour future.",
+        "createFailed": "Échec de la création du portefeuille. Veuillez réessayer."
     },
     "RestoreScreen": {
         "title": "Restaurer le portefeuille",
@@ -3610,7 +3609,9 @@
         "noBackupFound": "Aucune sauvegarde trouvée",
         "noBackupDescription": "Nous n'avons pas trouvé de sauvegarde. Vous pouvez entrer votre phrase de sauvegarde manuellement.",
         "enterPassword": "Entrez votre mot de passe de chiffrement",
-        "wrongPassword": "Mot de passe incorrect. Veuillez réessayer."
+        "wrongPassword": "Mot de passe incorrect. Veuillez réessayer.",
+        "pickBackupTitle": "Choisissez un portefeuille",
+        "pickBackupDescription": "Sélectionnez une sauvegarde à restaurer"
     },
     "BackupNudge": {
         "title": "Vos fonds sont en danger",
@@ -3619,11 +3620,7 @@
         "settingsWarning": "Sauvegardez votre portefeuille. Si vous perdez cet appareil, vous perdrez vos fonds.",
         "modalTitle": "Sécurisez vos fonds",
         "modalDescription": "Nous vous recommandons vivement de sauvegarder votre portefeuille pour éviter une perte totale de fonds en cas de perte de cet appareil.",
-        "secureMe": "Sécuriser le portefeuille",
-        "trustModelTitle": "Vous avez le contrôle",
-        "trustModelDescription": "Vos clés contrôlent vos fonds. Les transactions sont traitées par les opérateurs Spark, non validées directement sur Bitcoin L1.",
-        "trustModelWarning": "Les très petits soldes peuvent ne pas être économiques à récupérer sur la chaîne de base Bitcoin.",
-        "trustModelDismiss": "Je comprends"
+        "secureMe": "Sécuriser le portefeuille"
     },
     "StableBalance": {
         "title": "Solde stable",
@@ -3647,12 +3644,6 @@
             "deactivateConfirm": "Désactiver",
             "cancel": "Annuler"
         },
-        "firstTimeModal": {
-            "title": "À propos de la Conversion",
-            "dualBalance": "BTC et USD sont deux soldes indépendants dans votre portefeuille. Utilisez Convert à tout moment pour déplacer des fonds entre eux.",
-            "trustDisclosure": "Le mode USD utilise des jetons USDB sur Spark. Les hypothèses de confiance diffèrent de la détention directe de BTC. USDB repose sur l'émetteur de jetons de Spark.",
-            "acknowledge": "Je comprends"
-        },
         "minimumConversion": "Conversion minimale : {amount:string}",
         "conversionUnavailable": "La conversion est temporairement indisponible. Veuillez réessayer."
     },
@@ -3667,7 +3658,7 @@
         "featureEarn": "Gagner",
         "featureCard": "Carte"
     },
-    "SparkWalletCreationScreen": {
+    "WalletCreationScreen": {
         "creating": "Création de votre portefeuille...",
         "errorTitle": "Échec de la création du portefeuille",
         "errorDescription": "Quelque chose s'est mal passé. Veuillez réessayer.",
@@ -3743,10 +3734,16 @@
         "degradedBanner": "Le réseau Spark est actuellement dégradé. Les paiements peuvent prendre plus de temps."
     },
     "SelfCustodialDelete": {
-        "title": "Supprimer le portefeuille auto-custodial",
-        "warning": "Cela supprimera ce portefeuille de cet appareil.",
-        "recoveryNote": "Si vous avez sauvegardé votre phrase de sauvegarde, vous pouvez restaurer ce portefeuille sur n'importe quel appareil. Sinon, vous perdrez l'accès à vos fonds.",
-        "backupBadgeCompleted": "Sauvegarde terminée",
-        "backupBadgeMissing": "Sauvegarde incomplète"
+        "dangerZoneImportantTitle": "Important",
+        "dangerZoneBulletReinstated": "Un compte supprimé ne peut pas être rétabli",
+        "dangerZoneBulletPermanent": "La suppression du compte est définitive",
+        "dangerZoneBulletEmpty": "Assure-toi que le compte est vide",
+        "dangerZoneDeleteButton": "Supprimer compte et données",
+        "confirmModalTitle": "Confirmer la suppression du compte",
+        "confirmModalTypeToConfirm": "Saisissez \"{delete: string}\" pour confirmer",
+        "hasFundsWarningTitle": "Avertissement",
+        "hasFundsWarningBody": "Votre portefeuille a un solde de {balance}. Pour votre sécurité, nous n'autorisons pas la suppression de comptes contenant des fonds.",
+        "hasFundsWarningHelper": "Pour poursuivre la suppression, videz votre compte ou faites un don à des économies circulaires.",
+        "hasFundsWarningButton": "Retour"
     }
 }

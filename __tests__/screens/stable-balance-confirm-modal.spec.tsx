@@ -39,7 +39,6 @@ const baseProps: ModalProps = {
   isVisible: true,
   isActivating: true,
   feeText: "$0.05",
-  adjustmentText: null,
   isLoading: false,
   hasError: false,
   showFeeRow: true,

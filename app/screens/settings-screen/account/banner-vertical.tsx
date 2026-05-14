@@ -6,16 +6,20 @@
  */
 import React from "react"
 import { View } from "react-native"
-import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 
-import { useSettingsScreenQuery } from "@app/graphql/generated"
-import { AccountLevel, useLevel } from "@app/graphql/level-context"
-import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, Skeleton, Avatar } from "@rn-vui/themed"
+
+import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { AccountType } from "@app/types/wallet"
 
 export const AccountBannerVertical: React.FC = () => {
   const styles = useStyles()
@@ -29,16 +33,44 @@ export const AccountBannerVertical: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const { currentLevel } = useLevel()
+  const { activeAccount } = useAccountRegistry()
+  const { lightningAddress: selfCustodialLightningAddress } = useSelfCustodialWallet()
+  const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
   const isUserLoggedIn = currentLevel !== AccountLevel.NonAuth
 
-  const { data, loading } = useSettingsScreenQuery({ fetchPolicy: "cache-first" })
+  const { data, loading } = useSettingsScreenQuery({
+    fetchPolicy: "cache-first",
+    skip: isSelfCustodial,
+  })
 
   const hasUsername = Boolean(data?.me?.username)
-  const lnAddress = `${data?.me?.username}@${lnAddressHostname}`
-
-  const usernameTitle = hasUsername ? lnAddress : LL.common.blinkUser()
+  const custodialLnAddress = `${data?.me?.username}@${lnAddressHostname}`
 
   if (loading) return <Skeleton style={styles.outer} animation="pulse" />
+
+  if (isSelfCustodial) {
+    const subtitle = LL.SettingsScreen.nonCustodialAccount()
+    const avatarChar = (selfCustodialLightningAddress ?? subtitle).charAt(0)
+    return (
+      <View style={styles.outer}>
+        <Avatar
+          size={80}
+          rounded
+          title={avatarChar}
+          containerStyle={styles.containerStyle}
+          titleStyle={styles.titleStyle}
+        />
+        <View style={styles.textContainer}>
+          {selfCustodialLightningAddress ? (
+            <Text type="p2">{selfCustodialLightningAddress}</Text>
+          ) : null}
+          <Text type="p2">{subtitle}</Text>
+        </View>
+      </View>
+    )
+  }
+
+  const usernameTitle = hasUsername ? custodialLnAddress : LL.common.blinkUser()
 
   return (
     <TouchableWithoutFeedback

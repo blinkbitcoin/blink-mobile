@@ -100,18 +100,18 @@ describe("migration-checkpoint-storage", () => {
 
   describe("resolveCheckpointRoute", () => {
     it("returns default for null checkpoint", () => {
-      expect(resolveCheckpointRoute(null)).toBe("sparkMigrationExplainer")
+      expect(resolveCheckpointRoute(null)).toBe("accountMigrationExplainer")
     })
 
     it("returns correct route for BackupMethod", () => {
       expect(resolveCheckpointRoute(MigrationCheckpoint.BackupMethod)).toBe(
-        "sparkBackupMethodScreen",
+        "selfCustodialBackupMethod",
       )
     })
 
     it("returns correct route for BackupAlerts", () => {
       expect(resolveCheckpointRoute(MigrationCheckpoint.BackupAlerts)).toBe(
-        "sparkBackupAlertsScreen",
+        "selfCustodialBackupSecurityChecks",
       )
     })
 
@@ -120,7 +120,7 @@ describe("migration-checkpoint-storage", () => {
       Object.defineProperty(Platform, "OS", { value: "android" })
 
       expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toBe(
-        "sparkCloudBackupScreen",
+        "selfCustodialCloudBackup",
       )
 
       Object.defineProperty(Platform, "OS", { value: original })
@@ -131,7 +131,7 @@ describe("migration-checkpoint-storage", () => {
       Object.defineProperty(Platform, "OS", { value: "ios" })
 
       expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toBe(
-        "sparkMigrationExplainer",
+        "accountMigrationExplainer",
       )
 
       Object.defineProperty(Platform, "OS", { value: original })
@@ -170,11 +170,10 @@ describe("migration-checkpoint-storage", () => {
       expect(result).toBeNull()
     })
 
-    it("returns null and clears on storage error", async () => {
+    it("clears the key and re-throws on storage error so the caller can report", async () => {
       mockLoadJson.mockRejectedValue(new Error("corrupt"))
 
-      const result = await loadCheckpoint("test-key")
-      expect(result).toBeNull()
+      await expect(loadCheckpoint("test-key")).rejects.toThrow("corrupt")
       expect(mockRemove).toHaveBeenCalledWith("test-key")
     })
 

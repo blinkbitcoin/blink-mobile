@@ -168,6 +168,7 @@ export const PaymentRequestState = {
   Created: "Created",
   Error: "Error",
   Paid: "Paid",
+  Converting: "Converting",
   Expired: "Expired",
 } as const
 export type PaymentRequestStateType =

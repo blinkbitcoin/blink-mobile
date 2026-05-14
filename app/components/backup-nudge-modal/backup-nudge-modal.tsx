@@ -4,11 +4,11 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 
+import { GaloyIcon } from "../atomic/galoy-icon"
 import CustomModal from "../custom-modal/custom-modal"
 
 type BackupNudgeModalProps = {
@@ -29,7 +29,7 @@ export const BackupNudgeModal: React.FC<BackupNudgeModalProps> = ({
 
   const handleSecure = () => {
     onClose()
-    navigation.navigate("sparkBackupMethodScreen")
+    navigation.navigate("selfCustodialBackupMethod")
   }
 
   return (

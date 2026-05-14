@@ -128,8 +128,17 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 }))
 
 const useSelfCustodialWalletMock = jest.fn(() => ({ sdk: undefined }))
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => useSelfCustodialWalletMock(),
+}))
+
+const useScanContextMock = jest.fn(() => ({
+  myWalletIds: ["btc-wallet-id"],
+  bitcoinNetwork: "mainnet",
+  lnurlDomains: ["blink.sv", "blink.sv", "pay.blink.sv", "pay.bbw.sv"],
+}))
+jest.mock("@app/hooks/use-scan-context", () => ({
+  useScanContext: () => useScanContextMock(),
 }))
 
 jest.mock("@app/self-custodial/payment-details/wrap-destination", () => ({
@@ -177,6 +186,11 @@ describe("SendBitcoinDestinationScreen", () => {
       accountType: "Custodial",
     })
     useSelfCustodialWalletMock.mockReturnValue({ sdk: undefined })
+    useScanContextMock.mockReturnValue({
+      myWalletIds: ["btc-wallet-id"],
+      bitcoinNetwork: "mainnet",
+      lnurlDomains: ["blink.sv", "blink.sv", "pay.blink.sv", "pay.bbw.sv"],
+    })
     mockedDestinationData = {
       globals: { network: "mainnet" },
       me: {
@@ -979,6 +993,11 @@ describe("SendBitcoinDestinationScreen paste buttons", () => {
         accountType: "Custodial",
       })
       useSelfCustodialWalletMock.mockReturnValue({ sdk: undefined })
+      useScanContextMock.mockReturnValue({
+        myWalletIds: ["btc-wallet-id"],
+        bitcoinNetwork: "mainnet",
+        lnurlDomains: ["blink.sv", "blink.sv", "pay.blink.sv", "pay.bbw.sv"],
+      })
     })
 
     const triggerParseDestination = async () => {
@@ -990,7 +1009,7 @@ describe("SendBitcoinDestinationScreen paste buttons", () => {
       await flushAsync()
     }
 
-    it("passes empty lnurlDomains when active wallet is self-custodial", async () => {
+    it("forwards adapter lnurlDomains=[] from useScanContext (self-custodial)", async () => {
       useActiveWalletMock.mockReturnValue({
         isSelfCustodial: true,
         isReady: true,
@@ -998,6 +1017,11 @@ describe("SendBitcoinDestinationScreen paste buttons", () => {
         wallets: activeWalletWallets,
         status: "ready",
         accountType: "SelfCustodial",
+      })
+      useScanContextMock.mockReturnValue({
+        myWalletIds: ["btc-wallet-id"],
+        bitcoinNetwork: "mainnet",
+        lnurlDomains: [],
       })
       parseDestinationMock.mockResolvedValue({
         valid: false,
@@ -1022,7 +1046,7 @@ describe("SendBitcoinDestinationScreen paste buttons", () => {
       )
     })
 
-    it("passes [lnAddressHostname, ...LNURL_DOMAINS] when active wallet is custodial", async () => {
+    it("forwards adapter lnurlDomains from useScanContext (custodial)", async () => {
       parseDestinationMock.mockResolvedValue({
         valid: false,
         invalidReason: InvalidDestinationReason.UsernameDoesNotExist,

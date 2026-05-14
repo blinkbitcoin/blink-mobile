@@ -14,6 +14,7 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
+import { AccountTypeMode } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 
@@ -21,8 +22,8 @@ import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 
 export type RootStackParamList = {
   getStarted: undefined
-  accountTypeSelection: { mode: "create" | "restore" }
-  sparkWalletCreation: undefined
+  accountTypeSelection: { mode: AccountTypeMode }
+  selfCustodialWalletCreation: undefined
   liteDeviceAccount: {
     appCheckToken: string
   }
@@ -182,23 +183,23 @@ export type RootStackParamList = {
   cardOnboardingPreapprovedScreen: undefined
   cardOnboardingProcessingScreen: undefined
   cardOnboardingApprovedScreen: undefined
-  sparkBackupMethodScreen: undefined
-  sparkCloudBackupScreen: undefined
-  sparkBackupAlertsScreen: undefined
-  sparkBackupPhraseScreen: { step: PhraseStep }
-  sparkBackupConfirmScreen: {
+  selfCustodialBackupMethod: undefined
+  selfCustodialCloudBackup: undefined
+  selfCustodialBackupSecurityChecks: undefined
+  selfCustodialBackupPhrase: { step: PhraseStep }
+  selfCustodialViewBackupSecurityChecks: undefined
+  selfCustodialViewBackupPhrase: undefined
+  selfCustodialBackupPhraseConfirm: {
     challenges: Array<{ index: number; word: string }>
+    successMessage?: string
   }
-  sparkBackupSuccessScreen: { reBackup?: boolean } | undefined
-  sparkMigrationExplainer: undefined
-  sparkMigrationTransferringFunds: undefined
-  sparkRestorePhraseScreen: { step: PhraseStep; words?: string[] }
-  sparkRestoreMethodScreen: undefined
-  sparkCloudRestoreScreen: undefined
+  selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
+  accountMigrationExplainer: undefined
+  accountMigrationTransferringFunds: undefined
+  selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
+  selfCustodialRestoreMethod: undefined
+  selfCustodialCloudRestore: undefined
   stableBalanceSettings: undefined
-  selfCustodialAccountInformationScreen: undefined
-  selfCustodialTransactionLimitsScreen: undefined
-  selfCustodialBitcoinDepositScreen: undefined
 }
 
 export type OnboardingStackParamList = {
