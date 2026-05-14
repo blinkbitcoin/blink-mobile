@@ -4,7 +4,7 @@ import { fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
-import { SparkViewBackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manual-backup/view-backup-phrase-screen"
+import { ViewBackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manual-backup/view-backup-phrase-screen"
 
 import { ContextForScreen } from "../../../helper"
 
@@ -36,7 +36,7 @@ jest.mock("@app/utils/external", () => ({
 loadLocale("en")
 const LL = i18nObject("en")
 
-describe("SparkViewBackupPhraseScreen", () => {
+describe("ViewBackupPhraseScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -44,7 +44,7 @@ describe("SparkViewBackupPhraseScreen", () => {
   it("renders all 12 words once the mnemonic loads", async () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkViewBackupPhraseScreen />
+        <ViewBackupPhraseScreen />
       </ContextForScreen>,
     )
 
@@ -57,7 +57,7 @@ describe("SparkViewBackupPhraseScreen", () => {
   it("shows the Copy button and the spark-compatible wallet link", async () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkViewBackupPhraseScreen />
+        <ViewBackupPhraseScreen />
       </ContextForScreen>,
     )
 
@@ -71,7 +71,7 @@ describe("SparkViewBackupPhraseScreen", () => {
   it("copies the full mnemonic to the clipboard", async () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkViewBackupPhraseScreen />
+        <ViewBackupPhraseScreen />
       </ContextForScreen>,
     )
 
@@ -89,7 +89,7 @@ describe("SparkViewBackupPhraseScreen", () => {
   it("opens the spark-compatible link from the info banner", async () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkViewBackupPhraseScreen />
+        <ViewBackupPhraseScreen />
       </ContextForScreen>,
     )
 
@@ -102,7 +102,7 @@ describe("SparkViewBackupPhraseScreen", () => {
   it("renders the Test your backup CTA", async () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkViewBackupPhraseScreen />
+        <ViewBackupPhraseScreen />
       </ContextForScreen>,
     )
 
@@ -113,7 +113,7 @@ describe("SparkViewBackupPhraseScreen", () => {
   it("navigates to confirm with challenges and the dynamic success message", async () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkViewBackupPhraseScreen />
+        <ViewBackupPhraseScreen />
       </ContextForScreen>,
     )
 
@@ -121,7 +121,7 @@ describe("SparkViewBackupPhraseScreen", () => {
     fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.testBackup()))
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      "sparkBackupConfirmScreen",
+      "selfCustodialBackupPhraseConfirm",
       expect.objectContaining({
         challenges: expect.arrayContaining([
           expect.objectContaining({

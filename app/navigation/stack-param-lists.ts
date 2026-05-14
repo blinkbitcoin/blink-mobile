@@ -188,8 +188,8 @@ export type RootStackParamList = {
   selfCustodialBackupSecurityChecks: undefined
   selfCustodialBackupPhrase: { step: PhraseStep }
   selfCustodialViewBackupSecurityChecks: undefined
-  sparkViewBackupPhraseScreen: undefined
-  sparkBackupConfirmScreen: {
+  selfCustodialViewBackupPhrase: undefined
+  selfCustodialBackupPhraseConfirm: {
     challenges: Array<{ index: number; word: string }>
     successMessage?: string
   }

@@ -135,8 +135,8 @@ import {
   BackupSecurityChecksScreen,
   BackupPhraseScreen,
   ViewBackupSecurityChecksScreen,
-  SparkViewBackupPhraseScreen,
-  SparkBackupConfirmScreen,
+  ViewBackupPhraseScreen,
+  BackupPhraseConfirmScreen,
   BackupSuccessScreen,
   SparkWalletCreationScreen,
 } from "@app/screens/self-custodial/onboarding"
@@ -784,15 +784,15 @@ export const RootStack = () => {
         options={{ title: "" }}
       />
       <RootNavigator.Screen
-        name="sparkViewBackupPhraseScreen"
-        component={SparkViewBackupPhraseScreen}
+        name="selfCustodialViewBackupPhrase"
+        component={ViewBackupPhraseScreen}
         options={{
           title: LL.BackupScreen.ManualBackup.Phrase.headerTitle(),
         }}
       />
       <RootNavigator.Screen
-        name="sparkBackupConfirmScreen"
-        component={SparkBackupConfirmScreen}
+        name="selfCustodialBackupPhraseConfirm"
+        component={BackupPhraseConfirmScreen}
         options={{
           title: LL.BackupScreen.ManualBackup.Confirm.headerTitle(),
         }}

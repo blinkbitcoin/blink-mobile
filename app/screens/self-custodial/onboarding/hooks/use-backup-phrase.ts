@@ -61,7 +61,7 @@ export const useBackupPhrase = (step: PhraseStep) => {
       return
     }
     const challenges = buildConfirmChallenges(words, 3)
-    navigation.navigate("sparkBackupConfirmScreen", { challenges })
+    navigation.navigate("selfCustodialBackupPhraseConfirm", { challenges })
   }, [isStep1, navigation, words])
 
   const buttonTitle = (() => {

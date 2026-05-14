@@ -76,7 +76,7 @@ describe("ViewBackupPhraseSetting", () => {
     const { getByTestId } = render(<ViewBackupPhraseSetting />)
     fireEvent.press(getByTestId("settings-row"))
 
-    expect(mockNavigate).not.toHaveBeenCalledWith("sparkViewBackupPhraseScreen")
+    expect(mockNavigate).not.toHaveBeenCalledWith("selfCustodialViewBackupPhrase")
   })
 
   it("returns null when custodial account", () => {

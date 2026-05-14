@@ -161,7 +161,7 @@ describe("BackupPhraseScreen", () => {
       await waitFor(() => expect(getByText("ritual")).toBeTruthy())
       fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.savedConfirm()))
       expect(mockNavigate).toHaveBeenCalledWith(
-        "sparkBackupConfirmScreen",
+        "selfCustodialBackupPhraseConfirm",
         expect.objectContaining({
           challenges: expect.arrayContaining([
             expect.objectContaining({

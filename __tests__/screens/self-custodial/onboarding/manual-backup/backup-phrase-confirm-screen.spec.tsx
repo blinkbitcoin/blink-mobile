@@ -3,7 +3,7 @@ import { render, fireEvent } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
-import { SparkBackupConfirmScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-confirm-screen"
+import { BackupPhraseConfirmScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-confirm-screen"
 import { ContextForScreen } from "../../../helper"
 
 jest.mock("react-native-inappbrowser-reborn", () => ({
@@ -81,7 +81,7 @@ const LL = i18nObject("en")
 
 const mockSetBackupCompleted = jest.fn()
 
-describe("SparkBackupConfirmScreen", () => {
+describe("BackupPhraseConfirmScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.useFakeTimers()
@@ -110,7 +110,7 @@ describe("SparkBackupConfirmScreen", () => {
   it("renders subtitle and input fields", () => {
     const { getByText, getByPlaceholderText } = render(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
 
@@ -129,7 +129,7 @@ describe("SparkBackupConfirmScreen", () => {
   it("shows enter words label when inputs are empty", () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
 
@@ -139,7 +139,7 @@ describe("SparkBackupConfirmScreen", () => {
   it("shows autocomplete suggestions when typing 3+ characters", () => {
     const { getByPlaceholderText, getByText } = render(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
 
@@ -155,7 +155,7 @@ describe("SparkBackupConfirmScreen", () => {
   it("fills input when suggestion is selected", () => {
     const { getByPlaceholderText, getByText } = render(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
 
@@ -171,7 +171,7 @@ describe("SparkBackupConfirmScreen", () => {
   it("shows word number when input has content", () => {
     const { getByPlaceholderText, getByText } = render(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
 
@@ -214,7 +214,7 @@ describe("SparkBackupConfirmScreen", () => {
 
     const { getByPlaceholderText } = render(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
 
@@ -234,7 +234,7 @@ describe("SparkBackupConfirmScreen", () => {
 
     const { getByPlaceholderText } = render(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
 
@@ -252,7 +252,7 @@ describe("SparkBackupConfirmScreen", () => {
 
     const { getByPlaceholderText } = render(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
 
@@ -273,7 +273,7 @@ describe("SparkBackupConfirmScreen", () => {
 
     const { getByPlaceholderText } = render(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
 
@@ -303,7 +303,7 @@ describe("SparkBackupConfirmScreen", () => {
 
     const { getByPlaceholderText } = render(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
 
@@ -325,7 +325,7 @@ describe("SparkBackupConfirmScreen", () => {
 
     const { getByPlaceholderText, rerender } = render(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
 
@@ -338,7 +338,7 @@ describe("SparkBackupConfirmScreen", () => {
     mockCheckpointLoading.mockReturnValue(false)
     rerender(
       <ContextForScreen>
-        <SparkBackupConfirmScreen />
+        <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
     jest.advanceTimersByTime(500)

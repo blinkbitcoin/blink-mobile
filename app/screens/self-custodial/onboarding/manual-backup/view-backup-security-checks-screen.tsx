@@ -12,7 +12,7 @@ export const ViewBackupSecurityChecksScreen: React.FC = () => {
 
   return (
     <BackupPhraseSecurityChecks
-      onContinue={() => navigation.navigate("sparkViewBackupPhraseScreen")}
+      onContinue={() => navigation.navigate("selfCustodialViewBackupPhrase")}
     />
   )
 }
