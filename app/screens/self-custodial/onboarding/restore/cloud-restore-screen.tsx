@@ -17,7 +17,7 @@ import { OnboardingScreenLayout } from "../layouts"
 import { CloudBackupPicker } from "./cloud-backup-picker"
 import { useCloudRestore } from "./hooks/use-cloud-restore"
 
-export const SparkCloudRestoreScreen: React.FC = () => {
+export const CloudRestoreScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()

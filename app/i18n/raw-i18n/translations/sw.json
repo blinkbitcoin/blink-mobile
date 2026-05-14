@@ -3629,7 +3629,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Kuunda mkoba wako...",
     "errorTitle": "Kuunda mkoba kumeshindikana",
     "errorDescription": "Kuna kitu kimekwenda vibaya. Tafadhali jaribu tena.",

@@ -3670,7 +3670,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Mencipta dompet anda...",
     "errorTitle": "Penciptaan dompet gagal",
     "errorDescription": "Sesuatu telah berlaku. Sila cuba lagi.",

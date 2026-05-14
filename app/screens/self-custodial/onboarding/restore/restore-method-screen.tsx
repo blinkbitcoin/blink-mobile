@@ -65,7 +65,7 @@ export const RestoreMethodScreen: React.FC = () => {
         <>
           <GaloyPrimaryButton
             title={cloudProvider}
-            onPress={() => navigation.navigate("sparkCloudRestoreScreen")}
+            onPress={() => navigation.navigate("selfCustodialCloudRestore")}
             {...testProps("restore-cloud-button")}
           />
           <GaloySecondaryButton

@@ -9,7 +9,7 @@ import { testProps } from "@app/utils/testProps"
 
 import { CreationStatus, useCreateWallet } from "./hooks/use-create-wallet"
 
-export const SparkWalletCreationScreen: React.FC = () => {
+export const WalletCreationScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const { status, create } = useCreateWallet()
@@ -27,15 +27,15 @@ export const SparkWalletCreationScreen: React.FC = () => {
         <View style={styles.wrapper}>
           <View style={styles.body}>
             <Text type="h1" style={styles.title} {...testProps("error-title")}>
-              {LL.SparkWalletCreationScreen.errorTitle()}
+              {LL.WalletCreationScreen.errorTitle()}
             </Text>
             <Text style={styles.description}>
-              {LL.SparkWalletCreationScreen.errorDescription()}
+              {LL.WalletCreationScreen.errorDescription()}
             </Text>
           </View>
           <View style={styles.ctaContainer}>
             <GaloyPrimaryButton
-              title={LL.SparkWalletCreationScreen.retry()}
+              title={LL.WalletCreationScreen.retry()}
               onPress={create}
               {...testProps("retry-button")}
             />
@@ -50,7 +50,7 @@ export const SparkWalletCreationScreen: React.FC = () => {
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
         <Text style={styles.loadingText} {...testProps("creating-text")}>
-          {LL.SparkWalletCreationScreen.creating()}
+          {LL.WalletCreationScreen.creating()}
         </Text>
       </View>
     </Screen>

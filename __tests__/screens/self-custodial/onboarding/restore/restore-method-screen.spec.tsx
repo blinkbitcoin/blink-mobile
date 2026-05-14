@@ -103,7 +103,7 @@ describe("RestoreMethodScreen", () => {
     )
 
     fireEvent.press(getByTestId(`primary-${LL.BackupScreen.BackupMethod.appleICloud()}`))
-    expect(mockNavigate).toHaveBeenCalledWith("sparkCloudRestoreScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialCloudRestore")
   })
 
   it("navigates to the manual restore screen when the manual button is pressed", () => {

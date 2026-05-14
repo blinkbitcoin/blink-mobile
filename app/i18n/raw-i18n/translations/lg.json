@@ -3629,7 +3629,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Okukola wallet yo...",
     "errorTitle": "Okukola wallet kugaanye",
     "errorDescription": "Waliwo ekikyamu. Gezaako nate.",

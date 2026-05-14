@@ -3629,7 +3629,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Creant la teva cartera...",
     "errorTitle": "Error en crear la cartera",
     "errorDescription": "Alguna cosa ha anat malament. Si us plau, torna-ho a intentar.",

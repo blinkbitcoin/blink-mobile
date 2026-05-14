@@ -3629,7 +3629,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Se creează portofelul...",
     "errorTitle": "Crearea portofelului a eșuat",
     "errorDescription": "Ceva nu a mers bine. Vă rugăm încercați din nou.",

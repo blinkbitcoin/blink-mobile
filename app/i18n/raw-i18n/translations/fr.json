@@ -3658,7 +3658,7 @@
         "featureEarn": "Gagner",
         "featureCard": "Carte"
     },
-    "SparkWalletCreationScreen": {
+    "WalletCreationScreen": {
         "creating": "Création de votre portefeuille...",
         "errorTitle": "Échec de la création du portefeuille",
         "errorDescription": "Quelque chose s'est mal passé. Veuillez réessayer.",

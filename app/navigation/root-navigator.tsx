@@ -138,12 +138,12 @@ import {
   ViewBackupPhraseScreen,
   BackupPhraseConfirmScreen,
   BackupSuccessScreen,
-  SparkWalletCreationScreen,
+  WalletCreationScreen,
 } from "@app/screens/self-custodial/onboarding"
 import {
   RestoreMethodScreen,
   RestorePhraseScreen,
-  SparkCloudRestoreScreen,
+  CloudRestoreScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
 import {
   SparkMigrationExplainerScreen,
@@ -803,8 +803,8 @@ export const RootStack = () => {
         options={{ headerShown: false }}
       />
       <RootNavigator.Screen
-        name="sparkWalletCreation"
-        component={SparkWalletCreationScreen}
+        name="selfCustodialWalletCreation"
+        component={WalletCreationScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
@@ -833,8 +833,8 @@ export const RootStack = () => {
         options={{ title: LL.RestoreScreen.phraseTitle(), headerRight: () => null }}
       />
       <RootNavigator.Screen
-        name="sparkCloudRestoreScreen"
-        component={SparkCloudRestoreScreen}
+        name="selfCustodialCloudRestore"
+        component={CloudRestoreScreen}
         options={{ title: "" }}
       />
     </RootNavigator.Navigator>

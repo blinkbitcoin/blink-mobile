@@ -3617,7 +3617,7 @@
         "featureEarn": "Aprende",
         "featureCard": "Tarjeta"
     },
-    "SparkWalletCreationScreen": {
+    "WalletCreationScreen": {
         "creating": "Creando tu billetera...",
         "errorTitle": "Error al crear la billetera",
         "errorDescription": "Algo salió mal. Por favor, inténtalo de nuevo.",
