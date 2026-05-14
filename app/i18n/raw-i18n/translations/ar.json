@@ -3667,7 +3667,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "جارٍ إنشاء محفظتك...",
     "errorTitle": "فشل إنشاء المحفظة",
     "errorDescription": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",

@@ -6,4 +6,4 @@ export { ViewBackupSecurityChecksScreen } from "./manual-backup/view-backup-secu
 export { ViewBackupPhraseScreen } from "./manual-backup/view-backup-phrase-screen"
 export { BackupPhraseConfirmScreen } from "./manual-backup/backup-phrase-confirm-screen"
 export { BackupSuccessScreen } from "./backup-success-screen"
-export { SparkWalletCreationScreen } from "./wallet-creation-screen"
+export { WalletCreationScreen } from "./wallet-creation-screen"

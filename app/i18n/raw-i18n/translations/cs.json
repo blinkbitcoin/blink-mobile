@@ -3670,7 +3670,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Vytváření peněženky...",
     "errorTitle": "Vytvoření peněženky selhalo",
     "errorDescription": "Něco se pokazilo. Zkuste to prosím znovu.",

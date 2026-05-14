@@ -3671,7 +3671,7 @@
     "featureEarn": "Վաստակել",
     "featureCard": "Քարտ"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Ստեղծում ենք ձեր դրամապանակը...",
     "errorTitle": "Դրամապանակի ստեղծումը ձախողվեց",
     "errorDescription": "Ինչ-որ բան սխալ գնաց։ Խնդրում ենք կրկին փորձել։",

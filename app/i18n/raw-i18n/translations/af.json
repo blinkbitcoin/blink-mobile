@@ -3670,7 +3670,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Skep jou beursie...",
     "errorTitle": "Beursie skepping het misluk",
     "errorDescription": "Iets het verkeerd gegaan. Probeer asseblief weer.",

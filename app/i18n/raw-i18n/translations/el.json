@@ -3629,7 +3629,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Δημιουργία πορτοφολιού...",
     "errorTitle": "Αποτυχία δημιουργίας πορτοφολιού",
     "errorDescription": "Κάτι πήγε στραβά. Παρακαλώ δοκιμάστε ξανά.",

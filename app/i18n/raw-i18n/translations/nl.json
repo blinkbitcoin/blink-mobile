@@ -3670,7 +3670,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Portemonnee aanmaken...",
     "errorTitle": "Aanmaken portemonnee mislukt",
     "errorDescription": "Er is iets misgegaan. Probeer het opnieuw.",

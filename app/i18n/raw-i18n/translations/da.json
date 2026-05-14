@@ -3647,7 +3647,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Opretter din tegnebog...",
     "errorTitle": "Oprettelse af tegnebog mislykkedes",
     "errorDescription": "Noget gik galt. Prøv venligst igen.",

@@ -12175,7 +12175,7 @@ type RootTranslation = {
 		 */
 		conversionUnavailable: string
 	}
-	SparkWalletCreationScreen: {
+	WalletCreationScreen: {
 		/**
 		 * C​r​e​a​t​i​n​g​ ​y​o​u​r​ ​w​a​l​l​e​t​.​.​.
 		 */
@@ -24302,7 +24302,7 @@ export type TranslationFunctions = {
 		 */
 		conversionUnavailable: () => LocalizedString
 	}
-	SparkWalletCreationScreen: {
+	WalletCreationScreen: {
 		/**
 		 * Creating your wallet...
 		 */

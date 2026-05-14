@@ -3617,7 +3617,7 @@
         "featureEarn": "Verdienen",
         "featureCard": "Karte"
     },
-    "SparkWalletCreationScreen": {
+    "WalletCreationScreen": {
         "creating": "Erstelle dein Wallet...",
         "errorTitle": "Wallet-Erstellung fehlgeschlagen",
         "errorDescription": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",

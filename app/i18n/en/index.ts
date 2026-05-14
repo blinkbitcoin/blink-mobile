@@ -3831,7 +3831,7 @@ const en: BaseTranslation = {
     minimumConversion: "Minimum conversion: {amount:string}",
     conversionUnavailable: "Conversion is temporarily unavailable. Please try again.",
   },
-  SparkWalletCreationScreen: {
+  WalletCreationScreen: {
     creating: "Creating your wallet...",
     errorTitle: "Wallet creation failed",
     errorDescription: "Something went wrong. Please try again.",

@@ -3629,7 +3629,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Tárca létrehozása...",
     "errorTitle": "Tárca létrehozása sikertelen",
     "errorDescription": "Valami hiba történt. Kérjük, próbálja újra.",

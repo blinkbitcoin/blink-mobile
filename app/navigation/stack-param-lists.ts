@@ -23,7 +23,7 @@ import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 export type RootStackParamList = {
   getStarted: undefined
   accountTypeSelection: { mode: AccountTypeMode }
-  sparkWalletCreation: undefined
+  selfCustodialWalletCreation: undefined
   liteDeviceAccount: {
     appCheckToken: string
   }
@@ -198,7 +198,7 @@ export type RootStackParamList = {
   sparkMigrationTransferringFunds: undefined
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined
-  sparkCloudRestoreScreen: undefined
+  selfCustodialCloudRestore: undefined
   stableBalanceSettings: undefined
 }
 

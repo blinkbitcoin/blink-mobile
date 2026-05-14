@@ -3658,7 +3658,7 @@
         "featureEarn": "Earn",
         "featureCard": "Card"
     },
-    "SparkWalletCreationScreen": {
+    "WalletCreationScreen": {
         "creating": "ウォレットを作成中...",
         "errorTitle": "ウォレットの作成に失敗しました",
         "errorDescription": "エラーが発生しました。もう一度お試しください。",

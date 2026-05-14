@@ -3676,7 +3676,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Ukwenza isikhwama sakho...",
     "errorTitle": "Ukwenza isikhwama akuphumelelanga",
     "errorDescription": "Kukho into engahambanga kakuhle. Nceda uzame kwakhona.",

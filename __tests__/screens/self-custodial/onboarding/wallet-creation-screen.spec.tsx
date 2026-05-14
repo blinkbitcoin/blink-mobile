@@ -1,7 +1,7 @@
 import React from "react"
 import { render, waitFor, fireEvent } from "@testing-library/react-native"
 
-import { SparkWalletCreationScreen } from "@app/screens/self-custodial/onboarding/wallet-creation-screen"
+import { WalletCreationScreen } from "@app/screens/self-custodial/onboarding/wallet-creation-screen"
 
 const mockCreate = jest.fn()
 let mockStatus = "idle"
@@ -17,7 +17,7 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks/use-create-wallet", () =
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
-      SparkWalletCreationScreen: {
+      WalletCreationScreen: {
         creating: () => "Creating your wallet...",
         errorTitle: () => "Wallet creation failed",
         errorDescription: () => "Something went wrong. Please try again.",
@@ -59,28 +59,28 @@ jest.mock("@app/utils/testProps", () => ({
   testProps: (id: string) => ({ testID: id }),
 }))
 
-describe("SparkWalletCreationScreen", () => {
+describe("WalletCreationScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockStatus = "idle"
   })
 
   it("calls create on mount", () => {
-    render(<SparkWalletCreationScreen />)
+    render(<WalletCreationScreen />)
 
     expect(mockCreate).toHaveBeenCalledTimes(1)
   })
 
   it("shows loading state when creating", () => {
     mockStatus = "creating"
-    const { getByTestId } = render(<SparkWalletCreationScreen />)
+    const { getByTestId } = render(<WalletCreationScreen />)
 
     expect(getByTestId("creating-text")).toBeTruthy()
   })
 
   it("shows error state with retry button on error", () => {
     mockStatus = "error"
-    const { getByTestId, getByText } = render(<SparkWalletCreationScreen />)
+    const { getByTestId, getByText } = render(<WalletCreationScreen />)
 
     expect(getByTestId("error-title")).toBeTruthy()
     expect(getByText("Try again")).toBeTruthy()
@@ -88,7 +88,7 @@ describe("SparkWalletCreationScreen", () => {
 
   it("calls create on retry press", async () => {
     mockStatus = "error"
-    const { getByText } = render(<SparkWalletCreationScreen />)
+    const { getByText } = render(<WalletCreationScreen />)
 
     fireEvent.press(getByText("Try again"))
 

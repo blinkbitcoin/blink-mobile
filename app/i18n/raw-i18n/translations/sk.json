@@ -3629,7 +3629,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Vytváranie peňaženky...",
     "errorTitle": "Vytvorenie peňaženky zlyhalo",
     "errorDescription": "Niečo sa pokazilo. Skúste to prosím znova.",

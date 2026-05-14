@@ -3667,7 +3667,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "กำลังสร้างกระเป๋าเงิน...",
     "errorTitle": "สร้างกระเป๋าเงินล้มเหลว",
     "errorDescription": "มีบางอย่างผิดพลาด กรุณาลองอีกครั้ง",

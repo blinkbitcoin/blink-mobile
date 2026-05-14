@@ -3617,7 +3617,7 @@
         "featureEarn": "Aprenda",
         "featureCard": "Cartão"
     },
-    "SparkWalletCreationScreen": {
+    "WalletCreationScreen": {
         "creating": "Criando sua carteira...",
         "errorTitle": "Falha ao criar carteira",
         "errorDescription": "Algo deu errado. Por favor, tente novamente.",

@@ -3629,7 +3629,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Cüzdanınız oluşturuluyor...",
     "errorTitle": "Cüzdan oluşturma başarısız",
     "errorDescription": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",

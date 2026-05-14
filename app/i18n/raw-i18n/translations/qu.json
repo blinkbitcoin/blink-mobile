@@ -3667,7 +3667,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Walletaykita ruwachkanku...",
     "errorTitle": "Wallet ruway mana allinchu",
     "errorDescription": "Imapas mana allinchu. Watiqmanta ruway.",

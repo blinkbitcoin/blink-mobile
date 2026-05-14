@@ -3670,7 +3670,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Stvaranje novčanika...",
     "errorTitle": "Stvaranje novčanika nije uspjelo",
     "errorDescription": "Nešto je pošlo po krivu. Molimo pokušajte ponovo.",
