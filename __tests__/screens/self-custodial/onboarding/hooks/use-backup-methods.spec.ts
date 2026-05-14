@@ -132,7 +132,7 @@ describe("useBackupMethods", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ type: "success", message: "Backup saved" }),
       )
-      expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
     })
 
     it("stays silent when the user cancels", async () => {
@@ -203,7 +203,7 @@ describe("useBackupMethods", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ message: "Coming soon on iOS" }),
       )
-      expect(mockNavigate).not.toHaveBeenCalledWith("sparkCloudBackupScreen")
+      expect(mockNavigate).not.toHaveBeenCalledWith("selfCustodialCloudBackup")
     })
 
     it("navigates to the cloud backup screen on Android", () => {
@@ -215,7 +215,7 @@ describe("useBackupMethods", () => {
       })
 
       expect(result.current.isDriveBackupAvailable).toBe(true)
-      expect(mockNavigate).toHaveBeenCalledWith("sparkCloudBackupScreen")
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialCloudBackup")
     })
   })
 

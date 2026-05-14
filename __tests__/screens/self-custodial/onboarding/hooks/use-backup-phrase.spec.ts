@@ -77,7 +77,7 @@ describe("useBackupPhrase", () => {
     await waitFor(() => expect(result.current.firstCard.length).toBeGreaterThan(0))
     act(() => result.current.handleContinue())
 
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupPhraseScreen", {
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupPhrase", {
       step: PhraseStep.Second,
     })
   })

@@ -242,7 +242,7 @@ describe("SparkBackupConfirmScreen", () => {
     jest.advanceTimersByTime(500)
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      "sparkBackupSuccessScreen",
+      "selfCustodialBackupSuccess",
       expect.objectContaining({ reBackup: true }),
     )
   })
@@ -260,7 +260,7 @@ describe("SparkBackupConfirmScreen", () => {
     jest.advanceTimersByTime(500)
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      "sparkBackupSuccessScreen",
+      "selfCustodialBackupSuccess",
       expect.objectContaining({ reBackup: false }),
     )
   })
@@ -282,7 +282,7 @@ describe("SparkBackupConfirmScreen", () => {
 
     expect(mockNavigate).not.toHaveBeenCalledWith("sparkMigrationTransferringFunds")
     expect(mockNavigate).toHaveBeenCalledWith(
-      "sparkBackupSuccessScreen",
+      "selfCustodialBackupSuccess",
       expect.objectContaining({ reBackup: false }),
     )
   })
@@ -311,7 +311,7 @@ describe("SparkBackupConfirmScreen", () => {
     jest.advanceTimersByTime(500)
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      "sparkBackupSuccessScreen",
+      "selfCustodialBackupSuccess",
       expect.objectContaining({
         reBackup: true,
         message: "Your backup phrase is correct",

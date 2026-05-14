@@ -130,14 +130,14 @@ import {
   SupportOnboardingScreen,
 } from "@app/screens/onboarding-screen"
 import {
-  SparkBackupMethodScreen,
-  SparkCloudBackupScreen,
+  BackupMethodScreen,
+  CloudBackupScreen,
   SparkBackupAlertsScreen,
-  SparkBackupPhraseScreen,
+  BackupPhraseScreen,
   SparkViewBackupAlertsScreen,
   SparkViewBackupPhraseScreen,
   SparkBackupConfirmScreen,
-  SparkBackupSuccessScreen,
+  BackupSuccessScreen,
   SparkWalletCreationScreen,
 } from "@app/screens/self-custodial/onboarding"
 import {
@@ -757,13 +757,13 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
-        name="sparkBackupMethodScreen"
-        component={SparkBackupMethodScreen}
+        name="selfCustodialBackupMethod"
+        component={BackupMethodScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
-        name="sparkCloudBackupScreen"
-        component={SparkCloudBackupScreen}
+        name="selfCustodialCloudBackup"
+        component={CloudBackupScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
@@ -772,8 +772,8 @@ export const RootStack = () => {
         options={{ title: "" }}
       />
       <RootNavigator.Screen
-        name="sparkBackupPhraseScreen"
-        component={SparkBackupPhraseScreen}
+        name="selfCustodialBackupPhrase"
+        component={BackupPhraseScreen}
         options={{
           title: LL.BackupScreen.ManualBackup.Phrase.headerTitle(),
         }}
@@ -798,8 +798,8 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
-        name="sparkBackupSuccessScreen"
-        component={SparkBackupSuccessScreen}
+        name="selfCustodialBackupSuccess"
+        component={BackupSuccessScreen}
         options={{ headerShown: false }}
       />
       <RootNavigator.Screen

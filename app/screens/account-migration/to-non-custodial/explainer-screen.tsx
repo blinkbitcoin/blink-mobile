@@ -41,7 +41,7 @@ export const SparkMigrationExplainerScreen: React.FC = () => {
       title={LL.AccountMigration.explainerTitle()}
       steps={steps}
       ctaTitle={LL.AccountMigration.letsMove()}
-      onCtaPress={() => navigation.navigate("sparkBackupMethodScreen")}
+      onCtaPress={() => navigation.navigate("selfCustodialBackupMethod")}
     />
   )
 }

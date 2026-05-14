@@ -15,9 +15,9 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { useMigrationCheckpoint } from "../../account-migration/hooks"
 
-type SuccessRouteProp = RouteProp<RootStackParamList, "sparkBackupSuccessScreen">
+type SuccessRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupSuccess">
 
-export const SparkBackupSuccessScreen: React.FC = () => {
+export const BackupSuccessScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const navigation = useNavigation()

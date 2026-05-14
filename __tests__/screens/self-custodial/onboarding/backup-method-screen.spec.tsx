@@ -7,7 +7,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
 import { IconHero } from "@app/components/icon-hero"
-import { SparkBackupMethodScreen } from "@app/screens/self-custodial/onboarding/backup-method-screen"
+import { BackupMethodScreen } from "@app/screens/self-custodial/onboarding/backup-method-screen"
 import theme from "@app/rne-theme/theme"
 import { ContextForScreen } from "../../helper"
 
@@ -80,7 +80,7 @@ jest.mock("@app/components/icon-hero", () => {
 loadLocale("en")
 const LL = i18nObject("en")
 
-describe("SparkBackupMethodScreen", () => {
+describe("BackupMethodScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockKeychainLoading = false
@@ -91,7 +91,7 @@ describe("SparkBackupMethodScreen", () => {
   it("renders title and subtitle", () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkBackupMethodScreen />
+        <BackupMethodScreen />
       </ContextForScreen>,
     )
 
@@ -108,7 +108,7 @@ describe("SparkBackupMethodScreen", () => {
   it("renders all three backup method buttons", () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkBackupMethodScreen />
+        <BackupMethodScreen />
       </ContextForScreen>,
     )
 
@@ -120,7 +120,7 @@ describe("SparkBackupMethodScreen", () => {
   it("calls handleCloudBackup on cloud provider press", () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkBackupMethodScreen />
+        <BackupMethodScreen />
       </ContextForScreen>,
     )
 
@@ -131,7 +131,7 @@ describe("SparkBackupMethodScreen", () => {
   it("calls handleManualBackup on manual backup press", () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkBackupMethodScreen />
+        <BackupMethodScreen />
       </ContextForScreen>,
     )
 
@@ -142,7 +142,7 @@ describe("SparkBackupMethodScreen", () => {
   it("calls handleCredentialBackup on password manager press", async () => {
     const { getByText } = render(
       <ContextForScreen>
-        <SparkBackupMethodScreen />
+        <BackupMethodScreen />
       </ContextForScreen>,
     )
 
@@ -158,7 +158,7 @@ describe("SparkBackupMethodScreen", () => {
 
     const { queryByText } = render(
       <ContextForScreen>
-        <SparkBackupMethodScreen />
+        <BackupMethodScreen />
       </ContextForScreen>,
     )
 
@@ -171,7 +171,7 @@ describe("SparkBackupMethodScreen", () => {
 
     const { getByTestId, getByText } = render(
       <ContextForScreen>
-        <SparkBackupMethodScreen />
+        <BackupMethodScreen />
       </ContextForScreen>,
     )
 
@@ -185,7 +185,7 @@ describe("SparkBackupMethodScreen", () => {
   it("saves BackupMethod checkpoint on mount", () => {
     render(
       <ContextForScreen>
-        <SparkBackupMethodScreen />
+        <BackupMethodScreen />
       </ContextForScreen>,
     )
 
@@ -195,7 +195,7 @@ describe("SparkBackupMethodScreen", () => {
   it("renders the hero icon with the success color", () => {
     render(
       <ContextForScreen>
-        <SparkBackupMethodScreen />
+        <BackupMethodScreen />
       </ContextForScreen>,
     )
 

@@ -157,7 +157,7 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
   it("uploads encrypted backup when encryption enabled", async () => {
@@ -176,7 +176,7 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
   it("shows error toast on upload failure", async () => {
@@ -193,7 +193,7 @@ describe("useCloudBackup", () => {
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ message: "Upload failed" }),
     )
-    expect(mockNavigate).not.toHaveBeenCalledWith("sparkBackupSuccessScreen")
+    expect(mockNavigate).not.toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
   it("does not double-report to crashlytics on upload failure — the inner hook owns Drive error telemetry", async () => {

@@ -16,8 +16,8 @@ type StoredCheckpoint = {
 
 type ResumeRoute =
   | "sparkMigrationExplainer"
-  | "sparkBackupMethodScreen"
-  | "sparkCloudBackupScreen"
+  | "selfCustodialBackupMethod"
+  | "selfCustodialCloudBackup"
   | "sparkBackupAlertsScreen"
 
 const STORAGE_KEY_PREFIX = "migrationCheckpoint"
@@ -25,8 +25,8 @@ const STORAGE_KEY_PREFIX = "migrationCheckpoint"
 const CHECKPOINT_EXPIRATION_MS = 48 * 60 * 60 * 1000 // 48h
 
 const CHECKPOINT_ROUTE_MAP: Record<MigrationCheckpoint, ResumeRoute> = {
-  [MigrationCheckpoint.BackupMethod]: "sparkBackupMethodScreen",
-  [MigrationCheckpoint.CloudBackup]: "sparkCloudBackupScreen",
+  [MigrationCheckpoint.BackupMethod]: "selfCustodialBackupMethod",
+  [MigrationCheckpoint.CloudBackup]: "selfCustodialCloudBackup",
   [MigrationCheckpoint.BackupAlerts]: "sparkBackupAlertsScreen",
 }
 

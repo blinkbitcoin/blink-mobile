@@ -111,7 +111,7 @@ describe("useRestoreWallet", () => {
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
     expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith(TEST_ACCOUNT_ID, "manual")
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
   it("activates an existing account when the mnemonic is already imported", async () => {
@@ -129,7 +129,7 @@ describe("useRestoreWallet", () => {
     expect(mockRestore).not.toHaveBeenCalled()
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupSuccessScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
   it("aborts restore when the index lookup fails — never duplicates an existing account", async () => {

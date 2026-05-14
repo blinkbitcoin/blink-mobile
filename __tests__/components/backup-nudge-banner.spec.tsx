@@ -94,6 +94,6 @@ describe("BackupNudgeBanner", () => {
 
     fireEvent.press(getByTestId("cta-button"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupMethodScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
   })
 })

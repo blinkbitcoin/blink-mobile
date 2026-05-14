@@ -88,7 +88,7 @@ describe("SparkViewBackupAlertsScreen — Settings flow", () => {
     tickAllChecks(getByText)
     fireEvent.press(getByText(LL.common.continue()))
     expect(mockNavigate).not.toHaveBeenCalledWith(
-      "sparkBackupPhraseScreen",
+      "selfCustodialBackupPhrase",
       expect.anything(),
     )
   })

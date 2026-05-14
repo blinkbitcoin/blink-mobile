@@ -29,7 +29,7 @@ export const BackupNudgeModal: React.FC<BackupNudgeModalProps> = ({
 
   const handleSecure = () => {
     onClose()
-    navigation.navigate("sparkBackupMethodScreen")
+    navigation.navigate("selfCustodialBackupMethod")
   }
 
   return (

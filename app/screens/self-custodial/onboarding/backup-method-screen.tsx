@@ -17,7 +17,7 @@ import { useBackupMethods } from "./hooks"
 import { OnboardingScreenLayout } from "./layouts"
 import { getCloudProviderName } from "./utils"
 
-export const SparkBackupMethodScreen: React.FC = () => {
+export const BackupMethodScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {

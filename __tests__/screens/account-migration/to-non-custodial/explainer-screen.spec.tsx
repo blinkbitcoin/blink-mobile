@@ -104,6 +104,6 @@ describe("SparkMigrationExplainerScreen", () => {
     )
 
     fireEvent.press(screen.getByText("Let's move"))
-    expect(mockNavigate).toHaveBeenCalledWith("sparkBackupMethodScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
   })
 })

@@ -16,7 +16,7 @@ import { testProps } from "@app/utils/testProps"
 import { useCloudBackup, useCloudBackupForm } from "./hooks"
 import { getCloudProviderName } from "./utils"
 
-export const SparkCloudBackupScreen: React.FC = () => {
+export const CloudBackupScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {

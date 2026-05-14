@@ -18,7 +18,7 @@ export const BackupNudgeBanner: React.FC<BackupNudgeBannerProps> = ({ onDismiss 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
   const handleAction = useCallback(async () => {
-    navigation.navigate("sparkBackupMethodScreen")
+    navigation.navigate("selfCustodialBackupMethod")
   }, [navigation])
 
   return (

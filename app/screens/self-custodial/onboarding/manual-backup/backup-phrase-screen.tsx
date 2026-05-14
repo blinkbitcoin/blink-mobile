@@ -18,9 +18,9 @@ import { useBackupPhrase } from "../hooks"
 
 const WORDS_PER_CARD = 3
 
-type PhraseRouteProp = RouteProp<RootStackParamList, "sparkBackupPhraseScreen">
+type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase">
 
-export const SparkBackupPhraseScreen: React.FC = () => {
+export const BackupPhraseScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const { step } = useRoute<PhraseRouteProp>().params
