@@ -3481,8 +3481,7 @@
       "manualBackup": "Nakala ya mkono",
       "passwordManagerBackupSaved": "Nakala imehifadhiwa kwenye kidhibiti cha nywila",
       "passwordManagerBackupFailed": "Imeshindwa kuhifadhi nakala",
-      "passwordManagerUnavailable": "Hakuna kidhibiti cha nenosiri kinachopatikana kwenye kifaa hiki. Tumia nakala rudufu ya Drive au hifadhi maneno yako 12 mwenyewe.",
-      "iOSComingSoon": "Hifadhi nakala ya iCloud inakuja hivi karibuni"
+      "passwordManagerUnavailable": "Hakuna kidhibiti cha nenosiri kinachopatikana kwenye kifaa hiki. Tumia nakala rudufu ya Drive au hifadhi maneno yako 12 mwenyewe."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3532,7 +3531,9 @@
       "passwordMismatch": "Nywila hazifanani",
       "uploadSuccess": "Nakala imehifadhiwa kwenye {provider}",
       "uploadFailed": "Imeshindwa kupakia nakala",
-      "signInFailed": "Imeshindwa kuingia kwenye Google",
+      "signInFailed": "Imeshindwa kuingia katika {provider}",
+      "cloudNotAvailable": "iCloud Drive haipatikani. Tafadhali ingia katika iCloud kupitia Mipangilio na uwashe iCloud Drive.",
+      "networkError": "Hitilafu ya mtandao. Tafadhali angalia muunganisho wako na ujaribu tena.",
       "existingBackupTitle": "Nakala imepatikana",
       "existingBackupMessage": "Tayari kuna nakala kwenye {provider} yako. Je, ungependa kuibadilisha?",
       "existingBackupMessageWithDetails": "Hifadhi tayari ipo katika {provider} yako.\n\nAnwani ya Lightning: {address}\nIliundwa: {createdAt}\n\nUnataka kuandika juu yake?",

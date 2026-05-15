@@ -3519,8 +3519,7 @@
       "manualBackup": "Sao lưu thủ công",
       "passwordManagerBackupSaved": "Đã lưu bản sao lưu vào trình quản lý mật khẩu",
       "passwordManagerBackupFailed": "Không thể lưu bản sao lưu",
-      "passwordManagerUnavailable": "Không có trình quản lý mật khẩu nào khả dụng trên thiết bị này. Hãy sử dụng bản sao lưu Drive hoặc lưu cụm từ 12 chữ của bạn theo cách thủ công.",
-      "iOSComingSoon": "Sao lưu iCloud sắp ra mắt"
+      "passwordManagerUnavailable": "Không có trình quản lý mật khẩu nào khả dụng trên thiết bị này. Hãy sử dụng bản sao lưu Drive hoặc lưu cụm từ 12 chữ của bạn theo cách thủ công."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3570,7 +3569,9 @@
       "passwordMismatch": "Mật khẩu không khớp",
       "uploadSuccess": "Bản sao lưu đã được lưu vào {provider}",
       "uploadFailed": "Không thể tải lên bản sao lưu",
-      "signInFailed": "Không thể đăng nhập vào Google",
+      "signInFailed": "Không thể đăng nhập vào {provider}",
+      "cloudNotAvailable": "iCloud Drive không khả dụng. Vui lòng đăng nhập iCloud trong Cài đặt và bật iCloud Drive.",
+      "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.",
       "existingBackupTitle": "Đã tìm thấy bản sao lưu",
       "existingBackupMessage": "Đã có bản sao lưu trong {provider} của bạn. Bạn có muốn ghi đè không?",
       "existingBackupMessageWithDetails": "Đã tồn tại bản sao lưu trên {provider} của bạn.\n\nĐịa chỉ Lightning: {address}\nĐã tạo: {createdAt}\n\nBạn có muốn ghi đè không?",

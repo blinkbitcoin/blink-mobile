@@ -3510,8 +3510,7 @@
             "manualBackup": "Sauvegarde manuelle",
             "passwordManagerBackupSaved": "Sauvegarde enregistrée dans le gestionnaire de mots de passe",
             "passwordManagerBackupFailed": "Échec de l’enregistrement de la sauvegarde",
-            "passwordManagerUnavailable": "Aucun gestionnaire de mots de passe n'est disponible sur cet appareil. Utilisez la sauvegarde Drive ou enregistrez votre phrase de 12 mots manuellement.",
-            "iOSComingSoon": "La sauvegarde iCloud arrive bientôt"
+            "passwordManagerUnavailable": "Aucun gestionnaire de mots de passe n'est disponible sur cet appareil. Utilisez la sauvegarde Drive ou enregistrez votre phrase de 12 mots manuellement."
         },
         "ManualBackup": {
             "Alerts": {
@@ -3561,7 +3560,9 @@
             "passwordMismatch": "Les mots de passe ne correspondent pas",
             "uploadSuccess": "Sauvegarde enregistrée dans {provider}",
             "uploadFailed": "Échec du téléchargement de la sauvegarde",
-            "signInFailed": "Échec de la connexion à Google",
+            "signInFailed": "Échec de la connexion à {provider}",
+            "cloudNotAvailable": "iCloud Drive n'est pas disponible. Veuillez vous connecter à iCloud dans les Réglages et activer iCloud Drive.",
+            "networkError": "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
             "existingBackupTitle": "Sauvegarde trouvée",
             "existingBackupMessage": "Une sauvegarde existe déjà dans votre {provider}. Voulez-vous la remplacer ?",
             "existingBackupMessageWithDetails": "Une sauvegarde existe déjà sur votre {provider}.\n\nAdresse Lightning : {address}\nCréée : {createdAt}\n\nVoulez-vous l'écraser ?",

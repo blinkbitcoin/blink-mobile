@@ -3632,7 +3632,6 @@ const en: BaseTranslation = {
       passwordManagerBackupFailed: "Failed to save backup",
       passwordManagerUnavailable:
         "No password manager available on this device. Use Drive backup or save your 12-word phrase manually.",
-      iOSComingSoon: "iCloud backup coming soon",
     },
     CloudBackup: {
       title: "Let's back up your wallet",
@@ -3660,7 +3659,9 @@ const en: BaseTranslation = {
       overwrite: "Overwrite",
       uploadSuccess: "Backup saved to {provider: string}",
       uploadFailed: "Failed to upload backup",
-      signInFailed: "Failed to sign in to Google",
+      signInFailed: "Failed to sign in to {provider: string}",
+      cloudNotAvailable: "iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.",
+      networkError: "Network error. Please check your connection and try again.",
     },
     ManualBackup: {
       Alerts: {

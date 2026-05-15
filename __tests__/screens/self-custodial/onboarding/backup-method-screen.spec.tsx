@@ -191,22 +191,6 @@ describe("BackupMethodScreen", () => {
     expect(queryByText(LL.BackupScreen.BackupMethod.manualBackup())).toBeTruthy()
   })
 
-  it("disables cloud backup and shows coming soon text when unavailable", () => {
-    mockIsCloudBackupAvailable = false
-
-    const { getByTestId, getByText } = render(
-      <ContextForScreen>
-        <BackupMethodScreen />
-      </ContextForScreen>,
-    )
-
-    expect(
-      getByTestId(`primary-${LL.BackupScreen.BackupMethod.appleICloud()}`).props
-        .accessibilityState,
-    ).toEqual({ disabled: true })
-    expect(getByText(LL.BackupScreen.BackupMethod.iOSComingSoon())).toBeTruthy()
-  })
-
   it("saves BackupMethod checkpoint on mount", () => {
     render(
       <ContextForScreen>

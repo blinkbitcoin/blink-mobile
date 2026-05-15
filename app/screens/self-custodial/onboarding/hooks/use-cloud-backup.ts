@@ -3,24 +3,25 @@ import { useCallback } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
-import { getSparkDriveBackupFilename } from "@app/config/appinfo"
-import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
-import { useBackupState } from "@app/self-custodial/providers/backup-state"
-import { useAppConfig, useGoogleDriveBackup } from "@app/hooks"
+import { getCloudBackupFilename } from "@app/config/appinfo"
+import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { confirmDialog } from "@app/utils/confirm-dialog"
+import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
+import { BackupMethod, useBackupState } from "@app/self-custodial/providers/backup-state"
+import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import {
   buildBackupPayload,
   type BackupMetadata,
   parseBackupMetadata,
 } from "@app/utils/backup-payload"
-import { reportError } from "@app/utils/error-logging"
+import { confirmDialog } from "@app/utils/confirm-dialog"
 import { toastShow } from "@app/utils/toast"
 
 import { getCloudProviderName } from "../utils"
 
+import { usePlatformCloudBackup } from "./use-platform-cloud-backup"
 import { useWalletMnemonic } from "./use-wallet-mnemonic"
 
 const DEFAULT_BACKUP_VERSION = 1
@@ -56,7 +57,8 @@ export const useCloudBackup = ({
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { appConfig } = useAppConfig()
-  const { startSession, upload, downloadById, loading } = useGoogleDriveBackup()
+  const { startSession, upload, downloadById, resolveErrorMessage, loading } =
+    usePlatformCloudBackup()
   const mnemonic = useWalletMnemonic()
   const { identityPubkey, lightningAddress } = useSelfCustodialAccountInfo()
   const { setBackupCompleted } = useBackupState()
@@ -65,29 +67,33 @@ export const useCloudBackup = ({
     const provider = getCloudProviderName(LL)
 
     if (!identityPubkey) {
-      toastShow({ message: LL.BackupScreen.CloudBackup.signInFailed(), LL })
+      toastShow({ message: LL.BackupScreen.CloudBackup.signInFailed({ provider }), LL })
       return
     }
 
-    const filename = getSparkDriveBackupFilename(
-      appConfig.galoyInstance.name,
-      identityPubkey,
-    )
+    const filename = getCloudBackupFilename(appConfig.galoyInstance.name, identityPubkey)
 
-    let session
-    try {
-      session = await startSession(filename)
-    } catch (err) {
-      reportError("Cloud backup sign-in", err)
-      toastShow({ message: LL.BackupScreen.CloudBackup.signInFailed(), LL })
+    const sessionResult = await startSession(filename)
+    if (!sessionResult.success) {
+      toastShow({ message: resolveErrorMessage(sessionResult.reason, LL), LL })
       return
     }
+    const { session } = sessionResult
 
     if (session.existingFileId) {
       const downloadResult = await downloadById(
         session.existingFileId,
         session.accessToken,
       )
+
+      if (
+        !downloadResult.success &&
+        downloadResult.reason !== CloudBackupErrorReason.NotFound
+      ) {
+        toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
+        return
+      }
+
       const metadata = downloadResult.success
         ? parseBackupMetadata(downloadResult.content)
         : null
@@ -116,7 +122,7 @@ export const useCloudBackup = ({
       return
     }
 
-    setBackupCompleted("cloud")
+    setBackupCompleted(BackupMethod.Cloud)
     toastShow({
       message: LL.BackupScreen.CloudBackup.uploadSuccess({ provider }),
       type: "success",
@@ -130,6 +136,7 @@ export const useCloudBackup = ({
     startSession,
     upload,
     downloadById,
+    resolveErrorMessage,
     navigation,
     LL,
     appConfig.galoyInstance.name,

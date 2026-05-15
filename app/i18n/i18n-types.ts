@@ -11536,10 +11536,6 @@ type RootTranslation = {
 			 * N​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​U​s​e​ ​D​r​i​v​e​ ​b​a​c​k​u​p​ ​o​r​ ​s​a​v​e​ ​y​o​u​r​ ​1​2​-​w​o​r​d​ ​p​h​r​a​s​e​ ​m​a​n​u​a​l​l​y​.
 			 */
 			passwordManagerUnavailable: string
-			/**
-			 * i​C​l​o​u​d​ ​b​a​c​k​u​p​ ​c​o​m​i​n​g​ ​s​o​o​n
-			 */
-			iOSComingSoon: string
 		}
 		CloudBackup: {
 			/**
@@ -11639,9 +11635,18 @@ type RootTranslation = {
 			 */
 			uploadFailed: string
 			/**
-			 * F​a​i​l​e​d​ ​t​o​ ​s​i​g​n​ ​i​n​ ​t​o​ ​G​o​o​g​l​e
+			 * F​a​i​l​e​d​ ​t​o​ ​s​i​g​n​ ​i​n​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}
+			 * @param {string} provider
 			 */
-			signInFailed: string
+			signInFailed: RequiredParams<'provider'>
+			/**
+			 * i​C​l​o​u​d​ ​D​r​i​v​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​s​i​g​n​ ​i​n​ ​t​o​ ​i​C​l​o​u​d​ ​i​n​ ​S​e​t​t​i​n​g​s​ ​a​n​d​ ​e​n​a​b​l​e​ ​i​C​l​o​u​d​ ​D​r​i​v​e​.
+			 */
+			cloudNotAvailable: string
+			/**
+			 * N​e​t​w​o​r​k​ ​e​r​r​o​r​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+			 */
+			networkError: string
 		}
 		ManualBackup: {
 			Alerts: {
@@ -23685,10 +23690,6 @@ export type TranslationFunctions = {
 			 * No password manager available on this device. Use Drive backup or save your 12-word phrase manually.
 			 */
 			passwordManagerUnavailable: () => LocalizedString
-			/**
-			 * iCloud backup coming soon
-			 */
-			iOSComingSoon: () => LocalizedString
 		}
 		CloudBackup: {
 			/**
@@ -23781,9 +23782,17 @@ export type TranslationFunctions = {
 			 */
 			uploadFailed: () => LocalizedString
 			/**
-			 * Failed to sign in to Google
+			 * Failed to sign in to {provider}
 			 */
-			signInFailed: () => LocalizedString
+			signInFailed: (arg: { provider: string }) => LocalizedString
+			/**
+			 * iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.
+			 */
+			cloudNotAvailable: () => LocalizedString
+			/**
+			 * Network error. Please check your connection and try again.
+			 */
+			networkError: () => LocalizedString
 		}
 		ManualBackup: {
 			Alerts: {

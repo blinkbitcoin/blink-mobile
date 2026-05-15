@@ -3469,8 +3469,7 @@
             "manualBackup": "Backup manuale",
             "passwordManagerBackupSaved": "Backup salvato nel gestore password",
             "passwordManagerBackupFailed": "Impossibile salvare il backup",
-            "passwordManagerUnavailable": "Nessun gestore di password disponibile su questo dispositivo. Usa il backup di Drive o salva la tua frase di 12 parole manualmente.",
-            "iOSComingSoon": "Backup su iCloud in arrivo"
+            "passwordManagerUnavailable": "Nessun gestore di password disponibile su questo dispositivo. Usa il backup di Drive o salva la tua frase di 12 parole manualmente."
         },
         "ManualBackup": {
             "Alerts": {
@@ -3520,7 +3519,9 @@
             "passwordMismatch": "Le password non corrispondono",
             "uploadSuccess": "Backup salvato su {provider}",
             "uploadFailed": "Impossibile caricare il backup",
-            "signInFailed": "Accesso a Google non riuscito",
+            "signInFailed": "Accesso a {provider} non riuscito",
+            "cloudNotAvailable": "iCloud Drive non è disponibile. Accedi a iCloud nelle Impostazioni e abilita iCloud Drive.",
+            "networkError": "Errore di rete. Controlla la connessione e riprova.",
             "existingBackupTitle": "Backup trovato",
             "existingBackupMessage": "Esiste già un backup nel tuo {provider}. Vuoi sovrascriverlo?",
             "existingBackupMessageWithDetails": "Esiste già un backup sul tuo {provider}.\n\nIndirizzo Lightning: {address}\nCreato: {createdAt}\n\nVuoi sovrascriverlo?",

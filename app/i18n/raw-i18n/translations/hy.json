@@ -3523,8 +3523,7 @@
       "manualBackup": "Ձեռքով պահուստավորում",
       "passwordManagerBackupSaved": "Պահուստավորումը պահպանվել է գաղտնաբառերի կառավարչում",
       "passwordManagerBackupFailed": "Չհաջողվել պահուստավորումը",
-      "passwordManagerUnavailable": "Այս սարքում գաղտնաբառերի կառավարիչ չկա։ Օգտագործեք Drive-ի պահուստը կամ պահպանեք ձեր 12-բառ արտահայտությունը ձեռքով։",
-      "iOSComingSoon": "iCloud-ի պահուստավորումը շուտով հասանելի կլինի"
+      "passwordManagerUnavailable": "Այս սարքում գաղտնաբառերի կառավարիչ չկա։ Օգտագործեք Drive-ի պահուստը կամ պահպանեք ձեր 12-բառ արտահայտությունը ձեռքով։"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3574,7 +3573,9 @@
       "passwordMismatch": "Գաղտնաբառերը չեն համընկնում",
       "uploadSuccess": "Պահուստային պատճենը պահպանվել է {provider}-ում",
       "uploadFailed": "Պահուստային պատճենի վերբեռնումը ձախողվեց",
-      "signInFailed": "Google-ի մուտքը ձախողվեց",
+      "signInFailed": "{provider}-ին մուտքը ձախողվեց",
+      "cloudNotAvailable": "iCloud Drive հասանելի չէ։ Մուտք գործեք iCloud Կարգավորումներից և միացրեք iCloud Drive-ը։",
+      "networkError": "Ցանցի սխալ։ Ստուգեք միացումը և կրկին փորձեք։",
       "existingBackupTitle": "Պահուստային պատճեն գտնվել է",
       "existingBackupMessage": "Ձեր {provider}-ում արդեն պահուստային պատճեն կա: Ուզում եք վերագրե՞լ:",
       "existingBackupMessageWithDetails": "Ձեր {provider}-ում արդեն կա պահուստ։\n\nLightning հասցե՝ {address}\nՍտեղծվել է՝ {createdAt}\n\nՑանկանու՞մ եք վերագրել այն։",

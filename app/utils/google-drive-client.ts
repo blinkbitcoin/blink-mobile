@@ -1,5 +1,7 @@
 import Crypto from "react-native-quick-crypto"
 
+import { type AppDataFileEntry, CloudBackupErrorReason } from "@app/types/cloud-backup"
+
 type UploadParams = {
   content: string
   fileName: string
@@ -11,18 +13,9 @@ const DRIVE_FILES_URL = "https://www.googleapis.com/drive/v3/files"
 const DRIVE_UPLOAD_URL = "https://www.googleapis.com/upload/drive/v3/files"
 const DRIVE_APP_DATA_FOLDER = "appDataFolder"
 
-export const DriveErrorReason = {
-  NotFound: "not-found",
-  Auth: "auth",
-  Transient: "transient",
-  Unknown: "unknown",
-} as const
-
-export type DriveErrorReason = (typeof DriveErrorReason)[keyof typeof DriveErrorReason]
-
 export class DriveError extends Error {
   constructor(
-    readonly reason: DriveErrorReason,
+    readonly reason: CloudBackupErrorReason,
     message: string,
   ) {
     super(message)
@@ -30,18 +23,18 @@ export class DriveError extends Error {
   }
 }
 
-const HTTP_STATUS_TO_REASON: Readonly<Record<number, DriveErrorReason>> = {
-  401: DriveErrorReason.Auth,
-  403: DriveErrorReason.Auth,
-  404: DriveErrorReason.NotFound,
-  429: DriveErrorReason.Transient,
+const HTTP_STATUS_TO_REASON: Readonly<Record<number, CloudBackupErrorReason>> = {
+  401: CloudBackupErrorReason.Auth,
+  403: CloudBackupErrorReason.Auth,
+  404: CloudBackupErrorReason.NotFound,
+  429: CloudBackupErrorReason.Transient,
 }
 
-const classifyHttpStatus = (status: number): DriveErrorReason => {
+const classifyHttpStatus = (status: number): CloudBackupErrorReason => {
   const direct = HTTP_STATUS_TO_REASON[status]
   if (direct) return direct
-  if (status >= 500) return DriveErrorReason.Transient
-  return DriveErrorReason.Unknown
+  if (status >= 500) return CloudBackupErrorReason.Transient
+  return CloudBackupErrorReason.Unknown
 }
 
 const ClientOperation = {
@@ -58,7 +51,7 @@ const driveFetch = async (input: string, init?: RequestInit): Promise<Response> 
     return await fetch(input, init)
   } catch (err) {
     throw new DriveError(
-      DriveErrorReason.Transient,
+      CloudBackupErrorReason.Transient,
       `Drive network error: ${err instanceof Error ? err.message : String(err)}`,
     )
   }
@@ -114,8 +107,6 @@ export const findAppDataFile = async (
   const data = (await response.json()) as { files: ReadonlyArray<{ id: string }> }
   return data.files[0]?.id
 }
-
-export type AppDataFileEntry = { id: string; name: string }
 
 export const listAppDataFiles = async (
   filenamePrefix: string,

@@ -3481,8 +3481,7 @@
       "manualBackup": "Cadangan manual",
       "passwordManagerBackupSaved": "Cadangan disimpan ke pengelola kata sandi",
       "passwordManagerBackupFailed": "Gagal menyimpan cadangan",
-      "passwordManagerUnavailable": "Tidak ada pengelola kata sandi yang tersedia di perangkat ini. Gunakan cadangan Drive atau simpan frasa 12 kata Anda secara manual.",
-      "iOSComingSoon": "Pencadangan iCloud segera hadir"
+      "passwordManagerUnavailable": "Tidak ada pengelola kata sandi yang tersedia di perangkat ini. Gunakan cadangan Drive atau simpan frasa 12 kata Anda secara manual."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3532,7 +3531,9 @@
       "passwordMismatch": "Kata sandi tidak cocok",
       "uploadSuccess": "Cadangan disimpan ke {provider}",
       "uploadFailed": "Gagal mengunggah cadangan",
-      "signInFailed": "Gagal masuk ke Google",
+      "signInFailed": "Gagal masuk ke {provider}",
+      "cloudNotAvailable": "iCloud Drive tidak tersedia. Silakan masuk ke iCloud di Pengaturan dan aktifkan iCloud Drive.",
+      "networkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
       "existingBackupTitle": "Cadangan ditemukan",
       "existingBackupMessage": "Cadangan sudah ada di {provider} Anda. Apakah Anda ingin menimpanya?",
       "existingBackupMessageWithDetails": "Cadangan sudah ada di {provider} Anda.\n\nAlamat Lightning: {address}\nDibuat: {createdAt}\n\nApakah Anda ingin menimpanya?",

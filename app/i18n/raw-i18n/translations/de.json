@@ -3469,8 +3469,7 @@
             "manualBackup": "Manuelle Sicherung",
             "passwordManagerBackupSaved": "Sicherung im Passwort-Manager gespeichert",
             "passwordManagerBackupFailed": "Sicherung konnte nicht gespeichert werden",
-            "passwordManagerUnavailable": "Auf diesem Gerät ist kein Passwortmanager verfügbar. Nutze die Drive-Sicherung oder speichere deine 12-Wort-Phrase manuell.",
-            "iOSComingSoon": "iCloud-Backup kommt bald"
+            "passwordManagerUnavailable": "Auf diesem Gerät ist kein Passwortmanager verfügbar. Nutze die Drive-Sicherung oder speichere deine 12-Wort-Phrase manuell."
         },
         "ManualBackup": {
             "Alerts": {
@@ -3520,7 +3519,9 @@
             "passwordMismatch": "Passwörter stimmen nicht überein",
             "uploadSuccess": "Sicherung in {provider} gespeichert",
             "uploadFailed": "Fehler beim Hochladen der Sicherung",
-            "signInFailed": "Anmeldung bei Google fehlgeschlagen",
+            "signInFailed": "Anmeldung bei {provider} fehlgeschlagen",
+            "cloudNotAvailable": "iCloud Drive ist nicht verfügbar. Bitte melde dich in den Einstellungen bei iCloud an und aktiviere iCloud Drive.",
+            "networkError": "Netzwerkfehler. Bitte überprüfe deine Verbindung und versuche es erneut.",
             "existingBackupTitle": "Sicherung gefunden",
             "existingBackupMessage": "Es existiert bereits eine Sicherung in Ihrem {provider}. Möchten Sie sie überschreiben?",
             "existingBackupMessageWithDetails": "Auf deinem {provider} existiert bereits ein Backup.\n\nLightning-Adresse: {address}\nErstellt: {createdAt}\n\nMöchtest du es überschreiben?",

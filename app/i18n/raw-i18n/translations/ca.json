@@ -3481,8 +3481,7 @@
       "manualBackup": "Còpia de seguretat manual",
       "passwordManagerBackupSaved": "Còpia de seguretat desada al gestor de contrasenyes",
       "passwordManagerBackupFailed": "No s’ha pogut desar la còpia de seguretat",
-      "passwordManagerUnavailable": "No hi ha cap gestor de contrasenyes disponible en aquest dispositiu. Utilitza la còpia de seguretat de Drive o desa la teva frase de 12 paraules manualment.",
-      "iOSComingSoon": "La còpia de seguretat a l’iCloud arribarà aviat"
+      "passwordManagerUnavailable": "No hi ha cap gestor de contrasenyes disponible en aquest dispositiu. Utilitza la còpia de seguretat de Drive o desa la teva frase de 12 paraules manualment."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3532,7 +3531,9 @@
       "passwordMismatch": "Les contrasenyes no coincideixen",
       "uploadSuccess": "Còpia de seguretat desada a {provider}",
       "uploadFailed": "Error en pujar la còpia de seguretat",
-      "signInFailed": "Error en iniciar sessió a Google",
+      "signInFailed": "No s'ha pogut iniciar sessió a {provider}",
+      "cloudNotAvailable": "iCloud Drive no està disponible. Inicia sessió a iCloud des de Configuració i activa iCloud Drive.",
+      "networkError": "Error de xarxa. Comprova la connexió i torna-ho a provar.",
       "existingBackupTitle": "Còpia de seguretat trobada",
       "existingBackupMessage": "Ja existeix una còpia de seguretat al teu {provider}. Vols sobreescriure-la?",
       "existingBackupMessageWithDetails": "Ja existeix una còpia de seguretat al teu {provider}.\n\nAdreça Lightning: {address}\nCreada: {createdAt}\n\nVols sobreescriure-la?",

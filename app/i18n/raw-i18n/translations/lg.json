@@ -3481,8 +3481,7 @@
       "manualBackup": "Okukoppa mu ngalo",
       "passwordManagerBackupSaved": "Okukoppa kutereddwa mu muteegezzi w'ebigambo",
       "passwordManagerBackupFailed": "Okukoppa tekusobodde kutereka",
-      "passwordManagerUnavailable": "Tewali maneja wa passwordi ku kyuma kino. Kozesa Drive backup oba okuume ekigambo ekirimu ebigambo 12 mu ngeri ye'maanyi.",
-      "iOSComingSoon": "Okukoppa ku iCloud kujja mangu"
+      "passwordManagerUnavailable": "Tewali maneja wa passwordi ku kyuma kino. Kozesa Drive backup oba okuume ekigambo ekirimu ebigambo 12 mu ngeri ye'maanyi."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3532,7 +3531,9 @@
       "passwordMismatch": "Ebigambo eby'okuyingira tebituukagana",
       "uploadSuccess": "Kopi eterekedwa mu {provider}",
       "uploadFailed": "Enteeka y'ekopi teeyasoboka",
-      "signInFailed": "Okuyingira mu Google tekwagenda bulungi",
+      "signInFailed": "Okuyingira mu {provider} kukomye",
+      "cloudNotAvailable": "iCloud Drive teweza. Yingira mu iCloud mu Settings era okkirize iCloud Drive.",
+      "networkError": "Ensobi y'omukutu. Kebera enkolagana yo era oddemu okugezaako.",
       "existingBackupTitle": "Kopi efuniddwa",
       "existingBackupMessage": "Waliwo kopi mu {provider} yo. Oyagala okugisimbulira?",
       "existingBackupMessageWithDetails": "Waliwo ekkopi ku {provider} yo.\n\nEndagiriro ya Lightning: {address}\nEkoleddwa: {createdAt}\n\nOyagala kugiwandiikako?",

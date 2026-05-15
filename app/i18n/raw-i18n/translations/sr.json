@@ -3519,8 +3519,7 @@
       "manualBackup": "Ручна резервна копија",
       "passwordManagerBackupSaved": "Резервна копија сачувана у менаџеру лозинки",
       "passwordManagerBackupFailed": "Чување резервне копије није успело",
-      "passwordManagerUnavailable": "На овом уређају није доступан управљач лозинкама. Користите Drive резервну копију или ручно сачувајте своју фразу од 12 речи.",
-      "iOSComingSoon": "iCloud резервна копија ускоро стиже"
+      "passwordManagerUnavailable": "На овом уређају није доступан управљач лозинкама. Користите Drive резервну копију или ручно сачувајте своју фразу од 12 речи."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3570,7 +3569,9 @@
       "passwordMismatch": "Лозинке се не подударају",
       "uploadSuccess": "Резервна копија сачувана у {provider}",
       "uploadFailed": "Отпремање резервне копије није успело",
-      "signInFailed": "Пријава на Google није успела",
+      "signInFailed": "Пријављивање на {provider} није успело",
+      "cloudNotAvailable": "iCloud Drive није доступан. Пријавите се на iCloud у Подешавањима и омогућите iCloud Drive.",
+      "networkError": "Грешка мреже. Проверите везу и покушајте поново.",
       "existingBackupTitle": "Резервна копија пронађена",
       "existingBackupMessage": "Резервна копија већ постоји у вашем {provider}. Желите ли да је препишете?",
       "existingBackupMessageWithDetails": "Резервна копија већ постоји на вашем {provider}.\n\nLightning адреса: {address}\nКреирано: {createdAt}\n\nДа ли желите да је препишете?",

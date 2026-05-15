@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
-import { getSparkDriveBackupFilenamePrefix } from "@app/config/appinfo"
-import { useAppConfig, useGoogleDriveBackup } from "@app/hooks"
+import { getCloudBackupFilenamePrefix } from "@app/config/appinfo"
+import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import {
   type BackupMetadata,
   BackupPayloadError,
@@ -13,7 +14,8 @@ import {
   parseEncryptedBackupPayload,
 } from "@app/utils/backup-payload"
 import { reportError } from "@app/utils/error-logging"
-import { DriveErrorReason } from "@app/utils/google-drive-client"
+
+import { usePlatformCloudBackup } from "../../hooks/use-platform-cloud-backup"
 
 import { RestoreWalletStatus, useRestoreWallet } from "./use-restore-wallet"
 
@@ -27,11 +29,11 @@ const CloudStep = {
 
 type CloudStep = (typeof CloudStep)[keyof typeof CloudStep]
 
-const STEP_FOR_REASON: Readonly<Record<DriveErrorReason, CloudStep>> = {
-  [DriveErrorReason.NotFound]: CloudStep.NotFound,
-  [DriveErrorReason.Auth]: CloudStep.Error,
-  [DriveErrorReason.Transient]: CloudStep.Error,
-  [DriveErrorReason.Unknown]: CloudStep.Error,
+const STEP_FOR_REASON: Readonly<Record<CloudBackupErrorReason, CloudStep>> = {
+  [CloudBackupErrorReason.NotFound]: CloudStep.NotFound,
+  [CloudBackupErrorReason.Auth]: CloudStep.Error,
+  [CloudBackupErrorReason.Transient]: CloudStep.Error,
+  [CloudBackupErrorReason.Unknown]: CloudStep.Error,
 }
 
 export type CloudBackupEntry = {
@@ -57,7 +59,7 @@ type RestoreErrorContext = (typeof RestoreErrorContext)[keyof typeof RestoreErro
 export const useCloudRestore = () => {
   const { LL } = useI18nContext()
   const { appConfig } = useAppConfig()
-  const { listBackups, downloadById, loading: driveLoading } = useGoogleDriveBackup()
+  const { listBackups, downloadById, loading: cloudLoading } = usePlatformCloudBackup()
   const { restore, status: restoreStatus } = useRestoreWallet()
 
   const [step, setStep] = useState<CloudStep>(CloudStep.Loading)
@@ -85,6 +87,10 @@ export const useCloudRestore = () => {
     async (entry: CloudBackupEntry) => {
       const accessToken = accessTokenRef.current
       if (!accessToken) {
+        reportError(
+          RestoreErrorContext.CloudDownload,
+          new Error("Access token unavailable when picking backup entry"),
+        )
         setStep(CloudStep.Error)
         return
       }
@@ -111,9 +117,14 @@ export const useCloudRestore = () => {
     setBackupContent(null)
 
     try {
-      const prefix = getSparkDriveBackupFilenamePrefix(appConfig.galoyInstance.name)
-      const { entries: files, accessToken: token } = await listBackups(prefix)
+      const prefix = getCloudBackupFilenamePrefix(appConfig.galoyInstance.name)
+      const listResult = await listBackups(prefix)
+      if (!listResult.success) {
+        setStep(STEP_FOR_REASON[listResult.reason])
+        return
+      }
 
+      const { entries: files, accessToken: token } = listResult
       accessTokenRef.current = token
 
       if (files.length === 0) {
@@ -140,7 +151,7 @@ export const useCloudRestore = () => {
           try {
             const result = await downloadById(file.id, token)
             if (!result.success) {
-              return result.reason === DriveErrorReason.NotFound
+              return result.reason === CloudBackupErrorReason.NotFound
                 ? { kind: "not-found" }
                 : { kind: "failure" }
             }
@@ -213,7 +224,7 @@ export const useCloudRestore = () => {
   const isLoading =
     step === CloudStep.Loading ||
     restoreStatus === RestoreWalletStatus.Restoring ||
-    driveLoading
+    cloudLoading
 
   const hasError = step === CloudStep.Error || restoreStatus === RestoreWalletStatus.Error
 

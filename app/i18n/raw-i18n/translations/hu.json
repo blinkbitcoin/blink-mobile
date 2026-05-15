@@ -3481,8 +3481,7 @@
       "manualBackup": "Kézi biztonsági mentés",
       "passwordManagerBackupSaved": "Biztonsági mentés elmentve a jelszókezelőbe",
       "passwordManagerBackupFailed": "Nem sikerült elmenteni a biztonsági mentést",
-      "passwordManagerUnavailable": "Ezen az eszközön nem érhető el jelszókezelő. Használja a Drive biztonsági mentését, vagy mentse el a 12 szavas kifejezését manuálisan.",
-      "iOSComingSoon": "Az iCloud biztonsági mentés hamarosan érkezik"
+      "passwordManagerUnavailable": "Ezen az eszközön nem érhető el jelszókezelő. Használja a Drive biztonsági mentését, vagy mentse el a 12 szavas kifejezését manuálisan."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3532,7 +3531,9 @@
       "passwordMismatch": "A jelszavak nem egyeznek",
       "uploadSuccess": "Biztonsági mentés elmentve a {provider} tárhelyre",
       "uploadFailed": "A biztonsági mentés feltöltése sikertelen",
-      "signInFailed": "Bejelentkezés a Google-be sikertelen",
+      "signInFailed": "Nem sikerült bejelentkezni a következőbe: {provider}",
+      "cloudNotAvailable": "Az iCloud Drive nem érhető el. Jelentkezz be az iCloudba a Beállításokban, és engedélyezd az iCloud Drive-ot.",
+      "networkError": "Hálózati hiba. Ellenőrizd a kapcsolatot, és próbáld újra.",
       "existingBackupTitle": "Biztonsági mentés találva",
       "existingBackupMessage": "Már létezik biztonsági mentés a {provider} tárhelyeden. Felül szeretnéd írni?",
       "existingBackupMessageWithDetails": "A {provider} már tartalmaz biztonsági mentést.\n\nLightning cím: {address}\nLétrehozva: {createdAt}\n\nFelül szeretnéd írni?",

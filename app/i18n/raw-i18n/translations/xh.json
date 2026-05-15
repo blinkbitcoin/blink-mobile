@@ -3528,8 +3528,7 @@
       "manualBackup": "Ukugcina ngesandla",
       "passwordManagerBackupSaved": "Ukugcinwa kugcinwe kumlawuli wezigxina",
       "passwordManagerBackupFailed": "Ukugcinwa akuphumelelanga",
-      "passwordManagerUnavailable": "Akukho mlawuli wegama lokugqitha ofumanekayo kwesi sixhobo. Sebenzisa ungqino lwe-Drive okanye ugcine ibinzana lakho lamagama ali-12 ngokwesandla.",
-      "iOSComingSoon": "Ugcino lwe-iCloud luyeza kungekudala"
+      "passwordManagerUnavailable": "Akukho mlawuli wegama lokugqitha ofumanekayo kwesi sixhobo. Sebenzisa ungqino lwe-Drive okanye ugcine ibinzana lakho lamagama ali-12 ngokwesandla."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3579,7 +3578,9 @@
       "passwordMismatch": "Amagama okugqitha awafani",
       "uploadSuccess": "Ikopi igcinwe kwi-{provider}",
       "uploadFailed": "Ukufaka ikopi akuphumelelanga",
-      "signInFailed": "Ukungena kwi-Google akuphumelelanga",
+      "signInFailed": "Akuphumelelanga ukungena ku-{provider}",
+      "cloudNotAvailable": "I-iCloud Drive ayifumaneki. Nceda ngena ku-iCloud kwiisetingi uvule i-iCloud Drive.",
+      "networkError": "Impazamo yothungelwano. Nceda ujonge uxhumano lwakho uphinde uzame.",
       "existingBackupTitle": "Ikopi ifunyenwe",
       "existingBackupMessage": "Sele kukho ikopi kwi-{provider} yakho. Ungathanda ukuyibhala phezu kwayo?",
       "existingBackupMessageWithDetails": "Sele ikhona ikopi yokugcina kwi-{provider} yakho.\n\nIdilesi ye-Lightning: {address}\nYenziwe: {createdAt}\n\nUyafuna ukuyibhala?",

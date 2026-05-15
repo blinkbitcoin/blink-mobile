@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { useGoogleDriveBackup } from "@app/hooks/use-google-drive-backup"
+import { useGoogleDriveBackup } from "@app/screens/self-custodial/onboarding/hooks/use-google-drive-backup"
 
 const mockConfigure = jest.fn()
 const mockHasPlayServices = jest.fn(() => Promise.resolve(true))
@@ -42,9 +42,12 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: readonly unknown[]) => mockRecordError(...args),
 }))
 
-const { DriveError, DriveErrorReason } = jest.requireActual(
+const { DriveError } = jest.requireActual(
   "@app/utils/google-drive-client",
 ) as typeof import("@app/utils/google-drive-client")
+const { CloudBackupErrorReason: DriveErrorReason } = jest.requireActual(
+  "@app/types/cloud-backup",
+) as typeof import("@app/types/cloud-backup")
 
 describe("useGoogleDriveBackup", () => {
   beforeEach(() => {
@@ -62,15 +65,19 @@ describe("useGoogleDriveBackup", () => {
 
       const { result } = renderHook(() => useGoogleDriveBackup())
 
-      let session = { accessToken: "", existingFileId: undefined as string | undefined }
+      let sessionResult:
+        | Awaited<ReturnType<typeof result.current.startSession>>
+        | undefined
       await act(async () => {
-        session = await result.current.startSession("backup.json")
+        sessionResult = await result.current.startSession("backup.json")
       })
 
       expect(mockConfigure).toHaveBeenCalled()
       expect(mockSignIn).toHaveBeenCalled()
-      expect(session.accessToken).toBe("test-access-token")
-      expect(session.existingFileId).toBeUndefined()
+      expect(sessionResult).toEqual({
+        success: true,
+        session: { accessToken: "test-access-token", existingFileId: undefined },
+      })
     })
 
     it("returns existing file id when backup exists", async () => {
@@ -78,24 +85,36 @@ describe("useGoogleDriveBackup", () => {
 
       const { result } = renderHook(() => useGoogleDriveBackup())
 
-      let session = { accessToken: "", existingFileId: undefined as string | undefined }
+      let sessionResult:
+        | Awaited<ReturnType<typeof result.current.startSession>>
+        | undefined
       await act(async () => {
-        session = await result.current.startSession("backup.json")
+        sessionResult = await result.current.startSession("backup.json")
       })
 
-      expect(session.existingFileId).toBe("existing-id")
+      expect(sessionResult).toMatchObject({
+        success: true,
+        session: { existingFileId: "existing-id" },
+      })
     })
 
-    it("throws on sign-in failure", async () => {
+    it("returns failure result on sign-in failure", async () => {
       mockSignIn.mockRejectedValueOnce(new Error("Sign in cancelled"))
 
       const { result } = renderHook(() => useGoogleDriveBackup())
 
-      await expect(
-        act(async () => {
-          await result.current.startSession("backup.json")
-        }),
-      ).rejects.toThrow("Sign in cancelled")
+      let sessionResult:
+        | Awaited<ReturnType<typeof result.current.startSession>>
+        | undefined
+      await act(async () => {
+        sessionResult = await result.current.startSession("backup.json")
+      })
+
+      expect(sessionResult).toEqual({
+        success: false,
+        reason: DriveErrorReason.Unknown,
+      })
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -256,6 +275,7 @@ describe("useGoogleDriveBackup", () => {
         "test-access-token",
       )
       expect(listResult).toEqual({
+        success: true,
         entries,
         accessToken: "test-access-token",
       })
@@ -271,19 +291,24 @@ describe("useGoogleDriveBackup", () => {
         listResult = await result.current.listBackups("prefix-")
       })
 
-      expect(listResult?.entries).toEqual([])
+      expect(listResult).toMatchObject({ success: true, entries: [] })
     })
 
-    it("propagates sign-in failure", async () => {
+    it("returns failure result on sign-in failure", async () => {
       mockSignIn.mockRejectedValueOnce(new Error("Sign in cancelled"))
 
       const { result } = renderHook(() => useGoogleDriveBackup())
 
-      await expect(
-        act(async () => {
-          await result.current.listBackups("prefix-")
-        }),
-      ).rejects.toThrow("Sign in cancelled")
+      let listResult: Awaited<ReturnType<typeof result.current.listBackups>> | undefined
+      await act(async () => {
+        listResult = await result.current.listBackups("prefix-")
+      })
+
+      expect(listResult).toEqual({
+        success: false,
+        reason: DriveErrorReason.Unknown,
+      })
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
     })
   })
 

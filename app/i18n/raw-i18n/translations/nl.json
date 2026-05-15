@@ -3522,8 +3522,7 @@
       "manualBackup": "Handmatige back-up",
       "passwordManagerBackupSaved": "Back-up opgeslagen in wachtwoordbeheerder",
       "passwordManagerBackupFailed": "Back-up opslaan mislukt",
-      "passwordManagerUnavailable": "Geen wachtwoordbeheerder beschikbaar op dit apparaat. Gebruik Drive-back-up of bewaar je 12-woord-frase handmatig.",
-      "iOSComingSoon": "iCloud-back-up komt binnenkort"
+      "passwordManagerUnavailable": "Geen wachtwoordbeheerder beschikbaar op dit apparaat. Gebruik Drive-back-up of bewaar je 12-woord-frase handmatig."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3573,7 +3572,9 @@
       "passwordMismatch": "Wachtwoorden komen niet overeen",
       "uploadSuccess": "Back-up opgeslagen in {provider}",
       "uploadFailed": "Uploaden van back-up mislukt",
-      "signInFailed": "Inloggen bij Google mislukt",
+      "signInFailed": "Aanmelden bij {provider} mislukt",
+      "cloudNotAvailable": "iCloud Drive is niet beschikbaar. Meld je aan bij iCloud in Instellingen en schakel iCloud Drive in.",
+      "networkError": "Netwerkfout. Controleer je verbinding en probeer het opnieuw.",
       "existingBackupTitle": "Back-up gevonden",
       "existingBackupMessage": "Er bestaat al een back-up in je {provider}. Wil je deze overschrijven?",
       "existingBackupMessageWithDetails": "Er bestaat al een back-up op je {provider}.\n\nLightning-adres: {address}\nAangemaakt: {createdAt}\n\nWil je deze overschrijven?",

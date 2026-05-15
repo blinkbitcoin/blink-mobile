@@ -3481,8 +3481,7 @@
       "manualBackup": "Backup manual",
       "passwordManagerBackupSaved": "Backup salvat în managerul de parole",
       "passwordManagerBackupFailed": "Nu s-a putut salva backup-ul",
-      "passwordManagerUnavailable": "Niciun manager de parole nu este disponibil pe acest dispozitiv. Folosește copia de rezervă Drive sau salvează manual fraza ta de 12 cuvinte.",
-      "iOSComingSoon": "Backup-ul în iCloud va fi disponibil în curând"
+      "passwordManagerUnavailable": "Niciun manager de parole nu este disponibil pe acest dispozitiv. Folosește copia de rezervă Drive sau salvează manual fraza ta de 12 cuvinte."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3532,7 +3531,9 @@
       "passwordMismatch": "Parolele nu se potrivesc",
       "uploadSuccess": "Copie de siguranță salvată în {provider}",
       "uploadFailed": "Încarcărea copiei de siguranță a eșuat",
-      "signInFailed": "Conectarea la Google a eșuat",
+      "signInFailed": "Conectarea la {provider} a eșuat",
+      "cloudNotAvailable": "iCloud Drive nu este disponibil. Conectează-te la iCloud din Setări și activează iCloud Drive.",
+      "networkError": "Eroare de rețea. Verifică-ți conexiunea și încearcă din nou.",
       "existingBackupTitle": "Copie de siguranță găsită",
       "existingBackupMessage": "Există deja o copie de siguranță în {provider} tău. Vrei să o suprascrii?",
       "existingBackupMessageWithDetails": "Există deja o copie de rezervă pe {provider}.\n\nAdresă Lightning: {address}\nCreată: {createdAt}\n\nDoriți să o suprascrieți?",

@@ -3519,8 +3519,7 @@
       "manualBackup": "نسخ احتياطي يدوي",
       "passwordManagerBackupSaved": "تم حفظ النسخة الاحتياطية في مدير كلمات المرور",
       "passwordManagerBackupFailed": "فشل حفظ النسخة الاحتياطية",
-      "passwordManagerUnavailable": "لا يوجد مدير كلمات مرور متوفر على هذا الجهاز. استخدم النسخ الاحتياطي على Drive أو احفظ عبارة الـ 12 كلمة يدوياً.",
-      "iOSComingSoon": "النسخ الاحتياطي على iCloud قريبًا"
+      "passwordManagerUnavailable": "لا يوجد مدير كلمات مرور متوفر على هذا الجهاز. استخدم النسخ الاحتياطي على Drive أو احفظ عبارة الـ 12 كلمة يدوياً."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3570,7 +3569,9 @@
       "passwordMismatch": "كلمات المرور غير متطابقة",
       "uploadSuccess": "تم حفظ النسخة الاحتياطية في {provider}",
       "uploadFailed": "فشل رفع النسخة الاحتياطية",
-      "signInFailed": "فشل تسجيل الدخول إلى Google",
+      "signInFailed": "فشل تسجيل الدخول إلى {provider}",
+      "cloudNotAvailable": "iCloud Drive غير متوفر. يُرجى تسجيل الدخول إلى iCloud من الإعدادات وتفعيل iCloud Drive.",
+      "networkError": "خطأ في الشبكة. يُرجى التحقق من اتصالك والمحاولة مرة أخرى.",
       "existingBackupTitle": "تم العثور على نسخة احتياطية",
       "existingBackupMessage": "توجد نسخة احتياطية بالفعل في {provider} الخاص بك. هل تريد استبدالها؟",
       "existingBackupMessageWithDetails": "توجد نسخة احتياطية بالفعل في {provider}.\n\nعنوان Lightning: {address}\nتم الإنشاء: {createdAt}\n\nهل تريد استبدالها؟",

@@ -3522,8 +3522,7 @@
       "manualBackup": "Handmatige rugsteun",
       "passwordManagerBackupSaved": "Rugsteun gestoor in wagwoordbestuurder",
       "passwordManagerBackupFailed": "Kon nie rugsteun stoor nie",
-      "passwordManagerUnavailable": "Geen wagwoordbestuurder op hierdie toestel beskikbaar nie. Gebruik Drive-rugsteun of stoor jou 12-woord-frase handmatig.",
-      "iOSComingSoon": "iCloud-rugsteun kom binnekort"
+      "passwordManagerUnavailable": "Geen wagwoordbestuurder op hierdie toestel beskikbaar nie. Gebruik Drive-rugsteun of stoor jou 12-woord-frase handmatig."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3573,7 +3572,9 @@
       "passwordMismatch": "Wagwoorde stem nie ooreen nie",
       "uploadSuccess": "Rugsteun gestoor in {provider}",
       "uploadFailed": "Kon nie rugsteun oplaai nie",
-      "signInFailed": "Kon nie by Google aanmeld nie",
+      "signInFailed": "Kon nie by {provider} aanmeld nie",
+      "cloudNotAvailable": "iCloud Drive is nie beskikbaar nie. Meld asseblief in Instellings by iCloud aan en aktiveer iCloud Drive.",
+      "networkError": "Netwerkfout. Maak asseblief seker van jou verbinding en probeer weer.",
       "existingBackupTitle": "Rugsteun gevind",
       "existingBackupMessage": "'n Rugsteun bestaan reeds in jou {provider}. Wil jy dit oorskryf?",
       "existingBackupMessageWithDetails": "Daar bestaan reeds 'n rugsteun op jou {provider}.\n\nLightning-adres: {address}\nGeskep: {createdAt}\n\nWil jy dit oorskryf?",

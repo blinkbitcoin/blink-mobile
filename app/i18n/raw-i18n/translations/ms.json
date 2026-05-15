@@ -3522,8 +3522,7 @@
       "manualBackup": "Sandaran manual",
       "passwordManagerBackupSaved": "Sandaran disimpan ke pengurus kata laluan",
       "passwordManagerBackupFailed": "Gagal menyimpan sandaran",
-      "passwordManagerUnavailable": "Tiada pengurus kata laluan tersedia pada peranti ini. Gunakan sandaran Drive atau simpan frasa 12 perkataan anda secara manual.",
-      "iOSComingSoon": "Sandaran iCloud akan datang tidak lama lagi"
+      "passwordManagerUnavailable": "Tiada pengurus kata laluan tersedia pada peranti ini. Gunakan sandaran Drive atau simpan frasa 12 perkataan anda secara manual."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3573,7 +3572,9 @@
       "passwordMismatch": "Kata laluan tidak sepadan",
       "uploadSuccess": "Sandaran disimpan ke {provider}",
       "uploadFailed": "Gagal memuat naik sandaran",
-      "signInFailed": "Gagal log masuk ke Google",
+      "signInFailed": "Gagal mendaftar masuk ke {provider}",
+      "cloudNotAvailable": "iCloud Drive tidak tersedia. Sila daftar masuk ke iCloud dalam Tetapan dan dayakan iCloud Drive.",
+      "networkError": "Ralat rangkaian. Sila periksa sambungan anda dan cuba lagi.",
       "existingBackupTitle": "Sandaran ditemui",
       "existingBackupMessage": "Sandaran sudah wujud di {provider} anda. Adakah anda mahu menimpanya?",
       "existingBackupMessageWithDetails": "Sandaran sudah wujud pada {provider} anda.\n\nAlamat Lightning: {address}\nDicipta: {createdAt}\n\nAdakah anda mahu menulis ganti?",

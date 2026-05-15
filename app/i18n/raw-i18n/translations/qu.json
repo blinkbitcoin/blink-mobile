@@ -3519,8 +3519,7 @@
       "manualBackup": "Makiwan waqaychay",
       "passwordManagerBackupSaved": "Waqaychay yaykuna rimay kamachiqpi waqaychasqa",
       "passwordManagerBackupFailed": "Mana atikurqachu waqaychayta",
-      "passwordManagerUnavailable": "Kay laqacheqpiqa manan kanchu password kamachiq. Drive backup-ta apaykachay icha 12 simi rimayniykita makillaykiwan waqaychay.",
-      "iOSComingSoon": "iCloudpi waqaychayqa utqayman hamunqa"
+      "passwordManagerUnavailable": "Kay laqacheqpiqa manan kanchu password kamachiq. Drive backup-ta apaykachay icha 12 simi rimayniykita makillaykiwan waqaychay."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3570,7 +3569,9 @@
       "passwordMismatch": "Contraseñakuna mana tupanchu",
       "uploadSuccess": "Waqaychay {provider} nisqaman waqaychasqa",
       "uploadFailed": "Waqaychayta apachiy mana atikurqanchu",
-      "signInFailed": "Google nisqaman yaykuy mana atikurqanchu",
+      "signInFailed": "{provider}-man yaykuy mana atikurqachu",
+      "cloudNotAvailable": "iCloud Drive mana kachkanchu. Iskayllapi iCloudman yaykuy hinaspa iCloud Drive-ta hatarichiy.",
+      "networkError": "Antiska panta. Tinkichaykita qhaway hinaspa kutiy ruway.",
       "existingBackupTitle": "Waqaychay tarikusqa",
       "existingBackupMessage": "{provider} nisqaykipi huknin waqaychay kachkanña. Qawariyta munankichu?",
       "existingBackupMessageWithDetails": "{provider}-pi waqaychay kashanña.\n\nLightning kaynin: {address}\nKamarisqa: {createdAt}\n\nMusuqmanta qillqaytachu munanki?",

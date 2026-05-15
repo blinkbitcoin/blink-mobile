@@ -1,5 +1,4 @@
 import { useCallback } from "react"
-import { Platform } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -50,7 +49,6 @@ export const useBackupMethods = () => {
   const { identityPubkey } = useSelfCustodialAccountInfo()
   const { setBackupCompleted } = useBackupState()
   const { selfCustodialEntries } = useAccountRegistry()
-  const isDriveBackupAvailable = Platform.OS !== "ios"
   const credentialBackupAvailable = isCredentialBackupAvailable(
     selfCustodialEntries.length,
   )
@@ -82,22 +80,14 @@ export const useBackupMethods = () => {
   }, [save, navigation, LL, mnemonic, identityPubkey, setBackupCompleted])
 
   const handleCloudBackup = useCallback(() => {
-    if (!isDriveBackupAvailable) {
-      toastShow({
-        message: LL.BackupScreen.BackupMethod.iOSComingSoon(),
-        LL,
-      })
-      return
-    }
     navigation.navigate("selfCustodialCloudBackup")
-  }, [isDriveBackupAvailable, navigation, LL])
+  }, [navigation])
 
   const handleManualBackup = useCallback(() => {
     navigation.navigate("selfCustodialBackupSecurityChecks")
   }, [navigation])
 
   return {
-    isDriveBackupAvailable,
     isCredentialBackupAvailable: credentialBackupAvailable,
     credentialLoading,
     handleCredentialBackup,

@@ -1,8 +1,8 @@
+import { CloudBackupErrorReason as DriveErrorReason } from "@app/types/cloud-backup"
 import {
   buildMultipartBody,
   downloadAppDataFile,
   DriveError,
-  DriveErrorReason,
   findAppDataFile,
   listAppDataFiles,
   uploadAppDataFile,

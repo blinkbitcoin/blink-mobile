@@ -3481,8 +3481,7 @@
       "manualBackup": "Manuel yedekleme",
       "passwordManagerBackupSaved": "Yedekleme şifre yöneticisine kaydedildi",
       "passwordManagerBackupFailed": "Yedekleme kaydedilemedi",
-      "passwordManagerUnavailable": "Bu cihazda kullanılabilir parola yöneticisi yok. Drive yedeklemesini kullan veya 12 kelimelik ifadeni manuel olarak kaydet.",
-      "iOSComingSoon": "iCloud yedekleme yakında geliyor"
+      "passwordManagerUnavailable": "Bu cihazda kullanılabilir parola yöneticisi yok. Drive yedeklemesini kullan veya 12 kelimelik ifadeni manuel olarak kaydet."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3532,7 +3531,9 @@
       "passwordMismatch": "Şifreler uyuşmuyor",
       "uploadSuccess": "Yedek {provider} hesabına kaydedildi",
       "uploadFailed": "Yedek yüklenemedi",
-      "signInFailed": "Google'a giriş yapılamadı",
+      "signInFailed": "{provider} hesabınıza giriş yapılamadı",
+      "cloudNotAvailable": "iCloud Drive kullanılamıyor. Lütfen Ayarlar'dan iCloud'da oturum açın ve iCloud Drive'ı etkinleştirin.",
+      "networkError": "Ağ hatası. Lütfen bağlantınızı kontrol edip tekrar deneyin.",
       "existingBackupTitle": "Yedek bulundu",
       "existingBackupMessage": "{provider} hesabınızda zaten bir yedek var. Üzerine yazmak ister misiniz?",
       "existingBackupMessageWithDetails": "{provider} hesabınızda zaten bir yedek mevcut.\n\nLightning adresi: {address}\nOluşturuldu: {createdAt}\n\nÜzerine yazmak ister misiniz?",

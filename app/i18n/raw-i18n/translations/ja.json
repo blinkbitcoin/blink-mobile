@@ -3510,8 +3510,7 @@
             "manualBackup": "手動バックアップ",
             "passwordManagerBackupSaved": "バックアップがパスワードマネージャーに保存されました",
             "passwordManagerBackupFailed": "バックアップの保存に失敗しました",
-            "passwordManagerUnavailable": "このデバイスでは利用可能なパスワードマネージャーがありません。Driveバックアップを使用するか、12単語のフレーズを手動で保存してください。",
-            "iOSComingSoon": "iCloudバックアップは近日公開予定です"
+            "passwordManagerUnavailable": "このデバイスでは利用可能なパスワードマネージャーがありません。Driveバックアップを使用するか、12単語のフレーズを手動で保存してください。"
         },
         "ManualBackup": {
             "Alerts": {
@@ -3561,7 +3560,9 @@
             "passwordMismatch": "パスワードが一致しません",
             "uploadSuccess": "{provider}にバックアップを保存しました",
             "uploadFailed": "バックアップのアップロードに失敗しました",
-            "signInFailed": "Googleへのログインに失敗しました",
+            "signInFailed": "{provider}へのサインインに失敗しました",
+            "cloudNotAvailable": "iCloud Driveが利用できません。設定からiCloudにサインインし、iCloud Driveを有効にしてください。",
+            "networkError": "ネットワークエラーが発生しました。接続を確認して、もう一度お試しください。",
             "existingBackupTitle": "バックアップが見つかりました",
             "existingBackupMessage": "{provider}にバックアップが既に存在します。上書きしますか？",
             "existingBackupMessageWithDetails": "{provider}にすでにバックアップが存在します。\n\nLightningアドレス: {address}\n作成日時: {createdAt}\n\n上書きしますか？",

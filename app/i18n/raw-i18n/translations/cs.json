@@ -3522,8 +3522,7 @@
       "manualBackup": "Ruční zálohování",
       "passwordManagerBackupSaved": "Záloha uložena do správce hesel",
       "passwordManagerBackupFailed": "Nepodařilo se uložit zálohu",
-      "passwordManagerUnavailable": "Na tomto zařízení není k dispozici žádný správce hesel. Použijte zálohu Drive nebo uložte svou 12slovnou frázi ručně.",
-      "iOSComingSoon": "Zálohování na iCloud bude již brzy k dispozici"
+      "passwordManagerUnavailable": "Na tomto zařízení není k dispozici žádný správce hesel. Použijte zálohu Drive nebo uložte svou 12slovnou frázi ručně."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3573,7 +3572,9 @@
       "passwordMismatch": "Hesla se neshodují",
       "uploadSuccess": "Záloha uložena do {provider}",
       "uploadFailed": "Nahrání zálohy se nezdařilo",
-      "signInFailed": "Přihlášení ke Google se nezdařilo",
+      "signInFailed": "Přihlášení k {provider} se nezdařilo",
+      "cloudNotAvailable": "iCloud Drive není k dispozici. Přihlaste se k iCloudu v Nastavení a zapněte iCloud Drive.",
+      "networkError": "Chyba sítě. Zkontrolujte připojení a zkuste to znovu.",
       "existingBackupTitle": "Záloha nalezena",
       "existingBackupMessage": "Ve vašem {provider} již existuje záloha. Chcete ji přepsat?",
       "existingBackupMessageWithDetails": "Na vašem {provider} již existuje záloha.\n\nLightning adresa: {address}\nVytvořeno: {createdAt}\n\nChcete ji přepsat?",

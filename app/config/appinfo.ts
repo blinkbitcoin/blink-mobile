@@ -22,11 +22,11 @@ export const getInviteLink = (_username: string | null | undefined) => {
 
 export const BLINK_DOMAIN = "blink.sv"
 
-export const getSparkDriveBackupFilenamePrefix = (network: string) =>
+export const getCloudBackupFilenamePrefix = (network: string) =>
   `blink-spark-backup-${network.toLowerCase()}-`
 
-export const getSparkDriveBackupFilename = (network: string, walletIdentifier: string) =>
-  `${getSparkDriveBackupFilenamePrefix(network)}${walletIdentifier}.json`
+export const getCloudBackupFilename = (network: string, walletIdentifier: string) =>
+  `${getCloudBackupFilenamePrefix(network)}${walletIdentifier}.json`
 
 export const BLINK_DEEP_LINK_PREFIX = "blink:/"
 export const TELEGRAM_CALLBACK_PATH = "auth/passport-callback"

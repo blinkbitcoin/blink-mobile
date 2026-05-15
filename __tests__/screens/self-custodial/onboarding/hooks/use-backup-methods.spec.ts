@@ -100,7 +100,6 @@ describe("useBackupMethods", () => {
     mockLoading = true
     const { result } = renderHook(() => useBackupMethods())
     expect(result.current.credentialLoading).toBe(true)
-    expect(result.current.isDriveBackupAvailable).toBe(originalPlatform !== "ios")
   })
 
   describe("handleCredentialBackup", () => {
@@ -191,7 +190,7 @@ describe("useBackupMethods", () => {
   })
 
   describe("handleCloudBackup", () => {
-    it("shows iOS-coming-soon toast on iOS", () => {
+    it("navigates to the cloud backup screen on iOS", () => {
       Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
       const { result } = renderHook(() => useBackupMethods())
 
@@ -199,11 +198,7 @@ describe("useBackupMethods", () => {
         result.current.handleCloudBackup()
       })
 
-      expect(result.current.isDriveBackupAvailable).toBe(false)
-      expect(mockToastShow).toHaveBeenCalledWith(
-        expect.objectContaining({ message: "Coming soon on iOS" }),
-      )
-      expect(mockNavigate).not.toHaveBeenCalledWith("selfCustodialCloudBackup")
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialCloudBackup")
     })
 
     it("navigates to the cloud backup screen on Android", () => {
@@ -214,7 +209,6 @@ describe("useBackupMethods", () => {
         result.current.handleCloudBackup()
       })
 
-      expect(result.current.isDriveBackupAvailable).toBe(true)
       expect(mockNavigate).toHaveBeenCalledWith("selfCustodialCloudBackup")
     })
   })

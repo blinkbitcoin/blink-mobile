@@ -11,15 +11,21 @@ jest.mock("@app/hooks", () => ({
   useAppConfig: () => ({
     appConfig: { galoyInstance: { name: "Main" } },
   }),
-  useGoogleDriveBackup: () => ({
-    listBackups: mockListBackups,
-    downloadById: mockDownloadById,
-    loading: false,
-  }),
 }))
 
+jest.mock(
+  "@app/screens/self-custodial/onboarding/hooks/use-platform-cloud-backup",
+  () => ({
+    usePlatformCloudBackup: () => ({
+      listBackups: mockListBackups,
+      downloadById: mockDownloadById,
+      loading: false,
+    }),
+  }),
+)
+
 jest.mock("@app/config/appinfo", () => ({
-  getSparkDriveBackupFilenamePrefix: (name: string) =>
+  getCloudBackupFilenamePrefix: (name: string) =>
     `blink-spark-backup-${name.toLowerCase()}-`,
 }))
 
@@ -123,7 +129,11 @@ describe("useCloudRestore", () => {
   })
 
   it("shows not-found when no backups are listed", async () => {
-    mockListBackups.mockResolvedValue({ entries: [], accessToken: "token" })
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [],
+      accessToken: "token",
+    })
 
     const { result } = renderHook(() => useCloudRestore())
 
@@ -134,6 +144,7 @@ describe("useCloudRestore", () => {
 
   it("auto-restores when only one backup exists and it is unencrypted", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -151,6 +162,7 @@ describe("useCloudRestore", () => {
 
   it("shows password step when only one backup exists and it is encrypted", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -168,6 +180,7 @@ describe("useCloudRestore", () => {
 
   it("shows picker when multiple valid backups exist", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
         { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
@@ -199,6 +212,7 @@ describe("useCloudRestore", () => {
 
   it("skips entries that fail to download or parse", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
         { id: "file-2", name: "blink-spark-backup-main-bad.json" },
@@ -227,6 +241,7 @@ describe("useCloudRestore", () => {
 
   it("falls to NotFound when the single download returns reason='not-found'", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -244,6 +259,7 @@ describe("useCloudRestore", () => {
 
   it("falls to Error (not NotFound) when the single download fails with auth", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -262,6 +278,7 @@ describe("useCloudRestore", () => {
 
   it("falls to Error (not NotFound) when the single download fails with transient", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -280,6 +297,7 @@ describe("useCloudRestore", () => {
 
   it("falls to Error (not NotFound) when the single download fails with unknown", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -298,6 +316,7 @@ describe("useCloudRestore", () => {
 
   it("falls to Error in the picker flow when ALL per-file downloads fail with non-not-found reasons", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
         { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
@@ -316,6 +335,7 @@ describe("useCloudRestore", () => {
 
   it("falls to NotFound only when ALL per-file downloads return not-found", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
         { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
@@ -333,6 +353,7 @@ describe("useCloudRestore", () => {
 
   it("falls to Error when a per-file download mixes not-found with a non-not-found failure", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
         { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
@@ -356,6 +377,7 @@ describe("useCloudRestore", () => {
 
   it("falls to NotFound when ALL per-file downloads succeed but metadata fails to parse", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
         { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
@@ -377,6 +399,7 @@ describe("useCloudRestore", () => {
 
   it("falls to NotFound on single-file path when downloaded content fails parseBackupMetadata", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -396,6 +419,7 @@ describe("useCloudRestore", () => {
 
   it("does not call restore on single-file path when content lacks walletIdentifier", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -414,6 +438,7 @@ describe("useCloudRestore", () => {
 
   it("proceeds with the backup on single-file path when metadata parses successfully", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -431,6 +456,7 @@ describe("useCloudRestore", () => {
 
   it("reports per-file exceptions to crashlytics during picker assembly", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
         { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
@@ -458,6 +484,7 @@ describe("useCloudRestore", () => {
 
   it("decrypts encrypted backup with correct password", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -491,6 +518,7 @@ describe("useCloudRestore", () => {
     })
 
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -526,6 +554,7 @@ describe("useCloudRestore", () => {
     })
 
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -561,6 +590,7 @@ describe("useCloudRestore", () => {
     })
 
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -595,6 +625,7 @@ describe("useCloudRestore", () => {
     })
 
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -619,6 +650,7 @@ describe("useCloudRestore", () => {
 
   it("does not classify a restore-side failure as 'wrong password' after a successful decrypt", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -643,6 +675,7 @@ describe("useCloudRestore", () => {
 
   it("does not fire loadCloudBackups twice on rerender", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
       accessToken: "token",
     })
@@ -675,6 +708,7 @@ describe("useCloudRestore", () => {
 
   it("handlePick downloads and restores the selected entry", async () => {
     mockListBackups.mockResolvedValue({
+      success: true,
       entries: [
         { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
         { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },

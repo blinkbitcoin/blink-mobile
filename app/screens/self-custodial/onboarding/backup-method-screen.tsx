@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import { Platform } from "react-native"
 
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -20,14 +20,12 @@ import { getCloudProviderName } from "./utils"
 
 export const BackupMethodScreen: React.FC = () => {
   const { LL } = useI18nContext()
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
 
   const { saveCheckpoint } = useMigrationCheckpoint()
   const {
-    isDriveBackupAvailable,
     isCredentialBackupAvailable,
     credentialLoading,
     handleCredentialBackup,
@@ -48,14 +46,8 @@ export const BackupMethodScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={cloudProvider}
             onPress={handleCloudBackup}
-            disabled={!isDriveBackupAvailable}
             {...testProps("backup-cloud-button")}
           />
-          {!isDriveBackupAvailable && (
-            <Text style={styles.comingSoonText}>
-              {LL.BackupScreen.BackupMethod.iOSComingSoon()}
-            </Text>
-          )}
           {/* TODO: disabled on iOS while credential-based backup integration is completed */}
           {Platform.OS !== "ios" && isCredentialBackupAvailable && (
             <GaloySecondaryButton
@@ -82,9 +74,3 @@ export const BackupMethodScreen: React.FC = () => {
     </OnboardingScreenLayout>
   )
 }
-
-const useStyles = makeStyles(() => ({
-  comingSoonText: {
-    textAlign: "center",
-  },
-}))
