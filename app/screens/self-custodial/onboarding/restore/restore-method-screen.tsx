@@ -1,4 +1,5 @@
 import React, { useCallback } from "react"
+import { Platform } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -68,12 +69,15 @@ export const RestoreMethodScreen: React.FC = () => {
             onPress={() => navigation.navigate("selfCustodialCloudRestore")}
             {...testProps("restore-cloud-button")}
           />
-          <GaloySecondaryButton
-            title={LL.BackupScreen.BackupMethod.passwordManager()}
-            onPress={handleCredentialRestore}
-            loading={credentialLoading}
-            {...testProps("restore-credential-button")}
-          />
+          {/* TODO: disabled on iOS while credential-based restore integration is completed */}
+          {Platform.OS !== "ios" && (
+            <GaloySecondaryButton
+              title={LL.BackupScreen.BackupMethod.passwordManager()}
+              onPress={handleCredentialRestore}
+              loading={credentialLoading}
+              {...testProps("restore-credential-button")}
+            />
+          )}
           <GaloySecondaryButton
             title={LL.BackupScreen.BackupMethod.manualBackup()}
             onPress={() =>

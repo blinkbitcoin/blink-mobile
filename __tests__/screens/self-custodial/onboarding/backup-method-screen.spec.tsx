@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, Text } from "react-native"
+import { Platform, Pressable, Text } from "react-native"
 
 import { act, fireEvent, render } from "@testing-library/react-native"
 
@@ -81,11 +81,17 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 describe("BackupMethodScreen", () => {
+  const originalPlatform = Platform.OS
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockKeychainLoading = false
     mockIsCloudBackupAvailable = true
     mockIsCredentialBackupAvailable = true
+  })
+
+  afterEach(() => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: originalPlatform })
   })
 
   it("renders title and subtitle", () => {
@@ -105,14 +111,16 @@ describe("BackupMethodScreen", () => {
     ).toBeTruthy()
   })
 
-  it("renders all three backup method buttons", () => {
+  it("renders all three backup method buttons on Android", () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
+
     const { getByText } = render(
       <ContextForScreen>
         <BackupMethodScreen />
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.BackupScreen.BackupMethod.appleICloud())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.BackupMethod.googleDrive())).toBeTruthy()
     expect(getByText(LL.BackupScreen.BackupMethod.passwordManager())).toBeTruthy()
     expect(getByText(LL.BackupScreen.BackupMethod.manualBackup())).toBeTruthy()
   })
@@ -140,6 +148,8 @@ describe("BackupMethodScreen", () => {
   })
 
   it("calls handleCredentialBackup on password manager press", async () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
+
     const { getByText } = render(
       <ContextForScreen>
         <BackupMethodScreen />
@@ -153,8 +163,23 @@ describe("BackupMethodScreen", () => {
     expect(mockHandleKeychainBackup).toHaveBeenCalled()
   })
 
-  it("hides the password manager button when credential backup is unavailable (iOS multi-account)", () => {
+  it("hides the password manager button when credential backup is unavailable (Android multi-account)", () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
     mockIsCredentialBackupAvailable = false
+
+    const { queryByText } = render(
+      <ContextForScreen>
+        <BackupMethodScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText(LL.BackupScreen.BackupMethod.passwordManager())).toBeNull()
+    expect(queryByText(LL.BackupScreen.BackupMethod.manualBackup())).toBeTruthy()
+  })
+
+  it("hides the password manager button on iOS even when credential backup is available", () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
+    mockIsCredentialBackupAvailable = true
 
     const { queryByText } = render(
       <ContextForScreen>

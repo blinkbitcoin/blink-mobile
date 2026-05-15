@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, Text } from "react-native"
+import { Platform, Pressable, Text } from "react-native"
 
 import { act, fireEvent, render } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -76,9 +76,15 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 describe("RestoreMethodScreen", () => {
+  const originalPlatform = Platform.OS
+
   beforeEach(() => {
     jest.clearAllMocks()
     mockLoading = false
+  })
+
+  afterEach(() => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: originalPlatform })
   })
 
   it("renders the hero icon with the success color", () => {
@@ -121,9 +127,27 @@ describe("RestoreMethodScreen", () => {
     })
   })
 
+  it("hides the password manager button on iOS", () => {
+    Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <RestoreMethodScreen />
+      </ContextForScreen>,
+    )
+
+    expect(
+      queryByTestId(`secondary-${LL.BackupScreen.BackupMethod.passwordManager()}`),
+    ).toBeNull()
+  })
+
   describe("password manager restore", () => {
     const passwordManagerTestId = () =>
       `secondary-${LL.BackupScreen.BackupMethod.passwordManager()}`
+
+    beforeEach(() => {
+      Object.defineProperty(Platform, "OS", { configurable: true, value: "android" })
+    })
 
     it("restores the wallet on successful read", async () => {
       mockRead.mockResolvedValue({

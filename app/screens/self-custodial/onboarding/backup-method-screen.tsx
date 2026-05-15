@@ -1,4 +1,5 @@
 import React, { useEffect } from "react"
+import { Platform } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -55,7 +56,8 @@ export const BackupMethodScreen: React.FC = () => {
               {LL.BackupScreen.BackupMethod.iOSComingSoon()}
             </Text>
           )}
-          {isCredentialBackupAvailable && (
+          {/* TODO: disabled on iOS while credential-based backup integration is completed */}
+          {Platform.OS !== "ios" && isCredentialBackupAvailable && (
             <GaloySecondaryButton
               title={LL.BackupScreen.BackupMethod.passwordManager()}
               onPress={handleCredentialBackup}
