@@ -7,24 +7,32 @@ import type { CloudBackupEntry } from "@app/screens/self-custodial/onboarding/re
 
 import { ContextForScreen } from "../../../helper"
 
-const buildEntry = (
-  fileId: string,
-  walletIdentifier: string,
-  lightningAddress?: string,
-): CloudBackupEntry => ({
+type BuildEntryArgs = {
+  fileId: string
+  walletIdentifier: string
+  lightningAddress?: string
+  createdAt?: number
+}
+
+const buildEntry = ({
+  fileId,
+  walletIdentifier,
+  lightningAddress,
+  createdAt = 0,
+}: BuildEntryArgs): CloudBackupEntry => ({
   fileId,
   metadata: {
     version: 1,
     walletIdentifier,
     lightningAddress,
-    createdAt: 0,
+    createdAt,
     encrypted: false,
   },
 })
 
 describe("CloudBackupPicker", () => {
   it("renders walletIdentifier as the only line when no lightning address is set", () => {
-    const entries = [buildEntry("file-1", "pubkey-1")]
+    const entries = [buildEntry({ fileId: "file-1", walletIdentifier: "pubkey-1" })]
     const onSelect = jest.fn()
 
     const { getByText, queryAllByText } = render(
@@ -38,7 +46,13 @@ describe("CloudBackupPicker", () => {
   })
 
   it("renders lightning address as the title and identifier as subtitle when present", () => {
-    const entries = [buildEntry("file-1", "pubkey-1", "alice@blink.sv")]
+    const entries = [
+      buildEntry({
+        fileId: "file-1",
+        walletIdentifier: "pubkey-1",
+        lightningAddress: "alice@blink.sv",
+      }),
+    ]
     const onSelect = jest.fn()
 
     const { getByText } = render(
@@ -53,9 +67,17 @@ describe("CloudBackupPicker", () => {
 
   it("renders one row per entry", () => {
     const entries = [
-      buildEntry("file-1", "pubkey-1", "alice@blink.sv"),
-      buildEntry("file-2", "pubkey-2"),
-      buildEntry("file-3", "pubkey-3", "carol@blink.sv"),
+      buildEntry({
+        fileId: "file-1",
+        walletIdentifier: "pubkey-1",
+        lightningAddress: "alice@blink.sv",
+      }),
+      buildEntry({ fileId: "file-2", walletIdentifier: "pubkey-2" }),
+      buildEntry({
+        fileId: "file-3",
+        walletIdentifier: "pubkey-3",
+        lightningAddress: "carol@blink.sv",
+      }),
     ]
     const onSelect = jest.fn()
 
@@ -72,8 +94,12 @@ describe("CloudBackupPicker", () => {
 
   it("invokes onSelect with the chosen entry when a row is pressed", () => {
     const entries = [
-      buildEntry("file-1", "pubkey-1", "alice@blink.sv"),
-      buildEntry("file-2", "pubkey-2"),
+      buildEntry({
+        fileId: "file-1",
+        walletIdentifier: "pubkey-1",
+        lightningAddress: "alice@blink.sv",
+      }),
+      buildEntry({ fileId: "file-2", walletIdentifier: "pubkey-2" }),
     ]
     const onSelect = jest.fn()
 
@@ -99,5 +125,36 @@ describe("CloudBackupPicker", () => {
     )
 
     expect(queryByTestId(/^cloud-backup-entry-/)).toBeNull()
+  })
+
+  it("renders the formatted createdAt date when present", () => {
+    const createdAt = new Date("2026-03-15T10:00:00Z").getTime()
+    const entries = [
+      buildEntry({ fileId: "file-1", walletIdentifier: "pubkey-1", createdAt }),
+    ]
+    const formattedDate = new Date(createdAt).toLocaleDateString()
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <CloudBackupPicker entries={entries} onSelect={jest.fn()} />
+      </ContextForScreen>,
+    )
+
+    expect(getByText(new RegExp(formattedDate.replace(/\//g, "\\/")))).toBeTruthy()
+  })
+
+  it("hides the createdAt row when the timestamp is 0 (legacy backup)", () => {
+    const entries = [
+      buildEntry({ fileId: "file-1", walletIdentifier: "pubkey-1", createdAt: 0 }),
+    ]
+    const legacyFormatted = new Date(0).toLocaleDateString()
+
+    const { queryByText } = render(
+      <ContextForScreen>
+        <CloudBackupPicker entries={entries} onSelect={jest.fn()} />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText(new RegExp(legacyFormatted.replace(/\//g, "\\/")))).toBeNull()
   })
 })

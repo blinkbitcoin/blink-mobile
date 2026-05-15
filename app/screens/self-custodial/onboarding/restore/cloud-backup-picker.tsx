@@ -4,6 +4,7 @@ import { TouchableOpacity, View } from "react-native"
 import { ListItem, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 
 import type { CloudBackupEntry } from "./hooks/use-cloud-restore"
@@ -18,12 +19,14 @@ export const CloudBackupPicker: React.FC<Props> = ({ entries, onSelect }) => {
   const {
     theme: { colors },
   } = useTheme()
+  const { LL } = useI18nContext()
 
   return (
     <View>
       {entries.map((entry, index) => {
-        const { walletIdentifier, lightningAddress } = entry.metadata
+        const { walletIdentifier, lightningAddress, createdAt } = entry.metadata
         const hasLightningAddress = Boolean(lightningAddress)
+        const dateLabel = `${LL.common.date()}: ${new Date(createdAt).toLocaleDateString()}`
 
         return (
           <TouchableOpacity
@@ -48,6 +51,11 @@ export const CloudBackupPicker: React.FC<Props> = ({ entries, onSelect }) => {
                     ellipsizeMode="middle"
                   >
                     {walletIdentifier}
+                  </Text>
+                )}
+                {createdAt > 0 && (
+                  <Text type="p3" style={styles.subtitle} numberOfLines={1}>
+                    {dateLabel}
                   </Text>
                 )}
               </ListItem.Content>
