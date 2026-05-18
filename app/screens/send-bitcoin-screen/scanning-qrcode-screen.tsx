@@ -34,6 +34,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { isNwcUri } from "@app/screens/nostr-wallet-connect/nwc-uri"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { parseDestination } from "./payment-destination"
@@ -134,9 +135,20 @@ export const ScanningQRCodeScreen: React.FC = () => {
 
   const processInvoice = React.useMemo(() => {
     return async (data: string | undefined) => {
-      if (pending || !wallets || !bitcoinNetwork || !data) {
+      if (pending || !data) {
         return
       }
+
+      if (isNwcUri(data)) {
+        setPending(true)
+        navigation.replace("nwcAuthorization", { uri: data })
+        return
+      }
+
+      if (!wallets || !bitcoinNetwork) {
+        return
+      }
+
       try {
         setPending(true)
 

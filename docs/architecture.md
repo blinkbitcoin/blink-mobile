@@ -67,7 +67,8 @@ GestureHandlerRootView
                                     └── NotificationsProvider
                                         ├── AppStateWrapper
                                         ├── PushNotificationComponent
-                                        ├── RootStack (Navigation)
+                                        ├── NwcConnectionsProvider
+                                        │   └── RootStack (Navigation)
                                         ├── NetworkErrorComponent
                                         └── ActionModals
 ```
@@ -135,6 +136,7 @@ RootStack (Stack Navigator)
 | Persistent State | Settings, preferences | PersistentStateContext + AsyncStorage |
 | UI State | Loading, errors, modals | React Context + local state |
 | Feature Flags | Feature toggles | FeatureFlagContext |
+| NWC Connections | Interim Nostr Wallet Connect authorization state | NwcConnectionsProvider |
 
 ## Authentication Flow
 

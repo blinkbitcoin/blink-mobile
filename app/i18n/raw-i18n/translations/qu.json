@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "{identifier: string} nisqawan tinkisqa sesiónmanta lluqsinki.\nQhipaman watiqmanta yaykunaykipaq yaykuyta atisqaykita chiqapchay.",
     "logoutOneAccountConfirm": "Riqsinim. Ama hina kaspa lluqsichiy.",
     "receiveCurrency": "Chaskiy qullqi laya",
-    "displayCurrency": "Rikuchiy qullqi laya"
+    "displayCurrency": "Rikuchiy qullqi laya",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Willakuy churanakuna",
@@ -3467,5 +3468,24 @@
         "buttonText": "Wisq'ay"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Blink nisqata huk ruraykunaman tinki NWC nisqawan",
+    "newConnection": "Musuq tinki",
+    "connectWallet": "Waletata tinki",
+    "appNameLabel": "Tinkiyta munanki chay ruraypa sutin",
+    "appNamePlaceholder": "Ruraypa sutin",
+    "dailyBudget": "Sapa punchaw qullqi",
+    "connectionCreated": "Tinki kamarisqa",
+    "nwcConnectionString": "NWC tinki qillqa",
+    "copyInstruction": "Kay qillqata kichay hinaspa tinkiyta munanki chay rurayman churay.",
+    "nwcStringCopied": "NWC tinki qillqa kichasqa",
+    "done": "Tukusqa",
+    "connectedApps": "Tinkisqa ruraykuna",
+    "budget": "Qullqi: {amount}",
+    "doNotNotifyBelow": "Ama willaychu ura ruraykuna",
+    "deleteConfirmTitle": "Chiqaqchu?",
+    "deleteConfirmBody": "Chiqaqtachu {appName} nisqapa tinkinta puchukachisunki?",
+    "dismiss": "Wikchuy"
   }
 }

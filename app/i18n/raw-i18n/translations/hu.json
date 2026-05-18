@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "Ki leszel jelentkeztetve a(z) {identifier: string} munkamenetből.\nGyőződj meg róla, hogy a jövőben is hozzáférsz a bejelentkezéshez.",
     "logoutOneAccountConfirm": "Megértettem. Kérlek jelentkeztess ki.",
     "receiveCurrency": "Fogadás pénzneme",
-    "displayCurrency": "Megjelenítés pénzneme"
+    "displayCurrency": "Megjelenítés pénzneme",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Értesítési beállítások",
@@ -3429,5 +3430,24 @@
         "buttonText": "Bezárás"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Csatlakoztassa a Blinket más alkalmazásokhoz NWC-n keresztül",
+    "newConnection": "Új kapcsolat",
+    "connectWallet": "Tárca csatlakoztatása",
+    "appNameLabel": "A csatlakoztatni kívánt alkalmazás neve",
+    "appNamePlaceholder": "Alkalmazás neve",
+    "dailyBudget": "Napi költségkeret",
+    "connectionCreated": "Kapcsolat létrehozva",
+    "nwcConnectionString": "NWC kapcsolati karakterlánc",
+    "copyInstruction": "Másolja ki ezt a karakterláncot és illessze be a csatlakoztatni kívánt alkalmazásba.",
+    "nwcStringCopied": "NWC kapcsolati karakterlánc vágólapra másolva",
+    "done": "Kész",
+    "connectedApps": "Csatlakoztatott alkalmazások",
+    "budget": "Költségkeret: {amount}",
+    "doNotNotifyBelow": "Ne értesítsen az alábbi tranzakciókról",
+    "deleteConfirmTitle": "Biztos benne?",
+    "deleteConfirmBody": "Valóban vissza akarja vonni a kapcsolatot a(z) {appName} alkalmazással?",
+    "dismiss": "Elvetés"
   }
 }

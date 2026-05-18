@@ -2355,7 +2355,8 @@
     "logoutOneAccountAlertContent": "Je wordt uitgelogd van de sessie gekoppeld aan {identifier: string}.\nZorg ervoor dat je in de toekomst weer kunt inloggen.",
     "logoutOneAccountConfirm": "Ik begrijp het. Log me uit.",
     "receiveCurrency": "Ontvangstvaluta",
-    "displayCurrency": "Weergavevaluta"
+    "displayCurrency": "Weergavevaluta",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Notificatie instellingen",
@@ -3470,5 +3471,24 @@
         "buttonText": "Sluiten"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Verbind Blink met andere apps via NWC",
+    "newConnection": "Nieuwe verbinding",
+    "connectWallet": "Portemonnee verbinden",
+    "appNameLabel": "Naam van de app die u wilt verbinden",
+    "appNamePlaceholder": "Appnaam",
+    "dailyBudget": "Dagelijks budget",
+    "connectionCreated": "Verbinding aangemaakt",
+    "nwcConnectionString": "NWC-verbindingsreeks",
+    "copyInstruction": "Kopieer deze reeks en plak deze in de app die u wilt verbinden.",
+    "nwcStringCopied": "NWC-verbindingsreeks gekopieerd naar klembord",
+    "done": "Klaar",
+    "connectedApps": "Verbonden apps",
+    "budget": "Budget: {amount}",
+    "doNotNotifyBelow": "Niet melden voor transacties onder",
+    "deleteConfirmTitle": "Weet u het zeker?",
+    "deleteConfirmBody": "Wilt u de verbinding met {appName} echt intrekken?",
+    "dismiss": "Verwerpen"
   }
 }

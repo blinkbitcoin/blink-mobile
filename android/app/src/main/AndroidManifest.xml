@@ -7,6 +7,10 @@
         <action android:name="android.intent.action.VIEW" />
         <data android:scheme="tg" />
       </intent>
+      <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="satsback" />
+      </intent>
     </queries>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -117,6 +121,13 @@
             <category android:name="android.intent.category.DEFAULT" />
             <category android:name="android.intent.category.BROWSABLE" />
             <data android:scheme="lapp" />
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="nostr+walletconnect" />
         </intent-filter>
         <intent-filter>
             <action android:name="android.intent.action.VIEW" />

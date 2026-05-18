@@ -122,7 +122,7 @@ describe("BlinkCard", () => {
       const { getByText } = renderWithProviders(
         <BlinkCard
           {...defaultProps}
-          validThruDate={new Date(2028, 11, 1)}
+          validThruDate={new Date(Date.UTC(2028, 11, 1))}
           showCardDetails={true}
         />,
       )

@@ -18,6 +18,11 @@ import { RootStackParamList } from "./stack-param-lists"
 
 import { PREFIX_LINKING, TELEGRAM_CALLBACK_PATH } from "@app/config"
 import { Action, useActionsContext } from "@app/components/actions"
+import {
+  getNwcAuthorizationLinkingUrl,
+  isNwcUri,
+  NWC_AUTH_LINKING_PATH,
+} from "@app/screens/nostr-wallet-connect/nwc-uri"
 
 export type AuthenticationContextType = {
   isAppLocked: boolean
@@ -107,6 +112,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
       "lnurlw://",
       "lnurlp://",
       "lnurl://",
+      "nostr+walletconnect://",
     ],
     config: {
       screens: {
@@ -139,6 +145,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         notificationSettingsScreen: "settings/notifications",
         emailRegistrationInitiate: "settings/email",
         settings: "settings",
+        nwcAuthorization: NWC_AUTH_LINKING_PATH,
         cardDashboardScreen: "card",
         cardDetailsScreen: "card/details",
         cardLimitsScreen: "card/limits",
@@ -167,13 +174,16 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     subscribe: (listener) => {
       const onReceiveURL = ({ url }: { url: string }) => {
         if (url.includes(TELEGRAM_CALLBACK_PATH)) return
+        const navigationUrl = isNwcUri(url) ? getNwcAuthorizationLinkingUrl(url) : url
 
         if (!isAppLocked && isAuthed) {
-          const maybeAction = processLinkForAction(url)
-          if (maybeAction) {
-            setActiveAction(maybeAction)
+          if (!isNwcUri(url)) {
+            const maybeAction = processLinkForAction(url)
+            if (maybeAction) {
+              setActiveAction(maybeAction)
+            }
           }
-          listener(url)
+          listener(navigationUrl)
         } else {
           setUrlAfterUnlockAndAuth(url)
         }

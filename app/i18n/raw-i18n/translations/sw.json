@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "Utatoka kwenye kipindi kinachohusiana na {identifier: string}.\nHakikisha una uwezo wa kuingia tena katika siku zijazo.",
     "logoutOneAccountConfirm": "Ninaelewa. Tafadhali niondoe.",
     "receiveCurrency": "Sarafu ya kupokea",
-    "displayCurrency": "Sarafu ya kuonyesha"
+    "displayCurrency": "Sarafu ya kuonyesha",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Mipangilio ya Arifa",
@@ -3429,5 +3430,24 @@
         "buttonText": "Funga"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Unganisha Blink na programu nyingine kupitia NWC",
+    "newConnection": "Muunganisho mpya",
+    "connectWallet": "Unganisha pochi",
+    "appNameLabel": "Jina la programu unayotaka kuunganisha",
+    "appNamePlaceholder": "Jina la programu",
+    "dailyBudget": "Bajeti ya kila siku",
+    "connectionCreated": "Muunganisho umeundwa",
+    "nwcConnectionString": "Mfuatano wa muunganisho wa NWC",
+    "copyInstruction": "Nakili mfuatano huu na ubandike kwenye programu unayotaka kuunganisha.",
+    "nwcStringCopied": "Mfuatano wa muunganisho wa NWC umenakiliwa kwenye ubao wa kunakili",
+    "done": "Imekamilika",
+    "connectedApps": "Programu zilizounganishwa",
+    "budget": "Bajeti: {amount}",
+    "doNotNotifyBelow": "Usijulishe kwa miamala chini ya",
+    "deleteConfirmTitle": "Una uhakika?",
+    "deleteConfirmBody": "Je, kweli unataka kubatilisha muunganisho na {appName}?",
+    "dismiss": "Ondoa"
   }
 }

@@ -2374,7 +2374,8 @@
     "logoutOneAccountConfirm": "Ndiyaqonda. Nceda undikhuphele ngaphandle.",
     "receiveCurrency": "Imali yokufumana",
     "displayCurrency": "Imali yokubonisa",
-    "tapLogIn": "Cofa ukwazi ukungena"
+    "tapLogIn": "Cofa ukwazi ukungena",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Iisetingi zezaziso",
@@ -3476,5 +3477,24 @@
         "buttonText": "Vala"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Dibanisa i-Blink kwiinkqubo zokusetyenziswa ngayo i-NWC",
+    "newConnection": "Unxibelelwano olutsha",
+    "connectWallet": "Dibanisa isikhwama",
+    "appNameLabel": "Igama lenkqubo ofuna ukuyidibanisa",
+    "appNamePlaceholder": "Igama lenkqubo",
+    "dailyBudget": "Ibhajethi yosuku",
+    "connectionCreated": "Unxibelelwano ludalwe",
+    "nwcConnectionString": "Uluhlu lonxibelelwano lwe-NWC",
+    "copyInstruction": "Kopa olu luhlu uze uluncamathisele kwinkqubo ofuna ukuyidibanisa.",
+    "nwcStringCopied": "Uluhlu lonxibelelwano lwe-NWC lukhutshelwe kwibhodi yokuncamathisela",
+    "done": "Kugqityiwe",
+    "connectedApps": "Iinkqubo ezidibeneyo",
+    "budget": "Ibhajethi: {amount}",
+    "doNotNotifyBelow": "Ungazisi ngentengiso engaphantsi",
+    "deleteConfirmTitle": "Uqinisekile?",
+    "deleteConfirmBody": "Ngaba ufuna ngokwenene ukurhoxisa unxibelelwano ne-{appName}?",
+    "dismiss": "Lahla"
   }
 }

@@ -2338,7 +2338,8 @@
     "logoutOneAccountAlertContent": "Es tancarà la sessió vinculada a {identifier: string}.\nAssegura't de tenir accés per iniciar sessió de nou en el futur.",
     "logoutOneAccountConfirm": "Ho entenc. Si us plau, tanca la sessió.",
     "receiveCurrency": "Moneda de recepció",
-    "displayCurrency": "Moneda de visualització"
+    "displayCurrency": "Moneda de visualització",
+    "nostrWalletConnect": "Nostr Wallet Connect"
   },
   "NotificationSettingsScreen": {
     "title": "Configuració de notificacions",
@@ -3429,5 +3430,24 @@
         "buttonText": "Tancar"
       }
     }
+  },
+  "NostrWalletConnect": {
+    "emptyStateHeadline": "Connecta Blink amb altres aplicacions via NWC",
+    "newConnection": "Nova connexió",
+    "connectWallet": "Connectar cartera",
+    "appNameLabel": "Nom de l'aplicació que vols connectar",
+    "appNamePlaceholder": "Nom de l'aplicació",
+    "dailyBudget": "Pressupost diari",
+    "connectionCreated": "Connexió creada",
+    "nwcConnectionString": "Cadena de connexió NWC",
+    "copyInstruction": "Copia aquesta cadena i enganxa-la a l'aplicació que vols connectar.",
+    "nwcStringCopied": "Cadena de connexió NWC copiada al porta-retalls",
+    "done": "Fet",
+    "connectedApps": "Aplicacions connectades",
+    "budget": "Pressupost: {amount}",
+    "doNotNotifyBelow": "No notifiquis transaccions inferiors a",
+    "deleteConfirmTitle": "N'estàs segur?",
+    "deleteConfirmBody": "Realment vols revocar la connexió amb {appName}?",
+    "dismiss": "Descartar"
   }
 }

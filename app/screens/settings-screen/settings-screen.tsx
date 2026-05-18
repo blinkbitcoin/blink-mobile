@@ -27,6 +27,7 @@ import { AccountPOS } from "./settings/account-pos"
 import { TxLimits } from "./settings/account-tx-limits"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
+import { NwcSetting } from "./settings/advanced-nwc"
 import { JoinCommunitySetting } from "./settings/community-join"
 import { NeedHelpSetting } from "./settings/community-need-help"
 import { CurrencySetting } from "./settings/preferences-currency"
@@ -95,7 +96,7 @@ export const SettingsScreen: React.FC = () => {
       ThemeSetting,
     ],
     securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting],
-    advanced: [ExportCsvSetting, ApiAccessSetting],
+    advanced: [ExportCsvSetting, ApiAccessSetting, NwcSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],
   }
 
