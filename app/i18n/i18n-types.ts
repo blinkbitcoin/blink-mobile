@@ -11375,6 +11375,91 @@ type RootTranslation = {
 		 */
 		connectedApps: string
 		/**
+		 * N​o​ ​c​o​n​n​e​c​t​e​d​ ​a​p​p​s
+		 */
+		connectedAppsEmptyTitle: string
+		/**
+		 * A​p​p​s​ ​y​o​u​ ​c​o​n​n​e​c​t​ ​w​i​t​h​ ​N​o​s​t​r​ ​W​a​l​l​e​t​ ​C​o​n​n​e​c​t​ ​w​i​l​l​ ​a​p​p​e​a​r​ ​h​e​r​e​.
+		 */
+		connectedAppsEmptyBody: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​l​o​a​d​ ​c​o​n​n​e​c​t​e​d​ ​a​p​p​s​.​ ​P​u​l​l​ ​t​o​ ​r​e​f​r​e​s​h​.
+		 */
+		connectedAppsLoadError: string
+		/**
+		 * C​o​n​n​e​c​t​i​o​n​ ​d​e​t​a​i​l​s
+		 */
+		connectionDetails: string
+		/**
+		 * C​o​n​n​e​c​t​i​o​n​ ​d​e​t​a​i​l​s​ ​a​r​e​ ​u​n​a​v​a​i​l​a​b​l​e​.
+		 */
+		connectionDetailsUnavailable: string
+		/**
+		 * L​a​s​t​ ​u​s​e​d​:​ ​{​d​a​t​e​}
+		 * @param {string} date
+		 */
+		lastUsed: RequiredParams<'date'>
+		/**
+		 * N​e​v​e​r​ ​u​s​e​d
+		 */
+		neverUsed: string
+		/**
+		 * C​r​e​a​t​e​d
+		 */
+		createdDate: string
+		/**
+		 * L​a​s​t​ ​u​s​e​d
+		 */
+		lastUsedDate: string
+		/**
+		 * E​x​p​i​r​a​t​i​o​n
+		 */
+		expirationDate: string
+		/**
+		 * N​o​ ​e​x​p​i​r​a​t​i​o​n
+		 */
+		noExpiration: string
+		/**
+		 * A​p​p​ ​p​u​b​l​i​c​ ​k​e​y
+		 */
+		appPubkey: string
+		/**
+		 * A​c​t​i​v​e
+		 */
+		statusActive: string
+		/**
+		 * E​x​p​i​r​e​d
+		 */
+		statusExpired: string
+		/**
+		 * R​e​v​o​k​e​d
+		 */
+		statusRevoked: string
+		/**
+		 * B​u​d​g​e​t​ ​l​i​m​i​t​s
+		 */
+		budgetLimits: string
+		/**
+		 * {​u​s​e​d​}​ ​o​f​ ​{​a​m​o​u​n​t​}​ ​u​s​e​d
+		 * @param {string} amount
+		 * @param {string} used
+		 */
+		budgetUsage: RequiredParams<'amount' | 'used'>
+		/**
+		 * {​a​m​o​u​n​t​}​ ​r​e​m​a​i​n​i​n​g
+		 * @param {string} amount
+		 */
+		budgetRemaining: RequiredParams<'amount'>
+		/**
+		 * R​e​s​e​t​s​ ​{​d​a​t​e​}
+		 * @param {string} date
+		 */
+		budgetResetsAt: RequiredParams<'date'>
+		/**
+		 * D​o​e​s​ ​n​o​t​ ​r​e​s​e​t
+		 */
+		budgetDoesNotReset: string
+		/**
 		 * B​u​d​g​e​t​:​ ​{​a​m​o​u​n​t​}
 		 * @param {string} amount
 		 */
@@ -11551,6 +11636,49 @@ type RootTranslation = {
 		 * R​e​p​l​a​c​e​ ​c​o​n​n​e​c​t​i​o​n
 		 */
 		replaceConnection: string
+		/**
+		 * R​e​v​o​k​e​ ​c​o​n​n​e​c​t​i​o​n
+		 */
+		revokeConnection: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​r​e​v​o​k​e​ ​t​h​i​s​ ​c​o​n​n​e​c​t​i​o​n​.​ ​T​r​y​ ​a​g​a​i​n​.
+		 */
+		revokeFailed: string
+		/**
+		 * R​e​v​o​k​e​ ​c​o​n​n​e​c​t​i​o​n​?
+		 */
+		revokeConfirmTitle: string
+		/**
+		 * {​a​p​p​N​a​m​e​}​ ​w​i​l​l​ ​i​m​m​e​d​i​a​t​e​l​y​ ​l​o​s​e​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​w​a​l​l​e​t​.
+		 * @param {string} appName
+		 */
+		revokeConfirmBody: RequiredParams<'appName'>
+		/**
+		 * R​e​v​o​k​e​ ​a​l​l​ ​c​o​n​n​e​c​t​i​o​n​s
+		 */
+		revokeAllConnections: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​r​e​v​o​k​e​ ​c​o​n​n​e​c​t​i​o​n​s​.​ ​T​r​y​ ​a​g​a​i​n​.
+		 */
+		revokeAllFailed: string
+		/**
+		 * {​c​o​u​n​t​}​ ​c​o​n​n​e​c​t​i​o​n​(​s​)​ ​r​e​v​o​k​e​d
+		 * @param {number} count
+		 */
+		revokeAllSuccess: RequiredParams<'count'>
+		/**
+		 * R​e​v​o​k​e​ ​a​l​l​ ​c​o​n​n​e​c​t​i​o​n​s​?
+		 */
+		revokeAllConfirmTitle: string
+		/**
+		 * E​v​e​r​y​ ​c​o​n​n​e​c​t​e​d​ ​a​p​p​ ​w​i​l​l​ ​i​m​m​e​d​i​a​t​e​l​y​ ​l​o​s​e​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​w​a​l​l​e​t​.​ ​T​h​i​s​ ​c​a​n​n​o​t​ ​b​e​ ​u​n​d​o​n​e​.
+		 */
+		revokeAllConfirmBody: string
+		/**
+		 * T​y​p​e​ ​"​{​c​o​n​f​i​r​m​a​t​i​o​n​}​"​ ​t​o​ ​c​o​n​f​i​r​m​.
+		 * @param {string} confirmation
+		 */
+		revokeAllTypeConfirm: RequiredParams<'confirmation'>
 		/**
 		 * {​a​p​p​N​a​m​e​}​ ​i​s​ ​c​o​n​n​e​c​t​e​d
 		 * @param {string} appName
@@ -22800,6 +22928,86 @@ export type TranslationFunctions = {
 		 */
 		connectedApps: () => LocalizedString
 		/**
+		 * No connected apps
+		 */
+		connectedAppsEmptyTitle: () => LocalizedString
+		/**
+		 * Apps you connect with Nostr Wallet Connect will appear here.
+		 */
+		connectedAppsEmptyBody: () => LocalizedString
+		/**
+		 * Unable to load connected apps. Pull to refresh.
+		 */
+		connectedAppsLoadError: () => LocalizedString
+		/**
+		 * Connection details
+		 */
+		connectionDetails: () => LocalizedString
+		/**
+		 * Connection details are unavailable.
+		 */
+		connectionDetailsUnavailable: () => LocalizedString
+		/**
+		 * Last used: {date}
+		 */
+		lastUsed: (arg: { date: string }) => LocalizedString
+		/**
+		 * Never used
+		 */
+		neverUsed: () => LocalizedString
+		/**
+		 * Created
+		 */
+		createdDate: () => LocalizedString
+		/**
+		 * Last used
+		 */
+		lastUsedDate: () => LocalizedString
+		/**
+		 * Expiration
+		 */
+		expirationDate: () => LocalizedString
+		/**
+		 * No expiration
+		 */
+		noExpiration: () => LocalizedString
+		/**
+		 * App public key
+		 */
+		appPubkey: () => LocalizedString
+		/**
+		 * Active
+		 */
+		statusActive: () => LocalizedString
+		/**
+		 * Expired
+		 */
+		statusExpired: () => LocalizedString
+		/**
+		 * Revoked
+		 */
+		statusRevoked: () => LocalizedString
+		/**
+		 * Budget limits
+		 */
+		budgetLimits: () => LocalizedString
+		/**
+		 * {used} of {amount} used
+		 */
+		budgetUsage: (arg: { amount: string, used: string }) => LocalizedString
+		/**
+		 * {amount} remaining
+		 */
+		budgetRemaining: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Resets {date}
+		 */
+		budgetResetsAt: (arg: { date: string }) => LocalizedString
+		/**
+		 * Does not reset
+		 */
+		budgetDoesNotReset: () => LocalizedString
+		/**
 		 * Budget: {amount}
 		 */
 		budget: (arg: { amount: string }) => LocalizedString
@@ -22971,6 +23179,46 @@ export type TranslationFunctions = {
 		 * Replace connection
 		 */
 		replaceConnection: () => LocalizedString
+		/**
+		 * Revoke connection
+		 */
+		revokeConnection: () => LocalizedString
+		/**
+		 * Unable to revoke this connection. Try again.
+		 */
+		revokeFailed: () => LocalizedString
+		/**
+		 * Revoke connection?
+		 */
+		revokeConfirmTitle: () => LocalizedString
+		/**
+		 * {appName} will immediately lose access to your wallet.
+		 */
+		revokeConfirmBody: (arg: { appName: string }) => LocalizedString
+		/**
+		 * Revoke all connections
+		 */
+		revokeAllConnections: () => LocalizedString
+		/**
+		 * Unable to revoke connections. Try again.
+		 */
+		revokeAllFailed: () => LocalizedString
+		/**
+		 * {count} connection(s) revoked
+		 */
+		revokeAllSuccess: (arg: { count: number }) => LocalizedString
+		/**
+		 * Revoke all connections?
+		 */
+		revokeAllConfirmTitle: () => LocalizedString
+		/**
+		 * Every connected app will immediately lose access to your wallet. This cannot be undone.
+		 */
+		revokeAllConfirmBody: () => LocalizedString
+		/**
+		 * Type "{confirmation}" to confirm.
+		 */
+		revokeAllTypeConfirm: (arg: { confirmation: string }) => LocalizedString
 		/**
 		 * {appName} is connected
 		 */
