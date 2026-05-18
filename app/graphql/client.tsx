@@ -40,6 +40,11 @@ import { NetworkErrorContextProvider } from "./network-error-context"
 
 const noRetryOperations = [
   "nwcConnectionCreate",
+  "nwcConnectionDelete",
+  "nwcConnectionRevoke",
+  "nwcConnectionRevokeAll",
+  "nwcConnectionsRevokeAll",
+  "nwcConnectionUpdate",
 
   "intraLedgerPaymentSend",
   "intraLedgerUsdPaymentSend",
@@ -64,6 +69,9 @@ const noRetryOperations = [
   // and can create some unwanted loop when token is not valid
   "deviceNotificationTokenCreate",
 ]
+
+const shouldBypassPersistedQueries = (operationName: string | undefined) =>
+  operationName?.startsWith("nwc") ?? false
 
 const getAuthorizationHeader = (token: string): string => {
   return `Bearer ${token}`
@@ -232,6 +240,14 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         uri: appConfig.galoyInstance.graphqlUri,
       })
 
+      const httpLinkWithPersistedQueries = ApolloLink.from([persistedQueryLink, httpLink])
+
+      const httpLinkForOperation = split(
+        ({ operationName }) => shouldBypassPersistedQueries(operationName),
+        httpLink,
+        httpLinkWithPersistedQueries,
+      )
+
       const link = split(
         ({ query }) => {
           const definition = getMainDefinition(query)
@@ -247,8 +263,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
           appCheckLink,
           authLink,
           retry401ErrorLink,
-          persistedQueryLink,
-          httpLink,
+          httpLinkForOperation,
         ]),
       )
 

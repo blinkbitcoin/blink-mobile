@@ -35,7 +35,7 @@ const DEFAULT_AUTH_BUDGET = "10000"
 const createNwcGraphqlDocument = (source: string) => createGraphqlDocument(source)
 
 const NWC_KNOWN_APP_QUERY = createNwcGraphqlDocument(`
-  query NwcKnownAppForAuthorization($pubkey: String!) {
+  query nwcKnownAppForAuthorization($pubkey: String!) {
     nwcKnownApp(pubkey: $pubkey) {
       name
     }

@@ -87,7 +87,7 @@ const NWC_CONNECTION_CREATE_MUTATION = createNwcGraphqlDocument(`
 `)
 
 const NWC_SERVICE_INFO_QUERY = createNwcGraphqlDocument(`
-  query NwcServiceInfoForCreate {
+  query nwcServiceInfoForCreate {
     nwcServiceInfo {
       serverPubkey
       relayUrl
