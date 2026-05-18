@@ -97,7 +97,7 @@ const updateNotificationCount = (next: number) => {
 }
 
 const mockNavigate = jest.fn()
-let mockHasNwcConnections = false
+let mockNwcConnectionCount = 0
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -122,8 +122,8 @@ jest.mock("@react-navigation/native", () => ({
 }))
 
 jest.mock("@app/screens/nostr-wallet-connect/hooks", () => ({
-  useNwcConnections: () => ({
-    hasConnections: mockHasNwcConnections,
+  useNwcConnectionsQuery: () => ({
+    connectionCount: mockNwcConnectionCount,
   }),
 }))
 
@@ -248,7 +248,7 @@ describe("Settings Screen", () => {
   beforeEach(() => {
     loadLocale("en")
     mockNavigate.mockClear()
-    mockHasNwcConnections = false
+    mockNwcConnectionCount = 0
     testState = createTestState()
   })
 
@@ -503,7 +503,7 @@ describe("Settings Screen", () => {
     expect(subtitleNode.props.ellipsizeMode).toBe("tail")
   })
 
-  it("renders Nostr Wallet Connect option in Advanced section", async () => {
+  it("renders Connected apps option in Advanced section", async () => {
     render(
       <ContextForScreen>
         <LoggedInWithUsername mock={mocksWithUsername} />
@@ -517,10 +517,10 @@ describe("Settings Screen", () => {
         }),
     )
 
-    expect(screen.getByText("Nostr Wallet Connect")).toBeTruthy()
+    expect(screen.getByText("Connected apps")).toBeTruthy()
   })
 
-  it("opens the NWC empty state from Settings when there are no connections", async () => {
+  it("opens the connected apps list from Settings", async () => {
     render(
       <ContextForScreen>
         <LoggedInWithUsername mock={mocksWithUsername} />
@@ -534,30 +534,28 @@ describe("Settings Screen", () => {
         }),
     )
 
-    fireEvent.press(screen.getByTestId("Nostr Wallet Connect"))
-
-    expect(mockNavigate).toHaveBeenCalledWith("nwcEmptyState")
-  })
-
-  it("opens the connected apps list from Settings when connections exist", async () => {
-    mockHasNwcConnections = true
-
-    render(
-      <ContextForScreen>
-        <LoggedInWithUsername mock={mocksWithUsername} />
-      </ContextForScreen>,
-    )
-
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
-
-    fireEvent.press(screen.getByTestId("Nostr Wallet Connect"))
+    fireEvent.press(screen.getByTestId("Connected apps"))
 
     expect(mockNavigate).toHaveBeenCalledWith("nwcConnectedApps")
+  })
+
+  it("shows the connected apps count badge", async () => {
+    mockNwcConnectionCount = 3
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expect(screen.getByText("3")).toBeTruthy()
   })
 
   it("truncates long title and subtitle together", () => {

@@ -121,6 +121,7 @@ import {
   NwcNewConnectionFormScreen,
   NwcConnectionCreatedScreen,
   NwcConnectedAppsListScreen,
+  NwcConnectionDetailScreen,
   NwcAuthorizationScreen,
 } from "@app/screens/nostr-wallet-connect"
 import {
@@ -715,7 +716,12 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="nwcConnectedApps"
         component={NwcConnectedAppsListScreen}
-        options={{ title: LL.SettingsScreen.nostrWalletConnect() }}
+        options={{ title: LL.NostrWalletConnect.connectedApps() }}
+      />
+      <RootNavigator.Screen
+        name="nwcConnectionDetail"
+        component={NwcConnectionDetailScreen}
+        options={{ title: LL.NostrWalletConnect.connectedApps() }}
       />
       <RootNavigator.Screen
         name="nwcAuthorization"

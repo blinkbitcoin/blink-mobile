@@ -203,6 +203,7 @@ export type RootStackParamList = {
         returnUrl?: string
       }
   nwcConnectedApps: undefined
+  nwcConnectionDetail: { connectionId: string }
   nwcAuthorization: { uri: string }
 }
 
