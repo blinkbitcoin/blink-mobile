@@ -83,7 +83,7 @@ export const SettingsRow: React.FC<Props> = ({
               <Text type="p2" numberOfLines={1} ellipsizeMode="tail" style={styles.title}>
                 {title}
               </Text>
-              <Text>{extraComponentBesideTitle}</Text>
+              {extraComponentBesideTitle}
             </View>
             {subtitle && (
               <Text
