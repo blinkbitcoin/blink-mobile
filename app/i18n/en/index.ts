@@ -3606,7 +3606,6 @@ const en: BaseTranslation = {
     budgetUsage: "{used: string} of {amount: string} used",
     budgetRemaining: "{amount: string} remaining",
     budgetResetsAt: "Resets {date: string}",
-    budgetDoesNotReset: "Does not reset",
     budget: "Budget: {amount: string}",
     doNotNotifyBelow: "Do not notify for transactions below",
     deleteConfirmTitle: "Are you sure?",

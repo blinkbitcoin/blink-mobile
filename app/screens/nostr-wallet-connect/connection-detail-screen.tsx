@@ -277,13 +277,13 @@ const BudgetUsageCard: React.FC<{
       <Text style={styles.budgetMeta}>
         {LL.NostrWalletConnect.budgetRemaining({ amount: remaining })}
       </Text>
-      <Text style={styles.budgetMeta}>
-        {budget.resetsAt
-          ? LL.NostrWalletConnect.budgetResetsAt({
-              date: formatUnixTimestampYMDHM(budget.resetsAt),
-            })
-          : LL.NostrWalletConnect.budgetDoesNotReset()}
-      </Text>
+      {budget.resetsAt && (
+        <Text style={styles.budgetMeta}>
+          {LL.NostrWalletConnect.budgetResetsAt({
+            date: formatUnixTimestampYMDHM(budget.resetsAt),
+          })}
+        </Text>
+      )}
     </View>
   )
 }

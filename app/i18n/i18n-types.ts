@@ -11456,10 +11456,6 @@ type RootTranslation = {
 		 */
 		budgetResetsAt: RequiredParams<'date'>
 		/**
-		 * D​o​e​s​ ​n​o​t​ ​r​e​s​e​t
-		 */
-		budgetDoesNotReset: string
-		/**
 		 * B​u​d​g​e​t​:​ ​{​a​m​o​u​n​t​}
 		 * @param {string} amount
 		 */
@@ -23003,10 +22999,6 @@ export type TranslationFunctions = {
 		 * Resets {date}
 		 */
 		budgetResetsAt: (arg: { date: string }) => LocalizedString
-		/**
-		 * Does not reset
-		 */
-		budgetDoesNotReset: () => LocalizedString
 		/**
 		 * Budget: {amount}
 		 */

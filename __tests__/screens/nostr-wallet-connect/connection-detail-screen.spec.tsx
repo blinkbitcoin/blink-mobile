@@ -137,7 +137,7 @@ describe("NwcConnectionDetailScreen", () => {
   })
 
   it("renders connection details, permissions, and budget usage", async () => {
-    const { getByText, getAllByText } = render(
+    const { getByText, getAllByText, queryByText } = render(
       <ContextForScreen>
         <NwcConnectionDetailScreen />
       </ContextForScreen>,
@@ -160,6 +160,7 @@ describe("NwcConnectionDetailScreen", () => {
         }),
       ),
     ).toBeTruthy()
+    expect(queryByText("Does not reset")).toBeNull()
   })
 
   it("revokes the connection and returns to connected apps", async () => {
