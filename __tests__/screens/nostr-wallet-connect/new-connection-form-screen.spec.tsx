@@ -65,7 +65,7 @@ let mockEnabledBudgetCount = 0
 let mockBudgetsForCreate: ReadonlyArray<{ amountSats: number; period: "DAILY" }> = []
 let mockPermissions: ReadonlyArray<string> = ["GET_INFO", "MAKE_INVOICE"]
 type MockBudgetConfig = {
-  period: "DAILY" | "WEEKLY" | "MONTHLY" | "NEVER"
+  period: "DAILY" | "WEEKLY" | "MONTHLY" | "ANNUAL"
   amountSatsText: string
   enabled: boolean
 }
@@ -73,7 +73,7 @@ let mockBudgetConfigs: ReadonlyArray<MockBudgetConfig> = [
   { period: "DAILY", amountSatsText: "", enabled: false },
   { period: "WEEKLY", amountSatsText: "", enabled: false },
   { period: "MONTHLY", amountSatsText: "", enabled: false },
-  { period: "NEVER", amountSatsText: "", enabled: false },
+  { period: "ANNUAL", amountSatsText: "", enabled: false },
 ]
 
 jest.mock("@app/screens/nostr-wallet-connect/hooks", () => ({
@@ -113,7 +113,7 @@ describe("NwcNewConnectionFormScreen", () => {
       { period: "DAILY", amountSatsText: "", enabled: false },
       { period: "WEEKLY", amountSatsText: "", enabled: false },
       { period: "MONTHLY", amountSatsText: "", enabled: false },
-      { period: "NEVER", amountSatsText: "", enabled: false },
+      { period: "ANNUAL", amountSatsText: "", enabled: false },
     ]
     mockCreateManualNwcConnection.mockResolvedValue({
       errors: [],

@@ -2,7 +2,7 @@ import { useCallback, useState } from "react"
 
 import { NwcBudgetPeriod, NwcGraphqlPermission } from "../nwc-types"
 
-export const MANUAL_BUDGET_PERIODS = ["DAILY", "WEEKLY", "MONTHLY", "NEVER"] as const
+export const MANUAL_BUDGET_PERIODS = ["DAILY", "WEEKLY", "MONTHLY", "ANNUAL"] as const
 
 const parseBudgetSats = (value: string) => Number(value) || 0
 

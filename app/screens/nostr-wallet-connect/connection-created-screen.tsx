@@ -327,7 +327,7 @@ const budgetPeriodLabel = (
     DAILY: LL.NostrWalletConnect.periodDaily(),
     WEEKLY: LL.NostrWalletConnect.periodWeekly(),
     MONTHLY: LL.NostrWalletConnect.periodMonthly(),
-    NEVER: LL.NostrWalletConnect.periodAnnually(),
+    ANNUAL: LL.NostrWalletConnect.periodAnnually(),
   })[period]
 
 const graphqlPermissionLabel = (

@@ -11,7 +11,7 @@ describe("useNewConnection", () => {
       { period: "DAILY", amountSatsText: "", enabled: false },
       { period: "WEEKLY", amountSatsText: "", enabled: false },
       { period: "MONTHLY", amountSatsText: "", enabled: false },
-      { period: "NEVER", amountSatsText: "", enabled: false },
+      { period: "ANNUAL", amountSatsText: "", enabled: false },
     ])
     expect(result.current.enabledBudgetCount).toBe(0)
     expect(result.current.budgetsForCreate).toEqual([])
@@ -70,7 +70,7 @@ describe("useNewConnection", () => {
       { period: "DAILY", amountSatsText: "10000", enabled: true },
       { period: "WEEKLY", amountSatsText: "2500", enabled: true },
       { period: "MONTHLY", amountSatsText: "", enabled: false },
-      { period: "NEVER", amountSatsText: "", enabled: false },
+      { period: "ANNUAL", amountSatsText: "", enabled: false },
     ])
   })
 

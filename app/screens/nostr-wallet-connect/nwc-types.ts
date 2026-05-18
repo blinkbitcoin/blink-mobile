@@ -17,7 +17,9 @@ export const DEFAULT_NWC_PERMISSIONS: ReadonlyArray<NwcPermission> = [
   "pay_invoice",
 ]
 
-export const NWC_BUDGET_PERIODS = ["DAILY", "WEEKLY", "MONTHLY", "NEVER"] as const
+// TODO(blink-nwc): add a distinct NEVER budget period here if the backend
+// supports a no-reset spend limit in the future.
+export const NWC_BUDGET_PERIODS = ["DAILY", "WEEKLY", "MONTHLY", "ANNUAL"] as const
 
 export type NwcBudgetPeriod = (typeof NWC_BUDGET_PERIODS)[number]
 

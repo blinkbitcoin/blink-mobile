@@ -202,12 +202,12 @@ describe("NwcConnectionCreatedScreen", () => {
     expect(queryByTestId("qr-code")).toBeNull()
   })
 
-  it("renders the non-resetting budget period as annually", async () => {
+  it("renders the annual budget period", async () => {
     mockRouteParams = {
       appName: "Amethyst",
       successMode: "authorization",
       permissions: ["GET_INFO"],
-      budgets: [{ amountSats: 10_000, period: "NEVER" }],
+      budgets: [{ amountSats: 10_000, period: "ANNUAL" }],
     }
 
     const { getByText } = render(

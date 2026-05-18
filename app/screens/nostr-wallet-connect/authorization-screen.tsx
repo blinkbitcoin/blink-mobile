@@ -140,7 +140,7 @@ export const NwcAuthorizationScreen: React.FC = () => {
           DAILY: LL.NostrWalletConnect.periodDaily(),
           WEEKLY: LL.NostrWalletConnect.periodWeekly(),
           MONTHLY: LL.NostrWalletConnect.periodMonthly(),
-          NEVER: LL.NostrWalletConnect.periodAnnually(),
+          ANNUAL: LL.NostrWalletConnect.periodAnnually(),
         }[period],
       })),
     [LL],
@@ -154,7 +154,7 @@ export const NwcAuthorizationScreen: React.FC = () => {
       DAILY: LL.NostrWalletConnect.periodDaily(),
       WEEKLY: LL.NostrWalletConnect.periodWeekly(),
       MONTHLY: LL.NostrWalletConnect.periodMonthly(),
-      NEVER: LL.NostrWalletConnect.periodAnnually(),
+      ANNUAL: LL.NostrWalletConnect.periodAnnually(),
     })[period]
 
   const appName = parsed.valid
