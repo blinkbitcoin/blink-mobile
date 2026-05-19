@@ -24,6 +24,11 @@ jest.mock("@app/self-custodial/storage/account-index", () => ({
   StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
 }))
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 describe("useEffectiveAuthToken", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -111,22 +116,42 @@ describe("useEffectiveAuthToken", () => {
     })
   })
 
-  it("keeps the optimistic empty-token state when the self-custodial index read fails", async () => {
-    // Read failures must not flip the user back to custodial — that would be
-    // the same data-leak that the empty-token guard exists to prevent. The
-    // hook stays optimistic about self-custodial until the index can be consulted.
+  it("falls back to the live custodial token when the self-custodial index read fails", async () => {
+    // A permanent empty-token lockout (with no recovery path) is worse than
+    // the brief window where backend-gated screens could see the user's own
+    // custodial data. Failures are surfaced to crashlytics for diagnosis.
     mockActiveAccountId = "self-custodial-uuid-1"
+    const readError = new Error("AsyncStorage unavailable")
     mockListSelfCustodialAccounts.mockResolvedValue({
       status: "read-failed",
-      error: new Error("AsyncStorage unavailable"),
+      error: readError,
     })
 
     const { result } = renderHook(() => useEffectiveAuthToken())
 
     await waitFor(() => {
-      expect(mockListSelfCustodialAccounts).toHaveBeenCalled()
+      expect(result.current).toBe("live-token")
     })
-    expect(result.current).toBe("")
+    expect(mockReportError).toHaveBeenCalledWith(
+      "auth-token account-index read",
+      readError,
+    )
+  })
+
+  it("falls back to the live custodial token when the self-custodial index promise rejects", async () => {
+    mockActiveAccountId = "self-custodial-uuid-1"
+    const rejection = new Error("AsyncStorage threw")
+    mockListSelfCustodialAccounts.mockRejectedValue(rejection)
+
+    const { result } = renderHook(() => useEffectiveAuthToken())
+
+    await waitFor(() => {
+      expect(result.current).toBe("live-token")
+    })
+    expect(mockReportError).toHaveBeenCalledWith(
+      "auth-token account-index read rejected",
+      rejection,
+    )
   })
 
   it("re-queries the self-custodial index when the active account id changes", async () => {
