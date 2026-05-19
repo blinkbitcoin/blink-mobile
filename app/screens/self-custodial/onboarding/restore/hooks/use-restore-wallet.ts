@@ -9,6 +9,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { logSelfCustodialRestoreCompleted } from "@app/self-custodial/analytics"
 import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
 import {
   BackupMethod,
@@ -20,7 +21,6 @@ import {
   StorageReadStatus,
 } from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
-import { logSelfCustodialRestoreCompleted } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
 import { normalizeMnemonic } from "@app/utils/mnemonic"
 import { toastShow } from "@app/utils/toast"
@@ -71,6 +71,7 @@ export const useRestoreWallet = () => {
           if (lookup.id) {
             activateAccount(lookup.id)
             reinitSdk()
+            logSelfCustodialRestoreCompleted()
             navigation.navigate("selfCustodialBackupSuccess")
             return
           }

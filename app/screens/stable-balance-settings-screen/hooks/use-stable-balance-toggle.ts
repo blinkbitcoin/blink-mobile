@@ -2,13 +2,13 @@ import { useCallback, useState } from "react"
 
 import type { BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
+import { logSelfCustodialStableBalanceActivated } from "@app/self-custodial/analytics"
 import {
   activateStableBalance,
   deactivateStableBalance,
 } from "@app/self-custodial/bridge"
 import { SparkToken } from "@app/self-custodial/config"
 import type { TranslationFunctions } from "@app/i18n/i18n-types"
-import { logSelfCustodialStableBalanceActivated } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 

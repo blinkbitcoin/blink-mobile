@@ -1,4 +1,5 @@
 import { useCallback } from "react"
+import { Platform } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
@@ -8,6 +9,7 @@ import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { BackupMethod, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
@@ -123,6 +125,9 @@ export const useCloudBackup = ({
     }
 
     setBackupCompleted(BackupMethod.Cloud)
+    logSelfCustodialBackupCompleted({
+      backupMethod: Platform.OS === "ios" ? "icloud" : "google_drive",
+    })
     toastShow({
       message: LL.BackupScreen.CloudBackup.uploadSuccess({ provider }),
       type: "success",

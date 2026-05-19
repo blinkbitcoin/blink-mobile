@@ -7,6 +7,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { BackupMethod, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { toastShow } from "@app/utils/toast"
@@ -71,6 +72,7 @@ export const useBackupMethods = () => {
     }
 
     setBackupCompleted(BackupMethod.Keychain)
+    logSelfCustodialBackupCompleted({ backupMethod: "keychain" })
     toastShow({
       message: LL.BackupScreen.BackupMethod.passwordManagerBackupSaved(),
       type: "success",

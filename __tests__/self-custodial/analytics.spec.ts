@@ -4,7 +4,7 @@ import {
   logSelfCustodialRestoreCompleted,
   logSelfCustodialRolloutExposed,
   logSelfCustodialStableBalanceActivated,
-} from "@app/utils/analytics"
+} from "@app/self-custodial/analytics"
 
 const mockLogEvent = jest.fn()
 
