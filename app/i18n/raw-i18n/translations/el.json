@@ -76,8 +76,7 @@
     "feeError": "Δεν ήταν δυνατή η ανάκτηση της χρέωσης μετατροπής"
   },
   "ConversionSuccessScreen": {
-    "message": "Επιτυχής μετατροπή",
-    "title": "Επιτυχής μετατροπή "
+    "message": "Επιτυχής μετατροπή"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2311,7 +2310,6 @@
     "slow": "Αργή",
     "recommended": "Συνιστάται",
     "walletOffline": "Το πορτοφόλι σας είναι εκτός σύνδεσης. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.",
-    "destinationIsRequired": "Απαιτείται προορισμός",
     "sdkInsufficientFunds": "Ανεπαρκές υπόλοιπο για αυτήν τη συναλλαγή.",
     "sdkAmountTooLow": "Το ποσό είναι πολύ μικρό για μια συναλλαγή on-chain.",
     "sdkNetworkError": "Σφάλμα δικτύου. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.",
@@ -2362,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Διεύθυνση Lightning"
     }
   },
   "NotificationSettingsScreen": {
@@ -2495,9 +2494,9 @@
     "body": "Το Λογαριασμός Δολαρίου χρησιμοποιεί τεχνολογία Stablesats για να κρατά το Bitcoin σταθερό στην τιμή USD. Πάντα κρατάς Bitcoin — όχι πραγματικά δολάρια — αλλά η αξία USD δεν διακυμαίνεται. Μπορείς να στέλνεις και να λαμβάνεις Bitcoin κανονικά, αλλά δεν είναι συμβατό με το παραδοσιακό τραπεζικό σύστημα.",
     "termsAndConditions": "Διαβάστε τους Όρους & Προϋποθέσεις",
     "learnMore": "Μάθετε περισσότερα σχετικά με τα Stablesats",
-      "headerSelfCustodial": "Ο λογαριασμός σου σε δολάρια κρατά stablecoins",
-      "bodySelfCustodial": "Στον λογαριασμό σε δολάρια κρατάς stablecoins. Tokens με αντίκρισμα σε περιουσιακά στοιχεία και αξία σταθερή έναντι του USD. Δεν μπορείς (ακόμα) να στείλεις και να λάβεις stablecoins. Όταν στέλνεις από τον λογαριασμό σε δολάρια, τα stablecoins σου ανταλλάσσονται και αποστέλλονται ως Bitcoin στον παραλήπτη.",
-      "learnMoreSelfCustodial": "Μάθε περισσότερα"
+    "headerSelfCustodial": "Ο λογαριασμός σου σε δολάρια κρατά stablecoins",
+    "bodySelfCustodial": "Στον λογαριασμό σε δολάρια κρατάς stablecoins. Tokens με αντίκρισμα σε περιουσιακά στοιχεία και αξία σταθερή έναντι του USD. Δεν μπορείς (ακόμα) να στείλεις και να λάβεις stablecoins. Όταν στέλνεις από τον λογαριασμό σε δολάρια, τα stablecoins σου ανταλλάσσονται και αποστέλλονται ως Bitcoin στον παραλήπτη.",
+    "learnMoreSelfCustodial": "Μάθε περισσότερα"
   },
   "SplashScreen": {
     "update": "Η εφαρμογή σας είναι ξεπερασμένη. Χρειάζεται ενημέρωση για να μπορέσετε να χρησιμοποιήσετε την εφαρμογή.\n\nΑυτό μπορεί να γίνει από το PlayStore για Android και το Testflight για iOS."
@@ -2822,7 +2821,8 @@
       "invalidRegion": "Μη έγκυρη επιλογή περιοχής"
     },
     "passwordTooWeak": "Ο κωδικός πρόσβασης είναι πολύ αδύναμος. Χρησιμοποιήστε συνδυασμό κεφαλαίων, πεζών, αριθμών και ειδικών χαρακτήρων.",
-    "passwordCommon": "Αυτός ο κωδικός πρόσβασης είναι πολύ συνηθισμένος. Παρακαλώ επιλέξτε έναν ισχυρότερο κωδικό πρόσβασης."
+    "passwordCommon": "Αυτός ο κωδικός πρόσβασης είναι πολύ συνηθισμένος. Παρακαλώ επιλέξτε έναν ισχυρότερο κωδικό πρόσβασης.",
+    "copied": "Αντιγράφηκε στο πρόχειρο"
   },
   "errors": {
     "generic": "Υπήρξε ένα σφάλμα. \nΠαρακαλούμε δοκιμάστε πάλι αργότερα. ",
@@ -2991,7 +2991,10 @@
       "emptyTransactions": "Δεν υπάρχουν συναλλαγές ακόμη",
       "addFunds": "Προσθήκη χρημάτων",
       "transactionsTitle": "Συναλλαγές",
-      "title": "Κάρτα Visa"
+      "title": "Κάρτα Visa",
+      "noCardAvailable": "Δεν υπάρχουν διαθέσιμες κάρτες",
+      "cardNotUsable": "Αυτή η κάρτα δεν είναι διαθέσιμη για χρήση",
+      "cardUpdateError": "Αδυναμία ενημέρωσης κατάστασης κάρτας"
     },
     "validThruLabel": "ΙΣΧΥΕΙ ΜΕΧΡΙ",
     "networkVisa": "Visa",
@@ -3263,9 +3266,6 @@
         "damagedCard": "Κατεστραμμένη κάρτα",
         "damagedCardDescription": "Η κάρτα μου είναι φυσικά κατεστραμμένη",
         "whatHappensNext": "Τι γίνεται μετά;",
-        "currentCardDeactivated": "Η τρέχουσα κάρτα σας θα απενεργοποιηθεί αμέσως",
-        "newCardShipped": "Μια νέα κάρτα θα αποσταλεί στη διεύθυνσή σας",
-        "digitalCardAvailable": "Η ψηφιακή σας κάρτα παραμένει διαθέσιμη κατά τη διάρκεια αυτής της διαδικασίας",
         "cardManagement": "Διαχείριση κάρτας",
         "bullet1": "Η τρέχουσα κάρτα σας θα παγώσει για λόγους ασφαλείας",
         "bullet2": "Θα εκδοθεί νέα κάρτα με διαφορετικούς αριθμούς",
@@ -3286,15 +3286,9 @@
         "title": "Ελέγξτε το αίτημά σας",
         "subtitle": "Επιβεβαιώστε τα στοιχεία αντικατάστασης της κάρτας σας",
         "requestSummary": "Σύνοψη αιτήματος",
-        "reason": "Λόγος",
         "delivery": "Παράδοση",
-        "shippingAddress": "Διεύθυνση αποστολής",
-        "deliveryCost": "Κόστος παράδοσης",
         "submitRequest": "Υποβολή αιτήματος",
         "importantInformation": "Σημαντικές πληροφορίες",
-        "processedImmediately": "Το αίτημά σας θα επεξεργαστεί αμέσως",
-        "currentCardDeactivated": "Η τρέχουσα κάρτα θα απενεργοποιηθεί με την επιβεβαίωση",
-        "trackStatus": "Μπορείτε να παρακολουθείτε την κατάσταση παράδοσης της νέας σας κάρτας στην εφαρμογή",
         "issueType": "Λόγος",
         "deliveryTime": "Χρόνος παράδοσης",
         "shippingCost": "Κόστος παράδοσης",
@@ -3347,10 +3341,7 @@
         "feature2": "Τσιπ EMV για ενισχυμένη ασφάλεια",
         "feature3": "Μαγνητική ταινία για καθολική αποδοχή",
         "feature4": "Το όνομά σας ανάγλυφο στην κάρτα",
-        "important": "Σημαντικό",
-        "importantBullet1": "Η εικονική κάρτα θα παραμείνει ενεργή όσο περιμένετε τη φυσική κάρτα",
-        "importantBullet2": "Θα χρειαστεί να ενεργοποιήσετε τη φυσική κάρτα όταν φτάσει",
-        "importantBullet3": "Και οι δύο κάρτες θα έχουν τον ίδιο αριθμό και στοιχεία"
+        "important": "Σημαντικό"
       },
       "Confirm": {
         "title": "Επιβεβαιώστε την παραγγελία σας",
@@ -3499,7 +3490,6 @@
         "savedConfirm": "Την αποθήκευσα",
         "copy": "Αντιγραφή",
         "continueButton": "Συνέχεια",
-        "selfCustodialDisabled": "Το μη-επιμελούμενο είναι προσωρινά μη διαθέσιμο.",
         "testBackup": "Δοκιμάστε το αντίγραφο ασφαλείας"
       },
       "Confirm": {
@@ -3562,7 +3552,8 @@
     "chooseMethod": "Επιλέξτε μέθοδο",
     "restoreComingSoonTitle": "Σύντομα διαθέσιμο",
     "restoreComingSoonDescription": "Η λειτουργία επαναφοράς θα είναι διαθέσιμη σε μελλοντική ενημέρωση.",
-    "createFailed": "Αποτυχία δημιουργίας πορτοφολιού. Παρακαλώ δοκιμάστε ξανά."
+    "createFailed": "Αποτυχία δημιουργίας πορτοφολιού. Παρακαλώ δοκιμάστε ξανά.",
+    "selfCustodialDisabled": "Η μη-φύλαξη είναι προσωρινά μη διαθέσιμη."
   },
   "RestoreScreen": {
     "title": "Επαναφορά πορτοφολιού",
@@ -3666,7 +3657,6 @@
     "description": "Σύνολο: {sats} sats διαθέσιμα για διεκδίκηση",
     "claim": "Διεκδίκηση τώρα",
     "claiming": "Διεκδίκηση...",
-    "belowMinimum": "{count} κατάθεση(-εις) κάτω από το ελάχιστο (~{minimum} sats). Δεν μπορούν να διεκδικηθούν ακόμα.",
     "screenTitle": "Αδιεκδίκητες καταθέσεις",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3689,12 +3679,7 @@
     "refundNow": "Επιστροφή τώρα",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Έτοιμο",
-    "badgePending": "Εκκρεμεί",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Σφάλμα",
-    "badgeRefunded": "Επιστράφηκε"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

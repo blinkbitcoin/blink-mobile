@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "كيفية استخدام سلة الشراء",
     "howToUseYourAddressExplainer": "Share with someone that has a compatible wallet, such as:",
     "howToUseYourPaycodeExplainer": "You can print your Paycode (technically, this is an lnurl-pay address) and display it in your business to receive payments. Individuals can pay you by scanning it with a Lightning-enabled wallet.\n\nHowever, be aware that some wallets can’t scan a Paycode such as:",
-    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet.",
-    "yourAddress": "عنوانك في {bankName: string}",
-    "copiedAddressToClipboard": "نُسخ عنوانك في {bankName: string} إلى الحافظة."
+    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "الشروط والأحكام",
@@ -78,8 +76,7 @@
     "feeError": "تعذر جلب رسوم التحويل"
   },
   "ConversionSuccessScreen": {
-    "message": "تم التحويل بنجاح",
-    "title": "نجح التحويل"
+    "message": "تم التحويل بنجاح"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2075,12 +2072,7 @@
     "payBusiness": "ادفع لهذا المحل",
     "openSettings": "فتح الإعدادات",
     "title": "خريطة",
-    "error": "عفوًا. حدث خطأ أثناء الحصول على موقعك",
-    "locationPermissionMessage": "قم بتشغيل خاصية مكانك لتعرف اين انت على الخريطة",
-    "locationPermissionNegative": "إلغاء",
-    "locationPermissionNeutral": "اسألني لاحقا",
-    "locationPermissionPositive": "كل شيء على مايرام 👍",
-    "locationPermissionTitle": "قم بتحديد مكانك على الخريطة"
+    "error": "عفوًا. حدث خطأ أثناء الحصول على موقعك"
   },
   "HomeScreen": {
     "receive": "استقبال",
@@ -2264,16 +2256,7 @@
     "clipboardError": "خطأ في الحصول على القيمة من الحافظة",
     "pastedClipboardSuccess": "تم اللصق من الحافظة",
     "invalidPhoneNumber": "أدخل رقم هاتف محمول صالح",
-    "phoneNotAllowed": "هذا الحقل لا يقبل أرقام الهواتف",
-    "confirmModal": {
-      "title": "You've never sent money to this address",
-      "body1": "رجاءً تأكد أن المتلقي أعطاك عنوانًا في {bankName: string}.",
-      "bold2bold": "ليس أسم مستخدم من محفظة أخرى",
-      "body3": "وإلا، سيذهب النقد إلى الحساب في {bankName: string}، الذي عنوانه البرقي هو “{lnAddress: string}”.\n\nتحقق من صحة كتابة العنوان كذلك، مثلًا jackie ليس نفسه jack1e.",
-      "warning": "إذا كان العنوان مدخلًا خطأً، لن يستطيع {bankName: string} التراجع عن المعاملة.",
-      "checkBox": "{lnAddress: string} هو العنوان الصحيح.",
-      "confirmButton": "أنا متأكد 100%"
-    }
+    "phoneNotAllowed": "هذا الحقل لا يقبل أرقام الهواتف"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "يجب إرسال المعاملة إلى mempool",
@@ -2327,8 +2310,6 @@
     "slow": "بطيء",
     "recommended": "موصى به",
     "walletOffline": "محفظتك غير متصلة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
-    "destinationIsRequired": "الوجهة مطلوبة",
-    "lnurlInvoiceIncorrectDescription": "استجاب الخادم بفاتورة فيها هاش وصف غير صالح.",
     "sdkInsufficientFunds": "لا توجد أموال كافية لهذه المعاملة.",
     "sdkAmountTooLow": "المبلغ منخفض جدًا لمعاملة على السلسلة.",
     "sdkNetworkError": "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
@@ -2379,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "عنوان Lightning"
     }
   },
   "NotificationSettingsScreen": {
@@ -2512,9 +2494,9 @@
     "body": "يستخدم حساب بالدولار تقنية Stablesats للحفاظ على Bitcoin مستقراً بسعر USD. أنت دائماً تحتفظ بـ Bitcoin — وليس دولارات حقيقية — لكن قيمة USD لا تتقلب. يمكنك إرسال واستقبال Bitcoin كالمعتاد، لكنه غير متوافق مع النظام المصرفي التقليدي.",
     "termsAndConditions": "إقرأ الشروط والأحكام",
     "learnMore": "تعلم المزيد عن Stablesats",
-      "headerSelfCustodial": "حساب الدولار الخاص بك يحتفظ بالعملات المستقرة",
-      "bodySelfCustodial": "في حساب الدولار، أنت تحتفظ بعملات مستقرة. وهي رموز مدعومة بأصول وقيمتها مرتبطة بالدولار الأمريكي. لا يمكنك إرسال واستقبال العملات المستقرة (حتى الآن). عندما ترسل من حساب الدولار، سيتم تحويل عملاتك المستقرة وإرسالها كبيتكوين إلى المستلم.",
-      "learnMoreSelfCustodial": "اعرف المزيد"
+    "headerSelfCustodial": "حساب الدولار الخاص بك يحتفظ بالعملات المستقرة",
+    "bodySelfCustodial": "في حساب الدولار، أنت تحتفظ بعملات مستقرة. وهي رموز مدعومة بأصول وقيمتها مرتبطة بالدولار الأمريكي. لا يمكنك إرسال واستقبال العملات المستقرة (حتى الآن). عندما ترسل من حساب الدولار، سيتم تحويل عملاتك المستقرة وإرسالها كبيتكوين إلى المستلم.",
+    "learnMoreSelfCustodial": "اعرف المزيد"
   },
   "SplashScreen": {
     "update": "تطبيقك قديم. لا بد من تحديث التطبيق حتى يمكن استخدامه.\n\nيمكنك التحديث من متجر PlayStore للأندرويد أو Testflight لنظام iOS"
@@ -2839,7 +2821,8 @@
       "invalidRegion": "اختيار منطقة غير صالح"
     },
     "passwordTooWeak": "كلمة المرور ضعيفة جدًا. استخدم مزيجًا من الأحرف الكبيرة والصغيرة والأرقام والرموز الخاصة.",
-    "passwordCommon": "كلمة المرور هذه شائعة جدًا. يرجى اختيار كلمة مرور أقوى."
+    "passwordCommon": "كلمة المرور هذه شائعة جدًا. يرجى اختيار كلمة مرور أقوى.",
+    "copied": "تم النسخ إلى الحافظة"
   },
   "errors": {
     "generic": "كان هناك خطأ.\nالرجاء معاودة المحاولة في وقت لاحق.",
@@ -2968,27 +2951,6 @@
       "title": "تحدي يونيو!",
       "description": "وسّع دائرتك الداخلية بـ 10 للحصول على فرصة للفوز بتذكرة مميزة بقيمة 1000$ لمؤتمر Adopting Bitcoin السلفادور",
       "details": "اربح تذكرة مميزة لمؤتمر Adopting Bitcoin السلفادور\n\nوسّع دائرتك الداخلية بـ 10 للحصول على فرصة للفوز بتذكرة مميزة بقيمة 1000$ لمؤتمر Adopting Bitcoin السلفادور! تتضمن التذكرة وصولًا حصريًا إلى المؤتمر الرئيسي، والميزانين مع الطعام/المشروبات/الوجبات الخفيفة، وعشاء المتحدثين، ومهرجان الأفلام.\n\nشارك دوائرك على وسائل التواصل الاجتماعي بهاشتاغ #blinkcircles للمشاركة.\n\nهذه المرة، سيكون هناك فائزان!"
-    },
-    "septChallenge": {
-      "title": "September Challenge!",
-      "description": "Inner Circle {innerCircle: number}/21 - Earn $21\nTop 3 - Win tickets to Adopting Bitcoin!",
-      "details": "Grow your inner circle by 21 people in September and share on social with #blinkcircles to get $21 to your Stablesats account. Top 3 win tickets to Adopting Bitcoin!",
-      "peopleWelcomedSoFar": "people welcomed so far",
-      "yourRank": "your rank",
-      "reminder": "Reminder: Your inner circle grows when you send a new Blink user their first sats",
-      "fullDetails": "Full details at"
-    },
-    "octoberChallenge": {
-      "title": "October Challenge!",
-      "description": "Share your #blinkcircles for a chance to win 1,000,000 sats!",
-      "details": "We're giving away 1,000,000 sats!\n\n Share your Circles on social with tag `#blinkcircles` to enter! The winner will be chosen at random on October 31st.\n\n You must have at least one person in your Inner Circle to enter!",
-      "connectOnSocial": "Connect on social: ",
-      "fullDetails": "Full details at "
-    },
-    "novemberChallenge": {
-      "title": "November Challenge!",
-      "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-      "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
     }
   },
   "FullOnboarding": {
@@ -3029,7 +2991,10 @@
       "emptyTransactions": "لا توجد معاملات بعد",
       "addFunds": "إضافة أموال",
       "transactionsTitle": "المعاملات",
-      "title": "بطاقة Visa"
+      "title": "بطاقة Visa",
+      "noCardAvailable": "لا توجد بطاقات متاحة",
+      "cardNotUsable": "هذه البطاقة غير متاحة للاستخدام حاليًا",
+      "cardUpdateError": "تعذر تحديث حالة البطاقة"
     },
     "validThruLabel": "صالح حتى",
     "networkVisa": "Visa",
@@ -3301,9 +3266,6 @@
         "damagedCard": "بطاقة تالفة",
         "damagedCardDescription": "بطاقتي متضررة فعلياً",
         "whatHappensNext": "ماذا يحدث بعد ذلك؟",
-        "currentCardDeactivated": "سيتم إلغاء تنشيط بطاقتك الحالية فوراً",
-        "newCardShipped": "سيتم شحن بطاقة جديدة إلى عنوانك",
-        "digitalCardAvailable": "تبقى بطاقتك الرقمية متاحة خلال هذه العملية",
         "cardManagement": "إدارة البطاقة",
         "bullet1": "سيتم تجميد بطاقتك الحالية لأغراض الأمان",
         "bullet2": "سيتم إصدار بطاقة جديدة بأرقام مختلفة",
@@ -3324,15 +3286,9 @@
         "title": "راجع طلبك",
         "subtitle": "يرجى تأكيد تفاصيل استبدال بطاقتك",
         "requestSummary": "ملخص الطلب",
-        "reason": "السبب",
         "delivery": "التوصيل",
-        "shippingAddress": "عنوان الشحن",
-        "deliveryCost": "تكلفة التوصيل",
         "submitRequest": "إرسال الطلب",
         "importantInformation": "معلومات مهمة",
-        "processedImmediately": "سيتم معالجة طلبك فوراً",
-        "currentCardDeactivated": "سيتم إلغاء تنشيط البطاقة الحالية عند التأكيد",
-        "trackStatus": "يمكنك تتبع حالة توصيل بطاقتك الجديدة في التطبيق",
         "issueType": "السبب",
         "deliveryTime": "وقت التسليم",
         "shippingCost": "تكلفة التوصيل",
@@ -3385,10 +3341,7 @@
         "feature2": "شريحة EMV لتعزيز الأمان",
         "feature3": "شريط مغناطيسي للقبول العالمي",
         "feature4": "سيتم نقش اسمك على البطاقة",
-        "important": "مهم",
-        "importantBullet1": "ستظل بطاقتك الافتراضية نشطة أثناء انتظار البطاقة الفعلية",
-        "importantBullet2": "ستحتاج إلى تفعيل بطاقتك الفعلية عند وصولها",
-        "importantBullet3": "ستحمل كلتا البطاقتين نفس رقم البطاقة والتفاصيل"
+        "important": "مهم"
       },
       "Confirm": {
         "title": "أكد طلبك",
@@ -3537,7 +3490,6 @@
         "savedConfirm": "لقد حفظتها",
         "copy": "نسخ",
         "continueButton": "متابعة",
-        "selfCustodialDisabled": "الحفظ الذاتي غير متاح مؤقتًا.",
         "testBackup": "اختبر نسختك الاحتياطية"
       },
       "Confirm": {
@@ -3600,7 +3552,8 @@
     "chooseMethod": "اختر الطريقة",
     "restoreComingSoonTitle": "قريباً",
     "restoreComingSoonDescription": "ستكون ميزة الاستعادة متاحة في تحديث مستقبلي.",
-    "createFailed": "فشل في إنشاء المحفظة. يرجى المحاولة مرة أخرى."
+    "createFailed": "فشل في إنشاء المحفظة. يرجى المحاولة مرة أخرى.",
+    "selfCustodialDisabled": "غير الحفظ غير متاح مؤقتًا."
   },
   "RestoreScreen": {
     "title": "استعادة المحفظة",
@@ -3704,7 +3657,6 @@
     "description": "الإجمالي: {sats} سات متاحة للمطالبة",
     "claim": "طالب الآن",
     "claiming": "جارٍ المطالبة...",
-    "belowMinimum": "{count} إيداع(ات) أقل من الحد الأدنى (~{minimum} سات). لا يمكن المطالبة بها بعد.",
     "screenTitle": "إيداعات غير مطالب بها",
     "cardTitle": "استلام {sats} sats",
     "claimWithFee": "استلام (رسوم قصوى: {fee} sats)",
@@ -3727,12 +3679,7 @@
     "refundNow": "استرداد الآن",
     "refundSuccess": "تم بدء الاسترداد بنجاح",
     "claimSuccess": "تم استلام الإيداع بنجاح",
-    "error": "تعذر استلام هذا الإيداع",
-    "badgeReady": "جاهز",
-    "badgePending": "معلق",
-    "badgeFeeIssue": "مشكلة رسوم",
-    "badgeError": "خطأ",
-    "badgeRefunded": "مسترد"
+    "error": "تعذر استلام هذا الإيداع"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

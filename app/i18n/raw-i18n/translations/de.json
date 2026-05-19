@@ -76,8 +76,7 @@
         "feeError": "Konvertierungsgebühr konnte nicht abgerufen werden"
     },
     "ConversionSuccessScreen": {
-        "message": "Das hat geklappt!",
-        "title": "Umtausch erfolgreich"
+        "message": "Das hat geklappt!"
     },
     "EarnScreen": {
         "satoshi": "Sat",
@@ -2311,7 +2310,6 @@
         "slow": "Langsam",
         "recommended": "Empfohlen",
         "walletOffline": "Deine Wallet ist offline. Bitte überprüfe deine Verbindung und versuche es erneut.",
-        "destinationIsRequired": "Empfänger ist erforderlich",
         "sdkInsufficientFunds": "Nicht genügend Guthaben für diese Transaktion.",
         "sdkAmountTooLow": "Der Betrag ist zu niedrig für eine On-Chain-Transaktion.",
         "sdkNetworkError": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
@@ -2362,7 +2360,8 @@
             "backupStatusLabel": "Backup-Status",
             "backupStatusCompleted": "Backup abgeschlossen",
             "backupStatusNotCompleted": "Backup unvollständig",
-            "loadError": "Kontoinformationen konnten nicht geladen werden."
+            "loadError": "Kontoinformationen konnten nicht geladen werden.",
+            "lightningAddressLabel": "Lightning-Adresse"
         }
     },
     "NotificationSettingsScreen": {
@@ -2822,7 +2821,8 @@
             "invalidRegion": "Ungültige Regionsauswahl"
         },
         "passwordTooWeak": "Das Passwort ist zu schwach. Verwende eine Kombination aus Groß- und Kleinbuchstaben, Zahlen und Sonderzeichen.",
-        "passwordCommon": "Dieses Passwort ist zu häufig. Bitte wähle ein stärkeres Passwort."
+        "passwordCommon": "Dieses Passwort ist zu häufig. Bitte wähle ein stärkeres Passwort.",
+        "copied": "In die Zwischenablage kopiert"
     },
     "errors": {
         "generic": "Es gab einen Fehler.\nBitte versuche es später erneut.",
@@ -2991,7 +2991,10 @@
             "emptyTransactions": "Noch keine Transaktionen",
             "addFunds": "Guthaben hinzufügen",
             "transactionsTitle": "Transaktionen",
-            "title": "Visa-Karte"
+            "title": "Visa-Karte",
+            "noCardAvailable": "Keine Karten verfügbar",
+            "cardNotUsable": "Diese Karte ist derzeit nicht verfügbar",
+            "cardUpdateError": "Kartenstatus konnte nicht aktualisiert werden"
         },
         "validThruLabel": "GÜLTIG BIS",
         "networkVisa": "Visa",
@@ -3487,7 +3490,6 @@
                 "savedConfirm": "Ich habe sie gespeichert",
                 "copy": "Kopieren",
                 "continueButton": "Weiter",
-                "selfCustodialDisabled": "Nicht-verwahrend ist vorübergehend nicht verfügbar.",
                 "testBackup": "Sicherung testen"
             },
             "Confirm": {
@@ -3550,7 +3552,8 @@
         "chooseMethod": "Methode wählen",
         "restoreComingSoonTitle": "Demnächst verfügbar",
         "restoreComingSoonDescription": "Die Wiederherstellungsfunktion wird in einem zukünftigen Update verfügbar sein.",
-        "createFailed": "Wallet konnte nicht erstellt werden. Bitte erneut versuchen."
+        "createFailed": "Wallet konnte nicht erstellt werden. Bitte erneut versuchen.",
+        "selfCustodialDisabled": "Nicht-verwahrend ist vorübergehend nicht verfügbar."
     },
     "RestoreScreen": {
         "title": "Wallet wiederherstellen",
@@ -3654,7 +3657,6 @@
         "description": "Gesamt: {sats} Sats zum Beanspruchen verfügbar",
         "claim": "Jetzt beanspruchen",
         "claiming": "Wird beansprucht...",
-        "belowMinimum": "{count} Einzahlung(en) unter dem Minimum (~{minimum} Sats). Diese können noch nicht beansprucht werden.",
         "screenTitle": "Nicht beanspruchte Einzahlungen",
         "cardTitle": "{sats} Sats beanspruchen",
         "claimWithFee": "Beanspruchen (max. Gebühr: {fee} sats)",
@@ -3677,12 +3679,7 @@
         "refundNow": "Jetzt erstatten",
         "refundSuccess": "Rückerstattung erfolgreich eingeleitet",
         "claimSuccess": "Einzahlung erfolgreich beansprucht",
-        "error": "Diese Einzahlung kann nicht beansprucht werden",
-        "badgeReady": "Bereit",
-        "badgePending": "Ausstehend",
-        "badgeFeeIssue": "Gebührenproblem",
-        "badgeError": "Fehler",
-        "badgeRefunded": "Erstattet"
+        "error": "Diese Einzahlung kann nicht beansprucht werden"
     },
     "FeatureUnavailable": {
         "SelfCustodial": {

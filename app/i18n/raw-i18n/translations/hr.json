@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "Kako koristiti vašu blagajnu",
     "howToUseYourAddressExplainer": "Podijelite s nekim tko ima kompatibilan novčanik, kao što su:",
     "howToUseYourPaycodeExplainer": "Možete ispisati svoj Paycode (tehnički, ovo je lnurl-pay adresa) i prikazati ga u svojoj tvrtki za primanje uplata. Pojedinci vam mogu platiti skeniranjem pomoću novčanika koji podržava Lightning.\n\nMeđutim, imajte na umu da neki novčanici ne mogu skenirati Paycode kao što su:",
-    "howToUseYourCashRegisterExplainer": "Omogućite ljudima da prikupljaju uplate putem poveznice na blagajnu, bez pristupa vašem novčaniku.\n\nOni mogu izraditi fakture i uplate će se slati izravno u vaš novčanik {bankName: string}.",
-    "yourAddress": "Vaša {bankName: string} adresa",
-    "copiedAddressToClipboard": "{bankName: string} adresa kopirana je u međuspremnik"
+    "howToUseYourCashRegisterExplainer": "Omogućite ljudima da prikupljaju uplate putem poveznice na blagajnu, bez pristupa vašem novčaniku.\n\nOni mogu izraditi fakture i uplate će se slati izravno u vaš novčanik {bankName: string}."
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "Uvjeti korištenja",
@@ -78,8 +76,7 @@
     "feeError": "Nije bilo moguće dohvatiti naknadu za konverziju"
   },
   "ConversionSuccessScreen": {
-    "message": "Konverzija uspješna",
-    "title": "Uspjeh konverzije"
+    "message": "Konverzija uspješna"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2075,12 +2072,7 @@
     "payBusiness": "plati ovu radnju",
     "openSettings": "Otvori postavke",
     "title": "Karta",
-    "error": "Ups. Nešto je pošlo po zlu prilikom dohvaćanja vaše lokacije",
-    "locationPermissionMessage": "Aktivirajte svoju lokaciju kako biste znali gdje se nalazite na karti",
-    "locationPermissionNegative": "Poništi",
-    "locationPermissionNeutral": "Pitaj me kasnije",
-    "locationPermissionPositive": "OK",
-    "locationPermissionTitle": "Locirajte se na karti"
+    "error": "Ups. Nešto je pošlo po zlu prilikom dohvaćanja vaše lokacije"
   },
   "HomeScreen": {
     "receive": "Primi",
@@ -2264,16 +2256,7 @@
     "clipboardError": "Pogreška prilikom preuzimanja vrijednosti iz međuspremnika",
     "pastedClipboardSuccess": "Zalijepljeno iz međuspremnika",
     "invalidPhoneNumber": "Unesite valjani broj mobitela",
-    "phoneNotAllowed": "Ovo polje ne prihvaća telefonske brojeve",
-    "confirmModal": {
-      "title": "Nikada niste slali novac na ovu adresu",
-      "body1": "Provjerite je li vam primatelj dao {bankName: string} adresu,",
-      "bold2bold": "nije korisničko ime iz drugog novčanika. ",
-      "body3": "U suprotnom, novac će ići na račun {bankName: string} koji ima adresu “{lnAddress: string}”.\n\nProvjerite i pravopis prvog dijela adrese. npr. jackie i jack1e su 2 različite adrese",
-      "warning": "Ako je adresa {bankName: string} netočno unesena, {bankName: string} ne može poništiti transakciju.",
-      "checkBox": "{lnAddress: niz} je prava adresa.",
-      "confirmButton": "100% sam siguran"
-    }
+    "phoneNotAllowed": "Ovo polje ne prihvaća telefonske brojeve"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakcija bi trebala biti poslana u mempool",
@@ -2327,8 +2310,6 @@
     "slow": "Sporo",
     "recommended": "Preporučeno",
     "walletOffline": "Vaš novčanik je offline. Provjerite vezu i pokušajte ponovo.",
-    "destinationIsRequired": "Odredište je obavezno",
-    "lnurlInvoiceIncorrectDescription": "lnurl poslužitelj je odgovorio fakturom s netočnim hashom opisa.",
     "sdkInsufficientFunds": "Nedovoljno sredstava za ovu transakciju.",
     "sdkAmountTooLow": "Iznos je prenizak za on-chain transakciju.",
     "sdkNetworkError": "Mrežna greška. Provjerite vezu i pokušajte ponovo.",
@@ -2379,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Lightning adresa"
     }
   },
   "NotificationSettingsScreen": {
@@ -2512,9 +2494,9 @@
     "body": "Dolar račun koristi Stablesats tehnologiju za održavanje Bitcoina stabilnim na USD cijeni. Uvijek držite Bitcoin — ne prave dolare — ali USD vrijednost ne fluktuira. Možete slati i primati Bitcoin kao i obično, ali nije kompatibilan s tradicionalnim bankarskim sustavom.",
     "termsAndConditions": "Pročitajte Uvjete i odredbe",
     "learnMore": "Saznajte više o Stablesats-u",
-      "headerSelfCustodial": "Vaš dolarski račun drži stablecoine",
-      "bodySelfCustodial": "Na dolarskom računu držite stablecoine. Tokeni potpomognuti imovinom čija je vrijednost stabilna u odnosu na USD. Stablecoine zasad ne možete slati ni primati. Kada šaljete s dolarskog računa, vaši stablecoini se zamjenjuju i šalju kao Bitcoin primatelju.",
-      "learnMoreSelfCustodial": "Saznajte više"
+    "headerSelfCustodial": "Vaš dolarski račun drži stablecoine",
+    "bodySelfCustodial": "Na dolarskom računu držite stablecoine. Tokeni potpomognuti imovinom čija je vrijednost stabilna u odnosu na USD. Stablecoine zasad ne možete slati ni primati. Kada šaljete s dolarskog računa, vaši stablecoini se zamjenjuju i šalju kao Bitcoin primatelju.",
+    "learnMoreSelfCustodial": "Saznajte više"
   },
   "SplashScreen": {
     "update": "Vaša je aplikacija zastarjela. Prije upotrebe aplikacije potrebno je ažuriranje.\n\nTo se može učiniti iz PlayStorea za Android i Testflighta za iOS"
@@ -2839,7 +2821,8 @@
       "invalidRegion": "Nevažeći odabir regije"
     },
     "passwordTooWeak": "Lozinka je preslaba. Upotrijebite kombinaciju velikih i malih slova, brojeva i posebnih znakova.",
-    "passwordCommon": "Ova je lozinka previše česta. Odaberite jaču lozinku."
+    "passwordCommon": "Ova je lozinka previše česta. Odaberite jaču lozinku.",
+    "copied": "Kopirano u međuspremnik"
   },
   "errors": {
     "generic": "Dogodila se greška.\nMolimo pokušajte ponovo kasnije.",
@@ -2968,27 +2951,6 @@
       "title": "Lipanjski izazov!",
       "description": "Proširite svoj unutarnji krug za 10 za priliku osvajanja privilegirane ulaznice od $1000 za Adopting Bitcoin El Salvador",
       "details": "Osvojite privilegiranu ulaznicu za Adopting Bitcoin El Salvador\n\nProširite svoj unutarnji krug za 10 za priliku osvajanja privilegirane ulaznice od $1000 za Adopting Bitcoin El Salvador! Ulaznica uključuje ekskluzivni pristup glavnoj konferenciji, mezzaninu s hranom/pićem/grickalicama, večeri za govornike i filmskom festivalu.\n\nPodijelite svoje krugove na društvenim mrežama s hashtagom #blinkcircles za sudjelovanje.\n\nOvaj put će biti dva dobitnika!"
-    },
-    "septChallenge": {
-      "title": "Rujanski izazov!",
-      "description": "Unutarnji krug {innerCircle: number}/21 - Zaradite 21 USD\nNajbolja 3 - osvojaju ulaznice za Adopting Bitcoin!",
-      "details": "Proširite svoj unutarnji krug za 21 osobu u rujnu i dijelite na društvenim mrežama s #blinkcircles da biste dobili 21 USD na svoj Stablesats račun. Najbolja 3 osvajaju ulaznice za Adopting Bitcoin!",
-      "peopleWelcomedSoFar": "ljudi dočekani do sada",
-      "yourRank": "tvoj rang",
-      "reminder": "Podsjetnik: Vaš unutarnji krug raste kada novom korisniku Blinka pošaljete prve satoshije",
-      "fullDetails": "Sve pojedinosti na"
-    },
-    "octoberChallenge": {
-      "title": "Listopadski izazov!",
-      "description": "Podijelite svoje #blinkcircles za priliku da osvojite 1.000.000 sat!",
-      "details": "Poklanjamo 1.000.000 sat!\n\nPodijelite svoje krugove na društvenim mrežama s oznakom `#blinkcircles` za ulazak! Pobjednik će biti odabran slučajnim odabirom 31. listopada.\n\nMorate imati najmanje jednu osobu u svom unutarnjem krugu da biste sudjelovali!",
-      "connectOnSocial": "Povežite se na društvenim mrežama:",
-      "fullDetails": "Sve pojedinosti na"
-    },
-    "novemberChallenge": {
-      "title": "November Challenge!",
-      "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-      "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
     }
   },
   "FullOnboarding": {
@@ -3012,9 +2974,6 @@
     "title": "Obavijesti",
     "noNotifications": "Trenutno nemate nikakvih obavijesti"
   },
-  "Fake": {
-    "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
-  },
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Na čekanju",
@@ -3032,7 +2991,10 @@
       "emptyTransactions": "Još nema transakcija",
       "addFunds": "Dodaj sredstva",
       "transactionsTitle": "Transakcije",
-      "title": "Visa kartica"
+      "title": "Visa kartica",
+      "noCardAvailable": "Nema dostupnih kartica",
+      "cardNotUsable": "Ova kartica trenutno nije dostupna za upotrebu",
+      "cardUpdateError": "Nije moguće ažurirati status kartice"
     },
     "validThruLabel": "VRIJEDI DO",
     "networkVisa": "Visa",
@@ -3304,9 +3266,6 @@
         "damagedCard": "Oštećena kartica",
         "damagedCardDescription": "Moja kartica je fizički oštećena",
         "whatHappensNext": "Što slijedi?",
-        "currentCardDeactivated": "Vaša trenutna kartica bit će odmah deaktivirana",
-        "newCardShipped": "Nova kartica bit će poslana na vašu adresu",
-        "digitalCardAvailable": "Vaša digitalna kartica ostaje dostupna tijekom ovog procesa",
         "cardManagement": "Upravljanje karticom",
         "bullet1": "Vaša trenutna kartica bit će zamrznuta radi sigurnosti",
         "bullet2": "Izdat će se nova kartica s drugim brojevima",
@@ -3327,15 +3286,9 @@
         "title": "Pregledajte svoj zahtjev",
         "subtitle": "Potvrdite detalje zamjene kartice",
         "requestSummary": "Sažetak zahtjeva",
-        "reason": "Razlog",
         "delivery": "Dostava",
-        "shippingAddress": "Adresa za dostavu",
-        "deliveryCost": "Trošak dostave",
         "submitRequest": "Pošalji zahtjev",
         "importantInformation": "Važne informacije",
-        "processedImmediately": "Vaš zahtjev bit će odmah obrađen",
-        "currentCardDeactivated": "Trenutna kartica bit će deaktivirana nakon potvrde",
-        "trackStatus": "Možete pratiti status dostave nove kartice u aplikaciji",
         "issueType": "Razlog",
         "deliveryTime": "Vrijeme isporuke",
         "shippingCost": "Trošak dostave",
@@ -3388,10 +3341,7 @@
         "feature2": "EMV čip za veću sigurnost",
         "feature3": "Magnetska traka za univerzalnu prihvaćenost",
         "feature4": "Vaše ime utisnuto na kartici",
-        "important": "Važno",
-        "importantBullet1": "Vaša virtualna kartica ostat će aktivna dok čekate fizičku karticu",
-        "importantBullet2": "Morat ćete aktivirati fizičku karticu kada stigne",
-        "importantBullet3": "Obje kartice imat će isti broj i podatke"
+        "important": "Važno"
       },
       "Confirm": {
         "title": "Potvrdite narudžbu",
@@ -3540,7 +3490,6 @@
         "savedConfirm": "Spremio sam je",
         "copy": "Kopiraj",
         "continueButton": "Nastavi",
-        "selfCustodialDisabled": "Ne-skrbništvo je privremeno nedostupno.",
         "testBackup": "Testirajte sigurnosnu kopiju"
       },
       "Confirm": {
@@ -3603,7 +3552,8 @@
     "chooseMethod": "Odaberite metodu",
     "restoreComingSoonTitle": "Uskoro dostupno",
     "restoreComingSoonDescription": "Funkcija vraćanja bit će dostupna u budućem ažuriranju.",
-    "createFailed": "Neuspjelo stvaranje novčanika. Molimo pokušajte ponovno."
+    "createFailed": "Neuspjelo stvaranje novčanika. Molimo pokušajte ponovno.",
+    "selfCustodialDisabled": "Nekustodijska opcija je privremeno nedostupna."
   },
   "RestoreScreen": {
     "title": "Vraćanje novčanika",
@@ -3707,7 +3657,6 @@
     "description": "Ukupno: {sats} satova dostupno za potraživanje",
     "claim": "Zatraži sada",
     "claiming": "Zahtijevanje...",
-    "belowMinimum": "{count} polog(a) ispod minimuma (~{minimum} satova). Još se ne mogu zatražiti.",
     "screenTitle": "Nezatraženi depoziti",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3730,12 +3679,7 @@
     "refundNow": "Povrat sada",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Spremno",
-    "badgePending": "Na čekanju",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Greška",
-    "badgeRefunded": "Vraćeno"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

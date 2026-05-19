@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "Hoe om jou Kasregister te gebruik",
     "howToUseYourAddressExplainer": "Deel met iemand wat 'n versoenbare beursie het soos:",
     "howToUseYourPaycodeExplainer": "Jy kan jou LNURL uitdruk op papier (dit is tegnies 'n lnurl-pay adres) en dit in jou besigheid vertoon om betalings te ontvang. Individue kan jou betaal deur dit te skandeer met enige Lightning-beursie. \n\nWees egter bewus dat seker beursies nie 'n LNURL kan skandeer nie.",
-    "howToUseYourCashRegisterExplainer": "Laat mense toe om betalings namens jou te aanvaar via die Kasregister skakel sonder om hulle toegang te gee tot die beursie. \n\nHulle kan dan self fakature genereer en betalings sal direk na jou {bankName: string} beursie gaan. ",
-    "yourAddress": "{bankName: string}-adres",
-    "copiedAddressToClipboard": "{bankName: string}-adres is na knipbord oorgedra"
+    "howToUseYourCashRegisterExplainer": "Laat mense toe om betalings namens jou te aanvaar via die Kasregister skakel sonder om hulle toegang te gee tot die beursie. \n\nHulle kan dan self fakature genereer en betalings sal direk na jou {bankName: string} beursie gaan. "
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "Bepalings en Voorwaardes",
@@ -78,8 +76,7 @@
     "feeError": "Kon nie die omskakelingsfooi haal nie"
   },
   "ConversionSuccessScreen": {
-    "message": "Omskakeling suksesvol",
-    "title": "Omskakeling sukses"
+    "message": "Omskakeling suksesvol"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2075,12 +2072,7 @@
     "payBusiness": "betaal hierdie besigheid",
     "openSettings": "Maak instellings oop",
     "title": "Kaart",
-    "error": "Oeps. Iets het verkeerd gegaan terwyl jou ligging bepaal is",
-    "locationPermissionMessage": "Aktiveer jou ligging sodat ons weet waar jy is op die kaart",
-    "locationPermissionNegative": "Kanselleer ",
-    "locationPermissionNeutral": "Vra my later",
-    "locationPermissionPositive": "OK",
-    "locationPermissionTitle": "Vind jou ligging op die kaart"
+    "error": "Oeps. Iets het verkeerd gegaan terwyl jou ligging bepaal is"
   },
   "HomeScreen": {
     "receive": "Ontvang",
@@ -2264,16 +2256,7 @@
     "clipboardError": "Fout - Kon nie die waarde van die knipbord kry nie. ",
     "pastedClipboardSuccess": "Vanaf knipbord geplak",
     "invalidPhoneNumber": "Voer 'n geldige selfoonnommer in",
-    "phoneNotAllowed": "Hierdie veld aanvaar nie telefoonnommers nie",
-    "confirmModal": {
-      "title": "Jy het nog nooit fondse na die adres gestuur nie",
-      "body1": "Maak asseblief seker die ontvanger het vir jou 'n {bankName: adres} gegee",
-      "bold2bold": "nie 'n gebruikersnaam van 'n ander beursie nie.",
-      "body3": "Anders gaan die geld na 'n {bankName: string} rekening wat die \"{lnAddress: string}\"-adres bevat.\n\nBevestig die spelling van die eerste deel van die adres ook bv. fanie en fan1e is 2 verskillende adresse.",
-      "warning": "As die {bankName: string}-adres verkeerd ingevul word, kan {bankName: string} nie die transaksie regstel of verander nie. ",
-      "checkBox": "{lnAddress: string} is die regte adres. ",
-      "confirmButton": "Ek is 100% seker"
-    }
+    "phoneNotAllowed": "Hierdie veld aanvaar nie telefoonnommers nie"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksie behoort aan mempool voorgelê te word",
@@ -2327,8 +2310,6 @@
     "slow": "Stadig",
     "recommended": "Aanbeveel",
     "walletOffline": "Jou beursie is vanlyn. Kontroleer asseblief jou verbinding en probeer weer.",
-    "destinationIsRequired": "Bestemming word benodig",
-    "lnurlInvoiceIncorrectDescription": "Die LNURL-bediener het reageer met 'n faktuur met 'n verkeerde transaksie-hash",
     "sdkInsufficientFunds": "Nie genoeg fondse vir hierdie transaksie nie.",
     "sdkAmountTooLow": "Bedrag is te laag vir 'n on-chain transaksie.",
     "sdkNetworkError": "Netwerkfout. Kontroleer asseblief jou verbinding en probeer weer.",
@@ -2379,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Lightning-adres"
     }
   },
   "NotificationSettingsScreen": {
@@ -2512,9 +2494,9 @@
     "body": "Die Dollar-rekening gebruik Stablesats-tegnologie om Bitcoin stabiel teen USD-prys te hou. Jy hou altyd Bitcoin — nie werklike dollars nie — maar die USD-waarde fluktueer nie. Jy kan Bitcoin stuur en ontvang soos gewoonlik, maar dit is nie versoenbaar met die tradisionele bankstelsel nie.",
     "termsAndConditions": "Lees die Terme en Voorwaardes",
     "learnMore": "Leer meer van Stablesats",
-      "headerSelfCustodial": "Jou Dollar-rekening hou stablecoins",
-      "bodySelfCustodial": "In die Dollar-rekening hou jy stablecoins. Tokens gerugsteun deur bates met waarde gestabiliseer aan die USD. Jy kan nog nie stablecoins stuur en ontvang nie. Wanneer jy van die Dollar-rekening stuur, sal jy jou stablecoins omruil en as Bitcoin aan die ontvanger stuur.",
-      "learnMoreSelfCustodial": "Lees meer"
+    "headerSelfCustodial": "Jou Dollar-rekening hou stablecoins",
+    "bodySelfCustodial": "In die Dollar-rekening hou jy stablecoins. Tokens gerugsteun deur bates met waarde gestabiliseer aan die USD. Jy kan nog nie stablecoins stuur en ontvang nie. Wanneer jy van die Dollar-rekening stuur, sal jy jou stablecoins omruil en as Bitcoin aan die ontvanger stuur.",
+    "learnMoreSelfCustodial": "Lees meer"
   },
   "SplashScreen": {
     "update": "Jou toepassing is lanklaas opgedateer. Dateer asseblief die toepassing op voordat jy dit kan gebruik.\n\nDit kan gedoen word by die Android of google Playstore of Apple App store vir IOS."
@@ -2839,7 +2821,8 @@
       "invalidRegion": "Ongeldige streekkeuse"
     },
     "passwordTooWeak": "Wagwoord is te swak. Gebruik ’n mengsel van hoofletters, kleinletters, syfers en spesiale karakters.",
-    "passwordCommon": "Hierdie wagwoord is te algemeen. Kies asseblief ’n sterker wagwoord."
+    "passwordCommon": "Hierdie wagwoord is te algemeen. Kies asseblief ’n sterker wagwoord.",
+    "copied": "Na knipbord gekopieer"
   },
   "errors": {
     "generic": "Daar was 'n fout.\nProbeer asseblief later weer.",
@@ -2968,27 +2951,6 @@
       "title": "Junie-uitdaging!",
       "description": "Brei jou binnekring uit met 10 vir 'n kans om 'n $1000-voorregkaartjie vir die Adopting Bitcoin El Salvador te wen",
       "details": "Wen 'n voorregkaartjie vir Adopting Bitcoin El Salvador\n\nBrei jou binnekring uit met 10 vir 'n kans om 'n $1000-voorregkaartjie te wen vir Adopting Bitcoin El Salvador! Die kaartjie sluit eksklusiewe toegang in tot die hoofkonferensie, mezzanine met kos/drank/versnaperinge, sprekers se aandete, en die Filmfees.\n\nDeel jou sirkels op sosiale media met die hutsmerk #blinkcircles om deel te neem.\n\nHierdie keer sal daar twee wenners wees!"
-    },
-    "septChallenge": {
-      "title": "September Uitdaging!",
-      "description": "Binnesirkel {innerCircle: number}/21 - Verdien $21\nTop 3 - Wen kaartjies na Adopting Bitcoin!",
-      "details": "Groei jou binnesirkel met 21 mense in September en deel op sosiale media met #blinkcircles om $21 se Stablesats in jou blink-rekening te ontvang. Top 3 wen kaartjies na Adopting Bitcoin! ",
-      "peopleWelcomedSoFar": "mense reeds verwelkom",
-      "yourRank": "Jou rang",
-      "reminder": "Herhindering: Jou binnesirkel groei wanneer jy die eerste sats na 'n nuwe Blink-gebruiker stuur",
-      "fullDetails": "Volle besonderhede"
-    },
-    "octoberChallenge": {
-      "title": "Oktober uitdaging!",
-      "description": "Deel jou #blinksirkels vir 'n kans om 1,000,000 sats te wen!",
-      "details": "Ons gee 1,000,000 sats weg! Deel jou sirkels op sosiaal en tag #blinksirkels om in te skryf! Die wenner word lukraak gekies op 31 Oktober.\n\nJy moet minstens een persoon in jou binnesirkel hê om in te skryf!",
-      "connectOnSocial": "Skakel op sosiaal:",
-      "fullDetails": "Volle besonderhede by"
-    },
-    "novemberChallenge": {
-      "title": "November Challenge!",
-      "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-      "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
     }
   },
   "FullOnboarding": {
@@ -3012,9 +2974,6 @@
     "title": "Kennisgewings",
     "noNotifications": "Jy het tans geen kennisgewings nie"
   },
-  "Fake": {
-    "doNotTranslate": "NA"
-  },
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Hangend",
@@ -3032,7 +2991,10 @@
       "emptyTransactions": "Nog geen transaksies nie",
       "addFunds": "Voeg fondse by",
       "transactionsTitle": "Transaksies",
-      "title": "Visa-kaart"
+      "title": "Visa-kaart",
+      "noCardAvailable": "Geen kaarte beskikbaar nie",
+      "cardNotUsable": "Hierdie kaart is tans nie beskikbaar vir gebruik nie",
+      "cardUpdateError": "Kon kaartstatus nie opdateer nie"
     },
     "validThruLabel": "GELDIG TOT",
     "networkVisa": "Visa",
@@ -3304,9 +3266,6 @@
         "damagedCard": "Beskadigde kaart",
         "damagedCardDescription": "My kaart is fisies beskadig",
         "whatHappensNext": "Wat gebeur volgende?",
-        "currentCardDeactivated": "Jou huidige kaart sal onmiddellik gedeaktiveer word",
-        "newCardShipped": "'n Nuwe kaart sal na jou adres gestuur word",
-        "digitalCardAvailable": "Jou digitale kaart bly beskikbaar tydens hierdie proses",
         "cardManagement": "Kaartbestuur",
         "bullet1": "Jou huidige kaart sal gevries word vir sekuriteit",
         "bullet2": "'n Nuwe kaart met verskillende nommers sal uitgereik word",
@@ -3327,15 +3286,9 @@
         "title": "Hersien jou versoek",
         "subtitle": "Bevestig asseblief die besonderhede van jou kaartvervanging",
         "requestSummary": "Versoekoopsomming",
-        "reason": "Rede",
         "delivery": "Aflewering",
-        "shippingAddress": "Versendingsadres",
-        "deliveryCost": "Afleweringskoste",
         "submitRequest": "Dien versoek in",
         "importantInformation": "Belangrike inligting",
-        "processedImmediately": "Jou versoek sal onmiddellik verwerk word",
-        "currentCardDeactivated": "Huidige kaart sal met bevestiging gedeaktiveer word",
-        "trackStatus": "Jy kan jou nuwe kaart se afleweringstatus in die app volg",
         "issueType": "Rede",
         "deliveryTime": "Afleweringstyd",
         "shippingCost": "Afleweringskoste",
@@ -3388,10 +3341,7 @@
         "feature2": "EMV-skyfie vir verbeterde sekuriteit",
         "feature3": "Magneetstrook vir universele aanvaarding",
         "feature4": "Jou naam op die kaart ge-embosseer",
-        "important": "Belangrik",
-        "importantBullet1": "Jou virtuele kaart bly aktief terwyl jy vir die fisiese kaart wag",
-        "importantBullet2": "Jy sal jou fisiese kaart moet aktiveer wanneer dit aankom",
-        "importantBullet3": "Albei kaarte sal dieselfde kaartnommer en besonderhede hê"
+        "important": "Belangrik"
       },
       "Confirm": {
         "title": "Bevestig jou bestelling",
@@ -3540,7 +3490,6 @@
         "savedConfirm": "Ek het dit gestoor",
         "copy": "Kopieer",
         "continueButton": "Gaan voort",
-        "selfCustodialDisabled": "Nie-bewaring is tydelik onbeskikbaar.",
         "testBackup": "Toets jou rugsteun"
       },
       "Confirm": {
@@ -3603,7 +3552,8 @@
     "chooseMethod": "Kies metode",
     "restoreComingSoonTitle": "Binnekort beskikbaar",
     "restoreComingSoonDescription": "Herstelfunksie sal in 'n toekomstige opdatering beskikbaar wees.",
-    "createFailed": "Kon nie tronk skep nie. Probeer asseblief weer."
+    "createFailed": "Kon nie tronk skep nie. Probeer asseblief weer.",
+    "selfCustodialDisabled": "Nie-bewaring is tydelik onbeskikbaar."
   },
   "RestoreScreen": {
     "title": "Herstel beursie",
@@ -3707,7 +3657,6 @@
     "description": "Totaal: {sats} sats beskikbaar om te eis",
     "claim": "Eis nou",
     "claiming": "Besig om te eis...",
-    "belowMinimum": "{count} deposito('s) onder minimum (~{minimum} sats). Hierdie kan nog nie geëis word nie.",
     "screenTitle": "Ongeëiste Deposito's",
     "cardTitle": "Eis {sats} sats",
     "claimWithFee": "Eis (maks fooi: {fee} sats)",
@@ -3730,12 +3679,7 @@
     "refundNow": "Betaal nou terug",
     "refundSuccess": "Terugbetaling suksesvol begin",
     "claimSuccess": "Deposito suksesvol geëis",
-    "error": "Kan nie hierdie deposito eis nie",
-    "badgeReady": "Gereed",
-    "badgePending": "Hangend",
-    "badgeFeeIssue": "Fooi probleem",
-    "badgeError": "Fout",
-    "badgeRefunded": "Terugbetaal"
+    "error": "Kan nie hierdie deposito eis nie"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

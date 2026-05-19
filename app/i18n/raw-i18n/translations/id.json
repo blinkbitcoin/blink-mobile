@@ -76,8 +76,7 @@
     "feeError": "Tidak dapat mengambil biaya konversi"
   },
   "ConversionSuccessScreen": {
-    "message": "Konversi Berhasil",
-    "title": "Konversi Berhasil"
+    "message": "Konversi Berhasil"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2311,7 +2310,6 @@
     "slow": "Lambat",
     "recommended": "Direkomendasikan",
     "walletOffline": "Dompet Anda sedang offline. Silakan periksa koneksi Anda dan coba lagi.",
-    "destinationIsRequired": "Tujuan diperlukan",
     "sdkInsufficientFunds": "Dana tidak cukup untuk transaksi ini.",
     "sdkAmountTooLow": "Jumlah terlalu rendah untuk transaksi on-chain.",
     "sdkNetworkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
@@ -2362,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Alamat Lightning"
     }
   },
   "NotificationSettingsScreen": {
@@ -2495,9 +2494,9 @@
     "body": "Akun Dolar menggunakan teknologi Stablesats untuk menjaga Bitcoin tetap stabil pada harga USD. Anda selalu memegang Bitcoin — bukan dolar sungguhan — tetapi nilai USD tidak berfluktuasi. Anda dapat mengirim dan menerima Bitcoin seperti biasa, tetapi ini tidak kompatibel dengan sistem perbankan tradisional.",
     "termsAndConditions": "Baca Syarat & Ketentuan",
     "learnMore": "Pelajari lebih lanjut tentang Stablesats",
-      "headerSelfCustodial": "Akun Dolar Anda menyimpan stablecoin",
-      "bodySelfCustodial": "Di akun Dolar Anda menyimpan stablecoin. Token yang didukung oleh aset dengan nilai yang dijaga stabil terhadap USD. Anda belum bisa mengirim dan menerima stablecoin. Saat mengirim dari akun Dolar, stablecoin Anda akan ditukar dan dikirim sebagai Bitcoin kepada penerima.",
-      "learnMoreSelfCustodial": "Pelajari selengkapnya"
+    "headerSelfCustodial": "Akun Dolar Anda menyimpan stablecoin",
+    "bodySelfCustodial": "Di akun Dolar Anda menyimpan stablecoin. Token yang didukung oleh aset dengan nilai yang dijaga stabil terhadap USD. Anda belum bisa mengirim dan menerima stablecoin. Saat mengirim dari akun Dolar, stablecoin Anda akan ditukar dan dikirim sebagai Bitcoin kepada penerima.",
+    "learnMoreSelfCustodial": "Pelajari selengkapnya"
   },
   "SplashScreen": {
     "update": "Aplikasi Anda sudah usang. Pembaruan diperlukan sebelum aplikasi dapat digunakan.\n\nIni dapat dilakukan melalui PlayStore untuk Android dan Testflight untuk iOS"
@@ -2822,7 +2821,8 @@
       "invalidRegion": "Pilihan wilayah tidak valid"
     },
     "passwordTooWeak": "Kata sandi terlalu lemah. Gunakan kombinasi huruf besar, huruf kecil, angka, dan karakter khusus.",
-    "passwordCommon": "Kata sandi ini terlalu umum. Silakan pilih kata sandi yang lebih kuat."
+    "passwordCommon": "Kata sandi ini terlalu umum. Silakan pilih kata sandi yang lebih kuat.",
+    "copied": "Disalin ke clipboard"
   },
   "errors": {
     "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",
@@ -2991,7 +2991,10 @@
       "emptyTransactions": "Belum ada transaksi",
       "addFunds": "Tambah dana",
       "transactionsTitle": "Transaksi",
-      "title": "Kartu Visa"
+      "title": "Kartu Visa",
+      "noCardAvailable": "Tidak ada kartu tersedia",
+      "cardNotUsable": "Kartu ini saat ini tidak tersedia untuk digunakan",
+      "cardUpdateError": "Tidak dapat memperbarui status kartu"
     },
     "validThruLabel": "BERLAKU HINGGA",
     "networkVisa": "Visa",
@@ -3263,9 +3266,6 @@
         "damagedCard": "Kartu rusak",
         "damagedCardDescription": "Kartu saya rusak secara fisik",
         "whatHappensNext": "Apa yang terjadi selanjutnya?",
-        "currentCardDeactivated": "Kartu Anda saat ini akan segera dinonaktifkan",
-        "newCardShipped": "Kartu baru akan dikirim ke alamat Anda",
-        "digitalCardAvailable": "Kartu digital Anda tetap tersedia selama proses ini",
         "cardManagement": "Manajemen kartu",
         "bullet1": "Kartu Anda saat ini akan dibekukan demi keamanan",
         "bullet2": "Kartu baru dengan nomor berbeda akan diterbitkan",
@@ -3286,15 +3286,9 @@
         "title": "Tinjau permintaan Anda",
         "subtitle": "Konfirmasi detail penggantian kartu Anda",
         "requestSummary": "Ringkasan permintaan",
-        "reason": "Alasan",
         "delivery": "Pengiriman",
-        "shippingAddress": "Alamat pengiriman",
-        "deliveryCost": "Biaya pengiriman",
         "submitRequest": "Kirim permintaan",
         "importantInformation": "Informasi penting",
-        "processedImmediately": "Permintaan Anda akan segera diproses",
-        "currentCardDeactivated": "Kartu saat ini akan dinonaktifkan setelah konfirmasi",
-        "trackStatus": "Anda dapat melacak status pengiriman kartu baru di aplikasi",
         "issueType": "Alasan",
         "deliveryTime": "Waktu pengiriman",
         "shippingCost": "Biaya pengiriman",
@@ -3347,10 +3341,7 @@
         "feature2": "Chip EMV untuk keamanan yang ditingkatkan",
         "feature3": "Pita magnetik untuk penerimaan universal",
         "feature4": "Nama Anda terembos pada kartu",
-        "important": "Penting",
-        "importantBullet1": "Kartu virtual Anda akan tetap aktif saat Anda menunggu kartu fisik",
-        "importantBullet2": "Anda perlu mengaktifkan kartu fisik saat tiba",
-        "importantBullet3": "Kedua kartu akan memiliki nomor dan detail yang sama"
+        "important": "Penting"
       },
       "Confirm": {
         "title": "Konfirmasi pesanan Anda",
@@ -3499,7 +3490,6 @@
         "savedConfirm": "Saya sudah menyimpannya",
         "copy": "Salin",
         "continueButton": "Lanjutkan",
-        "selfCustodialDisabled": "Non-kustodian sementara tidak tersedia.",
         "testBackup": "Uji cadanganmu"
       },
       "Confirm": {
@@ -3562,7 +3552,8 @@
     "chooseMethod": "Pilih metode",
     "restoreComingSoonTitle": "Segera hadir",
     "restoreComingSoonDescription": "Fitur pemulihan akan tersedia dalam pembaruan mendatang.",
-    "createFailed": "Gagal membuat dompet. Silakan coba lagi."
+    "createFailed": "Gagal membuat dompet. Silakan coba lagi.",
+    "selfCustodialDisabled": "Non-kustodial sementara tidak tersedia."
   },
   "RestoreScreen": {
     "title": "Pulihkan dompet",
@@ -3666,7 +3657,6 @@
     "description": "Total: {sats} sats tersedia untuk diklaim",
     "claim": "Klaim sekarang",
     "claiming": "Mengklaim...",
-    "belowMinimum": "{count} deposit di bawah minimum (~{minimum} sats). Belum bisa diklaim.",
     "screenTitle": "Deposit yang belum diklaim",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3689,12 +3679,7 @@
     "refundNow": "Kembalikan sekarang",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Siap",
-    "badgePending": "Tertunda",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Kesalahan",
-    "badgeRefunded": "Dikembalikan"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

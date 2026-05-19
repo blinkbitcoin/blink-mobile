@@ -76,8 +76,7 @@
         "feeError": "Não foi possível obter a taxa de conversão"
     },
     "ConversionSuccessScreen": {
-        "message": "Conversão bem sucedida",
-        "title": "Sucesso na Conversão"
+        "message": "Conversão bem sucedida"
     },
     "EarnScreen": {
         "satoshi": "sat",
@@ -2311,7 +2310,6 @@
         "slow": "Lento",
         "recommended": "Recomendado",
         "walletOffline": "Sua carteira está offline. Verifique sua conexão e tente novamente.",
-        "destinationIsRequired": "Destino é obrigatório",
         "sdkInsufficientFunds": "Saldo insuficiente para esta transação.",
         "sdkAmountTooLow": "O valor é muito baixo para uma transação on-chain.",
         "sdkNetworkError": "Erro de rede. Verifique sua conexão e tente novamente.",
@@ -2362,7 +2360,8 @@
             "backupStatusLabel": "Status do backup",
             "backupStatusCompleted": "Backup completo",
             "backupStatusNotCompleted": "Backup incompleto",
-            "loadError": "Não foi possível carregar as informações da conta."
+            "loadError": "Não foi possível carregar as informações da conta.",
+            "lightningAddressLabel": "Endereço Lightning"
         }
     },
     "NotificationSettingsScreen": {
@@ -2822,7 +2821,8 @@
             "invalidRegion": "Seleção de região inválida"
         },
         "passwordTooWeak": "A palavra-passe é demasiado fraca. Use uma combinação de letras maiúsculas, minúsculas, números e caracteres especiais.",
-        "passwordCommon": "Esta palavra-passe é demasiado comum. Escolha uma palavra-passe mais forte."
+        "passwordCommon": "Esta palavra-passe é demasiado comum. Escolha uma palavra-passe mais forte.",
+        "copied": "Copiado para a área de transferência"
     },
     "errors": {
         "generic": "Ocorreu um erro.\nPor favor, tente novamente mais tarde.",
@@ -2991,7 +2991,10 @@
             "emptyTransactions": "Nenhuma transação ainda",
             "addFunds": "Adicionar fundos",
             "transactionsTitle": "Transações",
-            "title": "Cartão Visa"
+            "title": "Cartão Visa",
+            "noCardAvailable": "Nenhum cartão disponível",
+            "cardNotUsable": "Este cartão não está disponível para uso no momento",
+            "cardUpdateError": "Não foi possível atualizar o status do cartão"
         },
         "validThruLabel": "VÁLIDO ATÉ",
         "networkVisa": "Visa",
@@ -3487,7 +3490,6 @@
                 "savedConfirm": "Já salvei",
                 "copy": "Copiar",
                 "continueButton": "Continuar",
-                "selfCustodialDisabled": "Não custodial está temporariamente indisponível.",
                 "testBackup": "Teste seu backup"
             },
             "Confirm": {
@@ -3550,7 +3552,8 @@
         "chooseMethod": "Escolher método",
         "restoreComingSoonTitle": "Em breve",
         "restoreComingSoonDescription": "A função de restauração estará disponível em uma atualização futura.",
-        "createFailed": "Falha ao criar a carteira. Por favor, tente novamente."
+        "createFailed": "Falha ao criar a carteira. Por favor, tente novamente.",
+        "selfCustodialDisabled": "O modo não custodial está temporariamente indisponível."
     },
     "RestoreScreen": {
         "title": "Restaurar carteira",
@@ -3654,7 +3657,6 @@
         "description": "Total: {sats} sats disponíveis para reivindicar",
         "claim": "Reivindicar agora",
         "claiming": "Reivindicando...",
-        "belowMinimum": "{count} depósito(s) abaixo do mínimo (~{minimum} sats). Ainda não podem ser reivindicados.",
         "screenTitle": "Depósitos não reclamados",
         "cardTitle": "Reclamar {sats} sats",
         "claimWithFee": "Reclamar (taxa máx: {fee} sats)",
@@ -3677,12 +3679,7 @@
         "refundNow": "Reembolsar agora",
         "refundSuccess": "Reembolso iniciado com sucesso",
         "claimSuccess": "Depósito reclamado com sucesso",
-        "error": "Não é possível reclamar este depósito",
-        "badgeReady": "Pronto",
-        "badgePending": "Pendente",
-        "badgeFeeIssue": "Problema de taxa",
-        "badgeError": "Erro",
-        "badgeRefunded": "Reembolsado"
+        "error": "Não é possível reclamar este depósito"
     },
     "FeatureUnavailable": {
         "SelfCustodial": {

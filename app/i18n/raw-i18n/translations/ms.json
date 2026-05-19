@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "Cara menggunakan Cash Register anda",
     "howToUseYourAddressExplainer": "Kongsikan dengan seseorang yang mempunyai dompet yang sama seperti;",
     "howToUseYourPaycodeExplainer": "Cetak kod bayaran anda (secara teknikalnya, ini adalah alamat lnurl-pay) dan sila pamerkan di perniagaan anda untuk terima bayaran. Para pelanggan boleh membayar anda dengan mengimbasnya dengan dompet LN  .\n\nAkan tetapi, bukan semua jenis dompet boleh mengimbasnya seperti:",
-    "howToUseYourCashRegisterExplainer": "Benarkan individu lain untuk terima bayaran melalui pautan Cash Register, tanpa akses ke dompet anda\n\nMereka boleh membuat invois baru dan bayaran akan dihantar terus ke dompet {bankName: string} anda.",
-    "yourAddress": "Alamat LN {bankName: string} Anda",
-    "copiedAddressToClipboard": "Salin alamat LN {bankName: string} ke clipboard"
+    "howToUseYourCashRegisterExplainer": "Benarkan individu lain untuk terima bayaran melalui pautan Cash Register, tanpa akses ke dompet anda\n\nMereka boleh membuat invois baru dan bayaran akan dihantar terus ke dompet {bankName: string} anda."
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "Terma dan Syarat",
@@ -78,8 +76,7 @@
     "feeError": "Tidak dapat mendapatkan yuran pertukaran"
   },
   "ConversionSuccessScreen": {
-    "message": "Penukaran telah berjaya",
-    "title": "penukaran berjaya"
+    "message": "Penukaran telah berjaya"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2075,12 +2072,7 @@
     "payBusiness": "Bayar kepada perniagaan ini",
     "openSettings": "Buka tetapan",
     "title": "Peta",
-    "error": "Alamak. Sesuatu tidak kena semasa mendapatkan lokasi anda",
-    "locationPermissionMessage": "Aktifkan lokasi anda. Jadi kami akan tahu di mana anda berada dalam peta",
-    "locationPermissionNegative": "Batal",
-    "locationPermissionNeutral": "Tanya aku lepas inj",
-    "locationPermissionPositive": "Baiklah",
-    "locationPermissionTitle": "Lokasi anda dalam peta"
+    "error": "Alamak. Sesuatu tidak kena semasa mendapatkan lokasi anda"
   },
   "HomeScreen": {
     "receive": "Terima",
@@ -2264,16 +2256,7 @@
     "clipboardError": "Ada kesalahan ketika nak dapatkan nilai daripada clipboard",
     "pastedClipboardSuccess": "Ditampal dari clipboard",
     "invalidPhoneNumber": "Masukkan nombor telefon bimbit yang sah",
-    "phoneNotAllowed": "Ruangan ini tidak menerima nombor telefon",
-    "confirmModal": {
-      "title": "Anda tak pernah menghantar wang ke alamat ini ",
-      "body1": "Sila pastikan penerima telah memberi anda alamat {bankName: string}, ",
-      "bold2bold": "id pengguna ini tiada atau bukan dari dompet yang lain.",
-      "body3": "Sebaliknya, wang tersebut akan masuk ke akaun {bankName: string} yang mempunyai alamat “{AlamatLn: string}”.\n\nSemak ejaan bahagian pertama alamat dengan baik. contoh jackie dan jack1e adalah 2 alamat yang berbeza ",
-      "warning": "Jika alamat {bankName: string} ditulis tidak tepat, transaksi ke {bankName: string} tidak dapat dipulangkan semula",
-      "checkBox": "{lnAddress: string} adalah alamat yang betul.",
-      "confirmButton": "Saya 100% yakin"
-    }
+    "phoneNotAllowed": "Ruangan ini tidak menerima nombor telefon"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi sepatutnya dihantar ke mempool",
@@ -2327,8 +2310,6 @@
     "slow": "Perlahan",
     "recommended": "Disyorkan",
     "walletOffline": "Dompet anda di luar talian. Sila semak sambungan anda dan cuba lagi.",
-    "destinationIsRequired": "Destinasi penghantaran adalah wajib",
-    "lnurlInvoiceIncorrectDescription": "Server lnurl telah respon terhadap invois tersebut dengan kesalahan pada perincian hash",
     "sdkInsufficientFunds": "Dana tidak mencukupi untuk transaksi ini.",
     "sdkAmountTooLow": "Jumlah terlalu rendah untuk transaksi on-chain.",
     "sdkNetworkError": "Ralat rangkaian. Sila semak sambungan anda dan cuba lagi.",
@@ -2379,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Alamat Lightning"
     }
   },
   "NotificationSettingsScreen": {
@@ -2512,9 +2494,9 @@
     "body": "Akaun Dolar menggunakan teknologi Stablesats untuk mengekalkan Bitcoin stabil pada harga USD. Anda sentiasa memegang Bitcoin — bukan dolar sebenar — tetapi nilai USD tidak turun naik. Anda boleh menghantar dan menerima Bitcoin seperti biasa, tetapi ia tidak serasi dengan sistem perbankan tradisional.",
     "termsAndConditions": "Baca terma & syarat",
     "learnMore": "Ketahui lebih lanjut tentang stablesats",
-      "headerSelfCustodial": "Akaun Dolar anda menyimpan stablecoin",
-      "bodySelfCustodial": "Dalam akaun Dolar anda menyimpan stablecoin. Token yang disokong oleh aset dengan nilai dikekalkan stabil terhadap USD. Anda belum boleh menghantar dan menerima stablecoin. Apabila anda menghantar dari akaun Dolar, stablecoin anda akan ditukar dan dihantar sebagai Bitcoin kepada penerima.",
-      "learnMoreSelfCustodial": "Ketahui lebih lanjut"
+    "headerSelfCustodial": "Akaun Dolar anda menyimpan stablecoin",
+    "bodySelfCustodial": "Dalam akaun Dolar anda menyimpan stablecoin. Token yang disokong oleh aset dengan nilai dikekalkan stabil terhadap USD. Anda belum boleh menghantar dan menerima stablecoin. Apabila anda menghantar dari akaun Dolar, stablecoin anda akan ditukar dan dihantar sebagai Bitcoin kepada penerima.",
+    "learnMoreSelfCustodial": "Ketahui lebih lanjut"
   },
   "SplashScreen": {
     "update": "Aplikasi anda bukan versi terkini. Kemaskini diperlukan sebelum aplikasi dapat digunakan\n\nKemaskini boleh dilakukan dsri PlayStore untuk Android dan Testflight untuk iOS"
@@ -2839,7 +2821,8 @@
       "invalidRegion": "Pilihan wilayah tidak sah"
     },
     "passwordTooWeak": "Kata laluan terlalu lemah. Gunakan gabungan huruf besar, huruf kecil, nombor dan aksara khas.",
-    "passwordCommon": "Kata laluan ini terlalu biasa. Sila pilih kata laluan yang lebih kukuh."
+    "passwordCommon": "Kata laluan ini terlalu biasa. Sila pilih kata laluan yang lebih kukuh.",
+    "copied": "Disalin ke papan klip"
   },
   "errors": {
     "generic": "Ada masalah timbul\nSila cuba lagi",
@@ -2968,27 +2951,6 @@
       "title": "Cabaran Jun!",
       "description": "Kembangkan Lingkaran Dalaman anda sebanyak 10 untuk peluang memenangi tiket keistimewaan $1000 ke Adopting Bitcoin El Salvador",
       "details": "Menangi tiket keistimewaan ke Adopting Bitcoin El Salvador\n\nKembangkan Lingkaran Dalaman anda sebanyak 10 untuk peluang memenangi tiket keistimewaan $1000 ke Adopting Bitcoin El Salvador! Tiket ini termasuk akses eksklusif ke persidangan utama, mezanin dengan makanan/minuman/snek, makan malam penceramah, dan Festival Filem.\n\nKongsikan lingkaran anda di sosial dengan hashtag #blinkcircles untuk menyertai.\n\nKali ini, akan ada dua pemenang!"
-    },
-    "septChallenge": {
-      "title": "Cabaran September!",
-      "description": "Kumpulan Kecil {innerCircle: number}/21 - Dapatkan $21\n3 Teratas - Menangi tiket ke Adopting Bitcoin!",
-      "details": "Kembangkan kumpulan kecil anda menjadi 21 orang pada September ini dan dapat $21 dalam akaun stablesats anda. 3 yang teratas akan memenangi tiket Adopting Bitcoin!",
-      "peopleWelcomedSoFar": "Kenalan yang telah menyertai setakat ini",
-      "yourRank": "ranking kedudukan anda",
-      "reminder": "Perhatian: Kumpulan kecil anda akan bertambah sekiranya anda menghantar sats kepada pengguna baru Blink ",
-      "fullDetails": "Maklumat penuh di"
-    },
-    "octoberChallenge": {
-      "title": "Cabaran Oktober!",
-      "description": "Kongsikan #blinkcircles untuk peluang memenangi 1,000,000 sats!",
-      "details": "Kami akan berikan hadiah 1,000,000 sats!\n\nKongsikan Kumpulan Kecil Anda di media sosial dengan `#blinkcircles` untuk penyertaan! Pemenang akan dipilih secara rawak pada 31 Oktober ini.\n\nAnda perlu ada sekurang-kurangnya seorang sahaja dalam Kumpulan Kecil untuk layak menyertainya!",
-      "connectOnSocial": "Hubungi kami di media sosial:",
-      "fullDetails": "Maklumat terperinci ada di"
-    },
-    "novemberChallenge": {
-      "title": "November Challenge!",
-      "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-      "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
     }
   },
   "FullOnboarding": {
@@ -3012,9 +2974,6 @@
     "title": "Notifikasi",
     "noNotifications": "Anda tidak mempunyai sebarang notifikasi buat masa ini"
   },
-  "Fake": {
-    "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
-  },
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Menunggu",
@@ -3032,7 +2991,10 @@
       "emptyTransactions": "Belum ada transaksi",
       "addFunds": "Tambah dana",
       "transactionsTitle": "Transaksi",
-      "title": "Kad Visa"
+      "title": "Kad Visa",
+      "noCardAvailable": "Tiada kad tersedia",
+      "cardNotUsable": "Kad ini tidak tersedia untuk digunakan pada masa ini",
+      "cardUpdateError": "Tidak dapat mengemas kini status kad"
     },
     "validThruLabel": "SAH SEHINGGA",
     "networkVisa": "Visa",
@@ -3304,9 +3266,6 @@
         "damagedCard": "Kad rosak",
         "damagedCardDescription": "Kad saya rosak secara fizikal",
         "whatHappensNext": "Apa yang berlaku seterusnya?",
-        "currentCardDeactivated": "Kad semasa anda akan dinyahaktifkan serta-merta",
-        "newCardShipped": "Kad baharu akan dihantar ke alamat anda",
-        "digitalCardAvailable": "Kad digital anda kekal tersedia semasa proses ini",
         "cardManagement": "Pengurusan kad",
         "bullet1": "Kad semasa anda akan dibekukan untuk keselamatan",
         "bullet2": "Kad baharu dengan nombor berbeza akan dikeluarkan",
@@ -3327,15 +3286,9 @@
         "title": "Semak permintaan anda",
         "subtitle": "Sila sahkan butiran penggantian kad anda",
         "requestSummary": "Ringkasan permintaan",
-        "reason": "Sebab",
         "delivery": "Penghantaran",
-        "shippingAddress": "Alamat penghantaran",
-        "deliveryCost": "Kos penghantaran",
         "submitRequest": "Hantar permintaan",
         "importantInformation": "Maklumat penting",
-        "processedImmediately": "Permintaan anda akan diproses serta-merta",
-        "currentCardDeactivated": "Kad semasa akan dinyahaktifkan selepas pengesahan",
-        "trackStatus": "Anda boleh menjejaki status penghantaran kad baharu anda dalam aplikasi",
         "issueType": "Sebab",
         "deliveryTime": "Masa penghantaran",
         "shippingCost": "Kos penghantaran",
@@ -3388,10 +3341,7 @@
         "feature2": "Cip EMV untuk keselamatan yang dipertingkatkan",
         "feature3": "Jalur magnet untuk penerimaan sejagat",
         "feature4": "Nama anda timbul pada kad",
-        "important": "Penting",
-        "importantBullet1": "Kad maya anda akan kekal aktif sementara menunggu kad fizikal",
-        "importantBullet2": "Anda perlu mengaktifkan kad fizikal apabila ia tiba",
-        "importantBullet3": "Kedua-dua kad akan mempunyai nombor dan butiran yang sama"
+        "important": "Penting"
       },
       "Confirm": {
         "title": "Sahkan pesanan anda",
@@ -3540,7 +3490,6 @@
         "savedConfirm": "Saya telah menyimpannya",
         "copy": "Salin",
         "continueButton": "Teruskan",
-        "selfCustodialDisabled": "Bukan kustodian tidak tersedia buat sementara.",
         "testBackup": "Uji sandaran anda"
       },
       "Confirm": {
@@ -3603,7 +3552,8 @@
     "chooseMethod": "Pilih kaedah",
     "restoreComingSoonTitle": "Akan datang",
     "restoreComingSoonDescription": "Ciri pemulihan akan tersedia dalam kemas kini akan datang.",
-    "createFailed": "Gagal mencipta dompet. Sila cuba lagi."
+    "createFailed": "Gagal mencipta dompet. Sila cuba lagi.",
+    "selfCustodialDisabled": "Bukan kustodial tidak tersedia buat sementara waktu."
   },
   "RestoreScreen": {
     "title": "Pulihkan dompet",
@@ -3707,7 +3657,6 @@
     "description": "Jumlah: {sats} sats tersedia untuk dituntut",
     "claim": "Tuntut sekarang",
     "claiming": "Menuntut...",
-    "belowMinimum": "{count} deposit di bawah minimum (~{minimum} sats). Belum boleh dituntut.",
     "screenTitle": "Deposit tidak dituntut",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3730,12 +3679,7 @@
     "refundNow": "Bayar balik sekarang",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Sedia",
-    "badgePending": "Tertangguh",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Ralat",
-    "badgeRefunded": "Dibayar balik"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

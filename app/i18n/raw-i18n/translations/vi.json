@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "Cách sử dụng Cash Register của bạn",
     "howToUseYourAddressExplainer": "Share with someone that has a compatible wallet, such as:",
     "howToUseYourPaycodeExplainer": "You can print your Paycode (technically, this is an lnurl-pay address) and display it in your business to receive payments. Individuals can pay you by scanning it with a Lightning-enabled wallet.\n\nHowever, be aware that some wallets can’t scan a Paycode such as:",
-    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet.",
-    "yourAddress": "Địa chỉ {bankName: string} của bạn",
-    "copiedAddressToClipboard": "Đã sao chép địa chỉ {bankName: string} vào bộ nhớ tạm"
+    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "Điều khoản và Điều kiện",
@@ -78,8 +76,7 @@
     "feeError": "Không thể lấy phí chuyển đổi"
   },
   "ConversionSuccessScreen": {
-    "message": "Chuyễn đổi đã thành công",
-    "title": "Chuyển đổi thành công"
+    "message": "Chuyễn đổi đã thành công"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2075,12 +2072,7 @@
     "payBusiness": "trả tiền cho doanh nghiệp này",
     "openSettings": "Mở cài đặt",
     "title": "Bản đồ",
-    "error": "Rất tiếc. Đã xảy ra lỗi khi lấy vị trí của bạn",
-    "locationPermissionMessage": "Kích hoạt vị trí của bạn để bạn biết mình đang ở đâu trên bản đồ",
-    "locationPermissionNegative": "Hủy",
-    "locationPermissionNeutral": "Hãy hỏi lai tôi sau",
-    "locationPermissionPositive": "OK",
-    "locationPermissionTitle": "Xác định vị trí của bạn trên bản đồ"
+    "error": "Rất tiếc. Đã xảy ra lỗi khi lấy vị trí của bạn"
   },
   "HomeScreen": {
     "receive": "Nhận",
@@ -2264,16 +2256,7 @@
     "clipboardError": "Lỗi lấy giá trị từ bộ nhớ tạm",
     "pastedClipboardSuccess": "Đã dán từ bộ nhớ tạm",
     "invalidPhoneNumber": "Nhập số điện thoại di động hợp lệ",
-    "phoneNotAllowed": "Trường này không chấp nhận số điện thoại",
-    "confirmModal": {
-      "title": "You've never sent money to this address",
-      "body1": "Please make sure the recipient gave you a {bankName: string} address,",
-      "bold2bold": "not a username from another wallet.",
-      "body3": "Otherwise, the money will go to a {bankName: string} Account that has the “{lnAddress: string}” address.\n\nCheck the spelling of the first part of the address as well. e.g. jackie and jack1e are 2 different addresses",
-      "warning": "Nếu địa chỉ {bankName: string} được nhập không chính xác, {bankName: string} không thể hủy giao dịch.",
-      "checkBox": "{lnAddress: string} là địa chỉ phù hợp.",
-      "confirmButton": "Tôi chắc chắn 100%"
-    }
+    "phoneNotAllowed": "Trường này không chấp nhận số điện thoại"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Giao dịch sẽ được gửi vào mempool",
@@ -2327,8 +2310,6 @@
     "slow": "Chậm",
     "recommended": "Đề xuất",
     "walletOffline": "Ví của bạn đang ngoại tuyến. Vui lòng kiểm tra kết nối và thử lại.",
-    "destinationIsRequired": "Điểm đến là bắt buộc",
-    "lnurlInvoiceIncorrectDescription": "Máy chủ LNURL đã phản hồi với một hóa đơn có phần mô tả không chính xác.",
     "sdkInsufficientFunds": "Không đủ số dư cho giao dịch này.",
     "sdkAmountTooLow": "Số tiền quá thấp cho giao dịch on-chain.",
     "sdkNetworkError": "Lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.",
@@ -2379,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Địa chỉ Lightning"
     }
   },
   "NotificationSettingsScreen": {
@@ -2512,9 +2494,9 @@
     "body": "Tài khoản Đô la sử dụng công nghệ Stablesats để giữ Bitcoin ổn định theo giá USD. Bạn luôn nắm giữ Bitcoin — không phải đô la thật — nhưng giá trị USD không biến động. Bạn có thể gửi và nhận Bitcoin như bình thường, nhưng không tương thích với hệ thống ngân hàng truyền thống.",
     "termsAndConditions": "Đọc các Điều khoản & Điều kiện",
     "learnMore": "Tìm hiểu thêm về Stablesats",
-      "headerSelfCustodial": "Tài khoản Đô la của bạn giữ stablecoin",
-      "bodySelfCustodial": "Trong tài khoản Đô la, bạn nắm giữ stablecoin. Token được bảo đảm bởi tài sản với giá trị giữ ổn định so với USD. Bạn chưa thể gửi và nhận stablecoin. Khi bạn gửi từ tài khoản Đô la, stablecoin của bạn sẽ được hoán đổi và gửi dưới dạng Bitcoin cho người nhận.",
-      "learnMoreSelfCustodial": "Tìm hiểu thêm"
+    "headerSelfCustodial": "Tài khoản Đô la của bạn giữ stablecoin",
+    "bodySelfCustodial": "Trong tài khoản Đô la, bạn nắm giữ stablecoin. Token được bảo đảm bởi tài sản với giá trị giữ ổn định so với USD. Bạn chưa thể gửi và nhận stablecoin. Khi bạn gửi từ tài khoản Đô la, stablecoin của bạn sẽ được hoán đổi và gửi dưới dạng Bitcoin cho người nhận.",
+    "learnMoreSelfCustodial": "Tìm hiểu thêm"
   },
   "SplashScreen": {
     "update": "Ứng dụng của bạn đã lỗi thời. Cần cập nhật ứng dụng để chạy ứng dụng.\n\nĐiều này có thể được thực hiện từ PlayStore cho Android và Testflight cho iOS"
@@ -2839,7 +2821,8 @@
       "invalidRegion": "Lựa chọn vùng không hợp lệ"
     },
     "passwordTooWeak": "Mật khẩu quá yếu. Hãy dùng kết hợp chữ hoa, chữ thường, số và ký tự đặc biệt.",
-    "passwordCommon": "Mật khẩu này quá phổ biến. Vui lòng chọn mật khẩu mạnh hơn."
+    "passwordCommon": "Mật khẩu này quá phổ biến. Vui lòng chọn mật khẩu mạnh hơn.",
+    "copied": "Đã sao chép vào bộ nhớ tạm"
   },
   "errors": {
     "generic": "Đã có lỗi.\nVui lòng thử lại sau.",
@@ -2968,27 +2951,6 @@
       "title": "Thử thách Tháng Sáu!",
       "description": "Mở rộng Vòng tròn Nội bộ của bạn thêm 10 người để có cơ hội giành được vé đặc quyền $1000 đến Adopting Bitcoin El Salvador",
       "details": "Giành vé đặc quyền đến Adopting Bitcoin El Salvador\n\nMở rộng Vòng tròn Nội bộ của bạn thêm 10 người để có cơ hội giành được vé đặc quyền $1000 đến Adopting Bitcoin El Salvador! Vé bao gồm quyền truy cập độc quyền vào hội nghị chính, tầng lửng với đồ ăn/thức uống/đồ ăn nhẹ, bữa tối diễn giả và Liên hoan Phim.\n\nChia sẻ vòng tròn của bạn trên mạng xã hội với hashtag #blinkcircles để tham gia.\n\nLần này sẽ có hai người chiến thắng!"
-    },
-    "septChallenge": {
-      "title": "September Challenge!",
-      "description": "Inner Circle {innerCircle: number}/21 - Earn $21\nTop 3 - Win tickets to Adopting Bitcoin!",
-      "details": "Grow your inner circle by 21 people in September and share on social with #blinkcircles to get $21 to your Stablesats account. Top 3 win tickets to Adopting Bitcoin!",
-      "peopleWelcomedSoFar": "people welcomed so far",
-      "yourRank": "your rank",
-      "reminder": "Reminder: Your inner circle grows when you send a new Blink user their first sats",
-      "fullDetails": "Full details at"
-    },
-    "octoberChallenge": {
-      "title": "October Challenge!",
-      "description": "Share your #blinkcircles for a chance to win 1,000,000 sats!",
-      "details": "We're giving away 1,000,000 sats!\n\n Share your Circles on social with tag `#blinkcircles` to enter! The winner will be chosen at random on October 31st.\n\n You must have at least one person in your Inner Circle to enter!",
-      "connectOnSocial": "Connect on social: ",
-      "fullDetails": "Full details at "
-    },
-    "novemberChallenge": {
-      "title": "November Challenge!",
-      "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-      "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
     }
   },
   "FullOnboarding": {
@@ -3029,7 +2991,10 @@
       "emptyTransactions": "Chưa có giao dịch",
       "addFunds": "Nạp tiền",
       "transactionsTitle": "Giao dịch",
-      "title": "Thẻ Visa"
+      "title": "Thẻ Visa",
+      "noCardAvailable": "Không có thẻ nào khả dụng",
+      "cardNotUsable": "Thẻ này hiện không khả dụng để sử dụng",
+      "cardUpdateError": "Không thể cập nhật trạng thái thẻ"
     },
     "validThruLabel": "CÓ HIỆU LỰC ĐẾN",
     "networkVisa": "Visa",
@@ -3301,9 +3266,6 @@
         "damagedCard": "Thẻ bị hỏng",
         "damagedCardDescription": "Thẻ của tôi bị hỏng vật lý",
         "whatHappensNext": "Điều gì xảy ra tiếp theo?",
-        "currentCardDeactivated": "Thẻ hiện tại của bạn sẽ bị vô hiệu hóa ngay lập tức",
-        "newCardShipped": "Thẻ mới sẽ được gửi đến địa chỉ của bạn",
-        "digitalCardAvailable": "Thẻ kỹ thuật số của bạn vẫn có sẵn trong quá trình này",
         "cardManagement": "Quản lý thẻ",
         "bullet1": "Thẻ hiện tại của bạn sẽ bị đóng băng vì lý do bảo mật",
         "bullet2": "Thẻ mới với số khác sẽ được phát hành",
@@ -3324,15 +3286,9 @@
         "title": "Xem lại yêu cầu của bạn",
         "subtitle": "Vui lòng xác nhận chi tiết thay thế thẻ của bạn",
         "requestSummary": "Tóm tắt yêu cầu",
-        "reason": "Lý do",
         "delivery": "Giao hàng",
-        "shippingAddress": "Địa chỉ giao hàng",
-        "deliveryCost": "Phí giao hàng",
         "submitRequest": "Gửi yêu cầu",
         "importantInformation": "Thông tin quan trọng",
-        "processedImmediately": "Yêu cầu của bạn sẽ được xử lý ngay lập tức",
-        "currentCardDeactivated": "Thẻ hiện tại sẽ bị vô hiệu hóa khi xác nhận",
-        "trackStatus": "Bạn có thể theo dõi trạng thái giao hàng của thẻ mới trong ứng dụng",
         "issueType": "Lý do",
         "deliveryTime": "Thời gian giao hàng",
         "shippingCost": "Phí giao hàng",
@@ -3385,10 +3341,7 @@
         "feature2": "Chip EMV tăng cường bảo mật",
         "feature3": "Dải từ để chấp nhận rộng rãi",
         "feature4": "Tên của bạn được dập nổi trên thẻ",
-        "important": "Quan trọng",
-        "importantBullet1": "Thẻ ảo của bạn sẽ vẫn hoạt động trong khi chờ thẻ vật lý",
-        "importantBullet2": "Bạn cần kích hoạt thẻ vật lý khi nhận được",
-        "importantBullet3": "Cả hai thẻ sẽ có cùng số thẻ và thông tin"
+        "important": "Quan trọng"
       },
       "Confirm": {
         "title": "Xác nhận đơn hàng",
@@ -3537,7 +3490,6 @@
         "savedConfirm": "Tôi đã lưu",
         "copy": "Sao chép",
         "continueButton": "Tiếp tục",
-        "selfCustodialDisabled": "Không lưu ký tạm thời không khả dụng.",
         "testBackup": "Kiểm tra bản sao lưu của bạn"
       },
       "Confirm": {
@@ -3600,7 +3552,8 @@
     "chooseMethod": "Chọn phương thức",
     "restoreComingSoonTitle": "Sắp ra mắt",
     "restoreComingSoonDescription": "Tính năng khôi phục sẽ có trong bản cập nhật tương lai.",
-    "createFailed": "Không thể tạo ví. Vui lòng thử lại."
+    "createFailed": "Không thể tạo ví. Vui lòng thử lại.",
+    "selfCustodialDisabled": "Phi giám sát hiện không khả dụng."
   },
   "RestoreScreen": {
     "title": "Khôi phục ví",
@@ -3704,7 +3657,6 @@
     "description": "Tổng: {sats} sats có thể yêu cầu",
     "claim": "Yêu cầu ngay",
     "claiming": "Đang yêu cầu...",
-    "belowMinimum": "{count} khoản gửi dưới mức tối thiểu (~{minimum} sats). Chưa thể yêu cầu.",
     "screenTitle": "Tiền gửi chưa được nhận",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3727,12 +3679,7 @@
     "refundNow": "Hoàn tiền ngay",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Sẵn sàng",
-    "badgePending": "Đang chờ",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Lỗi",
-    "badgeRefunded": "Đã hoàn tiền"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

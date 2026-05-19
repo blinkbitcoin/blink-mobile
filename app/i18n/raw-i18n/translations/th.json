@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "วิธีใช้งานทะเบียนรับเงิน",
     "howToUseYourAddressExplainer": "Share with someone that has a compatible wallet, such as:",
     "howToUseYourPaycodeExplainer": "You can print your Paycode (technically, this is an lnurl-pay address) and display it in your business to receive payments. Individuals can pay you by scanning it with a Lightning-enabled wallet.\n\nHowever, be aware that some wallets can’t scan a Paycode such as:",
-    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet.",
-    "yourAddress": "แอดเดรส {bankName: string} ของคุณ",
-    "copiedAddressToClipboard": "คัดลอกแอดเดรส {bankName: string} ไปยังคลิปบอร์ดแล้ว"
+    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "ข้อกำหนดและเงื่อนไข",
@@ -78,8 +76,7 @@
     "feeError": "ไม่สามารถดึงค่าธรรมเนียมการแปลงได้"
   },
   "ConversionSuccessScreen": {
-    "message": "การแลกเปลี่ยนสำเร็จแล้ว",
-    "title": "แลกเปลี่ยนเสร็จสิ้น"
+    "message": "การแลกเปลี่ยนสำเร็จแล้ว"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2075,12 +2072,7 @@
     "payBusiness": "จ่ายเงินให้ร้านนี้",
     "openSettings": "เปิดการตั้งค่า",
     "title": "แผนที่",
-    "error": "เกิดข้อผิดพลาดขณะรับตำแหน่งของคุณ",
-    "locationPermissionMessage": "เปิดใช้งานการระบุตำแหน่ง เพื่อให้คุณรู้ว่าคุณอยู่ตรงไหนของบนแผนที่",
-    "locationPermissionNegative": "ยกเลิก",
-    "locationPermissionNeutral": "ถามอีกครั้งในภายหลัง",
-    "locationPermissionPositive": "ตกลง",
-    "locationPermissionTitle": "หาตำแหน่งของคุณบนแผนที่"
+    "error": "เกิดข้อผิดพลาดขณะรับตำแหน่งของคุณ"
   },
   "HomeScreen": {
     "receive": "รับเงิน",
@@ -2264,16 +2256,7 @@
     "clipboardError": "เกิดข้อผิดพลาดในการรับค่าจากคลิปบอร์ด",
     "pastedClipboardSuccess": "วางจากคลิปบอร์ดแล้ว",
     "invalidPhoneNumber": "กรุณาป้อนหมายเลขโทรศัพท์มือถือที่ถูกต้อง",
-    "phoneNotAllowed": "ช่องนี้ไม่รับหมายเลขโทรศัพท์",
-    "confirmModal": {
-      "title": "You've never sent money to this address",
-      "body1": "Please make sure the recipient gave you a {bankName: string} address,",
-      "bold2bold": "not a username from another wallet.",
-      "body3": "Otherwise, the money will go to a {bankName: string} Account that has the “{lnAddress: string}” address.\n\nCheck the spelling of the first part of the address as well. e.g. jackie and jack1e are 2 different addresses",
-      "warning": "หากแอดเดรส {bankName: string} ที่ระบุมาไม่ถูกต้อง {bankName: string} ไม่สามารถยกเลิกธุรกรรมได้",
-      "checkBox": "{lnAddress: string} เป็นแอดเดรสที่ถูกต้อง",
-      "confirmButton": "ฉันมั่นใจ 100%"
-    }
+    "phoneNotAllowed": "ช่องนี้ไม่รับหมายเลขโทรศัพท์"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "ธุรกรรมจะถูกส่งไปยัง Mempool",
@@ -2327,8 +2310,6 @@
     "slow": "ช้า",
     "recommended": "แนะนำ",
     "walletOffline": "กระเป๋าเงินของคุณออฟไลน์ กรุณาตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
-    "destinationIsRequired": "กรุณาระบุปลายทาง",
-    "lnurlInvoiceIncorrectDescription": "เซิร์ฟเวอร์ lnurl ตอบสนองกับ invoice ที่มี Description hash ไม่ถูกต้อง",
     "sdkInsufficientFunds": "ยอดเงินไม่เพียงพอสำหรับธุรกรรมนี้",
     "sdkAmountTooLow": "จำนวนเงินต่ำเกินไปสำหรับธุรกรรม on-chain",
     "sdkNetworkError": "ข้อผิดพลาดของเครือข่าย กรุณาตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
@@ -2379,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "ที่อยู่ Lightning"
     }
   },
   "NotificationSettingsScreen": {
@@ -2512,9 +2494,9 @@
     "body": "บัญชีเงินดอลล่าร์ ใช้เทคโนโลยี Stablesats เพื่อรักษา Bitcoin ให้มีเสถียรภาพตามราคา USD คุณถือ Bitcoin ตลอดเวลา — ไม่ใช่ดอลลาร์จริง — แต่มูลค่า USD ไม่ผันผวน คุณสามารถส่งและรับ Bitcoin ได้ตามปกติ แต่ไม่รองรับระบบธนาคารแบบดั้งเดิม",
     "termsAndConditions": "อ่านข้อกำหนดและเงื่อนไข",
     "learnMore": "เรียนรู้เพิ่มเติมเกี่ยวกับ Stablesats",
-      "headerSelfCustodial": "บัญชีดอลลาร์ของคุณถือ stablecoins",
-      "bodySelfCustodial": "ในบัญชีดอลลาร์คุณถือ stablecoins โทเคนที่หนุนด้วยสินทรัพย์ซึ่งมีมูลค่าคงที่เทียบกับดอลลาร์สหรัฐ คุณยังไม่สามารถส่งและรับ stablecoins ได้ เมื่อคุณส่งจากบัญชีดอลลาร์ stablecoins ของคุณจะถูกสลับและส่งเป็น Bitcoin ไปยังผู้รับ",
-      "learnMoreSelfCustodial": "เรียนรู้เพิ่มเติม"
+    "headerSelfCustodial": "บัญชีดอลลาร์ของคุณถือ stablecoins",
+    "bodySelfCustodial": "ในบัญชีดอลลาร์คุณถือ stablecoins โทเคนที่หนุนด้วยสินทรัพย์ซึ่งมีมูลค่าคงที่เทียบกับดอลลาร์สหรัฐ คุณยังไม่สามารถส่งและรับ stablecoins ได้ เมื่อคุณส่งจากบัญชีดอลลาร์ stablecoins ของคุณจะถูกสลับและส่งเป็น Bitcoin ไปยังผู้รับ",
+    "learnMoreSelfCustodial": "เรียนรู้เพิ่มเติม"
   },
   "SplashScreen": {
     "update": "แอปของคุณเป็นเวอร์ชั่นที่เก่าเกินไป จะต้องอัพเดทก่อนจึงจะใช้งานได้\n\nหากใช้แอนดรอยด์ คุณสามารถอัพเดทได้ที่ PlayStore หรือหากใช้ iOS สามารถอัพเดทได้ที่ Testflight"
@@ -2839,7 +2821,8 @@
       "invalidRegion": "การเลือกภูมิภาคไม่ถูกต้อง"
     },
     "passwordTooWeak": "รหัสผ่านนี้คาดเดาง่ายเกินไป ใช้อักษรพิมพ์ใหญ่ อักษรพิมพ์เล็ก ตัวเลข และอักขระพิเศษผสมกัน",
-    "passwordCommon": "รหัสผ่านนี้ใช้กันทั่วไปเกินไป โปรดเลือกรหัสผ่านที่รัดกุมกว่า"
+    "passwordCommon": "รหัสผ่านนี้ใช้กันทั่วไปเกินไป โปรดเลือกรหัสผ่านที่รัดกุมกว่า",
+    "copied": "คัดลอกไปยังคลิปบอร์ดแล้ว"
   },
   "errors": {
     "generic": "มีขความผิดพลาดเกิดขึ้น\nโปรดลองอีกครั้งในภายหลัง",
@@ -2968,27 +2951,6 @@
       "title": "ชาเลนจ์เดือนมิถุนายน!",
       "description": "ขยายวงในของคุณเพิ่ม 10 คน เพื่อลุ้นรับตั๋ว Privilege มูลค่า $1000 สำหรับงาน Adopting Bitcoin El Salvador",
       "details": "ลุ้นรับตั๋ว Privilege สำหรับงาน Adopting Bitcoin El Salvador\n\nขยายวงในของคุณเพิ่ม 10 คน เพื่อลุ้นรับตั๋ว Privilege มูลค่า $1000 สำหรับงาน Adopting Bitcoin El Salvador! ตั๋วนี้รวมสิทธิ์เข้าร่วมงานหลัก พื้นที่ Mezzanine พร้อมอาหาร/เครื่องดื่ม/ของว่าง งานเลี้ยงวิทยากร และเทศกาลภาพยนตร์\n\nแชร์วงของคุณบนโซเชียลด้วยแฮชแท็ก #blinkcircles เพื่อเข้าร่วม\n\nครั้งนี้จะมีผู้ชนะสองคน!"
-    },
-    "septChallenge": {
-      "title": "September Challenge!",
-      "description": "Inner Circle {innerCircle: number}/21 - Earn $21\nTop 3 - Win tickets to Adopting Bitcoin!",
-      "details": "Grow your inner circle by 21 people in September and share on social with #blinkcircles to get $21 to your Stablesats account. Top 3 win tickets to Adopting Bitcoin!",
-      "peopleWelcomedSoFar": "people welcomed so far",
-      "yourRank": "your rank",
-      "reminder": "Reminder: Your inner circle grows when you send a new Blink user their first sats",
-      "fullDetails": "Full details at"
-    },
-    "octoberChallenge": {
-      "title": "October Challenge!",
-      "description": "Share your #blinkcircles for a chance to win 1,000,000 sats!",
-      "details": "We're giving away 1,000,000 sats!\n\n Share your Circles on social with tag `#blinkcircles` to enter! The winner will be chosen at random on October 31st.\n\n You must have at least one person in your Inner Circle to enter!",
-      "connectOnSocial": "Connect on social: ",
-      "fullDetails": "Full details at "
-    },
-    "novemberChallenge": {
-      "title": "November Challenge!",
-      "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-      "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
     }
   },
   "FullOnboarding": {
@@ -3029,7 +2991,10 @@
       "emptyTransactions": "ยังไม่มีธุรกรรม",
       "addFunds": "เติมเงิน",
       "transactionsTitle": "ธุรกรรม",
-      "title": "บัตร Visa"
+      "title": "บัตร Visa",
+      "noCardAvailable": "ไม่มีบัตรที่ใช้ได้",
+      "cardNotUsable": "ขณะนี้บัตรนี้ไม่พร้อมใช้งาน",
+      "cardUpdateError": "ไม่สามารถอัปเดตสถานะบัตรได้"
     },
     "validThruLabel": "ใช้ได้ถึง",
     "networkVisa": "Visa",
@@ -3301,9 +3266,6 @@
         "damagedCard": "บัตรเสียหาย",
         "damagedCardDescription": "บัตรของฉันเสียหายทางกายภาพ",
         "whatHappensNext": "จะเกิดอะไรขึ้นต่อไป?",
-        "currentCardDeactivated": "บัตรปัจจุบันของคุณจะถูกปิดใช้งานทันที",
-        "newCardShipped": "บัตรใหม่จะถูกจัดส่งไปยังที่อยู่ของคุณ",
-        "digitalCardAvailable": "บัตรดิจิทัลของคุณยังคงใช้งานได้ระหว่างกระบวนการนี้",
         "cardManagement": "การจัดการบัตร",
         "bullet1": "บัตรปัจจุบันของคุณจะถูกระงับเพื่อความปลอดภัย",
         "bullet2": "จะออกบัตรใหม่ที่มีหมายเลขต่างกัน",
@@ -3324,15 +3286,9 @@
         "title": "ตรวจสอบคำขอของคุณ",
         "subtitle": "กรุณายืนยันรายละเอียดการเปลี่ยนบัตรของคุณ",
         "requestSummary": "สรุปคำขอ",
-        "reason": "เหตุผล",
         "delivery": "การจัดส่ง",
-        "shippingAddress": "ที่อยู่จัดส่ง",
-        "deliveryCost": "ค่าจัดส่ง",
         "submitRequest": "ส่งคำขอ",
         "importantInformation": "ข้อมูลสำคัญ",
-        "processedImmediately": "คำขอของคุณจะถูกดำเนินการทันที",
-        "currentCardDeactivated": "บัตรปัจจุบันจะถูกปิดใช้งานเมื่อยืนยัน",
-        "trackStatus": "คุณสามารถติดตามสถานะการจัดส่งบัตรใหม่ของคุณในแอป",
         "issueType": "เหตุผล",
         "deliveryTime": "เวลาจัดส่ง",
         "shippingCost": "ค่าจัดส่ง",
@@ -3385,10 +3341,7 @@
         "feature2": "ชิป EMV เพื่อความปลอดภัยที่สูงขึ้น",
         "feature3": "แถบแม่เหล็กเพื่อการยอมรับทั่วโลก",
         "feature4": "ชื่อของคุณถูกปั๊มนูนบนบัตร",
-        "important": "สำคัญ",
-        "importantBullet1": "บัตรเสมือนของคุณจะยังใช้งานได้ระหว่างรอบัตรจริง",
-        "importantBullet2": "คุณต้องเปิดใช้งานบัตรจริงเมื่อมาถึง",
-        "importantBullet3": "บัตรทั้งสองใบจะมีหมายเลขและรายละเอียดเดียวกัน"
+        "important": "สำคัญ"
       },
       "Confirm": {
         "title": "ยืนยันคำสั่งซื้อ",
@@ -3537,7 +3490,6 @@
         "savedConfirm": "ฉันบันทึกแล้ว",
         "copy": "คัดลอก",
         "continueButton": "ดำเนินการต่อ",
-        "selfCustodialDisabled": "ไม่ฝากดูแลไม่พร้อมใช้งานชั่วคราว",
         "testBackup": "ทดสอบข้อมูลสำรองของคุณ"
       },
       "Confirm": {
@@ -3600,7 +3552,8 @@
     "chooseMethod": "เลือกวิธี",
     "restoreComingSoonTitle": "เร็วๆ นี้",
     "restoreComingSoonDescription": "ฟีเจอร์กู้คืนจะพร้อมใช้งานในการอัปเดตในอนาคต",
-    "createFailed": "สร้างกระเป๋าเงินไม่สำเร็จ กรุณาลองอีกครั้ง"
+    "createFailed": "สร้างกระเป๋าเงินไม่สำเร็จ กรุณาลองอีกครั้ง",
+    "selfCustodialDisabled": "ไม่ใช่การคุ้มครองไม่พร้อมใช้งานชั่วคราว"
   },
   "RestoreScreen": {
     "title": "กู้คืนกระเป๋าเงิน",
@@ -3704,7 +3657,6 @@
     "description": "รวม: {sats} sats พร้อมเรียกร้อง",
     "claim": "เรียกร้องตอนนี้",
     "claiming": "กำลังเรียกร้อง...",
-    "belowMinimum": "{count} รายการฝากต่ำกว่าขั้นต่ำ (~{minimum} sats) ยังไม่สามารถเรียกร้องได้",
     "screenTitle": "เงินฝากที่ยังไม่ได้เรียกร้อง",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3727,12 +3679,7 @@
     "refundNow": "คืนเงินตอนนี้",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "พร้อม",
-    "badgePending": "รอดำเนินการ",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "ข้อผิดพลาด",
-    "badgeRefunded": "คืนเงินแล้ว"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

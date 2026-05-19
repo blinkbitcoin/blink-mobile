@@ -18,9 +18,7 @@
         "howToUseYourCashRegister": "Comment utiliser votre terminal de paiement",
         "howToUseYourAddressExplainer": "Partager avec quelqu’un qui possède un portefeuille compatible, par exemple : ",
         "howToUseYourPaycodeExplainer": "Vous pouvez imprimer votre Code de paiement (techniquement c’est une adresse lnurl-pay) et l’afficher dans votre entreprise pour recevoir des paiements. Les particuliers peuvent vous payer en le scannant avec un portefeuille utilisant Lightning.\n\nCependant, il faut savoir que certains portefeuilles ne peuvent pas scanner un Code de paiement comme par exemple : ",
-        "howToUseYourCashRegisterExplainer": "Accepter que des personnes collectent des paiements via le lien du terminal de paiement, sans avoir accès à votre portefeuille.\n\nIls peuvent créer des factures et les paiements seront envoyés directement à votre portefeuille\n{bankName: string}.",
-        "yourAddress": "Votre adresse {bankName: string} ",
-        "copiedAddressToClipboard": "Adresse {bankName: string} copiée dans le presse-papiers"
+        "howToUseYourCashRegisterExplainer": "Accepter que des personnes collectent des paiements via le lien du terminal de paiement, sans avoir accès à votre portefeuille.\n\nIls peuvent créer des factures et les paiements seront envoyés directement à votre portefeuille\n{bankName: string}."
     },
     "AcceptTermsAndConditionsScreen": {
         "title": "Conditions générales",
@@ -78,8 +76,7 @@
         "feeError": "Impossible de récupérer les frais de conversion"
     },
     "ConversionSuccessScreen": {
-        "message": "Conversion réussie",
-        "title": "Conversion réalisée avec succès"
+        "message": "Conversion réussie"
     },
     "EarnScreen": {
         "satoshi": "sat",
@@ -2075,12 +2072,7 @@
         "payBusiness": "payez cette entreprise",
         "openSettings": "Ouvrir les paramètres",
         "title": "Carte",
-        "error": "Oups. Un problème est survenu lors de la récupération de votre position",
-        "locationPermissionMessage": "Entrez votre localisation, vous pourrez ainsi être inscrit sur la carte",
-        "locationPermissionNegative": "Annuler",
-        "locationPermissionNeutral": "Demandez moi plus tard",
-        "locationPermissionPositive": "OK",
-        "locationPermissionTitle": "Localisez votre position sur la carte"
+        "error": "Oups. Un problème est survenu lors de la récupération de votre position"
     },
     "HomeScreen": {
         "receive": "Recevoir",
@@ -2264,16 +2256,7 @@
         "clipboardError": "Erreur pour obtenir le prix depuis le presse-papier",
         "pastedClipboardSuccess": "Collé depuis le presse-papiers",
         "invalidPhoneNumber": "Entrez un numéro de mobile valide",
-        "phoneNotAllowed": "Ce champ n'accepte pas les numéros de téléphone",
-        "confirmModal": {
-            "title": "Vous n’avez jamais envoyé d’argent à cette adresse",
-            "body1": "Merci de vous assurer que le bénéficiaire vous a donné une adresse {bankName: string}, ",
-            "bold2bold": "et non pas un identifiant d’un autre portefeuille.",
-            "body3": "Sinon l’argent sera transféré au compte {bankName: string} qui a l’adresse “{lnAddress: string}”.\n\nVérifiez également l’orthographe de la première partie de l’adresse, par exemple jackie et jack1e sont 2 adresses différentes.",
-            "warning": "Si l’adresse {bankName: string} est saisie de manière incorrecte, {bankName: string} ne peut pas annuler la transaction.",
-            "checkBox": "{lnAddress: string} est la correcte adresse.",
-            "confirmButton": "J’en suis sûr-e à 100%"
-        }
+        "phoneNotAllowed": "Ce champ n'accepte pas les numéros de téléphone"
     },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transaction devrait être soumise au mempool",
@@ -2327,8 +2310,6 @@
         "slow": "Lent",
         "recommended": "Recommandé",
         "walletOffline": "Votre portefeuille est hors ligne. Veuillez vérifier votre connexion et réessayer.",
-        "destinationIsRequired": "Adresse de destination requise",
-        "lnurlInvoiceIncorrectDescription": "Le serveur lnurl a répondu avec une facture contenant un hachage de description incorrect.",
         "sdkInsufficientFunds": "Fonds insuffisants pour cette transaction.",
         "sdkAmountTooLow": "Le montant est trop faible pour une transaction on-chain.",
         "sdkNetworkError": "Erreur réseau. Vérifiez votre connexion et réessayez.",
@@ -2379,7 +2360,8 @@
             "backupStatusLabel": "État de la sauvegarde",
             "backupStatusCompleted": "Sauvegarde terminée",
             "backupStatusNotCompleted": "Sauvegarde incomplète",
-            "loadError": "Impossible de charger les informations de votre compte."
+            "loadError": "Impossible de charger les informations de votre compte.",
+            "lightningAddressLabel": "Adresse Lightning"
         }
     },
     "NotificationSettingsScreen": {
@@ -2839,7 +2821,8 @@
             "invalidRegion": "Sélection de région non valide"
         },
         "passwordTooWeak": "Le mot de passe est trop faible. Utilisez une combinaison de majuscules, minuscules, chiffres et caractères spéciaux.",
-        "passwordCommon": "Ce mot de passe est trop courant. Veuillez choisir un mot de passe plus robuste."
+        "passwordCommon": "Ce mot de passe est trop courant. Veuillez choisir un mot de passe plus robuste.",
+        "copied": "Copié dans le presse-papiers"
     },
     "errors": {
         "generic": "Une erreur est survenue.\nMerci d’essayer ultérieurement.",
@@ -2968,27 +2951,6 @@
             "title": "Défi de juin !",
             "description": "Élargissez votre cercle intérieur de 10 pour tenter de gagner un billet privilège de 1 000 $ pour Adopting Bitcoin El Salvador",
             "details": "Gagnez un billet privilège pour Adopting Bitcoin El Salvador\n\nÉlargissez votre cercle intérieur de 10 pour tenter de gagner un billet privilège de 1 000 $ pour Adopting Bitcoin El Salvador ! Le billet inclut un accès exclusif à la conférence principale, la mezzanine avec nourriture/boissons/snacks, le dîner des intervenants et le Festival du Film.\n\nPartagez vos cercles sur les réseaux sociaux avec le hashtag #blinkcircles pour participer.\n\nCette fois-ci, il y aura deux gagnants !"
-        },
-        "septChallenge": {
-            "title": "Défi de septembre !",
-            "description": "Cercle interne {innerCircle: number}/21 - Gagnez $21\nTop 3 - Gagnez votre billet pour Adopting Bitcoin !",
-            "details": "Augmentez votre cercle interne de 21 personnes en septembre et partagez sur les réseaux sociaux avec l’hashtag #blinkcircles pour recevoir $21 sur votre compte Stablesats. Les 3 finalistes gagneront leur billet pour la conférence Adopting Bitcoin !",
-            "peopleWelcomedSoFar": "personnes parrainées pour le moment",
-            "yourRank": "votre classement",
-            "reminder": "Rappel : votre cercle interne augmente lorsque vous envoyez à un nouvel utilisateur Blink ses premiers sats.",
-            "fullDetails": "Tous les détails à"
-        },
-        "octoberChallenge": {
-            "title": "Challenge d'octobre !",
-            "description": "Partagez vos #blinkcircles pour avoir une chance de gagner 1 000 000 sats !",
-            "details": "Nous offrons 1 000 000 sats ! Partagez vos Circles sur les réseaux sociaux avec le hashtag #blinkcircles pour participer ! Le gagnant sera choisi au hasard le 31 octobre. Vous devez avoir au moins une personne dans votre Inner Circle pour participer !Nous offrons 1 000 000 sats ! Partagez vos Circles sur les réseaux sociaux avec le hashtag #blinkcircles pour participer ! Le gagnant sera choisi au hasard le 31 octobre. Vous devez avoir au moins une personne dans votre Inner Circle pour participer !",
-            "connectOnSocial": "Connectez-vous sur les réseaux sociaux :",
-            "fullDetails": "Plus d'informations sur"
-        },
-        "novemberChallenge": {
-            "title": "Défi de novembre !\n ",
-            "description": "Gagnez 2 100 sats pour chaque personne que vous accueillez sur Blink en novembre !\n ",
-            "details": "Gagnez 2 100 sats pour chaque personne que vous accueillez sur Blink en novembre !\nPour réclamer vos sats, il vous suffit de partager vos Circles sur les réseaux sociaux à tout moment pendant le mois de novembre avec le tag #blinkcircles.\nVos sats seront versés le 1er décembre 2023."
         }
     },
     "FullOnboarding": {
@@ -3012,9 +2974,6 @@
         "title": "Notifications",
         "noNotifications": "Vous n'avez aucune notification pour le moment"
     },
-    "Fake": {
-        "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
-    },
     "CardFlow": {
         "TransactionStatus": {
             "pending": "En attente",
@@ -3032,7 +2991,10 @@
             "emptyTransactions": "Aucune transaction pour le moment",
             "addFunds": "Ajouter des fonds",
             "transactionsTitle": "Transactions",
-            "title": "Carte Visa"
+            "title": "Carte Visa",
+            "noCardAvailable": "Aucune carte disponible",
+            "cardNotUsable": "Cette carte n'est pas disponible actuellement",
+            "cardUpdateError": "Impossible de mettre à jour le statut de la carte"
         },
         "validThruLabel": "VALIDE JUSQU’À",
         "networkVisa": "Visa",
@@ -3528,7 +3490,6 @@
                 "savedConfirm": "Je l'ai sauvegardée",
                 "copy": "Copier",
                 "continueButton": "Continuer",
-                "selfCustodialDisabled": "Non-custodial est temporairement indisponible.",
                 "testBackup": "Tester votre sauvegarde"
             },
             "Confirm": {
@@ -3591,7 +3552,8 @@
         "chooseMethod": "Choisir la méthode",
         "restoreComingSoonTitle": "Bientôt disponible",
         "restoreComingSoonDescription": "La fonction de restauration sera disponible dans une mise à jour future.",
-        "createFailed": "Échec de la création du portefeuille. Veuillez réessayer."
+        "createFailed": "Échec de la création du portefeuille. Veuillez réessayer.",
+        "selfCustodialDisabled": "La non-custodial est temporairement indisponible."
     },
     "RestoreScreen": {
         "title": "Restaurer le portefeuille",
@@ -3695,7 +3657,6 @@
         "description": "Total : {sats} sats disponibles à réclamer",
         "claim": "Réclamer maintenant",
         "claiming": "Réclamation...",
-        "belowMinimum": "{count} dépôt(s) en dessous du minimum (~{minimum} sats). Ils ne peuvent pas encore être réclamés.",
         "screenTitle": "Dépôts non réclamés",
         "cardTitle": "Réclamer {sats} sats",
         "claimWithFee": "Réclamer (frais max : {fee} sats)",
@@ -3718,12 +3679,7 @@
         "refundNow": "Rembourser maintenant",
         "refundSuccess": "Remboursement initié avec succès",
         "claimSuccess": "Dépôt réclamé avec succès",
-        "error": "Impossible de réclamer ce dépôt",
-        "badgeReady": "Prêt",
-        "badgePending": "En attente",
-        "badgeFeeIssue": "Problème de frais",
-        "badgeError": "Erreur",
-        "badgeRefunded": "Remboursé"
+        "error": "Impossible de réclamer ce dépôt"
     },
     "FeatureUnavailable": {
         "SelfCustodial": {

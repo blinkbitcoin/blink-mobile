@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "Yanapaq yachan Cash Register",
     "howToUseYourAddressExplainer": "Churaykachkan kaqmi tukuyta riqsichiqmanta k'anchu, hukninta kawsanakuyqa kachkanku:",
     "howToUseYourPaycodeExplainer": "You can print your Paycode (technically, this is an lnurl-pay address) and display it in your business to receive payments. Individuals can pay you by scanning it with a Lightning-enabled wallet.\n\nHowever, be aware that some wallets can’t scan a Paycode such as:",
-    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet.",
-    "yourAddress": "Apu {bankName: string} tinkunata",
-    "copiedAddressToClipboard": "{bankName: string} nispayta kanchu"
+    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "Rimanakuykuna Kamachiykunapas",
@@ -78,8 +76,7 @@
     "feeError": "Conversionpa pagon mana apaykachay atinchu"
   },
   "ConversionSuccessScreen": {
-    "message": "Unanchayninmi kamarichik",
-    "title": "Unanchayninmi kamachi"
+    "message": "Unanchayninmi kamarichik"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2075,12 +2072,7 @@
     "payBusiness": "Kay allinmi kuskanchik",
     "openSettings": "Churanakuyta kichay",
     "title": "Pacha mapa",
-    "error": "Uyuyuy. Imapas mana allinchu kasqa maypi kasqaykita maskhashaspa",
-    "locationPermissionMessage": "Mapapi qarqanapaqmi, llaqtamanta kani, kaypiqaqa, llaqtamanta yachanichu.",
-    "locationPermissionNegative": "T'akuy",
-    "locationPermissionNeutral": "Imaynalla yanapaqmi",
-    "locationPermissionPositive": "Ay",
-    "locationPermissionTitle": "Mapapi qarqanapaqmi, llaqtamanta kani"
+    "error": "Uyuyuy. Imapas mana allinchu kasqa maypi kasqaykita maskhashaspa"
   },
   "HomeScreen": {
     "receive": "Allinmi",
@@ -2264,16 +2256,7 @@
     "clipboardError": "Ch'usaqiy qillqata sutichinaqinmi kawsayniyta qillqata sutichinaqinmiimpuyta mana kaniyta rikuchiy.",
     "pastedClipboardSuccess": "Clipboard nisqamanta p'itisqa",
     "invalidPhoneNumber": "Allin celular yupay nisqata churay",
-    "phoneNotAllowed": "Kay campo nisqaqa mana teléfono yupaykunata chaskikunchu",
-    "confirmModal": {
-      "title": "You've never sent money to this address",
-      "body1": "Kawsayniyta qillqata sutichinaqinmi, ñuqaqa kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi {bankName: string} kaniyta rikuyta munanpi yachanakuyta sutichqinmi,",
-      "bold2bold": "Mana kaniyta yachanakuyta.",
-      "body3": "Mana kaniyta rikuchiy, kawsayniyta qillqata sutichinaqinmi {bankName: string} kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi, “{lnAddress: string}” kaniyta rikuyta munanpi.\n\nChaynamanta kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi k'anchaypi yachanakuyta sutichqinmi, chaynamanta kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi, jackie y jack1e kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi 2 kaniyta rikuchiy.",
-      "warning": "{bankName: string} kaniyta rikuyta munanpi, chaynamanta kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiy, mana kaniyta rikuchiy {bankName: string}.",
-      "checkBox": "{lnAddress: string} kaniyta rikuchiy.",
-      "confirmButton": "Ñuqaqa 100% ch'usaqiy"
-    }
+    "phoneNotAllowed": "Kay campo nisqaqa mana teléfono yupaykunata chaskikunchu"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Ruwaynin mempool nisqaman apachisqa kanan kachkan",
@@ -2327,8 +2310,6 @@
     "slow": "Allillamanta",
     "recommended": "Allin",
     "walletOffline": "Qullqi wasi offline kachkan. Ama hina t'inkisqaykita qhaway hinaspa wakmanta ñit'iy.",
-    "destinationIsRequired": "Qillqata sutichinaqinmi kaniyta rikuyta munanpi kaniyta rikuchiy",
-    "lnurlInvoiceIncorrectDescription": "Lnurl serverpi kawsayniyta qillqata sutichinaqinmi, ñuqaqa ch'usaqiy kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi, chaynamanta hashpi mana kaniyta rikuchiy.",
     "sdkInsufficientFunds": "Mana kaniyuqchu kay ruwaykunapaq.",
     "sdkAmountTooLow": "Yupayqa pisillam on-chain ruwaykunapaq.",
     "sdkNetworkError": "Llika pantay. Tinkisqaykita qhaway hinaspa watiqmanta ruway.",
@@ -2379,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Lightning chaskiyninkuna"
     }
   },
   "NotificationSettingsScreen": {
@@ -2512,9 +2494,9 @@
     "body": "Dolar qillqay Stablesats yachaykunata llamk'achin Bitcoin-ta USD chaniman sayasqata waqaychispa. Wiñaypaq Bitcoin-ta hap'inki — mana chiqap dólar-tachu — ichaqa USD chanin mana kuyunchu. Bitcoin-ta apachiy hinaspa chaskiy atikunki imaynatachus, ichaqa mana banco kay pachap sistemanwan tupanchu.",
     "termsAndConditions": "Qillqata sutichinaqinmi t'ikrayninmi yachanakuyta munayniyta rikuchiy",
     "learnMore": "Stablesat kawsayniyta tukuyta yachanakuyta munanki",
-      "headerSelfCustodial": "Dólar cuentaykipi stablecoinkuna kachkanku",
-      "bodySelfCustodial": "Dólar cuentapi stablecoinkunata waqaychanki. Tokenkuna activokunawan saywanachasqa, USDwan kuska valormi takyan. Manaraqmi stablecoinkunata apachiyta nitaq chaskiyta atinkichu. Dólar cuentamanta apachiqtiykiqa, stablecoinkunaykita trukaspa Bitcoin hina chaskiqman apachisun.",
-      "learnMoreSelfCustodial": "Astawan yachay"
+    "headerSelfCustodial": "Dólar cuentaykipi stablecoinkuna kachkanku",
+    "bodySelfCustodial": "Dólar cuentapi stablecoinkunata waqaychanki. Tokenkuna activokunawan saywanachasqa, USDwan kuska valormi takyan. Manaraqmi stablecoinkunata apachiyta nitaq chaskiyta atinkichu. Dólar cuentamanta apachiqtiykiqa, stablecoinkunaykita trukaspa Bitcoin hina chaskiqman apachisun.",
+    "learnMoreSelfCustodial": "Astawan yachay"
   },
   "SplashScreen": {
     "update": "Ñuqaqmi app qatichkanmi kaniyta rikuchiy, chaymanta app qillqata sutichinaqinmi kaniyta munanki. Chaymi PlayStore Androidmanta Testflight iOSmanta kaniyta rikuchiy"
@@ -2839,7 +2821,8 @@
       "invalidRegion": "Mana allin suyu akllay"
     },
     "passwordTooWeak": "Yaykuna rimayqa ancha pisi kallpayoqmi. Hatun qillqakuna, uchuy qillqakuna, yupaykuna hinaspa huk señalakunata chaqrullay.",
-    "passwordCommon": "Kay yaykuna rimayqa ancha riqsisqa kachkan. Aswan kallpasapa yaykuna rimayta akllay."
+    "passwordCommon": "Kay yaykuna rimayqa ancha riqsisqa kachkan. Aswan kallpasapa yaykuna rimayta akllay.",
+    "copied": "Portapapelmanmi kikinchasqa"
   },
   "errors": {
     "generic": "Kanqaqa ñuqaqa kani.\nImaynalla rikuchiy.",
@@ -2968,27 +2951,6 @@
       "title": "¡Junio atipanakuy!",
       "description": "Ukhu Muyu nisqaykita 10 nisqawan hatunchay, Adopting Bitcoin El Salvador nisqaman $1000 chaniyuq boleto gananapaq",
       "details": "Adopting Bitcoin El Salvador nisqapaq chaniyuq boleto ganay\n\nUkhu Muyu nisqaykita 10 nisqawan hatunchay, Adopting Bitcoin El Salvador nisqaman $1000 chaniyuq boleto gananapaq! Boletoqa hatun tantanakuyman, mezzanine nisqaman mikhuykunawan upyanakunawan, rimaqkunapa mikhuy tantanakuyman, hinaspa Película Raymi nisqamanpas yaykunata qun.\n\nMuyu nisqaykikunata social nisqapi #blinkcircles nisqawan willakuy.\n\n¡Kay kutipaq, iskay ganaqkuna kanqa!"
-    },
-    "septChallenge": {
-      "title": "September Challenge!",
-      "description": "Inner Circle {innerCircle: number}/21 - Earn $21\nTop 3 - Win tickets to Adopting Bitcoin!",
-      "details": "Grow your inner circle by 21 people in September and share on social with #blinkcircles to get $21 to your Stablesats account. Top 3 win tickets to Adopting Bitcoin!",
-      "peopleWelcomedSoFar": "people welcomed so far",
-      "yourRank": "your rank",
-      "reminder": "Reminder: Your inner circle grows when you send a new Blink user their first sats",
-      "fullDetails": "Full details at"
-    },
-    "octoberChallenge": {
-      "title": "October Challenge!",
-      "description": "Share your #blinkcircles for a chance to win 1,000,000 sats!",
-      "details": "We're giving away 1,000,000 sats!\n\n Share your Circles on social with tag `#blinkcircles` to enter! The winner will be chosen at random on October 31st.\n\n You must have at least one person in your Inner Circle to enter!",
-      "connectOnSocial": "Connect on social: ",
-      "fullDetails": "Full details at "
-    },
-    "novemberChallenge": {
-      "title": "November Challenge!",
-      "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-      "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
     }
   },
   "FullOnboarding": {
@@ -3029,7 +2991,10 @@
       "emptyTransactions": "Aún no hay transacciones",
       "addFunds": "Agregar fondos",
       "transactionsTitle": "Transacciones",
-      "title": "Tarjeta Visa"
+      "title": "Tarjeta Visa",
+      "noCardAvailable": "Manan tarjetakuna kanchu",
+      "cardNotUsable": "Kay tarjeta kunan mana atikunchu ruwakunapaq",
+      "cardUpdateError": "Tarjetap kaynin mana hukchayta atinchu"
     },
     "validThruLabel": "VÁLIDO HASTA",
     "networkVisa": "Visa",
@@ -3301,9 +3266,6 @@
         "damagedCard": "Waqlisqa tarjeta",
         "damagedCardDescription": "Tarjetay waqlisqañam",
         "whatHappensNext": "¿Imatataq qhipa kanqa?",
-        "currentCardDeactivated": "Kunan tarjetayki usqhaylla pisiyachisqa kanqa",
-        "newCardShipped": "Musuq tarjetam direcciónniykiman apachisqa kanqa",
-        "digitalCardAvailable": "Digital tarjetayki kay ruraykuna ukhupi kaqllapi",
         "cardManagement": "Tarjeta kamachiy",
         "bullet1": "Kunan tarjetayki chirirachisqa kanqa waqaychanapaq",
         "bullet2": "Musuq tarjeta huknin yupaywanmi hurqusqa kanqa",
@@ -3324,15 +3286,9 @@
         "title": "Mañakusqaykita qhaway",
         "subtitle": "Ama hina kaspa tarjeta tikrachiyniykipa willakuykunata takyachiy",
         "requestSummary": "Mañakuypa pisiyachisqan",
-        "reason": "Imarayku",
         "delivery": "Apachiy",
-        "shippingAddress": "Apachina dirección",
-        "deliveryCost": "Apachiy chanin",
         "submitRequest": "Mañakuyta apachiy",
         "importantInformation": "Allin yuyaykuna",
-        "processedImmediately": "Mañakusqayki usqhaylla ruwasqa kanqa",
-        "currentCardDeactivated": "Kunan tarjeta takyachisqa kaptin pisiyachisqa kanqa",
-        "trackStatus": "Musuq tarjetaykipa apachiy kayninmanta qatipanki app ukhupi",
         "issueType": "Imarayku",
         "deliveryTime": "Apachiy pacha",
         "shippingCost": "Apachiy chanin",
@@ -3385,10 +3341,7 @@
         "feature2": "EMV chip aswan allin waqaychaypaq",
         "feature3": "Magnetic stripe llapanwan chaskiypaq",
         "feature4": "Sutiyki tarjeta patapi reliefe-wan",
-        "important": "Allin yuyaykuna",
-        "importantBullet1": "Virtual tarjetayki kawsaqllam kanqa físico tarjetata suyaykuchkanki",
-        "importantBullet2": "Físico tarjetata chayamupataq llamk'achiyta munanki",
-        "importantBullet3": "Iskay tarjetakuna kikin yupayniyuqmi kanqa"
+        "important": "Allin yuyaykuna"
       },
       "Confirm": {
         "title": "Mañakuyta takyachiy",
@@ -3537,7 +3490,6 @@
         "savedConfirm": "Ñam waqaychani",
         "copy": "Kopiyay",
         "continueButton": "Hinaspa",
-        "selfCustodialDisabled": "Mana qhawasqaqa ratulla mana atikunchu.",
         "testBackup": "Bakuyniykita pruwaspay"
       },
       "Confirm": {
@@ -3600,7 +3552,8 @@
     "chooseMethod": "Ñan aklliy",
     "restoreComingSoonTitle": "Qayllamuchkan",
     "restoreComingSoonDescription": "Kutichiy ruway hamuq actualizaciónpi kanqa.",
-    "createFailed": "Manan walletta paqarichiyta atinkuchu. Allinta llamk'apuy."
+    "createFailed": "Manan walletta paqarichiyta atinkuchu. Allinta llamk'apuy.",
+    "selfCustodialDisabled": "Mana-waqaychay manaraqmi atikunchu."
   },
   "RestoreScreen": {
     "title": "Walleta kutichiy",
@@ -3704,7 +3657,6 @@
     "description": "Tukuy: {sats} sats mañakunapaq",
     "claim": "Kunan mañakuy",
     "claiming": "Mañakuchkan...",
-    "belowMinimum": "{count} churana(kuna) pisi (~{minimum} sats). Manaraj mañakuyta atinkichu.",
     "screenTitle": "Mana mañasqa churasqakuna",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3727,12 +3679,7 @@
     "refundNow": "Kunan kutichiy",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Wakichisqa",
-    "badgePending": "Suyachkan",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Pantay",
-    "badgeRefunded": "Kutichisqa"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

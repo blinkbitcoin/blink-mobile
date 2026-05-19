@@ -76,8 +76,7 @@
     "feeError": "Nepodarilo sa načítať poplatok za konverziu"
   },
   "ConversionSuccessScreen": {
-    "message": "Úspešná konverzia",
-    "title": "Úspešná konverzia"
+    "message": "Úspešná konverzia"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2311,7 +2310,6 @@
     "slow": "Pomalý",
     "recommended": "Odporúčané",
     "walletOffline": "Vaša peňaženka je offline. Skontrolujte pripojenie a skúste to znova.",
-    "destinationIsRequired": "Príjemca je povinný",
     "sdkInsufficientFunds": "Nedostatok prostriedkov pre túto transakciu.",
     "sdkAmountTooLow": "Suma je príliš nízka pre on-chain transakciu.",
     "sdkNetworkError": "Chyba siete. Skontrolujte pripojenie a skúste to znova.",
@@ -2362,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Lightning adresa"
     }
   },
   "NotificationSettingsScreen": {
@@ -2495,9 +2494,9 @@
     "body": "Dolárový účet využíva technológiu Stablesats na udržanie Bitcoinu stabilného na cene USD. Vždy držíte Bitcoin — nie skutočné doláre — ale hodnota USD nekolíše. Môžete odosielať a prijímať Bitcoin ako zvyčajne, ale nie je to kompatibilné s tradičným bankovým systémom.",
     "termsAndConditions": "Prečítajte si podmienky používania",
     "learnMore": "Zistite viac o Stablesats",
-      "headerSelfCustodial": "Váš dolárový účet drží stablecoiny",
-      "bodySelfCustodial": "Na dolárovom účte držíte stablecoiny. Tokeny kryté aktívami s hodnotou udržiavanou stabilnou voči USD. Stablecoiny zatiaľ nemôžete posielať ani prijímať. Keď pošlete z dolárového účtu, vaše stablecoiny budú zamenené a odoslané ako Bitcoin príjemcovi.",
-      "learnMoreSelfCustodial": "Zistiť viac"
+    "headerSelfCustodial": "Váš dolárový účet drží stablecoiny",
+    "bodySelfCustodial": "Na dolárovom účte držíte stablecoiny. Tokeny kryté aktívami s hodnotou udržiavanou stabilnou voči USD. Stablecoiny zatiaľ nemôžete posielať ani prijímať. Keď pošlete z dolárového účtu, vaše stablecoiny budú zamenené a odoslané ako Bitcoin príjemcovi.",
+    "learnMoreSelfCustodial": "Zistiť viac"
   },
   "SplashScreen": {
     "update": "Vaša aplikácia je zastaraná. Pred použitím aplikácie je potrebná aktualizácia.\n\nMôžete to urobiť v obchode PlayStore pre Android a Testflight pre iOS"
@@ -2822,7 +2821,8 @@
       "invalidRegion": "Neplatný výber regiónu"
     },
     "passwordTooWeak": "Heslo je príliš slabé. Použite kombináciu veľkých a malých písmen, číslic a špeciálnych znakov.",
-    "passwordCommon": "Toto heslo je príliš bežné. Vyberte si silnejšie heslo."
+    "passwordCommon": "Toto heslo je príliš bežné. Vyberte si silnejšie heslo.",
+    "copied": "Skopírované do schránky"
   },
   "errors": {
     "generic": "Vyskytla sa chyba.\nSkúste to prosím neskôr.",
@@ -2991,7 +2991,10 @@
       "emptyTransactions": "Zatiaľ žiadne transakcie",
       "addFunds": "Pridať prostriedky",
       "transactionsTitle": "Transakcie",
-      "title": "Karta Visa"
+      "title": "Karta Visa",
+      "noCardAvailable": "Žiadne dostupné karty",
+      "cardNotUsable": "Táto karta momentálne nie je k dispozícii na používanie",
+      "cardUpdateError": "Nepodarilo sa aktualizovať stav karty"
     },
     "validThruLabel": "PLATNÉ DO",
     "networkVisa": "Visa",
@@ -3263,9 +3266,6 @@
         "damagedCard": "Poškodená karta",
         "damagedCardDescription": "Moja karta je fyzicky poškodená",
         "whatHappensNext": "Čo bude nasledovať?",
-        "currentCardDeactivated": "Vaša aktuálna karta bude okamžite deaktivovaná",
-        "newCardShipped": "Nová karta bude odoslaná na vašu adresu",
-        "digitalCardAvailable": "Vaša digitálna karta zostáva počas tohto procesu dostupná",
         "cardManagement": "Správa karty",
         "bullet1": "Vaša aktuálna karta bude z bezpečnostných dôvodov zmrazená",
         "bullet2": "Bude vydaná nová karta s inými číslami",
@@ -3286,15 +3286,9 @@
         "title": "Skontrolujte svoju žiadosť",
         "subtitle": "Potvrďte prosím údaje o výmene karty",
         "requestSummary": "Zhrnutie žiadosti",
-        "reason": "Dôvod",
         "delivery": "Doručenie",
-        "shippingAddress": "Doručovacia adresa",
-        "deliveryCost": "Cena doručenia",
         "submitRequest": "Odoslať žiadosť",
         "importantInformation": "Dôležité informácie",
-        "processedImmediately": "Vaša žiadosť bude spracovaná okamžite",
-        "currentCardDeactivated": "Aktuálna karta bude po potvrdení deaktivovaná",
-        "trackStatus": "Stav doručenia novej karty môžete sledovať v aplikácii",
         "issueType": "Dôvod",
         "deliveryTime": "Čas doručenia",
         "shippingCost": "Cena doručenia",
@@ -3347,10 +3341,7 @@
         "feature2": "EMV čip pre zvýšenú bezpečnosť",
         "feature3": "Magnetický prúžok pre univerzálnu akceptáciu",
         "feature4": "Vaše meno vyrazené na karte",
-        "important": "Dôležité",
-        "importantBullet1": "Vaša virtuálna karta zostane aktívna, kým čakáte na fyzickú kartu",
-        "importantBullet2": "Po doručení budete musieť fyzickú kartu aktivovať",
-        "importantBullet3": "Obe karty budú mať rovnaké číslo a údaje"
+        "important": "Dôležité"
       },
       "Confirm": {
         "title": "Potvrďte objednávku",
@@ -3499,7 +3490,6 @@
         "savedConfirm": "Už som ju uložil",
         "copy": "Kopírovať",
         "continueButton": "Pokračovať",
-        "selfCustodialDisabled": "Nezáväzná správa je dočasne nedostupná.",
         "testBackup": "Otestujte zálohu"
       },
       "Confirm": {
@@ -3562,7 +3552,8 @@
     "chooseMethod": "Vyberte metódu",
     "restoreComingSoonTitle": "Čoskoro dostupné",
     "restoreComingSoonDescription": "Funkcia obnovenia bude dostupná v budúcej aktualizácii.",
-    "createFailed": "Nepodarilo sa vytvoriť peňaženku. Skúste to znova."
+    "createFailed": "Nepodarilo sa vytvoriť peňaženku. Skúste to znova.",
+    "selfCustodialDisabled": "Nesprávcovský režim je dočasne nedostupný."
   },
   "RestoreScreen": {
     "title": "Obnoviť peňaženku",
@@ -3666,7 +3657,6 @@
     "description": "Celkom: {sats} satov na vyzdvihnutie",
     "claim": "Vyzdvihnúť teraz",
     "claiming": "Vyzdvihuje sa...",
-    "belowMinimum": "{count} vklad(ov) pod minimom (~{minimum} satov). Zatiaľ sa nedajú vyzdvihnúť.",
     "screenTitle": "Nevyzdvihnuté vklady",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3689,12 +3679,7 @@
     "refundNow": "Vrátiť teraz",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Pripravené",
-    "badgePending": "Čaká sa",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Chyba",
-    "badgeRefunded": "Vrátené"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

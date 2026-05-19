@@ -76,8 +76,7 @@
         "feeError": "Impossibile recuperare la commissione di conversione"
     },
     "ConversionSuccessScreen": {
-        "message": "Conversione riuscita",
-        "title": "Successo della conversione"
+        "message": "Conversione riuscita"
     },
     "EarnScreen": {
         "satoshi": "sat",
@@ -2311,7 +2310,6 @@
         "slow": "Lento",
         "recommended": "Consigliato",
         "walletOffline": "Il tuo portafoglio è offline. Controlla la connessione e riprova.",
-        "destinationIsRequired": "La destinazione è richiesta",
         "sdkInsufficientFunds": "Fondi insufficienti per questa transazione.",
         "sdkAmountTooLow": "L'importo è troppo basso per una transazione on-chain.",
         "sdkNetworkError": "Errore di rete. Controlla la connessione e riprova.",
@@ -2362,7 +2360,8 @@
             "backupStatusLabel": "Stato del backup",
             "backupStatusCompleted": "Backup completato",
             "backupStatusNotCompleted": "Backup incompleto",
-            "loadError": "Impossibile caricare le informazioni del tuo account."
+            "loadError": "Impossibile caricare le informazioni del tuo account.",
+            "lightningAddressLabel": "Indirizzo Lightning"
         }
     },
     "NotificationSettingsScreen": {
@@ -2822,7 +2821,8 @@
             "invalidRegion": "Selezione regione non valida"
         },
         "passwordTooWeak": "La password è troppo debole. Usa una combinazione di lettere maiuscole, minuscole, numeri e caratteri speciali.",
-        "passwordCommon": "Questa password è troppo comune. Scegli una password più sicura."
+        "passwordCommon": "Questa password è troppo comune. Scegli una password più sicura.",
+        "copied": "Copiato negli appunti"
     },
     "errors": {
         "generic": "Si è verificato un errore.\nPer favore riprova più tardi.",
@@ -2991,7 +2991,10 @@
             "emptyTransactions": "Nessuna transazione al momento",
             "addFunds": "Aggiungi fondi",
             "transactionsTitle": "Transazioni",
-            "title": "Carta Visa"
+            "title": "Carta Visa",
+            "noCardAvailable": "Nessuna carta disponibile",
+            "cardNotUsable": "Questa carta non è attualmente disponibile per l'uso",
+            "cardUpdateError": "Impossibile aggiornare lo stato della carta"
         },
         "validThruLabel": "VALIDA FINO",
         "networkVisa": "Visa",
@@ -3487,7 +3490,6 @@
                 "savedConfirm": "L'ho salvata",
                 "copy": "Copia",
                 "continueButton": "Continua",
-                "selfCustodialDisabled": "Non custodiale temporaneamente non disponibile.",
                 "testBackup": "Verifica il tuo backup"
             },
             "Confirm": {
@@ -3550,7 +3552,8 @@
         "chooseMethod": "Scegli metodo",
         "restoreComingSoonTitle": "In arrivo",
         "restoreComingSoonDescription": "La funzione di ripristino sarà disponibile in un aggiornamento futuro.",
-        "createFailed": "Impossibile creare il wallet. Riprova."
+        "createFailed": "Impossibile creare il wallet. Riprova.",
+        "selfCustodialDisabled": "La modalità non custodial è temporaneamente non disponibile."
     },
     "RestoreScreen": {
         "title": "Ripristina portafoglio",
@@ -3654,7 +3657,6 @@
         "description": "Totale: {sats} sats disponibili da reclamare",
         "claim": "Reclama ora",
         "claiming": "Reclamando...",
-        "belowMinimum": "{count} deposito/i sotto il minimo (~{minimum} sats). Non possono ancora essere reclamati.",
         "screenTitle": "Depositi non riscossi",
         "cardTitle": "Claim {sats} sats",
         "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3677,12 +3679,7 @@
         "refundNow": "Rimborsa ora",
         "refundSuccess": "Refund initiated successfully",
         "claimSuccess": "Deposit claimed successfully",
-        "error": "Unable to claim this deposit",
-        "badgeReady": "Pronto",
-        "badgePending": "In sospeso",
-        "badgeFeeIssue": "Fee issue",
-        "badgeError": "Errore",
-        "badgeRefunded": "Rimborsato"
+        "error": "Unable to claim this deposit"
     },
     "FeatureUnavailable": {
         "SelfCustodial": {

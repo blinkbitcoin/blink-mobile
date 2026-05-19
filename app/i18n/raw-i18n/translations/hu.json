@@ -76,8 +76,7 @@
     "feeError": "Nem sikerült lekérni az átváltási díjat"
   },
   "ConversionSuccessScreen": {
-    "message": "Sikeres átváltás",
-    "title": "Sikeres átváltás"
+    "message": "Sikeres átváltás"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2311,7 +2310,6 @@
     "slow": "Lassú",
     "recommended": "Ajánlott",
     "walletOffline": "A tárcád offline. Kérjük, ellenőrizd a kapcsolatot és próbáld újra.",
-    "destinationIsRequired": "A cél kötelező",
     "sdkInsufficientFunds": "Nincs elegendő egyenleg ehhez a tranzakcióhoz.",
     "sdkAmountTooLow": "Az összeg túl alacsony egy on-chain tranzakcióhoz.",
     "sdkNetworkError": "Hálózati hiba. Ellenőrizze a kapcsolatot és próbálja újra.",
@@ -2362,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Lightning cím"
     }
   },
   "NotificationSettingsScreen": {
@@ -2495,9 +2494,9 @@
     "body": "A Dollár Számla Stablesats technológiát használ a Bitcoin USD árhoz stabilizálásához. Mindig Bitcoint tartasz — nem valódi dollárt — de az USD érték nem ingadozik. Bitcoint küldhetsz és fogadhatsz a szokásos módon, de nem kompatibilis a hagyományos bankrendszerrel.",
     "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket",
     "learnMore": "Tudj meg többet a Stablesatsról",
-      "headerSelfCustodial": "A Dollár-számlád stablecoinokat tárol",
-      "bodySelfCustodial": "A Dollár-számlán stablecoinokat tartasz. Olyan tokenek, amelyeket eszközök fedezetnek, és értékük stabil marad a USD-hez képest. Stablecoinokat egyelőre nem küldhetsz és nem fogadhatsz. Amikor a Dollár-számláról küldesz, a stablecoinjaidat átváltjuk és Bitcoinként küldjük a címzettnek.",
-      "learnMoreSelfCustodial": "Tudj meg többet"
+    "headerSelfCustodial": "A Dollár-számlád stablecoinokat tárol",
+    "bodySelfCustodial": "A Dollár-számlán stablecoinokat tartasz. Olyan tokenek, amelyeket eszközök fedezetnek, és értékük stabil marad a USD-hez képest. Stablecoinokat egyelőre nem küldhetsz és nem fogadhatsz. Amikor a Dollár-számláról küldesz, a stablecoinjaidat átváltjuk és Bitcoinként küldjük a címzettnek.",
+    "learnMoreSelfCustodial": "Tudj meg többet"
   },
   "SplashScreen": {
     "update": "Az alkalmazása elavult. Az alkalmazás használatához frissítés szükséges.\n\nAndroid esetén a Play Áruházból, iOS esetén pedig a Testflight alkalmazáson keresztül tudod elvégezni."
@@ -2822,7 +2821,8 @@
       "invalidRegion": "Érvénytelen régióválasztás"
     },
     "passwordTooWeak": "A jelszó túl gyenge. Használjon kis- és nagybetűket, számokat és speciális karaktereket.",
-    "passwordCommon": "Ez a jelszó túl gyakori. Kérjük, válasszon erősebb jelszót."
+    "passwordCommon": "Ez a jelszó túl gyakori. Kérjük, válasszon erősebb jelszót.",
+    "copied": "Vágólapra másolva"
   },
   "errors": {
     "generic": "Hiba történt.\nKérjük, próbáld újra később.",
@@ -2991,7 +2991,10 @@
       "emptyTransactions": "Még nincs tranzakció",
       "addFunds": "Pénz hozzáadása",
       "transactionsTitle": "Tranzakciók",
-      "title": "Visa kártya"
+      "title": "Visa kártya",
+      "noCardAvailable": "Nincs elérhető kártya",
+      "cardNotUsable": "Ez a kártya jelenleg nem használható",
+      "cardUpdateError": "Nem sikerült frissíteni a kártya állapotát"
     },
     "validThruLabel": "ÉRVÉNYES",
     "networkVisa": "Visa",
@@ -3263,9 +3266,6 @@
         "damagedCard": "Sérült kártya",
         "damagedCardDescription": "A kártyám fizikailag sérült",
         "whatHappensNext": "Mi történik ezután?",
-        "currentCardDeactivated": "A jelenlegi kártyája azonnal deaktiválásra kerül",
-        "newCardShipped": "Új kártyát küldünk a címére",
-        "digitalCardAvailable": "A digitális kártyája elérhető marad a folyamat során",
         "cardManagement": "Kártyakezelés",
         "bullet1": "Jelenlegi kártyáját biztonsági okokból befagyasztjuk",
         "bullet2": "Új kártya kerül kiállításra eltérő számokkal",
@@ -3286,15 +3286,9 @@
         "title": "Ellenőrizze a kérelmét",
         "subtitle": "Kérjük, erősítse meg a kártyacsere részleteit",
         "requestSummary": "Kérelem összefoglalása",
-        "reason": "Ok",
         "delivery": "Szállítás",
-        "shippingAddress": "Szállítási cím",
-        "deliveryCost": "Szállítási költség",
         "submitRequest": "Kérelem beküldése",
         "importantInformation": "Fontos információk",
-        "processedImmediately": "A kérelmét azonnal feldolgozzuk",
-        "currentCardDeactivated": "A jelenlegi kártya megerősítéskor deaktiválásra kerül",
-        "trackStatus": "Az új kártya szállítási állapotát az alkalmazásban követheti nyomon",
         "issueType": "Ok",
         "deliveryTime": "Szállítási idő",
         "shippingCost": "Szállítási költség",
@@ -3347,10 +3341,7 @@
         "feature2": "EMV chip a fokozott biztonságért",
         "feature3": "Mágnescsík az univerzális elfogadásért",
         "feature4": "A neve dombornyomva a kártyán",
-        "important": "Fontos",
-        "importantBullet1": "A virtuális kártyája aktív marad, amíg a fizikai kártyára vár",
-        "importantBullet2": "A fizikai kártyát érkezéskor aktiválnia kell",
-        "importantBullet3": "Mindkét kártya azonos kártyaszámmal és adatokkal rendelkezik"
+        "important": "Fontos"
       },
       "Confirm": {
         "title": "Rendelés megerősítése",
@@ -3499,7 +3490,6 @@
         "savedConfirm": "Elmentettem",
         "copy": "Másolás",
         "continueButton": "Tovább",
-        "selfCustodialDisabled": "A nem-letétkezelés átmenetileg nem elérhető.",
         "testBackup": "Tesztelje a biztonsági másolatot"
       },
       "Confirm": {
@@ -3562,7 +3552,8 @@
     "chooseMethod": "Válasszon módszert",
     "restoreComingSoonTitle": "Hamarosan elérhető",
     "restoreComingSoonDescription": "A visszaállítási funkció egy jövőbeli frissítésben lesz elérhető.",
-    "createFailed": "Nem sikerült létrehozni a pénztárcát. Kérjük, próbáld újra."
+    "createFailed": "Nem sikerült létrehozni a pénztárcát. Kérjük, próbáld újra.",
+    "selfCustodialDisabled": "A nem-letétkezelői mód átmenetileg nem érhető el."
   },
   "RestoreScreen": {
     "title": "Tárca visszaállítása",
@@ -3666,7 +3657,6 @@
     "description": "Összesen: {sats} sat elérhető igénylésre",
     "claim": "Igénylés most",
     "claiming": "Igénylés...",
-    "belowMinimum": "{count} befizetés a minimum alatt (~{minimum} sat). Ezek még nem igényelhetők.",
     "screenTitle": "Nem igényelt befizetések",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3689,12 +3679,7 @@
     "refundNow": "Visszatérítés most",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Kész",
-    "badgePending": "Függő",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Hiba",
-    "badgeRefunded": "Visszatérítve"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

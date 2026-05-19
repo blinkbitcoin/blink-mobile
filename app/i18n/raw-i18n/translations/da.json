@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "Hvordan bruges dit kasseapparat?",
     "howToUseYourAddressExplainer": "Del med en som har en kompatibel wallet, som f.eks.:",
     "howToUseYourPaycodeExplainer": "Du kan udskrive din betalingskode (teknisk set er det en LNURL-pay adresse) og lade den stå fremme i din forretning, så man kan betale ved at scanne den med en Lightning-understøttet wallet.\n\nVær dog opmærksom på, at nogle wallets ikke kan scanne denne form for betalingskode, f.eks.:",
-    "howToUseYourCashRegisterExplainer": "Tillad folk at modtage betalinger via kasseapparat-linket uden at få adgang til din wallet.\n\nDe kan oprette fakturaer, og betalinger vil blive sendt direkte til din {bankName: string} wallet.",
-    "yourAddress": "Din {bankName: string} adresse",
-    "copiedAddressToClipboard": "{bankName: string} kopieret til clipboard"
+    "howToUseYourCashRegisterExplainer": "Tillad folk at modtage betalinger via kasseapparat-linket uden at få adgang til din wallet.\n\nDe kan oprette fakturaer, og betalinger vil blive sendt direkte til din {bankName: string} wallet."
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "Vilkår og betingelser",
@@ -78,8 +76,7 @@
     "feeError": "Kunne ikke hente konverteringsgebyret"
   },
   "ConversionSuccessScreen": {
-    "message": "Konvertering vel afsluttet",
-    "title": "Konvertering lykkedes"
+    "message": "Konvertering vel afsluttet"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2043,8 +2040,7 @@
         "title": "Fortsæt uden belønning?",
         "message": "Du kan kun gennemføre ét afsnit om dagen, mens du optjener sats-belønninger."
       }
-    },
-    "notYet": "Not yet"
+    }
   },
   "GetStartedScreen": {
     "logInCreateAccount": "Log in / opret konto",
@@ -2314,7 +2310,6 @@
     "slow": "Langsom",
     "recommended": "Anbefalet",
     "walletOffline": "Din tegnebog er offline. Tjek venligst din forbindelse og prøv igen.",
-    "destinationIsRequired": "Destination er påkrævet",
     "sdkInsufficientFunds": "Ikke nok midler til denne transaktion.",
     "sdkAmountTooLow": "Beløbet er for lavt til en on-chain transaktion.",
     "sdkNetworkError": "Netværksfejl. Tjek din forbindelse og prøv igen.",
@@ -2365,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Lightning-adresse"
     }
   },
   "NotificationSettingsScreen": {
@@ -2498,9 +2494,9 @@
     "body": "Dollar-konto bruger Stablesats-teknologi til at holde Bitcoin stabil på USD-prisen. Du holder altid Bitcoin — ikke rigtige dollars — men USD-værdien svinger ikke. Du kan sende og modtage Bitcoin som normalt, men det er ikke kompatibelt med det traditionelle banksystem.",
     "termsAndConditions": "Læs vilkårene",
     "learnMore": "Læs mere om Stablesats",
-      "headerSelfCustodial": "Din Dollar-konto indeholder stablecoins",
-      "bodySelfCustodial": "På Dollar-kontoen holder du stablecoins. Tokens, der er bakket op af aktiver, hvis værdi holdes stabil i forhold til USD. Du kan endnu ikke sende og modtage stablecoins. Når du sender fra Dollar-kontoen, ombyttes dine stablecoins og sendes som Bitcoin til modtageren.",
-      "learnMoreSelfCustodial": "Lær mere"
+    "headerSelfCustodial": "Din Dollar-konto indeholder stablecoins",
+    "bodySelfCustodial": "På Dollar-kontoen holder du stablecoins. Tokens, der er bakket op af aktiver, hvis værdi holdes stabil i forhold til USD. Du kan endnu ikke sende og modtage stablecoins. Når du sender fra Dollar-kontoen, ombyttes dine stablecoins og sendes som Bitcoin til modtageren.",
+    "learnMoreSelfCustodial": "Lær mere"
   },
   "SplashScreen": {
     "update": "Din app er forældet. En opdatering er nødvendig, før appen kan bruges.\n\nDette kan gøres fra PlayStore for Android og Testflight for iOS"
@@ -2825,7 +2821,8 @@
       "invalidRegion": "Ugyldigt regionsvalg"
     },
     "passwordTooWeak": "Adgangskoden er for svag. Brug en kombination af store og små bogstaver, tal og specialtegn.",
-    "passwordCommon": "Denne adgangskode er for almindelig. Vælg venligst en stærkere adgangskode."
+    "passwordCommon": "Denne adgangskode er for almindelig. Vælg venligst en stærkere adgangskode.",
+    "copied": "Kopieret til udklipsholder"
   },
   "errors": {
     "generic": "Der opstod en fejl.\nPrøv igen senere.",
@@ -2954,21 +2951,6 @@
       "title": "Juni-udfordring!",
       "description": "Udvid din indre cirkel med 10 for en chance for at vinde en $1000 privilege-billet til Adopting Bitcoin El Salvador",
       "details": "Vind en privilege-billet til Adopting Bitcoin El Salvador\n\nUdvid din indre cirkel med 10 for en chance for at vinde en $1000 privilege-billet til Adopting Bitcoin El Salvador! Billetten inkluderer eksklusiv adgang til hovedkonferencen, mezzanin med mad/drikke/snacks, talernes middag og filmfestivalen.\n\nDel dine cirkler på sociale medier med hashtagget #blinkcircles for at deltage.\n\nDenne gang vil der være to vindere!"
-    },
-    "decemberChallenge": {
-      "title": "December Udfordring!",
-      "description": "+10 indre cirkel for en chance for at vinde $100!",
-      "details": "Udvid din indre kreds med 10 personer i december for en chance for at vinde $100!\n\nFor at deltage skal du dele dine cirkler på sociale medier, når du har nået 10 for måneden, og tagge #blinkcircles.\n\nDen 1. januar vil tre personer blive valgt tilfældigt til at modtage $100!"
-    },
-    "januaryChallenge": {
-      "title": "January Challenge!",
-      "description": "+10 outer circle in January for a chance at $100!",
-      "details": "Grow your OUTER circle by 10 in January for a chance at $100!\n\nYour outer circle grows when people in your inner circle welcome others, so reach out and remind those you onboarded to share Blink with their friends and family.\n\nShare your circles on social with #blinkcircles to participate."
-    },
-    "februaryChallenge": {
-      "title": "February Challenge!",
-      "description": "+3 inner circle for a chance to win a Seedsigner hardware wallet!",
-      "details": "Grow your inner circle by 3 in February for a chance to win a Seedsigner hardware wallet!\n\nReminder: your circles grow when you send a new Blink user their first sats.\n\nShare your circles on social with #blinkcircles to participate."
     }
   },
   "FullOnboarding": {
@@ -3009,7 +2991,10 @@
       "emptyTransactions": "Ingen transaktioner endnu",
       "addFunds": "Tilføj midler",
       "transactionsTitle": "Transaktioner",
-      "title": "Visa-kort"
+      "title": "Visa-kort",
+      "noCardAvailable": "Ingen kort tilgængelige",
+      "cardNotUsable": "Dette kort er ikke tilgængeligt til brug i øjeblikket",
+      "cardUpdateError": "Kunne ikke opdatere kortstatus"
     },
     "validThruLabel": "GYLDIG TIL",
     "networkVisa": "Visa",
@@ -3281,9 +3266,6 @@
         "damagedCard": "Beskadiget kort",
         "damagedCardDescription": "Mit kort er fysisk beskadiget",
         "whatHappensNext": "Hvad sker der nu?",
-        "currentCardDeactivated": "Dit nuværende kort vil straks blive deaktiveret",
-        "newCardShipped": "Et nyt kort vil blive sendt til din adresse",
-        "digitalCardAvailable": "Dit digitale kort forbliver tilgængeligt under denne proces",
         "cardManagement": "Kortadministration",
         "bullet1": "Dit nuværende kort vil blive frosset af sikkerhedshensyn",
         "bullet2": "Et nyt kort med andre numre vil blive udstedt",
@@ -3304,15 +3286,9 @@
         "title": "Gennemgå din anmodning",
         "subtitle": "Bekræft venligst detaljerne for din kortudskiftning",
         "requestSummary": "Anmodningsoversigt",
-        "reason": "Årsag",
         "delivery": "Levering",
-        "shippingAddress": "Leveringsadresse",
-        "deliveryCost": "Leveringsomkostninger",
         "submitRequest": "Indsend anmodning",
         "importantInformation": "Vigtig information",
-        "processedImmediately": "Din anmodning vil blive behandlet med det samme",
-        "currentCardDeactivated": "Nuværende kort vil blive deaktiveret ved bekræftelse",
-        "trackStatus": "Du kan følge dit nye korts leveringsstatus i appen",
         "issueType": "Årsag",
         "deliveryTime": "Leveringstid",
         "shippingCost": "Leveringsomkostninger",
@@ -3365,10 +3341,7 @@
         "feature2": "EMV-chip for øget sikkerhed",
         "feature3": "Magnetstribe til universel accept",
         "feature4": "Dit navn præget på kortet",
-        "important": "Vigtigt",
-        "importantBullet1": "Dit virtuelle kort forbliver aktivt, mens du venter på det fysiske kort",
-        "importantBullet2": "Du skal aktivere dit fysiske kort, når det ankommer",
-        "importantBullet3": "Begge kort vil have samme kortnummer og oplysninger"
+        "important": "Vigtigt"
       },
       "Confirm": {
         "title": "Bekræft din bestilling",
@@ -3517,7 +3490,6 @@
         "savedConfirm": "Jeg har gemt den",
         "copy": "Kopiér",
         "continueButton": "Fortsæt",
-        "selfCustodialDisabled": "Ikke-forvaring er midlertidigt utilgængelig.",
         "testBackup": "Test din backup"
       },
       "Confirm": {
@@ -3580,7 +3552,8 @@
     "chooseMethod": "Vælg metode",
     "restoreComingSoonTitle": "Kommer snart",
     "restoreComingSoonDescription": "Gendannelsesfunktionen vil være tilgængelig i en fremtidig opdatering.",
-    "createFailed": "Kunne ikke oprette tegnebog. Prøv venligst igen."
+    "createFailed": "Kunne ikke oprette tegnebog. Prøv venligst igen.",
+    "selfCustodialDisabled": "Ikke-forvaltning er midlertidigt utilgængelig."
   },
   "RestoreScreen": {
     "title": "Gendan tegnebog",
@@ -3684,7 +3657,6 @@
     "description": "Total: {sats} sats tilgængelige at gøre krav på",
     "claim": "Gør krav nu",
     "claiming": "Gør krav...",
-    "belowMinimum": "{count} indbetaling(er) under minimum (~{minimum} sats). Disse kan ikke gøres krav på endnu.",
     "screenTitle": "Uafhentede indbetalinger",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3707,12 +3679,7 @@
     "refundNow": "Refunder nu",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Klar",
-    "badgePending": "Afventer",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Fejl",
-    "badgeRefunded": "Refunderet"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

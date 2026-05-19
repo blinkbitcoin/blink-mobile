@@ -76,8 +76,7 @@
     "feeError": "Imeshindikana kupata ada ya ubadilishaji"
   },
   "ConversionSuccessScreen": {
-    "message": "Ubadilishaji umekamilika",
-    "title": "Ubadilishaji umekamilika kwa ufanisi"
+    "message": "Ubadilishaji umekamilika"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2311,7 +2310,6 @@
     "slow": "Polepole",
     "recommended": "Inapendekezwa",
     "walletOffline": "Pochi yako haiko mtandaoni. Tafadhali angalia muunganisho wako na ujaribu tena.",
-    "destinationIsRequired": "Mpokeaji anahitajika",
     "sdkInsufficientFunds": "Fedha hazitoshi kwa muamala huu.",
     "sdkAmountTooLow": "Kiasi ni kidogo sana kwa muamala wa on-chain.",
     "sdkNetworkError": "Hitilafu ya mtandao. Angalia muunganisho wako na ujaribu tena.",
@@ -2362,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Anwani ya Lightning"
     }
   },
   "NotificationSettingsScreen": {
@@ -2495,9 +2494,9 @@
     "body": "Akaunti ya Dola inatumia teknolojia ya Stablesats kushikilia Bitcoin thabiti kwa bei ya USD. Daima unashikilia Bitcoin — si dola halisi — lakini thamani ya USD haisumbui. Unaweza kutuma na kupokea Bitcoin kama kawaida, lakini haiendani na mfumo wa benki wa jadi.",
     "termsAndConditions": "Soma Sheria na Masharti",
     "learnMore": "Soma zaidi kuhusu Stablesats",
-      "headerSelfCustodial": "Akaunti yako ya Dola inashika stablecoins",
-      "bodySelfCustodial": "Katika akaunti ya Dola unashika stablecoins. Tokeni zinazoungwa mkono na rasilimali zenye thamani inayodumishwa imara dhidi ya USD. Bado huwezi kutuma na kupokea stablecoins. Unapotuma kutoka kwenye akaunti ya Dola, stablecoins zako zitabadilishwa na kutumwa kama Bitcoin kwa mpokeaji.",
-      "learnMoreSelfCustodial": "Jifunze zaidi"
+    "headerSelfCustodial": "Akaunti yako ya Dola inashika stablecoins",
+    "bodySelfCustodial": "Katika akaunti ya Dola unashika stablecoins. Tokeni zinazoungwa mkono na rasilimali zenye thamani inayodumishwa imara dhidi ya USD. Bado huwezi kutuma na kupokea stablecoins. Unapotuma kutoka kwenye akaunti ya Dola, stablecoins zako zitabadilishwa na kutumwa kama Bitcoin kwa mpokeaji.",
+    "learnMoreSelfCustodial": "Jifunze zaidi"
   },
   "SplashScreen": {
     "update": "Aplikisheni yako imepitwa na wakati. Sahihisho linahitajika kabla aplikisheni inaweza kutumiwa.\n\nHii inaweza kufanywa kutoka kwenye PlayStore kwa Android na Testflight kwa iOS"
@@ -2822,7 +2821,8 @@
       "invalidRegion": "Uchaguzi wa eneo si sahihi"
     },
     "passwordTooWeak": "Nenosiri ni dhaifu sana. Tumia mchanganyiko wa herufi kubwa, herufi ndogo, nambari na alama maalum.",
-    "passwordCommon": "Nenosiri hili ni la kawaida sana. Tafadhali chagua nenosiri lenye nguvu zaidi."
+    "passwordCommon": "Nenosiri hili ni la kawaida sana. Tafadhali chagua nenosiri lenye nguvu zaidi.",
+    "copied": "Imenakiliwa kwenye ubao wa kunakili"
   },
   "errors": {
     "generic": "Kumekuwa na kosa.\nTafadhali jaribu tena.",
@@ -2991,7 +2991,10 @@
       "emptyTransactions": "Hakuna miamala bado",
       "addFunds": "Ongeza fedha",
       "transactionsTitle": "Miamala",
-      "title": "Kadi ya Visa"
+      "title": "Kadi ya Visa",
+      "noCardAvailable": "Hakuna kadi zinazopatikana",
+      "cardNotUsable": "Kadi hii haipatikani kwa matumizi kwa sasa",
+      "cardUpdateError": "Imeshindwa kusasisha hali ya kadi"
     },
     "validThruLabel": "INATUMIKA HADI",
     "networkVisa": "Visa",
@@ -3263,9 +3266,6 @@
         "damagedCard": "Kadi iliyoharibiwa",
         "damagedCardDescription": "Kadi yangu imeharibiwa kimwili",
         "whatHappensNext": "Nini kitatokea baadaye?",
-        "currentCardDeactivated": "Kadi yako ya sasa itazimwa mara moja",
-        "newCardShipped": "Kadi mpya itatumwa kwa anwani yako",
-        "digitalCardAvailable": "Kadi yako ya kidijitali inabaki kupatikana wakati wa mchakato huu",
         "cardManagement": "Usimamizi wa kadi",
         "bullet1": "Kadi yako ya sasa itagandishwa kwa usalama",
         "bullet2": "Kadi mpya yenye nambari tofauti itatolewa",
@@ -3286,15 +3286,9 @@
         "title": "Kagua ombi lako",
         "subtitle": "Tafadhali thibitisha maelezo ya ubadilishaji wa kadi yako",
         "requestSummary": "Muhtasari wa ombi",
-        "reason": "Sababu",
         "delivery": "Utoaji",
-        "shippingAddress": "Anwani ya usafirishaji",
-        "deliveryCost": "Gharama ya utoaji",
         "submitRequest": "Wasilisha ombi",
         "importantInformation": "Taarifa muhimu",
-        "processedImmediately": "Ombi lako litashughulikiwa mara moja",
-        "currentCardDeactivated": "Kadi ya sasa itazimwa baada ya kuthibitisha",
-        "trackStatus": "Unaweza kufuatilia hali ya utoaji wa kadi yako mpya kwenye programu",
         "issueType": "Sababu",
         "deliveryTime": "Muda wa uwasilishaji",
         "shippingCost": "Gharama ya utoaji",
@@ -3347,10 +3341,7 @@
         "feature2": "Chip ya EMV kwa usalama ulioimarishwa",
         "feature3": "Mkanda wa sumaku kwa kukubalika kwa wote",
         "feature4": "Jina lako limechongwa kwenye kadi",
-        "important": "Muhimu",
-        "importantBullet1": "Kadi yako ya mtandaoni itaendelea kuwa hai unapongoja kadi ya kimwili",
-        "importantBullet2": "Utahitaji kuwasha kadi yako ya kimwili inapowasili",
-        "importantBullet3": "Kadi zote mbili zitakuwa na namba na maelezo yale yale"
+        "important": "Muhimu"
       },
       "Confirm": {
         "title": "Thibitisha agizo lako",
@@ -3499,7 +3490,6 @@
         "savedConfirm": "Nimehifadhi",
         "copy": "Nakili",
         "continueButton": "Endelea",
-        "selfCustodialDisabled": "Isiyo ya udhamini haipatikani kwa muda.",
         "testBackup": "Jaribu hifadhi yako"
       },
       "Confirm": {
@@ -3562,7 +3552,8 @@
     "chooseMethod": "Chagua njia",
     "restoreComingSoonTitle": "Inakuja hivi karibuni",
     "restoreComingSoonDescription": "Kipengele cha kurejesha kitapatikana katika sasisho la baadaye.",
-    "createFailed": "Imeshindwa kuunda mkoba. Tafadhali jaribu tena."
+    "createFailed": "Imeshindwa kuunda mkoba. Tafadhali jaribu tena.",
+    "selfCustodialDisabled": "Isiyo na ulinzi haipatikani kwa muda."
   },
   "RestoreScreen": {
     "title": "Rejesha mkoba",
@@ -3666,7 +3657,6 @@
     "description": "Jumla: {sats} sats zinazopatikana kudai",
     "claim": "Dai sasa",
     "claiming": "Inadai...",
-    "belowMinimum": "Amana {count} chini ya kiwango cha chini (~{minimum} sats). Bado haziwezi kudaiwa.",
     "screenTitle": "Amana zisizoombwa",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3689,12 +3679,7 @@
     "refundNow": "Rudisha sasa",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Tayari",
-    "badgePending": "Inasubiri",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Hitilafu",
-    "badgeRefunded": "Imerudishwa"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

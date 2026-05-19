@@ -76,8 +76,7 @@
     "feeError": "Dönüştürme ücreti alınamadı"
   },
   "ConversionSuccessScreen": {
-    "message": "Çevirme başarılı",
-    "title": "Çevirme başarısı"
+    "message": "Çevirme başarılı"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2311,7 +2310,6 @@
     "slow": "Yavaş",
     "recommended": "Önerilen",
     "walletOffline": "Cüzdanınız çevrimdışı. Lütfen bağlantınızı kontrol edin ve tekrar deneyin.",
-    "destinationIsRequired": "Gönderilecek adres gerekli.",
     "sdkInsufficientFunds": "Bu işlem için yeterli bakiye yok.",
     "sdkAmountTooLow": "Tutar, bir on-chain işlemi için çok düşük.",
     "sdkNetworkError": "Ağ hatası. Bağlantınızı kontrol edin ve tekrar deneyin.",
@@ -2362,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Lightning adresi"
     }
   },
   "NotificationSettingsScreen": {
@@ -2495,9 +2494,9 @@
     "body": "Dolar Hesabı, Bitcoin'i USD fiyatında sabit tutmak için Stablesats teknolojisini kullanır. Her zaman Bitcoin tutarsınız — gerçek dolar değil — ama USD değeri dalgalanmaz. Her zamanki gibi Bitcoin gönderip alabilirsiniz, ancak geleneksel bankacılık sistemiyle uyumlu değildir.",
     "termsAndConditions": "Hükümler ve koşulları oku",
     "learnMore": "Stablesats'i öğrenin",
-      "headerSelfCustodial": "Dolar hesabın stablecoin tutar",
-      "bodySelfCustodial": "Dolar hesabında stablecoin tutarsın. Varlıklarla teminatlandırılmış ve değeri ABD doları karşısında sabit tutulan tokenler. Stablecoin'leri henüz gönderip alamazsın. Dolar hesabından gönderdiğinde, stablecoin'lerin takas edilir ve alıcıya Bitcoin olarak gönderilir.",
-      "learnMoreSelfCustodial": "Daha fazla bilgi"
+    "headerSelfCustodial": "Dolar hesabın stablecoin tutar",
+    "bodySelfCustodial": "Dolar hesabında stablecoin tutarsın. Varlıklarla teminatlandırılmış ve değeri ABD doları karşısında sabit tutulan tokenler. Stablecoin'leri henüz gönderip alamazsın. Dolar hesabından gönderdiğinde, stablecoin'lerin takas edilir ve alıcıya Bitcoin olarak gönderilir.",
+    "learnMoreSelfCustodial": "Daha fazla bilgi"
   },
   "SplashScreen": {
     "update": "Uygulamanızın modası geçmiş. Uygulamanın kullanılabilmesi için bir güncelleme gereklidir.\n\nBu, Android için PlayStore'dan ve iOS için Testflight'tan yapılabilir"
@@ -2822,7 +2821,8 @@
       "invalidRegion": "Geçersiz bölge seçimi"
     },
     "passwordTooWeak": "Şifre çok zayıf. Büyük harf, küçük harf, rakam ve özel karakterlerden oluşan bir kombinasyon kullanın.",
-    "passwordCommon": "Bu şifre çok yaygın. Lütfen daha güçlü bir şifre seçin."
+    "passwordCommon": "Bu şifre çok yaygın. Lütfen daha güçlü bir şifre seçin.",
+    "copied": "Panoya kopyalandı"
   },
   "errors": {
     "generic": "Bir hata oluştu.\nLütfen daha sonra tekrar deneyin.",
@@ -2991,7 +2991,10 @@
       "emptyTransactions": "Henüz işlem yok",
       "addFunds": "Para ekle",
       "transactionsTitle": "İşlemler",
-      "title": "Visa Kartı"
+      "title": "Visa Kartı",
+      "noCardAvailable": "Kullanılabilir kart yok",
+      "cardNotUsable": "Bu kart şu anda kullanım için uygun değil",
+      "cardUpdateError": "Kart durumu güncellenemedi"
     },
     "validThruLabel": "GEÇERLİLİK",
     "networkVisa": "Visa",
@@ -3263,9 +3266,6 @@
         "damagedCard": "Hasarlı kart",
         "damagedCardDescription": "Kartım fiziksel olarak hasar gördü",
         "whatHappensNext": "Bundan sonra ne olacak?",
-        "currentCardDeactivated": "Mevcut kartınız derhal devre dışı bırakılacak",
-        "newCardShipped": "Yeni bir kart adresinize gönderilecek",
-        "digitalCardAvailable": "Dijital kartınız bu süreç boyunca kullanılabilir kalır",
         "cardManagement": "Kart yönetimi",
         "bullet1": "Mevcut kartınız güvenlik için dondurulacak",
         "bullet2": "Farklı numaralarla yeni bir kart düzenlenecek",
@@ -3286,15 +3286,9 @@
         "title": "Talebinizi gözden geçirin",
         "subtitle": "Lütfen kart değişimi detaylarını onaylayın",
         "requestSummary": "Talep özeti",
-        "reason": "Neden",
         "delivery": "Teslimat",
-        "shippingAddress": "Teslimat adresi",
-        "deliveryCost": "Teslimat ücreti",
         "submitRequest": "Talebi gönder",
         "importantInformation": "Önemli bilgiler",
-        "processedImmediately": "Talebiniz derhal işleme alınacak",
-        "currentCardDeactivated": "Mevcut kart onay sonrasında devre dışı bırakılacak",
-        "trackStatus": "Yeni kartınızın teslimat durumunu uygulamada takip edebilirsiniz",
         "issueType": "Neden",
         "deliveryTime": "Teslimat süresi",
         "shippingCost": "Teslimat ücreti",
@@ -3347,10 +3341,7 @@
         "feature2": "Gelişmiş güvenlik için EMV çipi",
         "feature3": "Evrensel kabul için manyetik şerit",
         "feature4": "İsmin kartın üzerinde kabartmalı",
-        "important": "Önemli",
-        "importantBullet1": "Fiziksel kartı beklerken sanal kartın aktif kalacak",
-        "importantBullet2": "Fiziksel kartın geldiğinde etkinleştirmen gerekecek",
-        "importantBullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak"
+        "important": "Önemli"
       },
       "Confirm": {
         "title": "Siparişini onayla",
@@ -3499,7 +3490,6 @@
         "savedConfirm": "Kaydettim",
         "copy": "Kopyala",
         "continueButton": "Devam et",
-        "selfCustodialDisabled": "Saklamasız geçici olarak kullanılamıyor.",
         "testBackup": "Yedeğini test et"
       },
       "Confirm": {
@@ -3562,7 +3552,8 @@
     "chooseMethod": "Yöntem seçin",
     "restoreComingSoonTitle": "Yakında",
     "restoreComingSoonDescription": "Geri yükleme özelliği gelecek bir güncellemede kullanılabilir olacaktır.",
-    "createFailed": "Cüzdan oluşturulamadı. Lütfen tekrar deneyin."
+    "createFailed": "Cüzdan oluşturulamadı. Lütfen tekrar deneyin.",
+    "selfCustodialDisabled": "Saklamasız mod geçici olarak kullanılamıyor."
   },
   "RestoreScreen": {
     "title": "Cüzdanı geri yükle",
@@ -3666,7 +3657,6 @@
     "description": "Toplam: {sats} sats talep edilebilir",
     "claim": "Şimdi talep et",
     "claiming": "Talep ediliyor...",
-    "belowMinimum": "{count} yatırma minimum altında (~{minimum} sats). Henüz talep edilemez.",
     "screenTitle": "Talep edilmemiş depozitolar",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3689,12 +3679,7 @@
     "refundNow": "Şimdi iade et",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Hazır",
-    "badgePending": "Beklemede",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Hata",
-    "badgeRefunded": "İade edildi"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

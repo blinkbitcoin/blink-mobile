@@ -76,8 +76,7 @@
     "feeError": "Nu s-a putut obține comisionul de conversie"
   },
   "ConversionSuccessScreen": {
-    "message": "Conversie reușită",
-    "title": "Conversie cu succes"
+    "message": "Conversie reușită"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2311,7 +2310,6 @@
     "slow": "Lent",
     "recommended": "Recomandat",
     "walletOffline": "Portofelul tău este offline. Te rugăm să verifici conexiunea și să încerci din nou.",
-    "destinationIsRequired": "Destinația este necesară",
     "sdkInsufficientFunds": "Fonduri insuficiente pentru această tranzacție.",
     "sdkAmountTooLow": "Suma este prea mică pentru o tranzacție on-chain.",
     "sdkNetworkError": "Eroare de rețea. Verificați conexiunea și încercați din nou.",
@@ -2362,7 +2360,8 @@
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Adresă Lightning"
     }
   },
   "NotificationSettingsScreen": {
@@ -2495,9 +2494,9 @@
     "body": "Cont Dolar folosește tehnologia Stablesats pentru a menține Bitcoin stabil la prețul USD. Mereu deții Bitcoin — nu dolari reali — dar valoarea USD nu fluctuează. Poți trimite și primi Bitcoin ca de obicei, dar nu este compatibil cu sistemul bancar tradițional.",
     "termsAndConditions": "Citiți Termenii și condițiile",
     "learnMore": "Aflați mai multe despre Stablesats",
-      "headerSelfCustodial": "Contul tău în Dolari deține stablecoins",
-      "bodySelfCustodial": "În contul în Dolari deții stablecoins. Tokenuri susținute de active a căror valoare este menținută stabilă față de USD. Nu poți încă trimite și primi stablecoins. Când trimiți din contul în Dolari, stablecoins-ul tău va fi schimbat și trimis ca Bitcoin către destinatar.",
-      "learnMoreSelfCustodial": "Află mai multe"
+    "headerSelfCustodial": "Contul tău în Dolari deține stablecoins",
+    "bodySelfCustodial": "În contul în Dolari deții stablecoins. Tokenuri susținute de active a căror valoare este menținută stabilă față de USD. Nu poți încă trimite și primi stablecoins. Când trimiți din contul în Dolari, stablecoins-ul tău va fi schimbat și trimis ca Bitcoin către destinatar.",
+    "learnMoreSelfCustodial": "Află mai multe"
   },
   "SplashScreen": {
     "update": "Aplicația este învechită. Este necesară o actualizare înainte ca aplicația să poată fi utilizată.\n\nAcest lucru se poate face din PlayStore pentru Android și Testflight pentru iOS"
@@ -2822,7 +2821,8 @@
       "invalidRegion": "Selectarea regiunii este invalidă"
     },
     "passwordTooWeak": "Parola este prea slabă. Folosește o combinație de litere mari, litere mici, cifre și caractere speciale.",
-    "passwordCommon": "Această parolă este prea comună. Te rugăm să alegi o parolă mai puternică."
+    "passwordCommon": "Această parolă este prea comună. Te rugăm să alegi o parolă mai puternică.",
+    "copied": "Copiat în clipboard"
   },
   "errors": {
     "generic": "A apărut o eroare.\nVă rugăm să încercați din nou mai târziu.",
@@ -2991,7 +2991,10 @@
       "emptyTransactions": "Încă nu există tranzacții",
       "addFunds": "Adaugă fonduri",
       "transactionsTitle": "Tranzacții",
-      "title": "Card Visa"
+      "title": "Card Visa",
+      "noCardAvailable": "Niciun card disponibil",
+      "cardNotUsable": "Acest card nu este disponibil pentru utilizare în acest moment",
+      "cardUpdateError": "Nu s-a putut actualiza starea cardului"
     },
     "validThruLabel": "VALABIL PÂNĂ LA",
     "networkVisa": "Visa",
@@ -3263,9 +3266,6 @@
         "damagedCard": "Card deteriorat",
         "damagedCardDescription": "Cardul meu este deteriorat fizic",
         "whatHappensNext": "Ce urmează?",
-        "currentCardDeactivated": "Cardul tău actual va fi dezactivat imediat",
-        "newCardShipped": "Un card nou va fi expediat la adresa ta",
-        "digitalCardAvailable": "Cardul tău digital rămâne disponibil în timpul acestui proces",
         "cardManagement": "Gestionare card",
         "bullet1": "Cardul tău actual va fi înghețat pentru securitate",
         "bullet2": "Va fi emis un card nou cu numere diferite",
@@ -3286,15 +3286,9 @@
         "title": "Verifică solicitarea ta",
         "subtitle": "Te rugăm să confirmi detaliile înlocuirii cardului",
         "requestSummary": "Rezumatul solicitării",
-        "reason": "Motiv",
         "delivery": "Livrare",
-        "shippingAddress": "Adresa de expediere",
-        "deliveryCost": "Cost de livrare",
         "submitRequest": "Trimite solicitarea",
         "importantInformation": "Informații importante",
-        "processedImmediately": "Solicitarea ta va fi procesată imediat",
-        "currentCardDeactivated": "Cardul actual va fi dezactivat la confirmare",
-        "trackStatus": "Poți urmări starea livrării noului tău card în aplicație",
         "issueType": "Motiv",
         "deliveryTime": "Timp de livrare",
         "shippingCost": "Cost de livrare",
@@ -3347,10 +3341,7 @@
         "feature2": "Cip EMV pentru securitate sporită",
         "feature3": "Bandă magnetică pentru acceptare universală",
         "feature4": "Numele tău embosat pe card",
-        "important": "Important",
-        "importantBullet1": "Cardul tău virtual va rămâne activ cât timp aștepți cardul fizic",
-        "importantBullet2": "Va trebui să activezi cardul fizic când ajunge",
-        "importantBullet3": "Ambele carduri vor avea același număr și aceleași detalii"
+        "important": "Important"
       },
       "Confirm": {
         "title": "Confirmă comanda",
@@ -3499,7 +3490,6 @@
         "savedConfirm": "Am salvat-o",
         "copy": "Copiază",
         "continueButton": "Continuă",
-        "selfCustodialDisabled": "Non-custodial este temporar indisponibil.",
         "testBackup": "Testează-ți copia de rezervă"
       },
       "Confirm": {
@@ -3562,7 +3552,8 @@
     "chooseMethod": "Alegeți metoda",
     "restoreComingSoonTitle": "În curând",
     "restoreComingSoonDescription": "Funcția de restaurare va fi disponibilă într-o actualizare viitoare.",
-    "createFailed": "Crearea portofelului a eșuat. Vă rugăm să încercați din nou."
+    "createFailed": "Crearea portofelului a eșuat. Vă rugăm să încercați din nou.",
+    "selfCustodialDisabled": "Non-custodial este temporar indisponibil."
   },
   "RestoreScreen": {
     "title": "Restaurare portofel",
@@ -3666,7 +3657,6 @@
     "description": "Total: {sats} sats disponibili pentru revendicare",
     "claim": "Revendică acum",
     "claiming": "Se revendică...",
-    "belowMinimum": "{count} depozit(e) sub minimum (~{minimum} sats). Nu pot fi revendicate încă.",
     "screenTitle": "Depozite nerevendicate",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3689,12 +3679,7 @@
     "refundNow": "Rambursează acum",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Pregătit",
-    "badgePending": "În așteptare",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Eroare",
-    "badgeRefunded": "Rambursat"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {

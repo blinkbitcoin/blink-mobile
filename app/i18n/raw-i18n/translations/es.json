@@ -2050,7 +2050,6 @@
         "login": "Iniciar sesión",
         "loginOrRestore": "Iniciar sesión / Restaurar",
         "headline": "El banco con dinero sólido",
-        "upgradeYourAccount": "Actualiza tu cuenta",
         "startTrialAccount": "Empieza con una cuenta de prueba.",
         "startWithTrialAccount": "Empezar con la cuenta de prueba",
         "registerPhoneAccount": "Registra cuenta de teléfono",
@@ -2361,7 +2360,8 @@
             "backupStatusLabel": "Estado del respaldo",
             "backupStatusCompleted": "Respaldo completo",
             "backupStatusNotCompleted": "Respaldo incompleto",
-            "loadError": "No se pudo cargar la información de tu cuenta."
+            "loadError": "No se pudo cargar la información de tu cuenta.",
+            "lightningAddressLabel": "Dirección Lightning"
         }
     },
     "NotificationSettingsScreen": {
@@ -2991,7 +2991,10 @@
             "emptyTransactions": "Aún no hay transacciones",
             "addFunds": "Agregar fondos",
             "transactionsTitle": "Transacciones",
-            "title": "Tarjeta Visa"
+            "title": "Tarjeta Visa",
+            "noCardAvailable": "No hay tarjetas disponibles",
+            "cardNotUsable": "Esta tarjeta no está disponible para su uso",
+            "cardUpdateError": "No se pudo actualizar el estado de la tarjeta"
         },
         "validThruLabel": "VÁLIDO HASTA",
         "networkVisa": "Visa",
@@ -3487,7 +3490,6 @@
                 "savedConfirm": "Ya la guardé",
                 "copy": "Copiar",
                 "continueButton": "Continuar",
-                "selfCustodialDisabled": "No custodial no está disponible temporalmente.",
                 "testBackup": "Prueba tu respaldo"
             },
             "Confirm": {
@@ -3550,7 +3552,8 @@
         "chooseMethod": "Elegir método",
         "restoreComingSoonTitle": "Próximamente",
         "restoreComingSoonDescription": "La función de restauración estará disponible en una actualización futura.",
-        "createFailed": "Error al crear la billetera. Por favor intenta de nuevo."
+        "createFailed": "Error al crear la billetera. Por favor intenta de nuevo.",
+        "selfCustodialDisabled": "La modalidad no custodial no está disponible temporalmente."
     },
     "RestoreScreen": {
         "title": "Restaurar billetera",
@@ -3654,7 +3657,6 @@
         "description": "Total: {sats} sats disponibles para reclamar",
         "claim": "Reclamar ahora",
         "claiming": "Reclamando...",
-        "belowMinimum": "{count} depósito(s) por debajo del mínimo (~{minimum} sats). Aún no se pueden reclamar.",
         "screenTitle": "Depósitos sin reclamar",
         "cardTitle": "Reclamar {sats} sats",
         "claimWithFee": "Reclamar (comisión máx: {fee} sats)",
@@ -3677,12 +3679,7 @@
         "refundNow": "Reembolsar ahora",
         "refundSuccess": "Reembolso iniciado exitosamente",
         "claimSuccess": "Depósito reclamado exitosamente",
-        "error": "No se puede reclamar este depósito",
-        "badgeReady": "Listo",
-        "badgePending": "Pendiente",
-        "badgeFeeIssue": "Problema de comisión",
-        "badgeError": "Error",
-        "badgeRefunded": "Reembolsado"
+        "error": "No se puede reclamar este depósito"
     },
     "FeatureUnavailable": {
         "SelfCustodial": {

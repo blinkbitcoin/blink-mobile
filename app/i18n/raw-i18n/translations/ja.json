@@ -18,9 +18,7 @@
         "howToUseYourCashRegister": "レジの使い方",
         "howToUseYourAddressExplainer": "以下の互換ウォレット利用者に共有",
         "howToUseYourPaycodeExplainer": "ペイコード（lnurl-payアドレス）を紙に印刷すれば、それをお客様がライトニング対応ウォレットでスキャンして支払いを行えます。\n\nただし、以下のように、ペイコードのスキャンができないウォレットもあります。",
-        "howToUseYourCashRegisterExplainer": "ウォレットを使わず、レジリンクから支払いを受けることもできます。\n\nインボイスが生成され、支払いは直接あなたの{bankName: string}ウォレットに入金されます。",
-        "yourAddress": "あなたの{bankName: string}アドレス",
-        "copiedAddressToClipboard": "{bankName: string} アドレスをクリップボードにコピーしました"
+        "howToUseYourCashRegisterExplainer": "ウォレットを使わず、レジリンクから支払いを受けることもできます。\n\nインボイスが生成され、支払いは直接あなたの{bankName: string}ウォレットに入金されます。"
     },
     "AcceptTermsAndConditionsScreen": {
         "title": "利用規約",
@@ -78,8 +76,7 @@
         "feeError": "変換手数料を取得できませんでした"
     },
     "ConversionSuccessScreen": {
-        "message": "両替が完了しました",
-        "title": "両替完了"
+        "message": "両替が完了しました"
     },
     "EarnScreen": {
         "satoshi": "sat",
@@ -2075,12 +2072,7 @@
         "payBusiness": "支払う",
         "openSettings": "設定を開く",
         "title": "マップ",
-        "error": "位置情報の取得中にエラーが発生しました",
-        "locationPermissionMessage": "位置情報を有効にして、マップ上の現在地を確認する",
-        "locationPermissionNegative": "キャンセル",
-        "locationPermissionNeutral": "あとで確認する",
-        "locationPermissionPositive": "OK",
-        "locationPermissionTitle": "マップ上で自分の位置を確認する"
+        "error": "位置情報の取得中にエラーが発生しました"
     },
     "HomeScreen": {
         "receive": "受金",
@@ -2264,16 +2256,7 @@
         "clipboardError": "エラー：クリップボードからコピーした値が正しくありません",
         "pastedClipboardSuccess": "クリップボードから貼り付けました",
         "invalidPhoneNumber": "有効な携帯電話番号を入力してください",
-        "phoneNotAllowed": "このフィールドでは電話番号を使用できません",
-        "confirmModal": {
-            "title": "このアドレスに、あなたは一度も送金したことがありません。",
-            "body1": "受金者がお伝えした{bankName: string}アドレスが正しいことを確認してください",
-            "bold2bold": "他のウォレットのユーザー名ではありません。",
-            "body3": "そうでない場合は、{lnAddress: string}アドレスを持つ{bankName: string}ウォレットに送金されます。\n\nアドレスの最初の部分のスペルも確認してください。例えば、jackieとjack1eは2つの異なるアドレスです。",
-            "warning": "{bankName: string}アドレスを誤って入力した場合、{bankName: string}はトランザクションを取り消すことができません。",
-            "checkBox": "{lnAddress: string}は正しいアドレスです。",
-            "confirmButton": "間違いありません"
-        }
+        "phoneNotAllowed": "このフィールドでは電話番号を使用できません"
     },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "トランザクションはメモリプールに送信されます",
@@ -2327,8 +2310,6 @@
         "slow": "低速",
         "recommended": "推奨",
         "walletOffline": "ウォレットがオフラインです。接続を確認してもう一度お試しください。",
-        "destinationIsRequired": "送金先の入力は必須です",
-        "lnurlInvoiceIncorrectDescription": "lnurlサーバーが不正な説明ハッシュを持つインボイスで応答しました。",
         "sdkInsufficientFunds": "この取引に十分な残高がありません。",
         "sdkAmountTooLow": "オンチェーン取引には金額が低すぎます。",
         "sdkNetworkError": "ネットワークエラー。接続を確認して再試行してください。",
@@ -2379,7 +2360,8 @@
             "backupStatusLabel": "Backup status",
             "backupStatusCompleted": "Backup complete",
             "backupStatusNotCompleted": "Backup not complete",
-            "loadError": "Could not load your account information."
+            "loadError": "Could not load your account information.",
+            "lightningAddressLabel": "Lightningアドレス"
         }
     },
     "NotificationSettingsScreen": {
@@ -2839,7 +2821,8 @@
             "invalidRegion": "地域の選択が無効です"
         },
         "passwordTooWeak": "パスワードが弱すぎます。大文字、小文字、数字、特殊文字を組み合わせてください。",
-        "passwordCommon": "このパスワードは一般的すぎます。より強力なパスワードを選んでください。"
+        "passwordCommon": "このパスワードは一般的すぎます。より強力なパスワードを選んでください。",
+        "copied": "クリップボードにコピーしました"
     },
     "errors": {
         "generic": "エラーが発生しました。\n時間をあけてもう一度トライしてみてください。",
@@ -2968,27 +2951,6 @@
             "title": "6月チャレンジ！",
             "description": "インナーサークルを10人拡大して、Adopting Bitcoin El Salvadorの$1000特別チケットを獲得するチャンスを手に入れましょう",
             "details": "Adopting Bitcoin El Salvadorの特別チケットを獲得しよう\n\nインナーサークルを10人拡大して、Adopting Bitcoin El Salvadorの$1000特別チケットを獲得するチャンスを手に入れましょう！チケットにはメインカンファレンスへの独占アクセス、飲食付きメザニン、スピーカーディナー、フィルムフェスティバルが含まれます。\n\nハッシュタグ #blinkcircles を付けてサークルをソーシャルでシェアして参加しましょう。\n\n今回は当選者が2名です！"
-        },
-        "septChallenge": {
-            "title": "9月のチャレンジ！",
-            "description": "インナーサークル {innerCircle: number}/21 - $21獲得\nトップ3 - Adopting Bitcoinのチケットを獲得できます!",
-            "details": "9月中にインナーサークルを21人に増やし、#blinkcircles タグと一緒にソーシャルメディアでシェアすると、ステイブル satsウォレットに$21が振り込まれます。さらに、上位3名には「Adopting Bitcoin!」のチケットが当たります！",
-            "peopleWelcomedSoFar": "最近招待したお友だち",
-            "yourRank": "あなたのランキング",
-            "reminder": "リマインダー：新しいBlinkユーザーに最初のサトシを送るとあなたのインナーサークルが広がります！",
-            "fullDetails": "詳細はこちら："
-        },
-        "octoberChallenge": {
-            "title": "10月のチャレンジ！",
-            "description": "あなたの #blinkcircles をシェアして、1,000,000サトシを獲得するチャンス！",
-            "details": "1,000,000サトシをプレゼントします！\n\n#blinkcircles タグをつけて、あなたのサークルをSNSでシェアしてください！当選者は10月31日にランダムに選ばれます。\n\n応募資格はあなたのインナーサークルが1以上であることです！",
-            "connectOnSocial": "SNSでつながる：",
-            "fullDetails": "詳細はこちら："
-        },
-        "novemberChallenge": {
-            "title": "November Challenge!",
-            "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-            "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
         }
     },
     "FullOnboarding": {
@@ -3012,9 +2974,6 @@
         "title": "通知",
         "noNotifications": "現在、通知はありません"
     },
-    "Fake": {
-        "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
-    },
     "CardFlow": {
         "TransactionStatus": {
             "pending": "保留中",
@@ -3032,7 +2991,10 @@
             "emptyTransactions": "取引はまだありません",
             "addFunds": "入金",
             "transactionsTitle": "取引",
-            "title": "Visaカード"
+            "title": "Visaカード",
+            "noCardAvailable": "利用可能なカードがありません",
+            "cardNotUsable": "このカードは現在使用できません",
+            "cardUpdateError": "カードステータスを更新できませんでした"
         },
         "validThruLabel": "有効期限",
         "networkVisa": "Visa",
@@ -3528,7 +3490,6 @@
                 "savedConfirm": "保存しました",
                 "copy": "コピー",
                 "continueButton": "続行",
-                "selfCustodialDisabled": "ノンカストディアルは一時的に利用できません。",
                 "testBackup": "バックアップをテスト"
             },
             "Confirm": {
@@ -3591,7 +3552,8 @@
         "chooseMethod": "方法を選択",
         "restoreComingSoonTitle": "近日公開",
         "restoreComingSoonDescription": "復元機能は将来のアップデートで利用可能になります。",
-        "createFailed": "ウォレットの作成に失敗しました。もう一度お試しください。"
+        "createFailed": "ウォレットの作成に失敗しました。もう一度お試しください。",
+        "selfCustodialDisabled": "ノンカストディアルは一時的に利用できません。"
     },
     "RestoreScreen": {
         "title": "ウォレットを復元",
@@ -3695,7 +3657,6 @@
         "description": "合計: {sats} sats請求可能",
         "claim": "今すぐ請求",
         "claiming": "請求中...",
-        "belowMinimum": "{count}件のデポジットが最小額(~{minimum} sats)未満です。まだ請求できません。",
         "screenTitle": "未請求のデポジット",
         "cardTitle": "{sats} sats を請求",
         "claimWithFee": "請求（最大手数料: {fee} sats）",
@@ -3718,12 +3679,7 @@
         "refundNow": "今すぐ払い戻し",
         "refundSuccess": "払い戻しが正常に開始されました",
         "claimSuccess": "デポジットが正常に請求されました",
-        "error": "このデポジットを請求できません",
-        "badgeReady": "準備完了",
-        "badgePending": "保留中",
-        "badgeFeeIssue": "手数料問題",
-        "badgeError": "エラー",
-        "badgeRefunded": "払い戻し済み"
+        "error": "このデポジットを請求できません"
     },
     "FeatureUnavailable": {
         "SelfCustodial": {
