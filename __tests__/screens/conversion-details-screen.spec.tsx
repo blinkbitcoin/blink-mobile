@@ -2083,7 +2083,6 @@ describe("Self-custodial conversion limits gating", () => {
   it("disables Next during the self-custodial SDK boot window — accountType=SelfCustodial + isReady=false", async () => {
     mockUseActiveWallet.mockReturnValue({
       ...selfCustodialActiveWallet,
-      isSelfCustodial: false,
       isReady: false,
       status: "Unavailable",
     })
