@@ -18,7 +18,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   }),
 }))
 
-jest.mock("@app/hooks/use-self-custodial-rollback", () => ({
+jest.mock("@app/self-custodial/hooks/use-rollback", () => ({
   useSelfCustodialRollback: jest.fn(),
 }))
 

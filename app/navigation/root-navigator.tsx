@@ -90,8 +90,8 @@ import { StableBalanceSettingsScreen } from "../screens/stable-balance-settings-
 import { TransactionHistoryScreen } from "../screens/transaction-history/transaction-history-screen"
 import { UnclaimedDepositsScreen } from "../screens/unclaimed-deposits/unclaimed-deposits-screen"
 
-import { useSelfCustodialUnavailable } from "@app/hooks/use-self-custodial-unavailable"
 import { OfflineGate } from "@app/self-custodial/components"
+import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unavailable"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"

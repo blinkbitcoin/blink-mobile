@@ -1,8 +1,7 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { AccountStatus, AccountType } from "@app/types/wallet"
-
-import { useSelfCustodialRollback } from "@app/hooks/use-self-custodial-rollback"
+import { useSelfCustodialRollback } from "@app/self-custodial/hooks/use-rollback"
 
 let mockNonCustodialEnabled = true
 let mockRemoteConfigReady = true

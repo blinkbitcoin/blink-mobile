@@ -1,5 +1,6 @@
-import { useAccountRegistry } from "./use-account-registry"
-import { useSelfCustodialRollback } from "./use-self-custodial-rollback"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+
+import { useSelfCustodialRollback } from "./use-rollback"
 
 export const useSelfCustodialUnavailable = (): boolean => {
   const { activeAccount, accounts, setActiveAccountId } = useAccountRegistry()

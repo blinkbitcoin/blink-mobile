@@ -3,7 +3,7 @@ import { AccountType } from "@app/types/wallet"
 import {
   sdkContactToUserContact,
   unifiedContactToUserContact,
-} from "@app/screens/people-screen/contacts/legacy-contact-shims"
+} from "@app/self-custodial/mappers/contact"
 
 describe("unifiedContactToUserContact", () => {
   it("maps a unified Contact into the legacy GraphQL UserContact shape", () => {

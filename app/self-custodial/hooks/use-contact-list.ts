@@ -3,9 +3,9 @@ import { useCallback, useRef, useState } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 
 import { UserContact } from "@app/graphql/generated"
-import { unifiedContactToUserContact } from "@app/screens/people-screen/contacts/legacy-contact-shims"
+import { useContacts } from "@app/hooks/use-contacts"
 
-import { useContacts } from "./use-contacts"
+import { unifiedContactToUserContact } from "../mappers/contact"
 
 export const useSelfCustodialContactList = (enabled: boolean): UserContact[] => {
   const adapter = useContacts()

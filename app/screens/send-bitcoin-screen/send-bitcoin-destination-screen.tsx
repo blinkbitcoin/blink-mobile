@@ -34,8 +34,8 @@ import { makeStyles, useTheme, Text, ListItem } from "@rn-vui/themed"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useScanContext } from "@app/hooks/use-scan-context"
-import { useSelfCustodialContactList } from "@app/hooks/use-self-custodial-contact-list"
 import { ActiveWalletStatus } from "@app/types/wallet"
+import { useSelfCustodialContactList } from "@app/self-custodial/hooks/use-contact-list"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 
 import { toWalletBalances } from "./hooks/use-send-wallets"
