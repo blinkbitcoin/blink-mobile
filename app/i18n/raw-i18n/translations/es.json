@@ -2813,7 +2813,7 @@
         "some": "Algunos",
         "support": "Soporte",
         "blinkToBlink": "Blink a Blink",
-        "copied": "Copied to clipboard",
+        "copied": "Copiado al portapapeles",
         "hasBeenCopiedToClipboard": "{type: string} se ha copiado al portapapeles",
         "validation": {
             "required": "Este campo es obligatorio",
