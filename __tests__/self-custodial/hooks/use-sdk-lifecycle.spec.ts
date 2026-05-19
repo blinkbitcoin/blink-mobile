@@ -352,6 +352,9 @@ describe("useSdkLifecycle", () => {
         expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3", "/tmp/acct-B")
       })
 
+      expect(mockDisconnectSdk.mock.invocationCallOrder[0]).toBeLessThan(
+        mockInitSdk.mock.invocationCallOrder[1],
+      )
       expect(mockRemoveSdkEventListener).toHaveBeenCalledWith(sdkA, "listener-id")
     })
 
@@ -581,7 +584,7 @@ describe("useSdkLifecycle", () => {
       })
 
       await waitFor(() => {
-        expect(mockGetSnapshot.mock.calls.length).toBeGreaterThan(callsBefore)
+        expect(mockGetSnapshot.mock.calls).toHaveLength(callsBefore + 1)
       })
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     })

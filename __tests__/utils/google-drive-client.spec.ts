@@ -56,7 +56,9 @@ describe("google drive client", () => {
       text: async () => "Unauthorized",
     })
 
-    await expect(findAppDataFile("backup.json", "token")).rejects.toMatchObject({
+    const error = await findAppDataFile("backup.json", "token").catch((e) => e)
+    expect(error).toBeInstanceOf(DriveError)
+    expect(error).toMatchObject({
       name: "DriveError",
       reason: DriveErrorReason.Auth,
       message: expect.stringContaining("Drive query failed (401)"),
@@ -70,9 +72,9 @@ describe("google drive client", () => {
       text: async () => "Forbidden",
     })
 
-    await expect(findAppDataFile("backup.json", "token")).rejects.toMatchObject({
-      reason: DriveErrorReason.Auth,
-    })
+    const error = await findAppDataFile("backup.json", "token").catch((e) => e)
+    expect(error).toBeInstanceOf(DriveError)
+    expect(error.reason).toBe(DriveErrorReason.Auth)
   })
 
   it("throws DriveError with reason='transient' on 429", async () => {
@@ -82,9 +84,9 @@ describe("google drive client", () => {
       text: async () => "Rate limited",
     })
 
-    await expect(findAppDataFile("backup.json", "token")).rejects.toMatchObject({
-      reason: DriveErrorReason.Transient,
-    })
+    const error = await findAppDataFile("backup.json", "token").catch((e) => e)
+    expect(error).toBeInstanceOf(DriveError)
+    expect(error.reason).toBe(DriveErrorReason.Transient)
   })
 
   it("throws DriveError with reason='transient' on 503", async () => {
@@ -94,9 +96,9 @@ describe("google drive client", () => {
       text: async () => "Service unavailable",
     })
 
-    await expect(findAppDataFile("backup.json", "token")).rejects.toMatchObject({
-      reason: DriveErrorReason.Transient,
-    })
+    const error = await findAppDataFile("backup.json", "token").catch((e) => e)
+    expect(error).toBeInstanceOf(DriveError)
+    expect(error.reason).toBe(DriveErrorReason.Transient)
   })
 
   it("throws DriveError with reason='transient' on the 500 boundary", async () => {
@@ -106,9 +108,9 @@ describe("google drive client", () => {
       text: async () => "Internal server error",
     })
 
-    await expect(findAppDataFile("backup.json", "token")).rejects.toMatchObject({
-      reason: DriveErrorReason.Transient,
-    })
+    const error = await findAppDataFile("backup.json", "token").catch((e) => e)
+    expect(error).toBeInstanceOf(DriveError)
+    expect(error.reason).toBe(DriveErrorReason.Transient)
   })
 
   it("throws DriveError with reason='transient' when fetch itself rejects (network failure)", async () => {
