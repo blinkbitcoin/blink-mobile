@@ -261,6 +261,72 @@ describe("useSdkLifecycle", () => {
     })
   })
 
+  describe("initial sync timeout safety net", () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it("escalates out of Loading when neither the Synced event nor the post-connect sync resolve within the timeout window", async () => {
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+      // Both the Synced event AND the sync call hang — the correlated-failure case.
+      mockSyncSelfCustodialWallet.mockReturnValue(new Promise(() => {}))
+      captureListener()
+
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+
+      await waitFor(() => {
+        expect(result.current.sdk).not.toBeNull()
+      })
+
+      expect(result.current.status).toBe(ActiveWalletStatus.Loading)
+
+      await act(async () => {
+        jest.advanceTimersByTime(30_000)
+        await Promise.resolve()
+      })
+
+      await waitFor(() => {
+        expect(result.current.status).not.toBe(ActiveWalletStatus.Loading)
+      })
+      expect(mockRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining("Initial sync did not complete"),
+        }),
+      )
+    })
+
+    it("does not fire the timeout escalation once the Synced event arrives in time", async () => {
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+      const listener = captureListener()
+
+      renderHook(() => useSdkLifecycle("acct-1", 0))
+
+      await waitFor(() => {
+        expect(listener.current).not.toBeNull()
+      })
+      await act(async () => {
+        await listener.current?.({ tag: "Synced" })
+      })
+
+      mockRecordError.mockClear()
+
+      await act(async () => {
+        jest.advanceTimersByTime(60_000)
+        await Promise.resolve()
+      })
+
+      expect(mockRecordError).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining("Initial sync did not complete"),
+        }),
+      )
+    })
+  })
+
   describe("account-switch disconnect ordering", () => {
     it("disconnects the previous SDK when the active account changes", async () => {
       const sdkA = buildSdk("sdk-A")

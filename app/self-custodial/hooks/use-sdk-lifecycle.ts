@@ -64,6 +64,8 @@ const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
 
 const RECONNECT_BACKOFF_MS: readonly number[] = [1000, 3000, 9000]
 
+const INITIAL_SYNC_TIMEOUT_MS = 30_000
+
 const teardownSdk = async (
   sdk: BreezSdkInterface,
   listenerId: string | null,
@@ -91,6 +93,7 @@ export const useSdkLifecycle = (
   const pendingRefreshRef = useRef(false)
   const rawTxOffsetRef = useRef(0)
   const initialSyncCompletedRef = useRef(false)
+  const initialSyncTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { schedule: scheduleBackoffRetry, reset: resetBackoff } =
     useBackoffRetry(RECONNECT_BACKOFF_MS)
 
@@ -220,6 +223,16 @@ export const useSdkLifecycle = (
           reportError("Post-connect sync", err)
         })
 
+      initialSyncTimeoutIdRef.current = setTimeout(() => {
+        if (!mounted || initialSyncCompletedRef.current) return
+        reportError(
+          "SDK lifecycle: initial sync timeout",
+          new Error(`Initial sync did not complete within ${INITIAL_SYNC_TIMEOUT_MS}ms`),
+        )
+        initialSyncCompletedRef.current = true
+        refreshWallets().catch(() => {})
+      }, INITIAL_SYNC_TIMEOUT_MS)
+
       getUserSettings(connectedSdk)
         .then((settings) => {
           if (mounted) {
@@ -259,6 +272,11 @@ export const useSdkLifecycle = (
       mounted = false
       abortRef.current = true
       resetBackoff()
+
+      if (initialSyncTimeoutIdRef.current) {
+        clearTimeout(initialSyncTimeoutIdRef.current)
+        initialSyncTimeoutIdRef.current = null
+      }
 
       const sdk = sdkRef.current
       const listenerId = listenerIdRef.current
