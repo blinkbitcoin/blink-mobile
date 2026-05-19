@@ -248,7 +248,7 @@ export const HomeScreen: React.FC = () => {
     variables: { first: 1 },
   })
 
-  const loading = isSelfCustodial
+  const queryLoading = isSelfCustodial
     ? activeWallet.status === "loading"
     : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
@@ -270,8 +270,13 @@ export const HomeScreen: React.FC = () => {
         walletCurrency: w.walletCurrency,
       }))
     : dataAuthed?.me?.defaultAccount?.wallets
-  const { formattedBalance: defaultFormattedBalance, satsBalance } =
-    useTotalBalance(wallets)
+  const {
+    formattedBalance: defaultFormattedBalance,
+    satsBalance,
+    isLoading: balanceConversionLoading,
+  } = useTotalBalance(wallets)
+
+  const loading = queryLoading || balanceConversionLoading
 
   const showStableBalanceToggle =
     stableBalanceEnabled && isSelfCustodial && isStableBalanceActive

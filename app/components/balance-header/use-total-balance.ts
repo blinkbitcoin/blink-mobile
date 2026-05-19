@@ -15,6 +15,7 @@ export const useTotalBalance = (
   formattedBalance: string
   numericBalance: number
   satsBalance: number
+  isLoading: boolean
 } => {
   const { formatMoneyAmount } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
@@ -34,11 +35,14 @@ export const useTotalBalance = (
     DisplayCurrency,
   )
 
+  const isLoading = !convertMoneyAmount
+
   if (!btcAmount || !usdAmount) {
     return {
       formattedBalance: "$0.00",
       numericBalance: 0,
       satsBalance: 0,
+      isLoading,
     }
   }
 
@@ -60,5 +64,6 @@ export const useTotalBalance = (
     formattedBalance: formatMoneyAmount({ moneyAmount: totalDisplay }),
     numericBalance: isNaN(numericBalance) ? 0 : numericBalance,
     satsBalance: isNaN(satsBalance) ? 0 : satsBalance,
+    isLoading,
   }
 }

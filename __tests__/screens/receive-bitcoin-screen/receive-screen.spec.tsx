@@ -72,8 +72,22 @@ jest.mock("@app/self-custodial/hooks", () => ({
   usePaymentRequest: () => mockUseSelfCustodialPaymentRequest(),
 }))
 
+// eslint-disable-next-line prefer-const
+let mockPriceConversionOverride: { convertMoneyAmount?: unknown } | null = null
+
 jest.mock("@app/hooks", () => ({
   useNotificationPermission: jest.fn(),
+  usePriceConversion: () =>
+    mockPriceConversionOverride ?? {
+      convertMoneyAmount: (
+        moneyAmount: { amount: number; currency: string },
+        toCurrency: string,
+      ) => ({
+        amount: moneyAmount.amount,
+        currency: toCurrency,
+        currencyCode: toCurrency,
+      }),
+    },
 }))
 
 jest.mock("@app/screens/receive-bitcoin-screen/my-ln-updates-sub", () => ({
@@ -110,8 +124,21 @@ const renderScreen = () =>
 describe("ReceiveScreen — routing", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockPriceConversionOverride = null
     mockUsePaymentRequest.mockReturnValue({ state: "ready" })
     mockUseSelfCustodialPaymentRequest.mockReturnValue({ state: "ready" })
+  })
+
+  it("renders a loader while price conversion is bootstrapping after an account switch", () => {
+    mockPriceConversionOverride = { convertMoneyAmount: undefined }
+    mockUseActiveWallet.mockReturnValue({
+      isSelfCustodial: false,
+      status: ActiveWalletStatus.Ready,
+    })
+
+    const { getByTestId } = renderScreen()
+
+    expect(getByTestId("receive-loading")).toBeTruthy()
   })
 
   it("renders nothing when self-custodial wallet is in Error status", () => {

@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { Pressable, View } from "react-native"
+import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { ActionButton } from "@app/components/action-button"
 import { AmountInputModal } from "@app/components/amount-input/amount-input-modal"
@@ -16,7 +16,7 @@ import { Screen } from "@app/components/screen"
 import { SetLightningAddressModal } from "@app/components/set-lightning-address-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { WalletCurrency } from "@app/graphql/generated"
-import { useNotificationPermission } from "@app/hooks"
+import { useNotificationPermission, usePriceConversion } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -45,13 +45,33 @@ const SELF_CUSTODIAL_BLOCKED_STATUSES: ActiveWalletStatus[] = [
   ActiveWalletStatus.Unavailable,
 ]
 
+const LoadingView: React.FC = () => {
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+  return (
+    <Screen>
+      <View style={styles.loadingContainer} testID="receive-loading">
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    </Screen>
+  )
+}
+
 const ReceiveScreen = () => {
   const { isSelfCustodial, status } = useActiveWallet()
+  const { convertMoneyAmount } = usePriceConversion()
   const custodialRequest = usePaymentRequest()
   const selfCustodialRequest = useSelfCustodialPaymentRequest()
 
   if (isSelfCustodial && SELF_CUSTODIAL_BLOCKED_STATUSES.includes(status)) {
     return null
+  }
+
+  /** Loader while price conversion bootstraps after an account switch. */
+  if (!convertMoneyAmount) {
+    return <LoadingView />
   }
 
   const requestState = isSelfCustodial ? selfCustodialRequest : custodialRequest
@@ -364,6 +384,11 @@ const useStyles = makeStyles(({ colors }) => ({
   screenStyle: {
     paddingVertical: 12,
     flexGrow: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   paymentIdentifier: {
     alignItems: "center",
