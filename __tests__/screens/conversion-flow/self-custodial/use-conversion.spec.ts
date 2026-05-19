@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { useNonCustodialConversion } from "@app/screens/conversion-flow/hooks/use-non-custodial-conversion"
+import { useSelfCustodialConversion } from "@app/screens/conversion-flow/hooks/self-custodial/use-conversion"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertDirection, PaymentResultStatus } from "@app/types/payment"
 
@@ -63,7 +63,7 @@ const makeQuote = (
     jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
 })
 
-describe("useNonCustodialConversion", () => {
+describe("useSelfCustodialConversion", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockConvertMoneyAmount.mockImplementation(
@@ -76,7 +76,7 @@ describe("useNonCustodialConversion", () => {
 
   it("stays idle when enabled is false and does not call getQuote", async () => {
     const { result } = renderHook(() =>
-      useNonCustodialConversion({ ...defaultParams, enabled: false }),
+      useSelfCustodialConversion({ ...defaultParams, enabled: false }),
     )
 
     await waitFor(() => {
@@ -90,7 +90,7 @@ describe("useNonCustodialConversion", () => {
     const quote = makeQuote()
     mockGetQuote.mockResolvedValue(quote)
 
-    const { result } = renderHook(() => useNonCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
 
     await waitFor(() => expect(result.current.canExecute).toBe(true))
     expect(result.current.isQuoting).toBe(false)
@@ -106,7 +106,7 @@ describe("useNonCustodialConversion", () => {
   it("falls into Error when getQuote resolves to null", async () => {
     mockGetQuote.mockResolvedValue(null)
 
-    const { result } = renderHook(() => useNonCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
 
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
     expect(result.current.canExecute).toBe(false)
@@ -116,7 +116,7 @@ describe("useNonCustodialConversion", () => {
   it("falls into Error when getQuote rejects", async () => {
     mockGetQuote.mockRejectedValue(new Error("boom"))
 
-    const { result } = renderHook(() => useNonCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
 
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
     expect(result.current.canExecute).toBe(false)
@@ -126,7 +126,7 @@ describe("useNonCustodialConversion", () => {
     const execute = jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success })
     mockGetQuote.mockResolvedValue(makeQuote({ execute }))
 
-    const { result } = renderHook(() => useNonCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
     await waitFor(() => expect(result.current.canExecute).toBe(true))
 
     let outcome: Awaited<ReturnType<typeof result.current.execute>> | undefined
@@ -145,7 +145,7 @@ describe("useNonCustodialConversion", () => {
     })
     mockGetQuote.mockResolvedValue(makeQuote({ execute }))
 
-    const { result } = renderHook(() => useNonCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
     await waitFor(() => expect(result.current.canExecute).toBe(true))
 
     let outcome: Awaited<ReturnType<typeof result.current.execute>> | undefined
@@ -162,7 +162,7 @@ describe("useNonCustodialConversion", () => {
   it("execute() refuses to run when no quote is ready", async () => {
     mockGetQuote.mockResolvedValue(null)
 
-    const { result } = renderHook(() => useNonCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
 
     let outcome: Awaited<ReturnType<typeof result.current.execute>> | undefined
@@ -181,7 +181,7 @@ describe("useNonCustodialConversion", () => {
     mockGetQuote.mockResolvedValue(quote)
 
     const { result, rerender } = renderHook(() =>
-      useNonCustodialConversion(defaultParams),
+      useSelfCustodialConversion(defaultParams),
     )
 
     await waitFor(() => expect(result.current.canExecute).toBe(true))
@@ -211,7 +211,7 @@ describe("useNonCustodialConversion", () => {
     mockGetQuote.mockResolvedValueOnce(firstQuote).mockResolvedValueOnce(secondQuote)
 
     const { result, rerender } = renderHook(
-      (params: typeof defaultParams) => useNonCustodialConversion(params),
+      (params: typeof defaultParams) => useSelfCustodialConversion(params),
       { initialProps: defaultParams },
     )
 

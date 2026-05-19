@@ -35,7 +35,7 @@ import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 
 import { ConversionFeeRow } from "./conversion-fee-row"
-import { useNonCustodialConversion } from "./hooks"
+import { useSelfCustodialConversion } from "./hooks"
 
 import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -113,7 +113,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
   }, [convertMoneyAmount, formatMoneyAmount])
 
-  const nonCustodialConversion = useNonCustodialConversion({
+  const nonCustodialConversion = useSelfCustodialConversion({
     fromCurrency: fromWalletCurrency,
     moneyAmount,
     enabled: isSelfCustodial,

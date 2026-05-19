@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { useNonCustodialConversionGuard } from "@app/screens/conversion-flow/hooks/use-non-custodial-conversion-guard"
+import { useSelfCustodialConversionGuard } from "@app/screens/conversion-flow/hooks/self-custodial/use-conversion-guard"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import {
   ConvertAmountAdjustment,
@@ -46,7 +46,7 @@ const defaultParams = {
   enabled: true,
 }
 
-describe("useNonCustodialConversionGuard", () => {
+describe("useSelfCustodialConversionGuard", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockConvertMoneyAmount.mockImplementation(
@@ -59,7 +59,7 @@ describe("useNonCustodialConversionGuard", () => {
 
   it("stays inactive and does not quote when disabled", async () => {
     const { result } = renderHook(() =>
-      useNonCustodialConversionGuard({ ...defaultParams, enabled: false }),
+      useSelfCustodialConversionGuard({ ...defaultParams, enabled: false }),
     )
 
     await waitFor(() => expect(result.current.isQuoting).toBe(false))
@@ -69,7 +69,7 @@ describe("useNonCustodialConversionGuard", () => {
 
   it("stays inactive when amountInSourceCurrency is zero", async () => {
     const { result } = renderHook(() =>
-      useNonCustodialConversionGuard({ ...defaultParams, amountInSourceCurrency: 0 }),
+      useSelfCustodialConversionGuard({ ...defaultParams, amountInSourceCurrency: 0 }),
     )
 
     await waitFor(() => expect(result.current.isQuoting).toBe(false))
@@ -79,7 +79,7 @@ describe("useNonCustodialConversionGuard", () => {
 
   it("stays inactive when fromCurrency is undefined", async () => {
     const { result } = renderHook(() =>
-      useNonCustodialConversionGuard({ ...defaultParams, fromCurrency: undefined }),
+      useSelfCustodialConversionGuard({ ...defaultParams, fromCurrency: undefined }),
     )
 
     await waitFor(() => expect(result.current.isQuoting).toBe(false))
@@ -91,7 +91,7 @@ describe("useNonCustodialConversionGuard", () => {
     mockGetQuote.mockResolvedValue(buildQuote(ConvertAmountAdjustment.FlooredToMin))
 
     const { result } = renderHook(() =>
-      useNonCustodialConversionGuard({
+      useSelfCustodialConversionGuard({
         ...defaultParams,
         amountInSourceCurrency: 50,
       }),
@@ -108,7 +108,7 @@ describe("useNonCustodialConversionGuard", () => {
     )
 
     const { result } = renderHook(() =>
-      useNonCustodialConversionGuard({
+      useSelfCustodialConversionGuard({
         ...defaultParams,
         amountInSourceCurrency: 4_500,
         fromWalletBalance: 5_000,
@@ -128,7 +128,7 @@ describe("useNonCustodialConversionGuard", () => {
     )
 
     const { result } = renderHook(() =>
-      useNonCustodialConversionGuard({
+      useSelfCustodialConversionGuard({
         ...defaultParams,
         amountInSourceCurrency: 5_000,
         fromWalletBalance: 5_000,
@@ -146,7 +146,7 @@ describe("useNonCustodialConversionGuard", () => {
     )
 
     const { result } = renderHook(() =>
-      useNonCustodialConversionGuard({
+      useSelfCustodialConversionGuard({
         ...defaultParams,
         amountInSourceCurrency: 5_500,
         fromWalletBalance: 5_000,
@@ -164,7 +164,7 @@ describe("useNonCustodialConversionGuard", () => {
     )
 
     const { result } = renderHook(() =>
-      useNonCustodialConversionGuard({
+      useSelfCustodialConversionGuard({
         ...defaultParams,
         amountInSourceCurrency: 4_500,
         fromWalletBalance: undefined,
@@ -181,7 +181,7 @@ describe("useNonCustodialConversionGuard", () => {
   it("returns null blockingReason when SDK reports no adjustment", async () => {
     mockGetQuote.mockResolvedValue(buildQuote())
 
-    const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
 
     await waitFor(() => expect(mockGetQuote).toHaveBeenCalled())
     await waitFor(() => expect(result.current.isQuoting).toBe(false))
@@ -197,7 +197,7 @@ describe("useNonCustodialConversionGuard", () => {
         }),
     )
 
-    const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
 
     await waitFor(() => expect(result.current.isQuoting).toBe(true))
     expect(result.current.blockingReason).toBeNull()
@@ -215,7 +215,7 @@ describe("useNonCustodialConversionGuard", () => {
   it("surfaces hasQuoteError=true and keeps blockingReason null when the quote rejects", async () => {
     mockGetQuote.mockRejectedValue(new Error("pools unavailable"))
 
-    const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
 
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
     expect(result.current.isQuoting).toBe(false)
@@ -225,7 +225,7 @@ describe("useNonCustodialConversionGuard", () => {
   it("surfaces hasQuoteError=true when the SDK returns a null quote", async () => {
     mockGetQuote.mockResolvedValue(null)
 
-    const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
 
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
     expect(result.current.blockingReason).toBeNull()
@@ -234,7 +234,7 @@ describe("useNonCustodialConversionGuard", () => {
   it("keeps hasQuoteError=false on the success path", async () => {
     mockGetQuote.mockResolvedValue(buildQuote())
 
-    const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
 
     await waitFor(() => expect(mockGetQuote).toHaveBeenCalled())
     await waitFor(() => expect(result.current.isQuoting).toBe(false))
@@ -245,7 +245,7 @@ describe("useNonCustodialConversionGuard", () => {
   it("keeps hasQuoteError=false while the quote is in flight", async () => {
     mockGetQuote.mockImplementation(() => new Promise<ConvertQuote>(() => {}))
 
-    const { result } = renderHook(() => useNonCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
 
     await waitFor(() => expect(result.current.isQuoting).toBe(true))
     expect(result.current.hasQuoteError).toBe(false)
@@ -253,7 +253,7 @@ describe("useNonCustodialConversionGuard", () => {
 
   it("keeps hasQuoteError=false in the disabled and idle paths", async () => {
     const { result } = renderHook(() =>
-      useNonCustodialConversionGuard({ ...defaultParams, enabled: false }),
+      useSelfCustodialConversionGuard({ ...defaultParams, enabled: false }),
     )
 
     await waitFor(() => expect(result.current.isQuoting).toBe(false))

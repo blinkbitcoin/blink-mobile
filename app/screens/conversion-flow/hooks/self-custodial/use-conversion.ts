@@ -11,9 +11,9 @@ import {
 } from "@app/types/payment"
 import { logConversionAttempt } from "@app/utils/analytics"
 
-import { buildConvertParams } from "../build-convert-params"
+import { buildConvertParams } from "../../build-convert-params"
 
-import { useConversionQuote } from "./use-conversion-quote"
+import { useConversionQuote } from "../use-conversion-quote"
 
 type Params = {
   fromCurrency: WalletCurrency
@@ -21,23 +21,23 @@ type Params = {
   enabled: boolean
 }
 
-export type NonCustodialConversionOutcome =
+export type SelfCustodialConversionOutcome =
   | { status: typeof PaymentResultStatus.Success }
   | { status: typeof PaymentResultStatus.Failed; message: string }
 
-export type NonCustodialConversionFlow = {
+export type SelfCustodialConversionFlow = {
   isQuoting: boolean
   hasQuoteError: boolean
   feeText: string
   canExecute: boolean
-  execute: () => Promise<NonCustodialConversionOutcome>
+  execute: () => Promise<SelfCustodialConversionOutcome>
 }
 
-export const useNonCustodialConversion = ({
+export const useSelfCustodialConversion = ({
   fromCurrency,
   moneyAmount,
   enabled,
-}: Params): NonCustodialConversionFlow => {
+}: Params): SelfCustodialConversionFlow => {
   const { convertMoneyAmount } = usePriceConversion()
   const { LL } = useI18nContext()
 
@@ -63,7 +63,7 @@ export const useNonCustodialConversion = ({
     }
   }, [quote, snapshotParams, liveQuoteParams])
 
-  const execute = useCallback(async (): Promise<NonCustodialConversionOutcome> => {
+  const execute = useCallback(async (): Promise<SelfCustodialConversionOutcome> => {
     if (!quote) {
       return { status: PaymentResultStatus.Failed, message: LL.errors.generic() }
     }

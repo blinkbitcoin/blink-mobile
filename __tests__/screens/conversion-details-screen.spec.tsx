@@ -92,11 +92,11 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   }),
 }))
 
-const mockUseNonCustodialConversionGuard = jest.fn()
+const mockUseSelfCustodialConversionGuard = jest.fn()
 jest.mock(
-  "@app/screens/conversion-flow/hooks/use-non-custodial-conversion-guard",
+  "@app/screens/conversion-flow/hooks/self-custodial/use-conversion-guard",
   () => ({
-    useNonCustodialConversionGuard: () => mockUseNonCustodialConversionGuard(),
+    useSelfCustodialConversionGuard: () => mockUseSelfCustodialConversionGuard(),
   }),
 )
 
@@ -625,7 +625,7 @@ beforeEach(() => {
   jest.clearAllMocks()
   mockUseActiveWallet.mockReturnValue(defaultActiveWallet)
   mockUseNonCustodialConversionLimits.mockReturnValue(defaultLimits)
-  mockUseNonCustodialConversionGuard.mockReturnValue({
+  mockUseSelfCustodialConversionGuard.mockReturnValue({
     isQuoting: false,
     hasQuoteError: false,
     blockingReason: null,
@@ -2060,7 +2060,7 @@ describe("Self-custodial conversion limits gating", () => {
       loading: false,
       error: null,
     })
-    mockUseNonCustodialConversionGuard.mockReturnValue({
+    mockUseSelfCustodialConversionGuard.mockReturnValue({
       isQuoting: false,
       hasQuoteError: true,
       blockingReason: null,

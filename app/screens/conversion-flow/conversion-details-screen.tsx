@@ -50,7 +50,7 @@ import { AccountType } from "@app/types/wallet"
 import {
   useConversionFormatting,
   useConversionOverlayFocus,
-  useNonCustodialConversionGuard,
+  useSelfCustodialConversionGuard,
   useSyncedInputValues,
 } from "./hooks"
 import { BTC_SUFFIX, findBtcSuffixIndex } from "./btc-format"
@@ -167,7 +167,7 @@ export const ConversionDetailsScreen = () => {
   const selfCustodialLimitsUnavailable =
     isSelfCustodial && selfCustodialLimitsError !== null
 
-  const conversionGuard = useNonCustodialConversionGuard({
+  const conversionGuard = useSelfCustodialConversionGuard({
     fromCurrency: fromWallet?.walletCurrency,
     amountInSourceCurrency: settlementSendAmount?.amount ?? 0,
     fromWalletBalance: fromWallet?.balance,
