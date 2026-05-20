@@ -3492,5 +3492,31 @@
         "explainerStep3": "Continue using Blink as usual",
         "letsMove": "Let's move",
         "transferringFunds": "Transferring your funds. It should be done in a few seconds."
+    },
+    "AccountTypeSelectionScreen": {
+        "title": "Choose account type",
+        "description": "Select how you want to manage your funds",
+        "custodialLabel": "Blink",
+        "selfCustodialLabel": "Spark"
+    },
+    "BackupScreen": {
+        "title": "Back up your wallet",
+        "description": "Choose a backup method to secure your funds"
+    },
+    "RestoreScreen": {
+        "title": "Restore wallet",
+        "description": "Recover your wallet from a backup"
+    },
+    "BackupNudge": {
+        "title": "Secure your wallet",
+        "description": "Your funds are at risk. Secure your wallet now."
+    },
+    "StableBalance": {
+        "title": "Stable Balance",
+        "description": "Hold a USD-denominated balance powered by USDB on Spark."
+    },
+    "BackendFeatureGate": {
+        "title": "Feature unavailable",
+        "description": "This feature requires a custodial account."
     }
 }

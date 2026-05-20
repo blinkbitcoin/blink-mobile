@@ -3502,5 +3502,31 @@
     "explainerStep3": "Blink'i her zamanki gibi kullanmaya devam edin",
     "letsMove": "Hadi başlayalım",
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Hesap türünü seçin",
+    "description": "Fonlarınızı nasıl yönetmek istediğinizi seçin",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Cüzdanı yedekle",
+    "description": "Fonlarınızı korumak için bir yedekleme yöntemi seçin"
+  },
+  "RestoreScreen": {
+    "title": "Cüzdanı geri yükle",
+    "description": "Cüzdanınızı bir yedekten geri yükleyin"
+  },
+  "BackupNudge": {
+    "title": "Cüzdanınızı güvence altına alın",
+    "description": "Fonlarınız risk altında. Cüzdanınızı şimdi güvence altına alın."
+  },
+  "StableBalance": {
+    "title": "Sabit bakiye",
+    "description": "Spark üzerinde USDB tarafından desteklenen USD bakiyesi tutun."
+  },
+  "BackendFeatureGate": {
+    "title": "Özellik kullanılamıyor",
+    "description": "Bu özellik bir saklama hesabı gerektiriyor."
   }
 }

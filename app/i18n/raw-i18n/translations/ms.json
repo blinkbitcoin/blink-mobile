@@ -3543,5 +3543,31 @@
     "explainerStep3": "Teruskan menggunakan Blink seperti biasa",
     "letsMove": "Jom",
     "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Pilih jenis akaun",
+    "description": "Pilih bagaimana anda mahu menguruskan dana anda",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Sandaran dompet",
+    "description": "Pilih kaedah sandaran untuk melindungi dana anda"
+  },
+  "RestoreScreen": {
+    "title": "Pulihkan dompet",
+    "description": "Pulihkan dompet anda daripada sandaran"
+  },
+  "BackupNudge": {
+    "title": "Lindungi dompet anda",
+    "description": "Dana anda dalam bahaya. Lindungi dompet anda sekarang."
+  },
+  "StableBalance": {
+    "title": "Baki stabil",
+    "description": "Simpan baki dalam USD dikuasakan USDB di Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Ciri tidak tersedia",
+    "description": "Ciri ini memerlukan akaun jagaan."
   }
 }

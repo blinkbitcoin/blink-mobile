@@ -3543,5 +3543,31 @@
     "explainerStep3": "Nastavite koristiti Blink kao i obično",
     "letsMove": "Idemo",
     "transferringFunds": "Prebacujemo vaša sredstva. Trebalo bi biti gotovo za nekoliko sekundi."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Odaberite vrstu računa",
+    "description": "Odaberite kako želite upravljati sredstvima",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Sigurnosna kopija novčanika",
+    "description": "Odaberite metodu sigurnosne kopije za zaštitu sredstava"
+  },
+  "RestoreScreen": {
+    "title": "Vraćanje novčanika",
+    "description": "Vratite novčanik iz sigurnosne kopije"
+  },
+  "BackupNudge": {
+    "title": "Zaštitite novčanik",
+    "description": "Vaša sredstva su ugrožena. Zaštitite novčanik sada."
+  },
+  "StableBalance": {
+    "title": "Stabilan saldo",
+    "description": "Držite saldo u USD pokretan USDB na Sparku."
+  },
+  "BackendFeatureGate": {
+    "title": "Značajka nedostupna",
+    "description": "Ova značajka zahtijeva skrbnički račun."
   }
 }

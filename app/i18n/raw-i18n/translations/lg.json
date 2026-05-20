@@ -3502,5 +3502,31 @@
     "explainerStep3": "Weyongere okukozesa Blink nga bulijjo",
     "letsMove": "Ka tugende",
     "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Londa ekika ky'akawunti",
+    "description": "Londa engeri gy'oyagala okuddukanya ssente zo",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Koppa wallet yo",
+    "description": "Londa enkola y'okukoppa okukuuma ssente zo"
+  },
+  "RestoreScreen": {
+    "title": "Zzaawo wallet",
+    "description": "Zzaawo wallet yo okuva mu koppi"
+  },
+  "BackupNudge": {
+    "title": "Kuuma wallet yo",
+    "description": "Ssente zo ziri mu kabi. Kuuma wallet yo kati."
+  },
+  "StableBalance": {
+    "title": "Bbaalansi ennywevu",
+    "description": "Kuuma bbaalansi mu USD n'obuyambi bwa USDB ku Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Ekikola tekiriwo",
+    "description": "Ekikola kino kyetaagisa akawunti ya custodial."
   }
 }

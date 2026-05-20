@@ -11528,6 +11528,74 @@ type RootTranslation = {
 		 */
 		transferringFunds: string
 	}
+	AccountTypeSelectionScreen: {
+		/**
+		 * C​h​o​o​s​e​ ​a​c​c​o​u​n​t​ ​t​y​p​e
+		 */
+		title: string
+		/**
+		 * S​e​l​e​c​t​ ​h​o​w​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​m​a​n​a​g​e​ ​y​o​u​r​ ​f​u​n​d​s
+		 */
+		description: string
+		/**
+		 * B​l​i​n​k
+		 */
+		custodialLabel: string
+		/**
+		 * S​p​a​r​k
+		 */
+		selfCustodialLabel: string
+	}
+	BackupScreen: {
+		/**
+		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t
+		 */
+		title: string
+		/**
+		 * C​h​o​o​s​e​ ​a​ ​b​a​c​k​u​p​ ​m​e​t​h​o​d​ ​t​o​ ​s​e​c​u​r​e​ ​y​o​u​r​ ​f​u​n​d​s
+		 */
+		description: string
+	}
+	RestoreScreen: {
+		/**
+		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
+		 */
+		title: string
+		/**
+		 * R​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​f​r​o​m​ ​a​ ​b​a​c​k​u​p
+		 */
+		description: string
+	}
+	BackupNudge: {
+		/**
+		 * S​e​c​u​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​a​t​ ​r​i​s​k​.​ ​S​e​c​u​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​n​o​w​.
+		 */
+		description: string
+	}
+	StableBalance: {
+		/**
+		 * S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+		 */
+		title: string
+		/**
+		 * H​o​l​d​ ​a​ ​U​S​D​-​d​e​n​o​m​i​n​a​t​e​d​ ​b​a​l​a​n​c​e​ ​p​o​w​e​r​e​d​ ​b​y​ ​U​S​D​B​ ​o​n​ ​S​p​a​r​k​.
+		 */
+		description: string
+	}
+	BackendFeatureGate: {
+		/**
+		 * F​e​a​t​u​r​e​ ​u​n​a​v​a​i​l​a​b​l​e
+		 */
+		title: string
+		/**
+		 * T​h​i​s​ ​f​e​a​t​u​r​e​ ​r​e​q​u​i​r​e​s​ ​a​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+		 */
+		description: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -22905,6 +22973,74 @@ export type TranslationFunctions = {
 		 * Transferring your funds. It should be done in a few seconds.
 		 */
 		transferringFunds: () => LocalizedString
+	}
+	AccountTypeSelectionScreen: {
+		/**
+		 * Choose account type
+		 */
+		title: () => LocalizedString
+		/**
+		 * Select how you want to manage your funds
+		 */
+		description: () => LocalizedString
+		/**
+		 * Blink
+		 */
+		custodialLabel: () => LocalizedString
+		/**
+		 * Spark
+		 */
+		selfCustodialLabel: () => LocalizedString
+	}
+	BackupScreen: {
+		/**
+		 * Back up your wallet
+		 */
+		title: () => LocalizedString
+		/**
+		 * Choose a backup method to secure your funds
+		 */
+		description: () => LocalizedString
+	}
+	RestoreScreen: {
+		/**
+		 * Restore wallet
+		 */
+		title: () => LocalizedString
+		/**
+		 * Recover your wallet from a backup
+		 */
+		description: () => LocalizedString
+	}
+	BackupNudge: {
+		/**
+		 * Secure your wallet
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your funds are at risk. Secure your wallet now.
+		 */
+		description: () => LocalizedString
+	}
+	StableBalance: {
+		/**
+		 * Stable Balance
+		 */
+		title: () => LocalizedString
+		/**
+		 * Hold a USD-denominated balance powered by USDB on Spark.
+		 */
+		description: () => LocalizedString
+	}
+	BackendFeatureGate: {
+		/**
+		 * Feature unavailable
+		 */
+		title: () => LocalizedString
+		/**
+		 * This feature requires a custodial account.
+		 */
+		description: () => LocalizedString
 	}
 }
 

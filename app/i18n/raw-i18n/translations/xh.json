@@ -3549,5 +3549,31 @@
     "explainerStep3": "Qhubeka usebenzise i-Blink njengoko uqhele",
     "letsMove": "Masiqale",
     "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Khetha uhlobo lwe-akhawunti",
+    "description": "Khetha indlela ofuna ukulawula ngayo imali yakho",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Gcina isipele sesikhwama",
+    "description": "Khetha indlela yokugcina ukuze ukhusele imali yakho"
+  },
+  "RestoreScreen": {
+    "title": "Buyisela isikhwama",
+    "description": "Buyisela isikhwama sakho kwikhophi"
+  },
+  "BackupNudge": {
+    "title": "Khusela isikhwama sakho",
+    "description": "Imali yakho isengozini. Khusela isikhwama sakho ngoku."
+  },
+  "StableBalance": {
+    "title": "Ibhalansi ezinzileyo",
+    "description": "Gcina ibhalansi ye-USD exhaswe yi-USDB kwi-Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Isici asifumaneki",
+    "description": "Esi sici sidinga i-akhawunti ye-custodial."
   }
 }

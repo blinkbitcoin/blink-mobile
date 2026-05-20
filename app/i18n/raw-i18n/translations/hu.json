@@ -3502,5 +3502,31 @@
     "explainerStep3": "Használd tovább a Blinket a megszokott módon",
     "letsMove": "Rajta",
     "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Válasszon fióktípust",
+    "description": "Válassza ki, hogyan szeretné kezelni pénzeszközeit",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Tárca biztonsági mentése",
+    "description": "Válasszon biztonsági mentési módszert pénzeszközei védelméhez"
+  },
+  "RestoreScreen": {
+    "title": "Tárca visszaállítása",
+    "description": "Állítsa vissza tárcáját biztonsági mentésből"
+  },
+  "BackupNudge": {
+    "title": "Biztosítsa tárcáját",
+    "description": "Pénzeszközei veszélyben vannak. Biztosítsa tárcáját most."
+  },
+  "StableBalance": {
+    "title": "Stabil egyenleg",
+    "description": "Tartson USD egyenleget USDB-vel a Sparkon."
+  },
+  "BackendFeatureGate": {
+    "title": "Funkció nem elérhető",
+    "description": "Ez a funkció letéti fiókot igényel."
   }
 }

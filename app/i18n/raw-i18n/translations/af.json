@@ -3543,5 +3543,31 @@
     "explainerStep3": "Gebruik Blink voort soos gewoonlik",
     "letsMove": "Kom ons gaan",
     "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees."
+  },
+  "AccountTypeSelectionScreen": {
+    "title": "Kies rekeningtipe",
+    "description": "Kies hoe jy jou fondse wil bestuur",
+    "custodialLabel": "Blink",
+    "selfCustodialLabel": "Spark"
+  },
+  "BackupScreen": {
+    "title": "Rugsteun jou beursie",
+    "description": "Kies 'n rugsteunmetode om jou fondse te beveilig"
+  },
+  "RestoreScreen": {
+    "title": "Herstel beursie",
+    "description": "Herstel jou beursie vanaf 'n rugsteun"
+  },
+  "BackupNudge": {
+    "title": "Beveilig jou beursie",
+    "description": "Jou fondse is in gevaar. Beveilig jou beursie nou."
+  },
+  "StableBalance": {
+    "title": "Stabiele balans",
+    "description": "Hou 'n USD-balans aangedryf deur USDB op Spark."
+  },
+  "BackendFeatureGate": {
+    "title": "Funksie nie beskikbaar nie",
+    "description": "Hierdie funksie vereis 'n bewaarderrekening."
   }
 }
