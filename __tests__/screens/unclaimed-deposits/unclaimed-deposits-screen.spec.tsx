@@ -6,7 +6,7 @@ import theme from "@app/rne-theme/theme"
 import { UnclaimedDepositsScreen } from "@app/screens/unclaimed-deposits/unclaimed-deposits-screen"
 import { SdkFeeError } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
-import { DepositStatus, type PendingDeposit } from "@app/types/payment.types"
+import { DepositStatus, type PendingDeposit } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
 const mockHandleRefund = jest.fn()
@@ -51,7 +51,7 @@ jest.mock("@app/screens/unclaimed-deposits/hooks/use-recommended-fee-tiers", () 
   }
 })
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ sdk: { id: "sdk" } }),
 }))
 
@@ -111,7 +111,7 @@ const setAddress = (utils: ReturnType<typeof renderScreen>, address: string) => 
   fireEvent.changeText(utils.getByTestId("refund-address-input"), address)
 }
 
-describe("UnclaimedDepositsScreen — refund fee gating (Critical #2)", () => {
+describe("UnclaimedDepositsScreen — refund fee gating", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockDeposits = [claimableDeposit]
@@ -159,7 +159,7 @@ describe("UnclaimedDepositsScreen — refund fee gating (Critical #2)", () => {
     expect(utils.queryByText("Couldn't load network fees")).toBeNull()
   })
 
-  it("disables Refund now when selected tier rate is 0 (regression for Critical #2)", () => {
+  it("disables Refund now when selected tier rate is 0 (regression)", () => {
     mockFeeTiers = {
       [FeeTierOption.Fast]: { feeSats: 0, etaMinutes: 10 },
       [FeeTierOption.Medium]: { feeSats: 0, etaMinutes: 30 },

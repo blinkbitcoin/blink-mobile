@@ -8,10 +8,11 @@ import {
   PaymentResultStatus,
   type ConvertParams,
   type ConvertQuote,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 
 const mockGetQuote = jest.fn()
+const mockConvertMoneyAmount = jest.fn((amount) => amount)
 
 jest.mock("@app/hooks/use-payments", () => ({
   usePayments: () => ({ getConversionQuote: mockGetQuote }),
@@ -25,9 +26,7 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 }))
 
 jest.mock("@app/hooks/use-price-conversion", () => ({
-  usePriceConversion: () => ({
-    convertMoneyAmount: (amount: { amount: number }) => amount,
-  }),
+  usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount }),
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => {
@@ -37,17 +36,6 @@ jest.mock("@react-native-firebase/crashlytics", () => {
     default: () => ({ recordError }),
   }
 })
-
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      ConversionConfirmationScreen: {
-        amountFloored: () => "Amount floored",
-        amountDustBumped: () => "Amount bumped",
-      },
-    },
-  }),
-}))
 
 const buildQuote = (amountAdjustment?: ConvertAmountAdjustment): ConvertQuote => ({
   feeAmount: toUsdMoneyAmount(5),
@@ -104,6 +92,38 @@ describe("useConversionQuote", () => {
     expect(result.current.hasQuoteError).toBe(false)
   })
 
+  it("converts feeAmount to display currency before formatting (avoids stale USD code)", async () => {
+    const quote = buildQuote()
+    mockGetQuote.mockResolvedValue(quote)
+
+    const { result } = renderHook(() => useHookUnderTest(ConvertDirection.BtcToUsd))
+
+    await waitFor(() => expect(result.current.quote).toBe(quote))
+    expect(mockConvertMoneyAmount).toHaveBeenCalledWith(
+      quote.feeAmount,
+      "DisplayCurrency",
+    )
+  })
+
+  it("falls back to the raw USD fee when convertMoneyAmount is unavailable", async () => {
+    const quote = buildQuote()
+    mockGetQuote.mockResolvedValue(quote)
+
+    const usePriceConversionMock = jest.requireMock("@app/hooks/use-price-conversion")
+    usePriceConversionMock.usePriceConversion = () => ({ convertMoneyAmount: undefined })
+
+    const { result } = renderHook(() => useHookUnderTest(ConvertDirection.BtcToUsd))
+
+    await waitFor(() => expect(result.current.quote).toBe(quote))
+    // formatUsdInDisplay falls back to formatting the raw USD amount so the UI
+    // never blocks on price loading.
+    expect(result.current.feeText).toBe("$0.05")
+
+    usePriceConversionMock.usePriceConversion = () => ({
+      convertMoneyAmount: mockConvertMoneyAmount,
+    })
+  })
+
   it("transitions to Error when the quote is null", async () => {
     mockGetQuote.mockResolvedValue(null)
 
@@ -122,31 +142,37 @@ describe("useConversionQuote", () => {
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
   })
 
-  it("maps FlooredToMin to the correct i18n message", async () => {
+  it("forwards FlooredToMin adjustment from the quote", async () => {
     mockGetQuote.mockResolvedValue(buildQuote(ConvertAmountAdjustment.FlooredToMin))
 
     const { result } = renderHook(() => useHookUnderTest(ConvertDirection.BtcToUsd))
 
-    await waitFor(() => expect(result.current.adjustmentText).toBe("Amount floored"))
+    await waitFor(() =>
+      expect(result.current.amountAdjustment).toBe(ConvertAmountAdjustment.FlooredToMin),
+    )
   })
 
-  it("maps IncreasedToAvoidDust to the correct i18n message", async () => {
+  it("forwards IncreasedToAvoidDust adjustment from the quote", async () => {
     mockGetQuote.mockResolvedValue(
       buildQuote(ConvertAmountAdjustment.IncreasedToAvoidDust),
     )
 
     const { result } = renderHook(() => useHookUnderTest(ConvertDirection.BtcToUsd))
 
-    await waitFor(() => expect(result.current.adjustmentText).toBe("Amount bumped"))
+    await waitFor(() =>
+      expect(result.current.amountAdjustment).toBe(
+        ConvertAmountAdjustment.IncreasedToAvoidDust,
+      ),
+    )
   })
 
-  it("returns null adjustmentText when the SDK reports none", async () => {
+  it("returns null amountAdjustment when the SDK reports none", async () => {
     mockGetQuote.mockResolvedValue(buildQuote())
 
     const { result } = renderHook(() => useHookUnderTest(ConvertDirection.BtcToUsd))
 
     await waitFor(() => expect(result.current.quote).not.toBeNull())
-    expect(result.current.adjustmentText).toBeNull()
+    expect(result.current.amountAdjustment).toBeNull()
   })
 
   it("cancels the stale in-flight request when params change", async () => {

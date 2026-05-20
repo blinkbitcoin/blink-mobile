@@ -62,7 +62,8 @@
     "title": "Çevir",
     "transfer": "Transfer",
     "percentageToConvert": "Dönüştürülecek %",
-    "reviewTransfer": "Transferi incele"
+    "reviewTransfer": "Transferi incele",
+    "dustError": "Bakiyenin tamamı transfer edilmelidir."
   },
   "ConversionConfirmationScreen": {
     "title": "Çevirmeyi incele",
@@ -72,13 +73,10 @@
     "infoDollar": "Dolar miktarı yalnızca yaklaşık bir değerdir. Küçük bir miktar farklılık gösterebilir.",
     "transferButtonText": "{fromWallet} hesabından {toWallet} hesabına transfer et",
     "feeLabel": "Dönüştürme ücreti",
-    "feeError": "Dönüştürme ücreti alınamadı",
-    "amountFloored": "Tutar, dönüştürme minimumunu karşılamak için artırıldı.",
-    "amountDustBumped": "Tutar, tüm bakiyenizi dönüştürmek için artırıldı."
+    "feeError": "Dönüştürme ücreti alınamadı"
   },
   "ConversionSuccessScreen": {
-    "message": "Çevirme başarılı",
-    "title": "Çevirme başarısı"
+    "message": "Çevirme başarılı"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2166,8 +2164,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Yatırma ücreti: {threshold} SAT altındaki tutarlar için {fee} SAT veya {threshold} SAT üzerindeki yatırmalar için {overFee} SAT",
     "autoConvertMinAmount": "{minSats: number} sats altındaki tutarlar otomatik olarak Dolara çevrilemez. Bunun yerine Bitcoin alacaksınız.",
-    "autoConvertSuccess": "{amount: number} sats alındı, Dolara çevrildi.",
-    "autoConvertFailed": "Ödeme alındı ancak dönüşüm başarısız oldu."
+    "autoConvertFailed": "Ödeme alındı ancak dönüşüm başarısız oldu.",
+    "pleaseWaitForConversion": "Lütfen dönüştürme tamamlanana kadar bekleyin"
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin olarak kullan",
@@ -2312,7 +2310,6 @@
     "slow": "Yavaş",
     "recommended": "Önerilen",
     "walletOffline": "Cüzdanınız çevrimdışı. Lütfen bağlantınızı kontrol edin ve tekrar deneyin.",
-    "destinationIsRequired": "Gönderilecek adres gerekli.",
     "sdkInsufficientFunds": "Bu işlem için yeterli bakiye yok.",
     "sdkAmountTooLow": "Tutar, bir on-chain işlemi için çok düşük.",
     "sdkNetworkError": "Ağ hatası. Bağlantınızı kontrol edin ve tekrar deneyin.",
@@ -2333,7 +2330,6 @@
     "nonCustodialAccount": "Saklamasız hesap",
     "tapUserName": "Kullanıcı adını ayarlamak için tıkla",
     "notifications": "Bildirimler",
-    "recoveryMethod": "Kurtarma yöntemi",
     "title": "Ayarlar",
     "darkMode": "Karanlık Mod",
     "setToDark": "Mod: karanlık.",
@@ -2360,27 +2356,12 @@
     "receiveCurrency": "Alış para birimi",
     "displayCurrency": "Görüntülenen para birimi",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Lightning adresi"
     }
   },
   "NotificationSettingsScreen": {
@@ -2420,6 +2401,7 @@
     "level": "Seviye {level: string}",
     "switchAccount": "Hesap değiştir",
     "pleaseWait": "Lütfen Bekleyin.",
+    "probeBalanceFailed": "Cüzdan bakiyesi doğrulanamadı. Lütfen tekrar deneyin.",
     "accountLevel": "Hesap Seviyesi",
     "upgrade": "Hesabınızı güncelleyin",
     "logOutAndDeleteLocalData": "Çıkış yap ve yerel tüm dosyaları sil",
@@ -2459,6 +2441,8 @@
     "copiedAccountId": "Hesap kimliğiniz panoya kopyalandı",
     "yourAccountId": "Hesap Kimliğiniz",
     "accountId": "Hesap Kimliği",
+    "publicKey": "Genel anahtar",
+    "copiedPublicKey": "Genel anahtar panoya kopyalandı",
     "copy": "Kopyala",
     "identityVerification": "Kimlik Doğrulama"
   },
@@ -2489,7 +2473,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Varsayılan alma hesabı",
-    "info": "Bitcoin Hesabı'ınız sats biriktirmek içindir, burada USD değeri piyasayla hareket eder. Dolar Hesabı'ınız Stablesats tarafından desteklenmektedir — USD değerinde sabit kalacak şekilde korunan Bitcoin tutar. Her zaman Bitcoin tutarsınız ama dolar değeri değişmez."
+    "info": "Bitcoin Hesabı'ınız sats biriktirmek içindir, burada USD değeri piyasayla hareket eder. Dolar Hesabı'ınız Stablesats tarafından desteklenmektedir — USD değerinde sabit kalacak şekilde korunan Bitcoin tutar. Her zaman Bitcoin tutarsınız ama dolar değeri değişmez.",
+    "titleSelfCustodial": "Varsayılan hesap",
+    "infoSelfCustodial": "Bu hesap alma ve gönderme sırasında varsayılan olarak kullanılacaktır. İstediğiniz zaman değiştirebilirsiniz."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2507,7 +2493,10 @@
     "header": "Dolar Hesabı'ınız Stablesats tarafından desteklenmektedir",
     "body": "Dolar Hesabı, Bitcoin'i USD fiyatında sabit tutmak için Stablesats teknolojisini kullanır. Her zaman Bitcoin tutarsınız — gerçek dolar değil — ama USD değeri dalgalanmaz. Her zamanki gibi Bitcoin gönderip alabilirsiniz, ancak geleneksel bankacılık sistemiyle uyumlu değildir.",
     "termsAndConditions": "Hükümler ve koşulları oku",
-    "learnMore": "Stablesats'i öğrenin"
+    "learnMore": "Stablesats'i öğrenin",
+    "headerSelfCustodial": "Dolar hesabın stablecoin tutar",
+    "bodySelfCustodial": "Dolar hesabında stablecoin tutarsın. Varlıklarla teminatlandırılmış ve değeri ABD doları karşısında sabit tutulan tokenler. Stablecoin'leri henüz gönderip alamazsın. Dolar hesabından gönderdiğinde, stablecoin'lerin takas edilir ve alıcıya Bitcoin olarak gönderilir.",
+    "learnMoreSelfCustodial": "Daha fazla bilgi"
   },
   "SplashScreen": {
     "update": "Uygulamanızın modası geçmiş. Uygulamanın kullanılabilmesi için bir güncelleme gereklidir.\n\nBu, Android için PlayStore'dan ve iOS için Testflight'tan yapılabilir"
@@ -2787,6 +2776,7 @@
     "submit": "Gönder",
     "success": "Başarılı!",
     "dollarStablesats": "Dolar (Stablesats)",
+    "dollarStablecoin": "Dolar (Stablecoin)",
     "to": "Gönderilecek",
     "total": "Toplam",
     "transactions": "İşlemler",
@@ -2831,7 +2821,8 @@
       "invalidRegion": "Geçersiz bölge seçimi"
     },
     "passwordTooWeak": "Şifre çok zayıf. Büyük harf, küçük harf, rakam ve özel karakterlerden oluşan bir kombinasyon kullanın.",
-    "passwordCommon": "Bu şifre çok yaygın. Lütfen daha güçlü bir şifre seçin."
+    "passwordCommon": "Bu şifre çok yaygın. Lütfen daha güçlü bir şifre seçin.",
+    "copied": "Panoya kopyalandı"
   },
   "errors": {
     "generic": "Bir hata oluştu.\nLütfen daha sonra tekrar deneyin.",
@@ -3000,7 +2991,10 @@
       "emptyTransactions": "Henüz işlem yok",
       "addFunds": "Para ekle",
       "transactionsTitle": "İşlemler",
-      "title": "Visa Kartı"
+      "title": "Visa Kartı",
+      "noCardAvailable": "Kullanılabilir kart yok",
+      "cardNotUsable": "Bu kart şu anda kullanım için uygun değil",
+      "cardUpdateError": "Kart durumu güncellenemedi"
     },
     "validThruLabel": "GEÇERLİLİK",
     "networkVisa": "Visa",
@@ -3272,9 +3266,6 @@
         "damagedCard": "Hasarlı kart",
         "damagedCardDescription": "Kartım fiziksel olarak hasar gördü",
         "whatHappensNext": "Bundan sonra ne olacak?",
-        "currentCardDeactivated": "Mevcut kartınız derhal devre dışı bırakılacak",
-        "newCardShipped": "Yeni bir kart adresinize gönderilecek",
-        "digitalCardAvailable": "Dijital kartınız bu süreç boyunca kullanılabilir kalır",
         "cardManagement": "Kart yönetimi",
         "bullet1": "Mevcut kartınız güvenlik için dondurulacak",
         "bullet2": "Farklı numaralarla yeni bir kart düzenlenecek",
@@ -3295,15 +3286,9 @@
         "title": "Talebinizi gözden geçirin",
         "subtitle": "Lütfen kart değişimi detaylarını onaylayın",
         "requestSummary": "Talep özeti",
-        "reason": "Neden",
         "delivery": "Teslimat",
-        "shippingAddress": "Teslimat adresi",
-        "deliveryCost": "Teslimat ücreti",
         "submitRequest": "Talebi gönder",
         "importantInformation": "Önemli bilgiler",
-        "processedImmediately": "Talebiniz derhal işleme alınacak",
-        "currentCardDeactivated": "Mevcut kart onay sonrasında devre dışı bırakılacak",
-        "trackStatus": "Yeni kartınızın teslimat durumunu uygulamada takip edebilirsiniz",
         "issueType": "Neden",
         "deliveryTime": "Teslimat süresi",
         "shippingCost": "Teslimat ücreti",
@@ -3356,10 +3341,7 @@
         "feature2": "Gelişmiş güvenlik için EMV çipi",
         "feature3": "Evrensel kabul için manyetik şerit",
         "feature4": "İsmin kartın üzerinde kabartmalı",
-        "important": "Önemli",
-        "importantBullet1": "Fiziksel kartı beklerken sanal kartın aktif kalacak",
-        "importantBullet2": "Fiziksel kartın geldiğinde etkinleştirmen gerekecek",
-        "importantBullet3": "Her iki kart da aynı kart numarası ve detaylara sahip olacak"
+        "important": "Önemli"
       },
       "Confirm": {
         "title": "Siparişini onayla",
@@ -3488,9 +3470,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Şifre yöneticisi",
       "manualBackup": "Manuel yedekleme",
-      "keychainSaved": "Yedekleme şifre yöneticisine kaydedildi",
-      "keychainFailed": "Yedekleme kaydedilemedi",
-      "iOSComingSoon": "iCloud yedekleme yakında geliyor"
+      "passwordManagerBackupSaved": "Yedekleme şifre yöneticisine kaydedildi",
+      "passwordManagerBackupFailed": "Yedekleme kaydedilemedi",
+      "passwordManagerUnavailable": "Bu cihazda kullanılabilir parola yöneticisi yok. Drive yedeklemesini kullan veya 12 kelimelik ifadeni manuel olarak kaydet."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3507,7 +3489,8 @@
         "saveItNow": "Şimdi kaydet",
         "savedConfirm": "Kaydettim",
         "copy": "Kopyala",
-        "continueButton": "Devam et"
+        "continueButton": "Devam et",
+        "testBackup": "Yedeğini test et"
       },
       "Confirm": {
         "headerTitle": "Yedekleme ifadesini onayla",
@@ -3518,7 +3501,8 @@
         "incorrectWord": "Yanlış kelime, lütfen sırayı kontrol edin"
       },
       "Success": {
-        "title": "Gözetimsiz Blink'e hoş geldiniz"
+        "title": "Gözetimsiz Blink'e hoş geldiniz",
+        "testSuccess": "Yedekleme ifaden doğru"
       }
     },
     "CloudBackup": {
@@ -3537,9 +3521,14 @@
       "passwordMismatch": "Şifreler uyuşmuyor",
       "uploadSuccess": "Yedek {provider} hesabına kaydedildi",
       "uploadFailed": "Yedek yüklenemedi",
-      "signInFailed": "Google'a giriş yapılamadı",
+      "signInFailed": "{provider} hesabınıza giriş yapılamadı",
+      "cloudNotAvailable": "iCloud Drive kullanılamıyor. Lütfen Ayarlar'dan iCloud'da oturum açın ve iCloud Drive'ı etkinleştirin.",
+      "networkError": "Ağ hatası. Lütfen bağlantınızı kontrol edip tekrar deneyin.",
       "existingBackupTitle": "Yedek bulundu",
       "existingBackupMessage": "{provider} hesabınızda zaten bir yedek var. Üzerine yazmak ister misiniz?",
+      "existingBackupMessageWithDetails": "{provider} hesabınızda zaten bir yedek mevcut.\n\nLightning adresi: {address}\nOluşturuldu: {createdAt}\n\nÜzerine yazmak ister misiniz?",
+      "existingBackupUnknownAddress": "Mevcut değil",
+      "existingBackupUnknownCreatedAt": "Bilinmiyor",
       "overwrite": "Üzerine yaz"
     }
   },
@@ -3553,8 +3542,8 @@
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Emanetli",
+    "selfCustodialLabel": "Emanetsiz",
     "custodialDescription": "Fonlarınızı sizin adınıza saklıyoruz",
     "selfCustodialDescription": "Fonlarınıza yalnızca siz erişebilirsiniz",
     "continueButton": "Devam et",
@@ -3562,7 +3551,9 @@
     "descriptionSelected": "Lütfen hesap türünü seçin.",
     "chooseMethod": "Yöntem seçin",
     "restoreComingSoonTitle": "Yakında",
-    "restoreComingSoonDescription": "Geri yükleme özelliği gelecek bir güncellemede kullanılabilir olacaktır."
+    "restoreComingSoonDescription": "Geri yükleme özelliği gelecek bir güncellemede kullanılabilir olacaktır.",
+    "createFailed": "Cüzdan oluşturulamadı. Lütfen tekrar deneyin.",
+    "selfCustodialDisabled": "Saklamasız mod geçici olarak kullanılamıyor."
   },
   "RestoreScreen": {
     "title": "Cüzdanı geri yükle",
@@ -3581,7 +3572,9 @@
     "noBackupFound": "Yedek bulunamadı",
     "noBackupDescription": "Bir yedek bulamadık. Yedekleme ifadenizi manuel olarak girebilirsiniz.",
     "enterPassword": "Şifreleme parolanızı girin",
-    "wrongPassword": "Yanlış parola. Lütfen tekrar deneyin."
+    "wrongPassword": "Yanlış parola. Lütfen tekrar deneyin.",
+    "pickBackupTitle": "Bir cüzdan seçin",
+    "pickBackupDescription": "Geri yüklemek için bir yedek seçin"
   },
   "BackupNudge": {
     "title": "Fonlarınız risk altında",
@@ -3590,11 +3583,7 @@
     "settingsWarning": "Cüzdanınızı yedekleyin. Bu cihazı kaybederseniz, fonlarınızı kaybedersiniz.",
     "modalTitle": "Fonlarınızı güvenceye alın",
     "modalDescription": "Cüzdanınızı yedeklemenizi şiddetle tavsiye ederiz. Bu cihazı kaybetmeniz durumunda fonlarınızın tamamen kaybolmasını önlemek için.",
-    "secureMe": "Cüzdanı güvenceye al",
-    "trustModelTitle": "Kontrol sizde",
-    "trustModelDescription": "Anahtarlarınız fonlarınızı kontrol eder. İşlemler Spark operatörleri tarafından işlenir, doğrudan Bitcoin L1'de doğrulanmaz.",
-    "trustModelWarning": "Çok küçük bakiyeler Bitcoin temel zincirine kurtarmak için ekonomik olmayabilir.",
-    "trustModelDismiss": "Anlıyorum"
+    "secureMe": "Cüzdanı güvenceye al"
   },
   "StableBalance": {
     "title": "Sabit bakiye",
@@ -3618,12 +3607,6 @@
       "deactivateConfirm": "Devre dışı bırak",
       "cancel": "İptal"
     },
-    "firstTimeModal": {
-      "title": "Dönüşüm Hakkında",
-      "dualBalance": "BTC ve USD, cüzdanınızdaki iki bağımsız bakiyedir. Aralarında fon taşımak için istediğiniz zaman Convert'i kullanın.",
-      "trustDisclosure": "USD modu Spark üzerindeki USDB tokenlarını kullanır. Güven varsayımları doğrudan BTC tutmaktan farklıdır. USDB Spark'ın token çıkaranına dayanır.",
-      "acknowledge": "Anlıyorum"
-    },
     "minimumConversion": "Minimum dönüşüm: {amount:string}",
     "conversionUnavailable": "Dönüşüm geçici olarak kullanılamıyor. Lütfen tekrar deneyin."
   },
@@ -3638,7 +3621,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Cüzdanınız oluşturuluyor...",
     "errorTitle": "Cüzdan oluşturma başarısız",
     "errorDescription": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
@@ -3674,7 +3657,6 @@
     "description": "Toplam: {sats} sats talep edilebilir",
     "claim": "Şimdi talep et",
     "claiming": "Talep ediliyor...",
-    "belowMinimum": "{count} yatırma minimum altında (~{minimum} sats). Henüz talep edilemez.",
     "screenTitle": "Talep edilmemiş depozitolar",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3697,12 +3679,7 @@
     "refundNow": "Şimdi iade et",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Hazır",
-    "badgePending": "Beklemede",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Hata",
-    "badgeRefunded": "İade edildi"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {
@@ -3714,10 +3691,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Önemli",
+    "dangerZoneBulletReinstated": "Silinen hesap geri yüklenemez",
+    "dangerZoneBulletPermanent": "Hesap silme işlemi kalıcıdır",
+    "dangerZoneBulletEmpty": "Hesabın boş olduğundan emin olun",
+    "dangerZoneDeleteButton": "Hesabı ve verileri sil",
+    "confirmModalTitle": "Hesap silmeyi onayla",
+    "confirmModalTypeToConfirm": "\"{delete: string}\" yazarak onayla",
+    "hasFundsWarningTitle": "Uyarı",
+    "hasFundsWarningBody": "Cüzdanında {balance} bakiye var. Güvenliğin için, bakiyesi olan hesapların silinmesine izin vermiyoruz.",
+    "hasFundsWarningHelper": "Silme işlemine devam etmek için hesabını boşalt veya döngüsel ekonomilere bağışta bulun.",
+    "hasFundsWarningButton": "Geri dön"
   }
 }

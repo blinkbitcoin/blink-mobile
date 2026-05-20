@@ -62,7 +62,8 @@
     "title": "Konversi",
     "transfer": "Transfer",
     "percentageToConvert": "% untuk dikonversi",
-    "reviewTransfer": "Tinjau transfer"
+    "reviewTransfer": "Tinjau transfer",
+    "dustError": "Seluruh saldo harus ditransfer."
   },
   "ConversionConfirmationScreen": {
     "title": "Tinjau konversi",
@@ -72,13 +73,10 @@
     "infoDollar": "Jumlah Dolar hanya perkiraan. Bisa sedikit berbeda.",
     "transferButtonText": "Transfer {fromWallet} ke {toWallet}",
     "feeLabel": "Biaya konversi",
-    "feeError": "Tidak dapat mengambil biaya konversi",
-    "amountFloored": "Jumlah dinaikkan untuk memenuhi minimum konversi.",
-    "amountDustBumped": "Jumlah dinaikkan untuk mengonversi seluruh saldo Anda."
+    "feeError": "Tidak dapat mengambil biaya konversi"
   },
   "ConversionSuccessScreen": {
-    "message": "Konversi Berhasil",
-    "title": "Konversi Berhasil"
+    "message": "Konversi Berhasil"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2166,8 +2164,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Biaya deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit di atas {threshold} SAT",
     "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats tidak dapat dikonversi ke Dolar secara otomatis. Anda akan menerima Bitcoin.",
-    "autoConvertSuccess": "Diterima {amount: number} sats, dikonversi ke Dolar.",
-    "autoConvertFailed": "Pembayaran diterima tetapi konversi gagal."
+    "autoConvertFailed": "Pembayaran diterima tetapi konversi gagal.",
+    "pleaseWaitForConversion": "Mohon tunggu sampai konversi selesai"
   },
   "RedeemBitcoinScreen": {
     "title": "Tukarkan Bitcoin",
@@ -2312,7 +2310,6 @@
     "slow": "Lambat",
     "recommended": "Direkomendasikan",
     "walletOffline": "Dompet Anda sedang offline. Silakan periksa koneksi Anda dan coba lagi.",
-    "destinationIsRequired": "Tujuan diperlukan",
     "sdkInsufficientFunds": "Dana tidak cukup untuk transaksi ini.",
     "sdkAmountTooLow": "Jumlah terlalu rendah untuk transaksi on-chain.",
     "sdkNetworkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
@@ -2333,7 +2330,6 @@
     "nonCustodialAccount": "Akun non-kustodial",
     "tapUserName": "Ketuk untuk mengatur nama pengguna",
     "notifications": "Notifikasi",
-    "recoveryMethod": "Metode pemulihan",
     "title": "Pengaturan",
     "darkMode": "Mode Gelap",
     "setToDark": "Mode: gelap.",
@@ -2360,27 +2356,12 @@
     "receiveCurrency": "Mata uang penerimaan",
     "displayCurrency": "Mata uang tampilan",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Alamat Lightning"
     }
   },
   "NotificationSettingsScreen": {
@@ -2420,6 +2401,7 @@
     "level": "Level {level: string}",
     "switchAccount": "Ganti akun",
     "pleaseWait": "Harap Tunggu.",
+    "probeBalanceFailed": "Tidak dapat memverifikasi saldo dompet. Silakan coba lagi.",
     "accountLevel": "Level Akun",
     "upgrade": "Tingkatkan akun Anda",
     "logOutAndDeleteLocalData": "Keluar dan hapus semua data lokal",
@@ -2459,6 +2441,8 @@
     "copiedAccountId": "ID akun Anda telah disalin ke papan klip",
     "yourAccountId": "ID Akun Anda",
     "accountId": "ID Akun",
+    "publicKey": "Kunci publik",
+    "copiedPublicKey": "Kunci publik disalin ke papan klip",
     "copy": "Salin",
     "identityVerification": "Verifikasi Identitas"
   },
@@ -2489,7 +2473,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Akun penerima default",
-    "info": "Akun Bitcoin Anda untuk mengumpulkan sats, di mana nilai USD bergerak sesuai pasar. Akun Dolar Anda didukung oleh Stablesats — menyimpan Bitcoin yang dilindungi agar tetap stabil dalam nilai USD. Anda selalu memegang Bitcoin, tetapi nilai dolarnya tidak berubah."
+    "info": "Akun Bitcoin Anda untuk mengumpulkan sats, di mana nilai USD bergerak sesuai pasar. Akun Dolar Anda didukung oleh Stablesats — menyimpan Bitcoin yang dilindungi agar tetap stabil dalam nilai USD. Anda selalu memegang Bitcoin, tetapi nilai dolarnya tidak berubah.",
+    "titleSelfCustodial": "Akun default",
+    "infoSelfCustodial": "Akun ini akan digunakan secara default saat menerima dan mengirim. Anda dapat beralih kapan saja."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2507,7 +2493,10 @@
     "header": "Akun Dolar Anda didukung oleh Stablesats",
     "body": "Akun Dolar menggunakan teknologi Stablesats untuk menjaga Bitcoin tetap stabil pada harga USD. Anda selalu memegang Bitcoin — bukan dolar sungguhan — tetapi nilai USD tidak berfluktuasi. Anda dapat mengirim dan menerima Bitcoin seperti biasa, tetapi ini tidak kompatibel dengan sistem perbankan tradisional.",
     "termsAndConditions": "Baca Syarat & Ketentuan",
-    "learnMore": "Pelajari lebih lanjut tentang Stablesats"
+    "learnMore": "Pelajari lebih lanjut tentang Stablesats",
+    "headerSelfCustodial": "Akun Dolar Anda menyimpan stablecoin",
+    "bodySelfCustodial": "Di akun Dolar Anda menyimpan stablecoin. Token yang didukung oleh aset dengan nilai yang dijaga stabil terhadap USD. Anda belum bisa mengirim dan menerima stablecoin. Saat mengirim dari akun Dolar, stablecoin Anda akan ditukar dan dikirim sebagai Bitcoin kepada penerima.",
+    "learnMoreSelfCustodial": "Pelajari selengkapnya"
   },
   "SplashScreen": {
     "update": "Aplikasi Anda sudah usang. Pembaruan diperlukan sebelum aplikasi dapat digunakan.\n\nIni dapat dilakukan melalui PlayStore untuk Android dan Testflight untuk iOS"
@@ -2787,6 +2776,7 @@
     "submit": "Kirim",
     "success": "Berhasil!",
     "dollarStablesats": "Dolar (Stablesats)",
+    "dollarStablecoin": "Dolar (Stablecoin)",
     "to": "Ke",
     "total": "Total",
     "transactions": "Transaksi",
@@ -2831,7 +2821,8 @@
       "invalidRegion": "Pilihan wilayah tidak valid"
     },
     "passwordTooWeak": "Kata sandi terlalu lemah. Gunakan kombinasi huruf besar, huruf kecil, angka, dan karakter khusus.",
-    "passwordCommon": "Kata sandi ini terlalu umum. Silakan pilih kata sandi yang lebih kuat."
+    "passwordCommon": "Kata sandi ini terlalu umum. Silakan pilih kata sandi yang lebih kuat.",
+    "copied": "Disalin ke clipboard"
   },
   "errors": {
     "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",
@@ -3000,7 +2991,10 @@
       "emptyTransactions": "Belum ada transaksi",
       "addFunds": "Tambah dana",
       "transactionsTitle": "Transaksi",
-      "title": "Kartu Visa"
+      "title": "Kartu Visa",
+      "noCardAvailable": "Tidak ada kartu tersedia",
+      "cardNotUsable": "Kartu ini saat ini tidak tersedia untuk digunakan",
+      "cardUpdateError": "Tidak dapat memperbarui status kartu"
     },
     "validThruLabel": "BERLAKU HINGGA",
     "networkVisa": "Visa",
@@ -3272,9 +3266,6 @@
         "damagedCard": "Kartu rusak",
         "damagedCardDescription": "Kartu saya rusak secara fisik",
         "whatHappensNext": "Apa yang terjadi selanjutnya?",
-        "currentCardDeactivated": "Kartu Anda saat ini akan segera dinonaktifkan",
-        "newCardShipped": "Kartu baru akan dikirim ke alamat Anda",
-        "digitalCardAvailable": "Kartu digital Anda tetap tersedia selama proses ini",
         "cardManagement": "Manajemen kartu",
         "bullet1": "Kartu Anda saat ini akan dibekukan demi keamanan",
         "bullet2": "Kartu baru dengan nomor berbeda akan diterbitkan",
@@ -3295,15 +3286,9 @@
         "title": "Tinjau permintaan Anda",
         "subtitle": "Konfirmasi detail penggantian kartu Anda",
         "requestSummary": "Ringkasan permintaan",
-        "reason": "Alasan",
         "delivery": "Pengiriman",
-        "shippingAddress": "Alamat pengiriman",
-        "deliveryCost": "Biaya pengiriman",
         "submitRequest": "Kirim permintaan",
         "importantInformation": "Informasi penting",
-        "processedImmediately": "Permintaan Anda akan segera diproses",
-        "currentCardDeactivated": "Kartu saat ini akan dinonaktifkan setelah konfirmasi",
-        "trackStatus": "Anda dapat melacak status pengiriman kartu baru di aplikasi",
         "issueType": "Alasan",
         "deliveryTime": "Waktu pengiriman",
         "shippingCost": "Biaya pengiriman",
@@ -3356,10 +3341,7 @@
         "feature2": "Chip EMV untuk keamanan yang ditingkatkan",
         "feature3": "Pita magnetik untuk penerimaan universal",
         "feature4": "Nama Anda terembos pada kartu",
-        "important": "Penting",
-        "importantBullet1": "Kartu virtual Anda akan tetap aktif saat Anda menunggu kartu fisik",
-        "importantBullet2": "Anda perlu mengaktifkan kartu fisik saat tiba",
-        "importantBullet3": "Kedua kartu akan memiliki nomor dan detail yang sama"
+        "important": "Penting"
       },
       "Confirm": {
         "title": "Konfirmasi pesanan Anda",
@@ -3488,9 +3470,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Pengelola kata sandi",
       "manualBackup": "Cadangan manual",
-      "keychainSaved": "Cadangan disimpan ke pengelola kata sandi",
-      "keychainFailed": "Gagal menyimpan cadangan",
-      "iOSComingSoon": "Pencadangan iCloud segera hadir"
+      "passwordManagerBackupSaved": "Cadangan disimpan ke pengelola kata sandi",
+      "passwordManagerBackupFailed": "Gagal menyimpan cadangan",
+      "passwordManagerUnavailable": "Tidak ada pengelola kata sandi yang tersedia di perangkat ini. Gunakan cadangan Drive atau simpan frasa 12 kata Anda secara manual."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3507,7 +3489,8 @@
         "saveItNow": "Simpan sekarang",
         "savedConfirm": "Saya sudah menyimpannya",
         "copy": "Salin",
-        "continueButton": "Lanjutkan"
+        "continueButton": "Lanjutkan",
+        "testBackup": "Uji cadanganmu"
       },
       "Confirm": {
         "headerTitle": "Konfirmasi frasa cadangan",
@@ -3518,7 +3501,8 @@
         "incorrectWord": "Kata salah, harap periksa urutannya"
       },
       "Success": {
-        "title": "Selamat datang di Blink non-kustodial"
+        "title": "Selamat datang di Blink non-kustodial",
+        "testSuccess": "Frasa cadanganmu sudah benar"
       }
     },
     "CloudBackup": {
@@ -3537,9 +3521,14 @@
       "passwordMismatch": "Kata sandi tidak cocok",
       "uploadSuccess": "Cadangan disimpan ke {provider}",
       "uploadFailed": "Gagal mengunggah cadangan",
-      "signInFailed": "Gagal masuk ke Google",
+      "signInFailed": "Gagal masuk ke {provider}",
+      "cloudNotAvailable": "iCloud Drive tidak tersedia. Silakan masuk ke iCloud di Pengaturan dan aktifkan iCloud Drive.",
+      "networkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
       "existingBackupTitle": "Cadangan ditemukan",
       "existingBackupMessage": "Cadangan sudah ada di {provider} Anda. Apakah Anda ingin menimpanya?",
+      "existingBackupMessageWithDetails": "Cadangan sudah ada di {provider} Anda.\n\nAlamat Lightning: {address}\nDibuat: {createdAt}\n\nApakah Anda ingin menimpanya?",
+      "existingBackupUnknownAddress": "Tidak tersedia",
+      "existingBackupUnknownCreatedAt": "Tidak diketahui",
       "overwrite": "Timpa"
     }
   },
@@ -3553,8 +3542,8 @@
     "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Kustodian",
+    "selfCustodialLabel": "Non-kustodian",
     "custodialDescription": "Kami menyimpan dana atas nama Anda",
     "selfCustodialDescription": "Hanya Anda yang dapat mengakses dana",
     "continueButton": "Lanjutkan",
@@ -3562,7 +3551,9 @@
     "descriptionSelected": "Silakan pilih jenis akun.",
     "chooseMethod": "Pilih metode",
     "restoreComingSoonTitle": "Segera hadir",
-    "restoreComingSoonDescription": "Fitur pemulihan akan tersedia dalam pembaruan mendatang."
+    "restoreComingSoonDescription": "Fitur pemulihan akan tersedia dalam pembaruan mendatang.",
+    "createFailed": "Gagal membuat dompet. Silakan coba lagi.",
+    "selfCustodialDisabled": "Non-kustodial sementara tidak tersedia."
   },
   "RestoreScreen": {
     "title": "Pulihkan dompet",
@@ -3581,7 +3572,9 @@
     "noBackupFound": "Cadangan tidak ditemukan",
     "noBackupDescription": "Kami tidak dapat menemukan cadangan. Anda dapat memasukkan frasa cadangan secara manual.",
     "enterPassword": "Masukkan kata sandi enkripsi Anda",
-    "wrongPassword": "Kata sandi salah. Silakan coba lagi."
+    "wrongPassword": "Kata sandi salah. Silakan coba lagi.",
+    "pickBackupTitle": "Pilih dompet",
+    "pickBackupDescription": "Pilih cadangan untuk dipulihkan"
   },
   "BackupNudge": {
     "title": "Dana Anda dalam bahaya",
@@ -3590,11 +3583,7 @@
     "settingsWarning": "Cadangkan dompet Anda. Jika Anda kehilangan perangkat ini, Anda akan kehilangan dana.",
     "modalTitle": "Amankan dana Anda",
     "modalDescription": "Kami sangat menyarankan Anda untuk mencadangkan dompet Anda untuk mencegah kehilangan total dana jika Anda kehilangan perangkat ini.",
-    "secureMe": "Amankan dompet",
-    "trustModelTitle": "Anda yang mengendalikan",
-    "trustModelDescription": "Kunci Anda mengendalikan dana Anda. Transaksi diproses oleh operator Spark, bukan langsung di Bitcoin L1.",
-    "trustModelWarning": "Saldo yang sangat kecil mungkin tidak ekonomis untuk dipulihkan ke rantai dasar Bitcoin.",
-    "trustModelDismiss": "Saya mengerti"
+    "secureMe": "Amankan dompet"
   },
   "StableBalance": {
     "title": "Saldo stabil",
@@ -3618,12 +3607,6 @@
       "deactivateConfirm": "Nonaktifkan",
       "cancel": "Batal"
     },
-    "firstTimeModal": {
-      "title": "Tentang Konversi",
-      "dualBalance": "BTC dan USD adalah dua saldo independen di dompet Anda. Gunakan Convert kapan saja untuk memindahkan dana di antara keduanya.",
-      "trustDisclosure": "Mode USD menggunakan token USDB di Spark. Asumsi kepercayaan berbeda dari memegang BTC langsung. USDB bergantung pada penerbit token Spark.",
-      "acknowledge": "Saya mengerti"
-    },
     "minimumConversion": "Konversi minimum: {amount:string}",
     "conversionUnavailable": "Konversi sementara tidak tersedia. Silakan coba lagi."
   },
@@ -3638,7 +3621,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Membuat dompet Anda...",
     "errorTitle": "Gagal membuat dompet",
     "errorDescription": "Terjadi kesalahan. Silakan coba lagi.",
@@ -3674,7 +3657,6 @@
     "description": "Total: {sats} sats tersedia untuk diklaim",
     "claim": "Klaim sekarang",
     "claiming": "Mengklaim...",
-    "belowMinimum": "{count} deposit di bawah minimum (~{minimum} sats). Belum bisa diklaim.",
     "screenTitle": "Deposit yang belum diklaim",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3697,12 +3679,7 @@
     "refundNow": "Kembalikan sekarang",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Siap",
-    "badgePending": "Tertunda",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Kesalahan",
-    "badgeRefunded": "Dikembalikan"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {
@@ -3714,10 +3691,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Penting",
+    "dangerZoneBulletReinstated": "Akun yang dihapus tidak dapat dipulihkan",
+    "dangerZoneBulletPermanent": "Penghapusan akun bersifat permanen",
+    "dangerZoneBulletEmpty": "Pastikan akun kosong",
+    "dangerZoneDeleteButton": "Hapus akun dan data",
+    "confirmModalTitle": "Konfirmasi penghapusan akun",
+    "confirmModalTypeToConfirm": "Ketik \"{delete: string}\" untuk mengonfirmasi",
+    "hasFundsWarningTitle": "Peringatan",
+    "hasFundsWarningBody": "Dompet Anda memiliki saldo {balance}. Demi keamanan Anda, kami tidak mengizinkan penghapusan akun yang masih memiliki dana.",
+    "hasFundsWarningHelper": "Untuk melanjutkan penghapusan, kosongkan akun Anda atau donasikan ke ekonomi sirkular.",
+    "hasFundsWarningButton": "Kembali"
   }
 }

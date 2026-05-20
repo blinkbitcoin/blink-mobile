@@ -1,11 +1,12 @@
 import { TxDirection, TxStatus, WalletCurrency } from "@app/graphql/generated"
+import { DisplayCurrency } from "@app/types/amounts"
 import {
   PaymentType,
   TransactionDirection,
   TransactionStatus,
   type NormalizedTransaction,
-} from "@app/types/transaction.types"
-import { AccountType } from "@app/types/wallet.types"
+} from "@app/types/transaction"
+import { AccountType } from "@app/types/wallet"
 
 import {
   toTransactionFragment,
@@ -209,7 +210,7 @@ describe("toTransactionFragment", () => {
         currency: WalletCurrency.Btc,
         currencyCode: WalletCurrency.Btc,
       }),
-      "USD",
+      DisplayCurrency,
     )
     // The settlement amount stays in USD cents for the display conversion.
     expect(convertMoneyAmount).toHaveBeenCalledWith(
@@ -218,8 +219,67 @@ describe("toTransactionFragment", () => {
         currency: WalletCurrency.Usd,
         currencyCode: WalletCurrency.Usd,
       }),
-      "USD",
+      DisplayCurrency,
     )
+  })
+
+  const currencyCodes = ["USD", "EUR", "GBP", "JPY"]
+  currencyCodes.forEach((currencyCode) => {
+    it(`always converts to the DisplayCurrency literal regardless of the displayCurrency code (${currencyCode})`, () => {
+      const tx = createTx()
+      const convertMoneyAmount = jest.fn().mockReturnValue({
+        amount: 100,
+        currency: DisplayCurrency,
+        currencyCode,
+      })
+
+      toTransactionFragment(tx, {
+        displayCurrency: currencyCode,
+        convertMoneyAmount: convertMoneyAmount as never,
+        fractionDigits: 2,
+      })
+
+      const calls = convertMoneyAmount.mock.calls
+      expect(calls.length).toBeGreaterThan(0)
+      calls.forEach(([, toCurrency]) => {
+        expect(toCurrency).toBe(DisplayCurrency)
+      })
+    })
+  })
+
+  it("produces a numeric settlementDisplayAmount for a non-USD displayCurrency (no NaN)", () => {
+    const tx = createTx({ direction: TransactionDirection.Receive })
+    const convertMoneyAmount = jest.fn().mockReturnValue({
+      amount: 79, // EUR cents
+      currency: DisplayCurrency,
+      currencyCode: "EUR",
+    })
+
+    const result = toTransactionFragment(tx, {
+      displayCurrency: "EUR",
+      convertMoneyAmount: convertMoneyAmount as never,
+      fractionDigits: 2,
+    })
+
+    expect(result.settlementDisplayAmount).toBe("0.79")
+    expect(Number.isNaN(Number(result.settlementDisplayAmount))).toBe(false)
+  })
+
+  it("preserves the displayCurrency code in settlementDisplayCurrency for non-USD", () => {
+    const tx = createTx()
+    const convertMoneyAmount = jest.fn().mockReturnValue({
+      amount: 100,
+      currency: DisplayCurrency,
+      currencyCode: "EUR",
+    })
+
+    const result = toTransactionFragment(tx, {
+      displayCurrency: "EUR",
+      convertMoneyAmount: convertMoneyAmount as never,
+      fractionDigits: 2,
+    })
+
+    expect(result.settlementDisplayCurrency).toBe("EUR")
   })
 })
 

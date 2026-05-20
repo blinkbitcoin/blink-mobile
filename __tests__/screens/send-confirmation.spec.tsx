@@ -16,6 +16,37 @@ import {
 } from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.stories"
 import { ContextForScreen } from "./helper"
 
+jest.mock("@app/store/persistent-state", () => ({
+  ...jest.requireActual("@app/store/persistent-state"),
+  usePersistentStateContext: () => ({
+    persistentState: {
+      schemaVersion: 11,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+    },
+    updateState: jest.fn(),
+    resetState: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    accounts: [],
+    activeAccount: undefined,
+    selfCustodialEntries: [],
+    setActiveAccountId: jest.fn(),
+    reloadSelfCustodialAccounts: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/hooks/use-effective-display-currency", () => ({
+  useEffectiveDisplayCurrency: () => ({
+    displayCurrency: "NGN",
+    setDisplayCurrency: jest.fn(),
+    loading: false,
+  }),
+}))
+
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   useSendBitcoinConfirmationScreenQuery: jest.fn(() => ({
@@ -569,7 +600,7 @@ const buildUsdSettlementRoute = (
   } as const
 }
 
-describe("SendBitcoinConfirmationScreen — Critical #4 fee-currency conversion", () => {
+describe("SendBitcoinConfirmationScreen — fee-currency conversion", () => {
   beforeEach(() => {
     // Balance: $10.00 = 1000 cents.
     mockUseSendBalances.mockReturnValue({
@@ -633,7 +664,7 @@ describe("SendBitcoinConfirmationScreen — Critical #4 fee-currency conversion"
   })
 })
 
-describe("SendBitcoinConfirmationScreen — Critical #5 skipBalanceCheck matrix", () => {
+describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
   beforeEach(() => {
     // Settlement $11.00 (1100 cents) is always over the $10.00 (1000 cents) balance.
     mockUseSendBalances.mockReturnValue({

@@ -37,7 +37,7 @@ const baseFlags: Flags = {
   hasCustodialAccount: false,
 }
 
-describe("rolloutLoggedRef once-per-session dedup (Important #12)", () => {
+describe("rolloutLoggedRef once-per-session dedup", () => {
   it("does not log while remoteConfigReady is false", () => {
     const log = jest.fn()
     renderHook(() => useRolloutExposureLogger(false, baseFlags, log))

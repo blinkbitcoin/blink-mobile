@@ -8,7 +8,7 @@ import type {
   PaymentError,
   ReceiveLightningAdapter,
   ReceiveOnchainAdapter,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 
 const receiveError = (message: string) => ({
   errors: [{ message }] as PaymentError[],

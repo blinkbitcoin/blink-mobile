@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "Ինչպե՞ս օգտագործել վճարումներ ստանալու ծրագիրը",
     "howToUseYourAddressExplainer": "Կիսվել մեկի հետ, ով ունի համատեղելի դրամապանակ, օրինակ․",
     "howToUseYourPaycodeExplainer": "Դուք կարող եք տպել Ձեր վճարային ծածկագիրը (տեխնիկապես սա Inurl-pay հասցե է) և ցուցադրել այն Ձեր բիզնեսում, որպեսզի ստանաք վճարումներ։ Անհատները կարող են Ձեզ վճարել սկանավորելով այն Կայծակնային դրամապանակի միջոցով։ \n\nԱյնուամենայնիվ, հիշե՛ք, որ որոշ դրամապանակներ չեն կարող սկանավորել վճարման ծածկագիրը․ ",
-    "howToUseYourCashRegisterExplainer": "Թույլ տվեք մարդկանց հավաքել վճարումներ ստանալու ծրագրի հղման միջոցով և առանց մուտք գործելու Ձեր դրամապանակ։ \n\nՆրանք կարող են վճարման հարցումներ ստեղծել, և վճարումները կուղարկվեն անմիջապես Ձեր {bankName: string} դրամապանակին:",
-    "yourAddress": "Ձեր {bankName: string} հասցեն",
-    "copiedAddressToClipboard": "Հասցեն {bankName: string} պատճենվեց ժամանակավոր շտեմարանում"
+    "howToUseYourCashRegisterExplainer": "Թույլ տվեք մարդկանց հավաքել վճարումներ ստանալու ծրագրի հղման միջոցով և առանց մուտք գործելու Ձեր դրամապանակ։ \n\nՆրանք կարող են վճարման հարցումներ ստեղծել, և վճարումները կուղարկվեն անմիջապես Ձեր {bankName: string} դրամապանակին:"
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "Պայմաններ և պայմանագրեր",
@@ -64,7 +62,8 @@
     "title": "Փոխակերպել",
     "transfer": "Փոխանցում",
     "percentageToConvert": "փոխակերպելու %",
-    "reviewTransfer": "Ստուգել փոխանցումը"
+    "reviewTransfer": "Ստուգել փոխանցումը",
+    "dustError": "Ամբողջ մնացորդը պետք է փոխանցվի։"
   },
   "ConversionConfirmationScreen": {
     "title": "Ստուգել փոխակերպումը",
@@ -74,13 +73,10 @@
     "infoDollar": "Դոլարի գումարը մոտավորապես է։ Այն կարող է փոքր-ինչ տարբերվել։",
     "transferButtonText": "Փոխանցել {fromWallet}-ից {toWallet}",
     "feeLabel": "Փոխարկման վճար",
-    "feeError": "Չհաջողվեց ստանալ փոխարկման վճարը",
-    "amountFloored": "Գումարն ավելացվեց փոխարկման նվազագույնին հասնելու համար։",
-    "amountDustBumped": "Գումարն ավելացվեց ամբողջ մնացորդդ փոխարկելու համար։"
+    "feeError": "Չհաջողվեց ստանալ փոխարկման վճարը"
   },
   "ConversionSuccessScreen": {
-    "message": "Փոխակերպումը հաջողությամբ է կատարվել",
-    "title": "Հաջող փոխակերպում"
+    "message": "Փոխակերպումը հաջողությամբ է կատարվել"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2076,12 +2072,7 @@
     "payBusiness": "վճարել այս բիզնեսը",
     "openSettings": "Բացել կարգավորումները",
     "title": "Քարտեզ",
-    "error": "Վայ։ Ինչ-որ բան այնպես չգնաց ձեր տեղադրությունը ստանալիս",
-    "locationPermissionMessage": "Ակտիվացրեք Ձեր տեղորոշման տվյալները, որպեսզի իմանաք քարտեզի վրա Ձեր դիրքի մասին ",
-    "locationPermissionNegative": "Չեղարկել ",
-    "locationPermissionNeutral": "Հարցնել ավելի ուշ",
-    "locationPermissionPositive": "OK ",
-    "locationPermissionTitle": "Ընտրեք Ձեր գտնվելու վայրը քարտեզի վրա"
+    "error": "Վայ։ Ինչ-որ բան այնպես չգնաց ձեր տեղադրությունը ստանալիս"
   },
   "HomeScreen": {
     "receive": "Ստանալ",
@@ -2173,8 +2164,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ավանդի վճար: {fee} SAT մինչև {threshold} SAT գումարների համար կամ {overFee} SAT {threshold} SAT-ից բարձր ավանդների համար",
     "autoConvertMinAmount": "{minSats: number} սաթերից պակաս գումարները չեն կարող ավտոմատ կերպով փոխարկվել Դոլարի։ Դուք կստանաք Bitcoin։",
-    "autoConvertSuccess": "Ստացվեց {amount: number} սաթ, փոխարկվեց Դոլարի։",
-    "autoConvertFailed": "Վճարումը ստացվեց, սակայն փոխարկումը չհաջողվեց։"
+    "autoConvertFailed": "Վճարումը ստացվեց, սակայն փոխարկումը չհաջողվեց։",
+    "pleaseWaitForConversion": "Խնդրում ենք սպասել, մինչև փոխարկումն ավարտվի"
   },
   "RedeemBitcoinScreen": {
     "title": "Հետ գնել Բիթքոյն",
@@ -2265,16 +2256,7 @@
     "clipboardError": "Չհաջողվեց արժեք ստանալ ժամանակավոր շտեմարանից",
     "pastedClipboardSuccess": "Տեղադրվեց ջամանակավոր շտեմարանից",
     "invalidPhoneNumber": "Մուտքագրեք վավեր բջջային հեռախոսահամար",
-    "phoneNotAllowed": "Այս դաշտը չի ընդունում հեռախոսահամարներ",
-    "confirmModal": {
-      "title": "Դուք երբեք գումար չեք ուղարկել այս հասցեին։ ",
-      "body1": "Խնդրում ենք համոզվել, որ ստացողը Ձեզ տրամադրել է {bankName: string} հասցե, ",
-      "bold2bold": "և ոչ մեկ այլ դրամապանակի օգտանուն։",
-      "body3": "Հակառակ դեպքում գումարը կփոխանցվի {bankName: string} հաշվին, որն ունի «{lnAddress: string}» հասցե:\n\nՍտուգեք նաև հասցեի առաջին մասի ուղղագրությունը։ օր. jackie-ն և jack1e-ն 2 տարբեր հասցեներ են",
-      "warning": "Եթե {bankName: string} հասցեն սխալ է մուտքագրվել, {bankName: string}-ը չի կարող հետարկել գործառնությունը։ ",
-      "checkBox": "{lnAddress: string} ճիշտ հասցեն է։ ",
-      "confirmButton": "Ես 100% վստահ եմ"
-    }
+    "phoneNotAllowed": "Այս դաշտը չի ընդունում հեռախոսահամարներ"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Գործարքը պետք է ուղարկվի mempool",
@@ -2328,8 +2310,6 @@
     "slow": "Դանդաղ",
     "recommended": "Առաջարկվող",
     "walletOffline": "Ձեր դրամապանակն անցանց է։ Խնդրում ենք ստուգել կապը և նորից փորձել։",
-    "destinationIsRequired": "Հարկավոր է հասցեատեր",
-    "lnurlInvoiceIncorrectDescription": "Inurl սերվերը պատասխանել է սխալ մեթատվյալ պարունակով հեշով վճարման հարցմամբ։",
     "sdkInsufficientFunds": "Այս գործարքի համար բավարար միջոցներ չկան։",
     "sdkAmountTooLow": "Գումարը չափազանց փոքր է on-chain գործարքի համար։",
     "sdkNetworkError": "Ցանցի սխալ։ Խնդրում ենք ստուգել ձեր կապը և փորձել կրկին։",
@@ -2350,7 +2330,6 @@
     "nonCustodialAccount": "Ոչ պահպանող հաշիվ",
     "tapUserName": "Սեղմել՝ օգտանուն սահմանելու համար",
     "notifications": "Notifications",
-    "recoveryMethod": "Վերականգնման մեթոդ",
     "title": "Կարգավորումներ",
     "darkMode": "Գիշերային ռեժիմ",
     "setToDark": "Ռեժիմ՝ գիշերային։ ",
@@ -2377,28 +2356,12 @@
     "receiveCurrency": "Ստացման արժույթ",
     "displayCurrency": "Ցուցադրման արժույթ",
     "AccountInformation": {
-      "accountTypeLabel": "Հաշվի տեսակը",
       "identityLabel": "Դրամապանակի նույնացուցիչ",
       "lightningAddressLabel": "Lightning հասցե",
       "backupStatusLabel": "Պահուստավորման վիճակ",
       "backupStatusCompleted": "Պահուստավորումը ավարտված է",
       "backupStatusNotCompleted": "Պահուստավորումը ավարտված չէ",
       "loadError": "Չհաջողվեց բեռնել ձեր հաշվի տեղեկությունները։"
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning և on-chain գործարքները հետևում են Bitcoin արձանագրության սահմանափակումներին։ Ստորև նշված փոխարկման սահմանաչափերը կիրառվում են Spark ցանցի կողմից։",
-      "btcToUsdTitle": "Բիթքոյնից դոլար",
-      "usdToBtcTitle": "Դոլարից բիթքոյն",
-      "minFromLabel": "Նվազագույն ուղարկված",
-      "minToLabel": "Նվազագույն ստացված",
-      "loadError": "Չհաջողվեց բեռնել փոխարկման սահմանաչափերը։"
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning հասցե",
-      "lightningAddressDescription": "Կիսվեք այս հասցեով՝ Lightning վճարումներ անմիջապես ստանալու համար։",
-      "onchainTitle": "Bitcoin ավանդի հասցե",
-      "onchainDescription": "Կիսվեք այս հասցեով՝ Bitcoin on-chain ստանալու համար։",
-      "loadError": "Չհաջողվեց բեռնել ձեր վճարման տվյալները։"
     }
   },
   "NotificationSettingsScreen": {
@@ -2438,6 +2401,7 @@
     "level": "Մակարդակ {level: string}",
     "switchAccount": "Փոխել հաշիվը",
     "pleaseWait": "Խնդրում ենք սպասել։",
+    "probeBalanceFailed": "Չհաջողվեց ստուգել դրամապանակի մնացորդը: Խնդրում ենք կրկին փորձել:",
     "accountLevel": "Հաշվի մակարդակ",
     "upgrade": "Թարմացրել Ձեր հաշիվը",
     "logOutAndDeleteLocalData": "Դուրս գալ և ջնջել բոլոր տվյալները",
@@ -2477,6 +2441,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "Հաշվի ID",
+    "publicKey": "Հանրային բանալի",
+    "copiedPublicKey": "Հանրային բանալին պատճենվել է հիշապահոցում",
     "copy": "Պատճենել",
     "identityVerification": "Ինdelays delays"
   },
@@ -2507,7 +2473,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Լռացուցիչ ստանալու հաշիվ",
-    "info": "Ձեր Բիթքոյն հաշիվ-ը նախատեսված է sats կուտակելու համար, որտեղ USD արժեքը շարժվում է շուկայի հետ: Ձեր Դոլար հաշիվ-ը աշխատեցնվում է Stablesats-ի միջոցով — այն պահում է Bitcoin, որը ապահովագրված է USD արժեքով կայուն մնալու համար: Ձեր միշտ պահում եք Bitcoin, բայց դոլարային արժեքը չի փոխվում:"
+    "info": "Ձեր Բիթքոյն հաշիվ-ը նախատեսված է sats կուտակելու համար, որտեղ USD արժեքը շարժվում է շուկայի հետ: Ձեր Դոլար հաշիվ-ը աշխատեցնվում է Stablesats-ի միջոցով — այն պահում է Bitcoin, որը ապահովագրված է USD արժեքով կայուն մնալու համար: Ձեր միշտ պահում եք Bitcoin, բայց դոլարային արժեքը չի փոխվում:",
+    "titleSelfCustodial": "Կանխադրված հաշիվ",
+    "infoSelfCustodial": "Այս հաշիվը կօգտագործվի լռելյայն ստանալու և ուղարկելու համար: Կարող եք փոխել ցանկացած պահի:"
   },
   "ThemeScreen": {
     "title": "Ոճ",
@@ -2525,7 +2493,10 @@
     "header": "Ձեր Դոլար հաշիվ-ը աշխատեցնվում է Stablesats-ի միջոցով",
     "body": "Դոլար հաշիվ-ը օգտագործում է Stablesats տեխնոլոգիանը Bitcoin-ը USD գնով կայուն պահելու համար: Ձեր միշտ պահում եք Bitcoin — ոչ իրական դոլարներ — բայց USD արժեքը չի տատանվում: Ձեր կարող եք Bitcoin ուղարկել և ստանալ սովորականի պես, բայց սա համատեղելի չէ ավանդական բանկային համակարգի հետ:",
     "termsAndConditions": "Կարդալ պայմաններն ու դրույթները",
-    "learnMore": "Իմանալ ավելին Stableսատերի մասին։ "
+    "learnMore": "Իմանալ ավելին Stableսատերի մասին։ ",
+    "headerSelfCustodial": "Ձեր Դոլարային հաշիվը պահում է կայուն մետաղադրամներ",
+    "bodySelfCustodial": "Դոլարային հաշվում դուք պահում եք կայուն մետաղադրամներ։ Տոկեններ, որոնք ապահովված են ակտիվներով և որոնց արժեքը պահպանվում է կայուն ԱՄՆ դոլարի նկատմամբ։ Դուք դեռ չեք կարող ուղարկել և ստանալ կայուն մետաղադրամներ։ Երբ ուղարկում եք Դոլարային հաշվից, ձեր կայուն մետաղադրամները փոխանակվում են և ուղարկվում որպես Բիթքոին ստացողին։",
+    "learnMoreSelfCustodial": "Իմացիր ավելին"
   },
   "SplashScreen": {
     "update": "Ձեր հավելվածը ունի թարմացման կարիք: Հավելվածն օգտագործելուց առաջ անհրաժեշտ է թարմացում:\n\nԴա կարելի է անել PlayStore-ից՝ Android-ի և Testflight-ից՝ iOS-ի համար"
@@ -2805,6 +2776,7 @@
     "submit": "Հաստատել",
     "success": "Հաջողությու՛ն։ ",
     "dollarStablesats": "Դոլար (Stablesats)",
+    "dollarStablecoin": "Դոլար (Stablecoin)",
     "to": "ստացող",
     "total": "Ընդհանուր",
     "transactions": "Գործառնություններ",
@@ -2849,7 +2821,8 @@
       "invalidRegion": "Անվավեր տարածաշրջանի ընտրություն"
     },
     "passwordTooWeak": "Գաղտնաբառը չափազանց թույլ է։ Օգտագործեք մեծատառերի, փոքրատառերի, թվերի և հատուկ նշանների համադրություն։",
-    "passwordCommon": "Այս գաղտնաբառը չափազանց տարածված է։ Խնդրում ենք ընտրել ավելի ուժեղ գաղտնաբառ։"
+    "passwordCommon": "Այս գաղտնաբառը չափազանց տարածված է։ Խնդրում ենք ընտրել ավելի ուժեղ գաղտնաբառ։",
+    "copied": "Պատճենվեց սեղմատախտակին"
   },
   "errors": {
     "generic": "Սխալ\nՓորձեք կրկին ավելի ուշ։ ",
@@ -2978,27 +2951,6 @@
       "title": "Հունիսյան մարտահրավեր՝",
       "description": "Delays delays delays delays delays delays delays 10-delays Adopting Bitcoin El Salvador-delays $1000 delays delays delays delays delays delays delays delays delays delays delays",
       "details": "Delays delays delays delays delays Adopting Bitcoin El Salvador-delays\n\nDelays delays delays delays delays delays delays 10-delays Adopting Bitcoin El Salvador-delays $1000 delays delays delays delays delays delays delays delays delays delays delays Delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays delays\n\nDelays delays delays delays delays delays delays delays delays delays delays #blinkcircles delays delays delays delays delays delays delays\n\nDelays delays delays delays delays delays delays delays"
-    },
-    "septChallenge": {
-      "title": "September Challenge!",
-      "description": "Inner Circle {innerCircle: number}/21 - Earn $21\nTop 3 - Win tickets to Adopting Bitcoin!",
-      "details": "Grow your inner circle by 21 people in September and share on social with #blinkcircles to get $21 to your Stablesats account. Top 3 win tickets to Adopting Bitcoin!",
-      "peopleWelcomedSoFar": "people welcomed so far",
-      "yourRank": "your rank",
-      "reminder": "Reminder: Your inner circle grows when you send a new Blink user their first sats",
-      "fullDetails": "Full details at"
-    },
-    "octoberChallenge": {
-      "title": "October Challenge!",
-      "description": "Share your #blinkcircles for a chance to win 1,000,000 sats!",
-      "details": "We're giving away 1,000,000 sats!\n\n Share your Circles on social with tag `#blinkcircles` to enter! The winner will be chosen at random on October 31st.\n\n You must have at least one person in your Inner Circle to enter!",
-      "connectOnSocial": "Connect on social: ",
-      "fullDetails": "Full details at "
-    },
-    "novemberChallenge": {
-      "title": "November Challenge!",
-      "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-      "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
     }
   },
   "FullOnboarding": {
@@ -3022,9 +2974,6 @@
     "title": "Ծանուցումներ",
     "noNotifications": "Դուք այս պահին ծանուցումներ չունեք"
   },
-  "Fake": {
-    "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
-  },
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Սպասման մեջ",
@@ -3042,7 +2991,10 @@
       "emptyTransactions": "Դեռ գործարքներ չկան",
       "addFunds": "Ավելացնել միջոցներ",
       "transactionsTitle": "Գործարքներ",
-      "title": "Visa քարտ"
+      "title": "Visa քարտ",
+      "noCardAvailable": "Հասանելի քարտեր չկան",
+      "cardNotUsable": "Այս քարտը ներկայումս հասանելի չէ օգտագործման համար",
+      "cardUpdateError": "Չհաջողվեց թարմացնել քարտի կարգավիճակը"
     },
     "validThruLabel": "Վավեր է մինչև",
     "networkVisa": "Visa",
@@ -3314,9 +3266,6 @@
         "damagedCard": "Վնասված քարտ",
         "damagedCardDescription": "Իմ քարտը ֆիզիկապես վնասված է",
         "whatHappensNext": "Ի՞նչ է լինելու հաջորդը",
-        "currentCardDeactivated": "Ձեր ընթացիկ քարտը անմիջապես ապաակտիվացվի",
-        "newCardShipped": "Նոր քարտը կառաքվի ձեր հասցեով",
-        "digitalCardAvailable": "Այս ընթացքում ձեր թվային քարտը կմնա հասանելի",
         "cardManagement": "Քարտի կառավարում",
         "bullet1": "Ձեր ընթացիկ քարտը անվտանգության համար կսառեցվի",
         "bullet2": "Կտրամադրվի նոր քարտ տարբեր համարներով",
@@ -3337,15 +3286,9 @@
         "title": "Վերանայեք ձեր հարցումը",
         "subtitle": "Խնդրում ենք հաստատել ձեր քարտի փոխարինման տվյալները",
         "requestSummary": "Հարցման ամփոփում",
-        "reason": "Պատճառ",
         "delivery": "Առաքում",
-        "shippingAddress": "Առաքման հասցե",
-        "deliveryCost": "Առաքման արժեք",
         "submitRequest": "Ուղարկել հարցումը",
         "importantInformation": "Կարևոր տեղեկություն",
-        "processedImmediately": "Ձեր հարցումը կմշակվի անմիջապես",
-        "currentCardDeactivated": "Ընթացիկ քարտը հաստատումից հետո ապաակտիվացվի",
-        "trackStatus": "Դուք կարող եք հետևել ձեր նոր քարտի առաքման կարգավիճակին հավելվածում",
         "issueType": "Խնդրի տեսակը",
         "deliveryTime": "Առաքման ժամկետը",
         "shippingCost": "Առաքման արժեքը",
@@ -3398,10 +3341,7 @@
         "feature2": "EMV չիպ՝ բարձրացված անվտանգության համար",
         "feature3": "Մագնիսական շերտ՝ համընդհանուր ընդունելիության համար",
         "feature4": "Ձեր անունը քարտի վրա դրոշմված",
-        "important": "Կարևոր",
-        "importantBullet1": "Ձեր վիրտուալ քարտը կմնա ակտիվ, մինչև սպասեք ֆիզիկական քարտին",
-        "importantBullet2": "Ֆիզիկական քարտը ստանալուց հետո պետք է այն ակտիվացնեք",
-        "importantBullet3": "Երկու քարտերն էլ կունենան նույն քարտի համարը և տվյալները"
+        "important": "Կարևոր"
       },
       "Confirm": {
         "title": "Հաստատեք ձեր պատվերը",
@@ -3530,9 +3470,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Գաղտնաբառերի կառավարիչ",
       "manualBackup": "Ձեռքով պահուստավորում",
-      "keychainSaved": "Պահուստավորումը պահպանվել է գաղտնաբառերի կառավարչում",
-      "keychainFailed": "Չհաջողվել պահուստավորումը",
-      "iOSComingSoon": "iCloud-ի պահուստավորումը շուտով հասանելի կլինի"
+      "passwordManagerBackupSaved": "Պահուստավորումը պահպանվել է գաղտնաբառերի կառավարչում",
+      "passwordManagerBackupFailed": "Չհաջողվել պահուստավորումը",
+      "passwordManagerUnavailable": "Այս սարքում գաղտնաբառերի կառավարիչ չկա։ Օգտագործեք Drive-ի պահուստը կամ պահպանեք ձեր 12-բառ արտահայտությունը ձեռքով։"
     },
     "ManualBackup": {
       "Alerts": {
@@ -3549,7 +3489,8 @@
         "saveItNow": "Պահպանեք հիմա",
         "savedConfirm": "Ես պահպանել եմ",
         "copy": "Պատճենել",
-        "continueButton": "Շարունակել"
+        "continueButton": "Շարունակել",
+        "testBackup": "Փորձարկեք ձեր պահեստավորումը"
       },
       "Confirm": {
         "headerTitle": "Հաստատեք պահուստային արտահայտությունը",
@@ -3560,7 +3501,8 @@
         "incorrectWord": "Սխալ բառ, խնդրում ենք ստուգել կարգը"
       },
       "Success": {
-        "title": "Բարի գալուստ ոչ պահառու Blink"
+        "title": "Բարի գալուստ ոչ պահառու Blink",
+        "testSuccess": "Ձեր պահեստավորման բառակապակցությունը ճիշտ է"
       }
     },
     "CloudBackup": {
@@ -3579,9 +3521,14 @@
       "passwordMismatch": "Գաղտնաբառերը չեն համընկնում",
       "uploadSuccess": "Պահուստային պատճենը պահպանվել է {provider}-ում",
       "uploadFailed": "Պահուստային պատճենի վերբեռնումը ձախողվեց",
-      "signInFailed": "Google-ի մուտքը ձախողվեց",
+      "signInFailed": "{provider}-ին մուտքը ձախողվեց",
+      "cloudNotAvailable": "iCloud Drive հասանելի չէ։ Մուտք գործեք iCloud Կարգավորումներից և միացրեք iCloud Drive-ը։",
+      "networkError": "Ցանցի սխալ։ Ստուգեք միացումը և կրկին փորձեք։",
       "existingBackupTitle": "Պահուստային պատճեն գտնվել է",
       "existingBackupMessage": "Ձեր {provider}-ում արդեն պահուստային պատճեն կա: Ուզում եք վերագրե՞լ:",
+      "existingBackupMessageWithDetails": "Ձեր {provider}-ում արդեն կա պահուստ։\n\nLightning հասցե՝ {address}\nՍտեղծվել է՝ {createdAt}\n\nՑանկանու՞մ եք վերագրել այն։",
+      "existingBackupUnknownAddress": "Հասանելի չէ",
+      "existingBackupUnknownCreatedAt": "Անհայտ",
       "overwrite": "Վերագրել"
     }
   },
@@ -3595,8 +3542,8 @@
     "transferringFunds": "Ձեր միջոցները փոխանցվում են։ Դա պետք է ավարտվի մի քանի վայրկյանի ընթացքում։"
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Պահառությամբ",
+    "selfCustodialLabel": "Ինքնապահառությամբ",
     "custodialDescription": "Մենք պահում ենք միջոցները ձեր անունից",
     "selfCustodialDescription": "Միայն դուք կարող եք մուտք գործել միջոցներին",
     "continueButton": "Շարունակել",
@@ -3604,7 +3551,9 @@
     "descriptionSelected": "Խնդրում ենք ընտրել հաշվի տեսակը։",
     "chooseMethod": "Ընտրեք եղանակը",
     "restoreComingSoonTitle": "Շուտով",
-    "restoreComingSoonDescription": "Վերականգնման գործառույթը հասանելի կլինի ապագա թարմացման մեջ։"
+    "restoreComingSoonDescription": "Վերականգնման գործառույթը հասանելի կլինի ապագա թարմացման մեջ։",
+    "createFailed": "Չհաջողվեց ստեղծել դրամապանակը: Խնդրում ենք կրկին փորձել:",
+    "selfCustodialDisabled": "Ոչ պահպանողականը ժամանակավորապես անհասանելի է։"
   },
   "RestoreScreen": {
     "title": "Վերականգնել դրամապանակը",
@@ -3623,7 +3572,9 @@
     "noBackupFound": "Պահուստային պատճեն չի գտնվել",
     "noBackupDescription": "Չհաջողվեց գտնել պահուստային պատճեն։ Փոխարենը կարող եք ձեռքով մուտքագրել ձեր պահուստային արտահայտությունը։",
     "enterPassword": "Մուտքագրեք ձեր գաղտնագրման գաղտնաբառը",
-    "wrongPassword": "Սխալ գաղտնաբառ։ Խնդրում ենք կրկին փորձել։"
+    "wrongPassword": "Սխալ գաղտնաբառ։ Խնդրում ենք կրկին փորձել։",
+    "pickBackupTitle": "Ընտրեք դրամապանակ",
+    "pickBackupDescription": "Ընտրեք պահեստավորում վերականգնելու համար"
   },
   "BackupNudge": {
     "title": "Ձեր միջոցները վտանգի տակ են",
@@ -3632,11 +3583,7 @@
     "settingsWarning": "Պահուստավորեք ձեր դրամապանակը։ Եթե կորցնեք այս սարքը, կկորցնեք ձեր միջոցները։",
     "modalTitle": "Ապահովեք ձեր միջոցները",
     "modalDescription": "Խիստ խորհուրդ ենք տալիս պահուստավորել ձեր դրամապանակը՝ միջոցների ամբողջական կորուստը կանխելու համար, եթե կորցնեք այս սարքը։",
-    "secureMe": "Ապահովել դրամապանակը",
-    "trustModelTitle": "Վերահսկողությունը ձեր ձեռքում է",
-    "trustModelDescription": "Ձեր բանալիներն են վերահսկում ձեր միջոցները։ Գործարքները մշակում են Spark օպերատորները, այլ ոչ թե ուղղակիորեն վավերացվում են Bitcoin L1-ում։",
-    "trustModelWarning": "Շատ փոքր մնացորդները Bitcoin-ի բազային շղթայում վերականգնելը կարող է տնտեսապես նպատակահարմար չլինել։",
-    "trustModelDismiss": "Հասկացա"
+    "secureMe": "Ապահովել դրամապանակը"
   },
   "StableBalance": {
     "title": "Կայուն մնացորդ",
@@ -3660,12 +3607,6 @@
       "deactivateConfirm": "Ապաակտիվացնել",
       "cancel": "Չեղարկել"
     },
-    "firstTimeModal": {
-      "title": "Փոխարկման մասին",
-      "dualBalance": "BTC-ն և USD-ն ձեր դրամապանակում երկու անկախ մնացորդներ են։ Ցանկացած պահի օգտագործեք Convert-ը՝ դրանց միջև միջոցներ տեղափոխելու համար։",
-      "trustDisclosure": "USD ռեժիմը օգտագործում է USDB թոքեններ Spark-ում։ Վստահության ենթադրությունները տարբերվում են BTC-ի ուղղակի պահելուց. USDB-ն հիմնված է Spark-ի թոքեն թողարկողի վրա։",
-      "acknowledge": "Ես հասկանում եմ"
-    },
     "minimumConversion": "Նվազագույն փոխարկում. {amount:string}",
     "conversionUnavailable": "Փոխարկումը ժամանակավորապես անհասանելի է։ Խնդրում ենք փորձել կրկին։"
   },
@@ -3680,7 +3621,7 @@
     "featureEarn": "Վաստակել",
     "featureCard": "Քարտ"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Ստեղծում ենք ձեր դրամապանակը...",
     "errorTitle": "Դրամապանակի ստեղծումը ձախողվեց",
     "errorDescription": "Ինչ-որ բան սխալ գնաց։ Խնդրում ենք կրկին փորձել։",
@@ -3716,7 +3657,6 @@
     "description": "Ընդամենը՝ {sats} sats, հասանելի պահանջման համար",
     "claim": "Պահանջել հիմա",
     "claiming": "Պահանջվում է...",
-    "belowMinimum": "{count} ավանդ(ներ) նվազագույնից ցածր են (~{minimum} sats)։ Դրանք դեռ հնարավոր չէ պահանջել։",
     "screenTitle": "Չպահանջված ավանդներ",
     "cardTitle": "Պահանջել {sats} sats",
     "claimWithFee": "Պահանջել (առավելագույն վճար՝ {fee} sats)",
@@ -3739,12 +3679,7 @@
     "refundNow": "Վերադարձնել հիմա",
     "refundSuccess": "Վերադարձը հաջողությամբ սկսվեց",
     "claimSuccess": "Ավանդը հաջողությամբ պահանջվեց",
-    "error": "Չհաջողվեց պահանջել այս ավանդը",
-    "badgeReady": "Պատրաստ",
-    "badgePending": "Սպասման մեջ",
-    "badgeFeeIssue": "Վճարի խնդիր",
-    "badgeError": "Սխալ",
-    "badgeRefunded": "Վերադարձված"
+    "error": "Չհաջողվեց պահանջել այս ավանդը"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {
@@ -3756,10 +3691,16 @@
     "degradedBanner": "Spark ցանցը ներկայումս թուլացած է։ Վճարումները կարող են ավելի երկար տևել։"
   },
   "SelfCustodialDelete": {
-    "title": "Ինքնապահպանվող դրամապանակի ջնջում",
-    "warning": "Սա կհեռացնի այս դրամապանակը այս սարքից։",
-    "recoveryNote": "Եթե պահել եք պահուստային արտահայտությունը, կարող եք վերականգնել այս դրամապանակը ցանկացած սարքում։ Եթե ոչ, կկորցնեք մուտքը ձեր միջոցներին։",
-    "backupBadgeCompleted": "Պահուստավորումը ավարտված է",
-    "backupBadgeMissing": "Պահուստավորումը ավարտված չէ"
+    "dangerZoneImportantTitle": "Կարևոր",
+    "dangerZoneBulletReinstated": "Ջնջված հաշիվը հնարավոր չէ վերականգնել",
+    "dangerZoneBulletPermanent": "Հաշվի ջնջումը մշտական է",
+    "dangerZoneBulletEmpty": "Համոզվեք, որ հաշիվը դատարկ է",
+    "dangerZoneDeleteButton": "Ջնջել հաշիվը և տվյալները",
+    "confirmModalTitle": "Հաստատել հաշվի ջնջումը",
+    "confirmModalTypeToConfirm": "Մուտքագրեք \"{delete: string}\" հաստատելու համար",
+    "hasFundsWarningTitle": "Զգուշացում",
+    "hasFundsWarningBody": "Ձեր դրամապանակում առկա է {balance} միջոցներ։ Ձեր անվտանգության համար մենք թույլ չենք տալիս ջնջել միջոցներ պարունակող հաշիվներ։",
+    "hasFundsWarningHelper": "Ջնջումը շարունակելու համար դատարկեք ձեր հաշիվը կամ նվիրաբերեք շրջանաձև տնտեսություններին։",
+    "hasFundsWarningButton": "Հետ"
   }
 }

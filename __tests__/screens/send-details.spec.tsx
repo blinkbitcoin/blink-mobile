@@ -31,6 +31,37 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }))
 
+jest.mock("@app/store/persistent-state", () => ({
+  ...jest.requireActual("@app/store/persistent-state"),
+  usePersistentStateContext: () => ({
+    persistentState: {
+      schemaVersion: 11,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+    },
+    updateState: jest.fn(),
+    resetState: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    accounts: [],
+    activeAccount: undefined,
+    selfCustodialEntries: [],
+    setActiveAccountId: jest.fn(),
+    reloadSelfCustodialAccounts: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/hooks/use-effective-display-currency", () => ({
+  useEffectiveDisplayCurrency: () => ({
+    displayCurrency: "NGN",
+    setDisplayCurrency: jest.fn(),
+    loading: false,
+  }),
+}))
+
 jest.mock("@react-native-firebase/app-check", () => {
   return () => ({
     initializeAppCheck: jest.fn(),
@@ -209,7 +240,7 @@ describe("SendBitcoinDetailsScreen — LNURL requestInvoice gate", () => {
     loadLocale("en")
   })
 
-  it("does NOT call lnurl-pay requestInvoice when paymentDetail.sendPaymentMutation is set (SC path)", async () => {
+  it("does NOT call lnurl-pay requestInvoice when paymentDetail.sendPaymentMutation is set (self-custodial path)", async () => {
     const detail = buildLnurlPaymentDetail({ withSendMutation: true })
     const LL = i18nObject("en")
 

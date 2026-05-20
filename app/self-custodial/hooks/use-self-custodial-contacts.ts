@@ -7,23 +7,24 @@ import {
   type Contact as SdkContact,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { mapSelfCustodialTransactions } from "@app/self-custodial/mappers/transaction-mapper"
-import {
-  addContact as bridgeAddContact,
-  deleteContact as bridgeDeleteContact,
-  listContacts as bridgeListContacts,
-  listPayments as bridgeListPayments,
-  updateContact as bridgeUpdateContact,
-} from "@app/self-custodial/bridge"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import {
   type Contact,
   type ContactAdapter,
   type ContactListResult,
-} from "@app/types/contact.types"
-import { type NormalizedTransaction } from "@app/types/transaction.types"
-import { AccountType } from "@app/types/wallet.types"
+} from "@app/types/contact"
+import { type NormalizedTransaction } from "@app/types/transaction"
+import { AccountType } from "@app/types/wallet"
 import { normalizeString } from "@app/utils/helper"
+
+import {
+  findOrCreateContact as bridgeFindOrCreateContact,
+  deleteContact as bridgeDeleteContact,
+  listContacts as bridgeListContacts,
+  listPayments as bridgeListPayments,
+  updateContact as bridgeUpdateContact,
+} from "../bridge"
+import { mapSelfCustodialTransactions } from "../mappers/transaction"
+import { useSelfCustodialWallet } from "../providers/wallet"
 
 const MATCHED_PAYMENTS_LIMIT = 100
 
@@ -89,10 +90,7 @@ export const useSelfCustodialContacts = (): ContactAdapter & {
       input: Omit<Contact, "id" | "transactionsCount" | "sourceAccountType">,
     ): Promise<ContactListResult> => {
       await sdkRequired(sdk, (s) =>
-        bridgeAddContact(s, {
-          name: input.displayName,
-          paymentIdentifier: input.paymentIdentifier,
-        }),
+        bridgeFindOrCreateContact(s, input.paymentIdentifier, input.displayName),
       )
       const updated = await refresh()
       return { contacts: updated }

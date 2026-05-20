@@ -5,16 +5,21 @@ import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 const mockBackupState = jest.fn()
 const mockActiveWallet = jest.fn()
 const mockRemoteConfig = jest.fn()
+const mockAccountRegistry = jest.fn()
 const mockGetItem = jest.fn()
 const mockSetItem = jest.fn()
 
-jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupStatus: { None: "none", Completed: "completed" },
   useBackupState: () => mockBackupState(),
 }))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockActiveWallet(),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => mockAccountRegistry(),
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -53,11 +58,14 @@ const defaultConfig = {
   backupNudgeModalThreshold: 21000,
 }
 
+const selfCustodialAccount = { type: "self-custodial", id: "test-self-custodial-uuid" }
+
 describe("useBackupNudgeState", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockBackupState.mockReturnValue(defaultBackupState)
     mockActiveWallet.mockReturnValue(selfCustodialWallet)
+    mockAccountRegistry.mockReturnValue({ activeAccount: selfCustodialAccount })
     mockRemoteConfig.mockReturnValue(defaultConfig)
     mockGetItem.mockResolvedValue(null)
     mockSetItem.mockResolvedValue(undefined)
@@ -144,7 +152,10 @@ describe("useBackupNudgeState", () => {
     })
 
     expect(result.current.shouldShowBanner).toBe(false)
-    expect(mockSetItem).toHaveBeenCalledWith("backupNudgeDismissedAt", expect.any(String))
+    expect(mockSetItem).toHaveBeenCalledWith(
+      "backupNudgeDismissedAt:test-self-custodial-uuid",
+      expect.any(String),
+    )
   })
 
   it("loads dismissed state from AsyncStorage", async () => {

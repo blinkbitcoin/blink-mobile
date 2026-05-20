@@ -5,16 +5,13 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 import { toBtcMoneyAmount } from "@app/types/amounts"
-import {
-  ConvertMoneyAmount,
-  type PaymentDetail,
-} from "@app/screens/send-bitcoin-screen/payment-details/index.types"
-import { type ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 
 import { buildFeeTierOptions } from "../fee-tier-options"
+import { type ParseDestinationResult } from "../payment-destination/index.types"
+import { ConvertMoneyAmount, type PaymentDetail } from "../payment-details/index.types"
 
 import { FeeTierOption } from "./fee-tiers.types"
 import {

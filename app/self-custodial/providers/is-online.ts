@@ -37,9 +37,6 @@ export const isOnlineStatus = (status: ServiceStatus): boolean =>
 export const isDegradedStatus = (status: ServiceStatus): boolean =>
   status === ServiceStatus.Degraded
 
-export const isOnline = async (): Promise<boolean> =>
-  isOnlineStatus(await getServiceStatus())
-
 export const OnlineState = {
   Online: "online",
   Offline: "offline",

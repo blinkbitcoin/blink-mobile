@@ -1,4 +1,3 @@
-import crashlytics from "@react-native-firebase/crashlytics"
 import {
   OnchainConfirmationSpeed,
   type BreezSdkInterface,
@@ -12,6 +11,7 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { toBtcMoneyAmount, type WalletAmount } from "@app/types/amounts"
+import { reportError } from "@app/utils/error-logging"
 
 import {
   executeSend,
@@ -80,7 +80,7 @@ const reportSendFailure = (
   scope: string,
   err: unknown,
 ): { __typename: "GraphQLApplicationError"; message: string } => {
-  crashlytics().recordError(err instanceof Error ? err : new Error(`${scope}: ${err}`))
+  reportError(scope, err)
   return { __typename: "GraphQLApplicationError", message: classifySdkError(err) }
 }
 
@@ -93,7 +93,7 @@ export const createSendMutation = (params: PrepareParams): SendPaymentMutation =
     } catch (err) {
       return {
         status: PaymentSendResult.Failure,
-        errors: [reportSendFailure("Self-custodial Lightning send failed", err)],
+        errors: [reportSendFailure("Self-custodial Lightning send", err)],
       }
     }
   }
@@ -111,7 +111,7 @@ export const createSendMutationOnchain = (
     } catch (err) {
       return {
         status: PaymentSendResult.Failure,
-        errors: [reportSendFailure("Self-custodial onchain send failed", err)],
+        errors: [reportSendFailure("Self-custodial onchain send", err)],
       }
     }
   }

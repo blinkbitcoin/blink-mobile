@@ -1,7 +1,5 @@
 import { Platform } from "react-native"
 
-import crashlytics from "@react-native-firebase/crashlytics"
-
 import { loadJson, remove, saveJson } from "@app/utils/storage"
 
 // Values are persisted to AsyncStorage — do not rename
@@ -17,22 +15,22 @@ type StoredCheckpoint = {
 }
 
 type ResumeRoute =
-  | "sparkMigrationExplainer"
-  | "sparkBackupMethodScreen"
-  | "sparkCloudBackupScreen"
-  | "sparkBackupAlertsScreen"
+  | "accountMigrationExplainer"
+  | "selfCustodialBackupMethod"
+  | "selfCustodialCloudBackup"
+  | "selfCustodialBackupSecurityChecks"
 
 const STORAGE_KEY_PREFIX = "migrationCheckpoint"
 
 const CHECKPOINT_EXPIRATION_MS = 48 * 60 * 60 * 1000 // 48h
 
 const CHECKPOINT_ROUTE_MAP: Record<MigrationCheckpoint, ResumeRoute> = {
-  [MigrationCheckpoint.BackupMethod]: "sparkBackupMethodScreen",
-  [MigrationCheckpoint.CloudBackup]: "sparkCloudBackupScreen",
-  [MigrationCheckpoint.BackupAlerts]: "sparkBackupAlertsScreen",
+  [MigrationCheckpoint.BackupMethod]: "selfCustodialBackupMethod",
+  [MigrationCheckpoint.CloudBackup]: "selfCustodialCloudBackup",
+  [MigrationCheckpoint.BackupAlerts]: "selfCustodialBackupSecurityChecks",
 }
 
-const DEFAULT_ROUTE: ResumeRoute = "sparkMigrationExplainer"
+const DEFAULT_ROUTE: ResumeRoute = "accountMigrationExplainer"
 
 export const getStorageKey = (environment: string): string =>
   `${STORAGE_KEY_PREFIX}_${environment.toLowerCase()}`
@@ -81,11 +79,8 @@ export const loadCheckpoint = async (
 
     return parsed
   } catch (err) {
-    crashlytics().recordError(
-      err instanceof Error ? err : new Error(`Checkpoint load failed: ${err}`),
-    )
     await remove(storageKey).catch(() => {})
-    return null
+    throw err
   }
 }
 
@@ -93,13 +88,7 @@ export const saveCheckpointToStorage = async (
   storageKey: string,
   step: MigrationCheckpoint,
 ): Promise<void> => {
-  try {
-    await saveJson(storageKey, { step, savedAt: Date.now() })
-  } catch (err) {
-    crashlytics().recordError(
-      err instanceof Error ? err : new Error(`Checkpoint save failed: ${err}`),
-    )
-  }
+  await saveJson(storageKey, { step, savedAt: Date.now() })
 }
 
 export const clearCheckpointFromStorage = async (storageKey: string): Promise<void> => {

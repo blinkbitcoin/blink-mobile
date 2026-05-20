@@ -1,5 +1,5 @@
 import { fetchConversionLimits } from "@app/self-custodial/bridge/limits"
-import { ConvertDirection } from "@app/types/payment.types"
+import { ConvertDirection } from "@app/types/payment"
 
 const mockRequireTokenId = jest.fn(() => "usdb-token-id")
 

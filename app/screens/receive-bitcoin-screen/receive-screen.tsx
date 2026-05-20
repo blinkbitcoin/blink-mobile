@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { Pressable, View } from "react-native"
+import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { ActionButton } from "@app/components/action-button"
 import { AmountInputModal } from "@app/components/amount-input/amount-input-modal"
@@ -16,13 +16,13 @@ import { Screen } from "@app/components/screen"
 import { SetLightningAddressModal } from "@app/components/set-lightning-address-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { WalletCurrency } from "@app/graphql/generated"
-import { useNotificationPermission } from "@app/hooks"
+import { useNotificationPermission, usePriceConversion } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
 import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
-import { ActiveWalletStatus } from "@app/types/wallet.types"
+import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 
 import { NfcHeaderButton } from "./nfc-header-button"
@@ -45,13 +45,33 @@ const SELF_CUSTODIAL_BLOCKED_STATUSES: ActiveWalletStatus[] = [
   ActiveWalletStatus.Unavailable,
 ]
 
+const LoadingView: React.FC = () => {
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+  return (
+    <Screen>
+      <View style={styles.loadingContainer} testID="receive-loading">
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    </Screen>
+  )
+}
+
 const ReceiveScreen = () => {
   const { isSelfCustodial, status } = useActiveWallet()
+  const { convertMoneyAmount } = usePriceConversion()
   const custodialRequest = usePaymentRequest()
   const selfCustodialRequest = useSelfCustodialPaymentRequest()
 
   if (isSelfCustodial && SELF_CUSTODIAL_BLOCKED_STATUSES.includes(status)) {
     return null
+  }
+
+  /** Loader while price conversion bootstraps after an account switch. */
+  if (!convertMoneyAmount) {
+    return <LoadingView />
   }
 
   const requestState = isSelfCustodial ? selfCustodialRequest : custodialRequest
@@ -164,6 +184,8 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     }, [openTrialModal]),
   )
 
+  const isConverting = requestState.state === PaymentRequestState.Converting
+
   useEffect(() => {
     if (requestState.state !== PaymentRequestState.Paid) return
     const id = setTimeout(() => navigation.goBack(), AUTO_DISMISS_DELAY)
@@ -194,6 +216,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             getFullUri={requestState.info?.data?.getFullUriFn}
             loading={requestState.state === PaymentRequestState.Loading}
             completed={requestState.state === PaymentRequestState.Paid}
+            converting={isConverting}
             err={
               requestState.state === PaymentRequestState.Error
                 ? LL.ReceiveScreen.error()
@@ -213,6 +236,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             getFullUri={onchain.getFullUriFn}
             loading={onchain.loading}
             completed={requestState.state === PaymentRequestState.Paid}
+            converting={isConverting}
             err=""
             expired={false}
             regenerateInvoiceFn={requestState.regenerateInvoice}
@@ -360,6 +384,11 @@ const useStyles = makeStyles(({ colors }) => ({
   screenStyle: {
     paddingVertical: 12,
     flexGrow: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   paymentIdentifier: {
     alignItems: "center",

@@ -4,7 +4,7 @@ import remoteConfigInstance from "@react-native-firebase/remote-config"
 import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
-import { logSelfCustodialRolloutExposed } from "@app/utils/analytics"
+import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
 
 const DeviceAccountEnabledKey = "deviceAccountEnabledRestAuth"
 const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
@@ -94,8 +94,8 @@ const defaultRemoteConfig: RemoteConfig = {
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
   autoConvertMaxAttempts: 3,
-  autoConvertPollMaxAttempts: 7,
-  autoConvertPollIntervalMs: 2000,
+  autoConvertPollMaxAttempts: 30,
+  autoConvertPollIntervalMs: 500,
   autoConvertAmountMatchToleranceBps: 500,
 }
 

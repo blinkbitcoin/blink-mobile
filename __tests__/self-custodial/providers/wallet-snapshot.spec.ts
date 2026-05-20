@@ -1,7 +1,7 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import { toWalletMoneyAmount } from "@app/types/amounts"
-import type { NormalizedTransaction } from "@app/types/transaction.types"
-import { AccountType, toWalletId, type WalletState } from "@app/types/wallet.types"
+import type { NormalizedTransaction } from "@app/types/transaction"
+import { AccountType, toWalletId, type WalletState } from "@app/types/wallet"
 
 import {
   appendTransactions,
@@ -137,7 +137,7 @@ const buildUnknownTokenPayment = (id: string) => ({
   },
 })
 
-describe("hasMore pagination (Critical #10)", () => {
+describe("hasMore pagination", () => {
   it("computes hasMore from the raw response, not after isKnownPayment filtering", async () => {
     // 20 raw items (page-size) where 5 are unknown tokens that get filtered out.
     const sdk = createMockSdk()
@@ -232,7 +232,7 @@ describe("loadMoreTransactions", () => {
   })
 })
 
-describe("getSelfCustodialWalletSnapshot pagination preservation (Critical #8)", () => {
+describe("getSelfCustodialWalletSnapshot pagination preservation", () => {
   it("fetches a single page when no targetRawCount is provided", async () => {
     const sdk = createMockSdk()
     sdk.listPayments.mockResolvedValue({
@@ -363,7 +363,7 @@ describe("appendTransactions", () => {
     expect(result[0].transactions).toEqual([existing])
   })
 
-  it("dedupes incoming transactions whose id is already in the wallet (regression Critical #10)", () => {
+  it("dedupes incoming transactions whose id is already in the wallet (regression)", () => {
     const existing = buildTx("dup-btc", WalletCurrency.Btc)
     const wallets = [buildWallet(WalletCurrency.Btc, [existing])]
     const newTxs = [
@@ -391,7 +391,7 @@ describe("appendTransactions", () => {
   })
 })
 
-describe("isKnownPayment crashlytics reporting (Critical #10)", () => {
+describe("isKnownPayment crashlytics reporting", () => {
   beforeEach(() => {
     mockRecordError.mockClear()
   })

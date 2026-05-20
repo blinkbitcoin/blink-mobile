@@ -1,15 +1,15 @@
 import { useCallback, useState } from "react"
 
 import type { BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
+import { logSelfCustodialStableBalanceActivated } from "@app/self-custodial/analytics"
 import {
   activateStableBalance,
   deactivateStableBalance,
 } from "@app/self-custodial/bridge"
 import { SparkToken } from "@app/self-custodial/config"
 import type { TranslationFunctions } from "@app/i18n/i18n-types"
-import { logSelfCustodialStableBalanceActivated } from "@app/utils/analytics"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
 type Params = {
@@ -56,9 +56,7 @@ export const useStableBalanceToggle = ({
         await refreshStableBalanceActive()
         await refreshWallets()
       } catch (err) {
-        crashlytics().recordError(
-          err instanceof Error ? err : new Error(`Stable Balance toggle failed: ${err}`),
-        )
+        reportError("Stable Balance toggle", err)
         toastShow({
           message: (tr) => tr.StableBalance.toggleFailedToast(),
           LL,

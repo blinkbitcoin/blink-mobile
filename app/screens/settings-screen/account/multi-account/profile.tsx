@@ -16,7 +16,7 @@ import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-
 import Modal from "react-native-modal"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
-import { DefaultAccountId, AccountType } from "@app/types/wallet.types"
+import { DefaultAccountId, AccountType } from "@app/types/wallet"
 import { toastShow } from "@app/utils/toast"
 
 export const ProfileScreen: React.FC<ProfileProps> = ({

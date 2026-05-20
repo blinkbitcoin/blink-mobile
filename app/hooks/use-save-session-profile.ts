@@ -4,10 +4,11 @@ import crashlytics from "@react-native-firebase/crashlytics"
 
 import { updateDeviceSessionCount } from "@app/graphql/client-only-query"
 import { useGetUsernamesLazyQuery } from "@app/graphql/generated"
-import { usePersistentStateContext } from "@app/store/persistent-state"
-import { DefaultAccountId } from "@app/types/wallet.types"
-import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+
+import { usePersistentStateContext } from "../store/persistent-state"
+import { DefaultAccountId } from "../types/wallet"
 
 import { useAppConfig } from "./use-app-config"
 import { useAutoShowUpgradeModal } from "./use-show-upgrade-modal"

@@ -6,8 +6,8 @@ import crashlytics from "@react-native-firebase/crashlytics"
 
 import { ContactType, useContactCreateMutation } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { addContact as bridgeAddContact } from "@app/self-custodial/bridge"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { findOrCreateContact as bridgeFindOrCreateContact } from "@app/self-custodial/bridge"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 
 gql`
   mutation contactCreate($input: ContactCreateInput!) {
@@ -51,7 +51,7 @@ export const useSaveLnAddressContact = () => {
       if (isSelfCustodial) {
         if (!sdk) return { saved: false }
         try {
-          await bridgeAddContact(sdk, { name: handle, paymentIdentifier: handle })
+          await bridgeFindOrCreateContact(sdk, handle, handle)
           return { saved: true, handle }
         } catch (err) {
           crashlytics().log(

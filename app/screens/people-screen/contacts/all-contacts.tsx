@@ -10,8 +10,9 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useContacts } from "@app/hooks/use-contacts"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PeopleStackParamList } from "@app/navigation/stack-param-lists"
-import type { Contact } from "@app/types/contact.types"
-import { AccountType } from "@app/types/wallet.types"
+import { unifiedContactToUserContact } from "@app/self-custodial/mappers/contact"
+import type { Contact } from "@app/types/contact"
+import { AccountType } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 import { useAppConfig } from "@app/hooks"
@@ -20,8 +21,6 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { SearchBar } from "@rn-vui/base"
 import { ListItem, makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-
-import { unifiedContactToUserContact } from "./legacy-contact-shims"
 
 gql`
   query contacts {

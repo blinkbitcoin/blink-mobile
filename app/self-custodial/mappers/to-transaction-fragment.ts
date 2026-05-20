@@ -4,13 +4,17 @@ import {
   WalletCurrency,
   type TransactionFragment,
 } from "@app/graphql/generated"
-import { type MoneyAmount, type WalletOrDisplayCurrency } from "@app/types/amounts"
+import {
+  DisplayCurrency,
+  type MoneyAmount,
+  type WalletOrDisplayCurrency,
+} from "@app/types/amounts"
 import {
   TransactionDirection,
   TransactionStatus,
   PaymentType,
   type NormalizedTransaction,
-} from "@app/types/transaction.types"
+} from "@app/types/transaction"
 
 type ConvertFn = (
   amount: MoneyAmount<WalletOrDisplayCurrency>,
@@ -64,10 +68,7 @@ const formatInDisplayCurrency = (
   amount: MoneyAmount<WalletOrDisplayCurrency>,
   display: DisplayInfo,
 ): string => {
-  const converted = display.convertMoneyAmount(
-    amount,
-    display.displayCurrency as WalletOrDisplayCurrency,
-  )
+  const converted = display.convertMoneyAmount(amount, DisplayCurrency)
   const majorUnits = converted.amount / 10 ** display.fractionDigits
   return majorUnits.toFixed(display.fractionDigits)
 }

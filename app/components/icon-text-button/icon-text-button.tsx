@@ -1,8 +1,9 @@
 import React from "react"
 import { TouchableOpacity } from "react-native"
+
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
 type IconTextButtonProps = {
   icon: IconNamesType

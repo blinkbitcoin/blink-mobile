@@ -8,12 +8,15 @@ import theme from "@app/rne-theme/theme"
 
 const mockUseSettingsScreenQuery = jest.fn()
 const mockUseUnacknowledgedNotificationCountQuery = jest.fn()
+const mockUseLanguageQuery = jest.fn()
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   useSettingsScreenQuery: (opts: unknown) => mockUseSettingsScreenQuery(opts),
   useUnacknowledgedNotificationCountQuery: (opts: unknown) =>
     mockUseUnacknowledgedNotificationCountQuery(opts),
+  useLanguageQuery: (opts: unknown) => mockUseLanguageQuery(opts),
+  useUserUpdateLanguageMutation: () => [jest.fn(), { loading: false }],
   useExportCsvSettingLazyQuery: () => [jest.fn(), { loading: false }],
 }))
 
@@ -61,7 +64,22 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({
     accounts: [],
     activeAccount: undefined,
+    selfCustodialEntries: [],
     setActiveAccountId: jest.fn(),
+    reloadSelfCustodialAccounts: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/store/persistent-state", () => ({
+  ...jest.requireActual("@app/store/persistent-state"),
+  usePersistentStateContext: () => ({
+    persistentState: {
+      schemaVersion: 11,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+    },
+    updateState: jest.fn(),
+    resetState: jest.fn(),
   }),
 }))
 
@@ -119,11 +137,11 @@ describe("settings skips graphql queries when unauthenticated", () => {
     jest.clearAllMocks()
     mockUseSettingsScreenQuery.mockReturnValue({ data: undefined, loading: false })
     mockUseUnacknowledgedNotificationCountQuery.mockReturnValue({ data: undefined })
+    mockUseLanguageQuery.mockReturnValue({ data: undefined, loading: false })
   })
 
   describe("useSettingsScreenQuery consumers without fetchPolicy", () => {
     const consumers = [
-      { name: "LanguageSetting", make: () => <LanguageSetting /> },
       { name: "DefaultWallet", make: () => <DefaultWallet /> },
       { name: "AccountPOS", make: () => <AccountPOS /> },
       { name: "AccountStaticQR", make: () => <AccountStaticQR /> },
@@ -143,6 +161,24 @@ describe("settings skips graphql queries when unauthenticated", () => {
       renderWithAuth(make(), true)
 
       expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: false }),
+      )
+    })
+  })
+
+  describe("LanguageSetting (uses useLanguageQuery via the effective-language adapter)", () => {
+    it("passes skip: true when unauthed", () => {
+      renderWithAuth(<LanguageSetting />, false)
+
+      expect(mockUseLanguageQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: true }),
+      )
+    })
+
+    it("passes skip: false when authed", () => {
+      renderWithAuth(<LanguageSetting />, true)
+
+      expect(mockUseLanguageQuery).toHaveBeenCalledWith(
         expect.objectContaining({ skip: false }),
       )
     })

@@ -12,7 +12,7 @@ import {
   BaseCreatePaymentDetailsParams,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
-import { ConvertDirection } from "@app/types/payment.types"
+import { ConvertDirection } from "@app/types/payment"
 
 import { buildConversionType } from "../bridge"
 

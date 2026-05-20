@@ -11,6 +11,7 @@ import {
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { toUsdMoneyAmount } from "@app/types/amounts"
+import { reportError } from "@app/utils/error-logging"
 import {
   ConvertAmountAdjustment,
   ConvertDirection,
@@ -20,7 +21,7 @@ import {
   type ConvertQuote,
   type GetConversionQuoteAdapter,
   type PaymentAdapterResult,
-} from "@app/types/payment.types"
+} from "@app/types/payment"
 import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 
@@ -47,9 +48,7 @@ const recordConvertError = (err: unknown, params: ConvertParams, where: string):
   crashlytics().log(
     `[Convert] ${where} failed (direction=${params.direction}, fromAmount=${params.fromAmount.amount}, toAmount=${params.toAmount.amount})`,
   )
-  crashlytics().recordError(
-    err instanceof Error ? err : new Error(`${where} failed: ${err}`),
-  )
+  reportError(where, err)
 }
 
 const mapAmountAdjustment = (
@@ -257,8 +256,14 @@ const prepareConversion = async (
     destinationAmount: initialTarget,
   })
 
-  const finalAmountIn = BigInt(toNumber(prepared.conversionEstimate?.amountIn ?? 0n))
+  const finalEstimate = prepared.conversionEstimate
+  const finalAmountIn = BigInt(toNumber(finalEstimate?.amountIn ?? 0n))
   if (finalAmountIn <= inputAmount) return { prepared, tokenDecimals }
+
+  /** SDK forced full-balance to avoid dust; correcting would swap the user's typed amount for the pool minimum. */
+  if (finalEstimate?.amountAdjustment === AmountAdjustmentReason.IncreasedToAvoidDust) {
+    return { prepared, tokenDecimals }
+  }
 
   // Final overshoots: shrink by the observed ratio and re-quote once.
   const correctedTarget = (initialTarget * inputAmount) / finalAmountIn
@@ -278,16 +283,9 @@ const executePrepared = async (
 ): Promise<PaymentAdapterResult> => {
   try {
     await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
-    // TODO: remove once @breeztech/breez-sdk-spark-react-native materializes
-    // token balances on payment insert. Today it only happens on sync, so we
-    // force one here to keep getInfo aligned with the convert result.
-    try {
-      await sdk.syncWallet(SyncWalletRequest.create({}))
-    } catch (err) {
-      crashlytics().recordError(
-        err instanceof Error ? err : new Error(`convert: post-send syncWallet: ${err}`),
-      )
-    }
+    sdk.syncWallet(SyncWalletRequest.create({})).catch((err) => {
+      reportError("convert: post-send syncWallet", err)
+    })
     return { status: PaymentResultStatus.Success }
   } catch (err) {
     recordConvertError(err, params, "executePrepared")

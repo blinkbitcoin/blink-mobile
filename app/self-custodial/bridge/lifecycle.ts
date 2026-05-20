@@ -6,10 +6,10 @@ import {
   type BreezSdkInterface,
   type SdkEvent,
 } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { generateMnemonic, validateMnemonic } from "bip39"
 import Crypto from "react-native-quick-crypto"
 
+import { reportError } from "@app/utils/error-logging"
 import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
@@ -104,9 +104,7 @@ export const selfCustodialRestoreWallet = async (
     await addSelfCustodialAccountId(accountId)
   } catch (err) {
     await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
-    crashlytics().recordError(
-      err instanceof Error ? err : new Error(`Wallet restore failed: ${err}`),
-    )
+    reportError("Wallet restore", err)
     throw err
   }
 }

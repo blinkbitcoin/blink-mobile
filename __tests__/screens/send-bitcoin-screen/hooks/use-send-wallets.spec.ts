@@ -11,6 +11,7 @@ const mockIsAuthed = jest.fn()
 const mockDetailsQuery = jest.fn()
 const mockConfirmationQuery = jest.fn()
 const mockUnauthedQuery = jest.fn()
+const mockPersistentState = jest.fn()
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockActiveWallet(),
@@ -25,6 +26,13 @@ jest.mock("@app/graphql/generated", () => ({
   useSendBitcoinDetailsScreenQuery: () => mockDetailsQuery(),
   useSendBitcoinConfirmationScreenQuery: () => mockConfirmationQuery(),
   useHomeUnauthedQuery: () => mockUnauthedQuery(),
+}))
+
+jest.mock("@app/store/persistent-state", () => ({
+  usePersistentStateContext: () => ({
+    persistentState: mockPersistentState(),
+    updateState: jest.fn(),
+  }),
 }))
 
 const btcWallet = {
@@ -47,6 +55,7 @@ describe("useSendWallets", () => {
     mockUnauthedQuery.mockReturnValue({
       data: { globals: { network: "mainnet" } },
     })
+    mockPersistentState.mockReturnValue({})
   })
 
   it("returns wallets when self-custodial", () => {
@@ -124,6 +133,42 @@ describe("useSendWallets", () => {
     const { result } = renderHook(() => useSendWallets())
 
     expect(result.current.defaultWallet?.walletCurrency).toBe(WalletCurrency.Btc)
+  })
+
+  it("honors the per-account self-custodial default currency from persistent state", () => {
+    mockActiveWallet.mockReturnValue({
+      isSelfCustodial: true,
+      isReady: true,
+      wallets: [btcWallet, usdWallet],
+    })
+    mockIsAuthed.mockReturnValue(false)
+    mockDetailsQuery.mockReturnValue({ data: undefined, loading: false })
+    mockPersistentState.mockReturnValue({
+      activeAccountId: "self-custodial-id",
+      selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "USD" },
+    })
+
+    const { result } = renderHook(() => useSendWallets())
+
+    expect(result.current.defaultWallet?.id).toBe("usd-w1")
+  })
+
+  it("falls back to BTC when preferred USD wallet is missing", () => {
+    mockActiveWallet.mockReturnValue({
+      isSelfCustodial: true,
+      isReady: true,
+      wallets: [btcWallet],
+    })
+    mockIsAuthed.mockReturnValue(false)
+    mockDetailsQuery.mockReturnValue({ data: undefined, loading: false })
+    mockPersistentState.mockReturnValue({
+      activeAccountId: "self-custodial-id",
+      selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "USD" },
+    })
+
+    const { result } = renderHook(() => useSendWallets())
+
+    expect(result.current.defaultWallet?.id).toBe("btc-w1")
   })
 })
 

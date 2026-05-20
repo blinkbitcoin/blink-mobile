@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import crashlytics from "@react-native-firebase/crashlytics"
+import { utils as lnurlUtils } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
@@ -26,13 +27,14 @@ import {
   ReceiveAssetMode,
 } from "../auto-convert"
 import { createReceiveLightning, createReceiveOnchain } from "../bridge"
-import { useSelfCustodialWallet } from "../providers/wallet-provider"
+import { AutoConvertStatus, useAutoConvertStatus } from "../providers/auto-convert-status"
+import { useSelfCustodialWallet } from "../providers/wallet"
 
 import { useReceiveAssetMode } from "./use-receive-asset-mode"
 import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"
 
 export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => {
-  const { sdk, lastReceivedPaymentId } = useSelfCustodialWallet()
+  const { sdk, lastReceivedPaymentId, lightningAddress } = useSelfCustodialWallet()
   const { wallets, isReady } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()
   const {
@@ -44,6 +46,13 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
 
   const btcWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
   const usdWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Usd)
+
+  const parsedLnAddress = lightningAddress
+    ? lnurlUtils.parseLightningAddress(lightningAddress)
+    : null
+  const canUsePaycode = Boolean(parsedLnAddress)
+  const lnAddressUsername = parsedLnAddress?.username ?? ""
+  const lnAddressHostname = parsedLnAddress?.domain ?? ""
 
   const [type, setType] = useState<InvoiceType>(Invoice.Lightning)
   const [memo, setMemoState] = useState("")
@@ -57,9 +66,12 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const [autoConvertMinSats, setAutoConvertMinSats] = useState<number | undefined>(
     undefined,
   )
+  const [typeInitialized, setTypeInitialized] = useState(false)
   const baselinePaymentIdRef = useRef<string | null>(lastReceivedPaymentId)
   const lastPaymentIdRef = useRef(lastReceivedPaymentId)
   lastPaymentIdRef.current = lastReceivedPaymentId
+  const requestStateRef = useRef<string>(PaymentRequestState.Idle)
+  requestStateRef.current = requestState
 
   const receivingCurrency =
     assetMode === ReceiveAssetMode.Dollar ? WalletCurrency.Usd : WalletCurrency.Btc
@@ -80,7 +92,14 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   )
 
   const generateRequest = useCallback(async () => {
-    if (!sdk || !isReady || isAssetModeLoading || type === Invoice.OnChain) return
+    if (!sdk || !isReady || isAssetModeLoading || !typeInitialized) return
+    if (type === Invoice.OnChain || type === Invoice.PayCode) return
+    if (
+      requestStateRef.current === PaymentRequestState.Converting ||
+      requestStateRef.current === PaymentRequestState.Paid
+    ) {
+      return
+    }
     setRequestState(PaymentRequestState.Loading)
 
     try {
@@ -95,6 +114,12 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
         memo: memo || undefined,
       })
       if (!("invoice" in result) || !result.invoice) {
+        crashlytics().log(
+          `[Self-custodial] Lightning adapter returned no invoice (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
+        )
+        crashlytics().recordError(
+          new Error("Self-custodial invoice adapter returned no invoice field"),
+        )
         setRequestState(PaymentRequestState.Error)
         return
       }
@@ -127,6 +152,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     sdk,
     isReady,
     isAssetModeLoading,
+    typeInitialized,
     type,
     memo,
     amount,
@@ -153,6 +179,23 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     },
     [setAssetMode],
   )
+
+  // Auto-snap initial type to PayCode when LN address is available and conditions are clean
+  // (no amount, no memo, BTC mode). Mirrors custodial's initial PayCode default. Subsequent
+  // transitions Lightning <-> PayCode are driven by useReceiveFlow on amount/memo/toggle changes.
+  // typeInitialized gates generateRequest so we don't fire a Lightning invoice before the
+  // PayCode decision lands on the first render.
+  useEffect(() => {
+    if (typeInitialized) return
+    if (!canUsePaycode) {
+      setTypeInitialized(true)
+      return
+    }
+    const shouldUsePaycode =
+      assetMode === ReceiveAssetMode.Bitcoin && !amount && !memoChangeText && !memo
+    if (shouldUsePaycode) setType(Invoice.PayCode)
+    setTypeInitialized(true)
+  }, [typeInitialized, canUsePaycode, assetMode, amount, memoChangeText, memo])
 
   useEffect(() => {
     generateRequest()
@@ -200,15 +243,34 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     return pendingSats < autoConvertMinSats
   }, [assetMode, autoConvertMinSats, amountInSats])
 
+  const autoConvertStatus = useAutoConvertStatus(paymentRequest)
+
   useEffect(() => {
     if (requestState !== PaymentRequestState.Created) return
     if (!lastReceivedPaymentId) return
     if (lastReceivedPaymentId === baselinePaymentIdRef.current) return
+    const isDollarInvoice = assetMode === ReceiveAssetMode.Dollar
+    setRequestState(
+      isDollarInvoice ? PaymentRequestState.Converting : PaymentRequestState.Paid,
+    )
+  }, [lastReceivedPaymentId, requestState, assetMode])
+
+  useEffect(() => {
+    if (requestState !== PaymentRequestState.Converting) return
+    if (autoConvertStatus !== AutoConvertStatus.Settled) return
     setRequestState(PaymentRequestState.Paid)
-  }, [lastReceivedPaymentId, requestState])
+  }, [requestState, autoConvertStatus])
 
   const getFullUriFn = useCallback(
     (params: { uppercase?: boolean; prefix?: boolean }) => {
+      if (type === Invoice.PayCode && lightningAddress) {
+        return getPaymentRequestFullUri({
+          type: Invoice.PayCode,
+          input: lightningAddress,
+          uppercase: params.uppercase,
+          prefix: params.prefix,
+        })
+      }
       if (!paymentRequest) return ""
       return getPaymentRequestFullUri({
         type: Invoice.Lightning,
@@ -217,10 +279,13 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
         prefix: params.prefix,
       })
     },
-    [paymentRequest],
+    [type, lightningAddress, paymentRequest],
   )
 
-  const getCopyableInvoiceFn = useCallback(() => paymentRequest ?? "", [paymentRequest])
+  const getCopyableInvoiceFn = useCallback(() => {
+    if (type === Invoice.PayCode && lightningAddress) return lightningAddress
+    return paymentRequest ?? ""
+  }, [type, lightningAddress, paymentRequest])
 
   const getOnchainFullUriFn = useCallback(
     (params: { uppercase?: boolean; prefix?: boolean }) => {
@@ -238,15 +303,28 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
 
   if (!sdk || !btcWallet || !convertMoneyAmount) return null
 
-  const invoiceData: InvoiceData | undefined = paymentRequest
-    ? {
+  const buildInvoiceData = (): InvoiceData | undefined => {
+    if (type === Invoice.PayCode && lightningAddress) {
+      return {
+        invoiceType: Invoice.PayCode,
+        username: lnAddressUsername,
+        getFullUriFn,
+        getCopyableInvoiceFn,
+      }
+    }
+    if (paymentRequest) {
+      return {
         invoiceType: type,
         paymentRequest,
         address: undefined,
         getFullUriFn,
         getCopyableInvoiceFn,
       }
-    : undefined
+    }
+    return undefined
+  }
+
+  const invoiceData = buildInvoiceData()
 
   return {
     type,
@@ -272,10 +350,10 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     receivingWalletDescriptor,
     canSetAmount: true,
     canSetMemo: true,
-    canUsePaycode: false,
+    canUsePaycode,
     btcWalletId: btcWallet?.id,
     usdWalletId: usdWallet?.id,
-    lnAddressHostname: "",
+    lnAddressHostname,
     feesInformation: undefined,
     info: invoiceData ? { data: invoiceData } : undefined,
     onchainAddress,

@@ -3,7 +3,7 @@ import React from "react"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { DepositErrorReason, type PendingDeposit } from "@app/types/payment.types"
+import { DepositErrorReason, type PendingDeposit } from "@app/types/payment"
 
 type Props = {
   deposit: PendingDeposit

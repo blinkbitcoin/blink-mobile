@@ -1,16 +1,18 @@
 import React, { useState, useCallback } from "react"
 import { ScrollView, RefreshControl } from "react-native-gesture-handler"
 
+import { makeStyles } from "@rn-vui/themed"
+
 import { Screen } from "@app/components/screen"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
-import { AccountType } from "@app/types/wallet.types"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { AccountType } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
-import { makeStyles } from "@rn-vui/themed"
 
 import { SettingsGroup } from "../group"
+import { AccountFields } from "../self-custodial/account-fields"
 
 import { AccountDeleteContextProvider } from "./account-delete-context"
 import { AccountBannerVertical } from "./banner-vertical"
@@ -34,11 +36,17 @@ export const AccountScreen: React.FC = () => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true)
-    const work = isSelfCustodial
-      ? Promise.all([refreshSelfCustodialWallets(), updateCurrentSelfCustodialAccount()])
-      : updateCurrentProfile()
-    await work
-    setRefreshing(false)
+    try {
+      const work = isSelfCustodial
+        ? Promise.all([
+            refreshSelfCustodialWallets(),
+            updateCurrentSelfCustodialAccount(),
+          ])
+        : updateCurrentProfile()
+      await work
+    } finally {
+      setRefreshing(false)
+    }
   }, [
     isSelfCustodial,
     refreshSelfCustodialWallets,
@@ -50,19 +58,28 @@ export const AccountScreen: React.FC = () => {
     <AccountDeleteContextProvider>
       <Screen keyboardShouldPersistTaps="handled">
         <ScrollView
-          contentContainerStyle={styles.outer}
+          contentContainerStyle={[
+            styles.outer,
+            isSelfCustodial && styles.outerSelfCustodial,
+          ]}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           {...testProps("account-screen-scroll-view")}
         >
           <AccountBannerVertical />
-          <UpgradeTrialAccount />
-          <SettingsGroup
-            items={[UpgradeAccountLevelOne]}
-            name={LL.AccountScreen.upgrade()}
-          />
-          <AccountId />
+          {isSelfCustodial ? (
+            <AccountFields />
+          ) : (
+            <>
+              <UpgradeTrialAccount />
+              <SettingsGroup
+                items={[UpgradeAccountLevelOne]}
+                name={LL.AccountScreen.upgrade()}
+              />
+              <AccountId />
+            </>
+          )}
           <DangerZoneSettings />
         </ScrollView>
       </Screen>
@@ -78,5 +95,9 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     flexDirection: "column",
     rowGap: 15,
+  },
+  outerSelfCustodial: {
+    paddingHorizontal: 20,
+    rowGap: 20,
   },
 }))

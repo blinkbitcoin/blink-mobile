@@ -11,7 +11,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   getLightningAddress: (...args: unknown[]) => mockGetLightningAddress(...args),
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 
@@ -22,7 +22,7 @@ describe("useSelfCustodialAccountInfo", () => {
     jest.clearAllMocks()
   })
 
-  it("flips to loading=false with an unavailable-error when sdk is null (Important #3: no infinite spinner offline)", async () => {
+  it("flips to loading=false with an unavailable-error when sdk is null (no infinite spinner offline)", async () => {
     mockUseSelfCustodialWallet.mockReturnValue({ sdk: null })
 
     const { result } = renderHook(() => useSelfCustodialAccountInfo())

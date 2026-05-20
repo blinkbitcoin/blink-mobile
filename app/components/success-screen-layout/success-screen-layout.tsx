@@ -3,9 +3,9 @@ import { View } from "react-native"
 
 import { makeStyles } from "@rn-vui/themed"
 
-import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
-import { SuccessIconAnimation } from "@app/components/success-animation/success-icon-animation"
-import { CompletedTextAnimation } from "@app/components/success-animation/success-text-animation"
+import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
+import { SuccessIconAnimation } from "../success-animation/success-icon-animation"
+import { CompletedTextAnimation } from "../success-animation/success-text-animation"
 
 type SuccessScreenLayoutProps = {
   icon?: IconNamesType

@@ -144,10 +144,11 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
-const mockNonCustodialConversion = jest.fn()
+const mockSelfCustodialConversion = jest.fn()
 
-jest.mock("@app/screens/conversion-flow/hooks/use-non-custodial-conversion", () => ({
-  useNonCustodialConversion: (...args: unknown[]) => mockNonCustodialConversion(...args),
+jest.mock("@app/screens/conversion-flow/hooks/self-custodial/use-conversion", () => ({
+  useSelfCustodialConversion: (...args: unknown[]) =>
+    mockSelfCustodialConversion(...args),
 }))
 
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
@@ -175,7 +176,7 @@ describe("conversion-confirmation-screen", () => {
     jest.clearAllMocks()
     ;(useNavigation as jest.Mock).mockReturnValue({ dispatch: dispatchMock })
     mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false, wallets: [] })
-    mockNonCustodialConversion.mockReturnValue({
+    mockSelfCustodialConversion.mockReturnValue({
       isQuoting: false,
       hasQuoteError: false,
       feeText: "",
@@ -389,15 +390,15 @@ describe("conversion-confirmation-screen", () => {
 describe("conversion-confirmation-screen — self-custodial submit path", () => {
   let LL: ReturnType<typeof i18nObject>
   const dispatchMock = jest.fn()
-  const scWallets = [
+  const selfCustodialWallets = [
     {
-      id: "sc-btc-wallet",
+      id: "self-custodial-btc-wallet",
       walletCurrency: WalletCurrency.Btc,
       balance: { amount: 100000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
       transactions: [],
     },
     {
-      id: "sc-usd-wallet",
+      id: "self-custodial-usd-wallet",
       walletCurrency: WalletCurrency.Usd,
       balance: { amount: 50000, currency: WalletCurrency.Usd, currencyCode: "USD" },
       transactions: [],
@@ -412,11 +413,14 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
     LL = i18nObject("en")
     jest.clearAllMocks()
     ;(useNavigation as jest.Mock).mockReturnValue({ dispatch: dispatchMock })
-    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: true, wallets: scWallets })
+    mockUseActiveWallet.mockReturnValue({
+      isSelfCustodial: true,
+      wallets: selfCustodialWallets,
+    })
   })
 
-  it("renders the SC fee row with the feeText returned by useNonCustodialConversion", () => {
-    mockNonCustodialConversion.mockReturnValue({
+  it("renders the self-custodial fee row with the feeText returned by useSelfCustodialConversion", () => {
+    mockSelfCustodialConversion.mockReturnValue({
       isQuoting: false,
       hasQuoteError: false,
       feeText: "$0.05",
@@ -449,7 +453,7 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
 
   it("invokes nonCustodialConversion.execute and resets navigation to conversionSuccess on success", async () => {
     const executeMock = jest.fn().mockResolvedValue({ status: "success" })
-    mockNonCustodialConversion.mockReturnValue({
+    mockSelfCustodialConversion.mockReturnValue({
       isQuoting: false,
       hasQuoteError: false,
       feeText: "$0.05",
@@ -499,7 +503,7 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       status: "failed",
       message: "SDK rejected",
     })
-    mockNonCustodialConversion.mockReturnValue({
+    mockSelfCustodialConversion.mockReturnValue({
       isQuoting: false,
       hasQuoteError: false,
       feeText: "$0.05",

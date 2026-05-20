@@ -9,9 +9,9 @@ import {
   type Contact,
   type ContactAdapter,
   type ContactListResult,
-} from "@app/types/contact.types"
-import { AccountType } from "@app/types/wallet.types"
-import { type NormalizedTransaction } from "@app/types/transaction.types"
+} from "@app/types/contact"
+import { type NormalizedTransaction } from "@app/types/transaction"
+import { AccountType } from "@app/types/wallet"
 
 const unsupported = (operation: string): Error =>
   new Error(`Custodial contacts do not support ${operation}`)

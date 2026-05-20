@@ -6,11 +6,8 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import {
-  BackupStatus,
-  useBackupState,
-} from "@app/self-custodial/providers/backup-state-provider"
-import { AccountType } from "@app/types/wallet.types"
+import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
+import { AccountType } from "@app/types/wallet"
 
 import { SettingsRow } from "../row"
 
@@ -27,7 +24,7 @@ export const ViewBackupPhraseSetting: React.FC = () => {
     <SettingsRow
       title={LL.BackupScreen.ManualBackup.Phrase.headerTitle()}
       leftGaloyIcon="key-outline"
-      action={() => navigate("sparkBackupAlertsScreen")}
+      action={() => navigate("selfCustodialViewBackupSecurityChecks")}
     />
   )
 }

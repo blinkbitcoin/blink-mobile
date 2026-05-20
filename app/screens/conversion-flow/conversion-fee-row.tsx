@@ -7,17 +7,11 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 
 type Props = {
   feeText: string
-  adjustmentText: string | null
   isLoading: boolean
   hasError: boolean
 }
 
-export const ConversionFeeRow: React.FC<Props> = ({
-  feeText,
-  adjustmentText,
-  isLoading,
-  hasError,
-}) => {
+export const ConversionFeeRow: React.FC<Props> = ({ feeText, isLoading, hasError }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
 
@@ -33,11 +27,6 @@ export const ConversionFeeRow: React.FC<Props> = ({
           <Text style={[styles.value, hasError && styles.errorValue]}>{valueText}</Text>
         </View>
       )}
-      {adjustmentText ? (
-        <Text type="p2" style={styles.adjustment}>
-          {adjustmentText}
-        </Text>
-      ) : null}
     </View>
   )
 }
@@ -49,7 +38,6 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
     borderRadius: 13,
     padding: 20,
-    gap: 6,
   },
   row: {
     flexDirection: "row",
@@ -68,9 +56,5 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   errorValue: {
     color: colors.error,
-  },
-  adjustment: {
-    color: colors.warning,
-    fontSize: 12,
   },
 }))

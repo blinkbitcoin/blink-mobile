@@ -29,6 +29,7 @@ jest.mock("@app/components/screen", () => ({
 
 const mockUseIsAuthed = jest.fn()
 const mockUseHasCustodialAccount = jest.fn()
+const mockUseActiveWallet = jest.fn()
 
 jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockUseIsAuthed(),
@@ -36,6 +37,10 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 
 jest.mock("@app/hooks/use-has-custodial-account", () => ({
   useHasCustodialAccount: () => mockUseHasCustodialAccount(),
+}))
+
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => mockUseActiveWallet(),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -63,9 +68,10 @@ const renderGate = () =>
 describe("BackendFeatureGate", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
   })
 
-  it("renders the gated children when the user is authenticated", () => {
+  it("renders the gated children when the user is authenticated and on a custodial account", () => {
     mockUseIsAuthed.mockReturnValue(true)
     mockUseHasCustodialAccount.mockReturnValue(false)
 
@@ -94,5 +100,17 @@ describe("BackendFeatureGate", () => {
 
     expect(getByText("Create an account")).toBeTruthy()
     expect(getByText("Create an account to use Cards")).toBeTruthy()
+  })
+
+  it("blocks the gated children when the active account is self-custodial, even with a saved custodial token", () => {
+    mockUseIsAuthed.mockReturnValue(true)
+    mockUseHasCustodialAccount.mockReturnValue(true)
+    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: true })
+
+    const { queryByTestId, getByText } = renderGate()
+
+    expect(queryByTestId("children")).toBeNull()
+    expect(queryByTestId("backend-feature-gate")).toBeTruthy()
+    expect(getByText("Sign in to continue")).toBeTruthy()
   })
 })

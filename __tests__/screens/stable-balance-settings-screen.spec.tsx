@@ -63,7 +63,7 @@ jest.mock("@app/self-custodial/config", () => ({
   SparkToken: { Label: "USDB", Ticker: "USDB" },
 }))
 
-jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockWallet(),
 }))
 
@@ -170,7 +170,7 @@ describe("StableBalanceSettingsScreen", () => {
     expect(getByText("Holding USD")).toBeTruthy()
   })
 
-  it("renders without crashing when isStableBalanceActive is undefined (Critical #7 boot-window)", () => {
+  it("renders without crashing when isStableBalanceActive is undefined (boot-window)", () => {
     mockWallet.mockReturnValue({ ...baseContext, isStableBalanceActive: undefined })
     const { getByText } = renderScreen()
 

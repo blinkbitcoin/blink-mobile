@@ -62,7 +62,8 @@
     "title": "Kyusa",
     "transfer": "Weereza",
     "percentageToConvert": "Ebitundu ku kikumi eby'okukyusa",
-    "reviewTransfer": "Kebera okuweereza"
+    "reviewTransfer": "Kebera okuweereza",
+    "dustError": "Ssente zonna zirina okutambuzibwa."
   },
   "ConversionConfirmationScreen": {
     "title": "Wekenneenye enkyusa",
@@ -72,13 +73,10 @@
     "infoDollar": "Omuwendo gwa Doola gwa mugerageranyo gwokka. Guyinza okukyuka katono.",
     "transferButtonText": "Weereza {fromWallet} eri {toWallet}",
     "feeLabel": "Ssente z'okukyusa",
-    "feeError": "Tekisoboka kuggya ssente z'okukyusa",
-    "amountFloored": "Omuwendo gulinnyisiddwa okutuuka ku minimum y'okukyusa.",
-    "amountDustBumped": "Omuwendo gulinnyisiddwa okukyusa akasente ko kwonna."
+    "feeError": "Tekisoboka kuggya ssente z'okukyusa"
   },
   "ConversionSuccessScreen": {
-    "message": "Okukyusa kutuuse kubuwanguzi",
-    "title": "Obuwanguzi bw'okukyusa"
+    "message": "Okukyusa kutuuse kubuwanguzi"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2166,8 +2164,8 @@
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ssente z'okuteekawo: {fee} SAT ku muwendo gw'okuwandiika {threshold} SAT oba {overFee} SAT ku biteekawo ebisukka {threshold} SAT",
     "autoConvertMinAmount": "Omuwendo ogutasukka mu {minSats: number} sats tegusobola kukyusibwa mu Doola nga byekka. Ojja kufuna Bitcoin.",
-    "autoConvertSuccess": "Ofunye {amount: number} sats, bakyusiddwa mu Doola.",
-    "autoConvertFailed": "Okusasula kutuuse naye okukyusa kulemye."
+    "autoConvertFailed": "Okusasula kutuuse naye okukyusa kulemye.",
+    "pleaseWaitForConversion": "Lindako okutuusa ng'okukyusa kuwedde"
   },
   "RedeemBitcoinScreen": {
     "title": "Nunula Bitcoin",
@@ -2312,7 +2310,6 @@
     "slow": "Mpola",
     "recommended": "Kirungi",
     "walletOffline": "Wallet yo eri offline. Kebera ennyukuta yo oddemu ogezeko.",
-    "destinationIsRequired": "Enkomerero y'etagisa",
     "sdkInsufficientFunds": "Ssente tezimala ku mulimu guno.",
     "sdkAmountTooLow": "Omuwendo guli wansi ennyo olw'okukola on-chain.",
     "sdkNetworkError": "Ensobi y'ennyonnyola. Kebera ennyonnyola yo oddemu okugezaako.",
@@ -2333,7 +2330,6 @@
     "nonCustodialAccount": "Akawunti etakuumibwa",
     "tapUserName": "Koona okuteeka erinnya ly'omukozesa",
     "notifications": "Okumanyisibwa",
-    "recoveryMethod": "Engeri y'okuzzaawo",
     "title": "Ensengeka",
     "darkMode": "Endabika Y'ekizikiza",
     "setToDark": "Endabika: y'ekizikiza.",
@@ -2360,27 +2356,12 @@
     "receiveCurrency": "Ssente z'okufuna",
     "displayCurrency": "Ssente ez'okulaga",
     "AccountInformation": {
-      "accountTypeLabel": "Account type",
       "identityLabel": "Wallet identifier",
       "backupStatusLabel": "Backup status",
       "backupStatusCompleted": "Backup complete",
       "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information."
-    },
-    "TransactionLimits": {
-      "protocolNote": "Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.",
-      "btcToUsdTitle": "Bitcoin to Dollars",
-      "usdToBtcTitle": "Dollars to Bitcoin",
-      "minFromLabel": "Minimum sent",
-      "minToLabel": "Minimum received",
-      "loadError": "Could not load conversion limits."
-    },
-    "WaysToGetPaid": {
-      "lightningAddressTitle": "Lightning address",
-      "lightningAddressDescription": "Share this address to receive Lightning payments instantly.",
-      "onchainTitle": "Bitcoin deposit address",
-      "onchainDescription": "Share this address to receive Bitcoin on-chain.",
-      "loadError": "Could not load your payment details."
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Endagiriro ya Lightning"
     }
   },
   "NotificationSettingsScreen": {
@@ -2420,6 +2401,7 @@
     "level": "Omutendera {level: string}",
     "switchAccount": "Kyusa akawunti",
     "pleaseWait": "Nsaba Olinde.",
+    "probeBalanceFailed": "Tetwasobola kukakasa ssente za walletu. Wadde nga, gerageza nate.",
     "accountLevel": "Omutendera gwa Akawunti",
     "upgrade": "Linyisa omutindo gwa akawunti yo",
     "logOutAndDeleteLocalData": "Log out oggyewo ne bwino yenna",
@@ -2459,6 +2441,8 @@
     "copiedAccountId": "Wandukulula ID ya akawunti yo ku lutimbe",
     "yourAccountId": "ID ya Akawunti yo",
     "accountId": "ID ya Akawunti",
+    "publicKey": "Ekisumuluzo eky'olukale",
+    "copiedPublicKey": "Ekisumuluzo eky'olukale kikopereddwa mu kibiina",
     "copy": "Koppa",
     "identityVerification": "Okukakasa obumanyirivu"
   },
@@ -2489,7 +2473,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Akawunti ey'okufuna eyekyamukirizo",
-    "info": "Akawunti ya Bitcoin yo ye ya kukuŋŋaanya sats, omuwendo gwa USD gwe gutambulira n'akatale. Akawunti ya Dola yo etambulizibwa Stablesats — ekuuma Bitcoin ekuumibwa okubeera ennywevu mu muwendo gwa USD. Bulijjo okutta Bitcoin, naye omuwendo gw'edoola teguyunjuluka."
+    "info": "Akawunti ya Bitcoin yo ye ya kukuŋŋaanya sats, omuwendo gwa USD gwe gutambulira n'akatale. Akawunti ya Dola yo etambulizibwa Stablesats — ekuuma Bitcoin ekuumibwa okubeera ennywevu mu muwendo gwa USD. Bulijjo okutta Bitcoin, naye omuwendo gw'edoola teguyunjuluka.",
+    "titleSelfCustodial": "Akawunti eya bulijjo",
+    "infoSelfCustodial": "Akawunti eno y'eneekozesebwa nga eya bulijjo nga osasula n'okusiga. Osobola okukyusa buli kiseera."
   },
   "ThemeScreen": {
     "title": "Endabika",
@@ -2507,7 +2493,10 @@
     "header": "Akawunti ya Dola yo etambulizibwa Stablesats",
     "body": "Akawunti ya Dola ekozesa tekinologiya ya Stablesats okukuuma Bitcoin ennywevu ku bbeeyi ya USD. Bulijjo okutta Bitcoin — si ddoola ennyangu — naye omuwendo gwa USD teguyunjuluka. Osobola okusindika n'okufuna Bitcoin nga bulijjo, naye tekitukayanganye na sisitemu y'amabanka eya bulijjo.",
     "termsAndConditions": "Soma amateeka n'ebiragiro",
-    "learnMore": "Yiga ebisingawo ku Stablesats"
+    "learnMore": "Yiga ebisingawo ku Stablesats",
+    "headerSelfCustodial": "Akawunti yo eya Dollar elina stablecoins",
+    "bodySelfCustodial": "Mu akawunti ya Dollar olina stablecoins. Tokens eziwagirwa ebintu nga omuwendo gwazo gugume nga gwekuusa ku USD. Tosobola kusindika oba kufuna stablecoins (nga kati). Bw'osindika okuva mu akawunti ya Dollar, stablecoins zo zinaakyusibwa ne zisindikibwa nga Bitcoin eri omufunisi.",
+    "learnMoreSelfCustodial": "Manya ebisingawo"
   },
   "SplashScreen": {
     "update": "App yo evudde ku mulembe. Okulongoosa kwetaagibwa nga app tennakozesebwa.\n\nKino osobola okukikola okuva ku PlayStore eya Android ne Testflight eya iOS"
@@ -2787,6 +2776,7 @@
     "submit": "Waayo",
     "success": "Obuwanguzi!",
     "dollarStablesats": "Doola (Stablesats)",
+    "dollarStablecoin": "Doola (Stablecoin)",
     "to": "Eri",
     "total": "Omugatte",
     "transactions": "Empaanyisiganya",
@@ -2831,7 +2821,8 @@
       "invalidRegion": "Okulonda ekitundu tekikkaanya"
     },
     "passwordTooWeak": "Ebigambo eby’ekyama binafu nnyo. Kozesa ennukuta ennene n’entono, ennamba n’obubonero obw’enjawulo.",
-    "passwordCommon": "Ebigambo bino eby’ekyama bimanyiddwa nnyo. Nsaba olonde ekigambo eky’ekyama ekisinga obukakafu."
+    "passwordCommon": "Ebigambo bino eby’ekyama bimanyiddwa nnyo. Nsaba olonde ekigambo eky’ekyama ekisinga obukakafu.",
+    "copied": "Kikoppiddwa ku kifo eky'okukwatiramu"
   },
   "errors": {
     "generic": "Wabaddewo ensobi.\nTukusaba oddemu ogezeeko oluvannyuma.",
@@ -3000,7 +2991,10 @@
       "emptyTransactions": "Tewali byokukola ku nsimbi",
       "addFunds": "Yongera sente",
       "transactionsTitle": "Ebyokukola ku nsimbi",
-      "title": "Kaadi ya Visa"
+      "title": "Kaadi ya Visa",
+      "noCardAvailable": "Tewali kaadi zikola",
+      "cardNotUsable": "Kaadi eno tekulinkwa kukozesebwa kati",
+      "cardUpdateError": "Tekisobose kukyusa embeera ya kaadi"
     },
     "validThruLabel": "KIKWATA OKUTUUSA",
     "networkVisa": "Visa",
@@ -3272,9 +3266,6 @@
         "damagedCard": "Kaadi eyonoonese",
         "damagedCardDescription": "Kaadi yange yonoonese",
         "whatHappensNext": "Kiki ekiddayo?",
-        "currentCardDeactivated": "Kaadi yo ey'omu kaakati ejja kusazibwamu amangu ago",
-        "newCardShipped": "Kaadi empya ejja kutumibwa ku ndagiriro yo",
-        "digitalCardAvailable": "Kaadi yo eya dijitaali esigala ng'esoboka mu nkola eno",
         "cardManagement": "Okuddukanya kaadi",
         "bullet1": "Kaadi yo ey'omu kaakati ejja kuzibwa olw'obukuumi",
         "bullet2": "Kaadi empya n'ennamba ez'enjawulo ejja kufulumizibwa",
@@ -3295,15 +3286,9 @@
         "title": "Kebera okusaba kwo",
         "subtitle": "Kakasa ebikwata ku kukyusa kaadi yo",
         "requestSummary": "Akafunze k'okusaba",
-        "reason": "Ensonga",
         "delivery": "Okutwala",
-        "shippingAddress": "Endagiriro y'okutuma",
-        "deliveryCost": "Bbeeyi y'okutwala",
         "submitRequest": "Weereza okusaba",
         "importantInformation": "Amawulire ag'omugaso",
-        "processedImmediately": "Okusaba kwo kujja kukolesereza amangu ago",
-        "currentCardDeactivated": "Kaadi ey'omu kaakati ejja kusazibwamu ng'okakasizza",
-        "trackStatus": "Osobola okugoberera embeera y'okutwala kaadi yo empya mu app",
         "issueType": "Ensonga",
         "deliveryTime": "Obudde bw'okutuusa",
         "shippingCost": "Bbeeyi y'okutwala",
@@ -3356,10 +3341,7 @@
         "feature2": "EMV chip olw'obukuumi obulungi",
         "feature3": "Magnetic stripe olw'okukkirizibwa buli wansi",
         "feature4": "Erinnya lyo liryanga ku kaadi",
-        "important": "Kikulu",
-        "importantBullet1": "Kaadi yo ya virtual ejja kusigala nga erimu emirimu ng'owuliriza kaadi ey'omubiri",
-        "importantBullet2": "Ojja kwetaaga okukola aktivesoni ya kaadi ey'omubiri ng'etuuse",
-        "importantBullet3": "Kaadi zombi zijja kuba n'omuwendo n'obubaka obw'ekimu"
+        "important": "Kikulu"
       },
       "Confirm": {
         "title": "Kakasa oda yo",
@@ -3488,9 +3470,9 @@
       "appleICloud": "Apple iCloud",
       "passwordManager": "Omuteegezzi w'ebigambo by'okuyingira",
       "manualBackup": "Okukoppa mu ngalo",
-      "keychainSaved": "Okukoppa kutereddwa mu muteegezzi w'ebigambo",
-      "keychainFailed": "Okukoppa tekusobodde kutereka",
-      "iOSComingSoon": "Okukoppa ku iCloud kujja mangu"
+      "passwordManagerBackupSaved": "Okukoppa kutereddwa mu muteegezzi w'ebigambo",
+      "passwordManagerBackupFailed": "Okukoppa tekusobodde kutereka",
+      "passwordManagerUnavailable": "Tewali maneja wa passwordi ku kyuma kino. Kozesa Drive backup oba okuume ekigambo ekirimu ebigambo 12 mu ngeri ye'maanyi."
     },
     "ManualBackup": {
       "Alerts": {
@@ -3507,7 +3489,8 @@
         "saveItNow": "Kitereke kati",
         "savedConfirm": "Nkitereka",
         "copy": "Koppa",
-        "continueButton": "Weyongerawo"
+        "continueButton": "Weyongerawo",
+        "testBackup": "Gezza okukuumako"
       },
       "Confirm": {
         "headerTitle": "Kakasa ekigambo eky'okukoppa",
@@ -3518,7 +3501,8 @@
         "incorrectWord": "Ekigambo si kituufu, tunuulira enkola"
       },
       "Success": {
-        "title": "Tukulabiriza ku Blink etali ya kuzibika"
+        "title": "Tukulabiriza ku Blink etali ya kuzibika",
+        "testSuccess": "Ebigambo byo ebya bbakappu birongoofu"
       }
     },
     "CloudBackup": {
@@ -3537,9 +3521,14 @@
       "passwordMismatch": "Ebigambo eby'okuyingira tebituukagana",
       "uploadSuccess": "Kopi eterekedwa mu {provider}",
       "uploadFailed": "Enteeka y'ekopi teeyasoboka",
-      "signInFailed": "Okuyingira mu Google tekwagenda bulungi",
+      "signInFailed": "Okuyingira mu {provider} kukomye",
+      "cloudNotAvailable": "iCloud Drive teweza. Yingira mu iCloud mu Settings era okkirize iCloud Drive.",
+      "networkError": "Ensobi y'omukutu. Kebera enkolagana yo era oddemu okugezaako.",
       "existingBackupTitle": "Kopi efuniddwa",
       "existingBackupMessage": "Waliwo kopi mu {provider} yo. Oyagala okugisimbulira?",
+      "existingBackupMessageWithDetails": "Waliwo ekkopi ku {provider} yo.\n\nEndagiriro ya Lightning: {address}\nEkoleddwa: {createdAt}\n\nOyagala kugiwandiikako?",
+      "existingBackupUnknownAddress": "Tekiriiwo",
+      "existingBackupUnknownCreatedAt": "Tekimanyiddwa",
       "overwrite": "Simbulira"
     }
   },
@@ -3553,8 +3542,8 @@
     "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark",
+    "custodialLabel": "Eterekeddwa",
+    "selfCustodialLabel": "Yeefuga",
     "custodialDescription": "Tukuuma ssente zo ku lw'ekitiibwa kyo",
     "selfCustodialDescription": "Ggwe wekka oyinza okufuna ssente",
     "continueButton": "Weyongerayo",
@@ -3562,7 +3551,9 @@
     "descriptionSelected": "Londa ekika ky'akawunti.",
     "chooseMethod": "Londa enkola",
     "restoreComingSoonTitle": "Kijja mangu",
-    "restoreComingSoonDescription": "Enkola y'okuzzaawo ejja kubeera mu update ejja."
+    "restoreComingSoonDescription": "Enkola y'okuzzaawo ejja kubeera mu update ejja.",
+    "createFailed": "Tekisobose okukola wallet. Tugezeeyo nate.",
+    "selfCustodialDisabled": "Tekikola kati ku non-custodial."
   },
   "RestoreScreen": {
     "title": "Zzaawo wallet",
@@ -3581,7 +3572,9 @@
     "noBackupFound": "Tewali koppa efuniddwa",
     "noBackupDescription": "Tetufunye koppa. Osobola okuyingiza ekigambo ky'okukuuma mu ngalo.",
     "enterPassword": "Yingiza password yo ey'okusiba",
-    "wrongPassword": "Password si ntuufu. Gezaako nate."
+    "wrongPassword": "Password si ntuufu. Gezaako nate.",
+    "pickBackupTitle": "Londa wallet",
+    "pickBackupDescription": "Londa kopiyo y'okuzzaawo"
   },
   "BackupNudge": {
     "title": "Ssente zo ziri mu bulabe",
@@ -3590,11 +3583,7 @@
     "settingsWarning": "Koppa wallet yo. Bw'ofiirwa ekikozesebwa kino, onofiirwa ssente zo.",
     "modalTitle": "Kuuma ssente zo",
     "modalDescription": "Tukutegeeza nnyo okukola backup ya wallet yo okusobola okuziyiza okufiirwa ssente zo zonna bw'onooba ofiirwa device eno.",
-    "secureMe": "Kuuma wallet",
-    "trustModelTitle": "Ggwe ofuga",
-    "trustModelDescription": "Ebisumuluzo byo bifuga ssente zo. Okutambula kw'ensimbi kukolebwa Spark operators, so si butereevu ku Bitcoin L1.",
-    "trustModelWarning": "Balance entono ennyo teyandibadde ya mugaso okuddamu ku Bitcoin base chain.",
-    "trustModelDismiss": "Ntegedde"
+    "secureMe": "Kuuma wallet"
   },
   "StableBalance": {
     "title": "Bbaalansi ennywevu",
@@ -3618,12 +3607,6 @@
       "deactivateConfirm": "Kusalako",
       "cancel": "Sazaamu"
     },
-    "firstTimeModal": {
-      "title": "Ebikwata ku Kukyusa",
-      "dualBalance": "BTC ne USD bye ssente ebbiri ezeewaddeko mu wolede yo. Kozesa Convert buli kiseera okusengula ssente wakati waabyo.",
-      "trustDisclosure": "Endowooza ya USD ekozesa tokens za USDB ku Spark. Ebiteebereezebwa eby'obwesige bya njawulo okukuuma BTC butereevu. USDB yeesigamye ku muwa tokens wa Spark.",
-      "acknowledge": "Ntegedde"
-    },
     "minimumConversion": "Ekitono ekisinga okukyusa: {amount:string}",
     "conversionUnavailable": "Okukyusa tekikolaako kati. Gezaako nate."
   },
@@ -3638,7 +3621,7 @@
     "featureEarn": "Earn",
     "featureCard": "Card"
   },
-  "SparkWalletCreationScreen": {
+  "WalletCreationScreen": {
     "creating": "Okukola wallet yo...",
     "errorTitle": "Okukola wallet kugaanye",
     "errorDescription": "Waliwo ekikyamu. Gezaako nate.",
@@ -3674,7 +3657,6 @@
     "description": "Omutindo: {sats} sats ezikubirwa",
     "claim": "Teeka kati",
     "claiming": "Kuteeka...",
-    "belowMinimum": "{count} ebiteekeddwa wansi w'obunene (~{minimum} sats). Bino tebisobola kuteekebwa.",
     "screenTitle": "Ebisika ebitafunidde",
     "cardTitle": "Claim {sats} sats",
     "claimWithFee": "Claim (max fee: {fee} sats)",
@@ -3697,12 +3679,7 @@
     "refundNow": "Zzaayo kati",
     "refundSuccess": "Refund initiated successfully",
     "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit",
-    "badgeReady": "Tereke",
-    "badgePending": "Ekyalindirira",
-    "badgeFeeIssue": "Fee issue",
-    "badgeError": "Ensobi",
-    "badgeRefunded": "Ezzaddayo"
+    "error": "Unable to claim this deposit"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {
@@ -3714,10 +3691,16 @@
     "degradedBanner": "Spark network is currently degraded. Payments may take longer."
   },
   "SelfCustodialDelete": {
-    "title": "Delete self-custodial wallet",
-    "warning": "This will remove this wallet from this device.",
-    "recoveryNote": "If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.",
-    "backupBadgeCompleted": "Backup complete",
-    "backupBadgeMissing": "Backup not complete"
+    "dangerZoneImportantTitle": "Kikulu",
+    "dangerZoneBulletReinstated": "Akawunti esangiddwawo teyinza kuzzibwawo",
+    "dangerZoneBulletPermanent": "Okusangulawo akawunti kya lubeerera",
+    "dangerZoneBulletEmpty": "Kakasa nti akawunti nkalu",
+    "dangerZoneDeleteButton": "Sangulawo akawunti n'ebigamuli",
+    "confirmModalTitle": "Kakasa okusangulawo akawunti",
+    "confirmModalTypeToConfirm": "Wandika \"{delete: string}\" okukakasa",
+    "hasFundsWarningTitle": "Okulabula",
+    "hasFundsWarningBody": "Ssente zo eziri ku akawunti ze {balance}. Olw'obukuumi bwo, tetukkiriza kusangulawo akawunti ezirimu sente.",
+    "hasFundsWarningHelper": "Okweyongera okusangulawo, jjawo sente zo oba kuba ne togaba mu economies circular.",
+    "hasFundsWarningButton": "Komawo"
   }
 }

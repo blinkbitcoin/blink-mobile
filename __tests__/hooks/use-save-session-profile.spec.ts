@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { DefaultAccountId } from "@app/types/wallet.types"
+import { DefaultAccountId } from "@app/types/wallet"
 
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
@@ -79,7 +79,7 @@ describe("useSaveSessionProfile", () => {
     mockSaveSessionProfiles.mockResolvedValue(true)
   })
 
-  describe("saveProfile (Important #13)", () => {
+  describe("saveProfile", () => {
     it("returns without writing when token is empty", async () => {
       const { result } = renderHook(() => useSaveSessionProfile())
 
@@ -136,7 +136,7 @@ describe("useSaveSessionProfile", () => {
       expect(saveTokenOrder).toBeLessThan(updateStateOrder)
     })
 
-    it("calls updateState BEFORE the profile fetch so an SC-active user lands on Custodial even if /me fails", async () => {
+    it("calls updateState BEFORE the profile fetch so an self-custodial-active user lands on Custodial even if /me fails", async () => {
       mockFetchUsername.mockRejectedValue(new Error("network down"))
 
       const { result } = renderHook(() => useSaveSessionProfile())

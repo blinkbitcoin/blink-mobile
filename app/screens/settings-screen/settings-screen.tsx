@@ -9,6 +9,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { Screen } from "@app/components/screen"
 import { SettingsCard } from "./settings-card"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -17,6 +18,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useUnacknowledgedNotificationCountQuery } from "@app/graphql/generated"
+import { AccountType } from "@app/types/wallet"
 
 import { AccountBanner } from "./account/banner"
 import { EmailSetting } from "./account/settings/email"
@@ -39,11 +41,10 @@ import { NotificationSetting } from "./settings/sp-notifications"
 import { OnDeviceSecuritySetting } from "./settings/sp-security"
 import { TotpSetting } from "./totp"
 import { AccountStaticQR } from "./settings/account-static-qr"
-import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
+// TODO: re-enable once the custodial → non-custodial migration is complete
+// import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
 import { SwitchAccountSetting } from "./settings/multi-account"
 import { StableBalanceSetting } from "./settings/stable-balance"
-import { SelfCustodialAccountInformationSetting } from "./settings/self-custodial-account-information"
-import { SelfCustodialBitcoinDeposit } from "./settings/self-custodial-bitcoin-deposit"
 import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
 
 // All queries in settings have to be set here so that the server is not hit with
@@ -89,26 +90,23 @@ export const SettingsScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const { isAtLeastLevelOne } = useLevel()
   const { shouldShowSettingsBanner } = useBackupNudgeState()
+  const { activeAccount } = useAccountRegistry()
   const { data: unackNotificationCount } = useUnacknowledgedNotificationCountQuery({
     skip: !isAuthed,
     fetchPolicy: "cache-and-network",
   })
 
+  const isSelfCustodialMode = activeAccount?.type === AccountType.SelfCustodial
+
   const items = {
     account: [
       AccountLevelSetting,
-      SelfCustodialAccountInformationSetting,
       TxLimits,
       SwitchAccountSetting,
-      MoveToNonCustodialSetting,
+      // TODO: re-enable once the custodial → non-custodial migration is complete
+      // MoveToNonCustodialSetting,
     ],
-    waysToGetPaid: [
-      AccountLNAddress,
-      PhoneLnAddress,
-      AccountPOS,
-      AccountStaticQR,
-      SelfCustodialBitcoinDeposit,
-    ],
+    waysToGetPaid: [AccountLNAddress, PhoneLnAddress, AccountPOS, AccountStaticQR],
     loginMethods: [EmailSetting, PhoneSetting],
     preferences: [
       NotificationSetting,
@@ -153,7 +151,7 @@ export const SettingsScreen: React.FC = () => {
           <SettingsCard
             title={LL.BackupNudge.title()}
             description={LL.BackupNudge.settingsWarning()}
-            onPress={() => navigation.navigate("sparkBackupMethodScreen")}
+            onPress={() => navigation.navigate("selfCustodialBackupMethod")}
             borderColor="primary"
             titleColor="primary"
           />
@@ -163,7 +161,7 @@ export const SettingsScreen: React.FC = () => {
           name={LL.SettingsScreen.addressScreen()}
           items={items.waysToGetPaid}
         />
-        {isAtLeastLevelOne && (
+        {isAtLeastLevelOne && !isSelfCustodialMode && (
           <SettingsGroup
             name={LL.AccountScreen.loginMethods()}
             items={items.loginMethods}
@@ -174,7 +172,9 @@ export const SettingsScreen: React.FC = () => {
           name={LL.common.securityAndPrivacy()}
           items={items.securityAndPrivacy}
         />
-        <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
+        {!isSelfCustodialMode && (
+          <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
+        )}
         <SettingsGroup name={LL.common.support()} items={items.community} />
         <VersionComponent />
       </ScrollView>

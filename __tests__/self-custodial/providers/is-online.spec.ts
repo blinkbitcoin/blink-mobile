@@ -3,7 +3,6 @@ import { ServiceStatus } from "@breeztech/breez-sdk-spark-react-native"
 import {
   getOnlineState,
   getServiceStatus,
-  isOnline,
   isOnlineStatus,
   STATUS_TIMEOUT_MS,
 } from "@app/self-custodial/providers/is-online"
@@ -114,46 +113,7 @@ describe("isOnlineStatus", () => {
   })
 })
 
-describe("isOnline", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("returns true when status is Operational", async () => {
-    mockGetSparkStatus.mockResolvedValue({
-      status: ServiceStatus.Operational,
-      lastUpdated: BigInt(0),
-    })
-
-    expect(await isOnline()).toBe(true)
-  })
-
-  it("returns true when status is Degraded", async () => {
-    mockGetSparkStatus.mockResolvedValue({
-      status: ServiceStatus.Degraded,
-      lastUpdated: BigInt(0),
-    })
-
-    expect(await isOnline()).toBe(true)
-  })
-
-  it("returns false when status is Major", async () => {
-    mockGetSparkStatus.mockResolvedValue({
-      status: ServiceStatus.Major,
-      lastUpdated: BigInt(0),
-    })
-
-    expect(await isOnline()).toBe(false)
-  })
-
-  it("returns false when getSparkStatus throws", async () => {
-    mockGetSparkStatus.mockRejectedValue(new Error("net down"))
-
-    expect(await isOnline()).toBe(false)
-  })
-})
-
-describe("getOnlineState (3-state, Critical #4)", () => {
+describe("getOnlineState (3-state)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -193,7 +153,7 @@ describe("getOnlineState (3-state, Critical #4)", () => {
     expect(await getOnlineState()).toBe("unknown")
   })
 
-  it("forwards an AbortSignal to getSparkStatus (Critical #3)", async () => {
+  it("forwards an AbortSignal to getSparkStatus", async () => {
     mockGetSparkStatus.mockResolvedValue({
       status: ServiceStatus.Operational,
       lastUpdated: BigInt(0),
@@ -206,7 +166,7 @@ describe("getOnlineState (3-state, Critical #4)", () => {
     expect(signal.aborted).toBe(false)
   })
 
-  it("aborts and returns 'unknown' when the SDK call hangs past the timeout (Critical #3)", async () => {
+  it("aborts and returns 'unknown' when the SDK call hangs past the timeout", async () => {
     jest.useFakeTimers()
     mockGetSparkStatus.mockImplementation(
       (signal: AbortSignal) =>
@@ -224,7 +184,7 @@ describe("getOnlineState (3-state, Critical #4)", () => {
   })
 })
 
-describe("crashlytics reporting on Spark status failures (I4)", () => {
+describe("crashlytics reporting on Spark status failures", () => {
   beforeEach(() => {
     mockRecordError.mockClear()
   })
