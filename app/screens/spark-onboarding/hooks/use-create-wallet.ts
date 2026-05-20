@@ -1,15 +1,16 @@
 import { useCallback, useState } from "react"
+import Crypto from "react-native-quick-crypto"
 
 import { CommonActions, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import crashlytics from "@react-native-firebase/crashlytics"
 
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { selfCustodialCreateWallet } from "@app/self-custodial/bridge"
-import { useBackupState } from "@app/self-custodial/providers/backup-state-provider"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
 import { usePersistentStateContext } from "@app/store/persistent-state"
-import { DefaultAccountId } from "@app/types/wallet.types"
+import { reportError } from "@app/utils/error-logging"
 
 export const CreationStatus = {
   Idle: "idle",
@@ -23,29 +24,31 @@ export const useCreateWallet = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { updateState } = usePersistentStateContext()
   const { retry: reinitSdk } = useSelfCustodialWallet()
-  const { resetBackupState } = useBackupState()
+  const { reloadSelfCustodialAccounts } = useAccountRegistry()
   const [status, setStatus] = useState<CreationStatus>(CreationStatus.Idle)
+  const guard = useInFlightGuard()
 
   const create = useCallback(async () => {
-    setStatus(CreationStatus.Creating)
-    try {
-      await selfCustodialCreateWallet()
-      reinitSdk()
-      resetBackupState()
-      updateState((prev) => {
-        if (!prev) return prev
-        return { ...prev, activeAccountId: DefaultAccountId.SelfCustodial }
-      })
-      navigation.dispatch(
-        CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
-      )
-    } catch (err) {
-      crashlytics().recordError(
-        err instanceof Error ? err : new Error(`Wallet creation failed: ${err}`),
-      )
-      setStatus(CreationStatus.Error)
-    }
-  }, [navigation, updateState, reinitSdk, resetBackupState])
+    await guard.run(async () => {
+      setStatus(CreationStatus.Creating)
+      try {
+        const accountId = Crypto.randomUUID()
+        await selfCustodialCreateWallet(accountId)
+        await reloadSelfCustodialAccounts()
+        reinitSdk()
+        updateState((prev) => {
+          if (!prev) return prev
+          return { ...prev, activeAccountId: accountId }
+        })
+        navigation.dispatch(
+          CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
+        )
+      } catch (err) {
+        reportError("Wallet creation", err)
+        setStatus(CreationStatus.Error)
+      }
+    })
+  }, [guard, navigation, updateState, reinitSdk, reloadSelfCustodialAccounts])
 
   return { status, create }
 }

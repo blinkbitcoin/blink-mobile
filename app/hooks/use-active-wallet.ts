@@ -45,7 +45,9 @@ export const useActiveWallet = (): ActiveWalletResult => {
 
     return {
       ...base,
-      isReady: base.status === ActiveWalletStatus.Ready,
+      isReady:
+        base.status === ActiveWalletStatus.Ready ||
+        base.status === ActiveWalletStatus.Degraded,
       isSelfCustodial:
         base.accountType === AccountType.SelfCustodial &&
         base.status !== ActiveWalletStatus.Unavailable,

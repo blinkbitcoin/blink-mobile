@@ -8,6 +8,8 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { BackendFeatureGate } from "@app/components/backend-feature-gate"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { MountainHeader } from "../../components/mountain-header"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -84,7 +86,7 @@ type FinishProps = {
   length: number
 }
 
-export const EarnMapScreen: React.FC = () => {
+const EarnMapScreenContent: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
@@ -405,3 +407,15 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 20,
   },
 }))
+
+export const EarnMapScreen: React.FC = () => {
+  const { LL } = useI18nContext()
+  return (
+    <BackendFeatureGate
+      featureName={LL.BackendFeatureGate.featureEarn()}
+      icon={<GaloyIcon name="map" size={64} />}
+    >
+      <EarnMapScreenContent />
+    </BackendFeatureGate>
+  )
+}

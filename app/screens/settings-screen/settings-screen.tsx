@@ -42,6 +42,8 @@ import { AccountStaticQR } from "./settings/account-static-qr"
 import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
 import { SwitchAccountSetting } from "./settings/multi-account"
 import { StableBalanceSetting } from "./settings/stable-balance"
+import { SelfCustodialAccountInformationSetting } from "./settings/self-custodial-account-information"
+import { SelfCustodialBitcoinDeposit } from "./settings/self-custodial-bitcoin-deposit"
 import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
 
 // All queries in settings have to be set here so that the server is not hit with
@@ -95,11 +97,18 @@ export const SettingsScreen: React.FC = () => {
   const items = {
     account: [
       AccountLevelSetting,
+      SelfCustodialAccountInformationSetting,
       TxLimits,
       SwitchAccountSetting,
       MoveToNonCustodialSetting,
     ],
-    waysToGetPaid: [AccountLNAddress, PhoneLnAddress, AccountPOS, AccountStaticQR],
+    waysToGetPaid: [
+      AccountLNAddress,
+      PhoneLnAddress,
+      AccountPOS,
+      AccountStaticQR,
+      SelfCustodialBitcoinDeposit,
+    ],
     loginMethods: [EmailSetting, PhoneSetting],
     preferences: [
       NotificationSetting,

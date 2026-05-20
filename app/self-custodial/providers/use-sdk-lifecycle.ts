@@ -8,12 +8,26 @@ import { ActiveWalletStatus, type WalletState } from "@app/types/wallet.types"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { withTimeout } from "@app/utils/with-timeout"
 
-import { addSdkEventListener, disconnectSdk, getUserSettings, initSdk } from "../bridge"
+import {
+  addSdkEventListener,
+  disconnectSdk,
+  getUserSettings,
+  initSdk,
+  removeSdkEventListener,
+} from "../bridge"
+import { storageDirFor } from "../config"
+import { useBackoffRetry } from "../hooks/use-backoff-retry"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 
 import { extractPaymentId, PAYMENT_RECEIVED_EVENTS, REFRESH_EVENTS } from "./sdk-events"
 import { validateStoredNetwork } from "./validate-network"
-import { getOnlineState, OnlineState, STATUS_TIMEOUT_MS } from "./is-online"
+import {
+  getOnlineState,
+  getServiceStatus,
+  isDegradedStatus,
+  OnlineState,
+  STATUS_TIMEOUT_MS,
+} from "./is-online"
 import {
   appendTransactions,
   getSelfCustodialWalletSnapshot,
@@ -24,6 +38,7 @@ type SdkLifecycleState = {
   wallets: WalletState[]
   status: ActiveWalletStatus
   sdk: BreezSdkInterface | null
+  connectedAccountId: string | null
   isStableBalanceActive?: boolean
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
@@ -38,7 +53,20 @@ const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
   ActiveWalletStatus.Unavailable,
 ]
 
-export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
+const RECONNECT_BACKOFF_MS: readonly number[] = [1000, 3000, 9000]
+
+const teardownSdk = async (
+  sdk: BreezSdkInterface,
+  listenerId: string | null,
+): Promise<void> => {
+  if (listenerId) await removeSdkEventListener(sdk, listenerId)
+  await disconnectSdk(sdk)
+}
+
+export const useSdkLifecycle = (
+  activeSelfCustodialAccountId: string | null,
+  retryCount: number,
+): SdkLifecycleState => {
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
   const [isStableBalanceActive, setIsStableBalanceActive] = useState<boolean>()
@@ -46,10 +74,15 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
   const [hasMoreTransactions, setHasMoreTransactions] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [sdk, setSdk] = useState<BreezSdkInterface | null>(null)
+  const [connectedAccountId, setConnectedAccountId] = useState<string | null>(null)
   const sdkRef = useRef<BreezSdkInterface | null>(null)
+  const listenerIdRef = useRef<string | null>(null)
+  const abortRef = useRef(false)
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
   const rawTxOffsetRef = useRef(0)
+  const { schedule: scheduleBackoffRetry, reset: resetBackoff } =
+    useBackoffRetry(RECONNECT_BACKOFF_MS)
 
   // `refreshingRef` linearizes concurrent refreshes (10s poll, AppState change,
   // SDK events): only one runOnce executes at a time, and any overlapping call
@@ -78,8 +111,13 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
         setWallets(snapshot.wallets)
         setHasMoreTransactions(snapshot.hasMore)
         rawTxOffsetRef.current = snapshot.rawTransactionCount // eslint-disable-line require-atomic-updates
-        // Snapshot success implies network reach; we skip a second `getServiceStatus()` here.
-        setStatus(ActiveWalletStatus.Ready)
+        const serviceStatus = await getServiceStatus()
+        setStatus(
+          isDegradedStatus(serviceStatus)
+            ? ActiveWalletStatus.Degraded
+            : ActiveWalletStatus.Ready,
+        )
+        resetBackoff()
       } catch (err) {
         logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
         crashlytics().recordError(
@@ -102,6 +140,9 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
           }
           return prev === ActiveWalletStatus.Loading ? ActiveWalletStatus.Error : prev
         })
+        scheduleBackoffRetry(() => {
+          if (sdkRef.current) refreshWallets()
+        })
       }
     }
 
@@ -113,22 +154,30 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     } finally {
       refreshingRef.current = false // eslint-disable-line require-atomic-updates
     }
-  }, [])
+  }, [resetBackoff, scheduleBackoffRetry])
 
   useEffect(() => {
+    if (!activeSelfCustodialAccountId) {
+      setStatus(ActiveWalletStatus.Unavailable)
+      return
+    }
+
     let mounted = true
+    abortRef.current = false
+    const accountId = activeSelfCustodialAccountId
 
     const connectAndListen = async (mnemonic: string) => {
-      const connectedSdk = await initSdk(mnemonic)
-      if (!mounted) {
-        await disconnectSdk(connectedSdk)
+      const connectedSdk = await initSdk(mnemonic, storageDirFor(accountId))
+      if (abortRef.current || !mounted) {
+        await teardownSdk(connectedSdk, null)
         return
       }
 
       sdkRef.current = connectedSdk
       setSdk(connectedSdk)
+      setConnectedAccountId(accountId)
 
-      await addSdkEventListener(connectedSdk, async (event) => {
+      const listenerId = await addSdkEventListener(connectedSdk, async (event) => {
         if (!mounted) return
         if (!REFRESH_EVENTS.has(event.tag)) return
 
@@ -138,7 +187,11 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
         }
         await refreshWallets()
       })
-      if (!mounted) return
+      if (abortRef.current || !mounted) {
+        await teardownSdk(connectedSdk, listenerId)
+        return
+      }
+      listenerIdRef.current = listenerId
 
       refreshWallets()
 
@@ -155,13 +208,13 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     }
 
     const initialize = async () => {
-      const mnemonic = await KeyStoreWrapper.getMnemonic()
+      const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
       if (!mnemonic) {
         if (mounted) setStatus(ActiveWalletStatus.Unavailable)
         return
       }
 
-      const networkValid = await validateStoredNetwork()
+      const networkValid = await validateStoredNetwork(accountId)
       if (!networkValid) {
         if (mounted) setStatus(ActiveWalletStatus.Error)
         return
@@ -181,13 +234,24 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
 
     return () => {
       mounted = false
-      if (sdkRef.current) {
-        disconnectSdk(sdkRef.current)
-        sdkRef.current = null
-        setSdk(null)
-      }
+      abortRef.current = true
+      resetBackoff()
+
+      const sdk = sdkRef.current
+      const listenerId = listenerIdRef.current
+      sdkRef.current = null
+      listenerIdRef.current = null
+      setSdk(null)
+      setConnectedAccountId(null)
+
+      if (!sdk) return
+      teardownSdk(sdk, listenerId).catch((err) => {
+        crashlytics().recordError(
+          err instanceof Error ? err : new Error(`SDK cleanup failed: ${err}`),
+        )
+      })
     }
-  }, [retryCount, refreshWallets])
+  }, [retryCount, refreshWallets, activeSelfCustodialAccountId, resetBackoff])
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
@@ -247,6 +311,7 @@ export const useSdkLifecycle = (retryCount: number): SdkLifecycleState => {
     wallets,
     status,
     sdk,
+    connectedAccountId,
     isStableBalanceActive,
     lastReceivedPaymentId,
     hasMoreTransactions,

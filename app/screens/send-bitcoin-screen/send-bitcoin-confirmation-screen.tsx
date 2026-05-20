@@ -28,7 +28,6 @@ import {
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
 import { useTranslateSdkError } from "@app/self-custodial/hooks"
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
@@ -93,7 +92,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     formatMoneyAmount,
   } = useDisplayCurrency()
   const saveLnAddressContact = useSaveLnAddressContact()
-  const { isSelfCustodial } = useActiveWallet()
 
   const { btcWallet, usdWallet } = useSendBalances()
 
@@ -193,16 +191,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       })
 
       if (status === "SUCCESS" || status === "PENDING") {
-        if (!isSelfCustodial) {
-          await saveLnAddressContact({
-            paymentType,
-            destination,
-            isMerchant:
-              paymentDetail.paymentType === "lnurl"
-                ? paymentDetail.isMerchant
-                : undefined,
-          })
-        }
+        await saveLnAddressContact({
+          paymentType,
+          destination,
+          isMerchant:
+            paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
+        })
 
         navigation.dispatch((state) => {
           const routes = [
@@ -281,7 +275,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     paymentType,
     destination,
     saveLnAddressContact,
-    isSelfCustodial,
     currencyAmount,
     satAmount,
     currencyFeeAmount,

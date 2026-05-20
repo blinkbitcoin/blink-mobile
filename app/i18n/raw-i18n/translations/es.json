@@ -2329,6 +2329,7 @@
         "setYourLightningAddress": "Establezca su dirección lightning",
         "activated": "Activada",
         "addressScreen": "Formas de recibir pagos",
+        "nonCustodialAccount": "Cuenta no custodial",
         "tapUserName": "Ingrese aquí para configurarlo",
         "notifications": "Notificaciones",
         "recoveryMethod": "Método de recuperación",
@@ -2356,7 +2357,30 @@
         "logoutOneAccountAlertContent": "Se cerrará la sesión vinculada a {identifier: string}.\nAsegúrese de tener acceso nuevamente para poder iniciar sesión en el futuro.",
         "logoutOneAccountConfirm": "Comprendo. Por favor, cierre sesión.",
         "receiveCurrency": "Cuenta a recibir",
-        "displayCurrency": "Moneda"
+        "displayCurrency": "Moneda",
+        "AccountInformation": {
+            "accountTypeLabel": "Tipo de cuenta",
+            "identityLabel": "Identificador de billetera",
+            "backupStatusLabel": "Estado del respaldo",
+            "backupStatusCompleted": "Respaldo completo",
+            "backupStatusNotCompleted": "Respaldo incompleto",
+            "loadError": "No se pudo cargar la información de tu cuenta."
+        },
+        "TransactionLimits": {
+            "protocolNote": "Las transacciones Lightning y on-chain siguen los límites del protocolo Bitcoin. Los límites de conversión que ves abajo los aplica la red Spark.",
+            "btcToUsdTitle": "Bitcoin a dólares",
+            "usdToBtcTitle": "Dólares a Bitcoin",
+            "minFromLabel": "Mínimo enviado",
+            "minToLabel": "Mínimo recibido",
+            "loadError": "No se pudieron cargar los límites de conversión."
+        },
+        "WaysToGetPaid": {
+            "lightningAddressTitle": "Dirección Lightning",
+            "lightningAddressDescription": "Comparte esta dirección para recibir pagos Lightning al instante.",
+            "onchainTitle": "Dirección de depósito Bitcoin",
+            "onchainDescription": "Comparte esta dirección para recibir Bitcoin on-chain.",
+            "loadError": "No se pudieron cargar tus datos de pago."
+        }
     },
     "NotificationSettingsScreen": {
         "title": "Configuración de notificaciones",
@@ -2683,6 +2707,8 @@
         "accountInformation": "Información de la cuenta",
         "trialAccount": "Cuenta de prueba",
         "blinkUser": "Usuario de Blink",
+        "anonymous": "Anónimo",
+        "anonymousUser": "Usuario anónimo",
         "transactionLimits": "Límites de la transacción",
         "activateWallet": "Activar billetera",
         "amountRequired": "Se requiere cantidad",
@@ -3591,7 +3617,14 @@
     },
     "BackendFeatureGate": {
         "title": "Función no disponible",
-        "description": "Esta función requiere una cuenta custodia."
+        "description": "Esta función requiere una cuenta custodia.",
+        "signInTitle": "Inicia sesión",
+        "signInDescription": "Inicia sesión en tu cuenta custodial para usar {featureName}.",
+        "noAccountTitle": "Cuenta custodial requerida",
+        "noAccountDescription": "{featureName} requiere una cuenta custodial de Blink.",
+        "featureCircles": "Círculos",
+        "featureEarn": "Aprende",
+        "featureCard": "Tarjeta"
     },
     "SparkWalletCreationScreen": {
         "creating": "Creando tu billetera...",
@@ -3658,5 +3691,21 @@
         "badgeFeeIssue": "Problema de comisión",
         "badgeError": "Error",
         "badgeRefunded": "Reembolsado"
+    },
+    "FeatureUnavailable": {
+        "SelfCustodial": {
+            "title": "Temporalmente no disponible",
+            "description": "Las funciones de billetera autocustodial están temporalmente deshabilitadas. Tu billetera y fondos están seguros. Vuelve más tarde."
+        }
+    },
+    "NetworkStatus": {
+        "degradedBanner": "La red Spark está degradada actualmente. Los pagos pueden tardar más."
+    },
+    "SelfCustodialDelete": {
+        "title": "Eliminar billetera autocustodial",
+        "warning": "Esto eliminará esta billetera de este dispositivo.",
+        "recoveryNote": "Si tienes tu frase de respaldo guardada podrás restaurar esta billetera en cualquier dispositivo. Si no la tienes, perderás el acceso a tus fondos.",
+        "backupBadgeCompleted": "Respaldo completo",
+        "backupBadgeMissing": "Respaldo incompleto"
     }
 }

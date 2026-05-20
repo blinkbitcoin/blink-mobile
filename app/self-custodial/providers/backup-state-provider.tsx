@@ -10,7 +10,13 @@ import React, {
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import crashlytics from "@react-native-firebase/crashlytics"
 
-const BACKUP_STATE_KEY = "backupState"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { AccountType } from "@app/types/wallet.types"
+
+const BACKUP_STATE_KEY_PREFIX = "backupState"
+
+const backupStateKeyFor = (accountId: string): string =>
+  `${BACKUP_STATE_KEY_PREFIX}:${accountId}`
 
 const BackupStatus = {
   None: "none",
@@ -52,31 +58,65 @@ const defaultContextValue: BackupStateContextValue = {
 
 const BackupStateContext = createContext<BackupStateContextValue>(defaultContextValue)
 
+const readBackupState = async (key: string): Promise<BackupState | null> => {
+  const raw = await AsyncStorage.getItem(key)
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw)
+    if (parsed?.status && Object.values(BackupStatus).includes(parsed.status)) {
+      return parsed as BackupState
+    }
+  } catch {
+    // corrupted data; ignore silently
+  }
+  return null
+}
+
+export const removeBackupStateFor = async (accountId: string): Promise<void> => {
+  await AsyncStorage.removeItem(backupStateKeyFor(accountId))
+}
+
 export const BackupStateProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+  const { activeAccount } = useAccountRegistry()
+  const activeSelfCustodialAccountId =
+    activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
+
   const [backupState, setBackupState] = useState<BackupState>(defaultState)
 
   useEffect(() => {
-    AsyncStorage.getItem(BACKUP_STATE_KEY).then((raw) => {
-      if (!raw) return
-      try {
-        const parsed = JSON.parse(raw)
-        if (parsed?.status && Object.values(BackupStatus).includes(parsed.status)) {
-          setBackupState(parsed as BackupState)
-        }
-      } catch {
-        // corrupted data — ignore silently
-      }
-    })
-  }, [])
+    if (!activeSelfCustodialAccountId) {
+      setBackupState(defaultState)
+      return
+    }
 
-  const persist = useCallback((state: BackupState) => {
-    setBackupState(state)
-    AsyncStorage.setItem(BACKUP_STATE_KEY, JSON.stringify(state)).catch((err) => {
-      crashlytics().recordError(
-        err instanceof Error ? err : new Error(`Backup state persist failed: ${err}`),
-      )
-    })
-  }, [])
+    let mounted = true
+    const accountId = activeSelfCustodialAccountId
+    const load = async () => {
+      const fresh = await readBackupState(backupStateKeyFor(accountId))
+      if (!mounted) return
+      setBackupState(fresh ?? defaultState)
+    }
+    load()
+    return () => {
+      mounted = false
+    }
+  }, [activeSelfCustodialAccountId])
+
+  const persist = useCallback(
+    (state: BackupState) => {
+      if (!activeSelfCustodialAccountId) return
+      setBackupState(state)
+      AsyncStorage.setItem(
+        backupStateKeyFor(activeSelfCustodialAccountId),
+        JSON.stringify(state),
+      ).catch((err) => {
+        crashlytics().recordError(
+          err instanceof Error ? err : new Error(`Backup state persist failed: ${err}`),
+        )
+      })
+    },
+    [activeSelfCustodialAccountId],
+  )
 
   const setBackupCompleted = useCallback(
     (method: BackupMethod) => {

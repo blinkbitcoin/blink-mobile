@@ -2347,6 +2347,7 @@
     "setYourLightningAddress": "Սահմանեք ձեր Lightning հասցեը",
     "activated": "Ակտիվացված է",
     "addressScreen": "Վճարվելու միջոցներ",
+    "nonCustodialAccount": "Ոչ պահպանող հաշիվ",
     "tapUserName": "Սեղմել՝ օգտանուն սահմանելու համար",
     "notifications": "Notifications",
     "recoveryMethod": "Վերականգնման մեթոդ",
@@ -2374,7 +2375,31 @@
     "logoutOneAccountAlertContent": "Դուք դուրս կգաք {identifier: string}-ին կապված նիստից։\nՀամոզվեք՝ որ հետագայում կրկին մուտք գործելու հնարավորություն ունեք։",
     "logoutOneAccountConfirm": "Հասկանում եմ։ Խնդրում եմ՝ դուրս գալ։",
     "receiveCurrency": "Ստացման արժույթ",
-    "displayCurrency": "Ցուցադրման արժույթ"
+    "displayCurrency": "Ցուցադրման արժույթ",
+    "AccountInformation": {
+      "accountTypeLabel": "Հաշվի տեսակը",
+      "identityLabel": "Դրամապանակի նույնացուցիչ",
+      "lightningAddressLabel": "Lightning հասցե",
+      "backupStatusLabel": "Պահուստավորման վիճակ",
+      "backupStatusCompleted": "Պահուստավորումը ավարտված է",
+      "backupStatusNotCompleted": "Պահուստավորումը ավարտված չէ",
+      "loadError": "Չհաջողվեց բեռնել ձեր հաշվի տեղեկությունները։"
+    },
+    "TransactionLimits": {
+      "protocolNote": "Lightning և on-chain գործարքները հետևում են Bitcoin արձանագրության սահմանափակումներին։ Ստորև նշված փոխարկման սահմանաչափերը կիրառվում են Spark ցանցի կողմից։",
+      "btcToUsdTitle": "Բիթքոյնից դոլար",
+      "usdToBtcTitle": "Դոլարից բիթքոյն",
+      "minFromLabel": "Նվազագույն ուղարկված",
+      "minToLabel": "Նվազագույն ստացված",
+      "loadError": "Չհաջողվեց բեռնել փոխարկման սահմանաչափերը։"
+    },
+    "WaysToGetPaid": {
+      "lightningAddressTitle": "Lightning հասցե",
+      "lightningAddressDescription": "Կիսվեք այս հասցեով՝ Lightning վճարումներ անմիջապես ստանալու համար։",
+      "onchainTitle": "Bitcoin ավանդի հասցե",
+      "onchainDescription": "Կիսվեք այս հասցեով՝ Bitcoin on-chain ստանալու համար։",
+      "loadError": "Չհաջողվեց բեռնել ձեր վճարման տվյալները։"
+    }
   },
   "NotificationSettingsScreen": {
     "title": "Ծանուցումների կարգավորումներ",
@@ -2701,6 +2726,8 @@
     "accountInformation": "Հաշվի տեղեկատվություն",
     "trialAccount": "Փորձնական հաշիվ",
     "blinkUser": "Blink օգտատեր",
+    "anonymous": "Անանուն",
+    "anonymousUser": "Անանուն օգտատեր",
     "blinkToBlink": "Blink-ից Blink",
     "transactionLimits": "Գործառնության սահմաններ",
     "activateWallet": "Ակտիվացնել դրամապանակը",
@@ -3644,7 +3671,14 @@
   },
   "BackendFeatureGate": {
     "title": "Հնարավորությունը հասանելի չէ",
-    "description": "Այս հնարավորությունը պահանջում է պահառու հաշիվ։"
+    "description": "Այս հնարավորությունը պահանջում է պահառու հաշիվ։",
+    "signInTitle": "Մուտք գործելը պարտադիր է",
+    "signInDescription": "Մուտք գործեք ձեր պահառու հաշվին՝ {featureName: string} օգտագործելու համար։",
+    "noAccountTitle": "Պահառու հաշիվ է պահանջվում",
+    "noAccountDescription": "{featureName: string}-ի համար անհրաժեշտ է Blink պահառու հաշիվ։",
+    "featureCircles": "Circles",
+    "featureEarn": "Վաստակել",
+    "featureCard": "Քարտ"
   },
   "SparkWalletCreationScreen": {
     "creating": "Ստեղծում ենք ձեր դրամապանակը...",
@@ -3711,5 +3745,21 @@
     "badgeFeeIssue": "Վճարի խնդիր",
     "badgeError": "Սխալ",
     "badgeRefunded": "Վերադարձված"
+  },
+  "FeatureUnavailable": {
+    "SelfCustodial": {
+      "title": "Ժամանակավորապես անհասանելի",
+      "description": "Ինքնապահպանվող դրամապանակի հնարավորությունները ժամանակավորապես անջատված են։ Ձեր դրամապանակը և միջոցները անվտանգ են։ Խնդրում ենք փորձել ավելի ուշ։"
+    }
+  },
+  "NetworkStatus": {
+    "degradedBanner": "Spark ցանցը ներկայումս թուլացած է։ Վճարումները կարող են ավելի երկար տևել։"
+  },
+  "SelfCustodialDelete": {
+    "title": "Ինքնապահպանվող դրամապանակի ջնջում",
+    "warning": "Սա կհեռացնի այս դրամապանակը այս սարքից։",
+    "recoveryNote": "Եթե պահել եք պահուստային արտահայտությունը, կարող եք վերականգնել այս դրամապանակը ցանկացած սարքում։ Եթե ոչ, կկորցնեք մուտքը ձեր միջոցներին։",
+    "backupBadgeCompleted": "Պահուստավորումը ավարտված է",
+    "backupBadgeMissing": "Պահուստավորումը ավարտված չէ"
   }
 }

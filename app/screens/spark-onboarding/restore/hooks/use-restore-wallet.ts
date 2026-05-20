@@ -1,9 +1,11 @@
 import { useCallback, useState } from "react"
+import Crypto from "react-native-quick-crypto"
 
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
-import crashlytics from "@react-native-firebase/crashlytics"
 
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
@@ -12,9 +14,10 @@ import {
   useBackupState,
 } from "@app/self-custodial/providers/backup-state-provider"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { findSelfCustodialAccountByMnemonic } from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
-import { DefaultAccountId } from "@app/types/wallet.types"
-import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+import { logSelfCustodialRestoreCompleted } from "@app/utils/analytics"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 
 const RestoreWalletStatus = {
@@ -25,45 +28,63 @@ const RestoreWalletStatus = {
 
 type RestoreWalletStatus = (typeof RestoreWalletStatus)[keyof typeof RestoreWalletStatus]
 
-const reportError = (err: unknown): void => {
-  crashlytics().recordError(
-    err instanceof Error ? err : new Error(`Wallet restore failed: ${err}`),
-  )
-}
-
 export const useRestoreWallet = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { updateState } = usePersistentStateContext()
   const { retry: reinitSdk } = useSelfCustodialWallet()
+  const { reloadSelfCustodialAccounts } = useAccountRegistry()
   const { setBackupCompleted } = useBackupState()
   const [status, setStatus] = useState<RestoreWalletStatus>(RestoreWalletStatus.Idle)
+  const guard = useInFlightGuard()
 
-  const activateAccount = useCallback(() => {
-    updateState((prev) => {
-      if (!prev) return prev
-      return { ...prev, activeAccountId: DefaultAccountId.SelfCustodial }
-    })
-  }, [updateState])
+  const activateAccount = useCallback(
+    (accountId: string) => {
+      updateState((prev) => {
+        if (!prev) return prev
+        return { ...prev, activeAccountId: accountId }
+      })
+    },
+    [updateState],
+  )
 
   const restore = useCallback(
     async (mnemonic: string) => {
-      setStatus(RestoreWalletStatus.Restoring)
-      try {
-        await selfCustodialRestoreWallet(mnemonic)
-        activateAccount()
-        reinitSdk()
-        setBackupCompleted(BackupMethod.Manual)
-        navigation.navigate("sparkBackupSuccessScreen")
-      } catch (err) {
-        await KeyStoreWrapper.deleteMnemonic().catch(() => {})
-        reportError(err)
-        setStatus(RestoreWalletStatus.Error)
-        toastShow({ message: LL.RestoreScreen.restoreFailed(), LL })
-        throw err
-      }
+      await guard.run(async () => {
+        setStatus(RestoreWalletStatus.Restoring)
+        try {
+          const existingId = await findSelfCustodialAccountByMnemonic(mnemonic)
+          if (existingId) {
+            activateAccount(existingId)
+            reinitSdk()
+            navigation.navigate("sparkBackupSuccessScreen")
+            return
+          }
+          const accountId = Crypto.randomUUID()
+          await selfCustodialRestoreWallet(accountId, mnemonic)
+          await reloadSelfCustodialAccounts()
+          activateAccount(accountId)
+          reinitSdk()
+          setBackupCompleted(BackupMethod.Manual)
+          logSelfCustodialRestoreCompleted()
+          navigation.navigate("sparkBackupSuccessScreen")
+        } catch (err) {
+          reportError("Wallet restore", err)
+          setStatus(RestoreWalletStatus.Error)
+          toastShow({ message: LL.RestoreScreen.restoreFailed(), LL })
+          throw err
+        }
+      })
     },
-    [activateAccount, reinitSdk, setBackupCompleted, navigation, LL],
+    [
+      guard,
+      activateAccount,
+      reinitSdk,
+      reloadSelfCustodialAccounts,
+      setBackupCompleted,
+      navigation,
+      LL,
+    ],
   )
 
   return { restore, status }

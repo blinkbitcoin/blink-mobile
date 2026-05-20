@@ -5,21 +5,33 @@
  * Later on, this will support switching between accounts
  */
 import React from "react"
-import { View } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
+import { useAppConfig, useClipboard } from "@app/hooks"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet-provider"
+import { AccountType } from "@app/types/wallet.types"
 import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { Text, makeStyles, useTheme, Skeleton } from "@rn-vui/themed"
-import { useAppConfig } from "@app/hooks"
 
 export const AccountBanner: React.FC = () => {
+  const { activeAccount } = useAccountRegistry()
+
+  if (activeAccount?.type === AccountType.SelfCustodial) {
+    return <SelfCustodialAccountBanner />
+  }
+  return <CustodialAccountBanner />
+}
+
+const CustodialAccountBanner: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const {
@@ -68,6 +80,41 @@ export const AccountBanner: React.FC = () => {
   )
 }
 
+const SelfCustodialAccountBanner: React.FC = () => {
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+  const { LL } = useI18nContext()
+  const { lightningAddress } = useSelfCustodialWallet()
+  const { copyToClipboard } = useClipboard()
+
+  if (!lightningAddress) return null
+
+  const handleCopy = () =>
+    copyToClipboard({
+      content: lightningAddress,
+      message: LL.GaloyAddressScreen.copiedLightningAddressToClipboard(),
+    })
+
+  return (
+    <TouchableOpacity onPress={handleCopy} style={styles.outer}>
+      <View style={styles.iconContainer}>
+        <AccountIcon size={25} />
+      </View>
+      <View style={styles.textContainer}>
+        <Text type="p2" numberOfLines={1} ellipsizeMode="middle">
+          {lightningAddress}
+        </Text>
+        <Text type="p3" style={styles.subtitle}>
+          {LL.SettingsScreen.nonCustodialAccount()}
+        </Text>
+      </View>
+      <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+    </TouchableOpacity>
+  )
+}
+
 export const AccountIcon: React.FC<{ size: number }> = ({ size }) => {
   const {
     theme: { colors },
@@ -94,5 +141,12 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.colors.grey4,
     borderRadius: 100,
     padding: 3,
+  },
+  textContainer: {
+    flex: 1,
+    flexDirection: "column",
+  },
+  subtitle: {
+    color: theme.colors.grey2,
   },
 }))

@@ -9,6 +9,7 @@ import {
 } from "@app/self-custodial/bridge"
 import { SparkToken } from "@app/self-custodial/config"
 import type { TranslationFunctions } from "@app/i18n/i18n-types"
+import { logSelfCustodialStableBalanceActivated } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 
 type Params = {
@@ -48,6 +49,7 @@ export const useStableBalanceToggle = ({
       try {
         if (activate) {
           await activateStableBalance(sdk, SparkToken.Label)
+          logSelfCustodialStableBalanceActivated({ label: SparkToken.Label })
         } else {
           await deactivateStableBalance(sdk)
         }

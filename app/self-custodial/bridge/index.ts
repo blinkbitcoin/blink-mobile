@@ -11,6 +11,7 @@ export {
   listPayments,
   getUserSettings,
   syncSelfCustodialWallet,
+  getLightningAddress,
 } from "./wallet"
 export { getSparkStatus } from "./status"
 export { activateStableBalance, deactivateStableBalance } from "./stable-balance"
@@ -34,3 +35,4 @@ export { buildConversionType, fetchConversionLimits } from "./limits"
 export { parseSparkAddress } from "./parse"
 export type { ParsedSparkAddress } from "./parse"
 export { findUsdbToken, fetchUsdbDecimals } from "./token-balance"
+export { listContacts, addContact, updateContact, deleteContact } from "./contacts"

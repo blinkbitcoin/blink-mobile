@@ -106,7 +106,7 @@ export const TotpRegistrationInitiateScreen = () => {
       ) : (
         <>
           <View style={styles.centeredContent}>
-            <QrCodeComponent otpauth={otpauth} />
+            <QrCodeComponent value={otpauth} />
           </View>
           <CopySecretComponent secret={secret} />
           <Text style={styles.textStyle} type="p2">

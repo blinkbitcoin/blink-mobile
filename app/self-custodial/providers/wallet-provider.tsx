@@ -1,7 +1,17 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react"
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { getLightningAddress } from "@app/self-custodial/bridge"
+import { setSelfCustodialLightningAddress } from "@app/self-custodial/storage/account-index"
 import {
   AccountType,
   ActiveWalletStatus,
@@ -13,6 +23,7 @@ import { useSdkLifecycle } from "./use-sdk-lifecycle"
 type SelfCustodialWalletContextValue = ActiveWalletState & {
   retry: () => void
   sdk: BreezSdkInterface | null
+  lightningAddress: string | null
   isStableBalanceActive?: boolean
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
@@ -20,6 +31,7 @@ type SelfCustodialWalletContextValue = ActiveWalletState & {
   loadMore: () => Promise<void>
   refreshWallets: () => Promise<void>
   refreshStableBalanceActive: () => Promise<void>
+  updateCurrentSelfCustodialAccount: () => Promise<void>
 }
 
 const noop = async () => {}
@@ -30,12 +42,14 @@ const defaultState: SelfCustodialWalletContextValue = {
   accountType: AccountType.SelfCustodial,
   retry: () => {},
   sdk: null,
+  lightningAddress: null,
   lastReceivedPaymentId: null,
   hasMoreTransactions: false,
   loadingMore: false,
   loadMore: noop,
   refreshWallets: noop,
   refreshStableBalanceActive: noop,
+  updateCurrentSelfCustodialAccount: noop,
 }
 
 const SelfCustodialWalletContext =
@@ -44,11 +58,16 @@ const SelfCustodialWalletContext =
 export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
+  const { activeAccount, reloadSelfCustodialAccounts } = useAccountRegistry()
+  const activeSelfCustodialAccountId =
+    activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
+
   const [retryCount, setRetryCount] = useState(0)
   const {
     wallets,
     status,
     sdk,
+    connectedAccountId,
     isStableBalanceActive,
     lastReceivedPaymentId,
     hasMoreTransactions,
@@ -56,11 +75,56 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     loadMore,
     refreshWallets,
     refreshStableBalanceActive,
-  } = useSdkLifecycle(retryCount)
+  } = useSdkLifecycle(activeSelfCustodialAccountId, retryCount)
 
   const retry = useCallback(() => {
     setRetryCount((prev) => prev + 1)
   }, [])
+
+  const [lightningAddress, setLightningAddress] = useState<string | null>(null)
+
+  useEffect(() => {
+    setLightningAddress(null)
+  }, [activeSelfCustodialAccountId])
+
+  useEffect(() => {
+    if (!sdk || !connectedAccountId) return undefined
+    let mounted = true
+    const accountId = connectedAccountId
+
+    const resolveAndPersist = async () => {
+      try {
+        const info = await getLightningAddress(sdk)
+        if (!mounted) return
+        const resolved = info?.lightningAddress ?? null
+        setLightningAddress(resolved)
+        if (!resolved) return
+        await setSelfCustodialLightningAddress(accountId, resolved).catch(() => {})
+        if (mounted) await reloadSelfCustodialAccounts()
+      } catch {
+        // opportunistic; swallow errors
+      }
+    }
+
+    resolveAndPersist()
+
+    return () => {
+      mounted = false
+    }
+  }, [sdk, connectedAccountId, reloadSelfCustodialAccounts])
+
+  const updateCurrentSelfCustodialAccount = useCallback(async () => {
+    if (!sdk || !connectedAccountId) return
+    try {
+      const info = await getLightningAddress(sdk)
+      const resolved = info?.lightningAddress ?? null
+      setLightningAddress(resolved)
+      await setSelfCustodialLightningAddress(connectedAccountId, resolved)
+      await reloadSelfCustodialAccounts()
+    } catch {
+      // opportunistic refresh; swallow errors
+    }
+  }, [sdk, connectedAccountId, reloadSelfCustodialAccounts])
 
   const value = useMemo(
     (): SelfCustodialWalletContextValue => ({
@@ -69,6 +133,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       accountType: AccountType.SelfCustodial,
       retry,
       sdk,
+      lightningAddress,
       isStableBalanceActive,
       lastReceivedPaymentId,
       hasMoreTransactions,
@@ -76,12 +141,14 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       loadMore,
       refreshWallets,
       refreshStableBalanceActive,
+      updateCurrentSelfCustodialAccount,
     }),
     [
       wallets,
       status,
       retry,
       sdk,
+      lightningAddress,
       isStableBalanceActive,
       lastReceivedPaymentId,
       hasMoreTransactions,
@@ -89,6 +156,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       loadMore,
       refreshWallets,
       refreshStableBalanceActive,
+      updateCurrentSelfCustodialAccount,
     ],
   )
 

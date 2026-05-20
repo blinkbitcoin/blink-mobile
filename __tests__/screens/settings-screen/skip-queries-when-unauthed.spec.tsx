@@ -10,6 +10,7 @@ const mockUseSettingsScreenQuery = jest.fn()
 const mockUseUnacknowledgedNotificationCountQuery = jest.fn()
 
 jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
   useSettingsScreenQuery: (opts: unknown) => mockUseSettingsScreenQuery(opts),
   useUnacknowledgedNotificationCountQuery: (opts: unknown) =>
     mockUseUnacknowledgedNotificationCountQuery(opts),
@@ -54,6 +55,14 @@ jest.mock("@app/hooks", () => ({
     },
   }),
   useClipboard: () => ({ copyToClipboard: jest.fn() }),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    accounts: [],
+    activeAccount: undefined,
+    setActiveAccountId: jest.fn(),
+  }),
 }))
 
 jest.mock("@rn-vui/themed", () => ({

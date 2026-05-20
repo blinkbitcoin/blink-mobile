@@ -7529,6 +7529,10 @@ type RootTranslation = {
 		 */
 		addressScreen: string
 		/**
+		 * N​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
+		 */
+		nonCustodialAccount: string
+		/**
 		 * T​a​p​ ​t​o​ ​s​e​t​ ​u​s​e​r​n​a​m​e
 		 */
 		tapUserName: string
@@ -7643,6 +7647,84 @@ type RootTranslation = {
 		 * D​i​s​p​l​a​y​ ​c​u​r​r​e​n​c​y
 		 */
 		displayCurrency: string
+		AccountInformation: {
+			/**
+			 * A​c​c​o​u​n​t​ ​t​y​p​e
+			 */
+			accountTypeLabel: string
+			/**
+			 * W​a​l​l​e​t​ ​i​d​e​n​t​i​f​i​e​r
+			 */
+			identityLabel: string
+			/**
+			 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
+			 */
+			lightningAddressLabel: string
+			/**
+			 * B​a​c​k​u​p​ ​s​t​a​t​u​s
+			 */
+			backupStatusLabel: string
+			/**
+			 * B​a​c​k​u​p​ ​c​o​m​p​l​e​t​e
+			 */
+			backupStatusCompleted: string
+			/**
+			 * B​a​c​k​u​p​ ​n​o​t​ ​c​o​m​p​l​e​t​e
+			 */
+			backupStatusNotCompleted: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​n​f​o​r​m​a​t​i​o​n​.
+			 */
+			loadError: string
+		}
+		TransactionLimits: {
+			/**
+			 * L​i​g​h​t​n​i​n​g​ ​a​n​d​ ​o​n​-​c​h​a​i​n​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​f​o​l​l​o​w​ ​B​i​t​c​o​i​n​ ​p​r​o​t​o​c​o​l​ ​l​i​m​i​t​s​.​ ​C​o​n​v​e​r​s​i​o​n​ ​l​i​m​i​t​s​ ​b​e​l​o​w​ ​a​r​e​ ​e​n​f​o​r​c​e​d​ ​b​y​ ​t​h​e​ ​S​p​a​r​k​ ​n​e​t​w​o​r​k​.
+			 */
+			protocolNote: string
+			/**
+			 * B​i​t​c​o​i​n​ ​t​o​ ​D​o​l​l​a​r​s
+			 */
+			btcToUsdTitle: string
+			/**
+			 * D​o​l​l​a​r​s​ ​t​o​ ​B​i​t​c​o​i​n
+			 */
+			usdToBtcTitle: string
+			/**
+			 * M​i​n​i​m​u​m​ ​s​e​n​t
+			 */
+			minFromLabel: string
+			/**
+			 * M​i​n​i​m​u​m​ ​r​e​c​e​i​v​e​d
+			 */
+			minToLabel: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​c​o​n​v​e​r​s​i​o​n​ ​l​i​m​i​t​s​.
+			 */
+			loadError: string
+		}
+		WaysToGetPaid: {
+			/**
+			 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
+			 */
+			lightningAddressTitle: string
+			/**
+			 * S​h​a​r​e​ ​t​h​i​s​ ​a​d​d​r​e​s​s​ ​t​o​ ​r​e​c​e​i​v​e​ ​L​i​g​h​t​n​i​n​g​ ​p​a​y​m​e​n​t​s​ ​i​n​s​t​a​n​t​l​y​.
+			 */
+			lightningAddressDescription: string
+			/**
+			 * B​i​t​c​o​i​n​ ​d​e​p​o​s​i​t​ ​a​d​d​r​e​s​s
+			 */
+			onchainTitle: string
+			/**
+			 * S​h​a​r​e​ ​t​h​i​s​ ​a​d​d​r​e​s​s​ ​t​o​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​o​n​-​c​h​a​i​n​.
+			 */
+			onchainDescription: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​p​a​y​m​e​n​t​ ​d​e​t​a​i​l​s​.
+			 */
+			loadError: string
+		}
 	}
 	NotificationSettingsScreen: {
 		/**
@@ -8785,6 +8867,14 @@ type RootTranslation = {
 		 * B​l​i​n​k​ ​U​s​e​r
 		 */
 		blinkUser: string
+		/**
+		 * A​n​o​n​y​m​o​u​s
+		 */
+		anonymous: string
+		/**
+		 * A​n​o​n​y​m​o​u​s​ ​u​s​e​r
+		 */
+		anonymousUser: string
 		/**
 		 * B​l​i​n​k​ ​t​o​ ​B​l​i​n​k
 		 */
@@ -12123,6 +12213,76 @@ type RootTranslation = {
 		 * T​h​i​s​ ​f​e​a​t​u​r​e​ ​r​e​q​u​i​r​e​s​ ​a​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
 		 */
 		description: string
+		/**
+		 * S​i​g​n​ ​i​n​ ​r​e​q​u​i​r​e​d
+		 */
+		signInTitle: string
+		/**
+		 * S​i​g​n​ ​i​n​ ​t​o​ ​y​o​u​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​t​o​ ​u​s​e​ ​{​f​e​a​t​u​r​e​N​a​m​e​}​.
+		 * @param {string} featureName
+		 */
+		signInDescription: RequiredParams<'featureName'>
+		/**
+		 * C​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​r​e​q​u​i​r​e​d
+		 */
+		noAccountTitle: string
+		/**
+		 * {​f​e​a​t​u​r​e​N​a​m​e​}​ ​r​e​q​u​i​r​e​s​ ​a​ ​B​l​i​n​k​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+		 * @param {string} featureName
+		 */
+		noAccountDescription: RequiredParams<'featureName'>
+		/**
+		 * C​i​r​c​l​e​s
+		 */
+		featureCircles: string
+		/**
+		 * E​a​r​n
+		 */
+		featureEarn: string
+		/**
+		 * C​a​r​d
+		 */
+		featureCard: string
+	}
+	FeatureUnavailable: {
+		SelfCustodial: {
+			/**
+			 * T​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e
+			 */
+			title: string
+			/**
+			 * S​e​l​f​-​c​u​s​t​o​d​i​a​l​ ​w​a​l​l​e​t​ ​f​e​a​t​u​r​e​s​ ​a​r​e​ ​t​e​m​p​o​r​a​r​i​l​y​ ​d​i​s​a​b​l​e​d​.​ ​Y​o​u​r​ ​w​a​l​l​e​t​ ​a​n​d​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​b​a​c​k​ ​l​a​t​e​r​.
+			 */
+			description: string
+		}
+	}
+	NetworkStatus: {
+		/**
+		 * S​p​a​r​k​ ​n​e​t​w​o​r​k​ ​i​s​ ​c​u​r​r​e​n​t​l​y​ ​d​e​g​r​a​d​e​d​.​ ​P​a​y​m​e​n​t​s​ ​m​a​y​ ​t​a​k​e​ ​l​o​n​g​e​r​.
+		 */
+		degradedBanner: string
+	}
+	SelfCustodialDelete: {
+		/**
+		 * D​e​l​e​t​e​ ​s​e​l​f​-​c​u​s​t​o​d​i​a​l​ ​w​a​l​l​e​t
+		 */
+		title: string
+		/**
+		 * T​h​i​s​ ​w​i​l​l​ ​r​e​m​o​v​e​ ​t​h​i​s​ ​w​a​l​l​e​t​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​.
+		 */
+		warning: string
+		/**
+		 * I​f​ ​y​o​u​ ​h​a​v​e​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​s​a​v​e​d​ ​y​o​u​ ​c​a​n​ ​r​e​s​t​o​r​e​ ​t​h​i​s​ ​w​a​l​l​e​t​ ​o​n​ ​a​n​y​ ​d​e​v​i​c​e​.​ ​I​f​ ​y​o​u​ ​d​o​n​'​t​,​ ​y​o​u​ ​w​i​l​l​ ​l​o​s​e​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​f​u​n​d​s​.
+		 */
+		recoveryNote: string
+		/**
+		 * B​a​c​k​u​p​ ​c​o​m​p​l​e​t​e
+		 */
+		backupBadgeCompleted: string
+		/**
+		 * B​a​c​k​u​p​ ​n​o​t​ ​c​o​m​p​l​e​t​e
+		 */
+		backupBadgeMissing: string
 	}
 }
 
@@ -19569,6 +19729,10 @@ export type TranslationFunctions = {
 		 */
 		addressScreen: () => LocalizedString
 		/**
+		 * Non-custodial account
+		 */
+		nonCustodialAccount: () => LocalizedString
+		/**
 		 * Tap to set username
 		 */
 		tapUserName: () => LocalizedString
@@ -19681,6 +19845,84 @@ export type TranslationFunctions = {
 		 * Display currency
 		 */
 		displayCurrency: () => LocalizedString
+		AccountInformation: {
+			/**
+			 * Account type
+			 */
+			accountTypeLabel: () => LocalizedString
+			/**
+			 * Wallet identifier
+			 */
+			identityLabel: () => LocalizedString
+			/**
+			 * Lightning address
+			 */
+			lightningAddressLabel: () => LocalizedString
+			/**
+			 * Backup status
+			 */
+			backupStatusLabel: () => LocalizedString
+			/**
+			 * Backup complete
+			 */
+			backupStatusCompleted: () => LocalizedString
+			/**
+			 * Backup not complete
+			 */
+			backupStatusNotCompleted: () => LocalizedString
+			/**
+			 * Could not load your account information.
+			 */
+			loadError: () => LocalizedString
+		}
+		TransactionLimits: {
+			/**
+			 * Lightning and on-chain transactions follow Bitcoin protocol limits. Conversion limits below are enforced by the Spark network.
+			 */
+			protocolNote: () => LocalizedString
+			/**
+			 * Bitcoin to Dollars
+			 */
+			btcToUsdTitle: () => LocalizedString
+			/**
+			 * Dollars to Bitcoin
+			 */
+			usdToBtcTitle: () => LocalizedString
+			/**
+			 * Minimum sent
+			 */
+			minFromLabel: () => LocalizedString
+			/**
+			 * Minimum received
+			 */
+			minToLabel: () => LocalizedString
+			/**
+			 * Could not load conversion limits.
+			 */
+			loadError: () => LocalizedString
+		}
+		WaysToGetPaid: {
+			/**
+			 * Lightning address
+			 */
+			lightningAddressTitle: () => LocalizedString
+			/**
+			 * Share this address to receive Lightning payments instantly.
+			 */
+			lightningAddressDescription: () => LocalizedString
+			/**
+			 * Bitcoin deposit address
+			 */
+			onchainTitle: () => LocalizedString
+			/**
+			 * Share this address to receive Bitcoin on-chain.
+			 */
+			onchainDescription: () => LocalizedString
+			/**
+			 * Could not load your payment details.
+			 */
+			loadError: () => LocalizedString
+		}
 	}
 	NotificationSettingsScreen: {
 		/**
@@ -20796,6 +21038,14 @@ export type TranslationFunctions = {
 		 * Blink User
 		 */
 		blinkUser: () => LocalizedString
+		/**
+		 * Anonymous
+		 */
+		anonymous: () => LocalizedString
+		/**
+		 * Anonymous user
+		 */
+		anonymousUser: () => LocalizedString
 		/**
 		 * Blink to Blink
 		 */
@@ -24077,6 +24327,74 @@ export type TranslationFunctions = {
 		 * This feature requires a custodial account.
 		 */
 		description: () => LocalizedString
+		/**
+		 * Sign in required
+		 */
+		signInTitle: () => LocalizedString
+		/**
+		 * Sign in to your custodial account to use {featureName}.
+		 */
+		signInDescription: (arg: { featureName: string }) => LocalizedString
+		/**
+		 * Custodial account required
+		 */
+		noAccountTitle: () => LocalizedString
+		/**
+		 * {featureName} requires a Blink custodial account.
+		 */
+		noAccountDescription: (arg: { featureName: string }) => LocalizedString
+		/**
+		 * Circles
+		 */
+		featureCircles: () => LocalizedString
+		/**
+		 * Earn
+		 */
+		featureEarn: () => LocalizedString
+		/**
+		 * Card
+		 */
+		featureCard: () => LocalizedString
+	}
+	FeatureUnavailable: {
+		SelfCustodial: {
+			/**
+			 * Temporarily unavailable
+			 */
+			title: () => LocalizedString
+			/**
+			 * Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later.
+			 */
+			description: () => LocalizedString
+		}
+	}
+	NetworkStatus: {
+		/**
+		 * Spark network is currently degraded. Payments may take longer.
+		 */
+		degradedBanner: () => LocalizedString
+	}
+	SelfCustodialDelete: {
+		/**
+		 * Delete self-custodial wallet
+		 */
+		title: () => LocalizedString
+		/**
+		 * This will remove this wallet from this device.
+		 */
+		warning: () => LocalizedString
+		/**
+		 * If you have your backup phrase saved you can restore this wallet on any device. If you don't, you will lose access to your funds.
+		 */
+		recoveryNote: () => LocalizedString
+		/**
+		 * Backup complete
+		 */
+		backupBadgeCompleted: () => LocalizedString
+		/**
+		 * Backup not complete
+		 */
+		backupBadgeMissing: () => LocalizedString
 	}
 }
 

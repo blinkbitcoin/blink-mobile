@@ -36,15 +36,11 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-jest.mock("@app/utils/storage/secureStorage", () => ({
-  __esModule: true,
-  default: {
-    getMnemonic: jest
-      .fn()
-      .mockResolvedValue(
-        "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain",
-      ),
-  },
+jest.mock("@app/hooks/use-wallet-mnemonic", () => ({
+  useWalletMnemonicWords: () =>
+    "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain".split(
+      " ",
+    ),
 }))
 
 jest.mock("react-native-inappbrowser-reborn", () => ({
