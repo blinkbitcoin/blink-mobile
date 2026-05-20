@@ -5,18 +5,17 @@ import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { toWalletMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 
-import { buildConvertParams } from "../../build-convert-params"
+import { buildConvertParams } from "../build-convert-params"
 
-import { useConversionQuote } from "../use-conversion-quote"
+import { useConversionQuote } from "./use-conversion-quote"
 
-export type UseSelfCustodialConversionGuardParams = {
+export type UseConversionDustGuardParams = {
   fromCurrency: WalletCurrency | undefined
   amountInSourceCurrency: number
   fromWalletBalance: number | undefined
-  enabled: boolean
 }
 
-export type SelfCustodialConversionGuard = {
+export type ConversionDustGuard = {
   isQuoting: boolean
   hasQuoteError: boolean
   blockingReason: ConvertAmountAdjustment | null
@@ -33,20 +32,19 @@ const resolveBlockingReason = (
   return amountInSourceCurrency >= fromWalletBalance ? null : amountAdjustment
 }
 
-export const useSelfCustodialConversionGuard = ({
+export const useConversionDustGuard = ({
   fromCurrency,
   amountInSourceCurrency,
   fromWalletBalance,
-  enabled,
-}: UseSelfCustodialConversionGuardParams): SelfCustodialConversionGuard => {
+}: UseConversionDustGuardParams): ConversionDustGuard => {
   const { convertMoneyAmount } = usePriceConversion()
 
   const quoteParams = useMemo(() => {
-    if (!enabled || !convertMoneyAmount || !fromCurrency) return null
+    if (!convertMoneyAmount || !fromCurrency) return null
     if (amountInSourceCurrency <= 0) return null
     const primary = toWalletMoneyAmount(amountInSourceCurrency, fromCurrency)
     return buildConvertParams(primary, fromCurrency, convertMoneyAmount)
-  }, [enabled, convertMoneyAmount, amountInSourceCurrency, fromCurrency])
+  }, [convertMoneyAmount, amountInSourceCurrency, fromCurrency])
 
   const { isQuoting, hasQuoteError, amountAdjustment } = useConversionQuote(quoteParams)
 

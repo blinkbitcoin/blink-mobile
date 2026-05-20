@@ -1,6 +1,8 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { AccountType } from "@app/types/wallet"
+import { WalletCurrency } from "@app/graphql/generated"
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { AccountType, ActiveWalletStatus, toWalletId } from "@app/types/wallet"
 
 import { usePayments } from "@app/hooks/use-payments"
 
@@ -10,6 +12,29 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({
     activeAccount: mockActiveAccount(),
   }),
+}))
+
+const mockIntraLedgerPaymentSend = jest.fn()
+const mockIntraLedgerUsdPaymentSend = jest.fn()
+
+jest.mock("@app/graphql/generated", () => {
+  const actual = jest.requireActual("@app/graphql/generated")
+  return {
+    ...actual,
+    useIntraLedgerPaymentSendMutation: () => [
+      mockIntraLedgerPaymentSend,
+      { loading: false },
+    ],
+    useIntraLedgerUsdPaymentSendMutation: () => [
+      mockIntraLedgerUsdPaymentSend,
+      { loading: false },
+    ],
+  }
+})
+
+const mockUseActiveWallet = jest.fn()
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => mockUseActiveWallet(),
 }))
 
 const mockSdk = {}
@@ -29,7 +54,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
     getClaimFee: jest.fn(),
     claimDeposit: jest.fn(),
   }),
-  createGetConversionQuote: jest.fn().mockReturnValue(jest.fn()),
+  createSelfCustodialConvert: jest.fn().mockReturnValue({ getQuote: jest.fn() }),
 }))
 
 jest.mock("@app/custodial/adapters/payment", () => ({
@@ -38,13 +63,36 @@ jest.mock("@app/custodial/adapters/payment", () => ({
     getClaimFee: jest.fn(),
     claimDeposit: jest.fn(),
   },
-  createCustodialConvert: jest.fn().mockResolvedValue({ status: "failed", errors: [] }),
+  createCustodialConvert: jest.fn().mockReturnValue({ getQuote: jest.fn() }),
 }))
+
+const custodialWallets = [
+  {
+    id: toWalletId("btc-wallet-id"),
+    walletCurrency: WalletCurrency.Btc,
+    balance: toBtcMoneyAmount(1000),
+    transactions: [],
+  },
+  {
+    id: toWalletId("usd-wallet-id"),
+    walletCurrency: WalletCurrency.Usd,
+    balance: toUsdMoneyAmount(500),
+    transactions: [],
+  },
+]
 
 describe("usePayments", () => {
   beforeEach(() => {
     mockActiveAccount.mockReturnValue({ id: "custodial-default", type: "custodial" })
     mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })
+    mockUseActiveWallet.mockReturnValue({
+      wallets: custodialWallets,
+      status: ActiveWalletStatus.Ready,
+      accountType: AccountType.Custodial,
+      isReady: true,
+      isSelfCustodial: false,
+      needsBackendAuth: true,
+    })
   })
 
   it("returns accountType as custodial by default", () => {
@@ -91,6 +139,28 @@ describe("usePayments", () => {
     expect(result.current.receiveOnchain).toBeUndefined()
   })
 
+  it("wires a convert adapter on the custodial path when both wallet IDs are present", () => {
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.convert).toBeDefined()
+    expect(result.current.convert!.getQuote).toBeDefined()
+  })
+
+  it("returns convert as undefined when the custodial active wallet is missing IDs", () => {
+    mockUseActiveWallet.mockReturnValue({
+      wallets: [],
+      status: ActiveWalletStatus.Loading,
+      accountType: AccountType.Custodial,
+      isReady: false,
+      isSelfCustodial: false,
+      needsBackendAuth: true,
+    })
+
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.convert).toBeUndefined()
+  })
+
   it("returns self-custodial adapters when self-custodial account with SDK", () => {
     mockActiveAccount.mockReturnValue({
       id: "self-custodial-default",
@@ -105,6 +175,8 @@ describe("usePayments", () => {
     expect(result.current.getFee).toBeDefined()
     expect(result.current.receiveLightning).toBeDefined()
     expect(result.current.receiveOnchain).toBeDefined()
+    expect(result.current.convert).toBeDefined()
+    expect(result.current.convert!.getQuote).toBeDefined()
   })
 
   it("returns no adapters while a self-custodial account is loading its SDK (regression)", () => {
@@ -137,38 +209,5 @@ describe("usePayments", () => {
     expect(result.current.listPendingDeposits).toBeUndefined()
     expect(result.current.claimDeposit).toBeUndefined()
     expect(result.current.convert).toBeUndefined()
-  })
-
-  it("exposes getConversionQuote only on the self-custodial path with an SDK", () => {
-    mockActiveAccount.mockReturnValue({
-      id: "self-custodial-default",
-      type: AccountType.SelfCustodial,
-    })
-    mockSelfCustodialWallet.mockReturnValue({ sdk: mockSdk })
-
-    const { result } = renderHook(() => usePayments())
-
-    expect(result.current.getConversionQuote).toBeDefined()
-  })
-
-  it("does not expose getConversionQuote on the custodial path", () => {
-    mockActiveAccount.mockReturnValue({ id: "custodial-default", type: "custodial" })
-    mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })
-
-    const { result } = renderHook(() => usePayments())
-
-    expect(result.current.getConversionQuote).toBeUndefined()
-  })
-
-  it("does not expose getConversionQuote for a self-custodial account missing its SDK", () => {
-    mockActiveAccount.mockReturnValue({
-      id: "self-custodial-default",
-      type: AccountType.SelfCustodial,
-    })
-    mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })
-
-    const { result } = renderHook(() => usePayments())
-
-    expect(result.current.getConversionQuote).toBeUndefined()
   })
 })

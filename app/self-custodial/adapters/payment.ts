@@ -1,17 +1,29 @@
-import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  AmountAdjustmentReason,
+  PrepareSendPaymentResponse,
+  SendPaymentRequest,
+  SyncWalletRequest,
+  type BreezSdkInterface,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { toBtcMoneyAmount } from "@app/types/amounts"
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import {
+  ConvertAmountAdjustment,
   FEE_TIER_ETA_MINUTES,
+  failedPayment,
   FeeMode,
   FeeQuoteType,
   FeeTier,
   PaymentResultStatus,
+  type ConvertAdapter,
+  type ConvertParams,
+  type ConvertQuote,
   type GetFeeAdapter,
   type PaymentAdapterResult,
   type SendPaymentAdapter,
 } from "@app/types/payment"
+import { tokenBaseUnitsToCents } from "@app/utils/amounts"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
 
@@ -19,15 +31,13 @@ import {
   executeSend,
   extractLightningFee,
   extractOnchainFees,
+  prepareConversion,
   prepareSend,
+  recordConvertError,
   resolveSendTokenIdentifier,
   toSdkSendAmount,
+  type PreparedConversion,
 } from "../bridge"
-
-const failed = (message: string): PaymentAdapterResult => ({
-  status: PaymentResultStatus.Failed,
-  errors: [{ message }],
-})
 
 export const createSendPayment = (sdk: BreezSdkInterface): SendPaymentAdapter => {
   return async ({ destination, amount }) => {
@@ -42,7 +52,7 @@ export const createSendPayment = (sdk: BreezSdkInterface): SendPaymentAdapter =>
 
       return { status: PaymentResultStatus.Success }
     } catch (err) {
-      return failed(err instanceof Error ? err.message : `Send failed: ${err}`)
+      return failedPayment(err instanceof Error ? err.message : `Send failed: ${err}`)
     }
   }
 }
@@ -91,3 +101,59 @@ export const createGetFee = (sdk: BreezSdkInterface): GetFeeAdapter => {
     }
   }
 }
+
+const mapAmountAdjustment = (
+  reason: AmountAdjustmentReason | undefined,
+): ConvertAmountAdjustment | undefined => {
+  if (reason === AmountAdjustmentReason.FlooredToMinLimit) {
+    return ConvertAmountAdjustment.FlooredToMin
+  }
+  if (reason === AmountAdjustmentReason.IncreasedToAvoidDust) {
+    return ConvertAmountAdjustment.IncreasedToAvoidDust
+  }
+  return undefined
+}
+
+const executePrepared = async (
+  sdk: BreezSdkInterface,
+  prepared: PrepareSendPaymentResponse,
+  params: ConvertParams,
+): Promise<PaymentAdapterResult> => {
+  try {
+    await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
+    sdk.syncWallet(SyncWalletRequest.create({})).catch((err) => {
+      reportError("convert: post-send syncWallet", err)
+    })
+    return { status: PaymentResultStatus.Success }
+  } catch (err) {
+    recordConvertError(err, params, "executePrepared")
+    return failedPayment(err instanceof Error ? err.message : `Conversion failed: ${err}`)
+  }
+}
+
+const toConvertQuote = (
+  sdk: BreezSdkInterface,
+  { prepared, tokenDecimals }: PreparedConversion,
+  params: ConvertParams,
+): ConvertQuote | null => {
+  const estimate = prepared.conversionEstimate
+  if (!estimate) return null
+  const feeCents = tokenBaseUnitsToCents(toNumber(estimate.fee), tokenDecimals)
+  return {
+    feeAmount: toUsdMoneyAmount(feeCents),
+    amountAdjustment: mapAmountAdjustment(estimate.amountAdjustment),
+    execute: () => executePrepared(sdk, prepared, params),
+  }
+}
+
+export const createSelfCustodialConvert = (sdk: BreezSdkInterface): ConvertAdapter => ({
+  getQuote: async (params) => {
+    try {
+      const context = await prepareConversion(sdk, params)
+      return toConvertQuote(sdk, context, params)
+    } catch (err) {
+      recordConvertError(err, params, "getQuote")
+      throw err
+    }
+  },
+})

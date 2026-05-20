@@ -146,6 +146,11 @@ export const convertDirectionFromCurrency = (
 export const oppositeWalletCurrency = (currency: WalletCurrency): WalletCurrency =>
   currency === WalletCurrency.Btc ? WalletCurrency.Usd : WalletCurrency.Btc
 
+export const failedPayment = (message: string): PaymentAdapterResult => ({
+  status: PaymentResultStatus.Failed,
+  errors: [{ message }],
+})
+
 export type ConvertParams = {
   fromAmount: MoneyAmount<WalletCurrency>
   toAmount: MoneyAmount<WalletCurrency>
@@ -191,8 +196,6 @@ export type ClaimDepositAdapter = {
   refundDeposit: (params: RefundDepositParams) => Promise<PaymentAdapterResult>
 }
 
-export type ConvertAdapter = (params: ConvertParams) => Promise<PaymentAdapterResult>
-
 export const ConvertAmountAdjustment = {
   FlooredToMin: "floored_to_min",
   IncreasedToAvoidDust: "increased_to_avoid_dust",
@@ -207,6 +210,6 @@ export type ConvertQuote = {
   execute: () => Promise<PaymentAdapterResult>
 }
 
-export type GetConversionQuoteAdapter = (
-  params: ConvertParams,
-) => Promise<ConvertQuote | null>
+export type ConvertAdapter = {
+  getQuote: (params: ConvertParams) => Promise<ConvertQuote | null>
+}

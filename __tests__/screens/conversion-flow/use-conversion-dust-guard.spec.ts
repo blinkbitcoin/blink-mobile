@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { useSelfCustodialConversionGuard } from "@app/screens/conversion-flow/hooks/self-custodial/use-conversion-guard"
+import { useConversionDustGuard } from "@app/screens/conversion-flow/hooks/use-conversion-dust-guard"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import {
   ConvertAmountAdjustment,
@@ -14,7 +14,7 @@ const mockConvertMoneyAmount = jest.fn()
 const mockFormatMoneyAmount = jest.fn(() => "$0.05")
 
 jest.mock("@app/hooks/use-payments", () => ({
-  usePayments: () => ({ getConversionQuote: mockGetQuote }),
+  usePayments: () => ({ convert: { getQuote: mockGetQuote } }),
 }))
 
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -43,10 +43,9 @@ const defaultParams = {
   fromCurrency: WalletCurrency.Btc,
   amountInSourceCurrency: 1_000,
   fromWalletBalance: 5_000,
-  enabled: true,
 }
 
-describe("useSelfCustodialConversionGuard", () => {
+describe("useConversionDustGuard", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockConvertMoneyAmount.mockImplementation(
@@ -57,19 +56,9 @@ describe("useSelfCustodialConversionGuard", () => {
     )
   })
 
-  it("stays inactive and does not quote when disabled", async () => {
-    const { result } = renderHook(() =>
-      useSelfCustodialConversionGuard({ ...defaultParams, enabled: false }),
-    )
-
-    await waitFor(() => expect(result.current.isQuoting).toBe(false))
-    expect(result.current.blockingReason).toBeNull()
-    expect(mockGetQuote).not.toHaveBeenCalled()
-  })
-
   it("stays inactive when amountInSourceCurrency is zero", async () => {
     const { result } = renderHook(() =>
-      useSelfCustodialConversionGuard({ ...defaultParams, amountInSourceCurrency: 0 }),
+      useConversionDustGuard({ ...defaultParams, amountInSourceCurrency: 0 }),
     )
 
     await waitFor(() => expect(result.current.isQuoting).toBe(false))
@@ -79,7 +68,7 @@ describe("useSelfCustodialConversionGuard", () => {
 
   it("stays inactive when fromCurrency is undefined", async () => {
     const { result } = renderHook(() =>
-      useSelfCustodialConversionGuard({ ...defaultParams, fromCurrency: undefined }),
+      useConversionDustGuard({ ...defaultParams, fromCurrency: undefined }),
     )
 
     await waitFor(() => expect(result.current.isQuoting).toBe(false))
@@ -91,7 +80,7 @@ describe("useSelfCustodialConversionGuard", () => {
     mockGetQuote.mockResolvedValue(buildQuote(ConvertAmountAdjustment.FlooredToMin))
 
     const { result } = renderHook(() =>
-      useSelfCustodialConversionGuard({
+      useConversionDustGuard({
         ...defaultParams,
         amountInSourceCurrency: 50,
       }),
@@ -108,7 +97,7 @@ describe("useSelfCustodialConversionGuard", () => {
     )
 
     const { result } = renderHook(() =>
-      useSelfCustodialConversionGuard({
+      useConversionDustGuard({
         ...defaultParams,
         amountInSourceCurrency: 4_500,
         fromWalletBalance: 5_000,
@@ -128,7 +117,7 @@ describe("useSelfCustodialConversionGuard", () => {
     )
 
     const { result } = renderHook(() =>
-      useSelfCustodialConversionGuard({
+      useConversionDustGuard({
         ...defaultParams,
         amountInSourceCurrency: 5_000,
         fromWalletBalance: 5_000,
@@ -146,7 +135,7 @@ describe("useSelfCustodialConversionGuard", () => {
     )
 
     const { result } = renderHook(() =>
-      useSelfCustodialConversionGuard({
+      useConversionDustGuard({
         ...defaultParams,
         amountInSourceCurrency: 5_500,
         fromWalletBalance: 5_000,
@@ -164,7 +153,7 @@ describe("useSelfCustodialConversionGuard", () => {
     )
 
     const { result } = renderHook(() =>
-      useSelfCustodialConversionGuard({
+      useConversionDustGuard({
         ...defaultParams,
         amountInSourceCurrency: 4_500,
         fromWalletBalance: undefined,
@@ -181,7 +170,7 @@ describe("useSelfCustodialConversionGuard", () => {
   it("returns null blockingReason when SDK reports no adjustment", async () => {
     mockGetQuote.mockResolvedValue(buildQuote())
 
-    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useConversionDustGuard(defaultParams))
 
     await waitFor(() => expect(mockGetQuote).toHaveBeenCalled())
     await waitFor(() => expect(result.current.isQuoting).toBe(false))
@@ -197,7 +186,7 @@ describe("useSelfCustodialConversionGuard", () => {
         }),
     )
 
-    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useConversionDustGuard(defaultParams))
 
     await waitFor(() => expect(result.current.isQuoting).toBe(true))
     expect(result.current.blockingReason).toBeNull()
@@ -215,7 +204,7 @@ describe("useSelfCustodialConversionGuard", () => {
   it("surfaces hasQuoteError=true and keeps blockingReason null when the quote rejects", async () => {
     mockGetQuote.mockRejectedValue(new Error("pools unavailable"))
 
-    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useConversionDustGuard(defaultParams))
 
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
     expect(result.current.isQuoting).toBe(false)
@@ -225,7 +214,7 @@ describe("useSelfCustodialConversionGuard", () => {
   it("surfaces hasQuoteError=true when the SDK returns a null quote", async () => {
     mockGetQuote.mockResolvedValue(null)
 
-    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useConversionDustGuard(defaultParams))
 
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
     expect(result.current.blockingReason).toBeNull()
@@ -234,7 +223,7 @@ describe("useSelfCustodialConversionGuard", () => {
   it("keeps hasQuoteError=false on the success path", async () => {
     mockGetQuote.mockResolvedValue(buildQuote())
 
-    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useConversionDustGuard(defaultParams))
 
     await waitFor(() => expect(mockGetQuote).toHaveBeenCalled())
     await waitFor(() => expect(result.current.isQuoting).toBe(false))
@@ -245,18 +234,9 @@ describe("useSelfCustodialConversionGuard", () => {
   it("keeps hasQuoteError=false while the quote is in flight", async () => {
     mockGetQuote.mockImplementation(() => new Promise<ConvertQuote>(() => {}))
 
-    const { result } = renderHook(() => useSelfCustodialConversionGuard(defaultParams))
+    const { result } = renderHook(() => useConversionDustGuard(defaultParams))
 
     await waitFor(() => expect(result.current.isQuoting).toBe(true))
-    expect(result.current.hasQuoteError).toBe(false)
-  })
-
-  it("keeps hasQuoteError=false in the disabled and idle paths", async () => {
-    const { result } = renderHook(() =>
-      useSelfCustodialConversionGuard({ ...defaultParams, enabled: false }),
-    )
-
-    await waitFor(() => expect(result.current.isQuoting).toBe(false))
     expect(result.current.hasQuoteError).toBe(false)
   })
 })

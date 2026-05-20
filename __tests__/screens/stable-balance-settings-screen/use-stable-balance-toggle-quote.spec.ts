@@ -9,7 +9,7 @@ const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
 
 jest.mock("@app/hooks/use-payments", () => ({
-  usePayments: () => ({ getConversionQuote: mockGetQuote }),
+  usePayments: () => ({ convert: { getQuote: mockGetQuote } }),
 }))
 
 jest.mock("@app/hooks/use-price-conversion", () => ({

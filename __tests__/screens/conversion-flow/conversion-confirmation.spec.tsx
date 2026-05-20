@@ -4,76 +4,13 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react-nativ
 import { useNavigation } from "@react-navigation/native"
 
 import { ConversionConfirmationScreen } from "@app/screens/conversion-flow"
-import { HomeAuthedDocument, WalletCurrency } from "@app/graphql/generated"
+import { WalletCurrency } from "@app/graphql/generated"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { toWalletId } from "@app/types/wallet"
 
 import { ContextForScreen } from "../helper"
-
-const conversionQueryMock = jest.fn(() => ({
-  data: {
-    me: {
-      id: "user-id",
-      defaultAccount: {
-        id: "account-id",
-        wallets: [
-          {
-            id: "btc-wallet-id",
-            walletCurrency: "BTC",
-            balance: 100000,
-            __typename: "BTCWallet",
-          },
-          {
-            id: "usd-wallet-id",
-            walletCurrency: "USD",
-            balance: 5000,
-            __typename: "UsdWallet",
-          },
-        ],
-        __typename: "ConsumerAccount",
-      },
-      __typename: "User",
-    },
-  },
-}))
-
-const intraLedgerMutationMock = jest.fn(() =>
-  Promise.resolve({
-    data: {
-      intraLedgerPaymentSend: {
-        status: "SUCCESS",
-        errors: [],
-      },
-    },
-  }),
-)
-
-const intraLedgerUsdMutationMock = jest.fn(() =>
-  Promise.resolve({
-    data: {
-      intraLedgerUsdPaymentSend: {
-        status: "SUCCESS",
-        errors: [],
-      },
-    },
-  }),
-)
-
-jest.mock("@app/graphql/generated", () => {
-  const actual = jest.requireActual("@app/graphql/generated")
-  return {
-    ...actual,
-    useConversionScreenQuery: () => conversionQueryMock(),
-    useIntraLedgerPaymentSendMutation: () => [
-      intraLedgerMutationMock,
-      { loading: false },
-    ],
-    useIntraLedgerUsdPaymentSendMutation: () => [
-      intraLedgerUsdMutationMock,
-      { loading: false },
-    ],
-  }
-})
 
 const priceConversionMock = jest.fn(() => ({
   convertMoneyAmount: (
@@ -135,20 +72,34 @@ jest.mock("@app/utils/analytics", () => ({
   logConversionResult: jest.fn(),
 }))
 
-const mockUseActiveWallet: jest.Mock<{
-  isSelfCustodial: boolean
-  wallets: unknown[]
-}> = jest.fn(() => ({ isSelfCustodial: false, wallets: [] }))
+const baseWallets = [
+  {
+    id: toWalletId("btc-wallet-id"),
+    walletCurrency: WalletCurrency.Btc,
+    balance: toBtcMoneyAmount(100000),
+    transactions: [],
+  },
+  {
+    id: toWalletId("usd-wallet-id"),
+    walletCurrency: WalletCurrency.Usd,
+    balance: toUsdMoneyAmount(50000),
+    transactions: [],
+  },
+]
+
+const mockUseActiveWallet = jest.fn(() => ({
+  isSelfCustodial: false,
+  wallets: baseWallets,
+}))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
-const mockSelfCustodialConversion = jest.fn()
+const mockConversionExecution = jest.fn()
 
-jest.mock("@app/screens/conversion-flow/hooks/self-custodial/use-conversion", () => ({
-  useSelfCustodialConversion: (...args: unknown[]) =>
-    mockSelfCustodialConversion(...args),
+jest.mock("@app/screens/conversion-flow/hooks/use-conversion-execution", () => ({
+  useConversionExecution: (...args: unknown[]) => mockConversionExecution(...args),
 }))
 
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
@@ -163,6 +114,16 @@ jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () =
   return { __esModule: true, default: MockGaloySliderButton }
 })
 
+const buildRoute = (currency: WalletCurrency, amount: number) =>
+  ({
+    key: "conversionConfirmation",
+    name: "conversionConfirmation",
+    params: {
+      fromWalletCurrency: currency,
+      moneyAmount: { amount, currency, currencyCode: currency },
+    },
+  }) as const
+
 describe("conversion-confirmation-screen", () => {
   let LL: ReturnType<typeof i18nObject>
   const dispatchMock = jest.fn()
@@ -175,34 +136,21 @@ describe("conversion-confirmation-screen", () => {
     LL = i18nObject("en")
     jest.clearAllMocks()
     ;(useNavigation as jest.Mock).mockReturnValue({ dispatch: dispatchMock })
-    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false, wallets: [] })
-    mockSelfCustodialConversion.mockReturnValue({
+    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false, wallets: baseWallets })
+    mockConversionExecution.mockReturnValue({
       isQuoting: false,
       hasQuoteError: false,
       feeText: "",
-      adjustmentText: null,
-      canExecute: false,
-      execute: jest.fn(),
+      hasFee: false,
+      canExecute: true,
+      execute: jest.fn().mockResolvedValue({ status: "success" }),
     })
   })
 
-  it("renders BTC to USD texts", async () => {
-    const route = {
-      key: "conversionConfirmation",
-      name: "conversionConfirmation",
-      params: {
-        fromWalletCurrency: WalletCurrency.Btc,
-        moneyAmount: {
-          amount: 10000,
-          currency: WalletCurrency.Btc,
-          currencyCode: WalletCurrency.Btc,
-        },
-      },
-    } as const
-
+  it("renders BTC to USD texts", () => {
     render(
       <ContextForScreen>
-        <ConversionConfirmationScreen route={route} />
+        <ConversionConfirmationScreen route={buildRoute(WalletCurrency.Btc, 10000)} />
       </ContextForScreen>,
     )
 
@@ -212,31 +160,16 @@ describe("conversion-confirmation-screen", () => {
     })
     const infoText = LL.ConversionConfirmationScreen.infoDollar()
 
-    expect(conversionQueryMock).toHaveBeenCalled()
     expect(priceConversionMock).toHaveBeenCalled()
     expect(displayCurrencyMock).toHaveBeenCalled()
-
     expect(screen.getByText(transferText)).toBeTruthy()
     expect(screen.getByText(infoText)).toBeTruthy()
   })
 
-  it("renders USD to BTC texts", async () => {
-    const route = {
-      key: "conversionConfirmation",
-      name: "conversionConfirmation",
-      params: {
-        fromWalletCurrency: WalletCurrency.Usd,
-        moneyAmount: {
-          amount: 5000,
-          currency: WalletCurrency.Usd,
-          currencyCode: WalletCurrency.Usd,
-        },
-      },
-    } as const
-
+  it("renders USD to BTC texts", () => {
     render(
       <ContextForScreen>
-        <ConversionConfirmationScreen route={route} />
+        <ConversionConfirmationScreen route={buildRoute(WalletCurrency.Usd, 5000)} />
       </ContextForScreen>,
     )
 
@@ -250,69 +183,40 @@ describe("conversion-confirmation-screen", () => {
     expect(screen.getByText(infoText)).toBeTruthy()
   })
 
-  it("shows conversion rate", async () => {
-    const route = {
-      key: "conversionConfirmation",
-      name: "conversionConfirmation",
-      params: {
-        fromWalletCurrency: WalletCurrency.Btc,
-        moneyAmount: {
-          amount: 10000,
-          currency: WalletCurrency.Btc,
-          currencyCode: WalletCurrency.Btc,
-        },
-      },
-    } as const
-
+  it("shows conversion rate", () => {
     render(
       <ContextForScreen>
-        <ConversionConfirmationScreen route={route} />
+        <ConversionConfirmationScreen route={buildRoute(WalletCurrency.Btc, 10000)} />
       </ContextForScreen>,
     )
 
     expect(screen.getByText("1 BTC = $100000000")).toBeTruthy()
   })
 
-  it("shows from and to amounts for BTC to USD", async () => {
-    const route = {
-      key: "conversionConfirmation",
-      name: "conversionConfirmation",
-      params: {
-        fromWalletCurrency: WalletCurrency.Btc,
-        moneyAmount: {
-          amount: 10000,
-          currency: WalletCurrency.Btc,
-          currencyCode: WalletCurrency.Btc,
-        },
-      },
-    } as const
-
+  it("shows from and to amounts", () => {
     render(
       <ContextForScreen>
-        <ConversionConfirmationScreen route={route} />
+        <ConversionConfirmationScreen route={buildRoute(WalletCurrency.Btc, 10000)} />
       </ContextForScreen>,
     )
 
     expect(screen.getAllByText("$10000").length).toBeGreaterThanOrEqual(2)
   })
 
-  it("sends BTC conversion on swipe", async () => {
-    const route = {
-      key: "conversionConfirmation",
-      name: "conversionConfirmation",
-      params: {
-        fromWalletCurrency: WalletCurrency.Btc,
-        moneyAmount: {
-          amount: 10000,
-          currency: WalletCurrency.Btc,
-          currencyCode: WalletCurrency.Btc,
-        },
-      },
-    } as const
+  it("invokes conversion.execute and resets to conversionSuccess on success", async () => {
+    const execute = jest.fn().mockResolvedValue({ status: "success" })
+    mockConversionExecution.mockReturnValue({
+      isQuoting: false,
+      hasQuoteError: false,
+      feeText: "$0.00",
+      hasFee: false,
+      canExecute: true,
+      execute,
+    })
 
     render(
       <ContextForScreen>
-        <ConversionConfirmationScreen route={route} />
+        <ConversionConfirmationScreen route={buildRoute(WalletCurrency.Btc, 10000)} />
       </ContextForScreen>,
     )
 
@@ -325,39 +229,27 @@ describe("conversion-confirmation-screen", () => {
       ),
     )
 
-    await waitFor(() => {
-      expect(intraLedgerMutationMock).toHaveBeenCalledWith({
-        variables: {
-          input: {
-            walletId: "btc-wallet-id",
-            recipientWalletId: "usd-wallet-id",
-            amount: 10000,
-          },
-        },
-        refetchQueries: [HomeAuthedDocument],
-      })
-    })
-
+    await waitFor(() => expect(execute).toHaveBeenCalledTimes(1))
     expect(dispatchMock).toHaveBeenCalled()
   })
 
-  it("sends USD conversion on swipe", async () => {
-    const route = {
-      key: "conversionConfirmation",
-      name: "conversionConfirmation",
-      params: {
-        fromWalletCurrency: WalletCurrency.Usd,
-        moneyAmount: {
-          amount: 5000,
-          currency: WalletCurrency.Usd,
-          currencyCode: WalletCurrency.Usd,
-        },
-      },
-    } as const
+  it("does not navigate when conversion.execute reports failure", async () => {
+    const execute = jest.fn().mockResolvedValue({
+      status: "failed",
+      message: "Conversion rejected",
+    })
+    mockConversionExecution.mockReturnValue({
+      isQuoting: false,
+      hasQuoteError: false,
+      feeText: "",
+      hasFee: false,
+      canExecute: true,
+      execute,
+    })
 
     render(
       <ContextForScreen>
-        <ConversionConfirmationScreen route={route} />
+        <ConversionConfirmationScreen route={buildRoute(WalletCurrency.Usd, 5000)} />
       </ContextForScreen>,
     )
 
@@ -370,179 +262,46 @@ describe("conversion-confirmation-screen", () => {
       ),
     )
 
-    await waitFor(() => {
-      expect(intraLedgerUsdMutationMock).toHaveBeenCalledWith({
-        variables: {
-          input: {
-            walletId: "usd-wallet-id",
-            recipientWalletId: "btc-wallet-id",
-            amount: 5000,
-          },
-        },
-        refetchQueries: [HomeAuthedDocument],
-      })
-    })
-
-    expect(dispatchMock).toHaveBeenCalled()
-  })
-})
-
-describe("conversion-confirmation-screen — self-custodial submit path", () => {
-  let LL: ReturnType<typeof i18nObject>
-  const dispatchMock = jest.fn()
-  const selfCustodialWallets = [
-    {
-      id: "self-custodial-btc-wallet",
-      walletCurrency: WalletCurrency.Btc,
-      balance: { amount: 100000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
-      transactions: [],
-    },
-    {
-      id: "self-custodial-usd-wallet",
-      walletCurrency: WalletCurrency.Usd,
-      balance: { amount: 50000, currency: WalletCurrency.Usd, currencyCode: "USD" },
-      transactions: [],
-    },
-  ]
-
-  beforeAll(() => {
-    loadLocale("en")
+    await waitFor(() => expect(execute).toHaveBeenCalledTimes(1))
+    expect(dispatchMock).not.toHaveBeenCalled()
+    expect(screen.getByText("Conversion rejected")).toBeTruthy()
   })
 
-  beforeEach(() => {
-    LL = i18nObject("en")
-    jest.clearAllMocks()
-    ;(useNavigation as jest.Mock).mockReturnValue({ dispatch: dispatchMock })
-    mockUseActiveWallet.mockReturnValue({
-      isSelfCustodial: true,
-      wallets: selfCustodialWallets,
-    })
-  })
-
-  it("renders the self-custodial fee row with the feeText returned by useSelfCustodialConversion", () => {
-    mockSelfCustodialConversion.mockReturnValue({
+  it("renders the fee row only when the quote has a non-zero fee", () => {
+    mockConversionExecution.mockReturnValue({
       isQuoting: false,
       hasQuoteError: false,
       feeText: "$0.05",
-      adjustmentText: null,
+      hasFee: true,
       canExecute: true,
       execute: jest.fn(),
     })
 
-    const route = {
-      key: "conversionConfirmation",
-      name: "conversionConfirmation",
-      params: {
-        fromWalletCurrency: WalletCurrency.Btc,
-        moneyAmount: {
-          amount: 10000,
-          currency: WalletCurrency.Btc,
-          currencyCode: WalletCurrency.Btc,
-        },
-      },
-    } as const
-
     render(
       <ContextForScreen>
-        <ConversionConfirmationScreen route={route} />
+        <ConversionConfirmationScreen route={buildRoute(WalletCurrency.Btc, 10000)} />
       </ContextForScreen>,
     )
 
     expect(screen.getByText("$0.05")).toBeTruthy()
   })
 
-  it("invokes nonCustodialConversion.execute and resets navigation to conversionSuccess on success", async () => {
-    const executeMock = jest.fn().mockResolvedValue({ status: "success" })
-    mockSelfCustodialConversion.mockReturnValue({
+  it("does not render the fee row when the quote has zero fee (custodial intra-ledger)", () => {
+    mockConversionExecution.mockReturnValue({
       isQuoting: false,
       hasQuoteError: false,
-      feeText: "$0.05",
-      adjustmentText: null,
+      feeText: "$0.00",
+      hasFee: false,
       canExecute: true,
-      execute: executeMock,
+      execute: jest.fn(),
     })
-
-    const route = {
-      key: "conversionConfirmation",
-      name: "conversionConfirmation",
-      params: {
-        fromWalletCurrency: WalletCurrency.Btc,
-        moneyAmount: {
-          amount: 10000,
-          currency: WalletCurrency.Btc,
-          currencyCode: WalletCurrency.Btc,
-        },
-      },
-    } as const
 
     render(
       <ContextForScreen>
-        <ConversionConfirmationScreen route={route} />
+        <ConversionConfirmationScreen route={buildRoute(WalletCurrency.Btc, 10000)} />
       </ContextForScreen>,
     )
 
-    fireEvent.press(
-      screen.getByText(
-        LL.ConversionConfirmationScreen.transferButtonText({
-          fromWallet: LL.common.bitcoin(),
-          toWallet: LL.common.dollar(),
-        }),
-      ),
-    )
-
-    await waitFor(() => {
-      expect(executeMock).toHaveBeenCalledTimes(1)
-    })
-    expect(dispatchMock).toHaveBeenCalled()
-    expect(intraLedgerMutationMock).not.toHaveBeenCalled()
-    expect(intraLedgerUsdMutationMock).not.toHaveBeenCalled()
-  })
-
-  it("does not navigate when nonCustodialConversion.execute reports failure", async () => {
-    const executeMock = jest.fn().mockResolvedValue({
-      status: "failed",
-      message: "SDK rejected",
-    })
-    mockSelfCustodialConversion.mockReturnValue({
-      isQuoting: false,
-      hasQuoteError: false,
-      feeText: "$0.05",
-      adjustmentText: null,
-      canExecute: true,
-      execute: executeMock,
-    })
-
-    const route = {
-      key: "conversionConfirmation",
-      name: "conversionConfirmation",
-      params: {
-        fromWalletCurrency: WalletCurrency.Usd,
-        moneyAmount: {
-          amount: 5000,
-          currency: WalletCurrency.Usd,
-          currencyCode: WalletCurrency.Usd,
-        },
-      },
-    } as const
-
-    render(
-      <ContextForScreen>
-        <ConversionConfirmationScreen route={route} />
-      </ContextForScreen>,
-    )
-
-    fireEvent.press(
-      screen.getByText(
-        LL.ConversionConfirmationScreen.transferButtonText({
-          fromWallet: LL.common.dollar(),
-          toWallet: LL.common.bitcoin(),
-        }),
-      ),
-    )
-
-    await waitFor(() => {
-      expect(executeMock).toHaveBeenCalledTimes(1)
-    })
-    expect(dispatchMock).not.toHaveBeenCalled()
+    expect(screen.queryByText("$0.00")).toBeNull()
   })
 })

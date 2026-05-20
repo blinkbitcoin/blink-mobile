@@ -16,6 +16,7 @@ const mockRemovePendingAutoConvert = jest.fn()
 const mockUseSelfCustodialWallet = jest.fn()
 const mockUseRemoteConfig = jest.fn()
 const mockUsePriceConversion = jest.fn()
+const mockUsePayments = jest.fn()
 const mockRefreshWallets = jest.fn()
 const mockSyncSelfCustodialWallet = jest.fn().mockResolvedValue(undefined)
 
@@ -59,6 +60,10 @@ jest.mock("@app/config/feature-flags-context", () => ({
 
 jest.mock("@app/hooks/use-price-conversion", () => ({
   usePriceConversion: () => mockUsePriceConversion(),
+}))
+
+jest.mock("@app/hooks/use-payments", () => ({
+  usePayments: () => mockUsePayments(),
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
@@ -146,6 +151,7 @@ const setupDefaults = (sdk: ListenerSdk) => {
   mockUsePriceConversion.mockReturnValue({
     convertMoneyAmount: (a: { amount: number }) => ({ amount: a.amount }),
   })
+  mockUsePayments.mockReturnValue({ convert: { getQuote: jest.fn() } })
   mockPruneExpiredAutoConverts.mockResolvedValue(undefined)
   mockPruneExpiredAutoConvertPairings.mockResolvedValue(undefined)
   mockListPendingAutoConverts.mockResolvedValue([])
@@ -677,6 +683,7 @@ describe("useAutoConvertListener — live trigger", () => {
     expect(mockExecuteAutoConvert).toHaveBeenCalledWith(
       sdk,
       expect.objectContaining({ isStableBalanceActive: false }),
+      expect.objectContaining({ getQuote: expect.any(Function) }),
     )
   })
 

@@ -8,7 +8,7 @@ import {
 } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
-import { createGetConversionQuote } from "@app/self-custodial/bridge/convert"
+import { createSelfCustodialConvert } from "@app/self-custodial/adapters/payment"
 
 const mockFetchLimits = jest.fn()
 const mockRequireTokenId = jest.fn(() => "usdb-token-id")
@@ -55,7 +55,7 @@ const createSdk = () => ({
   }),
 })
 
-describe("createGetConversionQuote — BTC → USD", () => {
+describe("createSelfCustodialConvert — BTC → USD", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -64,7 +64,7 @@ describe("createGetConversionQuote — BTC → USD", () => {
     mockFetchLimits.mockResolvedValue({ minFromAmount: 1000, minToAmount: 0 })
     const sdk = createSdk()
 
-    const quote = await createGetConversionQuote(sdk as never)({
+    const quote = await createSelfCustodialConvert(sdk as never).getQuote({
       fromAmount: toBtcMoneyAmount(5000),
       toAmount: toUsdMoneyAmount(137),
       direction: ConvertDirection.BtcToUsd,
@@ -86,7 +86,7 @@ describe("createGetConversionQuote — BTC → USD", () => {
     mockFetchLimits.mockResolvedValue({ minFromAmount: 1000, minToAmount: 0 })
     const sdk = createSdk()
 
-    const quote = await createGetConversionQuote(sdk as never)({
+    const quote = await createSelfCustodialConvert(sdk as never).getQuote({
       fromAmount: toBtcMoneyAmount(5000),
       toAmount: toUsdMoneyAmount(137),
       direction: ConvertDirection.BtcToUsd,
@@ -105,7 +105,7 @@ describe("createGetConversionQuote — BTC → USD", () => {
     mockFetchLimits.mockResolvedValue({ minFromAmount: 0, minToAmount: 0 })
     const sdk = createSdk()
 
-    const quote = await createGetConversionQuote(sdk as never)({
+    const quote = await createSelfCustodialConvert(sdk as never).getQuote({
       fromAmount: toBtcMoneyAmount(5000),
       toAmount: toUsdMoneyAmount(137),
       direction: ConvertDirection.BtcToUsd,
@@ -120,7 +120,7 @@ describe("createGetConversionQuote — BTC → USD", () => {
     const sdk = createSdk()
 
     await expect(
-      createGetConversionQuote(sdk as never)({
+      createSelfCustodialConvert(sdk as never).getQuote({
         fromAmount: toBtcMoneyAmount(5000),
         toAmount: toUsdMoneyAmount(137),
         direction: ConvertDirection.BtcToUsd,
@@ -136,7 +136,7 @@ describe("createGetConversionQuote — BTC → USD", () => {
     const sdk = createSdk()
 
     await expect(
-      createGetConversionQuote(sdk as never)({
+      createSelfCustodialConvert(sdk as never).getQuote({
         fromAmount: toBtcMoneyAmount(5000),
         toAmount: toUsdMoneyAmount(137),
         direction: ConvertDirection.BtcToUsd,
@@ -151,7 +151,7 @@ describe("createGetConversionQuote — BTC → USD", () => {
     mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
     const sdk = createSdk()
 
-    const quote = await createGetConversionQuote(sdk as never)({
+    const quote = await createSelfCustodialConvert(sdk as never).getQuote({
       fromAmount: toBtcMoneyAmount(100),
       toAmount: toUsdMoneyAmount(7),
       direction: ConvertDirection.BtcToUsd,
@@ -167,7 +167,7 @@ describe("createGetConversionQuote — BTC → USD", () => {
     mockFetchLimits.mockResolvedValue({ minFromAmount: 0, minToAmount: 1500 })
     const sdk = createSdk()
 
-    await createGetConversionQuote(sdk as never)({
+    await createSelfCustodialConvert(sdk as never).getQuote({
       fromAmount: toBtcMoneyAmount(5000),
       toAmount: toUsdMoneyAmount(2000),
       direction: ConvertDirection.BtcToUsd,
@@ -178,7 +178,7 @@ describe("createGetConversionQuote — BTC → USD", () => {
   })
 })
 
-describe("createGetConversionQuote — USD → BTC", () => {
+describe("createSelfCustodialConvert — USD → BTC", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -187,7 +187,7 @@ describe("createGetConversionQuote — USD → BTC", () => {
     mockFetchLimits.mockResolvedValue({ minFromAmount: 10, minToAmount: 500 })
     const sdk = createSdk()
 
-    const quote = await createGetConversionQuote(sdk as never)({
+    const quote = await createSelfCustodialConvert(sdk as never).getQuote({
       fromAmount: toUsdMoneyAmount(100),
       toAmount: toBtcMoneyAmount(1300),
       direction: ConvertDirection.UsdToBtc,
@@ -205,7 +205,7 @@ describe("createGetConversionQuote — USD → BTC", () => {
   })
 })
 
-describe("createGetConversionQuote — error handling", () => {
+describe("createSelfCustodialConvert — error handling", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
@@ -222,7 +222,7 @@ describe("createGetConversionQuote — error handling", () => {
     }
 
     await expect(
-      createGetConversionQuote(sdk as never)({
+      createSelfCustodialConvert(sdk as never).getQuote({
         fromAmount: toBtcMoneyAmount(5000),
         toAmount: toUsdMoneyAmount(137),
         direction: ConvertDirection.BtcToUsd,
@@ -246,7 +246,7 @@ describe("createGetConversionQuote — error handling", () => {
       getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
     }
 
-    const quote = await createGetConversionQuote(sdk as never)({
+    const quote = await createSelfCustodialConvert(sdk as never).getQuote({
       fromAmount: toBtcMoneyAmount(5000),
       toAmount: toUsdMoneyAmount(137),
       direction: ConvertDirection.BtcToUsd,
@@ -298,7 +298,7 @@ describe("createGetConversionQuote — error handling", () => {
       }),
     }
 
-    const quote = await createGetConversionQuote(sdk as never)({
+    const quote = await createSelfCustodialConvert(sdk as never).getQuote({
       fromAmount: toUsdMoneyAmount(249),
       toAmount: toBtcMoneyAmount(3_032),
       direction: ConvertDirection.UsdToBtc,
@@ -348,7 +348,7 @@ describe("createGetConversionQuote — error handling", () => {
     }
 
     await expect(
-      createGetConversionQuote(sdk as never)({
+      createSelfCustodialConvert(sdk as never).getQuote({
         fromAmount: toBtcMoneyAmount(5000),
         toAmount: toUsdMoneyAmount(180),
         direction: ConvertDirection.BtcToUsd,
@@ -368,7 +368,7 @@ describe("createGetConversionQuote — error handling", () => {
     const sdk = createSdk()
 
     await expect(
-      createGetConversionQuote(sdk as never)({
+      createSelfCustodialConvert(sdk as never).getQuote({
         fromAmount: toBtcMoneyAmount(5000),
         toAmount: toUsdMoneyAmount(137),
         direction: ConvertDirection.BtcToUsd,

@@ -1,4 +1,8 @@
-import { ConvertErrorCode, PaymentResultStatus } from "@app/types/payment"
+import {
+  ConvertErrorCode,
+  PaymentResultStatus,
+  type ConvertAdapter,
+} from "@app/types/payment"
 
 import {
   executeAutoConvert,
@@ -11,12 +15,9 @@ const mockGetConversionQuote = jest.fn()
 const mockFetchLimits = jest.fn()
 const mockFetchDecimals = jest.fn()
 
-jest.mock("@app/self-custodial/bridge/convert", () => ({
-  createGetConversionQuote:
-    () =>
-    (...args: unknown[]) =>
-      mockGetConversionQuote(...args),
-}))
+const mockConvertAdapter: ConvertAdapter = {
+  getQuote: (...args) => mockGetConversionQuote(...args),
+}
 
 jest.mock("@app/self-custodial/bridge/limits", () => ({
   fetchConversionLimits: (...args: unknown[]) => mockFetchLimits(...args),
@@ -164,10 +165,11 @@ describe("executeAutoConvert", () => {
   })
 
   it("short-circuits with SkippedStableBalanceActive when the sweep owns the conversion", async () => {
-    const outcome = await executeAutoConvert(sdkWith([]), {
-      ...baseParams,
-      isStableBalanceActive: true,
-    })
+    const outcome = await executeAutoConvert(
+      sdkWith([]),
+      { ...baseParams, isStableBalanceActive: true },
+      mockConvertAdapter,
+    )
 
     expect(outcome).toEqual({ status: "skipped-stable-balance-active" })
     expect(mockGetConversionQuote).not.toHaveBeenCalled()
@@ -185,6 +187,7 @@ describe("executeAutoConvert", () => {
         },
       ]),
       baseParams,
+      mockConvertAdapter,
     )
 
     expect(outcome).toEqual({ status: "already-converted" })
@@ -205,6 +208,7 @@ describe("executeAutoConvert", () => {
         },
       ]),
       baseParams,
+      mockConvertAdapter,
     )
 
     expect(outcome).toEqual({ status: "converted" })
@@ -223,6 +227,7 @@ describe("executeAutoConvert", () => {
         },
       ]),
       baseParams,
+      mockConvertAdapter,
     )
 
     expect(outcome).toEqual({ status: "already-converted" })
@@ -242,6 +247,7 @@ describe("executeAutoConvert", () => {
         },
       ]),
       baseParams,
+      mockConvertAdapter,
     )
 
     expect(mockGetConversionQuote).toHaveBeenCalled()
@@ -250,7 +256,7 @@ describe("executeAutoConvert", () => {
   it("requests a quote and returns Converted on success", async () => {
     mockGetConversionQuote.mockResolvedValue(successQuote())
 
-    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams, mockConvertAdapter)
 
     expect(outcome).toEqual({ status: "converted" })
   })
@@ -260,7 +266,7 @@ describe("executeAutoConvert", () => {
       Object.assign(new Error("below"), { code: ConvertErrorCode.BelowMinimum }),
     )
 
-    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams, mockConvertAdapter)
 
     expect(outcome).toEqual({ status: "skipped-below-min" })
   })
@@ -268,7 +274,7 @@ describe("executeAutoConvert", () => {
   it("returns Failed when getConversionQuote throws any other error", async () => {
     mockGetConversionQuote.mockRejectedValue(new Error("network"))
 
-    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams, mockConvertAdapter)
 
     expect(outcome).toEqual({ status: "failed" })
   })
@@ -276,7 +282,7 @@ describe("executeAutoConvert", () => {
   it("returns Failed when getConversionQuote returns null (no estimate)", async () => {
     mockGetConversionQuote.mockResolvedValue(null)
 
-    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams, mockConvertAdapter)
 
     expect(outcome).toEqual({ status: "failed" })
   })
@@ -289,7 +295,7 @@ describe("executeAutoConvert", () => {
       }),
     })
 
-    const outcome = await executeAutoConvert(sdkWith([]), baseParams)
+    const outcome = await executeAutoConvert(sdkWith([]), baseParams, mockConvertAdapter)
 
     expect(outcome).toEqual({ status: "failed" })
   })
@@ -300,7 +306,7 @@ describe("executeAutoConvert", () => {
       listPayments: jest.fn().mockRejectedValue(new Error("network")),
     }
 
-    const outcome = await executeAutoConvert(sdk as never, baseParams)
+    const outcome = await executeAutoConvert(sdk as never, baseParams, mockConvertAdapter)
 
     expect(outcome).toEqual({ status: "converted" })
     await flushPromises()
@@ -320,6 +326,7 @@ describe("executeAutoConvert", () => {
         },
       ]),
       { ...baseParams, claimedConversionIds: new Set(["conv-paired-elsewhere"]) },
+      mockConvertAdapter,
     )
 
     expect(outcome).toEqual({ status: "converted" })
@@ -341,6 +348,7 @@ describe("executeAutoConvert", () => {
         },
       ]),
       { ...baseParams, claimedConversionIds: new Set(["conv-paired-elsewhere"]) },
+      mockConvertAdapter,
     )
 
     expect(outcome).toEqual({ status: "already-converted" })
