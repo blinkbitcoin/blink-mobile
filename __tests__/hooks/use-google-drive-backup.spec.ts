@@ -4,6 +4,7 @@ import { useGoogleDriveBackup } from "@app/hooks/use-google-drive-backup"
 
 const mockConfigure = jest.fn()
 const mockHasPlayServices = jest.fn(() => Promise.resolve(true))
+const mockSignOut = jest.fn(() => Promise.resolve())
 const mockSignIn = jest.fn(() => Promise.resolve({ idToken: "token" }))
 const mockGetTokens = jest.fn(() =>
   Promise.resolve({ accessToken: "test-access-token", idToken: "token" }),
@@ -13,6 +14,7 @@ jest.mock("@react-native-google-signin/google-signin", () => ({
   GoogleSignin: {
     configure: (...args: readonly unknown[]) => mockConfigure(...args),
     hasPlayServices: () => mockHasPlayServices(),
+    signOut: () => mockSignOut(),
     signIn: () => mockSignIn(),
     getTokens: () => mockGetTokens(),
   },

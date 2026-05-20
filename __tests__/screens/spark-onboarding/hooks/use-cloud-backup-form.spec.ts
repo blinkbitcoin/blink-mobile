@@ -37,7 +37,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         passwordTooWeak: () => "Password too weak",
         passwordCommon: () => "Password too common",
       },
-      SparkOnboarding: {
+      BackupScreen: {
         CloudBackup: {
           passwordTooShort: () => "Minimum 12 characters",
           passwordMismatch: () => "Passwords do not match",

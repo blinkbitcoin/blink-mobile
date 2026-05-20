@@ -2047,6 +2047,7 @@
         "createAccount": "新たにウォレットを作成する",
         "exploreWallet": "ウォレットを見つける",
         "login": "ログイン",
+        "loginOrRestore": "ログイン / 復元",
         "logBackInWith": "再ログイン：",
         "headline": "Galoyが提供するウォレット",
         "startTrialAccount": "トライアルウォレットで始める",
@@ -3461,7 +3462,9 @@
             }
         }
     },
-    "SparkOnboarding": {
+    "BackupScreen": {
+        "title": "Back up your wallet",
+        "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "バックアップ方法を選択",
             "subtitle": "新規ユーザーには{provider}をお勧めします。",
@@ -3544,17 +3547,37 @@
         "restoreComingSoonTitle": "近日公開",
         "restoreComingSoonDescription": "復元機能は将来のアップデートで利用可能になります。"
     },
-    "BackupScreen": {
-        "title": "ウォレットをバックアップ",
-        "description": "資金を保護するバックアップ方法を選択してください"
-    },
     "RestoreScreen": {
         "title": "ウォレットを復元",
-        "description": "バックアップからウォレットを復元します"
+        "description": "バックアップからウォレットを復元します",
+        "phraseTitle": "ウォレットを復元",
+        "phraseSubtitleStep1": "バックアップフレーズの最初の6語を入力してください",
+        "phraseSubtitleStep2": "バックアップフレーズの残りを入力してください",
+        "nextWords": "次の6語",
+        "paste": "貼り付け",
+        "enterWord": "単語",
+        "invalidMnemonic": "無効なバックアップフレーズです。単語を確認して再試行してください。",
+        "restoring": "ウォレットを復元中...",
+        "restoreSuccess": "ウォレットが正常に復元されました",
+        "restoreFailed": "ウォレットの復元に失敗しました。再試行してください。",
+        "restore": "ウォレットを復元",
+        "noBackupFound": "バックアップが見つかりません",
+        "noBackupDescription": "バックアップが見つかりませんでした。バックアップフレーズを手動で入力できます。",
+        "enterPassword": "暗号化パスワードを入力してください",
+        "wrongPassword": "パスワードが正しくありません。再試行してください."
     },
     "BackupNudge": {
-        "title": "ウォレットを保護",
-        "description": "資金が危険にさらされています。今すぐウォレットを保護してください。"
+        "title": "あなたの資金が危険にさらされています",
+        "description": "今すぐウォレットを保護してください。1分しかかかりません。",
+        "cta": "ウォレットを保護",
+        "settingsWarning": "ウォレットをバックアップしてください。このデバイスを紛失すると、資金を失います。",
+        "modalTitle": "資金を保護してください",
+        "modalDescription": "このデバイスを紛失した場合の資金の完全な喪失を防ぐために、ウォレットのバックアップを強くお勧めします。",
+        "secureMe": "ウォレットを保護",
+        "trustModelTitle": "あなたが管理しています",
+        "trustModelDescription": "あなたの鍵があなたの資金を管理しています。トランザクションはSparkオペレーターによって処理され、Bitcoin L1で直接検証されません。",
+        "trustModelWarning": "非常に少額の残高は、Bitcoinベースチェーンへの復元が経済的でない場合があります。",
+        "trustModelDismiss": "理解しました"
     },
     "StableBalance": {
         "title": "ステーブルバランス",

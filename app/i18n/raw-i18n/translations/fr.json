@@ -2047,6 +2047,7 @@
         "createAccount": "Créer un nouveau compte",
         "exploreWallet": "Explorer le portefeuille",
         "login": "Connexion",
+        "loginOrRestore": "Connexion / Restaurer",
         "logBackInWith": "Se reconnecter avec ",
         "headline": "Portefeuille développé par Galoy",
         "startTrialAccount": "Débuter avec un compte test",
@@ -3461,7 +3462,9 @@
             }
         }
     },
-    "SparkOnboarding": {
+    "BackupScreen": {
+        "title": "Back up your wallet",
+        "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Choisissez votre méthode de sauvegarde",
             "subtitle": "Nous recommandons {provider} pour les nouveaux utilisateurs.",
@@ -3544,17 +3547,37 @@
         "restoreComingSoonTitle": "Bientôt disponible",
         "restoreComingSoonDescription": "La fonction de restauration sera disponible dans une mise à jour future."
     },
-    "BackupScreen": {
-        "title": "Sauvegarder le portefeuille",
-        "description": "Choisissez une méthode de sauvegarde pour protéger vos fonds"
-    },
     "RestoreScreen": {
         "title": "Restaurer le portefeuille",
-        "description": "Récupérez votre portefeuille à partir d'une sauvegarde"
+        "description": "Récupérez votre portefeuille à partir d'une sauvegarde",
+        "phraseTitle": "Restaurer le portefeuille",
+        "phraseSubtitleStep1": "Entrez les 6 premiers mots de votre phrase de sauvegarde",
+        "phraseSubtitleStep2": "Entrez le reste de votre phrase de sauvegarde",
+        "nextWords": "6 mots suivants",
+        "paste": "Coller",
+        "enterWord": "Mot",
+        "invalidMnemonic": "Phrase de sauvegarde invalide. Veuillez vérifier vos mots et réessayer.",
+        "restoring": "Restauration de votre portefeuille...",
+        "restoreSuccess": "Portefeuille restauré avec succès",
+        "restoreFailed": "Échec de la restauration. Veuillez réessayer.",
+        "restore": "Restaurer le portefeuille",
+        "noBackupFound": "Aucune sauvegarde trouvée",
+        "noBackupDescription": "Nous n'avons pas trouvé de sauvegarde. Vous pouvez entrer votre phrase de sauvegarde manuellement.",
+        "enterPassword": "Entrez votre mot de passe de chiffrement",
+        "wrongPassword": "Mot de passe incorrect. Veuillez réessayer."
     },
     "BackupNudge": {
-        "title": "Sécurisez votre portefeuille",
-        "description": "Vos fonds sont en danger. Sécurisez votre portefeuille maintenant."
+        "title": "Vos fonds sont en danger",
+        "description": "Sécurisez votre portefeuille maintenant. Cela ne prend qu'une minute.",
+        "cta": "Sécuriser le portefeuille",
+        "settingsWarning": "Sauvegardez votre portefeuille. Si vous perdez cet appareil, vous perdrez vos fonds.",
+        "modalTitle": "Sécurisez vos fonds",
+        "modalDescription": "Nous vous recommandons vivement de sauvegarder votre portefeuille pour éviter une perte totale de fonds en cas de perte de cet appareil.",
+        "secureMe": "Sécuriser le portefeuille",
+        "trustModelTitle": "Vous avez le contrôle",
+        "trustModelDescription": "Vos clés contrôlent vos fonds. Les transactions sont traitées par les opérateurs Spark, non validées directement sur Bitcoin L1.",
+        "trustModelWarning": "Les très petits soldes peuvent ne pas être économiques à récupérer sur la chaîne de base Bitcoin.",
+        "trustModelDismiss": "Je comprends"
     },
     "StableBalance": {
         "title": "Solde stable",

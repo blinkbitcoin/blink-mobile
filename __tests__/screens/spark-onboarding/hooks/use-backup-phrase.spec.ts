@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-native"
+import { renderHook, act, waitFor } from "@testing-library/react-native"
 
 import { useBackupPhrase } from "@app/screens/spark-onboarding/hooks/use-backup-phrase"
 import { PhraseStep } from "@app/navigation/stack-param-lists"
@@ -21,7 +21,7 @@ jest.mock("@app/hooks", () => ({
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
-      SparkOnboarding: {
+      BackupScreen: {
         ManualBackup: {
           Phrase: {
             copiedToast: () => "Copied",
@@ -36,6 +36,17 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
+jest.mock("@app/utils/storage/secureStorage", () => ({
+  __esModule: true,
+  default: {
+    getMnemonic: jest
+      .fn()
+      .mockResolvedValue(
+        "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain",
+      ),
+  },
+}))
+
 jest.mock("react-native-inappbrowser-reborn", () => ({
   __esModule: true,
   default: { open: jest.fn(() => Promise.resolve()) },
@@ -46,25 +57,30 @@ describe("useBackupPhrase", () => {
     jest.clearAllMocks()
   })
 
-  it("returns first 6 words split into two cards for step 1", () => {
+  it("returns first 6 words split into two cards for step 1", async () => {
     const { result } = renderHook(() => useBackupPhrase(PhraseStep.First))
 
-    expect(result.current.firstCard).toHaveLength(3)
+    await waitFor(() => {
+      expect(result.current.firstCard).toHaveLength(3)
+    })
     expect(result.current.secondCard).toHaveLength(3)
     expect(result.current.offset).toBe(0)
   })
 
-  it("returns last 6 words split into two cards for step 2", () => {
+  it("returns last 6 words split into two cards for step 2", async () => {
     const { result } = renderHook(() => useBackupPhrase(PhraseStep.Second))
 
-    expect(result.current.firstCard).toHaveLength(3)
+    await waitFor(() => {
+      expect(result.current.firstCard).toHaveLength(3)
+    })
     expect(result.current.secondCard).toHaveLength(3)
     expect(result.current.offset).toBe(6)
   })
 
-  it("navigates to step 2 on continue from step 1", () => {
+  it("navigates to step 2 on continue from step 1", async () => {
     const { result } = renderHook(() => useBackupPhrase(PhraseStep.First))
 
+    await waitFor(() => expect(result.current.firstCard.length).toBeGreaterThan(0))
     act(() => result.current.handleContinue())
 
     expect(mockNavigate).toHaveBeenCalledWith("sparkBackupPhraseScreen", {
@@ -72,9 +88,10 @@ describe("useBackupPhrase", () => {
     })
   })
 
-  it("navigates to confirm screen on continue from step 2", () => {
+  it("navigates to confirm screen on continue from step 2", async () => {
     const { result } = renderHook(() => useBackupPhrase(PhraseStep.Second))
 
+    await waitFor(() => expect(result.current.firstCard.length).toBeGreaterThan(0))
     act(() => result.current.handleContinue())
 
     expect(mockNavigate).toHaveBeenCalledWith(

@@ -22,6 +22,7 @@ const signIn = async (): Promise<string> => {
   if (Platform.OS === "android") {
     await GoogleSignin.hasPlayServices()
   }
+  await GoogleSignin.signOut().catch(() => {})
   await GoogleSignin.signIn()
   const { accessToken } = await GoogleSignin.getTokens()
   return accessToken

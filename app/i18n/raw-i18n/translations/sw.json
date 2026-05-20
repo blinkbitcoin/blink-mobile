@@ -2045,6 +2045,7 @@
     "createAccount": "Unda akaunti mpya",
     "exploreWallet": "Tafuta mkoba",
     "login": "Ingia",
+    "loginOrRestore": "Ingia / Rejesha",
     "logBackInWith": "Ingia tena na",
     "headline": "Pochi limewezeshwa na Galoy.",
     "startTrialAccount": "Anza na akaunti ya majaribio",
@@ -3432,7 +3433,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Chagua njia yako ya nakala",
       "subtitle": "Tunapendekeza {provider} kwa watumiaji wapya.",
@@ -3515,17 +3518,37 @@
     "restoreComingSoonTitle": "Inakuja hivi karibuni",
     "restoreComingSoonDescription": "Kipengele cha kurejesha kitapatikana katika sasisho la baadaye."
   },
-  "BackupScreen": {
-    "title": "Hifadhi nakala ya mkoba",
-    "description": "Chagua njia ya kuhifadhi nakala ili kulinda fedha zako"
-  },
   "RestoreScreen": {
     "title": "Rejesha mkoba",
-    "description": "Rejesha mkoba wako kutoka kwa nakala"
+    "description": "Rejesha mkoba wako kutoka kwa nakala",
+    "phraseTitle": "Rejesha mkoba",
+    "phraseSubtitleStep1": "Ingiza maneno 6 ya kwanza ya msemo wako wa hifadhi",
+    "phraseSubtitleStep2": "Ingiza maneno yaliyobaki ya msemo wako wa hifadhi",
+    "nextWords": "Maneno 6 yanayofuata",
+    "paste": "Bandika",
+    "enterWord": "Neno",
+    "invalidMnemonic": "Msemo wa hifadhi si sahihi. Tafadhali angalia maneno yako na jaribu tena.",
+    "restoring": "Kurudisha mkoba wako...",
+    "restoreSuccess": "Mkoba umerejeshwa kwa mafanikio",
+    "restoreFailed": "Imeshindikana kurejesha mkoba. Tafadhali jaribu tena.",
+    "restore": "Rejesha mkoba",
+    "noBackupFound": "Hakuna hifadhi iliyopatikana",
+    "noBackupDescription": "Hatukupata hifadhi. Unaweza kuingiza msemo wako wa hifadhi kwa mkono.",
+    "enterPassword": "Ingiza nenosiri lako la usimbaji",
+    "wrongPassword": "Nenosiri si sahihi. Tafadhali jaribu tena."
   },
   "BackupNudge": {
-    "title": "Linda mkoba wako",
-    "description": "Fedha zako ziko hatarini. Linda mkoba wako sasa."
+    "title": "Fedha zako ziko hatarini",
+    "description": "Linda pochi yako sasa. Inachukua dakika moja tu.",
+    "cta": "Linda pochi",
+    "settingsWarning": "Hifadhi mkoba wako. Ukipoteza kifaa hiki, utapoteza fedha zako.",
+    "modalTitle": "Linda fedha zako",
+    "modalDescription": "Tunakushauri sana uhifadhi pochi yako ili kuzuia kupoteza fedha zako zote iwapo utapoteza kifaa hiki.",
+    "secureMe": "Linda pochi",
+    "trustModelTitle": "Wewe ndiye unayedhibiti",
+    "trustModelDescription": "Funguo zako zinadhibiti fedha zako. Miamala inashughulikiwa na waendeshaji wa Spark, si moja kwa moja kwenye Bitcoin L1.",
+    "trustModelWarning": "Salio ndogo sana huenda zisifae kiuchumi kurejesha kwenye mnyororo wa msingi wa Bitcoin.",
+    "trustModelDismiss": "Naelewa"
   },
   "StableBalance": {
     "title": "Salio thabiti",

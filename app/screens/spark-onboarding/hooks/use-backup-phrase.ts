@@ -43,7 +43,7 @@ export const useBackupPhrase = (step: PhraseStep) => {
   const handleCopy = useCallback(() => {
     copyToClipboard({
       content: words.join(" "),
-      message: LL.SparkOnboarding.ManualBackup.Phrase.copiedToast(),
+      message: LL.BackupScreen.ManualBackup.Phrase.copiedToast(),
     })
   }, [copyToClipboard, LL, words])
 
@@ -64,10 +64,10 @@ export const useBackupPhrase = (step: PhraseStep) => {
   const buttonTitle = (() => {
     if (isStep1) {
       if (remainingSeconds)
-        return `${LL.SparkOnboarding.ManualBackup.Phrase.saveItNow()} ${formatDuration(remainingSeconds, { unit: "second", locale })}`
-      return LL.SparkOnboarding.ManualBackup.Phrase.continueButton()
+        return `${LL.BackupScreen.ManualBackup.Phrase.saveItNow()} ${formatDuration(remainingSeconds, { unit: "second", locale })}`
+      return LL.BackupScreen.ManualBackup.Phrase.continueButton()
     }
-    return LL.SparkOnboarding.ManualBackup.Phrase.savedConfirm()
+    return LL.BackupScreen.ManualBackup.Phrase.savedConfirm()
   })()
 
   const isButtonDisabled = isStep1 && !isExpired

@@ -34,7 +34,7 @@ jest.mock("@app/hooks/use-wallet-mnemonic", () => ({
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
-      SparkOnboarding: {
+      BackupScreen: {
         BackupMethod: {
           keychainSaved: () => "Backup saved",
           keychainFailed: () => "Failed to save backup",
@@ -42,6 +42,23 @@ jest.mock("@app/i18n/i18n-react", () => ({
         },
       },
     },
+  }),
+}))
+
+jest.mock("@app/utils/storage/secureStorage", () => ({
+  __esModule: true,
+  default: {
+    getMnemonic: jest
+      .fn()
+      .mockResolvedValue(
+        "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain",
+      ),
+  },
+}))
+
+jest.mock("@app/self-custodial/providers/backup-state-provider", () => ({
+  useBackupState: () => ({
+    setBackupCompleted: jest.fn(),
   }),
 }))
 

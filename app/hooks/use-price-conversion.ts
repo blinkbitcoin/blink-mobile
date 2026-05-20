@@ -1,6 +1,10 @@
 import { useMemo } from "react"
 
-import { useRealtimePriceQuery, WalletCurrency } from "@app/graphql/generated"
+import {
+  useRealtimePriceQuery,
+  useRealtimePriceUnauthedQuery,
+  WalletCurrency,
+} from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import {
   createToDisplayAmount,
@@ -21,17 +25,25 @@ const usdDisplayCurrency = {
 
 const defaultDisplayCurrency = usdDisplayCurrency
 
+const PRICE_POLL_INTERVAL_MS = 5 * 60 * 1000
+
 export const usePriceConversion = () => {
   const isAuthed = useIsAuthed()
-  const { data } = useRealtimePriceQuery({ skip: !isAuthed })
+  const { data: authedData } = useRealtimePriceQuery({ skip: !isAuthed })
+  const authedPrice = authedData?.me?.defaultAccount?.realtimePrice
 
-  const displayCurrency =
-    data?.me?.defaultAccount?.realtimePrice?.denominatorCurrency ||
-    defaultDisplayCurrency.id
+  const skipUnauthed = isAuthed || Boolean(authedPrice)
+  const { data: unauthedData } = useRealtimePriceUnauthedQuery({
+    skip: skipUnauthed,
+    variables: { currency: "USD" },
+    pollInterval: skipUnauthed ? undefined : PRICE_POLL_INTERVAL_MS,
+  })
+
+  const realtimePrice = authedPrice ?? unauthedData?.realtimePrice
+
+  const displayCurrency = realtimePrice?.denominatorCurrency || defaultDisplayCurrency.id
   let displayCurrencyPerSat = NaN
   let displayCurrencyPerCent = NaN
-
-  const realtimePrice = data?.me?.defaultAccount?.realtimePrice
 
   if (realtimePrice) {
     displayCurrencyPerSat =

@@ -19,9 +19,10 @@ jest.mock("react-native-quick-crypto", () => {
 
 import {
   buildBackupPayload,
+  isEncryptedBackup,
   parseBackupPayload,
   parseEncryptedBackupPayload,
-} from "@app/utils/spark-backup-format"
+} from "@app/utils/backup-payload"
 
 describe("spark backup format", () => {
   const mnemonic =
@@ -86,6 +87,30 @@ describe("spark backup format", () => {
 
     expect(first.data).not.toBe(second.data)
     expect(first.iv).not.toBe(second.iv)
+  })
+
+  it("isEncryptedBackup returns true for encrypted payloads", () => {
+    const raw = buildBackupPayload(mnemonic, { password: "ValidPass1234!" })
+    expect(isEncryptedBackup(raw)).toBe(true)
+  })
+
+  it("isEncryptedBackup returns false for unencrypted payloads", () => {
+    const raw = buildBackupPayload(mnemonic)
+    expect(isEncryptedBackup(raw)).toBe(false)
+  })
+
+  it("isEncryptedBackup returns false for invalid JSON", () => {
+    expect(isEncryptedBackup("not json {{{")).toBe(false)
+  })
+
+  it("parseBackupPayload throws on encrypted payload", () => {
+    const raw = buildBackupPayload(mnemonic, { password: "ValidPass1234!" })
+    expect(() => parseBackupPayload(raw)).toThrow("Encrypted payload requires password")
+  })
+
+  it("parseEncryptedBackupPayload handles unencrypted payload", () => {
+    const raw = buildBackupPayload(mnemonic)
+    expect(parseEncryptedBackupPayload(raw, "anything")).toEqual({ mnemonic })
   })
 
   it("matches the app payload shape with standards-compliant AES-GCM output", () => {

@@ -2045,6 +2045,7 @@
     "createAccount": "Yeni bir hesap oluştur",
     "exploreWallet": "Cüzdanı keşfet",
     "login": "Giriş yap",
+    "loginOrRestore": "Giriş yap / Geri yükle",
     "logBackInWith": "Şununla tekrar giriş yap",
     "headline": "Cüzdan Galoy tarafından çalıştırılmakta",
     "startTrialAccount": "Bir deneme hesabı ile başla",
@@ -3432,7 +3433,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Yedekleme yönteminizi seçin",
       "subtitle": "Yeni kullanıcılar için {provider} öneriyoruz.",
@@ -3515,17 +3518,37 @@
     "restoreComingSoonTitle": "Yakında",
     "restoreComingSoonDescription": "Geri yükleme özelliği gelecek bir güncellemede kullanılabilir olacaktır."
   },
-  "BackupScreen": {
-    "title": "Cüzdanı yedekle",
-    "description": "Fonlarınızı korumak için bir yedekleme yöntemi seçin"
-  },
   "RestoreScreen": {
     "title": "Cüzdanı geri yükle",
-    "description": "Cüzdanınızı bir yedekten geri yükleyin"
+    "description": "Cüzdanınızı bir yedekten geri yükleyin",
+    "phraseTitle": "Cüzdanı geri yükle",
+    "phraseSubtitleStep1": "Yedekleme ifadenizin ilk 6 kelimesini girin",
+    "phraseSubtitleStep2": "Yedekleme ifadenizin geri kalanını girin",
+    "nextWords": "Sonraki 6 kelime",
+    "paste": "Yapıştır",
+    "enterWord": "Kelime",
+    "invalidMnemonic": "Geçersiz yedekleme ifadesi. Lütfen kelimelerinizi kontrol edin ve tekrar deneyin.",
+    "restoring": "Cüzdanınız geri yükleniyor...",
+    "restoreSuccess": "Cüzdan başarıyla geri yüklendi",
+    "restoreFailed": "Cüzdan geri yüklenemedi. Lütfen tekrar deneyin.",
+    "restore": "Cüzdanı geri yükle",
+    "noBackupFound": "Yedek bulunamadı",
+    "noBackupDescription": "Bir yedek bulamadık. Yedekleme ifadenizi manuel olarak girebilirsiniz.",
+    "enterPassword": "Şifreleme parolanızı girin",
+    "wrongPassword": "Yanlış parola. Lütfen tekrar deneyin."
   },
   "BackupNudge": {
-    "title": "Cüzdanınızı güvence altına alın",
-    "description": "Fonlarınız risk altında. Cüzdanınızı şimdi güvence altına alın."
+    "title": "Fonlarınız risk altında",
+    "description": "Cüzdanınızı şimdi güvenceye alın. Sadece bir dakika sürer.",
+    "cta": "Cüzdanı güvenceye al",
+    "settingsWarning": "Cüzdanınızı yedekleyin. Bu cihazı kaybederseniz, fonlarınızı kaybedersiniz.",
+    "modalTitle": "Fonlarınızı güvenceye alın",
+    "modalDescription": "Cüzdanınızı yedeklemenizi şiddetle tavsiye ederiz. Bu cihazı kaybetmeniz durumunda fonlarınızın tamamen kaybolmasını önlemek için.",
+    "secureMe": "Cüzdanı güvenceye al",
+    "trustModelTitle": "Kontrol sizde",
+    "trustModelDescription": "Anahtarlarınız fonlarınızı kontrol eder. İşlemler Spark operatörleri tarafından işlenir, doğrudan Bitcoin L1'de doğrulanmaz.",
+    "trustModelWarning": "Çok küçük bakiyeler Bitcoin temel zincirine kurtarmak için ekonomik olmayabilir.",
+    "trustModelDismiss": "Anlıyorum"
   },
   "StableBalance": {
     "title": "Sabit bakiye",

@@ -65,7 +65,7 @@ describe("SparkBackupSuccessScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.SparkOnboarding.ManualBackup.Success.title())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.ManualBackup.Success.title())).toBeTruthy()
   })
 
   it("renders without crashing", () => {

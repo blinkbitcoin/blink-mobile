@@ -14,6 +14,20 @@ import {
 
 let currentMocks: MockedResponse[] = []
 
+jest.mock("@app/hooks/use-backup-nudge-state", () => ({
+  useBackupNudgeState: () => ({
+    shouldShowBanner: false,
+    shouldShowModal: false,
+    shouldShowSettingsBanner: false,
+    dismissBanner: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/screens/spark-onboarding/trust-model-screen", () => ({
+  SparkTrustModelScreen: () => null,
+  useTrustModelSeen: () => ({ seen: true, markAsSeen: jest.fn() }),
+}))
+
 // eslint-disable-next-line prefer-const
 let mockActiveWalletOverride: Record<string, unknown> | null = null
 

@@ -30,8 +30,13 @@ import {
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
+import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { TrustModelModal } from "@app/components/trust-model-modal"
+import { useTrustModelSeen } from "@app/screens/spark-onboarding/trust-model-screen"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -165,6 +170,12 @@ export const HomeScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
+  const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
+  const {
+    seen: trustModelSeen,
+    loaded: trustModelLoaded,
+    markAsSeen: markTrustModelSeen,
+  } = useTrustModelSeen()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -228,7 +239,7 @@ export const HomeScreen: React.FC = () => {
   })
 
   const loading = isSelfCustodial
-    ? !activeWallet.isReady
+    ? activeWallet.status === "loading"
     : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const { username, phone } = currentUser?.me ?? {}
@@ -375,10 +386,11 @@ export const HomeScreen: React.FC = () => {
   // debug code. verify that we have 2 wallets. mobile doesn't work well with only one wallet
   // TODO: add this code in a better place
   React.useEffect(() => {
+    if (isSelfCustodial) return
     if (wallets?.length !== undefined && wallets?.length !== 2) {
       Alert.alert(LL.HomeScreen.walletCountNotTwo())
     }
-  }, [wallets, LL])
+  }, [wallets, LL, isSelfCustodial])
 
   // Trigger the upgrade trial account modal
   useFocusEffect(
@@ -472,6 +484,9 @@ export const HomeScreen: React.FC = () => {
     navigation.navigate("profileScreen")
   }
 
+  const showTrustModel =
+    isSelfCustodial && trustModelLoaded && !trustModelSeen && satsBalance > 0
+
   return (
     <Screen headerShown={false}>
       {AccountCreationNeededModal}
@@ -564,6 +579,7 @@ export const HomeScreen: React.FC = () => {
             </React.Fragment>
           ))}
         </View>
+        {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />
         <SetDefaultAccountModal
@@ -578,6 +594,8 @@ export const HomeScreen: React.FC = () => {
         bottomOffset={15}
         onAction={() => navigation.navigate("transactionHistory")}
       />
+      <BackupNudgeModal isVisible={shouldShowModal} onClose={dismissBanner} />
+      <TrustModelModal isVisible={showTrustModel} onDismiss={markTrustModelSeen} />
     </Screen>
   )
 }

@@ -8,7 +8,9 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconTextButton } from "@app/components/icon-text-button"
 import { InfoBanner } from "@app/components/info-banner"
 import { Screen } from "@app/components/screen"
+import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { testProps } from "@app/utils/testProps"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 
@@ -23,6 +25,8 @@ export const SparkBackupPhraseScreen: React.FC = () => {
   const styles = useStyles()
   const { step } = useRoute<PhraseRouteProp>().params
 
+  useScreenSecurity()
+
   const {
     firstCard,
     secondCard,
@@ -34,8 +38,8 @@ export const SparkBackupPhraseScreen: React.FC = () => {
     isButtonDisabled,
   } = useBackupPhrase(step)
 
-  const sparkLink = LL.SparkOnboarding.ManualBackup.Phrase.sparkCompatibleLink()
-  const infoText = LL.SparkOnboarding.ManualBackup.Phrase.sparkCompatible({
+  const sparkLink = LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()
+  const infoText = LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
     sparkCompatibleLink: sparkLink,
   })
   const [infoBefore, infoAfter] = infoText.split(sparkLink)
@@ -81,8 +85,9 @@ export const SparkBackupPhraseScreen: React.FC = () => {
 
         <IconTextButton
           icon="copy-paste"
-          label={LL.SparkOnboarding.ManualBackup.Phrase.copy()}
+          label={LL.BackupScreen.ManualBackup.Phrase.copy()}
           onPress={handleCopy}
+          {...testProps("backup-phrase-copy")}
         />
       </ScrollView>
 
@@ -91,6 +96,7 @@ export const SparkBackupPhraseScreen: React.FC = () => {
           title={buttonTitle}
           disabled={isButtonDisabled}
           onPress={handleContinue}
+          {...testProps("backup-phrase-continue")}
         />
       </View>
     </Screen>

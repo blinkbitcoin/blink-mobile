@@ -23,6 +23,7 @@ jest.mock("@app/graphql/generated", () => {
   return {
     ...jest.requireActual("@app/graphql/generated"),
     useRealtimePriceQuery: mockUseRealtimePriceQuery,
+    useRealtimePriceUnauthedQuery: jest.fn().mockReturnValue({ data: undefined }),
   }
 })
 

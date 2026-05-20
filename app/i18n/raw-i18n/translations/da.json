@@ -2048,6 +2048,7 @@
     "createAccount": "Opret ny konto",
     "exploreWallet": "Udforsk tegnebog",
     "login": "Log ind",
+    "loginOrRestore": "Log ind / Gendan",
     "logBackInWith": "Log ind igen med",
     "headline": "Tegnebogen er drevet af Galoy",
     "startTrialAccount": "Start med en prøvekonto",
@@ -3450,7 +3451,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Vælg din backup-metode",
       "subtitle": "Vi anbefaler {provider} til nye brugere.",
@@ -3533,17 +3536,37 @@
     "restoreComingSoonTitle": "Kommer snart",
     "restoreComingSoonDescription": "Gendannelsesfunktionen vil være tilgængelig i en fremtidig opdatering."
   },
-  "BackupScreen": {
-    "title": "Sikkerhedskopier tegnebog",
-    "description": "Vælg en sikkerhedskopieringsmetode for at beskytte dine midler"
-  },
   "RestoreScreen": {
     "title": "Gendan tegnebog",
-    "description": "Gendan din tegnebog fra en sikkerhedskopi"
+    "description": "Gendan din tegnebog fra en sikkerhedskopi",
+    "phraseTitle": "Gendan tegnebog",
+    "phraseSubtitleStep1": "Indtast de første 6 ord af din sikkerhedsfrase",
+    "phraseSubtitleStep2": "Indtast resten af din sikkerhedsfrase",
+    "nextWords": "Næste 6 ord",
+    "paste": "Indsæt",
+    "enterWord": "Ord",
+    "invalidMnemonic": "Ugyldig sikkerhedsfrase. Kontrollér venligst dine ord og prøv igen.",
+    "restoring": "Gendanner din tegnebog...",
+    "restoreSuccess": "Tegnebog genoprettet",
+    "restoreFailed": "Kunne ikke gendanne tegnebogen. Prøv venligst igen.",
+    "restore": "Gendan tegnebog",
+    "noBackupFound": "Ingen sikkerhedskopi fundet",
+    "noBackupDescription": "Vi kunne ikke finde en sikkerhedskopi. Du kan indtaste din sikkerhedsfrase manuelt.",
+    "enterPassword": "Indtast din krypteringsadgangskode",
+    "wrongPassword": "Forkert adgangskode. Prøv venligst igen."
   },
   "BackupNudge": {
-    "title": "Sikr din tegnebog",
-    "description": "Dine midler er i fare. Sikr din tegnebog nu."
+    "title": "Dine midler er i fare",
+    "description": "Sikr din tegnebog nu. Det tager kun et minut.",
+    "cta": "Sikr tegnebog",
+    "settingsWarning": "Sikkerhedskopiér din tegnebog. Hvis du mister denne enhed, mister du dine midler.",
+    "modalTitle": "Sikr dine midler",
+    "modalDescription": "Vi anbefaler stærkt, at du sikkerhedskopierer din tegnebog for at forhindre et fuldstændigt tab af midler, hvis du mister denne enhed.",
+    "secureMe": "Sikr tegnebog",
+    "trustModelTitle": "Du har kontrollen",
+    "trustModelDescription": "Dine nøgler styrer dine midler. Transaktioner behandles af Spark-operatører, ikke direkte valideret på Bitcoin L1.",
+    "trustModelWarning": "Meget små saldi er muligvis ikke økonomiske at gendanne til Bitcoin-basiskæden.",
+    "trustModelDismiss": "Jeg forstår"
   },
   "StableBalance": {
     "title": "Stabil saldo",

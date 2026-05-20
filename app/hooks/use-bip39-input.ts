@@ -1,0 +1,103 @@
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { Keyboard } from "react-native"
+
+import {
+  BIP39_WORDLIST_EN,
+  getBip39Suggestions,
+  splitWords,
+} from "@app/utils/bip39-wordlist"
+
+const BIP39_WORD_SET = new Set(BIP39_WORDLIST_EN)
+
+const MIN_CHARS = 3
+const MAX_SUGGESTIONS = 3
+
+type UseBip39InputParams = {
+  wordCount: number
+  wordsPerStep?: number
+  step?: number
+  initialWords?: string[]
+}
+
+export const useBip39Input = ({
+  wordCount,
+  wordsPerStep = wordCount,
+  step = 1,
+  initialWords,
+}: UseBip39InputParams) => {
+  const offset = (step - 1) * wordsPerStep
+
+  const [words, setWords] = useState<string[]>(initialWords ?? Array(wordCount).fill(""))
+  const [activeIndex, setActiveIndex] = useState(offset)
+  const [keyboardVisible, setKeyboardVisible] = useState(false)
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", () =>
+      setKeyboardVisible(true),
+    )
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false)
+      setActiveIndex(-1)
+    })
+    return () => {
+      showSub.remove()
+      hideSub.remove()
+    }
+  }, [])
+
+  const updateWord = useCallback((index: number, value: string) => {
+    setWords((prev) => {
+      const next = [...prev]
+      next[index] = value.toLowerCase().trim()
+      return next
+    })
+  }, [])
+
+  const handlePaste = useCallback(
+    (text: string) => {
+      const parsed = splitWords(text)
+      if (parsed.length !== wordCount) return false
+      setWords(parsed)
+      setActiveIndex(-1)
+      return true
+    },
+    [wordCount],
+  )
+
+  const suggestions = useMemo(() => {
+    if (!keyboardVisible) return []
+    const current = words[activeIndex]
+    if (!current || current.length < MIN_CHARS) return []
+    if (BIP39_WORD_SET.has(current)) return []
+    return getBip39Suggestions(current, { maxResults: MAX_SUGGESTIONS })
+  }, [words, activeIndex, keyboardVisible])
+
+  const selectSuggestion = useCallback(
+    (word: string) => {
+      updateWord(activeIndex, word)
+      const maxForStep = offset + wordsPerStep - 1
+      if (activeIndex < maxForStep) {
+        setActiveIndex(activeIndex + 1)
+      }
+    },
+    [activeIndex, updateWord, offset, wordsPerStep],
+  )
+
+  const stepWords = words.slice(offset, offset + wordsPerStep)
+  const stepFilled = stepWords.every((w) => w.length > 0)
+  const allFilled = words.every((w) => w.length > 0)
+
+  return {
+    words,
+    stepWords,
+    offset,
+    activeIndex,
+    setActiveIndex,
+    updateWord,
+    handlePaste,
+    suggestions,
+    selectSuggestion,
+    stepFilled,
+    allFilled,
+  }
+}

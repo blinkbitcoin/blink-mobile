@@ -68,15 +68,15 @@ describe("SparkBackupConfirmScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.SparkOnboarding.ManualBackup.Confirm.subtitle())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.ManualBackup.Confirm.subtitle())).toBeTruthy()
     expect(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 1`),
+      getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`),
     ).toBeTruthy()
     expect(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 5`),
+      getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 5`),
     ).toBeTruthy()
     expect(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 9`),
+      getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 9`),
     ).toBeTruthy()
   })
 
@@ -87,7 +87,7 @@ describe("SparkBackupConfirmScreen", () => {
       </ContextForScreen>,
     )
 
-    expect(getByText(LL.SparkOnboarding.ManualBackup.Confirm.enterWords())).toBeTruthy()
+    expect(getByText(LL.BackupScreen.ManualBackup.Confirm.enterWords())).toBeTruthy()
   })
 
   it("shows autocomplete suggestions when typing 3+ characters", () => {
@@ -98,7 +98,7 @@ describe("SparkBackupConfirmScreen", () => {
     )
 
     fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 1`),
+      getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`),
       "you",
     )
 
@@ -114,7 +114,7 @@ describe("SparkBackupConfirmScreen", () => {
     )
 
     const input = getByPlaceholderText(
-      `${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 1`,
+      `${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`,
     )
     fireEvent.changeText(input, "you")
     fireEvent.press(getByText("youth"))
@@ -130,7 +130,7 @@ describe("SparkBackupConfirmScreen", () => {
     )
 
     fireEvent.changeText(
-      getByPlaceholderText(`${LL.SparkOnboarding.ManualBackup.Confirm.enterWord()} 1`),
+      getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`),
       "you",
     )
     fireEvent.press(getByText("youth"))

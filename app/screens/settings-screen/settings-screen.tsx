@@ -8,7 +8,9 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { Screen } from "@app/components/screen"
+import { SettingsCard } from "./settings-card"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { VersionComponent } from "@app/components/version"
 import { useLevel } from "@app/graphql/level-context"
@@ -38,6 +40,7 @@ import { TotpSetting } from "./totp"
 import { AccountStaticQR } from "./settings/account-static-qr"
 import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
 import { SwitchAccountSetting } from "./settings/multi-account"
+import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
 
 // All queries in settings have to be set here so that the server is not hit with
 // multiple requests for each query
@@ -80,6 +83,7 @@ export const SettingsScreen: React.FC = () => {
   const { LL } = useI18nContext()
 
   const { isAtLeastLevelOne } = useLevel()
+  const { shouldShowSettingsBanner } = useBackupNudgeState()
   const { data: unackNotificationCount } = useUnacknowledgedNotificationCountQuery({
     fetchPolicy: "cache-and-network",
   })
@@ -100,7 +104,7 @@ export const SettingsScreen: React.FC = () => {
       LanguageSetting,
       ThemeSetting,
     ],
-    securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting],
+    securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting, ViewBackupPhraseSetting],
     advanced: [ExportCsvSetting, ApiAccessSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],
   }
@@ -131,6 +135,15 @@ export const SettingsScreen: React.FC = () => {
     <Screen keyboardShouldPersistTaps="handled">
       <ScrollView contentContainerStyle={styles.outer}>
         <AccountBanner />
+        {shouldShowSettingsBanner && (
+          <SettingsCard
+            title={LL.BackupNudge.title()}
+            description={LL.BackupNudge.settingsWarning()}
+            onPress={() => navigation.navigate("sparkBackupMethodScreen")}
+            borderColor="primary"
+            titleColor="primary"
+          />
+        )}
         <SettingsGroup name={LL.common.account()} items={items.account} />
         <SettingsGroup
           name={LL.SettingsScreen.addressScreen()}

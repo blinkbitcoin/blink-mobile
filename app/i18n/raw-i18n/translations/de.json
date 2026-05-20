@@ -2045,6 +2045,7 @@
         "createAccount": "Neues Konto anlegen",
         "exploreWallet": "Wallet erkunden",
         "login": "Anmelden",
+        "loginOrRestore": "Anmelden / Wiederherstellen",
         "logBackInWith": "Wieder einloggen mit",
         "headline": "Wallet zur Verfügung gestellt von Galoy",
         "startTrialAccount": "Mit einem Demo-Account beginnen",
@@ -3420,7 +3421,9 @@
             }
         }
     },
-    "SparkOnboarding": {
+    "BackupScreen": {
+        "title": "Back up your wallet",
+        "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Wähle deine Sicherungsmethode",
             "subtitle": "Wir empfehlen {provider} für neue Benutzer.",
@@ -3503,17 +3506,37 @@
         "restoreComingSoonTitle": "Demnächst verfügbar",
         "restoreComingSoonDescription": "Die Wiederherstellungsfunktion wird in einem zukünftigen Update verfügbar sein."
     },
-    "BackupScreen": {
-        "title": "Wallet sichern",
-        "description": "Wähle eine Sicherungsmethode zum Schutz deiner Mittel"
-    },
     "RestoreScreen": {
         "title": "Wallet wiederherstellen",
-        "description": "Stelle dein Wallet aus einer Sicherung wieder her"
+        "description": "Stelle dein Wallet aus einer Sicherung wieder her",
+        "phraseTitle": "Wallet wiederherstellen",
+        "phraseSubtitleStep1": "Gib die ersten 6 Wörter deiner Sicherungsphrase ein",
+        "phraseSubtitleStep2": "Gib den Rest deiner Sicherungsphrase ein",
+        "nextWords": "Nächste 6 Wörter",
+        "paste": "Einfügen",
+        "enterWord": "Wort",
+        "invalidMnemonic": "Ungültige Sicherungsphrase. Bitte überprüfe deine Wörter und versuche es erneut.",
+        "restoring": "Wallet wird wiederhergestellt...",
+        "restoreSuccess": "Wallet erfolgreich wiederhergestellt",
+        "restoreFailed": "Wallet-Wiederherstellung fehlgeschlagen. Bitte versuche es erneut.",
+        "restore": "Wallet wiederherstellen",
+        "noBackupFound": "Kein Backup gefunden",
+        "noBackupDescription": "Wir konnten kein Backup finden. Du kannst deine Sicherungsphrase manuell eingeben.",
+        "enterPassword": "Gib dein Verschlüsselungspasswort ein",
+        "wrongPassword": "Falsches Passwort. Bitte versuche es erneut."
     },
     "BackupNudge": {
-        "title": "Sichere dein Wallet",
-        "description": "Deine Mittel sind gefährdet. Sichere dein Wallet jetzt."
+        "title": "Ihre Mittel sind gefährdet",
+        "description": "Sichern Sie Ihre Wallet jetzt. Es dauert nur eine Minute.",
+        "cta": "Wallet sichern",
+        "settingsWarning": "Sichere deine Wallet. Wenn du dieses Gerät verlierst, verlierst du deine Guthaben.",
+        "modalTitle": "Sichern Sie Ihre Mittel",
+        "modalDescription": "Wir empfehlen dringend, Ihre Wallet zu sichern, um einen vollständigen Verlust Ihrer Mittel zu verhindern, falls Sie dieses Gerät verlieren.",
+        "secureMe": "Wallet sichern",
+        "trustModelTitle": "Du hast die Kontrolle",
+        "trustModelDescription": "Deine Schlüssel kontrollieren deine Guthaben. Transaktionen werden von Spark-Betreibern verarbeitet, nicht direkt auf Bitcoin L1 validiert.",
+        "trustModelWarning": "Sehr kleine Guthaben sind möglicherweise nicht wirtschaftlich auf die Bitcoin-Basiskette wiederherzustellen.",
+        "trustModelDismiss": "Ich verstehe"
     },
     "StableBalance": {
         "title": "Stabiler Saldo",

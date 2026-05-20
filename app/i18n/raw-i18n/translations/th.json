@@ -2047,6 +2047,7 @@
     "createAccount": "Create new account",
     "exploreWallet": "Explore wallet",
     "login": "เข้าสู่ระบบ",
+    "loginOrRestore": "เข้าสู่ระบบ / กู้คืน",
     "logBackInWith": "Log back in with",
     "headline": "สนับสนุนโดย Galoy",
     "startTrialAccount": "Start with a trial account",
@@ -3470,7 +3471,9 @@
       }
     }
   },
-  "SparkOnboarding": {
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "เลือกวิธีการสำรองข้อมูล",
       "subtitle": "เราแนะนำ {provider} สำหรับผู้ใช้ใหม่",
@@ -3553,17 +3556,37 @@
     "restoreComingSoonTitle": "เร็วๆ นี้",
     "restoreComingSoonDescription": "ฟีเจอร์กู้คืนจะพร้อมใช้งานในการอัปเดตในอนาคต"
   },
-  "BackupScreen": {
-    "title": "สำรองข้อมูลกระเป๋าเงิน",
-    "description": "เลือกวิธีการสำรองข้อมูลเพื่อปกป้องเงินของคุณ"
-  },
   "RestoreScreen": {
     "title": "กู้คืนกระเป๋าเงิน",
-    "description": "กู้คืนกระเป๋าเงินจากข้อมูลสำรอง"
+    "description": "กู้คืนกระเป๋าเงินจากข้อมูลสำรอง",
+    "phraseTitle": "กู้คืนกระเป๋าเงิน",
+    "phraseSubtitleStep1": "ป้อน 6 คำแรกของวลีสำรองข้อมูลของคุณ",
+    "phraseSubtitleStep2": "ป้อนคำที่เหลือของวลีสำรองข้อมูลของคุณ",
+    "nextWords": "6 คำถัดไป",
+    "paste": "วาง",
+    "enterWord": "คำ",
+    "invalidMnemonic": "วลีสำรองข้อมูลไม่ถูกต้อง โปรดตรวจสอบคำของคุณแล้วลองอีกครั้ง",
+    "restoring": "กำลังกู้คืนกระเป๋าเงินของคุณ...",
+    "restoreSuccess": "กู้คืนกระเป๋าเงินสำเร็จ",
+    "restoreFailed": "กู้คืนกระเป๋าเงินล้มเหลว โปรดลองอีกครั้ง",
+    "restore": "กู้คืนกระเป๋าเงิน",
+    "noBackupFound": "ไม่พบข้อมูลสำรอง",
+    "noBackupDescription": "ไม่พบข้อมูลสำรอง คุณสามารถป้อนวลีสำรองข้อมูลด้วยตนเอง",
+    "enterPassword": "ป้อนรหัสผ่านการเข้ารหัสของคุณ",
+    "wrongPassword": "รหัสผ่านไม่ถูกต้อง โปรดลองอีกครั้ง"
   },
   "BackupNudge": {
-    "title": "รักษาความปลอดภัยกระเป๋าเงิน",
-    "description": "เงินของคุณตกอยู่ในความเสี่ยง รักษาความปลอดภัยกระเป๋าเงินตอนนี้"
+    "title": "เงินของคุณมีความเสี่ยง",
+    "description": "รักษาความปลอดภัยกระเป๋าเงินของคุณตอนนี้ ใช้เวลาเพียงนาทีเดียว",
+    "cta": "รักษาความปลอดภัยกระเป๋าเงิน",
+    "settingsWarning": "สำรองข้อมูลกระเป๋าเงินของคุณ หากคุณสูญเสียอุปกรณ์นี้ คุณจะสูญเสียเงินของคุณ",
+    "modalTitle": "รักษาความปลอดภัยเงินของคุณ",
+    "modalDescription": "เราขอแนะนำอย่างยิ่งให้คุณสำรองข้อมูลกระเป๋าเงินเพื่อป้องกันการสูญเสียเงินทั้งหมดในกรณีที่คุณทำอุปกรณ์นี้หาย",
+    "secureMe": "รักษาความปลอดภัยกระเป๋าเงิน",
+    "trustModelTitle": "คุณเป็นผู้ควบคุม",
+    "trustModelDescription": "กุญแจของคุณควบคุมเงินของคุณ ธุรกรรมถูกประมวลผลโดยผู้ดำเนินการ Spark ไม่ได้ตรวจสอบโดยตรงบน Bitcoin L1",
+    "trustModelWarning": "ยอดเงินที่น้อยมากอาจไม่คุ้มค่าทางเศรษฐกิจในการกู้คืนไปยัง Bitcoin base chain",
+    "trustModelDismiss": "ฉันเข้าใจ"
   },
   "StableBalance": {
     "title": "ยอดคงเหลือมั่นคง",
