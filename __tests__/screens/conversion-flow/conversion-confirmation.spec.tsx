@@ -1,5 +1,5 @@
 import React from "react"
-import { Text, TouchableOpacity } from "react-native"
+import { ActivityIndicator, Text, TouchableOpacity } from "react-native"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import { useNavigation } from "@react-navigation/native"
 
@@ -303,5 +303,24 @@ describe("conversion-confirmation-screen", () => {
     )
 
     expect(screen.queryByText("$0.00")).toBeNull()
+  })
+
+  it("renders the fee row with a spinner while the quote is loading", () => {
+    mockConversionExecution.mockReturnValue({
+      isQuoting: true,
+      hasQuoteError: false,
+      feeText: "",
+      hasFee: false,
+      canExecute: false,
+      execute: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <ConversionConfirmationScreen route={buildRoute(WalletCurrency.Btc, 10000)} />
+      </ContextForScreen>,
+    )
+
+    expect(screen.UNSAFE_getByType(ActivityIndicator)).toBeTruthy()
   })
 })
