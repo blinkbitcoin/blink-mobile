@@ -3534,5 +3534,14 @@
       "existingBackupMessage": "Ve vašem {provider} již existuje záloha. Chcete ji přepsat?",
       "overwrite": "Přepsat"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Přejít na non-custodial",
+    "explainerTitle": "Co znamená přejít na non-custodial?",
+    "explainerStep1": "Vytvoříte non-custodial účet na protokolu Spark, <link>zjistit více zde</link>",
+    "explainerStep2": "Převedeme vaše prostředky na váš nový non-custodial účet a váš stávající účet bude smazán",
+    "explainerStep3": "Pokračujte v používání Blink jako obvykle",
+    "letsMove": "Pojďme na to",
+    "transferringFunds": "Převádíme vaše prostředky. Mělo by to být hotové za několik sekund."
   }
 }

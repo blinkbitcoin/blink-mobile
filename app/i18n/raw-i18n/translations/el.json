@@ -3493,5 +3493,14 @@
       "existingBackupMessage": "Υπάρχει ήδη αντίγραφο ασφαλείας στο {provider} σας. Θέλετε να το αντικαταστήσετε;",
       "overwrite": "Αντικατάσταση"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Μετάβαση σε non-custodial",
+    "explainerTitle": "Τι σημαίνει η μετάβαση σε non-custodial;",
+    "explainerStep1": "Θα δημιουργήσετε έναν non-custodial λογαριασμό στο πρωτόκολλο Spark, <link>μάθετε περισσότερα εδώ</link>",
+    "explainerStep2": "Θα μεταφέρουμε τα κεφάλαιά σας στον νέο σας non-custodial λογαριασμό και ο τρέχων λογαριασμός σας θα διαγραφεί",
+    "explainerStep3": "Συνεχίστε να χρησιμοποιείτε το Blink κανονικά",
+    "letsMove": "Πάμε",
+    "transferringFunds": "Μεταφορά των κεφαλαίων σας. Θα ολοκληρωθεί σε λίγα δευτερόλεπτα."
   }
 }

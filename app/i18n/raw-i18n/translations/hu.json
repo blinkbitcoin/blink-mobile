@@ -3493,5 +3493,14 @@
       "existingBackupMessage": "Már létezik biztonsági mentés a {provider} tárhelyeden. Felül szeretnéd írni?",
       "overwrite": "Felülírás"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Áttérés non-custodial-ra",
+    "explainerTitle": "Mit jelent a non-custodial-ra való áttérés?",
+    "explainerStep1": "Létrehozol egy non-custodial fiókot a Spark protokollon, <link>tudj meg többet itt</link>",
+    "explainerStep2": "Átutaljuk az egyenlegedet az új non-custodial fiókodba, és a jelenlegi fiókod törlésre kerül",
+    "explainerStep3": "Használd tovább a Blinket a megszokott módon",
+    "letsMove": "Rajta",
+    "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik."
   }
 }

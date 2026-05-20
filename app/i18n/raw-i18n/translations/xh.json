@@ -3540,5 +3540,14 @@
       "existingBackupMessage": "Sele kukho ikopi kwi-{provider} yakho. Ungathanda ukuyibhala phezu kwayo?",
       "overwrite": "Bhala phezu kwayo"
     }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Fudukela kwi-non-custodial",
+    "explainerTitle": "Kuthetha ntoni ukufudukela kwi-non-custodial?",
+    "explainerStep1": "Uza kudala i-akhawunti ye-non-custodial kwi-Spark protocol, <link>funda ngakumbi apha</link>",
+    "explainerStep2": "Sidlulisela imali yakho kwi-akhawunti yakho entsha ye-non-custodial kwaye i-akhawunti yakho yangoku iya kucinywa",
+    "explainerStep3": "Qhubeka usebenzise i-Blink njengoko uqhele",
+    "letsMove": "Masiqale",
+    "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje."
   }
 }

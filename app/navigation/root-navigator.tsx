@@ -131,6 +131,10 @@ import {
   SparkBackupSuccessScreen,
 } from "@app/screens/spark-onboarding"
 import {
+  SparkMigrationExplainerScreen,
+  TransferringFundsScreen,
+} from "@app/screens/account-migration"
+import {
   OnboardingStackParamList,
   PeopleStackParamList,
   PhoneValidationStackParamList,
@@ -730,6 +734,16 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sparkBackupSuccessScreen"
         component={SparkBackupSuccessScreen}
+        options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="sparkMigrationExplainer"
+        component={SparkMigrationExplainerScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="sparkMigrationTransferringFunds"
+        component={TransferringFundsScreen}
         options={{ headerShown: false }}
       />
     </RootNavigator.Navigator>

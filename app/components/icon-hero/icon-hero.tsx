@@ -50,7 +50,6 @@ const useStyles = makeStyles(({ colors }) => ({
   textContainer: {
     alignItems: "center",
     gap: 8,
-    width: 264,
   },
   title: {
     fontSize: 20,

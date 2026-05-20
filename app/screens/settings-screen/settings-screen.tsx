@@ -36,6 +36,7 @@ import { NotificationSetting } from "./settings/sp-notifications"
 import { OnDeviceSecuritySetting } from "./settings/sp-security"
 import { TotpSetting } from "./totp"
 import { AccountStaticQR } from "./settings/account-static-qr"
+import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
 import { SwitchAccountSetting } from "./settings/multi-account"
 
 // All queries in settings have to be set here so that the server is not hit with
@@ -84,7 +85,12 @@ export const SettingsScreen: React.FC = () => {
   })
 
   const items = {
-    account: [AccountLevelSetting, TxLimits, SwitchAccountSetting],
+    account: [
+      AccountLevelSetting,
+      TxLimits,
+      SwitchAccountSetting,
+      MoveToNonCustodialSetting,
+    ],
     waysToGetPaid: [AccountLNAddress, PhoneLnAddress, AccountPOS, AccountStaticQR],
     loginMethods: [EmailSetting, PhoneSetting],
     preferences: [

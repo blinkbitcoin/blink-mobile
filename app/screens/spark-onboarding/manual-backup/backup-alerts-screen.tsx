@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Animated, View } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -11,6 +11,10 @@ import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  MigrationCheckpoint,
+  useMigrationCheckpoint,
+} from "@app/screens/account-migration/hooks"
 
 const ANIM_DURATION = 300
 
@@ -21,6 +25,11 @@ export const SparkBackupAlertsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { saveCheckpoint } = useMigrationCheckpoint()
+
+  useEffect(() => {
+    saveCheckpoint(MigrationCheckpoint.BackupAlerts)
+  }, [saveCheckpoint])
 
   const [checks, setChecks] = useState([false, false, false])
   const [visibleCount, setVisibleCount] = useState(1)

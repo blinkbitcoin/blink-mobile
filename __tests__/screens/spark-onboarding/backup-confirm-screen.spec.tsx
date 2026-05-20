@@ -11,6 +11,28 @@ jest.mock("react-native-inappbrowser-reborn", () => ({
   default: { open: jest.fn(() => Promise.resolve()) },
 }))
 
+jest.mock("@app/screens/account-migration/hooks", () => ({
+  useMigrationCheckpoint: () => ({ saveCheckpoint: jest.fn() }),
+  MigrationCheckpoint: {
+    BackupMethod: "backupMethod",
+    CloudBackup: "cloudBackup",
+    BackupAlerts: "backupAlerts",
+  },
+}))
+
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useHomeAuthedQuery: () => ({
+    data: {
+      me: {
+        defaultAccount: {
+          wallets: [{ balance: 1000, walletCurrency: "BTC" }],
+        },
+      },
+    },
+  }),
+}))
+
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),

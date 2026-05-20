@@ -22,6 +22,7 @@ declare module "@rn-vui/themed" {
     _green: string
     _primary1: string
     _primary2: string
+    _warningLight: string
 
     primary3: string
     primary4: string

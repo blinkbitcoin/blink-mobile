@@ -3522,5 +3522,14 @@
             "existingBackupMessage": "{provider}にバックアップが既に存在します。上書きしますか？",
             "overwrite": "上書き"
         }
+    },
+    "AccountMigration": {
+        "moveToNonCustodial": "ノンカストディアルに移行",
+        "explainerTitle": "ノンカストディアルへの移行とは？",
+        "explainerStep1": "Sparkプロトコル上にノンカストディアルアカウントを作成します、<link>詳細はこちら</link>",
+        "explainerStep2": "お客様の資金を新しいノンカストディアルアカウントに転送し、現在のアカウントは削除されます",
+        "explainerStep3": "これまで通りBlinkをご利用ください",
+        "letsMove": "移行する",
+        "transferringFunds": "資金を転送中です。数秒で完了するはずです。"
     }
 }
