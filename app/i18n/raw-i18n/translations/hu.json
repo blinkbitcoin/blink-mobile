@@ -2164,7 +2164,10 @@
     "lightningAddress": "Lightning cím",
     "lightningInvoice": "Lightning számla",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Befizetési díj: {fee} SAT az {threshold} SAT alatti összegekre vagy {overFee} SAT az {threshold} SAT feletti befizetésekre"
+    "depositFee": "Befizetési díj: {fee} SAT az {threshold} SAT alatti összegekre vagy {overFee} SAT az {threshold} SAT feletti befizetésekre",
+    "autoConvertMinAmount": "A {minSats: number} satoshi alatti összegek nem konvertálhatók automatikusan Dollárra. Bitcoint fogsz kapni helyette.",
+    "autoConvertSuccess": "{amount: number} satoshi beérkezett, Dollárra konvertálva.",
+    "autoConvertFailed": "Fizetés beérkezett, de a konverzió nem sikerült."
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin beváltása",
@@ -3626,9 +3629,12 @@
     "description": "A nem letétbe helyezett pénztárcája jelenleg nem tudja elérni a hálózatot. Próbálja újra, amikor ismét online lesz.",
     "retry": "Próbáld újra"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ELAVULT",
-    "syncFailedToast": "Az egyenleg szinkronizálása sikertelen. Az egyenleged elavult lehet."
+  "SelfCustodialError": {
+    "insufficientFunds": "Nincs elég pénz az összeg és a hálózati díjak fedezésére. Próbálj kisebb összeget.",
+    "belowMinimum": "Az összeg az ehhez a fizetéshez szükséges minimum alatt van. Próbálj nagyobb összeget.",
+    "networkError": "Hálózati kapcsolódási probléma. Ellenőrizd a kapcsolatot, és próbáld újra.",
+    "invalidInput": "A fizetés adatai érvénytelennek tűnnek. Kérjük, ellenőrizd, és próbáld újra.",
+    "generic": "A fizetés nem sikerült. Próbáld újra egy pillanat múlva, vagy használj kisebb összeget."
   },
   "UnclaimedDeposit": {
     "title": "{count} nem igényelt befizetésed van",

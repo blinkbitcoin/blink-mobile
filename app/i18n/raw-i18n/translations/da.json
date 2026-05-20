@@ -2167,7 +2167,10 @@
     "lightningAddress": "Lightning-adresse",
     "lightningInvoice": "Lightning-faktura",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Indbetalingsgebyr: {fee} SAT for beløb under {threshold} SAT eller {overFee} SAT for indbetalinger over {threshold} SAT"
+    "depositFee": "Indbetalingsgebyr: {fee} SAT for beløb under {threshold} SAT eller {overFee} SAT for indbetalinger over {threshold} SAT",
+    "autoConvertMinAmount": "Beløb under {minSats: number} sats kan ikke automatisk konverteres til Dollar. Du modtager Bitcoin i stedet.",
+    "autoConvertSuccess": "Modtog {amount: number} sats, konverteret til Dollar.",
+    "autoConvertFailed": "Betaling modtaget, men konverteringen mislykkedes."
   },
   "RedeemBitcoinScreen": {
     "title": "Indløs Bitcoin",
@@ -3644,9 +3647,12 @@
     "description": "Din ikke-deponerede pung kan ikke nå netværket lige nu. Prøv igen, når du er online.",
     "retry": "Prøv igen"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "FORÆLDET",
-    "syncFailedToast": "Synkronisering af saldo mislykkedes. Din saldo kan være forældet."
+  "SelfCustodialError": {
+    "insufficientFunds": "Ikke nok midler til at dække beløbet og netværksgebyrerne. Prøv et mindre beløb.",
+    "belowMinimum": "Beløbet er under minimumskravet for denne betaling. Prøv et større beløb.",
+    "networkError": "Problem med netværksforbindelsen. Tjek din forbindelse og prøv igen.",
+    "invalidInput": "Betalingsoplysningerne ser ugyldige ud. Tjek dem og prøv igen.",
+    "generic": "Betalingen kunne ikke gennemføres. Prøv igen om et øjeblik eller brug et mindre beløb."
   },
   "UnclaimedDeposit": {
     "title": "Du har {count} uafhentede indbetalinger",

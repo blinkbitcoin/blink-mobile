@@ -2171,7 +2171,10 @@
     "lightningAddress": "lightning հասցե",
     "lightningInvoice": "lightning վճարման հարցում",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Ավանդի վճար: {fee} SAT մինչև {threshold} SAT գումարների համար կամ {overFee} SAT {threshold} SAT-ից բարձր ավանդների համար"
+    "depositFee": "Ավանդի վճար: {fee} SAT մինչև {threshold} SAT գումարների համար կամ {overFee} SAT {threshold} SAT-ից բարձր ավանդների համար",
+    "autoConvertMinAmount": "{minSats: number} սաթերից պակաս գումարները չեն կարող ավտոմատ կերպով փոխարկվել Դոլարի։ Դուք կստանաք Bitcoin։",
+    "autoConvertSuccess": "Ստացվեց {amount: number} սաթ, փոխարկվեց Դոլարի։",
+    "autoConvertFailed": "Վճարումը ստացվեց, սակայն փոխարկումը չհաջողվեց։"
   },
   "RedeemBitcoinScreen": {
     "title": "Հետ գնել Բիթքոյն",
@@ -3667,9 +3670,12 @@
     "description": "Ձեր ոչ պահպանող դրամապանակը ներկայումս չի կարող հասնել ցանցին։ Փորձեք կրկին, երբ միացեք։",
     "retry": "Փորձել կրկին"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ՀՆԱՑԱԾ",
-    "syncFailedToast": "Մնացորդի համաժամացումը ձախողվեց։ Ձեր մնացորդը կարող է հնացած լինել։"
+  "SelfCustodialError": {
+    "insufficientFunds": "Բավարար միջոցներ չկան գումարը և ցանցի վճարները ծածկելու համար։ Փորձեք ավելի փոքր գումար։",
+    "belowMinimum": "Գումարը ցածր է այս վճարման համար պահանջվող նվազագույնից։ Փորձեք ավելի մեծ գումար։",
+    "networkError": "Ցանցի միացման խնդիր։ Ստուգեք միացումը և կրկին փորձեք։",
+    "invalidInput": "Վճարման մանրամասները թվում են անվավեր։ Խնդրում ենք ստուգել և կրկին փորձել։",
+    "generic": "Վճարումը հնարավոր չեղավ ավարտել։ Կրկին փորձեք մի պահից, կամ օգտագործեք ավելի փոքր գումար։"
   },
   "UnclaimedDeposit": {
     "title": "Դուք ունեք {count} չպահանջված ավանդ(ներ)",

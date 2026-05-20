@@ -29,6 +29,8 @@ type ContextualInfoProps = {
   walletCurrency: WalletCurrency
   canSetExpirationTime: boolean
   feesInformation?: FeesInformation
+  shouldShowAutoConvertMinWarning?: boolean
+  autoConvertMinSats?: number
 }
 
 export const ContextualInfo: React.FC<ContextualInfoProps> = ({
@@ -38,6 +40,8 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
   walletCurrency,
   canSetExpirationTime,
   feesInformation,
+  shouldShowAutoConvertMinWarning = false,
+  autoConvertMinSats,
 }) => {
   const styles = useStyles()
   const {
@@ -49,6 +53,23 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
   const onSetExpirationTime = (time: number) => {
     setExpirationTime(time)
     setIsExpirationModalOpen(false)
+  }
+
+  const stackedMessages: React.ReactNode[] = []
+
+  if (shouldShowAutoConvertMinWarning && autoConvertMinSats !== undefined) {
+    stackedMessages.push(
+      <View key="auto-convert-min" style={styles.depositFeeContainer}>
+        <GaloyIcon name="warning" size={16} color={colors.grey1} />
+        <Text style={styles.depositFeeText}>
+          {LL.ReceiveScreen.autoConvertMinAmount({ minSats: autoConvertMinSats })}
+        </Text>
+      </View>,
+    )
+  }
+
+  if (stackedMessages.length > 0) {
+    return <View style={styles.stackedContainer}>{stackedMessages}</View>
   }
 
   if (type === Invoice.Lightning && canSetExpirationTime) {
@@ -125,6 +146,9 @@ const formatDepositFees = (deposit: FeesInformation["deposit"]) => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  stackedContainer: {
+    rowGap: 4,
+  },
   container: {
     flexDirection: "row",
     alignItems: "center",

@@ -2171,7 +2171,10 @@
     "lightningAddress": "Lightning adresa",
     "lightningInvoice": "Lightning faktura",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Накнада за депозит: {fee} SAT за износе испод {threshold} SAT или {overFee} SAT за депозите преко {threshold} SAT"
+    "depositFee": "Накнада за депозит: {fee} SAT за износе испод {threshold} SAT или {overFee} SAT за депозите преко {threshold} SAT",
+    "autoConvertMinAmount": "Износи мањи од {minSats: number} сатошија не могу се аутоматски конвертовати у Доларе. Добићете Биткоин уместо тога.",
+    "autoConvertSuccess": "Примљено {amount: number} сатошија, конвертовано у Доларе.",
+    "autoConvertFailed": "Уплата примљена, али конверзија није успела."
   },
   "RedeemBitcoinScreen": {
     "title": "Откупи Биткоин",
@@ -3664,9 +3667,12 @@
     "description": "Ваш нестаратељски новчаник тренутно не може да приступи мрежи. Покушајте поново када се вратите на мрежу.",
     "retry": "Покушај поново"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "ЗАСТАРЕЛО",
-    "syncFailedToast": "Синхронизација стања није успела. Ваше стање можда није ажурно."
+  "SelfCustodialError": {
+    "insufficientFunds": "Недовољно средстава за покривање износа и мрежних накнада. Покушајте са мањим износом.",
+    "belowMinimum": "Износ је испод минимума потребног за ово плаћање. Покушајте са већим износом.",
+    "networkError": "Проблем са мрежном везом. Проверите везу и покушајте поново.",
+    "invalidInput": "Детаљи плаћања изгледају неважећи. Молимо проверите и покушајте поново.",
+    "generic": "Плаћање није могло бити завршено. Покушајте поново за тренутак, или употребите мањи износ."
   },
   "UnclaimedDeposit": {
     "title": "Имате {count} незатражен(их) депозит(а)",

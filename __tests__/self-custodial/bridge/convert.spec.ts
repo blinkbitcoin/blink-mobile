@@ -36,10 +36,13 @@ const createSdk = () => ({
     },
   }),
   sendPayment: jest.fn().mockResolvedValue(undefined),
+  syncWallet: jest.fn().mockResolvedValue(undefined),
   receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-spark-address" }),
   getInfo: jest.fn().mockResolvedValue({
+    balanceSats: 1_000_000_000n,
     tokenBalances: {
       "usdb-token-id": {
+        balance: 1_000_000_000n,
         tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
       },
     },
@@ -63,9 +66,11 @@ describe("createGetConversionQuote — BTC → USD", () => {
 
     expect(quote).not.toBeNull()
     expect(sdk.receivePayment).toHaveBeenCalled()
+    // Exact-input algorithm runs at least one prepare call (discovery); the
+    // destination amount is dynamic based on rate, so we only assert the
+    // SDK contract (token id + conversion options) is wired correctly.
     const prepArg = sdk.prepareSendPayment.mock.calls[0][0]
     expect(prepArg.paymentRequest).toBe("sp1own-spark-address")
-    expect(prepArg.amount).toBe(BigInt(1_370_000))
     expect(prepArg.tokenIdentifier).toBe("usdb-token-id")
     expect(prepArg.conversionOptions.conversionType).toEqual({ tag: "FromBitcoin" })
     expect(prepArg.conversionOptions.maxSlippageBps).toBe(50)
@@ -85,6 +90,9 @@ describe("createGetConversionQuote — BTC → USD", () => {
 
     expect(result.status).toBe("success")
     expect(sdk.sendPayment).toHaveBeenCalled()
+    // Post-send syncWallet is load-bearing: until Breez materializes token balances
+    // on payment insert, getInfo stays misaligned with the convert result without it.
+    expect(sdk.syncWallet).toHaveBeenCalled()
   })
 
   it("exposes the estimated fee converted to a USD MoneyAmount in cents", async () => {
@@ -145,6 +153,23 @@ describe("createGetConversionQuote — BTC → USD", () => {
 
     expect(quote).not.toBeNull()
   })
+
+  it("clamps the discovery destination up to minToAmount when it dominates (Important #8)", async () => {
+    // Target=2000 cents → halfDestination=1000; minFromAmount=0 → fromMin=0;
+    // minToAmount=1500 dominates the Math.max so the discovery destination
+    // is the to-side floor (1500 cents → 15_000_000 token base units at 6 decimals).
+    mockFetchLimits.mockResolvedValue({ minFromAmount: 0, minToAmount: 1500 })
+    const sdk = createSdk()
+
+    await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(5000),
+      toAmount: toUsdMoneyAmount(2000),
+      direction: ConvertDirection.BtcToUsd,
+    })
+
+    const prepArg = sdk.prepareSendPayment.mock.calls[0][0]
+    expect(prepArg.amount).toBe(BigInt(1500 * 10 ** 4))
+  })
 })
 
 describe("createGetConversionQuote — USD → BTC", () => {
@@ -165,7 +190,6 @@ describe("createGetConversionQuote — USD → BTC", () => {
     expect(quote).not.toBeNull()
     const arg = sdk.prepareSendPayment.mock.calls[0][0]
     expect(arg.paymentRequest).toBe("sp1own-spark-address")
-    expect(arg.amount).toBe(BigInt(1300))
     expect(arg.tokenIdentifier).toBeUndefined()
     expect(arg.conversionOptions.conversionType).toEqual({
       tag: "ToBitcoin",
@@ -225,6 +249,58 @@ describe("createGetConversionQuote — error handling", () => {
 
     expect(result.status).toBe("failed")
     expect(result.errors?.[0].message).toBe("send failed")
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  it("rethrows when the corrected re-quote rejects after an overshoot, never executing the discovery quote (Critical #3)", async () => {
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
+    const sdk = {
+      prepareSendPayment: jest
+        .fn()
+        .mockResolvedValueOnce({
+          paymentMethod: {},
+          conversionEstimate: {
+            amountIn: BigInt(2500),
+            amountOut: BigInt(60),
+            fee: BigInt(50),
+            amountAdjustment: undefined,
+          },
+        })
+        .mockResolvedValueOnce({
+          paymentMethod: {},
+          conversionEstimate: {
+            amountIn: BigInt(7500),
+            amountOut: BigInt(180),
+            fee: BigInt(50),
+            amountAdjustment: undefined,
+          },
+        })
+        .mockRejectedValueOnce(new Error("corrected quote rejected")),
+      sendPayment: jest.fn(),
+      receivePayment: jest
+        .fn()
+        .mockResolvedValue({ paymentRequest: "sp1own-spark-address" }),
+      getInfo: jest.fn().mockResolvedValue({
+        balanceSats: BigInt(1_000_000_000),
+        tokenBalances: {
+          "usdb-token-id": {
+            balance: BigInt(1_000_000_000),
+            tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
+          },
+        },
+      }),
+    }
+
+    await expect(
+      createGetConversionQuote(sdk as never)({
+        fromAmount: toBtcMoneyAmount(5000),
+        toAmount: toUsdMoneyAmount(180),
+        direction: ConvertDirection.BtcToUsd,
+      }),
+    ).rejects.toThrow("corrected quote rejected")
+
+    expect(sdk.prepareSendPayment).toHaveBeenCalledTimes(3)
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
     expect(mockRecordError).toHaveBeenCalled()
   })
 

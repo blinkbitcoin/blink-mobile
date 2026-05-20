@@ -2171,7 +2171,10 @@
         "lightningAddress": "Adresse lightning",
         "lightningInvoice": "Facture lightning",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "Frais de dépôt : {fee} SAT pour les montants inférieurs à {threshold} SAT ou {overFee} SAT pour les dépôts supérieurs à {threshold} SAT"
+        "depositFee": "Frais de dépôt : {fee} SAT pour les montants inférieurs à {threshold} SAT ou {overFee} SAT pour les dépôts supérieurs à {threshold} SAT",
+        "autoConvertMinAmount": "Les montants inférieurs à {minSats: number} sats ne peuvent pas être convertis en Dollar automatiquement. Vous recevrez des Bitcoins.",
+        "autoConvertSuccess": "{amount: number} sats reçus, convertis en Dollars.",
+        "autoConvertFailed": "Paiement reçu mais la conversion a échoué."
     },
     "RedeemBitcoinScreen": {
         "title": "Échanger des Bitcoin",
@@ -3655,9 +3658,12 @@
         "description": "Votre portefeuille non-custodial ne peut pas atteindre le réseau pour le moment. Réessayez lorsque vous serez de nouveau en ligne.",
         "retry": "Réessayer"
     },
-    "SelfCustodialBalance": {
-        "staleLabel": "OBSOLÈTE",
-        "syncFailedToast": "Échec de la synchronisation du solde. Votre solde peut être obsolète."
+    "SelfCustodialError": {
+        "insufficientFunds": "Fonds insuffisants pour couvrir le montant et les frais de réseau. Essayez un montant plus petit.",
+        "belowMinimum": "Le montant est inférieur au minimum requis pour ce paiement. Essayez un montant plus grand.",
+        "networkError": "Problème de connexion réseau. Vérifiez votre connexion et réessayez.",
+        "invalidInput": "Les détails du paiement semblent invalides. Veuillez les vérifier et réessayer.",
+        "generic": "Le paiement n'a pas pu être finalisé. Réessayez dans un instant, ou utilisez un montant plus petit."
     },
     "UnclaimedDeposit": {
         "title": "Vous avez {count} dépôt(s) non réclamé(s)",

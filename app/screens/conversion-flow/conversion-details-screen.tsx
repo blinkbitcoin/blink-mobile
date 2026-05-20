@@ -110,8 +110,9 @@ export const ConversionDetailsScreen = () => {
     shouldShow: shouldShowStableBalanceFirstTime,
     markAsShown: markStableBalanceFirstTimeShown,
   } = useStableBalanceFirstTime()
-  const showStableBalanceFirstTimeModal =
-    shouldShowStableBalanceFirstTime && isSelfCustodial && isStableBalanceActive
+  const showStableBalanceFirstTimeModal = Boolean(
+    shouldShowStableBalanceFirstTime && isSelfCustodial && isStableBalanceActive,
+  )
 
   const scWalletsForConvert = useMemo(() => {
     if (!isSelfCustodial) return null

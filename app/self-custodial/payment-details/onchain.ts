@@ -53,11 +53,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     ? {
         canSendPayment: true,
         canGetFee: true,
-        getFee: createGetFeeOnchain(
-          prepareParams,
-          sendingWalletDescriptor.currency,
-          feeTier,
-        ),
+        getFee: createGetFeeOnchain(prepareParams, feeTier),
         sendPaymentMutation: createSendMutationOnchain(prepareParams, feeTier),
       }
     : { canSendPayment: false, canGetFee: false }

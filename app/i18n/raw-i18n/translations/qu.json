@@ -2171,7 +2171,10 @@
     "lightningAddress": "Lightning address",
     "lightningInvoice": "Lightning invoice",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Waqaychay qullqi: {fee} SAT {threshold} SAT uray kaqkunapaq utaq {overFee} SAT {threshold} SAT hawapi waqaychaykunapaq"
+    "depositFee": "Waqaychay qullqi: {fee} SAT {threshold} SAT uray kaqkunapaq utaq {overFee} SAT {threshold} SAT hawapi waqaychaykunapaq",
+    "autoConvertMinAmount": "{minSats: number} sats manta pisi kaqkunaqa mana automatikumantachu Dólarman tikrasqa kanman. Bitcointa chaskinki.",
+    "autoConvertSuccess": "{amount: number} sats chaskikun, Dólarman tikrakun.",
+    "autoConvertFailed": "Qullqi chaskikun ichaqa tikrachiymi mana allintachu ruwakurqan."
   },
   "RedeemBitcoinScreen": {
     "title": "Bitcoin kawsayniyta qillqa",
@@ -3664,9 +3667,12 @@
     "description": "Non-custodial walletniyki kunanqa manan networkman chayayta atinchu. Conexionniyuq kutipiwanki.",
     "retry": "Yapamanta rurana"
   },
-  "SelfCustodialBalance": {
-    "staleLabel": "MACHURAYASQA",
-    "syncFailedToast": "Qullqi kaqllachiy mana atikurqachu. Qullqiyki mana hunt'aqchu kanman."
+  "SelfCustodialError": {
+    "insufficientFunds": "Mana suficiente qullqi kanchu chay qullqimanta nisqa kanapaq mink'a quykunatawan. Aswan huch'uy qullqitayqa rikuychis.",
+    "belowMinimum": "Qullqiqa kay quypaq mañasqa ñut'u qullqi sayanmantaqa pisinmanmi. Aswan hatun qullqitaqa rikuychis.",
+    "networkError": "Conexión sasachakuy. Conexión qhawariy hinaspa kaqmanta rurariy.",
+    "invalidInput": "Quy yachayninkuna mana allinmi kashan. Ama hina kaspa qhawariy hinaspa kaqmanta rurariy.",
+    "generic": "Quy mana tukukuyta atinmi. Pisi kutilla suyay hinaspa kaqmanta rurariy, utaq aswan huch'uy qullqitaqa rurariy."
   },
   "UnclaimedDeposit": {
     "title": "{count} mana mañakusqa churana(kuna) kapusunki",

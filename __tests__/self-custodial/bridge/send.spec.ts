@@ -2,6 +2,7 @@
 import { WalletCurrency } from "@app/graphql/generated"
 
 import {
+  executeSend,
   extractLightningFee,
   extractOnchainFees,
   prepareSend,
@@ -20,6 +21,9 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     BitcoinAddress: jest
       .fn()
       .mockImplementation((inner: unknown) => ({ tag: "BitcoinAddress", inner })),
+    Bolt11Invoice: jest
+      .fn()
+      .mockImplementation((inner: unknown) => ({ tag: "Bolt11Invoice", inner })),
   },
   SendPaymentRequest: { create: (p: Record<string, unknown>) => p },
 }))
@@ -60,7 +64,7 @@ describe("extractOnchainFees", () => {
 })
 
 describe("extractLightningFee", () => {
-  it("returns total lightning fee", () => {
+  it("returns the Spark transfer fee when both routes are present (Spark is cheaper)", () => {
     const prepared = {
       paymentMethod: {
         tag: "Bolt11Invoice",
@@ -71,10 +75,10 @@ describe("extractLightningFee", () => {
       },
     }
 
-    expect(extractLightningFee(prepared as never)).toBe(15)
+    expect(extractLightningFee(prepared as never)).toBe(5)
   })
 
-  it("handles undefined sparkTransferFeeSats", () => {
+  it("falls back to the lightning fee when there is no Spark route", () => {
     const prepared = {
       paymentMethod: {
         tag: "Bolt11Invoice",
@@ -88,12 +92,112 @@ describe("extractLightningFee", () => {
     expect(extractLightningFee(prepared as never)).toBe(10)
   })
 
+  it("returns null when neither route has a fee", () => {
+    const prepared = {
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { lightningFeeSats: undefined, sparkTransferFeeSats: undefined },
+      },
+    }
+
+    expect(extractLightningFee(prepared as never)).toBeNull()
+  })
+
   it("returns null for non-Bolt11Invoice payment", () => {
     const prepared = {
       paymentMethod: { tag: "BitcoinAddress", inner: {} },
     }
 
     expect(extractLightningFee(prepared as never)).toBeNull()
+  })
+})
+
+describe("executeSend", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("sends a Bolt11Invoice with preferSpark=true when a Spark route is available", async () => {
+    const sendPayment = jest.fn().mockResolvedValue(undefined)
+    const sdk = { sendPayment } as never
+    const prepared = {
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: {
+          lightningFeeSats: BigInt(10),
+          sparkTransferFeeSats: BigInt(5),
+        },
+      },
+    }
+
+    await executeSend(sdk, prepared as never)
+
+    expect(sendPayment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        options: expect.objectContaining({
+          tag: "Bolt11Invoice",
+          inner: expect.objectContaining({ preferSpark: true }),
+        }),
+      }),
+    )
+  })
+
+  it("sends a Bolt11Invoice with preferSpark=false when only the Lightning route is available", async () => {
+    const sendPayment = jest.fn().mockResolvedValue(undefined)
+    const sdk = { sendPayment } as never
+    const prepared = {
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: {
+          lightningFeeSats: BigInt(10),
+          sparkTransferFeeSats: undefined,
+        },
+      },
+    }
+
+    await executeSend(sdk, prepared as never)
+
+    expect(sendPayment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        options: expect.objectContaining({
+          tag: "Bolt11Invoice",
+          inner: expect.objectContaining({ preferSpark: false }),
+        }),
+      }),
+    )
+  })
+
+  it("forwards confirmationSpeed as a BitcoinAddress option for onchain sends", async () => {
+    const sendPayment = jest.fn().mockResolvedValue(undefined)
+    const sdk = { sendPayment } as never
+    const prepared = {
+      paymentMethod: { tag: "BitcoinAddress", inner: {} },
+    }
+
+    await executeSend(sdk, prepared as never, 0 /* Fast */)
+
+    expect(sendPayment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        options: expect.objectContaining({
+          tag: "BitcoinAddress",
+          inner: expect.objectContaining({ confirmationSpeed: 0 }),
+        }),
+      }),
+    )
+  })
+
+  it("omits options for BitcoinAddress when no confirmation speed is given", async () => {
+    const sendPayment = jest.fn().mockResolvedValue(undefined)
+    const sdk = { sendPayment } as never
+    const prepared = {
+      paymentMethod: { tag: "BitcoinAddress", inner: {} },
+    }
+
+    await executeSend(sdk, prepared as never)
+
+    expect(sendPayment).toHaveBeenCalledWith(
+      expect.objectContaining({ options: undefined }),
+    )
   })
 })
 
@@ -125,7 +229,28 @@ describe("prepareSend", () => {
       paymentRequest: "lnbc1abc",
       amount: BigInt(1000),
       tokenIdentifier: undefined,
+      conversionOptions: undefined,
     })
+  })
+
+  it("forwards conversionOptions when provided (USDB→BTC Lightning send)", async () => {
+    const prepareSendPayment = jest.fn().mockResolvedValue({})
+    const sdk = { prepareSendPayment } as never
+    const conversionOptions = {
+      conversionType: { tag: "ToBitcoin", inner: ["usdb-token-id"] },
+      maxSlippageBps: undefined,
+      completionTimeoutSecs: undefined,
+    } as never
+
+    await prepareSend(sdk, {
+      paymentRequest: "lnbc1abc",
+      amount: BigInt(1000),
+      conversionOptions,
+    })
+
+    expect(prepareSendPayment).toHaveBeenCalledWith(
+      expect.objectContaining({ conversionOptions }),
+    )
   })
 })
 

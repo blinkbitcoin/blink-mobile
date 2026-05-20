@@ -12,8 +12,9 @@ import {
   BaseCreatePaymentDetailsParams,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
+import { ConvertDirection } from "@app/types/payment.types"
 
-import { resolveSendTokenIdentifier, toSdkSendAmount } from "../bridge"
+import { buildConversionType } from "../bridge"
 
 import { createGetFee, createSendMutation } from "./send-helpers"
 
@@ -43,21 +44,27 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
     unitOfAccountAmount,
     sendingWalletDescriptor.currency,
   )
+  const btcAmount = convertMoneyAmount(unitOfAccountAmount, WalletCurrency.Btc)
+  const isUsdSend = sendingWalletDescriptor.currency === WalletCurrency.Usd
 
   const prepareParams = {
     sdk,
     paymentRequest,
-    amount: hasAmount
-      ? undefined
-      : toSdkSendAmount(settlementAmount.amount, sendingWalletDescriptor.currency),
-    tokenIdentifier: resolveSendTokenIdentifier(sendingWalletDescriptor.currency),
+    amount: hasAmount ? undefined : BigInt(btcAmount.amount),
+    conversionOptions: isUsdSend
+      ? {
+          conversionType: buildConversionType(ConvertDirection.UsdToBtc),
+          maxSlippageBps: undefined,
+          completionTimeoutSecs: undefined,
+        }
+      : undefined,
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
     ? {
         canSendPayment: true,
         canGetFee: true,
-        getFee: createGetFee(prepareParams, sendingWalletDescriptor.currency),
+        getFee: createGetFee(prepareParams),
         sendPaymentMutation: createSendMutation(prepareParams),
       }
     : { canSendPayment: false, canGetFee: false }

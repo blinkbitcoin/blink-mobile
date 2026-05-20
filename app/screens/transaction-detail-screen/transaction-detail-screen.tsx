@@ -23,6 +23,7 @@ import { useAppConfig, useClipboard, useTransactionSeenState } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toWalletAmount } from "@app/types/amounts"
+import { PaymentType } from "@app/types/transaction.types"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -72,7 +73,12 @@ const Row = ({
   )
 }
 
-const typeDisplay = (instance?: SettlementVia | DeepPartialObject<SettlementVia>) => {
+export const typeDisplay = (
+  instance?: SettlementVia | DeepPartialObject<SettlementVia>,
+  selfCustodialPaymentType?: PaymentType,
+) => {
+  if (selfCustodialPaymentType === PaymentType.Spark) return "Spark"
+
   if (!instance || !instance.__typename) {
     return "Unknown"
   }
@@ -130,9 +136,18 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const [timer, setTimer] = React.useState<number>(0)
 
   const { LL, locale } = useI18nContext()
-  const { isSelfCustodial } = useActiveWallet()
+  const { isSelfCustodial, wallets } = useActiveWallet()
   const { copyToClipboard } = useClipboard()
   const { formatCurrency } = useDisplayCurrency()
+
+  const selfCustodialPaymentType = React.useMemo(() => {
+    if (!isSelfCustodial) return undefined
+    for (const wallet of wallets) {
+      const match = wallet.transactions.find((t) => t.id === txid)
+      if (match) return match.paymentType
+    }
+    return undefined
+  }, [isSelfCustodial, wallets, txid])
 
   const description = useDescriptionDisplay({
     tx,
@@ -429,7 +444,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               value={settlementVia.counterPartyUsername || galoyInstance.name}
             />
           )}
-          <Row entry={LL.common.type()} value={typeDisplay(settlementVia)} />
+          <Row
+            entry={LL.common.type()}
+            value={typeDisplay(settlementVia, selfCustodialPaymentType)}
+          />
           {initiationVia?.__typename === "InitiationViaLn" &&
             initiationVia?.paymentHash && (
               <Row

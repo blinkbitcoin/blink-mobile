@@ -6869,6 +6869,20 @@ type RootTranslation = {
 		 * @param {string} threshold
 		 */
 		depositFee: RequiredParams<'fee' | 'overFee' | 'threshold' | 'threshold'>
+		/**
+		 * A​m​o​u​n​t​s​ ​b​e​l​o​w​ ​{​m​i​n​S​a​t​s​}​ ​s​a​t​s​ ​c​a​n​'​t​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​i​n​s​t​e​a​d​.
+		 * @param {number} minSats
+		 */
+		autoConvertMinAmount: RequiredParams<'minSats'>
+		/**
+		 * R​e​c​e​i​v​e​d​ ​{​a​m​o​u​n​t​}​ ​s​a​t​s​,​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​.
+		 * @param {number} amount
+		 */
+		autoConvertSuccess: RequiredParams<'amount'>
+		/**
+		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d​ ​b​u​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​a​i​l​e​d​.
+		 */
+		autoConvertFailed: string
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -11830,15 +11844,27 @@ type RootTranslation = {
 		 */
 		retry: string
 	}
-	SelfCustodialBalance: {
+	SelfCustodialError: {
 		/**
-		 * S​T​A​L​E
+		 * N​o​t​ ​e​n​o​u​g​h​ ​f​u​n​d​s​ ​t​o​ ​c​o​v​e​r​ ​t​h​e​ ​a​m​o​u​n​t​ ​a​n​d​ ​n​e​t​w​o​r​k​ ​f​e​e​s​.​ ​T​r​y​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
 		 */
-		staleLabel: string
+		insufficientFunds: string
 		/**
-		 * B​a​l​a​n​c​e​ ​s​y​n​c​ ​f​a​i​l​e​d​.​ ​Y​o​u​r​ ​b​a​l​a​n​c​e​ ​m​a​y​ ​b​e​ ​o​u​t​ ​o​f​ ​d​a​t​e​.
+		 * A​m​o​u​n​t​ ​i​s​ ​b​e​l​o​w​ ​t​h​e​ ​m​i​n​i​m​u​m​ ​r​e​q​u​i​r​e​d​ ​f​o​r​ ​t​h​i​s​ ​p​a​y​m​e​n​t​.​ ​T​r​y​ ​a​ ​l​a​r​g​e​r​ ​a​m​o​u​n​t​.
 		 */
-		syncFailedToast: string
+		belowMinimum: string
+		/**
+		 * N​e​t​w​o​r​k​ ​c​o​n​n​e​c​t​i​o​n​ ​p​r​o​b​l​e​m​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		networkError: string
+		/**
+		 * T​h​e​ ​p​a​y​m​e​n​t​ ​d​e​t​a​i​l​s​ ​l​o​o​k​ ​i​n​v​a​l​i​d​.​ ​P​l​e​a​s​e​ ​r​e​v​i​e​w​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		invalidInput: string
+		/**
+		 * T​h​e​ ​p​a​y​m​e​n​t​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​c​o​m​p​l​e​t​e​d​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​,​ ​o​r​ ​u​s​e​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
+		 */
+		generic: string
 	}
 	UnclaimedDeposit: {
 		/**
@@ -18912,6 +18938,18 @@ export type TranslationFunctions = {
 		 * Deposit fee: {fee} SAT for amounts under {threshold} SAT or {overFee} SAT for deposits over {threshold} SAT
 		 */
 		depositFee: (arg: { fee: string, overFee: string, threshold: string }) => LocalizedString
+		/**
+		 * Amounts below {minSats} sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.
+		 */
+		autoConvertMinAmount: (arg: { minSats: number }) => LocalizedString
+		/**
+		 * Received {amount} sats, converted to Dollar.
+		 */
+		autoConvertSuccess: (arg: { amount: number }) => LocalizedString
+		/**
+		 * Payment received but the conversion failed.
+		 */
+		autoConvertFailed: () => LocalizedString
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -23774,15 +23812,27 @@ export type TranslationFunctions = {
 		 */
 		retry: () => LocalizedString
 	}
-	SelfCustodialBalance: {
+	SelfCustodialError: {
 		/**
-		 * STALE
+		 * Not enough funds to cover the amount and network fees. Try a smaller amount.
 		 */
-		staleLabel: () => LocalizedString
+		insufficientFunds: () => LocalizedString
 		/**
-		 * Balance sync failed. Your balance may be out of date.
+		 * Amount is below the minimum required for this payment. Try a larger amount.
 		 */
-		syncFailedToast: () => LocalizedString
+		belowMinimum: () => LocalizedString
+		/**
+		 * Network connection problem. Check your connection and try again.
+		 */
+		networkError: () => LocalizedString
+		/**
+		 * The payment details look invalid. Please review and try again.
+		 */
+		invalidInput: () => LocalizedString
+		/**
+		 * The payment could not be completed. Try again in a moment, or use a smaller amount.
+		 */
+		generic: () => LocalizedString
 	}
 	UnclaimedDeposit: {
 		/**
