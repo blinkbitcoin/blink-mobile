@@ -2800,7 +2800,9 @@
       "minChars": "Musí obsahovat alespoň {min} znaků",
       "invalidPostalCode": "Neplatné PSČ, pravděpodobně překlep",
       "invalidRegion": "Neplatný výběr regionu"
-    }
+    },
+    "passwordTooWeak": "Heslo je příliš slabé. Použijte kombinaci velkých a malých písmen, čísel a speciálních znaků.",
+    "passwordCommon": "Toto heslo je příliš běžné. Zvolte prosím silnější heslo."
   },
   "errors": {
     "generic": "Došlo k chybě.\nZkuste to prosím později.",
@@ -3469,6 +3471,68 @@
         "subtitle": "Odhadovaná doba čekání: {waitTime: string}",
         "buttonText": "Zavřít"
       }
+    }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Vyberte metodu zálohování",
+      "subtitle": "Pro nové uživatele doporučujeme {provider}.",
+      "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
+      "passwordManager": "Správce hesel",
+      "manualBackup": "Ruční zálohování",
+      "keychainSaved": "Záloha uložena do správce hesel",
+      "keychainFailed": "Nepodařilo se uložit zálohu",
+      "iOSComingSoon": "Zálohování na iCloud bude již brzy k dispozici"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Udržujte záložní frázi v tajnosti!",
+        "check1": "Chápu, že nikdo nemůže obnovit mou peněženku, pokud ztratím tuto frázi",
+        "check2": "Chápu, že pokud někdo získá tuto frázi, může ukrást všechny mé prostředky.",
+        "check3": "Nikdo mě nežádá o tyto informace prostřednictvím zprávy nebo hovoru"
+      },
+      "Phrase": {
+        "headerTitle": "Vaše záložní fráze",
+        "sparkCompatible": "Tato záložní fráze funguje v jakékoli {sparkCompatibleLink}",
+        "sparkCompatibleLink": "peněžence kompatibilní se Spark",
+        "copiedToast": "Záložní fráze zkopírována do schránky",
+        "saveItNow": "Uložte ji nyní",
+        "savedConfirm": "Už jsem ji uložil",
+        "copy": "Kopírovat",
+        "continueButton": "Pokračovat"
+      },
+      "Confirm": {
+        "headerTitle": "Potvrďte záložní frázi",
+        "subtitle": "Rychlá kontrola, zda jste ji správně zapsali",
+        "enterWord": "Zadejte slovo",
+        "enterWords": "Zadejte slova",
+        "confirm": "Potvrdit"
+      },
+      "Success": {
+        "title": "Vítejte v necustodial Blink"
+      }
+    },
+    "CloudBackup": {
+      "title": "Zálohujme vaši peněženku",
+      "description": "Uložíme zálohu vaší záložní fráze do vašeho {provider}.",
+      "encryptCheckbox": "Šifrovat dodatečným heslem",
+      "password": "Heslo",
+      "passwordPlaceholder": "(minimálně 12 znaků)",
+      "confirmPassword": "Potvrdit heslo",
+      "confirmPasswordPlaceholder": "Zadejte heslo znovu",
+      "continueButton": "Pokračovat",
+      "importantTitle": "Důležité",
+      "importantMessage": "Blink toto heslo neukládá. Pokud ho ztratíte, {bold} obnovit vaši peněženku.",
+      "importantMessageBold": "nebudeme schopni",
+      "passwordTooShort": "Minimálně 12 znaků",
+      "passwordMismatch": "Hesla se neshodují",
+      "uploadSuccess": "Záloha uložena do {provider}",
+      "uploadFailed": "Nahrání zálohy se nezdařilo",
+      "signInFailed": "Přihlášení ke Google se nezdařilo",
+      "existingBackupTitle": "Záloha nalezena",
+      "existingBackupMessage": "Ve vašem {provider} již existuje záloha. Chcete ji přepsat?",
+      "overwrite": "Přepsat"
     }
   }
 }

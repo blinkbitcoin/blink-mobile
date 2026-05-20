@@ -2800,7 +2800,9 @@
       "minChars": "Мора имати најмање {min} знакова",
       "invalidPostalCode": "Неважећи поштански број, вероватно грешка у куцању",
       "invalidRegion": "Неважећи избор региона"
-    }
+    },
+    "passwordTooWeak": "Лозинка је преслаба. Користите комбинацију великих и малих слова, бројева и специјалних знакова.",
+    "passwordCommon": "Ова лозинка је превише честа. Изаберите јачу лозинку."
   },
   "errors": {
     "generic": "Дошло је до грешке.\nМолимо вас покушајте поново касније.",
@@ -3466,6 +3468,68 @@
         "subtitle": "Процењено време чекања: {waitTime: string}",
         "buttonText": "Затвори"
       }
+    }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Изаберите метод резервне копије",
+      "subtitle": "Препоручујемо {provider} за нове кoriснике.",
+      "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
+      "passwordManager": "Менаџер лозинки",
+      "manualBackup": "Ручна резервна копија",
+      "keychainSaved": "Резервна копија сачувана у менаџеру лозинки",
+      "keychainFailed": "Чување резервне копије није успело",
+      "iOSComingSoon": "iCloud резервна копија ускоро стиже"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Чувајте своју резервну фразу у тајности!",
+        "check1": "Разумем да нико не може повратити мој новчаник ако изгубим ову фразу",
+        "check2": "Разумем да ако неко добије ову фразу, може украсти сва моја средства.",
+        "check3": "Нико ме не тражи ове информације путем поруке или позива"
+      },
+      "Phrase": {
+        "headerTitle": "Ваша резервна фраза",
+        "sparkCompatible": "Ова резервна фраза ради у сваком {sparkCompatibleLink}",
+        "sparkCompatibleLink": "новчанику компатибилном са Spark",
+        "copiedToast": "Резервна фраза копирана у међуспремник",
+        "saveItNow": "Сачувајте сада",
+        "savedConfirm": "Сачувао сам је",
+        "copy": "Копирај",
+        "continueButton": "Настави"
+      },
+      "Confirm": {
+        "headerTitle": "Потврдите резервну фразу",
+        "subtitle": "Брза провера да ли сте је исправно записали",
+        "enterWord": "Унесите реч",
+        "enterWords": "Унесите речи",
+        "confirm": "Потврди"
+      },
+      "Success": {
+        "title": "Добродошли у Blink без скрбништва"
+      }
+    },
+    "CloudBackup": {
+      "title": "Направимо резервну копију вашег новчаника",
+      "description": "Сачуваћемо копију ваше фразе за опоравак у вашем {provider}.",
+      "encryptCheckbox": "Шифрујте додатном лозинком",
+      "password": "Лозинка",
+      "passwordPlaceholder": "(најмање 12 знакова)",
+      "confirmPassword": "Потврдите лозинку",
+      "confirmPasswordPlaceholder": "Унесите лозинку поново",
+      "continueButton": "Настави",
+      "importantTitle": "Важно",
+      "importantMessage": "Blink не чува ову лозинку. Ако је изгубите, {bold} да повратимо ваш новчаник.",
+      "importantMessageBold": "нећемо моћи",
+      "passwordTooShort": "Најмање 12 знакова",
+      "passwordMismatch": "Лозинке се не подударају",
+      "uploadSuccess": "Резервна копија сачувана у {provider}",
+      "uploadFailed": "Отпремање резервне копије није успело",
+      "signInFailed": "Пријава на Google није успела",
+      "existingBackupTitle": "Резервна копија пронађена",
+      "existingBackupMessage": "Резервна копија већ постоји у вашем {provider}. Желите ли да је препишете?",
+      "overwrite": "Препиши"
     }
   }
 }

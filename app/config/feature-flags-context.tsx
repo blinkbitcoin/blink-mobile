@@ -17,6 +17,7 @@ const CardCardholderAgreementUrlKey = "cardCardholderAgreementUrl"
 const CardSubscriptionPriceUsdKey = "cardSubscriptionPriceUsd"
 const CardProcessingWaitTimeHoursKey = "cardProcessingWaitTimeHours"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
+const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -44,6 +45,7 @@ type RemoteConfig = {
   [CardSubscriptionPriceUsdKey]: number
   [CardProcessingWaitTimeHoursKey]: number
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
+  [SparkCompatibleWalletsUrlKey]: string
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -65,6 +67,7 @@ const defaultRemoteConfig: RemoteConfig = {
   cardSubscriptionPriceUsd: 1000,
   cardProcessingWaitTimeHours: 24,
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
+  sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
 }
 
 const defaultFeatureFlags = {
@@ -147,6 +150,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(CardProcessingWaitTimeHoursKey)
           .asNumber()
 
+        const sparkCompatibleWalletsUrl = remoteConfigInstance()
+          .getValue(SparkCompatibleWalletsUrlKey)
+          .asString()
+
         const parsedDeliveryConfig = JSON.parse(
           remoteConfigInstance().getValue(ReplaceCardDeliveryConfigKey).asString(),
         )
@@ -169,6 +176,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           cardSubscriptionPriceUsd,
           cardProcessingWaitTimeHours,
           replaceCardDeliveryConfig,
+          sparkCompatibleWalletsUrl,
         })
       } catch (err) {
         console.error("Error fetching remote config:", err)

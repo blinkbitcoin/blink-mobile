@@ -2800,7 +2800,9 @@
       "minChars": "يجب أن يكون {min} أحرف على الأقل",
       "invalidPostalCode": "رمز بريدي غير صالح، ربما خطأ مطبعي",
       "invalidRegion": "اختيار منطقة غير صالح"
-    }
+    },
+    "passwordTooWeak": "كلمة المرور ضعيفة جدًا. استخدم مزيجًا من الأحرف الكبيرة والصغيرة والأرقام والرموز الخاصة.",
+    "passwordCommon": "كلمة المرور هذه شائعة جدًا. يرجى اختيار كلمة مرور أقوى."
   },
   "errors": {
     "generic": "كان هناك خطأ.\nالرجاء معاودة المحاولة في وقت لاحق.",
@@ -3466,6 +3468,68 @@
         "subtitle": "وقت الانتظار المقدر: {waitTime: string}",
         "buttonText": "إغلاق"
       }
+    }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "اختر طريقة النسخ الاحتياطي",
+      "subtitle": "نوصي بـ {provider} للمستخدمين الجدد.",
+      "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
+      "passwordManager": "مدير كلمات المرور",
+      "manualBackup": "نسخ احتياطي يدوي",
+      "keychainSaved": "تم حفظ النسخة الاحتياطية في مدير كلمات المرور",
+      "keychainFailed": "فشل حفظ النسخة الاحتياطية",
+      "iOSComingSoon": "النسخ الاحتياطي على iCloud قريبًا"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "حافظ على سرية عبارة النسخ الاحتياطي!",
+        "check1": "أفهم أنه لا يمكن لأحد استعادة محفظتي إذا فقدت هذه العبارة",
+        "check2": "أفهم أنه إذا حصل شخص ما على هذه العبارة، يمكنه سرقة جميع أموالي.",
+        "check3": "لا أحد يطلب مني هذه المعلومات عبر رسالة أو مكالمة"
+      },
+      "Phrase": {
+        "headerTitle": "عبارة النسخ الاحتياطي",
+        "sparkCompatible": "تعمل عبارة النسخ الاحتياطي هذه في أي {sparkCompatibleLink}",
+        "sparkCompatibleLink": "محفظة متوافقة مع Spark",
+        "copiedToast": "تم نسخ عبارة النسخ الاحتياطي إلى الحافظة",
+        "saveItNow": "احفظها الآن",
+        "savedConfirm": "لقد حفظتها",
+        "copy": "نسخ",
+        "continueButton": "متابعة"
+      },
+      "Confirm": {
+        "headerTitle": "تأكيد عبارة النسخ الاحتياطي",
+        "subtitle": "فحص سريع إذا كنت قد كتبتها بشكل صحيح",
+        "enterWord": "أدخل الكلمة",
+        "enterWords": "أدخل الكلمات",
+        "confirm": "تأكيد"
+      },
+      "Success": {
+        "title": "مرحبًا بك في Blink غير الحافظة"
+      }
+    },
+    "CloudBackup": {
+      "title": "لنقم بنسخ محفظتك احتياطيًا",
+      "description": "سنحفظ نسخة من عبارة النسخ الاحتياطي في {provider} الخاص بك.",
+      "encryptCheckbox": "تشفير بكلمة مرور إضافية",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "(12 حرفًا كحد أدنى)",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "أدخل كلمة المرور مرة أخرى",
+      "continueButton": "متابعة",
+      "importantTitle": "مهم",
+      "importantMessage": "لا يخزن Blink كلمة المرور هذه. إذا فقدتها، {bold} استعادة محفظتك.",
+      "importantMessageBold": "لن نتمكن من",
+      "passwordTooShort": "12 حرفًا كحد أدنى",
+      "passwordMismatch": "كلمات المرور غير متطابقة",
+      "uploadSuccess": "تم حفظ النسخة الاحتياطية في {provider}",
+      "uploadFailed": "فشل رفع النسخة الاحتياطية",
+      "signInFailed": "فشل تسجيل الدخول إلى Google",
+      "existingBackupTitle": "تم العثور على نسخة احتياطية",
+      "existingBackupMessage": "توجد نسخة احتياطية بالفعل في {provider} الخاص بك. هل تريد استبدالها؟",
+      "overwrite": "استبدال"
     }
   }
 }

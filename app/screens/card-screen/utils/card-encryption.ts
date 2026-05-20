@@ -9,7 +9,7 @@ export const encryptPin = (
   const secretKey = generateRandomHexKey()
   const sessionId = encryptRsaOaep(publicKeyPem, secretKey)
   const pinBlock = formatPinBlock(pin)
-  const { data: encryptedPin, iv } = encryptAesGcm(pinBlock, secretKey)
+  const { data: encryptedPin, iv } = encryptAesGcm(pinBlock, secretKey, { ivLength: 16 })
 
   return { encryptedPin, iv, sessionId }
 }

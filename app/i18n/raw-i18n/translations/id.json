@@ -2783,7 +2783,9 @@
       "minChars": "Harus minimal {min} karakter",
       "invalidPostalCode": "Kode pos tidak valid, mungkin salah ketik",
       "invalidRegion": "Pilihan wilayah tidak valid"
-    }
+    },
+    "passwordTooWeak": "Kata sandi terlalu lemah. Gunakan kombinasi huruf besar, huruf kecil, angka, dan karakter khusus.",
+    "passwordCommon": "Kata sandi ini terlalu umum. Silakan pilih kata sandi yang lebih kuat."
   },
   "errors": {
     "generic": "Terjadi kesalahan.\nSilakan coba lagi nanti.",
@@ -3428,6 +3430,68 @@
         "subtitle": "Perkiraan waktu tunggu: {waitTime: string}",
         "buttonText": "Tutup"
       }
+    }
+  },
+  "SparkOnboarding": {
+    "BackupMethod": {
+      "title": "Pilih metode cadangan Anda",
+      "subtitle": "Kami merekomendasikan {provider} untuk pengguna baru.",
+      "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
+      "passwordManager": "Pengelola kata sandi",
+      "manualBackup": "Cadangan manual",
+      "keychainSaved": "Cadangan disimpan ke pengelola kata sandi",
+      "keychainFailed": "Gagal menyimpan cadangan",
+      "iOSComingSoon": "Pencadangan iCloud segera hadir"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Rahasiakan frasa cadangan Anda!",
+        "check1": "Saya memahami tidak ada yang bisa memulihkan dompet saya jika saya kehilangan frasa ini",
+        "check2": "Saya memahami jika seseorang mendapatkan frasa ini, mereka bisa mencuri semua dana saya.",
+        "check3": "Tidak ada yang meminta informasi ini melalui pesan atau panggilan"
+      },
+      "Phrase": {
+        "headerTitle": "Frasa cadangan Anda",
+        "sparkCompatible": "Frasa cadangan ini berfungsi di {sparkCompatibleLink} mana pun",
+        "sparkCompatibleLink": "dompet yang kompatibel dengan Spark",
+        "copiedToast": "Frasa cadangan disalin ke papan klip",
+        "saveItNow": "Simpan sekarang",
+        "savedConfirm": "Saya sudah menyimpannya",
+        "copy": "Salin",
+        "continueButton": "Lanjutkan"
+      },
+      "Confirm": {
+        "headerTitle": "Konfirmasi frasa cadangan",
+        "subtitle": "Pemeriksaan cepat apakah Anda menulisnya dengan benar",
+        "enterWord": "Masukkan kata",
+        "enterWords": "Masukkan kata-kata",
+        "confirm": "Konfirmasi"
+      },
+      "Success": {
+        "title": "Selamat datang di Blink non-kustodial"
+      }
+    },
+    "CloudBackup": {
+      "title": "Mari cadangkan dompet Anda",
+      "description": "Kami akan menyimpan cadangan frasa pemulihan Anda ke {provider} Anda.",
+      "encryptCheckbox": "Enkripsi dengan kata sandi tambahan",
+      "password": "Kata sandi",
+      "passwordPlaceholder": "(minimal 12 karakter)",
+      "confirmPassword": "Konfirmasi kata sandi",
+      "confirmPasswordPlaceholder": "Masukkan kata sandi lagi",
+      "continueButton": "Lanjutkan",
+      "importantTitle": "Penting",
+      "importantMessage": "Blink tidak menyimpan kata sandi ini. Jika Anda kehilangannya, {bold} memulihkan dompet Anda.",
+      "importantMessageBold": "kami tidak akan bisa",
+      "passwordTooShort": "Minimal 12 karakter",
+      "passwordMismatch": "Kata sandi tidak cocok",
+      "uploadSuccess": "Cadangan disimpan ke {provider}",
+      "uploadFailed": "Gagal mengunggah cadangan",
+      "signInFailed": "Gagal masuk ke Google",
+      "existingBackupTitle": "Cadangan ditemukan",
+      "existingBackupMessage": "Cadangan sudah ada di {provider} Anda. Apakah Anda ingin menimpanya?",
+      "overwrite": "Timpa"
     }
   }
 }

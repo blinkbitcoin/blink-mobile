@@ -22,6 +22,13 @@ export const shuffle = <T>(array: T[]): T[] => {
   return array
 }
 
+export const pickRandomIndices = (total: number, count: number): number[] => {
+  const all = Array.from({ length: total }, (_, i) => i)
+  return shuffle([...all])
+    .slice(0, Math.min(count, total))
+    .sort((a, b) => a - b)
+}
+
 // Shorten a long text by inserting "..." in the middle, keeping the ends visible.
 export const ellipsizeMiddle = (
   text: string,

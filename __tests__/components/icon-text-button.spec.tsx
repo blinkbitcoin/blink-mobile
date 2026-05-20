@@ -2,7 +2,7 @@ import React from "react"
 import { Text as RNText, View } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
-import { IconTextButton } from "@app/components/card-screen/icon-text-button"
+import { IconTextButton } from "@app/components/icon-text-button"
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,

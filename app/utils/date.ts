@@ -151,9 +151,16 @@ export const formatCardValidThruDisplay = (
   return `${maskChar}${maskChar} / ${maskChar}${maskChar}`
 }
 
-export const formatDurationHours = (hours: number, locale?: string): string =>
-  new Intl.NumberFormat(locale || "en-US", {
+type DurationUnit = "second" | "minute" | "hour" | "day"
+
+type FormatDurationOptions = {
+  locale?: string
+  unit?: DurationUnit
+}
+
+export const formatDuration = (value: number, options?: FormatDurationOptions): string =>
+  new Intl.NumberFormat(options?.locale || "en-US", {
     style: "unit",
-    unit: "hour",
+    unit: options?.unit ?? "hour",
     unitDisplay: "narrow",
-  }).format(hours)
+  }).format(value)

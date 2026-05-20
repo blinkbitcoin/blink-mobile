@@ -2783,7 +2783,9 @@
             "minChars": "Debe tener al menos {min} caracteres",
             "invalidPostalCode": "Código postal no válido, probablemente un error tipográfico",
             "invalidRegion": "Selección de región no válida"
-        }
+        },
+        "passwordTooWeak": "La contraseña es demasiado débil. Usa una combinación de mayúsculas, minúsculas, números y caracteres especiales.",
+        "passwordCommon": "Esta contraseña es demasiado común. Elige una contraseña más segura."
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
@@ -3416,6 +3418,68 @@
                 "subtitle": "Tiempo estimado de espera: {waitTime: string}",
                 "buttonText": "Cerrar"
             }
+        }
+    },
+    "SparkOnboarding": {
+        "BackupMethod": {
+            "title": "Elige tu método de respaldo",
+            "subtitle": "Recomendamos {provider} para nuevos usuarios.",
+            "googleDrive": "Google Drive",
+            "appleICloud": "Apple iCloud",
+            "passwordManager": "Gestor de contraseñas",
+            "manualBackup": "Respaldo manual",
+            "keychainSaved": "Respaldo guardado en el gestor de contraseñas",
+            "keychainFailed": "Error al guardar el respaldo",
+            "iOSComingSoon": "Respaldo en iCloud próximamente"
+        },
+        "ManualBackup": {
+            "Alerts": {
+                "title": "¡Mantén tu frase de respaldo en secreto!",
+                "check1": "Entiendo que nadie puede recuperar mi billetera si pierdo esta frase",
+                "check2": "Entiendo que si alguien obtiene esta frase, puede robar todos mis fondos.",
+                "check3": "Nadie me está pidiendo esta información por mensaje o llamada"
+            },
+            "Phrase": {
+                "headerTitle": "Tu frase de respaldo",
+                "sparkCompatible": "Esta frase de respaldo funciona en cualquier {sparkCompatibleLink}",
+                "sparkCompatibleLink": "billetera compatible con Spark",
+                "copiedToast": "Frase de respaldo copiada al portapapeles",
+                "saveItNow": "Guárdala ahora",
+                "savedConfirm": "Ya la guardé",
+                "copy": "Copiar",
+                "continueButton": "Continuar"
+            },
+            "Confirm": {
+                "headerTitle": "Confirmar frase de respaldo",
+                "subtitle": "Una verificación rápida de que la escribiste correctamente",
+                "enterWord": "Ingresa la palabra",
+                "enterWords": "Ingresa las palabras",
+                "confirm": "Confirmar"
+            },
+            "Success": {
+                "title": "Bienvenido a Blink sin custodia"
+            }
+        },
+        "CloudBackup": {
+            "title": "Respaldemos tu billetera",
+            "description": "Guardaremos una copia de tu frase de respaldo en tu {provider}.",
+            "encryptCheckbox": "Encriptar con contraseña adicional",
+            "password": "Contraseña",
+            "passwordPlaceholder": "(mínimo 12 caracteres)",
+            "confirmPassword": "Confirmar contraseña",
+            "confirmPasswordPlaceholder": "Ingresa la contraseña de nuevo",
+            "continueButton": "Continuar",
+            "importantTitle": "Importante",
+            "importantMessage": "Blink no almacena esta contraseña. Si la pierdes, {bold} recuperar tu billetera.",
+            "importantMessageBold": "no podremos",
+            "passwordTooShort": "Mínimo 12 caracteres",
+            "passwordMismatch": "Las contraseñas no coinciden",
+            "uploadSuccess": "Respaldo guardado en {provider}",
+            "uploadFailed": "Error al subir el respaldo",
+            "signInFailed": "Error al iniciar sesión en Google",
+            "existingBackupTitle": "Respaldo encontrado",
+            "existingBackupMessage": "Ya existe un respaldo en tu {provider}. ¿Deseas sobrescribirlo?",
+            "overwrite": "Sobrescribir"
         }
     }
 }
