@@ -1,5 +1,6 @@
 import React from "react"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet } from "@app/graphql/wallets-utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -11,8 +12,9 @@ import { SettingsRow } from "../row"
 export const DefaultWallet: React.FC = () => {
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const isAuthed = useIsAuthed()
 
-  const { data, loading } = useSettingsScreenQuery()
+  const { data, loading } = useSettingsScreenQuery({ skip: !isAuthed })
   const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
 
   const btcWalletId = btcWallet?.id

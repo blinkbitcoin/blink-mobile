@@ -5,6 +5,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { getPaymentRequestFullUri } from "@app/screens/receive-bitcoin-screen/payment/helpers"
 import {
   Invoice,
   InvoiceType,
@@ -19,7 +20,7 @@ import {
   toBtcMoneyAmount,
 } from "@app/types/amounts"
 import { toSatsAmount } from "@app/utils/amounts"
-import { buildBitcoinUri, buildLightningUri } from "@app/utils/bitcoin-uri"
+import { buildBitcoinUri } from "@app/utils/bitcoin-uri"
 
 import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"
 
@@ -84,7 +85,15 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
       baselinePaymentIdRef.current = lastPaymentIdRef.current
       setPaymentRequest(result.invoice)
       setRequestState(PaymentRequestState.Created)
-    } catch {
+    } catch (err) {
+      crashlytics().log(
+        `[Self-custodial] Lightning invoice generation failed (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
+      )
+      crashlytics().recordError(
+        err instanceof Error
+          ? err
+          : new Error(`Self-custodial invoice generation failed: ${err}`),
+      )
       setRequestState(PaymentRequestState.Error)
     }
   }, [sdk, isReady, type, memo, amount, convertMoneyAmount])
@@ -141,7 +150,12 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const getFullUriFn = useCallback(
     (params: { uppercase?: boolean; prefix?: boolean }) => {
       if (!paymentRequest) return ""
-      return buildLightningUri(paymentRequest, params.prefix)
+      return getPaymentRequestFullUri({
+        type: Invoice.Lightning,
+        input: paymentRequest,
+        uppercase: params.uppercase,
+        prefix: params.prefix,
+      })
     },
     [paymentRequest],
   )

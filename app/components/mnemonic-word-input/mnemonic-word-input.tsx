@@ -1,4 +1,4 @@
-import React from "react"
+import React, { forwardRef, useImperativeHandle, useRef } from "react"
 import { TextInput, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -17,25 +17,29 @@ type MnemonicWordInputProps = {
   testID?: string
 }
 
-export const MnemonicWordInput: React.FC<MnemonicWordInputProps> = ({
-  index,
-  value,
-  placeholder,
-  onChangeText,
-  onFocus,
-  correct,
-  wrong,
-  testID,
-}) => {
+export type MnemonicWordInputHandle = {
+  focus: () => void
+}
+
+export const MnemonicWordInput = forwardRef<
+  MnemonicWordInputHandle,
+  MnemonicWordInputProps
+>(({ index, value, placeholder, onChangeText, onFocus, correct, wrong, testID }, ref) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
+  const inputRef = useRef<TextInput | null>(null)
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+  }))
 
   return (
     <View style={[styles.container, correct && styles.correct, wrong && styles.error]}>
       {value.trim().length > 0 && <Text style={styles.wordNumber}>{index + 1}.</Text>}
       <TextInput
+        ref={inputRef}
         style={styles.input}
         placeholder={placeholder}
         placeholderTextColor={colors.grey2}
@@ -50,7 +54,9 @@ export const MnemonicWordInput: React.FC<MnemonicWordInputProps> = ({
       <GaloyIcon name="pencil" size={16} color={colors.primary} />
     </View>
   )
-}
+})
+
+MnemonicWordInput.displayName = "MnemonicWordInput"
 
 const useStyles = makeStyles(({ colors }) => ({
   container: {

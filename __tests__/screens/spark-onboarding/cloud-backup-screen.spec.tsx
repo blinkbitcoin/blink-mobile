@@ -3,7 +3,10 @@ import { render, fireEvent } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
+import { IconHero } from "@app/components/icon-hero"
+import { InfoBanner } from "@app/components/info-banner"
 import { SparkCloudBackupScreen } from "@app/screens/spark-onboarding/cloud-backup-screen"
+import theme from "@app/rne-theme/theme"
 import { ContextForScreen } from "../helper"
 
 const mockHandleBackup = jest.fn()
@@ -35,11 +38,25 @@ jest.mock("@app/screens/spark-onboarding/hooks", () => ({
 jest.mock("@app/components/icon-hero", () => {
   const { Text } = jest.requireActual("react-native")
   return {
-    IconHero: ({ title, subtitle }: { title: string; subtitle: string }) => (
+    IconHero: jest.fn(({ title, subtitle }: { title: string; subtitle: string }) => (
       <>
         <Text>{title}</Text>
         <Text>{subtitle}</Text>
       </>
+    )),
+  }
+})
+
+jest.mock("@app/components/info-banner", () => {
+  const { Text } = jest.requireActual("react-native")
+  return {
+    InfoBanner: jest.fn(
+      ({ title, children }: { title?: string; children: React.ReactNode }) => (
+        <>
+          {title ? <Text>{title}</Text> : null}
+          {children}
+        </>
+      ),
     ),
   }
 })
@@ -109,5 +126,36 @@ describe("SparkCloudBackupScreen", () => {
 
     fireEvent.press(getByText(LL.BackupScreen.CloudBackup.continueButton()))
     expect(mockHandleBackup).toHaveBeenCalled()
+  })
+
+  it("renders the Important InfoBanner with warning icon color", () => {
+    mockIsEncrypted = true
+
+    render(
+      <ContextForScreen>
+        <SparkCloudBackupScreen />
+      </ContextForScreen>,
+    )
+
+    const infoBannerMock = InfoBanner as unknown as jest.Mock
+    const props = infoBannerMock.mock.calls[0][0]
+
+    expect(props.icon).toBe("warning")
+    expect(props.iconColor).toBe("warning")
+    expect(props.title).toBe(LL.BackupScreen.CloudBackup.importantTitle())
+  })
+
+  it("renders the hero icon with the success color", () => {
+    render(
+      <ContextForScreen>
+        <SparkCloudBackupScreen />
+      </ContextForScreen>,
+    )
+
+    const iconHeroMock = IconHero as unknown as jest.Mock
+    const props = iconHeroMock.mock.calls[0][0]
+
+    expect(props.iconColor).toBe(theme.lightColors?.success)
+    expect(props.icon).toBe("cloud")
   })
 })

@@ -18,6 +18,7 @@ jest.mock("@react-native-clipboard/clipboard", () => ({
 
 jest.mock("bip39", () => ({
   validateMnemonic: (m: string) => m.split(" ").length === 12 && m.startsWith("valid"),
+  wordlists: { english: [] },
 }))
 
 const mockUpdateWord = jest.fn()
@@ -35,6 +36,8 @@ let mockBip39State = {
   selectSuggestion: jest.fn(),
   stepFilled: false,
   allFilled: false,
+  focusRequest: null as number | null,
+  clearFocusRequest: jest.fn(),
 }
 
 jest.mock("@app/hooks/use-bip39-input", () => ({
@@ -74,6 +77,8 @@ describe("useRestorePhrase", () => {
       selectSuggestion: jest.fn(),
       stepFilled: false,
       allFilled: false,
+      focusRequest: null as number | null,
+      clearFocusRequest: jest.fn(),
     }
   })
 
@@ -108,6 +113,49 @@ describe("useRestorePhrase", () => {
     })
 
     expect(mockHandlePaste).toHaveBeenCalledWith("word1 word2 word3")
+  })
+
+  it("auto-navigates to step 2 when full valid phrase is pasted in step 1", () => {
+    mockHandlePaste.mockReturnValue(true)
+    const fullPhrase = "valid a b c d e f g h i j k"
+
+    const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.First }))
+
+    let returned: boolean | undefined
+    act(() => {
+      returned = result.current.handlePaste(fullPhrase)
+    })
+
+    expect(returned).toBe(true)
+    expect(mockNavigate).toHaveBeenCalledWith("sparkRestorePhraseScreen", {
+      step: PhraseStep.Second,
+      words: fullPhrase.split(" "),
+    })
+  })
+
+  it("does not auto-navigate when paste happens on step 2", () => {
+    mockHandlePaste.mockReturnValue(true)
+    const fullPhrase = "valid a b c d e f g h i j k"
+
+    const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.Second }))
+
+    act(() => {
+      result.current.handlePaste(fullPhrase)
+    })
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("does not auto-navigate when paste yields invalid mnemonic", () => {
+    mockHandlePaste.mockReturnValue(true)
+
+    const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.First }))
+
+    act(() => {
+      result.current.handlePaste("invalid a b c d e f g h i j k")
+    })
+
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("does not paste when clipboard is empty", async () => {

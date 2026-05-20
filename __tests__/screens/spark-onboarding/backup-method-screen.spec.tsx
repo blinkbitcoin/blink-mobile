@@ -4,7 +4,9 @@ import { Pressable, Text } from "react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
+import { IconHero } from "@app/components/icon-hero"
 import { SparkBackupMethodScreen } from "@app/screens/spark-onboarding/backup-method-screen"
+import theme from "@app/rne-theme/theme"
 import { ContextForScreen } from "../helper"
 
 const mockHandleKeychainBackup = jest.fn()
@@ -62,12 +64,12 @@ jest.mock("@app/components/atomic/galoy-secondary-button", () => ({
 
 jest.mock("@app/components/icon-hero", () => {
   return {
-    IconHero: ({ title, subtitle }: { title: string; subtitle: string }) => (
+    IconHero: jest.fn(({ title, subtitle }: { title: string; subtitle: string }) => (
       <>
         <Text>{title}</Text>
         <Text>{subtitle}</Text>
       </>
-    ),
+    )),
   }
 })
 
@@ -170,5 +172,19 @@ describe("SparkBackupMethodScreen", () => {
     )
 
     expect(mockSaveCheckpoint).toHaveBeenCalledWith("backupMethod")
+  })
+
+  it("renders the hero icon with the success color", () => {
+    render(
+      <ContextForScreen>
+        <SparkBackupMethodScreen />
+      </ContextForScreen>,
+    )
+
+    const iconHeroMock = IconHero as unknown as jest.Mock
+    const props = iconHeroMock.mock.calls[0][0]
+
+    expect(props.iconColor).toBe(theme.lightColors?.success)
+    expect(props.icon).toBe("cloud")
   })
 })

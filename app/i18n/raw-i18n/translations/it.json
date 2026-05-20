@@ -2329,6 +2329,7 @@
         "addressScreen": "Modi per farsi pagare",
         "tapUserName": "Tocca per impostare l'username",
         "notifications": "Notifiche",
+        "recoveryMethod": "Metodo di recupero",
         "title": "Impostazioni",
         "darkMode": "Modalità scura",
         "setToDark": "Modalità: scuro.",
@@ -3458,7 +3459,7 @@
                 "check3": "Nessuno mi sta chiedendo queste informazioni tramite messaggio o chiamata"
             },
             "Phrase": {
-                "headerTitle": "La tua frase di backup",
+                "headerTitle": "Frase di backup",
                 "sparkCompatible": "Questa frase di backup funziona in qualsiasi {sparkCompatibleLink}",
                 "sparkCompatibleLink": "portafoglio compatibile con Spark",
                 "copiedToast": "Frase di backup copiata negli appunti",
@@ -3472,7 +3473,8 @@
                 "subtitle": "Un controllo rapido per verificare di averla scritta correttamente",
                 "enterWord": "Inserisci la parola",
                 "enterWords": "Inserisci le parole",
-                "confirm": "Conferma"
+                "confirm": "Conferma",
+                "incorrectWord": "Parola sbagliata, controlla l'ordine"
             },
             "Success": {
                 "title": "Benvenuto su Blink non-custodial"
@@ -3530,7 +3532,7 @@
         "nextWords": "Prossime 6 parole",
         "paste": "Incolla",
         "enterWord": "Parola",
-        "invalidMnemonic": "Frase di backup non valida. Controlla le tue parole e riprova.",
+        "invalidMnemonic": "Frase di backup non valida. Verifica che l'ordine delle parole sia corretto.",
         "restoring": "Ripristino del portafoglio...",
         "restoreSuccess": "Portafoglio ripristinato con successo",
         "restoreFailed": "Ripristino del portafoglio fallito. Riprova.",

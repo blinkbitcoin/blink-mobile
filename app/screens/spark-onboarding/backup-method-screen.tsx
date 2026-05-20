@@ -69,7 +69,7 @@ export const SparkBackupMethodScreen: React.FC = () => {
     >
       <IconHero
         icon="cloud"
-        iconColor={colors.black}
+        iconColor={colors.success}
         title={LL.BackupScreen.BackupMethod.title()}
         subtitle={LL.BackupScreen.BackupMethod.subtitle({ provider: cloudProvider })}
       />

@@ -1,7 +1,11 @@
-import React from "react"
+import React, { createRef } from "react"
+import { TextInput } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
-import { MnemonicWordInput } from "@app/components/mnemonic-word-input"
+import {
+  MnemonicWordInput,
+  MnemonicWordInputHandle,
+} from "@app/components/mnemonic-word-input"
 
 jest.mock("@rn-vui/themed", () => {
   const colors = {
@@ -80,5 +84,17 @@ describe("MnemonicWordInput", () => {
     fireEvent(getByPlaceholderText("Word 1"), "focus")
 
     expect(onFocus).toHaveBeenCalled()
+  })
+
+  it("forwards focus through ref to underlying TextInput", () => {
+    const ref = createRef<MnemonicWordInputHandle>()
+    const focusSpy = jest.spyOn(TextInput.prototype, "focus")
+
+    render(<MnemonicWordInput ref={ref} {...defaultProps} />)
+
+    ref.current?.focus()
+
+    expect(focusSpy).toHaveBeenCalled()
+    focusSpy.mockRestore()
   })
 })

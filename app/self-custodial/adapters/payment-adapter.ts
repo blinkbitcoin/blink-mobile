@@ -86,8 +86,8 @@ export const createGetFee = (sdk: BreezSdkInterface): GetFeeAdapter => {
         feeAmount: toBtcMoneyAmount(0),
       }
     } catch (err) {
-      crashlytics().log(
-        `[SparkSDK] Fee quote failed: ${err instanceof Error ? err.message : err}`,
+      crashlytics().recordError(
+        err instanceof Error ? err : new Error(`[SparkSDK] Fee quote failed: ${err}`),
       )
       return null
     }

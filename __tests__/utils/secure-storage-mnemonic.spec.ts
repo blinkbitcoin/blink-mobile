@@ -3,6 +3,7 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 const mockGet = jest.fn()
 const mockSet = jest.fn()
 const mockRemove = jest.fn()
+const mockRecordError = jest.fn()
 
 jest.mock("react-native-secure-key-store", () => ({
   __esModule: true,
@@ -15,6 +16,11 @@ jest.mock("react-native-secure-key-store", () => ({
     ALWAYS_THIS_DEVICE_ONLY: "ALWAYS_THIS_DEVICE_ONLY",
     WHEN_UNLOCKED_THIS_DEVICE_ONLY: "WHEN_UNLOCKED_THIS_DEVICE_ONLY",
   },
+}))
+
+jest.mock("@react-native-firebase/crashlytics", () => ({
+  __esModule: true,
+  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
 }))
 
 describe("KeyStoreWrapper mnemonic methods", () => {
@@ -117,6 +123,37 @@ describe("KeyStoreWrapper mnemonic methods", () => {
       const result = await KeyStoreWrapper.deleteMnemonic()
 
       expect(result).toBe(false)
+    })
+
+    it("records crashlytics when the primary mnemonic removal fails (Important #5)", async () => {
+      mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+
+      await KeyStoreWrapper.deleteMnemonic()
+
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockRecordError.mock.calls[0][0].message).toContain("keystore unavailable")
+    })
+
+    it("records crashlytics for the network-key removal failure but still returns true (Important #5)", async () => {
+      mockRemove
+        .mockResolvedValueOnce(undefined)
+        .mockRejectedValueOnce(new Error("network key write-locked"))
+
+      const result = await KeyStoreWrapper.deleteMnemonic()
+
+      expect(result).toBe(true)
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockRecordError.mock.calls[0][0].message).toContain(
+        "network key write-locked",
+      )
+    })
+
+    it("does not record crashlytics when both removals succeed", async () => {
+      mockRemove.mockResolvedValue(undefined)
+
+      await KeyStoreWrapper.deleteMnemonic()
+
+      expect(mockRecordError).not.toHaveBeenCalled()
     })
   })
 

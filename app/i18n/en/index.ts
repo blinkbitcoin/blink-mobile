@@ -2397,6 +2397,7 @@ const en: BaseTranslation = {
     addressScreen: "Ways to get paid",
     tapUserName: "Tap to set username",
     notifications: "Notifications",
+    recoveryMethod: "Recovery method",
     title: "Settings",
     darkMode: "Dark Mode",
     setToDark: "Mode: dark.",
@@ -3641,7 +3642,7 @@ const en: BaseTranslation = {
         check3: "Nobody is asking me for this information via message or a call",
       },
       Phrase: {
-        headerTitle: "Your backup phrase",
+        headerTitle: "Backup phrase",
         sparkCompatible:
           "This backup phrase works in any {sparkCompatibleLink: string}",
         sparkCompatibleLink: "Spark-compatible wallet",
@@ -3657,6 +3658,7 @@ const en: BaseTranslation = {
         enterWord: "Enter word",
         enterWords: "Enter words",
         confirm: "Confirm",
+        incorrectWord: "Incorrect word, please check the order",
       },
       Success: {
         title: "Welcome to non-custodial Blink",
@@ -3697,7 +3699,7 @@ const en: BaseTranslation = {
     nextWords: "Next 6 words",
     paste: "Paste",
     enterWord: "Word",
-    invalidMnemonic: "Invalid backup phrase. Please check your words and try again.",
+    invalidMnemonic: "Invalid backup phrase. Please check if the word order is correct.",
     restoring: "Restoring your wallet...",
     restoreSuccess: "Wallet restored successfully",
     restoreFailed: "Failed to restore wallet. Please try again.",

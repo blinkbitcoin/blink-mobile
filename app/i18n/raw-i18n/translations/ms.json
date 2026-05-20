@@ -2346,6 +2346,7 @@
     "addressScreen": "Cara untuk terima bayaran",
     "tapUserName": "Tekan untuk tetapkan ID pengguna",
     "notifications": "Notifikasi",
+    "recoveryMethod": "Kaedah pemulihan",
     "title": "Tetapan",
     "darkMode": "Mode Gelap",
     "setToDark": "Mode: gelap",
@@ -3511,7 +3512,7 @@
         "check3": "Tiada sesiapa meminta maklumat ini melalui mesej atau panggilan"
       },
       "Phrase": {
-        "headerTitle": "Frasa sandaran anda",
+        "headerTitle": "Frasa sandaran",
         "sparkCompatible": "Frasa sandaran ini berfungsi dalam mana-mana {sparkCompatibleLink}",
         "sparkCompatibleLink": "dompet serasi Spark",
         "copiedToast": "Frasa sandaran disalin ke papan klip",
@@ -3525,7 +3526,8 @@
         "subtitle": "Semakan pantas sama ada anda telah menulisnya dengan betul",
         "enterWord": "Masukkan perkataan",
         "enterWords": "Masukkan perkataan",
-        "confirm": "Sahkan"
+        "confirm": "Sahkan",
+        "incorrectWord": "Perkataan salah, sila semak susunan"
       },
       "Success": {
         "title": "Selamat datang ke Blink bukan jagaan"
@@ -3583,7 +3585,7 @@
     "nextWords": "6 perkataan seterusnya",
     "paste": "Tampal",
     "enterWord": "Perkataan",
-    "invalidMnemonic": "Frasa sandaran tidak sah. Sila semak perkataan anda dan cuba lagi.",
+    "invalidMnemonic": "Frasa sandaran tidak sah. Sila semak sama ada susunan perkataan adalah betul.",
     "restoring": "Memulihkan dompet anda...",
     "restoreSuccess": "Dompet berjaya dipulihkan",
     "restoreFailed": "Gagal memulihkan dompet. Sila cuba lagi.",

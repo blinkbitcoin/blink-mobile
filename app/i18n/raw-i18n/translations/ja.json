@@ -2346,6 +2346,7 @@
         "addressScreen": "さまざまな受金方法を見る",
         "tapUserName": "タップしてユーザー名を設定する",
         "notifications": "通知",
+        "recoveryMethod": "復元方法",
         "title": "設定",
         "darkMode": "ダークモード",
         "setToDark": "モード：ダーク",
@@ -3513,7 +3514,8 @@
                 "subtitle": "正しく書き留めたか簡単に確認します",
                 "enterWord": "単語を入力",
                 "enterWords": "単語を入力",
-                "confirm": "確認"
+                "confirm": "確認",
+                "incorrectWord": "正しくない単語です。順番を確認してください"
             },
             "Success": {
                 "title": "ノンカストディアルBlinkへようこそ"
@@ -3571,7 +3573,7 @@
         "nextWords": "次の6語",
         "paste": "貼り付け",
         "enterWord": "単語",
-        "invalidMnemonic": "無効なバックアップフレーズです。単語を確認して再試行してください。",
+        "invalidMnemonic": "無効なバックアップフレーズです。単語の順序が正しいか確認してください。",
         "restoring": "ウォレットを復元中...",
         "restoreSuccess": "ウォレットが正常に復元されました",
         "restoreFailed": "ウォレットの復元に失敗しました。再試行してください。",

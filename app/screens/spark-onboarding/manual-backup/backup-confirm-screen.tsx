@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import { TextInput, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -12,7 +12,11 @@ import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useBackupState } from "@app/self-custodial/providers/backup-state-provider"
+import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
+import {
+  BackupStatus,
+  useBackupState,
+} from "@app/self-custodial/providers/backup-state-provider"
 import { testProps } from "@app/utils/testProps"
 
 import { useBackupConfirm } from "../hooks"
@@ -29,17 +33,20 @@ export const SparkBackupConfirmScreen: React.FC = () => {
   const { challenges } = useRoute<ConfirmRouteProp>().params
 
   const { wallets } = useActiveWallet()
-  const { setBackupCompleted } = useBackupState()
+  const { backupState, setBackupCompleted } = useBackupState()
+  const { checkpoint, loading: checkpointLoading } = useMigrationCheckpoint()
+  const alreadyBackedUp = backupState.status === BackupStatus.Completed
+  const isMigrating = checkpoint !== null && !alreadyBackedUp
   const hasFunds = wallets.some((w) => w.balance.amount > 0)
 
   const onComplete = useCallback(() => {
     setBackupCompleted("manual")
-    if (hasFunds) {
+    if (isMigrating && hasFunds) {
       navigation.navigate("sparkMigrationTransferringFunds")
       return
     }
-    navigation.navigate("sparkBackupSuccessScreen")
-  }, [navigation, hasFunds, setBackupCompleted])
+    navigation.navigate("sparkBackupSuccessScreen", { reBackup: alreadyBackedUp })
+  }, [navigation, isMigrating, hasFunds, alreadyBackedUp, setBackupCompleted])
 
   const {
     inputs,
@@ -52,7 +59,19 @@ export const SparkBackupConfirmScreen: React.FC = () => {
     selectSuggestion,
     isWordCorrect,
     isWordWrong,
-  } = useBackupConfirm({ challenges, onComplete })
+    focusRequest,
+    clearFocusRequest,
+  } = useBackupConfirm({ challenges, onComplete, disabled: checkpointLoading })
+
+  const anyWrong = challenges.some((_, i) => isWordWrong(i))
+
+  const inputRefs = useRef<Array<TextInput | null>>([])
+
+  useEffect(() => {
+    if (focusRequest === null) return
+    inputRefs.current[focusRequest]?.focus()
+    clearFocusRequest()
+  }, [focusRequest, clearFocusRequest])
 
   return (
     <Screen preset="fixed" keyboardShouldPersistTaps="handled">
@@ -79,6 +98,9 @@ export const SparkBackupConfirmScreen: React.FC = () => {
                       <Text style={styles.wordNumber}>{challenge.index + 1}.</Text>
                     )}
                     <TextInput
+                      ref={(ref) => {
+                        inputRefs.current[i] = ref
+                      }}
                       style={styles.input}
                       placeholder={`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} ${challenge.index + 1}`}
                       placeholderTextColor={colors.grey2}
@@ -99,6 +121,17 @@ export const SparkBackupConfirmScreen: React.FC = () => {
               )
             })}
           </View>
+
+          <View style={styles.errorContainer}>
+            {anyWrong && (
+              <>
+                <GaloyIcon name="warning" size={14} color={colors.error} />
+                <Text style={styles.errorText}>
+                  {LL.BackupScreen.ManualBackup.Confirm.incorrectWord()}
+                </Text>
+              </>
+            )}
+          </View>
         </View>
 
         {activeIndex !== undefined && (
@@ -115,7 +148,7 @@ export const SparkBackupConfirmScreen: React.FC = () => {
                 ? LL.BackupScreen.ManualBackup.Confirm.confirm()
                 : LL.BackupScreen.ManualBackup.Confirm.enterWords()
             }
-            disabled={!allCorrect}
+            disabled={!allCorrect || checkpointLoading}
             onPress={onComplete}
             {...testProps("backup-confirm-button")}
           />
@@ -170,6 +203,18 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 20,
     color: colors.black,
     fontFamily: "Source Sans Pro",
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    minHeight: 20,
+  },
+  errorText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.error,
   },
   buttonsContainer: {
     gap: 10,

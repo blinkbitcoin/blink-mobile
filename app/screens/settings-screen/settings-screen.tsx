@@ -13,6 +13,7 @@ import { Screen } from "@app/components/screen"
 import { SettingsCard } from "./settings-card"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { VersionComponent } from "@app/components/version"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useUnacknowledgedNotificationCountQuery } from "@app/graphql/generated"
@@ -83,9 +84,11 @@ export const SettingsScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
 
+  const isAuthed = useIsAuthed()
   const { isAtLeastLevelOne } = useLevel()
   const { shouldShowSettingsBanner } = useBackupNudgeState()
   const { data: unackNotificationCount } = useUnacknowledgedNotificationCountQuery({
+    skip: !isAuthed,
     fetchPolicy: "cache-and-network",
   })
 
