@@ -2297,7 +2297,17 @@
         "sender": "Sender",
         "recipient": "Recipient",
         "time": "Time",
-        "type": "Type"
+        "type": "Type",
+        "feeTier": "Fee speed",
+        "fast": "Fast",
+        "medium": "Medium",
+        "slow": "Slow",
+        "recommended": "Recommended",
+        "walletOffline": "Your wallet is offline. Please check your connection and try again.",
+        "sdkInsufficientFunds": "Not enough funds for this transaction.",
+        "sdkAmountTooLow": "Amount is too low for an on-chain transaction.",
+        "sdkNetworkError": "Network error. Please check your connection and try again.",
+        "sdkGenericError": "Unable to estimate fees. Please try a different amount."
     },
     "SettingsScreen": {
         "staticQr": "Printable static QR",
@@ -2467,6 +2477,19 @@
     },
     "SplashScreen": {
         "update": "Your app is outdated. An update is needed before the app can be used.\n\nThis can be done from the PlayStore for Android and Testflight for iOS"
+    },
+    "TransactionDescription": {
+        "sparkTransfer": "Spark Transfer",
+        "lightningPayment": "Lightning Payment",
+        "onchainDeposit": "On-chain Deposit",
+        "onchainWithdrawal": "On-chain Withdrawal",
+        "conversionFromBitcoin": "Conversion from Bitcoin",
+        "conversionToBitcoin": "Conversion to Bitcoin",
+        "conversionFromToken": "Conversion from {token: string}",
+        "conversionToToken": "Conversion to {token: string}",
+        "tokenTransfer": "{token: string} Transfer",
+        "payTo": "Pay to {address: string}",
+        "payment": "Payment"
     },
     "TransactionDetailScreen": {
         "paid": "Paid to/from",
@@ -2721,6 +2744,7 @@
         "or": "or",
         "openWallet": "Open Wallet",
         "onchain": "Onchain",
+        "spark": "Spark",
         "paymentRequest": "Payment Request",
         "phone": "Phone",
         "phoneNumber": "Phone Number",
@@ -3539,6 +3563,40 @@
         "trustModelDescription": "Your keys control your funds. Transactions are processed by Spark operators, not validated directly on Bitcoin L1.",
         "trustModelWarning": "Very small balances may not be economical to recover to the Bitcoin base chain.",
         "trustModelDismiss": "I understand"
+    },
+    "SelfCustodialOffline": {
+        "title": "Wallet is offline",
+        "description": "Your non-custodial wallet can't reach the network right now. Try again when you're back online.",
+        "retry": "Try again"
+    },
+    "UnclaimedDeposit": {
+        "screenTitle": "Unclaimed Deposits",
+        "cardTitle": "Claim {sats} sats",
+        "title": "You have {count} unclaimed deposit(s)",
+        "description": "Total: {sats} sats available to claim",
+        "claim": "Claim now",
+        "claimWithFee": "Claim (max fee: {fee} sats)",
+        "claiming": "Claiming...",
+        "refund": "Refund",
+        "refunding": "Refunding...",
+        "immature": "Waiting for confirmations...",
+        "feeExceeded": "Network fees are too high to claim ({requiredFee} sats required). Try again later or refund to an on-chain address.",
+        "missingUtxo": "This deposit is no longer available on the network.",
+        "belowDustLimit": "This deposit is too small to claim after fees. Wait for lower fees or refund to an on-chain address.",
+        "genericError": "Unable to claim: {error}",
+        "claimFailed": "Claim failed: {error}",
+        "refundFailed": "Refund failed: {error}",
+        "refundAddress": "Bitcoin address for refund",
+        "feeRate": "Network fee",
+        "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
+        "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
+        "feeRateHour": "Economy (~{sats} sats) ~60 min",
+        "feeRateUnit": "{rate} sat/vB",
+        "feeRateUnavailable": "Couldn't load network fees. Please check your connection and try again.",
+        "refundNow": "Refund now",
+        "refundSuccess": "Refund initiated successfully",
+        "claimSuccess": "Deposit claimed successfully",
+        "error": "Unable to claim this deposit"
     },
     "StableBalance": {
         "title": "Stable Balance",

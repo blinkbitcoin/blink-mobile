@@ -7412,6 +7412,46 @@ type RootTranslation = {
 		 * T​y​p​e
 		 */
 		type: string
+		/**
+		 * F​e​e​ ​s​p​e​e​d
+		 */
+		feeTier: string
+		/**
+		 * F​a​s​t
+		 */
+		fast: string
+		/**
+		 * M​e​d​i​u​m
+		 */
+		medium: string
+		/**
+		 * S​l​o​w
+		 */
+		slow: string
+		/**
+		 * R​e​c​o​m​m​e​n​d​e​d
+		 */
+		recommended: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		walletOffline: string
+		/**
+		 * N​o​t​ ​e​n​o​u​g​h​ ​f​u​n​d​s​ ​f​o​r​ ​t​h​i​s​ ​t​r​a​n​s​a​c​t​i​o​n​.
+		 */
+		sdkInsufficientFunds: string
+		/**
+		 * A​m​o​u​n​t​ ​i​s​ ​t​o​o​ ​l​o​w​ ​f​o​r​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​t​r​a​n​s​a​c​t​i​o​n​.
+		 */
+		sdkAmountTooLow: string
+		/**
+		 * N​e​t​w​o​r​k​ ​e​r​r​o​r​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		sdkNetworkError: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​e​s​t​i​m​a​t​e​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.
+		 */
+		sdkGenericError: string
 	}
 	SettingsScreen: {
 		/**
@@ -8000,6 +8040,56 @@ type RootTranslation = {
 	​T​h​i​s​ ​c​a​n​ ​b​e​ ​d​o​n​e​ ​f​r​o​m​ ​t​h​e​ ​P​l​a​y​S​t​o​r​e​ ​f​o​r​ ​A​n​d​r​o​i​d​ ​a​n​d​ ​T​e​s​t​f​l​i​g​h​t​ ​f​o​r​ ​i​O​S
 		 */
 		update: string
+	}
+	TransactionDescription: {
+		/**
+		 * S​p​a​r​k​ ​T​r​a​n​s​f​e​r
+		 */
+		sparkTransfer: string
+		/**
+		 * L​i​g​h​t​n​i​n​g​ ​P​a​y​m​e​n​t
+		 */
+		lightningPayment: string
+		/**
+		 * O​n​-​c​h​a​i​n​ ​D​e​p​o​s​i​t
+		 */
+		onchainDeposit: string
+		/**
+		 * O​n​-​c​h​a​i​n​ ​W​i​t​h​d​r​a​w​a​l
+		 */
+		onchainWithdrawal: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​f​r​o​m​ ​B​i​t​c​o​i​n
+		 */
+		conversionFromBitcoin: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​t​o​ ​B​i​t​c​o​i​n
+		 */
+		conversionToBitcoin: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​f​r​o​m​ ​{​t​o​k​e​n​}
+		 * @param {string} token
+		 */
+		conversionFromToken: RequiredParams<'token'>
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​t​o​ ​{​t​o​k​e​n​}
+		 * @param {string} token
+		 */
+		conversionToToken: RequiredParams<'token'>
+		/**
+		 * {​t​o​k​e​n​}​ ​T​r​a​n​s​f​e​r
+		 * @param {string} token
+		 */
+		tokenTransfer: RequiredParams<'token'>
+		/**
+		 * P​a​y​ ​t​o​ ​{​a​d​d​r​e​s​s​}
+		 * @param {string} address
+		 */
+		payTo: RequiredParams<'address'>
+		/**
+		 * P​a​y​m​e​n​t
+		 */
+		payment: string
 	}
 	TransactionDetailScreen: {
 		/**
@@ -8891,6 +8981,10 @@ type RootTranslation = {
 		 * O​n​c​h​a​i​n
 		 */
 		onchain: string
+		/**
+		 * S​p​a​r​k
+		 */
+		spark: string
 		/**
 		 * P​a​y​m​e​n​t​ ​R​e​q​u​e​s​t
 		 */
@@ -11697,6 +11791,142 @@ type RootTranslation = {
 		 * I​ ​u​n​d​e​r​s​t​a​n​d
 		 */
 		trustModelDismiss: string
+	}
+	SelfCustodialOffline: {
+		/**
+		 * W​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​w​a​l​l​e​t​ ​c​a​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​n​e​t​w​o​r​k​ ​r​i​g​h​t​ ​n​o​w​.​ ​T​r​y​ ​a​g​a​i​n​ ​w​h​e​n​ ​y​o​u​'​r​e​ ​b​a​c​k​ ​o​n​l​i​n​e​.
+		 */
+		description: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		retry: string
+	}
+	UnclaimedDeposit: {
+		/**
+		 * U​n​c​l​a​i​m​e​d​ ​D​e​p​o​s​i​t​s
+		 */
+		screenTitle: string
+		/**
+		 * C​l​a​i​m​ ​{​s​a​t​s​}​ ​s​a​t​s
+		 * @param {unknown} sats
+		 */
+		cardTitle: RequiredParams<'sats'>
+		/**
+		 * Y​o​u​ ​h​a​v​e​ ​{​c​o​u​n​t​}​ ​u​n​c​l​a​i​m​e​d​ ​d​e​p​o​s​i​t​(​s​)
+		 * @param {unknown} count
+		 */
+		title: RequiredParams<'count'>
+		/**
+		 * T​o​t​a​l​:​ ​{​s​a​t​s​}​ ​s​a​t​s​ ​a​v​a​i​l​a​b​l​e​ ​t​o​ ​c​l​a​i​m
+		 * @param {unknown} sats
+		 */
+		description: RequiredParams<'sats'>
+		/**
+		 * C​l​a​i​m​ ​n​o​w
+		 */
+		claim: string
+		/**
+		 * C​l​a​i​m​ ​(​m​a​x​ ​f​e​e​:​ ​{​f​e​e​}​ ​s​a​t​s​)
+		 * @param {unknown} fee
+		 */
+		claimWithFee: RequiredParams<'fee'>
+		/**
+		 * C​l​a​i​m​i​n​g​.​.​.
+		 */
+		claiming: string
+		/**
+		 * R​e​f​u​n​d
+		 */
+		refund: string
+		/**
+		 * R​e​f​u​n​d​i​n​g​.​.​.
+		 */
+		refunding: string
+		/**
+		 * W​a​i​t​i​n​g​ ​f​o​r​ ​c​o​n​f​i​r​m​a​t​i​o​n​s​.​.​.
+		 */
+		immature: string
+		/**
+		 * N​e​t​w​o​r​k​ ​f​e​e​s​ ​a​r​e​ ​t​o​o​ ​h​i​g​h​ ​t​o​ ​c​l​a​i​m​ ​(​{​r​e​q​u​i​r​e​d​F​e​e​}​ ​s​a​t​s​ ​r​e​q​u​i​r​e​d​)​.​ ​T​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​ ​o​r​ ​r​e​f​u​n​d​ ​t​o​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​a​d​d​r​e​s​s​.
+		 * @param {unknown} requiredFee
+		 */
+		feeExceeded: RequiredParams<'requiredFee'>
+		/**
+		 * T​h​i​s​ ​d​e​p​o​s​i​t​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​e​ ​n​e​t​w​o​r​k​.
+		 */
+		missingUtxo: string
+		/**
+		 * T​h​i​s​ ​d​e​p​o​s​i​t​ ​i​s​ ​t​o​o​ ​s​m​a​l​l​ ​t​o​ ​c​l​a​i​m​ ​a​f​t​e​r​ ​f​e​e​s​.​ ​W​a​i​t​ ​f​o​r​ ​l​o​w​e​r​ ​f​e​e​s​ ​o​r​ ​r​e​f​u​n​d​ ​t​o​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​a​d​d​r​e​s​s​.
+		 */
+		belowDustLimit: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​c​l​a​i​m​:​ ​{​e​r​r​o​r​}
+		 * @param {unknown} error
+		 */
+		genericError: RequiredParams<'error'>
+		/**
+		 * C​l​a​i​m​ ​f​a​i​l​e​d​:​ ​{​e​r​r​o​r​}
+		 * @param {unknown} error
+		 */
+		claimFailed: RequiredParams<'error'>
+		/**
+		 * R​e​f​u​n​d​ ​f​a​i​l​e​d​:​ ​{​e​r​r​o​r​}
+		 * @param {unknown} error
+		 */
+		refundFailed: RequiredParams<'error'>
+		/**
+		 * B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​ ​f​o​r​ ​r​e​f​u​n​d
+		 */
+		refundAddress: string
+		/**
+		 * N​e​t​w​o​r​k​ ​f​e​e
+		 */
+		feeRate: string
+		/**
+		 * F​a​s​t​e​s​t​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​1​0​ ​m​i​n
+		 * @param {unknown} sats
+		 */
+		feeRateFastest: RequiredParams<'sats'>
+		/**
+		 * N​o​r​m​a​l​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​3​0​ ​m​i​n
+		 * @param {unknown} sats
+		 */
+		feeRateHalfHour: RequiredParams<'sats'>
+		/**
+		 * E​c​o​n​o​m​y​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​6​0​ ​m​i​n
+		 * @param {unknown} sats
+		 */
+		feeRateHour: RequiredParams<'sats'>
+		/**
+		 * {​r​a​t​e​}​ ​s​a​t​/​v​B
+		 * @param {unknown} rate
+		 */
+		feeRateUnit: RequiredParams<'rate'>
+		/**
+		 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​n​e​t​w​o​r​k​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		feeRateUnavailable: string
+		/**
+		 * R​e​f​u​n​d​ ​n​o​w
+		 */
+		refundNow: string
+		/**
+		 * R​e​f​u​n​d​ ​i​n​i​t​i​a​t​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 */
+		refundSuccess: string
+		/**
+		 * D​e​p​o​s​i​t​ ​c​l​a​i​m​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 */
+		claimSuccess: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​c​l​a​i​m​ ​t​h​i​s​ ​d​e​p​o​s​i​t
+		 */
+		error: string
 	}
 	StableBalance: {
 		/**
@@ -19066,6 +19296,46 @@ export type TranslationFunctions = {
 		 * Type
 		 */
 		type: () => LocalizedString
+		/**
+		 * Fee speed
+		 */
+		feeTier: () => LocalizedString
+		/**
+		 * Fast
+		 */
+		fast: () => LocalizedString
+		/**
+		 * Medium
+		 */
+		medium: () => LocalizedString
+		/**
+		 * Slow
+		 */
+		slow: () => LocalizedString
+		/**
+		 * Recommended
+		 */
+		recommended: () => LocalizedString
+		/**
+		 * Your wallet is offline. Please check your connection and try again.
+		 */
+		walletOffline: () => LocalizedString
+		/**
+		 * Not enough funds for this transaction.
+		 */
+		sdkInsufficientFunds: () => LocalizedString
+		/**
+		 * Amount is too low for an on-chain transaction.
+		 */
+		sdkAmountTooLow: () => LocalizedString
+		/**
+		 * Network error. Please check your connection and try again.
+		 */
+		sdkNetworkError: () => LocalizedString
+		/**
+		 * Unable to estimate fees. Please try a different amount.
+		 */
+		sdkGenericError: () => LocalizedString
 	}
 	SettingsScreen: {
 		/**
@@ -19644,6 +19914,52 @@ export type TranslationFunctions = {
 	This can be done from the PlayStore for Android and Testflight for iOS
 		 */
 		update: () => LocalizedString
+	}
+	TransactionDescription: {
+		/**
+		 * Spark Transfer
+		 */
+		sparkTransfer: () => LocalizedString
+		/**
+		 * Lightning Payment
+		 */
+		lightningPayment: () => LocalizedString
+		/**
+		 * On-chain Deposit
+		 */
+		onchainDeposit: () => LocalizedString
+		/**
+		 * On-chain Withdrawal
+		 */
+		onchainWithdrawal: () => LocalizedString
+		/**
+		 * Conversion from Bitcoin
+		 */
+		conversionFromBitcoin: () => LocalizedString
+		/**
+		 * Conversion to Bitcoin
+		 */
+		conversionToBitcoin: () => LocalizedString
+		/**
+		 * Conversion from {token}
+		 */
+		conversionFromToken: (arg: { token: string }) => LocalizedString
+		/**
+		 * Conversion to {token}
+		 */
+		conversionToToken: (arg: { token: string }) => LocalizedString
+		/**
+		 * {token} Transfer
+		 */
+		tokenTransfer: (arg: { token: string }) => LocalizedString
+		/**
+		 * Pay to {address}
+		 */
+		payTo: (arg: { address: string }) => LocalizedString
+		/**
+		 * Payment
+		 */
+		payment: () => LocalizedString
 	}
 	TransactionDetailScreen: {
 		/**
@@ -20518,6 +20834,10 @@ export type TranslationFunctions = {
 		 * Onchain
 		 */
 		onchain: () => LocalizedString
+		/**
+		 * Spark
+		 */
+		spark: () => LocalizedString
 		/**
 		 * Payment Request
 		 */
@@ -23283,6 +23603,130 @@ export type TranslationFunctions = {
 		 * I understand
 		 */
 		trustModelDismiss: () => LocalizedString
+	}
+	SelfCustodialOffline: {
+		/**
+		 * Wallet is offline
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your non-custodial wallet can't reach the network right now. Try again when you're back online.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		retry: () => LocalizedString
+	}
+	UnclaimedDeposit: {
+		/**
+		 * Unclaimed Deposits
+		 */
+		screenTitle: () => LocalizedString
+		/**
+		 * Claim {sats} sats
+		 */
+		cardTitle: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * You have {count} unclaimed deposit(s)
+		 */
+		title: (arg: { count: unknown }) => LocalizedString
+		/**
+		 * Total: {sats} sats available to claim
+		 */
+		description: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * Claim now
+		 */
+		claim: () => LocalizedString
+		/**
+		 * Claim (max fee: {fee} sats)
+		 */
+		claimWithFee: (arg: { fee: unknown }) => LocalizedString
+		/**
+		 * Claiming...
+		 */
+		claiming: () => LocalizedString
+		/**
+		 * Refund
+		 */
+		refund: () => LocalizedString
+		/**
+		 * Refunding...
+		 */
+		refunding: () => LocalizedString
+		/**
+		 * Waiting for confirmations...
+		 */
+		immature: () => LocalizedString
+		/**
+		 * Network fees are too high to claim ({requiredFee} sats required). Try again later or refund to an on-chain address.
+		 */
+		feeExceeded: (arg: { requiredFee: unknown }) => LocalizedString
+		/**
+		 * This deposit is no longer available on the network.
+		 */
+		missingUtxo: () => LocalizedString
+		/**
+		 * This deposit is too small to claim after fees. Wait for lower fees or refund to an on-chain address.
+		 */
+		belowDustLimit: () => LocalizedString
+		/**
+		 * Unable to claim: {error}
+		 */
+		genericError: (arg: { error: unknown }) => LocalizedString
+		/**
+		 * Claim failed: {error}
+		 */
+		claimFailed: (arg: { error: unknown }) => LocalizedString
+		/**
+		 * Refund failed: {error}
+		 */
+		refundFailed: (arg: { error: unknown }) => LocalizedString
+		/**
+		 * Bitcoin address for refund
+		 */
+		refundAddress: () => LocalizedString
+		/**
+		 * Network fee
+		 */
+		feeRate: () => LocalizedString
+		/**
+		 * Fastest (~{sats} sats) ~10 min
+		 */
+		feeRateFastest: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * Normal (~{sats} sats) ~30 min
+		 */
+		feeRateHalfHour: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * Economy (~{sats} sats) ~60 min
+		 */
+		feeRateHour: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * {rate} sat/vB
+		 */
+		feeRateUnit: (arg: { rate: unknown }) => LocalizedString
+		/**
+		 * Couldn't load network fees. Please check your connection and try again.
+		 */
+		feeRateUnavailable: () => LocalizedString
+		/**
+		 * Refund now
+		 */
+		refundNow: () => LocalizedString
+		/**
+		 * Refund initiated successfully
+		 */
+		refundSuccess: () => LocalizedString
+		/**
+		 * Deposit claimed successfully
+		 */
+		claimSuccess: () => LocalizedString
+		/**
+		 * Unable to claim this deposit
+		 */
+		error: () => LocalizedString
 	}
 	StableBalance: {
 		/**

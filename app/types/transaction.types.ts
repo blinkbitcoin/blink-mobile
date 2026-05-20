@@ -35,6 +35,10 @@ export type NormalizedTransaction = {
   status: TransactionStatus
   timestamp: number
   paymentType: PaymentType
+  memo?: string
+  lnAddress?: string
+  tokenTicker?: string
+  isConversion?: boolean
   fee?: MoneyAmount<WalletCurrency>
   sourceAccountType?: AccountType
 }

@@ -7,12 +7,13 @@ import {
   isNonZeroMoneyAmount,
 } from "@app/types/amounts"
 
+import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
+
 import { Invoice, PaymentRequestState } from "../payment/index.types"
 import { usePaymentActions } from "./use-payment-actions"
 import { useLnurlWithdraw } from "./use-lnurl-withdraw"
-import { usePaymentRequest } from "./use-payment-request"
 
-type RequestState = NonNullable<ReturnType<typeof usePaymentRequest>>
+type RequestState = SelfCustodialPaymentRequestState
 
 type CarouselContext = {
   isOnChainPage: boolean

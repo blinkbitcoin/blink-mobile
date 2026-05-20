@@ -27,6 +27,7 @@ import {
   WalletAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
+import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction.types"
 import { WalletDescriptor } from "@app/types/wallets"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
@@ -114,6 +115,7 @@ type BasePaymentDetail<T extends WalletCurrency> = {
     | typeof PaymentType.Onchain
     | typeof PaymentType.Lightning
     | typeof PaymentType.Lnurl
+    | typeof SelfCustodialPaymentType.Spark
   destination: string
   sendingWalletDescriptor: WalletDescriptor<T>
   convertMoneyAmount: ConvertMoneyAmount

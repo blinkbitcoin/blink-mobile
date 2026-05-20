@@ -10,13 +10,8 @@ import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
 import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
-import {
-  useSendBitcoinConfirmationScreenQuery,
-  WalletCurrency,
-} from "@app/graphql/generated"
+import { WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useClipboard, useDisplayCurrency } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -38,6 +33,7 @@ import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
+import { useSendBalances } from "./hooks/use-send-wallets"
 import useFee from "./use-fee"
 import { useSendPayment } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
@@ -95,10 +91,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   } = useDisplayCurrency()
   const saveLnAddressContact = useSaveLnAddressContact()
 
-  const { data } = useSendBitcoinConfirmationScreenQuery({ skip: !useIsAuthed() })
-
-  const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
-  const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
+  const { btcWallet, usdWallet } = useSendBalances()
 
   const btcBalanceMoneyAmount = toBtcMoneyAmount(btcWallet?.balance)
 

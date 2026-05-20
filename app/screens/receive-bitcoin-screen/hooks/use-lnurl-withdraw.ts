@@ -5,9 +5,18 @@ import fetch from "cross-fetch"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import { ReceiveDestination } from "../../send-bitcoin-screen/payment-destination/index.types"
-import { Invoice, PaymentRequest } from "../payment/index.types"
+import { Invoice } from "../payment/index.types"
 
-export const useLnurlWithdraw = (pr: PaymentRequest | null | undefined) => {
+type LnurlWithdrawablePr = {
+  info?: {
+    data?: {
+      invoiceType?: string
+      paymentRequest?: string
+    } | null
+  } | null
+}
+
+export const useLnurlWithdraw = (pr: LnurlWithdrawablePr | null | undefined) => {
   const { LL } = useI18nContext()
 
   const receiveViaNFC = useCallback(

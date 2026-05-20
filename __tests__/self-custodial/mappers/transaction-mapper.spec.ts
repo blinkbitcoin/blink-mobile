@@ -7,30 +7,48 @@ import {
 import { AccountType } from "@app/types/wallet.types"
 
 import {
+  mapCurrency,
   mapSelfCustodialTransaction,
   mapSelfCustodialTransactions,
 } from "@app/self-custodial/mappers/transaction-mapper"
 
-jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
-  PaymentMethod: {
-    Lightning: 0,
-    Spark: 1,
-    Token: 2,
-    Deposit: 3,
-    Withdraw: 4,
-    Unknown: 5,
-  },
-  PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
-  PaymentType: { Send: 0, Receive: 1 },
-  // eslint-disable-next-line camelcase
-  PaymentDetails_Tags: {
-    Spark: "Spark",
-    Token: "Token",
-    Lightning: "Lightning",
-    Withdraw: "Withdraw",
-    Deposit: "Deposit",
-  },
+const mockRecordError = jest.fn()
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: (err: Error) => mockRecordError(err),
 }))
+
+jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
+  const instanceOf = (tag: string) => ({
+    instanceOf: (obj: { tag?: string }) => obj?.tag === tag,
+  })
+  return {
+    PaymentMethod: {
+      Lightning: 0,
+      Spark: 1,
+      Token: 2,
+      Deposit: 3,
+      Withdraw: 4,
+      Unknown: 5,
+    },
+    PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
+    PaymentType: { Send: 0, Receive: 1 },
+    // eslint-disable-next-line camelcase
+    PaymentDetails_Tags: {
+      Spark: "Spark",
+      Token: "Token",
+      Lightning: "Lightning",
+      Withdraw: "Withdraw",
+      Deposit: "Deposit",
+    },
+    PaymentDetails: {
+      Lightning: instanceOf("Lightning"),
+      Spark: instanceOf("Spark"),
+      Token: instanceOf("Token"),
+      Deposit: instanceOf("Deposit"),
+      Withdraw: instanceOf("Withdraw"),
+    },
+  }
+})
 
 type TestPayment = Parameters<typeof mapSelfCustodialTransaction>[0]
 
@@ -118,7 +136,13 @@ describe("mapSelfCustodialTransaction", () => {
 
   it("fees always use BTC currency", () => {
     const result = mapSelfCustodialTransaction(
-      createPayment({ method: 2, details: { tag: "Token", inner: {} } }),
+      createPayment({
+        method: 2,
+        details: {
+          tag: "Token",
+          inner: { metadata: { ticker: "USDB", decimals: 6, identifier: "test" } },
+        },
+      }),
     )
 
     expect(result.fee?.currency).toBe(WalletCurrency.Btc)
@@ -142,6 +166,87 @@ describe("mapSelfCustodialTransactions", () => {
   })
 })
 
+describe("mapCurrency", () => {
+  it("maps Token payment details to USD", () => {
+    expect(mapCurrency({ tag: "Token", inner: {} } as never)).toBe(WalletCurrency.Usd)
+  })
+
+  it("maps Lightning payment details to BTC", () => {
+    expect(mapCurrency({ tag: "Lightning", inner: {} } as never)).toBe(WalletCurrency.Btc)
+  })
+
+  it("defaults to BTC when details are undefined", () => {
+    expect(mapCurrency(undefined)).toBe(WalletCurrency.Btc)
+  })
+})
+
+describe("mapper exhaustiveness (Critical #8)", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("logs and falls back to Lightning when SDK returns PaymentMethod.Unknown", () => {
+    const result = mapSelfCustodialTransaction(
+      createPayment({
+        method: 5, // PaymentMethod.Unknown
+        details: { tag: "Spark", inner: {} },
+      }),
+    )
+
+    expect(result.paymentType).toBe(PaymentType.Lightning)
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("mapPaymentMethod"),
+      }),
+    )
+  })
+
+  it("maps PaymentMethod.Token (without Token details) to Conversion", () => {
+    const result = mapSelfCustodialTransaction(
+      createPayment({
+        method: 2, // PaymentMethod.Token
+        details: { tag: "Spark", inner: {} },
+      }),
+    )
+
+    expect(result.paymentType).toBe(PaymentType.Conversion)
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("logs and falls back to Receive when SDK returns an unhandled paymentType", () => {
+    const result = mapSelfCustodialTransaction(
+      createPayment({ paymentType: 99 } as never),
+    )
+
+    expect(result.direction).toBe(TransactionDirection.Receive)
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("mapDirection"),
+      }),
+    )
+  })
+
+  it("maps every known PaymentDetails tag to the right currency without logging", () => {
+    expect(mapCurrency({ tag: "Spark", inner: {} } as never)).toBe(WalletCurrency.Btc)
+    expect(mapCurrency({ tag: "Lightning", inner: {} } as never)).toBe(WalletCurrency.Btc)
+    expect(mapCurrency({ tag: "Withdraw", inner: {} } as never)).toBe(WalletCurrency.Btc)
+    expect(mapCurrency({ tag: "Deposit", inner: {} } as never)).toBe(WalletCurrency.Btc)
+    expect(mapCurrency({ tag: "Token", inner: {} } as never)).toBe(WalletCurrency.Usd)
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("logs and falls back to BTC for an unknown PaymentDetails tag", () => {
+    const result = mapCurrency({ tag: "FutureTag", inner: {} } as never)
+
+    expect(result).toBe(WalletCurrency.Btc)
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("mapCurrency"),
+      }),
+    )
+  })
+})
+
 describe("edge cases", () => {
   it("handles zero-amount payment", () => {
     const payment = createPayment({ amount: BigInt(0) })
@@ -157,21 +262,23 @@ describe("edge cases", () => {
     expect(result.fee?.amount).toBe(0)
   })
 
-  it("handles Deposit detail tag as Lightning", () => {
+  it("handles Deposit method as Onchain", () => {
     const payment = createPayment({
+      method: 3,
       details: { tag: "Deposit", inner: {} },
     })
     const result = mapSelfCustodialTransaction(payment)
 
-    expect(result.paymentType).toBe(PaymentType.Lightning)
+    expect(result.paymentType).toBe(PaymentType.Onchain)
   })
 
-  it("handles Withdraw detail tag as Lightning", () => {
+  it("handles Withdraw method as Onchain", () => {
     const payment = createPayment({
+      method: 4,
       details: { tag: "Withdraw", inner: {} },
     })
     const result = mapSelfCustodialTransaction(payment)
 
-    expect(result.paymentType).toBe(PaymentType.Lightning)
+    expect(result.paymentType).toBe(PaymentType.Onchain)
   })
 })

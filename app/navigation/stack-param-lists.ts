@@ -106,6 +106,7 @@ export type RootStackParamList = {
   phoneRegistrationInitiate: undefined
   phoneRegistrationValidate: { phone: string; channel: PhoneCodeChannelType }
   transactionDetail: { txid: string }
+  unclaimedDepositsScreen: undefined
   transactionHistory?: {
     wallets?: ReadonlyArray<{
       readonly id: string

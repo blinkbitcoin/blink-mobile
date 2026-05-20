@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 jest.mock("react-native-config", () => ({
   SPARK_TOKEN_IDENTIFIER: "test-token-id",
   BREEZ_API_KEY: "test-api-key",
@@ -9,6 +10,8 @@ jest.mock("react-native-fs", () => ({
 }))
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
+  BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
+  InputType_Tags: { SparkAddress: "SparkAddress" },
   Network: { Mainnet: 0, Regtest: 1 },
   Seed: { Mnemonic: jest.fn().mockImplementation((args: unknown) => args) },
   StableBalanceActiveLabel: {

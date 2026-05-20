@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
@@ -14,6 +15,7 @@ const mockRecordError = jest.fn()
 
 jest.mock("bip39", () => ({
   generateMnemonic: (...args: unknown[]) => mockGenerateMnemonic(...args),
+  validateMnemonic: jest.fn().mockReturnValue(true),
 }))
 
 jest.mock("react-native-quick-crypto", () => ({
@@ -21,6 +23,8 @@ jest.mock("react-native-quick-crypto", () => ({
 }))
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
+  BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
+  InputType_Tags: { SparkAddress: "SparkAddress" },
   Network: { Mainnet: 0, Regtest: 1 },
   Seed: { Mnemonic: jest.fn().mockImplementation((args) => args) },
   StableBalanceActiveLabel: {

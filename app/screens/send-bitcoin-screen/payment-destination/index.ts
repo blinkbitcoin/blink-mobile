@@ -18,6 +18,7 @@ export * from "./intraledger"
 export * from "./lightning"
 export * from "./lnurl"
 export * from "./onchain"
+export * from "./spark"
 
 export const parseDestination = async ({
   rawInput,
