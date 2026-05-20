@@ -1,144 +1,250 @@
-jest.mock("react-native-config", () => ({
-  SPARK_TOKEN_IDENTIFIER: "test-token-id",
-  BREEZ_API_KEY: "test-api-key",
-  BREEZ_NETWORK: "regtest",
-}))
-
-jest.mock("react-native-fs", () => ({
-  DocumentDirectoryPath: "/test/documents",
-}))
-
-jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
-  Network: { Mainnet: 0, Regtest: 1 },
-  PrepareSendPaymentRequest: {
-    create: jest.fn((args: Record<string, unknown>) => args),
-  },
-  SendPaymentRequest: {
-    create: jest.fn((args: Record<string, unknown>) => args),
-  },
-}))
-
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { ConvertDirection, ConvertErrorCode } from "@app/types/payment.types"
 import { WalletCurrency } from "@app/graphql/generated"
-import { ConvertDirection, PaymentResultStatus } from "@app/types/payment.types"
 
-import { createConvert } from "@app/self-custodial/bridge/convert"
+import { createGetConversionQuote } from "@app/self-custodial/bridge/convert"
 
-const buildSdk = () => ({
-  prepareSendPayment: jest.fn(),
-  sendPayment: jest.fn(),
+const mockFetchLimits = jest.fn()
+const mockRequireTokenId = jest.fn(() => "usdb-token-id")
+const mockRecordError = jest.fn()
+
+jest.mock("@react-native-firebase/crashlytics", () => ({
+  __esModule: true,
+  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+}))
+
+jest.mock("@app/self-custodial/bridge/limits", () => {
+  const actual = jest.requireActual("@app/self-custodial/bridge/limits")
+  return {
+    ...actual,
+    fetchConversionLimits: (...args: unknown[]) => mockFetchLimits(...args),
+  }
 })
 
-const buildAmount = (currency: WalletCurrency, amount = 1000) => ({
-  amount,
-  currency,
-  currencyCode: currency === WalletCurrency.Btc ? "BTC" : "USD",
+jest.mock("@app/self-custodial/config", () => ({
+  SparkConfig: { maxSlippageBps: 50 },
+  requireSparkTokenIdentifier: () => mockRequireTokenId(),
+  SparkToken: { Label: "USDB", DefaultDecimals: 6 },
+}))
+
+const createSdk = () => ({
+  prepareSendPayment: jest.fn().mockResolvedValue({
+    paymentMethod: {},
+    conversionEstimate: {
+      fee: BigInt(50000),
+      amountAdjustment: undefined,
+    },
+  }),
+  sendPayment: jest.fn().mockResolvedValue(undefined),
+  receivePayment: jest.fn().mockResolvedValue({ paymentRequest: "sp1own-spark-address" }),
+  getInfo: jest.fn().mockResolvedValue({
+    tokenBalances: {
+      "usdb-token-id": {
+        tokenMetadata: { identifier: "usdb-token-id", decimals: 6 },
+      },
+    },
+  }),
 })
 
-describe("createConvert", () => {
-  it("returns Success when prepareSendPayment + sendPayment both resolve (BTC → USD)", async () => {
-    const sdk = buildSdk()
-    sdk.prepareSendPayment.mockResolvedValue({ id: "prepared" })
-    sdk.sendPayment.mockResolvedValue(undefined)
+describe("createGetConversionQuote — BTC → USD", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
 
-    const convert = createConvert(sdk as never)
-    const result = await convert({
-      amount: buildAmount(WalletCurrency.Btc),
+  it("prepares a payment to own spark address with FromBitcoin conversion and USDB destination amount in token base units", async () => {
+    mockFetchLimits.mockResolvedValue({ minFromAmount: 1000, minToAmount: 0 })
+    const sdk = createSdk()
+
+    const quote = await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(5000),
+      toAmount: toUsdMoneyAmount(137),
       direction: ConvertDirection.BtcToUsd,
     })
 
-    expect(result.status).toBe(PaymentResultStatus.Success)
+    expect(quote).not.toBeNull()
+    expect(sdk.receivePayment).toHaveBeenCalled()
+    const prepArg = sdk.prepareSendPayment.mock.calls[0][0]
+    expect(prepArg.paymentRequest).toBe("sp1own-spark-address")
+    expect(prepArg.amount).toBe(BigInt(1_370_000))
+    expect(prepArg.tokenIdentifier).toBe("usdb-token-id")
+    expect(prepArg.conversionOptions.conversionType).toEqual({ tag: "FromBitcoin" })
+    expect(prepArg.conversionOptions.maxSlippageBps).toBe(50)
   })
 
-  it("forwards the configured tokenIdentifier on BTC → USD conversions", async () => {
-    const sdk = buildSdk()
-    sdk.prepareSendPayment.mockResolvedValue({ id: "prepared" })
-    sdk.sendPayment.mockResolvedValue(undefined)
+  it("execute() sends the prepared payment and returns success", async () => {
+    mockFetchLimits.mockResolvedValue({ minFromAmount: 1000, minToAmount: 0 })
+    const sdk = createSdk()
 
-    const convert = createConvert(sdk as never)
-    await convert({
-      amount: buildAmount(WalletCurrency.Btc),
+    const quote = await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(5000),
+      toAmount: toUsdMoneyAmount(137),
       direction: ConvertDirection.BtcToUsd,
     })
 
-    expect(sdk.prepareSendPayment).toHaveBeenCalledWith(
-      expect.objectContaining({ tokenIdentifier: "test-token-id" }),
-    )
+    const result = await quote!.execute()
+
+    expect(result.status).toBe("success")
+    expect(sdk.sendPayment).toHaveBeenCalled()
   })
 
-  it("omits tokenIdentifier on USD → BTC conversions", async () => {
-    const sdk = buildSdk()
-    sdk.prepareSendPayment.mockResolvedValue({ id: "prepared" })
-    sdk.sendPayment.mockResolvedValue(undefined)
+  it("exposes the estimated fee converted to a USD MoneyAmount in cents", async () => {
+    mockFetchLimits.mockResolvedValue({ minFromAmount: 0, minToAmount: 0 })
+    const sdk = createSdk()
 
-    const convert = createConvert(sdk as never)
-    await convert({
-      amount: buildAmount(WalletCurrency.Usd),
+    const quote = await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(5000),
+      toAmount: toUsdMoneyAmount(137),
+      direction: ConvertDirection.BtcToUsd,
+    })
+
+    expect(quote!.feeAmount.currency).toBe(WalletCurrency.Usd)
+    expect(quote!.feeAmount.amount).toBe(5)
+  })
+
+  it("throws BelowMinimum and records to crashlytics when fromAmount is under the SDK minimum", async () => {
+    mockFetchLimits.mockResolvedValue({ minFromAmount: 10000, minToAmount: 0 })
+    const sdk = createSdk()
+
+    await expect(
+      createGetConversionQuote(sdk as never)({
+        fromAmount: toBtcMoneyAmount(5000),
+        toAmount: toUsdMoneyAmount(137),
+        direction: ConvertDirection.BtcToUsd,
+      }),
+    ).rejects.toMatchObject({ code: ConvertErrorCode.BelowMinimum })
+
+    expect(mockRecordError).toHaveBeenCalled()
+    expect(sdk.prepareSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("throws LimitsUnavailable and records to crashlytics when fetchConversionLimits throws", async () => {
+    mockFetchLimits.mockRejectedValue(new Error("limits unavailable"))
+    const sdk = createSdk()
+
+    await expect(
+      createGetConversionQuote(sdk as never)({
+        fromAmount: toBtcMoneyAmount(5000),
+        toAmount: toUsdMoneyAmount(137),
+        direction: ConvertDirection.BtcToUsd,
+      }),
+    ).rejects.toMatchObject({ code: ConvertErrorCode.LimitsUnavailable })
+
+    expect(mockRecordError).toHaveBeenCalled()
+    expect(sdk.prepareSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("skips minimum check when minFromAmount is null (no limit)", async () => {
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
+    const sdk = createSdk()
+
+    const quote = await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(100),
+      toAmount: toUsdMoneyAmount(7),
+      direction: ConvertDirection.BtcToUsd,
+    })
+
+    expect(quote).not.toBeNull()
+  })
+})
+
+describe("createGetConversionQuote — USD → BTC", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("prepares a payment with ToBitcoin conversion and sat destination amount", async () => {
+    mockFetchLimits.mockResolvedValue({ minFromAmount: 10, minToAmount: 500 })
+    const sdk = createSdk()
+
+    const quote = await createGetConversionQuote(sdk as never)({
+      fromAmount: toUsdMoneyAmount(100),
+      toAmount: toBtcMoneyAmount(1300),
       direction: ConvertDirection.UsdToBtc,
     })
 
-    expect(sdk.prepareSendPayment).toHaveBeenCalledWith(
-      expect.objectContaining({ tokenIdentifier: undefined }),
-    )
+    expect(quote).not.toBeNull()
+    const arg = sdk.prepareSendPayment.mock.calls[0][0]
+    expect(arg.paymentRequest).toBe("sp1own-spark-address")
+    expect(arg.amount).toBe(BigInt(1300))
+    expect(arg.tokenIdentifier).toBeUndefined()
+    expect(arg.conversionOptions.conversionType).toEqual({
+      tag: "ToBitcoin",
+      inner: { fromTokenIdentifier: "usdb-token-id" },
+    })
+    expect(arg.conversionOptions.maxSlippageBps).toBe(50)
+  })
+})
+
+describe("createGetConversionQuote — error handling", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockFetchLimits.mockResolvedValue({ minFromAmount: null, minToAmount: null })
   })
 
-  it("returns Failed with the SDK error message when prepare rejects", async () => {
-    const sdk = buildSdk()
-    sdk.prepareSendPayment.mockRejectedValue(new Error("prepare boom"))
+  it("re-throws and records to crashlytics when prepareSendPayment fails", async () => {
+    const sdk = {
+      prepareSendPayment: jest.fn().mockRejectedValue(new Error("prepare failed")),
+      sendPayment: jest.fn(),
+      receivePayment: jest
+        .fn()
+        .mockResolvedValue({ paymentRequest: "sp1own-spark-address" }),
+      getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    }
 
-    const convert = createConvert(sdk as never)
-    const result = await convert({
-      amount: buildAmount(WalletCurrency.Btc),
-      direction: ConvertDirection.BtcToUsd,
-    })
+    await expect(
+      createGetConversionQuote(sdk as never)({
+        fromAmount: toBtcMoneyAmount(5000),
+        toAmount: toUsdMoneyAmount(137),
+        direction: ConvertDirection.BtcToUsd,
+      }),
+    ).rejects.toThrow("prepare failed")
 
-    expect(result.status).toBe(PaymentResultStatus.Failed)
-    expect(result.errors?.[0].message).toBe("prepare boom")
+    expect(mockRecordError).toHaveBeenCalled()
     expect(sdk.sendPayment).not.toHaveBeenCalled()
   })
 
-  it("returns Failed when sendPayment rejects after a successful prepare", async () => {
-    const sdk = buildSdk()
-    sdk.prepareSendPayment.mockResolvedValue({ id: "prepared" })
-    sdk.sendPayment.mockRejectedValue(new Error("send boom"))
+  it("execute() records to crashlytics and returns failed when sendPayment throws", async () => {
+    const sdk = {
+      prepareSendPayment: jest.fn().mockResolvedValue({
+        paymentMethod: {},
+        conversionEstimate: { fee: BigInt(0), amountAdjustment: undefined },
+      }),
+      sendPayment: jest.fn().mockRejectedValue(new Error("send failed")),
+      receivePayment: jest
+        .fn()
+        .mockResolvedValue({ paymentRequest: "sp1own-spark-address" }),
+      getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    }
 
-    const convert = createConvert(sdk as never)
-    const result = await convert({
-      amount: buildAmount(WalletCurrency.Btc),
+    const quote = await createGetConversionQuote(sdk as never)({
+      fromAmount: toBtcMoneyAmount(5000),
+      toAmount: toUsdMoneyAmount(137),
       direction: ConvertDirection.BtcToUsd,
     })
+    const result = await quote!.execute()
 
-    expect(result.status).toBe(PaymentResultStatus.Failed)
-    expect(result.errors?.[0].message).toBe("send boom")
+    expect(result.status).toBe("failed")
+    expect(result.errors?.[0].message).toBe("send failed")
+    expect(mockRecordError).toHaveBeenCalled()
   })
 
-  it("wraps non-Error throws into a Conversion-failed message", async () => {
-    const sdk = buildSdk()
-    sdk.prepareSendPayment.mockRejectedValue("string thrown")
-
-    const convert = createConvert(sdk as never)
-    const result = await convert({
-      amount: buildAmount(WalletCurrency.Btc),
-      direction: ConvertDirection.BtcToUsd,
+  it("propagates the configuration error when SPARK_TOKEN_IDENTIFIER is missing", async () => {
+    mockFetchLimits.mockResolvedValue({ minFromAmount: 0, minToAmount: 0 })
+    mockRequireTokenId.mockImplementationOnce(() => {
+      throw new Error("SPARK_TOKEN_IDENTIFIER is not configured for this build")
     })
+    const sdk = createSdk()
 
-    expect(result.status).toBe(PaymentResultStatus.Failed)
-    expect(result.errors?.[0].message).toContain("Conversion failed")
-    expect(result.errors?.[0].message).toContain("string thrown")
-  })
+    await expect(
+      createGetConversionQuote(sdk as never)({
+        fromAmount: toBtcMoneyAmount(5000),
+        toAmount: toUsdMoneyAmount(137),
+        direction: ConvertDirection.BtcToUsd,
+      }),
+    ).rejects.toThrow("SPARK_TOKEN_IDENTIFIER is not configured for this build")
 
-  it("forwards the requested amount as a BigInt", async () => {
-    const sdk = buildSdk()
-    sdk.prepareSendPayment.mockResolvedValue({})
-    sdk.sendPayment.mockResolvedValue(undefined)
-
-    const convert = createConvert(sdk as never)
-    await convert({
-      amount: buildAmount(WalletCurrency.Btc, 12345),
-      direction: ConvertDirection.BtcToUsd,
-    })
-
-    expect(sdk.prepareSendPayment).toHaveBeenCalledWith(
-      expect.objectContaining({ amount: BigInt(12345) }),
-    )
+    expect(mockRecordError).toHaveBeenCalled()
+    expect(sdk.prepareSendPayment).not.toHaveBeenCalled()
+    expect(sdk.sendPayment).not.toHaveBeenCalled()
   })
 })

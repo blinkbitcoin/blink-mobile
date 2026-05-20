@@ -70,7 +70,11 @@
     "receivingAccount": "Akun penerima",
     "infoBitcoin": "Jumlah Bitcoin hanya perkiraan. Bisa sedikit berbeda.",
     "infoDollar": "Jumlah Dolar hanya perkiraan. Bisa sedikit berbeda.",
-    "transferButtonText": "Transfer {fromWallet} ke {toWallet}"
+    "transferButtonText": "Transfer {fromWallet} ke {toWallet}",
+    "feeLabel": "Biaya konversi",
+    "feeError": "Tidak dapat mengambil biaya konversi",
+    "amountFloored": "Jumlah dinaikkan untuk memenuhi minimum konversi.",
+    "amountDustBumped": "Jumlah dinaikkan untuk mengonversi seluruh saldo Anda."
   },
   "ConversionSuccessScreen": {
     "message": "Konversi Berhasil",
@@ -3563,7 +3567,34 @@
   },
   "StableBalance": {
     "title": "Saldo stabil",
-    "description": "Simpan saldo dalam USD didukung USDB di Spark."
+    "description": "Simpan saldo dalam USD didukung USDB di Spark.",
+    "balanceLabelBtc": "Saldo · SATS",
+    "balanceLabelUsd": "Saldo · USD",
+    "settingsRowTitle": "Saldo Stabil",
+    "settingsTitle": "Saldo Stabil",
+    "settingsDescription": "Simpan sebagian dompet Anda dalam USD. Konversi antara BTC dan USD secara manual kapan saja menggunakan tindakan Konversi.",
+    "activationLabel": "Aktif",
+    "activeHint": "Dompet Anda menyimpan USD melalui USDB.",
+    "inactiveHint": "Dompet Anda hanya menyimpan BTC.",
+    "deactivateWarningBody": "Anda masih memiliki {amount:string}. Konversikan ke BTC terlebih dahulu, atau saldo USD Anda akan disembunyikan hingga Anda mengaktifkan kembali Stable Balance.",
+    "toggleFailedToast": "Tidak dapat memperbarui Stable Balance. Silakan coba lagi.",
+    "toggleModal": {
+      "activateTitle": "Aktifkan Saldo Stabil",
+      "activateBody": "Saldo BTC Anda akan dikonversi ke USDB. Ini adalah perkiraan biaya konversi.",
+      "activateConfirm": "Aktifkan",
+      "deactivateTitle": "Nonaktifkan Saldo Stabil",
+      "deactivateBody": "Saldo USDB Anda akan dikonversi kembali ke BTC. Ini adalah perkiraan biaya konversi.",
+      "deactivateConfirm": "Nonaktifkan",
+      "cancel": "Batal"
+    },
+    "firstTimeModal": {
+      "title": "Tentang Konversi",
+      "dualBalance": "BTC dan USD adalah dua saldo independen di dompet Anda. Gunakan Convert kapan saja untuk memindahkan dana di antara keduanya.",
+      "trustDisclosure": "Mode USD menggunakan token USDB di Spark. Asumsi kepercayaan berbeda dari memegang BTC langsung. USDB bergantung pada penerbit token Spark.",
+      "acknowledge": "Saya mengerti"
+    },
+    "minimumConversion": "Konversi minimum: {amount:string}",
+    "conversionUnavailable": "Konversi sementara tidak tersedia. Silakan coba lagi."
   },
   "BackendFeatureGate": {
     "title": "Fitur tidak tersedia",
@@ -3592,6 +3623,10 @@
     "title": "Dompet offline",
     "description": "Dompet non-kustodian Anda tidak dapat mencapai jaringan saat ini. Coba lagi ketika Anda kembali online.",
     "retry": "Coba lagi"
+  },
+  "SelfCustodialBalance": {
+    "staleLabel": "USANG",
+    "syncFailedToast": "Sinkronisasi saldo gagal. Saldo Anda mungkin sudah tidak terbaru."
   },
   "UnclaimedDeposit": {
     "title": "Anda memiliki {count} deposit yang belum diklaim",

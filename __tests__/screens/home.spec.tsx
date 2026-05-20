@@ -14,6 +14,15 @@ import {
 
 let currentMocks: MockedResponse[] = []
 
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  __esModule: true,
+  default: {
+    getItem: jest.fn().mockResolvedValue(null),
+    setItem: jest.fn().mockResolvedValue(undefined),
+    removeItem: jest.fn().mockResolvedValue(undefined),
+  },
+}))
+
 jest.mock("@app/hooks/use-backup-nudge-state", () => ({
   useBackupNudgeState: () => ({
     shouldShowBanner: false,
@@ -30,6 +39,13 @@ jest.mock("@app/screens/spark-onboarding/trust-model-screen", () => ({
 
 // eslint-disable-next-line prefer-const
 let mockActiveWalletOverride: Record<string, unknown> | null = null
+// eslint-disable-next-line prefer-const
+let mockFeatureFlagsOverride: Record<string, unknown> | null = null
+// eslint-disable-next-line prefer-const
+let mockSelfCustodialWalletOverride: Record<string, unknown> | null = null
+const mockToggleBalanceMode = jest.fn()
+// eslint-disable-next-line prefer-const
+let mockBalanceModeValue: "btc" | "usd" = "usd"
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () =>
@@ -42,6 +58,57 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
       needsBackendAuth: true,
     },
 }))
+
+jest.mock("@app/config/feature-flags-context", () => {
+  const actual = jest.requireActual("@app/config/feature-flags-context")
+  return {
+    ...actual,
+    useFeatureFlags: () =>
+      mockFeatureFlagsOverride ?? {
+        nonCustodialEnabled: false,
+        stableBalanceEnabled: false,
+      },
+    useRemoteConfig: () => ({
+      loading: false,
+      remoteConfigReady: true,
+      featureFlags: {
+        nonCustodialEnabled: false,
+        stableBalanceEnabled: false,
+      },
+    }),
+  }
+})
+
+jest.mock("@app/self-custodial/providers/wallet-provider", () => ({
+  useSelfCustodialWallet: () =>
+    mockSelfCustodialWalletOverride ?? {
+      sdk: null,
+      wallets: [],
+      status: "unavailable",
+      isStableBalanceActive: false,
+      isBalanceStale: false,
+      lastReceivedPaymentId: null,
+      hasMoreTransactions: false,
+      loadingMore: false,
+      loadMore: jest.fn(),
+      refreshWallets: jest.fn(),
+      refreshStableBalanceActive: jest.fn(),
+      retry: jest.fn(),
+    },
+}))
+
+jest.mock("@app/hooks/use-balance-mode", () => {
+  const BalanceMode = { Btc: "btc", Usd: "usd" } as const
+  return {
+    BalanceMode,
+    useBalanceMode: () => ({
+      mode: mockBalanceModeValue,
+      setMode: jest.fn(),
+      toggleMode: mockToggleBalanceMode,
+      loaded: true,
+    }),
+  }
+})
 
 jest.mock("@app/utils/helper", () => ({
   ...jest.requireActual("@app/utils/helper"),
@@ -403,5 +470,124 @@ describe("HomeScreen", () => {
     expect(getByTestId("slide-up-handle")).toBeTruthy()
 
     mockActiveWalletOverride = null
+  })
+
+  describe("Stable Balance mode toggle (self-custodial)", () => {
+    const selfCustodialWallets = [
+      {
+        id: "btc-1",
+        walletCurrency: "BTC",
+        balance: { amount: 5517, currency: "BTC", currencyCode: "BTC" },
+        transactions: [],
+      },
+      {
+        id: "usd-1",
+        walletCurrency: "USD",
+        balance: { amount: 100, currency: "USD", currencyCode: "USD" },
+        transactions: [],
+      },
+    ]
+
+    beforeEach(() => {
+      mockToggleBalanceMode.mockClear()
+      mockActiveWalletOverride = {
+        wallets: selfCustodialWallets,
+        status: "ready",
+        accountType: "self-custodial",
+        isReady: true,
+        isSelfCustodial: true,
+        needsBackendAuth: false,
+      }
+      mockSelfCustodialWalletOverride = {
+        sdk: { id: "fake-sdk" },
+        wallets: selfCustodialWallets,
+        status: "ready",
+        isStableBalanceActive: true,
+        isBalanceStale: false,
+        lastReceivedPaymentId: null,
+        hasMoreTransactions: false,
+        loadingMore: false,
+        loadMore: jest.fn(),
+        refreshWallets: jest.fn(),
+        refreshStableBalanceActive: jest.fn(),
+        retry: jest.fn(),
+      }
+    })
+
+    afterEach(() => {
+      mockActiveWalletOverride = null
+      mockSelfCustodialWalletOverride = null
+      mockFeatureFlagsOverride = null
+      mockBalanceModeValue = "usd"
+    })
+
+    it("shows the balance mode toggle when SB is enabled and active", async () => {
+      mockFeatureFlagsOverride = {
+        nonCustodialEnabled: true,
+        stableBalanceEnabled: true,
+      }
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => expect(getByTestId("balance-mode-toggle")).toBeTruthy())
+    })
+
+    it("hides the toggle when stableBalanceEnabled flag is off", async () => {
+      mockFeatureFlagsOverride = {
+        nonCustodialEnabled: true,
+        stableBalanceEnabled: false,
+      }
+
+      const { queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+      expect(queryByTestId("balance-mode-toggle")).toBeNull()
+    })
+
+    it("hides the toggle when Stable Balance is inactive even if flag is on", async () => {
+      mockFeatureFlagsOverride = {
+        nonCustodialEnabled: true,
+        stableBalanceEnabled: true,
+      }
+      mockSelfCustodialWalletOverride = {
+        ...(mockSelfCustodialWalletOverride as Record<string, unknown>),
+        isStableBalanceActive: false,
+      }
+
+      const { queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+      expect(queryByTestId("balance-mode-toggle")).toBeNull()
+    })
+
+    it("invokes toggleMode when the label is pressed", async () => {
+      mockFeatureFlagsOverride = {
+        nonCustodialEnabled: true,
+        stableBalanceEnabled: true,
+      }
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      const toggle = await waitFor(() => getByTestId("balance-mode-toggle"))
+      fireEvent.press(toggle)
+
+      expect(mockToggleBalanceMode).toHaveBeenCalledTimes(1)
+    })
   })
 })

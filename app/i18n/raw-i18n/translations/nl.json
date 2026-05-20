@@ -72,7 +72,11 @@
     "receivingAccount": "Ontvanger",
     "infoBitcoin": "Het Bitcoin-bedrag is slechts een schatting. Het kan enigszins afwijken.",
     "infoDollar": "Het dollarbedrag is slechts een schatting. Het kan enigszins afwijken.",
-    "transferButtonText": "Overschrijven van {fromWallet} naar {toWallet}"
+    "transferButtonText": "Overschrijven van {fromWallet} naar {toWallet}",
+    "feeLabel": "Conversiekosten",
+    "feeError": "Kon de conversiekosten niet ophalen",
+    "amountFloored": "Bedrag verhoogd om aan het conversieminimum te voldoen.",
+    "amountDustBumped": "Bedrag verhoogd om je volledige saldo te converteren."
   },
   "ConversionSuccessScreen": {
     "message": "Wissel geslaagd",
@@ -3604,7 +3608,34 @@
   },
   "StableBalance": {
     "title": "Stabiel saldo",
-    "description": "Houd een USD-saldo aangedreven door USDB op Spark."
+    "description": "Houd een USD-saldo aangedreven door USDB op Spark.",
+    "balanceLabelBtc": "Saldo · SATS",
+    "balanceLabelUsd": "Saldo · USD",
+    "settingsRowTitle": "Stabiel Saldo",
+    "settingsTitle": "Stabiel Saldo",
+    "settingsDescription": "Houd een deel van je wallet in USD. Converteer handmatig tussen BTC en USD wanneer je maar wilt via de Converteer-actie.",
+    "activationLabel": "Actief",
+    "activeHint": "Je wallet houdt USD via USDB.",
+    "inactiveHint": "Je wallet houdt alleen BTC.",
+    "deactivateWarningBody": "Je hebt nog {amount:string}. Zet eerst om naar BTC, anders wordt je USD-saldo verborgen totdat je Stable Balance opnieuw activeert.",
+    "toggleFailedToast": "Stable Balance kon niet worden bijgewerkt. Probeer het opnieuw.",
+    "toggleModal": {
+      "activateTitle": "Stabiel saldo activeren",
+      "activateBody": "Je BTC-saldo wordt omgezet naar USDB. Dit zijn de geschatte conversiekosten.",
+      "activateConfirm": "Activeren",
+      "deactivateTitle": "Stabiel saldo deactiveren",
+      "deactivateBody": "Je USDB-saldo wordt terug omgezet naar BTC. Dit zijn de geschatte conversiekosten.",
+      "deactivateConfirm": "Deactiveren",
+      "cancel": "Annuleren"
+    },
+    "firstTimeModal": {
+      "title": "Over Converteren",
+      "dualBalance": "BTC en USD zijn twee onafhankelijke saldi in je portemonnee. Gebruik Convert op elk moment om geld tussen beide te verplaatsen.",
+      "trustDisclosure": "De USD-modus gebruikt USDB-tokens op Spark. De vertrouwensaannames verschillen van het direct aanhouden van BTC. USDB steunt op de token-uitgever van Spark.",
+      "acknowledge": "Ik begrijp het"
+    },
+    "minimumConversion": "Minimale conversie: {amount:string}",
+    "conversionUnavailable": "Conversie is tijdelijk niet beschikbaar. Probeer het opnieuw."
   },
   "BackendFeatureGate": {
     "title": "Functie niet beschikbaar",
@@ -3633,6 +3664,10 @@
     "title": "Wallet is offline",
     "description": "Je niet-bewaarde wallet kan het netwerk momenteel niet bereiken. Probeer het opnieuw wanneer je weer online bent.",
     "retry": "Opnieuw proberen"
+  },
+  "SelfCustodialBalance": {
+    "staleLabel": "VEROUDERD",
+    "syncFailedToast": "Synchroniseren van saldo mislukt. Je saldo is mogelijk verouderd."
   },
   "UnclaimedDeposit": {
     "title": "Je hebt {count} niet-opgeëiste storting(en)",

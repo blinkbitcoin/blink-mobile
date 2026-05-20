@@ -72,7 +72,11 @@
     "receivingAccount": "Modtager konto",
     "infoBitcoin": "Bitcoin-beløbet er kun omtrentligt. Det kan variere med et lille beløb.",
     "infoDollar": "Dollar-beløbet er kun omtrentligt. Det kan variere med et lille beløb.",
-    "transferButtonText": "Overfør {fromWallet} til {toWallet}"
+    "transferButtonText": "Overfør {fromWallet} til {toWallet}",
+    "feeLabel": "Konverteringsgebyr",
+    "feeError": "Kunne ikke hente konverteringsgebyret",
+    "amountFloored": "Beløb forøget for at opfylde konverteringsminimum.",
+    "amountDustBumped": "Beløb forøget for at konvertere hele din saldo."
   },
   "ConversionSuccessScreen": {
     "message": "Konvertering vel afsluttet",
@@ -3581,7 +3585,34 @@
   },
   "StableBalance": {
     "title": "Stabil saldo",
-    "description": "Hold en USD-saldo drevet af USDB på Spark."
+    "description": "Hold en USD-saldo drevet af USDB på Spark.",
+    "balanceLabelBtc": "Saldo · SATS",
+    "balanceLabelUsd": "Saldo · USD",
+    "settingsRowTitle": "Stabil Saldo",
+    "settingsTitle": "Stabil Saldo",
+    "settingsDescription": "Hold en del af din pung i USD. Konverter manuelt mellem BTC og USD når som helst med Konverter-handlingen.",
+    "activationLabel": "Aktiv",
+    "activeHint": "Din pung holder USD via USDB.",
+    "inactiveHint": "Din pung holder kun BTC.",
+    "deactivateWarningBody": "Du har stadig {amount:string}. Konverter til BTC først, ellers skjules din USD-saldo, indtil du genaktiverer Stable Balance.",
+    "toggleFailedToast": "Kunne ikke opdatere Stable Balance. Prøv igen.",
+    "toggleModal": {
+      "activateTitle": "Aktivér stabil saldo",
+      "activateBody": "Din BTC-saldo vil blive konverteret til USDB. Dette er det anslåede konverteringsgebyr.",
+      "activateConfirm": "Aktivér",
+      "deactivateTitle": "Deaktivér stabil saldo",
+      "deactivateBody": "Din USDB-saldo vil blive konverteret tilbage til BTC. Dette er det anslåede konverteringsgebyr.",
+      "deactivateConfirm": "Deaktivér",
+      "cancel": "Annullér"
+    },
+    "firstTimeModal": {
+      "title": "Om Konvertering",
+      "dualBalance": "BTC og USD er to uafhængige saldi i din tegnebog. Brug Convert når som helst til at flytte midler mellem dem.",
+      "trustDisclosure": "USD-tilstand bruger USDB-tokens på Spark. Tillidsantagelserne er anderledes end at holde BTC direkte. USDB er afhængig af Sparks tokenudsteder.",
+      "acknowledge": "Jeg forstår"
+    },
+    "minimumConversion": "Minimum konvertering: {amount:string}",
+    "conversionUnavailable": "Konvertering er midlertidigt utilgængelig. Prøv igen."
   },
   "BackendFeatureGate": {
     "title": "Funktion ikke tilgængelig",
@@ -3610,6 +3641,10 @@
     "title": "Pungen er offline",
     "description": "Din ikke-deponerede pung kan ikke nå netværket lige nu. Prøv igen, når du er online.",
     "retry": "Prøv igen"
+  },
+  "SelfCustodialBalance": {
+    "staleLabel": "FORÆLDET",
+    "syncFailedToast": "Synkronisering af saldo mislykkedes. Din saldo kan være forældet."
   },
   "UnclaimedDeposit": {
     "title": "Du har {count} uafhentede indbetalinger",

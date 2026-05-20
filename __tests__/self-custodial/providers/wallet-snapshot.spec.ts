@@ -9,10 +9,26 @@ import {
   loadMoreTransactions,
 } from "@app/self-custodial/providers/wallet-snapshot"
 
+const mockRecordError = jest.fn()
+
+jest.mock("@react-native-firebase/crashlytics", () => ({
+  __esModule: true,
+  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+}))
+
 jest.mock("@app/self-custodial/config", () => ({
   SparkToken: { Label: "USDB", Ticker: "USDB" },
-  SparkConfig: { tokenIdentifier: "test-token-id" },
+  SparkConfig: {},
+  requireSparkTokenIdentifier: () => "test-token-id",
 }))
+
+const loadFreshSnapshotModule = () => {
+  let mod: typeof import("@app/self-custodial/providers/wallet-snapshot") | undefined
+  jest.isolateModules(() => {
+    mod = require("@app/self-custodial/providers/wallet-snapshot")
+  })
+  return mod!
+}
 
 const createMockSdk = (overrides = {}) => ({
   getInfo: jest.fn().mockResolvedValue({
@@ -21,7 +37,11 @@ const createMockSdk = (overrides = {}) => ({
     tokenBalances: {
       token1: {
         balance: 150000,
-        tokenMetadata: { ticker: "USDB", decimals: 6 },
+        tokenMetadata: {
+          identifier: "test-token-id",
+          ticker: "USDB",
+          decimals: 6,
+        },
       },
     },
     ...overrides,
@@ -171,6 +191,112 @@ describe("loadMoreTransactions", () => {
     expect(page.hasMore).toBe(true)
     expect(page.transactions).toHaveLength(12)
   })
+
+  it("rawCount counts every payment from the SDK, not just the ones that survived filtering", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments.mockResolvedValue({
+      payments: [
+        ...Array.from({ length: 12 }, (_, i) => buildKnownPayment(`k-${i}`)),
+        ...Array.from({ length: 8 }, (_, i) => buildUnknownTokenPayment(`o-${i}`)),
+      ],
+    })
+
+    const page = await loadMoreTransactions(sdk as never, 20)
+
+    expect(page.rawCount).toBe(20)
+    expect(page.transactions).toHaveLength(12)
+  })
+
+  it("a caller advancing the cursor by rawCount keeps the next loadMore aligned with the SDK page size, not the filtered count", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments
+      .mockResolvedValueOnce({
+        payments: [
+          ...Array.from({ length: 12 }, (_, i) => buildKnownPayment(`k0-${i}`)),
+          ...Array.from({ length: 8 }, (_, i) => buildUnknownTokenPayment(`o0-${i}`)),
+        ],
+      })
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 5 }, (_, i) => buildKnownPayment(`k1-${i}`)),
+      })
+
+    const first = await loadMoreTransactions(sdk as never, 0)
+    expect(first.rawCount).toBe(20)
+    expect(first.transactions).toHaveLength(12)
+
+    await loadMoreTransactions(sdk as never, first.rawCount)
+
+    expect(sdk.listPayments).toHaveBeenLastCalledWith(
+      expect.objectContaining({ offset: 20, limit: 20 }),
+    )
+  })
+})
+
+describe("getSelfCustodialWalletSnapshot pagination preservation (Critical #8)", () => {
+  it("fetches a single page when no targetRawCount is provided", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments.mockResolvedValue({
+      payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`p-${i}`)),
+    })
+
+    const snapshot = await getSelfCustodialWalletSnapshot(sdk as never)
+
+    expect(sdk.listPayments).toHaveBeenCalledTimes(1)
+    expect(sdk.listPayments).toHaveBeenCalledWith(
+      expect.objectContaining({ offset: 0, limit: 20 }),
+    )
+    expect(snapshot.rawTransactionCount).toBe(20)
+    expect(snapshot.hasMore).toBe(true)
+  })
+
+  it("re-fetches every page up to the target raw count so loadMore cursor is preserved across refresh", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`page0-${i}`)),
+      })
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`page1-${i}`)),
+      })
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`page2-${i}`)),
+      })
+
+    const snapshot = await getSelfCustodialWalletSnapshot(sdk as never, 60)
+
+    expect(sdk.listPayments).toHaveBeenCalledTimes(3)
+    expect(sdk.listPayments).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ offset: 0, limit: 20 }),
+    )
+    expect(sdk.listPayments).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ offset: 20, limit: 20 }),
+    )
+    expect(sdk.listPayments).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({ offset: 40, limit: 20 }),
+    )
+    expect(snapshot.rawTransactionCount).toBe(60)
+    expect(snapshot.hasMore).toBe(true)
+  })
+
+  it("stops paginating early when the SDK returns fewer than a full page (no more transactions)", async () => {
+    const sdk = createMockSdk()
+    sdk.listPayments
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`page0-${i}`)),
+      })
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 5 }, (_, i) => buildKnownPayment(`page1-${i}`)),
+      })
+
+    const snapshot = await getSelfCustodialWalletSnapshot(sdk as never, 60)
+
+    expect(sdk.listPayments).toHaveBeenCalledTimes(2)
+    expect(snapshot.rawTransactionCount).toBe(25)
+    expect(snapshot.hasMore).toBe(false)
+  })
 })
 
 const buildTx = (id: string, currency: WalletCurrency): NormalizedTransaction => ({
@@ -262,5 +388,49 @@ describe("appendTransactions", () => {
 
     // Existing wallet is empty so the first "a" is appended; the second is filtered.
     expect(result[0].transactions.map((t) => t.id)).toEqual(["a", "b"])
+  })
+})
+
+describe("isKnownPayment crashlytics reporting (Critical #10)", () => {
+  beforeEach(() => {
+    mockRecordError.mockClear()
+  })
+
+  it("records to crashlytics once per unknown token identifier and drops the payment", async () => {
+    const fresh = loadFreshSnapshotModule()
+    const unknownTokenPayment = {
+      id: "unknown-1",
+      method: 2,
+      paymentType: 0,
+      status: 0,
+      amount: 100,
+      fees: 0,
+      timestamp: 0,
+      details: {
+        tag: "Token",
+        inner: {
+          metadata: { identifier: "rogue-token-id", decimals: 6, ticker: "ROGUE" },
+        },
+      },
+    }
+    const sdk = {
+      getInfo: jest.fn().mockResolvedValue({
+        identityPubkey: "pk",
+        balanceSats: 0,
+        tokenBalances: {},
+      }),
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [unknownTokenPayment, unknownTokenPayment],
+      }),
+    } as never
+
+    await fresh.getSelfCustodialWalletSnapshot(sdk)
+
+    const reportedErrors = mockRecordError.mock.calls.filter((args) => {
+      const message = args[0]?.message ?? ""
+      return message.includes("rogue-token-id")
+    })
+    expect(reportedErrors).toHaveLength(1)
+    expect(reportedErrors[0][0].message).toContain("expected=test-token-id")
   })
 })

@@ -14,7 +14,12 @@ import Crypto from "react-native-quick-crypto"
 
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { SparkConfig, SparkNetworkLabel, SparkToken } from "../config"
+import {
+  requireSparkTokenIdentifier,
+  SparkConfig,
+  SparkNetworkLabel,
+  SparkToken,
+} from "../config"
 import { createSdkLogListener } from "../logging"
 
 const initializeLogging = (() => {
@@ -34,13 +39,11 @@ const createSdkConfig = () => {
   const config = defaultConfig(SparkConfig.network)
   config.apiKey = SparkConfig.apiKey
 
-  if (SparkConfig.tokenIdentifier) {
-    config.stableBalanceConfig = {
-      tokens: [{ label: SparkToken.Label, tokenIdentifier: SparkConfig.tokenIdentifier }],
-      defaultActiveLabel: undefined,
-      thresholdSats: undefined,
-      maxSlippageBps: SparkConfig.maxSlippageBps,
-    }
+  config.stableBalanceConfig = {
+    tokens: [{ label: SparkToken.Label, tokenIdentifier: requireSparkTokenIdentifier() }],
+    defaultActiveLabel: undefined,
+    thresholdSats: undefined,
+    maxSlippageBps: SparkConfig.maxSlippageBps,
   }
 
   return config

@@ -72,7 +72,11 @@
     "receivingAccount": "Yanapa yupaychana",
     "infoBitcoin": "Bitcoin yupaynin asllata t'aqwirisqa kachkan. Asllata tikrakuyta atinmi.",
     "infoDollar": "Dólar yupaynin asllata t'aqwirisqa kachkan. Asllata tikrakuyta atinmi.",
-    "transferButtonText": "{fromWallet} manta {toWallet} man apachimuq"
+    "transferButtonText": "{fromWallet} manta {toWallet} man apachimuq",
+    "feeLabel": "Conversionpa pagon",
+    "feeError": "Conversionpa pagon mana apaykachay atinchu",
+    "amountFloored": "Qullqi yapayqa conversion minimumman chayanapaq.",
+    "amountDustBumped": "Qullqi yapayqa llapan qullqikipi conversion ruwanapaq."
   },
   "ConversionSuccessScreen": {
     "message": "Unanchayninmi kamarichik",
@@ -3601,7 +3605,34 @@
   },
   "StableBalance": {
     "title": "Saldo sinchi",
-    "description": "USD saldota USDB Spark nisqawan jap'iy."
+    "description": "USD saldota USDB Spark nisqawan jap'iy.",
+    "balanceLabelBtc": "Saldo · SATS",
+    "balanceLabelUsd": "Saldo · USD",
+    "settingsRowTitle": "Saldo Takyasqa",
+    "settingsTitle": "Saldo Takyasqa",
+    "settingsDescription": "Wallet-niyki t'aqata USD-pi waqaychay. BTC-manta USD-man mayqinpaqpas t'ikranki Convert ruwanamanta.",
+    "activationLabel": "Kawsachiy",
+    "activeHint": "Walletniyki USD-ta USDB-nintakama waqaychan.",
+    "inactiveHint": "Walletniyki BTC-llata waqaychan.",
+    "deactivateWarningBody": "Qanqa kanraqmi {amount:string}. Ñawpaqta BTC-man tikray, manaña chayqa USD saldoyki pakakunqa Stable Balance kutimanta llamkanchasqaykikama.",
+    "toggleFailedToast": "Stable Balance manam hukmanchayta atikurqachu. Yapamanta intentay.",
+    "toggleModal": {
+      "activateTitle": "Sayaq Qullqita Kachaykuy",
+      "activateBody": "BTC qullqiyki USDB-man tikrakunqa. Kaymi tikrachiypa chaninchasqa chaninchayninmi.",
+      "activateConfirm": "Kachaykuy",
+      "deactivateTitle": "Sayaq Qullqita Wañuchiy",
+      "deactivateBody": "USDB qullqiyki BTC-man kutichikunqa. Kaymi tikrachiypa chaninchasqa chaninchayninmi.",
+      "deactivateConfirm": "Wañuchiy",
+      "cancel": "T'akuy"
+    },
+    "firstTimeModal": {
+      "title": "Tikrana hawalla",
+      "dualBalance": "BTC-wan USD-wan qillqasapaykipi iskay saqisqa qullqikunam. Haykaqpas Convert-ta ruray paykunapura qullqita astanapaq.",
+      "trustDisclosure": "USD modoqa Sparkpi USDB tokenkunata apaykachan. Iñiy suposikuykunaqa wakjina kan BTC-ta direkto hapishaptikimanta. USDB Sparkpa token tuqyachisqanman tiyan.",
+      "acknowledge": "Entiendechkani"
+    },
+    "minimumConversion": "Aswan aslla tikray: {amount:string}",
+    "conversionUnavailable": "Tikrachiy mana atikuyniyuqchu kachkan. Yapamanta intentay."
   },
   "BackendFeatureGate": {
     "title": "Kay mana kanchu",
@@ -3630,6 +3661,10 @@
     "title": "Wallet manan conexionniyuqchu",
     "description": "Non-custodial walletniyki kunanqa manan networkman chayayta atinchu. Conexionniyuq kutipiwanki.",
     "retry": "Yapamanta rurana"
+  },
+  "SelfCustodialBalance": {
+    "staleLabel": "MACHURAYASQA",
+    "syncFailedToast": "Qullqi kaqllachiy mana atikurqachu. Qullqiyki mana hunt'aqchu kanman."
   },
   "UnclaimedDeposit": {
     "title": "{count} mana mañakusqa churana(kuna) kapusunki",

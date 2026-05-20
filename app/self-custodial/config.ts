@@ -4,7 +4,6 @@ import { DocumentDirectoryPath } from "react-native-fs"
 
 export const SparkToken = {
   Label: "USDB",
-  Ticker: "USDB",
   DefaultDecimals: 6,
 } as const
 
@@ -33,6 +32,22 @@ export const SparkConfig = {
   network: SparkNetwork,
   storageDir: `${DocumentDirectoryPath}/breez-sdk-spark-${SparkNetworkLabel}`,
   maxSlippageBps: 50,
-  tokenIdentifier: Config.SPARK_TOKEN_IDENTIFIER ?? "",
   apiKey: Config.BREEZ_API_KEY ?? "",
 } as const
+
+let cachedTokenIdentifier: string | null = null
+
+// Validates SPARK_TOKEN_IDENTIFIER once per session. The first call (typically
+// from `lifecycle.createSdkConfig` at SDK init) performs the env lookup and
+// throws on a misconfigured build; downstream callers in hot paths (mappers,
+// snapshot loops, conversion entry points) read the cached value without
+// re-validating.
+export const requireSparkTokenIdentifier = (): string => {
+  if (cachedTokenIdentifier !== null) return cachedTokenIdentifier
+  const id = Config.SPARK_TOKEN_IDENTIFIER
+  if (!id) {
+    throw new Error("SPARK_TOKEN_IDENTIFIER is not configured for this build")
+  }
+  cachedTokenIdentifier = id
+  return id
+}

@@ -70,7 +70,11 @@
     "receivingAccount": "Akaunti inayopokea",
     "infoBitcoin": "Kiasi cha Bitcoin ni takriban tu. Kinaweza kubadilika kwa kiasi kidogo.",
     "infoDollar": "Kiasi cha Dola ni takriban tu. Kinaweza kubadilika kwa kiasi kidogo.",
-    "transferButtonText": "Hamisha {fromWallet} kwenda {toWallet}"
+    "transferButtonText": "Hamisha {fromWallet} kwenda {toWallet}",
+    "feeLabel": "Ada ya ubadilishaji",
+    "feeError": "Imeshindikana kupata ada ya ubadilishaji",
+    "amountFloored": "Kiasi kimeongezwa ili kufikia kima cha chini cha ubadilishaji.",
+    "amountDustBumped": "Kiasi kimeongezwa ili kubadilisha salio lako lote."
   },
   "ConversionSuccessScreen": {
     "message": "Ubadilishaji umekamilika",
@@ -3563,7 +3567,34 @@
   },
   "StableBalance": {
     "title": "Salio thabiti",
-    "description": "Hifadhi salio la USD linaloendeleshwa na USDB kwenye Spark."
+    "description": "Hifadhi salio la USD linaloendeleshwa na USDB kwenye Spark.",
+    "balanceLabelBtc": "Salio · SATS",
+    "balanceLabelUsd": "Salio · USD",
+    "settingsRowTitle": "Salio Thabiti",
+    "settingsTitle": "Salio Thabiti",
+    "settingsDescription": "Weka sehemu ya pochi yako kwa USD. Badilisha kati ya BTC na USD kwa mkono wakati wowote kwa kutumia kitendo cha Badilisha.",
+    "activationLabel": "Hai",
+    "activeHint": "Pochi yako inashikilia USD kupitia USDB.",
+    "inactiveHint": "Pochi yako inashikilia BTC tu.",
+    "deactivateWarningBody": "Bado una {amount:string}. Badilisha kuwa BTC kwanza, ama salio lako la USD litafichwa hadi uwashe upya Stable Balance.",
+    "toggleFailedToast": "Imeshindikana kusasisha Stable Balance. Tafadhali jaribu tena.",
+    "toggleModal": {
+      "activateTitle": "Washa Salio Thabiti",
+      "activateBody": "Salio lako la BTC litabadilishwa kuwa USDB. Hii ni ada ya makadirio ya ubadilishaji.",
+      "activateConfirm": "Washa",
+      "deactivateTitle": "Zima Salio Thabiti",
+      "deactivateBody": "Salio lako la USDB litarudishwa kwa BTC. Hii ni ada ya makadirio ya ubadilishaji.",
+      "deactivateConfirm": "Zima",
+      "cancel": "Futa"
+    },
+    "firstTimeModal": {
+      "title": "Kuhusu Ubadilishaji",
+      "dualBalance": "BTC na USD ni salio mbili huru katika mkoba wako. Tumia Convert wakati wowote kuhamisha fedha kati yao.",
+      "trustDisclosure": "Modi ya USD hutumia tokeni za USDB kwenye Spark. Mawazo ya kuaminika ni tofauti na kushikilia BTC moja kwa moja. USDB inategemea mtoaji wa tokeni wa Spark.",
+      "acknowledge": "Naelewa"
+    },
+    "minimumConversion": "Ubadilishaji mdogo zaidi: {amount:string}",
+    "conversionUnavailable": "Ubadilishaji haupatikani kwa muda. Tafadhali jaribu tena."
   },
   "BackendFeatureGate": {
     "title": "Kipengele hakipatikani",
@@ -3592,6 +3623,10 @@
     "title": "Pochi iko nje ya mtandao",
     "description": "Pochi yako isiyo ya ulinzi haiwezi kufikia mtandao kwa sasa. Jaribu tena utakaporudi mtandaoni.",
     "retry": "Jaribu tena"
+  },
+  "SelfCustodialBalance": {
+    "staleLabel": "CHAKALA",
+    "syncFailedToast": "Kusawazisha salio kumeshindwa. Salio lako linaweza kuwa la zamani."
   },
   "UnclaimedDeposit": {
     "title": "Una amana {count} ambazo hazijaombwa",

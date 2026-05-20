@@ -70,7 +70,11 @@
         "receivingAccount": "Empfangendes Konto",
         "infoBitcoin": "Der Bitcoin-Betrag ist nur ungefähr. Er kann geringfügig abweichen.",
         "infoDollar": "Der Dollar-Betrag ist nur ungefähr. Er kann geringfügig abweichen.",
-        "transferButtonText": "{fromWallet} zu {toWallet} transferieren"
+        "transferButtonText": "{fromWallet} zu {toWallet} transferieren",
+        "feeLabel": "Konvertierungsgebühr",
+        "feeError": "Konvertierungsgebühr konnte nicht abgerufen werden",
+        "amountFloored": "Betrag erhöht, um das Konvertierungsminimum zu erreichen.",
+        "amountDustBumped": "Betrag erhöht, um dein gesamtes Guthaben umzuwandeln."
     },
     "ConversionSuccessScreen": {
         "message": "Das hat geklappt!",
@@ -3551,7 +3555,34 @@
     },
     "StableBalance": {
         "title": "Stabiler Saldo",
-        "description": "Halte einen USD-Saldo betrieben durch USDB auf Spark."
+        "description": "Halte einen USD-Saldo betrieben durch USDB auf Spark.",
+        "balanceLabelBtc": "Guthaben · SATS",
+        "balanceLabelUsd": "Guthaben · USD",
+        "settingsRowTitle": "Stabiler Saldo",
+        "settingsTitle": "Stabiler Saldo",
+        "settingsDescription": "Halte einen Teil deiner Wallet in USD. Wandle BTC und USD jederzeit manuell mit der Konvertieren-Aktion um.",
+        "activationLabel": "Aktiv",
+        "activeHint": "Deine Wallet hält USD über USDB.",
+        "inactiveHint": "Deine Wallet hält nur BTC.",
+        "deactivateWarningBody": "Du hast noch {amount:string}. Wandle zuerst in BTC um, sonst wird dein USD-Guthaben ausgeblendet, bis du Stable Balance erneut aktivierst.",
+        "toggleFailedToast": "Stable Balance konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+        "toggleModal": {
+            "activateTitle": "Stabiles Guthaben aktivieren",
+            "activateBody": "Dein BTC-Guthaben wird in USDB umgewandelt. Dies ist die geschätzte Umrechnungsgebühr.",
+            "activateConfirm": "Aktivieren",
+            "deactivateTitle": "Stabiles Guthaben deaktivieren",
+            "deactivateBody": "Dein USDB-Guthaben wird zurück in BTC umgewandelt. Dies ist die geschätzte Umrechnungsgebühr.",
+            "deactivateConfirm": "Deaktivieren",
+            "cancel": "Abbrechen"
+        },
+        "firstTimeModal": {
+            "title": "Über Umwandlung",
+            "dualBalance": "BTC und USD sind zwei unabhängige Guthaben in deiner Wallet. Nutze Convert jederzeit, um Gelder zwischen ihnen zu bewegen.",
+            "trustDisclosure": "Der USD-Modus nutzt USDB-Tokens auf Spark. Die Vertrauensannahmen unterscheiden sich vom direkten Halten von BTC. USDB stützt sich auf den Token-Emittenten von Spark.",
+            "acknowledge": "Ich verstehe"
+        },
+        "minimumConversion": "Mindestumwandlung: {amount:string}",
+        "conversionUnavailable": "Die Umwandlung ist vorübergehend nicht verfügbar. Bitte versuche es erneut."
     },
     "BackendFeatureGate": {
         "title": "Funktion nicht verfügbar",
@@ -3580,6 +3611,10 @@
         "title": "Wallet ist offline",
         "description": "Deine nicht-verwahrte Wallet kann das Netzwerk gerade nicht erreichen. Versuche es erneut, wenn du wieder online bist.",
         "retry": "Erneut versuchen"
+    },
+    "SelfCustodialBalance": {
+        "staleLabel": "VERALTET",
+        "syncFailedToast": "Saldo-Synchronisierung fehlgeschlagen. Dein Saldo könnte veraltet sein."
     },
     "UnclaimedDeposit": {
         "title": "Du hast {count} nicht beanspruchte Einzahlung(en)",

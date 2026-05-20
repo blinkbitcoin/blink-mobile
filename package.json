@@ -65,7 +65,7 @@
     "@apollo/client": "^3.9.11",
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@blinkbitcoin/blink-client": "0.5.3",
-    "@breeztech/breez-sdk-spark-react-native": "^0.12.2-dev3",
+    "@breeztech/breez-sdk-spark-react-native": "0.13.2-dev3",
     "@expo/react-native-action-sheet": "^4.0.1",
     "@formatjs/intl-getcanonicallocales": "^2.3.0",
     "@formatjs/intl-locale": "^3.4.5",
