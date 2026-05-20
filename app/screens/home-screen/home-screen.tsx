@@ -31,6 +31,7 @@ import {
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
@@ -162,6 +163,8 @@ export const HomeScreen: React.FC = () => {
   const { isAtLeastLevelOne } = useLevel()
 
   const isAuthed = useIsAuthed()
+  const activeWallet = useActiveWallet()
+  const { isSelfCustodial } = activeWallet
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -177,7 +180,7 @@ export const HomeScreen: React.FC = () => {
     error,
     refetch: refetchAuthed,
   } = useHomeAuthedQuery({
-    skip: !isAuthed,
+    skip: !isAuthed || isSelfCustodial,
     fetchPolicy: "network-only",
     errorPolicy: "all",
 
@@ -186,7 +189,7 @@ export const HomeScreen: React.FC = () => {
   })
 
   const { loading: loadingPrice, refetch: refetchRealtimePrice } = useRealtimePriceQuery({
-    skip: !isAuthed,
+    skip: !isAuthed || isSelfCustodial,
     fetchPolicy: "network-only",
 
     // this enables offline mode use-case
@@ -224,12 +227,20 @@ export const HomeScreen: React.FC = () => {
     variables: { first: 1 },
   })
 
-  const loading = loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
+  const loading = isSelfCustodial
+    ? !activeWallet.isReady
+    : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const { username, phone } = currentUser?.me ?? {}
   const usernameTitle = username || phone || LL.common.blinkUser()
 
-  const wallets = dataAuthed?.me?.defaultAccount?.wallets
+  const wallets = isSelfCustodial
+    ? activeWallet.wallets.map((w) => ({
+        id: w.id,
+        balance: w.balance.amount,
+        walletCurrency: w.walletCurrency,
+      }))
+    : dataAuthed?.me?.defaultAccount?.wallets
   const { formattedBalance, satsBalance } = useTotalBalance(wallets)
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
@@ -337,24 +348,23 @@ export const HomeScreen: React.FC = () => {
   const numberOfTxs = transactions.length
 
   const onMenuClick = (target: Target) => {
-    if (isAuthed) {
-      if (
-        target === "receiveBitcoin" &&
-        !hasPromptedSetDefaultAccount &&
-        numberOfTxs >= TransactionCountToTriggerSetDefaultAccountModal &&
-        galoyInstanceId === "Main"
-      ) {
-        toggleSetDefaultAccountModal()
-        return
-      }
-
-      // we are using any because Typescript complain on the fact we are not passing any params
-      // but there is no need for a params and the types should not necessitate it
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      navigation.navigate(target as any)
-    } else {
+    if (!isSelfCustodial && !isAuthed) {
       setModalVisible(true)
+      return
     }
+
+    if (
+      !isSelfCustodial &&
+      target === "receiveBitcoin" &&
+      !hasPromptedSetDefaultAccount &&
+      numberOfTxs >= TransactionCountToTriggerSetDefaultAccountModal &&
+      galoyInstanceId === "Main"
+    ) {
+      toggleSetDefaultAccountModal()
+      return
+    }
+
+    navigation.navigate(target)
   }
 
   const activateWallet = () => {
@@ -387,7 +397,11 @@ export const HomeScreen: React.FC = () => {
     }, [openUpgradeModal, triggerUpgradeModal]),
   )
 
-  type Target = "scanningQRCode" | "sendBitcoinDestination" | "receiveBitcoin"
+  type Target =
+    | "scanningQRCode"
+    | "sendBitcoinDestination"
+    | "receiveBitcoin"
+    | "conversionDetails"
   type IconNamesType = keyof typeof icons
 
   const buttons = [
@@ -410,13 +424,15 @@ export const HomeScreen: React.FC = () => {
 
   const isIosWithBalance = isIos && satsBalance > 0
 
-  if (
+  const shouldShowTransferButton =
+    isSelfCustodial ||
     !isIos ||
     dataUnauthed?.globals?.network !== "mainnet" ||
     levelAccount === AccountLevel.Two ||
     levelAccount === AccountLevel.Three ||
     isIosWithBalance
-  ) {
+
+  if (shouldShowTransferButton) {
     buttons.unshift({
       title: LL.ConversionDetailsScreen.transfer(),
       target: "conversionDetails" as Target,

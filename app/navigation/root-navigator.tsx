@@ -5,6 +5,7 @@ import LearnIcon from "@app/assets/icons/learn.svg"
 import MapIcon from "@app/assets/icons/map.svg"
 import ScanIcon from "@app/assets/icons/scan.svg"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { usePersistentStateContext } from "@app/store/persistent-state"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   ConversionConfirmationScreen,
@@ -73,6 +74,7 @@ import { DeveloperScreen } from "../screens/developer-screen"
 import { EarnMapScreen } from "../screens/earns-map-screen"
 import { EarnQuiz, EarnSection } from "../screens/earns-screen"
 import { SectionCompleted } from "../screens/earns-screen/section-completed"
+import { AccountTypeSelectionScreen } from "../screens/account-type-selection"
 import { GetStartedScreen } from "../screens/get-started-screen"
 import { HomeScreen } from "../screens/home-screen"
 import { MapScreen } from "../screens/map-screen/map-screen"
@@ -129,6 +131,7 @@ import {
   SparkBackupPhraseScreen,
   SparkBackupConfirmScreen,
   SparkBackupSuccessScreen,
+  SparkWalletCreationScreen,
 } from "@app/screens/spark-onboarding"
 import {
   SparkMigrationExplainerScreen,
@@ -155,7 +158,10 @@ export const RootStack = () => {
   } = useTheme()
   const isAuthed = useIsAuthed()
   const { LL } = useI18nContext()
+  const { persistentState } = usePersistentStateContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+
+  const hasAccount = isAuthed || Boolean(persistentState.activeAccountId)
   return (
     <RootNavigator.Navigator
       screenOptions={{
@@ -169,12 +175,17 @@ export const RootStack = () => {
         headerMode: "screen",
         headerLeft: headerBackControl(),
       }}
-      initialRouteName={isAuthed ? "authenticationCheck" : "getStarted"}
+      initialRouteName={hasAccount ? "authenticationCheck" : "getStarted"}
     >
       <RootNavigator.Screen
         name="getStarted"
         component={GetStartedScreen}
         options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="accountTypeSelection"
+        component={AccountTypeSelectionScreen}
+        options={{ title: "" }}
       />
       <RootNavigator.Screen
         name="authenticationCheck"
@@ -735,6 +746,11 @@ export const RootStack = () => {
         name="sparkBackupSuccessScreen"
         component={SparkBackupSuccessScreen}
         options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="sparkWalletCreation"
+        component={SparkWalletCreationScreen}
+        options={{ title: "" }}
       />
       <RootNavigator.Screen
         name="sparkMigrationExplainer"

@@ -3492,10 +3492,16 @@
         "transferringFunds": "Transferindo seus fundos. Deve ser concluído em poucos segundos."
     },
     "AccountTypeSelectionScreen": {
-        "title": "Escolha o tipo de conta",
-        "description": "Selecione como deseja gerenciar seus fundos",
         "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark"
+        "selfCustodialLabel": "Spark",
+        "custodialDescription": "Nós custodiamos os fundos em seu nome",
+        "selfCustodialDescription": "Somente você pode acessar os fundos",
+        "continueButton": "Continuar",
+        "descriptionDefault": "Por favor, escolha seu tipo preferido de Blink.",
+        "descriptionSelected": "Por favor, escolha o tipo de conta.",
+        "chooseMethod": "Escolher método",
+        "restoreComingSoonTitle": "Em breve",
+        "restoreComingSoonDescription": "A função de restauração estará disponível em uma atualização futura."
     },
     "BackupScreen": {
         "title": "Fazer backup da carteira",
@@ -3516,5 +3522,11 @@
     "BackendFeatureGate": {
         "title": "Recurso indisponível",
         "description": "Este recurso requer uma conta custodial."
+    },
+    "SparkWalletCreationScreen": {
+        "creating": "Criando sua carteira...",
+        "errorTitle": "Falha ao criar carteira",
+        "errorDescription": "Algo deu errado. Por favor, tente novamente.",
+        "retry": "Tentar novamente"
     }
 }

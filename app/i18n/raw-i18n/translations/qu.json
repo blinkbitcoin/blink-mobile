@@ -3542,10 +3542,16 @@
     "transferringFunds": "Qullqiykita apachkaniku. Iskay kinsa sikundullapi tukurunqa."
   },
   "AccountTypeSelectionScreen": {
-    "title": "Aklliy cuenta laya",
-    "description": "Aklliy imaynata qullqi kamachiy munasqayki",
     "custodialLabel": "Blink",
-    "selfCustodialLabel": "Spark"
+    "selfCustodialLabel": "Spark",
+    "custodialDescription": "Ñuqayku qullqiykita waqaychayku",
+    "selfCustodialDescription": "Qamlla qullqiykiman yaykuyta atinki",
+    "continueButton": "Hinaspa",
+    "descriptionDefault": "Blink laya munasqaykita aklliy.",
+    "descriptionSelected": "Cuenta laya aklliy.",
+    "chooseMethod": "Ñan aklliy",
+    "restoreComingSoonTitle": "Qayllamuchkan",
+    "restoreComingSoonDescription": "Kutichiy ruway hamuq actualizaciónpi kanqa."
   },
   "BackupScreen": {
     "title": "Walleta waqaychay",
@@ -3566,5 +3572,11 @@
   "BackendFeatureGate": {
     "title": "Kay mana kanchu",
     "description": "Kay ruwayqa custodial cuentata munan."
+  },
+  "SparkWalletCreationScreen": {
+    "creating": "Walletaykita ruwachkanku...",
+    "errorTitle": "Wallet ruway mana allinchu",
+    "errorDescription": "Imapas mana allinchu. Watiqmanta ruway.",
+    "retry": "Watiqmanta ruway"
   }
 }

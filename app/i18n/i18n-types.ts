@@ -11530,21 +11530,45 @@ type RootTranslation = {
 	}
 	AccountTypeSelectionScreen: {
 		/**
-		 * C​h​o​o​s​e​ ​a​c​c​o​u​n​t​ ​t​y​p​e
+		 * P​l​e​a​s​e​ ​c​h​o​o​s​e​ ​y​o​u​r​ ​p​r​e​f​e​r​r​e​d​ ​t​y​p​e​ ​o​f​ ​B​l​i​n​k​.
 		 */
-		title: string
+		descriptionDefault: string
 		/**
-		 * S​e​l​e​c​t​ ​h​o​w​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​m​a​n​a​g​e​ ​y​o​u​r​ ​f​u​n​d​s
+		 * P​l​e​a​s​e​ ​c​h​o​o​s​e​ ​a​c​c​o​u​n​t​ ​t​y​p​e​.
 		 */
-		description: string
+		descriptionSelected: string
 		/**
-		 * B​l​i​n​k
+		 * C​u​s​t​o​d​i​a​l
 		 */
 		custodialLabel: string
 		/**
-		 * S​p​a​r​k
+		 * N​o​n​-​c​u​s​t​o​d​i​a​l
 		 */
 		selfCustodialLabel: string
+		/**
+		 * W​e​ ​h​o​l​d​ ​t​h​e​ ​f​u​n​d​s​ ​o​n​ ​y​o​u​r​ ​b​e​h​a​l​f
+		 */
+		custodialDescription: string
+		/**
+		 * O​n​l​y​ ​y​o​u​ ​c​a​n​ ​a​c​c​e​s​s​ ​f​u​n​d​s
+		 */
+		selfCustodialDescription: string
+		/**
+		 * C​h​o​o​s​e​ ​m​e​t​h​o​d
+		 */
+		chooseMethod: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		continueButton: string
+		/**
+		 * C​o​m​i​n​g​ ​s​o​o​n
+		 */
+		restoreComingSoonTitle: string
+		/**
+		 * R​e​s​t​o​r​e​ ​f​l​o​w​ ​w​i​l​l​ ​b​e​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​a​ ​f​u​t​u​r​e​ ​u​p​d​a​t​e​.
+		 */
+		restoreComingSoonDescription: string
 	}
 	BackupScreen: {
 		/**
@@ -11585,6 +11609,24 @@ type RootTranslation = {
 		 * H​o​l​d​ ​a​ ​U​S​D​-​d​e​n​o​m​i​n​a​t​e​d​ ​b​a​l​a​n​c​e​ ​p​o​w​e​r​e​d​ ​b​y​ ​U​S​D​B​ ​o​n​ ​S​p​a​r​k​.
 		 */
 		description: string
+	}
+	SparkWalletCreationScreen: {
+		/**
+		 * C​r​e​a​t​i​n​g​ ​y​o​u​r​ ​w​a​l​l​e​t​.​.​.
+		 */
+		creating: string
+		/**
+		 * W​a​l​l​e​t​ ​c​r​e​a​t​i​o​n​ ​f​a​i​l​e​d
+		 */
+		errorTitle: string
+		/**
+		 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		errorDescription: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		retry: string
 	}
 	BackendFeatureGate: {
 		/**
@@ -22976,21 +23018,45 @@ export type TranslationFunctions = {
 	}
 	AccountTypeSelectionScreen: {
 		/**
-		 * Choose account type
+		 * Please choose your preferred type of Blink.
 		 */
-		title: () => LocalizedString
+		descriptionDefault: () => LocalizedString
 		/**
-		 * Select how you want to manage your funds
+		 * Please choose account type.
 		 */
-		description: () => LocalizedString
+		descriptionSelected: () => LocalizedString
 		/**
-		 * Blink
+		 * Custodial
 		 */
 		custodialLabel: () => LocalizedString
 		/**
-		 * Spark
+		 * Non-custodial
 		 */
 		selfCustodialLabel: () => LocalizedString
+		/**
+		 * We hold the funds on your behalf
+		 */
+		custodialDescription: () => LocalizedString
+		/**
+		 * Only you can access funds
+		 */
+		selfCustodialDescription: () => LocalizedString
+		/**
+		 * Choose method
+		 */
+		chooseMethod: () => LocalizedString
+		/**
+		 * Continue
+		 */
+		continueButton: () => LocalizedString
+		/**
+		 * Coming soon
+		 */
+		restoreComingSoonTitle: () => LocalizedString
+		/**
+		 * Restore flow will be available in a future update.
+		 */
+		restoreComingSoonDescription: () => LocalizedString
 	}
 	BackupScreen: {
 		/**
@@ -23031,6 +23097,24 @@ export type TranslationFunctions = {
 		 * Hold a USD-denominated balance powered by USDB on Spark.
 		 */
 		description: () => LocalizedString
+	}
+	SparkWalletCreationScreen: {
+		/**
+		 * Creating your wallet...
+		 */
+		creating: () => LocalizedString
+		/**
+		 * Wallet creation failed
+		 */
+		errorTitle: () => LocalizedString
+		/**
+		 * Something went wrong. Please try again.
+		 */
+		errorDescription: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		retry: () => LocalizedString
 	}
 	BackendFeatureGate: {
 		/**

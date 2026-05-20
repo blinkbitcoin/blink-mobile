@@ -7,15 +7,14 @@ import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
   AccountStatus,
   AccountType,
-  CUSTODIAL_DEFAULT_ID,
-  SELF_CUSTODIAL_DEFAULT_ID,
+  DefaultAccountId,
   type AccountDescriptor,
 } from "@app/types/wallet.types"
 
 import { useAppConfig } from "./use-app-config"
 
 export const createCustodialDescriptor = (label: string): AccountDescriptor => ({
-  id: CUSTODIAL_DEFAULT_ID,
+  id: DefaultAccountId.Custodial,
   type: AccountType.Custodial,
   label,
   selected: false,
@@ -23,7 +22,7 @@ export const createCustodialDescriptor = (label: string): AccountDescriptor => (
 })
 
 export const createSelfCustodialDescriptor = (label: string): AccountDescriptor => ({
-  id: SELF_CUSTODIAL_DEFAULT_ID,
+  id: DefaultAccountId.SelfCustodial,
   type: AccountType.SelfCustodial,
   label,
   selected: false,

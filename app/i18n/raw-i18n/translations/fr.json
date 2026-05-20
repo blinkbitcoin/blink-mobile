@@ -3533,10 +3533,16 @@
         "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes."
     },
     "AccountTypeSelectionScreen": {
-        "title": "Choisir le type de compte",
-        "description": "Sélectionnez comment vous souhaitez gérer vos fonds",
         "custodialLabel": "Blink",
-        "selfCustodialLabel": "Spark"
+        "selfCustodialLabel": "Spark",
+        "custodialDescription": "Nous gardons les fonds en votre nom",
+        "selfCustodialDescription": "Vous seul pouvez accéder aux fonds",
+        "continueButton": "Continuer",
+        "descriptionDefault": "Veuillez choisir votre type préféré de Blink.",
+        "descriptionSelected": "Veuillez choisir le type de compte.",
+        "chooseMethod": "Choisir la méthode",
+        "restoreComingSoonTitle": "Bientôt disponible",
+        "restoreComingSoonDescription": "La fonction de restauration sera disponible dans une mise à jour future."
     },
     "BackupScreen": {
         "title": "Sauvegarder le portefeuille",
@@ -3557,5 +3563,11 @@
     "BackendFeatureGate": {
         "title": "Fonctionnalité indisponible",
         "description": "Cette fonctionnalité nécessite un compte de garde."
+    },
+    "SparkWalletCreationScreen": {
+        "creating": "Création de votre portefeuille...",
+        "errorTitle": "Échec de la création du portefeuille",
+        "errorDescription": "Quelque chose s'est mal passé. Veuillez réessayer.",
+        "retry": "Réessayer"
     }
 }

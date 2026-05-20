@@ -61,6 +61,9 @@ const noRetryOperations = [
   // specially as it's running on app start
   // and can create some unwanted loop when token is not valid
   "deviceNotificationTokenCreate",
+
+  // Self-custodial payment operations — add here when Send/Receive screens land.
+  // Breez SDK payment operations must not be retried by Apollo.
 ]
 
 const getAuthorizationHeader = (token: string): string => {

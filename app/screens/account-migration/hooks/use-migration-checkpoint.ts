@@ -43,14 +43,14 @@ export const useMigrationCheckpoint = () => {
   const saveCheckpoint = useCallback(
     (step: MigrationCheckpoint) => {
       setCheckpoint(step)
-      saveCheckpointToStorage(storageKey, step)
+      saveCheckpointToStorage(storageKey, step).catch(() => {})
     },
     [storageKey],
   )
 
   const clearCheckpoint = useCallback(() => {
     setCheckpoint(null)
-    clearCheckpointFromStorage(storageKey)
+    clearCheckpointFromStorage(storageKey).catch(() => {})
   }, [storageKey])
 
   const getRouteForCheckpoint = useCallback(
