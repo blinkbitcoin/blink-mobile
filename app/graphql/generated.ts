@@ -3352,11 +3352,6 @@ export type CardReplaceMutationVariables = Exact<{
 
 export type CardReplaceMutation = { readonly __typename: 'Mutation', readonly cardReplace: { readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus } };
 
-export type ConversionScreenQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ConversionScreenQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
-
 export type DebugScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5682,53 +5677,6 @@ export function useCardReplaceMutation(baseOptions?: Apollo.MutationHookOptions<
 export type CardReplaceMutationHookResult = ReturnType<typeof useCardReplaceMutation>;
 export type CardReplaceMutationResult = Apollo.MutationResult<CardReplaceMutation>;
 export type CardReplaceMutationOptions = Apollo.BaseMutationOptions<CardReplaceMutation, CardReplaceMutationVariables>;
-export const ConversionScreenDocument = gql`
-    query conversionScreen {
-  me {
-    id
-    defaultAccount {
-      id
-      wallets {
-        id
-        balance
-        walletCurrency
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useConversionScreenQuery__
- *
- * To run a query within a React component, call `useConversionScreenQuery` and pass it any options that fit your needs.
- * When your component renders, `useConversionScreenQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useConversionScreenQuery({
- *   variables: {
- *   },
- * });
- */
-export function useConversionScreenQuery(baseOptions?: Apollo.QueryHookOptions<ConversionScreenQuery, ConversionScreenQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ConversionScreenQuery, ConversionScreenQueryVariables>(ConversionScreenDocument, options);
-      }
-export function useConversionScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ConversionScreenQuery, ConversionScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ConversionScreenQuery, ConversionScreenQueryVariables>(ConversionScreenDocument, options);
-        }
-export function useConversionScreenSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ConversionScreenQuery, ConversionScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<ConversionScreenQuery, ConversionScreenQueryVariables>(ConversionScreenDocument, options);
-        }
-export type ConversionScreenQueryHookResult = ReturnType<typeof useConversionScreenQuery>;
-export type ConversionScreenLazyQueryHookResult = ReturnType<typeof useConversionScreenLazyQuery>;
-export type ConversionScreenSuspenseQueryHookResult = ReturnType<typeof useConversionScreenSuspenseQuery>;
-export type ConversionScreenQueryResult = Apollo.QueryResult<ConversionScreenQuery, ConversionScreenQueryVariables>;
 export const DebugScreenDocument = gql`
     query debugScreen {
   me {

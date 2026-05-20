@@ -15,7 +15,6 @@ import { ThemeProvider } from "@rn-vui/themed"
 import { ConversionDetailsScreen } from "@app/screens/conversion-flow/conversion-details-screen"
 import {
   WalletCurrency,
-  ConversionScreenDocument,
   RealtimePriceDocument,
   RealtimePriceUnauthedDocument,
   DisplayCurrencyDocument,
@@ -227,39 +226,8 @@ const setActiveWalletFromOptions = (options: MockOptions) => {
 }
 
 const createGraphQLMocks = (options: MockOptions): MockedResponse[] => {
-  const { btcBalance, usdBalance, displayCurrency = "USD" } = options
+  const { displayCurrency = "USD" } = options
   setActiveWalletFromOptions(options)
-
-  const conversionScreenMock = {
-    request: { query: ConversionScreenDocument },
-    result: {
-      data: {
-        __typename: "Query",
-        me: {
-          __typename: "User",
-          id: "user-id",
-          defaultAccount: {
-            __typename: "ConsumerAccount",
-            id: "account-id",
-            wallets: [
-              {
-                __typename: "BTCWallet",
-                id: "btc-wallet-id",
-                balance: btcBalance,
-                walletCurrency: WalletCurrency.Btc,
-              },
-              {
-                __typename: "UsdWallet",
-                id: "usd-wallet-id",
-                balance: usdBalance,
-                walletCurrency: WalletCurrency.Usd,
-              },
-            ],
-          },
-        },
-      },
-    },
-  }
 
   const realtimePriceMock = {
     request: { query: RealtimePriceDocument },
@@ -348,17 +316,14 @@ const createGraphQLMocks = (options: MockOptions): MockedResponse[] => {
   }
 
   return [
-    conversionScreenMock,
     realtimePriceMock,
     realtimePriceUnauthedMock,
     displayCurrencyMock,
     currencyListMock,
-    conversionScreenMock,
     realtimePriceMock,
     realtimePriceUnauthedMock,
     displayCurrencyMock,
     currencyListMock,
-    conversionScreenMock,
     realtimePriceMock,
     realtimePriceUnauthedMock,
     displayCurrencyMock,
@@ -368,10 +333,6 @@ const createGraphQLMocks = (options: MockOptions): MockedResponse[] => {
 
 const createEmptyMocks = (): MockedResponse[] => {
   const baseMocks: MockedResponse[] = [
-    {
-      request: { query: ConversionScreenDocument },
-      result: { data: { __typename: "Query", me: null } },
-    },
     {
       request: { query: RealtimePriceDocument },
       result: { data: { __typename: "Query", me: null } },
