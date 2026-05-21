@@ -2,6 +2,13 @@
 
 set -eu
 export CI_ROOT="$(pwd)"
+export ENVFILE=.env.ci
+REACT_NATIVE_CONFIG_ENV="${CI_ROOT}/repo/${ENVFILE}"
+
+cleanup_react_native_config_env() {
+  rm -f "$REACT_NATIVE_CONFIG_ENV"
+}
+trap cleanup_react_native_config_env EXIT
 
 export PATH=$(cat /Users/m1/concourse/path)
 export PUBLIC_VERSION=$(cat $VERSION_FILE)
@@ -25,6 +32,12 @@ pushd repo
 
 echo "    --> Checking out $GIT_REF"
 git checkout $GIT_REF
+
+cat > "$REACT_NATIVE_CONFIG_ENV" <<EOF
+SPARK_TOKEN_IDENTIFIER=$SPARK_TOKEN_IDENTIFIER
+BREEZ_API_KEY=$BREEZ_API_KEY
+BREEZ_NETWORK=$BREEZ_NETWORK
+EOF
 
 echo "    --> Installing dependencies"
 nix develop -c yarn install
