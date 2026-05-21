@@ -825,6 +825,7 @@ describe("Toggle without amount - Critical bug test", () => {
   })
 
   it("next button remains disabled after toggle without amount", async () => {
+    jest.useRealTimers()
     const Wrapper = createTestWrapper(buildMocks())
 
     const { getByTestId } = render(
@@ -842,18 +843,20 @@ describe("Toggle without amount - Critical bug test", () => {
 
     const toggleButton = getByTestId("wallet-toggle-button")
 
-    await act(async () => {
-      fireEvent.press(toggleButton)
-    })
+    jest.useFakeTimers()
+    try {
+      await act(async () => {
+        fireEvent.press(toggleButton)
+      })
 
-    act(() => {
-      jest.advanceTimersByTime(200)
-    })
+      act(() => {
+        jest.advanceTimersByTime(200)
+      })
 
-    await waitFor(() => {
-      const button = getByTestId("next-button")
-      expect(button.props.accessibilityState?.disabled).toBe(true)
-    })
+      expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+    } finally {
+      jest.useRealTimers()
+    }
   })
 
   it("handles multiple consecutive toggles without crashing", async () => {
