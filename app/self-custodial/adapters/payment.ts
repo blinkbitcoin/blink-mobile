@@ -12,6 +12,7 @@ import {
   ConvertAmountAdjustment,
   FEE_TIER_ETA_MINUTES,
   failedPayment,
+  failedReceive,
   FeeMode,
   FeeQuoteType,
   FeeTier,
@@ -21,6 +22,8 @@ import {
   type ConvertQuote,
   type GetFeeAdapter,
   type PaymentAdapterResult,
+  type ReceiveLightningAdapter,
+  type ReceiveOnchainAdapter,
   type SendPaymentAdapter,
 } from "@app/types/payment"
 import { tokenBaseUnitsToCents } from "@app/utils/amounts"
@@ -32,12 +35,18 @@ import {
   extractLightningFee,
   extractOnchainFees,
   prepareConversion,
+  prepareReceiveBolt11,
+  prepareReceiveOnchain,
   prepareSend,
   recordConvertError,
+  recordReceiveError,
   resolveSendTokenIdentifier,
   toSdkSendAmount,
   type PreparedConversion,
 } from "../bridge"
+
+const LIGHTNING_INVOICE_FAILED_MESSAGE = "Lightning invoice creation failed"
+const ONCHAIN_ADDRESS_FAILED_MESSAGE = "Onchain address creation failed"
 
 export const createSendPayment = (sdk: BreezSdkInterface): SendPaymentAdapter => {
   return async ({ destination, amount }) => {
@@ -158,3 +167,40 @@ export const createSelfCustodialConvert = (sdk: BreezSdkInterface): ConvertAdapt
     }
   },
 })
+
+export const createSelfCustodialReceiveLightning = (
+  sdk: BreezSdkInterface,
+): ReceiveLightningAdapter => {
+  return async ({ amount, memo }) => {
+    try {
+      const { paymentRequest } = await prepareReceiveBolt11(sdk, {
+        amountSats: amount?.amount,
+        memo,
+      })
+      if (!paymentRequest) return failedReceive(LIGHTNING_INVOICE_FAILED_MESSAGE)
+      return { invoice: { paymentRequest } }
+    } catch (err) {
+      return failedReceive(
+        err instanceof Error ? err.message : LIGHTNING_INVOICE_FAILED_MESSAGE,
+      )
+    }
+  }
+}
+
+export const createSelfCustodialReceiveOnchain = (
+  sdk: BreezSdkInterface,
+): ReceiveOnchainAdapter => {
+  return async ({ walletCurrency }) => {
+    try {
+      const { address } = await prepareReceiveOnchain(sdk)
+      return { address }
+    } catch (err) {
+      recordReceiveError(err, "createSelfCustodialReceiveOnchain", {
+        currency: walletCurrency,
+      })
+      return failedReceive(
+        err instanceof Error ? err.message : ONCHAIN_ADDRESS_FAILED_MESSAGE,
+      )
+    }
+  }
+}

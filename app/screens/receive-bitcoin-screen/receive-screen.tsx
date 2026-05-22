@@ -119,11 +119,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
 
   const carousel = useReceiveCarousel(requestState, openTrialModal)
 
-  const onchain = useOnchainResolver(
-    isSelfCustodial,
-    requestState,
-    carousel.onchainWalletCurrency,
-  )
+  const onchain = useOnchainResolver(requestState, carousel.onchainWalletCurrency)
 
   const {
     handleSetAmount,

@@ -30,11 +30,9 @@ jest.mock("@app/graphql/generated", () => ({
   WalletCurrency: { Btc: "BTC", Usd: "USD" },
 }))
 
-const mockMutations = {
-  lnNoAmountInvoiceCreate: jest.fn(),
-  lnInvoiceCreate: jest.fn(),
-  lnUsdInvoiceCreate: jest.fn(),
-  onChainAddressCurrent: jest.fn(),
+const mockAdapters = {
+  receiveLightning: jest.fn(),
+  receiveOnchain: jest.fn(),
 }
 
 type MockPR = {
@@ -71,26 +69,26 @@ describe("useInvoiceLifecycle", () => {
   it("returns null pr when prcd is null", () => {
     mockCreatePaymentRequest.mockReturnValue(createMockPR())
 
-    const { result } = renderHook(() => useInvoiceLifecycle(null, mockMutations as never))
+    const { result } = renderHook(() => useInvoiceLifecycle(null, mockAdapters as never))
 
-    expect(result.current.pr).toBeNull()
+    expect(result.current.paymentRequest).toBeNull()
     expect(mockCreatePaymentRequest).not.toHaveBeenCalled()
   })
 
-  it("creates PR from prcd and mutations", () => {
+  it("creates PR from prcd and adapters", () => {
     const mockPR = createMockPR()
     mockCreatePaymentRequest.mockReturnValue(mockPR)
 
     const prcd = { id: "test-prcd" }
     const { result } = renderHook(() =>
-      useInvoiceLifecycle(prcd as never, mockMutations as never),
+      useInvoiceLifecycle(prcd as never, mockAdapters as never),
     )
 
     expect(mockCreatePaymentRequest).toHaveBeenCalledWith({
-      mutations: mockMutations,
+      adapters: mockAdapters,
       creationData: prcd,
     })
-    expect(result.current.pr).toBeDefined()
+    expect(result.current.paymentRequest).toBeDefined()
   })
 
   it("triggers invoice generation when PR is Idle", async () => {
@@ -102,7 +100,7 @@ describe("useInvoiceLifecycle", () => {
     mockCreatePaymentRequest.mockReturnValue(idlePR)
 
     const prcd = { id: "test-prcd" }
-    renderHook(() => useInvoiceLifecycle(prcd as never, mockMutations as never))
+    renderHook(() => useInvoiceLifecycle(prcd as never, mockAdapters as never))
 
     expect(idlePR.generateRequest).toHaveBeenCalled()
   })
@@ -113,7 +111,7 @@ describe("useInvoiceLifecycle", () => {
     )
 
     const { result } = renderHook(() =>
-      useInvoiceLifecycle({ id: "test" } as never, mockMutations as never),
+      useInvoiceLifecycle({ id: "test" } as never, mockAdapters as never),
     )
 
     expect(result.current.regenerateInvoice).toBeDefined()
@@ -133,7 +131,7 @@ describe("useInvoiceLifecycle", () => {
     mockCreatePaymentRequest.mockReturnValue(mockPR)
     mockUseLnUpdateHashPaid.mockReturnValue("abc123")
 
-    renderHook(() => useInvoiceLifecycle({ id: "test" } as never, mockMutations as never))
+    renderHook(() => useInvoiceLifecycle({ id: "test" } as never, mockAdapters as never))
 
     expect(mockHaptic).toHaveBeenCalledWith("notificationSuccess", {
       ignoreAndroidSystemSettings: true,
@@ -153,7 +151,7 @@ describe("useInvoiceLifecycle", () => {
     mockCreatePaymentRequest.mockReturnValue(mockPR)
     mockUseLnUpdateHashPaid.mockReturnValue("different-hash")
 
-    renderHook(() => useInvoiceLifecycle({ id: "test" } as never, mockMutations as never))
+    renderHook(() => useInvoiceLifecycle({ id: "test" } as never, mockAdapters as never))
 
     expect(mockHaptic).not.toHaveBeenCalled()
   })
@@ -165,7 +163,7 @@ describe("useInvoiceLifecycle", () => {
     mockUseCountdown.mockReturnValue({ remainingSeconds: 300, isExpired: false })
 
     const { result } = renderHook(() =>
-      useInvoiceLifecycle({ id: "test" } as never, mockMutations as never),
+      useInvoiceLifecycle({ id: "test" } as never, mockAdapters as never),
     )
 
     expect(result.current.expiresInSeconds).toBe(300)

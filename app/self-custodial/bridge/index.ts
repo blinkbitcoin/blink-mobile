@@ -15,7 +15,6 @@ export {
 } from "./wallet"
 export { getSparkStatus } from "./status"
 export { activateStableBalance, deactivateStableBalance } from "./stable-balance"
-export { createReceiveLightning, createReceiveOnchain } from "./receive"
 export {
   prepareSend,
   executeSend,
@@ -32,6 +31,11 @@ export { listDeposits, claimDeposit, refundDeposit, getRecommendedFees } from ".
 export type { MappedDeposit, NetworkFeeRates } from "./deposits"
 export { prepareConversion, recordConvertError } from "./convert"
 export type { PreparedConversion } from "./convert"
+export {
+  prepareReceiveBolt11,
+  prepareReceiveOnchain,
+  recordReceiveError,
+} from "./receive"
 export { buildConversionType, fetchConversionLimits } from "./limits"
 export { parseSparkAddress } from "./parse"
 export type { ParsedSparkAddress } from "./parse"

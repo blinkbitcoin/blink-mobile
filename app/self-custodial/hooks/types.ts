@@ -17,6 +17,28 @@ export type InvoiceData = {
   getCopyableInvoiceFn: () => string
 }
 
+type PaymentRequestInfo = {
+  data?: InvoiceData
+}
+
+type ReceivingWalletDescriptor = {
+  id: string
+  currency: WalletCurrency
+}
+
+type ReceiveFeesInformation = {
+  deposit: {
+    minBankFee: string
+    minBankFeeThreshold: string
+    ratio: string
+  }
+}
+
+type PaymentRequestSnapshot = {
+  state?: PaymentRequestStateType
+  info?: PaymentRequestInfo
+}
+
 export type SelfCustodialPaymentRequestState = {
   type: InvoiceType
   state?: PaymentRequestStateType
@@ -37,29 +59,16 @@ export type SelfCustodialPaymentRequestState = {
   >
   settlementAmount?: MoneyAmount<WalletCurrency>
   unitOfAccountAmount?: MoneyAmount<WalletOrDisplayCurrency>
-  receivingWalletDescriptor: { id: string; currency: WalletCurrency }
+  receivingWalletDescriptor: ReceivingWalletDescriptor
   canSetAmount: boolean
   canSetMemo: boolean
   canUsePaycode: boolean
   btcWalletId?: string
   usdWalletId?: string
   lnAddressHostname: string
-  feesInformation:
-    | {
-        deposit: {
-          minBankFee: string
-          minBankFeeThreshold: string
-          ratio: string
-        }
-      }
-    | undefined
-  info?: { data?: InvoiceData }
-  onchainAddress?: string
-  getOnchainFullUriFn?: (params: UriParams) => string
-  pr: {
-    state?: PaymentRequestStateType
-    info?: { data?: InvoiceData }
-  } | null
+  feesInformation: ReceiveFeesInformation | undefined
+  info?: PaymentRequestInfo
+  paymentRequest: PaymentRequestSnapshot | null
   isAssetToggleDisabled?: boolean
   shouldShowAutoConvertMinWarning?: boolean
   autoConvertMinSats?: number

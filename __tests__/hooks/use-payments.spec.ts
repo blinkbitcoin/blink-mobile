@@ -16,6 +16,10 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 
 const mockIntraLedgerPaymentSend = jest.fn()
 const mockIntraLedgerUsdPaymentSend = jest.fn()
+const mockLnInvoiceCreate = jest.fn()
+const mockLnNoAmountInvoiceCreate = jest.fn()
+const mockLnUsdInvoiceCreate = jest.fn()
+const mockOnChainAddressCurrent = jest.fn()
 
 jest.mock("@app/graphql/generated", () => {
   const actual = jest.requireActual("@app/graphql/generated")
@@ -27,6 +31,16 @@ jest.mock("@app/graphql/generated", () => {
     ],
     useIntraLedgerUsdPaymentSendMutation: () => [
       mockIntraLedgerUsdPaymentSend,
+      { loading: false },
+    ],
+    useLnInvoiceCreateMutation: () => [mockLnInvoiceCreate, { loading: false }],
+    useLnNoAmountInvoiceCreateMutation: () => [
+      mockLnNoAmountInvoiceCreate,
+      { loading: false },
+    ],
+    useLnUsdInvoiceCreateMutation: () => [mockLnUsdInvoiceCreate, { loading: false }],
+    useOnChainAddressCurrentMutation: () => [
+      mockOnChainAddressCurrent,
       { loading: false },
     ],
   }
@@ -44,17 +58,20 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
 }))
 
-jest.mock("@app/self-custodial/bridge", () => ({
+jest.mock("@app/self-custodial/adapters/payment", () => ({
   createSendPayment: jest.fn().mockReturnValue(jest.fn()),
   createGetFee: jest.fn().mockReturnValue(jest.fn()),
-  createReceiveLightning: jest.fn().mockReturnValue(jest.fn()),
-  createReceiveOnchain: jest.fn().mockReturnValue(jest.fn()),
+  createSelfCustodialReceiveLightning: jest.fn().mockReturnValue(jest.fn()),
+  createSelfCustodialReceiveOnchain: jest.fn().mockReturnValue(jest.fn()),
+  createSelfCustodialConvert: jest.fn().mockReturnValue({ getQuote: jest.fn() }),
+}))
+
+jest.mock("@app/self-custodial/adapters/deposit", () => ({
   createListPendingDeposits: jest.fn().mockReturnValue(jest.fn()),
   createClaimDeposit: jest.fn().mockReturnValue({
     getClaimFee: jest.fn(),
     claimDeposit: jest.fn(),
   }),
-  createSelfCustodialConvert: jest.fn().mockReturnValue({ getQuote: jest.fn() }),
 }))
 
 jest.mock("@app/custodial/adapters/payment", () => ({
@@ -64,6 +81,8 @@ jest.mock("@app/custodial/adapters/payment", () => ({
     claimDeposit: jest.fn(),
   },
   createCustodialConvert: jest.fn().mockReturnValue({ getQuote: jest.fn() }),
+  createCustodialReceiveLightning: jest.fn().mockReturnValue(jest.fn()),
+  createCustodialReceiveOnchain: jest.fn().mockReturnValue(jest.fn()),
 }))
 
 const custodialWallets = [
@@ -127,16 +146,16 @@ describe("usePayments", () => {
     expect(result.current.getFee).toBeUndefined()
   })
 
-  it("returns receiveLightning as undefined (not wired yet)", () => {
+  it("wires receiveLightning adapter on the custodial path", () => {
     const { result } = renderHook(() => usePayments())
 
-    expect(result.current.receiveLightning).toBeUndefined()
+    expect(result.current.receiveLightning).toBeDefined()
   })
 
-  it("returns receiveOnchain as undefined (not wired yet)", () => {
+  it("wires receiveOnchain adapter on the custodial path", () => {
     const { result } = renderHook(() => usePayments())
 
-    expect(result.current.receiveOnchain).toBeUndefined()
+    expect(result.current.receiveOnchain).toBeDefined()
   })
 
   it("wires a convert adapter on the custodial path when both wallet IDs are present", () => {

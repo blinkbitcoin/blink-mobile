@@ -113,6 +113,13 @@ const lnUsdInvoiceCreateMock = jest.fn(() =>
   }),
 )
 
+;(globalThis as unknown as { __receiveMocks: Record<string, unknown> }).__receiveMocks = {
+  lnInvoiceCreate: lnInvoiceCreateMock,
+  lnNoAmountInvoiceCreate: lnNoAmountInvoiceCreateMock,
+  lnUsdInvoiceCreate: lnUsdInvoiceCreateMock,
+  onChainAddressCurrent: onChainAddressCurrentMock,
+}
+
 jest.mock("@app/graphql/generated", () => {
   const actual = jest.requireActual("@app/graphql/generated")
   return {
@@ -123,7 +130,39 @@ jest.mock("@app/graphql/generated", () => {
     useLnInvoiceCreateMutation: () => [lnInvoiceCreateMock],
     useLnUsdInvoiceCreateMutation: () => [lnUsdInvoiceCreateMock],
     useOnChainAddressCurrentMutation: () => [onChainAddressCurrentMock],
+    useIntraLedgerPaymentSendMutation: () => [jest.fn()],
+    useIntraLedgerUsdPaymentSendMutation: () => [jest.fn()],
     useMyLnUpdatesSubscription: () => ({ data: null }),
+  }
+})
+
+jest.mock("@app/hooks/use-payments", () => {
+  const { createCustodialReceiveLightning, createCustodialReceiveOnchain } =
+    jest.requireActual("@app/custodial/adapters/payment")
+  let cached: { receiveLightning: unknown; receiveOnchain: unknown } | null = null
+  return {
+    usePayments: () => {
+      if (cached) return { ...cached, accountType: "Custodial" }
+      const g = globalThis as unknown as {
+        __receiveMocks?: {
+          lnInvoiceCreate: unknown
+          lnNoAmountInvoiceCreate: unknown
+          lnUsdInvoiceCreate: unknown
+          onChainAddressCurrent: unknown
+        }
+      }
+      if (!g.__receiveMocks) return { accountType: "Custodial" }
+      const deps = {
+        ...g.__receiveMocks,
+        btcWalletId: "btc-wallet-id",
+        usdWalletId: "usd-wallet-id",
+      }
+      cached = {
+        receiveLightning: createCustodialReceiveLightning(deps),
+        receiveOnchain: createCustodialReceiveOnchain(deps),
+      }
+      return { ...cached, accountType: "Custodial" }
+    },
   }
 })
 

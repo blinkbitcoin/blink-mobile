@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 
-import { gql } from "@apollo/client"
-import {
-  WalletCurrency,
-  useLnInvoiceCreateMutation,
-  useLnNoAmountInvoiceCreateMutation,
-  useLnUsdInvoiceCreateMutation,
-  useOnChainAddressCurrentMutation,
-} from "@app/graphql/generated"
+import { WalletCurrency } from "@app/graphql/generated"
+import { usePayments } from "@app/hooks/use-payments"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { BtcWalletDescriptor } from "@app/types/wallets"
 
@@ -21,55 +15,6 @@ import { createPaymentRequestCreationData } from "../payment/payment-request-cre
 import { useInvoiceLifecycle } from "./use-invoice-lifecycle"
 import { useWalletResolution } from "./use-wallet-resolution"
 
-gql`
-  mutation lnNoAmountInvoiceCreate($input: LnNoAmountInvoiceCreateInput!) {
-    lnNoAmountInvoiceCreate(input: $input) {
-      errors {
-        message
-      }
-      invoice {
-        createdAt
-        paymentHash
-        paymentRequest
-        paymentStatus
-        externalId
-      }
-    }
-  }
-
-  mutation lnInvoiceCreate($input: LnInvoiceCreateInput!) {
-    lnInvoiceCreate(input: $input) {
-      errors {
-        message
-      }
-      invoice {
-        createdAt
-        paymentHash
-        paymentRequest
-        paymentStatus
-        externalId
-        satoshis
-      }
-    }
-  }
-
-  mutation lnUsdInvoiceCreate($input: LnUsdInvoiceCreateInput!) {
-    lnUsdInvoiceCreate(input: $input) {
-      errors {
-        message
-      }
-      invoice {
-        createdAt
-        paymentHash
-        paymentRequest
-        paymentStatus
-        externalId
-        satoshis
-      }
-    }
-  }
-`
-
 const DEFAULT_EXPIRATION_MINUTES: Record<WalletCurrency, number> = {
   [WalletCurrency.Btc]: 1440, // 24h
   [WalletCurrency.Usd]: 5,
@@ -77,11 +22,7 @@ const DEFAULT_EXPIRATION_MINUTES: Record<WalletCurrency, number> = {
 
 export const usePaymentRequest = () => {
   const wallets = useWalletResolution()
-
-  const [lnNoAmountInvoiceCreate] = useLnNoAmountInvoiceCreateMutation()
-  const [lnUsdInvoiceCreate] = useLnUsdInvoiceCreateMutation()
-  const [lnInvoiceCreate] = useLnInvoiceCreateMutation()
-  const [onChainAddressCurrent] = useOnChainAddressCurrentMutation()
+  const { receiveLightning, receiveOnchain } = usePayments()
 
   const [prcd, setPRCD] = useState<PaymentRequestCreationData<WalletCurrency> | null>(
     null,
@@ -125,17 +66,16 @@ export const usePaymentRequest = () => {
     setPRCD(createPaymentRequestCreationData(initialPRParams))
   }, [prcd, wallets])
 
-  const mutations = useMemo(
-    () => ({
-      lnNoAmountInvoiceCreate,
-      lnUsdInvoiceCreate,
-      lnInvoiceCreate,
-      onChainAddressCurrent,
-    }),
-    [lnNoAmountInvoiceCreate, lnUsdInvoiceCreate, lnInvoiceCreate, onChainAddressCurrent],
+  const adapters = useMemo(
+    () =>
+      receiveLightning && receiveOnchain ? { receiveLightning, receiveOnchain } : null,
+    [receiveLightning, receiveOnchain],
   )
 
-  const { pr, regenerateInvoice, expiresInSeconds } = useInvoiceLifecycle(prcd, mutations)
+  const { paymentRequest, regenerateInvoice, expiresInSeconds } = useInvoiceLifecycle(
+    prcd,
+    adapters,
+  )
 
   useEffect(() => {
     if (wallets?.username && wallets.username !== prcd?.username) {
@@ -216,8 +156,8 @@ export const usePaymentRequest = () => {
 
   return {
     ...prcd,
-    ...pr,
-    pr,
+    ...paymentRequest,
+    paymentRequest,
     setType,
     setMemo,
     switchReceivingWallet,
