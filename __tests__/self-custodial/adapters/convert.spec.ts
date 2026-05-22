@@ -113,6 +113,7 @@ describe("createSelfCustodialConvert — BTC → USD", () => {
 
     expect(quote!.feeAmount.currency).toBe(WalletCurrency.Usd)
     expect(quote!.feeAmount.amount).toBe(5)
+    expect(quote!.showFeeRow).toBe(true)
   })
 
   it("throws BelowMinimum and records to crashlytics when fromAmount is under the SDK minimum", async () => {

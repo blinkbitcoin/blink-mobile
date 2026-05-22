@@ -206,6 +206,7 @@ export type ConvertAmountAdjustment =
 
 export type ConvertQuote = {
   feeAmount: UsdMoneyAmount
+  showFeeRow: boolean
   amountAdjustment?: ConvertAmountAdjustment
   execute: () => Promise<PaymentAdapterResult>
 }

@@ -115,6 +115,7 @@ const executeUsdToBtc = async (
 export const createCustodialConvert = (deps: CustodialConvertDeps): ConvertAdapter => ({
   getQuote: async (params): Promise<ConvertQuote> => ({
     feeAmount: ZeroUsdMoneyAmount,
+    showFeeRow: false,
     execute: () =>
       params.direction === ConvertDirection.BtcToUsd
         ? executeBtcToUsd(deps, params)

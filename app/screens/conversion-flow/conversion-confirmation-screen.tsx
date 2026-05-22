@@ -221,7 +221,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
             </View>
           </View>
         </View>
-        {(conversion.hasFee || conversion.isQuoting || conversion.hasQuoteError) && (
+        {conversion.feeRowVisible && (
           <ConversionFeeRow
             feeText={conversion.feeText}
             isLoading={conversion.isQuoting}

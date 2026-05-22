@@ -28,7 +28,7 @@ export type ConversionExecutionState = {
   isQuoting: boolean
   hasQuoteError: boolean
   feeText: string
-  hasFee: boolean
+  feeRowVisible: boolean
   canExecute: boolean
   execute: () => Promise<ConversionExecutionOutcome>
 }
@@ -83,13 +83,13 @@ export const useConversionExecution = ({
   }, [quote, fromCurrency, LL])
 
   const canExecute = quote !== null
-  const hasFee = quote !== null && quote.feeAmount.amount > 0
+  const feeRowVisible = isQuoting || hasQuoteError || (quote !== null && quote.showFeeRow)
 
   return {
     isQuoting,
     hasQuoteError,
     feeText,
-    hasFee,
+    feeRowVisible,
     canExecute,
     execute,
   }

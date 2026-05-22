@@ -74,6 +74,7 @@ describe("createCustodialConvert — getQuote", () => {
     expect(quote).not.toBeNull()
     expect(quote!.feeAmount.amount).toBe(0)
     expect(quote!.feeAmount.currency).toBe(WalletCurrency.Usd)
+    expect(quote!.showFeeRow).toBe(false)
   })
 })
 

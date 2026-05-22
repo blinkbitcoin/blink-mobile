@@ -39,6 +39,7 @@ jest.mock("@react-native-firebase/crashlytics", () => {
 
 const buildQuote = (amountAdjustment?: ConvertAmountAdjustment): ConvertQuote => ({
   feeAmount: toUsdMoneyAmount(5),
+  showFeeRow: true,
   amountAdjustment,
   execute: jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
 })

@@ -141,7 +141,7 @@ describe("conversion-confirmation-screen", () => {
       isQuoting: false,
       hasQuoteError: false,
       feeText: "",
-      hasFee: false,
+      feeRowVisible: false,
       canExecute: true,
       execute: jest.fn().mockResolvedValue({ status: "success" }),
     })
@@ -209,7 +209,7 @@ describe("conversion-confirmation-screen", () => {
       isQuoting: false,
       hasQuoteError: false,
       feeText: "$0.00",
-      hasFee: false,
+      feeRowVisible: false,
       canExecute: true,
       execute,
     })
@@ -242,7 +242,7 @@ describe("conversion-confirmation-screen", () => {
       isQuoting: false,
       hasQuoteError: false,
       feeText: "",
-      hasFee: false,
+      feeRowVisible: false,
       canExecute: true,
       execute,
     })
@@ -272,7 +272,7 @@ describe("conversion-confirmation-screen", () => {
       isQuoting: false,
       hasQuoteError: false,
       feeText: "$0.05",
-      hasFee: true,
+      feeRowVisible: true,
       canExecute: true,
       execute: jest.fn(),
     })
@@ -291,7 +291,7 @@ describe("conversion-confirmation-screen", () => {
       isQuoting: false,
       hasQuoteError: false,
       feeText: "$0.00",
-      hasFee: false,
+      feeRowVisible: false,
       canExecute: true,
       execute: jest.fn(),
     })
@@ -310,7 +310,7 @@ describe("conversion-confirmation-screen", () => {
       isQuoting: true,
       hasQuoteError: false,
       feeText: "",
-      hasFee: false,
+      feeRowVisible: true,
       canExecute: false,
       execute: jest.fn(),
     })

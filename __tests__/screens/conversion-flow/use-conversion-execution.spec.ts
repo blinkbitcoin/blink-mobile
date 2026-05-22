@@ -53,10 +53,12 @@ const defaultParams = {
 const makeQuote = (
   overrides: Partial<{
     feeAmount: ReturnType<typeof toUsdMoneyAmount>
+    showFeeRow: boolean
     execute: jest.Mock
   }> = {},
 ) => ({
   feeAmount: overrides.feeAmount ?? toUsdMoneyAmount(5),
+  showFeeRow: overrides.showFeeRow ?? true,
   execute:
     overrides.execute ??
     jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
@@ -83,7 +85,7 @@ describe("useConversionExecution", () => {
     expect(result.current.isQuoting).toBe(false)
     expect(result.current.feeText).toBe("$0.05")
     expect(result.current.hasQuoteError).toBe(false)
-    expect(result.current.hasFee).toBe(true)
+    expect(result.current.feeRowVisible).toBe(true)
     expect(mockGetQuote).toHaveBeenCalledWith({
       fromAmount: expect.objectContaining({ currency: WalletCurrency.Btc }),
       toAmount: expect.objectContaining({ currency: WalletCurrency.Usd }),
@@ -91,13 +93,26 @@ describe("useConversionExecution", () => {
     })
   })
 
-  it("reports hasFee=false when the quote fee is zero (custodial intra-ledger path)", async () => {
-    mockGetQuote.mockResolvedValue(makeQuote({ feeAmount: toUsdMoneyAmount(0) }))
+  it("hides the fee row when the adapter opts out (custodial intra-ledger path)", async () => {
+    mockGetQuote.mockResolvedValue(
+      makeQuote({ feeAmount: toUsdMoneyAmount(0), showFeeRow: false }),
+    )
 
     const { result } = renderHook(() => useConversionExecution(defaultParams))
 
     await waitFor(() => expect(result.current.canExecute).toBe(true))
-    expect(result.current.hasFee).toBe(false)
+    expect(result.current.feeRowVisible).toBe(false)
+  })
+
+  it("keeps the fee row visible for self-custodial quotes even when fee rounds to zero", async () => {
+    mockGetQuote.mockResolvedValue(
+      makeQuote({ feeAmount: toUsdMoneyAmount(0), showFeeRow: true }),
+    )
+
+    const { result } = renderHook(() => useConversionExecution(defaultParams))
+
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+    expect(result.current.feeRowVisible).toBe(true)
   })
 
   it("falls into Error when getQuote resolves to null", async () => {

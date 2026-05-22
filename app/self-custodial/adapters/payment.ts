@@ -141,6 +141,7 @@ const toConvertQuote = (
   const feeCents = tokenBaseUnitsToCents(toNumber(estimate.fee), tokenDecimals)
   return {
     feeAmount: toUsdMoneyAmount(feeCents),
+    showFeeRow: true,
     amountAdjustment: mapAmountAdjustment(estimate.amountAdjustment),
     execute: () => executePrepared(sdk, prepared, params),
   }
