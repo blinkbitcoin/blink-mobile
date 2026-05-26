@@ -215,8 +215,7 @@ describe("useOnchainFeeTiers", () => {
       .mockReturnValueOnce({ fast: 999, medium: 999, slow: 999 }) // stale tiers
 
     const { result, rerender } = renderHook(
-      ({ amount }: { amount: number }) =>
-        useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
+      ({ amount }: { amount: number }) => useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
       { initialProps: { amount: 1000 as number } },
     )
 
