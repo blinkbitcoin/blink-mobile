@@ -16,12 +16,20 @@
 default_platform(:android)
 
 platform :android do
-  desc "Build Releasable APK"
+  desc "Build Releasable APK + AAB"
   lane :build do
     android_set_version_name(version_name: ENV["PUBLIC_VERSION"])
     gradle(task: 'clean')
+    # APKs (universal + per-ABI splits): still built for e2e (BrowserStack),
+    # Huawei AppGallery, and the GCS archive. NOT uploaded to Play anymore.
     gradle(
       task: "assemble",
+      build_type: "Release",
+      flags: "--no-daemon --stacktrace --info",
+    )
+    # AAB: the artifact published to Google Play (see play_store_upload for why).
+    gradle(
+      task: "bundle",
       build_type: "Release",
       flags: "--no-daemon --stacktrace --info",
     )
@@ -29,21 +37,39 @@ platform :android do
 
   desc "Deploy a new version to the Google Play"
   lane :play_store_upload do
+    # Publish an Android App Bundle (AAB), not APKs. The universal APK packs every
+    # ABI into one ~240 MB file, which exceeds Google Play's hard 100 MB single-APK
+    # limit ("Google Api Error: APK ... is too large"). Play has required AAB for
+    # new apps since Aug 2021; it generates/signs optimized per-device APKs
+    # server-side (no 100 MB ceiling) and gives users smaller downloads.
+    # Requires Play App Signing to be enabled for the app.
     upload_to_play_store(
-      apk_paths: [
-        "./app/build/outputs/apk/release/app-arm64-v8a-release.apk",
-        "./app/build/outputs/apk/release/app-armeabi-v7a-release.apk",
-        "./app/build/outputs/apk/release/app-universal-release.apk",
-        "./app/build/outputs/apk/release/app-x86-release.apk",
-        "./app/build/outputs/apk/release/app-x86_64-release.apk",
-      ],
-      # metadata_path: "./app/build/outputs/apk/release",
+      aab: "./app/build/outputs/bundle/release/app-release.aab",
       track: "internal",
       skip_upload_changelogs: true,
       skip_upload_images: true,
       skip_upload_metadata: true,
       skip_upload_screenshots: true
     )
+
+    # LEGACY (do not re-enable): multi-APK upload. The universal APK below blows
+    # past Play's 100 MB single-APK limit and fails the whole edit. Kept for
+    # reference; Huawei + e2e still build these APKs.
+    # upload_to_play_store(
+    #   apk_paths: [
+    #     "./app/build/outputs/apk/release/app-arm64-v8a-release.apk",
+    #     "./app/build/outputs/apk/release/app-armeabi-v7a-release.apk",
+    #     "./app/build/outputs/apk/release/app-universal-release.apk",
+    #     "./app/build/outputs/apk/release/app-x86-release.apk",
+    #     "./app/build/outputs/apk/release/app-x86_64-release.apk",
+    #   ],
+    #   # metadata_path: "./app/build/outputs/apk/release",
+    #   track: "internal",
+    #   skip_upload_changelogs: true,
+    #   skip_upload_images: true,
+    #   skip_upload_metadata: true,
+    #   skip_upload_screenshots: true
+    # )
   end
 
   desc "Deploy the new version to Huawei App Gallery"
