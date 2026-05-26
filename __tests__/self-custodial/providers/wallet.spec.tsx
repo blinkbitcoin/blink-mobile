@@ -11,6 +11,15 @@ import {
 
 import { getWalletSnapshotMocks, setupConnectedWallet } from "./wallet.fixtures"
 
+jest.mock("react-native/Libraries/AppState/AppState", () => ({
+  __esModule: true,
+  default: {
+    currentState: "active",
+    addEventListener: () => ({ remove: () => {} }),
+    removeEventListener: () => {},
+  },
+}))
+
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   Network: { Mainnet: 0, Regtest: 1 },
   // eslint-disable-next-line camelcase
@@ -1542,7 +1551,7 @@ describe("SelfCustodialWalletProvider — stale-write safety", () => {
       const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
       await waitFor(() => {
-        expect(result.current.updateCurrentSelfCustodialAccount).toBeDefined()
+        expect(mockGetLightningAddress).toHaveBeenCalled()
       })
 
       mockGetLightningAddress.mockRejectedValueOnce(new Error("refresh failed"))

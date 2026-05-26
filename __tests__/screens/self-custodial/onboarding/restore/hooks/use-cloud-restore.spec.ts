@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react-native"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { useCloudRestore } from "@app/screens/self-custodial/onboarding/restore/hooks/use-cloud-restore"
 
@@ -499,7 +499,7 @@ describe("useCloudRestore", () => {
       expect(result.current.isPassword).toBe(true)
     })
 
-    await waitFor(async () => {
+    await act(async () => {
       await result.current.handleDecrypt()
     })
 
@@ -533,7 +533,7 @@ describe("useCloudRestore", () => {
       expect(result.current.isPassword).toBe(true)
     })
 
-    await waitFor(async () => {
+    await act(async () => {
       await result.current.handleDecrypt()
     })
 
@@ -569,7 +569,7 @@ describe("useCloudRestore", () => {
       expect(result.current.isPassword).toBe(true)
     })
 
-    await waitFor(async () => {
+    await act(async () => {
       await result.current.handleDecrypt()
     })
 
@@ -605,7 +605,7 @@ describe("useCloudRestore", () => {
       expect(result.current.isPassword).toBe(true)
     })
 
-    await waitFor(async () => {
+    await act(async () => {
       await result.current.handleDecrypt()
     })
 
@@ -640,7 +640,7 @@ describe("useCloudRestore", () => {
       expect(result.current.isPassword).toBe(true)
     })
 
-    await waitFor(async () => {
+    await act(async () => {
       await result.current.handleDecrypt()
     })
 
@@ -666,7 +666,7 @@ describe("useCloudRestore", () => {
       expect(result.current.isPassword).toBe(true)
     })
 
-    await waitFor(async () => {
+    await act(async () => {
       await result.current.handleDecrypt()
     })
 

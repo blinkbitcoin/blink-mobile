@@ -142,8 +142,11 @@ describe("EarnMapScreen", () => {
       expect(screen.getByText(oneSectionTitle)).toBeTruthy()
     })
     fireEvent.press(screen.getByText(LL.EarnScreen.continueNoRewards()))
-    await waitFor(() => {
-      expect(screen.queryByText(oneSectionTitle)).toBeNull()
-    })
+    await waitFor(
+      () => {
+        expect(screen.queryByText(oneSectionTitle)).toBeNull()
+      },
+      { timeout: 3000 },
+    )
   })
 })

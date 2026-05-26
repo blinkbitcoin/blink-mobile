@@ -2,6 +2,13 @@ import * as React from "react"
 import { Text as ReactNativeText, TouchableOpacity, View, Linking } from "react-native"
 import { render, fireEvent, waitFor } from "@testing-library/react-native"
 
+jest.mock("@app/components/animations", () => ({
+  useDropInOutAnimation: () => ({
+    opacity: { _value: 1 },
+    translateY: { _value: 0 },
+  }),
+}))
+
 import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { testBulletinsStore } from "@app/components/notifications/test-bulletins-store"
 import { BulletinsQuery, Icon } from "@app/graphql/generated"

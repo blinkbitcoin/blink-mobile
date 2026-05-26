@@ -25,14 +25,34 @@ describe("AutoConvertListenerMount", () => {
   })
 
   it("does not swallow errors thrown by the listener hook", () => {
-    // The wrapper has no try/catch around the hook; a crash must propagate
-    // to React rather than be silently absorbed by the wrapper.
+    // The wrapper has no try/catch around the hook; a crash must surface via
+    // an ErrorBoundary instead of being silently absorbed by the wrapper.
     mockListener.mockImplementationOnce(() => {
       throw new Error("listener crashed")
     })
 
+    const captured: { error: Error | null } = { error: null }
+    class Boundary extends React.Component<
+      { children: React.ReactNode },
+      { error: Error | null }
+    > {
+      state = { error: null as Error | null }
+      static getDerivedStateFromError(error: Error) {
+        captured.error = error
+        return { error }
+      }
+      render() {
+        return this.state.error ? null : this.props.children
+      }
+    }
+
     const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
-    expect(() => render(<AutoConvertListenerMount />)).toThrow("listener crashed")
+    render(
+      <Boundary>
+        <AutoConvertListenerMount />
+      </Boundary>,
+    )
     consoleErrorSpy.mockRestore()
+    expect(captured.error?.message).toBe("listener crashed")
   })
 })

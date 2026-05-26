@@ -15,11 +15,14 @@ jest.mock("@react-navigation/native", () => ({
 }))
 
 jest.mock("react-native/Libraries/Linking/Linking", () => ({
-  openURL: jest.fn(),
-  addEventListener: jest.fn(() => ({ remove: jest.fn() })),
-  removeEventListener: jest.fn(),
-  getInitialURL: jest.fn(),
-  canOpenURL: jest.fn(),
+  __esModule: true,
+  default: {
+    openURL: jest.fn(),
+    addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+    removeEventListener: jest.fn(),
+    getInitialURL: jest.fn(),
+    canOpenURL: jest.fn(),
+  },
 }))
 
 const route: RouteProp<OnboardingStackParamList, "supportScreen"> = {
