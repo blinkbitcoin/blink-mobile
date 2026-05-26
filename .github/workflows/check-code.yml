@@ -1,5 +1,5 @@
-#! Auto synced from Shared CI Resources repository
-#! Don't change this file, instead change it in github.com/GaloyMoney/concourse-shared
+#! Originally synced from github.com/GaloyMoney/concourse-shared (now archived).
+#! blink-mobile is not a sync target, so this file is maintained directly here.
 
 name: Check Code
 
