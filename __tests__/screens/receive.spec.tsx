@@ -206,8 +206,6 @@ jest.mock("react-native-nfc-manager", () => ({
   },
 }))
 
-jest.mock("@gorhom/bottom-sheet")
-
 jest.mock("react-native-haptic-feedback", () => ({
   trigger: jest.fn(),
 }))
@@ -698,7 +696,7 @@ describe("ReceiveScreen", () => {
       })
     })
 
-    it("applies NFC amount only after modal dismiss animation completes", async () => {
+    it("applies NFC amount when Set Amount is pressed", async () => {
       render(
         <ContextForScreen>
           <ReceiveScreen />
@@ -722,21 +720,7 @@ describe("ReceiveScreen", () => {
       fireEvent.press(screen.getByTestId("Key 2"))
       await flushAsync()
 
-      jest.useFakeTimers()
-      try {
-        fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
-
-        expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
-        act(() => {
-          jest.advanceTimersByTime(39)
-        })
-        expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
-        act(() => {
-          jest.advanceTimersByTime(1)
-        })
-      } finally {
-        jest.useRealTimers()
-      }
+      fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
 
       await waitFor(() => {
         expect(lnInvoiceCreateMock).toHaveBeenCalled()
@@ -1315,7 +1299,7 @@ describe("Amount modal lifecycle", () => {
     LL = i18nObject("en")
   })
 
-  it("applies amount only after modal dismiss animation completes", async () => {
+  it("applies amount when Set Amount is pressed", async () => {
     render(
       <ContextForScreen>
         <ReceiveScreen />
@@ -1332,35 +1316,15 @@ describe("Amount modal lifecycle", () => {
     fireEvent.press(screen.getByText(LL.AmountInputButton.tapToSetAmount()))
     await flushAsync()
 
-    expect(screen.getByTestId("bottom-sheet-modal")).toBeTruthy()
-
     fireEvent.press(screen.getByTestId("Key 3"))
     await flushAsync()
-    jest.useFakeTimers()
-    try {
-      fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
 
-      expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
-      act(() => {
-        jest.advanceTimersByTime(39)
-      })
-      expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
-      act(() => {
-        jest.advanceTimersByTime(1)
-      })
-    } finally {
-      jest.useRealTimers()
-    }
+    fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
 
     await waitFor(() => {
       expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
     })
 
     expect(lnInvoiceCreateMock).toHaveBeenCalled()
-
-    await flushAsync()
-    await flushAsync()
-
-    expect(screen.queryByTestId("bottom-sheet-modal")).toBeNull()
   })
 })
