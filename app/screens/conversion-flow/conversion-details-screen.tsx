@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { View, TextInput, Animated, Easing, LayoutChangeEvent } from "react-native"
+import { View, Animated, Easing, LayoutChangeEvent } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
+
+import type { InputRef } from "@app/types/themed-input"
 
 import {
   useConversionScreenQuery,
@@ -214,9 +216,9 @@ export const ConversionDetailsScreen = () => {
     labels: pillLabels,
   })
 
-  const fromInputRef = useRef<TextInput | null>(null)
-  const toInputRef = useRef<TextInput | null>(null)
-  const currencyInputRef = useRef<TextInput | null>(null)
+  const fromInputRef = useRef<InputRef | null>(null)
+  const toInputRef = useRef<InputRef | null>(null)
+  const currencyInputRef = useRef<InputRef | null>(null)
   const toggleInitiated = useRef(false)
   const pendingFocusId = useRef<ConvertInputType | null>(null)
   const hadInitialFocus = useRef(false)

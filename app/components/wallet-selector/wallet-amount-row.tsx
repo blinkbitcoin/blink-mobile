@@ -4,7 +4,6 @@ import { Input, makeStyles, Text, useTheme } from "@rn-vui/themed"
 import {
   LayoutChangeEvent,
   StyleProp,
-  TextInput,
   TouchableOpacity,
   View,
   ViewStyle,
@@ -13,9 +12,10 @@ import {
 import { CurrencyPill } from "@app/components/atomic/currency-pill"
 import { WalletCurrency } from "@app/graphql/generated"
 import { APPROXIMATE_PREFIX } from "@app/config"
+import type { InputRef } from "@app/types/themed-input"
 
 export type WalletAmountRowProps = {
-  inputRef: React.RefObject<TextInput>
+  inputRef: React.RefObject<InputRef | null>
   value: string
   placeholder: string
   rightIcon?: IconNode
