@@ -50,9 +50,11 @@ describe("AmountInputModal", () => {
   })
 
   it("calls close on Android back dismiss (onRequestClose)", () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
     const { UNSAFE_getByType } = render(<AmountInputModal {...defaultProps} />)
     const Modal = jest.requireActual("react-native").Modal
 
+    // eslint-disable-next-line camelcase
     fireEvent(UNSAFE_getByType(Modal), "requestClose")
 
     expect(mockClose).toHaveBeenCalledTimes(1)
