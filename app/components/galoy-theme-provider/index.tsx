@@ -14,7 +14,7 @@ export const GaloyThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   let mode: ThemeMode = "light"
   if (colorScheme === "system" || !colorScheme) {
     const systemScheme = Appearance.getColorScheme()
-    if (systemScheme) {
+    if (systemScheme && systemScheme !== "unspecified") {
       mode = systemScheme
     }
   } else {
