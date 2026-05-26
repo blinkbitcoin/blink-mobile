@@ -27,9 +27,9 @@
       system: let
         overlays = [
           (self: super: {
-            nodejs = super.nodejs_20;
+            nodejs = super.nodejs_24;
             yarn = super.yarn.override {
-              nodejs = super.nodejs_20;
+              nodejs = super.nodejs_24;
             };
           })
         ];
