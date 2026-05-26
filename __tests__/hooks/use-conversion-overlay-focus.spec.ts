@@ -1,4 +1,3 @@
-import { TextInput } from "react-native"
 import { renderHook, act } from "@testing-library/react-hooks"
 
 import { useConversionOverlayFocus } from "@app/screens/conversion-flow/hooks/use-conversion-overlay-focus"
@@ -20,14 +19,14 @@ describe("useConversionOverlayFocus", () => {
     current: {
       focus: mockFromInputFocus,
       setNativeProps: mockFromInputSetNativeProps,
-    } as unknown as TextInput,
+    },
   }
 
   const toInputRef = {
     current: {
       focus: mockToInputFocus,
       setNativeProps: mockToInputSetNativeProps,
-    } as unknown as TextInput,
+    },
   }
 
   const defaultInputValues = {
