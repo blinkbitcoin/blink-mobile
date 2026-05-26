@@ -10,7 +10,7 @@ const delay = (ms: number): Promise<void> =>
     setTimeout(resolve, ms)
   })
 
-export const useScreenshot = (viewRef: RefObject<View>) => {
+export const useScreenshot = (viewRef: RefObject<View | null>) => {
   const [isTakingScreenshot, setIsTakingScreenshot] = useState(false)
 
   const captureAndShare = useCallback(async () => {

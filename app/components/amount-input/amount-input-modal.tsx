@@ -41,7 +41,9 @@ export const AmountInputModal: React.FC<AmountInputModalProps> = ({
   const { bottom } = useSafeAreaInsets()
   const styles = useStyles({ bottom })
   const bottomSheetRef = useRef<BottomSheetModal>(null)
-  const pendingSetAmountRef = useRef<MoneyAmount<WalletOrDisplayCurrency>>()
+  const pendingSetAmountRef = useRef<MoneyAmount<WalletOrDisplayCurrency> | undefined>(
+    undefined,
+  )
 
   useEffect(() => {
     if (isOpen) {

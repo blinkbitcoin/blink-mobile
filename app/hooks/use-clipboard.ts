@@ -11,7 +11,7 @@ type CopyToClipboardParams = {
 
 export const useClipboard = (clearAfterMs?: number) => {
   const { LL } = useI18nContext()
-  const timerRef = useRef<ReturnType<typeof setTimeout>>()
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     if (!clearAfterMs) clearTimeout(timerRef.current)
