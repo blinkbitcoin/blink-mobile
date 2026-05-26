@@ -91,7 +91,7 @@
     "@rn-vui/base": "^5.1.10",
     "@rn-vui/themed": "^5.1.10",
     "@ronradtke/react-native-markdown-display": "^8.0.0",
-    "@shopify/react-native-skia": "^1.12.4",
+    "@shopify/react-native-skia": "^2.6.4",
     "apollo3-cache-persist": "^0.15.0",
     "axios": "^1.11.0",
     "bech32": "^2.0.0",
