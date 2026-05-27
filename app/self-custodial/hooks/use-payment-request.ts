@@ -76,6 +76,9 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const receivingCurrency =
     assetMode === ReceiveAssetMode.Dollar ? WalletCurrency.Usd : WalletCurrency.Btc
 
+  const convertMoneyAmountRef = useRef(convertMoneyAmount)
+  convertMoneyAmountRef.current = convertMoneyAmount
+
   const receivingWalletDescriptor = useMemo(
     () => ({
       id:
@@ -95,6 +98,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     if (!sdk || !isReady || isAssetModeLoading || !typeInitialized) return
     if (type === Invoice.OnChain || type === Invoice.PayCode) return
     if (
+      requestStateRef.current === PaymentRequestState.Loading ||
       requestStateRef.current === PaymentRequestState.Converting ||
       requestStateRef.current === PaymentRequestState.Paid
     ) {
@@ -103,6 +107,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     setRequestState(PaymentRequestState.Loading)
 
     try {
+      const convertMoneyAmount = convertMoneyAmountRef.current
       const invoiceSats =
         amount && convertMoneyAmount
           ? toSatsAmount(amount, convertMoneyAmount)
@@ -148,17 +153,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
       )
       setRequestState(PaymentRequestState.Error)
     }
-  }, [
-    sdk,
-    isReady,
-    isAssetModeLoading,
-    typeInitialized,
-    type,
-    memo,
-    amount,
-    convertMoneyAmount,
-    assetMode,
-  ])
+  }, [sdk, isReady, isAssetModeLoading, typeInitialized, type, memo, amount, assetMode])
 
   const setMemo = useCallback(() => {
     setMemoState(memoChangeText || "")
