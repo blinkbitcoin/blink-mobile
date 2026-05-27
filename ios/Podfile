@@ -48,17 +48,6 @@ target 'GaloyApp' do
       end
     end
 
-    # from https://github.com/software-mansion/react-native-reanimated/issues/4522
-    installer.generated_projects.each do |project|
-      project.targets.each do |target|
-        target.build_configurations.each do |config|
-          if target.name === "RNReanimated"
-            config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
-          end
-        end
-      end
-    end
-
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,
@@ -66,6 +55,15 @@ target 'GaloyApp' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Keep fmt on C++17 to avoid Xcode 26.5 consteval failures.
+    installer.pods_project.targets.each do |target|
+      if target.name == "fmt"
+        target.build_configurations.each do |config|
+          config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        end
+      end
+    end
 
     installer.pods_project.build_configurations.each do |config|
       config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
