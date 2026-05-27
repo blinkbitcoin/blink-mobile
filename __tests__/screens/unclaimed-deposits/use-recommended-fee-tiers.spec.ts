@@ -73,7 +73,7 @@ describe("useRecommendedFeeTiers", () => {
     })
 
     const { result, rerender } = renderHook(
-      ({ enabled }) => useRecommendedFeeTiers(mockSdk, enabled),
+      ({ enabled }: { enabled: boolean }) => useRecommendedFeeTiers(mockSdk, enabled),
       { initialProps: { enabled: true } },
     )
 

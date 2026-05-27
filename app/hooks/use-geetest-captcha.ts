@@ -43,8 +43,8 @@ export const useGeetestCaptcha = (): GeetestCaptchaReturn => {
     useState<GeetestValidationData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const { LL } = useI18nContext()
-  const onGeeTestDialogResultListener = useRef<EventSubscription>()
-  const onGeeTestFailedListener = useRef<EventSubscription>()
+  const onGeeTestDialogResultListener = useRef<EventSubscription | undefined>(undefined)
+  const onGeeTestFailedListener = useRef<EventSubscription | undefined>(undefined)
 
   const [captchaCreateChallenge, { loading: loadingRegisterCaptcha }] =
     useCaptchaCreateChallengeMutation({

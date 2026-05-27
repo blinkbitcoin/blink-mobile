@@ -35,7 +35,7 @@ const CarouselItem: React.FC<{
       {children}
       <Animated.View
         pointerEvents="none"
-        style={[StyleSheet.absoluteFillObject, overlayStyle, animatedOverlay]}
+        style={[StyleSheet.absoluteFill, overlayStyle, animatedOverlay]}
       />
     </View>
   )

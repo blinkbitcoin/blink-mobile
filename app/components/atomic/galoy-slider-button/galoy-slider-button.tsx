@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { ActivityIndicator, Dimensions, View, I18nManager } from "react-native"
-import { PanGestureHandler } from "react-native-gesture-handler"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, {
   Extrapolate,
   Extrapolation,
@@ -8,7 +8,6 @@ import Animated, {
   FadeOut,
   interpolate,
   runOnJS,
-  useAnimatedGestureHandler,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -52,22 +51,22 @@ const GaloySliderButton = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading])
 
-  const animatedGestureHandler = useAnimatedGestureHandler({
-    onActive: (e) => {
+  const panGesture = Gesture.Pan()
+    .enabled(!isLoading && !disabled)
+    .onUpdate((e) => {
       const newValue = Math.abs(e.translationX)
 
       if (newValue >= 0 && newValue <= SWIPE_RANGE) {
         X.value = newValue
       }
-    },
-    onEnd: () => {
+    })
+    .onEnd(() => {
       if (X.value < SWIPE_RANGE * 0.6) {
         X.value = withSpring(0)
       } else {
         runOnJS(onSwipe)()
       }
-    },
-  })
+    })
 
   const AnimatedStyles = {
     swipeButton: useAnimatedStyle(() => {
@@ -107,11 +106,7 @@ const GaloySliderButton = ({
   return (
     <View style={styles.swipeButtonContainer}>
       {!isLoading && (
-        <PanGestureHandler
-          enabled={!isLoading && !disabled}
-          onGestureEvent={animatedGestureHandler}
-          {...testProps("slider")}
-        >
+        <GestureDetector gesture={panGesture}>
           <Animated.View
             style={[
               styles.swipeButton,
@@ -119,6 +114,7 @@ const GaloySliderButton = ({
               { backgroundColor: disabled ? colors.disabled : colors.primary },
             ]}
             exiting={FadeOut.duration(400)}
+            {...testProps("slider")}
           >
             {isRTL ? (
               <GaloyIcon size={30} name="arrow-left" color="white" />
@@ -126,7 +122,7 @@ const GaloySliderButton = ({
               <GaloyIcon size={30} name="arrow-right" color="white" />
             )}
           </Animated.View>
-        </PanGestureHandler>
+        </GestureDetector>
       )}
       {!disabled && (
         <Animated.Text style={[styles.swipeText, AnimatedStyles.swipeText]}>

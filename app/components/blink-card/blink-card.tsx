@@ -167,20 +167,20 @@ const useStyles = makeStyles(({ colors }) => ({
     textShadowRadius: 2,
   },
   frozenOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: "center",
     alignItems: "center",
   },
   blurContainer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 14,
     overflow: "hidden",
   },
   blurOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   blurTint: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: colors._black,
     opacity: 0.6,
   },
@@ -194,7 +194,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 8,
   },
   lockCircleBackground: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: colors.error,
     opacity: 0.2,
   },

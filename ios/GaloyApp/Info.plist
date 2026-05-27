@@ -68,16 +68,18 @@
 			</array>
 		</dict>
 	</array>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-	  	<string>tg</string>
-	</array>
 	<key>CFBundleVersion</key>
 	<string>772</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tg</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NFCReaderUsageDescription</key>
+	<string>Receive payments over NFC</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -89,14 +91,14 @@
 	<string>Activate your camera to scan QR codes</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>$(PRODUCT_NAME) requires FaceID access for quick and secure authentication</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Find merchants who accept bitcoin near you</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app includes a component that requires background location access, but your location is only used while in app to find merchants near you.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Find merchants who accept bitcoin near you</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Import a screenshot with a QR code</string>
-	<key>NFCReaderUsageDescription</key>
-	<string>Receive payments over NFC</string>
+	<key>RCTNewArchEnabled</key>
+	<true/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>

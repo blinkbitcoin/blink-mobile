@@ -692,4 +692,36 @@ describe("usePaymentRequest", () => {
       expect(result.current?.info?.data?.invoiceType).toBe("Lightning")
     })
   })
+
+  describe("in-flight guard", () => {
+    it("does not fire a second SDK call while a Lightning generation is in flight", async () => {
+      let resolveInFlight: ((value: { invoice: string }) => void) | undefined
+      const inFlightPromise = new Promise<{ invoice: string }>((resolve) => {
+        resolveInFlight = resolve
+      })
+      mockReceiveLightning.mockReturnValueOnce(inFlightPromise)
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.state).toBe("Loading")
+      })
+      expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
+
+      await act(async () => {
+        await result.current?.regenerateInvoice()
+      })
+
+      expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
+
+      await act(async () => {
+        resolveInFlight?.({ invoice: "lnbc1test..." })
+      })
+
+      await waitFor(() => {
+        expect(result.current?.state).toBe("Created")
+      })
+      expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
+    })
+  })
 })

@@ -158,7 +158,8 @@ describe("useOnchainFeeTiers", () => {
     mockPrepareSend.mockRejectedValue(new Error("transient"))
 
     const { result, rerender } = renderHook(
-      ({ amount }) => useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
+      ({ amount }: { amount: number | undefined }) =>
+        useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
       { initialProps: { amount: 100 as number | undefined } },
     )
 
@@ -182,7 +183,8 @@ describe("useOnchainFeeTiers", () => {
     mockPrepareSend.mockRejectedValue(new Error("transient"))
 
     const { result, rerender } = renderHook(
-      ({ amount }) => useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
+      ({ amount }: { amount: number | undefined }) =>
+        useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
       { initialProps: { amount: 100 as number | undefined } },
     )
 
@@ -213,7 +215,7 @@ describe("useOnchainFeeTiers", () => {
       .mockReturnValueOnce({ fast: 999, medium: 999, slow: 999 }) // stale tiers
 
     const { result, rerender } = renderHook(
-      ({ amount }) => useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
+      ({ amount }: { amount: number }) => useOnchainFeeTiers(mockSdk, "bc1qtest", amount),
       { initialProps: { amount: 1000 as number } },
     )
 

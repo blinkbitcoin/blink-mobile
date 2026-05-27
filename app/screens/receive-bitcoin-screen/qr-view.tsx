@@ -265,7 +265,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "center",
   },
   logoOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: "center",
     alignItems: "center",
   },

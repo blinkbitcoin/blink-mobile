@@ -5,7 +5,6 @@ import {
   ReceivePaymentMethod,
   ReceivePaymentRequest,
   SendPaymentRequest,
-  SyncWalletRequest,
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
@@ -283,9 +282,6 @@ const executePrepared = async (
 ): Promise<PaymentAdapterResult> => {
   try {
     await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
-    sdk.syncWallet(SyncWalletRequest.create({})).catch((err) => {
-      reportError("convert: post-send syncWallet", err)
-    })
     return { status: PaymentResultStatus.Success }
   } catch (err) {
     recordConvertError(err, params, "executePrepared")

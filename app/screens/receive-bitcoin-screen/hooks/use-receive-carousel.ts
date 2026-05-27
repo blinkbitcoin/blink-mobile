@@ -14,7 +14,7 @@ enum CarouselPage {
 }
 
 type CarouselReturn = {
-  ref: RefObject<ICarouselInstance>
+  ref: RefObject<ICarouselInstance | null>
   isOnChainPage: boolean
   onchainWalletCurrency: WalletCurrency
   syncOnchainWallet: (currency: WalletCurrency) => void

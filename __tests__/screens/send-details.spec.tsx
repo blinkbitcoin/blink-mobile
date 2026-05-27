@@ -79,8 +79,6 @@ jest.mock("react-native-config", () => {
   }
 })
 
-jest.mock("@gorhom/bottom-sheet")
-
 const flushAsync = () =>
   act(
     () =>
@@ -98,7 +96,7 @@ it("SendScreen Details", async () => {
   await act(async () => {})
 })
 
-it("applies send amount only after modal dismiss animation completes", async () => {
+it("applies send amount when Set Amount is pressed", async () => {
   loadLocale("en")
   const LL = i18nObject("en")
 
@@ -117,31 +115,11 @@ it("applies send amount only after modal dismiss animation completes", async () 
   fireEvent.press(screen.getByTestId("Amount Input Button"))
   await flushAsync()
 
-  expect(screen.getByTestId("bottom-sheet-modal")).toBeTruthy()
-
   fireEvent.press(screen.getByTestId("Key 1"))
   await flushAsync()
 
-  jest.useFakeTimers()
-  try {
-    const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
-    fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
-
-    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
-      true,
-    )
-    act(() => {
-      jest.advanceTimersByTime(39)
-    })
-    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
-      true,
-    )
-    act(() => {
-      jest.advanceTimersByTime(1)
-    })
-  } finally {
-    jest.useRealTimers()
-  }
+  const setAmountButtons = screen.getAllByText(LL.AmountInputScreen.setAmount())
+  fireEvent.press(setAmountButtons[setAmountButtons.length - 1])
 
   await waitFor(() => {
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(

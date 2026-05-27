@@ -25,10 +25,13 @@ const createThemeWithMode = (mode: ThemeMode) =>
     mode,
   })
 
-export const ContextForScreen: React.FC<PropsWithChildren> = ({ children }) => (
+export const ContextForScreen: React.FC<PropsWithChildren<{ headerShown?: boolean }>> = ({
+  children,
+  headerShown = false,
+}) => (
   <ThemeProvider theme={theme}>
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown }}>
         <Stack.Screen name="Home">
           {() => (
             <MockedProvider mocks={mocks} cache={createCache()}>
@@ -52,7 +55,7 @@ export const ContextForScreenWithTheme: React.FC<
 > = ({ children, mode }) => (
   <ThemeProvider theme={createThemeWithMode(mode)}>
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home">
           {() => (
             <MockedProvider mocks={mocks} cache={createCache()}>

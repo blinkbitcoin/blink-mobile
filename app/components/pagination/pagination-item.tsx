@@ -3,6 +3,7 @@ import { View } from "react-native"
 import Animated, {
   Extrapolate,
   interpolate,
+  SharedValue,
   useAnimatedStyle,
 } from "react-native-reanimated"
 
@@ -24,7 +25,7 @@ export const PaginationItem: React.FC<{
   index: number
   backgroundColor: string
   length: number
-  animValue: Animated.SharedValue<number>
+  animValue: SharedValue<number>
   isRotate?: boolean
 }> = (props) => {
   const styles = useStyles()
