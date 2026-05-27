@@ -10,6 +10,11 @@ end
 node_require('react-native/scripts/react_native_pods.rb')
 node_require('react-native-permissions/scripts/setup.rb')
 
+# RN 0.84+ ships React-Core as a prebuilt binary which breaks RNFirebase
+# static framework imports. Build from source until RNFirebase adds support.
+# https://github.com/invertase/react-native-firebase/issues/8883
+ENV['RCT_USE_PREBUILT_RNCORE'] ||= '0'
+
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
@@ -65,14 +70,21 @@ target 'GaloyApp' do
       end
     end
 
+    # use_frameworks!(:static) enables DEFINES_MODULE on every pod, making
+    # Clang treat non-modular header includes as hard errors. Downgrade to
+    # warnings so third-party pods can include React headers without failing.
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+        cflags = config.build_settings['OTHER_CFLAGS'] || '$(inherited)'
+        unless cflags.include?('-Wno-error=non-modular-include-in-framework-module')
+          config.build_settings['OTHER_CFLAGS'] = "#{cflags} -Wno-error=non-modular-include-in-framework-module"
+        end
+      end
+    end
+
     installer.pods_project.build_configurations.each do |config|
       config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
     end
   end
-
-  # pod 'Firebase', :modular_headers => true
-  # pod 'FirebaseCore', :modular_headers => true
-  # pod 'GoogleUtilities', :modular_headers => true
-
-
 end
