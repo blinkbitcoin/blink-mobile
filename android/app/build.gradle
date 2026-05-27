@@ -128,6 +128,11 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
+            // Real Android devices are ARM-only; x86/x86_64 exist solely for emulators
+            // (used by debug e2e). Strip them from release to shrink the AAB + APKs.
+            ndk {
+                abiFilters "armeabi-v7a", "arm64-v8a"
+            }
         }
     }
 

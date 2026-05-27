@@ -20,18 +20,27 @@ platform :android do
   lane :build do
     android_set_version_name(version_name: ENV["PUBLIC_VERSION"])
     gradle(task: 'clean')
+    # ARM-only for release: real Android devices are ARM, so x86/x86_64 are dead
+    # weight here. Limiting reactNativeArchitectures skips compiling the unused
+    # x86 native libs (faster CI) and stops emitting the orphan x86 split APKs.
+    # The release buildType also pins ndk.abiFilters as a hard packaging guarantee
+    # (catches any x86 .so shipped by 3rd-party AARs). Debug keeps all 4 ABIs for
+    # emulator e2e (Detox Pixel_API_34, Appium generic_x86).
+    release_abis = { "reactNativeArchitectures" => "armeabi-v7a,arm64-v8a" }
     # APKs (universal + per-ABI splits): still built for e2e (BrowserStack),
     # Huawei AppGallery, and the GCS archive. NOT uploaded to Play anymore.
     gradle(
       task: "assemble",
       build_type: "Release",
       flags: "--no-daemon --stacktrace --info",
+      properties: release_abis,
     )
     # AAB: the artifact published to Google Play (see play_store_upload for why).
     gradle(
       task: "bundle",
       build_type: "Release",
       flags: "--no-daemon --stacktrace --info",
+      properties: release_abis,
     )
   end
 
