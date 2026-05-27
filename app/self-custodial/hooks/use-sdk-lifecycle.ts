@@ -171,8 +171,12 @@ export const useSdkLifecycle = (
   useEffect(() => {
     if (!activeSelfCustodialAccountId) {
       setStatus(ActiveWalletStatus.Unavailable)
+      setWallets([])
       return
     }
+
+    setStatus(ActiveWalletStatus.Loading)
+    setWallets([])
 
     let mounted = true
     abortRef.current = false
