@@ -49,7 +49,6 @@ const mockDisconnectSdk = jest.fn()
 const mockAddSdkEventListener = jest.fn()
 const mockRemoveSdkEventListener = jest.fn()
 const mockGetUserSettings = jest.fn()
-const mockSyncSelfCustodialWallet = jest.fn()
 
 let mockStableBalanceEnabled = true
 jest.mock("@app/utils/storage/secureStorage", () => ({
@@ -70,7 +69,6 @@ jest.mock("@app/self-custodial/bridge", () => ({
   removeSdkEventListener: (...args: unknown[]) => mockRemoveSdkEventListener(...args),
   getUserSettings: (...args: unknown[]) => mockGetUserSettings(...args),
   getLightningAddress: (...args: unknown[]) => mockGetLightningAddress(...args),
-  syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
 }))
 
 const mockListSelfCustodialAccounts = jest
@@ -180,6 +178,15 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
   <SelfCustodialWalletProvider>{children}</SelfCustodialWalletProvider>
 )
 
+const fireInitialSynced = async (
+  listener: ReturnType<typeof setupConnectedWallet>["listener"],
+): Promise<void> => {
+  await waitFor(() => expect(listener.current).not.toBeNull())
+  await act(async () => {
+    await listener.current?.({ tag: "Synced" })
+  })
+}
+
 describe("SelfCustodialWalletProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -190,7 +197,6 @@ describe("SelfCustodialWalletProvider", () => {
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
     mockRemoveSdkEventListener.mockResolvedValue(undefined)
-    mockSyncSelfCustodialWallet.mockResolvedValue(undefined)
     mockGetUserSettings.mockResolvedValue({
       stableBalanceActiveLabel: undefined,
       sparkPrivateModeEnabled: false,
@@ -290,7 +296,7 @@ describe("SelfCustodialWalletProvider", () => {
   })
 
   it("sets Loading then Ready on successful init", async () => {
-    setupConnectedWallet({
+    const { listener } = setupConnectedWallet({
       getMnemonicForAccount: mockGetMnemonicForAccount,
       listSelfCustodialAccounts: mockListSelfCustodialAccounts,
       setActiveAccountId: (id: string) => {
@@ -301,6 +307,8 @@ describe("SelfCustodialWalletProvider", () => {
     })
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await fireInitialSynced(listener)
 
     await waitFor(() => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
@@ -308,7 +316,7 @@ describe("SelfCustodialWalletProvider", () => {
   })
 
   it("initializes SDK regardless of feature flag state (rollback-safe)", async () => {
-    setupConnectedWallet({
+    const { listener } = setupConnectedWallet({
       getMnemonicForAccount: mockGetMnemonicForAccount,
       listSelfCustodialAccounts: mockListSelfCustodialAccounts,
       setActiveAccountId: (id: string) => {
@@ -319,6 +327,8 @@ describe("SelfCustodialWalletProvider", () => {
     })
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await fireInitialSynced(listener)
 
     await waitFor(() => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
@@ -368,6 +378,8 @@ describe("SelfCustodialWalletProvider", () => {
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
+    await fireInitialSynced(listener)
+
     await waitFor(() => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     })
@@ -391,6 +403,8 @@ describe("SelfCustodialWalletProvider", () => {
     const { getSelfCustodialWalletSnapshot } = getWalletSnapshotMocks()
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await fireInitialSynced(listener)
 
     await waitFor(() => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
@@ -600,6 +614,8 @@ describe("SelfCustodialWalletProvider", () => {
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
+    await fireInitialSynced(listener)
+
     await waitFor(() => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     })
@@ -666,6 +682,8 @@ describe("SelfCustodialWalletProvider", () => {
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
+    await fireInitialSynced(listener)
+
     await waitFor(() => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     })
@@ -728,6 +746,8 @@ describe("SelfCustodialWalletProvider", () => {
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
+    await fireInitialSynced(listener)
+
     await waitFor(() => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     })
@@ -761,6 +781,8 @@ describe("SelfCustodialWalletProvider", () => {
     const { getSelfCustodialWalletSnapshot } = getWalletSnapshotMocks()
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await fireInitialSynced(listener)
 
     await waitFor(() => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
@@ -798,7 +820,6 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockAddSdkEventListener.mockResolvedValue("listener-id")
     mockRemoveSdkEventListener.mockResolvedValue(undefined)
-    mockSyncSelfCustodialWallet.mockResolvedValue(undefined)
     mockGetUserSettings.mockResolvedValue({
       stableBalanceActiveLabel: undefined,
       sparkPrivateModeEnabled: false,
@@ -967,6 +988,8 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     })
 
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+    await fireInitialSynced(listener)
 
     await waitFor(() => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)

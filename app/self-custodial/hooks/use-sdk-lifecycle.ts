@@ -18,7 +18,6 @@ import {
   getUserSettings,
   initSdk,
   removeSdkEventListener,
-  syncSelfCustodialWallet,
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
@@ -210,18 +209,6 @@ export const useSdkLifecycle = (
       listenerIdRef.current = listenerId
 
       refreshWallets()
-
-      // Force token balances to materialize. Whichever fires first — the
-      // `Synced` event or this promise resolving — releases the loading state.
-      syncSelfCustodialWallet(connectedSdk)
-        .then(() => {
-          if (!mounted || initialSyncCompletedRef.current) return
-          initialSyncCompletedRef.current = true
-          refreshWallets().catch(() => {})
-        })
-        .catch((err) => {
-          reportError("Post-connect sync", err)
-        })
 
       initialSyncTimeoutIdRef.current = setTimeout(() => {
         if (!mounted || initialSyncCompletedRef.current) return

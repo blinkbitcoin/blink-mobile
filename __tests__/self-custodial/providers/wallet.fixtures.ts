@@ -31,7 +31,6 @@ type SetupMocks = {
   setActiveAccountId: (id: string) => void
 }
 
-/** Minimal connected SDK mock: `initSdk` resolves, snapshot returns empty wallets. */
 export const setupConnectedWallet = (
   mocks: SetupMocks,
   snapshot: WalletSnapshot = { wallets: [], hasMore: false },
