@@ -25,19 +25,18 @@
     }
     // flake-utils.lib.eachSystem ["aarch64-darwin" "x86_64-darwin" "x86_64-linux"] (
       system: let
-        overlays = [
-          (self: super: {
+        nodejsOverlay = self: super: {
+          nodejs = super.nodejs_24;
+          yarn = super.yarn.override {
             nodejs = super.nodejs_24;
-            yarn = super.yarn.override {
-              nodejs = super.nodejs_24;
-            };
-          })
-        ];
+          };
+        };
 
         inherit (nixpkgs) lib;
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
+            nodejsOverlay
             self.overlay
             ruby-nix.overlays.default
           ];
