@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
 
+import { fetchConversionLimits } from "@app/self-custodial/bridge"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { type ConversionLimits, type ConvertDirection } from "@app/types/payment"
+import { AccountType } from "@app/types/wallet"
 
-import { fetchConversionLimits } from "../bridge"
-import { useSelfCustodialWallet } from "../providers/wallet"
+import { useAccountRegistry } from "./use-account-registry"
 
 type Result = {
   limits: ConversionLimits | null
@@ -11,15 +13,24 @@ type Result = {
   error: Error | null
 }
 
-export const useNonCustodialConversionLimits = (
-  direction: ConvertDirection | undefined,
-): Result => {
+const NO_LIMITS: ConversionLimits = { minFromAmount: null, minToAmount: null }
+
+export const useConversionLimits = (direction: ConvertDirection | undefined): Result => {
+  const { activeAccount } = useAccountRegistry()
   const { sdk } = useSelfCustodialWallet()
+  const accountType = activeAccount?.type
+
   const [limits, setLimits] = useState<ConversionLimits | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
+    if (accountType !== AccountType.SelfCustodial) {
+      setLimits(NO_LIMITS)
+      setLoading(false)
+      setError(null)
+      return
+    }
     if (!sdk || !direction) {
       setLimits(null)
       return
@@ -45,7 +56,7 @@ export const useNonCustodialConversionLimits = (
     return () => {
       cancelled = true
     }
-  }, [sdk, direction])
+  }, [accountType, sdk, direction])
 
   return { limits, loading, error }
 }

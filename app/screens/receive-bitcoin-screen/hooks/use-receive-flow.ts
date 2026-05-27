@@ -32,7 +32,7 @@ export const useReceiveFlow = (
   }: CarouselContext,
 ) => {
   const {
-    pr,
+    paymentRequest,
     setAmount,
     setType,
     setMemo,
@@ -47,7 +47,7 @@ export const useReceiveFlow = (
 
   const activeCopyableContent = isOnChainPage
     ? onchainAddress ?? undefined
-    : pr?.info?.data?.getCopyableInvoiceFn()
+    : paymentRequest?.info?.data?.getCopyableInvoiceFn()
 
   const activeInvoiceType = isOnChainPage ? Invoice.OnChain : requestType
 
@@ -56,7 +56,7 @@ export const useReceiveFlow = (
     invoiceType: activeInvoiceType,
   })
 
-  const receiveViaNFC = useLnurlWithdraw(pr)
+  const receiveViaNFC = useLnurlWithdraw(paymentRequest)
 
   const isReady = requestState !== PaymentRequestState.Loading
 

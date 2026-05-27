@@ -10,7 +10,9 @@ import {
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
+import { usePayments } from "@app/hooks/use-payments"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { type ConvertAdapter } from "@app/types/payment"
 import { addBounded } from "@app/utils/bounded-collections"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
@@ -96,6 +98,7 @@ type RunAutoConvertParams = {
   satsReceived: number
   isStableBalanceActive: boolean
   convert: ConvertMoneyAmount
+  convertAdapter: ConvertAdapter
   maxAttempts: number
   waitOptions: WaitForPaymentOptions
   amountMatchToleranceBps: number
@@ -118,6 +121,7 @@ const runAutoConvert = async ({
   satsReceived,
   isStableBalanceActive,
   convert,
+  convertAdapter,
   maxAttempts,
   waitOptions,
   amountMatchToleranceBps,
@@ -150,14 +154,18 @@ const runAutoConvert = async ({
     await recordAutoConvertAttempt(record.paymentRequest, Date.now())
 
     const usdCentsAmount = convertSatsToUsdCents(satsReceived, convert)
-    const outcome = await executeAutoConvert(sdk, {
-      satsAmount: satsReceived,
-      usdCentsAmount,
-      isStableBalanceActive,
-      recordCreatedAtMs: record.createdAtMs,
-      amountMatchToleranceBps,
-      claimedConversionIds,
-    })
+    const outcome = await executeAutoConvert(
+      sdk,
+      {
+        satsAmount: satsReceived,
+        usdCentsAmount,
+        isStableBalanceActive,
+        recordCreatedAtMs: record.createdAtMs,
+        amountMatchToleranceBps,
+        claimedConversionIds,
+      },
+      convertAdapter,
+    )
 
     if (outcome.status === AutoConvertStatus.Converted) {
       const conversionId = await findRecentConversionId(sdk, {
@@ -237,6 +245,7 @@ export const useAutoConvertListener = (): void => {
   // Defaults unknown to not-active so existing records still process.
   const isStableBalanceActive = wallet.isStableBalanceActive ?? false
   const { convertMoneyAmount } = usePriceConversion()
+  const { convert: convertAdapter } = usePayments()
   const {
     autoConvertMaxAttempts,
     autoConvertPollMaxAttempts,
@@ -268,6 +277,7 @@ export const useAutoConvertListener = (): void => {
       paymentId: string
       satsReceived: number
       convert: ConvertMoneyAmount
+      convertAdapter: ConvertAdapter
       claimedConversionIds: ReadonlySet<string>
     }): Promise<void> => {
       const { record } = params
@@ -285,6 +295,7 @@ export const useAutoConvertListener = (): void => {
           satsReceived: params.satsReceived,
           isStableBalanceActive,
           convert: params.convert,
+          convertAdapter: params.convertAdapter,
           maxAttempts: autoConvertMaxAttempts,
           waitOptions,
           amountMatchToleranceBps: autoConvertAmountMatchToleranceBps,
@@ -309,7 +320,7 @@ export const useAutoConvertListener = (): void => {
   )
 
   useEffect(() => {
-    if (!sdk || !convertMoneyAmount) return
+    if (!sdk || !convertMoneyAmount || !convertAdapter) return
     if (!lastReceivedPaymentId) return
     if (processedPaymentIdsRef.current.has(lastReceivedPaymentId)) return
     addBounded(
@@ -341,15 +352,22 @@ export const useAutoConvertListener = (): void => {
         paymentId: lastReceivedPaymentId,
         satsReceived: toNumber(payment.amount),
         convert: convertMoneyAmount,
+        convertAdapter,
         claimedConversionIds,
       })
     }
 
     run().catch((err) => reportError("auto-convert-listener live run", err))
-  }, [sdk, lastReceivedPaymentId, convertMoneyAmount, processWithInFlightLock])
+  }, [
+    sdk,
+    lastReceivedPaymentId,
+    convertMoneyAmount,
+    convertAdapter,
+    processWithInFlightLock,
+  ])
 
   useEffect(() => {
-    if (!sdk || !convertMoneyAmount) return
+    if (!sdk || !convertMoneyAmount || !convertAdapter) return
     if (initialReplayDoneRef.current) return
     initialReplayDoneRef.current = true
 
@@ -390,6 +408,7 @@ export const useAutoConvertListener = (): void => {
           paymentId: paid.paymentId,
           satsReceived: paid.amount,
           convert: convertMoneyAmount,
+          convertAdapter,
           claimedConversionIds,
         })
       }
@@ -401,5 +420,11 @@ export const useAutoConvertListener = (): void => {
     }
 
     replay().catch((err) => reportError("auto-convert-listener replay", err))
-  }, [sdk, convertMoneyAmount, processWithInFlightLock, autoConvertMaxAttempts])
+  }, [
+    sdk,
+    convertMoneyAmount,
+    convertAdapter,
+    processWithInFlightLock,
+    autoConvertMaxAttempts,
+  ])
 }

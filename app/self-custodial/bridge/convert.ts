@@ -4,25 +4,17 @@ import {
   PrepareSendPaymentResponse,
   ReceivePaymentMethod,
   ReceivePaymentRequest,
-  SendPaymentRequest,
-  SyncWalletRequest,
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
-import { toUsdMoneyAmount } from "@app/types/amounts"
-import { reportError } from "@app/utils/error-logging"
 import {
-  ConvertAmountAdjustment,
   ConvertDirection,
   ConvertErrorCode,
-  PaymentResultStatus,
   type ConvertParams,
-  type ConvertQuote,
-  type GetConversionQuoteAdapter,
-  type PaymentAdapterResult,
 } from "@app/types/payment"
-import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts"
+import { centsToTokenBaseUnits } from "@app/utils/amounts"
+import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
 
 import { requireSparkTokenIdentifier, SparkConfig } from "../config"
@@ -30,12 +22,7 @@ import { requireSparkTokenIdentifier, SparkConfig } from "../config"
 import { buildConversionType, fetchConversionLimits } from "./limits"
 import { fetchUsdbDecimals, findUsdbToken } from "./token-balance"
 
-const failed = (message: string, code?: string): PaymentAdapterResult => ({
-  status: PaymentResultStatus.Failed,
-  errors: [{ message, code }],
-})
-
-class ConvertError extends Error {
+export class ConvertError extends Error {
   constructor(
     readonly code: ConvertErrorCode,
     message: string,
@@ -44,23 +31,15 @@ class ConvertError extends Error {
   }
 }
 
-const recordConvertError = (err: unknown, params: ConvertParams, where: string): void => {
+export const recordConvertError = (
+  err: unknown,
+  params: ConvertParams,
+  where: string,
+): void => {
   crashlytics().log(
     `[Convert] ${where} failed (direction=${params.direction}, fromAmount=${params.fromAmount.amount}, toAmount=${params.toAmount.amount})`,
   )
   reportError(where, err)
-}
-
-const mapAmountAdjustment = (
-  reason: AmountAdjustmentReason | undefined,
-): ConvertAmountAdjustment | undefined => {
-  if (reason === AmountAdjustmentReason.FlooredToMinLimit) {
-    return ConvertAmountAdjustment.FlooredToMin
-  }
-  if (reason === AmountAdjustmentReason.IncreasedToAvoidDust) {
-    return ConvertAmountAdjustment.IncreasedToAvoidDust
-  }
-  return undefined
 }
 
 const createOwnSparkInvoice = async (
@@ -88,7 +67,7 @@ const buildConversionOptions = (direction: ConvertDirection) => ({
   completionTimeoutSecs: undefined,
 })
 
-type PreparedConversion = {
+export type PreparedConversion = {
   prepared: PrepareSendPaymentResponse
   tokenDecimals: number
 }
@@ -204,7 +183,7 @@ const projectInputMinIntoDestination = (
  * on `FromBitcoin`, so we solve for the destination whose `amountIn`
  * lands on `inputAmount`.
  */
-const prepareConversion = async (
+export const prepareConversion = async (
   sdk: BreezSdkInterface,
   params: ConvertParams,
 ): Promise<PreparedConversion> => {
@@ -275,47 +254,3 @@ const prepareConversion = async (
   })
   return { prepared: corrected, tokenDecimals }
 }
-
-const executePrepared = async (
-  sdk: BreezSdkInterface,
-  prepared: PrepareSendPaymentResponse,
-  params: ConvertParams,
-): Promise<PaymentAdapterResult> => {
-  try {
-    await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
-    sdk.syncWallet(SyncWalletRequest.create({})).catch((err) => {
-      reportError("convert: post-send syncWallet", err)
-    })
-    return { status: PaymentResultStatus.Success }
-  } catch (err) {
-    recordConvertError(err, params, "executePrepared")
-    return failed(err instanceof Error ? err.message : `Conversion failed: ${err}`)
-  }
-}
-
-const toConvertQuote = (
-  sdk: BreezSdkInterface,
-  { prepared, tokenDecimals }: PreparedConversion,
-  params: ConvertParams,
-): ConvertQuote | null => {
-  const estimate = prepared.conversionEstimate
-  if (!estimate) return null
-  const feeCents = tokenBaseUnitsToCents(toNumber(estimate.fee), tokenDecimals)
-  return {
-    feeAmount: toUsdMoneyAmount(feeCents),
-    amountAdjustment: mapAmountAdjustment(estimate.amountAdjustment),
-    execute: () => executePrepared(sdk, prepared, params),
-  }
-}
-
-export const createGetConversionQuote =
-  (sdk: BreezSdkInterface): GetConversionQuoteAdapter =>
-  async (params) => {
-    try {
-      const context = await prepareConversion(sdk, params)
-      return toConvertQuote(sdk, context, params)
-    } catch (err) {
-      recordConvertError(err, params, "getConversionQuote")
-      throw err
-    }
-  }

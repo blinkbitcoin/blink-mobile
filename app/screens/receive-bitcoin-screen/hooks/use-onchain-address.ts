@@ -1,61 +1,46 @@
 import { useEffect, useMemo, useState } from "react"
 
-import { gql } from "@apollo/client"
-import { useOnChainAddressCurrentMutation } from "@app/graphql/generated"
+import { WalletCurrency } from "@app/graphql/generated"
+import { usePayments } from "@app/hooks/use-payments"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
 
 import { getPaymentRequestFullUri } from "../payment/helpers"
 import { GetFullUriFn, Invoice } from "../payment/index.types"
 
-gql`
-  mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
-    onChainAddressCurrent(input: $input) {
-      errors {
-        message
-      }
-      address
-    }
-  }
-`
-
 type UseOnChainAddressOptions = {
+  walletCurrency: WalletCurrency
   amount?: number
   memo?: string
 }
 
-export const useOnChainAddress = (
-  walletId: string | undefined,
-  { amount, memo }: UseOnChainAddressOptions = {},
-) => {
-  const [onChainAddressCurrent] = useOnChainAddressCurrentMutation()
+export const useOnChainAddress = ({
+  walletCurrency,
+  amount,
+  memo,
+}: UseOnChainAddressOptions) => {
+  const { receiveOnchain } = usePayments()
   const { LL } = useI18nContext()
 
   const [address, setAddress] = useState<string | null>(null)
-  const [loading, setLoading] = useState(Boolean(walletId))
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(Boolean(receiveOnchain))
 
   useEffect(() => {
-    if (!walletId) return
+    if (!receiveOnchain) return
 
-    setError(null)
     setLoading(true)
-    onChainAddressCurrent({
-      variables: { input: { walletId } },
-    })
+    receiveOnchain({ walletCurrency })
       .then((result) => {
-        const addr = result.data?.onChainAddressCurrent?.address
-        if (addr) setAddress(addr)
+        if (result.address) setAddress(result.address)
       })
-      .catch((err) => {
-        const message = err?.message ?? "Unknown error"
-        setError(message)
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : "Unknown error"
         toastShow({ message, LL, type: "warning" })
       })
       .finally(() => {
         setLoading(false)
       })
-  }, [walletId, onChainAddressCurrent, LL])
+  }, [receiveOnchain, walletCurrency, LL])
 
   const getFullUriFn = useMemo<GetFullUriFn | undefined>(() => {
     if (!address) return undefined
@@ -70,5 +55,5 @@ export const useOnChainAddress = (
       })
   }, [address, amount, memo])
 
-  return { address, loading, error, getFullUriFn }
+  return { address, loading, getFullUriFn }
 }

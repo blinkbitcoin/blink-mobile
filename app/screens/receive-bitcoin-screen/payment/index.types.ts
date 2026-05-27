@@ -5,19 +5,12 @@
  * PaymentRequest - Generated quotation which contains the finalized invoice data
  * Invoice - (not specific to LN) The quoted invoice that contains invoice type specific data
  */
-import { GraphQLError } from "graphql"
-
-import {
-  GraphQlApplicationError,
-  LnInvoice,
-  LnNoAmountInvoice,
-  WalletCurrency,
-  LnNoAmountInvoiceCreateMutationHookResult,
-  LnInvoiceCreateMutationHookResult,
-  LnUsdInvoiceCreateMutationHookResult,
-  OnChainAddressCurrentMutationHookResult,
-  Network,
-} from "@app/graphql/generated"
+import { LnInvoice, Network, WalletCurrency } from "@app/graphql/generated"
+import type {
+  PaymentError,
+  ReceiveLightningAdapter,
+  ReceiveOnchainAdapter,
+} from "@app/types/payment"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
 import {
   BtcMoneyAmount,
@@ -48,12 +41,15 @@ export type InvoiceData = (
 }
 
 export type LnInvoiceNoSecret = Omit<LnInvoice, "paymentSecret">
-type LnInvoiceNoSecretNoAmount = Omit<LnNoAmountInvoice, "paymentSecret">
 
-type LnInvoiceWithOrWithoutAmountNoSecret = LnInvoiceNoSecret | LnInvoiceNoSecretNoAmount
-
-export type LightningInvoiceData = LnInvoiceWithOrWithoutAmountNoSecret & {
+type LightningInvoiceData = {
   invoiceType: typeof Invoice.Lightning
+  paymentRequest: string
+  paymentHash?: string
+  externalId?: string
+  createdAt?: number
+  paymentStatus?: string
+  satoshis?: number
   expiresAt?: Date
   memo?: string
 }
@@ -174,11 +170,9 @@ export const PaymentRequestState = {
 export type PaymentRequestStateType =
   (typeof PaymentRequestState)[keyof typeof PaymentRequestState]
 
-export type GeneratePaymentRequestMutations = {
-  lnNoAmountInvoiceCreate: LnNoAmountInvoiceCreateMutationHookResult["0"]
-  lnInvoiceCreate: LnInvoiceCreateMutationHookResult["0"]
-  lnUsdInvoiceCreate: LnUsdInvoiceCreateMutationHookResult["0"]
-  onChainAddressCurrent: OnChainAddressCurrentMutationHookResult["0"]
+export type GeneratePaymentRequestAdapters = {
+  receiveLightning: ReceiveLightningAdapter
+  receiveOnchain: ReceiveOnchainAdapter
 }
 
 /* Has immutable payment quotation from the server and handles payment state for itself (via hook) */
@@ -192,13 +186,12 @@ export type PaymentRequest = {
 
 export type PaymentRequestInformation = {
   data: InvoiceData | undefined
-  applicationErrors: readonly GraphQlApplicationError[] | undefined
-  gqlErrors: readonly GraphQLError[] | undefined
+  errors: PaymentError[] | undefined
 }
 
 export type CreatePaymentRequestParams = {
   creationData: PaymentRequestCreationData<WalletCurrency>
-  mutations: GeneratePaymentRequestMutations
+  adapters: GeneratePaymentRequestAdapters
   state?: PaymentRequestStateType
   info?: PaymentRequestInformation
 }

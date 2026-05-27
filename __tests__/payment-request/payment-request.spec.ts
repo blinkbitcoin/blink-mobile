@@ -1,11 +1,12 @@
 import {
-  GeneratePaymentRequestMutations,
+  GeneratePaymentRequestAdapters,
   Invoice,
   PaymentRequestState,
 } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 import { createPaymentRequest } from "@app/screens/receive-bitcoin-screen/payment/payment-request"
 import { createPaymentRequestCreationData } from "@app/screens/receive-bitcoin-screen/payment/payment-request-creation-data"
 import { toUsdMoneyAmount } from "@app/types/amounts"
+import { WalletCurrency } from "@app/graphql/generated"
 
 import { btcWalletDescriptor, defaultParams, usdWalletDescriptor } from "./helpers"
 
@@ -17,101 +18,26 @@ const btcAmountInvoice =
   "lnbc23690n1p3l2qugpp5jeflfqjpxhe0hg3tzttc325j5l6czs9vq9zqx5edpt0yf7k6cypsdqqcqzpuxqyz5vqsp5lteanmnwddszwut839etrgjenfr3dv5tnvz2d2ww2mvggq7zn46q9qyyssqzcz0rvt7r30q7jul79xqqwpr4k2e8mgd23fkjm422sdgpndwql93d4wh3lap9yfwahue9n7ju80ynkqly0lrqqd2978dr8srkrlrjvcq2v5s6k"
 const mockOnChainAddress = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"
 
-// Manually created mock objects
-const mockLnInvoice = {
-  __typename: "LnInvoice",
-  paymentRequest: btcAmountInvoice,
-  // Add other necessary properties here
-}
+const mockReceiveLightning = jest.fn(async ({ amount }) => {
+  if (amount?.currency === WalletCurrency.Usd) {
+    return { invoice: { paymentRequest: usdAmountInvoice } }
+  }
+  if (amount && amount.amount > 0) {
+    return { invoice: { paymentRequest: btcAmountInvoice } }
+  }
+  return { invoice: { paymentRequest: noAmountInvoice } }
+})
 
-const mockLnUsdInvoice = {
-  __typename: "LnInvoice",
-  paymentRequest: usdAmountInvoice,
-  // Add other necessary properties here
-}
+const mockReceiveOnchain = jest.fn(async () => ({ address: mockOnChainAddress }))
 
-const mockLnNoAmountInvoice = {
-  __typename: "LnInvoice",
-  paymentRequest: noAmountInvoice,
-  // Add other necessary properties here
-}
-
-const mockLnInvoiceCreate = jest.fn(() =>
-  Promise.resolve({
-    data: {
-      __typename: "Mutation", // Correct placement according to your schema
-      lnInvoiceCreate: {
-        __typename: "LnInvoicePayload",
-        invoice: mockLnInvoice,
-        errors: [],
-      },
-    },
-    errors: [],
-  }),
-)
-
-const mockLnUsdInvoiceCreate = jest.fn(() =>
-  Promise.resolve({
-    data: {
-      __typename: "Mutation", // Correct placement according to your schema
-      lnUsdInvoiceCreate: {
-        __typename: "LnInvoicePayload",
-        invoice: mockLnUsdInvoice,
-        errors: [],
-      },
-    },
-    errors: [],
-  }),
-)
-
-const mockLnNoAmountInvoiceCreate = jest.fn(() =>
-  Promise.resolve({
-    data: {
-      __typename: "Mutation", // Correct placement according to your schema
-      lnNoAmountInvoiceCreate: {
-        __typename: "LnNoAmountInvoicePayload",
-        invoice: mockLnNoAmountInvoice,
-        errors: [],
-      },
-    },
-    errors: [],
-  }),
-)
-
-const mockOnChainAddressCurrent = jest.fn(() =>
-  Promise.resolve({
-    data: {
-      __typename: "Mutation", // Correct placement according to your schema
-      onChainAddressCurrent: {
-        __typename: "OnChainAddressPayload",
-        address: mockOnChainAddress,
-        errors: [],
-      },
-    },
-    errors: [],
-  }),
-)
-
-export const mutations: GeneratePaymentRequestMutations = {
-  // eslint-disable-next-line
-  // @ts-ignore type mismatch, but we don't care because it's a mock
-  lnInvoiceCreate: mockLnInvoiceCreate,
-  // eslint-disable-next-line
-  // @ts-ignore type mismatch, but we don't care because it's a mock
-  lnUsdInvoiceCreate: mockLnUsdInvoiceCreate,
-  // eslint-disable-next-line
-  // @ts-ignore type mismatch, but we don't care because it's a mock
-  lnNoAmountInvoiceCreate: mockLnNoAmountInvoiceCreate,
-  // eslint-disable-next-line
-  // @ts-ignore type mismatch, but we don't care because it's a mock
-  onChainAddressCurrent: mockOnChainAddressCurrent,
+export const adapters: GeneratePaymentRequestAdapters = {
+  receiveLightning: mockReceiveLightning,
+  receiveOnchain: mockReceiveOnchain,
 }
 
 export const clearMocks = () => {
-  mockLnInvoiceCreate.mockClear()
-  mockLnUsdInvoiceCreate.mockClear()
-  mockLnNoAmountInvoiceCreate.mockClear()
-  mockOnChainAddressCurrent.mockClear()
+  mockReceiveLightning.mockClear()
+  mockReceiveOnchain.mockClear()
 }
 
 describe("payment request", () => {
@@ -121,14 +47,16 @@ describe("payment request", () => {
       receivingWalletDescriptor: btcWalletDescriptor,
     })
 
-    const pr = createPaymentRequest({ creationData: prcd, mutations })
+    const pr = createPaymentRequest({ creationData: prcd, adapters })
 
     expect(pr.info).toBeUndefined()
     expect(pr.state).toBe(PaymentRequestState.Idle)
 
     const prNew = await pr.generateRequest()
     expect(prNew.info).not.toBeUndefined()
-    expect(mockLnNoAmountInvoiceCreate).toHaveBeenCalled()
+    expect(mockReceiveLightning).toHaveBeenCalledWith(
+      expect.objectContaining({ walletCurrency: WalletCurrency.Btc }),
+    )
     expect(prNew.state).toBe(PaymentRequestState.Created)
     expect(prNew.info?.data?.invoiceType).toBe(Invoice.Lightning)
     expect(prNew.info?.data?.getFullUriFn({})).toBe(noAmountInvoice)
@@ -140,14 +68,16 @@ describe("payment request", () => {
       receivingWalletDescriptor: usdWalletDescriptor,
     })
 
-    const pr = createPaymentRequest({ creationData: prcd, mutations })
+    const pr = createPaymentRequest({ creationData: prcd, adapters })
 
     expect(pr.info).toBeUndefined()
     expect(pr.state).toBe(PaymentRequestState.Idle)
 
     const prNew = await pr.generateRequest()
     expect(prNew.info).not.toBeUndefined()
-    expect(mockLnNoAmountInvoiceCreate).toHaveBeenCalled()
+    expect(mockReceiveLightning).toHaveBeenCalledWith(
+      expect.objectContaining({ walletCurrency: WalletCurrency.Usd }),
+    )
     expect(prNew.state).toBe(PaymentRequestState.Created)
     expect(prNew.info?.data?.invoiceType).toBe(Invoice.Lightning)
     expect(prNew.info?.data?.getFullUriFn({})).toBe(noAmountInvoice)
@@ -160,14 +90,16 @@ describe("payment request", () => {
       unitOfAccountAmount: toUsdMoneyAmount(1),
     })
 
-    const pr = createPaymentRequest({ creationData: prcd, mutations })
+    const pr = createPaymentRequest({ creationData: prcd, adapters })
 
     expect(pr.info).toBeUndefined()
     expect(pr.state).toBe(PaymentRequestState.Idle)
 
     const prNew = await pr.generateRequest()
     expect(prNew.info).not.toBeUndefined()
-    expect(mockLnInvoiceCreate).toHaveBeenCalled()
+    expect(mockReceiveLightning).toHaveBeenCalledWith(
+      expect.objectContaining({ walletCurrency: WalletCurrency.Btc }),
+    )
     expect(prNew.state).toBe(PaymentRequestState.Created)
     expect(prNew.info?.data?.invoiceType).toBe(Invoice.Lightning)
     expect(prNew.info?.data?.getFullUriFn({})).toBe(btcAmountInvoice)
@@ -180,14 +112,16 @@ describe("payment request", () => {
       unitOfAccountAmount: toUsdMoneyAmount(1),
     })
 
-    const pr = createPaymentRequest({ creationData: prcd, mutations })
+    const pr = createPaymentRequest({ creationData: prcd, adapters })
 
     expect(pr.info).toBeUndefined()
     expect(pr.state).toBe(PaymentRequestState.Idle)
 
     const prNew = await pr.generateRequest()
     expect(prNew.info).not.toBeUndefined()
-    expect(mockLnUsdInvoiceCreate).toHaveBeenCalled()
+    expect(mockReceiveLightning).toHaveBeenCalledWith(
+      expect.objectContaining({ walletCurrency: WalletCurrency.Usd }),
+    )
     expect(prNew.state).toBe(PaymentRequestState.Created)
     expect(prNew.info?.data?.invoiceType).toBe(Invoice.Lightning)
     expect(prNew.info?.data?.getFullUriFn({})).toBe(usdAmountInvoice)
@@ -201,7 +135,7 @@ describe("payment request", () => {
       posUrl: "posUrl",
     })
 
-    const pr = createPaymentRequest({ creationData: prcd, mutations })
+    const pr = createPaymentRequest({ creationData: prcd, adapters })
     expect(pr.info).toBeUndefined()
     expect(pr.state).toBe(PaymentRequestState.Idle)
 
@@ -220,14 +154,14 @@ describe("payment request", () => {
       type: Invoice.OnChain,
     })
 
-    const pr = createPaymentRequest({ creationData: prcd, mutations })
+    const pr = createPaymentRequest({ creationData: prcd, adapters })
 
     expect(pr.info).toBeUndefined()
     expect(pr.state).toBe(PaymentRequestState.Idle)
 
     const prNew = await pr.generateRequest()
     expect(prNew.info).not.toBeUndefined()
-    expect(mockOnChainAddressCurrent).toHaveBeenCalled()
+    expect(mockReceiveOnchain).toHaveBeenCalled()
     expect(prNew.state).toBe(PaymentRequestState.Created)
     expect(prNew.info?.data?.invoiceType).toBe(Invoice.OnChain)
     expect(

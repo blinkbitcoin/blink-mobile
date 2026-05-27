@@ -65,6 +65,14 @@ jest.mock("react-native-haptic-feedback", () => ({
   trigger: jest.fn(),
 }))
 
+jest.mock("@app/hooks/use-payments", () => {
+  const stableAdapters = {
+    receiveLightning: jest.fn(),
+    receiveOnchain: jest.fn(),
+  }
+  return { usePayments: () => stableAdapters }
+})
+
 const createFullMockPRCD = () => ({
   type: Invoice.PayCode,
   receivingWalletDescriptor: { currency: WalletCurrency.Btc, id: "btc-id" },

@@ -46,9 +46,11 @@ export type SendPaymentParams = {
   feeTier?: FeeTier
 }
 
-export type ReceiveLightningParams = {
+type ReceiveLightningParams = {
+  walletCurrency: WalletCurrency
   amount?: MoneyAmount<WalletCurrency>
   memo?: string
+  expirationTimeMinutes?: number
 }
 
 export const FeeQuoteType = {
@@ -146,6 +148,21 @@ export const convertDirectionFromCurrency = (
 export const oppositeWalletCurrency = (currency: WalletCurrency): WalletCurrency =>
   currency === WalletCurrency.Btc ? WalletCurrency.Usd : WalletCurrency.Btc
 
+export const failedPayment = (message: string): PaymentAdapterResult => ({
+  status: PaymentResultStatus.Failed,
+  errors: [{ message }],
+})
+
+export const failedReceive = (message: string): { errors: PaymentError[] } => ({
+  errors: [{ message }],
+})
+
+export const extractApolloErrorMessage = (
+  apolloErrors: ReadonlyArray<{ message: string }> | undefined,
+  payloadErrors: ReadonlyArray<{ message: string }> | undefined,
+  fallback: string,
+): string => apolloErrors?.[0]?.message ?? payloadErrors?.[0]?.message ?? fallback
+
 export type ConvertParams = {
   fromAmount: MoneyAmount<WalletCurrency>
   toAmount: MoneyAmount<WalletCurrency>
@@ -170,12 +187,29 @@ export type SendPaymentAdapter = (
 
 export type GetFeeAdapter = (params: SendPaymentParams) => Promise<FeeQuote | null>
 
-export type ReceiveLightningAdapter = (params: ReceiveLightningParams) => Promise<{
-  invoice?: string
-  errors?: PaymentError[]
-}>
+type ReceiveLightningInvoice = {
+  paymentRequest: string
+  paymentHash?: string
+  externalId?: string
+  createdAt?: number
+  paymentStatus?: string
+  satoshis?: number
+}
 
-export type ReceiveOnchainAdapter = () => Promise<{
+type ReceiveLightningResult = {
+  invoice?: ReceiveLightningInvoice
+  errors?: PaymentError[]
+}
+
+export type ReceiveLightningAdapter = (
+  params: ReceiveLightningParams,
+) => Promise<ReceiveLightningResult>
+
+type ReceiveOnchainParams = {
+  walletCurrency: WalletCurrency
+}
+
+export type ReceiveOnchainAdapter = (params: ReceiveOnchainParams) => Promise<{
   address?: string
   errors?: PaymentError[]
 }>
@@ -191,8 +225,6 @@ export type ClaimDepositAdapter = {
   refundDeposit: (params: RefundDepositParams) => Promise<PaymentAdapterResult>
 }
 
-export type ConvertAdapter = (params: ConvertParams) => Promise<PaymentAdapterResult>
-
 export const ConvertAmountAdjustment = {
   FlooredToMin: "floored_to_min",
   IncreasedToAvoidDust: "increased_to_avoid_dust",
@@ -203,10 +235,11 @@ export type ConvertAmountAdjustment =
 
 export type ConvertQuote = {
   feeAmount: UsdMoneyAmount
+  showFeeRow: boolean
   amountAdjustment?: ConvertAmountAdjustment
   execute: () => Promise<PaymentAdapterResult>
 }
 
-export type GetConversionQuoteAdapter = (
-  params: ConvertParams,
-) => Promise<ConvertQuote | null>
+export type ConvertAdapter = {
+  getQuote: (params: ConvertParams) => Promise<ConvertQuote | null>
+}

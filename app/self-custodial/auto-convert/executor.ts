@@ -11,12 +11,13 @@ import {
   ConvertDirection,
   ConvertErrorCode,
   PaymentResultStatus,
+  type ConvertAdapter,
   type ConvertParams,
 } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
+import { sleep } from "@app/utils/sleep"
 
-import { createGetConversionQuote } from "../bridge/convert"
 import { fetchConversionLimits } from "../bridge/limits"
 import { fetchUsdbDecimals } from "../bridge/token-balance"
 
@@ -37,11 +38,6 @@ export type ExecuteAutoConvertParams = {
   /** Conversion paymentIds already paired with another receive; excluded from amount-tolerance dedup. */
   claimedConversionIds?: ReadonlySet<string>
 }
-
-const sleep = (ms: number): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms)
-  })
 
 export type WaitForPaymentOptions = {
   maxAttempts: number
@@ -178,6 +174,7 @@ const isBelowMinimumError = (err: unknown): boolean =>
 export const executeAutoConvert = async (
   sdk: BreezSdkInterface,
   params: ExecuteAutoConvertParams,
+  convertAdapter: ConvertAdapter,
 ): Promise<AutoConvertOutcome> => {
   if (params.isStableBalanceActive) {
     return { status: AutoConvertStatus.SkippedStableBalanceActive }
@@ -211,7 +208,7 @@ export const executeAutoConvert = async (
 
   let quote
   try {
-    quote = await createGetConversionQuote(sdk)(convertParams)
+    quote = await convertAdapter.getQuote(convertParams)
   } catch (err) {
     if (isBelowMinimumError(err)) {
       return { status: AutoConvertStatus.SkippedBelowMin }

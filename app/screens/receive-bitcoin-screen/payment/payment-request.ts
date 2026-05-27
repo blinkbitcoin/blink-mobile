@@ -1,25 +1,193 @@
 import { bech32 } from "bech32"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { BtcMoneyAmount } from "@app/types/amounts"
+import { BtcMoneyAmount, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { getLightningAddress } from "@app/utils/pay-links"
 
 import { getPaymentRequestFullUri, prToDateString } from "./helpers"
 import {
   CreatePaymentRequestParams,
+  GeneratePaymentRequestAdapters,
+  GetCopyableInvoiceFn,
   GetFullUriFn,
   Invoice,
   PaymentRequest,
+  PaymentRequestCreationData,
+  PaymentRequestInformation,
   PaymentRequestState,
   PaymentRequestStateType,
-  PaymentRequestInformation,
-  GetCopyableInvoiceFn,
 } from "./index.types"
+
+const DEFAULT_MEMO = "Pay to Blink Wallet User"
+const LNURL_BECH32_LIMIT = 1500
+const LNURL_RENDER_DELAY_MS = 50
+
+type PrCreationData = PaymentRequestCreationData<WalletCurrency>
+
+const formatPayCodeAmountQuery = (
+  amount: MoneyAmount<WalletOrDisplayCurrency> | undefined,
+): string => {
+  if (!amount || amount.amount === 0) return ""
+  return `amount=${amount.amount}&currency=${amount.currencyCode}`
+}
+
+const buildOnchainInfo = async (
+  request: PrCreationData,
+  adapters: GeneratePaymentRequestAdapters,
+): Promise<PaymentRequestInformation> => {
+  if (
+    request.settlementAmount &&
+    request.settlementAmount.currency !== WalletCurrency.Btc
+  ) {
+    throw new Error("Onchain invoices only support BTC")
+  }
+
+  const result = await adapters.receiveOnchain({ walletCurrency: WalletCurrency.Btc })
+  const { address } = result
+
+  if (!address) return { data: undefined, errors: result.errors }
+
+  const getFullUriFn: GetFullUriFn = ({ uppercase, prefix }) =>
+    getPaymentRequestFullUri({
+      type: Invoice.OnChain,
+      input: address,
+      amount: request.settlementAmount?.amount,
+      memo: request.memo,
+      uppercase,
+      prefix,
+    })
+  const getCopyableInvoiceFn: GetCopyableInvoiceFn = () => address
+
+  return {
+    data: {
+      invoiceType: Invoice.OnChain,
+      getFullUriFn,
+      getCopyableInvoiceFn,
+      address,
+      amount: request.settlementAmount as BtcMoneyAmount,
+      memo: request.memo,
+    },
+    errors: result.errors,
+  }
+}
+
+const buildLightningInfo = async (
+  request: PrCreationData,
+  adapters: GeneratePaymentRequestAdapters,
+): Promise<PaymentRequestInformation> => {
+  const { settlementAmount } = request
+  const hasPositiveAmount = settlementAmount !== undefined && settlementAmount.amount > 0
+  const lightningAmount = hasPositiveAmount
+    ? (settlementAmount as MoneyAmount<WalletCurrency>)
+    : undefined
+
+  const result = await adapters.receiveLightning({
+    walletCurrency: request.receivingWalletDescriptor.currency,
+    amount: lightningAmount,
+    memo: request.memo,
+    expirationTimeMinutes: request.expirationTime,
+  })
+
+  if (!result.invoice) return { data: undefined, errors: result.errors }
+
+  const { invoice } = result
+  const dateString = prToDateString(invoice.paymentRequest, request.network)
+  const expiresAt = dateString ? new Date(dateString) : undefined
+
+  const getFullUriFn: GetFullUriFn = ({ uppercase, prefix }) =>
+    getPaymentRequestFullUri({
+      type: Invoice.Lightning,
+      input: invoice.paymentRequest,
+      amount: request.settlementAmount?.amount,
+      memo: request.memo,
+      uppercase,
+      prefix,
+    })
+  const getCopyableInvoiceFn: GetCopyableInvoiceFn = () => getFullUriFn({})
+
+  return {
+    data: {
+      invoiceType: Invoice.Lightning,
+      paymentRequest: invoice.paymentRequest,
+      paymentHash: invoice.paymentHash ?? "",
+      externalId: invoice.externalId ?? "",
+      paymentStatus: invoice.paymentStatus,
+      createdAt: invoice.createdAt,
+      satoshis: invoice.satoshis,
+      expiresAt,
+      getCopyableInvoiceFn,
+      getFullUriFn,
+    },
+    errors: result.errors,
+  }
+}
+
+const encodeLnurl = (posUrl: string, username: string, amountQuery: string): string =>
+  bech32.encode(
+    "lnurl",
+    bech32.toWords(
+      Buffer.from(
+        `${posUrl}/.well-known/lnurlp/${username}${amountQuery ? `?${amountQuery}` : ""}`,
+        "utf8",
+      ),
+    ),
+    LNURL_BECH32_LIMIT,
+  )
+
+const buildPayCodeInfo = async (
+  request: PrCreationData,
+  username: string,
+): Promise<PaymentRequestInformation> => {
+  const amountQuery = formatPayCodeAmountQuery(request.unitOfAccountAmount)
+  const lnurl = encodeLnurl(request.posUrl, username, amountQuery)
+
+  /** Defer one frame so the loading state paints (bech32.encode takes ~10ms on slower phones). */
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, LNURL_RENDER_DELAY_MS)
+  })
+
+  const getFullUriFn: GetFullUriFn = ({ uppercase, prefix }) =>
+    getPaymentRequestFullUri({
+      type: Invoice.PayCode,
+      input: lnurl.toUpperCase(),
+      uppercase,
+      prefix,
+    })
+  const getCopyableInvoiceFn: GetCopyableInvoiceFn = () =>
+    getLightningAddress(request.lnAddressHostname, username)
+
+  return {
+    data: {
+      invoiceType: Invoice.PayCode,
+      username,
+      getCopyableInvoiceFn,
+      getFullUriFn,
+    },
+    errors: undefined,
+  }
+}
+
+const buildInfoForType = (
+  request: PrCreationData,
+  adapters: GeneratePaymentRequestAdapters,
+): Promise<PaymentRequestInformation> => {
+  switch (request.type) {
+    case Invoice.OnChain:
+      return buildOnchainInfo(request, adapters)
+    case Invoice.Lightning:
+      return buildLightningInfo(request, adapters)
+    case Invoice.PayCode:
+      return buildPayCodeInfo(request, request.username as string)
+    default:
+      throw new Error("Unknown Payment Request Type Encountered - Please Report")
+  }
+}
 
 export const createPaymentRequest = (
   params: CreatePaymentRequestParams,
 ): PaymentRequest => {
-  let { state, info } = params
+  let { state } = params
+  const { info } = params
   if (!state) state = PaymentRequestState.Idle
 
   const setState = (state: PaymentRequestStateType) => {
@@ -28,261 +196,25 @@ export const createPaymentRequest = (
     return createPaymentRequest({ ...params, state })
   }
 
-  // The hook should setState(Loading) before calling this
+  /** The hook should setState(Loading) before calling this. */
   const generateQuote: () => Promise<PaymentRequest> = async () => {
-    const { creationData, mutations } = params
-    const pr = { ...creationData } // clone creation data object
+    const { creationData, adapters } = params
+    const request = { ...creationData }
+    if (!request.memo) request.memo = DEFAULT_MEMO
 
-    let info: PaymentRequestInformation | undefined
-
-    // Default memo
-    if (!pr.memo) pr.memo = "Pay to Blink Wallet User"
-
-    // On Chain BTC
-    if (pr.type === Invoice.OnChain) {
-      const { data, errors } = await mutations.onChainAddressCurrent({
-        variables: { input: { walletId: pr.receivingWalletDescriptor.id } },
-      })
-
-      if (pr.settlementAmount && pr.settlementAmount.currency !== WalletCurrency.Btc)
-        throw new Error("Onchain invoices only support BTC")
-
-      const address = data?.onChainAddressCurrent?.address || undefined
-
-      const getFullUriFn: GetFullUriFn = ({ uppercase, prefix }) =>
-        getPaymentRequestFullUri({
-          type: Invoice.OnChain,
-          input: address || "",
-          amount: pr.settlementAmount?.amount,
-          memo: pr.memo,
-          uppercase,
-          prefix,
-        })
-      const getCopyableInvoiceFn: GetCopyableInvoiceFn = () => address || ""
-
-      info = {
-        data: address
-          ? {
-              invoiceType: Invoice.OnChain,
-              getFullUriFn,
-              getCopyableInvoiceFn,
-              address,
-              amount: pr.settlementAmount as BtcMoneyAmount,
-              memo: pr.memo,
-            }
-          : undefined,
-        applicationErrors: data?.onChainAddressCurrent?.errors,
-        gqlErrors: errors,
-      }
-
-      // Lightning without Amount (or zero-amount)
-    } else if (
-      pr.type === Invoice.Lightning &&
-      (pr.settlementAmount === undefined || pr.settlementAmount.amount === 0)
-    ) {
-      const { data, errors } = await mutations.lnNoAmountInvoiceCreate({
-        variables: {
-          input: {
-            walletId: pr.receivingWalletDescriptor.id,
-            memo: pr.memo,
-            expiresIn: pr.expirationTime?.toString(),
-          },
-        },
-      })
-
-      const dateString = prToDateString(
-        data?.lnNoAmountInvoiceCreate.invoice?.paymentRequest ?? "",
-        pr.network,
-      )
-
-      const getFullUriFn: GetFullUriFn = ({ uppercase, prefix }) =>
-        getPaymentRequestFullUri({
-          type: Invoice.Lightning,
-          input: data?.lnNoAmountInvoiceCreate.invoice?.paymentRequest || "",
-          amount: pr.settlementAmount?.amount,
-          memo: pr.memo,
-          uppercase,
-          prefix,
-        })
-      const getCopyableInvoiceFn: GetCopyableInvoiceFn = () => getFullUriFn({})
-
-      info = {
-        data: data?.lnNoAmountInvoiceCreate.invoice
-          ? {
-              invoiceType: Invoice.Lightning,
-              ...data?.lnNoAmountInvoiceCreate.invoice,
-              expiresAt: dateString ? new Date(dateString) : undefined,
-              getCopyableInvoiceFn,
-              getFullUriFn,
-            }
-          : undefined,
-        applicationErrors: data?.lnNoAmountInvoiceCreate?.errors,
-        gqlErrors: errors,
-      }
-
-      // Lightning with BTC Amount
-    } else if (
-      pr.type === Invoice.Lightning &&
-      pr.settlementAmount &&
-      pr.settlementAmount?.currency === WalletCurrency.Btc
-    ) {
-      const { data, errors } = await mutations.lnInvoiceCreate({
-        variables: {
-          input: {
-            walletId: pr.receivingWalletDescriptor.id,
-            amount: pr.settlementAmount.amount,
-            memo: pr.memo,
-            expiresIn: pr.expirationTime?.toString(),
-          },
-        },
-      })
-
-      const dateString = prToDateString(
-        data?.lnInvoiceCreate.invoice?.paymentRequest ?? "",
-        pr.network,
-      )
-
-      const getFullUriFn: GetFullUriFn = ({ uppercase, prefix }) =>
-        getPaymentRequestFullUri({
-          type: Invoice.Lightning,
-          input: data?.lnInvoiceCreate.invoice?.paymentRequest || "",
-          amount: pr.settlementAmount?.amount,
-          memo: pr.memo,
-          uppercase,
-          prefix,
-        })
-      const getCopyableInvoiceFn: GetCopyableInvoiceFn = () => getFullUriFn({})
-
-      info = {
-        data: data?.lnInvoiceCreate.invoice
-          ? {
-              invoiceType: Invoice.Lightning,
-              ...data?.lnInvoiceCreate.invoice,
-              expiresAt: dateString ? new Date(dateString) : undefined,
-              getCopyableInvoiceFn,
-              getFullUriFn,
-            }
-          : undefined,
-        applicationErrors: data?.lnInvoiceCreate?.errors,
-        gqlErrors: errors,
-      }
-      // Lightning with USD Amount
-    } else if (
-      pr.type === Invoice.Lightning &&
-      pr.settlementAmount &&
-      pr.settlementAmount?.currency === WalletCurrency.Usd
-    ) {
-      const { data, errors } = await mutations.lnUsdInvoiceCreate({
-        variables: {
-          input: {
-            walletId: pr.receivingWalletDescriptor.id,
-            amount: pr.settlementAmount.amount,
-            memo: pr.memo,
-            expiresIn: pr.expirationTime?.toString(),
-          },
-        },
-      })
-
-      const dateString = prToDateString(
-        data?.lnUsdInvoiceCreate.invoice?.paymentRequest ?? "",
-        pr.network,
-      )
-
-      const getFullUriFn: GetFullUriFn = ({ uppercase, prefix }) =>
-        getPaymentRequestFullUri({
-          type: Invoice.Lightning,
-          input: data?.lnUsdInvoiceCreate.invoice?.paymentRequest || "",
-          amount: pr.settlementAmount?.amount,
-          memo: pr.memo,
-          uppercase,
-          prefix,
-        })
-      const getCopyableInvoiceFn: GetCopyableInvoiceFn = () => getFullUriFn({})
-
-      info = {
-        data: data?.lnUsdInvoiceCreate.invoice
-          ? {
-              invoiceType: Invoice.Lightning,
-              ...data?.lnUsdInvoiceCreate.invoice,
-              expiresAt: dateString ? new Date(dateString) : undefined,
-              getCopyableInvoiceFn,
-              getFullUriFn,
-            }
-          : undefined,
-        applicationErrors: data?.lnUsdInvoiceCreate?.errors,
-        gqlErrors: errors,
-      }
-
-      // Paycode
-    } else if (pr.type === Invoice.PayCode && pr.username) {
-      const username = pr.username
-      const queryStringForAmount =
-        pr.unitOfAccountAmount === undefined || pr.unitOfAccountAmount.amount === 0
-          ? ""
-          : `amount=${pr.unitOfAccountAmount?.amount}&currency=${pr.unitOfAccountAmount?.currencyCode}`
-
-      const lnurl: string = await new Promise((resolve) => {
-        resolve(
-          bech32.encode(
-            "lnurl",
-            bech32.toWords(
-              Buffer.from(
-                `${pr.posUrl}/.well-known/lnurlp/${username}${
-                  queryStringForAmount ? `?${queryStringForAmount}` : ""
-                }`,
-                "utf8",
-              ),
-            ),
-            1500,
-          ),
-        )
-      })
-
-      // To make the page render at loading state
-      // (otherwise jittery because encode takes ~10ms on slower phones)
-      await new Promise((r) => {
-        setTimeout(r, 50)
-      })
-
-      const getFullUriFn: GetFullUriFn = ({ uppercase, prefix }) =>
-        getPaymentRequestFullUri({
-          type: Invoice.PayCode,
-          input: lnurl.toUpperCase(),
-          uppercase,
-          prefix,
-        })
-      const getCopyableInvoiceFn: GetCopyableInvoiceFn = () =>
-        getLightningAddress(pr.lnAddressHostname, username)
-
-      info = {
-        data: {
-          invoiceType: Invoice.PayCode,
-          username,
-          getCopyableInvoiceFn,
-          getFullUriFn,
-        },
-        applicationErrors: undefined,
-        gqlErrors: undefined,
-      }
-    } else if (pr.type === Invoice.PayCode && !pr.username) {
-      // Can't create paycode payment request for a user with no username set so info will be empty
+    if (request.type === Invoice.PayCode && !request.username) {
       return createPaymentRequest({
         ...params,
         state: PaymentRequestState.Created,
         info: undefined,
       })
-    } else {
-      info = undefined
-      console.log(JSON.stringify({ pr }, null, 2))
-      throw new Error("Unknown Payment Request Type Encountered - Please Report")
     }
 
-    let state: PaymentRequestStateType = PaymentRequestState.Created
-    if (!info || info.applicationErrors?.length || info.gqlErrors?.length || !info.data) {
-      state = PaymentRequestState.Error
-    }
+    const nextInfo = await buildInfoForType(request, adapters)
+    const succeeded = !nextInfo.errors?.length && Boolean(nextInfo.data)
+    const nextState = succeeded ? PaymentRequestState.Created : PaymentRequestState.Error
 
-    return createPaymentRequest({ ...params, info, state })
+    return createPaymentRequest({ ...params, info: nextInfo, state: nextState })
   }
 
   return { ...params, state, info, generateRequest: generateQuote, setState }

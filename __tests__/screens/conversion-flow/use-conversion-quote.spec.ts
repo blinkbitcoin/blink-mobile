@@ -15,7 +15,7 @@ const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn((amount) => amount)
 
 jest.mock("@app/hooks/use-payments", () => ({
-  usePayments: () => ({ getConversionQuote: mockGetQuote }),
+  usePayments: () => ({ convert: { getQuote: mockGetQuote } }),
 }))
 
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -39,6 +39,7 @@ jest.mock("@react-native-firebase/crashlytics", () => {
 
 const buildQuote = (amountAdjustment?: ConvertAmountAdjustment): ConvertQuote => ({
   feeAmount: toUsdMoneyAmount(5),
+  showFeeRow: true,
   amountAdjustment,
   execute: jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
 })

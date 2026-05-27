@@ -30,7 +30,8 @@ export type ConversionQuoteState = {
 export const useConversionQuote = (
   quoteParams: ConvertParams | null,
 ): ConversionQuoteState => {
-  const { getConversionQuote } = usePayments()
+  const { convert } = usePayments()
+  const getQuote = convert?.getQuote
   const { formatMoneyAmount } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
 
@@ -40,13 +41,13 @@ export const useConversionQuote = (
   }>({ status: QuoteStatus.Idle, quote: null })
 
   useEffect(() => {
-    if (!getConversionQuote || !quoteParams) {
+    if (!getQuote || !quoteParams) {
       setState({ status: QuoteStatus.Idle, quote: null })
       return
     }
     let cancelled = false
     setState({ status: QuoteStatus.Loading, quote: null })
-    getConversionQuote(quoteParams)
+    getQuote(quoteParams)
       .then((quote) => {
         if (cancelled) return
         if (!quote) {
@@ -56,15 +57,13 @@ export const useConversionQuote = (
       })
       .catch(() => {
         if (cancelled) return
-        // Bridge already records to crashlytics with breadcrumbs
-        // (`createGetConversionQuote` in `app/self-custodial/bridge/convert.ts`),
-        // so the hook only needs to surface the Error state to the UI.
+        /** Bridge already records to crashlytics with breadcrumbs in `createSelfCustodialConvert` (`app/self-custodial/adapters/payment.ts`), so the hook only needs to surface the Error state to the UI. */
         setState({ status: QuoteStatus.Error, quote: null })
       })
     return () => {
       cancelled = true
     }
-  }, [getConversionQuote, quoteParams])
+  }, [getQuote, quoteParams])
 
   const { quote } = state
 
@@ -81,9 +80,12 @@ export const useConversionQuote = (
     return quote.amountAdjustment ?? null
   }, [quote])
 
+  const isQuoting = state.status === QuoteStatus.Loading
+  const hasQuoteError = state.status === QuoteStatus.Error
+
   return {
-    isQuoting: state.status === QuoteStatus.Loading,
-    hasQuoteError: state.status === QuoteStatus.Error,
+    isQuoting,
+    hasQuoteError,
     quote: state.quote,
     feeText,
     amountAdjustment,

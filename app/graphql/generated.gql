@@ -1222,23 +1222,6 @@ query contacts {
   }
 }
 
-query conversionScreen {
-  me {
-    id
-    defaultAccount {
-      id
-      wallets {
-        id
-        balance
-        walletCurrency
-        __typename
-      }
-      __typename
-    }
-    __typename
-  }
-}
-
 query currencyList {
   currencyList {
     __typename

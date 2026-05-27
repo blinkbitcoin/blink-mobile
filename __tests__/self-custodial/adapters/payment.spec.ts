@@ -1,6 +1,11 @@
 /* eslint-disable camelcase */
-import { createSendPayment, createGetFee } from "@app/self-custodial/adapters/payment"
-import { createReceiveLightning, createReceiveOnchain } from "@app/self-custodial/bridge"
+import { WalletCurrency } from "@app/graphql/generated"
+import {
+  createGetFee,
+  createSelfCustodialReceiveLightning,
+  createSelfCustodialReceiveOnchain,
+  createSendPayment,
+} from "@app/self-custodial/adapters/payment"
 
 const mockRecordError = jest.fn()
 
@@ -355,35 +360,35 @@ describe("self-custodial payment adapters", () => {
     })
   })
 
-  describe("createReceiveLightning", () => {
+  describe("createSelfCustodialReceiveLightning", () => {
     it("returns invoice from SDK", async () => {
       const sdk = createMockSdk()
       sdk.receivePayment.mockResolvedValue({ paymentRequest: "lnbc1invoice..." })
 
-      const receive = createReceiveLightning(sdk as never)
-      const result = await receive({ memo: "test" })
+      const receive = createSelfCustodialReceiveLightning(sdk as never)
+      const result = await receive({ walletCurrency: WalletCurrency.Btc, memo: "test" })
 
-      expect(result.invoice).toBe("lnbc1invoice...")
+      expect(result.invoice).toEqual({ paymentRequest: "lnbc1invoice..." })
     })
 
     it("returns error on failure", async () => {
       const sdk = createMockSdk()
       sdk.receivePayment.mockRejectedValue(new Error("SDK error"))
 
-      const receive = createReceiveLightning(sdk as never)
-      const result = await receive({})
+      const receive = createSelfCustodialReceiveLightning(sdk as never)
+      const result = await receive({ walletCurrency: WalletCurrency.Btc })
 
       expect(result.errors?.[0].message).toBe("SDK error")
     })
   })
 
-  describe("createReceiveOnchain", () => {
+  describe("createSelfCustodialReceiveOnchain", () => {
     it("returns bitcoin address from SDK", async () => {
       const sdk = createMockSdk()
       sdk.receivePayment.mockResolvedValue({ paymentRequest: "bc1q..." })
 
-      const receive = createReceiveOnchain(sdk as never)
-      const result = await receive()
+      const receive = createSelfCustodialReceiveOnchain(sdk as never)
+      const result = await receive({ walletCurrency: WalletCurrency.Btc })
 
       expect(result.address).toBe("bc1q...")
     })
@@ -392,8 +397,8 @@ describe("self-custodial payment adapters", () => {
       const sdk = createMockSdk()
       sdk.receivePayment.mockRejectedValue(new Error("no address"))
 
-      const receive = createReceiveOnchain(sdk as never)
-      const result = await receive()
+      const receive = createSelfCustodialReceiveOnchain(sdk as never)
+      const result = await receive({ walletCurrency: WalletCurrency.Btc })
 
       expect(result.errors?.[0].message).toBe("no address")
     })

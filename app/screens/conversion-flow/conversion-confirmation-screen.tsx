@@ -1,4 +1,3 @@
-import { GraphQLError } from "graphql"
 import React, { useMemo, useState } from "react"
 import { TouchableOpacity, View } from "react-native"
 import { makeStyles, useTheme, Text } from "@rn-vui/themed"
@@ -12,35 +11,24 @@ import {
   useNavigation,
 } from "@react-navigation/native"
 
-import {
-  HomeAuthedDocument,
-  PaymentSendResult,
-  useConversionScreenQuery,
-  useIntraLedgerPaymentSendMutation,
-  useIntraLedgerUsdPaymentSendMutation,
-  WalletCurrency,
-} from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getErrorMessages } from "@app/graphql/utils"
-import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
+import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
+import { Screen } from "@app/components/screen"
+import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import { SATS_PER_BTC, usePriceConversion } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount } from "@app/types/amounts"
-import { PaymentResultStatus } from "@app/types/payment"
+import { oppositeWalletCurrency, PaymentResultStatus } from "@app/types/payment"
 import { WalletDescriptor } from "@app/types/wallets"
-import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
+import { logConversionResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 
 import { ConversionFeeRow } from "./conversion-fee-row"
-import { useSelfCustodialConversion } from "./hooks"
-
-import { Screen } from "@app/components/screen"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
-import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
+import { useConversionExecution } from "./hooks"
 
 type Props = {
   route: RouteProp<RootStackParamList, "conversionConfirmation">
@@ -60,46 +48,29 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const { fromWalletCurrency, moneyAmount } = route.params
   const [errorMessage, setErrorMessage] = useState<string | undefined>()
-  const [selfCustodialConverting, setSelfCustodialConverting] = useState(false)
-  const isAuthed = useIsAuthed()
-  const { isSelfCustodial, wallets: activeWallets } = useActiveWallet()
+  const [isExecuting, setIsExecuting] = useState(false)
+  const { wallets: activeWallets } = useActiveWallet()
 
-  const [intraLedgerPaymentSend, { loading: intraLedgerPaymentSendLoading }] =
-    useIntraLedgerPaymentSendMutation()
-  const [intraLedgerUsdPaymentSend, { loading: intraLedgerUsdPaymentSendLoading }] =
-    useIntraLedgerUsdPaymentSendMutation()
-  const isLoading =
-    intraLedgerPaymentSendLoading ||
-    intraLedgerUsdPaymentSendLoading ||
-    selfCustodialConverting
   const { LL } = useI18nContext()
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
 
-  const { data } = useConversionScreenQuery({
-    fetchPolicy: "cache-first",
-    skip: !isAuthed || isSelfCustodial,
-  })
-
-  const selfCustodialBtcWallet = activeWallets.find(
-    (w) => w.walletCurrency === WalletCurrency.Btc,
-  )
-  const selfCustodialUsdWallet = activeWallets.find(
-    (w) => w.walletCurrency === WalletCurrency.Usd,
-  )
-  const btcWallet = isSelfCustodial
-    ? selfCustodialBtcWallet && {
-        id: selfCustodialBtcWallet.id,
-        balance: selfCustodialBtcWallet.balance.amount,
-        walletCurrency: selfCustodialBtcWallet.walletCurrency,
-      }
-    : getBtcWallet(data?.me?.defaultAccount?.wallets)
-  const usdWallet = isSelfCustodial
-    ? selfCustodialUsdWallet && {
-        id: selfCustodialUsdWallet.id,
-        balance: selfCustodialUsdWallet.balance.amount,
-        walletCurrency: selfCustodialUsdWallet.walletCurrency,
-      }
-    : getUsdWallet(data?.me?.defaultAccount?.wallets)
+  const wallets = useMemo(() => {
+    const btc = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
+    const usd = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Usd)
+    if (!btc || !usd) return null
+    return {
+      btc: {
+        id: btc.id,
+        balance: btc.balance.amount,
+        walletCurrency: btc.walletCurrency,
+      },
+      usd: {
+        id: usd.id,
+        balance: usd.balance.amount,
+        walletCurrency: usd.walletCurrency,
+      },
+    }
+  }, [activeWallets])
 
   const btcToUsdRate = useMemo(() => {
     if (!convertMoneyAmount) return null
@@ -113,121 +84,75 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
   }, [convertMoneyAmount, formatMoneyAmount])
 
-  const nonCustodialConversion = useSelfCustodialConversion({
+  const conversion = useConversionExecution({
     fromCurrency: fromWalletCurrency,
     moneyAmount,
-    enabled: isSelfCustodial,
   })
 
-  if (
-    (!isSelfCustodial && !data?.me) ||
-    !usdWallet ||
-    !btcWallet ||
-    !convertMoneyAmount
-  ) {
-    // TODO: handle errors and or provide some loading state
+  if (!wallets || !convertMoneyAmount) {
     return null
   }
 
-  const fromWallet: WalletDescriptor<WalletCurrency> =
-    fromWalletCurrency === WalletCurrency.Btc
-      ? { id: btcWallet.id, currency: WalletCurrency.Btc }
-      : { id: usdWallet.id, currency: WalletCurrency.Usd }
+  const isFromBtc = fromWalletCurrency === WalletCurrency.Btc
+  const fromWallet: WalletDescriptor<WalletCurrency> = isFromBtc
+    ? { id: wallets.btc.id, currency: WalletCurrency.Btc }
+    : { id: wallets.usd.id, currency: WalletCurrency.Usd }
 
-  const toWallet: WalletDescriptor<WalletCurrency> =
-    fromWalletCurrency === WalletCurrency.Btc
-      ? { id: usdWallet.id, currency: WalletCurrency.Usd }
-      : { id: btcWallet.id, currency: WalletCurrency.Btc }
+  const toWallet: WalletDescriptor<WalletCurrency> = isFromBtc
+    ? { id: wallets.usd.id, currency: WalletCurrency.Usd }
+    : { id: wallets.btc.id, currency: WalletCurrency.Btc }
 
-  const fromWalletLabel =
-    fromWallet.currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
-  const toWalletLabel =
-    toWallet.currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
+  const currencyLabel = (currency: WalletCurrency) =>
+    currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
+  const fromWalletLabel = currencyLabel(fromWallet.currency)
+  const toWalletLabel = currencyLabel(toWallet.currency)
 
   const fromAmount = convertMoneyAmount(moneyAmount, fromWallet.currency)
   const toAmount = convertMoneyAmount(moneyAmount, toWallet.currency)
 
+  const satsEquivalent = (currency: WalletCurrency, amount: typeof fromAmount) => {
+    if (currency === WalletCurrency.Usd && displayCurrency === WalletCurrency.Usd) {
+      return null
+    }
+    return moneyAmountToDisplayCurrencyString({
+      moneyAmount: amount,
+      isApproximate: true,
+    })
+  }
+
   const fromWalletBalanceFormatted = formatMoneyAmount({ moneyAmount: fromAmount })
-  const fromSatsFormatted =
-    fromWallet.currency === WalletCurrency.Usd && displayCurrency === WalletCurrency.Usd
-      ? null
-      : moneyAmountToDisplayCurrencyString({
-          moneyAmount: fromAmount,
-          isApproximate: true,
-        })
+  const fromSatsFormatted = satsEquivalent(fromWallet.currency, fromAmount)
 
   const toWalletBalanceFormatted = formatMoneyAmount({
     moneyAmount: toAmount,
     isApproximate: true,
   })
-  const toSatsFormatted =
-    toWallet.currency === WalletCurrency.Usd && displayCurrency === WalletCurrency.Usd
-      ? null
-      : moneyAmountToDisplayCurrencyString({
-          moneyAmount: toAmount,
-          isApproximate: true,
-        })
+  const toSatsFormatted = satsEquivalent(toWallet.currency, toAmount)
 
-  const handlePaymentReturn = (
-    status: PaymentSendResult,
-    errorsMessage: readonly GraphQLError[] | string | undefined,
-  ) => {
-    if (status === "SUCCESS") {
-      // navigate to next screen
-      navigation.dispatch((state) => {
-        const routes = [{ name: "Primary" }, { name: "conversionSuccess" }]
-        return CommonActions.reset({
-          ...state,
-          routes,
-          index: routes.length - 1,
-        })
+  const navigateToSuccess = () => {
+    navigation.dispatch((state) => {
+      const routes = [{ name: "Primary" }, { name: "conversionSuccess" }]
+      return CommonActions.reset({
+        ...state,
+        routes,
+        index: routes.length - 1,
       })
-      ReactNativeHapticFeedback.trigger("notificationSuccess", {
-        ignoreAndroidSystemSettings: true,
-      })
-    }
-
-    if (typeof errorsMessage === "string") {
-      setErrorMessage(errorsMessage)
-      ReactNativeHapticFeedback.trigger("notificationError", {
-        ignoreAndroidSystemSettings: true,
-      })
-    } else if (errorsMessage?.length) {
-      setErrorMessage(getErrorMessages(errorsMessage))
-      ReactNativeHapticFeedback.trigger("notificationError", {
-        ignoreAndroidSystemSettings: true,
-      })
-    }
+    })
   }
 
-  const handlePaymentError = (error: Error) => {
-    toastShow({ message: error.message, LL })
-  }
-
-  const paySelfCustodial = async () => {
-    setSelfCustodialConverting(true)
+  const payWallet = async () => {
+    setIsExecuting(true)
+    setErrorMessage(undefined)
     try {
-      const outcome = await nonCustodialConversion.execute()
+      const outcome = await conversion.execute()
+      const succeeded = outcome.status === PaymentResultStatus.Success
       logConversionResult({
         sendingWallet: fromWalletCurrency,
-        receivingWallet:
-          fromWalletCurrency === WalletCurrency.Btc
-            ? WalletCurrency.Usd
-            : WalletCurrency.Btc,
-        paymentStatus:
-          outcome.status === PaymentResultStatus.Success
-            ? PaymentSendResult.Success
-            : PaymentSendResult.Failure,
+        receivingWallet: oppositeWalletCurrency(fromWalletCurrency),
+        paymentStatus: succeeded ? PaymentSendResult.Success : PaymentSendResult.Failure,
       })
-      if (outcome.status === PaymentResultStatus.Success) {
-        navigation.dispatch((state) => {
-          const routes = [{ name: "Primary" }, { name: "conversionSuccess" }]
-          return CommonActions.reset({
-            ...state,
-            routes,
-            index: routes.length - 1,
-          })
-        })
+      if (succeeded) {
+        navigateToSuccess()
         ReactNativeHapticFeedback.trigger("notificationSuccess", {
           ignoreAndroidSystemSettings: true,
         })
@@ -240,95 +165,10 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     } catch (err) {
       if (err instanceof Error) {
         crashlytics().recordError(err)
-        handlePaymentError(err)
+        toastShow({ message: err.message, LL })
       }
     } finally {
-      setSelfCustodialConverting(false)
-    }
-  }
-
-  const payWallet = async () => {
-    if (isSelfCustodial) {
-      await paySelfCustodial()
-      return
-    }
-    if (fromWallet.currency === WalletCurrency.Btc) {
-      try {
-        logConversionAttempt({
-          sendingWallet: fromWallet.currency,
-          receivingWallet: toWallet.currency,
-        })
-        const { data, errors } = await intraLedgerPaymentSend({
-          variables: {
-            input: {
-              walletId: fromWallet.id,
-              recipientWalletId: toWallet.id,
-              amount: fromAmount.amount,
-            },
-          },
-          refetchQueries: [HomeAuthedDocument],
-        })
-
-        const status = data?.intraLedgerPaymentSend.status
-
-        if (!status) {
-          throw new Error("Conversion failed")
-        }
-
-        logConversionResult({
-          sendingWallet: fromWallet.currency,
-          receivingWallet: toWallet.currency,
-          paymentStatus: status,
-        })
-        handlePaymentReturn(
-          status,
-          errors || data?.intraLedgerPaymentSend.errors[0]?.message,
-        )
-      } catch (err) {
-        if (err instanceof Error) {
-          crashlytics().recordError(err)
-          handlePaymentError(err)
-        }
-      }
-    }
-    if (fromWallet.currency === WalletCurrency.Usd) {
-      try {
-        logConversionAttempt({
-          sendingWallet: fromWallet.currency,
-          receivingWallet: toWallet.currency,
-        })
-        const { data, errors } = await intraLedgerUsdPaymentSend({
-          variables: {
-            input: {
-              walletId: fromWallet.id,
-              recipientWalletId: toWallet.id,
-              amount: fromAmount.amount,
-            },
-          },
-          refetchQueries: [HomeAuthedDocument],
-        })
-
-        const status = data?.intraLedgerUsdPaymentSend.status
-
-        if (!status) {
-          throw new Error("Conversion failed")
-        }
-
-        logConversionResult({
-          sendingWallet: fromWallet.currency,
-          receivingWallet: toWallet.currency,
-          paymentStatus: status,
-        })
-        handlePaymentReturn(
-          status,
-          errors || data?.intraLedgerUsdPaymentSend.errors[0]?.message,
-        )
-      } catch (err) {
-        if (err instanceof Error) {
-          crashlytics().recordError(err)
-          handlePaymentError(err)
-        }
-      }
+      setIsExecuting(false)
     }
   }
 
@@ -381,11 +221,11 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
             </View>
           </View>
         </View>
-        {isSelfCustodial && (
+        {conversion.feeRowVisible && (
           <ConversionFeeRow
-            feeText={nonCustodialConversion.feeText}
-            isLoading={nonCustodialConversion.isQuoting}
-            hasError={nonCustodialConversion.hasQuoteError}
+            feeText={conversion.feeText}
+            isLoading={conversion.isQuoting}
+            hasError={conversion.hasQuoteError}
           />
         )}
         <View style={styles.infoContainer}>
@@ -404,16 +244,14 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
       <PanGestureHandler>
         <View style={styles.sliderContainer}>
           <GaloySliderButton
-            isLoading={isLoading}
+            isLoading={isExecuting}
             initialText={LL.ConversionConfirmationScreen.transferButtonText({
               fromWallet: fromWalletLabel,
               toWallet: toWalletLabel,
             })}
             loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
             onSwipe={payWallet}
-            disabled={
-              isLoading || (isSelfCustodial && !nonCustodialConversion.canExecute)
-            }
+            disabled={isExecuting || !conversion.canExecute}
           />
         </View>
       </PanGestureHandler>

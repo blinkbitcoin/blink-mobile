@@ -6,7 +6,7 @@ import { useLnUpdateHashPaid } from "@app/graphql/ln-update-context"
 import { useCountdown } from "@app/hooks"
 
 import {
-  GeneratePaymentRequestMutations,
+  GeneratePaymentRequestAdapters,
   Invoice,
   PaymentRequest,
   PaymentRequestState,
@@ -14,60 +14,64 @@ import {
 } from "../payment/index.types"
 import { createPaymentRequest } from "../payment/payment-request"
 
+const getLightningInvoiceData = (paymentRequest: PaymentRequest | null) => {
+  const data = paymentRequest?.info?.data
+  if (data?.invoiceType === Invoice.Lightning) return data
+
+  return undefined
+}
+
 export const useInvoiceLifecycle = (
   prcd: PaymentRequestCreationData<WalletCurrency> | null,
-  mutations: GeneratePaymentRequestMutations,
+  adapters: GeneratePaymentRequestAdapters | null,
 ) => {
-  const [pr, setPR] = useState<PaymentRequest | null>(null)
-
-  useLayoutEffect(() => {
-    if (prcd) {
-      setPR(createPaymentRequest({ mutations, creationData: prcd }))
-    }
-  }, [prcd, mutations])
-
-  useEffect(() => {
-    if (pr && pr.state === PaymentRequestState.Idle) {
-      setPR((current) => current && current.setState(PaymentRequestState.Loading))
-      pr.generateRequest().then((newPR) =>
-        setPR((currentPR) => {
-          if (currentPR?.creationData === newPR.creationData) return newPR
-          return currentPR
-        }),
-      )
-    }
-  }, [pr])
-
-  const regenerateInvoice = useCallback(() => {
-    setPR((current) => current && current.setState(PaymentRequestState.Idle))
-  }, [])
-
+  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null)
   const lastHash = useLnUpdateHashPaid()
-  useEffect(() => {
-    if (
-      pr?.state === PaymentRequestState.Created &&
-      pr.info?.data?.invoiceType === Invoice.Lightning &&
-      lastHash === pr.info.data.paymentHash
-    ) {
-      setPR((current) => current && current.setState(PaymentRequestState.Paid))
-      ReactNativeHapticFeedback.trigger("notificationSuccess", {
-        ignoreAndroidSystemSettings: true,
-      })
-    }
-  }, [lastHash, pr])
 
-  const expiresAt =
-    pr?.info?.data?.invoiceType === Invoice.Lightning && pr.info?.data?.expiresAt
-      ? pr.info.data.expiresAt
-      : null
+  const lightningInvoice = getLightningInvoiceData(paymentRequest)
+  const isCreated = paymentRequest?.state === PaymentRequestState.Created
+  const isPaid = isCreated && lightningInvoice?.paymentHash === lastHash
+  const expiresAt = lightningInvoice?.expiresAt ?? null
 
   const { remainingSeconds: expiresInSeconds, isExpired } = useCountdown(expiresAt)
 
-  useEffect(() => {
-    if (isExpired) {
-      setPR((current) => current && current.setState(PaymentRequestState.Expired))
+  useLayoutEffect(() => {
+    if (prcd && adapters) {
+      setPaymentRequest(createPaymentRequest({ adapters, creationData: prcd }))
     }
+  }, [prcd, adapters])
+
+  useEffect(() => {
+    if (!paymentRequest || paymentRequest.state !== PaymentRequestState.Idle) return
+    setPaymentRequest(
+      (current) => current && current.setState(PaymentRequestState.Loading),
+    )
+    paymentRequest.generateRequest().then((next) =>
+      setPaymentRequest((current) => {
+        if (current?.creationData === next.creationData) return next
+        return current
+      }),
+    )
+  }, [paymentRequest])
+
+  useEffect(() => {
+    if (!isPaid) return
+    setPaymentRequest((current) => current && current.setState(PaymentRequestState.Paid))
+    ReactNativeHapticFeedback.trigger("notificationSuccess", {
+      ignoreAndroidSystemSettings: true,
+    })
+  }, [isPaid])
+
+  useEffect(() => {
+    if (!isExpired) return
+    setPaymentRequest(
+      (current) => current && current.setState(PaymentRequestState.Expired),
+    )
   }, [isExpired])
 
-  return { pr, regenerateInvoice, expiresInSeconds }
+  const regenerateInvoice = useCallback(() => {
+    setPaymentRequest((current) => current && current.setState(PaymentRequestState.Idle))
+  }, [])
+
+  return { paymentRequest, regenerateInvoice, expiresInSeconds }
 }

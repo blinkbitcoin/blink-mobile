@@ -2,14 +2,21 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { View, TextInput, Animated, Easing, LayoutChangeEvent } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import { gql } from "@apollo/client"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useEqualPillWidth } from "@app/components/atomic/currency-pill/use-equal-pill-width"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { CurrencyInput } from "@app/components/currency-input"
+import { PercentageSelector } from "@app/components/percentage-selector"
+import { Screen } from "@app/components/screen"
 import {
-  useConversionScreenQuery,
-  useRealtimePriceQuery,
-  WalletCurrency,
-} from "@app/graphql/generated"
-import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+  AmountInputScreen,
+  ConvertInputType,
+} from "@app/components/transfer-amount-input"
+import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
+import { useRealtimePriceQuery, WalletCurrency } from "@app/graphql/generated"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useConversionLimits } from "@app/hooks/use-conversion-limits"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -29,47 +36,15 @@ import {
   toWalletMoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
-
-import { Screen } from "@app/components/screen"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { CurrencyInput } from "@app/components/currency-input"
-import { PercentageSelector } from "@app/components/percentage-selector"
-import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { useEqualPillWidth } from "@app/components/atomic/currency-pill/use-equal-pill-width"
-import {
-  AmountInputScreen,
-  ConvertInputType,
-} from "@app/components/transfer-amount-input"
-
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
 import { convertDirectionFromCurrency } from "@app/types/payment"
-import { AccountType } from "@app/types/wallet"
 
+import { BTC_SUFFIX, findBtcSuffixIndex } from "./btc-format"
 import {
   useConversionFormatting,
   useConversionOverlayFocus,
-  useSelfCustodialConversionGuard,
+  useConversionDustGuard,
   useSyncedInputValues,
 } from "./hooks"
-import { BTC_SUFFIX, findBtcSuffixIndex } from "./btc-format"
-
-gql`
-  query conversionScreen {
-    me {
-      id
-      defaultAccount {
-        id
-        wallets {
-          id
-          balance
-          walletCurrency
-        }
-      }
-    }
-  }
-`
 
 const ANIMATION_CONFIG = {
   duration: 120,
@@ -87,19 +62,7 @@ export const ConversionDetailsScreen = () => {
 
   useRealtimePriceQuery({ fetchPolicy: "network-only" })
 
-  const {
-    isSelfCustodial,
-    isReady,
-    accountType,
-    wallets: activeWallets,
-  } = useActiveWallet()
-  const isSelfCustodialBooting = accountType === AccountType.SelfCustodial && !isReady
-
-  const { data } = useConversionScreenQuery({
-    fetchPolicy: "cache-and-network",
-    returnPartialData: true,
-    skip: isSelfCustodial,
-  })
+  const { isReady: isActiveWalletReady, wallets: activeWallets } = useActiveWallet()
 
   const { LL } = useI18nContext()
   const {
@@ -110,33 +73,26 @@ export const ConversionDetailsScreen = () => {
   } = useDisplayCurrency()
   const styles = useStyles(displayCurrency !== WalletCurrency.Usd)
 
-  const selfCustodialWalletsForConvert = useMemo(() => {
-    if (!isSelfCustodial) return null
-    const selfCustodialBtc = activeWallets.find(
-      (w) => w.walletCurrency === WalletCurrency.Btc,
-    )
-    const selfCustodialUsd = activeWallets.find(
-      (w) => w.walletCurrency === WalletCurrency.Usd,
-    )
-    if (!selfCustodialBtc || !selfCustodialUsd) return null
+  const walletFragments = useMemo(() => {
+    const btc = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
+    const usd = activeWallets.find((w) => w.walletCurrency === WalletCurrency.Usd)
+    if (!btc || !usd) return null
     return {
       btc: {
-        id: selfCustodialBtc.id,
-        balance: selfCustodialBtc.balance.amount,
-        walletCurrency: selfCustodialBtc.walletCurrency,
+        id: btc.id,
+        balance: btc.balance.amount,
+        walletCurrency: btc.walletCurrency,
       },
       usd: {
-        id: selfCustodialUsd.id,
-        balance: selfCustodialUsd.balance.amount,
-        walletCurrency: selfCustodialUsd.walletCurrency,
+        id: usd.id,
+        balance: usd.balance.amount,
+        walletCurrency: usd.walletCurrency,
       },
     }
-  }, [isSelfCustodial, activeWallets])
+  }, [activeWallets])
 
-  const btcWallet =
-    selfCustodialWalletsForConvert?.btc ?? getBtcWallet(data?.me?.defaultAccount?.wallets)
-  const usdWallet =
-    selfCustodialWalletsForConvert?.usd ?? getUsdWallet(data?.me?.defaultAccount?.wallets)
+  const btcWallet = walletFragments?.btc
+  const usdWallet = walletFragments?.usd
 
   const {
     fromWallet,
@@ -155,23 +111,18 @@ export const ConversionDetailsScreen = () => {
       : undefined,
   )
 
-  const convertDirection =
-    isSelfCustodial && fromWallet
-      ? convertDirectionFromCurrency(fromWallet.walletCurrency)
-      : undefined
-  const { limits: selfCustodialConversionLimits, error: selfCustodialLimitsError } =
-    useNonCustodialConversionLimits(convertDirection)
-  const selfCustodialMinFromAmount = isSelfCustodial
-    ? selfCustodialConversionLimits?.minFromAmount ?? null
-    : null
-  const selfCustodialLimitsUnavailable =
-    isSelfCustodial && selfCustodialLimitsError !== null
+  const convertDirection = fromWallet
+    ? convertDirectionFromCurrency(fromWallet.walletCurrency)
+    : undefined
+  const { limits: conversionLimits, error: conversionLimitsError } =
+    useConversionLimits(convertDirection)
+  const minFromAmount = conversionLimits?.minFromAmount ?? null
+  const conversionLimitsUnavailable = conversionLimitsError !== null
 
-  const conversionGuard = useSelfCustodialConversionGuard({
+  const conversionGuard = useConversionDustGuard({
     fromCurrency: fromWallet?.walletCurrency,
     amountInSourceCurrency: settlementSendAmount?.amount ?? 0,
     fromWalletBalance: fromWallet?.balance,
-    enabled: isSelfCustodial,
   })
   const quoteBlocking = conversionGuard.blockingReason !== null
 
@@ -366,7 +317,7 @@ export const ConversionDetailsScreen = () => {
     }
   }, [displayCurrency, renderValue])
 
-  if ((!isSelfCustodial && !data?.me?.defaultAccount) || !fromWallet) return <></>
+  if (!fromWallet) return <></>
 
   const toggleInputs = () => {
     if (uiLocked) return
@@ -492,23 +443,19 @@ export const ConversionDetailsScreen = () => {
   })
 
   const belowMinimum =
-    isSelfCustodial &&
-    selfCustodialMinFromAmount !== null &&
+    minFromAmount !== null &&
     settlementSendAmount.amount > 0 &&
-    settlementSendAmount.amount < selfCustodialMinFromAmount
+    settlementSendAmount.amount < minFromAmount
 
   const amountFieldError: string | undefined = (() => {
     if (exceedsBalance) {
       return LL.SendBitcoinScreen.amountExceed({ balance: fromWalletBalanceFormatted })
     }
-    if (selfCustodialLimitsUnavailable) {
+    if (conversionLimitsUnavailable) {
       return LL.StableBalance.conversionUnavailable()
     }
-    if (belowMinimum && selfCustodialMinFromAmount !== null) {
-      const minMoneyAmount = toWalletMoneyAmount(
-        selfCustodialMinFromAmount,
-        fromWallet.walletCurrency,
-      )
+    if (belowMinimum && minFromAmount !== null) {
+      const minMoneyAmount = toWalletMoneyAmount(minFromAmount, fromWallet.walletCurrency)
       return LL.StableBalance.minimumConversion({
         amount: formatMoneyAmount({ moneyAmount: minMoneyAmount }),
       })
@@ -756,11 +703,11 @@ export const ConversionDetailsScreen = () => {
             isTyping ||
             Boolean(loadingPercent) ||
             belowMinimum ||
-            selfCustodialLimitsUnavailable ||
+            conversionLimitsUnavailable ||
             quoteBlocking ||
             conversionGuard.isQuoting ||
             conversionGuard.hasQuoteError ||
-            isSelfCustodialBooting
+            !isActiveWalletReady
           }
           onPress={moveToNextScreen}
           testID="next-button"

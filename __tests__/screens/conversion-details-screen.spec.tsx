@@ -15,7 +15,6 @@ import { ThemeProvider } from "@rn-vui/themed"
 import { ConversionDetailsScreen } from "@app/screens/conversion-flow/conversion-details-screen"
 import {
   WalletCurrency,
-  ConversionScreenDocument,
   RealtimePriceDocument,
   RealtimePriceUnauthedDocument,
   DisplayCurrencyDocument,
@@ -64,15 +63,17 @@ jest.mock("@react-navigation/native", () => ({
 }))
 
 const mockUseActiveWallet = jest.fn()
-const mockUseNonCustodialConversionLimits = jest.fn()
+const mockUseConversionLimits = jest.fn()
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
+jest.mock("@app/hooks/use-conversion-limits", () => ({
+  useConversionLimits: (...args: unknown[]) => mockUseConversionLimits(...args),
+}))
+
 jest.mock("@app/self-custodial/hooks", () => ({
-  useNonCustodialConversionLimits: (...args: unknown[]) =>
-    mockUseNonCustodialConversionLimits(...args),
   usePaymentRequest: jest.fn(),
 }))
 
@@ -92,13 +93,10 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   }),
 }))
 
-const mockUseSelfCustodialConversionGuard = jest.fn()
-jest.mock(
-  "@app/screens/conversion-flow/hooks/self-custodial/use-conversion-guard",
-  () => ({
-    useSelfCustodialConversionGuard: () => mockUseSelfCustodialConversionGuard(),
-  }),
-)
+const mockUseConversionDustGuard = jest.fn()
+jest.mock("@app/screens/conversion-flow/hooks/use-conversion-dust-guard", () => ({
+  useConversionDustGuard: () => mockUseConversionDustGuard(),
+}))
 
 type CurrencyPillProps = {
   currency?: WalletCurrency | "ALL"
@@ -195,39 +193,41 @@ type MockOptions = {
   displayCurrency?: string
 }
 
-const createGraphQLMocks = (options: MockOptions): MockedResponse[] => {
-  const { btcBalance, usdBalance, displayCurrency = "USD" } = options
-
-  const conversionScreenMock = {
-    request: { query: ConversionScreenDocument },
-    result: {
-      data: {
-        __typename: "Query",
-        me: {
-          __typename: "User",
-          id: "user-id",
-          defaultAccount: {
-            __typename: "ConsumerAccount",
-            id: "account-id",
-            wallets: [
-              {
-                __typename: "BTCWallet",
-                id: "btc-wallet-id",
-                balance: btcBalance,
-                walletCurrency: WalletCurrency.Btc,
-              },
-              {
-                __typename: "UsdWallet",
-                id: "usd-wallet-id",
-                balance: usdBalance,
-                walletCurrency: WalletCurrency.Usd,
-              },
-            ],
-          },
+const setActiveWalletFromOptions = (options: MockOptions) => {
+  mockUseActiveWallet.mockReturnValue({
+    isSelfCustodial: false,
+    isReady: true,
+    needsBackendAuth: true,
+    accountType: "Custodial",
+    status: "ready",
+    wallets: [
+      {
+        id: "btc-wallet-id",
+        walletCurrency: WalletCurrency.Btc,
+        balance: {
+          amount: options.btcBalance,
+          currency: WalletCurrency.Btc,
+          currencyCode: "BTC",
         },
+        transactions: [],
       },
-    },
-  }
+      {
+        id: "usd-wallet-id",
+        walletCurrency: WalletCurrency.Usd,
+        balance: {
+          amount: options.usdBalance,
+          currency: WalletCurrency.Usd,
+          currencyCode: "USD",
+        },
+        transactions: [],
+      },
+    ],
+  })
+}
+
+const createGraphQLMocks = (options: MockOptions): MockedResponse[] => {
+  const { displayCurrency = "USD" } = options
+  setActiveWalletFromOptions(options)
 
   const realtimePriceMock = {
     request: { query: RealtimePriceDocument },
@@ -316,17 +316,14 @@ const createGraphQLMocks = (options: MockOptions): MockedResponse[] => {
   }
 
   return [
-    conversionScreenMock,
     realtimePriceMock,
     realtimePriceUnauthedMock,
     displayCurrencyMock,
     currencyListMock,
-    conversionScreenMock,
     realtimePriceMock,
     realtimePriceUnauthedMock,
     displayCurrencyMock,
     currencyListMock,
-    conversionScreenMock,
     realtimePriceMock,
     realtimePriceUnauthedMock,
     displayCurrencyMock,
@@ -336,10 +333,6 @@ const createGraphQLMocks = (options: MockOptions): MockedResponse[] => {
 
 const createEmptyMocks = (): MockedResponse[] => {
   const baseMocks: MockedResponse[] = [
-    {
-      request: { query: ConversionScreenDocument },
-      result: { data: { __typename: "Query", me: null } },
-    },
     {
       request: { query: RealtimePriceDocument },
       result: { data: { __typename: "Query", me: null } },
@@ -624,8 +617,8 @@ loadLocale("en")
 beforeEach(() => {
   jest.clearAllMocks()
   mockUseActiveWallet.mockReturnValue(defaultActiveWallet)
-  mockUseNonCustodialConversionLimits.mockReturnValue(defaultLimits)
-  mockUseSelfCustodialConversionGuard.mockReturnValue({
+  mockUseConversionLimits.mockReturnValue(defaultLimits)
+  mockUseConversionDustGuard.mockReturnValue({
     isQuoting: false,
     hasQuoteError: false,
     blockingReason: null,
@@ -832,6 +825,7 @@ describe("Toggle without amount - Critical bug test", () => {
   })
 
   it("next button remains disabled after toggle without amount", async () => {
+    jest.useRealTimers()
     const Wrapper = createTestWrapper(buildMocks())
 
     const { getByTestId } = render(
@@ -849,18 +843,20 @@ describe("Toggle without amount - Critical bug test", () => {
 
     const toggleButton = getByTestId("wallet-toggle-button")
 
-    await act(async () => {
-      fireEvent.press(toggleButton)
-    })
+    jest.useFakeTimers()
+    try {
+      await act(async () => {
+        fireEvent.press(toggleButton)
+      })
 
-    act(() => {
-      jest.advanceTimersByTime(200)
-    })
+      act(() => {
+        jest.advanceTimersByTime(200)
+      })
 
-    await waitFor(() => {
-      const button = getByTestId("next-button")
-      expect(button.props.accessibilityState?.disabled).toBe(true)
-    })
+      expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+    } finally {
+      jest.useRealTimers()
+    }
   })
 
   it("handles multiple consecutive toggles without crashing", async () => {
@@ -2006,7 +2002,7 @@ describe("Self-custodial conversion limits gating", () => {
 
   it("disables Next and surfaces the unavailable message when limits fail to load", async () => {
     mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
-    mockUseNonCustodialConversionLimits.mockReturnValue({
+    mockUseConversionLimits.mockReturnValue({
       limits: null,
       loading: false,
       error: new Error("limits load failed"),
@@ -2033,7 +2029,7 @@ describe("Self-custodial conversion limits gating", () => {
 
   it("keeps Next disabled while limits load successfully but amount is below the minimum", async () => {
     mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
-    mockUseNonCustodialConversionLimits.mockReturnValue({
+    mockUseConversionLimits.mockReturnValue({
       limits: { minFromAmount: 1_000_000, minToAmount: null },
       loading: false,
       error: null,
@@ -2055,12 +2051,12 @@ describe("Self-custodial conversion limits gating", () => {
 
   it("disables Next when the conversion guard reports hasQuoteError", async () => {
     mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
-    mockUseNonCustodialConversionLimits.mockReturnValue({
+    mockUseConversionLimits.mockReturnValue({
       limits: { minFromAmount: 0, minToAmount: null },
       loading: false,
       error: null,
     })
-    mockUseSelfCustodialConversionGuard.mockReturnValue({
+    mockUseConversionDustGuard.mockReturnValue({
       isQuoting: false,
       hasQuoteError: true,
       blockingReason: null,

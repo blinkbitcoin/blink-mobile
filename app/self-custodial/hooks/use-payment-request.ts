@@ -5,6 +5,7 @@ import { utils as lnurlUtils } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { usePayments } from "@app/hooks/use-payments"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { getPaymentRequestFullUri } from "@app/screens/receive-bitcoin-screen/payment/helpers"
 import {
@@ -19,14 +20,12 @@ import {
   toBtcMoneyAmount,
 } from "@app/types/amounts"
 import { toSatsAmount } from "@app/utils/amounts"
-import { buildBitcoinUri } from "@app/utils/bitcoin-uri"
 
 import {
   addPendingAutoConvert,
   fetchAutoConvertMinSats,
   ReceiveAssetMode,
 } from "../auto-convert"
-import { createReceiveLightning, createReceiveOnchain } from "../bridge"
 import { AutoConvertStatus, useAutoConvertStatus } from "../providers/auto-convert-status"
 import { useSelfCustodialWallet } from "../providers/wallet"
 
@@ -37,6 +36,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const { sdk, lastReceivedPaymentId, lightningAddress } = useSelfCustodialWallet()
   const { wallets, isReady } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()
+  const { receiveLightning } = usePayments()
   const {
     assetMode,
     setAssetMode,
@@ -59,7 +59,6 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const [memoChangeText, setMemoChangeText] = useState<string | null>(null)
   const [amount, setAmountState] = useState<MoneyAmount<WalletOrDisplayCurrency>>()
   const [paymentRequest, setPaymentRequest] = useState<string>()
-  const [onchainAddress, setOnchainAddress] = useState<string>()
   const [requestState, setRequestState] = useState<PaymentRequestStateType>(
     PaymentRequestState.Idle,
   )
@@ -93,6 +92,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
 
   const generateRequest = useCallback(async () => {
     if (!sdk || !isReady || isAssetModeLoading || !typeInitialized) return
+    if (!receiveLightning) return
     if (type === Invoice.OnChain || type === Invoice.PayCode) return
     if (
       requestStateRef.current === PaymentRequestState.Converting ||
@@ -102,44 +102,23 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     }
     setRequestState(PaymentRequestState.Loading)
 
-    try {
-      const invoiceSats =
-        amount && convertMoneyAmount
-          ? toSatsAmount(amount, convertMoneyAmount)
-          : undefined
+    const invoiceSats =
+      amount && convertMoneyAmount ? toSatsAmount(amount, convertMoneyAmount) : undefined
 
-      const adapter = createReceiveLightning(sdk)
-      const result = await adapter({
+    const logContext = `(amount=${amount?.amount ?? "none"}, currency=${
+      amount?.currencyCode ?? "none"
+    })`
+
+    let result
+    try {
+      result = await receiveLightning({
+        walletCurrency: receivingCurrency,
         amount: invoiceSats ? toBtcMoneyAmount(invoiceSats) : undefined,
         memo: memo || undefined,
       })
-      if (!("invoice" in result) || !result.invoice) {
-        crashlytics().log(
-          `[Self-custodial] Lightning adapter returned no invoice (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
-        )
-        crashlytics().recordError(
-          new Error("Self-custodial invoice adapter returned no invoice field"),
-        )
-        setRequestState(PaymentRequestState.Error)
-        return
-      }
-
-      if (assetMode === ReceiveAssetMode.Dollar) {
-        await addPendingAutoConvert({
-          paymentRequest: result.invoice,
-          amountSats: invoiceSats,
-          createdAtMs: Date.now(),
-          attempts: 0,
-          lastAttemptAtMs: undefined,
-        })
-      }
-
-      baselinePaymentIdRef.current = lastPaymentIdRef.current
-      setPaymentRequest(result.invoice)
-      setRequestState(PaymentRequestState.Created)
     } catch (err) {
       crashlytics().log(
-        `[Self-custodial] Lightning invoice generation failed (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
+        `[Self-custodial] Lightning invoice generation failed ${logContext}`,
       )
       crashlytics().recordError(
         err instanceof Error
@@ -147,7 +126,44 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
           : new Error(`Self-custodial invoice generation failed: ${err}`),
       )
       setRequestState(PaymentRequestState.Error)
+      return
     }
+
+    if (!result.invoice) {
+      crashlytics().log(
+        `[Self-custodial] Lightning adapter returned no invoice ${logContext}`,
+      )
+      crashlytics().recordError(
+        new Error("Self-custodial invoice adapter returned no invoice field"),
+      )
+      setRequestState(PaymentRequestState.Error)
+      return
+    }
+
+    if (assetMode === ReceiveAssetMode.Dollar) {
+      try {
+        await addPendingAutoConvert({
+          paymentRequest: result.invoice.paymentRequest,
+          amountSats: invoiceSats,
+          createdAtMs: Date.now(),
+          attempts: 0,
+          lastAttemptAtMs: undefined,
+        })
+      } catch (err) {
+        crashlytics().log(`[Self-custodial] addPendingAutoConvert failed ${logContext}`)
+        crashlytics().recordError(
+          err instanceof Error
+            ? err
+            : new Error(`Self-custodial addPendingAutoConvert failed: ${err}`),
+        )
+        setRequestState(PaymentRequestState.Error)
+        return
+      }
+    }
+
+    baselinePaymentIdRef.current = lastPaymentIdRef.current
+    setPaymentRequest(result.invoice.paymentRequest)
+    setRequestState(PaymentRequestState.Created)
   }, [
     sdk,
     isReady,
@@ -158,6 +174,8 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     amount,
     convertMoneyAmount,
     assetMode,
+    receiveLightning,
+    receivingCurrency,
   ])
 
   const setMemo = useCallback(() => {
@@ -200,28 +218,6 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   useEffect(() => {
     generateRequest()
   }, [generateRequest])
-
-  useEffect(() => {
-    if (!sdk) return
-    let cancelled = false
-    const adapter = createReceiveOnchain(sdk)
-    adapter()
-      .then((result: { address?: string }) => {
-        if (cancelled) return
-        if (result.address) setOnchainAddress(result.address)
-      })
-      .catch((err) => {
-        if (cancelled) return
-        crashlytics().recordError(
-          err instanceof Error
-            ? err
-            : new Error(`Self-custodial receive onchain adapter failed: ${err}`),
-        )
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [sdk])
 
   useEffect(() => {
     if (!sdk) return
@@ -287,20 +283,6 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     return paymentRequest ?? ""
   }, [type, lightningAddress, paymentRequest])
 
-  const getOnchainFullUriFn = useCallback(
-    (params: { uppercase?: boolean; prefix?: boolean }) => {
-      if (!onchainAddress) return ""
-      return buildBitcoinUri({
-        address: onchainAddress,
-        amountSats: amountInSats,
-        memo: memo || undefined,
-        uppercase: params.uppercase,
-        prefix: params.prefix,
-      })
-    },
-    [onchainAddress, amountInSats, memo],
-  )
-
   if (!sdk || !btcWallet || !convertMoneyAmount) return null
 
   const buildInvoiceData = (): InvoiceData | undefined => {
@@ -356,9 +338,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     lnAddressHostname,
     feesInformation: undefined,
     info: invoiceData ? { data: invoiceData } : undefined,
-    onchainAddress,
-    getOnchainFullUriFn,
-    pr: {
+    paymentRequest: {
       state: requestState,
       info: { data: invoiceData },
     },

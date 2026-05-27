@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { useSelfCustodialConversion } from "@app/screens/conversion-flow/hooks/self-custodial/use-conversion"
+import { useConversionExecution } from "@app/screens/conversion-flow/hooks/use-conversion-execution"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertDirection, PaymentResultStatus } from "@app/types/payment"
 
@@ -9,7 +9,7 @@ const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
 
 jest.mock("@app/hooks/use-payments", () => ({
-  usePayments: () => ({ getConversionQuote: mockGetQuote }),
+  usePayments: () => ({ convert: { getQuote: mockGetQuote } }),
 }))
 
 jest.mock("@app/hooks/use-price-conversion", () => ({
@@ -48,22 +48,23 @@ jest.mock("@app/i18n/i18n-react", () => ({
 const defaultParams = {
   fromCurrency: WalletCurrency.Btc,
   moneyAmount: toUsdMoneyAmount(500),
-  enabled: true,
 }
 
 const makeQuote = (
   overrides: Partial<{
     feeAmount: ReturnType<typeof toUsdMoneyAmount>
+    showFeeRow: boolean
     execute: jest.Mock
   }> = {},
 ) => ({
   feeAmount: overrides.feeAmount ?? toUsdMoneyAmount(5),
+  showFeeRow: overrides.showFeeRow ?? true,
   execute:
     overrides.execute ??
     jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success }),
 })
 
-describe("useSelfCustodialConversion", () => {
+describe("useConversionExecution", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockConvertMoneyAmount.mockImplementation(
@@ -74,28 +75,17 @@ describe("useSelfCustodialConversion", () => {
     )
   })
 
-  it("stays idle when enabled is false and does not call getQuote", async () => {
-    const { result } = renderHook(() =>
-      useSelfCustodialConversion({ ...defaultParams, enabled: false }),
-    )
-
-    await waitFor(() => {
-      expect(result.current.isQuoting).toBe(false)
-    })
-    expect(result.current.canExecute).toBe(false)
-    expect(mockGetQuote).not.toHaveBeenCalled()
-  })
-
   it("transitions Loading → Ready and exposes the formatted fee", async () => {
     const quote = makeQuote()
     mockGetQuote.mockResolvedValue(quote)
 
-    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useConversionExecution(defaultParams))
 
     await waitFor(() => expect(result.current.canExecute).toBe(true))
     expect(result.current.isQuoting).toBe(false)
     expect(result.current.feeText).toBe("$0.05")
     expect(result.current.hasQuoteError).toBe(false)
+    expect(result.current.feeRowVisible).toBe(true)
     expect(mockGetQuote).toHaveBeenCalledWith({
       fromAmount: expect.objectContaining({ currency: WalletCurrency.Btc }),
       toAmount: expect.objectContaining({ currency: WalletCurrency.Usd }),
@@ -103,10 +93,32 @@ describe("useSelfCustodialConversion", () => {
     })
   })
 
+  it("hides the fee row when the adapter opts out (custodial intra-ledger path)", async () => {
+    mockGetQuote.mockResolvedValue(
+      makeQuote({ feeAmount: toUsdMoneyAmount(0), showFeeRow: false }),
+    )
+
+    const { result } = renderHook(() => useConversionExecution(defaultParams))
+
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+    expect(result.current.feeRowVisible).toBe(false)
+  })
+
+  it("keeps the fee row visible for self-custodial quotes even when fee rounds to zero", async () => {
+    mockGetQuote.mockResolvedValue(
+      makeQuote({ feeAmount: toUsdMoneyAmount(0), showFeeRow: true }),
+    )
+
+    const { result } = renderHook(() => useConversionExecution(defaultParams))
+
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+    expect(result.current.feeRowVisible).toBe(true)
+  })
+
   it("falls into Error when getQuote resolves to null", async () => {
     mockGetQuote.mockResolvedValue(null)
 
-    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useConversionExecution(defaultParams))
 
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
     expect(result.current.canExecute).toBe(false)
@@ -116,7 +128,7 @@ describe("useSelfCustodialConversion", () => {
   it("falls into Error when getQuote rejects", async () => {
     mockGetQuote.mockRejectedValue(new Error("boom"))
 
-    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useConversionExecution(defaultParams))
 
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
     expect(result.current.canExecute).toBe(false)
@@ -126,7 +138,7 @@ describe("useSelfCustodialConversion", () => {
     const execute = jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success })
     mockGetQuote.mockResolvedValue(makeQuote({ execute }))
 
-    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useConversionExecution(defaultParams))
     await waitFor(() => expect(result.current.canExecute).toBe(true))
 
     let outcome: Awaited<ReturnType<typeof result.current.execute>> | undefined
@@ -145,7 +157,7 @@ describe("useSelfCustodialConversion", () => {
     })
     mockGetQuote.mockResolvedValue(makeQuote({ execute }))
 
-    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useConversionExecution(defaultParams))
     await waitFor(() => expect(result.current.canExecute).toBe(true))
 
     let outcome: Awaited<ReturnType<typeof result.current.execute>> | undefined
@@ -162,7 +174,7 @@ describe("useSelfCustodialConversion", () => {
   it("execute() refuses to run when no quote is ready", async () => {
     mockGetQuote.mockResolvedValue(null)
 
-    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    const { result } = renderHook(() => useConversionExecution(defaultParams))
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
 
     let outcome: Awaited<ReturnType<typeof result.current.execute>> | undefined
@@ -180,15 +192,11 @@ describe("useSelfCustodialConversion", () => {
     const quote = makeQuote()
     mockGetQuote.mockResolvedValue(quote)
 
-    const { result, rerender } = renderHook(() =>
-      useSelfCustodialConversion(defaultParams),
-    )
+    const { result, rerender } = renderHook(() => useConversionExecution(defaultParams))
 
     await waitFor(() => expect(result.current.canExecute).toBe(true))
     expect(mockGetQuote).toHaveBeenCalledTimes(1)
 
-    // Simulate a realtime-price tick: the price-conversion hook returns a new
-    // identity for convertMoneyAmount, so liveQuoteParams would change.
     mockConvertMoneyAmount.mockImplementation(
       (amount: { amount: number }, currency: WalletCurrency) =>
         currency === WalletCurrency.Btc
@@ -211,7 +219,7 @@ describe("useSelfCustodialConversion", () => {
     mockGetQuote.mockResolvedValueOnce(firstQuote).mockResolvedValueOnce(secondQuote)
 
     const { result, rerender } = renderHook(
-      (params: typeof defaultParams) => useSelfCustodialConversion(params),
+      (params: typeof defaultParams) => useConversionExecution(params),
       { initialProps: defaultParams },
     )
 

@@ -53,9 +53,11 @@ const mockAddPendingAutoConvert = jest.fn()
 const mockFetchAutoConvertMinSats = jest.fn()
 const mockUseMyLnUpdatesSubscription = jest.fn()
 
-jest.mock("@app/self-custodial/bridge", () => ({
-  createReceiveLightning: () => mockReceiveLightning,
-  createReceiveOnchain: () => mockReceiveOnchain,
+jest.mock("@app/hooks/use-payments", () => ({
+  usePayments: () => ({
+    receiveLightning: mockReceiveLightning,
+    receiveOnchain: mockReceiveOnchain,
+  }),
 }))
 
 jest.mock("@app/self-custodial/auto-convert", () => ({
@@ -338,7 +340,9 @@ describe("ReceiveScreen — self-custodial", () => {
     jest.clearAllMocks()
     LL = i18nObject("en")
     setupSelfCustodial()
-    mockReceiveLightning.mockResolvedValue({ invoice: "lnbcsc1invoice..." })
+    mockReceiveLightning.mockResolvedValue({
+      invoice: { paymentRequest: "lnbcsc1invoice..." },
+    })
     mockReceiveOnchain.mockResolvedValue({ address: "bc1qsconchain..." })
     mockAddPendingAutoConvert.mockResolvedValue(undefined)
     mockFetchAutoConvertMinSats.mockResolvedValue(undefined)

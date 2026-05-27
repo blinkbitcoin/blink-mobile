@@ -13,10 +13,25 @@ const mockAddPendingAutoConvert = jest.fn()
 const mockFetchAutoConvertMinSats = jest.fn()
 const mockUseReceiveAssetMode = jest.fn()
 
-jest.mock("@app/self-custodial/bridge", () => ({
-  createReceiveLightning: () => mockReceiveLightning,
-  createReceiveOnchain: () => mockReceiveOnchain,
-}))
+jest.mock("@app/hooks/use-payments", () => {
+  const stableReceiveLightning = (...args: unknown[]) =>
+    (
+      globalThis as unknown as { __mockReceiveLightning: jest.Mock }
+    ).__mockReceiveLightning(...args)
+  const stableReceiveOnchain = (...args: unknown[]) =>
+    (globalThis as unknown as { __mockReceiveOnchain: jest.Mock }).__mockReceiveOnchain(
+      ...args,
+    )
+  const stablePaymentsResult = {
+    receiveLightning: stableReceiveLightning,
+    receiveOnchain: stableReceiveOnchain,
+  }
+  return { usePayments: () => stablePaymentsResult }
+})
+;(globalThis as unknown as { __mockReceiveLightning: jest.Mock }).__mockReceiveLightning =
+  mockReceiveLightning
+;(globalThis as unknown as { __mockReceiveOnchain: jest.Mock }).__mockReceiveOnchain =
+  mockReceiveOnchain
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
   __esModule: true,
@@ -69,7 +84,9 @@ describe("usePaymentRequest", () => {
       lastReceivedPaymentId: null,
     })
     mockActiveWallet.mockReturnValue({ wallets: [btcWallet, usdWallet], isReady: true })
-    mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1test..." })
+    mockReceiveLightning.mockResolvedValue({
+      invoice: { paymentRequest: "lnbc1test..." },
+    })
     mockReceiveOnchain.mockResolvedValue({ address: "bc1qtest..." })
     mockConvertMoneyAmount.mockImplementation(
       (amount: { amount: number }, currency: string) => ({
@@ -138,8 +155,8 @@ describe("usePaymentRequest", () => {
     })
   })
 
-  it("sets error state when the receive adapter throws", async () => {
-    mockReceiveLightning.mockRejectedValue(new Error("network down"))
+  it("sets error state when the adapter returns no invoice", async () => {
+    mockReceiveLightning.mockResolvedValue({ errors: [{ message: "network down" }] })
 
     const { result } = renderHook(() => usePaymentRequest())
 
@@ -148,21 +165,7 @@ describe("usePaymentRequest", () => {
     })
   })
 
-  it("records the rejection to crashlytics when the receive adapter throws", async () => {
-    mockReceiveLightning.mockRejectedValue(new Error("invoice generation boom"))
-
-    const { result } = renderHook(() => usePaymentRequest())
-
-    await waitFor(() => {
-      expect(result.current?.state).toBe("Error")
-    })
-
-    expect(mockRecordError).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "invoice generation boom" }),
-    )
-  })
-
-  it("records the silent failure to crashlytics when the adapter resolves without an invoice", async () => {
+  it("sets error state when the adapter resolves with an empty object", async () => {
     mockReceiveLightning.mockResolvedValue({} as unknown as { invoice: string })
 
     const { result } = renderHook(() => usePaymentRequest())
@@ -170,28 +173,6 @@ describe("usePaymentRequest", () => {
     await waitFor(() => {
       expect(result.current?.state).toBe("Error")
     })
-
-    expect(mockRecordError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: "Self-custodial invoice adapter returned no invoice field",
-      }),
-    )
-  })
-
-  it("records the silent failure to crashlytics when the adapter resolves with an empty invoice string", async () => {
-    mockReceiveLightning.mockResolvedValue({ invoice: "" })
-
-    const { result } = renderHook(() => usePaymentRequest())
-
-    await waitFor(() => {
-      expect(result.current?.state).toBe("Error")
-    })
-
-    expect(mockRecordError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: "Self-custodial invoice adapter returned no invoice field",
-      }),
-    )
   })
 
   it("does not call the receive adapter while active wallet is not ready", () => {
@@ -205,14 +186,6 @@ describe("usePaymentRequest", () => {
     expect(mockReceiveLightning).not.toHaveBeenCalled()
   })
 
-  it("generates on-chain address on mount", async () => {
-    const { result } = renderHook(() => usePaymentRequest())
-
-    await waitFor(() => {
-      expect(result.current?.onchainAddress).toBe("bc1qtest...")
-    })
-  })
-
   it("getFullUriFn returns raw lightning invoice without `lightning:` prefix even when prefix is requested", async () => {
     const { result } = renderHook(() => usePaymentRequest())
 
@@ -220,7 +193,7 @@ describe("usePaymentRequest", () => {
       expect(result.current?.state).toBe("Created")
     })
 
-    const uri = result.current?.pr?.info?.data?.getFullUriFn({
+    const uri = result.current?.paymentRequest?.info?.data?.getFullUriFn({
       prefix: true,
       uppercase: false,
     })
@@ -234,7 +207,7 @@ describe("usePaymentRequest", () => {
       expect(result.current?.state).toBe("Created")
     })
 
-    const uri = result.current?.pr?.info?.data?.getFullUriFn({
+    const uri = result.current?.paymentRequest?.info?.data?.getFullUriFn({
       prefix: false,
       uppercase: false,
     })
@@ -248,7 +221,9 @@ describe("usePaymentRequest", () => {
       expect(result.current?.state).toBe("Created")
     })
 
-    const uri = result.current?.pr?.info?.data?.getFullUriFn({ uppercase: true })
+    const uri = result.current?.paymentRequest?.info?.data?.getFullUriFn({
+      uppercase: true,
+    })
     expect(uri).toBe("LNBC1TEST...")
   })
 
@@ -259,7 +234,7 @@ describe("usePaymentRequest", () => {
       expect(result.current?.state).toBe("Created")
     })
 
-    const invoice = result.current?.pr?.info?.data?.getCopyableInvoiceFn()
+    const invoice = result.current?.paymentRequest?.info?.data?.getCopyableInvoiceFn()
     expect(invoice).toBe("lnbc1test...")
   })
 
@@ -356,7 +331,9 @@ describe("usePaymentRequest", () => {
       sdk: mockSdk,
       lastReceivedPaymentId: "payment-first",
     })
-    mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1second..." })
+    mockReceiveLightning.mockResolvedValue({
+      invoice: { paymentRequest: "lnbc1second..." },
+    })
 
     const { result: result2 } = renderHook(() => usePaymentRequest())
 
@@ -382,74 +359,6 @@ describe("usePaymentRequest", () => {
     expect(result.current?.lnAddressHostname).toBe("")
   })
 
-  it("getOnchainFullUriFn returns bitcoin URI with address", async () => {
-    const { result } = renderHook(() => usePaymentRequest())
-
-    await waitFor(() => {
-      expect(result.current?.onchainAddress).toBe("bc1qtest...")
-    })
-
-    const uri = result.current?.getOnchainFullUriFn?.({
-      prefix: true,
-      uppercase: false,
-    })
-    expect(uri).toBe("bitcoin:bc1qtest...")
-  })
-
-  describe("onchain adapter rejection (regression)", () => {
-    it("does not crash the hook when createReceiveOnchain rejects", async () => {
-      mockReceiveOnchain.mockRejectedValueOnce(new Error("onchain receive boom"))
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
-
-      const { result } = renderHook(() => usePaymentRequest())
-
-      await waitFor(() => {
-        expect(result.current).not.toBeNull()
-      })
-      expect(result.current?.onchainAddress).toBeUndefined()
-      consoleSpy.mockRestore()
-    })
-
-    it("does not surface an unhandled rejection when the SDK adapter throws", async () => {
-      const onUnhandled = jest.fn()
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {})
-      process.on("unhandledRejection", onUnhandled)
-
-      mockReceiveOnchain.mockRejectedValueOnce(new Error("onchain rejected"))
-      renderHook(() => usePaymentRequest())
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 0)
-      })
-      process.off("unhandledRejection", onUnhandled)
-      consoleSpy.mockRestore()
-
-      expect(onUnhandled).not.toHaveBeenCalled()
-    })
-
-    it("retries the onchain address when the SDK identity changes (reconnect)", async () => {
-      mockReceiveOnchain
-        .mockResolvedValueOnce({ address: "bc1qfirst..." })
-        .mockResolvedValueOnce({ address: "bc1qsecond..." })
-
-      const { result, rerender } = renderHook(() => usePaymentRequest())
-
-      await waitFor(() => {
-        expect(result.current?.onchainAddress).toBe("bc1qfirst...")
-      })
-
-      mockSelfCustodialWallet.mockReturnValue({
-        sdk: { id: "different-sdk" },
-        lastReceivedPaymentId: null,
-      })
-
-      rerender({})
-
-      await waitFor(() => {
-        expect(result.current?.onchainAddress).toBe("bc1qsecond...")
-      })
-    })
-  })
-
   describe("Dollar-mode auto-convert integration", () => {
     it("persists a pending auto-convert record when the invoice is flagged Dollar", async () => {
       mockUseReceiveAssetMode.mockReturnValue({
@@ -457,7 +366,9 @@ describe("usePaymentRequest", () => {
         setAssetMode: jest.fn(),
         isToggleDisabled: false,
       })
-      mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1dollar..." })
+      mockReceiveLightning.mockResolvedValue({
+        invoice: { paymentRequest: "lnbc1dollar..." },
+      })
 
       const { result } = renderHook(() => usePaymentRequest())
 

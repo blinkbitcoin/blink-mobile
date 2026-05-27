@@ -4,19 +4,14 @@ import { toBtcMoneyAmount } from "@app/types/amounts"
 import {
   DepositErrorReason,
   DepositStatus,
+  failedPayment,
   PaymentResultStatus,
   type ClaimDepositAdapter,
   type ListPendingDepositsAdapter,
-  type PaymentAdapterResult,
   type PendingDeposit,
 } from "@app/types/payment"
 
 import { claimDeposit, listDeposits, refundDeposit, type MappedDeposit } from "../bridge"
-
-const failed = (message: string): PaymentAdapterResult => ({
-  status: PaymentResultStatus.Failed,
-  errors: [{ message }],
-})
 
 const resolveStatus = ({
   isMature,
@@ -93,23 +88,23 @@ export const createClaimDeposit = (sdk: BreezSdkInterface): ClaimDepositAdapter 
 
   claimDeposit: async ({ depositId, maxFeeSats }) => {
     const parsed = parseDepositId(depositId)
-    if (!parsed) return failed(`Invalid depositId: ${depositId}`)
+    if (!parsed) return failedPayment(`Invalid depositId: ${depositId}`)
     try {
       await claimDeposit({ sdk, ...parsed, maxFeeSats })
       return { status: PaymentResultStatus.Success }
     } catch (err) {
-      return failed(err instanceof Error ? err.message : `Claim failed: ${err}`)
+      return failedPayment(err instanceof Error ? err.message : `Claim failed: ${err}`)
     }
   },
 
   refundDeposit: async ({ depositId, destinationAddress, feeRateSatPerVb }) => {
     const parsed = parseDepositId(depositId)
-    if (!parsed) return failed(`Invalid depositId: ${depositId}`)
+    if (!parsed) return failedPayment(`Invalid depositId: ${depositId}`)
     try {
       await refundDeposit({ sdk, ...parsed, destinationAddress, feeRateSatPerVb })
       return { status: PaymentResultStatus.Success }
     } catch (err) {
-      return failed(err instanceof Error ? err.message : `Refund failed: ${err}`)
+      return failedPayment(err instanceof Error ? err.message : `Refund failed: ${err}`)
     }
   },
 })
