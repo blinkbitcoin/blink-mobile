@@ -1,6 +1,12 @@
 import React from "react"
 import { render } from "@testing-library/react-native"
 
+// React 19 react-test-renderer calls window.dispatchEvent for error
+// reporting which doesn't exist in React Native jest environment.
+if (typeof window !== "undefined" && !window.dispatchEvent) {
+  window.dispatchEvent = jest.fn()
+}
+
 import { AutoConvertListenerMount } from "@app/self-custodial/components/auto-convert-listener-mount"
 
 const mockListener = jest.fn()
