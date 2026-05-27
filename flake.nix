@@ -36,9 +36,9 @@
         pkgs = import nixpkgs {
           inherit system;
           overlays = [
-            nodejsOverlay
             self.overlay
             ruby-nix.overlays.default
+            nodejsOverlay
           ];
         };
 
