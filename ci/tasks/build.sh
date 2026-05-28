@@ -59,6 +59,20 @@ sed -i'' -e "s/versionCode .*$/versionCode $BUILD_NUMBER/g" android/app/build.gr
 echo $ANDROID_KEYSTORE | base64 -d > android/app/release.keystore
 nix develop -c sh -c 'cd android && bundle exec fastlane android build --verbose'
 
+# Guard: release artifacts must be ARM-only. x86/x86_64 exist solely for emulators
+# and are excluded via abiFilters (app/build.gradle) + reactNativeArchitectures
+# (Fastfile). This catches a silent re-introduction (e.g. abiFilters dropped, x86
+# re-added, or the legacy apk_paths upload re-enabled) bloating the Play AAB.
+echo "    --> Verifying release artifacts are ARM-only (no x86)"
+for artifact in \
+  android/app/build/outputs/bundle/release/app-release.aab \
+  android/app/build/outputs/apk/release/app-universal-release.apk; do
+  if unzip -l "$artifact" | grep -qE 'lib/x86'; then
+    echo "ERROR: $artifact ships x86 native libs — release must be ARM-only"
+    exit 1
+  fi
+done
+
 echo "    --> Building iOS"
 # iOS Build
 export BUILD_NUMBER=$(cat ${CI_ROOT}/build-number-ios/ios)
