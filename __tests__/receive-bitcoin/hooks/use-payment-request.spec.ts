@@ -51,6 +51,15 @@ jest.mock("@app/graphql/ln-update-context", () => ({
   useLnUpdateHashPaid: () => mockUseLnUpdateHashPaid(),
 }))
 
+jest.mock("@app/hooks/use-stablesats-restricted", () => ({
+  useStablesatsRestricted: () => false,
+}))
+
+jest.mock("@app/hooks/use-device-location", () => ({
+  __esModule: true,
+  default: () => ({ countryCode: "SV", loading: false }),
+}))
+
 const mockUseCountdown = jest.fn()
 jest.mock("@app/hooks", () => ({
   useCountdown: (...args: ReadonlyArray<Date | null>) => mockUseCountdown(...args),

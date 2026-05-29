@@ -156,6 +156,15 @@ jest.mock("@app/hooks", () => {
   }
 })
 
+jest.mock("@app/hooks/use-stablesats-restricted", () => ({
+  useStablesatsRestricted: () => false,
+}))
+
+jest.mock("@app/hooks/use-device-location", () => ({
+  __esModule: true,
+  default: () => ({ countryCode: "SV", loading: false }),
+}))
+
 jest.mock("@app/hooks/use-display-currency", () => {
   const info = {
     BTC: {
