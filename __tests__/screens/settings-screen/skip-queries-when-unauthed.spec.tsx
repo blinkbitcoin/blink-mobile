@@ -74,7 +74,7 @@ jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
   usePersistentStateContext: () => ({
     persistentState: {
-      schemaVersion: 11,
+      schemaVersion: 12,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
     },

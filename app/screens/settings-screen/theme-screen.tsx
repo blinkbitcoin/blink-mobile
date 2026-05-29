@@ -1,12 +1,11 @@
 import * as React from "react"
 import { View } from "react-native"
 
-import { useApolloClient } from "@apollo/client"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
 import { MenuSelect, MenuSelectItem } from "@app/components/menu-select"
-import { updateColorScheme } from "@app/graphql/client-only-query"
-import { useColorSchemeQuery } from "@app/graphql/generated"
+import { useEffectiveTheme } from "@app/hooks/use-effective-theme"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { type ThemePreference } from "@app/store/persistent-state/theme-preference"
 import { makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
@@ -21,14 +20,12 @@ const useStyles = makeStyles(() => ({
 }))
 
 export const ThemeScreen: React.FC = () => {
-  const client = useApolloClient()
-  const colorSchemeData = useColorSchemeQuery()
-  const colorScheme = colorSchemeData?.data?.colorScheme ?? "system"
+  const { theme, setTheme } = useEffectiveTheme()
 
   const { LL } = useI18nContext()
   const styles = useStyles()
 
-  const Themes = [
+  const Themes: { id: ThemePreference; text: string }[] = [
     {
       id: "system",
       text: LL.ThemeScreen.system(),
@@ -46,8 +43,8 @@ export const ThemeScreen: React.FC = () => {
   return (
     <Screen style={styles.container} preset="scroll">
       <MenuSelect
-        value={colorScheme}
-        onChange={async (scheme) => updateColorScheme(client, scheme)}
+        value={theme}
+        onChange={async (value) => setTheme(value as ThemePreference)}
       >
         {Themes.map(({ id, text }) => (
           <MenuSelectItem key={id} value={id}>

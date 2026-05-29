@@ -33,7 +33,7 @@ it("migration from 5 to current returns ok with the migrated state", async () =>
   expect(result).toEqual({
     status: MigrationStatus.Ok,
     state: {
-      schemaVersion: 11,
+      schemaVersion: 12,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "myToken",
     },
