@@ -1,5 +1,5 @@
 import React from "react"
-import { useColorSchemeQuery } from "@app/graphql/generated"
+import { useEffectiveTheme } from "@app/hooks/use-effective-theme"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
@@ -11,21 +11,21 @@ export const ThemeSetting: React.FC = () => {
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const colorSchemeData = useColorSchemeQuery()
-  let colorScheme = LL.SettingsScreen.setByOs()
+  const { theme } = useEffectiveTheme()
+  let label = LL.SettingsScreen.setByOs()
 
-  switch (colorSchemeData?.data?.colorScheme) {
+  switch (theme) {
     case "light":
-      colorScheme = LL.ThemeScreen.setToLight()
+      label = LL.ThemeScreen.setToLight()
       break
     case "dark":
-      colorScheme = LL.ThemeScreen.setToDark()
+      label = LL.ThemeScreen.setToDark()
       break
   }
 
   return (
     <SettingsRow
-      title={`${LL.SettingsScreen.theme()}: ${colorScheme}`}
+      title={`${LL.SettingsScreen.theme()}: ${label}`}
       leftGaloyIcon="brush"
       action={() => navigate("theme")}
     />

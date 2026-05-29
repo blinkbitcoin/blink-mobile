@@ -95,9 +95,6 @@ export const createCache = () =>
           beta: {
             read: (value) => value ?? false,
           },
-          colorScheme: {
-            read: (value) => value ?? "system",
-          },
           countryCode: {
             read: (value) => value ?? "SV",
           },

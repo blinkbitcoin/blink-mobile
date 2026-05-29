@@ -1,24 +1,23 @@
 import * as React from "react"
 import { Appearance } from "react-native"
 
-import { useColorSchemeQuery } from "@app/graphql/generated"
+import { useEffectiveTheme } from "@app/hooks/use-effective-theme"
 import theme from "@app/rne-theme/theme"
 import { ThemeMode, ThemeProvider } from "@rn-vui/themed"
 
 export const GaloyThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const data = useColorSchemeQuery()
+  const { theme: themePreference } = useEffectiveTheme()
 
-  const colorScheme = data?.data?.colorScheme
   let mode: ThemeMode = "light"
-  if (colorScheme === "system" || !colorScheme) {
+  if (themePreference === "system") {
     const systemScheme = Appearance.getColorScheme()
     if (systemScheme && systemScheme !== "unspecified") {
       mode = systemScheme
     }
   } else {
-    mode = colorScheme as ThemeMode
+    mode = themePreference
   }
 
   return (
