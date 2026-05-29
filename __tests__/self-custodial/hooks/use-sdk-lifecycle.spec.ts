@@ -187,6 +187,17 @@ describe("useSdkLifecycle", () => {
       })
     })
 
+    it("transitions to Ready after the first successful snapshot, even when the Synced event never arrives (regression for #3791)", async () => {
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+      captureListener()
+
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+
+      await waitFor(() => {
+        expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+      })
+    })
+
     it("surfaces the lastReceivedPaymentId when a PaymentSucceeded event fires", async () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       const listener = captureListener()
@@ -205,70 +216,6 @@ describe("useSdkLifecycle", () => {
       })
 
       expect(result.current.lastReceivedPaymentId).toBe("p1")
-    })
-  })
-
-  describe("initial sync timeout safety net", () => {
-    beforeEach(() => {
-      jest.useFakeTimers()
-    })
-
-    afterEach(() => {
-      jest.useRealTimers()
-    })
-
-    it("escalates out of Loading when the Synced event does not arrive within the timeout window", async () => {
-      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
-      captureListener()
-
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
-
-      await waitFor(() => {
-        expect(result.current.sdk).not.toBeNull()
-      })
-
-      expect(result.current.status).toBe(ActiveWalletStatus.Loading)
-
-      await act(async () => {
-        jest.advanceTimersByTime(30_000)
-        await Promise.resolve()
-      })
-
-      await waitFor(() => {
-        expect(result.current.status).not.toBe(ActiveWalletStatus.Loading)
-      })
-      expect(mockRecordError).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: expect.stringContaining("Initial sync did not complete"),
-        }),
-      )
-    })
-
-    it("does not fire the timeout escalation once the Synced event arrives in time", async () => {
-      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
-      const listener = captureListener()
-
-      renderHook(() => useSdkLifecycle("acct-1", 0))
-
-      await waitFor(() => {
-        expect(listener.current).not.toBeNull()
-      })
-      await act(async () => {
-        await listener.current?.({ tag: "Synced" })
-      })
-
-      mockRecordError.mockClear()
-
-      await act(async () => {
-        jest.advanceTimersByTime(60_000)
-        await Promise.resolve()
-      })
-
-      expect(mockRecordError).not.toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: expect.stringContaining("Initial sync did not complete"),
-        }),
-      )
     })
   })
 
