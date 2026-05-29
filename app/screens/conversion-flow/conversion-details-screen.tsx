@@ -34,6 +34,7 @@ import {
 
 import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useStablesatsRestrictionGuard } from "@app/hooks/use-stablesats-restriction-guard"
 import { CurrencyInput } from "@app/components/currency-input"
 import { PercentageSelector } from "@app/components/percentage-selector"
 import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
@@ -80,6 +81,12 @@ const ANIMATION_CONFIG = {
 }
 
 export const ConversionDetailsScreen = () => {
+  if (useStablesatsRestrictionGuard()) return null
+
+  return <ConversionDetailsScreenContent />
+}
+
+const ConversionDetailsScreenContent = () => {
   const {
     theme: { colors },
   } = useTheme()
