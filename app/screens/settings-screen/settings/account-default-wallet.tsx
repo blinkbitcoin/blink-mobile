@@ -7,6 +7,7 @@ import { useSettingsScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet } from "@app/graphql/wallets-utils"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePersistentStateContext } from "@app/store/persistent-state"
@@ -22,6 +23,7 @@ export const DefaultWallet: React.FC = () => {
   const { activeAccount } = useAccountRegistry()
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
   const { persistentState } = usePersistentStateContext()
+  const isStablesatsRestricted = useStablesatsRestricted()
 
   const { data, loading } = useSettingsScreenQuery({ skip: !isAuthed || isSelfCustodial })
   const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
@@ -43,6 +45,8 @@ export const DefaultWallet: React.FC = () => {
   const title = isSelfCustodial
     ? LL.DefaultWalletScreen.titleSelfCustodial()
     : LL.DefaultWalletScreen.title()
+
+  if (isStablesatsRestricted) return null
 
   return (
     <SettingsRow
