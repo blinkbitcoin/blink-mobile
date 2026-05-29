@@ -6,7 +6,6 @@ import RNFS from "react-native-fs"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { disconnectSdk } from "@app/self-custodial/bridge"
-import { storageDirFor } from "@app/self-custodial/config"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { removeSelfCustodialAccountId } from "@app/self-custodial/storage/account-index"
@@ -30,7 +29,7 @@ type DeleteAccountResult = {
 }
 
 export const useDeleteAccount = (): DeleteAccountResult => {
-  const { sdk } = useSelfCustodialWallet()
+  const { sdk, selfCustodialBridge } = useSelfCustodialWallet()
   const { accounts, activeAccount, setActiveAccountId, reloadSelfCustodialAccounts } =
     useAccountRegistry()
   const { updateState } = usePersistentStateContext()
@@ -78,10 +77,16 @@ export const useDeleteAccount = (): DeleteAccountResult => {
           })
         }
 
+        if (!selfCustodialBridge) {
+          throw new Error("Self-custodial bridge unavailable")
+        }
+
         await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
-        await RNFS.unlink(storageDirFor(accountId)).catch((err) => {
-          crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)
-        })
+        await RNFS.unlink(selfCustodialBridge.storageDirForAccount(accountId)).catch(
+          (err) => {
+            crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)
+          },
+        )
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)
         await reloadSelfCustodialAccounts()
@@ -108,6 +113,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
       reloadSelfCustodialAccounts,
       updateState,
       hasCustodialAccount,
+      selfCustodialBridge,
     ],
   )
 

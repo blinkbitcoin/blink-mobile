@@ -33,10 +33,6 @@ jest.mock("@app/self-custodial/bridge", () => ({
   disconnectSdk: (...args: unknown[]) => mockDisconnectSdk(...args),
 }))
 
-jest.mock("@app/self-custodial/config", () => ({
-  storageDirFor: (id: string) => `/tmp/${id}`,
-}))
-
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   removeBackupStateFor: (...args: unknown[]) => mockRemoveBackupStateFor(...args),
 }))
@@ -87,7 +83,10 @@ const activeSelfCustodialAccount = {
 describe("useDeleteAccount", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseSelfCustodialWallet.mockReturnValue({ sdk: mockSdk })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk: mockSdk,
+      selfCustodialBridge: { storageDirForAccount: (id: string) => `/tmp/${id}` },
+    })
     mockUseHasCustodialAccount.mockReturnValue(false)
     mockUseAccountRegistry.mockReturnValue({
       accounts: [activeSelfCustodialAccount],
@@ -189,7 +188,10 @@ describe("useDeleteAccount", () => {
   })
 
   it("skips disconnect when sdk is null but still wipes the mnemonic and returns an outcome", async () => {
-    mockUseSelfCustodialWallet.mockReturnValue({ sdk: null })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk: null,
+      selfCustodialBridge: { storageDirForAccount: (id: string) => `/tmp/${id}` },
+    })
     const { result } = renderHook(() => useDeleteAccount())
 
     let outcome: string | undefined

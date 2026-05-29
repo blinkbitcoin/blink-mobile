@@ -87,7 +87,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
 
   const { LL } = useI18nContext()
   const { displayCurrency } = useDisplayCurrency()
-  const { sdk } = useSelfCustodialWallet()
+  const { sdk, selfCustodialBridge } = useSelfCustodialWallet()
 
   React.useEffect(() => {
     if (!isFocused) {
@@ -149,6 +149,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
             displayCurrency,
           },
           sdk,
+          selfCustodialBridge?.parseSparkAddress,
         )
         logParseDestinationResult(destination)
 
@@ -262,6 +263,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
     accountDefaultWalletQuery,
     displayCurrency,
     sdk,
+    selfCustodialBridge,
   ])
 
   const handleCodeScanned = React.useCallback(

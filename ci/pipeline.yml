@@ -146,7 +146,6 @@ jobs:
         APPSTORE_ISSUER_ID: #@ data.values.appstore_issuer_id
         SPARK_TOKEN_IDENTIFIER: #@ data.values.spark_token_identifier
         BREEZ_API_KEY: #@ data.values.breez_api_key
-        BREEZ_NETWORK: #@ data.values.breez_network
   - task: upload-to-gcs
     config:
       platform: linux
@@ -293,7 +292,6 @@ jobs:
         APPSTORE_ISSUER_ID: #@ data.values.appstore_issuer_id
         SPARK_TOKEN_IDENTIFIER: #@ data.values.spark_token_identifier
         BREEZ_API_KEY: #@ data.values.breez_api_key
-        BREEZ_NETWORK: #@ data.values.breez_network
   - task: upload-to-gcs
     config:
       platform: linux

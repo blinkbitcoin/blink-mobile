@@ -199,7 +199,11 @@ describe("ProfileRow", () => {
     jest.clearAllMocks()
     lastConfirmModalProps.isVisible = undefined
     lastWarningModalProps.isVisible = undefined
-    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null, wallets: [] })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: null,
+      wallets: [],
+      selfCustodialBridge: { initSdk: jest.fn() },
+    })
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
     mockUseDeleteAccount.mockReturnValue({
       state: "idle",
@@ -281,7 +285,10 @@ describe("ProfileRow", () => {
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
-    expect(mockProbeWallets).toHaveBeenCalledWith(TEST_ENTRY_ID)
+    expect(mockProbeWallets).toHaveBeenCalledWith(
+      TEST_ENTRY_ID,
+      expect.objectContaining({ initSdk: expect.any(Function) }),
+    )
     expect(mockDeleteWallet).not.toHaveBeenCalled()
   })
 

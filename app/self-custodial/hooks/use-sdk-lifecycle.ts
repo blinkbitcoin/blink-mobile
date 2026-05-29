@@ -10,20 +10,18 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { withTimeout } from "@app/utils/with-timeout"
 
 import {
+  type SelfCustodialBridge,
   addSdkEventListener,
   disconnectSdk,
   getUserSettings,
-  initSdk,
   removeSdkEventListener,
 } from "../bridge"
-import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 import {
   extractPaymentId,
   PAYMENT_RECEIVED_EVENTS,
   REFRESH_EVENTS,
 } from "../providers/sdk-events"
-import { validateStoredNetwork } from "../providers/validate-network"
 import {
   getOnlineState,
   getServiceStatus,
@@ -70,6 +68,7 @@ const teardownSdk = async (
 
 export const useSdkLifecycle = (
   activeSelfCustodialAccountId: string | null,
+  selfCustodialBridge: SelfCustodialBridge,
   retryCount: number,
 ): SdkLifecycleState => {
   const [wallets, setWallets] = useState<WalletState[]>([])
@@ -174,7 +173,7 @@ export const useSdkLifecycle = (
     const accountId = activeSelfCustodialAccountId
 
     const connectAndListen = async (mnemonic: string) => {
-      const connectedSdk = await initSdk(mnemonic, storageDirFor(accountId))
+      const connectedSdk = await selfCustodialBridge.initSdk(mnemonic, accountId)
       if (abortRef.current || !mounted) {
         await teardownSdk(connectedSdk, null)
         return
@@ -221,7 +220,7 @@ export const useSdkLifecycle = (
         return
       }
 
-      const networkValid = await validateStoredNetwork(accountId)
+      const networkValid = await selfCustodialBridge.validateStoredNetwork(accountId)
       if (!networkValid) {
         if (mounted) setStatus(ActiveWalletStatus.Error)
         return
@@ -254,7 +253,13 @@ export const useSdkLifecycle = (
         reportError("SDK cleanup", err)
       })
     }
-  }, [retryCount, refreshWallets, activeSelfCustodialAccountId, resetBackoff])
+  }, [
+    retryCount,
+    refreshWallets,
+    activeSelfCustodialAccountId,
+    resetBackoff,
+    selfCustodialBridge,
+  ])
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {

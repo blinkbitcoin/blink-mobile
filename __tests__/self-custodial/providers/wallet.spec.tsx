@@ -63,6 +63,18 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
 const mockGetLightningAddress = jest.fn().mockResolvedValue(null)
 
 jest.mock("@app/self-custodial/bridge", () => ({
+  createSelfCustodialBridge: jest.fn().mockImplementation(() => ({
+    sparkNetworkLabel: "regtest",
+    initSdk: (...args: unknown[]) => mockInitSdk(...args),
+    validateStoredNetwork: (...args: unknown[]) =>
+      jest
+        .requireMock("@app/self-custodial/providers/validate-network")
+        .validateStoredNetwork(...args),
+    selfCustodialCreateWallet: jest.fn(),
+    selfCustodialRestoreWallet: jest.fn(),
+    parseSparkAddress: jest.fn(),
+    storageDirForAccount: (id: string) => `/tmp/${id}`,
+  })),
   initSdk: (...args: unknown[]) => mockInitSdk(...args),
   disconnectSdk: (...args: unknown[]) => mockDisconnectSdk(...args),
   addSdkEventListener: (...args: unknown[]) => mockAddSdkEventListener(...args),
@@ -124,7 +136,7 @@ jest.mock("@app/store/persistent-state", () => ({
 jest.mock("@app/hooks/use-app-config", () => ({
   useAppConfig: () => ({
     saveToken: mockSaveToken,
-    appConfig: { token: "", galoyInstance: { id: "Main" } },
+    appConfig: { token: "", galoyInstance: { id: "Staging" } },
   }),
 }))
 
@@ -138,12 +150,6 @@ const mockCrashlyticsLog = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockCrashlyticsRecordError(...args),
   log: (...args: unknown[]) => mockCrashlyticsLog(...args),
-}))
-
-jest.mock("@app/self-custodial/config", () => ({
-  SparkConfig: { network: 1 },
-  SparkNetworkLabel: "regtest",
-  storageDirFor: (id: string) => `/tmp/${id}`,
 }))
 
 jest.mock("@app/self-custodial/providers/validate-network", () => ({
@@ -336,7 +342,7 @@ describe("SelfCustodialWalletProvider", () => {
 
     expect(mockInitSdk).toHaveBeenCalledWith(
       "word1 word2 word3",
-      "/tmp/test-self-custodial-uuid",
+      "test-self-custodial-uuid",
     )
   })
 

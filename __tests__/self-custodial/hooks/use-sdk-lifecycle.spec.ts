@@ -2,6 +2,7 @@ import { renderHook, act, waitFor } from "@testing-library/react-native"
 
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { useSdkLifecycle } from "@app/self-custodial/hooks/use-sdk-lifecycle"
+import { type SelfCustodialBridge } from "@app/self-custodial/bridge"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   // eslint-disable-next-line camelcase
@@ -38,11 +39,6 @@ jest.mock("@app/self-custodial/bridge", () => ({
   getUserSettings: (...args: unknown[]) => mockGetUserSettings(...args),
 }))
 
-const mockValidateStoredNetwork = jest.fn()
-jest.mock("@app/self-custodial/providers/validate-network", () => ({
-  validateStoredNetwork: (id: string) => mockValidateStoredNetwork(id),
-}))
-
 const mockGetSnapshot = jest.fn()
 jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
   getSelfCustodialWalletSnapshot: (...args: unknown[]) => mockGetSnapshot(...args),
@@ -69,10 +65,6 @@ jest.mock("@app/self-custodial/logging", () => ({
   SdkLogLevel: { Error: "error" },
 }))
 
-jest.mock("@app/self-custodial/config", () => ({
-  storageDirFor: (id: string) => `/tmp/${id}`,
-}))
-
 const mockRecordError = jest.fn()
 const mockCrashlyticsLog = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
@@ -94,6 +86,20 @@ const captureListener = (): { current: SdkEventListener | null } => {
 }
 
 const buildSdk = (id: string) => ({ id }) as unknown as object
+
+const sharedBridge: SelfCustodialBridge = {
+  sparkNetworkLabel: "regtest",
+  initSdk: ((...args: unknown[]) =>
+    mockInitSdk(...args)) as SelfCustodialBridge["initSdk"],
+  validateStoredNetwork: ((...args: unknown[]) =>
+    mockValidateStoredNetwork(...args)) as SelfCustodialBridge["validateStoredNetwork"],
+  selfCustodialCreateWallet: jest.fn(),
+  selfCustodialRestoreWallet: jest.fn(),
+  parseSparkAddress: jest.fn(),
+  storageDirForAccount: (accountId: string) => `/tmp/${accountId}`,
+}
+
+const mockValidateStoredNetwork = jest.fn()
 
 describe("useSdkLifecycle", () => {
   beforeEach(() => {
@@ -117,7 +123,7 @@ describe("useSdkLifecycle", () => {
 
   describe("inactive paths", () => {
     it("stays Unavailable and never calls initSdk when accountId is null", async () => {
-      const { result } = renderHook(() => useSdkLifecycle(null, 0))
+      const { result } = renderHook(() => useSdkLifecycle(null, sharedBridge, 0))
 
       await waitFor(() => {
         expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
@@ -128,7 +134,7 @@ describe("useSdkLifecycle", () => {
     it("falls to Unavailable when the keystore has no mnemonic for the account", async () => {
       mockGetMnemonicForAccount.mockResolvedValue(null)
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
@@ -139,7 +145,7 @@ describe("useSdkLifecycle", () => {
     it("falls to Error when the stored network does not match the current build", async () => {
       mockValidateStoredNetwork.mockResolvedValue(false)
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(result.current.status).toBe(ActiveWalletStatus.Error)
@@ -150,7 +156,7 @@ describe("useSdkLifecycle", () => {
     it("falls to Error when initSdk throws", async () => {
       mockInitSdk.mockRejectedValue(new Error("connect failed"))
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(result.current.status).toBe(ActiveWalletStatus.Error)
@@ -164,7 +170,7 @@ describe("useSdkLifecycle", () => {
       mockInitSdk.mockResolvedValue(sdk)
       const listener = captureListener()
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(result.current.sdk).toBe(sdk)
@@ -172,7 +178,7 @@ describe("useSdkLifecycle", () => {
 
       expect(mockGetMnemonicForAccount).toHaveBeenCalledWith("acct-1")
       expect(mockValidateStoredNetwork).toHaveBeenCalledWith("acct-1")
-      expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3", "/tmp/acct-1")
+      expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3", "acct-1")
       expect(result.current.connectedAccountId).toBe("acct-1")
 
       await waitFor(() => {
@@ -191,7 +197,7 @@ describe("useSdkLifecycle", () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       captureListener()
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(result.current.status).toBe(ActiveWalletStatus.Ready)
@@ -202,7 +208,7 @@ describe("useSdkLifecycle", () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       const listener = captureListener()
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(listener.current).not.toBeNull()
@@ -227,12 +233,13 @@ describe("useSdkLifecycle", () => {
       captureListener()
 
       const { rerender } = renderHook(
-        ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+        ({ accountId }: { accountId: string }) =>
+          useSdkLifecycle(accountId, sharedBridge, 0),
         { initialProps: { accountId: "acct-A" } },
       )
 
       await waitFor(() => {
-        expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3", "/tmp/acct-A")
+        expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3", "acct-A")
       })
 
       rerender({ accountId: "acct-B" })
@@ -241,7 +248,7 @@ describe("useSdkLifecycle", () => {
         expect(mockDisconnectSdk).toHaveBeenCalledWith(sdkA)
       })
       await waitFor(() => {
-        expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3", "/tmp/acct-B")
+        expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3", "acct-B")
       })
 
       expect(mockDisconnectSdk.mock.invocationCallOrder[0]).toBeLessThan(
@@ -255,7 +262,7 @@ describe("useSdkLifecycle", () => {
       mockInitSdk.mockResolvedValue(sdk)
       captureListener()
 
-      const { unmount } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { unmount } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(mockInitSdk).toHaveBeenCalled()
@@ -273,7 +280,8 @@ describe("useSdkLifecycle", () => {
       captureListener()
 
       const { result, rerender } = renderHook(
-        ({ accountId }: { accountId: string | null }) => useSdkLifecycle(accountId, 0),
+        ({ accountId }: { accountId: string | null }) =>
+          useSdkLifecycle(accountId, sharedBridge, 0),
         { initialProps: { accountId: "acct-1" as string | null } },
       )
 
@@ -295,7 +303,7 @@ describe("useSdkLifecycle", () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       const listener = captureListener()
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(listener.current).not.toBeNull()
@@ -315,7 +323,7 @@ describe("useSdkLifecycle", () => {
       mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
       const listener = captureListener()
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(listener.current).not.toBeNull()
@@ -351,7 +359,7 @@ describe("useSdkLifecycle", () => {
         rawTransactionCount: 0,
       })
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(result.current.hasMoreTransactions).toBe(true)
@@ -373,7 +381,7 @@ describe("useSdkLifecycle", () => {
         "@app/self-custodial/providers/wallet-snapshot",
       )
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(result.current.sdk).not.toBeNull()
@@ -391,7 +399,7 @@ describe("useSdkLifecycle", () => {
         "@app/self-custodial/providers/wallet-snapshot",
       )
 
-      const { result } = renderHook(() => useSdkLifecycle(null, 0))
+      const { result } = renderHook(() => useSdkLifecycle(null, sharedBridge, 0))
 
       await act(async () => {
         await result.current.loadMore()
@@ -407,7 +415,7 @@ describe("useSdkLifecycle", () => {
       captureListener()
       mockGetUserSettings.mockResolvedValueOnce({ stableBalanceActiveLabel: undefined })
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(result.current.sdkStableBalanceActive).toBe(false)
@@ -423,7 +431,7 @@ describe("useSdkLifecycle", () => {
     })
 
     it("no-ops when the SDK is not connected", async () => {
-      const { result } = renderHook(() => useSdkLifecycle(null, 0))
+      const { result } = renderHook(() => useSdkLifecycle(null, sharedBridge, 0))
 
       await act(async () => {
         await result.current.refreshStableBalanceActive()
@@ -455,7 +463,7 @@ describe("useSdkLifecycle", () => {
         rawTransactionCount: 0,
       })
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(listener.current).not.toBeNull()
@@ -491,7 +499,7 @@ describe("useSdkLifecycle", () => {
       const isOnline = jest.requireMock("@app/self-custodial/providers/is-online")
       isOnline.getOnlineState.mockResolvedValue("offline")
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(listener.current).not.toBeNull()
@@ -515,7 +523,7 @@ describe("useSdkLifecycle", () => {
 
       mockGetSnapshot.mockRejectedValue(new Error("snapshot failed"))
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(listener.current).not.toBeNull()
@@ -537,7 +545,7 @@ describe("useSdkLifecycle", () => {
       const isOnline = jest.requireMock("@app/self-custodial/providers/is-online")
       isOnline.isDegradedStatus.mockReturnValue(true)
 
-      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", sharedBridge, 0))
 
       await waitFor(() => {
         expect(listener.current).not.toBeNull()
@@ -559,7 +567,7 @@ describe("useSdkLifecycle", () => {
       captureListener()
 
       const { rerender } = renderHook(
-        ({ retry }: { retry: number }) => useSdkLifecycle("acct-1", retry),
+        ({ retry }: { retry: number }) => useSdkLifecycle("acct-1", sharedBridge, retry),
         { initialProps: { retry: 0 } },
       )
 

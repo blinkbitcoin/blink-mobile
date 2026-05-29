@@ -19,7 +19,7 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 
 jest.mock("@app/hooks/use-app-config", () => ({
   useAppConfig: () => ({
-    appConfig: { galoyInstance: { lnAddressHostname: "blink.sv" } },
+    appConfig: { galoyInstance: { id: "Main", lnAddressHostname: "blink.sv" } },
   }),
 }))
 
@@ -35,7 +35,7 @@ jest.mock("@app/graphql/generated", () => {
 })
 
 jest.mock("@app/self-custodial/config", () => ({
-  SparkNetworkLabel: "mainnet",
+  sparkNetworkLabelFromGaloyInstanceId: () => "mainnet",
 }))
 
 describe("useScanContext", () => {
@@ -108,7 +108,7 @@ describe("useScanContext", () => {
   })
 
   describe("self-custodial", () => {
-    it("maps wallet ids from useActiveWallet and uses SparkNetworkLabel for network", () => {
+    it("maps wallet ids from useActiveWallet and uses mapped Spark network label", () => {
       mockActiveWallet.mockReturnValue({
         isSelfCustodial: true,
         wallets: [

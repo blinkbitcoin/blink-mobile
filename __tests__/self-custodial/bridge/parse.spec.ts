@@ -11,11 +11,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
-  SparkConfig: { network: 1 },
-}))
-
-jest.mock("react-native-config", () => ({
-  BREEZ_NETWORK: "regtest",
+  sparkNetworkFromGaloyInstanceId: () => 1,
 }))
 
 const createMockSdk = (parseResult: unknown) =>
@@ -34,7 +30,7 @@ describe("parseSparkAddress", () => {
       ],
     })
 
-    const result = await parseSparkAddress(sdk, "spark1abc...")
+    const result = await parseSparkAddress(sdk, "spark1abc...", 1)
 
     expect(result).not.toBeNull()
     expect(result?.address).toBe("spark1abc...")
@@ -54,7 +50,7 @@ describe("parseSparkAddress", () => {
       ],
     })
 
-    const result = await parseSparkAddress(sdk, "spark1abc...")
+    const result = await parseSparkAddress(sdk, "spark1abc...", 1)
 
     expect(result).not.toBeNull()
     expect(result?.networkMatch).toBe(false)
@@ -66,7 +62,7 @@ describe("parseSparkAddress", () => {
       inner: [{ address: "bc1q..." }],
     })
 
-    const result = await parseSparkAddress(sdk, "bc1q...")
+    const result = await parseSparkAddress(sdk, "bc1q...", 1)
 
     expect(result).toBeNull()
   })
@@ -76,7 +72,7 @@ describe("parseSparkAddress", () => {
       parse: jest.fn().mockRejectedValue(new Error("parse failed")),
     } as never
 
-    const result = await parseSparkAddress(sdk, "invalid")
+    const result = await parseSparkAddress(sdk, "invalid", 1)
 
     expect(result).toBeNull()
   })
@@ -95,7 +91,7 @@ describe("parseSparkAddressDetailed (I15 — distinguishes 'not Spark' from 'SDK
       ],
     })
 
-    const result = await parseSparkAddressDetailed(sdk, "spark1abc...")
+    const result = await parseSparkAddressDetailed(sdk, "spark1abc...", 1)
 
     expect(result.outcome).toBe(ParseSparkAddressOutcome.Match)
     if (result.outcome === ParseSparkAddressOutcome.Match) {
@@ -110,7 +106,7 @@ describe("parseSparkAddressDetailed (I15 — distinguishes 'not Spark' from 'SDK
       inner: [{ address: "bc1q..." }],
     })
 
-    const result = await parseSparkAddressDetailed(sdk, "bc1q...")
+    const result = await parseSparkAddressDetailed(sdk, "bc1q...", 1)
 
     expect(result.outcome).toBe(ParseSparkAddressOutcome.NotSparkAddress)
   })
@@ -121,7 +117,7 @@ describe("parseSparkAddressDetailed (I15 — distinguishes 'not Spark' from 'SDK
       parse: jest.fn().mockRejectedValue(sdkErr),
     } as never
 
-    const result = await parseSparkAddressDetailed(sdk, "anything")
+    const result = await parseSparkAddressDetailed(sdk, "anything", 1)
 
     expect(result.outcome).toBe(ParseSparkAddressOutcome.ParseError)
     if (result.outcome === ParseSparkAddressOutcome.ParseError) {

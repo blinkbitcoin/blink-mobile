@@ -1,4 +1,5 @@
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
+import { type GaloyInstanceName } from "@app/config"
 import Config from "react-native-config"
 import { DocumentDirectoryPath } from "react-native-fs"
 
@@ -9,28 +10,30 @@ export const SparkToken = {
 
 export type SparkToken = (typeof SparkToken)[keyof typeof SparkToken]
 
-const NETWORK_MAP: Record<string, Network> = {
-  mainnet: Network.Mainnet,
-  regtest: Network.Regtest,
+export type SparkNetworkLabel = "mainnet" | "regtest"
+
+const SPARK_NETWORK_BY_INSTANCE_ID: Record<GaloyInstanceName, Network> = {
+  Main: Network.Mainnet,
+  Staging: Network.Regtest,
+  Local: Network.Regtest,
+  Custom: Network.Mainnet,
 }
 
-const parseNetwork = (): Network => {
-  const raw = Config.BREEZ_NETWORK?.toLowerCase()
-  if (!raw) return Network.Mainnet
-  const network = NETWORK_MAP[raw]
-  if (network === undefined) {
-    throw new Error(`Unknown BREEZ_NETWORK: "${raw}". Expected: mainnet, regtest`)
-  }
-  return network
-}
+export const sparkNetworkFromGaloyInstanceId = (instanceId: GaloyInstanceName): Network =>
+  SPARK_NETWORK_BY_INSTANCE_ID[instanceId]
 
-export const SparkNetwork = parseNetwork()
+export const sparkNetworkLabelFromNetwork = (network: Network): SparkNetworkLabel =>
+  network === Network.Mainnet ? "mainnet" : "regtest"
 
-export const SparkNetworkLabel = SparkNetwork === Network.Mainnet ? "mainnet" : "regtest"
+export const sparkNetworkLabelFromGaloyInstanceId = (
+  instanceId: GaloyInstanceName,
+): SparkNetworkLabel =>
+  sparkNetworkLabelFromNetwork(sparkNetworkFromGaloyInstanceId(instanceId))
+
+export const sparkStorageDir = (networkLabel: SparkNetworkLabel): string =>
+  `${DocumentDirectoryPath}/breez-sdk-spark-${networkLabel}`
 
 export const SparkConfig = {
-  network: SparkNetwork,
-  storageDir: `${DocumentDirectoryPath}/breez-sdk-spark-${SparkNetworkLabel}`,
   maxSlippageBps: 50,
   apiKey: Config.BREEZ_API_KEY ?? "",
 } as const
@@ -52,5 +55,7 @@ export const requireSparkTokenIdentifier = (): string => {
   return id
 }
 
-export const storageDirFor = (accountId: string): string =>
-  `${SparkConfig.storageDir}/${accountId}`
+export const storageDirFor = (
+  networkLabel: SparkNetworkLabel,
+  accountId: string,
+): string => `${sparkStorageDir(networkLabel)}/${accountId}`

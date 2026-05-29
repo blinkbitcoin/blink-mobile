@@ -7,6 +7,7 @@ import {
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { createSelfCustodialScanContext } from "@app/self-custodial/adapters/scan-context"
+import { sparkNetworkLabelFromGaloyInstanceId } from "@app/self-custodial/config"
 import { type ScanContextAdapter } from "@app/types/scan-context"
 
 import { useActiveWallet } from "./use-active-wallet"
@@ -17,7 +18,7 @@ export const useScanContext = (): ScanContextAdapter => {
   const { isSelfCustodial, wallets } = useActiveWallet()
   const {
     appConfig: {
-      galoyInstance: { lnAddressHostname },
+      galoyInstance: { id: galoyInstanceId, lnAddressHostname },
     },
   } = useAppConfig()
   const { data } = useScanningQrCodeScreenQuery({ skip: !isAuthed })
@@ -25,12 +26,15 @@ export const useScanContext = (): ScanContextAdapter => {
 
   return useMemo((): ScanContextAdapter => {
     if (isSelfCustodial) {
-      return createSelfCustodialScanContext(wallets)
+      return createSelfCustodialScanContext(
+        wallets,
+        sparkNetworkLabelFromGaloyInstanceId(galoyInstanceId),
+      )
     }
     return createCustodialScanContext(
       data,
       unauthedData?.globals?.network ?? null,
       lnAddressHostname,
     )
-  }, [isSelfCustodial, wallets, data, unauthedData, lnAddressHostname])
+  }, [isSelfCustodial, wallets, data, unauthedData, lnAddressHostname, galoyInstanceId])
 }

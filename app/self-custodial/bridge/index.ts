@@ -6,6 +6,8 @@ export {
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
 } from "./lifecycle"
+export { createSelfCustodialBridge } from "./factory"
+export type { SelfCustodialBridge } from "./factory"
 export {
   getWalletInfo,
   listPayments,
