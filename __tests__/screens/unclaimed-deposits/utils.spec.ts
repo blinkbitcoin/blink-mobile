@@ -1,7 +1,7 @@
 const mockOpenExternalUrl = jest.fn()
 
 jest.mock("@app/utils/external", () => ({
-  openExternalUrl: (...args: unknown[]) => mockOpenExternalUrl(...args),
+  openExternalUrl: (...args: unknown[]) => Promise.resolve(mockOpenExternalUrl(...args)),
 }))
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
@@ -14,7 +14,7 @@ const loadUtils = (network: "Mainnet" | "Regtest") => {
     sparkNetworkFromGaloyInstanceId: () => network,
   }))
   jest.doMock("@app/utils/external", () => ({
-    openExternalUrl: (...args: unknown[]) => mockOpenExternalUrl(...args),
+    openExternalUrl: (...args: unknown[]) => Promise.resolve(mockOpenExternalUrl(...args)),
   }))
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   return require("@app/screens/unclaimed-deposits/utils")
