@@ -2456,6 +2456,11 @@
         "switchAccount": "Cambiaste a otra cuenta",
         "removedAccount": "Eliminaste la cuenta {identifier: string}."
     },
+    "StablesatsRestriction": {
+        "modalTitle": "Stablesats no está disponible en tu país",
+        "modalTitleSelfCustodial": "Las stablecoins no están disponibles en tu país",
+        "modalBody": "Debido a la incertidumbre regulatoria, no podemos ofrecer esta función en tu país."
+    },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticación de dos factores",
         "secret": "código secreto/respaldo",
@@ -2752,9 +2757,11 @@
         "needWallet": "Inicia sesión o crea una cuenta para acceder a tu billetera",
         "next": "Siguiente",
         "No": "No",
+        "notAvailable": "no disponible",
         "note": "Nota ",
         "notification": "Notificación",
         "ok": "OK",
+        "okay": "Aceptar",
         "or": "o",
         "openWallet": "Abrir billetera",
         "onchain": "Onchain",

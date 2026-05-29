@@ -2456,6 +2456,11 @@
     "switchAccount": "Has canviat a un altre compte",
     "removedAccount": "Has eliminat el compte {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats no està disponible al teu país",
+    "modalTitleSelfCustodial": "Les stablecoins no estan disponibles al teu país",
+    "modalBody": "A causa de la incertesa reguladora, no podem oferir aquesta funció al teu país."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificació de dos factors",
     "secret": "Secret/còpia de seguretat",
@@ -2753,9 +2758,11 @@
     "needWallet": "Inicia sessió o crea un compte per accedir al teu moneder",
     "next": "Següent",
     "No": "No",
+    "notAvailable": "no disponible",
     "note": "Nota",
     "notification": "Notificació",
     "ok": "D'acord",
+    "okay": "D’acord",
     "or": "o",
     "openWallet": "Obrir el moneder",
     "onchain": "Onchain",

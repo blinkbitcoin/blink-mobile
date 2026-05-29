@@ -2456,6 +2456,11 @@
     "switchAccount": "Bạn đã chuyển sang tài khoản khác",
     "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats không khả dụng tại quốc gia của bạn",
+    "modalTitleSelfCustodial": "Stablecoin không khả dụng tại quốc gia của bạn",
+    "modalBody": "Do tính không chắc chắn về quy định, chúng tôi không thể cung cấp tính năng này tại quốc gia của bạn."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
     "secret": "Khóa bí mật/sao lưu",
@@ -2753,9 +2758,11 @@
     "needWallet": "Log in or create an account to access your wallet",
     "next": "Tiếp theo",
     "No": "Không",
+    "notAvailable": "không khả dụng",
     "note": "Ghi chú",
     "notification": "Thông báo",
     "ok": "OK",
+    "okay": "Đồng ý",
     "or": "or",
     "openWallet": "Mở ví",
     "onchain": "Trên chuỗi",

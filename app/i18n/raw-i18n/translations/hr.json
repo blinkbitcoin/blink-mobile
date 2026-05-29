@@ -2456,6 +2456,11 @@
     "switchAccount": "Prebacili ste se na drugi račun",
     "removedAccount": "Uklonili ste račun {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats nije dostupan u vašoj zemlji",
+    "modalTitleSelfCustodial": "Stablecoini nisu dostupni u vašoj zemlji",
+    "modalBody": "Zbog regulatorne neizvjesnosti ne možemo ponuditi ovu značajku u vašoj zemlji."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvofaktorska autentifikacija",
     "secret": "Tajni ključ/sigurnosna kopija",
@@ -2753,9 +2758,11 @@
     "needWallet": "Prijavite se ili kreirajte račun za pristup svom novčaniku",
     "next": "Sljedeće",
     "No": "Ne",
+    "notAvailable": "nije dostupno",
     "note": "Bilješka",
     "notification": "Obavijest",
     "ok": "OK",
+    "okay": "U redu",
     "or": "ili",
     "openWallet": "Otvori Novčanik",
     "onchain": "Onchain",

@@ -2456,6 +2456,11 @@
     "switchAccount": "Ați comutat pe alt cont",
     "removedAccount": "Ați eliminat contul {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats nu este disponibil în țara ta",
+    "modalTitleSelfCustodial": "Stablecoin-urile nu sunt disponibile în țara ta",
+    "modalBody": "Din cauza incertitudinii reglementare, nu putem oferi această funcție în țara ta."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificare cu doi factori",
     "secret": "Secret/backup",
@@ -2753,9 +2758,11 @@
     "needWallet": "Conectați-vă sau creați un cont pentru a vă accesa portofelul",
     "next": "Următorul",
     "No": "Nu",
+    "notAvailable": "indisponibil",
     "note": "Notă",
     "notification": "Notificare",
     "ok": "OK",
+    "okay": "În regulă",
     "or": "sau",
     "openWallet": "Deschideți portofelul",
     "onchain": "Onchain",

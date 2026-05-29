@@ -2456,6 +2456,11 @@
     "switchAccount": "คุณได้สลับไปยังบัญชีอื่นแล้ว",
     "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว"
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats ไม่พร้อมใช้งานในประเทศของคุณ",
+    "modalTitleSelfCustodial": "Stablecoin ไม่พร้อมใช้งานในประเทศของคุณ",
+    "modalBody": "เนื่องจากความไม่แน่นอนของกฎระเบียบ เราจึงไม่สามารถให้บริการฟีเจอร์นี้ในประเทศของคุณได้"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
     "secret": "รหัสลับ/สำรอง",
@@ -2753,9 +2758,11 @@
     "needWallet": "Log in or create an account to access your wallet",
     "next": "ต่อไป",
     "No": "ไม่",
+    "notAvailable": "ไม่พร้อมใช้งาน",
     "note": "โน้ต",
     "notification": "การแจ้งเตือน",
     "ok": "ตกลง",
+    "okay": "ตกลง",
     "or": "or",
     "openWallet": "เปิดกระเป๋า",
     "onchain": "Onchain",

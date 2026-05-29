@@ -2456,6 +2456,11 @@
     "switchAccount": "Másik fiókra váltottál",
     "removedAccount": "Eltávolítottad a(z) {identifier: string} fiókot."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "A Stablesats nem érhető el az országodban",
+    "modalTitleSelfCustodial": "A stablecoinok nem érhetők el az országodban",
+    "modalBody": "A szabályozási bizonytalanság miatt nem tudjuk biztosítani ezt a funkciót az országodban."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Kétlépcsős azonosítás",
     "secret": "Titkos kulcs/biztonsági mentés",
@@ -2753,9 +2758,11 @@
     "needWallet": "Jelentkezz be vagy hozz létre számlát a tárcád eléréséhez",
     "next": "Következő",
     "No": "Nem",
+    "notAvailable": "nem érhető el",
     "note": "Megjegyzés",
     "notification": "Értesítés",
     "ok": "OK",
+    "okay": "Rendben",
     "or": "vagy",
     "openWallet": "Pénztárca megnyitása",
     "onchain": "Onchain",

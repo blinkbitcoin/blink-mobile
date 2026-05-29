@@ -2456,6 +2456,11 @@
         "switchAccount": "Vous avez changé de compte",
         "removedAccount": "Vous avez supprimé le compte {identifier: string}."
     },
+    "StablesatsRestriction": {
+        "modalTitle": "Stablesats n'est pas disponible dans votre pays",
+        "modalTitleSelfCustodial": "Les stablecoins ne sont pas disponibles dans votre pays",
+        "modalBody": "En raison de l'incertitude réglementaire, nous ne pouvons pas offrir cette fonctionnalité dans votre pays."
+    },
     "TotpRegistrationInitiateScreen": {
         "title": "Authentification à deux niveaux",
         "secret": "Secret/sauvegarde",
@@ -2753,9 +2758,11 @@
         "needWallet": "Se connecter ou créer un compte pour accéder à votre portefeuille.",
         "next": "Suivant",
         "No": "Non",
+        "notAvailable": "non disponible",
         "note": "Note",
         "notification": "Notification",
         "ok": "OK",
+        "okay": "D’accord",
         "or": "ou",
         "openWallet": "Ouvrir Portefeuille",
         "onchain": "Onchain",

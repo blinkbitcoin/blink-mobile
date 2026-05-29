@@ -2456,6 +2456,11 @@
     "switchAccount": "Je bent gewisseld naar een ander account",
     "removedAccount": "Je hebt account {identifier: string} verwijderd."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats is niet beschikbaar in jouw land",
+    "modalTitleSelfCustodial": "Stablecoins zijn niet beschikbaar in jouw land",
+    "modalBody": "Vanwege regelgevende onzekerheid kunnen we deze functie niet aanbieden in jouw land."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Tweefactorauthenticatie",
     "secret": "Geheim/back-up",
@@ -2753,9 +2758,11 @@
     "needWallet": "Log in of maak een account aan om toegang te krijgen tot uw wallet",
     "next": "Volgende",
     "No": "Nee",
+    "notAvailable": "niet beschikbaar",
     "note": "Noot",
     "notification": "Melding",
     "ok": "OK",
+    "okay": "Oké",
     "or": "of",
     "openWallet": "Open Wallet",
     "onchain": "Onchain",

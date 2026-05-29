@@ -2456,6 +2456,11 @@
     "switchAccount": "Umebadilisha kwenda akaunti nyingine",
     "removedAccount": "Umeondoa akaunti {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats haipatikani katika nchi yako",
+    "modalTitleSelfCustodial": "Stablecoin hazipatikani katika nchi yako",
+    "modalBody": "Kutokana na kutokuwa na uhakika wa udhibiti, hatuwezi kutoa kipengele hiki katika nchi yako."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "uthibitishaji wa hatua mbili",
     "secret": "Siri/hifadhi rudufu",
@@ -2753,9 +2758,11 @@
     "needWallet": "Ingia au tengeneza akaunti ili ufikie mfuko wako wa fedha",
     "next": "Ifuatayo",
     "No": "Hapana",
+    "notAvailable": "haipatikani",
     "note": "Dokezo",
     "notification": "Taarifa",
     "ok": "Sawa",
+    "okay": "Sawa",
     "or": "au",
     "openWallet": "Fungua pochi",
     "onchain": "Onchain",

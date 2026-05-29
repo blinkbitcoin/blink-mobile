@@ -2456,6 +2456,11 @@
         "switchAccount": "別のアカウントに切り替えました",
         "removedAccount": "アカウント {identifier: string} を削除しました。"
     },
+    "StablesatsRestriction": {
+        "modalTitle": "あなたの国ではStablesatsをご利用いただけません",
+        "modalTitleSelfCustodial": "あなたの国ではstablecoinをご利用いただけません",
+        "modalBody": "規制上の不確実性により、あなたの国ではこの機能を提供できません。"
+    },
     "TotpRegistrationInitiateScreen": {
         "title": "2要素認証（2FA）",
         "secret": "シークレット/バックアップ",
@@ -2753,9 +2758,11 @@
         "needWallet": "ウォレットにアクセスするには、ログインするか、新たにウォレットを作成してください",
         "next": "次",
         "No": "いいえ",
+        "notAvailable": "利用不可",
         "note": "メモ",
         "notification": "通知",
         "ok": "OK",
+        "okay": "了解",
         "or": "または",
         "openWallet": "ウォレットを開く",
         "onchain": "オンチェーン",

@@ -2456,6 +2456,11 @@
     "switchAccount": "Okyusizza eri akawunti endala",
     "removedAccount": "Oggyewo akawunti {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats teriiwo mu nsi yo",
+    "modalTitleSelfCustodial": "Stablecoin teziriiwo mu nsi yo",
+    "modalBody": "Olw'okutali kakasa mu by'amateeka, tetuyinza kuwaayo mulimu guno mu nsi yo."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Okukakasa emirundi ebiri",
     "secret": "Ekyama/ekyokudda ku nnyuma",
@@ -2753,9 +2758,11 @@
     "needWallet": "Yingira oba tonda wo akawunti okusobola okwetuusako waleti yo",
     "next": "Ekiddako",
     "No": "Nedda",
+    "notAvailable": "tekiriiwo",
     "note": "Ebbaluwa",
     "notification": "Ekilango",
     "ok": "kale",
+    "okay": "Kale",
     "or": "oba",
     "openWallet": "Waleti Enzigule",
     "onchain": "Ku lujegere",

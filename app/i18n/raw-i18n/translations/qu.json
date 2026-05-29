@@ -2456,6 +2456,11 @@
     "switchAccount": "Huk cuentaman tikrarqanki",
     "removedAccount": "{identifier: string} cuentata qichurqanki."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats mana kapunchu llaqtaykipi",
+    "modalTitleSelfCustodial": "Stablecoin mana kapunchu llaqtaykipi",
+    "modalBody": "Kamachiq mana sut'i kasqanrayku, mana atinikuchu kay ruwayta haywayta llaqtaykipi."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
     "secret": "Pakasqa/waqaychasqa",
@@ -2753,9 +2758,11 @@
     "needWallet": "Log in or create an account to access your wallet",
     "next": "Qhipa",
     "No": "Mana",
+    "notAvailable": "mana kapunchu",
     "note": "Willana",
     "notification": "Willanakuy",
     "ok": "Ay",
+    "okay": "Allinmi",
     "or": "or",
     "openWallet": "Qipi qillqayniy",
     "onchain": "Onchain",

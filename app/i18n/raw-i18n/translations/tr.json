@@ -2456,6 +2456,11 @@
     "switchAccount": "Başka bir hesaba geçiş yaptınız",
     "removedAccount": "{identifier: string} hesabını kaldırdınız."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats ülkenizde kullanılamıyor",
+    "modalTitleSelfCustodial": "Stablecoinler ülkenizde kullanılamıyor",
+    "modalBody": "Düzenleyici belirsizlik nedeniyle bu özelliği ülkenizde sunamıyoruz."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "İki aşamalı doğrulama",
     "secret": "Gizli anahtar/yedek",
@@ -2753,9 +2758,11 @@
     "needWallet": "Cüzdanınıza erişmek için giriş yapın veya bir hesap oluşturun",
     "next": "İlerle",
     "No": "Hayır",
+    "notAvailable": "kullanılamıyor",
     "note": "Not",
     "notification": "Bildirim",
     "ok": "Tamam",
+    "okay": "Tamam",
     "or": "ya da",
     "openWallet": "Cüzdanı aç",
     "onchain": "Onchain",

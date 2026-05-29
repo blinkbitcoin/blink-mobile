@@ -2456,6 +2456,11 @@
     "switchAccount": "Anda beralih ke akun lain",
     "removedAccount": "Anda menghapus akun {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats tidak tersedia di negara Anda",
+    "modalTitleSelfCustodial": "Stablecoin tidak tersedia di negara Anda",
+    "modalBody": "Karena ketidakpastian regulasi, kami tidak dapat menawarkan fitur ini di negara Anda."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Otentikasi dua faktor",
     "secret": "Rahasia/cadangan",
@@ -2753,9 +2758,11 @@
     "needWallet": "Masuk atau buat akun untuk mengakses dompet Anda",
     "next": "Berikutnya",
     "No": "Tidak",
+    "notAvailable": "tidak tersedia",
     "note": "Catatan",
     "notification": "Notifikasi",
     "ok": "OK",
+    "okay": "Oke",
     "or": "atau",
     "openWallet": "Buka Dompet",
     "onchain": "Onchain",

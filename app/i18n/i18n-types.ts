@@ -8135,6 +8135,20 @@ type RootTranslation = {
 		 */
 		learnMoreSelfCustodial: string
 	}
+	StablesatsRestriction: {
+		/**
+		 * S​t​a​b​l​e​s​a​t​s​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​c​o​u​n​t​r​y
+		 */
+		modalTitle: string
+		/**
+		 * S​t​a​b​l​e​c​o​i​n​s​ ​a​r​e​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​c​o​u​n​t​r​y
+		 */
+		modalTitleSelfCustodial: string
+		/**
+		 * D​u​e​ ​t​o​ ​r​e​g​u​l​a​t​o​r​y​ ​u​n​c​e​r​t​a​i​n​t​y​,​ ​w​e​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​t​h​i​s​ ​f​e​a​t​u​r​e​ ​i​n​ ​y​o​u​r​ ​c​o​u​n​t​r​y​.
+		 */
+		modalBody: string
+	}
 	SplashScreen: {
 		/**
 		 * Y​o​u​r​ ​a​p​p​ ​i​s​ ​o​u​t​d​a​t​e​d​.​ ​A​n​ ​u​p​d​a​t​e​ ​i​s​ ​n​e​e​d​e​d​ ​b​e​f​o​r​e​ ​t​h​e​ ​a​p​p​ ​c​a​n​ ​b​e​ ​u​s​e​d​.​
@@ -9068,6 +9082,10 @@ type RootTranslation = {
 		 */
 		No: string
 		/**
+		 * n​o​t​ ​a​v​a​i​l​a​b​l​e
+		 */
+		notAvailable: string
+		/**
 		 * N​o​t​e
 		 */
 		note: string
@@ -9079,6 +9097,10 @@ type RootTranslation = {
 		 * O​K
 		 */
 		ok: string
+		/**
+		 * O​k​a​y
+		 */
+		okay: string
 		/**
 		 * o​r
 		 */
@@ -20358,6 +20380,20 @@ export type TranslationFunctions = {
 		 */
 		learnMoreSelfCustodial: () => LocalizedString
 	}
+	StablesatsRestriction: {
+		/**
+		 * Stablesats is not available in your country
+		 */
+		modalTitle: () => LocalizedString
+		/**
+		 * Stablecoins are not available in your country
+		 */
+		modalTitleSelfCustodial: () => LocalizedString
+		/**
+		 * Due to regulatory uncertainty, we cannot offer this feature in your country.
+		 */
+		modalBody: () => LocalizedString
+	}
 	SplashScreen: {
 		/**
 		 * Your app is outdated. An update is needed before the app can be used.
@@ -21270,6 +21306,10 @@ export type TranslationFunctions = {
 		 */
 		No: () => LocalizedString
 		/**
+		 * not available
+		 */
+		notAvailable: () => LocalizedString
+		/**
 		 * Note
 		 */
 		note: () => LocalizedString
@@ -21281,6 +21321,10 @@ export type TranslationFunctions = {
 		 * OK
 		 */
 		ok: () => LocalizedString
+		/**
+		 * Okay
+		 */
+		okay: () => LocalizedString
 		/**
 		 * or
 		 */

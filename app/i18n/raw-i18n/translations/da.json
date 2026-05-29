@@ -2456,6 +2456,11 @@
     "switchAccount": "Du skiftede til en anden konto",
     "removedAccount": "Du fjernede kontoen {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats er ikke tilgængelig i dit land",
+    "modalTitleSelfCustodial": "Stablecoins er ikke tilgængelige i dit land",
+    "modalBody": "På grund af reguleringsmæssig usikkerhed kan vi ikke tilbyde denne funktion i dit land."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "To-faktor godkendelse",
     "secret": "Hemmelighed/backup",
@@ -2753,9 +2758,11 @@
     "needWallet": "Log ind eller opret en konto for at få adgang til din tegnebog",
     "next": "Næste",
     "No": "Nej",
+    "notAvailable": "ikke tilgængelig",
     "note": "Note",
     "notification": "Notifikation",
     "ok": "OK",
+    "okay": "Okay",
     "or": "eller",
     "openWallet": "Åben Tegnebog",
     "onchain": "Onchain",

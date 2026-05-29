@@ -2456,6 +2456,11 @@
     "switchAccount": "Utshintshele kwenye i-akhawunti",
     "removedAccount": "Ususile i-akhawunti {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "I-Stablesats ayifumaneki kwilizwe lakho",
+    "modalTitleSelfCustodial": "Ii-stablecoin azifumaneki kwilizwe lakho",
+    "modalBody": "Ngenxa yokungaqiniseki kommiselo, asikwazi ukunika lo msebenzi kwilizwe lakho."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Uqinisekiso lwezinto ezimbini",
     "secret": "Imfihlo/ibhekap",
@@ -2753,9 +2758,11 @@
     "needWallet": "Log in or create an account to access your wallet",
     "next": "Next",
     "No": "No",
+    "notAvailable": "ayifumaneki",
     "note": "Note",
     "notification": "Notification",
     "ok": "KULUNGILE",
+    "okay": "Kulungile",
     "or": "okanye",
     "openWallet": "Open Wallet",
     "onchain": "Onchain",

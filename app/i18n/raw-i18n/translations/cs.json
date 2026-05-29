@@ -2456,6 +2456,11 @@
     "switchAccount": "Přepnuli jste na jiný účet",
     "removedAccount": "Odebrali jste účet {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats není ve vaší zemi k dispozici",
+    "modalTitleSelfCustodial": "Stablecoiny nejsou ve vaší zemi k dispozici",
+    "modalBody": "Vzhledem k regulační nejistotě nemůžeme tuto funkci ve vaší zemi nabídnout."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvoufaktorové ověření",
     "secret": "Tajný klíč/záloha",
@@ -2753,9 +2758,11 @@
     "needWallet": "Přihlašte se nebo si založte účet pro přístup k vaší peněžence",
     "next": "Další",
     "No": "Ne",
+    "notAvailable": "není k dispozici",
     "note": "Poznámka",
     "notification": "Upozornění",
     "ok": "OK",
+    "okay": "Dobře",
     "or": "nebo",
     "openWallet": "Otevřít peněženku",
     "onchain": "Onchain",

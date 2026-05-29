@@ -2456,6 +2456,11 @@
     "switchAccount": "Delays delays delays delays",
     "removedAccount": "Դուք հեռացրել եք {identifier: string} հաշիվը։"
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats-ը հասանելի չէ ձեր երկրում",
+    "modalTitleSelfCustodial": "Stablecoin-ները հասանելի չեն ձեր երկրում",
+    "modalBody": "Կարգավորիչ անորոշության պատճառով մենք չենք կարող առաջարկել այս հնարավորությունը ձեր երկրում։"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Երկգործոն նույնականացում",
     "secret": "Գաղտնի / պահուստային պատճեն",
@@ -2753,9 +2758,11 @@
     "needWallet": "Մուտք գործել կամ ստեղծել հաշիվ՝ Ձեր դրամապանակ մուտք գործելու համար",
     "next": "Հաջորդը",
     "No": "Ոչ",
+    "notAvailable": "հասանելի չէ",
     "note": "Նշում",
     "notification": "Ծանուցում",
     "ok": "OK ",
+    "okay": "Լավ",
     "or": "կամ",
     "openWallet": "Բաց դրամապանակ",
     "onchain": "Onchain",

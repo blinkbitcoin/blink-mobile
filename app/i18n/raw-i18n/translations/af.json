@@ -2456,6 +2456,11 @@
     "switchAccount": "Jy het na 'n ander rekening oorgeskakel",
     "removedAccount": "Jy het rekening {identifier: string} verwyder."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats is nie beskikbaar in jou land nie",
+    "modalTitleSelfCustodial": "Stablecoins is nie beskikbaar in jou land nie",
+    "modalBody": "Weens regulatoriese onsekerheid kan ons hierdie funksie nie in jou land aanbied nie."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Twee-faktor-verifikasie",
     "secret": "Geheim/rugsteun",
@@ -2753,9 +2758,11 @@
     "needWallet": "Teken in om 'n rekening oop te maak en om toegang tot jou beursie te kry. ",
     "next": "Volgende",
     "No": "Nee",
+    "notAvailable": "nie beskikbaar",
     "note": "Nota",
     "notification": "Kennisgewing",
     "ok": "OK",
+    "okay": "Goed",
     "or": "of",
     "openWallet": "Maak beursie oop",
     "onchain": "Onchain",

@@ -2456,6 +2456,11 @@
     "switchAccount": "لقد انتقلت إلى حساب آخر",
     "removedAccount": "لقد أزلت الحساب {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats غير متاح في بلدك",
+    "modalTitleSelfCustodial": "العملات المستقرة غير متاحة في بلدك",
+    "modalBody": "نظراً لعدم اليقين التنظيمي، لا يمكننا تقديم هذه الميزة في بلدك."
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
     "secret": "الرمز السري/النسخ الاحتياطي",
@@ -2753,9 +2758,11 @@
     "needWallet": "Log in or create an account to access your wallet",
     "next": "التالي",
     "No": "لا",
+    "notAvailable": "غير متاح",
     "note": "ملاحظة ",
     "notification": "إشعار",
     "ok": "كل شيء على مايرام 👍",
+    "okay": "حسناً",
     "or": "or",
     "openWallet": "افتح المحفظة",
     "onchain": "على السلسلة",
