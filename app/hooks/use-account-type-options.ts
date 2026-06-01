@@ -1,8 +1,7 @@
-import { isCustodialAllowedForCountry } from "@app/config/custodial-eligibility"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { AccountTypeMode } from "@app/types/account"
 
-import useDeviceLocation from "./use-device-location"
+import { useCustodialEligibility } from "./use-custodial-eligibility"
 
 export const AccountOption = {
   Custodial: "custodial",
@@ -22,14 +21,14 @@ export const useAccountTypeOptions = (
   mode: AccountTypeMode = AccountTypeMode.Create,
 ): AccountTypeOptionsResult => {
   const { nonCustodialEnabled } = useFeatureFlags()
-  const { countryCode, loading } = useDeviceLocation()
+  const { signupAllowed, loading } = useCustodialEligibility()
 
   const isRestore = mode === AccountTypeMode.Restore
-  const custodialAllowed = isRestore || isCustodialAllowedForCountry(countryCode)
+  const custodialAvailable = isRestore || signupAllowed
 
   const options: AccountOption[] = []
   if (nonCustodialEnabled) options.push(AccountOption.SelfCustodial)
-  if (custodialAllowed) options.push(AccountOption.Custodial)
+  if (custodialAvailable) options.push(AccountOption.Custodial)
 
   return {
     options,
