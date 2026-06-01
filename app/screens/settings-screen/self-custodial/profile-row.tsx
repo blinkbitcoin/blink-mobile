@@ -43,8 +43,11 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { activeAccount, setActiveAccountId } = useAccountRegistry()
-  const { lightningAddress: liveLightningAddress, wallets: liveWallets } =
-    useSelfCustodialWallet()
+  const {
+    lightningAddress: liveLightningAddress,
+    wallets: liveWallets,
+    selfCustodialBridge,
+  } = useSelfCustodialWallet()
   const { state: deleteState, deleteWallet } = useDeleteAccount()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
@@ -96,9 +99,10 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
       openModalForWallets(liveWallets ?? [])
       return
     }
+    if (!selfCustodialBridge) return
 
     setProbingBalance(true)
-    const result = await probeSelfCustodialAccountWallets(accountId)
+    const result = await probeSelfCustodialAccountWallets(accountId, selfCustodialBridge)
     setProbingBalance(false)
 
     switch (result.status) {

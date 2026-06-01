@@ -140,6 +140,7 @@ describe("ScanningQRCodeScreen", () => {
     expect(mockResolveDestination).toHaveBeenCalledWith(
       expect.objectContaining({ rawInput: "lnbc1qrcode", inputSource: "qr" }),
       null,
+      undefined,
     )
   })
 
@@ -160,6 +161,7 @@ describe("ScanningQRCodeScreen", () => {
     expect(mockResolveDestination).toHaveBeenCalledWith(
       expect.objectContaining({ rawInput: "sp1qabc" }),
       sdk,
+      undefined,
     )
   })
 
@@ -179,6 +181,7 @@ describe("ScanningQRCodeScreen", () => {
     expect(mockResolveDestination).toHaveBeenCalledWith(
       expect.objectContaining({ lnurlDomains: [] }),
       expect.anything(),
+      undefined,
     )
   })
 
@@ -198,6 +201,7 @@ describe("ScanningQRCodeScreen", () => {
         lnurlDomains: ["blink.sv", "blink.sv", "pay.blink.sv", "pay.bbw.sv"],
       }),
       null,
+      undefined,
     )
   })
 

@@ -10,7 +10,6 @@ import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logSelfCustodialRestoreCompleted } from "@app/self-custodial/analytics"
-import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
 import {
   BackupMethod,
   markBackupCompletedFor,
@@ -37,7 +36,7 @@ export const useRestoreWallet = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { updateState } = usePersistentStateContext()
-  const { retry: reinitSdk } = useSelfCustodialWallet()
+  const { retry: reinitSdk, selfCustodialBridge } = useSelfCustodialWallet()
   const { reloadSelfCustodialAccounts } = useAccountRegistry()
   const [status, setStatus] = useState<RestoreWalletStatus>(RestoreWalletStatus.Idle)
   const guard = useInFlightGuard()
@@ -77,7 +76,8 @@ export const useRestoreWallet = () => {
           }
 
           const accountId = Crypto.randomUUID()
-          await selfCustodialRestoreWallet(accountId, normalized)
+          if (!selfCustodialBridge) throw new Error("Self-custodial bridge unavailable")
+          await selfCustodialBridge.selfCustodialRestoreWallet(accountId, normalized)
           await markBackupCompletedFor(accountId, BackupMethod.Manual)
           await reloadSelfCustodialAccounts()
 
@@ -93,7 +93,15 @@ export const useRestoreWallet = () => {
         }
       })
     },
-    [guard, activateAccount, reinitSdk, reloadSelfCustodialAccounts, navigation, LL],
+    [
+      guard,
+      activateAccount,
+      reinitSdk,
+      reloadSelfCustodialAccounts,
+      navigation,
+      LL,
+      selfCustodialBridge,
+    ],
   )
 
   return { restore, status }

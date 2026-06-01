@@ -11,9 +11,13 @@ import { resolveSparkDestination } from "./spark"
 export const resolveDestination = async (
   params: ParseDestinationParams,
   sdk: BreezSdkInterface | null,
+  parseSelfCustodialSparkAddress?: (
+    sdk: BreezSdkInterface,
+    input: string,
+  ) => Promise<Awaited<ReturnType<typeof parseSparkAddress>>>,
 ): Promise<ParseDestinationResult> => {
-  if (sdk) {
-    const sparkParsed = await parseSparkAddress(sdk, params.rawInput)
+  if (sdk && parseSelfCustodialSparkAddress) {
+    const sparkParsed = await parseSelfCustodialSparkAddress(sdk, params.rawInput)
     if (sparkParsed) {
       return wrapDestination(resolveSparkDestination(sparkParsed), sdk)
     }

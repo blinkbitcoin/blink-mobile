@@ -1,10 +1,9 @@
 import {
+  Network,
   BitcoinNetwork,
   InputType_Tags as InputTag,
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
-
-import { SparkConfig } from "../config"
 
 export type ParsedSparkAddress = {
   address: string
@@ -34,6 +33,7 @@ const NETWORK_MAP: Record<number, BitcoinNetwork> = {
 export const parseSparkAddressDetailed = async (
   sdk: BreezSdkInterface,
   input: string,
+  sparkNetwork: Network,
 ): Promise<ParseSparkAddressResult> => {
   try {
     const parsed = await sdk.parse(input.trim())
@@ -42,7 +42,7 @@ export const parseSparkAddressDetailed = async (
     }
 
     const [details] = parsed.inner
-    const expectedNetwork = NETWORK_MAP[SparkConfig.network]
+    const expectedNetwork = NETWORK_MAP[sparkNetwork]
 
     return {
       outcome: ParseSparkAddressOutcome.Match,
@@ -60,7 +60,8 @@ export const parseSparkAddressDetailed = async (
 export const parseSparkAddress = async (
   sdk: BreezSdkInterface,
   input: string,
+  sparkNetwork: Network,
 ): Promise<ParsedSparkAddress | null> => {
-  const result = await parseSparkAddressDetailed(sdk, input)
+  const result = await parseSparkAddressDetailed(sdk, input, sparkNetwork)
   return result.outcome === ParseSparkAddressOutcome.Match ? result.address : null
 }

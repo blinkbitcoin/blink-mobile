@@ -2,7 +2,6 @@
 jest.mock("react-native-config", () => ({
   SPARK_TOKEN_IDENTIFIER: "test-token-id",
   BREEZ_API_KEY: "test-api-key",
-  BREEZ_NETWORK: "regtest",
 }))
 
 jest.mock("react-native-fs", () => ({
@@ -94,7 +93,7 @@ describe("initSdk", () => {
     const sdk = makeSdk()
     mockConnect.mockResolvedValue(sdk)
 
-    const result = await initSdk("word1 word2 word3", "/test/storage")
+    const result = await initSdk("word1 word2 word3", "/test/storage", 1)
 
     expect(mockConnect).toHaveBeenCalledTimes(1)
     expect(mockConnect).toHaveBeenCalledWith(
@@ -108,7 +107,7 @@ describe("initSdk", () => {
   it("propagates connection errors from the SDK", async () => {
     mockConnect.mockRejectedValue(new Error("connect refused"))
 
-    await expect(initSdk("word1 word2 word3", "/test/storage")).rejects.toThrow(
+    await expect(initSdk("word1 word2 word3", "/test/storage", 1)).rejects.toThrow(
       "connect refused",
     )
   })
@@ -161,7 +160,7 @@ describe("selfCustodialCreateWallet", () => {
   })
 
   it("stores the mnemonic and the active network label for the given account", async () => {
-    await selfCustodialCreateWallet("test-account")
+    await selfCustodialCreateWallet("test-account", "regtest")
 
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
     expect(mockSetMnemonicNetwork).toHaveBeenCalledTimes(1)
@@ -170,7 +169,7 @@ describe("selfCustodialCreateWallet", () => {
   it("throws when mnemonic generation produces an empty string", async () => {
     mockGenerateMnemonic.mockReturnValue("")
 
-    await expect(selfCustodialCreateWallet("test-account")).rejects.toThrow(
+    await expect(selfCustodialCreateWallet("test-account", "regtest")).rejects.toThrow(
       "Failed to generate mnemonic",
     )
     expect(mockSetMnemonic).not.toHaveBeenCalled()
@@ -179,7 +178,7 @@ describe("selfCustodialCreateWallet", () => {
   it("throws when secure storage refuses to persist the mnemonic", async () => {
     mockSetMnemonic.mockResolvedValueOnce(false)
 
-    await expect(selfCustodialCreateWallet("test-account")).rejects.toThrow(
+    await expect(selfCustodialCreateWallet("test-account", "regtest")).rejects.toThrow(
       "Failed to store mnemonic",
     )
     expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
@@ -199,21 +198,36 @@ describe("selfCustodialRestoreWallet", () => {
   })
 
   it("trims/normalises whitespace before validating the mnemonic", async () => {
-    await selfCustodialRestoreWallet("test-account", "  alpha   beta  gamma  ")
+    await selfCustodialRestoreWallet({
+      accountId: "test-account",
+      mnemonic: "  alpha   beta  gamma  ",
+      network: 1,
+      storageDir: "/test/storage",
+    })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
   })
 
   it("normalises tabs and newlines before validating the mnemonic", async () => {
-    await selfCustodialRestoreWallet("test-account", "\talpha\tbeta\ngamma\r\n")
+    await selfCustodialRestoreWallet({
+      accountId: "test-account",
+      mnemonic: "\talpha\tbeta\ngamma\r\n",
+      network: 1,
+      storageDir: "/test/storage",
+    })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
   })
 
   it("normalises mixed whitespace runs before validating the mnemonic", async () => {
-    await selfCustodialRestoreWallet("test-account", "  alpha\t\tbeta \n gamma  ")
+    await selfCustodialRestoreWallet({
+      accountId: "test-account",
+      mnemonic: "  alpha\t\tbeta \n gamma  ",
+      network: 1,
+      storageDir: "/test/storage",
+    })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
@@ -223,7 +237,12 @@ describe("selfCustodialRestoreWallet", () => {
     mockValidateMnemonic.mockReturnValueOnce(false)
 
     await expect(
-      selfCustodialRestoreWallet("test-account", "totally invalid"),
+      selfCustodialRestoreWallet({
+        accountId: "test-account",
+        mnemonic: "totally invalid",
+        network: 1,
+        storageDir: "/test/storage",
+      }),
     ).rejects.toThrow("Invalid BIP39 mnemonic")
 
     expect(mockSetMnemonic).not.toHaveBeenCalled()
@@ -232,7 +251,12 @@ describe("selfCustodialRestoreWallet", () => {
   })
 
   it("stores the mnemonic and writes the active network label on success", async () => {
-    await selfCustodialRestoreWallet("test-account", "provided mnemonic words")
+    await selfCustodialRestoreWallet({
+      accountId: "test-account",
+      mnemonic: "provided mnemonic words",
+      network: 1,
+      storageDir: "/test/storage",
+    })
 
     expect(mockSetMnemonic).toHaveBeenCalledWith("provided mnemonic words")
     expect(mockSetMnemonicNetwork).toHaveBeenCalledTimes(1)
@@ -244,9 +268,14 @@ describe("selfCustodialRestoreWallet", () => {
   it("throws when secure storage refuses to persist the mnemonic", async () => {
     mockSetMnemonic.mockResolvedValueOnce(false)
 
-    await expect(selfCustodialRestoreWallet("test-account", "any words")).rejects.toThrow(
-      "Failed to store mnemonic",
-    )
+    await expect(
+      selfCustodialRestoreWallet({
+        accountId: "test-account",
+        mnemonic: "any words",
+        network: 1,
+        storageDir: "/test/storage",
+      }),
+    ).rejects.toThrow("Failed to store mnemonic")
     expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
     expect(mockConnect).not.toHaveBeenCalled()
   })
@@ -255,7 +284,12 @@ describe("selfCustodialRestoreWallet", () => {
     mockConnect.mockRejectedValueOnce(new Error("SDK init refused"))
 
     await expect(
-      selfCustodialRestoreWallet("test-account", "any valid words"),
+      selfCustodialRestoreWallet({
+        accountId: "test-account",
+        mnemonic: "any valid words",
+        network: 1,
+        storageDir: "/test/storage",
+      }),
     ).rejects.toThrow("SDK init refused")
 
     expect(mockSetMnemonic).toHaveBeenCalledTimes(1)

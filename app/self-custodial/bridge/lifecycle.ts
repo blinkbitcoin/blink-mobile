@@ -1,4 +1,5 @@
 import {
+  Network,
   Seed,
   connect,
   defaultConfig,
@@ -15,10 +16,10 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import {
   requireSparkTokenIdentifier,
+  sparkNetworkLabelFromNetwork,
+  type SparkNetworkLabel,
   SparkConfig,
-  SparkNetworkLabel,
   SparkToken,
-  storageDirFor,
 } from "../config"
 import { createSdkLogListener } from "../logging"
 import { addSelfCustodialAccountId } from "../storage/account-index"
@@ -36,8 +37,8 @@ const initializeLogging = (() => {
   }
 })()
 
-const createSdkConfig = () => {
-  const config = defaultConfig(SparkConfig.network)
+const createSdkConfig = (network: Network) => {
+  const config = defaultConfig(network)
   config.apiKey = SparkConfig.apiKey
 
   config.stableBalanceConfig = {
@@ -53,10 +54,11 @@ const createSdkConfig = () => {
 export const initSdk = async (
   mnemonic: string,
   storageDir: string,
+  network: Network,
 ): Promise<BreezSdkInterface> => {
   initializeLogging()
   const seed = new Seed.Mnemonic({ mnemonic, passphrase: undefined })
-  const config = createSdkConfig()
+  const config = createSdkConfig(network)
   return connect({ config, seed, storageDir })
 }
 
@@ -72,7 +74,10 @@ export const addSdkEventListener = (
 export const removeSdkEventListener = (sdk: BreezSdkInterface, listenerId: string) =>
   sdk.removeEventListener(listenerId)
 
-export const selfCustodialCreateWallet = async (accountId: string): Promise<void> => {
+export const selfCustodialCreateWallet = async (
+  accountId: string,
+  networkLabel: SparkNetworkLabel,
+): Promise<void> => {
   const mnemonic = generateMnemonic(128, (size: number) =>
     Buffer.from(Crypto.randomBytes(size)),
   )
@@ -81,14 +86,22 @@ export const selfCustodialCreateWallet = async (accountId: string): Promise<void
   const stored = await KeyStoreWrapper.setMnemonicForAccount(accountId, mnemonic)
   if (!stored) throw new Error("Failed to store mnemonic")
 
-  await KeyStoreWrapper.setMnemonicNetworkForAccount(accountId, SparkNetworkLabel)
+  await KeyStoreWrapper.setMnemonicNetworkForAccount(accountId, networkLabel)
   await addSelfCustodialAccountId(accountId)
 }
 
-export const selfCustodialRestoreWallet = async (
-  accountId: string,
-  mnemonic: string,
-): Promise<void> => {
+export const selfCustodialRestoreWallet = async ({
+  accountId,
+  mnemonic,
+  network,
+  storageDir,
+}: {
+  accountId: string
+  mnemonic: string
+  network: Network
+  storageDir: string
+}): Promise<void> => {
+  const networkLabel = sparkNetworkLabelFromNetwork(network)
   const normalized = normalizeMnemonic(mnemonic)
   if (!validateMnemonic(normalized)) {
     throw new Error("Invalid BIP39 mnemonic")
@@ -98,8 +111,8 @@ export const selfCustodialRestoreWallet = async (
   if (!stored) throw new Error("Failed to store mnemonic")
 
   try {
-    await KeyStoreWrapper.setMnemonicNetworkForAccount(accountId, SparkNetworkLabel)
-    const sdk = await initSdk(normalized, storageDirFor(accountId))
+    await KeyStoreWrapper.setMnemonicNetworkForAccount(accountId, networkLabel)
+    const sdk = await initSdk(normalized, storageDir, network)
     await disconnectSdk(sdk)
     await addSelfCustodialAccountId(accountId)
   } catch (err) {

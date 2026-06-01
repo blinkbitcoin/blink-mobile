@@ -8,7 +8,6 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { selfCustodialCreateWallet } from "@app/self-custodial/bridge"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { reportError } from "@app/utils/error-logging"
@@ -25,7 +24,7 @@ type CreationStatus = (typeof CreationStatus)[keyof typeof CreationStatus]
 export const useCreateWallet = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
   const { updateState } = usePersistentStateContext()
-  const { retry: reinitSdk } = useSelfCustodialWallet()
+  const { retry: reinitSdk, selfCustodialBridge } = useSelfCustodialWallet()
   const { reloadSelfCustodialAccounts } = useAccountRegistry()
   const { LL } = useI18nContext()
   const [status, setStatus] = useState<CreationStatus>(CreationStatus.Idle)
@@ -35,8 +34,9 @@ export const useCreateWallet = () => {
     await guard.run(async () => {
       setStatus(CreationStatus.Creating)
       try {
+        if (!selfCustodialBridge) throw new Error("Self-custodial bridge unavailable")
         const accountId = Crypto.randomUUID()
-        await selfCustodialCreateWallet(accountId)
+        await selfCustodialBridge.selfCustodialCreateWallet(accountId)
         await reloadSelfCustodialAccounts()
         reinitSdk()
         updateState((prev) => {
@@ -52,7 +52,15 @@ export const useCreateWallet = () => {
         toastShow({ message: LL.AccountTypeSelectionScreen.createFailed(), LL })
       }
     })
-  }, [guard, navigation, updateState, reinitSdk, reloadSelfCustodialAccounts, LL])
+  }, [
+    guard,
+    navigation,
+    updateState,
+    reinitSdk,
+    reloadSelfCustodialAccounts,
+    LL,
+    selfCustodialBridge,
+  ])
 
   return { status, create }
 }

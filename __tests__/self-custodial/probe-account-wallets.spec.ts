@@ -21,11 +21,6 @@ jest.mock("@app/self-custodial/bridge", () => ({
   disconnectSdk: (...args: unknown[]) => mockDisconnectSdk(...args),
 }))
 
-const mockStorageDirFor = jest.fn((accountId: string) => `/storage/spark/${accountId}`)
-jest.mock("@app/self-custodial/config", () => ({
-  storageDirFor: (accountId: string) => mockStorageDirFor(accountId),
-}))
-
 const mockGetSnapshot = jest.fn()
 jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
   getSelfCustodialWalletSnapshot: (...args: unknown[]) => mockGetSnapshot(...args),
@@ -39,6 +34,15 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 const TEST_ACCOUNT_ID = "account-123"
 const TEST_MNEMONIC = "abandon abandon abandon abandon abandon abandon"
 const FAKE_SDK = { id: "sdk-instance" }
+const fakeBridge = {
+  sparkNetworkLabel: "regtest",
+  initSdk: (...args: unknown[]) => mockInitSdk(...args),
+  validateStoredNetwork: jest.fn(),
+  selfCustodialCreateWallet: jest.fn(),
+  selfCustodialRestoreWallet: jest.fn(),
+  parseSparkAddress: jest.fn(),
+  storageDirForAccount: (accountId: string) => `/storage/spark/${accountId}`,
+} as const
 
 const sampleWallets = [
   {
@@ -63,7 +67,7 @@ describe("probeSelfCustodialAccountWallets", () => {
   it("returns no-mnemonic without initializing the SDK when no mnemonic is stored", async () => {
     mockGetMnemonic.mockResolvedValue(null)
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, fakeBridge)
 
     expect(result).toEqual({ status: ProbeAccountWalletsStatus.NoMnemonic })
     expect(mockInitSdk).not.toHaveBeenCalled()
@@ -79,12 +83,9 @@ describe("probeSelfCustodialAccountWallets", () => {
       rawTransactionCount: 0,
     })
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, fakeBridge)
 
-    expect(mockInitSdk).toHaveBeenCalledWith(
-      TEST_MNEMONIC,
-      `/storage/spark/${TEST_ACCOUNT_ID}`,
-    )
+    expect(mockInitSdk).toHaveBeenCalledWith(TEST_MNEMONIC, TEST_ACCOUNT_ID)
     expect(mockGetSnapshot).toHaveBeenCalledWith(FAKE_SDK)
     expect(result).toEqual({
       status: ProbeAccountWalletsStatus.Ok,
@@ -101,7 +102,7 @@ describe("probeSelfCustodialAccountWallets", () => {
       rawTransactionCount: 0,
     })
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, fakeBridge)
 
     expect(mockDisconnectSdk).toHaveBeenCalledWith(FAKE_SDK)
   })
@@ -111,7 +112,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockRejectedValue(new Error("getInfo failed"))
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, fakeBridge)
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
     if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
@@ -124,7 +125,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockRejectedValue(new Error("connect failed"))
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, fakeBridge)
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
     if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
@@ -138,7 +139,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockRejectedValue("opaque string failure")
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, fakeBridge)
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
     if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
@@ -157,7 +158,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     })
     mockDisconnectSdk.mockRejectedValueOnce(new Error("disconnect failed"))
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, fakeBridge)
 
     expect(result).toEqual({
       status: ProbeAccountWalletsStatus.Ok,
@@ -176,7 +177,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     const disconnectError = new Error("SQLite handle locked")
     mockDisconnectSdk.mockRejectedValueOnce(disconnectError)
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, fakeBridge)
 
     expect(mockRecordError).toHaveBeenCalledWith(disconnectError)
   })
@@ -191,7 +192,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     })
     mockDisconnectSdk.mockRejectedValueOnce("native handle invalid")
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, fakeBridge)
 
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({

@@ -35,7 +35,11 @@ jest.mock("@app/screens/unclaimed-deposits/hooks/use-deposit-actions", () => ({
 
 jest.mock("@app/screens/unclaimed-deposits/utils", () => ({
   openMempoolTx: (...args: unknown[]) => mockOpenMempoolTx(...args),
-  ADDRESS_PLACEHOLDER: "bc1q...",
+  addressPlaceholder: () => "bc1q...",
+}))
+
+jest.mock("@app/hooks", () => ({
+  useAppConfig: () => ({ appConfig: { galoyInstance: { id: "Main" } } }),
 }))
 
 jest.mock("@app/screens/unclaimed-deposits/hooks/use-recommended-fee-tiers", () => {
@@ -234,7 +238,7 @@ describe("UnclaimedDepositsScreen — broader flows", () => {
 
     fireEvent.press(utils.getByText(claimableDeposit.txid))
 
-    expect(mockOpenMempoolTx).toHaveBeenCalledWith(claimableDeposit.txid)
+    expect(mockOpenMempoolTx).toHaveBeenCalledWith(claimableDeposit.txid, "Main")
   })
 
   it("shows the immature copy and hides claim/refund actions for Immature deposits", () => {

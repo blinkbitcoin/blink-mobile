@@ -30,10 +30,6 @@ jest.mock("react-native-quick-crypto", () => ({
   randomUUID: () => "test-account-id-123",
 }))
 
-jest.mock("@app/self-custodial/bridge", () => ({
-  selfCustodialRestoreWallet: (...args: string[]) => mockRestore(...args),
-}))
-
 jest.mock("@app/self-custodial/storage/account-index", () => ({
   findSelfCustodialAccountByMnemonic: (...args: string[]) =>
     mockFindSelfCustodialAccountByMnemonic(...args),
@@ -60,7 +56,12 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
-  useSelfCustodialWallet: () => ({ retry: mockReinitSdk }),
+  useSelfCustodialWallet: () => ({
+    retry: mockReinitSdk,
+    selfCustodialBridge: {
+      selfCustodialRestoreWallet: (...args: string[]) => mockRestore(...args),
+    },
+  }),
 }))
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({

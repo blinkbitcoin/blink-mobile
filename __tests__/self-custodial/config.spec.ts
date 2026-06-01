@@ -18,42 +18,50 @@ describe("SparkConfig", () => {
     return require("@app/self-custodial/config")
   }
 
-  it("defaults to mainnet when BREEZ_NETWORK is not set", () => {
-    const { SparkConfig, SparkNetwork } = loadConfig()
+  it("maps Main instance to mainnet", () => {
+    const { sparkNetworkFromGaloyInstanceId } = loadConfig()
 
-    expect(SparkNetwork).toBe(0)
-    expect(SparkConfig.network).toBe(0)
+    expect(sparkNetworkFromGaloyInstanceId("Main")).toBe(0)
   })
 
-  it("parses regtest network", () => {
-    const { SparkConfig, SparkNetwork } = loadConfig({ BREEZ_NETWORK: "regtest" })
+  it("maps Staging and Local instances to regtest", () => {
+    const { sparkNetworkFromGaloyInstanceId } = loadConfig()
 
-    expect(SparkNetwork).toBe(1)
-    expect(SparkConfig.network).toBe(1)
+    expect(sparkNetworkFromGaloyInstanceId("Staging")).toBe(1)
+    expect(sparkNetworkFromGaloyInstanceId("Local")).toBe(1)
   })
 
-  it("parses mainnet network (case-insensitive)", () => {
-    const { SparkNetwork } = loadConfig({ BREEZ_NETWORK: "Mainnet" })
+  it("maps Custom instance to mainnet default", () => {
+    const { sparkNetworkFromGaloyInstanceId } = loadConfig()
 
-    expect(SparkNetwork).toBe(0)
+    expect(sparkNetworkFromGaloyInstanceId("Custom")).toBe(0)
   })
 
-  it("throws on unknown network", () => {
-    expect(() => loadConfig({ BREEZ_NETWORK: "testnet" })).toThrow(
-      'Unknown BREEZ_NETWORK: "testnet"',
+  it("builds storage dir for mainnet and regtest labels", () => {
+    const { sparkStorageDir } = loadConfig()
+
+    expect(sparkStorageDir("mainnet")).toBe("/test/documents/breez-sdk-spark-mainnet")
+    expect(sparkStorageDir("regtest")).toBe("/test/documents/breez-sdk-spark-regtest")
+  })
+
+  it("scopes account storage dir by network label", () => {
+    const { storageDirFor } = loadConfig()
+
+    expect(storageDirFor("mainnet", "acct-1")).toBe(
+      "/test/documents/breez-sdk-spark-mainnet/acct-1",
+    )
+    expect(storageDirFor("regtest", "acct-2")).toBe(
+      "/test/documents/breez-sdk-spark-regtest/acct-2",
     )
   })
 
-  it("scopes storageDir by network — mainnet", () => {
-    const { SparkConfig } = loadConfig()
+  it("derives network label from galoy instance id", () => {
+    const { sparkNetworkLabelFromGaloyInstanceId } = loadConfig()
 
-    expect(SparkConfig.storageDir).toBe("/test/documents/breez-sdk-spark-mainnet")
-  })
-
-  it("scopes storageDir by network — regtest", () => {
-    const { SparkConfig } = loadConfig({ BREEZ_NETWORK: "regtest" })
-
-    expect(SparkConfig.storageDir).toBe("/test/documents/breez-sdk-spark-regtest")
+    expect(sparkNetworkLabelFromGaloyInstanceId("Main")).toBe("mainnet")
+    expect(sparkNetworkLabelFromGaloyInstanceId("Staging")).toBe("regtest")
+    expect(sparkNetworkLabelFromGaloyInstanceId("Local")).toBe("regtest")
+    expect(sparkNetworkLabelFromGaloyInstanceId("Custom")).toBe("mainnet")
   })
 
   it("reads apiKey from env", () => {
@@ -78,15 +86,10 @@ describe("SparkConfig", () => {
     )
   })
 
-  it("exports SparkNetworkLabel as 'mainnet' for mainnet", () => {
-    const { SparkNetworkLabel } = loadConfig()
+  it("derives network label from spark network enum", () => {
+    const { sparkNetworkLabelFromNetwork } = loadConfig()
 
-    expect(SparkNetworkLabel).toBe("mainnet")
-  })
-
-  it("exports SparkNetworkLabel as 'regtest' for regtest", () => {
-    const { SparkNetworkLabel } = loadConfig({ BREEZ_NETWORK: "regtest" })
-
-    expect(SparkNetworkLabel).toBe("regtest")
+    expect(sparkNetworkLabelFromNetwork(0)).toBe("mainnet")
+    expect(sparkNetworkLabelFromNetwork(1)).toBe("regtest")
   })
 })

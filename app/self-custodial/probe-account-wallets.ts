@@ -4,8 +4,7 @@ import { type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { disconnectSdk, initSdk } from "./bridge"
-import { storageDirFor } from "./config"
+import { disconnectSdk, type SelfCustodialBridge } from "./bridge"
 import { getSelfCustodialWalletSnapshot } from "./providers/wallet-snapshot"
 
 export const ProbeAccountWalletsStatus = {
@@ -34,13 +33,14 @@ const toProbeFailed = (err: unknown): ProbeAccountWalletsResult => ({
  */
 export const probeSelfCustodialAccountWallets = async (
   accountId: string,
+  selfCustodialBridge: SelfCustodialBridge,
 ): Promise<ProbeAccountWalletsResult> => {
   const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
   if (!mnemonic) return { status: ProbeAccountWalletsStatus.NoMnemonic }
 
   let sdk: BreezSdkInterface | undefined
   try {
-    sdk = await initSdk(mnemonic, storageDirFor(accountId))
+    sdk = await selfCustodialBridge.initSdk(mnemonic, accountId)
     const snapshot = await getSelfCustodialWalletSnapshot(sdk)
     return { status: ProbeAccountWalletsStatus.Ok, wallets: snapshot.wallets }
   } catch (err) {

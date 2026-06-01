@@ -11,6 +11,7 @@ import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useFeatureFlags } from "@app/config/feature-flags-context"
+import { useAppConfig } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import {
   AccountType,
@@ -18,7 +19,11 @@ import {
   type ActiveWalletState,
 } from "@app/types/wallet"
 
-import { getLightningAddress } from "../bridge"
+import {
+  createSelfCustodialBridge,
+  getLightningAddress,
+  type SelfCustodialBridge,
+} from "../bridge"
 import { useSdkLifecycle } from "../hooks/use-sdk-lifecycle"
 import { setSelfCustodialLightningAddress } from "../storage/account-index"
 
@@ -53,6 +58,7 @@ type SelfCustodialWalletContextValue = ActiveWalletState & {
   refreshWallets: () => Promise<void>
   refreshStableBalanceActive: () => Promise<void>
   updateCurrentSelfCustodialAccount: () => Promise<void>
+  selfCustodialBridge: SelfCustodialBridge | null
 }
 
 const noop = async () => {}
@@ -71,6 +77,7 @@ const defaultState: SelfCustodialWalletContextValue = {
   refreshWallets: noop,
   refreshStableBalanceActive: noop,
   updateCurrentSelfCustodialAccount: noop,
+  selfCustodialBridge: null,
 }
 
 const SelfCustodialWalletContext =
@@ -80,6 +87,15 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const { activeAccount, reloadSelfCustodialAccounts } = useAccountRegistry()
+  const {
+    appConfig: {
+      galoyInstance: { id: galoyInstanceId },
+    },
+  } = useAppConfig()
+  const selfCustodialBridge = useMemo(
+    () => createSelfCustodialBridge(galoyInstanceId),
+    [galoyInstanceId],
+  )
   const activeSelfCustodialAccountId =
     activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
 
@@ -97,7 +113,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     loadMore,
     refreshWallets,
     refreshStableBalanceActive,
-  } = useSdkLifecycle(activeSelfCustodialAccountId, retryCount)
+  } = useSdkLifecycle(activeSelfCustodialAccountId, selfCustodialBridge, retryCount)
 
   const isStableBalanceActive = stableBalanceEnabled && sdkStableBalanceActive
 
@@ -168,6 +184,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       refreshWallets,
       refreshStableBalanceActive,
       updateCurrentSelfCustodialAccount,
+      selfCustodialBridge,
     }),
     [
       wallets,
@@ -183,6 +200,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       refreshWallets,
       refreshStableBalanceActive,
       updateCurrentSelfCustodialAccount,
+      selfCustodialBridge,
     ],
   )
 

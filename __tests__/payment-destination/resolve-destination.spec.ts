@@ -16,10 +16,6 @@ jest.mock("@app/screens/send-bitcoin-screen/payment-destination/spark", () => ({
   resolveSparkDestination: (...args: unknown[]) => mockResolveSparkDestination(...args),
 }))
 
-jest.mock("@app/self-custodial/bridge", () => ({
-  parseSparkAddress: (...args: unknown[]) => mockParseSparkAddress(...args),
-}))
-
 jest.mock("@app/self-custodial/payment-details/wrap-destination", () => ({
   wrapDestination: (...args: unknown[]) => mockWrapDestination(...args),
 }))
@@ -73,6 +69,7 @@ describe("resolveDestination", () => {
       const result = await resolveDestination(
         { ...baseParams, rawInput: "sp1qabc" },
         fakeSdk,
+        (...args: unknown[]) => mockParseSparkAddress(...args),
       )
 
       expect(mockParseSparkAddress).toHaveBeenCalledWith(fakeSdk, "sp1qabc")
@@ -90,7 +87,9 @@ describe("resolveDestination", () => {
       mockParseDestination.mockResolvedValue(parsed)
       mockWrapDestination.mockReturnValue(wrapped)
 
-      const result = await resolveDestination(baseParams, fakeSdk)
+      const result = await resolveDestination(baseParams, fakeSdk, (...args: unknown[]) =>
+        mockParseSparkAddress(...args),
+      )
 
       expect(mockParseDestination).toHaveBeenCalledWith(baseParams)
       expect(mockWrapDestination).toHaveBeenCalledWith(parsed, fakeSdk)
@@ -103,7 +102,9 @@ describe("resolveDestination", () => {
       mockParseDestination.mockResolvedValue(invalid)
       mockWrapDestination.mockReturnValue(invalid)
 
-      const result = await resolveDestination(baseParams, fakeSdk)
+      const result = await resolveDestination(baseParams, fakeSdk, (...args: unknown[]) =>
+        mockParseSparkAddress(...args),
+      )
 
       expect(mockWrapDestination).toHaveBeenCalledWith(invalid, fakeSdk)
       expect(result).toBe(invalid)

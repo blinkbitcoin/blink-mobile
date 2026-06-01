@@ -7,6 +7,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { CheckboxRow } from "@app/components/checkbox-row"
 import { Screen } from "@app/components/screen"
+import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { DepositStatus } from "@app/types/payment"
@@ -21,7 +22,7 @@ import {
   getFeeRateSatPerVb,
   useRecommendedFeeTiers,
 } from "./hooks/use-recommended-fee-tiers"
-import { ADDRESS_PLACEHOLDER, openMempoolTx } from "./utils"
+import { addressPlaceholder, openMempoolTx } from "./utils"
 
 export const UnclaimedDepositsScreen: React.FC = () => {
   const styles = useStyles()
@@ -30,6 +31,11 @@ export const UnclaimedDepositsScreen: React.FC = () => {
   } = useTheme()
   const { LL, locale } = useI18nContext()
   const { sdk } = useSelfCustodialWallet()
+  const {
+    appConfig: {
+      galoyInstance: { id: galoyInstanceId },
+    },
+  } = useAppConfig()
 
   const { deposits, isBusy, isProcessing, handleClaim, handleRefund, DepositActionType } =
     useDepositActions()
@@ -91,7 +97,10 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                 })}
               </Text>
 
-              <Pressable style={styles.txRow} onPress={() => openMempoolTx(deposit.txid)}>
+              <Pressable
+                style={styles.txRow}
+                onPress={() => openMempoolTx(deposit.txid, galoyInstanceId)}
+              >
                 <Text style={styles.txLink} numberOfLines={1} ellipsizeMode="middle">
                   {deposit.txid}
                 </Text>
@@ -133,7 +142,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                     <View style={styles.fieldInput}>
                       <TextInput
                         style={styles.fieldInputText}
-                        placeholder={ADDRESS_PLACEHOLDER}
+                        placeholder={addressPlaceholder(galoyInstanceId)}
                         placeholderTextColor={colors.grey2}
                         value={refundAddress}
                         onChangeText={setRefundAddress}

@@ -161,7 +161,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial, isReady: isWalletReady } = activeWallet
-  const { sdk } = useSelfCustodialWallet()
+  const { sdk, selfCustodialBridge } = useSelfCustodialWallet()
 
   const [destinationState, dispatchDestinationStateAction] = useReducer(
     sendBitcoinDestinationReducer,
@@ -348,6 +348,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           accountDefaultWalletQuery,
         },
         sdk,
+        selfCustodialBridge?.parseSparkAddress,
       )
       logParseDestinationResult(wrappedDestination)
 
