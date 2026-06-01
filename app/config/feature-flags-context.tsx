@@ -28,6 +28,8 @@ const AutoConvertMaxAttemptsKey = "autoConvertMaxAttempts"
 const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
 const AutoConvertPollIntervalMsKey = "autoConvertPollIntervalMs"
 const AutoConvertAmountMatchToleranceBpsKey = "autoConvertAmountMatchToleranceBps"
+const CustodialSignupBlockedCountriesKey = "custodialSignupBlockedCountries"
+const CustodialFirstSignupBlockedCountriesKey = "custodialFirstSignupBlockedCountries"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -67,11 +69,28 @@ type RemoteConfig = {
   [AutoConvertPollMaxAttemptsKey]: number
   [AutoConvertPollIntervalMsKey]: number
   [AutoConvertAmountMatchToleranceBpsKey]: number
+  [CustodialSignupBlockedCountriesKey]: string[]
+  [CustodialFirstSignupBlockedCountriesKey]: string[]
 }
 
 const defaultReplaceCardDeliveryConfig = {
   standard: { minDays: 7, maxDays: 10, priceUsd: 0 },
   express: { minDays: 1, maxDays: 2, priceUsd: 15 },
+}
+
+// prettier-ignore
+const defaultCustodialBlocks = {
+  blockAnySignup: ["US"],
+  blockFirstSignup: [
+    // OFAC sanctions
+    "CU", "IR", "KP",
+    // Google Play 16329703
+    "AE", "BH", "CA", "CH", "GB", "ID", "IL", "JP", "KR", "PH", "ZA",
+    // Google Play 16329703 (EU-27, MiCA)
+    "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR",
+    "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO",
+    "SE", "SI", "SK",
+  ],
 }
 
 const defaultRemoteConfig: RemoteConfig = {
@@ -97,6 +116,8 @@ const defaultRemoteConfig: RemoteConfig = {
   autoConvertPollMaxAttempts: 30,
   autoConvertPollIntervalMs: 500,
   autoConvertAmountMatchToleranceBps: 500,
+  custodialSignupBlockedCountries: defaultCustodialBlocks.blockAnySignup,
+  custodialFirstSignupBlockedCountries: defaultCustodialBlocks.blockFirstSignup,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -109,6 +130,10 @@ const defaultFeatureFlags: FeatureFlags = {
 remoteConfigInstance().setDefaults({
   ...defaultRemoteConfig,
   replaceCardDeliveryConfig: JSON.stringify(defaultReplaceCardDeliveryConfig),
+  custodialSignupBlockedCountries: JSON.stringify(defaultCustodialBlocks.blockAnySignup),
+  custodialFirstSignupBlockedCountries: JSON.stringify(
+    defaultCustodialBlocks.blockFirstSignup,
+  ),
 })
 
 remoteConfigInstance().setConfigSettings({
@@ -228,6 +253,16 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           ...parsedDeliveryConfig,
         }
 
+        const custodialSignupBlockedCountries = JSON.parse(
+          remoteConfigInstance().getValue(CustodialSignupBlockedCountriesKey).asString(),
+        )
+
+        const custodialFirstSignupBlockedCountries = JSON.parse(
+          remoteConfigInstance()
+            .getValue(CustodialFirstSignupBlockedCountriesKey)
+            .asString(),
+        )
+
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
@@ -251,6 +286,8 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           autoConvertPollMaxAttempts,
           autoConvertPollIntervalMs,
           autoConvertAmountMatchToleranceBps,
+          custodialSignupBlockedCountries,
+          custodialFirstSignupBlockedCountries,
         })
       } catch (err) {
         console.error("Error fetching remote config:", err)
