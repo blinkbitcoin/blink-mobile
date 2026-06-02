@@ -203,6 +203,10 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     ? onchainAmountRowCurrency
     : requestState.receivingWalletDescriptor.currency
 
+  const canToggleWallet = isSelfCustodial
+    ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
+    : !isStablesatsRestricted
+
   return (
     <Screen
       preset="scroll"
@@ -289,12 +293,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           setAmount={handleSetAmount}
           canSetAmount={requestState.canSetAmount}
           onToggleWallet={handleToggleWallet}
-          canToggleWallet={
-            !isStablesatsRestricted &&
-            (isSelfCustodial
-              ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
-              : true)
-          }
+          canToggleWallet={canToggleWallet}
           disabled={
             !isSelfCustodial &&
             carousel.isOnChainPage &&

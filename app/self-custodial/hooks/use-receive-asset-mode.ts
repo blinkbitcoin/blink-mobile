@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
 
@@ -27,11 +26,9 @@ const BITCOIN_ONLY = [ReceiveAssetMode.Bitcoin] as const
 const DOLLAR_ONLY = [ReceiveAssetMode.Dollar] as const
 
 const resolveInitialMode = (
-  isStableBalanceActive: boolean | undefined,
-  defaultCurrency: "BTC" | "USD" | undefined,
-  isStablesatsRestricted: boolean,
+  isStableBalanceActive?: boolean,
+  defaultCurrency?: "BTC" | "USD",
 ): ReceiveAssetMode => {
-  if (isStablesatsRestricted) return ReceiveAssetMode.Bitcoin
   if (isStableBalanceActive) return ReceiveAssetMode.Dollar
   if (defaultCurrency === WalletCurrency.Usd) return ReceiveAssetMode.Dollar
   return ReceiveAssetMode.Bitcoin
@@ -41,30 +38,17 @@ export const useReceiveAssetMode = (): UseReceiveAssetModeResult => {
   const { isStableBalanceActive } = useSelfCustodialWallet()
   const { persistentState } = usePersistentStateContext()
   const defaultCurrency = getSelfCustodialDefaultCurrency(persistentState)
-  const isStablesatsRestricted = useStablesatsRestricted()
 
   const [assetMode, setAssetMode] = useState<ReceiveAssetMode>(
-    resolveInitialMode(
-      isStableBalanceActive === true,
-      defaultCurrency,
-      isStablesatsRestricted,
-    ),
+    resolveInitialMode(isStableBalanceActive === true, defaultCurrency),
   )
 
-  // Re-align to Dollar when stable balance becomes active (but only if not restricted).
+  // Re-align to Dollar when stable balance becomes active.
   useEffect(() => {
-    if (isStablesatsRestricted) return
     if (isStableBalanceActive && assetMode !== ReceiveAssetMode.Dollar) {
       setAssetMode(ReceiveAssetMode.Dollar)
     }
-  }, [isStableBalanceActive, assetMode, isStablesatsRestricted])
-
-  // Re-align to Bitcoin if the restriction becomes active after the initial mount.
-  useEffect(() => {
-    if (isStablesatsRestricted && assetMode !== ReceiveAssetMode.Bitcoin) {
-      setAssetMode(ReceiveAssetMode.Bitcoin)
-    }
-  }, [isStablesatsRestricted, assetMode])
+  }, [isStableBalanceActive, assetMode])
 
   const availableModesForRail = useCallback(
     (rail: ReceiveRail): readonly ReceiveAssetMode[] => {

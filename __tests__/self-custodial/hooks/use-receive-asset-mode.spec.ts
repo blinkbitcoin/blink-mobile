@@ -1,8 +1,9 @@
 import { act, renderHook } from "@testing-library/react-native"
 
+import { useReceiveAssetMode } from "@app/self-custodial/hooks/use-receive-asset-mode"
+
 const mockSelfCustodialWallet = jest.fn()
 const mockPersistentState = jest.fn()
-const mockUseStablesatsRestricted = jest.fn()
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockSelfCustodialWallet(),
@@ -15,17 +16,10 @@ jest.mock("@app/store/persistent-state", () => ({
   }),
 }))
 
-jest.mock("@app/hooks/use-stablesats-restricted", () => ({
-  useStablesatsRestricted: () => mockUseStablesatsRestricted(),
-}))
-
-import { useReceiveAssetMode } from "@app/self-custodial/hooks/use-receive-asset-mode"
-
 describe("useReceiveAssetMode", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockPersistentState.mockReturnValue({})
-    mockUseStablesatsRestricted.mockReturnValue(false)
   })
 
   describe("initial state", () => {
@@ -203,65 +197,6 @@ describe("useReceiveAssetMode", () => {
         "bitcoin",
         "dollar",
       ])
-    })
-  })
-
-  describe("stablesats restriction", () => {
-    it("forces Bitcoin initial mode when restricted even with stable balance active", () => {
-      mockUseStablesatsRestricted.mockReturnValue(true)
-      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: true })
-
-      const { result } = renderHook(() => useReceiveAssetMode())
-
-      expect(result.current.assetMode).toBe("bitcoin")
-    })
-
-    it("forces Bitcoin initial mode when restricted with USD default preference", () => {
-      mockUseStablesatsRestricted.mockReturnValue(true)
-      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
-      mockPersistentState.mockReturnValue({
-        activeAccountId: "self-custodial-id",
-        selfCustodialDefaultWalletCurrencyByAccountId: { "self-custodial-id": "USD" },
-      })
-
-      const { result } = renderHook(() => useReceiveAssetMode())
-
-      expect(result.current.assetMode).toBe("bitcoin")
-    })
-
-    it("does not re-align to Dollar mid-session when restricted, even if stable balance turns on", () => {
-      mockUseStablesatsRestricted.mockReturnValue(true)
-      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: false })
-      const { result, rerender } = renderHook(() => useReceiveAssetMode())
-
-      expect(result.current.assetMode).toBe("bitcoin")
-
-      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: true })
-      rerender({})
-
-      expect(result.current.assetMode).toBe("bitcoin")
-    })
-
-    it("snaps Dollar back to Bitcoin when restriction becomes true after mount", () => {
-      mockUseStablesatsRestricted.mockReturnValue(false)
-      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: true })
-      const { result, rerender } = renderHook(() => useReceiveAssetMode())
-
-      expect(result.current.assetMode).toBe("dollar")
-
-      mockUseStablesatsRestricted.mockReturnValue(true)
-      rerender({})
-
-      expect(result.current.assetMode).toBe("bitcoin")
-    })
-
-    it("preserves existing non-restricted behavior when restriction is false", () => {
-      mockUseStablesatsRestricted.mockReturnValue(false)
-      mockSelfCustodialWallet.mockReturnValue({ isStableBalanceActive: true })
-
-      const { result } = renderHook(() => useReceiveAssetMode())
-
-      expect(result.current.assetMode).toBe("dollar")
     })
   })
 })
