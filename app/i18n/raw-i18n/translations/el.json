@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Το Stablesats δεν είναι διαθέσιμο στη χώρα σου",
-    "modalTitleSelfCustodial": "Τα stablecoins δεν είναι διαθέσιμα στη χώρα σου",
-    "modalBody": "Λόγω ρυθμιστικής αβεβαιότητας, δεν μπορούμε να προσφέρουμε αυτή τη λειτουργία στη χώρα σου."
+    "modalBody": "Για να αποκτήσετε πρόσβαση σε λογαριασμό δολαρίων, δημιουργήστε έναν non-custodial λογαριασμό.",
+    "createNew": "Δημιουργία νέου"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Έλεγχος ταυτότητας δύο παραγόντων",
@@ -2762,7 +2762,6 @@
     "note": "Σημείωση",
     "notification": "Ειδοποίηση",
     "ok": "Εντάξει",
-    "okay": "Εντάξει",
     "or": "ή",
     "openWallet": "Ανοίξτε το Πορτοφόλι",
     "onchain": "On-chain",

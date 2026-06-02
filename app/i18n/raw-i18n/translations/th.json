@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats ไม่พร้อมใช้งานในประเทศของคุณ",
-    "modalTitleSelfCustodial": "Stablecoin ไม่พร้อมใช้งานในประเทศของคุณ",
-    "modalBody": "เนื่องจากความไม่แน่นอนของกฎระเบียบ เราจึงไม่สามารถให้บริการฟีเจอร์นี้ในประเทศของคุณได้"
+    "modalBody": "หากต้องการเข้าถึงบัญชีดอลลาร์ ให้สร้างบัญชีแบบ non-custodial",
+    "createNew": "สร้างใหม่"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -2762,7 +2762,6 @@
     "note": "โน้ต",
     "notification": "การแจ้งเตือน",
     "ok": "ตกลง",
-    "okay": "ตกลง",
     "or": "or",
     "openWallet": "เปิดกระเป๋า",
     "onchain": "Onchain",

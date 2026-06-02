@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats teriiwo mu nsi yo",
-    "modalTitleSelfCustodial": "Stablecoin teziriiwo mu nsi yo",
-    "modalBody": "Olw'okutali kakasa mu by'amateeka, tetuyinza kuwaayo mulimu guno mu nsi yo."
+    "modalBody": "Okusobola okufuna akawunti ya doola, kola akawunti etali ya kuterekebwa.",
+    "createNew": "Kola eppya"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Okukakasa emirundi ebiri",
@@ -2762,7 +2762,6 @@
     "note": "Ebbaluwa",
     "notification": "Ekilango",
     "ok": "kale",
-    "okay": "Kale",
     "or": "oba",
     "openWallet": "Waleti Enzigule",
     "onchain": "Ku lujegere",

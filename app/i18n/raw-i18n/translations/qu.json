@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats mana kapunchu llaqtaykipi",
-    "modalTitleSelfCustodial": "Stablecoin mana kapunchu llaqtaykipi",
-    "modalBody": "Kamachiq mana sut'i kasqanrayku, mana atinikuchu kay ruwayta haywayta llaqtaykipi."
+    "modalBody": "Dólar cuentaman yaykunaykipaq, mana waqaychaq cuentata kamariy.",
+    "createNew": "Musuq kamariy"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -2762,7 +2762,6 @@
     "note": "Willana",
     "notification": "Willanakuy",
     "ok": "Ay",
-    "okay": "Allinmi",
     "or": "or",
     "openWallet": "Qipi qillqayniy",
     "onchain": "Onchain",

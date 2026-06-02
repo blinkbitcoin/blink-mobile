@@ -2458,8 +2458,8 @@
     },
     "StablesatsRestriction": {
         "modalTitle": "あなたの国ではStablesatsをご利用いただけません",
-        "modalTitleSelfCustodial": "あなたの国ではstablecoinをご利用いただけません",
-        "modalBody": "規制上の不確実性により、あなたの国ではこの機能を提供できません。"
+        "modalBody": "ドル口座にアクセスするには、ノンカストディアル口座を作成してください。",
+        "createNew": "新規作成"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "2要素認証（2FA）",
@@ -2762,7 +2762,6 @@
         "note": "メモ",
         "notification": "通知",
         "ok": "OK",
-        "okay": "了解",
         "or": "または",
         "openWallet": "ウォレットを開く",
         "onchain": "オンチェーン",

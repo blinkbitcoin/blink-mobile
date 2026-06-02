@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats tidak tersedia di negara Anda",
-    "modalTitleSelfCustodial": "Stablecoin tidak tersedia di negara Anda",
-    "modalBody": "Karena ketidakpastian regulasi, kami tidak dapat menawarkan fitur ini di negara Anda."
+    "modalBody": "Untuk mengakses akun dolar, buat akun non-custodial.",
+    "createNew": "Buat baru"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Otentikasi dua faktor",
@@ -2762,7 +2762,6 @@
     "note": "Catatan",
     "notification": "Notifikasi",
     "ok": "OK",
-    "okay": "Oke",
     "or": "atau",
     "openWallet": "Buka Dompet",
     "onchain": "Onchain",

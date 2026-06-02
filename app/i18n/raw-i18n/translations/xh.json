@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "I-Stablesats ayifumaneki kwilizwe lakho",
-    "modalTitleSelfCustodial": "Ii-stablecoin azifumaneki kwilizwe lakho",
-    "modalBody": "Ngenxa yokungaqiniseki kommiselo, asikwazi ukunika lo msebenzi kwilizwe lakho."
+    "modalBody": "Ukufumana ifikelelo kwiakhawunti yedola, yenza iakhawunti engenagunya.",
+    "createNew": "Yenza entsha"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Uqinisekiso lwezinto ezimbini",
@@ -2762,7 +2762,6 @@
     "note": "Note",
     "notification": "Notification",
     "ok": "KULUNGILE",
-    "okay": "Kulungile",
     "or": "okanye",
     "openWallet": "Open Wallet",
     "onchain": "Onchain",

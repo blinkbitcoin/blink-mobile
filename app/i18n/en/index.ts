@@ -2594,9 +2594,8 @@ const en: BaseTranslation = {
   },
   StablesatsRestriction: {
     modalTitle: "Stablesats is not available in your country",
-    modalTitleSelfCustodial: "Stablecoins are not available in your country",
-    modalBody:
-      "Due to regulatory uncertainty, we cannot offer this feature in your country.",
+    modalBody: "To get access to a dollar account, create a non-custodial account.",
+    createNew: "Create new",
   },
   SplashScreen: {
     update:
@@ -2883,7 +2882,6 @@ const en: BaseTranslation = {
     note: "Note",
     notification: "Notification",
     ok: "OK",
-    okay: "Okay",
     or: "or",
     openWallet: "Open Wallet",
     onchain: "Onchain",

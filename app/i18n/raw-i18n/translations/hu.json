@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "A Stablesats nem érhető el az országodban",
-    "modalTitleSelfCustodial": "A stablecoinok nem érhetők el az országodban",
-    "modalBody": "A szabályozási bizonytalanság miatt nem tudjuk biztosítani ezt a funkciót az országodban."
+    "modalBody": "A dollárszámlához való hozzáféréshez hozz létre egy nem letétkezelői fiókot.",
+    "createNew": "Új létrehozása"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Kétlépcsős azonosítás",
@@ -2762,7 +2762,6 @@
     "note": "Megjegyzés",
     "notification": "Értesítés",
     "ok": "OK",
-    "okay": "Rendben",
     "or": "vagy",
     "openWallet": "Pénztárca megnyitása",
     "onchain": "Onchain",

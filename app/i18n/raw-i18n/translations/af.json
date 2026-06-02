@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats is nie beskikbaar in jou land nie",
-    "modalTitleSelfCustodial": "Stablecoins is nie beskikbaar in jou land nie",
-    "modalBody": "Weens regulatoriese onsekerheid kan ons hierdie funksie nie in jou land aanbied nie."
+    "modalBody": "Om toegang tot 'n dollar-rekening te kry, skep 'n nie-bewaarende rekening.",
+    "createNew": "Skep nuwe"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Twee-faktor-verifikasie",
@@ -2762,7 +2762,6 @@
     "note": "Nota",
     "notification": "Kennisgewing",
     "ok": "OK",
-    "okay": "Goed",
     "or": "of",
     "openWallet": "Maak beursie oop",
     "onchain": "Onchain",

@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats er ikke tilgængelig i dit land",
-    "modalTitleSelfCustodial": "Stablecoins er ikke tilgængelige i dit land",
-    "modalBody": "På grund af reguleringsmæssig usikkerhed kan vi ikke tilbyde denne funktion i dit land."
+    "modalBody": "For at få adgang til en dollarkonto skal du oprette en non-custodial konto.",
+    "createNew": "Opret ny"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "To-faktor godkendelse",
@@ -2762,7 +2762,6 @@
     "note": "Note",
     "notification": "Notifikation",
     "ok": "OK",
-    "okay": "Okay",
     "or": "eller",
     "openWallet": "Åben Tegnebog",
     "onchain": "Onchain",

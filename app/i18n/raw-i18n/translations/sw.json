@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats haipatikani katika nchi yako",
-    "modalTitleSelfCustodial": "Stablecoin hazipatikani katika nchi yako",
-    "modalBody": "Kutokana na kutokuwa na uhakika wa udhibiti, hatuwezi kutoa kipengele hiki katika nchi yako."
+    "modalBody": "Ili kufikia akaunti ya dola, unda akaunti isiyo ya ulinzi.",
+    "createNew": "Unda mpya"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "uthibitishaji wa hatua mbili",
@@ -2762,7 +2762,6 @@
     "note": "Dokezo",
     "notification": "Taarifa",
     "ok": "Sawa",
-    "okay": "Sawa",
     "or": "au",
     "openWallet": "Fungua pochi",
     "onchain": "Onchain",

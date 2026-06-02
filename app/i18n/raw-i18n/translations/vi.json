@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats không khả dụng tại quốc gia của bạn",
-    "modalTitleSelfCustodial": "Stablecoin không khả dụng tại quốc gia của bạn",
-    "modalBody": "Do tính không chắc chắn về quy định, chúng tôi không thể cung cấp tính năng này tại quốc gia của bạn."
+    "modalBody": "Để truy cập tài khoản đô la, hãy tạo tài khoản không lưu ký.",
+    "createNew": "Tạo mới"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -2762,7 +2762,6 @@
     "note": "Ghi chú",
     "notification": "Thông báo",
     "ok": "OK",
-    "okay": "Đồng ý",
     "or": "or",
     "openWallet": "Mở ví",
     "onchain": "Trên chuỗi",

@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats tidak tersedia di negara anda",
-    "modalTitleSelfCustodial": "Stablecoin tidak tersedia di negara anda",
-    "modalBody": "Disebabkan ketidakpastian peraturan, kami tidak dapat menawarkan ciri ini di negara anda."
+    "modalBody": "Untuk mengakses akaun dolar, cipta akaun bukan kustodian.",
+    "createNew": "Cipta baharu"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Pengesahan dua kali",
@@ -2762,7 +2762,6 @@
     "note": "Nota",
     "notification": "Pemberitahuan",
     "ok": "Baiklah",
-    "okay": "Okey",
     "or": "atau",
     "openWallet": "Buka Dompet",
     "onchain": "Onchain",

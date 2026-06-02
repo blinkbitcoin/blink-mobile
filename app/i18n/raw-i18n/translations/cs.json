@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats není ve vaší zemi k dispozici",
-    "modalTitleSelfCustodial": "Stablecoiny nejsou ve vaší zemi k dispozici",
-    "modalBody": "Vzhledem k regulační nejistotě nemůžeme tuto funkci ve vaší zemi nabídnout."
+    "modalBody": "Pro přístup k dolarovému účtu si vytvořte ne-custodial účet.",
+    "createNew": "Vytvořit nový"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvoufaktorové ověření",
@@ -2762,7 +2762,6 @@
     "note": "Poznámka",
     "notification": "Upozornění",
     "ok": "OK",
-    "okay": "Dobře",
     "or": "nebo",
     "openWallet": "Otevřít peněženku",
     "onchain": "Onchain",

@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats is niet beschikbaar in jouw land",
-    "modalTitleSelfCustodial": "Stablecoins zijn niet beschikbaar in jouw land",
-    "modalBody": "Vanwege regelgevende onzekerheid kunnen we deze functie niet aanbieden in jouw land."
+    "modalBody": "Maak een non-custodial account aan om toegang te krijgen tot een dollar-account.",
+    "createNew": "Nieuw aanmaken"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Tweefactorauthenticatie",
@@ -2762,7 +2762,6 @@
     "note": "Noot",
     "notification": "Melding",
     "ok": "OK",
-    "okay": "Oké",
     "or": "of",
     "openWallet": "Open Wallet",
     "onchain": "Onchain",

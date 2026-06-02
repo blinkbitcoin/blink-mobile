@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats غير متاح في بلدك",
-    "modalTitleSelfCustodial": "العملات المستقرة غير متاحة في بلدك",
-    "modalBody": "نظراً لعدم اليقين التنظيمي، لا يمكننا تقديم هذه الميزة في بلدك."
+    "modalBody": "للوصول إلى حساب الدولار، أنشئ حسابًا غير حافظ.",
+    "createNew": "إنشاء جديد"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -2762,7 +2762,6 @@
     "note": "ملاحظة ",
     "notification": "إشعار",
     "ok": "كل شيء على مايرام 👍",
-    "okay": "حسناً",
     "or": "or",
     "openWallet": "افتح المحفظة",
     "onchain": "على السلسلة",

@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats-ը հասանելի չէ ձեր երկրում",
-    "modalTitleSelfCustodial": "Stablecoin-ները հասանելի չեն ձեր երկրում",
-    "modalBody": "Կարգավորիչ անորոշության պատճառով մենք չենք կարող առաջարկել այս հնարավորությունը ձեր երկրում։"
+    "modalBody": "Դոլարային հաշվին մուտք գործելու համար ստեղծեք ոչ-պահառու հաշիվ.",
+    "createNew": "Ստեղծել նոր"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Երկգործոն նույնականացում",
@@ -2762,7 +2762,6 @@
     "note": "Նշում",
     "notification": "Ծանուցում",
     "ok": "OK ",
-    "okay": "Լավ",
     "or": "կամ",
     "openWallet": "Բաց դրամապանակ",
     "onchain": "Onchain",

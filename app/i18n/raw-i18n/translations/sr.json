@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats није доступан у вашој земљи",
-    "modalTitleSelfCustodial": "Stablecoinи нису доступни у вашој земљи",
-    "modalBody": "Због регулаторне неизвесности не можемо да понудимо ову функцију у вашој земљи."
+    "modalBody": "За приступ долар налогу, креирајте не-кастодијални налог.",
+    "createNew": "Креирај нови"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -2762,7 +2762,6 @@
     "note": "Белешка",
     "notification": "Нотификација",
     "ok": "ОК",
-    "okay": "У реду",
     "or": "or",
     "openWallet": "Отвори новчаник",
     "onchain": "На блокчејну",

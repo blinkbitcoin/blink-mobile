@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats nie je vo vašej krajine k dispozícii",
-    "modalTitleSelfCustodial": "Stablecoiny nie sú vo vašej krajine k dispozícii",
-    "modalBody": "Kvôli regulačnej neistote nemôžeme túto funkciu vo vašej krajine ponúknuť."
+    "modalBody": "Ak chcete získať prístup k dolárovému účtu, vytvorte ne-úschovný účet.",
+    "createNew": "Vytvoriť nový"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvojfaktorové overenie",
@@ -2762,7 +2762,6 @@
     "note": "Poznámka",
     "notification": "Upozornenie",
     "ok": "OK",
-    "okay": "Dobre",
     "or": "alebo",
     "openWallet": "Otvoriť peňaženku",
     "onchain": "Onchain",

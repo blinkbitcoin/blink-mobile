@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats ülkenizde kullanılamıyor",
-    "modalTitleSelfCustodial": "Stablecoinler ülkenizde kullanılamıyor",
-    "modalBody": "Düzenleyici belirsizlik nedeniyle bu özelliği ülkenizde sunamıyoruz."
+    "modalBody": "Dolar hesabına erişmek için saklamasız bir hesap oluşturun.",
+    "createNew": "Yeni oluştur"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "İki aşamalı doğrulama",
@@ -2762,7 +2762,6 @@
     "note": "Not",
     "notification": "Bildirim",
     "ok": "Tamam",
-    "okay": "Tamam",
     "or": "ya da",
     "openWallet": "Cüzdanı aç",
     "onchain": "Onchain",

@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats no està disponible al teu país",
-    "modalTitleSelfCustodial": "Les stablecoins no estan disponibles al teu país",
-    "modalBody": "A causa de la incertesa reguladora, no podem oferir aquesta funció al teu país."
+    "modalBody": "Per accedir a un compte en dòlars, crea un compte no custodial.",
+    "createNew": "Crea nou"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificació de dos factors",
@@ -2762,7 +2762,6 @@
     "note": "Nota",
     "notification": "Notificació",
     "ok": "D'acord",
-    "okay": "D’acord",
     "or": "o",
     "openWallet": "Obrir el moneder",
     "onchain": "Onchain",

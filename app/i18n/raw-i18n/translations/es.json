@@ -2458,8 +2458,8 @@
     },
     "StablesatsRestriction": {
         "modalTitle": "Stablesats no está disponible en tu país",
-        "modalTitleSelfCustodial": "Las stablecoins no están disponibles en tu país",
-        "modalBody": "Debido a la incertidumbre regulatoria, no podemos ofrecer esta función en tu país."
+        "modalBody": "Para acceder a una cuenta en dólares, crea una cuenta no custodial.",
+        "createNew": "Crear nueva"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticación de dos factores",
@@ -2761,7 +2761,6 @@
         "note": "Nota ",
         "notification": "Notificación",
         "ok": "OK",
-        "okay": "Aceptar",
         "or": "o",
         "openWallet": "Abrir billetera",
         "onchain": "Onchain",

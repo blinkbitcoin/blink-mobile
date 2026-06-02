@@ -2458,8 +2458,8 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats nu este disponibil în țara ta",
-    "modalTitleSelfCustodial": "Stablecoin-urile nu sunt disponibile în țara ta",
-    "modalBody": "Din cauza incertitudinii reglementare, nu putem oferi această funcție în țara ta."
+    "modalBody": "Pentru a accesa un cont în dolari, creează un cont non-custodial.",
+    "createNew": "Crează cont nou"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificare cu doi factori",
@@ -2762,7 +2762,6 @@
     "note": "Notă",
     "notification": "Notificare",
     "ok": "OK",
-    "okay": "În regulă",
     "or": "sau",
     "openWallet": "Deschideți portofelul",
     "onchain": "Onchain",

@@ -8141,13 +8141,13 @@ type RootTranslation = {
 		 */
 		modalTitle: string
 		/**
-		 * S​t​a​b​l​e​c​o​i​n​s​ ​a​r​e​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​c​o​u​n​t​r​y
-		 */
-		modalTitleSelfCustodial: string
-		/**
-		 * D​u​e​ ​t​o​ ​r​e​g​u​l​a​t​o​r​y​ ​u​n​c​e​r​t​a​i​n​t​y​,​ ​w​e​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​t​h​i​s​ ​f​e​a​t​u​r​e​ ​i​n​ ​y​o​u​r​ ​c​o​u​n​t​r​y​.
+		 * T​o​ ​g​e​t​ ​a​c​c​e​s​s​ ​t​o​ ​a​ ​d​o​l​l​a​r​ ​a​c​c​o​u​n​t​,​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
 		 */
 		modalBody: string
+		/**
+		 * C​r​e​a​t​e​ ​n​e​w
+		 */
+		createNew: string
 	}
 	SplashScreen: {
 		/**
@@ -9097,10 +9097,6 @@ type RootTranslation = {
 		 * O​K
 		 */
 		ok: string
-		/**
-		 * O​k​a​y
-		 */
-		okay: string
 		/**
 		 * o​r
 		 */
@@ -20386,13 +20382,13 @@ export type TranslationFunctions = {
 		 */
 		modalTitle: () => LocalizedString
 		/**
-		 * Stablecoins are not available in your country
-		 */
-		modalTitleSelfCustodial: () => LocalizedString
-		/**
-		 * Due to regulatory uncertainty, we cannot offer this feature in your country.
+		 * To get access to a dollar account, create a non-custodial account.
 		 */
 		modalBody: () => LocalizedString
+		/**
+		 * Create new
+		 */
+		createNew: () => LocalizedString
 	}
 	SplashScreen: {
 		/**
@@ -21321,10 +21317,6 @@ export type TranslationFunctions = {
 		 * OK
 		 */
 		ok: () => LocalizedString
-		/**
-		 * Okay
-		 */
-		okay: () => LocalizedString
 		/**
 		 * or
 		 */
