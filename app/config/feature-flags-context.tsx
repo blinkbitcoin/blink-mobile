@@ -5,6 +5,11 @@ import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
+import {
+  getRemoteConfigList,
+  getRemoteConfigObject,
+  serializeRemoteConfigDefault,
+} from "@app/utils/remote-config"
 
 const DeviceAccountEnabledKey = "deviceAccountEnabledRestAuth"
 const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
@@ -129,9 +134,13 @@ const defaultFeatureFlags: FeatureFlags = {
 
 remoteConfigInstance().setDefaults({
   ...defaultRemoteConfig,
-  replaceCardDeliveryConfig: JSON.stringify(defaultReplaceCardDeliveryConfig),
-  custodialSignupBlockedCountries: JSON.stringify(defaultCustodialBlocks.blockAnySignup),
-  custodialFirstSignupBlockedCountries: JSON.stringify(
+  replaceCardDeliveryConfig: serializeRemoteConfigDefault(
+    defaultReplaceCardDeliveryConfig,
+  ),
+  custodialSignupBlockedCountries: serializeRemoteConfigDefault(
+    defaultCustodialBlocks.blockAnySignup,
+  ),
+  custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
     defaultCustodialBlocks.blockFirstSignup,
   ),
 })
@@ -245,22 +254,23 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(AutoConvertAmountMatchToleranceBpsKey)
           .asNumber()
 
-        const parsedDeliveryConfig = JSON.parse(
-          remoteConfigInstance().getValue(ReplaceCardDeliveryConfigKey).asString(),
+        const parsedDeliveryConfig = getRemoteConfigObject<ReplaceCardDeliveryConfig>(
+          ReplaceCardDeliveryConfigKey,
+          {},
         )
         const replaceCardDeliveryConfig: ReplaceCardDeliveryConfig = {
           ...defaultReplaceCardDeliveryConfig,
           ...parsedDeliveryConfig,
         }
 
-        const custodialSignupBlockedCountries = JSON.parse(
-          remoteConfigInstance().getValue(CustodialSignupBlockedCountriesKey).asString(),
+        const custodialSignupBlockedCountries = getRemoteConfigList<string>(
+          CustodialSignupBlockedCountriesKey,
+          defaultCustodialBlocks.blockAnySignup,
         )
 
-        const custodialFirstSignupBlockedCountries = JSON.parse(
-          remoteConfigInstance()
-            .getValue(CustodialFirstSignupBlockedCountriesKey)
-            .asString(),
+        const custodialFirstSignupBlockedCountries = getRemoteConfigList<string>(
+          CustodialFirstSignupBlockedCountriesKey,
+          defaultCustodialBlocks.blockFirstSignup,
         )
 
         setRemoteConfig({
