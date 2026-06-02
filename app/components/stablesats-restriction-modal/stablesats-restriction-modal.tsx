@@ -1,9 +1,12 @@
 import * as React from "react"
 import { Text } from "react-native"
 
+import { useNavigation } from "@react-navigation/native"
+import { StackNavigationProp } from "@react-navigation/stack"
+
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import CustomModal from "../custom-modal/custom-modal"
@@ -22,22 +25,25 @@ export const StablesatsRestrictionModal: React.FC<Props> = ({
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
-  const { isSelfCustodial } = useActiveWallet()
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
 
-  const title = isSelfCustodial
-    ? LL.StablesatsRestriction.modalTitleSelfCustodial()
-    : LL.StablesatsRestriction.modalTitle()
+  const handleCreateNew = () => {
+    toggleModal()
+    navigation.navigate("getStarted")
+  }
 
   return (
     <CustomModal
       isVisible={isVisible}
       toggleModal={toggleModal}
-      image={<GaloyIcon name="info" size={100} color={colors.primary3} />}
-      title={title}
+      image={<GaloyIcon name="info" size={80} color={colors.primary3} />}
+      title={LL.StablesatsRestriction.modalTitle()}
       titleMaxWidth="100%"
       body={<Text style={styles.body}>{LL.StablesatsRestriction.modalBody()}</Text>}
-      primaryButtonTitle={LL.common.okay()}
-      primaryButtonOnPress={toggleModal}
+      primaryButtonTitle={LL.StablesatsRestriction.createNew()}
+      primaryButtonOnPress={handleCreateNew}
+      secondaryButtonTitle={LL.common.close()}
+      secondaryButtonOnPress={toggleModal}
       showCloseIconButton={true}
     />
   )
