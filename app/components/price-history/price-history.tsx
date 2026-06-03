@@ -145,11 +145,9 @@ export const PriceHistory = () => {
   return (
     <View style={styles.screen}>
       <View {...testProps(LL.PriceHistoryScreen.satPrice())} style={styles.textView}>
-        <AnimText
-          // @ts-ignore-next-line
+        <AnimatedText
           text={activePrice}
-          style={styles.priceText}
-          color={colors.black}
+          style={[styles.priceText, { color: colors.black }]}
         />
         <View style={styles.subtextContainer}>
           {!isActive && !loading ? (
@@ -160,11 +158,9 @@ export const PriceHistory = () => {
               {label()}
             </Text>
           ) : (
-            <AnimText
-              // @ts-ignore-next-line
+            <AnimatedText
               text={activeTimestamp}
-              style={styles.subtext}
-              color={colors.black}
+              style={[styles.subtext, { color: colors.black }]}
             />
           )}
         </View>
@@ -258,7 +254,7 @@ type AnimatedTextProps = Omit<TextInputProps, "editable" | "value"> & {
   style?: React.ComponentProps<typeof AnimText>["style"]
 }
 
-export function AnimatedText({ text, ...rest }: AnimatedTextProps) {
+function AnimatedText({ text, ...rest }: AnimatedTextProps) {
   const animProps = useAnimatedProps(() => {
     return {
       text: text.value,

@@ -31,7 +31,6 @@ import {
   type PendingAutoConvert,
   type WaitForPaymentOptions,
 } from "../auto-convert"
-import { syncSelfCustodialWallet } from "../bridge"
 import { useAutoConvertStatusActions } from "../providers/auto-convert-status"
 import { useSelfCustodialWallet } from "../providers/wallet"
 
@@ -105,12 +104,6 @@ type RunAutoConvertParams = {
   onConverted?: () => void
 }
 
-const triggerBackgroundSync = (sdk: BreezSdkInterface): void => {
-  syncSelfCustodialWallet(sdk).catch((err) => {
-    reportError("auto-convert-listener syncWallet", err)
-  })
-}
-
 const runAutoConvert = async ({
   sdk,
   record,
@@ -137,11 +130,6 @@ const runAutoConvert = async ({
 
   onConverting?.(record.paymentRequest)
   try {
-    // Run sync in parallel with the bounded poll: by the time
-    // `waitForPaymentCompleted` resolves, the SDK has typically materialized
-    // the just-received token balance.
-    triggerBackgroundSync(sdk)
-
     const settled = await waitForPaymentCompleted(sdk, paymentId, waitOptions)
     if (!settled) return
 

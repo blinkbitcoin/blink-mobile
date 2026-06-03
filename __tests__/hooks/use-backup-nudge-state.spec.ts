@@ -47,10 +47,12 @@ const defaultBackupState = { backupState: { status: "none", method: null } }
 const completedBackupState = { backupState: { status: "completed", method: "manual" } }
 const selfCustodialWallet = {
   accountType: "self-custodial",
+  isReady: true,
   wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 3000 } }],
 }
 const custodialWallet = {
   accountType: "custodial",
+  isReady: true,
   wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 50000 } }],
 }
 const defaultConfig = {
@@ -100,6 +102,7 @@ describe("useBackupNudgeState", () => {
   it("shows modal when balance >= modal threshold", async () => {
     mockActiveWallet.mockReturnValue({
       accountType: "self-custodial",
+      isReady: true,
       wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 22000 } }],
     })
 
@@ -187,6 +190,7 @@ describe("useBackupNudgeState", () => {
 
     mockActiveWallet.mockReturnValue({
       accountType: "self-custodial",
+      isReady: true,
       wallets: [
         { id: "btc-1", walletCurrency: "BTC", balance: { amount: btcAmount } },
         { id: "usd-1", walletCurrency: "USD", balance: { amount: usdCentsAmount } },
@@ -209,6 +213,7 @@ describe("useBackupNudgeState", () => {
 
     mockActiveWallet.mockReturnValue({
       accountType: "self-custodial",
+      isReady: true,
       wallets: [
         { id: "btc-1", walletCurrency: "BTC", balance: { amount: btcAmount } },
         { id: "usd-1", walletCurrency: "USD", balance: { amount: usdCentsAmount } },
@@ -220,5 +225,20 @@ describe("useBackupNudgeState", () => {
     await act(async () => {})
 
     expect(result.current.shouldShowModal).toBe(true)
+  })
+
+  it("hides banner and modal while the active wallet is not ready (account switch in flight)", async () => {
+    mockActiveWallet.mockReturnValue({
+      accountType: "self-custodial",
+      isReady: false,
+      wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: { amount: 22000 } }],
+    })
+
+    const { result } = renderHook(() => useBackupNudgeState())
+
+    await act(async () => {})
+
+    expect(result.current.shouldShowBanner).toBe(false)
+    expect(result.current.shouldShowModal).toBe(false)
   })
 })

@@ -8,9 +8,12 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 const mockLinkingOpenURL = jest.fn()
 jest.mock("react-native/Libraries/Linking/Linking", () => ({
-  openURL: (...args: unknown[]) => mockLinkingOpenURL(...args),
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn(),
+  __esModule: true,
+  default: {
+    openURL: (...args: unknown[]) => mockLinkingOpenURL(...args),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  },
 }))
 
 jest.mock("@rn-vui/themed", () => {

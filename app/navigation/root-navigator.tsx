@@ -1044,7 +1044,7 @@ export const PrimaryNavigator = () => {
         options={{
           title: LL.HomeScreen.title(),
           tabBarAccessibilityLabel: LL.HomeScreen.title(),
-          tabBarTestID: LL.HomeScreen.title(),
+          tabBarButtonTestID: LL.HomeScreen.title(),
           tabBarIcon: ({ color }: { color: string }) => (
             <HomeIcon {...testProps("Home")} fill={color} color={color} />
           ),
@@ -1058,7 +1058,7 @@ export const PrimaryNavigator = () => {
           headerShown: false,
           title: LL.PeopleScreen.title(),
           tabBarAccessibilityLabel: LL.PeopleScreen.title(),
-          tabBarTestID: LL.PeopleScreen.title(),
+          tabBarButtonTestID: LL.PeopleScreen.title(),
           tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
             <PeopleTabIcon color={color} focused={focused} />
           ),
@@ -1071,7 +1071,7 @@ export const PrimaryNavigator = () => {
           title: LL.MapScreen.title(),
           headerShown: false,
           tabBarAccessibilityLabel: LL.MapScreen.title(),
-          tabBarTestID: LL.MapScreen.title(),
+          tabBarButtonTestID: LL.MapScreen.title(),
           tabBarIcon: ({ color }: { color: string }) => <MapIcon color={color} />,
         }}
       />
@@ -1082,7 +1082,7 @@ export const PrimaryNavigator = () => {
           title: LL.EarnScreen.title(),
           headerShown: false,
           tabBarAccessibilityLabel: LL.EarnScreen.title(),
-          tabBarTestID: LL.EarnScreen.title(),
+          tabBarButtonTestID: LL.EarnScreen.title(),
           tabBarIcon: ({ color }: { color: string }) => (
             <LearnIcon {...testProps("Earn")} color={color} />
           ),

@@ -62,6 +62,7 @@ export const useBackupNudgeState = (): BackupNudgeState => {
 
   const isBackedUp = backupState.status === BackupStatus.Completed
   const isSelfCustodial = activeWallet.accountType === AccountType.SelfCustodial
+  const isWalletReady = activeWallet.isReady
 
   const walletsForTotal = useMemo(
     () =>
@@ -79,11 +80,16 @@ export const useBackupNudgeState = (): BackupNudgeState => {
     dismissedAt !== null && Date.now() - dismissedAt < DISMISSAL_COOLDOWN_MS
 
   const shouldShowModal =
-    !isBackedUp && isSelfCustodial && loaded && satsBalance >= backupNudgeModalThreshold
+    !isBackedUp &&
+    isSelfCustodial &&
+    isWalletReady &&
+    loaded &&
+    satsBalance >= backupNudgeModalThreshold
 
   const shouldShowBanner =
     !isBackedUp &&
     isSelfCustodial &&
+    isWalletReady &&
     loaded &&
     satsBalance >= backupNudgeBannerThreshold &&
     !shouldShowModal &&

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { View, Alert, ScrollView } from "react-native"
 import InAppReview from "react-native-in-app-review"
-import ViewShot from "react-native-view-shot"
+import ViewShot, { type ViewShotRef } from "react-native-view-shot"
 
 import { useApolloClient } from "@apollo/client"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -302,7 +302,7 @@ const HeaderSection: React.FC<{
 
 const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
   const [showSuccessIcon, setShowSuccessIcon] = useState(true)
-  const viewRef = useRef<View>(null)
+  const viewRef = useRef<ViewShotRef>(null)
 
   const {
     arrivalAtMempoolEstimate,

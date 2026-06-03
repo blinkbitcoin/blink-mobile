@@ -1,52 +1,19 @@
 import React from "react"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { AmountInputModal } from "@app/components/amount-input/amount-input-modal"
-
-const mockPresent = jest.fn()
-const mockDismiss = jest.fn()
-let capturedOnDismiss: (() => void) | undefined
-
-jest.mock("@gorhom/bottom-sheet", () => {
-  const RN = jest.requireActual("react-native")
-  const ReactMod = jest.requireActual("react")
-
-  const BottomSheetModal = ReactMod.forwardRef(
-    (
-      {
-        children,
-        onDismiss,
-      }: {
-        children: React.ReactNode
-        onDismiss?: () => void
-      },
-      ref: React.Ref<{ present: () => void; dismiss: () => void }>,
-    ) => {
-      capturedOnDismiss = onDismiss
-      ReactMod.useImperativeHandle(ref, () => ({
-        present: mockPresent,
-        dismiss: mockDismiss,
-      }))
-      return <RN.View testID="bottom-sheet-modal">{children}</RN.View>
-    },
-  )
-
-  return {
-    BottomSheetModal,
-    BottomSheetView: ({ children }: { children: React.ReactNode }) => (
-      <RN.View testID="bottom-sheet-view">{children}</RN.View>
-    ),
-    BottomSheetBackdrop: () => <RN.View testID="backdrop" />,
-  }
-})
 
 jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }))
 
 jest.mock("@rn-vui/themed", () => ({
-  makeStyles: () => () => ({ handleIndicator: {}, sheetBackground: {} }),
+  makeStyles: () => () => ({
+    overlay: {},
+    sheetContent: {},
+    handleIndicator: {},
+  }),
 }))
 
 let capturedAmountInputScreenProps: Record<string, unknown> = {}
@@ -67,32 +34,29 @@ describe("AmountInputModal", () => {
   const defaultProps = {
     walletCurrency: WalletCurrency.Btc,
     convertMoneyAmount: mockConvertMoneyAmount,
-    isOpen: false,
+    isOpen: true,
     close: mockClose,
   }
 
   beforeEach(() => {
     jest.clearAllMocks()
     capturedAmountInputScreenProps = {}
-    capturedOnDismiss = undefined
   })
 
-  it("renders BottomSheetModal", () => {
-    const { getByTestId } = render(<AmountInputModal {...defaultProps} />)
-
-    expect(getByTestId("bottom-sheet-modal")).toBeTruthy()
-  })
-
-  it("renders AmountInputScreen inside sheet", () => {
+  it("renders AmountInputScreen inside the modal when open", () => {
     const { getByTestId } = render(<AmountInputModal {...defaultProps} />)
 
     expect(getByTestId("amount-input-screen")).toBeTruthy()
   })
 
-  it("calls close on dismiss", () => {
-    render(<AmountInputModal {...defaultProps} />)
+  it("calls close on Android back dismiss (onRequestClose)", () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = render(<AmountInputModal {...defaultProps} />)
+    const Modal = jest.requireActual("react-native").Modal
 
-    capturedOnDismiss?.()
+    // eslint-disable-next-line camelcase
+    fireEvent(UNSAFE_getByType(Modal), "requestClose")
+
     expect(mockClose).toHaveBeenCalledTimes(1)
   })
 
@@ -134,7 +98,7 @@ describe("AmountInputModal", () => {
     expect(capturedAmountInputScreenProps.minAmount).toBe(minAmount)
   })
 
-  it("defers onSetAmount until sheet dismiss", () => {
+  it("calls onSetAmount and close when AmountInputScreen submits an amount", () => {
     render(<AmountInputModal {...defaultProps} onSetAmount={mockOnSetAmount} />)
 
     const setAmountFn = capturedAmountInputScreenProps.setAmount as (
@@ -145,11 +109,7 @@ describe("AmountInputModal", () => {
     const amount = { amount: 100, currency: "BTC", currencyCode: "SAT" }
     setAmountFn(amount)
 
-    expect(mockDismiss).toHaveBeenCalled()
-    expect(mockOnSetAmount).not.toHaveBeenCalled()
-
-    capturedOnDismiss?.()
-
+    expect(mockClose).toHaveBeenCalledTimes(1)
     expect(mockOnSetAmount).toHaveBeenCalledWith(amount)
   })
 

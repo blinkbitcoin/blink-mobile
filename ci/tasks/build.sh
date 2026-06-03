@@ -75,6 +75,20 @@ done < "$REACT_NATIVE_CONFIG_ENV"
 echo "✅ all ${ENVFILE} keys survived R8 into release BuildConfig"
 rm -f "${CI_ROOT}/release-buildconfig.dump"
 
+# Release artifacts must be ARM-only. x86/x86_64 exist solely for emulators
+# and are excluded via abiFilters (app/build.gradle) + reactNativeArchitectures
+# (Fastfile). This catches a silent re-introduction (e.g. abiFilters dropped, x86
+# re-added, or the legacy apk_paths upload re-enabled) bloating the Play AAB.
+echo "    --> Verifying release artifacts are ARM-only (no x86)"
+for artifact in \
+  android/app/build/outputs/bundle/release/app-release.aab \
+  android/app/build/outputs/apk/release/app-universal-release.apk; do
+  if unzip -l "$artifact" | grep -qE 'lib/x86'; then
+    echo "ERROR: $artifact ships x86 native libs — release must be ARM-only"
+    exit 1
+  fi
+done
+
 echo "    --> Building iOS"
 # iOS Build
 export BUILD_NUMBER=$(cat ${CI_ROOT}/build-number-ios/ios)

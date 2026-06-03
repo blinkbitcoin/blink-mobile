@@ -2191,7 +2191,6 @@ export type Query = {
   readonly cardHolder: CardHolder;
   readonly cardSecretsEncrypted: CardSecretsEncrypted;
   readonly cardTransactionsPaginated: CardTransactionConnection;
-  readonly colorScheme: Scalars['String']['output'];
   readonly countryCode: Scalars['String']['output'];
   /** Returns an estimated conversion rate for the given amount and currency */
   readonly currencyConversionEstimation: CurrencyConversionEstimation;
@@ -3178,11 +3177,6 @@ export type BetaQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type BetaQuery = { readonly __typename: 'Query', readonly beta: boolean };
-
-export type ColorSchemeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ColorSchemeQuery = { readonly __typename: 'Query', readonly colorScheme: string };
 
 export type CountryCodeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4510,43 +4504,6 @@ export type BetaQueryHookResult = ReturnType<typeof useBetaQuery>;
 export type BetaLazyQueryHookResult = ReturnType<typeof useBetaLazyQuery>;
 export type BetaSuspenseQueryHookResult = ReturnType<typeof useBetaSuspenseQuery>;
 export type BetaQueryResult = Apollo.QueryResult<BetaQuery, BetaQueryVariables>;
-export const ColorSchemeDocument = gql`
-    query colorScheme {
-  colorScheme @client
-}
-    `;
-
-/**
- * __useColorSchemeQuery__
- *
- * To run a query within a React component, call `useColorSchemeQuery` and pass it any options that fit your needs.
- * When your component renders, `useColorSchemeQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useColorSchemeQuery({
- *   variables: {
- *   },
- * });
- */
-export function useColorSchemeQuery(baseOptions?: Apollo.QueryHookOptions<ColorSchemeQuery, ColorSchemeQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ColorSchemeQuery, ColorSchemeQueryVariables>(ColorSchemeDocument, options);
-      }
-export function useColorSchemeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ColorSchemeQuery, ColorSchemeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ColorSchemeQuery, ColorSchemeQueryVariables>(ColorSchemeDocument, options);
-        }
-export function useColorSchemeSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ColorSchemeQuery, ColorSchemeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<ColorSchemeQuery, ColorSchemeQueryVariables>(ColorSchemeDocument, options);
-        }
-export type ColorSchemeQueryHookResult = ReturnType<typeof useColorSchemeQuery>;
-export type ColorSchemeLazyQueryHookResult = ReturnType<typeof useColorSchemeLazyQuery>;
-export type ColorSchemeSuspenseQueryHookResult = ReturnType<typeof useColorSchemeSuspenseQuery>;
-export type ColorSchemeQueryResult = Apollo.QueryResult<ColorSchemeQuery, ColorSchemeQueryVariables>;
 export const CountryCodeDocument = gql`
     query countryCode {
   countryCode @client
@@ -10936,7 +10893,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   cardHolder?: Resolver<ResolversTypes['CardHolder'], ParentType, ContextType, RequireFields<QueryCardHolderArgs, 'cardId'>>;
   cardSecretsEncrypted?: Resolver<ResolversTypes['CardSecretsEncrypted'], ParentType, ContextType, RequireFields<QueryCardSecretsEncryptedArgs, 'cardId' | 'sessionId'>>;
   cardTransactionsPaginated?: Resolver<ResolversTypes['CardTransactionConnection'], ParentType, ContextType, RequireFields<QueryCardTransactionsPaginatedArgs, 'cardId' | 'first'>>;
-  colorScheme?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   countryCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   currencyConversionEstimation?: Resolver<ResolversTypes['CurrencyConversionEstimation'], ParentType, ContextType, RequireFields<QueryCurrencyConversionEstimationArgs, 'amount' | 'currency'>>;
   currencyList?: Resolver<ReadonlyArray<ResolversTypes['Currency']>, ParentType, ContextType>;

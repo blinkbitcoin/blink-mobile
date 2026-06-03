@@ -4,7 +4,6 @@ import {
   NativeSyntheticEvent,
   StyleProp,
   TargetedEvent,
-  TextInput,
   TextInputFocusEventData,
   TouchableOpacity,
   View,
@@ -13,6 +12,7 @@ import {
 import { Input, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "@app/utils/testProps"
+import type { InputRef } from "@app/types/themed-input"
 
 type AnimatedViewStyle = Animated.WithAnimatedValue<StyleProp<ViewStyle>>
 
@@ -20,7 +20,7 @@ type CurrencyInputProps = {
   placeholder?: string
   currency: string
   value?: string
-  inputRef?: React.RefObject<TextInput>
+  inputRef?: React.RefObject<InputRef | null>
   onChangeText: (text: string) => void
   onFocus?: ((e: NativeSyntheticEvent<TextInputFocusEventData>) => void) &
     ((event: NativeSyntheticEvent<TargetedEvent>) => void)
@@ -29,7 +29,7 @@ type CurrencyInputProps = {
   AnimatedViewStyle?: AnimatedViewStyle
 }
 
-export const CurrencyInput = forwardRef<TextInput, CurrencyInputProps>(
+export const CurrencyInput = forwardRef<InputRef, CurrencyInputProps>(
   (
     {
       placeholder,
@@ -49,7 +49,7 @@ export const CurrencyInput = forwardRef<TextInput, CurrencyInputProps>(
     } = useTheme()
     const styles = useStyles(isFocused)
 
-    useImperativeHandle(ref, () => inputRef?.current as TextInput)
+    useImperativeHandle(ref, () => inputRef?.current as InputRef)
 
     const getEndSelection = useCallback(() => {
       const text = value ?? ""

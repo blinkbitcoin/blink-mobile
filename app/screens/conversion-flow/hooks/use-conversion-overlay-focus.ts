@@ -1,5 +1,4 @@
 import { useCallback } from "react"
-import { TextInput } from "react-native"
 
 import { ConvertInputType } from "@app/components/transfer-amount-input"
 import { findBtcSuffixIndex } from "@app/screens/conversion-flow/btc-format"
@@ -7,6 +6,11 @@ import {
   InputField,
   InputValues,
 } from "@app/screens/conversion-flow/use-convert-money-details"
+
+type FocusableInputRef = {
+  focus: () => void
+  setNativeProps: (props: { selection: { start: number; end: number } }) => void
+}
 
 type Params = {
   uiLocked: boolean
@@ -16,8 +20,8 @@ type Params = {
   inputFormattedValues: InputValues | null
   inputValues: InputValues
   renderValue: (id: InputField["id"]) => string | undefined
-  fromInputRef: React.RefObject<TextInput>
-  toInputRef: React.RefObject<TextInput>
+  fromInputRef: React.RefObject<FocusableInputRef | null>
+  toInputRef: React.RefObject<FocusableInputRef | null>
   setFocusedInputValues: React.Dispatch<React.SetStateAction<InputField | null>>
 }
 

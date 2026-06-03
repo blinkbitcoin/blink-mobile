@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
-import {
-  type BreezSdkInterface,
-  SdkEvent_Tags as SdkEventTags,
-} from "@breeztech/breez-sdk-spark-react-native"
+import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet"
@@ -18,7 +15,6 @@ import {
   getUserSettings,
   initSdk,
   removeSdkEventListener,
-  syncSelfCustodialWallet,
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
@@ -64,8 +60,6 @@ const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
 
 const RECONNECT_BACKOFF_MS: readonly number[] = [1000, 3000, 9000]
 
-const INITIAL_SYNC_TIMEOUT_MS = 30_000
-
 const teardownSdk = async (
   sdk: BreezSdkInterface,
   listenerId: string | null,
@@ -92,8 +86,6 @@ export const useSdkLifecycle = (
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
   const rawTxOffsetRef = useRef(0)
-  const initialSyncCompletedRef = useRef(false)
-  const initialSyncTimeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { schedule: scheduleBackoffRetry, reset: resetBackoff } =
     useBackoffRetry(RECONNECT_BACKOFF_MS)
 
@@ -124,14 +116,12 @@ export const useSdkLifecycle = (
         setWallets(snapshot.wallets)
         setHasMoreTransactions(snapshot.hasMore)
         rawTxOffsetRef.current = snapshot.rawTransactionCount // eslint-disable-line require-atomic-updates
-        if (initialSyncCompletedRef.current) {
-          const serviceStatus = await getServiceStatus()
-          setStatus(
-            isDegradedStatus(serviceStatus)
-              ? ActiveWalletStatus.Degraded
-              : ActiveWalletStatus.Ready,
-          )
-        }
+
+        const serviceStatus = await getServiceStatus()
+        const nextStatus = isDegradedStatus(serviceStatus)
+          ? ActiveWalletStatus.Degraded
+          : ActiveWalletStatus.Ready
+        setStatus(nextStatus)
         resetBackoff()
       } catch (err) {
         logSdkEvent(SdkLogLevel.Error, `Failed to refresh wallets: ${err}`)
@@ -172,13 +162,16 @@ export const useSdkLifecycle = (
   useEffect(() => {
     if (!activeSelfCustodialAccountId) {
       setStatus(ActiveWalletStatus.Unavailable)
+      setWallets([])
       return
     }
+
+    setStatus(ActiveWalletStatus.Loading)
+    setWallets([])
 
     let mounted = true
     abortRef.current = false
     const accountId = activeSelfCustodialAccountId
-    initialSyncCompletedRef.current = false
 
     const connectAndListen = async (mnemonic: string) => {
       const connectedSdk = await initSdk(mnemonic, storageDirFor(accountId))
@@ -195,8 +188,6 @@ export const useSdkLifecycle = (
         if (!mounted) return
         if (!REFRESH_EVENTS.has(event.tag)) return
 
-        if (event.tag === SdkEventTags.Synced) initialSyncCompletedRef.current = true
-
         if (PAYMENT_RECEIVED_EVENTS.has(event.tag)) {
           const paymentId = extractPaymentId(event)
           if (paymentId) setLastReceivedPaymentId(paymentId)
@@ -210,28 +201,6 @@ export const useSdkLifecycle = (
       listenerIdRef.current = listenerId
 
       refreshWallets()
-
-      // Force token balances to materialize. Whichever fires first — the
-      // `Synced` event or this promise resolving — releases the loading state.
-      syncSelfCustodialWallet(connectedSdk)
-        .then(() => {
-          if (!mounted || initialSyncCompletedRef.current) return
-          initialSyncCompletedRef.current = true
-          refreshWallets().catch(() => {})
-        })
-        .catch((err) => {
-          reportError("Post-connect sync", err)
-        })
-
-      initialSyncTimeoutIdRef.current = setTimeout(() => {
-        if (!mounted || initialSyncCompletedRef.current) return
-        reportError(
-          "SDK lifecycle: initial sync timeout",
-          new Error(`Initial sync did not complete within ${INITIAL_SYNC_TIMEOUT_MS}ms`),
-        )
-        initialSyncCompletedRef.current = true
-        refreshWallets().catch(() => {})
-      }, INITIAL_SYNC_TIMEOUT_MS)
 
       getUserSettings(connectedSdk)
         .then((settings) => {
@@ -272,11 +241,6 @@ export const useSdkLifecycle = (
       mounted = false
       abortRef.current = true
       resetBackoff()
-
-      if (initialSyncTimeoutIdRef.current) {
-        clearTimeout(initialSyncTimeoutIdRef.current)
-        initialSyncTimeoutIdRef.current = null
-      }
 
       const sdk = sdkRef.current
       const listenerId = listenerIdRef.current

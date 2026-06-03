@@ -4,7 +4,7 @@ import {
 } from "libphonenumber-js/mobile"
 import * as React from "react"
 import { useEffect, useRef } from "react"
-import { ActivityIndicator, View, TextInput } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 import CountryPicker, {
   CountryCode,
   DARK_THEME,
@@ -23,6 +23,7 @@ import { testProps } from "@app/utils/testProps"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 import { makeStyles, useTheme, Text, Input } from "@rn-vui/themed"
+import type { InputRef } from "@app/types/themed-input"
 
 import { Screen } from "../../components/screen"
 import { PhoneChannelButton } from "./phone-channel-buttons"
@@ -121,7 +122,7 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
 
   const styles = useStyles()
 
-  const phoneInputRef = useRef<TextInput>(null)
+  const phoneInputRef = useRef<InputRef>(null)
 
   const navigation =
     useNavigation<

@@ -4,7 +4,7 @@ import parsePhoneNumber, {
   getCountryCallingCode,
 } from "libphonenumber-js/mobile"
 import React, { useEffect, useMemo, useRef, useState } from "react"
-import { View, TouchableOpacity, TextInput, StyleProp, ViewStyle } from "react-native"
+import { View, TouchableOpacity, StyleProp, ViewStyle } from "react-native"
 import CountryPicker, {
   CountryCode,
   DARK_THEME,
@@ -16,6 +16,7 @@ import { testProps } from "@app/utils/testProps"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { useSupportedCountriesQuery } from "@app/graphql/generated"
 import { IconNode } from "@rn-vui/base"
+import type { InputRef } from "@app/types/themed-input"
 
 import PhoneInputSkeleton from "./phone-input-skeleton"
 
@@ -65,7 +66,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   const { data } = useSupportedCountriesQuery()
 
   const [countryCode, setCountryCode] = useState<PhoneNumberCountryCode | undefined>()
-  const phoneInputRef = useRef<TextInput>(null)
+  const phoneInputRef = useRef<InputRef>(null)
   const { countryCode: detectedCountryCode, loading: loadingLocation } =
     useDeviceLocation()
 

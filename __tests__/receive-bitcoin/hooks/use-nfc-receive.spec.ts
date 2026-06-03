@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks"
+import { renderHook, act, waitFor } from "@testing-library/react-native"
 
 import { useNfcReceive } from "@app/screens/receive-bitcoin-screen/hooks/use-nfc-receive"
 import {
@@ -27,11 +27,11 @@ describe("useNfcReceive", () => {
   })
 
   it("detects NFC support on mount", async () => {
-    const { result, waitForNextUpdate } = renderHook(() => useNfcReceive(defaultParams))
+    const { result } = renderHook(() => useNfcReceive(defaultParams))
 
-    await waitForNextUpdate()
-
-    expect(result.current.showNfcButton).toBe(true)
+    await waitFor(() => {
+      expect(result.current.showNfcButton).toBe(true)
+    })
   })
 
   it("hides NFC button when device does not support NFC", () => {
@@ -44,51 +44,59 @@ describe("useNfcReceive", () => {
   })
 
   it("hides NFC button when on onchain page", async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useNfcReceive({ ...defaultParams, isOnChainPage: true }),
     )
 
-    await waitForNextUpdate()
+    await waitFor(() => {
+      expect(mockIsSupported).toHaveBeenCalled()
+    })
 
     expect(result.current.showNfcButton).toBe(false)
   })
 
   it("hides NFC button when request state is not Created", async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useNfcReceive({ ...defaultParams, requestState: PaymentRequestState.Loading }),
     )
 
-    await waitForNextUpdate()
+    await waitFor(() => {
+      expect(mockIsSupported).toHaveBeenCalled()
+    })
 
     expect(result.current.showNfcButton).toBe(false)
   })
 
   it("shows NFC button for PayCode type", async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useNfcReceive({ ...defaultParams, requestType: Invoice.PayCode }),
     )
 
-    await waitForNextUpdate()
-
-    expect(result.current.showNfcButton).toBe(true)
+    await waitFor(() => {
+      expect(result.current.showNfcButton).toBe(true)
+    })
   })
 
   it("hides NFC button for OnChain type", async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useNfcReceive({ ...defaultParams, requestType: Invoice.OnChain }),
     )
 
-    await waitForNextUpdate()
+    await waitFor(() => {
+      expect(mockIsSupported).toHaveBeenCalled()
+    })
 
     expect(result.current.showNfcButton).toBe(false)
   })
 
   it("opens amount modal when pressing NFC without settlement amount", async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useNfcReceive({ ...defaultParams, hasSettlementAmount: false }),
     )
 
-    await waitForNextUpdate()
+    await waitFor(() => {
+      expect(mockIsSupported).toHaveBeenCalled()
+    })
 
     act(() => {
       result.current.onNfcPress()
@@ -99,9 +107,11 @@ describe("useNfcReceive", () => {
   })
 
   it("shows NFC receive directly when pressing with settlement amount", async () => {
-    const { result, waitForNextUpdate } = renderHook(() => useNfcReceive(defaultParams))
+    const { result } = renderHook(() => useNfcReceive(defaultParams))
 
-    await waitForNextUpdate()
+    await waitFor(() => {
+      expect(result.current.showNfcButton).toBe(true)
+    })
 
     act(() => {
       result.current.onNfcPress()
@@ -112,11 +122,13 @@ describe("useNfcReceive", () => {
   })
 
   it("closes NFC amount modal", async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useNfcReceive({ ...defaultParams, hasSettlementAmount: false }),
     )
 
-    await waitForNextUpdate()
+    await waitFor(() => {
+      expect(mockIsSupported).toHaveBeenCalled()
+    })
 
     act(() => {
       result.current.onNfcPress()
@@ -133,11 +145,13 @@ describe("useNfcReceive", () => {
 
   it("handleNfcAmountSet calls handleSetAmount and closes modal", async () => {
     const handleSetAmount = jest.fn()
-    const { result, waitForNextUpdate } = renderHook(() =>
+    const { result } = renderHook(() =>
       useNfcReceive({ ...defaultParams, hasSettlementAmount: false, handleSetAmount }),
     )
 
-    await waitForNextUpdate()
+    await waitFor(() => {
+      expect(mockIsSupported).toHaveBeenCalled()
+    })
 
     act(() => {
       result.current.onNfcPress()
@@ -174,9 +188,11 @@ describe("useNfcReceive", () => {
   })
 
   it("setDisplayReceiveNfc updates state", async () => {
-    const { result, waitForNextUpdate } = renderHook(() => useNfcReceive(defaultParams))
+    const { result } = renderHook(() => useNfcReceive(defaultParams))
 
-    await waitForNextUpdate()
+    await waitFor(() => {
+      expect(result.current.showNfcButton).toBe(true)
+    })
 
     act(() => {
       result.current.setDisplayReceiveNfc(true)

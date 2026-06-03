@@ -1,8 +1,9 @@
 import React from "react"
-import { Text as ReactNativeText, TextInput } from "react-native"
+import { Text as ReactNativeText } from "react-native"
 import { render } from "@testing-library/react-native"
 
 import { CurrencyInput } from "@app/components/currency-input/currency-input"
+import type { InputRef } from "@app/types/themed-input"
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (() => {
@@ -28,7 +29,7 @@ jest.mock("@rn-vui/themed", () => ({
           onFocus?: () => void
           testID?: string
         },
-        _ref: React.Ref<TextInput>,
+        _ref: React.Ref<InputRef>,
       ) => <ReactNativeText testID={testID}>{value || placeholder}</ReactNativeText>,
     )
 
@@ -61,7 +62,7 @@ jest.mock("@rn-vui/themed", () => ({
 
 describe("CurrencyInput", () => {
   const mockOnChangeText = jest.fn()
-  const inputRef = React.createRef<TextInput>()
+  const inputRef = React.createRef<InputRef>()
 
   beforeEach(() => {
     jest.clearAllMocks()

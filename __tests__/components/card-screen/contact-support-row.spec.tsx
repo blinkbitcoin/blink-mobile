@@ -15,7 +15,10 @@ jest.mock("@app/config/feature-flags-context", () => ({
 }))
 
 jest.mock("react-native/Libraries/Linking/Linking", () => ({
-  openURL: jest.fn(),
+  __esModule: true,
+  default: {
+    openURL: jest.fn(),
+  },
 }))
 
 const renderWithProviders = (component: React.ReactElement) => {

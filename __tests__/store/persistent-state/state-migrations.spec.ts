@@ -23,7 +23,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state6)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.galoyAuthToken).toBe("test-token")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
@@ -39,7 +39,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state7)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.activeAccountId).toBe("custodial-default")
   })
 
@@ -52,7 +52,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state5)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.galoyAuthToken).toBe("old-token")
     expect(result.activeAccountId).toBeUndefined()
   })
@@ -68,7 +68,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state9)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
       "self-custodial-id": "USD",
@@ -89,7 +89,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state10)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
       "self-custodial-id-1": "USD",
       "self-custodial-id-2": "BTC",
@@ -105,14 +105,14 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state10)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.selfCustodialDisplayCurrencyByAccountId).toBeUndefined()
     expect(result.selfCustodialLanguageByAccountId).toBeUndefined()
   })
 
   it("preserves schema 11 per-account display currency and language maps as-is", async () => {
     const state11 = {
-      schemaVersion: 11,
+      schemaVersion: 12,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "token",
       activeAccountId: "self-custodial-id-1",
@@ -128,7 +128,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state11)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.selfCustodialDisplayCurrencyByAccountId).toEqual({
       "self-custodial-id-1": "EUR",
       "self-custodial-id-2": "JPY",
@@ -174,7 +174,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state4)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.galoyAuthToken).toBe("token-v4")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
@@ -203,14 +203,14 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state3)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.galoyAuthToken).toBe("token-v3")
     expect(result.galoyInstance).toEqual({ id: "Main" })
     expect(result.activeAccountId).toBeUndefined()
   })
 
   it("default state has schema version 11", () => {
-    expect(defaultPersistentState.schemaVersion).toBe(11)
+    expect(defaultPersistentState.schemaVersion).toBe(12)
     expect(defaultPersistentState.activeAccountId).toBeUndefined()
     expect(
       defaultPersistentState.selfCustodialDefaultWalletCurrencyByAccountId,
@@ -228,7 +228,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state8)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
       "self-custodial-id": "USD",
@@ -247,7 +247,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state8)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
       "self-custodial-id": "BTC",
@@ -263,7 +263,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state8)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
   })
@@ -278,7 +278,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state9)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
   })
@@ -294,7 +294,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state10)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toBeUndefined()
   })
@@ -314,7 +314,7 @@ describe("state-migrations schema 10", () => {
 
     const result = await migrateAndGetPersistentState(state10)
 
-    expect(result.schemaVersion).toBe(11)
+    expect(result.schemaVersion).toBe(12)
     expect(result.selfCustodialDefaultWalletCurrency).toBeUndefined()
     expect(result.selfCustodialDefaultWalletCurrencyByAccountId).toEqual({
       "self-custodial-id-1": "BTC",

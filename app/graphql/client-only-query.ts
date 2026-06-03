@@ -6,8 +6,6 @@ import { ApolloClient, gql } from "@apollo/client"
 import {
   BetaDocument,
   BetaQuery,
-  ColorSchemeDocument,
-  ColorSchemeQuery,
   CountryCodeDocument,
   CountryCodeQuery,
   FeedbackModalShownDocument,
@@ -45,10 +43,6 @@ export default gql`
 
   query beta {
     beta @client
-  }
-
-  query colorScheme {
-    colorScheme @client # "system" | "light" | "dark"
   }
 
   query countryCode {
@@ -148,20 +142,6 @@ export const activateBeta = (client: ApolloClient<unknown>, status: boolean) => 
     })
   } catch {
     console.warn("impossible to update beta")
-  }
-}
-
-export const updateColorScheme = (client: ApolloClient<unknown>, colorScheme: string) => {
-  try {
-    client.writeQuery<ColorSchemeQuery>({
-      query: ColorSchemeDocument,
-      data: {
-        __typename: "Query",
-        colorScheme,
-      },
-    })
-  } catch {
-    console.warn("impossible to update color scheme")
   }
 }
 

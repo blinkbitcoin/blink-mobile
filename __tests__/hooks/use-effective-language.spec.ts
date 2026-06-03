@@ -14,7 +14,7 @@ const mockUseUserUpdateLanguageMutation = jest.fn(
 )
 const mockUpdateState = jest.fn()
 let mockPersistentState = {
-  schemaVersion: 11,
+  schemaVersion: 12,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
   activeAccountId: undefined as string | undefined,
@@ -47,7 +47,7 @@ describe("useEffectiveLanguage", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockPersistentState = {
-      schemaVersion: 11,
+      schemaVersion: 12,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
       activeAccountId: undefined,

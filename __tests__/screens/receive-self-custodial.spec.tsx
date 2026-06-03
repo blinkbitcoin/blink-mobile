@@ -189,8 +189,6 @@ jest.mock("react-native-nfc-manager", () => ({
   },
 }))
 
-jest.mock("@gorhom/bottom-sheet")
-
 jest.mock("react-native-haptic-feedback", () => ({
   trigger: jest.fn(),
 }))

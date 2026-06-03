@@ -3,6 +3,7 @@
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
+#import <ReactAppDependencyProvider/RCTAppDependencyProvider.h>
 
 #import "RNBootSplash.h"
 
@@ -13,8 +14,7 @@
   [FIRApp configure];
 
   self.moduleName = @"GaloyApp";
-  // You can add your custom initial props in the dictionary below.
-  // They will be passed down to the ViewController used by React Native.
+  self.dependencyProvider = [RCTAppDependencyProvider new];
   self.initialProps = @{};
 
   [super application:application didFinishLaunchingWithOptions:launchOptions];

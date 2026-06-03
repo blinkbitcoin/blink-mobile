@@ -128,20 +128,10 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
-        }
-    }
-
-    // https://github.com/react-native-community/discussions-and-proposals/issues/602
-    // applicationVariants are e.g. debug, release
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            // For each separate APK per architecture, set a unique version code as described here:
-            // https://developer.android.com/studio/build/configure-apk-splits.html
-            def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
-            def abi = output.getFilter(OutputFile.ABI)
-            if (abi != null) {  // null for the universal-debug, universal-release variants
-                output.versionCodeOverride =
-                    versionCodes.get(abi) * 10000000 + defaultConfig.versionCode
+            // Real Android devices are ARM-only; x86/x86_64 exist solely for emulators
+            // (used by debug e2e). Strip them from release to shrink the AAB + APKs.
+            ndk {
+                abiFilters "armeabi-v7a", "arm64-v8a"
             }
         }
     }

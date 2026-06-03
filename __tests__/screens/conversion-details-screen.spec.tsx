@@ -33,7 +33,7 @@ jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
   usePersistentStateContext: () => ({
     persistentState: {
-      schemaVersion: 11,
+      schemaVersion: 12,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
     },
@@ -60,6 +60,7 @@ jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     navigate: mockNavigate,
+    addListener: jest.fn(() => jest.fn()),
   }),
 }))
 
@@ -370,7 +371,7 @@ const createTestWrapper = (mocks: MockedResponse[]) => {
   const TestWrapper: React.FC<TestWrapperProps> = ({ children }) => (
     <ThemeProvider theme={theme}>
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Test">
             {() => (
               <MockedProvider mocks={mocks} cache={createCache()} addTypename={true}>
