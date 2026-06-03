@@ -100,6 +100,7 @@ describe("initSdk", () => {
     expect(mockConnect).toHaveBeenCalledWith(
       expect.objectContaining({
         seed: expect.objectContaining({ tag: "Mnemonic", mnemonic: "word1 word2 word3" }),
+        config: expect.objectContaining({ apiKey: "test-api-key" }),
       }),
     )
     expect(result).toBe(sdk)

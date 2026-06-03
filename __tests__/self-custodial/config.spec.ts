@@ -56,10 +56,18 @@ describe("SparkConfig", () => {
     expect(SparkConfig.storageDir).toBe("/test/documents/breez-sdk-spark-regtest")
   })
 
-  it("reads apiKey from env", () => {
-    const { SparkConfig } = loadConfig({ BREEZ_API_KEY: "my-key" })
+  it("requireBreezApiKey returns the configured key", () => {
+    const { requireBreezApiKey } = loadConfig({ BREEZ_API_KEY: "my-key" })
 
-    expect(SparkConfig.apiKey).toBe("my-key")
+    expect(requireBreezApiKey()).toBe("my-key")
+  })
+
+  it("requireBreezApiKey throws a clear error when env is missing", () => {
+    const { requireBreezApiKey } = loadConfig({ BREEZ_API_KEY: "" })
+
+    expect(() => requireBreezApiKey()).toThrow(
+      "BREEZ_API_KEY is not configured for this build",
+    )
   })
 
   it("requireSparkTokenIdentifier returns the configured identifier", () => {
