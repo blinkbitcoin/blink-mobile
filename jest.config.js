@@ -4,7 +4,7 @@ module.exports = {
     "./node_modules/@react-native/jest-preset/jest/setup.js",
     "./node_modules/react-native-gesture-handler/jestSetup.js",
   ],
-  setupFilesAfterEnv: ["@testing-library/jest-native/extend-expect"],
+  setupFilesAfterEnv: ["@testing-library/jest-native/extend-expect", "./jest.setup.js"],
   transform: {
     "\\.(ts|tsx)$": [
       "ts-jest",
