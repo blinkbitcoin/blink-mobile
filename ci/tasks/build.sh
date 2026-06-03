@@ -4,14 +4,20 @@ set -eu
 export CI_ROOT="$(pwd)"
 export ENVFILE=.env.ci
 REACT_NATIVE_CONFIG_ENV="${CI_ROOT}/repo/${ENVFILE}"
+DISK_CLEANUP_TASK="${CI_ROOT}/pipeline-tasks/ci/tasks/macos-build-disk-cleanup.sh"
 
-cleanup_react_native_config_env() {
+cleanup_build_task() {
   rm -f "$REACT_NATIVE_CONFIG_ENV"
+  lsof -ti:8080,8081 | xargs kill -9 || true
+  /bin/bash "$DISK_CLEANUP_TASK" post || true
 }
-trap cleanup_react_native_config_env EXIT
+trap cleanup_build_task EXIT
 
 export PATH=$(cat /Users/m1/concourse/path)
 export PUBLIC_VERSION=$(cat $VERSION_FILE)
+
+echo "    --> Preparing macOS build worker disk"
+/bin/bash "$DISK_CLEANUP_TASK" pre
 
 # Make sure ssh agent is running - to access GaloyMoney ios keystore from github
 echo "    --> Setting up ssh agent"
