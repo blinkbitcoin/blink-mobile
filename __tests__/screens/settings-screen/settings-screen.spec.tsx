@@ -15,7 +15,14 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 
 import React from "react"
 import { TouchableOpacity, View } from "react-native"
-import { act, fireEvent, render, screen, within } from "@testing-library/react-native"
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react-native"
 import { SettingsScreenDocument } from "@app/graphql/generated"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import { SettingsScreen } from "@app/screens/settings-screen/settings-screen"
@@ -255,6 +262,9 @@ const mocksWithUsername = [
 
 describe("Settings Screen", () => {
   beforeEach(() => {
+    jest.clearAllMocks()
+    // clearAllMocks does not reset return values, so re-arm the default explicitly
+    mockUseIsAuthed.mockReturnValue(true)
     loadLocale("en")
     testState = createTestState()
   })
@@ -302,15 +312,10 @@ describe("Settings Screen", () => {
       </ContextForScreen>,
     )
 
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
-
     const header = screen.getByTestId("notification-header")
-    expect(within(header).getByTestId("notification-badge")).toBeTruthy()
+    await waitFor(() => {
+      expect(within(header).getByTestId("notification-badge")).toBeTruthy()
+    })
 
     const headerButton = within(header).UNSAFE_getByType(TouchableOpacity)
     fireEvent.press(headerButton)
@@ -319,20 +324,16 @@ describe("Settings Screen", () => {
     expect(screen.getByTestId("notification-screen")).toBeTruthy()
     expect(screen.getAllByText(notificationTitle)).toHaveLength(3)
 
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
-    fireEvent.press(screen.getByTestId("back-to-settings"))
+    // acknowledgements drain while the history screen is open; wait for the
+    // badge to clear instead of sleeping a fixed amount
+    await waitFor(() => {
+      expect(within(header).queryByTestId("notification-badge")).toBeNull()
+    })
 
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
+    fireEvent.press(screen.getByTestId("back-to-settings"))
+    await waitFor(() => {
+      expect(screen.queryByTestId("notification-screen")).toBeNull()
+    })
 
     expect(within(header).queryByTestId("notification-badge")).toBeNull()
 
@@ -341,8 +342,6 @@ describe("Settings Screen", () => {
 
   it("hides the badge when the last unread notification is acknowledged", async () => {
     updateNotificationCount(1)
-    testState.headerCount = -1
-    testState.headerRight = null
 
     render(
       <ContextForScreen>
@@ -360,34 +359,25 @@ describe("Settings Screen", () => {
       </ContextForScreen>,
     )
 
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
-
     const header = screen.getByTestId("notification-header")
-    expect(within(header).getByTestId("notification-badge")).toBeTruthy()
+    await waitFor(() => {
+      expect(within(header).getByTestId("notification-badge")).toBeTruthy()
+    })
 
     const headerButton = within(header).UNSAFE_getByType(TouchableOpacity)
     fireEvent.press(headerButton)
     expect(mockNavigate).toHaveBeenCalledWith("notificationHistory")
 
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
-    fireEvent.press(screen.getByTestId("back-to-settings"))
+    // the last unread notification is acknowledged on entry; wait for the
+    // badge to clear instead of sleeping a fixed amount
+    await waitFor(() => {
+      expect(within(header).queryByTestId("notification-badge")).toBeNull()
+    })
 
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
+    fireEvent.press(screen.getByTestId("back-to-settings"))
+    await waitFor(() => {
+      expect(screen.queryByTestId("notification-screen")).toBeNull()
+    })
 
     expect(within(header).queryByTestId("notification-badge")).toBeNull()
 
@@ -396,8 +386,6 @@ describe("Settings Screen", () => {
 
   it("does not render a badge when there are no unread notifications", async () => {
     updateNotificationCount(0)
-    testState.headerCount = -1
-    testState.headerRight = null
 
     render(
       <ContextForScreen>
@@ -415,12 +403,8 @@ describe("Settings Screen", () => {
       </ContextForScreen>,
     )
 
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
+    // flush pending effects/microtasks, then assert the badge never rendered
+    await act(async () => {})
 
     const header = screen.getByTestId("notification-header")
     expect(within(header).queryByTestId("notification-badge")).toBeNull()
@@ -435,14 +419,7 @@ describe("Settings Screen", () => {
       </ContextForScreen>,
     )
 
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
-
-    const elements = screen.getAllByText("test1@blink.sv")
+    const elements = await screen.findAllByText("test1@blink.sv")
     expect(elements.length).toBeGreaterThan(0)
 
     await flushEffects()
@@ -480,12 +457,8 @@ describe("Settings Screen", () => {
       </ContextForScreen>,
     )
 
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
+    // flush pending effects/microtasks, then assert on the settled output
+    await act(async () => {})
 
     expect(screen.queryByText("Set your lightning address")).toBeNull()
     expect(screen.queryByText("+50365055539@blink.sv")).toBeNull()
@@ -547,12 +520,8 @@ describe("Settings Screen", () => {
       </ContextForScreen>,
     )
 
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
+    // flush pending effects/microtasks, then assert on the settled output
+    await act(async () => {})
 
     // TODO: re-enable once the custodial → non-custodial migration is complete
     expect(screen.queryByText("Move to non-custodial")).toBeNull()
@@ -567,12 +536,8 @@ describe("Settings Screen", () => {
       </ContextForScreen>,
     )
 
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
+    // flush pending effects/microtasks, then assert on the settled output
+    await act(async () => {})
 
     expect(screen.queryByTestId("Recovery method-group")).toBeNull()
 
