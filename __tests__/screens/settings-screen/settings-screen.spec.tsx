@@ -268,16 +268,6 @@ describe("Settings Screen", () => {
     testState = createTestState()
   })
 
-  afterEach(() => {
-    // Break the references captured by this test's render so late async work
-    // (acknowledge chains, re-render triggers) can't reach into an unmounted
-    // tree and poison the next test ("Can't access .root on unmounted test
-    // renderer" cascade).
-    testState.setActiveScreen = null
-    testState.triggerRender = null
-    testState.headerRight = null
-  })
-
   const TestNavigator = () => {
     const [screenName, setScreenName] = React.useState("settings")
     const [, setTick] = React.useState(0)
