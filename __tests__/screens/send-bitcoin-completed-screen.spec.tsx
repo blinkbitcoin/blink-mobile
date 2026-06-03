@@ -45,10 +45,6 @@ describe("SendBitcoinCompletedScreen", () => {
     LL = i18nObject("en")
   })
 
-  afterAll(() => {
-    jest.useRealTimers()
-  })
-
   it("renders the Success state correctly", async () => {
     render(
       <ContextForScreen>

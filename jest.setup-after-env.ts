@@ -89,4 +89,13 @@ const clearLiveTimers = () => {
 // sweep runs after every other hook (incl. RNTL auto-cleanup, whose unmount
 // can itself schedule timers) and is what prevents the cross-file crash.
 afterEach(clearLiveTimers)
-afterAll(clearLiveTimers)
+afterAll(() => {
+  // Restore real timers before the final sweep: in fake-timer suites the
+  // global clearTimeout is sinon's, which silently no-ops on the REAL handles
+  // tracked above (timers scheduled at module-import time, before the suite's
+  // jest.useFakeTimers() ran) — leaving them to fire after teardown. Safe at
+  // file end (no test relies on fake timers persisting past afterAll, unlike
+  // in the afterEach above) and a no-op when fake timers were never installed.
+  jest.useRealTimers()
+  clearLiveTimers()
+})

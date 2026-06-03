@@ -33,10 +33,6 @@ describe("formatTimeToMempool", () => {
   jest.useFakeTimers()
   jest.setSystemTime(1701819669000)
 
-  afterAll(() => {
-    jest.useRealTimers()
-  })
-
   loadLocale("en")
   const LL = i18nObject("en")
 
