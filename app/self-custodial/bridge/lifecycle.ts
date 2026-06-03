@@ -14,6 +14,7 @@ import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import {
+  requireBreezApiKey,
   requireSparkTokenIdentifier,
   SparkConfig,
   SparkNetworkLabel,
@@ -38,7 +39,7 @@ const initializeLogging = (() => {
 
 const createSdkConfig = () => {
   const config = defaultConfig(SparkConfig.network)
-  config.apiKey = SparkConfig.apiKey
+  config.apiKey = requireBreezApiKey()
 
   config.stableBalanceConfig = {
     tokens: [{ label: SparkToken.Label, tokenIdentifier: requireSparkTokenIdentifier() }],

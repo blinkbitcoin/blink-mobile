@@ -32,8 +32,20 @@ export const SparkConfig = {
   network: SparkNetwork,
   storageDir: `${DocumentDirectoryPath}/breez-sdk-spark-${SparkNetworkLabel}`,
   maxSlippageBps: 50,
-  apiKey: Config.BREEZ_API_KEY ?? "",
 } as const
+
+// Validates BREEZ_API_KEY at SDK init (from `lifecycle.createSdkConfig`). A
+// missing key means the build is misconfigured (e.g. release minification
+// stripped the react-native-config BuildConfig values); failing loud here
+// surfaces that instead of connecting with an empty key and showing a
+// misleading "wallet is offline" network error.
+export const requireBreezApiKey = (): string => {
+  const apiKey = Config.BREEZ_API_KEY
+  if (!apiKey) {
+    throw new Error("BREEZ_API_KEY is not configured for this build")
+  }
+  return apiKey
+}
 
 let cachedTokenIdentifier: string | null = null
 

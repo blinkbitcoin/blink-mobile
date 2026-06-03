@@ -59,7 +59,23 @@ sed -i'' -e "s/versionCode .*$/versionCode $BUILD_NUMBER/g" android/app/build.gr
 echo $ANDROID_KEYSTORE | base64 -d > android/app/release.keystore
 nix develop -c sh -c 'cd android && bundle exec fastlane android build --verbose'
 
-# Guard: release artifacts must be ARM-only. x86/x86_64 exist solely for emulators
+# Assert react-native-config values survived R8/ProGuard in the release build.
+# react-native-config reads them by reflection over com.galoyapp.BuildConfig; if the
+# keep rule is missing/ineffective they get stripped and Config.* is null at runtime
+# (self-custodial wallet goes "offline"). Source of truth is the same .env.ci the build
+# consumed, so any key added there is covered automatically — nothing is hardcoded here.
+# Must run before the EXIT trap removes $REACT_NATIVE_CONFIG_ENV.
+echo "    --> Verifying react-native-config values survived R8 (release BuildConfig)"
+nix develop -c sh -c 'apkanalyzer dex code --class com.galoyapp.BuildConfig "$(ls android/app/build/outputs/apk/release/app-*-release.apk | head -1)"' > "${CI_ROOT}/release-buildconfig.dump"
+while IFS='=' read -r key _value; do
+  case "$key" in ''|\#*) continue ;; esac
+  grep -qw "$key" "${CI_ROOT}/release-buildconfig.dump" \
+    || { echo "❌ ${key} (from ${ENVFILE}) missing from release BuildConfig — R8 stripped react-native-config values"; exit 1; }
+done < "$REACT_NATIVE_CONFIG_ENV"
+echo "✅ all ${ENVFILE} keys survived R8 into release BuildConfig"
+rm -f "${CI_ROOT}/release-buildconfig.dump"
+
+# Release artifacts must be ARM-only. x86/x86_64 exist solely for emulators
 # and are excluded via abiFilters (app/build.gradle) + reactNativeArchitectures
 # (Fastfile). This catches a silent re-introduction (e.g. abiFilters dropped, x86
 # re-added, or the legacy apk_paths upload re-enabled) bloating the Play AAB.
