@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
+import { flushEffects } from "../../helpers/flush-effects"
 import { useOnChainAddress } from "@app/screens/receive-bitcoin-screen/hooks/use-onchain-address"
 
 const mockMutationFn = jest.fn()
@@ -23,7 +24,7 @@ describe("useOnChainAddress", () => {
     jest.clearAllMocks()
   })
 
-  it("returns loading true initially", () => {
+  it("returns loading true initially", async () => {
     mockMutationFn.mockResolvedValue({
       data: { onChainAddressCurrent: { address: "bc1qtest" } },
     })
@@ -32,6 +33,7 @@ describe("useOnChainAddress", () => {
 
     expect(result.current.loading).toBe(true)
     expect(result.current.address).toBeNull()
+    await flushEffects()
   })
 
   it("fetches address when walletId is provided", async () => {

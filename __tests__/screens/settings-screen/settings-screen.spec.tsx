@@ -25,6 +25,7 @@ import { LoggedInWithUsername } from "@app/screens/settings-screen/settings-scre
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import mocks from "@app/graphql/mocks"
 import { ContextForScreen } from "../helper"
+import { flushEffects } from "../../helpers/flush-effects"
 
 const notificationTitle = "Test notification"
 const notificationBody = "Test body"
@@ -334,6 +335,8 @@ describe("Settings Screen", () => {
     )
 
     expect(within(header).queryByTestId("notification-badge")).toBeNull()
+
+    await flushEffects()
   })
 
   it("hides the badge when the last unread notification is acknowledged", async () => {
@@ -387,6 +390,8 @@ describe("Settings Screen", () => {
     )
 
     expect(within(header).queryByTestId("notification-badge")).toBeNull()
+
+    await flushEffects()
   })
 
   it("does not render a badge when there are no unread notifications", async () => {
@@ -419,6 +424,8 @@ describe("Settings Screen", () => {
 
     const header = screen.getByTestId("notification-header")
     expect(within(header).queryByTestId("notification-badge")).toBeNull()
+
+    await flushEffects()
   })
 
   it("Renders user info", async () => {
@@ -437,6 +444,8 @@ describe("Settings Screen", () => {
 
     const elements = screen.getAllByText("test1@blink.sv")
     expect(elements.length).toBeGreaterThan(0)
+
+    await flushEffects()
   })
 
   it("shows phone ln address when phone is verified", async () => {
@@ -458,6 +467,8 @@ describe("Settings Screen", () => {
     )
 
     expect(screen.getByText(lnAddress)).toBeTruthy()
+
+    await flushEffects()
   })
 
   it("hides phone ln address when phone is missing", async () => {
@@ -478,6 +489,8 @@ describe("Settings Screen", () => {
 
     expect(screen.queryByText("Set your lightning address")).toBeNull()
     expect(screen.queryByText("+50365055539@blink.sv")).toBeNull()
+
+    await flushEffects()
   })
 
   it("truncates long settings row titles", () => {
@@ -543,6 +556,8 @@ describe("Settings Screen", () => {
 
     // TODO: re-enable once the custodial → non-custodial migration is complete
     expect(screen.queryByText("Move to non-custodial")).toBeNull()
+
+    await flushEffects()
   })
 
   it("does not render a standalone Recovery method group", async () => {
@@ -560,6 +575,8 @@ describe("Settings Screen", () => {
     )
 
     expect(screen.queryByTestId("Recovery method-group")).toBeNull()
+
+    await flushEffects()
   })
 
   it("skips the unread-notifications query when not authenticated", async () => {
@@ -583,6 +600,8 @@ describe("Settings Screen", () => {
     expect(generated.useUnacknowledgedNotificationCountQuery).toHaveBeenCalledWith(
       expect.objectContaining({ skip: true }),
     )
+
+    await flushEffects()
   })
 
   it("runs the unread-notifications query when authenticated", async () => {
@@ -606,5 +625,7 @@ describe("Settings Screen", () => {
     expect(generated.useUnacknowledgedNotificationCountQuery).toHaveBeenCalledWith(
       expect.objectContaining({ skip: false }),
     )
+
+    await flushEffects()
   })
 })

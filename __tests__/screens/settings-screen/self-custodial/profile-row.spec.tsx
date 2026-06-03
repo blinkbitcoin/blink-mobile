@@ -1,9 +1,11 @@
 import React from "react"
-import { fireEvent, render } from "@testing-library/react-native"
+import { act, fireEvent, render } from "@testing-library/react-native"
 
 import { AccountStatus, AccountType } from "@app/types/wallet"
 
 import { ProfileRow } from "@app/screens/settings-screen/self-custodial/profile-row"
+
+import { flushEffects } from "../../../helpers/flush-effects"
 
 const TEST_ENTRY_ID = "test-account-id"
 
@@ -294,7 +296,9 @@ describe("ProfileRow", () => {
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
     await findByTestId("delete-modal")
 
-    await lastConfirmModalProps.onConfirm?.()
+    await act(async () => {
+      await lastConfirmModalProps.onConfirm?.()
+    })
     rerender(<ProfileRow entry={entry} />)
 
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
@@ -358,9 +362,7 @@ describe("ProfileRow", () => {
     )
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
-    await new Promise((resolve) => {
-      setTimeout(resolve, 20)
-    })
+    await flushEffects()
 
     expect(queryByTestId("delete-modal")).toBeNull()
     expect(queryByTestId("warning-modal")).toBeNull()

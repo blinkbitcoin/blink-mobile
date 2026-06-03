@@ -4,6 +4,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { ReplaceCardScreen } from "@app/screens/card-screen/replace-card-screens/replace-card-screen"
 import { ContextForScreen } from "../../helper"
+import { flushEffects } from "../../../helpers/flush-effects"
 
 jest.mock("react-native-reanimated", () => {
   const RNView = jest.requireActual<typeof import("react-native")>("react-native").View
@@ -118,6 +119,18 @@ describe("ReplaceCardScreen", () => {
     mockLockCard.mockResolvedValue(true)
   })
 
+  // StepsProgressBar runs an Animated.timing (real-timer, ~120ms) whose frames
+  // land after the synchronous test body returns. Wait the animation out inside
+  // act() so its updates neither warn nor leak into the next test.
+  afterEach(async () => {
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 200)
+      })
+    })
+    await flushEffects()
+  })
+
   describe("rendering", () => {
     it("renders without crashing", async () => {
       const { toJSON } = render(
@@ -126,7 +139,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(toJSON()).toBeTruthy()
     })
@@ -138,7 +151,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Report card Issue")).toBeTruthy()
     })
@@ -150,7 +163,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Continue")).toBeTruthy()
     })
@@ -164,7 +177,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Lost card")).toBeTruthy()
       expect(getByText("Stolen card")).toBeTruthy()
@@ -178,7 +191,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Damaged card"))
@@ -200,7 +213,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Lost card"))
@@ -222,7 +235,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Stolen card"))
@@ -244,7 +257,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Damaged card"))
@@ -266,7 +279,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Lost card"))
@@ -300,7 +313,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await advanceToStep2(getByText)
 
@@ -335,7 +348,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await advanceToStep3(getByText)
 
@@ -352,7 +365,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await advanceToStep3(getByText)
 
@@ -382,7 +395,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await advanceToStep3(getByText)
 
@@ -418,7 +431,7 @@ describe("ReplaceCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Report card Issue")).toBeTruthy()
 

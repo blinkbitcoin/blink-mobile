@@ -1,5 +1,6 @@
 import { renderHook } from "@testing-library/react-hooks"
 
+import { flushEffects } from "../../helpers/flush-effects"
 import { useInvoiceLifecycle } from "@app/screens/receive-bitcoin-screen/hooks/use-invoice-lifecycle"
 import {
   Invoice,
@@ -77,7 +78,7 @@ describe("useInvoiceLifecycle", () => {
     expect(mockCreatePaymentRequest).not.toHaveBeenCalled()
   })
 
-  it("creates PR from prcd and mutations", () => {
+  it("creates PR from prcd and mutations", async () => {
     const mockPR = createMockPR()
     mockCreatePaymentRequest.mockReturnValue(mockPR)
 
@@ -91,6 +92,7 @@ describe("useInvoiceLifecycle", () => {
       creationData: prcd,
     })
     expect(result.current.pr).toBeDefined()
+    await flushEffects()
   })
 
   it("triggers invoice generation when PR is Idle", async () => {
@@ -105,6 +107,7 @@ describe("useInvoiceLifecycle", () => {
     renderHook(() => useInvoiceLifecycle(prcd as never, mockMutations as never))
 
     expect(idlePR.generateRequest).toHaveBeenCalled()
+    await flushEffects()
   })
 
   it("exposes regenerateInvoice callback", () => {

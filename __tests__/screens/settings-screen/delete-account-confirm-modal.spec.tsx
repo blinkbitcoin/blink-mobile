@@ -1,5 +1,5 @@
 import React from "react"
-import { fireEvent, render } from "@testing-library/react-native"
+import { act, fireEvent, render } from "@testing-library/react-native"
 
 import { DeleteAccountConfirmModal } from "@app/screens/settings-screen/self-custodial/delete-account-confirm-modal"
 
@@ -145,7 +145,9 @@ describe("DeleteAccountConfirmModal", () => {
     )
 
     fireEvent.changeText(getByTestId("self-custodial-danger-zone-delete-input"), "delete")
-    await lastModalProps.primaryButtonOnPress?.()
+    await act(async () => {
+      await lastModalProps.primaryButtonOnPress?.()
+    })
 
     expect(onConfirm).toHaveBeenCalledTimes(1)
   })

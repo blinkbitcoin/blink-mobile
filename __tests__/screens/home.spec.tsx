@@ -1,10 +1,11 @@
 import React from "react"
 import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
-import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
+import { fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { HomeScreen } from "../../app/screens/home-screen"
 import { ContextForScreen } from "./helper"
+import { flushEffects } from "../helpers/flush-effects"
 import {
   AccountLevel,
   HomeAuthedDocument,
@@ -396,7 +397,7 @@ describe("HomeScreen", () => {
         <HomeScreen />
       </ContextForScreen>,
     )
-    await act(async () => {})
+    await flushEffects()
 
     expect(getByTestId("slide-up-handle")).toBeTruthy()
   })
@@ -419,10 +420,13 @@ describe("HomeScreen", () => {
 
       if (expectConvertButton) {
         await waitFor(() => expect(getByTestId("transfer")).toBeTruthy())
+        await flushEffects()
         return
       }
 
       await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
+
+      await flushEffects()
     },
   )
 
@@ -438,6 +442,8 @@ describe("HomeScreen", () => {
     fireEvent.press(getByTestId("slide-up-handle"))
 
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("transactionHistory"))
+
+    await flushEffects()
   })
 
   it("renders home screen for self-custodial user", async () => {
@@ -469,7 +475,7 @@ describe("HomeScreen", () => {
       </ContextForScreen>,
     )
 
-    await act(async () => {})
+    await flushEffects()
 
     expect(getByTestId("slide-up-handle")).toBeTruthy()
 
@@ -506,7 +512,7 @@ describe("HomeScreen", () => {
       </ContextForScreen>,
     )
 
-    await act(async () => {})
+    await flushEffects()
 
     expect(queryByTestId("trust-model-modal")).toBeNull()
 
@@ -574,6 +580,8 @@ describe("HomeScreen", () => {
       )
 
       await waitFor(() => expect(getByTestId("balance-mode-toggle")).toBeTruthy())
+
+      await flushEffects()
     })
 
     it("hides the toggle when stableBalanceEnabled flag is off", async () => {
@@ -588,7 +596,7 @@ describe("HomeScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
       expect(queryByTestId("balance-mode-toggle")).toBeNull()
     })
 
@@ -608,7 +616,7 @@ describe("HomeScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
       expect(queryByTestId("balance-mode-toggle")).toBeNull()
     })
 
@@ -628,6 +636,8 @@ describe("HomeScreen", () => {
       fireEvent.press(toggle)
 
       expect(mockToggleBalanceMode).toHaveBeenCalledTimes(1)
+
+      await flushEffects()
     })
   })
 
@@ -658,7 +668,7 @@ describe("HomeScreen", () => {
           <HomeScreen />
         </ContextForScreen>,
       )
-      await act(async () => {})
+      await flushEffects()
 
       expect(lastIsVisible()).toBe(true)
     })
@@ -672,7 +682,7 @@ describe("HomeScreen", () => {
           <HomeScreen />
         </ContextForScreen>,
       )
-      await act(async () => {})
+      await flushEffects()
 
       expect(lastIsVisible()).toBe(false)
     })
@@ -686,7 +696,7 @@ describe("HomeScreen", () => {
           <HomeScreen />
         </ContextForScreen>,
       )
-      await act(async () => {})
+      await flushEffects()
 
       expect(lastIsVisible()).toBe(false)
     })
@@ -700,7 +710,7 @@ describe("HomeScreen", () => {
           <HomeScreen />
         </ContextForScreen>,
       )
-      await act(async () => {})
+      await flushEffects()
 
       expect(lastIsVisible()).toBe(false)
     })

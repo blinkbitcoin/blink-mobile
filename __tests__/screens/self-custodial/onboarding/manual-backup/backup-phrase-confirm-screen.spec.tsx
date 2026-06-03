@@ -1,5 +1,5 @@
 import React from "react"
-import { render, fireEvent } from "@testing-library/react-native"
+import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
@@ -107,7 +107,7 @@ describe("BackupPhraseConfirmScreen", () => {
     jest.useRealTimers()
   })
 
-  it("renders subtitle and input fields", () => {
+  it("renders subtitle and input fields", async () => {
     const { getByText, getByPlaceholderText } = render(
       <ContextForScreen>
         <BackupPhraseConfirmScreen />
@@ -219,7 +219,9 @@ describe("BackupPhraseConfirmScreen", () => {
     )
 
     fillAllChallenges(getByPlaceholderText)
-    jest.advanceTimersByTime(500)
+    act(() => {
+      jest.advanceTimersByTime(500)
+    })
 
     expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
@@ -239,7 +241,9 @@ describe("BackupPhraseConfirmScreen", () => {
     )
 
     fillAllChallenges(getByPlaceholderText)
-    jest.advanceTimersByTime(500)
+    act(() => {
+      jest.advanceTimersByTime(500)
+    })
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
@@ -257,7 +261,9 @@ describe("BackupPhraseConfirmScreen", () => {
     )
 
     fillAllChallenges(getByPlaceholderText)
-    jest.advanceTimersByTime(500)
+    act(() => {
+      jest.advanceTimersByTime(500)
+    })
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
@@ -278,7 +284,9 @@ describe("BackupPhraseConfirmScreen", () => {
     )
 
     fillAllChallenges(getByPlaceholderText)
-    jest.advanceTimersByTime(500)
+    act(() => {
+      jest.advanceTimersByTime(500)
+    })
 
     expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationTransferringFunds")
     expect(mockNavigate).toHaveBeenCalledWith(
@@ -308,7 +316,9 @@ describe("BackupPhraseConfirmScreen", () => {
     )
 
     fillAllChallenges(getByPlaceholderText)
-    jest.advanceTimersByTime(500)
+    act(() => {
+      jest.advanceTimersByTime(500)
+    })
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
@@ -330,7 +340,9 @@ describe("BackupPhraseConfirmScreen", () => {
     )
 
     fillAllChallenges(getByPlaceholderText)
-    jest.advanceTimersByTime(500)
+    act(() => {
+      jest.advanceTimersByTime(500)
+    })
 
     expect(mockNavigate).not.toHaveBeenCalled()
 
@@ -341,7 +353,9 @@ describe("BackupPhraseConfirmScreen", () => {
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
-    jest.advanceTimersByTime(500)
+    act(() => {
+      jest.advanceTimersByTime(500)
+    })
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
   })
