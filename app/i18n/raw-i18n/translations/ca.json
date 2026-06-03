@@ -2225,7 +2225,8 @@
     "slideToConfirm": "Llisca per confirmar",
     "slideConfirming": "Confirmant...",
     "copiedDestination": "Destinació copiada al porta-retalls",
-    "lightningRecommended": "Comissió alta! Recomanem utilitzar Lightning."
+    "lightningRecommended": "Comissió alta! Recomanem utilitzar Lightning.",
+    "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} nom d'usuari és ara la adreça {bankName: string}.",

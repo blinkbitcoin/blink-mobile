@@ -17,6 +17,7 @@ import {
   executeSend,
   extractLightningFee,
   extractOnchainFees,
+  mapAmountAdjustment,
   prepareSend,
 } from "../bridge"
 import { classifySdkError } from "../sdk-error"
@@ -52,7 +53,10 @@ export const createGetFee = <T extends WalletCurrency>(
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       const feeSats = extractLightningFee(prepared) ?? 0
-      return { amount: asGetFeeAmount<T>(feeSats) }
+      const amountAdjustment = mapAmountAdjustment(
+        prepared.conversionEstimate?.amountAdjustment,
+      )
+      return { amount: asGetFeeAmount<T>(feeSats), amountAdjustment }
     } catch {
       return { amount: undefined }
     }

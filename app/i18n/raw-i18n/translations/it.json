@@ -2225,7 +2225,8 @@
         "slideToConfirm": "Scorri per confermare",
         "slideConfirming": "Confermando...",
         "copiedDestination": "Destinazione copiata negli appunti",
-        "lightningRecommended": "Tariffa elevata! Consigliamo Lightning"
+        "lightningRecommended": "Tariffa elevata! Consigliamo Lightning",
+        "usdRemainderSweep": "Saldo rimanente {remaining: string} ({remainingSats: string}) sarà convertito in Bitcoin. Minimo USD: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "Gli username {bankName: string} sono ora indirizzi {bankName: string}.",

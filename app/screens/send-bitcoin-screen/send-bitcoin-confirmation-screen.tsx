@@ -27,7 +27,7 @@ import {
   ZeroBtcMoneyAmount,
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
-import { useTranslateSdkError } from "@app/self-custodial/hooks"
+import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
@@ -117,6 +117,16 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { copyToClipboard } = useClipboard()
 
   const fee = useFee(getFee)
+
+  const dustWarning = useSendDustWarning({
+    amountAdjustment: fee.amountAdjustment,
+    fromCurrency: sendingWalletDescriptor.currency,
+    fromWalletBalance: usdWallet?.balance,
+    unitOfAccountAmount,
+    settlementAmount: settlementAmount.amount,
+    feeSats: fee.amount?.amount ?? 0,
+    usdBalanceMoneyAmount,
+  })
 
   const defaultAmount = formatMoneyAmount({ moneyAmount: ZeroUsdMoneyAmount })
   let currencyFeeAmount = defaultAmount
@@ -497,6 +507,21 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           )}
         </View>
 
+        {dustWarning.shouldShow ? (
+          <View style={styles.fieldContainer}>
+            <View style={styles.dustWarning}>
+              <GaloyIcon name="warning" size={18} color={colors.warning} />
+              <Text type="p3" style={styles.dustWarningText}>
+                {" "}
+                {LL.SendBitcoinConfirmationScreen.usdRemainderSweep({
+                  remaining: dustWarning.remaining,
+                  remainingSats: dustWarning.remainingSats,
+                  minimum: dustWarning.minimum,
+                })}
+              </Text>
+            </View>
+          </View>
+        ) : null}
         {errorMessage ? (
           <View style={styles.errorContainer}>
             <Text type="p2" style={styles.errorText}>
@@ -513,7 +538,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 initialText={LL.SendBitcoinConfirmationScreen.slideToConfirm()}
                 loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
                 onSwipe={handleSendPayment}
-                disabled={!validAmount || hasAttemptedSend}
+                disabled={!validAmount || hasAttemptedSend || fee.status === "loading"}
               />
             </View>
           </PanGestureHandler>
@@ -617,6 +642,15 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   feeWarningText: {
     color: colors.warning,
+  },
+  dustWarning: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    columnGap: 4,
+  },
+  dustWarningText: {
+    color: colors.warning,
+    flex: 1,
   },
   feeTextContainer: {
     flexDirection: "row",

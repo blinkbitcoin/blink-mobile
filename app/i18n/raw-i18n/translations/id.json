@@ -2225,7 +2225,8 @@
     "slideToConfirm": "Geser untuk Konfirmasi",
     "slideConfirming": "Mengkonfirmasi...",
     "copiedDestination": "Tujuan disalin ke papan klip",
-    "lightningRecommended": "Biaya tinggi! Kami merekomendasikan Lightning."
+    "lightningRecommended": "Biaya tinggi! Kami merekomendasikan Lightning.",
+    "usdRemainderSweep": "Sisa {remaining: string} ({remainingSats: string}) akan dikonversi ke Bitcoin. Minimum USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} nama pengguna sekarang adalah alamat {bankName: string}.",

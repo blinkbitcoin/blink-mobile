@@ -2225,7 +2225,8 @@
     "slideToConfirm": "Posunutím potvrďte",
     "slideConfirming": "Potvrdzovanie...",
     "copiedDestination": "Cieľ bol skopírovaný do schránky",
-    "lightningRecommended": "Vysoký poplatok! Odporúčame Lightning."
+    "lightningRecommended": "Vysoký poplatok! Odporúčame Lightning.",
+    "usdRemainderSweep": "Zostávajúcich {remaining: string} ({remainingSats: string}) bude prevedených na Bitcoin. Minimum v USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "Používateľské mená {bankName: string} sú teraz adresy {bankName: string}.",

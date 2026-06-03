@@ -27,6 +27,7 @@ import {
   WalletAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
+import { ConvertAmountAdjustment } from "@app/types/payment"
 import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 import { WalletDescriptor } from "@app/types/wallets"
 import { PaymentType } from "@blinkbitcoin/blink-client"
@@ -64,6 +65,7 @@ export type GetFeeParams = {
 export type GetFee<T extends WalletCurrency> = (getFeeFns: GetFeeParams) => Promise<{
   amount?: WalletAmount<T> | null | undefined
   errors?: readonly GraphQlApplicationError[]
+  amountAdjustment?: ConvertAmountAdjustment | undefined
 }>
 
 export type SendPaymentMutationParams = {

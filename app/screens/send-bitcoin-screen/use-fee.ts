@@ -12,6 +12,7 @@ import {
   useOnChainUsdTxFeeLazyQuery,
 } from "@app/graphql/generated"
 import { WalletAmount } from "@app/types/amounts"
+import { ConvertAmountAdjustment } from "@app/types/payment"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { GetFee } from "./payment-details/index.types"
@@ -20,14 +21,17 @@ type FeeType =
   | {
       status: "loading" | "error" | "unset"
       amount?: undefined | null
+      amountAdjustment?: undefined
     }
   | {
       amount: WalletAmount<WalletCurrency>
       status: "set"
+      amountAdjustment?: ConvertAmountAdjustment
     }
   | {
       amount?: WalletAmount<WalletCurrency>
       status: "error"
+      amountAdjustment?: undefined
     }
 
 gql`
@@ -146,6 +150,7 @@ const useFee = <T extends WalletCurrency>(getFeeFn?: GetFee<T> | null): FeeType 
         return setFee({
           status: "set",
           amount: feeResponse.amount,
+          amountAdjustment: feeResponse.amountAdjustment,
         })
       } catch (err) {
         if (err instanceof Error) {

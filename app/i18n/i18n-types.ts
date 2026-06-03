@@ -7120,6 +7120,13 @@ type RootTranslation = {
 		 * H​i​g​h​ ​f​e​e​!​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
 		 */
 		lightningRecommended: string
+		/**
+		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
+		 * @param {string} minimum
+		 * @param {string} remaining
+		 * @param {string} remainingSats
+		 */
+		usdRemainderSweep: RequiredParams<'minimum' | 'remaining' | 'remainingSats'>
 	}
 	SendBitcoinDestinationScreen: {
 		/**
@@ -19358,6 +19365,10 @@ export type TranslationFunctions = {
 		 * High fee! We recommend Lightning.
 		 */
 		lightningRecommended: () => LocalizedString
+		/**
+		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
+		 */
+		usdRemainderSweep: (arg: { minimum: string, remaining: string, remainingSats: string }) => LocalizedString
 	}
 	SendBitcoinDestinationScreen: {
 		/**

@@ -29,7 +29,7 @@ import { requireSparkTokenIdentifier, SparkConfig } from "../config"
 import { buildConversionType, fetchConversionLimits } from "./limits"
 import { fetchUsdbDecimals, findUsdbToken } from "./token-balance"
 
-const mapAmountAdjustment = (
+export const mapAmountAdjustment = (
   reason: AmountAdjustmentReason | undefined,
 ): ConvertAmountAdjustment | undefined => {
   if (reason === undefined) return undefined

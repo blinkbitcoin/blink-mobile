@@ -30,6 +30,10 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
     Generic: "Generic",
   }
   return {
+    AmountAdjustmentReason: {
+      FlooredToMinLimit: "FlooredToMinLimit",
+      IncreasedToAvoidDust: "IncreasedToAvoidDust",
+    },
     BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
     InputType_Tags: { SparkAddress: "SparkAddress" },
     Network: { Mainnet: 0, Regtest: 1 },

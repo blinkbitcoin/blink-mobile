@@ -2225,7 +2225,8 @@
     "slideToConfirm": "Húzd el a megerősítéshez",
     "slideConfirming": "Megerősítés...",
     "copiedDestination": "Címzett a vágólapra másolva",
-    "lightningRecommended": "Magas díj! Lightning használata ajánlott."
+    "lightningRecommended": "Magas díj! Lightning használata ajánlott.",
+    "usdRemainderSweep": "A fennmaradó {remaining: string} ({remainingSats: string}) Bitcoinra lesz váltva. USD minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "Mostantól a {bankName: string} felhasználónevek {bankName: string} címek is.",

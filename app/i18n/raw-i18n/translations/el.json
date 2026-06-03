@@ -2225,7 +2225,8 @@
     "slideToConfirm": "Σύρετε για επιβεβαίωση",
     "slideConfirming": "Επιβεβαίωση...",
     "copiedDestination": "Αντιγραφή προορισμού στο πρόχειρο",
-    "lightningRecommended": "Υψηλή τέλη! Συνιστούμε το Lightning."
+    "lightningRecommended": "Υψηλή τέλη! Συνιστούμε το Lightning.",
+    "usdRemainderSweep": "Υπόλοιπο {remaining: string} ({remainingSats: string}) θα μετατραπεί σε Bitcoin. Ελάχιστο USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "Τα ονόματα χρηστών {bankName: string} είναι τώρα διευθύνσεις {bankName: string}.",

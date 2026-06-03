@@ -4,6 +4,7 @@ import { Satoshis } from "lnurl-pay"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { DisplayCurrency, toUsdMoneyAmount } from "@app/types/amounts"
+import { ConvertAmountAdjustment } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
@@ -14,6 +15,8 @@ import {
   Intraledger,
   LightningLnURL,
 } from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.stories"
+
+import { flushEffects } from "../helpers/flush-effects"
 import { ContextForScreen } from "./helper"
 
 jest.mock("@app/store/persistent-state", () => ({
@@ -179,6 +182,14 @@ const mockUseSendBalances = jest.fn()
 jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => ({
   ...jest.requireActual("@app/screens/send-bitcoin-screen/hooks/use-send-wallets"),
   useSendBalances: () => mockUseSendBalances(),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-non-custodial-conversion-limits", () => ({
+  useNonCustodialConversionLimits: () => ({
+    limits: { minFromAmount: 800, minToAmount: null },
+    loading: false,
+    error: null,
+  }),
 }))
 
 const useActiveWalletMock = jest.fn(() => ({
@@ -661,6 +672,96 @@ describe("SendBitcoinConfirmationScreen — fee-currency conversion", () => {
     )
 
     expect(screen.getByText(/exceeds your balance/i)).toBeTruthy()
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => {
+  const usdRemainderSweepMatcher = /will be converted to Bitcoin\. USD minimum:/i
+
+  beforeEach(() => {
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 0,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 1000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  it("renders the warning when fee quote reports IncreasedToAvoidDust and user is not draining balance", async () => {
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+      amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.getByText(usdRemainderSweepMatcher)).toBeTruthy()
+  })
+
+  it("does NOT render the warning when there is no amountAdjustment in the fee quote", async () => {
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.queryByText(usdRemainderSweepMatcher)).toBeNull()
+  })
+
+  it("does NOT render the warning when the user is already draining the full USD balance", async () => {
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+      amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(1000)} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.queryByText(usdRemainderSweepMatcher)).toBeNull()
+  })
+
+  it("does NOT render the warning for FlooredToMin (benign SDK floor)", async () => {
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+      amountAdjustment: ConvertAmountAdjustment.FlooredToMin,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.queryByText(usdRemainderSweepMatcher)).toBeNull()
   })
 })
 

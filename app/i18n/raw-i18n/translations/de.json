@@ -2225,7 +2225,8 @@
         "slideToConfirm": "Schiebe zur Bestätigung",
         "slideConfirming": "Bestätigend…",
         "copiedDestination": "Ziel in die Zwischenablage kopiert",
-        "lightningRecommended": "Hohe Gebühr! Wir empfehlen Lightning."
+        "lightningRecommended": "Hohe Gebühr! Wir empfehlen Lightning.",
+        "usdRemainderSweep": "Restbetrag {remaining: string} ({remainingSats: string}) wird in Bitcoin umgewandelt. USD-Mindestbetrag: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "{bankName: string} Benutzernamen sind nun {bankName: string} Adressen.",
