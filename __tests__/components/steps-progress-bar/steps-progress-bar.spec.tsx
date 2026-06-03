@@ -1,6 +1,6 @@
 import React from "react"
 import { Text as RNText } from "react-native"
-import { render } from "@testing-library/react-native"
+import { render, act } from "@testing-library/react-native"
 
 import { StepsProgressBar } from "@app/components/steps-progress-bar"
 
@@ -25,6 +25,16 @@ jest.mock("@rn-vui/themed", () => ({
   }),
 }))
 
+// The animated bar fill runs an Animated.timing whose updates land across several
+// frames after the synchronous test body returns. Drive those frames to
+// completion inside act() so they neither warn ("not wrapped in act(...)") nor
+// leak into the next test. The component's animation lasts 120ms; 200ms covers it.
+const settleAnimations = () => {
+  act(() => {
+    jest.advanceTimersByTime(200)
+  })
+}
+
 describe("StepsProgressBar", () => {
   const twoStepProps = {
     steps: ["Set PIN", "Confirm"],
@@ -35,6 +45,15 @@ describe("StepsProgressBar", () => {
     steps: ["Current PIN", "New PIN", "Confirm"],
     currentStep: 1,
   }
+
+  beforeEach(() => {
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    settleAnimations()
+    jest.useRealTimers()
+  })
 
   describe("rendering", () => {
     it("renders without crashing", () => {

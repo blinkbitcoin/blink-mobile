@@ -1,5 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
 
+import { flushEffects } from "../../helpers/flush-effects"
 import { useOnchainFeeAlert } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-alert"
 import { Network, WalletCurrency } from "@app/graphql/generated"
 import type { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
@@ -62,9 +63,7 @@ describe("useOnchainFeeAlert (self-custodial gate)", () => {
       },
     )
 
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 0)
-    })
+    await flushEffects()
     rerender({
       paymentDetail: buildOnchainPaymentDetail(100),
       walletId: "btc-wallet-1",
@@ -87,9 +86,7 @@ describe("useOnchainFeeAlert (self-custodial gate)", () => {
       }),
     )
 
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 0)
-    })
+    await flushEffects()
 
     expect(mockGetOnChainTxFee).toHaveBeenCalled()
     expect(result.current).toBe(false)

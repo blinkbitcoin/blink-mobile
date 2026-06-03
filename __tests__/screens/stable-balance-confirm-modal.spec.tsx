@@ -1,5 +1,5 @@
 import React from "react"
-import { fireEvent, render } from "@testing-library/react-native"
+import { act, fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
@@ -54,21 +54,33 @@ const renderModal = (overrides: Partial<ModalProps> = {}) =>
     </ThemeProvider>,
   )
 
+// react-native-modal animates its mount/unmount via RN Animated timers; let those
+// settle inside act() so their trailing setState doesn't fire outside act between tests.
+const settleModalAnimations = async (): Promise<void> => {
+  await act(async () => {
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 400)
+    })
+  })
+}
+
 describe("StableBalanceConfirmModal", () => {
   beforeEach(() => {
     onConfirm.mockReset()
     onCancel.mockReset()
   })
 
-  it("renders the activation title, body and fee", () => {
+  it("renders the activation title, body and fee", async () => {
     const { getByText } = renderModal()
 
     expect(getByText("Activate Stable Balance")).toBeTruthy()
     expect(getByText("Your BTC will be converted to USDB.")).toBeTruthy()
     expect(getByText("$0.05")).toBeTruthy()
+
+    await settleModalAnimations()
   })
 
-  it("renders the deactivation title and warning when provided", () => {
+  it("renders the deactivation title and warning when provided", async () => {
     const { getByText } = renderModal({
       isActivating: false,
       deactivationWarning: "You still have 5.00 USD.",
@@ -76,39 +88,51 @@ describe("StableBalanceConfirmModal", () => {
 
     expect(getByText("Deactivate Stable Balance")).toBeTruthy()
     expect(getByText("You still have 5.00 USD.")).toBeTruthy()
+
+    await settleModalAnimations()
   })
 
-  it("invokes onConfirm when the primary button is pressed", () => {
+  it("invokes onConfirm when the primary button is pressed", async () => {
     const { getByText } = renderModal()
 
     fireEvent.press(getByText("Activate"))
     expect(onConfirm).toHaveBeenCalledTimes(1)
+
+    await settleModalAnimations()
   })
 
-  it("does not invoke onConfirm when the fee preview has an error", () => {
+  it("does not invoke onConfirm when the fee preview has an error", async () => {
     const { getByText } = renderModal({ hasError: true })
 
     fireEvent.press(getByText("Activate"))
     expect(onConfirm).not.toHaveBeenCalled()
+
+    await settleModalAnimations()
   })
 
-  it("does not invoke onConfirm while loading", () => {
+  it("does not invoke onConfirm while loading", async () => {
     const { getByText } = renderModal({ isLoading: true })
 
     fireEvent.press(getByText("Activate"))
     expect(onConfirm).not.toHaveBeenCalled()
+
+    await settleModalAnimations()
   })
 
-  it("invokes onCancel when the secondary button is pressed", () => {
+  it("invokes onCancel when the secondary button is pressed", async () => {
     const { getByText } = renderModal()
 
     fireEvent.press(getByText("Cancel"))
     expect(onCancel).toHaveBeenCalledTimes(1)
+
+    await settleModalAnimations()
   })
 
-  it("hides the fee row when showFeeRow is false", () => {
+  it("hides the fee row when showFeeRow is false", async () => {
     const { queryByText } = renderModal({ showFeeRow: false })
 
     expect(queryByText("$0.05")).toBeNull()
+
+    await settleModalAnimations()
   })
 })

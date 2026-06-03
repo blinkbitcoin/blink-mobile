@@ -11,6 +11,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
 
 import { ContextForScreen } from "./helper"
+import { flushEffects } from "../helpers/flush-effects"
 
 const makeQueryResult = (defaultWalletId = "btc-wallet-id") => ({
   loading: false,
@@ -429,6 +430,8 @@ describe("ReceiveScreen", () => {
       await waitFor(() => {
         expect(onChainAddressCurrentMock).toHaveBeenCalled()
       })
+
+      await flushEffects()
     })
 
     it("renders OnChain QR on page 1", async () => {
@@ -725,6 +728,8 @@ describe("ReceiveScreen", () => {
       await waitFor(() => {
         expect(lnInvoiceCreateMock).toHaveBeenCalled()
       })
+
+      await flushEffects()
     })
   })
 

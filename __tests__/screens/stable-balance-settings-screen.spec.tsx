@@ -7,6 +7,8 @@ import { WalletCurrency } from "@app/graphql/generated"
 
 import { StableBalanceSettingsScreen } from "@app/screens/stable-balance-settings-screen"
 
+import { flushEffects } from "../helpers/flush-effects"
+
 jest.mock("react-native-reanimated", () => {
   const RNView = jest.requireActual<typeof import("react-native")>("react-native").View
   return {
@@ -186,6 +188,8 @@ describe("StableBalanceSettingsScreen", () => {
       expect(mockActivate).toHaveBeenCalledWith(baseContext.sdk, "USDB")
     })
     expect(queryByTestId("stable-balance-confirm-modal")).toBeNull()
+
+    await flushEffects()
   })
 
   it("deactivates directly when USD balance is zero (no conversion needed)", async () => {
@@ -198,9 +202,11 @@ describe("StableBalanceSettingsScreen", () => {
       expect(mockDeactivate).toHaveBeenCalledWith(baseContext.sdk)
     })
     expect(queryByTestId("stable-balance-confirm-modal")).toBeNull()
+
+    await flushEffects()
   })
 
-  it("shows confirm modal with fee on activate when BTC balance > 0", () => {
+  it("shows confirm modal with fee on activate when BTC balance > 0", async () => {
     mockWallet.mockReturnValue({
       ...baseContext,
       wallets: [
@@ -216,9 +222,11 @@ describe("StableBalanceSettingsScreen", () => {
     expect(getByText("Activate Stable Balance")).toBeTruthy()
     expect(getByText("$0.05")).toBeTruthy()
     expect(mockActivate).not.toHaveBeenCalled()
+
+    await flushEffects()
   })
 
-  it("shows confirm modal with fee on deactivate when USD balance > 0", () => {
+  it("shows confirm modal with fee on deactivate when USD balance > 0", async () => {
     mockWallet.mockReturnValue({
       ...baseContext,
       isStableBalanceActive: true,
@@ -236,6 +244,8 @@ describe("StableBalanceSettingsScreen", () => {
     expect(getByText("You still have $5.00.")).toBeTruthy()
     expect(getByText("$0.05")).toBeTruthy()
     expect(mockDeactivate).not.toHaveBeenCalled()
+
+    await flushEffects()
   })
 
   it("runs activation when the user confirms on the modal", async () => {
@@ -254,6 +264,8 @@ describe("StableBalanceSettingsScreen", () => {
     await waitFor(() => {
       expect(mockActivate).toHaveBeenCalledWith(baseContext.sdk, "USDB")
     })
+
+    await flushEffects()
   })
 
   it("runs deactivation when the user confirms on the modal", async () => {
@@ -275,9 +287,11 @@ describe("StableBalanceSettingsScreen", () => {
     await waitFor(() => {
       expect(mockDeactivate).toHaveBeenCalledWith(baseContext.sdk)
     })
+
+    await flushEffects()
   })
 
-  it("cancels the toggle without invoking the SDK when the user dismisses the modal", () => {
+  it("cancels the toggle without invoking the SDK when the user dismisses the modal", async () => {
     mockWallet.mockReturnValue({
       ...baseContext,
       wallets: [
@@ -292,6 +306,8 @@ describe("StableBalanceSettingsScreen", () => {
 
     expect(mockActivate).not.toHaveBeenCalled()
     expect(mockDeactivate).not.toHaveBeenCalled()
+
+    await flushEffects()
   })
 
   it("does not invoke the SDK when it is null (inactive wallet)", async () => {
@@ -301,9 +317,8 @@ describe("StableBalanceSettingsScreen", () => {
 
     fireEvent(getByTestId("stable-balance-switch"), "pressIn")
 
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 0)
-    })
+    await flushEffects()
+
     expect(mockActivate).not.toHaveBeenCalled()
     expect(mockDeactivate).not.toHaveBeenCalled()
   })
@@ -320,6 +335,8 @@ describe("StableBalanceSettingsScreen", () => {
     const refreshActiveOrder = mockRefreshStableBalanceActive.mock.invocationCallOrder[0]
     const refreshWalletsOrder = mockRefresh.mock.invocationCallOrder[0]
     expect(refreshActiveOrder).toBeLessThan(refreshWalletsOrder)
+
+    await flushEffects()
   })
 
   it("records to crashlytics and shows error toast when activation rejects", async () => {
@@ -336,6 +353,8 @@ describe("StableBalanceSettingsScreen", () => {
     expect(mockToastShow.mock.calls[0][0].type).toBe("error")
     expect(mockRefresh).not.toHaveBeenCalled()
     expect(mockRefreshStableBalanceActive).not.toHaveBeenCalled()
+
+    await flushEffects()
   })
 
   it("records to crashlytics and shows error toast when deactivation rejects", async () => {
@@ -352,5 +371,7 @@ describe("StableBalanceSettingsScreen", () => {
     })
     expect(mockRefresh).not.toHaveBeenCalled()
     expect(mockRefreshStableBalanceActive).not.toHaveBeenCalled()
+
+    await flushEffects()
   })
 })

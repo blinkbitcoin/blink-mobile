@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-var-requires, camelcase */
 import React from "react"
 
-import { render, waitFor } from "@testing-library/react-native"
+import { act, render, waitFor } from "@testing-library/react-native"
 import { InteractionManager, SectionList } from "react-native"
 
 import { TransactionHistoryScreen } from "@app/screens/transaction-history"
 import { ActiveWalletStatus, AccountType } from "@app/types/wallet"
+
+import { flushEffects } from "../helpers/flush-effects"
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
@@ -229,12 +231,16 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
     const { UNSAFE_getByType } = render(<TransactionHistoryScreen route={route} />)
     const list = UNSAFE_getByType(SectionList)
 
-    await list.props.onRefresh?.()
+    await act(async () => {
+      await list.props.onRefresh?.()
+    })
 
     await waitFor(() => {
       expect(mockRefetch).toHaveBeenCalledTimes(1)
     })
     expect(mockRefreshSelfCustodialWallets).not.toHaveBeenCalled()
+
+    await flushEffects()
   })
 
   it("self-custodial pull-to-refresh calls refreshWallets and not Apollo refetch", async () => {
@@ -243,12 +249,16 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
     const { UNSAFE_getByType } = render(<TransactionHistoryScreen route={route} />)
     const list = UNSAFE_getByType(SectionList)
 
-    await list.props.onRefresh?.()
+    await act(async () => {
+      await list.props.onRefresh?.()
+    })
 
     await waitFor(() => {
       expect(mockRefreshSelfCustodialWallets).toHaveBeenCalledTimes(1)
     })
     expect(mockRefetch).not.toHaveBeenCalled()
+
+    await flushEffects()
   })
 
   it("self-custodial mode batches the cache fragment writes through cache.batch", () => {

@@ -2,6 +2,8 @@ import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
+import { flushEffects } from "../../helpers/flush-effects"
+
 import theme from "@app/rne-theme/theme"
 import { UnclaimedDepositsScreen } from "@app/screens/unclaimed-deposits/unclaimed-deposits-screen"
 import { SdkFeeError } from "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers"
@@ -194,6 +196,8 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
       "bc1qaddr",
       20, // medium tier feeSats
     )
+
+    await flushEffects()
   })
 })
 

@@ -5,6 +5,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CloseCardModal } from "@app/screens/card-screen/card-settings-screen/close-card-modal"
 import { ContextForScreen } from "../../helper"
+import { flushEffects } from "../../../helpers/flush-effects"
 
 jest.mock("react-native-reanimated", () => {
   const RNView = jest.requireActual<typeof import("react-native")>("react-native").View
@@ -30,6 +31,20 @@ describe("CloseCardModal", () => {
     jest.clearAllMocks()
   })
 
+  // CustomModal (react-native-modal) runs ~300ms entrance/backdrop animations
+  // on real timers whose Animated updates land after the synchronous test body
+  // returns. Wait the animations out inside act() so they neither warn nor leak
+  // into the next test.
+  afterEach(async () => {
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 400)
+      })
+    })
+    await flushEffects()
+    await flushEffects()
+  })
+
   const renderModal = (overrides = {}) =>
     render(
       <ContextForScreen>
@@ -47,7 +62,7 @@ describe("CloseCardModal", () => {
     it("renders header title", async () => {
       const { getByText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Close card account")).toBeTruthy()
     })
@@ -55,7 +70,7 @@ describe("CloseCardModal", () => {
     it("renders warning text", async () => {
       const { getByText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(
         getByText(
@@ -67,7 +82,7 @@ describe("CloseCardModal", () => {
     it("renders instruction text", async () => {
       const { getByText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText('Please type "close" to confirm')).toBeTruthy()
     })
@@ -75,7 +90,7 @@ describe("CloseCardModal", () => {
     it("renders text input with placeholder", async () => {
       const { getByPlaceholderText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByPlaceholderText("close")).toBeTruthy()
     })
@@ -83,7 +98,7 @@ describe("CloseCardModal", () => {
     it("renders confirm and cancel buttons", async () => {
       const { getByText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Confirm")).toBeTruthy()
       expect(getByText("Cancel")).toBeTruthy()
@@ -95,7 +110,7 @@ describe("CloseCardModal", () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.changeText(getByPlaceholderText("close"), "close")
@@ -113,7 +128,7 @@ describe("CloseCardModal", () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.changeText(getByPlaceholderText("close"), "CLOSE")
@@ -131,7 +146,7 @@ describe("CloseCardModal", () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.changeText(getByPlaceholderText("close"), "  close  ")
@@ -149,7 +164,7 @@ describe("CloseCardModal", () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.changeText(getByPlaceholderText("close"), "clo")
@@ -167,7 +182,7 @@ describe("CloseCardModal", () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Confirm"))
@@ -182,7 +197,7 @@ describe("CloseCardModal", () => {
     it("calls onClose when cancel is pressed", async () => {
       const { getByText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Cancel"))
@@ -195,7 +210,7 @@ describe("CloseCardModal", () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.changeText(getByPlaceholderText("close"), "close")
@@ -220,7 +235,7 @@ describe("CloseCardModal", () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.changeText(getByPlaceholderText("close"), "close")
@@ -239,7 +254,7 @@ describe("CloseCardModal", () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.changeText(getByPlaceholderText("close"), "close")
@@ -261,7 +276,7 @@ describe("CloseCardModal", () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.changeText(getByPlaceholderText("close"), "close")
@@ -285,7 +300,7 @@ describe("CloseCardModal", () => {
       jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.changeText(getByPlaceholderText("close"), "close")
@@ -302,7 +317,7 @@ describe("CloseCardModal", () => {
       const alertSpy = jest.spyOn(Alert, "alert")
       const { getByText, getByPlaceholderText } = renderModal()
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.changeText(getByPlaceholderText("close"), "close")

@@ -9,6 +9,8 @@ import {
   useSelfCustodialWallet,
 } from "@app/self-custodial/providers/wallet"
 
+import { flushEffects } from "../../helpers/flush-effects"
+
 import { getWalletSnapshotMocks, setupConnectedWallet } from "./wallet.fixtures"
 
 jest.mock("react-native/Libraries/AppState/AppState", () => ({
@@ -209,7 +211,7 @@ describe("SelfCustodialWalletProvider", () => {
     mockSetSelfCustodialLightningAddress.mockResolvedValue(undefined)
   })
 
-  it("renders children", () => {
+  it("renders children", async () => {
     const { getByText } = render(
       <SelfCustodialWalletProvider>
         <Text>child</Text>
@@ -217,6 +219,7 @@ describe("SelfCustodialWalletProvider", () => {
     )
 
     expect(getByText("child")).toBeTruthy()
+    await flushEffects()
   })
 
   it("returns unavailable when no mnemonic exists", async () => {
@@ -229,22 +232,25 @@ describe("SelfCustodialWalletProvider", () => {
     })
   })
 
-  it("sets accountType to self-custodial", () => {
+  it("sets accountType to self-custodial", async () => {
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
     expect(result.current.accountType).toBe(AccountType.SelfCustodial)
+    await flushEffects()
   })
 
-  it("provides retry function", () => {
+  it("provides retry function", async () => {
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
     expect(typeof result.current.retry).toBe("function")
+    await flushEffects()
   })
 
-  it("default state has empty wallets", () => {
+  it("default state has empty wallets", async () => {
     const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
     expect(result.current.wallets).toEqual([])
+    await flushEffects()
   })
 
   it("sets error status on network mismatch", async () => {

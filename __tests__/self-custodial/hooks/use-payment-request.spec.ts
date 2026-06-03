@@ -1,6 +1,7 @@
 import { renderHook, act, waitFor } from "@testing-library/react-native"
 import { WalletCurrency } from "@app/graphql/generated"
 
+import { flushEffects } from "../../helpers/flush-effects"
 import { usePaymentRequest } from "@app/self-custodial/hooks/use-payment-request"
 
 const mockReceiveLightning = jest.fn()
@@ -99,12 +100,13 @@ describe("usePaymentRequest", () => {
     expect(result.current).toBeNull()
   })
 
-  it("returns null when btcWallet is missing", () => {
+  it("returns null when btcWallet is missing", async () => {
     mockActiveWallet.mockReturnValue({ wallets: [] })
 
     const { result } = renderHook(() => usePaymentRequest())
 
     expect(result.current).toBeNull()
+    await flushEffects()
   })
 
   it("generates Lightning invoice on mount", async () => {
@@ -194,7 +196,7 @@ describe("usePaymentRequest", () => {
     )
   })
 
-  it("does not call the receive adapter while active wallet is not ready", () => {
+  it("does not call the receive adapter while active wallet is not ready", async () => {
     mockActiveWallet.mockReturnValue({
       wallets: [btcWallet, usdWallet],
       isReady: false,
@@ -203,6 +205,7 @@ describe("usePaymentRequest", () => {
     renderHook(() => usePaymentRequest())
 
     expect(mockReceiveLightning).not.toHaveBeenCalled()
+    await flushEffects()
   })
 
   it("generates on-chain address on mount", async () => {
@@ -279,6 +282,7 @@ describe("usePaymentRequest", () => {
     })
 
     expect(result.current?.memo).toBe("test memo")
+    await flushEffects()
   })
 
   it("setAmount updates unitOfAccountAmount", async () => {
@@ -297,6 +301,7 @@ describe("usePaymentRequest", () => {
     })
 
     expect(result.current?.unitOfAccountAmount?.amount).toBe(5000)
+    await flushEffects()
   })
 
   it("transitions to Paid when a new payment arrives after invoice creation", async () => {
@@ -555,10 +560,8 @@ describe("usePaymentRequest", () => {
 
       renderHook(() => usePaymentRequest())
 
-      // Give any pending microtasks a chance to flush.
-      await new Promise((resolve) => {
-        setTimeout(resolve, 10)
-      })
+      // Give any pending microtasks a chance to flush (inside act()).
+      await flushEffects()
 
       expect(mockReceiveLightning).not.toHaveBeenCalled()
       expect(mockAddPendingAutoConvert).not.toHaveBeenCalled()
@@ -574,9 +577,7 @@ describe("usePaymentRequest", () => {
 
       const { rerender } = renderHook(() => usePaymentRequest())
 
-      await new Promise((resolve) => {
-        setTimeout(resolve, 10)
-      })
+      await flushEffects()
       expect(mockReceiveLightning).not.toHaveBeenCalled()
       expect(mockAddPendingAutoConvert).not.toHaveBeenCalled()
 
@@ -592,6 +593,7 @@ describe("usePaymentRequest", () => {
         expect(mockReceiveLightning).toHaveBeenCalled()
       })
       expect(mockAddPendingAutoConvert).toHaveBeenCalled()
+      await flushEffects()
     })
   })
 
