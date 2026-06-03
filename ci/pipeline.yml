@@ -86,6 +86,8 @@ jobs:
       - name: repo
       run:
         path: pipeline-tasks/ci/tasks/test-unit.sh
+      params:
+        CI: true
 
 - name: check-code
   plan:

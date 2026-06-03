@@ -6,6 +6,7 @@ module.exports = {
   ],
   setupFilesAfterEnv: [
     "@testing-library/jest-native/extend-expect",
+    "<rootDir>/jest.setup.js",
     "<rootDir>/jest.setup-after-env.ts",
   ],
   // Stopgap against CPU-starved CI runners pushing borderline tests past the
