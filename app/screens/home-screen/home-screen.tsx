@@ -39,6 +39,7 @@ import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { getErrorMessages } from "@app/graphql/utils"
@@ -58,7 +59,6 @@ import {
   TxDirection,
   TxStatus,
   useBulletinsQuery,
-  useHasPromptedSetDefaultAccountQuery,
   useHomeAuthedQuery,
   useHomeUnauthedQuery,
   useRealtimePriceQuery,
@@ -163,8 +163,7 @@ export const HomeScreen: React.FC = () => {
   const { balanceLimitToTriggerUpgradeModal, upgradeModalCooldownDays } =
     useRemoteConfig()
 
-  const { data: { hasPromptedSetDefaultAccount } = {} } =
-    useHasPromptedSetDefaultAccountQuery()
+  const { defaultAccountModalShown } = useDefaultAccountModalShown()
   const [setDefaultAccountModalVisible, setSetDefaultAccountModalVisible] =
     React.useState(false)
   const reopenUpgradeModal = React.useRef(false)
@@ -408,7 +407,7 @@ export const HomeScreen: React.FC = () => {
     if (
       !isSelfCustodial &&
       target === "receiveBitcoin" &&
-      !hasPromptedSetDefaultAccount &&
+      !defaultAccountModalShown &&
       numberOfTxs >= TransactionCountToTriggerSetDefaultAccountModal &&
       galoyInstanceId === "Main"
     ) {

@@ -10,7 +10,6 @@ import {
   CountryCodeQuery,
   FeedbackModalShownDocument,
   FeedbackModalShownQuery,
-  HasPromptedSetDefaultAccountDocument,
   HiddenBalanceToolTipDocument,
   HiddenBalanceToolTipQuery,
   HideBalanceDocument,
@@ -60,10 +59,6 @@ export default gql`
 
   query feedbackModalShown {
     feedbackModalShown @client
-  }
-
-  query hasPromptedSetDefaultAccount {
-    hasPromptedSetDefaultAccount @client
   }
 
   query introducingCirclesModalShown {
@@ -190,20 +185,6 @@ export const setFeedbackModalShown = (client: ApolloClient<unknown>, shown: bool
     })
   } catch {
     console.warn("unable to update feedbackModalShown")
-  }
-}
-
-export const setHasPromptedSetDefaultAccount = (client: ApolloClient<unknown>) => {
-  try {
-    client.writeQuery({
-      query: HasPromptedSetDefaultAccountDocument,
-      data: {
-        __typename: "Query",
-        hasPromptedSetDefaultAccount: true,
-      },
-    })
-  } catch {
-    console.warn("impossible to update hasPromptedSetDefaultAccount")
   }
 }
 

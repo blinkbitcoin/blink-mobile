@@ -10,7 +10,6 @@ extend type Query {
   countryCode: String!
   region: Region
   feedbackModalShown: Boolean!
-  hasPromptedSetDefaultAccount: Boolean!
   introducingCirclesModalShown: Boolean!
   innerCircleValue: Int!
   upgradeModalLastShownAt: String
