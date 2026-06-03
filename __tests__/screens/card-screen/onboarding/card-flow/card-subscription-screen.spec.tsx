@@ -84,6 +84,18 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
+// Some app handlers log placeholder/diagnostic messages via console.log when
+// pressed (e.g. "TODO: payment flow" in card-subscription-screen); capture them so expected logs don't pollute CI logs.
+let consoleLogSpy: jest.SpyInstance
+
+beforeEach(() => {
+  consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
+})
+
+afterEach(() => {
+  consoleLogSpy.mockRestore()
+})
+
 describe("CardSubscriptionScreen - subscribe variant", () => {
   beforeEach(() => {
     loadLocale("en")

@@ -5,6 +5,7 @@ import { act } from "react-test-renderer"
 import { MockedProvider } from "@apollo/client/testing"
 import {
   CurrencyListDocument,
+  DisplayCurrencyDocument,
   RealtimePriceDocument,
   WarningSecureAccountDocument,
 } from "@app/graphql/generated"
@@ -42,6 +43,8 @@ const mocksPrice = [
     request: {
       query: RealtimePriceDocument,
     },
+    // The hook re-renders and re-requests; reusable so MockLink never warns
+    maxUsageCount: Number.POSITIVE_INFINITY,
     result: {
       data: {
         me: {
@@ -77,6 +80,7 @@ const mocksPrice = [
     request: {
       query: CurrencyListDocument,
     },
+    maxUsageCount: Number.POSITIVE_INFINITY,
     result: {
       data: {
         currencyList: [
@@ -89,6 +93,25 @@ const mocksPrice = [
             __typename: "Currency",
           },
         ],
+      },
+    },
+  },
+  {
+    request: {
+      query: DisplayCurrencyDocument,
+    },
+    maxUsageCount: Number.POSITIVE_INFINITY,
+    result: {
+      data: {
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          defaultAccount: {
+            id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
+            displayCurrency: "USD",
+            __typename: "ConsumerAccount",
+          },
+          __typename: "User",
+        },
       },
     },
   },

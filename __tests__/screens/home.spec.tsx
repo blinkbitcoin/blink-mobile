@@ -12,6 +12,7 @@ import {
   HomeUnauthedDocument,
   Network,
 } from "@app/graphql/generated"
+import { mockCurrencyList } from "@app/graphql/mocks"
 
 let currentMocks: MockedResponse[] = []
 
@@ -76,6 +77,7 @@ jest.mock("@app/config/feature-flags-context", () => {
     useRemoteConfig: () => ({
       loading: false,
       remoteConfigReady: true,
+      feeReimbursementMemo: "fee reimbursement",
       featureFlags: {
         nonCustodialEnabled: false,
         stableBalanceEnabled: false,
@@ -134,12 +136,20 @@ jest.mock("@app/hooks", () => {
   }
 })
 
-jest.mock("@app/graphql/mocks", () => ({
-  __esModule: true,
-  get default() {
-    return currentMocks
-  },
-}))
+jest.mock("@app/graphql/mocks", () => {
+  const actual = jest.requireActual("@app/graphql/mocks")
+  return {
+    __esModule: true,
+    mockCurrencyList: actual.mockCurrencyList,
+    get default() {
+      // Spec-specific mocks first so they take precedence (they are
+      // infinite-use, so the shared variants of the same queries are never
+      // reached); the shared mocks backfill every other query fired by
+      // mounted components, keeping Apollo's MockLink warning-free.
+      return [...currentMocks, ...actual.default]
+    },
+  }
+})
 
 jest.mock("@app/components/slide-up-handle", () => {
   const React = jest.requireActual("react")
@@ -203,6 +213,7 @@ export const generateHomeMock = ({
   return [
     {
       request: { query: HomeUnauthedDocument },
+      maxUsageCount: Number.POSITIVE_INFINITY,
       result: {
         data: {
           __typename: "Query",
@@ -210,17 +221,28 @@ export const generateHomeMock = ({
             __typename: "Globals",
             network,
           },
-          currencyList: [],
+          // Must match the shared currencyList mock, or Apollo warns about
+          // cache data loss when the two results replace each other.
+          currencyList: mockCurrencyList,
         },
       },
     },
     {
       request: { query: HomeAuthedDocument },
+      maxUsageCount: Number.POSITIVE_INFINITY,
       result: {
         data: {
           me: {
             __typename: "User",
             id: "user-id",
+            language: "en",
+            username: "test-user",
+            phone: "+50365055539",
+            email: {
+              __typename: "Email",
+              address: null,
+              verified: false,
+            },
             defaultAccount: {
               __typename: "ConsumerAccount",
               id: "account-id",

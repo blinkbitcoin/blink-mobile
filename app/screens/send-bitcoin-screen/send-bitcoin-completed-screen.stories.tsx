@@ -6,6 +6,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 
 import { StoryScreen } from "../../../.storybook/views"
+import mocks from "../../graphql/mocks"
 import { createCache } from "../../graphql/cache"
 import { IsAuthedContextProvider } from "../../graphql/is-authed-context"
 import SendBitcoinCompletedScreen from "./send-bitcoin-completed-screen"
@@ -26,7 +27,7 @@ const successRoute = {
 } as const
 
 export const Success = () => (
-  <MockedProvider mocks={[]} cache={createCache()}>
+  <MockedProvider mocks={mocks} cache={createCache()}>
     <IsAuthedContextProvider value={true}>
       <SendBitcoinCompletedScreen route={successRoute} />
     </IsAuthedContextProvider>
@@ -43,7 +44,7 @@ const queuedRoute = {
 } as const
 
 export const Queued = () => (
-  <MockedProvider mocks={[]} cache={createCache()}>
+  <MockedProvider mocks={mocks} cache={createCache()}>
     <IsAuthedContextProvider value={true}>
       <SendBitcoinCompletedScreen route={queuedRoute} />
     </IsAuthedContextProvider>
@@ -60,7 +61,7 @@ const pendingRoute = {
 } as const
 
 export const Pending = () => (
-  <MockedProvider mocks={[]} cache={createCache()}>
+  <MockedProvider mocks={mocks} cache={createCache()}>
     <IsAuthedContextProvider value={true}>
       <SendBitcoinCompletedScreen route={pendingRoute} />
     </IsAuthedContextProvider>
@@ -72,7 +73,7 @@ export const SuccessAction = ({
 }: {
   route: RouteProp<RootStackParamList, "sendBitcoinCompleted">
 }) => (
-  <MockedProvider mocks={[]} cache={createCache()}>
+  <MockedProvider mocks={mocks} cache={createCache()}>
     <IsAuthedContextProvider value={true}>
       <SendBitcoinCompletedScreen route={route} />
     </IsAuthedContextProvider>

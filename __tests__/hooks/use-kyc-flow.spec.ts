@@ -187,6 +187,9 @@ describe("useKycFlow", () => {
   })
 
   it("calls goBack on canceled error", async () => {
+    // The hook logs the simulated failure via console.error; capture it so the
+    // expected error doesn't pollute CI logs (and assert it actually happened).
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
     mockKycFlowStart.mockRejectedValue(new Error("Request canceled by user"))
 
     const { result } = renderHook(() => useKycFlow())
@@ -197,9 +200,17 @@ describe("useKycFlow", () => {
 
     expect(mockGoBack).toHaveBeenCalledTimes(1)
     expect(Alert.alert).not.toHaveBeenCalled()
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "error:",
+      expect.objectContaining({ message: "Request canceled by user" }),
+    )
+    consoleErrorSpy.mockRestore()
   })
 
   it("shows Alert on other errors", async () => {
+    // The hook logs the simulated failure via console.error; capture it so the
+    // expected error doesn't pollute CI logs (and assert it actually happened).
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
     mockKycFlowStart.mockRejectedValue(new Error("Network failure"))
 
     const { result } = renderHook(() => useKycFlow())
@@ -213,6 +224,11 @@ describe("useKycFlow", () => {
       expect.stringContaining("Network failure"),
       expect.arrayContaining([expect.objectContaining({ text: "OK" })]),
     )
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "error:",
+      expect.objectContaining({ message: "Network failure" }),
+    )
+    consoleErrorSpy.mockRestore()
   })
 
   it("sets loading true during startKyc, false after", async () => {

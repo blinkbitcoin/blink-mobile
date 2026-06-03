@@ -139,6 +139,9 @@ describe("useLnurlWithdraw", () => {
   })
 
   it("shows submission error on non-ok response", async () => {
+    // The hook logs the simulated failure via console.error; capture it so the
+    // expected error doesn't pollute CI logs (and assert it actually happened).
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
     const alertSpy = jest.spyOn(Alert, "alert")
     mockFetch.mockResolvedValue({
       ok: false,
@@ -156,9 +159,17 @@ describe("useLnurlWithdraw", () => {
     })
 
     expect(alertSpy).toHaveBeenCalledWith("Submission error")
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      "error with submitting withdrawalRequest",
+    )
+    consoleErrorSpy.mockRestore()
   })
 
   it("shows redeeming error when response status is not ok", async () => {
+    // The hook logs the simulated failure via console.error; capture it so the
+    // expected error doesn't pollute CI logs (and assert it actually happened).
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
     const alertSpy = jest.spyOn(Alert, "alert")
     mockFetch.mockResolvedValue({
       ok: true,
@@ -176,6 +187,11 @@ describe("useLnurlWithdraw", () => {
     })
 
     expect(alertSpy).toHaveBeenCalledWith("Redeeming error", "Invalid k1")
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ status: "ERROR", reason: "Invalid k1" }),
+      "error with redeeming",
+    )
+    consoleErrorSpy.mockRestore()
   })
 
   it("does not alert on successful withdraw", async () => {
