@@ -4,7 +4,14 @@ module.exports = {
     "./node_modules/@react-native/jest-preset/jest/setup.js",
     "./node_modules/react-native-gesture-handler/jestSetup.js",
   ],
-  setupFilesAfterEnv: ["@testing-library/jest-native/extend-expect"],
+  setupFilesAfterEnv: [
+    "@testing-library/jest-native/extend-expect",
+    "<rootDir>/jest.setup-after-env.ts",
+  ],
+  // Stopgap against CPU-starved CI runners pushing borderline tests past the
+  // 5s default (issue #3815). Genuine hangs are fixed at the source; this only
+  // absorbs slow-runner tails without letting real hangs sit for a minute.
+  testTimeout: 20000,
   transform: {
     "\\.(ts|tsx)$": [
       "ts-jest",

@@ -12,8 +12,8 @@ jobs:
         with:
           node-version-file: .nvmrc
       - run: yarn install
-      - uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: yarn test
+      # Flake handling happens at test granularity now: jest retries individual
+      # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
+      # error, instead of silently re-running the whole job.
+      - run: yarn test
+        timeout-minutes: 20
