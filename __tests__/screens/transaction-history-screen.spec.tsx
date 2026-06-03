@@ -56,12 +56,18 @@ jest.mock("../../app/graphql/cache", () => {
   }
 })
 
-jest.mock("@app/graphql/mocks", () => ({
-  __esModule: true,
-  get default() {
-    return currentMocks
-  },
-}))
+jest.mock("@app/graphql/mocks", () => {
+  const actual = jest.requireActual("@app/graphql/mocks")
+  return {
+    __esModule: true,
+    get default() {
+      // Spec-specific mocks first so they take precedence; the shared mocks
+      // backfill every other query fired by mounted components, keeping
+      // Apollo's MockLink warning-free.
+      return [...currentMocks, ...actual.default]
+    },
+  }
+})
 
 jest.mock("@app/components/transaction-item", () => {
   const React = jest.requireActual("react")
@@ -237,6 +243,7 @@ const buildTransactionMocks = ({
       },
       newData: () => makeResult(edges),
     },
+    maxUsageCount: Number.POSITIVE_INFINITY,
     result: makeResult(edges),
   })
 

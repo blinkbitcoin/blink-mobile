@@ -1,5 +1,7 @@
 import { renderHook } from "@testing-library/react-hooks"
 
+import { flushEffects } from "../../helpers/flush-effects"
+
 import { usePaymentRequest } from "@app/screens/receive-bitcoin-screen/hooks/use-payment-request"
 import { WalletCurrency } from "@app/graphql/generated"
 import {
@@ -28,12 +30,20 @@ jest.mock("@app/screens/receive-bitcoin-screen/hooks/use-wallet-resolution", () 
   useWalletResolution: () => mockUseWalletResolution(),
 }))
 
+// The mutation functions must keep a stable identity across renders: they
+// feed the `mutations` useMemo in usePaymentRequest, and a fresh jest.fn()
+// per render would re-trigger useInvoiceLifecycle's layout effect on every
+// render, looping until React aborts with "Maximum update depth exceeded".
+const mockLnInvoiceCreate = jest.fn()
+const mockLnNoAmountInvoiceCreate = jest.fn()
+const mockLnUsdInvoiceCreate = jest.fn()
+const mockOnChainAddressCurrent = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   WalletCurrency: { Btc: "BTC", Usd: "USD" },
-  useLnInvoiceCreateMutation: () => [jest.fn()],
-  useLnNoAmountInvoiceCreateMutation: () => [jest.fn()],
-  useLnUsdInvoiceCreateMutation: () => [jest.fn()],
-  useOnChainAddressCurrentMutation: () => [jest.fn()],
+  useLnInvoiceCreateMutation: () => [mockLnInvoiceCreate],
+  useLnNoAmountInvoiceCreateMutation: () => [mockLnNoAmountInvoiceCreate],
+  useLnUsdInvoiceCreateMutation: () => [mockLnUsdInvoiceCreate],
+  useOnChainAddressCurrentMutation: () => [mockOnChainAddressCurrent],
 }))
 
 const mockUseLnUpdateHashPaid = jest.fn()
@@ -153,17 +163,20 @@ describe("usePaymentRequest", () => {
     expect(result.current).toBeNull()
   })
 
-  it("creates PRCD with PayCode for BTC default wallet with username", () => {
+  it("creates PRCD with PayCode for BTC default wallet with username", async () => {
     setupMocksWithPR()
 
     renderHook(() => usePaymentRequest())
+
+    // Settle generateRequest's async setPR inside act()
+    await flushEffects()
 
     expect(mockCreatePaymentRequestCreationData).toHaveBeenCalledWith(
       expect.objectContaining({ type: Invoice.PayCode }),
     )
   })
 
-  it("creates PRCD with Lightning for wallet without username", () => {
+  it("creates PRCD with Lightning for wallet without username", async () => {
     const walletsNoUsername = { ...mockWallets, username: null }
     const mockPRCD = {
       ...createFullMockPRCD(),
@@ -189,12 +202,15 @@ describe("usePaymentRequest", () => {
 
     renderHook(() => usePaymentRequest())
 
+    // Settle generateRequest's async setPR inside act()
+    await flushEffects()
+
     expect(mockCreatePaymentRequestCreationData).toHaveBeenCalledWith(
       expect.objectContaining({ type: Invoice.Lightning }),
     )
   })
 
-  it("creates PRCD with Lightning for USD default wallet even with username", () => {
+  it("creates PRCD with Lightning for USD default wallet even with username", async () => {
     const walletsUsdDefault = {
       ...mockWallets,
       defaultWallet: { id: "usd-id", balance: 100, walletCurrency: WalletCurrency.Usd },
@@ -219,15 +235,21 @@ describe("usePaymentRequest", () => {
 
     renderHook(() => usePaymentRequest())
 
+    // Settle generateRequest's async setPR inside act()
+    await flushEffects()
+
     expect(mockCreatePaymentRequestCreationData).toHaveBeenCalledWith(
       expect.objectContaining({ type: Invoice.Lightning }),
     )
   })
 
-  it("uses default expiration time for BTC wallet", () => {
+  it("uses default expiration time for BTC wallet", async () => {
     setupMocksWithPR()
 
     renderHook(() => usePaymentRequest())
+
+    // Settle generateRequest's async setPR inside act()
+    await flushEffects()
 
     expect(mockCreatePaymentRequestCreationData).toHaveBeenCalledWith(
       expect.objectContaining({ expirationTime: 1440 }),

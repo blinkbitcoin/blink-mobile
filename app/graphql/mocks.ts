@@ -1,5 +1,13 @@
 import {
+  BulletinsDocument,
+  ContactsDocument,
   CurrencyListDocument,
+  LanguageDocument,
+  NotificationSettingsDocument,
+  RealtimePriceUnauthedDocument,
+  SendBitcoinWithdrawalLimitsDocument,
+  SettingsScreenDocument,
+  WalletOverviewScreenDocument,
   DisplayCurrencyDocument,
   HomeAuthedDocument,
   HomeUnauthedDocument,
@@ -9,10 +17,12 @@ import {
   OnChainAddressCurrentDocument,
   PaymentRequestDocument,
   RealtimePriceDocument,
+  ScanningQrCodeScreenDocument,
   SendBitcoinConfirmationScreenDocument,
   SendBitcoinDestinationDocument,
   SendBitcoinDetailsScreenDocument,
   SendBitcoinInternalLimitsDocument,
+  SupportedCountriesDocument,
   UserUpdateUsernameDocument,
   MyUserIdDocument,
   TransactionListForDefaultAccountDocument,
@@ -23,6 +33,105 @@ import {
 // will it work for storybooks?
 // should not be in production build
 // no harm but will increase bundle size
+
+export const mockCurrencyList = [
+  {
+    flag: "🇺🇸",
+    id: "USD",
+    name: "US Dollar",
+    symbol: "$",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+  {
+    flag: "🇪🇺",
+    id: "EUR",
+    name: "Euro",
+    symbol: "€",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+  {
+    flag: "🇳🇬",
+    id: "NGN",
+    name: "Nigerian Naira",
+    symbol: "₦",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+  {
+    flag: "",
+    id: "XAF",
+    name: "CFA Franc BEAC",
+    symbol: "FCFA",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+  {
+    flag: "🇵🇪",
+    id: "PEN",
+    name: "Peruvian Nuevo Sol",
+    symbol: "S/.",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+  {
+    flag: "🇨🇴",
+    id: "COP",
+    name: "Colombian Peso",
+    symbol: "$",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+  {
+    flag: "🇧🇷",
+    id: "BRL",
+    name: "Brazilian Real",
+    symbol: "R$",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+  {
+    flag: "🇬🇹",
+    id: "GTQ",
+    name: "Guatemalan Quetzal",
+    symbol: "Q",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+  {
+    flag: "🇨🇷",
+    id: "CRC",
+    name: "Costa Rican Colón",
+    symbol: "₡",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+  {
+    flag: "🇹🇷",
+    id: "TRY",
+    name: "Turkish Lira",
+    symbol: "₤",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+  {
+    flag: "🇮🇳",
+    id: "INR",
+    name: "Indian Rupee",
+    symbol: "₹",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+  {
+    flag: "🇹🇹",
+    id: "TTD",
+    name: "Trinidad and Tobago Dollar",
+    symbol: "TT$",
+    fractionDigits: 2,
+    __typename: "Currency",
+  },
+]
 
 const mocks = [
   {
@@ -115,104 +224,7 @@ const mocks = [
     },
     result: {
       data: {
-        currencyList: [
-          {
-            flag: "🇺🇸",
-            id: "USD",
-            name: "US Dollar",
-            symbol: "$",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇪🇺",
-            id: "EUR",
-            name: "Euro",
-            symbol: "€",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇳🇬",
-            id: "NGN",
-            name: "Nigerian Naira",
-            symbol: "₦",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "",
-            id: "XAF",
-            name: "CFA Franc BEAC",
-            symbol: "FCFA",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇵🇪",
-            id: "PEN",
-            name: "Peruvian Nuevo Sol",
-            symbol: "S/.",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇨🇴",
-            id: "COP",
-            name: "Colombian Peso",
-            symbol: "$",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇧🇷",
-            id: "BRL",
-            name: "Brazilian Real",
-            symbol: "R$",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇬🇹",
-            id: "GTQ",
-            name: "Guatemalan Quetzal",
-            symbol: "Q",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇨🇷",
-            id: "CRC",
-            name: "Costa Rican Colón",
-            symbol: "₡",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇹🇷",
-            id: "TRY",
-            name: "Turkish Lira",
-            symbol: "₤",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇮🇳",
-            id: "INR",
-            name: "Indian Rupee",
-            symbol: "₹",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇹🇹",
-            id: "TTD",
-            name: "Trinidad and Tobago Dollar",
-            symbol: "TT$",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-        ],
+        currencyList: mockCurrencyList,
       },
     },
   },
@@ -570,104 +582,7 @@ const mocks = [
           currentSupported: 100,
           minSupported: 100,
         },
-        currencyList: [
-          {
-            flag: "🇺🇸",
-            id: "USD",
-            name: "US Dollar",
-            symbol: "$",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇪🇺",
-            id: "EUR",
-            name: "Euro",
-            symbol: "€",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇳🇬",
-            id: "NGN",
-            name: "Nigerian Naira",
-            symbol: "₦",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "",
-            id: "XAF",
-            name: "CFA Franc BEAC",
-            symbol: "FCFA",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇵🇪",
-            id: "PEN",
-            name: "Peruvian Nuevo Sol",
-            symbol: "S/.",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇨🇴",
-            id: "COP",
-            name: "Colombian Peso",
-            symbol: "$",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇧🇷",
-            id: "BRL",
-            name: "Brazilian Real",
-            symbol: "R$",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇬🇹",
-            id: "GTQ",
-            name: "Guatemalan Quetzal",
-            symbol: "Q",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇨🇷",
-            id: "CRC",
-            name: "Costa Rican Colón",
-            symbol: "₡",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇹🇷",
-            id: "TRY",
-            name: "Turkish Lira",
-            symbol: "₤",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇮🇳",
-            id: "INR",
-            name: "Indian Rupee",
-            symbol: "₹",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-          {
-            flag: "🇹🇹",
-            id: "TTD",
-            name: "Trinidad and Tobago Dollar",
-            symbol: "TT$",
-            fractionDigits: 2,
-            __typename: "Currency",
-          },
-        ],
+        currencyList: mockCurrencyList,
       },
     },
   },
@@ -682,8 +597,14 @@ const mocks = [
           language: "",
           username: "test1",
           phone: "+50365055539",
+          email: {
+            address: null,
+            verified: false,
+            __typename: "Email",
+          },
           defaultAccount: {
             level: "ONE",
+            pendingIncomingTransactions: [],
             id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
             defaultWalletId: "f79792e3-282b-45d4-85d5-7486d020def5",
             transactions: {
@@ -725,6 +646,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -760,6 +682,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -795,6 +718,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -830,6 +754,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -865,6 +790,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -900,6 +826,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -935,6 +862,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -965,11 +893,13 @@ const mocks = [
                     initiationVia: {
                       paymentHash:
                         "34f33b2c30907eb324f2f2128221307e93d3686e8ac71f02b6d8d5679a6b1ad8",
+                      paymentRequest: "mock-payment-request",
                       __typename: "InitiationViaLn",
                     },
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1000,11 +930,13 @@ const mocks = [
                     initiationVia: {
                       paymentHash:
                         "a01b22efb5eb7d16ecd47d6a66bb03682018a572d7cd0e069d5202913b99f58e",
+                      paymentRequest: "mock-payment-request",
                       __typename: "InitiationViaLn",
                     },
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1035,11 +967,13 @@ const mocks = [
                     initiationVia: {
                       paymentHash:
                         "58dce20cde9b58b2218bb9a4afe7f213dfc23daa7fc8b478632521646ad8ad20",
+                      paymentRequest: "mock-payment-request",
                       __typename: "InitiationViaLn",
                     },
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1075,6 +1009,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1110,6 +1045,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1140,11 +1076,13 @@ const mocks = [
                     initiationVia: {
                       paymentHash:
                         "bff4848dc3e20eb1cb265193d2ff53c41b1aca8ddcc21757e41af842a2e35cef",
+                      paymentRequest: "mock-payment-request",
                       __typename: "InitiationViaLn",
                     },
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1175,11 +1113,13 @@ const mocks = [
                     initiationVia: {
                       paymentHash:
                         "17a6c7d5c7d41c16bfcd0df540c52fbd718d9f4b87a5f823cfad57c176ba012c",
+                      paymentRequest: "mock-payment-request",
                       __typename: "InitiationViaLn",
                     },
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1210,11 +1150,13 @@ const mocks = [
                     initiationVia: {
                       paymentHash:
                         "41d8a8701d5c9fac263dbc8a413ebf5409f730e96ca226e0045924c852898e74",
+                      paymentRequest: "mock-payment-request",
                       __typename: "InitiationViaLn",
                     },
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1250,6 +1192,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: null,
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1285,6 +1228,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: null,
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1320,6 +1264,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1355,6 +1300,7 @@ const mocks = [
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1385,11 +1331,13 @@ const mocks = [
                     initiationVia: {
                       paymentHash:
                         "6d11c30f52d6f56b7ab28f17163bb07355bf483213c917f5d6c78ccb9662ddd9",
+                      paymentRequest: "mock-payment-request",
                       __typename: "InitiationViaLn",
                     },
                     settlementVia: {
                       counterPartyWalletId: null,
                       counterPartyUsername: "galoytest",
+                      preImage: null,
                       __typename: "SettlementViaIntraLedger",
                     },
                   },
@@ -1676,9 +1624,316 @@ const mocks = [
       },
     },
   },
+  {
+    request: {
+      query: ScanningQrCodeScreenDocument,
+    },
+    result: {
+      data: {
+        globals: {
+          network: "signet",
+          __typename: "Globals",
+        },
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          defaultAccount: {
+            id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
+            wallets: [
+              {
+                id: "f79792e3-282b-45d4-85d5-7486d020def5",
+                __typename: "BTCWallet",
+              },
+              {
+                id: "f091c102-6277-4cc6-8d81-87ebf6aaad1b",
+                __typename: "UsdWallet",
+              },
+            ],
+            __typename: "ConsumerAccount",
+          },
+          contacts: [
+            {
+              id: "extheo",
+              handle: "extheo",
+              username: "extheo",
+              __typename: "UserContact",
+            },
+            {
+              id: "test",
+              handle: "test",
+              username: "test",
+              __typename: "UserContact",
+            },
+            {
+              id: "galoytest",
+              handle: "galoytest",
+              username: "galoytest",
+              __typename: "UserContact",
+            },
+          ],
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: ContactsDocument,
+    },
+    result: {
+      data: {
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          contacts: [
+            {
+              id: "extheo",
+              handle: "extheo",
+              username: "extheo",
+              alias: null,
+              transactionsCount: 1,
+              __typename: "UserContact",
+            },
+            {
+              id: "test",
+              handle: "test",
+              username: "test",
+              alias: null,
+              transactionsCount: 1,
+              __typename: "UserContact",
+            },
+            {
+              id: "galoytest",
+              handle: "galoytest",
+              username: "galoytest",
+              alias: null,
+              transactionsCount: 1,
+              __typename: "UserContact",
+            },
+          ],
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: SupportedCountriesDocument,
+    },
+    result: {
+      data: {
+        globals: {
+          supportedCountries: [
+            {
+              id: "SV",
+              supportedAuthChannels: ["SMS"],
+              __typename: "Country",
+            },
+          ],
+          __typename: "Globals",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: SettingsScreenDocument,
+    },
+    result: {
+      data: {
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          username: "test1",
+          language: "en",
+          defaultAccount: {
+            id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
+            defaultWalletId: "f79792e3-282b-45d4-85d5-7486d020def5",
+            wallets: [
+              {
+                id: "f79792e3-282b-45d4-85d5-7486d020def5",
+                balance: 88413,
+                walletCurrency: "BTC",
+                __typename: "BTCWallet",
+              },
+              {
+                id: "f091c102-6277-4cc6-8d81-87ebf6aaad1b",
+                balance: 158,
+                walletCurrency: "USD",
+                __typename: "UsdWallet",
+              },
+            ],
+            __typename: "ConsumerAccount",
+          },
+          totpEnabled: false,
+          phone: "+50365055539",
+          email: {
+            address: null,
+            verified: false,
+            __typename: "Email",
+          },
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: WalletOverviewScreenDocument,
+    },
+    result: {
+      data: {
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          defaultAccount: {
+            id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
+            wallets: [
+              {
+                id: "f79792e3-282b-45d4-85d5-7486d020def5",
+                balance: 88413,
+                walletCurrency: "BTC",
+                __typename: "BTCWallet",
+              },
+              {
+                id: "f091c102-6277-4cc6-8d81-87ebf6aaad1b",
+                balance: 158,
+                walletCurrency: "USD",
+                __typename: "UsdWallet",
+              },
+            ],
+            __typename: "ConsumerAccount",
+          },
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: BulletinsDocument,
+      variables: { first: 1 },
+    },
+    result: {
+      data: {
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          unacknowledgedStatefulNotificationsWithBulletinEnabled: {
+            pageInfo: {
+              endCursor: null,
+              hasNextPage: false,
+              hasPreviousPage: false,
+              startCursor: null,
+              __typename: "PageInfo",
+            },
+            edges: [],
+            __typename: "StatefulNotificationConnection",
+          },
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: LanguageDocument,
+    },
+    result: {
+      data: {
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          language: "en",
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: NotificationSettingsDocument,
+    },
+    result: {
+      data: {
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          defaultAccount: {
+            id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
+            notificationSettings: {
+              push: {
+                enabled: true,
+                disabledCategories: [],
+                __typename: "NotificationChannelSettings",
+              },
+              __typename: "NotificationSettings",
+            },
+            __typename: "ConsumerAccount",
+          },
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: SendBitcoinWithdrawalLimitsDocument,
+    },
+    result: {
+      data: {
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          defaultAccount: {
+            id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
+            limits: {
+              withdrawal: [
+                {
+                  totalLimit: 100000000,
+                  remainingLimit: 100000000,
+                  interval: 86400,
+                  __typename: "OneDayAccountLimit",
+                },
+              ],
+              __typename: "AccountLimits",
+            },
+            __typename: "ConsumerAccount",
+          },
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: RealtimePriceUnauthedDocument,
+      variables: { currency: "USD" },
+    },
+    result: {
+      data: {
+        realtimePrice: {
+          btcSatPrice: {
+            base: 24015009766,
+            offset: 12,
+            __typename: "PriceOfOneSat",
+          },
+          denominatorCurrency: "USD",
+          id: "67b6e1d2-04c8-509a-abbd-b1cab08575d5",
+          timestamp: 1677184189,
+          usdCentPrice: {
+            base: 100000000,
+            offset: 6,
+            __typename: "PriceOfOneUsdCent",
+          },
+          __typename: "RealtimePrice",
+        },
+      },
+    },
+  },
 ]
 
 // queries are been consumed when they are used by MockedProvider
 // so they are duplicated here for now
 // export default mocks
-export default [...mocks, ...mocks, ...mocks, ...mocks, ...mocks, ...mocks]
+// Shared mocks are reusable: components fire the same queries on every mount,
+// re-render, and refetch, so each mock would otherwise be consumed after a
+// single request and Apollo's MockLink would flood test logs with
+// "No more mocked responses" warnings. maxUsageCount replaces the previous
+// hack of spreading the array six times.
+export default mocks.map((mock) => ({
+  maxUsageCount: Number.POSITIVE_INFINITY,
+  ...mock,
+}))

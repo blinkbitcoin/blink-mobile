@@ -233,6 +233,10 @@ describe("NetworkErrorComponent", () => {
   })
 
   it("ignores InvalidAuthentication when networkErrorToken differs from current token", async () => {
+    // The component logs the ignored stale-token 401 via console.debug;
+    // capture it so the expected log doesn't pollute CI logs (and assert it
+    // actually happened).
+    const consoleDebugSpy = jest.spyOn(console, "debug").mockImplementation(() => {})
     const { rerender } = render(<NetworkErrorComponent />)
 
     ;(useNetworkError as jest.Mock).mockReturnValue({
@@ -250,9 +254,18 @@ describe("NetworkErrorComponent", () => {
       expect(mockLogout).not.toHaveBeenCalled()
       expect(mockClearNetworkError).toHaveBeenCalled()
     })
+    expect(consoleDebugSpy).toHaveBeenCalledWith(
+      "Ignoring 401 for non-active token",
+      expect.objectContaining({ networkErrorToken: "stale-token" }),
+    )
+    consoleDebugSpy.mockRestore()
   })
 
   it("falls back to logout on error during token expiry handling", async () => {
+    // The component logs the simulated storage failure via console.error;
+    // capture it so the expected error doesn't pollute CI logs (and assert it
+    // actually happened).
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
     ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockRejectedValue(
       new Error("Storage error"),
     )
@@ -275,5 +288,10 @@ describe("NetworkErrorComponent", () => {
       })
       expect(mockClearNetworkError).toHaveBeenCalled()
     })
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Error handling token expiry:",
+      expect.objectContaining({ message: "Storage error" }),
+    )
+    consoleErrorSpy.mockRestore()
   })
 })

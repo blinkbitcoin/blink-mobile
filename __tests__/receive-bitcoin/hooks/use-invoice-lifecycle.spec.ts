@@ -31,6 +31,12 @@ jest.mock("@app/graphql/generated", () => ({
   WalletCurrency: { Btc: "BTC", Usd: "USD" },
 }))
 
+// prcd must keep a stable identity across renders: useInvoiceLifecycle's
+// layout effect recreates the PR whenever prcd changes, so an inline object
+// literal per render would loop with the state-updating effects until React
+// aborts with "Maximum update depth exceeded".
+const stablePrcd = { id: "test" } as never
+
 const mockMutations = {
   lnNoAmountInvoiceCreate: jest.fn(),
   lnInvoiceCreate: jest.fn(),
@@ -116,7 +122,7 @@ describe("useInvoiceLifecycle", () => {
     )
 
     const { result } = renderHook(() =>
-      useInvoiceLifecycle({ id: "test" } as never, mockMutations as never),
+      useInvoiceLifecycle(stablePrcd, mockMutations as never),
     )
 
     expect(result.current.regenerateInvoice).toBeDefined()
@@ -136,7 +142,7 @@ describe("useInvoiceLifecycle", () => {
     mockCreatePaymentRequest.mockReturnValue(mockPR)
     mockUseLnUpdateHashPaid.mockReturnValue("abc123")
 
-    renderHook(() => useInvoiceLifecycle({ id: "test" } as never, mockMutations as never))
+    renderHook(() => useInvoiceLifecycle(stablePrcd, mockMutations as never))
 
     expect(mockHaptic).toHaveBeenCalledWith("notificationSuccess", {
       ignoreAndroidSystemSettings: true,
@@ -156,7 +162,7 @@ describe("useInvoiceLifecycle", () => {
     mockCreatePaymentRequest.mockReturnValue(mockPR)
     mockUseLnUpdateHashPaid.mockReturnValue("different-hash")
 
-    renderHook(() => useInvoiceLifecycle({ id: "test" } as never, mockMutations as never))
+    renderHook(() => useInvoiceLifecycle(stablePrcd, mockMutations as never))
 
     expect(mockHaptic).not.toHaveBeenCalled()
   })
@@ -168,7 +174,7 @@ describe("useInvoiceLifecycle", () => {
     mockUseCountdown.mockReturnValue({ remainingSeconds: 300, isExpired: false })
 
     const { result } = renderHook(() =>
-      useInvoiceLifecycle({ id: "test" } as never, mockMutations as never),
+      useInvoiceLifecycle(stablePrcd, mockMutations as never),
     )
 
     expect(result.current.expiresInSeconds).toBe(300)

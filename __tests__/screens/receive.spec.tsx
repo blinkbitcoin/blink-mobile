@@ -204,7 +204,24 @@ jest.mock("react-native-nfc-manager", () => ({
     isSupported: jest.fn().mockResolvedValue(false),
     start: jest.fn(),
     stop: jest.fn(),
+    requestTechnology: jest.fn().mockResolvedValue(undefined),
+    // No tag found: ModalNfc init alerts "not compatible" and dismisses cleanly
+    getTag: jest.fn().mockResolvedValue(null),
+    cancelTechnologyRequest: jest.fn().mockResolvedValue(undefined),
   },
+  NfcTech: { Ndef: "Ndef" },
+  Ndef: { text: { decodePayload: jest.fn(() => "") } },
+}))
+
+// The invoice fixtures in this spec are intentionally fake (invalid bech32
+// checksum), which makes the real decodeInvoiceString throw and prToDateString
+// console.error on every quote generation, flooding CI logs. Return no expiry
+// instead — the same value prToDateString produced via its catch path — so
+// screen behavior is unchanged (no countdown mounts) and the logs stay clean.
+// useCountdown itself is covered by __tests__/hooks/use-countdown.spec.ts.
+jest.mock("@blinkbitcoin/blink-client", () => ({
+  ...jest.requireActual("@blinkbitcoin/blink-client"),
+  decodeInvoiceString: jest.fn(() => ({ timeExpireDateString: undefined })),
 }))
 
 jest.mock("react-native-haptic-feedback", () => ({
@@ -287,6 +304,18 @@ const flushAsync = () =>
         setTimeout(resolve, 0)
       }),
   )
+
+// Some app handlers log placeholder/diagnostic messages via console.log when
+// pressed (e.g. "starting scanNFCTag" in modal-nfc); capture them so expected logs don't pollute CI logs.
+let consoleLogSpy: jest.SpyInstance
+
+beforeEach(() => {
+  consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
+})
+
+afterEach(() => {
+  consoleLogSpy.mockRestore()
+})
 
 describe("ReceiveScreen", () => {
   let LL: ReturnType<typeof i18nObject>

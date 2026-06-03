@@ -25,12 +25,21 @@ const mockedLoadLocaleAsync = loadLocaleAsync as jest.MockedFunction<
 >
 
 describe("lazy-locale-loader", () => {
+  // ensureLocaleLoaded logs "Loading locale on demand: <locale>" in __DEV__
+  // (which jest runs as); capture it so the expected log doesn't pollute CI logs.
+  let consoleLogSpy: jest.SpyInstance
+
   beforeEach(() => {
     jest.clearAllMocks()
+    consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
     // Reset loadedLocales
     for (const key of Object.keys(loadedLocales)) {
       delete (loadedLocales as Record<string, unknown>)[key]
     }
+  })
+
+  afterEach(() => {
+    consoleLogSpy.mockRestore()
   })
 
   describe("isLocaleLoaded", () => {
@@ -48,6 +57,7 @@ describe("lazy-locale-loader", () => {
     it("calls loadLocaleAsync for an unloaded locale", async () => {
       await ensureLocaleLoaded("de" as Locales)
       expect(mockedLoadLocaleAsync).toHaveBeenCalledWith("de")
+      expect(consoleLogSpy).toHaveBeenCalledWith("Loading locale on demand: de")
     })
 
     it("skips loadLocaleAsync if locale is already loaded", async () => {
