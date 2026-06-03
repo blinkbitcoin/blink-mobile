@@ -4,6 +4,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { OrderCardScreen } from "@app/screens/card-screen/order-card-screens/order-card-screen"
 import { ContextForScreen } from "../../helper"
+import { flushEffects } from "../../../helpers/flush-effects"
 
 jest.mock("react-native-reanimated", () => {
   const RNView = jest.requireActual<typeof import("react-native")>("react-native").View
@@ -131,6 +132,18 @@ describe("OrderCardScreen", () => {
     })
   })
 
+  // StepsProgressBar runs an Animated.timing (real-timer, ~120ms) whose frames
+  // land after the synchronous test body returns. Wait the animation out inside
+  // act() so its updates neither warn nor leak into the next test.
+  afterEach(async () => {
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 200)
+      })
+    })
+    await flushEffects()
+  })
+
   describe("rendering", () => {
     it("renders without crashing", async () => {
       const { toJSON } = render(
@@ -139,7 +152,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(toJSON()).toBeTruthy()
     })
@@ -151,7 +164,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Order your physical card")).toBeTruthy()
     })
@@ -163,7 +176,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Continue")).toBeTruthy()
     })
@@ -177,7 +190,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Registered address")).toBeTruthy()
       expect(getByText("123 Main Street")).toBeTruthy()
@@ -190,7 +203,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Standard delivery")).toBeTruthy()
       expect(getByText("7-10 business days")).toBeTruthy()
@@ -203,7 +216,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Continue"))
@@ -227,7 +240,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await advanceToStep2(getByText)
 
@@ -242,7 +255,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await advanceToStep2(getByText)
 
@@ -256,7 +269,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await advanceToStep2(getByText)
 
@@ -300,7 +313,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await advanceToStep2(getByText)
 
@@ -321,7 +334,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Order your physical card")).toBeTruthy()
 
@@ -356,7 +369,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByTestId("activity-indicator")).toBeTruthy()
       expect(queryByText("Order your physical card")).toBeNull()
@@ -375,7 +388,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByTestId("activity-indicator")).toBeTruthy()
       expect(queryByText("Order your physical card")).toBeNull()
@@ -399,7 +412,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(mockGoBack).toHaveBeenCalled()
     })
@@ -420,7 +433,7 @@ describe("OrderCardScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(mockGoBack).toHaveBeenCalled()
     })

@@ -1,6 +1,6 @@
 import React from "react"
 
-import { fireEvent, render } from "@testing-library/react-native"
+import { act, fireEvent, render } from "@testing-library/react-native"
 
 import { AccountStatus, AccountType } from "@app/types/wallet"
 
@@ -223,7 +223,9 @@ describe("DeleteAccount", () => {
     fireEvent.press(getByTestId("danger-zone-delete-button"))
     expect(getByTestId("warning-modal")).toBeTruthy()
 
-    lastWarningProps.onClose?.()
+    act(() => {
+      lastWarningProps.onClose?.()
+    })
     rerender(<DeleteAccount />)
 
     expect(queryByTestId("warning-modal")).toBeNull()
@@ -238,7 +240,9 @@ describe("DeleteAccount", () => {
     const { getByTestId, queryByTestId, rerender } = render(<DeleteAccount />)
     fireEvent.press(getByTestId("danger-zone-delete-button"))
 
-    await lastConfirmProps.onConfirm?.()
+    await act(async () => {
+      await lastConfirmProps.onConfirm?.()
+    })
     rerender(<DeleteAccount />)
 
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)

@@ -1,6 +1,6 @@
 import React from "react"
 
-import { render } from "@testing-library/react-native"
+import { act, render } from "@testing-library/react-native"
 
 import { AccountScreen } from "@app/screens/settings-screen/account/account-screen"
 import { BackupStatus } from "@app/self-custodial/providers/backup-state"
@@ -232,7 +232,9 @@ describe("AccountScreen", () => {
     it("pull-to-refresh refreshes the self-custodial wallets and never hits updateCurrentProfile", async () => {
       render(<AccountScreen />)
 
-      await captureRefreshControl.onRefresh?.()
+      await act(async () => {
+        await captureRefreshControl.onRefresh?.()
+      })
 
       expect(mockRefreshSelfCustodialWallets).toHaveBeenCalledTimes(1)
       expect(mockUpdateCurrentProfile).not.toHaveBeenCalled()
@@ -243,7 +245,13 @@ describe("AccountScreen", () => {
 
       render(<AccountScreen />)
 
-      await Promise.resolve(captureRefreshControl.onRefresh?.()).catch(() => undefined)
+      await act(async () => {
+        try {
+          await captureRefreshControl.onRefresh?.()
+        } catch {
+          // swallow the simulated offline rejection
+        }
+      })
 
       expect(captureRefreshControl.refreshing).toBe(false)
     })
@@ -270,7 +278,9 @@ describe("AccountScreen", () => {
     it("pull-to-refresh calls updateCurrentProfile (custodial behavior unchanged)", async () => {
       render(<AccountScreen />)
 
-      await captureRefreshControl.onRefresh?.()
+      await act(async () => {
+        await captureRefreshControl.onRefresh?.()
+      })
 
       expect(mockUpdateCurrentProfile).toHaveBeenCalledTimes(1)
       expect(mockRefreshSelfCustodialWallets).not.toHaveBeenCalled()
@@ -281,7 +291,13 @@ describe("AccountScreen", () => {
 
       render(<AccountScreen />)
 
-      await Promise.resolve(captureRefreshControl.onRefresh?.()).catch(() => undefined)
+      await act(async () => {
+        try {
+          await captureRefreshControl.onRefresh?.()
+        } catch {
+          // swallow the simulated offline rejection
+        }
+      })
 
       expect(captureRefreshControl.refreshing).toBe(false)
     })

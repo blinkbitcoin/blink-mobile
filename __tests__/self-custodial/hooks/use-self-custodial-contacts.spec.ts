@@ -75,7 +75,10 @@ describe("useSelfCustodialContacts", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    const { contacts } = await result.current.list()
+    let contacts: Awaited<ReturnType<typeof result.current.list>>["contacts"] = []
+    await act(async () => {
+      ;({ contacts } = await result.current.list())
+    })
     expect(contacts).toEqual(expectedContacts)
   })
 
