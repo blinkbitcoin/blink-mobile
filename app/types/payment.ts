@@ -201,6 +201,16 @@ export const ConvertAmountAdjustment = {
 export type ConvertAmountAdjustment =
   (typeof ConvertAmountAdjustment)[keyof typeof ConvertAmountAdjustment]
 
+export const resolveDustAdjustment = (
+  amountAdjustment: ConvertAmountAdjustment | null,
+  amountInSourceCurrency: number,
+  fromWalletBalance: number | undefined,
+): ConvertAmountAdjustment | null => {
+  if (amountAdjustment !== ConvertAmountAdjustment.IncreasedToAvoidDust) return null
+  if (fromWalletBalance === undefined) return amountAdjustment
+  return amountInSourceCurrency >= fromWalletBalance ? null : amountAdjustment
+}
+
 export type ConvertQuote = {
   feeAmount: UsdMoneyAmount
   amountAdjustment?: ConvertAmountAdjustment
