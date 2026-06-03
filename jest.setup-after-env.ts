@@ -23,8 +23,16 @@ if (process.env.CI) {
 // - No jest.useRealTimers() here: suites that enable fake timers at module
 //   scope rely on them persisting across their tests.
 // - No cleanup()/unmount here: RNTL's auto-cleanup already owns that.
+//
+// Each `await Promise.resolve()` yields one microtask turn, advancing any
+// suspended async work by one step (one `.then` link / one `await`). The
+// deepest leftover chain diagnosed in #3815 (Promise.all -> .then ->
+// refetchQueries) settles in ~3 turns; 5 adds margin while staying
+// constant-time. Bump if a longer leaked chain ever surfaces.
+const MICROTASK_DRAIN_TURNS = 5
+
 afterEach(async () => {
-  for (let i = 0; i < 5; i += 1) {
+  for (let i = 0; i < MICROTASK_DRAIN_TURNS; i += 1) {
     await Promise.resolve()
   }
 })
