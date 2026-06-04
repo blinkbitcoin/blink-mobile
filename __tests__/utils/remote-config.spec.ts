@@ -63,6 +63,20 @@ describe("getRemoteConfigList", () => {
 
     expect(result).toEqual([{ id: 1 }, { id: 2 }])
   })
+
+  it("returns the fallback when the stored value is valid JSON but not an array (object)", () => {
+    mockAsString.mockReturnValue('{"US":true}')
+    const fallback = ["FALLBACK"]
+
+    expect(getRemoteConfigList("misconfigured-key", fallback)).toBe(fallback)
+  })
+
+  it("returns the fallback when the stored value is valid JSON but a primitive", () => {
+    mockAsString.mockReturnValue('"US"')
+    const fallback = ["FALLBACK"]
+
+    expect(getRemoteConfigList("misconfigured-key", fallback)).toBe(fallback)
+  })
 })
 
 describe("getRemoteConfigObject", () => {

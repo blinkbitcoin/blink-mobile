@@ -19,8 +19,13 @@ const tryParseJson = <T>(raw: string, fallback: T): T => {
   }
 }
 
-export const getRemoteConfigList = <T>(key: string, fallback: T[]): T[] =>
-  tryParseJson<T[]>(remoteConfigInstance().getValue(key).asString(), fallback)
+export const getRemoteConfigList = <T>(key: string, fallback: T[]): T[] => {
+  const parsed = tryParseJson<unknown>(
+    remoteConfigInstance().getValue(key).asString(),
+    fallback,
+  )
+  return Array.isArray(parsed) ? (parsed as T[]) : fallback
+}
 
 export const getRemoteConfigObject = <T extends object>(key: string, fallback: T): T =>
   tryParseJson<T>(remoteConfigInstance().getValue(key).asString(), fallback)
