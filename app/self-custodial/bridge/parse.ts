@@ -31,10 +31,19 @@ const NETWORK_MAP: Record<number, BitcoinNetwork> = {
   1: BitcoinNetwork.Regtest,
 }
 
+const SPARK_INPUT_PATTERN = /^(?:sp1|sprt1)/i
+
+const looksLikeSparkInput = (input: string): boolean =>
+  SPARK_INPUT_PATTERN.test(input.trim())
+
 export const parseSparkAddressDetailed = async (
   sdk: BreezSdkInterface,
   input: string,
 ): Promise<ParseSparkAddressResult> => {
+  if (!looksLikeSparkInput(input)) {
+    return { outcome: ParseSparkAddressOutcome.NotSparkAddress }
+  }
+
   try {
     const parsed = await sdk.parse(input.trim())
     if (parsed.tag !== InputTag.SparkAddress) {
