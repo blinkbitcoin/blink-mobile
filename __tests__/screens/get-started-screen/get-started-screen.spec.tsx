@@ -159,7 +159,7 @@ describe("GetStartedScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("disables Create new account while detecting the country", () => {
+  it("disables Create new account while detecting the country and ignores presses", () => {
     mockUseAccountTypeOptions.mockReturnValue({
       options: [],
       defaultSelected: null,
@@ -171,6 +171,9 @@ describe("GetStartedScreen", () => {
     const button = getByTestId("create-account-button")
 
     expect(button.props.accessibilityState.disabled).toBe(true)
+
+    fireEvent.press(button)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("routes to the selection screen when non-custodial is enabled and at least one option exists", () => {
