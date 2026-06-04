@@ -12,32 +12,40 @@ const mockFormatMoneyAmount = jest.fn()
 const mockOnAmountChange = jest.fn()
 const mockOnSetFormattedAmount = jest.fn()
 
-jest.mock("@app/hooks/use-display-currency", () => ({
-  useDisplayCurrency: () => ({
-    currencyInfo: {
-      BTC: {
-        symbol: "",
-        minorUnitToMajorUnitOffset: 0,
-        showFractionDigits: false,
-        currencyCode: "SAT",
-      },
-      USD: {
-        symbol: "$",
-        minorUnitToMajorUnitOffset: 2,
-        showFractionDigits: true,
-        currencyCode: "USD",
-      },
-      DisplayCurrency: {
-        symbol: "$",
-        minorUnitToMajorUnitOffset: 2,
-        showFractionDigits: true,
-        currencyCode: "USD",
-      },
+jest.mock("@app/hooks/use-display-currency", () => {
+  const currencyInfo = {
+    BTC: {
+      symbol: "",
+      minorUnitToMajorUnitOffset: 0,
+      showFractionDigits: false,
+      currencyCode: "SAT",
     },
-    formatMoneyAmount: mockFormatMoneyAmount,
-    zeroDisplayAmount: { amount: 0, currency: "DisplayCurrency", currencyCode: "USD" },
-  }),
-}))
+    USD: {
+      symbol: "$",
+      minorUnitToMajorUnitOffset: 2,
+      showFractionDigits: true,
+      currencyCode: "USD",
+    },
+    DisplayCurrency: {
+      symbol: "$",
+      minorUnitToMajorUnitOffset: 2,
+      showFractionDigits: true,
+      currencyCode: "USD",
+    },
+  }
+  const zeroDisplayAmount = {
+    amount: 0,
+    currency: "DisplayCurrency",
+    currencyCode: "USD",
+  }
+  return {
+    useDisplayCurrency: () => ({
+      currencyInfo,
+      formatMoneyAmount: mockFormatMoneyAmount,
+      zeroDisplayAmount,
+    }),
+  }
+})
 
 jest.mock("@app/hooks/use-debounce", () => ({
   useDebouncedEffect: (callback: () => void) => {
@@ -130,5 +138,52 @@ describe("AmountInputScreen", () => {
 
     const errorElement = getByTestId("error-message")
     expect(errorElement.props.children).toBe("")
+  })
+
+  it("propagates a fresh initialAmount even when focusedInput identity changes in the same commit", () => {
+    const initialFocusedInput = {
+      id: ConvertInputType.FROM,
+      currency: "BTC" as const,
+      formattedAmount: "",
+      isFocused: true,
+      amount: toBtcMoneyAmount(0),
+    }
+
+    const { rerender } = render(
+      <AmountInputScreen
+        inputValues={defaultInputValues}
+        onAmountChange={mockOnAmountChange}
+        convertMoneyAmount={mockConvertMoneyAmount}
+        onSetFormattedAmount={mockOnSetFormattedAmount}
+        focusedInput={initialFocusedInput}
+      />,
+    )
+
+    mockOnAmountChange.mockClear()
+
+    const chipAmount = toBtcMoneyAmount(25000)
+    const refocusedInput = {
+      ...initialFocusedInput,
+      amount: {
+        ...initialFocusedInput.amount,
+        currency: "USD" as const,
+        currencyCode: "USD",
+      },
+    }
+
+    rerender(
+      <AmountInputScreen
+        inputValues={defaultInputValues}
+        onAmountChange={mockOnAmountChange}
+        convertMoneyAmount={mockConvertMoneyAmount}
+        onSetFormattedAmount={mockOnSetFormattedAmount}
+        focusedInput={refocusedInput}
+        initialAmount={chipAmount}
+      />,
+    )
+
+    expect(mockOnAmountChange).toHaveBeenCalledWith(
+      expect.objectContaining({ amount: 25000 }),
+    )
   })
 })
