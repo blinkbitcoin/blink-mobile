@@ -47,17 +47,18 @@ remove_all_children() {
   fi
 }
 
-current_ios_runtime_identifier() {
-  local sdk_version
-  sdk_version="$(xcodebuild -version -sdk iphoneos SDKVersion 2>/dev/null | tr -d '[:space:]' || true)"
-
-  if [[ -n "$sdk_version" ]]; then
-    echo "com.apple.CoreSimulator.SimRuntime.iOS-${sdk_version//./-}"
-  fi
+unique_paths() {
+  printf "%s\n" "$@" | awk 'NF && !seen[$0]++'
 }
 
-installed_ios_runtime_identifiers() {
+current_ios_runtime_version() {
+  xcodebuild -version -sdk iphoneos SDKVersion 2>/dev/null | tr -d '[:space:]' || true
+}
+
+installed_ios_runtimes() {
   local runtime_list
+  local runtime_ids
+  local disk_image_runtimes
 
   if ! command -v xcrun >/dev/null 2>&1; then
     echo "xcrun is not available on PATH." >&2
@@ -69,9 +70,35 @@ installed_ios_runtime_identifiers() {
     return 1
   fi
 
-  printf "%s\n" "$runtime_list" \
-    | sed -n 's/.*\(com\.apple\.CoreSimulator\.SimRuntime\.iOS-[0-9A-Za-z.-]*\).*/\1/p' \
-    | sort -u
+  runtime_ids="$(
+    printf "%s\n" "$runtime_list" \
+      | sed -n 's/.*\(com\.apple\.CoreSimulator\.SimRuntime\.iOS-[0-9A-Za-z.-]*\).*/\1/p'
+  )"
+
+  while IFS= read -r runtime_id; do
+    [[ -z "$runtime_id" ]] && continue
+
+    local version="${runtime_id##*iOS-}"
+    version="${version//-/.}"
+    printf "%s\t%s\n" "$version" "$runtime_id"
+  done <<< "$runtime_ids"
+
+  disk_image_runtimes="$(
+    printf "%s\n" "$runtime_list" \
+      | sed -En 's/^[[:space:]]*iOS[[:space:]]+([0-9]+(\.[0-9]+)*)[[:space:]]+\([^)]+\)[[:space:]]+-[[:space:]]+([A-Fa-f0-9-]+).*/\1	\3/p'
+  )"
+
+  if [[ -n "$disk_image_runtimes" ]]; then
+    printf "%s\n" "$disk_image_runtimes"
+  fi
+}
+
+installed_ios_runtime_versions() {
+  installed_ios_runtimes | cut -f1 | sort -u
+}
+
+installed_ios_runtime_delete_refs() {
+  installed_ios_runtimes | sort -u
 }
 
 print_disk_report() {
@@ -80,7 +107,11 @@ print_disk_report() {
   df -h || true
 
   echo "---- Large macOS build paths ----"
-  for path in \
+  while IFS= read -r path; do
+    if [[ -e "$path" ]]; then
+      du -sh "$path" 2>/dev/null || true
+    fi
+  done < <(unique_paths \
     "$CI_ROOT/repo/node_modules" \
     "$CI_ROOT/repo/ios/Pods" \
     "$CI_ROOT/repo/android/app/build" \
@@ -94,11 +125,7 @@ print_disk_report() {
     "$BUILD_HOME/Library/Developer/Xcode/DerivedData" \
     "/Users/m1/Library/Developer/Xcode/Archives" \
     "/Users/m1/Library/Developer/Xcode/DerivedData" \
-    "/Library/Developer/CoreSimulator/Volumes"; do
-    if [[ -e "$path" ]]; then
-      du -sh "$path" 2>/dev/null || true
-    fi
-  done
+    "/Library/Developer/CoreSimulator/Volumes")
 
   echo "---- iOS simulator runtimes ----"
   if command -v xcrun >/dev/null 2>&1; then
@@ -114,22 +141,22 @@ cleanup_workspace_build_outputs() {
 }
 
 cleanup_xcode_artifacts() {
-  for dir in \
+  while IFS= read -r dir; do
+    remove_old_children "$dir" 28
+  done < <(unique_paths \
     "/private/var/root/Library/Developer/Xcode/Archives" \
     "$BUILD_HOME/Library/Developer/Xcode/Archives" \
-    "/Users/m1/Library/Developer/Xcode/Archives"; do
-    remove_old_children "$dir" 28
-  done
+    "/Users/m1/Library/Developer/Xcode/Archives")
 
-  for dir in \
-    "/private/var/root/Library/Developer/Xcode/DerivedData" \
-    "$BUILD_HOME/Library/Developer/Xcode/DerivedData" \
-    "/Users/m1/Library/Developer/Xcode/DerivedData"; do
+  while IFS= read -r dir; do
     if [[ -d "$dir" ]]; then
       echo "Removing GaloyApp DerivedData older than 28d from $dir"
       find "$dir" -mindepth 1 -maxdepth 1 -name "GaloyApp-*" -mtime +28 -exec rm -rf {} + || true
     fi
-  done
+  done < <(unique_paths \
+    "/private/var/root/Library/Developer/Xcode/DerivedData" \
+    "$BUILD_HOME/Library/Developer/Xcode/DerivedData" \
+    "/Users/m1/Library/Developer/Xcode/DerivedData")
 }
 
 cleanup_concourse_dead_volumes() {
@@ -137,50 +164,50 @@ cleanup_concourse_dead_volumes() {
 }
 
 cleanup_old_ios_runtimes() {
-  local current_runtime
+  local current_runtime_version
   local installed_runtimes
-  current_runtime="$(current_ios_runtime_identifier)"
+  current_runtime_version="$(current_ios_runtime_version)"
 
-  if [[ -z "$current_runtime" ]]; then
+  if [[ -z "$current_runtime_version" ]]; then
     echo "Could not determine current iOS SDK runtime; skipping simulator runtime cleanup."
     return
   fi
 
-  echo "Keeping current iOS simulator runtime: $current_runtime"
+  echo "Keeping current iOS simulator runtime version: $current_runtime_version"
 
-  if ! installed_runtimes="$(installed_ios_runtime_identifiers)"; then
+  if ! installed_runtimes="$(installed_ios_runtime_delete_refs)"; then
     echo "Could not list iOS simulator runtimes; skipping simulator runtime cleanup."
     return
   fi
 
-  while IFS= read -r runtime; do
-    [[ -z "$runtime" ]] && continue
+  while IFS=$'\t' read -r runtime_version runtime_delete_ref; do
+    [[ -z "$runtime_version" || -z "$runtime_delete_ref" ]] && continue
 
-    if [[ "$runtime" != "$current_runtime" ]]; then
-      echo "Deleting old iOS simulator runtime: $runtime"
-      xcrun simctl runtime delete "$runtime" || true
+    if [[ "$runtime_version" != "$current_runtime_version" ]]; then
+      echo "Deleting old iOS simulator runtime $runtime_version: $runtime_delete_ref"
+      xcrun simctl runtime delete "$runtime_delete_ref" || true
     fi
   done <<< "$installed_runtimes"
 }
 
 assert_current_ios_runtime_present() {
-  local current_runtime
-  local installed_runtimes
-  current_runtime="$(current_ios_runtime_identifier)"
+  local current_runtime_version
+  local installed_runtime_versions
+  current_runtime_version="$(current_ios_runtime_version)"
 
-  if [[ -z "$current_runtime" ]]; then
+  if [[ -z "$current_runtime_version" ]]; then
     echo "Could not determine current iOS SDK runtime; skipping current runtime assertion."
     return
   fi
 
-  if ! installed_runtimes="$(installed_ios_runtime_identifiers)"; then
+  if ! installed_runtime_versions="$(installed_ios_runtime_versions)"; then
     echo "ERROR: Could not list iOS simulator runtimes."
     echo "Check CoreSimulatorService/simdiskimaged on the Scaleway Mac before running the build."
     exit 1
   fi
 
-  if ! printf "%s\n" "$installed_runtimes" | grep -qx "$current_runtime"; then
-    echo "ERROR: Required iOS runtime $current_runtime is not installed."
+  if ! printf "%s\n" "$installed_runtime_versions" | grep -qx "$current_runtime_version"; then
+    echo "ERROR: Required iOS runtime $current_runtime_version is not installed."
     echo "Install the current platform runtime on the Scaleway Mac with: xcodebuild -downloadPlatform iOS"
     exit 1
   fi
