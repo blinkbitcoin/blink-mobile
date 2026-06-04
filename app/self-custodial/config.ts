@@ -9,6 +9,11 @@ export const SparkToken = {
 
 export type SparkToken = (typeof SparkToken)[keyof typeof SparkToken]
 
+const SPARK_ADDRESS_SHAPE_PATTERN = /^(?:sp1|sprt1)/i
+
+export const hasSparkAddressShape = (input: string): boolean =>
+  SPARK_ADDRESS_SHAPE_PATTERN.test(input.trim())
+
 const NETWORK_MAP: Record<string, Network> = {
   mainnet: Network.Mainnet,
   regtest: Network.Regtest,

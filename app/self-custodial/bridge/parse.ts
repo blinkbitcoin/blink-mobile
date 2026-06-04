@@ -4,7 +4,7 @@ import {
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { SparkConfig } from "../config"
+import { hasSparkAddressShape, SparkConfig } from "../config"
 
 export type ParsedSparkAddress = {
   address: string
@@ -31,16 +31,11 @@ const NETWORK_MAP: Record<number, BitcoinNetwork> = {
   1: BitcoinNetwork.Regtest,
 }
 
-const SPARK_INPUT_PATTERN = /^(?:sp1|sprt1)/i
-
-const looksLikeSparkInput = (input: string): boolean =>
-  SPARK_INPUT_PATTERN.test(input.trim())
-
 export const parseSparkAddressDetailed = async (
   sdk: BreezSdkInterface,
   input: string,
 ): Promise<ParseSparkAddressResult> => {
-  if (!looksLikeSparkInput(input)) {
+  if (!hasSparkAddressShape(input)) {
     return { outcome: ParseSparkAddressOutcome.NotSparkAddress }
   }
 

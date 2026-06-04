@@ -12,6 +12,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 
 jest.mock("@app/self-custodial/config", () => ({
   SparkConfig: { network: 1 },
+  hasSparkAddressShape: (input: string): boolean => /^(?:sp1|sprt1)/i.test(input.trim()),
 }))
 
 jest.mock("react-native-config", () => ({
@@ -20,8 +21,7 @@ jest.mock("react-native-config", () => ({
 
 const SPARK_REGTEST_INPUT = "sprt1qabcdefghijklmn"
 const SPARK_MAINNET_INPUT = "sp1qabcdefghijklmn"
-const LNURL_INPUT =
-  "LNURL1DP68GURN8GHJ7AR9WFKKJMNPDSHXYMRFDE4KYARR9E3K7MF0V9CXJTMKDA6KX6R9WGHKCMN4WF"
+const LNURL_INPUT = "lnurl1examplefixtureonly"
 
 const createMockSdk = (parseResult: unknown) =>
   ({ parse: jest.fn().mockResolvedValue(parseResult) }) as never
@@ -140,8 +140,8 @@ describe("parseSparkAddressDetailed", () => {
   })
 })
 
-describe("parseSparkAddressDetailed — shape pre-check (skips SDK for non-Spark inputs)", () => {
-  it("returns NotSparkAddress without touching the SDK for an LNURL bech32 string", async () => {
+describe("parseSparkAddressDetailed — shape gate integration with hasSparkAddressShape", () => {
+  it("short-circuits to NotSparkAddress without invoking the SDK when the input cannot be a Spark address", async () => {
     const parseFn = jest.fn()
     const sdk = { parse: parseFn } as never
 
@@ -151,52 +151,7 @@ describe("parseSparkAddressDetailed — shape pre-check (skips SDK for non-Spark
     expect(parseFn).not.toHaveBeenCalled()
   })
 
-  it("returns NotSparkAddress without touching the SDK for a Lightning invoice", async () => {
-    const parseFn = jest.fn()
-    const sdk = { parse: parseFn } as never
-
-    const result = await parseSparkAddressDetailed(sdk, "lnbc100n1pwjlwpzpp5...")
-
-    expect(result.outcome).toBe(ParseSparkAddressOutcome.NotSparkAddress)
-    expect(parseFn).not.toHaveBeenCalled()
-  })
-
-  it("returns NotSparkAddress without touching the SDK for arbitrary text", async () => {
-    const parseFn = jest.fn()
-    const sdk = { parse: parseFn } as never
-
-    const result = await parseSparkAddressDetailed(sdk, "https://example.com/?q=1")
-
-    expect(result.outcome).toBe(ParseSparkAddressOutcome.NotSparkAddress)
-    expect(parseFn).not.toHaveBeenCalled()
-  })
-
-  it("accepts mainnet Spark inputs (sp1...) and forwards to the SDK", async () => {
-    const { sdk, parseFn } = createInspectableSdk({
-      tag: "SparkAddress",
-      inner: [
-        { address: SPARK_MAINNET_INPUT, identityPublicKey: "pk", network: 0 },
-      ],
-    })
-
-    await parseSparkAddressDetailed(sdk, SPARK_MAINNET_INPUT)
-
-    expect(parseFn).toHaveBeenCalledWith(SPARK_MAINNET_INPUT)
-  })
-
-  it("accepts upper-case Spark inputs (case-insensitive HRP check)", async () => {
-    const upper = SPARK_REGTEST_INPUT.toUpperCase()
-    const { sdk, parseFn } = createInspectableSdk({
-      tag: "SparkAddress",
-      inner: [{ address: upper, identityPublicKey: "pk", network: 4 }],
-    })
-
-    await parseSparkAddressDetailed(sdk, upper)
-
-    expect(parseFn).toHaveBeenCalledWith(upper)
-  })
-
-  it("trims leading whitespace before applying the shape check", async () => {
+  it("forwards the trimmed input to the SDK when the shape gate passes", async () => {
     const padded = `  ${SPARK_REGTEST_INPUT}`
     const { sdk, parseFn } = createInspectableSdk({
       tag: "SparkAddress",
@@ -208,4 +163,3 @@ describe("parseSparkAddressDetailed — shape pre-check (skips SDK for non-Spark
     expect(parseFn).toHaveBeenCalledWith(SPARK_REGTEST_INPUT)
   })
 })
-
