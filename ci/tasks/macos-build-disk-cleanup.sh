@@ -7,6 +7,7 @@ MIN_FREE_GB="${MIN_BUILD_FREE_GB:-${2:-30}}"
 CI_ROOT="${CI_ROOT:-$(pwd)}"
 DISK_CHECK_PATH="${DISK_CHECK_PATH:-$CI_ROOT}"
 CONCOURSE_WORKDIR="${CONCOURSE_WORKDIR:-/Users/m1/concourse/workdir}"
+BUILD_HOME="${HOME:-/Users/m1}"
 
 required_kb=$((MIN_FREE_GB * 1024 * 1024))
 
@@ -89,8 +90,8 @@ print_disk_report() {
     "$CONCOURSE_WORKDIR/volumes/live" \
     "/private/var/root/Library/Developer/Xcode/Archives" \
     "/private/var/root/Library/Developer/Xcode/DerivedData" \
-    "$HOME/Library/Developer/Xcode/Archives" \
-    "$HOME/Library/Developer/Xcode/DerivedData" \
+    "$BUILD_HOME/Library/Developer/Xcode/Archives" \
+    "$BUILD_HOME/Library/Developer/Xcode/DerivedData" \
     "/Users/m1/Library/Developer/Xcode/Archives" \
     "/Users/m1/Library/Developer/Xcode/DerivedData" \
     "/Library/Developer/CoreSimulator/Volumes"; do
@@ -115,14 +116,14 @@ cleanup_workspace_build_outputs() {
 cleanup_xcode_artifacts() {
   for dir in \
     "/private/var/root/Library/Developer/Xcode/Archives" \
-    "$HOME/Library/Developer/Xcode/Archives" \
+    "$BUILD_HOME/Library/Developer/Xcode/Archives" \
     "/Users/m1/Library/Developer/Xcode/Archives"; do
     remove_old_children "$dir" 28
   done
 
   for dir in \
     "/private/var/root/Library/Developer/Xcode/DerivedData" \
-    "$HOME/Library/Developer/Xcode/DerivedData" \
+    "$BUILD_HOME/Library/Developer/Xcode/DerivedData" \
     "/Users/m1/Library/Developer/Xcode/DerivedData"; do
     if [[ -d "$dir" ]]; then
       echo "Removing GaloyApp DerivedData older than 28d from $dir"
