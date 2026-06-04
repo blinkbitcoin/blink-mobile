@@ -125,13 +125,13 @@ describe("useCustodialEligibility", () => {
   })
 
   describe("country undefined", () => {
-    it("treats both blocks as false when country is still being detected", () => {
+    it("fails closed: signupAllowed=false while the country is still being detected", () => {
       setUp({ countryCode: undefined, loading: true, accounts: [] })
       const { result } = renderHook(() => useCustodialEligibility())
 
       expect(result.current.signupBlocked).toBe(false)
       expect(result.current.firstSignupBlocked).toBe(false)
-      expect(result.current.signupAllowed).toBe(true)
+      expect(result.current.signupAllowed).toBe(false)
     })
   })
 

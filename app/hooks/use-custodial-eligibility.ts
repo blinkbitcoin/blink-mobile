@@ -24,7 +24,10 @@ export const useCustodialEligibility = (): CustodialEligibility => {
     country !== undefined && custodialFirstSignupBlockedCountries.includes(country)
 
   const isFirstSignup = accounts.length === 0
-  const signupAllowed = !signupBlocked && !(firstSignupBlocked && isFirstSignup)
+  /** Fail-closed when the country is unknown so consumers that forget to gate
+   * on `loading` still default to the safe outcome. */
+  const signupAllowed =
+    country !== undefined && !signupBlocked && !(firstSignupBlocked && isFirstSignup)
 
   return {
     signupAllowed,
