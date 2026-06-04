@@ -12,6 +12,7 @@ import {
 import { createGetFee, createSendPayment } from "@app/self-custodial/adapters/payment"
 import {
   createGetConversionQuote,
+  createLnurlWithdraw,
   createReceiveLightning,
   createReceiveOnchain,
 } from "@app/self-custodial/bridge"
@@ -22,6 +23,7 @@ import {
   type GetConversionQuoteAdapter,
   type GetFeeAdapter,
   type ListPendingDepositsAdapter,
+  type LnurlWithdrawAdapter,
   type ReceiveLightningAdapter,
   type ReceiveOnchainAdapter,
   type SendPaymentAdapter,
@@ -35,6 +37,7 @@ type PaymentsResult = {
   getFee?: GetFeeAdapter
   receiveLightning?: ReceiveLightningAdapter
   receiveOnchain?: ReceiveOnchainAdapter
+  lnurlWithdraw?: LnurlWithdrawAdapter
   listPendingDeposits?: ListPendingDepositsAdapter
   claimDeposit?: ClaimDepositAdapter
   convert?: ConvertAdapter
@@ -54,6 +57,7 @@ export const usePayments = (): PaymentsResult => {
         getFee: createGetFee(sdk),
         receiveLightning: createReceiveLightning(sdk),
         receiveOnchain: createReceiveOnchain(sdk),
+        lnurlWithdraw: createLnurlWithdraw(sdk),
         listPendingDeposits: createListPendingDeposits(sdk),
         claimDeposit: createClaimDeposit(sdk),
         getConversionQuote: createGetConversionQuote(sdk),

@@ -24,6 +24,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   createGetFee: jest.fn().mockReturnValue(jest.fn()),
   createReceiveLightning: jest.fn().mockReturnValue(jest.fn()),
   createReceiveOnchain: jest.fn().mockReturnValue(jest.fn()),
+  createLnurlWithdraw: jest.fn().mockReturnValue(jest.fn()),
   createListPendingDeposits: jest.fn().mockReturnValue(jest.fn()),
   createClaimDeposit: jest.fn().mockReturnValue({
     getClaimFee: jest.fn(),
@@ -105,6 +106,7 @@ describe("usePayments", () => {
     expect(result.current.getFee).toBeDefined()
     expect(result.current.receiveLightning).toBeDefined()
     expect(result.current.receiveOnchain).toBeDefined()
+    expect(result.current.lnurlWithdraw).toBeDefined()
   })
 
   it("returns no adapters while a self-custodial account is loading its SDK (regression)", () => {
@@ -121,6 +123,7 @@ describe("usePayments", () => {
     expect(result.current.getFee).toBeUndefined()
     expect(result.current.receiveLightning).toBeUndefined()
     expect(result.current.receiveOnchain).toBeUndefined()
+    expect(result.current.lnurlWithdraw).toBeUndefined()
     expect(result.current.listPendingDeposits).toBeUndefined()
     expect(result.current.claimDeposit).toBeUndefined()
     expect(result.current.convert).toBeUndefined()
@@ -170,5 +173,38 @@ describe("usePayments", () => {
     const { result } = renderHook(() => usePayments())
 
     expect(result.current.getConversionQuote).toBeUndefined()
+  })
+
+  it("exposes lnurlWithdraw only on the self-custodial path with an SDK", () => {
+    mockActiveAccount.mockReturnValue({
+      id: "self-custodial-default",
+      type: AccountType.SelfCustodial,
+    })
+    mockSelfCustodialWallet.mockReturnValue({ sdk: mockSdk })
+
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.lnurlWithdraw).toBeDefined()
+  })
+
+  it("does not expose lnurlWithdraw on the custodial path", () => {
+    mockActiveAccount.mockReturnValue({ id: "custodial-default", type: "custodial" })
+    mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })
+
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.lnurlWithdraw).toBeUndefined()
+  })
+
+  it("does not expose lnurlWithdraw for a self-custodial account missing its SDK", () => {
+    mockActiveAccount.mockReturnValue({
+      id: "self-custodial-default",
+      type: AccountType.SelfCustodial,
+    })
+    mockSelfCustodialWallet.mockReturnValue({ sdk: undefined })
+
+    const { result } = renderHook(() => usePayments())
+
+    expect(result.current.lnurlWithdraw).toBeUndefined()
   })
 })

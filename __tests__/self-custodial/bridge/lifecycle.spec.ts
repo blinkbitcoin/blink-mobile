@@ -24,6 +24,20 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
       .fn()
       .mockImplementation((args: unknown) => ({ tag: "Mnemonic", ...(args as object) })),
   },
+  SdkError_Tags: {
+    InsufficientFunds: "InsufficientFunds",
+    MaxDepositClaimFeeExceeded: "MaxDepositClaimFeeExceeded",
+    NetworkError: "NetworkError",
+    ChainServiceError: "ChainServiceError",
+    InvalidInput: "InvalidInput",
+    InvalidUuid: "InvalidUuid",
+    LnurlError: "LnurlError",
+    MissingUtxo: "MissingUtxo",
+    StorageError: "StorageError",
+    Signer: "Signer",
+    SparkError: "SparkError",
+    Generic: "Generic",
+  },
   StableBalanceActiveLabel: {
     Set: jest.fn().mockImplementation((args: unknown) => ({ tag: "Set", inner: args })),
   },
