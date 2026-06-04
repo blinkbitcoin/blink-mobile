@@ -164,6 +164,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   const typingRef = useRef(false)
   const [typingState, setTypingState] = useState(false)
   const forceDebounceRef = useRef(false)
+  const initialAmountAppliedRef = useRef(false)
 
   const notifyTyping = useCallback(
     (typing: boolean) => {
@@ -235,6 +236,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
     if (initialAmount) {
       setNumberPadAmount(initialAmount)
       forceDebounceRef.current = true
+      initialAmountAppliedRef.current = true
     }
   }, [initialAmount, setNumberPadAmount])
 
@@ -245,6 +247,9 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
     if (prevFocusSigRef.current === focusSig) {
       return
     }
+
+    const initialAmountJustApplied = initialAmountAppliedRef.current
+    initialAmountAppliedRef.current = false
 
     prevFocusSigRef.current = focusSig
     skipNextRecalcRef.current = true
@@ -261,8 +266,12 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
     })
 
     forceDebounceRef.current =
+      initialAmountJustApplied ||
+      forceDebounceRef.current ||
       currentAmountFromNp.amount !== focusedInput.amount.amount ||
       currentAmountFromNp.currency !== focusedInput.amount.currency
+
+    if (initialAmountJustApplied) return
 
     setNumberPadAmount(focusedInput.amount)
 
@@ -471,6 +480,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       onAmountChange(primaryAmount)
       notifyTyping(false)
       forceDebounceRef.current = false
+      initialAmountAppliedRef.current = false
       onAfterRecalc?.()
     },
     debounceMs,
