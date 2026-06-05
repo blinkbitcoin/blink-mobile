@@ -22918,7 +22918,7 @@ react-native-country-picker-modal@^2.0.0:
     prop-types "15.7.2"
     react-async-hook "3.6.1"
 
-react-native-credentials-manager@^0.8.1:
+react-native-credentials-manager@0.8.1:
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/react-native-credentials-manager/-/react-native-credentials-manager-0.8.1.tgz#65a1f868801eeedad7587f27fb7d84a86ee37857"
   integrity sha512-5Akhvz6OKM+qlm12PCzYTfKPwk3nBGe/yW1UJAknhGmTQe/PkgzhXCRIqPgmOPk7stFZGVtRYZUfu1EwfnYFbA==
