@@ -40,146 +40,43 @@ const setUp = ({
   })
 }
 
-describe("useCustodialEligibility", () => {
+describe("useCustodialEligibility (wiring)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  describe("country in always-blocked list (US)", () => {
-    it("blocks signup as first account", () => {
-      setUp({ countryCode: "US", accounts: [] })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.signupBlocked).toBe(true)
-      expect(result.current.firstSignupBlocked).toBe(false)
-      expect(result.current.isFirstSignup).toBe(true)
-      expect(result.current.signupAllowed).toBe(false)
-    })
-
-    it("blocks signup as second+ account too", () => {
-      setUp({ countryCode: "US", accounts: [{ id: "a" }] })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.signupBlocked).toBe(true)
-      expect(result.current.isFirstSignup).toBe(false)
-      expect(result.current.signupAllowed).toBe(false)
-    })
+  it("uppercases the country code before applying the policy", () => {
+    setUp({ countryCode: "us", accounts: [] })
+    const { result } = renderHook(() => useCustodialEligibility())
+    expect(result.current.signupAllowed).toBe(false)
   })
 
-  describe("country in first-signup-blocked list (GB)", () => {
-    it("blocks signup when there are no accounts yet", () => {
-      setUp({ countryCode: "GB", accounts: [] })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.signupBlocked).toBe(false)
-      expect(result.current.firstSignupBlocked).toBe(true)
-      expect(result.current.isFirstSignup).toBe(true)
-      expect(result.current.signupAllowed).toBe(false)
+  it("passes accountCount derived from the registry to the decider", () => {
+    setUp({
+      countryCode: "GB",
+      accounts: [{ id: "existing" }],
+      custodialFirstSignupBlockedCountries: ["GB"],
     })
-
-    it("allows signup when at least one account already exists", () => {
-      setUp({ countryCode: "GB", accounts: [{ id: "existing" }] })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.signupBlocked).toBe(false)
-      expect(result.current.firstSignupBlocked).toBe(true)
-      expect(result.current.isFirstSignup).toBe(false)
-      expect(result.current.signupAllowed).toBe(true)
-    })
+    const { result } = renderHook(() => useCustodialEligibility())
+    expect(result.current.signupAllowed).toBe(true)
   })
 
-  describe("country not in any list (SV)", () => {
-    it("allows signup as first account", () => {
-      setUp({ countryCode: "SV", accounts: [] })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.signupBlocked).toBe(false)
-      expect(result.current.firstSignupBlocked).toBe(false)
-      expect(result.current.signupAllowed).toBe(true)
-    })
-
-    it("allows signup as second+ account", () => {
-      setUp({ countryCode: "SV", accounts: [{ id: "a" }, { id: "b" }] })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.signupAllowed).toBe(true)
-    })
+  it("returns signupAllowed=true for an unblocked country", () => {
+    setUp({ countryCode: "SV", accounts: [] })
+    const { result } = renderHook(() => useCustodialEligibility())
+    expect(result.current.signupAllowed).toBe(true)
   })
 
-  describe("country code normalization", () => {
-    it("matches lowercase country codes against the always-blocked list", () => {
-      setUp({ countryCode: "us", accounts: [] })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.signupBlocked).toBe(true)
-      expect(result.current.signupAllowed).toBe(false)
-    })
-
-    it("matches mixed-case country codes against the first-signup list", () => {
-      setUp({ countryCode: "Gb", accounts: [] })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.firstSignupBlocked).toBe(true)
-      expect(result.current.signupAllowed).toBe(false)
-    })
+  it("forwards loading=true while country detection is in flight", () => {
+    setUp({ countryCode: undefined, loading: true })
+    const { result } = renderHook(() => useCustodialEligibility())
+    expect(result.current.loading).toBe(true)
+    expect(result.current.signupAllowed).toBe(false)
   })
 
-  describe("country undefined", () => {
-    it("fails closed: signupAllowed=false while the country is still being detected", () => {
-      setUp({ countryCode: undefined, loading: true, accounts: [] })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.signupBlocked).toBe(false)
-      expect(result.current.firstSignupBlocked).toBe(false)
-      expect(result.current.signupAllowed).toBe(false)
-    })
-  })
-
-  describe("loading propagation", () => {
-    it("forwards loading=true from useDeviceLocation", () => {
-      setUp({ countryCode: undefined, loading: true })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.loading).toBe(true)
-    })
-
-    it("forwards loading=false once country resolves", () => {
-      setUp({ countryCode: "SV", loading: false })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.loading).toBe(false)
-    })
-  })
-
-  describe("isFirstSignup boundary", () => {
-    it("is true when accounts is empty", () => {
-      setUp({ countryCode: "SV", accounts: [] })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.isFirstSignup).toBe(true)
-    })
-
-    it("is false with any number of existing accounts", () => {
-      setUp({ countryCode: "SV", accounts: [{}, {}, {}] })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.isFirstSignup).toBe(false)
-    })
-  })
-
-  describe("empty remote config lists", () => {
-    it("allows signup everywhere when both lists are empty", () => {
-      setUp({
-        countryCode: "US",
-        accounts: [],
-        custodialSignupBlockedCountries: [],
-        custodialFirstSignupBlockedCountries: [],
-      })
-      const { result } = renderHook(() => useCustodialEligibility())
-
-      expect(result.current.signupBlocked).toBe(false)
-      expect(result.current.firstSignupBlocked).toBe(false)
-      expect(result.current.signupAllowed).toBe(true)
-    })
+  it("forwards loading=false once country resolves", () => {
+    setUp({ countryCode: "SV", loading: false })
+    const { result } = renderHook(() => useCustodialEligibility())
+    expect(result.current.loading).toBe(false)
   })
 })

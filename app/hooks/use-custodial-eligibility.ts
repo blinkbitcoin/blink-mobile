@@ -1,13 +1,11 @@
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { decideCustodialEligibility } from "@app/utils/custodial-eligibility"
 
 import useDeviceLocation from "./use-device-location"
 import { useAccountRegistry } from "./use-account-registry"
 
 export type CustodialEligibility = {
   signupAllowed: boolean
-  signupBlocked: boolean
-  firstSignupBlocked: boolean
-  isFirstSignup: boolean
   loading: boolean
 }
 
@@ -17,23 +15,12 @@ export const useCustodialEligibility = (): CustodialEligibility => {
   const { custodialSignupBlockedCountries, custodialFirstSignupBlockedCountries } =
     useRemoteConfig()
 
-  const country = countryCode?.toUpperCase()
-  const signupBlocked =
-    country !== undefined && custodialSignupBlockedCountries.includes(country)
-  const firstSignupBlocked =
-    country !== undefined && custodialFirstSignupBlockedCountries.includes(country)
+  const signupAllowed = decideCustodialEligibility({
+    country: countryCode?.toUpperCase(),
+    accountCount: accounts.length,
+    custodialSignupBlockedCountries,
+    custodialFirstSignupBlockedCountries,
+  })
 
-  const isFirstSignup = accounts.length === 0
-  /** Fail-closed when the country is unknown so consumers that forget to gate
-   * on `loading` still default to the safe outcome. */
-  const signupAllowed =
-    country !== undefined && !signupBlocked && !(firstSignupBlocked && isFirstSignup)
-
-  return {
-    signupAllowed,
-    signupBlocked,
-    firstSignupBlocked,
-    isFirstSignup,
-    loading,
-  }
+  return { signupAllowed, loading }
 }
