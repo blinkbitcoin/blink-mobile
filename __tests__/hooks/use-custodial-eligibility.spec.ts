@@ -24,6 +24,7 @@ const setUp = ({
   loading = false,
   detectionFailed = false,
   accounts = [] as unknown[],
+  registryLoading = false,
   custodialSignupBlockedCountries = ["US"],
   custodialFirstSignupBlockedCountries = ["GB", "DE"],
 }: {
@@ -31,11 +32,12 @@ const setUp = ({
   loading?: boolean
   detectionFailed?: boolean
   accounts?: unknown[]
+  registryLoading?: boolean
   custodialSignupBlockedCountries?: string[]
   custodialFirstSignupBlockedCountries?: string[]
 }) => {
   mockUseDeviceLocation.mockReturnValue({ countryCode, loading, detectionFailed })
-  mockUseAccountRegistry.mockReturnValue({ accounts })
+  mockUseAccountRegistry.mockReturnValue({ accounts, loading: registryLoading })
   mockUseRemoteConfig.mockReturnValue({
     custodialSignupBlockedCountries,
     custodialFirstSignupBlockedCountries,
@@ -86,5 +88,19 @@ describe("useCustodialEligibility (wiring)", () => {
     setUp({ countryCode: "SV", detectionFailed: true, accounts: [] })
     const { result } = renderHook(() => useCustodialEligibility())
     expect(result.current.signupAllowed).toBe(false)
+  })
+
+  it("reports loading=true while the account registry is still hydrating (I1)", () => {
+    setUp({ countryCode: "SV", loading: false, registryLoading: true })
+    const { result } = renderHook(() => useCustodialEligibility())
+    expect(result.current.loading).toBe(true)
+  })
+
+  it("reports loading=true when either source is still loading", () => {
+    setUp({ countryCode: undefined, loading: true, registryLoading: false })
+    expect(renderHook(() => useCustodialEligibility()).result.current.loading).toBe(true)
+
+    setUp({ countryCode: "SV", loading: false, registryLoading: true })
+    expect(renderHook(() => useCustodialEligibility()).result.current.loading).toBe(true)
   })
 })
