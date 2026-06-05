@@ -22,17 +22,19 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 const setUp = ({
   countryCode,
   loading = false,
+  detectionFailed = false,
   accounts = [] as unknown[],
   custodialSignupBlockedCountries = ["US"],
   custodialFirstSignupBlockedCountries = ["GB", "DE"],
 }: {
   countryCode: string | undefined
   loading?: boolean
+  detectionFailed?: boolean
   accounts?: unknown[]
   custodialSignupBlockedCountries?: string[]
   custodialFirstSignupBlockedCountries?: string[]
 }) => {
-  mockUseDeviceLocation.mockReturnValue({ countryCode, loading })
+  mockUseDeviceLocation.mockReturnValue({ countryCode, loading, detectionFailed })
   mockUseAccountRegistry.mockReturnValue({ accounts })
   mockUseRemoteConfig.mockReturnValue({
     custodialSignupBlockedCountries,
@@ -78,5 +80,11 @@ describe("useCustodialEligibility (wiring)", () => {
     setUp({ countryCode: "SV", loading: false })
     const { result } = renderHook(() => useCustodialEligibility())
     expect(result.current.loading).toBe(false)
+  })
+
+  it("blocks signup when device-location reports a detection-failure fallback (C1)", () => {
+    setUp({ countryCode: "SV", detectionFailed: true, accounts: [] })
+    const { result } = renderHook(() => useCustodialEligibility())
+    expect(result.current.signupAllowed).toBe(false)
   })
 })

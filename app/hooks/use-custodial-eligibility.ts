@@ -10,13 +10,14 @@ export type CustodialEligibility = {
 }
 
 export const useCustodialEligibility = (): CustodialEligibility => {
-  const { countryCode, loading } = useDeviceLocation()
+  const { countryCode, loading, detectionFailed } = useDeviceLocation()
   const { accounts } = useAccountRegistry()
   const { custodialSignupBlockedCountries, custodialFirstSignupBlockedCountries } =
     useRemoteConfig()
 
   const signupAllowed = decideCustodialEligibility({
     country: countryCode?.toUpperCase(),
+    detectionFailed,
     accountCount: accounts.length,
     custodialSignupBlockedCountries,
     custodialFirstSignupBlockedCountries,

@@ -2,6 +2,7 @@ import { decideCustodialEligibility } from "@app/utils/custodial-eligibility"
 
 const baseInputs = {
   country: "SV",
+  detectionFailed: false,
   accountCount: 0,
   custodialSignupBlockedCountries: ["US"],
   custodialFirstSignupBlockedCountries: ["GB", "DE"],
@@ -46,11 +47,36 @@ describe("decideCustodialEligibility", () => {
 
   describe("country undefined", () => {
     it("fails closed: returns false when country has not been resolved", () => {
-      expect(decideCustodialEligibility({ ...baseInputs, country: undefined })).toBe(false)
+      expect(decideCustodialEligibility({ ...baseInputs, country: undefined })).toBe(
+        false,
+      )
     })
   })
 
-  describe("precedence — always-block list outranks first-signup carve-out", () => {
+  describe("detection failure (fallback country)", () => {
+    it("fails closed when the resolved country came from a detection-failure fallback, regardless of country", () => {
+      expect(
+        decideCustodialEligibility({
+          ...baseInputs,
+          country: "SV",
+          detectionFailed: true,
+        }),
+      ).toBe(false)
+    })
+
+    it("fails closed even for an unblocked country with existing accounts when detection failed", () => {
+      expect(
+        decideCustodialEligibility({
+          ...baseInputs,
+          country: "SV",
+          accountCount: 5,
+          detectionFailed: true,
+        }),
+      ).toBe(false)
+    })
+  })
+
+  describe("precedence: always-block list outranks first-signup carve-out", () => {
     it("blocks a country present in both lists with an existing account", () => {
       expect(
         decideCustodialEligibility({
