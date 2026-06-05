@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Wag asseblief totdat die omskakeling voltooi is"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Jou beursie koppel steeds. Wag asseblief 'n oomblik en probeer weer.",
+    "paymentPending": "Jou betaling word dalk steeds voltooi. Kontroleer jou saldo voordat jy weer probeer.",
     "title": "Verkry Bitcoin",
     "usdTitle": "Ruil om na Dollar-rekening",
     "error": "Kon nie faktuur genereer nie. Kontak asseblief ondersteuning as hierdie probleem voortduur.",

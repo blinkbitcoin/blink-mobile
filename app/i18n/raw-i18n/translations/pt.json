@@ -2168,6 +2168,8 @@
         "pleaseWaitForConversion": "Por favor aguarde até que a conversão seja concluída"
     },
     "RedeemBitcoinScreen": {
+        "walletNotConnected": "Sua carteira ainda está conectando. Aguarde um momento e tente novamente.",
+        "paymentPending": "Seu pagamento pode ainda estar sendo concluído. Verifique seu saldo antes de tentar novamente.",
         "title": "Resgatar Bitcoin",
         "usdTitle": "Resgatar na Conta Dólar",
         "error": "Falha ao gerar fatura. Entre em contato com o suporte se o problema persistir.",

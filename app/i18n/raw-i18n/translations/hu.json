@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Kérjük, várjon, amíg a konverzió befejeződik"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "A pénztárcád még csatlakozik. Várj egy pillanatot, és próbáld újra.",
+    "paymentPending": "Lehet, hogy a fizetésed még folyamatban van. Ellenőrizd az egyenlegedet, mielőtt újrapróbálkozol.",
     "title": "Bitcoin beváltása",
     "usdTitle": "Beváltás Dollár Számla-ra",
     "error": "Nem sikerült fizetési kérelmet generálni. Kérjük, ha a probléma továbbra is fennáll, vedd fel a kapcsolatot az ügyfélszolgálattal.",

@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Wacht tot de omzetting is voltooid"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Je portemonnee maakt nog verbinding. Wacht even en probeer het opnieuw.",
+    "paymentPending": "Je betaling wordt mogelijk nog voltooid. Controleer je saldo voordat je het opnieuw probeert.",
     "title": "Wissel Bitcoin",
     "usdTitle": "Inwisselen naar Dollar-rekening",
     "error": "Kan factuur niet genereren. Neem contact op met klantenservice als dit probleem zich blijft voordoen.",

@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Vui lòng đợi cho đến khi quá trình chuyển đổi hoàn tất"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Ví của bạn vẫn đang kết nối. Vui lòng đợi một lát và thử lại.",
+    "paymentPending": "Khoản thanh toán của bạn có thể vẫn đang hoàn tất. Hãy kiểm tra số dư trước khi thử lại.",
     "title": "Đổi lấy Bitcoin",
     "usdTitle": "Đổi sang Tài khoản Đô la",
     "error": "Không thể tạo hóa đơn. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",

@@ -28,11 +28,12 @@ type Params = {
 
 export type LnurlWithdrawRedemption = {
   paid: boolean
+  pending: boolean
   errorMessage: string
   lnServiceErrorReason: string
 }
 
-type AdapterParams = {
+type SelfCustodialParams = {
   enabled: boolean
   amountSats: number
   callback: string
@@ -42,7 +43,9 @@ type AdapterParams = {
   maxWithdrawableSatoshis: number
 }
 
-const useAdapterRedemption = ({
+const WALLET_CONNECT_TIMEOUT_MS = 10_000
+
+const useSelfCustodialRedemption = ({
   enabled,
   amountSats,
   callback,
@@ -50,19 +53,35 @@ const useAdapterRedemption = ({
   defaultDescription,
   minWithdrawableSatoshis,
   maxWithdrawableSatoshis,
-}: AdapterParams): LnurlWithdrawRedemption => {
+}: SelfCustodialParams): LnurlWithdrawRedemption => {
   const { lnurlWithdraw } = usePayments()
   const translateSdkError = useTranslateSdkError()
   const { LL } = useI18nContext()
 
   const [paid, setPaid] = useState(false)
+  const [pending, setPending] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
+  const [lnServiceErrorReason, setLnServiceErrorReason] = useState("")
+
+  useEffect(() => {
+    if (!enabled || lnurlWithdraw) return
+
+    const timer = setTimeout(() => {
+      setErrorMessage(LL.RedeemBitcoinScreen.walletNotConnected())
+    }, WALLET_CONNECT_TIMEOUT_MS)
+
+    return () => clearTimeout(timer)
+  }, [enabled, lnurlWithdraw, LL])
 
   useEffect(() => {
     if (!enabled || !lnurlWithdraw) return
 
     const controller = new AbortController()
     let cancelled = false
+
+    setPending(false)
+    setErrorMessage("")
+    setLnServiceErrorReason("")
 
     const run = async () => {
       const result = await lnurlWithdraw({
@@ -82,11 +101,22 @@ const useAdapterRedemption = ({
         return
       }
 
+      if (result.status === PaymentResultStatus.Pending) {
+        setPending(true)
+        return
+      }
+
       const code = result.errors?.[0]?.message
       setErrorMessage(translateSdkError(code) ?? LL.RedeemBitcoinScreen.redeemingError())
+
+      const reason = result.errors?.[0]?.reason
+      if (reason) setLnServiceErrorReason(reason)
     }
 
-    run()
+    run().catch(() => {
+      if (cancelled) return
+      setErrorMessage(LL.RedeemBitcoinScreen.redeemingError())
+    })
 
     return () => {
       cancelled = true
@@ -105,10 +135,10 @@ const useAdapterRedemption = ({
     LL,
   ])
 
-  return { paid, errorMessage, lnServiceErrorReason: "" }
+  return { paid, pending, errorMessage, lnServiceErrorReason }
 }
 
-type MutationParams = {
+type CustodialParams = {
   enabled: boolean
   walletId: string | undefined
   amountSats: number
@@ -117,14 +147,14 @@ type MutationParams = {
   defaultDescription: string
 }
 
-const useMutationRedemption = ({
+const useCustodialRedemption = ({
   enabled,
   walletId,
   amountSats,
   callback,
   k1,
   defaultDescription,
-}: MutationParams): LnurlWithdrawRedemption => {
+}: CustodialParams): LnurlWithdrawRedemption => {
   const { LL } = useI18nContext()
   const [lnInvoiceCreate] = useLnInvoiceCreateMutation()
   const apolloClient = useApolloClient()
@@ -141,6 +171,8 @@ const useMutationRedemption = ({
 
     const createInvoice = async () => {
       setWithdrawalInvoice(null)
+      setErrorMessage("")
+      setLnServiceErrorReason("")
       try {
         const { data } = await lnInvoiceCreate({
           variables: {
@@ -202,14 +234,14 @@ const useMutationRedemption = ({
     apolloClient.refetchQueries({ include: [HomeAuthedDocument] })
   }, [paid, apolloClient])
 
-  return { paid, errorMessage, lnServiceErrorReason }
+  return { paid, pending: false, errorMessage, lnServiceErrorReason }
 }
 
 export const useLnurlWithdrawRedemption = (params: Params): LnurlWithdrawRedemption => {
   const { accountType } = usePayments()
   const isSelfCustodial = accountType === AccountType.SelfCustodial
 
-  const adapterState = useAdapterRedemption({
+  const selfCustodialState = useSelfCustodialRedemption({
     enabled: isSelfCustodial,
     amountSats: params.amountSats,
     callback: params.callback,
@@ -219,7 +251,7 @@ export const useLnurlWithdrawRedemption = (params: Params): LnurlWithdrawRedempt
     maxWithdrawableSatoshis: params.maxWithdrawableSatoshis,
   })
 
-  const mutationState = useMutationRedemption({
+  const custodialState = useCustodialRedemption({
     enabled: !isSelfCustodial,
     walletId: params.walletId,
     amountSats: params.amountSats,
@@ -228,5 +260,5 @@ export const useLnurlWithdrawRedemption = (params: Params): LnurlWithdrawRedempt
     defaultDescription: params.defaultDescription,
   })
 
-  return isSelfCustodial ? adapterState : mutationState
+  return isSelfCustodial ? selfCustodialState : custodialState
 }

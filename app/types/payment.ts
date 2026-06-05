@@ -5,6 +5,7 @@ import { MoneyAmount, UsdMoneyAmount } from "./amounts"
 export type PaymentError = {
   message: string
   code?: string
+  reason?: string
 }
 
 export const PaymentResultStatus = {

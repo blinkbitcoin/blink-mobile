@@ -44,15 +44,16 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
   const { formatDisplayAndWalletAmount } = useDisplayCurrency()
   const { LL } = useI18nContext()
 
-  const { paid, errorMessage, lnServiceErrorReason } = useLnurlWithdrawRedemption({
-    walletId: receivingWalletDescriptor?.id,
-    amountSats: settlementAmount.amount,
-    callback,
-    k1,
-    defaultDescription,
-    minWithdrawableSatoshis: minWithdrawableSatoshis.amount,
-    maxWithdrawableSatoshis: maxWithdrawableSatoshis.amount,
-  })
+  const { paid, pending, errorMessage, lnServiceErrorReason } =
+    useLnurlWithdrawRedemption({
+      walletId: receivingWalletDescriptor?.id,
+      amountSats: settlementAmount.amount,
+      callback,
+      k1,
+      defaultDescription,
+      minWithdrawableSatoshis: minWithdrawableSatoshis.amount,
+      maxWithdrawableSatoshis: maxWithdrawableSatoshis.amount,
+    })
 
   useEffect(() => {
     // TODO: when USD is accepted:
@@ -89,14 +90,25 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
     )
   }, [errorMessage, lnServiceErrorReason, styles])
 
+  const renderPendingView = useMemo(() => {
+    if (!pending) return null
+    return (
+      <View style={styles.container}>
+        <Text style={styles.pendingText} selectable>
+          {LL.RedeemBitcoinScreen.paymentPending()}
+        </Text>
+      </View>
+    )
+  }, [pending, styles, LL])
+
   const renderActivityStatusView = useMemo(() => {
-    if (errorMessage !== "" || paid) return null
+    if (errorMessage !== "" || paid || pending) return null
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     )
-  }, [errorMessage, paid, styles, colors.primary])
+  }, [errorMessage, paid, pending, styles, colors.primary])
 
   return (
     <Screen preset="scroll" style={styles.contentContainer}>
@@ -122,6 +134,7 @@ const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
         <View style={styles.qr}>
           {renderSuccessView}
           {renderErrorView}
+          {renderPendingView}
           {renderActivityStatusView}
         </View>
       </View>
@@ -156,6 +169,10 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   errorText: {
     color: colors.error,
+    textAlign: "center",
+  },
+  pendingText: {
+    color: colors.warning,
     textAlign: "center",
   },
   contentContainer: {

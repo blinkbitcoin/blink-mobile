@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Pričekajte dok se konverzija ne dovrši"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Vaš novčanik se još povezuje. Pričekajte trenutak i pokušajte ponovno.",
+    "paymentPending": "Vaše plaćanje se možda još dovršava. Provjerite stanje prije ponovnog pokušaja.",
     "title": "Povuci bitcoin",
     "usdTitle": "Zamijeni na Dolar račun",
     "error": "Generiranje fakture nije uspjelo. Obratite se podršci ako se ovaj problem nastavi pojavljivati.",

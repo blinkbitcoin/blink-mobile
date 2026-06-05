@@ -2168,6 +2168,8 @@
         "pleaseWaitForConversion": "Attendi finché la conversione non è completata"
     },
     "RedeemBitcoinScreen": {
+        "walletNotConnected": "Il tuo portafoglio si sta ancora connettendo. Attendi un momento e riprova.",
+        "paymentPending": "Il tuo pagamento potrebbe essere ancora in fase di completamento. Controlla il saldo prima di riprovare.",
         "title": "Riscatta Bitcoin",
         "usdTitle": "Riscatta su Conto Dollaro",
         "error": "Impossibile generare un'invoice. Contattare l'assistenza se il problema persiste.",

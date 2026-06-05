@@ -2168,6 +2168,8 @@
         "pleaseWaitForConversion": "Por favor espera hasta que la conversión se complete"
     },
     "RedeemBitcoinScreen": {
+        "walletNotConnected": "Tu billetera aún se está conectando. Espera un momento e inténtalo de nuevo.",
+        "paymentPending": "Es posible que tu pago aún se esté completando. Revisa tu saldo antes de volver a intentarlo.",
         "title": "Canjear Bitcoin",
         "usdTitle": "Canjear a Cuenta Dólar",
         "error": "Error al generar la factura. Póngase en contacto con el soporte técnico si este problema persiste.",

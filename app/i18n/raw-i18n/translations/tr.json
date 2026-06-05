@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Lütfen dönüştürme tamamlanana kadar bekleyin"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Cüzdanınız hâlâ bağlanıyor. Lütfen bir an bekleyip tekrar deneyin.",
+    "paymentPending": "Ödemeniz hâlâ tamamlanıyor olabilir. Tekrar denemeden önce bakiyenizi kontrol edin.",
     "title": "Bitcoin olarak kullan",
     "usdTitle": "Dolar Hesabı'a aktar",
     "error": "Fatura oluşturulamadı. Sorun devam ederse lütfen destekle iletişime geçin.",

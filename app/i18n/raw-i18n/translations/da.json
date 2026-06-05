@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Vent venligst, indtil konverteringen er færdig"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Din tegnebog opretter stadig forbindelse. Vent et øjeblik, og prøv igen.",
+    "paymentPending": "Din betaling er muligvis stadig ved at blive gennemført. Tjek din saldo, før du prøver igen.",
     "title": "Indløs Bitcoin",
     "usdTitle": "Indløs til Dollar-konto",
     "error": "Fejl ved generering af faktura. Kontakt venligst support, hvis dette problem fortsætter.",

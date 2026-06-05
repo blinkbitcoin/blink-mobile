@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Tafadhali subiri hadi ubadilishaji ukamilike"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Pochi yako bado inaunganisha. Tafadhali subiri kidogo na ujaribu tena.",
+    "paymentPending": "Malipo yako huenda bado yanakamilika. Angalia salio lako kabla ya kujaribu tena.",
     "title": "Badilisha Bitcoin",
     "usdTitle": "Komboa kwenye Akaunti ya Dola",
     "error": "Kushindwa kuzalisha bili. Tafadhali wasiliana na msaada ikiwa tatizo hili litadumu.",
