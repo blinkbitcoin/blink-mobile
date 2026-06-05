@@ -58,6 +58,11 @@ export const SetDefaultAccountModal = ({
   const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
   const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
 
+  const closeAsAcknowledged = () => {
+    markDefaultAccountModalShown()
+    toggleModal()
+  }
+
   const onPressUsdAccount = async () => {
     setUsdLoading(true)
     if (usdWallet) {
@@ -77,8 +82,7 @@ export const SetDefaultAccountModal = ({
     }
     setUsdLoading(false)
 
-    markDefaultAccountModalShown()
-    toggleModal()
+    closeAsAcknowledged()
   }
 
   const onPressBtcAccount = async () => {
@@ -100,8 +104,7 @@ export const SetDefaultAccountModal = ({
     }
     setBtcLoading(false)
 
-    markDefaultAccountModalShown()
-    toggleModal()
+    closeAsAcknowledged()
   }
 
   return (
