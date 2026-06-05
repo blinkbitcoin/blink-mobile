@@ -3,19 +3,19 @@ import { useCallback } from "react"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
   getDefaultAccountModalShown,
-  markDefaultAccountModalShown,
+  withDefaultAccountModalShown,
 } from "@app/store/persistent-state/default-account-modal-shown"
 
-type UseDefaultAccountModalShownReturn = {
+type DefaultAccountModalShownReturn = {
   defaultAccountModalShown: boolean
   markDefaultAccountModalShown: () => void
 }
 
-export const useDefaultAccountModalShown = (): UseDefaultAccountModalShownReturn => {
+export const useDefaultAccountModalShown = (): DefaultAccountModalShownReturn => {
   const { persistentState, updateState } = usePersistentStateContext()
 
   const markShown = useCallback(() => {
-    updateState((prev) => prev && markDefaultAccountModalShown(prev))
+    updateState((prev) => prev && withDefaultAccountModalShown(prev))
   }, [updateState])
 
   return {

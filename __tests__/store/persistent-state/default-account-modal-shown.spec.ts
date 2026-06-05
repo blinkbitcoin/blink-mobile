@@ -1,6 +1,6 @@
 import {
   getDefaultAccountModalShown,
-  markDefaultAccountModalShown,
+  withDefaultAccountModalShown,
 } from "@app/store/persistent-state/default-account-modal-shown"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { DefaultAccountId } from "@app/types/wallet"
@@ -76,14 +76,14 @@ describe("getDefaultAccountModalShown", () => {
   })
 })
 
-describe("markDefaultAccountModalShown", () => {
+describe("withDefaultAccountModalShown", () => {
   it("creates the per-account map when absent and sets the flag for the active id", () => {
     const state: PersistentState = {
       ...baseState,
       activeAccountId: "self-custodial-1",
     }
 
-    const next = markDefaultAccountModalShown(state)
+    const next = withDefaultAccountModalShown(state)
 
     expect(next.defaultAccountModalShownByAccountId).toEqual({
       "self-custodial-1": true,
@@ -100,7 +100,7 @@ describe("markDefaultAccountModalShown", () => {
       },
     }
 
-    const next = markDefaultAccountModalShown(state)
+    const next = withDefaultAccountModalShown(state)
 
     expect(next.defaultAccountModalShownByAccountId).toEqual({
       "self-custodial-1": true,
@@ -109,7 +109,7 @@ describe("markDefaultAccountModalShown", () => {
   })
 
   it("uses the custodial slot when activeAccountId is undefined", () => {
-    const next = markDefaultAccountModalShown(baseState)
+    const next = withDefaultAccountModalShown(baseState)
 
     expect(next.defaultAccountModalShownByAccountId).toEqual({
       [DefaultAccountId.Custodial]: true,
@@ -126,7 +126,7 @@ describe("markDefaultAccountModalShown", () => {
     }
     const snapshot = JSON.parse(JSON.stringify(original))
 
-    markDefaultAccountModalShown(original)
+    withDefaultAccountModalShown(original)
 
     expect(original).toEqual(snapshot)
   })
