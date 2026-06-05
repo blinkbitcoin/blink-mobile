@@ -3,7 +3,7 @@ import { TouchableOpacity, Text } from "react-native"
 import { Satoshis } from "lnurl-pay"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
-import { DisplayCurrency, toUsdMoneyAmount } from "@app/types/amounts"
+import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
@@ -611,6 +611,22 @@ const buildUsdSettlementRoute = (
   } as const
 }
 
+const buildBtcSettlementRoute = (unitOfAccountSats: number) => {
+  const btcDescriptor = { currency: WalletCurrency.Btc, id: "btc-wallet-id" } as const
+  const params: PaymentDetails.CreateIntraledgerPaymentDetailsParams<WalletCurrency> = {
+    handle: "test",
+    recipientWalletId: "testid",
+    convertMoneyAmount: usdBtcConvert,
+    sendingWalletDescriptor: btcDescriptor,
+    unitOfAccountAmount: toBtcMoneyAmount(unitOfAccountSats),
+  }
+  return {
+    key: "sendBitcoinConfirmationScreen",
+    name: "sendBitcoinConfirmation",
+    params: { paymentDetail: PaymentDetails.createIntraledgerPaymentDetails(params) },
+  } as const
+}
+
 describe("SendBitcoinConfirmationScreen — fee-currency conversion", () => {
   beforeEach(() => {
     // Balance: $10.00 = 1000 cents.
@@ -763,6 +779,36 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
 
     expect(screen.queryByText(usdRemainderSweepMatcher)).toBeNull()
   })
+
+  it("does NOT render the warning for a BTC source wallet even when the fee quote reports IncreasedToAvoidDust (false-positive guard)", async () => {
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 1_000_000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 1000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildBtcSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.queryByText(usdRemainderSweepMatcher)).toBeNull()
+  })
 })
 
 describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
@@ -844,5 +890,55 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
 
     expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
+  })
+
+  it("disables the slider when the fee quote errors so the user cannot sweep unwarned (C1)", async () => {
+    mockUseFee.mockReturnValue({ status: "error" })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
+  })
+
+  it("disables the slider while the fee quote is loading", async () => {
+    mockUseFee.mockReturnValue({ status: "loading" })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
+  })
+
+  it("keeps the slider enabled on a fee error that still carries an amount (max-fee fallback, #559)", async () => {
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    mockUseFee.mockReturnValue({
+      status: "error",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
   })
 })
