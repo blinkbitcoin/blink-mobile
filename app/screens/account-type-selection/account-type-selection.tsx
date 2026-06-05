@@ -7,7 +7,11 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
-import { AccountOption, useAccountTypeOptions } from "@app/hooks/use-account-type-options"
+import {
+  ACCOUNT_OPTION_TO_FLOW,
+  AccountOption,
+  useAccountTypeOptions,
+} from "@app/hooks/use-account-type-options"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { AccountTypeMode } from "@app/types/account"
@@ -39,20 +43,16 @@ export const AccountTypeSelectionScreen: React.FC = () => {
   const handleContinue = () => {
     if (!selected) return
 
-    if (selected === AccountOption.Custodial) {
-      if (mode === AccountTypeMode.Create) {
-        navigation.navigate("acceptTermsAndConditions", { flow: "trial" })
-        return
-      }
-      navigation.navigate("login", {
-        type: PhoneLoginInitiateType.Login,
+    if (mode === AccountTypeMode.Create) {
+      navigation.navigate("acceptTermsAndConditions", {
+        flow: ACCOUNT_OPTION_TO_FLOW[selected],
       })
       return
     }
 
-    if (mode === AccountTypeMode.Create) {
-      navigation.navigate("acceptTermsAndConditions", {
-        flow: "selfCustodial",
+    if (selected === AccountOption.Custodial) {
+      navigation.navigate("login", {
+        type: PhoneLoginInitiateType.Login,
       })
       return
     }

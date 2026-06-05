@@ -27,6 +27,8 @@ jest.mock("@app/hooks", () => ({
 
 jest.mock("@app/hooks/use-account-type-options", () => ({
   AccountOption: { Custodial: "custodial", SelfCustodial: "selfCustodial" },
+  AccountFlow: { Trial: "trial", SelfCustodial: "selfCustodial" },
+  ACCOUNT_OPTION_TO_FLOW: { custodial: "trial", selfCustodial: "selfCustodial" },
   useAccountTypeOptions: () => mockUseAccountTypeOptions(),
 }))
 

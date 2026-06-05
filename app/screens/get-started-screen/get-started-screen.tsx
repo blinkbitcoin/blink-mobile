@@ -5,7 +5,10 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAppConfig } from "@app/hooks"
-import { useAccountTypeOptions, AccountOption } from "@app/hooks/use-account-type-options"
+import {
+  useAccountTypeOptions,
+  ACCOUNT_OPTION_TO_FLOW,
+} from "@app/hooks/use-account-type-options"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
 import { AccountTypeMode } from "@app/types/account"
@@ -59,9 +62,9 @@ export const GetStartedScreen: React.FC = () => {
     })
 
     if (defaultSelected) {
-      const flow =
-        defaultSelected === AccountOption.SelfCustodial ? "selfCustodial" : "trial"
-      navigation.navigate("acceptTermsAndConditions", { flow })
+      navigation.navigate("acceptTermsAndConditions", {
+        flow: ACCOUNT_OPTION_TO_FLOW[defaultSelected],
+      })
       return
     }
 
