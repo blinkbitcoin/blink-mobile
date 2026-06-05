@@ -84,10 +84,16 @@ const defaultReplaceCardDeliveryConfig = {
   express: { minDays: 1, maxDays: 2, priceUsd: 15 },
 }
 
+/**
+ * Default compliance country lists (ISO-3166-1 alpha-2, uppercased). Sources:
+ * OFAC sanctions (https://ofac.treasury.gov/sanctions-programs-and-country-information)
+ * and Google Play crypto-wallet policy article 16329703
+ * (https://support.google.com/googleplay/android-developer/answer/16329703).
+ */
 // prettier-ignore
 const defaultCustodialBlocks = {
-  blockAnySignup: ["US"],
-  blockFirstSignup: [
+  custodialSignupBlockedCountries: ["US"],
+  custodialFirstSignupBlockedCountries: [
     // OFAC sanctions
     "CU", "IR", "KP",
     // Google Play 16329703
@@ -99,7 +105,7 @@ const defaultCustodialBlocks = {
   ],
 }
 
-const defaultRemoteConfig: RemoteConfig = {
+export const defaultRemoteConfig: RemoteConfig = {
   deviceAccountEnabledRestAuth: false,
   balanceLimitToTriggerUpgradeModal: 2100,
   feedbackEmailAddress: "feedback@blink.sv",
@@ -122,8 +128,9 @@ const defaultRemoteConfig: RemoteConfig = {
   autoConvertPollMaxAttempts: 30,
   autoConvertPollIntervalMs: 500,
   autoConvertAmountMatchToleranceBps: 500,
-  custodialSignupBlockedCountries: defaultCustodialBlocks.blockAnySignup,
-  custodialFirstSignupBlockedCountries: defaultCustodialBlocks.blockFirstSignup,
+  custodialSignupBlockedCountries: defaultCustodialBlocks.custodialSignupBlockedCountries,
+  custodialFirstSignupBlockedCountries:
+    defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -139,10 +146,10 @@ remoteConfigInstance().setDefaults({
     defaultReplaceCardDeliveryConfig,
   ),
   custodialSignupBlockedCountries: serializeRemoteConfigDefault(
-    defaultCustodialBlocks.blockAnySignup,
+    defaultCustodialBlocks.custodialSignupBlockedCountries,
   ),
   custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
-    defaultCustodialBlocks.blockFirstSignup,
+    defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
   ),
 })
 
@@ -266,12 +273,12 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
 
         const custodialSignupBlockedCountries = getRemoteConfigStringList(
           CustodialSignupBlockedCountriesKey,
-          defaultCustodialBlocks.blockAnySignup,
+          defaultCustodialBlocks.custodialSignupBlockedCountries,
         )
 
         const custodialFirstSignupBlockedCountries = getRemoteConfigStringList(
           CustodialFirstSignupBlockedCountriesKey,
-          defaultCustodialBlocks.blockFirstSignup,
+          defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
         )
 
         setRemoteConfig({
