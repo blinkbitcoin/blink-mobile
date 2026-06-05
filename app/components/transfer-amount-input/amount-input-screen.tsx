@@ -164,7 +164,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
   const typingRef = useRef(false)
   const [typingState, setTypingState] = useState(false)
   const forceDebounceRef = useRef(false)
-  const initialAmountAppliedRef = useRef(false)
+  const chipAmountAppliedRef = useRef(false)
 
   const notifyTyping = useCallback(
     (typing: boolean) => {
@@ -236,7 +236,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
     if (initialAmount) {
       setNumberPadAmount(initialAmount)
       forceDebounceRef.current = true
-      initialAmountAppliedRef.current = true
+      chipAmountAppliedRef.current = true
     }
   }, [initialAmount, setNumberPadAmount])
 
@@ -248,8 +248,9 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       return
     }
 
-    const initialAmountJustApplied = initialAmountAppliedRef.current
-    initialAmountAppliedRef.current = false
+    /** Consume-once token; the initialAmount effect must stay declared before this effect so React sets it first. */
+    const chipAmountJustApplied = chipAmountAppliedRef.current
+    chipAmountAppliedRef.current = false
 
     prevFocusSigRef.current = focusSig
     skipNextRecalcRef.current = true
@@ -265,13 +266,15 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       currencyInfo,
     })
 
+    /** Sticky until the next debounce: set on chip-apply and focus changes, cleared only when the debounce fires. */
     forceDebounceRef.current =
-      initialAmountJustApplied ||
+      chipAmountJustApplied ||
       forceDebounceRef.current ||
       currentAmountFromNp.amount !== focusedInput.amount.amount ||
       currentAmountFromNp.currency !== focusedInput.amount.currency
 
-    if (initialAmountJustApplied) return
+    /** Number pad already holds the chip amount; bail before the focus reset and let the forced debounce re-push formatting instead of clobbering it to 0. */
+    if (chipAmountJustApplied) return
 
     setNumberPadAmount(focusedInput.amount)
 
@@ -480,7 +483,7 @@ export const AmountInputScreen: React.FC<AmountInputScreenProps> = ({
       onAmountChange(primaryAmount)
       notifyTyping(false)
       forceDebounceRef.current = false
-      initialAmountAppliedRef.current = false
+      chipAmountAppliedRef.current = false
       onAfterRecalc?.()
     },
     debounceMs,
