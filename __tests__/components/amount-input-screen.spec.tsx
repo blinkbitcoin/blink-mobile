@@ -12,6 +12,8 @@ const mockFormatMoneyAmount = jest.fn()
 const mockOnAmountChange = jest.fn()
 const mockOnSetFormattedAmount = jest.fn()
 
+const CHIP_AMOUNT_SATS = 25000
+
 jest.mock("@app/hooks/use-display-currency", () => {
   const currencyInfo = {
     BTC: {
@@ -140,7 +142,7 @@ describe("AmountInputScreen", () => {
     expect(errorElement.props.children).toBe("")
   })
 
-  it("propagates a fresh initialAmount even when focusedInput identity changes in the same commit", () => {
+  it("propagates a fresh initialAmount even when focusedInput identity changes in the same render", () => {
     const initialFocusedInput = {
       id: ConvertInputType.FROM,
       currency: "BTC" as const,
@@ -161,7 +163,7 @@ describe("AmountInputScreen", () => {
 
     mockOnAmountChange.mockClear()
 
-    const chipAmount = toBtcMoneyAmount(25000)
+    const chipAmount = toBtcMoneyAmount(CHIP_AMOUNT_SATS)
     const refocusedInput = {
       ...initialFocusedInput,
       amount: {
@@ -183,7 +185,10 @@ describe("AmountInputScreen", () => {
     )
 
     expect(mockOnAmountChange).toHaveBeenCalledWith(
-      expect.objectContaining({ amount: 25000 }),
+      expect.objectContaining({ amount: CHIP_AMOUNT_SATS }),
+    )
+    expect(mockOnAmountChange.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ amount: CHIP_AMOUNT_SATS }),
     )
   })
 })
