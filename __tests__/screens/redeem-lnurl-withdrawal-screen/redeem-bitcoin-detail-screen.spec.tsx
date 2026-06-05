@@ -239,6 +239,36 @@ describe("RedeemBitcoinDetailScreen", () => {
     })
   })
 
+  it("rounds non-divisible msats limits to the nearest sat through to navigation (rounding wire-through)", async () => {
+    mockUsePayments.mockReturnValue({ accountType: AccountType.SelfCustodial })
+    mockUsePaymentRequestQuery.mockReturnValue({ data: undefined })
+
+    const route = {
+      params: {
+        receiveDestination: {
+          validDestination: {
+            callback: "https://example.com/cb",
+            domain: "example.com",
+            k1: "k1-value",
+            defaultDescription: "voucher description",
+            minWithdrawable: 1500,
+            maxWithdrawable: 100_000_000,
+          },
+        },
+      },
+    } as unknown as Parameters<typeof RedeemBitcoinDetailScreen>[0]["route"]
+
+    const { getByTestId } = render(<RedeemBitcoinDetailScreen route={route} />)
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("redeem-button"))
+
+    const [, params] = mockReplace.mock.calls[0]
+    expect(params.minWithdrawableSatoshis.amount).toBe(2)
+    expect(params.maxWithdrawableSatoshis.amount).toBe(100_000)
+  })
+
   it("skips the custodial wallet query when account is self-custodial", async () => {
     mockUsePayments.mockReturnValue({ accountType: AccountType.SelfCustodial })
     mockUsePaymentRequestQuery.mockReturnValue({ data: undefined })

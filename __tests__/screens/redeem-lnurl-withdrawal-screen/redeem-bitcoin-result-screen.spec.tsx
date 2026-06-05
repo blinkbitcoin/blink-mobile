@@ -38,7 +38,13 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 
 jest.mock("@app/i18n/i18n-react", () => {
   let cached: {
-    LL: { RedeemBitcoinScreen: { title: () => string; redeemAmountFrom: () => string } }
+    LL: {
+      RedeemBitcoinScreen: {
+        title: () => string
+        redeemAmountFrom: () => string
+        paymentPending: () => string
+      }
+    }
   }
   return {
     useI18nContext: () => {
@@ -48,6 +54,7 @@ jest.mock("@app/i18n/i18n-react", () => {
             RedeemBitcoinScreen: {
               title: () => "Redeem Bitcoin",
               redeemAmountFrom: () => "Redeem 10 sats from example.com",
+              paymentPending: () => "Your payment may still be completing.",
             },
           },
         }
@@ -75,16 +82,34 @@ jest.mock("@app/components/atomic/galoy-icon", () => {
   }
 })
 
-jest.mock("@app/screens/receive-bitcoin-screen/my-ln-updates-sub", () => ({
-  withMyLnUpdateSub: <P,>(Component: React.ComponentType<P>) => Component,
-}))
+jest.mock("@app/screens/receive-bitcoin-screen/my-ln-updates-sub", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View } = jest.requireActual("react-native")
+  return {
+    withMyLnUpdateSub:
+      <P extends object>(Component: React.ComponentType<P>) =>
+      (props: P) =>
+        ReactActual.createElement(
+          View,
+          { testID: "my-ln-update-sub-wrapper" },
+          ReactActual.createElement(Component, props),
+        ),
+  }
+})
 
 jest.mock("@rn-vui/themed", () => {
   const ReactActual = jest.requireActual("react")
   return {
     makeStyles:
       (fn: (theme: { colors: Record<string, string> }) => Record<string, object>) => () =>
-        fn({ colors: { primary: "#fc5805", error: "#f00", grey5: "#eee" } }),
+        fn({
+          colors: {
+            primary: "#fc5805",
+            error: "#f00",
+            grey5: "#eee",
+            warning: "#f59e0b",
+          },
+        }),
     Text: ({ children }: { children: React.ReactNode }) =>
       ReactActual.createElement("Text", null, children),
     useTheme: () => ({ theme: { mode: "dark", colors: { primary: "#fc5805" } } }),
@@ -222,5 +247,33 @@ describe("RedeemBitcoinResultScreen", () => {
 
     expect(queryByText("voucher already used")).toBeTruthy()
     expect(queryByText("Redeeming error")).toBeTruthy()
+  })
+
+  it("renders the pending message and hides the spinner when the hook reports pending=true (C2)", async () => {
+    mockUseLnurlWithdrawRedemption.mockReturnValue({
+      paid: false,
+      pending: true,
+      errorMessage: "",
+      lnServiceErrorReason: "",
+    })
+
+    // eslint-disable-next-line camelcase
+    const { queryByText, UNSAFE_queryByType } = render(
+      <RedeemBitcoinResultScreen route={buildRoute()} />,
+    )
+
+    await flushEffects()
+
+    expect(queryByText("Your payment may still be completing.")).toBeTruthy()
+    // eslint-disable-next-line camelcase
+    expect(UNSAFE_queryByType(ActivityIndicator)).toBeNull()
+  })
+
+  it("wraps the screen in withMyLnUpdateSub so the custodial paid signal stays subscribed (HOC contract)", async () => {
+    const { queryByTestId } = render(<RedeemBitcoinResultScreen route={buildRoute()} />)
+
+    await flushEffects()
+
+    expect(queryByTestId("my-ln-update-sub-wrapper")).toBeTruthy()
   })
 })

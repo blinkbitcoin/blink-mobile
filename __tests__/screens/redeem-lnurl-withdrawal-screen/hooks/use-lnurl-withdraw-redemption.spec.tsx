@@ -11,6 +11,7 @@ const mockTranslateSdkError = jest.fn()
 const mockRedeemingError = jest.fn(() => "fallback-redeeming-error")
 const mockGenericError = jest.fn(() => "generic-error")
 const mockSubmissionError = jest.fn(() => "submission-error")
+const mockWalletNotConnected = jest.fn(() => "wallet-not-connected")
 const mockLnInvoiceCreate = jest.fn()
 const mockApolloRefetch = jest.fn()
 const mockUseLnUpdateHashPaid = jest.fn(() => "no-match-hash")
@@ -31,6 +32,7 @@ jest.mock("@app/i18n/i18n-react", () => {
         redeemingError: () => string
         error: () => string
         submissionError: () => string
+        walletNotConnected: () => string
         title: () => string
       }
     }
@@ -44,6 +46,7 @@ jest.mock("@app/i18n/i18n-react", () => {
               redeemingError: mockRedeemingError,
               error: mockGenericError,
               submissionError: mockSubmissionError,
+              walletNotConnected: mockWalletNotConnected,
               title: () => "Redeem Bitcoin",
             },
           },
@@ -103,19 +106,28 @@ describe("useLnurlWithdrawRedemption — self-custodial branch", () => {
     )
   })
 
-  it("does not run the SC adapter when lnurlWithdraw is unavailable (SDK still loading)", async () => {
-    mockUsePayments.mockReturnValue({
-      accountType: AccountType.SelfCustodial,
-      lnurlWithdraw: undefined,
-    })
+  it("surfaces a wallet-not-connected error after the bounded wait when the SDK never connects (C1)", () => {
+    jest.useFakeTimers()
+    try {
+      mockUsePayments.mockReturnValue({
+        accountType: AccountType.SelfCustodial,
+        lnurlWithdraw: undefined,
+      })
 
-    const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+      const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
 
-    await flushEffects()
+      expect(result.current.errorMessage).toBe("")
 
-    expect(mockLnurlWithdraw).not.toHaveBeenCalled()
-    expect(result.current.paid).toBe(false)
-    expect(result.current.errorMessage).toBe("")
+      act(() => {
+        jest.advanceTimersByTime(10_000)
+      })
+
+      expect(mockLnurlWithdraw).not.toHaveBeenCalled()
+      expect(result.current.paid).toBe(false)
+      expect(result.current.errorMessage).toBe("wallet-not-connected")
+    } finally {
+      jest.useRealTimers()
+    }
   })
 
   it("sets paid=true when the SC adapter resolves with Success", async () => {
@@ -223,6 +235,67 @@ describe("useLnurlWithdrawRedemption — self-custodial branch", () => {
 
     expect(mockTranslateSdkError).not.toHaveBeenCalled()
     expect(mockRedeemingError).not.toHaveBeenCalled()
+  })
+
+  it("sets pending=true (no error) when the self-custodial adapter resolves Pending (C2)", async () => {
+    mockLnurlWithdraw.mockResolvedValue({ status: PaymentResultStatus.Pending })
+
+    const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+    await flushEffects()
+
+    expect(result.current.pending).toBe(true)
+    expect(result.current.paid).toBe(false)
+    expect(result.current.errorMessage).toBe("")
+  })
+
+  it("threads the adapter error reason into lnServiceErrorReason (I2)", async () => {
+    mockLnurlWithdraw.mockResolvedValue({
+      status: PaymentResultStatus.Failed,
+      errors: [{ message: "sc_invalid_input", reason: "Voucher already claimed" }],
+    })
+
+    const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+    await flushEffects()
+
+    expect(result.current.lnServiceErrorReason).toBe("Voucher already claimed")
+  })
+
+  it("ignores a stale first resolution after amountSats changes mid-flight (stale resolution)", async () => {
+    let resolveFirst: (value: {
+      status: typeof PaymentResultStatus.Failed
+      errors: Array<{ message: string }>
+    }) => void = () => {}
+    mockLnurlWithdraw
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolveFirst = resolve
+          }),
+      )
+      .mockResolvedValueOnce({ status: PaymentResultStatus.Success })
+
+    const { result, rerender } = renderHook(
+      (props: typeof defaultParams) => useLnurlWithdrawRedemption(props),
+      { initialProps: defaultParams },
+    )
+    await flushEffects()
+
+    rerender({ ...defaultParams, amountSats: 3000 })
+    await flushEffects()
+
+    await act(async () => {
+      resolveFirst({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "sc_network_error" }],
+      })
+      await flushEffects()
+    })
+
+    expect(result.current.errorMessage).toBe("")
+    expect(mockLnurlWithdraw).toHaveBeenCalledTimes(2)
+    expect(mockLnurlWithdraw.mock.calls[1][0].amountSats).toBe(3000)
   })
 })
 
@@ -362,5 +435,50 @@ describe("useLnurlWithdrawRedemption — custodial branch", () => {
     await flushEffects()
 
     expect(result.current.errorMessage).toBe("submission-error")
+  })
+
+  it("resets a stale errorMessage when a new attempt starts and then succeeds (stale-error reset)", async () => {
+    mockLnInvoiceCreate.mockResolvedValueOnce({
+      data: { lnInvoiceCreate: { invoice: null, errors: [{ message: "boom" }] } },
+    })
+
+    const { result, rerender } = renderHook(
+      (props: typeof defaultParams) => useLnurlWithdrawRedemption(props),
+      { initialProps: defaultParams },
+    )
+    await flushEffects()
+    expect(result.current.errorMessage).toBe("generic-error")
+
+    const invoice = { paymentRequest: "lnbc-bolt11-string", paymentHash: "hash-B" }
+    mockLnInvoiceCreate.mockResolvedValueOnce({
+      data: { lnInvoiceCreate: { invoice, errors: [] } },
+    })
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ status: "OK" }) })
+    mockUseLnUpdateHashPaid.mockReturnValue("hash-B")
+
+    rerender({ ...defaultParams, amountSats: 3000 })
+    await flushEffects()
+    await flushEffects()
+
+    expect(result.current.errorMessage).toBe("")
+    expect(result.current.paid).toBe(true)
+  })
+
+  it("stays paid=false with no error while the LN hash has not arrived yet (in-flight contract)", async () => {
+    const invoice = { paymentRequest: "lnbc-bolt11-string", paymentHash: "hash-A" }
+    mockLnInvoiceCreate.mockResolvedValueOnce({
+      data: { lnInvoiceCreate: { invoice, errors: [] } },
+    })
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ status: "OK" }) })
+    mockUseLnUpdateHashPaid.mockReturnValue("different-hash")
+
+    const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+    await flushEffects()
+    await flushEffects()
+
+    expect(result.current.paid).toBe(false)
+    expect(result.current.errorMessage).toBe("")
+    expect(result.current.lnServiceErrorReason).toBe("")
   })
 })

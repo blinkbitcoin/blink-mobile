@@ -1,16 +1,26 @@
+import { PaymentStatus } from "@breeztech/breez-sdk-spark-react-native"
+
 import { PaymentResultStatus } from "@app/types/payment"
 
 import { createLnurlWithdraw } from "@app/self-custodial/bridge/lnurl-withdraw"
 
 const mockClassifySdkError = jest.fn()
+const mockGetSdkErrorReason = jest.fn()
+const mockReportError = jest.fn()
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   LnurlWithdrawRequest: { create: (p: Record<string, unknown>) => p },
   LnurlWithdrawRequestDetails: { create: (p: Record<string, unknown>) => p },
+  PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
 }))
 
 jest.mock("@app/self-custodial/sdk-error", () => ({
   classifySdkError: (...args: unknown[]) => mockClassifySdkError(...args),
+  getSdkErrorReason: (...args: unknown[]) => mockGetSdkErrorReason(...args),
+}))
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
 const baseParams = {
@@ -22,13 +32,15 @@ const baseParams = {
   maxWithdrawableMsats: 5_000_000,
 }
 
-describe("createLnurlWithdraw — success path", () => {
+describe("createLnurlWithdraw — resolve path", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  it("returns { status: Success } when sdk.lnurlWithdraw resolves", async () => {
-    const lnurlWithdraw = jest.fn().mockResolvedValue(undefined)
+  it("returns { status: Success } when the SDK resolves with a completed payment", async () => {
+    const lnurlWithdraw = jest
+      .fn()
+      .mockResolvedValue({ payment: { status: PaymentStatus.Completed } })
     const sdk = { lnurlWithdraw } as never
 
     const result = await createLnurlWithdraw(sdk)(baseParams)
@@ -36,6 +48,27 @@ describe("createLnurlWithdraw — success path", () => {
     expect(result).toEqual({ status: PaymentResultStatus.Success })
     expect(lnurlWithdraw).toHaveBeenCalledTimes(1)
     expect(mockClassifySdkError).not.toHaveBeenCalled()
+  })
+
+  it("returns { status: Pending } when the completion timeout resolves with no settled payment (C2)", async () => {
+    const lnurlWithdraw = jest.fn().mockResolvedValue({ payment: undefined })
+    const sdk = { lnurlWithdraw } as never
+
+    const result = await createLnurlWithdraw(sdk)(baseParams)
+
+    expect(result).toEqual({ status: PaymentResultStatus.Pending })
+    expect(mockClassifySdkError).not.toHaveBeenCalled()
+  })
+
+  it("returns { status: Pending } when the SDK resolves with a still-pending payment (C2)", async () => {
+    const lnurlWithdraw = jest
+      .fn()
+      .mockResolvedValue({ payment: { status: PaymentStatus.Pending } })
+    const sdk = { lnurlWithdraw } as never
+
+    const result = await createLnurlWithdraw(sdk)(baseParams)
+
+    expect(result).toEqual({ status: PaymentResultStatus.Pending })
   })
 })
 
@@ -132,5 +165,33 @@ describe("createLnurlWithdraw — error mapping", () => {
     })
     expect(mockClassifySdkError).toHaveBeenCalledTimes(1)
     expect(mockClassifySdkError).toHaveBeenCalledWith(sdkErr)
+  })
+
+  it("classifies a thrown timeout as Failed, never Pending (a thrown timeout may predate dispatch)", async () => {
+    const sdkErr = new Error("transport timeout")
+    const lnurlWithdraw = jest.fn().mockRejectedValue(sdkErr)
+    const sdk = { lnurlWithdraw } as never
+    mockClassifySdkError.mockReturnValueOnce("sc_network_error")
+
+    const result = await createLnurlWithdraw(sdk)(baseParams)
+
+    expect(result.status).toBe(PaymentResultStatus.Failed)
+    expect(result.status).not.toBe(PaymentResultStatus.Pending)
+  })
+
+  it("threads the raw SDK reason into the error and reports it to Crashlytics (I2 + I3)", async () => {
+    const sdkErr = new Error("raw sdk failure")
+    const lnurlWithdraw = jest.fn().mockRejectedValue(sdkErr)
+    const sdk = { lnurlWithdraw } as never
+    mockClassifySdkError.mockReturnValueOnce("sc_invalid_input")
+    mockGetSdkErrorReason.mockReturnValueOnce("Voucher already claimed")
+
+    const result = await createLnurlWithdraw(sdk)(baseParams)
+
+    expect(result).toEqual({
+      status: PaymentResultStatus.Failed,
+      errors: [{ message: "sc_invalid_input", reason: "Voucher already claimed" }],
+    })
+    expect(mockReportError).toHaveBeenCalledWith("lnurlWithdraw", sdkErr)
   })
 })
