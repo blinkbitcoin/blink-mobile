@@ -1,11 +1,13 @@
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { useDisplayCurrency } from "@app/hooks"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import {
   toBtcMoneyAmount,
+  toUsdMoneyAmount,
+  type BtcMoneyAmount,
   type MoneyAmount,
+  type UsdMoneyAmount,
   type WalletAmount,
   type WalletOrDisplayCurrency,
 } from "@app/types/amounts"
@@ -14,6 +16,7 @@ import {
   ConvertDirection,
   resolveDustAdjustment,
 } from "@app/types/payment"
+import { reportError } from "@app/utils/error-logging"
 
 import { useNonCustodialConversionLimits } from "./use-non-custodial-conversion-limits"
 
@@ -23,15 +26,25 @@ type Params = {
   fromWalletBalance: number | undefined
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   settlementAmount: number
-  feeSats: number
+  feeSats: number | undefined
   usdBalanceMoneyAmount: WalletAmount<typeof WalletCurrency.Usd>
 }
 
+/** Decision only; the screen formats. `pending`/`blocked` are fail-closed states the caller must disable the slider on. */
 export type SendDustWarning =
-  | { shouldShow: false }
-  | { shouldShow: true; remaining: string; remainingSats: string; minimum: string }
+  | { status: "hidden" }
+  | { status: "pending" }
+  | { status: "blocked" }
+  | {
+      status: "visible"
+      remaining: MoneyAmount<WalletOrDisplayCurrency>
+      remainingSats: BtcMoneyAmount
+      minimum: UsdMoneyAmount
+    }
 
-const HIDDEN: SendDustWarning = { shouldShow: false }
+const HIDDEN = { status: "hidden" } as const
+const PENDING = { status: "pending" } as const
+const BLOCKED = { status: "blocked" } as const
 
 export const useSendDustWarning = ({
   amountAdjustment,
@@ -42,48 +55,54 @@ export const useSendDustWarning = ({
   feeSats,
   usdBalanceMoneyAmount,
 }: Params): SendDustWarning => {
-  const { formatMoneyAmount } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
   const isUsdSource = fromCurrency === WalletCurrency.Usd
-  const { limits } = useNonCustodialConversionLimits(
-    isUsdSource ? ConvertDirection.BtcToUsd : undefined,
+  const { limits, loading, error } = useNonCustodialConversionLimits(
+    isUsdSource ? ConvertDirection.UsdToBtc : undefined,
   )
 
-  return useMemo(() => {
-    if (!convertMoneyAmount) return HIDDEN
-    const blockingReason = resolveDustAdjustment(
+  const dustApplies =
+    isUsdSource &&
+    resolveDustAdjustment(
       amountAdjustment ?? null,
       settlementAmount,
-      isUsdSource ? fromWalletBalance : undefined,
-    )
-    if (blockingReason !== ConvertAmountAdjustment.IncreasedToAvoidDust) return HIDDEN
-    if (!limits?.minFromAmount) return HIDDEN
+      fromWalletBalance,
+    ) === ConvertAmountAdjustment.IncreasedToAvoidDust
+
+  useEffect(() => {
+    if (dustApplies && error) {
+      reportError("self-custodial dust-warning conversion limits", error)
+    }
+  }, [dustApplies, error])
+
+  return useMemo<SendDustWarning>(() => {
+    if (!dustApplies) return HIDDEN
+    if (loading || !convertMoneyAmount) return PENDING
+    if (error || !limits?.minFromAmount) return BLOCKED
 
     const balanceSats = convertMoneyAmount(
       usdBalanceMoneyAmount,
       WalletCurrency.Btc,
     ).amount
     const sentSats = convertMoneyAmount(unitOfAccountAmount, WalletCurrency.Btc).amount
-    const remainingSats = toBtcMoneyAmount(Math.max(0, balanceSats - sentSats - feeSats))
+    const remainingSats = toBtcMoneyAmount(
+      Math.max(0, balanceSats - sentSats - (feeSats ?? 0)),
+    )
 
     return {
-      shouldShow: true,
-      remaining: formatMoneyAmount({
-        moneyAmount: convertMoneyAmount(remainingSats, WalletCurrency.Usd),
-      }),
-      remainingSats: formatMoneyAmount({ moneyAmount: remainingSats }),
-      minimum: formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(limits.minFromAmount) }),
+      status: "visible",
+      remaining: convertMoneyAmount(remainingSats, WalletCurrency.Usd),
+      remainingSats,
+      minimum: toUsdMoneyAmount(limits.minFromAmount),
     }
   }, [
-    amountAdjustment,
-    isUsdSource,
-    fromWalletBalance,
-    settlementAmount,
+    dustApplies,
+    loading,
+    error,
     limits?.minFromAmount,
+    convertMoneyAmount,
     usdBalanceMoneyAmount,
     unitOfAccountAmount,
     feeSats,
-    convertMoneyAmount,
-    formatMoneyAmount,
   ])
 }

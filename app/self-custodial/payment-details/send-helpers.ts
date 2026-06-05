@@ -11,7 +11,15 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { toBtcMoneyAmount, type WalletAmount } from "@app/types/amounts"
+import { ConvertAmountAdjustment } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
+
+/** GetFee result plus the SDK dust adjustment, kept behind the self-custodial port so the shared GetFee contract stays free of it. */
+export type SelfCustodialFeeResult<T extends WalletCurrency> = Awaited<
+  ReturnType<GetFee<T>>
+> & {
+  amountAdjustment?: ConvertAmountAdjustment
+}
 
 import {
   executeSend,
@@ -49,7 +57,7 @@ const asGetFeeAmount = <T extends WalletCurrency>(feeSats: number) =>
 export const createGetFee = <T extends WalletCurrency>(
   params: PrepareParams,
 ): GetFee<T> => {
-  return async () => {
+  return async (): Promise<SelfCustodialFeeResult<T>> => {
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       const feeSats = extractLightningFee(prepared) ?? 0
