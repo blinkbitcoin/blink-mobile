@@ -1,11 +1,17 @@
 import {
   getRemoteConfigList,
   getRemoteConfigObject,
+  getRemoteConfigStringList,
   serializeRemoteConfigDefault,
 } from "@app/utils/remote-config"
 
+const mockLogError = jest.fn()
 const mockAsString = jest.fn()
 const mockGetValue = jest.fn(() => ({ asString: mockAsString }))
+
+jest.mock("@app/utils/log-error", () => ({
+  logError: (...args: unknown[]) => mockLogError(...args),
+}))
 
 jest.mock("@react-native-firebase/remote-config", () => ({
   __esModule: true,
@@ -40,20 +46,61 @@ describe("getRemoteConfigList", () => {
 
     expect(result).toEqual(["US", "GB", "DE"])
     expect(mockGetValue).toHaveBeenCalledWith("any-key")
+    expect(mockLogError).not.toHaveBeenCalled()
   })
 
-  it("returns the fallback when the Remote Config value is an empty string", () => {
+  it("returns the fallback silently when the Remote Config value is an empty string", () => {
     mockAsString.mockReturnValue("")
     const fallback = ["FALLBACK"]
 
     expect(getRemoteConfigList("missing-key", fallback)).toBe(fallback)
+    expect(mockLogError).not.toHaveBeenCalled()
   })
 
-  it("returns the fallback when the stored value cannot be parsed as JSON", () => {
+  it("returns the fallback and logs the failure when the stored value cannot be parsed as JSON", () => {
     mockAsString.mockReturnValue("not-valid-json")
     const fallback = ["FALLBACK"]
 
     expect(getRemoteConfigList("bad-key", fallback)).toBe(fallback)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: "remote-config",
+        // The key must live in the Error message itself, not only in context,
+        // so a malformed-JSON ops typo is attributable in production Crashlytics.
+        error: expect.objectContaining({
+          message: expect.stringContaining("bad-key"),
+        }),
+        context: expect.objectContaining({ key: "bad-key" }),
+      }),
+    )
+  })
+
+  it("returns the fallback and logs when the stored value is valid JSON but not an array (object)", () => {
+    mockAsString.mockReturnValue('{"US":true}')
+    const fallback = ["FALLBACK"]
+
+    expect(getRemoteConfigList("misconfigured-key", fallback)).toBe(fallback)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: "remote-config",
+        context: expect.objectContaining({
+          key: "misconfigured-key",
+          actualShape: "object",
+        }),
+      }),
+    )
+  })
+
+  it("returns the fallback and logs when the stored value is valid JSON but a primitive", () => {
+    mockAsString.mockReturnValue('"US"')
+    const fallback = ["FALLBACK"]
+
+    expect(getRemoteConfigList("misconfigured-key", fallback)).toBe(fallback)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: expect.objectContaining({ actualShape: "string" }),
+      }),
+    )
   })
 
   it("preserves the generic element type for nested objects", () => {
@@ -63,19 +110,50 @@ describe("getRemoteConfigList", () => {
 
     expect(result).toEqual([{ id: 1 }, { id: 2 }])
   })
+})
 
-  it("returns the fallback when the stored value is valid JSON but not an array (object)", () => {
-    mockAsString.mockReturnValue('{"US":true}')
-    const fallback = ["FALLBACK"]
-
-    expect(getRemoteConfigList("misconfigured-key", fallback)).toBe(fallback)
+describe("getRemoteConfigStringList: normalizes case and validates elements", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
   })
 
-  it("returns the fallback when the stored value is valid JSON but a primitive", () => {
-    mockAsString.mockReturnValue('"US"')
-    const fallback = ["FALLBACK"]
+  it("uppercases every entry so a lowercase Firebase value still matches an uppercase country code", () => {
+    mockAsString.mockReturnValue('["us","Gb"]')
 
-    expect(getRemoteConfigList("misconfigured-key", fallback)).toBe(fallback)
+    expect(getRemoteConfigStringList("compliance-key", [])).toEqual(["US", "GB"])
+    expect(mockLogError).not.toHaveBeenCalled()
+  })
+
+  it("drops non-string entries and logs how many were discarded", () => {
+    mockAsString.mockReturnValue('["US",1,null,"gb",{"x":1}]')
+
+    expect(getRemoteConfigStringList("compliance-key", [])).toEqual(["US", "GB"])
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: "remote-config",
+        context: expect.objectContaining({
+          key: "compliance-key",
+          droppedCount: 3,
+          totalEntries: 5,
+        }),
+      }),
+    )
+  })
+
+  it("returns the fallback (and does not double-log) when the value is missing", () => {
+    mockAsString.mockReturnValue("")
+    const fallback = ["US"]
+
+    expect(getRemoteConfigStringList("compliance-key", fallback)).toBe(fallback)
+    expect(mockLogError).not.toHaveBeenCalled()
+  })
+
+  it("returns the fallback when the parsed value is not an array", () => {
+    mockAsString.mockReturnValue('{"US":true}')
+    const fallback = ["US"]
+
+    expect(getRemoteConfigStringList("compliance-key", fallback)).toBe(fallback)
+    expect(mockLogError).toHaveBeenCalled()
   })
 })
 
@@ -94,19 +172,48 @@ describe("getRemoteConfigObject", () => {
 
     expect(result).toEqual({ standard: { minDays: 7 }, express: { minDays: 1 } })
     expect(mockGetValue).toHaveBeenCalledWith("any-key")
+    expect(mockLogError).not.toHaveBeenCalled()
   })
 
-  it("returns the fallback when the Remote Config value is empty", () => {
+  it("returns the fallback silently when the Remote Config value is empty", () => {
     mockAsString.mockReturnValue("")
     const fallback = { foo: "bar" }
 
     expect(getRemoteConfigObject("missing-key", fallback)).toBe(fallback)
+    expect(mockLogError).not.toHaveBeenCalled()
   })
 
-  it("returns the fallback when the stored value cannot be parsed as JSON", () => {
+  it("returns the fallback and logs when the stored value cannot be parsed as JSON", () => {
     mockAsString.mockReturnValue("not-valid-json")
     const fallback = { foo: "bar" }
 
     expect(getRemoteConfigObject("bad-key", fallback)).toBe(fallback)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({ context: expect.objectContaining({ key: "bad-key" }) }),
+    )
+  })
+
+  it("returns the fallback and logs when the parsed value is an array", () => {
+    mockAsString.mockReturnValue("[1,2]")
+    const fallback = { foo: "bar" }
+
+    expect(getRemoteConfigObject("misconfigured-key", fallback)).toBe(fallback)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: expect.objectContaining({ actualShape: "array" }),
+      }),
+    )
+  })
+
+  it("returns the fallback and logs when the parsed value is a primitive number", () => {
+    mockAsString.mockReturnValue("42")
+    const fallback = { foo: "bar" }
+
+    expect(getRemoteConfigObject("misconfigured-key", fallback)).toBe(fallback)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: expect.objectContaining({ actualShape: "number" }),
+      }),
+    )
   })
 })

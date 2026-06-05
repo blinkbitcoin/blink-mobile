@@ -5,9 +5,10 @@ import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
+import { logError } from "@app/utils/log-error"
 import {
-  getRemoteConfigList,
   getRemoteConfigObject,
+  getRemoteConfigStringList,
   serializeRemoteConfigDefault,
 } from "@app/utils/remote-config"
 
@@ -263,12 +264,12 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           ...parsedDeliveryConfig,
         }
 
-        const custodialSignupBlockedCountries = getRemoteConfigList<string>(
+        const custodialSignupBlockedCountries = getRemoteConfigStringList(
           CustodialSignupBlockedCountriesKey,
           defaultCustodialBlocks.blockAnySignup,
         )
 
-        const custodialFirstSignupBlockedCountries = getRemoteConfigList<string>(
+        const custodialFirstSignupBlockedCountries = getRemoteConfigStringList(
           CustodialFirstSignupBlockedCountriesKey,
           defaultCustodialBlocks.blockFirstSignup,
         )
@@ -300,7 +301,11 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           custodialFirstSignupBlockedCountries,
         })
       } catch (err) {
-        console.error("Error fetching remote config:", err)
+        logError({
+          scope: "remote-config",
+          error: err,
+          context: { stage: "fetchAndActivate" },
+        })
       } finally {
         setRemoteConfigReady(true)
       }
