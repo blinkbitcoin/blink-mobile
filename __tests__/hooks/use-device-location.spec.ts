@@ -3,9 +3,15 @@ import axios from "axios"
 
 import useDeviceLocation from "@app/hooks/use-device-location"
 
+const mockLogError = jest.fn()
+const mockUpdateCountryCode = jest.fn()
+
 jest.mock("axios")
 
-const mockUpdateCountryCode = jest.fn()
+jest.mock("@app/utils/log-error", () => ({
+  logError: (...args: unknown[]) => mockLogError(...args),
+}))
+
 jest.mock("@app/graphql/client-only-query", () => ({
   updateCountryCode: (...args: unknown[]) => mockUpdateCountryCode(...args),
 }))
@@ -25,16 +31,9 @@ jest.mock("@app/graphql/generated", () => ({
 const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe("useDeviceLocation", () => {
-  let warnSpy: jest.SpyInstance
-
   beforeEach(() => {
     jest.clearAllMocks()
-    warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
     mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
-  })
-
-  afterEach(() => {
-    warnSpy.mockRestore()
   })
 
   it("should not expose any country code while loading", () => {
@@ -44,6 +43,7 @@ describe("useDeviceLocation", () => {
 
     expect(result.current.loading).toBe(true)
     expect(result.current.countryCode).toBeUndefined()
+    expect(result.current.detectionFailed).toBe(false)
   })
 
   it("should resolve country from logged-in user phone without calling ipapi", async () => {
@@ -61,6 +61,7 @@ describe("useDeviceLocation", () => {
 
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("DE")
+    expect(result.current.detectionFailed).toBe(false)
     expect(mockedAxios.get).not.toHaveBeenCalled()
   })
 
@@ -80,7 +81,7 @@ describe("useDeviceLocation", () => {
     expect(mockUpdateCountryCode).toHaveBeenCalledWith(expect.anything(), "DE")
   })
 
-  it("should fall back to SV when user phone cannot be parsed", async () => {
+  it("marks detection as failed when user phone cannot be parsed", async () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: "SV" },
       error: undefined,
@@ -95,6 +96,13 @@ describe("useDeviceLocation", () => {
 
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("SV")
+    expect(result.current.detectionFailed).toBe(true)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: "device-location",
+        context: expect.objectContaining({ source: "phone" }),
+      }),
+    )
   })
 
   it("should fall back to ipapi when user has no phone", async () => {
@@ -114,37 +122,19 @@ describe("useDeviceLocation", () => {
 
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("PL")
+    expect(result.current.detectionFailed).toBe(false)
     expect(mockedAxios.get).toHaveBeenCalled()
   })
 
-  it("should fall back to ipapi when user is not logged in", async () => {
-    mockUseCountryCodeQuery.mockReturnValue({
-      data: { countryCode: "SV" },
-      error: undefined,
-    })
-    // eslint-disable-next-line camelcase
-    mockedAxios.get.mockResolvedValue({ data: { country_code: "JP" } })
-
-    const { result } = renderHook(() => useDeviceLocation())
-
-    await act(async () => {})
-
-    expect(result.current.loading).toBe(false)
-    expect(result.current.countryCode).toBe("JP")
-  })
-
   it("should resolve to the ipapi country code and never flash SV as intermediate value", async () => {
-    // Apollo cache returns default "SV"
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: "SV" },
       error: undefined,
     })
 
-    // ipapi will return "PL" (Poland)
     // eslint-disable-next-line camelcase
     mockedAxios.get.mockResolvedValue({ data: { country_code: "PL" } })
 
-    // Track every value emitted by the hook across all renders
     const emittedValues: Array<{ countryCode: string | undefined; loading: boolean }> = []
 
     const { result } = renderHook(() => {
@@ -153,29 +143,21 @@ describe("useDeviceLocation", () => {
       return hook
     })
 
-    // Let the ipapi promise resolve
     await act(async () => {})
 
-    // Final state should be the detected country
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("PL")
 
-    // Critical assertion: no render ever showed "SV" while not loading.
-    // This is the flag flicker bug — "SV" must never appear as a visible (non-loading) country.
     const visibleValues = emittedValues.filter((v) => !v.loading)
     for (const value of visibleValues) {
       expect(value.countryCode).not.toBe("SV")
     }
 
-    // Also verify "SV" was never emitted at all (not even during loading),
-    // since consumers like useRequestPhoneCodeLogin react to countryCode changes
-    // via useEffect regardless of loading state.
     const allCountryCodes = emittedValues.map((v) => v.countryCode)
     expect(allCountryCodes).not.toContain("SV")
   })
 
-  it("should fall back to cached country code when ipapi fails", async () => {
-    // Apollo cache has "PL" from a previous session
+  it("uses the cached country and does NOT mark detection failed when ipapi fails but cache exists", async () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: "PL" },
       error: undefined,
@@ -189,10 +171,16 @@ describe("useDeviceLocation", () => {
 
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("PL")
+    expect(result.current.detectionFailed).toBe(false)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: "device-location",
+        context: expect.objectContaining({ source: "ipapi", hasCached: true }),
+      }),
+    )
   })
 
-  it("should fall back to SV when ipapi fails and no cached value exists", async () => {
-    // Apollo cache returns empty/null countryCode
+  it("marks detection failed when ipapi fails and no cached value exists (falls back to SV)", async () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: null },
       error: undefined,
@@ -206,9 +194,16 @@ describe("useDeviceLocation", () => {
 
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("SV")
+    expect(result.current.detectionFailed).toBe(true)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: "device-location",
+        context: expect.objectContaining({ source: "ipapi", hasCached: false }),
+      }),
+    )
   })
 
-  it("should fall back to SV on Apollo query error", () => {
+  it("marks detection failed on Apollo query error (falls back to SV)", () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: undefined,
       error: new Error("Apollo cache error"),
@@ -218,6 +213,13 @@ describe("useDeviceLocation", () => {
 
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("SV")
+    expect(result.current.detectionFailed).toBe(true)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: "device-location",
+        context: expect.objectContaining({ source: "country-code-query" }),
+      }),
+    )
   })
 
   it("should update Apollo cache when ipapi succeeds", async () => {
@@ -233,13 +235,10 @@ describe("useDeviceLocation", () => {
 
     await act(async () => {})
 
-    expect(mockUpdateCountryCode).toHaveBeenCalledWith(
-      expect.anything(), // apollo client
-      "DE",
-    )
+    expect(mockUpdateCountryCode).toHaveBeenCalledWith(expect.anything(), "DE")
   })
 
-  it("should fall back to SV when ipapi returns no country_code", async () => {
+  it("marks detection failed when ipapi returns no country_code and no cache exists", async () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: null },
       error: undefined,
@@ -253,6 +252,7 @@ describe("useDeviceLocation", () => {
 
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("SV")
-    expect(warnSpy).toHaveBeenCalled()
+    expect(result.current.detectionFailed).toBe(true)
+    expect(mockLogError).toHaveBeenCalled()
   })
 })

@@ -1,8 +1,7 @@
-import { isCustodialAllowedForCountry } from "@app/config/custodial-eligibility"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { AccountTypeMode } from "@app/types/account"
 
-import useDeviceLocation from "./use-device-location"
+import { useCustodialEligibility } from "./use-custodial-eligibility"
 
 export const AccountOption = {
   Custodial: "custodial",
@@ -10,6 +9,23 @@ export const AccountOption = {
 } as const
 
 export type AccountOption = (typeof AccountOption)[keyof typeof AccountOption]
+
+export const AccountFlow = {
+  Trial: "trial",
+  SelfCustodial: "selfCustodial",
+} as const
+
+export type AccountFlow = (typeof AccountFlow)[keyof typeof AccountFlow]
+
+/**
+ * Exhaustive map from an account option to the create-flow it enters.
+ * Adding a third `AccountOption` will fail to compile until this map
+ * declares its flow, preventing a silent fall-through.
+ */
+export const ACCOUNT_OPTION_TO_FLOW: Record<AccountOption, AccountFlow> = {
+  [AccountOption.Custodial]: AccountFlow.Trial,
+  [AccountOption.SelfCustodial]: AccountFlow.SelfCustodial,
+}
 
 type AccountTypeOptionsResult = {
   options: AccountOption[]
@@ -22,14 +38,14 @@ export const useAccountTypeOptions = (
   mode: AccountTypeMode = AccountTypeMode.Create,
 ): AccountTypeOptionsResult => {
   const { nonCustodialEnabled } = useFeatureFlags()
-  const { countryCode, loading } = useDeviceLocation()
+  const { signupAllowed, loading } = useCustodialEligibility()
 
   const isRestore = mode === AccountTypeMode.Restore
-  const custodialAllowed = isRestore || isCustodialAllowedForCountry(countryCode)
+  const custodialAvailable = isRestore || signupAllowed
 
   const options: AccountOption[] = []
   if (nonCustodialEnabled) options.push(AccountOption.SelfCustodial)
-  if (custodialAllowed) options.push(AccountOption.Custodial)
+  if (custodialAvailable) options.push(AccountOption.Custodial)
 
   return {
     options,

@@ -26,6 +26,9 @@ jest.mock("@app/hooks", () => ({
 }))
 
 jest.mock("@app/hooks/use-account-type-options", () => ({
+  AccountOption: { Custodial: "custodial", SelfCustodial: "selfCustodial" },
+  AccountFlow: { Trial: "trial", SelfCustodial: "selfCustodial" },
+  ACCOUNT_OPTION_TO_FLOW: { custodial: "trial", selfCustodial: "selfCustodial" },
   useAccountTypeOptions: () => mockUseAccountTypeOptions(),
 }))
 
@@ -158,7 +161,7 @@ describe("GetStartedScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("disables Create new account while detecting the country", () => {
+  it("disables Create new account while detecting the country and ignores presses", () => {
     mockUseAccountTypeOptions.mockReturnValue({
       options: [],
       defaultSelected: null,
@@ -170,6 +173,9 @@ describe("GetStartedScreen", () => {
     const button = getByTestId("create-account-button")
 
     expect(button.props.accessibilityState.disabled).toBe(true)
+
+    fireEvent.press(button)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("routes to the selection screen when non-custodial is enabled and at least one option exists", () => {
@@ -178,6 +184,22 @@ describe("GetStartedScreen", () => {
     fireEvent.press(getByTestId("create-account-button"))
 
     expect(mockNavigate).toHaveBeenCalledWith("accountTypeSelection", { mode: "create" })
+  })
+
+  it("routes directly to self-custodial T&C when only the self-custodial option exists (e.g. US)", () => {
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["selfCustodial"],
+      defaultSelected: "selfCustodial",
+      selfCustodialTemporarilyDisabled: false,
+      loading: false,
+    })
+
+    const { getByTestId } = render(<GetStartedScreen />)
+    fireEvent.press(getByTestId("create-account-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+      flow: "selfCustodial",
+    })
   })
 
   it("routes directly to trial T&C when non-custodial is off but custodial is allowed", () => {

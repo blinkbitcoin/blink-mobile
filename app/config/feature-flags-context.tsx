@@ -5,6 +5,12 @@ import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
+import { logError } from "@app/utils/log-error"
+import {
+  getRemoteConfigObject,
+  getRemoteConfigStringList,
+  serializeRemoteConfigDefault,
+} from "@app/utils/remote-config"
 
 const DeviceAccountEnabledKey = "deviceAccountEnabledRestAuth"
 const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
@@ -28,6 +34,8 @@ const AutoConvertMaxAttemptsKey = "autoConvertMaxAttempts"
 const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
 const AutoConvertPollIntervalMsKey = "autoConvertPollIntervalMs"
 const AutoConvertAmountMatchToleranceBpsKey = "autoConvertAmountMatchToleranceBps"
+const CustodialSignupBlockedCountriesKey = "custodialSignupBlockedCountries"
+const CustodialFirstSignupBlockedCountriesKey = "custodialFirstSignupBlockedCountries"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -67,6 +75,8 @@ type RemoteConfig = {
   [AutoConvertPollMaxAttemptsKey]: number
   [AutoConvertPollIntervalMsKey]: number
   [AutoConvertAmountMatchToleranceBpsKey]: number
+  [CustodialSignupBlockedCountriesKey]: string[]
+  [CustodialFirstSignupBlockedCountriesKey]: string[]
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -74,7 +84,28 @@ const defaultReplaceCardDeliveryConfig = {
   express: { minDays: 1, maxDays: 2, priceUsd: 15 },
 }
 
-const defaultRemoteConfig: RemoteConfig = {
+/**
+ * Default compliance country lists (ISO-3166-1 alpha-2, uppercased). Sources:
+ * OFAC sanctions (https://ofac.treasury.gov/sanctions-programs-and-country-information)
+ * and Google Play crypto-wallet policy article 16329703
+ * (https://support.google.com/googleplay/android-developer/answer/16329703).
+ */
+// prettier-ignore
+const defaultCustodialBlocks = {
+  custodialSignupBlockedCountries: ["US"],
+  custodialFirstSignupBlockedCountries: [
+    // OFAC sanctions
+    "CU", "IR", "KP",
+    // Google Play 16329703
+    "AE", "BH", "CA", "CH", "GB", "ID", "IL", "JP", "KR", "PH", "ZA",
+    // Google Play 16329703 (EU-27, MiCA)
+    "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR",
+    "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO",
+    "SE", "SI", "SK",
+  ],
+}
+
+export const defaultRemoteConfig: RemoteConfig = {
   deviceAccountEnabledRestAuth: false,
   balanceLimitToTriggerUpgradeModal: 2100,
   feedbackEmailAddress: "feedback@blink.sv",
@@ -97,6 +128,9 @@ const defaultRemoteConfig: RemoteConfig = {
   autoConvertPollMaxAttempts: 30,
   autoConvertPollIntervalMs: 500,
   autoConvertAmountMatchToleranceBps: 500,
+  custodialSignupBlockedCountries: defaultCustodialBlocks.custodialSignupBlockedCountries,
+  custodialFirstSignupBlockedCountries:
+    defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -108,7 +142,15 @@ const defaultFeatureFlags: FeatureFlags = {
 
 remoteConfigInstance().setDefaults({
   ...defaultRemoteConfig,
-  replaceCardDeliveryConfig: JSON.stringify(defaultReplaceCardDeliveryConfig),
+  replaceCardDeliveryConfig: serializeRemoteConfigDefault(
+    defaultReplaceCardDeliveryConfig,
+  ),
+  custodialSignupBlockedCountries: serializeRemoteConfigDefault(
+    defaultCustodialBlocks.custodialSignupBlockedCountries,
+  ),
+  custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
+    defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
+  ),
 })
 
 remoteConfigInstance().setConfigSettings({
@@ -220,13 +262,24 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(AutoConvertAmountMatchToleranceBpsKey)
           .asNumber()
 
-        const parsedDeliveryConfig = JSON.parse(
-          remoteConfigInstance().getValue(ReplaceCardDeliveryConfigKey).asString(),
+        const parsedDeliveryConfig = getRemoteConfigObject<ReplaceCardDeliveryConfig>(
+          ReplaceCardDeliveryConfigKey,
+          {},
         )
         const replaceCardDeliveryConfig: ReplaceCardDeliveryConfig = {
           ...defaultReplaceCardDeliveryConfig,
           ...parsedDeliveryConfig,
         }
+
+        const custodialSignupBlockedCountries = getRemoteConfigStringList(
+          CustodialSignupBlockedCountriesKey,
+          defaultCustodialBlocks.custodialSignupBlockedCountries,
+        )
+
+        const custodialFirstSignupBlockedCountries = getRemoteConfigStringList(
+          CustodialFirstSignupBlockedCountriesKey,
+          defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
+        )
 
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
@@ -251,9 +304,15 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           autoConvertPollMaxAttempts,
           autoConvertPollIntervalMs,
           autoConvertAmountMatchToleranceBps,
+          custodialSignupBlockedCountries,
+          custodialFirstSignupBlockedCountries,
         })
       } catch (err) {
-        console.error("Error fetching remote config:", err)
+        logError({
+          scope: "remote-config",
+          error: err,
+          context: { stage: "fetchAndActivate" },
+        })
       } finally {
         setRemoteConfigReady(true)
       }

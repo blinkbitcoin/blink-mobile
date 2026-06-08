@@ -77,6 +77,18 @@ describe("useAccountRegistry", () => {
     mockGetSessionProfiles.mockResolvedValue([])
   })
 
+  it("reports loading=true on initial render and loading=false after async hydrations settle", async () => {
+    mockUseIsAuthed.mockReturnValue(true)
+
+    const { result } = renderHook(() => useAccountRegistry())
+
+    expect(result.current.loading).toBe(true)
+
+    await flushAsyncEffects()
+
+    expect(result.current.loading).toBe(false)
+  })
+
   it("returns custodial account when authenticated", async () => {
     mockUseIsAuthed.mockReturnValue(true)
 

@@ -51,6 +51,7 @@ type AccountRegistryResult = {
   accounts: AccountDescriptor[]
   activeAccount?: AccountDescriptor
   selfCustodialEntries: SelfCustodialAccountEntry[]
+  loading: boolean
   setActiveAccountId: (id: string) => void
   reloadSelfCustodialAccounts: () => Promise<void>
 }
@@ -74,11 +75,17 @@ export const useAccountRegistry = (): AccountRegistryResult => {
   // been cleared but a session profile is still saved.
   const [hasStoredCustodialProfile, setHasStoredCustodialProfile] = useState(isAuthed)
 
+  // True until both async reads settle, so callers can wait before trusting `accounts`.
+  const [selfCustodialHydrating, setSelfCustodialHydrating] = useState(true)
+  const [profilesHydrating, setProfilesHydrating] = useState(true)
+
   const reloadSelfCustodialAccounts = useCallback(async () => {
+    setSelfCustodialHydrating(true)
     const result = await listSelfCustodialAccounts()
     if (result.status === StorageReadStatus.Ok) {
       setSelfCustodialEntries(result.entries)
     }
+    setSelfCustodialHydrating(false)
   }, [])
 
   useEffect(() => {
@@ -87,8 +94,12 @@ export const useAccountRegistry = (): AccountRegistryResult => {
 
   useEffect(() => {
     let mounted = true
+    setProfilesHydrating(true)
     KeyStoreWrapper.getSessionProfiles().then((profiles) => {
-      if (mounted) setHasStoredCustodialProfile(profiles.length > 0)
+      if (mounted) {
+        setHasStoredCustodialProfile(profiles.length > 0)
+        setProfilesHydrating(false)
+      }
     })
     return () => {
       mounted = false
@@ -138,6 +149,7 @@ export const useAccountRegistry = (): AccountRegistryResult => {
     accounts,
     activeAccount,
     selfCustodialEntries,
+    loading: selfCustodialHydrating || profilesHydrating,
     setActiveAccountId,
     reloadSelfCustodialAccounts,
   }
