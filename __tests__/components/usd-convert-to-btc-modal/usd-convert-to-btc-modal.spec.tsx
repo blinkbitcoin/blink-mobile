@@ -31,6 +31,12 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
   usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount }),
 }))
 
+const mockExecute = jest.fn()
+
+jest.mock("@app/hooks/use-intra-ledger-conversion", () => ({
+  useIntraLedgerConversion: () => ({ execute: mockExecute, loading: false }),
+}))
+
 import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
 
 loadLocale("en")
@@ -50,6 +56,8 @@ const renderModal = (props?: { toggleModal?: () => void; isVisible?: boolean }) 
         isVisible={props?.isVisible ?? true}
         toggleModal={props?.toggleModal ?? jest.fn()}
         usdWalletBalance={usdBalance}
+        usdWalletId="usd-wallet-id"
+        btcWalletId="btc-wallet-id"
       />,
     ),
   )
@@ -93,13 +101,12 @@ describe("UsdConvertToBtcModal", () => {
     expect(getByText("~ BTC:129184")).toBeTruthy()
   })
 
-  it("calls toggleModal when Approve is pressed", () => {
-    const toggleModal = jest.fn()
-    const { getByText } = renderModal({ toggleModal })
+  it("triggers the conversion when Approve is pressed", () => {
+    const { getByText } = renderModal()
 
     fireEvent.press(getByText("Approve"))
 
-    expect(toggleModal).toHaveBeenCalledTimes(1)
+    expect(mockExecute).toHaveBeenCalledTimes(1)
   })
 
   it("renders nothing when isVisible is false", () => {
