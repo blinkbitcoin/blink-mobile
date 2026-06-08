@@ -1744,6 +1744,20 @@ describe("Comprehensive conversion scenarios", () => {
       actions: [{ type: "typeDigits", field: "from", digits: ["4", "5", "4", "5", "5"] }],
       expectNextEnabled: true,
     },
+
+    {
+      name: "65. Enter -> toggle -> percent 25 -> validate (USD is the from wallet)",
+      options: { btcBalance: 100000, usdBalance: 50000 },
+      actions: [{ type: "toggle" }, { type: "percent", value: 25 }],
+    },
+    {
+      name: "66. Enter -> percent 25 -> percent 100 -> validate consecutive presses",
+      options: { btcBalance: 100000, usdBalance: 50000 },
+      actions: [
+        { type: "percent", value: 25 },
+        { type: "percent", value: 100 },
+      ],
+    },
   ]
 
   beforeEach(() => {
@@ -2100,5 +2114,89 @@ describe("Self-custodial conversion limits gating", () => {
     })
 
     expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+  })
+})
+
+describe("Self-custodial percentage chip happy-path", () => {
+  const selfCustodialActiveWallet = {
+    isSelfCustodial: true,
+    isReady: true,
+    needsBackendAuth: false,
+    wallets: [
+      {
+        id: "self-custodial-btc-id",
+        walletCurrency: WalletCurrency.Btc,
+        balance: { amount: 200000, currency: WalletCurrency.Btc },
+        transactions: [],
+      },
+      {
+        id: "self-custodial-usd-id",
+        walletCurrency: WalletCurrency.Usd,
+        balance: { amount: 50000, currency: WalletCurrency.Usd },
+        transactions: [],
+      },
+    ],
+    status: "Ready",
+    accountType: "SelfCustodial",
+  }
+
+  const buildMocks = () => createGraphQLMocks({ btcBalance: 200000, usdBalance: 50000 })
+
+  beforeEach(() => {
+    jest.useFakeTimers()
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: { minFromAmount: 0, minToAmount: null },
+      loading: false,
+      error: null,
+    })
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it("enables Next and carries the chip amount into nav params after a percent press", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("convert-25%")).toBeTruthy()
+    })
+
+    await act(async () => {
+      fireEvent.press(getByTestId("convert-25%"))
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(false)
+      },
+      { timeout: 3000 },
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("next-button"))
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "conversionConfirmation",
+      expect.objectContaining({
+        fromWalletCurrency: WalletCurrency.Btc,
+        moneyAmount: expect.objectContaining({
+          currency: expect.any(String),
+          amount: expect.any(Number),
+        }),
+      }),
+    )
   })
 })
