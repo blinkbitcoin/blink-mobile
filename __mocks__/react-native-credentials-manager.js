@@ -1,5 +1,9 @@
-const signUpWithPassword = jest.fn(() =>
-  Promise.resolve({ type: "password", success: true }),
+const signUpWithPassword = jest.fn((credentials) =>
+  Promise.resolve({
+    type: "password",
+    username: credentials?.username,
+    success: true,
+  }),
 )
 
 const signIn = jest.fn(() =>
