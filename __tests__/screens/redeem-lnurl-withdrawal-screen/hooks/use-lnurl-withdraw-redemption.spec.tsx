@@ -130,7 +130,7 @@ describe("useLnurlWithdrawRedemption — self-custodial branch", () => {
     }
   })
 
-  it("sets paid=true when the SC adapter resolves with Success", async () => {
+  it("sets paid=true when the self-custodial adapter resolves with Success", async () => {
     mockLnurlWithdraw.mockResolvedValue({ status: PaymentResultStatus.Success })
 
     const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
@@ -159,7 +159,7 @@ describe("useLnurlWithdrawRedemption — self-custodial branch", () => {
     expect(arg.signal).toBeInstanceOf(AbortSignal)
   })
 
-  it("sets the translated SDK error code when the SC adapter resolves Failed", async () => {
+  it("sets the translated SDK error code when the self-custodial adapter resolves Failed", async () => {
     mockLnurlWithdraw.mockResolvedValue({
       status: PaymentResultStatus.Failed,
       errors: [{ message: "sc_insufficient_funds" }],
@@ -187,7 +187,7 @@ describe("useLnurlWithdrawRedemption — self-custodial branch", () => {
     expect(result.current.errorMessage).toBe("fallback-redeeming-error")
   })
 
-  it("aborts the SC AbortController on unmount", async () => {
+  it("aborts the self-custodial AbortController on unmount", async () => {
     let observedSignal: AbortSignal | undefined
     mockLnurlWithdraw.mockImplementationOnce(
       (params: { signal?: AbortSignal }) =>
@@ -205,7 +205,7 @@ describe("useLnurlWithdrawRedemption — self-custodial branch", () => {
     expect(observedSignal?.aborted).toBe(true)
   })
 
-  it("ignores the SC Failed branch when the hook unmounts before the adapter resolves (cancellation guard)", async () => {
+  it("ignores the self-custodial Failed branch when the hook unmounts before the adapter resolves (cancellation guard)", async () => {
     let resolveAdapter: (value: {
       status: typeof PaymentResultStatus.Failed
       errors: Array<{ message: string }>
