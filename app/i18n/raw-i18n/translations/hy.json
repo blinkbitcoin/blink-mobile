@@ -2225,7 +2225,8 @@
     "slideToConfirm": "Սահեցրեք՝ հաստատելու համար",
     "slideConfirming": "Հաստատվում է...",
     "copiedDestination": "Նպատակակետը պատծենվել է ջամանակավոր շտեմարանում",
-    "lightningRecommended": "Բարձր միջնորդավճար։ Խորհուրդ ենք տալիս Lightning-ը։"
+    "lightningRecommended": "Բարձր միջնորդավճար։ Խորհուրդ ենք տալիս Lightning-ը։",
+    "usdRemainderSweep": "Մնացած {remaining: string} ({remainingSats: string}) կփոխարկվի Bitcoin-ի։ USD-ի նվազագույնը՝ {minimum: string}։"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} օգտանունները հիմա {bankName: string} հասցեներն են։ ",

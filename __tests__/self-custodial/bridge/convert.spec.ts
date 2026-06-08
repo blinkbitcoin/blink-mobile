@@ -8,7 +8,10 @@ import {
 } from "@app/types/payment"
 import { WalletCurrency } from "@app/graphql/generated"
 
-import { createGetConversionQuote } from "@app/self-custodial/bridge/convert"
+import {
+  createGetConversionQuote,
+  mapAmountAdjustment,
+} from "@app/self-custodial/bridge/convert"
 
 const mockFetchLimits = jest.fn()
 const mockRequireTokenId = jest.fn(() => "usdb-token-id")
@@ -375,5 +378,23 @@ describe("createGetConversionQuote — error handling", () => {
     expect(mockRecordError).toHaveBeenCalled()
     expect(sdk.prepareSendPayment).not.toHaveBeenCalled()
     expect(sdk.sendPayment).not.toHaveBeenCalled()
+  })
+})
+
+describe("mapAmountAdjustment", () => {
+  it("maps undefined to undefined", () => {
+    expect(mapAmountAdjustment(undefined)).toBeUndefined()
+  })
+
+  it("maps FlooredToMinLimit to the benign FlooredToMin adjustment", () => {
+    expect(mapAmountAdjustment(AmountAdjustmentReason.FlooredToMinLimit)).toBe(
+      ConvertAmountAdjustment.FlooredToMin,
+    )
+  })
+
+  it("maps IncreasedToAvoidDust to the dust-gate adjustment", () => {
+    expect(mapAmountAdjustment(AmountAdjustmentReason.IncreasedToAvoidDust)).toBe(
+      ConvertAmountAdjustment.IncreasedToAvoidDust,
+    )
   })
 })

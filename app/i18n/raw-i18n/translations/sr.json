@@ -2225,7 +2225,8 @@
     "slideToConfirm": "Превуците за потврду",
     "slideConfirming": "Потврђивање...",
     "copiedDestination": "Одредиште је копирано у клипборд",
-    "lightningRecommended": "Висока провизија! Препоручујемо Lightning."
+    "lightningRecommended": "Висока провизија! Препоручујемо Lightning.",
+    "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) biće konvertovano u Bitcoin. Minimum u USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} корисничка имена су сада {bankName: string} адресе.",

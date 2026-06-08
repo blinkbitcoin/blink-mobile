@@ -2225,7 +2225,8 @@
     "slideToConfirm": "اسحب للتأكيد",
     "slideConfirming": "جارٍ التأكيد...",
     "copiedDestination": "تم نسخ الوجهة إلى الحافظة",
-    "lightningRecommended": "رسوم مرتفعة! نوصي باستخدام Lightning."
+    "lightningRecommended": "رسوم مرتفعة! نوصي باستخدام Lightning.",
+    "usdRemainderSweep": "الرصيد المتبقي {remaining: string} ({remainingSats: string}) سيتم تحويله إلى بيتكوين. الحد الأدنى للدولار الأمريكي: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "أسماء المستخدمين في {bankName: string} أصبحت عناوين في {bankName: string}",

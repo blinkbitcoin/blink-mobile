@@ -2225,7 +2225,8 @@
     "slideToConfirm": "Veeg om te bevestigen",
     "slideConfirming": "Bevestigen...",
     "copiedDestination": "Bestemming naar het klembord gekopieerd",
-    "lightningRecommended": "Hoge kosten! We raden Lightning aan."
+    "lightningRecommended": "Hoge kosten! We raden Lightning aan.",
+    "usdRemainderSweep": "Resterend saldo {remaining: string} ({remainingSats: string}) wordt omgezet naar Bitcoin. USD-minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} gebruikersnamen zijn nu {bankName: string} adressen.",

@@ -2225,7 +2225,8 @@
     "slideToConfirm": "Slide to Confirm",
     "slideConfirming": "Confirming...",
     "copiedDestination": "Copied destination to clipboard",
-    "lightningRecommended": "High fee! We recommend Lightning."
+    "lightningRecommended": "High fee! We recommend Lightning.",
+    "usdRemainderSweep": "Resterende {remaining: string} ({remainingSats: string}) konverteres til Bitcoin. USD-minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} brugernavne er nu {bankName: string} adresser.",

@@ -2279,6 +2279,8 @@ const en: BaseTranslation = {
     slideConfirming: "Confirming...",
     copiedDestination: "Copied destination to clipboard",
     lightningRecommended: "High fee! We recommend Lightning.",
+    usdRemainderSweep:
+      "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
   },
   SendBitcoinDestinationScreen: {
     usernameNowAddress:

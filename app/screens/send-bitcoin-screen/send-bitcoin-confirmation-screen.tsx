@@ -9,6 +9,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
+import { WarningBanner } from "@app/components/warning-banner"
 import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
@@ -27,7 +28,7 @@ import {
   ZeroBtcMoneyAmount,
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
-import { useTranslateSdkError } from "@app/self-custodial/hooks"
+import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
@@ -117,6 +118,23 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { copyToClipboard } = useClipboard()
 
   const fee = useFee(getFee)
+
+  const settledFee = fee.status === "set" ? fee : undefined
+
+  const dustWarning = useSendDustWarning({
+    amountAdjustment: settledFee?.amountAdjustment,
+    fromCurrency: sendingWalletDescriptor.currency,
+    fromWalletBalance: usdWallet?.balance,
+    unitOfAccountAmount,
+    settlementAmount: settlementAmount.amount,
+    feeSats: settledFee?.amount.amount,
+    usdBalanceMoneyAmount,
+  })
+
+  const feeUnavailable =
+    fee.status === "loading" || (fee.status === "error" && !fee.amount)
+  const dustNotEvaluable =
+    dustWarning.status === "pending" || dustWarning.status === "blocked"
 
   const defaultAmount = formatMoneyAmount({ moneyAmount: ZeroUsdMoneyAmount })
   let currencyFeeAmount = defaultAmount
@@ -372,16 +390,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const LightningRecommendedComponent = isLightningRecommended() ? (
     <View style={styles.feeWarning}>
-      <GaloyIcon name="warning" size={18} color={colors.warning} />
-      <Text
-        type="p3"
-        style={styles.feeWarningText}
-        numberOfLines={1}
-        ellipsizeMode="tail"
-      >
-        {" "}
+      <WarningBanner numberOfLines={1}>
         {LL.SendBitcoinConfirmationScreen.lightningRecommended()}
-      </Text>
+      </WarningBanner>
     </View>
   ) : (
     <></>
@@ -497,6 +508,19 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           )}
         </View>
 
+        {dustWarning.status === "visible" ? (
+          <View style={styles.fieldContainer}>
+            <WarningBanner>
+              {LL.SendBitcoinConfirmationScreen.usdRemainderSweep({
+                remaining: formatMoneyAmount({ moneyAmount: dustWarning.remaining }),
+                remainingSats: formatMoneyAmount({
+                  moneyAmount: dustWarning.remainingSats,
+                }),
+                minimum: formatMoneyAmount({ moneyAmount: dustWarning.minimum }),
+              })}
+            </WarningBanner>
+          </View>
+        ) : null}
         {errorMessage ? (
           <View style={styles.errorContainer}>
             <Text type="p2" style={styles.errorText}>
@@ -513,7 +537,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 initialText={LL.SendBitcoinConfirmationScreen.slideToConfirm()}
                 loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
                 onSwipe={handleSendPayment}
-                disabled={!validAmount || hasAttemptedSend}
+                disabled={
+                  !validAmount || hasAttemptedSend || feeUnavailable || dustNotEvaluable
+                }
               />
             </View>
           </PanGestureHandler>
@@ -610,13 +636,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   feeWarning: {
     paddingBottom: 4,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
     flex: 0.95,
-  },
-  feeWarningText: {
-    color: colors.warning,
   },
   feeTextContainer: {
     flexDirection: "row",

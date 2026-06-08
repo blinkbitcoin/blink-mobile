@@ -29,6 +29,18 @@ import { requireSparkTokenIdentifier, SparkConfig } from "../config"
 import { buildConversionType, fetchConversionLimits } from "./limits"
 import { fetchUsdbDecimals, findUsdbToken } from "./token-balance"
 
+export const mapAmountAdjustment = (
+  reason: AmountAdjustmentReason | undefined,
+): ConvertAmountAdjustment | undefined => {
+  if (reason === undefined) return undefined
+  const map: Record<AmountAdjustmentReason, ConvertAmountAdjustment> = {
+    [AmountAdjustmentReason.FlooredToMinLimit]: ConvertAmountAdjustment.FlooredToMin,
+    [AmountAdjustmentReason.IncreasedToAvoidDust]:
+      ConvertAmountAdjustment.IncreasedToAvoidDust,
+  }
+  return map[reason]
+}
+
 const failed = (message: string, code?: string): PaymentAdapterResult => ({
   status: PaymentResultStatus.Failed,
   errors: [{ message, code }],
@@ -48,18 +60,6 @@ const recordConvertError = (err: unknown, params: ConvertParams, where: string):
     `[Convert] ${where} failed (direction=${params.direction}, fromAmount=${params.fromAmount.amount}, toAmount=${params.toAmount.amount})`,
   )
   reportError(where, err)
-}
-
-const mapAmountAdjustment = (
-  reason: AmountAdjustmentReason | undefined,
-): ConvertAmountAdjustment | undefined => {
-  if (reason === AmountAdjustmentReason.FlooredToMinLimit) {
-    return ConvertAmountAdjustment.FlooredToMin
-  }
-  if (reason === AmountAdjustmentReason.IncreasedToAvoidDust) {
-    return ConvertAmountAdjustment.IncreasedToAvoidDust
-  }
-  return undefined
 }
 
 const createOwnSparkInvoice = async (

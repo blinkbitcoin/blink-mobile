@@ -3,7 +3,7 @@ import { useMemo } from "react"
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { toWalletMoneyAmount } from "@app/types/amounts"
-import { ConvertAmountAdjustment } from "@app/types/payment"
+import { ConvertAmountAdjustment, resolveDustAdjustment } from "@app/types/payment"
 
 import { buildConvertParams } from "../../build-convert-params"
 
@@ -20,17 +20,6 @@ export type SelfCustodialConversionGuard = {
   isQuoting: boolean
   hasQuoteError: boolean
   blockingReason: ConvertAmountAdjustment | null
-}
-
-const resolveBlockingReason = (
-  amountAdjustment: ConvertAmountAdjustment | null,
-  amountInSourceCurrency: number,
-  fromWalletBalance: number | undefined,
-): ConvertAmountAdjustment | null => {
-  /** Only the dust gate blocks; `FlooredToMin` is a benign SDK floor and proceeds normally. */
-  if (amountAdjustment !== ConvertAmountAdjustment.IncreasedToAvoidDust) return null
-  if (fromWalletBalance === undefined) return amountAdjustment
-  return amountInSourceCurrency >= fromWalletBalance ? null : amountAdjustment
 }
 
 export const useSelfCustodialConversionGuard = ({
@@ -52,7 +41,7 @@ export const useSelfCustodialConversionGuard = ({
 
   const blockingReason = useMemo(
     () =>
-      resolveBlockingReason(amountAdjustment, amountInSourceCurrency, fromWalletBalance),
+      resolveDustAdjustment(amountAdjustment, amountInSourceCurrency, fromWalletBalance),
     [amountAdjustment, amountInSourceCurrency, fromWalletBalance],
   )
 

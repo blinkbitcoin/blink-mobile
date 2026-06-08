@@ -2225,7 +2225,8 @@
     "slideToConfirm": "Gly om te bevestig",
     "slideConfirming": "Besig om te bevestig...",
     "copiedDestination": "Bestemming na knipbord oorgedra",
-    "lightningRecommended": "Hoë fooi! Ons beveel Lightning aan."
+    "lightningRecommended": "Hoë fooi! Ons beveel Lightning aan.",
+    "usdRemainderSweep": "Oorblywende {remaining: string} ({remainingSats: string}) sal na Bitcoin omgeskakel word. USD-minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} gebruikersname is nou {bankName: string} adresse. ",

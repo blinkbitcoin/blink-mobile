@@ -10,6 +10,7 @@ import {
   createSendMutationOnchain,
 } from "@app/self-custodial/payment-details/send-helpers"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
+import { ConvertAmountAdjustment } from "@app/types/payment"
 
 const mockPrepareSendPayment = jest.fn()
 const mockSendPayment = jest.fn()
@@ -30,6 +31,10 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
     Generic: "Generic",
   }
   return {
+    AmountAdjustmentReason: {
+      FlooredToMinLimit: "FlooredToMinLimit",
+      IncreasedToAvoidDust: "IncreasedToAvoidDust",
+    },
     BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
     InputType_Tags: { SparkAddress: "SparkAddress" },
     Network: { Mainnet: 0, Regtest: 1 },
@@ -156,6 +161,43 @@ describe("createGetFee", () => {
     const result = await getFee()
 
     expect(result.amount).toBeUndefined()
+  })
+
+  it("threads the SDK dust adjustment through to amountAdjustment", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { lightningFeeSats: BigInt(10), sparkTransferFeeSats: BigInt(5) },
+      },
+      conversionEstimate: { amountAdjustment: "IncreasedToAvoidDust" },
+    })
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.amountAdjustment).toBe(ConvertAmountAdjustment.IncreasedToAvoidDust)
+  })
+
+  it("leaves amountAdjustment undefined when the SDK reports no conversion estimate", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { lightningFeeSats: BigInt(10), sparkTransferFeeSats: BigInt(5) },
+      },
+    })
+
+    const getFee = createGetFee({
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+    })
+    const result = await getFee()
+
+    expect(result.amountAdjustment).toBeUndefined()
   })
 
   it("forwards amount and tokenIdentifier on the prepare call", async () => {
