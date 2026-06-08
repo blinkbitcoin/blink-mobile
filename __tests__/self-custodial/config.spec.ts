@@ -1,3 +1,69 @@
+import { hasSparkAddressShape } from "@app/self-custodial/config"
+
+jest.mock("react-native-config", () => ({}))
+
+jest.mock("react-native-fs", () => ({
+  DocumentDirectoryPath: "/test/documents",
+}))
+
+jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
+  Network: { Mainnet: 0, Regtest: 1 },
+}))
+
+const LNURL_INPUT = "lnurl1examplefixtureonly"
+
+describe("hasSparkAddressShape", () => {
+  it("accepts a mainnet Spark address (sp1 HRP)", () => {
+    expect(hasSparkAddressShape("sp1qabcdefghijklmn")).toBe(true)
+  })
+
+  it("accepts a regtest Spark address (sprt1 HRP)", () => {
+    expect(hasSparkAddressShape("sprt1qabcdefghijklmn")).toBe(true)
+  })
+
+  it("is case-insensitive on the HRP", () => {
+    expect(hasSparkAddressShape("SP1QABCDEFGHIJKLMN")).toBe(true)
+    expect(hasSparkAddressShape("SPRT1QABCDEFGHIJKLMN")).toBe(true)
+  })
+
+  it("trims surrounding whitespace before applying the shape check", () => {
+    expect(hasSparkAddressShape("   sp1qabcdefghijklmn  ")).toBe(true)
+    expect(hasSparkAddressShape("\nsprt1qabcdefghijklmn\t")).toBe(true)
+  })
+
+  it("rejects an LNURL bech32 string (the original regression case)", () => {
+    expect(hasSparkAddressShape(LNURL_INPUT)).toBe(false)
+  })
+
+  it("rejects a Lightning invoice (lnbc...)", () => {
+    expect(hasSparkAddressShape("lnbc100n1pwjlwpzpp5...")).toBe(false)
+  })
+
+  it("rejects a Bitcoin bech32 address (bc1q...)", () => {
+    expect(hasSparkAddressShape("bc1qabcdefghijklmn")).toBe(false)
+  })
+
+  it("rejects a Lightning URI (lightning:...)", () => {
+    expect(hasSparkAddressShape("lightning:lnbc100n1...")).toBe(false)
+  })
+
+  it("rejects an HTTP URL", () => {
+    expect(hasSparkAddressShape("https://example.com/?q=sp1")).toBe(false)
+  })
+
+  it("rejects an empty string", () => {
+    expect(hasSparkAddressShape("")).toBe(false)
+  })
+
+  it("rejects a whitespace-only string", () => {
+    expect(hasSparkAddressShape("    ")).toBe(false)
+  })
+
+  it("rejects a string that contains a Spark HRP but does not start with one", () => {
+    expect(hasSparkAddressShape("garbage-sp1qabc")).toBe(false)
+  })
+})
+
 describe("SparkConfig", () => {
   beforeEach(() => {
     jest.resetModules()

@@ -5,6 +5,7 @@ import { MoneyAmount, UsdMoneyAmount } from "./amounts"
 export type PaymentError = {
   message: string
   code?: string
+  reason?: string
 }
 
 export const PaymentResultStatus = {
@@ -174,6 +175,21 @@ export type ReceiveLightningAdapter = (params: ReceiveLightningParams) => Promis
   invoice?: string
   errors?: PaymentError[]
 }>
+
+export type LnurlWithdrawParams = {
+  amountSats: number
+  callback: string
+  k1: string
+  defaultDescription: string
+  minWithdrawableMsats: number
+  maxWithdrawableMsats: number
+  completionTimeoutSecs?: number
+  signal?: AbortSignal
+}
+
+export type LnurlWithdrawAdapter = (
+  params: LnurlWithdrawParams,
+) => Promise<PaymentAdapterResult>
 
 export type ReceiveOnchainAdapter = () => Promise<{
   address?: string

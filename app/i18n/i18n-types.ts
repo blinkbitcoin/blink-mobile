@@ -6901,6 +6901,14 @@ type RootTranslation = {
 		 */
 		submissionError: string
 		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​s​t​i​l​l​ ​c​o​n​n​e​c​t​i​n​g​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​a​ ​m​o​m​e​n​t​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		walletNotConnected: string
+		/**
+		 * Y​o​u​r​ ​p​a​y​m​e​n​t​ ​m​a​y​ ​s​t​i​l​l​ ​b​e​ ​c​o​m​p​l​e​t​i​n​g​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​b​e​f​o​r​e​ ​r​e​t​r​y​i​n​g​.
+		 */
+		paymentPending: string
+		/**
 		 * M​i​n​:​ ​{​m​i​n​i​m​u​m​A​m​o​u​n​t​}​,​ ​M​a​x​:​ ​{​m​a​x​i​m​u​m​A​m​o​u​n​t​}
 		 * @param {string} maximumAmount
 		 * @param {string} minimumAmount
@@ -19155,6 +19163,14 @@ export type TranslationFunctions = {
 		 * Failed to submit withdrawal request. Please contact support if this problem persists.
 		 */
 		submissionError: () => LocalizedString
+		/**
+		 * Your wallet is still connecting. Please wait a moment and try again.
+		 */
+		walletNotConnected: () => LocalizedString
+		/**
+		 * Your payment may still be completing. Check your balance before retrying.
+		 */
+		paymentPending: () => LocalizedString
 		/**
 		 * Min: {minimumAmount}, Max: {maximumAmount}
 		 */

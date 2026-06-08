@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Vă rugăm să așteptați până când conversia este finalizată"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Portofelul tău încă se conectează. Așteaptă un moment și încearcă din nou.",
+    "paymentPending": "Este posibil ca plata ta să fie încă în curs de finalizare. Verifică-ți soldul înainte de a încerca din nou.",
     "title": "Răscumpărați Bitcoin",
     "usdTitle": "Răscumpără în Cont Dolar",
     "error": "Nu s-a reușit generarea facturii. Vă rugăm să contactați asistența dacă această problemă persistă.",

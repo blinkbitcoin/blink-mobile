@@ -1,6 +1,8 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import {
   centsToTokenBaseUnits,
+  msatsToSats,
+  satsToMsats,
   toSatsAmount,
   tokenBaseUnitsToCents,
   tokenBaseUnitsToCentsCeil,
@@ -100,5 +102,43 @@ describe("token base-unit round-trip", () => {
     const tokenDecimals = 6
     const baseUnits = centsToTokenBaseUnits(cents, tokenDecimals)
     expect(tokenBaseUnitsToCents(baseUnits, tokenDecimals)).toBe(cents)
+  })
+})
+
+describe("satsToMsats", () => {
+  it("multiplies sats by the Lightning protocol factor of 1000", () => {
+    expect(satsToMsats(1)).toBe(1000)
+    expect(satsToMsats(1500)).toBe(1_500_000)
+  })
+
+  it("returns 0 when given 0 sats", () => {
+    expect(satsToMsats(0)).toBe(0)
+  })
+
+  it("preserves negative values verbatim (callers may use it for deltas)", () => {
+    expect(satsToMsats(-7)).toBe(-7000)
+  })
+})
+
+describe("msatsToSats", () => {
+  it("divides msats by 1000 and returns an integer", () => {
+    expect(msatsToSats(1000)).toBe(1)
+    expect(msatsToSats(1_500_000)).toBe(1500)
+  })
+
+  it("rounds to the nearest sat (half-up) so the SDK never sees a fractional sat", () => {
+    expect(msatsToSats(1499)).toBe(1)
+    expect(msatsToSats(1500)).toBe(2)
+    expect(msatsToSats(1501)).toBe(2)
+  })
+
+  it("returns 0 when given 0 msats", () => {
+    expect(msatsToSats(0)).toBe(0)
+  })
+})
+
+describe("sat <-> msat round-trip", () => {
+  it("survives sats -> msats -> sats for whole-sat values", () => {
+    expect(msatsToSats(satsToMsats(2500))).toBe(2500)
   })
 })

@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Sila tunggu sehingga penukaran selesai"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Dompet anda masih menyambung. Sila tunggu sebentar dan cuba lagi.",
+    "paymentPending": "Pembayaran anda mungkin masih diselesaikan. Semak baki anda sebelum mencuba lagi.",
     "title": "Tebus bitcoin",
     "usdTitle": "Tebus ke Akaun Dolar",
     "error": "Gagal untuk menjana invois. Sila berhubung dengan tim sokongan\njika masalah ini tetap berlaku",

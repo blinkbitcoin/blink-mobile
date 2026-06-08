@@ -1,5 +1,9 @@
 /* eslint-disable camelcase */
-import { classifySdkError, SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
+import {
+  classifySdkError,
+  getSdkErrorReason,
+  SelfCustodialErrorCode,
+} from "@app/self-custodial/sdk-error"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
   const tags = {
@@ -147,5 +151,30 @@ describe("classifySdkError", () => {
     expect(classifySdkError(sdkError("SparkError", [""]))).toBe(
       SelfCustodialErrorCode.Generic,
     )
+  })
+})
+
+describe("getSdkErrorReason", () => {
+  it("returns the LNURL service reason from a LnurlError inner string", () => {
+    expect(getSdkErrorReason(sdkError("LnurlError", ["Voucher already claimed"]))).toBe(
+      "Voucher already claimed",
+    )
+  })
+
+  it("returns undefined for non-LnurlError tags so raw SDK diagnostics never reach the user", () => {
+    expect(
+      getSdkErrorReason(sdkError("Generic", ["internal spark failure"])),
+    ).toBeUndefined()
+    expect(
+      getSdkErrorReason(sdkError("NetworkError", ["request timeout"])),
+    ).toBeUndefined()
+  })
+
+  it("returns undefined when a LnurlError carries no inner string", () => {
+    expect(getSdkErrorReason(sdkError("LnurlError"))).toBeUndefined()
+  })
+
+  it("returns undefined for non-SdkError throwables", () => {
+    expect(getSdkErrorReason(new Error("plain js error"))).toBeUndefined()
   })
 })

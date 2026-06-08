@@ -62,3 +62,8 @@ export const classifySdkError = (err: unknown): SelfCustodialErrorCode => {
   }
   return TAG_TO_CODE[err.tag]
 }
+
+export const getSdkErrorReason = (err: unknown): string | undefined => {
+  if (!SdkError.instanceOf(err) || err.tag !== SdkErrorTags.LnurlError) return undefined
+  return readStringInner(err)
+}

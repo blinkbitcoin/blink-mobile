@@ -4,7 +4,7 @@ import {
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { SparkConfig } from "../config"
+import { hasSparkAddressShape, SparkConfig } from "../config"
 
 export type ParsedSparkAddress = {
   address: string
@@ -35,6 +35,10 @@ export const parseSparkAddressDetailed = async (
   sdk: BreezSdkInterface,
   input: string,
 ): Promise<ParseSparkAddressResult> => {
+  if (!hasSparkAddressShape(input)) {
+    return { outcome: ParseSparkAddressOutcome.NotSparkAddress }
+  }
+
   try {
     const parsed = await sdk.parse(input.trim())
     if (parsed.tag !== InputTag.SparkAddress) {

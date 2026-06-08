@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Si us plau, espera fins que la conversió s'hagi completat"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "La teva cartera encara s'està connectant. Espera un moment i torna-ho a provar.",
+    "paymentPending": "És possible que el teu pagament encara s'estigui completant. Comprova el teu saldo abans de tornar-ho a provar.",
     "title": "Bescanviar Bitcoin",
     "usdTitle": "Bescanvia a Compte Dòlar",
     "error": "No s'ha pogut generar la factura. Si us plau contacta amb el servei d'assistència si aquest problema persisteix.",

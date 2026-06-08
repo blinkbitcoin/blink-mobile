@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Ama hina kaspa, tikrachiy tukukunankama suyay"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Qullqi waqaychanaykiqa watachkanraqmi. Pisi pachata suyaspa watiqmanta ruwariy.",
+    "paymentPending": "Pagoykiqa hunt'akuchkanraqchá. Watiqmanta ruwanaykimanta ñawpaq saldoykita qhaway.",
     "title": "Bitcoin kawsayniyta qillqa",
     "usdTitle": "Kutichiy Dolar qillqay-man",
     "error": "Invoice kawsayniyta qillqata sutichinaqinmi. Chaskisqa kaniyta yachanakuyta sutichaqta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi.",

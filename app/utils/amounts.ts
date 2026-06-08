@@ -39,6 +39,10 @@ export const toSatsAmount = (
   ) => MoneyAmount<WalletCurrency>,
 ): number => convert(amount, WalletCurrency.Btc).amount
 
+export const satsToMsats = (sats: number): number => sats * 1000
+
+export const msatsToSats = (msats: number): number => Math.round(msats / 1000)
+
 export const tokenBaseUnitsToCentsExact = (
   rawAmount: number,
   tokenDecimals: number,

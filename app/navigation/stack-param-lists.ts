@@ -98,7 +98,7 @@ export type RootStackParamList = {
     defaultDescription: string
     minWithdrawableSatoshis: MoneyAmount<typeof WalletCurrency.Btc>
     maxWithdrawableSatoshis: MoneyAmount<typeof WalletCurrency.Btc>
-    receivingWalletDescriptor: WalletDescriptor<typeof WalletCurrency.Btc>
+    receivingWalletDescriptor?: WalletDescriptor<typeof WalletCurrency.Btc>
     unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
     settlementAmount: MoneyAmount<typeof WalletCurrency.Btc>
     displayAmount: MoneyAmount<DisplayCurrency>

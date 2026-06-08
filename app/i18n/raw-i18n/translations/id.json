@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Mohon tunggu sampai konversi selesai"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Dompet Anda masih menghubungkan. Mohon tunggu sebentar dan coba lagi.",
+    "paymentPending": "Pembayaran Anda mungkin masih diselesaikan. Periksa saldo Anda sebelum mencoba lagi.",
     "title": "Tukarkan Bitcoin",
     "usdTitle": "Tukarkan ke Akun Dolar",
     "error": "Gagal membuat faktur. Silakan hubungi support jika masalah ini berlanjut.",

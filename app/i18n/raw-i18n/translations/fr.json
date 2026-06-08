@@ -2168,6 +2168,8 @@
         "pleaseWaitForConversion": "Veuillez patienter jusqu'à ce que la conversion soit terminée"
     },
     "RedeemBitcoinScreen": {
+        "walletNotConnected": "Votre portefeuille est encore en cours de connexion. Veuillez patienter un instant et réessayer.",
+        "paymentPending": "Votre paiement est peut-être encore en cours de finalisation. Vérifiez votre solde avant de réessayer.",
         "title": "Échanger des Bitcoin",
         "usdTitle": "Échanger vers Compte dollar",
         "error": "Impossible de générer la facture. Merci de contacter le support si le problème persiste.",

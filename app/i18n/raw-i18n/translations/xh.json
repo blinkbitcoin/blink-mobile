@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Nceda linda de ukuguqulwa kugqitywe"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Isipaji sakho sisaqhagamshelana. Nceda ulinde umzuzwana uze uphinde uzame.",
+    "paymentPending": "Intlawulo yakho isenokuba isagqitywa. Khangela ibhalansi yakho phambi kokuba uphinde uzame.",
     "title": "Sebenzisa i-Bitcoin",
     "usdTitle": "Hlawulela kwi-Akhawunti ye-Idola",
     "error": "Ayiphumelelanga ukwenza i-invoyisi. Nceda uqhakamishele abezoncedo ukuba le ngxaki iyaqhubeka.",

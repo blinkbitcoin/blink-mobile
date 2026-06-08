@@ -2168,6 +2168,8 @@
         "pleaseWaitForConversion": "Bitte warte, bis die Umwandlung abgeschlossen ist"
     },
     "RedeemBitcoinScreen": {
+        "walletNotConnected": "Deine Wallet verbindet sich noch. Bitte warte einen Moment und versuche es erneut.",
+        "paymentPending": "Deine Zahlung wird möglicherweise noch abgeschlossen. Überprüfe dein Guthaben, bevor du es erneut versuchst.",
         "title": "Bitcoin einlösen",
         "usdTitle": "Einlösen auf Dollar-Konto",
         "error": "Invoice konnte nicht erstellt werden. Bitte kontaktiere den Support, wenn dieses Problem weiterhin besteht.",

@@ -2168,6 +2168,8 @@
     "pleaseWaitForConversion": "Počkejte, prosím, dokud se převod nedokončí"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Vaše peněženka se stále připojuje. Počkejte chvíli a zkuste to znovu.",
+    "paymentPending": "Vaše platba se možná stále dokončuje. Než to zkusíte znovu, zkontrolujte svůj zůstatek.",
     "title": "Směnit Bitcoin",
     "usdTitle": "Směnit na Dolarový účet",
     "error": "Nepodařilo se vygenerovat fakturu. Pokud tento problém přetrvává, kontaktujte prosím podporu.",

@@ -16,6 +16,7 @@ export {
 export { getSparkStatus } from "./status"
 export { activateStableBalance, deactivateStableBalance } from "./stable-balance"
 export { createReceiveLightning, createReceiveOnchain } from "./receive"
+export { createLnurlWithdraw } from "./lnurl-withdraw"
 export {
   prepareSend,
   executeSend,

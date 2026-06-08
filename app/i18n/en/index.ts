@@ -2218,6 +2218,10 @@ const en: BaseTranslation = {
       "Failed to redeem Bitcoin. Please contact support if this problem persists.",
     submissionError:
       "Failed to submit withdrawal request. Please contact support if this problem persists.",
+    walletNotConnected:
+      "Your wallet is still connecting. Please wait a moment and try again.",
+    paymentPending:
+      "Your payment may still be completing. Check your balance before retrying.",
     minMaxRange: "Min: {minimumAmount: string}, Max: {maximumAmount: string}",
     redeemBitcoin: "Redeem Bitcoin",
     amountToRedeemFrom: "Amount to redeem from {domain: string}",
