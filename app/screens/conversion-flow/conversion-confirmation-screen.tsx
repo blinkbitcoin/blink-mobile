@@ -1,8 +1,7 @@
-import React, { useMemo, useState } from "react"
+import React, { useMemo } from "react"
 import { TouchableOpacity, View } from "react-native"
 import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 import { PanGestureHandler, ScrollView } from "react-native-gesture-handler"
-import crashlytics from "@react-native-firebase/crashlytics"
 import {
   CommonActions,
   NavigationProp,
@@ -10,11 +9,7 @@ import {
   useNavigation,
 } from "@react-navigation/native"
 
-import {
-  PaymentSendResult,
-  useConversionScreenQuery,
-  WalletCurrency,
-} from "@app/graphql/generated"
+import { useConversionScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { SATS_PER_BTC, usePriceConversion } from "@app/hooks"
@@ -24,11 +19,7 @@ import { useIntraLedgerConversion } from "@app/hooks/use-intra-ledger-conversion
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount } from "@app/types/amounts"
-import { oppositeWalletCurrency, PaymentResultStatus } from "@app/types/payment"
 import { WalletDescriptor } from "@app/types/wallets"
-import { logConversionResult } from "@app/utils/analytics"
-import { triggerHapticFeedback } from "@app/utils/helper"
-import { toastShow } from "@app/utils/toast"
 
 import { ConversionFeeRow } from "./conversion-fee-row"
 import { useSelfCustodialConversion } from "./hooks"
@@ -55,8 +46,6 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { convertMoneyAmount } = usePriceConversion()
 
   const { fromWalletCurrency, moneyAmount } = route.params
-  const [errorMessage, setErrorMessage] = useState<string | undefined>()
-  const [selfCustodialConverting, setSelfCustodialConverting] = useState(false)
   const isAuthed = useIsAuthed()
   const { isSelfCustodial, wallets: activeWallets } = useActiveWallet()
 
@@ -111,11 +100,15 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     fromCurrency: fromWalletCurrency,
     moneyAmount,
     enabled: isSelfCustodial,
+    onSuccess: navigateToSuccess,
   })
 
   const intraLedgerConversion = useIntraLedgerConversion({ onSuccess: navigateToSuccess })
 
-  const isLoading = intraLedgerConversion.loading || selfCustodialConverting
+  const activeConversion = isSelfCustodial
+    ? nonCustodialConversion
+    : intraLedgerConversion
+  const isLoading = activeConversion.loading
 
   if (
     (!isSelfCustodial && !data?.me) ||
@@ -166,40 +159,9 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
           isApproximate: true,
         })
 
-  const handlePaymentError = (error: Error) => {
-    toastShow({ message: error.message, LL })
-  }
-
-  const paySelfCustodial = async () => {
-    setSelfCustodialConverting(true)
-    try {
-      const outcome = await nonCustodialConversion.execute()
-      const isSuccess = outcome.status === PaymentResultStatus.Success
-      logConversionResult({
-        sendingWallet: fromWalletCurrency,
-        receivingWallet: oppositeWalletCurrency(fromWalletCurrency),
-        paymentStatus: isSuccess ? PaymentSendResult.Success : PaymentSendResult.Failure,
-      })
-      if (isSuccess) {
-        navigateToSuccess()
-        triggerHapticFeedback("notificationSuccess")
-        return
-      }
-      setErrorMessage(outcome.message)
-      triggerHapticFeedback("notificationError")
-    } catch (err) {
-      if (err instanceof Error) {
-        crashlytics().recordError(err)
-        handlePaymentError(err)
-      }
-    } finally {
-      setSelfCustodialConverting(false)
-    }
-  }
-
   const payWallet = async () => {
     if (isSelfCustodial) {
-      await paySelfCustodial()
+      await nonCustodialConversion.execute()
       return
     }
     await intraLedgerConversion.execute({
@@ -209,7 +171,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
   }
 
-  const visibleErrorMessage = errorMessage ?? intraLedgerConversion.errorMessage
+  const visibleErrorMessage = activeConversion.errorMessage
 
   return (
     <Screen>
