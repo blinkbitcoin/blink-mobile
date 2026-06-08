@@ -2461,6 +2461,13 @@
         "modalBody": "Per accedere a un conto in dollari, crea un account non-custodial.",
         "createNew": "Crea nuovo"
     },
+    "ConvertDollarToBitcoinModal": {
+        "title": "Converti il tuo saldo in dollari in Bitcoin",
+        "body": "Il conto in dollari non è più disponibile nella tua regione.",
+        "youHave": "Hai",
+        "youGet": "Ricevi",
+        "approve": "Approva"
+    },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticazione a due fattori",
         "secret": "Segreto/backup",

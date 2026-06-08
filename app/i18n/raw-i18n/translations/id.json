@@ -2461,6 +2461,13 @@
     "modalBody": "Untuk mengakses akun dolar, buat akun non-custodial.",
     "createNew": "Buat baru"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Konversikan saldo Dolar Anda ke Bitcoin",
+    "body": "Akun Dolar tidak lagi tersedia di wilayah Anda.",
+    "youHave": "Anda punya",
+    "youGet": "Anda dapat",
+    "approve": "Setujui"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Otentikasi dua faktor",
     "secret": "Rahasia/cadangan",

@@ -2461,6 +2461,13 @@
     "modalBody": "Okusobola okufuna akawunti ya doola, kola akawunti etali ya kuterekebwa.",
     "createNew": "Kola eppya"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Kyusa ssente zo eza Doola zibe Bitcoin",
+    "body": "Akawunti ya Doola tekikyaliwo mu kitundu kyo.",
+    "youHave": "Olina",
+    "youGet": "Ofuna",
+    "approve": "Kkiriza"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Okukakasa emirundi ebiri",
     "secret": "Ekyama/ekyokudda ku nnyuma",

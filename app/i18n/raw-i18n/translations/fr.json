@@ -2461,6 +2461,13 @@
         "modalBody": "Pour accéder à un compte en dollars, créez un compte non-custodial.",
         "createNew": "Créer nouveau"
     },
+    "ConvertDollarToBitcoinModal": {
+        "title": "Convertissez votre solde en dollars en Bitcoin",
+        "body": "Le compte en dollars n'est plus disponible dans votre région.",
+        "youHave": "Vous avez",
+        "youGet": "Vous recevez",
+        "approve": "Approuver"
+    },
     "TotpRegistrationInitiateScreen": {
         "title": "Authentification à deux niveaux",
         "secret": "Secret/sauvegarde",

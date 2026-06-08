@@ -2461,6 +2461,13 @@
     "modalBody": "Để truy cập tài khoản đô la, hãy tạo tài khoản không lưu ký.",
     "createNew": "Tạo mới"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Chuyển đổi số dư Đô la của bạn sang Bitcoin",
+    "body": "Tài khoản Đô la không còn khả dụng ở khu vực của bạn.",
+    "youHave": "Bạn có",
+    "youGet": "Bạn nhận được",
+    "approve": "Phê duyệt"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
     "secret": "Khóa bí mật/sao lưu",

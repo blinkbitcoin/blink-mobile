@@ -2597,6 +2597,13 @@ const en: BaseTranslation = {
     modalBody: "To get access to a dollar account, create a non-custodial account.",
     createNew: "Create new",
   },
+  ConvertDollarToBitcoinModal: {
+    title: "Convert your Dollar balance to Bitcoin",
+    body: "Dollar account is no longer available in your region.",
+    youHave: "You have",
+    youGet: "You get",
+    approve: "Approve",
+  },
   SplashScreen: {
     update:
       "Your app is outdated. An update is needed before the app can be used.\n\nThis can be done from the PlayStore for Android and Testflight for iOS",

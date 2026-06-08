@@ -2461,6 +2461,13 @@
         "modalBody": "Para acessar uma conta em dólares, crie uma conta não custodial.",
         "createNew": "Criar nova"
     },
+    "ConvertDollarToBitcoinModal": {
+        "title": "Converta seu saldo em Dólar para Bitcoin",
+        "body": "A conta em Dólar não está mais disponível na sua região.",
+        "youHave": "Você tem",
+        "youGet": "Você recebe",
+        "approve": "Aprovar"
+    },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticação de dois fatores",
         "secret": "Segredo/backup",

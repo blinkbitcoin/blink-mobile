@@ -2461,6 +2461,13 @@
     "modalBody": "Pro přístup k dolarovému účtu si vytvořte ne-custodial účet.",
     "createNew": "Vytvořit nový"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Převeďte svůj zůstatek v dolarech na Bitcoin",
+    "body": "Dolarový účet již není ve vašem regionu dostupný.",
+    "youHave": "Máte",
+    "youGet": "Získáte",
+    "approve": "Schválit"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvoufaktorové ověření",
     "secret": "Tajný klíč/záloha",

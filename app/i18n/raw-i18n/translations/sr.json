@@ -2461,6 +2461,13 @@
     "modalBody": "За приступ долар налогу, креирајте не-кастодијални налог.",
     "createNew": "Креирај нови"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Конвертујте свој салдо у доларима у Bitcoin",
+    "body": "Налог у доларима више није доступан у вашем региону.",
+    "youHave": "Имате",
+    "youGet": "Добијате",
+    "approve": "Одобри"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
     "secret": "Тајна/резервна копија",

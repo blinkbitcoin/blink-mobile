@@ -2461,6 +2461,13 @@
     "modalBody": "Ili kufikia akaunti ya dola, unda akaunti isiyo ya ulinzi.",
     "createNew": "Unda mpya"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Badilisha salio lako la Dola kuwa Bitcoin",
+    "body": "Akaunti ya Dola haipatikani tena katika eneo lako.",
+    "youHave": "Una",
+    "youGet": "Unapata",
+    "approve": "Idhinisha"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "uthibitishaji wa hatua mbili",
     "secret": "Siri/hifadhi rudufu",

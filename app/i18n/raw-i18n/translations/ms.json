@@ -2461,6 +2461,13 @@
     "modalBody": "Untuk mengakses akaun dolar, cipta akaun bukan kustodian.",
     "createNew": "Cipta baharu"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Tukar baki Dolar anda kepada Bitcoin",
+    "body": "Akaun Dolar tidak lagi tersedia di rantau anda.",
+    "youHave": "Anda ada",
+    "youGet": "Anda dapat",
+    "approve": "Luluskan"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Pengesahan dua kali",
     "secret": "Rahsia/sandaran",

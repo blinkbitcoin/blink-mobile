@@ -2461,6 +2461,13 @@
     "modalBody": "Dólar cuentaman yaykunaykipaq, mana waqaychaq cuentata kamariy.",
     "createNew": "Musuq kamariy"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Dólar qullqiykita Bitcoinman tikray",
+    "body": "Dólar cuentaqa manaña suyuykipi kanchu.",
+    "youHave": "Kapusunki",
+    "youGet": "Chaskinki",
+    "approve": "Arí niy"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
     "secret": "Pakasqa/waqaychasqa",

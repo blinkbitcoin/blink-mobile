@@ -8149,6 +8149,28 @@ type RootTranslation = {
 		 */
 		createNew: string
 	}
+	ConvertDollarToBitcoinModal: {
+		/**
+		 * C​o​n​v​e​r​t​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n
+		 */
+		title: string
+		/**
+		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.
+		 */
+		body: string
+		/**
+		 * Y​o​u​ ​h​a​v​e
+		 */
+		youHave: string
+		/**
+		 * Y​o​u​ ​g​e​t
+		 */
+		youGet: string
+		/**
+		 * A​p​p​r​o​v​e
+		 */
+		approve: string
+	}
 	SplashScreen: {
 		/**
 		 * Y​o​u​r​ ​a​p​p​ ​i​s​ ​o​u​t​d​a​t​e​d​.​ ​A​n​ ​u​p​d​a​t​e​ ​i​s​ ​n​e​e​d​e​d​ ​b​e​f​o​r​e​ ​t​h​e​ ​a​p​p​ ​c​a​n​ ​b​e​ ​u​s​e​d​.​
@@ -20389,6 +20411,28 @@ export type TranslationFunctions = {
 		 * Create new
 		 */
 		createNew: () => LocalizedString
+	}
+	ConvertDollarToBitcoinModal: {
+		/**
+		 * Convert your Dollar balance to Bitcoin
+		 */
+		title: () => LocalizedString
+		/**
+		 * Dollar account is no longer available in your region.
+		 */
+		body: () => LocalizedString
+		/**
+		 * You have
+		 */
+		youHave: () => LocalizedString
+		/**
+		 * You get
+		 */
+		youGet: () => LocalizedString
+		/**
+		 * Approve
+		 */
+		approve: () => LocalizedString
 	}
 	SplashScreen: {
 		/**

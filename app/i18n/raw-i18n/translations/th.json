@@ -2461,6 +2461,13 @@
     "modalBody": "หากต้องการเข้าถึงบัญชีดอลลาร์ ให้สร้างบัญชีแบบ non-custodial",
     "createNew": "สร้างใหม่"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "แปลงยอดเงินดอลลาร์ของคุณเป็น Bitcoin",
+    "body": "บัญชีดอลลาร์ไม่สามารถใช้งานได้ในภูมิภาคของคุณอีกต่อไป",
+    "youHave": "คุณมี",
+    "youGet": "คุณจะได้รับ",
+    "approve": "อนุมัติ"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
     "secret": "รหัสลับ/สำรอง",

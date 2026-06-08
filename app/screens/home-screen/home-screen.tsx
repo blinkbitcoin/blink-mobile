@@ -18,11 +18,12 @@ import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
 import { StablesatsRestrictionModal } from "@app/components/stablesats-restriction-modal"
+import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
 import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { toBtcMoneyAmount } from "@app/types/amounts"
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
@@ -46,6 +47,7 @@ import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { getErrorMessages } from "@app/graphql/utils"
+import { getUsdWallet } from "@app/graphql/wallets-utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
@@ -350,7 +352,11 @@ export const HomeScreen: React.FC = () => {
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
   const [isRestrictionModalVisible, setIsRestrictionModalVisible] = React.useState(false)
+  const [isUsdConvertModalVisible, setIsUsdConvertModalVisible] = React.useState(false)
   const isStablesatsRestricted = useStablesatsRestricted()
+
+  const restrictedUsdWalletBalance =
+    getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)?.balance ?? 0
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const openUpgradeModal = React.useCallback(() => {
@@ -558,6 +564,14 @@ export const HomeScreen: React.FC = () => {
       <StablesatsRestrictionModal
         isVisible={isRestrictionModalVisible}
         toggleModal={() => setIsRestrictionModalVisible(false)}
+        onDismiss={() => {
+          if (restrictedUsdWalletBalance > 0) setIsUsdConvertModalVisible(true)
+        }}
+      />
+      <UsdConvertToBtcModal
+        isVisible={isUsdConvertModalVisible}
+        toggleModal={() => setIsUsdConvertModalVisible(false)}
+        usdWalletBalance={toUsdMoneyAmount(restrictedUsdWalletBalance)}
       />
       <View style={styles.balanceContainer}>
         <View style={styles.header}>

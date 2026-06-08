@@ -2461,6 +2461,13 @@
         "modalBody": "Um Zugriff auf ein Dollar-Konto zu erhalten, erstelle ein non-custodial Konto.",
         "createNew": "Neu erstellen"
     },
+    "ConvertDollarToBitcoinModal": {
+        "title": "Wandle dein Dollar-Guthaben in Bitcoin um",
+        "body": "Das Dollar-Konto ist in deiner Region nicht mehr verfügbar.",
+        "youHave": "Du hast",
+        "youGet": "Du erhältst",
+        "approve": "Bestätigen"
+    },
     "TotpRegistrationInitiateScreen": {
         "title": "Zwei-Faktor Authentifizierung",
         "secret": "Geheimnis/Backup",

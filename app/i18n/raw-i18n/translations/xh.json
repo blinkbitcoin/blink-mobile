@@ -2461,6 +2461,13 @@
     "modalBody": "Ukufumana ifikelelo kwiakhawunti yedola, yenza iakhawunti engenagunya.",
     "createNew": "Yenza entsha"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Guqula ibhalansi yakho yeDola ibe yiBitcoin",
+    "body": "I-akhawunti yeDola ayisafumaneki kummandla wakho.",
+    "youHave": "Unayo",
+    "youGet": "Ufumana",
+    "approve": "Yamkela"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Uqinisekiso lwezinto ezimbini",
     "secret": "Imfihlo/ibhekap",

@@ -2461,6 +2461,13 @@
     "modalBody": "Pentru a accesa un cont în dolari, creează un cont non-custodial.",
     "createNew": "Crează cont nou"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Convertește soldul tău în dolari în Bitcoin",
+    "body": "Contul în dolari nu mai este disponibil în regiunea ta.",
+    "youHave": "Ai",
+    "youGet": "Primești",
+    "approve": "Aprobă"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificare cu doi factori",
     "secret": "Secret/backup",

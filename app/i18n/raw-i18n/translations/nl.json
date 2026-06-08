@@ -2461,6 +2461,13 @@
     "modalBody": "Maak een non-custodial account aan om toegang te krijgen tot een dollar-account.",
     "createNew": "Nieuw aanmaken"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Zet je dollarsaldo om naar Bitcoin",
+    "body": "Het dollaraccount is niet langer beschikbaar in jouw regio.",
+    "youHave": "Je hebt",
+    "youGet": "Je krijgt",
+    "approve": "Goedkeuren"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Tweefactorauthenticatie",
     "secret": "Geheim/back-up",

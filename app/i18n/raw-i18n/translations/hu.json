@@ -2461,6 +2461,13 @@
     "modalBody": "A dollárszámlához való hozzáféréshez hozz létre egy nem letétkezelői fiókot.",
     "createNew": "Új létrehozása"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Váltsd át a dolláregyenleged Bitcoinra",
+    "body": "A dollárszámla már nem érhető el a régiódban.",
+    "youHave": "Nálad van",
+    "youGet": "Kapsz",
+    "approve": "Jóváhagyás"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Kétlépcsős azonosítás",
     "secret": "Titkos kulcs/biztonsági mentés",

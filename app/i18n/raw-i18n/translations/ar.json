@@ -2461,6 +2461,13 @@
     "modalBody": "للوصول إلى حساب الدولار، أنشئ حسابًا غير حافظ.",
     "createNew": "إنشاء جديد"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "حوّل رصيدك بالدولار إلى بيتكوين",
+    "body": "لم يعد حساب الدولار متاحًا في منطقتك.",
+    "youHave": "لديك",
+    "youGet": "تحصل على",
+    "approve": "موافقة"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
     "secret": "الرمز السري/النسخ الاحتياطي",

@@ -2461,6 +2461,13 @@
     "modalBody": "Per accedir a un compte en dòlars, crea un compte no custodial.",
     "createNew": "Crea nou"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Converteix el teu saldo en dòlars a Bitcoin",
+    "body": "El compte en dòlars ja no està disponible a la teva regió.",
+    "youHave": "Tens",
+    "youGet": "Reps",
+    "approve": "Aprova"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificació de dos factors",
     "secret": "Secret/còpia de seguretat",

@@ -2461,6 +2461,13 @@
     "modalBody": "For at få adgang til en dollarkonto skal du oprette en non-custodial konto.",
     "createNew": "Opret ny"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Konvertér din dollarsaldo til Bitcoin",
+    "body": "Dollarkontoen er ikke længere tilgængelig i din region.",
+    "youHave": "Du har",
+    "youGet": "Du får",
+    "approve": "Godkend"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "To-faktor godkendelse",
     "secret": "Hemmelighed/backup",

@@ -2461,6 +2461,13 @@
         "modalBody": "ドル口座にアクセスするには、ノンカストディアル口座を作成してください。",
         "createNew": "新規作成"
     },
+    "ConvertDollarToBitcoinModal": {
+        "title": "ドル残高をビットコインに変換",
+        "body": "ドルアカウントはお住まいの地域でご利用いただけなくなりました。",
+        "youHave": "保有額",
+        "youGet": "受取額",
+        "approve": "承認"
+    },
     "TotpRegistrationInitiateScreen": {
         "title": "2要素認証（2FA）",
         "secret": "シークレット/バックアップ",

@@ -2461,6 +2461,13 @@
     "modalBody": "Dolar hesabına erişmek için saklamasız bir hesap oluşturun.",
     "createNew": "Yeni oluştur"
   },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Dolar bakiyenizi Bitcoin'e dönüştürün",
+    "body": "Dolar hesabı artık bölgenizde kullanılamıyor.",
+    "youHave": "Sahip olduğunuz",
+    "youGet": "Alacağınız",
+    "approve": "Onayla"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "İki aşamalı doğrulama",
     "secret": "Gizli anahtar/yedek",
