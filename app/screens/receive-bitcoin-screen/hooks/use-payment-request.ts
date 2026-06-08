@@ -96,7 +96,8 @@ export const usePaymentRequest = () => {
 
   useLayoutEffect(() => {
     if (prcd !== null || !wallets?.convertMoneyAmount) return
-    if (locationLoading) return // wait until country detection settles to honor restriction
+    /** Wait until country detection settles so a restricted user never gets a USD invoice first. */
+    if (locationLoading) return
 
     const { defaultWallet, bitcoinWallet, username, posUrl, lnAddressHostname, network } =
       wallets

@@ -1,1 +1,1 @@
-export * from "./usd-convert-to-btc-modal"
+export { UsdConvertToBtcModal } from "./usd-convert-to-btc-modal"

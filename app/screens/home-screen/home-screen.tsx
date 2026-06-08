@@ -569,13 +569,15 @@ export const HomeScreen: React.FC = () => {
           if (restrictedUsdWalletBalance > 0) setIsUsdConvertModalVisible(true)
         }}
       />
-      <UsdConvertToBtcModal
-        isVisible={isUsdConvertModalVisible}
-        toggleModal={() => setIsUsdConvertModalVisible(false)}
-        usdWalletBalance={toUsdMoneyAmount(restrictedUsdWalletBalance)}
-        usdWalletId={restrictedUsdWallet?.id ?? ""}
-        btcWalletId={restrictedBtcWallet?.id ?? ""}
-      />
+      {restrictedUsdWallet && restrictedBtcWallet && (
+        <UsdConvertToBtcModal
+          isVisible={isUsdConvertModalVisible}
+          toggleModal={() => setIsUsdConvertModalVisible(false)}
+          usdWalletBalance={toUsdMoneyAmount(restrictedUsdWalletBalance)}
+          usdWalletId={restrictedUsdWallet.id}
+          btcWalletId={restrictedBtcWallet.id}
+        />
+      )}
       <View style={styles.balanceContainer}>
         <View style={styles.header}>
           <GaloyIconButton
