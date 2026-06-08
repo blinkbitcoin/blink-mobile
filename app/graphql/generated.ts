@@ -2198,7 +2198,6 @@ export type Query = {
   readonly deviceSessionCount: Scalars['Int']['output'];
   readonly feedbackModalShown: Scalars['Boolean']['output'];
   readonly globals?: Maybe<Globals>;
-  readonly hasPromptedSetDefaultAccount: Scalars['Boolean']['output'];
   readonly hiddenBalanceToolTip: Scalars['Boolean']['output'];
   readonly hideBalance: Scalars['Boolean']['output'];
   readonly innerCircleValue: Scalars['Int']['output'];
@@ -3192,11 +3191,6 @@ export type FeedbackModalShownQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type FeedbackModalShownQuery = { readonly __typename: 'Query', readonly feedbackModalShown: boolean };
-
-export type HasPromptedSetDefaultAccountQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type HasPromptedSetDefaultAccountQuery = { readonly __typename: 'Query', readonly hasPromptedSetDefaultAccount: boolean };
 
 export type IntroducingCirclesModalShownQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4620,43 +4614,6 @@ export type FeedbackModalShownQueryHookResult = ReturnType<typeof useFeedbackMod
 export type FeedbackModalShownLazyQueryHookResult = ReturnType<typeof useFeedbackModalShownLazyQuery>;
 export type FeedbackModalShownSuspenseQueryHookResult = ReturnType<typeof useFeedbackModalShownSuspenseQuery>;
 export type FeedbackModalShownQueryResult = Apollo.QueryResult<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>;
-export const HasPromptedSetDefaultAccountDocument = gql`
-    query hasPromptedSetDefaultAccount {
-  hasPromptedSetDefaultAccount @client
-}
-    `;
-
-/**
- * __useHasPromptedSetDefaultAccountQuery__
- *
- * To run a query within a React component, call `useHasPromptedSetDefaultAccountQuery` and pass it any options that fit your needs.
- * When your component renders, `useHasPromptedSetDefaultAccountQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHasPromptedSetDefaultAccountQuery({
- *   variables: {
- *   },
- * });
- */
-export function useHasPromptedSetDefaultAccountQuery(baseOptions?: Apollo.QueryHookOptions<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>(HasPromptedSetDefaultAccountDocument, options);
-      }
-export function useHasPromptedSetDefaultAccountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>(HasPromptedSetDefaultAccountDocument, options);
-        }
-export function useHasPromptedSetDefaultAccountSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>(HasPromptedSetDefaultAccountDocument, options);
-        }
-export type HasPromptedSetDefaultAccountQueryHookResult = ReturnType<typeof useHasPromptedSetDefaultAccountQuery>;
-export type HasPromptedSetDefaultAccountLazyQueryHookResult = ReturnType<typeof useHasPromptedSetDefaultAccountLazyQuery>;
-export type HasPromptedSetDefaultAccountSuspenseQueryHookResult = ReturnType<typeof useHasPromptedSetDefaultAccountSuspenseQuery>;
-export type HasPromptedSetDefaultAccountQueryResult = Apollo.QueryResult<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>;
 export const IntroducingCirclesModalShownDocument = gql`
     query introducingCirclesModalShown {
   introducingCirclesModalShown @client
@@ -10899,7 +10856,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   deviceSessionCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   feedbackModalShown?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   globals?: Resolver<Maybe<ResolversTypes['Globals']>, ParentType, ContextType>;
-  hasPromptedSetDefaultAccount?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   hiddenBalanceToolTip?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   hideBalance?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   innerCircleValue?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;

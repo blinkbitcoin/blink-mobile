@@ -3,14 +3,14 @@ import { View, TouchableOpacity, ActivityIndicator } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 
-import { gql, useApolloClient } from "@apollo/client"
-import { setHasPromptedSetDefaultAccount } from "@app/graphql/client-only-query"
+import { gql } from "@apollo/client"
 import {
   WalletCurrency,
   useAccountUpdateDefaultWalletIdMutation,
   useSetDefaultAccountModalQuery,
 } from "@app/graphql/generated"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -53,10 +53,15 @@ export const SetDefaultAccountModal = ({
     fetchPolicy: "cache-only",
   })
 
-  const client = useApolloClient()
+  const { markDefaultAccountModalShown } = useDefaultAccountModalShown()
 
   const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
   const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
+
+  const closeAsAcknowledged = () => {
+    markDefaultAccountModalShown()
+    toggleModal()
+  }
 
   const onPressUsdAccount = async () => {
     setUsdLoading(true)
@@ -77,8 +82,7 @@ export const SetDefaultAccountModal = ({
     }
     setUsdLoading(false)
 
-    setHasPromptedSetDefaultAccount(client)
-    toggleModal()
+    closeAsAcknowledged()
   }
 
   const onPressBtcAccount = async () => {
@@ -100,8 +104,7 @@ export const SetDefaultAccountModal = ({
     }
     setBtcLoading(false)
 
-    setHasPromptedSetDefaultAccount(client)
-    toggleModal()
+    closeAsAcknowledged()
   }
 
   return (

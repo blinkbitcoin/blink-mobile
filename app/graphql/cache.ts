@@ -104,9 +104,6 @@ export const createCache = () =>
           feedbackModalShown: {
             read: (value) => value ?? false,
           },
-          hasPromptedSetDefaultAccount: {
-            read: (value) => value ?? false,
-          },
           introducingCirclesModalShown: {
             read: (value) => value ?? false,
           },

@@ -1,11 +1,7 @@
-import { DefaultAccountId } from "@app/types/wallet"
-
+import { resolveAccountKey } from "./account-key"
 import { PersistentState } from "./state-migrations"
 
 export type ThemePreference = "system" | "light" | "dark"
-
-const resolveAccountKey = (state: PersistentState): string =>
-  state.activeAccountId ?? DefaultAccountId.Custodial
 
 export const getThemePreference = (state: PersistentState): ThemePreference => {
   const key = resolveAccountKey(state)
