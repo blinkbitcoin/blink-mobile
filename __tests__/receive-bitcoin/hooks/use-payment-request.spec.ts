@@ -51,13 +51,15 @@ jest.mock("@app/graphql/ln-update-context", () => ({
   useLnUpdateHashPaid: () => mockUseLnUpdateHashPaid(),
 }))
 
+const mockUseStablesatsRestricted = jest.fn(() => false)
 jest.mock("@app/hooks/use-stablesats-restricted", () => ({
-  useStablesatsRestricted: () => false,
+  useStablesatsRestricted: () => mockUseStablesatsRestricted(),
 }))
 
+const mockUseDeviceLocation = jest.fn(() => ({ countryCode: "SV", loading: false }))
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
-  default: () => ({ countryCode: "SV", loading: false }),
+  default: () => mockUseDeviceLocation(),
 }))
 
 const mockUseCountdown = jest.fn()
@@ -162,6 +164,8 @@ describe("usePaymentRequest", () => {
     mockUseWalletResolution.mockReturnValue(null)
     mockUseLnUpdateHashPaid.mockReturnValue(null)
     mockUseCountdown.mockReturnValue({ remainingSeconds: null, isExpired: false })
+    mockUseStablesatsRestricted.mockReturnValue(false)
+    mockUseDeviceLocation.mockReturnValue({ countryCode: "SV", loading: false })
   })
 
   it("returns null when wallet resolution is null", () => {
@@ -263,5 +267,35 @@ describe("usePaymentRequest", () => {
     expect(mockCreatePaymentRequestCreationData).toHaveBeenCalledWith(
       expect.objectContaining({ expirationTime: 1440 }),
     )
+  })
+
+  it("forces the bitcoin wallet as default when stablesats is restricted", async () => {
+    setupMocksWithPR()
+    mockUseStablesatsRestricted.mockReturnValue(true)
+    mockUseWalletResolution.mockReturnValue({
+      ...mockWallets,
+      defaultWallet: { id: "usd-id", balance: 100, walletCurrency: WalletCurrency.Usd },
+    })
+
+    renderHook(() => usePaymentRequest())
+
+    await flushEffects()
+
+    expect(mockCreatePaymentRequestCreationData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        defaultWalletDescriptor: { currency: WalletCurrency.Btc, id: "btc-id" },
+      }),
+    )
+  })
+
+  it("defers invoice creation until country detection settles", async () => {
+    setupMocksWithPR()
+    mockUseDeviceLocation.mockReturnValue({ countryCode: "SV", loading: true })
+
+    renderHook(() => usePaymentRequest())
+
+    await flushEffects()
+
+    expect(mockCreatePaymentRequestCreationData).not.toHaveBeenCalled()
   })
 })

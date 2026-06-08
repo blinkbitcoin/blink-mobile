@@ -182,6 +182,7 @@ describe("conversion-confirmation-screen", () => {
       feeText: "",
       adjustmentText: null,
       canExecute: false,
+      loading: false,
       execute: jest.fn(),
     })
   })
@@ -339,6 +340,11 @@ describe("conversion-confirmation-screen", () => {
     })
 
     expect(dispatchMock).toHaveBeenCalled()
+    const resetAction = dispatchMock.mock.calls[0][0]({ routes: [], index: 0 })
+    expect(resetAction.payload.routes).toEqual([
+      { name: "Primary" },
+      { name: "conversionSuccess" },
+    ])
   })
 
   it("sends USD conversion on swipe", async () => {
@@ -426,6 +432,7 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       feeText: "$0.05",
       adjustmentText: null,
       canExecute: true,
+      loading: false,
       execute: jest.fn(),
     })
 
@@ -452,15 +459,24 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
   })
 
   it("invokes nonCustodialConversion.execute and resets navigation to conversionSuccess on success", async () => {
-    const executeMock = jest.fn().mockResolvedValue({ status: "success" })
-    mockSelfCustodialConversion.mockReturnValue({
-      isQuoting: false,
-      hasQuoteError: false,
-      feeText: "$0.05",
-      adjustmentText: null,
-      canExecute: true,
-      execute: executeMock,
-    })
+    const executeMock = jest.fn()
+    mockSelfCustodialConversion.mockImplementation(
+      (params: { onSuccess: () => void }) => {
+        executeMock.mockImplementation(async () => {
+          params.onSuccess()
+        })
+        return {
+          isQuoting: false,
+          hasQuoteError: false,
+          feeText: "$0.05",
+          adjustmentText: null,
+          canExecute: true,
+          loading: false,
+          errorMessage: undefined,
+          execute: executeMock,
+        }
+      },
+    )
 
     const route = {
       key: "conversionConfirmation",
@@ -509,6 +525,7 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       feeText: "$0.05",
       adjustmentText: null,
       canExecute: true,
+      loading: false,
       execute: executeMock,
     })
 
@@ -544,5 +561,37 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       expect(executeMock).toHaveBeenCalledTimes(1)
     })
     expect(dispatchMock).not.toHaveBeenCalled()
+  })
+
+  it("renders nothing while the wallets are unavailable", () => {
+    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: true, wallets: [] })
+
+    const route = {
+      key: "conversionConfirmation",
+      name: "conversionConfirmation",
+      params: {
+        fromWalletCurrency: WalletCurrency.Btc,
+        moneyAmount: {
+          amount: 10000,
+          currency: WalletCurrency.Btc,
+          currencyCode: WalletCurrency.Btc,
+        },
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <ConversionConfirmationScreen route={route} />
+      </ContextForScreen>,
+    )
+
+    expect(
+      screen.queryByText(
+        LL.ConversionConfirmationScreen.transferButtonText({
+          fromWallet: LL.common.bitcoin(),
+          toWallet: LL.common.dollar(),
+        }),
+      ),
+    ).toBeNull()
   })
 })

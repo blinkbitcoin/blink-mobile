@@ -1,4 +1,5 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native"
+import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useSelfCustodialConversion } from "@app/screens/conversion-flow/hooks/self-custodial/use-conversion"
@@ -7,6 +8,8 @@ import { ConvertDirection, PaymentResultStatus } from "@app/types/payment"
 
 const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
+const mockOnSuccess = jest.fn()
+const mockRecordError = jest.fn()
 
 jest.mock("@app/hooks/use-payments", () => ({
   usePayments: () => ({ getConversionQuote: mockGetQuote }),
@@ -25,15 +28,13 @@ jest.mock("@app/hooks/use-display-currency", () => ({
 
 jest.mock("@app/utils/analytics", () => ({
   logConversionAttempt: jest.fn(),
+  logConversionResult: jest.fn(),
 }))
 
-jest.mock("@react-native-firebase/crashlytics", () => {
-  const recordError = jest.fn()
-  return {
-    __esModule: true,
-    default: () => ({ recordError }),
-  }
-})
+jest.mock("@react-native-firebase/crashlytics", () => ({
+  __esModule: true,
+  default: () => ({ recordError: mockRecordError }),
+}))
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
@@ -49,6 +50,7 @@ const defaultParams = {
   fromCurrency: WalletCurrency.Btc,
   moneyAmount: toUsdMoneyAmount(500),
   enabled: true,
+  onSuccess: mockOnSuccess,
 }
 
 const makeQuote = (
@@ -86,7 +88,7 @@ describe("useSelfCustodialConversion", () => {
     expect(mockGetQuote).not.toHaveBeenCalled()
   })
 
-  it("transitions Loading → Ready and exposes the formatted fee", async () => {
+  it("transitions Loading to Ready and exposes the formatted fee", async () => {
     const quote = makeQuote()
     mockGetQuote.mockResolvedValue(quote)
 
@@ -122,23 +124,29 @@ describe("useSelfCustodialConversion", () => {
     expect(result.current.canExecute).toBe(false)
   })
 
-  it("execute() delegates to quote.execute and reports success", async () => {
+  it("execute() runs the quote and calls onSuccess on success", async () => {
     const execute = jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success })
     mockGetQuote.mockResolvedValue(makeQuote({ execute }))
 
     const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
     await waitFor(() => expect(result.current.canExecute).toBe(true))
 
-    let outcome: Awaited<ReturnType<typeof result.current.execute>> | undefined
     await act(async () => {
-      outcome = await result.current.execute()
+      await result.current.execute()
     })
 
     expect(execute).toHaveBeenCalledTimes(1)
-    expect(outcome).toEqual({ status: PaymentResultStatus.Success })
+    expect(mockOnSuccess).toHaveBeenCalledTimes(1)
+    expect(result.current.errorMessage).toBeUndefined()
+    expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith(
+      "notificationSuccess",
+      {
+        ignoreAndroidSystemSettings: true,
+      },
+    )
   })
 
-  it("execute() surfaces the SDK error message on failure", async () => {
+  it("execute() surfaces the SDK error message and does not call onSuccess on failure", async () => {
     const execute = jest.fn().mockResolvedValue({
       status: PaymentResultStatus.Failed,
       errors: [{ message: "SDK boom" }],
@@ -148,32 +156,60 @@ describe("useSelfCustodialConversion", () => {
     const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
     await waitFor(() => expect(result.current.canExecute).toBe(true))
 
-    let outcome: Awaited<ReturnType<typeof result.current.execute>> | undefined
     await act(async () => {
-      outcome = await result.current.execute()
+      await result.current.execute()
     })
 
-    expect(outcome).toEqual({
-      status: PaymentResultStatus.Failed,
-      message: "SDK boom",
+    expect(result.current.errorMessage).toBe("SDK boom")
+    expect(mockOnSuccess).not.toHaveBeenCalled()
+    expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith("notificationError", {
+      ignoreAndroidSystemSettings: true,
     })
   })
 
-  it("execute() refuses to run when no quote is ready", async () => {
+  it("execute() sets a generic error when no quote is ready", async () => {
     mockGetQuote.mockResolvedValue(null)
 
     const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
     await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
 
-    let outcome: Awaited<ReturnType<typeof result.current.execute>> | undefined
     await act(async () => {
-      outcome = await result.current.execute()
+      await result.current.execute()
     })
 
-    expect(outcome).toEqual({
-      status: PaymentResultStatus.Failed,
-      message: "Generic error",
+    expect(result.current.errorMessage).toBe("Generic error")
+    expect(mockOnSuccess).not.toHaveBeenCalled()
+  })
+
+  it("execute() falls back to a generic error when the SDK fails without a message", async () => {
+    const execute = jest.fn().mockResolvedValue({ status: PaymentResultStatus.Failed })
+    mockGetQuote.mockResolvedValue(makeQuote({ execute }))
+
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    await act(async () => {
+      await result.current.execute()
     })
+
+    expect(result.current.errorMessage).toBe("Generic error")
+    expect(mockOnSuccess).not.toHaveBeenCalled()
+  })
+
+  it("execute() records a thrown error to crashlytics and surfaces its message", async () => {
+    const execute = jest.fn().mockRejectedValue(new Error("SDK exploded"))
+    mockGetQuote.mockResolvedValue(makeQuote({ execute }))
+
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    await act(async () => {
+      await result.current.execute()
+    })
+
+    expect(mockRecordError).toHaveBeenCalledWith(expect.any(Error))
+    expect(result.current.errorMessage).toBe("SDK exploded")
+    expect(mockOnSuccess).not.toHaveBeenCalled()
   })
 
   it("snapshots the first Ready quote and stops re-quoting on price ticks", async () => {

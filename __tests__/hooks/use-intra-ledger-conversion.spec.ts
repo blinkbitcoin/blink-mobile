@@ -169,6 +169,33 @@ describe("useIntraLedgerConversion", () => {
     expect(onSuccess).not.toHaveBeenCalled()
   })
 
+  it("translates USD-source transport errors through getErrorMessages", async () => {
+    mockUsdSend.mockResolvedValue({
+      data: {
+        intraLedgerUsdPaymentSend: { status: PaymentSendResult.Failure, errors: [] },
+      },
+      errors: [{ message: "USD network error" }],
+    })
+    const onSuccess = jest.fn()
+
+    const result = await runExecute(usdToBtcParams, onSuccess)
+
+    expect(result.current.errorMessage).toBe("USD network error")
+    expect(onSuccess).not.toHaveBeenCalled()
+  })
+
+  it("falls back to the localized error on a failure without any message", async () => {
+    mockBtcSend.mockResolvedValue({
+      data: { intraLedgerPaymentSend: { status: PaymentSendResult.Failure, errors: [] } },
+    })
+    const onSuccess = jest.fn()
+
+    const result = await runExecute(btcToUsdParams, onSuccess)
+
+    expect(result.current.errorMessage).toBe("Something went wrong")
+    expect(onSuccess).not.toHaveBeenCalled()
+  })
+
   it("falls back to the localized error when the mutation returns no status", async () => {
     mockBtcSend.mockResolvedValue({ data: null })
     const onSuccess = jest.fn()

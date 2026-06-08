@@ -32,9 +32,14 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
 }))
 
 const mockExecute = jest.fn()
+const mockUseIntraLedgerConversion = jest.fn(() => ({
+  execute: mockExecute,
+  loading: false,
+  errorMessage: undefined as string | undefined,
+}))
 
 jest.mock("@app/hooks/use-intra-ledger-conversion", () => ({
-  useIntraLedgerConversion: () => ({ execute: mockExecute, loading: false }),
+  useIntraLedgerConversion: () => mockUseIntraLedgerConversion(),
 }))
 
 import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
@@ -65,6 +70,11 @@ const renderModal = (props?: { toggleModal?: () => void; isVisible?: boolean }) 
 describe("UsdConvertToBtcModal", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockUseIntraLedgerConversion.mockReturnValue({
+      execute: mockExecute,
+      loading: false,
+      errorMessage: undefined,
+    })
   })
 
   it("renders the title and body", () => {
@@ -107,6 +117,18 @@ describe("UsdConvertToBtcModal", () => {
     fireEvent.press(getByText("Approve"))
 
     expect(mockExecute).toHaveBeenCalledTimes(1)
+  })
+
+  it("renders the error box when the conversion reports an error", () => {
+    mockUseIntraLedgerConversion.mockReturnValue({
+      execute: mockExecute,
+      loading: false,
+      errorMessage: "Insufficient balance",
+    })
+
+    const { getByText } = renderModal()
+
+    expect(getByText("Insufficient balance")).toBeTruthy()
   })
 
   it("renders nothing when isVisible is false", () => {
