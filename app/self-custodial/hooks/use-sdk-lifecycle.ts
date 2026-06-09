@@ -4,6 +4,7 @@ import { AppState } from "react-native"
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import { type NormalizedTransaction } from "@app/types/transaction"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
@@ -35,12 +36,14 @@ import {
   appendTransactions,
   getSelfCustodialWalletSnapshot,
   loadMoreTransactions,
+  mergeOrderedTransactions,
 } from "../providers/wallet-snapshot"
 
 import { useBackoffRetry } from "./use-backoff-retry"
 
 type SdkLifecycleState = {
   wallets: WalletState[]
+  allTransactions: NormalizedTransaction[]
   status: ActiveWalletStatus
   sdk: BreezSdkInterface | null
   connectedAccountId: string | null
@@ -73,6 +76,7 @@ export const useSdkLifecycle = (
   retryCount: number,
 ): SdkLifecycleState => {
   const [wallets, setWallets] = useState<WalletState[]>([])
+  const [allTransactions, setAllTransactions] = useState<NormalizedTransaction[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
   const [sdkStableBalanceActive, setSdkStableBalanceActive] = useState<boolean>()
   const [lastReceivedPaymentId, setLastReceivedPaymentId] = useState<string | null>(null)
@@ -114,6 +118,7 @@ export const useSdkLifecycle = (
         )
         if (isStale()) return
         setWallets(snapshot.wallets)
+        setAllTransactions(snapshot.allTransactions)
         setHasMoreTransactions(snapshot.hasMore)
         rawTxOffsetRef.current = snapshot.rawTransactionCount // eslint-disable-line require-atomic-updates
 
@@ -163,11 +168,13 @@ export const useSdkLifecycle = (
     if (!activeSelfCustodialAccountId) {
       setStatus(ActiveWalletStatus.Unavailable)
       setWallets([])
+      setAllTransactions([])
       return
     }
 
     setStatus(ActiveWalletStatus.Loading)
     setWallets([])
+    setAllTransactions([])
 
     let mounted = true
     abortRef.current = false
@@ -286,6 +293,7 @@ export const useSdkLifecycle = (
       rawTxOffsetRef.current += result.rawCount
       setHasMoreTransactions(result.hasMore)
       setWallets((prev) => appendTransactions(prev, result.transactions))
+      setAllTransactions((prev) => mergeOrderedTransactions(prev, result.transactions))
     } catch (err) {
       logSdkEvent(SdkLogLevel.Error, `Failed to load more transactions: ${err}`)
     } finally {
@@ -306,6 +314,7 @@ export const useSdkLifecycle = (
 
   return {
     wallets,
+    allTransactions,
     status,
     sdk,
     connectedAccountId,

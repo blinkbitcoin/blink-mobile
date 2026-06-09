@@ -80,8 +80,11 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   const isAuthed = useIsAuthed()
   const client = useApolloClient()
   const activeWallet = useActiveWallet()
-  const { loadMore: selfCustodialLoadMore, refreshWallets: refreshSelfCustodialWallets } =
-    useSelfCustodialWallet()
+  const {
+    allTransactions: selfCustodialAllTransactions,
+    loadMore: selfCustodialLoadMore,
+    refreshWallets: refreshSelfCustodialWallets,
+  } = useSelfCustodialWallet()
   const [selfCustodialRefreshing, setSelfCustodialRefreshing] = React.useState(false)
   const { convertMoneyAmount, displayCurrency } = usePriceConversion()
   const { fractionDigits } = useDisplayCurrency()
@@ -161,12 +164,23 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   const allSelfCustodialFragments = React.useMemo(() => {
     if (!activeWallet.isSelfCustodial) return []
-    const allTxs = activeWallet.wallets.flatMap((w) => w.transactions)
+
     const describe = (tx: Parameters<typeof getTransactionDescription>[0]) =>
       getTransactionDescription(tx, LL)
-    const fragments = toTransactionFragments(allTxs, selfCustodialDisplayInfo, describe)
+
+    const fragments = toTransactionFragments(
+      selfCustodialAllTransactions,
+      selfCustodialDisplayInfo,
+      describe,
+    )
+
     return fragments.filter((tx) => tx.status !== TxStatus.Failure)
-  }, [activeWallet.isSelfCustodial, activeWallet.wallets, selfCustodialDisplayInfo, LL])
+  }, [
+    activeWallet.isSelfCustodial,
+    selfCustodialAllTransactions,
+    selfCustodialDisplayInfo,
+    LL,
+  ])
 
   const selfCustodialFragments = React.useMemo(() => {
     if (walletFilter === "ALL") return allSelfCustodialFragments
