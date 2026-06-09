@@ -2593,13 +2593,13 @@ const en: BaseTranslation = {
     learnMoreSelfCustodial: "Learn more",
   },
   StablesatsRestriction: {
-    modalTitle: "Stablesats is not available in your country",
+    modalTitle: "Stablesats is not available in your region",
     modalBody: "To get access to a dollar account, create a non-custodial account.",
     createNew: "Create new",
   },
   ConvertDollarToBitcoinModal: {
-    title: "Convert your Dollar balance to Bitcoin",
-    body: "Dollar account is no longer available in your region.",
+    title: "Dollar account is no longer available in your region",
+    body: "Transfer your Dollar balance to Bitcoin",
     youHave: "You have",
     youGet: "You get",
     approve: "Approve",

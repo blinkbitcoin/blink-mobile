@@ -2457,13 +2457,13 @@
         "removedAccount": "Du hast das Konto {identifier: string} entfernt."
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats ist in deinem Land nicht verfügbar",
+        "modalTitle": "Stablesats ist in deiner Region nicht verfügbar",
         "modalBody": "Um Zugriff auf ein Dollar-Konto zu erhalten, erstelle ein non-custodial Konto.",
         "createNew": "Neu erstellen"
     },
     "ConvertDollarToBitcoinModal": {
-        "title": "Wandle dein Dollar-Guthaben in Bitcoin um",
-        "body": "Das Dollar-Konto ist in deiner Region nicht mehr verfügbar.",
+        "title": "Das Dollar-Konto ist in deiner Region nicht mehr verfügbar",
+        "body": "Übertrage dein Dollar-Guthaben in Bitcoin",
         "youHave": "Du hast",
         "youGet": "Du erhältst",
         "approve": "Bestätigen"

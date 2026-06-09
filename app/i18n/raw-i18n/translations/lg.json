@@ -2457,13 +2457,13 @@
     "removedAccount": "Oggyewo akawunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats teriiwo mu nsi yo",
+    "modalTitle": "Stablesats teriiwo mu kitundu kyo",
     "modalBody": "Okusobola okufuna akawunti ya doola, kola akawunti etali ya kuterekebwa.",
     "createNew": "Kola eppya"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Kyusa ssente zo eza Doola zibe Bitcoin",
-    "body": "Akawunti ya Doola tekikyaliwo mu kitundu kyo.",
+    "title": "Akawunti ya Doola tekikyaliwo mu kitundu kyo",
+    "body": "Tambuza ssente zo eza Doola zibe Bitcoin",
     "youHave": "Olina",
     "youGet": "Ofuna",
     "approve": "Kkiriza"

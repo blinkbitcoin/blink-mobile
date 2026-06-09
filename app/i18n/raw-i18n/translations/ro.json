@@ -2457,13 +2457,13 @@
     "removedAccount": "Ați eliminat contul {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats nu este disponibil în țara ta",
+    "modalTitle": "Stablesats nu este disponibil în regiunea ta",
     "modalBody": "Pentru a accesa un cont în dolari, creează un cont non-custodial.",
     "createNew": "Crează cont nou"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Convertește soldul tău în dolari în Bitcoin",
-    "body": "Contul în dolari nu mai este disponibil în regiunea ta.",
+    "title": "Contul în dolari nu mai este disponibil în regiunea ta",
+    "body": "Transferă soldul tău în dolari în Bitcoin",
     "youHave": "Ai",
     "youGet": "Primești",
     "approve": "Aprobă"

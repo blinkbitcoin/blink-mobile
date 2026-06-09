@@ -2457,13 +2457,13 @@
     "removedAccount": "Du fjernede kontoen {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats er ikke tilgængelig i dit land",
+    "modalTitle": "Stablesats er ikke tilgængelig i din region",
     "modalBody": "For at få adgang til en dollarkonto skal du oprette en non-custodial konto.",
     "createNew": "Opret ny"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Konvertér din dollarsaldo til Bitcoin",
-    "body": "Dollarkontoen er ikke længere tilgængelig i din region.",
+    "title": "Dollarkontoen er ikke længere tilgængelig i din region",
+    "body": "Overfør din dollarsaldo til Bitcoin",
     "youHave": "Du har",
     "youGet": "Du får",
     "approve": "Godkend"

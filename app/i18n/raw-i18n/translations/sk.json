@@ -2457,13 +2457,13 @@
     "removedAccount": "Odstránili ste účet {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats nie je vo vašej krajine k dispozícii",
+    "modalTitle": "Stablesats nie je vo vašom regióne k dispozícii",
     "modalBody": "Ak chcete získať prístup k dolárovému účtu, vytvorte ne-úschovný účet.",
     "createNew": "Vytvoriť nový"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Preveďte svoj zostatok v dolároch na Bitcoin",
-    "body": "Dolárový účet už nie je vo vašom regióne dostupný.",
+    "title": "Dolárový účet už nie je vo vašom regióne dostupný",
+    "body": "Preveďte svoj zostatok v dolároch na Bitcoin",
     "youHave": "Máte",
     "youGet": "Získate",
     "approve": "Schváliť"

@@ -2457,13 +2457,13 @@
     "removedAccount": "Uklonili ste račun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats nije dostupan u vašoj zemlji",
+    "modalTitle": "Stablesats nije dostupan u vašoj regiji",
     "modalBody": "Za pristup dolarskom računu, izradite ne-skrbnički račun.",
     "createNew": "Izradi novi"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Pretvorite svoje stanje u dolarima u Bitcoin",
-    "body": "Račun u dolarima više nije dostupan u vašoj regiji.",
+    "title": "Račun u dolarima više nije dostupan u vašoj regiji",
+    "body": "Prebacite svoje stanje u dolarima u Bitcoin",
     "youHave": "Imate",
     "youGet": "Dobivate",
     "approve": "Odobri"

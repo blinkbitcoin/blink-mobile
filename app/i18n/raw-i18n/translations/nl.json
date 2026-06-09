@@ -2457,13 +2457,13 @@
     "removedAccount": "Je hebt account {identifier: string} verwijderd."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats is niet beschikbaar in jouw land",
+    "modalTitle": "Stablesats is niet beschikbaar in jouw regio",
     "modalBody": "Maak een non-custodial account aan om toegang te krijgen tot een dollar-account.",
     "createNew": "Nieuw aanmaken"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Zet je dollarsaldo om naar Bitcoin",
-    "body": "Het dollaraccount is niet langer beschikbaar in jouw regio.",
+    "title": "Het dollaraccount is niet langer beschikbaar in jouw regio",
+    "body": "Breng je dollarsaldo over naar Bitcoin",
     "youHave": "Je hebt",
     "youGet": "Je krijgt",
     "approve": "Goedkeuren"

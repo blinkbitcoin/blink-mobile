@@ -49,7 +49,7 @@ export const UsdConvertToBtcModal: React.FC<Props> = ({
     <CustomModal
       isVisible={isVisible}
       toggleModal={toggleModal}
-      image={<GaloyIcon name="clock" size={80} color={colors.primary3} />}
+      image={<GaloyIcon name="warning" size={80} color={colors.primary3} />}
       title={LL.ConvertDollarToBitcoinModal.title()}
       titleMaxWidth="100%"
       body={
@@ -66,7 +66,8 @@ export const UsdConvertToBtcModal: React.FC<Props> = ({
       primaryButtonOnPress={convertBalance}
       primaryButtonLoading={loading}
       primaryButtonDisabled={loading}
-      showCloseIconButton={true}
+      showCloseIconButton={false}
+      dismissable={false}
     />
   )
 }
