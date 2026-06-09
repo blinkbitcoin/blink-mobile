@@ -490,7 +490,8 @@ describe("SendBitcoinConfirmationScreen", () => {
         }
         const routes = action.payload?.routes ?? action.routes ?? []
         const completed = routes.find((r) => r.name === "sendBitcoinCompleted")
-        if (completed) return completed.params as { successAction?: unknown }
+        if (completed)
+          return completed.params as { successAction?: unknown; note?: unknown }
       }
       throw new Error("sendBitcoinCompleted route was not dispatched")
     }
@@ -558,6 +559,38 @@ describe("SendBitcoinConfirmationScreen", () => {
 
       const params = findCompletedRouteParams()
       expect(params.successAction).toEqual(successActionMessageMock)
+    })
+
+    it("forwards the payment memo as the note to the completed screen", async () => {
+      const memo = "Dinner split with Alice"
+      const { createLnurlPaymentDetails } = PaymentDetailsLightning
+      const paymentDetailWithMemo = {
+        ...createLnurlPaymentDetails(defaultLightningParams),
+        memo,
+      }
+      const routeWithMemo = {
+        key: "sendBitcoinConfirmationScreen",
+        name: "sendBitcoinConfirmation",
+        params: { paymentDetail: paymentDetailWithMemo },
+      } as const
+
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "SUCCESS",
+        extraInfo: { preimage: "p" },
+      })
+
+      render(
+        <ContextForScreen>
+          <LightningLnURL route={routeWithMemo} />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      const params = findCompletedRouteParams()
+      expect(params.note).toBe(memo)
     })
   })
 })

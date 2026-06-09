@@ -309,6 +309,7 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     status: statusRaw,
     successAction,
     preimage,
+    note,
     currencyAmount,
     satAmount,
     currencyFeeAmount,
@@ -332,7 +333,9 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
 
   const status = processStatus({ arrivalAtMempoolEstimate, status: statusRaw })
   const usernameTitle = data?.me?.username || LL.common.blinkUser()
-  const noteMessage = useSuccessMessage(successAction, preimage)
+  const successActionMessage = useSuccessMessage(successAction, preimage)
+  /** The Note shows the LNURL success action if present, otherwise the payment memo. */
+  const noteMessage = successActionMessage || note?.trim() || ""
   const Logo = mode === "dark" ? LogoDarkMode : LogoLightMode
 
   const { requestFeedback, showSuggestionModal, setShowSuggestionModal } =

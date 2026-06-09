@@ -226,6 +226,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 status,
                 successAction: extraInfo?.successAction ?? paymentDetail?.successAction,
                 preimage: extraInfo?.preimage,
+                note,
                 currencyAmount,
                 satAmount,
                 currencyFeeAmount,
@@ -297,6 +298,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     satAmount,
     currencyFeeAmount,
     satFeeAmount,
+    note,
     translateSdkError,
   ])
 
