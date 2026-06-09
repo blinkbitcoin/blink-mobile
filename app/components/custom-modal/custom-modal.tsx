@@ -33,6 +33,7 @@ export type CustomModalProps = {
   secondaryButtonOnPress?: () => void
   secondaryButtonLoading?: boolean
   showCloseIconButton?: boolean
+  dismissable?: boolean
   minHeight?: DimensionValue
   titleMaxWidth?: DimensionValue
   titleTextAlignment?: "auto" | "center" | "left" | "right" | "justify"
@@ -61,6 +62,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
   secondaryButtonOnPress,
   secondaryButtonLoading,
   showCloseIconButton = true,
+  dismissable = true,
   backgroundModalColor,
   titleFontSize,
 }) => {
@@ -85,7 +87,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
       backdropColor={colors.white}
       backdropTransitionOutTiming={0}
       avoidKeyboard={true}
-      onBackdropPress={toggleModal}
+      onBackdropPress={dismissable ? toggleModal : undefined}
     >
       <View style={styles.container}>
         <View style={styles.headerContainer}>
