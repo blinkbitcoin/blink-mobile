@@ -2713,7 +2713,7 @@
     "trialAccount": "บัญชีทดลอง",
     "blinkUser": "ผู้ใช้ Blink",
     "anonymous": "นิรนาม",
-    "anonymousUser": "ผู้ใช้ที่ไม่ระบุชื่อ",
+    "anonymousUser": "ผู้ใช้นิรนาม",
     "blinkToBlink": "Blink ไปยัง Blink",
     "transactionLimits": "จำกัดธุรกรรม",
     "activateWallet": "เปิดใช้งานกระเป๋า",

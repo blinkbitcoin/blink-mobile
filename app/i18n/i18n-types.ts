@@ -8894,7 +8894,7 @@ type RootTranslation = {
 		 */
 		anonymous: string
 		/**
-		 * A​n​o​n​y​m​o​u​s​ ​u​s​e​r
+		 * A​n​o​n​ ​u​s​e​r
 		 */
 		anonymousUser: string
 		/**
@@ -21138,7 +21138,7 @@ export type TranslationFunctions = {
 		 */
 		anonymous: () => LocalizedString
 		/**
-		 * Anonymous user
+		 * Anon user
 		 */
 		anonymousUser: () => LocalizedString
 		/**

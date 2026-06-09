@@ -2833,7 +2833,7 @@ const en: BaseTranslation = {
     trialAccount: "Trial Account",
     blinkUser: "Blink User",
     anonymous: "Anonymous",
-    anonymousUser: "Anonymous user",
+    anonymousUser: "Anon user",
     blinkToBlink: "Blink to Blink",
     transactionLimits: "Transaction limits",
     activateWallet: "Activate Wallet",
