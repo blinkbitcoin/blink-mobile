@@ -12,6 +12,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { type NormalizedTransaction } from "@app/types/transaction"
 import {
   AccountType,
   ActiveWalletStatus,
@@ -42,6 +43,7 @@ const reportLightningAddressError = (
 }
 
 type SelfCustodialWalletContextValue = ActiveWalletState & {
+  allTransactions: NormalizedTransaction[]
   retry: () => void
   sdk: BreezSdkInterface | null
   lightningAddress: string | null
@@ -59,6 +61,7 @@ const noop = async () => {}
 
 const defaultState: SelfCustodialWalletContextValue = {
   wallets: [],
+  allTransactions: [],
   status: ActiveWalletStatus.Unavailable,
   accountType: AccountType.SelfCustodial,
   retry: () => {},
@@ -87,6 +90,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
   const { stableBalanceEnabled } = useFeatureFlags()
   const {
     wallets,
+    allTransactions,
     status,
     sdk,
     connectedAccountId,
@@ -155,6 +159,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
   const value = useMemo(
     (): SelfCustodialWalletContextValue => ({
       wallets,
+      allTransactions,
       status,
       accountType: AccountType.SelfCustodial,
       retry,
@@ -171,6 +176,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     }),
     [
       wallets,
+      allTransactions,
       status,
       retry,
       sdk,

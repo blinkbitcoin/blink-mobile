@@ -88,6 +88,7 @@ const buildWallets = (
 
 export type WalletSnapshot = {
   wallets: WalletState[]
+  allTransactions: NormalizedTransaction[]
   hasMore: boolean
   rawTransactionCount: number
 }
@@ -123,10 +124,15 @@ export const getSelfCustodialWalletSnapshot = async (
       },
       transactions,
     ),
+    allTransactions: transactions,
     hasMore,
     rawTransactionCount,
   }
 }
+
+const dedupeTransactionsById = (
+  transactions: NormalizedTransaction[],
+): NormalizedTransaction[] => [...new Map(transactions.map((tx) => [tx.id, tx])).values()]
 
 export const appendTransactions = (
   wallets: WalletState[],
@@ -134,9 +140,19 @@ export const appendTransactions = (
 ): WalletState[] =>
   wallets.map((w) => {
     const compatible = newTxs.filter((tx) => tx.amount.currency === w.walletCurrency)
-    const merged = new Map([...w.transactions, ...compatible].map((tx) => [tx.id, tx]))
-    return { ...w, transactions: [...merged.values()] }
+    return {
+      ...w,
+      transactions: dedupeTransactionsById([...w.transactions, ...compatible]),
+    }
   })
+
+export const mergeOrderedTransactions = (
+  existing: NormalizedTransaction[],
+  incoming: NormalizedTransaction[],
+): NormalizedTransaction[] =>
+  dedupeTransactionsById([...existing, ...incoming]).sort(
+    (a, b) => b.timestamp - a.timestamp,
+  )
 
 export const loadMoreTransactions = async (
   sdk: BreezSdkInterface,

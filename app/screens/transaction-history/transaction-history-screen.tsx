@@ -22,15 +22,21 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { shouldHighlightById } from "@app/custodial/mappers/transaction-highlight"
 import { getTransactionDescription } from "@app/self-custodial/mappers/transaction-description"
 import { toTransactionFragments } from "@app/self-custodial/mappers/to-transaction-fragment"
+import {
+  resolveHighlightBaseline,
+  shouldHighlightByTimestamp,
+  type HighlightBaseline,
+} from "@app/self-custodial/mappers/transaction-highlight"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   WalletFilterDropdown,
   WalletValues,
 } from "@app/components/wallet-filter-dropdown"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useTransactionSeenState } from "@app/hooks"
+import { useHasTransitioned, useTransactionSeenState } from "@app/hooks"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 
 import { MemoizedTransactionItem } from "@app/components/transaction-item"
@@ -80,12 +86,16 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   const isAuthed = useIsAuthed()
   const client = useApolloClient()
   const activeWallet = useActiveWallet()
-  const { loadMore: selfCustodialLoadMore, refreshWallets: refreshSelfCustodialWallets } =
-    useSelfCustodialWallet()
+  const {
+    allTransactions: selfCustodialAllTransactions,
+    loadMore: selfCustodialLoadMore,
+    refreshWallets: refreshSelfCustodialWallets,
+  } = useSelfCustodialWallet()
   const [selfCustodialRefreshing, setSelfCustodialRefreshing] = React.useState(false)
   const { convertMoneyAmount, displayCurrency } = usePriceConversion()
   const { fractionDigits } = useDisplayCurrency()
   const { feeReimbursementMemo } = useRemoteConfig()
+  const hasTransitioned = useHasTransitioned()
 
   const [deferQueries, setDeferQueries] = React.useState(true)
 
@@ -161,12 +171,23 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   const allSelfCustodialFragments = React.useMemo(() => {
     if (!activeWallet.isSelfCustodial) return []
-    const allTxs = activeWallet.wallets.flatMap((w) => w.transactions)
+
     const describe = (tx: Parameters<typeof getTransactionDescription>[0]) =>
       getTransactionDescription(tx, LL)
-    const fragments = toTransactionFragments(allTxs, selfCustodialDisplayInfo, describe)
+
+    const fragments = toTransactionFragments(
+      selfCustodialAllTransactions,
+      selfCustodialDisplayInfo,
+      describe,
+    )
+
     return fragments.filter((tx) => tx.status !== TxStatus.Failure)
-  }, [activeWallet.isSelfCustodial, activeWallet.wallets, selfCustodialDisplayInfo, LL])
+  }, [
+    activeWallet.isSelfCustodial,
+    selfCustodialAllTransactions,
+    selfCustodialDisplayInfo,
+    LL,
+  ])
 
   const selfCustodialFragments = React.useMemo(() => {
     if (walletFilter === "ALL") return allSelfCustodialFragments
@@ -281,14 +302,26 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       : highlightBaselineLastSeen.usdId
   }, [highlightBaselineLastSeen])
 
+  const lastSeenCreatedAt = React.useMemo<HighlightBaseline>(() => {
+    if (!activeWallet.isSelfCustodial) return { btc: null, usd: null }
+
+    return resolveHighlightBaseline({
+      fragments: allSelfCustodialFragments,
+      baselineBtcId: highlightBaselineLastSeen?.btcId,
+      baselineUsdId: highlightBaselineLastSeen?.usdId,
+    })
+  }, [activeWallet.isSelfCustodial, allSelfCustodialFragments, highlightBaselineLastSeen])
+
   const shouldHighlightTransactionId = React.useCallback(
     ({
       txId,
+      createdAt,
       settlementCurrency,
       memo,
       direction,
     }: {
       txId: string
+      createdAt: number
       settlementCurrency?: WalletCurrency | null
       memo?: string | null
       direction?: TxDirection | null
@@ -299,30 +332,29 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       if (memo?.toLowerCase() === feeReimbursementMemo.toLowerCase()) return false
       if (direction !== TxDirection.Receive) return false
 
-      const lastSeenIdForCurrency =
-        settlementCurrency === WalletCurrency.Btc
-          ? highlightBaselineLastSeen.btcId
-          : settlementCurrency === WalletCurrency.Usd
-            ? highlightBaselineLastSeen.usdId
-            : ""
-
       const latestTxIdForCurrency =
         settlementCurrency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
 
-      if (walletFilter === "ALL") {
-        if (lastSeenIdForAll) {
-          return txId > lastSeenIdForCurrency && txId > lastSeenIdForAll
-        }
-        return lastSeenIdForCurrency
-          ? txId > lastSeenIdForCurrency
-          : txId === latestTxIdForCurrency
+      if (activeWallet.isSelfCustodial) {
+        return shouldHighlightByTimestamp({
+          createdAt,
+          baselineCreatedAt:
+            settlementCurrency === WalletCurrency.Btc
+              ? lastSeenCreatedAt.btc
+              : lastSeenCreatedAt.usd,
+          isLatestForCurrency: txId === latestTxIdForCurrency,
+        })
       }
 
-      if (settlementCurrency !== walletFilter) return false
-
-      return lastSeenIdForCurrency
-        ? txId > lastSeenIdForCurrency
-        : txId === latestTxIdForCurrency
+      return shouldHighlightById({
+        txId,
+        settlementCurrency,
+        walletFilter,
+        baselineBtcId: highlightBaselineLastSeen.btcId,
+        baselineUsdId: highlightBaselineLastSeen.usdId,
+        lastSeenIdForAll,
+        latestTxIdForCurrency,
+      })
     },
     [
       walletFilter,
@@ -332,6 +364,8 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       feeReimbursementMemo,
       latestBtcTxId,
       latestUsdTxId,
+      activeWallet.isSelfCustodial,
+      lastSeenCreatedAt,
     ],
   )
 
@@ -390,6 +424,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         testId={`transaction-by-index-${index}`}
         highlight={shouldHighlightTransactionId({
           txId: item.id,
+          createdAt: item.createdAt,
           settlementCurrency: item.settlementCurrency,
           memo: item.memo,
           direction: item.direction,
@@ -412,7 +447,14 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   const refreshing = activeWallet.isSelfCustodial ? selfCustodialRefreshing : loading
 
-  if (deferQueries || (!transactions && !activeWallet.isSelfCustodial)) {
+  const selfCustodialSettling = activeWallet.isSelfCustodial && !hasTransitioned
+
+  const showLoadingSkeleton =
+    deferQueries ||
+    (!transactions && !activeWallet.isSelfCustodial) ||
+    selfCustodialSettling
+
+  if (showLoadingSkeleton) {
     return (
       <Screen>
         <WalletFilterDropdown

@@ -120,8 +120,10 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 
 const mockRefreshSelfCustodialWallets = jest.fn().mockResolvedValue(undefined)
 const mockSelfCustodialLoadMore = jest.fn().mockResolvedValue(undefined)
+const mockSelfCustodialState: { allTransactions: unknown[] } = { allTransactions: [] }
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({
+    allTransactions: mockSelfCustodialState.allTransactions,
     loadMore: mockSelfCustodialLoadMore,
     refreshWallets: mockRefreshSelfCustodialWallets,
   }),
@@ -138,7 +140,9 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
   }),
 }))
 
+const mockTransitionState = { hasTransitioned: true }
 jest.mock("@app/hooks", () => ({
+  useHasTransitioned: () => mockTransitionState.hasTransitioned,
   useTransactionSeenState: () => ({
     hasUnseenBtcTx: false,
     hasUnseenUsdTx: false,
@@ -205,6 +209,8 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockTransitionState.hasTransitioned = true
+    mockSelfCustodialState.allTransactions = []
     mockToTransactionFragments.mockReturnValue([])
     mockUseApolloClient.mockReturnValue({
       cache: {
@@ -304,5 +310,70 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
     render(<TransactionHistoryScreen route={route} />)
 
     expect(mockCacheBatch).not.toHaveBeenCalled()
+  })
+  ;["ALL", "BTC", "USD"].forEach((currencyFilter) => {
+    it(`feeds the ordered allTransactions to the mapper for the ${currencyFilter} filter without reordering`, () => {
+      const ordered = [
+        { id: "usd-new", amount: { currency: "USD" }, timestamp: 400 },
+        { id: "btc-mid", amount: { currency: "BTC" }, timestamp: 300 },
+        { id: "usd-old", amount: { currency: "USD" }, timestamp: 100 },
+      ]
+      mockSelfCustodialState.allTransactions = ordered
+      setActiveWallet(true)
+
+      render(
+        <TransactionHistoryScreen
+          route={{ ...route, params: { ...route.params, currencyFilter } } as never}
+        />,
+      )
+
+      expect(mockToTransactionFragments.mock.calls[0][0]).toEqual(ordered)
+    })
+  })
+
+  it("keeps the skeleton until the enter transition finishes, even with data ready", () => {
+    mockTransitionState.hasTransitioned = false
+    mockSelfCustodialState.allTransactions = [
+      { id: "tx-1", amount: { currency: "BTC" }, timestamp: 1 },
+    ]
+    mockToTransactionFragments.mockReturnValue([
+      {
+        id: "tx-1",
+        status: "SUCCESS",
+        settlementCurrency: "BTC",
+        settlementAmount: 1000,
+      },
+    ])
+    setActiveWallet(true)
+
+    const { queryByTestId, UNSAFE_queryByType } = render(
+      <TransactionHistoryScreen route={route} />,
+    )
+
+    expect(queryByTestId("transaction-history-skeleton")).toBeTruthy()
+    expect(UNSAFE_queryByType(SectionList)).toBeNull()
+  })
+
+  it("renders the list once the enter transition finishes", () => {
+    mockTransitionState.hasTransitioned = true
+    mockSelfCustodialState.allTransactions = [
+      { id: "tx-1", amount: { currency: "BTC" }, timestamp: 1 },
+    ]
+    mockToTransactionFragments.mockReturnValue([
+      {
+        id: "tx-1",
+        status: "SUCCESS",
+        settlementCurrency: "BTC",
+        settlementAmount: 1000,
+      },
+    ])
+    setActiveWallet(true)
+
+    const { queryByTestId, UNSAFE_getByType } = render(
+      <TransactionHistoryScreen route={route} />,
+    )
+
+    expect(queryByTestId("transaction-history-skeleton")).toBeNull()
+    expect(UNSAFE_getByType(SectionList)).toBeTruthy()
   })
 })

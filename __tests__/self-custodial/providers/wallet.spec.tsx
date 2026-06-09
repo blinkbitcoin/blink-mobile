@@ -174,6 +174,12 @@ jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
   getSelfCustodialWalletSnapshot: jest.fn().mockResolvedValue([]),
   loadMoreTransactions: jest.fn().mockResolvedValue({ transactions: [], hasMore: false }),
   appendTransactions: jest.fn().mockImplementation((wallets: unknown) => wallets),
+  mergeOrderedTransactions: jest
+    .fn()
+    .mockImplementation((existing: unknown[] = [], incoming: unknown[] = []) => [
+      ...existing,
+      ...incoming,
+    ]),
 }))
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
