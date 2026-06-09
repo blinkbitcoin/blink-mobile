@@ -22,8 +22,14 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { shouldHighlightById } from "@app/custodial/mappers/transaction-highlight"
 import { getTransactionDescription } from "@app/self-custodial/mappers/transaction-description"
 import { toTransactionFragments } from "@app/self-custodial/mappers/to-transaction-fragment"
+import {
+  resolveHighlightBaseline,
+  shouldHighlightByTimestamp,
+  type HighlightBaseline,
+} from "@app/self-custodial/mappers/transaction-highlight"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   WalletFilterDropdown,
@@ -295,14 +301,26 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       : highlightBaselineLastSeen.usdId
   }, [highlightBaselineLastSeen])
 
+  const lastSeenCreatedAt = React.useMemo<HighlightBaseline>(() => {
+    if (!activeWallet.isSelfCustodial) return { btc: null, usd: null }
+
+    return resolveHighlightBaseline({
+      fragments: allSelfCustodialFragments,
+      baselineBtcId: highlightBaselineLastSeen?.btcId,
+      baselineUsdId: highlightBaselineLastSeen?.usdId,
+    })
+  }, [activeWallet.isSelfCustodial, allSelfCustodialFragments, highlightBaselineLastSeen])
+
   const shouldHighlightTransactionId = React.useCallback(
     ({
       txId,
+      createdAt,
       settlementCurrency,
       memo,
       direction,
     }: {
       txId: string
+      createdAt: number
       settlementCurrency?: WalletCurrency | null
       memo?: string | null
       direction?: TxDirection | null
@@ -313,30 +331,29 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       if (memo?.toLowerCase() === feeReimbursementMemo.toLowerCase()) return false
       if (direction !== TxDirection.Receive) return false
 
-      const lastSeenIdForCurrency =
-        settlementCurrency === WalletCurrency.Btc
-          ? highlightBaselineLastSeen.btcId
-          : settlementCurrency === WalletCurrency.Usd
-            ? highlightBaselineLastSeen.usdId
-            : ""
-
       const latestTxIdForCurrency =
         settlementCurrency === WalletCurrency.Btc ? latestBtcTxId : latestUsdTxId
 
-      if (walletFilter === "ALL") {
-        if (lastSeenIdForAll) {
-          return txId > lastSeenIdForCurrency && txId > lastSeenIdForAll
-        }
-        return lastSeenIdForCurrency
-          ? txId > lastSeenIdForCurrency
-          : txId === latestTxIdForCurrency
+      if (activeWallet.isSelfCustodial) {
+        return shouldHighlightByTimestamp({
+          createdAt,
+          baselineCreatedAt:
+            settlementCurrency === WalletCurrency.Btc
+              ? lastSeenCreatedAt.btc
+              : lastSeenCreatedAt.usd,
+          isLatestForCurrency: txId === latestTxIdForCurrency,
+        })
       }
 
-      if (settlementCurrency !== walletFilter) return false
-
-      return lastSeenIdForCurrency
-        ? txId > lastSeenIdForCurrency
-        : txId === latestTxIdForCurrency
+      return shouldHighlightById({
+        txId,
+        settlementCurrency,
+        walletFilter,
+        baselineBtcId: highlightBaselineLastSeen.btcId,
+        baselineUsdId: highlightBaselineLastSeen.usdId,
+        lastSeenIdForAll,
+        latestTxIdForCurrency,
+      })
     },
     [
       walletFilter,
@@ -346,6 +363,8 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       feeReimbursementMemo,
       latestBtcTxId,
       latestUsdTxId,
+      activeWallet.isSelfCustodial,
+      lastSeenCreatedAt,
     ],
   )
 
@@ -404,6 +423,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
         testId={`transaction-by-index-${index}`}
         highlight={shouldHighlightTransactionId({
           txId: item.id,
+          createdAt: item.createdAt,
           settlementCurrency: item.settlementCurrency,
           memo: item.memo,
           direction: item.direction,
