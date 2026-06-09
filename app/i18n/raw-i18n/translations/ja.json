@@ -3498,7 +3498,7 @@
                 "check3": "メッセージや電話でこの情報を求めている人はいません"
             },
             "Phrase": {
-                "headerTitle": "バックアップフレーズ",
+                "headerTitle": "リカバリーフレーズ",
                 "sparkCompatible": "このバックアップフレーズは{sparkCompatibleLink}で使用できます",
                 "sparkCompatibleLink": "Spark対応ウォレット",
                 "copiedToast": "バックアップフレーズをクリップボードにコピーしました",

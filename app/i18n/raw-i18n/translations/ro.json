@@ -3498,7 +3498,7 @@
         "check3": "Nimeni nu îmi cere aceste informații prin mesaj sau apel"
       },
       "Phrase": {
-        "headerTitle": "Frază de backup",
+        "headerTitle": "Frază de recuperare",
         "sparkCompatible": "Această frază de backup funcționează în orice {sparkCompatibleLink}",
         "sparkCompatibleLink": "portofel compatibil Spark",
         "copiedToast": "Fraza de backup copiată în clipboard",

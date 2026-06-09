@@ -3498,7 +3498,7 @@
         "check3": "Niemand vraagt mij om deze informatie via bericht of telefoontje"
       },
       "Phrase": {
-        "headerTitle": "Back-upzin",
+        "headerTitle": "Herstelzin",
         "sparkCompatible": "Deze back-upzin werkt in elke {sparkCompatibleLink}",
         "sparkCompatibleLink": "Spark-compatibele portemonnee",
         "copiedToast": "Back-upzin naar klembord gekopieerd",

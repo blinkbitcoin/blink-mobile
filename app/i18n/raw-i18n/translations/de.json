@@ -3498,7 +3498,7 @@
                 "check3": "Niemand fragt mich nach diesen Informationen per Nachricht oder Anruf"
             },
             "Phrase": {
-                "headerTitle": "Backup-Phrase",
+                "headerTitle": "Wiederherstellungsphrase",
                 "sparkCompatible": "Diese Sicherungswörter funktionieren in jeder {sparkCompatibleLink}",
                 "sparkCompatibleLink": "Spark-kompatiblen Wallet",
                 "copiedToast": "Sicherungswörter in die Zwischenablage kopiert",
