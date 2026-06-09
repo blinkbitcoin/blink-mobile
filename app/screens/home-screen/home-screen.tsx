@@ -13,14 +13,17 @@ import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { DisabledFeature } from "@app/components/disabled-feature"
 import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
+import { StablesatsRestrictionModal } from "@app/components/stablesats-restriction-modal"
+import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
 import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { toBtcMoneyAmount } from "@app/types/amounts"
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
@@ -40,9 +43,11 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
+import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { getErrorMessages } from "@app/graphql/utils"
+import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
@@ -346,6 +351,13 @@ export const HomeScreen: React.FC = () => {
   const [modalVisible, setModalVisible] = React.useState(false)
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
+  const [isRestrictionModalVisible, setIsRestrictionModalVisible] = React.useState(false)
+  const [isUsdConvertModalVisible, setIsUsdConvertModalVisible] = React.useState(false)
+  const isStablesatsRestricted = useStablesatsRestricted()
+
+  const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
+  const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
+  const restrictedUsdWalletBalance = restrictedUsdWallet?.balance ?? 0
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const openUpgradeModal = React.useCallback(() => {
@@ -406,6 +418,7 @@ export const HomeScreen: React.FC = () => {
 
     if (
       !isSelfCustodial &&
+      !isStablesatsRestricted &&
       target === "receiveBitcoin" &&
       !defaultAccountModalShown &&
       numberOfTxs >= TransactionCountToTriggerSetDefaultAccountModal &&
@@ -456,21 +469,29 @@ export const HomeScreen: React.FC = () => {
     | "conversionDetails"
   type IconNamesType = keyof typeof icons
 
-  const buttons = [
+  type HomeButton = {
+    title: string
+    target: Target
+    icon: IconNamesType
+    disabled?: boolean
+    onDisabledPress?: () => void
+  }
+
+  const buttons: HomeButton[] = [
     {
       title: LL.HomeScreen.receive(),
-      target: "receiveBitcoin" as Target,
-      icon: "receive" as IconNamesType,
+      target: "receiveBitcoin",
+      icon: "receive",
     },
     {
       title: LL.HomeScreen.send(),
-      target: "sendBitcoinDestination" as Target,
-      icon: "send" as IconNamesType,
+      target: "sendBitcoinDestination",
+      icon: "send",
     },
     {
       title: LL.HomeScreen.scan(),
-      target: "scanningQRCode" as Target,
-      icon: "qr-code" as IconNamesType,
+      target: "scanningQRCode",
+      icon: "qr-code",
     },
   ]
 
@@ -487,8 +508,10 @@ export const HomeScreen: React.FC = () => {
   if (shouldShowTransferButton) {
     buttons.unshift({
       title: LL.ConversionDetailsScreen.transfer(),
-      target: "conversionDetails" as Target,
-      icon: "transfer" as IconNamesType,
+      target: "conversionDetails",
+      icon: "transfer",
+      disabled: isStablesatsRestricted,
+      onDisabledPress: () => setIsRestrictionModalVisible(true),
     })
   }
 
@@ -539,6 +562,22 @@ export const HomeScreen: React.FC = () => {
           reopenUpgradeModal.current = true
         }}
       />
+      <StablesatsRestrictionModal
+        isVisible={isRestrictionModalVisible}
+        toggleModal={() => setIsRestrictionModalVisible(false)}
+        onDismiss={() => {
+          if (restrictedUsdWalletBalance > 0) setIsUsdConvertModalVisible(true)
+        }}
+      />
+      {restrictedUsdWallet && restrictedBtcWallet && (
+        <UsdConvertToBtcModal
+          isVisible={isUsdConvertModalVisible}
+          toggleModal={() => setIsUsdConvertModalVisible(false)}
+          usdWalletBalance={toUsdMoneyAmount(restrictedUsdWalletBalance)}
+          usdWalletId={restrictedUsdWallet.id}
+          btcWalletId={restrictedBtcWallet.id}
+        />
+      )}
       <View style={styles.balanceContainer}>
         <View style={styles.header}>
           <GaloyIconButton
@@ -602,6 +641,7 @@ export const HomeScreen: React.FC = () => {
         <WalletOverview
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
+          onRestrictedTap={() => setIsRestrictionModalVisible(true)}
           wallets={wallets}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
@@ -612,13 +652,18 @@ export const HomeScreen: React.FC = () => {
             <React.Fragment key={item.icon}>
               {item.icon === "qr-code" && <View style={styles.actionsSeparator} />}
               <View style={styles.button}>
-                <GaloyIconButton
-                  name={item.icon}
-                  size="large"
-                  weight="regular"
-                  text={item.title}
-                  onPress={() => onMenuClick(item.target)}
-                />
+                <DisabledFeature
+                  disabled={Boolean(item.disabled)}
+                  onDisabledPress={item.onDisabledPress}
+                >
+                  <GaloyIconButton
+                    name={item.icon}
+                    size="large"
+                    weight="regular"
+                    text={item.title}
+                    onPress={() => onMenuClick(item.target)}
+                  />
+                </DisabledFeature>
               </View>
             </React.Fragment>
           ))}

@@ -2456,6 +2456,18 @@
     "switchAccount": "Přepnuli jste na jiný účet",
     "removedAccount": "Odebrali jste účet {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats není ve vaší zemi k dispozici",
+    "modalBody": "Pro přístup k dolarovému účtu si vytvořte ne-custodial účet.",
+    "createNew": "Vytvořit nový"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Převeďte svůj zůstatek v dolarech na Bitcoin",
+    "body": "Dolarový účet již není ve vašem regionu dostupný.",
+    "youHave": "Máte",
+    "youGet": "Získáte",
+    "approve": "Schválit"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvoufaktorové ověření",
     "secret": "Tajný klíč/záloha",
@@ -2753,6 +2765,7 @@
     "needWallet": "Přihlašte se nebo si založte účet pro přístup k vaší peněžence",
     "next": "Další",
     "No": "Ne",
+    "notAvailable": "není k dispozici",
     "note": "Poznámka",
     "notification": "Upozornění",
     "ok": "OK",

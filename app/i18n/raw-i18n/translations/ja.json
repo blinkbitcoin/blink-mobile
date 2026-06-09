@@ -2456,6 +2456,18 @@
         "switchAccount": "別のアカウントに切り替えました",
         "removedAccount": "アカウント {identifier: string} を削除しました。"
     },
+    "StablesatsRestriction": {
+        "modalTitle": "あなたの国ではStablesatsをご利用いただけません",
+        "modalBody": "ドル口座にアクセスするには、ノンカストディアル口座を作成してください。",
+        "createNew": "新規作成"
+    },
+    "ConvertDollarToBitcoinModal": {
+        "title": "ドル残高をビットコインに変換",
+        "body": "ドルアカウントはお住まいの地域でご利用いただけなくなりました。",
+        "youHave": "保有額",
+        "youGet": "受取額",
+        "approve": "承認"
+    },
     "TotpRegistrationInitiateScreen": {
         "title": "2要素認証（2FA）",
         "secret": "シークレット/バックアップ",
@@ -2753,6 +2765,7 @@
         "needWallet": "ウォレットにアクセスするには、ログインするか、新たにウォレットを作成してください",
         "next": "次",
         "No": "いいえ",
+        "notAvailable": "利用不可",
         "note": "メモ",
         "notification": "通知",
         "ok": "OK",

@@ -2456,6 +2456,18 @@
     "switchAccount": "لقد انتقلت إلى حساب آخر",
     "removedAccount": "لقد أزلت الحساب {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats غير متاح في بلدك",
+    "modalBody": "للوصول إلى حساب الدولار، أنشئ حسابًا غير حافظ.",
+    "createNew": "إنشاء جديد"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "حوّل رصيدك بالدولار إلى بيتكوين",
+    "body": "لم يعد حساب الدولار متاحًا في منطقتك.",
+    "youHave": "لديك",
+    "youGet": "تحصل على",
+    "approve": "موافقة"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
     "secret": "الرمز السري/النسخ الاحتياطي",
@@ -2753,6 +2765,7 @@
     "needWallet": "Log in or create an account to access your wallet",
     "next": "التالي",
     "No": "لا",
+    "notAvailable": "غير متاح",
     "note": "ملاحظة ",
     "notification": "إشعار",
     "ok": "كل شيء على مايرام 👍",

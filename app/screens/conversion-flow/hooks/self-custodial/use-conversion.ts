@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import crashlytics from "@react-native-firebase/crashlytics"
 
-import { WalletCurrency } from "@app/graphql/generated"
+import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { type MoneyAmount, type WalletOrDisplayCurrency } from "@app/types/amounts"
@@ -9,7 +10,8 @@ import {
   PaymentResultStatus,
   type ConvertParams,
 } from "@app/types/payment"
-import { logConversionAttempt } from "@app/utils/analytics"
+import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
+import { triggerHapticFeedback } from "@app/utils/helper"
 
 import { buildConvertParams } from "../../build-convert-params"
 
@@ -19,27 +21,29 @@ type Params = {
   fromCurrency: WalletCurrency
   moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
   enabled: boolean
+  onSuccess: () => void
 }
-
-export type SelfCustodialConversionOutcome =
-  | { status: typeof PaymentResultStatus.Success }
-  | { status: typeof PaymentResultStatus.Failed; message: string }
 
 export type SelfCustodialConversionFlow = {
   isQuoting: boolean
   hasQuoteError: boolean
   feeText: string
   canExecute: boolean
-  execute: () => Promise<SelfCustodialConversionOutcome>
+  execute: () => Promise<void>
+  loading: boolean
+  errorMessage?: string
 }
 
 export const useSelfCustodialConversion = ({
   fromCurrency,
   moneyAmount,
   enabled,
+  onSuccess,
 }: Params): SelfCustodialConversionFlow => {
   const { convertMoneyAmount } = usePriceConversion()
   const { LL } = useI18nContext()
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | undefined>()
 
   const liveQuoteParams = useMemo(() => {
     if (!enabled || !convertMoneyAmount) return null
@@ -63,23 +67,49 @@ export const useSelfCustodialConversion = ({
     }
   }, [quote, snapshotParams, liveQuoteParams])
 
-  const execute = useCallback(async (): Promise<SelfCustodialConversionOutcome> => {
-    if (!quote) {
-      return { status: PaymentResultStatus.Failed, message: LL.errors.generic() }
+  const execute = async () => {
+    setLoading(true)
+    setErrorMessage(undefined)
+
+    try {
+      if (!quote) {
+        setErrorMessage(LL.errors.generic())
+        triggerHapticFeedback("notificationError")
+        return
+      }
+
+      logConversionAttempt({
+        sendingWallet: fromCurrency,
+        receivingWallet: oppositeWalletCurrency(fromCurrency),
+      })
+
+      const result = await quote.execute()
+      const isSuccess = result.status === PaymentResultStatus.Success
+
+      logConversionResult({
+        sendingWallet: fromCurrency,
+        receivingWallet: oppositeWalletCurrency(fromCurrency),
+        paymentStatus: isSuccess ? PaymentSendResult.Success : PaymentSendResult.Failure,
+      })
+
+      if (isSuccess) {
+        triggerHapticFeedback("notificationSuccess")
+        onSuccess()
+        return
+      }
+
+      setErrorMessage(result.errors?.[0]?.message ?? LL.errors.generic())
+      triggerHapticFeedback("notificationError")
+    } catch (err) {
+      if (err instanceof Error) {
+        crashlytics().recordError(err)
+        setErrorMessage(err.message)
+        triggerHapticFeedback("notificationError")
+      }
+    } finally {
+      setLoading(false)
     }
-    logConversionAttempt({
-      sendingWallet: fromCurrency,
-      receivingWallet: oppositeWalletCurrency(fromCurrency),
-    })
-    const result = await quote.execute()
-    if (result.status === PaymentResultStatus.Success) {
-      return { status: PaymentResultStatus.Success }
-    }
-    return {
-      status: PaymentResultStatus.Failed,
-      message: result.errors?.[0]?.message ?? LL.errors.generic(),
-    }
-  }, [quote, fromCurrency, LL])
+  }
 
   return {
     isQuoting,
@@ -87,5 +117,7 @@ export const useSelfCustodialConversion = ({
     feeText,
     canExecute: quote !== null,
     execute,
+    loading,
+    errorMessage,
   }
 }

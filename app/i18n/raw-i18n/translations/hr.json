@@ -2456,6 +2456,18 @@
     "switchAccount": "Prebacili ste se na drugi račun",
     "removedAccount": "Uklonili ste račun {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats nije dostupan u vašoj zemlji",
+    "modalBody": "Za pristup dolarskom računu, izradite ne-skrbnički račun.",
+    "createNew": "Izradi novi"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Pretvorite svoje stanje u dolarima u Bitcoin",
+    "body": "Račun u dolarima više nije dostupan u vašoj regiji.",
+    "youHave": "Imate",
+    "youGet": "Dobivate",
+    "approve": "Odobri"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvofaktorska autentifikacija",
     "secret": "Tajni ključ/sigurnosna kopija",
@@ -2753,6 +2765,7 @@
     "needWallet": "Prijavite se ili kreirajte račun za pristup svom novčaniku",
     "next": "Sljedeće",
     "No": "Ne",
+    "notAvailable": "nije dostupno",
     "note": "Bilješka",
     "notification": "Obavijest",
     "ok": "OK",

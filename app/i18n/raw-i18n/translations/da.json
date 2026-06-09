@@ -2456,6 +2456,18 @@
     "switchAccount": "Du skiftede til en anden konto",
     "removedAccount": "Du fjernede kontoen {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats er ikke tilgængelig i dit land",
+    "modalBody": "For at få adgang til en dollarkonto skal du oprette en non-custodial konto.",
+    "createNew": "Opret ny"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Konvertér din dollarsaldo til Bitcoin",
+    "body": "Dollarkontoen er ikke længere tilgængelig i din region.",
+    "youHave": "Du har",
+    "youGet": "Du får",
+    "approve": "Godkend"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "To-faktor godkendelse",
     "secret": "Hemmelighed/backup",
@@ -2753,6 +2765,7 @@
     "needWallet": "Log ind eller opret en konto for at få adgang til din tegnebog",
     "next": "Næste",
     "No": "Nej",
+    "notAvailable": "ikke tilgængelig",
     "note": "Note",
     "notification": "Notifikation",
     "ok": "OK",

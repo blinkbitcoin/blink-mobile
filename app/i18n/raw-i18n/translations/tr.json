@@ -2456,6 +2456,18 @@
     "switchAccount": "Başka bir hesaba geçiş yaptınız",
     "removedAccount": "{identifier: string} hesabını kaldırdınız."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats ülkenizde kullanılamıyor",
+    "modalBody": "Dolar hesabına erişmek için saklamasız bir hesap oluşturun.",
+    "createNew": "Yeni oluştur"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Dolar bakiyenizi Bitcoin'e dönüştürün",
+    "body": "Dolar hesabı artık bölgenizde kullanılamıyor.",
+    "youHave": "Sahip olduğunuz",
+    "youGet": "Alacağınız",
+    "approve": "Onayla"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "İki aşamalı doğrulama",
     "secret": "Gizli anahtar/yedek",
@@ -2753,6 +2765,7 @@
     "needWallet": "Cüzdanınıza erişmek için giriş yapın veya bir hesap oluşturun",
     "next": "İlerle",
     "No": "Hayır",
+    "notAvailable": "kullanılamıyor",
     "note": "Not",
     "notification": "Bildirim",
     "ok": "Tamam",

@@ -2456,6 +2456,18 @@
     "switchAccount": "Anda beralih ke akun lain",
     "removedAccount": "Anda menghapus akun {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats tidak tersedia di negara Anda",
+    "modalBody": "Untuk mengakses akun dolar, buat akun non-custodial.",
+    "createNew": "Buat baru"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Konversikan saldo Dolar Anda ke Bitcoin",
+    "body": "Akun Dolar tidak lagi tersedia di wilayah Anda.",
+    "youHave": "Anda punya",
+    "youGet": "Anda dapat",
+    "approve": "Setujui"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Otentikasi dua faktor",
     "secret": "Rahasia/cadangan",
@@ -2753,6 +2765,7 @@
     "needWallet": "Masuk atau buat akun untuk mengakses dompet Anda",
     "next": "Berikutnya",
     "No": "Tidak",
+    "notAvailable": "tidak tersedia",
     "note": "Catatan",
     "notification": "Notifikasi",
     "ok": "OK",

@@ -2456,6 +2456,18 @@
         "switchAccount": "Cambiaste a otra cuenta",
         "removedAccount": "Eliminaste la cuenta {identifier: string}."
     },
+    "StablesatsRestriction": {
+        "modalTitle": "Stablesats no está disponible en tu país",
+        "modalBody": "Para acceder a una cuenta en dólares, crea una cuenta no custodial.",
+        "createNew": "Crear nueva"
+    },
+    "ConvertDollarToBitcoinModal": {
+        "title": "Convierte tu saldo en dólares a Bitcoin",
+        "body": "La cuenta en dólares ya no está disponible en tu región.",
+        "youHave": "Tienes",
+        "youGet": "Recibes",
+        "approve": "Aprobar"
+    },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticación de dos factores",
         "secret": "código secreto/respaldo",
@@ -2752,6 +2764,7 @@
         "needWallet": "Inicia sesión o crea una cuenta para acceder a tu billetera",
         "next": "Siguiente",
         "No": "No",
+        "notAvailable": "no disponible",
         "note": "Nota ",
         "notification": "Notificación",
         "ok": "OK",

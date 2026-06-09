@@ -52,6 +52,7 @@ let mockSelfCustodialWalletOverride: Record<string, unknown> | null = null
 const mockToggleBalanceMode = jest.fn()
 // eslint-disable-next-line prefer-const
 let mockBalanceModeValue: "btc" | "usd" = "usd"
+let mockStablesatsRestrictedOverride = false
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () =>
@@ -82,7 +83,46 @@ jest.mock("@app/config/feature-flags-context", () => {
         nonCustodialEnabled: false,
         stableBalanceEnabled: false,
       },
+      stablesatsBlockedCountries: [],
     }),
+  }
+})
+
+jest.mock("@app/hooks/use-stablesats-restricted", () => ({
+  useStablesatsRestricted: () => mockStablesatsRestrictedOverride,
+}))
+
+jest.mock("@app/components/stablesats-restriction-modal", () => {
+  const ReactActual = jest.requireActual("react")
+  const { Pressable, Text } = jest.requireActual("react-native")
+  return {
+    StablesatsRestrictionModal: ({ onDismiss }: { onDismiss?: () => void }) =>
+      ReactActual.createElement(
+        Pressable,
+        { testID: "restriction-dismiss", onPress: onDismiss },
+        ReactActual.createElement(Text, null, "restriction"),
+      ),
+  }
+})
+
+jest.mock("@app/components/usd-convert-to-btc-modal", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View, Text } = jest.requireActual("react-native")
+  return {
+    UsdConvertToBtcModal: ({
+      isVisible,
+      usdWalletBalance,
+    }: {
+      isVisible: boolean
+      usdWalletBalance: { amount: number }
+    }) =>
+      isVisible
+        ? ReactActual.createElement(
+            View,
+            { testID: "convert-modal" },
+            ReactActual.createElement(Text, null, String(usdWalletBalance.amount)),
+          )
+        : null,
   }
 })
 
@@ -410,6 +450,7 @@ describe("HomeScreen", () => {
   beforeEach(() => {
     currentMocks = []
     mockActiveWalletOverride = null
+    mockStablesatsRestrictedOverride = false
     jest.clearAllMocks()
   })
 
@@ -539,6 +580,53 @@ describe("HomeScreen", () => {
     expect(queryByTestId("trust-model-modal")).toBeNull()
 
     mockActiveWalletOverride = null
+  })
+
+  describe("Stablesats restriction to USD convert modal chaining", () => {
+    it("opens the USD convert modal on restriction dismiss when there is a Dollar balance", async () => {
+      mockStablesatsRestrictedOverride = true
+      currentMocks = generateHomeMock({
+        level: AccountLevel.One,
+        network: Network.Mainnet,
+        btcBalance: 0,
+        usdBalance: 10001,
+      })
+
+      const { getByTestId, getByText, queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(queryByTestId("convert-modal")).toBeNull()
+
+      fireEvent.press(getByTestId("restriction-dismiss"))
+
+      expect(getByTestId("convert-modal")).toBeTruthy()
+      expect(getByText("10001")).toBeTruthy()
+    })
+
+    it("does not open the USD convert modal on dismiss when the Dollar balance is zero", async () => {
+      mockStablesatsRestrictedOverride = true
+      currentMocks = generateHomeMock({
+        level: AccountLevel.One,
+        network: Network.Mainnet,
+        btcBalance: 0,
+        usdBalance: 0,
+      })
+
+      const { getByTestId, queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      fireEvent.press(getByTestId("restriction-dismiss"))
+
+      expect(queryByTestId("convert-modal")).toBeNull()
+    })
   })
 
   describe("Stable Balance mode toggle (self-custodial)", () => {

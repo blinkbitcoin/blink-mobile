@@ -36,6 +36,7 @@ const AutoConvertPollIntervalMsKey = "autoConvertPollIntervalMs"
 const AutoConvertAmountMatchToleranceBpsKey = "autoConvertAmountMatchToleranceBps"
 const CustodialSignupBlockedCountriesKey = "custodialSignupBlockedCountries"
 const CustodialFirstSignupBlockedCountriesKey = "custodialFirstSignupBlockedCountries"
+const StablesatsBlockedCountriesKey = "stablesatsBlockedCountries"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -77,6 +78,7 @@ type RemoteConfig = {
   [AutoConvertAmountMatchToleranceBpsKey]: number
   [CustodialSignupBlockedCountriesKey]: string[]
   [CustodialFirstSignupBlockedCountriesKey]: string[]
+  [StablesatsBlockedCountriesKey]: string[]
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -131,6 +133,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   custodialSignupBlockedCountries: defaultCustodialBlocks.custodialSignupBlockedCountries,
   custodialFirstSignupBlockedCountries:
     defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
+  stablesatsBlockedCountries: ["HK"],
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -150,6 +153,9 @@ remoteConfigInstance().setDefaults({
   ),
   custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
     defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
+  ),
+  stablesatsBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.stablesatsBlockedCountries,
   ),
 })
 
@@ -266,6 +272,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           ReplaceCardDeliveryConfigKey,
           {},
         )
+
         const replaceCardDeliveryConfig: ReplaceCardDeliveryConfig = {
           ...defaultReplaceCardDeliveryConfig,
           ...parsedDeliveryConfig,
@@ -279,6 +286,11 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
         const custodialFirstSignupBlockedCountries = getRemoteConfigStringList(
           CustodialFirstSignupBlockedCountriesKey,
           defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
+        )
+
+        const stablesatsBlockedCountries = getRemoteConfigStringList(
+          StablesatsBlockedCountriesKey,
+          defaultRemoteConfig.stablesatsBlockedCountries,
         )
 
         setRemoteConfig({
@@ -306,6 +318,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           autoConvertAmountMatchToleranceBps,
           custodialSignupBlockedCountries,
           custodialFirstSignupBlockedCountries,
+          stablesatsBlockedCountries,
         })
       } catch (err) {
         logError({

@@ -2456,6 +2456,18 @@
     "switchAccount": "Okyusizza eri akawunti endala",
     "removedAccount": "Oggyewo akawunti {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats teriiwo mu nsi yo",
+    "modalBody": "Okusobola okufuna akawunti ya doola, kola akawunti etali ya kuterekebwa.",
+    "createNew": "Kola eppya"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Kyusa ssente zo eza Doola zibe Bitcoin",
+    "body": "Akawunti ya Doola tekikyaliwo mu kitundu kyo.",
+    "youHave": "Olina",
+    "youGet": "Ofuna",
+    "approve": "Kkiriza"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Okukakasa emirundi ebiri",
     "secret": "Ekyama/ekyokudda ku nnyuma",
@@ -2753,6 +2765,7 @@
     "needWallet": "Yingira oba tonda wo akawunti okusobola okwetuusako waleti yo",
     "next": "Ekiddako",
     "No": "Nedda",
+    "notAvailable": "tekiriiwo",
     "note": "Ebbaluwa",
     "notification": "Ekilango",
     "ok": "kale",

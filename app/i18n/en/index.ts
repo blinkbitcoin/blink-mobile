@@ -2592,6 +2592,18 @@ const en: BaseTranslation = {
       "In the Dollar account you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from the Dollar account, you will swap your stablecoins and send as Bitcoin to the recipient.",
     learnMoreSelfCustodial: "Learn more",
   },
+  StablesatsRestriction: {
+    modalTitle: "Stablesats is not available in your country",
+    modalBody: "To get access to a dollar account, create a non-custodial account.",
+    createNew: "Create new",
+  },
+  ConvertDollarToBitcoinModal: {
+    title: "Convert your Dollar balance to Bitcoin",
+    body: "Dollar account is no longer available in your region.",
+    youHave: "You have",
+    youGet: "You get",
+    approve: "Approve",
+  },
   SplashScreen: {
     update:
       "Your app is outdated. An update is needed before the app can be used.\n\nThis can be done from the PlayStore for Android and Testflight for iOS",
@@ -2873,6 +2885,7 @@ const en: BaseTranslation = {
     needWallet: "Log in or create an account to access your wallet",
     next: "Next",
     No: "No",
+    notAvailable: "not available",
     note: "Note",
     notification: "Notification",
     ok: "OK",

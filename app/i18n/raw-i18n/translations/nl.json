@@ -2456,6 +2456,18 @@
     "switchAccount": "Je bent gewisseld naar een ander account",
     "removedAccount": "Je hebt account {identifier: string} verwijderd."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats is niet beschikbaar in jouw land",
+    "modalBody": "Maak een non-custodial account aan om toegang te krijgen tot een dollar-account.",
+    "createNew": "Nieuw aanmaken"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Zet je dollarsaldo om naar Bitcoin",
+    "body": "Het dollaraccount is niet langer beschikbaar in jouw regio.",
+    "youHave": "Je hebt",
+    "youGet": "Je krijgt",
+    "approve": "Goedkeuren"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Tweefactorauthenticatie",
     "secret": "Geheim/back-up",
@@ -2753,6 +2765,7 @@
     "needWallet": "Log in of maak een account aan om toegang te krijgen tot uw wallet",
     "next": "Volgende",
     "No": "Nee",
+    "notAvailable": "niet beschikbaar",
     "note": "Noot",
     "notification": "Melding",
     "ok": "OK",

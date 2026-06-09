@@ -2456,6 +2456,18 @@
     "switchAccount": "Ați comutat pe alt cont",
     "removedAccount": "Ați eliminat contul {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats nu este disponibil în țara ta",
+    "modalBody": "Pentru a accesa un cont în dolari, creează un cont non-custodial.",
+    "createNew": "Crează cont nou"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Convertește soldul tău în dolari în Bitcoin",
+    "body": "Contul în dolari nu mai este disponibil în regiunea ta.",
+    "youHave": "Ai",
+    "youGet": "Primești",
+    "approve": "Aprobă"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificare cu doi factori",
     "secret": "Secret/backup",
@@ -2753,6 +2765,7 @@
     "needWallet": "Conectați-vă sau creați un cont pentru a vă accesa portofelul",
     "next": "Următorul",
     "No": "Nu",
+    "notAvailable": "indisponibil",
     "note": "Notă",
     "notification": "Notificare",
     "ok": "OK",

@@ -2456,6 +2456,18 @@
     "switchAccount": "Delays delays delays delays",
     "removedAccount": "Դուք հեռացրել եք {identifier: string} հաշիվը։"
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats-ը հասանելի չէ ձեր երկրում",
+    "modalBody": "Դոլարային հաշվին մուտք գործելու համար ստեղծեք ոչ-պահառու հաշիվ.",
+    "createNew": "Ստեղծել նոր"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Փոխարկեք ձեր դոլարային մնացորդը Bitcoin-ի",
+    "body": "Դոլարային հաշիվն այլևս հասանելի չէ ձեր տարածաշրջանում։",
+    "youHave": "Դուք ունեք",
+    "youGet": "Դուք կստանաք",
+    "approve": "Հաստատել"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Երկգործոն նույնականացում",
     "secret": "Գաղտնի / պահուստային պատճեն",
@@ -2753,6 +2765,7 @@
     "needWallet": "Մուտք գործել կամ ստեղծել հաշիվ՝ Ձեր դրամապանակ մուտք գործելու համար",
     "next": "Հաջորդը",
     "No": "Ոչ",
+    "notAvailable": "հասանելի չէ",
     "note": "Նշում",
     "notification": "Ծանուցում",
     "ok": "OK ",

@@ -2456,6 +2456,18 @@
     "switchAccount": "Bạn đã chuyển sang tài khoản khác",
     "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats không khả dụng tại quốc gia của bạn",
+    "modalBody": "Để truy cập tài khoản đô la, hãy tạo tài khoản không lưu ký.",
+    "createNew": "Tạo mới"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Chuyển đổi số dư Đô la của bạn sang Bitcoin",
+    "body": "Tài khoản Đô la không còn khả dụng ở khu vực của bạn.",
+    "youHave": "Bạn có",
+    "youGet": "Bạn nhận được",
+    "approve": "Phê duyệt"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
     "secret": "Khóa bí mật/sao lưu",
@@ -2753,6 +2765,7 @@
     "needWallet": "Log in or create an account to access your wallet",
     "next": "Tiếp theo",
     "No": "Không",
+    "notAvailable": "không khả dụng",
     "note": "Ghi chú",
     "notification": "Thông báo",
     "ok": "OK",

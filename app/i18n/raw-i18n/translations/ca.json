@@ -2456,6 +2456,18 @@
     "switchAccount": "Has canviat a un altre compte",
     "removedAccount": "Has eliminat el compte {identifier: string}."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats no està disponible al teu país",
+    "modalBody": "Per accedir a un compte en dòlars, crea un compte no custodial.",
+    "createNew": "Crea nou"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Converteix el teu saldo en dòlars a Bitcoin",
+    "body": "El compte en dòlars ja no està disponible a la teva regió.",
+    "youHave": "Tens",
+    "youGet": "Reps",
+    "approve": "Aprova"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificació de dos factors",
     "secret": "Secret/còpia de seguretat",
@@ -2753,6 +2765,7 @@
     "needWallet": "Inicia sessió o crea un compte per accedir al teu moneder",
     "next": "Següent",
     "No": "No",
+    "notAvailable": "no disponible",
     "note": "Nota",
     "notification": "Notificació",
     "ok": "D'acord",

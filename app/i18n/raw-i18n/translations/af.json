@@ -2456,6 +2456,18 @@
     "switchAccount": "Jy het na 'n ander rekening oorgeskakel",
     "removedAccount": "Jy het rekening {identifier: string} verwyder."
   },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats is nie beskikbaar in jou land nie",
+    "modalBody": "Om toegang tot 'n dollar-rekening te kry, skep 'n nie-bewaarende rekening.",
+    "createNew": "Skep nuwe"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Skakel jou Dollar-saldo om na Bitcoin",
+    "body": "Die Dollar-rekening is nie meer in jou streek beskikbaar nie.",
+    "youHave": "Jy het",
+    "youGet": "Jy kry",
+    "approve": "Keur goed"
+  },
   "TotpRegistrationInitiateScreen": {
     "title": "Twee-faktor-verifikasie",
     "secret": "Geheim/rugsteun",
@@ -2753,6 +2765,7 @@
     "needWallet": "Teken in om 'n rekening oop te maak en om toegang tot jou beursie te kry. ",
     "next": "Volgende",
     "No": "Nee",
+    "notAvailable": "nie beskikbaar",
     "note": "Nota",
     "notification": "Kennisgewing",
     "ok": "OK",
