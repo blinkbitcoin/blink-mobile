@@ -120,8 +120,10 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 
 const mockRefreshSelfCustodialWallets = jest.fn().mockResolvedValue(undefined)
 const mockSelfCustodialLoadMore = jest.fn().mockResolvedValue(undefined)
+const mockSelfCustodialState: { allTransactions: unknown[] } = { allTransactions: [] }
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({
+    allTransactions: mockSelfCustodialState.allTransactions,
     loadMore: mockSelfCustodialLoadMore,
     refreshWallets: mockRefreshSelfCustodialWallets,
   }),
@@ -205,6 +207,7 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSelfCustodialState.allTransactions = []
     mockToTransactionFragments.mockReturnValue([])
     mockUseApolloClient.mockReturnValue({
       cache: {
@@ -304,5 +307,24 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
     render(<TransactionHistoryScreen route={route} />)
 
     expect(mockCacheBatch).not.toHaveBeenCalled()
+  })
+  ;["ALL", "BTC", "USD"].forEach((currencyFilter) => {
+    it(`feeds the ordered allTransactions to the mapper for the ${currencyFilter} filter without reordering`, () => {
+      const ordered = [
+        { id: "usd-new", amount: { currency: "USD" }, timestamp: 400 },
+        { id: "btc-mid", amount: { currency: "BTC" }, timestamp: 300 },
+        { id: "usd-old", amount: { currency: "USD" }, timestamp: 100 },
+      ]
+      mockSelfCustodialState.allTransactions = ordered
+      setActiveWallet(true)
+
+      render(
+        <TransactionHistoryScreen
+          route={{ ...route, params: { ...route.params, currencyFilter } } as never}
+        />,
+      )
+
+      expect(mockToTransactionFragments.mock.calls[0][0]).toEqual(ordered)
+    })
   })
 })

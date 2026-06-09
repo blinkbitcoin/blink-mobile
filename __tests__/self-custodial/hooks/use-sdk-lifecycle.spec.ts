@@ -50,6 +50,12 @@ jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
     .fn()
     .mockResolvedValue({ transactions: [], hasMore: false, rawCount: 0 }),
   appendTransactions: jest.fn().mockImplementation((wallets: unknown) => wallets),
+  mergeOrderedTransactions: jest
+    .fn()
+    .mockImplementation((existing: unknown[] = [], incoming: unknown[] = []) => [
+      ...existing,
+      ...incoming,
+    ]),
 }))
 
 jest.mock("@app/self-custodial/providers/is-online", () => ({
@@ -102,6 +108,7 @@ describe("useSdkLifecycle", () => {
     mockValidateStoredNetwork.mockResolvedValue(true)
     mockGetSnapshot.mockResolvedValue({
       wallets: [],
+      allTransactions: [],
       hasMore: false,
       rawTransactionCount: 0,
     })
@@ -336,8 +343,12 @@ describe("useSdkLifecycle", () => {
       captureListener()
 
       const newTransactions = [{ id: "tx-1" }]
-      const { loadMoreTransactions: loadMoreMock, appendTransactions: appendMock } =
-        jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
+      const existingAllTransactions = [{ id: "tx-existing" }]
+      const {
+        loadMoreTransactions: loadMoreMock,
+        appendTransactions: appendMock,
+        mergeOrderedTransactions: mergeMock,
+      } = jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
       loadMoreMock.mockResolvedValue({
         transactions: newTransactions,
         hasMore: true,
@@ -347,6 +358,7 @@ describe("useSdkLifecycle", () => {
 
       mockGetSnapshot.mockResolvedValue({
         wallets: ["w1"],
+        allTransactions: existingAllTransactions,
         hasMore: true,
         rawTransactionCount: 0,
       })
@@ -363,6 +375,11 @@ describe("useSdkLifecycle", () => {
 
       expect(loadMoreMock).toHaveBeenCalledWith(sdk, 0)
       expect(appendMock).toHaveBeenCalledWith(["w1"], newTransactions)
+      expect(mergeMock).toHaveBeenCalledWith(existingAllTransactions, newTransactions)
+      expect(result.current.allTransactions).toEqual([
+        ...existingAllTransactions,
+        ...newTransactions,
+      ])
       expect(result.current.hasMoreTransactions).toBe(true)
     })
 

@@ -7,6 +7,7 @@ import {
   appendTransactions,
   getSelfCustodialWalletSnapshot,
   loadMoreTransactions,
+  mergeOrderedTransactions,
 } from "@app/self-custodial/providers/wallet-snapshot"
 
 const mockRecordError = jest.fn()
@@ -107,6 +108,56 @@ describe("getSelfCustodialWalletSnapshot", () => {
     const { wallets } = await getSelfCustodialWalletSnapshot(sdk as never)
 
     expect(wallets[0].transactions.length).toBeGreaterThanOrEqual(0)
+  })
+
+  it("returns allTransactions globally time-ordered, interleaving currencies", async () => {
+    const tokenDetails = {
+      tag: "Token",
+      inner: { metadata: { ticker: "USDB", decimals: 6, identifier: "test-token-id" } },
+    }
+    const btcDetails = { tag: "Lightning", inner: { description: "" } }
+    const payment = (p: {
+      id: string
+      timestamp: number
+      method: number
+      details: unknown
+    }) => ({
+      id: p.id,
+      paymentType: 1,
+      amount: BigInt(1000),
+      fees: BigInt(0),
+      timestamp: BigInt(p.timestamp),
+      status: 0,
+      method: p.method,
+      details: p.details,
+    })
+    const sdk = createMockSdk()
+    // SDK returns newest-first, interleaving USD (Token) and BTC (Lightning)
+    sdk.listPayments.mockResolvedValue({
+      payments: [
+        payment({ id: "usd-new", timestamp: 400, method: 2, details: tokenDetails }),
+        payment({ id: "btc-mid", timestamp: 300, method: 0, details: btcDetails }),
+        payment({ id: "usd-mid", timestamp: 200, method: 2, details: tokenDetails }),
+        payment({ id: "btc-old", timestamp: 100, method: 0, details: btcDetails }),
+      ],
+    })
+
+    const { allTransactions } = await getSelfCustodialWalletSnapshot(sdk as never)
+
+    expect(allTransactions.map((t) => t.id)).toEqual([
+      "usd-new",
+      "btc-mid",
+      "usd-mid",
+      "btc-old",
+    ])
+    expect(allTransactions.map((t) => t.amount.currency)).toEqual([
+      WalletCurrency.Usd,
+      WalletCurrency.Btc,
+      WalletCurrency.Usd,
+      WalletCurrency.Btc,
+    ])
+    const timestamps = allTransactions.map((t) => t.timestamp)
+    expect(timestamps).toEqual([...timestamps].sort((a, b) => b - a))
   })
 })
 
@@ -299,12 +350,16 @@ describe("getSelfCustodialWalletSnapshot pagination preservation", () => {
   })
 })
 
-const buildTx = (id: string, currency: WalletCurrency): NormalizedTransaction => ({
+const buildTx = (
+  id: string,
+  currency: WalletCurrency,
+  timestamp = 1,
+): NormalizedTransaction => ({
   id,
   amount: toWalletMoneyAmount(1, currency),
   direction: "receive",
   status: "completed",
-  timestamp: 1,
+  timestamp,
   paymentType: "lightning",
   sourceAccountType: AccountType.SelfCustodial,
 })
@@ -432,5 +487,31 @@ describe("isKnownPayment crashlytics reporting", () => {
     })
     expect(reportedErrors).toHaveLength(1)
     expect(reportedErrors[0][0].message).toContain("expected=test-token-id")
+  })
+})
+
+describe("mergeOrderedTransactions", () => {
+  it("dedupes by id and keeps the list newest-first", () => {
+    const existing = [
+      buildTx("a", WalletCurrency.Usd, 300),
+      buildTx("c", WalletCurrency.Btc, 100),
+    ]
+    const incoming = [
+      buildTx("c", WalletCurrency.Btc, 100),
+      buildTx("b", WalletCurrency.Usd, 200),
+    ]
+
+    const result = mergeOrderedTransactions(existing, incoming)
+
+    expect(result.map((t) => t.id)).toEqual(["a", "b", "c"])
+  })
+
+  it("sorts an out-of-order older page after existing newer transactions", () => {
+    const existing = [buildTx("new", WalletCurrency.Usd, 500)]
+    const olderPage = [buildTx("old", WalletCurrency.Btc, 50)]
+
+    const result = mergeOrderedTransactions(existing, olderPage)
+
+    expect(result.map((t) => t.id)).toEqual(["new", "old"])
   })
 })
