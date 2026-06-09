@@ -449,11 +449,12 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   const selfCustodialSettling = activeWallet.isSelfCustodial && !hasTransitioned
 
-  if (
+  const showLoadingSkeleton =
     deferQueries ||
     (!transactions && !activeWallet.isSelfCustodial) ||
     selfCustodialSettling
-  ) {
+
+  if (showLoadingSkeleton) {
     return (
       <Screen>
         <WalletFilterDropdown
