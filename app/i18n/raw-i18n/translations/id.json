@@ -2457,13 +2457,13 @@
     "removedAccount": "Anda menghapus akun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats tidak tersedia di negara Anda",
+    "modalTitle": "Stablesats tidak tersedia di wilayah Anda",
     "modalBody": "Untuk mengakses akun dolar, buat akun non-custodial.",
     "createNew": "Buat baru"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Konversikan saldo Dolar Anda ke Bitcoin",
-    "body": "Akun Dolar tidak lagi tersedia di wilayah Anda.",
+    "title": "Akun Dolar tidak lagi tersedia di wilayah Anda",
+    "body": "Pindahkan saldo Dolar Anda ke Bitcoin",
     "youHave": "Anda punya",
     "youGet": "Anda dapat",
     "approve": "Setujui"

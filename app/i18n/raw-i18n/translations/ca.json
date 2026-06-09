@@ -2457,13 +2457,13 @@
     "removedAccount": "Has eliminat el compte {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats no està disponible al teu país",
+    "modalTitle": "Stablesats no està disponible a la teva regió",
     "modalBody": "Per accedir a un compte en dòlars, crea un compte no custodial.",
     "createNew": "Crea nou"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Converteix el teu saldo en dòlars a Bitcoin",
-    "body": "El compte en dòlars ja no està disponible a la teva regió.",
+    "title": "El compte en dòlars ja no està disponible a la teva regió",
+    "body": "Transfereix el teu saldo en dòlars a Bitcoin",
     "youHave": "Tens",
     "youGet": "Reps",
     "approve": "Aprova"

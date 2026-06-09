@@ -2457,13 +2457,13 @@
     "removedAccount": "Umeondoa akaunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats haipatikani katika nchi yako",
+    "modalTitle": "Stablesats haipatikani katika eneo lako",
     "modalBody": "Ili kufikia akaunti ya dola, unda akaunti isiyo ya ulinzi.",
     "createNew": "Unda mpya"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Badilisha salio lako la Dola kuwa Bitcoin",
-    "body": "Akaunti ya Dola haipatikani tena katika eneo lako.",
+    "title": "Akaunti ya Dola haipatikani tena katika eneo lako",
+    "body": "Hamisha salio lako la Dola kuwa Bitcoin",
     "youHave": "Una",
     "youGet": "Unapata",
     "approve": "Idhinisha"

@@ -2457,13 +2457,13 @@
     "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats không khả dụng tại quốc gia của bạn",
+    "modalTitle": "Stablesats không khả dụng tại khu vực của bạn",
     "modalBody": "Để truy cập tài khoản đô la, hãy tạo tài khoản không lưu ký.",
     "createNew": "Tạo mới"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Chuyển đổi số dư Đô la của bạn sang Bitcoin",
-    "body": "Tài khoản Đô la không còn khả dụng ở khu vực của bạn.",
+    "title": "Tài khoản Đô la không còn khả dụng ở khu vực của bạn",
+    "body": "Chuyển số dư Đô la của bạn sang Bitcoin",
     "youHave": "Bạn có",
     "youGet": "Bạn nhận được",
     "approve": "Phê duyệt"

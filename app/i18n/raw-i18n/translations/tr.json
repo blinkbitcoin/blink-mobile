@@ -2457,13 +2457,13 @@
     "removedAccount": "{identifier: string} hesabını kaldırdınız."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats ülkenizde kullanılamıyor",
+    "modalTitle": "Stablesats bölgenizde kullanılamıyor",
     "modalBody": "Dolar hesabına erişmek için saklamasız bir hesap oluşturun.",
     "createNew": "Yeni oluştur"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dolar bakiyenizi Bitcoin'e dönüştürün",
-    "body": "Dolar hesabı artık bölgenizde kullanılamıyor.",
+    "title": "Dolar hesabı artık bölgenizde kullanılamıyor",
+    "body": "Dolar bakiyenizi Bitcoin'e aktarın",
     "youHave": "Sahip olduğunuz",
     "youGet": "Alacağınız",
     "approve": "Onayla"

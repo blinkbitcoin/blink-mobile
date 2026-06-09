@@ -8137,7 +8137,7 @@ type RootTranslation = {
 	}
 	StablesatsRestriction: {
 		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​c​o​u​n​t​r​y
+		 * S​t​a​b​l​e​s​a​t​s​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		modalTitle: string
 		/**
@@ -8151,11 +8151,11 @@ type RootTranslation = {
 	}
 	ConvertDollarToBitcoinModal: {
 		/**
-		 * C​o​n​v​e​r​t​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n
+		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		title: string
 		/**
-		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.
+		 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n
 		 */
 		body: string
 		/**
@@ -20400,7 +20400,7 @@ export type TranslationFunctions = {
 	}
 	StablesatsRestriction: {
 		/**
-		 * Stablesats is not available in your country
+		 * Stablesats is not available in your region
 		 */
 		modalTitle: () => LocalizedString
 		/**
@@ -20414,11 +20414,11 @@ export type TranslationFunctions = {
 	}
 	ConvertDollarToBitcoinModal: {
 		/**
-		 * Convert your Dollar balance to Bitcoin
+		 * Dollar account is no longer available in your region
 		 */
 		title: () => LocalizedString
 		/**
-		 * Dollar account is no longer available in your region.
+		 * Transfer your Dollar balance to Bitcoin
 		 */
 		body: () => LocalizedString
 		/**

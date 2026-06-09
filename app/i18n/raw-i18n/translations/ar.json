@@ -2457,13 +2457,13 @@
     "removedAccount": "لقد أزلت الحساب {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats غير متاح في بلدك",
+    "modalTitle": "Stablesats غير متاح في منطقتك",
     "modalBody": "للوصول إلى حساب الدولار، أنشئ حسابًا غير حافظ.",
     "createNew": "إنشاء جديد"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "حوّل رصيدك بالدولار إلى بيتكوين",
-    "body": "لم يعد حساب الدولار متاحًا في منطقتك.",
+    "title": "لم يعد حساب الدولار متاحًا في منطقتك",
+    "body": "انقل رصيدك بالدولار إلى بيتكوين",
     "youHave": "لديك",
     "youGet": "تحصل على",
     "approve": "موافقة"

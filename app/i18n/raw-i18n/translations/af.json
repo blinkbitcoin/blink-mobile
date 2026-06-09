@@ -2457,13 +2457,13 @@
     "removedAccount": "Jy het rekening {identifier: string} verwyder."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats is nie beskikbaar in jou land nie",
+    "modalTitle": "Stablesats is nie beskikbaar in jou streek nie",
     "modalBody": "Om toegang tot 'n dollar-rekening te kry, skep 'n nie-bewaarende rekening.",
     "createNew": "Skep nuwe"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Skakel jou Dollar-saldo om na Bitcoin",
-    "body": "Die Dollar-rekening is nie meer in jou streek beskikbaar nie.",
+    "title": "Die Dollar-rekening is nie meer in jou streek beskikbaar nie",
+    "body": "Dra jou Dollar-saldo oor na Bitcoin",
     "youHave": "Jy het",
     "youGet": "Jy kry",
     "approve": "Keur goed"

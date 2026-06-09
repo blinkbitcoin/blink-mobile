@@ -31,7 +31,7 @@ describe("StablesatsRestrictionModal", () => {
       wrap(<StablesatsRestrictionModal isVisible={true} toggleModal={jest.fn()} />),
     )
 
-    expect(getByText("Stablesats is not available in your country")).toBeTruthy()
+    expect(getByText("Stablesats is not available in your region")).toBeTruthy()
   })
 
   it("renders the new body copy nudging users to a non-custodial account", () => {
@@ -117,6 +117,6 @@ describe("StablesatsRestrictionModal", () => {
       wrap(<StablesatsRestrictionModal isVisible={false} toggleModal={jest.fn()} />),
     )
 
-    expect(queryByText("Stablesats is not available in your country")).toBeNull()
+    expect(queryByText("Stablesats is not available in your region")).toBeNull()
   })
 })

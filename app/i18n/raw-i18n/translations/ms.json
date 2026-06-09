@@ -2457,13 +2457,13 @@
     "removedAccount": "Anda telah mengalih keluar akaun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats tidak tersedia di negara anda",
+    "modalTitle": "Stablesats tidak tersedia di rantau anda",
     "modalBody": "Untuk mengakses akaun dolar, cipta akaun bukan kustodian.",
     "createNew": "Cipta baharu"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Tukar baki Dolar anda kepada Bitcoin",
-    "body": "Akaun Dolar tidak lagi tersedia di rantau anda.",
+    "title": "Akaun Dolar tidak lagi tersedia di rantau anda",
+    "body": "Pindahkan baki Dolar anda kepada Bitcoin",
     "youHave": "Anda ada",
     "youGet": "Anda dapat",
     "approve": "Luluskan"
