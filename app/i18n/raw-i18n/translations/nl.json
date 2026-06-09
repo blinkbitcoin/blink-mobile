@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Ongeldige postcode, waarschijnlijk een typefout",
       "invalidRegion": "Ongeldige regioselectie"
     },
-    "passwordTooWeak": "Het wachtwoord is te zwak. Gebruik een combinatie van hoofdletters, kleine letters, cijfers en speciale tekens.",
-    "passwordCommon": "Dit wachtwoord komt te vaak voor. Kies een sterker wachtwoord.",
     "copied": "Gekopieerd naar klembord"
   },
   "errors": {

@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Codi postal no vàlid, probablement un error tipogràfic",
       "invalidRegion": "Selecció de regió no vàlida"
     },
-    "passwordTooWeak": "La contrasenya és massa feble. Fes servir una combinació de majúscules, minúscules, números i caràcters especials.",
-    "passwordCommon": "Aquesta contrasenya és massa comuna. Si us plau, tria una contrasenya més segura.",
     "copied": "Copiat al porta-retalls"
   },
   "errors": {

@@ -9382,14 +9382,6 @@ type RootTranslation = {
 			 */
 			invalidRegion: string
 		}
-		/**
-		 * P​a​s​s​w​o​r​d​ ​i​s​ ​t​o​o​ ​w​e​a​k​.​ ​U​s​e​ ​a​ ​m​i​x​ ​o​f​ ​u​p​p​e​r​c​a​s​e​,​ ​l​o​w​e​r​c​a​s​e​,​ ​n​u​m​b​e​r​s​,​ ​a​n​d​ ​s​p​e​c​i​a​l​ ​c​h​a​r​a​c​t​e​r​s​.
-		 */
-		passwordTooWeak: string
-		/**
-		 * T​h​i​s​ ​p​a​s​s​w​o​r​d​ ​i​s​ ​t​o​o​ ​c​o​m​m​o​n​.​ ​P​l​e​a​s​e​ ​c​h​o​o​s​e​ ​a​ ​s​t​r​o​n​g​e​r​ ​p​a​s​s​w​o​r​d​.
-		 */
-		passwordCommon: string
 	}
 	errors: {
 		/**
@@ -21622,14 +21614,6 @@ export type TranslationFunctions = {
 			 */
 			invalidRegion: () => LocalizedString
 		}
-		/**
-		 * Password is too weak. Use a mix of uppercase, lowercase, numbers, and special characters.
-		 */
-		passwordTooWeak: () => LocalizedString
-		/**
-		 * This password is too common. Please choose a stronger password.
-		 */
-		passwordCommon: () => LocalizedString
 	}
 	errors: {
 		/**

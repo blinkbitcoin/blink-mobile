@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Poskod tidak sah, mungkin kesilapan taip",
       "invalidRegion": "Pilihan wilayah tidak sah"
     },
-    "passwordTooWeak": "Kata laluan terlalu lemah. Gunakan gabungan huruf besar, huruf kecil, nombor dan aksara khas.",
-    "passwordCommon": "Kata laluan ini terlalu biasa. Sila pilih kata laluan yang lebih kukuh.",
     "copied": "Disalin ke papan klip"
   },
   "errors": {

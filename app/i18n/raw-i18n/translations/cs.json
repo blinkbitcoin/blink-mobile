@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Neplatné PSČ, pravděpodobně překlep",
       "invalidRegion": "Neplatný výběr regionu"
     },
-    "passwordTooWeak": "Heslo je příliš slabé. Použijte kombinaci velkých a malých písmen, čísel a speciálních znaků.",
-    "passwordCommon": "Toto heslo je příliš běžné. Zvolte prosím silnější heslo.",
     "copied": "Zkopírováno do schránky"
   },
   "errors": {

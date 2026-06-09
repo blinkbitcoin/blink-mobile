@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Érvénytelen irányítószám, valószínűleg elgépelés",
       "invalidRegion": "Érvénytelen régióválasztás"
     },
-    "passwordTooWeak": "A jelszó túl gyenge. Használjon kis- és nagybetűket, számokat és speciális karaktereket.",
-    "passwordCommon": "Ez a jelszó túl gyakori. Kérjük, válasszon erősebb jelszót.",
     "copied": "Vágólapra másolva"
   },
   "errors": {

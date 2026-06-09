@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Kode pos tidak valid, mungkin salah ketik",
       "invalidRegion": "Pilihan wilayah tidak valid"
     },
-    "passwordTooWeak": "Kata sandi terlalu lemah. Gunakan kombinasi huruf besar, huruf kecil, angka, dan karakter khusus.",
-    "passwordCommon": "Kata sandi ini terlalu umum. Silakan pilih kata sandi yang lebih kuat.",
     "copied": "Disalin ke clipboard"
   },
   "errors": {

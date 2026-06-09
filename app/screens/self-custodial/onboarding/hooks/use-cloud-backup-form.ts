@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { validatePassword, PasswordIssue } from "@app/utils/validators/password"
+import { validatePassword } from "@app/utils/validators/password"
 
 export const useCloudBackupForm = () => {
   const { LL } = useI18nContext()
@@ -48,22 +48,14 @@ export const useCloudBackupForm = () => {
     if (confirmPassword.length === 0) setConfirmPasswordTouched(false)
   }, [confirmPassword])
 
-  const passwordValidation = useMemo(() => {
-    if (!isEncrypted || password.length === 0) return null
-    return validatePassword(password)
-  }, [isEncrypted, password])
+  const isPasswordValid = useMemo(() => validatePassword(password).valid, [password])
 
   const passwordError = useMemo(() => {
-    if (!passwordTouched || !passwordValidation || passwordValidation.valid) {
+    if (!passwordTouched || !isEncrypted || password.length === 0 || isPasswordValid) {
       return undefined
     }
-    const { errors } = passwordValidation
-    if (errors.includes(PasswordIssue.TooShort))
-      return LL.BackupScreen.CloudBackup.passwordTooShort()
-    if (errors.includes(PasswordIssue.CommonPassword)) return LL.common.passwordCommon()
-    if (errors.includes(PasswordIssue.TooWeak)) return LL.common.passwordTooWeak()
-    return undefined
-  }, [passwordTouched, passwordValidation, LL])
+    return LL.BackupScreen.CloudBackup.passwordTooShort()
+  }, [passwordTouched, isEncrypted, password, isPasswordValid, LL])
 
   const confirmPasswordError = useMemo(() => {
     if (!confirmPasswordTouched || !isEncrypted || confirmPassword.length === 0) {
@@ -76,10 +68,10 @@ export const useCloudBackupForm = () => {
 
   const isValid = useMemo(() => {
     if (!isEncrypted) return true
-    if (!passwordValidation?.valid) return false
+    if (!isPasswordValid) return false
     if (confirmPassword !== password) return false
     return true
-  }, [isEncrypted, password, confirmPassword, passwordValidation])
+  }, [isEncrypted, password, confirmPassword, isPasswordValid])
 
   return {
     isEncrypted,

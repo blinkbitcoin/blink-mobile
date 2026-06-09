@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Ugyldigt postnummer, sandsynligvis en tastefejl",
       "invalidRegion": "Ugyldigt regionsvalg"
     },
-    "passwordTooWeak": "Adgangskoden er for svag. Brug en kombination af store og små bogstaver, tal og specialtegn.",
-    "passwordCommon": "Denne adgangskode er for almindelig. Vælg venligst en stærkere adgangskode.",
     "copied": "Kopieret til udklipsholder"
   },
   "errors": {

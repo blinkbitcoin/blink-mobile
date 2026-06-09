@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Ikhowudi yeposi engekho mthethweni, mhlawumbi yimpazamo yokutayipha",
       "invalidRegion": "Ukukhetha kwengingqi okungekho semthethweni"
     },
-    "passwordTooWeak": "Iphasiwedi ibuthathaka kakhulu. Sebenzisa indibaniselwano yoonobumba abakhulu, abancinci, amanani neempawu ezizodwa.",
-    "passwordCommon": "Le phasiwedi ixhaphake kakhulu. Nceda ukhethe iphasiwedi eyomeleleyo ngakumbi.",
     "copied": "Ikhutshelwe kwi-clipboard"
   },
   "errors": {

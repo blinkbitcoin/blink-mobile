@@ -2836,9 +2836,7 @@
             "minChars": "Debe tener al menos {min} caracteres",
             "invalidPostalCode": "Código postal no válido, probablemente un error tipográfico",
             "invalidRegion": "Selección de región no válida"
-        },
-        "passwordTooWeak": "La contraseña es demasiado débil. Usa una combinación de mayúsculas, minúsculas, números y caracteres especiales.",
-        "passwordCommon": "Esta contraseña es demasiado común. Elige una contraseña más segura."
+        }
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",

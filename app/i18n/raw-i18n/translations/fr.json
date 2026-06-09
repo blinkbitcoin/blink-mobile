@@ -2836,8 +2836,6 @@
             "invalidPostalCode": "Code postal invalide, probablement une faute de frappe",
             "invalidRegion": "Sélection de région non valide"
         },
-        "passwordTooWeak": "Le mot de passe est trop faible. Utilisez une combinaison de majuscules, minuscules, chiffres et caractères spéciaux.",
-        "passwordCommon": "Ce mot de passe est trop courant. Veuillez choisir un mot de passe plus robuste.",
         "copied": "Copié dans le presse-papiers"
     },
     "errors": {

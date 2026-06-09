@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Mana allin código postal, ichapas pantasqa qillqay",
       "invalidRegion": "Mana allin suyu akllay"
     },
-    "passwordTooWeak": "Yaykuna rimayqa ancha pisi kallpayoqmi. Hatun qillqakuna, uchuy qillqakuna, yupaykuna hinaspa huk señalakunata chaqrullay.",
-    "passwordCommon": "Kay yaykuna rimayqa ancha riqsisqa kachkan. Aswan kallpasapa yaykuna rimayta akllay.",
     "copied": "Portapapelmanmi kikinchasqa"
   },
   "errors": {

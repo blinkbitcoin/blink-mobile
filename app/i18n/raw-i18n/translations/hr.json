@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Nevažeći poštanski broj, vjerojatno tipfeler",
       "invalidRegion": "Nevažeći odabir regije"
     },
-    "passwordTooWeak": "Lozinka je preslaba. Upotrijebite kombinaciju velikih i malih slova, brojeva i posebnih znakova.",
-    "passwordCommon": "Ova je lozinka previše česta. Odaberite jaču lozinku.",
     "copied": "Kopirano u međuspremnik"
   },
   "errors": {

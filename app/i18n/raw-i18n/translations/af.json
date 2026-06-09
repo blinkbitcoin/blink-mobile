@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Ongeldige poskode, waarskynlik 'n tikfout",
       "invalidRegion": "Ongeldige streekkeuse"
     },
-    "passwordTooWeak": "Wagwoord is te swak. Gebruik ’n mengsel van hoofletters, kleinletters, syfers en spesiale karakters.",
-    "passwordCommon": "Hierdie wagwoord is te algemeen. Kies asseblief ’n sterker wagwoord.",
     "copied": "Na knipbord gekopieer"
   },
   "errors": {

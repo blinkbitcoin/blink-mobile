@@ -2836,8 +2836,6 @@
             "invalidPostalCode": "Ungültige Postleitzahl, wahrscheinlich ein Tippfehler",
             "invalidRegion": "Ungültige Regionsauswahl"
         },
-        "passwordTooWeak": "Das Passwort ist zu schwach. Verwende eine Kombination aus Groß- und Kleinbuchstaben, Zahlen und Sonderzeichen.",
-        "passwordCommon": "Dieses Passwort ist zu häufig. Bitte wähle ein stärkeres Passwort.",
         "copied": "In die Zwischenablage kopiert"
     },
     "errors": {

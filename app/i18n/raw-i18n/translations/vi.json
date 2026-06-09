@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Mã bưu chính không hợp lệ, có thể do lỗi đánh máy",
       "invalidRegion": "Lựa chọn vùng không hợp lệ"
     },
-    "passwordTooWeak": "Mật khẩu quá yếu. Hãy dùng kết hợp chữ hoa, chữ thường, số và ký tự đặc biệt.",
-    "passwordCommon": "Mật khẩu này quá phổ biến. Vui lòng chọn mật khẩu mạnh hơn.",
     "copied": "Đã sao chép vào bộ nhớ tạm"
   },
   "errors": {

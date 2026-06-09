@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Geçersiz posta kodu, muhtemelen yazım hatası",
       "invalidRegion": "Geçersiz bölge seçimi"
     },
-    "passwordTooWeak": "Şifre çok zayıf. Büyük harf, küçük harf, rakam ve özel karakterlerden oluşan bir kombinasyon kullanın.",
-    "passwordCommon": "Bu şifre çok yaygın. Lütfen daha güçlü bir şifre seçin.",
     "copied": "Panoya kopyalandı"
   },
   "errors": {

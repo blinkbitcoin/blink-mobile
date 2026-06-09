@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Cod poștal invalid, probabil o greșeală de tastare",
       "invalidRegion": "Selectarea regiunii este invalidă"
     },
-    "passwordTooWeak": "Parola este prea slabă. Folosește o combinație de litere mari, litere mici, cifre și caractere speciale.",
-    "passwordCommon": "Această parolă este prea comună. Te rugăm să alegi o parolă mai puternică.",
     "copied": "Copiat în clipboard"
   },
   "errors": {

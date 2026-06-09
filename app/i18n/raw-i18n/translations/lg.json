@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Koodi y'eposta si nnungi, oyinza okuba ekikyamu mu kuwandiika",
       "invalidRegion": "Okulonda ekitundu tekikkaanya"
     },
-    "passwordTooWeak": "Ebigambo eby’ekyama binafu nnyo. Kozesa ennukuta ennene n’entono, ennamba n’obubonero obw’enjawulo.",
-    "passwordCommon": "Ebigambo bino eby’ekyama bimanyiddwa nnyo. Nsaba olonde ekigambo eky’ekyama ekisinga obukakafu.",
     "copied": "Kikoppiddwa ku kifo eky'okukwatiramu"
   },
   "errors": {
