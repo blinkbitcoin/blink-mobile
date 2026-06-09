@@ -140,7 +140,9 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
   }),
 }))
 
+const mockTransitionState = { hasTransitioned: true }
 jest.mock("@app/hooks", () => ({
+  useHasTransitioned: () => mockTransitionState.hasTransitioned,
   useTransactionSeenState: () => ({
     hasUnseenBtcTx: false,
     hasUnseenUsdTx: false,
@@ -207,6 +209,7 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockTransitionState.hasTransitioned = true
     mockSelfCustodialState.allTransactions = []
     mockToTransactionFragments.mockReturnValue([])
     mockUseApolloClient.mockReturnValue({
@@ -326,5 +329,51 @@ describe("TransactionHistoryScreen — self-custodial behavior", () => {
 
       expect(mockToTransactionFragments.mock.calls[0][0]).toEqual(ordered)
     })
+  })
+
+  it("keeps the skeleton until the enter transition finishes, even with data ready", () => {
+    mockTransitionState.hasTransitioned = false
+    mockSelfCustodialState.allTransactions = [
+      { id: "tx-1", amount: { currency: "BTC" }, timestamp: 1 },
+    ]
+    mockToTransactionFragments.mockReturnValue([
+      {
+        id: "tx-1",
+        status: "SUCCESS",
+        settlementCurrency: "BTC",
+        settlementAmount: 1000,
+      },
+    ])
+    setActiveWallet(true)
+
+    const { queryByTestId, UNSAFE_queryByType } = render(
+      <TransactionHistoryScreen route={route} />,
+    )
+
+    expect(queryByTestId("transaction-history-skeleton")).toBeTruthy()
+    expect(UNSAFE_queryByType(SectionList)).toBeNull()
+  })
+
+  it("renders the list once the enter transition finishes", () => {
+    mockTransitionState.hasTransitioned = true
+    mockSelfCustodialState.allTransactions = [
+      { id: "tx-1", amount: { currency: "BTC" }, timestamp: 1 },
+    ]
+    mockToTransactionFragments.mockReturnValue([
+      {
+        id: "tx-1",
+        status: "SUCCESS",
+        settlementCurrency: "BTC",
+        settlementAmount: 1000,
+      },
+    ])
+    setActiveWallet(true)
+
+    const { queryByTestId, UNSAFE_getByType } = render(
+      <TransactionHistoryScreen route={route} />,
+    )
+
+    expect(queryByTestId("transaction-history-skeleton")).toBeNull()
+    expect(UNSAFE_getByType(SectionList)).toBeTruthy()
   })
 })

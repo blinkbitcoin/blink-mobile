@@ -36,7 +36,7 @@ import {
   WalletValues,
 } from "@app/components/wallet-filter-dropdown"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useTransactionSeenState } from "@app/hooks"
+import { useHasTransitioned, useTransactionSeenState } from "@app/hooks"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 
 import { MemoizedTransactionItem } from "@app/components/transaction-item"
@@ -95,6 +95,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   const { convertMoneyAmount, displayCurrency } = usePriceConversion()
   const { fractionDigits } = useDisplayCurrency()
   const { feeReimbursementMemo } = useRemoteConfig()
+  const hasTransitioned = useHasTransitioned()
 
   const [deferQueries, setDeferQueries] = React.useState(true)
 
@@ -446,7 +447,13 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 
   const refreshing = activeWallet.isSelfCustodial ? selfCustodialRefreshing : loading
 
-  if (deferQueries || (!transactions && !activeWallet.isSelfCustodial)) {
+  const selfCustodialSettling = activeWallet.isSelfCustodial && !hasTransitioned
+
+  if (
+    deferQueries ||
+    (!transactions && !activeWallet.isSelfCustodial) ||
+    selfCustodialSettling
+  ) {
     return (
       <Screen>
         <WalletFilterDropdown
