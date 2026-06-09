@@ -63,4 +63,5 @@ export type SelfCustodialPaymentRequestState = {
   isAssetToggleDisabled?: boolean
   shouldShowAutoConvertMinWarning?: boolean
   autoConvertMinSats?: number
+  autoConvertMinFiat?: string
 }

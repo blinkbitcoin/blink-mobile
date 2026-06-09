@@ -2163,7 +2163,7 @@
     "lightningInvoice": "Faktur lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Biaya deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit di atas {threshold} SAT",
-    "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats tidak dapat dikonversi ke Dolar secara otomatis. Anda akan menerima Bitcoin.",
+    "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats / {minFiat: string} tidak dapat dikonversi ke Dolar secara otomatis. Anda akan menerima Bitcoin.",
     "autoConvertFailed": "Pembayaran diterima tetapi konversi gagal.",
     "pleaseWaitForConversion": "Mohon tunggu sampai konversi selesai"
   },

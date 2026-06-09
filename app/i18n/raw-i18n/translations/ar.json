@@ -2163,7 +2163,7 @@
     "lightningInvoice": "فاتورة lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "رسوم الإيداع: {fee} SAT للمبالغ تحت {threshold} SAT أو {overFee} SAT للإيداعات فوق {threshold} SAT",
-    "autoConvertMinAmount": "لا يمكن تحويل المبالغ الأقل من {minSats: number} ساتوشي إلى دولار تلقائيًا. ستتلقى بيتكوين بدلاً من ذلك.",
+    "autoConvertMinAmount": "لا يمكن تحويل المبالغ الأقل من {minSats: number} ساتوشي / {minFiat: string} إلى دولار تلقائيًا. ستتلقى بيتكوين بدلاً من ذلك.",
     "autoConvertFailed": "تم استلام الدفعة لكن فشل التحويل.",
     "pleaseWaitForConversion": "يرجى الانتظار حتى اكتمال التحويل"
   },

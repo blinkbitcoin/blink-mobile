@@ -31,6 +31,7 @@ type ContextualInfoProps = {
   feesInformation?: FeesInformation
   shouldShowAutoConvertMinWarning?: boolean
   autoConvertMinSats?: number
+  autoConvertMinFiat?: string
 }
 
 export const ContextualInfo: React.FC<ContextualInfoProps> = ({
@@ -42,6 +43,7 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
   feesInformation,
   shouldShowAutoConvertMinWarning = false,
   autoConvertMinSats,
+  autoConvertMinFiat,
 }) => {
   const styles = useStyles()
   const {
@@ -62,7 +64,10 @@ export const ContextualInfo: React.FC<ContextualInfoProps> = ({
       <View key="auto-convert-min" style={styles.depositFeeContainer}>
         <GaloyIcon name="warning" size={16} color={colors.grey1} />
         <Text style={styles.depositFeeText}>
-          {LL.ReceiveScreen.autoConvertMinAmount({ minSats: autoConvertMinSats })}
+          {LL.ReceiveScreen.autoConvertMinAmount({
+            minSats: autoConvertMinSats,
+            minFiat: autoConvertMinFiat ?? "",
+          })}
         </Text>
       </View>,
     )

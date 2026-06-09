@@ -6866,10 +6866,11 @@ type RootTranslation = {
 		 */
 		depositFee: RequiredParams<'fee' | 'overFee' | 'threshold' | 'threshold'>
 		/**
-		 * A​m​o​u​n​t​s​ ​b​e​l​o​w​ ​{​m​i​n​S​a​t​s​}​ ​s​a​t​s​ ​c​a​n​'​t​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​i​n​s​t​e​a​d​.
+		 * A​m​o​u​n​t​s​ ​b​e​l​o​w​ ​{​m​i​n​S​a​t​s​}​ ​S​A​T​ ​/​ ​{​m​i​n​F​i​a​t​}​ ​c​a​n​'​t​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​i​n​s​t​e​a​d​.
+		 * @param {string} minFiat
 		 * @param {number} minSats
 		 */
-		autoConvertMinAmount: RequiredParams<'minSats'>
+		autoConvertMinAmount: RequiredParams<'minFiat' | 'minSats'>
 		/**
 		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d​ ​b​u​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​a​i​l​e​d​.
 		 */
@@ -19170,9 +19171,9 @@ export type TranslationFunctions = {
 		 */
 		depositFee: (arg: { fee: string, overFee: string, threshold: string }) => LocalizedString
 		/**
-		 * Amounts below {minSats} sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.
+		 * Amounts below {minSats} SAT / {minFiat} can't be converted to Dollar automatically. You'll receive Bitcoin instead.
 		 */
-		autoConvertMinAmount: (arg: { minSats: number }) => LocalizedString
+		autoConvertMinAmount: (arg: { minFiat: string, minSats: number }) => LocalizedString
 		/**
 		 * Payment received but the conversion failed.
 		 */

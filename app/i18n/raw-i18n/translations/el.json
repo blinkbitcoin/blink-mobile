@@ -2163,7 +2163,7 @@
     "lightningInvoice": "Τιμολόγιο lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Χρέωση κατάθεσης: {fee} SAT για ποσά κάτω από {threshold} SAT ή {overFee} SAT για καταθέσεις πάνω από {threshold} SAT",
-    "autoConvertMinAmount": "Ποσά κάτω από {minSats: number} sats δεν μπορούν να μετατραπούν αυτόματα σε Δολάρια. Θα λάβετε Bitcoin.",
+    "autoConvertMinAmount": "Ποσά κάτω από {minSats: number} sats / {minFiat: string} δεν μπορούν να μετατραπούν αυτόματα σε Δολάρια. Θα λάβετε Bitcoin.",
     "autoConvertFailed": "Η πληρωμή ελήφθη αλλά η μετατροπή απέτυχε.",
     "pleaseWaitForConversion": "Παρακαλούμε περιμένετε μέχρι να ολοκληρωθεί η μετατροπή"
   },

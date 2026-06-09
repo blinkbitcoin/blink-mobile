@@ -2163,7 +2163,7 @@
         "lightningInvoice": "Lightning-Rechnung",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Einzahlungsgebühr: {fee} SAT für Beträge unter {threshold} SAT oder {overFee} SAT für Einzahlungen über {threshold} SAT",
-        "autoConvertMinAmount": "Beträge unter {minSats: number} Sats können nicht automatisch in Dollar umgewandelt werden. Du erhältst stattdessen Bitcoin.",
+        "autoConvertMinAmount": "Beträge unter {minSats: number} Sats / {minFiat: string} können nicht automatisch in Dollar umgewandelt werden. Du erhältst stattdessen Bitcoin.",
         "autoConvertFailed": "Zahlung empfangen, aber die Umwandlung ist fehlgeschlagen.",
         "pleaseWaitForConversion": "Bitte warte, bis die Umwandlung abgeschlossen ist"
     },

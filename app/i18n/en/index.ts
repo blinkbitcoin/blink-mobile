@@ -2206,7 +2206,7 @@ const en: BaseTranslation = {
     depositFee:
       "Deposit fee: {fee: string} SAT for amounts under {threshold: string} SAT or {overFee: string} SAT for deposits over {threshold} SAT",
     autoConvertMinAmount:
-      "Amounts below {minSats: number} sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
+      "Amounts below {minSats: number} SAT / {minFiat: string} can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
     autoConvertFailed: "Payment received but the conversion failed.",
     pleaseWaitForConversion: "Please wait until the conversion is done",
   },

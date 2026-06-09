@@ -2163,7 +2163,7 @@
     "lightningInvoice": "Lightning számla",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Befizetési díj: {fee} SAT az {threshold} SAT alatti összegekre vagy {overFee} SAT az {threshold} SAT feletti befizetésekre",
-    "autoConvertMinAmount": "A {minSats: number} satoshi alatti összegek nem konvertálhatók automatikusan Dollárra. Bitcoint fogsz kapni helyette.",
+    "autoConvertMinAmount": "A {minSats: number} satoshi / {minFiat: string} alatti összegek nem konvertálhatók automatikusan Dollárra. Bitcoint fogsz kapni helyette.",
     "autoConvertFailed": "Fizetés beérkezett, de a konverzió nem sikerült.",
     "pleaseWaitForConversion": "Kérjük, várjon, amíg a konverzió befejeződik"
   },

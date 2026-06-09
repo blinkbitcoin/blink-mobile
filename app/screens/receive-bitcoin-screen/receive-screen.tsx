@@ -348,6 +348,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             selfCustodialRequest?.shouldShowAutoConvertMinWarning
           }
           autoConvertMinSats={selfCustodialRequest?.autoConvertMinSats}
+          autoConvertMinFiat={selfCustodialRequest?.autoConvertMinFiat}
         />
       </View>
 
