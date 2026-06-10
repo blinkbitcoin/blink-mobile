@@ -2163,7 +2163,7 @@
     "lightningInvoice": "Factura lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Comissió de dipòsit: {fee} SAT per a imports inferiors a {threshold} SAT o {overFee} SAT per a dipòsits superiors a {threshold} SAT",
-    "autoConvertMinAmount": "Les quantitats inferiors a {minSats: number} sats no es poden convertir a Dòlar automàticament. Rebràs Bitcoin.",
+    "autoConvertMinAmount": "Les quantitats inferiors a {minSats: number} sats / {minFiat: string} no es poden convertir a Dòlar automàticament. Rebràs Bitcoin.",
     "autoConvertFailed": "Pagament rebut però la conversió ha fallat.",
     "pleaseWaitForConversion": "Si us plau, espera fins que la conversió s'hagi completat"
   },
@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Codi postal no vàlid, probablement un error tipogràfic",
       "invalidRegion": "Selecció de regió no vàlida"
     },
-    "passwordTooWeak": "La contrasenya és massa feble. Fes servir una combinació de majúscules, minúscules, números i caràcters especials.",
-    "passwordCommon": "Aquesta contrasenya és massa comuna. Si us plau, tria una contrasenya més segura.",
     "copied": "Copiat al porta-retalls"
   },
   "errors": {

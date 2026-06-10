@@ -13,6 +13,7 @@ const mockRecordError = jest.fn()
 const mockAddPendingAutoConvert = jest.fn()
 const mockFetchAutoConvertMinSats = jest.fn()
 const mockUseReceiveAssetMode = jest.fn()
+const mockFormatMoneyAmount = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   createReceiveLightning: () => mockReceiveLightning,
@@ -46,6 +47,10 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
   usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount }),
 }))
 
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
+}))
+
 const btcWallet = {
   id: "btc-w1",
   walletCurrency: WalletCurrency.Btc,
@@ -61,6 +66,12 @@ const usdWallet = {
 }
 
 const mockSdk = { id: "mock-sdk" }
+
+const btcAmount = (amount: number) => ({
+  amount,
+  currency: WalletCurrency.Btc,
+  currencyCode: "BTC",
+})
 
 describe("usePaymentRequest", () => {
   beforeEach(() => {
@@ -78,6 +89,9 @@ describe("usePaymentRequest", () => {
         currency,
         currencyCode: currency,
       }),
+    )
+    mockFormatMoneyAmount.mockImplementation(
+      ({ moneyAmount }: { moneyAmount: { amount: number } }) => `$${moneyAmount.amount}`,
     )
     mockAddPendingAutoConvert.mockResolvedValue(undefined)
     mockFetchAutoConvertMinSats.mockResolvedValue(undefined)
@@ -527,6 +541,70 @@ describe("usePaymentRequest", () => {
       })
 
       expect(result.current?.shouldShowAutoConvertMinWarning).toBe(false)
+    })
+
+    it("exposes shouldShowAutoConvertMinWarning=false in Dollar mode when no amount is entered", async () => {
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "dollar",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: false,
+      })
+      mockFetchAutoConvertMinSats.mockResolvedValue(1000)
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.autoConvertMinSats).toBe(1000)
+      })
+
+      expect(result.current?.shouldShowAutoConvertMinWarning).toBe(false)
+    })
+
+    it("exposes the formatted fiat equivalent of the pool minimum", async () => {
+      mockFetchAutoConvertMinSats.mockResolvedValue(1000)
+
+      const { result } = renderHook(() => usePaymentRequest())
+
+      await waitFor(() => {
+        expect(result.current?.autoConvertMinFiat).toBe("$1000")
+      })
+    })
+
+    it("hides the warning when the entered amount is cleared back to zero", async () => {
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "dollar",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: false,
+      })
+      mockFetchAutoConvertMinSats.mockResolvedValue(1000)
+      const { result } = renderHook(() => usePaymentRequest())
+      await waitFor(() => expect(result.current?.autoConvertMinSats).toBe(1000))
+
+      act(() => result.current?.setAmount(btcAmount(500)))
+      await waitFor(() =>
+        expect(result.current?.shouldShowAutoConvertMinWarning).toBe(true),
+      )
+
+      act(() => result.current?.setAmount(btcAmount(0)))
+      await waitFor(() =>
+        expect(result.current?.shouldShowAutoConvertMinWarning).toBe(false),
+      )
+    })
+
+    it("hides the warning when the entered amount is at or above the pool minimum", async () => {
+      mockUseReceiveAssetMode.mockReturnValue({
+        assetMode: "dollar",
+        setAssetMode: jest.fn(),
+        isToggleDisabled: false,
+      })
+      mockFetchAutoConvertMinSats.mockResolvedValue(1000)
+      const { result } = renderHook(() => usePaymentRequest())
+      await waitFor(() => expect(result.current?.autoConvertMinSats).toBe(1000))
+
+      act(() => result.current?.setAmount(btcAmount(1000)))
+      await waitFor(() =>
+        expect(result.current?.shouldShowAutoConvertMinWarning).toBe(false),
+      )
     })
   })
 

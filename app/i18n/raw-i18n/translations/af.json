@@ -2163,7 +2163,7 @@
     "lightningInvoice": "Lightning-faktuur",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Deposito-fooi: {fee} SAT vir bedrae onder {threshold} SAT of {overFee} SAT vir deposito's oor {threshold} SAT",
-    "autoConvertMinAmount": "Bedrae onder {minSats: number} sats kan nie outomaties na Dollar omgeskakel word nie. Jy sal eerder Bitcoin ontvang.",
+    "autoConvertMinAmount": "Bedrae onder {minSats: number} sats / {minFiat: string} kan nie outomaties na Dollar omgeskakel word nie. Jy sal eerder Bitcoin ontvang.",
     "autoConvertFailed": "Betaling ontvang maar die omskakeling het misluk.",
     "pleaseWaitForConversion": "Wag asseblief totdat die omskakeling voltooi is"
   },
@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Ongeldige poskode, waarskynlik 'n tikfout",
       "invalidRegion": "Ongeldige streekkeuse"
     },
-    "passwordTooWeak": "Wagwoord is te swak. Gebruik ’n mengsel van hoofletters, kleinletters, syfers en spesiale karakters.",
-    "passwordCommon": "Hierdie wagwoord is te algemeen. Kies asseblief ’n sterker wagwoord.",
     "copied": "Na knipbord gekopieer"
   },
   "errors": {

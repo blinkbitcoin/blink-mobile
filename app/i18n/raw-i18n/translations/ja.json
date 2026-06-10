@@ -2163,7 +2163,7 @@
         "lightningInvoice": "Lightningインボイス",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT",
-        "autoConvertMinAmount": "{minSats: number} sats未満の金額はドルに自動変換できません。代わりにビットコインを受け取ります。",
+        "autoConvertMinAmount": "{minSats: number} sats / {minFiat: string}未満の金額はドルに自動変換できません。代わりにビットコインを受け取ります。",
         "autoConvertFailed": "支払いは受け取りましたが、変換に失敗しました。",
         "pleaseWaitForConversion": "変換が完了するまでお待ちください"
     },
@@ -2836,8 +2836,6 @@
             "invalidPostalCode": "無効な郵便番号です。入力ミスの可能性があります",
             "invalidRegion": "地域の選択が無効です"
         },
-        "passwordTooWeak": "パスワードが弱すぎます。大文字、小文字、数字、特殊文字を組み合わせてください。",
-        "passwordCommon": "このパスワードは一般的すぎます。より強力なパスワードを選んでください。",
         "copied": "クリップボードにコピーしました"
     },
     "errors": {
@@ -3498,7 +3496,7 @@
                 "check3": "メッセージや電話でこの情報を求めている人はいません"
             },
             "Phrase": {
-                "headerTitle": "バックアップフレーズ",
+                "headerTitle": "リカバリーフレーズ",
                 "sparkCompatible": "このバックアップフレーズは{sparkCompatibleLink}で使用できます",
                 "sparkCompatibleLink": "Spark対応ウォレット",
                 "copiedToast": "バックアップフレーズをクリップボードにコピーしました",

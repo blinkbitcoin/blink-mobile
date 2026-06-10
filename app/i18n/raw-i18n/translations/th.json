@@ -2163,7 +2163,7 @@
     "lightningInvoice": "ใบแจ้งหนี้ lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT",
-    "autoConvertMinAmount": "จำนวนต่ำกว่า {minSats: number} satoshi ไม่สามารถแปลงเป็นดอลลาร์อัตโนมัติได้ คุณจะได้รับ Bitcoin แทน",
+    "autoConvertMinAmount": "จำนวนต่ำกว่า {minSats: number} satoshi / {minFiat: string} ไม่สามารถแปลงเป็นดอลลาร์อัตโนมัติได้ คุณจะได้รับ Bitcoin แทน",
     "autoConvertFailed": "รับการชำระเงินแล้ว แต่การแปลงล้มเหลว",
     "pleaseWaitForConversion": "โปรดรอจนกว่าการแปลงจะเสร็จสิ้น"
   },
@@ -2713,7 +2713,7 @@
     "trialAccount": "บัญชีทดลอง",
     "blinkUser": "ผู้ใช้ Blink",
     "anonymous": "นิรนาม",
-    "anonymousUser": "ผู้ใช้ที่ไม่ระบุชื่อ",
+    "anonymousUser": "ผู้ใช้นิรนาม",
     "blinkToBlink": "Blink ไปยัง Blink",
     "transactionLimits": "จำกัดธุรกรรม",
     "activateWallet": "เปิดใช้งานกระเป๋า",
@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "รหัสไปรษณีย์ไม่ถูกต้อง อาจพิมพ์ผิด",
       "invalidRegion": "การเลือกภูมิภาคไม่ถูกต้อง"
     },
-    "passwordTooWeak": "รหัสผ่านนี้คาดเดาง่ายเกินไป ใช้อักษรพิมพ์ใหญ่ อักษรพิมพ์เล็ก ตัวเลข และอักขระพิเศษผสมกัน",
-    "passwordCommon": "รหัสผ่านนี้ใช้กันทั่วไปเกินไป โปรดเลือกรหัสผ่านที่รัดกุมกว่า",
     "copied": "คัดลอกไปยังคลิปบอร์ดแล้ว"
   },
   "errors": {

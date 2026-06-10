@@ -188,7 +188,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         probeBalanceFailed: () => "Couldn't verify the wallet's balance.",
       },
       common: {
-        anonymousUser: () => "Anonymous user",
+        anonymousUser: () => "Anon user",
       },
     },
   }),
@@ -232,7 +232,7 @@ describe("ProfileRow", () => {
       <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
     )
 
-    expect(getByText("Anonymous user")).toBeTruthy()
+    expect(getByText("Anon user")).toBeTruthy()
   })
 
   it("switches to the entry's account id when the row is pressed", () => {

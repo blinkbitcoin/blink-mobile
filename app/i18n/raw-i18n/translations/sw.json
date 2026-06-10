@@ -2163,7 +2163,7 @@
     "lightningInvoice": "Ankara ya lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ada ya amana: {fee} SAT kwa kiasi chini ya {threshold} SAT au {overFee} SAT kwa amana zaidi ya {threshold} SAT",
-    "autoConvertMinAmount": "Viwango vilivyo chini ya sats {minSats: number} haviwezi kubadilishwa kwa Dola kiotomatiki. Utapokea Bitcoin badala yake.",
+    "autoConvertMinAmount": "Viwango vilivyo chini ya sats {minSats: number} / {minFiat: string} haviwezi kubadilishwa kwa Dola kiotomatiki. Utapokea Bitcoin badala yake.",
     "autoConvertFailed": "Malipo yamepokelewa lakini ubadilishaji umeshindwa.",
     "pleaseWaitForConversion": "Tafadhali subiri hadi ubadilishaji ukamilike"
   },
@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Nambari ya posta si sahihi, labda kosa ya kuandika",
       "invalidRegion": "Uchaguzi wa eneo si sahihi"
     },
-    "passwordTooWeak": "Nenosiri ni dhaifu sana. Tumia mchanganyiko wa herufi kubwa, herufi ndogo, nambari na alama maalum.",
-    "passwordCommon": "Nenosiri hili ni la kawaida sana. Tafadhali chagua nenosiri lenye nguvu zaidi.",
     "copied": "Imenakiliwa kwenye ubao wa kunakili"
   },
   "errors": {

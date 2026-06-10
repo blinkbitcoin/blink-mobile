@@ -2163,7 +2163,7 @@
     "lightningInvoice": "Invois lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Yuran deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit melebihi {threshold} SAT",
-    "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats tidak boleh ditukar kepada Dolar secara automatik. Anda akan menerima Bitcoin.",
+    "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats / {minFiat: string} tidak boleh ditukar kepada Dolar secara automatik. Anda akan menerima Bitcoin.",
     "autoConvertFailed": "Pembayaran diterima tetapi penukaran gagal.",
     "pleaseWaitForConversion": "Sila tunggu sehingga penukaran selesai"
   },
@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Poskod tidak sah, mungkin kesilapan taip",
       "invalidRegion": "Pilihan wilayah tidak sah"
     },
-    "passwordTooWeak": "Kata laluan terlalu lemah. Gunakan gabungan huruf besar, huruf kecil, nombor dan aksara khas.",
-    "passwordCommon": "Kata laluan ini terlalu biasa. Sila pilih kata laluan yang lebih kukuh.",
     "copied": "Disalin ke papan klip"
   },
   "errors": {

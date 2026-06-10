@@ -2163,7 +2163,7 @@
         "lightningInvoice": "Lightning-Rechnung",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Einzahlungsgebühr: {fee} SAT für Beträge unter {threshold} SAT oder {overFee} SAT für Einzahlungen über {threshold} SAT",
-        "autoConvertMinAmount": "Beträge unter {minSats: number} Sats können nicht automatisch in Dollar umgewandelt werden. Du erhältst stattdessen Bitcoin.",
+        "autoConvertMinAmount": "Beträge unter {minSats: number} Sats / {minFiat: string} können nicht automatisch in Dollar umgewandelt werden. Du erhältst stattdessen Bitcoin.",
         "autoConvertFailed": "Zahlung empfangen, aber die Umwandlung ist fehlgeschlagen.",
         "pleaseWaitForConversion": "Bitte warte, bis die Umwandlung abgeschlossen ist"
     },
@@ -2836,8 +2836,6 @@
             "invalidPostalCode": "Ungültige Postleitzahl, wahrscheinlich ein Tippfehler",
             "invalidRegion": "Ungültige Regionsauswahl"
         },
-        "passwordTooWeak": "Das Passwort ist zu schwach. Verwende eine Kombination aus Groß- und Kleinbuchstaben, Zahlen und Sonderzeichen.",
-        "passwordCommon": "Dieses Passwort ist zu häufig. Bitte wähle ein stärkeres Passwort.",
         "copied": "In die Zwischenablage kopiert"
     },
     "errors": {
@@ -3498,7 +3496,7 @@
                 "check3": "Niemand fragt mich nach diesen Informationen per Nachricht oder Anruf"
             },
             "Phrase": {
-                "headerTitle": "Backup-Phrase",
+                "headerTitle": "Wiederherstellungsphrase",
                 "sparkCompatible": "Diese Sicherungswörter funktionieren in jeder {sparkCompatibleLink}",
                 "sparkCompatibleLink": "Spark-kompatiblen Wallet",
                 "copiedToast": "Sicherungswörter in die Zwischenablage kopiert",

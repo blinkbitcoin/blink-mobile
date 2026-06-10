@@ -67,8 +67,14 @@ jest.mock("@app/i18n/i18n-react", () => ({
           overFee: string
         }) =>
           `Deposit fee: ${fee} SAT for amounts under ${threshold} SAT or ${overFee} SAT for deposits over ${threshold} SAT`,
-        autoConvertMinAmount: ({ minSats }: { minSats: number }) =>
-          `Amounts below ${minSats} sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.`,
+        autoConvertMinAmount: ({
+          minSats,
+          minFiat,
+        }: {
+          minSats: number
+          minFiat: string
+        }) =>
+          `Amounts below ${minSats} SAT / ${minFiat} can't be converted to Dollar automatically. You'll receive Bitcoin instead.`,
       },
     },
   }),
@@ -224,19 +230,20 @@ describe("ContextualInfo", () => {
   })
 
   describe("auto-convert minimum warning", () => {
-    it("renders the warning when shouldShowAutoConvertMinWarning is true and autoConvertMinSats is defined", () => {
+    it("renders the warning with the sat minimum and its fiat equivalent", () => {
       const { getByText } = render(
         <ContextualInfo
           {...defaultProps}
           canSetExpirationTime={false}
           shouldShowAutoConvertMinWarning
           autoConvertMinSats={800}
+          autoConvertMinFiat="$0.30"
         />,
       )
 
       expect(
         getByText(
-          "Amounts below 800 sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
+          "Amounts below 800 SAT / $0.30 can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
         ),
       ).toBeTruthy()
     })

@@ -5,6 +5,7 @@ import { utils as lnurlUtils } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { getPaymentRequestFullUri } from "@app/screens/receive-bitcoin-screen/payment/helpers"
 import {
@@ -37,6 +38,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const { sdk, lastReceivedPaymentId, lightningAddress } = useSelfCustodialWallet()
   const { wallets, isReady } = useActiveWallet()
   const { convertMoneyAmount } = usePriceConversion()
+  const { formatMoneyAmount } = useDisplayCurrency()
   const {
     assetMode,
     setAssetMode,
@@ -233,10 +235,19 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   const shouldShowAutoConvertMinWarning = useMemo(() => {
     if (assetMode !== ReceiveAssetMode.Dollar) return false
     if (autoConvertMinSats === undefined) return false
-    const pendingSats = amountInSats
-    if (pendingSats === undefined) return true
-    return pendingSats < autoConvertMinSats
+    if (!amountInSats) return false
+    return amountInSats < autoConvertMinSats
   }, [assetMode, autoConvertMinSats, amountInSats])
+
+  const autoConvertMinFiat = useMemo(() => {
+    if (autoConvertMinSats === undefined || !convertMoneyAmount) return undefined
+    return formatMoneyAmount({
+      moneyAmount: convertMoneyAmount(
+        toBtcMoneyAmount(autoConvertMinSats),
+        WalletCurrency.Usd,
+      ),
+    })
+  }, [autoConvertMinSats, convertMoneyAmount, formatMoneyAmount])
 
   const autoConvertStatus = useAutoConvertStatus(paymentRequest)
 
@@ -360,5 +371,6 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     isAssetToggleDisabled,
     shouldShowAutoConvertMinWarning,
     autoConvertMinSats,
+    autoConvertMinFiat,
   }
 }

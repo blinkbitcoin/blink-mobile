@@ -2163,7 +2163,7 @@
     "lightningInvoice": "Lightning faktura",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Poplatek za vklad: {fee} SAT pro částky pod {threshold} SAT nebo {overFee} SAT pro vklady nad {threshold} SAT",
-    "autoConvertMinAmount": "Částky pod {minSats: number} satoshi nelze automaticky převést na dolary. Obdržíte místo toho Bitcoin.",
+    "autoConvertMinAmount": "Částky pod {minSats: number} satoshi / {minFiat: string} nelze automaticky převést na dolary. Obdržíte místo toho Bitcoin.",
     "autoConvertFailed": "Platba přijata, ale konverze selhala.",
     "pleaseWaitForConversion": "Počkejte, prosím, dokud se převod nedokončí"
   },
@@ -2713,7 +2713,7 @@
     "trialAccount": "Zkušební účet",
     "blinkUser": "Uživatel Blink",
     "anonymous": "Anonymní",
-    "anonymousUser": "Anonymní uživatel",
+    "anonymousUser": "Anonym",
     "blinkToBlink": "Blink na Blink",
     "transactionLimits": "Transakční limity",
     "activateWallet": "Aktivovat peněženku",
@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Neplatné PSČ, pravděpodobně překlep",
       "invalidRegion": "Neplatný výběr regionu"
     },
-    "passwordTooWeak": "Heslo je příliš slabé. Použijte kombinaci velkých a malých písmen, čísel a speciálních znaků.",
-    "passwordCommon": "Toto heslo je příliš běžné. Zvolte prosím silnější heslo.",
     "copied": "Zkopírováno do schránky"
   },
   "errors": {

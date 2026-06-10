@@ -2163,7 +2163,7 @@
     "lightningInvoice": "Lightning-faktura",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Indbetalingsgebyr: {fee} SAT for beløb under {threshold} SAT eller {overFee} SAT for indbetalinger over {threshold} SAT",
-    "autoConvertMinAmount": "Beløb under {minSats: number} sats kan ikke automatisk konverteres til Dollar. Du modtager Bitcoin i stedet.",
+    "autoConvertMinAmount": "Beløb under {minSats: number} sats / {minFiat: string} kan ikke automatisk konverteres til Dollar. Du modtager Bitcoin i stedet.",
     "autoConvertFailed": "Betaling modtaget, men konverteringen mislykkedes.",
     "pleaseWaitForConversion": "Vent venligst, indtil konverteringen er færdig"
   },
@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Ugyldigt postnummer, sandsynligvis en tastefejl",
       "invalidRegion": "Ugyldigt regionsvalg"
     },
-    "passwordTooWeak": "Adgangskoden er for svag. Brug en kombination af store og små bogstaver, tal og specialtegn.",
-    "passwordCommon": "Denne adgangskode er for almindelig. Vælg venligst en stærkere adgangskode.",
     "copied": "Kopieret til udklipsholder"
   },
   "errors": {
@@ -3498,7 +3496,7 @@
         "check3": "Ingen beder mig om disse oplysninger via besked eller opkald"
       },
       "Phrase": {
-        "headerTitle": "Backup-frase",
+        "headerTitle": "Gendannelsesfrase",
         "sparkCompatible": "Denne backup-sætning fungerer i enhver {sparkCompatibleLink}",
         "sparkCompatibleLink": "Spark-kompatibel tegnebog",
         "copiedToast": "Backup-sætning kopieret til udklipsholder",

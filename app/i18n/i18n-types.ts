@@ -6866,10 +6866,11 @@ type RootTranslation = {
 		 */
 		depositFee: RequiredParams<'fee' | 'overFee' | 'threshold' | 'threshold'>
 		/**
-		 * A​m​o​u​n​t​s​ ​b​e​l​o​w​ ​{​m​i​n​S​a​t​s​}​ ​s​a​t​s​ ​c​a​n​'​t​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​i​n​s​t​e​a​d​.
+		 * A​m​o​u​n​t​s​ ​b​e​l​o​w​ ​{​m​i​n​S​a​t​s​}​ ​S​A​T​ ​/​ ​{​m​i​n​F​i​a​t​}​ ​c​a​n​'​t​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​i​n​s​t​e​a​d​.
+		 * @param {string} minFiat
 		 * @param {number} minSats
 		 */
-		autoConvertMinAmount: RequiredParams<'minSats'>
+		autoConvertMinAmount: RequiredParams<'minFiat' | 'minSats'>
 		/**
 		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d​ ​b​u​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​a​i​l​e​d​.
 		 */
@@ -8894,7 +8895,7 @@ type RootTranslation = {
 		 */
 		anonymous: string
 		/**
-		 * A​n​o​n​y​m​o​u​s​ ​u​s​e​r
+		 * A​n​o​n​ ​u​s​e​r
 		 */
 		anonymousUser: string
 		/**
@@ -9381,14 +9382,6 @@ type RootTranslation = {
 			 */
 			invalidRegion: string
 		}
-		/**
-		 * P​a​s​s​w​o​r​d​ ​i​s​ ​t​o​o​ ​w​e​a​k​.​ ​U​s​e​ ​a​ ​m​i​x​ ​o​f​ ​u​p​p​e​r​c​a​s​e​,​ ​l​o​w​e​r​c​a​s​e​,​ ​n​u​m​b​e​r​s​,​ ​a​n​d​ ​s​p​e​c​i​a​l​ ​c​h​a​r​a​c​t​e​r​s​.
-		 */
-		passwordTooWeak: string
-		/**
-		 * T​h​i​s​ ​p​a​s​s​w​o​r​d​ ​i​s​ ​t​o​o​ ​c​o​m​m​o​n​.​ ​P​l​e​a​s​e​ ​c​h​o​o​s​e​ ​a​ ​s​t​r​o​n​g​e​r​ ​p​a​s​s​w​o​r​d​.
-		 */
-		passwordCommon: string
 	}
 	errors: {
 		/**
@@ -19170,9 +19163,9 @@ export type TranslationFunctions = {
 		 */
 		depositFee: (arg: { fee: string, overFee: string, threshold: string }) => LocalizedString
 		/**
-		 * Amounts below {minSats} sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.
+		 * Amounts below {minSats} SAT / {minFiat} can't be converted to Dollar automatically. You'll receive Bitcoin instead.
 		 */
-		autoConvertMinAmount: (arg: { minSats: number }) => LocalizedString
+		autoConvertMinAmount: (arg: { minFiat: string, minSats: number }) => LocalizedString
 		/**
 		 * Payment received but the conversion failed.
 		 */
@@ -21138,7 +21131,7 @@ export type TranslationFunctions = {
 		 */
 		anonymous: () => LocalizedString
 		/**
-		 * Anonymous user
+		 * Anon user
 		 */
 		anonymousUser: () => LocalizedString
 		/**
@@ -21621,14 +21614,6 @@ export type TranslationFunctions = {
 			 */
 			invalidRegion: () => LocalizedString
 		}
-		/**
-		 * Password is too weak. Use a mix of uppercase, lowercase, numbers, and special characters.
-		 */
-		passwordTooWeak: () => LocalizedString
-		/**
-		 * This password is too common. Please choose a stronger password.
-		 */
-		passwordCommon: () => LocalizedString
 	}
 	errors: {
 		/**

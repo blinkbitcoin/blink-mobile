@@ -2,41 +2,18 @@ import { renderHook, act } from "@testing-library/react-native"
 
 import { useCloudBackupForm } from "@app/screens/self-custodial/onboarding/hooks/use-cloud-backup-form"
 
+let mockFocusCleanup: (() => void) | void
+
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useFocusEffect: jest.fn(),
-}))
-
-jest.mock("@app/utils/validators/password", () => ({
-  validatePassword: jest.fn((password: string) => {
-    const errors: string[] = []
-    if (password.length < 12) errors.push("too-short")
-    if (
-      !/[A-Z]/.test(password) ||
-      !/[0-9]/.test(password) ||
-      !/[^a-zA-Z0-9]/.test(password)
-    )
-      errors.push("too-weak")
-    return {
-      valid: errors.length === 0,
-      errors,
-      strength: errors.length === 0 ? "strong" : "weak",
-    }
-  }),
-  PasswordIssue: {
-    TooShort: "too-short",
-    TooWeak: "too-weak",
-    CommonPassword: "common-password",
+  useFocusEffect: (callback: () => (() => void) | void) => {
+    mockFocusCleanup = callback()
   },
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
-      common: {
-        passwordTooWeak: () => "Password too weak",
-        passwordCommon: () => "Password too common",
-      },
       BackupScreen: {
         CloudBackup: {
           passwordTooShort: () => "Minimum 12 characters",
@@ -173,5 +150,60 @@ describe("useCloudBackupForm", () => {
     expect(result.current.passwordError).toBeUndefined()
     expect(result.current.confirmPasswordError).toBeUndefined()
     expect(result.current.isValid).toBe(true)
+  })
+
+  it("treats a password of exactly 11 characters as too short", () => {
+    const { result } = renderHook(() => useCloudBackupForm())
+
+    act(() => result.current.toggleEncryption())
+    act(() => result.current.setPassword("12345678901"))
+    act(() => result.current.markPasswordTouched())
+
+    expect(result.current.passwordError).toBe("Minimum 12 characters")
+    expect(result.current.isValid).toBe(false)
+  })
+
+  it("accepts a password of exactly 12 characters", () => {
+    const { result } = renderHook(() => useCloudBackupForm())
+
+    act(() => result.current.toggleEncryption())
+    act(() => result.current.setPassword("123456789012"))
+    act(() => result.current.setConfirmPassword("123456789012"))
+    act(() => result.current.markPasswordTouched())
+
+    expect(result.current.passwordError).toBeUndefined()
+    expect(result.current.isValid).toBe(true)
+  })
+
+  it("clears the confirm-password error once the fields match after being touched", () => {
+    const { result } = renderHook(() => useCloudBackupForm())
+
+    act(() => result.current.toggleEncryption())
+    act(() => result.current.setPassword("123456789012"))
+    act(() => result.current.setConfirmPassword("different"))
+    act(() => result.current.markConfirmPasswordTouched())
+
+    expect(result.current.confirmPasswordError).toBe("Passwords do not match")
+
+    act(() => result.current.setConfirmPassword("123456789012"))
+
+    expect(result.current.confirmPasswordError).toBeUndefined()
+  })
+
+  it("clears the fields and touched flags when the screen loses focus", () => {
+    const { result } = renderHook(() => useCloudBackupForm())
+
+    act(() => result.current.toggleEncryption())
+    act(() => result.current.setPassword("123456789012"))
+    act(() => result.current.setConfirmPassword("123456789012"))
+    act(() => result.current.markPasswordTouched())
+
+    act(() => {
+      mockFocusCleanup?.()
+    })
+
+    expect(result.current.password).toBe("")
+    expect(result.current.confirmPassword).toBe("")
+    expect(result.current.passwordError).toBeUndefined()
   })
 })

@@ -3,7 +3,8 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { validatePassword, PasswordIssue } from "@app/utils/validators/password"
+
+import { validateCloudBackupForm } from "../cloud-backup-validation"
 
 export const useCloudBackupForm = () => {
   const { LL } = useI18nContext()
@@ -41,45 +42,31 @@ export const useCloudBackupForm = () => {
   }, [])
 
   useEffect(() => {
-    if (password.length === 0) setPasswordTouched(false)
+    if (!password) setPasswordTouched(false)
   }, [password])
 
   useEffect(() => {
-    if (confirmPassword.length === 0) setConfirmPasswordTouched(false)
+    if (!confirmPassword) setConfirmPasswordTouched(false)
   }, [confirmPassword])
 
-  const passwordValidation = useMemo(() => {
-    if (!isEncrypted || password.length === 0) return null
-    return validatePassword(password)
-  }, [isEncrypted, password])
+  const { shouldShowPasswordError, shouldShowConfirmPasswordError, isValid } = useMemo(
+    () =>
+      validateCloudBackupForm({
+        isEncrypted,
+        password,
+        confirmPassword,
+        passwordTouched,
+        confirmPasswordTouched,
+      }),
+    [isEncrypted, password, confirmPassword, passwordTouched, confirmPasswordTouched],
+  )
 
-  const passwordError = useMemo(() => {
-    if (!passwordTouched || !passwordValidation || passwordValidation.valid) {
-      return undefined
-    }
-    const { errors } = passwordValidation
-    if (errors.includes(PasswordIssue.TooShort))
-      return LL.BackupScreen.CloudBackup.passwordTooShort()
-    if (errors.includes(PasswordIssue.CommonPassword)) return LL.common.passwordCommon()
-    if (errors.includes(PasswordIssue.TooWeak)) return LL.common.passwordTooWeak()
-    return undefined
-  }, [passwordTouched, passwordValidation, LL])
-
-  const confirmPasswordError = useMemo(() => {
-    if (!confirmPasswordTouched || !isEncrypted || confirmPassword.length === 0) {
-      return undefined
-    }
-    if (confirmPassword !== password)
-      return LL.BackupScreen.CloudBackup.passwordMismatch()
-    return undefined
-  }, [confirmPasswordTouched, isEncrypted, confirmPassword, password, LL])
-
-  const isValid = useMemo(() => {
-    if (!isEncrypted) return true
-    if (!passwordValidation?.valid) return false
-    if (confirmPassword !== password) return false
-    return true
-  }, [isEncrypted, password, confirmPassword, passwordValidation])
+  const passwordError = shouldShowPasswordError
+    ? LL.BackupScreen.CloudBackup.passwordTooShort()
+    : undefined
+  const confirmPasswordError = shouldShowConfirmPasswordError
+    ? LL.BackupScreen.CloudBackup.passwordMismatch()
+    : undefined
 
   return {
     isEncrypted,

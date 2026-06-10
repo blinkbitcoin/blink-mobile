@@ -2163,7 +2163,7 @@
     "lightningInvoice": "I-invoyisi ye-lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Imali yokufaka: {fee} SAT kwimali engaphantsi kwe-{threshold} SAT okanye {overFee} SAT kwimali efakwe engaphezulu kwe-{threshold} SAT",
-    "autoConvertMinAmount": "Amaxabiso angaphantsi kwe-{minSats: number} sats awanakho ukuguqulelwa ngokuzenzekelayo kwi-Dollar. Uya kufumana i-Bitcoin endaweni yoko.",
+    "autoConvertMinAmount": "Amaxabiso angaphantsi kwe-{minSats: number} sats / {minFiat: string} awanakho ukuguqulelwa ngokuzenzekelayo kwi-Dollar. Uya kufumana i-Bitcoin endaweni yoko.",
     "autoConvertFailed": "Intlawulo ifumenekile kodwa ukuguqulwa kusilele.",
     "pleaseWaitForConversion": "Nceda linda de ukuguqulwa kugqitywe"
   },
@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Ikhowudi yeposi engekho mthethweni, mhlawumbi yimpazamo yokutayipha",
       "invalidRegion": "Ukukhetha kwengingqi okungekho semthethweni"
     },
-    "passwordTooWeak": "Iphasiwedi ibuthathaka kakhulu. Sebenzisa indibaniselwano yoonobumba abakhulu, abancinci, amanani neempawu ezizodwa.",
-    "passwordCommon": "Le phasiwedi ixhaphake kakhulu. Nceda ukhethe iphasiwedi eyomeleleyo ngakumbi.",
     "copied": "Ikhutshelwe kwi-clipboard"
   },
   "errors": {

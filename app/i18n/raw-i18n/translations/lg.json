@@ -2163,7 +2163,7 @@
     "lightningInvoice": "Invoisi ya lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ssente z'okuteekawo: {fee} SAT ku muwendo gw'okuwandiika {threshold} SAT oba {overFee} SAT ku biteekawo ebisukka {threshold} SAT",
-    "autoConvertMinAmount": "Omuwendo ogutasukka mu {minSats: number} sats tegusobola kukyusibwa mu Doola nga byekka. Ojja kufuna Bitcoin.",
+    "autoConvertMinAmount": "Omuwendo ogutasukka mu {minSats: number} sats / {minFiat: string} tegusobola kukyusibwa mu Doola nga byekka. Ojja kufuna Bitcoin.",
     "autoConvertFailed": "Okusasula kutuuse naye okukyusa kulemye.",
     "pleaseWaitForConversion": "Lindako okutuusa ng'okukyusa kuwedde"
   },
@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Koodi y'eposta si nnungi, oyinza okuba ekikyamu mu kuwandiika",
       "invalidRegion": "Okulonda ekitundu tekikkaanya"
     },
-    "passwordTooWeak": "Ebigambo eby’ekyama binafu nnyo. Kozesa ennukuta ennene n’entono, ennamba n’obubonero obw’enjawulo.",
-    "passwordCommon": "Ebigambo bino eby’ekyama bimanyiddwa nnyo. Nsaba olonde ekigambo eky’ekyama ekisinga obukakafu.",
     "copied": "Kikoppiddwa ku kifo eky'okukwatiramu"
   },
   "errors": {

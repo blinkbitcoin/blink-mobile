@@ -2206,7 +2206,7 @@ const en: BaseTranslation = {
     depositFee:
       "Deposit fee: {fee: string} SAT for amounts under {threshold: string} SAT or {overFee: string} SAT for deposits over {threshold} SAT",
     autoConvertMinAmount:
-      "Amounts below {minSats: number} sats can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
+      "Amounts below {minSats: number} SAT / {minFiat: string} can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
     autoConvertFailed: "Payment received but the conversion failed.",
     pleaseWaitForConversion: "Please wait until the conversion is done",
   },
@@ -2833,7 +2833,7 @@ const en: BaseTranslation = {
     trialAccount: "Trial Account",
     blinkUser: "Blink User",
     anonymous: "Anonymous",
-    anonymousUser: "Anonymous user",
+    anonymousUser: "Anon user",
     blinkToBlink: "Blink to Blink",
     transactionLimits: "Transaction limits",
     activateWallet: "Activate Wallet",
@@ -2958,9 +2958,6 @@ const en: BaseTranslation = {
       invalidPostalCode: "Invalid postal code, probably a typo",
       invalidRegion: "Invalid region selection",
     },
-    passwordTooWeak:
-      "Password is too weak. Use a mix of uppercase, lowercase, numbers, and special characters.",
-    passwordCommon: "This password is too common. Please choose a stronger password.",
   },
   errors: {
     generic: "There was an error.\nPlease try again later.",

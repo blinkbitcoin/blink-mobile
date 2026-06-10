@@ -2163,7 +2163,7 @@
         "lightningInvoice": "Facture lightning",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Frais de dépôt : {fee} SAT pour les montants inférieurs à {threshold} SAT ou {overFee} SAT pour les dépôts supérieurs à {threshold} SAT",
-        "autoConvertMinAmount": "Les montants inférieurs à {minSats: number} sats ne peuvent pas être convertis en Dollar automatiquement. Vous recevrez des Bitcoins.",
+        "autoConvertMinAmount": "Les montants inférieurs à {minSats: number} sats / {minFiat: string} ne peuvent pas être convertis en Dollar automatiquement. Vous recevrez des Bitcoins.",
         "autoConvertFailed": "Paiement reçu mais la conversion a échoué.",
         "pleaseWaitForConversion": "Veuillez patienter jusqu'à ce que la conversion soit terminée"
     },
@@ -2836,8 +2836,6 @@
             "invalidPostalCode": "Code postal invalide, probablement une faute de frappe",
             "invalidRegion": "Sélection de région non valide"
         },
-        "passwordTooWeak": "Le mot de passe est trop faible. Utilisez une combinaison de majuscules, minuscules, chiffres et caractères spéciaux.",
-        "passwordCommon": "Ce mot de passe est trop courant. Veuillez choisir un mot de passe plus robuste.",
         "copied": "Copié dans le presse-papiers"
     },
     "errors": {

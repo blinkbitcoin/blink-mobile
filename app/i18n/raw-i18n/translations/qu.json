@@ -2163,7 +2163,7 @@
     "lightningInvoice": "Lightning invoice",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Waqaychay qullqi: {fee} SAT {threshold} SAT uray kaqkunapaq utaq {overFee} SAT {threshold} SAT hawapi waqaychaykunapaq",
-    "autoConvertMinAmount": "{minSats: number} sats manta pisi kaqkunaqa mana automatikumantachu Dólarman tikrasqa kanman. Bitcointa chaskinki.",
+    "autoConvertMinAmount": "{minSats: number} sats / {minFiat: string} manta pisi kaqkunaqa mana automatikumantachu Dólarman tikrasqa kanman. Bitcointa chaskinki.",
     "autoConvertFailed": "Qullqi chaskikun ichaqa tikrachiymi mana allintachu ruwakurqan.",
     "pleaseWaitForConversion": "Ama hina kaspa, tikrachiy tukukunankama suyay"
   },
@@ -2836,8 +2836,6 @@
       "invalidPostalCode": "Mana allin código postal, ichapas pantasqa qillqay",
       "invalidRegion": "Mana allin suyu akllay"
     },
-    "passwordTooWeak": "Yaykuna rimayqa ancha pisi kallpayoqmi. Hatun qillqakuna, uchuy qillqakuna, yupaykuna hinaspa huk señalakunata chaqrullay.",
-    "passwordCommon": "Kay yaykuna rimayqa ancha riqsisqa kachkan. Aswan kallpasapa yaykuna rimayta akllay.",
     "copied": "Portapapelmanmi kikinchasqa"
   },
   "errors": {

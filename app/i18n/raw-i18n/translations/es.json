@@ -2163,7 +2163,7 @@
         "lightningInvoice": "Factura lightning",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Comisión de depósito: {fee} SAT para montos menores a {threshold} SAT o {overFee} SAT para depósitos mayores a {threshold} SAT",
-        "autoConvertMinAmount": "Los montos por debajo de {minSats: number} sats no pueden convertirse a Dólar automáticamente. Recibirás Bitcoin.",
+        "autoConvertMinAmount": "Los montos por debajo de {minSats: number} sats / {minFiat: string} no pueden convertirse a Dólar automáticamente. Recibirás Bitcoin.",
         "autoConvertFailed": "Pago recibido pero la conversión falló.",
         "pleaseWaitForConversion": "Por favor espera hasta que la conversión se complete"
     },
@@ -2713,7 +2713,7 @@
         "trialAccount": "Cuenta de prueba",
         "blinkUser": "Usuario de Blink",
         "anonymous": "Anónimo",
-        "anonymousUser": "Usuario anónimo",
+        "anonymousUser": "Usuario Anon",
         "transactionLimits": "Límites de la transacción",
         "activateWallet": "Activar billetera",
         "amountRequired": "Se requiere cantidad",
@@ -2836,9 +2836,7 @@
             "minChars": "Debe tener al menos {min} caracteres",
             "invalidPostalCode": "Código postal no válido, probablemente un error tipográfico",
             "invalidRegion": "Selección de región no válida"
-        },
-        "passwordTooWeak": "La contraseña es demasiado débil. Usa una combinación de mayúsculas, minúsculas, números y caracteres especiales.",
-        "passwordCommon": "Esta contraseña es demasiado común. Elige una contraseña más segura."
+        }
     },
     "errors": {
         "generic": "Hubo un error inesperado.\nPor favor intente más tarde",
@@ -3498,7 +3496,7 @@
                 "check3": "Nadie me está pidiendo esta información por mensaje o llamada"
             },
             "Phrase": {
-                "headerTitle": "Frase de respaldo",
+                "headerTitle": "Frase de recuperación",
                 "sparkCompatible": "Esta frase de respaldo funciona en cualquier {sparkCompatibleLink}",
                 "sparkCompatibleLink": "billetera compatible con Spark",
                 "copiedToast": "Frase de respaldo copiada al portapapeles",
