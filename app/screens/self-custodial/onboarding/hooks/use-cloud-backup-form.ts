@@ -3,7 +3,8 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { validatePassword } from "@app/utils/validators/password"
+
+import { validateCloudBackupForm } from "../cloud-backup-validation"
 
 export const useCloudBackupForm = () => {
   const { LL } = useI18nContext()
@@ -41,37 +42,31 @@ export const useCloudBackupForm = () => {
   }, [])
 
   useEffect(() => {
-    if (password.length === 0) setPasswordTouched(false)
+    if (!password) setPasswordTouched(false)
   }, [password])
 
   useEffect(() => {
-    if (confirmPassword.length === 0) setConfirmPasswordTouched(false)
+    if (!confirmPassword) setConfirmPasswordTouched(false)
   }, [confirmPassword])
 
-  const isPasswordValid = useMemo(() => validatePassword(password).valid, [password])
+  const { shouldShowPasswordError, shouldShowConfirmPasswordError, isValid } = useMemo(
+    () =>
+      validateCloudBackupForm({
+        isEncrypted,
+        password,
+        confirmPassword,
+        passwordTouched,
+        confirmPasswordTouched,
+      }),
+    [isEncrypted, password, confirmPassword, passwordTouched, confirmPasswordTouched],
+  )
 
-  const passwordError = useMemo(() => {
-    if (!passwordTouched || !isEncrypted || password.length === 0 || isPasswordValid) {
-      return undefined
-    }
-    return LL.BackupScreen.CloudBackup.passwordTooShort()
-  }, [passwordTouched, isEncrypted, password, isPasswordValid, LL])
-
-  const confirmPasswordError = useMemo(() => {
-    if (!confirmPasswordTouched || !isEncrypted || confirmPassword.length === 0) {
-      return undefined
-    }
-    if (confirmPassword !== password)
-      return LL.BackupScreen.CloudBackup.passwordMismatch()
-    return undefined
-  }, [confirmPasswordTouched, isEncrypted, confirmPassword, password, LL])
-
-  const isValid = useMemo(() => {
-    if (!isEncrypted) return true
-    if (!isPasswordValid) return false
-    if (confirmPassword !== password) return false
-    return true
-  }, [isEncrypted, password, confirmPassword, isPasswordValid])
+  const passwordError = shouldShowPasswordError
+    ? LL.BackupScreen.CloudBackup.passwordTooShort()
+    : undefined
+  const confirmPasswordError = shouldShowConfirmPasswordError
+    ? LL.BackupScreen.CloudBackup.passwordMismatch()
+    : undefined
 
   return {
     isEncrypted,
