@@ -42,6 +42,7 @@ yarn ios             # iOS (terminal 2)
 | [Technology Stack](./technology-stack.md) | Complete list of technologies and dependencies |
 | [Source Tree Analysis](./source-tree-analysis.md) | Directory structure and code organization |
 | [API Reference](./api-reference.md) | GraphQL API types, queries, and mutations |
+| [CSV Export field explanations](./csv.md) | Transaction History, Payments, Types and FAQ on the matter |
 
 ### Existing Documentation
 
