@@ -13,6 +13,7 @@ import { createTheme, ThemeProvider } from "@rn-vui/themed"
 import { StoryScreen } from "../../.storybook/views"
 import { createCache } from "../../app/graphql/cache"
 import { IsAuthedContextProvider } from "../../app/graphql/is-authed-context"
+import { AccountRegistryProvider } from "../../app/hooks/use-account-registry"
 
 const Stack = createStackNavigator()
 
@@ -38,7 +39,7 @@ export const ContextForScreen: React.FC<PropsWithChildren<{ headerShown?: boolea
               <StoryScreen>
                 <TypesafeI18n locale={detectDefaultLocale()}>
                   <IsAuthedContextProvider value={true}>
-                    {children}
+                    <AccountRegistryProvider>{children}</AccountRegistryProvider>
                   </IsAuthedContextProvider>
                 </TypesafeI18n>
               </StoryScreen>
@@ -62,7 +63,7 @@ export const ContextForScreenWithTheme: React.FC<
               <StoryScreen>
                 <TypesafeI18n locale={detectDefaultLocale()}>
                   <IsAuthedContextProvider value={true}>
-                    {children}
+                    <AccountRegistryProvider>{children}</AccountRegistryProvider>
                   </IsAuthedContextProvider>
                 </TypesafeI18n>
               </StoryScreen>

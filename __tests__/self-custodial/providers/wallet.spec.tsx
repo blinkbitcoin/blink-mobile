@@ -4,6 +4,7 @@ import { act, render, renderHook, waitFor } from "@testing-library/react-native"
 
 import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
 
+import { AccountRegistryProvider } from "@app/hooks/use-account-registry"
 import {
   SelfCustodialWalletProvider,
   useSelfCustodialWallet,
@@ -183,7 +184,9 @@ jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
 }))
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <SelfCustodialWalletProvider>{children}</SelfCustodialWalletProvider>
+  <AccountRegistryProvider>
+    <SelfCustodialWalletProvider>{children}</SelfCustodialWalletProvider>
+  </AccountRegistryProvider>
 )
 
 const fireInitialSynced = async (
@@ -219,9 +222,11 @@ describe("SelfCustodialWalletProvider", () => {
 
   it("renders children", async () => {
     const { getByText } = render(
-      <SelfCustodialWalletProvider>
-        <Text>child</Text>
-      </SelfCustodialWalletProvider>,
+      <AccountRegistryProvider>
+        <SelfCustodialWalletProvider>
+          <Text>child</Text>
+        </SelfCustodialWalletProvider>
+      </AccountRegistryProvider>,
     )
 
     expect(getByText("child")).toBeTruthy()

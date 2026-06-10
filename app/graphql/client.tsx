@@ -23,6 +23,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import { SCHEMA_VERSION_KEY } from "@app/config"
 import { useAppConfig } from "@app/hooks"
+import { AccountRegistryProvider } from "@app/hooks/use-account-registry"
 import { useEffectiveLanguage } from "@app/hooks/use-effective-language"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ensureLocaleLoaded } from "@app/i18n/lazy-locale-loader"
@@ -337,23 +338,25 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <ApolloProvider client={apolloClient.client}>
       <IsAuthedContextProvider value={apolloClient.isAuthed}>
-        <LevelContainer>
-          <HideAmountContainer>
-            <NetworkErrorContextProvider
-              value={{
-                networkError,
-                clearNetworkError,
-                token: appConfig.token,
-              }}
-            >
-              <MessagingContainer />
-              <LanguageSync />
-              <AnalyticsContainer />
-              <MyPriceUpdates />
-              {children}
-            </NetworkErrorContextProvider>
-          </HideAmountContainer>
-        </LevelContainer>
+        <AccountRegistryProvider>
+          <LevelContainer>
+            <HideAmountContainer>
+              <NetworkErrorContextProvider
+                value={{
+                  networkError,
+                  clearNetworkError,
+                  token: appConfig.token,
+                }}
+              >
+                <MessagingContainer />
+                <LanguageSync />
+                <AnalyticsContainer />
+                <MyPriceUpdates />
+                {children}
+              </NetworkErrorContextProvider>
+            </HideAmountContainer>
+          </LevelContainer>
+        </AccountRegistryProvider>
       </IsAuthedContextProvider>
     </ApolloProvider>
   )
