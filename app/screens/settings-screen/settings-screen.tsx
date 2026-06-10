@@ -1,6 +1,6 @@
 import { ScrollView } from "react-native-gesture-handler"
-import React, { useEffect } from "react"
-import { TouchableOpacity } from "react-native"
+import React, { useEffect, useState } from "react"
+import { InteractionManager, TouchableOpacity } from "react-native"
 
 import { gql } from "@apollo/client"
 import { makeStyles, Text } from "@rn-vui/themed"
@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native"
 import { StackNavigationProp } from "@react-navigation/stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { Screen } from "@app/components/screen"
 import { SettingsCard } from "./settings-card"
@@ -24,6 +24,7 @@ import { AccountBanner } from "./account/banner"
 import { EmailSetting } from "./account/settings/email"
 import { PhoneSetting } from "./account/settings/phone"
 import { SettingsGroup } from "./group"
+import SettingsGroupsSkeleton from "./settings-groups-skeleton"
 import { DefaultWallet } from "./settings/account-default-wallet"
 import { AccountLevelSetting } from "./settings/account-level"
 import { AccountLNAddress } from "./settings/account-ln-address"
@@ -83,20 +84,36 @@ gql`
   }
 `
 
+// Safety net so the groups still render if interactions never settle.
+const DEFER_GROUPS_FALLBACK_MS = 1000
+
 export const SettingsScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
 
   const isAuthed = useIsAuthed()
   const { isAtLeastLevelOne } = useLevel()
-  const { shouldShowSettingsBanner } = useBackupNudgeState()
   const { activeAccount } = useAccountRegistry()
+  const { backupState } = useBackupState()
   const { data: unackNotificationCount } = useUnacknowledgedNotificationCountQuery({
     skip: !isAuthed,
     fetchPolicy: "cache-and-network",
   })
 
   const isSelfCustodialMode = activeAccount?.type === AccountType.SelfCustodial
+  const shouldShowSettingsBanner =
+    isSelfCustodialMode && backupState.status !== BackupStatus.Completed
+
+  // Defer the heavy groups past the nav transition so the screen paints immediately.
+  const [deferGroups, setDeferGroups] = useState(true)
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => setDeferGroups(false))
+    const fallback = setTimeout(() => setDeferGroups(false), DEFER_GROUPS_FALLBACK_MS)
+    return () => {
+      task.cancel()
+      clearTimeout(fallback)
+    }
+  }, [])
 
   const items = {
     account: [
@@ -156,26 +173,32 @@ export const SettingsScreen: React.FC = () => {
             titleColor="primary"
           />
         )}
-        <SettingsGroup name={LL.common.account()} items={items.account} />
-        <SettingsGroup
-          name={LL.SettingsScreen.addressScreen()}
-          items={items.waysToGetPaid}
-        />
-        {isAtLeastLevelOne && !isSelfCustodialMode && (
-          <SettingsGroup
-            name={LL.AccountScreen.loginMethods()}
-            items={items.loginMethods}
-          />
+        {deferGroups ? (
+          <SettingsGroupsSkeleton />
+        ) : (
+          <>
+            <SettingsGroup name={LL.common.account()} items={items.account} />
+            <SettingsGroup
+              name={LL.SettingsScreen.addressScreen()}
+              items={items.waysToGetPaid}
+            />
+            {isAtLeastLevelOne && !isSelfCustodialMode && (
+              <SettingsGroup
+                name={LL.AccountScreen.loginMethods()}
+                items={items.loginMethods}
+              />
+            )}
+            <SettingsGroup name={LL.common.preferences()} items={items.preferences} />
+            <SettingsGroup
+              name={LL.common.securityAndPrivacy()}
+              items={items.securityAndPrivacy}
+            />
+            {!isSelfCustodialMode && (
+              <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
+            )}
+            <SettingsGroup name={LL.common.support()} items={items.community} />
+          </>
         )}
-        <SettingsGroup name={LL.common.preferences()} items={items.preferences} />
-        <SettingsGroup
-          name={LL.common.securityAndPrivacy()}
-          items={items.securityAndPrivacy}
-        />
-        {!isSelfCustodialMode && (
-          <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
-        )}
-        <SettingsGroup name={LL.common.support()} items={items.community} />
         <VersionComponent />
       </ScrollView>
     </Screen>
