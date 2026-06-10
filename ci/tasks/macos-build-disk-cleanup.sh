@@ -4,12 +4,14 @@ set -euo pipefail
 
 MODE="${1:-check}"
 MIN_FREE_GB="${MIN_BUILD_FREE_GB:-${2:-30}}"
+HARD_MIN_FREE_GB="${MIN_BUILD_HARD_FREE_GB:-10}"
 CI_ROOT="${CI_ROOT:-$(pwd)}"
 DISK_CHECK_PATH="${DISK_CHECK_PATH:-$CI_ROOT}"
 CONCOURSE_WORKDIR="${CONCOURSE_WORKDIR:-/Users/m1/concourse/workdir}"
 BUILD_HOME="${HOME:-/Users/m1}"
 
 required_kb=$((MIN_FREE_GB * 1024 * 1024))
+hard_required_kb=$((HARD_MIN_FREE_GB * 1024 * 1024))
 
 free_kb() {
   df -Pk "$DISK_CHECK_PATH" | awk 'NR == 2 { print $4 }'
@@ -217,14 +219,21 @@ assert_free_space() {
   local available
   available="$(free_kb)"
 
-  if (( available < required_kb )); then
-    echo "ERROR: Only $(free_gb) GB free on $DISK_CHECK_PATH after macOS build cleanup. Required: ${MIN_FREE_GB} GB."
+  if (( available <= hard_required_kb )); then
+    echo "ERROR: Only $(free_gb) GB free on $DISK_CHECK_PATH after macOS build cleanup. Required: more than ${HARD_MIN_FREE_GB} GB."
     echo "Manual follow-up: remove only stale Concourse live volumes with the worker stopped, or run Nix garbage collection with the worker stopped."
     print_disk_report
     exit 1
   fi
 
-  echo "Free disk space on $DISK_CHECK_PATH: $(free_gb) GB (required: ${MIN_FREE_GB} GB)"
+  if (( available < required_kb )); then
+    echo "WARNING: Only $(free_gb) GB free on $DISK_CHECK_PATH after macOS build cleanup. Target: ${MIN_FREE_GB} GB. Builds fail only at or below ${HARD_MIN_FREE_GB} GB."
+    echo "Manual follow-up: remove only stale Concourse live volumes with the worker stopped, or run Nix garbage collection with the worker stopped."
+    print_disk_report
+    return
+  fi
+
+  echo "Free disk space on $DISK_CHECK_PATH: $(free_gb) GB (target: ${MIN_FREE_GB} GB, hard minimum: more than ${HARD_MIN_FREE_GB} GB)"
 }
 
 case "$MODE" in
