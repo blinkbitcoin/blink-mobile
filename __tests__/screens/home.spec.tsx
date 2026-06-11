@@ -90,6 +90,7 @@ jest.mock("@app/config/feature-flags-context", () => {
 
 jest.mock("@app/hooks/use-stablesats-restricted", () => ({
   useStablesatsRestricted: () => mockStablesatsRestrictedOverride,
+  useStablesatsRestrictionSync: () => undefined,
 }))
 
 jest.mock("@app/components/stablesats-restriction-modal", () => {
