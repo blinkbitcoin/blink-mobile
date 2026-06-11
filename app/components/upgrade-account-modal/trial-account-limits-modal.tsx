@@ -9,7 +9,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 export type TrialAccountLimitsModalProps = {
@@ -32,7 +32,7 @@ export const TrialAccountLimitsModal: React.FC<TrialAccountLimitsModalProps> = (
   } = useTheme()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "getStarted">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "getStarted">>()
 
   const navigateToPhoneLogin = () => {
     if (beforeSubmit) beforeSubmit()

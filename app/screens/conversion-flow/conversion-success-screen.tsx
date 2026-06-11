@@ -10,14 +10,14 @@ import {
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 export const ConversionSuccessScreen = () => {
   const styles = useStyles()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "conversionSuccess">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "conversionSuccess">>()
 
   const { LL } = useI18nContext()
   const CALLBACK_DELAY = 3000

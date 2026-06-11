@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef } from "react"
 import { Linking, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { InfoSection, StatusBadge, InfoCard } from "@app/components/card-screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -33,7 +33,7 @@ export const CardTransactionDetailsScreen: React.FC = () => {
   const { LL, locale } = useI18nContext()
   const { feedbackEmailAddress } = useRemoteConfig()
   const { formatCurrency } = useDisplayCurrency()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<CardTransactionDetailsScreenRouteProp>()
 
   const { transactionId } = route.params

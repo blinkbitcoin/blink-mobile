@@ -2,7 +2,7 @@ import * as React from "react"
 import { Text } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -27,7 +27,7 @@ export const StablesatsRestrictionModal: React.FC<Props> = ({
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const handleCreateNew = () => {
     toggleModal()

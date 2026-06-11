@@ -9,12 +9,12 @@ import { useCirclesQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PeopleStackParamList } from "@app/navigation/stack-param-lists"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 export const CirclesCardPeopleHome = () => {
   const styles = useStyles()
-  const navigation = useNavigation<StackNavigationProp<PeopleStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<PeopleStackParamList>>()
   const { LL } = useI18nContext()
 
   const { data, loading, refetch } = useCirclesQuery({

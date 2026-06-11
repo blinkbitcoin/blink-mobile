@@ -1,7 +1,7 @@
 import * as React from "react"
 import { ScrollView, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -19,7 +19,7 @@ export const CardProcessingScreen: React.FC = () => {
 
   const { LL, locale } = useI18nContext()
   const { cardProcessingWaitTimeHours } = useRemoteConfig()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const handleNext = () => {
     navigation.navigate("Primary")

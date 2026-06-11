@@ -11,8 +11,8 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
-jest.mock("@react-navigation/stack", () => ({
-  StackNavigationProp: jest.fn(),
+jest.mock("@react-navigation/native-stack", () => ({
+  NativeStackNavigationProp: jest.fn(),
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({

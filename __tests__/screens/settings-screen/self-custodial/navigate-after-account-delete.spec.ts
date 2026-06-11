@@ -1,4 +1,5 @@
-import { CommonActions, type NavigationProp } from "@react-navigation/native"
+import { CommonActions } from "@react-navigation/native"
+import { type NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { type RootStackParamList } from "@app/navigation/stack-param-lists"
 import { navigateAfterAccountDelete } from "@app/screens/settings-screen/self-custodial/navigate-after-account-delete"
@@ -10,7 +11,7 @@ const buildNavigation = () => {
     navigation: {
       dispatch,
       navigate,
-    } as unknown as NavigationProp<RootStackParamList>,
+    } as unknown as NativeStackNavigationProp<RootStackParamList>,
     dispatch,
     navigate,
   }

@@ -2,7 +2,7 @@ import * as React from "react"
 import { Alert, View } from "react-native"
 import { Text, makeStyles } from "@rn-vui/themed"
 import InAppBrowser from "react-native-inappbrowser-reborn"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -20,7 +20,9 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "acceptTermsAndConditions">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "acceptTermsAndConditions">
+    >()
 
   const route = useRoute<RouteProp<RootStackParamList, "acceptTermsAndConditions">>()
   const { flow } = route.params || { flow: "phone" }

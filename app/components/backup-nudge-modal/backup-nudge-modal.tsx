@@ -2,7 +2,7 @@ import React from "react"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -25,7 +25,7 @@ export const BackupNudgeModal: React.FC<BackupNudgeModalProps> = ({
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const handleSecure = () => {
     onClose()

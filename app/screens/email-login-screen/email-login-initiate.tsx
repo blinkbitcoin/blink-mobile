@@ -10,7 +10,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Input, Text, makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
@@ -58,7 +58,7 @@ export const EmailLoginInitiateScreen: React.FC = () => {
   } = useAppConfig()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "emailLoginInitiate">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "emailLoginInitiate">>()
 
   const [emailInput, setEmailInput] = React.useState<string>("")
   const [errorMessage, setErrorMessage] = React.useState<string>("")

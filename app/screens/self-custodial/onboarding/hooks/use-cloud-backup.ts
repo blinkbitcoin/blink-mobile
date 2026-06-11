@@ -2,7 +2,7 @@ import { useCallback } from "react"
 import { Platform } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { getCloudBackupFilename } from "@app/config/appinfo"
 import { useAppConfig } from "@app/hooks"
@@ -57,7 +57,7 @@ export const useCloudBackup = ({
   version = DEFAULT_BACKUP_VERSION,
 }: UseCloudBackupParams) => {
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { appConfig } = useAppConfig()
   const { startSession, upload, downloadById, resolveErrorMessage, loading } =
     usePlatformCloudBackup()

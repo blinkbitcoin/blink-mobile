@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react"
 import { Alert } from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
@@ -32,7 +32,8 @@ export const useKycFlow = ({
   type,
   headerTitle,
 }: UseKycFlowParams = {}) => {
-  const { navigate, goBack } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { navigate, goBack } =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { LL, locale } = useI18nContext()
   const {
     theme: { mode },

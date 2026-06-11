@@ -9,7 +9,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { AccountType } from "@app/types/wallet"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { SettingsRow } from "./row"
 
@@ -34,7 +34,7 @@ gql`
 
 export const TotpSetting: React.FC = () => {
   const { LL } = useI18nContext()
-  const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
 
   const [spinner, setSpinner] = useState(false)

@@ -19,7 +19,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme, Skeleton } from "@rn-vui/themed"
 
 export const AccountBanner: React.FC = () => {
@@ -40,7 +40,7 @@ const CustodialAccountBanner: React.FC = () => {
     },
   } = useAppConfig()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { currentLevel } = useLevel()
   const isUserLoggedIn = currentLevel !== AccountLevel.NonAuth

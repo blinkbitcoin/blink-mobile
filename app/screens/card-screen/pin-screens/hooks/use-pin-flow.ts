@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
@@ -11,7 +11,7 @@ type UsePinFlowOptions = {
 const FIRST_STEP = 1
 
 export const usePinFlow = ({ totalSteps }: UsePinFlowOptions) => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const [step, setStep] = useState(FIRST_STEP)
   const [storedPin, setStoredPin] = useState("")

@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react"
 
 import Clipboard from "@react-native-clipboard/clipboard"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { validateMnemonic } from "bip39"
 
 import { useBip39Input } from "@app/hooks/use-bip39-input"
@@ -22,7 +22,7 @@ type RestorePhraseParams = {
 
 export const useRestorePhrase = ({ step, initialWords }: RestorePhraseParams) => {
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { restore, status: restoreStatus } = useRestoreWallet()
   const [validationError, setValidationError] = useState<string | null>(null)
 

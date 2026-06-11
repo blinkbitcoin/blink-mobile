@@ -11,7 +11,7 @@ import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 gql`
   mutation userTotpRegistrationValidate($input: UserTotpRegistrationValidateInput!) {
@@ -38,7 +38,9 @@ type Props = {
 
 export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "totpRegistrationValidate">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "totpRegistrationValidate">
+    >()
 
   const [totpRegistrationValidate] = useUserTotpRegistrationValidateMutation()
 

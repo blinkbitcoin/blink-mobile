@@ -2,7 +2,7 @@ import React, { useLayoutEffect } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -20,7 +20,7 @@ import { useCloudRestore } from "./hooks/use-cloud-restore"
 export const CloudRestoreScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const {
     isLoading,

@@ -60,7 +60,7 @@ export const setLocalAndLoginWithAccessToken = async (
     .whileElement(developerScreenSV)
     .scroll(100, "up", NaN, 0.85)
 
-  await tap(by.id("Back"))
+  await device.pressBack()
 
   // Sometimes prompt to save password to keychain appears which need to be dismissed
   await device.sendToHome()

@@ -8,7 +8,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import analytics from "@react-native-firebase/analytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 type EmailLoginValidateScreenProps = {
   route: RouteProp<RootStackParamList, "emailLoginValidate">
@@ -18,7 +18,7 @@ export const EmailLoginValidateScreen: React.FC<EmailLoginValidateScreenProps> =
   route,
 }) => {
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "emailLoginValidate">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "emailLoginValidate">>()
 
   const [errorMessage, setErrorMessage] = React.useState<string>("")
 

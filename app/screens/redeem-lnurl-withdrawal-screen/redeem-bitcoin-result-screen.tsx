@@ -7,7 +7,7 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
@@ -21,7 +21,7 @@ type Prop = {
 
 const RedeemBitcoinResultScreen: React.FC<Prop> = ({ route }) => {
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "redeemBitcoinResult">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "redeemBitcoinResult">>()
 
   const {
     callback,

@@ -8,7 +8,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
@@ -39,7 +39,7 @@ export const PhoneSetting: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { loading, phone, emailVerified, phoneVerified } = useLoginMethods()
   const { updateCurrentProfile } = useSaveSessionProfile()

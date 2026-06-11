@@ -17,7 +17,7 @@ import { getErrorMessages } from "@app/graphql/utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button } from "@rn-vui/base"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -234,7 +234,8 @@ export const EarnQuiz = ({ route }: Props) => {
 
   const { LL } = useI18nContext()
   const quizQuestionsContent = getQuizQuestionsContent({ LL })
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList, "earnsQuiz">>()
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "earnsQuiz">>()
 
   const [permutation] = useState<ZeroTo2[]>(shuffle([0, 1, 2]))
 

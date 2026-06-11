@@ -9,7 +9,7 @@ import { View } from "react-native"
 
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, Skeleton, Avatar } from "@rn-vui/themed"
 
 import { useSettingsScreenQuery } from "@app/graphql/generated"
@@ -30,7 +30,7 @@ export const AccountBannerVertical: React.FC = () => {
     },
   } = useAppConfig()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { currentLevel } = useLevel()
   const { activeAccount } = useAccountRegistry()

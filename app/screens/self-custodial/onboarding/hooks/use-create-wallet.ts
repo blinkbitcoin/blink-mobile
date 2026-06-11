@@ -2,7 +2,7 @@ import { useCallback, useState } from "react"
 import Crypto from "react-native-quick-crypto"
 
 import { CommonActions, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
@@ -23,7 +23,7 @@ export const CreationStatus = {
 type CreationStatus = (typeof CreationStatus)[keyof typeof CreationStatus]
 
 export const useCreateWallet = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { updateState } = usePersistentStateContext()
   const { retry: reinitSdk } = useSelfCustodialWallet()
   const { reloadSelfCustodialAccounts } = useAccountRegistry()

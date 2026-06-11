@@ -4,7 +4,7 @@ import axios from "axios"
 
 import analytics from "@react-native-firebase/analytics"
 import { useNavigation, useFocusEffect } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { BLINK_DEEP_LINK_PREFIX, TELEGRAM_CALLBACK_PATH } from "@app/config"
@@ -42,7 +42,7 @@ gql`
 `
 
 export const useTelegramLogin = (phone: string, onboarding: boolean = false) => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { saveProfile, updateCurrentProfile } = useSaveSessionProfile()
 
   const [loading, setLoading] = useState(false)

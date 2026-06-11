@@ -16,7 +16,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import { useSwitchToNextProfile } from "@app/hooks/use-switch-to-next-profile"
@@ -38,7 +38,7 @@ gql`
 export const Delete = () => {
   const styles = useStyles()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { logout } = useLogout()
   const { appConfig } = useAppConfig()
   const { switchToNextProfile } = useSwitchToNextProfile()

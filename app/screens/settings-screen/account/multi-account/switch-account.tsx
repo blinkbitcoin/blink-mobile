@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles } from "@rn-vui/themed"
 import { Screen } from "@app/components/screen"
 
@@ -24,7 +24,7 @@ export const SwitchAccount: React.FC = () => {
   } = useAppConfig()
   const { saveProfile } = useSaveSessionProfile()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { selfCustodialEntries } = useAccountRegistry()
 

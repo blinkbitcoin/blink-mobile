@@ -20,7 +20,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { PeopleStackParamList } from "@app/navigation/stack-param-lists"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
@@ -52,7 +52,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
   } = useTheme()
   const styles = useStyles()
 
-  const navigation = useNavigation<StackNavigationProp<PeopleStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<PeopleStackParamList>>()
 
   const acknowledgeModal = () => {
     setIsVisible(false)

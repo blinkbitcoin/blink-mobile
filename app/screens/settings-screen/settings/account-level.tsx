@@ -1,7 +1,7 @@
 import React from "react"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useLevel } from "@app/graphql/level-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
@@ -13,7 +13,7 @@ import { SettingsRow } from "../row"
 
 export const AccountLevelSetting: React.FC = () => {
   const { LL } = useI18nContext()
-  const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { currentLevel: level } = useLevel()
   const { activeAccount } = useAccountRegistry()
 

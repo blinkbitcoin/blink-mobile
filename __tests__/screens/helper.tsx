@@ -7,7 +7,7 @@ import theme from "@app/rne-theme/theme"
 import { light, dark } from "@app/rne-theme/colors"
 import { detectDefaultLocale } from "@app/utils/locale-detector"
 import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { createTheme, ThemeProvider } from "@rn-vui/themed"
 
 import { StoryScreen } from "../../.storybook/views"
@@ -15,7 +15,7 @@ import { createCache } from "../../app/graphql/cache"
 import { IsAuthedContextProvider } from "../../app/graphql/is-authed-context"
 import { AccountRegistryProvider } from "../../app/hooks/use-account-registry"
 
-const Stack = createStackNavigator()
+const Stack = createNativeStackNavigator()
 
 type ThemeMode = "light" | "dark"
 

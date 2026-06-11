@@ -6,7 +6,7 @@ import { useApolloClient } from "@apollo/client"
 import { useHideBalanceQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useFocusEffect } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, ListItem } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -23,7 +23,7 @@ import { toastShow } from "../../utils/toast"
 import { Switch } from "@app/components/atomic/switch"
 
 type Props = {
-  navigation: StackNavigationProp<RootStackParamList, "security">
+  navigation: NativeStackNavigationProp<RootStackParamList, "security">
   route: RouteProp<RootStackParamList, "security">
 }
 

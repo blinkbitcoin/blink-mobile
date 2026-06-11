@@ -6,7 +6,7 @@ import { WebView, WebViewNavigation } from "react-native-webview"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
@@ -22,7 +22,8 @@ type Props = {
 export const WebViewScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
 
-  const { navigate } = useNavigation<StackNavigationProp<RootStackParamList, "Primary">>()
+  const { navigate } =
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "Primary">>()
   const { url, initialTitle, headerTitle } = route.params
   const { LL } = useI18nContext()
 

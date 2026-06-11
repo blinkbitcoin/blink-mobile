@@ -3,7 +3,7 @@ import { validateMnemonic } from "bip39"
 import Crypto from "react-native-quick-crypto"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
@@ -35,7 +35,7 @@ type RestoreWalletStatus = (typeof RestoreWalletStatus)[keyof typeof RestoreWall
 
 export const useRestoreWallet = () => {
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { updateState } = usePersistentStateContext()
   const { retry: reinitSdk } = useSelfCustodialWallet()
   const { reloadSelfCustodialAccounts } = useAccountRegistry()

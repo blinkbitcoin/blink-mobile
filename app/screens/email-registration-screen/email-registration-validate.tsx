@@ -9,7 +9,7 @@ import { useUserEmailRegistrationValidateMutation } from "@app/graphql/generated
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { SuccessIconAnimation } from "@app/components/success-animation"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
@@ -38,7 +38,7 @@ type Props = {
 const SUCCESS_DELAY = 2000
 
 export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const styles = useStyles()
 
   const [errorMessage, setErrorMessage] = React.useState<string>("")

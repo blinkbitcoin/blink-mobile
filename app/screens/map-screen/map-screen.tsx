@@ -18,7 +18,7 @@ import useDeviceLocation from "@app/hooks/use-device-location"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import Geolocation from "@react-native-community/geolocation"
 import { useFocusEffect } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import countryCodes from "../../../utils/countryInfo.json"
 import { Screen } from "../../components/screen"
@@ -39,7 +39,7 @@ const LATITUDE_DELTA = 15 // <-- decrease for more zoom
 const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height)
 
 type Props = {
-  navigation: StackNavigationProp<RootStackParamList, "Primary">
+  navigation: NativeStackNavigationProp<RootStackParamList, "Primary">
 }
 
 Geolocation.setRNConfiguration({

@@ -16,7 +16,7 @@ import { logGetStartedAction } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
@@ -28,7 +28,7 @@ import { PhoneLoginInitiateType } from "../phone-auth-screen"
 
 export const GetStartedScreen: React.FC = () => {
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "getStarted">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "getStarted">>()
 
   const styles = useStyles()
 

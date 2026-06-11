@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useClipboard } from "@app/hooks"
@@ -19,7 +19,7 @@ const CHALLENGE_COUNT = 3
 
 export const useViewBackupPhrase = () => {
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
   const { sparkCompatibleWalletsUrl } = useRemoteConfig()
   const mnemonic = useWalletMnemonic()

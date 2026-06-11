@@ -17,7 +17,7 @@ import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 import { useAppConfig } from "@app/hooks"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { SearchBar } from "@rn-vui/base"
 import { ListItem, makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -49,7 +49,7 @@ export const AllContactsScreen: React.FC = () => {
     },
   } = useAppConfig()
 
-  const navigation = useNavigation<StackNavigationProp<PeopleStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<PeopleStackParamList>>()
 
   const isAuthed = useIsAuthed()
   const { activeAccount } = useAccountRegistry()

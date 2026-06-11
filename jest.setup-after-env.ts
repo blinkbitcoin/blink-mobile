@@ -40,16 +40,16 @@ afterEach(async () => {
 // Leaked-timer janitor: track real timers created during each test and clear
 // any still pending at the test/file boundary.
 //
-// Why: @react-navigation/stack's Card schedules its mount animation via
-// setTimeout (Card.tsx, react-navigation#12401 workaround) without clearing it
-// reliably. A fast synchronous suite that renders a navigator (e.g. via the
-// shared ContextForScreen helper) finishes before the timer fires; under
-// --runInBand the leaked timer then fires in a LATER suite, after this file's
+// Why: a fast synchronous suite that renders a navigator (e.g. via the shared
+// ContextForScreen helper) can finish before a leaked real timer fires; under
+// --runInBand that timer then fires in a LATER suite, after this file's
 // environment is torn down, throwing "You are trying to `import` a file after
 // the Jest environment has been torn down" inside a timer callback — which
-// crashes the whole Jest process. Reproduced locally; this is the "random
-// suite, random run" CI failure from issue #3815. The leak lives in
-// node_modules, so it can't be fixed at the source in app code.
+// crashes the whole Jest process. The "random suite, random run" CI failure
+// from issue #3815. The original trigger (a JS-stack Card setTimeout,
+// react-navigation#12401) is gone after the native-stack migration, but this
+// janitor is kept as a general safety net since such leaks live in node_modules
+// and can't be fixed at the source in app code.
 //
 // Fake-timer suites are unaffected: jest.useFakeTimers() shadows these
 // wrappers entirely, and sinon restores them on useRealTimers().

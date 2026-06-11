@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useNavigation } from "@react-navigation/native"
 import { useApolloClient } from "@apollo/client"
 
@@ -27,7 +27,7 @@ export const useUnseenTxAmountBadge = ({
   hasUnseenUsdTx,
   hasUnseenBtcTx,
 }: UnseenTxAmountBadgeParams) => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatCurrency, formatMoneyAmount } = useDisplayCurrency()
   const { feeReimbursementMemo } = useRemoteConfig()
   const client = useApolloClient()

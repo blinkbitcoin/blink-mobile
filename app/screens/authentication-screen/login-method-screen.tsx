@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react"
 import { View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -36,7 +36,7 @@ export const LoginMethodScreen: React.FC<LoginMethodScreenProps> = ({ route }) =
     theme: { mode },
   } = useTheme()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const {
     isTelegramSupported,
     isSmsSupported,

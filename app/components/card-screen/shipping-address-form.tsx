@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react"
 import { View } from "react-native"
 import { makeStyles } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { InputField, ValueStyle } from "./input-field"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -34,7 +34,7 @@ export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { errors, isValid } = useMemo(
     () =>

@@ -32,7 +32,7 @@ import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/ho
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
@@ -67,7 +67,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinConfirmation">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "sendBitcoinConfirmation">
+    >()
 
   const { hideAmount } = useHideAmount()
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()

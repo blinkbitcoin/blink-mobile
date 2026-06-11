@@ -55,10 +55,9 @@ import { WebViewScreen } from "@app/screens/webview/webview"
 import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import {
-  CardStyleInterpolators,
-  createStackNavigator,
-  StackNavigationProp,
-} from "@react-navigation/stack"
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from "@react-navigation/native-stack"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -161,7 +160,7 @@ import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 
-const RootNavigator = createStackNavigator<RootStackParamList>()
+const RootNavigator = createNativeStackNavigator<RootStackParamList>()
 
 const withOfflineGate = <P extends object>(Screen: React.ComponentType<P>) => {
   const Gated: React.FC<P> = (props) => (
@@ -191,7 +190,7 @@ export const RootStack = () => {
   const isAuthed = useIsAuthed()
   const { LL } = useI18nContext()
   const { persistentState } = usePersistentStateContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const hasAccount = isAuthed || Boolean(persistentState.activeAccountId)
   const shouldShowUnavailable = useSelfCustodialUnavailable()
@@ -205,12 +204,9 @@ export const RootStack = () => {
       screenOptions={{
         gestureEnabled: true,
         headerBackTitle: LL.common.back(),
-        headerBackTestID: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
-        headerMode: "screen",
         headerLeft: headerBackControl(),
       }}
       initialRouteName={hasAccount ? "authenticationCheck" : "getStarted"}
@@ -266,7 +262,6 @@ export const RootStack = () => {
         options={{
           title: LL.ScanningQRCodeScreen.title(),
           headerShown: false,
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
         }}
       />
       <RootNavigator.Screen
@@ -353,14 +348,12 @@ export const RootStack = () => {
         name="earnsSection"
         component={EarnSection}
         options={{
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
           headerStyle: { backgroundColor: colors._blue },
           headerTintColor: colors._white,
           headerTitleStyle: {
             fontWeight: "bold",
             fontSize: 18,
           },
-          headerBackTitleStyle: { color: colors._white },
         }}
       />
       <RootNavigator.Screen
@@ -368,7 +361,7 @@ export const RootStack = () => {
         component={EarnQuiz}
         options={{
           headerShown: false,
-          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          animation: "slide_from_bottom",
         }}
       />
       <RootNavigator.Screen
@@ -426,7 +419,7 @@ export const RootStack = () => {
         component={SectionCompleted}
         options={{
           headerShown: false,
-          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          animation: "slide_from_bottom",
         }}
       />
       <RootNavigator.Screen
@@ -453,7 +446,6 @@ export const RootStack = () => {
         component={TransactionDetailScreen}
         options={{
           headerShown: false,
-          // cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS,
         }}
       />
       <RootNavigator.Screen
@@ -467,7 +459,7 @@ export const RootStack = () => {
         options={{
           title: LL.TransactionScreen.transactionHistoryTitle(),
           presentation: "modal",
-          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          animation: "slide_from_bottom",
           gestureEnabled: false,
         }}
       />
@@ -475,8 +467,6 @@ export const RootStack = () => {
         name="priceHistory"
         component={PriceHistoryScreen}
         options={{
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-          gestureDirection: "horizontal-inverted",
           title: LL.common.bitcoinPrice(),
         }}
       />
@@ -841,7 +831,7 @@ export const RootStack = () => {
   )
 }
 
-const Onboarding = createStackNavigator<OnboardingStackParamList>()
+const Onboarding = createNativeStackNavigator<OnboardingStackParamList>()
 
 export const OnboardingNavigator = () => {
   const { LL } = useI18nContext()
@@ -855,10 +845,8 @@ export const OnboardingNavigator = () => {
       screenOptions={{
         gestureEnabled: true,
         headerBackTitle: LL.common.back(),
-        headerBackTestID: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
       }}
     >
@@ -897,7 +885,7 @@ export const OnboardingNavigator = () => {
   )
 }
 
-const StackContacts = createStackNavigator<PeopleStackParamList>()
+const StackContacts = createNativeStackNavigator<PeopleStackParamList>()
 
 export const ContactNavigator = () => {
   const { LL } = useI18nContext()
@@ -911,10 +899,8 @@ export const ContactNavigator = () => {
       screenOptions={{
         gestureEnabled: true,
         headerBackTitle: LL.common.back(),
-        headerBackTestID: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
         headerLeft: headerBackControl(),
       }}
@@ -950,7 +936,7 @@ export const ContactNavigator = () => {
     </StackContacts.Navigator>
   )
 }
-const StackPhoneValidation = createStackNavigator<PhoneValidationStackParamList>()
+const StackPhoneValidation = createNativeStackNavigator<PhoneValidationStackParamList>()
 
 export const PhoneLoginNavigator = () => {
   const { LL } = useI18nContext()
@@ -970,10 +956,8 @@ export const PhoneLoginNavigator = () => {
       screenOptions={{
         gestureEnabled: true,
         headerBackTitle: LL.common.back(),
-        headerBackTestID: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
         headerLeft: headerBackControl(),
       }}

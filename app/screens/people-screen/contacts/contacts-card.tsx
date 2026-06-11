@@ -23,7 +23,7 @@ import { AccountType } from "@app/types/wallet"
 import { toastShow } from "@app/utils/toast"
 import { useAppConfig } from "@app/hooks"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 const RECENT_CONTACTS_LIMIT = 3
@@ -51,8 +51,9 @@ const Contact = ({
   isSelfCustodial: boolean
 }) => {
   const styles = useStyles()
-  const navigation = useNavigation<StackNavigationProp<PeopleStackParamList>>()
-  const rootNavigation = navigation.getParent<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<PeopleStackParamList>>()
+  const rootNavigation =
+    navigation.getParent<NativeStackNavigationProp<RootStackParamList>>()
   const {
     appConfig: {
       galoyInstance: { lnAddressHostname },
@@ -91,7 +92,7 @@ export const ContactsCard = () => {
   const { activeAccount } = useAccountRegistry()
   const { sdk } = useSelfCustodialWallet()
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
-  const navigation = useNavigation<StackNavigationProp<PeopleStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<PeopleStackParamList>>()
 
   const [selfCustodialContacts, setSelfCustodialContacts] = React.useState<UserContact[]>(
     [],
