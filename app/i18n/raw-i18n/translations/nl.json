@@ -2459,7 +2459,8 @@
   "StablesatsRestriction": {
     "modalTitle": "Stablesats is niet beschikbaar in jouw regio",
     "modalBody": "Maak een non-custodial account aan om toegang te krijgen tot een dollar-account.",
-    "createNew": "Nieuw aanmaken"
+    "createNew": "Nieuw aanmaken",
+    "walletLabel": "niet beschikbaar in jouw regio"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Het dollaraccount is niet langer beschikbaar in jouw regio",
@@ -2765,7 +2766,6 @@
     "needWallet": "Log in of maak een account aan om toegang te krijgen tot uw wallet",
     "next": "Volgende",
     "No": "Nee",
-    "notAvailable": "niet beschikbaar",
     "note": "Noot",
     "notification": "Melding",
     "ok": "OK",

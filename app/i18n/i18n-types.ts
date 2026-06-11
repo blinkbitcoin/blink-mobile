@@ -8149,6 +8149,10 @@ type RootTranslation = {
 		 * C​r​e​a​t​e​ ​n​e​w
 		 */
 		createNew: string
+		/**
+		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 */
+		walletLabel: string
 	}
 	ConvertDollarToBitcoinModal: {
 		/**
@@ -9104,10 +9108,6 @@ type RootTranslation = {
 		 * N​o
 		 */
 		No: string
-		/**
-		 * n​o​t​ ​a​v​a​i​l​a​b​l​e
-		 */
-		notAvailable: string
 		/**
 		 * N​o​t​e
 		 */
@@ -20404,6 +20404,10 @@ export type TranslationFunctions = {
 		 * Create new
 		 */
 		createNew: () => LocalizedString
+		/**
+		 * not available in your region
+		 */
+		walletLabel: () => LocalizedString
 	}
 	ConvertDollarToBitcoinModal: {
 		/**
@@ -21338,10 +21342,6 @@ export type TranslationFunctions = {
 		 * No
 		 */
 		No: () => LocalizedString
-		/**
-		 * not available
-		 */
-		notAvailable: () => LocalizedString
 		/**
 		 * Note
 		 */

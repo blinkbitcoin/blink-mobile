@@ -2459,7 +2459,8 @@
   "StablesatsRestriction": {
     "modalTitle": "Stablesats no està disponible a la teva regió",
     "modalBody": "Per accedir a un compte en dòlars, crea un compte no custodial.",
-    "createNew": "Crea nou"
+    "createNew": "Crea nou",
+    "walletLabel": "no està disponible a la teva regió"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "El compte en dòlars ja no està disponible a la teva regió",
@@ -2765,7 +2766,6 @@
     "needWallet": "Inicia sessió o crea un compte per accedir al teu moneder",
     "next": "Següent",
     "No": "No",
-    "notAvailable": "no disponible",
     "note": "Nota",
     "notification": "Notificació",
     "ok": "D'acord",

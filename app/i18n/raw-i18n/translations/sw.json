@@ -2459,7 +2459,8 @@
   "StablesatsRestriction": {
     "modalTitle": "Stablesats haipatikani katika eneo lako",
     "modalBody": "Ili kufikia akaunti ya dola, unda akaunti isiyo ya ulinzi.",
-    "createNew": "Unda mpya"
+    "createNew": "Unda mpya",
+    "walletLabel": "haipatikani katika eneo lako"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Akaunti ya Dola haipatikani tena katika eneo lako",
@@ -2765,7 +2766,6 @@
     "needWallet": "Ingia au tengeneza akaunti ili ufikie mfuko wako wa fedha",
     "next": "Ifuatayo",
     "No": "Hapana",
-    "notAvailable": "haipatikani",
     "note": "Dokezo",
     "notification": "Taarifa",
     "ok": "Sawa",

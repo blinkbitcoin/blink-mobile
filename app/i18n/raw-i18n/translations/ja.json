@@ -2459,7 +2459,8 @@
     "StablesatsRestriction": {
         "modalTitle": "あなたの地域ではStablesatsをご利用いただけません",
         "modalBody": "ドル口座にアクセスするには、ノンカストディアル口座を作成してください。",
-        "createNew": "新規作成"
+        "createNew": "新規作成",
+        "walletLabel": "あなたの地域ではご利用いただけません"
     },
     "ConvertDollarToBitcoinModal": {
         "title": "ドルアカウントはお住まいの地域でご利用いただけなくなりました",
@@ -2765,7 +2766,6 @@
         "needWallet": "ウォレットにアクセスするには、ログインするか、新たにウォレットを作成してください",
         "next": "次",
         "No": "いいえ",
-        "notAvailable": "利用不可",
         "note": "メモ",
         "notification": "通知",
         "ok": "OK",

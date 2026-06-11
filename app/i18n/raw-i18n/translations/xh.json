@@ -2459,7 +2459,8 @@
   "StablesatsRestriction": {
     "modalTitle": "I-Stablesats ayifumaneki kummandla wakho",
     "modalBody": "Ukufumana ifikelelo kwiakhawunti yedola, yenza iakhawunti engenagunya.",
-    "createNew": "Yenza entsha"
+    "createNew": "Yenza entsha",
+    "walletLabel": "ayifumaneki kummandla wakho"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "I-akhawunti yeDola ayisafumaneki kummandla wakho",
@@ -2765,7 +2766,6 @@
     "needWallet": "Log in or create an account to access your wallet",
     "next": "Next",
     "No": "No",
-    "notAvailable": "ayifumaneki",
     "note": "Note",
     "notification": "Notification",
     "ok": "KULUNGILE",

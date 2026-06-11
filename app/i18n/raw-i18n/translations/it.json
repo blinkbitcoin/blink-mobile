@@ -2459,7 +2459,8 @@
     "StablesatsRestriction": {
         "modalTitle": "Stablesats non è disponibile nella tua regione",
         "modalBody": "Per accedere a un conto in dollari, crea un account non-custodial.",
-        "createNew": "Crea nuovo"
+        "createNew": "Crea nuovo",
+        "walletLabel": "non è disponibile nella tua regione"
     },
     "ConvertDollarToBitcoinModal": {
         "title": "Il conto in dollari non è più disponibile nella tua regione",
@@ -2765,7 +2766,6 @@
         "needWallet": "Accedi o crea un account per accedere al tuo portafoglio",
         "next": "Avanti",
         "No": "No",
-        "notAvailable": "non disponibile",
         "note": "Nota",
         "notification": "Notifica",
         "ok": "OK",

@@ -2459,7 +2459,8 @@
   "StablesatsRestriction": {
     "modalTitle": "Stablesats mana kapunchu suyuykipi",
     "modalBody": "Dólar cuentaman yaykunaykipaq, mana waqaychaq cuentata kamariy.",
-    "createNew": "Musuq kamariy"
+    "createNew": "Musuq kamariy",
+    "walletLabel": "mana kapunchu suyuykipi"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dólar cuentaqa manaña suyuykipi kanchu",
@@ -2765,7 +2766,6 @@
     "needWallet": "Log in or create an account to access your wallet",
     "next": "Qhipa",
     "No": "Mana",
-    "notAvailable": "mana kapunchu",
     "note": "Willana",
     "notification": "Willanakuy",
     "ok": "Ay",

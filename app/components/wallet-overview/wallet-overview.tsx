@@ -215,7 +215,7 @@ const WalletOverview: React.FC<Props> = ({
               <Loader />
             ) : isStablesatsRestricted ? (
               <View style={styles.hideableArea}>
-                <Text type="p2">{LL.common.notAvailable()}</Text>
+                <Text type="p2">{LL.StablesatsRestriction.walletLabel()}</Text>
               </View>
             ) : (
               <View style={[styles.hideableArea, pressedUsd && styles.pressedOpacity]}>
