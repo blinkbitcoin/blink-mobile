@@ -17,7 +17,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
@@ -81,7 +81,7 @@ const WalletOverview: React.FC<Props> = ({
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { formatMoneyAmount, displayCurrency, moneyAmountToDisplayCurrencyString } =
     useDisplayCurrency()

@@ -21,7 +21,7 @@ import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme, Text, Input } from "@rn-vui/themed"
 import type { InputRef } from "@app/types/themed-input"
 
@@ -126,7 +126,7 @@ export const PhoneLoginInitiateScreen: React.FC<PhoneLoginInitiateScreenProps> =
 
   const navigation =
     useNavigation<
-      StackNavigationProp<PhoneValidationStackParamList, "phoneLoginInitiate">
+      NativeStackNavigationProp<PhoneValidationStackParamList, "phoneLoginInitiate">
     >()
 
   const {

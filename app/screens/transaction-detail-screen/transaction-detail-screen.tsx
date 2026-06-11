@@ -25,7 +25,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { toWalletAmount } from "@app/types/amounts"
 import { PaymentType } from "@app/types/transaction"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { IconTransaction } from "../../components/icon-transactions"
@@ -106,7 +106,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
   const insets = useSafeAreaInsets()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatMoneyAmount } = useDisplayCurrency()
   const {
     appConfig: { galoyInstance },

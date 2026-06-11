@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { View } from "react-native"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { AmountInput } from "@app/components/amount-input"
@@ -33,7 +33,7 @@ const RedeemBitcoinDetailScreen: React.FC<Prop> = ({ route }) => {
   const styles = useStyles()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "redeemBitcoinDetail">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "redeemBitcoinDetail">>()
 
   const { formatMoneyAmount } = useDisplayCurrency()
 

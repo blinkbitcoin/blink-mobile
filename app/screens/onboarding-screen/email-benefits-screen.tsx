@@ -1,6 +1,6 @@
 import * as React from "react"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import {
   OnboardingStackParamList,
@@ -16,7 +16,7 @@ type EmailBenefitsScreenProps = {
 
 export const EmailBenefitsScreen: React.FC<EmailBenefitsScreenProps> = ({ route }) => {
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { onboarding, hasUsername = false } = route.params
 

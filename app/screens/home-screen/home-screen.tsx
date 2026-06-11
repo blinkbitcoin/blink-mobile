@@ -4,7 +4,7 @@ import { RefreshControl, View, Alert, Pressable } from "react-native"
 import { gql } from "@apollo/client"
 import Modal from "react-native-modal"
 import { useNavigation, useIsFocused, useFocusEffect } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { ScrollView, TouchableWithoutFeedback } from "react-native-gesture-handler"
 
@@ -164,7 +164,7 @@ export const HomeScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { balanceLimitToTriggerUpgradeModal, upgradeModalCooldownDays } =
     useRemoteConfig()
 

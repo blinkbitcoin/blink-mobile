@@ -1,6 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react"
 
-import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
@@ -56,9 +63,11 @@ type AccountRegistryResult = {
   reloadSelfCustodialAccounts: () => Promise<void>
 }
 
-export const useAccountRegistry = (): AccountRegistryResult => {
+const AccountRegistryContext = createContext<AccountRegistryResult | null>(null)
+
+/** Owns the registry so its two device reads run once and are shared via context. */
+export const AccountRegistryProvider = ({ children }: { children: ReactNode }) => {
   const isAuthed = useIsAuthed()
-  const { nonCustodialEnabled } = useFeatureFlags()
   const { persistentState, updateState } = usePersistentStateContext()
   const { LL } = useI18nContext()
 
@@ -114,10 +123,7 @@ export const useAccountRegistry = (): AccountRegistryResult => {
     }
 
     const fallbackLabel = LL.AccountTypeSelectionScreen.selfCustodialLabel()
-    const visibleEntries =
-      nonCustodialEnabled || selfCustodialEntries.length > 0 ? selfCustodialEntries : []
-
-    for (const entry of visibleEntries) {
+    for (const entry of selfCustodialEntries) {
       list.push(
         createSelfCustodialDescriptor(entry.id, entry.lightningAddress ?? fallbackLabel),
       )
@@ -127,7 +133,6 @@ export const useAccountRegistry = (): AccountRegistryResult => {
   }, [
     isAuthed,
     hasStoredCustodialProfile,
-    nonCustodialEnabled,
     selfCustodialEntries,
     persistentState.activeAccountId,
     LL.AccountTypeSelectionScreen,
@@ -145,12 +150,37 @@ export const useAccountRegistry = (): AccountRegistryResult => {
     [updateState],
   )
 
-  return {
-    accounts,
-    activeAccount,
-    selfCustodialEntries,
-    loading: selfCustodialHydrating || profilesHydrating,
-    setActiveAccountId,
-    reloadSelfCustodialAccounts,
+  const value = useMemo<AccountRegistryResult>(
+    () => ({
+      accounts,
+      activeAccount,
+      selfCustodialEntries,
+      loading: selfCustodialHydrating || profilesHydrating,
+      setActiveAccountId,
+      reloadSelfCustodialAccounts,
+    }),
+    [
+      accounts,
+      activeAccount,
+      selfCustodialEntries,
+      selfCustodialHydrating,
+      profilesHydrating,
+      setActiveAccountId,
+      reloadSelfCustodialAccounts,
+    ],
+  )
+
+  return (
+    <AccountRegistryContext.Provider value={value}>
+      {children}
+    </AccountRegistryContext.Provider>
+  )
+}
+
+export const useAccountRegistry = (): AccountRegistryResult => {
+  const context = useContext(AccountRegistryContext)
+  if (!context) {
+    throw new Error("useAccountRegistry must be used within an AccountRegistryProvider")
   }
+  return context
 }

@@ -5,10 +5,10 @@ import { TouchableOpacity } from "react-native"
 import { gql } from "@apollo/client"
 import { makeStyles, Text } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { Screen } from "@app/components/screen"
 import { SettingsCard } from "./settings-card"
@@ -89,14 +89,16 @@ export const SettingsScreen: React.FC = () => {
 
   const isAuthed = useIsAuthed()
   const { isAtLeastLevelOne } = useLevel()
-  const { shouldShowSettingsBanner } = useBackupNudgeState()
   const { activeAccount } = useAccountRegistry()
+  const { backupState } = useBackupState()
   const { data: unackNotificationCount } = useUnacknowledgedNotificationCountQuery({
     skip: !isAuthed,
     fetchPolicy: "cache-and-network",
   })
 
   const isSelfCustodialMode = activeAccount?.type === AccountType.SelfCustodial
+  const shouldShowSettingsBanner =
+    isSelfCustodialMode && backupState.status !== BackupStatus.Completed
 
   const items = {
     account: [
@@ -121,7 +123,7 @@ export const SettingsScreen: React.FC = () => {
     community: [NeedHelpSetting, JoinCommunitySetting],
   }
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   useEffect(() => {
     const count =

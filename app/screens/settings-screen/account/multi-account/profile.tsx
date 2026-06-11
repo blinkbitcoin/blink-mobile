@@ -4,7 +4,7 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { ListItem, makeStyles, Overlay, useTheme, Text } from "@rn-vui/themed"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { CommonActions, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useState } from "react"
 import { useAppConfig } from "@app/hooks"
@@ -34,7 +34,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
   const styles = useStyles()
   const { LL } = useI18nContext()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const [switchLoading, setSwitchLoading] = useState(false)
   const [logoutLoading, setLogoutLoading] = useState(false)

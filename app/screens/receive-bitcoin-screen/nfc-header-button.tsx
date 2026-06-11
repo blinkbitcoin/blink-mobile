@@ -2,7 +2,7 @@ import React, { useEffect } from "react"
 import { TouchableOpacity } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { CustomIcon } from "@app/components/custom-icon"
@@ -18,7 +18,7 @@ export const NfcHeaderButton: React.FC<NfcHeaderButtonProps> = ({ visible, onPre
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const styles = useStyles()
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import React, { useCallback } from "react"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -19,7 +19,7 @@ const Step = {
 
 export const CardChangePinScreen: React.FC = () => {
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { updatePin, loading } = useCardPinUpdate()
 
   const handleBiometricFailure = useCallback(() => {

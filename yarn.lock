@@ -6516,6 +6516,16 @@
     use-latest-callback "^0.2.4"
     use-sync-external-store "^1.5.0"
 
+"@react-navigation/native-stack@~7.16.0":
+  version "7.16.0"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native-stack/-/native-stack-7.16.0.tgz#79a40035a67b277af7e2903e4395f2bc950d5d73"
+  integrity sha512-wM21rHYR2XifjDnKLrr3HeHUeGsWQZJRwPqEzy1Vp/a9k3ieiwTGpmpDItD/jtERH9qkYESwDPO6oEtrVBEpQg==
+  dependencies:
+    "@react-navigation/elements" "^2.9.19"
+    color "^4.2.3"
+    sf-symbols-typescript "^2.1.0"
+    warn-once "^0.1.1"
+
 "@react-navigation/native@^7.2.5":
   version "7.2.5"
   resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-7.2.5.tgz#f98db27148d1c8734ad021b204f117e18255a087"
@@ -6533,15 +6543,6 @@
   integrity sha512-9/hhMte12Kgu+pMnLfA4EWJ0OQmIEAMVMX06FPH2yGkEQSQ3JhhCN/GkcRikzQhtEi97VYYQA15umptBUShcOQ==
   dependencies:
     nanoid "^3.3.11"
-
-"@react-navigation/stack@^7.9.3":
-  version "7.9.3"
-  resolved "https://registry.yarnpkg.com/@react-navigation/stack/-/stack-7.9.3.tgz#f744d528e9d2e01c665d7bda27a6caf3ea850152"
-  integrity sha512-ZFMiyhx48HglkMGASfrEgU8ihvm38PP/Pjne76s9iOGmpJSmxnJtc1mS2O1zD3F2R5vqwE7D4077X7pzA5xqKA==
-  dependencies:
-    "@react-navigation/elements" "^2.9.19"
-    color "^4.2.3"
-    use-latest-callback "^0.2.4"
 
 "@repeaterjs/repeater@^3.0.4":
   version "3.0.5"
@@ -27277,7 +27278,7 @@ walker@^1.0.7, walker@^1.0.8, walker@~1.0.5:
   dependencies:
     makeerror "1.0.12"
 
-warn-once@^0.1.0:
+warn-once@^0.1.0, warn-once@^0.1.1:
   version "0.1.1"
   resolved "https://registry.npmjs.org/warn-once/-/warn-once-0.1.1.tgz#952088f4fb56896e73fd4e6a3767272a3fccce43"
   integrity sha512-VkQZJbO8zVImzYFteBXvBOZEl1qL175WH8VmZcxF2fZAoudNhNDvHi+doCaAEdU2l2vtcIwa2zn0QK5+I1HQ3Q==

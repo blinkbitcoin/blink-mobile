@@ -5,7 +5,7 @@ import { SvgProps } from "react-native-svg"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { BackendFeatureGate } from "@app/components/backend-feature-gate"
@@ -91,7 +91,8 @@ const EarnMapScreenContent: React.FC = () => {
     theme: { colors },
   } = useTheme()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList, "Earn">>()
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "Earn">>()
   const { LL } = useI18nContext()
   const quizQuestionsContent = getQuizQuestionsContent({ LL })
   const sections = Object.keys(earnSections) as EarnSectionType[]

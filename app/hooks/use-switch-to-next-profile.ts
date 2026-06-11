@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
@@ -13,7 +13,7 @@ type UseSwitchToNextProfileResult = {
 }
 
 export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { logout } = useLogout()
   const { saveToken } = useAppConfig()
   const { LL } = useI18nContext()

@@ -3,7 +3,7 @@ import { InteractionManager, SectionList, Text, View } from "react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { makeStyles } from "@rn-vui/themed"
 import { gql, useApolloClient } from "@apollo/client"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useNavigation, RouteProp } from "@react-navigation/native"
 
 import { Screen } from "@app/components/screen"
@@ -78,7 +78,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
 }) => {
   const styles = useStyles()
   const { LL, locale } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const [walletFilter, setWalletFilter] = React.useState<WalletValues>(
     route.params?.currencyFilter ?? "ALL",
   )

@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { ListItem, makeStyles, Overlay, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -41,7 +41,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   } = useTheme()
   const { LL } = useI18nContext()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount, setActiveAccountId } = useAccountRegistry()
   const { lightningAddress: liveLightningAddress, wallets: liveWallets } =
     useSelfCustodialWallet()

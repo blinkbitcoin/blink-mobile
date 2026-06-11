@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { ActivityIndicator, Pressable, View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -25,7 +25,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "accountTypeSelection">>()
   const { mode } = route.params
   const {

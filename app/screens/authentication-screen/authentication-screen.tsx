@@ -6,7 +6,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
@@ -29,7 +29,7 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
   const AppLogo = mode === "dark" ? AppLogoDarkMode : AppLogoLightMode
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "authentication">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "authentication">>()
 
   const styles = useStyles()
   const { logout } = useLogout()

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
 import { ParamListBase, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 export const useHasTransitioned = (): boolean => {
-  const navigation = useNavigation<StackNavigationProp<ParamListBase>>()
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>()
   const [hasTransitioned, setHasTransitioned] = useState(false)
 
   useEffect(() => {

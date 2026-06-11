@@ -1,7 +1,8 @@
 import React, { useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 
-import { useNavigation, type NavigationProp } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
+import { type NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Overlay, Text, useTheme } from "@rn-vui/themed"
 
 import { InfoCard } from "@app/components/card-screen"
@@ -26,7 +27,7 @@ export const DeleteAccount: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
   const { state, deleteWallet } = useDeleteAccount()
   const { wallets } = useSelfCustodialWallet()

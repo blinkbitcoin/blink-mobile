@@ -3,7 +3,7 @@ import { TextInput, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useRoute, useNavigation, RouteProp } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -28,7 +28,7 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { challenges, successMessage } = useRoute<ConfirmRouteProp>().params
 
   const { wallets, isSelfCustodial } = useActiveWallet()

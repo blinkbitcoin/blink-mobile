@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef } from "react"
 import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -28,7 +28,7 @@ export const RestorePhraseScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { step, words: initialWords } = useRoute<RestorePhraseRouteProp>().params
 
   const {

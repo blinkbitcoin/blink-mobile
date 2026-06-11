@@ -10,7 +10,7 @@ import {
 } from "react-native"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { BackendFeatureGate } from "@app/components/backend-feature-gate"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -44,7 +44,7 @@ const EmptyScreen = ({ message }: { message: string }) => {
 }
 
 const CardDashboardScreenContent: React.FC = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const isFocused = useIsFocused()
   const { LL } = useI18nContext()
   const styles = useStyles()

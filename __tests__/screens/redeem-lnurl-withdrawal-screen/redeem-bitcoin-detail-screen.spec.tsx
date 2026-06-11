@@ -21,8 +21,8 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }))
 
-jest.mock("@react-navigation/stack", () => ({
-  StackNavigationProp: jest.fn(),
+jest.mock("@react-navigation/native-stack", () => ({
+  NativeStackNavigationProp: jest.fn(),
 }))
 
 jest.mock("@app/hooks/use-payments", () => ({

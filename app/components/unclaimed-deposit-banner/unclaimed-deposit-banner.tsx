@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { Pressable, View } from "react-native"
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { usePayments } from "@app/hooks/use-payments"
@@ -20,7 +20,7 @@ export const UnclaimedDepositBanner: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { listPendingDeposits } = usePayments()
   // Re-fetch whenever wallets refresh (e.g. ClaimedDeposits / NewDeposits SDK events).
   const { wallets } = useSelfCustodialWallet()

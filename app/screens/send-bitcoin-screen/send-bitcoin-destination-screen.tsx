@@ -28,7 +28,7 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import { CountryCode, PhoneNumber } from "libphonenumber-js/mobile"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { SearchBar } from "@rn-vui/base"
 import { makeStyles, useTheme, Text, ListItem } from "@rn-vui/themed"
 
@@ -157,7 +157,9 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   } = useTheme()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinDestination">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "sendBitcoinDestination">
+    >()
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial, isReady: isWalletReady } = activeWallet

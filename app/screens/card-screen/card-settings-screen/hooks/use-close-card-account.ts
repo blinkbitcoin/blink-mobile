@@ -1,6 +1,6 @@
 import { useCallback } from "react"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import {
   CardStatus,
@@ -20,7 +20,7 @@ import { useCardData } from "../../hooks/use-card-data"
 export const useCloseCardAccount = () => {
   const { LL } = useI18nContext()
   const isAuthed = useIsAuthed()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
 
   const { card } = useCardData()

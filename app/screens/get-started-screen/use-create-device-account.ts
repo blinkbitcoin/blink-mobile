@@ -4,7 +4,7 @@ import { generateSecureRandom } from "react-native-securerandom"
 import { v4 as uuidv4 } from "uuid"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import analytics from "@react-native-firebase/analytics"
 import crashlytics from "@react-native-firebase/crashlytics"
 
@@ -35,7 +35,8 @@ export const useCreateDeviceAccount = () => {
 
   const { saveProfile } = useSaveSessionProfile()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList, "Primary">>()
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "Primary">>()
 
   const getOrCreateCredentials = async (): Promise<{
     username: string

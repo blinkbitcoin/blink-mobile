@@ -29,7 +29,7 @@ import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -65,7 +65,9 @@ gql`
 
 export const ScanningQRCodeScreen: React.FC = () => {
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinDestination">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "sendBitcoinDestination">
+    >()
   const isFocused = useIsFocused()
 
   // forcing price refresh

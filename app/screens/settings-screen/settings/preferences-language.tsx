@@ -5,13 +5,13 @@ import { LocaleToTranslateLanguageSelector } from "@app/i18n/mapping"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { getLanguageFromString } from "@app/utils/locale-detector"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { SettingsRow } from "../row"
 
 export const LanguageSetting: React.FC = () => {
   const { LL } = useI18nContext()
-  const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { language: serverLanguage, loading } = useEffectiveLanguage()
 
   const language = getLanguageFromString(serverLanguage)

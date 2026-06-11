@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -45,7 +45,7 @@ export const OrderCardScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { applicationId, loading: cardLoading, error: cardError } = useCardData()
   const { initialAddress, phone, loading: addressLoading } = useShippingAddressData()

@@ -21,7 +21,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logAppFeedback } from "@app/utils/analytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
@@ -324,7 +324,7 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     theme: { mode },
   } = useTheme()
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinCompleted">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "sendBitcoinCompleted">>()
   const { LL } = useI18nContext()
 
   const feedbackShownData = useFeedbackModalShownQuery()

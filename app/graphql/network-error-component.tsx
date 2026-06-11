@@ -7,7 +7,7 @@ import { useAppConfig } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useSwitchToNextProfile } from "@app/hooks/use-switch-to-next-profile"
 
@@ -15,7 +15,7 @@ import { NetworkErrorCode } from "./error-code"
 import { useNetworkError } from "./network-error-context"
 
 export const NetworkErrorComponent: React.FC = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { networkError, clearNetworkError, token: networkErrorToken } = useNetworkError()
   const { LL } = useI18nContext()

@@ -1,6 +1,6 @@
 import React, { useMemo } from "react"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useTheme } from "@rn-vui/themed"
 
 import { RichText } from "@app/components/rich-text"
@@ -16,7 +16,7 @@ export const MigrationExplainerScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { sparkCompatibleWalletsUrl } = useRemoteConfig()
 
   const steps: ReadonlyArray<React.ReactNode> = useMemo(

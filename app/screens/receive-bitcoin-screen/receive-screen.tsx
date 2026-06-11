@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { ActionButton } from "@app/components/action-button"
@@ -100,7 +100,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   useNotificationPermission()
 

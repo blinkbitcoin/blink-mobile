@@ -11,8 +11,8 @@ jest.mock("@react-navigation/native", () => ({
   useRoute: () => ({ params: { mode: mockMode() } }),
 }))
 
-jest.mock("@react-navigation/stack", () => ({
-  StackNavigationProp: jest.fn(),
+jest.mock("@react-navigation/native-stack", () => ({
+  NativeStackNavigationProp: jest.fn(),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({

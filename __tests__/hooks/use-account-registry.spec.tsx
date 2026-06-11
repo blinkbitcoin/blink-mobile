@@ -3,6 +3,7 @@ import { renderHook, act } from "@testing-library/react-native"
 import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet"
 
 import {
+  AccountRegistryProvider,
   createCustodialDescriptor,
   createSelfCustodialDescriptor,
   markSelected,
@@ -25,12 +26,6 @@ jest.mock("@app/i18n/i18n-react", () => ({
         selfCustodialLabel: () => "Spark",
       },
     },
-  }),
-}))
-
-jest.mock("@app/config/feature-flags-context", () => ({
-  useFeatureFlags: () => ({
-    nonCustodialEnabled: mockNonCustodialEnabled,
   }),
 }))
 
@@ -57,7 +52,6 @@ jest.mock("@app/self-custodial/storage/account-index", () => ({
   StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
 }))
 
-let mockNonCustodialEnabled = false
 let mockActiveAccountId: string | undefined
 let mockGaloyAuthToken = "token"
 
@@ -70,7 +64,6 @@ const flushAsyncEffects = async () => {
 describe("useAccountRegistry", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockNonCustodialEnabled = false
     mockActiveAccountId = undefined
     mockGaloyAuthToken = "token"
     mockListSelfCustodialAccounts.mockResolvedValue({ status: "ok", entries: [] })
@@ -80,7 +73,9 @@ describe("useAccountRegistry", () => {
   it("reports loading=true on initial render and loading=false after async hydrations settle", async () => {
     mockUseIsAuthed.mockReturnValue(true)
 
-    const { result } = renderHook(() => useAccountRegistry())
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
 
     expect(result.current.loading).toBe(true)
 
@@ -92,7 +87,9 @@ describe("useAccountRegistry", () => {
   it("returns custodial account when authenticated", async () => {
     mockUseIsAuthed.mockReturnValue(true)
 
-    const { result } = renderHook(() => useAccountRegistry())
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
     await flushAsyncEffects()
 
     expect(result.current.accounts).toHaveLength(1)
@@ -104,7 +101,9 @@ describe("useAccountRegistry", () => {
   it("returns empty accounts when not authenticated and KeyStore empty", async () => {
     mockUseIsAuthed.mockReturnValue(false)
 
-    const { result } = renderHook(() => useAccountRegistry())
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
     await flushAsyncEffects()
 
     expect(result.current.accounts).toHaveLength(0)
@@ -119,7 +118,9 @@ describe("useAccountRegistry", () => {
       { token: "stale", identifier: "esau", lnAddressHostname: "blink.sv" },
     ])
 
-    const { result } = renderHook(() => useAccountRegistry())
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
     await flushAsyncEffects()
 
     expect(result.current.accounts).toHaveLength(1)
@@ -131,7 +132,9 @@ describe("useAccountRegistry", () => {
     mockGaloyAuthToken = ""
     mockGetSessionProfiles.mockResolvedValue([])
 
-    const { result } = renderHook(() => useAccountRegistry())
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
     await flushAsyncEffects()
 
     expect(result.current.accounts).toHaveLength(0)
@@ -139,13 +142,14 @@ describe("useAccountRegistry", () => {
 
   it("includes self-custodial accounts loaded from the index", async () => {
     mockUseIsAuthed.mockReturnValue(true)
-    mockNonCustodialEnabled = true
     mockListSelfCustodialAccounts.mockResolvedValue({
       status: "ok",
       entries: [{ id: "self-custodial-uuid-1", lightningAddress: null }],
     })
 
-    const { result } = renderHook(() => useAccountRegistry())
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
     await flushAsyncEffects()
 
     expect(result.current.accounts).toHaveLength(2)
@@ -157,7 +161,9 @@ describe("useAccountRegistry", () => {
   it("selects first account by default when no activeAccountId", async () => {
     mockUseIsAuthed.mockReturnValue(true)
 
-    const { result } = renderHook(() => useAccountRegistry())
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
     await flushAsyncEffects()
 
     expect(result.current.activeAccount?.id).toBe(DefaultAccountId.Custodial)
@@ -166,14 +172,15 @@ describe("useAccountRegistry", () => {
 
   it("selects account matching activeAccountId", async () => {
     mockUseIsAuthed.mockReturnValue(true)
-    mockNonCustodialEnabled = true
     mockActiveAccountId = "self-custodial-uuid-1"
     mockListSelfCustodialAccounts.mockResolvedValue({
       status: "ok",
       entries: [{ id: "self-custodial-uuid-1", lightningAddress: null }],
     })
 
-    const { result } = renderHook(() => useAccountRegistry())
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
     await flushAsyncEffects()
 
     expect(result.current.activeAccount?.id).toBe("self-custodial-uuid-1")
@@ -183,7 +190,9 @@ describe("useAccountRegistry", () => {
   it("setActiveAccountId calls updateState with the new id", async () => {
     mockUseIsAuthed.mockReturnValue(true)
 
-    const { result } = renderHook(() => useAccountRegistry())
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
     await flushAsyncEffects()
 
     act(() => {
@@ -202,14 +211,15 @@ describe("useAccountRegistry", () => {
     // listSelfCustodialAccounts, which clobbered the seeded entry — every self-custodial
     // account vanished from the registry until next reload.
     mockUseIsAuthed.mockReturnValue(false)
-    mockNonCustodialEnabled = true
     mockActiveAccountId = "self-custodial-uuid-1"
     mockListSelfCustodialAccounts.mockResolvedValue({
       status: "read-failed",
       error: new Error("AsyncStorage unavailable"),
     })
 
-    const { result } = renderHook(() => useAccountRegistry())
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
     await flushAsyncEffects()
 
     expect(result.current.selfCustodialEntries).toEqual([
@@ -224,7 +234,9 @@ describe("useAccountRegistry", () => {
     // which used a stale closure value and reverted in-flight token swaps.
     mockUseIsAuthed.mockReturnValue(true)
 
-    const { result } = renderHook(() => useAccountRegistry())
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
     await flushAsyncEffects()
 
     act(() => {

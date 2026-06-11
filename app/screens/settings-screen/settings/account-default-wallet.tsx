@@ -1,7 +1,7 @@
 import React from "react"
 
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useSettingsScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -18,7 +18,7 @@ import { SettingsRow } from "../row"
 
 export const DefaultWallet: React.FC = () => {
   const { LL } = useI18nContext()
-  const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const isAuthed = useIsAuthed()
   const { activeAccount } = useAccountRegistry()
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial

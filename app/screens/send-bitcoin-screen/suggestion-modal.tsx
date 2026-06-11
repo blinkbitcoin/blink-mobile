@@ -5,7 +5,7 @@ import { gql } from "@apollo/client"
 import { useFeedbackSubmitMutation } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import CustomModal from "../../components/custom-modal/custom-modal"
@@ -25,7 +25,7 @@ gql`
 `
 
 export const SuggestionModal: React.FC<{
-  navigation: StackNavigationProp<RootStackParamList>
+  navigation: NativeStackNavigationProp<RootStackParamList>
   showSuggestionModal: boolean
   setShowSuggestionModal: (value: boolean) => void
 }> = ({ navigation, showSuggestionModal, setShowSuggestionModal }) => {

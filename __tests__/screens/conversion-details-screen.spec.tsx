@@ -9,7 +9,7 @@ import { it } from "@jest/globals"
 import { fireEvent, render, waitFor, act } from "@testing-library/react-native"
 import { MockedProvider, MockedResponse } from "@apollo/client/testing"
 import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { ConversionDetailsScreen } from "@app/screens/conversion-flow/conversion-details-screen"
@@ -123,7 +123,7 @@ jest.mock("@app/components/atomic/currency-pill/use-equal-pill-width", () => ({
   }),
 }))
 
-const Stack = createStackNavigator()
+const Stack = createNativeStackNavigator()
 
 const BTC_SAT_PRICE_BASE = 2200000000
 const BTC_SAT_PRICE_OFFSET = 12

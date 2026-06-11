@@ -1,10 +1,11 @@
-import { CommonActions, type NavigationProp } from "@react-navigation/native"
+import { CommonActions } from "@react-navigation/native"
+import { type NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { type RootStackParamList } from "@app/navigation/stack-param-lists"
 import { type DeleteAccountOutcome } from "@app/self-custodial/hooks/use-delete-account"
 
 export const navigateAfterAccountDelete = (
-  navigation: NavigationProp<RootStackParamList>,
+  navigation: NativeStackNavigationProp<RootStackParamList>,
   outcome: DeleteAccountOutcome,
 ): void => {
   switch (outcome) {
