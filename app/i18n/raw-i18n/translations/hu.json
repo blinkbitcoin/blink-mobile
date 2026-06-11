@@ -2459,7 +2459,8 @@
   "StablesatsRestriction": {
     "modalTitle": "A Stablesats nem érhető el a régiódban",
     "modalBody": "A dollárszámlához való hozzáféréshez hozz létre egy nem letétkezelői fiókot.",
-    "createNew": "Új létrehozása"
+    "createNew": "Új létrehozása",
+    "walletLabel": "nem érhető el a régiódban"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "A dollárszámla már nem érhető el a régiódban",
@@ -2765,7 +2766,6 @@
     "needWallet": "Jelentkezz be vagy hozz létre számlát a tárcád eléréséhez",
     "next": "Következő",
     "No": "Nem",
-    "notAvailable": "nem érhető el",
     "note": "Megjegyzés",
     "notification": "Értesítés",
     "ok": "OK",

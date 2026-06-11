@@ -2459,7 +2459,8 @@
   "StablesatsRestriction": {
     "modalTitle": "Stablesats is nie beskikbaar in jou streek nie",
     "modalBody": "Om toegang tot 'n dollar-rekening te kry, skep 'n nie-bewaarende rekening.",
-    "createNew": "Skep nuwe"
+    "createNew": "Skep nuwe",
+    "walletLabel": "nie beskikbaar in jou streek nie"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Die Dollar-rekening is nie meer in jou streek beskikbaar nie",
@@ -2765,7 +2766,6 @@
     "needWallet": "Teken in om 'n rekening oop te maak en om toegang tot jou beursie te kry. ",
     "next": "Volgende",
     "No": "Nee",
-    "notAvailable": "nie beskikbaar",
     "note": "Nota",
     "notification": "Kennisgewing",
     "ok": "OK",

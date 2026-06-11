@@ -2459,7 +2459,8 @@
   "StablesatsRestriction": {
     "modalTitle": "Stablesats nie je vo vašom regióne k dispozícii",
     "modalBody": "Ak chcete získať prístup k dolárovému účtu, vytvorte ne-úschovný účet.",
-    "createNew": "Vytvoriť nový"
+    "createNew": "Vytvoriť nový",
+    "walletLabel": "nie je vo vašom regióne k dispozícii"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolárový účet už nie je vo vašom regióne dostupný",
@@ -2765,7 +2766,6 @@
     "needWallet": "Prihláste sa alebo si vytvorte účet pre prístup k svojej peňaženke",
     "next": "Ďalej",
     "No": "Nie",
-    "notAvailable": "nie je k dispozícii",
     "note": "Poznámka",
     "notification": "Upozornenie",
     "ok": "OK",

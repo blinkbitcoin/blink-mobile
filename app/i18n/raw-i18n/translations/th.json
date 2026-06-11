@@ -2459,7 +2459,8 @@
   "StablesatsRestriction": {
     "modalTitle": "Stablesats ไม่พร้อมใช้งานในภูมิภาคของคุณ",
     "modalBody": "หากต้องการเข้าถึงบัญชีดอลลาร์ ให้สร้างบัญชีแบบ non-custodial",
-    "createNew": "สร้างใหม่"
+    "createNew": "สร้างใหม่",
+    "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "บัญชีดอลลาร์ไม่สามารถใช้งานได้ในภูมิภาคของคุณอีกต่อไป",
@@ -2765,7 +2766,6 @@
     "needWallet": "Log in or create an account to access your wallet",
     "next": "ต่อไป",
     "No": "ไม่",
-    "notAvailable": "ไม่พร้อมใช้งาน",
     "note": "โน้ต",
     "notification": "การแจ้งเตือน",
     "ok": "ตกลง",

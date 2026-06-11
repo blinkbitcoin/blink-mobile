@@ -2596,6 +2596,7 @@ const en: BaseTranslation = {
     modalTitle: "Stablesats is not available in your region",
     modalBody: "To get access to a dollar account, create a non-custodial account.",
     createNew: "Create new",
+    walletLabel: "not available in your region",
   },
   ConvertDollarToBitcoinModal: {
     title: "Dollar account is no longer available in your region",
@@ -2885,7 +2886,6 @@ const en: BaseTranslation = {
     needWallet: "Log in or create an account to access your wallet",
     next: "Next",
     No: "No",
-    notAvailable: "not available",
     note: "Note",
     notification: "Notification",
     ok: "OK",

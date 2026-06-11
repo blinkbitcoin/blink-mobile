@@ -2459,7 +2459,8 @@
   "StablesatsRestriction": {
     "modalTitle": "Stablesats tidak tersedia di wilayah Anda",
     "modalBody": "Untuk mengakses akun dolar, buat akun non-custodial.",
-    "createNew": "Buat baru"
+    "createNew": "Buat baru",
+    "walletLabel": "tidak tersedia di wilayah Anda"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Akun Dolar tidak lagi tersedia di wilayah Anda",
@@ -2765,7 +2766,6 @@
     "needWallet": "Masuk atau buat akun untuk mengakses dompet Anda",
     "next": "Berikutnya",
     "No": "Tidak",
-    "notAvailable": "tidak tersedia",
     "note": "Catatan",
     "notification": "Notifikasi",
     "ok": "OK",
