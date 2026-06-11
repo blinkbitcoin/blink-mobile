@@ -8,7 +8,10 @@ import {
 } from "@app/store/persistent-state/stablesats-restriction"
 import { AccountType } from "@app/types/wallet"
 
-import useDeviceLocation from "./use-device-location"
+import useDeviceLocation, {
+  LocationSource,
+  useIpCountryCode,
+} from "./use-device-location"
 import { useActiveWallet } from "./use-active-wallet"
 
 const isBlockedCountry = (
@@ -31,14 +34,25 @@ export const useStablesatsRestricted = (): boolean => {
 
 export const useStablesatsRestrictionSync = (): void => {
   const { accountType } = useActiveWallet()
-  const { countryCode } = useDeviceLocation()
+  const { countryCode, source } = useDeviceLocation()
   const { stablesatsBlockedCountries } = useRemoteConfig()
   const { persistentState, updateState } = usePersistentStateContext()
 
+  const isCustodial = accountType === AccountType.Custodial
+  const alreadyPersisted = getStablesatsRestricted(persistentState)
+  const primaryBlocked = isBlockedCountry(countryCode, stablesatsBlockedCountries)
+
+  const ipCountryCode = useIpCountryCode(
+    isCustodial &&
+      source === LocationSource.Phone &&
+      !alreadyPersisted &&
+      !primaryBlocked,
+  )
+
   const shouldPersist =
-    accountType === AccountType.Custodial &&
-    isBlockedCountry(countryCode, stablesatsBlockedCountries) &&
-    !getStablesatsRestricted(persistentState)
+    isCustodial &&
+    !alreadyPersisted &&
+    (primaryBlocked || isBlockedCountry(ipCountryCode, stablesatsBlockedCountries))
 
   useEffect(() => {
     if (!shouldPersist) return

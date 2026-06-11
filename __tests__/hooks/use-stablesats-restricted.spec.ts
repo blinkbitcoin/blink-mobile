@@ -8,12 +8,15 @@ const mockUseDeviceLocation = jest.fn()
 const mockUseRemoteConfig = jest.fn()
 const mockUseActiveWallet = jest.fn()
 const mockUpdateState = jest.fn()
+const mockUseIpCountryCode = jest.fn()
 
 let mockPersistentState: PersistentState
 
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
   default: () => mockUseDeviceLocation(),
+  useIpCountryCode: (enabled: boolean) => mockUseIpCountryCode(enabled),
+  LocationSource: { Phone: "phone", Ip: "ip" },
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -142,16 +145,21 @@ describe("useStablesatsRestricted (query)", () => {
 describe("useStablesatsRestrictionSync (command)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", loading: false })
+    mockUseDeviceLocation.mockReturnValue({
+      countryCode: "HK",
+      loading: false,
+      source: "phone",
+    })
     mockUseRemoteConfig.mockReturnValue({ stablesatsBlockedCountries: ["HK"] })
     mockUseActiveWallet.mockReturnValue({
       isSelfCustodial: false,
       accountType: AccountType.Custodial,
     })
+    mockUseIpCountryCode.mockReturnValue(undefined)
     mockPersistentState = baseState
   })
 
-  it("persists the restriction when a custodial account is in a blocked country", () => {
+  it("persists the restriction when the phone country is blocked", () => {
     renderHook(() => useStablesatsRestrictionSync())
 
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
@@ -159,11 +167,50 @@ describe("useStablesatsRestrictionSync (command)", () => {
     expect(getStablesatsRestricted(updater(baseState))).toBe(true)
   })
 
-  it("does not persist when the country is not blocked", () => {
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "AR", loading: false })
+  it("does not consult IP when the phone country already restricts", () => {
+    renderHook(() => useStablesatsRestrictionSync())
+
+    expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
+  })
+
+  it("falls back to IP when the phone country does not restrict and persists when IP is blocked", () => {
+    mockUseDeviceLocation.mockReturnValue({
+      countryCode: "SV",
+      loading: false,
+      source: "phone",
+    })
+    mockUseIpCountryCode.mockReturnValue("HK")
 
     renderHook(() => useStablesatsRestrictionSync())
 
+    expect(mockUseIpCountryCode).toHaveBeenCalledWith(true)
+    expect(mockUpdateState).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not persist when neither phone nor IP country is blocked", () => {
+    mockUseDeviceLocation.mockReturnValue({
+      countryCode: "SV",
+      loading: false,
+      source: "phone",
+    })
+    mockUseIpCountryCode.mockReturnValue("AR")
+
+    renderHook(() => useStablesatsRestrictionSync())
+
+    expect(mockUseIpCountryCode).toHaveBeenCalledWith(true)
+    expect(mockUpdateState).not.toHaveBeenCalled()
+  })
+
+  it("does not consult IP when there is no phone", () => {
+    mockUseDeviceLocation.mockReturnValue({
+      countryCode: "AR",
+      loading: false,
+      source: "ip",
+    })
+
+    renderHook(() => useStablesatsRestrictionSync())
+
+    expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
     expect(mockUpdateState).not.toHaveBeenCalled()
   })
 
@@ -172,6 +219,7 @@ describe("useStablesatsRestrictionSync (command)", () => {
 
     renderHook(() => useStablesatsRestrictionSync())
 
+    expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
     expect(mockUpdateState).not.toHaveBeenCalled()
   })
 
