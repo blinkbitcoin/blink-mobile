@@ -2,6 +2,7 @@ import { renderHook } from "@testing-library/react-native"
 
 import { Network } from "@app/graphql/generated"
 import { useScanContext } from "@app/hooks/use-scan-context"
+import { AccountType } from "@app/types/wallet"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   Network: { Mainnet: 0, Regtest: 1 },
@@ -44,12 +45,15 @@ describe("useScanContext", () => {
     mockUseIsAuthed.mockReturnValue(true)
     mockScanningQuery.mockReturnValue({ data: undefined })
     mockHomeUnauthedQuery.mockReturnValue({ data: undefined })
-    mockActiveWallet.mockReturnValue({ isSelfCustodial: false, wallets: [] })
+    mockActiveWallet.mockReturnValue({ accountType: AccountType.Custodial, wallets: [] })
   })
 
   describe("custodial", () => {
     it("maps wallet ids and network from the authed query", () => {
-      mockActiveWallet.mockReturnValue({ isSelfCustodial: false, wallets: [] })
+      mockActiveWallet.mockReturnValue({
+        accountType: AccountType.Custodial,
+        wallets: [],
+      })
       mockScanningQuery.mockReturnValue({
         data: {
           __typename: "Query",
@@ -110,7 +114,7 @@ describe("useScanContext", () => {
   describe("self-custodial", () => {
     it("maps wallet ids from useActiveWallet and uses SparkNetworkLabel for network", () => {
       mockActiveWallet.mockReturnValue({
-        isSelfCustodial: true,
+        accountType: AccountType.SelfCustodial,
         wallets: [
           {
             id: "self-custodial-btc",
@@ -138,7 +142,7 @@ describe("useScanContext", () => {
 
     it("exposes lnurlDomains as [] (intraledger lookup disabled)", () => {
       mockActiveWallet.mockReturnValue({
-        isSelfCustodial: true,
+        accountType: AccountType.SelfCustodial,
         wallets: [
           { id: "self-custodial", walletCurrency: "BTC", balance: {}, transactions: [] },
         ],
@@ -151,7 +155,7 @@ describe("useScanContext", () => {
 
     it("ignores the custodial GraphQL query when self-custodial is active", () => {
       mockActiveWallet.mockReturnValue({
-        isSelfCustodial: true,
+        accountType: AccountType.SelfCustodial,
         wallets: [
           {
             id: "self-custodial-only",
@@ -174,6 +178,26 @@ describe("useScanContext", () => {
       const { result } = renderHook(() => useScanContext())
 
       expect(result.current.myWalletIds).toEqual(["self-custodial-only"])
+    })
+
+    it("uses the self-custodial adapter by account type even when the wallet is still connecting", () => {
+      mockActiveWallet.mockReturnValue({
+        accountType: AccountType.SelfCustodial,
+        isSelfCustodial: false,
+        wallets: [
+          {
+            id: "self-custodial-btc",
+            walletCurrency: "BTC",
+            balance: {},
+            transactions: [],
+          },
+        ],
+      })
+
+      const { result } = renderHook(() => useScanContext())
+
+      expect(result.current.lnurlDomains).toEqual([])
+      expect(result.current.myWalletIds).toEqual(["self-custodial-btc"])
     })
   })
 })

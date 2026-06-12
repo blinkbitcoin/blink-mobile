@@ -8,13 +8,14 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { createSelfCustodialScanContext } from "@app/self-custodial/adapters/scan-context"
 import { type ScanContextAdapter } from "@app/types/scan-context"
+import { AccountType } from "@app/types/wallet"
 
 import { useActiveWallet } from "./use-active-wallet"
 import { useAppConfig } from "./use-app-config"
 
 export const useScanContext = (): ScanContextAdapter => {
   const isAuthed = useIsAuthed()
-  const { isSelfCustodial, wallets } = useActiveWallet()
+  const { accountType, wallets } = useActiveWallet()
   const {
     appConfig: {
       galoyInstance: { lnAddressHostname },
@@ -24,7 +25,7 @@ export const useScanContext = (): ScanContextAdapter => {
   const { data: unauthedData } = useHomeUnauthedQuery({ fetchPolicy: "cache-first" })
 
   return useMemo((): ScanContextAdapter => {
-    if (isSelfCustodial) {
+    if (accountType === AccountType.SelfCustodial) {
       return createSelfCustodialScanContext(wallets)
     }
     return createCustodialScanContext(
@@ -32,5 +33,5 @@ export const useScanContext = (): ScanContextAdapter => {
       unauthedData?.globals?.network ?? null,
       lnAddressHostname,
     )
-  }, [isSelfCustodial, wallets, data, unauthedData, lnAddressHostname])
+  }, [accountType, wallets, data, unauthedData, lnAddressHostname])
 }
