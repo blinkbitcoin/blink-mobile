@@ -71,6 +71,11 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
+jest.mock("@app/hooks/use-device-location", () => ({
+  __esModule: true,
+  default: () => ({ countryCode: "SV", loading: false }),
+}))
+
 jest.mock("@app/self-custodial/hooks", () => ({
   useNonCustodialConversionLimits: (...args: unknown[]) =>
     mockUseNonCustodialConversionLimits(...args),
