@@ -32,12 +32,11 @@ export const SwitchAccount: React.FC = () => {
   const [nextProfileToken, setNextProfileToken] = useState<string>()
 
   useEffect(() => {
-    if (!currentToken) return
     let isMounted = true
 
     const loadProfiles = async () => {
       let profilesList = await fetchProfiles(currentToken)
-      if (profilesList.length === 0) {
+      if (profilesList.length === 0 && currentToken) {
         await saveProfile(currentToken)
         profilesList = await fetchProfiles(currentToken)
       }
