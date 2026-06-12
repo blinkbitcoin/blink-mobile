@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-native"
+import { act, renderHook } from "@testing-library/react-native"
 
 import { getStablesatsRestricted } from "@app/store/persistent-state/stablesats-restriction"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
@@ -35,6 +35,7 @@ jest.mock("@app/store/persistent-state", () => ({
 }))
 
 import {
+  useStablesatsForcedConversion,
   useStablesatsRestricted,
   useStablesatsRestrictionSync,
 } from "@app/hooks/use-stablesats-restricted"
@@ -243,5 +244,58 @@ describe("useStablesatsRestrictionSync (command)", () => {
     renderHook(() => useStablesatsRestrictionSync())
 
     expect(mockUpdateState).not.toHaveBeenCalled()
+  })
+})
+
+describe("useStablesatsForcedConversion", () => {
+  it("opens the convert modal when restricted and the balance is positive", () => {
+    const { result } = renderHook(() =>
+      useStablesatsForcedConversion({ isRestricted: true, usdWalletBalance: 5000 }),
+    )
+
+    expect(result.current.isConvertModalVisible).toBe(true)
+  })
+
+  it("does not open when the account is not restricted", () => {
+    const { result } = renderHook(() =>
+      useStablesatsForcedConversion({ isRestricted: false, usdWalletBalance: 5000 }),
+    )
+
+    expect(result.current.isConvertModalVisible).toBe(false)
+  })
+
+  it("does not open when the restricted account has no balance", () => {
+    const { result } = renderHook(() =>
+      useStablesatsForcedConversion({ isRestricted: true, usdWalletBalance: 0 }),
+    )
+
+    expect(result.current.isConvertModalVisible).toBe(false)
+  })
+
+  it("stays closed after the user dismisses it while still restricted", () => {
+    const { result, rerender } = renderHook(
+      ({ balance }: { balance: number }) =>
+        useStablesatsForcedConversion({ isRestricted: true, usdWalletBalance: balance }),
+      { initialProps: { balance: 5000 } },
+    )
+    expect(result.current.isConvertModalVisible).toBe(true)
+
+    act(() => result.current.closeConvertModal())
+    expect(result.current.isConvertModalVisible).toBe(false)
+
+    rerender({ balance: 5000 })
+    expect(result.current.isConvertModalVisible).toBe(false)
+  })
+
+  it("re-opens when a positive balance arrives after being zero", () => {
+    const { result, rerender } = renderHook(
+      ({ balance }: { balance: number }) =>
+        useStablesatsForcedConversion({ isRestricted: true, usdWalletBalance: balance }),
+      { initialProps: { balance: 0 } },
+    )
+    expect(result.current.isConvertModalVisible).toBe(false)
+
+    rerender({ balance: 5000 })
+    expect(result.current.isConvertModalVisible).toBe(true)
   })
 })

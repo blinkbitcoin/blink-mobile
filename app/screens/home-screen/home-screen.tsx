@@ -44,6 +44,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import {
+  useStablesatsForcedConversion,
   useStablesatsRestricted,
   useStablesatsRestrictionSync,
 } from "@app/hooks/use-stablesats-restricted"
@@ -355,13 +356,17 @@ export const HomeScreen: React.FC = () => {
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
   const [isRestrictionModalVisible, setIsRestrictionModalVisible] = React.useState(false)
-  const [isUsdConvertModalVisible, setIsUsdConvertModalVisible] = React.useState(false)
   const isStablesatsRestricted = useStablesatsRestricted()
   useStablesatsRestrictionSync()
 
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedUsdWalletBalance = restrictedUsdWallet?.balance ?? 0
+
+  const { isConvertModalVisible, closeConvertModal } = useStablesatsForcedConversion({
+    isRestricted: isStablesatsRestricted,
+    usdWalletBalance: restrictedUsdWalletBalance,
+  })
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const openUpgradeModal = React.useCallback(() => {
@@ -569,14 +574,11 @@ export const HomeScreen: React.FC = () => {
       <StablesatsRestrictionModal
         isVisible={isRestrictionModalVisible}
         toggleModal={() => setIsRestrictionModalVisible(false)}
-        onDismiss={() => {
-          if (restrictedUsdWalletBalance > 0) setIsUsdConvertModalVisible(true)
-        }}
       />
       {restrictedUsdWallet && restrictedBtcWallet && (
         <UsdConvertToBtcModal
-          isVisible={isUsdConvertModalVisible}
-          toggleModal={() => setIsUsdConvertModalVisible(false)}
+          isVisible={isConvertModalVisible}
+          toggleModal={closeConvertModal}
           usdWalletBalance={toUsdMoneyAmount(restrictedUsdWalletBalance)}
           usdWalletId={restrictedUsdWallet.id}
           btcWalletId={restrictedBtcWallet.id}

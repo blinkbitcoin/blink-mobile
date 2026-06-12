@@ -141,7 +141,7 @@ describe("UsdConvertToBtcModal", () => {
     expect(getByTestId("icon-warning")).toBeTruthy()
   })
 
-  it("cannot be dismissed: it renders no close icon", () => {
+  it("renders no close icon button (dismissed via backdrop)", () => {
     const { queryByTestId } = renderModal()
 
     expect(queryByTestId("icon-close")).toBeNull()

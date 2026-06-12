@@ -14,13 +14,11 @@ import CustomModal from "../custom-modal/custom-modal"
 type Props = {
   isVisible: boolean
   toggleModal: () => void
-  onDismiss?: () => void
 }
 
 export const StablesatsRestrictionModal: React.FC<Props> = ({
   isVisible,
   toggleModal,
-  onDismiss,
 }) => {
   const { LL } = useI18nContext()
   const {
@@ -34,15 +32,10 @@ export const StablesatsRestrictionModal: React.FC<Props> = ({
     navigation.navigate("getStarted")
   }
 
-  const handleDismiss = () => {
-    toggleModal()
-    onDismiss?.()
-  }
-
   return (
     <CustomModal
       isVisible={isVisible}
-      toggleModal={handleDismiss}
+      toggleModal={toggleModal}
       image={<GaloyIcon name="info" size={80} color={colors.primary3} />}
       title={LL.StablesatsRestriction.modalTitle()}
       titleMaxWidth="100%"
@@ -50,7 +43,7 @@ export const StablesatsRestrictionModal: React.FC<Props> = ({
       primaryButtonTitle={LL.StablesatsRestriction.createNew()}
       primaryButtonOnPress={handleCreateNew}
       secondaryButtonTitle={LL.common.close()}
-      secondaryButtonOnPress={handleDismiss}
+      secondaryButtonOnPress={toggleModal}
       showCloseIconButton={true}
     />
   )
