@@ -7,6 +7,7 @@ import {
   createCustodialDescriptor,
   createSelfCustodialDescriptor,
   markSelected,
+  resolveActiveAccountId,
   useAccountRegistry,
 } from "@app/hooks/use-account-registry"
 
@@ -187,6 +188,45 @@ describe("useAccountRegistry", () => {
     expect(result.current.activeAccount?.type).toBe(AccountType.SelfCustodial)
   })
 
+  it("prefers a real self-custodial account over a token-less custodial profile when no activeAccountId", async () => {
+    // Repro: a token-less custodial profile used to shadow a usable self-custodial account when no activeAccountId.
+    mockUseIsAuthed.mockReturnValue(false)
+    mockGaloyAuthToken = ""
+    mockActiveAccountId = undefined
+    mockGetSessionProfiles.mockResolvedValue([
+      { token: "stale", identifier: "esau", lnAddressHostname: "blink.sv" },
+    ])
+    mockListSelfCustodialAccounts.mockResolvedValue({
+      status: "ok",
+      entries: [{ id: "self-custodial-uuid-1", lightningAddress: null }],
+    })
+
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
+    await flushAsyncEffects()
+
+    expect(result.current.activeAccount?.id).toBe("self-custodial-uuid-1")
+    expect(result.current.activeAccount?.type).toBe(AccountType.SelfCustodial)
+  })
+
+  it("falls back to the custodial profile when no activeAccountId and no self-custodial account", async () => {
+    mockUseIsAuthed.mockReturnValue(false)
+    mockGaloyAuthToken = ""
+    mockActiveAccountId = undefined
+    mockGetSessionProfiles.mockResolvedValue([
+      { token: "stale", identifier: "esau", lnAddressHostname: "blink.sv" },
+    ])
+
+    const { result } = renderHook(() => useAccountRegistry(), {
+      wrapper: AccountRegistryProvider,
+    })
+    await flushAsyncEffects()
+
+    expect(result.current.activeAccount?.id).toBe(DefaultAccountId.Custodial)
+    expect(result.current.activeAccount?.type).toBe(AccountType.Custodial)
+  })
+
   it("setActiveAccountId calls updateState with the new id", async () => {
     mockUseIsAuthed.mockReturnValue(true)
 
@@ -295,5 +335,64 @@ describe("markSelected", () => {
     const result = markSelected([], "some-id")
 
     expect(result).toHaveLength(0)
+  })
+})
+
+describe("resolveActiveAccountId", () => {
+  const selfCustodialEntries = [{ id: "self-custodial-id-1", lightningAddress: null }]
+
+  it("returns the persisted activeAccountId when present", () => {
+    expect(
+      resolveActiveAccountId({
+        activeAccountId: "self-custodial-id-1",
+        isAuthed: true,
+        selfCustodialEntries,
+        hasStoredCustodialProfile: true,
+      }),
+    ).toBe("self-custodial-id-1")
+  })
+
+  it("falls back to the custodial account for an authed session with no pointer", () => {
+    expect(
+      resolveActiveAccountId({
+        activeAccountId: undefined,
+        isAuthed: true,
+        selfCustodialEntries,
+        hasStoredCustodialProfile: false,
+      }),
+    ).toBe(DefaultAccountId.Custodial)
+  })
+
+  it("prefers the first self-custodial account when there is no pointer and no token", () => {
+    expect(
+      resolveActiveAccountId({
+        activeAccountId: undefined,
+        isAuthed: false,
+        selfCustodialEntries,
+        hasStoredCustodialProfile: true,
+      }),
+    ).toBe("self-custodial-id-1")
+  })
+
+  it("falls back to the stored custodial profile when there is no token and no self-custodial account", () => {
+    expect(
+      resolveActiveAccountId({
+        activeAccountId: undefined,
+        isAuthed: false,
+        selfCustodialEntries: [],
+        hasStoredCustodialProfile: true,
+      }),
+    ).toBe(DefaultAccountId.Custodial)
+  })
+
+  it("returns undefined when nothing is available", () => {
+    expect(
+      resolveActiveAccountId({
+        activeAccountId: undefined,
+        isAuthed: false,
+        selfCustodialEntries: [],
+        hasStoredCustodialProfile: false,
+      }),
+    ).toBeUndefined()
   })
 })

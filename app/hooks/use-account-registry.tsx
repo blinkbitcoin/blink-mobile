@@ -54,6 +54,29 @@ export const markSelected = (
   }))
 }
 
+type ResolveActiveAccountIdParams = {
+  activeAccountId: string | undefined
+  isAuthed: boolean
+  selfCustodialEntries: SelfCustodialAccountEntry[]
+  hasStoredCustodialProfile: boolean
+}
+
+export const resolveActiveAccountId = ({
+  activeAccountId,
+  isAuthed,
+  selfCustodialEntries,
+  hasStoredCustodialProfile,
+}: ResolveActiveAccountIdParams): string | undefined => {
+  const candidates = [
+    activeAccountId,
+    isAuthed ? DefaultAccountId.Custodial : undefined,
+    selfCustodialEntries[0]?.id,
+    hasStoredCustodialProfile ? DefaultAccountId.Custodial : undefined,
+  ]
+
+  return candidates.find(Boolean)
+}
+
 type AccountRegistryResult = {
   accounts: AccountDescriptor[]
   activeAccount?: AccountDescriptor
@@ -129,7 +152,14 @@ export const AccountRegistryProvider = ({ children }: { children: ReactNode }) =
       )
     }
 
-    return markSelected(list, persistentState.activeAccountId)
+    const resolvedActiveId = resolveActiveAccountId({
+      activeAccountId: persistentState.activeAccountId,
+      isAuthed,
+      selfCustodialEntries,
+      hasStoredCustodialProfile,
+    })
+
+    return markSelected(list, resolvedActiveId)
   }, [
     isAuthed,
     hasStoredCustodialProfile,

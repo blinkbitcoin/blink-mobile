@@ -29,6 +29,7 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
 }))
 
 const mockSaveProfile = jest.fn()
+let mockAppConfigToken = "mock-token-1"
 
 jest.mock("@app/hooks", () => ({
   useAppConfig: () => ({
@@ -36,7 +37,7 @@ jest.mock("@app/hooks", () => ({
       galoyInstance: {
         authUrl: "https://api.blink.sv",
       },
-      token: "mock-token-1",
+      token: mockAppConfigToken,
     },
   }),
   useSaveSessionProfile: () => ({
@@ -50,6 +51,8 @@ describe("Settings", () => {
   beforeEach(() => {
     loadLocale("en")
     LL = i18nObject("en")
+    mockAppConfigToken = "mock-token-1"
+    mockSaveProfile.mockClear()
   })
 
   it("Switch account shows user profiles", async () => {
@@ -70,5 +73,21 @@ describe("Settings", () => {
     const profiles = await KeyStoreWrapper.getSessionProfiles()
     expect(profiles).toEqual(expectedProfiles)
     expect(screen.getByTestId(LL.ProfileScreen.addAccount())).toBeTruthy()
+  })
+
+  it("shows stored custodial profiles even with no current token (self-custodial active)", async () => {
+    mockAppConfigToken = ""
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText("TestUser")).toBeTruthy()
+    })
+    expect(mockSaveProfile).not.toHaveBeenCalled()
   })
 })

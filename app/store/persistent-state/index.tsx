@@ -3,6 +3,11 @@ import * as React from "react"
 
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import {
+  listSelfCustodialAccounts,
+  StorageReadStatus,
+} from "@app/self-custodial/storage/account-index"
+import { DefaultAccountId } from "@app/types/wallet"
 import { loadJson, saveJson, saveString } from "@app/utils/storage"
 
 import {
@@ -23,13 +28,28 @@ const quarantineRawState = async (rawData: unknown): Promise<void> => {
   }
 }
 
+const recoverActiveAccount = async (state: PersistentState): Promise<PersistentState> => {
+  const custodialIsAuthoritative = Boolean(state.galoyAuthToken)
+  const pointerIsSelfCustodial =
+    Boolean(state.activeAccountId) && state.activeAccountId !== DefaultAccountId.Custodial
+  if (custodialIsAuthoritative || pointerIsSelfCustodial) return state
+
+  const result = await listSelfCustodialAccounts()
+  if (result.status !== StorageReadStatus.Ok) return state
+
+  const firstSelfCustodialId = result.entries[0]?.id
+  if (!firstSelfCustodialId) return state
+
+  return { ...state, activeAccountId: firstSelfCustodialId }
+}
+
 export const loadPersistentState = async (): Promise<PersistentState> => {
   const data = await loadJson(PERSISTENT_STATE_KEY)
   const result = await migratePersistentState(data)
 
   switch (result.status) {
     case MigrationStatus.Ok:
-      return result.state
+      return recoverActiveAccount(result.state)
     case MigrationStatus.NoData:
       return defaultPersistentState
     case MigrationStatus.Failed:
