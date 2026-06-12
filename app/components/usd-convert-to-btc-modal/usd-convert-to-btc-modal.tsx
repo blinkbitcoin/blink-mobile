@@ -67,6 +67,7 @@ export const UsdConvertToBtcModal: React.FC<Props> = ({
       primaryButtonLoading={loading}
       primaryButtonDisabled={loading}
       showCloseIconButton={false}
+      dismissable={false}
     />
   )
 }
