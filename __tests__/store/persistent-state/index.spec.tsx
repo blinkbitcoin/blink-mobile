@@ -3,6 +3,7 @@ import { Text, TouchableOpacity } from "react-native"
 import { render, act, screen, waitFor, fireEvent } from "@testing-library/react-native"
 
 import {
+  loadPersistentState,
   PersistentStateProvider,
   PersistentStateContext,
 } from "@app/store/persistent-state"
@@ -21,6 +22,12 @@ jest.mock("@app/utils/storage", () => ({
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
+}))
+
+const mockListSelfCustodialAccounts = jest.fn()
+jest.mock("@app/self-custodial/storage/account-index", () => ({
+  listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
+  StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
 }))
 
 const TestConsumer: React.FC = () => {
@@ -49,6 +56,7 @@ describe("PersistentStateProvider", () => {
     jest.clearAllMocks()
     mockSaveJson.mockResolvedValue(true)
     mockSaveString.mockResolvedValue(true)
+    mockListSelfCustodialAccounts.mockResolvedValue({ status: "ok", entries: [] })
   })
 
   it("renders nothing (null) while state is loading", async () => {
@@ -317,5 +325,93 @@ describe("PersistentStateProvider", () => {
       expect(mockRecordError).not.toHaveBeenCalled()
       expect(mockSaveString).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe("loadPersistentState self-custodial backfill", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockListSelfCustodialAccounts.mockResolvedValue({ status: "ok", entries: [] })
+  })
+
+  it("restores activeAccountId from the index when the pointer is missing and there is no token", async () => {
+    mockLoadJson.mockResolvedValue({
+      schemaVersion: 6,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+    })
+    mockListSelfCustodialAccounts.mockResolvedValue({
+      status: "ok",
+      entries: [{ id: "self-custodial-uuid-1", lightningAddress: null }],
+    })
+
+    const state = await loadPersistentState()
+
+    expect(state.activeAccountId).toBe("self-custodial-uuid-1")
+  })
+
+  it("does not backfill when a custodial token is present", async () => {
+    mockLoadJson.mockResolvedValue({
+      schemaVersion: 6,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "tok",
+    })
+    mockListSelfCustodialAccounts.mockResolvedValue({
+      status: "ok",
+      entries: [{ id: "self-custodial-uuid-1", lightningAddress: null }],
+    })
+
+    const state = await loadPersistentState()
+
+    expect(state.activeAccountId).toBeUndefined()
+  })
+
+  it("rewrites a token-less custodial-default pointer to the self-custodial account", async () => {
+    mockLoadJson.mockResolvedValue({
+      schemaVersion: 6,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+      activeAccountId: "custodial-default",
+    })
+    mockListSelfCustodialAccounts.mockResolvedValue({
+      status: "ok",
+      entries: [{ id: "self-custodial-uuid-1", lightningAddress: null }],
+    })
+
+    const state = await loadPersistentState()
+
+    expect(state.activeAccountId).toBe("self-custodial-uuid-1")
+  })
+
+  it("does not write an empty pointer when a self-custodial entry has an empty id", async () => {
+    mockLoadJson.mockResolvedValue({
+      schemaVersion: 6,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+    })
+    mockListSelfCustodialAccounts.mockResolvedValue({
+      status: "ok",
+      entries: [{ id: "", lightningAddress: null }],
+    })
+
+    const state = await loadPersistentState()
+
+    expect(state.activeAccountId).toBeUndefined()
+  })
+
+  it("leaves a token-less custodial-default pointer untouched when no self-custodial account exists", async () => {
+    // A genuine logged-out custodial user (no self-custodial account) keeps the
+    // custodial pointer so they land on the custodial re-auth flow.
+    mockLoadJson.mockResolvedValue({
+      schemaVersion: 6,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+      activeAccountId: "custodial-default",
+    })
+    mockListSelfCustodialAccounts.mockResolvedValue({ status: "ok", entries: [] })
+
+    const state = await loadPersistentState()
+
+    expect(state.activeAccountId).toBe("custodial-default")
   })
 })
