@@ -5,6 +5,7 @@ set -euo pipefail
 MODE="${1:-check}"
 MIN_FREE_GB="${MIN_BUILD_FREE_GB:-${2:-30}}"
 HARD_MIN_FREE_GB="${MIN_BUILD_HARD_FREE_GB:-10}"
+ROOT_DERIVED_DATA_MAX_GB="${ROOT_DERIVED_DATA_MAX_GB:-20}"
 CI_ROOT="${CI_ROOT:-$(pwd)}"
 DISK_CHECK_PATH="${DISK_CHECK_PATH:-$CI_ROOT}"
 CONCOURSE_WORKDIR="${CONCOURSE_WORKDIR:-/Users/m1/concourse/workdir}"
@@ -12,6 +13,7 @@ BUILD_HOME="${HOME:-/Users/m1}"
 
 required_kb=$((MIN_FREE_GB * 1024 * 1024))
 hard_required_kb=$((HARD_MIN_FREE_GB * 1024 * 1024))
+root_derived_data_max_kb=$((ROOT_DERIVED_DATA_MAX_GB * 1024 * 1024))
 
 free_kb() {
   df -Pk "$DISK_CHECK_PATH" | awk 'NR == 2 { print $4 }'
@@ -19,6 +21,20 @@ free_kb() {
 
 free_gb() {
   awk "BEGIN { printf \"%.1f\", $(free_kb) / 1024 / 1024 }"
+}
+
+free_space_below_target() {
+  (( $(free_kb) < required_kb ))
+}
+
+path_size_kb() {
+  local path="$1"
+
+  if [[ -e "$path" ]]; then
+    du -sk "$path" 2>/dev/null | awk 'NR == 1 { print $1 }'
+  else
+    echo 0
+  fi
 }
 
 remove_path() {
@@ -143,6 +159,9 @@ cleanup_workspace_build_outputs() {
 }
 
 cleanup_xcode_artifacts() {
+  local root_derived_data="/private/var/root/Library/Developer/Xcode/DerivedData"
+  local root_derived_data_size_kb
+
   while IFS= read -r dir; do
     remove_old_children "$dir" 28
   done < <(unique_paths \
@@ -159,6 +178,13 @@ cleanup_xcode_artifacts() {
     "/private/var/root/Library/Developer/Xcode/DerivedData" \
     "$BUILD_HOME/Library/Developer/Xcode/DerivedData" \
     "/Users/m1/Library/Developer/Xcode/DerivedData")
+
+  root_derived_data_size_kb="$(path_size_kb "$root_derived_data")"
+  if free_space_below_target || (( root_derived_data_size_kb > root_derived_data_max_kb )); then
+    echo "Removing root-owned Xcode DerivedData caches from $root_derived_data"
+    echo "Reason: free disk $(free_gb) GB, root DerivedData $((root_derived_data_size_kb / 1024 / 1024)) GB, cap ${ROOT_DERIVED_DATA_MAX_GB} GB"
+    remove_all_children "$root_derived_data"
+  fi
 }
 
 cleanup_concourse_dead_volumes() {
