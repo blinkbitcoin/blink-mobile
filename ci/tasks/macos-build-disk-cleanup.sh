@@ -5,6 +5,7 @@ set -euo pipefail
 MODE="${1:-check}"
 MIN_FREE_GB="${MIN_BUILD_FREE_GB:-${2:-30}}"
 HARD_MIN_FREE_GB="${MIN_BUILD_HARD_FREE_GB:-10}"
+XCODE_ARTIFACT_MAX_AGE_DAYS="${XCODE_ARTIFACT_MAX_AGE_DAYS:-14}"
 ROOT_DERIVED_DATA_MAX_GB="${ROOT_DERIVED_DATA_MAX_GB:-20}"
 CI_ROOT="${CI_ROOT:-$(pwd)}"
 DISK_CHECK_PATH="${DISK_CHECK_PATH:-$CI_ROOT}"
@@ -163,7 +164,7 @@ cleanup_xcode_artifacts() {
   local root_derived_data_size_kb
 
   while IFS= read -r dir; do
-    remove_old_children "$dir" 28
+    remove_old_children "$dir" "$XCODE_ARTIFACT_MAX_AGE_DAYS"
   done < <(unique_paths \
     "/private/var/root/Library/Developer/Xcode/Archives" \
     "$BUILD_HOME/Library/Developer/Xcode/Archives" \
@@ -171,8 +172,8 @@ cleanup_xcode_artifacts() {
 
   while IFS= read -r dir; do
     if [[ -d "$dir" ]]; then
-      echo "Removing GaloyApp DerivedData older than 28d from $dir"
-      find "$dir" -mindepth 1 -maxdepth 1 -name "GaloyApp-*" -mtime +28 -exec rm -rf {} + || true
+      echo "Removing GaloyApp DerivedData older than ${XCODE_ARTIFACT_MAX_AGE_DAYS}d from $dir"
+      find "$dir" -mindepth 1 -maxdepth 1 -name "GaloyApp-*" -mtime +"$XCODE_ARTIFACT_MAX_AGE_DAYS" -exec rm -rf {} + || true
     fi
   done < <(unique_paths \
     "/private/var/root/Library/Developer/Xcode/DerivedData" \
