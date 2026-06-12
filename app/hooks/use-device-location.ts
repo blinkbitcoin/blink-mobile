@@ -10,10 +10,23 @@ import { logError } from "@app/utils/log-error"
 const DEFAULT_COUNTRY_CODE: CountryCode = "SV"
 const IPAPI_URL = "https://ipapi.co/json/"
 
+export const LocationSource = {
+  Phone: "phone",
+  Ip: "ip",
+} as const
+
+export type LocationSource = (typeof LocationSource)[keyof typeof LocationSource]
+
+const fetchCountryFromIp = async (): Promise<CountryCode | undefined> => {
+  const { data } = await axios.get(IPAPI_URL, { timeout: 5000 })
+  return data?.country_code as CountryCode | undefined
+}
+
 type DeviceLocation = {
   countryCode: CountryCode | undefined
   loading: boolean
   detectionFailed: boolean
+  source: LocationSource | undefined
 }
 
 const useDeviceLocation = (): DeviceLocation => {
@@ -26,11 +39,13 @@ const useDeviceLocation = (): DeviceLocation => {
   const [loading, setLoading] = useState(true)
   const [countryCode, setCountryCode] = useState<CountryCode | undefined>()
   const [detectionFailed, setDetectionFailed] = useState(false)
+  const [source, setSource] = useState<LocationSource | undefined>()
 
   const userPhone = settingsData?.me?.phone
 
   useEffect(() => {
     if (!userPhone) return
+    setSource(LocationSource.Phone)
     try {
       const parsed = parsePhoneNumber(userPhone)
       if (!parsed?.country) {
@@ -62,6 +77,7 @@ const useDeviceLocation = (): DeviceLocation => {
   useEffect(() => {
     if (error && !userPhone) {
       setCountryCode(DEFAULT_COUNTRY_CODE)
+      setSource(LocationSource.Ip)
       setDetectionFailed(true)
       setLoading(false)
       logError({
@@ -74,12 +90,10 @@ const useDeviceLocation = (): DeviceLocation => {
 
   useEffect(() => {
     if (!data || userPhone) return
+    setSource(LocationSource.Ip)
     const getLocation = async () => {
       try {
-        const response = await axios.get(IPAPI_URL, {
-          timeout: 5000,
-        })
-        const _countryCode = response?.data?.country_code
+        const _countryCode = await fetchCountryFromIp()
         if (!_countryCode) {
           const cached = data.countryCode as CountryCode | undefined
           setCountryCode(cached ?? DEFAULT_COUNTRY_CODE)
@@ -114,7 +128,29 @@ const useDeviceLocation = (): DeviceLocation => {
     countryCode,
     loading,
     detectionFailed,
+    source,
   }
+}
+
+export const useIpCountryCode = (enabled: boolean): CountryCode | undefined => {
+  const [ipCountryCode, setIpCountryCode] = useState<CountryCode | undefined>()
+
+  useEffect(() => {
+    if (!enabled) return undefined
+    let active = true
+    fetchCountryFromIp()
+      .then((code) => {
+        if (active && code) setIpCountryCode(code)
+      })
+      .catch((err) => {
+        logError({ scope: "device-location", error: err, context: { source: "ipapi" } })
+      })
+    return () => {
+      active = false
+    }
+  }, [enabled])
+
+  return ipCountryCode
 }
 
 export default useDeviceLocation

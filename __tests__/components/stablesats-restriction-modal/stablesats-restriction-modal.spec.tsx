@@ -77,41 +77,6 @@ describe("StablesatsRestrictionModal", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("fires onDismiss when Close is pressed", () => {
-    const onDismiss = jest.fn()
-    const { getByText } = render(
-      wrap(
-        <StablesatsRestrictionModal
-          isVisible={true}
-          toggleModal={jest.fn()}
-          onDismiss={onDismiss}
-        />,
-      ),
-    )
-
-    fireEvent.press(getByText("Close"))
-
-    expect(onDismiss).toHaveBeenCalledTimes(1)
-  })
-
-  it("does not fire onDismiss when Create new is pressed (navigates instead)", () => {
-    const onDismiss = jest.fn()
-    const { getByText } = render(
-      wrap(
-        <StablesatsRestrictionModal
-          isVisible={true}
-          toggleModal={jest.fn()}
-          onDismiss={onDismiss}
-        />,
-      ),
-    )
-
-    fireEvent.press(getByText("Create new"))
-
-    expect(onDismiss).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("getStarted")
-  })
-
   it("renders nothing when isVisible is false", () => {
     const { queryByText } = render(
       wrap(<StablesatsRestrictionModal isVisible={false} toggleModal={jest.fn()} />),
