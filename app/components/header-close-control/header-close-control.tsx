@@ -6,6 +6,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
+import { headerRightNoGlass } from "../header-no-glass/header-no-glass"
 
 type HeaderCloseControlParams = {
   navigateTo?: keyof RootStackParamList
@@ -40,8 +41,14 @@ export const headerCloseControl = ({
   return HeaderCloseControlComponent
 }
 
+// Spread into a screen's `options` to render the close button without the iOS 26
+// Liquid Glass shared background. See header-no-glass.tsx.
+export const headerCloseControlOptions = ({
+  navigateTo = "Primary",
+}: HeaderCloseControlParams = {}) =>
+  headerRightNoGlass(() => <HeaderCloseButton navigateTo={navigateTo} />)
+
 const useStyles = makeStyles(() => ({
-  headerCloseButton: {
-    marginRight: 20,
-  },
+  // No margin — keeps the iOS 26 glass capsule concentric with the glyph; use padding for spacing.
+  headerCloseButton: {},
 }))

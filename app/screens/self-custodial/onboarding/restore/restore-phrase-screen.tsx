@@ -7,6 +7,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -68,8 +69,8 @@ export const RestorePhraseScreen: React.FC = () => {
 
   useLayoutEffect(() => {
     if (!isStep1) return
-    navigation.setOptions({
-      headerRight: () => (
+    navigation.setOptions(
+      headerRightNoGlass(() => (
         <Pressable
           onPress={handlePasteFromClipboard}
           style={styles.headerPaste}
@@ -77,8 +78,8 @@ export const RestorePhraseScreen: React.FC = () => {
         >
           <Text style={styles.headerPasteText}>{pasteLabel}</Text>
         </Pressable>
-      ),
-    })
+      )),
+    )
   }, [navigation, isStep1, handlePasteFromClipboard, pasteLabel, styles])
 
   if (status === RestoreStatus.Restoring) {
@@ -194,7 +195,8 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 10,
   },
   headerPaste: {
-    marginRight: 16,
+    // No margin — keeps the iOS 26 glass capsule concentric with the label.
+    padding: 8,
   },
   headerPasteText: {
     color: colors.primary,

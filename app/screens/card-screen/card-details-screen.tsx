@@ -7,6 +7,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { ActionField } from "@app/components/action-field"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
+import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
 import { InfoSection, InfoCard } from "@app/components/card-screen"
 import { Screen } from "@app/components/screen"
 import { CardStatus } from "@app/graphql/generated"
@@ -60,13 +61,13 @@ export const CardDetailsScreen: React.FC = () => {
   }, [navigation])
 
   useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
+    navigation.setOptions(
+      headerRightNoGlass(() => (
         <TouchableOpacity style={styles.headerRight} onPress={handleSettingsPress}>
           <GaloyIcon name="settings" size={24} color={colors.black} />
         </TouchableOpacity>
-      ),
-    })
+      )),
+    )
   }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
 
   const cardStatusConfig = useMemo(
@@ -195,7 +196,8 @@ export const CardDetailsScreen: React.FC = () => {
 
 const useStyles = makeStyles(() => ({
   headerRight: {
-    marginRight: 24,
+    // No margin — keeps the iOS 26 glass capsule concentric with the glyph.
+    padding: 8,
   },
   content: {
     paddingTop: 20,

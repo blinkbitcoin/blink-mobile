@@ -4,6 +4,7 @@ import { injectJs, onMessageHandler } from "react-native-webln"
 import { WebView, WebViewNavigation } from "react-native-webview"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { headerLeftNoGlass } from "@app/components/header-no-glass/header-no-glass"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -58,11 +59,11 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
 
   React.useEffect(() => {
     navigation.setOptions({
-      headerLeft: () => (
+      ...headerLeftNoGlass(() => (
         <TouchableOpacity style={styles.iconContainer} onPress={handleBackPress}>
           <GaloyIcon name="caret-left" size={20} color={colors.black} />
         </TouchableOpacity>
-      ),
+      )),
     })
   }, [navigation, handleBackPress, LL, styles.iconContainer, colors.black])
 
@@ -143,6 +144,7 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
 const useStyles = makeStyles(({ colors }) => ({
   full: { width: "100%", height: "100%", flex: 1, backgroundColor: colors.transparent },
   iconContainer: {
-    marginLeft: 10,
+    // No margin — keeps the iOS 26 glass capsule concentric with the glyph.
+    padding: 8,
   },
 }))

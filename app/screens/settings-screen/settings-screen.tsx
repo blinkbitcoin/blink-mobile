@@ -8,6 +8,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { Screen } from "@app/components/screen"
@@ -129,8 +130,8 @@ export const SettingsScreen: React.FC = () => {
     const count =
       unackNotificationCount?.me
         ?.unacknowledgedStatefulNotificationsWithoutBulletinEnabledCount || 0
-    navigation.setOptions({
-      headerRight: () => (
+    navigation.setOptions(
+      headerRightNoGlass(() => (
         <TouchableOpacity onPress={() => navigation.navigate("notificationHistory")}>
           <GaloyIcon name="bell" size={24} style={styles.headerRight} />
           {count !== 0 && (
@@ -141,8 +142,8 @@ export const SettingsScreen: React.FC = () => {
             />
           )}
         </TouchableOpacity>
-      ),
-    })
+      )),
+    )
   }, [navigation, styles, unackNotificationCount])
 
   return (
@@ -194,12 +195,13 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 18,
   },
   headerRight: {
-    marginRight: 12,
+    // No margin — keeps the iOS 26 glass capsule concentric with the glyph; padding keeps the touch target.
+    padding: 8,
   },
   notificationCount: {
     position: "absolute",
-    right: 9,
-    top: -3,
+    right: 2,
+    top: 2,
     color: colors._darkGrey,
     backgroundColor: colors.black,
     textAlign: "center",
