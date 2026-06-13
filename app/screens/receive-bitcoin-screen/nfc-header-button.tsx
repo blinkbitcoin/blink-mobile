@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { CustomIcon } from "@app/components/custom-icon"
+import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 
@@ -23,12 +24,12 @@ export const NfcHeaderButton: React.FC<NfcHeaderButtonProps> = ({ visible, onPre
 
   useEffect(() => {
     if (!visible) {
-      navigation.setOptions({ headerRight: () => <></> })
+      navigation.setOptions(headerRightNoGlass(() => <></>))
       return
     }
 
-    navigation.setOptions({
-      headerRight: () => (
+    navigation.setOptions(
+      headerRightNoGlass(() => (
         <TouchableOpacity
           {...testProps("nfc-icon")}
           style={styles.nfcIcon}
@@ -38,8 +39,8 @@ export const NfcHeaderButton: React.FC<NfcHeaderButtonProps> = ({ visible, onPre
         >
           <CustomIcon name="nfc" color={colors.black} size={24} />
         </TouchableOpacity>
-      ),
-    })
+      )),
+    )
   }, [visible, onPress, navigation, colors.black, styles.nfcIcon])
 
   return null
@@ -47,7 +48,7 @@ export const NfcHeaderButton: React.FC<NfcHeaderButtonProps> = ({ visible, onPre
 
 const useStyles = makeStyles(() => ({
   nfcIcon: {
-    marginRight: 10,
+    // No margin — keeps the iOS 26 glass capsule concentric with the glyph.
     padding: 12,
     alignItems: "center",
     justifyContent: "center",
