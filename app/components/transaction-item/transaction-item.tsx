@@ -1,5 +1,5 @@
 import React from "react"
-import { View } from "react-native"
+import { Pressable, View } from "react-native"
 import Animated, { useSharedValue, useAnimatedStyle } from "react-native-reanimated"
 import { useIsFocused } from "@react-navigation/native"
 import { Text, makeStyles, ListItem } from "@rn-vui/themed"
@@ -10,6 +10,7 @@ import {
   TransactionFragmentDoc,
   WalletCurrency,
 } from "@app/graphql/generated"
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -99,7 +100,7 @@ const TransactionItem: React.FC<Props> = ({
   } = useAppConfig()
   const { formatMoneyAmount, formatCurrency } = useDisplayCurrency()
 
-  const { hideAmount } = useHideAmount()
+  const { hideAmount, switchMemoryHideAmount } = useHideAmount()
 
   const description = useDescriptionDisplay({
     tx,
@@ -196,16 +197,20 @@ const TransactionItem: React.FC<Props> = ({
           </ListItem.Subtitle>
         </ListItem.Content>
 
-        {hideAmount ? (
-          <Text>****</Text>
-        ) : (
-          <View>
-            <Text style={amountStyle}>{formattedDisplayAmount}</Text>
-            {formattedSecondaryAmount && (
-              <Text style={amountStyle}>{formattedSecondaryAmount}</Text>
+        <Pressable hitSlop={10} onPress={switchMemoryHideAmount}>
+          <View style={styles.amountWrapper}>
+            {hideAmount ? (
+              <HiddenBalancePlaceholder size="small" />
+            ) : (
+              <>
+                <Text style={amountStyle}>{formattedDisplayAmount}</Text>
+                {formattedSecondaryAmount && (
+                  <Text style={amountStyle}>{formattedSecondaryAmount}</Text>
+                )}
+              </>
             )}
           </View>
-        )}
+        </Pressable>
       </ListItem>
     </Animated.View>
   )
@@ -258,5 +263,10 @@ const useStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     fontSize: 14,
     lineHeight: 20,
     fontWeight: "400",
+  },
+  amountWrapper: {
+    alignItems: "flex-end",
+    justifyContent: "center",
+    minHeight: 40,
   },
 }))
