@@ -10,8 +10,9 @@ import {
 } from "react-native"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { BackendFeatureGate } from "@app/components/backend-feature-gate"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
 import {
@@ -42,8 +43,8 @@ const EmptyScreen = ({ message }: { message: string }) => {
   )
 }
 
-export const CardDashboardScreen: React.FC = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+const CardDashboardScreenContent: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const isFocused = useIsFocused()
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -205,3 +206,15 @@ const useStyles = makeStyles(({ colors }) => ({
     marginRight: 16,
   },
 }))
+
+export const CardDashboardScreen: React.FC = () => {
+  const { LL } = useI18nContext()
+  return (
+    <BackendFeatureGate
+      featureName={LL.BackendFeatureGate.featureCard()}
+      icon={<GaloyIcon name="physical-card" size={64} />}
+    >
+      <CardDashboardScreenContent />
+    </BackendFeatureGate>
+  )
+}

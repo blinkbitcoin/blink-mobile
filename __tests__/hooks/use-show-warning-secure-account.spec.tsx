@@ -5,12 +5,36 @@ import { act } from "react-test-renderer"
 import { MockedProvider } from "@apollo/client/testing"
 import {
   CurrencyListDocument,
+  DisplayCurrencyDocument,
   RealtimePriceDocument,
   WarningSecureAccountDocument,
 } from "@app/graphql/generated"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { useShowWarningSecureAccount } from "@app/screens/settings-screen/account/show-warning-secure-account-hook"
 import { renderHook } from "@testing-library/react-hooks"
+
+jest.mock("@app/store/persistent-state", () => ({
+  ...jest.requireActual("@app/store/persistent-state"),
+  usePersistentStateContext: () => ({
+    persistentState: {
+      schemaVersion: 12,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+    },
+    updateState: jest.fn(),
+    resetState: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    accounts: [],
+    activeAccount: undefined,
+    selfCustodialEntries: [],
+    setActiveAccountId: jest.fn(),
+    reloadSelfCustodialAccounts: jest.fn(),
+  }),
+}))
 
 // FIXME: the mockPrice doesn't work as expect.
 // it's ok because we have more than $5 in the dollar wallet
@@ -19,6 +43,8 @@ const mocksPrice = [
     request: {
       query: RealtimePriceDocument,
     },
+    // The hook re-renders and re-requests; reusable so MockLink never warns
+    maxUsageCount: Number.POSITIVE_INFINITY,
     result: {
       data: {
         me: {
@@ -54,6 +80,7 @@ const mocksPrice = [
     request: {
       query: CurrencyListDocument,
     },
+    maxUsageCount: Number.POSITIVE_INFINITY,
     result: {
       data: {
         currencyList: [
@@ -66,6 +93,25 @@ const mocksPrice = [
             __typename: "Currency",
           },
         ],
+      },
+    },
+  },
+  {
+    request: {
+      query: DisplayCurrencyDocument,
+    },
+    maxUsageCount: Number.POSITIVE_INFINITY,
+    result: {
+      data: {
+        me: {
+          id: "70df9822-efe0-419c-b864-c9efa99872ea",
+          defaultAccount: {
+            id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
+            displayCurrency: "USD",
+            __typename: "ConsumerAccount",
+          },
+          __typename: "User",
+        },
       },
     },
   },

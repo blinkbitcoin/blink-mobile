@@ -4,13 +4,13 @@ import useLogout from "@app/hooks/use-logout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { SettingsButton } from "../../button"
 import { useLoginMethods } from "../login-methods-hook"
 
 export const LogOut = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { phone, bothEmailAndPhoneVerified, email, emailVerified } = useLoginMethods()
   const { LL } = useI18nContext()

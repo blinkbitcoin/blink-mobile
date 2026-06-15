@@ -62,7 +62,8 @@
     "title": "Conversie",
     "transfer": "Transfer",
     "percentageToConvert": "Conversie % ",
-    "reviewTransfer": "Examinați transferul"
+    "reviewTransfer": "Examinați transferul",
+    "dustError": "Trebuie transferat întregul sold."
   },
   "ConversionConfirmationScreen": {
     "title": "Examinați conversia",
@@ -70,11 +71,12 @@
     "receivingAccount": "Cont de primire",
     "infoBitcoin": "Suma în Bitcoin este doar aproximativă. Poate varia cu o mică diferență.",
     "infoDollar": "Suma în dolari este doar aproximativă. Poate varia cu o mică diferență.",
-    "transferButtonText": "Transferă {fromWallet} către {toWallet}"
+    "transferButtonText": "Transferă {fromWallet} către {toWallet}",
+    "feeLabel": "Comision de conversie",
+    "feeError": "Nu s-a putut obține comisionul de conversie"
   },
   "ConversionSuccessScreen": {
-    "message": "Conversie reușită",
-    "title": "Conversie cu succes"
+    "message": "Conversie reușită"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2045,6 +2047,7 @@
     "createAccount": "Creați un cont nou",
     "exploreWallet": "Explorați portofelul",
     "login": "Autentificare",
+    "loginOrRestore": "Autentificare / Restaurare",
     "logBackInWith": "Conectați-vă din nou cu",
     "headline": "Wallet powered by Galoy",
     "startTrialAccount": "Începeți cu un cont de încercare",
@@ -2159,9 +2162,14 @@
     "lightningAddress": "Adresă lightning",
     "lightningInvoice": "Factură lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Taxă de depunere: {fee} SAT pentru sume sub {threshold} SAT sau {overFee} SAT pentru depuneri peste {threshold} SAT"
+    "depositFee": "Taxă de depunere: {fee} SAT pentru sume sub {threshold} SAT sau {overFee} SAT pentru depuneri peste {threshold} SAT",
+    "autoConvertMinAmount": "Sumele sub {minSats: number} sats / {minFiat: string} nu pot fi convertite automat în Dolari. Veți primi Bitcoin în schimb.",
+    "autoConvertFailed": "Plata primită, dar conversia a eșuat.",
+    "pleaseWaitForConversion": "Vă rugăm să așteptați până când conversia este finalizată"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Portofelul tău încă se conectează. Așteaptă un moment și încearcă din nou.",
+    "paymentPending": "Este posibil ca plata ta să fie încă în curs de finalizare. Verifică-ți soldul înainte de a încerca din nou.",
     "title": "Răscumpărați Bitcoin",
     "usdTitle": "Răscumpără în Cont Dolar",
     "error": "Nu s-a reușit generarea facturii. Vă rugăm să contactați asistența dacă această problemă persistă.",
@@ -2219,7 +2227,8 @@
     "slideToConfirm": "Glisați pentru a confirma",
     "slideConfirming": "Confirmare...",
     "copiedDestination": "Destinație copiată în clipboard",
-    "lightningRecommended": "Taxă mare! Vă recomandăm Lightning."
+    "lightningRecommended": "Taxă mare! Vă recomandăm Lightning.",
+    "usdRemainderSweep": "Soldul rămas {remaining: string} ({remainingSats: string}) va fi convertit în Bitcoin. Minim USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "Numele de utilizator {bankName: string} sunt acum adrese {bankName: string}.",
@@ -2298,7 +2307,16 @@
     "recipient": "Destinatar",
     "time": "Ora",
     "type": "Tip",
-    "destinationIsRequired": "Destinația este necesară"
+    "feeTier": "Viteza comisionului",
+    "fast": "Rapid",
+    "medium": "Mediu",
+    "slow": "Lent",
+    "recommended": "Recomandat",
+    "walletOffline": "Portofelul tău este offline. Te rugăm să verifici conexiunea și să încerci din nou.",
+    "sdkInsufficientFunds": "Fonduri insuficiente pentru această tranzacție.",
+    "sdkAmountTooLow": "Suma este prea mică pentru o tranzacție on-chain.",
+    "sdkNetworkError": "Eroare de rețea. Verificați conexiunea și încercați din nou.",
+    "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită."
   },
   "SettingsScreen": {
     "staticQr": "Cod QR static imprimabil",
@@ -2312,6 +2330,7 @@
     "setYourLightningAddress": "Setați-vă adresa Lightning",
     "activated": "Activat",
     "addressScreen": "Modalități de a fi plătit",
+    "nonCustodialAccount": "Cont non-custodial",
     "tapUserName": "Atingeți pentru a seta numele de utilizator",
     "notifications": "Notificări",
     "title": "Setări",
@@ -2338,7 +2357,15 @@
     "logoutOneAccountAlertContent": "Vei fi deconectat din sesiunea legată de {identifier: string}.\n Asigură-te că ai acces pentru a te conecta din nou în viitor.",
     "logoutOneAccountConfirm": "Înțeleg. Te rog să mă deconectezi.",
     "receiveCurrency": "Monedă de primire",
-    "displayCurrency": "Monedă de afișare"
+    "displayCurrency": "Monedă de afișare",
+    "AccountInformation": {
+      "identityLabel": "Wallet identifier",
+      "backupStatusLabel": "Backup status",
+      "backupStatusCompleted": "Backup complete",
+      "backupStatusNotCompleted": "Backup not complete",
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Adresă Lightning"
+    }
   },
   "NotificationSettingsScreen": {
     "title": "Setări pentru notificări",
@@ -2377,6 +2404,7 @@
     "level": "Nivel {level: string}",
     "switchAccount": "Schimbă contul",
     "pleaseWait": "Te rog să aștepți.",
+    "probeBalanceFailed": "Nu s-a putut verifica soldul portofelului. Te rugăm să încerci din nou.",
     "accountLevel": "Nivel de cont",
     "upgrade": "Upgrade la cont",
     "logOutAndDeleteLocalData": "Deconectați-vă și ștergeți toate datele locale",
@@ -2416,6 +2444,8 @@
     "copiedAccountId": "Ați copiat ID-ul contului în clipboard",
     "yourAccountId": "ID-ul contului dvs.",
     "accountId": "ID-ul contului",
+    "publicKey": "Cheie publică",
+    "copiedPublicKey": "Cheia publică a fost copiată în clipboard",
     "copy": "Copiați",
     "identityVerification": "Verificarea identității"
   },
@@ -2425,6 +2455,19 @@
     "fromThisDevice": "de pe acest dispozitiv?",
     "switchAccount": "Ați comutat pe alt cont",
     "removedAccount": "Ați eliminat contul {identifier: string}."
+  },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats nu este disponibil în regiunea ta",
+    "modalBody": "Pentru a accesa un cont în dolari, creează un cont non-custodial.",
+    "createNew": "Crează cont nou",
+    "walletLabel": "nu este disponibil în regiunea ta"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Contul în dolari nu mai este disponibil în regiunea ta",
+    "body": "Transferă soldul tău în dolari în Bitcoin",
+    "youHave": "Ai",
+    "youGet": "Primești",
+    "approve": "Aprobă"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificare cu doi factori",
@@ -2446,7 +2489,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Cont implicit de primire",
-    "info": "Cont Bitcoin-ul tău este pentru acumularea de sats, unde valoarea USD se mișcă cu piața. Cont Dolar-ul tău este alimentat de Stablesats — deține Bitcoin acoperit pentru a rămâne stabil în valoare USD. Mereu deții Bitcoin, dar valoarea în dolari nu se schimbă."
+    "info": "Cont Bitcoin-ul tău este pentru acumularea de sats, unde valoarea USD se mișcă cu piața. Cont Dolar-ul tău este alimentat de Stablesats — deține Bitcoin acoperit pentru a rămâne stabil în valoare USD. Mereu deții Bitcoin, dar valoarea în dolari nu se schimbă.",
+    "titleSelfCustodial": "Cont implicit",
+    "infoSelfCustodial": "Acest cont va fi folosit în mod implicit la primire și trimitere. Poți schimba oricând."
   },
   "ThemeScreen": {
     "title": "Temă",
@@ -2464,7 +2509,10 @@
     "header": "Cont Dolar-ul tău este alimentat de Stablesats",
     "body": "Cont Dolar folosește tehnologia Stablesats pentru a menține Bitcoin stabil la prețul USD. Mereu deții Bitcoin — nu dolari reali — dar valoarea USD nu fluctuează. Poți trimite și primi Bitcoin ca de obicei, dar nu este compatibil cu sistemul bancar tradițional.",
     "termsAndConditions": "Citiți Termenii și condițiile",
-    "learnMore": "Aflați mai multe despre Stablesats"
+    "learnMore": "Aflați mai multe despre Stablesats",
+    "headerSelfCustodial": "Contul tău în Dolari deține stablecoins",
+    "bodySelfCustodial": "În contul în Dolari deții stablecoins. Tokenuri susținute de active a căror valoare este menținută stabilă față de USD. Nu poți încă trimite și primi stablecoins. Când trimiți din contul în Dolari, stablecoins-ul tău va fi schimbat și trimis ca Bitcoin către destinatar.",
+    "learnMoreSelfCustodial": "Află mai multe"
   },
   "SplashScreen": {
     "update": "Aplicația este învechită. Este necesară o actualizare înainte ca aplicația să poată fi utilizată.\n\nAcest lucru se poate face din PlayStore pentru Android și Testflight pentru iOS"
@@ -2665,6 +2713,8 @@
     "accountInformation": "Informații despre cont",
     "trialAccount": "Cont de probă",
     "blinkUser": "Utilizator Blink",
+    "anonymous": "Anonim",
+    "anonymousUser": "Utilizator anonim",
     "blinkToBlink": "Blink la Blink",
     "transactionLimits": "Limite de tranzacționare",
     "activateWallet": "Activați portofelul",
@@ -2722,6 +2772,7 @@
     "or": "sau",
     "openWallet": "Deschideți portofelul",
     "onchain": "Onchain",
+    "spark": "Spark",
     "paymentRequest": "Cerere de plată",
     "phone": "Telefon",
     "phoneNumber": "Număr de telefon",
@@ -2741,6 +2792,7 @@
     "submit": "Trimite",
     "success": "Success!",
     "dollarStablesats": "Dolar (Stablesats)",
+    "dollarStablecoin": "Dolar (Stablecoin)",
     "to": "Către",
     "total": "Total",
     "transactions": "Tranzacții",
@@ -2783,7 +2835,8 @@
       "minChars": "Trebuie să aibă cel puțin {min} caractere",
       "invalidPostalCode": "Cod poștal invalid, probabil o greșeală de tastare",
       "invalidRegion": "Selectarea regiunii este invalidă"
-    }
+    },
+    "copied": "Copiat în clipboard"
   },
   "errors": {
     "generic": "A apărut o eroare.\nVă rugăm să încercați din nou mai târziu.",
@@ -2952,7 +3005,10 @@
       "emptyTransactions": "Încă nu există tranzacții",
       "addFunds": "Adaugă fonduri",
       "transactionsTitle": "Tranzacții",
-      "title": "Card Visa"
+      "title": "Card Visa",
+      "noCardAvailable": "Niciun card disponibil",
+      "cardNotUsable": "Acest card nu este disponibil pentru utilizare în acest moment",
+      "cardUpdateError": "Nu s-a putut actualiza starea cardului"
     },
     "validThruLabel": "VALABIL PÂNĂ LA",
     "networkVisa": "Visa",
@@ -3224,9 +3280,6 @@
         "damagedCard": "Card deteriorat",
         "damagedCardDescription": "Cardul meu este deteriorat fizic",
         "whatHappensNext": "Ce urmează?",
-        "currentCardDeactivated": "Cardul tău actual va fi dezactivat imediat",
-        "newCardShipped": "Un card nou va fi expediat la adresa ta",
-        "digitalCardAvailable": "Cardul tău digital rămâne disponibil în timpul acestui proces",
         "cardManagement": "Gestionare card",
         "bullet1": "Cardul tău actual va fi înghețat pentru securitate",
         "bullet2": "Va fi emis un card nou cu numere diferite",
@@ -3247,15 +3300,9 @@
         "title": "Verifică solicitarea ta",
         "subtitle": "Te rugăm să confirmi detaliile înlocuirii cardului",
         "requestSummary": "Rezumatul solicitării",
-        "reason": "Motiv",
         "delivery": "Livrare",
-        "shippingAddress": "Adresa de expediere",
-        "deliveryCost": "Cost de livrare",
         "submitRequest": "Trimite solicitarea",
         "importantInformation": "Informații importante",
-        "processedImmediately": "Solicitarea ta va fi procesată imediat",
-        "currentCardDeactivated": "Cardul actual va fi dezactivat la confirmare",
-        "trackStatus": "Poți urmări starea livrării noului tău card în aplicație",
         "issueType": "Motiv",
         "deliveryTime": "Timp de livrare",
         "shippingCost": "Cost de livrare",
@@ -3308,10 +3355,7 @@
         "feature2": "Cip EMV pentru securitate sporită",
         "feature3": "Bandă magnetică pentru acceptare universală",
         "feature4": "Numele tău embosat pe card",
-        "important": "Important",
-        "importantBullet1": "Cardul tău virtual va rămâne activ cât timp aștepți cardul fizic",
-        "importantBullet2": "Va trebui să activezi cardul fizic când ajunge",
-        "importantBullet3": "Ambele carduri vor avea același număr și aceleași detalii"
+        "important": "Important"
       },
       "Confirm": {
         "title": "Confirmă comanda",
@@ -3429,5 +3473,248 @@
         "buttonText": "Închide"
       }
     }
+  },
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
+    "BackupMethod": {
+      "title": "Alege metoda de backup",
+      "subtitle": "Recomandăm {provider} pentru utilizatorii noi.",
+      "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
+      "passwordManager": "Manager de parole",
+      "manualBackup": "Backup manual",
+      "passwordManagerBackupSaved": "Backup salvat în managerul de parole",
+      "passwordManagerBackupFailed": "Nu s-a putut salva backup-ul",
+      "passwordManagerUnavailable": "Niciun manager de parole nu este disponibil pe acest dispozitiv. Folosește copia de rezervă Drive sau salvează manual fraza ta de 12 cuvinte."
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Păstrează-ți fraza de backup secretă!",
+        "check1": "Înțeleg că nimeni nu poate recupera portofelul meu dacă pierd această frază",
+        "check2": "Înțeleg că dacă cineva obține această frază, poate fura toate fondurile mele.",
+        "check3": "Nimeni nu îmi cere aceste informații prin mesaj sau apel"
+      },
+      "Phrase": {
+        "headerTitle": "Frază de recuperare",
+        "sparkCompatible": "Această frază de backup funcționează în orice {sparkCompatibleLink}",
+        "sparkCompatibleLink": "portofel compatibil Spark",
+        "copiedToast": "Fraza de backup copiată în clipboard",
+        "saveItNow": "Salvează acum",
+        "savedConfirm": "Am salvat-o",
+        "copy": "Copiază",
+        "continueButton": "Continuă",
+        "testBackup": "Testează-ți copia de rezervă"
+      },
+      "Confirm": {
+        "headerTitle": "Confirmă fraza de backup",
+        "subtitle": "O verificare rapidă dacă ai scris-o corect",
+        "enterWord": "Introdu cuvântul",
+        "enterWords": "Introdu cuvintele",
+        "confirm": "Confirmă",
+        "incorrectWord": "Cuvânt incorect, verificați ordinea"
+      },
+      "Success": {
+        "title": "Bun venit la Blink non-custodial",
+        "testSuccess": "Fraza ta de rezervă este corectă"
+      }
+    },
+    "CloudBackup": {
+      "title": "Să facem o copie de siguranță a portofelului tău",
+      "description": "Vom salva o copie a frazei de recuperare în {provider} tău.",
+      "encryptCheckbox": "Criptează cu o parolă suplimentară",
+      "password": "Parolă",
+      "passwordPlaceholder": "(minim 12 caractere)",
+      "confirmPassword": "Confirmă parola",
+      "confirmPasswordPlaceholder": "Introdu parola din nou",
+      "continueButton": "Continuă",
+      "importantTitle": "Important",
+      "importantMessage": "Blink nu stochează această parolă. Dacă o pierzi, {bold} să recuperăm portofelul tău.",
+      "importantMessageBold": "nu vom putea",
+      "passwordTooShort": "Minim 12 caractere",
+      "passwordMismatch": "Parolele nu se potrivesc",
+      "uploadSuccess": "Copie de siguranță salvată în {provider}",
+      "uploadFailed": "Încarcărea copiei de siguranță a eșuat",
+      "signInFailed": "Conectarea la {provider} a eșuat",
+      "cloudNotAvailable": "iCloud Drive nu este disponibil. Conectează-te la iCloud din Setări și activează iCloud Drive.",
+      "networkError": "Eroare de rețea. Verifică-ți conexiunea și încearcă din nou.",
+      "existingBackupTitle": "Copie de siguranță găsită",
+      "existingBackupMessage": "Există deja o copie de siguranță în {provider} tău. Vrei să o suprascrii?",
+      "existingBackupMessageWithDetails": "Există deja o copie de rezervă pe {provider}.\n\nAdresă Lightning: {address}\nCreată: {createdAt}\n\nDoriți să o suprascrieți?",
+      "existingBackupUnknownAddress": "Nu este disponibil",
+      "existingBackupUnknownCreatedAt": "Necunoscut",
+      "overwrite": "Suprascrie"
+    }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Treci la non-custodial",
+    "explainerTitle": "Ce înseamnă să treci la non-custodial?",
+    "explainerStep1": "Vei crea un cont non-custodial pe protocolul Spark, <link>află mai multe aici</link>",
+    "explainerStep2": "Transferăm fondurile tale în noul tău cont non-custodial, iar contul actual va fi șters",
+    "explainerStep3": "Continuă să folosești Blink ca de obicei",
+    "letsMove": "Hai să mergem",
+    "transferringFunds": "Se transferă fondurile tale. Ar trebui să fie gata în câteva secunde."
+  },
+  "AccountTypeSelectionScreen": {
+    "custodialLabel": "Custodial",
+    "selfCustodialLabel": "Non-custodial",
+    "custodialDescription": "Noi păstrăm fondurile în numele dumneavoastră",
+    "selfCustodialDescription": "Doar dumneavoastră puteți accesa fondurile",
+    "continueButton": "Continuă",
+    "descriptionDefault": "Vă rugăm alegeți tipul preferat de Blink.",
+    "descriptionSelected": "Vă rugăm alegeți tipul de cont.",
+    "chooseMethod": "Alegeți metoda",
+    "restoreComingSoonTitle": "În curând",
+    "restoreComingSoonDescription": "Funcția de restaurare va fi disponibilă într-o actualizare viitoare.",
+    "createFailed": "Crearea portofelului a eșuat. Vă rugăm să încercați din nou.",
+    "selfCustodialDisabled": "Non-custodial este temporar indisponibil."
+  },
+  "RestoreScreen": {
+    "title": "Restaurare portofel",
+    "description": "Recuperați portofelul dintr-o copie de siguranță",
+    "phraseTitle": "Restaurare portofel",
+    "phraseSubtitleStep1": "Introduceți primele 6 cuvinte din fraza de backup",
+    "phraseSubtitleStep2": "Introduceți restul frazei de backup",
+    "nextWords": "Următoarele 6 cuvinte",
+    "paste": "Lipește",
+    "enterWord": "Cuvânt",
+    "invalidMnemonic": "Frază de backup invalidă. Verificați dacă ordinea cuvintelor este corectă.",
+    "restoring": "Se restaurează portofelul...",
+    "restoreSuccess": "Portofel restaurat cu succes",
+    "restoreFailed": "Restaurarea a eșuat. Încercați din nou.",
+    "restore": "Restaurare portofel",
+    "noBackupFound": "Niciun backup găsit",
+    "noBackupDescription": "Nu am găsit un backup. Puteți introduce fraza de backup manual.",
+    "enterPassword": "Introduceți parola de criptare",
+    "wrongPassword": "Parolă incorectă. Încercați din nou.",
+    "pickBackupTitle": "Alege un portofel",
+    "pickBackupDescription": "Selectează o copie de rezervă pentru restaurare"
+  },
+  "BackupNudge": {
+    "title": "Fondurile dumneavoastră sunt în pericol",
+    "description": "Securizați-vă portofelul acum. Durează doar un minut.",
+    "cta": "Securizare portofel",
+    "settingsWarning": "Fă backup la portofel. Dacă pierzi acest dispozitiv, vei pierde fondurile.",
+    "modalTitle": "Securizați-vă fondurile",
+    "modalDescription": "Vă recomandăm insistent să faceți o copie de siguranță a portofelului pentru a preveni pierderea totală a fondurilor în cazul în care pierdeți acest dispozitiv.",
+    "secureMe": "Securizare portofel"
+  },
+  "StableBalance": {
+    "title": "Sold stabil",
+    "description": "Păstrați un sold în USD alimentat de USDB pe Spark.",
+    "balanceLabelBtc": "Sold · SATS",
+    "balanceLabelUsd": "Sold · USD",
+    "settingsRowTitle": "Sold Stabil",
+    "settingsTitle": "Sold Stabil",
+    "settingsDescription": "Păstrează o parte din portofelul tău în USD. Convertește între BTC și USD manual oricând folosind acțiunea Convertire.",
+    "activationLabel": "Activ",
+    "activeHint": "Portofelul tău păstrează USD prin USDB.",
+    "inactiveHint": "Portofelul tău păstrează doar BTC.",
+    "deactivateWarningBody": "Mai ai {amount:string}. Convertește mai întâi în BTC, altfel soldul în USD va fi ascuns până reactivezi Stable Balance.",
+    "toggleFailedToast": "Nu am putut actualiza Stable Balance. Încearcă din nou.",
+    "toggleModal": {
+      "activateTitle": "Activează soldul stabil",
+      "activateBody": "Soldul tău în BTC va fi convertit în USDB. Acesta este comisionul de conversie estimat.",
+      "activateConfirm": "Activează",
+      "deactivateTitle": "Dezactivează soldul stabil",
+      "deactivateBody": "Soldul tău în USDB va fi convertit înapoi în BTC. Acesta este comisionul de conversie estimat.",
+      "deactivateConfirm": "Dezactivează",
+      "cancel": "Anulează"
+    },
+    "minimumConversion": "Conversie minimă: {amount:string}",
+    "conversionUnavailable": "Conversia este temporar indisponibilă. Încearcă din nou."
+  },
+  "BackendFeatureGate": {
+    "title": "Funcție indisponibilă",
+    "description": "Această funcție necesită un cont custodial.",
+    "signInTitle": "Sign in required",
+    "signInDescription": "Sign in to your custodial account to use {featureName}.",
+    "noAccountTitle": "Custodial account required",
+    "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "featureCircles": "Circles",
+    "featureEarn": "Earn",
+    "featureCard": "Card"
+  },
+  "WalletCreationScreen": {
+    "creating": "Se creează portofelul...",
+    "errorTitle": "Crearea portofelului a eșuat",
+    "errorDescription": "Ceva nu a mers bine. Vă rugăm încercați din nou.",
+    "retry": "Încearcă din nou"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Transfer Spark",
+    "lightningPayment": "Plată Lightning",
+    "onchainDeposit": "Depozit On-chain",
+    "onchainWithdrawal": "Retragere On-chain",
+    "conversionFromBitcoin": "Conversie din Bitcoin",
+    "conversionToBitcoin": "Conversie în Bitcoin",
+    "conversionFromToken": "Conversie din {token}",
+    "conversionToToken": "Conversie în {token}",
+    "tokenTransfer": "Transfer {token}",
+    "payTo": "Plătește la {address}",
+    "payment": "Plată"
+  },
+  "SelfCustodialOffline": {
+    "title": "Portofelul este offline",
+    "description": "Portofelul tău non-custodial nu poate ajunge la rețea în acest moment. Încearcă din nou când ești online.",
+    "retry": "Încearcă din nou"
+  },
+  "SelfCustodialError": {
+    "insufficientFunds": "Fonduri insuficiente pentru a acoperi suma și taxele de rețea. Încearcă o sumă mai mică.",
+    "belowMinimum": "Suma este sub minimul necesar pentru această plată. Încearcă o sumă mai mare.",
+    "networkError": "Problemă de conexiune la rețea. Verifică conexiunea și încearcă din nou.",
+    "invalidInput": "Detaliile plății par invalide. Te rog verifică și încearcă din nou.",
+    "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică."
+  },
+  "UnclaimedDeposit": {
+    "title": "Ai {count} depozit(e) nerevendicate",
+    "description": "Total: {sats} sats disponibili pentru revendicare",
+    "claim": "Revendică acum",
+    "claiming": "Se revendică...",
+    "screenTitle": "Depozite nerevendicate",
+    "cardTitle": "Claim {sats} sats",
+    "claimWithFee": "Claim (max fee: {fee} sats)",
+    "refund": "Rambursare",
+    "refunding": "Refunding...",
+    "immature": "Se așteaptă confirmări...",
+    "feeExceeded": "Network fees are too high to claim ({requiredFee} sats required). Try again later or refund to an on-chain address.",
+    "missingUtxo": "This deposit is no longer available on the network.",
+    "belowDustLimit": "This deposit is too small to claim after fees. Wait for lower fees or refund to an on-chain address.",
+    "genericError": "Unable to claim: {error}",
+    "claimFailed": "Claim failed: {error}",
+    "refundFailed": "Refund failed: {error}",
+    "refundAddress": "Bitcoin address for refund",
+    "feeRate": "Network fee",
+    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
+    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
+    "feeRateHour": "Economy (~{sats} sats) ~60 min",
+    "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Nu s-au putut încărca comisioanele rețelei. Verifică conexiunea și încearcă din nou.",
+    "refundNow": "Rambursează acum",
+    "refundSuccess": "Refund initiated successfully",
+    "claimSuccess": "Deposit claimed successfully",
+    "error": "Unable to claim this deposit"
+  },
+  "FeatureUnavailable": {
+    "SelfCustodial": {
+      "title": "Temporarily unavailable",
+      "description": "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later."
+    }
+  },
+  "NetworkStatus": {
+    "degradedBanner": "Spark network is currently degraded. Payments may take longer."
+  },
+  "SelfCustodialDelete": {
+    "dangerZoneImportantTitle": "Important",
+    "dangerZoneBulletReinstated": "Contul șters nu poate fi restabilit",
+    "dangerZoneBulletPermanent": "Ștergerea contului este permanentă",
+    "dangerZoneBulletEmpty": "Asigură-te că contul este gol",
+    "dangerZoneDeleteButton": "Șterge contul și datele",
+    "confirmModalTitle": "Confirmă ștergerea contului",
+    "confirmModalTypeToConfirm": "Scrie \"{delete: string}\" pentru a confirma",
+    "hasFundsWarningTitle": "Avertisment",
+    "hasFundsWarningBody": "Portofelul tău are un sold de {balance}. Pentru siguranța ta, nu permitem ștergerea conturilor cu fonduri.",
+    "hasFundsWarningHelper": "Pentru a continua ștergerea, golește-ți contul sau donează către economii circulare.",
+    "hasFundsWarningButton": "Înapoi"
   }
 }

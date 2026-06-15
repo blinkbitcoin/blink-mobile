@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react"
 import { View } from "react-native"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
+import { RouteProp, useNavigation } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { AmountInput } from "@app/components/amount-input"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -9,6 +12,7 @@ import { usePaymentRequestQuery, WalletCurrency } from "@app/graphql/generated"
 import { getBtcWallet } from "@app/graphql/wallets-utils"
 import { usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { usePayments } from "@app/hooks/use-payments"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -17,10 +21,9 @@ import {
   toBtcMoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
+import { AccountType } from "@app/types/wallet"
+import { msatsToSats } from "@app/utils/amounts"
 import { testProps } from "@app/utils/testProps"
-import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text } from "@rn-vui/themed"
 
 type Prop = {
   route: RouteProp<RootStackParamList, "redeemBitcoinDetail">
@@ -30,16 +33,15 @@ const RedeemBitcoinDetailScreen: React.FC<Prop> = ({ route }) => {
   const styles = useStyles()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "redeemBitcoinDetail">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "redeemBitcoinDetail">>()
 
   const { formatMoneyAmount } = useDisplayCurrency()
 
   const { callback, domain, defaultDescription, k1, minWithdrawable, maxWithdrawable } =
     route.params.receiveDestination.validDestination
 
-  // minWithdrawable and maxWithdrawable are in msats
-  const minWithdrawableSatoshis = toBtcMoneyAmount(Math.round(minWithdrawable / 1000))
-  const maxWithdrawableSatoshis = toBtcMoneyAmount(Math.round(maxWithdrawable / 1000))
+  const minWithdrawableSatoshis = toBtcMoneyAmount(msatsToSats(minWithdrawable))
+  const maxWithdrawableSatoshis = toBtcMoneyAmount(msatsToSats(maxWithdrawable))
 
   const amountIsFlexible =
     minWithdrawableSatoshis.amount !== maxWithdrawableSatoshis.amount
@@ -49,7 +51,12 @@ const RedeemBitcoinDetailScreen: React.FC<Prop> = ({ route }) => {
   )
 
   const { LL } = useI18nContext()
-  const { data } = usePaymentRequestQuery({ fetchPolicy: "cache-first" })
+  const { accountType } = usePayments()
+  const isSelfCustodial = accountType === AccountType.SelfCustodial
+  const { data } = usePaymentRequestQuery({
+    fetchPolicy: "cache-first",
+    skip: isSelfCustodial,
+  })
 
   const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
 
@@ -89,22 +96,26 @@ const RedeemBitcoinDetailScreen: React.FC<Prop> = ({ route }) => {
       return
     }
 
-    btcWalletId &&
-      navigation.replace("redeemBitcoinResult", {
-        callback,
-        domain,
-        k1,
-        defaultDescription,
-        minWithdrawableSatoshis,
-        maxWithdrawableSatoshis,
-        receivingWalletDescriptor: {
-          id: btcWalletId,
-          currency: receiveCurrency,
-        },
-        unitOfAccountAmount,
-        settlementAmount: btcMoneyAmount,
-        displayAmount: convertMoneyAmount(btcMoneyAmount, DisplayCurrency),
-      })
+    if (!isSelfCustodial && !btcWalletId) {
+      return
+    }
+
+    const receivingWalletDescriptor = btcWalletId
+      ? { id: btcWalletId, currency: receiveCurrency }
+      : undefined
+
+    navigation.replace("redeemBitcoinResult", {
+      callback,
+      domain,
+      k1,
+      defaultDescription,
+      minWithdrawableSatoshis,
+      maxWithdrawableSatoshis,
+      receivingWalletDescriptor,
+      unitOfAccountAmount,
+      settlementAmount: btcMoneyAmount,
+      displayAmount: convertMoneyAmount(btcMoneyAmount, DisplayCurrency),
+    })
   }
 
   return (

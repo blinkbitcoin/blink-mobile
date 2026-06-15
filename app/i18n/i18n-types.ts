@@ -258,6 +258,10 @@ type RootTranslation = {
 		 * R​e​v​i​e​w​ ​t​r​a​n​s​f​e​r
 		 */
 		reviewTransfer: string
+		/**
+		 * F​u​l​l​ ​b​a​l​a​n​c​e​ ​h​a​s​ ​t​o​ ​b​e​ ​t​r​a​n​s​f​e​r​r​e​d​.
+		 */
+		dustError: string
 	}
 	ConversionConfirmationScreen: {
 		/**
@@ -286,6 +290,14 @@ type RootTranslation = {
 		 * @param {unknown} toWallet
 		 */
 		transferButtonText: RequiredParams<'fromWallet' | 'toWallet'>
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​f​e​e
+		 */
+		feeLabel: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​f​e​t​c​h​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e
+		 */
+		feeError: string
 	}
 	ConversionSuccessScreen: {
 		/**
@@ -6428,6 +6440,10 @@ type RootTranslation = {
 		 */
 		login: string
 		/**
+		 * L​o​g​ ​i​n​ ​/​ ​R​e​s​t​o​r​e
+		 */
+		loginOrRestore: string
+		/**
 		 * L​o​g​ ​b​a​c​k​ ​i​n​ ​w​i​t​h
 		 */
 		logBackInWith: string
@@ -6849,6 +6865,20 @@ type RootTranslation = {
 		 * @param {string} threshold
 		 */
 		depositFee: RequiredParams<'fee' | 'overFee' | 'threshold' | 'threshold'>
+		/**
+		 * A​m​o​u​n​t​s​ ​b​e​l​o​w​ ​{​m​i​n​S​a​t​s​}​ ​S​A​T​ ​/​ ​{​m​i​n​F​i​a​t​}​ ​c​a​n​'​t​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​i​n​s​t​e​a​d​.
+		 * @param {string} minFiat
+		 * @param {number} minSats
+		 */
+		autoConvertMinAmount: RequiredParams<'minFiat' | 'minSats'>
+		/**
+		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d​ ​b​u​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​a​i​l​e​d​.
+		 */
+		autoConvertFailed: string
+		/**
+		 * P​l​e​a​s​e​ ​w​a​i​t​ ​u​n​t​i​l​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​i​s​ ​d​o​n​e
+		 */
+		pleaseWaitForConversion: string
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -6871,6 +6901,14 @@ type RootTranslation = {
 		 * F​a​i​l​e​d​ ​t​o​ ​s​u​b​m​i​t​ ​w​i​t​h​d​r​a​w​a​l​ ​r​e​q​u​e​s​t​.​ ​P​l​e​a​s​e​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​i​f​ ​t​h​i​s​ ​p​r​o​b​l​e​m​ ​p​e​r​s​i​s​t​s​.
 		 */
 		submissionError: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​s​t​i​l​l​ ​c​o​n​n​e​c​t​i​n​g​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​a​ ​m​o​m​e​n​t​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		walletNotConnected: string
+		/**
+		 * Y​o​u​r​ ​p​a​y​m​e​n​t​ ​m​a​y​ ​s​t​i​l​l​ ​b​e​ ​c​o​m​p​l​e​t​i​n​g​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​b​e​f​o​r​e​ ​r​e​t​r​y​i​n​g​.
+		 */
+		paymentPending: string
 		/**
 		 * M​i​n​:​ ​{​m​i​n​i​m​u​m​A​m​o​u​n​t​}​,​ ​M​a​x​:​ ​{​m​a​x​i​m​u​m​A​m​o​u​n​t​}
 		 * @param {string} maximumAmount
@@ -7091,6 +7129,13 @@ type RootTranslation = {
 		 * H​i​g​h​ ​f​e​e​!​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
 		 */
 		lightningRecommended: string
+		/**
+		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
+		 * @param {string} minimum
+		 * @param {string} remaining
+		 * @param {string} remainingSats
+		 */
+		usdRemainderSweep: RequiredParams<'minimum' | 'remaining' | 'remainingSats'>
 	}
 	SendBitcoinDestinationScreen: {
 		/**
@@ -7408,6 +7453,46 @@ type RootTranslation = {
 		 * T​y​p​e
 		 */
 		type: string
+		/**
+		 * F​e​e​ ​s​p​e​e​d
+		 */
+		feeTier: string
+		/**
+		 * F​a​s​t
+		 */
+		fast: string
+		/**
+		 * M​e​d​i​u​m
+		 */
+		medium: string
+		/**
+		 * S​l​o​w
+		 */
+		slow: string
+		/**
+		 * R​e​c​o​m​m​e​n​d​e​d
+		 */
+		recommended: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		walletOffline: string
+		/**
+		 * N​o​t​ ​e​n​o​u​g​h​ ​f​u​n​d​s​ ​f​o​r​ ​t​h​i​s​ ​t​r​a​n​s​a​c​t​i​o​n​.
+		 */
+		sdkInsufficientFunds: string
+		/**
+		 * A​m​o​u​n​t​ ​i​s​ ​t​o​o​ ​l​o​w​ ​f​o​r​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​t​r​a​n​s​a​c​t​i​o​n​.
+		 */
+		sdkAmountTooLow: string
+		/**
+		 * N​e​t​w​o​r​k​ ​e​r​r​o​r​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		sdkNetworkError: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​e​s​t​i​m​a​t​e​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.
+		 */
+		sdkGenericError: string
 	}
 	SettingsScreen: {
 		/**
@@ -7454,6 +7539,10 @@ type RootTranslation = {
 		 * W​a​y​s​ ​t​o​ ​g​e​t​ ​p​a​i​d
 		 */
 		addressScreen: string
+		/**
+		 * N​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
+		 */
+		nonCustodialAccount: string
 		/**
 		 * T​a​p​ ​t​o​ ​s​e​t​ ​u​s​e​r​n​a​m​e
 		 */
@@ -7565,6 +7654,32 @@ type RootTranslation = {
 		 * D​i​s​p​l​a​y​ ​c​u​r​r​e​n​c​y
 		 */
 		displayCurrency: string
+		AccountInformation: {
+			/**
+			 * W​a​l​l​e​t​ ​i​d​e​n​t​i​f​i​e​r
+			 */
+			identityLabel: string
+			/**
+			 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
+			 */
+			lightningAddressLabel: string
+			/**
+			 * B​a​c​k​u​p​ ​s​t​a​t​u​s
+			 */
+			backupStatusLabel: string
+			/**
+			 * B​a​c​k​u​p​ ​c​o​m​p​l​e​t​e
+			 */
+			backupStatusCompleted: string
+			/**
+			 * B​a​c​k​u​p​ ​n​o​t​ ​c​o​m​p​l​e​t​e
+			 */
+			backupStatusNotCompleted: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​n​f​o​r​m​a​t​i​o​n​.
+			 */
+			loadError: string
+		}
 	}
 	NotificationSettingsScreen: {
 		/**
@@ -7676,6 +7791,10 @@ type RootTranslation = {
 		 * P​l​e​a​s​e​ ​W​a​i​t​.
 		 */
 		pleaseWait: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​v​e​r​i​f​y​ ​t​h​e​ ​w​a​l​l​e​t​'​s​ ​b​a​l​a​n​c​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		probeBalanceFailed: string
 		/**
 		 * A​c​c​o​u​n​t​ ​L​e​v​e​l
 		 */
@@ -7842,6 +7961,14 @@ type RootTranslation = {
 		 */
 		accountId: string
 		/**
+		 * P​u​b​l​i​c​ ​k​e​y
+		 */
+		publicKey: string
+		/**
+		 * C​o​p​i​e​d​ ​y​o​u​r​ ​p​u​b​l​i​c​ ​k​e​y​ ​t​o​ ​c​l​i​p​b​o​a​r​d
+		 */
+		copiedPublicKey: string
+		/**
 		 * C​o​p​y
 		 */
 		copy: string
@@ -7931,9 +8058,17 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
+		 * D​e​f​a​u​l​t​ ​a​c​c​o​u​n​t
+		 */
+		titleSelfCustodial: string
+		/**
 		 * Y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​i​s​ ​f​o​r​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s​,​ ​w​h​e​r​e​ ​t​h​e​ ​U​S​D​ ​v​a​l​u​e​ ​m​o​v​e​s​ ​w​i​t​h​ ​t​h​e​ ​m​a​r​k​e​t​.​ ​Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s​ ​—​ ​i​t​ ​h​o​l​d​s​ ​B​i​t​c​o​i​n​ ​t​h​a​t​ ​i​s​ ​h​e​d​g​e​d​ ​t​o​ ​s​t​a​y​ ​s​t​a​b​l​e​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​Y​o​u​'​r​e​ ​a​l​w​a​y​s​ ​h​o​l​d​i​n​g​ ​B​i​t​c​o​i​n​,​ ​b​u​t​ ​t​h​e​ ​d​o​l​l​a​r​ ​v​a​l​u​e​ ​d​o​e​s​n​'​t​ ​c​h​a​n​g​e​.
 		 */
 		info: string
+		/**
+		 * T​h​i​s​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​u​s​e​d​ ​b​y​ ​d​e​f​a​u​l​t​ ​w​h​e​n​ ​r​e​c​e​i​v​i​n​g​ ​a​n​d​ ​s​e​n​d​i​n​g​.​ ​Y​o​u​ ​c​a​n​ ​s​w​i​t​c​h​ ​a​n​y​ ​t​i​m​e​.
+		 */
+		infoSelfCustodial: string
 	}
 	ThemeScreen: {
 		/**
@@ -7988,6 +8123,58 @@ type RootTranslation = {
 		 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​S​t​a​b​l​e​s​a​t​s
 		 */
 		learnMore: string
+		/**
+		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​h​o​l​d​s​ ​s​t​a​b​l​e​c​o​i​n​s
+		 */
+		headerSelfCustodial: string
+		/**
+		 * I​n​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​y​o​u​ ​h​o​l​d​ ​s​t​a​b​l​e​c​o​i​n​s​.​ ​T​o​k​e​n​s​ ​b​a​c​k​e​d​ ​b​y​ ​a​s​s​e​t​s​ ​w​i​t​h​ ​v​a​l​u​e​ ​h​e​l​d​ ​s​t​a​b​l​e​ ​t​o​ ​t​h​e​ ​U​S​D​.​ ​Y​o​u​ ​c​a​n​'​t​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​s​t​a​b​l​e​c​o​i​n​s​ ​(​y​e​t​)​.​ ​W​h​e​n​ ​y​o​u​ ​s​e​n​d​ ​f​r​o​m​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​,​ ​y​o​u​ ​w​i​l​l​ ​s​w​a​p​ ​y​o​u​r​ ​s​t​a​b​l​e​c​o​i​n​s​ ​a​n​d​ ​s​e​n​d​ ​a​s​ ​B​i​t​c​o​i​n​ ​t​o​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​.
+		 */
+		bodySelfCustodial: string
+		/**
+		 * L​e​a​r​n​ ​m​o​r​e
+		 */
+		learnMoreSelfCustodial: string
+	}
+	StablesatsRestriction: {
+		/**
+		 * S​t​a​b​l​e​s​a​t​s​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 */
+		modalTitle: string
+		/**
+		 * T​o​ ​g​e​t​ ​a​c​c​e​s​s​ ​t​o​ ​a​ ​d​o​l​l​a​r​ ​a​c​c​o​u​n​t​,​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+		 */
+		modalBody: string
+		/**
+		 * C​r​e​a​t​e​ ​n​e​w
+		 */
+		createNew: string
+		/**
+		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 */
+		walletLabel: string
+	}
+	ConvertDollarToBitcoinModal: {
+		/**
+		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 */
+		title: string
+		/**
+		 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n
+		 */
+		body: string
+		/**
+		 * Y​o​u​ ​h​a​v​e
+		 */
+		youHave: string
+		/**
+		 * Y​o​u​ ​g​e​t
+		 */
+		youGet: string
+		/**
+		 * A​p​p​r​o​v​e
+		 */
+		approve: string
 	}
 	SplashScreen: {
 		/**
@@ -7996,6 +8183,56 @@ type RootTranslation = {
 	​T​h​i​s​ ​c​a​n​ ​b​e​ ​d​o​n​e​ ​f​r​o​m​ ​t​h​e​ ​P​l​a​y​S​t​o​r​e​ ​f​o​r​ ​A​n​d​r​o​i​d​ ​a​n​d​ ​T​e​s​t​f​l​i​g​h​t​ ​f​o​r​ ​i​O​S
 		 */
 		update: string
+	}
+	TransactionDescription: {
+		/**
+		 * S​p​a​r​k​ ​T​r​a​n​s​f​e​r
+		 */
+		sparkTransfer: string
+		/**
+		 * L​i​g​h​t​n​i​n​g​ ​P​a​y​m​e​n​t
+		 */
+		lightningPayment: string
+		/**
+		 * O​n​-​c​h​a​i​n​ ​D​e​p​o​s​i​t
+		 */
+		onchainDeposit: string
+		/**
+		 * O​n​-​c​h​a​i​n​ ​W​i​t​h​d​r​a​w​a​l
+		 */
+		onchainWithdrawal: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​f​r​o​m​ ​B​i​t​c​o​i​n
+		 */
+		conversionFromBitcoin: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​t​o​ ​B​i​t​c​o​i​n
+		 */
+		conversionToBitcoin: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​f​r​o​m​ ​{​t​o​k​e​n​}
+		 * @param {string} token
+		 */
+		conversionFromToken: RequiredParams<'token'>
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​t​o​ ​{​t​o​k​e​n​}
+		 * @param {string} token
+		 */
+		conversionToToken: RequiredParams<'token'>
+		/**
+		 * {​t​o​k​e​n​}​ ​T​r​a​n​s​f​e​r
+		 * @param {string} token
+		 */
+		tokenTransfer: RequiredParams<'token'>
+		/**
+		 * P​a​y​ ​t​o​ ​{​a​d​d​r​e​s​s​}
+		 * @param {string} address
+		 */
+		payTo: RequiredParams<'address'>
+		/**
+		 * P​a​y​m​e​n​t
+		 */
+		payment: string
 	}
 	TransactionDetailScreen: {
 		/**
@@ -8658,6 +8895,14 @@ type RootTranslation = {
 		 */
 		blinkUser: string
 		/**
+		 * A​n​o​n​y​m​o​u​s
+		 */
+		anonymous: string
+		/**
+		 * A​n​o​n​ ​u​s​e​r
+		 */
+		anonymousUser: string
+		/**
 		 * B​l​i​n​k​ ​t​o​ ​B​l​i​n​k
 		 */
 		blinkToBlink: string
@@ -8888,6 +9133,10 @@ type RootTranslation = {
 		 */
 		onchain: string
 		/**
+		 * S​p​a​r​k
+		 */
+		spark: string
+		/**
 		 * P​a​y​m​e​n​t​ ​R​e​q​u​e​s​t
 		 */
 		paymentRequest: string
@@ -8967,6 +9216,10 @@ type RootTranslation = {
 		 * D​o​l​l​a​r​ ​(​S​t​a​b​l​e​s​a​t​s​)
 		 */
 		dollarStablesats: string
+		/**
+		 * D​o​l​l​a​r​ ​(​S​t​a​b​l​e​c​o​i​n​)
+		 */
+		dollarStablecoin: string
 		/**
 		 * T​o
 		 */
@@ -11284,6 +11537,821 @@ type RootTranslation = {
 		 */
 		noNotifications: string
 	}
+	BackupScreen: {
+		/**
+		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t
+		 */
+		title: string
+		/**
+		 * C​h​o​o​s​e​ ​a​ ​b​a​c​k​u​p​ ​m​e​t​h​o​d​ ​t​o​ ​s​e​c​u​r​e​ ​y​o​u​r​ ​f​u​n​d​s
+		 */
+		description: string
+		BackupMethod: {
+			/**
+			 * C​h​o​o​s​e​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​m​e​t​h​o​d
+			 */
+			title: string
+			/**
+			 * W​e​ ​r​e​c​o​m​m​e​n​d​ ​{​p​r​o​v​i​d​e​r​}​ ​f​o​r​ ​n​e​w​ ​u​s​e​r​s​.
+			 * @param {string} provider
+			 */
+			subtitle: RequiredParams<'provider'>
+			/**
+			 * G​o​o​g​l​e​ ​D​r​i​v​e
+			 */
+			googleDrive: string
+			/**
+			 * A​p​p​l​e​ ​i​C​l​o​u​d
+			 */
+			appleICloud: string
+			/**
+			 * P​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+			 */
+			passwordManager: string
+			/**
+			 * M​a​n​u​a​l​ ​b​a​c​k​u​p
+			 */
+			manualBackup: string
+			/**
+			 * B​a​c​k​u​p​ ​s​a​v​e​d​ ​t​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+			 */
+			passwordManagerBackupSaved: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​s​a​v​e​ ​b​a​c​k​u​p
+			 */
+			passwordManagerBackupFailed: string
+			/**
+			 * N​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​U​s​e​ ​D​r​i​v​e​ ​b​a​c​k​u​p​ ​o​r​ ​s​a​v​e​ ​y​o​u​r​ ​1​2​-​w​o​r​d​ ​p​h​r​a​s​e​ ​m​a​n​u​a​l​l​y​.
+			 */
+			passwordManagerUnavailable: string
+		}
+		CloudBackup: {
+			/**
+			 * L​e​t​'​s​ ​b​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t
+			 */
+			title: string
+			/**
+			 * W​e​ ​w​i​l​l​ ​s​a​v​e​ ​a​ ​b​a​c​k​u​p​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​t​o​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.
+			 * @param {string} provider
+			 */
+			description: RequiredParams<'provider'>
+			/**
+			 * E​n​c​r​y​p​t​ ​w​i​t​h​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​w​o​r​d
+			 */
+			encryptCheckbox: string
+			/**
+			 * P​a​s​s​w​o​r​d
+			 */
+			password: string
+			/**
+			 * (​1​2​ ​c​h​a​r​a​c​t​e​r​s​ ​m​i​n​i​m​u​m​)
+			 */
+			passwordPlaceholder: string
+			/**
+			 * C​o​n​f​i​r​m​ ​p​a​s​s​w​o​r​d
+			 */
+			confirmPassword: string
+			/**
+			 * E​n​t​e​r​ ​p​a​s​s​w​o​r​d​ ​a​g​a​i​n
+			 */
+			confirmPasswordPlaceholder: string
+			/**
+			 * C​o​n​t​i​n​u​e
+			 */
+			continueButton: string
+			/**
+			 * I​m​p​o​r​t​a​n​t
+			 */
+			importantTitle: string
+			/**
+			 * B​l​i​n​k​ ​d​o​e​s​ ​n​o​t​ ​s​t​o​r​e​ ​t​h​i​s​ ​p​a​s​s​w​o​r​d​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​i​t​,​ ​{​b​o​l​d​}​ ​t​o​ ​r​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​.
+			 * @param {string} bold
+			 */
+			importantMessage: RequiredParams<'bold'>
+			/**
+			 * w​e​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​b​l​e
+			 */
+			importantMessageBold: string
+			/**
+			 * M​i​n​i​m​u​m​ ​1​2​ ​c​h​a​r​a​c​t​e​r​s
+			 */
+			passwordTooShort: string
+			/**
+			 * P​a​s​s​w​o​r​d​s​ ​d​o​ ​n​o​t​ ​m​a​t​c​h
+			 */
+			passwordMismatch: string
+			/**
+			 * B​a​c​k​u​p​ ​f​o​u​n​d
+			 */
+			existingBackupTitle: string
+			/**
+			 * A​ ​b​a​c​k​u​p​ ​a​l​r​e​a​d​y​ ​e​x​i​s​t​s​ ​i​n​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.​ ​D​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​o​v​e​r​w​r​i​t​e​ ​i​t​?
+			 * @param {string} provider
+			 */
+			existingBackupMessage: RequiredParams<'provider'>
+			/**
+			 * A​ ​b​a​c​k​u​p​ ​a​l​r​e​a​d​y​ ​e​x​i​s​t​s​ ​i​n​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.​
+		​
+		​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​:​ ​{​a​d​d​r​e​s​s​}​
+		​C​r​e​a​t​e​d​:​ ​{​c​r​e​a​t​e​d​A​t​}​
+		​
+		​D​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​o​v​e​r​w​r​i​t​e​ ​i​t​?
+			 * @param {string} address
+			 * @param {string} createdAt
+			 * @param {string} provider
+			 */
+			existingBackupMessageWithDetails: RequiredParams<'address' | 'createdAt' | 'provider'>
+			/**
+			 * N​o​t​ ​a​v​a​i​l​a​b​l​e
+			 */
+			existingBackupUnknownAddress: string
+			/**
+			 * U​n​k​n​o​w​n
+			 */
+			existingBackupUnknownCreatedAt: string
+			/**
+			 * O​v​e​r​w​r​i​t​e
+			 */
+			overwrite: string
+			/**
+			 * B​a​c​k​u​p​ ​s​a​v​e​d​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}
+			 * @param {string} provider
+			 */
+			uploadSuccess: RequiredParams<'provider'>
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​l​o​a​d​ ​b​a​c​k​u​p
+			 */
+			uploadFailed: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​s​i​g​n​ ​i​n​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}
+			 * @param {string} provider
+			 */
+			signInFailed: RequiredParams<'provider'>
+			/**
+			 * i​C​l​o​u​d​ ​D​r​i​v​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​s​i​g​n​ ​i​n​ ​t​o​ ​i​C​l​o​u​d​ ​i​n​ ​S​e​t​t​i​n​g​s​ ​a​n​d​ ​e​n​a​b​l​e​ ​i​C​l​o​u​d​ ​D​r​i​v​e​.
+			 */
+			cloudNotAvailable: string
+			/**
+			 * N​e​t​w​o​r​k​ ​e​r​r​o​r​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+			 */
+			networkError: string
+		}
+		ManualBackup: {
+			Alerts: {
+				/**
+				 * K​e​e​p​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​s​e​c​r​e​t​!
+				 */
+				title: string
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​n​o​b​o​d​y​ ​c​a​n​ ​r​e​c​o​v​e​r​ ​m​y​ ​w​a​l​l​e​t​ ​i​f​ ​I​ ​l​o​s​e​ ​t​h​i​s​ ​p​h​r​a​s​e
+				 */
+				check1: string
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​i​f​ ​s​o​m​e​b​o​d​y​ ​g​e​t​s​ ​t​h​i​s​ ​p​h​r​a​s​e​,​ ​t​h​e​y​ ​c​a​n​ ​s​t​e​a​l​ ​a​l​l​ ​m​y​ ​f​u​n​d​s​.
+				 */
+				check2: string
+				/**
+				 * N​o​b​o​d​y​ ​i​s​ ​a​s​k​i​n​g​ ​m​e​ ​f​o​r​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​v​i​a​ ​m​e​s​s​a​g​e​ ​o​r​ ​a​ ​c​a​l​l
+				 */
+				check3: string
+			}
+			Phrase: {
+				/**
+				 * B​a​c​k​u​p​ ​p​h​r​a​s​e
+				 */
+				headerTitle: string
+				/**
+				 * T​h​i​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​w​o​r​k​s​ ​i​n​ ​a​n​y​ ​{​s​p​a​r​k​C​o​m​p​a​t​i​b​l​e​L​i​n​k​}
+				 * @param {string} sparkCompatibleLink
+				 */
+				sparkCompatible: RequiredParams<'sparkCompatibleLink'>
+				/**
+				 * S​p​a​r​k​-​c​o​m​p​a​t​i​b​l​e​ ​w​a​l​l​e​t
+				 */
+				sparkCompatibleLink: string
+				/**
+				 * B​a​c​k​u​p​ ​p​h​r​a​s​e​ ​c​o​p​i​e​d​ ​i​n​t​o​ ​c​l​i​p​b​o​a​r​d
+				 */
+				copiedToast: string
+				/**
+				 * S​a​v​e​ ​i​t​ ​n​o​w
+				 */
+				saveItNow: string
+				/**
+				 * C​o​n​t​i​n​u​e
+				 */
+				continueButton: string
+				/**
+				 * I​ ​h​a​v​e​ ​s​a​v​e​d​ ​i​t
+				 */
+				savedConfirm: string
+				/**
+				 * C​o​p​y
+				 */
+				copy: string
+				/**
+				 * T​e​s​t​ ​y​o​u​r​ ​b​a​c​k​u​p
+				 */
+				testBackup: string
+			}
+			Confirm: {
+				/**
+				 * C​o​n​f​i​r​m​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+				 */
+				headerTitle: string
+				/**
+				 * A​ ​q​u​i​c​k​ ​c​h​e​c​k​ ​i​f​ ​y​o​u​ ​h​a​v​e​ ​w​r​i​t​t​e​n​ ​i​t​ ​d​o​w​n​ ​c​o​r​r​e​c​t​l​y
+				 */
+				subtitle: string
+				/**
+				 * E​n​t​e​r​ ​w​o​r​d
+				 */
+				enterWord: string
+				/**
+				 * E​n​t​e​r​ ​w​o​r​d​s
+				 */
+				enterWords: string
+				/**
+				 * C​o​n​f​i​r​m
+				 */
+				confirm: string
+				/**
+				 * I​n​c​o​r​r​e​c​t​ ​w​o​r​d​,​ ​p​l​e​a​s​e​ ​c​h​e​c​k​ ​t​h​e​ ​o​r​d​e​r
+				 */
+				incorrectWord: string
+			}
+			Success: {
+				/**
+				 * W​e​l​c​o​m​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​B​l​i​n​k
+				 */
+				title: string
+				/**
+				 * Y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​i​s​ ​c​o​r​r​e​c​t
+				 */
+				testSuccess: string
+			}
+		}
+	}
+	AccountMigration: {
+		/**
+		 * M​o​v​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l
+		 */
+		moveToNonCustodial: string
+		/**
+		 * W​h​a​t​ ​d​o​e​s​ ​i​t​ ​m​e​a​n​ ​t​o​ ​m​o​v​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​?
+		 */
+		explainerTitle: string
+		/**
+		 * Y​o​u​ ​w​i​l​l​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​o​n​ ​t​h​e​ ​S​p​a​r​k​ ​p​r​o​t​o​c​o​l​,​ ​<​l​i​n​k​>​l​e​a​r​n​ ​m​o​r​e​ ​h​e​r​e​<​/​l​i​n​k​>
+		 */
+		explainerStep1: string
+		/**
+		 * W​e​ ​t​r​a​n​s​f​e​r​ ​y​o​u​r​ ​f​u​n​d​s​ ​i​n​t​o​ ​y​o​u​r​ ​n​e​w​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​,​ ​a​n​d​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​d​e​l​e​t​e​d
+		 */
+		explainerStep2: string
+		/**
+		 * C​o​n​t​i​n​u​e​ ​u​s​i​n​g​ ​B​l​i​n​k​ ​a​s​ ​u​s​u​a​l
+		 */
+		explainerStep3: string
+		/**
+		 * L​e​t​'​s​ ​m​o​v​e
+		 */
+		letsMove: string
+		/**
+		 * T​r​a​n​s​f​e​r​r​i​n​g​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​I​t​ ​s​h​o​u​l​d​ ​b​e​ ​d​o​n​e​ ​i​n​ ​a​ ​f​e​w​ ​s​e​c​o​n​d​s​.
+		 */
+		transferringFunds: string
+	}
+	AccountTypeSelectionScreen: {
+		/**
+		 * P​l​e​a​s​e​ ​c​h​o​o​s​e​ ​y​o​u​r​ ​p​r​e​f​e​r​r​e​d​ ​t​y​p​e​ ​o​f​ ​B​l​i​n​k​.
+		 */
+		descriptionDefault: string
+		/**
+		 * P​l​e​a​s​e​ ​c​h​o​o​s​e​ ​a​c​c​o​u​n​t​ ​t​y​p​e​.
+		 */
+		descriptionSelected: string
+		/**
+		 * C​u​s​t​o​d​i​a​l
+		 */
+		custodialLabel: string
+		/**
+		 * N​o​n​-​c​u​s​t​o​d​i​a​l
+		 */
+		selfCustodialLabel: string
+		/**
+		 * W​e​ ​h​o​l​d​ ​t​h​e​ ​f​u​n​d​s​ ​o​n​ ​y​o​u​r​ ​b​e​h​a​l​f
+		 */
+		custodialDescription: string
+		/**
+		 * O​n​l​y​ ​y​o​u​ ​c​a​n​ ​a​c​c​e​s​s​ ​f​u​n​d​s
+		 */
+		selfCustodialDescription: string
+		/**
+		 * C​h​o​o​s​e​ ​m​e​t​h​o​d
+		 */
+		chooseMethod: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		continueButton: string
+		/**
+		 * N​o​n​-​c​u​s​t​o​d​i​a​l​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.
+		 */
+		selfCustodialDisabled: string
+		/**
+		 * C​o​m​i​n​g​ ​s​o​o​n
+		 */
+		restoreComingSoonTitle: string
+		/**
+		 * R​e​s​t​o​r​e​ ​f​l​o​w​ ​w​i​l​l​ ​b​e​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​a​ ​f​u​t​u​r​e​ ​u​p​d​a​t​e​.
+		 */
+		restoreComingSoonDescription: string
+		/**
+		 * F​a​i​l​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​w​a​l​l​e​t​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		createFailed: string
+	}
+	RestoreScreen: {
+		/**
+		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
+		 */
+		title: string
+		/**
+		 * R​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​f​r​o​m​ ​a​ ​b​a​c​k​u​p
+		 */
+		description: string
+		/**
+		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
+		 */
+		phraseTitle: string
+		/**
+		 * E​n​t​e​r​ ​f​i​r​s​t​ ​6​ ​w​o​r​d​s​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+		 */
+		phraseSubtitleStep1: string
+		/**
+		 * E​n​t​e​r​ ​r​e​s​t​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+		 */
+		phraseSubtitleStep2: string
+		/**
+		 * N​e​x​t​ ​6​ ​w​o​r​d​s
+		 */
+		nextWords: string
+		/**
+		 * P​a​s​t​e
+		 */
+		paste: string
+		/**
+		 * W​o​r​d
+		 */
+		enterWord: string
+		/**
+		 * I​n​v​a​l​i​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​i​f​ ​t​h​e​ ​w​o​r​d​ ​o​r​d​e​r​ ​i​s​ ​c​o​r​r​e​c​t​.
+		 */
+		invalidMnemonic: string
+		/**
+		 * R​e​s​t​o​r​i​n​g​ ​y​o​u​r​ ​w​a​l​l​e​t​.​.​.
+		 */
+		restoring: string
+		/**
+		 * W​a​l​l​e​t​ ​r​e​s​t​o​r​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 */
+		restoreSuccess: string
+		/**
+		 * F​a​i​l​e​d​ ​t​o​ ​r​e​s​t​o​r​e​ ​w​a​l​l​e​t​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		restoreFailed: string
+		/**
+		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
+		 */
+		restore: string
+		/**
+		 * N​o​ ​b​a​c​k​u​p​ ​f​o​u​n​d
+		 */
+		noBackupFound: string
+		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​f​i​n​d​ ​a​ ​b​a​c​k​u​p​.​ ​Y​o​u​ ​c​a​n​ ​e​n​t​e​r​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​m​a​n​u​a​l​l​y​ ​i​n​s​t​e​a​d​.
+		 */
+		noBackupDescription: string
+		/**
+		 * E​n​t​e​r​ ​y​o​u​r​ ​e​n​c​r​y​p​t​i​o​n​ ​p​a​s​s​w​o​r​d
+		 */
+		enterPassword: string
+		/**
+		 * I​n​c​o​r​r​e​c​t​ ​p​a​s​s​w​o​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		wrongPassword: string
+		/**
+		 * C​h​o​o​s​e​ ​a​ ​w​a​l​l​e​t
+		 */
+		pickBackupTitle: string
+		/**
+		 * S​e​l​e​c​t​ ​a​ ​b​a​c​k​u​p​ ​t​o​ ​r​e​s​t​o​r​e
+		 */
+		pickBackupDescription: string
+	}
+	BackupNudge: {
+		/**
+		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​a​t​ ​r​i​s​k
+		 */
+		title: string
+		/**
+		 * S​e​c​u​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​n​o​w​.​ ​I​t​ ​o​n​l​y​ ​t​a​k​e​s​ ​a​ ​m​i​n​u​t​e​.
+		 */
+		description: string
+		/**
+		 * S​e​c​u​r​e​ ​w​a​l​l​e​t
+		 */
+		cta: string
+		/**
+		 * B​a​c​k​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​d​e​v​i​c​e​,​ ​y​o​u​ ​w​i​l​l​ ​l​o​s​e​ ​y​o​u​r​ ​f​u​n​d​s​.
+		 */
+		settingsWarning: string
+		/**
+		 * S​e​c​u​r​e​ ​y​o​u​r​ ​f​u​n​d​s
+		 */
+		modalTitle: string
+		/**
+		 * W​e​ ​h​i​g​h​l​y​ ​r​e​c​o​m​m​e​n​d​ ​y​o​u​ ​b​a​c​k​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​t​o​ ​p​r​e​v​e​n​t​ ​a​ ​c​o​m​p​l​e​t​e​ ​l​o​s​s​ ​o​f​ ​f​u​n​d​s​ ​i​n​ ​c​a​s​e​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​d​e​v​i​c​e​.
+		 */
+		modalDescription: string
+		/**
+		 * S​e​c​u​r​e​ ​w​a​l​l​e​t
+		 */
+		secureMe: string
+	}
+	SelfCustodialOffline: {
+		/**
+		 * W​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​w​a​l​l​e​t​ ​c​a​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​n​e​t​w​o​r​k​ ​r​i​g​h​t​ ​n​o​w​.​ ​T​r​y​ ​a​g​a​i​n​ ​w​h​e​n​ ​y​o​u​'​r​e​ ​b​a​c​k​ ​o​n​l​i​n​e​.
+		 */
+		description: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		retry: string
+	}
+	SelfCustodialError: {
+		/**
+		 * N​o​t​ ​e​n​o​u​g​h​ ​f​u​n​d​s​ ​t​o​ ​c​o​v​e​r​ ​t​h​e​ ​a​m​o​u​n​t​ ​a​n​d​ ​n​e​t​w​o​r​k​ ​f​e​e​s​.​ ​T​r​y​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
+		 */
+		insufficientFunds: string
+		/**
+		 * A​m​o​u​n​t​ ​i​s​ ​b​e​l​o​w​ ​t​h​e​ ​m​i​n​i​m​u​m​ ​r​e​q​u​i​r​e​d​ ​f​o​r​ ​t​h​i​s​ ​p​a​y​m​e​n​t​.​ ​T​r​y​ ​a​ ​l​a​r​g​e​r​ ​a​m​o​u​n​t​.
+		 */
+		belowMinimum: string
+		/**
+		 * N​e​t​w​o​r​k​ ​c​o​n​n​e​c​t​i​o​n​ ​p​r​o​b​l​e​m​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		networkError: string
+		/**
+		 * T​h​e​ ​p​a​y​m​e​n​t​ ​d​e​t​a​i​l​s​ ​l​o​o​k​ ​i​n​v​a​l​i​d​.​ ​P​l​e​a​s​e​ ​r​e​v​i​e​w​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		invalidInput: string
+		/**
+		 * T​h​e​ ​p​a​y​m​e​n​t​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​c​o​m​p​l​e​t​e​d​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​,​ ​o​r​ ​u​s​e​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
+		 */
+		generic: string
+	}
+	UnclaimedDeposit: {
+		/**
+		 * U​n​c​l​a​i​m​e​d​ ​D​e​p​o​s​i​t​s
+		 */
+		screenTitle: string
+		/**
+		 * C​l​a​i​m​ ​{​s​a​t​s​}​ ​s​a​t​s
+		 * @param {unknown} sats
+		 */
+		cardTitle: RequiredParams<'sats'>
+		/**
+		 * Y​o​u​ ​h​a​v​e​ ​{​c​o​u​n​t​}​ ​u​n​c​l​a​i​m​e​d​ ​d​e​p​o​s​i​t​(​s​)
+		 * @param {unknown} count
+		 */
+		title: RequiredParams<'count'>
+		/**
+		 * T​o​t​a​l​:​ ​{​s​a​t​s​}​ ​s​a​t​s​ ​a​v​a​i​l​a​b​l​e​ ​t​o​ ​c​l​a​i​m
+		 * @param {unknown} sats
+		 */
+		description: RequiredParams<'sats'>
+		/**
+		 * C​l​a​i​m​ ​n​o​w
+		 */
+		claim: string
+		/**
+		 * C​l​a​i​m​ ​(​m​a​x​ ​f​e​e​:​ ​{​f​e​e​}​ ​s​a​t​s​)
+		 * @param {unknown} fee
+		 */
+		claimWithFee: RequiredParams<'fee'>
+		/**
+		 * C​l​a​i​m​i​n​g​.​.​.
+		 */
+		claiming: string
+		/**
+		 * R​e​f​u​n​d
+		 */
+		refund: string
+		/**
+		 * R​e​f​u​n​d​i​n​g​.​.​.
+		 */
+		refunding: string
+		/**
+		 * W​a​i​t​i​n​g​ ​f​o​r​ ​c​o​n​f​i​r​m​a​t​i​o​n​s​.​.​.
+		 */
+		immature: string
+		/**
+		 * N​e​t​w​o​r​k​ ​f​e​e​s​ ​a​r​e​ ​t​o​o​ ​h​i​g​h​ ​t​o​ ​c​l​a​i​m​ ​(​{​r​e​q​u​i​r​e​d​F​e​e​}​ ​s​a​t​s​ ​r​e​q​u​i​r​e​d​)​.​ ​T​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​ ​o​r​ ​r​e​f​u​n​d​ ​t​o​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​a​d​d​r​e​s​s​.
+		 * @param {unknown} requiredFee
+		 */
+		feeExceeded: RequiredParams<'requiredFee'>
+		/**
+		 * T​h​i​s​ ​d​e​p​o​s​i​t​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​e​ ​n​e​t​w​o​r​k​.
+		 */
+		missingUtxo: string
+		/**
+		 * T​h​i​s​ ​d​e​p​o​s​i​t​ ​i​s​ ​t​o​o​ ​s​m​a​l​l​ ​t​o​ ​c​l​a​i​m​ ​a​f​t​e​r​ ​f​e​e​s​.​ ​W​a​i​t​ ​f​o​r​ ​l​o​w​e​r​ ​f​e​e​s​ ​o​r​ ​r​e​f​u​n​d​ ​t​o​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​a​d​d​r​e​s​s​.
+		 */
+		belowDustLimit: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​c​l​a​i​m​:​ ​{​e​r​r​o​r​}
+		 * @param {unknown} error
+		 */
+		genericError: RequiredParams<'error'>
+		/**
+		 * C​l​a​i​m​ ​f​a​i​l​e​d​:​ ​{​e​r​r​o​r​}
+		 * @param {unknown} error
+		 */
+		claimFailed: RequiredParams<'error'>
+		/**
+		 * R​e​f​u​n​d​ ​f​a​i​l​e​d​:​ ​{​e​r​r​o​r​}
+		 * @param {unknown} error
+		 */
+		refundFailed: RequiredParams<'error'>
+		/**
+		 * B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​ ​f​o​r​ ​r​e​f​u​n​d
+		 */
+		refundAddress: string
+		/**
+		 * N​e​t​w​o​r​k​ ​f​e​e
+		 */
+		feeRate: string
+		/**
+		 * F​a​s​t​e​s​t​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​1​0​ ​m​i​n
+		 * @param {unknown} sats
+		 */
+		feeRateFastest: RequiredParams<'sats'>
+		/**
+		 * N​o​r​m​a​l​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​3​0​ ​m​i​n
+		 * @param {unknown} sats
+		 */
+		feeRateHalfHour: RequiredParams<'sats'>
+		/**
+		 * E​c​o​n​o​m​y​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​6​0​ ​m​i​n
+		 * @param {unknown} sats
+		 */
+		feeRateHour: RequiredParams<'sats'>
+		/**
+		 * {​r​a​t​e​}​ ​s​a​t​/​v​B
+		 * @param {unknown} rate
+		 */
+		feeRateUnit: RequiredParams<'rate'>
+		/**
+		 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​n​e​t​w​o​r​k​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		feeRateUnavailable: string
+		/**
+		 * R​e​f​u​n​d​ ​n​o​w
+		 */
+		refundNow: string
+		/**
+		 * R​e​f​u​n​d​ ​i​n​i​t​i​a​t​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 */
+		refundSuccess: string
+		/**
+		 * D​e​p​o​s​i​t​ ​c​l​a​i​m​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 */
+		claimSuccess: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​c​l​a​i​m​ ​t​h​i​s​ ​d​e​p​o​s​i​t
+		 */
+		error: string
+	}
+	StableBalance: {
+		/**
+		 * S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+		 */
+		title: string
+		/**
+		 * H​o​l​d​ ​a​ ​U​S​D​-​d​e​n​o​m​i​n​a​t​e​d​ ​b​a​l​a​n​c​e​ ​p​o​w​e​r​e​d​ ​b​y​ ​U​S​D​B​ ​o​n​ ​S​p​a​r​k​.
+		 */
+		description: string
+		/**
+		 * B​a​l​a​n​c​e​ ​·​ ​S​A​T​S
+		 */
+		balanceLabelBtc: string
+		/**
+		 * B​a​l​a​n​c​e​ ​·​ ​U​S​D
+		 */
+		balanceLabelUsd: string
+		/**
+		 * S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+		 */
+		settingsRowTitle: string
+		/**
+		 * S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+		 */
+		settingsTitle: string
+		/**
+		 * K​e​e​p​ ​p​a​r​t​ ​o​f​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​i​n​ ​U​S​D​.​ ​C​o​n​v​e​r​t​ ​b​e​t​w​e​e​n​ ​B​T​C​ ​a​n​d​ ​U​S​D​ ​m​a​n​u​a​l​l​y​ ​a​n​y​t​i​m​e​ ​u​s​i​n​g​ ​t​h​e​ ​C​o​n​v​e​r​t​ ​a​c​t​i​o​n​.
+		 */
+		settingsDescription: string
+		/**
+		 * A​c​t​i​v​e
+		 */
+		activationLabel: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​h​o​l​d​i​n​g​ ​U​S​D​ ​v​i​a​ ​U​S​D​B​.
+		 */
+		activeHint: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​h​o​l​d​i​n​g​ ​B​T​C​ ​o​n​l​y​.
+		 */
+		inactiveHint: string
+		/**
+		 * Y​o​u​ ​s​t​i​l​l​ ​h​a​v​e​ ​{​a​m​o​u​n​t​}​.​ ​C​o​n​v​e​r​t​ ​t​o​ ​B​T​C​ ​f​i​r​s​t​,​ ​o​r​ ​y​o​u​r​ ​U​S​D​ ​b​a​l​a​n​c​e​ ​w​i​l​l​ ​b​e​ ​h​i​d​d​e​n​ ​u​n​t​i​l​ ​y​o​u​ ​r​e​a​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e​.
+		 * @param {string} amount
+		 */
+		deactivateWarningBody: RequiredParams<'amount'>
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​u​p​d​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		toggleFailedToast: string
+		toggleModal: {
+			/**
+			 * A​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+			 */
+			activateTitle: string
+			/**
+			 * Y​o​u​r​ ​B​T​C​ ​b​a​l​a​n​c​e​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​U​S​D​B​.​ ​T​h​i​s​ ​i​s​ ​t​h​e​ ​e​s​t​i​m​a​t​e​d​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e​.
+			 */
+			activateBody: string
+			/**
+			 * A​c​t​i​v​a​t​e
+			 */
+			activateConfirm: string
+			/**
+			 * D​e​a​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+			 */
+			deactivateTitle: string
+			/**
+			 * Y​o​u​r​ ​U​S​D​B​ ​b​a​l​a​n​c​e​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​b​a​c​k​ ​t​o​ ​B​T​C​.​ ​T​h​i​s​ ​i​s​ ​t​h​e​ ​e​s​t​i​m​a​t​e​d​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e​.
+			 */
+			deactivateBody: string
+			/**
+			 * D​e​a​c​t​i​v​a​t​e
+			 */
+			deactivateConfirm: string
+			/**
+			 * C​a​n​c​e​l
+			 */
+			cancel: string
+		}
+		/**
+		 * M​i​n​i​m​u​m​ ​c​o​n​v​e​r​s​i​o​n​:​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		minimumConversion: RequiredParams<'amount'>
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		conversionUnavailable: string
+	}
+	WalletCreationScreen: {
+		/**
+		 * C​r​e​a​t​i​n​g​ ​y​o​u​r​ ​w​a​l​l​e​t​.​.​.
+		 */
+		creating: string
+		/**
+		 * W​a​l​l​e​t​ ​c​r​e​a​t​i​o​n​ ​f​a​i​l​e​d
+		 */
+		errorTitle: string
+		/**
+		 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		errorDescription: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		retry: string
+	}
+	BackendFeatureGate: {
+		/**
+		 * F​e​a​t​u​r​e​ ​u​n​a​v​a​i​l​a​b​l​e
+		 */
+		title: string
+		/**
+		 * T​h​i​s​ ​f​e​a​t​u​r​e​ ​r​e​q​u​i​r​e​s​ ​a​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+		 */
+		description: string
+		/**
+		 * S​i​g​n​ ​i​n​ ​r​e​q​u​i​r​e​d
+		 */
+		signInTitle: string
+		/**
+		 * S​i​g​n​ ​i​n​ ​t​o​ ​y​o​u​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​t​o​ ​u​s​e​ ​{​f​e​a​t​u​r​e​N​a​m​e​}​.
+		 * @param {string} featureName
+		 */
+		signInDescription: RequiredParams<'featureName'>
+		/**
+		 * C​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​r​e​q​u​i​r​e​d
+		 */
+		noAccountTitle: string
+		/**
+		 * {​f​e​a​t​u​r​e​N​a​m​e​}​ ​r​e​q​u​i​r​e​s​ ​a​ ​B​l​i​n​k​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+		 * @param {string} featureName
+		 */
+		noAccountDescription: RequiredParams<'featureName'>
+		/**
+		 * C​i​r​c​l​e​s
+		 */
+		featureCircles: string
+		/**
+		 * E​a​r​n
+		 */
+		featureEarn: string
+		/**
+		 * C​a​r​d
+		 */
+		featureCard: string
+	}
+	FeatureUnavailable: {
+		SelfCustodial: {
+			/**
+			 * T​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e
+			 */
+			title: string
+			/**
+			 * S​e​l​f​-​c​u​s​t​o​d​i​a​l​ ​w​a​l​l​e​t​ ​f​e​a​t​u​r​e​s​ ​a​r​e​ ​t​e​m​p​o​r​a​r​i​l​y​ ​d​i​s​a​b​l​e​d​.​ ​Y​o​u​r​ ​w​a​l​l​e​t​ ​a​n​d​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​b​a​c​k​ ​l​a​t​e​r​.
+			 */
+			description: string
+		}
+	}
+	NetworkStatus: {
+		/**
+		 * S​p​a​r​k​ ​n​e​t​w​o​r​k​ ​i​s​ ​c​u​r​r​e​n​t​l​y​ ​d​e​g​r​a​d​e​d​.​ ​P​a​y​m​e​n​t​s​ ​m​a​y​ ​t​a​k​e​ ​l​o​n​g​e​r​.
+		 */
+		degradedBanner: string
+	}
+	SelfCustodialDelete: {
+		/**
+		 * I​m​p​o​r​t​a​n​t
+		 */
+		dangerZoneImportantTitle: string
+		/**
+		 * D​e​l​e​t​e​d​ ​a​c​c​o​u​n​t​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​i​n​s​t​a​t​e​d
+		 */
+		dangerZoneBulletReinstated: string
+		/**
+		 * A​c​c​o​u​n​t​ ​d​e​l​e​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t
+		 */
+		dangerZoneBulletPermanent: string
+		/**
+		 * M​a​k​e​ ​s​u​r​e​ ​a​c​c​o​u​n​t​ ​i​s​ ​e​m​p​t​y
+		 */
+		dangerZoneBulletEmpty: string
+		/**
+		 * D​e​l​e​t​e​ ​a​c​c​o​u​n​t​ ​a​n​d​ ​d​a​t​a
+		 */
+		dangerZoneDeleteButton: string
+		/**
+		 * C​o​n​f​i​r​m​ ​a​c​c​o​u​n​t​ ​r​e​m​o​v​a​l
+		 */
+		confirmModalTitle: string
+		/**
+		 * T​y​p​e​ ​"​{​d​e​l​e​t​e​}​"​ ​t​o​ ​c​o​n​f​i​r​m
+		 * @param {string} delete
+		 */
+		confirmModalTypeToConfirm: RequiredParams<'delete'>
+		/**
+		 * W​a​r​n​i​n​g
+		 */
+		hasFundsWarningTitle: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​h​a​s​ ​a​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.​ ​F​o​r​ ​y​o​u​r​ ​s​a​f​e​t​y​,​ ​w​e​ ​d​o​n​t​ ​a​l​l​o​w​ ​d​e​l​e​t​i​o​n​ ​o​f​ ​a​c​c​o​u​n​t​s​ ​w​i​t​h​ ​f​u​n​d​s​.
+		 * @param {string} balance
+		 */
+		hasFundsWarningBody: RequiredParams<'balance'>
+		/**
+		 * T​o​ ​p​r​o​c​e​e​d​ ​w​i​t​h​ ​d​e​l​e​t​i​o​n​,​ ​e​i​t​h​e​r​ ​e​m​p​t​y​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​o​r​ ​d​o​n​a​t​e​ ​t​o​ ​c​i​r​c​u​l​a​r​ ​e​c​o​n​o​m​i​e​s​.
+		 */
+		hasFundsWarningHelper: string
+		/**
+		 * G​o​ ​b​a​c​k
+		 */
+		hasFundsWarningButton: string
+	}
 }
 
 export type TranslationFunctions = {
@@ -11502,6 +12570,10 @@ export type TranslationFunctions = {
 		 * Review transfer
 		 */
 		reviewTransfer: () => LocalizedString
+		/**
+		 * Full balance has to be transferred.
+		 */
+		dustError: () => LocalizedString
 	}
 	ConversionConfirmationScreen: {
 		/**
@@ -11528,6 +12600,14 @@ export type TranslationFunctions = {
 		 * Transfer {fromWallet} to {toWallet}
 		 */
 		transferButtonText: (arg: { fromWallet: unknown, toWallet: unknown }) => LocalizedString
+		/**
+		 * Conversion fee
+		 */
+		feeLabel: () => LocalizedString
+		/**
+		 * Couldn't fetch the conversion fee
+		 */
+		feeError: () => LocalizedString
 	}
 	ConversionSuccessScreen: {
 		/**
@@ -17666,6 +18746,10 @@ export type TranslationFunctions = {
 		 */
 		login: () => LocalizedString
 		/**
+		 * Log in / Restore
+		 */
+		loginOrRestore: () => LocalizedString
+		/**
 		 * Log back in with
 		 */
 		logBackInWith: () => LocalizedString
@@ -18078,6 +19162,18 @@ export type TranslationFunctions = {
 		 * Deposit fee: {fee} SAT for amounts under {threshold} SAT or {overFee} SAT for deposits over {threshold} SAT
 		 */
 		depositFee: (arg: { fee: string, overFee: string, threshold: string }) => LocalizedString
+		/**
+		 * Amounts below {minSats} SAT / {minFiat} can't be converted to Dollar automatically. You'll receive Bitcoin instead.
+		 */
+		autoConvertMinAmount: (arg: { minFiat: string, minSats: number }) => LocalizedString
+		/**
+		 * Payment received but the conversion failed.
+		 */
+		autoConvertFailed: () => LocalizedString
+		/**
+		 * Please wait until the conversion is done
+		 */
+		pleaseWaitForConversion: () => LocalizedString
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -18100,6 +19196,14 @@ export type TranslationFunctions = {
 		 * Failed to submit withdrawal request. Please contact support if this problem persists.
 		 */
 		submissionError: () => LocalizedString
+		/**
+		 * Your wallet is still connecting. Please wait a moment and try again.
+		 */
+		walletNotConnected: () => LocalizedString
+		/**
+		 * Your payment may still be completing. Check your balance before retrying.
+		 */
+		paymentPending: () => LocalizedString
 		/**
 		 * Min: {minimumAmount}, Max: {maximumAmount}
 		 */
@@ -18310,6 +19414,10 @@ export type TranslationFunctions = {
 		 * High fee! We recommend Lightning.
 		 */
 		lightningRecommended: () => LocalizedString
+		/**
+		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
+		 */
+		usdRemainderSweep: (arg: { minimum: string, remaining: string, remainingSats: string }) => LocalizedString
 	}
 	SendBitcoinDestinationScreen: {
 		/**
@@ -18610,6 +19718,46 @@ export type TranslationFunctions = {
 		 * Type
 		 */
 		type: () => LocalizedString
+		/**
+		 * Fee speed
+		 */
+		feeTier: () => LocalizedString
+		/**
+		 * Fast
+		 */
+		fast: () => LocalizedString
+		/**
+		 * Medium
+		 */
+		medium: () => LocalizedString
+		/**
+		 * Slow
+		 */
+		slow: () => LocalizedString
+		/**
+		 * Recommended
+		 */
+		recommended: () => LocalizedString
+		/**
+		 * Your wallet is offline. Please check your connection and try again.
+		 */
+		walletOffline: () => LocalizedString
+		/**
+		 * Not enough funds for this transaction.
+		 */
+		sdkInsufficientFunds: () => LocalizedString
+		/**
+		 * Amount is too low for an on-chain transaction.
+		 */
+		sdkAmountTooLow: () => LocalizedString
+		/**
+		 * Network error. Please check your connection and try again.
+		 */
+		sdkNetworkError: () => LocalizedString
+		/**
+		 * Unable to estimate fees. Please try a different amount.
+		 */
+		sdkGenericError: () => LocalizedString
 	}
 	SettingsScreen: {
 		/**
@@ -18656,6 +19804,10 @@ export type TranslationFunctions = {
 		 * Ways to get paid
 		 */
 		addressScreen: () => LocalizedString
+		/**
+		 * Non-custodial account
+		 */
+		nonCustodialAccount: () => LocalizedString
 		/**
 		 * Tap to set username
 		 */
@@ -18765,6 +19917,32 @@ export type TranslationFunctions = {
 		 * Display currency
 		 */
 		displayCurrency: () => LocalizedString
+		AccountInformation: {
+			/**
+			 * Wallet identifier
+			 */
+			identityLabel: () => LocalizedString
+			/**
+			 * Lightning address
+			 */
+			lightningAddressLabel: () => LocalizedString
+			/**
+			 * Backup status
+			 */
+			backupStatusLabel: () => LocalizedString
+			/**
+			 * Backup complete
+			 */
+			backupStatusCompleted: () => LocalizedString
+			/**
+			 * Backup not complete
+			 */
+			backupStatusNotCompleted: () => LocalizedString
+			/**
+			 * Could not load your account information.
+			 */
+			loadError: () => LocalizedString
+		}
 	}
 	NotificationSettingsScreen: {
 		/**
@@ -18875,6 +20053,10 @@ export type TranslationFunctions = {
 		 * Please Wait.
 		 */
 		pleaseWait: () => LocalizedString
+		/**
+		 * Couldn't verify the wallet's balance. Please try again.
+		 */
+		probeBalanceFailed: () => LocalizedString
 		/**
 		 * Account Level
 		 */
@@ -19035,6 +20217,14 @@ export type TranslationFunctions = {
 		 */
 		accountId: () => LocalizedString
 		/**
+		 * Public key
+		 */
+		publicKey: () => LocalizedString
+		/**
+		 * Copied your public key to clipboard
+		 */
+		copiedPublicKey: () => LocalizedString
+		/**
 		 * Copy
 		 */
 		copy: () => LocalizedString
@@ -19123,9 +20313,17 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
+		 * Default account
+		 */
+		titleSelfCustodial: () => LocalizedString
+		/**
 		 * Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change.
 		 */
 		info: () => LocalizedString
+		/**
+		 * This account will be used by default when receiving and sending. You can switch any time.
+		 */
+		infoSelfCustodial: () => LocalizedString
 	}
 	ThemeScreen: {
 		/**
@@ -19180,6 +20378,58 @@ export type TranslationFunctions = {
 		 * Learn more about Stablesats
 		 */
 		learnMore: () => LocalizedString
+		/**
+		 * Your Dollar account holds stablecoins
+		 */
+		headerSelfCustodial: () => LocalizedString
+		/**
+		 * In the Dollar account you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from the Dollar account, you will swap your stablecoins and send as Bitcoin to the recipient.
+		 */
+		bodySelfCustodial: () => LocalizedString
+		/**
+		 * Learn more
+		 */
+		learnMoreSelfCustodial: () => LocalizedString
+	}
+	StablesatsRestriction: {
+		/**
+		 * Stablesats is not available in your region
+		 */
+		modalTitle: () => LocalizedString
+		/**
+		 * To get access to a dollar account, create a non-custodial account.
+		 */
+		modalBody: () => LocalizedString
+		/**
+		 * Create new
+		 */
+		createNew: () => LocalizedString
+		/**
+		 * not available in your region
+		 */
+		walletLabel: () => LocalizedString
+	}
+	ConvertDollarToBitcoinModal: {
+		/**
+		 * Dollar account is no longer available in your region
+		 */
+		title: () => LocalizedString
+		/**
+		 * Transfer your Dollar balance to Bitcoin
+		 */
+		body: () => LocalizedString
+		/**
+		 * You have
+		 */
+		youHave: () => LocalizedString
+		/**
+		 * You get
+		 */
+		youGet: () => LocalizedString
+		/**
+		 * Approve
+		 */
+		approve: () => LocalizedString
 	}
 	SplashScreen: {
 		/**
@@ -19188,6 +20438,52 @@ export type TranslationFunctions = {
 	This can be done from the PlayStore for Android and Testflight for iOS
 		 */
 		update: () => LocalizedString
+	}
+	TransactionDescription: {
+		/**
+		 * Spark Transfer
+		 */
+		sparkTransfer: () => LocalizedString
+		/**
+		 * Lightning Payment
+		 */
+		lightningPayment: () => LocalizedString
+		/**
+		 * On-chain Deposit
+		 */
+		onchainDeposit: () => LocalizedString
+		/**
+		 * On-chain Withdrawal
+		 */
+		onchainWithdrawal: () => LocalizedString
+		/**
+		 * Conversion from Bitcoin
+		 */
+		conversionFromBitcoin: () => LocalizedString
+		/**
+		 * Conversion to Bitcoin
+		 */
+		conversionToBitcoin: () => LocalizedString
+		/**
+		 * Conversion from {token}
+		 */
+		conversionFromToken: (arg: { token: string }) => LocalizedString
+		/**
+		 * Conversion to {token}
+		 */
+		conversionToToken: (arg: { token: string }) => LocalizedString
+		/**
+		 * {token} Transfer
+		 */
+		tokenTransfer: (arg: { token: string }) => LocalizedString
+		/**
+		 * Pay to {address}
+		 */
+		payTo: (arg: { address: string }) => LocalizedString
+		/**
+		 * Payment
+		 */
+		payment: () => LocalizedString
 	}
 	TransactionDetailScreen: {
 		/**
@@ -19835,6 +21131,14 @@ export type TranslationFunctions = {
 		 */
 		blinkUser: () => LocalizedString
 		/**
+		 * Anonymous
+		 */
+		anonymous: () => LocalizedString
+		/**
+		 * Anon user
+		 */
+		anonymousUser: () => LocalizedString
+		/**
 		 * Blink to Blink
 		 */
 		blinkToBlink: () => LocalizedString
@@ -20063,6 +21367,10 @@ export type TranslationFunctions = {
 		 */
 		onchain: () => LocalizedString
 		/**
+		 * Spark
+		 */
+		spark: () => LocalizedString
+		/**
 		 * Payment Request
 		 */
 		paymentRequest: () => LocalizedString
@@ -20142,6 +21450,10 @@ export type TranslationFunctions = {
 		 * Dollar (Stablesats)
 		 */
 		dollarStablesats: () => LocalizedString
+		/**
+		 * Dollar (Stablecoin)
+		 */
+		dollarStablecoin: () => LocalizedString
 		/**
 		 * To
 		 */
@@ -22423,6 +23735,793 @@ export type TranslationFunctions = {
 		 * You don't have any notifications right now
 		 */
 		noNotifications: () => LocalizedString
+	}
+	BackupScreen: {
+		/**
+		 * Back up your wallet
+		 */
+		title: () => LocalizedString
+		/**
+		 * Choose a backup method to secure your funds
+		 */
+		description: () => LocalizedString
+		BackupMethod: {
+			/**
+			 * Choose your backup method
+			 */
+			title: () => LocalizedString
+			/**
+			 * We recommend {provider} for new users.
+			 */
+			subtitle: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Google Drive
+			 */
+			googleDrive: () => LocalizedString
+			/**
+			 * Apple iCloud
+			 */
+			appleICloud: () => LocalizedString
+			/**
+			 * Password manager
+			 */
+			passwordManager: () => LocalizedString
+			/**
+			 * Manual backup
+			 */
+			manualBackup: () => LocalizedString
+			/**
+			 * Backup saved to password manager
+			 */
+			passwordManagerBackupSaved: () => LocalizedString
+			/**
+			 * Failed to save backup
+			 */
+			passwordManagerBackupFailed: () => LocalizedString
+			/**
+			 * No password manager available on this device. Use Drive backup or save your 12-word phrase manually.
+			 */
+			passwordManagerUnavailable: () => LocalizedString
+		}
+		CloudBackup: {
+			/**
+			 * Let's back up your wallet
+			 */
+			title: () => LocalizedString
+			/**
+			 * We will save a backup of your backup phrase to your {provider}.
+			 */
+			description: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Encrypt with additional password
+			 */
+			encryptCheckbox: () => LocalizedString
+			/**
+			 * Password
+			 */
+			password: () => LocalizedString
+			/**
+			 * (12 characters minimum)
+			 */
+			passwordPlaceholder: () => LocalizedString
+			/**
+			 * Confirm password
+			 */
+			confirmPassword: () => LocalizedString
+			/**
+			 * Enter password again
+			 */
+			confirmPasswordPlaceholder: () => LocalizedString
+			/**
+			 * Continue
+			 */
+			continueButton: () => LocalizedString
+			/**
+			 * Important
+			 */
+			importantTitle: () => LocalizedString
+			/**
+			 * Blink does not store this password. If you lose it, {bold} to recover your wallet.
+			 */
+			importantMessage: (arg: { bold: string }) => LocalizedString
+			/**
+			 * we will not be able
+			 */
+			importantMessageBold: () => LocalizedString
+			/**
+			 * Minimum 12 characters
+			 */
+			passwordTooShort: () => LocalizedString
+			/**
+			 * Passwords do not match
+			 */
+			passwordMismatch: () => LocalizedString
+			/**
+			 * Backup found
+			 */
+			existingBackupTitle: () => LocalizedString
+			/**
+			 * A backup already exists in your {provider}. Do you want to overwrite it?
+			 */
+			existingBackupMessage: (arg: { provider: string }) => LocalizedString
+			/**
+			 * A backup already exists in your {provider}.
+	
+		Lightning address: {address}
+		Created: {createdAt}
+	
+		Do you want to overwrite it?
+			 */
+			existingBackupMessageWithDetails: (arg: { address: string, createdAt: string, provider: string }) => LocalizedString
+			/**
+			 * Not available
+			 */
+			existingBackupUnknownAddress: () => LocalizedString
+			/**
+			 * Unknown
+			 */
+			existingBackupUnknownCreatedAt: () => LocalizedString
+			/**
+			 * Overwrite
+			 */
+			overwrite: () => LocalizedString
+			/**
+			 * Backup saved to {provider}
+			 */
+			uploadSuccess: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Failed to upload backup
+			 */
+			uploadFailed: () => LocalizedString
+			/**
+			 * Failed to sign in to {provider}
+			 */
+			signInFailed: (arg: { provider: string }) => LocalizedString
+			/**
+			 * iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.
+			 */
+			cloudNotAvailable: () => LocalizedString
+			/**
+			 * Network error. Please check your connection and try again.
+			 */
+			networkError: () => LocalizedString
+		}
+		ManualBackup: {
+			Alerts: {
+				/**
+				 * Keep your backup phrase secret!
+				 */
+				title: () => LocalizedString
+				/**
+				 * I understand nobody can recover my wallet if I lose this phrase
+				 */
+				check1: () => LocalizedString
+				/**
+				 * I understand if somebody gets this phrase, they can steal all my funds.
+				 */
+				check2: () => LocalizedString
+				/**
+				 * Nobody is asking me for this information via message or a call
+				 */
+				check3: () => LocalizedString
+			}
+			Phrase: {
+				/**
+				 * Backup phrase
+				 */
+				headerTitle: () => LocalizedString
+				/**
+				 * This backup phrase works in any {sparkCompatibleLink}
+				 */
+				sparkCompatible: (arg: { sparkCompatibleLink: string }) => LocalizedString
+				/**
+				 * Spark-compatible wallet
+				 */
+				sparkCompatibleLink: () => LocalizedString
+				/**
+				 * Backup phrase copied into clipboard
+				 */
+				copiedToast: () => LocalizedString
+				/**
+				 * Save it now
+				 */
+				saveItNow: () => LocalizedString
+				/**
+				 * Continue
+				 */
+				continueButton: () => LocalizedString
+				/**
+				 * I have saved it
+				 */
+				savedConfirm: () => LocalizedString
+				/**
+				 * Copy
+				 */
+				copy: () => LocalizedString
+				/**
+				 * Test your backup
+				 */
+				testBackup: () => LocalizedString
+			}
+			Confirm: {
+				/**
+				 * Confirm backup phrase
+				 */
+				headerTitle: () => LocalizedString
+				/**
+				 * A quick check if you have written it down correctly
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Enter word
+				 */
+				enterWord: () => LocalizedString
+				/**
+				 * Enter words
+				 */
+				enterWords: () => LocalizedString
+				/**
+				 * Confirm
+				 */
+				confirm: () => LocalizedString
+				/**
+				 * Incorrect word, please check the order
+				 */
+				incorrectWord: () => LocalizedString
+			}
+			Success: {
+				/**
+				 * Welcome to non-custodial Blink
+				 */
+				title: () => LocalizedString
+				/**
+				 * Your backup phrase is correct
+				 */
+				testSuccess: () => LocalizedString
+			}
+		}
+	}
+	AccountMigration: {
+		/**
+		 * Move to non-custodial
+		 */
+		moveToNonCustodial: () => LocalizedString
+		/**
+		 * What does it mean to move to non-custodial?
+		 */
+		explainerTitle: () => LocalizedString
+		/**
+		 * You will create a non-custodial account on the Spark protocol, <link>learn more here</link>
+		 */
+		explainerStep1: () => LocalizedString
+		/**
+		 * We transfer your funds into your new non-custodial account, and your current account will be deleted
+		 */
+		explainerStep2: () => LocalizedString
+		/**
+		 * Continue using Blink as usual
+		 */
+		explainerStep3: () => LocalizedString
+		/**
+		 * Let's move
+		 */
+		letsMove: () => LocalizedString
+		/**
+		 * Transferring your funds. It should be done in a few seconds.
+		 */
+		transferringFunds: () => LocalizedString
+	}
+	AccountTypeSelectionScreen: {
+		/**
+		 * Please choose your preferred type of Blink.
+		 */
+		descriptionDefault: () => LocalizedString
+		/**
+		 * Please choose account type.
+		 */
+		descriptionSelected: () => LocalizedString
+		/**
+		 * Custodial
+		 */
+		custodialLabel: () => LocalizedString
+		/**
+		 * Non-custodial
+		 */
+		selfCustodialLabel: () => LocalizedString
+		/**
+		 * We hold the funds on your behalf
+		 */
+		custodialDescription: () => LocalizedString
+		/**
+		 * Only you can access funds
+		 */
+		selfCustodialDescription: () => LocalizedString
+		/**
+		 * Choose method
+		 */
+		chooseMethod: () => LocalizedString
+		/**
+		 * Continue
+		 */
+		continueButton: () => LocalizedString
+		/**
+		 * Non-custodial is temporarily unavailable.
+		 */
+		selfCustodialDisabled: () => LocalizedString
+		/**
+		 * Coming soon
+		 */
+		restoreComingSoonTitle: () => LocalizedString
+		/**
+		 * Restore flow will be available in a future update.
+		 */
+		restoreComingSoonDescription: () => LocalizedString
+		/**
+		 * Failed to create wallet. Please try again.
+		 */
+		createFailed: () => LocalizedString
+	}
+	RestoreScreen: {
+		/**
+		 * Restore wallet
+		 */
+		title: () => LocalizedString
+		/**
+		 * Recover your wallet from a backup
+		 */
+		description: () => LocalizedString
+		/**
+		 * Restore wallet
+		 */
+		phraseTitle: () => LocalizedString
+		/**
+		 * Enter first 6 words of your backup phrase
+		 */
+		phraseSubtitleStep1: () => LocalizedString
+		/**
+		 * Enter rest of your backup phrase
+		 */
+		phraseSubtitleStep2: () => LocalizedString
+		/**
+		 * Next 6 words
+		 */
+		nextWords: () => LocalizedString
+		/**
+		 * Paste
+		 */
+		paste: () => LocalizedString
+		/**
+		 * Word
+		 */
+		enterWord: () => LocalizedString
+		/**
+		 * Invalid backup phrase. Please check if the word order is correct.
+		 */
+		invalidMnemonic: () => LocalizedString
+		/**
+		 * Restoring your wallet...
+		 */
+		restoring: () => LocalizedString
+		/**
+		 * Wallet restored successfully
+		 */
+		restoreSuccess: () => LocalizedString
+		/**
+		 * Failed to restore wallet. Please try again.
+		 */
+		restoreFailed: () => LocalizedString
+		/**
+		 * Restore wallet
+		 */
+		restore: () => LocalizedString
+		/**
+		 * No backup found
+		 */
+		noBackupFound: () => LocalizedString
+		/**
+		 * We couldn't find a backup. You can enter your backup phrase manually instead.
+		 */
+		noBackupDescription: () => LocalizedString
+		/**
+		 * Enter your encryption password
+		 */
+		enterPassword: () => LocalizedString
+		/**
+		 * Incorrect password. Please try again.
+		 */
+		wrongPassword: () => LocalizedString
+		/**
+		 * Choose a wallet
+		 */
+		pickBackupTitle: () => LocalizedString
+		/**
+		 * Select a backup to restore
+		 */
+		pickBackupDescription: () => LocalizedString
+	}
+	BackupNudge: {
+		/**
+		 * Your funds are at risk
+		 */
+		title: () => LocalizedString
+		/**
+		 * Secure your wallet now. It only takes a minute.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Secure wallet
+		 */
+		cta: () => LocalizedString
+		/**
+		 * Backup your wallet. If you lose this device, you will lose your funds.
+		 */
+		settingsWarning: () => LocalizedString
+		/**
+		 * Secure your funds
+		 */
+		modalTitle: () => LocalizedString
+		/**
+		 * We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.
+		 */
+		modalDescription: () => LocalizedString
+		/**
+		 * Secure wallet
+		 */
+		secureMe: () => LocalizedString
+	}
+	SelfCustodialOffline: {
+		/**
+		 * Wallet is offline
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your non-custodial wallet can't reach the network right now. Try again when you're back online.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		retry: () => LocalizedString
+	}
+	SelfCustodialError: {
+		/**
+		 * Not enough funds to cover the amount and network fees. Try a smaller amount.
+		 */
+		insufficientFunds: () => LocalizedString
+		/**
+		 * Amount is below the minimum required for this payment. Try a larger amount.
+		 */
+		belowMinimum: () => LocalizedString
+		/**
+		 * Network connection problem. Check your connection and try again.
+		 */
+		networkError: () => LocalizedString
+		/**
+		 * The payment details look invalid. Please review and try again.
+		 */
+		invalidInput: () => LocalizedString
+		/**
+		 * The payment could not be completed. Try again in a moment, or use a smaller amount.
+		 */
+		generic: () => LocalizedString
+	}
+	UnclaimedDeposit: {
+		/**
+		 * Unclaimed Deposits
+		 */
+		screenTitle: () => LocalizedString
+		/**
+		 * Claim {sats} sats
+		 */
+		cardTitle: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * You have {count} unclaimed deposit(s)
+		 */
+		title: (arg: { count: unknown }) => LocalizedString
+		/**
+		 * Total: {sats} sats available to claim
+		 */
+		description: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * Claim now
+		 */
+		claim: () => LocalizedString
+		/**
+		 * Claim (max fee: {fee} sats)
+		 */
+		claimWithFee: (arg: { fee: unknown }) => LocalizedString
+		/**
+		 * Claiming...
+		 */
+		claiming: () => LocalizedString
+		/**
+		 * Refund
+		 */
+		refund: () => LocalizedString
+		/**
+		 * Refunding...
+		 */
+		refunding: () => LocalizedString
+		/**
+		 * Waiting for confirmations...
+		 */
+		immature: () => LocalizedString
+		/**
+		 * Network fees are too high to claim ({requiredFee} sats required). Try again later or refund to an on-chain address.
+		 */
+		feeExceeded: (arg: { requiredFee: unknown }) => LocalizedString
+		/**
+		 * This deposit is no longer available on the network.
+		 */
+		missingUtxo: () => LocalizedString
+		/**
+		 * This deposit is too small to claim after fees. Wait for lower fees or refund to an on-chain address.
+		 */
+		belowDustLimit: () => LocalizedString
+		/**
+		 * Unable to claim: {error}
+		 */
+		genericError: (arg: { error: unknown }) => LocalizedString
+		/**
+		 * Claim failed: {error}
+		 */
+		claimFailed: (arg: { error: unknown }) => LocalizedString
+		/**
+		 * Refund failed: {error}
+		 */
+		refundFailed: (arg: { error: unknown }) => LocalizedString
+		/**
+		 * Bitcoin address for refund
+		 */
+		refundAddress: () => LocalizedString
+		/**
+		 * Network fee
+		 */
+		feeRate: () => LocalizedString
+		/**
+		 * Fastest (~{sats} sats) ~10 min
+		 */
+		feeRateFastest: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * Normal (~{sats} sats) ~30 min
+		 */
+		feeRateHalfHour: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * Economy (~{sats} sats) ~60 min
+		 */
+		feeRateHour: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * {rate} sat/vB
+		 */
+		feeRateUnit: (arg: { rate: unknown }) => LocalizedString
+		/**
+		 * Couldn't load network fees. Please check your connection and try again.
+		 */
+		feeRateUnavailable: () => LocalizedString
+		/**
+		 * Refund now
+		 */
+		refundNow: () => LocalizedString
+		/**
+		 * Refund initiated successfully
+		 */
+		refundSuccess: () => LocalizedString
+		/**
+		 * Deposit claimed successfully
+		 */
+		claimSuccess: () => LocalizedString
+		/**
+		 * Unable to claim this deposit
+		 */
+		error: () => LocalizedString
+	}
+	StableBalance: {
+		/**
+		 * Stable Balance
+		 */
+		title: () => LocalizedString
+		/**
+		 * Hold a USD-denominated balance powered by USDB on Spark.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Balance · SATS
+		 */
+		balanceLabelBtc: () => LocalizedString
+		/**
+		 * Balance · USD
+		 */
+		balanceLabelUsd: () => LocalizedString
+		/**
+		 * Stable Balance
+		 */
+		settingsRowTitle: () => LocalizedString
+		/**
+		 * Stable Balance
+		 */
+		settingsTitle: () => LocalizedString
+		/**
+		 * Keep part of your wallet in USD. Convert between BTC and USD manually anytime using the Convert action.
+		 */
+		settingsDescription: () => LocalizedString
+		/**
+		 * Active
+		 */
+		activationLabel: () => LocalizedString
+		/**
+		 * Your wallet is holding USD via USDB.
+		 */
+		activeHint: () => LocalizedString
+		/**
+		 * Your wallet is holding BTC only.
+		 */
+		inactiveHint: () => LocalizedString
+		/**
+		 * You still have {amount}. Convert to BTC first, or your USD balance will be hidden until you reactivate Stable Balance.
+		 */
+		deactivateWarningBody: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Could not update Stable Balance. Please try again.
+		 */
+		toggleFailedToast: () => LocalizedString
+		toggleModal: {
+			/**
+			 * Activate Stable Balance
+			 */
+			activateTitle: () => LocalizedString
+			/**
+			 * Your BTC balance will be converted to USDB. This is the estimated conversion fee.
+			 */
+			activateBody: () => LocalizedString
+			/**
+			 * Activate
+			 */
+			activateConfirm: () => LocalizedString
+			/**
+			 * Deactivate Stable Balance
+			 */
+			deactivateTitle: () => LocalizedString
+			/**
+			 * Your USDB balance will be converted back to BTC. This is the estimated conversion fee.
+			 */
+			deactivateBody: () => LocalizedString
+			/**
+			 * Deactivate
+			 */
+			deactivateConfirm: () => LocalizedString
+			/**
+			 * Cancel
+			 */
+			cancel: () => LocalizedString
+		}
+		/**
+		 * Minimum conversion: {amount}
+		 */
+		minimumConversion: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Conversion is temporarily unavailable. Please try again.
+		 */
+		conversionUnavailable: () => LocalizedString
+	}
+	WalletCreationScreen: {
+		/**
+		 * Creating your wallet...
+		 */
+		creating: () => LocalizedString
+		/**
+		 * Wallet creation failed
+		 */
+		errorTitle: () => LocalizedString
+		/**
+		 * Something went wrong. Please try again.
+		 */
+		errorDescription: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		retry: () => LocalizedString
+	}
+	BackendFeatureGate: {
+		/**
+		 * Feature unavailable
+		 */
+		title: () => LocalizedString
+		/**
+		 * This feature requires a custodial account.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Sign in required
+		 */
+		signInTitle: () => LocalizedString
+		/**
+		 * Sign in to your custodial account to use {featureName}.
+		 */
+		signInDescription: (arg: { featureName: string }) => LocalizedString
+		/**
+		 * Custodial account required
+		 */
+		noAccountTitle: () => LocalizedString
+		/**
+		 * {featureName} requires a Blink custodial account.
+		 */
+		noAccountDescription: (arg: { featureName: string }) => LocalizedString
+		/**
+		 * Circles
+		 */
+		featureCircles: () => LocalizedString
+		/**
+		 * Earn
+		 */
+		featureEarn: () => LocalizedString
+		/**
+		 * Card
+		 */
+		featureCard: () => LocalizedString
+	}
+	FeatureUnavailable: {
+		SelfCustodial: {
+			/**
+			 * Temporarily unavailable
+			 */
+			title: () => LocalizedString
+			/**
+			 * Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later.
+			 */
+			description: () => LocalizedString
+		}
+	}
+	NetworkStatus: {
+		/**
+		 * Spark network is currently degraded. Payments may take longer.
+		 */
+		degradedBanner: () => LocalizedString
+	}
+	SelfCustodialDelete: {
+		/**
+		 * Important
+		 */
+		dangerZoneImportantTitle: () => LocalizedString
+		/**
+		 * Deleted account cannot be reinstated
+		 */
+		dangerZoneBulletReinstated: () => LocalizedString
+		/**
+		 * Account deletion is permanent
+		 */
+		dangerZoneBulletPermanent: () => LocalizedString
+		/**
+		 * Make sure account is empty
+		 */
+		dangerZoneBulletEmpty: () => LocalizedString
+		/**
+		 * Delete account and data
+		 */
+		dangerZoneDeleteButton: () => LocalizedString
+		/**
+		 * Confirm account removal
+		 */
+		confirmModalTitle: () => LocalizedString
+		/**
+		 * Type "{delete}" to confirm
+		 */
+		confirmModalTypeToConfirm: (arg: { delete: string }) => LocalizedString
+		/**
+		 * Warning
+		 */
+		hasFundsWarningTitle: () => LocalizedString
+		/**
+		 * Your wallet has a balance of {balance}. For your safety, we dont allow deletion of accounts with funds.
+		 */
+		hasFundsWarningBody: (arg: { balance: string }) => LocalizedString
+		/**
+		 * To proceed with deletion, either empty your account or donate to circular economies.
+		 */
+		hasFundsWarningHelper: () => LocalizedString
+		/**
+		 * Go back
+		 */
+		hasFundsWarningButton: () => LocalizedString
 	}
 }
 

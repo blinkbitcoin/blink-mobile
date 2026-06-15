@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "كيفية استخدام سلة الشراء",
     "howToUseYourAddressExplainer": "Share with someone that has a compatible wallet, such as:",
     "howToUseYourPaycodeExplainer": "You can print your Paycode (technically, this is an lnurl-pay address) and display it in your business to receive payments. Individuals can pay you by scanning it with a Lightning-enabled wallet.\n\nHowever, be aware that some wallets can’t scan a Paycode such as:",
-    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet.",
-    "yourAddress": "عنوانك في {bankName: string}",
-    "copiedAddressToClipboard": "نُسخ عنوانك في {bankName: string} إلى الحافظة."
+    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "الشروط والأحكام",
@@ -64,7 +62,8 @@
     "title": "تحويل",
     "transfer": "تحويل",
     "percentageToConvert": "النسبة المئوية (%) المراد تحويلها",
-    "reviewTransfer": "مراجعة التحويل"
+    "reviewTransfer": "مراجعة التحويل",
+    "dustError": "يجب تحويل الرصيد بالكامل."
   },
   "ConversionConfirmationScreen": {
     "title": "مراجعة التحويل",
@@ -72,11 +71,12 @@
     "receivingAccount": "حساب الاستلام",
     "infoBitcoin": "مبلغ Bitcoin تقريبي فقط. قد يختلف بمقدار صغير.",
     "infoDollar": "مبلغ الدولار تقريبي فقط. قد يختلف بمقدار صغير.",
-    "transferButtonText": "تحويل من {fromWallet} إلى {toWallet}"
+    "transferButtonText": "تحويل من {fromWallet} إلى {toWallet}",
+    "feeLabel": "رسوم التحويل",
+    "feeError": "تعذر جلب رسوم التحويل"
   },
   "ConversionSuccessScreen": {
-    "message": "تم التحويل بنجاح",
-    "title": "نجح التحويل"
+    "message": "تم التحويل بنجاح"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2047,6 +2047,7 @@
     "createAccount": "Create new account",
     "exploreWallet": "Explore wallet",
     "login": "تسجيل الدخول",
+    "loginOrRestore": "تسجيل الدخول / استعادة",
     "logBackInWith": "Log back in with",
     "headline": "المحفظة مشغلة بواسطة Galoy",
     "startTrialAccount": "Start with a trial account",
@@ -2071,12 +2072,7 @@
     "payBusiness": "ادفع لهذا المحل",
     "openSettings": "فتح الإعدادات",
     "title": "خريطة",
-    "error": "عفوًا. حدث خطأ أثناء الحصول على موقعك",
-    "locationPermissionMessage": "قم بتشغيل خاصية مكانك لتعرف اين انت على الخريطة",
-    "locationPermissionNegative": "إلغاء",
-    "locationPermissionNeutral": "اسألني لاحقا",
-    "locationPermissionPositive": "كل شيء على مايرام 👍",
-    "locationPermissionTitle": "قم بتحديد مكانك على الخريطة"
+    "error": "عفوًا. حدث خطأ أثناء الحصول على موقعك"
   },
   "HomeScreen": {
     "receive": "استقبال",
@@ -2166,9 +2162,14 @@
     "lightningAddress": "عنوان lightning",
     "lightningInvoice": "فاتورة lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "رسوم الإيداع: {fee} SAT للمبالغ تحت {threshold} SAT أو {overFee} SAT للإيداعات فوق {threshold} SAT"
+    "depositFee": "رسوم الإيداع: {fee} SAT للمبالغ تحت {threshold} SAT أو {overFee} SAT للإيداعات فوق {threshold} SAT",
+    "autoConvertMinAmount": "لا يمكن تحويل المبالغ الأقل من {minSats: number} ساتوشي / {minFiat: string} إلى دولار تلقائيًا. ستتلقى بيتكوين بدلاً من ذلك.",
+    "autoConvertFailed": "تم استلام الدفعة لكن فشل التحويل.",
+    "pleaseWaitForConversion": "يرجى الانتظار حتى اكتمال التحويل"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "لا تزال محفظتك قيد الاتصال. يرجى الانتظار لحظة والمحاولة مرة أخرى.",
+    "paymentPending": "قد تكون عملية الدفع لا تزال قيد الإكمال. تحقق من رصيدك قبل إعادة المحاولة.",
     "title": "حرر البيتكوين",
     "usdTitle": "استبدال إلى حساب بالدولار",
     "error": "أخفق توليد الفاتورة. أخبر فريق الدعم رجاءً إن استمرت المشكلة.",
@@ -2226,7 +2227,8 @@
     "slideToConfirm": "اسحب للتأكيد",
     "slideConfirming": "جارٍ التأكيد...",
     "copiedDestination": "تم نسخ الوجهة إلى الحافظة",
-    "lightningRecommended": "رسوم مرتفعة! نوصي باستخدام Lightning."
+    "lightningRecommended": "رسوم مرتفعة! نوصي باستخدام Lightning.",
+    "usdRemainderSweep": "الرصيد المتبقي {remaining: string} ({remainingSats: string}) سيتم تحويله إلى بيتكوين. الحد الأدنى للدولار الأمريكي: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "أسماء المستخدمين في {bankName: string} أصبحت عناوين في {bankName: string}",
@@ -2257,16 +2259,7 @@
     "clipboardError": "خطأ في الحصول على القيمة من الحافظة",
     "pastedClipboardSuccess": "تم اللصق من الحافظة",
     "invalidPhoneNumber": "أدخل رقم هاتف محمول صالح",
-    "phoneNotAllowed": "هذا الحقل لا يقبل أرقام الهواتف",
-    "confirmModal": {
-      "title": "You've never sent money to this address",
-      "body1": "رجاءً تأكد أن المتلقي أعطاك عنوانًا في {bankName: string}.",
-      "bold2bold": "ليس أسم مستخدم من محفظة أخرى",
-      "body3": "وإلا، سيذهب النقد إلى الحساب في {bankName: string}، الذي عنوانه البرقي هو “{lnAddress: string}”.\n\nتحقق من صحة كتابة العنوان كذلك، مثلًا jackie ليس نفسه jack1e.",
-      "warning": "إذا كان العنوان مدخلًا خطأً، لن يستطيع {bankName: string} التراجع عن المعاملة.",
-      "checkBox": "{lnAddress: string} هو العنوان الصحيح.",
-      "confirmButton": "أنا متأكد 100%"
-    }
+    "phoneNotAllowed": "هذا الحقل لا يقبل أرقام الهواتف"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "يجب إرسال المعاملة إلى mempool",
@@ -2314,8 +2307,16 @@
     "recipient": "المستلم",
     "time": "الوقت",
     "type": "النوع",
-    "destinationIsRequired": "الوجهة مطلوبة",
-    "lnurlInvoiceIncorrectDescription": "استجاب الخادم بفاتورة فيها هاش وصف غير صالح."
+    "feeTier": "سرعة الرسوم",
+    "fast": "سريع",
+    "medium": "متوسط",
+    "slow": "بطيء",
+    "recommended": "موصى به",
+    "walletOffline": "محفظتك غير متصلة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+    "sdkInsufficientFunds": "لا توجد أموال كافية لهذه المعاملة.",
+    "sdkAmountTooLow": "المبلغ منخفض جدًا لمعاملة على السلسلة.",
+    "sdkNetworkError": "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+    "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف."
   },
   "SettingsScreen": {
     "staticQr": "رمز QR ثابت قابل للطباعة",
@@ -2329,6 +2330,7 @@
     "setYourLightningAddress": "اضبط عنوان Lightning الخاص بك",
     "activated": "تم التفعيل",
     "addressScreen": "Ways to get paid",
+    "nonCustodialAccount": "حساب غير حافظ",
     "tapUserName": "إضغط لتعيين اسم المستخدم",
     "notifications": "Notifications",
     "title": "تطبيق الإعدادات",
@@ -2355,7 +2357,15 @@
     "logoutOneAccountAlertContent": "سيتم تسجيل خروجك من الجلسة المرتبطة بـ {identifier: string}.\nتأكد من أن لديك وسيلة لتسجيل الدخول مرة أخرى في المستقبل.",
     "logoutOneAccountConfirm": "أنا أفهم. يرجى تسجيل الخروج.",
     "receiveCurrency": "عملة الاستلام",
-    "displayCurrency": "عملة العرض"
+    "displayCurrency": "عملة العرض",
+    "AccountInformation": {
+      "identityLabel": "Wallet identifier",
+      "backupStatusLabel": "Backup status",
+      "backupStatusCompleted": "Backup complete",
+      "backupStatusNotCompleted": "Backup not complete",
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "عنوان Lightning"
+    }
   },
   "NotificationSettingsScreen": {
     "title": "إعدادات الإشعارات",
@@ -2394,6 +2404,7 @@
     "level": "المستوى {level: string}",
     "switchAccount": "تبديل الحساب",
     "pleaseWait": "يرجى الانتظار.",
+    "probeBalanceFailed": "تعذر التحقق من رصيد المحفظة. يرجى المحاولة مرة أخرى.",
     "accountLevel": "Account Level",
     "upgrade": "Upgrade your account",
     "logOutAndDeleteLocalData": "Log out and clear all local data",
@@ -2433,6 +2444,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "معرّف الحساب",
+    "publicKey": "المفتاح العام",
+    "copiedPublicKey": "تم نسخ المفتاح العام إلى الحافظة",
     "copy": "Copy",
     "identityVerification": "التحقق من الهوية"
   },
@@ -2442,6 +2455,19 @@
     "fromThisDevice": "من هذا الجهاز؟",
     "switchAccount": "لقد انتقلت إلى حساب آخر",
     "removedAccount": "لقد أزلت الحساب {identifier: string}."
+  },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats غير متاح في منطقتك",
+    "modalBody": "للوصول إلى حساب الدولار، أنشئ حسابًا غير حافظ.",
+    "createNew": "إنشاء جديد",
+    "walletLabel": "غير متاح في منطقتك"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "لم يعد حساب الدولار متاحًا في منطقتك",
+    "body": "انقل رصيدك بالدولار إلى بيتكوين",
+    "youHave": "لديك",
+    "youGet": "تحصل على",
+    "approve": "موافقة"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -2463,7 +2489,9 @@
   },
   "DefaultWalletScreen": {
     "title": "حساب الاستلام الافتراضي",
-    "info": "حساب البيتكوين الخاص بك لتجميع الساتوشي، حيث تتحرك قيمة USD مع السوق. حساب بالدولار الخاص بك مدعوم بتقنية Stablesats — يحتفظ بـ Bitcoin محمي ليبقى مستقراً بقيمة USD. أنت دائماً تحتفظ بـ Bitcoin، لكن قيمة الدولار لا تتغير."
+    "info": "حساب البيتكوين الخاص بك لتجميع الساتوشي، حيث تتحرك قيمة USD مع السوق. حساب بالدولار الخاص بك مدعوم بتقنية Stablesats — يحتفظ بـ Bitcoin محمي ليبقى مستقراً بقيمة USD. أنت دائماً تحتفظ بـ Bitcoin، لكن قيمة الدولار لا تتغير.",
+    "titleSelfCustodial": "الحساب الافتراضي",
+    "infoSelfCustodial": "سيتم استخدام هذا الحساب افتراضيًا عند الاستلام والإرسال. يمكنك التبديل في أي وقت."
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2481,7 +2509,10 @@
     "header": "حساب بالدولار الخاص بك مدعوم بتقنية Stablesats",
     "body": "يستخدم حساب بالدولار تقنية Stablesats للحفاظ على Bitcoin مستقراً بسعر USD. أنت دائماً تحتفظ بـ Bitcoin — وليس دولارات حقيقية — لكن قيمة USD لا تتقلب. يمكنك إرسال واستقبال Bitcoin كالمعتاد، لكنه غير متوافق مع النظام المصرفي التقليدي.",
     "termsAndConditions": "إقرأ الشروط والأحكام",
-    "learnMore": "تعلم المزيد عن Stablesats"
+    "learnMore": "تعلم المزيد عن Stablesats",
+    "headerSelfCustodial": "حساب الدولار الخاص بك يحتفظ بالعملات المستقرة",
+    "bodySelfCustodial": "في حساب الدولار، أنت تحتفظ بعملات مستقرة. وهي رموز مدعومة بأصول وقيمتها مرتبطة بالدولار الأمريكي. لا يمكنك إرسال واستقبال العملات المستقرة (حتى الآن). عندما ترسل من حساب الدولار، سيتم تحويل عملاتك المستقرة وإرسالها كبيتكوين إلى المستلم.",
+    "learnMoreSelfCustodial": "اعرف المزيد"
   },
   "SplashScreen": {
     "update": "تطبيقك قديم. لا بد من تحديث التطبيق حتى يمكن استخدامه.\n\nيمكنك التحديث من متجر PlayStore للأندرويد أو Testflight لنظام iOS"
@@ -2682,6 +2713,8 @@
     "accountInformation": "معلومات الحساب",
     "trialAccount": "حساب تجريبي",
     "blinkUser": "مستخدم Blink",
+    "anonymous": "مجهول",
+    "anonymousUser": "مستخدم مجهول",
     "blinkToBlink": "من Blink إلى Blink",
     "transactionLimits": "قيود المعاملات",
     "activateWallet": "تفعيل المحفظة",
@@ -2739,6 +2772,7 @@
     "or": "or",
     "openWallet": "افتح المحفظة",
     "onchain": "على السلسلة",
+    "spark": "Spark",
     "paymentRequest": "طلب دفع",
     "phone": "رقم الهاتف",
     "phoneNumber": "رقم الهاتف",
@@ -2758,6 +2792,7 @@
     "submit": "Submit",
     "success": "تم النجاح!",
     "dollarStablesats": "الدولار (Stablesats)",
+    "dollarStablecoin": "الدولار (Stablecoin)",
     "to": "الى",
     "total": "المجموع",
     "transactions": "المعاملات",
@@ -2800,7 +2835,8 @@
       "minChars": "يجب أن يكون {min} أحرف على الأقل",
       "invalidPostalCode": "رمز بريدي غير صالح، ربما خطأ مطبعي",
       "invalidRegion": "اختيار منطقة غير صالح"
-    }
+    },
+    "copied": "تم النسخ إلى الحافظة"
   },
   "errors": {
     "generic": "كان هناك خطأ.\nالرجاء معاودة المحاولة في وقت لاحق.",
@@ -2929,27 +2965,6 @@
       "title": "تحدي يونيو!",
       "description": "وسّع دائرتك الداخلية بـ 10 للحصول على فرصة للفوز بتذكرة مميزة بقيمة 1000$ لمؤتمر Adopting Bitcoin السلفادور",
       "details": "اربح تذكرة مميزة لمؤتمر Adopting Bitcoin السلفادور\n\nوسّع دائرتك الداخلية بـ 10 للحصول على فرصة للفوز بتذكرة مميزة بقيمة 1000$ لمؤتمر Adopting Bitcoin السلفادور! تتضمن التذكرة وصولًا حصريًا إلى المؤتمر الرئيسي، والميزانين مع الطعام/المشروبات/الوجبات الخفيفة، وعشاء المتحدثين، ومهرجان الأفلام.\n\nشارك دوائرك على وسائل التواصل الاجتماعي بهاشتاغ #blinkcircles للمشاركة.\n\nهذه المرة، سيكون هناك فائزان!"
-    },
-    "septChallenge": {
-      "title": "September Challenge!",
-      "description": "Inner Circle {innerCircle: number}/21 - Earn $21\nTop 3 - Win tickets to Adopting Bitcoin!",
-      "details": "Grow your inner circle by 21 people in September and share on social with #blinkcircles to get $21 to your Stablesats account. Top 3 win tickets to Adopting Bitcoin!",
-      "peopleWelcomedSoFar": "people welcomed so far",
-      "yourRank": "your rank",
-      "reminder": "Reminder: Your inner circle grows when you send a new Blink user their first sats",
-      "fullDetails": "Full details at"
-    },
-    "octoberChallenge": {
-      "title": "October Challenge!",
-      "description": "Share your #blinkcircles for a chance to win 1,000,000 sats!",
-      "details": "We're giving away 1,000,000 sats!\n\n Share your Circles on social with tag `#blinkcircles` to enter! The winner will be chosen at random on October 31st.\n\n You must have at least one person in your Inner Circle to enter!",
-      "connectOnSocial": "Connect on social: ",
-      "fullDetails": "Full details at "
-    },
-    "novemberChallenge": {
-      "title": "November Challenge!",
-      "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-      "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
     }
   },
   "FullOnboarding": {
@@ -2990,7 +3005,10 @@
       "emptyTransactions": "لا توجد معاملات بعد",
       "addFunds": "إضافة أموال",
       "transactionsTitle": "المعاملات",
-      "title": "بطاقة Visa"
+      "title": "بطاقة Visa",
+      "noCardAvailable": "لا توجد بطاقات متاحة",
+      "cardNotUsable": "هذه البطاقة غير متاحة للاستخدام حاليًا",
+      "cardUpdateError": "تعذر تحديث حالة البطاقة"
     },
     "validThruLabel": "صالح حتى",
     "networkVisa": "Visa",
@@ -3262,9 +3280,6 @@
         "damagedCard": "بطاقة تالفة",
         "damagedCardDescription": "بطاقتي متضررة فعلياً",
         "whatHappensNext": "ماذا يحدث بعد ذلك؟",
-        "currentCardDeactivated": "سيتم إلغاء تنشيط بطاقتك الحالية فوراً",
-        "newCardShipped": "سيتم شحن بطاقة جديدة إلى عنوانك",
-        "digitalCardAvailable": "تبقى بطاقتك الرقمية متاحة خلال هذه العملية",
         "cardManagement": "إدارة البطاقة",
         "bullet1": "سيتم تجميد بطاقتك الحالية لأغراض الأمان",
         "bullet2": "سيتم إصدار بطاقة جديدة بأرقام مختلفة",
@@ -3285,15 +3300,9 @@
         "title": "راجع طلبك",
         "subtitle": "يرجى تأكيد تفاصيل استبدال بطاقتك",
         "requestSummary": "ملخص الطلب",
-        "reason": "السبب",
         "delivery": "التوصيل",
-        "shippingAddress": "عنوان الشحن",
-        "deliveryCost": "تكلفة التوصيل",
         "submitRequest": "إرسال الطلب",
         "importantInformation": "معلومات مهمة",
-        "processedImmediately": "سيتم معالجة طلبك فوراً",
-        "currentCardDeactivated": "سيتم إلغاء تنشيط البطاقة الحالية عند التأكيد",
-        "trackStatus": "يمكنك تتبع حالة توصيل بطاقتك الجديدة في التطبيق",
         "issueType": "السبب",
         "deliveryTime": "وقت التسليم",
         "shippingCost": "تكلفة التوصيل",
@@ -3346,10 +3355,7 @@
         "feature2": "شريحة EMV لتعزيز الأمان",
         "feature3": "شريط مغناطيسي للقبول العالمي",
         "feature4": "سيتم نقش اسمك على البطاقة",
-        "important": "مهم",
-        "importantBullet1": "ستظل بطاقتك الافتراضية نشطة أثناء انتظار البطاقة الفعلية",
-        "importantBullet2": "ستحتاج إلى تفعيل بطاقتك الفعلية عند وصولها",
-        "importantBullet3": "ستحمل كلتا البطاقتين نفس رقم البطاقة والتفاصيل"
+        "important": "مهم"
       },
       "Confirm": {
         "title": "أكد طلبك",
@@ -3467,5 +3473,248 @@
         "buttonText": "إغلاق"
       }
     }
+  },
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
+    "BackupMethod": {
+      "title": "اختر طريقة النسخ الاحتياطي",
+      "subtitle": "نوصي بـ {provider} للمستخدمين الجدد.",
+      "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
+      "passwordManager": "مدير كلمات المرور",
+      "manualBackup": "نسخ احتياطي يدوي",
+      "passwordManagerBackupSaved": "تم حفظ النسخة الاحتياطية في مدير كلمات المرور",
+      "passwordManagerBackupFailed": "فشل حفظ النسخة الاحتياطية",
+      "passwordManagerUnavailable": "لا يوجد مدير كلمات مرور متوفر على هذا الجهاز. استخدم النسخ الاحتياطي على Drive أو احفظ عبارة الـ 12 كلمة يدوياً."
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "حافظ على سرية عبارة النسخ الاحتياطي!",
+        "check1": "أفهم أنه لا يمكن لأحد استعادة محفظتي إذا فقدت هذه العبارة",
+        "check2": "أفهم أنه إذا حصل شخص ما على هذه العبارة، يمكنه سرقة جميع أموالي.",
+        "check3": "لا أحد يطلب مني هذه المعلومات عبر رسالة أو مكالمة"
+      },
+      "Phrase": {
+        "headerTitle": "عبارة النسخ الاحتياطي",
+        "sparkCompatible": "تعمل عبارة النسخ الاحتياطي هذه في أي {sparkCompatibleLink}",
+        "sparkCompatibleLink": "محفظة متوافقة مع Spark",
+        "copiedToast": "تم نسخ عبارة النسخ الاحتياطي إلى الحافظة",
+        "saveItNow": "احفظها الآن",
+        "savedConfirm": "لقد حفظتها",
+        "copy": "نسخ",
+        "continueButton": "متابعة",
+        "testBackup": "اختبر نسختك الاحتياطية"
+      },
+      "Confirm": {
+        "headerTitle": "تأكيد عبارة النسخ الاحتياطي",
+        "subtitle": "فحص سريع إذا كنت قد كتبتها بشكل صحيح",
+        "enterWord": "أدخل الكلمة",
+        "enterWords": "أدخل الكلمات",
+        "confirm": "تأكيد",
+        "incorrectWord": "كلمة غير صحيحة، يرجى التحقق من الترتيب"
+      },
+      "Success": {
+        "title": "مرحبًا بك في Blink غير الحافظة",
+        "testSuccess": "عبارة النسخ الاحتياطي صحيحة"
+      }
+    },
+    "CloudBackup": {
+      "title": "لنقم بنسخ محفظتك احتياطيًا",
+      "description": "سنحفظ نسخة من عبارة النسخ الاحتياطي في {provider} الخاص بك.",
+      "encryptCheckbox": "تشفير بكلمة مرور إضافية",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "(12 حرفًا كحد أدنى)",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "أدخل كلمة المرور مرة أخرى",
+      "continueButton": "متابعة",
+      "importantTitle": "مهم",
+      "importantMessage": "لا يخزن Blink كلمة المرور هذه. إذا فقدتها، {bold} استعادة محفظتك.",
+      "importantMessageBold": "لن نتمكن من",
+      "passwordTooShort": "12 حرفًا كحد أدنى",
+      "passwordMismatch": "كلمات المرور غير متطابقة",
+      "uploadSuccess": "تم حفظ النسخة الاحتياطية في {provider}",
+      "uploadFailed": "فشل رفع النسخة الاحتياطية",
+      "signInFailed": "فشل تسجيل الدخول إلى {provider}",
+      "cloudNotAvailable": "iCloud Drive غير متوفر. يُرجى تسجيل الدخول إلى iCloud من الإعدادات وتفعيل iCloud Drive.",
+      "networkError": "خطأ في الشبكة. يُرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+      "existingBackupTitle": "تم العثور على نسخة احتياطية",
+      "existingBackupMessage": "توجد نسخة احتياطية بالفعل في {provider} الخاص بك. هل تريد استبدالها؟",
+      "existingBackupMessageWithDetails": "توجد نسخة احتياطية بالفعل في {provider}.\n\nعنوان Lightning: {address}\nتم الإنشاء: {createdAt}\n\nهل تريد استبدالها؟",
+      "existingBackupUnknownAddress": "غير متوفر",
+      "existingBackupUnknownCreatedAt": "غير معروف",
+      "overwrite": "استبدال"
+    }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "الانتقال إلى غير حفظي",
+    "explainerTitle": "ماذا يعني الانتقال إلى غير حفظي؟",
+    "explainerStep1": "ستقوم بإنشاء حساب غير حفظي على بروتوكول Spark، <link>اعرف المزيد هنا</link>",
+    "explainerStep2": "سننقل أموالك إلى حسابك الجديد غير الحفظي وسيتم حذف حسابك الحالي",
+    "explainerStep3": "استمر في استخدام Blink كالمعتاد",
+    "letsMove": "هيا بنا",
+    "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة."
+  },
+  "AccountTypeSelectionScreen": {
+    "custodialLabel": "محفوظ",
+    "selfCustodialLabel": "محفوظ ذاتيًا",
+    "custodialDescription": "نحن نحتفظ بالأموال نيابة عنك",
+    "selfCustodialDescription": "أنت فقط يمكنك الوصول إلى الأموال",
+    "continueButton": "متابعة",
+    "descriptionDefault": "يرجى اختيار النوع المفضل لديك من Blink.",
+    "descriptionSelected": "يرجى اختيار نوع الحساب.",
+    "chooseMethod": "اختر الطريقة",
+    "restoreComingSoonTitle": "قريباً",
+    "restoreComingSoonDescription": "ستكون ميزة الاستعادة متاحة في تحديث مستقبلي.",
+    "createFailed": "فشل في إنشاء المحفظة. يرجى المحاولة مرة أخرى.",
+    "selfCustodialDisabled": "غير الحفظ غير متاح مؤقتًا."
+  },
+  "RestoreScreen": {
+    "title": "استعادة المحفظة",
+    "description": "استعد محفظتك من نسخة احتياطية",
+    "phraseTitle": "استعادة المحفظة",
+    "phraseSubtitleStep1": "أدخل أول 6 كلمات من عبارة النسخ الاحتياطي",
+    "phraseSubtitleStep2": "أدخل بقية عبارة النسخ الاحتياطي",
+    "nextWords": "الكلمات الـ 6 التالية",
+    "paste": "لصق",
+    "enterWord": "كلمة",
+    "invalidMnemonic": "عبارة نسخ احتياطي غير صحيحة. يرجى التحقق من صحة ترتيب الكلمات.",
+    "restoring": "جاري استعادة محفظتك...",
+    "restoreSuccess": "تمت استعادة المحفظة بنجاح",
+    "restoreFailed": "فشل في استعادة المحفظة. يرجى المحاولة مرة أخرى.",
+    "restore": "استعادة المحفظة",
+    "noBackupFound": "لم يتم العثور على نسخة احتياطية",
+    "noBackupDescription": "لم نتمكن من العثور على نسخة احتياطية. يمكنك إدخال عبارة النسخ الاحتياطي يدوياً.",
+    "enterPassword": "أدخل كلمة مرور التشفير",
+    "wrongPassword": "كلمة مرور غير صحيحة. يرجى المحاولة مرة أخرى.",
+    "pickBackupTitle": "اختر محفظة",
+    "pickBackupDescription": "اختر نسخة احتياطية للاستعادة"
+  },
+  "BackupNudge": {
+    "title": "أموالك في خطر",
+    "description": "قم بتأمين محفظتك الآن. لن يستغرق الأمر سوى دقيقة واحدة.",
+    "cta": "تأمين المحفظة",
+    "settingsWarning": "قم بنسخ محفظتك احتياطياً. إذا فقدت هذا الجهاز، ستفقد أموالك.",
+    "modalTitle": "قم بتأمين أموالك",
+    "modalDescription": "نوصي بشدة بعمل نسخة احتياطية لمحفظتك لمنع فقدان كامل للأموال في حال فقدت هذا الجهاز.",
+    "secureMe": "تأمين المحفظة"
+  },
+  "StableBalance": {
+    "title": "الرصيد المستقر",
+    "description": "احتفظ برصيد مقوّم بالدولار مدعوم بـ USDB على Spark.",
+    "balanceLabelBtc": "الرصيد · ساتس",
+    "balanceLabelUsd": "الرصيد · دولار",
+    "settingsRowTitle": "الرصيد المستقر",
+    "settingsTitle": "الرصيد المستقر",
+    "settingsDescription": "احتفظ بجزء من محفظتك بالدولار الأمريكي. قم بالتحويل بين BTC والدولار الأمريكي يدويًا في أي وقت باستخدام إجراء التحويل.",
+    "activationLabel": "مفعل",
+    "activeHint": "محفظتك تحتفظ بالدولار عبر USDB.",
+    "inactiveHint": "محفظتك تحتفظ بالبيتكوين فقط.",
+    "deactivateWarningBody": "لا يزال لديك {amount:string}. قم بالتحويل إلى بيتكوين أولاً، وإلا سيتم إخفاء رصيد الدولار حتى تقوم بإعادة تفعيل الرصيد المستقر.",
+    "toggleFailedToast": "تعذر تحديث الرصيد المستقر. يرجى المحاولة مرة أخرى.",
+    "toggleModal": {
+      "activateTitle": "تفعيل الرصيد الثابت",
+      "activateBody": "سيتم تحويل رصيد البيتكوين الخاص بك إلى USDB. هذه هي رسوم التحويل التقديرية.",
+      "activateConfirm": "تفعيل",
+      "deactivateTitle": "إلغاء تفعيل الرصيد الثابت",
+      "deactivateBody": "سيتم تحويل رصيد USDB الخاص بك إلى البيتكوين. هذه هي رسوم التحويل التقديرية.",
+      "deactivateConfirm": "إلغاء التفعيل",
+      "cancel": "إلغاء"
+    },
+    "minimumConversion": "الحد الأدنى للتحويل: {amount:string}",
+    "conversionUnavailable": "التحويل غير متاح مؤقتًا. يرجى المحاولة مرة أخرى."
+  },
+  "BackendFeatureGate": {
+    "title": "الميزة غير متاحة",
+    "description": "تتطلب هذه الميزة حساباً وصائياً.",
+    "signInTitle": "Sign in required",
+    "signInDescription": "Sign in to your custodial account to use {featureName}.",
+    "noAccountTitle": "Custodial account required",
+    "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "featureCircles": "Circles",
+    "featureEarn": "Earn",
+    "featureCard": "Card"
+  },
+  "WalletCreationScreen": {
+    "creating": "جارٍ إنشاء محفظتك...",
+    "errorTitle": "فشل إنشاء المحفظة",
+    "errorDescription": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "retry": "حاول مرة أخرى"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "تحويل Spark",
+    "lightningPayment": "دفعة Lightning",
+    "onchainDeposit": "إيداع On-chain",
+    "onchainWithdrawal": "سحب On-chain",
+    "conversionFromBitcoin": "تحويل من Bitcoin",
+    "conversionToBitcoin": "تحويل إلى Bitcoin",
+    "conversionFromToken": "تحويل من {token}",
+    "conversionToToken": "تحويل إلى {token}",
+    "tokenTransfer": "تحويل {token}",
+    "payTo": "دفع إلى {address}",
+    "payment": "دفعة"
+  },
+  "SelfCustodialOffline": {
+    "title": "المحفظة غير متصلة",
+    "description": "محفظتك غير المحتجزة لا يمكنها الوصول إلى الشبكة الآن. حاول مرة أخرى عندما تكون متصلاً بالإنترنت.",
+    "retry": "حاول مرة أخرى"
+  },
+  "SelfCustodialError": {
+    "insufficientFunds": "أموال غير كافية لتغطية المبلغ ورسوم الشبكة. حاول بمبلغ أصغر.",
+    "belowMinimum": "المبلغ أقل من الحد الأدنى المطلوب لهذه الدفعة. حاول بمبلغ أكبر.",
+    "networkError": "مشكلة في اتصال الشبكة. تحقق من اتصالك وحاول مرة أخرى.",
+    "invalidInput": "تبدو تفاصيل الدفع غير صالحة. يرجى المراجعة والمحاولة مرة أخرى.",
+    "generic": "تعذر إكمال الدفع. حاول مرة أخرى بعد لحظة، أو استخدم مبلغًا أصغر."
+  },
+  "UnclaimedDeposit": {
+    "title": "لديك {count} إيداع(ات) غير مطالب بها",
+    "description": "الإجمالي: {sats} سات متاحة للمطالبة",
+    "claim": "طالب الآن",
+    "claiming": "جارٍ المطالبة...",
+    "screenTitle": "إيداعات غير مطالب بها",
+    "cardTitle": "استلام {sats} sats",
+    "claimWithFee": "استلام (رسوم قصوى: {fee} sats)",
+    "refund": "استرداد",
+    "refunding": "جارٍ الاسترداد...",
+    "immature": "في انتظار التأكيدات...",
+    "feeExceeded": "رسوم الشبكة مرتفعة جداً للاستلام ({requiredFee} sats مطلوبة). حاول لاحقاً أو استرد إلى عنوان on-chain.",
+    "missingUtxo": "هذا الإيداع لم يعد متوفراً على الشبكة.",
+    "belowDustLimit": "هذا الإيداع صغير جداً للاستلام بعد الرسوم. انتظر رسوماً أقل أو استرد إلى عنوان on-chain.",
+    "genericError": "تعذر الاستلام: {error}",
+    "claimFailed": "فشل الاستلام: {error}",
+    "refundFailed": "فشل الاسترداد: {error}",
+    "refundAddress": "عنوان بيتكوين للاسترداد",
+    "feeRate": "رسوم الشبكة",
+    "feeRateFastest": "الأسرع (~{sats} sats) ~10 دقائق",
+    "feeRateHalfHour": "عادي (~{sats} sats) ~30 دقيقة",
+    "feeRateHour": "اقتصادي (~{sats} sats) ~60 دقيقة",
+    "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "تعذّر تحميل رسوم الشبكة. يرجى التحقق من الاتصال والمحاولة مرة أخرى.",
+    "refundNow": "استرداد الآن",
+    "refundSuccess": "تم بدء الاسترداد بنجاح",
+    "claimSuccess": "تم استلام الإيداع بنجاح",
+    "error": "تعذر استلام هذا الإيداع"
+  },
+  "FeatureUnavailable": {
+    "SelfCustodial": {
+      "title": "Temporarily unavailable",
+      "description": "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later."
+    }
+  },
+  "NetworkStatus": {
+    "degradedBanner": "Spark network is currently degraded. Payments may take longer."
+  },
+  "SelfCustodialDelete": {
+    "dangerZoneImportantTitle": "مهم",
+    "dangerZoneBulletReinstated": "لا يمكن استعادة الحساب المحذوف",
+    "dangerZoneBulletPermanent": "حذف الحساب نهائي",
+    "dangerZoneBulletEmpty": "تأكد من أن الحساب فارغ",
+    "dangerZoneDeleteButton": "حذف الحساب والبيانات",
+    "confirmModalTitle": "تأكيد حذف الحساب",
+    "confirmModalTypeToConfirm": "اكتب \"{delete: string}\" للتأكيد",
+    "hasFundsWarningTitle": "تحذير",
+    "hasFundsWarningBody": "محفظتك تحتوي على رصيد قدره {balance}. للحفاظ على سلامتك، لا نسمح بحذف الحسابات التي تحتوي على أموال.",
+    "hasFundsWarningHelper": "للمتابعة في الحذف، يرجى إفراغ حسابك أو التبرع للاقتصادات الدائرية.",
+    "hasFundsWarningButton": "العودة"
   }
 }

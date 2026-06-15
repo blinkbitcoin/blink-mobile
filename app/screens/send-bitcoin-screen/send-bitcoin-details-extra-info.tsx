@@ -8,7 +8,7 @@ import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation, useFocusEffect } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 import { AmountInvalidReason, AmountStatus } from "./payment-details"
@@ -24,7 +24,7 @@ export const SendBitcoinDetailsExtraInfo = ({
   amountStatus,
   currentLevel,
 }: SendBitcoinDetailsExtraInfoProps) => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const [isUpgradeAccountModalVisible, setIsUpgradeAccountModalVisible] = useState(false)
   const closeModal = () => setIsUpgradeAccountModalVisible(false)

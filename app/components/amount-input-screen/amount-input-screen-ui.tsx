@@ -214,7 +214,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.black,
   },
   hiddenInput: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     opacity: 0,
   },
   errorRow: {

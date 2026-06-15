@@ -1,0 +1,79 @@
+import { useMemo } from "react"
+
+import {
+  createCustodialClaimDeposit,
+  createCustodialConvert,
+  createCustodialListPendingDeposits,
+} from "@app/custodial/adapters/payment"
+import {
+  createClaimDeposit,
+  createListPendingDeposits,
+} from "@app/self-custodial/adapters/deposit"
+import { createGetFee, createSendPayment } from "@app/self-custodial/adapters/payment"
+import {
+  createGetConversionQuote,
+  createLnurlWithdraw,
+  createReceiveLightning,
+  createReceiveOnchain,
+} from "@app/self-custodial/bridge"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import {
+  type ClaimDepositAdapter,
+  type ConvertAdapter,
+  type GetConversionQuoteAdapter,
+  type GetFeeAdapter,
+  type ListPendingDepositsAdapter,
+  type LnurlWithdrawAdapter,
+  type ReceiveLightningAdapter,
+  type ReceiveOnchainAdapter,
+  type SendPaymentAdapter,
+} from "@app/types/payment"
+import { AccountType } from "@app/types/wallet"
+
+import { useAccountRegistry } from "./use-account-registry"
+
+type PaymentsResult = {
+  sendPayment?: SendPaymentAdapter
+  getFee?: GetFeeAdapter
+  receiveLightning?: ReceiveLightningAdapter
+  receiveOnchain?: ReceiveOnchainAdapter
+  lnurlWithdraw?: LnurlWithdrawAdapter
+  listPendingDeposits?: ListPendingDepositsAdapter
+  claimDeposit?: ClaimDepositAdapter
+  convert?: ConvertAdapter
+  getConversionQuote?: GetConversionQuoteAdapter
+  accountType?: AccountType
+}
+
+export const usePayments = (): PaymentsResult => {
+  const { activeAccount } = useAccountRegistry()
+  const { sdk } = useSelfCustodialWallet()
+  const accountType = activeAccount?.type
+
+  return useMemo((): PaymentsResult => {
+    if (accountType === AccountType.SelfCustodial && sdk) {
+      return {
+        sendPayment: createSendPayment(sdk),
+        getFee: createGetFee(sdk),
+        receiveLightning: createReceiveLightning(sdk),
+        receiveOnchain: createReceiveOnchain(sdk),
+        lnurlWithdraw: createLnurlWithdraw(sdk),
+        listPendingDeposits: createListPendingDeposits(sdk),
+        claimDeposit: createClaimDeposit(sdk),
+        getConversionQuote: createGetConversionQuote(sdk),
+        accountType,
+      }
+    }
+
+    if (accountType === AccountType.Custodial) {
+      return {
+        listPendingDeposits: createCustodialListPendingDeposits,
+        claimDeposit: createCustodialClaimDeposit,
+        convert: createCustodialConvert,
+        accountType,
+      }
+    }
+
+    return { accountType }
+  }, [accountType, sdk])
+}

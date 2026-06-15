@@ -49,11 +49,14 @@ jest.mock("@app/hooks", () => ({
 
 jest.mock("axios")
 jest.mock("react-native/Libraries/Linking/Linking", () => ({
-  openURL: jest.fn(),
-  canOpenURL: jest.fn(),
-  addEventListener: jest.fn(() => ({
-    remove: jest.fn(),
-  })),
+  __esModule: true,
+  default: {
+    openURL: jest.fn(),
+    canOpenURL: jest.fn(),
+    addEventListener: jest.fn(() => ({
+      remove: jest.fn(),
+    })),
+  },
 }))
 
 const Wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (

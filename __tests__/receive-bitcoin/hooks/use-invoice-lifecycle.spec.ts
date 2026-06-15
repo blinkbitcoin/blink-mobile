@@ -1,5 +1,6 @@
 import { renderHook } from "@testing-library/react-hooks"
 
+import { flushEffects } from "../../helpers/flush-effects"
 import { useInvoiceLifecycle } from "@app/screens/receive-bitcoin-screen/hooks/use-invoice-lifecycle"
 import {
   Invoice,
@@ -29,6 +30,12 @@ jest.mock("react-native-haptic-feedback", () => ({
 jest.mock("@app/graphql/generated", () => ({
   WalletCurrency: { Btc: "BTC", Usd: "USD" },
 }))
+
+// prcd must keep a stable identity across renders: useInvoiceLifecycle's
+// layout effect recreates the PR whenever prcd changes, so an inline object
+// literal per render would loop with the state-updating effects until React
+// aborts with "Maximum update depth exceeded".
+const stablePrcd = { id: "test" } as never
 
 const mockMutations = {
   lnNoAmountInvoiceCreate: jest.fn(),
@@ -77,7 +84,7 @@ describe("useInvoiceLifecycle", () => {
     expect(mockCreatePaymentRequest).not.toHaveBeenCalled()
   })
 
-  it("creates PR from prcd and mutations", () => {
+  it("creates PR from prcd and mutations", async () => {
     const mockPR = createMockPR()
     mockCreatePaymentRequest.mockReturnValue(mockPR)
 
@@ -91,6 +98,7 @@ describe("useInvoiceLifecycle", () => {
       creationData: prcd,
     })
     expect(result.current.pr).toBeDefined()
+    await flushEffects()
   })
 
   it("triggers invoice generation when PR is Idle", async () => {
@@ -105,6 +113,7 @@ describe("useInvoiceLifecycle", () => {
     renderHook(() => useInvoiceLifecycle(prcd as never, mockMutations as never))
 
     expect(idlePR.generateRequest).toHaveBeenCalled()
+    await flushEffects()
   })
 
   it("exposes regenerateInvoice callback", () => {
@@ -113,7 +122,7 @@ describe("useInvoiceLifecycle", () => {
     )
 
     const { result } = renderHook(() =>
-      useInvoiceLifecycle({ id: "test" } as never, mockMutations as never),
+      useInvoiceLifecycle(stablePrcd, mockMutations as never),
     )
 
     expect(result.current.regenerateInvoice).toBeDefined()
@@ -133,7 +142,7 @@ describe("useInvoiceLifecycle", () => {
     mockCreatePaymentRequest.mockReturnValue(mockPR)
     mockUseLnUpdateHashPaid.mockReturnValue("abc123")
 
-    renderHook(() => useInvoiceLifecycle({ id: "test" } as never, mockMutations as never))
+    renderHook(() => useInvoiceLifecycle(stablePrcd, mockMutations as never))
 
     expect(mockHaptic).toHaveBeenCalledWith("notificationSuccess", {
       ignoreAndroidSystemSettings: true,
@@ -153,7 +162,7 @@ describe("useInvoiceLifecycle", () => {
     mockCreatePaymentRequest.mockReturnValue(mockPR)
     mockUseLnUpdateHashPaid.mockReturnValue("different-hash")
 
-    renderHook(() => useInvoiceLifecycle({ id: "test" } as never, mockMutations as never))
+    renderHook(() => useInvoiceLifecycle(stablePrcd, mockMutations as never))
 
     expect(mockHaptic).not.toHaveBeenCalled()
   })
@@ -165,7 +174,7 @@ describe("useInvoiceLifecycle", () => {
     mockUseCountdown.mockReturnValue({ remainingSeconds: 300, isExpired: false })
 
     const { result } = renderHook(() =>
-      useInvoiceLifecycle({ id: "test" } as never, mockMutations as never),
+      useInvoiceLifecycle(stablePrcd, mockMutations as never),
     )
 
     expect(result.current.expiresInSeconds).toBe(300)

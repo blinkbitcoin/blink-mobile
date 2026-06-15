@@ -1,18 +1,160 @@
 import React from "react"
 import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
-import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
+import { fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { HomeScreen } from "../../app/screens/home-screen"
 import { ContextForScreen } from "./helper"
+import { flushEffects } from "../helpers/flush-effects"
 import {
   AccountLevel,
   HomeAuthedDocument,
   HomeUnauthedDocument,
   Network,
 } from "@app/graphql/generated"
+import { mockCurrencyList } from "@app/graphql/mocks"
 
 let currentMocks: MockedResponse[] = []
+
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  __esModule: true,
+  default: {
+    getItem: jest.fn().mockResolvedValue(null),
+    setItem: jest.fn().mockResolvedValue(undefined),
+    removeItem: jest.fn().mockResolvedValue(undefined),
+  },
+}))
+
+const mockBackupNudgeState = {
+  shouldShowBanner: false,
+  shouldShowModal: false,
+  shouldShowSettingsBanner: false,
+  dismissBanner: jest.fn(),
+}
+jest.mock("@app/hooks/use-backup-nudge-state", () => ({
+  useBackupNudgeState: () => mockBackupNudgeState,
+}))
+
+type NudgeModalProps = { isVisible: boolean; onClose: () => void }
+const mockBackupNudgeModal = jest.fn<null, [NudgeModalProps]>(() => null)
+jest.mock("@app/components/backup-nudge-modal", () => ({
+  BackupNudgeModal: (props: NudgeModalProps) => mockBackupNudgeModal(props),
+}))
+
+let mockIsFocused = true
+
+// eslint-disable-next-line prefer-const
+let mockActiveWalletOverride: Record<string, unknown> | null = null
+// eslint-disable-next-line prefer-const
+let mockFeatureFlagsOverride: Record<string, unknown> | null = null
+// eslint-disable-next-line prefer-const
+let mockSelfCustodialWalletOverride: Record<string, unknown> | null = null
+const mockToggleBalanceMode = jest.fn()
+// eslint-disable-next-line prefer-const
+let mockBalanceModeValue: "btc" | "usd" = "usd"
+let mockStablesatsRestrictedOverride = false
+
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () =>
+    mockActiveWalletOverride ?? {
+      wallets: [],
+      status: "unavailable",
+      accountType: "custodial",
+      isReady: false,
+      isSelfCustodial: false,
+      needsBackendAuth: true,
+    },
+}))
+
+jest.mock("@app/config/feature-flags-context", () => {
+  const actual = jest.requireActual("@app/config/feature-flags-context")
+  return {
+    ...actual,
+    useFeatureFlags: () =>
+      mockFeatureFlagsOverride ?? {
+        nonCustodialEnabled: false,
+        stableBalanceEnabled: false,
+      },
+    useRemoteConfig: () => ({
+      loading: false,
+      remoteConfigReady: true,
+      feeReimbursementMemo: "fee reimbursement",
+      featureFlags: {
+        nonCustodialEnabled: false,
+        stableBalanceEnabled: false,
+      },
+      stablesatsBlockedCountries: [],
+    }),
+  }
+})
+
+jest.mock("@app/hooks/use-stablesats-restricted", () => ({
+  useStablesatsRestricted: () => mockStablesatsRestrictedOverride,
+}))
+
+jest.mock("@app/components/stablesats-restriction-modal", () => {
+  const ReactActual = jest.requireActual("react")
+  const { Pressable, Text } = jest.requireActual("react-native")
+  return {
+    StablesatsRestrictionModal: ({ onDismiss }: { onDismiss?: () => void }) =>
+      ReactActual.createElement(
+        Pressable,
+        { testID: "restriction-dismiss", onPress: onDismiss },
+        ReactActual.createElement(Text, null, "restriction"),
+      ),
+  }
+})
+
+jest.mock("@app/components/usd-convert-to-btc-modal", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View, Text } = jest.requireActual("react-native")
+  return {
+    UsdConvertToBtcModal: ({
+      isVisible,
+      usdWalletBalance,
+    }: {
+      isVisible: boolean
+      usdWalletBalance: { amount: number }
+    }) =>
+      isVisible
+        ? ReactActual.createElement(
+            View,
+            { testID: "convert-modal" },
+            ReactActual.createElement(Text, null, String(usdWalletBalance.amount)),
+          )
+        : null,
+  }
+})
+
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () =>
+    mockSelfCustodialWalletOverride ?? {
+      sdk: null,
+      wallets: [],
+      status: "unavailable",
+      isStableBalanceActive: false,
+      lastReceivedPaymentId: null,
+      hasMoreTransactions: false,
+      loadingMore: false,
+      loadMore: jest.fn(),
+      refreshWallets: jest.fn(),
+      refreshStableBalanceActive: jest.fn(),
+      retry: jest.fn(),
+    },
+}))
+
+jest.mock("@app/hooks/use-balance-mode", () => {
+  const BalanceMode = { Btc: "btc", Usd: "usd" } as const
+  return {
+    BalanceMode,
+    useBalanceMode: () => ({
+      mode: mockBalanceModeValue,
+      setMode: jest.fn(),
+      toggleMode: mockToggleBalanceMode,
+      loaded: true,
+    }),
+  }
+})
 
 jest.mock("@app/utils/helper", () => ({
   ...jest.requireActual("@app/utils/helper"),
@@ -34,12 +176,20 @@ jest.mock("@app/hooks", () => {
   }
 })
 
-jest.mock("@app/graphql/mocks", () => ({
-  __esModule: true,
-  get default() {
-    return currentMocks
-  },
-}))
+jest.mock("@app/graphql/mocks", () => {
+  const actual = jest.requireActual("@app/graphql/mocks")
+  return {
+    __esModule: true,
+    mockCurrencyList: actual.mockCurrencyList,
+    get default() {
+      // Spec-specific mocks first so they take precedence (they are
+      // infinite-use, so the shared variants of the same queries are never
+      // reached); the shared mocks backfill every other query fired by
+      // mounted components, keeping Apollo's MockLink warning-free.
+      return [...currentMocks, ...actual.default]
+    },
+  }
+})
 
 jest.mock("@app/components/slide-up-handle", () => {
   const React = jest.requireActual("react")
@@ -68,6 +218,7 @@ jest.mock("@react-navigation/native", () => {
       ...actual.useNavigation?.(),
       navigate: mockNavigate,
     }),
+    useIsFocused: () => mockIsFocused,
   }
 })
 
@@ -102,6 +253,7 @@ export const generateHomeMock = ({
   return [
     {
       request: { query: HomeUnauthedDocument },
+      maxUsageCount: Number.POSITIVE_INFINITY,
       result: {
         data: {
           __typename: "Query",
@@ -109,17 +261,28 @@ export const generateHomeMock = ({
             __typename: "Globals",
             network,
           },
-          currencyList: [],
+          // Must match the shared currencyList mock, or Apollo warns about
+          // cache data loss when the two results replace each other.
+          currencyList: mockCurrencyList,
         },
       },
     },
     {
       request: { query: HomeAuthedDocument },
+      maxUsageCount: Number.POSITIVE_INFINITY,
       result: {
         data: {
           me: {
             __typename: "User",
             id: "user-id",
+            language: "en",
+            username: "test-user",
+            phone: "+50365055539",
+            email: {
+              __typename: "Email",
+              address: null,
+              verified: false,
+            },
             defaultAccount: {
               __typename: "ConsumerAccount",
               id: "account-id",
@@ -286,16 +449,20 @@ const androidCases: ConvertButtonCase[] = [
 describe("HomeScreen", () => {
   beforeEach(() => {
     currentMocks = []
+    mockActiveWalletOverride = null
+    mockStablesatsRestrictedOverride = false
     jest.clearAllMocks()
   })
 
-  it("HomeAuthed", async () => {
-    render(
+  it("renders home screen for custodial user", async () => {
+    const { getByTestId } = render(
       <ContextForScreen>
         <HomeScreen />
       </ContextForScreen>,
     )
-    await act(async () => {})
+    await flushEffects()
+
+    expect(getByTestId("slide-up-handle")).toBeTruthy()
   })
 
   it.each([...iosCases, ...androidCases] satisfies ConvertButtonCase[])(
@@ -316,10 +483,13 @@ describe("HomeScreen", () => {
 
       if (expectConvertButton) {
         await waitFor(() => expect(getByTestId("transfer")).toBeTruthy())
+        await flushEffects()
         return
       }
 
       await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
+
+      await flushEffects()
     },
   )
 
@@ -335,5 +505,324 @@ describe("HomeScreen", () => {
     fireEvent.press(getByTestId("slide-up-handle"))
 
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("transactionHistory"))
+
+    await flushEffects()
+  })
+
+  it("renders home screen for self-custodial user", async () => {
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 0, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 0, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByTestId("slide-up-handle")).toBeTruthy()
+
+    mockActiveWalletOverride = null
+  })
+
+  it("never renders the trust-model modal for self-custodial users with balance", async () => {
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 5000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 5000,
+      usdBalance: 0,
+    })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("trust-model-modal")).toBeNull()
+
+    mockActiveWalletOverride = null
+  })
+
+  describe("Stablesats restriction to USD convert modal chaining", () => {
+    it("opens the USD convert modal on restriction dismiss when there is a Dollar balance", async () => {
+      mockStablesatsRestrictedOverride = true
+      currentMocks = generateHomeMock({
+        level: AccountLevel.One,
+        network: Network.Mainnet,
+        btcBalance: 0,
+        usdBalance: 10001,
+      })
+
+      const { getByTestId, getByText, queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(queryByTestId("convert-modal")).toBeNull()
+
+      fireEvent.press(getByTestId("restriction-dismiss"))
+
+      expect(getByTestId("convert-modal")).toBeTruthy()
+      expect(getByText("10001")).toBeTruthy()
+    })
+
+    it("does not open the USD convert modal on dismiss when the Dollar balance is zero", async () => {
+      mockStablesatsRestrictedOverride = true
+      currentMocks = generateHomeMock({
+        level: AccountLevel.One,
+        network: Network.Mainnet,
+        btcBalance: 0,
+        usdBalance: 0,
+      })
+
+      const { getByTestId, queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      fireEvent.press(getByTestId("restriction-dismiss"))
+
+      expect(queryByTestId("convert-modal")).toBeNull()
+    })
+  })
+
+  describe("Stable Balance mode toggle (self-custodial)", () => {
+    const selfCustodialWallets = [
+      {
+        id: "btc-1",
+        walletCurrency: "BTC",
+        balance: { amount: 5517, currency: "BTC", currencyCode: "BTC" },
+        transactions: [],
+      },
+      {
+        id: "usd-1",
+        walletCurrency: "USD",
+        balance: { amount: 100, currency: "USD", currencyCode: "USD" },
+        transactions: [],
+      },
+    ]
+
+    beforeEach(() => {
+      mockToggleBalanceMode.mockClear()
+      mockActiveWalletOverride = {
+        wallets: selfCustodialWallets,
+        status: "ready",
+        accountType: "self-custodial",
+        isReady: true,
+        isSelfCustodial: true,
+        needsBackendAuth: false,
+      }
+      mockSelfCustodialWalletOverride = {
+        sdk: { id: "fake-sdk" },
+        wallets: selfCustodialWallets,
+        status: "ready",
+        isStableBalanceActive: true,
+        lastReceivedPaymentId: null,
+        hasMoreTransactions: false,
+        loadingMore: false,
+        loadMore: jest.fn(),
+        refreshWallets: jest.fn(),
+        refreshStableBalanceActive: jest.fn(),
+        retry: jest.fn(),
+      }
+    })
+
+    afterEach(() => {
+      mockActiveWalletOverride = null
+      mockSelfCustodialWalletOverride = null
+      mockFeatureFlagsOverride = null
+      mockBalanceModeValue = "usd"
+    })
+
+    it("shows the balance mode toggle when SB is enabled and active", async () => {
+      mockFeatureFlagsOverride = {
+        nonCustodialEnabled: true,
+        stableBalanceEnabled: true,
+      }
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await waitFor(() => expect(getByTestId("balance-mode-toggle")).toBeTruthy())
+
+      await flushEffects()
+    })
+
+    it("hides the toggle when stableBalanceEnabled flag is off", async () => {
+      mockFeatureFlagsOverride = {
+        nonCustodialEnabled: true,
+        stableBalanceEnabled: false,
+      }
+
+      const { queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+      expect(queryByTestId("balance-mode-toggle")).toBeNull()
+    })
+
+    it("hides the toggle when Stable Balance is inactive even if flag is on", async () => {
+      mockFeatureFlagsOverride = {
+        nonCustodialEnabled: true,
+        stableBalanceEnabled: true,
+      }
+      mockSelfCustodialWalletOverride = {
+        ...(mockSelfCustodialWalletOverride as Record<string, unknown>),
+        isStableBalanceActive: false,
+      }
+
+      const { queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+      expect(queryByTestId("balance-mode-toggle")).toBeNull()
+    })
+
+    it("invokes toggleMode when the label is pressed", async () => {
+      mockFeatureFlagsOverride = {
+        nonCustodialEnabled: true,
+        stableBalanceEnabled: true,
+      }
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      const toggle = await waitFor(() => getByTestId("balance-mode-toggle"))
+      fireEvent.press(toggle)
+
+      expect(mockToggleBalanceMode).toHaveBeenCalledTimes(1)
+
+      await flushEffects()
+    })
+  })
+
+  describe("BackupNudgeModal focus gating", () => {
+    const lastIsVisible = (): boolean => {
+      const calls = mockBackupNudgeModal.mock.calls
+      expect(calls.length).toBeGreaterThan(0)
+      return calls[calls.length - 1][0].isVisible
+    }
+
+    beforeEach(() => {
+      mockBackupNudgeModal.mockClear()
+      mockBackupNudgeState.shouldShowModal = false
+      mockIsFocused = true
+    })
+
+    afterEach(() => {
+      mockBackupNudgeState.shouldShowModal = false
+      mockIsFocused = true
+    })
+
+    it("passes isVisible=true only when both isFocused and shouldShowModal are true", async () => {
+      mockBackupNudgeState.shouldShowModal = true
+      mockIsFocused = true
+
+      render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(lastIsVisible()).toBe(true)
+    })
+
+    it("passes isVisible=false when the home tab is not focused", async () => {
+      mockBackupNudgeState.shouldShowModal = true
+      mockIsFocused = false
+
+      render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(lastIsVisible()).toBe(false)
+    })
+
+    it("passes isVisible=false when the nudge state says it should not be shown", async () => {
+      mockBackupNudgeState.shouldShowModal = false
+      mockIsFocused = true
+
+      render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(lastIsVisible()).toBe(false)
+    })
+
+    it("passes isVisible=false when neither condition is met", async () => {
+      mockBackupNudgeState.shouldShowModal = false
+      mockIsFocused = false
+
+      render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(lastIsVisible()).toBe(false)
+    })
   })
 })

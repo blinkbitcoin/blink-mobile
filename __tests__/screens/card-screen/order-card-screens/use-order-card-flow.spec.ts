@@ -299,7 +299,9 @@ describe("useOrderCardFlow", () => {
       const listener =
         mockAddListener.mock.calls[mockAddListener.mock.calls.length - 1][1]
       const event = { preventDefault: jest.fn() }
-      listener(event)
+      act(() => {
+        listener(event)
+      })
 
       expect(event.preventDefault).toHaveBeenCalled()
       expect(result.current.step).toBe(Step.Shipping)

@@ -1,6 +1,6 @@
 import React from "react"
 import { CommonActions, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { CardStatusLayout } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -10,7 +10,7 @@ import { useCardData } from "../hooks/use-card-data"
 import { isCardFrozen } from "../utils/card-display"
 
 export const CardApprovedScreen: React.FC = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { LL } = useI18nContext()
   const { card, hasPhysicalCard } = useCardData()
 

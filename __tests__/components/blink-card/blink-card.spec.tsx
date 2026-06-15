@@ -122,7 +122,9 @@ describe("BlinkCard", () => {
       const { getByText } = renderWithProviders(
         <BlinkCard
           {...defaultProps}
-          validThruDate={new Date(2028, 11, 1)}
+          // Date.UTC: parseCardValidThru reads UTC fields, so a local-time
+          // date would render the previous month in timezones east of UTC
+          validThruDate={new Date(Date.UTC(2028, 11, 1))}
           showCardDetails={true}
         />,
       )

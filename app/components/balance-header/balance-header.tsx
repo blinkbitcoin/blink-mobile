@@ -1,12 +1,16 @@
 import * as React from "react"
 import ContentLoader, { Rect } from "react-content-loader/native"
-import { TouchableOpacity, View } from "react-native"
+import { Pressable, TouchableOpacity, View, Text } from "react-native"
 
-import { makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
+import { BalanceMode } from "@app/hooks/use-balance-mode"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
+
+import { StatusPill, type StatusPillVariant } from "../status-pill"
 
 const Loader = () => {
   const styles = useStyles()
@@ -24,31 +28,90 @@ const Loader = () => {
   )
 }
 
+export type StatusBadge = {
+  label: string
+  status: StatusPillVariant
+}
+
 type Props = {
   loading: boolean
   formattedBalance?: string
+  showStableBalanceToggle?: boolean
+  mode?: BalanceMode
+  onModeChange?: () => void
+  statusBadge?: StatusBadge
 }
 
-export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) => {
+export const BalanceHeader: React.FC<Props> = ({
+  loading,
+  formattedBalance,
+  showStableBalanceToggle,
+  mode,
+  onModeChange,
+  statusBadge,
+}) => {
   const styles = useStyles()
+  const { LL } = useI18nContext()
 
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
+  const currentMode = mode ?? BalanceMode.Btc
 
-  // TODO: use suspense for this component with the apollo suspense hook (in beta)
-  // so there is no need to pass loading from parent?
+  const modeLabel =
+    currentMode === BalanceMode.Btc
+      ? LL.StableBalance.balanceLabelBtc()
+      : LL.StableBalance.balanceLabelUsd()
+
+  const showBadge = Boolean(statusBadge) && !loading && !hideAmount
+
   return (
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
-      <TouchableOpacity style={styles.balanceWrapper} onPress={switchMemoryHideAmount}>
-        {hideAmount ? (
+      {hideAmount ? (
+        <TouchableOpacity style={styles.balanceWrapper} onPress={switchMemoryHideAmount}>
           <HiddenBalancePlaceholder size="large" />
-        ) : loading ? (
-          <Loader />
-        ) : (
-          <Text style={styles.primaryBalanceText} allowFontScaling adjustsFontSizeToFit>
-            {formattedBalance}
-          </Text>
-        )}
-      </TouchableOpacity>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity onPress={switchMemoryHideAmount}>
+          <View style={styles.amountWrapper}>
+            {showBadge && statusBadge ? (
+              <StatusPill
+                label={statusBadge.label}
+                status={statusBadge.status}
+                ghost
+                style={styles.statusPillGhost}
+              />
+            ) : null}
+            {loading ? (
+              <Loader />
+            ) : (
+              <Text
+                style={styles.primaryBalanceText}
+                allowFontScaling
+                adjustsFontSizeToFit
+              >
+                {formattedBalance}
+              </Text>
+            )}
+            {showBadge && statusBadge ? (
+              <StatusPill
+                label={statusBadge.label}
+                status={statusBadge.status}
+                testID="balance-status-badge"
+                style={styles.statusPill}
+              />
+            ) : null}
+          </View>
+        </TouchableOpacity>
+      )}
+      {showStableBalanceToggle && onModeChange ? (
+        <Pressable
+          onPress={onModeChange}
+          accessibilityRole="button"
+          style={styles.modeToggle}
+          {...testProps("balance-mode-toggle")}
+        >
+          <Text style={styles.modeToggleText}>{modeLabel}</Text>
+        </Pressable>
+      ) : null}
     </View>
   )
 }
@@ -56,11 +119,17 @@ export const BalanceHeader: React.FC<Props> = ({ loading, formattedBalance }) =>
 const useStyles = makeStyles(({ colors }) => ({
   balanceHeaderContainer: {
     alignItems: "center",
+    textAlign: "center",
   },
   balanceWrapper: {
     height: 48,
     justifyContent: "center",
     alignItems: "center",
+  },
+  amountWrapper: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    alignSelf: "center",
   },
   primaryBalanceText: {
     fontSize: 32,
@@ -71,5 +140,24 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   loaderForefound: {
     color: colors.loaderForeground,
+  },
+  modeToggle: {
+    marginTop: 4,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+  },
+  modeToggleText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: colors.grey2,
+    letterSpacing: 0.6,
+  },
+  statusPill: {
+    marginLeft: 6,
+    marginTop: 2,
+  },
+  statusPillGhost: {
+    marginRight: 6,
+    marginTop: 2,
   },
 }))

@@ -62,7 +62,8 @@
         "title": "Converter",
         "transfer": "Transferir",
         "percentageToConvert": "% para converter",
-        "reviewTransfer": "Revisar transferência"
+        "reviewTransfer": "Revisar transferência",
+        "dustError": "O saldo total deve ser transferido."
     },
     "ConversionConfirmationScreen": {
         "title": "Revisar conversão",
@@ -70,11 +71,12 @@
         "receivingAccount": "Conta de Recebimento",
         "infoBitcoin": "O valor em Bitcoin é apenas aproximado. Ele pode variar uma pequena quantia.",
         "infoDollar": "O valor em Dólar é apenas aproximado. Ele pode variar uma pequena quantia.",
-        "transferButtonText": "Transferir {fromWallet} para {toWallet}"
+        "transferButtonText": "Transferir {fromWallet} para {toWallet}",
+        "feeLabel": "Taxa de conversão",
+        "feeError": "Não foi possível obter a taxa de conversão"
     },
     "ConversionSuccessScreen": {
-        "message": "Conversão bem sucedida",
-        "title": "Sucesso na Conversão"
+        "message": "Conversão bem sucedida"
     },
     "EarnScreen": {
         "satoshi": "sat",
@@ -2045,6 +2047,7 @@
         "createAccount": "Criar nova conta",
         "exploreWallet": "Explorar carteira",
         "login": "Entrar",
+        "loginOrRestore": "Entrar / Restaurar",
         "logBackInWith": "Faça login novamente com",
         "headline": "Carteira desenvolvida pela Galoy",
         "startTrialAccount": "Comece com uma conta teste",
@@ -2159,9 +2162,14 @@
         "lightningAddress": "Endereço lightning",
         "lightningInvoice": "Fatura lightning",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "Taxa de depósito: {fee} SAT para valores abaixo de {threshold} SAT ou {overFee} SAT para depósitos acima de {threshold} SAT"
+        "depositFee": "Taxa de depósito: {fee} SAT para valores abaixo de {threshold} SAT ou {overFee} SAT para depósitos acima de {threshold} SAT",
+        "autoConvertMinAmount": "Valores abaixo de {minSats: number} sats / {minFiat: string} não podem ser convertidos em Dólar automaticamente. Você receberá Bitcoin.",
+        "autoConvertFailed": "Pagamento recebido mas a conversão falhou.",
+        "pleaseWaitForConversion": "Por favor aguarde até que a conversão seja concluída"
     },
     "RedeemBitcoinScreen": {
+        "walletNotConnected": "Sua carteira ainda está conectando. Aguarde um momento e tente novamente.",
+        "paymentPending": "Seu pagamento pode ainda estar sendo concluído. Verifique seu saldo antes de tentar novamente.",
         "title": "Resgatar Bitcoin",
         "usdTitle": "Resgatar na Conta Dólar",
         "error": "Falha ao gerar fatura. Entre em contato com o suporte se o problema persistir.",
@@ -2219,7 +2227,8 @@
         "slideToConfirm": "Deslize para Confirmar",
         "slideConfirming": "Confirmando...",
         "copiedDestination": "Copiado destino para a área de transferência",
-        "lightningRecommended": "Alta taxa! Recomendamos Lightning."
+        "lightningRecommended": "Alta taxa! Recomendamos Lightning.",
+        "usdRemainderSweep": "Saldo restante {remaining: string} ({remainingSats: string}) será convertido em Bitcoin. Mínimo em USD: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "Nomes de usuário {bankName: string} agora são endereços {bankName: string}.",
@@ -2298,7 +2307,16 @@
         "recipient": "Destinatário",
         "time": "Hora",
         "type": "Tipo",
-        "destinationIsRequired": "Destino é obrigatório"
+        "feeTier": "Velocidade da taxa",
+        "fast": "Rápido",
+        "medium": "Médio",
+        "slow": "Lento",
+        "recommended": "Recomendado",
+        "walletOffline": "Sua carteira está offline. Verifique sua conexão e tente novamente.",
+        "sdkInsufficientFunds": "Saldo insuficiente para esta transação.",
+        "sdkAmountTooLow": "O valor é muito baixo para uma transação on-chain.",
+        "sdkNetworkError": "Erro de rede. Verifique sua conexão e tente novamente.",
+        "sdkGenericError": "Não foi possível estimar as taxas. Tente um valor diferente."
     },
     "SettingsScreen": {
         "staticQr": "QR Code estático imprimível",
@@ -2312,6 +2330,7 @@
         "setYourLightningAddress": "Defina seu endereço Lightning",
         "activated": "Ativado",
         "addressScreen": "Formas de receber pagamentos",
+        "nonCustodialAccount": "Conta não custodial",
         "tapUserName": "Toque para definir o nome de usuário",
         "notifications": "Notificações",
         "title": "Configurações",
@@ -2338,7 +2357,15 @@
         "logoutOneAccountAlertContent": "Você será desconectado da sessão vinculada a {identifier: string}.\nCertifique-se de que tem acesso para entrar novamente no futuro.",
         "logoutOneAccountConfirm": "Eu entendo. Por favor, sair.",
         "receiveCurrency": "Moeda de recebimento",
-        "displayCurrency": "Moeda de exibição"
+        "displayCurrency": "Moeda de exibição",
+        "AccountInformation": {
+            "identityLabel": "Identificador da carteira",
+            "backupStatusLabel": "Status do backup",
+            "backupStatusCompleted": "Backup completo",
+            "backupStatusNotCompleted": "Backup incompleto",
+            "loadError": "Não foi possível carregar as informações da conta.",
+            "lightningAddressLabel": "Endereço Lightning"
+        }
     },
     "NotificationSettingsScreen": {
         "title": "Configurações de Notificação",
@@ -2377,6 +2404,7 @@
         "level": "Nível {level: string}",
         "switchAccount": "Trocar conta",
         "pleaseWait": "Aguarde.",
+        "probeBalanceFailed": "Não foi possível verificar o saldo da carteira. Por favor, tente novamente.",
         "accountLevel": "Nível da Conta",
         "upgrade": "Atualize a sua conta",
         "logOutAndDeleteLocalData": "Sair da conta e apagar toda a informação local",
@@ -2416,6 +2444,8 @@
         "copiedAccountId": "Copiou o ID da sua conta para a área de transferência",
         "yourAccountId": "Seu ID de conta",
         "accountId": "ID da conta",
+        "publicKey": "Chave pública",
+        "copiedPublicKey": "Chave pública copiada para a área de transferência",
         "copy": "Copiar",
         "identityVerification": "Verificação de Identidade"
     },
@@ -2425,6 +2455,19 @@
         "fromThisDevice": "deste dispositivo?",
         "switchAccount": "Você trocou para outra conta",
         "removedAccount": "Você removeu a conta {identifier: string}."
+    },
+    "StablesatsRestriction": {
+        "modalTitle": "Stablesats não está disponível na sua região",
+        "modalBody": "Para acessar uma conta em dólares, crie uma conta não custodial.",
+        "createNew": "Criar nova",
+        "walletLabel": "não está disponível na sua região"
+    },
+    "ConvertDollarToBitcoinModal": {
+        "title": "A conta em Dólar não está mais disponível na sua região",
+        "body": "Transfira seu saldo em Dólar para Bitcoin",
+        "youHave": "Você tem",
+        "youGet": "Você recebe",
+        "approve": "Aprovar"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticação de dois fatores",
@@ -2446,7 +2489,9 @@
     },
     "DefaultWalletScreen": {
         "title": "Conta de recebimento padrão",
-        "info": "Sua Conta Bitcoin é para acumular sats, onde o valor USD se move com o mercado. Sua Conta Dólar é powered by Stablesats — mantém Bitcoin protegido para permanecer estável em termos de USD. Você sempre tem Bitcoin, mas o valor em dólares não muda."
+        "info": "Sua Conta Bitcoin é para acumular sats, onde o valor USD se move com o mercado. Sua Conta Dólar é powered by Stablesats — mantém Bitcoin protegido para permanecer estável em termos de USD. Você sempre tem Bitcoin, mas o valor em dólares não muda.",
+        "titleSelfCustodial": "Conta padrão",
+        "infoSelfCustodial": "Esta conta será usada por padrão ao receber e enviar. Pode alternar a qualquer momento."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2464,7 +2509,10 @@
         "header": "Sua Conta Dólar é powered by Stablesats",
         "body": "A Conta Dólar usa tecnologia Stablesats para manter o Bitcoin estável no preço USD. Você sempre tem Bitcoin — não dólares reais — mas o valor USD não flutua. Você pode enviar e receber Bitcoin normalmente, mas não é compatível com o sistema bancário tradicional.",
         "termsAndConditions": "Leia os Termos e Condições",
-        "learnMore": "Aprenda mais sobre Stablesats"
+        "learnMore": "Aprenda mais sobre Stablesats",
+        "headerSelfCustodial": "A sua conta Dólar contém stablecoins",
+        "bodySelfCustodial": "Na conta Dólar você detém stablecoins. Tokens lastreados em ativos cujo valor é mantido estável em relação ao USD. Você ainda não pode enviar e receber stablecoins. Ao enviar a partir da conta Dólar, seus stablecoins serão trocados e enviados como Bitcoin ao destinatário.",
+        "learnMoreSelfCustodial": "Saiba mais"
     },
     "SplashScreen": {
         "update": "Seu aplicativo está desatualizado. Uma atualização é necessária antes que o aplicativo possa ser usado.\n\nIsso pode ser feito na PlayStore para Android e Testflight para iOS"
@@ -2665,6 +2713,8 @@
         "accountInformation": "Informações da Conta",
         "trialAccount": "Conta teste",
         "blinkUser": "Usuário Blink",
+        "anonymous": "Anónimo",
+        "anonymousUser": "Utilizador anónimo",
         "blinkToBlink": "Blink para Blink",
         "transactionLimits": "Limites de transação",
         "activateWallet": "Ativar Carteira",
@@ -2722,6 +2772,7 @@
         "or": "ou",
         "openWallet": "Abrir carteira",
         "onchain": "Onchain",
+        "spark": "Spark",
         "paymentRequest": "Pedido de Pagamento",
         "phone": "Telefone",
         "phoneNumber": "Número de Telefone",
@@ -2742,6 +2793,7 @@
         "submit": "Enviar",
         "success": "Sucesso!",
         "dollarStablesats": "Dólar (Stablesats)",
+        "dollarStablecoin": "Dólar (Stablecoin)",
         "to": "Para",
         "total": "Total",
         "transactions": "Transações",
@@ -2783,7 +2835,8 @@
             "minChars": "Deve ter pelo menos {min} caracteres",
             "invalidPostalCode": "Código postal inválido, provavelmente um erro de digitação",
             "invalidRegion": "Seleção de região inválida"
-        }
+        },
+        "copied": "Copiado para a área de transferência"
     },
     "errors": {
         "generic": "Ocorreu um erro.\nPor favor, tente novamente mais tarde.",
@@ -2952,7 +3005,10 @@
             "emptyTransactions": "Nenhuma transação ainda",
             "addFunds": "Adicionar fundos",
             "transactionsTitle": "Transações",
-            "title": "Cartão Visa"
+            "title": "Cartão Visa",
+            "noCardAvailable": "Nenhum cartão disponível",
+            "cardNotUsable": "Este cartão não está disponível para uso no momento",
+            "cardUpdateError": "Não foi possível atualizar o status do cartão"
         },
         "validThruLabel": "VÁLIDO ATÉ",
         "networkVisa": "Visa",
@@ -3417,5 +3473,248 @@
                 "buttonText": "Fechar"
             }
         }
+    },
+    "BackupScreen": {
+        "title": "Back up your wallet",
+        "description": "Choose a backup method to secure your funds",
+        "BackupMethod": {
+            "title": "Escolha seu método de backup",
+            "subtitle": "Recomendamos {provider} para novos usuários.",
+            "googleDrive": "Google Drive",
+            "appleICloud": "Apple iCloud",
+            "passwordManager": "Gerenciador de senhas",
+            "manualBackup": "Backup manual",
+            "passwordManagerBackupSaved": "Backup salvo no gerenciador de senhas",
+            "passwordManagerBackupFailed": "Falha ao salvar o backup",
+            "passwordManagerUnavailable": "Nenhum gerenciador de senhas disponível neste dispositivo. Use o backup do Drive ou salve sua frase de 12 palavras manualmente."
+        },
+        "ManualBackup": {
+            "Alerts": {
+                "title": "Mantenha sua frase de backup em segredo!",
+                "check1": "Entendo que ninguém pode recuperar minha carteira se eu perder esta frase",
+                "check2": "Entendo que se alguém obtiver esta frase, pode roubar todos os meus fundos.",
+                "check3": "Ninguém está me pedindo estas informações por mensagem ou ligação"
+            },
+            "Phrase": {
+                "headerTitle": "Frase de recuperação",
+                "sparkCompatible": "Esta frase de backup funciona em qualquer {sparkCompatibleLink}",
+                "sparkCompatibleLink": "carteira compatível com Spark",
+                "copiedToast": "Frase de backup copiada para a área de transferência",
+                "saveItNow": "Salve agora",
+                "savedConfirm": "Já salvei",
+                "copy": "Copiar",
+                "continueButton": "Continuar",
+                "testBackup": "Teste seu backup"
+            },
+            "Confirm": {
+                "headerTitle": "Confirmar frase de backup",
+                "subtitle": "Uma verificação rápida se você a escreveu corretamente",
+                "enterWord": "Digite a palavra",
+                "enterWords": "Digite as palavras",
+                "confirm": "Confirmar",
+                "incorrectWord": "Palavra incorreta, verifique a ordem"
+            },
+            "Success": {
+                "title": "Bem-vindo ao Blink não-custodial",
+                "testSuccess": "Sua frase de backup está correta"
+            }
+        },
+        "CloudBackup": {
+            "title": "Vamos fazer backup da sua carteira",
+            "description": "Salvaremos uma cópia da sua frase de backup no seu {provider}.",
+            "encryptCheckbox": "Criptografar com senha adicional",
+            "password": "Senha",
+            "passwordPlaceholder": "(mínimo 12 caracteres)",
+            "confirmPassword": "Confirmar senha",
+            "confirmPasswordPlaceholder": "Digite a senha novamente",
+            "continueButton": "Continuar",
+            "importantTitle": "Importante",
+            "importantMessage": "O Blink não armazena esta senha. Se você perdê-la, {bold} recuperar sua carteira.",
+            "importantMessageBold": "não poderemos",
+            "passwordTooShort": "Mínimo 12 caracteres",
+            "passwordMismatch": "As senhas não coincidem",
+            "uploadSuccess": "Backup salvo no {provider}",
+            "uploadFailed": "Falha ao enviar o backup",
+            "signInFailed": "Falha ao iniciar sessão em {provider}",
+            "cloudNotAvailable": "O iCloud Drive não está disponível. Inicie sessão no iCloud em Ajustes e ative o iCloud Drive.",
+            "networkError": "Erro de rede. Verifique a sua ligação e tente novamente.",
+            "existingBackupTitle": "Backup encontrado",
+            "existingBackupMessage": "Já existe um backup no seu {provider}. Deseja sobrescrevê-lo?",
+            "existingBackupMessageWithDetails": "Já existe um backup no seu {provider}.\n\nEndereço Lightning: {address}\nCriado: {createdAt}\n\nDeseja sobrescrevê-lo?",
+            "existingBackupUnknownAddress": "Não disponível",
+            "existingBackupUnknownCreatedAt": "Desconhecido",
+            "overwrite": "Sobrescrever"
+        }
+    },
+    "AccountMigration": {
+        "moveToNonCustodial": "Migrar para não custodial",
+        "explainerTitle": "O que significa migrar para não custodial?",
+        "explainerStep1": "Você criará uma conta não custodial no protocolo Spark, <link>saiba mais aqui</link>",
+        "explainerStep2": "Transferiremos seus fundos para sua nova conta não custodial e sua conta atual será excluída",
+        "explainerStep3": "Continue usando o Blink como de costume",
+        "letsMove": "Vamos lá",
+        "transferringFunds": "Transferindo seus fundos. Deve ser concluído em poucos segundos."
+    },
+    "AccountTypeSelectionScreen": {
+        "custodialLabel": "Custodiada",
+        "selfCustodialLabel": "Não custodiada",
+        "custodialDescription": "Nós custodiamos os fundos em seu nome",
+        "selfCustodialDescription": "Somente você pode acessar os fundos",
+        "continueButton": "Continuar",
+        "descriptionDefault": "Por favor, escolha seu tipo preferido de Blink.",
+        "descriptionSelected": "Por favor, escolha o tipo de conta.",
+        "chooseMethod": "Escolher método",
+        "restoreComingSoonTitle": "Em breve",
+        "restoreComingSoonDescription": "A função de restauração estará disponível em uma atualização futura.",
+        "createFailed": "Falha ao criar a carteira. Por favor, tente novamente.",
+        "selfCustodialDisabled": "O modo não custodial está temporariamente indisponível."
+    },
+    "RestoreScreen": {
+        "title": "Restaurar carteira",
+        "description": "Recupere sua carteira a partir de um backup",
+        "phraseTitle": "Restaurar carteira",
+        "phraseSubtitleStep1": "Digite as primeiras 6 palavras da sua frase de backup",
+        "phraseSubtitleStep2": "Digite o restante da sua frase de backup",
+        "nextWords": "Próximas 6 palavras",
+        "paste": "Colar",
+        "enterWord": "Palavra",
+        "invalidMnemonic": "Frase de backup inválida. Verifique se a ordem das palavras está correta.",
+        "restoring": "Restaurando sua carteira...",
+        "restoreSuccess": "Carteira restaurada com sucesso",
+        "restoreFailed": "Falha ao restaurar carteira. Tente novamente.",
+        "restore": "Restaurar carteira",
+        "noBackupFound": "Nenhum backup encontrado",
+        "noBackupDescription": "Não encontramos um backup. Você pode digitar sua frase de backup manualmente.",
+        "enterPassword": "Digite sua senha de criptografia",
+        "wrongPassword": "Senha incorreta. Tente novamente.",
+        "pickBackupTitle": "Escolha uma carteira",
+        "pickBackupDescription": "Selecione um backup para restaurar"
+    },
+    "BackupNudge": {
+        "title": "Seus fundos estão em risco",
+        "description": "Proteja sua carteira agora. Leva apenas um minuto.",
+        "cta": "Proteger carteira",
+        "settingsWarning": "Faça backup da sua carteira. Se perder este dispositivo, perderá seus fundos.",
+        "modalTitle": "Proteja seus fundos",
+        "modalDescription": "Recomendamos fortemente que você faça backup da sua carteira para evitar uma perda total de fundos caso perca este dispositivo.",
+        "secureMe": "Proteger carteira"
+    },
+    "StableBalance": {
+        "title": "Saldo estável",
+        "description": "Mantenha um saldo em USD alimentado por USDB no Spark.",
+        "balanceLabelBtc": "Saldo · SATS",
+        "balanceLabelUsd": "Saldo · USD",
+        "settingsRowTitle": "Saldo Estável",
+        "settingsTitle": "Saldo Estável",
+        "settingsDescription": "Mantenha parte da sua carteira em USD. Converta entre BTC e USD manualmente a qualquer momento com a ação Converter.",
+        "activationLabel": "Ativo",
+        "activeHint": "A tua carteira mantém USD via USDB.",
+        "inactiveHint": "A tua carteira só mantém BTC.",
+        "deactivateWarningBody": "Ainda tens {amount:string}. Converte primeiro para BTC, ou o teu saldo em USD ficará oculto até reativares o Stable Balance.",
+        "toggleFailedToast": "Não foi possível atualizar o Stable Balance. Tenta novamente.",
+        "toggleModal": {
+            "activateTitle": "Ativar saldo estável",
+            "activateBody": "Seu saldo em BTC será convertido em USDB. Esta é a taxa de conversão estimada.",
+            "activateConfirm": "Ativar",
+            "deactivateTitle": "Desativar saldo estável",
+            "deactivateBody": "Seu saldo em USDB será convertido de volta em BTC. Esta é a taxa de conversão estimada.",
+            "deactivateConfirm": "Desativar",
+            "cancel": "Cancelar"
+        },
+        "minimumConversion": "Conversão mínima: {amount:string}",
+        "conversionUnavailable": "A conversão está temporariamente indisponível. Tenta novamente."
+    },
+    "BackendFeatureGate": {
+        "title": "Recurso indisponível",
+        "description": "Este recurso requer uma conta custodial.",
+        "signInTitle": "Login necessário",
+        "signInDescription": "Faça login na sua conta custodial para usar {featureName}.",
+        "noAccountTitle": "Conta custodial necessária",
+        "noAccountDescription": "{featureName} requer uma conta custodial da Blink.",
+        "featureCircles": "Círculos",
+        "featureEarn": "Aprenda",
+        "featureCard": "Cartão"
+    },
+    "WalletCreationScreen": {
+        "creating": "Criando sua carteira...",
+        "errorTitle": "Falha ao criar carteira",
+        "errorDescription": "Algo deu errado. Por favor, tente novamente.",
+        "retry": "Tentar novamente"
+    },
+    "TransactionDescription": {
+        "sparkTransfer": "Transferência Spark",
+        "lightningPayment": "Pagamento Lightning",
+        "onchainDeposit": "Depósito On-chain",
+        "onchainWithdrawal": "Saque On-chain",
+        "conversionFromBitcoin": "Conversão de Bitcoin",
+        "conversionToBitcoin": "Conversão para Bitcoin",
+        "conversionFromToken": "Conversão de {token}",
+        "conversionToToken": "Conversão para {token}",
+        "tokenTransfer": "Transferência {token}",
+        "payTo": "Pagar a {address}",
+        "payment": "Pagamento"
+    },
+    "SelfCustodialOffline": {
+        "title": "A carteira está offline",
+        "description": "A sua carteira não custodial não consegue alcançar a rede neste momento. Tente novamente quando voltar a estar online.",
+        "retry": "Tentar novamente"
+    },
+    "SelfCustodialError": {
+        "insufficientFunds": "Fundos insuficientes para cobrir o valor e as taxas de rede. Tente um valor menor.",
+        "belowMinimum": "O valor está abaixo do mínimo exigido para este pagamento. Tente um valor maior.",
+        "networkError": "Problema de conexão de rede. Verifique sua conexão e tente novamente.",
+        "invalidInput": "Os detalhes do pagamento parecem inválidos. Por favor, revise e tente novamente.",
+        "generic": "Não foi possível concluir o pagamento. Tente novamente em um momento, ou use um valor menor."
+    },
+    "UnclaimedDeposit": {
+        "title": "Você tem {count} depósito(s) não reclamado(s)",
+        "description": "Total: {sats} sats disponíveis para reivindicar",
+        "claim": "Reivindicar agora",
+        "claiming": "Reivindicando...",
+        "screenTitle": "Depósitos não reclamados",
+        "cardTitle": "Reclamar {sats} sats",
+        "claimWithFee": "Reclamar (taxa máx: {fee} sats)",
+        "refund": "Reembolsar",
+        "refunding": "Reembolsando...",
+        "immature": "Aguardando confirmações...",
+        "feeExceeded": "As taxas de rede estão muito altas para reclamar ({requiredFee} sats necessários). Tente novamente mais tarde ou reembolse para um endereço on-chain.",
+        "missingUtxo": "Este depósito não está mais disponível na rede.",
+        "belowDustLimit": "Este depósito é muito pequeno para reclamar após as taxas. Aguarde taxas mais baixas ou reembolse para um endereço on-chain.",
+        "genericError": "Não foi possível reclamar: {error}",
+        "claimFailed": "Reclamo falhou: {error}",
+        "refundFailed": "Reembolso falhou: {error}",
+        "refundAddress": "Endereço Bitcoin para reembolso",
+        "feeRate": "Taxa de rede",
+        "feeRateFastest": "Mais rápido (~{sats} sats) ~10 min",
+        "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
+        "feeRateHour": "Econômico (~{sats} sats) ~60 min",
+        "feeRateUnit": "{rate} sat/vB",
+        "feeRateUnavailable": "Não foi possível carregar as taxas de rede. Verifique a conexão e tente novamente.",
+        "refundNow": "Reembolsar agora",
+        "refundSuccess": "Reembolso iniciado com sucesso",
+        "claimSuccess": "Depósito reclamado com sucesso",
+        "error": "Não é possível reclamar este depósito"
+    },
+    "FeatureUnavailable": {
+        "SelfCustodial": {
+            "title": "Temporariamente indisponível",
+            "description": "Os recursos de carteira autocustodial estão temporariamente desativados. Sua carteira e fundos estão seguros. Volte mais tarde."
+        }
+    },
+    "NetworkStatus": {
+        "degradedBanner": "A rede Spark está degradada no momento. Os pagamentos podem demorar mais."
+    },
+    "SelfCustodialDelete": {
+        "dangerZoneImportantTitle": "Importante",
+        "dangerZoneBulletReinstated": "A conta excluída não pode ser restabelecida",
+        "dangerZoneBulletPermanent": "A exclusão da conta é permanente",
+        "dangerZoneBulletEmpty": "Certifique-se de que a conta esteja vazia",
+        "dangerZoneDeleteButton": "Excluir conta e dados",
+        "confirmModalTitle": "Confirmar exclusão da conta",
+        "confirmModalTypeToConfirm": "Digite \"{delete: string}\" para confirmar",
+        "hasFundsWarningTitle": "Atenção",
+        "hasFundsWarningBody": "Sua carteira tem um saldo de {balance}. Para sua segurança, não permitimos a exclusão de contas com fundos.",
+        "hasFundsWarningHelper": "Para prosseguir com a exclusão, esvazie sua conta ou faça uma doação a economias circulares.",
+        "hasFundsWarningButton": "Voltar"
     }
 }

@@ -1,6 +1,12 @@
 import { useMemo } from "react"
 
-import { useRealtimePriceQuery, WalletCurrency } from "@app/graphql/generated"
+import crashlytics from "@react-native-firebase/crashlytics"
+
+import {
+  useRealtimePriceQuery,
+  useRealtimePriceUnauthedQuery,
+  WalletCurrency,
+} from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import {
   createToDisplayAmount,
@@ -9,29 +15,46 @@ import {
   moneyAmountIsCurrencyType,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { AccountType } from "@app/types/wallet"
+
+import { useAccountRegistry } from "./use-account-registry"
+import { useEffectiveDisplayCurrency } from "./use-effective-display-currency"
 
 export const SATS_PER_BTC = 100000000
 
-const usdDisplayCurrency = {
-  symbol: "$",
-  id: "USD",
-  fractionDigits: 2,
-}
-
-const defaultDisplayCurrency = usdDisplayCurrency
+const PRICE_POLL_INTERVAL_MS = 5 * 60 * 1000
 
 export const usePriceConversion = () => {
   const isAuthed = useIsAuthed()
-  const { data } = useRealtimePriceQuery({ skip: !isAuthed })
+  const { activeAccount } = useAccountRegistry()
+  const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
+  const { displayCurrency } = useEffectiveDisplayCurrency()
 
-  const displayCurrency =
-    data?.me?.defaultAccount?.realtimePrice?.denominatorCurrency ||
-    defaultDisplayCurrency.id
+  const skipAuthed = !isAuthed || isSelfCustodial
+  const { data: authedData } = useRealtimePriceQuery({
+    skip: skipAuthed,
+    fetchPolicy: "cache-and-network",
+  })
+  const authedPrice = authedData?.me?.defaultAccount?.realtimePrice
+
+  const skipUnauthed = !isSelfCustodial && (isAuthed || Boolean(authedPrice))
+  const { data: unauthedData } = useRealtimePriceUnauthedQuery({
+    skip: skipUnauthed,
+    variables: { currency: displayCurrency },
+    pollInterval: skipUnauthed ? undefined : PRICE_POLL_INTERVAL_MS,
+    fetchPolicy: "cache-and-network",
+  })
+
+  const candidatePrice = isSelfCustodial
+    ? unauthedData?.realtimePrice
+    : authedPrice ?? unauthedData?.realtimePrice
+
+  // Discard cached price when its denominator disagrees with the active preference.
+  const realtimePrice =
+    candidatePrice?.denominatorCurrency === displayCurrency ? candidatePrice : undefined
+
   let displayCurrencyPerSat = NaN
   let displayCurrencyPerCent = NaN
-
-  const realtimePrice = data?.me?.defaultAccount?.realtimePrice
 
   if (realtimePrice) {
     displayCurrencyPerSat =

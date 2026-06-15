@@ -25,14 +25,12 @@
     }
     // flake-utils.lib.eachSystem ["aarch64-darwin" "x86_64-darwin" "x86_64-linux"] (
       system: let
-        overlays = [
-          (self: super: {
-            nodejs = super.nodejs_20;
-            yarn = super.yarn.override {
-              nodejs = super.nodejs_20;
-            };
-          })
-        ];
+        nodejsOverlay = self: super: {
+          nodejs = super.nodejs_24;
+          yarn = super.yarn.override {
+            nodejs = super.nodejs_24;
+          };
+        };
 
         inherit (nixpkgs) lib;
         pkgs = import nixpkgs {
@@ -40,6 +38,7 @@
           overlays = [
             self.overlay
             ruby-nix.overlays.default
+            nodejsOverlay
           ];
         };
 
@@ -122,8 +121,8 @@
               echo no | avdmanager create avd --force -n Pixel_API_35 --abi "google_apis_playstore/$ARCH" --package "system-images;android-35;google_apis_playstore;$ARCH" --device 'pixel_8'
             fi
 
-            XCODE_VERSION="16.4"
-            XCODE_BUILD="16F6" # When updating xcode version, get it by running xcodes installed
+            XCODE_VERSION="26.5"
+            XCODE_BUILD="17F42" # When updating xcode version, get it by running xcodes installed
             if [[ $(uname) == "Darwin" ]] && [ -z "$CI" ]; then
               sudo xcodes install $XCODE_VERSION 2>/dev/null
               sudo xcodes installed

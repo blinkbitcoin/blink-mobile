@@ -4,7 +4,7 @@ import validator from "validator"
 
 import { gql } from "@apollo/client"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Input, Text, makeStyles } from "@rn-vui/themed"
 
 import { testProps } from "@app/utils/testProps"
@@ -82,7 +82,9 @@ export const EmailRegistrationInitiateScreen: React.FC<
   const styles = useStyles()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "emailRegistrationInitiate">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "emailRegistrationInitiate">
+    >()
 
   const [emailInput, setEmailInput] = React.useState<string>("")
   const [errorMessage, setErrorMessage] = React.useState<string>("")

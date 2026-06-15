@@ -20,7 +20,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button, Text, makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
@@ -50,7 +50,7 @@ export const DeveloperScreen: React.FC = () => {
   const { logout } = useLogout()
   const { saveProfile } = useSaveSessionProfile()
 
-  const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const testBulletins = useTestBulletins()
 
   const { appConfig, saveTokenAndInstance } = useAppConfig()

@@ -99,8 +99,8 @@ describe("useCardTransactions", () => {
     expect(result.current.transactions.length).toBeGreaterThan(0)
     const allTxs = result.current.transactions.flatMap((g) => g.transactions)
     expect(allTxs).toHaveLength(2)
-    expect(allTxs[0].merchantName).toBe("Coffee Shop")
-    expect(allTxs[1].merchantName).toBe("Grocery")
+    const merchantNames = allTxs.map((tx) => tx.merchantName).sort()
+    expect(merchantNames).toEqual(["Coffee Shop", "Grocery"])
   })
 
   it("deduplicates edges with same id", () => {

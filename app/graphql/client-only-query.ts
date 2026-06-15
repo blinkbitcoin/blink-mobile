@@ -6,13 +6,10 @@ import { ApolloClient, gql } from "@apollo/client"
 import {
   BetaDocument,
   BetaQuery,
-  ColorSchemeDocument,
-  ColorSchemeQuery,
   CountryCodeDocument,
   CountryCodeQuery,
   FeedbackModalShownDocument,
   FeedbackModalShownQuery,
-  HasPromptedSetDefaultAccountDocument,
   HiddenBalanceToolTipDocument,
   HiddenBalanceToolTipQuery,
   HideBalanceDocument,
@@ -47,10 +44,6 @@ export default gql`
     beta @client
   }
 
-  query colorScheme {
-    colorScheme @client # "system" | "light" | "dark"
-  }
-
   query countryCode {
     countryCode @client
   }
@@ -66,10 +59,6 @@ export default gql`
 
   query feedbackModalShown {
     feedbackModalShown @client
-  }
-
-  query hasPromptedSetDefaultAccount {
-    hasPromptedSetDefaultAccount @client
   }
 
   query introducingCirclesModalShown {
@@ -151,20 +140,6 @@ export const activateBeta = (client: ApolloClient<unknown>, status: boolean) => 
   }
 }
 
-export const updateColorScheme = (client: ApolloClient<unknown>, colorScheme: string) => {
-  try {
-    client.writeQuery<ColorSchemeQuery>({
-      query: ColorSchemeDocument,
-      data: {
-        __typename: "Query",
-        colorScheme,
-      },
-    })
-  } catch {
-    console.warn("impossible to update color scheme")
-  }
-}
-
 export const updateCountryCode = (
   client: ApolloClient<unknown>,
   countryCode: CountryCode,
@@ -210,20 +185,6 @@ export const setFeedbackModalShown = (client: ApolloClient<unknown>, shown: bool
     })
   } catch {
     console.warn("unable to update feedbackModalShown")
-  }
-}
-
-export const setHasPromptedSetDefaultAccount = (client: ApolloClient<unknown>) => {
-  try {
-    client.writeQuery({
-      query: HasPromptedSetDefaultAccountDocument,
-      data: {
-        __typename: "Query",
-        hasPromptedSetDefaultAccount: true,
-      },
-    })
-  } catch {
-    console.warn("impossible to update hasPromptedSetDefaultAccount")
   }
 }
 

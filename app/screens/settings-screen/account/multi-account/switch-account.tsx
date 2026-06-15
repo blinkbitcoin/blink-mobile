@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles } from "@rn-vui/themed"
 import { Screen } from "@app/components/screen"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+
+import { ProfileRow } from "../../self-custodial/profile-row"
 
 import { ProfileScreen } from "./profile"
 import { fetchProfiles } from "./utils"
@@ -21,7 +24,9 @@ export const SwitchAccount: React.FC = () => {
   } = useAppConfig()
   const { saveProfile } = useSaveSessionProfile()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  const { selfCustodialEntries } = useAccountRegistry()
 
   const [profiles, setProfiles] = useState<ProfileProps[]>([])
   const [nextProfileToken, setNextProfileToken] = useState<string>()
@@ -61,6 +66,13 @@ export const SwitchAccount: React.FC = () => {
             {...profile}
             isFirstItem={index === 0}
             nextProfileToken={nextProfileToken}
+          />
+        ))}
+        {selfCustodialEntries.map((entry, index) => (
+          <ProfileRow
+            key={entry.id}
+            entry={entry}
+            isFirstItem={profiles.length === 0 && index === 0}
           />
         ))}
       </ScrollView>

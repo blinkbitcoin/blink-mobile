@@ -24,7 +24,7 @@ import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import analytics from "@react-native-firebase/analytics"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme, Input } from "@rn-vui/themed"
 
 import { Screen } from "../../components/screen"
@@ -169,7 +169,7 @@ export const PhoneLoginValidationScreen: React.FC<PhoneLoginValidationScreenProp
   route,
 }) => {
   const styles = useStyles()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const [status, setStatus] = useState<ValidatePhoneCodeStatusType>(
     ValidatePhoneCodeStatus.WaitingForCode,

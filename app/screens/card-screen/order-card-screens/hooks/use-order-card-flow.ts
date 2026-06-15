@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -52,7 +52,7 @@ const LAST_STEP = Step.Confirm
 export const useOrderCardFlow = ({
   initialAddress,
 }: UseOrderCardFlowParams): UseOrderCardFlowReturn => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { countryCode: detectedCountry } = useDeviceLocation()
 
   const [step, setStep] = useState<StepType>(FIRST_STEP)

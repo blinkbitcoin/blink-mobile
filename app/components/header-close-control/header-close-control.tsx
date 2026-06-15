@@ -1,6 +1,6 @@
 import React from "react"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -18,7 +18,7 @@ const HeaderCloseButton: React.FC<HeaderCloseControlParams> = ({
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   return (
     <GaloyIconButton

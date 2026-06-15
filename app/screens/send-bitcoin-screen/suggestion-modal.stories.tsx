@@ -1,7 +1,7 @@
 import React from "react"
 
 import { MockedProvider } from "@apollo/client/testing"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Meta } from "@storybook/react"
 
 import { StoryScreen } from "../../../.storybook/views"
@@ -16,9 +16,9 @@ export default {
   decorators: [(Story) => <StoryScreen>{Story()}</StoryScreen>],
 } as Meta<typeof SuggestionModal>
 
-const navigationMock: StackNavigationProp<RootStackParamList> = {
+const navigationMock: NativeStackNavigationProp<RootStackParamList> = {
   popToTop: () => {},
-} as StackNavigationProp<RootStackParamList>
+} as NativeStackNavigationProp<RootStackParamList>
 
 const params = {
   navigation: navigationMock,

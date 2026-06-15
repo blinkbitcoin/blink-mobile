@@ -1,3 +1,5 @@
+import ReactNativeHapticFeedback from "react-native-haptic-feedback"
+
 import {
   toMajorUnit,
   toMinorUnit,
@@ -6,6 +8,8 @@ import {
   maskDigits,
   maskString,
   normalizeString,
+  pickRandomIndices,
+  triggerHapticFeedback,
 } from "@app/utils/helper"
 
 describe("ellipsizeMiddle", () => {
@@ -211,6 +215,58 @@ describe("formatCardDisplayNumber", () => {
   it("handles totalDigits smaller than groupSize without crashing", () => {
     expect(formatCardDisplayNumber("12", true, { totalDigits: 2, groupSize: 4 })).toBe(
       "12",
+    )
+  })
+})
+
+describe("pickRandomIndices", () => {
+  it("returns the correct number of indices", () => {
+    const result = pickRandomIndices(12, 3)
+    expect(result).toHaveLength(3)
+  })
+
+  it("returns sorted indices", () => {
+    const result = pickRandomIndices(12, 3)
+    expect(result).toEqual([...result].sort((a, b) => a - b))
+  })
+
+  it("returns unique indices", () => {
+    const result = pickRandomIndices(12, 3)
+    expect(new Set(result).size).toBe(3)
+  })
+
+  it("returns indices within range", () => {
+    const result = pickRandomIndices(12, 3)
+    result.forEach((index) => {
+      expect(index).toBeGreaterThanOrEqual(0)
+      expect(index).toBeLessThan(12)
+    })
+  })
+
+  it("returns all indices when count equals total", () => {
+    const result = pickRandomIndices(3, 3)
+    expect(result).toEqual([0, 1, 2])
+  })
+
+  it("returns all indices when count exceeds total", () => {
+    const result = pickRandomIndices(3, 5)
+    expect(result).toEqual([0, 1, 2])
+  })
+})
+
+describe("triggerHapticFeedback", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("triggers the given type while ignoring Android system settings", () => {
+    triggerHapticFeedback("notificationSuccess")
+
+    expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith(
+      "notificationSuccess",
+      {
+        ignoreAndroidSystemSettings: true,
+      },
     )
   })
 })

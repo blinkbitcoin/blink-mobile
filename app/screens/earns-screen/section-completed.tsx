@@ -3,7 +3,7 @@ import { Text, View } from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button } from "@rn-vui/base"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -67,7 +67,7 @@ export const SectionCompleted: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sectionCompleted">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "sectionCompleted">>()
 
   const { amount, sectionTitle, isAvailable } = route.params
   const { LL } = useI18nContext()

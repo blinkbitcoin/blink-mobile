@@ -154,7 +154,7 @@ af, ar, ca, cs, da, de, el, en, es, fr, hr, hu, hy, it, ja, ko, ms, nl, no, pl, 
 ### Build Tools
 | Tool | Purpose |
 |------|---------|
-| Xcode 16.4 | iOS builds |
+| Xcode 26.5 | iOS builds |
 | Android SDK 35 | Android builds |
 | JDK 17 | Android compilation |
 | CocoaPods | iOS dependency management |

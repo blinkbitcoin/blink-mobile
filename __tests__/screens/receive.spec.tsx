@@ -11,6 +11,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
 
 import { ContextForScreen } from "./helper"
+import { flushEffects } from "../helpers/flush-effects"
 
 const makeQueryResult = (defaultWalletId = "btc-wallet-id") => ({
   loading: false,
@@ -155,6 +156,15 @@ jest.mock("@app/hooks", () => {
   }
 })
 
+jest.mock("@app/hooks/use-stablesats-restricted", () => ({
+  useStablesatsRestricted: () => false,
+}))
+
+jest.mock("@app/hooks/use-device-location", () => ({
+  __esModule: true,
+  default: () => ({ countryCode: "SV", loading: false }),
+}))
+
 jest.mock("@app/hooks/use-display-currency", () => {
   const info = {
     BTC: {
@@ -203,10 +213,25 @@ jest.mock("react-native-nfc-manager", () => ({
     isSupported: jest.fn().mockResolvedValue(false),
     start: jest.fn(),
     stop: jest.fn(),
+    requestTechnology: jest.fn().mockResolvedValue(undefined),
+    // No tag found: ModalNfc init alerts "not compatible" and dismisses cleanly
+    getTag: jest.fn().mockResolvedValue(null),
+    cancelTechnologyRequest: jest.fn().mockResolvedValue(undefined),
   },
+  NfcTech: { Ndef: "Ndef" },
+  Ndef: { text: { decodePayload: jest.fn(() => "") } },
 }))
 
-jest.mock("@gorhom/bottom-sheet")
+// The invoice fixtures in this spec are intentionally fake (invalid bech32
+// checksum), which makes the real decodeInvoiceString throw and prToDateString
+// console.error on every quote generation, flooding CI logs. Return no expiry
+// instead — the same value prToDateString produced via its catch path — so
+// screen behavior is unchanged (no countdown mounts) and the logs stay clean.
+// useCountdown itself is covered by __tests__/hooks/use-countdown.spec.ts.
+jest.mock("@blinkbitcoin/blink-client", () => ({
+  ...jest.requireActual("@blinkbitcoin/blink-client"),
+  decodeInvoiceString: jest.fn(() => ({ timeExpireDateString: undefined })),
+}))
 
 jest.mock("react-native-haptic-feedback", () => ({
   trigger: jest.fn(),
@@ -289,6 +314,18 @@ const flushAsync = () =>
       }),
   )
 
+// Some app handlers log placeholder/diagnostic messages via console.log when
+// pressed (e.g. "starting scanNFCTag" in modal-nfc); capture them so expected logs don't pollute CI logs.
+let consoleLogSpy: jest.SpyInstance
+
+beforeEach(() => {
+  consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
+})
+
+afterEach(() => {
+  consoleLogSpy.mockRestore()
+})
+
 describe("ReceiveScreen", () => {
   let LL: ReturnType<typeof i18nObject>
 
@@ -311,7 +348,7 @@ describe("ReceiveScreen", () => {
       { name: "payment identifier", testId: "readable-payment-request" },
     ])("renders $name", async ({ testId }) => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -324,7 +361,7 @@ describe("ReceiveScreen", () => {
 
     it("renders copy and share action buttons", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -340,7 +377,7 @@ describe("ReceiveScreen", () => {
   describe("PayCode flow (username present)", () => {
     it("renders PayCode QR on page 0", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -353,7 +390,7 @@ describe("ReceiveScreen", () => {
 
     it("shows lightning address as payment identifier", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -365,7 +402,7 @@ describe("ReceiveScreen", () => {
 
     it("copies paycode to clipboard when pressing copy button", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -381,7 +418,7 @@ describe("ReceiveScreen", () => {
 
     it("copies paycode when tapping payment identifier", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -401,7 +438,7 @@ describe("ReceiveScreen", () => {
       })
 
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -423,7 +460,7 @@ describe("ReceiveScreen", () => {
   describe("OnChain flow (page 1)", () => {
     it("fetches onchain address on mount", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -431,11 +468,13 @@ describe("ReceiveScreen", () => {
       await waitFor(() => {
         expect(onChainAddressCurrentMock).toHaveBeenCalled()
       })
+
+      await flushEffects()
     })
 
     it("renders OnChain QR on page 1", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -449,7 +488,7 @@ describe("ReceiveScreen", () => {
 
     it("shows truncated onchain address after swiping to page 1", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -466,7 +505,7 @@ describe("ReceiveScreen", () => {
 
     it("copies onchain address when pressing copy on page 1", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -492,7 +531,7 @@ describe("ReceiveScreen", () => {
       })
 
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -520,7 +559,7 @@ describe("ReceiveScreen", () => {
   describe("Note input", () => {
     it("is editable on onchain page", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -540,7 +579,7 @@ describe("ReceiveScreen", () => {
   describe("Wallet toggle (BTC default)", () => {
     it("switches from PayCode to Lightning when toggling wallet", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -560,7 +599,7 @@ describe("ReceiveScreen", () => {
 
     it("reverts to PayCode when toggling back to BTC with no content", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -598,7 +637,7 @@ describe("ReceiveScreen", () => {
 
     it("starts on Lightning instead of PayCode", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -615,7 +654,7 @@ describe("ReceiveScreen", () => {
 
     it("reverts to PayCode when toggling to BTC with no content", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -648,7 +687,7 @@ describe("ReceiveScreen", () => {
 
     it("opens amount input when pressing NFC icon on PayCode", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -670,7 +709,7 @@ describe("ReceiveScreen", () => {
 
     it("opens amount input when pressing NFC icon on Lightning invoice", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -698,9 +737,9 @@ describe("ReceiveScreen", () => {
       })
     })
 
-    it("applies NFC amount only after modal dismiss animation completes", async () => {
+    it("applies NFC amount when Set Amount is pressed", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -722,32 +761,20 @@ describe("ReceiveScreen", () => {
       fireEvent.press(screen.getByTestId("Key 2"))
       await flushAsync()
 
-      jest.useFakeTimers()
-      try {
-        fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
-
-        expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
-        act(() => {
-          jest.advanceTimersByTime(39)
-        })
-        expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
-        act(() => {
-          jest.advanceTimersByTime(1)
-        })
-      } finally {
-        jest.useRealTimers()
-      }
+      fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
 
       await waitFor(() => {
         expect(lnInvoiceCreateMock).toHaveBeenCalled()
       })
+
+      await flushEffects()
     })
   })
 
   describe("data hooks integration", () => {
     it("calls paymentRequestQuery on mount", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -759,7 +786,7 @@ describe("ReceiveScreen", () => {
 
     it("calls priceConversion hook on mount", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -777,7 +804,7 @@ describe("ReceiveScreen", () => {
 
     it("switches to Dollar wallet when toggling from PayCode", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -799,7 +826,7 @@ describe("ReceiveScreen", () => {
 
     it("round-trips PayCode → Lightning → PayCode", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -840,7 +867,7 @@ describe("ReceiveScreen", () => {
 
     it("starts Lightning with Dollar wallet", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -856,7 +883,7 @@ describe("ReceiveScreen", () => {
 
     it("toggles to PayCode with Bitcoin wallet", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -877,7 +904,7 @@ describe("ReceiveScreen", () => {
 
     it("round-trips Lightning → PayCode → Lightning", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -912,7 +939,7 @@ describe("ReceiveScreen", () => {
   describe("Carousel page navigation does not change wallet", () => {
     it("BTC default: swipe to OnChain and back keeps Lightning wallet", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -937,7 +964,7 @@ describe("ReceiveScreen", () => {
       paymentRequestQueryMock.mockReturnValue(makeQueryResult("usd-wallet-id"))
 
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -965,7 +992,7 @@ describe("ReceiveScreen", () => {
 
     it("toggle USD on OnChain then back shows Dollar on page 0", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -994,7 +1021,7 @@ describe("ReceiveScreen", () => {
 
     it("toggle on OnChain syncs wallet to page 0", async () => {
       render(
-        <ContextForScreen>
+        <ContextForScreen headerShown>
           <ReceiveScreen />
         </ContextForScreen>,
       )
@@ -1045,7 +1072,7 @@ describe("Setting amount preserves wallet after round-trip toggle", () => {
 
   it("BTC default: keeps Bitcoin wallet", async () => {
     render(
-      <ContextForScreen>
+      <ContextForScreen headerShown>
         <ReceiveScreen />
       </ContextForScreen>,
     )
@@ -1092,7 +1119,7 @@ describe("Setting amount preserves wallet after round-trip toggle", () => {
     paymentRequestQueryMock.mockReturnValue(makeQueryResult("usd-wallet-id"))
 
     render(
-      <ContextForScreen>
+      <ContextForScreen headerShown>
         <ReceiveScreen />
       </ContextForScreen>,
     )
@@ -1154,7 +1181,7 @@ describe("Expiration time follows wallet currency", () => {
 
   it("BTC default: direct set amount uses 24h expiration", async () => {
     render(
-      <ContextForScreen>
+      <ContextForScreen headerShown>
         <ReceiveScreen />
       </ContextForScreen>,
     )
@@ -1190,7 +1217,7 @@ describe("Expiration time follows wallet currency", () => {
 
   it("BTC default: uses 24h expiration after round-trip toggle", async () => {
     render(
-      <ContextForScreen>
+      <ContextForScreen headerShown>
         <ReceiveScreen />
       </ContextForScreen>,
     )
@@ -1246,7 +1273,7 @@ describe("Expiration time follows wallet currency", () => {
     paymentRequestQueryMock.mockReturnValue(makeQueryResult("usd-wallet-id"))
 
     render(
-      <ContextForScreen>
+      <ContextForScreen headerShown>
         <ReceiveScreen />
       </ContextForScreen>,
     )
@@ -1315,9 +1342,9 @@ describe("Amount modal lifecycle", () => {
     LL = i18nObject("en")
   })
 
-  it("applies amount only after modal dismiss animation completes", async () => {
+  it("applies amount when Set Amount is pressed", async () => {
     render(
-      <ContextForScreen>
+      <ContextForScreen headerShown>
         <ReceiveScreen />
       </ContextForScreen>,
     )
@@ -1332,35 +1359,15 @@ describe("Amount modal lifecycle", () => {
     fireEvent.press(screen.getByText(LL.AmountInputButton.tapToSetAmount()))
     await flushAsync()
 
-    expect(screen.getByTestId("bottom-sheet-modal")).toBeTruthy()
-
     fireEvent.press(screen.getByTestId("Key 3"))
     await flushAsync()
-    jest.useFakeTimers()
-    try {
-      fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
 
-      expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
-      act(() => {
-        jest.advanceTimersByTime(39)
-      })
-      expect(lnInvoiceCreateMock).not.toHaveBeenCalled()
-      act(() => {
-        jest.advanceTimersByTime(1)
-      })
-    } finally {
-      jest.useRealTimers()
-    }
+    fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
 
     await waitFor(() => {
       expect(screen.getByTestId("qr-view-Lightning")).toBeTruthy()
     })
 
     expect(lnInvoiceCreateMock).toHaveBeenCalled()
-
-    await flushAsync()
-    await flushAsync()
-
-    expect(screen.queryByTestId("bottom-sheet-modal")).toBeNull()
   })
 })

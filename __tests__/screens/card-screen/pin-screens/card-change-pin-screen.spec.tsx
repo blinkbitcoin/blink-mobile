@@ -4,6 +4,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardChangePinScreen } from "@app/screens/card-screen/pin-screens/card-change-pin-screen"
 import { ContextForScreen } from "../../helper"
+import { flushEffects } from "../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
@@ -45,6 +46,18 @@ describe("CardChangePinScreen", () => {
     mockUpdatePin.mockResolvedValue(true)
   })
 
+  // StepsProgressBar runs an Animated.timing (real-timer, ~120ms) whose frames
+  // land after the synchronous test body returns. Wait the animation out inside
+  // act() so its updates neither warn nor leak into the next test.
+  afterEach(async () => {
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 200)
+      })
+    })
+    await flushEffects()
+  })
+
   describe("biometric gate", () => {
     it("does not render when biometric not authenticated", async () => {
       mockUseBiometricGate.mockReturnValue(false)
@@ -55,7 +68,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(queryByText("Enter new PIN")).toBeNull()
       expect(queryByText("New PIN")).toBeNull()
@@ -68,7 +81,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(mockUseBiometricGate).toHaveBeenCalledWith(
         expect.objectContaining({ required: true }),
@@ -84,7 +97,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(toJSON()).toBeTruthy()
     })
@@ -96,7 +109,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Enter new PIN")).toBeTruthy()
     })
@@ -108,7 +121,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Please enter your new 4-digit PIN.")).toBeTruthy()
     })
@@ -122,7 +135,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("New PIN")).toBeTruthy()
       expect(getByText("Confirm")).toBeTruthy()
@@ -137,7 +150,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByTestId("NumericKey-1")).toBeTruthy()
       expect(getByTestId("NumericKey-2")).toBeTruthy()
@@ -153,7 +166,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       fireEvent.press(getByTestId("NumericKey-5"))
       fireEvent.press(getByTestId("NumericKey-8"))
@@ -173,7 +186,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       fireEvent.press(getByTestId("NumericKey-5"))
       fireEvent.press(getByTestId("NumericKey-8"))
@@ -195,7 +208,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       fireEvent.press(getByTestId("NumericKey-5"))
       fireEvent.press(getByTestId("NumericKey-6"))
@@ -219,7 +232,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       fireEvent.press(getByTestId("NumericKey-5"))
       fireEvent.press(getByTestId("NumericKey-8"))
@@ -251,7 +264,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       fireEvent.press(getByTestId("NumericKey-5"))
       fireEvent.press(getByTestId("NumericKey-8"))
@@ -282,7 +295,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       fireEvent.press(getByTestId("NumericKey-5"))
       fireEvent.press(getByTestId("NumericKey-8"))
@@ -318,7 +331,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       fireEvent.press(getByTestId("NumericKey-5"))
       fireEvent.press(getByTestId("NumericKey-8"))
@@ -352,7 +365,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       fireEvent.press(getByTestId("NumericKey-5"))
       fireEvent.press(getByTestId("NumericKey-8"))
@@ -391,7 +404,7 @@ describe("CardChangePinScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Enter new PIN")).toBeTruthy()
       expect(getByText("New PIN")).toBeTruthy()

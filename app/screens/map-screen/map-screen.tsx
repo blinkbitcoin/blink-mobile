@@ -13,11 +13,12 @@ import {
   useRegionQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import Geolocation from "@react-native-community/geolocation"
 import { useFocusEffect } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import countryCodes from "../../../utils/countryInfo.json"
 import { Screen } from "../../components/screen"
@@ -38,7 +39,7 @@ const LATITUDE_DELTA = 15 // <-- decrease for more zoom
 const LONGITUDE_DELTA = LATITUDE_DELTA * (width / height)
 
 type Props = {
-  navigation: StackNavigationProp<RootStackParamList, "Primary">
+  navigation: NativeStackNavigationProp<RootStackParamList, "Primary">
 }
 
 Geolocation.setRNConfiguration({
@@ -65,6 +66,7 @@ gql`
 
 export const MapScreen: React.FC<Props> = ({ navigation }) => {
   const isAuthed = useIsAuthed()
+  const { isSelfCustodial } = useActiveWallet()
   const { countryCode, loading } = useDeviceLocation()
   const { data: lastRegion, error: lastRegionError } = useRegionQuery()
   const { LL } = useI18nContext()
@@ -162,7 +164,7 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
   }, [isInitializing, countryCode, lastRegion, loading, initialLocation])
 
   const handleCalloutPress = (item: MapMarker) => {
-    if (isAuthed) {
+    if (isAuthed || isSelfCustodial) {
       navigation.navigate("sendBitcoinDestination", { username: item.username })
     } else {
       navigation.navigate("acceptTermsAndConditions", { flow: "phone" })

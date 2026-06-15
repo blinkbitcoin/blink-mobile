@@ -1,4 +1,5 @@
 import { GALOY_INSTANCES, GaloyInstance, GaloyInstanceInput } from "@app/config"
+import { DefaultAccountId } from "@app/types/wallet"
 
 type PersistentState_3 = {
   schemaVersion: 3
@@ -30,8 +31,122 @@ type PersistentState_6 = {
   galoyAuthToken: string
 }
 
-const migrate6ToCurrent = (state: PersistentState_6): Promise<PersistentState> =>
+type PersistentState_7 = {
+  schemaVersion: 7
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+}
+
+type PersistentState_8 = {
+  schemaVersion: 8
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+}
+
+type PersistentState_9 = {
+  schemaVersion: 9
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+}
+
+type PersistentState_10 = {
+  schemaVersion: 10
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  // Legacy fallback for pre-schema-10 users; new writes go to the per-account map.
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+}
+
+type PersistentState_11 = {
+  schemaVersion: 11
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+}
+
+type PersistentState_12 = {
+  schemaVersion: 12
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+}
+
+type PersistentState_13 = {
+  schemaVersion: 13
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+}
+
+const migrate13ToCurrent = (state: PersistentState_13): Promise<PersistentState> =>
   Promise.resolve(state)
+
+const migrate12ToCurrent = (state: PersistentState_12): Promise<PersistentState> =>
+  migrate13ToCurrent({ ...state, schemaVersion: 13 })
+
+const migrate11ToCurrent = (state: PersistentState_11): Promise<PersistentState> =>
+  migrate12ToCurrent({ ...state, schemaVersion: 12 })
+
+const migrateLegacyDefaultCurrencyToActiveAccount = (
+  state: PersistentState_10,
+): PersistentState_10 => {
+  const { selfCustodialDefaultWalletCurrency: legacy, ...withoutLegacy } = state
+  if (!legacy) return state
+
+  const id = state.activeAccountId
+  if (!id || id === DefaultAccountId.Custodial) return withoutLegacy
+
+  const map = state.selfCustodialDefaultWalletCurrencyByAccountId
+  if (map && id in map) return withoutLegacy
+
+  return {
+    ...withoutLegacy,
+    selfCustodialDefaultWalletCurrencyByAccountId: { ...map, [id]: legacy },
+  }
+}
+
+const migrate10ToCurrent = (state: PersistentState_10): Promise<PersistentState> =>
+  migrate11ToCurrent({
+    ...migrateLegacyDefaultCurrencyToActiveAccount(state),
+    schemaVersion: 11,
+  })
+
+const migrate9ToCurrent = (state: PersistentState_9): Promise<PersistentState> =>
+  migrate10ToCurrent({ ...state, schemaVersion: 10 })
+
+const migrate8ToCurrent = (state: PersistentState_8): Promise<PersistentState> =>
+  migrate9ToCurrent({ ...state, schemaVersion: 9 })
+
+const migrate7ToCurrent = (state: PersistentState_7): Promise<PersistentState> =>
+  migrate8ToCurrent({ ...state, schemaVersion: 8 })
+
+const migrate6ToCurrent = (state: PersistentState_6): Promise<PersistentState> =>
+  migrate7ToCurrent({
+    ...state,
+    schemaVersion: 7,
+  })
 
 const migrate5ToCurrent = (state: PersistentState_5): Promise<PersistentState> => {
   return migrate6ToCurrent({
@@ -98,6 +213,13 @@ type StateMigrations = {
   4: (state: PersistentState_4) => Promise<PersistentState>
   5: (state: PersistentState_5) => Promise<PersistentState>
   6: (state: PersistentState_6) => Promise<PersistentState>
+  7: (state: PersistentState_7) => Promise<PersistentState>
+  8: (state: PersistentState_8) => Promise<PersistentState>
+  9: (state: PersistentState_9) => Promise<PersistentState>
+  10: (state: PersistentState_10) => Promise<PersistentState>
+  11: (state: PersistentState_11) => Promise<PersistentState>
+  12: (state: PersistentState_12) => Promise<PersistentState>
+  13: (state: PersistentState_13) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -105,34 +227,55 @@ const stateMigrations: StateMigrations = {
   4: migrate4ToCurrent,
   5: migrate5ToCurrent,
   6: migrate6ToCurrent,
+  7: migrate7ToCurrent,
+  8: migrate8ToCurrent,
+  9: migrate9ToCurrent,
+  10: migrate10ToCurrent,
+  11: migrate11ToCurrent,
+  12: migrate12ToCurrent,
+  13: migrate13ToCurrent,
 }
 
-export type PersistentState = PersistentState_6
+export type PersistentState = PersistentState_13
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 6,
+  schemaVersion: 13,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
 
-export const migrateAndGetPersistentState = async (
+export const MigrationStatus = {
+  Ok: "ok",
+  NoData: "no-data",
+  Failed: "failed",
+} as const
+
+export type MigrationStatus = (typeof MigrationStatus)[keyof typeof MigrationStatus]
+
+export type MigrationResult =
+  | { status: typeof MigrationStatus.Ok; state: PersistentState }
+  | { status: typeof MigrationStatus.NoData }
+  | { status: typeof MigrationStatus.Failed; error: Error; rawData: unknown }
+
+export const migratePersistentState = async (
   // TODO: pass the correct type.
   // this is especially important given this is migration code and it's hard to test manually
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
-): Promise<PersistentState> => {
-  if (Boolean(data) && data.schemaVersion in stateMigrations) {
-    const schemaVersion: 3 | 4 | 5 | 6 = data.schemaVersion
-    try {
-      const migration = stateMigrations[schemaVersion]
-      const persistentState = await migration(data)
-      if (persistentState) {
-        return persistentState
-      }
-    } catch (err) {
-      console.error({ err }, "error migrating persistent state")
+): Promise<MigrationResult> => {
+  if (!data || !(data.schemaVersion in stateMigrations)) {
+    return { status: MigrationStatus.NoData }
+  }
+  const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 = data.schemaVersion
+  try {
+    const migration = stateMigrations[schemaVersion]
+    const state = await migration(data)
+    return { status: MigrationStatus.Ok, state }
+  } catch (err) {
+    return {
+      status: MigrationStatus.Failed,
+      error: err instanceof Error ? err : new Error(String(err)),
+      rawData: data,
     }
   }
-
-  return defaultPersistentState
 }

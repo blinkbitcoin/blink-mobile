@@ -60,6 +60,18 @@ const cardApprovedWithCustomColorParams = {
   iconColor: "#FF5500",
 }
 
+// Some app handlers log placeholder/diagnostic messages via console.log when
+// pressed (e.g. "Add to wallet pressed" in card-status-layout); capture them so expected logs don't pollute CI logs.
+let consoleLogSpy: jest.SpyInstance
+
+beforeEach(() => {
+  consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
+})
+
+afterEach(() => {
+  consoleLogSpy.mockRestore()
+})
+
 describe("CardStatusScreen - Card Approved variant", () => {
   beforeEach(() => {
     loadLocale("en")

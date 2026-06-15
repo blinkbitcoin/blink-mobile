@@ -41,6 +41,7 @@ groups:
   - check-code
   - install-deps
   - dev-build
+  - cleanup-mac-build-worker
   - prerelease
   - prod-build
 - name: image
@@ -86,6 +87,8 @@ jobs:
       - name: repo
       run:
         path: pipeline-tasks/ci/tasks/test-unit.sh
+      params:
+        CI: true
 
 - name: check-code
   plan:
@@ -144,6 +147,10 @@ jobs:
         APPSTORE_API_KEY: #@ data.values.appstore_api_key
         APPSTORE_API_KEY_ID: #@ data.values.appstore_api_key_id
         APPSTORE_ISSUER_ID: #@ data.values.appstore_issuer_id
+        SPARK_TOKEN_IDENTIFIER: #@ data.values.spark_token_identifier
+        BREEZ_API_KEY: #@ data.values.breez_api_key
+        BREEZ_NETWORK: #@ data.values.breez_network
+        MIN_BUILD_FREE_GB: 30
   - task: upload-to-gcs
     config:
       platform: linux
@@ -212,6 +219,27 @@ jobs:
     - put: testflight-version
       params:
         file: testflight-version/version
+
+- name: cleanup-mac-build-worker
+  serial: true
+  plan:
+  - in_parallel:
+    - get: daily
+      trigger: true
+    - get: pipeline-tasks
+  - #@ claim_lock()
+  - task: cleanup-mac-build-worker
+    tags: [ mac-m1 ]
+    ensure: #@ release_lock()
+    config:
+      platform: darwin
+      inputs:
+      - name: pipeline-tasks
+      run:
+        path: /bin/sh
+        args: [ "-c", "arch -arm64 pipeline-tasks/ci/tasks/macos-build-disk-cleanup.sh scheduled" ]
+      params:
+        MIN_BUILD_FREE_GB: 35
 
 - name: prod-build
   serial: true
@@ -288,6 +316,10 @@ jobs:
         APPSTORE_API_KEY: #@ data.values.appstore_api_key
         APPSTORE_API_KEY_ID: #@ data.values.appstore_api_key_id
         APPSTORE_ISSUER_ID: #@ data.values.appstore_issuer_id
+        SPARK_TOKEN_IDENTIFIER: #@ data.values.spark_token_identifier
+        BREEZ_API_KEY: #@ data.values.breez_api_key
+        BREEZ_NETWORK: #@ data.values.breez_network
+        MIN_BUILD_FREE_GB: 30
   - task: upload-to-gcs
     config:
       platform: linux

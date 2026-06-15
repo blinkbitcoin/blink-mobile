@@ -11,7 +11,6 @@ import { FlatList } from "react-native-gesture-handler"
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
-import { LNURL_DOMAINS } from "@app/config"
 import { useAppConfig } from "@app/hooks"
 import {
   UserContact,
@@ -29,14 +28,21 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import { CountryCode, PhoneNumber } from "libphonenumber-js/mobile"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { SearchBar } from "@rn-vui/base"
 import { makeStyles, useTheme, Text, ListItem } from "@rn-vui/themed"
 
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useScanContext } from "@app/hooks/use-scan-context"
+import { ActiveWalletStatus } from "@app/types/wallet"
+import { useSelfCustodialContactList } from "@app/self-custodial/hooks/use-contact-list"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+
+import { toWalletBalances } from "./hooks/use-send-wallets"
 import { testProps } from "../../utils/testProps"
 import { ConfirmDestinationModal } from "./confirm-destination-modal"
 import { DestinationInformation } from "./destination-information"
-import { parseDestination } from "./payment-destination"
+import { resolveDestination } from "./payment-destination/resolve-destination"
 import {
   DestinationDirection,
   InvalidDestinationReason,
@@ -151,8 +157,13 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   } = useTheme()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinDestination">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "sendBitcoinDestination">
+    >()
   const isAuthed = useIsAuthed()
+  const activeWallet = useActiveWallet()
+  const { isSelfCustodial, isReady: isWalletReady } = activeWallet
+  const { sdk } = useSelfCustodialWallet()
 
   const [destinationState, dispatchDestinationStateAction] = useReducer(
     sendBitcoinDestinationReducer,
@@ -171,8 +182,10 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const { loading, data } = useSendBitcoinDestinationQuery({
     fetchPolicy: "cache-and-network",
     returnPartialData: true,
-    skip: !isAuthed,
+    skip: !isAuthed || isSelfCustodial,
   })
+
+  const { myWalletIds, bitcoinNetwork, lnurlDomains } = useScanContext()
 
   // forcing price refresh
   useRealtimePriceQuery({
@@ -180,12 +193,17 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     skip: !isAuthed,
   })
 
-  const wallets = useMemo(
-    () => data?.me?.defaultAccount.wallets,
-    [data?.me?.defaultAccount.wallets],
+  const wallets = useMemo(() => {
+    if (isSelfCustodial) {
+      return toWalletBalances(activeWallet.wallets)
+    }
+    return data?.me?.defaultAccount.wallets
+  }, [isSelfCustodial, activeWallet.wallets, data?.me?.defaultAccount.wallets])
+  const selfCustodialContacts = useSelfCustodialContactList(isSelfCustodial)
+  const contacts = useMemo(
+    () => (isSelfCustodial ? selfCustodialContacts : data?.me?.contacts ?? []),
+    [isSelfCustodial, selfCustodialContacts, data?.me?.contacts],
   )
-  const bitcoinNetwork = useMemo(() => data?.globals?.network, [data?.globals?.network])
-  const contacts = useMemo(() => data?.me?.contacts ?? [], [data?.me?.contacts])
   const contactHandleSet = useMemo(
     () => new Set(contacts.map((contact) => normalizeString(contact.handle))),
     [contacts],
@@ -323,17 +341,20 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         }
       }
 
-      const destination = await parseDestination({
-        rawInput,
-        myWalletIds: wallets.map((wallet) => wallet.id),
-        bitcoinNetwork,
-        lnurlDomains: [lnAddressHostname, ...LNURL_DOMAINS],
-        accountDefaultWalletQuery,
-      })
-      logParseDestinationResult(destination)
+      const wrappedDestination = await resolveDestination(
+        {
+          rawInput,
+          myWalletIds,
+          bitcoinNetwork,
+          lnurlDomains,
+          accountDefaultWalletQuery,
+        },
+        sdk,
+      )
+      logParseDestinationResult(wrappedDestination)
 
-      if (destination.valid === false) {
-        if (destination.invalidReason === InvalidDestinationReason.SelfPayment) {
+      if (wrappedDestination.valid === false) {
+        if (wrappedDestination.invalidReason === InvalidDestinationReason.SelfPayment) {
           dispatchDestinationStateAction({
             type: SendBitcoinActions.SetUnparsedDestination,
             payload: {
@@ -347,7 +368,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         dispatchDestinationStateAction({
           type: SendBitcoinActions.SetInvalid,
           payload: {
-            invalidDestination: destination,
+            invalidDestination: wrappedDestination,
             unparsedDestination: rawInput,
           },
         })
@@ -355,10 +376,12 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       }
 
       if (
-        destination.destinationDirection === DestinationDirection.Send &&
-        destination.validDestination.paymentType === PaymentType.Intraledger
+        wrappedDestination.destinationDirection === DestinationDirection.Send &&
+        wrappedDestination.validDestination.paymentType === PaymentType.Intraledger
       ) {
-        const normalizedHandle = normalizeString(destination.validDestination.handle)
+        const normalizedHandle = normalizeString(
+          wrappedDestination.validDestination.handle,
+        )
         const hasConfirmedUsername =
           normalizeString(destinationState.confirmationUsernameType?.username) ===
             normalizedHandle && destinationState.unparsedDestination === rawInput
@@ -367,11 +390,11 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           dispatchDestinationStateAction({
             type: SendBitcoinActions.SetRequiresUsernameConfirmation,
             payload: {
-              validDestination: destination,
+              validDestination: wrappedDestination,
               unparsedDestination: rawInput,
               confirmationUsernameType: {
                 type: "new-username",
-                username: destination.validDestination.handle,
+                username: wrappedDestination.validDestination.handle,
               },
             },
           })
@@ -380,11 +403,11 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       }
 
       if (
-        destination.destinationDirection === DestinationDirection.Send &&
-        destination.validDestination.paymentType === PaymentType.Lnurl &&
+        wrappedDestination.destinationDirection === DestinationDirection.Send &&
+        wrappedDestination.validDestination.paymentType === PaymentType.Lnurl &&
         activeInputRef.current === InputType.Phone
       ) {
-        const identifier = destination.validDestination.lnurlParams.identifier
+        const identifier = wrappedDestination.validDestination.lnurlParams.identifier
         const normalizedHandle = normalizeString(identifier)
         const hasConfirmedUsername =
           normalizeString(destinationState.confirmationUsernameType?.username) ===
@@ -394,7 +417,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           dispatchDestinationStateAction({
             type: SendBitcoinActions.SetRequiresUsernameConfirmation,
             payload: {
-              validDestination: destination,
+              validDestination: wrappedDestination,
               unparsedDestination: rawInput,
               confirmationUsernameType: {
                 type: "new-username",
@@ -411,7 +434,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       dispatchDestinationStateAction({
         type: SendBitcoinActions.SetValid,
         payload: {
-          validDestination: destination,
+          validDestination: wrappedDestination,
           unparsedDestination: rawInput,
         },
       })
@@ -422,11 +445,13 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       dispatchDestinationStateAction,
       destinationState,
       contactHandleSet,
+      myWalletIds,
       bitcoinNetwork,
+      lnurlDomains,
       wallets,
       contacts,
       parseValidPhone,
-      lnAddressHostname,
+      sdk,
     ],
   )
 
@@ -676,6 +701,24 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     destinationState.confirmationUsernameType,
     styles,
   ])
+
+  if (isSelfCustodial && !isWalletReady) {
+    const isOfflineOrError =
+      activeWallet.status === ActiveWalletStatus.Error ||
+      activeWallet.status === ActiveWalletStatus.Unavailable
+
+    return (
+      <Screen>
+        <View style={styles.sendBitcoinDestinationContainer}>
+          {isOfflineOrError ? (
+            <Text style={styles.offlineText}>{LL.SendBitcoinScreen.walletOffline()}</Text>
+          ) : (
+            <ActivityIndicator size="large" />
+          )}
+        </View>
+      </Screen>
+    )
+  }
 
   return (
     <Screen keyboardOffset="navigationHeader" keyboardShouldPersistTaps="handled">
@@ -1044,6 +1087,13 @@ const usestyles = makeStyles(({ colors }) => ({
   sendBitcoinDestinationContainer: {
     padding: 20,
     flex: 1,
+  },
+  offlineText: {
+    textAlign: "center",
+    marginTop: 40,
+    fontSize: 16,
+    color: colors.error,
+    paddingHorizontal: 20,
   },
   fieldBackground: {
     flexDirection: "row",

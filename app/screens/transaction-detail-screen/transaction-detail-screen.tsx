@@ -11,6 +11,7 @@ import { TransactionDate } from "@app/components/transaction-date"
 import { useDescriptionDisplay } from "@app/components/transaction-item"
 import { DeepPartialObject } from "@app/components/transaction-item/index.types"
 import { WalletSummary } from "@app/components/wallet-summary"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import {
   SettlementVia,
   TransactionFragment,
@@ -24,8 +25,9 @@ import { useAppConfig, useClipboard, useTransactionSeenState } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toWalletAmount } from "@app/types/amounts"
+import { PaymentType } from "@app/types/transaction"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { IconTransaction } from "../../components/icon-transactions"
@@ -73,7 +75,12 @@ const Row = ({
   )
 }
 
-const typeDisplay = (instance?: SettlementVia | DeepPartialObject<SettlementVia>) => {
+export const typeDisplay = (
+  instance?: SettlementVia | DeepPartialObject<SettlementVia>,
+  selfCustodialPaymentType?: PaymentType,
+) => {
+  if (selfCustodialPaymentType === PaymentType.Spark) return "Spark"
+
   if (!instance || !instance.__typename) {
     return "Unknown"
   }
@@ -101,7 +108,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
   const insets = useSafeAreaInsets()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
   const { formatMoneyAmount } = useDisplayCurrency()
   const {
@@ -132,8 +139,18 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const [timer, setTimer] = React.useState<number>(0)
 
   const { LL, locale } = useI18nContext()
+  const { isSelfCustodial, wallets } = useActiveWallet()
   const { copyToClipboard } = useClipboard()
   const { formatCurrency } = useDisplayCurrency()
+
+  const selfCustodialPaymentType = React.useMemo(() => {
+    if (!isSelfCustodial) return undefined
+    for (const wallet of wallets) {
+      const match = wallet.transactions.find((t) => t.id === txid)
+      if (match) return match.paymentType
+    }
+    return undefined
+  }, [isSelfCustodial, wallets, txid])
 
   const description = useDescriptionDisplay({
     tx,
@@ -438,7 +455,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               value={settlementVia.counterPartyUsername || galoyInstance.name}
             />
           )}
-          <Row entry={LL.common.type()} value={typeDisplay(settlementVia)} />
+          <Row
+            entry={LL.common.type()}
+            value={typeDisplay(settlementVia, selfCustodialPaymentType)}
+          />
           {initiationVia?.__typename === "InitiationViaLn" &&
             initiationVia?.paymentHash && (
               <Row
@@ -533,7 +553,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 ]}
               />
             )}
-          {id && (
+          {id && !isSelfCustodial && (
             <Row
               entry="Blink Internal Id"
               value={id}

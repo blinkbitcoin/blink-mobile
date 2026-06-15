@@ -274,6 +274,179 @@ describe("SendBitcoinCompletedScreen", () => {
     expect(screen.getByText(LL.common.share())).toBeTruthy()
   })
 
+  it("renders self-custodial AES plaintext from `message` (no ciphertext/iv)", async () => {
+    const plaintext = "redeem-code-XYZ"
+    const description = "Here is your AES secret"
+    const selfCustodialAesRoute = {
+      key: "sendBitcoinCompleted",
+      name: "sendBitcoinCompleted",
+      params: {
+        status: "SUCCESS",
+        successAction: {
+          tag: "aes",
+          message: plaintext,
+          description,
+          url: null,
+          ciphertext: null,
+          iv: null,
+          decipher: () => null,
+        },
+        preimage: undefined,
+        currencyAmount: "$0.03",
+        satAmount: "25 SAT",
+        currencyFeeAmount: "$0.00",
+        satFeeAmount: "0 SAT",
+        destination: "alice@blink.sv",
+        paymentType: "lightning",
+        createdAt: 1747691078,
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <SuccessAction route={selfCustodialAesRoute} />
+      </ContextForScreen>,
+    )
+    act(() => {
+      jest.advanceTimersByTime(2300)
+    })
+
+    expect(screen.getByText(`${plaintext} ${description}`)).toBeTruthy()
+  })
+
+  it("renders the sender's note for a regular payment with no success action", async () => {
+    const note = "Dinner split with Alice"
+    const regularPaymentRoute = {
+      key: "sendBitcoinCompleted",
+      name: "sendBitcoinCompleted",
+      params: {
+        status: "SUCCESS",
+        note,
+        currencyAmount: "$0.03",
+        satAmount: "25 SAT",
+        currencyFeeAmount: "$0.00",
+        satFeeAmount: "0 SAT",
+        destination: "alice",
+        paymentType: "intraledger",
+        createdAt: 1747691078,
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <SuccessAction route={regularPaymentRoute} />
+      </ContextForScreen>,
+    )
+
+    act(() => {
+      jest.advanceTimersByTime(2300)
+    })
+
+    expect(screen.getByText(LL.SendBitcoinScreen.noteLabel())).toBeTruthy()
+    expect(screen.getByText(note)).toBeTruthy()
+  })
+
+  it("prefers the success action over the sender's note when both are present", async () => {
+    const note = "Private memo to self"
+    const successMessage = "Thanks for your support."
+    const bothRoute = {
+      key: "sendBitcoinCompleted",
+      name: "sendBitcoinCompleted",
+      params: {
+        status: "SUCCESS",
+        successAction: {
+          tag: "message",
+          description: "",
+          url: null,
+          message: successMessage,
+          ciphertext: null,
+          iv: null,
+          decipher: () => null,
+        },
+        note,
+        currencyAmount: "$0.03",
+        satAmount: "25 SAT",
+        currencyFeeAmount: "$0.00",
+        satFeeAmount: "0 SAT",
+        destination: "moises",
+        paymentType: "lnurl",
+        createdAt: 1747691078,
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <SuccessAction route={bothRoute} />
+      </ContextForScreen>,
+    )
+
+    act(() => {
+      jest.advanceTimersByTime(2300)
+    })
+
+    expect(screen.getByText(successMessage)).toBeTruthy()
+    expect(screen.queryByText(note)).toBeNull()
+  })
+
+  it("hides the Note when there is neither a note nor a success action", async () => {
+    const noNoteRoute = {
+      key: "sendBitcoinCompleted",
+      name: "sendBitcoinCompleted",
+      params: {
+        status: "SUCCESS",
+        currencyAmount: "$0.03",
+        satAmount: "25 SAT",
+        currencyFeeAmount: "$0.00",
+        satFeeAmount: "0 SAT",
+        destination: "bob",
+        paymentType: "onchain",
+        createdAt: 1747691078,
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <SuccessAction route={noNoteRoute} />
+      </ContextForScreen>,
+    )
+
+    act(() => {
+      jest.advanceTimersByTime(2300)
+    })
+
+    expect(screen.queryByText(LL.SendBitcoinScreen.noteLabel())).toBeNull()
+  })
+
+  it("treats a whitespace-only note as empty and hides the Note", async () => {
+    const whitespaceNoteRoute = {
+      key: "sendBitcoinCompleted",
+      name: "sendBitcoinCompleted",
+      params: {
+        status: "SUCCESS",
+        note: "   ",
+        currencyAmount: "$0.03",
+        satAmount: "25 SAT",
+        currencyFeeAmount: "$0.00",
+        satFeeAmount: "0 SAT",
+        destination: "carol",
+        paymentType: "intraledger",
+        createdAt: 1747691078,
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <SuccessAction route={whitespaceNoteRoute} />
+      </ContextForScreen>,
+    )
+
+    act(() => {
+      jest.advanceTimersByTime(2300)
+    })
+
+    expect(screen.queryByText(LL.SendBitcoinScreen.noteLabel())).toBeNull()
+  })
+
   describe("ViewShot background color for screenshot", () => {
     const successRoute = {
       key: "sendBitcoinCompleted",

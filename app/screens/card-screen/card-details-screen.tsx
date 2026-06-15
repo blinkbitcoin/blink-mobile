@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { ActionField } from "@app/components/action-field"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -28,7 +28,7 @@ export const CardDetailsScreen: React.FC = () => {
   } = useTheme()
   const { LL, locale } = useI18nContext()
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const handleDismiss = useCallback(() => navigation.goBack(), [navigation])
 

@@ -4,7 +4,7 @@ import { RefreshControl, View, Alert, Pressable } from "react-native"
 import { gql } from "@apollo/client"
 import Modal from "react-native-modal"
 import { useNavigation, useIsFocused, useFocusEffect } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { ScrollView, TouchableWithoutFeedback } from "react-native-gesture-handler"
 
@@ -13,11 +13,17 @@ import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { DisabledFeature } from "@app/components/disabled-feature"
 import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
+import { StablesatsRestrictionModal } from "@app/components/stablesats-restriction-modal"
+import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
 import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
+import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
@@ -29,12 +35,24 @@ import {
 } from "@app/components/unseen-tx-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
+import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
+import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
+import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
+import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { getErrorMessages } from "@app/graphql/utils"
+import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
+import { extractLightningAddressUsername } from "@app/utils/pay-links"
 import {
   useAppConfig,
   useAutoShowUpgradeModal,
@@ -46,7 +64,6 @@ import {
   TxDirection,
   TxStatus,
   useBulletinsQuery,
-  useHasPromptedSetDefaultAccountQuery,
   useHomeAuthedQuery,
   useHomeUnauthedQuery,
   useRealtimePriceQuery,
@@ -147,12 +164,11 @@ export const HomeScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { balanceLimitToTriggerUpgradeModal, upgradeModalCooldownDays } =
     useRemoteConfig()
 
-  const { data: { hasPromptedSetDefaultAccount } = {} } =
-    useHasPromptedSetDefaultAccountQuery()
+  const { defaultAccountModalShown } = useDefaultAccountModalShown()
   const [setDefaultAccountModalVisible, setSetDefaultAccountModalVisible] =
     React.useState(false)
   const reopenUpgradeModal = React.useRef(false)
@@ -162,6 +178,18 @@ export const HomeScreen: React.FC = () => {
   const { isAtLeastLevelOne } = useLevel()
 
   const isAuthed = useIsAuthed()
+  const activeWallet = useActiveWallet()
+  const { isSelfCustodial } = activeWallet
+  const {
+    refreshWallets: refreshSelfCustodialWallets,
+    isStableBalanceActive,
+    lightningAddress: selfCustodialLightningAddress,
+  } = useSelfCustodialWallet()
+  const { accounts } = useAccountRegistry()
+  const hasMultipleAccounts = accounts.length > 1
+  const { stableBalanceEnabled } = useFeatureFlags()
+  const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
+  const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -177,7 +205,7 @@ export const HomeScreen: React.FC = () => {
     error,
     refetch: refetchAuthed,
   } = useHomeAuthedQuery({
-    skip: !isAuthed,
+    skip: !isAuthed || isSelfCustodial,
     fetchPolicy: "network-only",
     errorPolicy: "all",
 
@@ -186,7 +214,7 @@ export const HomeScreen: React.FC = () => {
   })
 
   const { loading: loadingPrice, refetch: refetchRealtimePrice } = useRealtimePriceQuery({
-    skip: !isAuthed,
+    skip: !isAuthed || isSelfCustodial,
     fetchPolicy: "network-only",
 
     // this enables offline mode use-case
@@ -224,13 +252,45 @@ export const HomeScreen: React.FC = () => {
     variables: { first: 1 },
   })
 
-  const loading = loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
+  const queryLoading = isSelfCustodial
+    ? activeWallet.status === "loading"
+    : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const { username, phone } = currentUser?.me ?? {}
-  const usernameTitle = username || phone || LL.common.blinkUser()
+  const selfCustodialFallbackTitle = hasMultipleAccounts ? LL.common.anonymousUser() : ""
 
-  const wallets = dataAuthed?.me?.defaultAccount?.wallets
-  const { formattedBalance, satsBalance } = useTotalBalance(wallets)
+  const selfCustodialUsername = extractLightningAddressUsername(
+    selfCustodialLightningAddress,
+  )
+  const usernameTitle = isSelfCustodial
+    ? selfCustodialUsername ?? selfCustodialFallbackTitle
+    : username || phone || LL.common.blinkUser()
+  const canSwitchAccount = isSelfCustodial ? hasMultipleAccounts : isAtLeastLevelOne
+
+  const wallets = isSelfCustodial
+    ? activeWallet.wallets.map((w) => ({
+        id: w.id,
+        balance: w.balance.amount,
+        walletCurrency: w.walletCurrency,
+      }))
+    : dataAuthed?.me?.defaultAccount?.wallets
+  const {
+    formattedBalance: defaultFormattedBalance,
+    satsBalance,
+    isLoading: balanceConversionLoading,
+  } = useTotalBalance(wallets)
+
+  const loading = queryLoading || balanceConversionLoading
+
+  const showStableBalanceToggle =
+    stableBalanceEnabled && isSelfCustodial && isStableBalanceActive
+
+  const { formatMoneyAmount } = useDisplayCurrency()
+
+  const formattedBalance =
+    showStableBalanceToggle && balanceMode === BalanceMode.Btc
+      ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
+      : defaultFormattedBalance
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
   const levelAccount = dataAuthed?.me?.defaultAccount.level
@@ -291,6 +351,13 @@ export const HomeScreen: React.FC = () => {
   const [modalVisible, setModalVisible] = React.useState(false)
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
+  const [isRestrictionModalVisible, setIsRestrictionModalVisible] = React.useState(false)
+  const [isUsdConvertModalVisible, setIsUsdConvertModalVisible] = React.useState(false)
+  const isStablesatsRestricted = useStablesatsRestricted()
+
+  const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
+  const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
+  const restrictedUsdWalletBalance = restrictedUsdWallet?.balance ?? 0
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const openUpgradeModal = React.useCallback(() => {
@@ -314,6 +381,11 @@ export const HomeScreen: React.FC = () => {
   ])
 
   const refetch = React.useCallback(() => {
+    if (isSelfCustodial) {
+      refreshSelfCustodialWallets()
+      return
+    }
+
     if (!isAuthed) return
 
     Promise.all([
@@ -327,6 +399,8 @@ export const HomeScreen: React.FC = () => {
     })
   }, [
     isAuthed,
+    isSelfCustodial,
+    refreshSelfCustodialWallets,
     refetchAuthed,
     refetchBulletins,
     refetchRealtimePrice,
@@ -337,24 +411,24 @@ export const HomeScreen: React.FC = () => {
   const numberOfTxs = transactions.length
 
   const onMenuClick = (target: Target) => {
-    if (isAuthed) {
-      if (
-        target === "receiveBitcoin" &&
-        !hasPromptedSetDefaultAccount &&
-        numberOfTxs >= TransactionCountToTriggerSetDefaultAccountModal &&
-        galoyInstanceId === "Main"
-      ) {
-        toggleSetDefaultAccountModal()
-        return
-      }
-
-      // we are using any because Typescript complain on the fact we are not passing any params
-      // but there is no need for a params and the types should not necessitate it
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      navigation.navigate(target as any)
-    } else {
+    if (!isSelfCustodial && !isAuthed) {
       setModalVisible(true)
+      return
     }
+
+    if (
+      !isSelfCustodial &&
+      !isStablesatsRestricted &&
+      target === "receiveBitcoin" &&
+      !defaultAccountModalShown &&
+      numberOfTxs >= TransactionCountToTriggerSetDefaultAccountModal &&
+      galoyInstanceId === "Main"
+    ) {
+      toggleSetDefaultAccountModal()
+      return
+    }
+
+    navigation.navigate(target)
   }
 
   const activateWallet = () => {
@@ -365,10 +439,11 @@ export const HomeScreen: React.FC = () => {
   // debug code. verify that we have 2 wallets. mobile doesn't work well with only one wallet
   // TODO: add this code in a better place
   React.useEffect(() => {
+    if (isSelfCustodial) return
     if (wallets?.length !== undefined && wallets?.length !== 2) {
       Alert.alert(LL.HomeScreen.walletCountNotTwo())
     }
-  }, [wallets, LL])
+  }, [wallets, LL, isSelfCustodial])
 
   // Trigger the upgrade trial account modal
   useFocusEffect(
@@ -387,40 +462,56 @@ export const HomeScreen: React.FC = () => {
     }, [openUpgradeModal, triggerUpgradeModal]),
   )
 
-  type Target = "scanningQRCode" | "sendBitcoinDestination" | "receiveBitcoin"
+  type Target =
+    | "scanningQRCode"
+    | "sendBitcoinDestination"
+    | "receiveBitcoin"
+    | "conversionDetails"
   type IconNamesType = keyof typeof icons
 
-  const buttons = [
+  type HomeButton = {
+    title: string
+    target: Target
+    icon: IconNamesType
+    disabled?: boolean
+    onDisabledPress?: () => void
+  }
+
+  const buttons: HomeButton[] = [
     {
       title: LL.HomeScreen.receive(),
-      target: "receiveBitcoin" as Target,
-      icon: "receive" as IconNamesType,
+      target: "receiveBitcoin",
+      icon: "receive",
     },
     {
       title: LL.HomeScreen.send(),
-      target: "sendBitcoinDestination" as Target,
-      icon: "send" as IconNamesType,
+      target: "sendBitcoinDestination",
+      icon: "send",
     },
     {
       title: LL.HomeScreen.scan(),
-      target: "scanningQRCode" as Target,
-      icon: "qr-code" as IconNamesType,
+      target: "scanningQRCode",
+      icon: "qr-code",
     },
   ]
 
   const isIosWithBalance = isIos && satsBalance > 0
 
-  if (
+  const shouldShowTransferButton =
+    isSelfCustodial ||
     !isIos ||
     dataUnauthed?.globals?.network !== "mainnet" ||
     levelAccount === AccountLevel.Two ||
     levelAccount === AccountLevel.Three ||
     isIosWithBalance
-  ) {
+
+  if (shouldShowTransferButton) {
     buttons.unshift({
       title: LL.ConversionDetailsScreen.transfer(),
-      target: "conversionDetails" as Target,
-      icon: "transfer" as IconNamesType,
+      target: "conversionDetails",
+      icon: "transfer",
+      disabled: isStablesatsRestricted,
+      onDisabledPress: () => setIsRestrictionModalVisible(true),
     })
   }
 
@@ -462,6 +553,7 @@ export const HomeScreen: React.FC = () => {
       <StableSatsModal
         isVisible={isStablesatModalVisible}
         setIsVisible={setIsStablesatModalVisible}
+        variant={isSelfCustodial ? "selfCustodial" : "custodial"}
       />
       <TrialAccountLimitsModal
         isVisible={isUpgradeModalVisible}
@@ -470,6 +562,22 @@ export const HomeScreen: React.FC = () => {
           reopenUpgradeModal.current = true
         }}
       />
+      <StablesatsRestrictionModal
+        isVisible={isRestrictionModalVisible}
+        toggleModal={() => setIsRestrictionModalVisible(false)}
+        onDismiss={() => {
+          if (restrictedUsdWalletBalance > 0) setIsUsdConvertModalVisible(true)
+        }}
+      />
+      {restrictedUsdWallet && restrictedBtcWallet && (
+        <UsdConvertToBtcModal
+          isVisible={isUsdConvertModalVisible}
+          toggleModal={() => setIsUsdConvertModalVisible(false)}
+          usdWalletBalance={toUsdMoneyAmount(restrictedUsdWalletBalance)}
+          usdWalletId={restrictedUsdWallet.id}
+          btcWalletId={restrictedBtcWallet.id}
+        />
+      )}
       <View style={styles.balanceContainer}>
         <View style={styles.header}>
           <GaloyIconButton
@@ -481,10 +589,10 @@ export const HomeScreen: React.FC = () => {
           />
           <View>
             {!loading && usernameTitle && (
-              <Pressable onPress={isAtLeastLevelOne ? handleSwitchPress : null}>
+              <Pressable onPress={canSwitchAccount ? handleSwitchPress : null}>
                 <View style={styles.profileContainer}>
                   <Text type="p2">{usernameTitle}</Text>
-                  {isAtLeastLevelOne && <GaloyIcon name={"caret-down"} size={18} />}
+                  {canSwitchAccount && <GaloyIcon name={"caret-down"} size={18} />}
                 </View>
               </Pressable>
             )}
@@ -498,7 +606,13 @@ export const HomeScreen: React.FC = () => {
           />
         </View>
       </View>
-      <BalanceHeader loading={loading} formattedBalance={formattedBalance} />
+      <BalanceHeader
+        loading={loading}
+        formattedBalance={formattedBalance}
+        showStableBalanceToggle={showStableBalanceToggle}
+        mode={balanceMode}
+        onModeChange={toggleBalanceMode}
+      />
       <View style={styles.badgeSlot}>
         <UnseenTxAmountBadge
           key={latestUnseenTx?.id}
@@ -527,6 +641,7 @@ export const HomeScreen: React.FC = () => {
         <WalletOverview
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
+          onRestrictedTap={() => setIsRestrictionModalVisible(true)}
           wallets={wallets}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
@@ -537,17 +652,25 @@ export const HomeScreen: React.FC = () => {
             <React.Fragment key={item.icon}>
               {item.icon === "qr-code" && <View style={styles.actionsSeparator} />}
               <View style={styles.button}>
-                <GaloyIconButton
-                  name={item.icon}
-                  size="large"
-                  weight="regular"
-                  text={item.title}
-                  onPress={() => onMenuClick(item.target)}
-                />
+                <DisabledFeature
+                  disabled={Boolean(item.disabled)}
+                  onDisabledPress={item.onDisabledPress}
+                >
+                  <GaloyIconButton
+                    name={item.icon}
+                    size="large"
+                    weight="regular"
+                    text={item.title}
+                    onPress={() => onMenuClick(item.target)}
+                  />
+                </DisabledFeature>
               </View>
             </React.Fragment>
           ))}
         </View>
+        {isSelfCustodial && <UnclaimedDepositBanner />}
+        <NetworkStatusBanner />
+        {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />
         <SetDefaultAccountModal
@@ -561,6 +684,10 @@ export const HomeScreen: React.FC = () => {
       <SlideUpHandle
         bottomOffset={15}
         onAction={() => navigation.navigate("transactionHistory")}
+      />
+      <BackupNudgeModal
+        isVisible={shouldShowModal && isFocused}
+        onClose={dismissBanner}
       />
     </Screen>
   )

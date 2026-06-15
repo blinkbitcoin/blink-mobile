@@ -15,7 +15,7 @@ import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { logAddPhoneAttempt, logValidateAuthCodeFailure } from "@app/utils/analytics"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
@@ -155,7 +155,9 @@ export const PhoneRegistrationValidateScreen: React.FC<
 > = ({ route }) => {
   const styles = useStyles()
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "phoneRegistrationValidate">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "phoneRegistrationValidate">
+    >()
 
   const [status, setStatus] = useState<ValidatePhoneCodeStatusType>(
     ValidatePhoneCodeStatus.WaitingForCode,

@@ -1,4 +1,7 @@
 import { NavigatorScreenParams } from "@react-navigation/native"
+
+export const PhraseStep = { First: 1, Second: 2 } as const
+export type PhraseStep = (typeof PhraseStep)[keyof typeof PhraseStep]
 import { LNURLPaySuccessAction } from "lnurl-pay"
 
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
@@ -11,6 +14,7 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
+import { AccountTypeMode } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 
@@ -18,6 +22,8 @@ import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 
 export type RootStackParamList = {
   getStarted: undefined
+  accountTypeSelection: { mode: AccountTypeMode }
+  selfCustodialWalletCreation: undefined
   liteDeviceAccount: {
     appCheckToken: string
   }
@@ -63,6 +69,7 @@ export type RootStackParamList = {
     status: PaymentSendCompletedStatus
     successAction?: LNURLPaySuccessAction
     preimage?: string
+    note?: string
     currencyAmount?: string
     satAmount?: string
     currencyFeeAmount?: string
@@ -92,7 +99,7 @@ export type RootStackParamList = {
     defaultDescription: string
     minWithdrawableSatoshis: MoneyAmount<typeof WalletCurrency.Btc>
     maxWithdrawableSatoshis: MoneyAmount<typeof WalletCurrency.Btc>
-    receivingWalletDescriptor: WalletDescriptor<typeof WalletCurrency.Btc>
+    receivingWalletDescriptor?: WalletDescriptor<typeof WalletCurrency.Btc>
     unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
     settlementAmount: MoneyAmount<typeof WalletCurrency.Btc>
     displayAmount: MoneyAmount<DisplayCurrency>
@@ -101,6 +108,7 @@ export type RootStackParamList = {
   phoneRegistrationInitiate: undefined
   phoneRegistrationValidate: { phone: string; channel: PhoneCodeChannelType }
   transactionDetail: { txid: string }
+  unclaimedDepositsScreen: undefined
   transactionHistory?: {
     wallets?: ReadonlyArray<{
       readonly id: string
@@ -176,6 +184,23 @@ export type RootStackParamList = {
   cardOnboardingPreapprovedScreen: undefined
   cardOnboardingProcessingScreen: undefined
   cardOnboardingApprovedScreen: undefined
+  selfCustodialBackupMethod: undefined
+  selfCustodialCloudBackup: undefined
+  selfCustodialBackupSecurityChecks: undefined
+  selfCustodialBackupPhrase: { step: PhraseStep }
+  selfCustodialViewBackupSecurityChecks: undefined
+  selfCustodialViewBackupPhrase: undefined
+  selfCustodialBackupPhraseConfirm: {
+    challenges: Array<{ index: number; word: string }>
+    successMessage?: string
+  }
+  selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
+  accountMigrationExplainer: undefined
+  accountMigrationTransferringFunds: undefined
+  selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
+  selfCustodialRestoreMethod: undefined
+  selfCustodialCloudRestore: undefined
+  stableBalanceSettings: undefined
 }
 
 export type OnboardingStackParamList = {
@@ -226,4 +251,4 @@ export type PrimaryStackParamList = {
   Web: undefined
 }
 
-export type NewAccountFlowParamsList = { flow: "phone" | "trial" }
+export type NewAccountFlowParamsList = { flow: "phone" | "trial" | "selfCustodial" }

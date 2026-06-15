@@ -73,6 +73,7 @@ const en: BaseTranslation = {
     transfer: "Transfer",
     percentageToConvert: "% to convert",
     reviewTransfer: "Review transfer",
+    dustError: "Full balance has to be transferred.",
   },
   ConversionConfirmationScreen: {
     title: "Confirm transfer",
@@ -81,6 +82,8 @@ const en: BaseTranslation = {
     infoBitcoin: "Bitcoin amount is only approximate. It can vary by a small amount.",
     infoDollar: "Dollar amount is only approximate. It can vary by a small amount.",
     transferButtonText: "Transfer {fromWallet} to {toWallet}",
+    feeLabel: "Conversion fee",
+    feeError: "Couldn't fetch the conversion fee",
   },
   ConversionSuccessScreen: {
     message: "Transfer successful",
@@ -2079,6 +2082,7 @@ const en: BaseTranslation = {
     createAccount: "Create new account",
     exploreWallet: "Explore wallet",
     login: "Login",
+    loginOrRestore: "Log in / Restore",
     logBackInWith: "Log back in with",
     headline: "Wallet powered by Blink",
     startTrialAccount: "Start with a trial account",
@@ -2201,6 +2205,10 @@ const en: BaseTranslation = {
     bitcoinOnchain: "Bitcoin onchain",
     depositFee:
       "Deposit fee: {fee: string} SAT for amounts under {threshold: string} SAT or {overFee: string} SAT for deposits over {threshold} SAT",
+    autoConvertMinAmount:
+      "Amounts below {minSats: number} SAT / {minFiat: string} can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
+    autoConvertFailed: "Payment received but the conversion failed.",
+    pleaseWaitForConversion: "Please wait until the conversion is done",
   },
   RedeemBitcoinScreen: {
     title: "Redeem Bitcoin",
@@ -2210,6 +2218,10 @@ const en: BaseTranslation = {
       "Failed to redeem Bitcoin. Please contact support if this problem persists.",
     submissionError:
       "Failed to submit withdrawal request. Please contact support if this problem persists.",
+    walletNotConnected:
+      "Your wallet is still connecting. Please wait a moment and try again.",
+    paymentPending:
+      "Your payment may still be completing. Check your balance before retrying.",
     minMaxRange: "Min: {minimumAmount: string}, Max: {maximumAmount: string}",
     redeemBitcoin: "Redeem Bitcoin",
     amountToRedeemFrom: "Amount to redeem from {domain: string}",
@@ -2271,6 +2283,8 @@ const en: BaseTranslation = {
     slideConfirming: "Confirming...",
     copiedDestination: "Copied destination to clipboard",
     lightningRecommended: "High fee! We recommend Lightning.",
+    usdRemainderSweep:
+      "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
   },
   SendBitcoinDestinationScreen: {
     usernameNowAddress:
@@ -2367,6 +2381,16 @@ const en: BaseTranslation = {
     recipient: "Recipient",
     time: "Time",
     type: "Type",
+    feeTier: "Fee speed",
+    fast: "Fast",
+    medium: "Medium",
+    slow: "Slow",
+    recommended: "Recommended",
+    walletOffline: "Your wallet is offline. Please check your connection and try again.",
+    sdkInsufficientFunds: "Not enough funds for this transaction.",
+    sdkAmountTooLow: "Amount is too low for an on-chain transaction.",
+    sdkNetworkError: "Network error. Please check your connection and try again.",
+    sdkGenericError: "Unable to estimate fees. Please try a different amount.",
   },
   SettingsScreen: {
     staticQr: "Printable static QR",
@@ -2380,6 +2404,7 @@ const en: BaseTranslation = {
     setYourLightningAddress: "Set your lightning address",
     activated: "Activated",
     addressScreen: "Ways to get paid",
+    nonCustodialAccount: "Non-custodial account",
     tapUserName: "Tap to set username",
     notifications: "Notifications",
     title: "Settings",
@@ -2410,6 +2435,14 @@ const en: BaseTranslation = {
     logoutOneAccountConfirm: "I understand. Please log out.",
     receiveCurrency: "Receive currency",
     displayCurrency: "Display currency",
+    AccountInformation: {
+      identityLabel: "Wallet identifier",
+      lightningAddressLabel: "Lightning address",
+      backupStatusLabel: "Backup status",
+      backupStatusCompleted: "Backup complete",
+      backupStatusNotCompleted: "Backup not complete",
+      loadError: "Could not load your account information.",
+    },
   },
   NotificationSettingsScreen: {
     title: "Notification settings",
@@ -2449,6 +2482,7 @@ const en: BaseTranslation = {
     level: "Level {level: string}",
     switchAccount: "Switch account",
     pleaseWait: "Please Wait.",
+    probeBalanceFailed: "Couldn't verify the wallet's balance. Please try again.",
     accountLevel: "Account Level",
     upgrade: "Upgrade your account",
     logOutAndDeleteLocalData: "Log out and clear all local data",
@@ -2496,6 +2530,8 @@ const en: BaseTranslation = {
     copiedAccountId: "Copied your account ID to clipboard",
     yourAccountId: "Your Account ID",
     accountId: "Account ID",
+    publicKey: "Public key",
+    copiedPublicKey: "Copied your public key to clipboard",
     copy: "Copy",
     identityVerification: "Identity Verification",
   },
@@ -2530,7 +2566,9 @@ const en: BaseTranslation = {
   },
   DefaultWalletScreen: {
     title: "Default receive account",
+    titleSelfCustodial: "Default account",
     info: "Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change.",
+    infoSelfCustodial: "This account will be used by default when receiving and sending. You can switch any time.",
   },
   ThemeScreen: {
     title: "Theme",
@@ -2549,10 +2587,40 @@ const en: BaseTranslation = {
     body: "The Dollar account uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.",
     termsAndConditions: "Read the Terms & Conditions.",
     learnMore: "Learn more about Stablesats",
+    headerSelfCustodial: "Your Dollar account holds stablecoins",
+    bodySelfCustodial:
+      "In the Dollar account you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from the Dollar account, you will swap your stablecoins and send as Bitcoin to the recipient.",
+    learnMoreSelfCustodial: "Learn more",
+  },
+  StablesatsRestriction: {
+    modalTitle: "Stablesats is not available in your region",
+    modalBody: "To get access to a dollar account, create a non-custodial account.",
+    createNew: "Create new",
+    walletLabel: "not available in your region",
+  },
+  ConvertDollarToBitcoinModal: {
+    title: "Dollar account is no longer available in your region",
+    body: "Transfer your Dollar balance to Bitcoin",
+    youHave: "You have",
+    youGet: "You get",
+    approve: "Approve",
   },
   SplashScreen: {
     update:
       "Your app is outdated. An update is needed before the app can be used.\n\nThis can be done from the PlayStore for Android and Testflight for iOS",
+  },
+  TransactionDescription: {
+    sparkTransfer: "Spark Transfer",
+    lightningPayment: "Lightning Payment",
+    onchainDeposit: "On-chain Deposit",
+    onchainWithdrawal: "On-chain Withdrawal",
+    conversionFromBitcoin: "Conversion from Bitcoin",
+    conversionToBitcoin: "Conversion to Bitcoin",
+    conversionFromToken: "Conversion from {token: string}",
+    conversionToToken: "Conversion to {token: string}",
+    tokenTransfer: "{token: string} Transfer",
+    payTo: "Pay to {address: string}",
+    payment: "Payment",
   },
   TransactionDetailScreen: {
     paid: "Paid to/from",
@@ -2765,6 +2833,8 @@ const en: BaseTranslation = {
     accountInformation: "Account Information",
     trialAccount: "Trial Account",
     blinkUser: "Blink User",
+    anonymous: "Anonymous",
+    anonymousUser: "Anon user",
     blinkToBlink: "Blink to Blink",
     transactionLimits: "Transaction limits",
     activateWallet: "Activate Wallet",
@@ -2822,6 +2892,7 @@ const en: BaseTranslation = {
     or: "or",
     openWallet: "Open Wallet",
     onchain: "Onchain",
+    spark: "Spark",
     paymentRequest: "Payment Request",
     phone: "Phone",
     phoneNumber: "Phone Number",
@@ -2842,6 +2913,7 @@ const en: BaseTranslation = {
     submit: "Submit",
     success: "Success!",
     dollarStablesats: "Dollar (Stablesats)",
+    dollarStablecoin: "Dollar (Stablecoin)",
     to: "To",
     total: "Total",
     transactions: "Transactions",
@@ -3561,6 +3633,265 @@ const en: BaseTranslation = {
   NotificationHistory: {
     title: "Notifications",
     noNotifications: "You don't have any notifications right now",
+  },
+  BackupScreen: {
+    title: "Back up your wallet",
+    description: "Choose a backup method to secure your funds",
+    BackupMethod: {
+      title: "Choose your backup method",
+      subtitle: "We recommend {provider: string} for new users.",
+      googleDrive: "Google Drive",
+      appleICloud: "Apple iCloud",
+      passwordManager: "Password manager",
+      manualBackup: "Manual backup",
+      passwordManagerBackupSaved: "Backup saved to password manager",
+      passwordManagerBackupFailed: "Failed to save backup",
+      passwordManagerUnavailable:
+        "No password manager available on this device. Use Drive backup or save your 12-word phrase manually.",
+    },
+    CloudBackup: {
+      title: "Let's back up your wallet",
+      description:
+        "We will save a backup of your backup phrase to your {provider: string}.",
+      encryptCheckbox: "Encrypt with additional password",
+      password: "Password",
+      passwordPlaceholder: "(12 characters minimum)",
+      confirmPassword: "Confirm password",
+      confirmPasswordPlaceholder: "Enter password again",
+      continueButton: "Continue",
+      importantTitle: "Important",
+      importantMessage:
+        "Blink does not store this password. If you lose it, {bold: string} to recover your wallet.",
+      importantMessageBold: "we will not be able",
+      passwordTooShort: "Minimum 12 characters",
+      passwordMismatch: "Passwords do not match",
+      existingBackupTitle: "Backup found",
+      existingBackupMessage:
+        "A backup already exists in your {provider: string}. Do you want to overwrite it?",
+      existingBackupMessageWithDetails:
+        "A backup already exists in your {provider: string}.\n\nLightning address: {address: string}\nCreated: {createdAt: string}\n\nDo you want to overwrite it?",
+      existingBackupUnknownAddress: "Not available",
+      existingBackupUnknownCreatedAt: "Unknown",
+      overwrite: "Overwrite",
+      uploadSuccess: "Backup saved to {provider: string}",
+      uploadFailed: "Failed to upload backup",
+      signInFailed: "Failed to sign in to {provider: string}",
+      cloudNotAvailable: "iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.",
+      networkError: "Network error. Please check your connection and try again.",
+    },
+    ManualBackup: {
+      Alerts: {
+        title: "Keep your backup phrase secret!",
+        check1: "I understand nobody can recover my wallet if I lose this phrase",
+        check2:
+          "I understand if somebody gets this phrase, they can steal all my funds.",
+        check3: "Nobody is asking me for this information via message or a call",
+      },
+      Phrase: {
+        headerTitle: "Backup phrase",
+        sparkCompatible:
+          "This backup phrase works in any {sparkCompatibleLink: string}",
+        sparkCompatibleLink: "Spark-compatible wallet",
+        copiedToast: "Backup phrase copied into clipboard",
+        saveItNow: "Save it now",
+        continueButton: "Continue",
+        savedConfirm: "I have saved it",
+        copy: "Copy",
+        testBackup: "Test your backup",
+      },
+      Confirm: {
+        headerTitle: "Confirm backup phrase",
+        subtitle: "A quick check if you have written it down correctly",
+        enterWord: "Enter word",
+        enterWords: "Enter words",
+        confirm: "Confirm",
+        incorrectWord: "Incorrect word, please check the order",
+      },
+      Success: {
+        title: "Welcome to non-custodial Blink",
+        testSuccess: "Your backup phrase is correct",
+      },
+    },
+  },
+  AccountMigration: {
+    moveToNonCustodial: "Move to non-custodial",
+    explainerTitle: "What does it mean to move to non-custodial?",
+    explainerStep1:
+      "You will create a non-custodial account on the Spark protocol, <link>learn more here</link>",
+    explainerStep2:
+      "We transfer your funds into your new non-custodial account, and your current account will be deleted",
+    explainerStep3: "Continue using Blink as usual",
+    letsMove: "Let's move",
+    transferringFunds:
+      "Transferring your funds. It should be done in a few seconds.",
+  },
+  AccountTypeSelectionScreen: {
+    descriptionDefault: "Please choose your preferred type of Blink.",
+    descriptionSelected: "Please choose account type.",
+    custodialLabel: "Custodial",
+    selfCustodialLabel: "Non-custodial",
+    custodialDescription: "We hold the funds on your behalf",
+    selfCustodialDescription: "Only you can access funds",
+    chooseMethod: "Choose method",
+    continueButton: "Continue",
+    selfCustodialDisabled: "Non-custodial is temporarily unavailable.",
+    restoreComingSoonTitle: "Coming soon",
+    restoreComingSoonDescription:
+      "Restore flow will be available in a future update.",
+    createFailed: "Failed to create wallet. Please try again.",
+  },
+  RestoreScreen: {
+    title: "Restore wallet",
+    description: "Recover your wallet from a backup",
+    phraseTitle: "Restore wallet",
+    phraseSubtitleStep1: "Enter first 6 words of your backup phrase",
+    phraseSubtitleStep2: "Enter rest of your backup phrase",
+    nextWords: "Next 6 words",
+    paste: "Paste",
+    enterWord: "Word",
+    invalidMnemonic: "Invalid backup phrase. Please check if the word order is correct.",
+    restoring: "Restoring your wallet...",
+    restoreSuccess: "Wallet restored successfully",
+    restoreFailed: "Failed to restore wallet. Please try again.",
+    restore: "Restore wallet",
+    noBackupFound: "No backup found",
+    noBackupDescription:
+      "We couldn't find a backup. You can enter your backup phrase manually instead.",
+    enterPassword: "Enter your encryption password",
+    wrongPassword: "Incorrect password. Please try again.",
+    pickBackupTitle: "Choose a wallet",
+    pickBackupDescription: "Select a backup to restore",
+  },
+  BackupNudge: {
+    title: "Your funds are at risk",
+    description: "Secure your wallet now. It only takes a minute.",
+    cta: "Secure wallet",
+    settingsWarning: "Backup your wallet. If you lose this device, you will lose your funds.",
+    modalTitle: "Secure your funds",
+    modalDescription:
+      "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
+    secureMe: "Secure wallet",
+  },
+  SelfCustodialOffline: {
+    title: "Wallet is offline",
+    description:
+      "Your non-custodial wallet can't reach the network right now. Try again when you're back online.",
+    retry: "Try again",
+  },
+  SelfCustodialError: {
+    insufficientFunds:
+      "Not enough funds to cover the amount and network fees. Try a smaller amount.",
+    belowMinimum:
+      "Amount is below the minimum required for this payment. Try a larger amount.",
+    networkError:
+      "Network connection problem. Check your connection and try again.",
+    invalidInput: "The payment details look invalid. Please review and try again.",
+    generic:
+      "The payment could not be completed. Try again in a moment, or use a smaller amount.",
+  },
+  UnclaimedDeposit: {
+    screenTitle: "Unclaimed Deposits",
+    cardTitle: "Claim {sats} sats",
+    title: "You have {count} unclaimed deposit(s)",
+    description: "Total: {sats} sats available to claim",
+    claim: "Claim now",
+    claimWithFee: "Claim (max fee: {fee} sats)",
+    claiming: "Claiming...",
+    refund: "Refund",
+    refunding: "Refunding...",
+    immature: "Waiting for confirmations...",
+    feeExceeded: "Network fees are too high to claim ({requiredFee} sats required). Try again later or refund to an on-chain address.",
+    missingUtxo: "This deposit is no longer available on the network.",
+    belowDustLimit:
+      "This deposit is too small to claim after fees. Wait for lower fees or refund to an on-chain address.",
+    genericError: "Unable to claim: {error}",
+    claimFailed: "Claim failed: {error}",
+    refundFailed: "Refund failed: {error}",
+    refundAddress: "Bitcoin address for refund",
+    feeRate: "Network fee",
+    feeRateFastest: "Fastest (~{sats} sats) ~10 min",
+    feeRateHalfHour: "Normal (~{sats} sats) ~30 min",
+    feeRateHour: "Economy (~{sats} sats) ~60 min",
+    feeRateUnit: "{rate} sat/vB",
+    feeRateUnavailable: "Couldn't load network fees. Please check your connection and try again.",
+    refundNow: "Refund now",
+    refundSuccess: "Refund initiated successfully",
+    claimSuccess: "Deposit claimed successfully",
+    error: "Unable to claim this deposit",
+  },
+  StableBalance: {
+    title: "Stable Balance",
+    description: "Hold a USD-denominated balance powered by USDB on Spark.",
+    balanceLabelBtc: "Balance · SATS",
+    balanceLabelUsd: "Balance · USD",
+    settingsRowTitle: "Stable Balance",
+    settingsTitle: "Stable Balance",
+    settingsDescription:
+      "Keep part of your wallet in USD. Convert between BTC and USD manually anytime using the Convert action.",
+    activationLabel: "Active",
+    activeHint: "Your wallet is holding USD via USDB.",
+    inactiveHint: "Your wallet is holding BTC only.",
+    deactivateWarningBody:
+      "You still have {amount:string}. Convert to BTC first, or your USD balance will be hidden until you reactivate Stable Balance.",
+    toggleFailedToast: "Could not update Stable Balance. Please try again.",
+    toggleModal: {
+      activateTitle: "Activate Stable Balance",
+      activateBody:
+        "Your BTC balance will be converted to USDB. This is the estimated conversion fee.",
+      activateConfirm: "Activate",
+      deactivateTitle: "Deactivate Stable Balance",
+      deactivateBody:
+        "Your USDB balance will be converted back to BTC. This is the estimated conversion fee.",
+      deactivateConfirm: "Deactivate",
+      cancel: "Cancel",
+    },
+    minimumConversion: "Minimum conversion: {amount:string}",
+    conversionUnavailable: "Conversion is temporarily unavailable. Please try again.",
+  },
+  WalletCreationScreen: {
+    creating: "Creating your wallet...",
+    errorTitle: "Wallet creation failed",
+    errorDescription: "Something went wrong. Please try again.",
+    retry: "Try again",
+  },
+  BackendFeatureGate: {
+    title: "Feature unavailable",
+    description: "This feature requires a custodial account.",
+    signInTitle: "Sign in required",
+    signInDescription:
+      "Sign in to your custodial account to use {featureName: string}.",
+    noAccountTitle: "Custodial account required",
+    noAccountDescription:
+      "{featureName: string} requires a Blink custodial account.",
+    featureCircles: "Circles",
+    featureEarn: "Earn",
+    featureCard: "Card",
+  },
+  FeatureUnavailable: {
+    SelfCustodial: {
+      title: "Temporarily unavailable",
+      description:
+        "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later.",
+    },
+  },
+  NetworkStatus: {
+    degradedBanner:
+      "Spark network is currently degraded. Payments may take longer.",
+  },
+  SelfCustodialDelete: {
+    dangerZoneImportantTitle: "Important",
+    dangerZoneBulletReinstated: "Deleted account cannot be reinstated",
+    dangerZoneBulletPermanent: "Account deletion is permanent",
+    dangerZoneBulletEmpty: "Make sure account is empty",
+    dangerZoneDeleteButton: "Delete account and data",
+    confirmModalTitle: "Confirm account removal",
+    confirmModalTypeToConfirm: 'Type "{delete: string}" to confirm',
+    hasFundsWarningTitle: "Warning",
+    hasFundsWarningBody:
+      "Your wallet has a balance of {balance: string}. For your safety, we dont allow deletion of accounts with funds.",
+    hasFundsWarningHelper:
+      "To proceed with deletion, either empty your account or donate to circular economies.",
+    hasFundsWarningButton: "Go back",
   },
 }
 

@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from "react"
 import { ActivityIndicator, View } from "react-native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { Screen } from "@app/components/screen"
 import { CardType } from "@app/graphql/generated"
@@ -39,7 +39,7 @@ export const ReplaceCardScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "replaceCardScreen">>()
   const { cardId } = route.params
 

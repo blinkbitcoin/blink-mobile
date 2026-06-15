@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { Pressable, View } from "react-native"
+import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
-import { makeStyles, Text } from "@rn-vui/themed"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { ActionButton } from "@app/components/action-button"
 import { AmountInputModal } from "@app/components/amount-input/amount-input-modal"
@@ -16,9 +16,14 @@ import { Screen } from "@app/components/screen"
 import { SetLightningAddressModal } from "@app/components/set-lightning-address-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { WalletCurrency } from "@app/graphql/generated"
-import { useNotificationPermission } from "@app/hooks"
+import { useNotificationPermission, usePriceConversion } from "@app/hooks"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
+import type { SelfCustodialPaymentRequestState } from "@app/self-custodial/hooks/types"
+import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 
 import { NfcHeaderButton } from "./nfc-header-button"
@@ -28,7 +33,7 @@ import { Invoice, InvoiceType, PaymentRequestState } from "./payment/index.types
 import {
   useDisplayPaymentRequest,
   useNfcReceive,
-  useOnChainAddress,
+  useOnchainResolver,
   usePaymentRequest,
   useReceiveCarousel,
   useReceiveFlow,
@@ -36,24 +41,70 @@ import {
 
 const AUTO_DISMISS_DELAY = 5000
 
-const ReceiveScreen = () => {
-  const requestState = usePaymentRequest()
+const SELF_CUSTODIAL_BLOCKED_STATUSES: ActiveWalletStatus[] = [
+  ActiveWalletStatus.Error,
+  ActiveWalletStatus.Unavailable,
+]
 
+const LoadingView: React.FC = () => {
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+  return (
+    <Screen>
+      <View style={styles.loadingContainer} testID="receive-loading">
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    </Screen>
+  )
+}
+
+const ReceiveScreen = () => {
+  const { isSelfCustodial, status } = useActiveWallet()
+  const { convertMoneyAmount } = usePriceConversion()
+  const custodialRequest = usePaymentRequest()
+  const selfCustodialRequest = useSelfCustodialPaymentRequest()
+
+  if (isSelfCustodial && SELF_CUSTODIAL_BLOCKED_STATUSES.includes(status)) {
+    return null
+  }
+
+  /** Loader while price conversion bootstraps after an account switch. */
+  if (!convertMoneyAmount) {
+    return <LoadingView />
+  }
+
+  const requestState = isSelfCustodial ? selfCustodialRequest : custodialRequest
   if (!requestState) return null
 
-  return <ReceiveScreenContent requestState={requestState} />
+  return (
+    <ReceiveScreenContent
+      requestState={requestState}
+      isSelfCustodial={isSelfCustodial}
+      selfCustodialRequest={isSelfCustodial ? selfCustodialRequest : undefined}
+    />
+  )
 }
 
 type ReceiveScreenContentProps = {
-  requestState: NonNullable<ReturnType<typeof usePaymentRequest>>
+  requestState: SelfCustodialPaymentRequestState
+  isSelfCustodial: boolean
+  selfCustodialRequest: SelfCustodialPaymentRequestState | null | undefined
 }
 
-const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestState }) => {
+const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
+  requestState,
+  isSelfCustodial,
+  selfCustodialRequest,
+}) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   useNotificationPermission()
+
+  const isStablesatsRestricted = useStablesatsRestricted()
 
   const [isTrialModalVisible, setIsTrialModalVisible] = useState(false)
   const openTrialModal = useCallback(() => setIsTrialModalVisible(true), [])
@@ -71,15 +122,11 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestStat
 
   const carousel = useReceiveCarousel(requestState, openTrialModal)
 
-  const onchainWalletId =
-    carousel.onchainWalletCurrency === WalletCurrency.Btc
-      ? requestState.btcWalletId
-      : requestState.usdWalletId
-
-  const onchain = useOnChainAddress(onchainWalletId, {
-    amount: requestState.settlementAmount?.amount,
-    memo: requestState.memo || undefined,
-  })
+  const onchain = useOnchainResolver(
+    isSelfCustodial,
+    requestState,
+    carousel.onchainWalletCurrency,
+  )
 
   const {
     handleSetAmount,
@@ -140,11 +187,25 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestStat
     }, [openTrialModal]),
   )
 
+  const isConverting = requestState.state === PaymentRequestState.Converting
+
   useEffect(() => {
     if (requestState.state !== PaymentRequestState.Paid) return
     const id = setTimeout(() => navigation.goBack(), AUTO_DISMISS_DELAY)
     return () => clearTimeout(id)
   }, [requestState.state, navigation])
+
+  const onchainAmountRowCurrency = isSelfCustodial
+    ? WalletCurrency.Btc
+    : carousel.onchainWalletCurrency
+
+  const amountRowCurrency = carousel.isOnChainPage
+    ? onchainAmountRowCurrency
+    : requestState.receivingWalletDescriptor.currency
+
+  const canToggleWallet = isSelfCustodial
+    ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
+    : !isStablesatsRestricted
 
   return (
     <Screen
@@ -162,6 +223,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestStat
             getFullUri={requestState.info?.data?.getFullUriFn}
             loading={requestState.state === PaymentRequestState.Loading}
             completed={requestState.state === PaymentRequestState.Paid}
+            converting={isConverting}
             err={
               requestState.state === PaymentRequestState.Error
                 ? LL.ReceiveScreen.error()
@@ -181,6 +243,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestStat
             getFullUri={onchain.getFullUriFn}
             loading={onchain.loading}
             completed={requestState.state === PaymentRequestState.Paid}
+            converting={isConverting}
             err=""
             expired={false}
             regenerateInvoiceFn={requestState.regenerateInvoice}
@@ -225,17 +288,14 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestStat
       <View style={styles.inputsContainer}>
         <ReceiveAmountRow
           unitOfAccountAmount={requestState.unitOfAccountAmount}
-          walletCurrency={
-            carousel.isOnChainPage
-              ? carousel.onchainWalletCurrency
-              : requestState.receivingWalletDescriptor.currency
-          }
+          walletCurrency={amountRowCurrency}
           convertMoneyAmount={requestState.convertMoneyAmount}
           setAmount={handleSetAmount}
           canSetAmount={requestState.canSetAmount}
           onToggleWallet={handleToggleWallet}
-          canToggleWallet={true}
+          canToggleWallet={canToggleWallet}
           disabled={
+            !isSelfCustodial &&
             carousel.isOnChainPage &&
             carousel.onchainWalletCurrency === WalletCurrency.Usd
           }
@@ -283,6 +343,12 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({ requestStat
           walletCurrency={requestState.receivingWalletDescriptor.currency}
           canSetExpirationTime={requestState.canSetExpirationTime}
           feesInformation={requestState.feesInformation}
+          shouldShowAutoConvertMinWarning={
+            !carousel.isOnChainPage &&
+            selfCustodialRequest?.shouldShowAutoConvertMinWarning
+          }
+          autoConvertMinSats={selfCustodialRequest?.autoConvertMinSats}
+          autoConvertMinFiat={selfCustodialRequest?.autoConvertMinFiat}
         />
       </View>
 
@@ -322,6 +388,11 @@ const useStyles = makeStyles(({ colors }) => ({
   screenStyle: {
     paddingVertical: 12,
     flexGrow: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   paymentIdentifier: {
     alignItems: "center",

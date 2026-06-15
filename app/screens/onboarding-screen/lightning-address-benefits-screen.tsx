@@ -1,6 +1,6 @@
 import * as React from "react"
 import { RouteProp, useFocusEffect, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
@@ -18,7 +18,7 @@ export const LightningBenefitsScreen: React.FC<LightningBenefitsScreenProps> = (
   route,
 }) => {
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { onboarding, canGoBack = true } = route.params
 

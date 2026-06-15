@@ -7,7 +7,7 @@ import { UserContact, useUserContactUpdateAliasMutation } from "@app/graphql/gen
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { isIos } from "@app/utils/helper"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme, Input } from "@rn-vui/themed"
 
 import { CloseCross } from "../../../components/close-cross"
@@ -54,7 +54,7 @@ export const ContactsDetailScreenJSX: React.FC<ContactDetailScreenProps> = ({
 
   const styles = useStyles()
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "transactionHistory">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "transactionHistory">>()
 
   const [contactName, setContactName] = React.useState(contact.alias)
   const { LL } = useI18nContext()

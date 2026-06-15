@@ -3,12 +3,12 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 
 import { SettingsRow } from "../row"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 export const ApiAccessSetting: React.FC = () => {
   const { LL } = useI18nContext()
-  const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   return (
     <SettingsRow

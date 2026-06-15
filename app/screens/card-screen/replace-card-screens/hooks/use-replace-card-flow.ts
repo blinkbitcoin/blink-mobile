@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -52,7 +52,7 @@ export const useReplaceCardFlow = ({
   isVirtualCard,
   initialAddress,
 }: UseReplaceCardFlowParams): UseReplaceCardFlowReturn => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const stepOrder = useMemo(
     () => (isVirtualCard ? VIRTUAL_STEPS : PHYSICAL_STEPS),

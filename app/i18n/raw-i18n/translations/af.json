@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "Hoe om jou Kasregister te gebruik",
     "howToUseYourAddressExplainer": "Deel met iemand wat 'n versoenbare beursie het soos:",
     "howToUseYourPaycodeExplainer": "Jy kan jou LNURL uitdruk op papier (dit is tegnies 'n lnurl-pay adres) en dit in jou besigheid vertoon om betalings te ontvang. Individue kan jou betaal deur dit te skandeer met enige Lightning-beursie. \n\nWees egter bewus dat seker beursies nie 'n LNURL kan skandeer nie.",
-    "howToUseYourCashRegisterExplainer": "Laat mense toe om betalings namens jou te aanvaar via die Kasregister skakel sonder om hulle toegang te gee tot die beursie. \n\nHulle kan dan self fakature genereer en betalings sal direk na jou {bankName: string} beursie gaan. ",
-    "yourAddress": "{bankName: string}-adres",
-    "copiedAddressToClipboard": "{bankName: string}-adres is na knipbord oorgedra"
+    "howToUseYourCashRegisterExplainer": "Laat mense toe om betalings namens jou te aanvaar via die Kasregister skakel sonder om hulle toegang te gee tot die beursie. \n\nHulle kan dan self fakature genereer en betalings sal direk na jou {bankName: string} beursie gaan. "
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "Bepalings en Voorwaardes",
@@ -64,7 +62,8 @@
     "title": "Ruil",
     "transfer": "Oordrag",
     "percentageToConvert": "% om te ruil",
-    "reviewTransfer": "Hersien oordrag"
+    "reviewTransfer": "Hersien oordrag",
+    "dustError": "Die volle saldo moet oorgedra word."
   },
   "ConversionConfirmationScreen": {
     "title": "Hersien omskakeling",
@@ -72,11 +71,12 @@
     "receivingAccount": "Ontvangsrekening",
     "infoBitcoin": "Bitcoin-bedrag is slegs 'n skatting. Dit kan met 'n klein bedrag wissel.",
     "infoDollar": "Dollar-bedrag is slegs 'n skatting. Dit kan met 'n klein bedrag wissel.",
-    "transferButtonText": "Dra {fromWallet} oor na {toWallet}"
+    "transferButtonText": "Dra {fromWallet} oor na {toWallet}",
+    "feeLabel": "Omskakelingsfooi",
+    "feeError": "Kon nie die omskakelingsfooi haal nie"
   },
   "ConversionSuccessScreen": {
-    "message": "Omskakeling suksesvol",
-    "title": "Omskakeling sukses"
+    "message": "Omskakeling suksesvol"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2047,6 +2047,7 @@
     "createAccount": "Skep 'n nuwe rekening",
     "exploreWallet": "Verken beursie",
     "login": "Meld aan",
+    "loginOrRestore": "Teken in / Herstel",
     "logBackInWith": "Teken weer in met",
     "headline": "Beursie deur Galoy gebou",
     "startTrialAccount": "Begin met 'n proefrekening",
@@ -2071,12 +2072,7 @@
     "payBusiness": "betaal hierdie besigheid",
     "openSettings": "Maak instellings oop",
     "title": "Kaart",
-    "error": "Oeps. Iets het verkeerd gegaan terwyl jou ligging bepaal is",
-    "locationPermissionMessage": "Aktiveer jou ligging sodat ons weet waar jy is op die kaart",
-    "locationPermissionNegative": "Kanselleer ",
-    "locationPermissionNeutral": "Vra my later",
-    "locationPermissionPositive": "OK",
-    "locationPermissionTitle": "Vind jou ligging op die kaart"
+    "error": "Oeps. Iets het verkeerd gegaan terwyl jou ligging bepaal is"
   },
   "HomeScreen": {
     "receive": "Ontvang",
@@ -2166,9 +2162,14 @@
     "lightningAddress": "Lightning-adres",
     "lightningInvoice": "Lightning-faktuur",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "Deposito-fooi: {fee} SAT vir bedrae onder {threshold} SAT of {overFee} SAT vir deposito's oor {threshold} SAT"
+    "depositFee": "Deposito-fooi: {fee} SAT vir bedrae onder {threshold} SAT of {overFee} SAT vir deposito's oor {threshold} SAT",
+    "autoConvertMinAmount": "Bedrae onder {minSats: number} sats / {minFiat: string} kan nie outomaties na Dollar omgeskakel word nie. Jy sal eerder Bitcoin ontvang.",
+    "autoConvertFailed": "Betaling ontvang maar die omskakeling het misluk.",
+    "pleaseWaitForConversion": "Wag asseblief totdat die omskakeling voltooi is"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "Jou beursie koppel steeds. Wag asseblief 'n oomblik en probeer weer.",
+    "paymentPending": "Jou betaling word dalk steeds voltooi. Kontroleer jou saldo voordat jy weer probeer.",
     "title": "Verkry Bitcoin",
     "usdTitle": "Ruil om na Dollar-rekening",
     "error": "Kon nie faktuur genereer nie. Kontak asseblief ondersteuning as hierdie probleem voortduur.",
@@ -2226,7 +2227,8 @@
     "slideToConfirm": "Gly om te bevestig",
     "slideConfirming": "Besig om te bevestig...",
     "copiedDestination": "Bestemming na knipbord oorgedra",
-    "lightningRecommended": "Hoë fooi! Ons beveel Lightning aan."
+    "lightningRecommended": "Hoë fooi! Ons beveel Lightning aan.",
+    "usdRemainderSweep": "Oorblywende {remaining: string} ({remainingSats: string}) sal na Bitcoin omgeskakel word. USD-minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "{bankName: string} gebruikersname is nou {bankName: string} adresse. ",
@@ -2257,16 +2259,7 @@
     "clipboardError": "Fout - Kon nie die waarde van die knipbord kry nie. ",
     "pastedClipboardSuccess": "Vanaf knipbord geplak",
     "invalidPhoneNumber": "Voer 'n geldige selfoonnommer in",
-    "phoneNotAllowed": "Hierdie veld aanvaar nie telefoonnommers nie",
-    "confirmModal": {
-      "title": "Jy het nog nooit fondse na die adres gestuur nie",
-      "body1": "Maak asseblief seker die ontvanger het vir jou 'n {bankName: adres} gegee",
-      "bold2bold": "nie 'n gebruikersnaam van 'n ander beursie nie.",
-      "body3": "Anders gaan die geld na 'n {bankName: string} rekening wat die \"{lnAddress: string}\"-adres bevat.\n\nBevestig die spelling van die eerste deel van die adres ook bv. fanie en fan1e is 2 verskillende adresse.",
-      "warning": "As die {bankName: string}-adres verkeerd ingevul word, kan {bankName: string} nie die transaksie regstel of verander nie. ",
-      "checkBox": "{lnAddress: string} is die regte adres. ",
-      "confirmButton": "Ek is 100% seker"
-    }
+    "phoneNotAllowed": "Hierdie veld aanvaar nie telefoonnommers nie"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksie behoort aan mempool voorgelê te word",
@@ -2314,8 +2307,16 @@
     "recipient": "Ontvanger",
     "time": "Tyd",
     "type": "Tipe",
-    "destinationIsRequired": "Bestemming word benodig",
-    "lnurlInvoiceIncorrectDescription": "Die LNURL-bediener het reageer met 'n faktuur met 'n verkeerde transaksie-hash"
+    "feeTier": "Fooi spoed",
+    "fast": "Vinnig",
+    "medium": "Medium",
+    "slow": "Stadig",
+    "recommended": "Aanbeveel",
+    "walletOffline": "Jou beursie is vanlyn. Kontroleer asseblief jou verbinding en probeer weer.",
+    "sdkInsufficientFunds": "Nie genoeg fondse vir hierdie transaksie nie.",
+    "sdkAmountTooLow": "Bedrag is te laag vir 'n on-chain transaksie.",
+    "sdkNetworkError": "Netwerkfout. Kontroleer asseblief jou verbinding en probeer weer.",
+    "sdkGenericError": "Kan nie fooie skat nie. Probeer asseblief 'n ander bedrag."
   },
   "SettingsScreen": {
     "staticQr": "Drukbare statiese QR",
@@ -2329,6 +2330,7 @@
     "setYourLightningAddress": "Stel jou Lightning-adres",
     "activated": "Geaktiveer ",
     "addressScreen": "Maniere om betaal te word",
+    "nonCustodialAccount": "Nie-bewaarrekening",
     "tapUserName": "Tik om gebruikersnaam te verander ",
     "notifications": "Notas",
     "title": "Verstellings",
@@ -2355,7 +2357,15 @@
     "logoutOneAccountAlertContent": "Jy sal afgemeld word van die sessie wat aan {identifier: string} gekoppel is.\nMaak seker jy het toegang om in die toekoms weer aan te meld.",
     "logoutOneAccountConfirm": "Ek verstaan. Meld asseblief af.",
     "receiveCurrency": "Ontvanggeldeenheid",
-    "displayCurrency": "Vertoongeldeenheid"
+    "displayCurrency": "Vertoongeldeenheid",
+    "AccountInformation": {
+      "identityLabel": "Wallet identifier",
+      "backupStatusLabel": "Backup status",
+      "backupStatusCompleted": "Backup complete",
+      "backupStatusNotCompleted": "Backup not complete",
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "Lightning-adres"
+    }
   },
   "NotificationSettingsScreen": {
     "title": "Notaverstellings",
@@ -2394,6 +2404,7 @@
     "level": "Vlak {level: string}",
     "switchAccount": "Wissel rekening",
     "pleaseWait": "Wag asseblief.",
+    "probeBalanceFailed": "Kon nie die beursie se saldo verifieer nie. Probeer asseblief weer.",
     "accountLevel": "Rekeningvlak",
     "upgrade": "Opgradeer jou rekening",
     "logOutAndDeleteLocalData": "Teken uit en verwyder alle plaaslike data",
@@ -2433,6 +2444,8 @@
     "copiedAccountId": "Jou rekening ID is oorgedra na die knipbord ",
     "yourAccountId": "Jou Rekening ID",
     "accountId": "Rekening-ID",
+    "publicKey": "Publieke sleutel",
+    "copiedPublicKey": "Publieke sleutel na knipbord gekopieer",
     "copy": "Dra oor",
     "identityVerification": "Identiteitsverifikasie"
   },
@@ -2442,6 +2455,19 @@
     "fromThisDevice": "van hierdie toestel?",
     "switchAccount": "Jy het na 'n ander rekening oorgeskakel",
     "removedAccount": "Jy het rekening {identifier: string} verwyder."
+  },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats is nie beskikbaar in jou streek nie",
+    "modalBody": "Om toegang tot 'n dollar-rekening te kry, skep 'n nie-bewaarende rekening.",
+    "createNew": "Skep nuwe",
+    "walletLabel": "nie beskikbaar in jou streek nie"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "Die Dollar-rekening is nie meer in jou streek beskikbaar nie",
+    "body": "Dra jou Dollar-saldo oor na Bitcoin",
+    "youHave": "Jy het",
+    "youGet": "Jy kry",
+    "approve": "Keur goed"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Twee-faktor-verifikasie",
@@ -2463,7 +2489,9 @@
   },
   "DefaultWalletScreen": {
     "title": "Verstek ontvangrekening",
-    "info": "Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg. Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie."
+    "info": "Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg. Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie.",
+    "titleSelfCustodial": "Verstek-rekening",
+    "infoSelfCustodial": "Hierdie rekening sal by verstek gebruik word vir ontvang en stuur. Jy kan enige tyd wissel."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2481,7 +2509,10 @@
     "header": "Jou Dollar-rekening word aangedryf deur Stablesats",
     "body": "Die Dollar-rekening gebruik Stablesats-tegnologie om Bitcoin stabiel teen USD-prys te hou. Jy hou altyd Bitcoin — nie werklike dollars nie — maar die USD-waarde fluktueer nie. Jy kan Bitcoin stuur en ontvang soos gewoonlik, maar dit is nie versoenbaar met die tradisionele bankstelsel nie.",
     "termsAndConditions": "Lees die Terme en Voorwaardes",
-    "learnMore": "Leer meer van Stablesats"
+    "learnMore": "Leer meer van Stablesats",
+    "headerSelfCustodial": "Jou Dollar-rekening hou stablecoins",
+    "bodySelfCustodial": "In die Dollar-rekening hou jy stablecoins. Tokens gerugsteun deur bates met waarde gestabiliseer aan die USD. Jy kan nog nie stablecoins stuur en ontvang nie. Wanneer jy van die Dollar-rekening stuur, sal jy jou stablecoins omruil en as Bitcoin aan die ontvanger stuur.",
+    "learnMoreSelfCustodial": "Lees meer"
   },
   "SplashScreen": {
     "update": "Jou toepassing is lanklaas opgedateer. Dateer asseblief die toepassing op voordat jy dit kan gebruik.\n\nDit kan gedoen word by die Android of google Playstore of Apple App store vir IOS."
@@ -2682,6 +2713,8 @@
     "accountInformation": "Rekeninginligting",
     "trialAccount": "Proefrekening",
     "blinkUser": "Blink-gebruiker",
+    "anonymous": "Anoniem",
+    "anonymousUser": "Anonieme gebruiker",
     "blinkToBlink": "Blink na Blink",
     "transactionLimits": "Transaksielimiete ",
     "activateWallet": "Aktiveer beursie",
@@ -2739,6 +2772,7 @@
     "or": "of",
     "openWallet": "Maak beursie oop",
     "onchain": "Onchain",
+    "spark": "Spark",
     "paymentRequest": "Betalingsversoek",
     "phone": "Selfoon",
     "phoneNumber": "Selfoonnommer ",
@@ -2758,6 +2792,7 @@
     "submit": "Stuur",
     "success": "Sukses!",
     "dollarStablesats": "Dollar (Stablesats)",
+    "dollarStablecoin": "Dollar (Stablecoin)",
     "to": "Aan",
     "total": "Totaal",
     "transactions": "Transaksies",
@@ -2800,7 +2835,8 @@
       "minChars": "Moet ten minste {min} karakters wees",
       "invalidPostalCode": "Ongeldige poskode, waarskynlik 'n tikfout",
       "invalidRegion": "Ongeldige streekkeuse"
-    }
+    },
+    "copied": "Na knipbord gekopieer"
   },
   "errors": {
     "generic": "Daar was 'n fout.\nProbeer asseblief later weer.",
@@ -2929,27 +2965,6 @@
       "title": "Junie-uitdaging!",
       "description": "Brei jou binnekring uit met 10 vir 'n kans om 'n $1000-voorregkaartjie vir die Adopting Bitcoin El Salvador te wen",
       "details": "Wen 'n voorregkaartjie vir Adopting Bitcoin El Salvador\n\nBrei jou binnekring uit met 10 vir 'n kans om 'n $1000-voorregkaartjie te wen vir Adopting Bitcoin El Salvador! Die kaartjie sluit eksklusiewe toegang in tot die hoofkonferensie, mezzanine met kos/drank/versnaperinge, sprekers se aandete, en die Filmfees.\n\nDeel jou sirkels op sosiale media met die hutsmerk #blinkcircles om deel te neem.\n\nHierdie keer sal daar twee wenners wees!"
-    },
-    "septChallenge": {
-      "title": "September Uitdaging!",
-      "description": "Binnesirkel {innerCircle: number}/21 - Verdien $21\nTop 3 - Wen kaartjies na Adopting Bitcoin!",
-      "details": "Groei jou binnesirkel met 21 mense in September en deel op sosiale media met #blinkcircles om $21 se Stablesats in jou blink-rekening te ontvang. Top 3 wen kaartjies na Adopting Bitcoin! ",
-      "peopleWelcomedSoFar": "mense reeds verwelkom",
-      "yourRank": "Jou rang",
-      "reminder": "Herhindering: Jou binnesirkel groei wanneer jy die eerste sats na 'n nuwe Blink-gebruiker stuur",
-      "fullDetails": "Volle besonderhede"
-    },
-    "octoberChallenge": {
-      "title": "Oktober uitdaging!",
-      "description": "Deel jou #blinksirkels vir 'n kans om 1,000,000 sats te wen!",
-      "details": "Ons gee 1,000,000 sats weg! Deel jou sirkels op sosiaal en tag #blinksirkels om in te skryf! Die wenner word lukraak gekies op 31 Oktober.\n\nJy moet minstens een persoon in jou binnesirkel hê om in te skryf!",
-      "connectOnSocial": "Skakel op sosiaal:",
-      "fullDetails": "Volle besonderhede by"
-    },
-    "novemberChallenge": {
-      "title": "November Challenge!",
-      "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-      "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
     }
   },
   "FullOnboarding": {
@@ -2973,9 +2988,6 @@
     "title": "Kennisgewings",
     "noNotifications": "Jy het tans geen kennisgewings nie"
   },
-  "Fake": {
-    "doNotTranslate": "NA"
-  },
   "CardFlow": {
     "TransactionStatus": {
       "pending": "Hangend",
@@ -2993,7 +3005,10 @@
       "emptyTransactions": "Nog geen transaksies nie",
       "addFunds": "Voeg fondse by",
       "transactionsTitle": "Transaksies",
-      "title": "Visa-kaart"
+      "title": "Visa-kaart",
+      "noCardAvailable": "Geen kaarte beskikbaar nie",
+      "cardNotUsable": "Hierdie kaart is tans nie beskikbaar vir gebruik nie",
+      "cardUpdateError": "Kon kaartstatus nie opdateer nie"
     },
     "validThruLabel": "GELDIG TOT",
     "networkVisa": "Visa",
@@ -3265,9 +3280,6 @@
         "damagedCard": "Beskadigde kaart",
         "damagedCardDescription": "My kaart is fisies beskadig",
         "whatHappensNext": "Wat gebeur volgende?",
-        "currentCardDeactivated": "Jou huidige kaart sal onmiddellik gedeaktiveer word",
-        "newCardShipped": "'n Nuwe kaart sal na jou adres gestuur word",
-        "digitalCardAvailable": "Jou digitale kaart bly beskikbaar tydens hierdie proses",
         "cardManagement": "Kaartbestuur",
         "bullet1": "Jou huidige kaart sal gevries word vir sekuriteit",
         "bullet2": "'n Nuwe kaart met verskillende nommers sal uitgereik word",
@@ -3288,15 +3300,9 @@
         "title": "Hersien jou versoek",
         "subtitle": "Bevestig asseblief die besonderhede van jou kaartvervanging",
         "requestSummary": "Versoekoopsomming",
-        "reason": "Rede",
         "delivery": "Aflewering",
-        "shippingAddress": "Versendingsadres",
-        "deliveryCost": "Afleweringskoste",
         "submitRequest": "Dien versoek in",
         "importantInformation": "Belangrike inligting",
-        "processedImmediately": "Jou versoek sal onmiddellik verwerk word",
-        "currentCardDeactivated": "Huidige kaart sal met bevestiging gedeaktiveer word",
-        "trackStatus": "Jy kan jou nuwe kaart se afleweringstatus in die app volg",
         "issueType": "Rede",
         "deliveryTime": "Afleweringstyd",
         "shippingCost": "Afleweringskoste",
@@ -3349,10 +3355,7 @@
         "feature2": "EMV-skyfie vir verbeterde sekuriteit",
         "feature3": "Magneetstrook vir universele aanvaarding",
         "feature4": "Jou naam op die kaart ge-embosseer",
-        "important": "Belangrik",
-        "importantBullet1": "Jou virtuele kaart bly aktief terwyl jy vir die fisiese kaart wag",
-        "importantBullet2": "Jy sal jou fisiese kaart moet aktiveer wanneer dit aankom",
-        "importantBullet3": "Albei kaarte sal dieselfde kaartnommer en besonderhede hê"
+        "important": "Belangrik"
       },
       "Confirm": {
         "title": "Bevestig jou bestelling",
@@ -3470,5 +3473,248 @@
         "buttonText": "Sluit"
       }
     }
+  },
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
+    "BackupMethod": {
+      "title": "Kies jou rugsteunmetode",
+      "subtitle": "Ons beveel {provider} aan vir nuwe gebruikers.",
+      "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
+      "passwordManager": "Wagwoordbestuurder",
+      "manualBackup": "Handmatige rugsteun",
+      "passwordManagerBackupSaved": "Rugsteun gestoor in wagwoordbestuurder",
+      "passwordManagerBackupFailed": "Kon nie rugsteun stoor nie",
+      "passwordManagerUnavailable": "Geen wagwoordbestuurder op hierdie toestel beskikbaar nie. Gebruik Drive-rugsteun of stoor jou 12-woord-frase handmatig."
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "Hou jou rugsteunfrase geheim!",
+        "check1": "Ek verstaan niemand kan my beursie herstel as ek hierdie frase verloor nie",
+        "check2": "Ek verstaan as iemand hierdie frase kry, kan hulle al my fondse steel.",
+        "check3": "Niemand vra my vir hierdie inligting via boodskap of oproep nie"
+      },
+      "Phrase": {
+        "headerTitle": "Rugsteunfrase",
+        "sparkCompatible": "Hierdie rugsteunfrase werk in enige {sparkCompatibleLink}",
+        "sparkCompatibleLink": "Spark-versoenbare beursie",
+        "copiedToast": "Rugsteunfrase na knipbord gekopieer",
+        "saveItNow": "Stoor dit nou",
+        "savedConfirm": "Ek het dit gestoor",
+        "copy": "Kopieer",
+        "continueButton": "Gaan voort",
+        "testBackup": "Toets jou rugsteun"
+      },
+      "Confirm": {
+        "headerTitle": "Bevestig rugsteunfrase",
+        "subtitle": "Vinnige kontrole of jy dit korrek neergeskryf het",
+        "enterWord": "Voer woord in",
+        "enterWords": "Voer woorde in",
+        "confirm": "Bevestig",
+        "incorrectWord": "Verkeerde woord, kontroleer asseblief die volgorde"
+      },
+      "Success": {
+        "title": "Welkom by nie-bewaarder Blink",
+        "testSuccess": "Jou rugsteunfrase is korrek"
+      }
+    },
+    "CloudBackup": {
+      "title": "Kom ons rugsteun jou beursie",
+      "description": "Ons sal 'n rugsteun van jou rugsteunfrase in jou {provider} stoor.",
+      "encryptCheckbox": "Enkripteer met bykomende wagwoord",
+      "password": "Wagwoord",
+      "passwordPlaceholder": "(minimum 12 karakters)",
+      "confirmPassword": "Bevestig wagwoord",
+      "confirmPasswordPlaceholder": "Voer wagwoord weer in",
+      "continueButton": "Gaan voort",
+      "importantTitle": "Belangrik",
+      "importantMessage": "Blink stoor nie hierdie wagwoord nie. As jy dit verloor, sal ons {bold} jou beursie herstel nie.",
+      "importantMessageBold": "nie in staat wees om",
+      "passwordTooShort": "Minimum 12 karakters",
+      "passwordMismatch": "Wagwoorde stem nie ooreen nie",
+      "uploadSuccess": "Rugsteun gestoor in {provider}",
+      "uploadFailed": "Kon nie rugsteun oplaai nie",
+      "signInFailed": "Kon nie by {provider} aanmeld nie",
+      "cloudNotAvailable": "iCloud Drive is nie beskikbaar nie. Meld asseblief in Instellings by iCloud aan en aktiveer iCloud Drive.",
+      "networkError": "Netwerkfout. Maak asseblief seker van jou verbinding en probeer weer.",
+      "existingBackupTitle": "Rugsteun gevind",
+      "existingBackupMessage": "'n Rugsteun bestaan reeds in jou {provider}. Wil jy dit oorskryf?",
+      "existingBackupMessageWithDetails": "Daar bestaan reeds 'n rugsteun op jou {provider}.\n\nLightning-adres: {address}\nGeskep: {createdAt}\n\nWil jy dit oorskryf?",
+      "existingBackupUnknownAddress": "Nie beskikbaar nie",
+      "existingBackupUnknownCreatedAt": "Onbekend",
+      "overwrite": "Oorskryf"
+    }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "Skuif na nie-bewaarde",
+    "explainerTitle": "Wat beteken dit om na nie-bewaarde te skuif?",
+    "explainerStep1": "Jy sal 'n nie-bewaarde rekening op die Spark-protokol skep, <link>leer meer hier</link>",
+    "explainerStep2": "Ons dra jou fondse oor na jou nuwe nie-bewaarde rekening en jou huidige rekening sal verwyder word",
+    "explainerStep3": "Gebruik Blink voort soos gewoonlik",
+    "letsMove": "Kom ons gaan",
+    "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees."
+  },
+  "AccountTypeSelectionScreen": {
+    "custodialLabel": "Bewaard",
+    "selfCustodialLabel": "Self-bewaard",
+    "custodialDescription": "Ons hou die fondse namens jou",
+    "selfCustodialDescription": "Net jy kan toegang tot fondse kry",
+    "continueButton": "Gaan voort",
+    "descriptionDefault": "Kies asseblief jou voorkeur tipe Blink.",
+    "descriptionSelected": "Kies asseblief rekeningtipe.",
+    "chooseMethod": "Kies metode",
+    "restoreComingSoonTitle": "Binnekort beskikbaar",
+    "restoreComingSoonDescription": "Herstelfunksie sal in 'n toekomstige opdatering beskikbaar wees.",
+    "createFailed": "Kon nie tronk skep nie. Probeer asseblief weer.",
+    "selfCustodialDisabled": "Nie-bewaring is tydelik onbeskikbaar."
+  },
+  "RestoreScreen": {
+    "title": "Herstel beursie",
+    "description": "Herstel jou beursie vanaf 'n rugsteun",
+    "phraseTitle": "Herstel beursie",
+    "phraseSubtitleStep1": "Voer die eerste 6 woorde van jou rugsteunfrase in",
+    "phraseSubtitleStep2": "Voer die res van jou rugsteunfrase in",
+    "nextWords": "Volgende 6 woorde",
+    "paste": "Plak",
+    "enterWord": "Woord",
+    "invalidMnemonic": "Ongeldige rugsteunfrase. Kontroleer asseblief of die woordvolgorde reg is.",
+    "restoring": "Jou beursie word herstel...",
+    "restoreSuccess": "Beursie suksesvol herstel",
+    "restoreFailed": "Kon nie beursie herstel nie. Probeer asseblief weer.",
+    "restore": "Herstel beursie",
+    "noBackupFound": "Geen rugsteun gevind nie",
+    "noBackupDescription": "Ons kon nie 'n rugsteun vind nie. Jy kan jou rugsteunfrase handmatig invoer.",
+    "enterPassword": "Voer jou enkripsierwagwoord in",
+    "wrongPassword": "Verkeerde wagwoord. Probeer asseblief weer.",
+    "pickBackupTitle": "Kies 'n beursie",
+    "pickBackupDescription": "Kies 'n rugsteun om te herstel"
+  },
+  "BackupNudge": {
+    "title": "Jou fondse is in gevaar",
+    "description": "Beveilig jou beursie nou. Dit neem net 'n minuut.",
+    "cta": "Beveilig beursie",
+    "settingsWarning": "Rugsteun jou beursie. As jy hierdie toestel verloor, verloor jy jou fondse.",
+    "modalTitle": "Beveilig jou fondse",
+    "modalDescription": "Ons beveel sterk aan dat u u beursie rugsteun om 'n algehele verlies van fondse te voorkom indien u hierdie toestel verloor.",
+    "secureMe": "Beveilig beursie"
+  },
+  "StableBalance": {
+    "title": "Stabiele balans",
+    "description": "Hou 'n USD-balans aangedryf deur USDB op Spark.",
+    "balanceLabelBtc": "Balans · SATS",
+    "balanceLabelUsd": "Balans · USD",
+    "settingsRowTitle": "Stabiele Balans",
+    "settingsTitle": "Stabiele Balans",
+    "settingsDescription": "Hou 'n deel van jou beursie in USD. Skakel BTC en USD enige tyd handmatig om met die Skakel-aksie.",
+    "activationLabel": "Aktief",
+    "activeHint": "Jou beursie hou USD via USDB.",
+    "inactiveHint": "Jou beursie hou net BTC.",
+    "deactivateWarningBody": "Jy het nog {amount:string}. Skakel eers om na BTC, anders word jou USD-saldo versteek totdat jy Stabiele Balans heractiveer.",
+    "toggleFailedToast": "Kon nie Stabiele Balans bywerk nie. Probeer asseblief weer.",
+    "toggleModal": {
+      "activateTitle": "Aktiveer Stabiele Saldo",
+      "activateBody": "Jou BTC-saldo sal na USDB omgeskakel word. Dit is die geskatte omskakelingsfooi.",
+      "activateConfirm": "Aktiveer",
+      "deactivateTitle": "Deaktiveer Stabiele Saldo",
+      "deactivateBody": "Jou USDB-saldo sal terug na BTC omgeskakel word. Dit is die geskatte omskakelingsfooi.",
+      "deactivateConfirm": "Deaktiveer",
+      "cancel": "Kanselleer"
+    },
+    "minimumConversion": "Minimum omskakeling: {amount:string}",
+    "conversionUnavailable": "Omskakeling is tydelik onbeskikbaar. Probeer asseblief weer."
+  },
+  "BackendFeatureGate": {
+    "title": "Funksie nie beskikbaar nie",
+    "description": "Hierdie funksie vereis 'n bewaarderrekening.",
+    "signInTitle": "Sign in required",
+    "signInDescription": "Sign in to your custodial account to use {featureName}.",
+    "noAccountTitle": "Custodial account required",
+    "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "featureCircles": "Circles",
+    "featureEarn": "Earn",
+    "featureCard": "Card"
+  },
+  "WalletCreationScreen": {
+    "creating": "Skep jou beursie...",
+    "errorTitle": "Beursie skepping het misluk",
+    "errorDescription": "Iets het verkeerd gegaan. Probeer asseblief weer.",
+    "retry": "Probeer weer"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "Spark-oordrag",
+    "lightningPayment": "Lightning-betaling",
+    "onchainDeposit": "On-chain Deposito",
+    "onchainWithdrawal": "On-chain Onttrekking",
+    "conversionFromBitcoin": "Omskakeling van Bitcoin",
+    "conversionToBitcoin": "Omskakeling na Bitcoin",
+    "conversionFromToken": "Omskakeling van {token}",
+    "conversionToToken": "Omskakeling na {token}",
+    "tokenTransfer": "{token}-oordrag",
+    "payTo": "Betaal aan {address}",
+    "payment": "Betaling"
+  },
+  "SelfCustodialOffline": {
+    "title": "Beursie is vanlyn",
+    "description": "Jou nie-bewaarderbeursie kan nie die netwerk nou bereik nie. Probeer weer wanneer jy aanlyn is.",
+    "retry": "Probeer weer"
+  },
+  "SelfCustodialError": {
+    "insufficientFunds": "Nie genoeg fondse om die bedrag en netwerkkostes te dek nie. Probeer 'n kleiner bedrag.",
+    "belowMinimum": "Bedrag is onder die minimum vereis vir hierdie betaling. Probeer 'n groter bedrag.",
+    "networkError": "Netwerkverbindingsprobleem. Kyk jou verbinding en probeer weer.",
+    "invalidInput": "Die betaalbesonderhede lyk ongeldig. Kyk asseblief en probeer weer.",
+    "generic": "Die betaling kon nie voltooi word nie. Probeer oor 'n oomblik weer, of gebruik 'n kleiner bedrag."
+  },
+  "UnclaimedDeposit": {
+    "title": "Jy het {count} onopgeëiste deposito('s)",
+    "description": "Totaal: {sats} sats beskikbaar om te eis",
+    "claim": "Eis nou",
+    "claiming": "Besig om te eis...",
+    "screenTitle": "Ongeëiste Deposito's",
+    "cardTitle": "Eis {sats} sats",
+    "claimWithFee": "Eis (maks fooi: {fee} sats)",
+    "refund": "Terugbetaling",
+    "refunding": "Terugbetaling...",
+    "immature": "Wag vir bevestigings...",
+    "feeExceeded": "Netwerkfooie is te hoog om te eis ({requiredFee} sats benodig). Probeer later weer of betaal terug na 'n on-chain adres.",
+    "missingUtxo": "Hierdie deposito is nie meer beskikbaar op die netwerk nie.",
+    "belowDustLimit": "Hierdie deposito is te klein om te eis na fooie. Wag vir laer fooie of betaal terug na 'n on-chain adres.",
+    "genericError": "Kan nie eis nie: {error}",
+    "claimFailed": "Eis het misluk: {error}",
+    "refundFailed": "Terugbetaling het misluk: {error}",
+    "refundAddress": "Bitcoin adres vir terugbetaling",
+    "feeRate": "Netwerkfooi",
+    "feeRateFastest": "Vinnigste (~{sats} sats) ~10 min",
+    "feeRateHalfHour": "Normaal (~{sats} sats) ~30 min",
+    "feeRateHour": "Ekonomies (~{sats} sats) ~60 min",
+    "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "Kon nie netwerkfooie laai nie. Kontroleer asseblief jou verbinding en probeer weer.",
+    "refundNow": "Betaal nou terug",
+    "refundSuccess": "Terugbetaling suksesvol begin",
+    "claimSuccess": "Deposito suksesvol geëis",
+    "error": "Kan nie hierdie deposito eis nie"
+  },
+  "FeatureUnavailable": {
+    "SelfCustodial": {
+      "title": "Temporarily unavailable",
+      "description": "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later."
+    }
+  },
+  "NetworkStatus": {
+    "degradedBanner": "Spark network is currently degraded. Payments may take longer."
+  },
+  "SelfCustodialDelete": {
+    "dangerZoneImportantTitle": "Belangrik",
+    "dangerZoneBulletReinstated": "Geskrapte rekening kan nie herstel word nie",
+    "dangerZoneBulletPermanent": "Rekeningverwydering is permanent",
+    "dangerZoneBulletEmpty": "Maak seker rekening is leeg",
+    "dangerZoneDeleteButton": "Verwyder rekening en data",
+    "confirmModalTitle": "Bevestig rekeningverwydering",
+    "confirmModalTypeToConfirm": "Tik \"{delete: string}\" om te bevestig",
+    "hasFundsWarningTitle": "Waarskuwing",
+    "hasFundsWarningBody": "Jou beursie het 'n saldo van {balance}. Vir jou veiligheid laat ons nie die verwydering van rekeninge met fondse toe nie.",
+    "hasFundsWarningHelper": "Om voort te gaan met verwydering, maak jou rekening leeg of skenk aan sirkulêre ekonomieë.",
+    "hasFundsWarningButton": "Gaan terug"
   }
 }

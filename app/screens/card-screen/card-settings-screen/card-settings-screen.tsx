@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { Alert, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import InAppBrowser from "react-native-inappbrowser-reborn"
 
 import { Screen } from "@app/components/screen"
@@ -23,7 +23,7 @@ export const CardSettingsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { cardTermsAndConditionsUrl, cardPrivacyPolicyUrl } = useRemoteConfig()
   const { card, hasPhysicalCard } = useCardData()

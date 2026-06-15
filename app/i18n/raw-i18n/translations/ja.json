@@ -18,9 +18,7 @@
         "howToUseYourCashRegister": "レジの使い方",
         "howToUseYourAddressExplainer": "以下の互換ウォレット利用者に共有",
         "howToUseYourPaycodeExplainer": "ペイコード（lnurl-payアドレス）を紙に印刷すれば、それをお客様がライトニング対応ウォレットでスキャンして支払いを行えます。\n\nただし、以下のように、ペイコードのスキャンができないウォレットもあります。",
-        "howToUseYourCashRegisterExplainer": "ウォレットを使わず、レジリンクから支払いを受けることもできます。\n\nインボイスが生成され、支払いは直接あなたの{bankName: string}ウォレットに入金されます。",
-        "yourAddress": "あなたの{bankName: string}アドレス",
-        "copiedAddressToClipboard": "{bankName: string} アドレスをクリップボードにコピーしました"
+        "howToUseYourCashRegisterExplainer": "ウォレットを使わず、レジリンクから支払いを受けることもできます。\n\nインボイスが生成され、支払いは直接あなたの{bankName: string}ウォレットに入金されます。"
     },
     "AcceptTermsAndConditionsScreen": {
         "title": "利用規約",
@@ -64,7 +62,8 @@
         "title": "両替",
         "transfer": "振替",
         "percentageToConvert": "%を換える",
-        "reviewTransfer": "振替内容を確認"
+        "reviewTransfer": "振替内容を確認",
+        "dustError": "残高をすべて送金する必要があります。"
     },
     "ConversionConfirmationScreen": {
         "title": "ご確認ください",
@@ -72,11 +71,12 @@
         "receivingAccount": "受金ウォレット",
         "infoBitcoin": "Bitcoin金額は概算です。少額の変動が生じる場合があります。",
         "infoDollar": "ドル金額は概算です。少額の変動が生じる場合があります。",
-        "transferButtonText": "{fromWallet}から{toWallet}へ振替"
+        "transferButtonText": "{fromWallet}から{toWallet}へ振替",
+        "feeLabel": "変換手数料",
+        "feeError": "変換手数料を取得できませんでした"
     },
     "ConversionSuccessScreen": {
-        "message": "両替が完了しました",
-        "title": "両替完了"
+        "message": "両替が完了しました"
     },
     "EarnScreen": {
         "satoshi": "sat",
@@ -2047,6 +2047,7 @@
         "createAccount": "新たにウォレットを作成する",
         "exploreWallet": "ウォレットを見つける",
         "login": "ログイン",
+        "loginOrRestore": "ログイン / 復元",
         "logBackInWith": "再ログイン：",
         "headline": "Galoyが提供するウォレット",
         "startTrialAccount": "トライアルウォレットで始める",
@@ -2071,12 +2072,7 @@
         "payBusiness": "支払う",
         "openSettings": "設定を開く",
         "title": "マップ",
-        "error": "位置情報の取得中にエラーが発生しました",
-        "locationPermissionMessage": "位置情報を有効にして、マップ上の現在地を確認する",
-        "locationPermissionNegative": "キャンセル",
-        "locationPermissionNeutral": "あとで確認する",
-        "locationPermissionPositive": "OK",
-        "locationPermissionTitle": "マップ上で自分の位置を確認する"
+        "error": "位置情報の取得中にエラーが発生しました"
     },
     "HomeScreen": {
         "receive": "受金",
@@ -2166,9 +2162,14 @@
         "lightningAddress": "Lightningアドレス",
         "lightningInvoice": "Lightningインボイス",
         "bitcoinOnchain": "Bitcoin onchain",
-        "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT"
+        "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT",
+        "autoConvertMinAmount": "{minSats: number} sats / {minFiat: string}未満の金額はドルに自動変換できません。代わりにビットコインを受け取ります。",
+        "autoConvertFailed": "支払いは受け取りましたが、変換に失敗しました。",
+        "pleaseWaitForConversion": "変換が完了するまでお待ちください"
     },
     "RedeemBitcoinScreen": {
+        "walletNotConnected": "ウォレットはまだ接続中です。少し待ってからもう一度お試しください。",
+        "paymentPending": "支払いはまだ完了処理中の可能性があります。再試行する前に残高をご確認ください。",
         "title": "ビットコインを換金する",
         "usdTitle": "ドルウォレットに交換する",
         "error": "インボイスの作成に失敗しました。この問題が解決しない場合は、サポートにお問い合わせください。",
@@ -2226,7 +2227,8 @@
         "slideToConfirm": "スライドして確認",
         "slideConfirming": "確認中...",
         "copiedDestination": "送信先をクリップボードにコピーしました",
-        "lightningRecommended": "手数料が高額です！Lightningをお勧めします。"
+        "lightningRecommended": "手数料が高額です！Lightningをお勧めします。",
+        "usdRemainderSweep": "残高{remaining: string}（{remainingSats: string}）はビットコインに変換されます。USDの最低額：{minimum: string}。"
     },
     "SendBitcoinDestinationScreen": {
         "usernameNowAddress": "ユーザー名{bankName: string}がアドレス{bankName: string}になりました。",
@@ -2257,16 +2259,7 @@
         "clipboardError": "エラー：クリップボードからコピーした値が正しくありません",
         "pastedClipboardSuccess": "クリップボードから貼り付けました",
         "invalidPhoneNumber": "有効な携帯電話番号を入力してください",
-        "phoneNotAllowed": "このフィールドでは電話番号を使用できません",
-        "confirmModal": {
-            "title": "このアドレスに、あなたは一度も送金したことがありません。",
-            "body1": "受金者がお伝えした{bankName: string}アドレスが正しいことを確認してください",
-            "bold2bold": "他のウォレットのユーザー名ではありません。",
-            "body3": "そうでない場合は、{lnAddress: string}アドレスを持つ{bankName: string}ウォレットに送金されます。\n\nアドレスの最初の部分のスペルも確認してください。例えば、jackieとjack1eは2つの異なるアドレスです。",
-            "warning": "{bankName: string}アドレスを誤って入力した場合、{bankName: string}はトランザクションを取り消すことができません。",
-            "checkBox": "{lnAddress: string}は正しいアドレスです。",
-            "confirmButton": "間違いありません"
-        }
+        "phoneNotAllowed": "このフィールドでは電話番号を使用できません"
     },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "トランザクションはメモリプールに送信されます",
@@ -2314,8 +2307,16 @@
         "recipient": "受取人",
         "time": "時間",
         "type": "種類",
-        "destinationIsRequired": "送金先の入力は必須です",
-        "lnurlInvoiceIncorrectDescription": "lnurlサーバーが不正な説明ハッシュを持つインボイスで応答しました。"
+        "feeTier": "手数料の速度",
+        "fast": "高速",
+        "medium": "中速",
+        "slow": "低速",
+        "recommended": "推奨",
+        "walletOffline": "ウォレットがオフラインです。接続を確認してもう一度お試しください。",
+        "sdkInsufficientFunds": "この取引に十分な残高がありません。",
+        "sdkAmountTooLow": "オンチェーン取引には金額が低すぎます。",
+        "sdkNetworkError": "ネットワークエラー。接続を確認して再試行してください。",
+        "sdkGenericError": "手数料を見積もれません。別の金額をお試しください。"
     },
     "SettingsScreen": {
         "staticQr": "印刷用静的QR",
@@ -2329,6 +2330,7 @@
         "setYourLightningAddress": "Lightningアドレスを設定",
         "activated": "アクティベーション",
         "addressScreen": "さまざまな受金方法を見る",
+        "nonCustodialAccount": "非カストディアルアカウント",
         "tapUserName": "タップしてユーザー名を設定する",
         "notifications": "通知",
         "title": "設定",
@@ -2355,7 +2357,15 @@
         "logoutOneAccountAlertContent": "{identifier: string}にリンクされたセッションからログアウトします。\n今後再度ログインできることを確認してください。",
         "logoutOneAccountConfirm": "了解しました。ログアウトしてください。",
         "receiveCurrency": "受取通貨",
-        "displayCurrency": "表示通貨"
+        "displayCurrency": "表示通貨",
+        "AccountInformation": {
+            "identityLabel": "Wallet identifier",
+            "backupStatusLabel": "Backup status",
+            "backupStatusCompleted": "Backup complete",
+            "backupStatusNotCompleted": "Backup not complete",
+            "loadError": "Could not load your account information.",
+            "lightningAddressLabel": "Lightningアドレス"
+        }
     },
     "NotificationSettingsScreen": {
         "title": "通知設定",
@@ -2394,6 +2404,7 @@
         "level": "レベル {level: string}",
         "switchAccount": "アカウントを切り替える",
         "pleaseWait": "お待ちください。",
+        "probeBalanceFailed": "ウォレットの残高を確認できませんでした。もう一度お試しください。",
         "accountLevel": "ウォレットレベル",
         "upgrade": "ウォレットをアップグレードする",
         "logOutAndDeleteLocalData": "ログアウトしてすべてのローカルデータをクリアする",
@@ -2433,6 +2444,8 @@
         "copiedAccountId": "アカウントIDをクリップボードにコピーする",
         "yourAccountId": "あなたのアカウントID",
         "accountId": "アカウントID",
+        "publicKey": "公開鍵",
+        "copiedPublicKey": "公開鍵をクリップボードにコピーしました",
         "copy": "コピー",
         "identityVerification": "本人確認"
     },
@@ -2442,6 +2455,19 @@
         "fromThisDevice": "このデバイスから？",
         "switchAccount": "別のアカウントに切り替えました",
         "removedAccount": "アカウント {identifier: string} を削除しました。"
+    },
+    "StablesatsRestriction": {
+        "modalTitle": "あなたの地域ではStablesatsをご利用いただけません",
+        "modalBody": "ドル口座にアクセスするには、ノンカストディアル口座を作成してください。",
+        "createNew": "新規作成",
+        "walletLabel": "あなたの地域ではご利用いただけません"
+    },
+    "ConvertDollarToBitcoinModal": {
+        "title": "ドルアカウントはお住まいの地域でご利用いただけなくなりました",
+        "body": "ドル残高をビットコインに移す",
+        "youHave": "保有額",
+        "youGet": "受取額",
+        "approve": "承認"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "2要素認証（2FA）",
@@ -2463,7 +2489,9 @@
     },
     "DefaultWalletScreen": {
         "title": "デフォルトの受取アカウント",
-        "info": "ビットコインウォレットはサトシを積み立てるためのもので、USD価値は市場と連動します。ドルウォレットはStablesatsで動いています。USD価値で安定するようにヘッジされたBitcoinを保有します。常にBitcoinを保有していますが、ドル価値は変動しません。"
+        "info": "ビットコインウォレットはサトシを積み立てるためのもので、USD価値は市場と連動します。ドルウォレットはStablesatsで動いています。USD価値で安定するようにヘッジされたBitcoinを保有します。常にBitcoinを保有していますが、ドル価値は変動しません。",
+        "titleSelfCustodial": "デフォルトアカウント",
+        "infoSelfCustodial": "このアカウントは受信と送信時に既定で使用されます。いつでも切り替え可能です。"
     },
     "ThemeScreen": {
         "title": "テーマ",
@@ -2481,7 +2509,10 @@
         "header": "あなたのドルウォレットはStablesatsで動いています",
         "body": "ドルウォレットはStablesats技術を使用してBitcoinをUSD価格で安定させます。常にBitcoinを保有しています — 実際のドルではありません — がUSD価値は変動しません。通常どおりBitcoinの送受信ができますが、従来の銀行システムとは互換性がありません。",
         "termsAndConditions": "利用規約を読む",
-        "learnMore": "ステーブル satsについて詳しく見る"
+        "learnMore": "ステーブル satsについて詳しく見る",
+        "headerSelfCustodial": "ドル口座にはステーブルコインが保管されています",
+        "bodySelfCustodial": "ドル口座ではステーブルコインを保有しています。資産に裏付けられ、米ドルに対して価値を安定させたトークンです。ステーブルコインの送受信はまだできません。ドル口座から送金すると、ステーブルコインが交換され、ビットコインとして受取人に送られます。",
+        "learnMoreSelfCustodial": "詳しく見る"
     },
     "SplashScreen": {
         "update": "旧バージョンのアプリです。 アプリを使用するには更新してください。\n\nAndroidの場合はPlayStoreから、iOSの場合はTestflightから実行できます。"
@@ -2682,6 +2713,8 @@
         "accountInformation": "アカウント情報",
         "trialAccount": "トライアルアカウント",
         "blinkUser": "Blinkユーザー",
+        "anonymous": "匿名",
+        "anonymousUser": "匿名ユーザー",
         "blinkToBlink": "Blink から Blink へ",
         "transactionLimits": "トランザクション限度額",
         "activateWallet": "ウォレットを有効化する",
@@ -2739,6 +2772,7 @@
         "or": "または",
         "openWallet": "ウォレットを開く",
         "onchain": "オンチェーン",
+        "spark": "Spark",
         "paymentRequest": "支払いリクエスト",
         "phone": "スマートフォン",
         "phoneNumber": "電話番号",
@@ -2759,6 +2793,7 @@
         "submit": "提出する",
         "success": "成功！",
         "dollarStablesats": "ドル（Stablesats）",
+        "dollarStablecoin": "ドル（Stablecoin）",
         "to": "送金先",
         "total": "合計",
         "transactions": "トランザクション",
@@ -2800,7 +2835,8 @@
             "minChars": "{min}文字以上で入力してください",
             "invalidPostalCode": "無効な郵便番号です。入力ミスの可能性があります",
             "invalidRegion": "地域の選択が無効です"
-        }
+        },
+        "copied": "クリップボードにコピーしました"
     },
     "errors": {
         "generic": "エラーが発生しました。\n時間をあけてもう一度トライしてみてください。",
@@ -2929,27 +2965,6 @@
             "title": "6月チャレンジ！",
             "description": "インナーサークルを10人拡大して、Adopting Bitcoin El Salvadorの$1000特別チケットを獲得するチャンスを手に入れましょう",
             "details": "Adopting Bitcoin El Salvadorの特別チケットを獲得しよう\n\nインナーサークルを10人拡大して、Adopting Bitcoin El Salvadorの$1000特別チケットを獲得するチャンスを手に入れましょう！チケットにはメインカンファレンスへの独占アクセス、飲食付きメザニン、スピーカーディナー、フィルムフェスティバルが含まれます。\n\nハッシュタグ #blinkcircles を付けてサークルをソーシャルでシェアして参加しましょう。\n\n今回は当選者が2名です！"
-        },
-        "septChallenge": {
-            "title": "9月のチャレンジ！",
-            "description": "インナーサークル {innerCircle: number}/21 - $21獲得\nトップ3 - Adopting Bitcoinのチケットを獲得できます!",
-            "details": "9月中にインナーサークルを21人に増やし、#blinkcircles タグと一緒にソーシャルメディアでシェアすると、ステイブル satsウォレットに$21が振り込まれます。さらに、上位3名には「Adopting Bitcoin!」のチケットが当たります！",
-            "peopleWelcomedSoFar": "最近招待したお友だち",
-            "yourRank": "あなたのランキング",
-            "reminder": "リマインダー：新しいBlinkユーザーに最初のサトシを送るとあなたのインナーサークルが広がります！",
-            "fullDetails": "詳細はこちら："
-        },
-        "octoberChallenge": {
-            "title": "10月のチャレンジ！",
-            "description": "あなたの #blinkcircles をシェアして、1,000,000サトシを獲得するチャンス！",
-            "details": "1,000,000サトシをプレゼントします！\n\n#blinkcircles タグをつけて、あなたのサークルをSNSでシェアしてください！当選者は10月31日にランダムに選ばれます。\n\n応募資格はあなたのインナーサークルが1以上であることです！",
-            "connectOnSocial": "SNSでつながる：",
-            "fullDetails": "詳細はこちら："
-        },
-        "novemberChallenge": {
-            "title": "November Challenge!",
-            "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-            "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
         }
     },
     "FullOnboarding": {
@@ -2973,9 +2988,6 @@
         "title": "通知",
         "noNotifications": "現在、通知はありません"
     },
-    "Fake": {
-        "doNotTranslate": "This is to trigger the translation pipeline. Do not translate."
-    },
     "CardFlow": {
         "TransactionStatus": {
             "pending": "保留中",
@@ -2993,7 +3005,10 @@
             "emptyTransactions": "取引はまだありません",
             "addFunds": "入金",
             "transactionsTitle": "取引",
-            "title": "Visaカード"
+            "title": "Visaカード",
+            "noCardAvailable": "利用可能なカードがありません",
+            "cardNotUsable": "このカードは現在使用できません",
+            "cardUpdateError": "カードステータスを更新できませんでした"
         },
         "validThruLabel": "有効期限",
         "networkVisa": "Visa",
@@ -3458,5 +3473,248 @@
                 "buttonText": "閉じる"
             }
         }
+    },
+    "BackupScreen": {
+        "title": "Back up your wallet",
+        "description": "Choose a backup method to secure your funds",
+        "BackupMethod": {
+            "title": "バックアップ方法を選択",
+            "subtitle": "新規ユーザーには{provider}をお勧めします。",
+            "googleDrive": "Google Drive",
+            "appleICloud": "Apple iCloud",
+            "passwordManager": "パスワードマネージャー",
+            "manualBackup": "手動バックアップ",
+            "passwordManagerBackupSaved": "バックアップがパスワードマネージャーに保存されました",
+            "passwordManagerBackupFailed": "バックアップの保存に失敗しました",
+            "passwordManagerUnavailable": "このデバイスでは利用可能なパスワードマネージャーがありません。Driveバックアップを使用するか、12単語のフレーズを手動で保存してください。"
+        },
+        "ManualBackup": {
+            "Alerts": {
+                "title": "バックアップフレーズを秘密にしてください！",
+                "check1": "このフレーズを紛失した場合、誰もウォレットを復元できないことを理解しています",
+                "check2": "誰かがこのフレーズを入手した場合、すべての資金を盗むことができることを理解しています。",
+                "check3": "メッセージや電話でこの情報を求めている人はいません"
+            },
+            "Phrase": {
+                "headerTitle": "リカバリーフレーズ",
+                "sparkCompatible": "このバックアップフレーズは{sparkCompatibleLink}で使用できます",
+                "sparkCompatibleLink": "Spark対応ウォレット",
+                "copiedToast": "バックアップフレーズをクリップボードにコピーしました",
+                "saveItNow": "今すぐ保存",
+                "savedConfirm": "保存しました",
+                "copy": "コピー",
+                "continueButton": "続行",
+                "testBackup": "バックアップをテスト"
+            },
+            "Confirm": {
+                "headerTitle": "バックアップフレーズの確認",
+                "subtitle": "正しく書き留めたか簡単に確認します",
+                "enterWord": "単語を入力",
+                "enterWords": "単語を入力",
+                "confirm": "確認",
+                "incorrectWord": "正しくない単語です。順番を確認してください"
+            },
+            "Success": {
+                "title": "ノンカストディアルBlinkへようこそ",
+                "testSuccess": "バックアップフレーズは正しいです"
+            }
+        },
+        "CloudBackup": {
+            "title": "ウォレットをバックアップしましょう",
+            "description": "{provider}にバックアップフレーズのコピーを保存します。",
+            "encryptCheckbox": "追加パスワードで暗号化",
+            "password": "パスワード",
+            "passwordPlaceholder": "（12文字以上）",
+            "confirmPassword": "パスワード確認",
+            "confirmPasswordPlaceholder": "パスワードを再入力",
+            "continueButton": "続行",
+            "importantTitle": "重要",
+            "importantMessage": "Blinkはこのパスワードを保存しません。紛失した場合、{bold}。",
+            "importantMessageBold": "ウォレットを復元できません",
+            "passwordTooShort": "12文字以上必要です",
+            "passwordMismatch": "パスワードが一致しません",
+            "uploadSuccess": "{provider}にバックアップを保存しました",
+            "uploadFailed": "バックアップのアップロードに失敗しました",
+            "signInFailed": "{provider}へのサインインに失敗しました",
+            "cloudNotAvailable": "iCloud Driveが利用できません。設定からiCloudにサインインし、iCloud Driveを有効にしてください。",
+            "networkError": "ネットワークエラーが発生しました。接続を確認して、もう一度お試しください。",
+            "existingBackupTitle": "バックアップが見つかりました",
+            "existingBackupMessage": "{provider}にバックアップが既に存在します。上書きしますか？",
+            "existingBackupMessageWithDetails": "{provider}にすでにバックアップが存在します。\n\nLightningアドレス: {address}\n作成日時: {createdAt}\n\n上書きしますか？",
+            "existingBackupUnknownAddress": "利用不可",
+            "existingBackupUnknownCreatedAt": "不明",
+            "overwrite": "上書き"
+        }
+    },
+    "AccountMigration": {
+        "moveToNonCustodial": "ノンカストディアルに移行",
+        "explainerTitle": "ノンカストディアルへの移行とは？",
+        "explainerStep1": "Sparkプロトコル上にノンカストディアルアカウントを作成します、<link>詳細はこちら</link>",
+        "explainerStep2": "お客様の資金を新しいノンカストディアルアカウントに転送し、現在のアカウントは削除されます",
+        "explainerStep3": "これまで通りBlinkをご利用ください",
+        "letsMove": "移行する",
+        "transferringFunds": "資金を転送中です。数秒で完了するはずです。"
+    },
+    "AccountTypeSelectionScreen": {
+        "custodialLabel": "カストディアル",
+        "selfCustodialLabel": "ノンカストディアル",
+        "custodialDescription": "お客様に代わって資金を保管します",
+        "selfCustodialDescription": "あなただけが資金にアクセスできます",
+        "continueButton": "続行",
+        "descriptionDefault": "ご希望のBlinkタイプを選択してください。",
+        "descriptionSelected": "アカウントタイプを選択してください。",
+        "chooseMethod": "方法を選択",
+        "restoreComingSoonTitle": "近日公開",
+        "restoreComingSoonDescription": "復元機能は将来のアップデートで利用可能になります。",
+        "createFailed": "ウォレットの作成に失敗しました。もう一度お試しください。",
+        "selfCustodialDisabled": "ノンカストディアルは一時的に利用できません。"
+    },
+    "RestoreScreen": {
+        "title": "ウォレットを復元",
+        "description": "バックアップからウォレットを復元します",
+        "phraseTitle": "ウォレットを復元",
+        "phraseSubtitleStep1": "バックアップフレーズの最初の6語を入力してください",
+        "phraseSubtitleStep2": "バックアップフレーズの残りを入力してください",
+        "nextWords": "次の6語",
+        "paste": "貼り付け",
+        "enterWord": "単語",
+        "invalidMnemonic": "無効なバックアップフレーズです。単語の順序が正しいか確認してください。",
+        "restoring": "ウォレットを復元中...",
+        "restoreSuccess": "ウォレットが正常に復元されました",
+        "restoreFailed": "ウォレットの復元に失敗しました。再試行してください。",
+        "restore": "ウォレットを復元",
+        "noBackupFound": "バックアップが見つかりません",
+        "noBackupDescription": "バックアップが見つかりませんでした。バックアップフレーズを手動で入力できます。",
+        "enterPassword": "暗号化パスワードを入力してください",
+        "wrongPassword": "パスワードが正しくありません。再試行してください.",
+        "pickBackupTitle": "ウォレットを選択",
+        "pickBackupDescription": "復元するバックアップを選択"
+    },
+    "BackupNudge": {
+        "title": "あなたの資金が危険にさらされています",
+        "description": "今すぐウォレットを保護してください。1分しかかかりません。",
+        "cta": "ウォレットを保護",
+        "settingsWarning": "ウォレットをバックアップしてください。このデバイスを紛失すると、資金を失います。",
+        "modalTitle": "資金を保護してください",
+        "modalDescription": "このデバイスを紛失した場合の資金の完全な喪失を防ぐために、ウォレットのバックアップを強くお勧めします。",
+        "secureMe": "ウォレットを保護"
+    },
+    "StableBalance": {
+        "title": "ステーブルバランス",
+        "description": "Spark上のUSDBによるUSD残高を保持します。",
+        "balanceLabelBtc": "残高 · SATS",
+        "balanceLabelUsd": "残高 · USD",
+        "settingsRowTitle": "安定残高",
+        "settingsTitle": "安定残高",
+        "settingsDescription": "ウォレットの一部をUSDで保持します。Convertアクションを使用して、いつでも手動でBTCとUSDの間で変換できます。",
+        "activationLabel": "有効",
+        "activeHint": "ウォレットはUSDB経由でUSDを保持しています。",
+        "inactiveHint": "ウォレットはBTCのみを保持しています。",
+        "deactivateWarningBody": "まだ {amount:string} あります。先にBTCに変換してください。そうしないと、Stable Balanceを再度有効にするまでUSD残高は非表示になります。",
+        "toggleFailedToast": "Stable Balanceを更新できませんでした。もう一度お試しください。",
+        "toggleModal": {
+            "activateTitle": "安定残高を有効化",
+            "activateBody": "BTC残高はUSDBに変換されます。これは推定される変換手数料です。",
+            "activateConfirm": "有効化",
+            "deactivateTitle": "安定残高を無効化",
+            "deactivateBody": "USDB残高はBTCに戻されます。これは推定される変換手数料です。",
+            "deactivateConfirm": "無効化",
+            "cancel": "キャンセル"
+        },
+        "minimumConversion": "最小変換額: {amount:string}",
+        "conversionUnavailable": "変換は一時的に利用できません。もう一度お試しください。"
+    },
+    "BackendFeatureGate": {
+        "title": "機能が利用できません",
+        "description": "この機能にはカストディアルアカウントが必要です。",
+        "signInTitle": "Sign in required",
+        "signInDescription": "Sign in to your custodial account to use {featureName}.",
+        "noAccountTitle": "Custodial account required",
+        "noAccountDescription": "{featureName} requires a Blink custodial account.",
+        "featureCircles": "Circles",
+        "featureEarn": "Earn",
+        "featureCard": "Card"
+    },
+    "WalletCreationScreen": {
+        "creating": "ウォレットを作成中...",
+        "errorTitle": "ウォレットの作成に失敗しました",
+        "errorDescription": "エラーが発生しました。もう一度お試しください。",
+        "retry": "再試行"
+    },
+    "TransactionDescription": {
+        "sparkTransfer": "Spark送金",
+        "lightningPayment": "Lightning支払い",
+        "onchainDeposit": "On-chain入金",
+        "onchainWithdrawal": "On-chain出金",
+        "conversionFromBitcoin": "Bitcoinからの変換",
+        "conversionToBitcoin": "Bitcoinへの変換",
+        "conversionFromToken": "{token}からの変換",
+        "conversionToToken": "{token}への変換",
+        "tokenTransfer": "{token}送金",
+        "payTo": "{address}に支払い",
+        "payment": "支払い"
+    },
+    "SelfCustodialOffline": {
+        "title": "ウォレットはオフラインです",
+        "description": "非保管型ウォレットは現在ネットワークに接続できません。オンラインに戻ったら再試行してください。",
+        "retry": "再試行"
+    },
+    "SelfCustodialError": {
+        "insufficientFunds": "金額とネットワーク手数料を賄う資金が不足しています。より少ない金額をお試しください。",
+        "belowMinimum": "金額がこの支払いの最低額を下回っています。より大きい金額をお試しください。",
+        "networkError": "ネットワーク接続の問題です。接続を確認してもう一度お試しください。",
+        "invalidInput": "支払いの詳細が無効のようです。確認してもう一度お試しください。",
+        "generic": "支払いを完了できませんでした。少し経ってからもう一度お試しいただくか、より少ない金額をお使いください。"
+    },
+    "UnclaimedDeposit": {
+        "title": "{count}件の未請求デポジットがあります",
+        "description": "合計: {sats} sats請求可能",
+        "claim": "今すぐ請求",
+        "claiming": "請求中...",
+        "screenTitle": "未請求のデポジット",
+        "cardTitle": "{sats} sats を請求",
+        "claimWithFee": "請求（最大手数料: {fee} sats）",
+        "refund": "払い戻し",
+        "refunding": "払い戻し中...",
+        "immature": "確認を待っています...",
+        "feeExceeded": "ネットワーク手数料が高すぎて請求できません（{requiredFee} sats 必要）。後で再試行するか、オンチェーンアドレスに払い戻してください。",
+        "missingUtxo": "このデポジットはネットワーク上で利用できなくなりました。",
+        "belowDustLimit": "このデポジットは手数料後に請求するには小さすぎます。手数料が下がるのを待つか、オンチェーンアドレスに払い戻してください。",
+        "genericError": "請求できません: {error}",
+        "claimFailed": "請求失敗: {error}",
+        "refundFailed": "払い戻し失敗: {error}",
+        "refundAddress": "払い戻し用Bitcoinアドレス",
+        "feeRate": "ネットワーク手数料",
+        "feeRateFastest": "最速 (~{sats} sats) ~10分",
+        "feeRateHalfHour": "通常 (~{sats} sats) ~30分",
+        "feeRateHour": "エコノミー (~{sats} sats) ~60分",
+        "feeRateUnit": "{rate} sat/vB",
+        "feeRateUnavailable": "ネットワーク手数料を読み込めませんでした。接続を確認してもう一度お試しください。",
+        "refundNow": "今すぐ払い戻し",
+        "refundSuccess": "払い戻しが正常に開始されました",
+        "claimSuccess": "デポジットが正常に請求されました",
+        "error": "このデポジットを請求できません"
+    },
+    "FeatureUnavailable": {
+        "SelfCustodial": {
+            "title": "Temporarily unavailable",
+            "description": "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later."
+        }
+    },
+    "NetworkStatus": {
+        "degradedBanner": "Spark network is currently degraded. Payments may take longer."
+    },
+    "SelfCustodialDelete": {
+        "dangerZoneImportantTitle": "重要",
+        "dangerZoneBulletReinstated": "削除したアカウントは復元できません",
+        "dangerZoneBulletPermanent": "アカウントの削除は永久的です",
+        "dangerZoneBulletEmpty": "アカウントが空であることを確認してください",
+        "dangerZoneDeleteButton": "アカウントとデータを削除",
+        "confirmModalTitle": "アカウント削除の確認",
+        "confirmModalTypeToConfirm": "確認するには \"{delete: string}\" と入力してください",
+        "hasFundsWarningTitle": "警告",
+        "hasFundsWarningBody": "ウォレットには{balance}の残高があります。安全のため、残高のあるアカウントの削除は許可されていません。",
+        "hasFundsWarningHelper": "削除を続行するには、アカウントを空にするか、循環経済へ寄付してください。",
+        "hasFundsWarningButton": "戻る"
     }
 }

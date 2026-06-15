@@ -59,7 +59,7 @@ describe("Receive: LN BTC Amountless", () => {
 
     await sendLnPaymentFromBob({ paymentRequest, amount: 2 })
 
-    await tap(by.id("Back"))
+    await device.pressBack()
     await waitForHomeScreen(LL)
   })
 })
@@ -85,7 +85,7 @@ describe("Receive: LN BTC $0.02 Amount", () => {
 
     await sendLnPaymentFromBob({ paymentRequest })
 
-    await tap(by.id("Back"))
+    await device.pressBack()
     await waitForHomeScreen(LL)
   })
 })
@@ -112,7 +112,7 @@ describe("Receive: LN Stablesats Amountless", () => {
 
     await sendLnPaymentFromBob({ paymentRequest, amount: 2 })
 
-    await tap(by.id("Back"))
+    await device.pressBack()
     await waitForHomeScreen(LL)
   })
 })
@@ -142,7 +142,7 @@ describe("Receive: LN Stablesats $0.02 Amount", () => {
 
     await sendLnPaymentFromBob({ paymentRequest })
 
-    await tap(by.id("Back"))
+    await device.pressBack()
     await waitForHomeScreen(LL)
   })
 })
@@ -167,7 +167,7 @@ describe("Receive: Onchain BTC", () => {
 
     await sendBtcTo({ address })
 
-    await tap(by.id("Back"))
+    await device.pressBack()
     await waitForHomeScreen(LL)
   })
 })
@@ -192,7 +192,7 @@ describe("Receive: Onchain Stablesats", () => {
 
     await sendBtcTo({ address })
 
-    await tap(by.id("Back"))
+    await device.pressBack()
     await waitForHomeScreen(LL)
   })
 })

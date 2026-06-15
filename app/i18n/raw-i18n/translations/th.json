@@ -18,9 +18,7 @@
     "howToUseYourCashRegister": "วิธีใช้งานทะเบียนรับเงิน",
     "howToUseYourAddressExplainer": "Share with someone that has a compatible wallet, such as:",
     "howToUseYourPaycodeExplainer": "You can print your Paycode (technically, this is an lnurl-pay address) and display it in your business to receive payments. Individuals can pay you by scanning it with a Lightning-enabled wallet.\n\nHowever, be aware that some wallets can’t scan a Paycode such as:",
-    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet.",
-    "yourAddress": "แอดเดรส {bankName: string} ของคุณ",
-    "copiedAddressToClipboard": "คัดลอกแอดเดรส {bankName: string} ไปยังคลิปบอร์ดแล้ว"
+    "howToUseYourCashRegisterExplainer": "Allow people to collect payments via the Cash Register link, without accessing your wallet.\n\nThey can create invoices and payments will be sent directly to your {bankName: string} Wallet."
   },
   "AcceptTermsAndConditionsScreen": {
     "title": "ข้อกำหนดและเงื่อนไข",
@@ -64,7 +62,8 @@
     "title": "แลกเปลี่ยน",
     "transfer": "โอน",
     "percentageToConvert": "% ที่ต้องการแลกเปลี่ยน",
-    "reviewTransfer": "ตรวจสอบการโอน"
+    "reviewTransfer": "ตรวจสอบการโอน",
+    "dustError": "ต้องโอนยอดคงเหลือทั้งหมด"
   },
   "ConversionConfirmationScreen": {
     "title": "ตรวจสอบการแลกเปลี่ยน",
@@ -72,11 +71,12 @@
     "receivingAccount": "บัญชีรับเงิน",
     "infoBitcoin": "จำนวน Bitcoin เป็นเพียงค่าประมาณ อาจเปลี่ยนแปลงเล็กน้อยได้",
     "infoDollar": "จำนวนดอลลาร์เป็นเพียงค่าประมาณ อาจเปลี่ยนแปลงเล็กน้อยได้",
-    "transferButtonText": "โอนจาก {fromWallet} ไป {toWallet}"
+    "transferButtonText": "โอนจาก {fromWallet} ไป {toWallet}",
+    "feeLabel": "ค่าธรรมเนียมการแปลง",
+    "feeError": "ไม่สามารถดึงค่าธรรมเนียมการแปลงได้"
   },
   "ConversionSuccessScreen": {
-    "message": "การแลกเปลี่ยนสำเร็จแล้ว",
-    "title": "แลกเปลี่ยนเสร็จสิ้น"
+    "message": "การแลกเปลี่ยนสำเร็จแล้ว"
   },
   "EarnScreen": {
     "satoshi": "sat",
@@ -2047,6 +2047,7 @@
     "createAccount": "Create new account",
     "exploreWallet": "Explore wallet",
     "login": "เข้าสู่ระบบ",
+    "loginOrRestore": "เข้าสู่ระบบ / กู้คืน",
     "logBackInWith": "Log back in with",
     "headline": "สนับสนุนโดย Galoy",
     "startTrialAccount": "Start with a trial account",
@@ -2071,12 +2072,7 @@
     "payBusiness": "จ่ายเงินให้ร้านนี้",
     "openSettings": "เปิดการตั้งค่า",
     "title": "แผนที่",
-    "error": "เกิดข้อผิดพลาดขณะรับตำแหน่งของคุณ",
-    "locationPermissionMessage": "เปิดใช้งานการระบุตำแหน่ง เพื่อให้คุณรู้ว่าคุณอยู่ตรงไหนของบนแผนที่",
-    "locationPermissionNegative": "ยกเลิก",
-    "locationPermissionNeutral": "ถามอีกครั้งในภายหลัง",
-    "locationPermissionPositive": "ตกลง",
-    "locationPermissionTitle": "หาตำแหน่งของคุณบนแผนที่"
+    "error": "เกิดข้อผิดพลาดขณะรับตำแหน่งของคุณ"
   },
   "HomeScreen": {
     "receive": "รับเงิน",
@@ -2166,9 +2162,14 @@
     "lightningAddress": "ที่อยู่ lightning",
     "lightningInvoice": "ใบแจ้งหนี้ lightning",
     "bitcoinOnchain": "Bitcoin onchain",
-    "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT"
+    "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT",
+    "autoConvertMinAmount": "จำนวนต่ำกว่า {minSats: number} satoshi / {minFiat: string} ไม่สามารถแปลงเป็นดอลลาร์อัตโนมัติได้ คุณจะได้รับ Bitcoin แทน",
+    "autoConvertFailed": "รับการชำระเงินแล้ว แต่การแปลงล้มเหลว",
+    "pleaseWaitForConversion": "โปรดรอจนกว่าการแปลงจะเสร็จสิ้น"
   },
   "RedeemBitcoinScreen": {
+    "walletNotConnected": "กระเป๋าเงินของคุณกำลังเชื่อมต่ออยู่ โปรดรอสักครู่แล้วลองอีกครั้ง",
+    "paymentPending": "การชำระเงินของคุณอาจยังดำเนินการอยู่ ตรวจสอบยอดคงเหลือของคุณก่อนลองใหม่อีกครั้ง",
     "title": "แลกรับบิตคอยน์",
     "usdTitle": "แลกเป็น บัญชีเงินดอลล่าร์",
     "error": "การสร้าง invoice ผิดพลาด หากปัญหายังคงอยู่ กรุณาติดต่อฝ่ายซัพพอร์ท",
@@ -2226,7 +2227,8 @@
     "slideToConfirm": "เลื่อนเพื่อยืนยัน",
     "slideConfirming": "กำลังยืนยัน...",
     "copiedDestination": "คัดลอกปลายทางไปยังคลิปบอร์ดแล้ว",
-    "lightningRecommended": "ค่าธรรมเนียมสูง! แนะนำให้ใช้ Lightning"
+    "lightningRecommended": "ค่าธรรมเนียมสูง! แนะนำให้ใช้ Lightning",
+    "usdRemainderSweep": "ยอดคงเหลือ {remaining: string} ({remainingSats: string}) จะถูกแปลงเป็น Bitcoin ขั้นต่ำของ USD: {minimum: string}"
   },
   "SendBitcoinDestinationScreen": {
     "usernameNowAddress": "ชื่อผู้ใช้{bankName: string} เป็นแอดเดรส{bankName: string}ของคุณในขณะนี้",
@@ -2257,16 +2259,7 @@
     "clipboardError": "เกิดข้อผิดพลาดในการรับค่าจากคลิปบอร์ด",
     "pastedClipboardSuccess": "วางจากคลิปบอร์ดแล้ว",
     "invalidPhoneNumber": "กรุณาป้อนหมายเลขโทรศัพท์มือถือที่ถูกต้อง",
-    "phoneNotAllowed": "ช่องนี้ไม่รับหมายเลขโทรศัพท์",
-    "confirmModal": {
-      "title": "You've never sent money to this address",
-      "body1": "Please make sure the recipient gave you a {bankName: string} address,",
-      "bold2bold": "not a username from another wallet.",
-      "body3": "Otherwise, the money will go to a {bankName: string} Account that has the “{lnAddress: string}” address.\n\nCheck the spelling of the first part of the address as well. e.g. jackie and jack1e are 2 different addresses",
-      "warning": "หากแอดเดรส {bankName: string} ที่ระบุมาไม่ถูกต้อง {bankName: string} ไม่สามารถยกเลิกธุรกรรมได้",
-      "checkBox": "{lnAddress: string} เป็นแอดเดรสที่ถูกต้อง",
-      "confirmButton": "ฉันมั่นใจ 100%"
-    }
+    "phoneNotAllowed": "ช่องนี้ไม่รับหมายเลขโทรศัพท์"
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "ธุรกรรมจะถูกส่งไปยัง Mempool",
@@ -2314,8 +2307,16 @@
     "recipient": "ผู้รับ",
     "time": "เวลา",
     "type": "ประเภท",
-    "destinationIsRequired": "กรุณาระบุปลายทาง",
-    "lnurlInvoiceIncorrectDescription": "เซิร์ฟเวอร์ lnurl ตอบสนองกับ invoice ที่มี Description hash ไม่ถูกต้อง"
+    "feeTier": "ความเร็วค่าธรรมเนียม",
+    "fast": "เร็ว",
+    "medium": "ปานกลาง",
+    "slow": "ช้า",
+    "recommended": "แนะนำ",
+    "walletOffline": "กระเป๋าเงินของคุณออฟไลน์ กรุณาตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
+    "sdkInsufficientFunds": "ยอดเงินไม่เพียงพอสำหรับธุรกรรมนี้",
+    "sdkAmountTooLow": "จำนวนเงินต่ำเกินไปสำหรับธุรกรรม on-chain",
+    "sdkNetworkError": "ข้อผิดพลาดของเครือข่าย กรุณาตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
+    "sdkGenericError": "ไม่สามารถประมาณค่าธรรมเนียมได้ กรุณาลองจำนวนอื่น"
   },
   "SettingsScreen": {
     "staticQr": "QR แบบคงที่สำหรับพิมพ์",
@@ -2329,6 +2330,7 @@
     "setYourLightningAddress": "ตั้งค่าแอดเดรส Lightning ของคุณ",
     "activated": "เปิดใช้งานเป็นที่เรียบร้อย",
     "addressScreen": "Ways to get paid",
+    "nonCustodialAccount": "บัญชีแบบไม่ฝากดูแล",
     "tapUserName": "กดเพื่อตั้งชื่อผู้ใช้",
     "notifications": "Notifications",
     "title": "การตั้งค่า",
@@ -2355,7 +2357,15 @@
     "logoutOneAccountAlertContent": "คุณจะถูกออกจากระบบจากเซสชันที่เชื่อมโยงกับ {identifier: string}\nกรุณาตรวจสอบว่าคุณสามารถเข้าสู่ระบบได้อีกในอนาคต",
     "logoutOneAccountConfirm": "ฉันเข้าใจแล้ว กรุณาออกจากระบบ",
     "receiveCurrency": "สกุลเงินรับ",
-    "displayCurrency": "สกุลเงินแสดงผล"
+    "displayCurrency": "สกุลเงินแสดงผล",
+    "AccountInformation": {
+      "identityLabel": "Wallet identifier",
+      "backupStatusLabel": "Backup status",
+      "backupStatusCompleted": "Backup complete",
+      "backupStatusNotCompleted": "Backup not complete",
+      "loadError": "Could not load your account information.",
+      "lightningAddressLabel": "ที่อยู่ Lightning"
+    }
   },
   "NotificationSettingsScreen": {
     "title": "ตั้งค่าการแจ้งเตือน",
@@ -2394,6 +2404,7 @@
     "level": "ระดับ {level: string}",
     "switchAccount": "สลับบัญชี",
     "pleaseWait": "กรุณารอสักครู่",
+    "probeBalanceFailed": "ไม่สามารถตรวจสอบยอดเงินในกระเป๋าเงินได้ โปรดลองอีกครั้ง",
     "accountLevel": "Account Level",
     "upgrade": "Upgrade your account",
     "logOutAndDeleteLocalData": "Log out and clear all local data",
@@ -2433,6 +2444,8 @@
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "รหัสบัญชี",
+    "publicKey": "คีย์สาธารณะ",
+    "copiedPublicKey": "คัดลอกคีย์สาธารณะไปยังคลิปบอร์ดแล้ว",
     "copy": "Copy",
     "identityVerification": "การยืนยันตัวตน"
   },
@@ -2442,6 +2455,19 @@
     "fromThisDevice": "จากอุปกรณ์นี้?",
     "switchAccount": "คุณได้สลับไปยังบัญชีอื่นแล้ว",
     "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว"
+  },
+  "StablesatsRestriction": {
+    "modalTitle": "Stablesats ไม่พร้อมใช้งานในภูมิภาคของคุณ",
+    "modalBody": "หากต้องการเข้าถึงบัญชีดอลลาร์ ให้สร้างบัญชีแบบ non-custodial",
+    "createNew": "สร้างใหม่",
+    "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ"
+  },
+  "ConvertDollarToBitcoinModal": {
+    "title": "บัญชีดอลลาร์ไม่สามารถใช้งานได้ในภูมิภาคของคุณอีกต่อไป",
+    "body": "โอนยอดเงินดอลลาร์ของคุณเป็น Bitcoin",
+    "youHave": "คุณมี",
+    "youGet": "คุณจะได้รับ",
+    "approve": "อนุมัติ"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -2463,7 +2489,9 @@
   },
   "DefaultWalletScreen": {
     "title": "บัญชีรับเริ่มต้น",
-    "info": "บัญชีบิตคอยน์ ของคุณสำหรับสะสม sats ซึ่งมูลค่า USD เคลื่อนไหวตามตลาด บัญชีเงินดอลล่าร์ ของคุณขับเคลื่อนโดย Stablesats — เก็บ Bitcoin ที่ป้องกันความเสี่ยงเพื่อรักษาเสถียรภาพในมูลค่า USD คุณถือ Bitcoin ตลอดเวลา แต่มูลค่าดอลลาร์ไม่เปลี่ยนแปลง"
+    "info": "บัญชีบิตคอยน์ ของคุณสำหรับสะสม sats ซึ่งมูลค่า USD เคลื่อนไหวตามตลาด บัญชีเงินดอลล่าร์ ของคุณขับเคลื่อนโดย Stablesats — เก็บ Bitcoin ที่ป้องกันความเสี่ยงเพื่อรักษาเสถียรภาพในมูลค่า USD คุณถือ Bitcoin ตลอดเวลา แต่มูลค่าดอลลาร์ไม่เปลี่ยนแปลง",
+    "titleSelfCustodial": "บัญชีเริ่มต้น",
+    "infoSelfCustodial": "บัญชีนี้จะถูกใช้เป็นค่าเริ่มต้นเมื่อรับและส่ง คุณสามารถสลับได้ตลอดเวลา"
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2481,7 +2509,10 @@
     "header": "บัญชีเงินดอลล่าร์ ของคุณขับเคลื่อนโดย Stablesats",
     "body": "บัญชีเงินดอลล่าร์ ใช้เทคโนโลยี Stablesats เพื่อรักษา Bitcoin ให้มีเสถียรภาพตามราคา USD คุณถือ Bitcoin ตลอดเวลา — ไม่ใช่ดอลลาร์จริง — แต่มูลค่า USD ไม่ผันผวน คุณสามารถส่งและรับ Bitcoin ได้ตามปกติ แต่ไม่รองรับระบบธนาคารแบบดั้งเดิม",
     "termsAndConditions": "อ่านข้อกำหนดและเงื่อนไข",
-    "learnMore": "เรียนรู้เพิ่มเติมเกี่ยวกับ Stablesats"
+    "learnMore": "เรียนรู้เพิ่มเติมเกี่ยวกับ Stablesats",
+    "headerSelfCustodial": "บัญชีดอลลาร์ของคุณถือ stablecoins",
+    "bodySelfCustodial": "ในบัญชีดอลลาร์คุณถือ stablecoins โทเคนที่หนุนด้วยสินทรัพย์ซึ่งมีมูลค่าคงที่เทียบกับดอลลาร์สหรัฐ คุณยังไม่สามารถส่งและรับ stablecoins ได้ เมื่อคุณส่งจากบัญชีดอลลาร์ stablecoins ของคุณจะถูกสลับและส่งเป็น Bitcoin ไปยังผู้รับ",
+    "learnMoreSelfCustodial": "เรียนรู้เพิ่มเติม"
   },
   "SplashScreen": {
     "update": "แอปของคุณเป็นเวอร์ชั่นที่เก่าเกินไป จะต้องอัพเดทก่อนจึงจะใช้งานได้\n\nหากใช้แอนดรอยด์ คุณสามารถอัพเดทได้ที่ PlayStore หรือหากใช้ iOS สามารถอัพเดทได้ที่ Testflight"
@@ -2682,6 +2713,8 @@
     "accountInformation": "ข้อมูลบัญชี",
     "trialAccount": "บัญชีทดลอง",
     "blinkUser": "ผู้ใช้ Blink",
+    "anonymous": "นิรนาม",
+    "anonymousUser": "ผู้ใช้นิรนาม",
     "blinkToBlink": "Blink ไปยัง Blink",
     "transactionLimits": "จำกัดธุรกรรม",
     "activateWallet": "เปิดใช้งานกระเป๋า",
@@ -2739,6 +2772,7 @@
     "or": "or",
     "openWallet": "เปิดกระเป๋า",
     "onchain": "Onchain",
+    "spark": "Spark",
     "paymentRequest": "คำขอชำระเงิน",
     "phone": "โทรศัพท์",
     "phoneNumber": "เบอร์โทรศัพท์",
@@ -2758,6 +2792,7 @@
     "submit": "Submit",
     "success": "สำเร็จ!",
     "dollarStablesats": "ดอลลาร์ (Stablesats)",
+    "dollarStablecoin": "ดอลลาร์ (Stablecoin)",
     "to": "ถึง",
     "total": "รวม",
     "transactions": "ธุรกรรม",
@@ -2800,7 +2835,8 @@
       "minChars": "ต้องมีอย่างน้อย {min} ตัวอักษร",
       "invalidPostalCode": "รหัสไปรษณีย์ไม่ถูกต้อง อาจพิมพ์ผิด",
       "invalidRegion": "การเลือกภูมิภาคไม่ถูกต้อง"
-    }
+    },
+    "copied": "คัดลอกไปยังคลิปบอร์ดแล้ว"
   },
   "errors": {
     "generic": "มีขความผิดพลาดเกิดขึ้น\nโปรดลองอีกครั้งในภายหลัง",
@@ -2929,27 +2965,6 @@
       "title": "ชาเลนจ์เดือนมิถุนายน!",
       "description": "ขยายวงในของคุณเพิ่ม 10 คน เพื่อลุ้นรับตั๋ว Privilege มูลค่า $1000 สำหรับงาน Adopting Bitcoin El Salvador",
       "details": "ลุ้นรับตั๋ว Privilege สำหรับงาน Adopting Bitcoin El Salvador\n\nขยายวงในของคุณเพิ่ม 10 คน เพื่อลุ้นรับตั๋ว Privilege มูลค่า $1000 สำหรับงาน Adopting Bitcoin El Salvador! ตั๋วนี้รวมสิทธิ์เข้าร่วมงานหลัก พื้นที่ Mezzanine พร้อมอาหาร/เครื่องดื่ม/ของว่าง งานเลี้ยงวิทยากร และเทศกาลภาพยนตร์\n\nแชร์วงของคุณบนโซเชียลด้วยแฮชแท็ก #blinkcircles เพื่อเข้าร่วม\n\nครั้งนี้จะมีผู้ชนะสองคน!"
-    },
-    "septChallenge": {
-      "title": "September Challenge!",
-      "description": "Inner Circle {innerCircle: number}/21 - Earn $21\nTop 3 - Win tickets to Adopting Bitcoin!",
-      "details": "Grow your inner circle by 21 people in September and share on social with #blinkcircles to get $21 to your Stablesats account. Top 3 win tickets to Adopting Bitcoin!",
-      "peopleWelcomedSoFar": "people welcomed so far",
-      "yourRank": "your rank",
-      "reminder": "Reminder: Your inner circle grows when you send a new Blink user their first sats",
-      "fullDetails": "Full details at"
-    },
-    "octoberChallenge": {
-      "title": "October Challenge!",
-      "description": "Share your #blinkcircles for a chance to win 1,000,000 sats!",
-      "details": "We're giving away 1,000,000 sats!\n\n Share your Circles on social with tag `#blinkcircles` to enter! The winner will be chosen at random on October 31st.\n\n You must have at least one person in your Inner Circle to enter!",
-      "connectOnSocial": "Connect on social: ",
-      "fullDetails": "Full details at "
-    },
-    "novemberChallenge": {
-      "title": "November Challenge!",
-      "description": "Earn 2,100 sats for every person you welcome to Blink in November!",
-      "details": "Earn 2,100 sats for every person you welcome to Blink in November!\n\nTo claim your sats, simply share your Circles on social any time during November with the tag `#blinkcircles`.\n\nYour sats will be paid out on December 1, 2023."
     }
   },
   "FullOnboarding": {
@@ -2990,7 +3005,10 @@
       "emptyTransactions": "ยังไม่มีธุรกรรม",
       "addFunds": "เติมเงิน",
       "transactionsTitle": "ธุรกรรม",
-      "title": "บัตร Visa"
+      "title": "บัตร Visa",
+      "noCardAvailable": "ไม่มีบัตรที่ใช้ได้",
+      "cardNotUsable": "ขณะนี้บัตรนี้ไม่พร้อมใช้งาน",
+      "cardUpdateError": "ไม่สามารถอัปเดตสถานะบัตรได้"
     },
     "validThruLabel": "ใช้ได้ถึง",
     "networkVisa": "Visa",
@@ -3262,9 +3280,6 @@
         "damagedCard": "บัตรเสียหาย",
         "damagedCardDescription": "บัตรของฉันเสียหายทางกายภาพ",
         "whatHappensNext": "จะเกิดอะไรขึ้นต่อไป?",
-        "currentCardDeactivated": "บัตรปัจจุบันของคุณจะถูกปิดใช้งานทันที",
-        "newCardShipped": "บัตรใหม่จะถูกจัดส่งไปยังที่อยู่ของคุณ",
-        "digitalCardAvailable": "บัตรดิจิทัลของคุณยังคงใช้งานได้ระหว่างกระบวนการนี้",
         "cardManagement": "การจัดการบัตร",
         "bullet1": "บัตรปัจจุบันของคุณจะถูกระงับเพื่อความปลอดภัย",
         "bullet2": "จะออกบัตรใหม่ที่มีหมายเลขต่างกัน",
@@ -3285,15 +3300,9 @@
         "title": "ตรวจสอบคำขอของคุณ",
         "subtitle": "กรุณายืนยันรายละเอียดการเปลี่ยนบัตรของคุณ",
         "requestSummary": "สรุปคำขอ",
-        "reason": "เหตุผล",
         "delivery": "การจัดส่ง",
-        "shippingAddress": "ที่อยู่จัดส่ง",
-        "deliveryCost": "ค่าจัดส่ง",
         "submitRequest": "ส่งคำขอ",
         "importantInformation": "ข้อมูลสำคัญ",
-        "processedImmediately": "คำขอของคุณจะถูกดำเนินการทันที",
-        "currentCardDeactivated": "บัตรปัจจุบันจะถูกปิดใช้งานเมื่อยืนยัน",
-        "trackStatus": "คุณสามารถติดตามสถานะการจัดส่งบัตรใหม่ของคุณในแอป",
         "issueType": "เหตุผล",
         "deliveryTime": "เวลาจัดส่ง",
         "shippingCost": "ค่าจัดส่ง",
@@ -3346,10 +3355,7 @@
         "feature2": "ชิป EMV เพื่อความปลอดภัยที่สูงขึ้น",
         "feature3": "แถบแม่เหล็กเพื่อการยอมรับทั่วโลก",
         "feature4": "ชื่อของคุณถูกปั๊มนูนบนบัตร",
-        "important": "สำคัญ",
-        "importantBullet1": "บัตรเสมือนของคุณจะยังใช้งานได้ระหว่างรอบัตรจริง",
-        "importantBullet2": "คุณต้องเปิดใช้งานบัตรจริงเมื่อมาถึง",
-        "importantBullet3": "บัตรทั้งสองใบจะมีหมายเลขและรายละเอียดเดียวกัน"
+        "important": "สำคัญ"
       },
       "Confirm": {
         "title": "ยืนยันคำสั่งซื้อ",
@@ -3467,5 +3473,248 @@
         "buttonText": "ปิด"
       }
     }
+  },
+  "BackupScreen": {
+    "title": "Back up your wallet",
+    "description": "Choose a backup method to secure your funds",
+    "BackupMethod": {
+      "title": "เลือกวิธีการสำรองข้อมูล",
+      "subtitle": "เราแนะนำ {provider} สำหรับผู้ใช้ใหม่",
+      "googleDrive": "Google Drive",
+      "appleICloud": "Apple iCloud",
+      "passwordManager": "ตัวจัดการรหัสผ่าน",
+      "manualBackup": "สำรองข้อมูลด้วยตนเอง",
+      "passwordManagerBackupSaved": "บันทึกสำรองไปยังตัวจัดการรหัสผ่านแล้ว",
+      "passwordManagerBackupFailed": "ไม่สามารถบันทึกสำรองได้",
+      "passwordManagerUnavailable": "ไม่มีตัวจัดการรหัสผ่านที่ใช้ได้บนอุปกรณ์นี้ ใช้การสำรองข้อมูล Drive หรือบันทึกวลี 12 คำของคุณด้วยตนเอง"
+    },
+    "ManualBackup": {
+      "Alerts": {
+        "title": "เก็บวลีสำรองของคุณเป็นความลับ!",
+        "check1": "ฉันเข้าใจว่าไม่มีใครสามารถกู้คืนกระเป๋าเงินของฉันได้หากฉันสูญเสียวลีนี้",
+        "check2": "ฉันเข้าใจว่าหากใครบางคนได้รับวลีนี้ พวกเขาสามารถขโมยเงินทั้งหมดของฉันได้",
+        "check3": "ไม่มีใครขอข้อมูลนี้จากฉันผ่านข้อความหรือโทรศัพท์"
+      },
+      "Phrase": {
+        "headerTitle": "วลีสำรอง",
+        "sparkCompatible": "วลีสำรองนี้ใช้ได้ใน{sparkCompatibleLink}",
+        "sparkCompatibleLink": "กระเป๋าเงินที่รองรับ Spark",
+        "copiedToast": "คัดลอกวลีสำรองไปยังคลิปบอร์ดแล้ว",
+        "saveItNow": "บันทึกตอนนี้",
+        "savedConfirm": "ฉันบันทึกแล้ว",
+        "copy": "คัดลอก",
+        "continueButton": "ดำเนินการต่อ",
+        "testBackup": "ทดสอบข้อมูลสำรองของคุณ"
+      },
+      "Confirm": {
+        "headerTitle": "ยืนยันวลีสำรอง",
+        "subtitle": "ตรวจสอบอย่างรวดเร็วว่าคุณเขียนถูกต้อง",
+        "enterWord": "ป้อนคำ",
+        "enterWords": "ป้อนคำ",
+        "confirm": "ยืนยัน",
+        "incorrectWord": "คำไม่ถูกต้อง โปรดตรวจสอบลำดับ"
+      },
+      "Success": {
+        "title": "ยินดีต้อนรับสู่ Blink แบบไม่มีผู้ดูแล",
+        "testSuccess": "วลีสำรองของคุณถูกต้อง"
+      }
+    },
+    "CloudBackup": {
+      "title": "มาสำรองข้อมูลกระเป๋าเงินของคุณกัน",
+      "description": "เราจะบันทึกสำเนาวลีสำรองของคุณไปยัง {provider} ของคุณ",
+      "encryptCheckbox": "เข้ารหัสด้วยรหัสผ่านเพิ่มเติม",
+      "password": "รหัสผ่าน",
+      "passwordPlaceholder": "(อย่างน้อย 12 ตัวอักษร)",
+      "confirmPassword": "ยืนยันรหัสผ่าน",
+      "confirmPasswordPlaceholder": "กรอกรหัสผ่านอีกครั้ง",
+      "continueButton": "ดำเนินการต่อ",
+      "importantTitle": "สำคัญ",
+      "importantMessage": "Blink ไม่ได้เก็บรหัสผ่านนี้ หากคุณทำหาย {bold} กู้คืนกระเป๋าเงินของคุณได้",
+      "importantMessageBold": "เราจะไม่สามารถ",
+      "passwordTooShort": "อย่างน้อย 12 ตัวอักษร",
+      "passwordMismatch": "รหัสผ่านไม่ตรงกัน",
+      "uploadSuccess": "สำรองข้อมูลไปยัง {provider} แล้ว",
+      "uploadFailed": "อัปโหลดข้อมูลสำรองไม่สำเร็จ",
+      "signInFailed": "ลงชื่อเข้าใช้ {provider} ไม่สำเร็จ",
+      "cloudNotAvailable": "iCloud Drive ไม่พร้อมใช้งาน โปรดลงชื่อเข้าใช้ iCloud ในการตั้งค่าและเปิดใช้ iCloud Drive",
+      "networkError": "เกิดข้อผิดพลาดของเครือข่าย โปรดตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
+      "existingBackupTitle": "พบข้อมูลสำรอง",
+      "existingBackupMessage": "มีข้อมูลสำรองอยู่แล้วใน {provider} ของคุณ คุณต้องการเขียนทับหรือไม่?",
+      "existingBackupMessageWithDetails": "มีการสำรองข้อมูลอยู่แล้วใน {provider} ของคุณ\n\nที่อยู่ Lightning: {address}\nสร้างเมื่อ: {createdAt}\n\nคุณต้องการเขียนทับหรือไม่?",
+      "existingBackupUnknownAddress": "ไม่พร้อมใช้งาน",
+      "existingBackupUnknownCreatedAt": "ไม่ทราบ",
+      "overwrite": "เขียนทับ"
+    }
+  },
+  "AccountMigration": {
+    "moveToNonCustodial": "ย้ายไปแบบ non-custodial",
+    "explainerTitle": "การย้ายไปแบบ non-custodial หมายความว่าอย่างไร?",
+    "explainerStep1": "คุณจะสร้างบัญชีแบบ non-custodial บนโปรโตคอล Spark <link>เรียนรู้เพิ่มเติมที่นี่</link>",
+    "explainerStep2": "เราจะโอนเงินของคุณไปยังบัญชี non-custodial ใหม่และบัญชีปัจจุบันของคุณจะถูกลบ",
+    "explainerStep3": "ใช้ Blink ต่อไปได้ตามปกติ",
+    "letsMove": "ไปกันเลย",
+    "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที"
+  },
+  "AccountTypeSelectionScreen": {
+    "custodialLabel": "ควบคุมโดยผู้ดูแล",
+    "selfCustodialLabel": "ควบคุมด้วยตัวเอง",
+    "custodialDescription": "เราดูแลเงินทุนในนามของคุณ",
+    "selfCustodialDescription": "คุณเท่านั้นที่สามารถเข้าถึงเงินทุน",
+    "continueButton": "ดำเนินการต่อ",
+    "descriptionDefault": "กรุณาเลือกประเภท Blink ที่คุณต้องการ",
+    "descriptionSelected": "กรุณาเลือกประเภทบัญชี",
+    "chooseMethod": "เลือกวิธี",
+    "restoreComingSoonTitle": "เร็วๆ นี้",
+    "restoreComingSoonDescription": "ฟีเจอร์กู้คืนจะพร้อมใช้งานในการอัปเดตในอนาคต",
+    "createFailed": "สร้างกระเป๋าเงินไม่สำเร็จ กรุณาลองอีกครั้ง",
+    "selfCustodialDisabled": "ไม่ใช่การคุ้มครองไม่พร้อมใช้งานชั่วคราว"
+  },
+  "RestoreScreen": {
+    "title": "กู้คืนกระเป๋าเงิน",
+    "description": "กู้คืนกระเป๋าเงินจากข้อมูลสำรอง",
+    "phraseTitle": "กู้คืนกระเป๋าเงิน",
+    "phraseSubtitleStep1": "ป้อน 6 คำแรกของวลีสำรองข้อมูลของคุณ",
+    "phraseSubtitleStep2": "ป้อนคำที่เหลือของวลีสำรองข้อมูลของคุณ",
+    "nextWords": "6 คำถัดไป",
+    "paste": "วาง",
+    "enterWord": "คำ",
+    "invalidMnemonic": "วลีสำรองไม่ถูกต้อง โปรดตรวจสอบว่าลำดับคำถูกต้องหรือไม่",
+    "restoring": "กำลังกู้คืนกระเป๋าเงินของคุณ...",
+    "restoreSuccess": "กู้คืนกระเป๋าเงินสำเร็จ",
+    "restoreFailed": "กู้คืนกระเป๋าเงินล้มเหลว โปรดลองอีกครั้ง",
+    "restore": "กู้คืนกระเป๋าเงิน",
+    "noBackupFound": "ไม่พบข้อมูลสำรอง",
+    "noBackupDescription": "ไม่พบข้อมูลสำรอง คุณสามารถป้อนวลีสำรองข้อมูลด้วยตนเอง",
+    "enterPassword": "ป้อนรหัสผ่านการเข้ารหัสของคุณ",
+    "wrongPassword": "รหัสผ่านไม่ถูกต้อง โปรดลองอีกครั้ง",
+    "pickBackupTitle": "เลือกกระเป๋าเงิน",
+    "pickBackupDescription": "เลือกการสำรองข้อมูลเพื่อกู้คืน"
+  },
+  "BackupNudge": {
+    "title": "เงินของคุณมีความเสี่ยง",
+    "description": "รักษาความปลอดภัยกระเป๋าเงินของคุณตอนนี้ ใช้เวลาเพียงนาทีเดียว",
+    "cta": "รักษาความปลอดภัยกระเป๋าเงิน",
+    "settingsWarning": "สำรองข้อมูลกระเป๋าเงินของคุณ หากคุณสูญเสียอุปกรณ์นี้ คุณจะสูญเสียเงินของคุณ",
+    "modalTitle": "รักษาความปลอดภัยเงินของคุณ",
+    "modalDescription": "เราขอแนะนำอย่างยิ่งให้คุณสำรองข้อมูลกระเป๋าเงินเพื่อป้องกันการสูญเสียเงินทั้งหมดในกรณีที่คุณทำอุปกรณ์นี้หาย",
+    "secureMe": "รักษาความปลอดภัยกระเป๋าเงิน"
+  },
+  "StableBalance": {
+    "title": "ยอดคงเหลือมั่นคง",
+    "description": "ถือยอดคงเหลือเป็น USD ขับเคลื่อนโดย USDB บน Spark",
+    "balanceLabelBtc": "ยอดเงิน · SATS",
+    "balanceLabelUsd": "ยอดเงิน · USD",
+    "settingsRowTitle": "ยอดเงินคงที่",
+    "settingsTitle": "ยอดเงินคงที่",
+    "settingsDescription": "เก็บส่วนหนึ่งของกระเป๋าของคุณเป็น USD แปลงระหว่าง BTC และ USD ด้วยตนเองได้ตลอดเวลาโดยใช้การกระทำ แปลง",
+    "activationLabel": "เปิดใช้งาน",
+    "activeHint": "กระเป๋าเงินของคุณถือ USD ผ่าน USDB",
+    "inactiveHint": "กระเป๋าเงินของคุณถือ BTC เท่านั้น",
+    "deactivateWarningBody": "คุณยังมี {amount:string} โปรดแปลงเป็น BTC ก่อน มิฉะนั้นยอด USD จะถูกซ่อนไว้จนกว่าคุณจะเปิด Stable Balance อีกครั้ง",
+    "toggleFailedToast": "ไม่สามารถอัปเดต Stable Balance ได้ โปรดลองอีกครั้ง",
+    "toggleModal": {
+      "activateTitle": "เปิดใช้ยอดคงเหลือแบบเสถียร",
+      "activateBody": "ยอดคงเหลือ BTC ของคุณจะถูกแปลงเป็น USDB นี่คือค่าธรรมเนียมการแปลงโดยประมาณ",
+      "activateConfirm": "เปิดใช้",
+      "deactivateTitle": "ปิดใช้ยอดคงเหลือแบบเสถียร",
+      "deactivateBody": "ยอดคงเหลือ USDB ของคุณจะถูกแปลงกลับเป็น BTC นี่คือค่าธรรมเนียมการแปลงโดยประมาณ",
+      "deactivateConfirm": "ปิดใช้",
+      "cancel": "ยกเลิก"
+    },
+    "minimumConversion": "จำนวนขั้นต่ำที่แปลงได้: {amount:string}",
+    "conversionUnavailable": "ขณะนี้ไม่สามารถแปลงได้ โปรดลองอีกครั้ง"
+  },
+  "BackendFeatureGate": {
+    "title": "ฟีเจอร์ไม่พร้อมใช้งาน",
+    "description": "ฟีเจอร์นี้ต้องการบัญชีแบบรับฝาก",
+    "signInTitle": "Sign in required",
+    "signInDescription": "Sign in to your custodial account to use {featureName}.",
+    "noAccountTitle": "Custodial account required",
+    "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "featureCircles": "Circles",
+    "featureEarn": "Earn",
+    "featureCard": "Card"
+  },
+  "WalletCreationScreen": {
+    "creating": "กำลังสร้างกระเป๋าเงิน...",
+    "errorTitle": "สร้างกระเป๋าเงินล้มเหลว",
+    "errorDescription": "มีบางอย่างผิดพลาด กรุณาลองอีกครั้ง",
+    "retry": "ลองอีกครั้ง"
+  },
+  "TransactionDescription": {
+    "sparkTransfer": "โอน Spark",
+    "lightningPayment": "ชำระเงิน Lightning",
+    "onchainDeposit": "ฝาก On-chain",
+    "onchainWithdrawal": "ถอน On-chain",
+    "conversionFromBitcoin": "แปลงจาก Bitcoin",
+    "conversionToBitcoin": "แปลงเป็น Bitcoin",
+    "conversionFromToken": "แปลงจาก {token}",
+    "conversionToToken": "แปลงเป็น {token}",
+    "tokenTransfer": "โอน {token}",
+    "payTo": "จ่ายไปที่ {address}",
+    "payment": "การชำระเงิน"
+  },
+  "SelfCustodialOffline": {
+    "title": "กระเป๋าเงินออฟไลน์",
+    "description": "กระเป๋าเงินที่ไม่ใช่การรับฝากของคุณไม่สามารถเข้าถึงเครือข่ายได้ในขณะนี้ ลองอีกครั้งเมื่อคุณกลับมาออนไลน์",
+    "retry": "ลองอีกครั้ง"
+  },
+  "SelfCustodialError": {
+    "insufficientFunds": "เงินไม่เพียงพอสำหรับครอบคลุมจำนวนและค่าธรรมเนียมเครือข่าย ลองจำนวนที่น้อยลง",
+    "belowMinimum": "จำนวนต่ำกว่าขั้นต่ำที่จำเป็นสำหรับการชำระเงินนี้ ลองจำนวนที่มากขึ้น",
+    "networkError": "ปัญหาการเชื่อมต่อเครือข่าย ตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
+    "invalidInput": "รายละเอียดการชำระเงินดูไม่ถูกต้อง โปรดตรวจสอบและลองอีกครั้ง",
+    "generic": "ไม่สามารถดำเนินการชำระเงินให้เสร็จสมบูรณ์ได้ ลองอีกครั้งในอีกสักครู่ หรือใช้จำนวนที่น้อยลง"
+  },
+  "UnclaimedDeposit": {
+    "title": "คุณมี {count} รายการฝากที่ยังไม่ได้เรียกร้อง",
+    "description": "รวม: {sats} sats พร้อมเรียกร้อง",
+    "claim": "เรียกร้องตอนนี้",
+    "claiming": "กำลังเรียกร้อง...",
+    "screenTitle": "เงินฝากที่ยังไม่ได้เรียกร้อง",
+    "cardTitle": "Claim {sats} sats",
+    "claimWithFee": "Claim (max fee: {fee} sats)",
+    "refund": "คืนเงิน",
+    "refunding": "Refunding...",
+    "immature": "รอการยืนยัน...",
+    "feeExceeded": "Network fees are too high to claim ({requiredFee} sats required). Try again later or refund to an on-chain address.",
+    "missingUtxo": "This deposit is no longer available on the network.",
+    "belowDustLimit": "This deposit is too small to claim after fees. Wait for lower fees or refund to an on-chain address.",
+    "genericError": "Unable to claim: {error}",
+    "claimFailed": "Claim failed: {error}",
+    "refundFailed": "Refund failed: {error}",
+    "refundAddress": "Bitcoin address for refund",
+    "feeRate": "Network fee",
+    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
+    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
+    "feeRateHour": "Economy (~{sats} sats) ~60 min",
+    "feeRateUnit": "{rate} sat/vB",
+    "feeRateUnavailable": "ไม่สามารถโหลดค่าธรรมเนียมเครือข่ายได้ โปรดตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
+    "refundNow": "คืนเงินตอนนี้",
+    "refundSuccess": "Refund initiated successfully",
+    "claimSuccess": "Deposit claimed successfully",
+    "error": "Unable to claim this deposit"
+  },
+  "FeatureUnavailable": {
+    "SelfCustodial": {
+      "title": "Temporarily unavailable",
+      "description": "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later."
+    }
+  },
+  "NetworkStatus": {
+    "degradedBanner": "Spark network is currently degraded. Payments may take longer."
+  },
+  "SelfCustodialDelete": {
+    "dangerZoneImportantTitle": "สำคัญ",
+    "dangerZoneBulletReinstated": "บัญชีที่ถูกลบไม่สามารถกู้คืนได้",
+    "dangerZoneBulletPermanent": "การลบบัญชีเป็นการถาวร",
+    "dangerZoneBulletEmpty": "ตรวจสอบให้แน่ใจว่าบัญชีว่างเปล่า",
+    "dangerZoneDeleteButton": "ลบบัญชีและข้อมูล",
+    "confirmModalTitle": "ยืนยันการลบบัญชี",
+    "confirmModalTypeToConfirm": "พิมพ์ \"{delete: string}\" เพื่อยืนยัน",
+    "hasFundsWarningTitle": "คำเตือน",
+    "hasFundsWarningBody": "กระเป๋าเงินของคุณมียอดคงเหลือ {balance} เพื่อความปลอดภัยของคุณ เราจึงไม่อนุญาตให้ลบบัญชีที่ยังมีเงินอยู่",
+    "hasFundsWarningHelper": "หากต้องการดำเนินการลบต่อ โปรดถอนเงินออกจากบัญชีของคุณหรือบริจาคให้กับ circular economies",
+    "hasFundsWarningButton": "ย้อนกลับ"
   }
 }

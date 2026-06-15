@@ -38,7 +38,8 @@ jest.mock("@rn-vui/themed", () => ({
   makeStyles: () => () => ({
     container: {},
     disabledOverlay: {},
-    textDisabled: {},
+    textDisabled: { opacity: 0.5 },
+    iconHidden: { opacity: 0 },
     amountSection: {},
     amountText: {},
     placeholderText: {},
@@ -186,6 +187,54 @@ describe("ReceiveAmountRow", () => {
       fireEvent.press(getByLabelText("Toggle wallet"))
 
       expect(mockOnToggleWallet).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("toggle locked visual treatment", () => {
+    // When canToggleWallet is false we hide the refresh icon (opacity 0 so the
+    // layout doesn't shift) and keep the pill at normal opacity. The container
+    // space stays intact so nothing reflows around it.
+    const flattenStyle = (style: unknown): Record<string, unknown> => {
+      if (Array.isArray(style)) {
+        return style.reduce<Record<string, unknown>>(
+          (acc, entry) => (entry ? { ...acc, ...flattenStyle(entry) } : acc),
+          {},
+        )
+      }
+      return (style as Record<string, unknown>) ?? {}
+    }
+
+    const findAncestorOpacity = (testId: string, root: ReturnType<typeof render>) => {
+      let node: { parent: typeof node; props: { style?: unknown } } | null =
+        root.getByTestId(testId).parent
+      while (node) {
+        const flat = flattenStyle(node.props.style)
+        if (flat.opacity !== undefined) return flat.opacity
+        node = node.parent
+      }
+      return undefined
+    }
+
+    it("hides the refresh icon with opacity 0 when canToggleWallet is false", () => {
+      const rendered = render(
+        <ReceiveAmountRow {...defaultProps} canToggleWallet={false} />,
+      )
+
+      expect(findAncestorOpacity("galoy-icon-refresh", rendered)).toBe(0)
+    })
+
+    it("leaves the refresh icon's ancestor opacity unset when canToggleWallet is true", () => {
+      const rendered = render(<ReceiveAmountRow {...defaultProps} />)
+
+      expect(findAncestorOpacity("galoy-icon-refresh", rendered)).toBeUndefined()
+    })
+
+    it("renders the currency pill even when the toggle is locked", () => {
+      const { getByTestId } = render(
+        <ReceiveAmountRow {...defaultProps} canToggleWallet={false} />,
+      )
+
+      expect(getByTestId("currency-pill-BTC")).toBeTruthy()
     })
   })
 

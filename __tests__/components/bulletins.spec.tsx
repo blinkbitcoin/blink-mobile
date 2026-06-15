@@ -2,6 +2,15 @@ import * as React from "react"
 import { Text as ReactNativeText, TouchableOpacity, View, Linking } from "react-native"
 import { render, fireEvent, waitFor } from "@testing-library/react-native"
 
+import { flushEffects } from "../helpers/flush-effects"
+
+jest.mock("@app/components/animations", () => ({
+  useDropInOutAnimation: () => ({
+    opacity: { _value: 1 },
+    translateY: { _value: 0 },
+  }),
+}))
+
 import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { testBulletinsStore } from "@app/components/notifications/test-bulletins-store"
 import { BulletinsQuery, Icon } from "@app/graphql/generated"
@@ -212,7 +221,7 @@ describe("BulletinsCard", () => {
     })
   })
 
-  it("calls ack on dismiss without opening any link", () => {
+  it("calls ack on dismiss without opening any link", async () => {
     const bulletins = makeBulletinsQuery([makeBulletin()])
     const { getByTestId } = render(
       <BulletinsCard loading={false} bulletins={bulletins} />,
@@ -224,6 +233,7 @@ describe("BulletinsCard", () => {
       variables: { input: { notificationId: "notif-1" } },
     })
     expect(Linking.openURL).not.toHaveBeenCalled()
+    await flushEffects()
   })
 
   it("renders multiple bulletins", () => {

@@ -15,6 +15,7 @@ import {
   BookOpenIcon,
   CalculatorIcon,
   CalendarIcon,
+  ClockIcon,
   CaretDownIcon,
   CaretLeftIcon,
   CaretRightIcon,
@@ -24,6 +25,7 @@ import {
   CheckIcon,
   CheckCircleIcon,
   ClipboardIcon,
+  CloudIcon,
   CoinsIcon,
   CopyIcon,
   CurrencyDollarIcon,
@@ -101,6 +103,7 @@ import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
 import QrCode from "@app/assets/icons-redesign/qr-code.svg"
 import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
 import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
+import CloudArrowUp from "@app/assets/icons-redesign/cloud-arrow-up.svg"
 import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -131,6 +134,7 @@ const phosphorIconMap = {
   "bank": BankIcon,
   "bell": BellIcon,
   "book": BookIcon,
+  "clock": ClockIcon,
   "brush": PaintBrushIcon,
   "book-open": BookOpenIcon,
   "calculator": CalculatorIcon,
@@ -143,6 +147,7 @@ const phosphorIconMap = {
   "check": CheckIcon,
   "clipboard": ClipboardIcon,
   "check-circle": CheckCircleIcon,
+  "cloud": CloudIcon,
   "coins": CoinsIcon,
   "document-outline": FileIcon,
   "dollar": CurrencyDollarIcon,
@@ -225,6 +230,7 @@ const customSvgMap = {
   "qr-code": QrCode,
   "btc-hand": BtcHand,
   "check-badge": CheckBadge,
+  "cloud-arrow-up": CloudArrowUp,
   "heart-outline": HeartOutline,
 } as const
 

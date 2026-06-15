@@ -9,7 +9,7 @@ import { PaginationItem } from "@app/components/pagination"
 import { useLevel } from "@app/graphql/level-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useIsFocused, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button } from "@rn-vui/base"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -166,7 +166,7 @@ export const EarnSection = ({ route }: Props) => {
   const styles = useStyles()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "earnsSection">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "earnsSection">>()
 
   const { isAtLeastLevelOne } = useLevel()
 

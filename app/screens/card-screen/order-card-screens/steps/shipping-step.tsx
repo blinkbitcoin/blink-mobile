@@ -3,12 +3,12 @@ import { View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import {
-  CheckboxRow,
   InfoCard,
   MultiLineField,
   OptionRow,
   ShippingAddressForm,
 } from "@app/components/card-screen"
+import { CheckboxRow } from "@app/components/checkbox-row"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"

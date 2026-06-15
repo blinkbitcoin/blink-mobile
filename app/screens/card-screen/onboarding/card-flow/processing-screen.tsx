@@ -1,7 +1,7 @@
 import * as React from "react"
 import { ScrollView, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Icon, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -9,7 +9,7 @@ import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { formatDurationHours } from "@app/utils/date"
+import { formatDuration } from "@app/utils/date"
 
 export const CardProcessingScreen: React.FC = () => {
   const styles = useStyles()
@@ -19,7 +19,7 @@ export const CardProcessingScreen: React.FC = () => {
 
   const { LL, locale } = useI18nContext()
   const { cardProcessingWaitTimeHours } = useRemoteConfig()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const handleNext = () => {
     navigation.navigate("Primary")
@@ -45,7 +45,7 @@ export const CardProcessingScreen: React.FC = () => {
           </Text>
           <Text type="p3" color={colors.grey3}>
             {LL.CardFlow.Onboarding.CardProcessing.subtitle({
-              waitTime: formatDurationHours(cardProcessingWaitTimeHours, locale),
+              waitTime: formatDuration(cardProcessingWaitTimeHours, { locale }),
             })}
           </Text>
         </View>

@@ -5,6 +5,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardSettingsScreen } from "@app/screens/card-screen/card-settings-screen"
 import { ContextForScreen } from "../../helper"
+import { flushEffects } from "../../../helpers/flush-effects"
 
 jest.mock("react-native-reanimated", () => {
   const RNView = jest.requireActual<typeof import("react-native")>("react-native").View
@@ -34,9 +35,12 @@ jest.mock("@app/utils/helper", () => ({
 }))
 
 jest.mock("react-native/Libraries/Linking/Linking", () => ({
-  openURL: jest.fn(),
-  addEventListener: jest.fn(() => ({ remove: jest.fn() })),
-  getInitialURL: jest.fn(() => Promise.resolve(null)),
+  __esModule: true,
+  default: {
+    openURL: jest.fn(),
+    addEventListener: jest.fn(() => ({ remove: jest.fn() })),
+    getInitialURL: jest.fn(() => Promise.resolve(null)),
+  },
 }))
 
 const mockInAppBrowserOpen = jest.fn()
@@ -100,6 +104,20 @@ describe("CardSettingsScreen", () => {
     }
   })
 
+  // The Switch and the ~300ms close-account modal animations run on real
+  // timers; their Animated updates land after the synchronous test body
+  // returns. Wait them out inside act() so they neither warn nor leak into the
+  // next test.
+  afterEach(async () => {
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 400)
+      })
+    })
+    await flushEffects()
+    await flushEffects()
+  })
+
   describe("rendering", () => {
     it("renders without crashing", async () => {
       const { toJSON } = render(
@@ -108,7 +126,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(toJSON()).toBeTruthy()
     })
@@ -120,7 +138,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Account Information")).toBeTruthy()
     })
@@ -132,7 +150,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Personal Details")).toBeTruthy()
     })
@@ -144,7 +162,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Change PIN")).toBeTruthy()
     })
@@ -158,7 +176,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Notifications")).toBeTruthy()
     })
@@ -170,7 +188,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Transaction alerts")).toBeTruthy()
       expect(getByText("Get notified for all transactions")).toBeTruthy()
@@ -183,7 +201,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Marketing updates")).toBeTruthy()
       expect(getByText("Product updates and offers")).toBeTruthy()
@@ -198,7 +216,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Card management")).toBeTruthy()
     })
@@ -210,7 +228,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Order physical card")).toBeTruthy()
     })
@@ -222,7 +240,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Add to Google Pay")).toBeTruthy()
     })
@@ -234,7 +252,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Replace card")).toBeTruthy()
     })
@@ -248,7 +266,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Support")).toBeTruthy()
     })
@@ -260,7 +278,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Contact Support")).toBeTruthy()
       expect(getByText("support@blink.sv")).toBeTruthy()
@@ -275,7 +293,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Account")).toBeTruthy()
     })
@@ -287,7 +305,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Card Terms & Conditions")).toBeTruthy()
     })
@@ -299,7 +317,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Card Privacy Policy")).toBeTruthy()
     })
@@ -313,7 +331,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Danger zone")).toBeTruthy()
     })
@@ -325,7 +343,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Close card account")).toBeTruthy()
       expect(getByText("Permanently close your Visa card")).toBeTruthy()
@@ -340,7 +358,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       const row = getByText("Personal Details")
       await act(async () => {
@@ -357,7 +375,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       const row = getByText("Change PIN")
       await act(async () => {
@@ -374,7 +392,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       const row = getByText("Order physical card")
       await act(async () => {
@@ -391,7 +409,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       const row = getByText("Add to Google Pay")
       await act(async () => {
@@ -411,7 +429,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       const row = getByText("Replace card")
       await act(async () => {
@@ -430,7 +448,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       const row = getByText("Contact Support")
       await act(async () => {
@@ -447,7 +465,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       const row = getByText("Card Terms & Conditions")
       await act(async () => {
@@ -466,7 +484,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       const row = getByText("Card Privacy Policy")
       await act(async () => {
@@ -487,7 +505,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Close card account"))
@@ -516,7 +534,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Close card account"))
@@ -544,7 +562,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Close card account"))
@@ -568,7 +586,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       const switches = getAllByRole("switch")
       expect(switches[0].props.accessibilityState.checked).toBe(true)
@@ -587,7 +605,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       const switches = getAllByRole("switch")
       expect(switches[1].props.accessibilityState.checked).toBe(false)
@@ -608,7 +626,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       expect(getByText("Account Information")).toBeTruthy()
       expect(getByText("Notifications")).toBeTruthy()
@@ -625,7 +643,7 @@ describe("CardSettingsScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {})
+      await flushEffects()
 
       await act(async () => {
         fireEvent.press(getByText("Personal Details"))

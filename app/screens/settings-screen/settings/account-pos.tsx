@@ -3,8 +3,11 @@ import { Linking } from "react-native"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig } from "@app/hooks"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { AccountType } from "@app/types/wallet"
 
 import { SettingsRow } from "../row"
 import { useTheme } from "@rn-vui/themed"
@@ -17,9 +20,12 @@ export const AccountPOS: React.FC = () => {
   const posUrl = appConfig.galoyInstance.posUrl
 
   const { LL } = useI18nContext()
+  const isAuthed = useIsAuthed()
+  const { activeAccount } = useAccountRegistry()
 
-  const { data, loading } = useSettingsScreenQuery()
-  if (!data?.me?.username) return <></>
+  const { data, loading } = useSettingsScreenQuery({ skip: !isAuthed })
+  if (activeAccount?.type === AccountType.SelfCustodial) return null
+  if (!data?.me?.username) return null
 
   const pos = `${posUrl}/${data.me.username}`
 
