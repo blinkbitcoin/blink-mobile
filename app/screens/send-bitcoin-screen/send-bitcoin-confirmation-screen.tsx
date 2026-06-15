@@ -14,6 +14,7 @@ import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useClipboard, useDisplayCurrency } from "@app/hooks"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -118,6 +119,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { LL } = useI18nContext()
   const translateSdkError = useTranslateSdkError()
   const { copyToClipboard } = useClipboard()
+  const { isSelfCustodial } = useActiveWallet()
 
   const fee = useFee(getFee)
 
@@ -542,7 +544,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
                 onSwipe={handleSendPayment}
                 disabled={
-                  !validAmount || hasAttemptedSend || feeUnavailable || dustNotEvaluable
+                  !validAmount ||
+                  hasAttemptedSend ||
+                  (isSelfCustodial && (feeUnavailable || dustNotEvaluable))
                 }
               />
             </View>
