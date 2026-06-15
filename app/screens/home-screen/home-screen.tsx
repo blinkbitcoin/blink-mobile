@@ -252,8 +252,9 @@ export const HomeScreen: React.FC = () => {
     variables: { first: 1 },
   })
 
+  // empty wallets means the balance has not loaded yet, not that it is zero
   const queryLoading = isSelfCustodial
-    ? activeWallet.status === "loading"
+    ? activeWallet.wallets.length === 0
     : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const { username, phone } = currentUser?.me ?? {}
