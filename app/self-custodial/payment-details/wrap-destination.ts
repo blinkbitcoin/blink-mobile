@@ -11,6 +11,7 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
+import { getLightningAddress } from "@app/utils/pay-links"
 
 import { createSelfCustodialLightningPaymentDetails } from "./lightning"
 import { createSelfCustodialLnurlPaymentDetails } from "./lnurl"
@@ -159,4 +160,29 @@ export const wrapDestination = (
       }
     },
   }
+}
+
+const intraledgerHandle = (result: ParseDestinationResult): string | undefined => {
+  if (!result.valid || result.destinationDirection !== DestinationDirection.Send) {
+    return undefined
+  }
+  const { validDestination } = result
+  if (
+    validDestination.paymentType === PaymentType.Intraledger ||
+    validDestination.paymentType === PaymentType.IntraledgerWithFlag
+  ) {
+    return validDestination.handle
+  }
+  return undefined
+}
+
+export const resolveUsername = async (
+  result: ParseDestinationResult,
+  lnAddressHostname: string,
+  resolveLnAddress: (rawInput: string) => Promise<ParseDestinationResult>,
+): Promise<ParseDestinationResult> => {
+  const handle = intraledgerHandle(result)
+  return handle
+    ? resolveLnAddress(getLightningAddress(lnAddressHostname, handle))
+    : result
 }
