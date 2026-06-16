@@ -892,6 +892,59 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
     }
   })
 
+  it("lets a slow snapshot that resolves within the timeout finish successfully", async () => {
+    // keep setImmediate real so flushEffects settles while setTimeout stays faked for the advance
+    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+    try {
+      setupConnectedWallet(
+        {
+          getMnemonicForAccount: mockGetMnemonicForAccount,
+          listSelfCustodialAccounts: mockListSelfCustodialAccounts,
+          setActiveAccountId: (id: string) => {
+            mockState.activeAccountId = id
+          },
+          initSdk: mockInitSdk,
+          addSdkEventListener: mockAddSdkEventListener,
+        },
+        { wallets: [], hasMore: false },
+      )
+      const snapshot = getWalletSnapshotMocks()
+      let resolveSnapshot: (value: unknown) => void = () => {}
+      snapshot.getSelfCustodialWalletSnapshot.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveSnapshot = resolve
+          }),
+      )
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      // settle the async init so refreshWallets runs and the slow snapshot arms withTimeout
+      await flushEffects()
+
+      // 6s elapse: past the old 5s budget but within the new 10s one, so withTimeout has not aborted
+      await act(async () => {
+        jest.advanceTimersByTime(6000)
+      })
+
+      // the slow snapshot now arrives and is accepted instead of aborted
+      await act(async () => {
+        resolveSnapshot({ wallets: [{ id: "btc-1" }], hasMore: false })
+      })
+      await flushEffects()
+
+      expect(result.current.status).toBe(ActiveWalletStatus.Ready)
+      expect(result.current.wallets).toHaveLength(1)
+      expect(mockCrashlyticsRecordError).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining("wallet snapshot timed out"),
+        }),
+      )
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
   it("transitions out of Loading to Error when both snapshot and connectivity check fail", async () => {
     const isOnline = jest.requireMock("@app/self-custodial/providers/is-online")
     isOnline.getOnlineState.mockResolvedValueOnce("unknown")

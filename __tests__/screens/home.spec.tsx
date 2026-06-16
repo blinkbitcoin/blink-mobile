@@ -883,5 +883,45 @@ describe("HomeScreen", () => {
 
       expect(getByTestId("balance-value")).toBeTruthy()
     })
+
+    it("shows the loading state during an account switch, before the new wallets load", async () => {
+      mockActiveWalletOverride = {
+        wallets: [],
+        status: "loading",
+        accountType: "self-custodial",
+        isReady: false,
+        isSelfCustodial: true,
+        needsBackendAuth: false,
+      }
+
+      const { queryByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(queryByTestId("balance-value")).toBeNull()
+    })
+
+    it("shows a zero balance, not a skeleton, for a ready account with no wallets", async () => {
+      mockActiveWalletOverride = {
+        wallets: [],
+        status: "ready",
+        accountType: "self-custodial",
+        isReady: true,
+        isSelfCustodial: true,
+        needsBackendAuth: false,
+      }
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(getByTestId("balance-value")).toBeTruthy()
+    })
   })
 })
