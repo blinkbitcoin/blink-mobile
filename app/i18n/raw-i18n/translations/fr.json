@@ -2413,7 +2413,7 @@
         "logoutAlertContentPhone": "Vous aurez besoin de saisir à nouveau votre numéro de téléphone pour vous reconnecter.\nVotre numéro de téléphone est le {phoneNumber: string}. Veillez à en avoir l’accès pour vous reconnecter.",
         "logoutAlertContentEmail": "Vous aurez besoin de saisir à nouveau votre adresse e-mail pour vous reconnecter.\nVotre e-mail est {email: string}. Veillez à en avoir l’accès pour vous reconnecter.",
         "logoutAlertContentPhoneEmail": "Vous aurez besoin de saisir à nouveau votre numéro de téléphone ou votre adresse e-mail pour vous reconnecter.\nVotre numéro de téléphone est le {phoneNumber: string} et votre e-mail est {email: string}. Veillez à en avoir l’accès pour vous reconnecter.",
-        "usdBalanceWarning": "Vous avez un Solde Dollar de {balance: string}.",
+        "usdBalanceWarning": "Vous avez un solde Dollar de {balance: string}.",
         "btcBalanceWarning": "Vous avez un solde Bitcoin de {balance: string}.",
         "secureYourAccount": "S’inscrire pour sécuriser votre compte",
         "tapToAdd": "Touchez pour ajouter",
@@ -2464,7 +2464,7 @@
     },
     "ConvertDollarToBitcoinModal": {
         "title": "Le Solde Dollar n'est plus disponible dans votre région",
-        "body": "Transférez votre Solde Dollar en Bitcoin",
+        "body": "Transférez votre solde Dollar en Bitcoin",
         "youHave": "Vous avez",
         "youGet": "Vous recevez",
         "approve": "Approuver"

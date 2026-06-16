@@ -2413,7 +2413,7 @@
     "logoutAlertContentPhone": "Yeniden giriş yapabilmek için telefon numaranızı tekrardan girmeniz gerekiyor.\ntelefon numaranız {phoneNumber: string} olduğundan tekrar giriş yapmak için bu numaraya erişiminiz olduğundan emin olun",
     "logoutAlertContentEmail": "Tekrar giriş yapmak için e-postanızı tekrar girmeniz gerekecektir.\ne-postanız {email: string} olduğundan tekrar giriş yapmak için ona erişiminiz olduğundan emin olun",
     "logoutAlertContentPhoneEmail": "Tekrar giriş yapmak için telefon numaranızı veya e-postanızı tekrar girmeniz gerekecektir.\ntelefon numaranız {phoneNumber: string} ve e-postanız {email: string} olduğundan tekrar giriş yapmak için bunlara erişiminiz olduğundan emin olun",
-    "usdBalanceWarning": "Dolar Bakiyeniz: {balance: string}.",
+    "usdBalanceWarning": "Dolar bakiyeniz: {balance: string}.",
     "btcBalanceWarning": "Bitcoin bakiyeniz {balance: string}.",
     "secureYourAccount": "Hesabınızı korumak almak için kaydolun",
     "tapToAdd": "Eklemek için dokunun",
@@ -2464,7 +2464,7 @@
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolar Bakiyesi artık bölgenizde kullanılamıyor",
-    "body": "Dolar Bakiyenizi Bitcoin'e aktarın",
+    "body": "Dolar bakiyenizi Bitcoin'e aktarın",
     "youHave": "Sahip olduğunuz",
     "youGet": "Alacağınız",
     "approve": "Onayla"

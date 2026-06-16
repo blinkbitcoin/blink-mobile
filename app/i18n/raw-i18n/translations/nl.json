@@ -2413,7 +2413,7 @@
     "logoutAlertContentPhone": "Om opnieuw in te loggen, moet u uw telefoonnummer opnieuw invoeren.\nuw telefoonnummer is {phoneNumber: string}, dus zorg ervoor dat u toegang heeft om opnieuw in te loggen",
     "logoutAlertContentEmail": "Om weer in te loggen, moet u uw e-mailadres opnieuw invoeren.\nuw e-mailadres is {email: string}, dus zorg ervoor dat u toegang heeft om opnieuw in te loggen",
     "logoutAlertContentPhoneEmail": "Om weer in te loggen, moet u uw telefoonnummer of e-mailadres opnieuw invoeren.\nje telefoonnummer is {phoneNumber: string} en je e-mailadres is {email: string}, dus zorg ervoor dat je toegang hebt tot de nummers om weer in te loggen",
-    "usdBalanceWarning": "Je hebt een Dollarsaldo van {balance: string}.",
+    "usdBalanceWarning": "Je hebt een dollarsaldo van {balance: string}.",
     "btcBalanceWarning": "U heeft een bitcoin-saldo van {balance: string}.",
     "secureYourAccount": "Registreer om uw account te beveiligen",
     "tapToAdd": "Tik om toe te voegen",
@@ -2464,7 +2464,7 @@
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Het Dollarsaldo is niet langer beschikbaar in jouw regio",
-    "body": "Breng je Dollarsaldo over naar Bitcoin",
+    "body": "Breng je dollarsaldo over naar Bitcoin",
     "youHave": "Je hebt",
     "youGet": "Je krijgt",
     "approve": "Goedkeuren"

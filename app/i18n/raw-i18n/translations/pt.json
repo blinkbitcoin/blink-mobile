@@ -2413,7 +2413,7 @@
         "logoutAlertContentPhone": "Você precisará digitar novamente seu número de telefone para fazer entrar novamente.\no seu número de telefone é {phoneNumber: string}, portanto, certifique-se de ter acesso a ele para entrar novamente.",
         "logoutAlertContentEmail": "Você precisará digitar seu e-mail novamente para fazer login.\nseu e-mail é {email: string} então certifique-se de ter acesso a ele para fazer login novamente.",
         "logoutAlertContentPhoneEmail": "Você precisará digitar novamente seu número de telefone ou e-mail para fazer login novamente. Seu número de telefone é {phoneNumber: string} e seu e-mail é {email: string}, então certifique-se de ter acesso a eles para fazer login novamente.",
-        "usdBalanceWarning": "Você tem um Saldo Dólar de {balance: string}.",
+        "usdBalanceWarning": "Você tem um saldo Dólar de {balance: string}.",
         "btcBalanceWarning": "Seu saldo de bitcoin é de {balance: string}.",
         "secureYourAccount": "Registre-se para proteger sua conta",
         "tapToAdd": "Toque para adicionar",
@@ -2464,7 +2464,7 @@
     },
     "ConvertDollarToBitcoinModal": {
         "title": "O Saldo Dólar não está mais disponível na sua região",
-        "body": "Transfira seu Saldo Dólar para Bitcoin",
+        "body": "Transfira seu saldo Dólar para Bitcoin",
         "youHave": "Você tem",
         "youGet": "Você recebe",
         "approve": "Aprovar"
