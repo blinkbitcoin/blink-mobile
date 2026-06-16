@@ -128,12 +128,14 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   amountWrapper: {
+    height: 48,
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     alignSelf: "center",
   },
   primaryBalanceText: {
     fontSize: 32,
+    fontWeight: "bold",
     color: colors.black,
   },
   loaderBackground: {

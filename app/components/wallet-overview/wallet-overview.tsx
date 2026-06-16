@@ -173,7 +173,12 @@ const WalletOverview: React.FC<Props> = ({
             <HiddenBalancePlaceholder size="small" />
           ) : (
             <View style={[styles.hideableArea, pressedBtc && styles.pressedOpacity]}>
-              <Text type="p1" bold {...testProps("bitcoin-balance")}>
+              <Text
+                type="p1"
+                bold
+                style={styles.boldBalance}
+                {...testProps("bitcoin-balance")}
+              >
                 {btcInUnderlyingCurrency}
               </Text>
               <Text type="p3">{btcInDisplayCurrencyFormatted}</Text>
@@ -226,7 +231,7 @@ const WalletOverview: React.FC<Props> = ({
                 {!hideAmount && (
                   <>
                     {usdInUnderlyingCurrency ? (
-                      <Text type="p1" bold>
+                      <Text type="p1" bold style={styles.boldBalance}>
                         {usdInUnderlyingCurrency}
                       </Text>
                     ) : null}
@@ -234,6 +239,7 @@ const WalletOverview: React.FC<Props> = ({
                       {...testProps("stablesats-balance")}
                       type={usdInUnderlyingCurrency ? "p3" : "p1"}
                       bold={!usdInUnderlyingCurrency}
+                      style={!usdInUnderlyingCurrency && styles.boldBalance}
                     >
                       {usdInDisplayCurrencyFormatted}
                     </Text>
@@ -307,6 +313,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   restrictionLabelText: {
     textAlign: "right",
+  },
+  boldBalance: {
+    fontFamily: "SourceSansPro-Bold",
   },
   loaderContainer: {
     flex: 1,
