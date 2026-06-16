@@ -1,14 +1,12 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
 import { parseSparkAddress } from "@app/self-custodial/bridge"
-import {
-  resolveUsername,
-  wrapDestination,
-} from "@app/self-custodial/payment-details/wrap-destination"
+import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 
 import { parseDestination } from "./index"
 import { type ParseDestinationParams, type ParseDestinationResult } from "./index.types"
 import { resolveSparkDestination } from "./spark"
+import { resolveUsername } from "./resolve-username"
 
 /** parseDestination + self-custodial-aware resolution and wrap when an SDK is connected. */
 export const resolveDestination = async (

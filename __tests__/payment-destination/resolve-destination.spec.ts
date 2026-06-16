@@ -23,8 +23,14 @@ jest.mock("@app/self-custodial/bridge", () => ({
 
 jest.mock("@app/self-custodial/payment-details/wrap-destination", () => ({
   wrapDestination: (...args: unknown[]) => mockWrapDestination(...args),
-  resolveUsername: (...args: unknown[]) => mockResolveUsername(...args),
 }))
+
+jest.mock(
+  "@app/screens/send-bitcoin-screen/payment-destination/resolve-username",
+  () => ({
+    resolveUsername: (...args: unknown[]) => mockResolveUsername(...args),
+  }),
+)
 
 const baseParams = {
   rawInput: "lnbc1...",
