@@ -60,6 +60,7 @@ export const useStablesatsRestrictionSync = (): void => {
   }, [shouldPersist, updateState])
 }
 
+// state mirror, not derived: closes on success immediately, before the balance refetches to zero
 export const useStablesatsForcedConversion = ({
   isRestricted,
   usdWalletBalance,

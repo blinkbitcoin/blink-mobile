@@ -32,14 +32,15 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
 }))
 
 const mockExecute = jest.fn()
-const mockUseIntraLedgerConversion = jest.fn(() => ({
+const mockUseIntraLedgerConversion = jest.fn((_config?: { onSuccess: () => void }) => ({
   execute: mockExecute,
   loading: false,
   errorMessage: undefined as string | undefined,
 }))
 
 jest.mock("@app/hooks/use-intra-ledger-conversion", () => ({
-  useIntraLedgerConversion: () => mockUseIntraLedgerConversion(),
+  useIntraLedgerConversion: (config: { onSuccess: () => void }) =>
+    mockUseIntraLedgerConversion(config),
 }))
 
 import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
@@ -145,5 +146,17 @@ describe("UsdConvertToBtcModal", () => {
     const { queryByTestId } = renderModal()
 
     expect(queryByTestId("icon-close")).toBeNull()
+  })
+
+  it("closes only on success: the conversion onSuccess handler is wired to toggleModal", () => {
+    const toggleModal = jest.fn()
+    renderModal({ toggleModal })
+
+    const { onSuccess } = mockUseIntraLedgerConversion.mock.calls[0][0] as {
+      onSuccess: () => void
+    }
+    onSuccess()
+
+    expect(toggleModal).toHaveBeenCalledTimes(1)
   })
 })
