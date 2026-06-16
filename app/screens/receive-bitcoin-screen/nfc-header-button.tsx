@@ -48,7 +48,7 @@ export const NfcHeaderButton: React.FC<NfcHeaderButtonProps> = ({ visible, onPre
 
 const useStyles = makeStyles(() => ({
   nfcIcon: {
-    // No margin — keeps the iOS 26 glass capsule concentric with the glyph.
+    marginRight: 10,
     padding: 12,
     alignItems: "center",
     justifyContent: "center",

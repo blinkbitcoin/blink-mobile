@@ -195,13 +195,12 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 18,
   },
   headerRight: {
-    // No margin — keeps the iOS 26 glass capsule concentric with the glyph; padding keeps the touch target.
-    padding: 8,
+    marginRight: 12,
   },
   notificationCount: {
     position: "absolute",
-    right: 2,
-    top: 2,
+    right: 9,
+    top: -3,
     color: colors._darkGrey,
     backgroundColor: colors.black,
     textAlign: "center",

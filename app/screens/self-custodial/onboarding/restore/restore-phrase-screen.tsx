@@ -195,8 +195,7 @@ const useStyles = makeStyles(({ colors }) => ({
     gap: 10,
   },
   headerPaste: {
-    // No margin — keeps the iOS 26 glass capsule concentric with the label.
-    padding: 8,
+    marginRight: 16,
   },
   headerPasteText: {
     color: colors.primary,

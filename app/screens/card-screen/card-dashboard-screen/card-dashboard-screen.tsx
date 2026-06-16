@@ -203,8 +203,8 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 16,
   },
   headerRight: {
-    // No margin — keeps the iOS 26 glass capsule concentric with the glyph.
     padding: 8,
+    marginRight: 16,
   },
 }))
 

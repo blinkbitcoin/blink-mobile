@@ -196,8 +196,7 @@ export const CardDetailsScreen: React.FC = () => {
 
 const useStyles = makeStyles(() => ({
   headerRight: {
-    // No margin — keeps the iOS 26 glass capsule concentric with the glyph.
-    padding: 8,
+    marginRight: 24,
   },
   content: {
     paddingTop: 20,
