@@ -2081,7 +2081,7 @@
     "scan": "Beolvasás",
     "updateAvailable": "Frissítés elérhető.\nKoppints a frissítéshez most",
     "useLightning": "Mi a Lightning Hálózatot használjuk.",
-    "myAccounts": "Számláim",
+    "myAccounts": "Egyenlegek",
     "walletCountNotTwo": "A tárca száma nem 2. Kérlek használd az irányítópultot az összes tárca és azok egyenlegeinek megtekintéséhez."
   },
   "PinScreen": {

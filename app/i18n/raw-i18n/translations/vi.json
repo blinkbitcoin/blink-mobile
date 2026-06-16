@@ -2081,7 +2081,7 @@
     "scan": "Scan",
     "updateAvailable": "Bản cập nhật mới đã có.\nNhấn để cập nhật ngay",
     "useLightning": "Chúng tôi sử dụng Lightning Network.",
-    "myAccounts": "My Accounts",
+    "myAccounts": "Số dư",
     "walletCountNotTwo": "Số ví không phải là 2. Vui lòng sử dụng bảng điều khiển để xem tất cả các ví và tiền trong tài khoản này"
   },
   "PinScreen": {

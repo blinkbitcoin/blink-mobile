@@ -2081,7 +2081,7 @@
         "scan": "Scaneie",
         "updateAvailable": "Uma atualização está disponível.\nToque para atualizar agora",
         "useLightning": "Nós utilizamos a Rede Lightning",
-        "myAccounts": "Minhas contas",
+        "myAccounts": "Saldos",
         "walletCountNotTwo": "O número de carteiras não é 2. Por favor, utilize o painel para ver todas as carteiras e fundos desta conta."
     },
     "PinScreen": {

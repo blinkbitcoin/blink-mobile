@@ -2081,7 +2081,7 @@
     "scan": "Scan",
     "updateAvailable": "Der er en opdatering tilgængelig.\nTryk for at opdatere nu",
     "useLightning": "Vi bruger Lightning-netværket.",
-    "myAccounts": "Mine konti",
+    "myAccounts": "Saldi",
     "walletCountNotTwo": "Antallet af tegnebøger er ikke 2. Brug venligst kontrolpanelet for at se alle tegnebøger og midler på denne konto"
   },
   "PinScreen": {

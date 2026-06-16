@@ -2081,7 +2081,7 @@
         "scan": "Scanner",
         "updateAvailable": "Une mise à jour est disponible. Appuyez pour mettre à jour maintenant",
         "useLightning": "Nous utilisons le réseau Lightning.",
-        "myAccounts": "Mes comptes",
+        "myAccounts": "Solde",
         "walletCountNotTwo": "Le nombre de portefeuilles n'est pas 2. Veuillez utiliser le tableau de bord pour voir tous les portefeuilles et les fonds de ce compte"
     },
     "PinScreen": {

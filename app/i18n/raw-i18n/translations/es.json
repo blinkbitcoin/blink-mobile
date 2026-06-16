@@ -2081,7 +2081,7 @@
         "scan": "Escanear",
         "updateAvailable": "Hay una actualización disponible.\nToque para actualizar ahora",
         "useLightning": "Usamos la red Lightning.",
-        "myAccounts": "Mis Cuentas",
+        "myAccounts": "Saldos",
         "walletCountNotTwo": "El recuento de billeteras no es 2. Utilice el panel para ver todas las billeteras y fondos de esta cuenta."
     },
     "PinScreen": {

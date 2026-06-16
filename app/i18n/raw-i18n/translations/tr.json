@@ -2081,7 +2081,7 @@
     "scan": "Tara",
     "updateAvailable": "Bir güncelleme mevcut\nGüncellemek için dokun",
     "useLightning": "Lightning ağını kullanıyoruz. ",
-    "myAccounts": "Hesabım",
+    "myAccounts": "Bakiyeler",
     "walletCountNotTwo": "Cüzdan sayısı 2 değil. Bu hesabın tüm cüzdanlarını ve fonlarını görmek için lütfen kontrol panelini kullanın"
   },
   "PinScreen": {

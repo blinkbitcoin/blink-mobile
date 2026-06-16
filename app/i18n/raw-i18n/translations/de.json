@@ -2081,7 +2081,7 @@
         "scan": "Scannen",
         "updateAvailable": "Ein Update ist verfügbar. \nKlicke, um zu updaten",
         "useLightning": "Wir nutzen das Lightning Netzwerk.",
-        "myAccounts": "Meine Konten",
+        "myAccounts": "Salden",
         "walletCountNotTwo": "Die Anzahl der Wallets ist nicht zwei. Bitte verwenden Sie das Dashboard, um alle Wallets und Guthaben dieses Kontos zu sehen"
     },
     "PinScreen": {

@@ -2081,7 +2081,7 @@
     "scan": "Escaneja",
     "updateAvailable": "Hi ha una actualització.\nToca per actualitzar ara",
     "useLightning": "Utilitzem la xaxa Lightning.",
-    "myAccounts": "Els meus comptes",
+    "myAccounts": "Saldos",
     "walletCountNotTwo": "El recompte de moneders no és 2. Utilitza el tauler per veure tots els moneders i els fons d'aquest compte"
   },
   "PinScreen": {

@@ -2081,7 +2081,7 @@
         "scan": "Scansione",
         "updateAvailable": "É disponibile un aggiornamento.\nClicca per aggiornare",
         "useLightning": "Usiamo il Lightning Network",
-        "myAccounts": "Il mio conto",
+        "myAccounts": "Saldo",
         "walletCountNotTwo": "Il conteggio del portafoglio non è 2. Si prega di utilizzare la dashboard per visualizzare tutti i portafogli e i fondi di questo account"
     },
     "PinScreen": {

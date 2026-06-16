@@ -2078,10 +2078,10 @@
     "receive": "Přijmout",
     "send": "Odeslat",
     "title": "Domů",
-    "scan": "Naskenovat",
+    "scan": "Číst QR",
     "updateAvailable": "K dispozici je aktualizace.\nKlepnutím aktualizujte",
     "useLightning": "Používáme Lightning Network. ",
-    "myAccounts": "Moje účty",
+    "myAccounts": "Zůstatky",
     "walletCountNotTwo": "Počet peněženek není 2. K zobrazení všech peněženek a prostředků tohoto účtu použijte prosím nástěnku"
   },
   "PinScreen": {

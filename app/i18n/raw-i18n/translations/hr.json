@@ -2081,7 +2081,7 @@
     "scan": "Skeniraj",
     "updateAvailable": "Ažuriranje je dostupno.\nDodirnite za ažuriranje sada",
     "useLightning": "Koristimo Lightning Network.",
-    "myAccounts": "Moji računi",
+    "myAccounts": "Stanja",
     "walletCountNotTwo": "Broj novčanika nije 2. Molimo koristite nadzornu ploču za pregled svih novčanika i sredstava ovog računa"
   },
   "PinScreen": {
