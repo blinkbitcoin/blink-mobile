@@ -49,6 +49,7 @@ export const headerCloseControlOptions = ({
   headerRightNoGlass(() => <HeaderCloseButton navigateTo={navigateTo} />)
 
 const useStyles = makeStyles(() => ({
-  // No margin — keeps the iOS 26 glass capsule concentric with the glyph; use padding for spacing.
-  headerCloseButton: {},
+  headerCloseButton: {
+    marginRight: 20,
+  },
 }))

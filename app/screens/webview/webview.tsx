@@ -144,7 +144,9 @@ export const WebViewScreen: React.FC<Props> = ({ route }) => {
 const useStyles = makeStyles(({ colors }) => ({
   full: { width: "100%", height: "100%", flex: 1, backgroundColor: colors.transparent },
   iconContainer: {
-    // No margin — keeps the iOS 26 glass capsule concentric with the glyph.
-    padding: 8,
+    // native-stack wraps headerLeft in react-native-screens' ScreenStackHeaderLeftView,
+    // which already applies the standard leading inset (both iOS bar-button items and
+    // Android). An extra marginLeft stacks on top and pushes the glyph ~10px right, so
+    // no margin here. (The old JS stack had no such inset, hence the previous marginLeft:10.)
   },
 }))

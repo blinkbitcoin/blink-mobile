@@ -788,7 +788,7 @@ export const RootStack = () => {
         component={CardAcknowledgementScreen}
         options={{
           title: "",
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -1198,7 +1198,6 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.black,
   },
   SendBitcoinScreenScanIcon: {
-    // No margin — keeps the iOS 26 glass capsule concentric with the glyph.
-    padding: 8,
+    marginRight: 20,
   },
 }))
