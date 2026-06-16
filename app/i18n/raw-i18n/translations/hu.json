@@ -2489,9 +2489,10 @@
   },
   "DefaultWalletScreen": {
     "title": "Alapértelmezett fogadási fiók",
-    "info": "A Bitcoin Számla-od sats gyűjtésére való, ahol az USD érték a piaccal mozog. A Dollár Számla-odat a Stablesats működteti — Bitcoint tart, amely fedezve van, hogy USD értékben stabil maradjon. Mindig Bitcoint tartasz, de a dollárérték nem változik.",
     "titleSelfCustodial": "Alapértelmezett fiók",
-    "infoSelfCustodial": "Ezt a fiókot fogja használni alapértelmezetten fogadáskor és küldéskor. Bármikor válthat."
+    "infoBtc": "A Bitcoin Számla-od sats gyűjtésére való, ahol az USD érték a piaccal mozog.",
+    "infoUsd": "A Dollár Számla-odat a Stablesats működteti — Bitcoint tart, amely fedezve van, hogy USD értékben stabil maradjon. Mindig Bitcoint tartasz, de a dollárérték nem változik.",
+    "infoUsdSelfCustodial": "Felhasználói élménnyel kapcsolatos megfontolások miatt úgy döntöttünk, hogy nem aktiváljuk ezt a funkciót a non-custodial fiókokban. Alapértelmezett fogadási beállításként csak a Bitcoin érhető el."
   },
   "ThemeScreen": {
     "title": "Téma",

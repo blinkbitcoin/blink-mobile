@@ -28,10 +28,10 @@
         "text": "By clicking 'Accept', you agree to our Terms And Conditions. You also agree that you are not a resident or citizen from one of the prohibited countries."
     },
     "SetAccountModal": {
-        "title": "Set up your receive account",
+        "title": "Set up your default Balance",
         "description": "You can always change this later in the Settings",
-        "stablesatsTag": "Dollar account — powered by Stablesats",
-        "bitcoinTag": "Bitcoin account for maximalists"
+        "stablesatsTag": "Dollar Balance — powered by Stablesats",
+        "bitcoinTag": "Bitcoin Balance for stacking sats"
     },
     "NoteInput": {
         "addNote": "Add note"
@@ -68,7 +68,7 @@
     "ConversionConfirmationScreen": {
         "title": "Confirm transfer",
         "youreConverting": "You're converting",
-        "receivingAccount": "Receiving account",
+        "receivingAccount": "Receiving balance",
         "infoBitcoin": "Bitcoin amount is only approximate. It can vary by a small amount.",
         "infoDollar": "Dollar amount is only approximate. It can vary by a small amount.",
         "transferButtonText": "Transfer {fromWallet} to {toWallet}",
@@ -2081,7 +2081,7 @@
         "scan": "Scan",
         "updateAvailable": "An update is available.\nTap to update now",
         "useLightning": "We use the Lightning Network.",
-        "myAccounts": "My Accounts",
+        "myAccounts": "Balances",
         "walletCountNotTwo": "Wallet count is not 2. Please use the dashboard to see all the wallets and funds of this account"
     },
     "PinScreen": {
@@ -2121,7 +2121,7 @@
         "setNote": "set a note",
         "tapQrCodeCopy": "Tap QR Code to Copy",
         "title": "Receive Bitcoin",
-        "usdTitle": "Receive to Dollar account",
+        "usdTitle": "Receive to Dollar Balance",
         "error": "Failed to generate invoice. Please contact support if this problem persists.",
         "copyInvoice": "Copy",
         "shareInvoice": "Share",
@@ -2169,7 +2169,7 @@
     },
     "RedeemBitcoinScreen": {
         "title": "Redeem Bitcoin",
-        "usdTitle": "Redeem to Dollar account",
+        "usdTitle": "Redeem to Dollar Balance",
         "error": "Failed to generate invoice. Please contact support if this problem persists.",
         "redeemingError": "Failed to redeem Bitcoin. Please contact support if this problem persists.",
         "submissionError": "Failed to submit withdrawal request. Please contact support if this problem persists.",
@@ -2342,7 +2342,7 @@
         "csvTransactionsError": "Unable to export transactions to csv. Something went wrong. If issue persists please contact support.",
         "lnurlNoUsername": "To generate an lnurl address you must first set a username.  Do you want to set a username now?",
         "copyClipboardLnurl": "Lnurl address has been copied in the clipboard",
-        "defaultWallet": "Default Account",
+        "defaultWallet": "Default Balance",
         "rateUs": "Rate us on {storeName: string}",
         "theme": "Theme",
         "nfc": "Receive from NFC",
@@ -2413,7 +2413,7 @@
         "logoutAlertContentPhone": "You will need to re-enter your phone number to log back in.\nyour phone number is {phoneNumber: string} so make sure you have access to it to log back in",
         "logoutAlertContentEmail": "You will need to re-enter your email to log back in.\nyour email is {email: string} so make sure you have access to it to log back in",
         "logoutAlertContentPhoneEmail": "You will need to re-enter either your phone number or email to log back in.\nyour phone number is {phoneNumber: string} and your email is {email: string} so make sure you have access to those to log back in",
-        "usdBalanceWarning": "You have a Dollar account balance of {balance: string}.",
+        "usdBalanceWarning": "You have a Dollar Balance of {balance: string}.",
         "btcBalanceWarning": "You have a bitcoin balance of {balance: string}.",
         "secureYourAccount": "Register to secure your account",
         "tapToAdd": "Tap to add",
@@ -2475,10 +2475,11 @@
         "toastMessage": "Secret copied to clipboard!"
     },
     "DefaultWalletScreen": {
-        "title": "Default receive account",
-        "titleSelfCustodial": "Default account",
-        "info": "Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change.",
-        "infoSelfCustodial": "This account will be used by default when receiving and sending. You can switch any time."
+        "title": "Default Balance",
+        "titleSelfCustodial": "Default Balance",
+        "infoBtc": "Your Bitcoin Balance is for stacking sats, where the value moves with the market.",
+        "infoUsd": "Your Dollar Balance is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the USD value doesn't change.",
+        "infoUsdSelfCustodial": "Due to user experience concerns we decided to not activate this feature in the non-custodial accounts. Only Bitcoin is available as your default receive setting."
     },
     "ThemeScreen": {
         "title": "Theme",
@@ -2493,23 +2494,23 @@
         "DEFAULT": "Default (OS)"
     },
     "StablesatsModal": {
-        "header": "Your Dollar account is powered by Stablesats",
-        "body": "The Dollar account uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.",
+        "header": "Your Dollar Balance is powered by Stablesats",
+        "body": "Your Dollar Balance uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.",
         "termsAndConditions": "Read the Terms & Conditions.",
         "learnMore": "Learn more about Stablesats",
-        "headerSelfCustodial": "Your Dollar account holds stablecoins",
-        "bodySelfCustodial": "In the Dollar account you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from the Dollar account, you will swap your stablecoins and send as Bitcoin to the recipient.",
+        "headerSelfCustodial": "Your Dollar Balance holds stablecoins",
+        "bodySelfCustodial": "In your Dollar Balance you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from your Dollar Balance, you will swap your stablecoins and send as Bitcoin to the recipient.",
         "learnMoreSelfCustodial": "Learn more"
     },
     "StablesatsRestriction": {
         "modalTitle": "Stablesats is not available in your region",
-        "modalBody": "To get access to a dollar account, create a non-custodial account.",
+        "modalBody": "To get access to a Dollar Balance, create a non-custodial account.",
         "createNew": "Create new",
         "walletLabel": "not available in your region"
     },
     "ConvertDollarToBitcoinModal": {
-        "title": "Dollar account is no longer available in your region",
-        "body": "Transfer your Dollar balance to Bitcoin",
+        "title": "Dollar Balance is no longer available in your region",
+        "body": "Transfer your Dollar Balance to Bitcoin",
         "youHave": "You have",
         "youGet": "You get",
         "approve": "Approve"
@@ -2535,8 +2536,8 @@
         "received": "You received",
         "spent": "You spent",
         "sending": "Sending",
-        "receivingAccount": "Receiving Account",
-        "sendingAccount": "Sending Account",
+        "receivingAccount": "Receiving Balance",
+        "sendingAccount": "Sending Balance",
         "txNotBroadcast": "Your transaction is queued. It should appear in the mempool {countdown: string}.",
         "momentarily": "momentarily"
     },
@@ -2547,7 +2548,7 @@
         "perWeek": "per week",
         "unlimited": "Unlimited",
         "remaining": "Remaining",
-        "stablesatTransfers": "Dollar account transfers",
+        "stablesatTransfers": "Dollar Balance transfers",
         "internalSend": "Send to {bankName: string} user",
         "error": "Unable to fetch limits at this time",
         "increaseLimits": "Increase your limits"
@@ -2741,7 +2742,7 @@
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Bitcoin Price",
-        "btcAccount": "Bitcoin Account",
+        "btcAccount": "Bitcoin Balance",
         "cancel": "Cancel",
         "close": "Close",
         "confirm": "Confirm",
@@ -2813,7 +2814,7 @@
         "transactionsError": "Error loading transactions",
         "tryAgain": "Try Again",
         "type": "Type",
-        "usdAccount": "Dollar Account",
+        "usdAccount": "Dollar Balance",
         "username": "Username",
         "usernameRequired": "Username is required",
         "backupAccount": "Backup/upgrade account",

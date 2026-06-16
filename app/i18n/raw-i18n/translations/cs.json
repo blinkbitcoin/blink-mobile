@@ -2489,9 +2489,10 @@
   },
   "DefaultWalletScreen": {
     "title": "Výchozí účet pro příjem",
-    "info": "Váš Bitcoin Účet je pro hromadění satů, kde se hodnota USD pohybuje s trhem. Váš Dolarový účet je poháněný technologií Stablesats — drží Bitcoin zajištěný tak, aby zůstal stabilní v hodnotě USD. Vždy držíte Bitcoin, ale dolarová hodnota se nemění.",
     "titleSelfCustodial": "Výchozí účet",
-    "infoSelfCustodial": "Tento účet bude použit jako výchozí pro příjem a odesílání. Kdykoli můžete přepnout."
+    "infoBtc": "Váš Bitcoin Účet je pro hromadění satů, kde se hodnota USD pohybuje s trhem.",
+    "infoUsd": "Váš Dolarový účet je poháněný technologií Stablesats — drží Bitcoin zajištěný tak, aby zůstal stabilní v hodnotě USD. Vždy držíte Bitcoin, ale dolarová hodnota se nemění.",
+    "infoUsdSelfCustodial": "Z důvodu obav o uživatelský zážitek jsme se rozhodli tuto funkci v non-custodial účtech neaktivovat. Jako výchozí nastavení příjmu je k dispozici pouze Bitcoin."
   },
   "ThemeScreen": {
     "title": "Motiv",

@@ -2489,9 +2489,10 @@
     },
     "DefaultWalletScreen": {
         "title": "Compte de réception par défaut",
-        "info": "Votre Compte Bitcoin est pour accumuler des sats, où la valeur USD évolue avec le marché. Votre Compte dollar est propulsé par Stablesats — il détient du Bitcoin couvert pour rester stable en valeur USD. Vous détenez toujours du Bitcoin, mais la valeur en dollars ne change pas.",
         "titleSelfCustodial": "Compte par défaut",
-        "infoSelfCustodial": "Ce compte sera utilisé par défaut lors de la réception et de l'envoi. Vous pouvez changer à tout moment."
+        "infoBtc": "Votre Compte Bitcoin est pour accumuler des sats, où la valeur USD évolue avec le marché.",
+        "infoUsd": "Votre Compte dollar est propulsé par Stablesats — il détient du Bitcoin couvert pour rester stable en valeur USD. Vous détenez toujours du Bitcoin, mais la valeur en dollars ne change pas.",
+        "infoUsdSelfCustodial": "Pour des raisons d'expérience utilisateur, nous avons décidé de ne pas activer cette fonctionnalité dans les comptes non-custodial. Seul Bitcoin est disponible comme paramètre de réception par défaut."
     },
     "ThemeScreen": {
         "title": "Thème",

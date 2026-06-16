@@ -2489,9 +2489,10 @@
   },
   "DefaultWalletScreen": {
     "title": "Cont implicit de primire",
-    "info": "Cont Bitcoin-ul tău este pentru acumularea de sats, unde valoarea USD se mișcă cu piața. Cont Dolar-ul tău este alimentat de Stablesats — deține Bitcoin acoperit pentru a rămâne stabil în valoare USD. Mereu deții Bitcoin, dar valoarea în dolari nu se schimbă.",
     "titleSelfCustodial": "Cont implicit",
-    "infoSelfCustodial": "Acest cont va fi folosit în mod implicit la primire și trimitere. Poți schimba oricând."
+    "infoBtc": "Cont Bitcoin-ul tău este pentru acumularea de sats, unde valoarea USD se mișcă cu piața.",
+    "infoUsd": "Cont Dolar-ul tău este alimentat de Stablesats — deține Bitcoin acoperit pentru a rămâne stabil în valoare USD. Mereu deții Bitcoin, dar valoarea în dolari nu se schimbă.",
+    "infoUsdSelfCustodial": "Din motive legate de experiența utilizatorului, am decis să nu activăm această funcție în conturile non-custodial. Doar Bitcoin este disponibil ca setare implicită de primire."
   },
   "ThemeScreen": {
     "title": "Temă",
