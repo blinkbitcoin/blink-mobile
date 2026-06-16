@@ -3,6 +3,7 @@ import { render, waitFor, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { SwitchAccountComponent } from "@app/screens/settings-screen/account/multi-account/switch-account.stories"
+import { fetchProfiles } from "@app/screens/settings-screen/account/multi-account/utils"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { ContextForScreen } from "../helper"
 
@@ -89,5 +90,41 @@ describe("Settings", () => {
       expect(screen.getByText("TestUser")).toBeTruthy()
     })
     expect(mockSaveProfile).not.toHaveBeenCalled()
+  })
+
+  it("saves the active custodial profile when a token is present and none are stored yet", async () => {
+    mockAppConfigToken = "mock-token-1"
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock)
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce(expectedProfiles)
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(mockSaveProfile).toHaveBeenCalledWith("mock-token-1")
+    })
+  })
+})
+
+describe("fetchProfiles", () => {
+  it("marks no profile as selected when there is no current token", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+
+    const profiles = await fetchProfiles("")
+
+    expect(profiles).toHaveLength(1)
+    expect(profiles.some((profile) => profile.selected)).toBe(false)
+  })
+
+  it("marks only the profile whose token matches the current token as selected", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+
+    const profiles = await fetchProfiles("mock-token-1")
+
+    expect(profiles[0].selected).toBe(true)
   })
 })
