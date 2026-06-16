@@ -36,7 +36,7 @@ export const StablesatsRestrictionModal: React.FC<Props> = ({
     <CustomModal
       isVisible={isVisible}
       toggleModal={toggleModal}
-      image={<GaloyIcon name="info" size={80} color={colors.primary3} />}
+      image={<GaloyIcon name="info" size={80} color={colors.primary} />}
       title={LL.StablesatsRestriction.modalTitle()}
       titleMaxWidth="100%"
       body={<Text style={styles.body}>{LL.StablesatsRestriction.modalBody()}</Text>}
