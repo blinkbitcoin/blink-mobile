@@ -28,10 +28,10 @@
     "text": "Door op 'Accepteren' te klikken, ga je akkoord met onze Algemene Voorwaarden. Je bevestigt ook dat je geen inwoner of staatsburger bent van een van de uitgesloten landen."
   },
   "SetAccountModal": {
-    "title": "Stel je ontvangstrekening in",
+    "title": "Stel je standaardsaldo in",
     "description": "Je kunt dit later altijd wijzigen in Instellingen",
-    "stablesatsTag": "Dollar-rekening — aangedreven door Stablesats",
-    "bitcoinTag": "Bitcoin-rekening voor maximalisten"
+    "stablesatsTag": "Dollarsaldo — aangedreven door Stablesats",
+    "bitcoinTag": "Bitcoinsaldo voor het stapelen van sats"
   },
   "NoteInput": {
     "addNote": "Notitie toevoegen"
@@ -68,7 +68,7 @@
   "ConversionConfirmationScreen": {
     "title": "Bevestig wissel",
     "youreConverting": "Uw wissel wordt verwerkt",
-    "receivingAccount": "Ontvanger",
+    "receivingAccount": "Ontvangend saldo",
     "infoBitcoin": "Het Bitcoin-bedrag is slechts een schatting. Het kan enigszins afwijken.",
     "infoDollar": "Het dollarbedrag is slechts een schatting. Het kan enigszins afwijken.",
     "transferButtonText": "Overschrijven van {fromWallet} naar {toWallet}",
@@ -2121,7 +2121,7 @@
     "setNote": "zet een noot",
     "tapQrCodeCopy": "Tik op QR-code om te kopiëren",
     "title": "Ontvang Bitcoin",
-    "usdTitle": "Ontvangen naar Dollar-rekening",
+    "usdTitle": "Ontvangen naar Dollarsaldo",
     "error": "Kan factuur niet genereren. Neem contact op met klantenservice als dit probleem zich blijft voordoen.",
     "copyInvoice": "Kopiëren",
     "shareInvoice": "Deel",
@@ -2171,7 +2171,7 @@
     "walletNotConnected": "Je portemonnee maakt nog verbinding. Wacht even en probeer het opnieuw.",
     "paymentPending": "Je betaling wordt mogelijk nog voltooid. Controleer je saldo voordat je het opnieuw probeert.",
     "title": "Wissel Bitcoin",
-    "usdTitle": "Inwisselen naar Dollar-rekening",
+    "usdTitle": "Inwisselen naar Dollarsaldo",
     "error": "Kan factuur niet genereren. Neem contact op met klantenservice als dit probleem zich blijft voordoen.",
     "redeemingError": "Kan Bitcoin niet inwisselen. Neem contact op met de technische ondersteuning als dit probleem zich blijft voordoen.",
     "submissionError": "Kan opnameverzoek niet indienen. Neem contact op met de technische ondersteuning als dit probleem zich blijft voordoen.",
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Kan transacties niet naar csv exporteren. Er is iets fout gegaan. Als het probleem zich blijft voordoen, neem dan contact op met de technische ondersteuning.",
     "lnurlNoUsername": "Om een ln-url adres te genereren, moet u eerst een gebruikersnaam instellen. Wilt u nu een gebruikersnaam instellen?",
     "copyClipboardLnurl": "Het Ln-url adres is naar het klembord gekopieerd",
-    "defaultWallet": "Standaard Account",
+    "defaultWallet": "Standaardsaldo",
     "rateUs": "Beoordeel ons op {storeName: string}",
     "theme": "Thema",
     "nfc": "Ontvangen van NFC",
@@ -2413,7 +2413,7 @@
     "logoutAlertContentPhone": "Om opnieuw in te loggen, moet u uw telefoonnummer opnieuw invoeren.\nuw telefoonnummer is {phoneNumber: string}, dus zorg ervoor dat u toegang heeft om opnieuw in te loggen",
     "logoutAlertContentEmail": "Om weer in te loggen, moet u uw e-mailadres opnieuw invoeren.\nuw e-mailadres is {email: string}, dus zorg ervoor dat u toegang heeft om opnieuw in te loggen",
     "logoutAlertContentPhoneEmail": "Om weer in te loggen, moet u uw telefoonnummer of e-mailadres opnieuw invoeren.\nje telefoonnummer is {phoneNumber: string} en je e-mailadres is {email: string}, dus zorg ervoor dat je toegang hebt tot de nummers om weer in te loggen",
-    "usdBalanceWarning": "Je hebt een Dollar-rekening-saldo van {balance: string}.",
+    "usdBalanceWarning": "Je hebt een Dollarsaldo van {balance: string}.",
     "btcBalanceWarning": "U heeft een bitcoin-saldo van {balance: string}.",
     "secureYourAccount": "Registreer om uw account te beveiligen",
     "tapToAdd": "Tik om toe te voegen",
@@ -2458,13 +2458,13 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "Stablesats is niet beschikbaar in jouw regio",
-    "modalBody": "Maak een non-custodial account aan om toegang te krijgen tot een dollar-account.",
+    "modalBody": "Maak een non-custodial account aan om toegang te krijgen tot een Dollarsaldo.",
     "createNew": "Nieuw aanmaken",
     "walletLabel": "niet beschikbaar in jouw regio"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Het dollaraccount is niet langer beschikbaar in jouw regio",
-    "body": "Breng je dollarsaldo over naar Bitcoin",
+    "title": "Het Dollarsaldo is niet langer beschikbaar in jouw regio",
+    "body": "Breng je Dollarsaldo over naar Bitcoin",
     "youHave": "Je hebt",
     "youGet": "Je krijgt",
     "approve": "Goedkeuren"
@@ -2488,10 +2488,10 @@
     "toastMessage": "Geheim gekopieerd naar klembord!"
   },
   "DefaultWalletScreen": {
-    "title": "Standaard ontvangstrekening",
-    "titleSelfCustodial": "Standaardrekening",
-    "infoBtc": "Je Bitcoin-rekening is voor het stapelen van sats, waar de USD-waarde meebeweegt met de markt.",
-    "infoUsd": "Je Dollar-rekening wordt aangedreven door Stablesats — het bevat Bitcoin die is afgedekt om stabiel te blijven in USD-waarde. Je houdt altijd Bitcoin, maar de dollarwaarde verandert niet.",
+    "title": "Standaardsaldo",
+    "titleSelfCustodial": "Standaardsaldo",
+    "infoBtc": "Je Bitcoinsaldo is voor het stapelen van sats, waar de USD-waarde meebeweegt met de markt.",
+    "infoUsd": "Je Dollarsaldo wordt aangedreven door Stablesats — het bevat Bitcoin die is afgedekt om stabiel te blijven in USD-waarde. Je houdt altijd Bitcoin, maar de dollarwaarde verandert niet.",
     "infoUsdSelfCustodial": "Vanwege overwegingen rond de gebruikerservaring hebben we besloten deze functie niet te activeren in non-custodial accounts. Alleen Bitcoin is beschikbaar als je standaard ontvangstinstelling."
   },
   "ThemeScreen": {
@@ -2507,12 +2507,12 @@
     "DEFAULT": "Standaard (OS)"
   },
   "StablesatsModal": {
-    "header": "Je Dollar-rekening wordt aangedreven door Stablesats",
-    "body": "De Dollar-rekening gebruikt Stablesats-technologie om Bitcoin stabiel te houden op de USD-prijs. Je houdt altijd Bitcoin — geen echte dollars — maar de USD-waarde fluctueert niet. Je kunt Bitcoin versturen en ontvangen zoals gewoonlijk, maar het is niet compatibel met het traditionele banksysteem.",
+    "header": "Je Dollarsaldo wordt aangedreven door Stablesats",
+    "body": "Het Dollarsaldo gebruikt Stablesats-technologie om Bitcoin stabiel te houden op de USD-prijs. Je houdt altijd Bitcoin — geen echte dollars — maar de USD-waarde fluctueert niet. Je kunt Bitcoin versturen en ontvangen zoals gewoonlijk, maar het is niet compatibel met het traditionele banksysteem.",
     "termsAndConditions": "Lees de Algemene voorwaarden",
     "learnMore": "Meer informatie over Stablesats",
-    "headerSelfCustodial": "Je Dollar-account bevat stablecoins",
-    "bodySelfCustodial": "In het Dollar-account houd je stablecoins. Tokens die gedekt worden door activa en waarvan de waarde stabiel wordt gehouden ten opzichte van de USD. Je kunt nog geen stablecoins versturen en ontvangen. Wanneer je vanaf het Dollar-account stuurt, worden je stablecoins omgewisseld en als Bitcoin naar de ontvanger gestuurd.",
+    "headerSelfCustodial": "Je Dollarsaldo bevat stablecoins",
+    "bodySelfCustodial": "In je Dollarsaldo houd je stablecoins. Tokens die gedekt worden door activa en waarvan de waarde stabiel wordt gehouden ten opzichte van de USD. Je kunt nog geen stablecoins versturen en ontvangen. Wanneer je vanaf je Dollarsaldo stuurt, worden je stablecoins omgewisseld en als Bitcoin naar de ontvanger gestuurd.",
     "learnMoreSelfCustodial": "Meer informatie"
   },
   "SplashScreen": {
@@ -2523,8 +2523,8 @@
     "received": "Jij ontving",
     "spent": "Je hebt uitgegeven",
     "sending": "Verzenden",
-    "receivingAccount": "Account voor Ontvangsten",
-    "sendingAccount": "Account voor Verzendingen",
+    "receivingAccount": "Ontvangend saldo",
+    "sendingAccount": "Verzendend saldo",
     "txNotBroadcast": "Uw transactie is momenteel in behandeling en wordt binnen enkele ogenblikken naar het Bitcoin-netwerk verzonden.",
     "momentarily": "binnenkort"
   },
@@ -2535,7 +2535,7 @@
     "perWeek": "per week",
     "unlimited": "Ongelimiteerd",
     "remaining": "Overig",
-    "stablesatTransfers": "Dollar-rekening-overboekingen",
+    "stablesatTransfers": "Dollarsaldo-overboekingen",
     "internalSend": "Verzenden naar {bankName: string} Gebruiker",
     "error": "Kan momenteel geen limieten ophalen",
     "increaseLimits": "Vergroot je grenzen"
@@ -2729,7 +2729,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin Prijs",
-    "btcAccount": "Bitcoin-rekening",
+    "btcAccount": "Bitcoinsaldo",
     "cancel": "Annuleer",
     "close": "Sluit",
     "confirm": "Bevestig",
@@ -2800,7 +2800,7 @@
     "transactionsError": "Fout bij het laden van transacties",
     "tryAgain": "Probeer opnieuw",
     "type": "Type",
-    "usdAccount": "Dollar-rekening",
+    "usdAccount": "Dollarsaldo",
     "username": "Gebruikersnaam",
     "usernameRequired": "Gebruikersnaam is vereist",
     "backupAccount": "Back-up/upgrade-account",
