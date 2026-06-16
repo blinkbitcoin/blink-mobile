@@ -61,7 +61,7 @@ const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
 ]
 
 const RECONNECT_BACKOFF_MS: readonly number[] = [1000, 3000, 9000]
-const WALLET_SNAPSHOT_TIMEOUT_MS = 10000
+export const WALLET_SNAPSHOT_TIMEOUT_MS = 10000
 
 const teardownSdk = async (
   sdk: BreezSdkInterface,

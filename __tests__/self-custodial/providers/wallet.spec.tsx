@@ -9,6 +9,7 @@ import {
   SelfCustodialWalletProvider,
   useSelfCustodialWallet,
 } from "@app/self-custodial/providers/wallet"
+import { WALLET_SNAPSHOT_TIMEOUT_MS } from "@app/self-custodial/hooks/use-sdk-lifecycle"
 
 import { flushEffects } from "../../helpers/flush-effects"
 
@@ -844,48 +845,51 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
   })
 
   it("recovers from a snapshot that hangs past the timeout instead of staying in Loading", async () => {
-    jest.useFakeTimers()
-    setupConnectedWallet(
-      {
-        getMnemonicForAccount: mockGetMnemonicForAccount,
-        listSelfCustodialAccounts: mockListSelfCustodialAccounts,
-        setActiveAccountId: (id: string) => {
-          mockState.activeAccountId = id
+    // keep setImmediate real so flushEffects settles while setTimeout stays faked for the advance
+    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+    try {
+      setupConnectedWallet(
+        {
+          getMnemonicForAccount: mockGetMnemonicForAccount,
+          listSelfCustodialAccounts: mockListSelfCustodialAccounts,
+          setActiveAccountId: (id: string) => {
+            mockState.activeAccountId = id
+          },
+          initSdk: mockInitSdk,
+          addSdkEventListener: mockAddSdkEventListener,
         },
-        initSdk: mockInitSdk,
-        addSdkEventListener: mockAddSdkEventListener,
-      },
-      { wallets: [], hasMore: false },
-    )
-    const snapshot = getWalletSnapshotMocks()
-    snapshot.getSelfCustodialWalletSnapshot.mockImplementation(
-      () =>
-        new Promise(() => {
-          // never resolves; should be aborted by the 5s timeout race
-        }),
-    )
+        { wallets: [], hasMore: false },
+      )
+      const snapshot = getWalletSnapshotMocks()
+      snapshot.getSelfCustodialWalletSnapshot.mockImplementation(
+        () =>
+          new Promise(() => {
+            // never resolves; aborted by the snapshot timeout race
+          }),
+      )
 
-    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
 
-    await waitFor(() => {
-      expect(mockInitSdk).toHaveBeenCalled()
-    })
+      // settle the async init so refreshWallets runs and the hung snapshot arms withTimeout
+      await flushEffects()
 
-    await act(async () => {
-      jest.advanceTimersByTime(5_001)
-    })
+      // cross the snapshot timeout: withTimeout aborts the hung snapshot
+      await act(async () => {
+        jest.advanceTimersByTime(WALLET_SNAPSHOT_TIMEOUT_MS + 1)
+      })
 
-    await waitFor(() => {
+      // settle the catch so the status moves off Loading
+      await flushEffects()
+
       expect(result.current.status).not.toBe(ActiveWalletStatus.Loading)
-    })
-
-    expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: expect.stringContaining("wallet snapshot timed out"),
-      }),
-    )
-
-    jest.useRealTimers()
+      expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining("wallet snapshot timed out"),
+        }),
+      )
+    } finally {
+      jest.useRealTimers()
+    }
   })
 
   it("transitions out of Loading to Error when both snapshot and connectivity check fail", async () => {
