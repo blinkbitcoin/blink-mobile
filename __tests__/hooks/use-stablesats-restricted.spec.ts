@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react-native"
 
 import { getStablesatsRestricted } from "@app/store/persistent-state/stablesats-restriction"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
-import { AccountType, DefaultAccountId } from "@app/types/wallet"
+import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
 const mockUseRemoteConfig = jest.fn()
@@ -48,7 +48,7 @@ const baseState: PersistentState = {
 
 const flaggedState: PersistentState = {
   ...baseState,
-  stablesatsRestrictedByAccountId: { [DefaultAccountId.Custodial]: true },
+  stablesatsRestrictedCustodial: true,
 }
 
 describe("useStablesatsRestricted (query)", () => {
@@ -136,6 +136,15 @@ describe("useStablesatsRestricted (query)", () => {
     it("stays restricted with no detected country once flagged", () => {
       mockPersistentState = flaggedState
       mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: false })
+
+      const { result } = renderHook(() => useStablesatsRestricted())
+      expect(result.current).toBe(true)
+    })
+
+    it("stays restricted after the blocked country is removed from the remote list", () => {
+      mockPersistentState = flaggedState
+      mockUseRemoteConfig.mockReturnValue({ stablesatsBlockedCountries: [] })
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", loading: false })
 
       const { result } = renderHook(() => useStablesatsRestricted())
       expect(result.current).toBe(true)
@@ -297,5 +306,19 @@ describe("useStablesatsForcedConversion", () => {
 
     rerender({ balance: 5000 })
     expect(result.current.isConvertModalVisible).toBe(true)
+  })
+
+  it("stays closed after a successful conversion zeroes the balance", () => {
+    const { result, rerender } = renderHook(
+      ({ balance }: { balance: number }) =>
+        useStablesatsForcedConversion({ isRestricted: true, usdWalletBalance: balance }),
+      { initialProps: { balance: 5000 } },
+    )
+    expect(result.current.isConvertModalVisible).toBe(true)
+
+    act(() => result.current.closeConvertModal())
+    rerender({ balance: 0 })
+
+    expect(result.current.isConvertModalVisible).toBe(false)
   })
 })

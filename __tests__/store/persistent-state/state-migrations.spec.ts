@@ -181,27 +181,21 @@ describe("state-migrations schema 10", () => {
     })
   })
 
-  it("v14 identity migration preserves stablesatsRestrictedByAccountId untouched", async () => {
+  it("v14 identity migration preserves stablesatsRestrictedCustodial untouched", async () => {
     const state14 = {
       schemaVersion: 14,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "token",
-      stablesatsRestrictedByAccountId: {
-        "acct-1": true,
-        "acct-2": false,
-      },
+      stablesatsRestrictedCustodial: true,
     }
 
     const result = await migrateAndGetPersistentState(state14)
 
     expect(result.schemaVersion).toBe(14)
-    expect(result.stablesatsRestrictedByAccountId).toEqual({
-      "acct-1": true,
-      "acct-2": false,
-    })
+    expect(result.stablesatsRestrictedCustodial).toBe(true)
   })
 
-  it("leaves stablesatsRestrictedByAccountId undefined when migrating from v13", async () => {
+  it("leaves stablesatsRestrictedCustodial undefined when migrating from v13", async () => {
     const state13 = {
       schemaVersion: 13,
       galoyInstance: { id: "Main" },
@@ -211,7 +205,7 @@ describe("state-migrations schema 10", () => {
     const result = await migrateAndGetPersistentState(state13)
 
     expect(result.schemaVersion).toBe(14)
-    expect(result.stablesatsRestrictedByAccountId).toBeUndefined()
+    expect(result.stablesatsRestrictedCustodial).toBeUndefined()
   })
 
   it("returns default state for invalid data", async () => {
