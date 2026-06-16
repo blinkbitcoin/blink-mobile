@@ -28,10 +28,10 @@
     "text": "Az 'Elfogadom' gombra kattintva elfogadod a Felhasználási Feltételeinket. Azzal is egyetértesz, hogy nem egy tiltott ország lakosa vagy állampolgára vagy."
   },
   "SetAccountModal": {
-    "title": "Állítsd be a fogadó számládat",
+    "title": "Állítsd be az alapértelmezett egyenleged",
     "description": "Ezt később bármikor módosíthatod a Beállításokban",
-    "stablesatsTag": "Dollár Számla — Stablesats technológiával",
-    "bitcoinTag": "Bitcoin számla maximalistáknak"
+    "stablesatsTag": "Dollár Egyenleg — Stablesats technológiával",
+    "bitcoinTag": "Bitcoin Egyenleg a sats gyűjtéséhez"
   },
   "NoteInput": {
     "addNote": "Jegyzet hozzáadása"
@@ -68,7 +68,7 @@
   "ConversionConfirmationScreen": {
     "title": "Átváltás ellenörzése",
     "youreConverting": "Átváltasz",
-    "receivingAccount": "Fogadó számla",
+    "receivingAccount": "Fogadó egyenleg",
     "infoBitcoin": "A Bitcoin összeg csak hozzávetőleges. Kis mértékben változhat.",
     "infoDollar": "A dollár összeg csak hozzávetőleges. Kis mértékben változhat.",
     "transferButtonText": "Átutalás {fromWallet}-ból/ből {toWallet}-ba/be",
@@ -2121,7 +2121,7 @@
     "setNote": "jegyzet beállítása",
     "tapQrCodeCopy": "QR kód másolása érintéssel",
     "title": "Bitcoin fogadása",
-    "usdTitle": "Fogadás Dollár Számla-ra",
+    "usdTitle": "Fogadás Dollár Egyenlegre",
     "error": "Számla létrehozása sikertelen. Kérjük, vedd fel a kapcsolatot az ügyfélszolgálattal, ha a probléma továbbra is fennáll.",
     "copyInvoice": "Másolás",
     "shareInvoice": "Megosztás",
@@ -2171,7 +2171,7 @@
     "walletNotConnected": "A pénztárcád még csatlakozik. Várj egy pillanatot, és próbáld újra.",
     "paymentPending": "Lehet, hogy a fizetésed még folyamatban van. Ellenőrizd az egyenlegedet, mielőtt újrapróbálkozol.",
     "title": "Bitcoin beváltása",
-    "usdTitle": "Beváltás Dollár Számla-ra",
+    "usdTitle": "Beváltás Dollár Egyenlegre",
     "error": "Nem sikerült fizetési kérelmet generálni. Kérjük, ha a probléma továbbra is fennáll, vedd fel a kapcsolatot az ügyfélszolgálattal.",
     "redeemingError": "Nem sikerült beváltani a Bitcoint. Kérjük, ha a probléma továbbra is fennáll, vedd fel a kapcsolatot az ügyfélszolgálattal.",
     "submissionError": "Nem sikerült benyújtani a kifizetési kérelmet. Kérjük, ha a probléma továbbra is fennáll, vedd fel a kapcsolatot az ügyfélszolgálattal.",
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Nem sikerült az tranzakciók CSV fájlba exportálása. Valami hiba történt. Ha a probléma továbbra is fennáll, kérjük, lépj kapcsolatba az ügyfélszolgálattal.",
     "lnurlNoUsername": "Az LNURL cím létrehozásához először be kell állítanod egy felhasználónevet. Szeretnél most beállítani egy felhasználónevet?",
     "copyClipboardLnurl": "LNURL cím a vágólapra másolva",
-    "defaultWallet": "Alapértelmezett számla",
+    "defaultWallet": "Alapértelmezett egyenleg",
     "rateUs": "Értékelj minket a {storeName: string} oldalon",
     "theme": "Téma",
     "nfc": "Fogadás NFC-ből",
@@ -2413,7 +2413,7 @@
     "logoutAlertContentPhone": "Újra meg kell adnod a telefonszámodat a bejelentkezéshez.\nA telefonszámod: {phoneNumber: string}, győződj meg róla, hogy hozzáférsz a bejelentkezéshez.",
     "logoutAlertContentEmail": "Újra meg kell adnod az email címedet a bejelentkezéshez.\nAz email címed: {email: string}, győződj meg róla, hogy hozzáférsz a bejelentkezéshez.",
     "logoutAlertContentPhoneEmail": "Újra meg kell adnod a telefonszámodat vagy az email címedet a bejelentkezéshez.\nA telefonszámod: {phoneNumber: string}, az email címed pedig: {email: string}, győződj meg róla, hogy hozzájuk férsz a bejelentkezéshez.",
-    "usdBalanceWarning": "Dollár Számla egyenleged: {balance: string}.",
+    "usdBalanceWarning": "Dollár egyenleged: {balance: string}.",
     "btcBalanceWarning": "Bitcoin egyenleged: {balance: string}.",
     "secureYourAccount": "Regisztrálj a fiókod biztonságossá tételéhez",
     "tapToAdd": "Koppints a hozzáadáshoz",
@@ -2458,12 +2458,12 @@
   },
   "StablesatsRestriction": {
     "modalTitle": "A Stablesats nem érhető el a régiódban",
-    "modalBody": "A dollárszámlához való hozzáféréshez hozz létre egy nem letétkezelői fiókot.",
+    "modalBody": "A Dollár Egyenleghez való hozzáféréshez hozz létre egy nem letétkezelői fiókot.",
     "createNew": "Új létrehozása",
     "walletLabel": "nem érhető el a régiódban"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "A dollárszámla már nem érhető el a régiódban",
+    "title": "A Dollár Egyenleg már nem érhető el a régiódban",
     "body": "Utald át a dolláregyenleged Bitcoinra",
     "youHave": "Nálad van",
     "youGet": "Kapsz",
@@ -2488,10 +2488,10 @@
     "toastMessage": "Titok másolva a vágólapra!"
   },
   "DefaultWalletScreen": {
-    "title": "Alapértelmezett fogadási fiók",
-    "titleSelfCustodial": "Alapértelmezett fiók",
-    "infoBtc": "A Bitcoin Számla-od sats gyűjtésére való, ahol az USD érték a piaccal mozog.",
-    "infoUsd": "A Dollár Számla-odat a Stablesats működteti — Bitcoint tart, amely fedezve van, hogy USD értékben stabil maradjon. Mindig Bitcoint tartasz, de a dollárérték nem változik.",
+    "title": "Alapértelmezett egyenleg",
+    "titleSelfCustodial": "Alapértelmezett egyenleg",
+    "infoBtc": "A Bitcoin Egyenleged sats gyűjtésére való, ahol az USD érték a piaccal mozog.",
+    "infoUsd": "A Dollár Egyenlegedet a Stablesats működteti — Bitcoint tart, amely fedezve van, hogy USD értékben stabil maradjon. Mindig Bitcoint tartasz, de a dollárérték nem változik.",
     "infoUsdSelfCustodial": "Felhasználói élménnyel kapcsolatos megfontolások miatt úgy döntöttünk, hogy nem aktiváljuk ezt a funkciót a non-custodial fiókokban. Alapértelmezett fogadási beállításként csak a Bitcoin érhető el."
   },
   "ThemeScreen": {
@@ -2507,12 +2507,12 @@
     "DEFAULT": "Alapértelmezett"
   },
   "StablesatsModal": {
-    "header": "A Dollár Számla-odat a Stablesats működteti",
-    "body": "A Dollár Számla Stablesats technológiát használ a Bitcoin USD árhoz stabilizálásához. Mindig Bitcoint tartasz — nem valódi dollárt — de az USD érték nem ingadozik. Bitcoint küldhetsz és fogadhatsz a szokásos módon, de nem kompatibilis a hagyományos bankrendszerrel.",
+    "header": "A Dollár Egyenlegedet a Stablesats működteti",
+    "body": "A Dollár Egyenleg Stablesats technológiát használ a Bitcoin USD árhoz stabilizálásához. Mindig Bitcoint tartasz — nem valódi dollárt — de az USD érték nem ingadozik. Bitcoint küldhetsz és fogadhatsz a szokásos módon, de nem kompatibilis a hagyományos bankrendszerrel.",
     "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket",
     "learnMore": "Tudj meg többet a Stablesatsról",
-    "headerSelfCustodial": "A Dollár-számlád stablecoinokat tárol",
-    "bodySelfCustodial": "A Dollár-számlán stablecoinokat tartasz. Olyan tokenek, amelyeket eszközök fedezetnek, és értékük stabil marad a USD-hez képest. Stablecoinokat egyelőre nem küldhetsz és nem fogadhatsz. Amikor a Dollár-számláról küldesz, a stablecoinjaidat átváltjuk és Bitcoinként küldjük a címzettnek.",
+    "headerSelfCustodial": "A Dollár Egyenleged stablecoinokat tárol",
+    "bodySelfCustodial": "A Dollár Egyenlegeden stablecoinokat tartasz. Olyan tokenek, amelyeket eszközök fedezetnek, és értékük stabil marad a USD-hez képest. Stablecoinokat egyelőre nem küldhetsz és nem fogadhatsz. Amikor a Dollár Egyenlegedről küldesz, a stablecoinjaidat átváltjuk és Bitcoinként küldjük a címzettnek.",
     "learnMoreSelfCustodial": "Tudj meg többet"
   },
   "SplashScreen": {
@@ -2523,8 +2523,8 @@
     "received": "Fogadott",
     "spent": "Elköltött",
     "sending": "Küld",
-    "receivingAccount": "Fogadó számla",
-    "sendingAccount": "Küldő számla",
+    "receivingAccount": "Fogadó egyenleg",
+    "sendingAccount": "Küldő egyenleg",
     "txNotBroadcast": "Az Ön tranzakciója sorban áll. Meg fog jelenni a mempoolban {countdown: string}.",
     "momentarily": "pillanatokon belül"
   },
@@ -2535,7 +2535,7 @@
     "perWeek": "hetente",
     "unlimited": "Korlátlan",
     "remaining": "Hátralévő",
-    "stablesatTransfers": "Dollár Számla átutalások",
+    "stablesatTransfers": "Dollár Egyenleg átutalások",
     "internalSend": "Küldés {bankName: string} felhasználónak",
     "error": "Jelenleg nem lehet lekérdezni a limitet",
     "increaseLimits": "Növelje a limitet"
@@ -2729,7 +2729,7 @@
     "beta": "béta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin Ár",
-    "btcAccount": "Bitcoin Számla",
+    "btcAccount": "Bitcoin Egyenleg",
     "cancel": "Mégse",
     "close": "Bezárás",
     "confirm": "Megerősítés",
@@ -2800,7 +2800,7 @@
     "transactionsError": "Hiba a tranzakciók betöltése közben",
     "tryAgain": "Próbáld újra",
     "type": "Típus",
-    "usdAccount": "Dollár Számla",
+    "usdAccount": "Dollár Egyenleg",
     "username": "Felhasználónév",
     "usernameRequired": "Felhasználónév szükséges",
     "backupAccount": "Biztonsági Mentése / Magasabb szintű fiókra váltás",
