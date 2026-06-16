@@ -22,6 +22,29 @@ const fetchCountryFromIp = async (): Promise<CountryCode | undefined> => {
   return data?.country_code as CountryCode | undefined
 }
 
+const resolveIpCountryCode = async (
+  context: Record<string, unknown> = {},
+): Promise<CountryCode | undefined> => {
+  try {
+    const countryCode = await fetchCountryFromIp()
+    if (!countryCode) {
+      logError({
+        scope: "device-location",
+        error: new Error("ipapi returned no country"),
+        context: { source: "ipapi", ...context },
+      })
+    }
+    return countryCode
+  } catch (err) {
+    logError({
+      scope: "device-location",
+      error: err,
+      context: { source: "ipapi", ...context },
+    })
+    return undefined
+  }
+}
+
 type DeviceLocation = {
   countryCode: CountryCode | undefined
   loading: boolean
@@ -92,32 +115,15 @@ const useDeviceLocation = (): DeviceLocation => {
     if (!data || userPhone) return
     setSource(LocationSource.Ip)
     const getLocation = async () => {
-      try {
-        const _countryCode = await fetchCountryFromIp()
-        if (!_countryCode) {
-          const cached = data.countryCode as CountryCode | undefined
-          setCountryCode(cached ?? DEFAULT_COUNTRY_CODE)
-          setDetectionFailed(!cached)
-          setLoading(false)
-          logError({
-            scope: "device-location",
-            error: new Error("ipapi returned no country, using cached or fallback"),
-            context: { source: "ipapi", hasCached: Boolean(cached) },
-          })
-          return
-        }
-        setCountryCode(_countryCode)
+      const cached = data.countryCode as CountryCode | undefined
+      const ipCountryCode = await resolveIpCountryCode({ hasCached: Boolean(cached) })
+      if (ipCountryCode) {
+        setCountryCode(ipCountryCode)
         setDetectionFailed(false)
-        updateCountryCode(client, _countryCode)
-      } catch (err) {
-        const cached = data.countryCode as CountryCode | undefined
+        updateCountryCode(client, ipCountryCode)
+      } else {
         setCountryCode(cached ?? DEFAULT_COUNTRY_CODE)
         setDetectionFailed(!cached)
-        logError({
-          scope: "device-location",
-          error: err,
-          context: { source: "ipapi", hasCached: Boolean(cached) },
-        })
       }
       setLoading(false)
     }
@@ -138,13 +144,9 @@ export const useIpCountryCode = (enabled: boolean): CountryCode | undefined => {
   useEffect(() => {
     if (!enabled) return undefined
     let active = true
-    fetchCountryFromIp()
-      .then((code) => {
-        if (active && code) setIpCountryCode(code)
-      })
-      .catch((err) => {
-        logError({ scope: "device-location", error: err, context: { source: "ipapi" } })
-      })
+    resolveIpCountryCode().then((code) => {
+      if (active && code) setIpCountryCode(code)
+    })
     return () => {
       active = false
     }
