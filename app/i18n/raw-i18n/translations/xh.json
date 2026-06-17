@@ -3551,9 +3551,10 @@
   "AccountMigration": {
     "moveToNonCustodial": "Fudukela kwi-non-custodial",
     "explainerTitle": "Kuthetha ntoni ukufudukela kwi-non-custodial?",
-    "explainerStep1": "Uza kudala i-akhawunti ye-non-custodial kwi-Spark protocol, <link>funda ngakumbi apha</link>",
-    "explainerStep2": "Sidlulisela imali yakho kwi-akhawunti yakho entsha ye-non-custodial kwaye i-akhawunti yakho yangoku iya kucinywa",
-    "explainerStep3": "Qhubeka usebenzise i-Blink njengoko uqhele",
+    "explainerCheck1": "Uza kudala i-akhawunti ye-non-custodial kwi-Spark protocol",
+    "explainerCheck2": "Sidlulisela imali yakho kwi-akhawunti yakho entsha ye-non-custodial; i-akhawunti yakho yangoku kunye nayo yonke idatha yayo, kuquka imbali yentengiselwano, iya kucinywa",
+    "explainerCheck3": "I-Blink POS, i-Blink API, iqhosha leminikelo ye-Blink kunye nayo nayiphi na enye inkonzo exhomekeke kwi-akhawunti ye-custodial aziyi kufumaneka",
+    "explainerCheck4": "Kwi-akhawunti yakho kuya kuhlawuliswa intlawulo yedipozithi ye-Spark engu-{feePercent: number}%",
     "letsMove": "Masiqale",
     "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje."
   },

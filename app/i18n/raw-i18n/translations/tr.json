@@ -3551,9 +3551,10 @@
   "AccountMigration": {
     "moveToNonCustodial": "Non-custodial'a geç",
     "explainerTitle": "Non-custodial'a geçmek ne anlama gelir?",
-    "explainerStep1": "Spark protokolünde bir non-custodial hesap oluşturacaksınız, <link>buradan daha fazla bilgi edinin</link>",
-    "explainerStep2": "Bakiyenizi yeni non-custodial hesabınıza aktarıyoruz ve mevcut hesabınız silinecek",
-    "explainerStep3": "Blink'i her zamanki gibi kullanmaya devam edin",
+    "explainerCheck1": "Spark protokolünde bir non-custodial hesap oluşturacaksınız",
+    "explainerCheck2": "Bakiyenizi yeni non-custodial hesabınıza aktarıyoruz; mevcut hesabınız ve işlem geçmişi dahil tüm verileri silinecek",
+    "explainerCheck3": "Blink POS, Blink API, Blink Bağış Düğmesi ve custodial hesaba dayanan diğer hizmetler kullanılamayacak",
+    "explainerCheck4": "Hesabınızdan {feePercent: number}%'lik bir Spark yatırma ücreti düşülecek",
     "letsMove": "Hadi başlayalım",
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır."
   },

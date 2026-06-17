@@ -3551,9 +3551,10 @@
   "AccountMigration": {
     "moveToNonCustodial": "Beralih ke non-custodial",
     "explainerTitle": "Apakah maksud beralih ke non-custodial?",
-    "explainerStep1": "Anda akan membuat akaun non-custodial di protokol Spark, <link>ketahui lebih lanjut di sini</link>",
-    "explainerStep2": "Kami memindahkan dana anda ke akaun non-custodial baharu dan akaun semasa anda akan dipadamkan",
-    "explainerStep3": "Teruskan menggunakan Blink seperti biasa",
+    "explainerCheck1": "Anda akan membuat akaun non-custodial di protokol Spark",
+    "explainerCheck2": "Kami memindahkan dana anda ke akaun non-custodial baharu; akaun semasa anda dan semua datanya termasuk sejarah transaksi akan dipadamkan",
+    "explainerCheck3": "Blink POS, Blink API, Butang Derma Blink dan mana-mana perkhidmatan lain yang bergantung pada akaun custodial tidak akan tersedia",
+    "explainerCheck4": "Akaun anda akan dikenakan yuran deposit Spark sebanyak {feePercent: number}%",
     "letsMove": "Jom",
     "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat."
   },

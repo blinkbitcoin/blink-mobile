@@ -1,47 +1,78 @@
-import React, { useMemo } from "react"
+import React, { useState } from "react"
+import { View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { useTheme } from "@rn-vui/themed"
 
-import { RichText } from "@app/components/rich-text"
+import { makeStyles, useTheme } from "@rn-vui/themed"
+
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { IconHero } from "@app/components/icon-hero"
+import { RevealedCheckboxList } from "@app/components/revealed-checkbox-list"
+import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { openExternalUrl } from "@app/utils/external"
-
-import { MigrationExplainerLayout } from "../migration-explainer-layout"
+import { testProps } from "@app/utils/testProps"
 
 export const MigrationExplainerScreen: React.FC = () => {
   const { LL } = useI18nContext()
+  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { sparkCompatibleWalletsUrl } = useRemoteConfig()
+  const { sparkDepositFeePercent } = useRemoteConfig()
 
-  const steps: ReadonlyArray<React.ReactNode> = useMemo(
-    () => [
-      <RichText
-        key="step1"
-        text={LL.AccountMigration.explainerStep1()}
-        tags={{
-          link: { onPress: () => openExternalUrl(sparkCompatibleWalletsUrl) },
-        }}
-      />,
-      LL.AccountMigration.explainerStep2(),
-      LL.AccountMigration.explainerStep3(),
-    ],
-    [LL, sparkCompatibleWalletsUrl],
-  )
+  const [allChecked, setAllChecked] = useState(false)
+
+  const checkLabels = [
+    LL.AccountMigration.explainerCheck1(),
+    LL.AccountMigration.explainerCheck2(),
+    LL.AccountMigration.explainerCheck3(),
+    LL.AccountMigration.explainerCheck4({ feePercent: sparkDepositFeePercent }),
+  ]
 
   return (
-    <MigrationExplainerLayout
-      icon="key-outline"
-      iconColor={colors.grey3}
-      title={LL.AccountMigration.explainerTitle()}
-      steps={steps}
-      ctaTitle={LL.AccountMigration.letsMove()}
-      onCtaPress={() => navigation.navigate("selfCustodialBackupMethod")}
-    />
+    <Screen preset="fixed">
+      <View style={styles.container}>
+        <View style={styles.content}>
+          <IconHero
+            icon="key-outline"
+            iconColor={colors.black}
+            title={LL.AccountMigration.explainerTitle()}
+          />
+          <RevealedCheckboxList
+            labels={checkLabels}
+            testIdPrefix="migration-explainer-check"
+            onAllCheckedChange={setAllChecked}
+          />
+        </View>
+
+        <View style={styles.buttonsContainer}>
+          <GaloyPrimaryButton
+            title={LL.AccountMigration.letsMove()}
+            disabled={!allChecked}
+            onPress={() => navigation.navigate("selfCustodialBackupMethod")}
+            {...testProps("migration-explainer-cta")}
+          />
+        </View>
+      </View>
+    </Screen>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  container: {
+    flex: 1,
+    justifyContent: "space-between",
+  },
+  content: {
+    flex: 1,
+  },
+  buttonsContainer: {
+    gap: 10,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 10,
+  },
+}))

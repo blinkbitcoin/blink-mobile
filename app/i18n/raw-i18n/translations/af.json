@@ -3551,9 +3551,10 @@
   "AccountMigration": {
     "moveToNonCustodial": "Skuif na nie-bewaarde",
     "explainerTitle": "Wat beteken dit om na nie-bewaarde te skuif?",
-    "explainerStep1": "Jy sal 'n nie-bewaarde rekening op die Spark-protokol skep, <link>leer meer hier</link>",
-    "explainerStep2": "Ons dra jou fondse oor na jou nuwe nie-bewaarde rekening en jou huidige rekening sal verwyder word",
-    "explainerStep3": "Gebruik Blink voort soos gewoonlik",
+    "explainerCheck1": "Jy sal 'n nie-bewaarde rekening op die Spark-protokol skep",
+    "explainerCheck2": "Ons dra jou fondse oor na jou nuwe nie-bewaarde rekening; jou huidige rekening en al sy data, insluitend transaksiegeskiedenis, sal verwyder word",
+    "explainerCheck3": "Blink POS, Blink API, die Blink Skenk-knoppie en enige ander diens wat op die bewaarde rekening staatmaak, sal nie beskikbaar wees nie",
+    "explainerCheck4": "'n Spark-deposito fooi van {feePercent: number}% sal van jou rekening afgetrek word",
     "letsMove": "Kom ons gaan",
     "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees."
   },

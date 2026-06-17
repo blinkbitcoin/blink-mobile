@@ -3551,9 +3551,10 @@
   "AccountMigration": {
     "moveToNonCustodial": "Prejsť na non-custodial",
     "explainerTitle": "Čo znamená prejsť na non-custodial?",
-    "explainerStep1": "Vytvoríte non-custodial účet na protokole Spark, <link>zistiť viac tu</link>",
-    "explainerStep2": "Prevedieme vaše prostriedky na váš nový non-custodial účet a váš súčasný účet bude vymazaný",
-    "explainerStep3": "Pokračujte v používaní Blink ako zvyčajne",
+    "explainerCheck1": "Vytvoríte non-custodial účet na protokole Spark",
+    "explainerCheck2": "Prevedieme vaše prostriedky na váš nový non-custodial účet; váš súčasný účet a všetky jeho údaje vrátane histórie transakcií budú vymazané",
+    "explainerCheck3": "Blink POS, Blink API, tlačidlo Blink Donate a akákoľvek iná služba závislá na custodial účte nebudú dostupné",
+    "explainerCheck4": "Z vášho účtu bude odpočítaný vkladový poplatok Spark vo výške {feePercent: number}%",
     "letsMove": "Poďme na to",
     "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd."
   },

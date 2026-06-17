@@ -3551,9 +3551,10 @@
   "AccountMigration": {
     "moveToNonCustodial": "Overstappen naar non-custodial",
     "explainerTitle": "Wat betekent overstappen naar non-custodial?",
-    "explainerStep1": "Je maakt een non-custodial account aan op het Spark-protocol, <link>lees hier meer</link>",
-    "explainerStep2": "We dragen je saldo over naar je nieuwe non-custodial account en je huidige account wordt verwijderd",
-    "explainerStep3": "Blijf Blink gebruiken zoals gewoonlijk",
+    "explainerCheck1": "Je maakt een non-custodial account aan op het Spark-protocol",
+    "explainerCheck2": "We dragen je saldo over naar je nieuwe non-custodial account; je huidige account en alle gegevens, inclusief de transactiegeschiedenis, worden verwijderd",
+    "explainerCheck3": "Blink POS, Blink API, de Blink-donatieknop en elke andere dienst die afhankelijk is van het custodial account zijn niet meer beschikbaar",
+    "explainerCheck4": "Er worden Spark-stortingskosten van {feePercent: number}% van je account afgetrokken",
     "letsMove": "Laten we gaan",
     "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn."
   },

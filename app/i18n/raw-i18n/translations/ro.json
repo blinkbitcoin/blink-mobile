@@ -3551,9 +3551,10 @@
   "AccountMigration": {
     "moveToNonCustodial": "Treci la non-custodial",
     "explainerTitle": "Ce înseamnă să treci la non-custodial?",
-    "explainerStep1": "Vei crea un cont non-custodial pe protocolul Spark, <link>află mai multe aici</link>",
-    "explainerStep2": "Transferăm fondurile tale în noul tău cont non-custodial, iar contul actual va fi șters",
-    "explainerStep3": "Continuă să folosești Blink ca de obicei",
+    "explainerCheck1": "Vei crea un cont non-custodial pe protocolul Spark",
+    "explainerCheck2": "Transferăm fondurile tale în noul tău cont non-custodial; contul tău actual și toate datele sale, inclusiv istoricul tranzacțiilor, vor fi șterse",
+    "explainerCheck3": "Blink POS, Blink API, butonul de donații Blink și orice alt serviciu care depinde de contul custodial nu vor mai fi disponibile",
+    "explainerCheck4": "Din contul tău se va deduce un comision de depozit Spark de {feePercent: number}%",
     "letsMove": "Hai să mergem",
     "transferringFunds": "Se transferă fondurile tale. Ar trebui să fie gata în câteva secunde."
   },

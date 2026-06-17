@@ -3551,9 +3551,10 @@
     "AccountMigration": {
         "moveToNonCustodial": "Passa a non-custodial",
         "explainerTitle": "Cosa significa passare a non-custodial?",
-        "explainerStep1": "Creerai un account non-custodial sul protocollo Spark, <link>scopri di più qui</link>",
-        "explainerStep2": "Trasferiamo i tuoi fondi nel tuo nuovo account non-custodial e il tuo account attuale verrà eliminato",
-        "explainerStep3": "Continua a usare Blink come al solito",
+        "explainerCheck1": "Creerai un account non-custodial sul protocollo Spark",
+        "explainerCheck2": "Trasferiamo i tuoi fondi nel tuo nuovo account non-custodial; il tuo account attuale e tutti i suoi dati, inclusa la cronologia delle transazioni, verranno eliminati",
+        "explainerCheck3": "Blink POS, Blink API, il pulsante di donazione Blink e qualsiasi altro servizio che si basa sull'account custodial non saranno più disponibili",
+        "explainerCheck4": "Dal tuo account verrà detratta una commissione di deposito Spark dello {feePercent: number}%",
         "letsMove": "Andiamo",
         "transferringFunds": "Trasferimento dei tuoi fondi in corso. Dovrebbe completarsi in pochi secondi."
     },

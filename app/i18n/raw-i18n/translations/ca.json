@@ -3551,9 +3551,10 @@
   "AccountMigration": {
     "moveToNonCustodial": "Passa a no custodial",
     "explainerTitle": "Què significa passar a no custodial?",
-    "explainerStep1": "Crearàs un compte no custodial al protocol Spark, <link>més informació aquí</link>",
-    "explainerStep2": "Transferirem els teus fons al teu nou compte no custodial i el teu compte actual serà eliminat",
-    "explainerStep3": "Continua fent servir Blink com sempre",
+    "explainerCheck1": "Crearàs un compte no custodial al protocol Spark",
+    "explainerCheck2": "Transferirem els teus fons al teu nou compte no custodial; el teu compte actual i totes les seves dades, inclòs l'historial de transaccions, s'eliminaran",
+    "explainerCheck3": "Blink POS, Blink API, el botó de donació de Blink i qualsevol altre servei que depengui del compte custodial deixaran d'estar disponibles",
+    "explainerCheck4": "Es descomptarà del teu compte una comissió de dipòsit de Spark del {feePercent: number}%",
     "letsMove": "Anem-hi",
     "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons."
   },

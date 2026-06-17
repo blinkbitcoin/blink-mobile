@@ -3551,9 +3551,10 @@
   "AccountMigration": {
     "moveToNonCustodial": "Μετάβαση σε non-custodial",
     "explainerTitle": "Τι σημαίνει η μετάβαση σε non-custodial;",
-    "explainerStep1": "Θα δημιουργήσετε έναν non-custodial λογαριασμό στο πρωτόκολλο Spark, <link>μάθετε περισσότερα εδώ</link>",
-    "explainerStep2": "Θα μεταφέρουμε τα κεφάλαιά σας στον νέο σας non-custodial λογαριασμό και ο τρέχων λογαριασμός σας θα διαγραφεί",
-    "explainerStep3": "Συνεχίστε να χρησιμοποιείτε το Blink κανονικά",
+    "explainerCheck1": "Θα δημιουργήσετε έναν non-custodial λογαριασμό στο πρωτόκολλο Spark",
+    "explainerCheck2": "Θα μεταφέρουμε τα κεφάλαιά σας στον νέο σας non-custodial λογαριασμό· ο τρέχων λογαριασμός σας και όλα τα δεδομένα του, συμπεριλαμβανομένου του ιστορικού συναλλαγών, θα διαγραφούν",
+    "explainerCheck3": "Το Blink POS, το Blink API, το κουμπί δωρεών Blink και κάθε άλλη υπηρεσία που βασίζεται στον custodial λογαριασμό δεν θα είναι διαθέσιμα",
+    "explainerCheck4": "Από τον λογαριασμό σας θα αφαιρεθεί τέλος κατάθεσης Spark {feePercent: number}%",
     "letsMove": "Πάμε",
     "transferringFunds": "Μεταφορά των κεφαλαίων σας. Θα ολοκληρωθεί σε λίγα δευτερόλεπτα."
   },

@@ -3551,9 +3551,10 @@
   "AccountMigration": {
     "moveToNonCustodial": "ย้ายไปแบบ non-custodial",
     "explainerTitle": "การย้ายไปแบบ non-custodial หมายความว่าอย่างไร?",
-    "explainerStep1": "คุณจะสร้างบัญชีแบบ non-custodial บนโปรโตคอล Spark <link>เรียนรู้เพิ่มเติมที่นี่</link>",
-    "explainerStep2": "เราจะโอนเงินของคุณไปยังบัญชี non-custodial ใหม่และบัญชีปัจจุบันของคุณจะถูกลบ",
-    "explainerStep3": "ใช้ Blink ต่อไปได้ตามปกติ",
+    "explainerCheck1": "คุณจะสร้างบัญชีแบบ non-custodial บนโปรโตคอล Spark",
+    "explainerCheck2": "เราจะโอนเงินของคุณไปยังบัญชี non-custodial ใหม่ บัญชีปัจจุบันของคุณและข้อมูลทั้งหมดรวมถึงประวัติธุรกรรมจะถูกลบ",
+    "explainerCheck3": "Blink POS, Blink API, ปุ่มบริจาค Blink และบริการอื่นใดที่อาศัยบัญชี custodial จะไม่สามารถใช้งานได้",
+    "explainerCheck4": "บัญชีของคุณจะถูกหักค่าธรรมเนียมการฝาก Spark {feePercent: number}%",
     "letsMove": "ไปกันเลย",
     "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที"
   },
