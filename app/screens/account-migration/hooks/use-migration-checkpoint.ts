@@ -16,6 +16,7 @@ export { MigrationCheckpoint }
 
 export const useMigrationCheckpoint = () => {
   const [checkpoint, setCheckpoint] = useState<MigrationCheckpoint | null>(null)
+  const [accountId, setAccountId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const mountedRef = useRef(true)
 
@@ -33,7 +34,10 @@ export const useMigrationCheckpoint = () => {
     loadCheckpoint(storageKey)
       .then((stored) => {
         if (!mountedRef.current) return
-        if (stored) setCheckpoint(stored.step)
+        if (stored) {
+          setCheckpoint(stored.step)
+          setAccountId(stored.accountId ?? null)
+        }
         setLoading(false)
       })
       .catch((err) => {
@@ -48,24 +52,36 @@ export const useMigrationCheckpoint = () => {
   }, [storageKey])
 
   const saveCheckpoint = useCallback(
-    (step: MigrationCheckpoint) => {
+    (step: MigrationCheckpoint, provisionedAccountId?: string) => {
       setCheckpoint(step)
-      saveCheckpointToStorage(storageKey, step).catch((err) => {
-        reportError("Checkpoint save", err)
-      })
+      if (provisionedAccountId) setAccountId(provisionedAccountId)
+      return saveCheckpointToStorage(storageKey, step, provisionedAccountId).catch(
+        (err) => {
+          reportError("Checkpoint save", err)
+        },
+      )
     },
     [storageKey],
   )
 
   const clearCheckpoint = useCallback(() => {
     setCheckpoint(null)
+    setAccountId(null)
     clearCheckpointFromStorage(storageKey).catch(() => {})
   }, [storageKey])
 
+  // Without a provisioned account, resume from the explainer so it gets provisioned.
   const getRouteForCheckpoint = useCallback(
-    () => resolveCheckpointRoute(checkpoint),
-    [checkpoint],
+    () => resolveCheckpointRoute(accountId ? checkpoint : null),
+    [checkpoint, accountId],
   )
 
-  return { checkpoint, loading, saveCheckpoint, clearCheckpoint, getRouteForCheckpoint }
+  return {
+    checkpoint,
+    accountId,
+    loading,
+    saveCheckpoint,
+    clearCheckpoint,
+    getRouteForCheckpoint,
+  }
 }

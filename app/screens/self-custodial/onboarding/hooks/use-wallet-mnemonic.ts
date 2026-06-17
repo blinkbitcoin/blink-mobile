@@ -2,27 +2,31 @@ import { useEffect, useState } from "react"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks/use-migration-checkpoint"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 export const useWalletMnemonic = (): string => {
   const [mnemonic, setMnemonic] = useState("")
   const { isSelfCustodial } = useActiveWallet()
   const { activeAccount } = useAccountRegistry()
-  const activeSelfCustodialAccountId = (isSelfCustodial && activeAccount?.id) || null
+  const { accountId: migrationAccountId } = useMigrationCheckpoint()
+
+  // Mid-migration the active account is still custodial, so read the provisioned account.
+  const targetAccountId = isSelfCustodial ? activeAccount?.id ?? null : migrationAccountId
 
   useEffect(() => {
-    if (!activeSelfCustodialAccountId) {
+    if (!targetAccountId) {
       setMnemonic("")
       return
     }
     let mounted = true
-    KeyStoreWrapper.getMnemonicForAccount(activeSelfCustodialAccountId).then((stored) => {
+    KeyStoreWrapper.getMnemonicForAccount(targetAccountId).then((stored) => {
       if (mounted && stored) setMnemonic(stored)
     })
     return () => {
       mounted = false
     }
-  }, [activeSelfCustodialAccountId])
+  }, [targetAccountId])
 
   return mnemonic
 }

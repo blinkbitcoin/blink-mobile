@@ -85,7 +85,39 @@ describe("useMigrationCheckpoint", () => {
     expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
       "migrationCheckpoint_main",
       MigrationCheckpoint.BackupMethod,
+      undefined,
     )
+  })
+
+  it("persists and exposes the provisioned account id", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod, "sc-account-1")
+    })
+
+    expect(result.current.accountId).toBe("sc-account-1")
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
+      "migrationCheckpoint_main",
+      MigrationCheckpoint.BackupMethod,
+      "sc-account-1",
+    )
+  })
+
+  it("loads the provisioned account id from storage", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupAlerts,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.accountId).toBe("sc-account-2")
   })
 
   it("reports the error and finishes loading when loadCheckpoint rejects", async () => {
@@ -141,7 +173,21 @@ describe("useMigrationCheckpoint", () => {
     expect(result.current.getRouteForCheckpoint()).toBe("accountMigrationExplainer")
   })
 
-  it("returns correct route for checkpoint", async () => {
+  it("returns correct route for a provisioned checkpoint", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.getRouteForCheckpoint()).toBe("selfCustodialBackupMethod")
+  })
+
+  it("resumes from the explainer when the checkpoint has no provisioned account", async () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.BackupMethod,
       savedAt: Date.now(),
@@ -151,7 +197,7 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.getRouteForCheckpoint()).toBe("selfCustodialBackupMethod")
+    expect(result.current.getRouteForCheckpoint()).toBe("accountMigrationExplainer")
   })
 
   it("resumes from checkpoint after unmount and remount", async () => {
@@ -169,6 +215,7 @@ describe("useMigrationCheckpoint", () => {
     expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
       "migrationCheckpoint_main",
       MigrationCheckpoint.BackupAlerts,
+      undefined,
     )
 
     unmount()
@@ -176,6 +223,7 @@ describe("useMigrationCheckpoint", () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.BackupAlerts,
       savedAt: Date.now(),
+      accountId: "sc-account-1",
     })
 
     const { result: result2 } = renderHook(() => useMigrationCheckpoint())

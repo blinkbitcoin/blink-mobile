@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useCallback, useState } from "react"
 import { View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -12,6 +12,7 @@ import { RevealedCheckboxList } from "@app/components/revealed-checkbox-list"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useMigrationAccount } from "@app/screens/account-migration/hooks"
 import { testProps } from "@app/utils/testProps"
 
 export const MigrationExplainerScreen: React.FC = () => {
@@ -22,8 +23,10 @@ export const MigrationExplainerScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { sparkDepositFeePercent } = useRemoteConfig()
+  const { ensureAccount, loading: checkpointLoading } = useMigrationAccount()
 
   const [allChecked, setAllChecked] = useState(false)
+  const [provisioning, setProvisioning] = useState(false)
 
   const checkLabels = [
     LL.AccountMigration.explainerCheck1(),
@@ -31,6 +34,13 @@ export const MigrationExplainerScreen: React.FC = () => {
     LL.AccountMigration.explainerCheck3(),
     LL.AccountMigration.explainerCheck4({ feePercent: sparkDepositFeePercent }),
   ]
+
+  const handleMove = useCallback(async () => {
+    setProvisioning(true)
+    const provisionedAccountId = await ensureAccount()
+    setProvisioning(false)
+    if (provisionedAccountId) navigation.navigate("selfCustodialBackupMethod")
+  }, [ensureAccount, navigation])
 
   return (
     <Screen preset="fixed">
@@ -51,8 +61,9 @@ export const MigrationExplainerScreen: React.FC = () => {
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
             title={LL.AccountMigration.letsMove()}
-            disabled={!allChecked}
-            onPress={() => navigation.navigate("selfCustodialBackupMethod")}
+            disabled={!allChecked || provisioning || checkpointLoading}
+            loading={provisioning}
+            onPress={handleMove}
             {...testProps("migration-explainer-cta")}
           />
         </View>

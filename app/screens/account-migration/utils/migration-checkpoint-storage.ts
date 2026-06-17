@@ -12,6 +12,7 @@ export enum MigrationCheckpoint {
 type StoredCheckpoint = {
   step: MigrationCheckpoint
   savedAt: number
+  accountId?: string
 }
 
 type ResumeRoute =
@@ -43,12 +44,13 @@ export const isExpired = (
 export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null => {
   if (!raw || typeof raw !== "object") return null
 
-  const { step, savedAt } = raw as StoredCheckpoint
+  const { step, savedAt, accountId } = raw as StoredCheckpoint
 
   if (!Object.values(MigrationCheckpoint).includes(step)) return null
   if (typeof savedAt !== "number") return null
+  if (accountId !== undefined && typeof accountId !== "string") return null
 
-  return { step, savedAt }
+  return { step, savedAt, accountId }
 }
 
 export const resolveCheckpointRoute = (
@@ -87,8 +89,15 @@ export const loadCheckpoint = async (
 export const saveCheckpointToStorage = async (
   storageKey: string,
   step: MigrationCheckpoint,
+  accountId?: string,
 ): Promise<void> => {
-  await saveJson(storageKey, { step, savedAt: Date.now() })
+  // Preserve the provisioned accountId across step updates for resume.
+  const existing = validateStoredCheckpoint(await loadJson(storageKey).catch(() => null))
+  await saveJson(storageKey, {
+    step,
+    savedAt: Date.now(),
+    accountId: accountId ?? existing?.accountId,
+  })
 }
 
 export const clearCheckpointFromStorage = async (storageKey: string): Promise<void> => {

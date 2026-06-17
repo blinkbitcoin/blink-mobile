@@ -187,6 +187,7 @@ describe("migration-checkpoint-storage", () => {
 
   describe("saveCheckpointToStorage", () => {
     it("persists step and timestamp", async () => {
+      mockLoadJson.mockResolvedValue(null)
       const before = Date.now()
       await saveCheckpointToStorage("test-key", MigrationCheckpoint.BackupAlerts)
 
@@ -198,6 +199,33 @@ describe("migration-checkpoint-storage", () => {
       const savedAt = mockSaveJson.mock.calls[0][1].savedAt
       expect(savedAt).toBeGreaterThanOrEqual(before)
       expect(savedAt).toBeLessThanOrEqual(Date.now())
+    })
+
+    it("stores the provided account id", async () => {
+      mockLoadJson.mockResolvedValue(null)
+      await saveCheckpointToStorage("test-key", MigrationCheckpoint.BackupMethod, "sc-1")
+
+      expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
+        step: MigrationCheckpoint.BackupMethod,
+        savedAt: expect.any(Number),
+        accountId: "sc-1",
+      })
+    })
+
+    it("preserves an existing account id across step updates", async () => {
+      mockLoadJson.mockResolvedValue({
+        step: MigrationCheckpoint.BackupMethod,
+        savedAt: Date.now(),
+        accountId: "sc-1",
+      })
+
+      await saveCheckpointToStorage("test-key", MigrationCheckpoint.BackupAlerts)
+
+      expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
+        step: MigrationCheckpoint.BackupAlerts,
+        savedAt: expect.any(Number),
+        accountId: "sc-1",
+      })
     })
   })
 

@@ -1,1 +1,3 @@
 export { useMigrationCheckpoint, MigrationCheckpoint } from "./use-migration-checkpoint"
+export { useMigrationAccount } from "./use-migration-account"
+export { useCompleteMigration } from "./use-complete-migration"

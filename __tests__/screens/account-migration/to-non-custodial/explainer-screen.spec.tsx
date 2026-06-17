@@ -1,11 +1,12 @@
 import React from "react"
-import { render, screen, fireEvent } from "@testing-library/react-native"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationExplainerScreen } from "@app/screens/account-migration/to-non-custodial/explainer-screen"
 import { ContextForScreen } from "../../helper"
+import { flushEffects } from "../../../helpers/flush-effects"
 
 loadLocale("en")
 const LL = i18nObject("en")
@@ -29,6 +30,11 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({ sparkDepositFeePercent: FEE_PERCENT }),
 }))
 
+const mockEnsureAccount = jest.fn()
+jest.mock("@app/screens/account-migration/hooks", () => ({
+  useMigrationAccount: () => ({ ensureAccount: mockEnsureAccount, loading: false }),
+}))
+
 const renderScreen = () =>
   render(
     <ContextForScreen>
@@ -39,17 +45,20 @@ const renderScreen = () =>
 describe("MigrationExplainerScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockEnsureAccount.mockResolvedValue("sc-account-1")
     loadLocale("en")
   })
 
-  it("renders the explainer title", () => {
+  it("renders the explainer title", async () => {
     renderScreen()
+    await flushEffects()
 
     expect(screen.getByText(LL.AccountMigration.explainerTitle())).toBeTruthy()
   })
 
-  it("reveals only the first checkbox initially and the rest as each is checked", () => {
+  it("reveals only the first checkbox initially and the rest as each is checked", async () => {
     renderScreen()
+    await flushEffects()
 
     expect(screen.getAllByRole("checkbox")).toHaveLength(1)
     expect(screen.getByText(LL.AccountMigration.explainerCheck1())).toBeTruthy()
@@ -64,22 +73,43 @@ describe("MigrationExplainerScreen", () => {
     expect(screen.getAllByRole("checkbox")).toHaveLength(4)
   })
 
-  it("keeps Let's move inert until every checkbox is accepted, then navigates", () => {
-    renderScreen()
-
-    const cta = screen.getByText(LL.AccountMigration.letsMove())
-
-    fireEvent.press(cta)
-    expect(mockNavigate).not.toHaveBeenCalled()
-
+  const acceptAllChecks = () => {
     fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck1()))
     fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck2()))
     fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck3()))
     fireEvent.press(
       screen.getByText(LL.AccountMigration.explainerCheck4({ feePercent: FEE_PERCENT })),
     )
+  }
+
+  it("keeps Let's move inert until every checkbox is accepted, then provisions and navigates", async () => {
+    renderScreen()
+    await flushEffects()
+
+    const cta = screen.getByText(LL.AccountMigration.letsMove())
 
     fireEvent.press(cta)
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
+    expect(mockEnsureAccount).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+
+    acceptAllChecks()
+    fireEvent.press(cta)
+
+    await waitFor(() =>
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod"),
+    )
+    expect(mockEnsureAccount).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not navigate when account provisioning fails", async () => {
+    mockEnsureAccount.mockResolvedValue(null)
+    renderScreen()
+    await flushEffects()
+
+    acceptAllChecks()
+    fireEvent.press(screen.getByText(LL.AccountMigration.letsMove()))
+
+    await waitFor(() => expect(mockEnsureAccount).toHaveBeenCalled())
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 })
