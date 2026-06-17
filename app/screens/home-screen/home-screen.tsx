@@ -252,8 +252,10 @@ export const HomeScreen: React.FC = () => {
     variables: { first: 1 },
   })
 
+  // not loaded yet: no wallets while not ready (a loaded account keeps its balance
+  // when a refresh goes offline, and a ready empty account shows zero, not a skeleton)
   const queryLoading = isSelfCustodial
-    ? activeWallet.status === "loading"
+    ? !activeWallet.isReady && activeWallet.wallets.length === 0
     : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const { username, phone } = currentUser?.me ?? {}

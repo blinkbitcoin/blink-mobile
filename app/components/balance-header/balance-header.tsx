@@ -83,6 +83,7 @@ export const BalanceHeader: React.FC<Props> = ({
               <Loader />
             ) : (
               <Text
+                {...testProps("balance-value")}
                 style={styles.primaryBalanceText}
                 allowFontScaling
                 adjustsFontSizeToFit
