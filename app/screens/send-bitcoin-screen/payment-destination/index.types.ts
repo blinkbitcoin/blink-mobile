@@ -61,6 +61,11 @@ export type ReceiveDestination = {
   destinationDirection: typeof DestinationDirection.Receive
 }
 
+export const isSendDestination = (
+  result: ParseDestinationResult,
+): result is PaymentDestination =>
+  result.valid && result.destinationDirection === DestinationDirection.Send
+
 export type InvalidDestination = {
   valid: false
   invalidPaymentDestination: ParsedPaymentDestination

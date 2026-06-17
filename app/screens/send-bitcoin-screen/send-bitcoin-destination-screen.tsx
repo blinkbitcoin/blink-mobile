@@ -350,6 +350,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           accountDefaultWalletQuery,
         },
         sdk,
+        lnAddressHostname,
       )
       logParseDestinationResult(wrappedDestination)
 
@@ -452,6 +453,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       contacts,
       parseValidPhone,
       sdk,
+      lnAddressHostname,
     ],
   )
 
