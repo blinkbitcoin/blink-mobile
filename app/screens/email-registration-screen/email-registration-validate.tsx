@@ -106,7 +106,7 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
         onboardingNavigate()
         return
       }
-      navigation.navigate("settings")
+      navigation.popTo("settings")
     }, SUCCESS_DELAY)
 
     return () => clearTimeout(t)

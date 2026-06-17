@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react-hooks"
 import axios from "axios"
 
-import useDeviceLocation from "@app/hooks/use-device-location"
+import useDeviceLocation, { useIpCountryCode } from "@app/hooks/use-device-location"
 
 const mockLogError = jest.fn()
 const mockUpdateCountryCode = jest.fn()
@@ -62,6 +62,7 @@ describe("useDeviceLocation", () => {
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("DE")
     expect(result.current.detectionFailed).toBe(false)
+    expect(result.current.source).toBe("phone")
     expect(mockedAxios.get).not.toHaveBeenCalled()
   })
 
@@ -123,6 +124,7 @@ describe("useDeviceLocation", () => {
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("PL")
     expect(result.current.detectionFailed).toBe(false)
+    expect(result.current.source).toBe("ip")
     expect(mockedAxios.get).toHaveBeenCalled()
   })
 
@@ -253,6 +255,42 @@ describe("useDeviceLocation", () => {
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("SV")
     expect(result.current.detectionFailed).toBe(true)
+    expect(mockLogError).toHaveBeenCalled()
+  })
+})
+
+describe("useIpCountryCode", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("does not call ipapi while disabled", () => {
+    const { result } = renderHook(() => useIpCountryCode(false))
+
+    expect(mockedAxios.get).not.toHaveBeenCalled()
+    expect(result.current).toBeUndefined()
+  })
+
+  it("resolves the country from ipapi when enabled", async () => {
+    // eslint-disable-next-line camelcase
+    mockedAxios.get.mockResolvedValue({ data: { country_code: "HK" } })
+
+    const { result } = renderHook(() => useIpCountryCode(true))
+
+    await act(async () => {})
+
+    expect(mockedAxios.get).toHaveBeenCalled()
+    expect(result.current).toBe("HK")
+  })
+
+  it("stays undefined when ipapi fails", async () => {
+    mockedAxios.get.mockRejectedValue(new Error("403 Forbidden"))
+
+    const { result } = renderHook(() => useIpCountryCode(true))
+
+    await act(async () => {})
+
+    expect(result.current).toBeUndefined()
     expect(mockLogError).toHaveBeenCalled()
   })
 })
