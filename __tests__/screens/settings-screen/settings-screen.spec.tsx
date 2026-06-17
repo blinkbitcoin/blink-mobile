@@ -513,20 +513,17 @@ describe("Settings Screen", () => {
     expect(subtitleNode.props.ellipsizeMode).toBe("tail")
   })
 
-  it("does not render Move to non-custodial option until migration is complete", async () => {
+  it("renders the Move to non-custodial option for a custodial account", async () => {
     render(
       <ContextForScreen>
         <LoggedInWithUsername mock={mocksWithUsername} />
       </ContextForScreen>,
     )
 
-    // flush pending effects/microtasks, then assert on the settled output
-    await act(async () => {})
-
-    // TODO: re-enable once the custodial → non-custodial migration is complete
-    expect(screen.queryByText("Move to non-custodial")).toBeNull()
-
+    // let the migration-checkpoint load settle so the row leaves its skeleton state
     await flushEffects()
+
+    expect(screen.getByText("Move to non-custodial")).toBeTruthy()
   })
 
   it("does not render a standalone Recovery method group", async () => {
