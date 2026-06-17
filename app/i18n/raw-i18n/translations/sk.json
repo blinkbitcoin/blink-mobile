@@ -2399,7 +2399,7 @@
     "dangerZone": "Nebezpečná zóna",
     "phoneDeletedSuccessfully": "Telefón bol úspešne odstránený",
     "phoneNumber": "Telefónne číslo",
-    "tapToAddPhoneNumber": "Klepnutím pridáte telefónne číslo",
+    "tapToAddPhoneNumber": "Pridať telefónne číslo",
     "loginMethods": "Metódy prihlásenia",
     "level": "Úroveň {level: string}",
     "switchAccount": "Prepnúť účet",

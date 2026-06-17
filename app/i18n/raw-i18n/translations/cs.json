@@ -2321,7 +2321,7 @@
   "SettingsScreen": {
     "staticQr": "Tisknutelný statický QR",
     "staticQrCopied": "Odkaz na váš statický QR kód byl zkopírován",
-    "setByOs": "Nastaveno operačním systémem",
+    "setByOs": "Systémové nastavení",
     "apiAcess": "Integrace API",
     "apiDocumentation": "Dokumentace API",
     "apiDashboard": "Přístup k API a nástěnka",
@@ -2399,7 +2399,7 @@
     "dangerZone": "Nebezpečná zóna",
     "phoneDeletedSuccessfully": "Telefonní číslo úspěšně odstraněno",
     "phoneNumber": "Telefonní číslo",
-    "tapToAddPhoneNumber": "Klepněte pro přidání telefonního čísla",
+    "tapToAddPhoneNumber": "Přidat telefonní číslo",
     "loginMethods": "Metody přihlášení",
     "level": "Úroveň {level: string}",
     "switchAccount": "Přepnout účet",
