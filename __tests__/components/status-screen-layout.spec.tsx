@@ -5,12 +5,18 @@ import { render, screen } from "@testing-library/react-native"
 import { StatusScreenLayout } from "@app/components/status-screen-layout"
 import { ContextForScreen } from "../screens/helper"
 
+const mockGaloyIcon = jest.fn()
 jest.mock("@app/components/atomic/galoy-icon", () => ({
-  GaloyIcon: ({ name }: { name: string }) => {
+  GaloyIcon: (props: { name: string; color?: string }) => {
+    mockGaloyIcon(props)
     const { Text } = jest.requireActual("react-native")
-    return <Text testID="galoy-icon">{name}</Text>
+    return <Text testID="galoy-icon">{props.name}</Text>
   },
 }))
+
+beforeEach(() => {
+  mockGaloyIcon.mockClear()
+})
 
 describe("StatusScreenLayout", () => {
   it("renders icon and children", () => {
@@ -52,5 +58,19 @@ describe("StatusScreenLayout", () => {
     )
 
     expect(screen.getByText("Footer")).toBeTruthy()
+  })
+
+  it("forwards iconColor to the icon", () => {
+    render(
+      <ContextForScreen>
+        <StatusScreenLayout icon="clock" iconColor="#F59E0B">
+          <Text>Content</Text>
+        </StatusScreenLayout>
+      </ContextForScreen>,
+    )
+
+    expect(mockGaloyIcon).toHaveBeenCalledWith(
+      expect.objectContaining({ color: "#F59E0B" }),
+    )
   })
 })

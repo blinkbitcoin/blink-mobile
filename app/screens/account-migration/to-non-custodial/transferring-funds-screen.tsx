@@ -37,7 +37,11 @@ export const TransferringFundsScreen: React.FC = () => {
 
   return (
     <Screen preset="fixed">
-      <StatusScreenLayout icon="clock" iconBackgroundColor={colors._warningLight}>
+      <StatusScreenLayout
+        icon="clock"
+        iconColor={colors.warning}
+        iconBackgroundColor={colors._warningLight}
+      >
         <Text style={styles.message}>{LL.AccountMigration.transferringFunds()}</Text>
       </StatusScreenLayout>
     </Screen>
