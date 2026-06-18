@@ -25,7 +25,7 @@ const sameDay = (d1: number, d2: number | Date): boolean => {
   )
 }
 
-const formatDateByMonthYear = (locale: string, date: number | Date): string => {
+export const formatDateByMonthYear = (locale: string, date: number | Date): string => {
   const parsedDate = typeof date === "number" ? new Date(1000 * date) : new Date(date)
   return parsedDate.toLocaleString(locale, { month: "long", year: "numeric" }) // e.g., "November 2023"
 }

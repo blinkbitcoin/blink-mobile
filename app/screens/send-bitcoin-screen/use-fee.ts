@@ -11,7 +11,9 @@ import {
   useOnChainUsdTxFeeAsBtcDenominatedLazyQuery,
   useOnChainUsdTxFeeLazyQuery,
 } from "@app/graphql/generated"
+import type { SelfCustodialFeeResult } from "@app/self-custodial/payment-details/send-helpers"
 import { WalletAmount } from "@app/types/amounts"
+import { ConvertAmountAdjustment } from "@app/types/payment"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { GetFee } from "./payment-details/index.types"
@@ -24,6 +26,7 @@ type FeeType =
   | {
       amount: WalletAmount<WalletCurrency>
       status: "set"
+      amountAdjustment?: ConvertAmountAdjustment
     }
   | {
       amount?: WalletAmount<WalletCurrency>
@@ -143,9 +146,11 @@ const useFee = <T extends WalletCurrency>(getFeeFn?: GetFee<T> | null): FeeType 
           })
         }
 
+        const { amountAdjustment } = feeResponse as SelfCustodialFeeResult<T>
         return setFee({
           status: "set",
           amount: feeResponse.amount,
+          amountAdjustment,
         })
       } catch (err) {
         if (err instanceof Error) {

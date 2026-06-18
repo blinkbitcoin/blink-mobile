@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react"
 import { View, TextInput, Keyboard, Modal } from "react-native"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
 
@@ -57,7 +57,7 @@ export const SetLightningAddressScreen: React.FC<{
   } = useTheme()
   const { LL } = useI18nContext()
   const styles = useStyles()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const [error, setError] = useState<SetUsernameError | undefined>()
   const [username, setUsername] = useState("")

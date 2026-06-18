@@ -9,7 +9,7 @@ import { it } from "@jest/globals"
 import { fireEvent, render, waitFor, act } from "@testing-library/react-native"
 import { MockedProvider, MockedResponse } from "@apollo/client/testing"
 import { NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { ConversionDetailsScreen } from "@app/screens/conversion-flow/conversion-details-screen"
@@ -17,15 +17,40 @@ import {
   WalletCurrency,
   ConversionScreenDocument,
   RealtimePriceDocument,
+  RealtimePriceUnauthedDocument,
   DisplayCurrencyDocument,
   CurrencyListDocument,
 } from "@app/graphql/generated"
 import { APPROXIMATE_PREFIX } from "@app/config"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import TypesafeI18n from "@app/i18n/i18n-react"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
 import { createCache } from "@app/graphql/cache"
 import { DisplayCurrency as DisplayCurrencyType } from "@app/types/amounts"
+
+jest.mock("@app/store/persistent-state", () => ({
+  ...jest.requireActual("@app/store/persistent-state"),
+  usePersistentStateContext: () => ({
+    persistentState: {
+      schemaVersion: 12,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "",
+    },
+    updateState: jest.fn(),
+    resetState: jest.fn(),
+  }),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    accounts: [],
+    activeAccount: undefined,
+    selfCustodialEntries: [],
+    setActiveAccountId: jest.fn(),
+    reloadSelfCustodialAccounts: jest.fn(),
+  }),
+}))
 
 const mockNavigate = jest.fn()
 const originalConsoleError = console.error
@@ -35,8 +60,51 @@ jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     navigate: mockNavigate,
+    addListener: jest.fn(() => jest.fn()),
   }),
 }))
+
+const mockUseActiveWallet = jest.fn()
+const mockUseNonCustodialConversionLimits = jest.fn()
+
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => mockUseActiveWallet(),
+}))
+
+jest.mock("@app/hooks/use-device-location", () => ({
+  __esModule: true,
+  default: () => ({ countryCode: "SV", loading: false }),
+}))
+
+jest.mock("@app/self-custodial/hooks", () => ({
+  useNonCustodialConversionLimits: (...args: unknown[]) =>
+    mockUseNonCustodialConversionLimits(...args),
+  usePaymentRequest: jest.fn(),
+}))
+
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => ({
+    wallets: [],
+    status: "Unavailable",
+    accountType: "SelfCustodial",
+    retry: () => {},
+    sdk: null,
+    isStableBalanceActive: false,
+    lastReceivedPaymentId: null,
+    hasMoreTransactions: false,
+    loadingMore: false,
+    loadMore: async () => {},
+    refreshWallets: async () => {},
+  }),
+}))
+
+const mockUseSelfCustodialConversionGuard = jest.fn()
+jest.mock(
+  "@app/screens/conversion-flow/hooks/self-custodial/use-conversion-guard",
+  () => ({
+    useSelfCustodialConversionGuard: () => mockUseSelfCustodialConversionGuard(),
+  }),
+)
 
 type CurrencyPillProps = {
   currency?: WalletCurrency | "ALL"
@@ -60,7 +128,7 @@ jest.mock("@app/components/atomic/currency-pill/use-equal-pill-width", () => ({
   }),
 }))
 
-const Stack = createStackNavigator()
+const Stack = createNativeStackNavigator()
 
 const BTC_SAT_PRICE_BASE = 2200000000
 const BTC_SAT_PRICE_OFFSET = 12
@@ -245,17 +313,28 @@ const createGraphQLMocks = (options: MockOptions): MockedResponse[] => {
     },
   }
 
+  const realtimePriceUnauthedMock = {
+    request: {
+      query: RealtimePriceUnauthedDocument,
+      variables: { currency: "USD" },
+    },
+    result: { data: { __typename: "Query", realtimePrice: null } },
+  }
+
   return [
     conversionScreenMock,
     realtimePriceMock,
+    realtimePriceUnauthedMock,
     displayCurrencyMock,
     currencyListMock,
     conversionScreenMock,
     realtimePriceMock,
+    realtimePriceUnauthedMock,
     displayCurrencyMock,
     currencyListMock,
     conversionScreenMock,
     realtimePriceMock,
+    realtimePriceUnauthedMock,
     displayCurrencyMock,
     currencyListMock,
   ]
@@ -270,6 +349,13 @@ const createEmptyMocks = (): MockedResponse[] => {
     {
       request: { query: RealtimePriceDocument },
       result: { data: { __typename: "Query", me: null } },
+    },
+    {
+      request: {
+        query: RealtimePriceUnauthedDocument,
+        variables: { currency: "USD" },
+      },
+      result: { data: { __typename: "Query", realtimePrice: null } },
     },
     {
       request: { query: DisplayCurrencyDocument },
@@ -290,7 +376,7 @@ const createTestWrapper = (mocks: MockedResponse[]) => {
   const TestWrapper: React.FC<TestWrapperProps> = ({ children }) => (
     <ThemeProvider theme={theme}>
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Test">
             {() => (
               <MockedProvider mocks={mocks} cache={createCache()} addTypename={true}>
@@ -528,8 +614,28 @@ afterAll(() => {
   consoleErrorSpy = null
 })
 
+const defaultActiveWallet = {
+  isSelfCustodial: false,
+  isReady: false,
+  needsBackendAuth: true,
+  wallets: [],
+  status: "Unavailable",
+  accountType: "Custodial",
+}
+
+const defaultLimits = { limits: null, loading: false, error: null }
+
+loadLocale("en")
+
 beforeEach(() => {
   jest.clearAllMocks()
+  mockUseActiveWallet.mockReturnValue(defaultActiveWallet)
+  mockUseNonCustodialConversionLimits.mockReturnValue(defaultLimits)
+  mockUseSelfCustodialConversionGuard.mockReturnValue({
+    isQuoting: false,
+    hasQuoteError: false,
+    blockingReason: null,
+  })
 })
 
 describe("Initial render with both wallets having balance", () => {
@@ -1643,6 +1749,20 @@ describe("Comprehensive conversion scenarios", () => {
       actions: [{ type: "typeDigits", field: "from", digits: ["4", "5", "4", "5", "5"] }],
       expectNextEnabled: true,
     },
+
+    {
+      name: "65. Enter -> toggle -> percent 25 -> validate (USD is the from wallet)",
+      options: { btcBalance: 100000, usdBalance: 50000 },
+      actions: [{ type: "toggle" }, { type: "percent", value: 25 }],
+    },
+    {
+      name: "66. Enter -> percent 25 -> percent 100 -> validate consecutive presses",
+      options: { btcBalance: 100000, usdBalance: 50000 },
+      actions: [
+        { type: "percent", value: 25 },
+        { type: "percent", value: 100 },
+      ],
+    },
   ]
 
   beforeEach(() => {
@@ -1876,5 +1996,212 @@ describe("Conversion calculation verification", () => {
     const backToSats = calculateExpectedSatsFromUsd(expectedUsdCents)
     const tolerance = Math.abs(sats - backToSats) / sats
     expect(tolerance).toBeLessThan(0.11)
+  })
+})
+
+describe("Self-custodial conversion limits gating", () => {
+  const selfCustodialActiveWallet = {
+    isSelfCustodial: true,
+    isReady: true,
+    needsBackendAuth: false,
+    wallets: [
+      {
+        id: "self-custodial-btc-id",
+        walletCurrency: WalletCurrency.Btc,
+        balance: { amount: 200000, currency: WalletCurrency.Btc },
+        transactions: [],
+      },
+      {
+        id: "self-custodial-usd-id",
+        walletCurrency: WalletCurrency.Usd,
+        balance: { amount: 50000, currency: WalletCurrency.Usd },
+        transactions: [],
+      },
+    ],
+    status: "Ready",
+    accountType: "SelfCustodial",
+  }
+
+  const buildMocks = () => createGraphQLMocks({ btcBalance: 200000, usdBalance: 50000 })
+
+  it("disables Next and surfaces the unavailable message when limits fail to load", async () => {
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: new Error("limits load failed"),
+    })
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+    await waitFor(() => {
+      expect(getByTestId("amount-field-error").props.children).toContain(
+        "Conversion is temporarily unavailable",
+      )
+    })
+  })
+
+  it("keeps Next disabled while limits load successfully but amount is below the minimum", async () => {
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: { minFromAmount: 1_000_000, minToAmount: null },
+      loading: false,
+      error: null,
+    })
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+  })
+
+  it("disables Next when the conversion guard reports hasQuoteError", async () => {
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: { minFromAmount: 0, minToAmount: null },
+      loading: false,
+      error: null,
+    })
+    mockUseSelfCustodialConversionGuard.mockReturnValue({
+      isQuoting: false,
+      hasQuoteError: true,
+      blockingReason: null,
+    })
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+  })
+
+  it("disables Next during the self-custodial SDK boot window — accountType=SelfCustodial + isReady=false", async () => {
+    mockUseActiveWallet.mockReturnValue({
+      ...selfCustodialActiveWallet,
+      isReady: false,
+      status: "Unavailable",
+    })
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
+  })
+})
+
+describe("Self-custodial percentage chip happy-path", () => {
+  const selfCustodialActiveWallet = {
+    isSelfCustodial: true,
+    isReady: true,
+    needsBackendAuth: false,
+    wallets: [
+      {
+        id: "self-custodial-btc-id",
+        walletCurrency: WalletCurrency.Btc,
+        balance: { amount: 200000, currency: WalletCurrency.Btc },
+        transactions: [],
+      },
+      {
+        id: "self-custodial-usd-id",
+        walletCurrency: WalletCurrency.Usd,
+        balance: { amount: 50000, currency: WalletCurrency.Usd },
+        transactions: [],
+      },
+    ],
+    status: "Ready",
+    accountType: "SelfCustodial",
+  }
+
+  const buildMocks = () => createGraphQLMocks({ btcBalance: 200000, usdBalance: 50000 })
+
+  beforeEach(() => {
+    jest.useFakeTimers()
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: { minFromAmount: 0, minToAmount: null },
+      loading: false,
+      error: null,
+    })
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it("enables Next and carries the chip amount into nav params after a percent press", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("convert-25%")).toBeTruthy()
+    })
+
+    await act(async () => {
+      fireEvent.press(getByTestId("convert-25%"))
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(false)
+      },
+      { timeout: 3000 },
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("next-button"))
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "conversionConfirmation",
+      expect.objectContaining({
+        fromWalletCurrency: WalletCurrency.Btc,
+        moneyAmount: expect.objectContaining({
+          currency: expect.any(String),
+          amount: expect.any(Number),
+        }),
+      }),
+    )
   })
 })

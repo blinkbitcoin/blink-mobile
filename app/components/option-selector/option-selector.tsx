@@ -9,7 +9,6 @@ import { OptionIcon } from "./option-icon"
 export type Option = {
   label: string
   value: string
-  ionicon?: string
   icon?: IconNamesType
   active?: boolean
   recommended?: boolean
@@ -81,11 +80,7 @@ export const OptionSelector: React.FC<OptionSelectorProps> = ({
                   )}
                 </View>
 
-                <OptionIcon
-                  ionicon={option.ionicon}
-                  icon={option.icon}
-                  isSelected={isSelected}
-                />
+                <OptionIcon icon={option.icon} isSelected={isSelected} />
               </View>
             </TouchableOpacity>
           )

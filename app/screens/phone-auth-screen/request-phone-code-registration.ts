@@ -15,7 +15,7 @@ import { useAppConfig } from "@app/hooks"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 export const RequestPhoneCodeStatus = {
   LoadingCountryCode: "LoadingCountryCode",
@@ -94,7 +94,9 @@ export const useRequestPhoneCodeRegistration = (): UseRequestPhoneCodeReturn => 
   const [error, setError] = useState<ErrorType | undefined>()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "phoneRegistrationInitiate">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "phoneRegistrationInitiate">
+    >()
 
   const { data } = useSupportedCountriesQuery()
   const { countryCode: detectedCountryCode } = useDeviceLocation()

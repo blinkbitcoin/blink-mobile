@@ -6,6 +6,7 @@ import {
   useExportCsvSettingLazyQuery,
   useSettingsScreenQuery,
 } from "@app/graphql/generated"
+import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import crashlytics from "@react-native-firebase/crashlytics"
@@ -26,8 +27,9 @@ gql`
 
 export const ExportCsvSetting: React.FC = () => {
   const { LL } = useI18nContext()
+  const isAuthed = useIsAuthed()
 
-  const { data, loading } = useSettingsScreenQuery()
+  const { data, loading } = useSettingsScreenQuery({ skip: !isAuthed })
 
   const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
   const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
@@ -68,8 +70,8 @@ export const ExportCsvSetting: React.FC = () => {
       loading={loading}
       spinner={spinner}
       title={LL.common.csvExport()}
-      leftIcon="list-outline"
-      rightIcon={"download-outline"}
+      leftGaloyIcon="menu"
+      rightIcon={"download"}
       action={fetchCsvTransactions}
     />
   )

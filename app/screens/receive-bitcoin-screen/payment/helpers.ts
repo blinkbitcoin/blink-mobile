@@ -1,16 +1,11 @@
 import { Network } from "@app/graphql/generated"
+import { buildBitcoinUri } from "@app/utils/bitcoin-uri"
 import {
   decodeInvoiceString,
   Network as NetworkLibGaloy,
 } from "@blinkbitcoin/blink-client"
 
 import { Invoice, GetFullUriInput } from "./index.types"
-
-const prefixByType = {
-  [Invoice.OnChain]: "bitcoin:",
-  [Invoice.Lightning]: "lightning:",
-  [Invoice.PayCode]: "",
-}
 
 export const getPaymentRequestFullUri = ({
   input,
@@ -20,25 +15,18 @@ export const getPaymentRequestFullUri = ({
   prefix = true,
   type = Invoice.OnChain,
 }: GetFullUriInput): string => {
-  if (type === Invoice.Lightning) {
+  if (type === Invoice.Lightning || type === Invoice.PayCode) {
     return uppercase ? input.toUpperCase() : input
   }
 
-  const uriPrefix = prefix ? prefixByType[type] : ""
-  const uri = `${uriPrefix}${input}`
-  const params = new URLSearchParams()
-
-  if (amount) params.append("amount", `${satsToBTC(amount)}`)
-
-  if (memo) {
-    params.append("message", encodeURI(memo))
-    return `${uri}?${params.toString()}`
-  }
-
-  return uri + (params.toString() ? "?" + params.toString() : "")
+  return buildBitcoinUri({
+    address: input,
+    amountSats: amount,
+    memo,
+    uppercase,
+    prefix,
+  })
 }
-
-export const satsToBTC = (satsAmount: number): number => satsAmount / 10 ** 8
 
 export const getDefaultMemo = (bankName: string) => {
   return `Pay to ${bankName} Wallet user`
@@ -74,6 +62,20 @@ export const generateFutureLocalTime = (secondsToAdd: number): string => {
   const period = date.getHours() >= 12 ? "PM" : "AM" // Get AM/PM
 
   return `${hours}:${minutes}${period}`
+}
+
+type TruncateMiddleOptions = {
+  startChars?: number
+  endChars?: number
+  separator?: string
+}
+
+export const truncateMiddle = (
+  text: string,
+  { startChars = 10, endChars = 10, separator = "..." }: TruncateMiddleOptions = {},
+): string => {
+  if (!text || text.length <= startChars + endChars) return text ?? ""
+  return `${text.slice(0, startChars)}${separator}${text.slice(-endChars)}`
 }
 
 export const prToDateString = (paymentRequest: string, network: Network) => {

@@ -3,7 +3,6 @@ import { useCallback, useMemo } from "react"
 import { gql } from "@apollo/client"
 import { APPROXIMATE_PREFIX } from "@app/config"
 import { useCurrencyListQuery, WalletCurrency } from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
 import {
@@ -117,8 +116,7 @@ const displayCurrencyHasSignificantMinorUnits = ({
 
 export const useDisplayCurrency = () => {
   const { LL } = useI18nContext()
-  const isAuthed = useIsAuthed()
-  const { data: dataCurrencyList } = useCurrencyListQuery({ skip: !isAuthed })
+  const { data: dataCurrencyList } = useCurrencyListQuery()
   const { convertMoneyAmount, displayCurrency, toDisplayMoneyAmount } =
     usePriceConversion()
 
@@ -352,6 +350,17 @@ export const useDisplayCurrency = () => {
     [displayCurrencyDictionary],
   )
 
+  const getFractionDigits = useCallback(
+    ({ currency }: { currency: string }) => {
+      const currencyInfo = displayCurrencyDictionary[currency] || {
+        symbol: currency,
+        fractionDigits: 2,
+      }
+      return currencyInfo.fractionDigits
+    },
+    [displayCurrencyDictionary],
+  )
+
   return {
     fractionDigits: displayCurrencyInfo.fractionDigits,
     fiatSymbol: displayCurrencyInfo.symbol,
@@ -371,5 +380,6 @@ export const useDisplayCurrency = () => {
 
     formatCurrency,
     getCurrencySymbol,
+    getFractionDigits,
   }
 }

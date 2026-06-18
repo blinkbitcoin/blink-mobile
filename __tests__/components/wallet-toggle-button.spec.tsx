@@ -23,8 +23,6 @@ jest.mock("@rn-vui/themed", () => ({
   }),
 }))
 
-jest.mock("react-native-vector-icons/Ionicons", () => "Icon")
-
 describe("WalletToggleButton", () => {
   const mockOnPress = jest.fn()
 

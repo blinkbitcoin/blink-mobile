@@ -1,3 +1,6 @@
 export * from "./use-conversion-formatting"
 export * from "./use-conversion-overlay-focus"
+export * from "./use-conversion-quote"
+export * from "./self-custodial/use-conversion"
+export * from "./self-custodial/use-conversion-guard"
 export * from "./use-synced-input-values"

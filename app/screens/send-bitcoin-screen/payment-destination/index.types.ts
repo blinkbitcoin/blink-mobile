@@ -6,6 +6,7 @@ import {
   WalletCurrency,
 } from "@app/graphql/generated"
 import { WalletDescriptor } from "@app/types/wallets"
+import { type SparkPaymentDestination } from "./spark"
 import {
   IntraledgerPaymentDestination,
   LightningPaymentDestination,
@@ -60,6 +61,11 @@ export type ReceiveDestination = {
   destinationDirection: typeof DestinationDirection.Receive
 }
 
+export const isSendDestination = (
+  result: ParseDestinationResult,
+): result is PaymentDestination =>
+  result.valid && result.destinationDirection === DestinationDirection.Send
+
 export type InvalidDestination = {
   valid: false
   invalidPaymentDestination: ParsedPaymentDestination
@@ -88,6 +94,7 @@ export type ValidParsedPaymentDestination = (
   | LightningPaymentDestination
   | OnchainPaymentDestination
   | ResolvedIntraledgerPaymentDestination
+  | SparkPaymentDestination
 ) & { valid: true }
 
 export type ResolvedIntraledgerPaymentDestination = IntraledgerPaymentDestination & {

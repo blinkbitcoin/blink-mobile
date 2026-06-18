@@ -34,7 +34,7 @@ export const setLocalEnvironment = async () => {
   const stagingInstanceText = element(by.text(`Galoy Instance: Local`))
   await waitFor(stagingInstanceText).toBeVisible().withTimeout(10000)
 
-  await tap(by.id("Back"))
+  await device.pressBack()
 }
 
 export const loginAs = (phone: string, LL: TranslationFunctions) => async () => {

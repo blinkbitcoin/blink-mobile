@@ -34,6 +34,10 @@ galoy_test_tokens: ((galoy-tokens.galoy_test_tokens))
 galoy_token_2: ((galoy-tokens.galoy_token_2))
 mailslurp_api_key: ((galoy-tokens.mailslurp_api_key))
 
+spark_token_identifier: ((mobile-self-custodial.spark_token_identifier))
+breez_api_key: ((mobile-self-custodial.breez_api_key))
+breez_network: mainnet
+
 android_keystore: ((android.keystore))
 fastlane_match_password: ((fastlane.match_password))
 fastlane_match_keychain_password: ((fastlane.match_keychain_password))

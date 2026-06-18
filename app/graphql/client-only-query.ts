@@ -6,13 +6,10 @@ import { ApolloClient, gql } from "@apollo/client"
 import {
   BetaDocument,
   BetaQuery,
-  ColorSchemeDocument,
-  ColorSchemeQuery,
   CountryCodeDocument,
   CountryCodeQuery,
   FeedbackModalShownDocument,
   FeedbackModalShownQuery,
-  HasPromptedSetDefaultAccountDocument,
   HiddenBalanceToolTipDocument,
   HiddenBalanceToolTipQuery,
   HideBalanceDocument,
@@ -27,6 +24,8 @@ import {
   UpgradeModalLastShownAtQuery,
   DeviceSessionCountDocument,
   DeviceSessionCountQuery,
+  PreferredAmountCurrencyDocument,
+  PreferredAmountCurrencyQuery,
   TxLastSeenDocument,
   TxLastSeenQuery,
   WalletCurrency,
@@ -43,10 +42,6 @@ export default gql`
 
   query beta {
     beta @client
-  }
-
-  query colorScheme {
-    colorScheme @client # "system" | "light" | "dark"
   }
 
   query countryCode {
@@ -66,10 +61,6 @@ export default gql`
     feedbackModalShown @client
   }
 
-  query hasPromptedSetDefaultAccount {
-    hasPromptedSetDefaultAccount @client
-  }
-
   query introducingCirclesModalShown {
     introducingCirclesModalShown @client
   }
@@ -84,6 +75,10 @@ export default gql`
 
   query deviceSessionCount {
     deviceSessionCount @client
+  }
+
+  query preferredAmountCurrency {
+    preferredAmountCurrency @client
   }
 
   query txLastSeen($accountId: ID!) {
@@ -145,20 +140,6 @@ export const activateBeta = (client: ApolloClient<unknown>, status: boolean) => 
   }
 }
 
-export const updateColorScheme = (client: ApolloClient<unknown>, colorScheme: string) => {
-  try {
-    client.writeQuery<ColorSchemeQuery>({
-      query: ColorSchemeDocument,
-      data: {
-        __typename: "Query",
-        colorScheme,
-      },
-    })
-  } catch {
-    console.warn("impossible to update color scheme")
-  }
-}
-
 export const updateCountryCode = (
   client: ApolloClient<unknown>,
   countryCode: CountryCode,
@@ -207,20 +188,6 @@ export const setFeedbackModalShown = (client: ApolloClient<unknown>, shown: bool
   }
 }
 
-export const setHasPromptedSetDefaultAccount = (client: ApolloClient<unknown>) => {
-  try {
-    client.writeQuery({
-      query: HasPromptedSetDefaultAccountDocument,
-      data: {
-        __typename: "Query",
-        hasPromptedSetDefaultAccount: true,
-      },
-    })
-  } catch {
-    console.warn("impossible to update hasPromptedSetDefaultAccount")
-  }
-}
-
 export const setIntroducingCirclesModalShown = (client: ApolloClient<unknown>) => {
   try {
     client.writeQuery<IntroducingCirclesModalShownQuery>({
@@ -265,6 +232,28 @@ export const setUpgradeModalLastShownAt = (
       },
     })
     return isoDatetime
+  } catch {
+    return null
+  }
+}
+
+export const PreferredAmountCurrency = {
+  Display: "display",
+  Default: "default",
+} as const
+export type PreferredAmountCurrency =
+  (typeof PreferredAmountCurrency)[keyof typeof PreferredAmountCurrency]
+
+export const savePreferredAmountCurrency = (
+  client: ApolloClient<unknown>,
+  currency: PreferredAmountCurrency,
+): PreferredAmountCurrency | null => {
+  try {
+    client.writeQuery<PreferredAmountCurrencyQuery>({
+      query: PreferredAmountCurrencyDocument,
+      data: { __typename: "Query", preferredAmountCurrency: currency },
+    })
+    return currency
   } catch {
     return null
   }

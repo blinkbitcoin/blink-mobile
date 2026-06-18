@@ -13,7 +13,7 @@ import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles } from "@rn-vui/base"
 import { Text, useTheme } from "@rn-vui/themed"
 
@@ -50,7 +50,9 @@ gql`
 
 export const TotpRegistrationInitiateScreen = () => {
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "totpRegistrationInitiate">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "totpRegistrationInitiate">
+    >()
 
   const [totpRegistrationInitiate] = useUserTotpRegistrationInitiateMutation()
 
@@ -106,7 +108,7 @@ export const TotpRegistrationInitiateScreen = () => {
       ) : (
         <>
           <View style={styles.centeredContent}>
-            <QrCodeComponent otpauth={otpauth} />
+            <QrCodeComponent value={otpauth} />
           </View>
           <CopySecretComponent secret={secret} />
           <Text style={styles.textStyle} type="p2">

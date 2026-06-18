@@ -7,15 +7,14 @@ extend type Query {
   hiddenBalanceToolTip: Boolean!
   price: String # FIXME test only?
   beta: Boolean!
-  colorScheme: String!
   countryCode: String!
   region: Region
   feedbackModalShown: Boolean!
-  hasPromptedSetDefaultAccount: Boolean!
   introducingCirclesModalShown: Boolean!
   innerCircleValue: Int!
   upgradeModalLastShownAt: String
   deviceSessionCount: Int!
+  preferredAmountCurrency: String
   txLastSeen(accountId: ID!): TxLastSeen!
 }
 

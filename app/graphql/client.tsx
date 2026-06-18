@@ -19,18 +19,25 @@ import { createPersistedQueryLink } from "@apollo/client/link/persisted-queries"
 import { RetryLink } from "@apollo/client/link/retry"
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions"
 import { getMainDefinition } from "@apollo/client/utilities"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
 import { SCHEMA_VERSION_KEY } from "@app/config"
 import { useAppConfig } from "@app/hooks"
+import { AccountRegistryProvider } from "@app/hooks/use-account-registry"
+import { useEffectiveLanguage } from "@app/hooks/use-effective-language"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { ensureLocaleLoaded } from "@app/i18n/lazy-locale-loader"
 import { getAppCheckToken } from "@app/screens/get-started-screen/use-device-token"
 import { getLanguageFromString, getLocaleFromLanguage } from "@app/utils/locale-detector"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import { isIos } from "../utils/helper"
 import { loadString, saveString } from "../utils/storage"
+
+import { useApolloRebuildLifecycle } from "./hooks/use-apollo-rebuild-lifecycle"
+import { useEffectiveAuthToken } from "./hooks/use-effective-auth-token"
 import { AnalyticsContainer } from "./analytics"
 import { createCache } from "./cache"
-import { useLanguageQuery, useRealtimePriceQuery } from "./generated"
+import { useRealtimePriceQuery } from "./generated"
 import { HideAmountContainer } from "./hide-amount-component"
 import { IsAuthedContextProvider, useIsAuthed } from "./is-authed-context"
 import { LevelContainer } from "./level-component"
@@ -60,6 +67,9 @@ const noRetryOperations = [
   // specially as it's running on app start
   // and can create some unwanted loop when token is not valid
   "deviceNotificationTokenCreate",
+
+  // Self-custodial payments go through Breez SDK directly, not Apollo.
+  // Add any future self-custodial GraphQL operations here if needed.
 ]
 
 const getAuthorizationHeader = (token: string): string => {
@@ -68,6 +78,7 @@ const getAuthorizationHeader = (token: string): string => {
 
 const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
   const { appConfig } = useAppConfig()
+  const effectiveToken = useEffectiveAuthToken()
 
   const [networkError, setNetworkError] = useState<NetworkError | undefined>(undefined)
   const hasNetworkErrorRef = useRef<boolean>(false)
@@ -82,9 +93,11 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
     isAuthed: boolean
   }>()
 
+  const { registerActiveClient } = useApolloRebuildLifecycle(effectiveToken)
+
   useEffect(() => {
     ;(async () => {
-      const token = appConfig.token
+      const token = effectiveToken
 
       console.log(
         `creating new apollo client, token: ${Boolean(token)}, uri: ${
@@ -213,7 +226,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
       }
 
       // persistedQuery provide client side bandwidth optimization by returning a hash
-      // of the uery instead of the whole query
+      // of the query instead of the whole query
       //
       // use the following line if you want to deactivate in dev
       // const persistedQueryLink = httpLink
@@ -282,9 +295,10 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
       const currentVersion = await loadString(SCHEMA_VERSION_KEY)
 
       if (currentVersion === SCHEMA_VERSION) {
-        // If the current version matches the latest version,
-        // we're good to go and can restore the cache.
-        await persistor.restore()
+        // Skip restore in self-custodial mode so the persisted custodial cache cannot leak.
+        if (token) {
+          await persistor.restore()
+        }
       } else {
         // Otherwise, we'll want to purge the outdated persisted cache
         // and mark ourselves as having updated to the latest version.
@@ -294,8 +308,11 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         await saveString(SCHEMA_VERSION_KEY, SCHEMA_VERSION)
       }
 
-      client.onClearStore(persistor.purge)
+      if (token) {
+        client.onClearStore(persistor.purge)
+      }
 
+      registerActiveClient(client)
       setApolloClient({
         client,
         isAuthed: Boolean(token),
@@ -304,7 +321,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
 
       return () => client.cache.reset()
     })()
-  }, [appConfig.token, appConfig.galoyInstance, clearNetworkError])
+  }, [effectiveToken, appConfig.galoyInstance, clearNetworkError, registerActiveClient])
 
   // Before we show the app, we have to wait for our state to be ready.
   // In the meantime, don't render anything. This will be the background
@@ -321,23 +338,25 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <ApolloProvider client={apolloClient.client}>
       <IsAuthedContextProvider value={apolloClient.isAuthed}>
-        <LevelContainer>
-          <HideAmountContainer>
-            <NetworkErrorContextProvider
-              value={{
-                networkError,
-                clearNetworkError,
-                token: appConfig.token,
-              }}
-            >
-              <MessagingContainer />
-              <LanguageSync />
-              <AnalyticsContainer />
-              <MyPriceUpdates />
-              {children}
-            </NetworkErrorContextProvider>
-          </HideAmountContainer>
-        </LevelContainer>
+        <AccountRegistryProvider>
+          <LevelContainer>
+            <HideAmountContainer>
+              <NetworkErrorContextProvider
+                value={{
+                  networkError,
+                  clearNetworkError,
+                  token: appConfig.token,
+                }}
+              >
+                <MessagingContainer />
+                <LanguageSync />
+                <AnalyticsContainer />
+                <MyPriceUpdates />
+                {children}
+              </NetworkErrorContextProvider>
+            </HideAmountContainer>
+          </LevelContainer>
+        </AccountRegistryProvider>
       </IsAuthedContextProvider>
     </ApolloProvider>
   )
@@ -360,19 +379,20 @@ const MyPriceUpdates = () => {
 }
 
 const LanguageSync = () => {
-  const isAuthed = useIsAuthed()
+  const { language } = useEffectiveLanguage()
 
-  const { data } = useLanguageQuery({ fetchPolicy: "cache-first", skip: !isAuthed })
-
-  const userPreferredLocale = getLocaleFromLanguage(
-    getLanguageFromString(data?.me?.language),
-  )
+  const userPreferredLocale = getLocaleFromLanguage(getLanguageFromString(language))
   const { locale, setLocale } = useI18nContext()
 
   useEffect(() => {
-    if (userPreferredLocale !== locale) {
-      setLocale(userPreferredLocale)
+    // Lazy load locale before switching if needed
+    const switchLocale = async () => {
+      if (userPreferredLocale !== locale) {
+        await ensureLocaleLoaded(userPreferredLocale)
+        setLocale(userPreferredLocale)
+      }
     }
+    switchLocale()
     // setLocale is not set as a dependency because it changes every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userPreferredLocale, locale])

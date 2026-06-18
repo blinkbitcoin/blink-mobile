@@ -1,44 +1,41 @@
 import {
-  defaultPersistentState,
-  migrateAndGetPersistentState,
+  migratePersistentState,
+  MigrationStatus,
 } from "../app/store/persistent-state/state-migrations"
 
-it("uses default state when none is present", async () => {
-  const state = await migrateAndGetPersistentState({})
-  expect(state).toEqual(defaultPersistentState)
+it("reports no-data for an empty object (no schemaVersion key)", async () => {
+  const result = await migratePersistentState({})
+  expect(result).toEqual({ status: MigrationStatus.NoData })
 })
 
-it("migrates persistent state", async () => {
-  const state = await migrateAndGetPersistentState({
+it("reports no-data for an unknown schemaVersion", async () => {
+  const result = await migratePersistentState({
     schemaVersion: 0,
     isUsdDisabled: true,
   })
-  expect(state).toEqual({
-    ...defaultPersistentState,
-  })
+  expect(result).toEqual({ status: MigrationStatus.NoData })
 })
 
-it("returns default when schema is not present", async () => {
-  const state = await migrateAndGetPersistentState({
-    schemaVersion: -2,
-  })
-  expect(state).toEqual(defaultPersistentState)
+it("reports no-data for a negative schemaVersion", async () => {
+  const result = await migratePersistentState({ schemaVersion: -2 })
+  expect(result).toEqual({ status: MigrationStatus.NoData })
 })
 
-it("migration from 5 to 6", async () => {
+it("migration from 5 to current returns ok with the migrated state", async () => {
   const state5 = {
     schemaVersion: 5,
     galoyInstance: { id: "Main" },
     galoyAuthToken: "myToken",
   }
 
-  const state6 = {
-    schemaVersion: 6,
-    galoyInstance: { id: "Main" },
-    galoyAuthToken: "myToken",
-  }
+  const result = await migratePersistentState(state5)
 
-  const res = await migrateAndGetPersistentState(state5)
-
-  expect(res).toStrictEqual(state6)
+  expect(result).toEqual({
+    status: MigrationStatus.Ok,
+    state: {
+      schemaVersion: 14,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "myToken",
+    },
+  })
 })

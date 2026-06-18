@@ -233,7 +233,6 @@ export type AccountUpdateNotificationSettingsPayload = {
   readonly errors: ReadonlyArray<Error>;
 };
 
-/** Address input (used for consumer application addresses and card billing addresses) */
 export type AddressInput = {
   readonly city: Scalars['String']['input'];
   readonly country?: InputMaybe<Scalars['String']['input']>;
@@ -252,6 +251,7 @@ export type ApiKey = {
   readonly expiresAt?: Maybe<Scalars['Timestamp']['output']>;
   readonly id: Scalars['ID']['output'];
   readonly lastUsedAt?: Maybe<Scalars['Timestamp']['output']>;
+  readonly limits: ApiKeyLimits;
   readonly name: Scalars['String']['output'];
   readonly readOnly: Scalars['Boolean']['output'];
   readonly revoked: Scalars['Boolean']['output'];
@@ -270,12 +270,40 @@ export type ApiKeyCreatePayload = {
   readonly apiKeySecret: Scalars['String']['output'];
 };
 
+export type ApiKeyLimits = {
+  readonly __typename: 'ApiKeyLimits';
+  readonly annualLimitSats?: Maybe<Scalars['Int']['output']>;
+  readonly annualSpentSats: Scalars['Int']['output'];
+  readonly dailyLimitSats?: Maybe<Scalars['Int']['output']>;
+  readonly dailySpentSats: Scalars['Int']['output'];
+  readonly monthlyLimitSats?: Maybe<Scalars['Int']['output']>;
+  readonly monthlySpentSats: Scalars['Int']['output'];
+  readonly weeklyLimitSats?: Maybe<Scalars['Int']['output']>;
+  readonly weeklySpentSats: Scalars['Int']['output'];
+};
+
+export type ApiKeyRemoveLimitInput = {
+  readonly id: Scalars['ID']['input'];
+  readonly limitTimeWindow: LimitTimeWindow;
+};
+
 export type ApiKeyRevokeInput = {
   readonly id: Scalars['ID']['input'];
 };
 
 export type ApiKeyRevokePayload = {
   readonly __typename: 'ApiKeyRevokePayload';
+  readonly apiKey: ApiKey;
+};
+
+export type ApiKeySetLimitInput = {
+  readonly id: Scalars['ID']['input'];
+  readonly limitSats: Scalars['Int']['input'];
+  readonly limitTimeWindow: LimitTimeWindow;
+};
+
+export type ApiKeySetLimitPayload = {
+  readonly __typename: 'ApiKeySetLimitPayload';
   readonly apiKey: ApiKey;
 };
 
@@ -448,104 +476,174 @@ export type Card = {
   readonly id: Scalars['ID']['output'];
   readonly lastFour: Scalars['String']['output'];
   readonly monthlyLimitCents?: Maybe<Scalars['Int']['output']>;
+  readonly shippingAddress?: Maybe<ShippingAddress>;
+  readonly spendingLimitStatus: ReadonlyArray<SpendingLimitStatus>;
+  readonly spendingLimits: ReadonlyArray<SpendingLimit>;
+  readonly spendingToggles: ReadonlyArray<SpendingToggle>;
   readonly status: CardStatus;
 };
 
+/** Balance in satoshis */
+export type CardBalance = {
+  readonly __typename: 'CardBalance';
+  readonly available: Scalars['Int']['output'];
+  readonly pending: Scalars['Int']['output'];
+  readonly posted: Scalars['Int']['output'];
+};
+
+export type CardCollateralBalance = {
+  readonly __typename: 'CardCollateralBalance';
+  readonly availableSats: Scalars['Int']['output'];
+  readonly pendingSats: Scalars['Int']['output'];
+  readonly settledSats: Scalars['Int']['output'];
+};
+
+export type CardCollateralDeposit = {
+  readonly __typename: 'CardCollateralDeposit';
+  readonly newAvailableBalance: Scalars['Int']['output'];
+  readonly satAmount: Scalars['Int']['output'];
+  readonly transferId: Scalars['ID']['output'];
+};
+
+export type CardCollateralDepositInput = {
+  readonly amountSats: Scalars['Int']['input'];
+  readonly blinkTxId: Scalars['String']['input'];
+};
+
 export type CardConsumerApplicationCreateInput = {
-  /** Account purpose */
   readonly accountPurpose: Scalars['String']['input'];
-  /** Annual salary range */
   readonly annualSalary: Scalars['String']['input'];
-  /** Expected monthly volume */
   readonly expectedMonthlyVolume: Scalars['String']['input'];
-  /** Whether the user has completed L2 KYC verification */
   readonly isL2Verified: Scalars['Boolean']['input'];
-  /** Terms of service acceptance (must be true) */
   readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
-  /** Occupation code */
   readonly occupation: Scalars['String']['input'];
-  /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
 };
 
-/** Input for creating a consumer application using manual KYC */
 export type CardConsumerApplicationManualCreateInput = {
-  /** Account purpose */
   readonly accountPurpose: Scalars['String']['input'];
-  /** Address information */
   readonly address: AddressInput;
-  /** Annual salary range */
   readonly annualSalary: Scalars['String']['input'];
-  /** Birth date in YYYY-MM-DD format */
+  /** YYYY-MM-DD format */
   readonly birthDate: Scalars['String']['input'];
-  /** 2-letter country code of ID issuing country */
+  /** 2-letter country code */
   readonly countryOfIssue: Scalars['String']['input'];
-  /** Email address */
   readonly email: Scalars['String']['input'];
-  /** Expected monthly volume */
   readonly expectedMonthlyVolume: Scalars['String']['input'];
-  /** First name */
   readonly firstName: Scalars['String']['input'];
-  /** Terms of service acceptance (must be true) */
   readonly isTermsOfServiceAccepted: Scalars['Boolean']['input'];
-  /** Last name */
   readonly lastName: Scalars['String']['input'];
-  /** National ID (SSN for US) */
   readonly nationalId: Scalars['String']['input'];
-  /** Occupation */
   readonly occupation: Scalars['String']['input'];
-  /** Phone country code (optional) */
   readonly phoneCountryCode?: InputMaybe<Scalars['String']['input']>;
-  /** Phone number (optional) */
   readonly phoneNumber?: InputMaybe<Scalars['String']['input']>;
-  /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
 };
 
-/** Input for updating an existing consumer application */
 export type CardConsumerApplicationUpdateInput = {
-  /** Account purpose (optional) */
   readonly accountPurpose?: InputMaybe<Scalars['String']['input']>;
-  /** Address information (optional) */
   readonly address?: InputMaybe<AddressInput>;
-  /** Annual salary range (optional) */
   readonly annualSalary?: InputMaybe<Scalars['String']['input']>;
-  /** Application ID to update */
   readonly applicationId: Scalars['ID']['input'];
-  /** Birth date in YYYY-MM-DD format (optional) */
   readonly birthDate?: InputMaybe<Scalars['String']['input']>;
-  /** 2-letter country code of ID issuing country (optional) */
   readonly countryOfIssue?: InputMaybe<Scalars['String']['input']>;
-  /** Expected monthly volume (optional) */
   readonly expectedMonthlyVolume?: InputMaybe<Scalars['String']['input']>;
-  /** First name (optional) */
   readonly firstName?: InputMaybe<Scalars['String']['input']>;
-  /** Whether to use existing documents for additional verification (optional) */
   readonly hasExistingDocuments?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Terms of service acceptance (optional) */
   readonly isTermsOfServiceAccepted?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Last name (optional) */
   readonly lastName?: InputMaybe<Scalars['String']['input']>;
-  /** National ID (SSN for US) (optional) */
   readonly nationalId?: InputMaybe<Scalars['String']['input']>;
-  /** Occupation (optional) */
   readonly occupation?: InputMaybe<Scalars['String']['input']>;
-  /** Source key for tracking (optional) */
   readonly sourceKey?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CardCreateInput = {
-  /** Application ID - references the approved consumer application */
   readonly applicationId: Scalars['ID']['input'];
   readonly billingAddress?: InputMaybe<AddressInput>;
   readonly cardType: CardType;
   readonly dailyLimitCents?: InputMaybe<Scalars['Int']['input']>;
-  /** Display name on the card (max 26 characters) */
+  /** Max 26 characters */
   readonly displayName?: InputMaybe<Scalars['String']['input']>;
   readonly monthlyLimitCents?: InputMaybe<Scalars['Int']['input']>;
   readonly shippingAddress?: InputMaybe<ShippingAddressInput>;
-  /** Initial card status (defaults to Active if not provided) */
   readonly status?: InputMaybe<CardStatus>;
+};
+
+export type CardHolder = {
+  readonly __typename: 'CardHolder';
+  readonly firstName: Scalars['String']['output'];
+  readonly lastName: Scalars['String']['output'];
+};
+
+export type CardMerchant = {
+  readonly __typename: 'CardMerchant';
+  readonly brandName?: Maybe<Scalars['String']['output']>;
+  readonly category?: Maybe<Scalars['String']['output']>;
+  readonly categoryGroup?: Maybe<Scalars['String']['output']>;
+  readonly city?: Maybe<Scalars['String']['output']>;
+  readonly confidenceRange?: Maybe<Scalars['String']['output']>;
+  readonly confidenceScore?: Maybe<Scalars['Float']['output']>;
+  readonly country?: Maybe<Scalars['String']['output']>;
+  readonly displayName?: Maybe<Scalars['String']['output']>;
+  readonly iconUrl?: Maybe<Scalars['String']['output']>;
+  readonly logoUrl?: Maybe<Scalars['String']['output']>;
+  readonly phone?: Maybe<Scalars['String']['output']>;
+  readonly state?: Maybe<Scalars['String']['output']>;
+  readonly website?: Maybe<Scalars['String']['output']>;
+};
+
+export type CardPinUpdateInput = {
+  readonly cardId: Scalars['ID']['input'];
+  readonly encryptedPin: Scalars['String']['input'];
+  readonly iv: Scalars['String']['input'];
+  readonly sessionId: Scalars['String']['input'];
+};
+
+export type CardReplaceInput = {
+  readonly cardId: Scalars['ID']['input'];
+};
+
+export type CardSecretsEncrypted = {
+  readonly __typename: 'CardSecretsEncrypted';
+  readonly encryptedCvc: EncryptedData;
+  readonly encryptedPan: EncryptedData;
+};
+
+export type CardSpendingLimitRemoveInput = {
+  readonly cardId: Scalars['ID']['input'];
+  readonly category: SpendingCategory;
+  readonly period: SpendingPeriod;
+};
+
+export type CardSpendingLimitRemovePayload = {
+  readonly __typename: 'CardSpendingLimitRemovePayload';
+  readonly removedLimit: SpendingLimit;
+  readonly statuses: ReadonlyArray<SpendingLimitStatus>;
+};
+
+export type CardSpendingLimitSetInput = {
+  readonly cardId: Scalars['ID']['input'];
+  readonly category: SpendingCategory;
+  readonly limitCents: Scalars['Int']['input'];
+  readonly period: SpendingPeriod;
+};
+
+export type CardSpendingLimitSetPayload = {
+  readonly __typename: 'CardSpendingLimitSetPayload';
+  readonly limit: SpendingLimit;
+  readonly statuses: ReadonlyArray<SpendingLimitStatus>;
+};
+
+export type CardSpendingToggleSetInput = {
+  readonly cardId: Scalars['ID']['input'];
+  readonly category: SpendingCategory;
+  readonly enabled: Scalars['Boolean']['input'];
+};
+
+export type CardSpendingToggleSetPayload = {
+  readonly __typename: 'CardSpendingToggleSetPayload';
+  readonly statuses: ReadonlyArray<SpendingLimitStatus>;
+  readonly toggle: SpendingToggle;
 };
 
 export const CardStatus = {
@@ -560,13 +658,42 @@ export const CardStatus = {
 export type CardStatus = typeof CardStatus[keyof typeof CardStatus];
 export type CardTransaction = {
   readonly __typename: 'CardTransaction';
-  readonly amount: Scalars['Float']['output'];
+  readonly amount: Scalars['Int']['output'];
   readonly cardId: Scalars['String']['output'];
   readonly createdAt: Scalars['DateTime']['output'];
   readonly currency: Scalars['String']['output'];
+  readonly enrichedMerchantCategory?: Maybe<Scalars['String']['output']>;
+  readonly enrichedMerchantName?: Maybe<Scalars['String']['output']>;
   readonly id: Scalars['ID']['output'];
+  readonly localAmount?: Maybe<Scalars['Int']['output']>;
+  readonly localCurrency?: Maybe<Scalars['String']['output']>;
+  readonly merchant?: Maybe<CardMerchant>;
+  readonly merchantCategory?: Maybe<Scalars['String']['output']>;
+  readonly merchantCategoryCode?: Maybe<Scalars['String']['output']>;
+  readonly merchantCity?: Maybe<Scalars['String']['output']>;
+  readonly merchantCountry?: Maybe<Scalars['String']['output']>;
   readonly merchantName: Scalars['String']['output'];
   readonly status: TransactionStatus;
+};
+
+export type CardTransactionConnection = {
+  readonly __typename: 'CardTransactionConnection';
+  readonly edges: ReadonlyArray<CardTransactionEdge>;
+  readonly pageInfo: CardTransactionPageInfo;
+};
+
+export type CardTransactionEdge = {
+  readonly __typename: 'CardTransactionEdge';
+  readonly cursor: Scalars['String']['output'];
+  readonly node: CardTransaction;
+};
+
+export type CardTransactionPageInfo = {
+  readonly __typename: 'CardTransactionPageInfo';
+  readonly endCursor?: Maybe<Scalars['String']['output']>;
+  readonly hasNextPage: Scalars['Boolean']['output'];
+  readonly hasPreviousPage: Scalars['Boolean']['output'];
+  readonly startCursor?: Maybe<Scalars['String']['output']>;
 };
 
 export const CardType = {
@@ -576,16 +703,11 @@ export const CardType = {
 
 export type CardType = typeof CardType[keyof typeof CardType];
 export type CardUpdateInput = {
-  /** Billing address (optional) */
   readonly billingAddress?: InputMaybe<AddressInput>;
   readonly cardId: Scalars['ID']['input'];
-  /** Daily spending limit in cents (optional, mutually exclusive with monthly_limit_cents) */
   readonly dailyLimitCents?: InputMaybe<Scalars['Int']['input']>;
-  /** Monthly spending limit in cents (optional, mutually exclusive with daily_limit_cents) */
   readonly monthlyLimitCents?: InputMaybe<Scalars['Int']['input']>;
-  /** New card status (optional) */
   readonly status?: InputMaybe<CardStatus>;
-  /** Virtual card art identifier (optional) */
   readonly virtualCardArt?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -601,7 +723,6 @@ export type ConsumerAccount = Account & {
   readonly callbackEndpoints: ReadonlyArray<CallbackEndpoint>;
   readonly callbackPortalUrl: Scalars['String']['output'];
   readonly cardConsumerApplications: ReadonlyArray<ConsumerApplication>;
-  readonly cardTransactions: ReadonlyArray<CardTransaction>;
   readonly cards: ReadonlyArray<Card>;
   /** return CSV stream, base64 encoded, of the list of transactions in the wallet */
   readonly csvTransactions: Scalars['String']['output'];
@@ -609,6 +730,7 @@ export type ConsumerAccount = Account & {
   readonly defaultWalletId: Scalars['WalletId']['output'];
   readonly displayCurrency: Scalars['DisplayCurrency']['output'];
   readonly firstName?: Maybe<Scalars['String']['output']>;
+  readonly flowType?: Maybe<KycFlowType>;
   readonly id: Scalars['ID']['output'];
   /** A list of all invoices associated with walletIds optionally passed. */
   readonly invoices?: Maybe<InvoiceConnection>;
@@ -627,11 +749,6 @@ export type ConsumerAccount = Account & {
   readonly walletById: Wallet;
   readonly wallets: ReadonlyArray<Wallet>;
   readonly welcomeProfile?: Maybe<WelcomeProfile>;
-};
-
-
-export type ConsumerAccountCardTransactionsArgs = {
-  first?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -669,12 +786,10 @@ export type ConsumerAccountWalletByIdArgs = {
 
 export type ConsumerApplication = {
   readonly __typename: 'ConsumerApplication';
-  /** Application completion link with params (if additional verification needed) */
   readonly applicationCompletionLink?: Maybe<Scalars['String']['output']>;
   readonly applicationReason?: Maybe<Scalars['String']['output']>;
   readonly applicationStatus: ApplicationStatus;
   readonly createdAt: Scalars['DateTime']['output'];
-  /** Application ID */
   readonly id: Scalars['ID']['output'];
   readonly updatedAt: Scalars['DateTime']['output'];
 };
@@ -763,6 +878,12 @@ export type Email = {
   readonly __typename: 'Email';
   readonly address?: Maybe<Scalars['EmailAddress']['output']>;
   readonly verified?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type EncryptedData = {
+  readonly __typename: 'EncryptedData';
+  readonly data: Scalars['String']['output'];
+  readonly iv: Scalars['String']['output'];
 };
 
 export type Error = {
@@ -966,8 +1087,15 @@ export type InvoicePaymentStatus = typeof InvoicePaymentStatus[keyof typeof Invo
 export type KycFlowStartInput = {
   readonly firstName?: InputMaybe<Scalars['String']['input']>;
   readonly lastName?: InputMaybe<Scalars['String']['input']>;
+  readonly type?: InputMaybe<KycFlowType>;
 };
 
+export const KycFlowType = {
+  Card: 'CARD',
+  UpgradeLevelTwo: 'UPGRADE_LEVEL_TWO'
+} as const;
+
+export type KycFlowType = typeof KycFlowType[keyof typeof KycFlowType];
 export type Leader = {
   readonly __typename: 'Leader';
   readonly name?: Maybe<Scalars['LeaderboardName']['output']>;
@@ -981,6 +1109,14 @@ export type Leaderboard = {
   readonly range: WelcomeRange;
 };
 
+export const LimitTimeWindow = {
+  Annual: 'ANNUAL',
+  Daily: 'DAILY',
+  Monthly: 'MONTHLY',
+  Weekly: 'WEEKLY'
+} as const;
+
+export type LimitTimeWindow = typeof LimitTimeWindow[keyof typeof LimitTimeWindow];
 export type LnAddressPaymentSendInput = {
   /** Amount in satoshis. */
   readonly amount: Scalars['SatAmount']['input'];
@@ -1030,6 +1166,7 @@ export type LnInvoiceCreateOnBehalfOfRecipientInput = {
   readonly memo?: InputMaybe<Scalars['Memo']['input']>;
   /** Wallet ID for a BTC wallet which belongs to any account. */
   readonly recipientWalletId: Scalars['WalletId']['input'];
+  readonly webhookUrl?: InputMaybe<Scalars['EndpointUrl']['input']>;
 };
 
 export type LnInvoiceFeeProbeInput = {
@@ -1109,6 +1246,7 @@ export type LnNoAmountInvoiceCreateOnBehalfOfRecipientInput = {
   readonly memo?: InputMaybe<Scalars['Memo']['input']>;
   /** ID for either a USD or BTC wallet which belongs to the account of any user. */
   readonly recipientWalletId: Scalars['WalletId']['input'];
+  readonly webhookUrl?: InputMaybe<Scalars['EndpointUrl']['input']>;
 };
 
 export type LnNoAmountInvoiceFeeProbeInput = {
@@ -1172,6 +1310,7 @@ export type LnUsdInvoiceBtcDenominatedCreateOnBehalfOfRecipientInput = {
   readonly memo?: InputMaybe<Scalars['Memo']['input']>;
   /** Wallet ID for a USD wallet which belongs to the account of any user. */
   readonly recipientWalletId: Scalars['WalletId']['input'];
+  readonly webhookUrl?: InputMaybe<Scalars['EndpointUrl']['input']>;
 };
 
 export type LnUsdInvoiceCreateInput = {
@@ -1197,6 +1336,7 @@ export type LnUsdInvoiceCreateOnBehalfOfRecipientInput = {
   readonly memo?: InputMaybe<Scalars['Memo']['input']>;
   /** Wallet ID for a USD wallet which belongs to the account of any user. */
   readonly recipientWalletId: Scalars['WalletId']['input'];
+  readonly webhookUrl?: InputMaybe<Scalars['EndpointUrl']['input']>;
 };
 
 export type LnUsdInvoiceFeeProbeInput = {
@@ -1268,15 +1408,23 @@ export type Mutation = {
   readonly accountUpdateDefaultWalletId: AccountUpdateDefaultWalletIdPayload;
   readonly accountUpdateDisplayCurrency: AccountUpdateDisplayCurrencyPayload;
   readonly apiKeyCreate: ApiKeyCreatePayload;
+  readonly apiKeyRemoveLimit: ApiKeySetLimitPayload;
   readonly apiKeyRevoke: ApiKeyRevokePayload;
+  readonly apiKeySetLimit: ApiKeySetLimitPayload;
   readonly callbackEndpointAdd: CallbackEndpointAddPayload;
   readonly callbackEndpointDelete: SuccessPayload;
   readonly captchaCreateChallenge: CaptchaCreateChallengePayload;
   readonly captchaRequestAuthCode: SuccessPayload;
+  readonly cardCollateralDeposit: CardCollateralDeposit;
   readonly cardConsumerApplicationCreate: ConsumerApplication;
   readonly cardConsumerApplicationManualCreate: ConsumerApplication;
   readonly cardConsumerApplicationUpdate: ConsumerApplication;
   readonly cardCreate: Card;
+  readonly cardPinUpdate: Scalars['Boolean']['output'];
+  readonly cardReplace: Card;
+  readonly cardSpendingLimitRemove: CardSpendingLimitRemovePayload;
+  readonly cardSpendingLimitSet: CardSpendingLimitSetPayload;
+  readonly cardSpendingToggleSet: CardSpendingToggleSetPayload;
   readonly cardUpdate: Card;
   readonly contactCreate: ContactPayload;
   readonly deviceNotificationTokenCreate: SuccessPayload;
@@ -1435,8 +1583,18 @@ export type MutationApiKeyCreateArgs = {
 };
 
 
+export type MutationApiKeyRemoveLimitArgs = {
+  input: ApiKeyRemoveLimitInput;
+};
+
+
 export type MutationApiKeyRevokeArgs = {
   input: ApiKeyRevokeInput;
+};
+
+
+export type MutationApiKeySetLimitArgs = {
+  input: ApiKeySetLimitInput;
 };
 
 
@@ -1452,6 +1610,11 @@ export type MutationCallbackEndpointDeleteArgs = {
 
 export type MutationCaptchaRequestAuthCodeArgs = {
   input: CaptchaRequestAuthCodeInput;
+};
+
+
+export type MutationCardCollateralDepositArgs = {
+  input: CardCollateralDepositInput;
 };
 
 
@@ -1472,6 +1635,31 @@ export type MutationCardConsumerApplicationUpdateArgs = {
 
 export type MutationCardCreateArgs = {
   input: CardCreateInput;
+};
+
+
+export type MutationCardPinUpdateArgs = {
+  input: CardPinUpdateInput;
+};
+
+
+export type MutationCardReplaceArgs = {
+  input: CardReplaceInput;
+};
+
+
+export type MutationCardSpendingLimitRemoveArgs = {
+  input: CardSpendingLimitRemoveInput;
+};
+
+
+export type MutationCardSpendingLimitSetArgs = {
+  input: CardSpendingLimitSetInput;
+};
+
+
+export type MutationCardSpendingToggleSetArgs = {
+  input: CardSpendingToggleSetInput;
 };
 
 
@@ -1816,6 +2004,7 @@ export type OnChainUsdTxFee = {
 export type OnboardingFlowStartInput = {
   readonly firstName: Scalars['String']['input'];
   readonly lastName: Scalars['String']['input'];
+  readonly type?: InputMaybe<KycFlowType>;
 };
 
 export type OnboardingFlowStartResult = {
@@ -1851,10 +2040,12 @@ export type OneDayAccountLimit = AccountLimit & {
 export type OpenDeepLinkAction = {
   readonly __typename: 'OpenDeepLinkAction';
   readonly deepLink: Scalars['String']['output'];
+  readonly label?: Maybe<Scalars['String']['output']>;
 };
 
 export type OpenExternalLinkAction = {
   readonly __typename: 'OpenExternalLinkAction';
+  readonly label?: Maybe<Scalars['String']['output']>;
   readonly url: Scalars['String']['output'];
 };
 
@@ -1998,7 +2189,12 @@ export type Query = {
   readonly beta: Scalars['Boolean']['output'];
   readonly btcPriceList?: Maybe<ReadonlyArray<Maybe<PricePoint>>>;
   readonly businessMapMarkers: ReadonlyArray<MapMarker>;
-  readonly colorScheme: Scalars['String']['output'];
+  readonly cardBalance: CardBalance;
+  readonly cardCollateralBalance: CardCollateralBalance;
+  readonly cardEncryptionPublicKey: Scalars['String']['output'];
+  readonly cardHolder: CardHolder;
+  readonly cardSecretsEncrypted: CardSecretsEncrypted;
+  readonly cardTransactionsPaginated: CardTransactionConnection;
   readonly countryCode: Scalars['String']['output'];
   /** Returns an estimated conversion rate for the given amount and currency */
   readonly currencyConversionEstimation: CurrencyConversionEstimation;
@@ -2006,7 +2202,6 @@ export type Query = {
   readonly deviceSessionCount: Scalars['Int']['output'];
   readonly feedbackModalShown: Scalars['Boolean']['output'];
   readonly globals?: Maybe<Globals>;
-  readonly hasPromptedSetDefaultAccount: Scalars['Boolean']['output'];
   readonly hiddenBalanceToolTip: Scalars['Boolean']['output'];
   readonly hideBalance: Scalars['Boolean']['output'];
   readonly innerCircleValue: Scalars['Int']['output'];
@@ -2022,6 +2217,7 @@ export type Query = {
   readonly onChainUsdTxFeeAsBtcDenominated: OnChainUsdTxFee;
   /** Returns the list of available speeds for on-chain payments */
   readonly payoutSpeeds: ReadonlyArray<PayoutSpeeds>;
+  readonly preferredAmountCurrency?: Maybe<Scalars['String']['output']>;
   readonly price?: Maybe<Scalars['String']['output']>;
   /** Returns 1 Sat and 1 Usd Cent price for the given currency in minor unit */
   readonly realtimePrice: RealtimePrice;
@@ -2043,6 +2239,29 @@ export type QueryAccountDefaultWalletArgs = {
 
 export type QueryBtcPriceListArgs = {
   range: PriceGraphRange;
+};
+
+
+export type QueryCardBalanceArgs = {
+  cardId: Scalars['ID']['input'];
+};
+
+
+export type QueryCardHolderArgs = {
+  cardId: Scalars['ID']['input'];
+};
+
+
+export type QueryCardSecretsEncryptedArgs = {
+  cardId: Scalars['ID']['input'];
+  sessionId: Scalars['String']['input'];
+};
+
+
+export type QueryCardTransactionsPaginatedArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  cardId: Scalars['ID']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -2202,11 +2421,23 @@ export type SettlementViaOnChain = {
   readonly vout?: Maybe<Scalars['Int']['output']>;
 };
 
-/** Shipping address input for physical cards */
+export type ShippingAddress = {
+  readonly __typename: 'ShippingAddress';
+  readonly city: Scalars['String']['output'];
+  readonly country?: Maybe<Scalars['String']['output']>;
+  readonly countryCode: Scalars['String']['output'];
+  readonly firstName?: Maybe<Scalars['String']['output']>;
+  readonly lastName?: Maybe<Scalars['String']['output']>;
+  readonly line1: Scalars['String']['output'];
+  readonly line2?: Maybe<Scalars['String']['output']>;
+  readonly phoneNumber: Scalars['String']['output'];
+  readonly postalCode: Scalars['String']['output'];
+  readonly region: Scalars['String']['output'];
+};
+
 export type ShippingAddressInput = {
   readonly city: Scalars['String']['input'];
   readonly country?: InputMaybe<Scalars['String']['input']>;
-  /** 2-letter country code */
   readonly countryCode: Scalars['String']['input'];
   readonly firstName?: InputMaybe<Scalars['String']['input']>;
   readonly lastName?: InputMaybe<Scalars['String']['input']>;
@@ -2215,6 +2446,39 @@ export type ShippingAddressInput = {
   readonly phoneNumber: Scalars['String']['input'];
   readonly postalCode: Scalars['String']['input'];
   readonly region: Scalars['String']['input'];
+};
+
+export const SpendingCategory = {
+  Atm: 'ATM'
+} as const;
+
+export type SpendingCategory = typeof SpendingCategory[keyof typeof SpendingCategory];
+export type SpendingLimit = {
+  readonly __typename: 'SpendingLimit';
+  readonly category: SpendingCategory;
+  readonly limitCents: Scalars['Int']['output'];
+  readonly period: SpendingPeriod;
+};
+
+export type SpendingLimitStatus = {
+  readonly __typename: 'SpendingLimitStatus';
+  readonly category: SpendingCategory;
+  readonly limitCents: Scalars['Int']['output'];
+  readonly period: SpendingPeriod;
+  readonly remainingCents: Scalars['Int']['output'];
+  readonly spentCents: Scalars['Int']['output'];
+};
+
+export const SpendingPeriod = {
+  Daily: 'DAILY',
+  Monthly: 'MONTHLY'
+} as const;
+
+export type SpendingPeriod = typeof SpendingPeriod[keyof typeof SpendingPeriod];
+export type SpendingToggle = {
+  readonly __typename: 'SpendingToggle';
+  readonly category: SpendingCategory;
+  readonly enabled: Scalars['Boolean']['output'];
 };
 
 export type StatefulNotification = {
@@ -2378,7 +2642,9 @@ export const TransactionStatus = {
   Completed: 'COMPLETED',
   Declined: 'DECLINED',
   Pending: 'PENDING',
-  Reversed: 'REVERSED'
+  Refunded: 'REFUNDED',
+  Reversed: 'REVERSED',
+  Unknown: 'UNKNOWN'
 } as const;
 
 export type TransactionStatus = typeof TransactionStatus[keyof typeof TransactionStatus];
@@ -2893,6 +3159,13 @@ export type RealtimePriceQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type RealtimePriceQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly realtimePrice: { readonly __typename: 'RealtimePrice', readonly denominatorCurrency: string, readonly id: string, readonly timestamp: number, readonly btcSatPrice: { readonly __typename: 'PriceOfOneSatInMinorUnit', readonly base: number, readonly offset: number }, readonly usdCentPrice: { readonly __typename: 'PriceOfOneUsdCentInMinorUnit', readonly base: number, readonly offset: number } } } } | null };
 
+export type RealtimePriceUnauthedQueryVariables = Exact<{
+  currency?: InputMaybe<Scalars['DisplayCurrency']['input']>;
+}>;
+
+
+export type RealtimePriceUnauthedQuery = { readonly __typename: 'Query', readonly realtimePrice: { readonly __typename: 'RealtimePrice', readonly denominatorCurrency: string, readonly id: string, readonly timestamp: number, readonly btcSatPrice: { readonly __typename: 'PriceOfOneSatInMinorUnit', readonly base: number, readonly offset: number }, readonly usdCentPrice: { readonly __typename: 'PriceOfOneUsdCentInMinorUnit', readonly base: number, readonly offset: number } } };
+
 export type HideBalanceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -2908,11 +3181,6 @@ export type BetaQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type BetaQuery = { readonly __typename: 'Query', readonly beta: boolean };
 
-export type ColorSchemeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ColorSchemeQuery = { readonly __typename: 'Query', readonly colorScheme: string };
-
 export type CountryCodeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -2927,11 +3195,6 @@ export type FeedbackModalShownQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type FeedbackModalShownQuery = { readonly __typename: 'Query', readonly feedbackModalShown: boolean };
-
-export type HasPromptedSetDefaultAccountQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type HasPromptedSetDefaultAccountQuery = { readonly __typename: 'Query', readonly hasPromptedSetDefaultAccount: boolean };
 
 export type IntroducingCirclesModalShownQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2952,6 +3215,11 @@ export type DeviceSessionCountQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type DeviceSessionCountQuery = { readonly __typename: 'Query', readonly deviceSessionCount: number };
+
+export type PreferredAmountCurrencyQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PreferredAmountCurrencyQuery = { readonly __typename: 'Query', readonly preferredAmountCurrency?: string | null };
 
 export type TxLastSeenQueryVariables = Exact<{
   accountId: Scalars['ID']['input'];
@@ -2989,6 +3257,13 @@ export type CaptchaCreateChallengeMutationVariables = Exact<{ [key: string]: nev
 
 export type CaptchaCreateChallengeMutation = { readonly __typename: 'Mutation', readonly captchaCreateChallenge: { readonly __typename: 'CaptchaCreateChallengePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly result?: { readonly __typename: 'CaptchaCreateChallengeResult', readonly id: string, readonly challengeCode: string, readonly newCaptcha: boolean, readonly failbackMode: boolean } | null } };
 
+export type KycFlowStartMutationVariables = Exact<{
+  input: KycFlowStartInput;
+}>;
+
+
+export type KycFlowStartMutation = { readonly __typename: 'Mutation', readonly kycFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
+
 export type UserLogoutMutationVariables = Exact<{
   input: UserLogoutInput;
 }>;
@@ -3000,6 +3275,74 @@ export type GetUsernamesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetUsernamesQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string }, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null } | null };
+
+export type CardBalanceQueryVariables = Exact<{
+  cardId: Scalars['ID']['input'];
+}>;
+
+
+export type CardBalanceQuery = { readonly __typename: 'Query', readonly cardBalance: { readonly __typename: 'CardBalance', readonly available: number, readonly pending: number, readonly posted: number } };
+
+export type CardUpdateMutationVariables = Exact<{
+  input: CardUpdateInput;
+}>;
+
+
+export type CardUpdateMutation = { readonly __typename: 'Mutation', readonly cardUpdate: { readonly __typename: 'Card', readonly id: string, readonly status: CardStatus } };
+
+export type CardTransactionsPaginatedQueryVariables = Exact<{
+  cardId: Scalars['ID']['input'];
+  first: Scalars['Int']['input'];
+  after?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CardTransactionsPaginatedQuery = { readonly __typename: 'Query', readonly cardTransactionsPaginated: { readonly __typename: 'CardTransactionConnection', readonly edges: ReadonlyArray<{ readonly __typename: 'CardTransactionEdge', readonly cursor: string, readonly node: { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly status: TransactionStatus, readonly createdAt: string, readonly cardId: string } }>, readonly pageInfo: { readonly __typename: 'CardTransactionPageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } };
+
+export type CardUpdateLimitsMutationVariables = Exact<{
+  input: CardUpdateInput;
+}>;
+
+
+export type CardUpdateLimitsMutation = { readonly __typename: 'Mutation', readonly cardUpdate: { readonly __typename: 'Card', readonly id: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null } };
+
+export type PersonalDetailsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PersonalDetailsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly firstName?: string | null, readonly lastName?: string | null, readonly onboardingStatus?: OnboardingStatus | null, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly shippingAddress?: { readonly __typename: 'ShippingAddress', readonly firstName?: string | null, readonly lastName?: string | null, readonly line1: string, readonly line2?: string | null, readonly city: string, readonly region: string, readonly postalCode: string, readonly country?: string | null, readonly countryCode: string } | null }> } } | null };
+
+export type CardTransactionDetailsFragment = { readonly __typename: 'CardTransaction', readonly id: string, readonly amount: number, readonly currency: string, readonly merchantName: string, readonly status: TransactionStatus, readonly createdAt: string };
+
+export type CardQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly cards: ReadonlyArray<{ readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus, readonly createdAt: string, readonly dailyLimitCents?: number | null, readonly monthlyLimitCents?: number | null }>, readonly cardConsumerApplications: ReadonlyArray<{ readonly __typename: 'ConsumerApplication', readonly id: string, readonly applicationStatus: ApplicationStatus }> } } | null };
+
+export type CardEncryptionPublicKeyQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardEncryptionPublicKeyQuery = { readonly __typename: 'Query', readonly cardEncryptionPublicKey: string };
+
+export type CardCreateMutationVariables = Exact<{
+  input: CardCreateInput;
+}>;
+
+
+export type CardCreateMutation = { readonly __typename: 'Mutation', readonly cardCreate: { readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus } };
+
+export type CardPinUpdateMutationVariables = Exact<{
+  input: CardPinUpdateInput;
+}>;
+
+
+export type CardPinUpdateMutation = { readonly __typename: 'Mutation', readonly cardPinUpdate: boolean };
+
+export type CardReplaceMutationVariables = Exact<{
+  input: CardReplaceInput;
+}>;
+
+
+export type CardReplaceMutation = { readonly __typename: 'Mutation', readonly cardReplace: { readonly __typename: 'Card', readonly id: string, readonly lastFour: string, readonly cardType: CardType, readonly status: CardStatus } };
 
 export type ConversionScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3037,13 +3380,6 @@ export type UserEmailRegistrationValidateMutationVariables = Exact<{
 
 export type UserEmailRegistrationValidateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationValidate: { readonly __typename: 'UserEmailRegistrationValidatePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
-export type KycFlowStartMutationVariables = Exact<{
-  input: KycFlowStartInput;
-}>;
-
-
-export type KycFlowStartMutation = { readonly __typename: 'Mutation', readonly kycFlowStart: { readonly __typename: 'OnboardingFlowStartResult', readonly workflowRunId: string, readonly tokenWeb: string } };
-
 export type FullOnboardingScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3070,7 +3406,7 @@ export type BulletinsQueryVariables = Exact<{
 }>;
 
 
-export type BulletinsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly unacknowledgedStatefulNotificationsWithBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null }, readonly edges: ReadonlyArray<{ readonly __typename: 'StatefulNotificationEdge', readonly cursor: string, readonly node: { readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string } | null } }> } } | null };
+export type BulletinsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly unacknowledgedStatefulNotificationsWithBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null }, readonly edges: ReadonlyArray<{ readonly __typename: 'StatefulNotificationEdge', readonly cursor: string, readonly node: { readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string, readonly label?: string | null } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string, readonly label?: string | null } | null } }> } } | null };
 
 export type BusinessMapMarkersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3089,7 +3425,7 @@ export type StatefulNotificationsQueryVariables = Exact<{
 }>;
 
 
-export type StatefulNotificationsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly statefulNotificationsWithoutBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly nodes: ReadonlyArray<{ readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string } | null }>, readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } } | null };
+export type StatefulNotificationsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly statefulNotificationsWithoutBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly nodes: ReadonlyArray<{ readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string, readonly label?: string | null } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string, readonly label?: string | null } | null }>, readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null } } } | null };
 
 export type CirclesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3169,15 +3505,12 @@ export type PriceHistoryScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type PriceHistoryScreenQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
 
-export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
+export type OnChainAddressCurrentMutationVariables = Exact<{
+  input: OnChainAddressCurrentInput;
+}>;
 
 
-export type MyLnUpdatesSubscription = { readonly __typename: 'Subscription', readonly myUpdates: { readonly __typename: 'MyUpdatesPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly update?: { readonly __typename: 'IntraLedgerUpdate' } | { readonly __typename: 'LnUpdate', readonly paymentHash: string, readonly status: InvoicePaymentStatus } | { readonly __typename: 'OnChainUpdate' } | { readonly __typename: 'Price' } | { readonly __typename: 'RealtimePrice' } | null } };
-
-export type PaymentRequestQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type PaymentRequestQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly network: Network, readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string } } } | null, readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
+export type OnChainAddressCurrentMutation = { readonly __typename: 'Mutation', readonly onChainAddressCurrent: { readonly __typename: 'OnChainAddressPayload', readonly address?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
 
 export type LnNoAmountInvoiceCreateMutationVariables = Exact<{
   input: LnNoAmountInvoiceCreateInput;
@@ -3193,19 +3526,22 @@ export type LnInvoiceCreateMutationVariables = Exact<{
 
 export type LnInvoiceCreateMutation = { readonly __typename: 'Mutation', readonly lnInvoiceCreate: { readonly __typename: 'LnInvoicePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly invoice?: { readonly __typename: 'LnInvoice', readonly createdAt: number, readonly paymentHash: string, readonly paymentRequest: string, readonly paymentStatus: InvoicePaymentStatus, readonly externalId: string, readonly satoshis: number } | null } };
 
-export type OnChainAddressCurrentMutationVariables = Exact<{
-  input: OnChainAddressCurrentInput;
-}>;
-
-
-export type OnChainAddressCurrentMutation = { readonly __typename: 'Mutation', readonly onChainAddressCurrent: { readonly __typename: 'OnChainAddressPayload', readonly address?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
-
 export type LnUsdInvoiceCreateMutationVariables = Exact<{
   input: LnUsdInvoiceCreateInput;
 }>;
 
 
 export type LnUsdInvoiceCreateMutation = { readonly __typename: 'Mutation', readonly lnUsdInvoiceCreate: { readonly __typename: 'LnInvoicePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly invoice?: { readonly __typename: 'LnInvoice', readonly createdAt: number, readonly paymentHash: string, readonly paymentRequest: string, readonly paymentStatus: InvoicePaymentStatus, readonly externalId: string, readonly satoshis: number } | null } };
+
+export type PaymentRequestQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PaymentRequestQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly network: Network, readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly ratio: string } } } | null, readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
+
+export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyLnUpdatesSubscription = { readonly __typename: 'Subscription', readonly myUpdates: { readonly __typename: 'MyUpdatesPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly update?: { readonly __typename: 'IntraLedgerUpdate' } | { readonly __typename: 'LnUpdate', readonly paymentHash: string, readonly status: InvoicePaymentStatus } | { readonly __typename: 'OnChainUpdate' } | { readonly __typename: 'Price' } | { readonly __typename: 'RealtimePrice' } | null } };
 
 export type ScanningQrCodeScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3598,6 +3934,16 @@ export const TransactionListFragmentDoc = gql`
   }
 }
     ${TransactionFragmentDoc}`;
+export const CardTransactionDetailsFragmentDoc = gql`
+    fragment CardTransactionDetails on CardTransaction {
+  id
+  amount
+  currency
+  merchantName
+  status
+  createdAt
+}
+    `;
 export const MobileUpdateDocument = gql`
     query mobileUpdate {
   mobileVersions {
@@ -3995,6 +4341,56 @@ export type RealtimePriceQueryHookResult = ReturnType<typeof useRealtimePriceQue
 export type RealtimePriceLazyQueryHookResult = ReturnType<typeof useRealtimePriceLazyQuery>;
 export type RealtimePriceSuspenseQueryHookResult = ReturnType<typeof useRealtimePriceSuspenseQuery>;
 export type RealtimePriceQueryResult = Apollo.QueryResult<RealtimePriceQuery, RealtimePriceQueryVariables>;
+export const RealtimePriceUnauthedDocument = gql`
+    query realtimePriceUnauthed($currency: DisplayCurrency) {
+  realtimePrice(currency: $currency) {
+    btcSatPrice {
+      base
+      offset
+    }
+    denominatorCurrency
+    id
+    timestamp
+    usdCentPrice {
+      base
+      offset
+    }
+  }
+}
+    `;
+
+/**
+ * __useRealtimePriceUnauthedQuery__
+ *
+ * To run a query within a React component, call `useRealtimePriceUnauthedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRealtimePriceUnauthedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRealtimePriceUnauthedQuery({
+ *   variables: {
+ *      currency: // value for 'currency'
+ *   },
+ * });
+ */
+export function useRealtimePriceUnauthedQuery(baseOptions?: Apollo.QueryHookOptions<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>(RealtimePriceUnauthedDocument, options);
+      }
+export function useRealtimePriceUnauthedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>(RealtimePriceUnauthedDocument, options);
+        }
+export function useRealtimePriceUnauthedSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>(RealtimePriceUnauthedDocument, options);
+        }
+export type RealtimePriceUnauthedQueryHookResult = ReturnType<typeof useRealtimePriceUnauthedQuery>;
+export type RealtimePriceUnauthedLazyQueryHookResult = ReturnType<typeof useRealtimePriceUnauthedLazyQuery>;
+export type RealtimePriceUnauthedSuspenseQueryHookResult = ReturnType<typeof useRealtimePriceUnauthedSuspenseQuery>;
+export type RealtimePriceUnauthedQueryResult = Apollo.QueryResult<RealtimePriceUnauthedQuery, RealtimePriceUnauthedQueryVariables>;
 export const HideBalanceDocument = gql`
     query hideBalance {
   hideBalance @client
@@ -4106,43 +4502,6 @@ export type BetaQueryHookResult = ReturnType<typeof useBetaQuery>;
 export type BetaLazyQueryHookResult = ReturnType<typeof useBetaLazyQuery>;
 export type BetaSuspenseQueryHookResult = ReturnType<typeof useBetaSuspenseQuery>;
 export type BetaQueryResult = Apollo.QueryResult<BetaQuery, BetaQueryVariables>;
-export const ColorSchemeDocument = gql`
-    query colorScheme {
-  colorScheme @client
-}
-    `;
-
-/**
- * __useColorSchemeQuery__
- *
- * To run a query within a React component, call `useColorSchemeQuery` and pass it any options that fit your needs.
- * When your component renders, `useColorSchemeQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useColorSchemeQuery({
- *   variables: {
- *   },
- * });
- */
-export function useColorSchemeQuery(baseOptions?: Apollo.QueryHookOptions<ColorSchemeQuery, ColorSchemeQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ColorSchemeQuery, ColorSchemeQueryVariables>(ColorSchemeDocument, options);
-      }
-export function useColorSchemeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ColorSchemeQuery, ColorSchemeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ColorSchemeQuery, ColorSchemeQueryVariables>(ColorSchemeDocument, options);
-        }
-export function useColorSchemeSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ColorSchemeQuery, ColorSchemeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<ColorSchemeQuery, ColorSchemeQueryVariables>(ColorSchemeDocument, options);
-        }
-export type ColorSchemeQueryHookResult = ReturnType<typeof useColorSchemeQuery>;
-export type ColorSchemeLazyQueryHookResult = ReturnType<typeof useColorSchemeLazyQuery>;
-export type ColorSchemeSuspenseQueryHookResult = ReturnType<typeof useColorSchemeSuspenseQuery>;
-export type ColorSchemeQueryResult = Apollo.QueryResult<ColorSchemeQuery, ColorSchemeQueryVariables>;
 export const CountryCodeDocument = gql`
     query countryCode {
   countryCode @client
@@ -4259,43 +4618,6 @@ export type FeedbackModalShownQueryHookResult = ReturnType<typeof useFeedbackMod
 export type FeedbackModalShownLazyQueryHookResult = ReturnType<typeof useFeedbackModalShownLazyQuery>;
 export type FeedbackModalShownSuspenseQueryHookResult = ReturnType<typeof useFeedbackModalShownSuspenseQuery>;
 export type FeedbackModalShownQueryResult = Apollo.QueryResult<FeedbackModalShownQuery, FeedbackModalShownQueryVariables>;
-export const HasPromptedSetDefaultAccountDocument = gql`
-    query hasPromptedSetDefaultAccount {
-  hasPromptedSetDefaultAccount @client
-}
-    `;
-
-/**
- * __useHasPromptedSetDefaultAccountQuery__
- *
- * To run a query within a React component, call `useHasPromptedSetDefaultAccountQuery` and pass it any options that fit your needs.
- * When your component renders, `useHasPromptedSetDefaultAccountQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHasPromptedSetDefaultAccountQuery({
- *   variables: {
- *   },
- * });
- */
-export function useHasPromptedSetDefaultAccountQuery(baseOptions?: Apollo.QueryHookOptions<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>(HasPromptedSetDefaultAccountDocument, options);
-      }
-export function useHasPromptedSetDefaultAccountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>(HasPromptedSetDefaultAccountDocument, options);
-        }
-export function useHasPromptedSetDefaultAccountSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>(HasPromptedSetDefaultAccountDocument, options);
-        }
-export type HasPromptedSetDefaultAccountQueryHookResult = ReturnType<typeof useHasPromptedSetDefaultAccountQuery>;
-export type HasPromptedSetDefaultAccountLazyQueryHookResult = ReturnType<typeof useHasPromptedSetDefaultAccountLazyQuery>;
-export type HasPromptedSetDefaultAccountSuspenseQueryHookResult = ReturnType<typeof useHasPromptedSetDefaultAccountSuspenseQuery>;
-export type HasPromptedSetDefaultAccountQueryResult = Apollo.QueryResult<HasPromptedSetDefaultAccountQuery, HasPromptedSetDefaultAccountQueryVariables>;
 export const IntroducingCirclesModalShownDocument = gql`
     query introducingCirclesModalShown {
   introducingCirclesModalShown @client
@@ -4444,6 +4766,43 @@ export type DeviceSessionCountQueryHookResult = ReturnType<typeof useDeviceSessi
 export type DeviceSessionCountLazyQueryHookResult = ReturnType<typeof useDeviceSessionCountLazyQuery>;
 export type DeviceSessionCountSuspenseQueryHookResult = ReturnType<typeof useDeviceSessionCountSuspenseQuery>;
 export type DeviceSessionCountQueryResult = Apollo.QueryResult<DeviceSessionCountQuery, DeviceSessionCountQueryVariables>;
+export const PreferredAmountCurrencyDocument = gql`
+    query preferredAmountCurrency {
+  preferredAmountCurrency @client
+}
+    `;
+
+/**
+ * __usePreferredAmountCurrencyQuery__
+ *
+ * To run a query within a React component, call `usePreferredAmountCurrencyQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePreferredAmountCurrencyQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePreferredAmountCurrencyQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePreferredAmountCurrencyQuery(baseOptions?: Apollo.QueryHookOptions<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>(PreferredAmountCurrencyDocument, options);
+      }
+export function usePreferredAmountCurrencyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>(PreferredAmountCurrencyDocument, options);
+        }
+export function usePreferredAmountCurrencySuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>(PreferredAmountCurrencyDocument, options);
+        }
+export type PreferredAmountCurrencyQueryHookResult = ReturnType<typeof usePreferredAmountCurrencyQuery>;
+export type PreferredAmountCurrencyLazyQueryHookResult = ReturnType<typeof usePreferredAmountCurrencyLazyQuery>;
+export type PreferredAmountCurrencySuspenseQueryHookResult = ReturnType<typeof usePreferredAmountCurrencySuspenseQuery>;
+export type PreferredAmountCurrencyQueryResult = Apollo.QueryResult<PreferredAmountCurrencyQuery, PreferredAmountCurrencyQueryVariables>;
 export const TxLastSeenDocument = gql`
     query txLastSeen($accountId: ID!) {
   txLastSeen(accountId: $accountId) @client {
@@ -4695,6 +5054,40 @@ export function useCaptchaCreateChallengeMutation(baseOptions?: Apollo.MutationH
 export type CaptchaCreateChallengeMutationHookResult = ReturnType<typeof useCaptchaCreateChallengeMutation>;
 export type CaptchaCreateChallengeMutationResult = Apollo.MutationResult<CaptchaCreateChallengeMutation>;
 export type CaptchaCreateChallengeMutationOptions = Apollo.BaseMutationOptions<CaptchaCreateChallengeMutation, CaptchaCreateChallengeMutationVariables>;
+export const KycFlowStartDocument = gql`
+    mutation kycFlowStart($input: KycFlowStartInput!) {
+  kycFlowStart(input: $input) {
+    workflowRunId
+    tokenWeb
+  }
+}
+    `;
+export type KycFlowStartMutationFn = Apollo.MutationFunction<KycFlowStartMutation, KycFlowStartMutationVariables>;
+
+/**
+ * __useKycFlowStartMutation__
+ *
+ * To run a mutation, you first call `useKycFlowStartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useKycFlowStartMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [kycFlowStartMutation, { data, loading, error }] = useKycFlowStartMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useKycFlowStartMutation(baseOptions?: Apollo.MutationHookOptions<KycFlowStartMutation, KycFlowStartMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<KycFlowStartMutation, KycFlowStartMutationVariables>(KycFlowStartDocument, options);
+      }
+export type KycFlowStartMutationHookResult = ReturnType<typeof useKycFlowStartMutation>;
+export type KycFlowStartMutationResult = Apollo.MutationResult<KycFlowStartMutation>;
+export type KycFlowStartMutationOptions = Apollo.BaseMutationOptions<KycFlowStartMutation, KycFlowStartMutationVariables>;
 export const UserLogoutDocument = gql`
     mutation userLogout($input: UserLogoutInput!) {
   userLogout(input: $input) {
@@ -4775,6 +5168,438 @@ export type GetUsernamesQueryHookResult = ReturnType<typeof useGetUsernamesQuery
 export type GetUsernamesLazyQueryHookResult = ReturnType<typeof useGetUsernamesLazyQuery>;
 export type GetUsernamesSuspenseQueryHookResult = ReturnType<typeof useGetUsernamesSuspenseQuery>;
 export type GetUsernamesQueryResult = Apollo.QueryResult<GetUsernamesQuery, GetUsernamesQueryVariables>;
+export const CardBalanceDocument = gql`
+    query cardBalance($cardId: ID!) {
+  cardBalance(cardId: $cardId) {
+    available
+    pending
+    posted
+  }
+}
+    `;
+
+/**
+ * __useCardBalanceQuery__
+ *
+ * To run a query within a React component, call `useCardBalanceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardBalanceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardBalanceQuery({
+ *   variables: {
+ *      cardId: // value for 'cardId'
+ *   },
+ * });
+ */
+export function useCardBalanceQuery(baseOptions: Apollo.QueryHookOptions<CardBalanceQuery, CardBalanceQueryVariables> & ({ variables: CardBalanceQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardBalanceQuery, CardBalanceQueryVariables>(CardBalanceDocument, options);
+      }
+export function useCardBalanceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardBalanceQuery, CardBalanceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardBalanceQuery, CardBalanceQueryVariables>(CardBalanceDocument, options);
+        }
+export function useCardBalanceSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardBalanceQuery, CardBalanceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardBalanceQuery, CardBalanceQueryVariables>(CardBalanceDocument, options);
+        }
+export type CardBalanceQueryHookResult = ReturnType<typeof useCardBalanceQuery>;
+export type CardBalanceLazyQueryHookResult = ReturnType<typeof useCardBalanceLazyQuery>;
+export type CardBalanceSuspenseQueryHookResult = ReturnType<typeof useCardBalanceSuspenseQuery>;
+export type CardBalanceQueryResult = Apollo.QueryResult<CardBalanceQuery, CardBalanceQueryVariables>;
+export const CardUpdateDocument = gql`
+    mutation cardUpdate($input: CardUpdateInput!) {
+  cardUpdate(input: $input) {
+    id
+    status
+  }
+}
+    `;
+export type CardUpdateMutationFn = Apollo.MutationFunction<CardUpdateMutation, CardUpdateMutationVariables>;
+
+/**
+ * __useCardUpdateMutation__
+ *
+ * To run a mutation, you first call `useCardUpdateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardUpdateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardUpdateMutation, { data, loading, error }] = useCardUpdateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardUpdateMutation(baseOptions?: Apollo.MutationHookOptions<CardUpdateMutation, CardUpdateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardUpdateMutation, CardUpdateMutationVariables>(CardUpdateDocument, options);
+      }
+export type CardUpdateMutationHookResult = ReturnType<typeof useCardUpdateMutation>;
+export type CardUpdateMutationResult = Apollo.MutationResult<CardUpdateMutation>;
+export type CardUpdateMutationOptions = Apollo.BaseMutationOptions<CardUpdateMutation, CardUpdateMutationVariables>;
+export const CardTransactionsPaginatedDocument = gql`
+    query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
+  cardTransactionsPaginated(cardId: $cardId, first: $first, after: $after) {
+    edges {
+      cursor
+      node {
+        id
+        amount
+        currency
+        merchantName
+        status
+        createdAt
+        cardId
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
+    }
+  }
+}
+    `;
+
+/**
+ * __useCardTransactionsPaginatedQuery__
+ *
+ * To run a query within a React component, call `useCardTransactionsPaginatedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardTransactionsPaginatedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardTransactionsPaginatedQuery({
+ *   variables: {
+ *      cardId: // value for 'cardId'
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useCardTransactionsPaginatedQuery(baseOptions: Apollo.QueryHookOptions<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables> & ({ variables: CardTransactionsPaginatedQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>(CardTransactionsPaginatedDocument, options);
+      }
+export function useCardTransactionsPaginatedLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>(CardTransactionsPaginatedDocument, options);
+        }
+export function useCardTransactionsPaginatedSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>(CardTransactionsPaginatedDocument, options);
+        }
+export type CardTransactionsPaginatedQueryHookResult = ReturnType<typeof useCardTransactionsPaginatedQuery>;
+export type CardTransactionsPaginatedLazyQueryHookResult = ReturnType<typeof useCardTransactionsPaginatedLazyQuery>;
+export type CardTransactionsPaginatedSuspenseQueryHookResult = ReturnType<typeof useCardTransactionsPaginatedSuspenseQuery>;
+export type CardTransactionsPaginatedQueryResult = Apollo.QueryResult<CardTransactionsPaginatedQuery, CardTransactionsPaginatedQueryVariables>;
+export const CardUpdateLimitsDocument = gql`
+    mutation cardUpdateLimits($input: CardUpdateInput!) {
+  cardUpdate(input: $input) {
+    id
+    dailyLimitCents
+    monthlyLimitCents
+  }
+}
+    `;
+export type CardUpdateLimitsMutationFn = Apollo.MutationFunction<CardUpdateLimitsMutation, CardUpdateLimitsMutationVariables>;
+
+/**
+ * __useCardUpdateLimitsMutation__
+ *
+ * To run a mutation, you first call `useCardUpdateLimitsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardUpdateLimitsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardUpdateLimitsMutation, { data, loading, error }] = useCardUpdateLimitsMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardUpdateLimitsMutation(baseOptions?: Apollo.MutationHookOptions<CardUpdateLimitsMutation, CardUpdateLimitsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardUpdateLimitsMutation, CardUpdateLimitsMutationVariables>(CardUpdateLimitsDocument, options);
+      }
+export type CardUpdateLimitsMutationHookResult = ReturnType<typeof useCardUpdateLimitsMutation>;
+export type CardUpdateLimitsMutationResult = Apollo.MutationResult<CardUpdateLimitsMutation>;
+export type CardUpdateLimitsMutationOptions = Apollo.BaseMutationOptions<CardUpdateLimitsMutation, CardUpdateLimitsMutationVariables>;
+export const PersonalDetailsDocument = gql`
+    query personalDetails {
+  me {
+    id
+    phone
+    email {
+      address
+    }
+    defaultAccount {
+      ... on ConsumerAccount {
+        id
+        firstName
+        lastName
+        onboardingStatus
+        cards {
+          id
+          shippingAddress {
+            firstName
+            lastName
+            line1
+            line2
+            city
+            region
+            postalCode
+            country
+            countryCode
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __usePersonalDetailsQuery__
+ *
+ * To run a query within a React component, call `usePersonalDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePersonalDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePersonalDetailsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePersonalDetailsQuery(baseOptions?: Apollo.QueryHookOptions<PersonalDetailsQuery, PersonalDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PersonalDetailsQuery, PersonalDetailsQueryVariables>(PersonalDetailsDocument, options);
+      }
+export function usePersonalDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PersonalDetailsQuery, PersonalDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PersonalDetailsQuery, PersonalDetailsQueryVariables>(PersonalDetailsDocument, options);
+        }
+export function usePersonalDetailsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PersonalDetailsQuery, PersonalDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PersonalDetailsQuery, PersonalDetailsQueryVariables>(PersonalDetailsDocument, options);
+        }
+export type PersonalDetailsQueryHookResult = ReturnType<typeof usePersonalDetailsQuery>;
+export type PersonalDetailsLazyQueryHookResult = ReturnType<typeof usePersonalDetailsLazyQuery>;
+export type PersonalDetailsSuspenseQueryHookResult = ReturnType<typeof usePersonalDetailsSuspenseQuery>;
+export type PersonalDetailsQueryResult = Apollo.QueryResult<PersonalDetailsQuery, PersonalDetailsQueryVariables>;
+export const CardDocument = gql`
+    query card {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cards {
+          id
+          lastFour
+          cardType
+          status
+          createdAt
+          dailyLimitCents
+          monthlyLimitCents
+        }
+        cardConsumerApplications {
+          id
+          applicationStatus
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCardQuery__
+ *
+ * To run a query within a React component, call `useCardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardQuery(baseOptions?: Apollo.QueryHookOptions<CardQuery, CardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardQuery, CardQueryVariables>(CardDocument, options);
+      }
+export function useCardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardQuery, CardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardQuery, CardQueryVariables>(CardDocument, options);
+        }
+export function useCardSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardQuery, CardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardQuery, CardQueryVariables>(CardDocument, options);
+        }
+export type CardQueryHookResult = ReturnType<typeof useCardQuery>;
+export type CardLazyQueryHookResult = ReturnType<typeof useCardLazyQuery>;
+export type CardSuspenseQueryHookResult = ReturnType<typeof useCardSuspenseQuery>;
+export type CardQueryResult = Apollo.QueryResult<CardQuery, CardQueryVariables>;
+export const CardEncryptionPublicKeyDocument = gql`
+    query cardEncryptionPublicKey {
+  cardEncryptionPublicKey
+}
+    `;
+
+/**
+ * __useCardEncryptionPublicKeyQuery__
+ *
+ * To run a query within a React component, call `useCardEncryptionPublicKeyQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardEncryptionPublicKeyQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardEncryptionPublicKeyQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardEncryptionPublicKeyQuery(baseOptions?: Apollo.QueryHookOptions<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>(CardEncryptionPublicKeyDocument, options);
+      }
+export function useCardEncryptionPublicKeyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>(CardEncryptionPublicKeyDocument, options);
+        }
+export function useCardEncryptionPublicKeySuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>(CardEncryptionPublicKeyDocument, options);
+        }
+export type CardEncryptionPublicKeyQueryHookResult = ReturnType<typeof useCardEncryptionPublicKeyQuery>;
+export type CardEncryptionPublicKeyLazyQueryHookResult = ReturnType<typeof useCardEncryptionPublicKeyLazyQuery>;
+export type CardEncryptionPublicKeySuspenseQueryHookResult = ReturnType<typeof useCardEncryptionPublicKeySuspenseQuery>;
+export type CardEncryptionPublicKeyQueryResult = Apollo.QueryResult<CardEncryptionPublicKeyQuery, CardEncryptionPublicKeyQueryVariables>;
+export const CardCreateDocument = gql`
+    mutation cardCreate($input: CardCreateInput!) {
+  cardCreate(input: $input) {
+    id
+    lastFour
+    cardType
+    status
+  }
+}
+    `;
+export type CardCreateMutationFn = Apollo.MutationFunction<CardCreateMutation, CardCreateMutationVariables>;
+
+/**
+ * __useCardCreateMutation__
+ *
+ * To run a mutation, you first call `useCardCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardCreateMutation, { data, loading, error }] = useCardCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardCreateMutation(baseOptions?: Apollo.MutationHookOptions<CardCreateMutation, CardCreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardCreateMutation, CardCreateMutationVariables>(CardCreateDocument, options);
+      }
+export type CardCreateMutationHookResult = ReturnType<typeof useCardCreateMutation>;
+export type CardCreateMutationResult = Apollo.MutationResult<CardCreateMutation>;
+export type CardCreateMutationOptions = Apollo.BaseMutationOptions<CardCreateMutation, CardCreateMutationVariables>;
+export const CardPinUpdateDocument = gql`
+    mutation cardPinUpdate($input: CardPinUpdateInput!) {
+  cardPinUpdate(input: $input)
+}
+    `;
+export type CardPinUpdateMutationFn = Apollo.MutationFunction<CardPinUpdateMutation, CardPinUpdateMutationVariables>;
+
+/**
+ * __useCardPinUpdateMutation__
+ *
+ * To run a mutation, you first call `useCardPinUpdateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardPinUpdateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardPinUpdateMutation, { data, loading, error }] = useCardPinUpdateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardPinUpdateMutation(baseOptions?: Apollo.MutationHookOptions<CardPinUpdateMutation, CardPinUpdateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardPinUpdateMutation, CardPinUpdateMutationVariables>(CardPinUpdateDocument, options);
+      }
+export type CardPinUpdateMutationHookResult = ReturnType<typeof useCardPinUpdateMutation>;
+export type CardPinUpdateMutationResult = Apollo.MutationResult<CardPinUpdateMutation>;
+export type CardPinUpdateMutationOptions = Apollo.BaseMutationOptions<CardPinUpdateMutation, CardPinUpdateMutationVariables>;
+export const CardReplaceDocument = gql`
+    mutation cardReplace($input: CardReplaceInput!) {
+  cardReplace(input: $input) {
+    id
+    lastFour
+    cardType
+    status
+  }
+}
+    `;
+export type CardReplaceMutationFn = Apollo.MutationFunction<CardReplaceMutation, CardReplaceMutationVariables>;
+
+/**
+ * __useCardReplaceMutation__
+ *
+ * To run a mutation, you first call `useCardReplaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCardReplaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cardReplaceMutation, { data, loading, error }] = useCardReplaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCardReplaceMutation(baseOptions?: Apollo.MutationHookOptions<CardReplaceMutation, CardReplaceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CardReplaceMutation, CardReplaceMutationVariables>(CardReplaceDocument, options);
+      }
+export type CardReplaceMutationHookResult = ReturnType<typeof useCardReplaceMutation>;
+export type CardReplaceMutationResult = Apollo.MutationResult<CardReplaceMutation>;
+export type CardReplaceMutationOptions = Apollo.BaseMutationOptions<CardReplaceMutation, CardReplaceMutationVariables>;
 export const ConversionScreenDocument = gql`
     query conversionScreen {
   me {
@@ -5041,40 +5866,6 @@ export function useUserEmailRegistrationValidateMutation(baseOptions?: Apollo.Mu
 export type UserEmailRegistrationValidateMutationHookResult = ReturnType<typeof useUserEmailRegistrationValidateMutation>;
 export type UserEmailRegistrationValidateMutationResult = Apollo.MutationResult<UserEmailRegistrationValidateMutation>;
 export type UserEmailRegistrationValidateMutationOptions = Apollo.BaseMutationOptions<UserEmailRegistrationValidateMutation, UserEmailRegistrationValidateMutationVariables>;
-export const KycFlowStartDocument = gql`
-    mutation kycFlowStart($input: KycFlowStartInput!) {
-  kycFlowStart(input: $input) {
-    workflowRunId
-    tokenWeb
-  }
-}
-    `;
-export type KycFlowStartMutationFn = Apollo.MutationFunction<KycFlowStartMutation, KycFlowStartMutationVariables>;
-
-/**
- * __useKycFlowStartMutation__
- *
- * To run a mutation, you first call `useKycFlowStartMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useKycFlowStartMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [kycFlowStartMutation, { data, loading, error }] = useKycFlowStartMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useKycFlowStartMutation(baseOptions?: Apollo.MutationHookOptions<KycFlowStartMutation, KycFlowStartMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<KycFlowStartMutation, KycFlowStartMutationVariables>(KycFlowStartDocument, options);
-      }
-export type KycFlowStartMutationHookResult = ReturnType<typeof useKycFlowStartMutation>;
-export type KycFlowStartMutationResult = Apollo.MutationResult<KycFlowStartMutation>;
-export type KycFlowStartMutationOptions = Apollo.BaseMutationOptions<KycFlowStartMutation, KycFlowStartMutationVariables>;
 export const FullOnboardingScreenDocument = gql`
     query fullOnboardingScreen {
   me {
@@ -5295,9 +6086,11 @@ export const BulletinsDocument = gql`
           action {
             ... on OpenDeepLinkAction {
               deepLink
+              label
             }
             ... on OpenExternalLinkAction {
               url
+              label
             }
           }
         }
@@ -5437,9 +6230,11 @@ export const StatefulNotificationsDocument = gql`
         action {
           ... on OpenDeepLinkAction {
             deepLink
+            label
           }
           ... on OpenExternalLinkAction {
             url
+            label
           }
         }
       }
@@ -5998,101 +6793,42 @@ export type PriceHistoryScreenQueryHookResult = ReturnType<typeof usePriceHistor
 export type PriceHistoryScreenLazyQueryHookResult = ReturnType<typeof usePriceHistoryScreenLazyQuery>;
 export type PriceHistoryScreenSuspenseQueryHookResult = ReturnType<typeof usePriceHistoryScreenSuspenseQuery>;
 export type PriceHistoryScreenQueryResult = Apollo.QueryResult<PriceHistoryScreenQuery, PriceHistoryScreenQueryVariables>;
-export const MyLnUpdatesDocument = gql`
-    subscription myLnUpdates {
-  myUpdates {
+export const OnChainAddressCurrentDocument = gql`
+    mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
+  onChainAddressCurrent(input: $input) {
     errors {
       message
     }
-    update {
-      ... on LnUpdate {
-        paymentHash
-        status
-      }
-    }
+    address
   }
 }
     `;
+export type OnChainAddressCurrentMutationFn = Apollo.MutationFunction<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>;
 
 /**
- * __useMyLnUpdatesSubscription__
+ * __useOnChainAddressCurrentMutation__
  *
- * To run a query within a React component, call `useMyLnUpdatesSubscription` and pass it any options that fit your needs.
- * When your component renders, `useMyLnUpdatesSubscription` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
+ * To run a mutation, you first call `useOnChainAddressCurrentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useOnChainAddressCurrentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
  *
- * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const { data, loading, error } = useMyLnUpdatesSubscription({
+ * const [onChainAddressCurrentMutation, { data, loading, error }] = useOnChainAddressCurrentMutation({
  *   variables: {
+ *      input: // value for 'input'
  *   },
  * });
  */
-export function useMyLnUpdatesSubscription(baseOptions?: Apollo.SubscriptionHookOptions<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>) {
+export function useOnChainAddressCurrentMutation(baseOptions?: Apollo.MutationHookOptions<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useSubscription<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>(MyLnUpdatesDocument, options);
+        return Apollo.useMutation<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>(OnChainAddressCurrentDocument, options);
       }
-export type MyLnUpdatesSubscriptionHookResult = ReturnType<typeof useMyLnUpdatesSubscription>;
-export type MyLnUpdatesSubscriptionResult = Apollo.SubscriptionResult<MyLnUpdatesSubscription>;
-export const PaymentRequestDocument = gql`
-    query paymentRequest {
-  globals {
-    network
-    feesInformation {
-      deposit {
-        minBankFee
-        minBankFeeThreshold
-      }
-    }
-  }
-  me {
-    id
-    username
-    defaultAccount {
-      id
-      wallets {
-        id
-        balance
-        walletCurrency
-      }
-      defaultWalletId
-    }
-  }
-}
-    `;
-
-/**
- * __usePaymentRequestQuery__
- *
- * To run a query within a React component, call `usePaymentRequestQuery` and pass it any options that fit your needs.
- * When your component renders, `usePaymentRequestQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePaymentRequestQuery({
- *   variables: {
- *   },
- * });
- */
-export function usePaymentRequestQuery(baseOptions?: Apollo.QueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
-      }
-export function usePaymentRequestLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
-        }
-export function usePaymentRequestSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
-        }
-export type PaymentRequestQueryHookResult = ReturnType<typeof usePaymentRequestQuery>;
-export type PaymentRequestLazyQueryHookResult = ReturnType<typeof usePaymentRequestLazyQuery>;
-export type PaymentRequestSuspenseQueryHookResult = ReturnType<typeof usePaymentRequestSuspenseQuery>;
-export type PaymentRequestQueryResult = Apollo.QueryResult<PaymentRequestQuery, PaymentRequestQueryVariables>;
+export type OnChainAddressCurrentMutationHookResult = ReturnType<typeof useOnChainAddressCurrentMutation>;
+export type OnChainAddressCurrentMutationResult = Apollo.MutationResult<OnChainAddressCurrentMutation>;
+export type OnChainAddressCurrentMutationOptions = Apollo.BaseMutationOptions<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>;
 export const LnNoAmountInvoiceCreateDocument = gql`
     mutation lnNoAmountInvoiceCreate($input: LnNoAmountInvoiceCreateInput!) {
   lnNoAmountInvoiceCreate(input: $input) {
@@ -6178,42 +6914,6 @@ export function useLnInvoiceCreateMutation(baseOptions?: Apollo.MutationHookOpti
 export type LnInvoiceCreateMutationHookResult = ReturnType<typeof useLnInvoiceCreateMutation>;
 export type LnInvoiceCreateMutationResult = Apollo.MutationResult<LnInvoiceCreateMutation>;
 export type LnInvoiceCreateMutationOptions = Apollo.BaseMutationOptions<LnInvoiceCreateMutation, LnInvoiceCreateMutationVariables>;
-export const OnChainAddressCurrentDocument = gql`
-    mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
-  onChainAddressCurrent(input: $input) {
-    errors {
-      message
-    }
-    address
-  }
-}
-    `;
-export type OnChainAddressCurrentMutationFn = Apollo.MutationFunction<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>;
-
-/**
- * __useOnChainAddressCurrentMutation__
- *
- * To run a mutation, you first call `useOnChainAddressCurrentMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOnChainAddressCurrentMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [onChainAddressCurrentMutation, { data, loading, error }] = useOnChainAddressCurrentMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useOnChainAddressCurrentMutation(baseOptions?: Apollo.MutationHookOptions<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>(OnChainAddressCurrentDocument, options);
-      }
-export type OnChainAddressCurrentMutationHookResult = ReturnType<typeof useOnChainAddressCurrentMutation>;
-export type OnChainAddressCurrentMutationResult = Apollo.MutationResult<OnChainAddressCurrentMutation>;
-export type OnChainAddressCurrentMutationOptions = Apollo.BaseMutationOptions<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>;
 export const LnUsdInvoiceCreateDocument = gql`
     mutation lnUsdInvoiceCreate($input: LnUsdInvoiceCreateInput!) {
   lnUsdInvoiceCreate(input: $input) {
@@ -6257,6 +6957,102 @@ export function useLnUsdInvoiceCreateMutation(baseOptions?: Apollo.MutationHookO
 export type LnUsdInvoiceCreateMutationHookResult = ReturnType<typeof useLnUsdInvoiceCreateMutation>;
 export type LnUsdInvoiceCreateMutationResult = Apollo.MutationResult<LnUsdInvoiceCreateMutation>;
 export type LnUsdInvoiceCreateMutationOptions = Apollo.BaseMutationOptions<LnUsdInvoiceCreateMutation, LnUsdInvoiceCreateMutationVariables>;
+export const PaymentRequestDocument = gql`
+    query paymentRequest {
+  globals {
+    network
+    feesInformation {
+      deposit {
+        minBankFee
+        minBankFeeThreshold
+        ratio
+      }
+    }
+  }
+  me {
+    id
+    username
+    defaultAccount {
+      id
+      wallets {
+        id
+        balance
+        walletCurrency
+      }
+      defaultWalletId
+    }
+  }
+}
+    `;
+
+/**
+ * __usePaymentRequestQuery__
+ *
+ * To run a query within a React component, call `usePaymentRequestQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePaymentRequestQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePaymentRequestQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePaymentRequestQuery(baseOptions?: Apollo.QueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
+      }
+export function usePaymentRequestLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
+        }
+export function usePaymentRequestSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PaymentRequestQuery, PaymentRequestQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PaymentRequestQuery, PaymentRequestQueryVariables>(PaymentRequestDocument, options);
+        }
+export type PaymentRequestQueryHookResult = ReturnType<typeof usePaymentRequestQuery>;
+export type PaymentRequestLazyQueryHookResult = ReturnType<typeof usePaymentRequestLazyQuery>;
+export type PaymentRequestSuspenseQueryHookResult = ReturnType<typeof usePaymentRequestSuspenseQuery>;
+export type PaymentRequestQueryResult = Apollo.QueryResult<PaymentRequestQuery, PaymentRequestQueryVariables>;
+export const MyLnUpdatesDocument = gql`
+    subscription myLnUpdates {
+  myUpdates {
+    errors {
+      message
+    }
+    update {
+      ... on LnUpdate {
+        paymentHash
+        status
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useMyLnUpdatesSubscription__
+ *
+ * To run a query within a React component, call `useMyLnUpdatesSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useMyLnUpdatesSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMyLnUpdatesSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMyLnUpdatesSubscription(baseOptions?: Apollo.SubscriptionHookOptions<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<MyLnUpdatesSubscription, MyLnUpdatesSubscriptionVariables>(MyLnUpdatesDocument, options);
+      }
+export type MyLnUpdatesSubscriptionHookResult = ReturnType<typeof useMyLnUpdatesSubscription>;
+export type MyLnUpdatesSubscriptionResult = Apollo.SubscriptionResult<MyLnUpdatesSubscription>;
 export const ScanningQrCodeScreenDocument = gql`
     query scanningQRCodeScreen {
   globals {
@@ -8556,8 +9352,12 @@ export type ResolversTypes = {
   ApiKey: ResolverTypeWrapper<ApiKey>;
   ApiKeyCreateInput: ApiKeyCreateInput;
   ApiKeyCreatePayload: ResolverTypeWrapper<ApiKeyCreatePayload>;
+  ApiKeyLimits: ResolverTypeWrapper<ApiKeyLimits>;
+  ApiKeyRemoveLimitInput: ApiKeyRemoveLimitInput;
   ApiKeyRevokeInput: ApiKeyRevokeInput;
   ApiKeyRevokePayload: ResolverTypeWrapper<ApiKeyRevokePayload>;
+  ApiKeySetLimitInput: ApiKeySetLimitInput;
+  ApiKeySetLimitPayload: ResolverTypeWrapper<ApiKeySetLimitPayload>;
   ApplicationStatus: ApplicationStatus;
   AuthToken: ResolverTypeWrapper<Scalars['AuthToken']['output']>;
   AuthTokenPayload: ResolverTypeWrapper<AuthTokenPayload>;
@@ -8573,13 +9373,31 @@ export type ResolversTypes = {
   CaptchaCreateChallengeResult: ResolverTypeWrapper<CaptchaCreateChallengeResult>;
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: ResolverTypeWrapper<Card>;
+  CardBalance: ResolverTypeWrapper<CardBalance>;
+  CardCollateralBalance: ResolverTypeWrapper<CardCollateralBalance>;
+  CardCollateralDeposit: ResolverTypeWrapper<CardCollateralDeposit>;
+  CardCollateralDepositInput: CardCollateralDepositInput;
   CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
   CardCreateInput: CardCreateInput;
+  CardHolder: ResolverTypeWrapper<CardHolder>;
+  CardMerchant: ResolverTypeWrapper<CardMerchant>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  CardPinUpdateInput: CardPinUpdateInput;
+  CardReplaceInput: CardReplaceInput;
+  CardSecretsEncrypted: ResolverTypeWrapper<CardSecretsEncrypted>;
+  CardSpendingLimitRemoveInput: CardSpendingLimitRemoveInput;
+  CardSpendingLimitRemovePayload: ResolverTypeWrapper<CardSpendingLimitRemovePayload>;
+  CardSpendingLimitSetInput: CardSpendingLimitSetInput;
+  CardSpendingLimitSetPayload: ResolverTypeWrapper<CardSpendingLimitSetPayload>;
+  CardSpendingToggleSetInput: CardSpendingToggleSetInput;
+  CardSpendingToggleSetPayload: ResolverTypeWrapper<CardSpendingToggleSetPayload>;
   CardStatus: CardStatus;
   CardTransaction: ResolverTypeWrapper<CardTransaction>;
-  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  CardTransactionConnection: ResolverTypeWrapper<CardTransactionConnection>;
+  CardTransactionEdge: ResolverTypeWrapper<CardTransactionEdge>;
+  CardTransactionPageInfo: ResolverTypeWrapper<CardTransactionPageInfo>;
   CardType: CardType;
   CardUpdateInput: CardUpdateInput;
   CentAmount: ResolverTypeWrapper<Scalars['CentAmount']['output']>;
@@ -8606,6 +9424,7 @@ export type ResolversTypes = {
   Email: ResolverTypeWrapper<Email>;
   EmailAddress: ResolverTypeWrapper<Scalars['EmailAddress']['output']>;
   EmailRegistrationId: ResolverTypeWrapper<Scalars['EmailRegistrationId']['output']>;
+  EncryptedData: ResolverTypeWrapper<EncryptedData>;
   EndpointId: ResolverTypeWrapper<Scalars['EndpointId']['output']>;
   EndpointUrl: ResolverTypeWrapper<Scalars['EndpointUrl']['output']>;
   Error: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Error']>;
@@ -8629,10 +9448,12 @@ export type ResolversTypes = {
   InvoiceEdge: ResolverTypeWrapper<InvoiceEdge>;
   InvoicePaymentStatus: InvoicePaymentStatus;
   KycFlowStartInput: KycFlowStartInput;
+  KycFlowType: KycFlowType;
   Language: ResolverTypeWrapper<Scalars['Language']['output']>;
   Leader: ResolverTypeWrapper<Leader>;
   Leaderboard: ResolverTypeWrapper<Leaderboard>;
   LeaderboardName: ResolverTypeWrapper<Scalars['LeaderboardName']['output']>;
+  LimitTimeWindow: LimitTimeWindow;
   LnAddressPaymentSendInput: LnAddressPaymentSendInput;
   LnInvoice: ResolverTypeWrapper<LnInvoice>;
   LnInvoiceCancelInput: LnInvoiceCancelInput;
@@ -8733,9 +9554,15 @@ export type ResolversTypes = {
   SettlementViaIntraLedger: ResolverTypeWrapper<SettlementViaIntraLedger>;
   SettlementViaLn: ResolverTypeWrapper<SettlementViaLn>;
   SettlementViaOnChain: ResolverTypeWrapper<SettlementViaOnChain>;
+  ShippingAddress: ResolverTypeWrapper<ShippingAddress>;
   ShippingAddressInput: ShippingAddressInput;
   SignedAmount: ResolverTypeWrapper<Scalars['SignedAmount']['output']>;
   SignedDisplayMajorAmount: ResolverTypeWrapper<Scalars['SignedDisplayMajorAmount']['output']>;
+  SpendingCategory: SpendingCategory;
+  SpendingLimit: ResolverTypeWrapper<SpendingLimit>;
+  SpendingLimitStatus: ResolverTypeWrapper<SpendingLimitStatus>;
+  SpendingPeriod: SpendingPeriod;
+  SpendingToggle: ResolverTypeWrapper<SpendingToggle>;
   StatefulNotification: ResolverTypeWrapper<Omit<StatefulNotification, 'action'> & { action?: Maybe<ResolversTypes['NotificationAction']> }>;
   StatefulNotificationAcknowledgeInput: StatefulNotificationAcknowledgeInput;
   StatefulNotificationAcknowledgePayload: ResolverTypeWrapper<StatefulNotificationAcknowledgePayload>;
@@ -8821,8 +9648,12 @@ export type ResolversParentTypes = {
   ApiKey: ApiKey;
   ApiKeyCreateInput: ApiKeyCreateInput;
   ApiKeyCreatePayload: ApiKeyCreatePayload;
+  ApiKeyLimits: ApiKeyLimits;
+  ApiKeyRemoveLimitInput: ApiKeyRemoveLimitInput;
   ApiKeyRevokeInput: ApiKeyRevokeInput;
   ApiKeyRevokePayload: ApiKeyRevokePayload;
+  ApiKeySetLimitInput: ApiKeySetLimitInput;
+  ApiKeySetLimitPayload: ApiKeySetLimitPayload;
   AuthToken: Scalars['AuthToken']['output'];
   AuthTokenPayload: AuthTokenPayload;
   Authorization: Authorization;
@@ -8837,12 +9668,30 @@ export type ResolversParentTypes = {
   CaptchaCreateChallengeResult: CaptchaCreateChallengeResult;
   CaptchaRequestAuthCodeInput: CaptchaRequestAuthCodeInput;
   Card: Card;
+  CardBalance: CardBalance;
+  CardCollateralBalance: CardCollateralBalance;
+  CardCollateralDeposit: CardCollateralDeposit;
+  CardCollateralDepositInput: CardCollateralDepositInput;
   CardConsumerApplicationCreateInput: CardConsumerApplicationCreateInput;
   CardConsumerApplicationManualCreateInput: CardConsumerApplicationManualCreateInput;
   CardConsumerApplicationUpdateInput: CardConsumerApplicationUpdateInput;
   CardCreateInput: CardCreateInput;
-  CardTransaction: CardTransaction;
+  CardHolder: CardHolder;
+  CardMerchant: CardMerchant;
   Float: Scalars['Float']['output'];
+  CardPinUpdateInput: CardPinUpdateInput;
+  CardReplaceInput: CardReplaceInput;
+  CardSecretsEncrypted: CardSecretsEncrypted;
+  CardSpendingLimitRemoveInput: CardSpendingLimitRemoveInput;
+  CardSpendingLimitRemovePayload: CardSpendingLimitRemovePayload;
+  CardSpendingLimitSetInput: CardSpendingLimitSetInput;
+  CardSpendingLimitSetPayload: CardSpendingLimitSetPayload;
+  CardSpendingToggleSetInput: CardSpendingToggleSetInput;
+  CardSpendingToggleSetPayload: CardSpendingToggleSetPayload;
+  CardTransaction: CardTransaction;
+  CardTransactionConnection: CardTransactionConnection;
+  CardTransactionEdge: CardTransactionEdge;
+  CardTransactionPageInfo: CardTransactionPageInfo;
   CardUpdateInput: CardUpdateInput;
   CentAmount: Scalars['CentAmount']['output'];
   CentAmountPayload: CentAmountPayload;
@@ -8867,6 +9716,7 @@ export type ResolversParentTypes = {
   Email: Email;
   EmailAddress: Scalars['EmailAddress']['output'];
   EmailRegistrationId: Scalars['EmailRegistrationId']['output'];
+  EncryptedData: EncryptedData;
   EndpointId: Scalars['EndpointId']['output'];
   EndpointUrl: Scalars['EndpointUrl']['output'];
   Error: ResolversInterfaceTypes<ResolversParentTypes>['Error'];
@@ -8983,9 +9833,13 @@ export type ResolversParentTypes = {
   SettlementViaIntraLedger: SettlementViaIntraLedger;
   SettlementViaLn: SettlementViaLn;
   SettlementViaOnChain: SettlementViaOnChain;
+  ShippingAddress: ShippingAddress;
   ShippingAddressInput: ShippingAddressInput;
   SignedAmount: Scalars['SignedAmount']['output'];
   SignedDisplayMajorAmount: Scalars['SignedDisplayMajorAmount']['output'];
+  SpendingLimit: SpendingLimit;
+  SpendingLimitStatus: SpendingLimitStatus;
+  SpendingToggle: SpendingToggle;
   StatefulNotification: Omit<StatefulNotification, 'action'> & { action?: Maybe<ResolversParentTypes['NotificationAction']> };
   StatefulNotificationAcknowledgeInput: StatefulNotificationAcknowledgeInput;
   StatefulNotificationAcknowledgePayload: StatefulNotificationAcknowledgePayload;
@@ -9114,6 +9968,7 @@ export type ApiKeyResolvers<ContextType = any, ParentType extends ResolversParen
   expiresAt?: Resolver<Maybe<ResolversTypes['Timestamp']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   lastUsedAt?: Resolver<Maybe<ResolversTypes['Timestamp']>, ParentType, ContextType>;
+  limits?: Resolver<ResolversTypes['ApiKeyLimits'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   readOnly?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   revoked?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
@@ -9127,7 +9982,24 @@ export type ApiKeyCreatePayloadResolvers<ContextType = any, ParentType extends R
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type ApiKeyLimitsResolvers<ContextType = any, ParentType extends ResolversParentTypes['ApiKeyLimits'] = ResolversParentTypes['ApiKeyLimits']> = {
+  annualLimitSats?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  annualSpentSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  dailyLimitSats?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  dailySpentSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  monthlyLimitSats?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  monthlySpentSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  weeklyLimitSats?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  weeklySpentSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type ApiKeyRevokePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['ApiKeyRevokePayload'] = ResolversParentTypes['ApiKeyRevokePayload']> = {
+  apiKey?: Resolver<ResolversTypes['ApiKey'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ApiKeySetLimitPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['ApiKeySetLimitPayload'] = ResolversParentTypes['ApiKeySetLimitPayload']> = {
   apiKey?: Resolver<ResolversTypes['ApiKey'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -9211,18 +10083,119 @@ export type CardResolvers<ContextType = any, ParentType extends ResolversParentT
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   lastFour?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   monthlyLimitCents?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  shippingAddress?: Resolver<Maybe<ResolversTypes['ShippingAddress']>, ParentType, ContextType>;
+  spendingLimitStatus?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimitStatus']>, ParentType, ContextType>;
+  spendingLimits?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimit']>, ParentType, ContextType>;
+  spendingToggles?: Resolver<ReadonlyArray<ResolversTypes['SpendingToggle']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['CardStatus'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type CardBalanceResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardBalance'] = ResolversParentTypes['CardBalance']> = {
+  available?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  pending?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  posted?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardCollateralBalanceResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardCollateralBalance'] = ResolversParentTypes['CardCollateralBalance']> = {
+  availableSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  pendingSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  settledSats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardCollateralDepositResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardCollateralDeposit'] = ResolversParentTypes['CardCollateralDeposit']> = {
+  newAvailableBalance?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  satAmount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  transferId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardHolderResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardHolder'] = ResolversParentTypes['CardHolder']> = {
+  firstName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  lastName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardMerchantResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardMerchant'] = ResolversParentTypes['CardMerchant']> = {
+  brandName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  category?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  categoryGroup?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  city?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  confidenceRange?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  confidenceScore?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  displayName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  iconUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  logoUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  phone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  state?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  website?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardSecretsEncryptedResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSecretsEncrypted'] = ResolversParentTypes['CardSecretsEncrypted']> = {
+  encryptedCvc?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
+  encryptedPan?: Resolver<ResolversTypes['EncryptedData'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardSpendingLimitRemovePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSpendingLimitRemovePayload'] = ResolversParentTypes['CardSpendingLimitRemovePayload']> = {
+  removedLimit?: Resolver<ResolversTypes['SpendingLimit'], ParentType, ContextType>;
+  statuses?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimitStatus']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardSpendingLimitSetPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSpendingLimitSetPayload'] = ResolversParentTypes['CardSpendingLimitSetPayload']> = {
+  limit?: Resolver<ResolversTypes['SpendingLimit'], ParentType, ContextType>;
+  statuses?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimitStatus']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardSpendingToggleSetPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardSpendingToggleSetPayload'] = ResolversParentTypes['CardSpendingToggleSetPayload']> = {
+  statuses?: Resolver<ReadonlyArray<ResolversTypes['SpendingLimitStatus']>, ParentType, ContextType>;
+  toggle?: Resolver<ResolversTypes['SpendingToggle'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type CardTransactionResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardTransaction'] = ResolversParentTypes['CardTransaction']> = {
-  amount?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  amount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   cardId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   currency?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  enrichedMerchantCategory?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  enrichedMerchantName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  localAmount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  localCurrency?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchant?: Resolver<Maybe<ResolversTypes['CardMerchant']>, ParentType, ContextType>;
+  merchantCategory?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchantCategoryCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchantCity?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  merchantCountry?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   merchantName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['TransactionStatus'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardTransactionConnectionResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardTransactionConnection'] = ResolversParentTypes['CardTransactionConnection']> = {
+  edges?: Resolver<ReadonlyArray<ResolversTypes['CardTransactionEdge']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['CardTransactionPageInfo'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardTransactionEdgeResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardTransactionEdge'] = ResolversParentTypes['CardTransactionEdge']> = {
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes['CardTransaction'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CardTransactionPageInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['CardTransactionPageInfo'] = ResolversParentTypes['CardTransactionPageInfo']> = {
+  endCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  hasPreviousPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  startCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -9241,13 +10214,13 @@ export type ConsumerAccountResolvers<ContextType = any, ParentType extends Resol
   callbackEndpoints?: Resolver<ReadonlyArray<ResolversTypes['CallbackEndpoint']>, ParentType, ContextType>;
   callbackPortalUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   cardConsumerApplications?: Resolver<ReadonlyArray<ResolversTypes['ConsumerApplication']>, ParentType, ContextType>;
-  cardTransactions?: Resolver<ReadonlyArray<ResolversTypes['CardTransaction']>, ParentType, ContextType, Partial<ConsumerAccountCardTransactionsArgs>>;
   cards?: Resolver<ReadonlyArray<ResolversTypes['Card']>, ParentType, ContextType>;
   csvTransactions?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<ConsumerAccountCsvTransactionsArgs, 'walletIds'>>;
   defaultWallet?: Resolver<ResolversTypes['PublicWallet'], ParentType, ContextType>;
   defaultWalletId?: Resolver<ResolversTypes['WalletId'], ParentType, ContextType>;
   displayCurrency?: Resolver<ResolversTypes['DisplayCurrency'], ParentType, ContextType>;
   firstName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  flowType?: Resolver<Maybe<ResolversTypes['KycFlowType']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   invoices?: Resolver<Maybe<ResolversTypes['InvoiceConnection']>, ParentType, ContextType, Partial<ConsumerAccountInvoicesArgs>>;
   lastName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -9370,6 +10343,12 @@ export interface EmailAddressScalarConfig extends GraphQLScalarTypeConfig<Resolv
 export interface EmailRegistrationIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['EmailRegistrationId'], any> {
   name: 'EmailRegistrationId';
 }
+
+export type EncryptedDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['EncryptedData'] = ResolversParentTypes['EncryptedData']> = {
+  data?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  iv?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export interface EndpointIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['EndpointId'], any> {
   name: 'EndpointId';
@@ -9614,15 +10593,23 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   accountUpdateDefaultWalletId?: Resolver<ResolversTypes['AccountUpdateDefaultWalletIdPayload'], ParentType, ContextType, RequireFields<MutationAccountUpdateDefaultWalletIdArgs, 'input'>>;
   accountUpdateDisplayCurrency?: Resolver<ResolversTypes['AccountUpdateDisplayCurrencyPayload'], ParentType, ContextType, RequireFields<MutationAccountUpdateDisplayCurrencyArgs, 'input'>>;
   apiKeyCreate?: Resolver<ResolversTypes['ApiKeyCreatePayload'], ParentType, ContextType, RequireFields<MutationApiKeyCreateArgs, 'input'>>;
+  apiKeyRemoveLimit?: Resolver<ResolversTypes['ApiKeySetLimitPayload'], ParentType, ContextType, RequireFields<MutationApiKeyRemoveLimitArgs, 'input'>>;
   apiKeyRevoke?: Resolver<ResolversTypes['ApiKeyRevokePayload'], ParentType, ContextType, RequireFields<MutationApiKeyRevokeArgs, 'input'>>;
+  apiKeySetLimit?: Resolver<ResolversTypes['ApiKeySetLimitPayload'], ParentType, ContextType, RequireFields<MutationApiKeySetLimitArgs, 'input'>>;
   callbackEndpointAdd?: Resolver<ResolversTypes['CallbackEndpointAddPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointAddArgs, 'input'>>;
   callbackEndpointDelete?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointDeleteArgs, 'input'>>;
   captchaCreateChallenge?: Resolver<ResolversTypes['CaptchaCreateChallengePayload'], ParentType, ContextType>;
   captchaRequestAuthCode?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCaptchaRequestAuthCodeArgs, 'input'>>;
+  cardCollateralDeposit?: Resolver<ResolversTypes['CardCollateralDeposit'], ParentType, ContextType, RequireFields<MutationCardCollateralDepositArgs, 'input'>>;
   cardConsumerApplicationCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationCreateArgs, 'input'>>;
   cardConsumerApplicationManualCreate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationManualCreateArgs, 'input'>>;
   cardConsumerApplicationUpdate?: Resolver<ResolversTypes['ConsumerApplication'], ParentType, ContextType, RequireFields<MutationCardConsumerApplicationUpdateArgs, 'input'>>;
   cardCreate?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardCreateArgs, 'input'>>;
+  cardPinUpdate?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCardPinUpdateArgs, 'input'>>;
+  cardReplace?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardReplaceArgs, 'input'>>;
+  cardSpendingLimitRemove?: Resolver<ResolversTypes['CardSpendingLimitRemovePayload'], ParentType, ContextType, RequireFields<MutationCardSpendingLimitRemoveArgs, 'input'>>;
+  cardSpendingLimitSet?: Resolver<ResolversTypes['CardSpendingLimitSetPayload'], ParentType, ContextType, RequireFields<MutationCardSpendingLimitSetArgs, 'input'>>;
+  cardSpendingToggleSet?: Resolver<ResolversTypes['CardSpendingToggleSetPayload'], ParentType, ContextType, RequireFields<MutationCardSpendingToggleSetArgs, 'input'>>;
   cardUpdate?: Resolver<ResolversTypes['Card'], ParentType, ContextType, RequireFields<MutationCardUpdateArgs, 'input'>>;
   contactCreate?: Resolver<ResolversTypes['ContactPayload'], ParentType, ContextType, RequireFields<MutationContactCreateArgs, 'input'>>;
   deviceNotificationTokenCreate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationDeviceNotificationTokenCreateArgs, 'input'>>;
@@ -9759,10 +10746,12 @@ export interface OneTimeAuthCodeScalarConfig extends GraphQLScalarTypeConfig<Res
 
 export type OpenDeepLinkActionResolvers<ContextType = any, ParentType extends ResolversParentTypes['OpenDeepLinkAction'] = ResolversParentTypes['OpenDeepLinkAction']> = {
   deepLink?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  label?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type OpenExternalLinkActionResolvers<ContextType = any, ParentType extends ResolversParentTypes['OpenExternalLinkAction'] = ResolversParentTypes['OpenExternalLinkAction']> = {
+  label?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -9859,14 +10848,18 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   beta?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   btcPriceList?: Resolver<Maybe<ReadonlyArray<Maybe<ResolversTypes['PricePoint']>>>, ParentType, ContextType, RequireFields<QueryBtcPriceListArgs, 'range'>>;
   businessMapMarkers?: Resolver<ReadonlyArray<ResolversTypes['MapMarker']>, ParentType, ContextType>;
-  colorScheme?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  cardBalance?: Resolver<ResolversTypes['CardBalance'], ParentType, ContextType, RequireFields<QueryCardBalanceArgs, 'cardId'>>;
+  cardCollateralBalance?: Resolver<ResolversTypes['CardCollateralBalance'], ParentType, ContextType>;
+  cardEncryptionPublicKey?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  cardHolder?: Resolver<ResolversTypes['CardHolder'], ParentType, ContextType, RequireFields<QueryCardHolderArgs, 'cardId'>>;
+  cardSecretsEncrypted?: Resolver<ResolversTypes['CardSecretsEncrypted'], ParentType, ContextType, RequireFields<QueryCardSecretsEncryptedArgs, 'cardId' | 'sessionId'>>;
+  cardTransactionsPaginated?: Resolver<ResolversTypes['CardTransactionConnection'], ParentType, ContextType, RequireFields<QueryCardTransactionsPaginatedArgs, 'cardId' | 'first'>>;
   countryCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   currencyConversionEstimation?: Resolver<ResolversTypes['CurrencyConversionEstimation'], ParentType, ContextType, RequireFields<QueryCurrencyConversionEstimationArgs, 'amount' | 'currency'>>;
   currencyList?: Resolver<ReadonlyArray<ResolversTypes['Currency']>, ParentType, ContextType>;
   deviceSessionCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   feedbackModalShown?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   globals?: Resolver<Maybe<ResolversTypes['Globals']>, ParentType, ContextType>;
-  hasPromptedSetDefaultAccount?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   hiddenBalanceToolTip?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   hideBalance?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   innerCircleValue?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -9880,6 +10873,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   onChainUsdTxFee?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   onChainUsdTxFeeAsBtcDenominated?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeAsBtcDenominatedArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   payoutSpeeds?: Resolver<ReadonlyArray<ResolversTypes['PayoutSpeeds']>, ParentType, ContextType>;
+  preferredAmountCurrency?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   price?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   realtimePrice?: Resolver<ResolversTypes['RealtimePrice'], ParentType, ContextType, RequireFields<QueryRealtimePriceArgs, 'currency'>>;
   region?: Resolver<Maybe<ResolversTypes['Region']>, ParentType, ContextType>;
@@ -9970,6 +10964,20 @@ export type SettlementViaOnChainResolvers<ContextType = any, ParentType extends 
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type ShippingAddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['ShippingAddress'] = ResolversParentTypes['ShippingAddress']> = {
+  city?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  countryCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  firstName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  lastName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  line1?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  line2?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  phoneNumber?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  postalCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  region?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export interface SignedAmountScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['SignedAmount'], any> {
   name: 'SignedAmount';
 }
@@ -9977,6 +10985,28 @@ export interface SignedAmountScalarConfig extends GraphQLScalarTypeConfig<Resolv
 export interface SignedDisplayMajorAmountScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['SignedDisplayMajorAmount'], any> {
   name: 'SignedDisplayMajorAmount';
 }
+
+export type SpendingLimitResolvers<ContextType = any, ParentType extends ResolversParentTypes['SpendingLimit'] = ResolversParentTypes['SpendingLimit']> = {
+  category?: Resolver<ResolversTypes['SpendingCategory'], ParentType, ContextType>;
+  limitCents?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  period?: Resolver<ResolversTypes['SpendingPeriod'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SpendingLimitStatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['SpendingLimitStatus'] = ResolversParentTypes['SpendingLimitStatus']> = {
+  category?: Resolver<ResolversTypes['SpendingCategory'], ParentType, ContextType>;
+  limitCents?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  period?: Resolver<ResolversTypes['SpendingPeriod'], ParentType, ContextType>;
+  remainingCents?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  spentCents?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SpendingToggleResolvers<ContextType = any, ParentType extends ResolversParentTypes['SpendingToggle'] = ResolversParentTypes['SpendingToggle']> = {
+  category?: Resolver<ResolversTypes['SpendingCategory'], ParentType, ContextType>;
+  enabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type StatefulNotificationResolvers<ContextType = any, ParentType extends ResolversParentTypes['StatefulNotification'] = ResolversParentTypes['StatefulNotification']> = {
   acknowledgedAt?: Resolver<Maybe<ResolversTypes['Timestamp']>, ParentType, ContextType>;
@@ -10276,7 +11306,9 @@ export type Resolvers<ContextType = any> = {
   AccountUpdateNotificationSettingsPayload?: AccountUpdateNotificationSettingsPayloadResolvers<ContextType>;
   ApiKey?: ApiKeyResolvers<ContextType>;
   ApiKeyCreatePayload?: ApiKeyCreatePayloadResolvers<ContextType>;
+  ApiKeyLimits?: ApiKeyLimitsResolvers<ContextType>;
   ApiKeyRevokePayload?: ApiKeyRevokePayloadResolvers<ContextType>;
+  ApiKeySetLimitPayload?: ApiKeySetLimitPayloadResolvers<ContextType>;
   AuthToken?: GraphQLScalarType;
   AuthTokenPayload?: AuthTokenPayloadResolvers<ContextType>;
   Authorization?: AuthorizationResolvers<ContextType>;
@@ -10288,7 +11320,19 @@ export type Resolvers<ContextType = any> = {
   CaptchaCreateChallengePayload?: CaptchaCreateChallengePayloadResolvers<ContextType>;
   CaptchaCreateChallengeResult?: CaptchaCreateChallengeResultResolvers<ContextType>;
   Card?: CardResolvers<ContextType>;
+  CardBalance?: CardBalanceResolvers<ContextType>;
+  CardCollateralBalance?: CardCollateralBalanceResolvers<ContextType>;
+  CardCollateralDeposit?: CardCollateralDepositResolvers<ContextType>;
+  CardHolder?: CardHolderResolvers<ContextType>;
+  CardMerchant?: CardMerchantResolvers<ContextType>;
+  CardSecretsEncrypted?: CardSecretsEncryptedResolvers<ContextType>;
+  CardSpendingLimitRemovePayload?: CardSpendingLimitRemovePayloadResolvers<ContextType>;
+  CardSpendingLimitSetPayload?: CardSpendingLimitSetPayloadResolvers<ContextType>;
+  CardSpendingToggleSetPayload?: CardSpendingToggleSetPayloadResolvers<ContextType>;
   CardTransaction?: CardTransactionResolvers<ContextType>;
+  CardTransactionConnection?: CardTransactionConnectionResolvers<ContextType>;
+  CardTransactionEdge?: CardTransactionEdgeResolvers<ContextType>;
+  CardTransactionPageInfo?: CardTransactionPageInfoResolvers<ContextType>;
   CentAmount?: GraphQLScalarType;
   CentAmountPayload?: CentAmountPayloadResolvers<ContextType>;
   ConsumerAccount?: ConsumerAccountResolvers<ContextType>;
@@ -10310,6 +11354,7 @@ export type Resolvers<ContextType = any> = {
   Email?: EmailResolvers<ContextType>;
   EmailAddress?: GraphQLScalarType;
   EmailRegistrationId?: GraphQLScalarType;
+  EncryptedData?: EncryptedDataResolvers<ContextType>;
   EndpointId?: GraphQLScalarType;
   EndpointUrl?: GraphQLScalarType;
   Error?: ErrorResolvers<ContextType>;
@@ -10391,8 +11436,12 @@ export type Resolvers<ContextType = any> = {
   SettlementViaIntraLedger?: SettlementViaIntraLedgerResolvers<ContextType>;
   SettlementViaLn?: SettlementViaLnResolvers<ContextType>;
   SettlementViaOnChain?: SettlementViaOnChainResolvers<ContextType>;
+  ShippingAddress?: ShippingAddressResolvers<ContextType>;
   SignedAmount?: GraphQLScalarType;
   SignedDisplayMajorAmount?: GraphQLScalarType;
+  SpendingLimit?: SpendingLimitResolvers<ContextType>;
+  SpendingLimitStatus?: SpendingLimitStatusResolvers<ContextType>;
+  SpendingToggle?: SpendingToggleResolvers<ContextType>;
   StatefulNotification?: StatefulNotificationResolvers<ContextType>;
   StatefulNotificationAcknowledgePayload?: StatefulNotificationAcknowledgePayloadResolvers<ContextType>;
   StatefulNotificationConnection?: StatefulNotificationConnectionResolvers<ContextType>;

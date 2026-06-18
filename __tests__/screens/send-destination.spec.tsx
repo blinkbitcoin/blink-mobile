@@ -22,7 +22,10 @@ import {
   PaymentType,
 } from "@blinkbitcoin/blink-client"
 
+import Clipboard from "@react-native-clipboard/clipboard"
+
 import { ContextForScreen } from "./helper"
+import { flushEffects } from "../helpers/flush-effects"
 
 type MockedContact = {
   id: string
@@ -50,6 +53,16 @@ const flushAsync = async () => {
       setTimeout(() => {
         resolve()
       }, 0)
+    })
+  })
+}
+
+// react-native-modal animates its mount/unmount via RN Animated timers; let those
+// settle inside act() so their trailing setState doesn't fire outside act between tests.
+const settleModalAnimations = async (): Promise<void> => {
+  await act(async () => {
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 400)
     })
   })
 }
@@ -106,6 +119,45 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }))
 
+const activeWalletWallets = [
+  {
+    id: "btc-wallet-id",
+    walletCurrency: "BTC",
+    balance: { currency: "BTC", currencyCode: "BTC", amount: 0 },
+  },
+]
+const useActiveWalletMock = jest.fn(() => ({
+  isSelfCustodial: false,
+  isReady: true,
+  needsBackendAuth: false,
+  wallets: activeWalletWallets,
+  status: "ready",
+  accountType: "Custodial",
+}))
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => useActiveWalletMock(),
+}))
+
+const useSelfCustodialWalletMock = jest.fn(() => ({ sdk: undefined }))
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => useSelfCustodialWalletMock(),
+}))
+
+const useScanContextMock = jest.fn(() => ({
+  myWalletIds: ["btc-wallet-id"],
+  bitcoinNetwork: "mainnet",
+  lnurlDomains: ["blink.sv", "blink.sv", "pay.blink.sv", "pay.bbw.sv"],
+}))
+jest.mock("@app/hooks/use-scan-context", () => ({
+  useScanContext: () => useScanContextMock(),
+}))
+
+jest.mock("@app/self-custodial/payment-details/wrap-destination", () => ({
+  wrapDestination: jest.fn(
+    (result: ParseDestinationResult): ParseDestinationResult => result,
+  ),
+}))
+
 const sendBitcoinDestination = {
   name: "sendBitcoinDestination",
   key: "sendBitcoinDestination",
@@ -115,6 +167,18 @@ const sendBitcoinDestination = {
   },
 } as const
 
+const getResponderByLabel = (label: string) => {
+  const responders = screen
+    .UNSAFE_getAllByType(View)
+    .filter((node) => typeof node.props.onResponderRelease === "function")
+  const match = responders.find((node) => within(node).queryByLabelText(label))
+  if (!match) {
+    throw new Error(`Responder not found for label: ${label}`)
+  }
+  return match
+}
+
+// eslint-disable-next-line max-lines-per-function
 describe("SendBitcoinDestinationScreen", () => {
   let LL: ReturnType<typeof i18nObject>
   const parseDestinationMock = parseDestination as jest.MockedFunction<
@@ -125,6 +189,20 @@ describe("SendBitcoinDestinationScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     LL = i18nObject("en")
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: false,
+      isReady: true,
+      needsBackendAuth: false,
+      wallets: activeWalletWallets,
+      status: "ready",
+      accountType: "Custodial",
+    })
+    useSelfCustodialWalletMock.mockReturnValue({ sdk: undefined })
+    useScanContextMock.mockReturnValue({
+      myWalletIds: ["btc-wallet-id"],
+      bitcoinNetwork: "mainnet",
+      lnurlDomains: ["blink.sv", "blink.sv", "pay.blink.sv", "pay.bbw.sv"],
+    })
     mockedDestinationData = {
       globals: { network: "mainnet" },
       me: {
@@ -155,17 +233,6 @@ describe("SendBitcoinDestinationScreen", () => {
     commentAllowed: 140,
     rawData: {},
   })
-
-  const getResponderByLabel = (label: string) => {
-    const responders = screen
-      .UNSAFE_getAllByType(View)
-      .filter((node) => typeof node.props.onResponderRelease === "function")
-    const match = responders.find((node) => within(node).queryByLabelText(label))
-    if (!match) {
-      throw new Error(`Responder not found for label: ${label}`)
-    }
-    return match
-  }
 
   const createUsernameDoesNotExistResult = (handle: string): ParseDestinationResult => {
     const invalidPaymentDestination: ParsedPaymentDestination = {
@@ -252,9 +319,56 @@ describe("SendBitcoinDestinationScreen", () => {
 
     if (shouldShowModal) {
       expect(await screen.findByText(modalTitle)).toBeTruthy()
+      await settleModalAnimations()
       return
     }
     expect(screen.queryByText(modalTitle)).toBeNull()
+
+    await flushEffects()
+  })
+
+  it("strips domain from LNURL identifier to prevent doubled @blink.sv in confirm modal", async () => {
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Lnurl,
+        lnurl: "lnurl",
+        isMerchant: false,
+        lnurlParams: createLnurlPayParams("+50370000000@blink.sv"),
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.changeText(screen.getByLabelText("telephoneNumber"), "70000000")
+    await flushAsync()
+    fireEvent.press(screen.getByLabelText(LL.common.next()))
+    await flushAsync()
+
+    expect(
+      await screen.findByText(
+        LL.SendBitcoinDestinationScreen.confirmUsernameModal.title(),
+      ),
+    ).toBeTruthy()
+
+    // The checkbox label should show +50370000000@blink.sv (single domain),
+    // NOT +50370000000@blink.sv@blink.sv (doubled domain)
+    expect(
+      screen.getByLabelText(
+        LL.SendBitcoinDestinationScreen.confirmUsernameModal.checkBox({
+          lnAddress: "+50370000000@blink.sv",
+        }),
+      ),
+    ).toBeTruthy()
+
+    await settleModalAnimations()
   })
 
   it.each([
@@ -308,9 +422,12 @@ describe("SendBitcoinDestinationScreen", () => {
     }
     if (shouldCallParse) {
       expect(parseDestinationMock).toHaveBeenCalled()
+      await flushEffects()
       return
     }
     expect(parseDestinationMock).not.toHaveBeenCalled()
+
+    await flushEffects()
   })
 
   it.each([
@@ -353,10 +470,13 @@ describe("SendBitcoinDestinationScreen", () => {
     if (expectPhoneNotAllowed) {
       expect(await screen.findByText(phoneNotAllowed)).toBeTruthy()
       expect(parseDestinationMock).not.toHaveBeenCalled()
+      await flushEffects()
       return
     }
     expect(screen.queryByText(phoneNotAllowed)).toBeNull()
     expect(parseDestinationMock).toHaveBeenCalled()
+
+    await flushEffects()
   })
 
   it.each([
@@ -418,10 +538,13 @@ describe("SendBitcoinDestinationScreen", () => {
     fireEvent.press(pasteButton)
 
     await flushAsync()
+    await flushAsync()
 
     expect(parseDestinationMock).toHaveBeenCalledWith(
       expect.objectContaining({ rawInput: "clipboard" }),
     )
+
+    await flushEffects()
   })
 
   it.each([
@@ -534,6 +657,8 @@ describe("SendBitcoinDestinationScreen", () => {
     expect(
       screen.queryByText(LL.SendBitcoinDestinationScreen.confirmUsernameModal.title()),
     ).toBeNull()
+
+    await settleModalAnimations()
   })
 
   it("shows confirm modal again for a different destination", async () => {
@@ -594,6 +719,8 @@ describe("SendBitcoinDestinationScreen", () => {
         LL.SendBitcoinDestinationScreen.confirmUsernameModal.title(),
       ),
     ).toBeTruthy()
+
+    await settleModalAnimations()
   })
 
   it("does not show confirm modal for a known contact", async () => {
@@ -703,5 +830,287 @@ describe("SendBitcoinDestinationScreen", () => {
     expect(
       screen.queryByText(LL.SendBitcoinDestinationScreen.confirmUsernameModal.title()),
     ).toBeNull()
+
+    await settleModalAnimations()
+  })
+
+  describe("deep link payment processing (processedPaymentRef)", () => {
+    const createRouteWithPayment = (payment: string) =>
+      ({
+        ...sendBitcoinDestination,
+        params: {
+          ...sendBitcoinDestination.params,
+          payment,
+        },
+      }) as typeof sendBitcoinDestination
+
+    const setupParseDestinationMock = (
+      mock: jest.MockedFunction<typeof parseDestination>,
+    ) => {
+      mock.mockResolvedValue({
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
+        validDestination: {
+          valid: true,
+          paymentType: PaymentType.Intraledger,
+          handle: "testuser",
+          walletId: "wallet-id",
+        },
+        createPaymentDetail: jest.fn(),
+      })
+    }
+
+    it("processes route.params.payment on initial render", async () => {
+      setupParseDestinationMock(parseDestinationMock)
+
+      const route = createRouteWithPayment("lnurl1testpayment123")
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={route} />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      expect(parseDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ rawInput: "lnurl1testpayment123" }),
+      )
+      expect(parseDestinationMock).toHaveBeenCalledTimes(1)
+
+      await settleModalAnimations()
+    })
+
+    it("does NOT re-process when re-rendered with the same payment param", async () => {
+      setupParseDestinationMock(parseDestinationMock)
+
+      const route = createRouteWithPayment("lnurl1testpayment123")
+
+      const { rerender } = render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={route} />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      expect(parseDestinationMock).toHaveBeenCalledTimes(1)
+
+      parseDestinationMock.mockClear()
+
+      // Re-render with the exact same payment value
+      rerender(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen
+            route={createRouteWithPayment("lnurl1testpayment123")}
+          />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      // The processedPaymentRef should prevent re-processing
+      expect(parseDestinationMock).not.toHaveBeenCalled()
+
+      await settleModalAnimations()
+    })
+
+    it("processes a NEW payment param after a previous one", async () => {
+      setupParseDestinationMock(parseDestinationMock)
+
+      const route = createRouteWithPayment("lnurl1first")
+
+      const { rerender } = render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={route} />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      expect(parseDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ rawInput: "lnurl1first" }),
+      )
+      expect(parseDestinationMock).toHaveBeenCalledTimes(1)
+
+      parseDestinationMock.mockClear()
+
+      // Re-render with a DIFFERENT payment value
+      rerender(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={createRouteWithPayment("lnurl1second")} />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      // The new payment should be processed
+      expect(parseDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ rawInput: "lnurl1second" }),
+      )
+      expect(parseDestinationMock).toHaveBeenCalledTimes(1)
+
+      await settleModalAnimations()
+    })
+  })
+})
+describe("SendBitcoinDestinationScreen paste buttons", () => {
+  let LL: ReturnType<typeof i18nObject>
+  const parseDestinationMock = parseDestination as jest.MockedFunction<
+    typeof parseDestination
+  >
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    LL = i18nObject("en")
+  })
+
+  it("search paste button works when phone input is active", async () => {
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Intraledger,
+        handle: "clipboard",
+        walletId: "wallet-id",
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.changeText(screen.getByLabelText("telephoneNumber"), "70000000")
+    await flushAsync()
+
+    const searchResponder = getResponderByLabel(LL.SendBitcoinScreen.placeholder())
+    const pasteButton = within(searchResponder).getByText(LL.common.paste())
+    fireEvent.press(pasteButton)
+    await flushAsync()
+    await flushAsync()
+
+    expect(parseDestinationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ rawInput: "clipboard" }),
+    )
+
+    await flushEffects()
+  })
+
+  it("phone paste button works when search input is active", async () => {
+    jest.mocked(Clipboard.getString).mockResolvedValueOnce("+50370000000")
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    const pasteButtons = screen.getAllByText(LL.common.paste())
+    const phonePasteButton = pasteButtons[1]
+
+    fireEvent.press(phonePasteButton)
+    await flushAsync()
+    await flushAsync()
+
+    expect(screen.getByLabelText("telephoneNumber").props.value).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  describe("lnurlDomains gate by active wallet type", () => {
+    beforeEach(() => {
+      // mockReturnValue overrides survive jest.clearAllMocks(); reset to default.
+      useActiveWalletMock.mockReturnValue({
+        isSelfCustodial: false,
+        isReady: true,
+        needsBackendAuth: false,
+        wallets: activeWalletWallets,
+        status: "ready",
+        accountType: "Custodial",
+      })
+      useSelfCustodialWalletMock.mockReturnValue({ sdk: undefined })
+      useScanContextMock.mockReturnValue({
+        myWalletIds: ["btc-wallet-id"],
+        bitcoinNetwork: "mainnet",
+        lnurlDomains: ["blink.sv", "blink.sv", "pay.blink.sv", "pay.bbw.sv"],
+      })
+    })
+
+    const triggerParseDestination = async () => {
+      jest.mocked(Clipboard.getString).mockResolvedValueOnce("alice@example.com")
+      const searchResponder = getResponderByLabel(LL.SendBitcoinScreen.placeholder())
+      const pasteButton = within(searchResponder).getByText(LL.common.paste())
+      fireEvent.press(pasteButton)
+      await flushAsync()
+      await flushAsync()
+    }
+
+    it("forwards adapter lnurlDomains=[] from useScanContext (self-custodial)", async () => {
+      useActiveWalletMock.mockReturnValue({
+        isSelfCustodial: true,
+        isReady: true,
+        needsBackendAuth: false,
+        wallets: activeWalletWallets,
+        status: "ready",
+        accountType: "SelfCustodial",
+      })
+      useScanContextMock.mockReturnValue({
+        myWalletIds: ["btc-wallet-id"],
+        bitcoinNetwork: "mainnet",
+        lnurlDomains: [],
+      })
+      parseDestinationMock.mockResolvedValue({
+        valid: false,
+        invalidReason: InvalidDestinationReason.UsernameDoesNotExist,
+        invalidPaymentDestination: {
+          valid: false,
+          paymentType: PaymentType.Intraledger,
+          invalidReason: InvalidIntraledgerReason.WrongDomain,
+          handle: "alice@example.com",
+        },
+      })
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+        </ContextForScreen>,
+      )
+      await triggerParseDestination()
+
+      expect(parseDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ lnurlDomains: [] }),
+      )
+    })
+
+    it("forwards adapter lnurlDomains from useScanContext (custodial)", async () => {
+      parseDestinationMock.mockResolvedValue({
+        valid: false,
+        invalidReason: InvalidDestinationReason.UsernameDoesNotExist,
+        invalidPaymentDestination: {
+          valid: false,
+          paymentType: PaymentType.Intraledger,
+          invalidReason: InvalidIntraledgerReason.WrongDomain,
+          handle: "alice@example.com",
+        },
+      })
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+        </ContextForScreen>,
+      )
+      await triggerParseDestination()
+
+      expect(parseDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lnurlDomains: ["blink.sv", "blink.sv", "pay.blink.sv", "pay.bbw.sv"],
+        }),
+      )
+    })
   })
 })

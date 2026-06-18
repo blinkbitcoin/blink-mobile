@@ -1,14 +1,11 @@
 import * as React from "react"
-import { View } from "react-native"
-import Icon from "react-native-vector-icons/Ionicons"
+import { TouchableOpacity, View } from "react-native"
 
 import { makeStyles } from "@rn-vui/themed"
 
-const useStyles = makeStyles(() => ({
-  icon: {
-    fontSize: 72,
-  },
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
+const useStyles = makeStyles(() => ({
   iconContainer: {
     alignItems: "flex-end",
     padding: 6,
@@ -28,7 +25,9 @@ export const CloseCross: React.FC<Props> = ({ onPress, color }) => {
 
   return (
     <View style={styles.iconContainer}>
-      <Icon name="close" style={styles.icon} onPress={onPress} color={color} />
+      <TouchableOpacity onPress={onPress}>
+        <GaloyIcon name="close" size={72} color={color} />
+      </TouchableOpacity>
     </View>
   )
 }

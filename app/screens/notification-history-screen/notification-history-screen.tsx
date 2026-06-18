@@ -40,9 +40,11 @@ gql`
           action {
             ... on OpenDeepLinkAction {
               deepLink
+              label
             }
             ... on OpenExternalLinkAction {
               url
+              label
             }
           }
         }
@@ -99,6 +101,11 @@ export const NotificationHistoryScreen = () => {
 
     if (unacknowledged.length === 0) return
 
+    // Guard against post-unmount work: without it, the promise chain below keeps
+    // running after the screen unmounts, firing Apollo refetches into a torn-down
+    // tree (a source of flaky test timeouts and act() warnings).
+    let cancelled = false
+
     unacknowledged.forEach((notification) => {
       inFlightIdsRef.current.add(notification.id)
     })
@@ -109,6 +116,7 @@ export const NotificationHistoryScreen = () => {
           variables: { input: { notificationId: notification.id } },
         })
           .then(() => {
+            if (cancelled) return
             acknowledgedIdsRef.current.add(notification.id)
           })
           .finally(() => {
@@ -117,6 +125,7 @@ export const NotificationHistoryScreen = () => {
       ),
     )
       .then(() => {
+        if (cancelled) return
         client.refetchQueries({
           include: [
             UnacknowledgedNotificationCountDocument,
@@ -124,7 +133,14 @@ export const NotificationHistoryScreen = () => {
           ],
         })
       })
-      .catch(console.error)
+      .catch((error) => {
+        if (cancelled) return
+        console.error(error)
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [acknowledgeNotification, client, isFocused, unackIdsKey])
 
   const fetchNextNotificationsPage = () => {

@@ -4,10 +4,12 @@ import { Alert } from "react-native"
 import { gql } from "@apollo/client"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { useSettingsScreenQuery, useUserTotpDeleteMutation } from "@app/graphql/generated"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { AccountType } from "@app/types/wallet"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { SettingsRow } from "./row"
 
@@ -32,7 +34,8 @@ gql`
 
 export const TotpSetting: React.FC = () => {
   const { LL } = useI18nContext()
-  const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { activeAccount } = useAccountRegistry()
 
   const [spinner, setSpinner] = useState(false)
 
@@ -42,6 +45,8 @@ export const TotpSetting: React.FC = () => {
     refetch: refetchTotpSettings,
   } = useSettingsScreenQuery({ fetchPolicy: "cache-only" })
   const [totpDeleteMutation] = useUserTotpDeleteMutation()
+
+  if (activeAccount?.type === AccountType.SelfCustodial) return null
 
   const totpEnabled = Boolean(data?.me?.totpEnabled)
 
@@ -85,7 +90,7 @@ export const TotpSetting: React.FC = () => {
       spinner={spinner}
       title={LL.AccountScreen.totp()}
       subtitle={totpEnabled ? LL.common.enabled() : undefined}
-      leftIcon="lock-closed-outline"
+      leftGaloyIcon="lock-closed"
       action={
         totpEnabled
           ? null

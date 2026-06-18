@@ -2,16 +2,15 @@ import React, { useState } from "react"
 import { ActivityIndicator, Pressable, View } from "react-native"
 
 import { testProps } from "@app/utils/testProps"
-import { makeStyles, Icon, Text, Skeleton, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, Skeleton, useTheme } from "@rn-vui/themed"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 
 type Props = {
   title: string
   subtitle?: string
   subtitleShorter?: boolean
-  leftIcon?: string
-  leftGaloyIcon?: IconNamesType
-  rightIcon?: string | null | React.ReactElement
+  leftGaloyIcon?: IconNamesType | React.ReactElement
+  rightIcon?: IconNamesType | null | React.ReactElement
   extraComponentBesideTitle?: React.ReactElement
   action: (() => void | Promise<void>) | null
   rightIconAction?: () => void | Promise<void>
@@ -24,7 +23,6 @@ export const SettingsRow: React.FC<Props> = ({
   title,
   subtitle,
   subtitleShorter,
-  leftIcon,
   leftGaloyIcon,
   rightIcon = "",
   action,
@@ -48,14 +46,21 @@ export const SettingsRow: React.FC<Props> = ({
       </View>
     )
 
-  const defaultIcon = expanded ? "chevron-down" : "chevron-forward"
-  const hasLeftIcon = Boolean(leftGaloyIcon || leftIcon)
+  const defaultIcon: IconNamesType = expanded ? "caret-down" : "caret-right"
+  const hasLeftIcon = Boolean(leftGaloyIcon)
+  const LeftIcon =
+    hasLeftIcon &&
+    leftGaloyIcon &&
+    (typeof leftGaloyIcon === "string" ? (
+      <GaloyIcon name={leftGaloyIcon as IconNamesType} size={20} />
+    ) : (
+      leftGaloyIcon
+    ))
   const RightIcon =
     rightIcon !== null &&
     (typeof rightIcon === "string" ? (
-      <Icon
-        name={rightIcon ? rightIcon : defaultIcon}
-        type="ionicon"
+      <GaloyIcon
+        name={(rightIcon as IconNamesType) || defaultIcon}
         size={20}
         color={colors.primary}
       />
@@ -72,12 +77,7 @@ export const SettingsRow: React.FC<Props> = ({
     >
       <View style={[styles.container, styles.spacing]}>
         <View style={[styles.container, styles.spacing, styles.internalContainer]}>
-          {hasLeftIcon &&
-            (leftGaloyIcon ? (
-              <GaloyIcon name={leftGaloyIcon} size={20} />
-            ) : (
-              <Icon name={leftIcon ?? ""} type="ionicon" size={20} />
-            ))}
+          {LeftIcon}
           <View>
             <View style={styles.sidetoside}>
               <Text type="p2" numberOfLines={1} ellipsizeMode="tail" style={styles.title}>

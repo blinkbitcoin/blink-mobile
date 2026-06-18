@@ -1,0 +1,342 @@
+import React from "react"
+import { View } from "react-native"
+import { render, fireEvent, act } from "@testing-library/react-native"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
+
+import { CardStatementsScreen } from "@app/screens/card-screen/card-statements-screen"
+import { ContextForScreen } from "../../helper"
+
+jest.mock("react-native-reanimated", () => ({
+  __esModule: true,
+  default: {
+    View,
+    createAnimatedComponent: (component: React.ComponentType) => component,
+  },
+  useSharedValue: (initial: number) => ({ value: initial }),
+  useAnimatedStyle: () => ({}),
+  withTiming: (value: number) => value,
+  interpolateColor: () => "transparent",
+}))
+
+jest.mock("react-native-modal", () => "Modal")
+
+jest.mock("@app/config/feature-flags-context", () => ({
+  useRemoteConfig: () => ({
+    feedbackEmailAddress: "support@test.com",
+  }),
+}))
+
+const mockUseStatementsData = jest.fn()
+jest.mock(
+  "@app/screens/card-screen/card-statements-screen/hooks/use-statements-data",
+  () => ({
+    useStatementsData: () => mockUseStatementsData(),
+  }),
+)
+
+const mockStatements = [
+  {
+    id: "2025-07",
+    month: "August",
+    year: 2025,
+    period: "Aug 1 - Aug 30",
+    transactionCount: 0,
+    totalSpent: "$1,021.00",
+    isCurrent: true,
+  },
+  {
+    id: "2025-06",
+    month: "July",
+    year: 2025,
+    period: "Jul 1 - Jul 30, 2025",
+    transactionCount: 5,
+    totalSpent: "$121.00",
+    isCurrent: false,
+  },
+  {
+    id: "2025-05",
+    month: "June",
+    year: 2025,
+    period: "Jun 1 - Jun 30, 2025",
+    transactionCount: 5,
+    totalSpent: "$121.00",
+    isCurrent: false,
+  },
+]
+
+const mockYearOptions = [{ year: 2025, itemCount: 3 }]
+
+const loadedReturn = {
+  statements: mockStatements,
+  yearOptions: mockYearOptions,
+  currentYear: 2025,
+  loading: false,
+  error: undefined,
+}
+
+describe("CardStatementsScreen", () => {
+  beforeEach(() => {
+    loadLocale("en")
+    mockUseStatementsData.mockReturnValue(loadedReturn)
+  })
+
+  describe("loading state", () => {
+    it("renders activity indicator when loading", async () => {
+      mockUseStatementsData.mockReturnValue({
+        ...loadedReturn,
+        statements: [],
+        yearOptions: [],
+        loading: true,
+      })
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByTestId("activity-indicator")).toBeTruthy()
+    })
+  })
+
+  describe("rendering", () => {
+    it("renders without crashing", async () => {
+      const { toJSON } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(toJSON()).toBeTruthy()
+    })
+
+    it("displays year selector section", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Select year")).toBeTruthy()
+    })
+
+    it("displays selected year", async () => {
+      const { getAllByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      const yearTexts = getAllByText("2025")
+      expect(yearTexts.length).toBeGreaterThan(0)
+    })
+
+    it("displays current statement section", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Current statement")).toBeTruthy()
+    })
+
+    it("displays statement period label", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Statement period")).toBeTruthy()
+    })
+
+    it("displays total spent label", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Total spent")).toBeTruthy()
+    })
+
+    it("displays current statement period value", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Aug 1 - Aug 30")).toBeTruthy()
+    })
+
+    it("displays current statement total spent value", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("$1,021.00")).toBeTruthy()
+    })
+
+    it("displays monthly statements section", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Monthly statements")).toBeTruthy()
+    })
+
+    it("displays statement items", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("August 2025")).toBeTruthy()
+      expect(getByText("July 2025")).toBeTruthy()
+      expect(getByText("June 2025")).toBeTruthy()
+    })
+
+    it("displays about statements section", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("About statements")).toBeTruthy()
+    })
+
+    it("displays support section", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Support")).toBeTruthy()
+    })
+
+    it("displays contact support text", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("Contact Support")).toBeTruthy()
+    })
+
+    it("displays support email from remote config", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("support@test.com")).toBeTruthy()
+    })
+
+    it("hides current statement when none exists", async () => {
+      mockUseStatementsData.mockReturnValue({
+        ...loadedReturn,
+        statements: loadedReturn.statements.filter((s) => !s.isCurrent),
+      })
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(queryByText("Current statement")).toBeNull()
+    })
+  })
+
+  describe("interaction", () => {
+    it("allows pressing contact support button", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      const contactSupportButton = getByText("Contact Support")
+      await act(async () => {
+        fireEvent.press(contactSupportButton)
+      })
+
+      expect(contactSupportButton).toBeTruthy()
+    })
+  })
+
+  describe("statement items", () => {
+    it("displays current statement with spent amount", async () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("August 2025")).toBeTruthy()
+      expect(getByText("$1,021.00 spent")).toBeTruthy()
+    })
+
+    it("displays past statements with period and transactions", async () => {
+      const { getByText, getAllByText } = render(
+        <ContextForScreen>
+          <CardStatementsScreen />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {})
+
+      expect(getByText("July 2025")).toBeTruthy()
+      expect(getByText("Jul 1 - Jul 30, 2025")).toBeTruthy()
+      const transactionTexts = getAllByText("5 transactions, $121.00 spent")
+      expect(transactionTexts.length).toBeGreaterThanOrEqual(1)
+    })
+  })
+})

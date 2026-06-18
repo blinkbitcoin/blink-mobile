@@ -23,6 +23,22 @@ gql`
       }
     }
   }
+
+  query realtimePriceUnauthed($currency: DisplayCurrency) {
+    realtimePrice(currency: $currency) {
+      btcSatPrice {
+        base
+        offset
+      }
+      denominatorCurrency
+      id
+      timestamp
+      usdCentPrice {
+        base
+        offset
+      }
+    }
+  }
 `
 
 export const createCache = () =>
@@ -79,9 +95,6 @@ export const createCache = () =>
           beta: {
             read: (value) => value ?? false,
           },
-          colorScheme: {
-            read: (value) => value ?? "system",
-          },
           countryCode: {
             read: (value) => value ?? "SV",
           },
@@ -89,9 +102,6 @@ export const createCache = () =>
             read: (value) => value ?? null,
           },
           feedbackModalShown: {
-            read: (value) => value ?? false,
-          },
-          hasPromptedSetDefaultAccount: {
             read: (value) => value ?? false,
           },
           introducingCirclesModalShown: {
@@ -103,9 +113,13 @@ export const createCache = () =>
           upgradeModalLastShownAt: {
             read: (value) => value ?? null,
           },
+          preferredAmountCurrency: {
+            read: (value) => value ?? null,
+          },
           deviceSessionCount: {
             read: (value) => value ?? 0,
           },
+          cardTransactionsPaginated: relayStylePagination(["cardId"]),
           txLastSeen: {
             keyArgs: ["accountId"],
             read(value, { args }) {

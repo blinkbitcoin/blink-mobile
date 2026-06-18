@@ -15,7 +15,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DisplayCurrency, toUsdMoneyAmount } from "@app/types/amounts"
 import { useNavigation, useFocusEffect } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 const useStyles = makeStyles(({ colors }) => ({
@@ -118,7 +118,7 @@ gql`
 `
 
 export const TransactionLimitsScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const styles = useStyles()
   const {

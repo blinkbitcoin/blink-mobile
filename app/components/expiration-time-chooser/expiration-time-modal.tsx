@@ -1,10 +1,11 @@
 import * as React from "react"
-import { SafeAreaView, View } from "react-native"
+import { Platform, View } from "react-native"
 import ReactNativeModal from "react-native-modal"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { timing } from "@app/rne-theme/timing"
 import { ListItem, makeStyles, useTheme, Text } from "@rn-vui/themed"
-import Icon from "react-native-vector-icons/Ionicons"
+import { GaloyIcon } from "../atomic/galoy-icon"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -28,6 +29,7 @@ export const ExpirationTimeModal: React.FC<ExpirationTimeModalProps> = ({
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
+  const insets = useSafeAreaInsets()
   const { LL } = useI18nContext()
 
   const btcExpirationList = [
@@ -64,7 +66,12 @@ export const ExpirationTimeModal: React.FC<ExpirationTimeModalProps> = ({
       style={styles.modal}
       animationInTiming={timing.quick}
     >
-      <SafeAreaView style={styles.amountInputScreenContainer}>
+      <View
+        style={[
+          styles.amountInputScreenContainer,
+          Platform.OS === "ios" && { paddingTop: insets.top },
+        ]}
+      >
         <View style={styles.headerContainer}>
           <Text type={"h1"}>{LL.common.expirationTime()}</Text>
           <GaloyIconButton iconOnly={true} size={"medium"} name="close" onPress={close} />
@@ -76,7 +83,7 @@ export const ExpirationTimeModal: React.FC<ExpirationTimeModalProps> = ({
             bottomDivider
           >
             {value === minutes ? (
-              <Icon name="checkmark-circle" size={18} color={colors._green} />
+              <GaloyIcon name="check-circle" size={18} color={colors._green} />
             ) : (
               <View style={styles.emptySpacer} />
             )}
@@ -85,7 +92,7 @@ export const ExpirationTimeModal: React.FC<ExpirationTimeModalProps> = ({
             </ListItem.Content>
           </ListItem>
         ))}
-      </SafeAreaView>
+      </View>
     </ReactNativeModal>
   )
 }

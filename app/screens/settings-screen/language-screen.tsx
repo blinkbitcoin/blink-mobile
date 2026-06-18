@@ -1,9 +1,9 @@
 import * as React from "react"
 
 import { gql } from "@apollo/client"
+
 import { MenuSelect, MenuSelectItem } from "@app/components/menu-select"
-import { useLanguageQuery, useUserUpdateLanguageMutation } from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useEffectiveLanguage } from "@app/hooks/use-effective-language"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { LocaleToTranslateLanguageSelector } from "@app/i18n/mapping"
 import { getLanguageFromString, Languages } from "@app/utils/locale-detector"
@@ -32,23 +32,15 @@ gql`
 `
 
 export const LanguageScreen: React.FC = () => {
-  const isAuthed = useIsAuthed()
-
-  const { data } = useLanguageQuery({
-    fetchPolicy: "cache-first",
-    skip: !isAuthed,
-  })
-
-  const languageFromServer = getLanguageFromString(data?.me?.language)
-
-  const [updateLanguage, { loading }] = useUserUpdateLanguageMutation()
+  const { language: serverLanguage, setLanguage, loading } = useEffectiveLanguage()
+  const languageFromServer = getLanguageFromString(serverLanguage)
   const { LL } = useI18nContext()
 
   const [newLanguage, setNewLanguage] = React.useState("")
 
   const handleUpdateLanguage = async (language: string) => {
     if (loading) return
-    await updateLanguage({ variables: { input: { language } } })
+    await setLanguage(language)
     setNewLanguage(language)
   }
 

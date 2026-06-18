@@ -2,15 +2,15 @@ import * as React from "react"
 import { Linking, TouchableWithoutFeedback, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
-import Icon from "react-native-vector-icons/Ionicons"
-
 import { useFragment } from "@apollo/client"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
 import { TransactionDate } from "@app/components/transaction-date"
 import { useDescriptionDisplay } from "@app/components/transaction-item"
 import { DeepPartialObject } from "@app/components/transaction-item/index.types"
 import { WalletSummary } from "@app/components/wallet-summary"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import {
   SettlementVia,
   TransactionFragment,
@@ -19,14 +19,13 @@ import {
   useHomeAuthedQuery,
   WalletCurrency,
 } from "@app/graphql/generated"
-import { useAppConfig, useTransactionSeenState } from "@app/hooks"
+import { useAppConfig, useClipboard, useTransactionSeenState } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toWalletAmount } from "@app/types/amounts"
-import { toastShow } from "@app/utils/toast"
-import Clipboard from "@react-native-clipboard/clipboard"
+import { PaymentType } from "@app/types/transaction"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { IconTransaction } from "../../components/icon-transactions"
@@ -74,7 +73,12 @@ const Row = ({
   )
 }
 
-const typeDisplay = (instance?: SettlementVia | DeepPartialObject<SettlementVia>) => {
+export const typeDisplay = (
+  instance?: SettlementVia | DeepPartialObject<SettlementVia>,
+  selfCustodialPaymentType?: PaymentType,
+) => {
+  if (selfCustodialPaymentType === PaymentType.Spark) return "Spark"
+
   if (!instance || !instance.__typename) {
     return "Unknown"
   }
@@ -102,7 +106,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
   const insets = useSafeAreaInsets()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatMoneyAmount } = useDisplayCurrency()
   const {
     appConfig: { galoyInstance },
@@ -132,7 +136,18 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
   const [timer, setTimer] = React.useState<number>(0)
 
   const { LL, locale } = useI18nContext()
+  const { isSelfCustodial, wallets } = useActiveWallet()
+  const { copyToClipboard } = useClipboard()
   const { formatCurrency } = useDisplayCurrency()
+
+  const selfCustodialPaymentType = React.useMemo(() => {
+    if (!isSelfCustodial) return undefined
+    for (const wallet of wallets) {
+      const match = wallet.transactions.find((t) => t.id === txid)
+      if (match) return match.paymentType
+    }
+    return undefined
+  }, [isSelfCustodial, wallets, txid])
 
   const description = useDescriptionDisplay({
     tx,
@@ -278,12 +293,16 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     />
   )
 
-  const copyToClipboard = ({ content, type }: { content: string; type: string }) => {
-    Clipboard.setString(content)
-    toastShow({
-      type: "success",
-      message: LL.TransactionDetailScreen.hasBeenCopiedToClipboard({ type }),
-      LL,
+  const handleCopyToClipboard = ({
+    content,
+    type,
+  }: {
+    content: string
+    type: string
+  }) => {
+    copyToClipboard({
+      content,
+      message: LL.common.hasBeenCopiedToClipboard({ type }),
     })
   }
 
@@ -348,8 +367,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                         )
                       }
                     >
-                      <Icon
-                        name="open-outline"
+                      <GaloyIcon
+                        name="arrow-square-out"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -359,7 +378,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <View key="copy">
                     <TouchableWithoutFeedback
                       onPress={() =>
-                        copyToClipboard({
+                        handleCopyToClipboard({
                           content:
                             ("transactionHash" in settlementVia &&
                               settlementVia?.transactionHash) ||
@@ -368,8 +387,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                         })
                       }
                     >
-                      <Icon
-                        name="copy-outline"
+                      <GaloyIcon
+                        name="copy-paste"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -403,14 +422,14 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               <View key="copy">
                 <TouchableWithoutFeedback
                   onPress={() =>
-                    copyToClipboard({
+                    handleCopyToClipboard({
                       content: description || "",
                       type: LL.common.description(),
                     })
                   }
                 >
-                  <Icon
-                    name="copy-outline"
+                  <GaloyIcon
+                    name="copy-paste"
                     size={22}
                     color={colors.primary}
                     style={styles.icon}
@@ -425,7 +444,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               value={settlementVia.counterPartyUsername || galoyInstance.name}
             />
           )}
-          <Row entry={LL.common.type()} value={typeDisplay(settlementVia)} />
+          <Row
+            entry={LL.common.type()}
+            value={typeDisplay(settlementVia, selfCustodialPaymentType)}
+          />
           {initiationVia?.__typename === "InitiationViaLn" &&
             initiationVia?.paymentHash && (
               <Row
@@ -435,14 +457,14 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <View key="copy">
                     <TouchableWithoutFeedback
                       onPress={() =>
-                        copyToClipboard({
+                        handleCopyToClipboard({
                           content: initiationVia?.paymentHash ?? "",
                           type: "Hash",
                         })
                       }
                     >
-                      <Icon
-                        name="copy-outline"
+                      <GaloyIcon
+                        name="copy-paste"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -463,14 +485,14 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <View key="copy">
                     <TouchableWithoutFeedback
                       onPress={() =>
-                        copyToClipboard({
+                        handleCopyToClipboard({
                           content: settlementVia?.preImage || "",
                           type: LL.common.preimageProofOfPayment(),
                         })
                       }
                     >
-                      <Icon
-                        name="copy-outline"
+                      <GaloyIcon
+                        name="copy-paste"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -492,8 +514,8 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                         viewInLightningDecoder(initiationVia?.paymentRequest || "")
                       }
                     >
-                      <Icon
-                        name="open-outline"
+                      <GaloyIcon
+                        name="arrow-square-out"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -503,14 +525,14 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <View key="copy">
                     <TouchableWithoutFeedback
                       onPress={() =>
-                        copyToClipboard({
+                        handleCopyToClipboard({
                           content: initiationVia?.paymentRequest ?? "",
                           type: LL.common.paymentRequest(),
                         })
                       }
                     >
-                      <Icon
-                        name="copy-outline"
+                      <GaloyIcon
+                        name="copy-paste"
                         size={22}
                         color={colors.primary}
                         style={styles.icon}
@@ -520,7 +542,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 ]}
               />
             )}
-          {id && (
+          {id && !isSelfCustodial && (
             <Row
               entry="Blink Internal Id"
               value={id}
@@ -528,14 +550,14 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 <View key="copy">
                   <TouchableWithoutFeedback
                     onPress={() =>
-                      copyToClipboard({
+                      handleCopyToClipboard({
                         content: id,
                         type: "Blink Internal Id",
                       })
                     }
                   >
-                    <Icon
-                      name="copy-outline"
+                    <GaloyIcon
+                      name="copy-paste"
                       size={22}
                       color={colors.primary}
                       style={styles.icon}

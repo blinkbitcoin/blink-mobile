@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react"
 import { View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -36,7 +36,7 @@ export const LoginMethodScreen: React.FC<LoginMethodScreenProps> = ({ route }) =
     theme: { mode },
   } = useTheme()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const {
     isTelegramSupported,
     isSmsSupported,
@@ -98,19 +98,19 @@ export const LoginMethodScreen: React.FC<LoginMethodScreenProps> = ({ route }) =
       {
         label: LL.support.sms(),
         value: LoginChannels.Sms,
-        ionicon: "call-outline",
+        icon: "phone",
         active: isSmsSupported,
       },
       {
         label: LL.support.whatsapp(),
         value: LoginChannels.Whatsapp,
-        ionicon: "logo-whatsapp",
+        icon: "chat",
         active: isWhatsAppSupported,
       },
       {
         label: LL.support.email(),
         value: LoginChannels.Email,
-        ionicon: "mail-outline",
+        icon: "email-add",
         active: type === PhoneLoginInitiateType.Login,
       },
     ],

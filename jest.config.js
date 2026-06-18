@@ -1,20 +1,33 @@
 module.exports = {
-  preset: "react-native",
-  setupFiles: ["./node_modules/react-native-gesture-handler/jestSetup.js"],
-  setupFilesAfterEnv: ["@testing-library/jest-native/extend-expect"],
+  preset: "@react-native/jest-preset",
+  setupFiles: [
+    "./node_modules/@react-native/jest-preset/jest/setup.js",
+    "./node_modules/react-native-gesture-handler/jestSetup.js",
+  ],
+  setupFilesAfterEnv: [
+    "@testing-library/jest-native/extend-expect",
+    "<rootDir>/jest.setup.js",
+    "<rootDir>/jest.setup-after-env.ts",
+  ],
+  // Stopgap against CPU-starved CI runners pushing borderline tests past the
+  // 5s default (issue #3815). Genuine hangs are fixed at the source; this only
+  // absorbs slow-runner tails without letting real hangs sit for a minute.
+  testTimeout: 20000,
   transform: {
     "\\.(ts|tsx)$": [
       "ts-jest",
       {
         compiler: "ttsc",
-        tsconfig: "tsconfig.jest.json",
+        tsconfig: "<rootDir>/tsconfig.jest.json",
       },
     ],
+    "\\.js$": "babel-jest",
     "^.+\\.svg$": "jest-transform-stub",
   },
   testRegex: "(/__tests__/.*\\.(test|spec))\\.(ts|tsx|js)$",
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   rootDir: ".",
+  resolver: "./node_modules/react-native-worklets/jest/resolver.js",
   moduleNameMapper: {
     "^@app/(.*)$": ["<rootDir>app/$1"],
     "^@mocks/(.*)$": ["<rootDir>__mocks__/$1"],
@@ -37,6 +50,7 @@ module.exports = {
       "|react-native-phone-number-input" +
       "|react-native-ratings" +
       "|react-native-reanimated" +
+      "|react-native-worklets" +
       "|react-native-linear-gradient" +
       "|react-native-root-siblings" +
       "|react-native-screens" +
@@ -53,6 +67,8 @@ module.exports = {
       "|react-native-auto-height-image" +
       "|react-native-nfc-manager" +
       "|uuid" +
+      "|@formatjs" +
+      "|react-native-inappbrowser-reborn" +
       ")/)",
   ],
 }

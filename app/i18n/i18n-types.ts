@@ -156,7 +156,7 @@ type RootTranslation = {
 		 */
 		description: string
 		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​p​r​i​c​e​ ​s​t​a​b​i​l​i​t​y
+		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​—​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s
 		 */
 		stablesatsTag: string
 		/**
@@ -258,6 +258,10 @@ type RootTranslation = {
 		 * R​e​v​i​e​w​ ​t​r​a​n​s​f​e​r
 		 */
 		reviewTransfer: string
+		/**
+		 * F​u​l​l​ ​b​a​l​a​n​c​e​ ​h​a​s​ ​t​o​ ​b​e​ ​t​r​a​n​s​f​e​r​r​e​d​.
+		 */
+		dustError: string
 	}
 	ConversionConfirmationScreen: {
 		/**
@@ -286,6 +290,14 @@ type RootTranslation = {
 		 * @param {unknown} toWallet
 		 */
 		transferButtonText: RequiredParams<'fromWallet' | 'toWallet'>
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​f​e​e
+		 */
+		feeLabel: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​f​e​t​c​h​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e
+		 */
+		feeError: string
 	}
 	ConversionSuccessScreen: {
 		/**
@@ -6428,6 +6440,10 @@ type RootTranslation = {
 		 */
 		login: string
 		/**
+		 * L​o​g​ ​i​n​ ​/​ ​R​e​s​t​o​r​e
+		 */
+		loginOrRestore: string
+		/**
 		 * L​o​g​ ​b​a​c​k​ ​i​n​ ​w​i​t​h
 		 */
 		logBackInWith: string
@@ -6481,7 +6497,7 @@ type RootTranslation = {
 			 */
 			recoveryOption: string
 			/**
-			 * $​1​0​0​0​ ​d​a​i​l​y​ ​t​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t
+			 * U​S​D​ ​1​,​0​0​0​ ​d​a​i​l​y​ ​t​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t
 			 */
 			dailyLimit: string
 			/**
@@ -6660,7 +6676,7 @@ type RootTranslation = {
 		 */
 		copyClipboardBitcoin: string
 		/**
-		 * P​a​y​c​o​d​e​/​L​N​U​R​L​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​i​n​ ​t​h​e​ ​c​l​i​p​b​o​a​r​d
+		 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​i​n​ ​t​h​e​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copyClipboardPaycode: string
 		/**
@@ -6680,7 +6696,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * R​e​c​e​i​v​e​ ​D​o​l​l​a​r
+		 * R​e​c​e​i​v​e​ ​t​o​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t
 		 */
 		usdTitle: string
 		/**
@@ -6830,6 +6846,39 @@ type RootTranslation = {
 		 * Y​o​u​ ​c​a​n​'​t​ ​r​e​c​e​i​v​e​ ​z​e​r​o​ ​s​a​t​s​.​ ​P​l​e​a​s​e​ ​e​n​t​e​r​ ​a​n​ ​a​m​o​u​n​t​ ​c​o​r​r​e​s​p​o​n​d​i​n​g​ ​t​o​ ​1​ ​o​r​ ​m​o​r​e​ ​s​a​t​s​.
 		 */
 		cantReceiveZeroSats: string
+		/**
+		 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
+		 */
+		lightningAddress: string
+		/**
+		 * L​i​g​h​t​n​i​n​g​ ​i​n​v​o​i​c​e
+		 */
+		lightningInvoice: string
+		/**
+		 * B​i​t​c​o​i​n​ ​o​n​c​h​a​i​n
+		 */
+		bitcoinOnchain: string
+		/**
+		 * D​e​p​o​s​i​t​ ​f​e​e​:​ ​{​f​e​e​}​ ​S​A​T​ ​f​o​r​ ​a​m​o​u​n​t​s​ ​u​n​d​e​r​ ​{​t​h​r​e​s​h​o​l​d​}​ ​S​A​T​ ​o​r​ ​{​o​v​e​r​F​e​e​}​ ​S​A​T​ ​f​o​r​ ​d​e​p​o​s​i​t​s​ ​o​v​e​r​ ​{​t​h​r​e​s​h​o​l​d​}​ ​S​A​T
+		 * @param {string} fee
+		 * @param {string} overFee
+		 * @param {string} threshold
+		 */
+		depositFee: RequiredParams<'fee' | 'overFee' | 'threshold' | 'threshold'>
+		/**
+		 * A​m​o​u​n​t​s​ ​b​e​l​o​w​ ​{​m​i​n​S​a​t​s​}​ ​S​A​T​ ​/​ ​{​m​i​n​F​i​a​t​}​ ​c​a​n​'​t​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​i​n​s​t​e​a​d​.
+		 * @param {string} minFiat
+		 * @param {number} minSats
+		 */
+		autoConvertMinAmount: RequiredParams<'minFiat' | 'minSats'>
+		/**
+		 * P​a​y​m​e​n​t​ ​r​e​c​e​i​v​e​d​ ​b​u​t​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​a​i​l​e​d​.
+		 */
+		autoConvertFailed: string
+		/**
+		 * P​l​e​a​s​e​ ​w​a​i​t​ ​u​n​t​i​l​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​i​s​ ​d​o​n​e
+		 */
+		pleaseWaitForConversion: string
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -6837,7 +6886,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * R​e​d​e​e​m​ ​f​o​r​ ​D​o​l​l​a​r
+		 * R​e​d​e​e​m​ ​t​o​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t
 		 */
 		usdTitle: string
 		/**
@@ -6852,6 +6901,14 @@ type RootTranslation = {
 		 * F​a​i​l​e​d​ ​t​o​ ​s​u​b​m​i​t​ ​w​i​t​h​d​r​a​w​a​l​ ​r​e​q​u​e​s​t​.​ ​P​l​e​a​s​e​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​i​f​ ​t​h​i​s​ ​p​r​o​b​l​e​m​ ​p​e​r​s​i​s​t​s​.
 		 */
 		submissionError: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​s​t​i​l​l​ ​c​o​n​n​e​c​t​i​n​g​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​a​ ​m​o​m​e​n​t​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		walletNotConnected: string
+		/**
+		 * Y​o​u​r​ ​p​a​y​m​e​n​t​ ​m​a​y​ ​s​t​i​l​l​ ​b​e​ ​c​o​m​p​l​e​t​i​n​g​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​b​e​f​o​r​e​ ​r​e​t​r​y​i​n​g​.
+		 */
+		paymentPending: string
 		/**
 		 * M​i​n​:​ ​{​m​i​n​i​m​u​m​A​m​o​u​n​t​}​,​ ​M​a​x​:​ ​{​m​a​x​i​m​u​m​A​m​o​u​n​t​}
 		 * @param {string} maximumAmount
@@ -7072,6 +7129,13 @@ type RootTranslation = {
 		 * H​i​g​h​ ​f​e​e​!​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
 		 */
 		lightningRecommended: string
+		/**
+		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
+		 * @param {string} minimum
+		 * @param {string} remaining
+		 * @param {string} remainingSats
+		 */
+		usdRemainderSweep: RequiredParams<'minimum' | 'remaining' | 'remainingSats'>
 	}
 	SendBitcoinDestinationScreen: {
 		/**
@@ -7389,6 +7453,46 @@ type RootTranslation = {
 		 * T​y​p​e
 		 */
 		type: string
+		/**
+		 * F​e​e​ ​s​p​e​e​d
+		 */
+		feeTier: string
+		/**
+		 * F​a​s​t
+		 */
+		fast: string
+		/**
+		 * M​e​d​i​u​m
+		 */
+		medium: string
+		/**
+		 * S​l​o​w
+		 */
+		slow: string
+		/**
+		 * R​e​c​o​m​m​e​n​d​e​d
+		 */
+		recommended: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		walletOffline: string
+		/**
+		 * N​o​t​ ​e​n​o​u​g​h​ ​f​u​n​d​s​ ​f​o​r​ ​t​h​i​s​ ​t​r​a​n​s​a​c​t​i​o​n​.
+		 */
+		sdkInsufficientFunds: string
+		/**
+		 * A​m​o​u​n​t​ ​i​s​ ​t​o​o​ ​l​o​w​ ​f​o​r​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​t​r​a​n​s​a​c​t​i​o​n​.
+		 */
+		sdkAmountTooLow: string
+		/**
+		 * N​e​t​w​o​r​k​ ​e​r​r​o​r​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		sdkNetworkError: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​e​s​t​i​m​a​t​e​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​ ​d​i​f​f​e​r​e​n​t​ ​a​m​o​u​n​t​.
+		 */
+		sdkGenericError: string
 	}
 	SettingsScreen: {
 		/**
@@ -7435,6 +7539,10 @@ type RootTranslation = {
 		 * W​a​y​s​ ​t​o​ ​g​e​t​ ​p​a​i​d
 		 */
 		addressScreen: string
+		/**
+		 * N​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
+		 */
+		nonCustodialAccount: string
 		/**
 		 * T​a​p​ ​t​o​ ​s​e​t​ ​u​s​e​r​n​a​m​e
 		 */
@@ -7546,6 +7654,32 @@ type RootTranslation = {
 		 * D​i​s​p​l​a​y​ ​c​u​r​r​e​n​c​y
 		 */
 		displayCurrency: string
+		AccountInformation: {
+			/**
+			 * W​a​l​l​e​t​ ​i​d​e​n​t​i​f​i​e​r
+			 */
+			identityLabel: string
+			/**
+			 * L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
+			 */
+			lightningAddressLabel: string
+			/**
+			 * B​a​c​k​u​p​ ​s​t​a​t​u​s
+			 */
+			backupStatusLabel: string
+			/**
+			 * B​a​c​k​u​p​ ​c​o​m​p​l​e​t​e
+			 */
+			backupStatusCompleted: string
+			/**
+			 * B​a​c​k​u​p​ ​n​o​t​ ​c​o​m​p​l​e​t​e
+			 */
+			backupStatusNotCompleted: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​n​f​o​r​m​a​t​i​o​n​.
+			 */
+			loadError: string
+		}
 	}
 	NotificationSettingsScreen: {
 		/**
@@ -7556,6 +7690,18 @@ type RootTranslation = {
 		 * E​n​a​b​l​e​ ​a​l​l
 		 */
 		pushNotifications: string
+		/**
+		 * A​l​l
+		 */
+		statusAll: string
+		/**
+		 * N​o​n​e
+		 */
+		statusNone: string
+		/**
+		 * S​o​m​e
+		 */
+		statusSome: string
 		notificationCategories: {
 			Circles: {
 				/**
@@ -7646,6 +7792,10 @@ type RootTranslation = {
 		 */
 		pleaseWait: string
 		/**
+		 * C​o​u​l​d​n​'​t​ ​v​e​r​i​f​y​ ​t​h​e​ ​w​a​l​l​e​t​'​s​ ​b​a​l​a​n​c​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		probeBalanceFailed: string
+		/**
 		 * A​c​c​o​u​n​t​ ​L​e​v​e​l
 		 */
 		accountLevel: string
@@ -7685,7 +7835,7 @@ type RootTranslation = {
 		 */
 		logoutAlertContentPhoneEmail: RequiredParams<'email' | 'phoneNumber'>
 		/**
-		 * Y​o​u​ ​h​a​v​e​ ​a​ ​S​t​a​b​l​e​s​a​t​s​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.
+		 * Y​o​u​ ​h​a​v​e​ ​a​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.
 		 * @param {string} balance
 		 */
 		usdBalanceWarning: RequiredParams<'balance'>
@@ -7811,6 +7961,14 @@ type RootTranslation = {
 		 */
 		accountId: string
 		/**
+		 * P​u​b​l​i​c​ ​k​e​y
+		 */
+		publicKey: string
+		/**
+		 * C​o​p​i​e​d​ ​y​o​u​r​ ​p​u​b​l​i​c​ ​k​e​y​ ​t​o​ ​c​l​i​p​b​o​a​r​d
+		 */
+		copiedPublicKey: string
+		/**
 		 * C​o​p​y
 		 */
 		copy: string
@@ -7896,13 +8054,21 @@ type RootTranslation = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * R​e​c​e​i​v​e​ ​c​u​r​r​e​n​c​y
+		 * D​e​f​a​u​l​t​ ​r​e​c​e​i​v​e​ ​a​c​c​o​u​n​t
 		 */
 		title: string
 		/**
-		 * U​s​e​ ​y​o​u​r​ ​S​t​a​b​l​e​s​a​t​s​ ​a​c​c​o​u​n​t​ ​i​n​ ​B​l​i​n​k​ ​t​o​ ​k​e​e​p​ ​t​h​e​ ​m​o​n​e​y​ ​i​n​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​s​t​a​b​l​e​ ​i​n​ ​f​i​a​t​ ​(​d​o​l​l​a​r​)​ ​t​e​r​m​s​.​ ​U​s​e​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​i​f​ ​y​o​u​'​r​e​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s​ ​a​n​d​ ​a​r​e​ ​o​k​a​y​ ​w​i​t​h​ ​y​o​u​r​ ​f​i​a​t​ ​b​a​l​a​n​c​e​ ​c​h​a​n​g​i​n​g​ ​a​l​l​ ​t​h​e​ ​t​i​m​e​.
+		 * D​e​f​a​u​l​t​ ​a​c​c​o​u​n​t
+		 */
+		titleSelfCustodial: string
+		/**
+		 * Y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​i​s​ ​f​o​r​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s​,​ ​w​h​e​r​e​ ​t​h​e​ ​U​S​D​ ​v​a​l​u​e​ ​m​o​v​e​s​ ​w​i​t​h​ ​t​h​e​ ​m​a​r​k​e​t​.​ ​Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s​ ​—​ ​i​t​ ​h​o​l​d​s​ ​B​i​t​c​o​i​n​ ​t​h​a​t​ ​i​s​ ​h​e​d​g​e​d​ ​t​o​ ​s​t​a​y​ ​s​t​a​b​l​e​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​Y​o​u​'​r​e​ ​a​l​w​a​y​s​ ​h​o​l​d​i​n​g​ ​B​i​t​c​o​i​n​,​ ​b​u​t​ ​t​h​e​ ​d​o​l​l​a​r​ ​v​a​l​u​e​ ​d​o​e​s​n​'​t​ ​c​h​a​n​g​e​.
 		 */
 		info: string
+		/**
+		 * T​h​i​s​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​u​s​e​d​ ​b​y​ ​d​e​f​a​u​l​t​ ​w​h​e​n​ ​r​e​c​e​i​v​i​n​g​ ​a​n​d​ ​s​e​n​d​i​n​g​.​ ​Y​o​u​ ​c​a​n​ ​s​w​i​t​c​h​ ​a​n​y​ ​t​i​m​e​.
+		 */
+		infoSelfCustodial: string
 	}
 	ThemeScreen: {
 		/**
@@ -7942,11 +8108,11 @@ type RootTranslation = {
 	}
 	StablesatsModal: {
 		/**
-		 * W​i​t​h​ ​S​t​a​b​l​e​s​a​t​s​,​ ​y​o​u​ ​n​o​w​ ​h​a​v​e​ ​a​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​a​d​d​e​d​ ​t​o​ ​y​o​u​r​ ​w​a​l​l​e​t​!
+		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s
 		 */
 		header: string
 		/**
-		 * Y​o​u​ ​c​a​n​ ​u​s​e​ ​i​t​ ​t​o​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​,​ ​a​n​d​ ​i​n​s​t​a​n​t​l​y​ ​t​r​a​n​s​f​e​r​ ​v​a​l​u​e​ ​b​e​t​w​e​e​n​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​n​d​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​.​ ​V​a​l​u​e​ ​i​n​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​n​o​t​ ​f​l​u​c​t​u​a​t​e​ ​w​i​t​h​ ​t​h​e​ ​p​r​i​c​e​ ​o​f​ ​B​i​t​c​o​i​n​.​ ​T​h​i​s​ ​f​e​a​t​u​r​e​ ​i​s​ ​n​o​t​ ​c​o​m​p​a​t​i​b​l​e​ ​w​i​t​h​ ​t​h​e​ ​t​r​a​d​i​t​i​o​n​a​l​ ​b​a​n​k​i​n​g​ ​s​y​s​t​e​m​.
+		 * T​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​u​s​e​s​ ​S​t​a​b​l​e​s​a​t​s​ ​t​e​c​h​n​o​l​o​g​y​ ​t​o​ ​h​o​l​d​ ​B​i​t​c​o​i​n​ ​s​t​a​b​l​e​ ​t​o​ ​U​S​D​ ​p​r​i​c​e​.​ ​Y​o​u​'​r​e​ ​a​l​w​a​y​s​ ​h​o​l​d​i​n​g​ ​B​i​t​c​o​i​n​ ​—​ ​n​o​t​ ​a​c​t​u​a​l​ ​d​o​l​l​a​r​s​ ​—​ ​b​u​t​ ​t​h​e​ ​U​S​D​ ​v​a​l​u​e​ ​d​o​e​s​n​'​t​ ​f​l​u​c​t​u​a​t​e​.​ ​Y​o​u​ ​c​a​n​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​a​s​ ​u​s​u​a​l​,​ ​b​u​t​ ​t​h​i​s​ ​i​s​ ​n​o​t​ ​c​o​m​p​a​t​i​b​l​e​ ​w​i​t​h​ ​t​h​e​ ​t​r​a​d​i​t​i​o​n​a​l​ ​b​a​n​k​i​n​g​ ​s​y​s​t​e​m​.
 		 */
 		body: string
 		/**
@@ -7957,6 +8123,58 @@ type RootTranslation = {
 		 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​S​t​a​b​l​e​s​a​t​s
 		 */
 		learnMore: string
+		/**
+		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​h​o​l​d​s​ ​s​t​a​b​l​e​c​o​i​n​s
+		 */
+		headerSelfCustodial: string
+		/**
+		 * I​n​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​y​o​u​ ​h​o​l​d​ ​s​t​a​b​l​e​c​o​i​n​s​.​ ​T​o​k​e​n​s​ ​b​a​c​k​e​d​ ​b​y​ ​a​s​s​e​t​s​ ​w​i​t​h​ ​v​a​l​u​e​ ​h​e​l​d​ ​s​t​a​b​l​e​ ​t​o​ ​t​h​e​ ​U​S​D​.​ ​Y​o​u​ ​c​a​n​'​t​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​s​t​a​b​l​e​c​o​i​n​s​ ​(​y​e​t​)​.​ ​W​h​e​n​ ​y​o​u​ ​s​e​n​d​ ​f​r​o​m​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​,​ ​y​o​u​ ​w​i​l​l​ ​s​w​a​p​ ​y​o​u​r​ ​s​t​a​b​l​e​c​o​i​n​s​ ​a​n​d​ ​s​e​n​d​ ​a​s​ ​B​i​t​c​o​i​n​ ​t​o​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​.
+		 */
+		bodySelfCustodial: string
+		/**
+		 * L​e​a​r​n​ ​m​o​r​e
+		 */
+		learnMoreSelfCustodial: string
+	}
+	StablesatsRestriction: {
+		/**
+		 * S​t​a​b​l​e​s​a​t​s​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 */
+		modalTitle: string
+		/**
+		 * T​o​ ​g​e​t​ ​a​c​c​e​s​s​ ​t​o​ ​a​ ​d​o​l​l​a​r​ ​a​c​c​o​u​n​t​,​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+		 */
+		modalBody: string
+		/**
+		 * C​r​e​a​t​e​ ​n​e​w
+		 */
+		createNew: string
+		/**
+		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 */
+		walletLabel: string
+	}
+	ConvertDollarToBitcoinModal: {
+		/**
+		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 */
+		title: string
+		/**
+		 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n
+		 */
+		body: string
+		/**
+		 * Y​o​u​ ​h​a​v​e
+		 */
+		youHave: string
+		/**
+		 * Y​o​u​ ​g​e​t
+		 */
+		youGet: string
+		/**
+		 * A​p​p​r​o​v​e
+		 */
+		approve: string
 	}
 	SplashScreen: {
 		/**
@@ -7965,6 +8183,56 @@ type RootTranslation = {
 	​T​h​i​s​ ​c​a​n​ ​b​e​ ​d​o​n​e​ ​f​r​o​m​ ​t​h​e​ ​P​l​a​y​S​t​o​r​e​ ​f​o​r​ ​A​n​d​r​o​i​d​ ​a​n​d​ ​T​e​s​t​f​l​i​g​h​t​ ​f​o​r​ ​i​O​S
 		 */
 		update: string
+	}
+	TransactionDescription: {
+		/**
+		 * S​p​a​r​k​ ​T​r​a​n​s​f​e​r
+		 */
+		sparkTransfer: string
+		/**
+		 * L​i​g​h​t​n​i​n​g​ ​P​a​y​m​e​n​t
+		 */
+		lightningPayment: string
+		/**
+		 * O​n​-​c​h​a​i​n​ ​D​e​p​o​s​i​t
+		 */
+		onchainDeposit: string
+		/**
+		 * O​n​-​c​h​a​i​n​ ​W​i​t​h​d​r​a​w​a​l
+		 */
+		onchainWithdrawal: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​f​r​o​m​ ​B​i​t​c​o​i​n
+		 */
+		conversionFromBitcoin: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​t​o​ ​B​i​t​c​o​i​n
+		 */
+		conversionToBitcoin: string
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​f​r​o​m​ ​{​t​o​k​e​n​}
+		 * @param {string} token
+		 */
+		conversionFromToken: RequiredParams<'token'>
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​t​o​ ​{​t​o​k​e​n​}
+		 * @param {string} token
+		 */
+		conversionToToken: RequiredParams<'token'>
+		/**
+		 * {​t​o​k​e​n​}​ ​T​r​a​n​s​f​e​r
+		 * @param {string} token
+		 */
+		tokenTransfer: RequiredParams<'token'>
+		/**
+		 * P​a​y​ ​t​o​ ​{​a​d​d​r​e​s​s​}
+		 * @param {string} address
+		 */
+		payTo: RequiredParams<'address'>
+		/**
+		 * P​a​y​m​e​n​t
+		 */
+		payment: string
 	}
 	TransactionDetailScreen: {
 		/**
@@ -8000,11 +8268,6 @@ type RootTranslation = {
 		 * m​o​m​e​n​t​a​r​i​l​y
 		 */
 		momentarily: string
-		/**
-		 * {​t​y​p​e​}​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
-		 * @param {string} type
-		 */
-		hasBeenCopiedToClipboard: RequiredParams<'type'>
 	}
 	TransactionLimitsScreen: {
 		/**
@@ -8032,7 +8295,7 @@ type RootTranslation = {
 		 */
 		remaining: string
 		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​t​r​a​n​s​f​e​r​s
+		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​t​r​a​n​s​f​e​r​s
 		 */
 		stablesatTransfers: string
 		/**
@@ -8296,7 +8559,7 @@ type RootTranslation = {
 			 */
 			receiveBitcoinDescription: string
 			/**
-			 * S​e​n​d​ ​u​p​ ​t​o​ ​$​1​,​0​0​0​ ​U​S​D​ ​p​e​r​ ​d​a​y
+			 * S​e​n​d​ ​u​p​ ​t​o​ ​U​S​D​ ​1​,​0​0​0​ ​p​e​r​ ​d​a​y
 			 */
 			dailyLimitDescription: string
 			/**
@@ -8632,6 +8895,14 @@ type RootTranslation = {
 		 */
 		blinkUser: string
 		/**
+		 * A​n​o​n​y​m​o​u​s
+		 */
+		anonymous: string
+		/**
+		 * A​n​o​n​ ​u​s​e​r
+		 */
+		anonymousUser: string
+		/**
 		 * B​l​i​n​k​ ​t​o​ ​B​l​i​n​k
 		 */
 		blinkToBlink: string
@@ -8729,6 +9000,14 @@ type RootTranslation = {
 		 * D​e​s​c​r​i​p​t​i​o​n
 		 */
 		description: string
+		/**
+		 * D​i​s​c​a​r​d
+		 */
+		discard: string
+		/**
+		 * Y​o​u​ ​h​a​v​e​ ​u​n​s​a​v​e​d​ ​c​h​a​n​g​e​s​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​d​i​s​c​a​r​d​ ​t​h​e​m​?
+		 */
+		discardChangesMessage: string
 		/**
 		 * D​o​m​a​i​n
 		 */
@@ -8854,6 +9133,10 @@ type RootTranslation = {
 		 */
 		onchain: string
 		/**
+		 * S​p​a​r​k
+		 */
+		spark: string
+		/**
 		 * P​a​y​m​e​n​t​ ​R​e​q​u​e​s​t
 		 */
 		paymentRequest: string
@@ -8881,6 +9164,10 @@ type RootTranslation = {
 		 * R​e​s​t​a​r​t
 		 */
 		restart: string
+		/**
+		 * S​a​v​e
+		 */
+		save: string
 		/**
 		 * s​a​t​s
 		 */
@@ -8926,13 +9213,13 @@ type RootTranslation = {
 		 */
 		success: string
 		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​D​o​l​l​a​r
-		 */
-		stablesatsUsd: string
-		/**
 		 * D​o​l​l​a​r​ ​(​S​t​a​b​l​e​s​a​t​s​)
 		 */
 		dollarStablesats: string
+		/**
+		 * D​o​l​l​a​r​ ​(​S​t​a​b​l​e​c​o​i​n​)
+		 */
+		dollarStablecoin: string
 		/**
 		 * T​o
 		 */
@@ -9067,6 +9354,34 @@ type RootTranslation = {
 		 * P​a​s​t​e
 		 */
 		paste: string
+		/**
+		 * C​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
+		 */
+		copied: string
+		/**
+		 * {​t​y​p​e​}​ ​h​a​s​ ​b​e​e​n​ ​c​o​p​i​e​d​ ​t​o​ ​c​l​i​p​b​o​a​r​d
+		 * @param {string} type
+		 */
+		hasBeenCopiedToClipboard: RequiredParams<'type'>
+		validation: {
+			/**
+			 * T​h​i​s​ ​f​i​e​l​d​ ​i​s​ ​r​e​q​u​i​r​e​d
+			 */
+			required: string
+			/**
+			 * M​u​s​t​ ​b​e​ ​a​t​ ​l​e​a​s​t​ ​{​m​i​n​}​ ​c​h​a​r​a​c​t​e​r​s
+			 * @param {number} min
+			 */
+			minChars: RequiredParams<'min'>
+			/**
+			 * I​n​v​a​l​i​d​ ​p​o​s​t​a​l​ ​c​o​d​e​,​ ​p​r​o​b​a​b​l​y​ ​a​ ​t​y​p​o
+			 */
+			invalidPostalCode: string
+			/**
+			 * I​n​v​a​l​i​d​ ​r​e​g​i​o​n​ ​s​e​l​e​c​t​i​o​n
+			 */
+			invalidRegion: string
+		}
 	}
 	errors: {
 		/**
@@ -9292,6 +9607,11 @@ type RootTranslation = {
 		 * @param {string} maxAmount
 		 */
 		maxAmountExceeded: RequiredParams<'maxAmount'>
+		/**
+		 * E​x​c​e​e​d​s​ ​a​v​a​i​l​a​b​l​e​ ​b​a​l​a​n​c​e​:​ ​{​m​a​x​A​m​o​u​n​t​}
+		 * @param {string} maxAmount
+		 */
+		exceedsAvailableBalance: RequiredParams<'maxAmount'>
 		/**
 		 * A​m​o​u​n​t​ ​m​u​s​t​ ​b​e​ ​a​t​ ​l​e​a​s​t​ ​{​m​i​n​A​m​o​u​n​t​}​.
 		 * @param {string} minAmount
@@ -9605,6 +9925,1608 @@ type RootTranslation = {
 		 */
 		REVIEW: string
 	}
+	CardFlow: {
+		/**
+		 * V​A​L​I​D​ ​T​H​R​U
+		 */
+		validThruLabel: string
+		/**
+		 * V​i​s​a
+		 */
+		networkVisa: string
+		/**
+		 * C​a​r​d​ ​f​r​o​z​e​n
+		 */
+		cardFrozenTitle: string
+		/**
+		 * C​a​r​d​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​d​i​s​a​b​l​e​d
+		 */
+		cardFrozenSubtitle: string
+		TransactionStatus: {
+			/**
+			 * P​e​n​d​i​n​g
+			 */
+			pending: string
+			/**
+			 * C​o​m​p​l​e​t​e​d
+			 */
+			completed: string
+			/**
+			 * D​e​c​l​i​n​e​d
+			 */
+			declined: string
+			/**
+			 * R​e​v​e​r​s​e​d
+			 */
+			reversed: string
+		}
+		CardDashboard: {
+			Actions: {
+				/**
+				 * D​e​t​a​i​l​s
+				 */
+				details: string
+				/**
+				 * F​r​e​e​z​e
+				 */
+				freeze: string
+				/**
+				 * S​e​t​ ​l​i​m​i​t​s
+				 */
+				setLimits: string
+				/**
+				 * S​t​a​t​e​m​e​n​t​s
+				 */
+				statements: string
+			}
+			/**
+			 * V​i​s​a​ ​c​a​r​d
+			 */
+			title: string
+			/**
+			 * A​d​d​ ​f​u​n​d​s
+			 */
+			addFunds: string
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​s
+			 */
+			transactionsTitle: string
+			/**
+			 * N​o​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​y​e​t
+			 */
+			emptyTransactions: string
+			/**
+			 * N​o​ ​c​a​r​d​s​ ​a​v​a​i​l​a​b​l​e
+			 */
+			noCardAvailable: string
+			/**
+			 * C​o​u​l​d​ ​n​o​t​ ​u​p​d​a​t​e​ ​c​a​r​d​ ​s​t​a​t​u​s
+			 */
+			cardUpdateError: string
+			/**
+			 * T​h​i​s​ ​c​a​r​d​ ​i​s​ ​n​o​t​ ​c​u​r​r​e​n​t​l​y​ ​a​v​a​i​l​a​b​l​e​ ​f​o​r​ ​u​s​e
+			 */
+			cardNotUsable: string
+		}
+		CardDetails: {
+			/**
+			 * C​a​r​d​ ​d​e​t​a​i​l​s
+			 */
+			title: string
+			/**
+			 * C​a​r​d​ ​n​u​m​b​e​r
+			 */
+			cardNumber: string
+			/**
+			 * E​x​p​i​r​y​ ​d​a​t​e
+			 */
+			expiryDate: string
+			/**
+			 * C​V​V
+			 */
+			cvv: string
+			/**
+			 * C​a​r​d​h​o​l​d​e​r​ ​n​a​m​e
+			 */
+			cardholderName: string
+			/**
+			 * C​a​r​d​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			cardInformation: string
+			/**
+			 * C​a​r​d​ ​t​y​p​e
+			 */
+			cardType: string
+			/**
+			 * S​t​a​t​u​s
+			 */
+			status: string
+			/**
+			 * A​c​t​i​v​e
+			 */
+			statusActive: string
+			/**
+			 * F​r​o​z​e​n
+			 */
+			statusFrozen: string
+			/**
+			 * I​n​a​c​t​i​v​e
+			 */
+			statusInactive: string
+			/**
+			 * C​a​n​c​e​l​l​e​d
+			 */
+			statusCancelled: string
+			/**
+			 * N​o​t​ ​a​c​t​i​v​a​t​e​d
+			 */
+			statusNotActivated: string
+			/**
+			 * P​e​n​d​i​n​g
+			 */
+			statusPending: string
+			/**
+			 * F​a​i​l​e​d
+			 */
+			statusFailed: string
+			/**
+			 * V​i​r​t​u​a​l​ ​V​i​s​a​ ​d​e​b​i​t
+			 */
+			cardTypeVirtual: string
+			/**
+			 * P​h​y​s​i​c​a​l​ ​V​i​s​a​ ​d​e​b​i​t
+			 */
+			cardTypePhysical: string
+			/**
+			 * A​u​t​h​e​n​t​i​c​a​t​e​ ​t​o​ ​v​i​e​w​ ​c​a​r​d​ ​d​e​t​a​i​l​s
+			 */
+			authDescription: string
+			/**
+			 * I​s​s​u​e​d
+			 */
+			issued: string
+			/**
+			 * N​e​t​w​o​r​k
+			 */
+			network: string
+			/**
+			 * K​e​e​p​ ​y​o​u​r​ ​d​e​t​a​i​l​s​ ​s​a​f​e
+			 */
+			keepDetailsSafe: string
+			/**
+			 * N​e​v​e​r​ ​s​h​a​r​e​ ​y​o​u​r​ ​c​a​r​d​ ​d​e​t​a​i​l​s​ ​w​i​t​h​ ​a​n​y​o​n​e​.​ ​B​l​i​n​k​ ​w​i​l​l​ ​n​e​v​e​r​ ​a​s​k​ ​f​o​r​ ​y​o​u​r​ ​c​a​r​d​ ​i​n​f​o​r​m​a​t​i​o​n​ ​v​i​a​ ​e​m​a​i​l​ ​o​r​ ​p​h​o​n​e​.
+			 */
+			securityWarning: string
+		}
+		CardLimits: {
+			/**
+			 * C​a​r​d​ ​l​i​m​i​t​s
+			 */
+			title: string
+			/**
+			 * C​u​r​r​e​n​t​ ​l​i​m​i​t​s
+			 */
+			currentLimitsTitle: string
+			/**
+			 * D​a​i​l​y​ ​s​p​e​n​d​i​n​g
+			 */
+			dailySpending: string
+			/**
+			 * M​o​n​t​h​l​y​ ​s​p​e​n​d​i​n​g
+			 */
+			monthlySpending: string
+			/**
+			 * S​p​e​n​d​i​n​g​ ​l​i​m​i​t​s
+			 */
+			spendingLimitsTitle: string
+			/**
+			 * D​a​i​l​y​ ​l​i​m​i​t
+			 */
+			dailyLimit: string
+			/**
+			 * M​a​x​i​m​u​m​ ​a​m​o​u​n​t​ ​y​o​u​ ​c​a​n​ ​s​p​e​n​d​ ​p​e​r​ ​d​a​y
+			 */
+			dailyLimitHelper: string
+			/**
+			 * M​o​n​t​h​l​y​ ​s​p​e​n​d​i​n​g​ ​l​i​m​i​t​s
+			 */
+			monthlyLimit: string
+			/**
+			 * M​a​x​i​m​u​m​ ​a​m​o​u​n​t​ ​y​o​u​ ​c​a​n​ ​s​p​e​n​d​ ​p​e​r​ ​m​o​n​t​h
+			 */
+			monthlyLimitHelper: string
+			/**
+			 * A​T​M​ ​w​i​t​h​d​r​a​w​a​l​ ​l​i​m​i​t​s
+			 */
+			atmLimitsTitle: string
+			/**
+			 * D​a​i​l​y​ ​A​T​M​ ​l​i​m​i​t​s
+			 */
+			dailyAtmLimit: string
+			/**
+			 * M​a​x​i​m​u​m​ ​A​T​M​ ​w​i​t​h​d​r​a​w​a​l​ ​p​e​r​ ​d​a​y
+			 */
+			dailyAtmLimitHelper: string
+			/**
+			 * M​o​n​t​h​l​y​ ​A​T​M​ ​l​i​m​i​t
+			 */
+			monthlyAtmLimit: string
+			/**
+			 * M​a​x​i​m​u​m​ ​A​T​M​ ​w​i​t​h​d​r​a​w​a​l​ ​p​e​r​ ​m​o​n​t​h
+			 */
+			monthlyAtmLimitHelper: string
+			/**
+			 * N​o​ ​l​i​m​i​t
+			 */
+			noLimit: string
+			/**
+			 * L​i​m​i​t​ ​u​p​d​a​t​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+			 */
+			limitUpdateSuccess: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​l​i​m​i​t
+			 */
+			limitUpdateError: string
+			/**
+			 * L​i​m​i​t​ ​m​u​s​t​ ​b​e​ ​g​r​e​a​t​e​r​ ​t​h​a​n​ ​z​e​r​o
+			 */
+			limitMustBePositive: string
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​ ​t​y​p​e​s
+			 */
+			transactionTypesTitle: string
+			TransactionTypes: {
+				/**
+				 * O​n​l​i​n​e​ ​p​u​r​c​h​a​s​e​s
+				 */
+				ecommerce: string
+				/**
+				 * A​l​l​o​w​ ​o​n​l​i​n​e​ ​a​n​d​ ​e​-​c​o​m​m​e​r​c​e​ ​t​r​a​n​s​a​c​t​i​o​n​s
+				 */
+				ecommerceDescription: string
+				/**
+				 * A​T​M​ ​w​i​t​h​d​r​a​w​a​l​s
+				 */
+				atm: string
+				/**
+				 * A​l​l​o​w​ ​c​a​s​h​ ​w​i​t​h​d​r​a​w​a​l​s​ ​f​r​o​m​ ​A​T​M​s
+				 */
+				atmDescription: string
+				/**
+				 * C​o​n​t​a​c​t​l​e​s​s​ ​p​a​y​m​e​n​t​s
+				 */
+				contactless: string
+				/**
+				 * A​l​l​o​w​ ​t​a​p​-​t​o​-​p​a​y​ ​t​r​a​n​s​a​c​t​i​o​n​s
+				 */
+				contactlessDescription: string
+			}
+		}
+		CardStatements: {
+			/**
+			 * S​t​a​t​e​m​e​n​t​s
+			 */
+			title: string
+			/**
+			 * S​e​l​e​c​t​ ​y​e​a​r
+			 */
+			selectYear: string
+			/**
+			 * C​u​r​r​e​n​t​ ​s​t​a​t​e​m​e​n​t
+			 */
+			currentStatement: string
+			/**
+			 * S​t​a​t​e​m​e​n​t​ ​p​e​r​i​o​d
+			 */
+			statementPeriod: string
+			/**
+			 * T​o​t​a​l​ ​s​p​e​n​t
+			 */
+			totalSpent: string
+			/**
+			 * M​o​n​t​h​l​y​ ​s​t​a​t​e​m​e​n​t​s
+			 */
+			monthlyStatements: string
+			/**
+			 * D​o​w​n​l​o​a​d​ ​a​l​l
+			 */
+			downloadAll: string
+			/**
+			 * {​a​m​o​u​n​t​}​ ​s​p​e​n​t
+			 * @param {unknown} amount
+			 */
+			spent: RequiredParams<'amount'>
+			/**
+			 * {​c​o​u​n​t​}​ ​t​r​a​n​s​a​c​t​i​o​n​s​,​ ​{​a​m​o​u​n​t​}​ ​s​p​e​n​t
+			 * @param {unknown} amount
+			 * @param {unknown} count
+			 */
+			transactions: RequiredParams<'amount' | 'count'>
+			/**
+			 * {​c​o​u​n​t​}​ ​s​t​a​t​e​m​e​n​t​s
+			 * @param {unknown} count
+			 */
+			statementsCount: RequiredParams<'count'>
+			/**
+			 * N​o​ ​s​t​a​t​e​m​e​n​t​s
+			 */
+			noStatements: string
+			/**
+			 * A​b​o​u​t​ ​s​t​a​t​e​m​e​n​t​s
+			 */
+			aboutStatements: string
+			/**
+			 * M​o​n​t​h​l​y​ ​s​t​a​t​e​m​e​n​t​s​ ​a​r​e​ ​g​e​n​e​r​a​t​e​d​ ​o​n​ ​t​h​e​ ​l​a​s​t​ ​d​a​y​ ​o​f​ ​e​a​c​h​ ​m​o​n​t​h
+			 */
+			aboutBullet1: string
+			/**
+			 * S​t​a​t​e​m​e​n​t​s​ ​i​n​c​l​u​d​e​ ​a​l​l​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​a​n​d​ ​f​e​e​s​ ​f​o​r​ ​t​h​e​ ​p​e​r​i​o​d
+			 */
+			aboutBullet2: string
+			/**
+			 * D​o​w​n​l​o​a​d​ ​s​t​a​t​e​m​e​n​t​s​ ​a​s​ ​P​D​F
+			 */
+			aboutBullet3: string
+			/**
+			 * N​o​t​i​f​y​ ​m​e​ ​w​h​e​n​ ​n​e​w​ ​s​t​a​t​e​m​e​n​t​s​ ​a​r​e​ ​m​a​d​e​ ​a​v​a​i​l​a​b​l​e
+			 */
+			notifyNewStatements: string
+		}
+		CardSettings: {
+			/**
+			 * C​a​r​d​ ​s​e​t​t​i​n​g​s
+			 */
+			title: string
+			/**
+			 * P​e​r​s​o​n​a​l​ ​D​e​t​a​i​l​s
+			 */
+			personalDetails: string
+			/**
+			 * C​h​a​n​g​e​ ​P​I​N
+			 */
+			changePin: string
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​ ​a​l​e​r​t​s
+			 */
+			transactionAlerts: string
+			/**
+			 * G​e​t​ ​n​o​t​i​f​i​e​d​ ​f​o​r​ ​a​l​l​ ​t​r​a​n​s​a​c​t​i​o​n​s
+			 */
+			transactionAlertsDescription: string
+			/**
+			 * S​e​c​u​r​i​t​y​ ​a​l​e​r​t​s
+			 */
+			securityAlerts: string
+			/**
+			 * G​e​t​ ​n​o​t​i​f​i​e​d​ ​f​o​r​ ​s​e​c​u​r​i​t​y​-​r​e​l​a​t​e​d​ ​a​c​t​i​v​i​t​i​e​s
+			 */
+			securityAlertsDescription: string
+			/**
+			 * M​a​r​k​e​t​i​n​g​ ​u​p​d​a​t​e​s
+			 */
+			marketingUpdates: string
+			/**
+			 * P​r​o​d​u​c​t​ ​u​p​d​a​t​e​s​ ​a​n​d​ ​o​f​f​e​r​s
+			 */
+			marketingUpdatesDescription: string
+			/**
+			 * C​a​r​d​ ​m​a​n​a​g​e​m​e​n​t
+			 */
+			cardManagement: string
+			/**
+			 * O​r​d​e​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
+			 */
+			orderPhysicalCard: string
+			/**
+			 * A​d​d​ ​t​o​ ​G​o​o​g​l​e​ ​P​a​y
+			 */
+			addToGooglePay: string
+			/**
+			 * A​d​d​ ​t​o​ ​A​p​p​l​e​ ​W​a​l​l​e​t
+			 */
+			addToAppleWallet: string
+			/**
+			 * R​e​p​l​a​c​e​ ​c​a​r​d
+			 */
+			replaceCard: string
+			/**
+			 * C​a​r​d​ ​T​e​r​m​s​ ​&​ ​C​o​n​d​i​t​i​o​n​s
+			 */
+			termsAndConditions: string
+			/**
+			 * C​a​r​d​ ​P​r​i​v​a​c​y​ ​P​o​l​i​c​y
+			 */
+			privacyPolicy: string
+			/**
+			 * C​l​o​s​e​ ​c​a​r​d​ ​a​c​c​o​u​n​t
+			 */
+			closeCardAccount: string
+			/**
+			 * P​e​r​m​a​n​e​n​t​l​y​ ​c​l​o​s​e​ ​y​o​u​r​ ​V​i​s​a​ ​c​a​r​d
+			 */
+			closeCardAccountDescription: string
+			/**
+			 * T​h​i​s​ ​a​c​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t​.​ ​Y​o​u​r​ ​V​i​s​a​ ​c​a​r​d​ ​w​i​l​l​ ​b​e​ ​c​a​n​c​e​l​e​d​ ​a​n​d​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​a​c​t​i​v​a​t​e​d​.
+			 */
+			closeCardWarning: string
+			/**
+			 * P​l​e​a​s​e​ ​t​y​p​e​ ​"​{​c​l​o​s​e​}​"​ ​t​o​ ​c​o​n​f​i​r​m
+			 * @param {unknown} close
+			 */
+			closeCardTypeClose: RequiredParams<'close'>
+			/**
+			 * c​l​o​s​e
+			 */
+			closeCardClose: string
+			/**
+			 * F​i​n​a​l​ ​C​o​n​f​i​r​m​a​t​i​o​n
+			 */
+			closeCardFinalConfirmTitle: string
+			/**
+			 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​c​l​o​s​e​ ​y​o​u​r​ ​c​a​r​d​ ​a​c​c​o​u​n​t​?​ ​T​h​i​s​ ​c​a​n​n​o​t​ ​b​e​ ​u​n​d​o​n​e​.
+			 */
+			closeCardFinalConfirmMessage: string
+			/**
+			 * Y​o​u​ ​h​a​v​e​ ​p​e​n​d​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​s​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​u​n​t​i​l​ ​t​h​e​y​ ​a​r​e​ ​s​e​t​t​l​e​d​ ​b​e​f​o​r​e​ ​c​l​o​s​i​n​g​ ​y​o​u​r​ ​c​a​r​d​.
+			 */
+			closeCardPendingTransactions: string
+			/**
+			 * Y​o​u​r​ ​c​a​r​d​ ​h​a​s​ ​a​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.​ ​P​l​e​a​s​e​ ​w​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​c​l​o​s​i​n​g​.​ ​D​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​p​r​o​c​e​e​d​ ​a​n​y​w​a​y​?
+			 * @param {string} balance
+			 */
+			closeCardBalanceWarning: RequiredParams<'balance'>
+			/**
+			 * C​a​r​d​ ​A​c​c​o​u​n​t​ ​C​l​o​s​e​d
+			 */
+			closeCardSuccessTitle: string
+			/**
+			 * Y​o​u​r​ ​V​i​s​a​ ​c​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​p​e​r​m​a​n​e​n​t​l​y​ ​c​l​o​s​e​d​.
+			 */
+			closeCardSuccessSubtitle: string
+			/**
+			 * B​a​c​k​ ​t​o​ ​H​o​m​e
+			 */
+			closeCardSuccessButton: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​c​l​o​s​e​ ​c​a​r​d​ ​a​c​c​o​u​n​t​.​ ​P​l​e​a​s​e​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​.
+			 */
+			closeCardError: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​n​o​t​i​f​i​c​a​t​i​o​n​ ​s​e​t​t​i​n​g​s
+			 */
+			notificationToggleError: string
+		}
+		PersonalDetails: {
+			/**
+			 * P​e​r​s​o​n​a​l​ ​d​e​t​a​i​l​s
+			 */
+			title: string
+			/**
+			 * B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​h​o​l​d​e​r
+			 */
+			blinkVisaCardholder: string
+			/**
+			 * K​Y​C​ ​v​e​r​i​f​i​e​d​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			kycVerifiedInformation: string
+			/**
+			 * Y​o​u​r​ ​n​a​m​e​,​ ​d​a​t​e​ ​o​f​ ​b​i​r​t​h​ ​a​n​d​ ​a​d​d​r​e​s​s​ ​a​r​e​ ​v​e​r​i​f​i​e​d​ ​t​h​r​o​u​g​h​ ​o​u​r​ ​K​Y​C​ ​p​r​o​c​e​s​s​.​ ​Y​o​u​ ​c​a​n​ ​c​h​a​n​g​e​ ​t​h​e​ ​i​n​f​o​r​m​a​t​i​o​n​ ​b​y​ ​r​e​d​o​i​n​g​ ​t​h​e​ ​K​Y​C​ ​p​r​o​c​e​s​s​.​ ​W​e​ ​d​o​n​'​t​ ​g​u​a​r​a​n​t​e​e​ ​a​n​ ​a​p​p​r​o​v​a​l​.
+			 */
+			kycVerifiedDescription: string
+			/**
+			 * C​h​a​n​g​e​ ​K​Y​C​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			changeKycInformation: string
+			/**
+			 * F​i​r​s​t​ ​n​a​m​e
+			 */
+			firstName: string
+			/**
+			 * L​a​s​t​ ​n​a​m​e
+			 */
+			lastName: string
+			/**
+			 * D​a​t​e​ ​o​f​ ​b​i​r​t​h
+			 */
+			dateOfBirth: string
+			/**
+			 * C​o​n​t​a​c​t​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			contactInformation: string
+			/**
+			 * R​e​g​i​s​t​e​r​e​d​ ​a​d​d​r​e​s​s
+			 */
+			registeredAddress: string
+			/**
+			 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
+			 */
+			shippingAddress: string
+			/**
+			 * K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​p​e​n​d​i​n​g
+			 */
+			kycPendingTitle: string
+			/**
+			 * Y​o​u​r​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​i​s​ ​b​e​i​n​g​ ​p​r​o​c​e​s​s​e​d​.​ ​T​h​i​s​ ​m​a​y​ ​t​a​k​e​ ​s​o​m​e​ ​t​i​m​e​.
+			 */
+			kycPendingDescription: string
+			/**
+			 * K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​d​e​c​l​i​n​e​d
+			 */
+			kycDeclinedTitle: string
+			/**
+			 * Y​o​u​r​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​w​a​s​ ​d​e​c​l​i​n​e​d​.​ ​P​l​e​a​s​e​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​f​o​r​ ​m​o​r​e​ ​i​n​f​o​r​m​a​t​i​o​n​.
+			 */
+			kycDeclinedDescription: string
+			/**
+			 * C​o​m​p​l​e​t​e​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n
+			 */
+			kycNotStartedTitle: string
+			/**
+			 * C​o​m​p​l​e​t​e​ ​t​h​e​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​p​r​o​c​e​s​s​ ​t​o​ ​u​n​l​o​c​k​ ​a​l​l​ ​c​a​r​d​ ​f​e​a​t​u​r​e​s​.
+			 */
+			kycNotStartedDescription: string
+			/**
+			 * C​o​n​t​i​n​u​e​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n
+			 */
+			kycAwaitingInputTitle: string
+			/**
+			 * A​d​d​i​t​i​o​n​a​l​ ​i​n​f​o​r​m​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d​ ​t​o​ ​c​o​m​p​l​e​t​e​ ​y​o​u​r​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​.
+			 */
+			kycAwaitingInputDescription: string
+			/**
+			 * K​Y​C​ ​u​n​d​e​r​ ​r​e​v​i​e​w
+			 */
+			kycUnderReviewTitle: string
+			/**
+			 * Y​o​u​r​ ​K​Y​C​ ​v​e​r​i​f​i​c​a​t​i​o​n​ ​i​s​ ​u​n​d​e​r​ ​m​a​n​u​a​l​ ​r​e​v​i​e​w​.​ ​T​h​i​s​ ​m​a​y​ ​t​a​k​e​ ​s​o​m​e​ ​t​i​m​e​.
+			 */
+			kycUnderReviewDescription: string
+			/**
+			 * V​e​r​i​f​i​c​a​t​i​o​n​ ​e​r​r​o​r
+			 */
+			kycErrorTitle: string
+			/**
+			 * A​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​ ​d​u​r​i​n​g​ ​v​e​r​i​f​i​c​a​t​i​o​n​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​o​r​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​.
+			 */
+			kycErrorDescription: string
+		}
+		AddToMobileWallet: {
+			/**
+			 * A​d​d​ ​t​o​ ​m​o​b​i​l​e​ ​w​a​l​l​e​t
+			 */
+			title: string
+			/**
+			 * A​d​d​ ​y​o​u​r​ ​c​a​r​d
+			 */
+			addYourCard: string
+			/**
+			 * A​d​d​ ​y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​ ​t​o​ ​y​o​u​r​ ​m​o​b​i​l​e​ ​w​a​l​l​e​t​ ​f​o​r​ ​q​u​i​c​k​ ​a​n​d​ ​s​e​c​u​r​e​ ​p​a​y​m​e​n​t​s
+			 */
+			addYourCardDescription: string
+			/**
+			 * A​d​d​ ​t​o
+			 */
+			addTo: string
+			Benefits: {
+				/**
+				 * B​e​n​e​f​i​t​s​ ​o​f​ ​m​o​b​i​l​e​ ​w​a​l​l​e​t
+				 */
+				title: string
+				/**
+				 * C​o​n​t​a​c​t​l​e​s​s​ ​p​a​y​m​e​n​t​s​ ​a​t​ ​m​i​l​l​i​o​n​s​ ​o​f​ ​l​o​c​a​t​i​o​n​s
+				 */
+				contactless: string
+				/**
+				 * E​n​h​a​n​c​e​d​ ​s​e​c​u​r​i​t​y​ ​w​i​t​h​ ​b​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
+				 */
+				security: string
+				/**
+				 * N​o​ ​n​e​e​d​ ​t​o​ ​c​a​r​r​y​ ​y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
+				 */
+				noPhysicalCard: string
+				/**
+				 * W​o​r​k​s​ ​e​v​e​n​ ​w​h​e​n​ ​y​o​u​r​ ​p​h​o​n​e​ ​i​s​ ​l​o​c​k​e​d
+				 */
+				worksLocked: string
+			}
+		}
+		CardStatus: {
+			/**
+			 * V​i​s​a​ ​c​a​r​d
+			 */
+			title: string
+			CardApproved: {
+				/**
+				 * C​o​n​g​r​a​t​u​l​a​t​i​o​n​s​!
+				 */
+				title: string
+				/**
+				 * Y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​a​c​t​i​v​a​t​e​d​.
+				 */
+				subtitle: string
+				/**
+				 * O​r​d​e​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
+				 */
+				buttonLabel: string
+				/**
+				 * D​a​s​h​b​o​a​r​d
+				 */
+				buttonLabelDashboard: string
+			}
+			PhysicalCardOrdered: {
+				/**
+				 * Y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d​ ​i​s​ ​o​n​ ​t​h​e​ ​w​a​y​!
+				 */
+				title: string
+				/**
+				 * O​r​d​e​r​ ​f​o​r​ ​d​e​l​i​v​e​r​y​ ​o​f​ ​y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​s​u​b​m​i​t​t​e​d​.
+				 */
+				subtitle: string
+				/**
+				 * C​r​e​a​t​e​ ​P​I​N
+				 */
+				buttonLabel: string
+			}
+		}
+		ShippingAddress: {
+			/**
+			 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
+			 */
+			title: string
+			/**
+			 * F​i​r​s​t​ ​n​a​m​e
+			 */
+			firstName: string
+			/**
+			 * L​a​s​t​ ​n​a​m​e
+			 */
+			lastName: string
+			/**
+			 * A​d​d​r​e​s​s​ ​l​i​n​e​ ​1
+			 */
+			addressLine1: string
+			/**
+			 * A​d​d​r​e​s​s​ ​l​i​n​e​ ​2
+			 */
+			addressLine2: string
+			/**
+			 * C​i​t​y
+			 */
+			city: string
+			/**
+			 * C​o​u​n​t​r​y
+			 */
+			country: string
+			labels: {
+				/**
+				 * S​t​a​t​e
+				 */
+				state: string
+				/**
+				 * P​r​o​v​i​n​c​e
+				 */
+				province: string
+				/**
+				 * P​r​e​f​e​c​t​u​r​e
+				 */
+				prefecture: string
+				/**
+				 * O​b​l​a​s​t
+				 */
+				oblast: string
+				/**
+				 * D​e​p​a​r​t​m​e​n​t
+				 */
+				department: string
+				/**
+				 * C​o​u​n​t​y
+				 */
+				county: string
+				/**
+				 * D​i​s​t​r​i​c​t
+				 */
+				district: string
+				/**
+				 * D​o​/​S​i
+				 */
+				doSi: string
+				/**
+				 * I​s​l​a​n​d
+				 */
+				island: string
+				/**
+				 * E​m​i​r​a​t​e
+				 */
+				emirate: string
+				/**
+				 * P​a​r​i​s​h
+				 */
+				parish: string
+				/**
+				 * R​e​g​i​o​n
+				 */
+				region: string
+				/**
+				 * Z​I​P​ ​c​o​d​e
+				 */
+				zip: string
+				/**
+				 * P​o​s​t​a​l​ ​c​o​d​e
+				 */
+				postalCode: string
+				/**
+				 * E​i​r​c​o​d​e
+				 */
+				eircode: string
+				/**
+				 * P​I​N​ ​c​o​d​e
+				 */
+				pin: string
+			}
+			/**
+			 * I​m​p​o​r​t​a​n​t
+			 */
+			important: string
+			/**
+			 * P​l​e​a​s​e​ ​e​n​s​u​r​e​ ​y​o​u​r​ ​a​d​d​r​e​s​s​ ​i​s​ ​a​c​c​u​r​a​t​e​ ​a​n​d​ ​c​o​m​p​l​e​t​e​.
+			 */
+			importantDescription: string
+			/**
+			 * C​a​r​d​s​ ​c​a​n​n​o​t​ ​b​e​ ​d​e​l​i​v​e​r​e​d​ ​t​o​ ​P​.​O​.​ ​b​o​x​e​s
+			 */
+			noPOBoxes: string
+			/**
+			 * S​i​g​n​a​t​u​r​e​ ​m​a​y​ ​b​e​ ​r​e​q​u​i​r​e​d​ ​u​p​o​n​ ​d​e​l​i​v​e​r​y
+			 */
+			signatureRequired: string
+			/**
+			 * A​d​d​r​e​s​s​ ​m​u​s​t​ ​b​e​ ​w​i​t​h​i​n​ ​s​u​p​p​o​r​t​e​d​ ​s​h​i​p​p​i​n​g​ ​r​e​g​i​o​n​s
+			 */
+			supportedRegions: string
+		}
+		TransactionDetails: {
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​ ​d​e​t​a​i​l​s
+			 */
+			title: string
+			/**
+			 * C​a​r​d​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			cardInformation: string
+			/**
+			 * A​m​o​u​n​t
+			 */
+			amount: string
+			/**
+			 * T​i​m​e
+			 */
+			time: string
+			/**
+			 * I​D
+			 */
+			transactionId: string
+			/**
+			 * C​a​r​d​ ​u​s​e​d
+			 */
+			cardUsed: string
+			/**
+			 * P​a​y​m​e​n​t​ ​m​e​t​h​o​d
+			 */
+			paymentMethod: string
+			/**
+			 * M​e​r​c​h​a​n​t​ ​i​n​f​o​r​m​a​t​i​o​n
+			 */
+			merchantInformation: string
+			/**
+			 * M​e​r​c​h​a​n​t
+			 */
+			merchant: string
+			/**
+			 * C​a​t​e​g​o​r​y
+			 */
+			category: string
+			/**
+			 * L​o​c​a​t​i​o​n
+			 */
+			location: string
+			/**
+			 * M​C​C​ ​c​o​d​e
+			 */
+			mccCode: string
+			/**
+			 * C​u​r​r​e​n​c​y​ ​c​o​n​v​e​r​s​i​o​n
+			 */
+			currencyConversion: string
+			/**
+			 * B​i​t​c​o​i​n​ ​r​a​t​e
+			 */
+			bitcoinRate: string
+			/**
+			 * B​i​t​c​o​i​n​ ​s​p​e​n​t
+			 */
+			bitcoinSpent: string
+			/**
+			 * C​o​n​v​e​r​s​i​o​n​ ​f​e​e
+			 */
+			conversionFee: string
+			/**
+			 * V​i​e​w​ ​o​n​ ​m​a​p
+			 */
+			viewOnMap: string
+			/**
+			 * D​o​w​n​l​o​a​d​ ​r​e​c​e​i​p​t
+			 */
+			downloadReceipt: string
+			/**
+			 * R​e​p​o​r​t​ ​i​s​s​u​e
+			 */
+			reportIssue: string
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​ ​h​e​l​p
+			 */
+			transactionHelp: string
+			/**
+			 * I​f​ ​y​o​u​ ​d​o​n​'​t​ ​r​e​c​o​g​n​i​z​e​ ​t​h​i​s​ ​t​r​a​n​s​a​c​t​i​o​n​ ​o​r​ ​n​e​e​d​ ​a​s​s​i​s​t​a​n​c​e​,​ ​c​o​n​t​a​c​t​ ​o​u​r​ ​{​s​u​p​p​o​r​t​T​e​a​m​}​ ​i​m​m​e​d​i​a​t​e​l​y​.
+			 * @param {unknown} supportTeam
+			 */
+			transactionHelpDescription: RequiredParams<'supportTeam'>
+			/**
+			 * s​u​p​p​o​r​t​ ​t​e​a​m
+			 */
+			supportTeam: string
+			/**
+			 * T​r​a​n​s​a​c​t​i​o​n​ ​n​o​t​ ​f​o​u​n​d
+			 */
+			transactionNotFound: string
+		}
+		PinScreens: {
+			common: {
+				/**
+				 * C​o​n​f​i​r​m​ ​n​e​w​ ​P​I​N
+				 */
+				confirmNewPin: string
+				/**
+				 * P​l​e​a​s​e​ ​r​e​-​e​n​t​e​r​ ​y​o​u​r​ ​n​e​w​ ​4​-​d​i​g​i​t​ ​P​I​N​ ​t​o​ ​c​o​n​t​i​n​u​e​.
+				 */
+				confirmPinSubtitle: string
+				/**
+				 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				incorrectPin: string
+				/**
+				 * P​I​N​s​ ​d​o​ ​n​o​t​ ​m​a​t​c​h​.​ ​R​e​-​e​n​t​e​r​ ​t​o​ ​c​o​n​f​i​r​m​ ​o​r​ ​g​o​ ​b​a​c​k​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​P​I​N​.
+				 */
+				pinMismatch: string
+				/**
+				 * T​h​i​s​ ​P​I​N​ ​i​s​ ​t​o​o​ ​e​a​s​y​ ​t​o​ ​g​u​e​s​s​.​ ​P​l​e​a​s​e​ ​c​h​o​o​s​e​ ​a​ ​s​t​r​o​n​g​e​r​ ​P​I​N​.
+				 */
+				weakPin: string
+				/**
+				 * C​a​r​d​ ​n​o​t​ ​f​o​u​n​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				cardNotFound: string
+				/**
+				 * F​a​i​l​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​P​I​N​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				pinUpdateFailed: string
+			}
+			CreateFlow: {
+				/**
+				 * C​r​e​a​t​e​ ​P​I​N
+				 */
+				title: string
+				steps: {
+					/**
+					 * S​e​t​ ​P​I​N
+					 */
+					setPin: string
+					/**
+					 * C​o​n​f​i​r​m
+					 */
+					confirm: string
+				}
+				/**
+				 * E​n​t​e​r​ ​y​o​u​r​ ​P​I​N
+				 */
+				enterYourPin: string
+				/**
+				 * P​l​e​a​s​e​ ​e​n​t​e​r​ ​a​ ​4​-​d​i​g​i​t​ ​P​I​N​ ​t​o​ ​c​o​n​t​i​n​u​e​.
+				 */
+				enterPinSubtitle: string
+				/**
+				 * P​I​N​ ​h​a​s​ ​b​e​e​n​ ​c​r​e​a​t​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+				 */
+				pinCreatedToast: string
+			}
+			ChangeFlow: {
+				/**
+				 * C​h​a​n​g​e​ ​P​I​N
+				 */
+				title: string
+				steps: {
+					/**
+					 * C​u​r​r​e​n​t​ ​P​I​N
+					 */
+					currentPin: string
+					/**
+					 * N​e​w​ ​P​I​N
+					 */
+					newPin: string
+					/**
+					 * C​o​n​f​i​r​m
+					 */
+					confirm: string
+				}
+				/**
+				 * E​n​t​e​r​ ​c​u​r​r​e​n​t​ ​P​I​N
+				 */
+				enterCurrentPin: string
+				/**
+				 * P​l​e​a​s​e​ ​e​n​t​e​r​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​4​-​d​i​g​i​t​ ​P​I​N​ ​t​o​ ​c​o​n​t​i​n​u​e​.
+				 */
+				enterCurrentPinSubtitle: string
+				/**
+				 * E​n​t​e​r​ ​n​e​w​ ​P​I​N
+				 */
+				enterNewPin: string
+				/**
+				 * P​l​e​a​s​e​ ​e​n​t​e​r​ ​y​o​u​r​ ​n​e​w​ ​4​-​d​i​g​i​t​ ​P​I​N​.
+				 */
+				enterNewPinSubtitle: string
+				/**
+				 * V​e​r​i​f​y​ ​y​o​u​r​ ​i​d​e​n​t​i​t​y​ ​t​o​ ​c​h​a​n​g​e​ ​P​I​N
+				 */
+				biometricDescription: string
+				/**
+				 * B​i​o​m​e​t​r​i​c​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​i​s​ ​r​e​q​u​i​r​e​d​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​P​I​N​.
+				 */
+				biometricRequired: string
+				/**
+				 * P​I​N​ ​c​h​a​n​g​e​d
+				 */
+				pinChangedTitle: string
+				/**
+				 * Y​o​u​r​ ​P​I​N​ ​h​a​s​ ​b​e​e​n​ ​c​h​a​n​g​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y​.
+				 */
+				pinChangedSubtitle: string
+				/**
+				 * P​I​N​ ​h​a​s​ ​b​e​e​n​ ​c​h​a​n​g​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+				 */
+				pinChangedToast: string
+			}
+		}
+		ReplaceCard: {
+			/**
+			 * R​e​p​l​a​c​e​ ​c​a​r​d
+			 */
+			title: string
+			steps: {
+				/**
+				 * R​e​p​o​r​t​ ​I​s​s​u​e
+				 */
+				reportIssue: string
+				/**
+				 * D​e​l​i​v​e​r​y
+				 */
+				delivery: string
+				/**
+				 * C​o​n​f​i​r​m
+				 */
+				confirm: string
+			}
+			ReportIssue: {
+				/**
+				 * R​e​p​o​r​t​ ​c​a​r​d​ ​I​s​s​u​e
+				 */
+				title: string
+				/**
+				 * L​e​t​ ​u​s​ ​k​n​o​w​ ​w​h​a​t​ ​h​a​p​p​e​n​e​d​ ​t​o​ ​y​o​u​r​ ​c​a​r​d​ ​s​o​ ​w​e​ ​c​a​n​ ​h​e​l​p​ ​y​o​u​ ​g​e​t​ ​a​ ​r​e​p​l​a​c​e​m​e​n​t​.
+				 */
+				subtitle: string
+				/**
+				 * C​a​r​d​ ​m​a​n​a​g​e​m​e​n​t
+				 */
+				cardManagement: string
+				/**
+				 * L​o​s​t​ ​c​a​r​d
+				 */
+				lostCard: string
+				/**
+				 * I​ ​m​i​s​p​l​a​c​e​d​ ​m​y​ ​c​a​r​d​ ​a​n​d​ ​c​a​n​'​t​ ​f​i​n​d​ ​i​t​ ​a​n​y​w​h​e​r​e​.
+				 */
+				lostCardDescription: string
+				/**
+				 * S​t​o​l​e​n​ ​c​a​r​d
+				 */
+				stolenCard: string
+				/**
+				 * I​ ​m​i​s​p​l​a​c​e​d​ ​m​y​ ​c​a​r​d​ ​a​n​d​ ​c​a​n​'​t​ ​f​i​n​d​ ​i​t​ ​a​n​y​w​h​e​r​e​.
+				 */
+				stolenCardDescription: string
+				/**
+				 * D​a​m​a​g​e​d​ ​c​a​r​d
+				 */
+				damagedCard: string
+				/**
+				 * I​ ​m​i​s​p​l​a​c​e​d​ ​m​y​ ​c​a​r​d​ ​a​n​d​ ​c​a​n​'​t​ ​f​i​n​d​ ​i​t​ ​a​n​y​w​h​e​r​e​.
+				 */
+				damagedCardDescription: string
+				/**
+				 * W​h​a​t​ ​h​a​p​p​e​n​s​ ​n​e​x​t​?
+				 */
+				whatHappensNext: string
+				/**
+				 * Y​o​u​r​ ​c​u​r​r​e​n​t​ ​c​a​r​d​ ​w​i​l​l​ ​b​e​ ​f​r​o​z​e​n​ ​f​o​r​ ​s​e​c​u​r​i​t​y
+				 */
+				bullet1: string
+				/**
+				 * A​ ​n​e​w​ ​c​a​r​d​ ​w​i​t​h​ ​d​i​f​f​e​r​e​n​t​ ​n​u​m​b​e​r​s​ ​w​i​l​l​ ​b​e​ ​i​s​s​u​e​d
+				 */
+				bullet2: string
+				/**
+				 * Y​o​u​ ​c​a​n​ ​u​n​f​r​e​e​z​e​ ​i​f​ ​y​o​u​ ​f​i​n​d​ ​y​o​u​r​ ​c​a​r​d​ ​l​a​t​e​r
+				 */
+				bullet3: string
+			}
+			Delivery: {
+				/**
+				 * D​e​l​i​v​e​r​y​ ​o​p​t​i​o​n​s
+				 */
+				title: string
+				/**
+				 * C​h​o​o​s​e​ ​h​o​w​ ​y​o​u​'​d​ ​l​i​k​e​ ​t​o​ ​r​e​c​e​i​v​e​ ​y​o​u​r​ ​r​e​p​l​a​c​e​m​e​n​t​ ​c​a​r​d​.
+				 */
+				subtitle: string
+				/**
+				 * S​t​a​n​d​a​r​d​ ​d​e​l​i​v​e​r​y
+				 */
+				standardDelivery: string
+				/**
+				 * {​d​a​y​1​}​-​{​d​a​y​2​}​ ​b​u​s​i​n​e​s​s​ ​d​a​y​s
+				 * @param {unknown} day1
+				 * @param {unknown} day2
+				 */
+				businessDays: RequiredParams<'day1' | 'day2'>
+				/**
+				 * F​R​E​E
+				 */
+				free: string
+				/**
+				 * E​x​p​r​e​s​s​ ​d​e​l​i​v​e​r​y
+				 */
+				expressDelivery: string
+				/**
+				 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
+				 */
+				shippingAddress: string
+				/**
+				 * U​s​e​ ​r​e​g​i​s​t​e​r​e​d​ ​a​d​d​r​e​s​s​ ​a​s​ ​s​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
+				 */
+				useRegisteredAddress: string
+				/**
+				 * C​h​o​o​s​e​ ​d​e​l​i​v​e​r​y​ ​s​p​e​e​d
+				 */
+				chooseDeliverySpeed: string
+			}
+			Confirm: {
+				/**
+				 * C​o​n​f​i​r​m​ ​r​e​p​l​a​c​e​m​e​n​t
+				 */
+				title: string
+				/**
+				 * R​e​v​i​e​w​ ​y​o​u​r​ ​r​e​q​u​e​s​t​ ​b​e​f​o​r​e​ ​s​u​b​m​i​t​t​i​n​g​.
+				 */
+				subtitle: string
+				/**
+				 * R​e​q​u​e​s​t​ ​s​u​m​m​a​r​y
+				 */
+				requestSummary: string
+				/**
+				 * I​s​s​u​e​ ​t​y​p​e
+				 */
+				issueType: string
+				/**
+				 * D​e​l​i​v​e​r​y
+				 */
+				delivery: string
+				/**
+				 * D​e​l​i​v​e​r​y​ ​t​i​m​e
+				 */
+				deliveryTime: string
+				/**
+				 * S​h​i​p​p​i​n​g​ ​c​o​s​t
+				 */
+				shippingCost: string
+				/**
+				 * I​m​p​o​r​t​a​n​t​ ​i​n​f​o​r​m​a​t​i​o​n
+				 */
+				importantInformation: string
+				DamagedInfo: {
+					/**
+					 * Y​o​u​r​ ​c​u​r​r​e​n​t​ ​c​a​r​d​ ​w​i​l​l​ ​r​e​m​a​i​n​ ​a​c​t​i​v​e​ ​u​n​t​i​l​ ​t​h​e​ ​n​e​w​ ​o​n​e​ ​a​r​r​i​v​e​s
+					 */
+					bullet1: string
+					/**
+					 * Y​o​u​r​ ​n​e​w​ ​c​a​r​d​ ​w​i​l​l​ ​h​a​v​e​ ​a​ ​n​e​w​ ​c​a​r​d​ ​n​u​m​b​e​r
+					 */
+					bullet2: string
+					/**
+					 * D​e​s​t​r​o​y​ ​y​o​u​r​ ​d​a​m​a​g​e​d​ ​c​a​r​d​ ​w​h​e​n​ ​t​h​e​ ​n​e​w​ ​o​n​e​ ​a​r​r​i​v​e​s
+					 */
+					bullet3: string
+				}
+				LostStolenInfo: {
+					/**
+					 * Y​o​u​r​ ​c​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​l​o​c​k​e​d​ ​f​o​r​ ​y​o​u​r​ ​p​r​o​t​e​c​t​i​o​n
+					 */
+					bullet1: string
+					/**
+					 * Y​o​u​r​ ​n​e​w​ ​c​a​r​d​ ​w​i​l​l​ ​h​a​v​e​ ​a​ ​n​e​w​ ​c​a​r​d​ ​n​u​m​b​e​r
+					 */
+					bullet2: string
+					/**
+					 * Y​o​u​r​ ​o​l​d​ ​c​a​r​d​ ​w​i​l​l​ ​b​e​ ​p​e​r​m​a​n​e​n​t​l​y​ ​c​a​n​c​e​l​e​d
+					 */
+					bullet3: string
+				}
+				/**
+				 * S​u​b​m​i​t​ ​r​e​q​u​e​s​t
+				 */
+				submitRequest: string
+			}
+			Status: {
+				/**
+				 * Y​o​u​r​ ​n​e​w​ ​c​a​r​d​ ​i​s​ ​o​n​ ​t​h​e​ ​w​a​y​!
+				 */
+				title: string
+				/**
+				 * O​r​d​e​r​ ​f​o​r​ ​d​e​l​i​v​e​r​y​ ​o​f​ ​y​o​u​r​ ​B​l​i​n​k​ ​C​a​r​d​ ​h​a​s​ ​b​e​e​n​ ​s​u​b​m​i​t​t​e​d​.
+				 */
+				subtitle: string
+				/**
+				 * D​a​s​h​b​o​a​r​d
+				 */
+				buttonLabel: string
+			}
+			errors: {
+				/**
+				 * F​a​i​l​e​d​ ​t​o​ ​l​o​c​k​ ​y​o​u​r​ ​c​a​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				lockFailed: string
+				/**
+				 * F​a​i​l​e​d​ ​t​o​ ​r​e​p​l​a​c​e​ ​y​o​u​r​ ​c​a​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				replaceFailed: string
+				/**
+				 * Y​o​u​r​ ​c​a​r​d​ ​w​a​s​ ​l​o​c​k​e​d​ ​b​u​t​ ​t​h​e​ ​r​e​p​l​a​c​e​m​e​n​t​ ​f​a​i​l​e​d​.​ ​P​l​e​a​s​e​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​f​o​r​ ​a​s​s​i​s​t​a​n​c​e​.
+				 */
+				replaceFailedCardLocked: string
+			}
+		}
+		OrderPhysicalCard: {
+			/**
+			 * O​r​d​e​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
+			 */
+			title: string
+			steps: {
+				/**
+				 * S​h​i​p​p​i​n​g
+				 */
+				shipping: string
+				/**
+				 * C​o​n​f​i​r​m
+				 */
+				confirm: string
+			}
+			Shipping: {
+				/**
+				 * O​r​d​e​r​ ​y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
+				 */
+				title: string
+				/**
+				 * G​e​t​ ​y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​ ​d​e​l​i​v​e​r​e​d​ ​t​o​ ​y​o​u​r​ ​a​d​d​r​e​s​s​.
+				 */
+				subtitle: string
+				/**
+				 * R​e​g​i​s​t​e​r​e​d​ ​a​d​d​r​e​s​s
+				 */
+				registeredAddress: string
+				/**
+				 * U​s​e​ ​r​e​g​i​s​t​e​r​e​d​ ​a​d​d​r​e​s​s​ ​a​s​ ​s​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
+				 */
+				useRegisteredAddress: string
+				/**
+				 * D​e​l​i​v​e​r​y
+				 */
+				delivery: string
+				/**
+				 * S​t​a​n​d​a​r​d​ ​d​e​l​i​v​e​r​y
+				 */
+				standardDelivery: string
+				/**
+				 * E​x​p​r​e​s​s​ ​d​e​l​i​v​e​r​y
+				 */
+				expressDelivery: string
+				/**
+				 * {​d​a​y​1​}​-​{​d​a​y​2​}​ ​b​u​s​i​n​e​s​s​ ​d​a​y​s
+				 * @param {unknown} day1
+				 * @param {unknown} day2
+				 */
+				businessDays: RequiredParams<'day1' | 'day2'>
+				/**
+				 * F​R​E​E
+				 */
+				free: string
+				/**
+				 * D​e​l​i​v​e​r​y​ ​i​n​f​o​r​m​a​t​i​o​n
+				 */
+				deliveryInformation: string
+				/**
+				 * Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​t​r​a​c​k​i​n​g​ ​i​n​f​o​r​m​a​t​i​o​n​ ​v​i​a​ ​e​m​a​i​l
+				 */
+				bullet1: string
+				/**
+				 * S​i​g​n​a​t​u​r​e​ ​m​a​y​ ​b​e​ ​r​e​q​u​i​r​e​d​ ​u​p​o​n​ ​d​e​l​i​v​e​r​y
+				 */
+				bullet2: string
+				/**
+				 * C​a​r​d​ ​w​i​l​l​ ​b​e​ ​s​h​i​p​p​e​d​ ​i​n​ ​d​i​s​c​r​e​e​t​ ​p​a​c​k​a​g​i​n​g
+				 */
+				bullet3: string
+				/**
+				 * A​c​t​i​v​a​t​e​ ​y​o​u​r​ ​c​a​r​d​ ​w​h​e​n​ ​i​t​ ​a​r​r​i​v​e​s
+				 */
+				bullet4: string
+				/**
+				 * C​a​r​d​ ​f​e​a​t​u​r​e​s
+				 */
+				cardFeatures: string
+				/**
+				 * C​o​n​t​a​c​t​l​e​s​s​ ​p​a​y​m​e​n​t​ ​t​e​c​h​n​o​l​o​g​y
+				 */
+				feature1: string
+				/**
+				 * E​M​V​ ​c​h​i​p​ ​f​o​r​ ​e​n​h​a​n​c​e​d​ ​s​e​c​u​r​i​t​y
+				 */
+				feature2: string
+				/**
+				 * M​a​g​n​e​t​i​c​ ​s​t​r​i​p​e​ ​f​o​r​ ​u​n​i​v​e​r​s​a​l​ ​a​c​c​e​p​t​a​n​c​e
+				 */
+				feature3: string
+				/**
+				 * Y​o​u​r​ ​n​a​m​e​ ​e​m​b​o​s​s​e​d​ ​o​n​ ​t​h​e​ ​c​a​r​d
+				 */
+				feature4: string
+				/**
+				 * I​m​p​o​r​t​a​n​t
+				 */
+				important: string
+			}
+			Confirm: {
+				/**
+				 * C​o​n​f​i​r​m​ ​y​o​u​r​ ​o​r​d​e​r
+				 */
+				title: string
+				/**
+				 * R​e​v​i​e​w​ ​y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d​ ​o​r​d​e​r​ ​b​e​f​o​r​e​ ​s​u​b​m​i​t​t​i​n​g​.
+				 */
+				subtitle: string
+				/**
+				 * O​r​d​e​r​ ​s​u​m​m​a​r​y
+				 */
+				orderSummary: string
+				/**
+				 * C​a​r​d​ ​d​e​s​i​g​n
+				 */
+				cardDesign: string
+				/**
+				 * D​e​l​i​v​e​r​y
+				 */
+				delivery: string
+				/**
+				 * D​e​l​i​v​e​r​y​ ​t​i​m​e
+				 */
+				deliveryTime: string
+				/**
+				 * S​h​i​p​p​i​n​g​ ​c​o​s​t
+				 */
+				shippingCost: string
+				/**
+				 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s
+				 */
+				shippingAddress: string
+				/**
+				 * P​l​a​c​e​ ​o​r​d​e​r
+				 */
+				placeOrder: string
+				/**
+				 * I​m​p​o​r​t​a​n​t
+				 */
+				important: string
+				/**
+				 * Y​o​u​r​ ​v​i​r​t​u​a​l​ ​c​a​r​d​ ​w​i​l​l​ ​r​e​m​a​i​n​ ​a​c​t​i​v​e​ ​w​h​i​l​e​ ​y​o​u​ ​w​a​i​t​ ​f​o​r​ ​t​h​e​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d
+				 */
+				bullet1: string
+				/**
+				 * Y​o​u​'​l​l​ ​n​e​e​d​ ​t​o​ ​a​c​t​i​v​a​t​e​ ​y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d​ ​w​h​e​n​ ​i​t​ ​a​r​r​i​v​e​s
+				 */
+				bullet2: string
+				/**
+				 * B​o​t​h​ ​c​a​r​d​s​ ​w​i​l​l​ ​h​a​v​e​ ​t​h​e​ ​s​a​m​e​ ​c​a​r​d​ ​n​u​m​b​e​r​ ​a​n​d​ ​d​e​t​a​i​l​s
+				 */
+				bullet3: string
+				/**
+				 * S​h​i​p​p​i​n​g​ ​a​d​d​r​e​s​s​ ​c​a​n​n​o​t​ ​b​e​ ​c​h​a​n​g​e​d​ ​a​f​t​e​r​ ​o​r​d​e​r​ ​i​s​ ​p​l​a​c​e​d
+				 */
+				bullet4: string
+			}
+			errors: {
+				/**
+				 * F​a​i​l​e​d​ ​t​o​ ​o​r​d​e​r​ ​y​o​u​r​ ​p​h​y​s​i​c​a​l​ ​c​a​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				createFailed: string
+			}
+		}
+		Onboarding: {
+			/**
+			 * V​e​r​i​f​i​c​a​t​i​o​n
+			 */
+			kycHeaderTitle: string
+			CardIntroducing: {
+				/**
+				 * I​n​t​r​o​d​u​c​i​n​g
+				 */
+				title: string
+				cardInfo: {
+					/**
+					 * T​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d
+					 */
+					bitcoinCard: string
+					/**
+					 * f​o​r
+					 */
+					'for': string
+					/**
+					 * B​i​t​c​o​i​n​ ​M​a​x​i​m​a​l​i​s​t​s
+					 */
+					maximalist: string
+				}
+				/**
+				 * C​o​n​t​i​n​u​e
+				 */
+				buttonText: string
+			}
+			CardDetails: {
+				/**
+				 * A​d​d​i​t​i​o​n​a​l​ ​p​e​r​k​s
+				 */
+				title: string
+				features: {
+					/**
+					 * D​e​d​i​c​a​t​e​d​ ​a​c​c​o​u​n​t​ ​m​a​n​a​g​e​r
+					 */
+					accountManager: string
+					/**
+					 * P​r​i​o​r​i​t​y​ ​s​u​p​p​o​r​t
+					 */
+					support: string
+					/**
+					 * 5​0​%​ ​b​a​c​k​ ​o​n​ ​t​r​a​n​s​a​c​t​i​o​n​ ​f​e​e​s
+					 */
+					onchainDeposits: string
+					/**
+					 * $​1​0​0​ ​t​o​ ​c​i​r​c​u​l​a​r​ ​e​c​o​n​o​m​i​e​s
+					 */
+					circularEconomies: string
+				}
+				/**
+				 * .​.​.​ ​a​n​d​ ​m​o​r​e​ ​c​o​m​i​n​g​ ​i​n​ ​2​0​2​6
+				 */
+				andMore: string
+				/**
+				 * C​o​n​t​i​n​u​e
+				 */
+				buttonText: string
+			}
+			WelcomeOnboard: {
+				welcomeMessage: {
+					/**
+					 * W​e​l​c​o​m​e​ ​o​n​b​o​a​r​d
+					 */
+					title: string
+					/**
+					 * T​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e
+					 */
+					subtitle: string
+					paragraphs: {
+						/**
+						 * S​o​m​e​o​n​e​ ​t​h​o​u​g​h​t​ ​o​f​ ​y​o​u​ ​a​n​d​ ​s​u​g​g​e​s​t​e​d​ ​t​h​a​t​ ​w​e​ ​s​h​o​u​l​d​ ​i​n​v​i​t​e​ ​y​o​u​ ​t​o​ ​B​l​i​n​k​ ​P​r​i​v​a​t​e​.​ ​P​r​o​b​a​b​l​y​ ​b​e​c​a​u​s​e​ ​y​o​u​ ​a​r​e​ ​a​n​ ​a​w​e​s​o​m​e​ ​B​i​t​c​o​i​n​e​r​.
+						 */
+						body1: string
+						/**
+						 * O​u​r​ ​g​o​a​l​ ​f​o​r​ ​2​0​2​6​ ​i​s​ ​t​o​ ​s​t​u​f​f​ ​t​h​e​ ​p​r​o​g​r​a​m​ ​w​i​t​h​ ​s​o​ ​m​u​c​h​ ​g​o​o​d​i​e​s​ ​t​h​a​t​ ​i​t​ ​w​i​l​l​ ​b​e​ ​o​b​v​i​o​u​s​ ​t​o​ ​r​e​n​e​w​ ​n​e​x​t​ ​y​e​a​r​.
+						 */
+						body2: string
+					}
+				}
+				/**
+				 * L​e​t​'​s​ ​g​o
+				 */
+				buttonText: string
+			}
+			CardSubscription: {
+				/**
+				 * S​u​b​s​c​r​i​b​e
+				 */
+				subscribeTitle: string
+				/**
+				 * P​a​y​m​e​n​t
+				 */
+				paymentTitle: string
+				/**
+				 * A​c​c​e​p​t
+				 */
+				acceptButton: string
+				/**
+				 * C​o​n​t​i​n​u​e​ ​&​ ​P​a​y
+				 */
+				payButton: string
+				/**
+				 * B​l​i​n​k​ ​P​r​i​v​a​t​e
+				 */
+				cardTitle: string
+				/**
+				 * p​e​r​ ​y​e​a​r
+				 */
+				perYear: string
+				status: {
+					/**
+					 * S​t​a​t​u​s
+					 */
+					label: string
+					/**
+					 * P​a​y​m​e​n​t​ ​P​e​n​d​i​n​g
+					 */
+					paymentPending: string
+					/**
+					 * F​i​r​s​t​ ​y​e​a​r​ ​f​r​e​e
+					 */
+					firstYearFree: string
+				}
+				renewalDate: {
+					/**
+					 * R​e​n​e​w​a​l​ ​d​a​t​e
+					 */
+					label: string
+				}
+				agreement: {
+					/**
+					 * I​ ​a​g​r​e​e​ ​t​o​ ​t​h​e
+					 */
+					text: string
+					/**
+					 * T​e​r​m​s​ ​o​f​ ​S​e​r​v​i​c​e
+					 */
+					termsOfService: string
+					/**
+					 * P​r​i​v​a​c​y​ ​P​o​l​i​c​y
+					 */
+					privacyPolicy: string
+					/**
+					 * C​a​r​d​h​o​l​d​e​r​ ​A​g​r​e​e​m​e​n​t
+					 */
+					cardholderAgreement: string
+					/**
+					 * a​n​d
+					 */
+					and: string
+				}
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​t​h​a​t​ ​m​y​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​w​i​l​l​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​r​e​n​e​w​ ​i​n​ ​1​ ​y​e​a​r
+				 */
+				renew: string
+			}
+			LoadingCard: {
+				/**
+				 * W​e​'​r​e​ ​w​o​r​k​i​n​g​ ​o​n​ ​y​o​u​r​ ​c​a​r​d
+				 */
+				title: string
+				/**
+				 * W​e​'​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​i​t​'​s​ ​h​e​r​e
+				 */
+				subtitle: string
+				/**
+				 * .​.​.​c​o​d​i​n​g​ ​t​h​e​ ​b​a​c​k​e​n​d
+				 */
+				codingBackend: string
+				/**
+				 * N​i​c​e
+				 */
+				buttonText: string
+			}
+			PersonalInformation: {
+				/**
+				 * F​i​n​a​l​ ​s​t​e​p
+				 */
+				title: string
+				fields: {
+					occupation: {
+						/**
+						 * O​c​c​u​p​a​t​i​o​n
+						 */
+						label: string
+						/**
+						 * S​e​l​e​c​t​ ​y​o​u​r​ ​o​c​c​u​p​a​t​i​o​n
+						 */
+						placeholder: string
+					}
+					annualSalaryRange: {
+						/**
+						 * A​n​n​u​a​l​ ​s​a​l​a​r​y
+						 */
+						label: string
+						/**
+						 * S​e​l​e​c​t​ ​y​o​u​r​ ​s​a​l​a​r​y​ ​r​a​n​g​e
+						 */
+						placeholder: string
+					}
+					accountPurpose: {
+						/**
+						 * A​c​c​o​u​n​t​ ​p​u​r​p​o​s​e
+						 */
+						label: string
+						/**
+						 * S​e​l​e​c​t​ ​p​u​r​p​o​s​e
+						 */
+						placeholder: string
+					}
+					expectedMonthlyVolume: {
+						/**
+						 * E​x​p​e​c​t​e​d​ ​m​o​n​t​h​l​y​ ​s​p​e​n​d​i​n​g
+						 */
+						label: string
+						/**
+						 * S​e​l​e​c​t​ ​y​o​u​r​ ​s​p​e​n​d​i​n​g​ ​r​a​n​g​e
+						 */
+						placeholder: string
+					}
+				}
+				/**
+				 * S​u​b​m​i​t​ ​a​p​p​l​i​c​a​t​i​o​n
+				 */
+				buttonText: string
+				/**
+				 * S​e​l​e​c​t
+				 */
+				select: string
+			}
+			CardPreapproved: {
+				/**
+				 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​p​r​e​-​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​!
+				 */
+				title: string
+				/**
+				 * C​l​o​s​e
+				 */
+				buttonText: string
+			}
+			CardProcessing: {
+				/**
+				 * P​r​o​c​e​s​s​i​n​g​ ​y​o​u​r​ ​a​p​p​l​i​c​a​t​i​o​n
+				 */
+				title: string
+				/**
+				 * E​s​t​i​m​a​t​e​d​ ​w​a​i​t​ ​t​i​m​e​:​ ​{​w​a​i​t​T​i​m​e​}
+				 * @param {string} waitTime
+				 */
+				subtitle: RequiredParams<'waitTime'>
+				/**
+				 * C​l​o​s​e
+				 */
+				buttonText: string
+			}
+		}
+	}
 	NotificationHistory: {
 		/**
 		 * N​o​t​i​f​i​c​a​t​i​o​n​s
@@ -9614,6 +11536,821 @@ type RootTranslation = {
 		 * Y​o​u​ ​d​o​n​'​t​ ​h​a​v​e​ ​a​n​y​ ​n​o​t​i​f​i​c​a​t​i​o​n​s​ ​r​i​g​h​t​ ​n​o​w
 		 */
 		noNotifications: string
+	}
+	BackupScreen: {
+		/**
+		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t
+		 */
+		title: string
+		/**
+		 * C​h​o​o​s​e​ ​a​ ​b​a​c​k​u​p​ ​m​e​t​h​o​d​ ​t​o​ ​s​e​c​u​r​e​ ​y​o​u​r​ ​f​u​n​d​s
+		 */
+		description: string
+		BackupMethod: {
+			/**
+			 * C​h​o​o​s​e​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​m​e​t​h​o​d
+			 */
+			title: string
+			/**
+			 * W​e​ ​r​e​c​o​m​m​e​n​d​ ​{​p​r​o​v​i​d​e​r​}​ ​f​o​r​ ​n​e​w​ ​u​s​e​r​s​.
+			 * @param {string} provider
+			 */
+			subtitle: RequiredParams<'provider'>
+			/**
+			 * G​o​o​g​l​e​ ​D​r​i​v​e
+			 */
+			googleDrive: string
+			/**
+			 * A​p​p​l​e​ ​i​C​l​o​u​d
+			 */
+			appleICloud: string
+			/**
+			 * P​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+			 */
+			passwordManager: string
+			/**
+			 * M​a​n​u​a​l​ ​b​a​c​k​u​p
+			 */
+			manualBackup: string
+			/**
+			 * B​a​c​k​u​p​ ​s​a​v​e​d​ ​t​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+			 */
+			passwordManagerBackupSaved: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​s​a​v​e​ ​b​a​c​k​u​p
+			 */
+			passwordManagerBackupFailed: string
+			/**
+			 * N​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​U​s​e​ ​D​r​i​v​e​ ​b​a​c​k​u​p​ ​o​r​ ​s​a​v​e​ ​y​o​u​r​ ​1​2​-​w​o​r​d​ ​p​h​r​a​s​e​ ​m​a​n​u​a​l​l​y​.
+			 */
+			passwordManagerUnavailable: string
+		}
+		CloudBackup: {
+			/**
+			 * L​e​t​'​s​ ​b​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t
+			 */
+			title: string
+			/**
+			 * W​e​ ​w​i​l​l​ ​s​a​v​e​ ​a​ ​b​a​c​k​u​p​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​t​o​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.
+			 * @param {string} provider
+			 */
+			description: RequiredParams<'provider'>
+			/**
+			 * E​n​c​r​y​p​t​ ​w​i​t​h​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​w​o​r​d
+			 */
+			encryptCheckbox: string
+			/**
+			 * P​a​s​s​w​o​r​d
+			 */
+			password: string
+			/**
+			 * (​1​2​ ​c​h​a​r​a​c​t​e​r​s​ ​m​i​n​i​m​u​m​)
+			 */
+			passwordPlaceholder: string
+			/**
+			 * C​o​n​f​i​r​m​ ​p​a​s​s​w​o​r​d
+			 */
+			confirmPassword: string
+			/**
+			 * E​n​t​e​r​ ​p​a​s​s​w​o​r​d​ ​a​g​a​i​n
+			 */
+			confirmPasswordPlaceholder: string
+			/**
+			 * C​o​n​t​i​n​u​e
+			 */
+			continueButton: string
+			/**
+			 * I​m​p​o​r​t​a​n​t
+			 */
+			importantTitle: string
+			/**
+			 * B​l​i​n​k​ ​d​o​e​s​ ​n​o​t​ ​s​t​o​r​e​ ​t​h​i​s​ ​p​a​s​s​w​o​r​d​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​i​t​,​ ​{​b​o​l​d​}​ ​t​o​ ​r​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​.
+			 * @param {string} bold
+			 */
+			importantMessage: RequiredParams<'bold'>
+			/**
+			 * w​e​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​b​l​e
+			 */
+			importantMessageBold: string
+			/**
+			 * M​i​n​i​m​u​m​ ​1​2​ ​c​h​a​r​a​c​t​e​r​s
+			 */
+			passwordTooShort: string
+			/**
+			 * P​a​s​s​w​o​r​d​s​ ​d​o​ ​n​o​t​ ​m​a​t​c​h
+			 */
+			passwordMismatch: string
+			/**
+			 * B​a​c​k​u​p​ ​f​o​u​n​d
+			 */
+			existingBackupTitle: string
+			/**
+			 * A​ ​b​a​c​k​u​p​ ​a​l​r​e​a​d​y​ ​e​x​i​s​t​s​ ​i​n​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.​ ​D​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​o​v​e​r​w​r​i​t​e​ ​i​t​?
+			 * @param {string} provider
+			 */
+			existingBackupMessage: RequiredParams<'provider'>
+			/**
+			 * A​ ​b​a​c​k​u​p​ ​a​l​r​e​a​d​y​ ​e​x​i​s​t​s​ ​i​n​ ​y​o​u​r​ ​{​p​r​o​v​i​d​e​r​}​.​
+		​
+		​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​:​ ​{​a​d​d​r​e​s​s​}​
+		​C​r​e​a​t​e​d​:​ ​{​c​r​e​a​t​e​d​A​t​}​
+		​
+		​D​o​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​o​v​e​r​w​r​i​t​e​ ​i​t​?
+			 * @param {string} address
+			 * @param {string} createdAt
+			 * @param {string} provider
+			 */
+			existingBackupMessageWithDetails: RequiredParams<'address' | 'createdAt' | 'provider'>
+			/**
+			 * N​o​t​ ​a​v​a​i​l​a​b​l​e
+			 */
+			existingBackupUnknownAddress: string
+			/**
+			 * U​n​k​n​o​w​n
+			 */
+			existingBackupUnknownCreatedAt: string
+			/**
+			 * O​v​e​r​w​r​i​t​e
+			 */
+			overwrite: string
+			/**
+			 * B​a​c​k​u​p​ ​s​a​v​e​d​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}
+			 * @param {string} provider
+			 */
+			uploadSuccess: RequiredParams<'provider'>
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​u​p​l​o​a​d​ ​b​a​c​k​u​p
+			 */
+			uploadFailed: string
+			/**
+			 * F​a​i​l​e​d​ ​t​o​ ​s​i​g​n​ ​i​n​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}
+			 * @param {string} provider
+			 */
+			signInFailed: RequiredParams<'provider'>
+			/**
+			 * i​C​l​o​u​d​ ​D​r​i​v​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​s​i​g​n​ ​i​n​ ​t​o​ ​i​C​l​o​u​d​ ​i​n​ ​S​e​t​t​i​n​g​s​ ​a​n​d​ ​e​n​a​b​l​e​ ​i​C​l​o​u​d​ ​D​r​i​v​e​.
+			 */
+			cloudNotAvailable: string
+			/**
+			 * N​e​t​w​o​r​k​ ​e​r​r​o​r​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+			 */
+			networkError: string
+		}
+		ManualBackup: {
+			Alerts: {
+				/**
+				 * K​e​e​p​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​s​e​c​r​e​t​!
+				 */
+				title: string
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​n​o​b​o​d​y​ ​c​a​n​ ​r​e​c​o​v​e​r​ ​m​y​ ​w​a​l​l​e​t​ ​i​f​ ​I​ ​l​o​s​e​ ​t​h​i​s​ ​p​h​r​a​s​e
+				 */
+				check1: string
+				/**
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​i​f​ ​s​o​m​e​b​o​d​y​ ​g​e​t​s​ ​t​h​i​s​ ​p​h​r​a​s​e​,​ ​t​h​e​y​ ​c​a​n​ ​s​t​e​a​l​ ​a​l​l​ ​m​y​ ​f​u​n​d​s​.
+				 */
+				check2: string
+				/**
+				 * N​o​b​o​d​y​ ​i​s​ ​a​s​k​i​n​g​ ​m​e​ ​f​o​r​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​v​i​a​ ​m​e​s​s​a​g​e​ ​o​r​ ​a​ ​c​a​l​l
+				 */
+				check3: string
+			}
+			Phrase: {
+				/**
+				 * B​a​c​k​u​p​ ​p​h​r​a​s​e
+				 */
+				headerTitle: string
+				/**
+				 * T​h​i​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​w​o​r​k​s​ ​i​n​ ​a​n​y​ ​{​s​p​a​r​k​C​o​m​p​a​t​i​b​l​e​L​i​n​k​}
+				 * @param {string} sparkCompatibleLink
+				 */
+				sparkCompatible: RequiredParams<'sparkCompatibleLink'>
+				/**
+				 * S​p​a​r​k​-​c​o​m​p​a​t​i​b​l​e​ ​w​a​l​l​e​t
+				 */
+				sparkCompatibleLink: string
+				/**
+				 * B​a​c​k​u​p​ ​p​h​r​a​s​e​ ​c​o​p​i​e​d​ ​i​n​t​o​ ​c​l​i​p​b​o​a​r​d
+				 */
+				copiedToast: string
+				/**
+				 * S​a​v​e​ ​i​t​ ​n​o​w
+				 */
+				saveItNow: string
+				/**
+				 * C​o​n​t​i​n​u​e
+				 */
+				continueButton: string
+				/**
+				 * I​ ​h​a​v​e​ ​s​a​v​e​d​ ​i​t
+				 */
+				savedConfirm: string
+				/**
+				 * C​o​p​y
+				 */
+				copy: string
+				/**
+				 * T​e​s​t​ ​y​o​u​r​ ​b​a​c​k​u​p
+				 */
+				testBackup: string
+			}
+			Confirm: {
+				/**
+				 * C​o​n​f​i​r​m​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+				 */
+				headerTitle: string
+				/**
+				 * A​ ​q​u​i​c​k​ ​c​h​e​c​k​ ​i​f​ ​y​o​u​ ​h​a​v​e​ ​w​r​i​t​t​e​n​ ​i​t​ ​d​o​w​n​ ​c​o​r​r​e​c​t​l​y
+				 */
+				subtitle: string
+				/**
+				 * E​n​t​e​r​ ​w​o​r​d
+				 */
+				enterWord: string
+				/**
+				 * E​n​t​e​r​ ​w​o​r​d​s
+				 */
+				enterWords: string
+				/**
+				 * C​o​n​f​i​r​m
+				 */
+				confirm: string
+				/**
+				 * I​n​c​o​r​r​e​c​t​ ​w​o​r​d​,​ ​p​l​e​a​s​e​ ​c​h​e​c​k​ ​t​h​e​ ​o​r​d​e​r
+				 */
+				incorrectWord: string
+			}
+			Success: {
+				/**
+				 * W​e​l​c​o​m​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​B​l​i​n​k
+				 */
+				title: string
+				/**
+				 * Y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​i​s​ ​c​o​r​r​e​c​t
+				 */
+				testSuccess: string
+			}
+		}
+	}
+	AccountMigration: {
+		/**
+		 * M​o​v​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l
+		 */
+		moveToNonCustodial: string
+		/**
+		 * W​h​a​t​ ​d​o​e​s​ ​i​t​ ​m​e​a​n​ ​t​o​ ​m​o​v​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​?
+		 */
+		explainerTitle: string
+		/**
+		 * Y​o​u​ ​w​i​l​l​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​o​n​ ​t​h​e​ ​S​p​a​r​k​ ​p​r​o​t​o​c​o​l​,​ ​<​l​i​n​k​>​l​e​a​r​n​ ​m​o​r​e​ ​h​e​r​e​<​/​l​i​n​k​>
+		 */
+		explainerStep1: string
+		/**
+		 * W​e​ ​t​r​a​n​s​f​e​r​ ​y​o​u​r​ ​f​u​n​d​s​ ​i​n​t​o​ ​y​o​u​r​ ​n​e​w​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​,​ ​a​n​d​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​d​e​l​e​t​e​d
+		 */
+		explainerStep2: string
+		/**
+		 * C​o​n​t​i​n​u​e​ ​u​s​i​n​g​ ​B​l​i​n​k​ ​a​s​ ​u​s​u​a​l
+		 */
+		explainerStep3: string
+		/**
+		 * L​e​t​'​s​ ​m​o​v​e
+		 */
+		letsMove: string
+		/**
+		 * T​r​a​n​s​f​e​r​r​i​n​g​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​I​t​ ​s​h​o​u​l​d​ ​b​e​ ​d​o​n​e​ ​i​n​ ​a​ ​f​e​w​ ​s​e​c​o​n​d​s​.
+		 */
+		transferringFunds: string
+	}
+	AccountTypeSelectionScreen: {
+		/**
+		 * P​l​e​a​s​e​ ​c​h​o​o​s​e​ ​y​o​u​r​ ​p​r​e​f​e​r​r​e​d​ ​t​y​p​e​ ​o​f​ ​B​l​i​n​k​.
+		 */
+		descriptionDefault: string
+		/**
+		 * P​l​e​a​s​e​ ​c​h​o​o​s​e​ ​a​c​c​o​u​n​t​ ​t​y​p​e​.
+		 */
+		descriptionSelected: string
+		/**
+		 * C​u​s​t​o​d​i​a​l
+		 */
+		custodialLabel: string
+		/**
+		 * N​o​n​-​c​u​s​t​o​d​i​a​l
+		 */
+		selfCustodialLabel: string
+		/**
+		 * W​e​ ​h​o​l​d​ ​t​h​e​ ​f​u​n​d​s​ ​o​n​ ​y​o​u​r​ ​b​e​h​a​l​f
+		 */
+		custodialDescription: string
+		/**
+		 * O​n​l​y​ ​y​o​u​ ​c​a​n​ ​a​c​c​e​s​s​ ​f​u​n​d​s
+		 */
+		selfCustodialDescription: string
+		/**
+		 * C​h​o​o​s​e​ ​m​e​t​h​o​d
+		 */
+		chooseMethod: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		continueButton: string
+		/**
+		 * N​o​n​-​c​u​s​t​o​d​i​a​l​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.
+		 */
+		selfCustodialDisabled: string
+		/**
+		 * C​o​m​i​n​g​ ​s​o​o​n
+		 */
+		restoreComingSoonTitle: string
+		/**
+		 * R​e​s​t​o​r​e​ ​f​l​o​w​ ​w​i​l​l​ ​b​e​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​a​ ​f​u​t​u​r​e​ ​u​p​d​a​t​e​.
+		 */
+		restoreComingSoonDescription: string
+		/**
+		 * F​a​i​l​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​w​a​l​l​e​t​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		createFailed: string
+	}
+	RestoreScreen: {
+		/**
+		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
+		 */
+		title: string
+		/**
+		 * R​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​f​r​o​m​ ​a​ ​b​a​c​k​u​p
+		 */
+		description: string
+		/**
+		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
+		 */
+		phraseTitle: string
+		/**
+		 * E​n​t​e​r​ ​f​i​r​s​t​ ​6​ ​w​o​r​d​s​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+		 */
+		phraseSubtitleStep1: string
+		/**
+		 * E​n​t​e​r​ ​r​e​s​t​ ​o​f​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+		 */
+		phraseSubtitleStep2: string
+		/**
+		 * N​e​x​t​ ​6​ ​w​o​r​d​s
+		 */
+		nextWords: string
+		/**
+		 * P​a​s​t​e
+		 */
+		paste: string
+		/**
+		 * W​o​r​d
+		 */
+		enterWord: string
+		/**
+		 * I​n​v​a​l​i​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​i​f​ ​t​h​e​ ​w​o​r​d​ ​o​r​d​e​r​ ​i​s​ ​c​o​r​r​e​c​t​.
+		 */
+		invalidMnemonic: string
+		/**
+		 * R​e​s​t​o​r​i​n​g​ ​y​o​u​r​ ​w​a​l​l​e​t​.​.​.
+		 */
+		restoring: string
+		/**
+		 * W​a​l​l​e​t​ ​r​e​s​t​o​r​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 */
+		restoreSuccess: string
+		/**
+		 * F​a​i​l​e​d​ ​t​o​ ​r​e​s​t​o​r​e​ ​w​a​l​l​e​t​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		restoreFailed: string
+		/**
+		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
+		 */
+		restore: string
+		/**
+		 * N​o​ ​b​a​c​k​u​p​ ​f​o​u​n​d
+		 */
+		noBackupFound: string
+		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​f​i​n​d​ ​a​ ​b​a​c​k​u​p​.​ ​Y​o​u​ ​c​a​n​ ​e​n​t​e​r​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​m​a​n​u​a​l​l​y​ ​i​n​s​t​e​a​d​.
+		 */
+		noBackupDescription: string
+		/**
+		 * E​n​t​e​r​ ​y​o​u​r​ ​e​n​c​r​y​p​t​i​o​n​ ​p​a​s​s​w​o​r​d
+		 */
+		enterPassword: string
+		/**
+		 * I​n​c​o​r​r​e​c​t​ ​p​a​s​s​w​o​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		wrongPassword: string
+		/**
+		 * C​h​o​o​s​e​ ​a​ ​w​a​l​l​e​t
+		 */
+		pickBackupTitle: string
+		/**
+		 * S​e​l​e​c​t​ ​a​ ​b​a​c​k​u​p​ ​t​o​ ​r​e​s​t​o​r​e
+		 */
+		pickBackupDescription: string
+	}
+	BackupNudge: {
+		/**
+		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​a​t​ ​r​i​s​k
+		 */
+		title: string
+		/**
+		 * S​e​c​u​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​n​o​w​.​ ​I​t​ ​o​n​l​y​ ​t​a​k​e​s​ ​a​ ​m​i​n​u​t​e​.
+		 */
+		description: string
+		/**
+		 * S​e​c​u​r​e​ ​w​a​l​l​e​t
+		 */
+		cta: string
+		/**
+		 * B​a​c​k​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​d​e​v​i​c​e​,​ ​y​o​u​ ​w​i​l​l​ ​l​o​s​e​ ​y​o​u​r​ ​f​u​n​d​s​.
+		 */
+		settingsWarning: string
+		/**
+		 * S​e​c​u​r​e​ ​y​o​u​r​ ​f​u​n​d​s
+		 */
+		modalTitle: string
+		/**
+		 * W​e​ ​h​i​g​h​l​y​ ​r​e​c​o​m​m​e​n​d​ ​y​o​u​ ​b​a​c​k​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​t​o​ ​p​r​e​v​e​n​t​ ​a​ ​c​o​m​p​l​e​t​e​ ​l​o​s​s​ ​o​f​ ​f​u​n​d​s​ ​i​n​ ​c​a​s​e​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​d​e​v​i​c​e​.
+		 */
+		modalDescription: string
+		/**
+		 * S​e​c​u​r​e​ ​w​a​l​l​e​t
+		 */
+		secureMe: string
+	}
+	SelfCustodialOffline: {
+		/**
+		 * W​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​w​a​l​l​e​t​ ​c​a​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​n​e​t​w​o​r​k​ ​r​i​g​h​t​ ​n​o​w​.​ ​T​r​y​ ​a​g​a​i​n​ ​w​h​e​n​ ​y​o​u​'​r​e​ ​b​a​c​k​ ​o​n​l​i​n​e​.
+		 */
+		description: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		retry: string
+	}
+	SelfCustodialError: {
+		/**
+		 * N​o​t​ ​e​n​o​u​g​h​ ​f​u​n​d​s​ ​t​o​ ​c​o​v​e​r​ ​t​h​e​ ​a​m​o​u​n​t​ ​a​n​d​ ​n​e​t​w​o​r​k​ ​f​e​e​s​.​ ​T​r​y​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
+		 */
+		insufficientFunds: string
+		/**
+		 * A​m​o​u​n​t​ ​i​s​ ​b​e​l​o​w​ ​t​h​e​ ​m​i​n​i​m​u​m​ ​r​e​q​u​i​r​e​d​ ​f​o​r​ ​t​h​i​s​ ​p​a​y​m​e​n​t​.​ ​T​r​y​ ​a​ ​l​a​r​g​e​r​ ​a​m​o​u​n​t​.
+		 */
+		belowMinimum: string
+		/**
+		 * N​e​t​w​o​r​k​ ​c​o​n​n​e​c​t​i​o​n​ ​p​r​o​b​l​e​m​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		networkError: string
+		/**
+		 * T​h​e​ ​p​a​y​m​e​n​t​ ​d​e​t​a​i​l​s​ ​l​o​o​k​ ​i​n​v​a​l​i​d​.​ ​P​l​e​a​s​e​ ​r​e​v​i​e​w​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		invalidInput: string
+		/**
+		 * T​h​e​ ​p​a​y​m​e​n​t​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​c​o​m​p​l​e​t​e​d​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​,​ ​o​r​ ​u​s​e​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
+		 */
+		generic: string
+	}
+	UnclaimedDeposit: {
+		/**
+		 * U​n​c​l​a​i​m​e​d​ ​D​e​p​o​s​i​t​s
+		 */
+		screenTitle: string
+		/**
+		 * C​l​a​i​m​ ​{​s​a​t​s​}​ ​s​a​t​s
+		 * @param {unknown} sats
+		 */
+		cardTitle: RequiredParams<'sats'>
+		/**
+		 * Y​o​u​ ​h​a​v​e​ ​{​c​o​u​n​t​}​ ​u​n​c​l​a​i​m​e​d​ ​d​e​p​o​s​i​t​(​s​)
+		 * @param {unknown} count
+		 */
+		title: RequiredParams<'count'>
+		/**
+		 * T​o​t​a​l​:​ ​{​s​a​t​s​}​ ​s​a​t​s​ ​a​v​a​i​l​a​b​l​e​ ​t​o​ ​c​l​a​i​m
+		 * @param {unknown} sats
+		 */
+		description: RequiredParams<'sats'>
+		/**
+		 * C​l​a​i​m​ ​n​o​w
+		 */
+		claim: string
+		/**
+		 * C​l​a​i​m​ ​(​m​a​x​ ​f​e​e​:​ ​{​f​e​e​}​ ​s​a​t​s​)
+		 * @param {unknown} fee
+		 */
+		claimWithFee: RequiredParams<'fee'>
+		/**
+		 * C​l​a​i​m​i​n​g​.​.​.
+		 */
+		claiming: string
+		/**
+		 * R​e​f​u​n​d
+		 */
+		refund: string
+		/**
+		 * R​e​f​u​n​d​i​n​g​.​.​.
+		 */
+		refunding: string
+		/**
+		 * W​a​i​t​i​n​g​ ​f​o​r​ ​c​o​n​f​i​r​m​a​t​i​o​n​s​.​.​.
+		 */
+		immature: string
+		/**
+		 * N​e​t​w​o​r​k​ ​f​e​e​s​ ​a​r​e​ ​t​o​o​ ​h​i​g​h​ ​t​o​ ​c​l​a​i​m​ ​(​{​r​e​q​u​i​r​e​d​F​e​e​}​ ​s​a​t​s​ ​r​e​q​u​i​r​e​d​)​.​ ​T​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​ ​o​r​ ​r​e​f​u​n​d​ ​t​o​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​a​d​d​r​e​s​s​.
+		 * @param {unknown} requiredFee
+		 */
+		feeExceeded: RequiredParams<'requiredFee'>
+		/**
+		 * T​h​i​s​ ​d​e​p​o​s​i​t​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​e​ ​n​e​t​w​o​r​k​.
+		 */
+		missingUtxo: string
+		/**
+		 * T​h​i​s​ ​d​e​p​o​s​i​t​ ​i​s​ ​t​o​o​ ​s​m​a​l​l​ ​t​o​ ​c​l​a​i​m​ ​a​f​t​e​r​ ​f​e​e​s​.​ ​W​a​i​t​ ​f​o​r​ ​l​o​w​e​r​ ​f​e​e​s​ ​o​r​ ​r​e​f​u​n​d​ ​t​o​ ​a​n​ ​o​n​-​c​h​a​i​n​ ​a​d​d​r​e​s​s​.
+		 */
+		belowDustLimit: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​c​l​a​i​m​:​ ​{​e​r​r​o​r​}
+		 * @param {unknown} error
+		 */
+		genericError: RequiredParams<'error'>
+		/**
+		 * C​l​a​i​m​ ​f​a​i​l​e​d​:​ ​{​e​r​r​o​r​}
+		 * @param {unknown} error
+		 */
+		claimFailed: RequiredParams<'error'>
+		/**
+		 * R​e​f​u​n​d​ ​f​a​i​l​e​d​:​ ​{​e​r​r​o​r​}
+		 * @param {unknown} error
+		 */
+		refundFailed: RequiredParams<'error'>
+		/**
+		 * B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​ ​f​o​r​ ​r​e​f​u​n​d
+		 */
+		refundAddress: string
+		/**
+		 * N​e​t​w​o​r​k​ ​f​e​e
+		 */
+		feeRate: string
+		/**
+		 * F​a​s​t​e​s​t​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​1​0​ ​m​i​n
+		 * @param {unknown} sats
+		 */
+		feeRateFastest: RequiredParams<'sats'>
+		/**
+		 * N​o​r​m​a​l​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​3​0​ ​m​i​n
+		 * @param {unknown} sats
+		 */
+		feeRateHalfHour: RequiredParams<'sats'>
+		/**
+		 * E​c​o​n​o​m​y​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​6​0​ ​m​i​n
+		 * @param {unknown} sats
+		 */
+		feeRateHour: RequiredParams<'sats'>
+		/**
+		 * {​r​a​t​e​}​ ​s​a​t​/​v​B
+		 * @param {unknown} rate
+		 */
+		feeRateUnit: RequiredParams<'rate'>
+		/**
+		 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​n​e​t​w​o​r​k​ ​f​e​e​s​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		feeRateUnavailable: string
+		/**
+		 * R​e​f​u​n​d​ ​n​o​w
+		 */
+		refundNow: string
+		/**
+		 * R​e​f​u​n​d​ ​i​n​i​t​i​a​t​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 */
+		refundSuccess: string
+		/**
+		 * D​e​p​o​s​i​t​ ​c​l​a​i​m​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
+		 */
+		claimSuccess: string
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​c​l​a​i​m​ ​t​h​i​s​ ​d​e​p​o​s​i​t
+		 */
+		error: string
+	}
+	StableBalance: {
+		/**
+		 * S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+		 */
+		title: string
+		/**
+		 * H​o​l​d​ ​a​ ​U​S​D​-​d​e​n​o​m​i​n​a​t​e​d​ ​b​a​l​a​n​c​e​ ​p​o​w​e​r​e​d​ ​b​y​ ​U​S​D​B​ ​o​n​ ​S​p​a​r​k​.
+		 */
+		description: string
+		/**
+		 * B​a​l​a​n​c​e​ ​·​ ​S​A​T​S
+		 */
+		balanceLabelBtc: string
+		/**
+		 * B​a​l​a​n​c​e​ ​·​ ​U​S​D
+		 */
+		balanceLabelUsd: string
+		/**
+		 * S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+		 */
+		settingsRowTitle: string
+		/**
+		 * S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+		 */
+		settingsTitle: string
+		/**
+		 * K​e​e​p​ ​p​a​r​t​ ​o​f​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​i​n​ ​U​S​D​.​ ​C​o​n​v​e​r​t​ ​b​e​t​w​e​e​n​ ​B​T​C​ ​a​n​d​ ​U​S​D​ ​m​a​n​u​a​l​l​y​ ​a​n​y​t​i​m​e​ ​u​s​i​n​g​ ​t​h​e​ ​C​o​n​v​e​r​t​ ​a​c​t​i​o​n​.
+		 */
+		settingsDescription: string
+		/**
+		 * A​c​t​i​v​e
+		 */
+		activationLabel: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​h​o​l​d​i​n​g​ ​U​S​D​ ​v​i​a​ ​U​S​D​B​.
+		 */
+		activeHint: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​h​o​l​d​i​n​g​ ​B​T​C​ ​o​n​l​y​.
+		 */
+		inactiveHint: string
+		/**
+		 * Y​o​u​ ​s​t​i​l​l​ ​h​a​v​e​ ​{​a​m​o​u​n​t​}​.​ ​C​o​n​v​e​r​t​ ​t​o​ ​B​T​C​ ​f​i​r​s​t​,​ ​o​r​ ​y​o​u​r​ ​U​S​D​ ​b​a​l​a​n​c​e​ ​w​i​l​l​ ​b​e​ ​h​i​d​d​e​n​ ​u​n​t​i​l​ ​y​o​u​ ​r​e​a​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e​.
+		 * @param {string} amount
+		 */
+		deactivateWarningBody: RequiredParams<'amount'>
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​u​p​d​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		toggleFailedToast: string
+		toggleModal: {
+			/**
+			 * A​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+			 */
+			activateTitle: string
+			/**
+			 * Y​o​u​r​ ​B​T​C​ ​b​a​l​a​n​c​e​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​U​S​D​B​.​ ​T​h​i​s​ ​i​s​ ​t​h​e​ ​e​s​t​i​m​a​t​e​d​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e​.
+			 */
+			activateBody: string
+			/**
+			 * A​c​t​i​v​a​t​e
+			 */
+			activateConfirm: string
+			/**
+			 * D​e​a​c​t​i​v​a​t​e​ ​S​t​a​b​l​e​ ​B​a​l​a​n​c​e
+			 */
+			deactivateTitle: string
+			/**
+			 * Y​o​u​r​ ​U​S​D​B​ ​b​a​l​a​n​c​e​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​b​a​c​k​ ​t​o​ ​B​T​C​.​ ​T​h​i​s​ ​i​s​ ​t​h​e​ ​e​s​t​i​m​a​t​e​d​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e​.
+			 */
+			deactivateBody: string
+			/**
+			 * D​e​a​c​t​i​v​a​t​e
+			 */
+			deactivateConfirm: string
+			/**
+			 * C​a​n​c​e​l
+			 */
+			cancel: string
+		}
+		/**
+		 * M​i​n​i​m​u​m​ ​c​o​n​v​e​r​s​i​o​n​:​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		minimumConversion: RequiredParams<'amount'>
+		/**
+		 * C​o​n​v​e​r​s​i​o​n​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		conversionUnavailable: string
+	}
+	WalletCreationScreen: {
+		/**
+		 * C​r​e​a​t​i​n​g​ ​y​o​u​r​ ​w​a​l​l​e​t​.​.​.
+		 */
+		creating: string
+		/**
+		 * W​a​l​l​e​t​ ​c​r​e​a​t​i​o​n​ ​f​a​i​l​e​d
+		 */
+		errorTitle: string
+		/**
+		 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		errorDescription: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		retry: string
+	}
+	BackendFeatureGate: {
+		/**
+		 * F​e​a​t​u​r​e​ ​u​n​a​v​a​i​l​a​b​l​e
+		 */
+		title: string
+		/**
+		 * T​h​i​s​ ​f​e​a​t​u​r​e​ ​r​e​q​u​i​r​e​s​ ​a​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+		 */
+		description: string
+		/**
+		 * S​i​g​n​ ​i​n​ ​r​e​q​u​i​r​e​d
+		 */
+		signInTitle: string
+		/**
+		 * S​i​g​n​ ​i​n​ ​t​o​ ​y​o​u​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​t​o​ ​u​s​e​ ​{​f​e​a​t​u​r​e​N​a​m​e​}​.
+		 * @param {string} featureName
+		 */
+		signInDescription: RequiredParams<'featureName'>
+		/**
+		 * C​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​r​e​q​u​i​r​e​d
+		 */
+		noAccountTitle: string
+		/**
+		 * {​f​e​a​t​u​r​e​N​a​m​e​}​ ​r​e​q​u​i​r​e​s​ ​a​ ​B​l​i​n​k​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+		 * @param {string} featureName
+		 */
+		noAccountDescription: RequiredParams<'featureName'>
+		/**
+		 * C​i​r​c​l​e​s
+		 */
+		featureCircles: string
+		/**
+		 * E​a​r​n
+		 */
+		featureEarn: string
+		/**
+		 * C​a​r​d
+		 */
+		featureCard: string
+	}
+	FeatureUnavailable: {
+		SelfCustodial: {
+			/**
+			 * T​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e
+			 */
+			title: string
+			/**
+			 * S​e​l​f​-​c​u​s​t​o​d​i​a​l​ ​w​a​l​l​e​t​ ​f​e​a​t​u​r​e​s​ ​a​r​e​ ​t​e​m​p​o​r​a​r​i​l​y​ ​d​i​s​a​b​l​e​d​.​ ​Y​o​u​r​ ​w​a​l​l​e​t​ ​a​n​d​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​b​a​c​k​ ​l​a​t​e​r​.
+			 */
+			description: string
+		}
+	}
+	NetworkStatus: {
+		/**
+		 * S​p​a​r​k​ ​n​e​t​w​o​r​k​ ​i​s​ ​c​u​r​r​e​n​t​l​y​ ​d​e​g​r​a​d​e​d​.​ ​P​a​y​m​e​n​t​s​ ​m​a​y​ ​t​a​k​e​ ​l​o​n​g​e​r​.
+		 */
+		degradedBanner: string
+	}
+	SelfCustodialDelete: {
+		/**
+		 * I​m​p​o​r​t​a​n​t
+		 */
+		dangerZoneImportantTitle: string
+		/**
+		 * D​e​l​e​t​e​d​ ​a​c​c​o​u​n​t​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​i​n​s​t​a​t​e​d
+		 */
+		dangerZoneBulletReinstated: string
+		/**
+		 * A​c​c​o​u​n​t​ ​d​e​l​e​t​i​o​n​ ​i​s​ ​p​e​r​m​a​n​e​n​t
+		 */
+		dangerZoneBulletPermanent: string
+		/**
+		 * M​a​k​e​ ​s​u​r​e​ ​a​c​c​o​u​n​t​ ​i​s​ ​e​m​p​t​y
+		 */
+		dangerZoneBulletEmpty: string
+		/**
+		 * D​e​l​e​t​e​ ​a​c​c​o​u​n​t​ ​a​n​d​ ​d​a​t​a
+		 */
+		dangerZoneDeleteButton: string
+		/**
+		 * C​o​n​f​i​r​m​ ​a​c​c​o​u​n​t​ ​r​e​m​o​v​a​l
+		 */
+		confirmModalTitle: string
+		/**
+		 * T​y​p​e​ ​"​{​d​e​l​e​t​e​}​"​ ​t​o​ ​c​o​n​f​i​r​m
+		 * @param {string} delete
+		 */
+		confirmModalTypeToConfirm: RequiredParams<'delete'>
+		/**
+		 * W​a​r​n​i​n​g
+		 */
+		hasFundsWarningTitle: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​h​a​s​ ​a​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.​ ​F​o​r​ ​y​o​u​r​ ​s​a​f​e​t​y​,​ ​w​e​ ​d​o​n​t​ ​a​l​l​o​w​ ​d​e​l​e​t​i​o​n​ ​o​f​ ​a​c​c​o​u​n​t​s​ ​w​i​t​h​ ​f​u​n​d​s​.
+		 * @param {string} balance
+		 */
+		hasFundsWarningBody: RequiredParams<'balance'>
+		/**
+		 * T​o​ ​p​r​o​c​e​e​d​ ​w​i​t​h​ ​d​e​l​e​t​i​o​n​,​ ​e​i​t​h​e​r​ ​e​m​p​t​y​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​o​r​ ​d​o​n​a​t​e​ ​t​o​ ​c​i​r​c​u​l​a​r​ ​e​c​o​n​o​m​i​e​s​.
+		 */
+		hasFundsWarningHelper: string
+		/**
+		 * G​o​ ​b​a​c​k
+		 */
+		hasFundsWarningButton: string
 	}
 }
 
@@ -9732,7 +12469,7 @@ export type TranslationFunctions = {
 		 */
 		description: () => LocalizedString
 		/**
-		 * Stablesats account for price stability
+		 * Dollar account — powered by Stablesats
 		 */
 		stablesatsTag: () => LocalizedString
 		/**
@@ -9833,6 +12570,10 @@ export type TranslationFunctions = {
 		 * Review transfer
 		 */
 		reviewTransfer: () => LocalizedString
+		/**
+		 * Full balance has to be transferred.
+		 */
+		dustError: () => LocalizedString
 	}
 	ConversionConfirmationScreen: {
 		/**
@@ -9859,6 +12600,14 @@ export type TranslationFunctions = {
 		 * Transfer {fromWallet} to {toWallet}
 		 */
 		transferButtonText: (arg: { fromWallet: unknown, toWallet: unknown }) => LocalizedString
+		/**
+		 * Conversion fee
+		 */
+		feeLabel: () => LocalizedString
+		/**
+		 * Couldn't fetch the conversion fee
+		 */
+		feeError: () => LocalizedString
 	}
 	ConversionSuccessScreen: {
 		/**
@@ -15997,6 +18746,10 @@ export type TranslationFunctions = {
 		 */
 		login: () => LocalizedString
 		/**
+		 * Log in / Restore
+		 */
+		loginOrRestore: () => LocalizedString
+		/**
 		 * Log back in with
 		 */
 		logBackInWith: () => LocalizedString
@@ -16050,7 +18803,7 @@ export type TranslationFunctions = {
 			 */
 			recoveryOption: () => LocalizedString
 			/**
-			 * $1000 daily transaction limit
+			 * USD 1,000 daily transaction limit
 			 */
 			dailyLimit: () => LocalizedString
 			/**
@@ -16228,7 +18981,7 @@ export type TranslationFunctions = {
 		 */
 		copyClipboardBitcoin: () => LocalizedString
 		/**
-		 * Paycode/LNURL has been copied in the clipboard
+		 * Lightning address has been copied in the clipboard
 		 */
 		copyClipboardPaycode: () => LocalizedString
 		/**
@@ -16248,7 +19001,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Receive Dollar
+		 * Receive to Dollar account
 		 */
 		usdTitle: () => LocalizedString
 		/**
@@ -16393,6 +19146,34 @@ export type TranslationFunctions = {
 		 * You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.
 		 */
 		cantReceiveZeroSats: () => LocalizedString
+		/**
+		 * Lightning address
+		 */
+		lightningAddress: () => LocalizedString
+		/**
+		 * Lightning invoice
+		 */
+		lightningInvoice: () => LocalizedString
+		/**
+		 * Bitcoin onchain
+		 */
+		bitcoinOnchain: () => LocalizedString
+		/**
+		 * Deposit fee: {fee} SAT for amounts under {threshold} SAT or {overFee} SAT for deposits over {threshold} SAT
+		 */
+		depositFee: (arg: { fee: string, overFee: string, threshold: string }) => LocalizedString
+		/**
+		 * Amounts below {minSats} SAT / {minFiat} can't be converted to Dollar automatically. You'll receive Bitcoin instead.
+		 */
+		autoConvertMinAmount: (arg: { minFiat: string, minSats: number }) => LocalizedString
+		/**
+		 * Payment received but the conversion failed.
+		 */
+		autoConvertFailed: () => LocalizedString
+		/**
+		 * Please wait until the conversion is done
+		 */
+		pleaseWaitForConversion: () => LocalizedString
 	}
 	RedeemBitcoinScreen: {
 		/**
@@ -16400,7 +19181,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Redeem for Dollar
+		 * Redeem to Dollar account
 		 */
 		usdTitle: () => LocalizedString
 		/**
@@ -16415,6 +19196,14 @@ export type TranslationFunctions = {
 		 * Failed to submit withdrawal request. Please contact support if this problem persists.
 		 */
 		submissionError: () => LocalizedString
+		/**
+		 * Your wallet is still connecting. Please wait a moment and try again.
+		 */
+		walletNotConnected: () => LocalizedString
+		/**
+		 * Your payment may still be completing. Check your balance before retrying.
+		 */
+		paymentPending: () => LocalizedString
 		/**
 		 * Min: {minimumAmount}, Max: {maximumAmount}
 		 */
@@ -16625,6 +19414,10 @@ export type TranslationFunctions = {
 		 * High fee! We recommend Lightning.
 		 */
 		lightningRecommended: () => LocalizedString
+		/**
+		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
+		 */
+		usdRemainderSweep: (arg: { minimum: string, remaining: string, remainingSats: string }) => LocalizedString
 	}
 	SendBitcoinDestinationScreen: {
 		/**
@@ -16925,6 +19718,46 @@ export type TranslationFunctions = {
 		 * Type
 		 */
 		type: () => LocalizedString
+		/**
+		 * Fee speed
+		 */
+		feeTier: () => LocalizedString
+		/**
+		 * Fast
+		 */
+		fast: () => LocalizedString
+		/**
+		 * Medium
+		 */
+		medium: () => LocalizedString
+		/**
+		 * Slow
+		 */
+		slow: () => LocalizedString
+		/**
+		 * Recommended
+		 */
+		recommended: () => LocalizedString
+		/**
+		 * Your wallet is offline. Please check your connection and try again.
+		 */
+		walletOffline: () => LocalizedString
+		/**
+		 * Not enough funds for this transaction.
+		 */
+		sdkInsufficientFunds: () => LocalizedString
+		/**
+		 * Amount is too low for an on-chain transaction.
+		 */
+		sdkAmountTooLow: () => LocalizedString
+		/**
+		 * Network error. Please check your connection and try again.
+		 */
+		sdkNetworkError: () => LocalizedString
+		/**
+		 * Unable to estimate fees. Please try a different amount.
+		 */
+		sdkGenericError: () => LocalizedString
 	}
 	SettingsScreen: {
 		/**
@@ -16971,6 +19804,10 @@ export type TranslationFunctions = {
 		 * Ways to get paid
 		 */
 		addressScreen: () => LocalizedString
+		/**
+		 * Non-custodial account
+		 */
+		nonCustodialAccount: () => LocalizedString
 		/**
 		 * Tap to set username
 		 */
@@ -17080,6 +19917,32 @@ export type TranslationFunctions = {
 		 * Display currency
 		 */
 		displayCurrency: () => LocalizedString
+		AccountInformation: {
+			/**
+			 * Wallet identifier
+			 */
+			identityLabel: () => LocalizedString
+			/**
+			 * Lightning address
+			 */
+			lightningAddressLabel: () => LocalizedString
+			/**
+			 * Backup status
+			 */
+			backupStatusLabel: () => LocalizedString
+			/**
+			 * Backup complete
+			 */
+			backupStatusCompleted: () => LocalizedString
+			/**
+			 * Backup not complete
+			 */
+			backupStatusNotCompleted: () => LocalizedString
+			/**
+			 * Could not load your account information.
+			 */
+			loadError: () => LocalizedString
+		}
 	}
 	NotificationSettingsScreen: {
 		/**
@@ -17090,6 +19953,18 @@ export type TranslationFunctions = {
 		 * Enable all
 		 */
 		pushNotifications: () => LocalizedString
+		/**
+		 * All
+		 */
+		statusAll: () => LocalizedString
+		/**
+		 * None
+		 */
+		statusNone: () => LocalizedString
+		/**
+		 * Some
+		 */
+		statusSome: () => LocalizedString
 		notificationCategories: {
 			Circles: {
 				/**
@@ -17179,6 +20054,10 @@ export type TranslationFunctions = {
 		 */
 		pleaseWait: () => LocalizedString
 		/**
+		 * Couldn't verify the wallet's balance. Please try again.
+		 */
+		probeBalanceFailed: () => LocalizedString
+		/**
 		 * Account Level
 		 */
 		accountLevel: () => LocalizedString
@@ -17214,7 +20093,7 @@ export type TranslationFunctions = {
 		 */
 		logoutAlertContentPhoneEmail: (arg: { email: string, phoneNumber: string }) => LocalizedString
 		/**
-		 * You have a Stablesats balance of {balance}.
+		 * You have a Dollar account balance of {balance}.
 		 */
 		usdBalanceWarning: (arg: { balance: string }) => LocalizedString
 		/**
@@ -17338,6 +20217,14 @@ export type TranslationFunctions = {
 		 */
 		accountId: () => LocalizedString
 		/**
+		 * Public key
+		 */
+		publicKey: () => LocalizedString
+		/**
+		 * Copied your public key to clipboard
+		 */
+		copiedPublicKey: () => LocalizedString
+		/**
 		 * Copy
 		 */
 		copy: () => LocalizedString
@@ -17422,13 +20309,21 @@ export type TranslationFunctions = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * Receive currency
+		 * Default receive account
 		 */
 		title: () => LocalizedString
 		/**
-		 * Use your Stablesats account in Blink to keep the money in your wallet stable in fiat (dollar) terms. Use your Bitcoin account if you're stacking sats and are okay with your fiat balance changing all the time.
+		 * Default account
+		 */
+		titleSelfCustodial: () => LocalizedString
+		/**
+		 * Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change.
 		 */
 		info: () => LocalizedString
+		/**
+		 * This account will be used by default when receiving and sending. You can switch any time.
+		 */
+		infoSelfCustodial: () => LocalizedString
 	}
 	ThemeScreen: {
 		/**
@@ -17468,11 +20363,11 @@ export type TranslationFunctions = {
 	}
 	StablesatsModal: {
 		/**
-		 * With Stablesats, you now have a Dollar account added to your wallet!
+		 * Your Dollar account is powered by Stablesats
 		 */
 		header: () => LocalizedString
 		/**
-		 * You can use it to send and receive Bitcoin, and instantly transfer value between your Bitcoin and Dollar account. Value in the Dollar account will not fluctuate with the price of Bitcoin. This feature is not compatible with the traditional banking system.
+		 * The Dollar account uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.
 		 */
 		body: () => LocalizedString
 		/**
@@ -17483,6 +20378,58 @@ export type TranslationFunctions = {
 		 * Learn more about Stablesats
 		 */
 		learnMore: () => LocalizedString
+		/**
+		 * Your Dollar account holds stablecoins
+		 */
+		headerSelfCustodial: () => LocalizedString
+		/**
+		 * In the Dollar account you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from the Dollar account, you will swap your stablecoins and send as Bitcoin to the recipient.
+		 */
+		bodySelfCustodial: () => LocalizedString
+		/**
+		 * Learn more
+		 */
+		learnMoreSelfCustodial: () => LocalizedString
+	}
+	StablesatsRestriction: {
+		/**
+		 * Stablesats is not available in your region
+		 */
+		modalTitle: () => LocalizedString
+		/**
+		 * To get access to a dollar account, create a non-custodial account.
+		 */
+		modalBody: () => LocalizedString
+		/**
+		 * Create new
+		 */
+		createNew: () => LocalizedString
+		/**
+		 * not available in your region
+		 */
+		walletLabel: () => LocalizedString
+	}
+	ConvertDollarToBitcoinModal: {
+		/**
+		 * Dollar account is no longer available in your region
+		 */
+		title: () => LocalizedString
+		/**
+		 * Transfer your Dollar balance to Bitcoin
+		 */
+		body: () => LocalizedString
+		/**
+		 * You have
+		 */
+		youHave: () => LocalizedString
+		/**
+		 * You get
+		 */
+		youGet: () => LocalizedString
+		/**
+		 * Approve
+		 */
+		approve: () => LocalizedString
 	}
 	SplashScreen: {
 		/**
@@ -17491,6 +20438,52 @@ export type TranslationFunctions = {
 	This can be done from the PlayStore for Android and Testflight for iOS
 		 */
 		update: () => LocalizedString
+	}
+	TransactionDescription: {
+		/**
+		 * Spark Transfer
+		 */
+		sparkTransfer: () => LocalizedString
+		/**
+		 * Lightning Payment
+		 */
+		lightningPayment: () => LocalizedString
+		/**
+		 * On-chain Deposit
+		 */
+		onchainDeposit: () => LocalizedString
+		/**
+		 * On-chain Withdrawal
+		 */
+		onchainWithdrawal: () => LocalizedString
+		/**
+		 * Conversion from Bitcoin
+		 */
+		conversionFromBitcoin: () => LocalizedString
+		/**
+		 * Conversion to Bitcoin
+		 */
+		conversionToBitcoin: () => LocalizedString
+		/**
+		 * Conversion from {token}
+		 */
+		conversionFromToken: (arg: { token: string }) => LocalizedString
+		/**
+		 * Conversion to {token}
+		 */
+		conversionToToken: (arg: { token: string }) => LocalizedString
+		/**
+		 * {token} Transfer
+		 */
+		tokenTransfer: (arg: { token: string }) => LocalizedString
+		/**
+		 * Pay to {address}
+		 */
+		payTo: (arg: { address: string }) => LocalizedString
+		/**
+		 * Payment
+		 */
+		payment: () => LocalizedString
 	}
 	TransactionDetailScreen: {
 		/**
@@ -17525,10 +20518,6 @@ export type TranslationFunctions = {
 		 * momentarily
 		 */
 		momentarily: () => LocalizedString
-		/**
-		 * {type} has been copied to clipboard
-		 */
-		hasBeenCopiedToClipboard: (arg: { type: string }) => LocalizedString
 	}
 	TransactionLimitsScreen: {
 		/**
@@ -17556,7 +20545,7 @@ export type TranslationFunctions = {
 		 */
 		remaining: () => LocalizedString
 		/**
-		 * Stablesats transfers
+		 * Dollar account transfers
 		 */
 		stablesatTransfers: () => LocalizedString
 		/**
@@ -17815,7 +20804,7 @@ export type TranslationFunctions = {
 			 */
 			receiveBitcoinDescription: () => LocalizedString
 			/**
-			 * Send up to $1,000 USD per day
+			 * Send up to USD 1,000 per day
 			 */
 			dailyLimitDescription: () => LocalizedString
 			/**
@@ -18142,6 +21131,14 @@ export type TranslationFunctions = {
 		 */
 		blinkUser: () => LocalizedString
 		/**
+		 * Anonymous
+		 */
+		anonymous: () => LocalizedString
+		/**
+		 * Anon user
+		 */
+		anonymousUser: () => LocalizedString
+		/**
 		 * Blink to Blink
 		 */
 		blinkToBlink: () => LocalizedString
@@ -18237,6 +21234,14 @@ export type TranslationFunctions = {
 		 * Description
 		 */
 		description: () => LocalizedString
+		/**
+		 * Discard
+		 */
+		discard: () => LocalizedString
+		/**
+		 * You have unsaved changes. Are you sure you want to discard them?
+		 */
+		discardChangesMessage: () => LocalizedString
 		/**
 		 * Domain
 		 */
@@ -18362,6 +21367,10 @@ export type TranslationFunctions = {
 		 */
 		onchain: () => LocalizedString
 		/**
+		 * Spark
+		 */
+		spark: () => LocalizedString
+		/**
 		 * Payment Request
 		 */
 		paymentRequest: () => LocalizedString
@@ -18389,6 +21398,10 @@ export type TranslationFunctions = {
 		 * Restart
 		 */
 		restart: () => LocalizedString
+		/**
+		 * Save
+		 */
+		save: () => LocalizedString
 		/**
 		 * sats
 		 */
@@ -18434,13 +21447,13 @@ export type TranslationFunctions = {
 		 */
 		success: () => LocalizedString
 		/**
-		 * Stablesats Dollar
-		 */
-		stablesatsUsd: () => LocalizedString
-		/**
 		 * Dollar (Stablesats)
 		 */
 		dollarStablesats: () => LocalizedString
+		/**
+		 * Dollar (Stablecoin)
+		 */
+		dollarStablecoin: () => LocalizedString
 		/**
 		 * To
 		 */
@@ -18575,6 +21588,32 @@ export type TranslationFunctions = {
 		 * Paste
 		 */
 		paste: () => LocalizedString
+		/**
+		 * Copied to clipboard
+		 */
+		copied: () => LocalizedString
+		/**
+		 * {type} has been copied to clipboard
+		 */
+		hasBeenCopiedToClipboard: (arg: { type: string }) => LocalizedString
+		validation: {
+			/**
+			 * This field is required
+			 */
+			required: () => LocalizedString
+			/**
+			 * Must be at least {min} characters
+			 */
+			minChars: (arg: { min: number }) => LocalizedString
+			/**
+			 * Invalid postal code, probably a typo
+			 */
+			invalidPostalCode: () => LocalizedString
+			/**
+			 * Invalid region selection
+			 */
+			invalidRegion: () => LocalizedString
+		}
 	}
 	errors: {
 		/**
@@ -18790,6 +21829,10 @@ export type TranslationFunctions = {
 		 * Amount must not exceed {maxAmount}.
 		 */
 		maxAmountExceeded: (arg: { maxAmount: string }) => LocalizedString
+		/**
+		 * Exceeds available balance: {maxAmount}
+		 */
+		exceedsAvailableBalance: (arg: { maxAmount: string }) => LocalizedString
 		/**
 		 * Amount must be at least {minAmount}.
 		 */
@@ -19093,6 +22136,1596 @@ export type TranslationFunctions = {
 		 */
 		REVIEW: () => LocalizedString
 	}
+	CardFlow: {
+		/**
+		 * VALID THRU
+		 */
+		validThruLabel: () => LocalizedString
+		/**
+		 * Visa
+		 */
+		networkVisa: () => LocalizedString
+		/**
+		 * Card frozen
+		 */
+		cardFrozenTitle: () => LocalizedString
+		/**
+		 * Card is temporarily disabled
+		 */
+		cardFrozenSubtitle: () => LocalizedString
+		TransactionStatus: {
+			/**
+			 * Pending
+			 */
+			pending: () => LocalizedString
+			/**
+			 * Completed
+			 */
+			completed: () => LocalizedString
+			/**
+			 * Declined
+			 */
+			declined: () => LocalizedString
+			/**
+			 * Reversed
+			 */
+			reversed: () => LocalizedString
+		}
+		CardDashboard: {
+			Actions: {
+				/**
+				 * Details
+				 */
+				details: () => LocalizedString
+				/**
+				 * Freeze
+				 */
+				freeze: () => LocalizedString
+				/**
+				 * Set limits
+				 */
+				setLimits: () => LocalizedString
+				/**
+				 * Statements
+				 */
+				statements: () => LocalizedString
+			}
+			/**
+			 * Visa card
+			 */
+			title: () => LocalizedString
+			/**
+			 * Add funds
+			 */
+			addFunds: () => LocalizedString
+			/**
+			 * Transactions
+			 */
+			transactionsTitle: () => LocalizedString
+			/**
+			 * No transactions yet
+			 */
+			emptyTransactions: () => LocalizedString
+			/**
+			 * No cards available
+			 */
+			noCardAvailable: () => LocalizedString
+			/**
+			 * Could not update card status
+			 */
+			cardUpdateError: () => LocalizedString
+			/**
+			 * This card is not currently available for use
+			 */
+			cardNotUsable: () => LocalizedString
+		}
+		CardDetails: {
+			/**
+			 * Card details
+			 */
+			title: () => LocalizedString
+			/**
+			 * Card number
+			 */
+			cardNumber: () => LocalizedString
+			/**
+			 * Expiry date
+			 */
+			expiryDate: () => LocalizedString
+			/**
+			 * CVV
+			 */
+			cvv: () => LocalizedString
+			/**
+			 * Cardholder name
+			 */
+			cardholderName: () => LocalizedString
+			/**
+			 * Card information
+			 */
+			cardInformation: () => LocalizedString
+			/**
+			 * Card type
+			 */
+			cardType: () => LocalizedString
+			/**
+			 * Status
+			 */
+			status: () => LocalizedString
+			/**
+			 * Active
+			 */
+			statusActive: () => LocalizedString
+			/**
+			 * Frozen
+			 */
+			statusFrozen: () => LocalizedString
+			/**
+			 * Inactive
+			 */
+			statusInactive: () => LocalizedString
+			/**
+			 * Cancelled
+			 */
+			statusCancelled: () => LocalizedString
+			/**
+			 * Not activated
+			 */
+			statusNotActivated: () => LocalizedString
+			/**
+			 * Pending
+			 */
+			statusPending: () => LocalizedString
+			/**
+			 * Failed
+			 */
+			statusFailed: () => LocalizedString
+			/**
+			 * Virtual Visa debit
+			 */
+			cardTypeVirtual: () => LocalizedString
+			/**
+			 * Physical Visa debit
+			 */
+			cardTypePhysical: () => LocalizedString
+			/**
+			 * Authenticate to view card details
+			 */
+			authDescription: () => LocalizedString
+			/**
+			 * Issued
+			 */
+			issued: () => LocalizedString
+			/**
+			 * Network
+			 */
+			network: () => LocalizedString
+			/**
+			 * Keep your details safe
+			 */
+			keepDetailsSafe: () => LocalizedString
+			/**
+			 * Never share your card details with anyone. Blink will never ask for your card information via email or phone.
+			 */
+			securityWarning: () => LocalizedString
+		}
+		CardLimits: {
+			/**
+			 * Card limits
+			 */
+			title: () => LocalizedString
+			/**
+			 * Current limits
+			 */
+			currentLimitsTitle: () => LocalizedString
+			/**
+			 * Daily spending
+			 */
+			dailySpending: () => LocalizedString
+			/**
+			 * Monthly spending
+			 */
+			monthlySpending: () => LocalizedString
+			/**
+			 * Spending limits
+			 */
+			spendingLimitsTitle: () => LocalizedString
+			/**
+			 * Daily limit
+			 */
+			dailyLimit: () => LocalizedString
+			/**
+			 * Maximum amount you can spend per day
+			 */
+			dailyLimitHelper: () => LocalizedString
+			/**
+			 * Monthly spending limits
+			 */
+			monthlyLimit: () => LocalizedString
+			/**
+			 * Maximum amount you can spend per month
+			 */
+			monthlyLimitHelper: () => LocalizedString
+			/**
+			 * ATM withdrawal limits
+			 */
+			atmLimitsTitle: () => LocalizedString
+			/**
+			 * Daily ATM limits
+			 */
+			dailyAtmLimit: () => LocalizedString
+			/**
+			 * Maximum ATM withdrawal per day
+			 */
+			dailyAtmLimitHelper: () => LocalizedString
+			/**
+			 * Monthly ATM limit
+			 */
+			monthlyAtmLimit: () => LocalizedString
+			/**
+			 * Maximum ATM withdrawal per month
+			 */
+			monthlyAtmLimitHelper: () => LocalizedString
+			/**
+			 * No limit
+			 */
+			noLimit: () => LocalizedString
+			/**
+			 * Limit updated successfully
+			 */
+			limitUpdateSuccess: () => LocalizedString
+			/**
+			 * Failed to update limit
+			 */
+			limitUpdateError: () => LocalizedString
+			/**
+			 * Limit must be greater than zero
+			 */
+			limitMustBePositive: () => LocalizedString
+			/**
+			 * Transaction types
+			 */
+			transactionTypesTitle: () => LocalizedString
+			TransactionTypes: {
+				/**
+				 * Online purchases
+				 */
+				ecommerce: () => LocalizedString
+				/**
+				 * Allow online and e-commerce transactions
+				 */
+				ecommerceDescription: () => LocalizedString
+				/**
+				 * ATM withdrawals
+				 */
+				atm: () => LocalizedString
+				/**
+				 * Allow cash withdrawals from ATMs
+				 */
+				atmDescription: () => LocalizedString
+				/**
+				 * Contactless payments
+				 */
+				contactless: () => LocalizedString
+				/**
+				 * Allow tap-to-pay transactions
+				 */
+				contactlessDescription: () => LocalizedString
+			}
+		}
+		CardStatements: {
+			/**
+			 * Statements
+			 */
+			title: () => LocalizedString
+			/**
+			 * Select year
+			 */
+			selectYear: () => LocalizedString
+			/**
+			 * Current statement
+			 */
+			currentStatement: () => LocalizedString
+			/**
+			 * Statement period
+			 */
+			statementPeriod: () => LocalizedString
+			/**
+			 * Total spent
+			 */
+			totalSpent: () => LocalizedString
+			/**
+			 * Monthly statements
+			 */
+			monthlyStatements: () => LocalizedString
+			/**
+			 * Download all
+			 */
+			downloadAll: () => LocalizedString
+			/**
+			 * {amount} spent
+			 */
+			spent: (arg: { amount: unknown }) => LocalizedString
+			/**
+			 * {count} transactions, {amount} spent
+			 */
+			transactions: (arg: { amount: unknown, count: unknown }) => LocalizedString
+			/**
+			 * {count} statements
+			 */
+			statementsCount: (arg: { count: unknown }) => LocalizedString
+			/**
+			 * No statements
+			 */
+			noStatements: () => LocalizedString
+			/**
+			 * About statements
+			 */
+			aboutStatements: () => LocalizedString
+			/**
+			 * Monthly statements are generated on the last day of each month
+			 */
+			aboutBullet1: () => LocalizedString
+			/**
+			 * Statements include all transactions and fees for the period
+			 */
+			aboutBullet2: () => LocalizedString
+			/**
+			 * Download statements as PDF
+			 */
+			aboutBullet3: () => LocalizedString
+			/**
+			 * Notify me when new statements are made available
+			 */
+			notifyNewStatements: () => LocalizedString
+		}
+		CardSettings: {
+			/**
+			 * Card settings
+			 */
+			title: () => LocalizedString
+			/**
+			 * Personal Details
+			 */
+			personalDetails: () => LocalizedString
+			/**
+			 * Change PIN
+			 */
+			changePin: () => LocalizedString
+			/**
+			 * Transaction alerts
+			 */
+			transactionAlerts: () => LocalizedString
+			/**
+			 * Get notified for all transactions
+			 */
+			transactionAlertsDescription: () => LocalizedString
+			/**
+			 * Security alerts
+			 */
+			securityAlerts: () => LocalizedString
+			/**
+			 * Get notified for security-related activities
+			 */
+			securityAlertsDescription: () => LocalizedString
+			/**
+			 * Marketing updates
+			 */
+			marketingUpdates: () => LocalizedString
+			/**
+			 * Product updates and offers
+			 */
+			marketingUpdatesDescription: () => LocalizedString
+			/**
+			 * Card management
+			 */
+			cardManagement: () => LocalizedString
+			/**
+			 * Order physical card
+			 */
+			orderPhysicalCard: () => LocalizedString
+			/**
+			 * Add to Google Pay
+			 */
+			addToGooglePay: () => LocalizedString
+			/**
+			 * Add to Apple Wallet
+			 */
+			addToAppleWallet: () => LocalizedString
+			/**
+			 * Replace card
+			 */
+			replaceCard: () => LocalizedString
+			/**
+			 * Card Terms & Conditions
+			 */
+			termsAndConditions: () => LocalizedString
+			/**
+			 * Card Privacy Policy
+			 */
+			privacyPolicy: () => LocalizedString
+			/**
+			 * Close card account
+			 */
+			closeCardAccount: () => LocalizedString
+			/**
+			 * Permanently close your Visa card
+			 */
+			closeCardAccountDescription: () => LocalizedString
+			/**
+			 * This action is permanent. Your Visa card will be canceled and cannot be reactivated.
+			 */
+			closeCardWarning: () => LocalizedString
+			/**
+			 * Please type "{close}" to confirm
+			 */
+			closeCardTypeClose: (arg: { close: unknown }) => LocalizedString
+			/**
+			 * close
+			 */
+			closeCardClose: () => LocalizedString
+			/**
+			 * Final Confirmation
+			 */
+			closeCardFinalConfirmTitle: () => LocalizedString
+			/**
+			 * Are you sure you want to close your card account? This cannot be undone.
+			 */
+			closeCardFinalConfirmMessage: () => LocalizedString
+			/**
+			 * You have pending transactions. Please wait until they are settled before closing your card.
+			 */
+			closeCardPendingTransactions: () => LocalizedString
+			/**
+			 * Your card has a balance of {balance}. Please withdraw your funds before closing. Do you want to proceed anyway?
+			 */
+			closeCardBalanceWarning: (arg: { balance: string }) => LocalizedString
+			/**
+			 * Card Account Closed
+			 */
+			closeCardSuccessTitle: () => LocalizedString
+			/**
+			 * Your Visa card has been permanently closed.
+			 */
+			closeCardSuccessSubtitle: () => LocalizedString
+			/**
+			 * Back to Home
+			 */
+			closeCardSuccessButton: () => LocalizedString
+			/**
+			 * Failed to close card account. Please contact support.
+			 */
+			closeCardError: () => LocalizedString
+			/**
+			 * Failed to update notification settings
+			 */
+			notificationToggleError: () => LocalizedString
+		}
+		PersonalDetails: {
+			/**
+			 * Personal details
+			 */
+			title: () => LocalizedString
+			/**
+			 * Blink Visa Cardholder
+			 */
+			blinkVisaCardholder: () => LocalizedString
+			/**
+			 * KYC verified information
+			 */
+			kycVerifiedInformation: () => LocalizedString
+			/**
+			 * Your name, date of birth and address are verified through our KYC process. You can change the information by redoing the KYC process. We don't guarantee an approval.
+			 */
+			kycVerifiedDescription: () => LocalizedString
+			/**
+			 * Change KYC information
+			 */
+			changeKycInformation: () => LocalizedString
+			/**
+			 * First name
+			 */
+			firstName: () => LocalizedString
+			/**
+			 * Last name
+			 */
+			lastName: () => LocalizedString
+			/**
+			 * Date of birth
+			 */
+			dateOfBirth: () => LocalizedString
+			/**
+			 * Contact information
+			 */
+			contactInformation: () => LocalizedString
+			/**
+			 * Registered address
+			 */
+			registeredAddress: () => LocalizedString
+			/**
+			 * Shipping address
+			 */
+			shippingAddress: () => LocalizedString
+			/**
+			 * KYC verification pending
+			 */
+			kycPendingTitle: () => LocalizedString
+			/**
+			 * Your KYC verification is being processed. This may take some time.
+			 */
+			kycPendingDescription: () => LocalizedString
+			/**
+			 * KYC verification declined
+			 */
+			kycDeclinedTitle: () => LocalizedString
+			/**
+			 * Your KYC verification was declined. Please contact support for more information.
+			 */
+			kycDeclinedDescription: () => LocalizedString
+			/**
+			 * Complete KYC verification
+			 */
+			kycNotStartedTitle: () => LocalizedString
+			/**
+			 * Complete the KYC verification process to unlock all card features.
+			 */
+			kycNotStartedDescription: () => LocalizedString
+			/**
+			 * Continue KYC verification
+			 */
+			kycAwaitingInputTitle: () => LocalizedString
+			/**
+			 * Additional information is required to complete your KYC verification.
+			 */
+			kycAwaitingInputDescription: () => LocalizedString
+			/**
+			 * KYC under review
+			 */
+			kycUnderReviewTitle: () => LocalizedString
+			/**
+			 * Your KYC verification is under manual review. This may take some time.
+			 */
+			kycUnderReviewDescription: () => LocalizedString
+			/**
+			 * Verification error
+			 */
+			kycErrorTitle: () => LocalizedString
+			/**
+			 * An error occurred during verification. Please try again or contact support.
+			 */
+			kycErrorDescription: () => LocalizedString
+		}
+		AddToMobileWallet: {
+			/**
+			 * Add to mobile wallet
+			 */
+			title: () => LocalizedString
+			/**
+			 * Add your card
+			 */
+			addYourCard: () => LocalizedString
+			/**
+			 * Add your Blink Visa card to your mobile wallet for quick and secure payments
+			 */
+			addYourCardDescription: () => LocalizedString
+			/**
+			 * Add to
+			 */
+			addTo: () => LocalizedString
+			Benefits: {
+				/**
+				 * Benefits of mobile wallet
+				 */
+				title: () => LocalizedString
+				/**
+				 * Contactless payments at millions of locations
+				 */
+				contactless: () => LocalizedString
+				/**
+				 * Enhanced security with biometric authentication
+				 */
+				security: () => LocalizedString
+				/**
+				 * No need to carry your physical card
+				 */
+				noPhysicalCard: () => LocalizedString
+				/**
+				 * Works even when your phone is locked
+				 */
+				worksLocked: () => LocalizedString
+			}
+		}
+		CardStatus: {
+			/**
+			 * Visa card
+			 */
+			title: () => LocalizedString
+			CardApproved: {
+				/**
+				 * Congratulations!
+				 */
+				title: () => LocalizedString
+				/**
+				 * Your Blink Visa Card has been activated.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Order physical card
+				 */
+				buttonLabel: () => LocalizedString
+				/**
+				 * Dashboard
+				 */
+				buttonLabelDashboard: () => LocalizedString
+			}
+			PhysicalCardOrdered: {
+				/**
+				 * Your physical card is on the way!
+				 */
+				title: () => LocalizedString
+				/**
+				 * Order for delivery of your Blink Card has been submitted.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Create PIN
+				 */
+				buttonLabel: () => LocalizedString
+			}
+		}
+		ShippingAddress: {
+			/**
+			 * Shipping address
+			 */
+			title: () => LocalizedString
+			/**
+			 * First name
+			 */
+			firstName: () => LocalizedString
+			/**
+			 * Last name
+			 */
+			lastName: () => LocalizedString
+			/**
+			 * Address line 1
+			 */
+			addressLine1: () => LocalizedString
+			/**
+			 * Address line 2
+			 */
+			addressLine2: () => LocalizedString
+			/**
+			 * City
+			 */
+			city: () => LocalizedString
+			/**
+			 * Country
+			 */
+			country: () => LocalizedString
+			labels: {
+				/**
+				 * State
+				 */
+				state: () => LocalizedString
+				/**
+				 * Province
+				 */
+				province: () => LocalizedString
+				/**
+				 * Prefecture
+				 */
+				prefecture: () => LocalizedString
+				/**
+				 * Oblast
+				 */
+				oblast: () => LocalizedString
+				/**
+				 * Department
+				 */
+				department: () => LocalizedString
+				/**
+				 * County
+				 */
+				county: () => LocalizedString
+				/**
+				 * District
+				 */
+				district: () => LocalizedString
+				/**
+				 * Do/Si
+				 */
+				doSi: () => LocalizedString
+				/**
+				 * Island
+				 */
+				island: () => LocalizedString
+				/**
+				 * Emirate
+				 */
+				emirate: () => LocalizedString
+				/**
+				 * Parish
+				 */
+				parish: () => LocalizedString
+				/**
+				 * Region
+				 */
+				region: () => LocalizedString
+				/**
+				 * ZIP code
+				 */
+				zip: () => LocalizedString
+				/**
+				 * Postal code
+				 */
+				postalCode: () => LocalizedString
+				/**
+				 * Eircode
+				 */
+				eircode: () => LocalizedString
+				/**
+				 * PIN code
+				 */
+				pin: () => LocalizedString
+			}
+			/**
+			 * Important
+			 */
+			important: () => LocalizedString
+			/**
+			 * Please ensure your address is accurate and complete.
+			 */
+			importantDescription: () => LocalizedString
+			/**
+			 * Cards cannot be delivered to P.O. boxes
+			 */
+			noPOBoxes: () => LocalizedString
+			/**
+			 * Signature may be required upon delivery
+			 */
+			signatureRequired: () => LocalizedString
+			/**
+			 * Address must be within supported shipping regions
+			 */
+			supportedRegions: () => LocalizedString
+		}
+		TransactionDetails: {
+			/**
+			 * Transaction details
+			 */
+			title: () => LocalizedString
+			/**
+			 * Card information
+			 */
+			cardInformation: () => LocalizedString
+			/**
+			 * Amount
+			 */
+			amount: () => LocalizedString
+			/**
+			 * Time
+			 */
+			time: () => LocalizedString
+			/**
+			 * ID
+			 */
+			transactionId: () => LocalizedString
+			/**
+			 * Card used
+			 */
+			cardUsed: () => LocalizedString
+			/**
+			 * Payment method
+			 */
+			paymentMethod: () => LocalizedString
+			/**
+			 * Merchant information
+			 */
+			merchantInformation: () => LocalizedString
+			/**
+			 * Merchant
+			 */
+			merchant: () => LocalizedString
+			/**
+			 * Category
+			 */
+			category: () => LocalizedString
+			/**
+			 * Location
+			 */
+			location: () => LocalizedString
+			/**
+			 * MCC code
+			 */
+			mccCode: () => LocalizedString
+			/**
+			 * Currency conversion
+			 */
+			currencyConversion: () => LocalizedString
+			/**
+			 * Bitcoin rate
+			 */
+			bitcoinRate: () => LocalizedString
+			/**
+			 * Bitcoin spent
+			 */
+			bitcoinSpent: () => LocalizedString
+			/**
+			 * Conversion fee
+			 */
+			conversionFee: () => LocalizedString
+			/**
+			 * View on map
+			 */
+			viewOnMap: () => LocalizedString
+			/**
+			 * Download receipt
+			 */
+			downloadReceipt: () => LocalizedString
+			/**
+			 * Report issue
+			 */
+			reportIssue: () => LocalizedString
+			/**
+			 * Transaction help
+			 */
+			transactionHelp: () => LocalizedString
+			/**
+			 * If you don't recognize this transaction or need assistance, contact our {supportTeam} immediately.
+			 */
+			transactionHelpDescription: (arg: { supportTeam: unknown }) => LocalizedString
+			/**
+			 * support team
+			 */
+			supportTeam: () => LocalizedString
+			/**
+			 * Transaction not found
+			 */
+			transactionNotFound: () => LocalizedString
+		}
+		PinScreens: {
+			common: {
+				/**
+				 * Confirm new PIN
+				 */
+				confirmNewPin: () => LocalizedString
+				/**
+				 * Please re-enter your new 4-digit PIN to continue.
+				 */
+				confirmPinSubtitle: () => LocalizedString
+				/**
+				 * Incorrect PIN. Please try again.
+				 */
+				incorrectPin: () => LocalizedString
+				/**
+				 * PINs do not match. Re-enter to confirm or go back to change your PIN.
+				 */
+				pinMismatch: () => LocalizedString
+				/**
+				 * This PIN is too easy to guess. Please choose a stronger PIN.
+				 */
+				weakPin: () => LocalizedString
+				/**
+				 * Card not found. Please try again.
+				 */
+				cardNotFound: () => LocalizedString
+				/**
+				 * Failed to update PIN. Please try again.
+				 */
+				pinUpdateFailed: () => LocalizedString
+			}
+			CreateFlow: {
+				/**
+				 * Create PIN
+				 */
+				title: () => LocalizedString
+				steps: {
+					/**
+					 * Set PIN
+					 */
+					setPin: () => LocalizedString
+					/**
+					 * Confirm
+					 */
+					confirm: () => LocalizedString
+				}
+				/**
+				 * Enter your PIN
+				 */
+				enterYourPin: () => LocalizedString
+				/**
+				 * Please enter a 4-digit PIN to continue.
+				 */
+				enterPinSubtitle: () => LocalizedString
+				/**
+				 * PIN has been created successfully
+				 */
+				pinCreatedToast: () => LocalizedString
+			}
+			ChangeFlow: {
+				/**
+				 * Change PIN
+				 */
+				title: () => LocalizedString
+				steps: {
+					/**
+					 * Current PIN
+					 */
+					currentPin: () => LocalizedString
+					/**
+					 * New PIN
+					 */
+					newPin: () => LocalizedString
+					/**
+					 * Confirm
+					 */
+					confirm: () => LocalizedString
+				}
+				/**
+				 * Enter current PIN
+				 */
+				enterCurrentPin: () => LocalizedString
+				/**
+				 * Please enter your current 4-digit PIN to continue.
+				 */
+				enterCurrentPinSubtitle: () => LocalizedString
+				/**
+				 * Enter new PIN
+				 */
+				enterNewPin: () => LocalizedString
+				/**
+				 * Please enter your new 4-digit PIN.
+				 */
+				enterNewPinSubtitle: () => LocalizedString
+				/**
+				 * Verify your identity to change PIN
+				 */
+				biometricDescription: () => LocalizedString
+				/**
+				 * Biometric authentication is required to change your PIN.
+				 */
+				biometricRequired: () => LocalizedString
+				/**
+				 * PIN changed
+				 */
+				pinChangedTitle: () => LocalizedString
+				/**
+				 * Your PIN has been changed successfully.
+				 */
+				pinChangedSubtitle: () => LocalizedString
+				/**
+				 * PIN has been changed successfully
+				 */
+				pinChangedToast: () => LocalizedString
+			}
+		}
+		ReplaceCard: {
+			/**
+			 * Replace card
+			 */
+			title: () => LocalizedString
+			steps: {
+				/**
+				 * Report Issue
+				 */
+				reportIssue: () => LocalizedString
+				/**
+				 * Delivery
+				 */
+				delivery: () => LocalizedString
+				/**
+				 * Confirm
+				 */
+				confirm: () => LocalizedString
+			}
+			ReportIssue: {
+				/**
+				 * Report card Issue
+				 */
+				title: () => LocalizedString
+				/**
+				 * Let us know what happened to your card so we can help you get a replacement.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Card management
+				 */
+				cardManagement: () => LocalizedString
+				/**
+				 * Lost card
+				 */
+				lostCard: () => LocalizedString
+				/**
+				 * I misplaced my card and can't find it anywhere.
+				 */
+				lostCardDescription: () => LocalizedString
+				/**
+				 * Stolen card
+				 */
+				stolenCard: () => LocalizedString
+				/**
+				 * I misplaced my card and can't find it anywhere.
+				 */
+				stolenCardDescription: () => LocalizedString
+				/**
+				 * Damaged card
+				 */
+				damagedCard: () => LocalizedString
+				/**
+				 * I misplaced my card and can't find it anywhere.
+				 */
+				damagedCardDescription: () => LocalizedString
+				/**
+				 * What happens next?
+				 */
+				whatHappensNext: () => LocalizedString
+				/**
+				 * Your current card will be frozen for security
+				 */
+				bullet1: () => LocalizedString
+				/**
+				 * A new card with different numbers will be issued
+				 */
+				bullet2: () => LocalizedString
+				/**
+				 * You can unfreeze if you find your card later
+				 */
+				bullet3: () => LocalizedString
+			}
+			Delivery: {
+				/**
+				 * Delivery options
+				 */
+				title: () => LocalizedString
+				/**
+				 * Choose how you'd like to receive your replacement card.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Standard delivery
+				 */
+				standardDelivery: () => LocalizedString
+				/**
+				 * {day1}-{day2} business days
+				 */
+				businessDays: (arg: { day1: unknown, day2: unknown }) => LocalizedString
+				/**
+				 * FREE
+				 */
+				free: () => LocalizedString
+				/**
+				 * Express delivery
+				 */
+				expressDelivery: () => LocalizedString
+				/**
+				 * Shipping address
+				 */
+				shippingAddress: () => LocalizedString
+				/**
+				 * Use registered address as shipping address
+				 */
+				useRegisteredAddress: () => LocalizedString
+				/**
+				 * Choose delivery speed
+				 */
+				chooseDeliverySpeed: () => LocalizedString
+			}
+			Confirm: {
+				/**
+				 * Confirm replacement
+				 */
+				title: () => LocalizedString
+				/**
+				 * Review your request before submitting.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Request summary
+				 */
+				requestSummary: () => LocalizedString
+				/**
+				 * Issue type
+				 */
+				issueType: () => LocalizedString
+				/**
+				 * Delivery
+				 */
+				delivery: () => LocalizedString
+				/**
+				 * Delivery time
+				 */
+				deliveryTime: () => LocalizedString
+				/**
+				 * Shipping cost
+				 */
+				shippingCost: () => LocalizedString
+				/**
+				 * Important information
+				 */
+				importantInformation: () => LocalizedString
+				DamagedInfo: {
+					/**
+					 * Your current card will remain active until the new one arrives
+					 */
+					bullet1: () => LocalizedString
+					/**
+					 * Your new card will have a new card number
+					 */
+					bullet2: () => LocalizedString
+					/**
+					 * Destroy your damaged card when the new one arrives
+					 */
+					bullet3: () => LocalizedString
+				}
+				LostStolenInfo: {
+					/**
+					 * Your card has been locked for your protection
+					 */
+					bullet1: () => LocalizedString
+					/**
+					 * Your new card will have a new card number
+					 */
+					bullet2: () => LocalizedString
+					/**
+					 * Your old card will be permanently canceled
+					 */
+					bullet3: () => LocalizedString
+				}
+				/**
+				 * Submit request
+				 */
+				submitRequest: () => LocalizedString
+			}
+			Status: {
+				/**
+				 * Your new card is on the way!
+				 */
+				title: () => LocalizedString
+				/**
+				 * Order for delivery of your Blink Card has been submitted.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Dashboard
+				 */
+				buttonLabel: () => LocalizedString
+			}
+			errors: {
+				/**
+				 * Failed to lock your card. Please try again.
+				 */
+				lockFailed: () => LocalizedString
+				/**
+				 * Failed to replace your card. Please try again.
+				 */
+				replaceFailed: () => LocalizedString
+				/**
+				 * Your card was locked but the replacement failed. Please contact support for assistance.
+				 */
+				replaceFailedCardLocked: () => LocalizedString
+			}
+		}
+		OrderPhysicalCard: {
+			/**
+			 * Order physical card
+			 */
+			title: () => LocalizedString
+			steps: {
+				/**
+				 * Shipping
+				 */
+				shipping: () => LocalizedString
+				/**
+				 * Confirm
+				 */
+				confirm: () => LocalizedString
+			}
+			Shipping: {
+				/**
+				 * Order your physical card
+				 */
+				title: () => LocalizedString
+				/**
+				 * Get your Blink Visa card delivered to your address.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Registered address
+				 */
+				registeredAddress: () => LocalizedString
+				/**
+				 * Use registered address as shipping address
+				 */
+				useRegisteredAddress: () => LocalizedString
+				/**
+				 * Delivery
+				 */
+				delivery: () => LocalizedString
+				/**
+				 * Standard delivery
+				 */
+				standardDelivery: () => LocalizedString
+				/**
+				 * Express delivery
+				 */
+				expressDelivery: () => LocalizedString
+				/**
+				 * {day1}-{day2} business days
+				 */
+				businessDays: (arg: { day1: unknown, day2: unknown }) => LocalizedString
+				/**
+				 * FREE
+				 */
+				free: () => LocalizedString
+				/**
+				 * Delivery information
+				 */
+				deliveryInformation: () => LocalizedString
+				/**
+				 * You'll receive tracking information via email
+				 */
+				bullet1: () => LocalizedString
+				/**
+				 * Signature may be required upon delivery
+				 */
+				bullet2: () => LocalizedString
+				/**
+				 * Card will be shipped in discreet packaging
+				 */
+				bullet3: () => LocalizedString
+				/**
+				 * Activate your card when it arrives
+				 */
+				bullet4: () => LocalizedString
+				/**
+				 * Card features
+				 */
+				cardFeatures: () => LocalizedString
+				/**
+				 * Contactless payment technology
+				 */
+				feature1: () => LocalizedString
+				/**
+				 * EMV chip for enhanced security
+				 */
+				feature2: () => LocalizedString
+				/**
+				 * Magnetic stripe for universal acceptance
+				 */
+				feature3: () => LocalizedString
+				/**
+				 * Your name embossed on the card
+				 */
+				feature4: () => LocalizedString
+				/**
+				 * Important
+				 */
+				important: () => LocalizedString
+			}
+			Confirm: {
+				/**
+				 * Confirm your order
+				 */
+				title: () => LocalizedString
+				/**
+				 * Review your physical card order before submitting.
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Order summary
+				 */
+				orderSummary: () => LocalizedString
+				/**
+				 * Card design
+				 */
+				cardDesign: () => LocalizedString
+				/**
+				 * Delivery
+				 */
+				delivery: () => LocalizedString
+				/**
+				 * Delivery time
+				 */
+				deliveryTime: () => LocalizedString
+				/**
+				 * Shipping cost
+				 */
+				shippingCost: () => LocalizedString
+				/**
+				 * Shipping address
+				 */
+				shippingAddress: () => LocalizedString
+				/**
+				 * Place order
+				 */
+				placeOrder: () => LocalizedString
+				/**
+				 * Important
+				 */
+				important: () => LocalizedString
+				/**
+				 * Your virtual card will remain active while you wait for the physical card
+				 */
+				bullet1: () => LocalizedString
+				/**
+				 * You'll need to activate your physical card when it arrives
+				 */
+				bullet2: () => LocalizedString
+				/**
+				 * Both cards will have the same card number and details
+				 */
+				bullet3: () => LocalizedString
+				/**
+				 * Shipping address cannot be changed after order is placed
+				 */
+				bullet4: () => LocalizedString
+			}
+			errors: {
+				/**
+				 * Failed to order your physical card. Please try again.
+				 */
+				createFailed: () => LocalizedString
+			}
+		}
+		Onboarding: {
+			/**
+			 * Verification
+			 */
+			kycHeaderTitle: () => LocalizedString
+			CardIntroducing: {
+				/**
+				 * Introducing
+				 */
+				title: () => LocalizedString
+				cardInfo: {
+					/**
+					 * The Blink Visa card
+					 */
+					bitcoinCard: () => LocalizedString
+					/**
+					 * for
+					 */
+					'for': () => LocalizedString
+					/**
+					 * Bitcoin Maximalists
+					 */
+					maximalist: () => LocalizedString
+				}
+				/**
+				 * Continue
+				 */
+				buttonText: () => LocalizedString
+			}
+			CardDetails: {
+				/**
+				 * Additional perks
+				 */
+				title: () => LocalizedString
+				features: {
+					/**
+					 * Dedicated account manager
+					 */
+					accountManager: () => LocalizedString
+					/**
+					 * Priority support
+					 */
+					support: () => LocalizedString
+					/**
+					 * 50% back on transaction fees
+					 */
+					onchainDeposits: () => LocalizedString
+					/**
+					 * $100 to circular economies
+					 */
+					circularEconomies: () => LocalizedString
+				}
+				/**
+				 * ... and more coming in 2026
+				 */
+				andMore: () => LocalizedString
+				/**
+				 * Continue
+				 */
+				buttonText: () => LocalizedString
+			}
+			WelcomeOnboard: {
+				welcomeMessage: {
+					/**
+					 * Welcome onboard
+					 */
+					title: () => LocalizedString
+					/**
+					 * To Blink Private
+					 */
+					subtitle: () => LocalizedString
+					paragraphs: {
+						/**
+						 * Someone thought of you and suggested that we should invite you to Blink Private. Probably because you are an awesome Bitcoiner.
+						 */
+						body1: () => LocalizedString
+						/**
+						 * Our goal for 2026 is to stuff the program with so much goodies that it will be obvious to renew next year.
+						 */
+						body2: () => LocalizedString
+					}
+				}
+				/**
+				 * Let's go
+				 */
+				buttonText: () => LocalizedString
+			}
+			CardSubscription: {
+				/**
+				 * Subscribe
+				 */
+				subscribeTitle: () => LocalizedString
+				/**
+				 * Payment
+				 */
+				paymentTitle: () => LocalizedString
+				/**
+				 * Accept
+				 */
+				acceptButton: () => LocalizedString
+				/**
+				 * Continue & Pay
+				 */
+				payButton: () => LocalizedString
+				/**
+				 * Blink Private
+				 */
+				cardTitle: () => LocalizedString
+				/**
+				 * per year
+				 */
+				perYear: () => LocalizedString
+				status: {
+					/**
+					 * Status
+					 */
+					label: () => LocalizedString
+					/**
+					 * Payment Pending
+					 */
+					paymentPending: () => LocalizedString
+					/**
+					 * First year free
+					 */
+					firstYearFree: () => LocalizedString
+				}
+				renewalDate: {
+					/**
+					 * Renewal date
+					 */
+					label: () => LocalizedString
+				}
+				agreement: {
+					/**
+					 * I agree to the
+					 */
+					text: () => LocalizedString
+					/**
+					 * Terms of Service
+					 */
+					termsOfService: () => LocalizedString
+					/**
+					 * Privacy Policy
+					 */
+					privacyPolicy: () => LocalizedString
+					/**
+					 * Cardholder Agreement
+					 */
+					cardholderAgreement: () => LocalizedString
+					/**
+					 * and
+					 */
+					and: () => LocalizedString
+				}
+				/**
+				 * I understand that my subscription will automatically renew in 1 year
+				 */
+				renew: () => LocalizedString
+			}
+			LoadingCard: {
+				/**
+				 * We're working on your card
+				 */
+				title: () => LocalizedString
+				/**
+				 * We'll notify you once it's here
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * ...coding the backend
+				 */
+				codingBackend: () => LocalizedString
+				/**
+				 * Nice
+				 */
+				buttonText: () => LocalizedString
+			}
+			PersonalInformation: {
+				/**
+				 * Final step
+				 */
+				title: () => LocalizedString
+				fields: {
+					occupation: {
+						/**
+						 * Occupation
+						 */
+						label: () => LocalizedString
+						/**
+						 * Select your occupation
+						 */
+						placeholder: () => LocalizedString
+					}
+					annualSalaryRange: {
+						/**
+						 * Annual salary
+						 */
+						label: () => LocalizedString
+						/**
+						 * Select your salary range
+						 */
+						placeholder: () => LocalizedString
+					}
+					accountPurpose: {
+						/**
+						 * Account purpose
+						 */
+						label: () => LocalizedString
+						/**
+						 * Select purpose
+						 */
+						placeholder: () => LocalizedString
+					}
+					expectedMonthlyVolume: {
+						/**
+						 * Expected monthly spending
+						 */
+						label: () => LocalizedString
+						/**
+						 * Select your spending range
+						 */
+						placeholder: () => LocalizedString
+					}
+				}
+				/**
+				 * Submit application
+				 */
+				buttonText: () => LocalizedString
+				/**
+				 * Select
+				 */
+				select: () => LocalizedString
+			}
+			CardPreapproved: {
+				/**
+				 * You have been pre-approved for the Blink Visa card!
+				 */
+				title: () => LocalizedString
+				/**
+				 * Close
+				 */
+				buttonText: () => LocalizedString
+			}
+			CardProcessing: {
+				/**
+				 * Processing your application
+				 */
+				title: () => LocalizedString
+				/**
+				 * Estimated wait time: {waitTime}
+				 */
+				subtitle: (arg: { waitTime: string }) => LocalizedString
+				/**
+				 * Close
+				 */
+				buttonText: () => LocalizedString
+			}
+		}
+	}
 	NotificationHistory: {
 		/**
 		 * Notifications
@@ -19102,6 +23735,793 @@ export type TranslationFunctions = {
 		 * You don't have any notifications right now
 		 */
 		noNotifications: () => LocalizedString
+	}
+	BackupScreen: {
+		/**
+		 * Back up your wallet
+		 */
+		title: () => LocalizedString
+		/**
+		 * Choose a backup method to secure your funds
+		 */
+		description: () => LocalizedString
+		BackupMethod: {
+			/**
+			 * Choose your backup method
+			 */
+			title: () => LocalizedString
+			/**
+			 * We recommend {provider} for new users.
+			 */
+			subtitle: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Google Drive
+			 */
+			googleDrive: () => LocalizedString
+			/**
+			 * Apple iCloud
+			 */
+			appleICloud: () => LocalizedString
+			/**
+			 * Password manager
+			 */
+			passwordManager: () => LocalizedString
+			/**
+			 * Manual backup
+			 */
+			manualBackup: () => LocalizedString
+			/**
+			 * Backup saved to password manager
+			 */
+			passwordManagerBackupSaved: () => LocalizedString
+			/**
+			 * Failed to save backup
+			 */
+			passwordManagerBackupFailed: () => LocalizedString
+			/**
+			 * No password manager available on this device. Use Drive backup or save your 12-word phrase manually.
+			 */
+			passwordManagerUnavailable: () => LocalizedString
+		}
+		CloudBackup: {
+			/**
+			 * Let's back up your wallet
+			 */
+			title: () => LocalizedString
+			/**
+			 * We will save a backup of your backup phrase to your {provider}.
+			 */
+			description: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Encrypt with additional password
+			 */
+			encryptCheckbox: () => LocalizedString
+			/**
+			 * Password
+			 */
+			password: () => LocalizedString
+			/**
+			 * (12 characters minimum)
+			 */
+			passwordPlaceholder: () => LocalizedString
+			/**
+			 * Confirm password
+			 */
+			confirmPassword: () => LocalizedString
+			/**
+			 * Enter password again
+			 */
+			confirmPasswordPlaceholder: () => LocalizedString
+			/**
+			 * Continue
+			 */
+			continueButton: () => LocalizedString
+			/**
+			 * Important
+			 */
+			importantTitle: () => LocalizedString
+			/**
+			 * Blink does not store this password. If you lose it, {bold} to recover your wallet.
+			 */
+			importantMessage: (arg: { bold: string }) => LocalizedString
+			/**
+			 * we will not be able
+			 */
+			importantMessageBold: () => LocalizedString
+			/**
+			 * Minimum 12 characters
+			 */
+			passwordTooShort: () => LocalizedString
+			/**
+			 * Passwords do not match
+			 */
+			passwordMismatch: () => LocalizedString
+			/**
+			 * Backup found
+			 */
+			existingBackupTitle: () => LocalizedString
+			/**
+			 * A backup already exists in your {provider}. Do you want to overwrite it?
+			 */
+			existingBackupMessage: (arg: { provider: string }) => LocalizedString
+			/**
+			 * A backup already exists in your {provider}.
+	
+		Lightning address: {address}
+		Created: {createdAt}
+	
+		Do you want to overwrite it?
+			 */
+			existingBackupMessageWithDetails: (arg: { address: string, createdAt: string, provider: string }) => LocalizedString
+			/**
+			 * Not available
+			 */
+			existingBackupUnknownAddress: () => LocalizedString
+			/**
+			 * Unknown
+			 */
+			existingBackupUnknownCreatedAt: () => LocalizedString
+			/**
+			 * Overwrite
+			 */
+			overwrite: () => LocalizedString
+			/**
+			 * Backup saved to {provider}
+			 */
+			uploadSuccess: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Failed to upload backup
+			 */
+			uploadFailed: () => LocalizedString
+			/**
+			 * Failed to sign in to {provider}
+			 */
+			signInFailed: (arg: { provider: string }) => LocalizedString
+			/**
+			 * iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.
+			 */
+			cloudNotAvailable: () => LocalizedString
+			/**
+			 * Network error. Please check your connection and try again.
+			 */
+			networkError: () => LocalizedString
+		}
+		ManualBackup: {
+			Alerts: {
+				/**
+				 * Keep your backup phrase secret!
+				 */
+				title: () => LocalizedString
+				/**
+				 * I understand nobody can recover my wallet if I lose this phrase
+				 */
+				check1: () => LocalizedString
+				/**
+				 * I understand if somebody gets this phrase, they can steal all my funds.
+				 */
+				check2: () => LocalizedString
+				/**
+				 * Nobody is asking me for this information via message or a call
+				 */
+				check3: () => LocalizedString
+			}
+			Phrase: {
+				/**
+				 * Backup phrase
+				 */
+				headerTitle: () => LocalizedString
+				/**
+				 * This backup phrase works in any {sparkCompatibleLink}
+				 */
+				sparkCompatible: (arg: { sparkCompatibleLink: string }) => LocalizedString
+				/**
+				 * Spark-compatible wallet
+				 */
+				sparkCompatibleLink: () => LocalizedString
+				/**
+				 * Backup phrase copied into clipboard
+				 */
+				copiedToast: () => LocalizedString
+				/**
+				 * Save it now
+				 */
+				saveItNow: () => LocalizedString
+				/**
+				 * Continue
+				 */
+				continueButton: () => LocalizedString
+				/**
+				 * I have saved it
+				 */
+				savedConfirm: () => LocalizedString
+				/**
+				 * Copy
+				 */
+				copy: () => LocalizedString
+				/**
+				 * Test your backup
+				 */
+				testBackup: () => LocalizedString
+			}
+			Confirm: {
+				/**
+				 * Confirm backup phrase
+				 */
+				headerTitle: () => LocalizedString
+				/**
+				 * A quick check if you have written it down correctly
+				 */
+				subtitle: () => LocalizedString
+				/**
+				 * Enter word
+				 */
+				enterWord: () => LocalizedString
+				/**
+				 * Enter words
+				 */
+				enterWords: () => LocalizedString
+				/**
+				 * Confirm
+				 */
+				confirm: () => LocalizedString
+				/**
+				 * Incorrect word, please check the order
+				 */
+				incorrectWord: () => LocalizedString
+			}
+			Success: {
+				/**
+				 * Welcome to non-custodial Blink
+				 */
+				title: () => LocalizedString
+				/**
+				 * Your backup phrase is correct
+				 */
+				testSuccess: () => LocalizedString
+			}
+		}
+	}
+	AccountMigration: {
+		/**
+		 * Move to non-custodial
+		 */
+		moveToNonCustodial: () => LocalizedString
+		/**
+		 * What does it mean to move to non-custodial?
+		 */
+		explainerTitle: () => LocalizedString
+		/**
+		 * You will create a non-custodial account on the Spark protocol, <link>learn more here</link>
+		 */
+		explainerStep1: () => LocalizedString
+		/**
+		 * We transfer your funds into your new non-custodial account, and your current account will be deleted
+		 */
+		explainerStep2: () => LocalizedString
+		/**
+		 * Continue using Blink as usual
+		 */
+		explainerStep3: () => LocalizedString
+		/**
+		 * Let's move
+		 */
+		letsMove: () => LocalizedString
+		/**
+		 * Transferring your funds. It should be done in a few seconds.
+		 */
+		transferringFunds: () => LocalizedString
+	}
+	AccountTypeSelectionScreen: {
+		/**
+		 * Please choose your preferred type of Blink.
+		 */
+		descriptionDefault: () => LocalizedString
+		/**
+		 * Please choose account type.
+		 */
+		descriptionSelected: () => LocalizedString
+		/**
+		 * Custodial
+		 */
+		custodialLabel: () => LocalizedString
+		/**
+		 * Non-custodial
+		 */
+		selfCustodialLabel: () => LocalizedString
+		/**
+		 * We hold the funds on your behalf
+		 */
+		custodialDescription: () => LocalizedString
+		/**
+		 * Only you can access funds
+		 */
+		selfCustodialDescription: () => LocalizedString
+		/**
+		 * Choose method
+		 */
+		chooseMethod: () => LocalizedString
+		/**
+		 * Continue
+		 */
+		continueButton: () => LocalizedString
+		/**
+		 * Non-custodial is temporarily unavailable.
+		 */
+		selfCustodialDisabled: () => LocalizedString
+		/**
+		 * Coming soon
+		 */
+		restoreComingSoonTitle: () => LocalizedString
+		/**
+		 * Restore flow will be available in a future update.
+		 */
+		restoreComingSoonDescription: () => LocalizedString
+		/**
+		 * Failed to create wallet. Please try again.
+		 */
+		createFailed: () => LocalizedString
+	}
+	RestoreScreen: {
+		/**
+		 * Restore wallet
+		 */
+		title: () => LocalizedString
+		/**
+		 * Recover your wallet from a backup
+		 */
+		description: () => LocalizedString
+		/**
+		 * Restore wallet
+		 */
+		phraseTitle: () => LocalizedString
+		/**
+		 * Enter first 6 words of your backup phrase
+		 */
+		phraseSubtitleStep1: () => LocalizedString
+		/**
+		 * Enter rest of your backup phrase
+		 */
+		phraseSubtitleStep2: () => LocalizedString
+		/**
+		 * Next 6 words
+		 */
+		nextWords: () => LocalizedString
+		/**
+		 * Paste
+		 */
+		paste: () => LocalizedString
+		/**
+		 * Word
+		 */
+		enterWord: () => LocalizedString
+		/**
+		 * Invalid backup phrase. Please check if the word order is correct.
+		 */
+		invalidMnemonic: () => LocalizedString
+		/**
+		 * Restoring your wallet...
+		 */
+		restoring: () => LocalizedString
+		/**
+		 * Wallet restored successfully
+		 */
+		restoreSuccess: () => LocalizedString
+		/**
+		 * Failed to restore wallet. Please try again.
+		 */
+		restoreFailed: () => LocalizedString
+		/**
+		 * Restore wallet
+		 */
+		restore: () => LocalizedString
+		/**
+		 * No backup found
+		 */
+		noBackupFound: () => LocalizedString
+		/**
+		 * We couldn't find a backup. You can enter your backup phrase manually instead.
+		 */
+		noBackupDescription: () => LocalizedString
+		/**
+		 * Enter your encryption password
+		 */
+		enterPassword: () => LocalizedString
+		/**
+		 * Incorrect password. Please try again.
+		 */
+		wrongPassword: () => LocalizedString
+		/**
+		 * Choose a wallet
+		 */
+		pickBackupTitle: () => LocalizedString
+		/**
+		 * Select a backup to restore
+		 */
+		pickBackupDescription: () => LocalizedString
+	}
+	BackupNudge: {
+		/**
+		 * Your funds are at risk
+		 */
+		title: () => LocalizedString
+		/**
+		 * Secure your wallet now. It only takes a minute.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Secure wallet
+		 */
+		cta: () => LocalizedString
+		/**
+		 * Backup your wallet. If you lose this device, you will lose your funds.
+		 */
+		settingsWarning: () => LocalizedString
+		/**
+		 * Secure your funds
+		 */
+		modalTitle: () => LocalizedString
+		/**
+		 * We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.
+		 */
+		modalDescription: () => LocalizedString
+		/**
+		 * Secure wallet
+		 */
+		secureMe: () => LocalizedString
+	}
+	SelfCustodialOffline: {
+		/**
+		 * Wallet is offline
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your non-custodial wallet can't reach the network right now. Try again when you're back online.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		retry: () => LocalizedString
+	}
+	SelfCustodialError: {
+		/**
+		 * Not enough funds to cover the amount and network fees. Try a smaller amount.
+		 */
+		insufficientFunds: () => LocalizedString
+		/**
+		 * Amount is below the minimum required for this payment. Try a larger amount.
+		 */
+		belowMinimum: () => LocalizedString
+		/**
+		 * Network connection problem. Check your connection and try again.
+		 */
+		networkError: () => LocalizedString
+		/**
+		 * The payment details look invalid. Please review and try again.
+		 */
+		invalidInput: () => LocalizedString
+		/**
+		 * The payment could not be completed. Try again in a moment, or use a smaller amount.
+		 */
+		generic: () => LocalizedString
+	}
+	UnclaimedDeposit: {
+		/**
+		 * Unclaimed Deposits
+		 */
+		screenTitle: () => LocalizedString
+		/**
+		 * Claim {sats} sats
+		 */
+		cardTitle: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * You have {count} unclaimed deposit(s)
+		 */
+		title: (arg: { count: unknown }) => LocalizedString
+		/**
+		 * Total: {sats} sats available to claim
+		 */
+		description: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * Claim now
+		 */
+		claim: () => LocalizedString
+		/**
+		 * Claim (max fee: {fee} sats)
+		 */
+		claimWithFee: (arg: { fee: unknown }) => LocalizedString
+		/**
+		 * Claiming...
+		 */
+		claiming: () => LocalizedString
+		/**
+		 * Refund
+		 */
+		refund: () => LocalizedString
+		/**
+		 * Refunding...
+		 */
+		refunding: () => LocalizedString
+		/**
+		 * Waiting for confirmations...
+		 */
+		immature: () => LocalizedString
+		/**
+		 * Network fees are too high to claim ({requiredFee} sats required). Try again later or refund to an on-chain address.
+		 */
+		feeExceeded: (arg: { requiredFee: unknown }) => LocalizedString
+		/**
+		 * This deposit is no longer available on the network.
+		 */
+		missingUtxo: () => LocalizedString
+		/**
+		 * This deposit is too small to claim after fees. Wait for lower fees or refund to an on-chain address.
+		 */
+		belowDustLimit: () => LocalizedString
+		/**
+		 * Unable to claim: {error}
+		 */
+		genericError: (arg: { error: unknown }) => LocalizedString
+		/**
+		 * Claim failed: {error}
+		 */
+		claimFailed: (arg: { error: unknown }) => LocalizedString
+		/**
+		 * Refund failed: {error}
+		 */
+		refundFailed: (arg: { error: unknown }) => LocalizedString
+		/**
+		 * Bitcoin address for refund
+		 */
+		refundAddress: () => LocalizedString
+		/**
+		 * Network fee
+		 */
+		feeRate: () => LocalizedString
+		/**
+		 * Fastest (~{sats} sats) ~10 min
+		 */
+		feeRateFastest: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * Normal (~{sats} sats) ~30 min
+		 */
+		feeRateHalfHour: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * Economy (~{sats} sats) ~60 min
+		 */
+		feeRateHour: (arg: { sats: unknown }) => LocalizedString
+		/**
+		 * {rate} sat/vB
+		 */
+		feeRateUnit: (arg: { rate: unknown }) => LocalizedString
+		/**
+		 * Couldn't load network fees. Please check your connection and try again.
+		 */
+		feeRateUnavailable: () => LocalizedString
+		/**
+		 * Refund now
+		 */
+		refundNow: () => LocalizedString
+		/**
+		 * Refund initiated successfully
+		 */
+		refundSuccess: () => LocalizedString
+		/**
+		 * Deposit claimed successfully
+		 */
+		claimSuccess: () => LocalizedString
+		/**
+		 * Unable to claim this deposit
+		 */
+		error: () => LocalizedString
+	}
+	StableBalance: {
+		/**
+		 * Stable Balance
+		 */
+		title: () => LocalizedString
+		/**
+		 * Hold a USD-denominated balance powered by USDB on Spark.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Balance · SATS
+		 */
+		balanceLabelBtc: () => LocalizedString
+		/**
+		 * Balance · USD
+		 */
+		balanceLabelUsd: () => LocalizedString
+		/**
+		 * Stable Balance
+		 */
+		settingsRowTitle: () => LocalizedString
+		/**
+		 * Stable Balance
+		 */
+		settingsTitle: () => LocalizedString
+		/**
+		 * Keep part of your wallet in USD. Convert between BTC and USD manually anytime using the Convert action.
+		 */
+		settingsDescription: () => LocalizedString
+		/**
+		 * Active
+		 */
+		activationLabel: () => LocalizedString
+		/**
+		 * Your wallet is holding USD via USDB.
+		 */
+		activeHint: () => LocalizedString
+		/**
+		 * Your wallet is holding BTC only.
+		 */
+		inactiveHint: () => LocalizedString
+		/**
+		 * You still have {amount}. Convert to BTC first, or your USD balance will be hidden until you reactivate Stable Balance.
+		 */
+		deactivateWarningBody: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Could not update Stable Balance. Please try again.
+		 */
+		toggleFailedToast: () => LocalizedString
+		toggleModal: {
+			/**
+			 * Activate Stable Balance
+			 */
+			activateTitle: () => LocalizedString
+			/**
+			 * Your BTC balance will be converted to USDB. This is the estimated conversion fee.
+			 */
+			activateBody: () => LocalizedString
+			/**
+			 * Activate
+			 */
+			activateConfirm: () => LocalizedString
+			/**
+			 * Deactivate Stable Balance
+			 */
+			deactivateTitle: () => LocalizedString
+			/**
+			 * Your USDB balance will be converted back to BTC. This is the estimated conversion fee.
+			 */
+			deactivateBody: () => LocalizedString
+			/**
+			 * Deactivate
+			 */
+			deactivateConfirm: () => LocalizedString
+			/**
+			 * Cancel
+			 */
+			cancel: () => LocalizedString
+		}
+		/**
+		 * Minimum conversion: {amount}
+		 */
+		minimumConversion: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Conversion is temporarily unavailable. Please try again.
+		 */
+		conversionUnavailable: () => LocalizedString
+	}
+	WalletCreationScreen: {
+		/**
+		 * Creating your wallet...
+		 */
+		creating: () => LocalizedString
+		/**
+		 * Wallet creation failed
+		 */
+		errorTitle: () => LocalizedString
+		/**
+		 * Something went wrong. Please try again.
+		 */
+		errorDescription: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		retry: () => LocalizedString
+	}
+	BackendFeatureGate: {
+		/**
+		 * Feature unavailable
+		 */
+		title: () => LocalizedString
+		/**
+		 * This feature requires a custodial account.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Sign in required
+		 */
+		signInTitle: () => LocalizedString
+		/**
+		 * Sign in to your custodial account to use {featureName}.
+		 */
+		signInDescription: (arg: { featureName: string }) => LocalizedString
+		/**
+		 * Custodial account required
+		 */
+		noAccountTitle: () => LocalizedString
+		/**
+		 * {featureName} requires a Blink custodial account.
+		 */
+		noAccountDescription: (arg: { featureName: string }) => LocalizedString
+		/**
+		 * Circles
+		 */
+		featureCircles: () => LocalizedString
+		/**
+		 * Earn
+		 */
+		featureEarn: () => LocalizedString
+		/**
+		 * Card
+		 */
+		featureCard: () => LocalizedString
+	}
+	FeatureUnavailable: {
+		SelfCustodial: {
+			/**
+			 * Temporarily unavailable
+			 */
+			title: () => LocalizedString
+			/**
+			 * Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later.
+			 */
+			description: () => LocalizedString
+		}
+	}
+	NetworkStatus: {
+		/**
+		 * Spark network is currently degraded. Payments may take longer.
+		 */
+		degradedBanner: () => LocalizedString
+	}
+	SelfCustodialDelete: {
+		/**
+		 * Important
+		 */
+		dangerZoneImportantTitle: () => LocalizedString
+		/**
+		 * Deleted account cannot be reinstated
+		 */
+		dangerZoneBulletReinstated: () => LocalizedString
+		/**
+		 * Account deletion is permanent
+		 */
+		dangerZoneBulletPermanent: () => LocalizedString
+		/**
+		 * Make sure account is empty
+		 */
+		dangerZoneBulletEmpty: () => LocalizedString
+		/**
+		 * Delete account and data
+		 */
+		dangerZoneDeleteButton: () => LocalizedString
+		/**
+		 * Confirm account removal
+		 */
+		confirmModalTitle: () => LocalizedString
+		/**
+		 * Type "{delete}" to confirm
+		 */
+		confirmModalTypeToConfirm: (arg: { delete: string }) => LocalizedString
+		/**
+		 * Warning
+		 */
+		hasFundsWarningTitle: () => LocalizedString
+		/**
+		 * Your wallet has a balance of {balance}. For your safety, we dont allow deletion of accounts with funds.
+		 */
+		hasFundsWarningBody: (arg: { balance: string }) => LocalizedString
+		/**
+		 * To proceed with deletion, either empty your account or donate to circular economies.
+		 */
+		hasFundsWarningHelper: () => LocalizedString
+		/**
+		 * Go back
+		 */
+		hasFundsWarningButton: () => LocalizedString
 	}
 }
 

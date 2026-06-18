@@ -1,33 +1,47 @@
+import { useState } from "react"
 import { View, TouchableOpacity } from "react-native"
 
+import { Text, makeStyles } from "@rn-vui/themed"
+
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { Icon, Text, makeStyles } from "@rn-vui/themed"
+import { AccountType } from "@app/types/wallet"
+
+import { DeleteAccount } from "../../self-custodial/delete-account"
 
 import { Delete } from "./delete"
 import { LogOut } from "./logout"
-import { useState } from "react"
 
 export const DangerZoneSettings: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
 
   const [expanded, setExpanded] = useState(false)
-  const defaultIcon = expanded ? "chevron-down" : "chevron-forward"
 
   const { currentLevel, isAtLeastLevelOne, isAtLeastLevelZero } = useLevel()
-  if (!isAtLeastLevelZero) return <></>
+  const { activeAccount } = useAccountRegistry()
+  const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
+
+  if (!isSelfCustodial && !isAtLeastLevelZero) return <></>
 
   return (
     <View style={styles.verticalSpacing}>
       <TouchableOpacity style={styles.titleStyle} onPress={() => setExpanded(!expanded)}>
-        <Icon name={defaultIcon} type="ionicon" size={20} />
+        <GaloyIcon name={expanded ? "caret-down" : "caret-right"} size={20} />
         <Text type="p2" bold>
           {LL.AccountScreen.dangerZone()}
         </Text>
       </TouchableOpacity>
-      {isAtLeastLevelOne && expanded && <LogOut />}
-      {currentLevel !== AccountLevel.NonAuth && expanded && <Delete />}
+      {isSelfCustodial
+        ? expanded && <DeleteAccount />
+        : expanded && (
+            <>
+              {isAtLeastLevelOne && <LogOut />}
+              {currentLevel !== AccountLevel.NonAuth && <Delete />}
+            </>
+          )}
     </View>
   )
 }

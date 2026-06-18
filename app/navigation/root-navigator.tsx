@@ -55,10 +55,9 @@ import { WebViewScreen } from "@app/screens/webview/webview"
 import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import {
-  CardStyleInterpolators,
-  createStackNavigator,
-  StackNavigationProp,
-} from "@react-navigation/stack"
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from "@react-navigation/native-stack"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -73,6 +72,7 @@ import { DeveloperScreen } from "../screens/developer-screen"
 import { EarnMapScreen } from "../screens/earns-map-screen"
 import { EarnQuiz, EarnSection } from "../screens/earns-screen"
 import { SectionCompleted } from "../screens/earns-screen/section-completed"
+import { AccountTypeSelectionScreen } from "../screens/account-type-selection"
 import { GetStartedScreen } from "../screens/get-started-screen"
 import { HomeScreen } from "../screens/home-screen"
 import { MapScreen } from "../screens/map-screen/map-screen"
@@ -81,18 +81,73 @@ import { PriceHistoryScreen } from "../screens/price/price-history-screen"
 import { ScanningQRCodeScreen } from "../screens/send-bitcoin-screen"
 import { SettingsScreen } from "../screens/settings-screen"
 import { LanguageScreen } from "../screens/settings-screen/language-screen"
+import { SelectionScreen } from "../screens/settings-screen/selection-screen"
 import { SecurityScreen } from "../screens/settings-screen/security-screen"
 import { TransactionDetailScreen } from "../screens/transaction-detail-screen"
+import { TemporarilyUnavailableScreen } from "../screens/feature-unavailable/temporarily-unavailable-screen"
+import { StableBalanceSettingsScreen } from "../screens/stable-balance-settings-screen"
 import { TransactionHistoryScreen } from "../screens/transaction-history/transaction-history-screen"
+import { UnclaimedDepositsScreen } from "../screens/unclaimed-deposits/unclaimed-deposits-screen"
 
+import { OfflineGate } from "@app/self-custodial/components"
+import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unavailable"
+import { usePersistentStateContext } from "@app/store/persistent-state"
+import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
+import { headerCloseControl } from "@app/components/header-close-control"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
+import {
+  CardAddToMobileWalletScreen,
+  CardChangePinScreen,
+  CardCreatePinScreen,
+  OrderCardScreen,
+  ReplaceCardScreen,
+  CardDetailsScreen,
+  CardLimitsScreen,
+  CardPersonalDetailsScreen,
+  CardSettingsScreen,
+  CardShippingAddressScreen,
+  CardStatementsScreen,
+  CardStatusScreen,
+  CardTransactionDetailsScreen,
+} from "@app/screens/card-screen"
+import {
+  CardIntroducingScreen,
+  CardDetailsScreen as OnboardingCardDetailsScreen,
+  WelcomeOnboardScreen,
+  CardSubscriptionScreen,
+  LoadingCardScreen,
+  CardPersonalInformationScreen,
+  CardPreapprovedScreen,
+  CardProcessingScreen,
+  CardApprovedScreen,
+} from "@app/screens/card-screen/onboarding"
 import {
   WelcomeLevel1Screen,
   EmailBenefitsScreen,
   LightningBenefitsScreen,
   SupportOnboardingScreen,
 } from "@app/screens/onboarding-screen"
+import {
+  BackupMethodScreen,
+  CloudBackupScreen,
+  BackupSecurityChecksScreen,
+  BackupPhraseScreen,
+  ViewBackupSecurityChecksScreen,
+  ViewBackupPhraseScreen,
+  BackupPhraseConfirmScreen,
+  BackupSuccessScreen,
+  WalletCreationScreen,
+} from "@app/screens/self-custodial/onboarding"
+import {
+  RestoreMethodScreen,
+  RestorePhraseScreen,
+  CloudRestoreScreen,
+} from "@app/screens/self-custodial/onboarding/restore"
+import {
+  MigrationExplainerScreen,
+  TransferringFundsScreen,
+} from "@app/screens/account-migration"
 import {
   OnboardingStackParamList,
   PeopleStackParamList,
@@ -105,7 +160,27 @@ import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
 
-const RootNavigator = createStackNavigator<RootStackParamList>()
+const RootNavigator = createNativeStackNavigator<RootStackParamList>()
+
+const withOfflineGate = <P extends object>(Screen: React.ComponentType<P>) => {
+  const Gated: React.FC<P> = (props) => (
+    <OfflineGate>
+      <Screen {...props} />
+    </OfflineGate>
+  )
+  Gated.displayName = `OfflineGated(${Screen.displayName ?? Screen.name ?? "Screen"})`
+  return Gated
+}
+
+const ScanningQRCodeGated = withOfflineGate(ScanningQRCodeScreen)
+const SendBitcoinDestinationGated = withOfflineGate(SendBitcoinDestinationScreen)
+const SendBitcoinDetailsGated = withOfflineGate(SendBitcoinDetailsScreen)
+const SendBitcoinConfirmationGated = withOfflineGate(SendBitcoinConfirmationScreen)
+const ReceiveGated = withOfflineGate(ReceiveScreen)
+const RedeemBitcoinDetailGated = withOfflineGate(RedeemBitcoinDetailScreen)
+const ConversionDetailsGated = withOfflineGate(ConversionDetailsScreen)
+const ConversionConfirmationGated = withOfflineGate(ConversionConfirmationScreen)
+const UnclaimedDepositsGated = withOfflineGate(UnclaimedDepositsScreen)
 
 export const RootStack = () => {
   const styles = useStyles()
@@ -114,27 +189,37 @@ export const RootStack = () => {
   } = useTheme()
   const isAuthed = useIsAuthed()
   const { LL } = useI18nContext()
-  const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinDestination">>()
+  const { persistentState } = usePersistentStateContext()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  const hasAccount = isAuthed || Boolean(persistentState.activeAccountId)
+  const shouldShowUnavailable = useSelfCustodialUnavailable()
+
+  if (shouldShowUnavailable) {
+    return <TemporarilyUnavailableScreen />
+  }
+
   return (
     <RootNavigator.Navigator
       screenOptions={{
         gestureEnabled: true,
         headerBackTitle: LL.common.back(),
-        headerBackTestID: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
-        headerMode: "screen",
         headerLeft: headerBackControl(),
       }}
-      initialRouteName={isAuthed ? "authenticationCheck" : "getStarted"}
+      initialRouteName={hasAccount ? "authenticationCheck" : "getStarted"}
     >
       <RootNavigator.Screen
         name="getStarted"
         component={GetStartedScreen}
         options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="accountTypeSelection"
+        component={AccountTypeSelectionScreen}
+        options={{ title: "" }}
       />
       <RootNavigator.Screen
         name="authenticationCheck"
@@ -173,16 +258,15 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="scanningQRCode"
-        component={ScanningQRCodeScreen}
+        component={ScanningQRCodeGated}
         options={{
           title: LL.ScanningQRCodeScreen.title(),
           headerShown: false,
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
         }}
       />
       <RootNavigator.Screen
         name="sendBitcoinDestination"
-        component={SendBitcoinDestinationScreen}
+        component={SendBitcoinDestinationGated}
         options={{
           title: LL.SendBitcoinScreen.destinationScreenTitle(),
           headerRight: () => (
@@ -197,12 +281,12 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="sendBitcoinDetails"
-        component={SendBitcoinDetailsScreen}
+        component={SendBitcoinDetailsGated}
         options={{ title: LL.SendBitcoinScreen.title() }}
       />
       <RootNavigator.Screen
         name="sendBitcoinConfirmation"
-        component={SendBitcoinConfirmationScreen}
+        component={SendBitcoinConfirmationGated}
         options={{ title: LL.SendBitcoinScreen.title() }}
       />
       <RootNavigator.Screen
@@ -212,7 +296,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="receiveBitcoin"
-        component={ReceiveScreen}
+        component={ReceiveGated}
         options={{
           title: LL.ReceiveScreen.title(),
         }}
@@ -226,7 +310,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="redeemBitcoinDetail"
-        component={RedeemBitcoinDetailScreen}
+        component={RedeemBitcoinDetailGated}
         options={{
           title: LL.RedeemBitcoinScreen.title(),
         }}
@@ -240,14 +324,14 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="conversionDetails"
-        component={ConversionDetailsScreen}
+        component={ConversionDetailsGated}
         options={{
           title: LL.ConversionDetailsScreen.title(),
         }}
       />
       <RootNavigator.Screen
         name="conversionConfirmation"
-        component={ConversionConfirmationScreen}
+        component={ConversionConfirmationGated}
         options={{
           title: LL.ConversionConfirmationScreen.title(),
         }}
@@ -264,14 +348,12 @@ export const RootStack = () => {
         name="earnsSection"
         component={EarnSection}
         options={{
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
           headerStyle: { backgroundColor: colors._blue },
           headerTintColor: colors._white,
           headerTitleStyle: {
             fontWeight: "bold",
             fontSize: 18,
           },
-          headerBackTitleStyle: { color: colors._white },
         }}
       />
       <RootNavigator.Screen
@@ -279,7 +361,7 @@ export const RootStack = () => {
         component={EarnQuiz}
         options={{
           headerShown: false,
-          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          animation: "slide_from_bottom",
         }}
       />
       <RootNavigator.Screen
@@ -337,7 +419,7 @@ export const RootStack = () => {
         component={SectionCompleted}
         options={{
           headerShown: false,
-          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          animation: "slide_from_bottom",
         }}
       />
       <RootNavigator.Screen
@@ -364,8 +446,12 @@ export const RootStack = () => {
         component={TransactionDetailScreen}
         options={{
           headerShown: false,
-          // cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS,
         }}
+      />
+      <RootNavigator.Screen
+        name="unclaimedDepositsScreen"
+        component={UnclaimedDepositsGated}
+        options={{ title: LL.UnclaimedDeposit.screenTitle() }}
       />
       <RootNavigator.Screen
         name="transactionHistory"
@@ -373,7 +459,7 @@ export const RootStack = () => {
         options={{
           title: LL.TransactionScreen.transactionHistoryTitle(),
           presentation: "modal",
-          cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+          animation: "slide_from_bottom",
           gestureEnabled: false,
         }}
       />
@@ -381,8 +467,6 @@ export const RootStack = () => {
         name="priceHistory"
         component={PriceHistoryScreen}
         options={{
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-          gestureDirection: "horizontal-inverted",
           title: LL.common.bitcoinPrice(),
         }}
       />
@@ -500,15 +584,254 @@ export const RootStack = () => {
         options={{ title: LL.NotificationHistory.title() }}
       />
       <RootNavigator.Screen
+        name="cardDashboardScreen"
+        component={CardDashboardScreen}
+        options={{
+          title: LL.CardFlow.CardDashboard.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardDetailsScreen"
+        component={CardDetailsScreen}
+        options={{ title: LL.CardFlow.CardDetails.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardLimitsScreen"
+        component={CardLimitsScreen}
+        options={{ title: LL.CardFlow.CardLimits.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardAddToMobileWalletScreen"
+        component={CardAddToMobileWalletScreen}
+        options={{ title: LL.CardFlow.AddToMobileWallet.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardPersonalDetailsScreen"
+        component={CardPersonalDetailsScreen}
+        options={{ title: LL.CardFlow.PersonalDetails.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardSettingsScreen"
+        component={CardSettingsScreen}
+        options={{ title: LL.CardFlow.CardSettings.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardStatementsScreen"
+        component={CardStatementsScreen}
+        options={{ title: LL.CardFlow.CardStatements.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardTransactionDetailsScreen"
+        component={CardTransactionDetailsScreen}
+        options={{ title: LL.CardFlow.TransactionDetails.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardStatusScreen"
+        component={CardStatusScreen}
+        options={{ title: LL.CardFlow.CardStatus.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardShippingAddressScreen"
+        component={CardShippingAddressScreen}
+        options={{ title: LL.CardFlow.ShippingAddress.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardCreatePinScreen"
+        component={CardCreatePinScreen}
+        options={{ title: LL.CardFlow.PinScreens.CreateFlow.title() }}
+      />
+      <RootNavigator.Screen
+        name="cardChangePinScreen"
+        component={CardChangePinScreen}
+        options={{ title: LL.CardFlow.PinScreens.ChangeFlow.title() }}
+      />
+      <RootNavigator.Screen
+        name="orderCardScreen"
+        component={OrderCardScreen}
+        options={{ title: LL.CardFlow.OrderPhysicalCard.title() }}
+      />
+      <RootNavigator.Screen
+        name="replaceCardScreen"
+        component={ReplaceCardScreen}
+        options={{ title: LL.CardFlow.ReplaceCard.title() }}
+      />
+      <RootNavigator.Screen
+        name="selectionScreen"
+        component={SelectionScreen}
+        options={({ route }) => ({ title: route.params.title })}
+      />
+      <RootNavigator.Screen
         name="onboarding"
         component={OnboardingNavigator}
         options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingIntroducingScreen"
+        component={CardIntroducingScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.CardIntroducing.title(),
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingDetailsScreen"
+        component={OnboardingCardDetailsScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.CardDetails.title(),
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingWelcomeScreen"
+        component={WelcomeOnboardScreen}
+        options={{
+          title: "",
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingSubscribeScreen"
+        component={CardSubscriptionScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.CardSubscription.subscribeTitle(),
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingPaymentScreen"
+        component={CardSubscriptionScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.CardSubscription.paymentTitle(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingLoadingScreen"
+        component={LoadingCardScreen}
+        options={{
+          title: "",
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingPersonalInfoScreen"
+        component={CardPersonalInformationScreen}
+        options={{
+          title: LL.CardFlow.Onboarding.PersonalInformation.title(),
+          headerLeft: () => <></>,
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingProcessingScreen"
+        component={CardProcessingScreen}
+        options={{
+          title: "",
+          headerLeft: () => <></>,
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingPreapprovedScreen"
+        component={CardPreapprovedScreen}
+        options={{
+          title: "",
+          headerLeft: () => <></>,
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingApprovedScreen"
+        component={CardApprovedScreen}
+        options={{
+          title: LL.CardFlow.CardStatus.title(),
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialBackupMethod"
+        component={BackupMethodScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialCloudBackup"
+        component={CloudBackupScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialBackupSecurityChecks"
+        component={BackupSecurityChecksScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialBackupPhrase"
+        component={BackupPhraseScreen}
+        options={{
+          title: LL.BackupScreen.ManualBackup.Phrase.headerTitle(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialViewBackupSecurityChecks"
+        component={ViewBackupSecurityChecksScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialViewBackupPhrase"
+        component={ViewBackupPhraseScreen}
+        options={{
+          title: LL.BackupScreen.ManualBackup.Phrase.headerTitle(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialBackupPhraseConfirm"
+        component={BackupPhraseConfirmScreen}
+        options={{
+          title: LL.BackupScreen.ManualBackup.Confirm.headerTitle(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialBackupSuccess"
+        component={BackupSuccessScreen}
+        options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialWalletCreation"
+        component={WalletCreationScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="stableBalanceSettings"
+        component={StableBalanceSettingsScreen}
+        options={{ title: LL.StableBalance.settingsTitle() }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationExplainer"
+        component={MigrationExplainerScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationTransferringFunds"
+        component={TransferringFundsScreen}
+        options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialRestoreMethod"
+        component={RestoreMethodScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialRestorePhrase"
+        component={RestorePhraseScreen}
+        options={{ title: LL.RestoreScreen.phraseTitle(), headerRight: () => null }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialCloudRestore"
+        component={CloudRestoreScreen}
+        options={{ title: "" }}
       />
     </RootNavigator.Navigator>
   )
 }
 
-const Onboarding = createStackNavigator<OnboardingStackParamList>()
+const Onboarding = createNativeStackNavigator<OnboardingStackParamList>()
 
 export const OnboardingNavigator = () => {
   const { LL } = useI18nContext()
@@ -522,10 +845,8 @@ export const OnboardingNavigator = () => {
       screenOptions={{
         gestureEnabled: true,
         headerBackTitle: LL.common.back(),
-        headerBackTestID: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
       }}
     >
@@ -564,7 +885,7 @@ export const OnboardingNavigator = () => {
   )
 }
 
-const StackContacts = createStackNavigator<PeopleStackParamList>()
+const StackContacts = createNativeStackNavigator<PeopleStackParamList>()
 
 export const ContactNavigator = () => {
   const { LL } = useI18nContext()
@@ -578,10 +899,8 @@ export const ContactNavigator = () => {
       screenOptions={{
         gestureEnabled: true,
         headerBackTitle: LL.common.back(),
-        headerBackTestID: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
         headerLeft: headerBackControl(),
       }}
@@ -617,7 +936,7 @@ export const ContactNavigator = () => {
     </StackContacts.Navigator>
   )
 }
-const StackPhoneValidation = createStackNavigator<PhoneValidationStackParamList>()
+const StackPhoneValidation = createNativeStackNavigator<PhoneValidationStackParamList>()
 
 export const PhoneLoginNavigator = () => {
   const { LL } = useI18nContext()
@@ -637,10 +956,8 @@ export const PhoneLoginNavigator = () => {
       screenOptions={{
         gestureEnabled: true,
         headerBackTitle: LL.common.back(),
-        headerBackTestID: LL.common.back(),
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
-        headerBackTitleStyle: styles.title,
         headerTintColor: colors.black,
         headerLeft: headerBackControl(),
       }}
@@ -711,7 +1028,7 @@ export const PrimaryNavigator = () => {
         options={{
           title: LL.HomeScreen.title(),
           tabBarAccessibilityLabel: LL.HomeScreen.title(),
-          tabBarTestID: LL.HomeScreen.title(),
+          tabBarButtonTestID: LL.HomeScreen.title(),
           tabBarIcon: ({ color }: { color: string }) => (
             <HomeIcon {...testProps("Home")} fill={color} color={color} />
           ),
@@ -725,7 +1042,7 @@ export const PrimaryNavigator = () => {
           headerShown: false,
           title: LL.PeopleScreen.title(),
           tabBarAccessibilityLabel: LL.PeopleScreen.title(),
-          tabBarTestID: LL.PeopleScreen.title(),
+          tabBarButtonTestID: LL.PeopleScreen.title(),
           tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
             <PeopleTabIcon color={color} focused={focused} />
           ),
@@ -738,7 +1055,7 @@ export const PrimaryNavigator = () => {
           title: LL.MapScreen.title(),
           headerShown: false,
           tabBarAccessibilityLabel: LL.MapScreen.title(),
-          tabBarTestID: LL.MapScreen.title(),
+          tabBarButtonTestID: LL.MapScreen.title(),
           tabBarIcon: ({ color }: { color: string }) => <MapIcon color={color} />,
         }}
       />
@@ -749,7 +1066,7 @@ export const PrimaryNavigator = () => {
           title: LL.EarnScreen.title(),
           headerShown: false,
           tabBarAccessibilityLabel: LL.EarnScreen.title(),
-          tabBarTestID: LL.EarnScreen.title(),
+          tabBarButtonTestID: LL.EarnScreen.title(),
           tabBarIcon: ({ color }: { color: string }) => (
             <LearnIcon {...testProps("Earn")} color={color} />
           ),

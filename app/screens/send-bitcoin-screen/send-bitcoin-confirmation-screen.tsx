@@ -9,15 +9,11 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import GaloySliderButton from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 import { PaymentDestinationDisplay } from "@app/components/payment-destination-display"
 import { Screen } from "@app/components/screen"
+import { WarningBanner } from "@app/components/warning-banner"
 import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
-import {
-  useSendBitcoinConfirmationScreenQuery,
-  WalletCurrency,
-} from "@app/graphql/generated"
+import { WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
-import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useClipboard, useDisplayCurrency } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -29,17 +25,18 @@ import {
   multiplyMoneyAmounts,
   toBtcMoneyAmount,
   toUsdMoneyAmount,
+  ZeroBtcMoneyAmount,
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
+import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
-import { toastShow } from "@app/utils/toast"
-import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
+import { useSendBalances } from "./hooks/use-send-wallets"
 import useFee from "./use-fee"
 import { useSendPayment } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
@@ -70,7 +67,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const styles = useStyles()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinConfirmation">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "sendBitcoinConfirmation">
+    >()
 
   const { hideAmount } = useHideAmount()
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
@@ -97,10 +96,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   } = useDisplayCurrency()
   const saveLnAddressContact = useSaveLnAddressContact()
 
-  const { data } = useSendBitcoinConfirmationScreenQuery({ skip: !useIsAuthed() })
-
-  const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
-  const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
+  const { btcWallet, usdWallet } = useSendBalances()
 
   const btcBalanceMoneyAmount = toBtcMoneyAmount(btcWallet?.balance)
 
@@ -120,8 +116,27 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
   const { LL } = useI18nContext()
+  const translateSdkError = useTranslateSdkError()
+  const { copyToClipboard } = useClipboard()
 
   const fee = useFee(getFee)
+
+  const settledFee = fee.status === "set" ? fee : undefined
+
+  const dustWarning = useSendDustWarning({
+    amountAdjustment: settledFee?.amountAdjustment,
+    fromCurrency: sendingWalletDescriptor.currency,
+    fromWalletBalance: usdWallet?.balance,
+    unitOfAccountAmount,
+    settlementAmount: settlementAmount.amount,
+    feeSats: settledFee?.amount.amount,
+    usdBalanceMoneyAmount,
+  })
+
+  const feeUnavailable =
+    fee.status === "loading" || (fee.status === "error" && !fee.amount)
+  const dustNotEvaluable =
+    dustWarning.status === "pending" || dustWarning.status === "blocked"
 
   const defaultAmount = formatMoneyAmount({ moneyAmount: ZeroUsdMoneyAmount })
   let currencyFeeAmount = defaultAmount
@@ -211,8 +226,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               params: {
                 arrivalAtMempoolEstimate: extraInfo?.arrivalAtMempoolEstimate,
                 status,
-                successAction: paymentDetail?.successAction,
+                successAction: extraInfo?.successAction ?? paymentDetail?.successAction,
                 preimage: extraInfo?.preimage,
+                note,
                 currencyAmount,
                 satAmount,
                 currencyFeeAmount,
@@ -251,7 +267,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       }
 
       setPaymentError(
-        errorsMessage || LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
+        translateSdkError(errorsMessage) ||
+          LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
       )
       ReactNativeHapticFeedback.trigger("notificationError", {
         ignoreAndroidSystemSettings: true,
@@ -283,20 +300,35 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     satAmount,
     currencyFeeAmount,
     satFeeAmount,
+    note,
+    translateSdkError,
   ])
 
   let validAmount = true
   let invalidAmountErrorMessage = ""
 
+  const zeroSettlementAmount = moneyAmountIsCurrencyType(
+    settlementAmount,
+    WalletCurrency.Btc,
+  )
+    ? ZeroBtcMoneyAmount
+    : ZeroUsdMoneyAmount
+
+  const feeInSettlementCurrency = fee.amount
+    ? paymentDetail.convertMoneyAmount(fee.amount, settlementAmount.currency)
+    : zeroSettlementAmount
+
   const totalAmount = addMoneyAmounts({
     a: settlementAmount,
-    b: fee.amount || ZeroUsdMoneyAmount,
+    b: feeInSettlementCurrency,
   })
+
+  const skipBalanceCheck = isSendingMax || hasAttemptedSend
 
   if (
     moneyAmountIsCurrencyType(settlementAmount, WalletCurrency.Btc) &&
     btcBalanceMoneyAmount &&
-    !isSendingMax
+    !skipBalanceCheck
   ) {
     validAmount = lessThanOrEqualTo({
       value: totalAmount,
@@ -312,7 +344,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   if (
     moneyAmountIsCurrencyType(settlementAmount, WalletCurrency.Usd) &&
     usdBalanceMoneyAmount &&
-    !isSendingMax
+    !skipBalanceCheck
   ) {
     validAmount = lessThanOrEqualTo({
       value: totalAmount,
@@ -325,12 +357,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     }
   }
 
-  const copyToClipboard = () => {
-    Clipboard.setString(destination)
-    toastShow({
-      type: "success",
+  const handleCopyToClipboard = () => {
+    copyToClipboard({
+      content: destination,
       message: LL.SendBitcoinConfirmationScreen.copiedDestination(),
-      LL,
     })
   }
 
@@ -341,6 +371,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     if (paymentType === "onchain") return LL.common.onchain()
     if (paymentType === "lightning") return LL.common.lightning()
     if (paymentType === "lnurl") return LL.common.lightning()
+    if (paymentType === "spark") return LL.common.spark()
   }
 
   const isLightningRecommended = () => {
@@ -363,16 +394,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const LightningRecommendedComponent = isLightningRecommended() ? (
     <View style={styles.feeWarning}>
-      <GaloyIcon name="warning" size={18} color={colors.warning} />
-      <Text
-        type="p3"
-        style={styles.feeWarningText}
-        numberOfLines={1}
-        ellipsizeMode="tail"
-      >
-        {" "}
+      <WarningBanner numberOfLines={1}>
         {LL.SendBitcoinConfirmationScreen.lightningRecommended()}
-      </Text>
+      </WarningBanner>
     </View>
   ) : (
     <></>
@@ -392,7 +416,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
             />
             <TouchableOpacity
               style={styles.iconContainer}
-              onPress={copyToClipboard}
+              onPress={handleCopyToClipboard}
               hitSlop={30}
             >
               <GaloyIcon name={"copy-paste"} size={18} color={colors.primary} />
@@ -488,6 +512,19 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           )}
         </View>
 
+        {dustWarning.status === "visible" ? (
+          <View style={styles.fieldContainer}>
+            <WarningBanner>
+              {LL.SendBitcoinConfirmationScreen.usdRemainderSweep({
+                remaining: formatMoneyAmount({ moneyAmount: dustWarning.remaining }),
+                remainingSats: formatMoneyAmount({
+                  moneyAmount: dustWarning.remainingSats,
+                }),
+                minimum: formatMoneyAmount({ moneyAmount: dustWarning.minimum }),
+              })}
+            </WarningBanner>
+          </View>
+        ) : null}
         {errorMessage ? (
           <View style={styles.errorContainer}>
             <Text type="p2" style={styles.errorText}>
@@ -504,7 +541,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 initialText={LL.SendBitcoinConfirmationScreen.slideToConfirm()}
                 loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
                 onSwipe={handleSendPayment}
-                disabled={!validAmount || hasAttemptedSend}
+                disabled={
+                  !validAmount || hasAttemptedSend || feeUnavailable || dustNotEvaluable
+                }
               />
             </View>
           </PanGestureHandler>
@@ -571,8 +610,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "flex-end",
   },
   errorContainer: {
-    marginVertical: 20,
-    flex: 1,
+    padding: 20,
   },
   errorText: {
     color: colors.error,
@@ -602,13 +640,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   feeWarning: {
     paddingBottom: 4,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
     flex: 0.95,
-  },
-  feeWarningText: {
-    color: colors.warning,
   },
   feeTextContainer: {
     flexDirection: "row",

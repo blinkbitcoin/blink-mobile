@@ -2,6 +2,7 @@ import { bech32 } from "bech32"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { BtcMoneyAmount } from "@app/types/amounts"
+import { getLightningAddress } from "@app/utils/pay-links"
 
 import { getPaymentRequestFullUri, prToDateString } from "./helpers"
 import {
@@ -214,6 +215,7 @@ export const createPaymentRequest = (
 
       // Paycode
     } else if (pr.type === Invoice.PayCode && pr.username) {
+      const username = pr.username
       const queryStringForAmount =
         pr.unitOfAccountAmount === undefined || pr.unitOfAccountAmount.amount === 0
           ? ""
@@ -225,7 +227,7 @@ export const createPaymentRequest = (
             "lnurl",
             bech32.toWords(
               Buffer.from(
-                `${pr.posUrl}/.well-known/lnurlp/${pr.username}${
+                `${pr.posUrl}/.well-known/lnurlp/${username}${
                   queryStringForAmount ? `?${queryStringForAmount}` : ""
                 }`,
                 "utf8",
@@ -250,12 +252,12 @@ export const createPaymentRequest = (
           prefix,
         })
       const getCopyableInvoiceFn: GetCopyableInvoiceFn = () =>
-        `${pr.username}@${pr.lnAddressHostname}`
+        getLightningAddress(pr.lnAddressHostname, username)
 
       info = {
         data: {
           invoiceType: Invoice.PayCode,
-          username: pr.username,
+          username,
           getCopyableInvoiceFn,
           getFullUriFn,
         },

@@ -1,9 +1,12 @@
 import React from "react"
 import { getStorybookUI } from "@storybook/react-native"
 
+// Set global flag to detect Storybook environment in theme
+;(global as typeof globalThis & { STORYBOOK_ENABLED?: boolean }).STORYBOOK_ENABLED = true
+
 import { NavigationContainer } from "@react-navigation/native"
 import { ThemeProvider } from "@rn-vui/themed"
-import { createStackNavigator } from "@react-navigation/stack"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import theme from "@app/rne-theme/theme"
 import TypesafeI18n from "@app/i18n/i18n-react"
 
@@ -26,7 +29,7 @@ const StorybookUI = getStorybookUI({
   shouldPersistSelection: false,
 })
 
-const Stack = createStackNavigator()
+const Stack = createNativeStackNavigator()
 
 const ThemeWrapper: React.FC<React.PropsWithChildren> = ({ children }) => (
   <ThemeProvider theme={theme}>{children}</ThemeProvider>
@@ -47,7 +50,7 @@ export const StorybookUIRoot: React.FC = () => (
                 name="Home"
                 options={{
                   headerShown: false,
-                  animationEnabled: false,
+                  animation: "none",
                 }}
                 component={StorybookUI}
               />

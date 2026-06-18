@@ -1,6 +1,6 @@
 import * as React from "react"
 import { RouteProp, useFocusEffect, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -22,7 +22,7 @@ export const SupportOnboardingScreen: React.FC<SupportOnboardingScreenProps> = (
   const { LL } = useI18nContext()
   const styles = useStyles()
 
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { feedbackEmailAddress } = useRemoteConfig()
 
   const canGoBack = route.params?.canGoBack ?? true

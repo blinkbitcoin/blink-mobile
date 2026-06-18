@@ -1,10 +1,10 @@
 import React from "react"
 import { View, TouchableOpacity, StyleSheet } from "react-native"
 import { Text, useTheme } from "@rn-vui/themed"
-import Clipboard from "@react-native-clipboard/clipboard"
+
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { toastShow } from "@app/utils/toast"
 
 type Props = {
   secret: string
@@ -12,18 +12,10 @@ type Props = {
 
 export const CopySecretComponent: React.FC<Props> = ({ secret }) => {
   const { LL } = useI18nContext()
+  const { copyToClipboard } = useClipboard()
   const {
     theme: { colors },
   } = useTheme()
-
-  const copyToClipboard = () => {
-    Clipboard.setString(secret)
-    toastShow({
-      type: "success",
-      message: LL.CopySecretComponent.toastMessage(),
-      LL,
-    })
-  }
 
   return (
     <View style={styles.container}>
@@ -31,7 +23,12 @@ export const CopySecretComponent: React.FC<Props> = ({ secret }) => {
         <Text type="p2">{LL.TotpRegistrationInitiateScreen.secret()}</Text>
         <TouchableOpacity
           style={[styles.secretContainer, { backgroundColor: colors.grey5 }]}
-          onPress={copyToClipboard}
+          onPress={() =>
+            copyToClipboard({
+              content: secret,
+              message: LL.CopySecretComponent.toastMessage(),
+            })
+          }
           activeOpacity={0.7}
         >
           <Text

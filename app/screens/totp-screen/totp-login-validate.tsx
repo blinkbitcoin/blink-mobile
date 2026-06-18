@@ -7,7 +7,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import analytics from "@react-native-firebase/analytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 type Props = {
   route: RouteProp<RootStackParamList, "totpLoginValidate">
@@ -15,7 +15,7 @@ type Props = {
 
 export const TotpLoginValidateScreen: React.FC<Props> = ({ route }) => {
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "totpLoginValidate">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "totpLoginValidate">>()
 
   const [errorMessage, setErrorMessage] = useState<string>("")
   const { saveProfile } = useSaveSessionProfile()

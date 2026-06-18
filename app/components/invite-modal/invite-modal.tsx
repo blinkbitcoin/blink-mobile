@@ -9,19 +9,18 @@ import {
 } from "react-native"
 import Modal from "react-native-modal"
 import QRCode from "react-native-qrcode-svg"
-import Icon from "react-native-vector-icons/Ionicons"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 import { gql } from "@apollo/client"
 import Logo from "@app/assets/logo/blink-logo-icon.png"
 import { getInviteLink } from "@app/config/appinfo"
 import { useInviteQuery } from "@app/graphql/generated"
+import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PeopleStackParamList } from "@app/navigation/stack-param-lists"
-import { toastShow } from "@app/utils/toast"
-import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
@@ -44,6 +43,7 @@ gql`
 
 export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
   const { LL } = useI18nContext()
+  const { copyToClipboard } = useClipboard()
 
   const { data } = useInviteQuery()
 
@@ -52,7 +52,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
   } = useTheme()
   const styles = useStyles()
 
-  const navigation = useNavigation<StackNavigationProp<PeopleStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<PeopleStackParamList>>()
 
   const acknowledgeModal = () => {
     setIsVisible(false)
@@ -70,12 +70,10 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
 
   const inviteLink = getInviteLink(data?.me?.username)
 
-  const copyToClipboard = () => {
-    Clipboard.setString(inviteLink)
-    toastShow({
-      type: "success",
+  const handleCopyToClipboard = () => {
+    copyToClipboard({
+      content: inviteLink,
       message: LL.Circles.copiedInviteLink(),
-      LL,
     })
   }
 
@@ -118,7 +116,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
               <GaloyIconButton name="close" size="medium" onPress={acknowledgeModal} />
             </View>
           </View>
-          <PressableCard onPress={copyToClipboard}>
+          <PressableCard onPress={handleCopyToClipboard}>
             <View style={styles.qrCard}>
               <QRCode
                 size={getQrSize()}
@@ -138,9 +136,9 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
 
           <View style={styles.actions}>
             <View style={styles.copyContainer}>
-              <TouchableOpacity onPress={copyToClipboard}>
+              <TouchableOpacity onPress={handleCopyToClipboard}>
                 <Text color={colors.grey2}>
-                  <Icon color={colors.grey2} name="copy-outline" />
+                  <GaloyIcon name="copy-paste" size={16} color={colors.grey2} />
                   <Text> </Text>
                   {LL.PeopleScreen.copy()}
                 </Text>
@@ -149,7 +147,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
             <View style={styles.shareContainer}>
               <TouchableOpacity onPress={share}>
                 <Text color={colors.grey2}>
-                  <Icon color={colors.grey2} name="share-outline" />
+                  <GaloyIcon name="share" size={16} color={colors.grey2} />
                   <Text> </Text>
                   {LL.Circles.share()}
                 </Text>

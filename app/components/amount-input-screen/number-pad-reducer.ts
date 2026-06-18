@@ -1,3 +1,5 @@
+import { WalletCurrency } from "@app/graphql/generated"
+import { CurrencyInfo } from "@app/hooks/use-display-currency"
 import { WalletOrDisplayCurrency } from "@app/types/amounts"
 
 export type NumberPadNumber = {
@@ -63,6 +65,62 @@ export type Key = (typeof Key)[keyof typeof Key]
 
 export type NumberPadReducerActionType =
   (typeof NumberPadReducerActionType)[keyof typeof NumberPadReducerActionType]
+
+export const parseStringToNumberPad = (value: string): NumberPadNumber => {
+  const trimmed = value.trim()
+  const match = /^(\d*)(?:\.(\d*))?$/.exec(trimmed)
+
+  if (!match) return { majorAmount: "", minorAmount: "", hasDecimal: false }
+
+  return {
+    majorAmount: match[1] || "",
+    minorAmount: match[2] || "",
+    hasDecimal: trimmed.includes("."),
+  }
+}
+
+export const numberPadToString = (numberPadNumber: NumberPadNumber): string => {
+  const { majorAmount, minorAmount, hasDecimal } = numberPadNumber
+  if (hasDecimal) {
+    return `${majorAmount || "0"}.${minorAmount}`
+  }
+  return majorAmount || "0"
+}
+
+export const formatNumberPadNumber = ({
+  numberPadNumber,
+  currency,
+  currencyInfo,
+  noSuffix = false,
+}: {
+  numberPadNumber: NumberPadNumber
+  currency: WalletOrDisplayCurrency
+  currencyInfo: Record<WalletOrDisplayCurrency, CurrencyInfo>
+  noSuffix?: boolean
+}) => {
+  const { majorAmount, minorAmount, hasDecimal } = numberPadNumber
+  const currencyCode =
+    currency === WalletCurrency.Btc && !noSuffix
+      ? currencyInfo[currency].currencyCode
+      : undefined
+
+  if (!majorAmount && !minorAmount && !hasDecimal && !currencyCode) return ""
+
+  const major = Number(majorAmount || "0").toLocaleString()
+  const suffix = currencyCode ? ` ${currencyCode}` : ""
+  return hasDecimal ? `${major}.${minorAmount}${suffix}` : `${major}${suffix}`
+}
+
+export const getDisabledKeys = ({
+  numberPadNumber,
+  numberOfDecimalsAllowed,
+}: NumberPadReducerState): ReadonlySet<Key> => {
+  const { majorAmount, minorAmount, hasDecimal } = numberPadNumber
+  const keys = new Set<Key>()
+  if (!majorAmount && !minorAmount && !hasDecimal) keys.add(Key.Backspace)
+  if (numberOfDecimalsAllowed === 0 || hasDecimal) keys.add(Key.Decimal)
+  return keys
+}
 
 export const numberPadReducer = (
   state: NumberPadReducerState,

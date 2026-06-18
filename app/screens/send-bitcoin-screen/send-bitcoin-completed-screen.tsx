@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { View, Alert, ScrollView } from "react-native"
 import InAppReview from "react-native-in-app-review"
-import ViewShot from "react-native-view-shot"
+import ViewShot, { type ViewShotRef } from "react-native-view-shot"
 
 import { useApolloClient } from "@apollo/client"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -21,7 +21,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logAppFeedback } from "@app/utils/analytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
@@ -302,13 +302,14 @@ const HeaderSection: React.FC<{
 
 const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
   const [showSuccessIcon, setShowSuccessIcon] = useState(true)
-  const viewRef = useRef<View>(null)
+  const viewRef = useRef<ViewShotRef>(null)
 
   const {
     arrivalAtMempoolEstimate,
     status: statusRaw,
     successAction,
     preimage,
+    note,
     currencyAmount,
     satAmount,
     currencyFeeAmount,
@@ -323,7 +324,7 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     theme: { mode },
   } = useTheme()
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinCompleted">>()
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "sendBitcoinCompleted">>()
   const { LL } = useI18nContext()
 
   const feedbackShownData = useFeedbackModalShownQuery()
@@ -332,7 +333,9 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
 
   const status = processStatus({ arrivalAtMempoolEstimate, status: statusRaw })
   const usernameTitle = data?.me?.username || LL.common.blinkUser()
-  const noteMessage = useSuccessMessage(successAction, preimage)
+  const successActionMessage = useSuccessMessage(successAction, preimage)
+  /** The Note shows the LNURL success action if present, otherwise the payment memo. */
+  const noteMessage = successActionMessage || note?.trim() || ""
   const Logo = mode === "dark" ? LogoDarkMode : LogoLightMode
 
   const { requestFeedback, showSuggestionModal, setShowSuggestionModal } =
@@ -429,6 +432,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   viewShot: {
     flexGrow: 1,
+    backgroundColor: colors.white,
   },
   completedText: {
     textAlign: "center",

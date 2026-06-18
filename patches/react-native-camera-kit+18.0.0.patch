@@ -1,0 +1,20 @@
+diff --git a/node_modules/react-native-camera-kit/ios/ReactNativeCameraKit/RealCamera.swift b/node_modules/react-native-camera-kit/ios/ReactNativeCameraKit/RealCamera.swift
+index cc722c6..6a9f4dc 100644
+--- a/node_modules/react-native-camera-kit/ios/ReactNativeCameraKit/RealCamera.swift
++++ b/node_modules/react-native-camera-kit/ios/ReactNativeCameraKit/RealCamera.swift
+@@ -721,6 +721,7 @@ class RealCamera: NSObject, CameraProtocol, AVCaptureMetadataOutputObjectsDelega
+     }
+ 
+     private func applyDeferredStartConfiguration() {
++#if compiler(>=6.2)
+         guard #available(iOS 26.0, *) else { return }
+ 
+         let enableDeferredStart = deferredStartEnabled
+@@ -732,6 +733,7 @@ class RealCamera: NSObject, CameraProtocol, AVCaptureMetadataOutputObjectsDelega
+         if metadataOutput.isDeferredStartSupported {
+             metadataOutput.isDeferredStartEnabled = enableDeferredStart
+         }
++#endif
+     }
+ 
+     private func defaultZoomFactor(for videoDevice: AVCaptureDevice) -> CGFloat {

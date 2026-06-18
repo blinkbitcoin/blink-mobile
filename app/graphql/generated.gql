@@ -1,3 +1,13 @@
+fragment CardTransactionDetails on CardTransaction {
+  id
+  amount
+  currency
+  merchantName
+  status
+  createdAt
+  __typename
+}
+
 fragment Transaction on Transaction {
   __typename
   id
@@ -238,6 +248,47 @@ mutation captchaRequestAuthCode($input: CaptchaRequestAuthCodeInput!) {
       __typename
     }
     success
+    __typename
+  }
+}
+
+mutation cardCreate($input: CardCreateInput!) {
+  cardCreate(input: $input) {
+    id
+    lastFour
+    cardType
+    status
+    __typename
+  }
+}
+
+mutation cardPinUpdate($input: CardPinUpdateInput!) {
+  cardPinUpdate(input: $input)
+}
+
+mutation cardReplace($input: CardReplaceInput!) {
+  cardReplace(input: $input) {
+    id
+    lastFour
+    cardType
+    status
+    __typename
+  }
+}
+
+mutation cardUpdate($input: CardUpdateInput!) {
+  cardUpdate(input: $input) {
+    id
+    status
+    __typename
+  }
+}
+
+mutation cardUpdateLimits($input: CardUpdateInput!) {
+  cardUpdate(input: $input) {
+    id
+    dailyLimitCents
+    monthlyLimitCents
     __typename
   }
 }
@@ -851,10 +902,12 @@ query Bulletins($first: Int!, $after: String) {
           action {
             ... on OpenDeepLinkAction {
               deepLink
+              label
               __typename
             }
             ... on OpenExternalLinkAction {
               url
+              label
               __typename
             }
             __typename
@@ -964,10 +1017,12 @@ query StatefulNotifications($after: String) {
         action {
           ... on OpenDeepLinkAction {
             deepLink
+            label
             __typename
           }
           ... on OpenExternalLinkAction {
             url
+            label
             __typename
           }
           __typename
@@ -1077,6 +1132,75 @@ query businessMapMarkers {
         latitude
         __typename
       }
+      __typename
+    }
+    __typename
+  }
+}
+
+query card {
+  me {
+    id
+    defaultAccount {
+      id
+      ... on ConsumerAccount {
+        cards {
+          id
+          lastFour
+          cardType
+          status
+          createdAt
+          dailyLimitCents
+          monthlyLimitCents
+          __typename
+        }
+        cardConsumerApplications {
+          id
+          applicationStatus
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+query cardBalance($cardId: ID!) {
+  cardBalance(cardId: $cardId) {
+    available
+    pending
+    posted
+    __typename
+  }
+}
+
+query cardEncryptionPublicKey {
+  cardEncryptionPublicKey
+}
+
+query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
+  cardTransactionsPaginated(cardId: $cardId, first: $first, after: $after) {
+    edges {
+      cursor
+      node {
+        id
+        amount
+        currency
+        merchantName
+        status
+        createdAt
+        cardId
+        __typename
+      }
+      __typename
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
       __typename
     }
     __typename
@@ -1354,6 +1478,7 @@ query paymentRequest {
       deposit {
         minBankFee
         minBankFeeThreshold
+        ratio
         __typename
       }
       __typename
@@ -1372,6 +1497,44 @@ query paymentRequest {
         __typename
       }
       defaultWalletId
+      __typename
+    }
+    __typename
+  }
+}
+
+query personalDetails {
+  me {
+    id
+    phone
+    email {
+      address
+      __typename
+    }
+    defaultAccount {
+      ... on ConsumerAccount {
+        id
+        firstName
+        lastName
+        onboardingStatus
+        cards {
+          id
+          shippingAddress {
+            firstName
+            lastName
+            line1
+            line2
+            city
+            region
+            postalCode
+            country
+            countryCode
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
       __typename
     }
     __typename
@@ -1410,6 +1573,25 @@ query realtimePrice {
         }
         __typename
       }
+      __typename
+    }
+    __typename
+  }
+}
+
+query realtimePriceUnauthed($currency: DisplayCurrency) {
+  realtimePrice(currency: $currency) {
+    btcSatPrice {
+      base
+      offset
+      __typename
+    }
+    denominatorCurrency
+    id
+    timestamp
+    usdCentPrice {
+      base
+      offset
       __typename
     }
     __typename

@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react"
-import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
 import { ActivityIndicator, Alert, View } from "react-native"
 import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
@@ -9,23 +7,11 @@ import { Screen } from "@app/components/screen"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { ContactSupportButton } from "@app/components/contact-support-button/contact-support-button"
 
-import { useAppConfig } from "@app/hooks"
+import { useKycFlow } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import {
-  OnboardingStatus,
-  useFullOnboardingScreenQuery,
-  useKycFlowStartMutation,
-} from "@app/graphql/generated"
+import { OnboardingStatus, useFullOnboardingScreenQuery } from "@app/graphql/generated"
 
 gql`
-  mutation kycFlowStart($input: KycFlowStartInput!) {
-    kycFlowStart(input: $input) {
-      workflowRunId
-      tokenWeb
-    }
-  }
-
   query fullOnboardingScreen {
     me {
       id
@@ -40,30 +26,20 @@ gql`
 `
 
 export const FullOnboardingFlowScreen: React.FC = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList, "Primary">>()
-  const { navigate, goBack } = navigation
-
-  const { LL, locale } = useI18nContext()
+  const { LL } = useI18nContext()
   const styles = useStyles()
   const {
-    theme: { colors, mode },
+    theme: { colors },
   } = useTheme()
 
   const { data, loading } = useFullOnboardingScreenQuery({ fetchPolicy: "network-only" })
 
   const onboardingStatus = data?.me?.defaultAccount?.onboardingStatus
 
-  const [loadingKyc, setLoadingKyc] = useState(false)
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
 
-  const [kycFlowStart] = useKycFlowStartMutation()
-
-  const {
-    appConfig: {
-      galoyInstance: { kycUrl },
-    },
-  } = useAppConfig()
+  const { startKyc, loading: loadingKyc } = useKycFlow({ firstName, lastName })
 
   const confirmNames = async () => {
     Alert.alert(
@@ -78,62 +54,6 @@ export const FullOnboardingFlowScreen: React.FC = () => {
       ],
     )
   }
-
-  const startKyc = React.useCallback(async () => {
-    setLoadingKyc(true)
-
-    try {
-      const res = await kycFlowStart({
-        variables: { input: { firstName, lastName } },
-      })
-
-      const token = res.data?.kycFlowStart?.tokenWeb ?? ""
-      const workflowRunId = res.data?.kycFlowStart?.workflowRunId ?? ""
-
-      const theme = mode === "dark" || mode === "light" ? mode : ""
-
-      const query = new URLSearchParams({
-        token,
-        ...(locale && { lang: locale }),
-        ...(theme && { theme }),
-      }).toString()
-
-      const workflowRunIdParam = workflowRunId ? `&workflow_run_id=${workflowRunId}` : ""
-      const url = `${kycUrl}/webflow?${query}${workflowRunIdParam}`
-
-      navigate("webView", {
-        url,
-        headerTitle: LL.UpgradeAccountModal.title(),
-      })
-    } catch (err) {
-      console.error(err, "error")
-      let message = ""
-      if (err instanceof Error) {
-        message = err.message
-      }
-
-      if (message.match(/canceled/i)) {
-        goBack()
-        setLoadingKyc(false)
-        return
-      }
-
-      Alert.alert(
-        LL.FullOnboarding.error(),
-        `${LL.GaloyAddressScreen.somethingWentWrong()}\n\n${message}`,
-        [
-          {
-            text: LL.common.ok(),
-            onPress: () => {
-              goBack()
-            },
-          },
-        ],
-      )
-    } finally {
-      setLoadingKyc(false)
-    }
-  }, [LL, firstName, lastName, locale, mode, navigate, goBack, kycFlowStart, kycUrl])
 
   useEffect(() => {
     if (onboardingStatus === OnboardingStatus.AwaitingInput) {

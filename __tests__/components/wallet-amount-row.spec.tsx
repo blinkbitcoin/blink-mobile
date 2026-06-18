@@ -1,9 +1,10 @@
 import React from "react"
-import { Text as ReactNativeText, TextInput } from "react-native"
+import { Text as ReactNativeText } from "react-native"
 import { render } from "@testing-library/react-native"
 
 import { WalletAmountRow } from "@app/components/wallet-selector/wallet-amount-row"
 import { WalletCurrency } from "@app/graphql/generated"
+import type { InputRef } from "@app/types/themed-input"
 
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof ReactNativeText>) => (
@@ -22,7 +23,7 @@ jest.mock("@rn-vui/themed", () => ({
         placeholder: string
         testID?: string
       },
-      _ref: React.Ref<TextInput>,
+      _ref: React.Ref<InputRef>,
     ) => <ReactNativeText testID={testID}>{value || placeholder}</ReactNativeText>,
   ),
   useTheme: () => ({
@@ -69,7 +70,7 @@ jest.mock("@app/components/atomic/currency-pill", () => ({
 }))
 
 describe("WalletAmountRow", () => {
-  const mockInputRef = React.createRef<TextInput>()
+  const mockInputRef = React.createRef<InputRef>()
   const mockOnOverlayPress = jest.fn()
   const mockOnFocus = jest.fn()
 

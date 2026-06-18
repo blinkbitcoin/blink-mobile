@@ -11,6 +11,11 @@ declare module "*.png" {
   export default content
 }
 
+declare module "*.gif" {
+  const content: number
+  export default content
+}
+
 declare module "*.json" {
   const content: string
   export default content

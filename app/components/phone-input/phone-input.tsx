@@ -4,7 +4,7 @@ import parsePhoneNumber, {
   getCountryCallingCode,
 } from "libphonenumber-js/mobile"
 import React, { useEffect, useMemo, useRef, useState } from "react"
-import { View, TouchableOpacity, TextInput, StyleProp, ViewStyle } from "react-native"
+import { View, TouchableOpacity, StyleProp, ViewStyle } from "react-native"
 import CountryPicker, {
   CountryCode,
   DARK_THEME,
@@ -16,8 +16,10 @@ import { testProps } from "@app/utils/testProps"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { useSupportedCountriesQuery } from "@app/graphql/generated"
 import { IconNode } from "@rn-vui/base"
+import type { InputRef } from "@app/types/themed-input"
 
-const DEFAULT_COUNTRY_CODE = "SV"
+import PhoneInputSkeleton from "./phone-input-skeleton"
+
 const PLACEHOLDER_PHONE_NUMBER = "123-456-7890"
 
 export type PhoneInputInfo = {
@@ -64,8 +66,9 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   const { data } = useSupportedCountriesQuery()
 
   const [countryCode, setCountryCode] = useState<PhoneNumberCountryCode | undefined>()
-  const phoneInputRef = useRef<TextInput>(null)
-  const { countryCode: detectedCountryCode } = useDeviceLocation()
+  const phoneInputRef = useRef<InputRef>(null)
+  const { countryCode: detectedCountryCode, loading: loadingLocation } =
+    useDeviceLocation()
 
   const { allSupportedCountries } = useMemo(() => {
     const allSupportedCountries = (data?.globals?.supportedCountries.map(
@@ -133,11 +136,15 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     if (onChangeInfo) onChangeInfo(phoneInputInfo)
   }, [phoneInputInfo, onChangeInfo])
 
+  if (loadingLocation) {
+    return <PhoneInputSkeleton height={60} />
+  }
+
   return (
     <View style={styles.inputContainer}>
       <CountryPicker
         theme={themeMode === "dark" ? DARK_THEME : DEFAULT_THEME}
-        countryCode={(phoneInputInfo?.countryCode || DEFAULT_COUNTRY_CODE) as CountryCode}
+        countryCode={phoneInputInfo?.countryCode as CountryCode}
         countryCodes={allSupportedCountries as CountryCode[]}
         onSelect={handleCountrySelect}
         onClose={handleCountryPickerClose}

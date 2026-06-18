@@ -3,11 +3,13 @@ import ContentLoader, { Rect } from "react-content-loader/native"
 import { Pressable, View } from "react-native"
 
 import { gql } from "@apollo/client"
+import { DisabledFeature } from "@app/components/disabled-feature"
 import { useWalletOverviewScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
@@ -15,7 +17,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
@@ -56,6 +58,7 @@ gql`
 type Props = {
   loading: boolean
   setIsStablesatModalVisible: (value: boolean) => void
+  onRestrictedTap?: () => void
   wallets?: readonly WalletBalance[]
   showBtcNotification?: boolean
   showUsdNotification?: boolean
@@ -64,10 +67,12 @@ type Props = {
 const WalletOverview: React.FC<Props> = ({
   loading,
   setIsStablesatModalVisible,
+  onRestrictedTap,
   wallets,
   showBtcNotification = false,
   showUsdNotification = false,
 }) => {
+  const isStablesatsRestricted = useStablesatsRestricted()
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
 
   const { LL } = useI18nContext()
@@ -76,7 +81,7 @@ const WalletOverview: React.FC<Props> = ({
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { formatMoneyAmount, displayCurrency, moneyAmountToDisplayCurrencyString } =
     useDisplayCurrency()
@@ -90,7 +95,7 @@ const WalletOverview: React.FC<Props> = ({
   const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
   const resolvedWallets = hasWallets ? wallets : data?.me?.defaultAccount?.wallets
 
-  if (isAuthed) {
+  if (isAuthed || hasWallets) {
     const btcWallet = getBtcWallet(resolvedWallets)
     const usdWallet = getUsdWallet(resolvedWallets)
 
@@ -178,55 +183,66 @@ const WalletOverview: React.FC<Props> = ({
 
       <View style={styles.separator} />
 
-      <Pressable
-        onPressIn={() => setPressedUsd(true)}
-        onPressOut={() => setPressedUsd(false)}
-        onPress={() => {
-          openTransactionHistory(WalletCurrency.Usd)
-        }}
+      <DisabledFeature
+        disabled={isStablesatsRestricted}
+        onDisabledPress={onRestrictedTap}
       >
-        <View style={styles.displayTextView}>
-          <View style={styles.currency}>
-            <View style={styles.bubbleWrapper} pointerEvents="box-none">
-              <View style={pressedUsd && styles.pressedOpacity}>
-                <CurrencyPill
-                  currency={WalletCurrency.Usd}
-                  containerSize="medium"
-                  containerStyle={pillWidthStyle}
-                  onLayout={onPillLayout(WalletCurrency.Usd)}
-                />
+        <Pressable
+          onPressIn={() => setPressedUsd(true)}
+          onPressOut={() => setPressedUsd(false)}
+          onPress={() => {
+            openTransactionHistory(WalletCurrency.Usd)
+          }}
+        >
+          <View style={styles.displayTextView}>
+            <View style={styles.currency}>
+              <View style={styles.bubbleWrapper} pointerEvents="box-none">
+                <View style={pressedUsd && styles.pressedOpacity}>
+                  <CurrencyPill
+                    currency={WalletCurrency.Usd}
+                    containerSize="medium"
+                    containerStyle={pillWidthStyle}
+                    onLayout={onPillLayout(WalletCurrency.Usd)}
+                  />
+                </View>
+                <NotificationBadge visible={showUsdNotification} />
               </View>
-              <NotificationBadge visible={showUsdNotification} />
+              <Pressable onPress={() => setIsStablesatModalVisible(true)}>
+                <GaloyIcon color={colors.grey1} name="question" size={18} />
+              </Pressable>
             </View>
-            <Pressable onPress={() => setIsStablesatModalVisible(true)}>
-              <GaloyIcon color={colors.grey1} name="question" size={18} />
-            </Pressable>
-          </View>
-          {loading ? (
-            <Loader />
-          ) : (
-            <View style={[styles.hideableArea, pressedUsd && styles.pressedOpacity]}>
-              {!hideAmount && (
-                <>
-                  {usdInUnderlyingCurrency ? (
-                    <Text type="p1" bold>
-                      {usdInUnderlyingCurrency}
+            {loading ? (
+              <Loader />
+            ) : isStablesatsRestricted ? (
+              <View style={[styles.hideableArea, styles.restrictionLabel]}>
+                <Text type="p2" style={styles.restrictionLabelText}>
+                  {LL.StablesatsRestriction.walletLabel()}
+                </Text>
+              </View>
+            ) : (
+              <View style={[styles.hideableArea, pressedUsd && styles.pressedOpacity]}>
+                {!hideAmount && (
+                  <>
+                    {usdInUnderlyingCurrency ? (
+                      <Text type="p1" bold>
+                        {usdInUnderlyingCurrency}
+                      </Text>
+                    ) : null}
+                    <Text
+                      {...testProps("stablesats-balance")}
+                      type={usdInUnderlyingCurrency ? "p3" : "p1"}
+                      bold={!usdInUnderlyingCurrency}
+                    >
+                      {usdInDisplayCurrencyFormatted}
                     </Text>
-                  ) : null}
-                  <Text
-                    {...testProps("stablesats-balance")}
-                    type={usdInUnderlyingCurrency ? "p3" : "p1"}
-                    bold={!usdInUnderlyingCurrency}
-                  >
-                    {usdInDisplayCurrencyFormatted}
-                  </Text>
-                </>
-              )}
-              {hideAmount && <Text>****</Text>}
-            </View>
-          )}
-        </View>
-      </Pressable>
+                  </>
+                )}
+                {hideAmount && <Text>****</Text>}
+              </View>
+            )}
+          </View>
+        </Pressable>
+      </DisabledFeature>
     </View>
   )
 }
@@ -240,6 +256,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "column",
     borderRadius: 12,
     padding: 12,
+    paddingBottom: 5,
   },
   loaderBackground: {
     color: colors.loaderBackground,
@@ -258,7 +275,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    height: 45,
+    minHeight: 45,
     marginVertical: 4,
     marginTop: 5,
   },
@@ -281,6 +298,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   hideableArea: {
     alignItems: "flex-end",
+  },
+  restrictionLabel: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  restrictionLabelText: {
+    textAlign: "right",
   },
   loaderContainer: {
     flex: 1,

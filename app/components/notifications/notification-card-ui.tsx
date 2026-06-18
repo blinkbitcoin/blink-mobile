@@ -5,6 +5,7 @@ import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 import { GaloyIconButton } from "../atomic/galoy-icon-button"
+import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
 
 export type NotificationCardUIProps = {
   title: string
@@ -13,6 +14,7 @@ export type NotificationCardUIProps = {
   action: () => Promise<void>
   loading?: boolean
   dismissAction?: () => void
+  buttonLabel?: string
 }
 
 export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
@@ -22,8 +24,8 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
   action,
   loading,
   dismissAction,
+  buttonLabel,
 }) => {
-  const iconName = icon || "pencil"
   const styles = useStyles()
   const {
     theme: { colors },
@@ -39,68 +41,112 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
 
   return (
     <TouchableOpacity style={styles.buttonContainer} onPress={action}>
-      <View style={styles.viewHeader}>
-        <View style={styles.leftIconContainer}>
-          <GaloyIcon name={iconName} color={colors.primary} size={24} />
+      <View style={styles.contentSection}>
+        <View style={styles.contentRow}>
+          {icon && (
+            <View style={styles.leftIconContainer}>
+              <GaloyIcon name={icon} color={colors.primary} size={24} />
+            </View>
+          )}
+          <View style={styles.textColumn}>
+            <Text style={styles.titleStyle}>{title}</Text>
+            <Text style={styles.bodyText}>{text}</Text>
+          </View>
+          {dismissAction && (
+            <GaloyIconButton
+              name="close"
+              size={"small"}
+              iconOnly={true}
+              onPress={dismissAction}
+            />
+          )}
         </View>
-
-        <Text type={"p1"} bold style={styles.titleStyle}>
-          {title}
-        </Text>
-        <View style={styles.rightIconContainer}>
-          <GaloyIconButton
-            name="close"
-            size={"small"}
-            iconOnly={true}
-            onPress={dismissAction}
+      </View>
+      {buttonLabel && (
+        <View style={[styles.buttonActionContainer, icon && styles.buttonWithIcon]}>
+          <GaloyPrimaryButton
+            title={buttonLabel}
+            onPress={action}
+            containerStyle={styles.bulletinButtonContainer}
+            buttonStyle={styles.bulletinButtonStyle}
+            titleStyle={styles.bulletinButtonTitle}
           />
         </View>
-      </View>
-      <View style={styles.textContainer}>
-        <Text type={"p2"}>{text}</Text>
-      </View>
+      )}
     </TouchableOpacity>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
   buttonContainer: {
-    padding: 12,
     backgroundColor: colors.grey5,
-    borderRadius: 12,
-    minHeight: 100,
-    columnGap: 15,
+    borderRadius: 8,
     flexDirection: "column",
   },
-  titleStyle: {
+  contentSection: {
+    paddingVertical: 14,
+    flexDirection: "column",
+    alignItems: "flex-start",
+    alignSelf: "stretch",
+  },
+  contentRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingLeft: 14,
+    paddingRight: 10,
+    gap: 14,
+  },
+  textColumn: {
     flex: 1,
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+  },
+  titleStyle: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: "400",
+    color: colors.black,
   },
   leftIconContainer: {
-    width: 40,
     justifyContent: "flex-start",
     flexDirection: "row",
   },
-  rightIconContainer: {
-    width: 40,
-    justifyContent: "flex-end",
-    flexDirection: "row",
-  },
-  viewHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   loadingButtonContainer: {
     flexDirection: "column",
-    padding: 12,
+    padding: 14,
     backgroundColor: colors.grey5,
-    borderRadius: 12,
-    minHeight: 100,
-    columnGap: 15,
+    borderRadius: 8,
+    minHeight: 80,
     justifyContent: "center",
     alignItems: "center",
   },
-  textContainer: {
-    flexGrow: 1,
-    paddingHorizontal: 40,
+  bodyText: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: "400",
+    color: colors.grey2,
+  },
+  buttonActionContainer: {
+    paddingHorizontal: 14,
+    paddingBottom: 10,
+  },
+  buttonWithIcon: {
+    paddingLeft: 52,
+  },
+  bulletinButtonContainer: {
+    alignSelf: "flex-start",
+  },
+  bulletinButtonStyle: {
+    minHeight: 36,
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  bulletinButtonTitle: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: "700",
+    color: colors.white,
   },
 }))

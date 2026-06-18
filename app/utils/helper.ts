@@ -1,4 +1,9 @@
 import { Platform } from "react-native"
+import ReactNativeHapticFeedback, {
+  HapticFeedbackTypes,
+} from "react-native-haptic-feedback"
+
+import { MASK_CHAR } from "@app/config/appinfo"
 
 // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
 export const shuffle = <T>(array: T[]): T[] => {
@@ -19,6 +24,13 @@ export const shuffle = <T>(array: T[]): T[] => {
   }
 
   return array
+}
+
+export const pickRandomIndices = (total: number, count: number): number[] => {
+  const all = Array.from({ length: total }, (_, i) => i)
+  return shuffle([...all])
+    .slice(0, Math.min(count, total))
+    .sort((a, b) => a - b)
 }
 
 // Shorten a long text by inserting "..." in the middle, keeping the ends visible.
@@ -43,3 +55,61 @@ export const ellipsizeMiddle = (
 export const isIos = Platform.OS === "ios"
 
 export const normalizeString = (value?: string) => (value ?? "").trim().toLowerCase()
+
+export const maskString = (
+  value: string,
+  options: {
+    visibleRight: number
+    maskChar?: string
+    maskPattern?: RegExp
+  },
+) => {
+  const { visibleRight, maskChar = MASK_CHAR, maskPattern = /./ } = options
+  const pattern = new RegExp(
+    maskPattern.source,
+    maskPattern.flags.includes("g") ? maskPattern.flags : `${maskPattern.flags}g`,
+  )
+  const totalMatches = (value.match(pattern) || []).length
+  let seenMatches = 0
+
+  return value.replace(pattern, (char) => {
+    seenMatches += 1
+    return seenMatches <= totalMatches - visibleRight ? maskChar : char
+  })
+}
+
+export const maskDigits = (
+  value: string,
+  options: {
+    visibleRight: number
+    maskChar?: string
+  },
+) => maskString(value, { ...options, maskPattern: /\d/ })
+
+export const formatCardDisplayNumber = (
+  cardNumber: string,
+  showDetails: boolean,
+  { totalDigits = 16, groupSize = 4, visibleDigits = 4 } = {},
+): string => {
+  const digits = cardNumber.replaceAll(" ", "")
+  const padded = digits.padStart(totalDigits, MASK_CHAR)
+  const masked = showDetails
+    ? padded
+    : maskString(padded, { visibleRight: visibleDigits })
+  return (masked.match(new RegExp(`.{1,${groupSize}}`, "g")) ?? [masked]).join(" ")
+}
+
+export const toMinorUnit = (dollars: string): number =>
+  Math.round(parseFloat(dollars) * 100)
+
+export const toMajorUnit = (cents: number): number => cents / 100
+
+export const toNumber = (value: bigint | string | number): number => {
+  if (typeof value === "number") return value
+  const parsed = Number(value)
+  if (Number.isNaN(parsed)) return 0
+  return parsed
+}
+
+export const triggerHapticFeedback = (type: keyof typeof HapticFeedbackTypes) =>
+  ReactNativeHapticFeedback.trigger(type, { ignoreAndroidSystemSettings: true })

@@ -12,7 +12,7 @@ import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useTheme } from "@rn-vui/themed"
 
 import { SettingsRow } from "../../row"
@@ -72,7 +72,7 @@ export const EmailSetting: React.FC = () => {
   } = useTheme()
 
   const { LL } = useI18nContext()
-  const { navigate } = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { loading, email, emailVerified, bothEmailAndPhoneVerified } = useLoginMethods()
   const { updateCurrentProfile } = useSaveSessionProfile()
@@ -185,7 +185,7 @@ export const EmailSetting: React.FC = () => {
       loading={loading}
       spinner={emDelLoading || emRegLoading}
       title={title(email, emailVerified, LL)}
-      leftIcon="mail-outline"
+      leftGaloyIcon="email-add"
       action={email ? null : () => navigate("emailRegistrationInitiate")}
       rightIcon={RightIcon}
       rightIconAction={rightIconAction}

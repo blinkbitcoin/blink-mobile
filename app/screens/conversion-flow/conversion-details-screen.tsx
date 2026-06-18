@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { View, TextInput, Animated, Easing, LayoutChangeEvent } from "react-native"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { View, Animated, Easing, LayoutChangeEvent } from "react-native"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { gql } from "@apollo/client"
+
+import type { InputRef } from "@app/types/themed-input"
 
 import {
   useConversionScreenQuery,
@@ -26,11 +28,13 @@ import {
   toDisplayAmount,
   toUsdMoneyAmount,
   toWalletAmount,
+  toWalletMoneyAmount,
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
 
 import { Screen } from "@app/components/screen"
-import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useStablesatsRestrictionGuard } from "@app/hooks/use-stablesats-restriction-guard"
 import { CurrencyInput } from "@app/components/currency-input"
 import { PercentageSelector } from "@app/components/percentage-selector"
 import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
@@ -41,9 +45,15 @@ import {
   ConvertInputType,
 } from "@app/components/transfer-amount-input"
 
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
+import { convertDirectionFromCurrency } from "@app/types/payment"
+import { AccountType } from "@app/types/wallet"
+
 import {
   useConversionFormatting,
   useConversionOverlayFocus,
+  useSelfCustodialConversionGuard,
   useSyncedInputValues,
 } from "./hooks"
 import { BTC_SUFFIX, findBtcSuffixIndex } from "./btc-format"
@@ -71,6 +81,12 @@ const ANIMATION_CONFIG = {
 }
 
 export const ConversionDetailsScreen = () => {
+  if (useStablesatsRestrictionGuard()) return null
+
+  return <ConversionDetailsScreenContent />
+}
+
+const ConversionDetailsScreenContent = () => {
   const {
     theme: { colors },
   } = useTheme()
@@ -80,9 +96,18 @@ export const ConversionDetailsScreen = () => {
 
   useRealtimePriceQuery({ fetchPolicy: "network-only" })
 
+  const {
+    isSelfCustodial,
+    isReady,
+    accountType,
+    wallets: activeWallets,
+  } = useActiveWallet()
+  const isSelfCustodialBooting = accountType === AccountType.SelfCustodial && !isReady
+
   const { data } = useConversionScreenQuery({
     fetchPolicy: "cache-and-network",
     returnPartialData: true,
+    skip: isSelfCustodial,
   })
 
   const { LL } = useI18nContext()
@@ -94,8 +119,33 @@ export const ConversionDetailsScreen = () => {
   } = useDisplayCurrency()
   const styles = useStyles(displayCurrency !== WalletCurrency.Usd)
 
-  const btcWallet = getBtcWallet(data?.me?.defaultAccount?.wallets)
-  const usdWallet = getUsdWallet(data?.me?.defaultAccount?.wallets)
+  const selfCustodialWalletsForConvert = useMemo(() => {
+    if (!isSelfCustodial) return null
+    const selfCustodialBtc = activeWallets.find(
+      (w) => w.walletCurrency === WalletCurrency.Btc,
+    )
+    const selfCustodialUsd = activeWallets.find(
+      (w) => w.walletCurrency === WalletCurrency.Usd,
+    )
+    if (!selfCustodialBtc || !selfCustodialUsd) return null
+    return {
+      btc: {
+        id: selfCustodialBtc.id,
+        balance: selfCustodialBtc.balance.amount,
+        walletCurrency: selfCustodialBtc.walletCurrency,
+      },
+      usd: {
+        id: selfCustodialUsd.id,
+        balance: selfCustodialUsd.balance.amount,
+        walletCurrency: selfCustodialUsd.walletCurrency,
+      },
+    }
+  }, [isSelfCustodial, activeWallets])
+
+  const btcWallet =
+    selfCustodialWalletsForConvert?.btc ?? getBtcWallet(data?.me?.defaultAccount?.wallets)
+  const usdWallet =
+    selfCustodialWalletsForConvert?.usd ?? getUsdWallet(data?.me?.defaultAccount?.wallets)
 
   const {
     fromWallet,
@@ -113,6 +163,26 @@ export const ConversionDetailsScreen = () => {
       ? { initialFromWallet: btcWallet, initialToWallet: usdWallet }
       : undefined,
   )
+
+  const convertDirection =
+    isSelfCustodial && fromWallet
+      ? convertDirectionFromCurrency(fromWallet.walletCurrency)
+      : undefined
+  const { limits: selfCustodialConversionLimits, error: selfCustodialLimitsError } =
+    useNonCustodialConversionLimits(convertDirection)
+  const selfCustodialMinFromAmount = isSelfCustodial
+    ? selfCustodialConversionLimits?.minFromAmount ?? null
+    : null
+  const selfCustodialLimitsUnavailable =
+    isSelfCustodial && selfCustodialLimitsError !== null
+
+  const conversionGuard = useSelfCustodialConversionGuard({
+    fromCurrency: fromWallet?.walletCurrency,
+    amountInSourceCurrency: settlementSendAmount?.amount ?? 0,
+    fromWalletBalance: fromWallet?.balance,
+    enabled: isSelfCustodial,
+  })
+  const quoteBlocking = conversionGuard.blockingReason !== null
 
   const [focusedInputValues, setFocusedInputValues] = useState<InputField | null>(null)
   const [initialAmount, setInitialAmount] =
@@ -153,9 +223,9 @@ export const ConversionDetailsScreen = () => {
     labels: pillLabels,
   })
 
-  const fromInputRef = useRef<TextInput | null>(null)
-  const toInputRef = useRef<TextInput | null>(null)
-  const currencyInputRef = useRef<TextInput | null>(null)
+  const fromInputRef = useRef<InputRef | null>(null)
+  const toInputRef = useRef<InputRef | null>(null)
+  const currencyInputRef = useRef<InputRef | null>(null)
   const toggleInitiated = useRef(false)
   const pendingFocusId = useRef<ConvertInputType | null>(null)
   const hadInitialFocus = useRef(false)
@@ -305,7 +375,7 @@ export const ConversionDetailsScreen = () => {
     }
   }, [displayCurrency, renderValue])
 
-  if (!data?.me?.defaultAccount || !fromWallet) return <></>
+  if ((!isSelfCustodial && !data?.me?.defaultAccount) || !fromWallet) return <></>
 
   const toggleInputs = () => {
     if (uiLocked) return
@@ -425,21 +495,43 @@ export const ConversionDetailsScreen = () => {
       ? null
       : moneyAmountToDisplayCurrencyString({ moneyAmount: toWalletBalance })
 
-  let amountFieldError: string | undefined = undefined
+  const exceedsBalance = lessThan({
+    value: fromWalletBalance,
+    lessThan: settlementSendAmount,
+  })
 
-  if (
-    lessThan({
-      value: fromWalletBalance,
-      lessThan: settlementSendAmount,
-    })
-  ) {
-    amountFieldError = LL.SendBitcoinScreen.amountExceed({
-      balance: fromWalletBalanceFormatted,
-    })
-  }
+  const belowMinimum =
+    isSelfCustodial &&
+    selfCustodialMinFromAmount !== null &&
+    settlementSendAmount.amount > 0 &&
+    settlementSendAmount.amount < selfCustodialMinFromAmount
+
+  const amountFieldError: string | undefined = (() => {
+    if (exceedsBalance) {
+      return LL.SendBitcoinScreen.amountExceed({ balance: fromWalletBalanceFormatted })
+    }
+    if (selfCustodialLimitsUnavailable) {
+      return LL.StableBalance.conversionUnavailable()
+    }
+    if (belowMinimum && selfCustodialMinFromAmount !== null) {
+      const minMoneyAmount = toWalletMoneyAmount(
+        selfCustodialMinFromAmount,
+        fromWallet.walletCurrency,
+      )
+      return LL.StableBalance.minimumConversion({
+        amount: formatMoneyAmount({ moneyAmount: minMoneyAmount }),
+      })
+    }
+    if (quoteBlocking) {
+      return LL.ConversionDetailsScreen.dustError()
+    }
+  })()
+
+  const hasError = Boolean(amountFieldError)
 
   const setAmountToBalancePercentage = (percentage: number) => {
     if (uiLocked) return
+    setLockFormattingInputId(null)
     setUiLocked(true)
     setLoadingPercent(percentage)
 
@@ -461,7 +553,12 @@ export const ConversionDetailsScreen = () => {
   return (
     <Screen preset="fixed">
       <View style={styles.styleWalletContainer}>
-        <View style={styles.walletSelectorContainer}>
+        <View
+          style={[
+            styles.walletSelectorContainer,
+            hasError && styles.walletSelectorContainerError,
+          ]}
+        >
           <Animated.View
             style={[
               styles.rowWrapTop,
@@ -596,12 +693,19 @@ export const ConversionDetailsScreen = () => {
           )}
         </View>
 
-        <View style={styles.errorBoxWrapper}>
-          {amountFieldError ? (
-            <GaloyErrorBox errorMessage={amountFieldError} />
-          ) : (
-            <View style={styles.errorBoxSpacer} />
-          )}
+        <View style={styles.errorRow}>
+          <GaloyIcon
+            name="warning"
+            size={14}
+            color={hasError ? colors.error : "transparent"}
+          />
+          <Text
+            type="p3"
+            color={hasError ? colors.error : "transparent"}
+            testID="amount-field-error"
+          >
+            {amountFieldError || " "}
+          </Text>
         </View>
       </View>
 
@@ -627,7 +731,6 @@ export const ConversionDetailsScreen = () => {
             onSetFormattedAmount={onSetFormattedValues}
             focusedInput={focusedInputValues}
             initialAmount={initialAmount}
-            compact
             debounceMs={1000}
             lockFormattingUntilBlur={Boolean(lockFormattingInputId)}
             onTypingChange={(typing, focusedId) => {
@@ -660,7 +763,13 @@ export const ConversionDetailsScreen = () => {
             uiLocked ||
             toggleInitiated.current ||
             isTyping ||
-            Boolean(loadingPercent)
+            Boolean(loadingPercent) ||
+            belowMinimum ||
+            selfCustodialLimitsUnavailable ||
+            quoteBlocking ||
+            conversionGuard.isQuoting ||
+            conversionGuard.hasQuoteError ||
+            isSelfCustodialBooting
           }
           onPress={moveToNextScreen}
           testID="next-button"
@@ -687,11 +796,16 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     flexDirection: "column",
     backgroundColor: colors.grey5,
     borderRadius: 13,
+    borderWidth: 1,
+    borderColor: "transparent",
     paddingHorizontal: 15,
     paddingTop: 0,
     paddingBottom: 0,
     overflow: "hidden",
     position: "relative",
+  },
+  walletSelectorContainerError: {
+    borderColor: colors.error,
   },
   rowWrapTop: {
     marginHorizontal: -15,
@@ -736,18 +850,22 @@ const useStyles = makeStyles(({ colors }, currencyInput: boolean) => ({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
-    marginVertical: 10,
+    paddingHorizontal: 10,
+    marginVertical: 0,
     gap: 12,
   },
   keyboardContainer: {
-    maxWidth: 450,
-    paddingHorizontal: 45,
-    paddingTop: 15,
-    paddingBottom: 32,
+    marginHorizontal: 20,
+    paddingTop: 0,
+    paddingBottom: 15,
   },
   disabledOpacity: { opacity: 0.5 },
   buttonContainer: { marginHorizontal: 20, marginBottom: 20 },
-  errorBoxWrapper: { marginTop: 8 },
-  errorBoxSpacer: { height: 44 },
+  errorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 3,
+    marginTop: 5,
+  },
 }))

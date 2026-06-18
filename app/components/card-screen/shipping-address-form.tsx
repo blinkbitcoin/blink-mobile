@@ -1,0 +1,211 @@
+import React, { useEffect, useMemo } from "react"
+import { View } from "react-native"
+import { makeStyles } from "@rn-vui/themed"
+import { useNavigation } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+
+import { InputField, ValueStyle } from "./input-field"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  getAllCountries,
+  getCountryLabel,
+  getRegionsByCountry,
+} from "@app/utils/address-metadata"
+import { ShippingAddress } from "@app/screens/card-screen/types"
+import {
+  getPostalLabelKey,
+  getStateLabelKey,
+  validateAddress,
+} from "@app/screens/card-screen/utils"
+
+type ShippingAddressFormProps = {
+  address: ShippingAddress
+  onAddressChange: (address: ShippingAddress) => void
+  onValidityChange?: (isValid: boolean) => void
+  showFullName?: boolean
+}
+
+export const ShippingAddressForm: React.FC<ShippingAddressFormProps> = ({
+  address,
+  onAddressChange,
+  onValidityChange,
+  showFullName = true,
+}) => {
+  const styles = useStyles()
+  const { LL } = useI18nContext()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  const { errors, isValid } = useMemo(
+    () =>
+      validateAddress(
+        address,
+        {
+          required: LL.common.validation.required(),
+          minChars: LL.common.validation.minChars,
+          noPOBoxes: LL.CardFlow.ShippingAddress.noPOBoxes(),
+          invalidPostalCode: LL.common.validation.invalidPostalCode(),
+          invalidRegion: LL.common.validation.invalidRegion(),
+        },
+        { checkFullName: showFullName },
+      ),
+    [address, showFullName, LL],
+  )
+
+  useEffect(() => {
+    onValidityChange?.(isValid)
+  }, [isValid, onValidityChange])
+
+  const handleFieldChange = (field: keyof ShippingAddress, value: string) => {
+    onAddressChange({ ...address, [field]: value })
+  }
+
+  const regions = getRegionsByCountry(address.countryCode)
+  const countryHasRegions = regions.length > 0
+  const labels = LL.CardFlow.ShippingAddress.labels
+
+  const stateLabelKey = getStateLabelKey(address.countryCode)
+  const postalLabelKey = getPostalLabelKey(address.countryCode)
+
+  const stateLabel = labels[stateLabelKey as keyof typeof labels]()
+  const postalLabel = labels[postalLabelKey as keyof typeof labels]()
+
+  const handleStateSelect = () => {
+    navigation.navigate("selectionScreen", {
+      title: stateLabel,
+      options: regions,
+      selectedValue: address.region,
+      onSelect: (value: string) => {
+        onAddressChange({ ...address, region: value })
+        navigation.goBack()
+      },
+    })
+  }
+
+  const handleCountrySelect = () => {
+    navigation.navigate("selectionScreen", {
+      title: LL.CardFlow.ShippingAddress.country(),
+      options: getAllCountries(),
+      selectedValue: address.countryCode,
+      onSelect: (value: string) => {
+        const firstRegion = getRegionsByCountry(value)[0]?.value ?? ""
+        onAddressChange({
+          ...address,
+          countryCode: value,
+          region: firstRegion,
+          postalCode: "",
+        })
+        navigation.goBack()
+      },
+    })
+  }
+
+  return (
+    <View style={styles.container}>
+      {showFullName && (
+        <InputField
+          label={LL.CardFlow.ShippingAddress.firstName()}
+          value={address.firstName}
+          rightIcon="pencil"
+          onChangeText={(text) => handleFieldChange("firstName", text)}
+          valueStyle={ValueStyle.Bold}
+          errorMessage={errors.firstName}
+        />
+      )}
+
+      {showFullName && (
+        <InputField
+          label={LL.CardFlow.ShippingAddress.lastName()}
+          value={address.lastName}
+          rightIcon="pencil"
+          onChangeText={(text) => handleFieldChange("lastName", text)}
+          valueStyle={ValueStyle.Bold}
+          errorMessage={errors.lastName}
+        />
+      )}
+
+      <InputField
+        label={LL.CardFlow.ShippingAddress.addressLine1()}
+        value={address.line1}
+        rightIcon="pencil"
+        onChangeText={(text) => handleFieldChange("line1", text)}
+        valueStyle={ValueStyle.Bold}
+        errorMessage={errors.line1}
+      />
+
+      <InputField
+        label={LL.CardFlow.ShippingAddress.addressLine2()}
+        value={address.line2}
+        rightIcon="pencil"
+        onChangeText={(text) => handleFieldChange("line2", text)}
+        valueStyle={ValueStyle.Bold}
+        errorMessage={errors.line2}
+      />
+
+      <View style={styles.gridRow}>
+        <View style={styles.gridItem}>
+          <InputField
+            label={LL.CardFlow.ShippingAddress.city()}
+            value={address.city}
+            onChangeText={(text) => handleFieldChange("city", text)}
+            valueStyle={ValueStyle.Regular}
+            errorMessage={errors.city}
+          />
+        </View>
+        <View style={styles.gridItem}>
+          {countryHasRegions ? (
+            <InputField
+              label={stateLabel}
+              value={address.region}
+              rightIcon="caret-down"
+              valueStyle={ValueStyle.Regular}
+              onPress={handleStateSelect}
+            />
+          ) : (
+            <InputField
+              label={labels.region()}
+              value={address.region}
+              rightIcon="pencil"
+              onChangeText={(text) => handleFieldChange("region", text)}
+              valueStyle={ValueStyle.Regular}
+            />
+          )}
+        </View>
+      </View>
+
+      <View style={styles.gridRow}>
+        <View style={styles.gridItem}>
+          <InputField
+            label={postalLabel}
+            value={address.postalCode}
+            onChangeText={(text) => handleFieldChange("postalCode", text)}
+            valueStyle={ValueStyle.Regular}
+            errorMessage={errors.postalCode}
+          />
+        </View>
+        <View style={styles.gridItem}>
+          <InputField
+            label={LL.CardFlow.ShippingAddress.country()}
+            value={getCountryLabel(address.countryCode)}
+            rightIcon="caret-down"
+            valueStyle={ValueStyle.Regular}
+            onPress={handleCountrySelect}
+          />
+        </View>
+      </View>
+    </View>
+  )
+}
+
+const useStyles = makeStyles(() => ({
+  container: {
+    gap: 4,
+  },
+  gridRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  gridItem: {
+    flex: 1,
+  },
+}))

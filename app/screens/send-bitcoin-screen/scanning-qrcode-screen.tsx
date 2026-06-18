@@ -10,34 +10,34 @@ import {
 } from "react-native"
 import { launchImageLibrary } from "react-native-image-picker"
 import Svg, { Circle } from "react-native-svg"
-import Icon from "react-native-vector-icons/Ionicons"
 import { Camera, CameraType } from "react-native-camera-kit"
 import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions"
 import RNQRGenerator from "rn-qr-generator"
 
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { LNURL_DOMAINS } from "@app/config"
 import {
   useAccountDefaultWalletLazyQuery,
   useRealtimePriceQuery,
-  useScanningQrCodeScreenQuery,
 } from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useScanContext } from "@app/hooks/use-scan-context"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { logParseDestinationResult } from "@app/utils/analytics"
 import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
-import { parseDestination } from "./payment-destination"
 import { DestinationDirection } from "./payment-destination/index.types"
+import { resolveDestination } from "./payment-destination/resolve-destination"
 
 const { width: screenWidth } = Dimensions.get("window")
 const { height: screenHeight } = Dimensions.get("window")
@@ -66,7 +66,9 @@ gql`
 
 export const ScanningQRCodeScreen: React.FC = () => {
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinDestination">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "sendBitcoinDestination">
+    >()
   const isFocused = useIsFocused()
 
   // forcing price refresh
@@ -81,15 +83,19 @@ export const ScanningQRCodeScreen: React.FC = () => {
   const [hasPermission, setHasPermission] = React.useState(false)
   const [isCameraUnavailable, setIsCameraUnavailable] = React.useState(false)
 
-  const { data } = useScanningQrCodeScreenQuery({ skip: !useIsAuthed() })
-  const wallets = data?.me?.defaultAccount.wallets
-  const bitcoinNetwork = data?.globals?.network
+  const { myWalletIds, bitcoinNetwork, lnurlDomains } = useScanContext()
   const [accountDefaultWalletQuery] = useAccountDefaultWalletLazyQuery({
     fetchPolicy: "no-cache",
   })
 
   const { LL } = useI18nContext()
   const { displayCurrency } = useDisplayCurrency()
+  const { sdk } = useSelfCustodialWallet()
+  const {
+    appConfig: {
+      galoyInstance: { lnAddressHostname },
+    },
+  } = useAppConfig()
 
   React.useEffect(() => {
     if (!isFocused) {
@@ -134,21 +140,25 @@ export const ScanningQRCodeScreen: React.FC = () => {
 
   const processInvoice = React.useMemo(() => {
     return async (data: string | undefined) => {
-      if (pending || !wallets || !bitcoinNetwork || !data) {
+      if (pending || !bitcoinNetwork || !data) {
         return
       }
       try {
         setPending(true)
 
-        const destination = await parseDestination({
-          rawInput: data,
-          myWalletIds: wallets.map((wallet) => wallet.id),
-          bitcoinNetwork,
-          lnurlDomains: LNURL_DOMAINS,
-          accountDefaultWalletQuery,
-          inputSource: "qr",
-          displayCurrency,
-        })
+        const destination = await resolveDestination(
+          {
+            rawInput: data,
+            myWalletIds,
+            bitcoinNetwork,
+            lnurlDomains,
+            accountDefaultWalletQuery,
+            inputSource: "qr",
+            displayCurrency,
+          },
+          sdk,
+          lnAddressHostname,
+        )
         logParseDestinationResult(destination)
 
         if (destination.valid) {
@@ -256,9 +266,12 @@ export const ScanningQRCodeScreen: React.FC = () => {
     navigation,
     pending,
     bitcoinNetwork,
-    wallets,
+    myWalletIds,
+    lnurlDomains,
     accountDefaultWalletQuery,
     displayCurrency,
+    sdk,
+    lnAddressHostname,
   ])
 
   const handleCodeScanned = React.useCallback(
@@ -375,12 +388,12 @@ export const ScanningQRCodeScreen: React.FC = () => {
             <Svg viewBox="0 0 100 100">
               <Circle cx={50} cy={50} r={50} fill={colors._white} opacity={0.5} />
             </Svg>
-            <Icon name="close" size={64} style={styles.iconClose} />
+            <GaloyIcon name="close" size={64} style={styles.iconClose} />
           </View>
         </Pressable>
         <View style={styles.openGallery}>
           <Pressable onPress={showImagePicker}>
-            <Icon
+            <GaloyIcon
               name="image"
               size={64}
               color={colors._lightGrey}
@@ -389,8 +402,8 @@ export const ScanningQRCodeScreen: React.FC = () => {
           </Pressable>
           <Pressable onPress={handleInvoicePaste}>
             {/* we could Paste from "FontAwesome" but as svg*/}
-            <Icon
-              name="clipboard-outline"
+            <GaloyIcon
+              name="clipboard"
               size={64}
               color={colors._lightGrey}
               style={styles.iconClipboard}

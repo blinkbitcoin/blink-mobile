@@ -8,12 +8,9 @@ import React, {
 } from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { FlatList } from "react-native-gesture-handler"
-import Icon from "react-native-vector-icons/Ionicons"
-
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
-import { LNURL_DOMAINS } from "@app/config"
 import { useAppConfig } from "@app/hooks"
 import {
   UserContact,
@@ -31,14 +28,21 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import { CountryCode, PhoneNumber } from "libphonenumber-js/mobile"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { SearchBar } from "@rn-vui/base"
 import { makeStyles, useTheme, Text, ListItem } from "@rn-vui/themed"
 
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useScanContext } from "@app/hooks/use-scan-context"
+import { ActiveWalletStatus } from "@app/types/wallet"
+import { useSelfCustodialContactList } from "@app/self-custodial/hooks/use-contact-list"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+
+import { toWalletBalances } from "./hooks/use-send-wallets"
 import { testProps } from "../../utils/testProps"
 import { ConfirmDestinationModal } from "./confirm-destination-modal"
 import { DestinationInformation } from "./destination-information"
-import { parseDestination } from "./payment-destination"
+import { resolveDestination } from "./payment-destination/resolve-destination"
 import {
   DestinationDirection,
   InvalidDestinationReason,
@@ -53,7 +57,11 @@ import {
 import { PhoneInput, PhoneInputInfo } from "@app/components/phone-input"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { normalizeString } from "@app/utils/helper"
-import { isPhoneNumber, parseValidPhoneNumber } from "@app/utils/phone"
+import {
+  isPhoneNumber,
+  parseValidPhoneNumber,
+  sanitizePhoneNumber,
+} from "@app/utils/phone"
 import { isInt } from "validator"
 
 gql`
@@ -149,8 +157,13 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   } = useTheme()
 
   const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "sendBitcoinDestination">>()
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "sendBitcoinDestination">
+    >()
   const isAuthed = useIsAuthed()
+  const activeWallet = useActiveWallet()
+  const { isSelfCustodial, isReady: isWalletReady } = activeWallet
+  const { sdk } = useSelfCustodialWallet()
 
   const [destinationState, dispatchDestinationStateAction] = useReducer(
     sendBitcoinDestinationReducer,
@@ -169,8 +182,10 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const { loading, data } = useSendBitcoinDestinationQuery({
     fetchPolicy: "cache-and-network",
     returnPartialData: true,
-    skip: !isAuthed,
+    skip: !isAuthed || isSelfCustodial,
   })
+
+  const { myWalletIds, bitcoinNetwork, lnurlDomains } = useScanContext()
 
   // forcing price refresh
   useRealtimePriceQuery({
@@ -178,12 +193,17 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     skip: !isAuthed,
   })
 
-  const wallets = useMemo(
-    () => data?.me?.defaultAccount.wallets,
-    [data?.me?.defaultAccount.wallets],
+  const wallets = useMemo(() => {
+    if (isSelfCustodial) {
+      return toWalletBalances(activeWallet.wallets)
+    }
+    return data?.me?.defaultAccount.wallets
+  }, [isSelfCustodial, activeWallet.wallets, data?.me?.defaultAccount.wallets])
+  const selfCustodialContacts = useSelfCustodialContactList(isSelfCustodial)
+  const contacts = useMemo(
+    () => (isSelfCustodial ? selfCustodialContacts : data?.me?.contacts ?? []),
+    [isSelfCustodial, selfCustodialContacts, data?.me?.contacts],
   )
-  const bitcoinNetwork = useMemo(() => data?.globals?.network, [data?.globals?.network])
-  const contacts = useMemo(() => data?.me?.contacts ?? [], [data?.me?.contacts])
   const contactHandleSet = useMemo(
     () => new Set(contacts.map((contact) => normalizeString(contact.handle))),
     [contacts],
@@ -321,17 +341,21 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         }
       }
 
-      const destination = await parseDestination({
-        rawInput,
-        myWalletIds: wallets.map((wallet) => wallet.id),
-        bitcoinNetwork,
-        lnurlDomains: [lnAddressHostname, ...LNURL_DOMAINS],
-        accountDefaultWalletQuery,
-      })
-      logParseDestinationResult(destination)
+      const wrappedDestination = await resolveDestination(
+        {
+          rawInput,
+          myWalletIds,
+          bitcoinNetwork,
+          lnurlDomains,
+          accountDefaultWalletQuery,
+        },
+        sdk,
+        lnAddressHostname,
+      )
+      logParseDestinationResult(wrappedDestination)
 
-      if (destination.valid === false) {
-        if (destination.invalidReason === InvalidDestinationReason.SelfPayment) {
+      if (wrappedDestination.valid === false) {
+        if (wrappedDestination.invalidReason === InvalidDestinationReason.SelfPayment) {
           dispatchDestinationStateAction({
             type: SendBitcoinActions.SetUnparsedDestination,
             payload: {
@@ -345,7 +369,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         dispatchDestinationStateAction({
           type: SendBitcoinActions.SetInvalid,
           payload: {
-            invalidDestination: destination,
+            invalidDestination: wrappedDestination,
             unparsedDestination: rawInput,
           },
         })
@@ -353,10 +377,12 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       }
 
       if (
-        destination.destinationDirection === DestinationDirection.Send &&
-        destination.validDestination.paymentType === PaymentType.Intraledger
+        wrappedDestination.destinationDirection === DestinationDirection.Send &&
+        wrappedDestination.validDestination.paymentType === PaymentType.Intraledger
       ) {
-        const normalizedHandle = normalizeString(destination.validDestination.handle)
+        const normalizedHandle = normalizeString(
+          wrappedDestination.validDestination.handle,
+        )
         const hasConfirmedUsername =
           normalizeString(destinationState.confirmationUsernameType?.username) ===
             normalizedHandle && destinationState.unparsedDestination === rawInput
@@ -365,11 +391,11 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           dispatchDestinationStateAction({
             type: SendBitcoinActions.SetRequiresUsernameConfirmation,
             payload: {
-              validDestination: destination,
+              validDestination: wrappedDestination,
               unparsedDestination: rawInput,
               confirmationUsernameType: {
                 type: "new-username",
-                username: destination.validDestination.handle,
+                username: wrappedDestination.validDestination.handle,
               },
             },
           })
@@ -378,11 +404,11 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       }
 
       if (
-        destination.destinationDirection === DestinationDirection.Send &&
-        destination.validDestination.paymentType === PaymentType.Lnurl &&
+        wrappedDestination.destinationDirection === DestinationDirection.Send &&
+        wrappedDestination.validDestination.paymentType === PaymentType.Lnurl &&
         activeInputRef.current === InputType.Phone
       ) {
-        const identifier = destination.validDestination.lnurlParams.identifier
+        const identifier = wrappedDestination.validDestination.lnurlParams.identifier
         const normalizedHandle = normalizeString(identifier)
         const hasConfirmedUsername =
           normalizeString(destinationState.confirmationUsernameType?.username) ===
@@ -392,11 +418,13 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           dispatchDestinationStateAction({
             type: SendBitcoinActions.SetRequiresUsernameConfirmation,
             payload: {
-              validDestination: destination,
+              validDestination: wrappedDestination,
               unparsedDestination: rawInput,
               confirmationUsernameType: {
                 type: "new-username",
-                username: identifier,
+                username: identifier.includes("@")
+                  ? identifier.split("@")[0]
+                  : identifier,
               },
             },
           })
@@ -407,7 +435,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       dispatchDestinationStateAction({
         type: SendBitcoinActions.SetValid,
         payload: {
-          validDestination: destination,
+          validDestination: wrappedDestination,
           unparsedDestination: rawInput,
         },
       })
@@ -418,10 +446,13 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       dispatchDestinationStateAction,
       destinationState,
       contactHandleSet,
+      myWalletIds,
       bitcoinNetwork,
+      lnurlDomains,
       wallets,
       contacts,
       parseValidPhone,
+      sdk,
       lnAddressHostname,
     ],
   )
@@ -506,9 +537,12 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     [resetInput],
   )
 
+  const processedPaymentRef = useRef<string | null>(null)
+
   useEffect(() => {
-    if (route.params?.payment) {
-      const text = route.params?.payment
+    if (route.params?.payment && route.params.payment !== processedPaymentRef.current) {
+      processedPaymentRef.current = route.params.payment
+      const text = route.params.payment
       const isPhoneNumberValid = parseValidPhone(text)
       if (isPhoneNumberValid && isPhoneNumberValid?.isValid()) {
         onFocusedInput(InputType.Phone)
@@ -516,8 +550,8 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         return
       }
       onFocusedInput(InputType.Search)
-      handleChangeText(route.params?.payment)
-      initiateGoToNextScreen(route.params?.payment)
+      handleChangeText(route.params.payment)
+      initiateGoToNextScreen(route.params.payment)
     }
   }, [
     route.params?.payment,
@@ -670,6 +704,24 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     styles,
   ])
 
+  if (isSelfCustodial && !isWalletReady) {
+    const isOfflineOrError =
+      activeWallet.status === ActiveWalletStatus.Error ||
+      activeWallet.status === ActiveWalletStatus.Unavailable
+
+    return (
+      <Screen>
+        <View style={styles.sendBitcoinDestinationContainer}>
+          {isOfflineOrError ? (
+            <Text style={styles.offlineText}>{LL.SendBitcoinScreen.walletOffline()}</Text>
+          ) : (
+            <ActivityIndicator size="large" />
+          )}
+        </View>
+      </Screen>
+    )
+  }
+
   return (
     <Screen keyboardOffset="navigationHeader" keyboardShouldPersistTaps="handled">
       <ConfirmDestinationModal
@@ -716,18 +768,11 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           />
           {destinationState.unparsedDestination &&
           activeInputRef.current === InputType.Search ? (
-            <Icon
-              name="close"
-              size={24}
-              onPress={resetInput}
-              color={styles.icon.color}
-              style={styles.iconContainer}
-            />
+            <TouchableOpacity onPress={resetInput} style={styles.iconContainer}>
+              <GaloyIcon name="close" size={24} color={styles.icon.color} />
+            </TouchableOpacity>
           ) : (
-            <TouchableOpacity
-              onPress={handlePaste}
-              disabled={activeInputRef.current === InputType.Phone}
-            >
+            <TouchableOpacity onPress={handlePaste}>
               <View style={styles.iconContainer}>
                 <Text color={colors.primary} type="p2">
                   {LL.common.paste()}
@@ -884,11 +929,12 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
     setKeepCountryCode(false)
 
     try {
-      const clipboard = await Clipboard.getString()
+      const clipboardValue = await Clipboard.getString()
+      const clipboardPhoneNumber = sanitizePhoneNumber(clipboardValue)
 
-      let parsed = null
-      parsed = parseValidPhone(clipboard)
-      const parseNumber = parsed && parsed?.isValid() ? parsed.number : clipboard
+      const parsed = parseValidPhone(clipboardPhoneNumber)
+      const parseNumber =
+        parsed && parsed?.isValid() ? parsed.number : clipboardPhoneNumber
 
       updateMatchingContacts(parseNumber)
       dispatchDestinationStateAction({
@@ -990,12 +1036,11 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
         <PhoneInput
           rightIcon={
             rawPhoneNumber && activeInputRef.current === InputType.Phone ? (
-              <Icon name="close" size={24} onPress={resetInput} color={colors.primary} />
+              <TouchableOpacity onPress={resetInput}>
+                <GaloyIcon name="close" size={24} color={colors.primary} />
+              </TouchableOpacity>
             ) : (
-              <TouchableOpacity
-                onPress={handlePastePhone}
-                disabled={activeInputRef.current === InputType.Search}
-              >
+              <TouchableOpacity onPress={handlePastePhone}>
                 <Text color={colors.primary} type="p2">
                   {LL.common.paste()}
                 </Text>
@@ -1004,7 +1049,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
           }
           onChangeText={(text) => {
             onFocusedInput(InputType.Phone)
-            setRawPhoneNumber(text)
+            setRawPhoneNumber(sanitizePhoneNumber(text))
           }}
           onChangeInfo={(e) => {
             setDefaultPhoneInputInfo(e)
@@ -1044,6 +1089,13 @@ const usestyles = makeStyles(({ colors }) => ({
   sendBitcoinDestinationContainer: {
     padding: 20,
     flex: 1,
+  },
+  offlineText: {
+    textAlign: "center",
+    marginTop: 40,
+    fontSize: 16,
+    color: colors.error,
+    paddingHorizontal: 20,
   },
   fieldBackground: {
     flexDirection: "row",

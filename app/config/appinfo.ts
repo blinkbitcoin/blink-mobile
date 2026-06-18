@@ -5,7 +5,6 @@ export const APP_STORE_LINK =
 export const PLAY_STORE_LINK =
   "https://play.google.com/store/apps/details?id=com.galoyapp"
 export const PREFIX_LINKING = [
-  "https://pay.mainnet.galoy.io",
   "https://pay.bbw.sv",
   "https://pay.blink.sv",
   "bitcoinbeach://",
@@ -20,7 +19,16 @@ export const getInviteLink = (_username: string | null | undefined) => {
   return `https://get.blink.sv${username}`
 }
 
+export const BLINK_DOMAIN = "blink.sv"
+
+export const getCloudBackupFilenamePrefix = (network: string) =>
+  `blink-spark-backup-${network.toLowerCase()}-`
+
+export const getCloudBackupFilename = (network: string, walletIdentifier: string) =>
+  `${getCloudBackupFilenamePrefix(network)}${walletIdentifier}.json`
+
 export const BLINK_DEEP_LINK_PREFIX = "blink:/"
 export const TELEGRAM_CALLBACK_PATH = "auth/passport-callback"
 export const HIDDEN_AMOUNT_PLACEHOLDER = "****"
 export const APPROXIMATE_PREFIX = "~"
+export const MASK_CHAR = "•"

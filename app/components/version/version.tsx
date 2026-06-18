@@ -4,7 +4,7 @@ import DeviceInfo from "react-native-device-info"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useNavigation } from "@react-navigation/native"
-import type { StackNavigationProp } from "@react-navigation/stack"
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -18,7 +18,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
 }))
 
-type VersionComponentNavigationProp = StackNavigationProp<
+type VersionComponentNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "getStarted" | "settings"
 >
