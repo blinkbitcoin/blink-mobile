@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "ไม่สามารถแปลงข้อมูลธุรกรรมเป็นไฟล์ CSV ได้ มีบางสิ่งผิดปกติ หากปัญหานี้ยังคงไม่หายไป กรุณาติดต่อศูนย์ช่วยเหลือ",
     "lnurlNoUsername": "เพื่อจะสร้างแอดเดรส lnurl คุณจะต้องตั้งชื่อผู้ใช้ของตัวเองก่อน อยากตั้งตอนนี้เลยไหม?",
     "copyClipboardLnurl": "คัดลอกแอดเดรส Lnurl ไว้ในคลิปบอร์ด",
-    "defaultWallet": "Default Account",
+    "defaultWallet": "Default balance",
     "rateUs": "Rate us on {storeName: string}",
     "theme": "Theme",
     "nfc": "Receive from NFC",

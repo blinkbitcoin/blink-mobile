@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "لم يمكن تصدير المعاملات في ملف csv. حدث خطأ. إذا استمرت المشكلة راجع الدعم.",
     "lnurlNoUsername": "لتوليد عنوان lnurl عليك أولًا أن تنشئ اسم مستخدم. هل تريد أن تحدد اسم مستخدمك الآن؟",
     "copyClipboardLnurl": "نُسخ عنوان Lnurl إلى الحافظة",
-    "defaultWallet": "Default Account",
+    "defaultWallet": "Default balance",
     "rateUs": "Rate us on {storeName: string}",
     "theme": "Theme",
     "nfc": "Receive from NFC",
