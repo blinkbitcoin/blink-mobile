@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { View, ScrollView } from "react-native"
+import { AppState, View, ScrollView } from "react-native"
 import ViewShot, { type ViewShotRef } from "react-native-view-shot"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -286,7 +286,21 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     return () => clearTimeout(timer)
   }, [successIconDuration])
 
-  const handleNavigateHome = () => navigation.navigate("Primary")
+  const handleNavigateHome = useCallback(
+    () => navigation.navigate("Primary"),
+    [navigation],
+  )
+
+  const appState = useRef(AppState.currentState)
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (appState.current === "active" && nextAppState === "background") {
+        handleNavigateHome()
+      }
+      appState.current = nextAppState
+    })
+    return () => subscription.remove()
+  }, [handleNavigateHome])
 
   if (showSuccessIcon) {
     return (
