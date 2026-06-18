@@ -8296,7 +8296,7 @@ type RootTranslation = {
 			 */
 			receiveBitcoinDescription: string
 			/**
-			 * S​e​n​d​ ​u​p​ ​t​o​ ​$​1​,​0​0​0​ ​p​e​r​ ​d​a​y
+			 * S​e​n​d​ ​u​p​ ​t​o​ ​$​1​,​0​0​0​ ​U​S​D​ ​p​e​r​ ​d​a​y
 			 */
 			dailyLimitDescription: string
 			/**
@@ -17815,7 +17815,7 @@ export type TranslationFunctions = {
 			 */
 			receiveBitcoinDescription: () => LocalizedString
 			/**
-			 * Send up to $1,000 per day
+			 * Send up to $1,000 USD per day
 			 */
 			dailyLimitDescription: () => LocalizedString
 			/**

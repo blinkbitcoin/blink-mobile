@@ -2650,7 +2650,7 @@ const en: BaseTranslation = {
       mainTitle: "Welcome to Level 1",
       title: "New features unlocked for your account:",
       receiveBitcoinDescription: "Receive Bitcoin using your phone number",
-      dailyLimitDescription: "Send up to $1,000 per day",
+      dailyLimitDescription: "Send up to $1,000 USD per day",
       onchainDescription: "Receive on-chain payments",
     },
     emailBenefits: {
