@@ -12,10 +12,10 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
-import { useBackupState } from "@app/self-custodial/providers/backup-state"
+import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { testProps } from "@app/utils/testProps"
 
-import { useBackupConfirm, useNavigateAfterBackup } from "../hooks"
+import { useBackupConfirm, useCompleteBackup } from "../hooks"
 
 type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
 
@@ -27,15 +27,13 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
   } = useTheme()
   const { challenges, successMessage } = useRoute<ConfirmRouteProp>().params
 
-  const { setBackupCompleted } = useBackupState()
   const { loading: checkpointLoading } = useMigrationCheckpoint()
-  const navigateAfterBackup = useNavigateAfterBackup()
+  const completeBackup = useCompleteBackup()
 
   const onComplete = useCallback(() => {
-    setBackupCompleted("manual")
     logSelfCustodialBackupCompleted({ backupMethod: "manual" })
-    navigateAfterBackup({ message: successMessage })
-  }, [navigateAfterBackup, setBackupCompleted, successMessage])
+    completeBackup({ method: BackupMethod.Manual, message: successMessage })
+  }, [completeBackup, successMessage])
 
   const {
     inputs,

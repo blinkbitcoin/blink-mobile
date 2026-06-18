@@ -8,7 +8,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
-import { BackupMethod, useBackupState } from "@app/self-custodial/providers/backup-state"
+import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { toastShow } from "@app/utils/toast"
 
 import {
@@ -16,7 +16,7 @@ import {
   isCredentialBackupAvailable,
   useCredentialBackup,
 } from "./use-credential-backup"
-import { useNavigateAfterBackup } from "./use-navigate-after-backup"
+import { useCompleteBackup } from "./use-complete-backup"
 import { useWalletIdentity, useWalletMnemonic } from "./use-wallet-mnemonic"
 
 const showBackupErrorToast = (error: CredentialError, LL: TranslationFunctions): void => {
@@ -48,8 +48,7 @@ export const useBackupMethods = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const mnemonic = useWalletMnemonic()
   const identityPubkey = useWalletIdentity(mnemonic)
-  const navigateAfterBackup = useNavigateAfterBackup()
-  const { setBackupCompleted } = useBackupState()
+  const completeBackup = useCompleteBackup()
   const { selfCustodialEntries } = useAccountRegistry()
   const credentialBackupAvailable = isCredentialBackupAvailable(
     selfCustodialEntries.length,
@@ -72,15 +71,14 @@ export const useBackupMethods = () => {
       return
     }
 
-    setBackupCompleted(BackupMethod.Keychain)
     logSelfCustodialBackupCompleted({ backupMethod: "keychain" })
     toastShow({
       message: LL.BackupScreen.BackupMethod.passwordManagerBackupSaved(),
       type: "success",
       LL,
     })
-    navigateAfterBackup()
-  }, [save, navigateAfterBackup, LL, mnemonic, identityPubkey, setBackupCompleted])
+    completeBackup({ method: BackupMethod.Keychain })
+  }, [save, completeBackup, LL, mnemonic, identityPubkey])
 
   const handleCloudBackup = useCallback(() => {
     navigation.navigate("selfCustodialCloudBackup")

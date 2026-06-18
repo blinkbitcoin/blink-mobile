@@ -13,10 +13,12 @@ jest.mock("react-native-inappbrowser-reborn", () => ({
 
 const mockCheckpoint = jest.fn<string | null, []>()
 const mockCheckpointLoading = jest.fn<boolean, []>()
+const mockMigrationAccountId = jest.fn<string | null, []>()
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
     saveCheckpoint: jest.fn(),
     checkpoint: mockCheckpoint(),
+    accountId: mockMigrationAccountId(),
     loading: mockCheckpointLoading(),
   }),
   MigrationCheckpoint: {
@@ -33,9 +35,13 @@ const mockBackupStateValue = jest.fn<
   },
   []
 >()
+const mockMarkBackupCompletedFor = jest.fn().mockResolvedValue(undefined)
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupStatus: { None: "none", Completed: "completed" },
+  BackupMethod: { Cloud: "cloud", Keychain: "keychain", Manual: "manual" },
   useBackupState: () => mockBackupStateValue(),
+  markBackupCompletedFor: (...args: readonly unknown[]) =>
+    mockMarkBackupCompletedFor(...args),
 }))
 
 const mockActiveWalletValue = jest.fn()
@@ -86,6 +92,7 @@ describe("BackupPhraseConfirmScreen", () => {
     jest.clearAllMocks()
     jest.useFakeTimers()
     mockCheckpoint.mockReturnValue(null)
+    mockMigrationAccountId.mockReturnValue("migration-uuid")
     mockCheckpointLoading.mockReturnValue(false)
     mockRouteParams.mockReturnValue({
       challenges: [
@@ -223,7 +230,7 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
-    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
+    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "manual")
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
   })
 
@@ -265,6 +272,7 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
     expect(mockNavigate).toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
       expect.objectContaining({ reBackup: false }),

@@ -2,13 +2,10 @@ import { renderHook, act } from "@testing-library/react-native"
 
 import { useCloudBackup } from "@app/screens/self-custodial/onboarding/hooks/use-cloud-backup"
 
-const mockNavigateAfterBackup = jest.fn()
-jest.mock(
-  "@app/screens/self-custodial/onboarding/hooks/use-navigate-after-backup",
-  () => ({
-    useNavigateAfterBackup: () => mockNavigateAfterBackup,
-  }),
-)
+const mockCompleteBackup = jest.fn()
+jest.mock("@app/screens/self-custodial/onboarding/hooks/use-complete-backup", () => ({
+  useCompleteBackup: () => mockCompleteBackup,
+}))
 
 const mockStartSession = jest.fn()
 const mockUpload = jest.fn()
@@ -66,9 +63,6 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
 }))
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
-  useBackupState: () => ({
-    setBackupCompleted: jest.fn(),
-  }),
   BackupMethod: { Cloud: "cloud", Keychain: "keychain", Manual: "manual" },
 }))
 
@@ -170,7 +164,7 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockNavigateAfterBackup).toHaveBeenCalled()
+    expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
   })
 
   it("uploads encrypted backup when encryption enabled", async () => {
@@ -189,7 +183,7 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockNavigateAfterBackup).toHaveBeenCalled()
+    expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
   })
 
   it("shows error toast on upload failure", async () => {
@@ -206,7 +200,7 @@ describe("useCloudBackup", () => {
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ message: "Upload failed" }),
     )
-    expect(mockNavigateAfterBackup).not.toHaveBeenCalled()
+    expect(mockCompleteBackup).not.toHaveBeenCalled()
   })
 
   it("does not double-report to crashlytics on upload failure — the inner hook owns Drive error telemetry", async () => {
@@ -406,7 +400,7 @@ describe("useCloudBackup", () => {
     })
 
     expect(mockUpload).not.toHaveBeenCalled()
-    expect(mockNavigateAfterBackup).not.toHaveBeenCalled()
+    expect(mockCompleteBackup).not.toHaveBeenCalled()
   })
 
   it("includes version in backup payload", async () => {

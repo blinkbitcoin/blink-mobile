@@ -41,13 +41,10 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", ()
   useWalletIdentity: () => mockIdentityPubkey,
 }))
 
-const mockNavigateAfterBackup = jest.fn()
-jest.mock(
-  "@app/screens/self-custodial/onboarding/hooks/use-navigate-after-backup",
-  () => ({
-    useNavigateAfterBackup: () => mockNavigateAfterBackup,
-  }),
-)
+const mockCompleteBackup = jest.fn()
+jest.mock("@app/screens/self-custodial/onboarding/hooks/use-complete-backup", () => ({
+  useCompleteBackup: () => mockCompleteBackup,
+}))
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
@@ -64,16 +61,12 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-const mockSetBackupCompleted = jest.fn()
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupMethod: {
     Cloud: "cloud",
     Keychain: "keychain",
     Manual: "manual",
   },
-  useBackupState: () => ({
-    setBackupCompleted: mockSetBackupCompleted,
-  }),
 }))
 
 let mockSelfCustodialEntries: Array<{ id: string; lightningAddress: string | null }> = []
@@ -129,11 +122,10 @@ describe("useBackupMethods", () => {
       })
 
       expect(mockSave).toHaveBeenCalledWith("test-pubkey-1234", "youth indicate void")
-      expect(mockSetBackupCompleted).toHaveBeenCalledWith("keychain")
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ type: "success", message: "Backup saved" }),
       )
-      expect(mockNavigateAfterBackup).toHaveBeenCalled()
+      expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "keychain" })
     })
 
     it("stays silent when the user cancels", async () => {
@@ -146,7 +138,7 @@ describe("useBackupMethods", () => {
 
       expect(mockToastShow).not.toHaveBeenCalled()
       expect(mockNavigate).not.toHaveBeenCalled()
-      expect(mockSetBackupCompleted).not.toHaveBeenCalled()
+      expect(mockCompleteBackup).not.toHaveBeenCalled()
     })
 
     it("shows the unavailable toast when no provider is configured", async () => {

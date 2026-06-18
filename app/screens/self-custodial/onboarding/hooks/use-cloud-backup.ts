@@ -7,7 +7,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
-import { BackupMethod, useBackupState } from "@app/self-custodial/providers/backup-state"
+import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import {
   buildBackupPayload,
@@ -19,7 +19,7 @@ import { toastShow } from "@app/utils/toast"
 
 import { getCloudProviderName } from "../utils"
 
-import { useNavigateAfterBackup } from "./use-navigate-after-backup"
+import { useCompleteBackup } from "./use-complete-backup"
 import { usePlatformCloudBackup } from "./use-platform-cloud-backup"
 import { useWalletIdentity, useWalletMnemonic } from "./use-wallet-mnemonic"
 
@@ -54,14 +54,13 @@ export const useCloudBackup = ({
   version = DEFAULT_BACKUP_VERSION,
 }: UseCloudBackupParams) => {
   const { LL } = useI18nContext()
-  const navigateAfterBackup = useNavigateAfterBackup()
+  const completeBackup = useCompleteBackup()
   const { appConfig } = useAppConfig()
   const { startSession, upload, downloadById, resolveErrorMessage, loading } =
     usePlatformCloudBackup()
   const mnemonic = useWalletMnemonic()
   const identityPubkey = useWalletIdentity(mnemonic)
   const { lightningAddress } = useSelfCustodialAccountInfo()
-  const { setBackupCompleted } = useBackupState()
 
   const handleBackup = useCallback(async () => {
     const provider = getCloudProviderName(LL)
@@ -122,7 +121,6 @@ export const useCloudBackup = ({
       return
     }
 
-    setBackupCompleted(BackupMethod.Cloud)
     logSelfCustodialBackupCompleted({
       backupMethod: Platform.OS === "ios" ? "icloud" : "google_drive",
     })
@@ -131,7 +129,7 @@ export const useCloudBackup = ({
       type: "success",
       LL,
     })
-    navigateAfterBackup()
+    completeBackup({ method: BackupMethod.Cloud })
   }, [
     isEncrypted,
     password,
@@ -140,13 +138,12 @@ export const useCloudBackup = ({
     upload,
     downloadById,
     resolveErrorMessage,
-    navigateAfterBackup,
+    completeBackup,
     LL,
     appConfig.galoyInstance.name,
     mnemonic,
     identityPubkey,
     lightningAddress,
-    setBackupCompleted,
   ])
 
   return { handleBackup, loading }
