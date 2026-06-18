@@ -28,10 +28,10 @@
         "text": "By clicking 'Accept', you agree to our Terms And Conditions. You also agree that you are not a resident or citizen from one of the prohibited countries."
     },
     "SetAccountModal": {
-        "title": "Set up your default Balance",
+        "title": "Set up your default balance",
         "description": "You can always change this later in the Settings",
-        "stablesatsTag": "Dollar Balance — powered by Stablesats",
-        "bitcoinTag": "Bitcoin Balance for stacking sats"
+        "stablesatsTag": "Dollar balance — powered by Stablesats",
+        "bitcoinTag": "Bitcoin balance for stacking sats"
     },
     "NoteInput": {
         "addNote": "Add note"
@@ -2121,7 +2121,7 @@
         "setNote": "set a note",
         "tapQrCodeCopy": "Tap QR Code to Copy",
         "title": "Receive Bitcoin",
-        "usdTitle": "Receive to Dollar Balance",
+        "usdTitle": "Receive to Dollar balance",
         "error": "Failed to generate invoice. Please contact support if this problem persists.",
         "copyInvoice": "Copy",
         "shareInvoice": "Share",
@@ -2169,7 +2169,7 @@
     },
     "RedeemBitcoinScreen": {
         "title": "Redeem Bitcoin",
-        "usdTitle": "Redeem to Dollar Balance",
+        "usdTitle": "Redeem to Dollar balance",
         "error": "Failed to generate invoice. Please contact support if this problem persists.",
         "redeemingError": "Failed to redeem Bitcoin. Please contact support if this problem persists.",
         "submissionError": "Failed to submit withdrawal request. Please contact support if this problem persists.",
@@ -2342,7 +2342,7 @@
         "csvTransactionsError": "Unable to export transactions to csv. Something went wrong. If issue persists please contact support.",
         "lnurlNoUsername": "To generate an lnurl address you must first set a username.  Do you want to set a username now?",
         "copyClipboardLnurl": "Lnurl address has been copied in the clipboard",
-        "defaultWallet": "Default Balance",
+        "defaultWallet": "Default balance",
         "rateUs": "Rate us on {storeName: string}",
         "theme": "Theme",
         "nfc": "Receive from NFC",
@@ -2413,7 +2413,7 @@
         "logoutAlertContentPhone": "You will need to re-enter your phone number to log back in.\nyour phone number is {phoneNumber: string} so make sure you have access to it to log back in",
         "logoutAlertContentEmail": "You will need to re-enter your email to log back in.\nyour email is {email: string} so make sure you have access to it to log back in",
         "logoutAlertContentPhoneEmail": "You will need to re-enter either your phone number or email to log back in.\nyour phone number is {phoneNumber: string} and your email is {email: string} so make sure you have access to those to log back in",
-        "usdBalanceWarning": "You have a Dollar Balance of {balance: string}.",
+        "usdBalanceWarning": "You have a Dollar balance of {balance: string}.",
         "btcBalanceWarning": "You have a bitcoin balance of {balance: string}.",
         "secureYourAccount": "Register to secure your account",
         "tapToAdd": "Tap to add",
@@ -2475,10 +2475,10 @@
         "toastMessage": "Secret copied to clipboard!"
     },
     "DefaultWalletScreen": {
-        "title": "Default Balance",
-        "titleSelfCustodial": "Default Balance",
-        "infoBtc": "Your Bitcoin Balance is for stacking sats, where the value moves with the market.",
-        "infoUsd": "Your Dollar Balance is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the USD value doesn't change.",
+        "title": "Default balance",
+        "titleSelfCustodial": "Default balance",
+        "infoBtc": "Your Bitcoin balance is for stacking sats, where the value moves with the market.",
+        "infoUsd": "Your Dollar balance is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the USD value doesn't change.",
         "infoUsdSelfCustodial": "Due to user experience concerns we decided to not activate this feature in the non-custodial accounts. Only Bitcoin is available as your default receive setting."
     },
     "ThemeScreen": {
@@ -2494,23 +2494,23 @@
         "DEFAULT": "Default (OS)"
     },
     "StablesatsModal": {
-        "header": "Your Dollar Balance is powered by Stablesats",
-        "body": "Your Dollar Balance uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.",
+        "header": "Your Dollar balance is powered by Stablesats",
+        "body": "Your Dollar balance uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.",
         "termsAndConditions": "Read the Terms & Conditions.",
         "learnMore": "Learn more about Stablesats",
-        "headerSelfCustodial": "Your Dollar Balance holds stablecoins",
-        "bodySelfCustodial": "In your Dollar Balance you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from your Dollar Balance, you will swap your stablecoins and send as Bitcoin to the recipient.",
+        "headerSelfCustodial": "Your Dollar balance holds stablecoins",
+        "bodySelfCustodial": "In your Dollar balance you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from your Dollar balance, you will swap your stablecoins and send as Bitcoin to the recipient.",
         "learnMoreSelfCustodial": "Learn more"
     },
     "StablesatsRestriction": {
         "modalTitle": "Stablesats is not available in your region",
-        "modalBody": "To get access to a Dollar Balance, create a non-custodial account.",
+        "modalBody": "To get access to a Dollar balance, create a non-custodial account.",
         "createNew": "Create new",
         "walletLabel": "not available in your region"
     },
     "ConvertDollarToBitcoinModal": {
-        "title": "Dollar Balance is no longer available in your region",
-        "body": "Transfer your Dollar Balance to Bitcoin",
+        "title": "Dollar balance is no longer available in your region",
+        "body": "Transfer your Dollar balance to Bitcoin",
         "youHave": "You have",
         "youGet": "You get",
         "approve": "Approve"
@@ -2536,8 +2536,8 @@
         "received": "You received",
         "spent": "You spent",
         "sending": "Sending",
-        "receivingAccount": "Receiving Balance",
-        "sendingAccount": "Sending Balance",
+        "receivingAccount": "Receiving balance",
+        "sendingAccount": "Sending balance",
         "txNotBroadcast": "Your transaction is queued. It should appear in the mempool {countdown: string}.",
         "momentarily": "momentarily"
     },
@@ -2548,7 +2548,7 @@
         "perWeek": "per week",
         "unlimited": "Unlimited",
         "remaining": "Remaining",
-        "stablesatTransfers": "Dollar Balance transfers",
+        "stablesatTransfers": "Dollar balance transfers",
         "internalSend": "Send to {bankName: string} user",
         "error": "Unable to fetch limits at this time",
         "increaseLimits": "Increase your limits"
@@ -2742,7 +2742,7 @@
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Bitcoin Price",
-        "btcAccount": "Bitcoin Balance",
+        "btcAccount": "Bitcoin balance",
         "cancel": "Cancel",
         "close": "Close",
         "confirm": "Confirm",
@@ -2814,7 +2814,7 @@
         "transactionsError": "Error loading transactions",
         "tryAgain": "Try Again",
         "type": "Type",
-        "usdAccount": "Dollar Balance",
+        "usdAccount": "Dollar balance",
         "username": "Username",
         "usernameRequired": "Username is required",
         "backupAccount": "Backup/upgrade account",
@@ -3655,23 +3655,23 @@
         "error": "Unable to claim this deposit"
     },
     "StableBalance": {
-        "title": "Stable Balance",
+        "title": "Stable balance",
         "description": "Hold a USD-denominated balance powered by USDB on Spark.",
         "balanceLabelBtc": "Balance · SATS",
         "balanceLabelUsd": "Balance · USD",
-        "settingsRowTitle": "Stable Balance",
-        "settingsTitle": "Stable Balance",
+        "settingsRowTitle": "Stable balance",
+        "settingsTitle": "Stable balance",
         "settingsDescription": "Keep part of your wallet in USD. Convert between BTC and USD manually anytime using the Convert action.",
         "activationLabel": "Active",
         "activeHint": "Your wallet is holding USD via USDB.",
         "inactiveHint": "Your wallet is holding BTC only.",
-        "deactivateWarningBody": "You still have {amount:string}. Convert to BTC first, or your USD balance will be hidden until you reactivate Stable Balance.",
-        "toggleFailedToast": "Could not update Stable Balance. Please try again.",
+        "deactivateWarningBody": "You still have {amount:string}. Convert to BTC first, or your USD balance will be hidden until you reactivate Stable balance.",
+        "toggleFailedToast": "Could not update Stable balance. Please try again.",
         "toggleModal": {
-            "activateTitle": "Activate Stable Balance",
+            "activateTitle": "Activate Stable balance",
             "activateBody": "Your BTC balance will be converted to USDB. This is the estimated conversion fee.",
             "activateConfirm": "Activate",
-            "deactivateTitle": "Deactivate Stable Balance",
+            "deactivateTitle": "Deactivate Stable balance",
             "deactivateBody": "Your USDB balance will be converted back to BTC. This is the estimated conversion fee.",
             "deactivateConfirm": "Deactivate",
             "cancel": "Cancel"
