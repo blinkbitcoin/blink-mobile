@@ -35,17 +35,19 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
 }))
 
+let mockIdentityPubkey: string | null = "test-pubkey-1234"
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () => "youth indicate void",
+  useWalletIdentity: () => mockIdentityPubkey,
 }))
 
-let mockIdentityPubkey: string | null = "test-pubkey-1234"
-jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
-  useSelfCustodialAccountInfo: () => ({
-    identityPubkey: mockIdentityPubkey,
-    lightningAddress: null,
+const mockNavigateAfterBackup = jest.fn()
+jest.mock(
+  "@app/screens/self-custodial/onboarding/hooks/use-navigate-after-backup",
+  () => ({
+    useNavigateAfterBackup: () => mockNavigateAfterBackup,
   }),
-}))
+)
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
@@ -131,7 +133,7 @@ describe("useBackupMethods", () => {
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ type: "success", message: "Backup saved" }),
       )
-      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+      expect(mockNavigateAfterBackup).toHaveBeenCalled()
     })
 
     it("stays silent when the user cancels", async () => {

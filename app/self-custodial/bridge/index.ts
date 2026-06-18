@@ -8,6 +8,7 @@ export {
 } from "./lifecycle"
 export {
   getWalletInfo,
+  deriveWalletIdentityPubkey,
   listPayments,
   getUserSettings,
   syncSelfCustodialWallet,

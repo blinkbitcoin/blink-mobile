@@ -2,12 +2,13 @@ import { renderHook, act } from "@testing-library/react-native"
 
 import { useCloudBackup } from "@app/screens/self-custodial/onboarding/hooks/use-cloud-backup"
 
-const mockNavigate = jest.fn()
-jest.mock("@react-navigation/native", () => ({
-  ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
-  useFocusEffect: jest.fn(),
-}))
+const mockNavigateAfterBackup = jest.fn()
+jest.mock(
+  "@app/screens/self-custodial/onboarding/hooks/use-navigate-after-backup",
+  () => ({
+    useNavigateAfterBackup: () => mockNavigateAfterBackup,
+  }),
+)
 
 const mockStartSession = jest.fn()
 const mockUpload = jest.fn()
@@ -51,15 +52,15 @@ jest.mock("@app/utils/crypto", () => ({
   encryptAesGcm: () => ({ data: "ZW5jcnlwdGVk", iv: "aXY=" }),
 }))
 
+let mockIdentityPubkey: string | null = "test-pubkey-1234"
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () => "youth indicate void",
+  useWalletIdentity: () => mockIdentityPubkey,
 }))
 
-let mockIdentityPubkey: string | null = "test-pubkey-1234"
 let mockLightningAddress: string | null = null
 jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
   useSelfCustodialAccountInfo: () => ({
-    identityPubkey: mockIdentityPubkey,
     lightningAddress: mockLightningAddress,
   }),
 }))
@@ -169,7 +170,7 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+    expect(mockNavigateAfterBackup).toHaveBeenCalled()
   })
 
   it("uploads encrypted backup when encryption enabled", async () => {
@@ -188,7 +189,7 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+    expect(mockNavigateAfterBackup).toHaveBeenCalled()
   })
 
   it("shows error toast on upload failure", async () => {
@@ -205,7 +206,7 @@ describe("useCloudBackup", () => {
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ message: "Upload failed" }),
     )
-    expect(mockNavigate).not.toHaveBeenCalledWith("selfCustodialBackupSuccess")
+    expect(mockNavigateAfterBackup).not.toHaveBeenCalled()
   })
 
   it("does not double-report to crashlytics on upload failure — the inner hook owns Drive error telemetry", async () => {
@@ -405,7 +406,7 @@ describe("useCloudBackup", () => {
     })
 
     expect(mockUpload).not.toHaveBeenCalled()
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockNavigateAfterBackup).not.toHaveBeenCalled()
   })
 
   it("includes version in backup payload", async () => {

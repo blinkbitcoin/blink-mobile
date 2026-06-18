@@ -2,23 +2,20 @@ import React, { useCallback, useEffect, useRef } from "react"
 import { TextInput, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import { useRoute, useNavigation, RouteProp } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { useRoute, RouteProp } from "@react-navigation/native"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { SuggestionBar } from "@app/components/suggestion-bar"
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
-import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
-import { hasFunds } from "@app/utils/has-funds"
+import { useBackupState } from "@app/self-custodial/providers/backup-state"
 import { testProps } from "@app/utils/testProps"
 
-import { useBackupConfirm } from "../hooks"
+import { useBackupConfirm, useNavigateAfterBackup } from "../hooks"
 
 type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
 
@@ -28,36 +25,17 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { challenges, successMessage } = useRoute<ConfirmRouteProp>().params
 
-  const { wallets, isSelfCustodial } = useActiveWallet()
-  const { backupState, setBackupCompleted } = useBackupState()
-  const { checkpoint, loading: checkpointLoading } = useMigrationCheckpoint()
-  const alreadyBackedUp = backupState.status === BackupStatus.Completed
-  // Migration only applies on a custodial account; self-custodial backups are standalone.
-  const isMigrating = !isSelfCustodial && checkpoint !== null && !alreadyBackedUp
-  const walletsHaveFunds = hasFunds(wallets)
+  const { setBackupCompleted } = useBackupState()
+  const { loading: checkpointLoading } = useMigrationCheckpoint()
+  const navigateAfterBackup = useNavigateAfterBackup()
 
   const onComplete = useCallback(() => {
     setBackupCompleted("manual")
     logSelfCustodialBackupCompleted({ backupMethod: "manual" })
-    if (isMigrating && walletsHaveFunds) {
-      navigation.navigate("accountMigrationTransferringFunds")
-      return
-    }
-    navigation.navigate("selfCustodialBackupSuccess", {
-      reBackup: alreadyBackedUp,
-      message: successMessage,
-    })
-  }, [
-    navigation,
-    isMigrating,
-    walletsHaveFunds,
-    alreadyBackedUp,
-    setBackupCompleted,
-    successMessage,
-  ])
+    navigateAfterBackup({ message: successMessage })
+  }, [navigateAfterBackup, setBackupCompleted, successMessage])
 
   const {
     inputs,

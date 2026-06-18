@@ -8,7 +8,6 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
-import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { BackupMethod, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { toastShow } from "@app/utils/toast"
 
@@ -17,7 +16,8 @@ import {
   isCredentialBackupAvailable,
   useCredentialBackup,
 } from "./use-credential-backup"
-import { useWalletMnemonic } from "./use-wallet-mnemonic"
+import { useNavigateAfterBackup } from "./use-navigate-after-backup"
+import { useWalletIdentity, useWalletMnemonic } from "./use-wallet-mnemonic"
 
 const showBackupErrorToast = (error: CredentialError, LL: TranslationFunctions): void => {
   switch (error) {
@@ -47,7 +47,8 @@ export const useBackupMethods = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const mnemonic = useWalletMnemonic()
-  const { identityPubkey } = useSelfCustodialAccountInfo()
+  const identityPubkey = useWalletIdentity(mnemonic)
+  const navigateAfterBackup = useNavigateAfterBackup()
   const { setBackupCompleted } = useBackupState()
   const { selfCustodialEntries } = useAccountRegistry()
   const credentialBackupAvailable = isCredentialBackupAvailable(
@@ -78,8 +79,8 @@ export const useBackupMethods = () => {
       type: "success",
       LL,
     })
-    navigation.navigate("selfCustodialBackupSuccess")
-  }, [save, navigation, LL, mnemonic, identityPubkey, setBackupCompleted])
+    navigateAfterBackup()
+  }, [save, navigateAfterBackup, LL, mnemonic, identityPubkey, setBackupCompleted])
 
   const handleCloudBackup = useCallback(() => {
     navigation.navigate("selfCustodialCloudBackup")

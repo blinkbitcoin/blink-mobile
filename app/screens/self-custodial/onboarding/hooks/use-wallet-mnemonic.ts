@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks/use-migration-checkpoint"
+import { deriveWalletIdentityPubkey } from "@app/self-custodial/bridge"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 export const useWalletMnemonic = (): string => {
@@ -30,3 +31,6 @@ export const useWalletMnemonic = (): string => {
 
   return mnemonic
 }
+
+export const useWalletIdentity = (mnemonic: string): string =>
+  useMemo(() => (mnemonic ? deriveWalletIdentityPubkey(mnemonic) : ""), [mnemonic])

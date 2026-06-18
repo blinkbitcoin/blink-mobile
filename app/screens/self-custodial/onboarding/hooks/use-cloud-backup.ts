@@ -1,14 +1,10 @@
 import { useCallback } from "react"
 import { Platform } from "react-native"
 
-import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-
 import { getCloudBackupFilename } from "@app/config/appinfo"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { BackupMethod, useBackupState } from "@app/self-custodial/providers/backup-state"
@@ -23,8 +19,9 @@ import { toastShow } from "@app/utils/toast"
 
 import { getCloudProviderName } from "../utils"
 
+import { useNavigateAfterBackup } from "./use-navigate-after-backup"
 import { usePlatformCloudBackup } from "./use-platform-cloud-backup"
-import { useWalletMnemonic } from "./use-wallet-mnemonic"
+import { useWalletIdentity, useWalletMnemonic } from "./use-wallet-mnemonic"
 
 const DEFAULT_BACKUP_VERSION = 1
 
@@ -57,12 +54,13 @@ export const useCloudBackup = ({
   version = DEFAULT_BACKUP_VERSION,
 }: UseCloudBackupParams) => {
   const { LL } = useI18nContext()
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const navigateAfterBackup = useNavigateAfterBackup()
   const { appConfig } = useAppConfig()
   const { startSession, upload, downloadById, resolveErrorMessage, loading } =
     usePlatformCloudBackup()
   const mnemonic = useWalletMnemonic()
-  const { identityPubkey, lightningAddress } = useSelfCustodialAccountInfo()
+  const identityPubkey = useWalletIdentity(mnemonic)
+  const { lightningAddress } = useSelfCustodialAccountInfo()
   const { setBackupCompleted } = useBackupState()
 
   const handleBackup = useCallback(async () => {
@@ -133,7 +131,7 @@ export const useCloudBackup = ({
       type: "success",
       LL,
     })
-    navigation.navigate("selfCustodialBackupSuccess")
+    navigateAfterBackup()
   }, [
     isEncrypted,
     password,
@@ -142,7 +140,7 @@ export const useCloudBackup = ({
     upload,
     downloadById,
     resolveErrorMessage,
-    navigation,
+    navigateAfterBackup,
     LL,
     appConfig.galoyInstance.name,
     mnemonic,

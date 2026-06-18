@@ -1,12 +1,16 @@
 import { renderHook, waitFor } from "@testing-library/react-native"
 
-import { useWalletMnemonic } from "@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic"
+import {
+  useWalletIdentity,
+  useWalletMnemonic,
+} from "@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic"
 import { AccountType } from "@app/types/wallet"
 
 const mockGetMnemonicForAccount = jest.fn()
 const mockUseActiveWallet = jest.fn()
 const mockUseAccountRegistry = jest.fn()
 const mockUseMigrationCheckpoint = jest.fn()
+const mockDeriveWalletIdentityPubkey = jest.fn()
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -25,6 +29,11 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint", () => ({
   useMigrationCheckpoint: () => mockUseMigrationCheckpoint(),
+}))
+
+jest.mock("@app/self-custodial/bridge", () => ({
+  deriveWalletIdentityPubkey: (mnemonic: string) =>
+    mockDeriveWalletIdentityPubkey(mnemonic),
 }))
 
 const ACCOUNT_ID = "self-custodial-uuid-1"
@@ -106,5 +115,37 @@ describe("useWalletMnemonic", () => {
     })
     expect(mockGetMnemonicForAccount).toHaveBeenCalledWith(ACCOUNT_ID)
     expect(mockGetMnemonicForAccount).not.toHaveBeenCalledWith(MIGRATION_ACCOUNT_ID)
+  })
+})
+
+describe("useWalletIdentity", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockDeriveWalletIdentityPubkey.mockReturnValue("derived-pubkey")
+  })
+
+  it("derives the identity pubkey from the mnemonic", () => {
+    const { result } = renderHook(() => useWalletIdentity("youth indicate void"))
+
+    expect(result.current).toBe("derived-pubkey")
+    expect(mockDeriveWalletIdentityPubkey).toHaveBeenCalledWith("youth indicate void")
+  })
+
+  it("returns an empty string and skips derivation while the mnemonic is empty", () => {
+    const { result } = renderHook(() => useWalletIdentity(""))
+
+    expect(result.current).toBe("")
+    expect(mockDeriveWalletIdentityPubkey).not.toHaveBeenCalled()
+  })
+
+  it("memoizes the derivation across renders with the same mnemonic", () => {
+    const { result, rerender } = renderHook(
+      ({ m }: { m: string }) => useWalletIdentity(m),
+      { initialProps: { m: "youth indicate void" } },
+    )
+    rerender({ m: "youth indicate void" })
+
+    expect(result.current).toBe("derived-pubkey")
+    expect(mockDeriveWalletIdentityPubkey).toHaveBeenCalledTimes(1)
   })
 })
