@@ -115,6 +115,7 @@ type PersistentState_14 = {
   stableTokenTransferBlocked?: boolean
   stablesatsTransferBlocked?: boolean
   stableTokenRestricted?: boolean
+  custodialMigrationRequired?: boolean
 }
 
 const migrate14ToCurrent = (state: PersistentState_14): Promise<PersistentState> =>
