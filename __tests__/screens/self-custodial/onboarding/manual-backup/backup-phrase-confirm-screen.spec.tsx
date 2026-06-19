@@ -21,6 +21,11 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     accountId: mockMigrationAccountId(),
     loading: mockCheckpointLoading(),
   }),
+  useCompleteMigration: () => ({
+    migrationCheckpoint: mockCheckpoint(),
+    migrationAccountId: mockMigrationAccountId(),
+    completeMigration: jest.fn().mockResolvedValue(true),
+  }),
   MigrationCheckpoint: {
     BackupMethod: "backupMethod",
     CloudBackup: "cloudBackup",
@@ -279,7 +284,7 @@ describe("BackupPhraseConfirmScreen", () => {
     )
   })
 
-  it("does not route to migration when migrating but no funds", () => {
+  it("does not route to migration when migrating but no funds", async () => {
     mockCheckpoint.mockReturnValue("backupAlerts")
     mockActiveWalletValue.mockReturnValue({
       wallets: [{ id: "btc-1", balance: { amount: 0 }, walletCurrency: "BTC" }],
@@ -295,6 +300,8 @@ describe("BackupPhraseConfirmScreen", () => {
     act(() => {
       jest.advanceTimersByTime(500)
     })
+    // The no-funds migration finishes asynchronously before it navigates to success.
+    await act(async () => {})
 
     expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationTransferringFunds")
     expect(mockNavigate).toHaveBeenCalledWith(

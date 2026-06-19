@@ -31,10 +31,12 @@ jest.mock("@app/self-custodial/providers/backup-state", () => ({
 
 let mockCheckpoint: string | null = "backupAlerts"
 let mockMigrationAccountId: string | null = "migration-uuid"
+const mockCompleteMigration = jest.fn()
 jest.mock("@app/screens/account-migration/hooks", () => ({
-  useMigrationCheckpoint: () => ({
-    checkpoint: mockCheckpoint,
-    accountId: mockMigrationAccountId,
+  useCompleteMigration: () => ({
+    migrationCheckpoint: mockCheckpoint,
+    migrationAccountId: mockMigrationAccountId,
+    completeMigration: mockCompleteMigration,
   }),
 }))
 
@@ -50,6 +52,7 @@ describe("useCompleteBackup", () => {
     mockBackupStatus = "none"
     mockCheckpoint = "backupAlerts"
     mockMigrationAccountId = "migration-uuid"
+    mockCompleteMigration.mockResolvedValue(true)
   })
 
   it("marks the provisioned account and continues to the transfer during a funded migration", () => {
@@ -59,17 +62,20 @@ describe("useCompleteBackup", () => {
 
     expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "manual")
     expect(mockSetBackupCompleted).not.toHaveBeenCalled()
+    // Completion is deferred to the transfer screen on the funded path.
+    expect(mockCompleteMigration).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
   })
 
-  it("marks the provisioned account but skips the transfer in a no-funds migration", () => {
+  it("completes the migration without a transfer in a no-funds migration", async () => {
     mockWallets = [{ balance: { amount: 0 } }]
 
     const { result } = renderHook(() => useCompleteBackup())
 
-    result.current({ method: "cloud" })
+    await result.current({ method: "cloud" })
 
     expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "cloud")
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationTransferringFunds")
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
       reBackup: false,
@@ -86,6 +92,7 @@ describe("useCompleteBackup", () => {
 
     expect(mockSetBackupCompleted).toHaveBeenCalledWith("keychain")
     expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
+    expect(mockCompleteMigration).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
       reBackup: false,
       message: "All set",
