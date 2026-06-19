@@ -2462,6 +2462,10 @@
     "createNew": "Unda mpya",
     "walletLabel": "haipatikani katika eneo lako"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Salio la dola haipatikani katika eneo lako",
+    "modalBody": "Salio lako la dola haipatikani katika eneo lako. Bado unaweza kutuma na kupokea Bitcoin."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Akaunti ya Dola haipatikani tena katika eneo lako",
     "body": "Hamisha salio lako la Dola kuwa Bitcoin",

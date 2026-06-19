@@ -37,6 +37,7 @@ const AutoConvertAmountMatchToleranceBpsKey = "autoConvertAmountMatchToleranceBp
 const CustodialSignupBlockedCountriesKey = "custodialSignupBlockedCountries"
 const CustodialFirstSignupBlockedCountriesKey = "custodialFirstSignupBlockedCountries"
 const StablesatsBlockedCountriesKey = "stablesatsBlockedCountries"
+const StableTokenBlockedCountriesKey = "stableTokenBlockedCountries"
 const StableTokenTransferBlockedCountriesKey = "stableTokenTransferBlockedCountries"
 
 type DeliveryOptionConfig = {
@@ -80,6 +81,7 @@ type RemoteConfig = {
   [CustodialSignupBlockedCountriesKey]: string[]
   [CustodialFirstSignupBlockedCountriesKey]: string[]
   [StablesatsBlockedCountriesKey]: string[]
+  [StableTokenBlockedCountriesKey]: string[]
   [StableTokenTransferBlockedCountriesKey]: string[]
 }
 
@@ -144,6 +146,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   custodialFirstSignupBlockedCountries:
     defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
   stablesatsBlockedCountries: ["HK"],
+  stableTokenBlockedCountries: ["HK"],
   stableTokenTransferBlockedCountries: stableTokenTransferBlockedDefault,
 }
 
@@ -167,6 +170,9 @@ remoteConfigInstance().setDefaults({
   ),
   stablesatsBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.stablesatsBlockedCountries,
+  ),
+  stableTokenBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.stableTokenBlockedCountries,
   ),
   stableTokenTransferBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.stableTokenTransferBlockedCountries,
@@ -307,6 +313,11 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           defaultRemoteConfig.stablesatsBlockedCountries,
         )
 
+        const stableTokenBlockedCountries = getRemoteConfigStringList(
+          StableTokenBlockedCountriesKey,
+          defaultRemoteConfig.stableTokenBlockedCountries,
+        )
+
         const stableTokenTransferBlockedCountries = getRemoteConfigStringList(
           StableTokenTransferBlockedCountriesKey,
           defaultRemoteConfig.stableTokenTransferBlockedCountries,
@@ -338,6 +349,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           custodialSignupBlockedCountries,
           custodialFirstSignupBlockedCountries,
           stablesatsBlockedCountries,
+          stableTokenBlockedCountries,
           stableTokenTransferBlockedCountries,
         })
       } catch (err) {

@@ -2462,6 +2462,10 @@
     "createNew": "Crea nou",
     "walletLabel": "no està disponible a la teva regió"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "El saldo en dòlars no està disponible a la teva regió",
+    "modalBody": "El teu saldo en dòlars no està disponible a la teva regió. Encara pots enviar i rebre Bitcoin."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "El compte en dòlars ja no està disponible a la teva regió",
     "body": "Transfereix el teu saldo en dòlars a Bitcoin",

@@ -2462,6 +2462,10 @@
     "createNew": "Yeni oluştur",
     "walletLabel": "bölgenizde kullanılamıyor"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor",
+    "modalBody": "Dolar bakiyeniz bölgenizde kullanılamıyor. Yine de Bitcoin gönderip alabilirsiniz."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolar hesabı artık bölgenizde kullanılamıyor",
     "body": "Dolar bakiyenizi Bitcoin'e aktarın",

@@ -2462,6 +2462,10 @@
     "createNew": "Kola eppya",
     "walletLabel": "teriiwo mu kitundu kyo"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo",
+    "modalBody": "Bbalansi yo eya doola teriiwo mu kitundu kyo. Osobola okusindika n'okufuna Bitcoin."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Akawunti ya Doola tekikyaliwo mu kitundu kyo",
     "body": "Tambuza ssente zo eza Doola zibe Bitcoin",

@@ -52,7 +52,7 @@ let mockSelfCustodialWalletOverride: Record<string, unknown> | null = null
 const mockToggleBalanceMode = jest.fn()
 // eslint-disable-next-line prefer-const
 let mockBalanceModeValue: "btc" | "usd" = "usd"
-let mockStablesatsRestrictedOverride = false
+let mockDollarBalanceRestrictedOverride = false
 let mockStableTokenTransferBlockedOverride = false
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
@@ -85,6 +85,7 @@ jest.mock("@app/config/feature-flags-context", () => {
         stableBalanceEnabled: false,
       },
       stablesatsBlockedCountries: [],
+      stableTokenBlockedCountries: [],
     }),
   }
 })
@@ -94,9 +95,12 @@ jest.mock("@app/hooks/use-stable-token-transfer-blocked", () => ({
   useStableTokenTransferBlockedSync: () => undefined,
 }))
 
-jest.mock("@app/hooks/use-stablesats-restricted", () => ({
-  useStablesatsRestricted: () => mockStablesatsRestrictedOverride,
-  useStablesatsRestrictionSync: () => undefined,
+jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
+  useDollarBalanceRestricted: () => mockDollarBalanceRestrictedOverride,
+  useDollarBalanceRestrictionSync: () => undefined,
+}))
+
+jest.mock("@app/hooks/use-stablesats-forced-conversion", () => ({
   useStablesatsForcedConversion: ({
     isRestricted,
     usdWalletBalance,
@@ -115,6 +119,19 @@ jest.mock("@app/components/stablesats-restriction-modal", () => {
   return {
     StablesatsRestrictionModal: () =>
       ReactActual.createElement(Text, { testID: "restriction-modal" }, "restriction"),
+  }
+})
+
+jest.mock("@app/components/stable-token-restriction-modal", () => {
+  const ReactActual = jest.requireActual("react")
+  const { Text } = jest.requireActual("react-native")
+  return {
+    StableTokenRestrictionModal: () =>
+      ReactActual.createElement(
+        Text,
+        { testID: "stable-token-restriction-modal" },
+        "stable-token-restriction",
+      ),
   }
 })
 
@@ -463,7 +480,7 @@ describe("HomeScreen", () => {
   beforeEach(() => {
     currentMocks = []
     mockActiveWalletOverride = null
-    mockStablesatsRestrictedOverride = false
+    mockDollarBalanceRestrictedOverride = false
     mockStableTokenTransferBlockedOverride = false
     jest.clearAllMocks()
   })
@@ -527,7 +544,7 @@ describe("HomeScreen", () => {
   })
 
   it("auto-opens the convert modal when a restricted account holds a Dollar balance", async () => {
-    mockStablesatsRestrictedOverride = true
+    mockDollarBalanceRestrictedOverride = true
     currentMocks = generateHomeMock({
       level: AccountLevel.One,
       network: Network.Mainnet,
@@ -548,7 +565,7 @@ describe("HomeScreen", () => {
   })
 
   it("does not auto-open the convert modal when the restricted account has no Dollar balance", async () => {
-    mockStablesatsRestrictedOverride = true
+    mockDollarBalanceRestrictedOverride = true
     currentMocks = generateHomeMock({
       level: AccountLevel.One,
       network: Network.Mainnet,
@@ -565,6 +582,50 @@ describe("HomeScreen", () => {
     await flushEffects()
 
     expect(queryByTestId("convert-modal")).toBeNull()
+  })
+
+  it("uses the stable-token restriction modal and skips forced conversion for self-custodial", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 5000, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId, queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByTestId("stable-token-restriction-modal")).toBeTruthy()
+    expect(queryByTestId("convert-modal")).toBeNull()
+
+    mockActiveWalletOverride = null
   })
 
   it("Slide-up handle triggers navigation to transaction history", async () => {

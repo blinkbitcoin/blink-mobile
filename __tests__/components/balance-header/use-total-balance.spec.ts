@@ -8,7 +8,7 @@ const mockFormatMoneyAmount = jest.fn(
   ({ moneyAmount }: { moneyAmount: { amount: number } }) =>
     `$${(moneyAmount.amount / 100).toFixed(2)}`,
 )
-const mockUseStablesatsRestricted = jest.fn()
+const mockUseDollarBalanceRestricted = jest.fn()
 
 jest.mock("@app/hooks", () => ({
   usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount() }),
@@ -18,8 +18,8 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
 }))
 
-jest.mock("@app/hooks/use-stablesats-restricted", () => ({
-  useStablesatsRestricted: () => mockUseStablesatsRestricted(),
+jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
+  useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
 }))
 
 const wallets = [
@@ -30,7 +30,7 @@ const wallets = [
 describe("useTotalBalance", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseStablesatsRestricted.mockReturnValue(false)
+    mockUseDollarBalanceRestricted.mockReturnValue(false)
   })
 
   it("flags isLoading=true while price conversion is bootstrapping (account-switch window)", () => {
@@ -63,7 +63,7 @@ describe("useTotalBalance", () => {
       }))
 
     it("forces the USD wallet contribution to zero when computing the total", () => {
-      mockUseStablesatsRestricted.mockReturnValue(true)
+      mockUseDollarBalanceRestricted.mockReturnValue(true)
       const convert = buildConvertSpy()
       mockConvertMoneyAmount.mockReturnValue(convert)
 
@@ -79,7 +79,7 @@ describe("useTotalBalance", () => {
     })
 
     it("uses the actual USD balance when not restricted", () => {
-      mockUseStablesatsRestricted.mockReturnValue(false)
+      mockUseDollarBalanceRestricted.mockReturnValue(false)
       const convert = buildConvertSpy()
       mockConvertMoneyAmount.mockReturnValue(convert)
 

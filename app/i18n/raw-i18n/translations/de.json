@@ -2462,6 +2462,10 @@
         "createNew": "Neu erstellen",
         "walletLabel": "in deiner Region nicht verfügbar"
     },
+    "StableTokenRestriction": {
+        "modalTitle": "Dollar-Guthaben ist in deiner Region nicht verfügbar",
+        "modalBody": "Dein Dollar-Guthaben ist in deiner Region nicht verfügbar. Du kannst weiterhin Bitcoin senden und empfangen."
+    },
     "ConvertDollarToBitcoinModal": {
         "title": "Das Dollar-Konto ist in deiner Region nicht mehr verfügbar",
         "body": "Übertrage dein Dollar-Guthaben in Bitcoin",

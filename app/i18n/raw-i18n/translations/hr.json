@@ -2462,6 +2462,10 @@
     "createNew": "Izradi novi",
     "walletLabel": "nije dostupan u vašoj regiji"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji",
+    "modalBody": "Vaš dolarski saldo nije dostupan u vašoj regiji. I dalje možete slati i primati Bitcoin."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Račun u dolarima više nije dostupan u vašoj regiji",
     "body": "Prebacite svoje stanje u dolarima u Bitcoin",

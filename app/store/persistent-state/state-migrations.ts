@@ -113,6 +113,7 @@ type PersistentState_14 = {
   defaultAccountModalShownByAccountId?: Record<string, boolean>
   stablesatsRestrictedCustodial?: boolean
   stableTokenTransferBlocked?: boolean
+  stableTokenRestricted?: boolean
 }
 
 const migrate14ToCurrent = (state: PersistentState_14): Promise<PersistentState> =>

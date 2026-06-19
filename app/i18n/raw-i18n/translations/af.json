@@ -2462,6 +2462,10 @@
     "createNew": "Skep nuwe",
     "walletLabel": "nie beskikbaar in jou streek nie"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Dollar-saldo is nie beskikbaar in jou streek nie",
+    "modalBody": "Jou dollar-saldo is nie beskikbaar in jou streek nie. Jy kan steeds Bitcoin stuur en ontvang."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Die Dollar-rekening is nie meer in jou streek beskikbaar nie",
     "body": "Dra jou Dollar-saldo oor na Bitcoin",

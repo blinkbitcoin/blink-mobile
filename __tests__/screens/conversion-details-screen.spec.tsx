@@ -73,6 +73,7 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
+  ...jest.requireActual("@app/hooks/use-device-location"),
   default: () => ({ countryCode: "SV", loading: false }),
 }))
 

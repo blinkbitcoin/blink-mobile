@@ -8154,6 +8154,16 @@ type RootTranslation = {
 		 */
 		walletLabel: string
 	}
+	StableTokenRestriction: {
+		/**
+		 * D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 */
+		modalTitle: string
+		/**
+		 * Y​o​u​r​ ​d​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​Y​o​u​ ​c​a​n​ ​s​t​i​l​l​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​.
+		 */
+		modalBody: string
+	}
 	ConvertDollarToBitcoinModal: {
 		/**
 		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
@@ -20415,6 +20425,16 @@ export type TranslationFunctions = {
 		 * not available in your region
 		 */
 		walletLabel: () => LocalizedString
+	}
+	StableTokenRestriction: {
+		/**
+		 * Dollar balance is not available in your region
+		 */
+		modalTitle: () => LocalizedString
+		/**
+		 * Your dollar balance is not available in your region. You can still send and receive Bitcoin.
+		 */
+		modalBody: () => LocalizedString
 	}
 	ConvertDollarToBitcoinModal: {
 		/**

@@ -2598,6 +2598,11 @@ const en: BaseTranslation = {
     createNew: "Create new",
     walletLabel: "not available in your region",
   },
+  StableTokenRestriction: {
+    modalTitle: "Dollar balance is not available in your region",
+    modalBody:
+      "Your dollar balance is not available in your region. You can still send and receive Bitcoin.",
+  },
   ConvertDollarToBitcoinModal: {
     title: "Dollar account is no longer available in your region",
     body: "Transfer your Dollar balance to Bitcoin",

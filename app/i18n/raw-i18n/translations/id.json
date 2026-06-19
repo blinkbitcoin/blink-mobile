@@ -2462,6 +2462,10 @@
     "createNew": "Buat baru",
     "walletLabel": "tidak tersedia di wilayah Anda"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda",
+    "modalBody": "Saldo dolar Anda tidak tersedia di wilayah Anda. Anda masih dapat mengirim dan menerima Bitcoin."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Akun Dolar tidak lagi tersedia di wilayah Anda",
     "body": "Pindahkan saldo Dolar Anda ke Bitcoin",

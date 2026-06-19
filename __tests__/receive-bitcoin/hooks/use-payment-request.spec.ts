@@ -51,9 +51,9 @@ jest.mock("@app/graphql/ln-update-context", () => ({
   useLnUpdateHashPaid: () => mockUseLnUpdateHashPaid(),
 }))
 
-const mockUseStablesatsRestricted = jest.fn(() => false)
-jest.mock("@app/hooks/use-stablesats-restricted", () => ({
-  useStablesatsRestricted: () => mockUseStablesatsRestricted(),
+const mockUseDollarBalanceRestricted = jest.fn(() => false)
+jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
+  useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
 }))
 
 const mockUseDeviceLocation = jest.fn(() => ({ countryCode: "SV", loading: false }))
@@ -164,7 +164,7 @@ describe("usePaymentRequest", () => {
     mockUseWalletResolution.mockReturnValue(null)
     mockUseLnUpdateHashPaid.mockReturnValue(null)
     mockUseCountdown.mockReturnValue({ remainingSeconds: null, isExpired: false })
-    mockUseStablesatsRestricted.mockReturnValue(false)
+    mockUseDollarBalanceRestricted.mockReturnValue(false)
     mockUseDeviceLocation.mockReturnValue({ countryCode: "SV", loading: false })
   })
 
@@ -271,7 +271,7 @@ describe("usePaymentRequest", () => {
 
   it("forces the bitcoin wallet as default when stablesats is restricted", async () => {
     setupMocksWithPR()
-    mockUseStablesatsRestricted.mockReturnValue(true)
+    mockUseDollarBalanceRestricted.mockReturnValue(true)
     mockUseWalletResolution.mockReturnValue({
       ...mockWallets,
       defaultWallet: { id: "usd-id", balance: 100, walletCurrency: WalletCurrency.Usd },

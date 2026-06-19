@@ -2462,6 +2462,10 @@
     "createNew": "Opret ny",
     "walletLabel": "ikke tilgængelig i din region"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Dollar-saldo er ikke tilgængelig i din region",
+    "modalBody": "Din dollar-saldo er ikke tilgængelig i din region. Du kan stadig sende og modtage Bitcoin."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Dollarkontoen er ikke længere tilgængelig i din region",
     "body": "Overfør din dollarsaldo til Bitcoin",

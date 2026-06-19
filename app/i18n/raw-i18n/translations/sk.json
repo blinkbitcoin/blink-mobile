@@ -2462,6 +2462,10 @@
     "createNew": "Vytvoriť nový",
     "walletLabel": "nie je vo vašom regióne k dispozícii"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Dolárový zostatok nie je vo vašom regióne k dispozícii",
+    "modalBody": "Váš dolárový zostatok nie je vo vašom regióne k dispozícii. Stále môžete posielať a prijímať Bitcoin."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolárový účet už nie je vo vašom regióne dostupný",
     "body": "Preveďte svoj zostatok v dolároch na Bitcoin",

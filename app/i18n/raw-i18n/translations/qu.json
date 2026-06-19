@@ -2462,6 +2462,10 @@
     "createNew": "Musuq kamariy",
     "walletLabel": "mana kapunchu suyuykipi"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Dólar saldoqa mana kapunchu suyuykipi",
+    "modalBody": "Dólar saldoyki mana kapunchu suyuykipi. Bitcointaqa apachiyta chaskiytapas atinkiraqmi."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Dólar cuentaqa manaña suyuykipi kanchu",
     "body": "Dólar qullqiykita Bitcoinman astay",

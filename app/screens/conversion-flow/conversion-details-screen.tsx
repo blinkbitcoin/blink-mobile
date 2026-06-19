@@ -34,7 +34,7 @@ import {
 
 import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useStablesatsRestrictionGuard } from "@app/hooks/use-stablesats-restriction-guard"
+import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
 import { useStableTokenTransferBlockedGuard } from "@app/hooks/use-stable-token-transfer-blocked-guard"
 import { CurrencyInput } from "@app/components/currency-input"
 import { PercentageSelector } from "@app/components/percentage-selector"
@@ -82,9 +82,9 @@ const ANIMATION_CONFIG = {
 }
 
 export const ConversionDetailsScreen = () => {
-  const isStablesatsRestricted = useStablesatsRestrictionGuard()
+  const isDollarBalanceRestricted = useDollarBalanceRestrictionGuard()
   const isTransferBlocked = useStableTokenTransferBlockedGuard()
-  if (isStablesatsRestricted || isTransferBlocked) return null
+  if (isDollarBalanceRestricted || isTransferBlocked) return null
 
   return <ConversionDetailsScreenContent />
 }

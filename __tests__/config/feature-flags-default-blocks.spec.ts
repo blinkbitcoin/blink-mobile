@@ -76,4 +76,12 @@ describe("defaultRemoteConfig: compliance country lists", () => {
   it("stableTokenTransferBlockedCountries defaults to the 27 EU member states", () => {
     expect(defaultRemoteConfig.stableTokenTransferBlockedCountries).toHaveLength(27)
   })
+
+  it("stableTokenBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.stableTokenBlockedCountries)
+  })
+
+  it("stableTokenBlockedCountries defaults to Hong Kong", () => {
+    expect(defaultRemoteConfig.stableTokenBlockedCountries).toEqual(["HK"])
+  })
 })

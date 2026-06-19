@@ -2462,6 +2462,10 @@
     "createNew": "Tạo mới",
     "walletLabel": "không khả dụng tại khu vực của bạn"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Số dư đô la không khả dụng tại khu vực của bạn",
+    "modalBody": "Số dư đô la của bạn không khả dụng tại khu vực của bạn. Bạn vẫn có thể gửi và nhận Bitcoin."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Tài khoản Đô la không còn khả dụng ở khu vực của bạn",
     "body": "Chuyển số dư Đô la của bạn sang Bitcoin",

@@ -2462,6 +2462,10 @@
     "createNew": "Új létrehozása",
     "walletLabel": "nem érhető el a régiódban"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "A dolláregyenleg nem érhető el a régiódban",
+    "modalBody": "A dolláregyenleged nem érhető el a régiódban. Továbbra is küldhetsz és fogadhatsz Bitcoint."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "A dollárszámla már nem érhető el a régiódban",
     "body": "Utald át a dolláregyenleged Bitcoinra",

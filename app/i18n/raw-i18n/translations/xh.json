@@ -2462,6 +2462,10 @@
     "createNew": "Yenza entsha",
     "walletLabel": "ayifumaneki kummandla wakho"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho",
+    "modalBody": "Ibhalansi yakho yedola ayifumaneki kummandla wakho. Usenako ukuthumela nokufumana iBitcoin."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "I-akhawunti yeDola ayisafumaneki kummandla wakho",
     "body": "Dlulisela ibhalansi yakho yeDola kwiBitcoin",

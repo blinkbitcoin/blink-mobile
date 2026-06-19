@@ -2462,6 +2462,10 @@
     "createNew": "Cipta baharu",
     "walletLabel": "tidak tersedia di rantau anda"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Baki dolar tidak tersedia di rantau anda",
+    "modalBody": "Baki dolar anda tidak tersedia di rantau anda. Anda masih boleh menghantar dan menerima Bitcoin."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Akaun Dolar tidak lagi tersedia di rantau anda",
     "body": "Pindahkan baki Dolar anda kepada Bitcoin",

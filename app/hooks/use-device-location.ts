@@ -17,6 +17,11 @@ export const LocationSource = {
 
 export type LocationSource = (typeof LocationSource)[keyof typeof LocationSource]
 
+export const isBlockedCountry = (
+  countryCode: string | undefined,
+  blockedCountries: string[],
+): boolean => Boolean(countryCode && blockedCountries.includes(countryCode.toUpperCase()))
+
 const fetchCountryFromIp = async (): Promise<CountryCode | undefined> => {
   const { data } = await axios.get(IPAPI_URL, { timeout: 5000 })
   return data?.country_code as CountryCode | undefined

@@ -1,12 +1,12 @@
 import { renderHook } from "@testing-library/react-native"
 
-const mockUseStablesatsRestricted = jest.fn()
+const mockUseDollarBalanceRestricted = jest.fn()
 const mockDispatch = jest.fn()
 const mockResetAction = { type: "RESET" }
 const mockReset = jest.fn((_arg: unknown) => mockResetAction)
 
-jest.mock("@app/hooks/use-stablesats-restricted", () => ({
-  useStablesatsRestricted: () => mockUseStablesatsRestricted(),
+jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
+  useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
 }))
 
 const mockNavigation = { dispatch: mockDispatch }
@@ -16,17 +16,17 @@ jest.mock("@react-navigation/native", () => ({
   CommonActions: { reset: (arg: unknown) => mockReset(arg) },
 }))
 
-import { useStablesatsRestrictionGuard } from "@app/hooks/use-stablesats-restriction-guard"
+import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
 
-describe("useStablesatsRestrictionGuard", () => {
+describe("useDollarBalanceRestrictionGuard", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   it("returns false and does not dispatch when not restricted", () => {
-    mockUseStablesatsRestricted.mockReturnValue(false)
+    mockUseDollarBalanceRestricted.mockReturnValue(false)
 
-    const { result } = renderHook(() => useStablesatsRestrictionGuard())
+    const { result } = renderHook(() => useDollarBalanceRestrictionGuard())
 
     expect(result.current).toBe(false)
     expect(mockDispatch).not.toHaveBeenCalled()
@@ -34,9 +34,9 @@ describe("useStablesatsRestrictionGuard", () => {
   })
 
   it("returns true and dispatches a reset to Primary when restricted", () => {
-    mockUseStablesatsRestricted.mockReturnValue(true)
+    mockUseDollarBalanceRestricted.mockReturnValue(true)
 
-    const { result } = renderHook(() => useStablesatsRestrictionGuard())
+    const { result } = renderHook(() => useDollarBalanceRestrictionGuard())
 
     expect(result.current).toBe(true)
     expect(mockReset).toHaveBeenCalledWith({
@@ -47,21 +47,21 @@ describe("useStablesatsRestrictionGuard", () => {
   })
 
   it("dispatches exactly once even after re-renders with the same restricted value", () => {
-    mockUseStablesatsRestricted.mockReturnValue(true)
+    mockUseDollarBalanceRestricted.mockReturnValue(true)
 
-    const { rerender } = renderHook(() => useStablesatsRestrictionGuard())
+    const { rerender } = renderHook(() => useDollarBalanceRestrictionGuard())
     rerender({})
 
     expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
 
   it("dispatches when the restriction flips to true after mount", () => {
-    mockUseStablesatsRestricted.mockReturnValue(false)
-    const { rerender } = renderHook(() => useStablesatsRestrictionGuard())
+    mockUseDollarBalanceRestricted.mockReturnValue(false)
+    const { rerender } = renderHook(() => useDollarBalanceRestrictionGuard())
 
     expect(mockDispatch).not.toHaveBeenCalled()
 
-    mockUseStablesatsRestricted.mockReturnValue(true)
+    mockUseDollarBalanceRestricted.mockReturnValue(true)
     rerender({})
 
     expect(mockDispatch).toHaveBeenCalledTimes(1)

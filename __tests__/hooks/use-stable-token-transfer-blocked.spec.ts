@@ -13,9 +13,9 @@ let mockPersistentState: PersistentState
 
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
+  ...jest.requireActual("@app/hooks/use-device-location"),
   default: () => mockUseDeviceLocation(),
   useIpCountryCode: (enabled: boolean) => mockUseIpCountryCode(enabled),
-  LocationSource: { Phone: "phone", Ip: "ip" },
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({

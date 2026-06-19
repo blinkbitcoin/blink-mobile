@@ -2462,6 +2462,10 @@
         "createNew": "Crear nueva",
         "walletLabel": "no está disponible en tu región"
     },
+    "StableTokenRestriction": {
+        "modalTitle": "El saldo en dólares no está disponible en tu región",
+        "modalBody": "Tu saldo en dólares no está disponible en tu región. Aún puedes enviar y recibir Bitcoin."
+    },
     "ConvertDollarToBitcoinModal": {
         "title": "La cuenta en dólares ya no está disponible en tu región",
         "body": "Transfiere tu saldo en dólares a Bitcoin",

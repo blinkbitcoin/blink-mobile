@@ -2462,6 +2462,10 @@
     "createNew": "Crează cont nou",
     "walletLabel": "nu este disponibil în regiunea ta"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta",
+    "modalBody": "Soldul tău în dolari nu este disponibil în regiunea ta. Poți în continuare să trimiți și să primești Bitcoin."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Contul în dolari nu mai este disponibil în regiunea ta",
     "body": "Transferă soldul tău în dolari în Bitcoin",

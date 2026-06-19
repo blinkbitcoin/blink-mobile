@@ -9,15 +9,11 @@ import {
 import { AccountType } from "@app/types/wallet"
 
 import useDeviceLocation, {
+  isBlockedCountry,
   LocationSource,
   useIpCountryCode,
 } from "./use-device-location"
 import { useActiveWallet } from "./use-active-wallet"
-
-const isBlockedCountry = (
-  countryCode: string | undefined,
-  blockedCountries: string[],
-): boolean => Boolean(countryCode && blockedCountries.includes(countryCode.toUpperCase()))
 
 export const useStableTokenTransferBlocked = (): boolean => {
   const { accountType } = useActiveWallet()

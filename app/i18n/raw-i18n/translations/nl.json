@@ -2462,6 +2462,10 @@
     "createNew": "Nieuw aanmaken",
     "walletLabel": "niet beschikbaar in jouw regio"
   },
+  "StableTokenRestriction": {
+    "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio",
+    "modalBody": "Je dollar-saldo is niet beschikbaar in jouw regio. Je kunt nog steeds Bitcoin verzenden en ontvangen."
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Het dollaraccount is niet langer beschikbaar in jouw regio",
     "body": "Breng je dollarsaldo over naar Bitcoin",

@@ -13,7 +13,7 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useStablesatsRestrictionGuard } from "@app/hooks/use-stablesats-restriction-guard"
+import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
@@ -199,7 +199,7 @@ const SelfCustodialDefaultWallet: React.FC = () => {
 }
 
 export const DefaultWalletScreen: React.FC = () => {
-  if (useStablesatsRestrictionGuard()) return null
+  if (useDollarBalanceRestrictionGuard()) return null
   return <DefaultWalletScreenContent />
 }
 

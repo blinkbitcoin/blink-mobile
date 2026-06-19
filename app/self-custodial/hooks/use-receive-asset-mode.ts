@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
+import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
 
@@ -26,9 +27,11 @@ const BITCOIN_ONLY = [ReceiveAssetMode.Bitcoin] as const
 const DOLLAR_ONLY = [ReceiveAssetMode.Dollar] as const
 
 const resolveInitialMode = (
-  isStableBalanceActive?: boolean,
-  defaultCurrency?: "BTC" | "USD",
+  isStableBalanceActive: boolean | undefined,
+  defaultCurrency: "BTC" | "USD" | undefined,
+  isRestricted: boolean,
 ): ReceiveAssetMode => {
+  if (isRestricted) return ReceiveAssetMode.Bitcoin
   if (isStableBalanceActive) return ReceiveAssetMode.Dollar
   if (defaultCurrency === WalletCurrency.Usd) return ReceiveAssetMode.Dollar
   return ReceiveAssetMode.Bitcoin
@@ -37,32 +40,42 @@ const resolveInitialMode = (
 export const useReceiveAssetMode = (): UseReceiveAssetModeResult => {
   const { isStableBalanceActive } = useSelfCustodialWallet()
   const { persistentState } = usePersistentStateContext()
+  const isDollarBalanceRestricted = useDollarBalanceRestricted()
   const defaultCurrency = getSelfCustodialDefaultCurrency(persistentState)
 
   const [assetMode, setAssetMode] = useState<ReceiveAssetMode>(
-    resolveInitialMode(isStableBalanceActive === true, defaultCurrency),
+    resolveInitialMode(
+      isStableBalanceActive === true,
+      defaultCurrency,
+      isDollarBalanceRestricted,
+    ),
   )
 
-  // Re-align to Dollar when stable balance becomes active.
+  // The dollar-balance restriction locks receiving to Bitcoin; otherwise stable
+  // balance becoming active re-aligns to Dollar.
   useEffect(() => {
+    if (isDollarBalanceRestricted) {
+      if (assetMode !== ReceiveAssetMode.Bitcoin) setAssetMode(ReceiveAssetMode.Bitcoin)
+      return
+    }
     if (isStableBalanceActive && assetMode !== ReceiveAssetMode.Dollar) {
       setAssetMode(ReceiveAssetMode.Dollar)
     }
-  }, [isStableBalanceActive, assetMode])
+  }, [isDollarBalanceRestricted, isStableBalanceActive, assetMode])
 
   const availableModesForRail = useCallback(
     (rail: ReceiveRail): readonly ReceiveAssetMode[] => {
-      if (rail === ReceiveRail.Onchain) return BITCOIN_ONLY
+      if (isDollarBalanceRestricted || rail === ReceiveRail.Onchain) return BITCOIN_ONLY
       if (isStableBalanceActive) return DOLLAR_ONLY
       return ALL_MODES
     },
-    [isStableBalanceActive],
+    [isDollarBalanceRestricted, isStableBalanceActive],
   )
 
   return {
     assetMode,
     setAssetMode,
-    isToggleDisabled: Boolean(isStableBalanceActive),
+    isToggleDisabled: isDollarBalanceRestricted || Boolean(isStableBalanceActive),
     availableModesForRail,
     loading: isStableBalanceActive === undefined,
   }
