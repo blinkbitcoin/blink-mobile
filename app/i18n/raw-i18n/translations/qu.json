@@ -3549,6 +3549,12 @@
     }
   },
   "AccountMigration": {
+    "migrationRequiredTitle": "Mosoqyanapaq pacha",
+    "migrationRequiredBody": "Waqaychasqa kuentaykita mana waqaychasqa kuentaman astanaykipaq pachan. Kamachiykunarayku kallpachasqam. Ichaqa, qampaqpas aswan allinmi!",
+    "bitcoinBalance": "Bitcoin saldo",
+    "dollarBalance": "Dólar saldo",
+    "migrationRequiredSmallBalanceWarning": "Dólar saldoyki apachinapaq pisillanmi, chaymantaqa bitcointam apachisqayki",
+    "migrateNow": "Kunan astay",
     "moveToNonCustodial": "Non-custodial nisqaman kutiy",
     "explainerTitle": "Imataq niyta munan non-custodial nisqaman kutiy?",
     "explainerCheck1": "Spark protocol nisqapi non-custodial akawuntita ruwanki",

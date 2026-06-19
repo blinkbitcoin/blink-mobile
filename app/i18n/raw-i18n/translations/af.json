@@ -3549,6 +3549,12 @@
     }
   },
   "AccountMigration": {
+    "migrationRequiredTitle": "Tyd om op te gradeer",
+    "migrationRequiredBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer. Dit word om regulatoriese redes vereis. Maar ook, dit is beter vir jou!",
+    "bitcoinBalance": "Bitcoin-saldo",
+    "dollarBalance": "Dollar-saldo",
+    "migrationRequiredSmallBalanceWarning": "Jou dollar-saldo is te klein om gestuur te word, ons sal vir jou bitcoin stuur in plaas daarvan",
+    "migrateNow": "Migreer nou",
     "moveToNonCustodial": "Skuif na nie-bewaarde",
     "explainerTitle": "Wat beteken dit om na nie-bewaarde te skuif?",
     "explainerCheck1": "Jy sal 'n nie-bewaarde rekening op die Spark-protokol skep",

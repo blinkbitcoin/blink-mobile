@@ -3549,6 +3549,12 @@
         }
     },
     "AccountMigration": {
+        "migrationRequiredTitle": "Zeit für ein Upgrade",
+        "migrationRequiredBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren. Das ist aus regulatorischen Gründen erforderlich. Aber es ist auch besser für dich!",
+        "bitcoinBalance": "Bitcoin-Guthaben",
+        "dollarBalance": "Dollar-Guthaben",
+        "migrationRequiredSmallBalanceWarning": "Dein Dollar-Guthaben ist zu gering, um gesendet zu werden; wir senden dir stattdessen Bitcoin",
+        "migrateNow": "Jetzt migrieren",
         "moveToNonCustodial": "Zu Non-Custodial wechseln",
         "explainerTitle": "Was bedeutet es, zu Non-Custodial zu wechseln?",
         "explainerCheck1": "Du erstellst ein Non-Custodial-Konto auf dem Spark-Protokoll",

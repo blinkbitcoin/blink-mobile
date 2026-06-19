@@ -3549,6 +3549,12 @@
     }
   },
   "AccountMigration": {
+    "migrationRequiredTitle": "Ideje frissíteni",
+    "migrationRequiredBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba. Szabályozási okokból kötelező. De ráadásul jobb is önnek!",
+    "bitcoinBalance": "Bitcoin-egyenleg",
+    "dollarBalance": "Dollár-egyenleg",
+    "migrationRequiredSmallBalanceWarning": "A dollár-egyenlege túl kicsi a küldéshez, helyette bitcoint küldünk önnek",
+    "migrateNow": "Átköltöztetés most",
     "moveToNonCustodial": "Áttérés önrendelkezőre",
     "explainerTitle": "Mit jelent az önrendelkező módra való áttérés?",
     "explainerCheck1": "Létrehozol egy önrendelkező fiókot a Spark protokollon",

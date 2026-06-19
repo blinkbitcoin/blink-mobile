@@ -3549,6 +3549,12 @@
         }
     },
     "AccountMigration": {
+        "migrationRequiredTitle": "アップグレードの時間です",
+        "migrationRequiredBody": "カストディアルアカウントを非カストディアルアカウントに移行する時です。規制上の理由で必須です。それに、あなたにとっても良いことです！",
+        "bitcoinBalance": "ビットコイン残高",
+        "dollarBalance": "ドル残高",
+        "migrationRequiredSmallBalanceWarning": "ドル残高が少なすぎて送信できないため、代わりにビットコインをお送りします",
+        "migrateNow": "今すぐ移行",
         "moveToNonCustodial": "ノンカストディアルに移行",
         "explainerTitle": "ノンカストディアルへの移行とは？",
         "explainerCheck1": "Sparkプロトコル上にノンカストディアルアカウントを作成します",

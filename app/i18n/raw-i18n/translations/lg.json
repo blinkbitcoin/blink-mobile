@@ -3549,6 +3549,12 @@
     }
   },
   "AccountMigration": {
+    "migrationRequiredTitle": "Ekiseera ky'okuzza omu maaso",
+    "migrationRequiredBody": "Kiseera ky'okujja akawunti yo ekuumibwa ogigirre mu akawunti etakuumibwa. Kyetaagisa olw'ensonga z'amateeka. Era kirungi gy'oli!",
+    "bitcoinBalance": "Bbalansi ya Bitcoin",
+    "dollarBalance": "Bbalansi ya doola",
+    "migrationRequiredSmallBalanceWarning": "Bbalansi yo eya doola ntono nnyo okusindika, mu kifo kyayo tujja kukuweereza bitcoin",
+    "migrateNow": "Jja kati",
     "moveToNonCustodial": "Tuuka ku non-custodial",
     "explainerTitle": "Kitegeeza ki okutuuka ku non-custodial?",
     "explainerCheck1": "Ojja okukola akawunti ya non-custodial ku Spark protocol",

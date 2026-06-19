@@ -3549,6 +3549,12 @@
     }
   },
   "AccountMigration": {
+    "migrationRequiredTitle": "Čas na upgrade",
+    "migrationRequiredBody": "Je čas migrovať váš zverenský účet na nesverenecký účet. Vyžaduje sa to z regulačných dôvodov. A navyše je to pre vás lepšie!",
+    "bitcoinBalance": "Zostatok Bitcoinu",
+    "dollarBalance": "Zostatok v dolároch",
+    "migrationRequiredSmallBalanceWarning": "Váš dolárový zostatok je príliš malý na odoslanie, namiesto toho vám pošleme bitcoin",
+    "migrateNow": "Migrovať teraz",
     "moveToNonCustodial": "Prejsť na non-custodial",
     "explainerTitle": "Čo znamená prejsť na non-custodial?",
     "explainerCheck1": "Vytvoríte non-custodial účet na protokole Spark",

@@ -3549,6 +3549,12 @@
     }
   },
   "AccountMigration": {
+    "migrationRequiredTitle": "Tid til at opgradere",
+    "migrationRequiredBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto. Det er påkrævet af regulatoriske årsager. Men det er også bedre for dig!",
+    "bitcoinBalance": "Bitcoin-saldo",
+    "dollarBalance": "Dollar-saldo",
+    "migrationRequiredSmallBalanceWarning": "Din dollar-saldo er for lille til at blive sendt, vi sender dig bitcoin i stedet",
+    "migrateNow": "Migrér nu",
     "moveToNonCustodial": "Flyt til non-custodial",
     "explainerTitle": "Hvad betyder det at flytte til non-custodial?",
     "explainerCheck1": "Du opretter en non-custodial konto på Spark-protokollen",

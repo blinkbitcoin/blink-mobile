@@ -3549,6 +3549,12 @@
     }
   },
   "AccountMigration": {
+    "migrationRequiredTitle": "Tijd om te upgraden",
+    "migrationRequiredBody": "Het is tijd om je bewaarde rekening te migreren naar een niet-bewaarde rekening. Dit is verplicht om regelgevende redenen. Maar het is ook beter voor jou!",
+    "bitcoinBalance": "Bitcoin-saldo",
+    "dollarBalance": "Dollarsaldo",
+    "migrationRequiredSmallBalanceWarning": "Je dollarsaldo is te klein om te verzenden, we sturen je in plaats daarvan bitcoin",
+    "migrateNow": "Nu migreren",
     "moveToNonCustodial": "Overstappen naar non-custodial",
     "explainerTitle": "Wat betekent overstappen naar non-custodial?",
     "explainerCheck1": "Je maakt een non-custodial account aan op het Spark-protocol",

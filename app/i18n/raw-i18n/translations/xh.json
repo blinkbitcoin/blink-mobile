@@ -3549,6 +3549,12 @@
     }
   },
   "AccountMigration": {
+    "migrationRequiredTitle": "Lixesha lokuphucula",
+    "migrationRequiredBody": "Lixesha lokufudusela iakhawunti yakho egcinwayo kwiakhawunti engagcinwanga. Kuyimfuneko ngenxa yezizathu zomthetho. Kodwa kwakhona, kungcono kuwe!",
+    "bitcoinBalance": "Ibhalansi yeBitcoin",
+    "dollarBalance": "Ibhalansi yedola",
+    "migrationRequiredSmallBalanceWarning": "Ibhalansi yakho yedola incinci kakhulu ukuba ingathunyelwa, endaweni yoko siza kukuthumelela ibhitcoin",
+    "migrateNow": "Fudusa ngoku",
     "moveToNonCustodial": "Fudukela kwi-non-custodial",
     "explainerTitle": "Kuthetha ntoni ukufudukela kwi-non-custodial?",
     "explainerCheck1": "Uza kudala i-akhawunti ye-non-custodial kwi-Spark protocol",

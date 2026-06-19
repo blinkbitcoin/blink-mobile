@@ -3549,6 +3549,12 @@
     }
   },
   "AccountMigration": {
+    "migrationRequiredTitle": "Masa untuk menaik taraf",
+    "migrationRequiredBody": "Sudah tiba masanya untuk memindahkan akaun kustodial anda ke akaun bukan kustodial. Ia diwajibkan atas sebab peraturan. Tetapi juga, ia lebih baik untuk anda!",
+    "bitcoinBalance": "Baki Bitcoin",
+    "dollarBalance": "Baki dolar",
+    "migrationRequiredSmallBalanceWarning": "Baki dolar anda terlalu kecil untuk dihantar, sebaliknya kami akan menghantar bitcoin kepada anda",
+    "migrateNow": "Pindah sekarang",
     "moveToNonCustodial": "Beralih ke non-custodial",
     "explainerTitle": "Apakah maksud beralih ke non-custodial?",
     "explainerCheck1": "Anda akan membuat akaun non-custodial di protokol Spark",

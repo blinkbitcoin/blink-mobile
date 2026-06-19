@@ -11828,6 +11828,30 @@ type RootTranslation = {
 		 * T​r​a​n​s​f​e​r​r​i​n​g​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​I​t​ ​s​h​o​u​l​d​ ​b​e​ ​d​o​n​e​ ​i​n​ ​a​ ​f​e​w​ ​s​e​c​o​n​d​s​.
 		 */
 		transferringFunds: string
+		/**
+		 * T​i​m​e​ ​t​o​ ​u​p​g​r​a​d​e
+		 */
+		migrationRequiredTitle: string
+		/**
+		 * I​t​'​s​ ​t​i​m​e​ ​t​o​ ​m​i​g​r​a​t​e​ ​y​o​u​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.​ ​I​t​'​s​ ​r​e​q​u​i​r​e​d​ ​f​o​r​ ​r​e​g​u​l​a​t​o​r​y​ ​r​e​a​s​o​n​s​.​ ​B​u​t​ ​a​l​s​o​,​ ​i​t​'​s​ ​b​e​t​t​e​r​ ​f​o​r​ ​y​o​u​!
+		 */
+		migrationRequiredBody: string
+		/**
+		 * B​i​t​c​o​i​n​ ​b​a​l​a​n​c​e
+		 */
+		bitcoinBalance: string
+		/**
+		 * D​o​l​l​a​r​ ​b​a​l​a​n​c​e
+		 */
+		dollarBalance: string
+		/**
+		 * Y​o​u​r​ ​d​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​t​o​o​ ​s​m​a​l​l​ ​t​o​ ​b​e​ ​s​e​n​t​,​ ​w​e​ ​w​i​l​l​ ​s​e​n​d​ ​y​o​u​ ​b​i​t​c​o​i​n​ ​i​n​s​t​e​a​d
+		 */
+		migrationRequiredSmallBalanceWarning: string
+		/**
+		 * M​i​g​r​a​t​e​ ​n​o​w
+		 */
+		migrateNow: string
 	}
 	AccountTypeSelectionScreen: {
 		/**
@@ -24054,6 +24078,30 @@ export type TranslationFunctions = {
 		 * Transferring your funds. It should be done in a few seconds.
 		 */
 		transferringFunds: () => LocalizedString
+		/**
+		 * Time to upgrade
+		 */
+		migrationRequiredTitle: () => LocalizedString
+		/**
+		 * It's time to migrate your custodial account to a non-custodial account. It's required for regulatory reasons. But also, it's better for you!
+		 */
+		migrationRequiredBody: () => LocalizedString
+		/**
+		 * Bitcoin balance
+		 */
+		bitcoinBalance: () => LocalizedString
+		/**
+		 * Dollar balance
+		 */
+		dollarBalance: () => LocalizedString
+		/**
+		 * Your dollar balance is too small to be sent, we will send you bitcoin instead
+		 */
+		migrationRequiredSmallBalanceWarning: () => LocalizedString
+		/**
+		 * Migrate now
+		 */
+		migrateNow: () => LocalizedString
 	}
 	AccountTypeSelectionScreen: {
 		/**
