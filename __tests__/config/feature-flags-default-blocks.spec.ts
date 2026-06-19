@@ -94,4 +94,12 @@ describe("defaultRemoteConfig: compliance country lists", () => {
     expect(defaultRemoteConfig.custodialCreationBlockedCountries).toEqual(expected)
     expect(defaultRemoteConfig.selfCustodialCreationBlockedCountries).toEqual(expected)
   })
+
+  it("custodialMigrationRequiredCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.custodialMigrationRequiredCountries)
+  })
+
+  it("custodialMigrationRequiredCountries always includes US as the baked-in floor", () => {
+    expect(defaultRemoteConfig.custodialMigrationRequiredCountries).toContain("US")
+  })
 })
