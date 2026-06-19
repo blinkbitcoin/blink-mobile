@@ -53,6 +53,7 @@ const mockToggleBalanceMode = jest.fn()
 // eslint-disable-next-line prefer-const
 let mockBalanceModeValue: "btc" | "usd" = "usd"
 let mockStablesatsRestrictedOverride = false
+let mockStableTokenTransferBlockedOverride = false
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () =>
@@ -87,6 +88,11 @@ jest.mock("@app/config/feature-flags-context", () => {
     }),
   }
 })
+
+jest.mock("@app/hooks/use-stable-token-transfer-blocked", () => ({
+  useStableTokenTransferBlocked: () => mockStableTokenTransferBlockedOverride,
+  useStableTokenTransferBlockedSync: () => undefined,
+}))
 
 jest.mock("@app/hooks/use-stablesats-restricted", () => ({
   useStablesatsRestricted: () => mockStablesatsRestrictedOverride,
@@ -458,6 +464,7 @@ describe("HomeScreen", () => {
     currentMocks = []
     mockActiveWalletOverride = null
     mockStablesatsRestrictedOverride = false
+    mockStableTokenTransferBlockedOverride = false
     jest.clearAllMocks()
   })
 
@@ -499,6 +506,25 @@ describe("HomeScreen", () => {
       await flushEffects()
     },
   )
+
+  it("hides the transfer button when stable-token transfers are blocked", async () => {
+    mockStableTokenTransferBlockedOverride = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.Two,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
+    await flushEffects()
+  })
 
   it("auto-opens the convert modal when a restricted account holds a Dollar balance", async () => {
     mockStablesatsRestrictedOverride = true

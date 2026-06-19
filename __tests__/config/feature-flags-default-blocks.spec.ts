@@ -68,4 +68,12 @@ describe("defaultRemoteConfig: compliance country lists", () => {
       expect(always.has(code)).toBe(false)
     }
   })
+
+  it("stableTokenTransferBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.stableTokenTransferBlockedCountries)
+  })
+
+  it("stableTokenTransferBlockedCountries defaults to the 27 EU member states", () => {
+    expect(defaultRemoteConfig.stableTokenTransferBlockedCountries).toHaveLength(27)
+  })
 })

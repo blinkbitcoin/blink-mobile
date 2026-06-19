@@ -48,6 +48,10 @@ import {
   useStablesatsRestricted,
   useStablesatsRestrictionSync,
 } from "@app/hooks/use-stablesats-restricted"
+import {
+  useStableTokenTransferBlocked,
+  useStableTokenTransferBlockedSync,
+} from "@app/hooks/use-stable-token-transfer-blocked"
 import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
@@ -363,6 +367,9 @@ export const HomeScreen: React.FC = () => {
   const isStablesatsRestricted = useStablesatsRestricted()
   useStablesatsRestrictionSync()
 
+  const isStableTokenTransferBlocked = useStableTokenTransferBlocked()
+  useStableTokenTransferBlockedSync()
+
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedUsdWalletBalance = restrictedUsdWallet?.balance ?? 0
@@ -511,12 +518,13 @@ export const HomeScreen: React.FC = () => {
   const isIosWithBalance = isIos && satsBalance > 0
 
   const shouldShowTransferButton =
-    isSelfCustodial ||
-    !isIos ||
-    dataUnauthed?.globals?.network !== "mainnet" ||
-    levelAccount === AccountLevel.Two ||
-    levelAccount === AccountLevel.Three ||
-    isIosWithBalance
+    !isStableTokenTransferBlocked &&
+    (isSelfCustodial ||
+      !isIos ||
+      dataUnauthed?.globals?.network !== "mainnet" ||
+      levelAccount === AccountLevel.Two ||
+      levelAccount === AccountLevel.Three ||
+      isIosWithBalance)
 
   if (shouldShowTransferButton) {
     buttons.unshift({

@@ -112,6 +112,7 @@ type PersistentState_14 = {
   themeByAccountId?: Record<string, "system" | "light" | "dark">
   defaultAccountModalShownByAccountId?: Record<string, boolean>
   stablesatsRestrictedCustodial?: boolean
+  stableTokenTransferBlocked?: boolean
 }
 
 const migrate14ToCurrent = (state: PersistentState_14): Promise<PersistentState> =>
