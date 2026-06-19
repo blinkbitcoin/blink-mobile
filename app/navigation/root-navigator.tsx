@@ -92,6 +92,10 @@ import { UnclaimedDepositsScreen } from "../screens/unclaimed-deposits/unclaimed
 
 import { OfflineGate } from "@app/self-custodial/components"
 import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unavailable"
+import {
+  useCustodialMigrationRequired,
+  useCustodialMigrationRequiredSync,
+} from "@app/hooks/use-custodial-migration-required"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
@@ -147,6 +151,7 @@ import {
 } from "@app/screens/self-custodial/onboarding/restore"
 import {
   MigrationExplainerScreen,
+  MigrationRequiredScreen,
   TransferringFundsScreen,
 } from "@app/screens/account-migration"
 import {
@@ -1003,6 +1008,11 @@ export const PrimaryNavigator = () => {
   const insets = useSafeAreaInsets()
 
   const { LL } = useI18nContext()
+
+  useCustodialMigrationRequiredSync()
+  const migrationRequired = useCustodialMigrationRequired()
+  if (migrationRequired) return <MigrationRequiredScreen />
+
   // The cacheId is updated after every mutation that affects current user data (balanace, contacts, ...)
   // It's used to re-mount this component and thus reset what's cached in Apollo (and React)
 
