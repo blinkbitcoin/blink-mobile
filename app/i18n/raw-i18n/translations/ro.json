@@ -3606,6 +3606,11 @@
     "modalDescription": "Vă recomandăm insistent să faceți o copie de siguranță a portofelului pentru a preveni pierderea totală a fondurilor în cazul în care pierdeți acest dispozitiv.",
     "secureMe": "Securizare portofel"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Acesta este un cont non-custodial",
+    "body": "Pentru a afla mai multe, citește articolul nostru de blog",
+    "cta": "Citește"
+  },
   "StableBalance": {
     "title": "Sold stabil",
     "description": "Păstrați un sold în USD alimentat de USDB pe Spark.",

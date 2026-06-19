@@ -3606,6 +3606,11 @@
     "modalDescription": "Dôrazne odporúčame zálohovať peňaženku, aby ste predišli úplnej strate prostriedkov v prípade straty tohto zariadenia.",
     "secureMe": "Zabezpečiť peňaženku"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Toto je nesvereneský účet",
+    "body": "Ak sa chcete dozvedieť viac, prečítajte si náš blogový príspevok",
+    "cta": "Čítať"
+  },
   "StableBalance": {
     "title": "Stabilný zostatok",
     "description": "Udržiavajte zostatok v USD poháňaný USDB na Spark.",

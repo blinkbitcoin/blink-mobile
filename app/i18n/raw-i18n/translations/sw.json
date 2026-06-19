@@ -3606,6 +3606,11 @@
     "modalDescription": "Tunakushauri sana uhifadhi pochi yako ili kuzuia kupoteza fedha zako zote iwapo utapoteza kifaa hiki.",
     "secureMe": "Linda pochi"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Hii ni akaunti isiyo ya udhamini",
+    "body": "Ili kujifunza zaidi, soma chapisho letu la blogu",
+    "cta": "Soma"
+  },
   "StableBalance": {
     "title": "Salio thabiti",
     "description": "Hifadhi salio la USD linaloendeleshwa na USDB kwenye Spark.",

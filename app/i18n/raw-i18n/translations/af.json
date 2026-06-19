@@ -3606,6 +3606,11 @@
     "modalDescription": "Ons beveel sterk aan dat u u beursie rugsteun om 'n algehele verlies van fondse te voorkom indien u hierdie toestel verloor.",
     "secureMe": "Beveilig beursie"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Hierdie is 'n nie-bewaarrekening",
+    "body": "Lees ons blogpos om meer te wete te kom",
+    "cta": "Lees"
+  },
   "StableBalance": {
     "title": "Stabiele balans",
     "description": "Hou 'n USD-balans aangedryf deur USDB op Spark.",

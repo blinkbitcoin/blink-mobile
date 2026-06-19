@@ -3606,6 +3606,11 @@
     "modalDescription": "Kami sangat mengesyorkan anda membuat sandaran dompet anda untuk mengelakkan kehilangan dana sepenuhnya sekiranya anda kehilangan peranti ini.",
     "secureMe": "Lindungi dompet"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Ini ialah akaun bukan kustodial",
+    "body": "Untuk mengetahui lebih lanjut, baca catatan blog kami",
+    "cta": "Baca"
+  },
   "StableBalance": {
     "title": "Baki stabil",
     "description": "Simpan baki dalam USD dikuasakan USDB di Spark.",

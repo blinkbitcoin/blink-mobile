@@ -3606,6 +3606,11 @@
     "modalDescription": "Et recomanem fermament que facis una còpia de seguretat de la teva cartera per evitar una pèrdua total de fons en cas que perdis aquest dispositiu.",
     "secureMe": "Assegurar cartera"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Aquest és un compte no custodi",
+    "body": "Per saber-ne més, llegeix la nostra entrada del blog",
+    "cta": "Llegeix"
+  },
   "StableBalance": {
     "title": "Balanç estable",
     "description": "Mantén un balanç denominat en USD amb USDB a Spark.",

@@ -3606,6 +3606,11 @@
     "modalDescription": "Kami sangat menyarankan Anda untuk mencadangkan dompet Anda untuk mencegah kehilangan total dana jika Anda kehilangan perangkat ini.",
     "secureMe": "Amankan dompet"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Ini adalah akun non-kustodial",
+    "body": "Untuk mempelajari lebih lanjut, baca postingan blog kami",
+    "cta": "Baca"
+  },
   "StableBalance": {
     "title": "Saldo stabil",
     "description": "Simpan saldo dalam USD didukung USDB di Spark.",

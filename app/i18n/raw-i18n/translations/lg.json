@@ -3606,6 +3606,11 @@
     "modalDescription": "Tukutegeeza nnyo okukola backup ya wallet yo okusobola okuziyiza okufiirwa ssente zo zonna bw'onooba ofiirwa device eno.",
     "secureMe": "Kuuma wallet"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Eno ye akawunti etakuumibwa",
+    "body": "Okumanya ebisingawo, soma blog yaffe",
+    "cta": "Soma"
+  },
   "StableBalance": {
     "title": "Bbaalansi ennywevu",
     "description": "Kuuma bbaalansi mu USD n'obuyambi bwa USDB ku Spark.",

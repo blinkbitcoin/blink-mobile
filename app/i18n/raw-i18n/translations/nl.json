@@ -3606,6 +3606,11 @@
     "modalDescription": "We raden u ten zeerste aan om een back-up van uw portemonnee te maken om volledig verlies van fondsen te voorkomen als u dit apparaat kwijtraakt.",
     "secureMe": "Portemonnee beveiligen"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Dit is een niet-bewaarde rekening",
+    "body": "Lees ons blogbericht voor meer informatie",
+    "cta": "Lezen"
+  },
   "StableBalance": {
     "title": "Stabiel saldo",
     "description": "Houd een USD-saldo aangedreven door USDB op Spark.",

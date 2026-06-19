@@ -3606,6 +3606,11 @@
     "modalDescription": "Preporučujemo da napravite sigurnosnu kopiju novčanika kako biste spriječili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
     "secureMe": "Osiguraj novčanik"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Ovo je račun bez skrbništva",
+    "body": "Da biste saznali više, pročitajte naš blog post",
+    "cta": "Pročitaj"
+  },
   "StableBalance": {
     "title": "Stabilan saldo",
     "description": "Držite saldo u USD pokretan USDB na Sparku.",

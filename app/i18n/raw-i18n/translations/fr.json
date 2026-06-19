@@ -3606,6 +3606,11 @@
         "modalDescription": "Nous vous recommandons vivement de sauvegarder votre portefeuille pour éviter une perte totale de fonds en cas de perte de cet appareil.",
         "secureMe": "Sécuriser le portefeuille"
     },
+    "NonCustodialInfoBulletin": {
+        "title": "Ceci est un compte non-custodial",
+        "body": "Pour en savoir plus, lisez notre article de blog",
+        "cta": "Lire"
+    },
     "StableBalance": {
         "title": "Solde stable",
         "description": "Conservez un solde en USD propulsé par USDB sur Spark.",

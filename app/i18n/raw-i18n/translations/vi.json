@@ -3606,6 +3606,11 @@
     "modalDescription": "Chúng tôi khuyến nghị bạn sao lưu ví để ngăn chặn mất hoàn toàn tiền trong trường hợp bạn mất thiết bị này.",
     "secureMe": "Bảo mật ví"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Đây là tài khoản không lưu ký",
+    "body": "Để tìm hiểu thêm, hãy đọc bài viết trên blog của chúng tôi",
+    "cta": "Đọc"
+  },
   "StableBalance": {
     "title": "Số dư ổn định",
     "description": "Giữ số dư tính bằng USD được hỗ trợ bởi USDB trên Spark.",

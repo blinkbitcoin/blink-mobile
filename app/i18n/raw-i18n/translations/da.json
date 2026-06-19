@@ -3606,6 +3606,11 @@
     "modalDescription": "Vi anbefaler stærkt, at du sikkerhedskopierer din tegnebog for at forhindre et fuldstændigt tab af midler, hvis du mister denne enhed.",
     "secureMe": "Sikr tegnebog"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Dette er en ikke-depotkonto",
+    "body": "Læs vores blogindlæg for at lære mere",
+    "cta": "Læs"
+  },
   "StableBalance": {
     "title": "Stabil saldo",
     "description": "Hold en USD-saldo drevet af USDB på Spark.",

@@ -3606,6 +3606,11 @@
         "modalDescription": "Recomendamos fortemente que você faça backup da sua carteira para evitar uma perda total de fundos caso perca este dispositivo.",
         "secureMe": "Proteger carteira"
     },
+    "NonCustodialInfoBulletin": {
+        "title": "Esta é uma conta não custodial",
+        "body": "Para saber mais, leia a nossa publicação no blog",
+        "cta": "Ler"
+    },
     "StableBalance": {
         "title": "Saldo estável",
         "description": "Mantenha um saldo em USD alimentado por USDB no Spark.",

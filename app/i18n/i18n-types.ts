@@ -11997,6 +11997,20 @@ type RootTranslation = {
 		 */
 		secureMe: string
 	}
+	NonCustodialInfoBulletin: {
+		/**
+		 * T​h​i​s​ ​i​s​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
+		 */
+		title: string
+		/**
+		 * T​o​ ​l​e​a​r​n​ ​m​o​r​e​ ​r​e​a​d​ ​o​u​r​ ​b​l​o​g​ ​p​o​s​t
+		 */
+		body: string
+		/**
+		 * R​e​a​d
+		 */
+		cta: string
+	}
 	SelfCustodialOffline: {
 		/**
 		 * W​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e
@@ -24208,6 +24222,20 @@ export type TranslationFunctions = {
 		 * Secure wallet
 		 */
 		secureMe: () => LocalizedString
+	}
+	NonCustodialInfoBulletin: {
+		/**
+		 * This is a non-custodial account
+		 */
+		title: () => LocalizedString
+		/**
+		 * To learn more read our blog post
+		 */
+		body: () => LocalizedString
+		/**
+		 * Read
+		 */
+		cta: () => LocalizedString
 	}
 	SelfCustodialOffline: {
 		/**

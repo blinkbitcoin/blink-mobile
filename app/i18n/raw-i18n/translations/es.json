@@ -3606,6 +3606,11 @@
         "modalDescription": "Te recomendamos encarecidamente respaldar tu billetera para prevenir una pérdida total de fondos en caso de que pierdas este dispositivo.",
         "secureMe": "Asegurar billetera"
     },
+    "NonCustodialInfoBulletin": {
+        "title": "Esta es una cuenta no custodial",
+        "body": "Para saber más, lee nuestra entrada del blog",
+        "cta": "Leer"
+    },
     "StableBalance": {
         "title": "Balance estable",
         "description": "Mantén un balance en USD impulsado por USDB en Spark.",

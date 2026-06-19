@@ -3606,6 +3606,11 @@
         "modalDescription": "Wir empfehlen dringend, Ihre Wallet zu sichern, um einen vollständigen Verlust Ihrer Mittel zu verhindern, falls Sie dieses Gerät verlieren.",
         "secureMe": "Wallet sichern"
     },
+    "NonCustodialInfoBulletin": {
+        "title": "Dies ist ein nicht-verwahrtes Konto",
+        "body": "Lies unseren Blogbeitrag, um mehr zu erfahren",
+        "cta": "Lesen"
+    },
     "StableBalance": {
         "title": "Stabiles Guthaben",
         "description": "Halte ein USD-Guthaben betrieben durch USDB auf Spark.",

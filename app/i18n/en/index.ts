@@ -3780,6 +3780,11 @@ const en: BaseTranslation = {
       "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
     secureMe: "Secure wallet",
   },
+  NonCustodialInfoBulletin: {
+    title: "This is a non-custodial account",
+    body: "To learn more read our blog post",
+    cta: "Read",
+  },
   SelfCustodialOffline: {
     title: "Wallet is offline",
     description:

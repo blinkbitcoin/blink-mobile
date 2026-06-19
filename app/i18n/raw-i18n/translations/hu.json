@@ -3606,6 +3606,11 @@
     "modalDescription": "Nyomatékosan javasoljuk, hogy készíts biztonsági mentést a tárcádról, hogy megelőzd a pénzeszközeid teljes elvesztését, ha elveszíted ezt az eszközt.",
     "secureMe": "Tárca biztosítása"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Ez egy nem letétkezelt fiók",
+    "body": "További információért olvasd el blogbejegyzésünket",
+    "cta": "Olvasás"
+  },
   "StableBalance": {
     "title": "Stabil egyenleg",
     "description": "Tartson USD egyenleget USDB-vel a Sparkon.",

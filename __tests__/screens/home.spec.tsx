@@ -42,6 +42,22 @@ jest.mock("@app/components/backup-nudge-modal", () => ({
   BackupNudgeModal: (props: NudgeModalProps) => mockBackupNudgeModal(props),
 }))
 
+const mockSelfCustodialInfoBulletinState = {
+  shouldShow: false,
+  dismiss: jest.fn(),
+}
+jest.mock("@app/hooks/use-self-custodial-info-bulletin-state", () => ({
+  useSelfCustodialInfoBulletinState: () => mockSelfCustodialInfoBulletinState,
+}))
+
+const mockSelfCustodialInfoBulletin = jest.fn<null, [{ onDismiss: () => void }]>(
+  () => null,
+)
+jest.mock("@app/components/self-custodial-info-bulletin", () => ({
+  SelfCustodialInfoBulletin: (props: { onDismiss: () => void }) =>
+    mockSelfCustodialInfoBulletin(props),
+}))
+
 let mockIsFocused = true
 
 // eslint-disable-next-line prefer-const
@@ -1254,6 +1270,49 @@ describe("HomeScreen", () => {
       await flushEffects()
 
       expect(getByTestId("balance-value")).toBeTruthy()
+    })
+  })
+
+  describe("SelfCustodialInfoBulletin gating", () => {
+    beforeEach(() => {
+      mockSelfCustodialInfoBulletinState.shouldShow = false
+    })
+
+    afterEach(() => {
+      mockSelfCustodialInfoBulletinState.shouldShow = false
+      mockActiveWalletOverride = null
+    })
+
+    const renderForSelfCustodial = () => {
+      mockActiveWalletOverride = {
+        wallets: [],
+        status: "ready",
+        accountType: "self-custodial",
+        isReady: true,
+        isSelfCustodial: true,
+        needsBackendAuth: false,
+      }
+      return render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+    }
+
+    it("renders the bulletin when the hook says it should show", async () => {
+      mockSelfCustodialInfoBulletinState.shouldShow = true
+
+      renderForSelfCustodial()
+      await flushEffects()
+
+      expect(mockSelfCustodialInfoBulletin).toHaveBeenCalled()
+    })
+
+    it("does not render the bulletin when the hook says it should not show", async () => {
+      renderForSelfCustodial()
+      await flushEffects()
+
+      expect(mockSelfCustodialInfoBulletin).not.toHaveBeenCalled()
     })
   })
 })

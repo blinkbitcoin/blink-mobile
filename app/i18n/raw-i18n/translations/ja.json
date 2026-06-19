@@ -3606,6 +3606,11 @@
         "modalDescription": "このデバイスを紛失した場合の資金の完全な喪失を防ぐために、ウォレットのバックアップを強くお勧めします。",
         "secureMe": "ウォレットを保護"
     },
+    "NonCustodialInfoBulletin": {
+        "title": "これは非カストディアルアカウントです",
+        "body": "詳しくはブログ記事をご覧ください",
+        "cta": "読む"
+    },
     "StableBalance": {
         "title": "ステーブルバランス",
         "description": "Spark上のUSDBによるUSD残高を保持します。",

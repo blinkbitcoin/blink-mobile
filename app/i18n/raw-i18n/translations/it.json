@@ -3606,6 +3606,11 @@
         "modalDescription": "Ti consigliamo vivamente di eseguire il backup del tuo portafoglio per prevenire una perdita totale dei fondi nel caso in cui perdessi questo dispositivo.",
         "secureMe": "Proteggi portafoglio"
     },
+    "NonCustodialInfoBulletin": {
+        "title": "Questo è un account non custodiale",
+        "body": "Per saperne di più, leggi il nostro articolo del blog",
+        "cta": "Leggi"
+    },
     "StableBalance": {
         "title": "Saldo stabile",
         "description": "Mantieni un saldo in USD alimentato da USDB su Spark.",

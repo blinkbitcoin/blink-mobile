@@ -3606,6 +3606,11 @@
     "modalDescription": "Cüzdanınızı yedeklemenizi şiddetle tavsiye ederiz. Bu cihazı kaybetmeniz durumunda fonlarınızın tamamen kaybolmasını önlemek için.",
     "secureMe": "Cüzdanı güvenceye al"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Bu, saklamasız bir hesaptır",
+    "body": "Daha fazla bilgi için blog yazımızı okuyun",
+    "cta": "Oku"
+  },
   "StableBalance": {
     "title": "Sabit bakiye",
     "description": "Spark üzerinde USDB tarafından desteklenen USD bakiyesi tutun.",

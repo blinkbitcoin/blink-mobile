@@ -3606,6 +3606,11 @@
     "modalDescription": "Ñuqayku mayt'a kunaykiku wallitaykita waqaychayta ama tukuy qullqiyki chinkananpaq kay aparatuykita chinkachispayki.",
     "secureMe": "Waqaychay wallita"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Kayqa mana waqaychasqa kuentam",
+    "body": "Astawan yachanaykipaq, blog qillqaykuta ñawinchay",
+    "cta": "Ñawinchay"
+  },
   "StableBalance": {
     "title": "Saldo sinchi",
     "description": "USD saldota USDB Spark nisqawan jap'iy.",

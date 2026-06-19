@@ -3606,6 +3606,11 @@
     "modalDescription": "Siyakucebisa kakhulu ukuba wenze isipele songeno lwengxowa yakho ukukhusela ukuphulukana ngokupheleleyo neemali zakho xa uphulukana nale divayisi.",
     "secureMe": "Khuseleka ingxowa"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Le yiakhawunti engagcinwanga",
+    "body": "Ukufunda okungakumbi, funda ipowusti yebhlog yethu",
+    "cta": "Funda"
+  },
   "StableBalance": {
     "title": "Ibhalansi ezinzileyo",
     "description": "Gcina ibhalansi ye-USD exhaswe yi-USDB kwi-Spark.",

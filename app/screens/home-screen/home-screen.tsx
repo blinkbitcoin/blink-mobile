@@ -38,6 +38,7 @@ import {
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
+import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -58,6 +59,7 @@ import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -208,6 +210,10 @@ export const HomeScreen: React.FC = () => {
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
+  const {
+    shouldShow: shouldShowSelfCustodialInfoBulletin,
+    dismiss: dismissSelfCustodialInfoBulletin,
+  } = useSelfCustodialInfoBulletinState()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -758,6 +764,9 @@ export const HomeScreen: React.FC = () => {
         {isSelfCustodial && <UnclaimedDepositBanner />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
+        {shouldShowSelfCustodialInfoBulletin && (
+          <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />
+        )}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />
         <SetDefaultAccountModal
