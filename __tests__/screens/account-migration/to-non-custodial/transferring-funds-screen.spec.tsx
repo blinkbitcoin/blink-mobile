@@ -44,7 +44,7 @@ describe("TransferringFundsScreen", () => {
     jest.clearAllMocks()
     jest.useFakeTimers({ doNotFake: ["setImmediate"] })
     mockMigrationAccountId = "sc-account-1"
-    mockCompleteMigration.mockReturnValue(true)
+    mockCompleteMigration.mockResolvedValue(true)
     loadLocale("en")
   })
 
@@ -71,6 +71,7 @@ describe("TransferringFundsScreen", () => {
     act(() => {
       jest.advanceTimersByTime(TRANSFER_DELAY_MS)
     })
+    await flushEffects()
 
     expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
@@ -92,13 +93,14 @@ describe("TransferringFundsScreen", () => {
   })
 
   it("does not navigate to success when the swap does not happen", async () => {
-    mockCompleteMigration.mockReturnValue(false)
+    mockCompleteMigration.mockResolvedValue(false)
     renderScreen()
     await flushEffects()
 
     act(() => {
       jest.advanceTimersByTime(TRANSFER_DELAY_MS)
     })
+    await flushEffects()
 
     expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalled()

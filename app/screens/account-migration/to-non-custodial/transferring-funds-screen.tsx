@@ -26,8 +26,8 @@ export const TransferringFundsScreen: React.FC = () => {
   useEffect(() => {
     if (!migrationAccountId) return
 
-    const timer = setTimeout(() => {
-      if (completeMigration()) {
+    const timer = setTimeout(async () => {
+      if (await completeMigration()) {
         navigation.navigate("selfCustodialBackupSuccess", { reBackup: false })
       }
     }, TRANSFER_SIMULATION_MS)
