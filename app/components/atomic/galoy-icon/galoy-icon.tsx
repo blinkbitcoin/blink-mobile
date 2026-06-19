@@ -105,6 +105,7 @@ import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
 import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
 import CloudArrowUp from "@app/assets/icons-redesign/cloud-arrow-up.svg"
 import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
+import CaretUpCircle from "@app/assets/icons-redesign/caret-up-circle.svg"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -232,6 +233,7 @@ const customSvgMap = {
   "check-badge": CheckBadge,
   "cloud-arrow-up": CloudArrowUp,
   "heart-outline": HeartOutline,
+  "caret-up-circle": CaretUpCircle,
 } as const
 
 export const icons = { ...phosphorIconMap, ...customSvgMap } as const
