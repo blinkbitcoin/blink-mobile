@@ -149,7 +149,6 @@ jobs:
         APPSTORE_ISSUER_ID: #@ data.values.appstore_issuer_id
         SPARK_TOKEN_IDENTIFIER: #@ data.values.spark_token_identifier
         BREEZ_API_KEY: #@ data.values.breez_api_key
-        BREEZ_NETWORK: #@ data.values.breez_network
         MIN_BUILD_FREE_GB: 30
   - task: upload-to-gcs
     config:
@@ -318,7 +317,6 @@ jobs:
         APPSTORE_ISSUER_ID: #@ data.values.appstore_issuer_id
         SPARK_TOKEN_IDENTIFIER: #@ data.values.spark_token_identifier
         BREEZ_API_KEY: #@ data.values.breez_api_key
-        BREEZ_NETWORK: #@ data.values.breez_network
         MIN_BUILD_FREE_GB: 30
   - task: upload-to-gcs
     config:
