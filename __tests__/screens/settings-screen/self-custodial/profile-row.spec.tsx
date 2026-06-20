@@ -10,8 +10,10 @@ import { flushEffects } from "../../../helpers/flush-effects"
 
 const TEST_ENTRY_ID = "test-account-id"
 
+let mockNetwork = mockSparkNetwork.Regtest
+
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
-  useSparkNetwork: () => mockSparkNetwork.Regtest,
+  useSparkNetwork: () => mockNetwork,
 }))
 
 jest.mock("@rn-vui/themed", () => {
@@ -204,6 +206,7 @@ const setActiveAccountId = jest.fn()
 describe("ProfileRow", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockNetwork = mockSparkNetwork.Mainnet
     lastConfirmModalProps.isVisible = undefined
     lastWarningModalProps.isVisible = undefined
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null, wallets: [] })
@@ -288,7 +291,7 @@ describe("ProfileRow", () => {
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
-    expect(mockProbeWallets).toHaveBeenCalledWith(TEST_ENTRY_ID, mockSparkNetwork.Regtest)
+    expect(mockProbeWallets).toHaveBeenCalledWith(TEST_ENTRY_ID, mockSparkNetwork.Mainnet)
     expect(mockDeleteWallet).not.toHaveBeenCalled()
   })
 
@@ -311,7 +314,7 @@ describe("ProfileRow", () => {
     expect(queryByTestId("delete-modal")).toBeNull()
   })
 
-  it("opens the has-funds warning when the probe returns a positive balance", async () => {
+  it("opens the has-funds warning on mainnet when the probe returns a positive balance", async () => {
     mockProbeWallets.mockResolvedValue({
       status: "ok",
       wallets: [
@@ -332,6 +335,19 @@ describe("ProfileRow", () => {
     expect(await findByTestId("warning-modal")).toBeTruthy()
     expect(queryByTestId("delete-modal")).toBeNull()
     expect(lastWarningModalProps.wallets?.[0]?.balance.amount).toBe(9999)
+  })
+
+  it("skips the probe and the funds warning on regtest, opening the confirm modal directly", async () => {
+    mockNetwork = mockSparkNetwork.Regtest
+
+    const { getByTestId, queryByTestId, findByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+
+    expect(await findByTestId("delete-modal")).toBeTruthy()
+    expect(queryByTestId("warning-modal")).toBeNull()
+    expect(mockProbeWallets).not.toHaveBeenCalled()
   })
 
   it("opens the confirm modal when the probe returns a zero balance", async () => {
@@ -390,7 +406,7 @@ describe("ProfileRow", () => {
     expect(await findByTestId("delete-modal")).toBeTruthy()
   })
 
-  it("short-circuits the probe when the row is the active self-custodial account, reading live wallets from useSelfCustodialWallet", async () => {
+  it("short-circuits the probe on mainnet when the row is the active self-custodial account, reading live wallets from useSelfCustodialWallet", async () => {
     mockUseAccountRegistry.mockReturnValue({
       activeAccount: {
         id: TEST_ENTRY_ID,
@@ -421,6 +437,40 @@ describe("ProfileRow", () => {
     expect(await findByTestId("warning-modal")).toBeTruthy()
     expect(mockProbeWallets).not.toHaveBeenCalled()
     expect(lastWarningModalProps.wallets?.[0]?.balance.amount).toBe(1234)
+  })
+
+  it("skips the warning on regtest for the active self-custodial account even with live funds", async () => {
+    mockNetwork = mockSparkNetwork.Regtest
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: {
+        id: TEST_ENTRY_ID,
+        type: AccountType.SelfCustodial,
+        label: "Spark",
+        selected: true,
+        status: AccountStatus.RequiresRestore,
+      },
+      setActiveAccountId,
+    })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: null,
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1234, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+    })
+
+    const { getByTestId, queryByTestId, findByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+
+    expect(await findByTestId("delete-modal")).toBeTruthy()
+    expect(queryByTestId("warning-modal")).toBeNull()
+    expect(mockProbeWallets).not.toHaveBeenCalled()
   })
 
   it("opens the confirm modal directly on the active self-custodial account when live wallets are zero-balance", async () => {

@@ -30,6 +30,8 @@ export const networkForInstance = (instanceId: GaloyInstanceName): Network =>
 export const networkLabelFor = (network: Network): SparkNetworkLabel =>
   network === Network.Mainnet ? "mainnet" : "regtest"
 
+export const isRegtestNetwork = (network: Network): boolean => network === Network.Regtest
+
 export const storageDirFor = (accountId: string, network: Network): string =>
   `${DocumentDirectoryPath}/breez-sdk-spark-${networkLabelFor(network)}/${accountId}`
 

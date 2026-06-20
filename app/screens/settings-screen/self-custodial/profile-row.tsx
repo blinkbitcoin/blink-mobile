@@ -12,6 +12,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DeleteAccountConfirmModal } from "./delete-account-confirm-modal"
 import { DeleteAccountHasFundsModal } from "./delete-account-has-funds-modal"
+import { isRegtestNetwork } from "@app/self-custodial/config"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   probeSelfCustodialAccountWallets,
@@ -93,6 +94,15 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
 
   const handleRemovePress = async () => {
     if (probingBalance) return
+
+    /**
+     * Regtest accounts are deletable regardless of funds, so the balance is
+     * irrelevant: skip the probe (an SDK connect) and confirm directly.
+     */
+    if (isRegtestNetwork(network)) {
+      setConfirmVisible(true)
+      return
+    }
 
     if (isActive) {
       openModalForWallets(liveWallets ?? [])

@@ -2,6 +2,7 @@ import { Network } from "@breeztech/breez-sdk-spark-react-native"
 
 import {
   hasSparkAddressShape,
+  isRegtestNetwork,
   networkForInstance,
   networkLabelFor,
   storageDirFor,
@@ -96,6 +97,16 @@ describe("networkLabelFor", () => {
 
   it("labels regtest", () => {
     expect(networkLabelFor(Network.Regtest)).toBe("regtest")
+  })
+})
+
+describe("isRegtestNetwork", () => {
+  it("is true for regtest", () => {
+    expect(isRegtestNetwork(Network.Regtest)).toBe(true)
+  })
+
+  it("is false for mainnet", () => {
+    expect(isRegtestNetwork(Network.Mainnet)).toBe(false)
   })
 })
 
