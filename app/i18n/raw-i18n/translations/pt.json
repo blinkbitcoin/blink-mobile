@@ -3666,6 +3666,9 @@
         "invalidInput": "Os detalhes do pagamento parecem inválidos. Por favor, revise e tente novamente.",
         "generic": "Não foi possível concluir o pagamento. Tente novamente em um momento, ou use um valor menor."
     },
+    "SelfCustodialNetworkMismatch": {
+        "toast": "Esta conta foi criada em {network}. Mude para {network} para usá-la."
+    },
     "UnclaimedDeposit": {
         "title": "Você tem {count} depósito(s) não reclamado(s)",
         "description": "Total: {sats} sats disponíveis para reivindicar",

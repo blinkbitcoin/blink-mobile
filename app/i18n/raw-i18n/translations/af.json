@@ -3666,6 +3666,9 @@
     "invalidInput": "Die betaalbesonderhede lyk ongeldig. Kyk asseblief en probeer weer.",
     "generic": "Die betaling kon nie voltooi word nie. Probeer oor 'n oomblik weer, of gebruik 'n kleiner bedrag."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Hierdie rekening is op {network} geskep. Skakel oor na {network} om dit te gebruik."
+  },
   "UnclaimedDeposit": {
     "title": "Jy het {count} onopgeëiste deposito('s)",
     "description": "Totaal: {sats} sats beskikbaar om te eis",

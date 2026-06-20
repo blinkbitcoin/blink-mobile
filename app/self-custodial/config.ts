@@ -32,6 +32,19 @@ export const networkLabelFor = (network: Network): SparkNetworkLabel =>
 
 export const isRegtestNetwork = (network: Network): boolean => network === Network.Regtest
 
+/**
+ * Returns the wallet's stored network label when it conflicts with the current
+ * network, or null when there is no stored label or it matches. Single source
+ * of the mismatch rule shared by the SDK connect gate and the mismatch toast.
+ */
+export const mismatchedNetworkLabel = (
+  storedLabel: string | null,
+  network: Network,
+): string | null => {
+  if (!storedLabel) return null
+  return storedLabel === networkLabelFor(network) ? null : storedLabel
+}
+
 export const storageDirFor = (accountId: string, network: Network): string =>
   `${DocumentDirectoryPath}/breez-sdk-spark-${networkLabelFor(network)}/${accountId}`
 

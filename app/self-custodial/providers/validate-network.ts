@@ -3,7 +3,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { networkLabelFor } from "../config"
+import { mismatchedNetworkLabel, networkLabelFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 
 export const validateStoredNetwork = async (
@@ -11,12 +11,10 @@ export const validateStoredNetwork = async (
   network: Network,
 ): Promise<boolean> => {
   const storedNetwork = await KeyStoreWrapper.getMnemonicNetworkForAccount(accountId)
-  if (!storedNetwork) return true
+  const mismatch = mismatchedNetworkLabel(storedNetwork, network)
+  if (!mismatch) return true
 
-  const label = networkLabelFor(network)
-  if (storedNetwork === label) return true
-
-  const message = `Network mismatch: wallet=${storedNetwork}, config=${label}`
+  const message = `Network mismatch: wallet=${mismatch}, config=${networkLabelFor(network)}`
   logSdkEvent(SdkLogLevel.Error, message)
   crashlytics().recordError(new Error(message))
   return false

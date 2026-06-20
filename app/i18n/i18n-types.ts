@@ -12016,6 +12016,13 @@ type RootTranslation = {
 		 */
 		generic: string
 	}
+	SelfCustodialNetworkMismatch: {
+		/**
+		 * T​h​i​s​ ​a​c​c​o​u​n​t​ ​w​a​s​ ​c​r​e​a​t​e​d​ ​o​n​ ​{​n​e​t​w​o​r​k​}​.​ ​S​w​i​t​c​h​ ​t​o​ ​{​n​e​t​w​o​r​k​}​ ​t​o​ ​u​s​e​ ​i​t​.
+		 * @param {string} network
+		 */
+		toast: RequiredParams<'network' | 'network'>
+	}
 	UnclaimedDeposit: {
 		/**
 		 * U​n​c​l​a​i​m​e​d​ ​D​e​p​o​s​i​t​s
@@ -24204,6 +24211,12 @@ export type TranslationFunctions = {
 		 * The payment could not be completed. Try again in a moment, or use a smaller amount.
 		 */
 		generic: () => LocalizedString
+	}
+	SelfCustodialNetworkMismatch: {
+		/**
+		 * This account was created on {network}. Switch to {network} to use it.
+		 */
+		toast: (arg: { network: string }) => LocalizedString
 	}
 	UnclaimedDeposit: {
 		/**

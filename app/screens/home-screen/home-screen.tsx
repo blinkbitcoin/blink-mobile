@@ -48,6 +48,7 @@ import {
   useStablesatsRestricted,
   useStablesatsRestrictionSync,
 } from "@app/hooks/use-stablesats-restricted"
+import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { getErrorMessages } from "@app/graphql/utils"
@@ -184,6 +185,7 @@ export const HomeScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
+  useSelfCustodialNetworkMismatchToast()
   const {
     refreshWallets: refreshSelfCustodialWallets,
     isStableBalanceActive,

@@ -3,6 +3,7 @@ import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import {
   hasSparkAddressShape,
   isRegtestNetwork,
+  mismatchedNetworkLabel,
   networkForInstance,
   networkLabelFor,
   storageDirFor,
@@ -107,6 +108,22 @@ describe("isRegtestNetwork", () => {
 
   it("is false for mainnet", () => {
     expect(isRegtestNetwork(Network.Mainnet)).toBe(false)
+  })
+})
+
+describe("mismatchedNetworkLabel", () => {
+  it("returns null when there is no stored label", () => {
+    expect(mismatchedNetworkLabel(null, Network.Regtest)).toBeNull()
+  })
+
+  it("returns null when the stored label matches the current network", () => {
+    expect(mismatchedNetworkLabel("regtest", Network.Regtest)).toBeNull()
+    expect(mismatchedNetworkLabel("mainnet", Network.Mainnet)).toBeNull()
+  })
+
+  it("returns the stored label when it conflicts with the current network", () => {
+    expect(mismatchedNetworkLabel("mainnet", Network.Regtest)).toBe("mainnet")
+    expect(mismatchedNetworkLabel("regtest", Network.Mainnet)).toBe("regtest")
   })
 })
 

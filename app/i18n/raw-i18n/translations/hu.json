@@ -3666,6 +3666,9 @@
     "invalidInput": "A fizetés adatai érvénytelennek tűnnek. Kérjük, ellenőrizd, és próbáld újra.",
     "generic": "A fizetés nem sikerült. Próbáld újra egy pillanat múlva, vagy használj kisebb összeget."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Ez a fiók a(z) {network} hálózaton jött létre. Használatához váltson a(z) {network} hálózatra."
+  },
   "UnclaimedDeposit": {
     "title": "{count} nem igényelt befizetésed van",
     "description": "Összesen: {sats} sat elérhető igénylésre",

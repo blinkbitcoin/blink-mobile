@@ -3666,6 +3666,9 @@
     "invalidInput": "Butiran pembayaran kelihatan tidak sah. Sila semak dan cuba lagi.",
     "generic": "Pembayaran tidak dapat diselesaikan. Cuba lagi sekejap, atau gunakan jumlah yang lebih kecil."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Akaun ini dicipta pada {network}. Tukar ke {network} untuk menggunakannya."
+  },
   "UnclaimedDeposit": {
     "title": "Anda mempunyai {count} deposit yang belum dituntut",
     "description": "Jumlah: {sats} sats tersedia untuk dituntut",

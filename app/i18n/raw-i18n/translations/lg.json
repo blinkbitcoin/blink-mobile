@@ -3666,6 +3666,9 @@
     "invalidInput": "Ebikwata ku kusasula bifaanana nga si bituufu. Wonna obyebibebule oddemu ogezeeko.",
     "generic": "Okusasula tekuyinzizza kuwedwa. Ddamu ogezeeko mu kaseera, oba kozesa omuwendo omutono."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Akawunti eno yakolebwa ku {network}. Kyuka odde ku {network} okugikozesa."
+  },
   "UnclaimedDeposit": {
     "title": "Olina {count} ebitateekeddwa",
     "description": "Omutindo: {sats} sats ezikubirwa",

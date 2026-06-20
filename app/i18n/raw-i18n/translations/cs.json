@@ -3666,6 +3666,9 @@
     "invalidInput": "Detaily platby vypadají neplatně. Zkontrolujte je a zkuste to znovu.",
     "generic": "Platbu nebylo možné dokončit. Zkuste to za chvíli znovu nebo použijte menší částku."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Tento účet byl vytvořen v síti {network}. Chcete-li jej použít, přepněte na {network}."
+  },
   "UnclaimedDeposit": {
     "title": "Máte {count} nevyzvednutý(ch) vklad(ů)",
     "description": "Celkem: {sats} satů k vyzvednutí",

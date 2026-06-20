@@ -3666,6 +3666,9 @@
     "invalidInput": "Chi tiết thanh toán có vẻ không hợp lệ. Vui lòng xem lại và thử lại.",
     "generic": "Không thể hoàn tất thanh toán. Hãy thử lại sau một lát, hoặc dùng số tiền nhỏ hơn."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Tài khoản này được tạo trên {network}. Chuyển sang {network} để sử dụng."
+  },
   "UnclaimedDeposit": {
     "title": "Bạn có {count} khoản gửi chưa được yêu cầu",
     "description": "Tổng: {sats} sats có thể yêu cầu",

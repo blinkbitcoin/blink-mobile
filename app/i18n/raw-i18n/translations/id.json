@@ -3666,6 +3666,9 @@
     "invalidInput": "Detail pembayaran tampak tidak valid. Harap periksa dan coba lagi.",
     "generic": "Pembayaran tidak dapat diselesaikan. Coba lagi sebentar, atau gunakan jumlah yang lebih kecil."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Akun ini dibuat di {network}. Beralih ke {network} untuk menggunakannya."
+  },
   "UnclaimedDeposit": {
     "title": "Anda memiliki {count} deposit yang belum diklaim",
     "description": "Total: {sats} sats tersedia untuk diklaim",
