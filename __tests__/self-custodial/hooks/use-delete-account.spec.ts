@@ -1,3 +1,4 @@
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { renderHook, act, waitFor } from "@testing-library/react-native"
 
 import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet"
@@ -27,6 +28,10 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 
 jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockSparkNetwork.Regtest,
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({

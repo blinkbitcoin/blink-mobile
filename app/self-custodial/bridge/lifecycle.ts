@@ -4,6 +4,7 @@ import {
   defaultConfig,
   initLogging,
   type BreezSdkInterface,
+  type Network,
   type SdkEvent,
 } from "@breeztech/breez-sdk-spark-react-native"
 import { generateMnemonic, validateMnemonic } from "bip39"
@@ -14,10 +15,10 @@ import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import {
+  MAX_SLIPPAGE_BPS,
+  networkLabelFor,
   requireBreezApiKey,
   requireSparkTokenIdentifier,
-  SparkConfig,
-  SparkNetworkLabel,
   SparkToken,
   storageDirFor,
 } from "../config"
@@ -37,15 +38,15 @@ const initializeLogging = (() => {
   }
 })()
 
-const createSdkConfig = () => {
-  const config = defaultConfig(SparkConfig.network)
+const createSdkConfig = (network: Network) => {
+  const config = defaultConfig(network)
   config.apiKey = requireBreezApiKey()
 
   config.stableBalanceConfig = {
     tokens: [{ label: SparkToken.Label, tokenIdentifier: requireSparkTokenIdentifier() }],
     defaultActiveLabel: undefined,
     thresholdSats: undefined,
-    maxSlippageBps: SparkConfig.maxSlippageBps,
+    maxSlippageBps: MAX_SLIPPAGE_BPS,
   }
 
   return config
@@ -54,10 +55,11 @@ const createSdkConfig = () => {
 export const initSdk = async (
   mnemonic: string,
   storageDir: string,
+  network: Network,
 ): Promise<BreezSdkInterface> => {
   initializeLogging()
   const seed = new Seed.Mnemonic({ mnemonic, passphrase: undefined })
-  const config = createSdkConfig()
+  const config = createSdkConfig(network)
   return connect({ config, seed, storageDir })
 }
 
@@ -73,7 +75,10 @@ export const addSdkEventListener = (
 export const removeSdkEventListener = (sdk: BreezSdkInterface, listenerId: string) =>
   sdk.removeEventListener(listenerId)
 
-export const selfCustodialCreateWallet = async (accountId: string): Promise<void> => {
+export const selfCustodialCreateWallet = async (
+  accountId: string,
+  network: Network,
+): Promise<void> => {
   const mnemonic = generateMnemonic(128, (size: number) =>
     Buffer.from(Crypto.randomBytes(size)),
   )
@@ -82,13 +87,14 @@ export const selfCustodialCreateWallet = async (accountId: string): Promise<void
   const stored = await KeyStoreWrapper.setMnemonicForAccount(accountId, mnemonic)
   if (!stored) throw new Error("Failed to store mnemonic")
 
-  await KeyStoreWrapper.setMnemonicNetworkForAccount(accountId, SparkNetworkLabel)
+  await KeyStoreWrapper.setMnemonicNetworkForAccount(accountId, networkLabelFor(network))
   await addSelfCustodialAccountId(accountId)
 }
 
 export const selfCustodialRestoreWallet = async (
   accountId: string,
   mnemonic: string,
+  network: Network,
 ): Promise<void> => {
   const normalized = normalizeMnemonic(mnemonic)
   if (!validateMnemonic(normalized)) {
@@ -99,8 +105,11 @@ export const selfCustodialRestoreWallet = async (
   if (!stored) throw new Error("Failed to store mnemonic")
 
   try {
-    await KeyStoreWrapper.setMnemonicNetworkForAccount(accountId, SparkNetworkLabel)
-    const sdk = await initSdk(normalized, storageDirFor(accountId))
+    await KeyStoreWrapper.setMnemonicNetworkForAccount(
+      accountId,
+      networkLabelFor(network),
+    )
+    const sdk = await initSdk(normalized, storageDirFor(accountId, network), network)
     await disconnectSdk(sdk)
     await addSelfCustodialAccountId(accountId)
   } catch (err) {

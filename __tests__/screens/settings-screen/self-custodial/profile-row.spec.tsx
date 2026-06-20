@@ -1,4 +1,5 @@
 import React from "react"
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { act, fireEvent, render } from "@testing-library/react-native"
 
 import { AccountStatus, AccountType } from "@app/types/wallet"
@@ -8,6 +9,10 @@ import { ProfileRow } from "@app/screens/settings-screen/self-custodial/profile-
 import { flushEffects } from "../../../helpers/flush-effects"
 
 const TEST_ENTRY_ID = "test-account-id"
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockSparkNetwork.Regtest,
+}))
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
@@ -283,7 +288,7 @@ describe("ProfileRow", () => {
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
-    expect(mockProbeWallets).toHaveBeenCalledWith(TEST_ENTRY_ID)
+    expect(mockProbeWallets).toHaveBeenCalledWith(TEST_ENTRY_ID, mockSparkNetwork.Regtest)
     expect(mockDeleteWallet).not.toHaveBeenCalled()
   })
 

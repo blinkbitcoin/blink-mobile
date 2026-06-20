@@ -1,10 +1,8 @@
-import { Network as GaloyNetwork, WalletCurrency } from "@app/graphql/generated"
+import { Network } from "@breeztech/breez-sdk-spark-react-native"
+
+import { WalletCurrency } from "@app/graphql/generated"
 import { createSelfCustodialScanContext } from "@app/self-custodial/adapters/scan-context"
 import { type WalletState, toWalletId } from "@app/types/wallet"
-
-jest.mock("@app/self-custodial/config", () => ({
-  SparkNetworkLabel: "mainnet",
-}))
 
 const buildWallet = (id: string): WalletState => ({
   id: toWalletId(id),
@@ -15,29 +13,28 @@ const buildWallet = (id: string): WalletState => ({
 
 describe("createSelfCustodialScanContext", () => {
   it("maps wallet ids from the active self-custodial wallets", () => {
-    const adapter = createSelfCustodialScanContext([
-      buildWallet("self-custodial-btc"),
-      buildWallet("self-custodial-usd"),
-    ])
+    const adapter = createSelfCustodialScanContext(
+      [buildWallet("self-custodial-btc"), buildWallet("self-custodial-usd")],
+      Network.Mainnet,
+    )
 
     expect(adapter.myWalletIds).toEqual(["self-custodial-btc", "self-custodial-usd"])
   })
 
-  it("returns bitcoinNetwork equal to SparkNetworkLabel from config", () => {
-    const adapter = createSelfCustodialScanContext([])
-
-    expect(adapter.bitcoinNetwork).toBe(GaloyNetwork.Mainnet)
+  it("maps the Breez network to its label", () => {
+    expect(createSelfCustodialScanContext([], Network.Mainnet).bitcoinNetwork).toBe(
+      "mainnet",
+    )
+    expect(createSelfCustodialScanContext([], Network.Regtest).bitcoinNetwork).toBe(
+      "regtest",
+    )
   })
 
   it("returns an empty wallet id list when no wallets are connected", () => {
-    const adapter = createSelfCustodialScanContext([])
-
-    expect(adapter.myWalletIds).toEqual([])
+    expect(createSelfCustodialScanContext([], Network.Mainnet).myWalletIds).toEqual([])
   })
 
   it("returns an empty lnurlDomains list (intraledger lookup is disabled in self-custodial)", () => {
-    const adapter = createSelfCustodialScanContext([])
-
-    expect(adapter.lnurlDomains).toEqual([])
+    expect(createSelfCustodialScanContext([], Network.Mainnet).lnurlDomains).toEqual([])
   })
 })

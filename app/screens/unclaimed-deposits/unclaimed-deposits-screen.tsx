@@ -8,6 +8,7 @@ import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-butto
 import { CheckboxRow } from "@app/components/checkbox-row"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { DepositStatus } from "@app/types/payment"
 import { testProps } from "@app/utils/testProps"
@@ -21,7 +22,7 @@ import {
   getFeeRateSatPerVb,
   useRecommendedFeeTiers,
 } from "./hooks/use-recommended-fee-tiers"
-import { ADDRESS_PLACEHOLDER, openMempoolTx } from "./utils"
+import { addressPlaceholderFor, openMempoolTx } from "./utils"
 
 export const UnclaimedDepositsScreen: React.FC = () => {
   const styles = useStyles()
@@ -30,6 +31,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
   } = useTheme()
   const { LL, locale } = useI18nContext()
   const { sdk } = useSelfCustodialWallet()
+  const network = useSparkNetwork()
 
   const { deposits, isBusy, isProcessing, handleClaim, handleRefund, DepositActionType } =
     useDepositActions()
@@ -91,7 +93,10 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                 })}
               </Text>
 
-              <Pressable style={styles.txRow} onPress={() => openMempoolTx(deposit.txid)}>
+              <Pressable
+                style={styles.txRow}
+                onPress={() => openMempoolTx(deposit.txid, network)}
+              >
                 <Text style={styles.txLink} numberOfLines={1} ellipsizeMode="middle">
                   {deposit.txid}
                 </Text>
@@ -133,7 +138,7 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                     <View style={styles.fieldInput}>
                       <TextInput
                         style={styles.fieldInputText}
-                        placeholder={ADDRESS_PLACEHOLDER}
+                        placeholder={addressPlaceholderFor(network)}
                         placeholderTextColor={colors.grey2}
                         value={refundAddress}
                         onChangeText={setRefundAddress}

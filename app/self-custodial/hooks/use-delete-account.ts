@@ -7,6 +7,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { disconnectSdk } from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { removeSelfCustodialAccountId } from "@app/self-custodial/storage/account-index"
@@ -38,6 +39,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
 
   const [state, setState] = useState<DeleteState>("idle")
   const [error, setError] = useState<Error | null>(null)
+  const network = useSparkNetwork()
 
   const deleteWallet = useCallback(
     async (accountId: string): Promise<DeleteAccountOutcome | undefined> => {
@@ -79,7 +81,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
         }
 
         await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
-        await RNFS.unlink(storageDirFor(accountId)).catch((err) => {
+        await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
           crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)
         })
         await removeSelfCustodialAccountId(accountId)
@@ -108,6 +110,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
       reloadSelfCustodialAccounts,
       updateState,
       hasCustodialAccount,
+      network,
     ],
   )
 

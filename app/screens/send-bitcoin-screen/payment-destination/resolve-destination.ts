@@ -1,4 +1,7 @@
-import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  type BreezSdkInterface,
+  type Network,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import { parseSparkAddress } from "@app/self-custodial/bridge"
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
@@ -8,15 +11,21 @@ import { type ParseDestinationParams, type ParseDestinationResult } from "./inde
 import { resolveSparkDestination } from "./spark"
 import { resolveUsername } from "./resolve-username"
 
+export type SparkSession = {
+  sdk: BreezSdkInterface | null
+  network: Network
+}
+
 /** parseDestination + self-custodial-aware resolution and wrap when an SDK is connected. */
 export const resolveDestination = async (
   params: ParseDestinationParams,
-  sdk: BreezSdkInterface | null,
+  session: SparkSession,
   lnAddressHostname: string,
 ): Promise<ParseDestinationResult> => {
+  const { sdk, network } = session
   if (!sdk) return parseDestination(params)
 
-  const sparkParsed = await parseSparkAddress(sdk, params.rawInput)
+  const sparkParsed = await parseSparkAddress(sdk, params.rawInput, network)
   if (sparkParsed) {
     return wrapDestination(resolveSparkDestination(sparkParsed), sdk)
   }

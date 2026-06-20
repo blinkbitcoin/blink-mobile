@@ -1,3 +1,4 @@
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { renderHook, act } from "@testing-library/react-native"
 
 import {
@@ -19,8 +20,12 @@ jest.mock("react-native-quick-crypto", () => ({
   randomUUID: () => "test-account-id-123",
 }))
 
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockSparkNetwork.Regtest,
+}))
+
 jest.mock("@app/self-custodial/bridge", () => ({
-  selfCustodialCreateWallet: (accountId: string) => mockCreateWallet(accountId),
+  selfCustodialCreateWallet: (...args: unknown[]) => mockCreateWallet(...args),
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -123,6 +128,19 @@ describe("useCreateWallet", () => {
     })
 
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
+  })
+
+  it("creates the wallet for the generated account id on the active spark network", async () => {
+    const { result } = renderHook(() => useCreateWallet())
+
+    await act(async () => {
+      await result.current.create()
+    })
+
+    expect(mockCreateWallet).toHaveBeenCalledWith(
+      TEST_ACCOUNT_ID,
+      mockSparkNetwork.Regtest,
+    )
   })
 
   it("navigates to Primary on success", async () => {

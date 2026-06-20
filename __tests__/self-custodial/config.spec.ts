@@ -1,4 +1,11 @@
-import { hasSparkAddressShape } from "@app/self-custodial/config"
+import { Network } from "@breeztech/breez-sdk-spark-react-native"
+
+import {
+  hasSparkAddressShape,
+  networkForInstance,
+  networkLabelFor,
+  storageDirFor,
+} from "@app/self-custodial/config"
 
 jest.mock("react-native-config", () => ({}))
 
@@ -64,7 +71,46 @@ describe("hasSparkAddressShape", () => {
   })
 })
 
-describe("SparkConfig", () => {
+describe("networkForInstance", () => {
+  it("maps the Main instance to mainnet", () => {
+    expect(networkForInstance("Main")).toBe(Network.Mainnet)
+  })
+
+  it("maps the Staging instance to regtest", () => {
+    expect(networkForInstance("Staging")).toBe(Network.Regtest)
+  })
+
+  it("maps the Local instance to regtest", () => {
+    expect(networkForInstance("Local")).toBe(Network.Regtest)
+  })
+
+  it("maps a Custom instance to regtest", () => {
+    expect(networkForInstance("Custom")).toBe(Network.Regtest)
+  })
+})
+
+describe("networkLabelFor", () => {
+  it("labels mainnet", () => {
+    expect(networkLabelFor(Network.Mainnet)).toBe("mainnet")
+  })
+
+  it("labels regtest", () => {
+    expect(networkLabelFor(Network.Regtest)).toBe("regtest")
+  })
+})
+
+describe("storageDirFor", () => {
+  it("scopes the account storage path by network", () => {
+    expect(storageDirFor("acct-1", Network.Mainnet)).toBe(
+      "/test/documents/breez-sdk-spark-mainnet/acct-1",
+    )
+    expect(storageDirFor("acct-1", Network.Regtest)).toBe(
+      "/test/documents/breez-sdk-spark-regtest/acct-1",
+    )
+  })
+})
+
+describe("required build config", () => {
   beforeEach(() => {
     jest.resetModules()
   })
@@ -75,52 +121,8 @@ describe("SparkConfig", () => {
       SPARK_TOKEN_IDENTIFIER: "test-token-id",
       ...env,
     }))
-    jest.doMock("react-native-fs", () => ({
-      DocumentDirectoryPath: "/test/documents",
-    }))
-    jest.doMock("@breeztech/breez-sdk-spark-react-native", () => ({
-      Network: { Mainnet: 0, Regtest: 1 },
-    }))
     return require("@app/self-custodial/config")
   }
-
-  it("defaults to mainnet when BREEZ_NETWORK is not set", () => {
-    const { SparkConfig, SparkNetwork } = loadConfig()
-
-    expect(SparkNetwork).toBe(0)
-    expect(SparkConfig.network).toBe(0)
-  })
-
-  it("parses regtest network", () => {
-    const { SparkConfig, SparkNetwork } = loadConfig({ BREEZ_NETWORK: "regtest" })
-
-    expect(SparkNetwork).toBe(1)
-    expect(SparkConfig.network).toBe(1)
-  })
-
-  it("parses mainnet network (case-insensitive)", () => {
-    const { SparkNetwork } = loadConfig({ BREEZ_NETWORK: "Mainnet" })
-
-    expect(SparkNetwork).toBe(0)
-  })
-
-  it("throws on unknown network", () => {
-    expect(() => loadConfig({ BREEZ_NETWORK: "testnet" })).toThrow(
-      'Unknown BREEZ_NETWORK: "testnet"',
-    )
-  })
-
-  it("scopes storageDir by network — mainnet", () => {
-    const { SparkConfig } = loadConfig()
-
-    expect(SparkConfig.storageDir).toBe("/test/documents/breez-sdk-spark-mainnet")
-  })
-
-  it("scopes storageDir by network — regtest", () => {
-    const { SparkConfig } = loadConfig({ BREEZ_NETWORK: "regtest" })
-
-    expect(SparkConfig.storageDir).toBe("/test/documents/breez-sdk-spark-regtest")
-  })
 
   it("requireBreezApiKey returns the configured key", () => {
     const { requireBreezApiKey } = loadConfig({ BREEZ_API_KEY: "my-key" })
@@ -150,17 +152,5 @@ describe("SparkConfig", () => {
     expect(() => requireSparkTokenIdentifier()).toThrow(
       "SPARK_TOKEN_IDENTIFIER is not configured for this build",
     )
-  })
-
-  it("exports SparkNetworkLabel as 'mainnet' for mainnet", () => {
-    const { SparkNetworkLabel } = loadConfig()
-
-    expect(SparkNetworkLabel).toBe("mainnet")
-  })
-
-  it("exports SparkNetworkLabel as 'regtest' for regtest", () => {
-    const { SparkNetworkLabel } = loadConfig({ BREEZ_NETWORK: "regtest" })
-
-    expect(SparkNetworkLabel).toBe("regtest")
   })
 })

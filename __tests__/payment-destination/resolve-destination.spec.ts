@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { Network as SparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
+
 import { Network } from "@app/graphql/generated"
 
 import { resolveDestination } from "@app/screens/send-bitcoin-screen/payment-destination/resolve-destination"
@@ -53,7 +55,11 @@ describe("resolveDestination", () => {
       const parsed = { valid: true, validDestination: { paymentType: "Lightning" } }
       mockParseDestination.mockResolvedValue(parsed)
 
-      const result = await resolveDestination(baseParams, null, lnAddressHostname)
+      const result = await resolveDestination(
+        baseParams,
+        { sdk: null, network: SparkNetwork.Regtest },
+        lnAddressHostname,
+      )
 
       expect(mockParseSparkAddress).not.toHaveBeenCalled()
       expect(mockResolveUsername).not.toHaveBeenCalled()
@@ -64,7 +70,11 @@ describe("resolveDestination", () => {
     it("does not attempt the Spark pre-check when sdk is null", async () => {
       mockParseDestination.mockResolvedValue({ valid: false })
 
-      await resolveDestination(baseParams, null, lnAddressHostname)
+      await resolveDestination(
+        baseParams,
+        { sdk: null, network: SparkNetwork.Regtest },
+        lnAddressHostname,
+      )
 
       expect(mockParseSparkAddress).not.toHaveBeenCalled()
     })
@@ -82,11 +92,15 @@ describe("resolveDestination", () => {
 
       const result = await resolveDestination(
         { ...baseParams, rawInput: "sp1qabc" },
-        fakeSdk,
+        { sdk: fakeSdk, network: SparkNetwork.Regtest },
         lnAddressHostname,
       )
 
-      expect(mockParseSparkAddress).toHaveBeenCalledWith(fakeSdk, "sp1qabc")
+      expect(mockParseSparkAddress).toHaveBeenCalledWith(
+        fakeSdk,
+        "sp1qabc",
+        SparkNetwork.Regtest,
+      )
       expect(mockResolveSparkDestination).toHaveBeenCalledWith(sparkParsed)
       expect(mockWrapDestination).toHaveBeenCalledWith(sparkResolved, fakeSdk)
       expect(mockParseDestination).not.toHaveBeenCalled()
@@ -104,7 +118,11 @@ describe("resolveDestination", () => {
       mockResolveUsername.mockResolvedValue(resolved)
       mockWrapDestination.mockReturnValue(wrapped)
 
-      const result = await resolveDestination(baseParams, fakeSdk, lnAddressHostname)
+      const result = await resolveDestination(
+        baseParams,
+        { sdk: fakeSdk, network: SparkNetwork.Regtest },
+        lnAddressHostname,
+      )
 
       expect(mockParseDestination).toHaveBeenCalledWith(baseParams)
       expect(mockResolveUsername).toHaveBeenCalledWith(
@@ -124,7 +142,11 @@ describe("resolveDestination", () => {
       mockResolveUsername.mockResolvedValue(parsed)
       mockWrapDestination.mockReturnValue(parsed)
 
-      await resolveDestination(baseParams, fakeSdk, lnAddressHostname)
+      await resolveDestination(
+        baseParams,
+        { sdk: fakeSdk, network: SparkNetwork.Regtest },
+        lnAddressHostname,
+      )
 
       const resolveLnAddress = mockResolveUsername.mock.calls[0][2]
       mockParseDestination.mockClear()
@@ -144,7 +166,11 @@ describe("resolveDestination", () => {
       mockResolveUsername.mockResolvedValue(invalid)
       mockWrapDestination.mockReturnValue(invalid)
 
-      const result = await resolveDestination(baseParams, fakeSdk, lnAddressHostname)
+      const result = await resolveDestination(
+        baseParams,
+        { sdk: fakeSdk, network: SparkNetwork.Regtest },
+        lnAddressHostname,
+      )
 
       expect(mockWrapDestination).toHaveBeenCalledWith(invalid, fakeSdk)
       expect(result).toBe(invalid)

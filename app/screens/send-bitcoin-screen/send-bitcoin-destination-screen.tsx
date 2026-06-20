@@ -36,6 +36,7 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useScanContext } from "@app/hooks/use-scan-context"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { useSelfCustodialContactList } from "@app/self-custodial/hooks/use-contact-list"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 
 import { toWalletBalances } from "./hooks/use-send-wallets"
@@ -164,6 +165,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const activeWallet = useActiveWallet()
   const { isSelfCustodial, isReady: isWalletReady } = activeWallet
   const { sdk } = useSelfCustodialWallet()
+  const sparkNetwork = useSparkNetwork()
 
   const [destinationState, dispatchDestinationStateAction] = useReducer(
     sendBitcoinDestinationReducer,
@@ -349,7 +351,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           lnurlDomains,
           accountDefaultWalletQuery,
         },
-        sdk,
+        { sdk, network: sparkNetwork },
         lnAddressHostname,
       )
       logParseDestinationResult(wrappedDestination)
@@ -453,6 +455,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       contacts,
       parseValidPhone,
       sdk,
+      sparkNetwork,
       lnAddressHostname,
     ],
   )

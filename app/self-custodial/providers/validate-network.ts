@@ -1,16 +1,22 @@
+import { type Network } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { SparkNetworkLabel } from "../config"
+import { networkLabelFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
 
-export const validateStoredNetwork = async (accountId: string): Promise<boolean> => {
+export const validateStoredNetwork = async (
+  accountId: string,
+  network: Network,
+): Promise<boolean> => {
   const storedNetwork = await KeyStoreWrapper.getMnemonicNetworkForAccount(accountId)
   if (!storedNetwork) return true
-  if (storedNetwork === SparkNetworkLabel) return true
 
-  const message = `Network mismatch: wallet=${storedNetwork}, config=${SparkNetworkLabel}`
+  const label = networkLabelFor(network)
+  if (storedNetwork === label) return true
+
+  const message = `Network mismatch: wallet=${storedNetwork}, config=${label}`
   logSdkEvent(SdkLogLevel.Error, message)
   crashlytics().recordError(new Error(message))
   return false

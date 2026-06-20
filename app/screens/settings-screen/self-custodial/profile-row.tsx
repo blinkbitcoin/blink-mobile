@@ -12,6 +12,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DeleteAccountConfirmModal } from "./delete-account-confirm-modal"
 import { DeleteAccountHasFundsModal } from "./delete-account-has-funds-modal"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   probeSelfCustodialAccountWallets,
   ProbeAccountWalletsStatus,
@@ -46,6 +47,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const { lightningAddress: liveLightningAddress, wallets: liveWallets } =
     useSelfCustodialWallet()
   const { state: deleteState, deleteWallet } = useDeleteAccount()
+  const network = useSparkNetwork()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [hasFundsWarningVisible, setHasFundsWarningVisible] = useState(false)
@@ -98,7 +100,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
     }
 
     setProbingBalance(true)
-    const result = await probeSelfCustodialAccountWallets(accountId)
+    const result = await probeSelfCustodialAccountWallets(accountId, network)
     setProbingBalance(false)
 
     switch (result.status) {
