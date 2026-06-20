@@ -42,6 +42,8 @@ export const Default = () => {
       lnAddress="Testing"
       setLnAddress={console.log}
       error=""
+      hostname="blink.sv"
+      bankName="Blink"
     />
   )
 }
@@ -56,6 +58,8 @@ export const Error = () => {
       setLnAddress={console.log}
       loading={false}
       error="This is an error message"
+      hostname="blink.sv"
+      bankName="Blink"
     />
   )
 }

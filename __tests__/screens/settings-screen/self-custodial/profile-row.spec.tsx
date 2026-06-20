@@ -227,12 +227,15 @@ describe("ProfileRow", () => {
     })
   })
 
-  it("renders the lightning address as the row title when one is set", () => {
-    const { getByText } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@example.com" }} />,
+  it("renders the lightning username without the domain as the row title when one is set", () => {
+    const { getByText, queryByText } = render(
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@lnurl.staging.blink.sv" }}
+      />,
     )
 
-    expect(getByText("alice@example.com")).toBeTruthy()
+    expect(getByText("alice")).toBeTruthy()
+    expect(queryByText("alice@lnurl.staging.blink.sv")).toBeNull()
   })
 
   it("falls back to anonymous user label when no lightning address is set", () => {
@@ -560,7 +563,7 @@ describe("ProfileRow", () => {
       <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "stale@example.com" }} />,
     )
 
-    expect(getByText("magentamouse1845@breez.tips")).toBeTruthy()
+    expect(getByText("magentamouse1845")).toBeTruthy()
   })
 
   it("ignores the live lightning address for inactive rows and uses the persisted entry value", () => {
@@ -575,6 +578,6 @@ describe("ProfileRow", () => {
       />,
     )
 
-    expect(getByText("stored@example.com")).toBeTruthy()
+    expect(getByText("stored")).toBeTruthy()
   })
 })

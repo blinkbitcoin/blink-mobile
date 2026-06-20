@@ -25,3 +25,11 @@ export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: numb
 export const getUserSettings = (sdk: BreezSdkInterface) => sdk.getUserSettings()
 
 export const getLightningAddress = (sdk: BreezSdkInterface) => sdk.getLightningAddress()
+
+export const checkLightningAddressAvailable = (
+  sdk: BreezSdkInterface,
+  username: string,
+) => sdk.checkLightningAddressAvailable({ username })
+
+export const registerLightningAddress = (sdk: BreezSdkInterface, username: string) =>
+  sdk.registerLightningAddress({ username, description: undefined })
