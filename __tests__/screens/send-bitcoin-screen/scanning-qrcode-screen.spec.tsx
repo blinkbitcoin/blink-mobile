@@ -161,10 +161,10 @@ describe("ScanningQRCodeScreen", () => {
     })
 
     await renderScreen()
-    await fireScan("sp1qabc")
+    await fireScan("sparkrt1qabc")
 
     expect(mockResolveDestination).toHaveBeenCalledWith(
-      expect.objectContaining({ rawInput: "sp1qabc" }),
+      expect.objectContaining({ rawInput: "sparkrt1qabc" }),
       { sdk, network: mockSparkNetwork.Regtest },
       "blink.sv",
     )

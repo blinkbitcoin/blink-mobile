@@ -82,7 +82,11 @@ describe("resolveDestination", () => {
 
   describe("self-custodial path (sdk present)", () => {
     it("wraps the resolved Spark destination when parseSparkAddress matches", async () => {
-      const sparkParsed = { address: "sp1", identityPublicKey: "pk", networkMatch: true }
+      const sparkParsed = {
+        address: "spark1qabc",
+        identityPublicKey: "pk",
+        networkMatch: true,
+      }
       const sparkResolved = { valid: true, validDestination: { paymentType: "spark" } }
       const wrapped = { ...sparkResolved, createPaymentDetail: jest.fn() }
 
@@ -91,18 +95,43 @@ describe("resolveDestination", () => {
       mockWrapDestination.mockReturnValue(wrapped)
 
       const result = await resolveDestination(
-        { ...baseParams, rawInput: "sp1qabc" },
+        { ...baseParams, rawInput: "sparkrt1qabc" },
         { sdk: fakeSdk, network: SparkNetwork.Regtest },
         lnAddressHostname,
       )
 
       expect(mockParseSparkAddress).toHaveBeenCalledWith(
         fakeSdk,
-        "sp1qabc",
+        "sparkrt1qabc",
         SparkNetwork.Regtest,
       )
       expect(mockResolveSparkDestination).toHaveBeenCalledWith(sparkParsed)
       expect(mockWrapDestination).toHaveBeenCalledWith(sparkResolved, fakeSdk)
+      expect(mockParseDestination).not.toHaveBeenCalled()
+      expect(mockResolveUsername).not.toHaveBeenCalled()
+      expect(result).toBe(wrapped)
+    })
+
+    it("routes a wrong-network Spark address through resolveSparkDestination without falling through to the generic parser", async () => {
+      const sparkParsed = {
+        address: "spark1qabc",
+        identityPublicKey: "pk",
+        networkMatch: false,
+      }
+      const sparkResolved = { valid: false, invalidReason: "WrongNetwork" }
+      const wrapped = { ...sparkResolved }
+
+      mockParseSparkAddress.mockResolvedValue(sparkParsed)
+      mockResolveSparkDestination.mockReturnValue(sparkResolved)
+      mockWrapDestination.mockReturnValue(wrapped)
+
+      const result = await resolveDestination(
+        { ...baseParams, rawInput: "spark1qabc" },
+        { sdk: fakeSdk, network: SparkNetwork.Regtest },
+        lnAddressHostname,
+      )
+
+      expect(mockResolveSparkDestination).toHaveBeenCalledWith(sparkParsed)
       expect(mockParseDestination).not.toHaveBeenCalled()
       expect(mockResolveUsername).not.toHaveBeenCalled()
       expect(result).toBe(wrapped)

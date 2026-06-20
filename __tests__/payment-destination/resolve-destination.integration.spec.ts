@@ -88,4 +88,50 @@ describe("resolveDestination (integration: real parser)", () => {
     expect(result.valid && result.validDestination.paymentType).toBe(PaymentType.Lnurl)
     expect(mockWrapDestination).toHaveBeenCalled()
   })
+
+  it("resolves a matching-network Spark address to a valid Spark destination", async () => {
+    mockParseSparkAddress.mockResolvedValue({
+      address: "sparkrt1qabcdefghijklmn",
+      identityPublicKey: "pubkey123",
+      networkMatch: true,
+    })
+
+    const result = await resolveDestination(
+      {
+        rawInput: "sparkrt1qabcdefghijklmn",
+        myWalletIds: ["my-wallet-id"],
+        bitcoinNetwork: Network.Mainnet,
+        lnurlDomains: [],
+        accountDefaultWalletQuery: jest.fn() as never,
+      },
+      { sdk: fakeSdk, network: mockSparkNetwork.Regtest },
+      lnAddressHostname,
+    )
+
+    expect(result.valid).toBe(true)
+    expect(result.valid && result.validDestination.paymentType).toBe("spark")
+  })
+
+  it("marks a wrong-network Spark address invalid without falling through to the generic parser", async () => {
+    mockParseSparkAddress.mockResolvedValue({
+      address: "spark1qabcdefghijklmn",
+      identityPublicKey: "pubkey123",
+      networkMatch: false,
+    })
+
+    const result = await resolveDestination(
+      {
+        rawInput: "spark1qabcdefghijklmn",
+        myWalletIds: ["my-wallet-id"],
+        bitcoinNetwork: Network.Mainnet,
+        lnurlDomains: [],
+        accountDefaultWalletQuery: jest.fn() as never,
+      },
+      { sdk: fakeSdk, network: mockSparkNetwork.Regtest },
+      lnAddressHostname,
+    )
+
+    expect(result.valid).toBe(false)
+    expect(!result.valid && result.invalidReason).toBe("WrongNetwork")
+  })
 })

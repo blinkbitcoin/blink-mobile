@@ -13,12 +13,11 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   InputType_Tags: { SparkAddress: "SparkAddress", BitcoinAddress: "BitcoinAddress" },
 }))
 
-jest.mock("@app/self-custodial/config", () => ({
-  hasSparkAddressShape: (input: string): boolean => /^(?:sp1|sprt1)/i.test(input.trim()),
-}))
+jest.mock("react-native-config", () => ({}))
+jest.mock("react-native-fs", () => ({ DocumentDirectoryPath: "/test" }))
 
-const SPARK_REGTEST_INPUT = "sprt1qabcdefghijklmn"
-const SPARK_MAINNET_INPUT = "sp1qabcdefghijklmn"
+const SPARK_REGTEST_INPUT = "sparkrt1qabcdefghijklmn"
+const SPARK_MAINNET_INPUT = "spark1qabcdefghijklmn"
 const LNURL_INPUT = "lnurl1examplefixtureonly"
 
 const createMockSdk = (parseResult: unknown) =>

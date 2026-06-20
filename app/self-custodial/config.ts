@@ -13,7 +13,8 @@ export type SparkToken = (typeof SparkToken)[keyof typeof SparkToken]
 
 export const MAX_SLIPPAGE_BPS = 50
 
-const SPARK_ADDRESS_SHAPE_PATTERN = /^(?:sp1|sprt1)/i
+// Spark bech32 HRPs (spark1/sparkrt1); gates the async sdk.parse, which can hang on some non-Spark bech32 input.
+const SPARK_ADDRESS_SHAPE_PATTERN = /^(?:spark1|sparkrt1)/i
 
 export const hasSparkAddressShape = (input: string): boolean =>
   SPARK_ADDRESS_SHAPE_PATTERN.test(input.trim())

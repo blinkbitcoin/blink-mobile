@@ -22,22 +22,29 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 const LNURL_INPUT = "lnurl1examplefixtureonly"
 
 describe("hasSparkAddressShape", () => {
-  it("accepts a mainnet Spark address (sp1 HRP)", () => {
-    expect(hasSparkAddressShape("sp1qabcdefghijklmn")).toBe(true)
+  it("accepts a mainnet Spark address (spark1 HRP)", () => {
+    expect(hasSparkAddressShape("spark1qabcdefghijklmn")).toBe(true)
   })
 
-  it("accepts a regtest Spark address (sprt1 HRP)", () => {
-    expect(hasSparkAddressShape("sprt1qabcdefghijklmn")).toBe(true)
+  it("accepts a regtest Spark address (sparkrt1 HRP)", () => {
+    expect(hasSparkAddressShape("sparkrt1qabcdefghijklmn")).toBe(true)
   })
 
   it("is case-insensitive on the HRP", () => {
-    expect(hasSparkAddressShape("SP1QABCDEFGHIJKLMN")).toBe(true)
-    expect(hasSparkAddressShape("SPRT1QABCDEFGHIJKLMN")).toBe(true)
+    expect(hasSparkAddressShape("SPARK1QABCDEFGHIJKLMN")).toBe(true)
+    expect(hasSparkAddressShape("SPARKRT1QABCDEFGHIJKLMN")).toBe(true)
+    expect(hasSparkAddressShape("Spark1qabcdefghijklmn")).toBe(true)
+    expect(hasSparkAddressShape("SparkRt1qabcdefghijklmn")).toBe(true)
   })
 
   it("trims surrounding whitespace before applying the shape check", () => {
-    expect(hasSparkAddressShape("   sp1qabcdefghijklmn  ")).toBe(true)
-    expect(hasSparkAddressShape("\nsprt1qabcdefghijklmn\t")).toBe(true)
+    expect(hasSparkAddressShape("   spark1qabcdefghijklmn  ")).toBe(true)
+    expect(hasSparkAddressShape("\nsparkrt1qabcdefghijklmn\t")).toBe(true)
+  })
+
+  it("rejects the legacy sp1/sprt1 HRPs that predate the current address format", () => {
+    expect(hasSparkAddressShape("sp1qabcdefghijklmn")).toBe(false)
+    expect(hasSparkAddressShape("sprt1qabcdefghijklmn")).toBe(false)
   })
 
   it("rejects an LNURL bech32 string (the original regression case)", () => {
@@ -69,7 +76,7 @@ describe("hasSparkAddressShape", () => {
   })
 
   it("rejects a string that contains a Spark HRP but does not start with one", () => {
-    expect(hasSparkAddressShape("garbage-sp1qabc")).toBe(false)
+    expect(hasSparkAddressShape("garbage-spark1qabc")).toBe(false)
   })
 })
 
