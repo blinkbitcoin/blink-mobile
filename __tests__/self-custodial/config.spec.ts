@@ -121,11 +121,11 @@ describe("isRegtestNetwork", () => {
 
 describe("lnurlDomainFor", () => {
   it("uses the production Blink LNURL host on mainnet", () => {
-    expect(lnurlDomainFor(Network.Mainnet)).toBe("lnurl.blink.sv")
+    expect(lnurlDomainFor(Network.Mainnet)).toBe("blink.sv")
   })
 
   it("uses the staging Blink LNURL host on regtest", () => {
-    expect(lnurlDomainFor(Network.Regtest)).toBe("lnurl.staging.blink.sv")
+    expect(lnurlDomainFor(Network.Regtest)).toBe("staging.blink.sv")
   })
 })
 

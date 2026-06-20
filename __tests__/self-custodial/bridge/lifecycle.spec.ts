@@ -119,7 +119,7 @@ describe("initSdk", () => {
         seed: expect.objectContaining({ tag: "Mnemonic", mnemonic: "word1 word2 word3" }),
         config: expect.objectContaining({
           apiKey: "test-api-key",
-          lnurlDomain: "lnurl.staging.blink.sv",
+          lnurlDomain: "staging.blink.sv",
         }),
       }),
     )

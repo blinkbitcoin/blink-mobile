@@ -64,7 +64,7 @@ describe("registerLightningAddress", () => {
   it("forwards the username and description and returns the address info", async () => {
     const register = jest
       .fn()
-      .mockResolvedValue({ lightningAddress: "alice@lnurl.staging.blink.sv" })
+      .mockResolvedValue({ lightningAddress: "alice@staging.blink.sv" })
 
     const result = await registerLightningAddress(
       { registerLightningAddress: register } as never,
@@ -72,6 +72,6 @@ describe("registerLightningAddress", () => {
     )
 
     expect(register).toHaveBeenCalledWith({ username: "alice", description: undefined })
-    expect(result).toEqual({ lightningAddress: "alice@lnurl.staging.blink.sv" })
+    expect(result).toEqual({ lightningAddress: "alice@staging.blink.sv" })
   })
 })

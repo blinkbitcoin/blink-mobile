@@ -49,7 +49,7 @@ describe("SetSelfCustodialLightningAddressModal", () => {
   it("renders the shared modal UI with the staging Blink LNURL host on regtest", () => {
     render(<SetSelfCustodialLightningAddressModal isVisible toggleModal={jest.fn()} />)
 
-    expect(lastProps().hostname).toBe("lnurl.staging.blink.sv")
+    expect(lastProps().hostname).toBe("staging.blink.sv")
     expect(lastProps().bankName).toBe("Blink")
     expect(lastProps().lnAddress).toBe("alice")
     expect(lastProps().loading).toBe(false)
@@ -61,7 +61,7 @@ describe("SetSelfCustodialLightningAddressModal", () => {
 
     render(<SetSelfCustodialLightningAddressModal isVisible toggleModal={jest.fn()} />)
 
-    expect(lastProps().hostname).toBe("lnurl.blink.sv")
+    expect(lastProps().hostname).toBe("blink.sv")
   })
 
   it("wires register to the primary action and passes toggleModal as the onRegistered callback", () => {

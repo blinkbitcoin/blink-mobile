@@ -67,7 +67,7 @@ import { AccountLNAddress } from "@app/screens/settings-screen/settings/account-
 const lastRowProps = (): Record<string, unknown> =>
   (mockSettingsRow.mock.calls.at(-1)?.[0] ?? {}) as Record<string, unknown>
 
-const SC_ADDRESS = "alice@lnurl.staging.blink.sv"
+const SC_ADDRESS = "alice@staging.blink.sv"
 
 describe("AccountLNAddress (self-custodial)", () => {
   beforeEach(() => {

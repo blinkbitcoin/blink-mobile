@@ -230,12 +230,12 @@ describe("ProfileRow", () => {
   it("renders the lightning username without the domain as the row title when one is set", () => {
     const { getByText, queryByText } = render(
       <ProfileRow
-        entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@lnurl.staging.blink.sv" }}
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@staging.blink.sv" }}
       />,
     )
 
     expect(getByText("alice")).toBeTruthy()
-    expect(queryByText("alice@lnurl.staging.blink.sv")).toBeNull()
+    expect(queryByText("alice@staging.blink.sv")).toBeNull()
   })
 
   it("falls back to anonymous user label when no lightning address is set", () => {

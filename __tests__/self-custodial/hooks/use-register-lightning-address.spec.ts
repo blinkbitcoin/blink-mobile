@@ -26,7 +26,7 @@ describe("useRegisterLightningAddress", () => {
     jest.clearAllMocks()
     mockSdk = FAKE_SDK
     mockCheckAvailable.mockResolvedValue(true)
-    mockRegister.mockResolvedValue({ lightningAddress: "alice@lnurl.staging.blink.sv" })
+    mockRegister.mockResolvedValue({ lightningAddress: "alice@staging.blink.sv" })
     mockUpdateAccount.mockResolvedValue(undefined)
   })
 
