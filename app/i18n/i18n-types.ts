@@ -8150,11 +8150,11 @@ type RootTranslation = {
 	}
 	ConvertDollarToBitcoinModal: {
 		/**
-		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		title: string
 		/**
-		 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n
+		 * T​r​a​n​s​f​e​r​ ​f​r​o​m​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e
 		 */
 		body: string
 		/**
@@ -8165,10 +8165,6 @@ type RootTranslation = {
 		 * Y​o​u​ ​g​e​t
 		 */
 		youGet: string
-		/**
-		 * A​p​p​r​o​v​e
-		 */
-		approve: string
 	}
 	SplashScreen: {
 		/**
@@ -20406,11 +20402,11 @@ export type TranslationFunctions = {
 	}
 	ConvertDollarToBitcoinModal: {
 		/**
-		 * Dollar account is no longer available in your region
+		 * Dollar Balance is not available in your region
 		 */
 		title: () => LocalizedString
 		/**
-		 * Transfer your Dollar balance to Bitcoin
+		 * Transfer from Dollar Balance to Bitcoin Balance
 		 */
 		body: () => LocalizedString
 		/**
@@ -20421,10 +20417,6 @@ export type TranslationFunctions = {
 		 * You get
 		 */
 		youGet: () => LocalizedString
-		/**
-		 * Approve
-		 */
-		approve: () => LocalizedString
 	}
 	SplashScreen: {
 		/**

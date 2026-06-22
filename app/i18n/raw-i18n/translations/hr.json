@@ -2463,11 +2463,10 @@
     "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Račun u dolarima više nije dostupan u vašoj regiji",
-    "body": "Prebacite svoje stanje u dolarima u Bitcoin",
+    "title": "Dolarski saldo nije dostupan u vašoj regiji",
+    "body": "Prebacite s dolarskog stanja na Bitcoin stanje",
     "youHave": "Imate",
-    "youGet": "Dobivate",
-    "approve": "Odobri"
+    "youGet": "Dobivate"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvofaktorska autentifikacija",

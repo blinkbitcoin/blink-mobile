@@ -2463,11 +2463,10 @@
     "modalTitle": "Baki dolar tidak tersedia di rantau anda"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Akaun Dolar tidak lagi tersedia di rantau anda",
-    "body": "Pindahkan baki Dolar anda kepada Bitcoin",
+    "title": "Baki dolar tidak tersedia di rantau anda",
+    "body": "Pindahkan daripada Baki Dolar ke Baki Bitcoin",
     "youHave": "Anda ada",
-    "youGet": "Anda dapat",
-    "approve": "Luluskan"
+    "youGet": "Anda dapat"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Pengesahan dua kali",

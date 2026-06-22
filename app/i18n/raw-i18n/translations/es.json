@@ -2463,11 +2463,10 @@
         "modalTitle": "El saldo en dólares no está disponible en tu región"
     },
     "ConvertDollarToBitcoinModal": {
-        "title": "La cuenta en dólares ya no está disponible en tu región",
-        "body": "Transfiere tu saldo en dólares a Bitcoin",
+        "title": "El saldo en dólares no está disponible en tu región",
+        "body": "Transfiere del saldo en dólares al saldo en Bitcoin",
         "youHave": "Tienes",
-        "youGet": "Recibes",
-        "approve": "Aprobar"
+        "youGet": "Recibes"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticación de dos factores",

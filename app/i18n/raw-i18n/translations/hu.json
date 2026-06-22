@@ -2463,11 +2463,10 @@
     "modalTitle": "A dolláregyenleg nem érhető el a régiódban"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "A dollárszámla már nem érhető el a régiódban",
-    "body": "Utald át a dolláregyenleged Bitcoinra",
+    "title": "A dolláregyenleg nem érhető el a régiódban",
+    "body": "Utald át a dolláregyenlegről a Bitcoin-egyenlegre",
     "youHave": "Nálad van",
-    "youGet": "Kapsz",
-    "approve": "Jóváhagyás"
+    "youGet": "Kapsz"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Kétlépcsős azonosítás",

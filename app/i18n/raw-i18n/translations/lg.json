@@ -2463,11 +2463,10 @@
     "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Akawunti ya Doola tekikyaliwo mu kitundu kyo",
-    "body": "Tambuza ssente zo eza Doola zibe Bitcoin",
+    "title": "Bbalansi ya doola teriiwo mu kitundu kyo",
+    "body": "Tambuza okuva ku bbalansi ya doola okudda ku bbalansi ya Bitcoin",
     "youHave": "Olina",
-    "youGet": "Ofuna",
-    "approve": "Kkiriza"
+    "youGet": "Ofuna"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Okukakasa emirundi ebiri",

@@ -2463,11 +2463,10 @@
     "modalTitle": "Доларски салдо није доступан у вашем региону"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Налог у доларима више није доступан у вашем региону",
-    "body": "Пребаците свој салдо у доларима у Bitcoin",
+    "title": "Доларски салдо није доступан у вашем региону",
+    "body": "Пренесите са доларског салда на Bitcoin салдо",
     "youHave": "Имате",
-    "youGet": "Добијате",
-    "approve": "Одобри"
+    "youGet": "Добијате"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",

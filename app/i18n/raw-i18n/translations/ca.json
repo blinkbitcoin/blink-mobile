@@ -2463,11 +2463,10 @@
     "modalTitle": "El saldo en dòlars no està disponible a la teva regió"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "El compte en dòlars ja no està disponible a la teva regió",
-    "body": "Transfereix el teu saldo en dòlars a Bitcoin",
+    "title": "El saldo en dòlars no està disponible a la teva regió",
+    "body": "Transfereix del saldo en dòlars al saldo en Bitcoin",
     "youHave": "Tens",
-    "youGet": "Reps",
-    "approve": "Aprova"
+    "youGet": "Reps"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificació de dos factors",

@@ -2463,11 +2463,10 @@
     "modalTitle": "Dolárový zostatok nie je vo vašom regióne k dispozícii"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dolárový účet už nie je vo vašom regióne dostupný",
-    "body": "Preveďte svoj zostatok v dolároch na Bitcoin",
+    "title": "Dolárový zostatok nie je vo vašom regióne k dispozícii",
+    "body": "Preveďte z dolárového zostatku na bitcoinový zostatok",
     "youHave": "Máte",
-    "youGet": "Získate",
-    "approve": "Schváliť"
+    "youGet": "Získate"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvojfaktorové overenie",

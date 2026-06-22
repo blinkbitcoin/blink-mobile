@@ -2463,11 +2463,10 @@
     "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "I-akhawunti yeDola ayisafumaneki kummandla wakho",
-    "body": "Dlulisela ibhalansi yakho yeDola kwiBitcoin",
+    "title": "Ibhalansi yedola ayifumaneki kummandla wakho",
+    "body": "Dlulisa kwiBhalansi yeDola ukuya kwiBhalansi yeBitcoin",
     "youHave": "Unayo",
-    "youGet": "Ufumana",
-    "approve": "Yamkela"
+    "youGet": "Ufumana"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Uqinisekiso lwezinto ezimbini",

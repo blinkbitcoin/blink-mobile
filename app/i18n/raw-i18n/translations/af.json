@@ -2463,11 +2463,10 @@
     "modalTitle": "Dollar-saldo is nie beskikbaar in jou streek nie"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Die Dollar-rekening is nie meer in jou streek beskikbaar nie",
-    "body": "Dra jou Dollar-saldo oor na Bitcoin",
+    "title": "Dollar-saldo is nie beskikbaar in jou streek nie",
+    "body": "Dra oor van Dollar-saldo na Bitcoin-saldo",
     "youHave": "Jy het",
-    "youGet": "Jy kry",
-    "approve": "Keur goed"
+    "youGet": "Jy kry"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Twee-faktor-verifikasie",

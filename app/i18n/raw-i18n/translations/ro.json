@@ -2463,11 +2463,10 @@
     "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Contul în dolari nu mai este disponibil în regiunea ta",
-    "body": "Transferă soldul tău în dolari în Bitcoin",
+    "title": "Soldul în dolari nu este disponibil în regiunea ta",
+    "body": "Transferă din soldul în dolari în soldul în Bitcoin",
     "youHave": "Ai",
-    "youGet": "Primești",
-    "approve": "Aprobă"
+    "youGet": "Primești"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificare cu doi factori",

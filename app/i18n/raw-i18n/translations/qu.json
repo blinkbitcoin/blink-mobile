@@ -2463,11 +2463,10 @@
     "modalTitle": "Dólar saldoqa mana kapunchu suyuykipi"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dólar cuentaqa manaña suyuykipi kanchu",
-    "body": "Dólar qullqiykita Bitcoinman astay",
+    "title": "Dólar saldoqa mana kapunchu suyuykipi",
+    "body": "Dólar saldomanta Bitcoin saldoman apachiy",
     "youHave": "Kapusunki",
-    "youGet": "Chaskinki",
-    "approve": "Arí niy"
+    "youGet": "Chaskinki"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",

@@ -2463,11 +2463,10 @@
     "modalTitle": "رصيد الدولار غير متاح في منطقتك"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "لم يعد حساب الدولار متاحًا في منطقتك",
-    "body": "انقل رصيدك بالدولار إلى بيتكوين",
+    "title": "رصيد الدولار غير متاح في منطقتك",
+    "body": "حوّل من رصيد الدولار إلى رصيد البيتكوين",
     "youHave": "لديك",
-    "youGet": "تحصل على",
-    "approve": "موافقة"
+    "youGet": "تحصل على"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",

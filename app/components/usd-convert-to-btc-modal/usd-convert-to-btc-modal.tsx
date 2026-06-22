@@ -62,7 +62,7 @@ export const UsdConvertToBtcModal: React.FC<Props> = ({
           ) : null}
         </>
       }
-      primaryButtonTitle={LL.ConvertDollarToBitcoinModal.approve()}
+      primaryButtonTitle={LL.ConversionDetailsScreen.transfer()}
       primaryButtonOnPress={convertBalance}
       primaryButtonLoading={loading}
       primaryButtonDisabled={loading}

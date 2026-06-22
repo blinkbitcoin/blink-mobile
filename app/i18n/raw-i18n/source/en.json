@@ -2508,11 +2508,10 @@
         "modalTitle": "Dollar Balance is not available in your region"
     },
     "ConvertDollarToBitcoinModal": {
-        "title": "Dollar account is no longer available in your region",
-        "body": "Transfer your Dollar balance to Bitcoin",
+        "title": "Dollar Balance is not available in your region",
+        "body": "Transfer from Dollar Balance to Bitcoin Balance",
         "youHave": "You have",
-        "youGet": "You get",
-        "approve": "Approve"
+        "youGet": "You get"
     },
     "SplashScreen": {
         "update": "Your app is outdated. An update is needed before the app can be used.\n\nThis can be done from the PlayStore for Android and Testflight for iOS"

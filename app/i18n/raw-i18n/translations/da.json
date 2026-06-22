@@ -2463,11 +2463,10 @@
     "modalTitle": "Dollar-saldo er ikke tilgængelig i din region"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dollarkontoen er ikke længere tilgængelig i din region",
-    "body": "Overfør din dollarsaldo til Bitcoin",
+    "title": "Dollar-saldo er ikke tilgængelig i din region",
+    "body": "Overfør fra dollarsaldo til Bitcoin-saldo",
     "youHave": "Du har",
-    "youGet": "Du får",
-    "approve": "Godkend"
+    "youGet": "Du får"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "To-faktor godkendelse",

@@ -2463,11 +2463,10 @@
     "modalTitle": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "บัญชีดอลลาร์ไม่สามารถใช้งานได้ในภูมิภาคของคุณอีกต่อไป",
-    "body": "โอนยอดเงินดอลลาร์ของคุณเป็น Bitcoin",
+    "title": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ",
+    "body": "โอนจากยอดดอลลาร์ไปยังยอดบิตคอยน์",
     "youHave": "คุณมี",
-    "youGet": "คุณจะได้รับ",
-    "approve": "อนุมัติ"
+    "youGet": "คุณจะได้รับ"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",

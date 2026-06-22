@@ -2463,11 +2463,10 @@
         "modalTitle": "ドル残高はあなたの地域ではご利用いただけません"
     },
     "ConvertDollarToBitcoinModal": {
-        "title": "ドルアカウントはお住まいの地域でご利用いただけなくなりました",
-        "body": "ドル残高をビットコインに移す",
+        "title": "ドル残高はあなたの地域ではご利用いただけません",
+        "body": "ドル残高からビットコイン残高へ移動",
         "youHave": "保有額",
-        "youGet": "受取額",
-        "approve": "承認"
+        "youGet": "受取額"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "2要素認証（2FA）",
