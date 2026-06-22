@@ -1,4 +1,5 @@
 import React from "react"
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 
 import { act, fireEvent, render } from "@testing-library/react-native"
 
@@ -121,6 +122,11 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 
+let mockNetwork = mockSparkNetwork.Mainnet
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockNetwork,
+}))
+
 const mockFormatMoneyAmount = jest.fn(
   ({ moneyAmount }: { moneyAmount: { amount: number; currencyCode: string } }) =>
     `${moneyAmount.currencyCode} ${moneyAmount.amount}`,
@@ -173,6 +179,7 @@ const fundedWallet = (id: string, currency: "BTC" | "USD", amount: number) => ({
 describe("DeleteAccount", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockNetwork = mockSparkNetwork.Mainnet
     lastWarningProps.isVisible = undefined
     lastConfirmProps.isVisible = undefined
   })
@@ -230,6 +237,19 @@ describe("DeleteAccount", () => {
 
     expect(queryByTestId("warning-modal")).toBeNull()
     expect(mockDeleteWallet).not.toHaveBeenCalled()
+  })
+
+  it("skips the warning on regtest and opens the confirm modal even with a funded wallet", () => {
+    mockNetwork = mockSparkNetwork.Regtest
+    mockUseSelfCustodialWallet.mockReturnValue({
+      wallets: [fundedWallet("btc", "BTC", 21000), emptyWallet("usd", "USD")],
+    })
+
+    const { getByTestId, queryByTestId } = render(<DeleteAccount />)
+    fireEvent.press(getByTestId("danger-zone-delete-button"))
+
+    expect(getByTestId("confirm-modal")).toBeTruthy()
+    expect(queryByTestId("warning-modal")).toBeNull()
   })
 
   it("confirm onConfirm calls deleteWallet and closes the modal", async () => {

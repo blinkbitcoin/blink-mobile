@@ -1,9 +1,5 @@
 import { buildFeeTierOptions } from "@app/screens/send-bitcoin-screen/fee-tier-options"
 
-jest.mock("react-native-config", () => ({
-  BREEZ_NETWORK: "regtest",
-}))
-
 jest.mock("react-native-fs", () => ({
   DocumentDirectoryPath: "/test",
 }))

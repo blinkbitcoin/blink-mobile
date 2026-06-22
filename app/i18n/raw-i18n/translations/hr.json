@@ -3666,6 +3666,9 @@
     "invalidInput": "Detalji plaćanja izgledaju nevažeći. Molimo provjerite i pokušajte ponovno.",
     "generic": "Plaćanje nije moglo biti dovršeno. Pokušajte ponovno za trenutak ili upotrijebite manji iznos."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Ovaj račun je stvoren na mreži {network}. Prebacite se na {network} kako biste ga koristili."
+  },
   "UnclaimedDeposit": {
     "title": "Imate {count} nezatraženi(h) polog(a)",
     "description": "Ukupno: {sats} satova dostupno za potraživanje",

@@ -3666,6 +3666,9 @@
     "invalidInput": "Iinkcukacha zentlawulo zibonakala zingafanelekanga. Nceda uphinde ujonge uphinde uzame.",
     "generic": "Intlawulo ayizange igqibekise. Zama kwakhona kwakamsinya, okanye usebenzise isixa esincinci."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Le akhawunti yenziwe kwi-{network}. Tshintshela kwi-{network} ukuze uyisebenzise."
+  },
   "UnclaimedDeposit": {
     "title": "Unama-{count} edipozithi engabangwayo",
     "description": "Iyonke: {sats} sats ezifumanekayo ukufuna",

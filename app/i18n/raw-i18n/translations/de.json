@@ -3666,6 +3666,9 @@
         "invalidInput": "Die Zahlungsdetails scheinen ungültig zu sein. Bitte überprüfen und erneut versuchen.",
         "generic": "Die Zahlung konnte nicht abgeschlossen werden. Versuche es in einem Moment erneut oder verwende einen kleineren Betrag."
     },
+    "SelfCustodialNetworkMismatch": {
+        "toast": "Dieses Konto wurde auf {network} erstellt. Wechsle zu {network}, um es zu verwenden."
+    },
     "UnclaimedDeposit": {
         "title": "Du hast {count} nicht beanspruchte Einzahlung(en)",
         "description": "Gesamt: {sats} Sats zum Beanspruchen verfügbar",

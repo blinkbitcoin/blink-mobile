@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { Network } from "@breeztech/breez-sdk-spark-react-native"
+
 import {
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
@@ -52,7 +54,6 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 jest.mock("react-native-config", () => ({
   SPARK_TOKEN_IDENTIFIER: "test-token-id",
   BREEZ_API_KEY: "test-api-key",
-  BREEZ_NETWORK: "regtest",
 }))
 
 jest.mock("react-native-fs", () => ({
@@ -93,7 +94,7 @@ describe("selfCustodialCreateWallet", () => {
   })
 
   it("generates mnemonic and stores it", async () => {
-    await selfCustodialCreateWallet("test-account-id")
+    await selfCustodialCreateWallet("test-account-id", Network.Regtest)
 
     expect(mockGenerateMnemonic).toHaveBeenCalledTimes(1)
     expect(mockSetMnemonicForAccount).toHaveBeenCalledWith(
@@ -103,7 +104,7 @@ describe("selfCustodialCreateWallet", () => {
   })
 
   it("does not connect to the SDK or touch user settings during creation", async () => {
-    await selfCustodialCreateWallet("test-account-id")
+    await selfCustodialCreateWallet("test-account-id", Network.Regtest)
 
     expect(mockConnect).not.toHaveBeenCalled()
     expect(mockUpdateUserSettings).not.toHaveBeenCalled()
@@ -113,21 +114,21 @@ describe("selfCustodialCreateWallet", () => {
   it("throws if mnemonic generation fails", async () => {
     mockGenerateMnemonic.mockReturnValue("")
 
-    await expect(selfCustodialCreateWallet("test-account-id")).rejects.toThrow(
-      "Failed to generate mnemonic",
-    )
+    await expect(
+      selfCustodialCreateWallet("test-account-id", Network.Regtest),
+    ).rejects.toThrow("Failed to generate mnemonic")
   })
 
   it("throws if keychain storage fails", async () => {
     mockSetMnemonicForAccount.mockResolvedValue(false)
 
-    await expect(selfCustodialCreateWallet("test-account-id")).rejects.toThrow(
-      "Failed to store mnemonic",
-    )
+    await expect(
+      selfCustodialCreateWallet("test-account-id", Network.Regtest),
+    ).rejects.toThrow("Failed to store mnemonic")
   })
 
   it("stores network alongside mnemonic", async () => {
-    await selfCustodialCreateWallet("test-account-id")
+    await selfCustodialCreateWallet("test-account-id", Network.Regtest)
 
     expect(mockSetMnemonicNetworkForAccount).toHaveBeenCalledWith(
       "test-account-id",
@@ -145,7 +146,11 @@ describe("selfCustodialRestoreWallet", () => {
   })
 
   it("stores provided mnemonic and network", async () => {
-    await selfCustodialRestoreWallet("test-account-id", "restore word1 word2 word3")
+    await selfCustodialRestoreWallet(
+      "test-account-id",
+      "restore word1 word2 word3",
+      Network.Regtest,
+    )
 
     expect(mockSetMnemonicForAccount).toHaveBeenCalledWith(
       "test-account-id",
@@ -161,7 +166,7 @@ describe("selfCustodialRestoreWallet", () => {
     mockSetMnemonicForAccount.mockResolvedValue(false)
 
     await expect(
-      selfCustodialRestoreWallet("test-account-id", "mnemonic"),
+      selfCustodialRestoreWallet("test-account-id", "mnemonic", Network.Regtest),
     ).rejects.toThrow("Failed to store mnemonic")
   })
 })

@@ -3666,6 +3666,9 @@
         "invalidInput": "支払いの詳細が無効のようです。確認してもう一度お試しください。",
         "generic": "支払いを完了できませんでした。少し経ってからもう一度お試しいただくか、より少ない金額をお使いください。"
     },
+    "SelfCustodialNetworkMismatch": {
+        "toast": "このアカウントは {network} で作成されました。使用するには {network} に切り替えてください。"
+    },
     "UnclaimedDeposit": {
         "title": "{count}件の未請求デポジットがあります",
         "description": "合計: {sats} sats請求可能",

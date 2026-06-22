@@ -3666,6 +3666,9 @@
     "invalidInput": "Maelezo ya malipo yanaonekana batili. Tafadhali kagua na ujaribu tena.",
     "generic": "Malipo hayakuweza kukamilika. Jaribu tena baada ya muda mfupi, au tumia kiasi kidogo."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Akaunti hii iliundwa kwenye {network}. Badilisha hadi {network} ili kuitumia."
+  },
   "UnclaimedDeposit": {
     "title": "Una amana {count} ambazo hazijaombwa",
     "description": "Jumla: {sats} sats zinazopatikana kudai",

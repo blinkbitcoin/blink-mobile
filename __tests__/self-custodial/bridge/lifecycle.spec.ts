@@ -2,7 +2,6 @@
 jest.mock("react-native-config", () => ({
   SPARK_TOKEN_IDENTIFIER: "test-token-id",
   BREEZ_API_KEY: "test-api-key",
-  BREEZ_NETWORK: "regtest",
 }))
 
 jest.mock("react-native-fs", () => ({
@@ -10,6 +9,7 @@ jest.mock("react-native-fs", () => ({
 }))
 
 const mockConnect = jest.fn()
+const mockDefaultConfig = jest.fn().mockReturnValue({})
 const mockUpdateUserSettings = jest.fn()
 const mockDisconnect = jest.fn()
 const mockAddEventListener = jest.fn()
@@ -42,7 +42,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     Set: jest.fn().mockImplementation((args: unknown) => ({ tag: "Set", inner: args })),
   },
   connect: (...args: unknown[]) => mockConnect(...args),
-  defaultConfig: jest.fn().mockReturnValue({}),
+  defaultConfig: (...args: unknown[]) => mockDefaultConfig(...args),
   initLogging: jest.fn(),
 }))
 
@@ -83,6 +83,8 @@ jest.mock("@app/self-custodial/logging", () => ({
   createSdkLogListener: jest.fn().mockReturnValue({ log: jest.fn() }),
 }))
 
+import { Network } from "@breeztech/breez-sdk-spark-react-native"
+
 import {
   addSdkEventListener,
   disconnectSdk,
@@ -108,8 +110,9 @@ describe("initSdk", () => {
     const sdk = makeSdk()
     mockConnect.mockResolvedValue(sdk)
 
-    const result = await initSdk("word1 word2 word3", "/test/storage")
+    const result = await initSdk("word1 word2 word3", "/test/storage", Network.Regtest)
 
+    expect(mockDefaultConfig).toHaveBeenCalledWith(Network.Regtest)
     expect(mockConnect).toHaveBeenCalledTimes(1)
     expect(mockConnect).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -123,9 +126,9 @@ describe("initSdk", () => {
   it("propagates connection errors from the SDK", async () => {
     mockConnect.mockRejectedValue(new Error("connect refused"))
 
-    await expect(initSdk("word1 word2 word3", "/test/storage")).rejects.toThrow(
-      "connect refused",
-    )
+    await expect(
+      initSdk("word1 word2 word3", "/test/storage", Network.Regtest),
+    ).rejects.toThrow("connect refused")
   })
 })
 
@@ -176,7 +179,7 @@ describe("selfCustodialCreateWallet", () => {
   })
 
   it("stores the mnemonic and the active network label for the given account", async () => {
-    await selfCustodialCreateWallet("test-account")
+    await selfCustodialCreateWallet("test-account", Network.Regtest)
 
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
     expect(mockSetMnemonicNetwork).toHaveBeenCalledTimes(1)
@@ -185,18 +188,18 @@ describe("selfCustodialCreateWallet", () => {
   it("throws when mnemonic generation produces an empty string", async () => {
     mockGenerateMnemonic.mockReturnValue("")
 
-    await expect(selfCustodialCreateWallet("test-account")).rejects.toThrow(
-      "Failed to generate mnemonic",
-    )
+    await expect(
+      selfCustodialCreateWallet("test-account", Network.Regtest),
+    ).rejects.toThrow("Failed to generate mnemonic")
     expect(mockSetMnemonic).not.toHaveBeenCalled()
   })
 
   it("throws when secure storage refuses to persist the mnemonic", async () => {
     mockSetMnemonic.mockResolvedValueOnce(false)
 
-    await expect(selfCustodialCreateWallet("test-account")).rejects.toThrow(
-      "Failed to store mnemonic",
-    )
+    await expect(
+      selfCustodialCreateWallet("test-account", Network.Regtest),
+    ).rejects.toThrow("Failed to store mnemonic")
     expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
   })
 })
@@ -214,21 +217,33 @@ describe("selfCustodialRestoreWallet", () => {
   })
 
   it("trims/normalises whitespace before validating the mnemonic", async () => {
-    await selfCustodialRestoreWallet("test-account", "  alpha   beta  gamma  ")
+    await selfCustodialRestoreWallet(
+      "test-account",
+      "  alpha   beta  gamma  ",
+      Network.Regtest,
+    )
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
   })
 
   it("normalises tabs and newlines before validating the mnemonic", async () => {
-    await selfCustodialRestoreWallet("test-account", "\talpha\tbeta\ngamma\r\n")
+    await selfCustodialRestoreWallet(
+      "test-account",
+      "\talpha\tbeta\ngamma\r\n",
+      Network.Regtest,
+    )
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
   })
 
   it("normalises mixed whitespace runs before validating the mnemonic", async () => {
-    await selfCustodialRestoreWallet("test-account", "  alpha\t\tbeta \n gamma  ")
+    await selfCustodialRestoreWallet(
+      "test-account",
+      "  alpha\t\tbeta \n gamma  ",
+      Network.Regtest,
+    )
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
@@ -238,7 +253,7 @@ describe("selfCustodialRestoreWallet", () => {
     mockValidateMnemonic.mockReturnValueOnce(false)
 
     await expect(
-      selfCustodialRestoreWallet("test-account", "totally invalid"),
+      selfCustodialRestoreWallet("test-account", "totally invalid", Network.Regtest),
     ).rejects.toThrow("Invalid BIP39 mnemonic")
 
     expect(mockSetMnemonic).not.toHaveBeenCalled()
@@ -247,7 +262,11 @@ describe("selfCustodialRestoreWallet", () => {
   })
 
   it("stores the mnemonic and writes the active network label on success", async () => {
-    await selfCustodialRestoreWallet("test-account", "provided mnemonic words")
+    await selfCustodialRestoreWallet(
+      "test-account",
+      "provided mnemonic words",
+      Network.Regtest,
+    )
 
     expect(mockSetMnemonic).toHaveBeenCalledWith("provided mnemonic words")
     expect(mockSetMnemonicNetwork).toHaveBeenCalledTimes(1)
@@ -259,9 +278,9 @@ describe("selfCustodialRestoreWallet", () => {
   it("throws when secure storage refuses to persist the mnemonic", async () => {
     mockSetMnemonic.mockResolvedValueOnce(false)
 
-    await expect(selfCustodialRestoreWallet("test-account", "any words")).rejects.toThrow(
-      "Failed to store mnemonic",
-    )
+    await expect(
+      selfCustodialRestoreWallet("test-account", "any words", Network.Regtest),
+    ).rejects.toThrow("Failed to store mnemonic")
     expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
     expect(mockConnect).not.toHaveBeenCalled()
   })
@@ -270,7 +289,7 @@ describe("selfCustodialRestoreWallet", () => {
     mockConnect.mockRejectedValueOnce(new Error("SDK init refused"))
 
     await expect(
-      selfCustodialRestoreWallet("test-account", "any valid words"),
+      selfCustodialRestoreWallet("test-account", "any valid words", Network.Regtest),
     ).rejects.toThrow("SDK init refused")
 
     expect(mockSetMnemonic).toHaveBeenCalledTimes(1)

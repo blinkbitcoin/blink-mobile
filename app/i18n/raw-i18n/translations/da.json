@@ -3666,6 +3666,9 @@
     "invalidInput": "Betalingsoplysningerne ser ugyldige ud. Tjek dem og prøv igen.",
     "generic": "Betalingen kunne ikke gennemføres. Prøv igen om et øjeblik eller brug et mindre beløb."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Denne konto blev oprettet på {network}. Skift til {network} for at bruge den."
+  },
   "UnclaimedDeposit": {
     "title": "Du har {count} uafhentede indbetalinger",
     "description": "Total: {sats} sats tilgængelige at gøre krav på",

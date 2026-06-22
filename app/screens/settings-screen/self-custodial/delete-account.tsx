@@ -9,7 +9,9 @@ import { InfoCard } from "@app/components/card-screen"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { type RootStackParamList } from "@app/navigation/stack-param-lists"
+import { isRegtestNetwork } from "@app/self-custodial/config"
 import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 import { hasFunds } from "@app/utils/has-funds"
@@ -31,12 +33,13 @@ export const DeleteAccount: React.FC = () => {
   const { activeAccount } = useAccountRegistry()
   const { state, deleteWallet } = useDeleteAccount()
   const { wallets } = useSelfCustodialWallet()
+  const network = useSparkNetwork()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [warningVisible, setWarningVisible] = useState(false)
 
   const handleDeletePress = () => {
-    if (hasFunds(wallets)) {
+    if (!isRegtestNetwork(network) && hasFunds(wallets)) {
       setWarningVisible(true)
       return
     }

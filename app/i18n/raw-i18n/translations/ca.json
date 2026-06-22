@@ -3666,6 +3666,9 @@
     "invalidInput": "Els detalls del pagament semblen invàlids. Si us plau, revisa'ls i torna-ho a provar.",
     "generic": "No s'ha pogut completar el pagament. Torna-ho a provar en un moment, o utilitza un import més petit."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Aquest compte es va crear a {network}. Canvia a {network} per utilitzar-lo."
+  },
   "UnclaimedDeposit": {
     "title": "Tens {count} dipòsit(s) no reclamat(s)",
     "description": "Total: {sats} sats disponibles per reclamar",

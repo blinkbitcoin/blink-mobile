@@ -23,6 +23,7 @@ import {
 import { useAppConfig } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useScanContext } from "@app/hooks/use-scan-context"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { logParseDestinationResult } from "@app/utils/analytics"
@@ -91,6 +92,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const { displayCurrency } = useDisplayCurrency()
   const { sdk } = useSelfCustodialWallet()
+  const sparkNetwork = useSparkNetwork()
   const {
     appConfig: {
       galoyInstance: { lnAddressHostname },
@@ -156,7 +158,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
             inputSource: "qr",
             displayCurrency,
           },
-          sdk,
+          { sdk, network: sparkNetwork },
           lnAddressHostname,
         )
         logParseDestinationResult(destination)
@@ -271,6 +273,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
     accountDefaultWalletQuery,
     displayCurrency,
     sdk,
+    sparkNetwork,
     lnAddressHostname,
   ])
 

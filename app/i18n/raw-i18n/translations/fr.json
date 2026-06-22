@@ -3666,6 +3666,9 @@
         "invalidInput": "Les détails du paiement semblent invalides. Veuillez les vérifier et réessayer.",
         "generic": "Le paiement n'a pas pu être finalisé. Réessayez dans un instant, ou utilisez un montant plus petit."
     },
+    "SelfCustodialNetworkMismatch": {
+        "toast": "Ce compte a été créé sur {network}. Passez à {network} pour l'utiliser."
+    },
     "UnclaimedDeposit": {
         "title": "Vous avez {count} dépôt(s) non réclamé(s)",
         "description": "Total : {sats} sats disponibles à réclamer",

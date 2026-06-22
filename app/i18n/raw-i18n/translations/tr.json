@@ -3666,6 +3666,9 @@
     "invalidInput": "Ödeme bilgileri geçersiz görünüyor. Lütfen gözden geçirip tekrar deneyin.",
     "generic": "Ödeme tamamlanamadı. Bir an sonra tekrar deneyin veya daha küçük bir tutar kullanın."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Bu hesap {network} ağında oluşturuldu. Kullanmak için {network} ağına geçin."
+  },
   "UnclaimedDeposit": {
     "title": "{count} talep edilmemiş yatırmanız var",
     "description": "Toplam: {sats} sats talep edilebilir",

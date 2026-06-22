@@ -1,5 +1,6 @@
 import React from "react"
 import { Text } from "react-native"
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { act, render, renderHook, waitFor } from "@testing-library/react-native"
 
 import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
@@ -44,6 +45,10 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     Major: 4,
   },
   initLogging: jest.fn(),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockSparkNetwork.Regtest,
 }))
 
 const mockGetMnemonicForAccount = jest.fn()
@@ -355,6 +360,7 @@ describe("SelfCustodialWalletProvider", () => {
     expect(mockInitSdk).toHaveBeenCalledWith(
       "word1 word2 word3",
       "/tmp/test-self-custodial-uuid",
+      mockSparkNetwork.Regtest,
     )
   })
 

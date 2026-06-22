@@ -3666,6 +3666,9 @@
     "invalidInput": "Quy yachayninkuna mana allinmi kashan. Ama hina kaspa qhawariy hinaspa kaqmanta rurariy.",
     "generic": "Quy mana tukukuyta atinmi. Pisi kutilla suyay hinaspa kaqmanta rurariy, utaq aswan huch'uy qullqitaqa rurariy."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Kay cuentaqa {network} pi kamarisqa karqan. Llamk'achinapaq {network} man tikray."
+  },
   "UnclaimedDeposit": {
     "title": "{count} mana mañakusqa churana(kuna) kapusunki",
     "description": "Tukuy: {sats} sats mañakunapaq",

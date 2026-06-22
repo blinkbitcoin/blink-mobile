@@ -3789,6 +3789,10 @@ const en: BaseTranslation = {
     generic:
       "The payment could not be completed. Try again in a moment, or use a smaller amount.",
   },
+  SelfCustodialNetworkMismatch: {
+    toast:
+      "This account was created on {network: string}. Switch to {network} to use it.",
+  },
   UnclaimedDeposit: {
     screenTitle: "Unclaimed Deposits",
     cardTitle: "Claim {sats} sats",

@@ -3666,6 +3666,9 @@
     "invalidInput": "Detaliile plății par invalide. Te rog verifică și încearcă din nou.",
     "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică."
   },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Acest cont a fost creat pe {network}. Comută la {network} pentru a-l folosi."
+  },
   "UnclaimedDeposit": {
     "title": "Ai {count} depozit(e) nerevendicate",
     "description": "Total: {sats} sats disponibili pentru revendicare",
