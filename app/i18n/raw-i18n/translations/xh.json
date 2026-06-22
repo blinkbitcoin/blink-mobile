@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Receive to",
     "infoBtc": "I-Akhawunti ye-Bitcoin yakho yeyokuqokelela i-sats, apho ixabiso le-USD lihamba nemarike.",
     "infoUsd": "I-Akhawunti ye-Idola yakho ixhaswa yi-Stablesats — igcina i-Bitcoin ekhuselweyo ukuze ihlale izinzile ngexabiso le-USD. Usoloko ugcine i-Bitcoin, kodwa ixabiso le-idola alitshintshi.",
-    "infoUsdSelfCustodial": "Ngenxa yeenkxalabo zamava omsebenzisi, sigqibe ukungayenzi isebenze le nto kwiiakhawunti ezingagcinwayo. YiBitcoin kuphela efumanekayo njengesicwangciso sakho sokwamkela esimiselweyo."
+    "infoUsdSelfCustodial": "Ukufumana iiDola akufumaneki njengenketho yokufumana emiselweyo kwiiakhawunti ezingagcinwayo."
   },
   "ThemeScreen": {
     "title": "Theme",

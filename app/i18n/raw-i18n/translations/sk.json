@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Predvolený príjem",
     "infoBtc": "Váš Bitcoinový zostatok je na hromadenie satov, kde sa hodnota USD pohybuje s trhom.",
     "infoUsd": "Váš Dolárový zostatok je poháňaný technológiou Stablesats — drží Bitcoin zaistený tak, aby zostal stabilný v hodnote USD. Vždy držíte Bitcoin, ale dolárová hodnota sa nemení.",
-    "infoUsdSelfCustodial": "Z dôvodu obáv o používateľský zážitok sme sa rozhodli túto funkciu v non-custodial účtoch neaktivovať. Ako predvolené nastavenie prijímania je k dispozícii iba Bitcoin."
+    "infoUsdSelfCustodial": "Príjem dolárov nie je k dispozícii ako predvolená možnosť príjmu pre non-custodial účty."
   },
   "ThemeScreen": {
     "title": "Motív",

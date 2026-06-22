@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Standardmodtagelse",
     "infoBtc": "Din Bitcoin-konto er til at samle sats, hvor USD-værdien bevæger sig med markedet.",
     "infoUsd": "Din Dollar-konto er drevet af Stablesats — den holder Bitcoin, der er sikret til at forblive stabil i USD-værdi. Du holder altid Bitcoin, men dollarværdien ændrer sig ikke.",
-    "infoUsdSelfCustodial": "På grund af hensyn til brugeroplevelsen har vi besluttet ikke at aktivere denne funktion i non-custodial-konti. Kun Bitcoin er tilgængelig som din standardindstilling for modtagelse."
+    "infoUsdSelfCustodial": "Dollar-modtagelse er ikke tilgængelig som en standard modtagelsesmulighed for non-custodial-konti."
   },
   "ThemeScreen": {
     "title": "Tema",

@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Penerimaan default",
     "infoBtc": "Akun Bitcoin Anda untuk mengumpulkan sats, di mana nilai USD bergerak sesuai pasar.",
     "infoUsd": "Akun Dolar Anda didukung oleh Stablesats — menyimpan Bitcoin yang dilindungi agar tetap stabil dalam nilai USD. Anda selalu memegang Bitcoin, tetapi nilai dolarnya tidak berubah.",
-    "infoUsdSelfCustodial": "Karena pertimbangan pengalaman pengguna, kami memutuskan untuk tidak mengaktifkan fitur ini di akun non-kustodian. Hanya Bitcoin yang tersedia sebagai pengaturan penerimaan default Anda."
+    "infoUsdSelfCustodial": "Penerimaan Dolar tidak tersedia sebagai opsi penerimaan default untuk akun non-kustodian."
   },
   "ThemeScreen": {
     "title": "Tema",

@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Verstek ontvangs",
     "infoBtc": "Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg.",
     "infoUsd": "Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie.",
-    "infoUsdSelfCustodial": "Weens bekommernisse oor gebruikerservaring het ons besluit om hierdie funksie nie in die nie-bewarende rekeninge te aktiveer nie. Slegs Bitcoin is beskikbaar as jou verstek-ontvanginstelling."
+    "infoUsdSelfCustodial": "Dollar-ontvangs is nie beskikbaar as 'n verstek-ontvangopsie vir nie-bewarende rekeninge nie."
   },
   "ThemeScreen": {
     "title": "Tema",

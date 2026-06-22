@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Alapért. fogadás",
     "infoBtc": "A Bitcoin Egyenleged sats gyűjtésére való, ahol az USD érték a piaccal mozog.",
     "infoUsd": "A Dollár Egyenlegedet a Stablesats működteti — Bitcoint tart, amely fedezve van, hogy USD értékben stabil maradjon. Mindig Bitcoint tartasz, de a dollárérték nem változik.",
-    "infoUsdSelfCustodial": "Felhasználói élménnyel kapcsolatos megfontolások miatt úgy döntöttünk, hogy nem aktiváljuk ezt a funkciót a non-custodial fiókokban. Alapértelmezett fogadási beállításként csak a Bitcoin érhető el."
+    "infoUsdSelfCustodial": "A dollár fogadása nem érhető el alapértelmezett fogadási lehetőségként a non-custodial fiókoknál."
   },
   "ThemeScreen": {
     "title": "Téma",

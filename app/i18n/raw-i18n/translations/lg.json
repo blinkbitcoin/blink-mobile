@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Receive to",
     "infoBtc": "Akawunti ya Bitcoin yo ye ya kukuŋŋaanya sats, omuwendo gwa USD gwe gutambulira n'akatale.",
     "infoUsd": "Akawunti ya Dola yo etambulizibwa Stablesats — ekuuma Bitcoin ekuumibwa okubeera ennywevu mu muwendo gwa USD. Bulijjo okutta Bitcoin, naye omuwendo gw'edoola teguyunjuluka.",
-    "infoUsdSelfCustodial": "Olw'ensonga z'obumanyirivu bw'omukozesa, twasalawo obutakkiriza mpeereza eno mu akawunti ezitakuumibwa. Bitcoin yokka y'eriwo ng'enteekateeka yo eya bulijjo ey'okufuna."
+    "infoUsdSelfCustodial": "Okufuna Doola tekuliiwo ng'enkola ya bulijjo ey'okufuna ku akawunti ezitakuumibwa."
   },
   "ThemeScreen": {
     "title": "Endabika",

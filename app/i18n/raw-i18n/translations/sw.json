@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Pokea chaguo-msingi",
     "infoBtc": "Akaunti ya Bitcoin yako ni ya kukusanya sats, ambapo thamani ya USD inasogea na soko.",
     "infoUsd": "Akaunti ya Dola yako inaendeshwa na Stablesats — inashikilia Bitcoin iliyolindwa ili ibaki thabiti kwa thamani ya USD. Daima unashikilia Bitcoin, lakini thamani ya dola haibadiliki.",
-    "infoUsdSelfCustodial": "Kwa sababu za uzoefu wa mtumiaji, tuliamua kutowezesha kipengele hiki katika akaunti zisizo za ulinzi. Bitcoin pekee ndiyo inayopatikana kama mpangilio wako wa kupokea wa chaguo-msingi."
+    "infoUsdSelfCustodial": "Kupokea Dola hakupatikani kama chaguo la kupokea la chaguo-msingi kwa akaunti zisizo za ulinzi."
   },
   "ThemeScreen": {
     "title": "Mandhari",

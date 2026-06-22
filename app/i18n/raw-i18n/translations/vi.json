@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Nhận mặc định",
     "infoBtc": "Số dư Bitcoin của bạn dùng để tích lũy sats, nơi giá trị USD biến động theo thị trường.",
     "infoUsd": "Số dư Đô la của bạn được hỗ trợ bởi Stablesats — giữ Bitcoin được bảo hiểm để duy trì ổn định theo giá trị USD. Bạn luôn nắm giữ Bitcoin, nhưng giá trị đô la không thay đổi.",
-    "infoUsdSelfCustodial": "Vì lý do trải nghiệm người dùng, chúng tôi quyết định không kích hoạt tính năng này trong các tài khoản non-custodial. Chỉ Bitcoin khả dụng làm cài đặt nhận mặc định của bạn."
+    "infoUsdSelfCustodial": "Nhận Đô la không khả dụng làm tùy chọn nhận mặc định cho các tài khoản non-custodial."
   },
   "ThemeScreen": {
     "title": "Theme",

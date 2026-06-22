@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Zadano primanje",
     "infoBtc": "Vaš Bitcoin račun je za skupljanje satova, gdje se USD vrijednost kreće s tržištem.",
     "infoUsd": "Vaš Dolar račun pokreće Stablesats — drži Bitcoin zaštićen da ostane stabilan u USD vrijednosti. Uvijek držite Bitcoin, ali dolarska vrijednost se ne mijenja.",
-    "infoUsdSelfCustodial": "Zbog razloga korisničkog iskustva odlučili smo ne aktivirati ovu značajku na non-custodial računima. Samo je Bitcoin dostupan kao vaša zadana postavka za primanje."
+    "infoUsdSelfCustodial": "Primanje dolara nije dostupno kao zadana opcija primanja za non-custodial račune."
   },
   "ThemeScreen": {
     "title": "Tema",

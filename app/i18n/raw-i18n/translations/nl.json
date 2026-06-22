@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Standaard ontvangst",
     "infoBtc": "Je Bitcoinsaldo is voor het stapelen van sats, waar de USD-waarde meebeweegt met de markt.",
     "infoUsd": "Je Dollarsaldo wordt aangedreven door Stablesats — het bevat Bitcoin die is afgedekt om stabiel te blijven in USD-waarde. Je houdt altijd Bitcoin, maar de dollarwaarde verandert niet.",
-    "infoUsdSelfCustodial": "Vanwege overwegingen rond de gebruikerservaring hebben we besloten deze functie niet te activeren in non-custodial accounts. Alleen Bitcoin is beschikbaar als je standaard ontvangstinstelling."
+    "infoUsdSelfCustodial": "Dollar ontvangen is niet beschikbaar als standaard ontvangstoptie voor non-custodial accounts."
   },
   "ThemeScreen": {
     "title": "Thema",

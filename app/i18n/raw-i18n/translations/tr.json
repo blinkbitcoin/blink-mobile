@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Varsayılan alım",
     "infoBtc": "Bitcoin Bakiyeniz sats biriktirmek içindir, burada USD değeri piyasayla hareket eder.",
     "infoUsd": "Dolar Bakiyeniz Stablesats tarafından desteklenmektedir — USD değerinde sabit kalacak şekilde korunan Bitcoin tutar. Her zaman Bitcoin tutarsınız ama dolar değeri değişmez.",
-    "infoUsdSelfCustodial": "Kullanıcı deneyimiyle ilgili kaygılar nedeniyle bu özelliği non-custodial hesaplarda etkinleştirmemeye karar verdik. Varsayılan alma ayarın olarak yalnızca Bitcoin kullanılabilir."
+    "infoUsdSelfCustodial": "Dolar alımı, non-custodial hesaplar için varsayılan alma seçeneği olarak kullanılamaz."
   },
   "ThemeScreen": {
     "title": "Tema",

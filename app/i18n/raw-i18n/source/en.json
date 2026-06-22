@@ -29,7 +29,7 @@
     },
     "SetAccountModal": {
         "title": "Set up your default Balance",
-        "description": "You can always change this later in the settings",
+        "description": "You can always change this later in the Settings",
         "stablesatsTag": "Dollar Balance — powered by Stablesats",
         "bitcoinTag": "Bitcoin Balance for stacking sats"
     },

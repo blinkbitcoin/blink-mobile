@@ -2492,7 +2492,7 @@
         "titleSelfCustodial": "Ricezione predef.",
         "infoBtc": "Il tuo Conto Bitcoin è per accumulare sats, dove il valore USD si muove con il mercato.",
         "infoUsd": "Il tuo Conto Dollaro è alimentato da Stablesats — contiene Bitcoin coperto per rimanere stabile in valore USD. Detieni sempre Bitcoin, ma il valore in dollari non cambia.",
-        "infoUsdSelfCustodial": "Per motivi legati all'esperienza utente, abbiamo deciso di non attivare questa funzione negli account non custodial. Solo Bitcoin è disponibile come impostazione di ricezione predefinita."
+        "infoUsdSelfCustodial": "La ricezione in dollari non è disponibile come opzione di ricezione predefinita per gli account non custodial."
     },
     "ThemeScreen": {
         "title": "Tema",

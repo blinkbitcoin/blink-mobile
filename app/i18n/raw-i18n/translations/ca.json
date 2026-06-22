@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Rebre per defecte",
     "infoBtc": "El teu Compte Bitcoin és per acumular sats, on el valor USD es mou amb el mercat.",
     "infoUsd": "El teu Compte Dòlar està impulsat per Stablesats — conté Bitcoin cobert per mantenir-se estable en termes USD. Sempre tens Bitcoin, però el valor en dòlars no canvia.",
-    "infoUsdSelfCustodial": "Per motius d'experiència d'usuari, hem decidit no activar aquesta funció als comptes no custodials. Només Bitcoin està disponible com a configuració de recepció predeterminada."
+    "infoUsdSelfCustodial": "La recepció en dòlars no està disponible com a opció de recepció predeterminada per als comptes no custodials."
   },
   "ThemeScreen": {
     "title": "Tema",

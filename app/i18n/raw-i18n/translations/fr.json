@@ -2492,7 +2492,7 @@
         "titleSelfCustodial": "Réception par défaut",
         "infoBtc": "Votre Solde Bitcoin est pour accumuler des sats, où la valeur USD évolue avec le marché.",
         "infoUsd": "Votre Solde Dollar est propulsé par Stablesats — il détient du Bitcoin couvert pour rester stable en valeur USD. Vous détenez toujours du Bitcoin, mais la valeur en dollars ne change pas.",
-        "infoUsdSelfCustodial": "Pour des raisons d'expérience utilisateur, nous avons décidé de ne pas activer cette fonctionnalité dans les comptes non-custodial. Seul Bitcoin est disponible comme paramètre de réception par défaut."
+        "infoUsdSelfCustodial": "La réception en dollars n'est pas disponible comme option de réception par défaut pour les comptes non-custodial."
     },
     "ThemeScreen": {
         "title": "Thème",

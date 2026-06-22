@@ -2492,7 +2492,7 @@
     "titleSelfCustodial": "Receive to",
     "infoBtc": "Bitcoin qillqa sutiyuq-niyki sats huñunampaq, maypichus USD chanin qhatuman kuyun.",
     "infoUsd": "Dolar qillqay-niyki Stablesats-wan llamk'achisqa — Bitcoin-ta waqaychin USD chaniman sayasqa kanampaq. Wiñaypaq Bitcoin-ta hap'inki, ichaqa dólar chanin mana tikrakunchu.",
-    "infoUsdSelfCustodial": "Llamk'achiqpa ruwayninmanta llakikuyrayku, mana custodia kaq cuentakunapi kay ruwayta mana kallpachayta munaykuchu. Bitcoin sapallanmi chaskinapaq kanchadaq churana hina kachkan."
+    "infoUsdSelfCustodial": "Dólar chaskiyqa mana custodia kaq cuentakunapaq mana kanchu kanchadaq chaskina churana hina."
   },
   "ThemeScreen": {
     "title": "Theme",

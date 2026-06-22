@@ -2492,7 +2492,7 @@
         "titleSelfCustodial": "デフォルトの受取",
         "infoBtc": "ビットコインウォレットはサトシを積み立てるためのもので、USD価値は市場と連動します。",
         "infoUsd": "ドルウォレットはStablesatsで動いています。USD価値で安定するようにヘッジされたBitcoinを保有します。常にBitcoinを保有していますが、ドル価値は変動しません。",
-        "infoUsdSelfCustodial": "ユーザー体験上の懸念から、非カストディアル口座ではこの機能を有効にしないことにしました。デフォルトの受取設定として利用できるのはBitcoinのみです。"
+        "infoUsdSelfCustodial": "ドル受取は、非カストディアル口座のデフォルトの受取オプションとしては利用できません。"
     },
     "ThemeScreen": {
         "title": "テーマ",
