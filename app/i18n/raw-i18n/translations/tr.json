@@ -2457,14 +2457,10 @@
     "removedAccount": "{identifier: string} hesabını kaldırdınız."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats bölgenizde kullanılamıyor",
-    "modalBody": "Dolar hesabına erişmek için saklamasız bir hesap oluşturun.",
-    "createNew": "Yeni oluştur",
     "walletLabel": "bölgenizde kullanılamıyor"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor",
-    "modalBody": "Dolar bakiyeniz bölgenizde kullanılamıyor. Yine de Bitcoin gönderip alabilirsiniz."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolar hesabı artık bölgenizde kullanılamıyor",

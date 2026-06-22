@@ -2457,14 +2457,10 @@
         "removedAccount": "Eliminaste la cuenta {identifier: string}."
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats no está disponible en tu región",
-        "modalBody": "Para acceder a una cuenta en dólares, crea una cuenta no custodial.",
-        "createNew": "Crear nueva",
         "walletLabel": "no está disponible en tu región"
     },
-    "StableTokenRestriction": {
-        "modalTitle": "El saldo en dólares no está disponible en tu región",
-        "modalBody": "Tu saldo en dólares no está disponible en tu región. Aún puedes enviar y recibir Bitcoin."
+    "DollarBalanceRestriction": {
+        "modalTitle": "El saldo en dólares no está disponible en tu región"
     },
     "ConvertDollarToBitcoinModal": {
         "title": "La cuenta en dólares ya no está disponible en tu región",

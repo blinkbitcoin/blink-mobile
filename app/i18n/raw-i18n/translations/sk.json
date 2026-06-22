@@ -2457,14 +2457,10 @@
     "removedAccount": "Odstránili ste účet {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats nie je vo vašom regióne k dispozícii",
-    "modalBody": "Ak chcete získať prístup k dolárovému účtu, vytvorte ne-úschovný účet.",
-    "createNew": "Vytvoriť nový",
     "walletLabel": "nie je vo vašom regióne k dispozícii"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Dolárový zostatok nie je vo vašom regióne k dispozícii",
-    "modalBody": "Váš dolárový zostatok nie je vo vašom regióne k dispozícii. Stále môžete posielať a prijímať Bitcoin."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dolárový zostatok nie je vo vašom regióne k dispozícii"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolárový účet už nie je vo vašom regióne dostupný",

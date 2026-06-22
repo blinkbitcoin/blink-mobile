@@ -2457,14 +2457,10 @@
     "removedAccount": "Anda telah mengalih keluar akaun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats tidak tersedia di rantau anda",
-    "modalBody": "Untuk mengakses akaun dolar, cipta akaun bukan kustodian.",
-    "createNew": "Cipta baharu",
     "walletLabel": "tidak tersedia di rantau anda"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Baki dolar tidak tersedia di rantau anda",
-    "modalBody": "Baki dolar anda tidak tersedia di rantau anda. Anda masih boleh menghantar dan menerima Bitcoin."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Baki dolar tidak tersedia di rantau anda"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Akaun Dolar tidak lagi tersedia di rantau anda",

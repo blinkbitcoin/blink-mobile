@@ -2457,14 +2457,10 @@
     "removedAccount": "Du fjernede kontoen {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats er ikke tilgængelig i din region",
-    "modalBody": "For at få adgang til en dollarkonto skal du oprette en non-custodial konto.",
-    "createNew": "Opret ny",
     "walletLabel": "ikke tilgængelig i din region"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Dollar-saldo er ikke tilgængelig i din region",
-    "modalBody": "Din dollar-saldo er ikke tilgængelig i din region. Du kan stadig sende og modtage Bitcoin."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dollar-saldo er ikke tilgængelig i din region"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dollarkontoen er ikke længere tilgængelig i din region",

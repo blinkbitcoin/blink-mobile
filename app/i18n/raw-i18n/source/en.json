@@ -2502,14 +2502,10 @@
         "learnMoreSelfCustodial": "Learn more"
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats is not available in your region",
-        "modalBody": "To get access to a dollar account, create a non-custodial account.",
-        "createNew": "Create new",
         "walletLabel": "not available in your region"
     },
-    "StableTokenRestriction": {
-        "modalTitle": "Dollar balance is not available in your region",
-        "modalBody": "Your dollar balance is not available in your region. You can still send and receive Bitcoin."
+    "DollarBalanceRestriction": {
+        "modalTitle": "Dollar Balance is not available in your region"
     },
     "ConvertDollarToBitcoinModal": {
         "title": "Dollar account is no longer available in your region",

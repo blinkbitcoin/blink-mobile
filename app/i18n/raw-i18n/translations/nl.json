@@ -2457,14 +2457,10 @@
     "removedAccount": "Je hebt account {identifier: string} verwijderd."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats is niet beschikbaar in jouw regio",
-    "modalBody": "Maak een non-custodial account aan om toegang te krijgen tot een dollar-account.",
-    "createNew": "Nieuw aanmaken",
     "walletLabel": "niet beschikbaar in jouw regio"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio",
-    "modalBody": "Je dollar-saldo is niet beschikbaar in jouw regio. Je kunt nog steeds Bitcoin verzenden en ontvangen."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Het dollaraccount is niet langer beschikbaar in jouw regio",

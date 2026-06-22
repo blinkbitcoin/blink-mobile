@@ -2457,14 +2457,10 @@
     "removedAccount": "Uklonili ste račun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats nije dostupan u vašoj regiji",
-    "modalBody": "Za pristup dolarskom računu, izradite ne-skrbnički račun.",
-    "createNew": "Izradi novi",
     "walletLabel": "nije dostupan u vašoj regiji"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji",
-    "modalBody": "Vaš dolarski saldo nije dostupan u vašoj regiji. I dalje možete slati i primati Bitcoin."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Račun u dolarima više nije dostupan u vašoj regiji",

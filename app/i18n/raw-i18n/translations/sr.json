@@ -2457,14 +2457,10 @@
     "removedAccount": "Уклонили сте налог {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats није доступан у вашем региону",
-    "modalBody": "За приступ долар налогу, креирајте не-кастодијални налог.",
-    "createNew": "Креирај нови",
     "walletLabel": "није доступан у вашем региону"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Доларски салдо није доступан у вашем региону",
-    "modalBody": "Ваш доларски салдо није доступан у вашем региону. И даље можете слати и примати Bitcoin."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Доларски салдо није доступан у вашем региону"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Налог у доларима више није доступан у вашем региону",

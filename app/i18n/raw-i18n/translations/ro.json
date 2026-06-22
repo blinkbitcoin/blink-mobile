@@ -2457,14 +2457,10 @@
     "removedAccount": "Ați eliminat contul {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats nu este disponibil în regiunea ta",
-    "modalBody": "Pentru a accesa un cont în dolari, creează un cont non-custodial.",
-    "createNew": "Crează cont nou",
     "walletLabel": "nu este disponibil în regiunea ta"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta",
-    "modalBody": "Soldul tău în dolari nu este disponibil în regiunea ta. Poți în continuare să trimiți și să primești Bitcoin."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Contul în dolari nu mai este disponibil în regiunea ta",

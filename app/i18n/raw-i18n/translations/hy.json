@@ -2457,14 +2457,10 @@
     "removedAccount": "Դուք հեռացրել եք {identifier: string} հաշիվը։"
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats-ը հասանելի չէ ձեր տարածաշրջանում",
-    "modalBody": "Դոլարային հաշվին մուտք գործելու համար ստեղծեք ոչ-պահառու հաշիվ.",
-    "createNew": "Ստեղծել նոր",
     "walletLabel": "հասանելի չէ ձեր տարածաշրջանում"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Դոլարային մնացորդը հասանելի չէ ձեր տարածաշրջանում",
-    "modalBody": "Ձեր դոլարային մնացորդը հասանելի չէ ձեր տարածաշրջանում: Դուք դեռ կարող եք ուղարկել և ստանալ Bitcoin:"
+  "DollarBalanceRestriction": {
+    "modalTitle": "Դոլարային մնացորդը հասանելի չէ ձեր տարածաշրջանում"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Դոլարային հաշիվն այլևս հասանելի չէ ձեր տարածաշրջանում",

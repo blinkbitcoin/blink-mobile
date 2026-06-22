@@ -8138,31 +8138,15 @@ type RootTranslation = {
 	}
 	StablesatsRestriction: {
 		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
-		 */
-		modalTitle: string
-		/**
-		 * T​o​ ​g​e​t​ ​a​c​c​e​s​s​ ​t​o​ ​a​ ​d​o​l​l​a​r​ ​a​c​c​o​u​n​t​,​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
-		 */
-		modalBody: string
-		/**
-		 * C​r​e​a​t​e​ ​n​e​w
-		 */
-		createNew: string
-		/**
 		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		walletLabel: string
 	}
-	StableTokenRestriction: {
+	DollarBalanceRestriction: {
 		/**
-		 * D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		modalTitle: string
-		/**
-		 * Y​o​u​r​ ​d​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​Y​o​u​ ​c​a​n​ ​s​t​i​l​l​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​.
-		 */
-		modalBody: string
 	}
 	ConvertDollarToBitcoinModal: {
 		/**
@@ -20410,31 +20394,15 @@ export type TranslationFunctions = {
 	}
 	StablesatsRestriction: {
 		/**
-		 * Stablesats is not available in your region
-		 */
-		modalTitle: () => LocalizedString
-		/**
-		 * To get access to a dollar account, create a non-custodial account.
-		 */
-		modalBody: () => LocalizedString
-		/**
-		 * Create new
-		 */
-		createNew: () => LocalizedString
-		/**
 		 * not available in your region
 		 */
 		walletLabel: () => LocalizedString
 	}
-	StableTokenRestriction: {
+	DollarBalanceRestriction: {
 		/**
-		 * Dollar balance is not available in your region
+		 * Dollar Balance is not available in your region
 		 */
 		modalTitle: () => LocalizedString
-		/**
-		 * Your dollar balance is not available in your region. You can still send and receive Bitcoin.
-		 */
-		modalBody: () => LocalizedString
 	}
 	ConvertDollarToBitcoinModal: {
 		/**

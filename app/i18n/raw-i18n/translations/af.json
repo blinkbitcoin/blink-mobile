@@ -2457,14 +2457,10 @@
     "removedAccount": "Jy het rekening {identifier: string} verwyder."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats is nie beskikbaar in jou streek nie",
-    "modalBody": "Om toegang tot 'n dollar-rekening te kry, skep 'n nie-bewaarende rekening.",
-    "createNew": "Skep nuwe",
     "walletLabel": "nie beskikbaar in jou streek nie"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Dollar-saldo is nie beskikbaar in jou streek nie",
-    "modalBody": "Jou dollar-saldo is nie beskikbaar in jou streek nie. Jy kan steeds Bitcoin stuur en ontvang."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dollar-saldo is nie beskikbaar in jou streek nie"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Die Dollar-rekening is nie meer in jou streek beskikbaar nie",

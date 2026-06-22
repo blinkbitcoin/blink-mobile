@@ -2457,14 +2457,10 @@
         "removedAccount": "アカウント {identifier: string} を削除しました。"
     },
     "StablesatsRestriction": {
-        "modalTitle": "あなたの地域ではStablesatsをご利用いただけません",
-        "modalBody": "ドル口座にアクセスするには、ノンカストディアル口座を作成してください。",
-        "createNew": "新規作成",
         "walletLabel": "あなたの地域ではご利用いただけません"
     },
-    "StableTokenRestriction": {
-        "modalTitle": "ドル残高はあなたの地域ではご利用いただけません",
-        "modalBody": "あなたのドル残高はお住まいの地域ではご利用いただけません。引き続きBitcoinの送受信は可能です。"
+    "DollarBalanceRestriction": {
+        "modalTitle": "ドル残高はあなたの地域ではご利用いただけません"
     },
     "ConvertDollarToBitcoinModal": {
         "title": "ドルアカウントはお住まいの地域でご利用いただけなくなりました",

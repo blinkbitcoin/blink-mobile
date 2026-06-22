@@ -2457,14 +2457,10 @@
     "removedAccount": "Oggyewo akawunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats teriiwo mu kitundu kyo",
-    "modalBody": "Okusobola okufuna akawunti ya doola, kola akawunti etali ya kuterekebwa.",
-    "createNew": "Kola eppya",
     "walletLabel": "teriiwo mu kitundu kyo"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo",
-    "modalBody": "Bbalansi yo eya doola teriiwo mu kitundu kyo. Osobola okusindika n'okufuna Bitcoin."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Akawunti ya Doola tekikyaliwo mu kitundu kyo",

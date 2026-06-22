@@ -2457,14 +2457,10 @@
     "removedAccount": "Odebrali jste účet {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats není ve vašem regionu k dispozici",
-    "modalBody": "Pro přístup k dolarovému účtu si vytvořte ne-custodial účet.",
-    "createNew": "Vytvořit nový",
     "walletLabel": "není ve vašem regionu k dispozici"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Dolarový zůstatek není ve vašem regionu k dispozici",
-    "modalBody": "Váš dolarový zůstatek není ve vašem regionu k dispozici. Stále můžete posílat a přijímat Bitcoin."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dolarový zůstatek není ve vašem regionu k dispozici"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolarový účet již není ve vašem regionu dostupný",

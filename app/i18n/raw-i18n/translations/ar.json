@@ -2457,14 +2457,10 @@
     "removedAccount": "لقد أزلت الحساب {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats غير متاح في منطقتك",
-    "modalBody": "للوصول إلى حساب الدولار، أنشئ حسابًا غير حافظ.",
-    "createNew": "إنشاء جديد",
     "walletLabel": "غير متاح في منطقتك"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "رصيد الدولار غير متاح في منطقتك",
-    "modalBody": "رصيد الدولار الخاص بك غير متاح في منطقتك. لا يزال بإمكانك إرسال واستلام البيتكوين."
+  "DollarBalanceRestriction": {
+    "modalTitle": "رصيد الدولار غير متاح في منطقتك"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "لم يعد حساب الدولار متاحًا في منطقتك",

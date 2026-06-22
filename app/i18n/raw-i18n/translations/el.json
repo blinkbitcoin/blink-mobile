@@ -2457,14 +2457,10 @@
     "removedAccount": "Αφαιρέσατε τον λογαριασμό {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Το Stablesats δεν είναι διαθέσιμο στην περιοχή σου",
-    "modalBody": "Για να αποκτήσετε πρόσβαση σε λογαριασμό δολαρίων, δημιουργήστε έναν non-custodial λογαριασμό.",
-    "createNew": "Δημιουργία νέου",
     "walletLabel": "δεν είναι διαθέσιμο στην περιοχή σου"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Το υπόλοιπο δολαρίων δεν είναι διαθέσιμο στην περιοχή σου",
-    "modalBody": "Το υπόλοιπο δολαρίων σου δεν είναι διαθέσιμο στην περιοχή σου. Μπορείς ακόμα να στέλνεις και να λαμβάνεις Bitcoin."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Το υπόλοιπο δολαρίων δεν είναι διαθέσιμο στην περιοχή σου"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Ο λογαριασμός σε δολάρια δεν είναι πλέον διαθέσιμος στην περιοχή σας",

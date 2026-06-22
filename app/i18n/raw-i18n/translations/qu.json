@@ -2457,14 +2457,10 @@
     "removedAccount": "{identifier: string} cuentata qichurqanki."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats mana kapunchu suyuykipi",
-    "modalBody": "Dólar cuentaman yaykunaykipaq, mana waqaychaq cuentata kamariy.",
-    "createNew": "Musuq kamariy",
     "walletLabel": "mana kapunchu suyuykipi"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Dólar saldoqa mana kapunchu suyuykipi",
-    "modalBody": "Dólar saldoyki mana kapunchu suyuykipi. Bitcointaqa apachiyta chaskiytapas atinkiraqmi."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dólar saldoqa mana kapunchu suyuykipi"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dólar cuentaqa manaña suyuykipi kanchu",

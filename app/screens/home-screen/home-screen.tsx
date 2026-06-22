@@ -17,8 +17,7 @@ import { DisabledFeature } from "@app/components/disabled-feature"
 import { BulletinsCard } from "@app/components/notifications/bulletins"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
-import { StableTokenRestrictionModal } from "@app/components/stable-token-restriction-modal"
-import { StablesatsRestrictionModal } from "@app/components/stablesats-restriction-modal"
+import { DollarBalanceRestrictionModal } from "@app/components/dollar-balance-restriction-modal"
 import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
 import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
@@ -586,17 +585,10 @@ export const HomeScreen: React.FC = () => {
           reopenUpgradeModal.current = true
         }}
       />
-      {accountType === AccountType.SelfCustodial ? (
-        <StableTokenRestrictionModal
-          isVisible={isRestrictionModalVisible}
-          toggleModal={closeRestrictionModal}
-        />
-      ) : (
-        <StablesatsRestrictionModal
-          isVisible={isRestrictionModalVisible}
-          toggleModal={closeRestrictionModal}
-        />
-      )}
+      <DollarBalanceRestrictionModal
+        isVisible={isRestrictionModalVisible}
+        toggleModal={closeRestrictionModal}
+      />
       {restrictedUsdWallet && restrictedBtcWallet && (
         <UsdConvertToBtcModal
           isVisible={isConvertModalVisible}

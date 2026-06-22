@@ -2457,14 +2457,10 @@
     "removedAccount": "Anda menghapus akun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats tidak tersedia di wilayah Anda",
-    "modalBody": "Untuk mengakses akun dolar, buat akun non-custodial.",
-    "createNew": "Buat baru",
     "walletLabel": "tidak tersedia di wilayah Anda"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda",
-    "modalBody": "Saldo dolar Anda tidak tersedia di wilayah Anda. Anda masih dapat mengirim dan menerima Bitcoin."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Akun Dolar tidak lagi tersedia di wilayah Anda",

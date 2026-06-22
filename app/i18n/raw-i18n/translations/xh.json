@@ -2457,14 +2457,10 @@
     "removedAccount": "Ususile i-akhawunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "I-Stablesats ayifumaneki kummandla wakho",
-    "modalBody": "Ukufumana ifikelelo kwiakhawunti yedola, yenza iakhawunti engenagunya.",
-    "createNew": "Yenza entsha",
     "walletLabel": "ayifumaneki kummandla wakho"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho",
-    "modalBody": "Ibhalansi yakho yedola ayifumaneki kummandla wakho. Usenako ukuthumela nokufumana iBitcoin."
+  "DollarBalanceRestriction": {
+    "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "I-akhawunti yeDola ayisafumaneki kummandla wakho",

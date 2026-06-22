@@ -54,7 +54,7 @@ const mockToggleBalanceMode = jest.fn()
 let mockBalanceModeValue: "btc" | "usd" = "usd"
 let mockDollarBalanceRestrictedOverride = false
 let mockStableTokenTransferBlockedOverride = false
-let mockStableTokenModalVisible = false
+let mockDollarBalanceModalVisible = false
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () =>
@@ -114,25 +114,16 @@ jest.mock("@app/hooks/use-stablesats-forced-conversion", () => ({
   }),
 }))
 
-jest.mock("@app/components/stablesats-restriction-modal", () => {
+jest.mock("@app/components/dollar-balance-restriction-modal", () => {
   const ReactActual = jest.requireActual("react")
   const { Text } = jest.requireActual("react-native")
   return {
-    StablesatsRestrictionModal: () =>
-      ReactActual.createElement(Text, { testID: "restriction-modal" }, "restriction"),
-  }
-})
-
-jest.mock("@app/components/stable-token-restriction-modal", () => {
-  const ReactActual = jest.requireActual("react")
-  const { Text } = jest.requireActual("react-native")
-  return {
-    StableTokenRestrictionModal: ({ isVisible }: { isVisible: boolean }) => {
-      mockStableTokenModalVisible = isVisible
+    DollarBalanceRestrictionModal: ({ isVisible }: { isVisible: boolean }) => {
+      mockDollarBalanceModalVisible = isVisible
       return ReactActual.createElement(
         Text,
-        { testID: "stable-token-restriction-modal" },
-        "stable-token-restriction",
+        { testID: "dollar-balance-restriction-modal" },
+        "dollar-balance-restriction",
       )
     },
   }
@@ -485,7 +476,7 @@ describe("HomeScreen", () => {
     mockActiveWalletOverride = null
     mockDollarBalanceRestrictedOverride = false
     mockStableTokenTransferBlockedOverride = false
-    mockStableTokenModalVisible = false
+    mockDollarBalanceModalVisible = false
     jest.clearAllMocks()
   })
 
@@ -588,7 +579,7 @@ describe("HomeScreen", () => {
     expect(queryByTestId("convert-modal")).toBeNull()
   })
 
-  it("uses the stable-token restriction modal and skips forced conversion for self-custodial", async () => {
+  it("shows the dollar-balance restriction modal and skips forced conversion for self-custodial", async () => {
     mockDollarBalanceRestrictedOverride = true
     mockActiveWalletOverride = {
       wallets: [
@@ -626,13 +617,13 @@ describe("HomeScreen", () => {
 
     await flushEffects()
 
-    expect(getByTestId("stable-token-restriction-modal")).toBeTruthy()
+    expect(getByTestId("dollar-balance-restriction-modal")).toBeTruthy()
     expect(queryByTestId("convert-modal")).toBeNull()
 
     mockActiveWalletOverride = null
   })
 
-  it("opens the self-custodial restriction modal (not the custodial one) from the disabled transfer button", async () => {
+  it("opens the dollar-balance restriction modal from the disabled transfer button", async () => {
     mockDollarBalanceRestrictedOverride = true
     mockActiveWalletOverride = {
       wallets: [
@@ -662,7 +653,7 @@ describe("HomeScreen", () => {
       usdBalance: 5000,
     })
 
-    const { getByTestId, queryByTestId } = render(
+    const { getByTestId } = render(
       <ContextForScreen>
         <HomeScreen />
       </ContextForScreen>,
@@ -672,12 +663,11 @@ describe("HomeScreen", () => {
 
     // Transfers are not blocked, so the button is rendered but disabled.
     expect(getByTestId("transfer")).toBeTruthy()
-    expect(mockStableTokenModalVisible).toBe(false)
+    expect(mockDollarBalanceModalVisible).toBe(false)
 
     fireEvent.press(getByTestId("transfer"))
 
-    expect(mockStableTokenModalVisible).toBe(true)
-    expect(queryByTestId("restriction-modal")).toBeNull()
+    expect(mockDollarBalanceModalVisible).toBe(true)
 
     mockActiveWalletOverride = null
   })

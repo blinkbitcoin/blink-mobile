@@ -2457,14 +2457,10 @@
     "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว"
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats ไม่พร้อมใช้งานในภูมิภาคของคุณ",
-    "modalBody": "หากต้องการเข้าถึงบัญชีดอลลาร์ ให้สร้างบัญชีแบบ non-custodial",
-    "createNew": "สร้างใหม่",
     "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ",
-    "modalBody": "ยอดเงินดอลลาร์ของคุณไม่พร้อมใช้งานในภูมิภาคของคุณ คุณยังสามารถส่งและรับ Bitcoin ได้"
+  "DollarBalanceRestriction": {
+    "modalTitle": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "บัญชีดอลลาร์ไม่สามารถใช้งานได้ในภูมิภาคของคุณอีกต่อไป",

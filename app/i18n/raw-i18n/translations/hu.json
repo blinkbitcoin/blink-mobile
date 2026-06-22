@@ -2457,14 +2457,10 @@
     "removedAccount": "Eltávolítottad a(z) {identifier: string} fiókot."
   },
   "StablesatsRestriction": {
-    "modalTitle": "A Stablesats nem érhető el a régiódban",
-    "modalBody": "A dollárszámlához való hozzáféréshez hozz létre egy nem letétkezelői fiókot.",
-    "createNew": "Új létrehozása",
     "walletLabel": "nem érhető el a régiódban"
   },
-  "StableTokenRestriction": {
-    "modalTitle": "A dolláregyenleg nem érhető el a régiódban",
-    "modalBody": "A dolláregyenleged nem érhető el a régiódban. Továbbra is küldhetsz és fogadhatsz Bitcoint."
+  "DollarBalanceRestriction": {
+    "modalTitle": "A dolláregyenleg nem érhető el a régiódban"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "A dollárszámla már nem érhető el a régiódban",
