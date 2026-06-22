@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Nem sikerült az tranzakciók CSV fájlba exportálása. Valami hiba történt. Ha a probléma továbbra is fennáll, kérjük, lépj kapcsolatba az ügyfélszolgálattal.",
     "lnurlNoUsername": "Az LNURL cím létrehozásához először be kell állítanod egy felhasználónevet. Szeretnél most beállítani egy felhasználónevet?",
     "copyClipboardLnurl": "LNURL cím a vágólapra másolva",
-    "defaultWallet": "Alapértelmezett egyenleg",
+    "defaultWallet": "Alapért. fogadás",
     "rateUs": "Értékelj minket a {storeName: string} oldalon",
     "theme": "Téma",
     "nfc": "Fogadás NFC-ből",
@@ -2488,8 +2488,8 @@
     "toastMessage": "Titok másolva a vágólapra!"
   },
   "DefaultWalletScreen": {
-    "title": "Alapértelmezett egyenleg",
-    "titleSelfCustodial": "Alapértelmezett egyenleg",
+    "title": "Alapért. fogadás",
+    "titleSelfCustodial": "Alapért. fogadás",
     "infoBtc": "A Bitcoin Egyenleged sats gyűjtésére való, ahol az USD érték a piaccal mozog.",
     "infoUsd": "A Dollár Egyenlegedet a Stablesats működteti — Bitcoint tart, amely fedezve van, hogy USD értékben stabil maradjon. Mindig Bitcoint tartasz, de a dollárérték nem változik.",
     "infoUsdSelfCustodial": "Felhasználói élménnyel kapcsolatos megfontolások miatt úgy döntöttünk, hogy nem aktiváljuk ezt a funkciót a non-custodial fiókokban. Alapértelmezett fogadási beállításként csak a Bitcoin érhető el."

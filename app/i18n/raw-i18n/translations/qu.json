@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "CSVpi kawsayniyta qillqata sutichinaqinmi chimpuyta mana kaniyta rikuchiy, kaymi kaniyta rikuyta munanki. Hinataqmi, ñuqaqa yachanakuyta sutichinaqinmi kaniyta rikuyta munanki, ñuqaqa kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanki k'anchayta munayniyta kaniyta rikuchiykachkanki.",
     "lnurlNoUsername": "Lnurl pacha sutichinaqinmi kaniyta rikuyta munanki, ñuqaqa yachanakuyta sutichinaqinmi kaniyta rikuchiykachkanki. Ñuqaqa yachanakuyta sutichinaqinmi kaniyta rikuchiykachkanki, kaymi kaniyta rikuyta munanki?",
     "copyClipboardLnurl": "Lnurl pacha sutichinaqinmi chimpuyta kaniyta rikuchiy",
-    "defaultWallet": "Chaynamanta kaniy",
+    "defaultWallet": "Receive to",
     "rateUs": "{storeName: string}pi ñuqaqa yachanakuyta munayniytaikuchiy",
     "theme": "Theme",
     "nfc": "Receive from NFC",
@@ -2488,8 +2488,8 @@
     "toastMessage": "Secret copied to clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "Ñawpaq chaskiy cuenta",
-    "titleSelfCustodial": "Saqisqa cuenta",
+    "title": "Receive to",
+    "titleSelfCustodial": "Receive to",
     "infoBtc": "Bitcoin qillqa sutiyuq-niyki sats huñunampaq, maypichus USD chanin qhatuman kuyun.",
     "infoUsd": "Dolar qillqay-niyki Stablesats-wan llamk'achisqa — Bitcoin-ta waqaychin USD chaniman sayasqa kanampaq. Wiñaypaq Bitcoin-ta hap'inki, ichaqa dólar chanin mana tikrakunchu.",
     "infoUsdSelfCustodial": "Llamk'achiqpa ruwayninmanta llakikuyrayku, mana custodia kaq cuentakunapi kay ruwayta mana kallpachayta munaykuchu. Bitcoin sapallanmi chaskinapaq kanchadaq churana hina kachkan."

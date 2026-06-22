@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Không thể xuất các giao dịch sang CSV. Có lỗi xảy ra. Nếu vấn đề vẫn tiếp diễn xin vui lòng liên hệ với bộ phận hỗ trợ.",
     "lnurlNoUsername": "Để tạo địa chỉ LNURL, trước tiên bạn phải đặt tên người dùng. Bạn có muốn đặt tên người dùng ngay bây giờ không?",
     "copyClipboardLnurl": "Địa chỉ LNURL đã được sao chép trong bộ nhớ tạm",
-    "defaultWallet": "Số dư mặc định",
+    "defaultWallet": "Nhận mặc định",
     "rateUs": "Rate us on {storeName: string}",
     "theme": "Theme",
     "nfc": "Receive from NFC",
@@ -2488,8 +2488,8 @@
     "toastMessage": "Secret copied to clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "Số dư mặc định",
-    "titleSelfCustodial": "Số dư mặc định",
+    "title": "Nhận mặc định",
+    "titleSelfCustodial": "Nhận mặc định",
     "infoBtc": "Số dư Bitcoin của bạn dùng để tích lũy sats, nơi giá trị USD biến động theo thị trường.",
     "infoUsd": "Số dư Đô la của bạn được hỗ trợ bởi Stablesats — giữ Bitcoin được bảo hiểm để duy trì ổn định theo giá trị USD. Bạn luôn nắm giữ Bitcoin, nhưng giá trị đô la không thay đổi.",
     "infoUsdSelfCustodial": "Vì lý do trải nghiệm người dùng, chúng tôi quyết định không kích hoạt tính năng này trong các tài khoản non-custodial. Chỉ Bitcoin khả dụng làm cài đặt nhận mặc định của bạn."

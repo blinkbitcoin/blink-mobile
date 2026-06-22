@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Haikuweza kupeleka malipo kwenye csv. Kitu kilienda mrama. Ikiwa tatizo hili litaendelea tafadhali wasiliana na usaidizi. ",
     "lnurlNoUsername": "Ukitaka kuunda anwani ya lnurl, lazima kwanza uandikishe jina la mtumiaji. Unataka kuandikisha jina la mtumiaji saa hii?",
     "copyClipboardLnurl": "Anwani ya lnurl imenakiliwa kwenye ubao wa kunakili",
-    "defaultWallet": "Akaunti ya Msingi",
+    "defaultWallet": "Pokea chaguo-msingi",
     "rateUs": "Tupie ukadiriaji kwenye {storeName: string}",
     "theme": "Mandhari",
     "nfc": "Pokea kutoka NFC",
@@ -2488,8 +2488,8 @@
     "toastMessage": "Siri imeakiliwa kwenye ubao wa kunakili!"
   },
   "DefaultWalletScreen": {
-    "title": "Akaunti ya kupokea chaguo-msingi",
-    "titleSelfCustodial": "Akaunti chaguomsingi",
+    "title": "Pokea chaguo-msingi",
+    "titleSelfCustodial": "Pokea chaguo-msingi",
     "infoBtc": "Akaunti ya Bitcoin yako ni ya kukusanya sats, ambapo thamani ya USD inasogea na soko.",
     "infoUsd": "Akaunti ya Dola yako inaendeshwa na Stablesats — inashikilia Bitcoin iliyolindwa ili ibaki thabiti kwa thamani ya USD. Daima unashikilia Bitcoin, lakini thamani ya dola haibadiliki.",
     "infoUsdSelfCustodial": "Kwa sababu za uzoefu wa mtumiaji, tuliamua kutowezesha kipengele hiki katika akaunti zisizo za ulinzi. Bitcoin pekee ndiyo inayopatikana kama mpangilio wako wa kupokea wa chaguo-msingi."

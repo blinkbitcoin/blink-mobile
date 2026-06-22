@@ -2342,7 +2342,7 @@
         "csvTransactionsError": "エラーが発生しました。トランザクションをCSVにエクスポートできません。問題が解決しない場合は、サポートにお問い合わせください。",
         "lnurlNoUsername": "lnurlアドレスを発行するには、まずはユーザー名を設定する必要があります。 今すぐユーザー名を設定しますか？",
         "copyClipboardLnurl": "Lnurlアドレスがクリップボードにコピーされました",
-        "defaultWallet": "メインウォレット",
+        "defaultWallet": "デフォルトの受取",
         "rateUs": "{storeName: string}で評価する",
         "theme": "テーマ",
         "nfc": "NFCから受金する",
@@ -2488,8 +2488,8 @@
         "toastMessage": "シークレットコードがクリップボードにコピーするされました！"
     },
     "DefaultWalletScreen": {
-        "title": "デフォルトの受取アカウント",
-        "titleSelfCustodial": "デフォルトアカウント",
+        "title": "デフォルトの受取",
+        "titleSelfCustodial": "デフォルトの受取",
         "infoBtc": "ビットコインウォレットはサトシを積み立てるためのもので、USD価値は市場と連動します。",
         "infoUsd": "ドルウォレットはStablesatsで動いています。USD価値で安定するようにヘッジされたBitcoinを保有します。常にBitcoinを保有していますが、ドル価値は変動しません。",
         "infoUsdSelfCustodial": "ユーザー体験上の懸念から、非カストディアル口座ではこの機能を有効にしないことにしました。デフォルトの受取設定として利用できるのはBitcoinのみです。"

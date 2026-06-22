@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Nie je možné exportovať transakcie do formátu CSV. Niečo sa pokazilo. Ak problém pretrváva, kontaktujte podporu.",
     "lnurlNoUsername": "Ak chcete vygenerovať adresu lnurl, musíte najprv nastaviť používateľské meno. Chcete ho teraz nastaviť?",
     "copyClipboardLnurl": "Lnurl adresa bola skopírovaná do schránky",
-    "defaultWallet": "Predvolený zostatok",
+    "defaultWallet": "Predvolený príjem",
     "rateUs": "Ohodnoťte nás na {storeName: string}",
     "theme": "Motív",
     "nfc": "Prijať cez NFC",
@@ -2488,8 +2488,8 @@
     "toastMessage": "Tajný kód bol skopírovaný do schránky!"
   },
   "DefaultWalletScreen": {
-    "title": "Predvolený zostatok",
-    "titleSelfCustodial": "Predvolený zostatok",
+    "title": "Predvolený príjem",
+    "titleSelfCustodial": "Predvolený príjem",
     "infoBtc": "Váš Bitcoinový zostatok je na hromadenie satov, kde sa hodnota USD pohybuje s trhom.",
     "infoUsd": "Váš Dolárový zostatok je poháňaný technológiou Stablesats — drží Bitcoin zaistený tak, aby zostal stabilný v hodnote USD. Vždy držíte Bitcoin, ale dolárová hodnota sa nemení.",
     "infoUsdSelfCustodial": "Z dôvodu obáv o používateľský zážitok sme sa rozhodli túto funkciu v non-custodial účtoch neaktivovať. Ako predvolené nastavenie prijímania je k dispozícii iba Bitcoin."

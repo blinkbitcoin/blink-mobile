@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Kan transacties niet naar csv exporteren. Er is iets fout gegaan. Als het probleem zich blijft voordoen, neem dan contact op met de technische ondersteuning.",
     "lnurlNoUsername": "Om een ln-url adres te genereren, moet u eerst een gebruikersnaam instellen. Wilt u nu een gebruikersnaam instellen?",
     "copyClipboardLnurl": "Het Ln-url adres is naar het klembord gekopieerd",
-    "defaultWallet": "Standaardsaldo",
+    "defaultWallet": "Standaard ontvangst",
     "rateUs": "Beoordeel ons op {storeName: string}",
     "theme": "Thema",
     "nfc": "Ontvangen van NFC",
@@ -2488,8 +2488,8 @@
     "toastMessage": "Geheim gekopieerd naar klembord!"
   },
   "DefaultWalletScreen": {
-    "title": "Standaardsaldo",
-    "titleSelfCustodial": "Standaardsaldo",
+    "title": "Standaard ontvangst",
+    "titleSelfCustodial": "Standaard ontvangst",
     "infoBtc": "Je Bitcoinsaldo is voor het stapelen van sats, waar de USD-waarde meebeweegt met de markt.",
     "infoUsd": "Je Dollarsaldo wordt aangedreven door Stablesats — het bevat Bitcoin die is afgedekt om stabiel te blijven in USD-waarde. Je houdt altijd Bitcoin, maar de dollarwaarde verandert niet.",
     "infoUsdSelfCustodial": "Vanwege overwegingen rond de gebruikerservaring hebben we besloten deze functie niet te activeren in non-custodial accounts. Alleen Bitcoin is beschikbaar als je standaard ontvangstinstelling."

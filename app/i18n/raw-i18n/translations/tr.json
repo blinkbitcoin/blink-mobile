@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "İşlemler csv'ye aktarılamıyor. Bir şeyler yanlış gitti. Sorun devam ederse lütfen destek ekibiyle iletişime geçin.",
     "lnurlNoUsername": "Bir lnurl adresi oluşturmak için önce bir kullanıcı adı belirlemelisiniz. Şimdi bir kullanıcı adı belirlemek istiyor musunuz?",
     "copyClipboardLnurl": "Lnurl adresi panodan kopyalandı",
-    "defaultWallet": "Varsayılan Bakiye",
+    "defaultWallet": "Varsayılan alım",
     "rateUs": "{storeName: string}'da bizi değerlendirin",
     "theme": "Tema",
     "nfc": "NFC ile ödeme alın",
@@ -2488,8 +2488,8 @@
     "toastMessage": "Sır panoya kopyalandı"
   },
   "DefaultWalletScreen": {
-    "title": "Varsayılan Bakiye",
-    "titleSelfCustodial": "Varsayılan Bakiye",
+    "title": "Varsayılan alım",
+    "titleSelfCustodial": "Varsayılan alım",
     "infoBtc": "Bitcoin Bakiyeniz sats biriktirmek içindir, burada USD değeri piyasayla hareket eder.",
     "infoUsd": "Dolar Bakiyeniz Stablesats tarafından desteklenmektedir — USD değerinde sabit kalacak şekilde korunan Bitcoin tutar. Her zaman Bitcoin tutarsınız ama dolar değeri değişmez.",
     "infoUsdSelfCustodial": "Kullanıcı deneyimiyle ilgili kaygılar nedeniyle bu özelliği non-custodial hesaplarda etkinleştirmemeye karar verdik. Varsayılan alma ayarın olarak yalnızca Bitcoin kullanılabilir."

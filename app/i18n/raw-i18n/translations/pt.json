@@ -2342,7 +2342,7 @@
         "csvTransactionsError": "Não foi possível exportar transações para csv. Algo deu errado. Se o problema persistir, entre em contato com o suporte.",
         "lnurlNoUsername": "Para gerar um endereço lnurl você deve primeiro definir um nome de usuário. Deseja definir um nome de usuário agora?",
         "copyClipboardLnurl": "O endereço Lnurl foi copiado na área de transferência",
-        "defaultWallet": "Saldo Padrão",
+        "defaultWallet": "Recebimento padrão",
         "rateUs": "Avalie-nos na {storeName: string}",
         "theme": "Tema",
         "nfc": "Receber por NFC",
@@ -2488,8 +2488,8 @@
         "toastMessage": "Texto copiado para a área de transferência!"
     },
     "DefaultWalletScreen": {
-        "title": "Saldo Padrão",
-        "titleSelfCustodial": "Saldo Padrão",
+        "title": "Recebimento padrão",
+        "titleSelfCustodial": "Recebimento padrão",
         "infoBtc": "Seu Saldo Bitcoin é para acumular sats, onde o valor USD se move com o mercado.",
         "infoUsd": "Seu Saldo Dólar é powered by Stablesats — mantém Bitcoin protegido para permanecer estável em termos de USD. Você sempre tem Bitcoin, mas o valor em dólares não muda.",
         "infoUsdSelfCustodial": "Por questões de experiência do usuário, decidimos não ativar esse recurso nas contas não custodiais. Apenas Bitcoin está disponível como sua configuração de recebimento padrão."

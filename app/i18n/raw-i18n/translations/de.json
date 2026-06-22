@@ -2342,7 +2342,7 @@
         "csvTransactionsError": "Die Transaktionen konnten nicht als CSV exportiert werden. Etwas ging schief. Wenn es weiterhin nicht funktioniert, kontaktiere uns.",
         "lnurlNoUsername": "Um eine LNURL Adresse zu generieren, gib zuerst einen Benutzernamen an. Möchtest Du jetzt einen Benutzernamen festlegen?",
         "copyClipboardLnurl": "LNURL Adresse wurde in die Zwischenablage kopiert",
-        "defaultWallet": "Standard-Guthaben",
+        "defaultWallet": "Standard-Empfang",
         "rateUs": "Bewerte uns auf {storeName: string}",
         "theme": "Design",
         "nfc": "Per NFC empfangen",
@@ -2488,8 +2488,8 @@
         "toastMessage": "Geheimnis in Zwischenablage kopiert!"
     },
     "DefaultWalletScreen": {
-        "title": "Standard-Guthaben",
-        "titleSelfCustodial": "Standard-Guthaben",
+        "title": "Standard-Empfang",
+        "titleSelfCustodial": "Standard-Empfang",
         "infoBtc": "Dein Bitcoin-Guthaben ist zum Sats-Stapeln, wo sich der USD-Wert mit dem Markt bewegt.",
         "infoUsd": "Dein Dollar-Guthaben wird von Stablesats betrieben — es hält Bitcoin, der abgesichert ist, um in USD-Wert stabil zu bleiben. Du hältst immer Bitcoin, aber der Dollarwert ändert sich nicht.",
         "infoUsdSelfCustodial": "Dollar-Empfang ist für Non-Custodial-Konten nicht als Standard-Empfangsoption verfügbar."

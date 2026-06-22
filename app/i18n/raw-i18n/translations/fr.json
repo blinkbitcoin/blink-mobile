@@ -2342,7 +2342,7 @@
         "csvTransactionsError": "Impossible d’exporter les transactions vers un fichier CSV. Une erreur s’est produite. Si le problème persiste, veuillez contacter le support technique.",
         "lnurlNoUsername": "Pour générer une adresse lnurl, vous devez d’abord définir un identifiant. Voulez-vous en définir un maintenant ?",
         "copyClipboardLnurl": "L'adresse lnurl a été copiée dans le presse-papiers",
-        "defaultWallet": "Solde par défaut",
+        "defaultWallet": "Réception par défaut",
         "rateUs": "Donnez-nous une note sur {storeName: string}",
         "theme": "Thème",
         "nfc": "Recevoir depuis le paiement sans contact",
@@ -2488,8 +2488,8 @@
         "toastMessage": "Le code secret à été copié dans le presse-papiers !"
     },
     "DefaultWalletScreen": {
-        "title": "Solde par défaut",
-        "titleSelfCustodial": "Solde par défaut",
+        "title": "Réception par défaut",
+        "titleSelfCustodial": "Réception par défaut",
         "infoBtc": "Votre Solde Bitcoin est pour accumuler des sats, où la valeur USD évolue avec le marché.",
         "infoUsd": "Votre Solde Dollar est propulsé par Stablesats — il détient du Bitcoin couvert pour rester stable en valeur USD. Vous détenez toujours du Bitcoin, mais la valeur en dollars ne change pas.",
         "infoUsdSelfCustodial": "Pour des raisons d'expérience utilisateur, nous avons décidé de ne pas activer cette fonctionnalité dans les comptes non-custodial. Seul Bitcoin est disponible comme paramètre de réception par défaut."

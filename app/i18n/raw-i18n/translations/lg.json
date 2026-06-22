@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Tesobola kufulumya ewaanyisa mu csv. Waliwo ekyitambudde obubi. Singa ensonga ekyaliwo nsaba otuutukirire tukuyambe.",
     "lnurlNoUsername": "Okukola endagiriro ya lnurl olina okusooka okuteekawo erinnya ly'omukozesa. Oyagala okuteekawo erinnya ly'omukozesa kati?",
     "copyClipboardLnurl": "Endagiriro ya Lnurl ewandukuddwa ku lutimbe",
-    "defaultWallet": "Akawunti Esokerwako",
+    "defaultWallet": "Receive to",
     "rateUs": "Tugere ku {storeName: string}",
     "theme": "Endabika",
     "nfc": "Funa okuva ku NFC",
@@ -2488,8 +2488,8 @@
     "toastMessage": "Ekyama kyiwanduukuluddwa ku lutimbe"
   },
   "DefaultWalletScreen": {
-    "title": "Akawunti ey'okufuna eyekyamukirizo",
-    "titleSelfCustodial": "Akawunti eya bulijjo",
+    "title": "Receive to",
+    "titleSelfCustodial": "Receive to",
     "infoBtc": "Akawunti ya Bitcoin yo ye ya kukuŋŋaanya sats, omuwendo gwa USD gwe gutambulira n'akatale.",
     "infoUsd": "Akawunti ya Dola yo etambulizibwa Stablesats — ekuuma Bitcoin ekuumibwa okubeera ennywevu mu muwendo gwa USD. Bulijjo okutta Bitcoin, naye omuwendo gw'edoola teguyunjuluka.",
     "infoUsdSelfCustodial": "Olw'ensonga z'obumanyirivu bw'omukozesa, twasalawo obutakkiriza mpeereza eno mu akawunti ezitakuumibwa. Bitcoin yokka y'eriwo ng'enteekateeka yo eya bulijjo ey'okufuna."

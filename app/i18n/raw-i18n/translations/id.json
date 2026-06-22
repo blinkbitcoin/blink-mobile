@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Tidak dapat mengekspor transaksi ke CSV. Terjadi kesalahan. Jika masalah berlanjut, silakan hubungi dukungan.",
     "lnurlNoUsername": "Untuk membuat alamat lnurl, Anda harus mengatur nama pengguna terlebih dahulu. Apakah Anda ingin mengatur nama pengguna sekarang?",
     "copyClipboardLnurl": "Alamat Lnurl telah disalin ke papan klip",
-    "defaultWallet": "Akun Default",
+    "defaultWallet": "Penerimaan default",
     "rateUs": "Beri peringkat kami di {storeName: string}",
     "theme": "Tema",
     "nfc": "Terima melalui NFC",
@@ -2488,8 +2488,8 @@
     "toastMessage": "Rahasia disalin ke papan klip!"
   },
   "DefaultWalletScreen": {
-    "title": "Akun penerima default",
-    "titleSelfCustodial": "Akun default",
+    "title": "Penerimaan default",
+    "titleSelfCustodial": "Penerimaan default",
     "infoBtc": "Akun Bitcoin Anda untuk mengumpulkan sats, di mana nilai USD bergerak sesuai pasar.",
     "infoUsd": "Akun Dolar Anda didukung oleh Stablesats — menyimpan Bitcoin yang dilindungi agar tetap stabil dalam nilai USD. Anda selalu memegang Bitcoin, tetapi nilai dolarnya tidak berubah.",
     "infoUsdSelfCustodial": "Karena pertimbangan pengalaman pengguna, kami memutuskan untuk tidak mengaktifkan fitur ini di akun non-kustodian. Hanya Bitcoin yang tersedia sebagai pengaturan penerimaan default Anda."

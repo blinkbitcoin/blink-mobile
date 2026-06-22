@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Nu se pot exporta tranzacții în CSV. Ceva nu a mers bine. Dacă problema persistă, vă rugăm să contactați asistența.",
     "lnurlNoUsername": "Pentru a genera o adresă lnurl trebuie mai întâi să setați un nume de utilizator. Doriți să setați un nume de utilizator acum?",
     "copyClipboardLnurl": "Adresa Lnurl a fost copiată în clipboard",
-    "defaultWallet": "Cont implicit - Default",
+    "defaultWallet": "Primire implicită",
     "rateUs": "Evaluați-ne pe {storeName: string}",
     "theme": "Temă",
     "nfc": "Primiți de la NFC",
@@ -2488,8 +2488,8 @@
     "toastMessage": "Secret copiat în clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "Cont implicit de primire",
-    "titleSelfCustodial": "Cont implicit",
+    "title": "Primire implicită",
+    "titleSelfCustodial": "Primire implicită",
     "infoBtc": "Cont Bitcoin-ul tău este pentru acumularea de sats, unde valoarea USD se mișcă cu piața.",
     "infoUsd": "Cont Dolar-ul tău este alimentat de Stablesats — deține Bitcoin acoperit pentru a rămâne stabil în valoare USD. Mereu deții Bitcoin, dar valoarea în dolari nu se schimbă.",
     "infoUsdSelfCustodial": "Din motive legate de experiența utilizatorului, am decis să nu activăm această funcție în conturile non-custodial. Doar Bitcoin este disponibil ca setare implicită de primire."
