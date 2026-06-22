@@ -2081,7 +2081,7 @@
         "scan": "Scannen",
         "updateAvailable": "Ein Update ist verfügbar. \nKlicke, um zu updaten",
         "useLightning": "Wir nutzen das Lightning Netzwerk.",
-        "myAccounts": "Salden",
+        "myAccounts": "Guthaben",
         "walletCountNotTwo": "Die Anzahl der Wallets ist nicht zwei. Bitte verwenden Sie das Dashboard, um alle Wallets und Guthaben dieses Kontos zu sehen"
     },
     "PinScreen": {
@@ -2492,7 +2492,7 @@
         "titleSelfCustodial": "Standard-Guthaben",
         "infoBtc": "Dein Bitcoin-Guthaben ist zum Sats-Stapeln, wo sich der USD-Wert mit dem Markt bewegt.",
         "infoUsd": "Dein Dollar-Guthaben wird von Stablesats betrieben — es hält Bitcoin, der abgesichert ist, um in USD-Wert stabil zu bleiben. Du hältst immer Bitcoin, aber der Dollarwert ändert sich nicht.",
-        "infoUsdSelfCustodial": "Aus Gründen der Benutzererfahrung haben wir uns entschieden, diese Funktion in Non-Custodial-Konten nicht zu aktivieren. Nur Bitcoin ist als deine standardmäßige Empfangseinstellung verfügbar."
+        "infoUsdSelfCustodial": "Dollar-Empfang ist für Non-Custodial-Konten nicht als Standard-Empfangsoption verfügbar."
     },
     "ThemeScreen": {
         "title": "Design",
