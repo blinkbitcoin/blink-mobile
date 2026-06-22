@@ -21,7 +21,7 @@
 -keep class com.facebook.react.turbomodule.** { *; }
 
 # react-native-config reads these values via reflection on the app BuildConfig.
-# Without this keep, R8 strips BREEZ_API_KEY/SPARK_TOKEN_IDENTIFIER/BREEZ_NETWORK
+# Without this keep, R8 strips BREEZ_API_KEY/SPARK_TOKEN_IDENTIFIER
 # from release builds and Config.* resolves to null (self-custodial wallet goes "offline").
 -keep class com.galoyapp.BuildConfig { *; }
 
