@@ -1,4 +1,5 @@
 import {
+  RegisterLightningAddressRequest,
   SyncWalletRequest,
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
@@ -32,4 +33,4 @@ export const checkLightningAddressAvailable = (
 ) => sdk.checkLightningAddressAvailable({ username })
 
 export const registerLightningAddress = (sdk: BreezSdkInterface, username: string) =>
-  sdk.registerLightningAddress({ username, description: undefined })
+  sdk.registerLightningAddress(RegisterLightningAddressRequest.create({ username }))

@@ -99,9 +99,15 @@ const SelfCustodialLightningAddressRow: React.FC = () => {
     selfCustodialEntries.find((entry) => entry.id === activeAccount?.id)
       ?.lightningAddress ?? null
 
+  /**
+   * Prefer the live SDK address but fall back to the persisted one while the SDK
+   * reconnects, so a user who already registered never sees the "set" prompt.
+   */
+  const address = liveLightningAddress ?? persistedLightningAddress
+
   return (
     <LightningAddressRow
-      address={liveLightningAddress ?? persistedLightningAddress}
+      address={address}
       renderModal={({ isVisible, toggleModal }) => (
         <SetSelfCustodialLightningAddressModal
           isVisible={isVisible}

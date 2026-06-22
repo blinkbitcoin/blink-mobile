@@ -143,6 +143,33 @@ describe("useRegisterLightningAddress", () => {
     expect(result.current.error).toBe(SetUsernameError.TOO_LONG)
   })
 
+  it("ignores a second register() call while the first is still in flight", async () => {
+    let resolveCheck: (available: boolean) => void = () => {}
+    mockCheckAvailable.mockReturnValue(
+      new Promise<boolean>((resolve) => {
+        resolveCheck = resolve
+      }),
+    )
+    const onRegistered = jest.fn()
+    const { result } = renderHook(() => useRegisterLightningAddress(onRegistered))
+
+    act(() => result.current.setLnAddress("alice"))
+
+    let calls: Array<Promise<void>> = []
+    act(() => {
+      calls = [result.current.register(), result.current.register()]
+    })
+
+    await act(async () => {
+      resolveCheck(true)
+      await Promise.all(calls)
+    })
+
+    expect(mockCheckAvailable).toHaveBeenCalledTimes(1)
+    expect(mockRegister).toHaveBeenCalledTimes(1)
+    expect(onRegistered).toHaveBeenCalledTimes(1)
+  })
+
   it("keeps loading true while the registration request is in flight", async () => {
     let resolveCheck: (available: boolean) => void = () => {}
     mockCheckAvailable.mockReturnValue(
