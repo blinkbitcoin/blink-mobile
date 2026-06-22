@@ -81,7 +81,7 @@ describe("UsdConvertToBtcModal", () => {
     const { getByText } = renderModal()
 
     expect(getByText("Dollar Balance is no longer available in your region")).toBeTruthy()
-    expect(getByText("Transfer your Dollar Balance to Bitcoin")).toBeTruthy()
+    expect(getByText("Transfer your Dollar balance to Bitcoin")).toBeTruthy()
   })
 
   it("renders the You have and You get labels", () => {
