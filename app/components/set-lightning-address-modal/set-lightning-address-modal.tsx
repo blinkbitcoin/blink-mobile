@@ -104,6 +104,12 @@ export const SetLightningAddressModal = ({
     toggleModal()
   }
 
+  const {
+    appConfig: {
+      galoyInstance: { lnAddressHostname, name: bankName },
+    },
+  } = useAppConfig()
+
   return (
     <SetLightningAddressModalUI
       isVisible={isVisible}
@@ -113,6 +119,8 @@ export const SetLightningAddressModal = ({
       loading={loading}
       setLnAddress={onChangeLnAddress}
       onSetLightningAddress={onSetLightningAddress}
+      hostname={lnAddressHostname}
+      bankName={bankName}
     />
   )
 }
@@ -130,6 +138,8 @@ export type SetLightningAddressModalUIProps = {
   error?: SetUsernameError
   lnAddress: string
   setLnAddress?: (lightningAddress: string) => void
+  hostname: string
+  bankName: string
 }
 
 export const SetLightningAddressModalUI = ({
@@ -140,12 +150,9 @@ export const SetLightningAddressModalUI = ({
   setLnAddress,
   loading,
   error,
+  hostname,
+  bankName,
 }: SetLightningAddressModalUIProps) => {
-  const {
-    appConfig: {
-      galoyInstance: { lnAddressHostname, name: bankName },
-    },
-  } = useAppConfig()
   const {
     theme: { colors },
   } = useTheme()
@@ -198,7 +205,7 @@ export const SetLightningAddressModalUI = ({
               placeholder={"SatoshiNakamoto"}
               placeholderTextColor={colors.grey3}
             />
-            <Text type={"p1"}>{`@${lnAddressHostname}`}</Text>
+            <Text type={"p1"}>{`@${hostname}`}</Text>
           </View>
           {errorMessage && <GaloyErrorBox errorMessage={errorMessage} />}
           <Text type={"p1"} style={styles.centerAlign}>

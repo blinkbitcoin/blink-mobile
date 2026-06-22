@@ -83,6 +83,7 @@ module.exports = {
     IncreasedToAvoidDust: "IncreasedToAvoidDust",
   },
   PrepareSendPaymentRequest: { create: (p) => p },
+  RegisterLightningAddressRequest: { create: (p) => p },
   SendPaymentRequest: { create: (p) => p },
   SyncWalletRequest: { create: (p) => p },
   ReceivePaymentRequest: { create: (p) => p },

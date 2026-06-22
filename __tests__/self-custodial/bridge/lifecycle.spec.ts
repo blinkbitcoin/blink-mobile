@@ -117,7 +117,10 @@ describe("initSdk", () => {
     expect(mockConnect).toHaveBeenCalledWith(
       expect.objectContaining({
         seed: expect.objectContaining({ tag: "Mnemonic", mnemonic: "word1 word2 word3" }),
-        config: expect.objectContaining({ apiKey: "test-api-key" }),
+        config: expect.objectContaining({
+          apiKey: "test-api-key",
+          lnurlDomain: "staging.blink.sv",
+        }),
       }),
     )
     expect(result).toBe(sdk)

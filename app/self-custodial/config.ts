@@ -33,6 +33,12 @@ export const networkLabelFor = (network: Network): SparkNetworkLabel =>
 
 export const isRegtestNetwork = (network: Network): boolean => network === Network.Regtest
 
+const MAINNET_LNURL_DOMAIN = "blink.sv"
+const REGTEST_LNURL_DOMAIN = "staging.blink.sv"
+
+export const lnurlDomainFor = (network: Network): string =>
+  network === Network.Mainnet ? MAINNET_LNURL_DOMAIN : REGTEST_LNURL_DOMAIN
+
 /**
  * Returns the wallet's stored network label when it conflicts with the current
  * network, or null when there is no stored label or it matches. Single source

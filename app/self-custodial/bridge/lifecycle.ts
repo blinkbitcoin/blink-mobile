@@ -15,6 +15,7 @@ import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import {
+  lnurlDomainFor,
   MAX_SLIPPAGE_BPS,
   networkLabelFor,
   requireBreezApiKey,
@@ -41,6 +42,7 @@ const initializeLogging = (() => {
 const createSdkConfig = (network: Network) => {
   const config = defaultConfig(network)
   config.apiKey = requireBreezApiKey()
+  config.lnurlDomain = lnurlDomainFor(network)
 
   config.stableBalanceConfig = {
     tokens: [{ label: SparkToken.Label, tokenIdentifier: requireSparkTokenIdentifier() }],

@@ -3,6 +3,7 @@ import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import {
   hasSparkAddressShape,
   isRegtestNetwork,
+  lnurlDomainFor,
   mismatchedNetworkLabel,
   networkForInstance,
   networkLabelFor,
@@ -115,6 +116,16 @@ describe("isRegtestNetwork", () => {
 
   it("is false for mainnet", () => {
     expect(isRegtestNetwork(Network.Mainnet)).toBe(false)
+  })
+})
+
+describe("lnurlDomainFor", () => {
+  it("uses the production Blink LNURL host on mainnet", () => {
+    expect(lnurlDomainFor(Network.Mainnet)).toBe("blink.sv")
+  })
+
+  it("uses the staging Blink LNURL host on regtest", () => {
+    expect(lnurlDomainFor(Network.Regtest)).toBe("staging.blink.sv")
   })
 })
 
