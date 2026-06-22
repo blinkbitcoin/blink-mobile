@@ -70,6 +70,11 @@ export const useDollarBalanceRestrictionSync = (): void => {
   const shouldPersist =
     !isPersisted && (primaryBlocked || isBlockedCountry(ipCountryCode, blockedCountries))
 
+  /**
+   * `persist` is in the deps on purpose: its identity flips with accountType, so
+   * a custodial-to-self-custodial switch in a blocked country re-fires this effect
+   * and writes the self-custodial flag too (anti-bypass double-write).
+   */
   useEffect(() => {
     if (!shouldPersist) return
     updateState((state) => (state ? persist(state) : state))

@@ -54,6 +54,7 @@ const mockToggleBalanceMode = jest.fn()
 let mockBalanceModeValue: "btc" | "usd" = "usd"
 let mockDollarBalanceRestrictedOverride = false
 let mockStableTokenTransferBlockedOverride = false
+let mockStableTokenModalVisible = false
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () =>
@@ -126,12 +127,14 @@ jest.mock("@app/components/stable-token-restriction-modal", () => {
   const ReactActual = jest.requireActual("react")
   const { Text } = jest.requireActual("react-native")
   return {
-    StableTokenRestrictionModal: () =>
-      ReactActual.createElement(
+    StableTokenRestrictionModal: ({ isVisible }: { isVisible: boolean }) => {
+      mockStableTokenModalVisible = isVisible
+      return ReactActual.createElement(
         Text,
         { testID: "stable-token-restriction-modal" },
         "stable-token-restriction",
-      ),
+      )
+    },
   }
 })
 
@@ -482,6 +485,7 @@ describe("HomeScreen", () => {
     mockActiveWalletOverride = null
     mockDollarBalanceRestrictedOverride = false
     mockStableTokenTransferBlockedOverride = false
+    mockStableTokenModalVisible = false
     jest.clearAllMocks()
   })
 
@@ -624,6 +628,56 @@ describe("HomeScreen", () => {
 
     expect(getByTestId("stable-token-restriction-modal")).toBeTruthy()
     expect(queryByTestId("convert-modal")).toBeNull()
+
+    mockActiveWalletOverride = null
+  })
+
+  it("opens the self-custodial restriction modal (not the custodial one) from the disabled transfer button", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 5000, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId, queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    // Transfers are not blocked, so the button is rendered but disabled.
+    expect(getByTestId("transfer")).toBeTruthy()
+    expect(mockStableTokenModalVisible).toBe(false)
+
+    fireEvent.press(getByTestId("transfer"))
+
+    expect(mockStableTokenModalVisible).toBe(true)
+    expect(queryByTestId("restriction-modal")).toBeNull()
 
     mockActiveWalletOverride = null
   })

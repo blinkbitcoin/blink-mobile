@@ -216,6 +216,7 @@ const WalletOverview: React.FC<Props> = ({
             ) : isDollarBalanceRestricted ? (
               <View style={[styles.hideableArea, styles.restrictionLabel]}>
                 <Text type="p2" style={styles.restrictionLabelText}>
+                  {/* Shared across custodial and self-custodial restricted accounts: the copy is identical, so both reuse the Stablesats key. */}
                   {LL.StablesatsRestriction.walletLabel()}
                 </Text>
               </View>

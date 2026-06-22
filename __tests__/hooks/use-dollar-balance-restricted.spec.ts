@@ -196,4 +196,25 @@ describe("useDollarBalanceRestrictionSync", () => {
     expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
     expect(mockUpdateState).not.toHaveBeenCalled()
   })
+
+  it("writes the self-custodial flag too when a blocked-country user switches from custodial to self-custodial", () => {
+    setup(AccountType.Custodial)
+    mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", source: "phone" })
+    mockUseRemoteConfig.mockReturnValue({
+      stablesatsBlockedCountries: ["HK"],
+      stableTokenBlockedCountries: ["HK"],
+    })
+
+    const { rerender } = renderHook(() => useDollarBalanceRestrictionSync())
+
+    const custodialUpdater = mockUpdateState.mock.calls[0][0]
+    expect(getStablesatsRestricted(custodialUpdater(baseState))).toBe(true)
+
+    mockUseActiveWallet.mockReturnValue({ accountType: AccountType.SelfCustodial })
+    rerender({})
+
+    expect(mockUpdateState).toHaveBeenCalledTimes(2)
+    const selfCustodialUpdater = mockUpdateState.mock.calls[1][0]
+    expect(getStableTokenRestricted(selfCustodialUpdater(baseState))).toBe(true)
+  })
 })
