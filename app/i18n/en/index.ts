@@ -2418,7 +2418,7 @@ const en: BaseTranslation = {
     lnurlNoUsername:
       "To generate an lnurl address you must first set a username.  Do you want to set a username now?",
     copyClipboardLnurl: "Lnurl address has been copied in the clipboard",
-    defaultWallet: "Default Balance",
+    defaultWallet: "Default receive",
     rateUs: "Rate us on {storeName: string}",
     theme: "Theme",
     nfc: "Receive from NFC",
@@ -2565,11 +2565,11 @@ const en: BaseTranslation = {
     toastMessage: "Secret copied to clipboard!",
   },
   DefaultWalletScreen: {
-    title: "Default Balance",
-    titleSelfCustodial: "Default Balance",
+    title: "Default receive",
+    titleSelfCustodial: "Default receive",
     infoBtc: "Your Bitcoin Balance is for stacking sats, where the value moves with the market.",
     infoUsd: "Your Dollar Balance is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the USD value doesn't change.",
-    infoUsdSelfCustodial: "Due to user experience concerns we decided to not activate this feature in the non-custodial accounts. Only Bitcoin is available as your default receive setting.",
+    infoUsdSelfCustodial: "Dollar receive is not available as a default receive option for non-custodial accounts.",
   },
   ThemeScreen: {
     title: "Theme",
