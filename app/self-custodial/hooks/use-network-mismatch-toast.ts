@@ -13,8 +13,10 @@ import { useSparkNetwork } from "./use-spark-network"
 /**
  * A self-custodial account is bound to the network it was created on, so it
  * cannot connect while the environment runs a different network. This surfaces
- * a one-time toast naming the network to switch back to, instead of leaving the
- * user on a silently stuck wallet.
+ * a toast naming the network to switch back to, instead of leaving the user on
+ * a silently stuck wallet. It fires once per activation of a mismatched account
+ * (deduped while that account stays active) and re-warns if the account is
+ * deselected and reselected.
  */
 export const useSelfCustodialNetworkMismatchToast = (): void => {
   const { LL } = useI18nContext()

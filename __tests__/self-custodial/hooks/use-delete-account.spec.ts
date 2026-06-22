@@ -30,16 +30,18 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
+let mockNetwork = mockSparkNetwork.Regtest
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
-  useSparkNetwork: () => mockSparkNetwork.Regtest,
+  useSparkNetwork: () => mockNetwork,
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
   disconnectSdk: (...args: unknown[]) => mockDisconnectSdk(...args),
 }))
 
+const mockStorageDirFor = jest.fn((id: string, _network: unknown) => `/tmp/${id}`)
 jest.mock("@app/self-custodial/config", () => ({
-  storageDirFor: (id: string) => `/tmp/${id}`,
+  storageDirFor: (id: string, network: unknown) => mockStorageDirFor(id, network),
 }))
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
@@ -92,6 +94,7 @@ const activeSelfCustodialAccount = {
 describe("useDeleteAccount", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockNetwork = mockSparkNetwork.Regtest
     mockUseSelfCustodialWallet.mockReturnValue({ sdk: mockSdk })
     mockUseHasCustodialAccount.mockReturnValue(false)
     mockUseAccountRegistry.mockReturnValue({
@@ -130,6 +133,20 @@ describe("useDeleteAccount", () => {
     expect(mockUpdateState).toHaveBeenCalled()
     expect(outcome).toBe("logged-out")
     expect(result.current.state).toBe("idle")
+  })
+
+  it("wipes the active network's storage directory, not a hardcoded one, when deleting on mainnet", async () => {
+    mockNetwork = mockSparkNetwork.Mainnet
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockStorageDirFor).toHaveBeenCalledWith(
+      TEST_SC_ACCOUNT_ID,
+      mockSparkNetwork.Mainnet,
+    )
   })
 
   it("switches to the custodial account and returns 'switched-to-custodial' when a custodial account exists", async () => {

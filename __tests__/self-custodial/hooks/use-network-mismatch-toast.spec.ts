@@ -114,6 +114,24 @@ describe("useSelfCustodialNetworkMismatchToast", () => {
     expect(mockToastShow).toHaveBeenCalledTimes(1)
   })
 
+  it("re-warns after a custodial round-trip when the mismatched account is reselected", async () => {
+    const { rerender } = renderHook(() => useSelfCustodialNetworkMismatchToast())
+    await flushEffects()
+    expect(mockToastShow).toHaveBeenCalledTimes(1)
+
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: { id: "cust-1", type: AccountType.Custodial },
+    })
+    rerender({})
+    await flushEffects()
+    expect(mockToastShow).toHaveBeenCalledTimes(1)
+
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: SC_ACCOUNT })
+    rerender({})
+    await flushEffects()
+    expect(mockToastShow).toHaveBeenCalledTimes(2)
+  })
+
   it("does not toast when the hook unmounts before the network lookup resolves", async () => {
     let resolveLookup: (value: string) => void = () => {}
     mockGetMnemonicNetwork.mockReturnValue(
