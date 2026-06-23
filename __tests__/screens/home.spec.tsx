@@ -53,7 +53,7 @@ const mockToggleBalanceMode = jest.fn()
 // eslint-disable-next-line prefer-const
 let mockBalanceModeValue: "btc" | "usd" = "usd"
 let mockDollarBalanceRestrictedOverride = false
-let mockStableTokenTransferBlockedOverride = false
+let mockTransferBlockedOverride = false
 let mockDollarBalanceModalVisible = false
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
@@ -91,9 +91,9 @@ jest.mock("@app/config/feature-flags-context", () => {
   }
 })
 
-jest.mock("@app/hooks/use-stable-token-transfer-blocked", () => ({
-  useStableTokenTransferBlocked: () => mockStableTokenTransferBlockedOverride,
-  useStableTokenTransferBlockedSync: () => undefined,
+jest.mock("@app/hooks/use-transfer-blocked", () => ({
+  useTransferBlocked: () => mockTransferBlockedOverride,
+  useTransferBlockedSync: () => undefined,
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
@@ -475,7 +475,7 @@ describe("HomeScreen", () => {
     currentMocks = []
     mockActiveWalletOverride = null
     mockDollarBalanceRestrictedOverride = false
-    mockStableTokenTransferBlockedOverride = false
+    mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
     jest.clearAllMocks()
   })
@@ -519,8 +519,8 @@ describe("HomeScreen", () => {
     },
   )
 
-  it("hides the transfer button when stable-token transfers are blocked", async () => {
-    mockStableTokenTransferBlockedOverride = true
+  it("hides the transfer button when transfers are blocked", async () => {
+    mockTransferBlockedOverride = true
     currentMocks = generateHomeMock({
       level: AccountLevel.Two,
       network: Network.Mainnet,

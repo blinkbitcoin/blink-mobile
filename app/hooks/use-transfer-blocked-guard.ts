@@ -2,10 +2,10 @@ import { useEffect } from "react"
 
 import { CommonActions, useNavigation } from "@react-navigation/native"
 
-import { useStableTokenTransferBlocked } from "./use-stable-token-transfer-blocked"
+import { useTransferBlocked } from "./use-transfer-blocked"
 
-export const useStableTokenTransferBlockedGuard = (): boolean => {
-  const isTransferBlocked = useStableTokenTransferBlocked()
+export const useTransferBlockedGuard = (): boolean => {
+  const isTransferBlocked = useTransferBlocked()
   const navigation = useNavigation()
 
   useEffect(() => {

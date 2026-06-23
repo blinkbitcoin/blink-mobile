@@ -77,6 +77,17 @@ describe("defaultRemoteConfig: compliance country lists", () => {
     expect(defaultRemoteConfig.stableTokenTransferBlockedCountries).toHaveLength(27)
   })
 
+  it("stablesatsTransferBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.stablesatsTransferBlockedCountries)
+  })
+
+  it("both account-type transfer blocks default to the same 27 EU member states", () => {
+    expect(defaultRemoteConfig.stablesatsTransferBlockedCountries).toEqual(
+      defaultRemoteConfig.stableTokenTransferBlockedCountries,
+    )
+    expect(defaultRemoteConfig.stablesatsTransferBlockedCountries).toHaveLength(27)
+  })
+
   it("stableTokenBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
     assertCanonical(defaultRemoteConfig.stableTokenBlockedCountries)
   })

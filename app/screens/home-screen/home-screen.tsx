@@ -50,9 +50,9 @@ import {
 } from "@app/hooks/use-dollar-balance-restricted"
 import { useStablesatsForcedConversion } from "@app/hooks/use-stablesats-forced-conversion"
 import {
-  useStableTokenTransferBlocked,
-  useStableTokenTransferBlockedSync,
-} from "@app/hooks/use-stable-token-transfer-blocked"
+  useTransferBlocked,
+  useTransferBlockedSync,
+} from "@app/hooks/use-transfer-blocked"
 import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
@@ -368,8 +368,8 @@ export const HomeScreen: React.FC = () => {
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
   useDollarBalanceRestrictionSync()
 
-  const isStableTokenTransferBlocked = useStableTokenTransferBlocked()
-  useStableTokenTransferBlockedSync()
+  const isTransferBlocked = useTransferBlocked()
+  useTransferBlockedSync()
 
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
@@ -520,7 +520,7 @@ export const HomeScreen: React.FC = () => {
   const isIosWithBalance = isIos && satsBalance > 0
 
   const shouldShowTransferButton =
-    !isStableTokenTransferBlocked &&
+    !isTransferBlocked &&
     (isSelfCustodial ||
       !isIos ||
       dataUnauthed?.globals?.network !== "mainnet" ||

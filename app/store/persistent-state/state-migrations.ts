@@ -113,6 +113,7 @@ type PersistentState_14 = {
   defaultAccountModalShownByAccountId?: Record<string, boolean>
   stablesatsRestrictedCustodial?: boolean
   stableTokenTransferBlocked?: boolean
+  stablesatsTransferBlocked?: boolean
   stableTokenRestricted?: boolean
 }
 

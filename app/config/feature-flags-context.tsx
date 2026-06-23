@@ -39,6 +39,7 @@ const CustodialFirstSignupBlockedCountriesKey = "custodialFirstSignupBlockedCoun
 const StablesatsBlockedCountriesKey = "stablesatsBlockedCountries"
 const StableTokenBlockedCountriesKey = "stableTokenBlockedCountries"
 const StableTokenTransferBlockedCountriesKey = "stableTokenTransferBlockedCountries"
+const StablesatsTransferBlockedCountriesKey = "stablesatsTransferBlockedCountries"
 const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
 const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
 
@@ -85,6 +86,7 @@ type RemoteConfig = {
   [StablesatsBlockedCountriesKey]: string[]
   [StableTokenBlockedCountriesKey]: string[]
   [StableTokenTransferBlockedCountriesKey]: string[]
+  [StablesatsTransferBlockedCountriesKey]: string[]
   [CustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialCreationBlockedCountriesKey]: string[]
 }
@@ -94,9 +96,9 @@ const defaultReplaceCardDeliveryConfig = {
   express: { minDays: 1, maxDays: 2, priceUsd: 15 },
 }
 
-/** Default for the self-custodial stable-token transfer block. */
+/** Default transfer/swap block, read by both account types. */
 // prettier-ignore
-const stableTokenTransferBlockedDefault = [
+const transferBlockedDefault = [
   "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR",
   "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO",
   "SE", "SI", "SK",
@@ -157,7 +159,8 @@ export const defaultRemoteConfig: RemoteConfig = {
     defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
   stablesatsBlockedCountries: ["HK"],
   stableTokenBlockedCountries: ["HK"],
-  stableTokenTransferBlockedCountries: stableTokenTransferBlockedDefault,
+  stableTokenTransferBlockedCountries: transferBlockedDefault,
+  stablesatsTransferBlockedCountries: transferBlockedDefault,
   custodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialCreationBlockedCountries: creationBlockedDefault,
 }
@@ -188,6 +191,9 @@ remoteConfigInstance().setDefaults({
   ),
   stableTokenTransferBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.stableTokenTransferBlockedCountries,
+  ),
+  stablesatsTransferBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.stablesatsTransferBlockedCountries,
   ),
   custodialCreationBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.custodialCreationBlockedCountries,
@@ -341,6 +347,11 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           defaultRemoteConfig.stableTokenTransferBlockedCountries,
         )
 
+        const stablesatsTransferBlockedCountries = getRemoteConfigStringList(
+          StablesatsTransferBlockedCountriesKey,
+          defaultRemoteConfig.stablesatsTransferBlockedCountries,
+        )
+
         const custodialCreationBlockedCountries = getRemoteConfigStringList(
           CustodialCreationBlockedCountriesKey,
           defaultRemoteConfig.custodialCreationBlockedCountries,
@@ -379,6 +390,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           stablesatsBlockedCountries,
           stableTokenBlockedCountries,
           stableTokenTransferBlockedCountries,
+          stablesatsTransferBlockedCountries,
           custodialCreationBlockedCountries,
           selfCustodialCreationBlockedCountries,
         })
