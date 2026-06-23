@@ -34,7 +34,6 @@ const AutoConvertMaxAttemptsKey = "autoConvertMaxAttempts"
 const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
 const AutoConvertPollIntervalMsKey = "autoConvertPollIntervalMs"
 const AutoConvertAmountMatchToleranceBpsKey = "autoConvertAmountMatchToleranceBps"
-const CustodialSignupBlockedCountriesKey = "custodialSignupBlockedCountries"
 const CustodialFirstSignupBlockedCountriesKey = "custodialFirstSignupBlockedCountries"
 const StablesatsBlockedCountriesKey = "stablesatsBlockedCountries"
 const StableTokenBlockedCountriesKey = "stableTokenBlockedCountries"
@@ -81,7 +80,6 @@ type RemoteConfig = {
   [AutoConvertPollMaxAttemptsKey]: number
   [AutoConvertPollIntervalMsKey]: number
   [AutoConvertAmountMatchToleranceBpsKey]: number
-  [CustodialSignupBlockedCountriesKey]: string[]
   [CustodialFirstSignupBlockedCountriesKey]: string[]
   [StablesatsBlockedCountriesKey]: string[]
   [StableTokenBlockedCountriesKey]: string[]
@@ -105,25 +103,22 @@ const transferBlockedDefault = [
 ]
 
 /**
- * Default compliance country lists (ISO-3166-1 alpha-2, uppercased). Sources:
+ * Default first-custodial-signup block (ISO-3166-1 alpha-2, uppercased). Sources:
  * OFAC sanctions (https://ofac.treasury.gov/sanctions-programs-and-country-information)
  * and Google Play crypto-wallet policy article 16329703
  * (https://support.google.com/googleplay/android-developer/answer/16329703).
  */
 // prettier-ignore
-const defaultCustodialBlocks = {
-  custodialSignupBlockedCountries: ["US"],
-  custodialFirstSignupBlockedCountries: [
-    // OFAC sanctions
-    "CU", "IR", "KP",
-    // Google Play 16329703
-    "AE", "BH", "CA", "CH", "GB", "ID", "IL", "JP", "KR", "PH", "ZA",
-    // Google Play 16329703 (EU-27, MiCA)
-    "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR",
-    "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO",
-    "SE", "SI", "SK",
-  ],
-}
+const custodialFirstSignupBlockedDefault = [
+  // OFAC sanctions
+  "CU", "IR", "KP",
+  // Google Play 16329703
+  "AE", "BH", "CA", "CH", "GB", "ID", "IL", "JP", "KR", "PH", "ZA",
+  // Google Play 16329703 (EU-27, MiCA)
+  "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR",
+  "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO",
+  "SE", "SI", "SK",
+]
 
 /** Default countries where account creation is blocked, redirecting to the Unsupported region screen (both account types). */
 // prettier-ignore
@@ -154,9 +149,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   autoConvertPollMaxAttempts: 30,
   autoConvertPollIntervalMs: 500,
   autoConvertAmountMatchToleranceBps: 500,
-  custodialSignupBlockedCountries: defaultCustodialBlocks.custodialSignupBlockedCountries,
-  custodialFirstSignupBlockedCountries:
-    defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
+  custodialFirstSignupBlockedCountries: custodialFirstSignupBlockedDefault,
   stablesatsBlockedCountries: ["HK"],
   stableTokenBlockedCountries: ["HK"],
   stableTokenTransferBlockedCountries: transferBlockedDefault,
@@ -177,11 +170,8 @@ remoteConfigInstance().setDefaults({
   replaceCardDeliveryConfig: serializeRemoteConfigDefault(
     defaultReplaceCardDeliveryConfig,
   ),
-  custodialSignupBlockedCountries: serializeRemoteConfigDefault(
-    defaultCustodialBlocks.custodialSignupBlockedCountries,
-  ),
   custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
-    defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
+    custodialFirstSignupBlockedDefault,
   ),
   stablesatsBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.stablesatsBlockedCountries,
@@ -322,14 +312,9 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           ...parsedDeliveryConfig,
         }
 
-        const custodialSignupBlockedCountries = getRemoteConfigStringList(
-          CustodialSignupBlockedCountriesKey,
-          defaultCustodialBlocks.custodialSignupBlockedCountries,
-        )
-
         const custodialFirstSignupBlockedCountries = getRemoteConfigStringList(
           CustodialFirstSignupBlockedCountriesKey,
-          defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
+          custodialFirstSignupBlockedDefault,
         )
 
         const stablesatsBlockedCountries = getRemoteConfigStringList(
@@ -385,7 +370,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           autoConvertPollMaxAttempts,
           autoConvertPollIntervalMs,
           autoConvertAmountMatchToleranceBps,
-          custodialSignupBlockedCountries,
           custodialFirstSignupBlockedCountries,
           stablesatsBlockedCountries,
           stableTokenBlockedCountries,

@@ -2,7 +2,6 @@ type CustodialEligibilityInputs = {
   country: string | undefined
   detectionFailed: boolean
   accountCount: number
-  custodialSignupBlockedCountries: string[]
   custodialFirstSignupBlockedCountries: string[]
 }
 
@@ -11,12 +10,9 @@ export const decideCustodialEligibility = ({
   country,
   detectionFailed,
   accountCount,
-  custodialSignupBlockedCountries,
   custodialFirstSignupBlockedCountries,
 }: CustodialEligibilityInputs): boolean => {
   if (country === undefined || detectionFailed) return false
-
-  if (custodialSignupBlockedCountries.includes(country)) return false
 
   const isFirstSignup = accountCount === 0
   const firstSignupBlocked = custodialFirstSignupBlockedCountries.includes(country)

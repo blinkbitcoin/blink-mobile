@@ -50,23 +50,8 @@ const assertCanonical = (list: string[]) => {
 }
 
 describe("defaultRemoteConfig: compliance country lists", () => {
-  it("custodialSignupBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
-    assertCanonical(defaultRemoteConfig.custodialSignupBlockedCountries)
-  })
-
   it("custodialFirstSignupBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
     assertCanonical(defaultRemoteConfig.custodialFirstSignupBlockedCountries)
-  })
-
-  it("custodialSignupBlockedCountries always includes US as the baked-in floor", () => {
-    expect(defaultRemoteConfig.custodialSignupBlockedCountries).toContain("US")
-  })
-
-  it("does not allow a country to appear in both lists (always-block already covers first-signup)", () => {
-    const always = new Set(defaultRemoteConfig.custodialSignupBlockedCountries)
-    for (const code of defaultRemoteConfig.custodialFirstSignupBlockedCountries) {
-      expect(always.has(code)).toBe(false)
-    }
   })
 
   it("stableTokenTransferBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
