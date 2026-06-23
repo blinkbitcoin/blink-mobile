@@ -40,7 +40,7 @@ describe("StablesatsRestrictionModal", () => {
     )
 
     expect(
-      getByText("To get access to a dollar account, create a non-custodial account."),
+      getByText("To get access to a Dollar Balance, create a non-custodial account."),
     ).toBeTruthy()
   })
 

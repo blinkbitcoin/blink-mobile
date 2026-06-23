@@ -2081,7 +2081,7 @@
         "scan": "スキャン",
         "updateAvailable": "新しいアップデートがあります。\n今すぐ更新をタップして、アップデートしてください",
         "useLightning": "私たちはライトニング・ネットワークを使っています。",
-        "myAccounts": "ウォレット",
+        "myAccounts": "残高",
         "walletCountNotTwo": "ウォレット数が2つではありません。ダッシュボードからこのアカウントのすべてのウォレットと資金を確認してください"
     },
     "PinScreen": {
@@ -2342,7 +2342,7 @@
         "csvTransactionsError": "エラーが発生しました。トランザクションをCSVにエクスポートできません。問題が解決しない場合は、サポートにお問い合わせください。",
         "lnurlNoUsername": "lnurlアドレスを発行するには、まずはユーザー名を設定する必要があります。 今すぐユーザー名を設定しますか？",
         "copyClipboardLnurl": "Lnurlアドレスがクリップボードにコピーされました",
-        "defaultWallet": "メインウォレット",
+        "defaultWallet": "デフォルトの受取",
         "rateUs": "{storeName: string}で評価する",
         "theme": "テーマ",
         "nfc": "NFCから受金する",
@@ -2488,10 +2488,11 @@
         "toastMessage": "シークレットコードがクリップボードにコピーするされました！"
     },
     "DefaultWalletScreen": {
-        "title": "デフォルトの受取アカウント",
-        "info": "ビットコインウォレットはサトシを積み立てるためのもので、USD価値は市場と連動します。ドルウォレットはStablesatsで動いています。USD価値で安定するようにヘッジされたBitcoinを保有します。常にBitcoinを保有していますが、ドル価値は変動しません。",
-        "titleSelfCustodial": "デフォルトアカウント",
-        "infoSelfCustodial": "このアカウントは受信と送信時に既定で使用されます。いつでも切り替え可能です。"
+        "title": "デフォルトの受取",
+        "titleSelfCustodial": "デフォルトの受取",
+        "infoBtc": "ビットコインウォレットはサトシを積み立てるためのもので、USD価値は市場と連動します。",
+        "infoUsd": "ドルウォレットはStablesatsで動いています。USD価値で安定するようにヘッジされたBitcoinを保有します。常にBitcoinを保有していますが、ドル価値は変動しません。",
+        "infoUsdSelfCustodial": "ドル受取は、非カストディアル口座のデフォルトの受取オプションとしては利用できません。"
     },
     "ThemeScreen": {
         "title": "テーマ",

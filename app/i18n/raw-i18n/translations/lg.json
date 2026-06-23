@@ -2081,7 +2081,7 @@
     "scan": "Sikaani",
     "updateAvailable": "Ekipya wekiri.\nKoona wano okufuna ekipya kati",
     "useLightning": "Tukozesa Lightning Network.",
-    "myAccounts": "Akawunti Zange",
+    "myAccounts": "Bbalansi",
     "walletCountNotTwo": "Embala ya waleti teri 2. Nsaba okozese dashboard olabe waleti zonna ne ssente za akawunti eno"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Tesobola kufulumya ewaanyisa mu csv. Waliwo ekyitambudde obubi. Singa ensonga ekyaliwo nsaba otuutukirire tukuyambe.",
     "lnurlNoUsername": "Okukola endagiriro ya lnurl olina okusooka okuteekawo erinnya ly'omukozesa. Oyagala okuteekawo erinnya ly'omukozesa kati?",
     "copyClipboardLnurl": "Endagiriro ya Lnurl ewandukuddwa ku lutimbe",
-    "defaultWallet": "Akawunti Esokerwako",
+    "defaultWallet": "Receive to",
     "rateUs": "Tugere ku {storeName: string}",
     "theme": "Endabika",
     "nfc": "Funa okuva ku NFC",
@@ -2488,10 +2488,11 @@
     "toastMessage": "Ekyama kyiwanduukuluddwa ku lutimbe"
   },
   "DefaultWalletScreen": {
-    "title": "Akawunti ey'okufuna eyekyamukirizo",
-    "info": "Akawunti ya Bitcoin yo ye ya kukuŋŋaanya sats, omuwendo gwa USD gwe gutambulira n'akatale. Akawunti ya Dola yo etambulizibwa Stablesats — ekuuma Bitcoin ekuumibwa okubeera ennywevu mu muwendo gwa USD. Bulijjo okutta Bitcoin, naye omuwendo gw'edoola teguyunjuluka.",
-    "titleSelfCustodial": "Akawunti eya bulijjo",
-    "infoSelfCustodial": "Akawunti eno y'eneekozesebwa nga eya bulijjo nga osasula n'okusiga. Osobola okukyusa buli kiseera."
+    "title": "Receive to",
+    "titleSelfCustodial": "Receive to",
+    "infoBtc": "Akawunti ya Bitcoin yo ye ya kukuŋŋaanya sats, omuwendo gwa USD gwe gutambulira n'akatale.",
+    "infoUsd": "Akawunti ya Dola yo etambulizibwa Stablesats — ekuuma Bitcoin ekuumibwa okubeera ennywevu mu muwendo gwa USD. Bulijjo okutta Bitcoin, naye omuwendo gw'edoola teguyunjuluka.",
+    "infoUsdSelfCustodial": "Okufuna Doola tekuliiwo ng'enkola ya bulijjo ey'okufuna ku akawunti ezitakuumibwa."
   },
   "ThemeScreen": {
     "title": "Endabika",

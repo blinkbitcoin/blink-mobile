@@ -2081,7 +2081,7 @@
     "scan": "Scan",
     "updateAvailable": "Uhlaziyo luyafumaneka. Cofa ukuhlaziya ngoku",
     "useLightning": "Sisebenzisa inethiwekhi yombane.",
-    "myAccounts": "My Accounts",
+    "myAccounts": "Ibhalansi",
     "walletCountNotTwo": "Inani lezipaji asizizo ezi-2. Nceda usebenzise idashbhodi ukubona zonke izipaji nemali yeli akhawunti"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Ayikwazanga ukuthumela ngaphandle intengiselwano kwi-csv. Into ayihamba kakuhle. Ukuba umcimbi uyaqhubeka ufuna uncedo olupheleleyo.",
     "lnurlNoUsername": "Ukwenza idilesi ye-lnurl kufuneka uqale usete igama lomsebenzisi. Ngaba ufuna ukuseta igama lokusebenzisa ngoku?",
     "copyClipboardLnurl": "Idilesi ye-Lnurl ikotshwe kwiKlipbhodi.",
-    "defaultWallet": "Iakhawunti ehlala ikho",
+    "defaultWallet": "Receive to",
     "rateUs": "Isilinganisele kwi- {storeName.: string}",
     "theme": "Theme",
     "nfc": "Receive from NFC",
@@ -2488,10 +2488,11 @@
     "toastMessage": "Imfihlo ikopishwe kwibhodi eqhotyoshwayo!"
   },
   "DefaultWalletScreen": {
-    "title": "I-akhawunti yokufumana engagqibekanga",
-    "info": "I-Akhawunti ye-Bitcoin yakho yeyokuqokelela i-sats, apho ixabiso le-USD lihamba nemarike. I-Akhawunti ye-Idola yakho ixhaswa yi-Stablesats — igcina i-Bitcoin ekhuselweyo ukuze ihlale izinzile ngexabiso le-USD. Usoloko ugcine i-Bitcoin, kodwa ixabiso le-idola alitshintshi.",
-    "titleSelfCustodial": "Iakhawunti emiselweyo",
-    "infoSelfCustodial": "Le akhawunti iza kusetyenziswa ngokumiselweyo xa ufumana kwaye uthumela. Ungatshintsha nangaliphi ixesha."
+    "title": "Receive to",
+    "titleSelfCustodial": "Receive to",
+    "infoBtc": "I-Akhawunti ye-Bitcoin yakho yeyokuqokelela i-sats, apho ixabiso le-USD lihamba nemarike.",
+    "infoUsd": "I-Akhawunti ye-Idola yakho ixhaswa yi-Stablesats — igcina i-Bitcoin ekhuselweyo ukuze ihlale izinzile ngexabiso le-USD. Usoloko ugcine i-Bitcoin, kodwa ixabiso le-idola alitshintshi.",
+    "infoUsdSelfCustodial": "Ukufumana iiDola akufumaneki njengenketho yokufumana emiselweyo kwiiakhawunti ezingagcinwayo."
   },
   "ThemeScreen": {
     "title": "Theme",

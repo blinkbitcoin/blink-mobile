@@ -2081,7 +2081,7 @@
     "scan": "Skeniraj",
     "updateAvailable": "Ažuriranje je dostupno.\nDodirnite za ažuriranje sada",
     "useLightning": "Koristimo Lightning Network.",
-    "myAccounts": "Moji računi",
+    "myAccounts": "Stanja",
     "walletCountNotTwo": "Broj novčanika nije 2. Molimo koristite nadzornu ploču za pregled svih novčanika i sredstava ovog računa"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Nije moguće izvesti transakcije u csv. Nešto je pošlo po zlu. Ako se problem nastavi, kontaktirajte podršku.",
     "lnurlNoUsername": "Za generiranje lnurl adrese prvo morate postaviti korisničko ime. Želite li sada postaviti korisničko ime?",
     "copyClipboardLnurl": "Lnurl adresa je kopirana u međuspremnik",
-    "defaultWallet": "Zadani račun",
+    "defaultWallet": "Zadano primanje",
     "rateUs": "Ocijenite nas na {storeName: string}",
     "theme": "Tema",
     "nfc": "Primanje od NFC-a",
@@ -2488,10 +2488,11 @@
     "toastMessage": "Tajna kopirana u međuspremnik!"
   },
   "DefaultWalletScreen": {
-    "title": "Zadani račun za primanje",
-    "info": "Vaš Bitcoin račun je za skupljanje satova, gdje se USD vrijednost kreće s tržištem. Vaš Dolar račun pokreće Stablesats — drži Bitcoin zaštićen da ostane stabilan u USD vrijednosti. Uvijek držite Bitcoin, ali dolarska vrijednost se ne mijenja.",
-    "titleSelfCustodial": "Zadani račun",
-    "infoSelfCustodial": "Ovaj račun će se koristiti kao zadani za primanje i slanje. Možete prebaciti u bilo kojem trenutku."
+    "title": "Zadano primanje",
+    "titleSelfCustodial": "Zadano primanje",
+    "infoBtc": "Vaš Bitcoin račun je za skupljanje satova, gdje se USD vrijednost kreće s tržištem.",
+    "infoUsd": "Vaš Dolar račun pokreće Stablesats — drži Bitcoin zaštićen da ostane stabilan u USD vrijednosti. Uvijek držite Bitcoin, ali dolarska vrijednost se ne mijenja.",
+    "infoUsdSelfCustodial": "Primanje dolara nije dostupno kao zadana opcija primanja za non-custodial račune."
   },
   "ThemeScreen": {
     "title": "Tema",

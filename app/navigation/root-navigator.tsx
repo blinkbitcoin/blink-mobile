@@ -382,7 +382,7 @@ export const RootStack = () => {
         name="defaultWallet"
         component={DefaultWalletScreen}
         options={() => ({
-          title: LL.SettingsScreen.receiveCurrency(),
+          title: LL.DefaultWalletScreen.title(),
         })}
       />
       <RootNavigator.Screen

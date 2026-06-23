@@ -2081,7 +2081,7 @@
     "scan": "Skeni",
     "updateAvailable": "Sasisho lipo.\nGusa ili kusasisha sasa",
     "useLightning": "Tunatumia mtandao wa Lighting.",
-    "myAccounts": "Akaunti Zangu",
+    "myAccounts": "Salio",
     "walletCountNotTwo": "Idadi ya mifuko haitoshi. Tafadhali tumia kiolesura ili kuona mifuko yote na fedha za akaunti hii"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Haikuweza kupeleka malipo kwenye csv. Kitu kilienda mrama. Ikiwa tatizo hili litaendelea tafadhali wasiliana na usaidizi. ",
     "lnurlNoUsername": "Ukitaka kuunda anwani ya lnurl, lazima kwanza uandikishe jina la mtumiaji. Unataka kuandikisha jina la mtumiaji saa hii?",
     "copyClipboardLnurl": "Anwani ya lnurl imenakiliwa kwenye ubao wa kunakili",
-    "defaultWallet": "Akaunti ya Msingi",
+    "defaultWallet": "Pokea chaguo-msingi",
     "rateUs": "Tupie ukadiriaji kwenye {storeName: string}",
     "theme": "Mandhari",
     "nfc": "Pokea kutoka NFC",
@@ -2488,10 +2488,11 @@
     "toastMessage": "Siri imeakiliwa kwenye ubao wa kunakili!"
   },
   "DefaultWalletScreen": {
-    "title": "Akaunti ya kupokea chaguo-msingi",
-    "info": "Akaunti ya Bitcoin yako ni ya kukusanya sats, ambapo thamani ya USD inasogea na soko. Akaunti ya Dola yako inaendeshwa na Stablesats — inashikilia Bitcoin iliyolindwa ili ibaki thabiti kwa thamani ya USD. Daima unashikilia Bitcoin, lakini thamani ya dola haibadiliki.",
-    "titleSelfCustodial": "Akaunti chaguomsingi",
-    "infoSelfCustodial": "Akaunti hii itatumika kwa chaguomsingi wakati wa kupokea na kutuma. Unaweza kubadilisha wakati wowote."
+    "title": "Pokea chaguo-msingi",
+    "titleSelfCustodial": "Pokea chaguo-msingi",
+    "infoBtc": "Akaunti ya Bitcoin yako ni ya kukusanya sats, ambapo thamani ya USD inasogea na soko.",
+    "infoUsd": "Akaunti ya Dola yako inaendeshwa na Stablesats — inashikilia Bitcoin iliyolindwa ili ibaki thabiti kwa thamani ya USD. Daima unashikilia Bitcoin, lakini thamani ya dola haibadiliki.",
+    "infoUsdSelfCustodial": "Kupokea Dola hakupatikani kama chaguo la kupokea la chaguo-msingi kwa akaunti zisizo za ulinzi."
   },
   "ThemeScreen": {
     "title": "Mandhari",

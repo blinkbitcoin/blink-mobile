@@ -2081,7 +2081,7 @@
     "scan": "Scan",
     "updateAvailable": "تحديث متاح.\nانقر للتحديث الآن",
     "useLightning": "نحن نستخدم شبكة البرق.",
-    "myAccounts": "My Accounts",
+    "myAccounts": "أرصدة",
     "walletCountNotTwo": "عدد المحافظ ليس 2. يرجى استخدام لوحة التحكم لعرض جميع المحافظ وأموال هذا الحساب"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "لم يمكن تصدير المعاملات في ملف csv. حدث خطأ. إذا استمرت المشكلة راجع الدعم.",
     "lnurlNoUsername": "لتوليد عنوان lnurl عليك أولًا أن تنشئ اسم مستخدم. هل تريد أن تحدد اسم مستخدمك الآن؟",
     "copyClipboardLnurl": "نُسخ عنوان Lnurl إلى الحافظة",
-    "defaultWallet": "Default Account",
+    "defaultWallet": "الاستلام الافتراضي",
     "rateUs": "Rate us on {storeName: string}",
     "theme": "Theme",
     "nfc": "Receive from NFC",
@@ -2488,10 +2488,11 @@
     "toastMessage": "Secret copied to clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "حساب الاستلام الافتراضي",
-    "info": "حساب البيتكوين الخاص بك لتجميع الساتوشي، حيث تتحرك قيمة USD مع السوق. حساب بالدولار الخاص بك مدعوم بتقنية Stablesats — يحتفظ بـ Bitcoin محمي ليبقى مستقراً بقيمة USD. أنت دائماً تحتفظ بـ Bitcoin، لكن قيمة الدولار لا تتغير.",
-    "titleSelfCustodial": "الحساب الافتراضي",
-    "infoSelfCustodial": "سيتم استخدام هذا الحساب افتراضيًا عند الاستلام والإرسال. يمكنك التبديل في أي وقت."
+    "title": "الاستلام الافتراضي",
+    "titleSelfCustodial": "الاستلام الافتراضي",
+    "infoBtc": "حساب البيتكوين الخاص بك لتجميع الساتوشي، حيث تتحرك قيمة USD مع السوق.",
+    "infoUsd": "حساب بالدولار الخاص بك مدعوم بتقنية Stablesats — يحتفظ بـ Bitcoin محمي ليبقى مستقراً بقيمة USD. أنت دائماً تحتفظ بـ Bitcoin، لكن قيمة الدولار لا تتغير.",
+    "infoUsdSelfCustodial": "استقبال الدولار غير متاح كخيار استقبال افتراضي للحسابات غير الوصائية."
   },
   "ThemeScreen": {
     "title": "Theme",
