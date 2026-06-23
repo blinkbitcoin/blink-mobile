@@ -3569,6 +3569,10 @@
     "createFailed": "Kon nie tronk skep nie. Probeer asseblief weer.",
     "selfCustodialDisabled": "Nie-bewaring is tydelik onbeskikbaar."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Nie-ondersteunde streek",
+    "description": "Ongelukkig kan ons nie gebruikers uit jou huidige streek bedien nie."
+  },
   "RestoreScreen": {
     "title": "Herstel beursie",
     "description": "Herstel jou beursie vanaf 'n rugsteun",

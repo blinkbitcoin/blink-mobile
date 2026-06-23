@@ -3569,6 +3569,10 @@
     "createFailed": "No s'ha pogut crear la cartera. Si us plau, torna-ho a provar.",
     "selfCustodialDisabled": "El mode no custodial està temporalment no disponible."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Regió no admesa",
+    "description": "Malauradament, no podem atendre usuaris de la vostra regió actual."
+  },
   "RestoreScreen": {
     "title": "Restaura la cartera",
     "description": "Recupera la teva cartera des d'una còpia de seguretat",

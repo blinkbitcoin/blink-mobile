@@ -3569,6 +3569,10 @@
     "createFailed": "Manan walletta paqarichiyta atinkuchu. Allinta llamk'apuy.",
     "selfCustodialDisabled": "Mana-waqaychay manaraqmi atikunchu."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Mana yanapasqa suyu",
+    "description": "Llakikuypaq, kunan suyuykimanta ruraqkunata mana yanapayta atiykuchu."
+  },
   "RestoreScreen": {
     "title": "Walleta kutichiy",
     "description": "Walletaykita waqaychaymanta kutichiy",

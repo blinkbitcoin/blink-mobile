@@ -3569,6 +3569,10 @@
     "createFailed": "Crearea portofelului a eșuat. Vă rugăm să încercați din nou.",
     "selfCustodialDisabled": "Non-custodial este temporar indisponibil."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Regiune neacceptată",
+    "description": "Din păcate nu putem deservi utilizatorii din regiunea ta actuală."
+  },
   "RestoreScreen": {
     "title": "Restaurare portofel",
     "description": "Recuperați portofelul dintr-o copie de siguranță",

@@ -3569,6 +3569,10 @@
     "createFailed": "Nem sikerült létrehozni a pénztárcát. Kérjük, próbáld újra.",
     "selfCustodialDisabled": "Az önrendelkező mód átmenetileg nem érhető el."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Nem támogatott régió",
+    "description": "Sajnos nem tudjuk kiszolgálni a jelenlegi régiódból érkező felhasználókat."
+  },
   "RestoreScreen": {
     "title": "Tárca visszaállítása",
     "description": "Állítsd vissza a tárcádat biztonsági mentésből",

@@ -3740,6 +3740,10 @@ const en: BaseTranslation = {
       "Restore flow will be available in a future update.",
     createFailed: "Failed to create wallet. Please try again.",
   },
+  UnsupportedRegionScreen: {
+    title: "Unsupported region",
+    description: "Unfortunately we can not serve users from your current region.",
+  },
   RestoreScreen: {
     title: "Restore wallet",
     description: "Recover your wallet from a backup",

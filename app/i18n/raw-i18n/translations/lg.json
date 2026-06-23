@@ -3569,6 +3569,10 @@
     "createFailed": "Tekisobose okukola wallet. Tugezeeyo nate.",
     "selfCustodialDisabled": "Tekikola kati ku non-custodial."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Ekitundu ekitawagirwa",
+    "description": "Eky'embi, tetusobola kuweereza bakozesa abava mu kitundu kyo eky'okaakano."
+  },
   "RestoreScreen": {
     "title": "Zzaawo wallet",
     "description": "Zzaawo wallet yo okuva mu koppi",

@@ -3569,6 +3569,10 @@
         "createFailed": "Error al crear la billetera. Por favor intenta de nuevo.",
         "selfCustodialDisabled": "La modalidad no custodial no está disponible temporalmente."
     },
+    "UnsupportedRegionScreen": {
+        "title": "Región no compatible",
+        "description": "Lamentablemente no podemos atender a usuarios de tu región actual."
+    },
     "RestoreScreen": {
         "title": "Restaurar billetera",
         "description": "Recupera tu billetera desde un respaldo",

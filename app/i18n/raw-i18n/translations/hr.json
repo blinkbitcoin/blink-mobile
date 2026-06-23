@@ -3569,6 +3569,10 @@
     "createFailed": "Neuspjelo stvaranje novčanika. Molimo pokušajte ponovno.",
     "selfCustodialDisabled": "Nekustodijska opcija je privremeno nedostupna."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Nepodržana regija",
+    "description": "Nažalost ne možemo pružati uslugu korisnicima iz vaše trenutne regije."
+  },
   "RestoreScreen": {
     "title": "Vraćanje novčanika",
     "description": "Vratite novčanik iz sigurnosne kopije",

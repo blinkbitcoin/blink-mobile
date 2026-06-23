@@ -3569,6 +3569,10 @@
     "createFailed": "Ayikwazanga ukudala iwallet. Nceda zama kwakhona.",
     "selfCustodialDisabled": "I-non-custodial ayifumaneki okwexeshana."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Ummandla ongaxhaswanga",
+    "description": "Ngelishwa asikwazi ukunceda abasebenzisi abavela kummandla wakho wangoku."
+  },
   "RestoreScreen": {
     "title": "Buyisela isikhwama",
     "description": "Buyisela isikhwama sakho kwikhophi",

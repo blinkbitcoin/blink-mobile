@@ -3569,6 +3569,10 @@
     "createFailed": "Gagal membuat dompet. Silakan coba lagi.",
     "selfCustodialDisabled": "Non-kustodial sementara tidak tersedia."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Wilayah tidak didukung",
+    "description": "Sayangnya kami tidak dapat melayani pengguna dari wilayah Anda saat ini."
+  },
   "RestoreScreen": {
     "title": "Pulihkan dompet",
     "description": "Pulihkan dompet Anda dari cadangan",

@@ -84,4 +84,18 @@ describe("defaultRemoteConfig: compliance country lists", () => {
   it("stableTokenBlockedCountries defaults to Hong Kong", () => {
     expect(defaultRemoteConfig.stableTokenBlockedCountries).toEqual(["HK"])
   })
+
+  it("custodialCreationBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.custodialCreationBlockedCountries)
+  })
+
+  it("selfCustodialCreationBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.selfCustodialCreationBlockedCountries)
+  })
+
+  it("creation blocks default to the comprehensively sanctioned regions plus Russia and Belarus, identically for both account types", () => {
+    const expected = ["CU", "IR", "KP", "SY", "RU", "BY"]
+    expect(defaultRemoteConfig.custodialCreationBlockedCountries).toEqual(expected)
+    expect(defaultRemoteConfig.selfCustodialCreationBlockedCountries).toEqual(expected)
+  })
 })

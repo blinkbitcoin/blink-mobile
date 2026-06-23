@@ -3569,6 +3569,10 @@
     "createFailed": "Cüzdan oluşturulamadı. Lütfen tekrar deneyin.",
     "selfCustodialDisabled": "Saklamasız mod geçici olarak kullanılamıyor."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Desteklenmeyen bölge",
+    "description": "Maalesef mevcut bölgenizdeki kullanıcılara hizmet veremiyoruz."
+  },
   "RestoreScreen": {
     "title": "Cüzdanı geri yükle",
     "description": "Cüzdanınızı bir yedekten geri yükleyin",

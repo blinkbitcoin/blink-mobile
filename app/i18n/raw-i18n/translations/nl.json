@@ -3569,6 +3569,10 @@
     "createFailed": "Kon portemonnee niet aanmaken. Probeer het opnieuw.",
     "selfCustodialDisabled": "Niet-bewarend is tijdelijk niet beschikbaar."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Niet-ondersteunde regio",
+    "description": "Helaas kunnen we geen gebruikers uit je huidige regio bedienen."
+  },
   "RestoreScreen": {
     "title": "Portemonnee herstellen",
     "description": "Herstel je portemonnee vanuit een back-up",

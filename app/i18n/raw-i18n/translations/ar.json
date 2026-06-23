@@ -3569,6 +3569,10 @@
     "createFailed": "فشل في إنشاء المحفظة. يرجى المحاولة مرة أخرى.",
     "selfCustodialDisabled": "غير الحفظ غير متاح مؤقتًا."
   },
+  "UnsupportedRegionScreen": {
+    "title": "منطقة غير مدعومة",
+    "description": "للأسف لا يمكننا خدمة المستخدمين من منطقتك الحالية."
+  },
   "RestoreScreen": {
     "title": "استعادة المحفظة",
     "description": "استعد محفظتك من نسخة احتياطية",

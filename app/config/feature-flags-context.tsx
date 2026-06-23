@@ -39,6 +39,8 @@ const CustodialFirstSignupBlockedCountriesKey = "custodialFirstSignupBlockedCoun
 const StablesatsBlockedCountriesKey = "stablesatsBlockedCountries"
 const StableTokenBlockedCountriesKey = "stableTokenBlockedCountries"
 const StableTokenTransferBlockedCountriesKey = "stableTokenTransferBlockedCountries"
+const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
+const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -83,6 +85,8 @@ type RemoteConfig = {
   [StablesatsBlockedCountriesKey]: string[]
   [StableTokenBlockedCountriesKey]: string[]
   [StableTokenTransferBlockedCountriesKey]: string[]
+  [CustodialCreationBlockedCountriesKey]: string[]
+  [SelfCustodialCreationBlockedCountriesKey]: string[]
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -119,6 +123,12 @@ const defaultCustodialBlocks = {
   ],
 }
 
+/** Default countries where account creation is blocked, redirecting to the Unsupported region screen (both account types). */
+// prettier-ignore
+const creationBlockedDefault = [
+  "CU", "IR", "KP", "SY", "RU", "BY",
+]
+
 export const defaultRemoteConfig: RemoteConfig = {
   deviceAccountEnabledRestAuth: false,
   balanceLimitToTriggerUpgradeModal: 2100,
@@ -148,6 +158,8 @@ export const defaultRemoteConfig: RemoteConfig = {
   stablesatsBlockedCountries: ["HK"],
   stableTokenBlockedCountries: ["HK"],
   stableTokenTransferBlockedCountries: stableTokenTransferBlockedDefault,
+  custodialCreationBlockedCountries: creationBlockedDefault,
+  selfCustodialCreationBlockedCountries: creationBlockedDefault,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -176,6 +188,12 @@ remoteConfigInstance().setDefaults({
   ),
   stableTokenTransferBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.stableTokenTransferBlockedCountries,
+  ),
+  custodialCreationBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.custodialCreationBlockedCountries,
+  ),
+  selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.selfCustodialCreationBlockedCountries,
   ),
 })
 
@@ -323,6 +341,16 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           defaultRemoteConfig.stableTokenTransferBlockedCountries,
         )
 
+        const custodialCreationBlockedCountries = getRemoteConfigStringList(
+          CustodialCreationBlockedCountriesKey,
+          defaultRemoteConfig.custodialCreationBlockedCountries,
+        )
+
+        const selfCustodialCreationBlockedCountries = getRemoteConfigStringList(
+          SelfCustodialCreationBlockedCountriesKey,
+          defaultRemoteConfig.selfCustodialCreationBlockedCountries,
+        )
+
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
@@ -351,6 +379,8 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           stablesatsBlockedCountries,
           stableTokenBlockedCountries,
           stableTokenTransferBlockedCountries,
+          custodialCreationBlockedCountries,
+          selfCustodialCreationBlockedCountries,
         })
       } catch (err) {
         logError({

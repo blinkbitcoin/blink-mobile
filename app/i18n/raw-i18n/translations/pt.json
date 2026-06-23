@@ -3569,6 +3569,10 @@
         "createFailed": "Falha ao criar a carteira. Por favor, tente novamente.",
         "selfCustodialDisabled": "O modo não custodial está temporariamente indisponível."
     },
+    "UnsupportedRegionScreen": {
+        "title": "Região não suportada",
+        "description": "Infelizmente não podemos atender utilizadores da sua região atual."
+    },
     "RestoreScreen": {
         "title": "Restaurar carteira",
         "description": "Recupere sua carteira a partir de um backup",

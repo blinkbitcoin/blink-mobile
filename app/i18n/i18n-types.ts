@@ -11866,6 +11866,16 @@ type RootTranslation = {
 		 */
 		createFailed: string
 	}
+	UnsupportedRegionScreen: {
+		/**
+		 * U​n​s​u​p​p​o​r​t​e​d​ ​r​e​g​i​o​n
+		 */
+		title: string
+		/**
+		 * U​n​f​o​r​t​u​n​a​t​e​l​y​ ​w​e​ ​c​a​n​ ​n​o​t​ ​s​e​r​v​e​ ​u​s​e​r​s​ ​f​r​o​m​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​g​i​o​n​.
+		 */
+		description: string
+	}
 	RestoreScreen: {
 		/**
 		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
@@ -24055,6 +24065,16 @@ export type TranslationFunctions = {
 		 * Failed to create wallet. Please try again.
 		 */
 		createFailed: () => LocalizedString
+	}
+	UnsupportedRegionScreen: {
+		/**
+		 * Unsupported region
+		 */
+		title: () => LocalizedString
+		/**
+		 * Unfortunately we can not serve users from your current region.
+		 */
+		description: () => LocalizedString
 	}
 	RestoreScreen: {
 		/**

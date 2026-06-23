@@ -3569,6 +3569,10 @@
         "createFailed": "Wallet konnte nicht erstellt werden. Bitte erneut versuchen.",
         "selfCustodialDisabled": "Nicht-verwahrend ist vorübergehend nicht verfügbar."
     },
+    "UnsupportedRegionScreen": {
+        "title": "Nicht unterstützte Region",
+        "description": "Leider können wir keine Nutzer aus deiner aktuellen Region bedienen."
+    },
     "RestoreScreen": {
         "title": "Wallet wiederherstellen",
         "description": "Stelle dein Wallet aus einer Sicherung wieder her",

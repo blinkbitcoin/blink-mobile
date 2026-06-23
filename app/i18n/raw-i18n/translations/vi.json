@@ -3569,6 +3569,10 @@
     "createFailed": "Không thể tạo ví. Vui lòng thử lại.",
     "selfCustodialDisabled": "Phi giám sát hiện không khả dụng."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Khu vực không được hỗ trợ",
+    "description": "Rất tiếc, chúng tôi không thể phục vụ người dùng từ khu vực hiện tại của bạn."
+  },
   "RestoreScreen": {
     "title": "Khôi phục ví",
     "description": "Khôi phục ví của bạn từ bản sao lưu",

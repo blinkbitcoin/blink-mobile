@@ -3569,6 +3569,10 @@
     "createFailed": "Nepodarilo sa vytvoriť peňaženku. Skúste to znova.",
     "selfCustodialDisabled": "Nesprávcovský režim je dočasne nedostupný."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Nepodporovaný región",
+    "description": "Bohužiaľ nemôžeme obsluhovať používateľov z vášho aktuálneho regiónu."
+  },
   "RestoreScreen": {
     "title": "Obnoviť peňaženku",
     "description": "Obnovte peňaženku zo zálohy",

@@ -3569,6 +3569,10 @@
         "createFailed": "Échec de la création du portefeuille. Veuillez réessayer.",
         "selfCustodialDisabled": "La non-custodial est temporairement indisponible."
     },
+    "UnsupportedRegionScreen": {
+        "title": "Région non prise en charge",
+        "description": "Malheureusement, nous ne pouvons pas servir les utilisateurs de votre région actuelle."
+    },
     "RestoreScreen": {
         "title": "Restaurer le portefeuille",
         "description": "Récupérez votre portefeuille à partir d'une sauvegarde",

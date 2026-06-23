@@ -9,6 +9,7 @@ import {
   useAccountTypeOptions,
   ACCOUNT_OPTION_TO_FLOW,
 } from "@app/hooks/use-account-type-options"
+import { useCreationBlock } from "@app/hooks/use-creation-block"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
 import { AccountTypeMode } from "@app/types/account"
@@ -49,12 +50,18 @@ export const GetStartedScreen: React.FC = () => {
 
   const { deviceAccountEnabled, nonCustodialEnabled } = useFeatureFlags()
   const { options, defaultSelected, loading: detectingCountry } = useAccountTypeOptions()
+  const { isCreationBlocked, loading: detectingRegion } = useCreationBlock()
   const canCreateAccount = options.length > 0
 
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
 
   const handleCreateAccount = () => {
     if (!canCreateAccount) return
+
+    if (options.every((option) => isCreationBlocked(option))) {
+      navigation.navigate("unsupportedRegion")
+      return
+    }
 
     logGetStartedAction({
       action: "create_device_account",
@@ -119,7 +126,7 @@ export const GetStartedScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.GetStartedScreen.createAccount()}
             onPress={handleCreateAccount}
-            disabled={!canCreateAccount || detectingCountry}
+            disabled={!canCreateAccount || detectingCountry || detectingRegion}
           />
           <GaloySecondaryButton
             title={

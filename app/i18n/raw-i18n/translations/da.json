@@ -3569,6 +3569,10 @@
     "createFailed": "Kunne ikke oprette tegnebog. Prøv venligst igen.",
     "selfCustodialDisabled": "Ikke-forvaltning er midlertidigt utilgængelig."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Ikke-understøttet region",
+    "description": "Desværre kan vi ikke betjene brugere fra din nuværende region."
+  },
   "RestoreScreen": {
     "title": "Gendan tegnebog",
     "description": "Gendan din tegnebog fra en sikkerhedskopi",

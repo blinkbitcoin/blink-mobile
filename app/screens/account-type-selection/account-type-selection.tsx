@@ -12,6 +12,7 @@ import {
   AccountOption,
   useAccountTypeOptions,
 } from "@app/hooks/use-account-type-options"
+import { useCreationBlock } from "@app/hooks/use-creation-block"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { AccountTypeMode } from "@app/types/account"
@@ -34,6 +35,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     selfCustodialTemporarilyDisabled,
     loading: detectingCountry,
   } = useAccountTypeOptions(mode)
+  const { isCreationBlocked, loading: detectingRegion } = useCreationBlock()
   const [selected, setSelected] = useState<AccountOption | null>(defaultSelected)
 
   useEffect(() => {
@@ -44,6 +46,10 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     if (!selected) return
 
     if (mode === AccountTypeMode.Create) {
+      if (isCreationBlocked(selected)) {
+        navigation.navigate("unsupportedRegion")
+        return
+      }
       navigation.navigate("acceptTermsAndConditions", {
         flow: ACCOUNT_OPTION_TO_FLOW[selected],
       })
@@ -147,7 +153,11 @@ export const AccountTypeSelectionScreen: React.FC = () => {
                 : LL.AccountTypeSelectionScreen.chooseMethod()
             }
             onPress={handleContinue}
-            disabled={!selected || detectingCountry}
+            disabled={
+              !selected ||
+              detectingCountry ||
+              (mode === AccountTypeMode.Create && detectingRegion)
+            }
             {...testProps("continue-button")}
           />
         </View>

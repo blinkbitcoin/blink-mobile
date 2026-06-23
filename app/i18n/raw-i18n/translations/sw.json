@@ -3569,6 +3569,10 @@
     "createFailed": "Imeshindwa kuunda mkoba. Tafadhali jaribu tena.",
     "selfCustodialDisabled": "Isiyo na ulinzi haipatikani kwa muda."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Eneo lisilotumika",
+    "description": "Kwa bahati mbaya hatuwezi kuhudumia watumiaji kutoka eneo lako la sasa."
+  },
   "RestoreScreen": {
     "title": "Rejesha mkoba",
     "description": "Rejesha mkoba wako kutoka kwa nakala",
