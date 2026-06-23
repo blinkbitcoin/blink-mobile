@@ -2463,8 +2463,8 @@
     "modalTitle": "Số dư đô la không khả dụng tại khu vực của bạn"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Số dư Đô la không còn khả dụng ở khu vực của bạn",
-    "body": "Chuyển số dư Đô la của bạn sang Bitcoin",
+    "title": "Số dư đô la không khả dụng tại khu vực của bạn",
+    "body": "Chuyển từ Số dư Đô la sang Số dư Bitcoin",
     "youHave": "Bạn có",
     "youGet": "Bạn nhận được"
   },

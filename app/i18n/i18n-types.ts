@@ -8154,7 +8154,7 @@ type RootTranslation = {
 	}
 	ConvertDollarToBitcoinModal: {
 		/**
-		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		title: string
 		/**
@@ -20410,7 +20410,7 @@ export type TranslationFunctions = {
 	}
 	ConvertDollarToBitcoinModal: {
 		/**
-		 * Dollar Balance is no longer available in your region
+		 * Dollar Balance is not available in your region
 		 */
 		title: () => LocalizedString
 		/**

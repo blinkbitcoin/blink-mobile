@@ -2463,8 +2463,8 @@
     "modalTitle": "A dolláregyenleg nem érhető el a régiódban"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "A Dollár Egyenleg már nem érhető el a régiódban",
-    "body": "Utald át a dolláregyenleged Bitcoinra",
+    "title": "A dolláregyenleg nem érhető el a régiódban",
+    "body": "Utald át a dolláregyenlegről a Bitcoin-egyenlegre",
     "youHave": "Nálad van",
     "youGet": "Kapsz"
   },

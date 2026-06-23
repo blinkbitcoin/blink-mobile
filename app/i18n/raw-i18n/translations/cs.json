@@ -2463,8 +2463,8 @@
     "modalTitle": "Dolarový zůstatek není ve vašem regionu k dispozici"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dolarový zůstatek již není ve vašem regionu dostupný",
-    "body": "Převeďte svůj zůstatek v dolarech na Bitcoin",
+    "title": "Dolarový zůstatek není ve vašem regionu k dispozici",
+    "body": "Převeďte z dolarového zůstatku na bitcoinový zůstatek",
     "youHave": "Máte",
     "youGet": "Získáte"
   },

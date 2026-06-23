@@ -2463,8 +2463,8 @@
     "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Het Dollarsaldo is niet langer beschikbaar in jouw regio",
-    "body": "Breng je dollarsaldo over naar Bitcoin",
+    "title": "Dollar-saldo is niet beschikbaar in jouw regio",
+    "body": "Zet over van dollarsaldo naar Bitcoin-saldo",
     "youHave": "Je hebt",
     "youGet": "Je krijgt"
   },

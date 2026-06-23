@@ -2463,8 +2463,8 @@
         "modalTitle": "Le solde en dollars n'est pas disponible dans votre région"
     },
     "ConvertDollarToBitcoinModal": {
-        "title": "Le Solde Dollar n'est plus disponible dans votre région",
-        "body": "Transférez votre solde Dollar en Bitcoin",
+        "title": "Le solde en dollars n'est pas disponible dans votre région",
+        "body": "Transférez du solde en dollars vers le solde en Bitcoin",
         "youHave": "Vous avez",
         "youGet": "Vous recevez"
     },

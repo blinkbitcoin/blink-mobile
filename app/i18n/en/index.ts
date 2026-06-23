@@ -2600,8 +2600,8 @@ const en: BaseTranslation = {
     modalTitle: "Dollar Balance is not available in your region",
   },
   ConvertDollarToBitcoinModal: {
-    title: "Dollar Balance is no longer available in your region",
-    body: "Transfer your Dollar balance to Bitcoin",
+    title: "Dollar Balance is not available in your region",
+    body: "Transfer from Dollar Balance to Bitcoin Balance",
     youHave: "You have",
     youGet: "You get",
   },

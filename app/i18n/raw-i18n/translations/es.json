@@ -2463,8 +2463,8 @@
         "modalTitle": "El saldo en dólares no está disponible en tu región"
     },
     "ConvertDollarToBitcoinModal": {
-        "title": "El Saldo Dólar ya no está disponible en tu región",
-        "body": "Transfiere tu saldo Dólar a Bitcoin",
+        "title": "El saldo en dólares no está disponible en tu región",
+        "body": "Transfiere del saldo en dólares al saldo en Bitcoin",
         "youHave": "Tienes",
         "youGet": "Recibes"
     },

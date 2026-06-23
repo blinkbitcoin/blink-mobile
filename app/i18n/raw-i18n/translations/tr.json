@@ -2463,8 +2463,8 @@
     "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dolar Bakiyesi artık bölgenizde kullanılamıyor",
-    "body": "Dolar bakiyenizi Bitcoin'e aktarın",
+    "title": "Dolar bakiyesi bölgenizde kullanılamıyor",
+    "body": "Dolar Bakiyesinden Bitcoin Bakiyesine aktarın",
     "youHave": "Sahip olduğunuz",
     "youGet": "Alacağınız"
   },

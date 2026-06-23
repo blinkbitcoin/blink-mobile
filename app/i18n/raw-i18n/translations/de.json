@@ -2463,8 +2463,8 @@
         "modalTitle": "Dollar-Guthaben ist in deiner Region nicht verfügbar"
     },
     "ConvertDollarToBitcoinModal": {
-        "title": "Das Dollar-Guthaben ist in deiner Region nicht mehr verfügbar",
-        "body": "Übertrage dein Dollar-Guthaben in Bitcoin",
+        "title": "Dollar-Guthaben ist in deiner Region nicht verfügbar",
+        "body": "Übertrage vom Dollar-Guthaben auf das Bitcoin-Guthaben",
         "youHave": "Du hast",
         "youGet": "Du erhältst"
     },
