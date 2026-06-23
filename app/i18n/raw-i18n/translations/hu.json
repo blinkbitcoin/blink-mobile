@@ -2862,7 +2862,7 @@
     }
   },
   "support": {
-    "contactUs": "Segítségre van szükséged? Írj nekünk.",
+    "contactUs": "Segítségre van szükséged? Írj nekünk!",
     "joinTheCommunity": "Csatlakozz a közösséghez",
     "whatsapp": "WhatsApp",
     "email": "Email",
@@ -3486,13 +3486,13 @@
       "manualBackup": "Kézi biztonsági mentés",
       "passwordManagerBackupSaved": "Biztonsági mentés elmentve a jelszókezelőbe",
       "passwordManagerBackupFailed": "Nem sikerült elmenteni a biztonsági mentést",
-      "passwordManagerUnavailable": "Ezen az eszközön nem érhető el jelszókezelő. Használja a Drive biztonsági mentését, vagy mentse el a 12 szavas kifejezését manuálisan."
+      "passwordManagerUnavailable": "Ezen az eszközön nem érhető el jelszókezelő. Használd a Drive biztonsági mentését, vagy mentsd el a 12 szavas kifejezésedet manuálisan."
     },
     "ManualBackup": {
       "Alerts": {
         "title": "Tartsd titokban a biztonsági mentési kifejezésed!",
-        "check1": "Megértem, hogy senki sem tudja visszaállítani a pénztárcámat, ha elveszítem ezt a kifejezést",
-        "check2": "Megértem, hogy ha valaki megszerzi ezt a kifejezést, ellophatja az összes pénzemet.",
+        "check1": "Megértettem, hogy senki sem tudja visszaállítani a pénztárcámat, ha elveszítem ezt a kifejezést",
+        "check2": "Megértettem, hogy ha valaki megszerzi ezt a kifejezést, ellophatja az összes pénzemet",
         "check3": "Senki nem kéri tőlem ezeket az információkat üzenetben vagy hívásban"
       },
       "Phrase": {
@@ -3504,7 +3504,7 @@
         "savedConfirm": "Elmentettem",
         "copy": "Másolás",
         "continueButton": "Tovább",
-        "testBackup": "Tesztelje a biztonsági másolatot"
+        "testBackup": "Teszteld a biztonsági mentést"
       },
       "Confirm": {
         "headerTitle": "Biztonsági mentés megerősítése",
@@ -3515,7 +3515,7 @@
         "incorrectWord": "Helytelen szó, kérlek ellenőrizd a sorrendet"
       },
       "Success": {
-        "title": "Üdvözöljük a nem letétkezelő Blinkben",
+        "title": "Üdvözlünk az önrendelkező Blinkben",
         "testSuccess": "A biztonsági mentési kifejezésed helyes"
       }
     },
@@ -3547,31 +3547,31 @@
     }
   },
   "AccountMigration": {
-    "moveToNonCustodial": "Áttérés non-custodial-ra",
-    "explainerTitle": "Mit jelent a non-custodial-ra való áttérés?",
-    "explainerStep1": "Létrehozol egy non-custodial fiókot a Spark protokollon, <link>tudj meg többet itt</link>",
-    "explainerStep2": "Átutaljuk az egyenlegedet az új non-custodial fiókodba, és a jelenlegi fiókod törlésre kerül",
+    "moveToNonCustodial": "Áttérés önrendelkezőre",
+    "explainerTitle": "Mit jelent az önrendelkező módra való áttérés?",
+    "explainerStep1": "Létrehozol egy önrendelkező fiókot a Spark protokollon, <link>tudj meg többet itt</link>",
+    "explainerStep2": "Átutaljuk az egyenlegedet az új önrendelkező fiókodba, és a jelenlegi fiókod törlésre kerül",
     "explainerStep3": "Használd tovább a Blinket a megszokott módon",
     "letsMove": "Rajta",
     "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Letéti",
-    "selfCustodialLabel": "Önletéti",
-    "custodialDescription": "Mi kezeljük a pénzeszközöket az Ön nevében",
-    "selfCustodialDescription": "Csak Ön férhet hozzá a pénzeszközökhöz",
+    "selfCustodialLabel": "Önrendelkező",
+    "custodialDescription": "Mi kezeljük a pénzeszközeidet a nevedben",
+    "selfCustodialDescription": "Csak te férhetsz hozzá a pénzeszközeidhez",
     "continueButton": "Folytatás",
-    "descriptionDefault": "Kérjük, válassza ki a kívánt Blink típust.",
-    "descriptionSelected": "Kérjük, válassza ki a fiók típusát.",
-    "chooseMethod": "Válasszon módszert",
+    "descriptionDefault": "Válaszd ki a kívánt Blink típust.",
+    "descriptionSelected": "Válaszd ki a fiók típusát.",
+    "chooseMethod": "Válassz módszert",
     "restoreComingSoonTitle": "Hamarosan elérhető",
     "restoreComingSoonDescription": "A visszaállítási funkció egy jövőbeli frissítésben lesz elérhető.",
     "createFailed": "Nem sikerült létrehozni a pénztárcát. Kérjük, próbáld újra.",
-    "selfCustodialDisabled": "A nem-letétkezelői mód átmenetileg nem érhető el."
+    "selfCustodialDisabled": "Az önrendelkező mód átmenetileg nem érhető el."
   },
   "RestoreScreen": {
     "title": "Tárca visszaállítása",
-    "description": "Állítsa vissza tárcáját biztonsági mentésből",
+    "description": "Állítsd vissza a tárcádat biztonsági mentésből",
     "phraseTitle": "Tárca visszaállítása",
     "phraseSubtitleStep1": "Add meg a biztonsági kifejezésed első 6 szavát",
     "phraseSubtitleStep2": "Add meg a biztonsági kifejezésed többi szavát",
@@ -3591,12 +3591,12 @@
     "pickBackupDescription": "Válassz egy biztonsági mentést a visszaállításhoz"
   },
   "BackupNudge": {
-    "title": "Az Ön pénzeszközei veszélyben vannak",
-    "description": "Biztosítsa tárcáját most. Csak egy percet vesz igénybe.",
+    "title": "Pénzeszközeid veszélyben vannak",
+    "description": "Biztosítsd a tárcádat most. Csak egy percet vesz igénybe.",
     "cta": "Tárca biztosítása",
-    "settingsWarning": "Készíts biztonsági mentést. Ha elveszíted ezt az eszközt, elveszíted a pénzedet.",
-    "modalTitle": "Biztosítsa pénzeszközeit",
-    "modalDescription": "Nyomatékosan javasoljuk, hogy készítsen biztonsági mentést a tárcájáról, hogy megelőzze a pénzeszközök teljes elvesztését, ha elveszíti ezt az eszközt.",
+    "settingsWarning": "Készíts biztonsági mentést! Ha elveszíted ezt az eszközt, elveszíted a pénzedet.",
+    "modalTitle": "Biztosítsd a pénzeszközeidet",
+    "modalDescription": "Nyomatékosan javasoljuk, hogy készíts biztonsági mentést a tárcádról, hogy megelőzd a pénzeszközeid teljes elvesztését, ha elveszíted ezt az eszközt.",
     "secureMe": "Tárca biztosítása"
   },
   "StableBalance": {
