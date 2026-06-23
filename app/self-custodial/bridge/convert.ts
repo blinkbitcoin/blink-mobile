@@ -24,7 +24,7 @@ import {
 import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts"
 import { toNumber } from "@app/utils/helper"
 
-import { requireSparkTokenIdentifier, SparkConfig } from "../config"
+import { MAX_SLIPPAGE_BPS, requireSparkTokenIdentifier } from "../config"
 
 import { buildConversionType, fetchConversionLimits } from "./limits"
 import { fetchUsdbDecimals, findUsdbToken } from "./token-balance"
@@ -83,7 +83,7 @@ const createOwnSparkInvoice = async (
 
 const buildConversionOptions = (direction: ConvertDirection) => ({
   conversionType: buildConversionType(direction),
-  maxSlippageBps: SparkConfig.maxSlippageBps,
+  maxSlippageBps: MAX_SLIPPAGE_BPS,
   completionTimeoutSecs: undefined,
 })
 

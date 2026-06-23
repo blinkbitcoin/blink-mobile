@@ -273,7 +273,7 @@ type RootTranslation = {
 		 */
 		youreConverting: string
 		/**
-		 * R​e​c​e​i​v​i​n​g​ ​b​a​l​a​n​c​e
+		 * R​e​c​e​i​v​i​n​g​ ​B​a​l​a​n​c​e
 		 */
 		receivingAccount: string
 		/**
@@ -7588,7 +7588,7 @@ type RootTranslation = {
 		 */
 		copyClipboardLnurl: string
 		/**
-		 * D​e​f​a​u​l​t​ ​B​a​l​a​n​c​e
+		 * D​e​f​a​u​l​t​ ​r​e​c​e​i​v​e
 		 */
 		defaultWallet: string
 		/**
@@ -7835,7 +7835,7 @@ type RootTranslation = {
 		 */
 		logoutAlertContentPhoneEmail: RequiredParams<'email' | 'phoneNumber'>
 		/**
-		 * Y​o​u​ ​h​a​v​e​ ​a​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.
+		 * Y​o​u​ ​h​a​v​e​ ​a​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.
 		 * @param {string} balance
 		 */
 		usdBalanceWarning: RequiredParams<'balance'>
@@ -8054,11 +8054,11 @@ type RootTranslation = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * D​e​f​a​u​l​t​ ​B​a​l​a​n​c​e
+		 * D​e​f​a​u​l​t​ ​r​e​c​e​i​v​e
 		 */
 		title: string
 		/**
-		 * D​e​f​a​u​l​t​ ​B​a​l​a​n​c​e
+		 * D​e​f​a​u​l​t​ ​r​e​c​e​i​v​e
 		 */
 		titleSelfCustodial: string
 		/**
@@ -8070,7 +8070,7 @@ type RootTranslation = {
 		 */
 		infoUsd: string
 		/**
-		 * D​u​e​ ​t​o​ ​u​s​e​r​ ​e​x​p​e​r​i​e​n​c​e​ ​c​o​n​c​e​r​n​s​ ​w​e​ ​d​e​c​i​d​e​d​ ​t​o​ ​n​o​t​ ​a​c​t​i​v​a​t​e​ ​t​h​i​s​ ​f​e​a​t​u​r​e​ ​i​n​ ​t​h​e​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​.​ ​O​n​l​y​ ​B​i​t​c​o​i​n​ ​i​s​ ​a​v​a​i​l​a​b​l​e​ ​a​s​ ​y​o​u​r​ ​d​e​f​a​u​l​t​ ​r​e​c​e​i​v​e​ ​s​e​t​t​i​n​g​.
+		 * D​o​l​l​a​r​ ​r​e​c​e​i​v​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​a​s​ ​a​ ​d​e​f​a​u​l​t​ ​r​e​c​e​i​v​e​ ​o​p​t​i​o​n​ ​f​o​r​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​.
 		 */
 		infoUsdSelfCustodial: string
 	}
@@ -8164,7 +8164,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n
+		 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n
 		 */
 		body: string
 		/**
@@ -12020,6 +12020,13 @@ type RootTranslation = {
 		 */
 		generic: string
 	}
+	SelfCustodialNetworkMismatch: {
+		/**
+		 * T​h​i​s​ ​a​c​c​o​u​n​t​ ​w​a​s​ ​c​r​e​a​t​e​d​ ​o​n​ ​{​n​e​t​w​o​r​k​}​.​ ​S​w​i​t​c​h​ ​t​o​ ​{​n​e​t​w​o​r​k​}​ ​t​o​ ​u​s​e​ ​i​t​.
+		 * @param {string} network
+		 */
+		toast: RequiredParams<'network' | 'network'>
+	}
 	UnclaimedDeposit: {
 		/**
 		 * U​n​c​l​a​i​m​e​d​ ​D​e​p​o​s​i​t​s
@@ -12589,7 +12596,7 @@ export type TranslationFunctions = {
 		 */
 		youreConverting: () => LocalizedString
 		/**
-		 * Receiving balance
+		 * Receiving Balance
 		 */
 		receivingAccount: () => LocalizedString
 		/**
@@ -19857,7 +19864,7 @@ export type TranslationFunctions = {
 		 */
 		copyClipboardLnurl: () => LocalizedString
 		/**
-		 * Default Balance
+		 * Default receive
 		 */
 		defaultWallet: () => LocalizedString
 		/**
@@ -20097,7 +20104,7 @@ export type TranslationFunctions = {
 		 */
 		logoutAlertContentPhoneEmail: (arg: { email: string, phoneNumber: string }) => LocalizedString
 		/**
-		 * You have a Dollar Balance of {balance}.
+		 * You have a Dollar balance of {balance}.
 		 */
 		usdBalanceWarning: (arg: { balance: string }) => LocalizedString
 		/**
@@ -20313,11 +20320,11 @@ export type TranslationFunctions = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * Default Balance
+		 * Default receive
 		 */
 		title: () => LocalizedString
 		/**
-		 * Default Balance
+		 * Default receive
 		 */
 		titleSelfCustodial: () => LocalizedString
 		/**
@@ -20329,7 +20336,7 @@ export type TranslationFunctions = {
 		 */
 		infoUsd: () => LocalizedString
 		/**
-		 * Due to user experience concerns we decided to not activate this feature in the non-custodial accounts. Only Bitcoin is available as your default receive setting.
+		 * Dollar receive is not available as a default receive option for non-custodial accounts.
 		 */
 		infoUsdSelfCustodial: () => LocalizedString
 	}
@@ -20423,7 +20430,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Transfer your Dollar Balance to Bitcoin
+		 * Transfer your Dollar balance to Bitcoin
 		 */
 		body: () => LocalizedString
 		/**
@@ -24212,6 +24219,12 @@ export type TranslationFunctions = {
 		 * The payment could not be completed. Try again in a moment, or use a smaller amount.
 		 */
 		generic: () => LocalizedString
+	}
+	SelfCustodialNetworkMismatch: {
+		/**
+		 * This account was created on {network}. Switch to {network} to use it.
+		 */
+		toast: (arg: { network: string }) => LocalizedString
 	}
 	UnclaimedDeposit: {
 		/**

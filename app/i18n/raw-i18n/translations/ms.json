@@ -2081,7 +2081,7 @@
     "scan": "Jejak",
     "updateAvailable": "Ada kemaskini terbaharu\ntekan untuk kemaskini sekarang",
     "useLightning": "Kami menggunakan Lightning Network.",
-    "myAccounts": "Akaun aku",
+    "myAccounts": "Baki",
     "walletCountNotTwo": "Bilangan dompet bukan 2. Sila gunakan papan pemuka untuk melihat semua dompet dan dana akaun ini"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Tak dapat untuk eksport transaksi kepada fail csv. Ada berlaku masalah. Jika masalah ini berterusan, hubungi pasukan sokongan.",
     "lnurlNoUsername": "Untuk menjana alamat lnurl anda mesti mempunyai ID pengguna. Nak tetapkan ID pengguna anda sekarang?",
     "copyClipboardLnurl": "Alamat Lnurl telah disalin dalam clipboard",
-    "defaultWallet": "Akaun tetap",
+    "defaultWallet": "Penerimaan lalai",
     "rateUs": "Berikan rating anda {storeName: string}",
     "theme": "Tema",
     "nfc": "Terima dari NFC",
@@ -2488,11 +2488,11 @@
     "toastMessage": "Kata rahsia telah disalin pada papan klip!"
   },
   "DefaultWalletScreen": {
-    "title": "Akaun penerima lalai",
-    "titleSelfCustodial": "Akaun lalai",
+    "title": "Penerimaan lalai",
+    "titleSelfCustodial": "Penerimaan lalai",
     "infoBtc": "Akaun Bitcoin anda untuk mengumpul sats, di mana nilai USD bergerak mengikut pasaran.",
     "infoUsd": "Akaun Dolar anda dikuasakan oleh Stablesats — menyimpan Bitcoin yang dilindung nilai untuk kekal stabil dalam nilai USD. Anda sentiasa memegang Bitcoin, tetapi nilai dolar tidak berubah.",
-    "infoUsdSelfCustodial": "Atas sebab pengalaman pengguna, kami memutuskan untuk tidak mengaktifkan ciri ini dalam akaun bukan kustodian. Hanya Bitcoin tersedia sebagai tetapan terima lalai anda."
+    "infoUsdSelfCustodial": "Penerimaan Dolar tidak tersedia sebagai pilihan penerimaan lalai untuk akaun bukan kustodian."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -3666,6 +3666,9 @@
     "networkError": "Masalah sambungan rangkaian. Semak sambungan anda dan cuba lagi.",
     "invalidInput": "Butiran pembayaran kelihatan tidak sah. Sila semak dan cuba lagi.",
     "generic": "Pembayaran tidak dapat diselesaikan. Cuba lagi sekejap, atau gunakan jumlah yang lebih kecil."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Akaun ini dicipta pada {network}. Tukar ke {network} untuk menggunakannya."
   },
   "UnclaimedDeposit": {
     "title": "Anda mempunyai {count} deposit yang belum dituntut",

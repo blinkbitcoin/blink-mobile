@@ -2081,7 +2081,7 @@
     "scan": "Escaneja",
     "updateAvailable": "Hi ha una actualització.\nToca per actualitzar ara",
     "useLightning": "Utilitzem la xaxa Lightning.",
-    "myAccounts": "Els meus comptes",
+    "myAccounts": "Saldos",
     "walletCountNotTwo": "El recompte de moneders no és 2. Utilitza el tauler per veure tots els moneders i els fons d'aquest compte"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "No es poden exportar transaccions a csv. Alguna cosa ha anat malament. Si el problema persisteix,  contacta amb el servei d'assistència.",
     "lnurlNoUsername": "Per generar una adreça lnurl primer has d'establir un nom d'usuari. Vols configurar un nom d'usuari ara?",
     "copyClipboardLnurl": "L'adreça Lnurl s'ha copiat al porta-retalls",
-    "defaultWallet": "Compte predeterminat",
+    "defaultWallet": "Rebre per defecte",
     "rateUs": "Valora'ns a {storeName: string}",
     "theme": "Tema",
     "nfc": "Rep per NFC",
@@ -2488,11 +2488,11 @@
     "toastMessage": "El secret s'ha copiat al porta-retalls!"
   },
   "DefaultWalletScreen": {
-    "title": "Compte de recepció predeterminat",
-    "titleSelfCustodial": "Compte per defecte",
+    "title": "Rebre per defecte",
+    "titleSelfCustodial": "Rebre per defecte",
     "infoBtc": "El teu Compte Bitcoin és per acumular sats, on el valor USD es mou amb el mercat.",
     "infoUsd": "El teu Compte Dòlar està impulsat per Stablesats — conté Bitcoin cobert per mantenir-se estable en termes USD. Sempre tens Bitcoin, però el valor en dòlars no canvia.",
-    "infoUsdSelfCustodial": "Per motius d'experiència d'usuari, hem decidit no activar aquesta funció als comptes no custodials. Només Bitcoin està disponible com a configuració de recepció predeterminada."
+    "infoUsdSelfCustodial": "La recepció en dòlars no està disponible com a opció de recepció predeterminada per als comptes no custodials."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -3666,6 +3666,9 @@
     "networkError": "Problema de connexió de xarxa. Comprova la teva connexió i torna-ho a provar.",
     "invalidInput": "Els detalls del pagament semblen invàlids. Si us plau, revisa'ls i torna-ho a provar.",
     "generic": "No s'ha pogut completar el pagament. Torna-ho a provar en un moment, o utilitza un import més petit."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Aquest compte es va crear a {network}. Canvia a {network} per utilitzar-lo."
   },
   "UnclaimedDeposit": {
     "title": "Tens {count} dipòsit(s) no reclamat(s)",

@@ -11,6 +11,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logSelfCustodialRestoreCompleted } from "@app/self-custodial/analytics"
 import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   BackupMethod,
   markBackupCompletedFor,
@@ -41,6 +42,7 @@ export const useRestoreWallet = () => {
   const { reloadSelfCustodialAccounts } = useAccountRegistry()
   const [status, setStatus] = useState<RestoreWalletStatus>(RestoreWalletStatus.Idle)
   const guard = useInFlightGuard()
+  const network = useSparkNetwork()
 
   const activateAccount = useCallback(
     (accountId: string) => {
@@ -77,7 +79,7 @@ export const useRestoreWallet = () => {
           }
 
           const accountId = Crypto.randomUUID()
-          await selfCustodialRestoreWallet(accountId, normalized)
+          await selfCustodialRestoreWallet(accountId, normalized, network)
           await markBackupCompletedFor(accountId, BackupMethod.Manual)
           await reloadSelfCustodialAccounts()
 
@@ -93,7 +95,15 @@ export const useRestoreWallet = () => {
         }
       })
     },
-    [guard, activateAccount, reinitSdk, reloadSelfCustodialAccounts, navigation, LL],
+    [
+      guard,
+      activateAccount,
+      reinitSdk,
+      reloadSelfCustodialAccounts,
+      navigation,
+      LL,
+      network,
+    ],
   )
 
   return { restore, status }

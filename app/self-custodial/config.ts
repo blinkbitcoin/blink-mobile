@@ -2,6 +2,8 @@ import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import Config from "react-native-config"
 import { DocumentDirectoryPath } from "react-native-fs"
 
+import { type GaloyInstanceName } from "@app/config/galoy-instances"
+
 export const SparkToken = {
   Label: "USDB",
   DefaultDecimals: 6,
@@ -9,35 +11,49 @@ export const SparkToken = {
 
 export type SparkToken = (typeof SparkToken)[keyof typeof SparkToken]
 
-const SPARK_ADDRESS_SHAPE_PATTERN = /^(?:sp1|sprt1)/i
+export const MAX_SLIPPAGE_BPS = 50
+
+// Spark bech32 HRPs (spark1/sparkrt1); gates the async sdk.parse, which can hang on some non-Spark bech32 input.
+const SPARK_ADDRESS_SHAPE_PATTERN = /^(?:spark1|sparkrt1)/i
 
 export const hasSparkAddressShape = (input: string): boolean =>
   SPARK_ADDRESS_SHAPE_PATTERN.test(input.trim())
 
-const NETWORK_MAP: Record<string, Network> = {
-  mainnet: Network.Mainnet,
-  regtest: Network.Regtest,
+export type SparkNetworkLabel = "mainnet" | "regtest"
+
+/**
+ * Self-custodial follows the same environment mapping as custodial. Breez only
+ * supports mainnet and regtest, so every non-Main instance maps to regtest.
+ */
+export const networkForInstance = (instanceId: GaloyInstanceName): Network =>
+  instanceId === "Main" ? Network.Mainnet : Network.Regtest
+
+export const networkLabelFor = (network: Network): SparkNetworkLabel =>
+  network === Network.Mainnet ? "mainnet" : "regtest"
+
+export const isRegtestNetwork = (network: Network): boolean => network === Network.Regtest
+
+const MAINNET_LNURL_DOMAIN = "blink.sv"
+const REGTEST_LNURL_DOMAIN = "staging.blink.sv"
+
+export const lnurlDomainFor = (network: Network): string =>
+  network === Network.Mainnet ? MAINNET_LNURL_DOMAIN : REGTEST_LNURL_DOMAIN
+
+/**
+ * Returns the wallet's stored network label when it conflicts with the current
+ * network, or null when there is no stored label or it matches. Single source
+ * of the mismatch rule shared by the SDK connect gate and the mismatch toast.
+ */
+export const mismatchedNetworkLabel = (
+  storedLabel: string | null,
+  network: Network,
+): string | null => {
+  if (!storedLabel) return null
+  return storedLabel === networkLabelFor(network) ? null : storedLabel
 }
 
-const parseNetwork = (): Network => {
-  const raw = Config.BREEZ_NETWORK?.toLowerCase()
-  if (!raw) return Network.Mainnet
-  const network = NETWORK_MAP[raw]
-  if (network === undefined) {
-    throw new Error(`Unknown BREEZ_NETWORK: "${raw}". Expected: mainnet, regtest`)
-  }
-  return network
-}
-
-export const SparkNetwork = parseNetwork()
-
-export const SparkNetworkLabel = SparkNetwork === Network.Mainnet ? "mainnet" : "regtest"
-
-export const SparkConfig = {
-  network: SparkNetwork,
-  storageDir: `${DocumentDirectoryPath}/breez-sdk-spark-${SparkNetworkLabel}`,
-  maxSlippageBps: 50,
-} as const
+export const storageDirFor = (accountId: string, network: Network): string =>
+  `${DocumentDirectoryPath}/breez-sdk-spark-${networkLabelFor(network)}/${accountId}`
 
 // Validates BREEZ_API_KEY at SDK init (from `lifecycle.createSdkConfig`). A
 // missing key means the build is misconfigured (e.g. release minification
@@ -68,6 +84,3 @@ export const requireSparkTokenIdentifier = (): string => {
   cachedTokenIdentifier = id
   return id
 }
-
-export const storageDirFor = (accountId: string): string =>
-  `${SparkConfig.storageDir}/${accountId}`

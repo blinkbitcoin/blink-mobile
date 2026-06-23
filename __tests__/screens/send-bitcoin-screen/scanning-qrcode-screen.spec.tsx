@@ -1,5 +1,6 @@
 import React from "react"
 import { Alert } from "react-native"
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { act, render, waitFor } from "@testing-library/react-native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -33,6 +34,10 @@ jest.mock("react-native-permissions", () => ({
   request: jest.fn().mockResolvedValue("granted"),
   PERMISSIONS: { IOS: { CAMERA: "ios-camera" }, ANDROID: { CAMERA: "android-camera" } },
   RESULTS: { GRANTED: "granted", UNAVAILABLE: "unavailable" },
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockSparkNetwork.Regtest,
 }))
 
 const mockNavigate = jest.fn()
@@ -139,7 +144,8 @@ describe("ScanningQRCodeScreen", () => {
 
     expect(mockResolveDestination).toHaveBeenCalledWith(
       expect.objectContaining({ rawInput: "lnbc1qrcode", inputSource: "qr" }),
-      null,
+      { sdk: null, network: mockSparkNetwork.Regtest },
+      "blink.sv",
     )
   })
 
@@ -155,11 +161,12 @@ describe("ScanningQRCodeScreen", () => {
     })
 
     await renderScreen()
-    await fireScan("sp1qabc")
+    await fireScan("sparkrt1qabc")
 
     expect(mockResolveDestination).toHaveBeenCalledWith(
-      expect.objectContaining({ rawInput: "sp1qabc" }),
-      sdk,
+      expect.objectContaining({ rawInput: "sparkrt1qabc" }),
+      { sdk, network: mockSparkNetwork.Regtest },
+      "blink.sv",
     )
   })
 
@@ -179,6 +186,7 @@ describe("ScanningQRCodeScreen", () => {
     expect(mockResolveDestination).toHaveBeenCalledWith(
       expect.objectContaining({ lnurlDomains: [] }),
       expect.anything(),
+      "blink.sv",
     )
   })
 
@@ -197,7 +205,8 @@ describe("ScanningQRCodeScreen", () => {
       expect.objectContaining({
         lnurlDomains: ["blink.sv", "blink.sv", "pay.blink.sv", "pay.bbw.sv"],
       }),
-      null,
+      { sdk: null, network: mockSparkNetwork.Regtest },
+      "blink.sv",
     )
   })
 

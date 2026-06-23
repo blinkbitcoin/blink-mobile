@@ -1,7 +1,7 @@
 # Verifying Android env config survives R8 (`react-native-config` + ProGuard)
 
 This document explains a class of Android-only bug where `react-native-config`
-values (`BREEZ_API_KEY`, `SPARK_TOKEN_IDENTIFIER`, `BREEZ_NETWORK`, …) are
+values (`BREEZ_API_KEY`, `SPARK_TOKEN_IDENTIFIER`, …) are
 present in the build but **stripped from the release APK by R8/ProGuard**, and
 how to reproduce and verify both the problem and the fix locally — without a
 device and without real secrets.
@@ -80,7 +80,6 @@ nix develop -c keytool -genkeypair -v -keystore android/app/release.keystore \
 cat > .env <<'EOF'
 BREEZ_API_KEY=placeholder-breez-key-local-test
 SPARK_TOKEN_IDENTIFIER=placeholder-spark-token-local-test
-BREEZ_NETWORK=mainnet
 EOF
 ```
 
@@ -121,7 +120,6 @@ nix develop -c sh -c "apkanalyzer dex code --class com.galoyapp.BuildConfig '$AP
 
 ```
 .field public static final BREEZ_API_KEY:Ljava/lang/String; = "placeholder-breez-key-local-test"
-.field public static final BREEZ_NETWORK:Ljava/lang/String; = "mainnet"
 .field public static final SPARK_TOKEN_IDENTIFIER:Ljava/lang/String; = "placeholder-spark-token-local-test"
 ```
 

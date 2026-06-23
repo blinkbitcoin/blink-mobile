@@ -9,6 +9,7 @@ import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { selfCustodialCreateWallet } from "@app/self-custodial/bridge"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { reportError } from "@app/utils/error-logging"
@@ -30,13 +31,14 @@ export const useCreateWallet = () => {
   const { LL } = useI18nContext()
   const [status, setStatus] = useState<CreationStatus>(CreationStatus.Idle)
   const guard = useInFlightGuard()
+  const network = useSparkNetwork()
 
   const create = useCallback(async () => {
     await guard.run(async () => {
       setStatus(CreationStatus.Creating)
       try {
         const accountId = Crypto.randomUUID()
-        await selfCustodialCreateWallet(accountId)
+        await selfCustodialCreateWallet(accountId, network)
         await reloadSelfCustodialAccounts()
         reinitSdk()
         updateState((prev) => {
@@ -52,7 +54,15 @@ export const useCreateWallet = () => {
         toastShow({ message: LL.AccountTypeSelectionScreen.createFailed(), LL })
       }
     })
-  }, [guard, navigation, updateState, reinitSdk, reloadSelfCustodialAccounts, LL])
+  }, [
+    guard,
+    navigation,
+    updateState,
+    reinitSdk,
+    reloadSelfCustodialAccounts,
+    LL,
+    network,
+  ])
 
   return { status, create }
 }

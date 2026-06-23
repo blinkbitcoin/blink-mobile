@@ -1,4 +1,5 @@
 import React from "react"
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
@@ -37,7 +38,7 @@ jest.mock("@app/screens/unclaimed-deposits/hooks/use-deposit-actions", () => ({
 
 jest.mock("@app/screens/unclaimed-deposits/utils", () => ({
   openMempoolTx: (...args: unknown[]) => mockOpenMempoolTx(...args),
-  ADDRESS_PLACEHOLDER: "bc1q...",
+  addressPlaceholderFor: () => "bc1q...",
 }))
 
 jest.mock("@app/screens/unclaimed-deposits/hooks/use-recommended-fee-tiers", () => {
@@ -55,6 +56,10 @@ jest.mock("@app/screens/unclaimed-deposits/hooks/use-recommended-fee-tiers", () 
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ sdk: { id: "sdk" } }),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockSparkNetwork.Regtest,
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -238,7 +243,10 @@ describe("UnclaimedDepositsScreen — broader flows", () => {
 
     fireEvent.press(utils.getByText(claimableDeposit.txid))
 
-    expect(mockOpenMempoolTx).toHaveBeenCalledWith(claimableDeposit.txid)
+    expect(mockOpenMempoolTx).toHaveBeenCalledWith(
+      claimableDeposit.txid,
+      mockSparkNetwork.Regtest,
+    )
   })
 
   it("shows the immature copy and hides claim/refund actions for Immature deposits", () => {

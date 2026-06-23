@@ -2081,7 +2081,7 @@
     "scan": "Scan",
     "updateAvailable": "ตรวจพบเวอร์ชั่นอัพเดต\nกดเพื่ออัปเดตตอนนี้",
     "useLightning": "เราใช้ ไลท์นิ่ง เน็ตเวิร์ก",
-    "myAccounts": "My Accounts",
+    "myAccounts": "ยอดคงเหลือ",
     "walletCountNotTwo": "จำนวนกระเป๋าไม่ใช่ 2 กรุณาใช้แดชบอร์ดเพื่อดูกระเป๋าและเงินทั้งหมดของบัญชีนี้"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "ไม่สามารถแปลงข้อมูลธุรกรรมเป็นไฟล์ CSV ได้ มีบางสิ่งผิดปกติ หากปัญหานี้ยังคงไม่หายไป กรุณาติดต่อศูนย์ช่วยเหลือ",
     "lnurlNoUsername": "เพื่อจะสร้างแอดเดรส lnurl คุณจะต้องตั้งชื่อผู้ใช้ของตัวเองก่อน อยากตั้งตอนนี้เลยไหม?",
     "copyClipboardLnurl": "คัดลอกแอดเดรส Lnurl ไว้ในคลิปบอร์ด",
-    "defaultWallet": "Default Account",
+    "defaultWallet": "Receive to",
     "rateUs": "Rate us on {storeName: string}",
     "theme": "Theme",
     "nfc": "Receive from NFC",
@@ -2488,11 +2488,11 @@
     "toastMessage": "Secret copied to clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "บัญชีรับเริ่มต้น",
-    "titleSelfCustodial": "บัญชีเริ่มต้น",
+    "title": "Receive to",
+    "titleSelfCustodial": "Receive to",
     "infoBtc": "บัญชีบิตคอยน์ ของคุณสำหรับสะสม sats ซึ่งมูลค่า USD เคลื่อนไหวตามตลาด",
     "infoUsd": "บัญชีเงินดอลล่าร์ ของคุณขับเคลื่อนโดย Stablesats — เก็บ Bitcoin ที่ป้องกันความเสี่ยงเพื่อรักษาเสถียรภาพในมูลค่า USD คุณถือ Bitcoin ตลอดเวลา แต่มูลค่าดอลลาร์ไม่เปลี่ยนแปลง",
-    "infoUsdSelfCustodial": "เนื่องด้วยความกังวลด้านประสบการณ์ผู้ใช้ เราจึงตัดสินใจไม่เปิดใช้งานฟีเจอร์นี้ในบัญชีแบบ non-custodial มีเพียง Bitcoin เท่านั้นที่ใช้ได้เป็นการตั้งค่าการรับเริ่มต้นของคุณ"
+    "infoUsdSelfCustodial": "การรับดอลลาร์ไม่สามารถใช้เป็นตัวเลือกการรับเริ่มต้นสำหรับบัญชีแบบ non-custodial ได้"
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -3666,6 +3666,9 @@
     "networkError": "ปัญหาการเชื่อมต่อเครือข่าย ตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
     "invalidInput": "รายละเอียดการชำระเงินดูไม่ถูกต้อง โปรดตรวจสอบและลองอีกครั้ง",
     "generic": "ไม่สามารถดำเนินการชำระเงินให้เสร็จสมบูรณ์ได้ ลองอีกครั้งในอีกสักครู่ หรือใช้จำนวนที่น้อยลง"
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "บัญชีนี้ถูกสร้างบน {network} สลับไปที่ {network} เพื่อใช้งาน"
   },
   "UnclaimedDeposit": {
     "title": "คุณมี {count} รายการฝากที่ยังไม่ได้เรียกร้อง",

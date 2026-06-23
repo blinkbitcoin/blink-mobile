@@ -1,7 +1,9 @@
 import {
+  checkLightningAddressAvailable,
   getUserSettings,
   getWalletInfo,
   listPayments,
+  registerLightningAddress,
 } from "@app/self-custodial/bridge/wallet"
 
 describe("getWalletInfo", () => {
@@ -41,5 +43,35 @@ describe("getUserSettings", () => {
     getUserSettings({ getUserSettings: getSettings } as never)
 
     expect(getSettings).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("checkLightningAddressAvailable", () => {
+  it("forwards the username and returns the SDK availability result", async () => {
+    const check = jest.fn().mockResolvedValue(true)
+
+    const result = await checkLightningAddressAvailable(
+      { checkLightningAddressAvailable: check } as never,
+      "alice",
+    )
+
+    expect(check).toHaveBeenCalledWith({ username: "alice" })
+    expect(result).toBe(true)
+  })
+})
+
+describe("registerLightningAddress", () => {
+  it("forwards the username and returns the address info", async () => {
+    const register = jest
+      .fn()
+      .mockResolvedValue({ lightningAddress: "alice@staging.blink.sv" })
+
+    const result = await registerLightningAddress(
+      { registerLightningAddress: register } as never,
+      "alice",
+    )
+
+    expect(register).toHaveBeenCalledWith(expect.objectContaining({ username: "alice" }))
+    expect(result).toEqual({ lightningAddress: "alice@staging.blink.sv" })
   })
 })

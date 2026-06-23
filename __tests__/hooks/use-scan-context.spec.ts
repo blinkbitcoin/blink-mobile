@@ -1,3 +1,4 @@
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { renderHook } from "@testing-library/react-native"
 
 import { Network } from "@app/graphql/generated"
@@ -5,6 +6,10 @@ import { useScanContext } from "@app/hooks/use-scan-context"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   Network: { Mainnet: 0, Regtest: 1 },
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockSparkNetwork.Regtest,
 }))
 
 const mockUseIsAuthed = jest.fn()
@@ -35,7 +40,8 @@ jest.mock("@app/graphql/generated", () => {
 })
 
 jest.mock("@app/self-custodial/config", () => ({
-  SparkNetworkLabel: "mainnet",
+  networkLabelFor: (network: number) =>
+    network === mockSparkNetwork.Mainnet ? "mainnet" : "regtest",
 }))
 
 describe("useScanContext", () => {
@@ -108,7 +114,7 @@ describe("useScanContext", () => {
   })
 
   describe("self-custodial", () => {
-    it("maps wallet ids from useActiveWallet and uses SparkNetworkLabel for network", () => {
+    it("maps wallet ids from useActiveWallet and uses the spark network label", () => {
       mockActiveWallet.mockReturnValue({
         isSelfCustodial: true,
         wallets: [
@@ -133,7 +139,7 @@ describe("useScanContext", () => {
         "self-custodial-btc",
         "self-custodial-usd",
       ])
-      expect(result.current.bitcoinNetwork).toBe(Network.Mainnet)
+      expect(result.current.bitcoinNetwork).toBe("regtest")
     })
 
     it("exposes lnurlDomains as [] (intraledger lookup disabled)", () => {

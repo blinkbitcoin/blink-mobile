@@ -78,7 +78,7 @@ const en: BaseTranslation = {
   ConversionConfirmationScreen: {
     title: "Confirm transfer",
     youreConverting: "You're converting",
-    receivingAccount: "Receiving balance",
+    receivingAccount: "Receiving Balance",
     infoBitcoin: "Bitcoin amount is only approximate. It can vary by a small amount.",
     infoDollar: "Dollar amount is only approximate. It can vary by a small amount.",
     transferButtonText: "Transfer {fromWallet} to {toWallet}",
@@ -2418,7 +2418,7 @@ const en: BaseTranslation = {
     lnurlNoUsername:
       "To generate an lnurl address you must first set a username.  Do you want to set a username now?",
     copyClipboardLnurl: "Lnurl address has been copied in the clipboard",
-    defaultWallet: "Default Balance",
+    defaultWallet: "Default receive",
     rateUs: "Rate us on {storeName: string}",
     theme: "Theme",
     nfc: "Receive from NFC",
@@ -2494,7 +2494,7 @@ const en: BaseTranslation = {
       "You will need to re-enter your email to log back in.\nyour email is {email: string} so make sure you have access to it to log back in",
     logoutAlertContentPhoneEmail:
       "You will need to re-enter either your phone number or email to log back in.\nyour phone number is {phoneNumber: string} and your email is {email: string} so make sure you have access to those to log back in",
-    usdBalanceWarning: "You have a Dollar Balance of {balance: string}.",
+    usdBalanceWarning: "You have a Dollar balance of {balance: string}.",
     btcBalanceWarning: "You have a bitcoin balance of {balance: string}.",
     secureYourAccount: "Register to secure your account",
     tapToAdd: "Tap to add",
@@ -2565,11 +2565,11 @@ const en: BaseTranslation = {
     toastMessage: "Secret copied to clipboard!",
   },
   DefaultWalletScreen: {
-    title: "Default Balance",
-    titleSelfCustodial: "Default Balance",
+    title: "Default receive",
+    titleSelfCustodial: "Default receive",
     infoBtc: "Your Bitcoin Balance is for stacking sats, where the value moves with the market.",
     infoUsd: "Your Dollar Balance is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the USD value doesn't change.",
-    infoUsdSelfCustodial: "Due to user experience concerns we decided to not activate this feature in the non-custodial accounts. Only Bitcoin is available as your default receive setting.",
+    infoUsdSelfCustodial: "Dollar receive is not available as a default receive option for non-custodial accounts.",
   },
   ThemeScreen: {
     title: "Theme",
@@ -2601,7 +2601,7 @@ const en: BaseTranslation = {
   },
   ConvertDollarToBitcoinModal: {
     title: "Dollar Balance is no longer available in your region",
-    body: "Transfer your Dollar Balance to Bitcoin",
+    body: "Transfer your Dollar balance to Bitcoin",
     youHave: "You have",
     youGet: "You get",
     approve: "Approve",
@@ -3789,6 +3789,10 @@ const en: BaseTranslation = {
     invalidInput: "The payment details look invalid. Please review and try again.",
     generic:
       "The payment could not be completed. Try again in a moment, or use a smaller amount.",
+  },
+  SelfCustodialNetworkMismatch: {
+    toast:
+      "This account was created on {network: string}. Switch to {network} to use it.",
   },
   UnclaimedDeposit: {
     screenTitle: "Unclaimed Deposits",

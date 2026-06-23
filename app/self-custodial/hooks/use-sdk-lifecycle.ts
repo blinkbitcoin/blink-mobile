@@ -30,7 +30,6 @@ import {
   getServiceStatus,
   isDegradedStatus,
   OnlineState,
-  STATUS_TIMEOUT_MS,
 } from "../providers/is-online"
 import {
   appendTransactions,
@@ -40,6 +39,7 @@ import {
 } from "../providers/wallet-snapshot"
 
 import { useBackoffRetry } from "./use-backoff-retry"
+import { useSparkNetwork } from "./use-spark-network"
 
 type SdkLifecycleState = {
   wallets: WalletState[]
@@ -62,6 +62,7 @@ const OFFLINE_EXEMPT_STATUSES: readonly ActiveWalletStatus[] = [
 ]
 
 const RECONNECT_BACKOFF_MS: readonly number[] = [1000, 3000, 9000]
+export const WALLET_SNAPSHOT_TIMEOUT_MS = 10000
 
 const teardownSdk = async (
   sdk: BreezSdkInterface,
@@ -75,6 +76,7 @@ export const useSdkLifecycle = (
   activeSelfCustodialAccountId: string | null,
   retryCount: number,
 ): SdkLifecycleState => {
+  const network = useSparkNetwork()
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [allTransactions, setAllTransactions] = useState<NormalizedTransaction[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
@@ -113,7 +115,7 @@ export const useSdkLifecycle = (
       try {
         const snapshot = await withTimeout(
           getSelfCustodialWalletSnapshot(sdk, rawTxOffsetRef.current),
-          STATUS_TIMEOUT_MS,
+          WALLET_SNAPSHOT_TIMEOUT_MS,
           "wallet snapshot",
         )
         if (isStale()) return
@@ -181,7 +183,11 @@ export const useSdkLifecycle = (
     const accountId = activeSelfCustodialAccountId
 
     const connectAndListen = async (mnemonic: string) => {
-      const connectedSdk = await initSdk(mnemonic, storageDirFor(accountId))
+      const connectedSdk = await initSdk(
+        mnemonic,
+        storageDirFor(accountId, network),
+        network,
+      )
       if (abortRef.current || !mounted) {
         await teardownSdk(connectedSdk, null)
         return
@@ -228,7 +234,7 @@ export const useSdkLifecycle = (
         return
       }
 
-      const networkValid = await validateStoredNetwork(accountId)
+      const networkValid = await validateStoredNetwork(accountId, network)
       if (!networkValid) {
         if (mounted) setStatus(ActiveWalletStatus.Error)
         return
@@ -261,7 +267,7 @@ export const useSdkLifecycle = (
         reportError("SDK cleanup", err)
       })
     }
-  }, [retryCount, refreshWallets, activeSelfCustodialAccountId, resetBackoff])
+  }, [retryCount, refreshWallets, activeSelfCustodialAccountId, resetBackoff, network])
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {

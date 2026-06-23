@@ -28,10 +28,10 @@
         "text": "Indem Sie auf \"Akzeptieren\" klicken, erklären Sie sich mit unseren Allgemeinen Geschäftsbedingungen einverstanden. Sie stimmen auch zu, dass Sie kein Einwohner oder Staatsbürger eines der verbotenen Länder sind."
     },
     "SetAccountModal": {
-        "title": "Richte dein Empfangskonto ein",
+        "title": "Richte dein Standard-Guthaben ein",
         "description": "Du kannst das später jederzeit in den Einstellungen ändern",
-        "stablesatsTag": "Dollar-Konto — betrieben mit Stablesats",
-        "bitcoinTag": "Bitcoin-Konto für Maximalisten"
+        "stablesatsTag": "Dollar-Guthaben — betrieben mit Stablesats",
+        "bitcoinTag": "Bitcoin-Guthaben zum Sats-Stapeln"
     },
     "NoteInput": {
         "addNote": "Notiz hinzufügen"
@@ -68,7 +68,7 @@
     "ConversionConfirmationScreen": {
         "title": "Umtausch prüfen",
         "youreConverting": "Umtausch läuft",
-        "receivingAccount": "Empfangendes Konto",
+        "receivingAccount": "Empfangendes Guthaben",
         "infoBitcoin": "Der Bitcoin-Betrag ist nur ungefähr. Er kann geringfügig abweichen.",
         "infoDollar": "Der Dollar-Betrag ist nur ungefähr. Er kann geringfügig abweichen.",
         "transferButtonText": "{fromWallet} zu {toWallet} transferieren",
@@ -2081,7 +2081,7 @@
         "scan": "Scannen",
         "updateAvailable": "Ein Update ist verfügbar. \nKlicke, um zu updaten",
         "useLightning": "Wir nutzen das Lightning Netzwerk.",
-        "myAccounts": "Meine Konten",
+        "myAccounts": "Guthaben",
         "walletCountNotTwo": "Die Anzahl der Wallets ist nicht zwei. Bitte verwenden Sie das Dashboard, um alle Wallets und Guthaben dieses Kontos zu sehen"
     },
     "PinScreen": {
@@ -2121,7 +2121,7 @@
         "setNote": "Notiz erstellen",
         "tapQrCodeCopy": "Tippe den QR Code um zu kopieren",
         "title": "Bitcoin empfangen",
-        "usdTitle": "Empfangen auf Dollar-Konto",
+        "usdTitle": "Empfangen auf Dollar-Guthaben",
         "error": "Invoice konnte nicht erstellt werden. Bitte kontaktiere den Support, wenn dieses Problem weiterhin besteht.",
         "copyInvoice": "Kopieren",
         "shareInvoice": "Teilen",
@@ -2171,7 +2171,7 @@
         "walletNotConnected": "Deine Wallet verbindet sich noch. Bitte warte einen Moment und versuche es erneut.",
         "paymentPending": "Deine Zahlung wird möglicherweise noch abgeschlossen. Überprüfe dein Guthaben, bevor du es erneut versuchst.",
         "title": "Bitcoin einlösen",
-        "usdTitle": "Einlösen auf Dollar-Konto",
+        "usdTitle": "Einlösen auf Dollar-Guthaben",
         "error": "Invoice konnte nicht erstellt werden. Bitte kontaktiere den Support, wenn dieses Problem weiterhin besteht.",
         "redeemingError": "Bitcoin konnten nicht eingelöst werden. Bitte kontaktiere den Support, wenn das Problem weiterhin besteht.",
         "submissionError": "Auszahlung fehlgeschlagen. Bitte kontaktiere den Support, wenn das Problem weiterhin besteht.",
@@ -2342,7 +2342,7 @@
         "csvTransactionsError": "Die Transaktionen konnten nicht als CSV exportiert werden. Etwas ging schief. Wenn es weiterhin nicht funktioniert, kontaktiere uns.",
         "lnurlNoUsername": "Um eine LNURL Adresse zu generieren, gib zuerst einen Benutzernamen an. Möchtest Du jetzt einen Benutzernamen festlegen?",
         "copyClipboardLnurl": "LNURL Adresse wurde in die Zwischenablage kopiert",
-        "defaultWallet": "Standard-Konto",
+        "defaultWallet": "Standard-Empfang",
         "rateUs": "Bewerte uns auf {storeName: string}",
         "theme": "Design",
         "nfc": "Per NFC empfangen",
@@ -2413,7 +2413,7 @@
         "logoutAlertContentPhone": "Um dich erneut einzuloggen, benötigst du deine Telefonnummer. Deine Telefonnummer lautet {phoneNumber: string}. Stelle bitte sicher, dass du Zugriff auf diese hast, um dich erneut einloggen zu können",
         "logoutAlertContentEmail": "Um dich erneut einzuloggen, benötigst du deine Email-Adresse. Diese lautet {email: string}. Stelle bitte sicher, dass du Zugriff darauf hast, um dich erneut einloggen zu können",
         "logoutAlertContentPhoneEmail": "Um dich erneut einzuloggen, benötigst du entweder deine Telefonnummer oder deine Email-Adresse.\nDeine Telefonnummer lautet {phoneNumber: string} und deine Email-Adresse ist {email: string}. Stelle bitte sicher, dass du Zugriff auf diese hast, um dich erneut einloggen zu können.",
-        "usdBalanceWarning": "Du hast ein Dollar-Konto-Guthaben von {balance: string}.",
+        "usdBalanceWarning": "Du hast ein Dollar-Guthaben von {balance: string}.",
         "btcBalanceWarning": "Dein Bitcoin Kontostand beträgt {balance: string}.",
         "secureYourAccount": "Registriere dich, um deinen Account zu sichern",
         "tapToAdd": "Antippen zum Hinzufügen",
@@ -2458,12 +2458,12 @@
     },
     "StablesatsRestriction": {
         "modalTitle": "Stablesats ist in deiner Region nicht verfügbar",
-        "modalBody": "Um Zugriff auf ein Dollar-Konto zu erhalten, erstelle ein non-custodial Konto.",
+        "modalBody": "Um Zugriff auf ein Dollar-Guthaben zu erhalten, erstelle ein non-custodial Konto.",
         "createNew": "Neu erstellen",
         "walletLabel": "in deiner Region nicht verfügbar"
     },
     "ConvertDollarToBitcoinModal": {
-        "title": "Das Dollar-Konto ist in deiner Region nicht mehr verfügbar",
+        "title": "Das Dollar-Guthaben ist in deiner Region nicht mehr verfügbar",
         "body": "Übertrage dein Dollar-Guthaben in Bitcoin",
         "youHave": "Du hast",
         "youGet": "Du erhältst",
@@ -2488,11 +2488,11 @@
         "toastMessage": "Geheimnis in Zwischenablage kopiert!"
     },
     "DefaultWalletScreen": {
-        "title": "Standard-Empfangskonto",
-        "titleSelfCustodial": "Standardkonto",
-        "infoBtc": "Dein Bitcoin-Konto ist zum Sats-Stapeln, wo sich der USD-Wert mit dem Markt bewegt.",
-        "infoUsd": "Dein Dollar-Konto wird von Stablesats betrieben — er hält Bitcoin, der abgesichert ist, um in USD-Wert stabil zu bleiben. Du hältst immer Bitcoin, aber der Dollarwert ändert sich nicht.",
-        "infoUsdSelfCustodial": "Aus Gründen der Benutzererfahrung haben wir uns entschieden, diese Funktion in Non-Custodial-Konten nicht zu aktivieren. Nur Bitcoin ist als deine standardmäßige Empfangseinstellung verfügbar."
+        "title": "Standard-Empfang",
+        "titleSelfCustodial": "Standard-Empfang",
+        "infoBtc": "Dein Bitcoin-Guthaben ist zum Sats-Stapeln, wo sich der USD-Wert mit dem Markt bewegt.",
+        "infoUsd": "Dein Dollar-Guthaben wird von Stablesats betrieben — es hält Bitcoin, der abgesichert ist, um in USD-Wert stabil zu bleiben. Du hältst immer Bitcoin, aber der Dollarwert ändert sich nicht.",
+        "infoUsdSelfCustodial": "Dollar-Empfang ist für Non-Custodial-Konten nicht als Standard-Empfangsoption verfügbar."
     },
     "ThemeScreen": {
         "title": "Design",
@@ -2507,12 +2507,12 @@
         "DEFAULT": "Standard (OS)"
     },
     "StablesatsModal": {
-        "header": "Dein Dollar-Konto wird von Stablesats betrieben",
-        "body": "Der Dollar-Konto nutzt Stablesats-Technologie, um Bitcoin stabil zum USD-Preis zu halten. Du hältst immer Bitcoin — keine echten Dollar — aber der USD-Wert schwankt nicht. Du kannst Bitcoin wie gewohnt senden und empfangen, aber es ist nicht mit dem traditionellen Bankensystem kompatibel.",
+        "header": "Dein Dollar-Guthaben wird von Stablesats betrieben",
+        "body": "Das Dollar-Guthaben nutzt Stablesats-Technologie, um Bitcoin stabil zum USD-Preis zu halten. Du hältst immer Bitcoin — keine echten Dollar — aber der USD-Wert schwankt nicht. Du kannst Bitcoin wie gewohnt senden und empfangen, aber es ist nicht mit dem traditionellen Bankensystem kompatibel.",
         "termsAndConditions": "Allgemeine Geschäftsbedingungen lesen",
         "learnMore": "Mehr über Stablesats erfahren",
-        "headerSelfCustodial": "Dein Dollar-Konto hält Stablecoins",
-        "bodySelfCustodial": "Im Dollar-Konto hältst du Stablecoins. Tokens, die durch Vermögenswerte gedeckt sind und deren Wert stabil zum USD gehalten wird. Du kannst Stablecoins (noch) nicht senden und empfangen. Wenn du vom Dollar-Konto sendest, werden deine Stablecoins getauscht und als Bitcoin an den Empfänger geschickt.",
+        "headerSelfCustodial": "Dein Dollar-Guthaben hält Stablecoins",
+        "bodySelfCustodial": "In deinem Dollar-Guthaben hältst du Stablecoins. Tokens, die durch Vermögenswerte gedeckt sind und deren Wert stabil zum USD gehalten wird. Du kannst Stablecoins (noch) nicht senden und empfangen. Wenn du von deinem Dollar-Guthaben sendest, werden deine Stablecoins getauscht und als Bitcoin an den Empfänger geschickt.",
         "learnMoreSelfCustodial": "Mehr erfahren"
     },
     "SplashScreen": {
@@ -2523,8 +2523,8 @@
         "received": "Du erhieltst",
         "spent": "Du zahltest",
         "sending": "Sendend",
-        "receivingAccount": "Empfangendes Konto",
-        "sendingAccount": "Sendendes Konto",
+        "receivingAccount": "Empfangendes Guthaben",
+        "sendingAccount": "Sendendes Guthaben",
         "txNotBroadcast": "Ihre Transaktion befindet sich in der Warteschlange. Sie sollte im Mempool erscheinen: {countdown: string} ",
         "momentarily": "momentan"
     },
@@ -2535,7 +2535,7 @@
         "perWeek": "pro Woche",
         "unlimited": "Unbeschränkt",
         "remaining": "Verbleibend",
-        "stablesatTransfers": "Dollar-Konto-Überweisungen",
+        "stablesatTransfers": "Dollar-Guthaben-Überweisungen",
         "internalSend": "Sende an {bankName: string} User",
         "error": "Limits können aktuell nicht abgerufen werden",
         "increaseLimits": "Erhöhe deine Limits"
@@ -2729,7 +2729,7 @@
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Bitcoin Preis",
-        "btcAccount": "Bitcoin-Konto",
+        "btcAccount": "Bitcoin-Guthaben",
         "cancel": "Abbrechen",
         "close": "Schließen",
         "confirm": "Bestätigen",
@@ -2801,7 +2801,7 @@
         "transactionsError": "Transaktionen konnten nicht geladen werden",
         "tryAgain": "Erneut versuchen",
         "type": "Typ",
-        "usdAccount": "Dollar-Konto",
+        "usdAccount": "Dollar-Guthaben",
         "username": "Benutzername",
         "usernameRequired": "Benutzername ist erforderlich",
         "backupAccount": "Account sichern / upgraden",
@@ -3601,12 +3601,12 @@
         "secureMe": "Wallet sichern"
     },
     "StableBalance": {
-        "title": "Stabiler Saldo",
-        "description": "Halte einen USD-Saldo betrieben durch USDB auf Spark.",
+        "title": "Stabiles Guthaben",
+        "description": "Halte ein USD-Guthaben betrieben durch USDB auf Spark.",
         "balanceLabelBtc": "Guthaben · SATS",
         "balanceLabelUsd": "Guthaben · USD",
-        "settingsRowTitle": "Stabiler Saldo",
-        "settingsTitle": "Stabiler Saldo",
+        "settingsRowTitle": "Stabiles Guthaben",
+        "settingsTitle": "Stabiles Guthaben",
         "settingsDescription": "Halte einen Teil deiner Wallet in USD. Wandle BTC und USD jederzeit manuell mit der Konvertieren-Aktion um.",
         "activationLabel": "Aktiv",
         "activeHint": "Deine Wallet hält USD über USDB.",
@@ -3666,6 +3666,9 @@
         "networkError": "Netzwerkverbindungsproblem. Überprüfe deine Verbindung und versuche es erneut.",
         "invalidInput": "Die Zahlungsdetails scheinen ungültig zu sein. Bitte überprüfen und erneut versuchen.",
         "generic": "Die Zahlung konnte nicht abgeschlossen werden. Versuche es in einem Moment erneut oder verwende einen kleineren Betrag."
+    },
+    "SelfCustodialNetworkMismatch": {
+        "toast": "Dieses Konto wurde auf {network} erstellt. Wechsle zu {network}, um es zu verwenden."
     },
     "UnclaimedDeposit": {
         "title": "Du hast {count} nicht beanspruchte Einzahlung(en)",

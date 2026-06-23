@@ -43,7 +43,12 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
-import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
+import {
+  useStablesatsForcedConversion,
+  useStablesatsRestricted,
+  useStablesatsRestrictionSync,
+} from "@app/hooks/use-stablesats-restricted"
+import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { getErrorMessages } from "@app/graphql/utils"
@@ -180,6 +185,7 @@ export const HomeScreen: React.FC = () => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
+  useSelfCustodialNetworkMismatchToast()
   const {
     refreshWallets: refreshSelfCustodialWallets,
     isStableBalanceActive,
@@ -252,8 +258,10 @@ export const HomeScreen: React.FC = () => {
     variables: { first: 1 },
   })
 
+  // not loaded yet: no wallets while not ready (a loaded account keeps its balance
+  // when a refresh goes offline, and a ready empty account shows zero, not a skeleton)
   const queryLoading = isSelfCustodial
-    ? activeWallet.status === "loading"
+    ? !activeWallet.isReady && activeWallet.wallets.length === 0
     : loadingAuthed || loadingPrice || loadingUnauthed || loadingSettings
 
   const { username, phone } = currentUser?.me ?? {}
@@ -352,12 +360,17 @@ export const HomeScreen: React.FC = () => {
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
   const [isRestrictionModalVisible, setIsRestrictionModalVisible] = React.useState(false)
-  const [isUsdConvertModalVisible, setIsUsdConvertModalVisible] = React.useState(false)
   const isStablesatsRestricted = useStablesatsRestricted()
+  useStablesatsRestrictionSync()
 
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedUsdWalletBalance = restrictedUsdWallet?.balance ?? 0
+
+  const { isConvertModalVisible, closeConvertModal } = useStablesatsForcedConversion({
+    isRestricted: isStablesatsRestricted,
+    usdWalletBalance: restrictedUsdWalletBalance,
+  })
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const openUpgradeModal = React.useCallback(() => {
@@ -565,14 +578,11 @@ export const HomeScreen: React.FC = () => {
       <StablesatsRestrictionModal
         isVisible={isRestrictionModalVisible}
         toggleModal={() => setIsRestrictionModalVisible(false)}
-        onDismiss={() => {
-          if (restrictedUsdWalletBalance > 0) setIsUsdConvertModalVisible(true)
-        }}
       />
       {restrictedUsdWallet && restrictedBtcWallet && (
         <UsdConvertToBtcModal
-          isVisible={isUsdConvertModalVisible}
-          toggleModal={() => setIsUsdConvertModalVisible(false)}
+          isVisible={isConvertModalVisible}
+          toggleModal={closeConvertModal}
           usdWalletBalance={toUsdMoneyAmount(restrictedUsdWalletBalance)}
           usdWalletId={restrictedUsdWallet.id}
           btcWalletId={restrictedBtcWallet.id}

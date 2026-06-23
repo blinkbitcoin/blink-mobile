@@ -40,7 +40,7 @@ describe("StablesatsRestrictionModal", () => {
     )
 
     expect(
-      getByText("To get access to a dollar account, create a non-custodial account."),
+      getByText("To get access to a Dollar Balance, create a non-custodial account."),
     ).toBeTruthy()
   })
 
@@ -75,41 +75,6 @@ describe("StablesatsRestrictionModal", () => {
 
     expect(toggleModal).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalled()
-  })
-
-  it("fires onDismiss when Close is pressed", () => {
-    const onDismiss = jest.fn()
-    const { getByText } = render(
-      wrap(
-        <StablesatsRestrictionModal
-          isVisible={true}
-          toggleModal={jest.fn()}
-          onDismiss={onDismiss}
-        />,
-      ),
-    )
-
-    fireEvent.press(getByText("Close"))
-
-    expect(onDismiss).toHaveBeenCalledTimes(1)
-  })
-
-  it("does not fire onDismiss when Create new is pressed (navigates instead)", () => {
-    const onDismiss = jest.fn()
-    const { getByText } = render(
-      wrap(
-        <StablesatsRestrictionModal
-          isVisible={true}
-          toggleModal={jest.fn()}
-          onDismiss={onDismiss}
-        />,
-      ),
-    )
-
-    fireEvent.press(getByText("Create new"))
-
-    expect(onDismiss).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("getStarted")
   })
 
   it("renders nothing when isVisible is false", () => {

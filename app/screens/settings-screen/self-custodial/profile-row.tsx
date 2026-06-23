@@ -12,6 +12,8 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DeleteAccountConfirmModal } from "./delete-account-confirm-modal"
 import { DeleteAccountHasFundsModal } from "./delete-account-has-funds-modal"
+import { isRegtestNetwork } from "@app/self-custodial/config"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   probeSelfCustodialAccountWallets,
   ProbeAccountWalletsStatus,
@@ -21,6 +23,7 @@ import { type SelfCustodialAccountEntry } from "@app/self-custodial/storage/acco
 import { AccountType, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import { hasFunds } from "@app/utils/has-funds"
+import { extractLightningAddressUsername } from "@app/utils/pay-links"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
@@ -46,6 +49,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const { lightningAddress: liveLightningAddress, wallets: liveWallets } =
     useSelfCustodialWallet()
   const { state: deleteState, deleteWallet } = useDeleteAccount()
+  const network = useSparkNetwork()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [hasFundsWarningVisible, setHasFundsWarningVisible] = useState(false)
@@ -58,7 +62,8 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const lightningAddress = isActive
     ? liveLightningAddress ?? persistedLightningAddress
     : persistedLightningAddress
-  const rowTitle = lightningAddress ?? LL.common.anonymousUser()
+  const rowTitle =
+    extractLightningAddressUsername(lightningAddress) ?? LL.common.anonymousUser()
 
   const handleSwitch = () => {
     if (isActive) return
@@ -92,13 +97,22 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const handleRemovePress = async () => {
     if (probingBalance) return
 
+    /**
+     * Regtest accounts are deletable regardless of funds, so the balance is
+     * irrelevant: skip the probe (an SDK connect) and confirm directly.
+     */
+    if (isRegtestNetwork(network)) {
+      setConfirmVisible(true)
+      return
+    }
+
     if (isActive) {
       openModalForWallets(liveWallets ?? [])
       return
     }
 
     setProbingBalance(true)
-    const result = await probeSelfCustodialAccountWallets(accountId)
+    const result = await probeSelfCustodialAccountWallets(accountId, network)
     setProbingBalance(false)
 
     switch (result.status) {

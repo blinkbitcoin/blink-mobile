@@ -214,8 +214,10 @@ const WalletOverview: React.FC<Props> = ({
             {loading ? (
               <Loader />
             ) : isStablesatsRestricted ? (
-              <View style={styles.hideableArea}>
-                <Text type="p2">{LL.StablesatsRestriction.walletLabel()}</Text>
+              <View style={[styles.hideableArea, styles.restrictionLabel]}>
+                <Text type="p2" style={styles.restrictionLabelText}>
+                  {LL.StablesatsRestriction.walletLabel()}
+                </Text>
               </View>
             ) : (
               <View style={[styles.hideableArea, pressedUsd && styles.pressedOpacity]}>
@@ -273,7 +275,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    height: 45,
+    minHeight: 45,
     marginVertical: 4,
     marginTop: 5,
   },
@@ -296,6 +298,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   hideableArea: {
     alignItems: "flex-end",
+  },
+  restrictionLabel: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  restrictionLabelText: {
+    textAlign: "right",
   },
   loaderContainer: {
     flex: 1,
