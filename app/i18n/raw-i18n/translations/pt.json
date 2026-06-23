@@ -2457,9 +2457,6 @@
         "removedAccount": "Você removeu a conta {identifier: string}."
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats não está disponível na sua região",
-        "modalBody": "Para acessar um Saldo Dólar, crie uma conta não custodial.",
-        "createNew": "Criar nova",
         "walletLabel": "não está disponível na sua região"
     },
     "DollarBalanceRestriction": {

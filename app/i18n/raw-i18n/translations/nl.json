@@ -2457,9 +2457,6 @@
     "removedAccount": "Je hebt account {identifier: string} verwijderd."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats is niet beschikbaar in jouw regio",
-    "modalBody": "Maak een non-custodial account aan om toegang te krijgen tot een Dollarsaldo.",
-    "createNew": "Nieuw aanmaken",
     "walletLabel": "niet beschikbaar in jouw regio"
   },
   "DollarBalanceRestriction": {

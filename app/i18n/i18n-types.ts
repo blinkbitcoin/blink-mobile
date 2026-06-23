@@ -8142,18 +8142,6 @@ type RootTranslation = {
 	}
 	StablesatsRestriction: {
 		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
-		 */
-		modalTitle: string
-		/**
-		 * T​o​ ​g​e​t​ ​a​c​c​e​s​s​ ​t​o​ ​a​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​,​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
-		 */
-		modalBody: string
-		/**
-		 * C​r​e​a​t​e​ ​n​e​w
-		 */
-		createNew: string
-		/**
 		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		walletLabel: string
@@ -20409,18 +20397,6 @@ export type TranslationFunctions = {
 		learnMoreSelfCustodial: () => LocalizedString
 	}
 	StablesatsRestriction: {
-		/**
-		 * Stablesats is not available in your region
-		 */
-		modalTitle: () => LocalizedString
-		/**
-		 * To get access to a Dollar Balance, create a non-custodial account.
-		 */
-		modalBody: () => LocalizedString
-		/**
-		 * Create new
-		 */
-		createNew: () => LocalizedString
 		/**
 		 * not available in your region
 		 */

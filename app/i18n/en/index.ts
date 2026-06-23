@@ -2594,9 +2594,6 @@ const en: BaseTranslation = {
     learnMoreSelfCustodial: "Learn more",
   },
   StablesatsRestriction: {
-    modalTitle: "Stablesats is not available in your region",
-    modalBody: "To get access to a Dollar Balance, create a non-custodial account.",
-    createNew: "Create new",
     walletLabel: "not available in your region",
   },
   DollarBalanceRestriction: {

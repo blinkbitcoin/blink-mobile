@@ -2457,9 +2457,6 @@
         "removedAccount": "Vous avez supprimé le compte {identifier: string}."
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats n'est pas disponible dans votre région",
-        "modalBody": "Pour accéder à un Solde Dollar, créez un compte non-custodial.",
-        "createNew": "Créer nouveau",
         "walletLabel": "n'est pas disponible dans votre région"
     },
     "DollarBalanceRestriction": {

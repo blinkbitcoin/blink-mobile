@@ -2457,9 +2457,6 @@
     "removedAccount": "{identifier: string} hesabını kaldırdınız."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats bölgenizde kullanılamıyor",
-    "modalBody": "Dolar Bakiyesine erişmek için saklamasız bir hesap oluşturun.",
-    "createNew": "Yeni oluştur",
     "walletLabel": "bölgenizde kullanılamıyor"
   },
   "DollarBalanceRestriction": {

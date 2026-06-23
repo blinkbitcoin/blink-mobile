@@ -2457,9 +2457,6 @@
     "removedAccount": "Eltávolítottad a(z) {identifier: string} fiókot."
   },
   "StablesatsRestriction": {
-    "modalTitle": "A Stablesats nem érhető el a régiódban",
-    "modalBody": "A Dollár Egyenleghez való hozzáféréshez hozz létre egy nem letétkezelői fiókot.",
-    "createNew": "Új létrehozása",
     "walletLabel": "nem érhető el a régiódban"
   },
   "DollarBalanceRestriction": {

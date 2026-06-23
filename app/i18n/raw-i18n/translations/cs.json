@@ -2457,9 +2457,6 @@
     "removedAccount": "Odebrali jste účet {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats není ve vašem regionu k dispozici",
-    "modalBody": "Pro přístup k Dolarovému zůstatku si vytvořte ne-custodial účet.",
-    "createNew": "Vytvořit nový",
     "walletLabel": "není ve vašem regionu k dispozici"
   },
   "DollarBalanceRestriction": {

@@ -2457,9 +2457,6 @@
         "removedAccount": "Du hast das Konto {identifier: string} entfernt."
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats ist in deiner Region nicht verfügbar",
-        "modalBody": "Um Zugriff auf ein Dollar-Guthaben zu erhalten, erstelle ein non-custodial Konto.",
-        "createNew": "Neu erstellen",
         "walletLabel": "in deiner Region nicht verfügbar"
     },
     "DollarBalanceRestriction": {

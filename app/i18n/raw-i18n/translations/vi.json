@@ -2457,9 +2457,6 @@
     "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats không khả dụng tại khu vực của bạn",
-    "modalBody": "Để truy cập Số dư Đô la, hãy tạo tài khoản không lưu ký.",
-    "createNew": "Tạo mới",
     "walletLabel": "không khả dụng tại khu vực của bạn"
   },
   "DollarBalanceRestriction": {
