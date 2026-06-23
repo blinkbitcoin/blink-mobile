@@ -38,10 +38,15 @@ cat testflight-version/version
 echo ""
 
 cat testflight-version/version > testflight-version/testflight-version
+current_major=$(cut -d. -f1 testflight-version/version)
 
 # Initial Version
 if [[ $(cat testflight-version/version) == "0.0.0" ]]; then
   echo "0.1.0" > testflight-version/testflight-version
+# Force the first 3.x release. Subsequent releases count up from this version.
+elif [[ $current_major -lt 3 ]]; then
+  echo "    --> Current major version is below 3, releasing 3.0.0..."
+  echo "3.0.0" > testflight-version/testflight-version
 # Figure out proper version to release
 elif [[ $(cat artifacts/gh-release-notes.md | grep \*\*breaking\*\*) != '' ]]; then
   echo "    --> Breaking change / Feature Addition found, bumping minor version..."
