@@ -28,10 +28,10 @@
         "text": "Al hacer clic en \"Aceptar\", acepta nuestros Términos y condiciones. También acepta que no es residente ni ciudadano de uno de los países prohibidos."
     },
     "SetAccountModal": {
-        "title": "Configura tu cuenta de recepción",
+        "title": "Configura tu saldo predeterminado",
         "description": "Siempre puedes cambiar esto más tarde en Configuración",
-        "stablesatsTag": "Cuenta Dólar — impulsado por Stablesats",
-        "bitcoinTag": "Cuenta Bitcoin para maximalistas"
+        "stablesatsTag": "Saldo Dólar — impulsado por Stablesats",
+        "bitcoinTag": "Saldo Bitcoin para acumular sats"
     },
     "NoteInput": {
         "addNote": "Añade una nota"
@@ -68,7 +68,7 @@
     "ConversionConfirmationScreen": {
         "title": "Confirmar transferencia",
         "youreConverting": "Estás convirtiendo",
-        "receivingAccount": "Cuenta destino",
+        "receivingAccount": "Saldo destino",
         "infoBitcoin": "La cantidad de Bitcoin es solo aproximada. Puede variar en una pequeña cantidad.",
         "infoDollar": "La cantidad de Dólares es solo aproximada. Puede variar en una pequeña cantidad.",
         "transferButtonText": "Transferir {fromWallet} a {toWallet}",
@@ -2081,7 +2081,7 @@
         "scan": "Escanear",
         "updateAvailable": "Hay una actualización disponible.\nToque para actualizar ahora",
         "useLightning": "Usamos la red Lightning.",
-        "myAccounts": "Mis Cuentas",
+        "myAccounts": "Saldos",
         "walletCountNotTwo": "El recuento de billeteras no es 2. Utilice el panel para ver todas las billeteras y fondos de esta cuenta."
     },
     "PinScreen": {
@@ -2121,7 +2121,7 @@
         "setNote": "ingrese una nota",
         "tapQrCodeCopy": "Toque el código QR para copiar",
         "title": "Recibir Bitcoin",
-        "usdTitle": "Recibir a Cuenta Dólar",
+        "usdTitle": "Recibir a Saldo Dólar",
         "error": "Error al generar la factura. Póngase en contacto con el soporte técnico si este problema persiste.",
         "copyInvoice": "Copiar",
         "shareInvoice": "Compartir",
@@ -2171,7 +2171,7 @@
         "walletNotConnected": "Tu billetera aún se está conectando. Espera un momento e inténtalo de nuevo.",
         "paymentPending": "Es posible que tu pago aún se esté completando. Revisa tu saldo antes de volver a intentarlo.",
         "title": "Canjear Bitcoin",
-        "usdTitle": "Canjear a Cuenta Dólar",
+        "usdTitle": "Canjear a Saldo Dólar",
         "error": "Error al generar la factura. Póngase en contacto con el soporte técnico si este problema persiste.",
         "redeemingError": "Error al canjear Bitcoin. Póngase en contacto con el soporte técnico si este problema persiste.",
         "submissionError": "No se pudo enviar la solicitud de retiro. Póngase en contacto con el soporte técnico si este problema persiste.",
@@ -2342,7 +2342,7 @@
         "csvTransactionsError": "No se pueden exportar transacciones a csv. Algo salió mal. Si el problema persiste, póngase en contacto con el soporte.",
         "lnurlNoUsername": "Para generar una dirección lnurl primero debe establecer un nombre de usuario. ¿Desea establecer un nombre de usuario ahora?",
         "copyClipboardLnurl": "La dirección de Lnurl se ha copiado en el portapapeles",
-        "defaultWallet": "Cuenta predeterminada",
+        "defaultWallet": "Recibir por defecto",
         "rateUs": "Califícanos en {storeName: string}",
         "theme": "Tema",
         "nfc": "Recibir desde NFC",
@@ -2413,7 +2413,7 @@
         "logoutAlertContentPhone": "Deberá volver a ingresar su número de teléfono para volver a iniciar sesión.\nsu número de teléfono es {phoneNumber: string}, así que asegúrese de tener acceso a él para volver a iniciar sesión",
         "logoutAlertContentEmail": "Deberá volver a ingresar su correo electrónico para volver a iniciar sesión.\nsu correo electrónico es {email: string}, así que asegúrese de tener acceso a él para volver a iniciar sesión",
         "logoutAlertContentPhoneEmail": "Deberá volver a ingresar su número de teléfono o correo electrónico para volver a iniciar sesión.\nsu número de teléfono es {phoneNumber: string} y su correo electrónico es {email: string}, así que asegúrese de tener acceso a ellos para volver a iniciar sesión",
-        "usdBalanceWarning": "Tienes un saldo en Cuenta Dólar de {balance: string}.",
+        "usdBalanceWarning": "Tienes un saldo Dólar de {balance: string}.",
         "btcBalanceWarning": "Tienes un saldo de bitcoin de {balance: string}.",
         "secureYourAccount": "Registrate para asegurar tu cuenta",
         "tapToAdd": "Toca para agregar",
@@ -2457,14 +2457,17 @@
         "removedAccount": "Eliminaste la cuenta {identifier: string}."
     },
     "StablesatsRestriction": {
+        "modalTitle": "Stablesats no está disponible en tu región",
+        "modalBody": "Para acceder a un Saldo Dólar, crea una cuenta no custodial.",
+        "createNew": "Crear nueva",
         "walletLabel": "no está disponible en tu región"
     },
     "DollarBalanceRestriction": {
         "modalTitle": "El saldo en dólares no está disponible en tu región"
     },
     "ConvertDollarToBitcoinModal": {
-        "title": "El saldo en dólares no está disponible en tu región",
-        "body": "Transfiere del saldo en dólares al saldo en Bitcoin",
+        "title": "El Saldo Dólar ya no está disponible en tu región",
+        "body": "Transfiere tu saldo Dólar a Bitcoin",
         "youHave": "Tienes",
         "youGet": "Recibes"
     },
@@ -2487,10 +2490,11 @@
         "toastMessage": "¡Código secreto copiado al portapapeles!"
     },
     "DefaultWalletScreen": {
-        "title": "Cuenta de recepción predeterminada",
-        "info": "Tu Cuenta Bitcoin es para acumular sats, donde el valor USD se mueve con el mercado. Tu Cuenta Dólar está impulsado por Stablesats — contiene Bitcoin cubierto para mantenerse estable en términos USD. Siempre tienes Bitcoin, pero el valor en dólares no cambia.",
-        "titleSelfCustodial": "Cuenta predeterminada",
-        "infoSelfCustodial": "Esta cuenta se usará por defecto al recibir y enviar. Podés cambiarla cuando quieras."
+        "title": "Recibir por defecto",
+        "titleSelfCustodial": "Recibir por defecto",
+        "infoBtc": "Tu Saldo Bitcoin es para acumular sats, donde el valor USD se mueve con el mercado.",
+        "infoUsd": "Tu Saldo Dólar está impulsado por Stablesats — contiene Bitcoin cubierto para mantenerse estable en términos USD. Siempre tienes Bitcoin, pero el valor en dólares no cambia.",
+        "infoUsdSelfCustodial": "La recepción en dólares no está disponible como opción de recepción predeterminada para las cuentas no custodiales."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2505,12 +2509,12 @@
         "DEFAULT": "Predeterminado (OS)"
     },
     "StablesatsModal": {
-        "header": "Tu Cuenta Dólar está impulsado por Stablesats",
-        "body": "Cuenta Dólar utiliza la tecnología Stablesats para mantener Bitcoin estable al precio USD. Siempre tienes Bitcoin — no dólares reales — pero el valor USD no fluctúa. Puedes enviar y recibir Bitcoin como siempre, pero no es compatible con el sistema bancario tradicional.",
+        "header": "Tu Saldo Dólar está impulsado por Stablesats",
+        "body": "El Saldo Dólar utiliza la tecnología Stablesats para mantener Bitcoin estable al precio USD. Siempre tienes Bitcoin — no dólares reales — pero el valor USD no fluctúa. Puedes enviar y recibir Bitcoin como siempre, pero no es compatible con el sistema bancario tradicional.",
         "termsAndConditions": "Lee los términos y condiciones",
         "learnMore": "Aprende más sobre StableSats",
-        "headerSelfCustodial": "Tu cuenta Dólar tiene stablecoins",
-        "bodySelfCustodial": "En la cuenta Dólar tienes stablecoins. Tokens respaldados por activos cuyo valor se mantiene estable respecto al USD. Aún no puedes enviar ni recibir stablecoins. Cuando envíes desde la cuenta Dólar, intercambiarás tus stablecoins y se enviarán como Bitcoin al destinatario.",
+        "headerSelfCustodial": "Tu Saldo Dólar tiene stablecoins",
+        "bodySelfCustodial": "En tu Saldo Dólar tienes stablecoins. Tokens respaldados por activos cuyo valor se mantiene estable respecto al USD. Aún no puedes enviar ni recibir stablecoins. Cuando envíes desde tu Saldo Dólar, intercambiarás tus stablecoins y se enviarán como Bitcoin al destinatario.",
         "learnMoreSelfCustodial": "Saber más"
     },
     "SplashScreen": {
@@ -2521,8 +2525,8 @@
         "received": "Recibiste",
         "spent": "Gastaste",
         "sending": "Enviando",
-        "receivingAccount": "Cuenta receptora",
-        "sendingAccount": "Cuenta de envio",
+        "receivingAccount": "Saldo receptor",
+        "sendingAccount": "Saldo de envío",
         "txNotBroadcast": "Tu transacción está en cola. Debería aparecer en la Mempool en {countdown: string}.",
         "momentarily": "momentáneamente"
     },
@@ -2533,7 +2537,7 @@
         "perWeek": "por semana",
         "unlimited": "ilimitado",
         "remaining": "Restante",
-        "stablesatTransfers": "Transferencias de Cuenta Dólar",
+        "stablesatTransfers": "Transferencias de Saldo Dólar",
         "internalSend": "Enviar a usuario {bankName: string}",
         "error": "No se pueden obtener los límites en este momento",
         "increaseLimits": "Incrementa tus límites"
@@ -2726,7 +2730,7 @@
         "beta": "beta",
         "bitcoin": "Bitcoin",
         "bitcoinPrice": "Precio de Bitcoin",
-        "btcAccount": "Cuenta Bitcoin",
+        "btcAccount": "Saldo Bitcoin",
         "cancel": "Cancelar",
         "close": "Cerrar ",
         "confirm": "Confirmar",
@@ -2798,7 +2802,7 @@
         "transactionsError": "Error al cargar las transacciones",
         "tryAgain": "Inténtalo de Nuevo",
         "type": "tipo",
-        "usdAccount": "Cuenta Dólar",
+        "usdAccount": "Saldo Dólar",
         "username": "Nombre de usuario",
         "usernameRequired": "El nombre de usuario es requerido",
         "backupAccount": "Copia de seguridad/actualización de la cuenta",

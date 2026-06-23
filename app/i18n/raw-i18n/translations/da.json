@@ -2081,7 +2081,7 @@
     "scan": "Scan",
     "updateAvailable": "Der er en opdatering tilgængelig.\nTryk for at opdatere nu",
     "useLightning": "Vi bruger Lightning-netværket.",
-    "myAccounts": "Mine konti",
+    "myAccounts": "Saldi",
     "walletCountNotTwo": "Antallet af tegnebøger er ikke 2. Brug venligst kontrolpanelet for at se alle tegnebøger og midler på denne konto"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Kunne ikke eksportere transaktioner til csv. Noget gik galt. Hvis problemet fortsætter, kontakt venligst support.",
     "lnurlNoUsername": "For at generere en LNURL-adresse skal du først vælge et brugernavn. Vil du vælge et brugernavn nu?",
     "copyClipboardLnurl": "LNURL-adresse er blevet kopieret til udklipsholderen",
-    "defaultWallet": "Standardkonto",
+    "defaultWallet": "Standardmodtagelse",
     "rateUs": "Bedøm os på {storeName: string}",
     "theme": "Tema",
     "nfc": "Modtag fra NFC",
@@ -2487,10 +2487,11 @@
     "toastMessage": "Hemmelig nøgle kopieret til udklipsholderen!"
   },
   "DefaultWalletScreen": {
-    "title": "Standard modtagekonto",
-    "info": "Din Bitcoin-konto er til at samle sats, hvor USD-værdien bevæger sig med markedet. Din Dollar-konto er drevet af Stablesats — den holder Bitcoin, der er sikret til at forblive stabil i USD-værdi. Du holder altid Bitcoin, men dollarværdien ændrer sig ikke.",
-    "titleSelfCustodial": "Standardkonto",
-    "infoSelfCustodial": "Denne konto vil blive brugt som standard ved modtagelse og afsendelse. Du kan skifte når som helst."
+    "title": "Standardmodtagelse",
+    "titleSelfCustodial": "Standardmodtagelse",
+    "infoBtc": "Din Bitcoin-konto er til at samle sats, hvor USD-værdien bevæger sig med markedet.",
+    "infoUsd": "Din Dollar-konto er drevet af Stablesats — den holder Bitcoin, der er sikret til at forblive stabil i USD-værdi. Du holder altid Bitcoin, men dollarværdien ændrer sig ikke.",
+    "infoUsdSelfCustodial": "Dollar-modtagelse er ikke tilgængelig som en standard modtagelsesmulighed for non-custodial-konti."
   },
   "ThemeScreen": {
     "title": "Tema",

@@ -28,10 +28,10 @@
     "text": "Kliknutím na \"Prijať\" súhlasíte s našimi zmluvnými podmienkami. Súhlasíte tiež s tým, že nie ste rezidentom ani občanom jednej zo zakázaných krajín."
   },
   "SetAccountModal": {
-    "title": "Nastavte si účet na prijímanie",
+    "title": "Nastavte si predvolený zostatok",
     "description": "Toto môžete kedykoľvek neskôr zmeniť v Nastaveniach",
-    "stablesatsTag": "Dolárový účet — poháňaný technológiou Stablesats",
-    "bitcoinTag": "Bitcoin účet pre maximalistov"
+    "stablesatsTag": "Dolárový zostatok — poháňaný technológiou Stablesats",
+    "bitcoinTag": "Bitcoinový zostatok na hromadenie satov"
   },
   "NoteInput": {
     "addNote": "Pridať poznámku"
@@ -68,7 +68,7 @@
   "ConversionConfirmationScreen": {
     "title": "Preskúmať konverziu",
     "youreConverting": "Konvertujete",
-    "receivingAccount": "Prijímajúci účet",
+    "receivingAccount": "Prijímajúci zostatok",
     "infoBitcoin": "Suma v Bitcoin je len približná. Môže sa mierne líšiť.",
     "infoDollar": "Suma v dolároch je len približná. Môže sa mierne líšiť.",
     "transferButtonText": "Previesť {fromWallet} na {toWallet}",
@@ -2081,7 +2081,7 @@
     "scan": "Skenovať",
     "updateAvailable": "K dispozícii je aktualizácia.\nKliknite na aktualizáciu",
     "useLightning": "Používame Lightning Network.",
-    "myAccounts": "Moje účty",
+    "myAccounts": "Zostatky",
     "walletCountNotTwo": "Počet peňaženiek nie je 2. Na zobrazenie všetkých peňaženiek a prostriedkov tohto účtu použite informačný panel"
   },
   "PinScreen": {
@@ -2121,7 +2121,7 @@
     "setNote": "nastaviť poznámku",
     "tapQrCodeCopy": "Klepnite na QR kód na jeho skopírovanie",
     "title": "Prijať Bitcoin",
-    "usdTitle": "Prijať na Dolárový účet",
+    "usdTitle": "Prijať na Dolárový zostatok",
     "error": "Nepodarilo sa vygenerovať faktúru. Ak tento problém pretrváva, kontaktujte prosím podporu.",
     "copyInvoice": "Kopírovať",
     "shareInvoice": "Zdieľať",
@@ -2171,7 +2171,7 @@
     "walletNotConnected": "Vaša peňaženka sa stále pripája. Počkajte chvíľu a skúste to znova.",
     "paymentPending": "Vaša platba sa možno stále dokončuje. Pred opätovným pokusom skontrolujte svoj zostatok.",
     "title": "Prijať Bitcoin",
-    "usdTitle": "Vymeniť na Dolárový účet",
+    "usdTitle": "Vymeniť na Dolárový zostatok",
     "error": "Nepodarilo sa vygenerovať faktúru. Ak tento problém pretrváva, kontaktujte prosím podporu.",
     "redeemingError": "Bitcoin sa nepodarilo prijať. Ak tento problém pretrváva, kontaktujte prosím podporu.",
     "submissionError": "Nepodarilo sa odoslať žiadosť o výber. Ak tento problém pretrváva, kontaktujte prosím podporu.",
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Nie je možné exportovať transakcie do formátu CSV. Niečo sa pokazilo. Ak problém pretrváva, kontaktujte podporu.",
     "lnurlNoUsername": "Ak chcete vygenerovať adresu lnurl, musíte najprv nastaviť používateľské meno. Chcete ho teraz nastaviť?",
     "copyClipboardLnurl": "Lnurl adresa bola skopírovaná do schránky",
-    "defaultWallet": "Predvolený účet",
+    "defaultWallet": "Predvolený príjem",
     "rateUs": "Ohodnoťte nás na {storeName: string}",
     "theme": "Motív",
     "nfc": "Prijať cez NFC",
@@ -2399,7 +2399,7 @@
     "dangerZone": "Nebezpečná zóna",
     "phoneDeletedSuccessfully": "Telefón bol úspešne odstránený",
     "phoneNumber": "Telefónne číslo",
-    "tapToAddPhoneNumber": "Klepnutím pridáte telefónne číslo",
+    "tapToAddPhoneNumber": "Pridať telefónne číslo",
     "loginMethods": "Metódy prihlásenia",
     "level": "Úroveň {level: string}",
     "switchAccount": "Prepnúť účet",
@@ -2413,7 +2413,7 @@
     "logoutAlertContentPhone": "Na opätovné prihlásenie bude potrebné znovu zadať telefónne číslo.\nVaše telefónne číslo je {phoneNumber: string}, takže sa uistite, že k nemu máte prístup, aby ste sa mohli znovu prihlásiť.",
     "logoutAlertContentEmail": "Na opätovné prihlásenie bude potrebné znovu zadať e-mail.\nVáš e-mail je {email: string}, takže sa uistite, že k nemu máte prístup, aby ste sa mohli znovu prihlásiť.",
     "logoutAlertContentPhoneEmail": "Na opätovné prihlásenie bude potrebné znovu zadať telefónne číslo alebo e-mail.\nVaše telefónne číslo je {phoneNumber: string} a váš e-mail je {email: string}, takže sa uistite, že k nim máte prístup, aby ste sa mohli znovu prihlásiť.",
-    "usdBalanceWarning": "Máte zostatok na Dolárový účet vo výške {balance: string}.",
+    "usdBalanceWarning": "Máte dolárový zostatok vo výške {balance: string}.",
     "btcBalanceWarning": "Váš bitcoinový zostatok je {balance: string}.",
     "secureYourAccount": "Zaregistrujte sa na zabezpečenie svojho účtu",
     "tapToAdd": "Klepnite na pridanie",
@@ -2457,14 +2457,17 @@
     "removedAccount": "Odstránili ste účet {identifier: string}."
   },
   "StablesatsRestriction": {
+    "modalTitle": "Stablesats nie je vo vašom regióne k dispozícii",
+    "modalBody": "Ak chcete získať prístup k Dolárovému zostatku, vytvorte ne-úschovný účet.",
+    "createNew": "Vytvoriť nový",
     "walletLabel": "nie je vo vašom regióne k dispozícii"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolárový zostatok nie je vo vašom regióne k dispozícii"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dolárový zostatok nie je vo vašom regióne k dispozícii",
-    "body": "Preveďte z dolárového zostatku na bitcoinový zostatok",
+    "title": "Dolárový zostatok už nie je vo vašom regióne dostupný",
+    "body": "Preveďte svoj zostatok v dolároch na Bitcoin",
     "youHave": "Máte",
     "youGet": "Získate"
   },
@@ -2487,10 +2490,11 @@
     "toastMessage": "Tajný kód bol skopírovaný do schránky!"
   },
   "DefaultWalletScreen": {
-    "title": "Predvolený účet na príjem",
-    "info": "Váš Bitcoin účet je na hromadenie satov, kde sa hodnota USD pohybuje s trhom. Váš Dolárový účet je poháňaný technológiou Stablesats — drží Bitcoin zaistený tak, aby zostal stabilný v hodnote USD. Vždy držíte Bitcoin, ale dolárová hodnota sa nemení.",
-    "titleSelfCustodial": "Predvolený účet",
-    "infoSelfCustodial": "Tento účet bude predvolene použitý pri prijímaní a odosielaní. Kedykoľvek ho môžete zmeniť."
+    "title": "Predvolený príjem",
+    "titleSelfCustodial": "Predvolený príjem",
+    "infoBtc": "Váš Bitcoinový zostatok je na hromadenie satov, kde sa hodnota USD pohybuje s trhom.",
+    "infoUsd": "Váš Dolárový zostatok je poháňaný technológiou Stablesats — drží Bitcoin zaistený tak, aby zostal stabilný v hodnote USD. Vždy držíte Bitcoin, ale dolárová hodnota sa nemení.",
+    "infoUsdSelfCustodial": "Príjem dolárov nie je k dispozícii ako predvolená možnosť príjmu pre non-custodial účty."
   },
   "ThemeScreen": {
     "title": "Motív",
@@ -2505,12 +2509,12 @@
     "DEFAULT": "Predvolené nastavenie (OS)"
   },
   "StablesatsModal": {
-    "header": "Váš Dolárový účet je poháňaný technológiou Stablesats",
-    "body": "Dolárový účet využíva technológiu Stablesats na udržanie Bitcoinu stabilného na cene USD. Vždy držíte Bitcoin — nie skutočné doláre — ale hodnota USD nekolíše. Môžete odosielať a prijímať Bitcoin ako zvyčajne, ale nie je to kompatibilné s tradičným bankovým systémom.",
+    "header": "Váš Dolárový zostatok je poháňaný technológiou Stablesats",
+    "body": "Dolárový zostatok využíva technológiu Stablesats na udržanie Bitcoinu stabilného na cene USD. Vždy držíte Bitcoin — nie skutočné doláre — ale hodnota USD nekolíše. Môžete odosielať a prijímať Bitcoin ako zvyčajne, ale nie je to kompatibilné s tradičným bankovým systémom.",
     "termsAndConditions": "Prečítajte si podmienky používania",
     "learnMore": "Zistite viac o Stablesats",
-    "headerSelfCustodial": "Váš dolárový účet drží stablecoiny",
-    "bodySelfCustodial": "Na dolárovom účte držíte stablecoiny. Tokeny kryté aktívami s hodnotou udržiavanou stabilnou voči USD. Stablecoiny zatiaľ nemôžete posielať ani prijímať. Keď pošlete z dolárového účtu, vaše stablecoiny budú zamenené a odoslané ako Bitcoin príjemcovi.",
+    "headerSelfCustodial": "Váš Dolárový zostatok drží stablecoiny",
+    "bodySelfCustodial": "Na Dolárovom zostatku držíte stablecoiny. Tokeny kryté aktívami s hodnotou udržiavanou stabilnou voči USD. Stablecoiny zatiaľ nemôžete posielať ani prijímať. Keď pošlete z Dolárového zostatku, vaše stablecoiny budú zamenené a odoslané ako Bitcoin príjemcovi.",
     "learnMoreSelfCustodial": "Zistiť viac"
   },
   "SplashScreen": {
@@ -2521,8 +2525,8 @@
     "received": "Prijali ste",
     "spent": "Minuli ste",
     "sending": "Odosielanie",
-    "receivingAccount": "Prijímajúci účet",
-    "sendingAccount": "Odosielajúci účet",
+    "receivingAccount": "Prijímajúci zostatok",
+    "sendingAccount": "Odosielajúci zostatok",
     "txNotBroadcast": "Vaša transakcia je zaradená do frontu. Mala by sa objaviť v mempoole {countdown: string}.",
     "momentarily": "momentálne"
   },
@@ -2533,7 +2537,7 @@
     "perWeek": "týždenne",
     "unlimited": "Neobmedzene",
     "remaining": "Zostávajúce",
-    "stablesatTransfers": "Prevody Dolárový účet",
+    "stablesatTransfers": "Prevody Dolárový zostatok",
     "internalSend": "Odoslať používateľovi {bankName: string}",
     "error": "Momentálne nie je možné načítať limity",
     "increaseLimits": "Zvýšiť limity transakcií"
@@ -2727,7 +2731,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Cena bitcoinu",
-    "btcAccount": "Bitcoin účet",
+    "btcAccount": "Bitcoinový zostatok",
     "cancel": "Zrušiť",
     "close": "Zatvoriť",
     "confirm": "Potvrdiť",
@@ -2798,7 +2802,7 @@
     "transactionsError": "Chyba pri načítaní transakcií",
     "tryAgain": "Skúsiť znova",
     "type": "Typ",
-    "usdAccount": "Dolárový účet",
+    "usdAccount": "Dolárový zostatok",
     "username": "Používateľské meno",
     "usernameRequired": "Používateľské meno je vyžadované",
     "backupAccount": "Záloha/aktualizácia účtu",

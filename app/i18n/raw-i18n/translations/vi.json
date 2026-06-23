@@ -28,10 +28,10 @@
     "text": "Bằng cách nhấn 'Chấp nhận', bạn đồng ý với Điều khoản và Điều kiện của chúng tôi. Bạn cũng xác nhận rằng bạn không phải là cư dân hoặc công dân của một trong các quốc gia bị cấm."
   },
   "SetAccountModal": {
-    "title": "Thiết lập tài khoản nhận",
+    "title": "Thiết lập số dư mặc định",
     "description": "Bạn luôn có thể thay đổi điều này sau trong Cài đặt",
-    "stablesatsTag": "Tài khoản Đô la — được hỗ trợ bởi Stablesats",
-    "bitcoinTag": "Tài khoản Bitcoin cho các maximalist"
+    "stablesatsTag": "Số dư Đô la — được hỗ trợ bởi Stablesats",
+    "bitcoinTag": "Số dư Bitcoin để tích lũy sats"
   },
   "NoteInput": {
     "addNote": "Add note"
@@ -68,7 +68,7 @@
   "ConversionConfirmationScreen": {
     "title": "Xem lại sự chuyển đổi",
     "youreConverting": "Bạn đang chuyển đổi",
-    "receivingAccount": "Tài khoản nhận",
+    "receivingAccount": "Số dư nhận",
     "infoBitcoin": "Số lượng Bitcoin chỉ là gần đúng. Nó có thể thay đổi một lượng nhỏ.",
     "infoDollar": "Số tiền Đô la chỉ là gần đúng. Nó có thể thay đổi một lượng nhỏ.",
     "transferButtonText": "Chuyển {fromWallet} sang {toWallet}",
@@ -2081,7 +2081,7 @@
     "scan": "Scan",
     "updateAvailable": "Bản cập nhật mới đã có.\nNhấn để cập nhật ngay",
     "useLightning": "Chúng tôi sử dụng Lightning Network.",
-    "myAccounts": "My Accounts",
+    "myAccounts": "Số dư",
     "walletCountNotTwo": "Số ví không phải là 2. Vui lòng sử dụng bảng điều khiển để xem tất cả các ví và tiền trong tài khoản này"
   },
   "PinScreen": {
@@ -2121,7 +2121,7 @@
     "setNote": "Viết ghi chú",
     "tapQrCodeCopy": "Nhấn Mã QR để sao chép",
     "title": "Nhận Bitcoin",
-    "usdTitle": "Nhận vào Tài khoản Đô la",
+    "usdTitle": "Nhận vào Số dư Đô la",
     "error": "Không thể tạo hóa đơn. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
     "copyInvoice": "Copy",
     "shareInvoice": "Chia sẻ",
@@ -2171,7 +2171,7 @@
     "walletNotConnected": "Ví của bạn vẫn đang kết nối. Vui lòng đợi một lát và thử lại.",
     "paymentPending": "Khoản thanh toán của bạn có thể vẫn đang hoàn tất. Hãy kiểm tra số dư trước khi thử lại.",
     "title": "Đổi lấy Bitcoin",
-    "usdTitle": "Đổi sang Tài khoản Đô la",
+    "usdTitle": "Đổi sang Số dư Đô la",
     "error": "Không thể tạo hóa đơn. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
     "redeemingError": "Không thể đổi lấy Bitcoin. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
     "submissionError": "Không thể tiến hành yêu cầu rút tiền. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Không thể xuất các giao dịch sang CSV. Có lỗi xảy ra. Nếu vấn đề vẫn tiếp diễn xin vui lòng liên hệ với bộ phận hỗ trợ.",
     "lnurlNoUsername": "Để tạo địa chỉ LNURL, trước tiên bạn phải đặt tên người dùng. Bạn có muốn đặt tên người dùng ngay bây giờ không?",
     "copyClipboardLnurl": "Địa chỉ LNURL đã được sao chép trong bộ nhớ tạm",
-    "defaultWallet": "Default Account",
+    "defaultWallet": "Nhận mặc định",
     "rateUs": "Rate us on {storeName: string}",
     "theme": "Theme",
     "nfc": "Receive from NFC",
@@ -2413,7 +2413,7 @@
     "logoutAlertContentPhone": "You will need to re-enter your phone number to log back in.\nyour phone number is {phoneNumber: string} so make sure you have access to it to log back in",
     "logoutAlertContentEmail": "You will need to re-enter your email to log back in.\nyour email is {email: string} so make sure you have access to it to log back in",
     "logoutAlertContentPhoneEmail": "You will need to re-enter either your phone number or email to log back in.\nyour phone number is {phoneNumber: string} and your email is {email: string} so make sure you have access to those to log back in",
-    "usdBalanceWarning": "Bạn có số dư Tài khoản Đô la là {balance: string}.",
+    "usdBalanceWarning": "Bạn có số dư Đô la là {balance: string}.",
     "btcBalanceWarning": "You have a bitcoin balance of {balance: string}.",
     "secureYourAccount": "Register to secure your account",
     "tapToAdd": "Tap to add",
@@ -2457,14 +2457,17 @@
     "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
   },
   "StablesatsRestriction": {
+    "modalTitle": "Stablesats không khả dụng tại khu vực của bạn",
+    "modalBody": "Để truy cập Số dư Đô la, hãy tạo tài khoản không lưu ký.",
+    "createNew": "Tạo mới",
     "walletLabel": "không khả dụng tại khu vực của bạn"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Số dư đô la không khả dụng tại khu vực của bạn"
   },
   "ConvertDollarToBitcoinModal": {
-    "title": "Số dư đô la không khả dụng tại khu vực của bạn",
-    "body": "Chuyển từ Số dư Đô la sang Số dư Bitcoin",
+    "title": "Số dư Đô la không còn khả dụng ở khu vực của bạn",
+    "body": "Chuyển số dư Đô la của bạn sang Bitcoin",
     "youHave": "Bạn có",
     "youGet": "Bạn nhận được"
   },
@@ -2487,10 +2490,11 @@
     "toastMessage": "Secret copied to clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "Tài khoản nhận mặc định",
-    "info": "Tài khoản Bitcoin của bạn dùng để tích lũy sats, nơi giá trị USD biến động theo thị trường. Tài khoản Đô la của bạn được hỗ trợ bởi Stablesats — giữ Bitcoin được bảo hiểm để duy trì ổn định theo giá trị USD. Bạn luôn nắm giữ Bitcoin, nhưng giá trị đô la không thay đổi.",
-    "titleSelfCustodial": "Tài khoản mặc định",
-    "infoSelfCustodial": "Tài khoản này sẽ được sử dụng mặc định khi nhận và gửi. Bạn có thể chuyển đổi bất cứ lúc nào."
+    "title": "Nhận mặc định",
+    "titleSelfCustodial": "Nhận mặc định",
+    "infoBtc": "Số dư Bitcoin của bạn dùng để tích lũy sats, nơi giá trị USD biến động theo thị trường.",
+    "infoUsd": "Số dư Đô la của bạn được hỗ trợ bởi Stablesats — giữ Bitcoin được bảo hiểm để duy trì ổn định theo giá trị USD. Bạn luôn nắm giữ Bitcoin, nhưng giá trị đô la không thay đổi.",
+    "infoUsdSelfCustodial": "Nhận Đô la không khả dụng làm tùy chọn nhận mặc định cho các tài khoản non-custodial."
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2505,12 +2509,12 @@
     "DEFAULT": "Mặc định (OS)"
   },
   "StablesatsModal": {
-    "header": "Tài khoản Đô la của bạn được hỗ trợ bởi Stablesats",
-    "body": "Tài khoản Đô la sử dụng công nghệ Stablesats để giữ Bitcoin ổn định theo giá USD. Bạn luôn nắm giữ Bitcoin — không phải đô la thật — nhưng giá trị USD không biến động. Bạn có thể gửi và nhận Bitcoin như bình thường, nhưng không tương thích với hệ thống ngân hàng truyền thống.",
+    "header": "Số dư Đô la của bạn được hỗ trợ bởi Stablesats",
+    "body": "Số dư Đô la sử dụng công nghệ Stablesats để giữ Bitcoin ổn định theo giá USD. Bạn luôn nắm giữ Bitcoin — không phải đô la thật — nhưng giá trị USD không biến động. Bạn có thể gửi và nhận Bitcoin như bình thường, nhưng không tương thích với hệ thống ngân hàng truyền thống.",
     "termsAndConditions": "Đọc các Điều khoản & Điều kiện",
     "learnMore": "Tìm hiểu thêm về Stablesats",
-    "headerSelfCustodial": "Tài khoản Đô la của bạn giữ stablecoin",
-    "bodySelfCustodial": "Trong tài khoản Đô la, bạn nắm giữ stablecoin. Token được bảo đảm bởi tài sản với giá trị giữ ổn định so với USD. Bạn chưa thể gửi và nhận stablecoin. Khi bạn gửi từ tài khoản Đô la, stablecoin của bạn sẽ được hoán đổi và gửi dưới dạng Bitcoin cho người nhận.",
+    "headerSelfCustodial": "Số dư Đô la của bạn giữ stablecoin",
+    "bodySelfCustodial": "Trong Số dư Đô la, bạn nắm giữ stablecoin. Token được bảo đảm bởi tài sản với giá trị giữ ổn định so với USD. Bạn chưa thể gửi và nhận stablecoin. Khi bạn gửi từ Số dư Đô la, stablecoin của bạn sẽ được hoán đổi và gửi dưới dạng Bitcoin cho người nhận.",
     "learnMoreSelfCustodial": "Tìm hiểu thêm"
   },
   "SplashScreen": {
@@ -2521,8 +2525,8 @@
     "received": "Bạn đã nhận",
     "spent": "Bạn đã chi",
     "sending": "Đang gửi",
-    "receivingAccount": "Receiving Account",
-    "sendingAccount": "Sending Account",
+    "receivingAccount": "Số dư nhận",
+    "sendingAccount": "Số dư gửi",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
     "momentarily": "trong giây lát"
   },
@@ -2533,7 +2537,7 @@
     "perWeek": "mỗi tuần",
     "unlimited": "Không giới hạn",
     "remaining": "Còn lại",
-    "stablesatTransfers": "Chuyển khoản Tài khoản Đô la",
+    "stablesatTransfers": "Chuyển khoản Số dư Đô la",
     "internalSend": "Send to {bankName: string} User",
     "error": "Không thể tìm kiếm giới hạn tại thời điểm này",
     "increaseLimits": "Increase your limits"
@@ -2727,7 +2731,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Giá Bitcoin",
-    "btcAccount": "Tài khoản Bitcoin",
+    "btcAccount": "Số dư Bitcoin",
     "cancel": "Hủy",
     "close": "Đóng",
     "confirm": "Xác nhận",
@@ -2798,7 +2802,7 @@
     "transactionsError": "Lỗi tải các giao dịch",
     "tryAgain": "Vui lòng thử lại",
     "type": "Loại",
-    "usdAccount": "Tài khoản Đô la",
+    "usdAccount": "Số dư Đô la",
     "username": "Người dùng",
     "usernameRequired": "Tên người dùng là bắt buộc",
     "backupAccount": "Backup/upgrade account",

@@ -2081,7 +2081,7 @@
     "scan": "Skandeer",
     "updateAvailable": "'n Opdatering is beskikbaar.\nTik om nou op te dateer",
     "useLightning": "Ons gebruik die Lightning-network - Bliksemnet ",
-    "myAccounts": "My Rekeninge",
+    "myAccounts": "Saldo's",
     "walletCountNotTwo": "Beursietelling is nie 2 nie. Gebruik asseblief die kontroleskerm om al die beursies en fondse van hierdie rekening te sien"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Kan nie nou die transaksielys na csv uitvoer nie. Iets het verkeerd geloop. As die probleem voortduur, kontak asseblief ondersteuning. ",
     "lnurlNoUsername": "Om 'n LNURL-adres te genereer moet jy eers 'n gebruikersnaak kies. Wil jy dit nou doen? ",
     "copyClipboardLnurl": "LNURL-adres is na die klipbord oorgedra",
-    "defaultWallet": "Verstekrekening",
+    "defaultWallet": "Verstek ontvangs",
     "rateUs": "Gradeer ons op {storeName: string}",
     "theme": "Tema",
     "nfc": "Ontvang van NFC",
@@ -2487,10 +2487,11 @@
     "toastMessage": "Geheim na knipbord!"
   },
   "DefaultWalletScreen": {
-    "title": "Verstek ontvangrekening",
-    "info": "Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg. Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie.",
-    "titleSelfCustodial": "Verstek-rekening",
-    "infoSelfCustodial": "Hierdie rekening sal by verstek gebruik word vir ontvang en stuur. Jy kan enige tyd wissel."
+    "title": "Verstek ontvangs",
+    "titleSelfCustodial": "Verstek ontvangs",
+    "infoBtc": "Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg.",
+    "infoUsd": "Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie.",
+    "infoUsdSelfCustodial": "Dollar-ontvangs is nie beskikbaar as 'n verstek-ontvangopsie vir nie-bewarende rekeninge nie."
   },
   "ThemeScreen": {
     "title": "Tema",

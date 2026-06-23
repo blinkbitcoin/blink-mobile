@@ -94,8 +94,8 @@ describe("UsdConvertToBtcModal", () => {
   it("renders the title and body", () => {
     const { getByText } = renderModal()
 
-    expect(getByText("Dollar Balance is not available in your region")).toBeTruthy()
-    expect(getByText("Transfer from Dollar Balance to Bitcoin Balance")).toBeTruthy()
+    expect(getByText("Dollar Balance is no longer available in your region")).toBeTruthy()
+    expect(getByText("Transfer your Dollar balance to Bitcoin")).toBeTruthy()
   })
 
   it("renders the You have and You get labels", () => {
@@ -146,7 +146,7 @@ describe("UsdConvertToBtcModal", () => {
   it("renders nothing when isVisible is false", () => {
     const { queryByText } = renderModal({ isVisible: false })
 
-    expect(queryByText("Dollar Balance is not available in your region")).toBeNull()
+    expect(queryByText("Dollar Balance is no longer available in your region")).toBeNull()
   })
 
   it("shows the warning icon", () => {

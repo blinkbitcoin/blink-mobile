@@ -2081,7 +2081,7 @@
         "scan": "Scansione",
         "updateAvailable": "É disponibile un aggiornamento.\nClicca per aggiornare",
         "useLightning": "Usiamo il Lightning Network",
-        "myAccounts": "Il mio conto",
+        "myAccounts": "Saldo",
         "walletCountNotTwo": "Il conteggio del portafoglio non è 2. Si prega di utilizzare la dashboard per visualizzare tutti i portafogli e i fondi di questo account"
     },
     "PinScreen": {
@@ -2342,7 +2342,7 @@
         "csvTransactionsError": "Impossibile esportare le transazioni in csv. Qualcosa è andato storto. Se il problema persiste contattare l'assistenza.",
         "lnurlNoUsername": "Per generare un indirizzo lnurl è necessario prima impostare un username. Vuoi impostare un username ora?",
         "copyClipboardLnurl": "L'indirizzo Lnurl è stato copiato negli appunti",
-        "defaultWallet": "Account predefinito",
+        "defaultWallet": "Ricezione predef.",
         "rateUs": "Valutaci su {storeName: string}",
         "theme": "Tema",
         "nfc": "Ricevi da NFC",
@@ -2487,10 +2487,11 @@
         "toastMessage": "Segreto copiato negli appunti!"
     },
     "DefaultWalletScreen": {
-        "title": "Conto di ricezione predefinito",
-        "info": "Il tuo Conto Bitcoin è per accumulare sats, dove il valore USD si muove con il mercato. Il tuo Conto Dollaro è alimentato da Stablesats — contiene Bitcoin coperto per rimanere stabile in valore USD. Detieni sempre Bitcoin, ma il valore in dollari non cambia.",
-        "titleSelfCustodial": "Account predefinito",
-        "infoSelfCustodial": "Questo account verrà usato di default per ricevere e inviare. Puoi cambiarlo in qualsiasi momento."
+        "title": "Ricezione predef.",
+        "titleSelfCustodial": "Ricezione predef.",
+        "infoBtc": "Il tuo Conto Bitcoin è per accumulare sats, dove il valore USD si muove con il mercato.",
+        "infoUsd": "Il tuo Conto Dollaro è alimentato da Stablesats — contiene Bitcoin coperto per rimanere stabile in valore USD. Detieni sempre Bitcoin, ma il valore in dollari non cambia.",
+        "infoUsdSelfCustodial": "La ricezione in dollari non è disponibile come opzione di ricezione predefinita per gli account non custodial."
     },
     "ThemeScreen": {
         "title": "Tema",
