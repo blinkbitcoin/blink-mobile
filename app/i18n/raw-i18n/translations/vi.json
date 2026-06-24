@@ -2457,17 +2457,16 @@
     "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats không khả dụng tại khu vực của bạn",
-    "modalBody": "Để truy cập Số dư Đô la, hãy tạo tài khoản không lưu ký.",
-    "createNew": "Tạo mới",
     "walletLabel": "không khả dụng tại khu vực của bạn"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Số dư đô la không khả dụng tại khu vực của bạn"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Số dư Đô la không còn khả dụng ở khu vực của bạn",
-    "body": "Chuyển số dư Đô la của bạn sang Bitcoin",
+    "title": "Số dư đô la không khả dụng tại khu vực của bạn",
+    "body": "Chuyển từ Số dư Đô la sang Số dư Bitcoin",
     "youHave": "Bạn có",
-    "youGet": "Bạn nhận được",
-    "approve": "Phê duyệt"
+    "youGet": "Bạn nhận được"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "Tính năng khôi phục sẽ có trong bản cập nhật tương lai.",
     "createFailed": "Không thể tạo ví. Vui lòng thử lại.",
     "selfCustodialDisabled": "Phi giám sát hiện không khả dụng."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Khu vực không được hỗ trợ",
+    "description": "Rất tiếc, chúng tôi không thể phục vụ người dùng từ khu vực hiện tại của bạn."
   },
   "RestoreScreen": {
     "title": "Khôi phục ví",

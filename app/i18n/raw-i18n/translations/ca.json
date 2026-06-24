@@ -2457,17 +2457,16 @@
     "removedAccount": "Has eliminat el compte {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats no està disponible a la teva regió",
-    "modalBody": "Per accedir a un compte en dòlars, crea un compte no custodial.",
-    "createNew": "Crea nou",
     "walletLabel": "no està disponible a la teva regió"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "El saldo en dòlars no està disponible a la teva regió"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "El compte en dòlars ja no està disponible a la teva regió",
-    "body": "Transfereix el teu saldo en dòlars a Bitcoin",
+    "title": "El saldo en dòlars no està disponible a la teva regió",
+    "body": "Transfereix del saldo en dòlars al saldo en Bitcoin",
     "youHave": "Tens",
-    "youGet": "Reps",
-    "approve": "Aprova"
+    "youGet": "Reps"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificació de dos factors",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "La funció de restauració estarà disponible en una actualització futura.",
     "createFailed": "No s'ha pogut crear la cartera. Si us plau, torna-ho a provar.",
     "selfCustodialDisabled": "El mode no custodial està temporalment no disponible."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Regió no admesa",
+    "description": "Malauradament, no podem atendre usuaris de la vostra regió actual."
   },
   "RestoreScreen": {
     "title": "Restaura la cartera",

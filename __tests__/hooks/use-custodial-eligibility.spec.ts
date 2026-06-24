@@ -25,7 +25,6 @@ const setUp = ({
   detectionFailed = false,
   accounts = [] as unknown[],
   registryLoading = false,
-  custodialSignupBlockedCountries = ["US"],
   custodialFirstSignupBlockedCountries = ["GB", "DE"],
 }: {
   countryCode: string | undefined
@@ -33,13 +32,11 @@ const setUp = ({
   detectionFailed?: boolean
   accounts?: unknown[]
   registryLoading?: boolean
-  custodialSignupBlockedCountries?: string[]
   custodialFirstSignupBlockedCountries?: string[]
 }) => {
   mockUseDeviceLocation.mockReturnValue({ countryCode, loading, detectionFailed })
   mockUseAccountRegistry.mockReturnValue({ accounts, loading: registryLoading })
   mockUseRemoteConfig.mockReturnValue({
-    custodialSignupBlockedCountries,
     custodialFirstSignupBlockedCountries,
   })
 }
@@ -50,7 +47,7 @@ describe("useCustodialEligibility (wiring)", () => {
   })
 
   it("uppercases the country code before applying the policy", () => {
-    setUp({ countryCode: "us", accounts: [] })
+    setUp({ countryCode: "gb", accounts: [] })
     const { result } = renderHook(() => useCustodialEligibility())
     expect(result.current.signupAllowed).toBe(false)
   })

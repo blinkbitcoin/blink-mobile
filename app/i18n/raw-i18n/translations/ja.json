@@ -2457,17 +2457,16 @@
         "removedAccount": "アカウント {identifier: string} を削除しました。"
     },
     "StablesatsRestriction": {
-        "modalTitle": "あなたの地域ではStablesatsをご利用いただけません",
-        "modalBody": "ドル口座にアクセスするには、ノンカストディアル口座を作成してください。",
-        "createNew": "新規作成",
         "walletLabel": "あなたの地域ではご利用いただけません"
     },
+    "DollarBalanceRestriction": {
+        "modalTitle": "ドル残高はあなたの地域ではご利用いただけません"
+    },
     "ConvertDollarToBitcoinModal": {
-        "title": "ドルアカウントはお住まいの地域でご利用いただけなくなりました",
-        "body": "ドル残高をビットコインに移す",
+        "title": "ドル残高はあなたの地域ではご利用いただけません",
+        "body": "ドル残高からビットコイン残高へ移動",
         "youHave": "保有額",
-        "youGet": "受取額",
-        "approve": "承認"
+        "youGet": "受取額"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "2要素認証（2FA）",
@@ -3569,6 +3568,10 @@
         "restoreComingSoonDescription": "復元機能は将来のアップデートで利用可能になります。",
         "createFailed": "ウォレットの作成に失敗しました。もう一度お試しください。",
         "selfCustodialDisabled": "ノンカストディアルは一時的に利用できません。"
+    },
+    "UnsupportedRegionScreen": {
+        "title": "未対応の地域",
+        "description": "申し訳ございませんが、現在の地域のユーザーにはサービスをご提供できません。"
     },
     "RestoreScreen": {
         "title": "ウォレットを復元",

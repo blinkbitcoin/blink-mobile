@@ -2457,17 +2457,16 @@
     "removedAccount": "Anda telah mengalih keluar akaun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats tidak tersedia di rantau anda",
-    "modalBody": "Untuk mengakses akaun dolar, cipta akaun bukan kustodian.",
-    "createNew": "Cipta baharu",
     "walletLabel": "tidak tersedia di rantau anda"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Baki dolar tidak tersedia di rantau anda"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Akaun Dolar tidak lagi tersedia di rantau anda",
-    "body": "Pindahkan baki Dolar anda kepada Bitcoin",
+    "title": "Baki dolar tidak tersedia di rantau anda",
+    "body": "Pindahkan daripada Baki Dolar ke Baki Bitcoin",
     "youHave": "Anda ada",
-    "youGet": "Anda dapat",
-    "approve": "Luluskan"
+    "youGet": "Anda dapat"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Pengesahan dua kali",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "Ciri pemulihan akan tersedia dalam kemas kini akan datang.",
     "createFailed": "Gagal mencipta dompet. Sila cuba lagi.",
     "selfCustodialDisabled": "Bukan kustodial tidak tersedia buat sementara waktu."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Wilayah tidak disokong",
+    "description": "Malangnya kami tidak dapat melayani pengguna dari wilayah semasa anda."
   },
   "RestoreScreen": {
     "title": "Pulihkan dompet",

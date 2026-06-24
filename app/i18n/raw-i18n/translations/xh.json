@@ -2457,17 +2457,16 @@
     "removedAccount": "Ususile i-akhawunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "I-Stablesats ayifumaneki kummandla wakho",
-    "modalBody": "Ukufumana ifikelelo kwiakhawunti yedola, yenza iakhawunti engenagunya.",
-    "createNew": "Yenza entsha",
     "walletLabel": "ayifumaneki kummandla wakho"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "I-akhawunti yeDola ayisafumaneki kummandla wakho",
-    "body": "Dlulisela ibhalansi yakho yeDola kwiBitcoin",
+    "title": "Ibhalansi yedola ayifumaneki kummandla wakho",
+    "body": "Dlulisa kwiBhalansi yeDola ukuya kwiBhalansi yeBitcoin",
     "youHave": "Unayo",
-    "youGet": "Ufumana",
-    "approve": "Yamkela"
+    "youGet": "Ufumana"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Uqinisekiso lwezinto ezimbini",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "Isici sokubuyisela siya kufumaneka kwisashintsho elizayo.",
     "createFailed": "Ayikwazanga ukudala iwallet. Nceda zama kwakhona.",
     "selfCustodialDisabled": "I-non-custodial ayifumaneki okwexeshana."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Ummandla ongaxhaswanga",
+    "description": "Ngelishwa asikwazi ukunceda abasebenzisi abavela kummandla wakho wangoku."
   },
   "RestoreScreen": {
     "title": "Buyisela isikhwama",

@@ -2457,17 +2457,16 @@
         "removedAccount": "Du hast das Konto {identifier: string} entfernt."
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats ist in deiner Region nicht verfügbar",
-        "modalBody": "Um Zugriff auf ein Dollar-Guthaben zu erhalten, erstelle ein non-custodial Konto.",
-        "createNew": "Neu erstellen",
         "walletLabel": "in deiner Region nicht verfügbar"
     },
+    "DollarBalanceRestriction": {
+        "modalTitle": "Dollar-Guthaben ist in deiner Region nicht verfügbar"
+    },
     "ConvertDollarToBitcoinModal": {
-        "title": "Das Dollar-Guthaben ist in deiner Region nicht mehr verfügbar",
-        "body": "Übertrage dein Dollar-Guthaben in Bitcoin",
+        "title": "Dollar-Guthaben ist in deiner Region nicht verfügbar",
+        "body": "Übertrage vom Dollar-Guthaben auf das Bitcoin-Guthaben",
         "youHave": "Du hast",
-        "youGet": "Du erhältst",
-        "approve": "Bestätigen"
+        "youGet": "Du erhältst"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Zwei-Faktor Authentifizierung",
@@ -3569,6 +3568,10 @@
         "restoreComingSoonDescription": "Die Wiederherstellungsfunktion wird in einem zukünftigen Update verfügbar sein.",
         "createFailed": "Wallet konnte nicht erstellt werden. Bitte erneut versuchen.",
         "selfCustodialDisabled": "Nicht-verwahrend ist vorübergehend nicht verfügbar."
+    },
+    "UnsupportedRegionScreen": {
+        "title": "Nicht unterstützte Region",
+        "description": "Leider können wir keine Nutzer aus deiner aktuellen Region bedienen."
     },
     "RestoreScreen": {
         "title": "Wallet wiederherstellen",

@@ -2457,17 +2457,16 @@
         "removedAccount": "Vous avez supprimé le compte {identifier: string}."
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats n'est pas disponible dans votre région",
-        "modalBody": "Pour accéder à un Solde Dollar, créez un compte non-custodial.",
-        "createNew": "Créer nouveau",
         "walletLabel": "n'est pas disponible dans votre région"
     },
+    "DollarBalanceRestriction": {
+        "modalTitle": "Le solde en dollars n'est pas disponible dans votre région"
+    },
     "ConvertDollarToBitcoinModal": {
-        "title": "Le Solde Dollar n'est plus disponible dans votre région",
-        "body": "Transférez votre solde Dollar en Bitcoin",
+        "title": "Le solde en dollars n'est pas disponible dans votre région",
+        "body": "Transférez du solde en dollars vers le solde en Bitcoin",
         "youHave": "Vous avez",
-        "youGet": "Vous recevez",
-        "approve": "Approuver"
+        "youGet": "Vous recevez"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Authentification à deux niveaux",
@@ -3569,6 +3568,10 @@
         "restoreComingSoonDescription": "La fonction de restauration sera disponible dans une mise à jour future.",
         "createFailed": "Échec de la création du portefeuille. Veuillez réessayer.",
         "selfCustodialDisabled": "La non-custodial est temporairement indisponible."
+    },
+    "UnsupportedRegionScreen": {
+        "title": "Région non prise en charge",
+        "description": "Malheureusement, nous ne pouvons pas servir les utilisateurs de votre région actuelle."
     },
     "RestoreScreen": {
         "title": "Restaurer le portefeuille",

@@ -12,9 +12,14 @@ const mockDetailsQuery = jest.fn()
 const mockConfirmationQuery = jest.fn()
 const mockUnauthedQuery = jest.fn()
 const mockPersistentState = jest.fn()
+const mockUseDollarBalanceRestricted = jest.fn()
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockActiveWallet(),
+}))
+
+jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
+  useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -56,6 +61,7 @@ describe("useSendWallets", () => {
       data: { globals: { network: "mainnet" } },
     })
     mockPersistentState.mockReturnValue({})
+    mockUseDollarBalanceRestricted.mockReturnValue(false)
   })
 
   it("returns wallets when self-custodial", () => {
@@ -169,6 +175,72 @@ describe("useSendWallets", () => {
     const { result } = renderHook(() => useSendWallets())
 
     expect(result.current.defaultWallet?.id).toBe("btc-w1")
+  })
+
+  it("restricts a self-custodial send to Bitcoin only when the dollar balance is restricted", () => {
+    mockActiveWallet.mockReturnValue({
+      isSelfCustodial: true,
+      isReady: true,
+      wallets: [btcWallet, usdWallet],
+    })
+    mockIsAuthed.mockReturnValue(false)
+    mockDetailsQuery.mockReturnValue({ data: undefined, loading: false })
+    mockUseDollarBalanceRestricted.mockReturnValue(true)
+
+    const { result } = renderHook(() => useSendWallets())
+
+    expect(result.current.wallets).toHaveLength(1)
+    expect(result.current.wallets?.[0]?.walletCurrency).toBe(WalletCurrency.Btc)
+    expect(result.current.defaultWallet?.id).toBe("btc-w1")
+    expect(result.current.usdWallet).toBeUndefined()
+  })
+
+  it("restricts a custodial send to Bitcoin only when the dollar balance is restricted", () => {
+    mockActiveWallet.mockReturnValue({
+      isSelfCustodial: false,
+      isReady: false,
+      wallets: [],
+    })
+    mockIsAuthed.mockReturnValue(true)
+    // No globals here so the network resolves via the unauthed fallback.
+    mockDetailsQuery.mockReturnValue({
+      data: {
+        me: {
+          defaultAccount: {
+            defaultWalletId: "cust-btc",
+            wallets: [
+              { id: "cust-btc", walletCurrency: WalletCurrency.Btc, balance: 10000 },
+              { id: "cust-usd", walletCurrency: WalletCurrency.Usd, balance: 500 },
+            ],
+          },
+        },
+      },
+      loading: false,
+    })
+    mockUseDollarBalanceRestricted.mockReturnValue(true)
+
+    const { result } = renderHook(() => useSendWallets())
+
+    expect(result.current.wallets).toHaveLength(1)
+    expect(result.current.defaultWallet?.id).toBe("cust-btc")
+    expect(result.current.usdWallet).toBeUndefined()
+    expect(result.current.network).toBe("mainnet")
+  })
+
+  it("leaves wallets untouched when restricted but no Bitcoin wallet exists", () => {
+    mockActiveWallet.mockReturnValue({
+      isSelfCustodial: true,
+      isReady: true,
+      wallets: [usdWallet],
+    })
+    mockIsAuthed.mockReturnValue(false)
+    mockDetailsQuery.mockReturnValue({ data: undefined, loading: false })
+    mockUseDollarBalanceRestricted.mockReturnValue(true)
+
+    const { result } = renderHook(() => useSendWallets())
+
+    expect(result.current.wallets).toHaveLength(1)
+    expect(result.current.usdWallet?.id).toBe("usd-w1")
   })
 })
 

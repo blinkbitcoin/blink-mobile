@@ -2457,17 +2457,16 @@
     "removedAccount": "Eltávolítottad a(z) {identifier: string} fiókot."
   },
   "StablesatsRestriction": {
-    "modalTitle": "A Stablesats nem érhető el a régiódban",
-    "modalBody": "A Dollár Egyenleghez való hozzáféréshez hozz létre egy nem letétkezelői fiókot.",
-    "createNew": "Új létrehozása",
     "walletLabel": "nem érhető el a régiódban"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "A dolláregyenleg nem érhető el a régiódban"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "A Dollár Egyenleg már nem érhető el a régiódban",
-    "body": "Utald át a dolláregyenleged Bitcoinra",
+    "title": "A dolláregyenleg nem érhető el a régiódban",
+    "body": "Utald át a dolláregyenlegről a Bitcoin-egyenlegre",
     "youHave": "Nálad van",
-    "youGet": "Kapsz",
-    "approve": "Jóváhagyás"
+    "youGet": "Kapsz"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Kétlépcsős azonosítás",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "A visszaállítási funkció egy jövőbeli frissítésben lesz elérhető.",
     "createFailed": "Nem sikerült létrehozni a pénztárcát. Kérjük, próbáld újra.",
     "selfCustodialDisabled": "Az önrendelkező mód átmenetileg nem érhető el."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Nem támogatott régió",
+    "description": "Sajnos nem tudjuk kiszolgálni a jelenlegi régiódból érkező felhasználókat."
   },
   "RestoreScreen": {
     "title": "Tárca visszaállítása",

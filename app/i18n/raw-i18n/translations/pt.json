@@ -2457,17 +2457,16 @@
         "removedAccount": "Você removeu a conta {identifier: string}."
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats não está disponível na sua região",
-        "modalBody": "Para acessar um Saldo Dólar, crie uma conta não custodial.",
-        "createNew": "Criar nova",
         "walletLabel": "não está disponível na sua região"
     },
+    "DollarBalanceRestriction": {
+        "modalTitle": "O saldo em dólares não está disponível na sua região"
+    },
     "ConvertDollarToBitcoinModal": {
-        "title": "O Saldo Dólar não está mais disponível na sua região",
-        "body": "Transfira seu saldo Dólar para Bitcoin",
+        "title": "O saldo em dólares não está disponível na sua região",
+        "body": "Transfira do saldo em dólares para o saldo em Bitcoin",
         "youHave": "Você tem",
-        "youGet": "Você recebe",
-        "approve": "Aprovar"
+        "youGet": "Você recebe"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticação de dois fatores",
@@ -3569,6 +3568,10 @@
         "restoreComingSoonDescription": "A função de restauração estará disponível em uma atualização futura.",
         "createFailed": "Falha ao criar a carteira. Por favor, tente novamente.",
         "selfCustodialDisabled": "O modo não custodial está temporariamente indisponível."
+    },
+    "UnsupportedRegionScreen": {
+        "title": "Região não suportada",
+        "description": "Infelizmente não podemos atender utilizadores da sua região atual."
     },
     "RestoreScreen": {
         "title": "Restaurar carteira",

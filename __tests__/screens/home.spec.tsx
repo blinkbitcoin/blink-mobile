@@ -52,7 +52,9 @@ let mockSelfCustodialWalletOverride: Record<string, unknown> | null = null
 const mockToggleBalanceMode = jest.fn()
 // eslint-disable-next-line prefer-const
 let mockBalanceModeValue: "btc" | "usd" = "usd"
-let mockStablesatsRestrictedOverride = false
+let mockDollarBalanceRestrictedOverride = false
+let mockTransferBlockedOverride = false
+let mockDollarBalanceModalVisible = false
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () =>
@@ -83,14 +85,23 @@ jest.mock("@app/config/feature-flags-context", () => {
         nonCustodialEnabled: false,
         stableBalanceEnabled: false,
       },
-      stablesatsBlockedCountries: [],
+      custodialDollarBalanceBlockedCountries: [],
+      selfCustodialDollarBalanceBlockedCountries: [],
     }),
   }
 })
 
-jest.mock("@app/hooks/use-stablesats-restricted", () => ({
-  useStablesatsRestricted: () => mockStablesatsRestrictedOverride,
-  useStablesatsRestrictionSync: () => undefined,
+jest.mock("@app/hooks/use-transfer-blocked", () => ({
+  useTransferBlocked: () => mockTransferBlockedOverride,
+  useTransferBlockedSync: () => undefined,
+}))
+
+jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
+  useDollarBalanceRestricted: () => mockDollarBalanceRestrictedOverride,
+  useDollarBalanceRestrictionSync: () => undefined,
+}))
+
+jest.mock("@app/hooks/use-stablesats-forced-conversion", () => ({
   useStablesatsForcedConversion: ({
     isRestricted,
     usdWalletBalance,
@@ -103,12 +114,18 @@ jest.mock("@app/hooks/use-stablesats-restricted", () => ({
   }),
 }))
 
-jest.mock("@app/components/stablesats-restriction-modal", () => {
+jest.mock("@app/components/dollar-balance-restriction-modal", () => {
   const ReactActual = jest.requireActual("react")
   const { Text } = jest.requireActual("react-native")
   return {
-    StablesatsRestrictionModal: () =>
-      ReactActual.createElement(Text, { testID: "restriction-modal" }, "restriction"),
+    DollarBalanceRestrictionModal: ({ isVisible }: { isVisible: boolean }) => {
+      mockDollarBalanceModalVisible = isVisible
+      return ReactActual.createElement(
+        Text,
+        { testID: "dollar-balance-restriction-modal" },
+        "dollar-balance-restriction",
+      )
+    },
   }
 })
 
@@ -457,7 +474,9 @@ describe("HomeScreen", () => {
   beforeEach(() => {
     currentMocks = []
     mockActiveWalletOverride = null
-    mockStablesatsRestrictedOverride = false
+    mockDollarBalanceRestrictedOverride = false
+    mockTransferBlockedOverride = false
+    mockDollarBalanceModalVisible = false
     jest.clearAllMocks()
   })
 
@@ -500,8 +519,27 @@ describe("HomeScreen", () => {
     },
   )
 
+  it("hides the transfer button when transfers are blocked", async () => {
+    mockTransferBlockedOverride = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.Two,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
+    await flushEffects()
+  })
+
   it("auto-opens the convert modal when a restricted account holds a Dollar balance", async () => {
-    mockStablesatsRestrictedOverride = true
+    mockDollarBalanceRestrictedOverride = true
     currentMocks = generateHomeMock({
       level: AccountLevel.One,
       network: Network.Mainnet,
@@ -522,7 +560,7 @@ describe("HomeScreen", () => {
   })
 
   it("does not auto-open the convert modal when the restricted account has no Dollar balance", async () => {
-    mockStablesatsRestrictedOverride = true
+    mockDollarBalanceRestrictedOverride = true
     currentMocks = generateHomeMock({
       level: AccountLevel.One,
       network: Network.Mainnet,
@@ -539,6 +577,99 @@ describe("HomeScreen", () => {
     await flushEffects()
 
     expect(queryByTestId("convert-modal")).toBeNull()
+  })
+
+  it("shows the dollar-balance restriction modal and skips forced conversion for self-custodial", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 5000, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId, queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByTestId("dollar-balance-restriction-modal")).toBeTruthy()
+    expect(queryByTestId("convert-modal")).toBeNull()
+
+    mockActiveWalletOverride = null
+  })
+
+  it("opens the dollar-balance restriction modal from the disabled transfer button", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 5000, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    // Transfers are not blocked, so the button is rendered but disabled.
+    expect(getByTestId("transfer")).toBeTruthy()
+    expect(mockDollarBalanceModalVisible).toBe(false)
+
+    fireEvent.press(getByTestId("transfer"))
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+
+    mockActiveWalletOverride = null
   })
 
   it("Slide-up handle triggers navigation to transaction history", async () => {

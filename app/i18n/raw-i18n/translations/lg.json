@@ -2457,17 +2457,16 @@
     "removedAccount": "Oggyewo akawunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats teriiwo mu kitundu kyo",
-    "modalBody": "Okusobola okufuna akawunti ya doola, kola akawunti etali ya kuterekebwa.",
-    "createNew": "Kola eppya",
     "walletLabel": "teriiwo mu kitundu kyo"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Akawunti ya Doola tekikyaliwo mu kitundu kyo",
-    "body": "Tambuza ssente zo eza Doola zibe Bitcoin",
+    "title": "Bbalansi ya doola teriiwo mu kitundu kyo",
+    "body": "Tambuza okuva ku bbalansi ya doola okudda ku bbalansi ya Bitcoin",
     "youHave": "Olina",
-    "youGet": "Ofuna",
-    "approve": "Kkiriza"
+    "youGet": "Ofuna"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Okukakasa emirundi ebiri",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "Enkola y'okuzzaawo ejja kubeera mu update ejja.",
     "createFailed": "Tekisobose okukola wallet. Tugezeeyo nate.",
     "selfCustodialDisabled": "Tekikola kati ku non-custodial."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Ekitundu ekitawagirwa",
+    "description": "Eky'embi, tetusobola kuweereza bakozesa abava mu kitundu kyo eky'okaakano."
   },
   "RestoreScreen": {
     "title": "Zzaawo wallet",

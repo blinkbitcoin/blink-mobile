@@ -2457,17 +2457,16 @@
         "removedAccount": "Hai rimosso l'account {identifier: string}."
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats non è disponibile nella tua regione",
-        "modalBody": "Per accedere a un conto in dollari, crea un account non-custodial.",
-        "createNew": "Crea nuovo",
         "walletLabel": "non è disponibile nella tua regione"
     },
+    "DollarBalanceRestriction": {
+        "modalTitle": "Il saldo in dollari non è disponibile nella tua regione"
+    },
     "ConvertDollarToBitcoinModal": {
-        "title": "Il conto in dollari non è più disponibile nella tua regione",
-        "body": "Trasferisci il tuo saldo in dollari in Bitcoin",
+        "title": "Il saldo in dollari non è disponibile nella tua regione",
+        "body": "Trasferisci dal saldo in dollari al saldo in Bitcoin",
         "youHave": "Hai",
-        "youGet": "Ricevi",
-        "approve": "Approva"
+        "youGet": "Ricevi"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticazione a due fattori",
@@ -3569,6 +3568,10 @@
         "restoreComingSoonDescription": "La funzione di ripristino sarà disponibile in un aggiornamento futuro.",
         "createFailed": "Impossibile creare il wallet. Riprova.",
         "selfCustodialDisabled": "La modalità non custodial è temporaneamente non disponibile."
+    },
+    "UnsupportedRegionScreen": {
+        "title": "Regione non supportata",
+        "description": "Purtroppo non possiamo servire gli utenti dalla tua regione attuale."
     },
     "RestoreScreen": {
         "title": "Ripristina portafoglio",

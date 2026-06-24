@@ -8142,29 +8142,23 @@ type RootTranslation = {
 	}
 	StablesatsRestriction: {
 		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
-		 */
-		modalTitle: string
-		/**
-		 * T​o​ ​g​e​t​ ​a​c​c​e​s​s​ ​t​o​ ​a​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​,​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
-		 */
-		modalBody: string
-		/**
-		 * C​r​e​a​t​e​ ​n​e​w
-		 */
-		createNew: string
-		/**
 		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		walletLabel: string
 	}
+	DollarBalanceRestriction: {
+		/**
+		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 */
+		modalTitle: string
+	}
 	ConvertDollarToBitcoinModal: {
 		/**
-		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		title: string
 		/**
-		 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n
+		 * T​r​a​n​s​f​e​r​ ​f​r​o​m​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e
 		 */
 		body: string
 		/**
@@ -8175,10 +8169,6 @@ type RootTranslation = {
 		 * Y​o​u​ ​g​e​t
 		 */
 		youGet: string
-		/**
-		 * A​p​p​r​o​v​e
-		 */
-		approve: string
 	}
 	SplashScreen: {
 		/**
@@ -11875,6 +11865,16 @@ type RootTranslation = {
 		 * F​a​i​l​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​w​a​l​l​e​t​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
 		 */
 		createFailed: string
+	}
+	UnsupportedRegionScreen: {
+		/**
+		 * U​n​s​u​p​p​o​r​t​e​d​ ​r​e​g​i​o​n
+		 */
+		title: string
+		/**
+		 * U​n​f​o​r​t​u​n​a​t​e​l​y​ ​w​e​ ​c​a​n​ ​n​o​t​ ​s​e​r​v​e​ ​u​s​e​r​s​ ​f​r​o​m​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​g​i​o​n​.
+		 */
+		description: string
 	}
 	RestoreScreen: {
 		/**
@@ -20408,29 +20408,23 @@ export type TranslationFunctions = {
 	}
 	StablesatsRestriction: {
 		/**
-		 * Stablesats is not available in your region
-		 */
-		modalTitle: () => LocalizedString
-		/**
-		 * To get access to a Dollar Balance, create a non-custodial account.
-		 */
-		modalBody: () => LocalizedString
-		/**
-		 * Create new
-		 */
-		createNew: () => LocalizedString
-		/**
 		 * not available in your region
 		 */
 		walletLabel: () => LocalizedString
 	}
+	DollarBalanceRestriction: {
+		/**
+		 * Dollar Balance is not available in your region
+		 */
+		modalTitle: () => LocalizedString
+	}
 	ConvertDollarToBitcoinModal: {
 		/**
-		 * Dollar Balance is no longer available in your region
+		 * Dollar Balance is not available in your region
 		 */
 		title: () => LocalizedString
 		/**
-		 * Transfer your Dollar balance to Bitcoin
+		 * Transfer from Dollar Balance to Bitcoin Balance
 		 */
 		body: () => LocalizedString
 		/**
@@ -20441,10 +20435,6 @@ export type TranslationFunctions = {
 		 * You get
 		 */
 		youGet: () => LocalizedString
-		/**
-		 * Approve
-		 */
-		approve: () => LocalizedString
 	}
 	SplashScreen: {
 		/**
@@ -24075,6 +24065,16 @@ export type TranslationFunctions = {
 		 * Failed to create wallet. Please try again.
 		 */
 		createFailed: () => LocalizedString
+	}
+	UnsupportedRegionScreen: {
+		/**
+		 * Unsupported region
+		 */
+		title: () => LocalizedString
+		/**
+		 * Unfortunately we can not serve users from your current region.
+		 */
+		description: () => LocalizedString
 	}
 	RestoreScreen: {
 		/**

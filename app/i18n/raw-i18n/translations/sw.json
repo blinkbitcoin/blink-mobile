@@ -2457,17 +2457,16 @@
     "removedAccount": "Umeondoa akaunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats haipatikani katika eneo lako",
-    "modalBody": "Ili kufikia akaunti ya dola, unda akaunti isiyo ya ulinzi.",
-    "createNew": "Unda mpya",
     "walletLabel": "haipatikani katika eneo lako"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Salio la dola haipatikani katika eneo lako"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Akaunti ya Dola haipatikani tena katika eneo lako",
-    "body": "Hamisha salio lako la Dola kuwa Bitcoin",
+    "title": "Salio la dola haipatikani katika eneo lako",
+    "body": "Hamisha kutoka Salio la Dola hadi Salio la Bitcoin",
     "youHave": "Una",
-    "youGet": "Unapata",
-    "approve": "Idhinisha"
+    "youGet": "Unapata"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "uthibitishaji wa hatua mbili",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "Kipengele cha kurejesha kitapatikana katika sasisho la baadaye.",
     "createFailed": "Imeshindwa kuunda mkoba. Tafadhali jaribu tena.",
     "selfCustodialDisabled": "Isiyo na ulinzi haipatikani kwa muda."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Eneo lisilotumika",
+    "description": "Kwa bahati mbaya hatuwezi kuhudumia watumiaji kutoka eneo lako la sasa."
   },
   "RestoreScreen": {
     "title": "Rejesha mkoba",

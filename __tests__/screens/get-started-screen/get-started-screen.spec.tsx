@@ -6,6 +6,8 @@ import { GetStartedScreen } from "@app/screens/get-started-screen/get-started-sc
 const mockNavigate = jest.fn()
 const mockUseFeatureFlags = jest.fn()
 const mockUseAccountTypeOptions = jest.fn()
+const mockIsCreationBlocked = jest.fn()
+const mockRegionLoading = jest.fn(() => false)
 
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
@@ -30,6 +32,13 @@ jest.mock("@app/hooks/use-account-type-options", () => ({
   AccountFlow: { Trial: "trial", SelfCustodial: "selfCustodial" },
   ACCOUNT_OPTION_TO_FLOW: { custodial: "trial", selfCustodial: "selfCustodial" },
   useAccountTypeOptions: () => mockUseAccountTypeOptions(),
+}))
+
+jest.mock("@app/hooks/use-creation-block", () => ({
+  useCreationBlock: () => ({
+    isCreationBlocked: mockIsCreationBlocked,
+    loading: mockRegionLoading(),
+  }),
 }))
 
 jest.mock("@app/screens/get-started-screen/use-device-token", () => ({
@@ -128,6 +137,8 @@ jest.mock("@app/assets/logo/blink-logo-light.svg", () => "AppLogoLight")
 describe("GetStartedScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsCreationBlocked.mockReturnValue(false)
+    mockRegionLoading.mockReturnValue(false)
     mockUseFeatureFlags.mockReturnValue({
       deviceAccountEnabled: false,
       nonCustodialEnabled: true,
@@ -220,6 +231,64 @@ describe("GetStartedScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
       flow: "trial",
     })
+  })
+
+  it("redirects to Unsupported region when every available option is region-blocked", () => {
+    mockIsCreationBlocked.mockReturnValue(true)
+
+    const { getByTestId } = render(<GetStartedScreen />)
+    fireEvent.press(getByTestId("create-account-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion")
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountTypeSelection", {
+      mode: "create",
+    })
+  })
+
+  it("proceeds to the selection screen when at least one option is not region-blocked", () => {
+    mockIsCreationBlocked.mockImplementation(
+      (option: string) => option === "selfCustodial",
+    )
+
+    const { getByTestId } = render(<GetStartedScreen />)
+    fireEvent.press(getByTestId("create-account-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountTypeSelection", { mode: "create" })
+    expect(mockNavigate).not.toHaveBeenCalledWith("unsupportedRegion")
+  })
+
+  it("redirects when the only available option is region-blocked (non-custodial off, custodial blocked)", () => {
+    mockUseFeatureFlags.mockReturnValue({
+      deviceAccountEnabled: false,
+      nonCustodialEnabled: false,
+    })
+    mockUseAccountTypeOptions.mockReturnValue({
+      options: ["custodial"],
+      defaultSelected: "custodial",
+      selfCustodialTemporarilyDisabled: true,
+      loading: false,
+    })
+    mockIsCreationBlocked.mockReturnValue(true)
+
+    const { getByTestId } = render(<GetStartedScreen />)
+    fireEvent.press(getByTestId("create-account-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion")
+    expect(mockNavigate).not.toHaveBeenCalledWith("acceptTermsAndConditions", {
+      flow: "trial",
+    })
+  })
+
+  it("disables Create new account while detecting the region and ignores presses", () => {
+    mockRegionLoading.mockReturnValue(true)
+
+    const { getByTestId } = render(<GetStartedScreen />)
+    const button = getByTestId("create-account-button")
+
+    expect(button.props.accessibilityState.disabled).toBe(true)
+
+    fireEvent.press(button)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("routes Login to the selection screen with restore mode when non-custodial is enabled", () => {

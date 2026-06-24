@@ -2457,17 +2457,16 @@
     "removedAccount": "Du fjernede kontoen {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats er ikke tilgængelig i din region",
-    "modalBody": "For at få adgang til en dollarkonto skal du oprette en non-custodial konto.",
-    "createNew": "Opret ny",
     "walletLabel": "ikke tilgængelig i din region"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dollar-saldo er ikke tilgængelig i din region"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dollarkontoen er ikke længere tilgængelig i din region",
-    "body": "Overfør din dollarsaldo til Bitcoin",
+    "title": "Dollar-saldo er ikke tilgængelig i din region",
+    "body": "Overfør fra dollarsaldo til Bitcoin-saldo",
     "youHave": "Du har",
-    "youGet": "Du får",
-    "approve": "Godkend"
+    "youGet": "Du får"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "To-faktor godkendelse",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "Gendannelsesfunktionen vil være tilgængelig i en fremtidig opdatering.",
     "createFailed": "Kunne ikke oprette tegnebog. Prøv venligst igen.",
     "selfCustodialDisabled": "Ikke-forvaltning er midlertidigt utilgængelig."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Ikke-understøttet region",
+    "description": "Desværre kan vi ikke betjene brugere fra din nuværende region."
   },
   "RestoreScreen": {
     "title": "Gendan tegnebog",

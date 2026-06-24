@@ -2457,17 +2457,16 @@
     "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว"
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats ไม่พร้อมใช้งานในภูมิภาคของคุณ",
-    "modalBody": "หากต้องการเข้าถึงบัญชีดอลลาร์ ให้สร้างบัญชีแบบ non-custodial",
-    "createNew": "สร้างใหม่",
     "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "บัญชีดอลลาร์ไม่สามารถใช้งานได้ในภูมิภาคของคุณอีกต่อไป",
-    "body": "โอนยอดเงินดอลลาร์ของคุณเป็น Bitcoin",
+    "title": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ",
+    "body": "โอนจากยอดดอลลาร์ไปยังยอดบิตคอยน์",
     "youHave": "คุณมี",
-    "youGet": "คุณจะได้รับ",
-    "approve": "อนุมัติ"
+    "youGet": "คุณจะได้รับ"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "ฟีเจอร์กู้คืนจะพร้อมใช้งานในการอัปเดตในอนาคต",
     "createFailed": "สร้างกระเป๋าเงินไม่สำเร็จ กรุณาลองอีกครั้ง",
     "selfCustodialDisabled": "ไม่ใช่การคุ้มครองไม่พร้อมใช้งานชั่วคราว"
+  },
+  "UnsupportedRegionScreen": {
+    "title": "ภูมิภาคที่ไม่รองรับ",
+    "description": "ขออภัย เราไม่สามารถให้บริการผู้ใช้จากภูมิภาคปัจจุบันของคุณได้"
   },
   "RestoreScreen": {
     "title": "กู้คืนกระเป๋าเงิน",

@@ -2457,17 +2457,16 @@
     "removedAccount": "Ați eliminat contul {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats nu este disponibil în regiunea ta",
-    "modalBody": "Pentru a accesa un cont în dolari, creează un cont non-custodial.",
-    "createNew": "Crează cont nou",
     "walletLabel": "nu este disponibil în regiunea ta"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Contul în dolari nu mai este disponibil în regiunea ta",
-    "body": "Transferă soldul tău în dolari în Bitcoin",
+    "title": "Soldul în dolari nu este disponibil în regiunea ta",
+    "body": "Transferă din soldul în dolari în soldul în Bitcoin",
     "youHave": "Ai",
-    "youGet": "Primești",
-    "approve": "Aprobă"
+    "youGet": "Primești"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificare cu doi factori",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "Funcția de restaurare va fi disponibilă într-o actualizare viitoare.",
     "createFailed": "Crearea portofelului a eșuat. Vă rugăm să încercați din nou.",
     "selfCustodialDisabled": "Non-custodial este temporar indisponibil."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Regiune neacceptată",
+    "description": "Din păcate nu putem deservi utilizatorii din regiunea ta actuală."
   },
   "RestoreScreen": {
     "title": "Restaurare portofel",

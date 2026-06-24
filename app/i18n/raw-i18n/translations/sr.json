@@ -2457,17 +2457,16 @@
     "removedAccount": "Уклонили сте налог {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats није доступан у вашем региону",
-    "modalBody": "За приступ долар налогу, креирајте не-кастодијални налог.",
-    "createNew": "Креирај нови",
     "walletLabel": "није доступан у вашем региону"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Доларски салдо није доступан у вашем региону"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Налог у доларима више није доступан у вашем региону",
-    "body": "Пребаците свој салдо у доларима у Bitcoin",
+    "title": "Доларски салдо није доступан у вашем региону",
+    "body": "Пренесите са доларског салда на Bitcoin салдо",
     "youHave": "Имате",
-    "youGet": "Добијате",
-    "approve": "Одобри"
+    "youGet": "Добијате"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "Функција враћања биће доступна у будућем ажурирању.",
     "createFailed": "Није успело креирање новчаника. Молимо покушајте поново.",
     "selfCustodialDisabled": "Не-кастодијална опција је привремено недоступна."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Неподржани регион",
+    "description": "Нажалост не можемо да пружамо услугу корисницима из вашег тренутног региона."
   },
   "RestoreScreen": {
     "title": "Враћање новчаника",

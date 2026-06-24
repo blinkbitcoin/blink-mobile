@@ -12,6 +12,7 @@ import {
   AccountOption,
   useAccountTypeOptions,
 } from "@app/hooks/use-account-type-options"
+import { useCreationBlock } from "@app/hooks/use-creation-block"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { AccountTypeMode } from "@app/types/account"
@@ -28,12 +29,14 @@ export const AccountTypeSelectionScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "accountTypeSelection">>()
   const { mode } = route.params
+  const isCreateMode = mode === AccountTypeMode.Create
   const {
     options,
     defaultSelected,
     selfCustodialTemporarilyDisabled,
     loading: detectingCountry,
   } = useAccountTypeOptions(mode)
+  const { isCreationBlocked, loading: detectingRegion } = useCreationBlock()
   const [selected, setSelected] = useState<AccountOption | null>(defaultSelected)
 
   useEffect(() => {
@@ -43,7 +46,11 @@ export const AccountTypeSelectionScreen: React.FC = () => {
   const handleContinue = () => {
     if (!selected) return
 
-    if (mode === AccountTypeMode.Create) {
+    if (isCreateMode) {
+      if (isCreationBlocked(selected)) {
+        navigation.navigate("unsupportedRegion")
+        return
+      }
       navigation.navigate("acceptTermsAndConditions", {
         flow: ACCOUNT_OPTION_TO_FLOW[selected],
       })
@@ -63,13 +70,15 @@ export const AccountTypeSelectionScreen: React.FC = () => {
   const isSelected = (option: AccountOption) => selected === option
   const showSelfCustodial = options.includes(AccountOption.SelfCustodial)
   const showCustodial = options.includes(AccountOption.Custodial)
+  const isContinueDisabled =
+    !selected || detectingCountry || (isCreateMode && detectingRegion)
 
   return (
     <Screen>
       <View style={styles.wrapper}>
         <View style={styles.body}>
           <Text style={styles.description}>
-            {mode === AccountTypeMode.Create
+            {isCreateMode
               ? LL.AccountTypeSelectionScreen.descriptionDefault()
               : LL.AccountTypeSelectionScreen.descriptionSelected()}
           </Text>
@@ -147,7 +156,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
                 : LL.AccountTypeSelectionScreen.chooseMethod()
             }
             onPress={handleContinue}
-            disabled={!selected || detectingCountry}
+            disabled={isContinueDisabled}
             {...testProps("continue-button")}
           />
         </View>

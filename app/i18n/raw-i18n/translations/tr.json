@@ -2457,17 +2457,16 @@
     "removedAccount": "{identifier: string} hesabını kaldırdınız."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats bölgenizde kullanılamıyor",
-    "modalBody": "Dolar Bakiyesine erişmek için saklamasız bir hesap oluşturun.",
-    "createNew": "Yeni oluştur",
     "walletLabel": "bölgenizde kullanılamıyor"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dolar Bakiyesi artık bölgenizde kullanılamıyor",
-    "body": "Dolar bakiyenizi Bitcoin'e aktarın",
+    "title": "Dolar bakiyesi bölgenizde kullanılamıyor",
+    "body": "Dolar Bakiyesinden Bitcoin Bakiyesine aktarın",
     "youHave": "Sahip olduğunuz",
-    "youGet": "Alacağınız",
-    "approve": "Onayla"
+    "youGet": "Alacağınız"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "İki aşamalı doğrulama",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "Geri yükleme özelliği gelecek bir güncellemede kullanılabilir olacaktır.",
     "createFailed": "Cüzdan oluşturulamadı. Lütfen tekrar deneyin.",
     "selfCustodialDisabled": "Saklamasız mod geçici olarak kullanılamıyor."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Desteklenmeyen bölge",
+    "description": "Maalesef mevcut bölgenizdeki kullanıcılara hizmet veremiyoruz."
   },
   "RestoreScreen": {
     "title": "Cüzdanı geri yükle",

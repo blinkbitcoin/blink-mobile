@@ -2457,17 +2457,16 @@
     "removedAccount": "Je hebt account {identifier: string} verwijderd."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats is niet beschikbaar in jouw regio",
-    "modalBody": "Maak een non-custodial account aan om toegang te krijgen tot een Dollarsaldo.",
-    "createNew": "Nieuw aanmaken",
     "walletLabel": "niet beschikbaar in jouw regio"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Het Dollarsaldo is niet langer beschikbaar in jouw regio",
-    "body": "Breng je dollarsaldo over naar Bitcoin",
+    "title": "Dollar-saldo is niet beschikbaar in jouw regio",
+    "body": "Zet over van dollarsaldo naar Bitcoin-saldo",
     "youHave": "Je hebt",
-    "youGet": "Je krijgt",
-    "approve": "Goedkeuren"
+    "youGet": "Je krijgt"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Tweefactorauthenticatie",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "De herstelfunctie wordt beschikbaar in een toekomstige update.",
     "createFailed": "Kon portemonnee niet aanmaken. Probeer het opnieuw.",
     "selfCustodialDisabled": "Niet-bewarend is tijdelijk niet beschikbaar."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Niet-ondersteunde regio",
+    "description": "Helaas kunnen we geen gebruikers uit je huidige regio bedienen."
   },
   "RestoreScreen": {
     "title": "Portemonnee herstellen",

@@ -2457,17 +2457,16 @@
     "removedAccount": "لقد أزلت الحساب {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats غير متاح في منطقتك",
-    "modalBody": "للوصول إلى حساب الدولار، أنشئ حسابًا غير حافظ.",
-    "createNew": "إنشاء جديد",
     "walletLabel": "غير متاح في منطقتك"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "رصيد الدولار غير متاح في منطقتك"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "لم يعد حساب الدولار متاحًا في منطقتك",
-    "body": "انقل رصيدك بالدولار إلى بيتكوين",
+    "title": "رصيد الدولار غير متاح في منطقتك",
+    "body": "حوّل من رصيد الدولار إلى رصيد البيتكوين",
     "youHave": "لديك",
-    "youGet": "تحصل على",
-    "approve": "موافقة"
+    "youGet": "تحصل على"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "ستكون ميزة الاستعادة متاحة في تحديث مستقبلي.",
     "createFailed": "فشل في إنشاء المحفظة. يرجى المحاولة مرة أخرى.",
     "selfCustodialDisabled": "غير الحفظ غير متاح مؤقتًا."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "منطقة غير مدعومة",
+    "description": "للأسف لا يمكننا خدمة المستخدمين من منطقتك الحالية."
   },
   "RestoreScreen": {
     "title": "استعادة المحفظة",

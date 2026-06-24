@@ -2457,17 +2457,16 @@
     "removedAccount": "Odebrali jste účet {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats není ve vašem regionu k dispozici",
-    "modalBody": "Pro přístup k Dolarovému zůstatku si vytvořte ne-custodial účet.",
-    "createNew": "Vytvořit nový",
     "walletLabel": "není ve vašem regionu k dispozici"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dolarový zůstatek není ve vašem regionu k dispozici"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dolarový zůstatek již není ve vašem regionu dostupný",
-    "body": "Převeďte svůj zůstatek v dolarech na Bitcoin",
+    "title": "Dolarový zůstatek není ve vašem regionu k dispozici",
+    "body": "Převeďte z dolarového zůstatku na bitcoinový zůstatek",
     "youHave": "Máte",
-    "youGet": "Získáte",
-    "approve": "Schválit"
+    "youGet": "Získáte"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvoufaktorové ověření",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "Funkce obnovení bude dostupná v budoucí aktualizaci.",
     "createFailed": "Nepodařilo se vytvořit peněženku. Zkuste to prosím znovu.",
     "selfCustodialDisabled": "Nesvěřenecký režim je dočasně nedostupný."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Nepodporovaný region",
+    "description": "Bohužel nemůžeme obsluhovat uživatele z vašeho aktuálního regionu."
   },
   "RestoreScreen": {
     "title": "Obnovit peněženku",

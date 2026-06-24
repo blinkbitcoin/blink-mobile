@@ -4,23 +4,10 @@ const baseInputs = {
   country: "SV",
   detectionFailed: false,
   accountCount: 0,
-  custodialSignupBlockedCountries: ["US"],
   custodialFirstSignupBlockedCountries: ["GB", "DE"],
 }
 
 describe("decideCustodialEligibility", () => {
-  describe("country in always-blocked list", () => {
-    it("blocks signup as first account", () => {
-      expect(decideCustodialEligibility({ ...baseInputs, country: "US" })).toBe(false)
-    })
-
-    it("blocks signup even with existing accounts", () => {
-      expect(
-        decideCustodialEligibility({ ...baseInputs, country: "US", accountCount: 3 }),
-      ).toBe(false)
-    })
-  })
-
   describe("country in first-signup-blocked list", () => {
     it("blocks signup when there are no accounts yet", () => {
       expect(decideCustodialEligibility({ ...baseInputs, country: "GB" })).toBe(false)
@@ -33,7 +20,7 @@ describe("decideCustodialEligibility", () => {
     })
   })
 
-  describe("country not in any list", () => {
+  describe("country not in the list", () => {
     it("allows signup as first account", () => {
       expect(decideCustodialEligibility({ ...baseInputs, country: "SV" })).toBe(true)
     })
@@ -76,27 +63,12 @@ describe("decideCustodialEligibility", () => {
     })
   })
 
-  describe("precedence: always-block list outranks first-signup carve-out", () => {
-    it("blocks a country present in both lists with an existing account", () => {
+  describe("empty first-signup list", () => {
+    it("allows signup everywhere when the list is empty", () => {
       expect(
         decideCustodialEligibility({
           ...baseInputs,
-          country: "US",
-          accountCount: 1,
-          custodialSignupBlockedCountries: ["US"],
-          custodialFirstSignupBlockedCountries: ["US"],
-        }),
-      ).toBe(false)
-    })
-  })
-
-  describe("empty remote config lists", () => {
-    it("allows signup everywhere when both lists are empty", () => {
-      expect(
-        decideCustodialEligibility({
-          ...baseInputs,
-          country: "US",
-          custodialSignupBlockedCountries: [],
+          country: "GB",
           custodialFirstSignupBlockedCountries: [],
         }),
       ).toBe(true)

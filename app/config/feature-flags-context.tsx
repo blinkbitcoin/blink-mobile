@@ -34,9 +34,14 @@ const AutoConvertMaxAttemptsKey = "autoConvertMaxAttempts"
 const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
 const AutoConvertPollIntervalMsKey = "autoConvertPollIntervalMs"
 const AutoConvertAmountMatchToleranceBpsKey = "autoConvertAmountMatchToleranceBps"
-const CustodialSignupBlockedCountriesKey = "custodialSignupBlockedCountries"
 const CustodialFirstSignupBlockedCountriesKey = "custodialFirstSignupBlockedCountries"
-const StablesatsBlockedCountriesKey = "stablesatsBlockedCountries"
+const CustodialDollarBalanceBlockedCountriesKey = "custodialDollarBalanceBlockedCountries"
+const SelfCustodialDollarBalanceBlockedCountriesKey =
+  "selfCustodialDollarBalanceBlockedCountries"
+const SelfCustodialTransferBlockedCountriesKey = "selfCustodialTransferBlockedCountries"
+const CustodialTransferBlockedCountriesKey = "custodialTransferBlockedCountries"
+const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
+const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -76,9 +81,13 @@ type RemoteConfig = {
   [AutoConvertPollMaxAttemptsKey]: number
   [AutoConvertPollIntervalMsKey]: number
   [AutoConvertAmountMatchToleranceBpsKey]: number
-  [CustodialSignupBlockedCountriesKey]: string[]
   [CustodialFirstSignupBlockedCountriesKey]: string[]
-  [StablesatsBlockedCountriesKey]: string[]
+  [CustodialDollarBalanceBlockedCountriesKey]: string[]
+  [SelfCustodialDollarBalanceBlockedCountriesKey]: string[]
+  [SelfCustodialTransferBlockedCountriesKey]: string[]
+  [CustodialTransferBlockedCountriesKey]: string[]
+  [CustodialCreationBlockedCountriesKey]: string[]
+  [SelfCustodialCreationBlockedCountriesKey]: string[]
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -86,26 +95,37 @@ const defaultReplaceCardDeliveryConfig = {
   express: { minDays: 1, maxDays: 2, priceUsd: 15 },
 }
 
+/** Default transfer/swap block, read by both account types. */
+// prettier-ignore
+const transferBlockedDefault = [
+  "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR",
+  "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO",
+  "SE", "SI", "SK",
+]
+
 /**
- * Default compliance country lists (ISO-3166-1 alpha-2, uppercased). Sources:
+ * Default first-custodial-signup block (ISO-3166-1 alpha-2, uppercased). Sources:
  * OFAC sanctions (https://ofac.treasury.gov/sanctions-programs-and-country-information)
  * and Google Play crypto-wallet policy article 16329703
  * (https://support.google.com/googleplay/android-developer/answer/16329703).
  */
 // prettier-ignore
-const defaultCustodialBlocks = {
-  custodialSignupBlockedCountries: ["US"],
-  custodialFirstSignupBlockedCountries: [
-    // OFAC sanctions
-    "CU", "IR", "KP",
-    // Google Play 16329703
-    "AE", "BH", "CA", "CH", "GB", "ID", "IL", "JP", "KR", "PH", "ZA",
-    // Google Play 16329703 (EU-27, MiCA)
-    "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR",
-    "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO",
-    "SE", "SI", "SK",
-  ],
-}
+const custodialFirstSignupBlockedDefault = [
+  // OFAC sanctions
+  "CU", "IR", "KP",
+  // Google Play 16329703
+  "AE", "BH", "CA", "CH", "GB", "ID", "IL", "JP", "KR", "PH", "ZA",
+  // Google Play 16329703 (EU-27, MiCA)
+  "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR",
+  "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO",
+  "SE", "SI", "SK",
+]
+
+/** Default countries where account creation is blocked, redirecting to the Unsupported region screen (both account types). */
+// prettier-ignore
+const creationBlockedDefault = [
+  "CU", "IR", "KP", "SY", "RU", "BY",
+]
 
 export const defaultRemoteConfig: RemoteConfig = {
   deviceAccountEnabledRestAuth: false,
@@ -130,10 +150,13 @@ export const defaultRemoteConfig: RemoteConfig = {
   autoConvertPollMaxAttempts: 30,
   autoConvertPollIntervalMs: 500,
   autoConvertAmountMatchToleranceBps: 500,
-  custodialSignupBlockedCountries: defaultCustodialBlocks.custodialSignupBlockedCountries,
-  custodialFirstSignupBlockedCountries:
-    defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
-  stablesatsBlockedCountries: ["HK"],
+  custodialFirstSignupBlockedCountries: custodialFirstSignupBlockedDefault,
+  custodialDollarBalanceBlockedCountries: ["HK"],
+  selfCustodialDollarBalanceBlockedCountries: ["HK"],
+  selfCustodialTransferBlockedCountries: transferBlockedDefault,
+  custodialTransferBlockedCountries: transferBlockedDefault,
+  custodialCreationBlockedCountries: creationBlockedDefault,
+  selfCustodialCreationBlockedCountries: creationBlockedDefault,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -148,14 +171,26 @@ remoteConfigInstance().setDefaults({
   replaceCardDeliveryConfig: serializeRemoteConfigDefault(
     defaultReplaceCardDeliveryConfig,
   ),
-  custodialSignupBlockedCountries: serializeRemoteConfigDefault(
-    defaultCustodialBlocks.custodialSignupBlockedCountries,
-  ),
   custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
-    defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
+    custodialFirstSignupBlockedDefault,
   ),
-  stablesatsBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.stablesatsBlockedCountries,
+  custodialDollarBalanceBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.custodialDollarBalanceBlockedCountries,
+  ),
+  selfCustodialDollarBalanceBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
+  ),
+  selfCustodialTransferBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.selfCustodialTransferBlockedCountries,
+  ),
+  custodialTransferBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.custodialTransferBlockedCountries,
+  ),
+  custodialCreationBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.custodialCreationBlockedCountries,
+  ),
+  selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.selfCustodialCreationBlockedCountries,
   ),
 })
 
@@ -278,19 +313,39 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           ...parsedDeliveryConfig,
         }
 
-        const custodialSignupBlockedCountries = getRemoteConfigStringList(
-          CustodialSignupBlockedCountriesKey,
-          defaultCustodialBlocks.custodialSignupBlockedCountries,
-        )
-
         const custodialFirstSignupBlockedCountries = getRemoteConfigStringList(
           CustodialFirstSignupBlockedCountriesKey,
-          defaultCustodialBlocks.custodialFirstSignupBlockedCountries,
+          custodialFirstSignupBlockedDefault,
         )
 
-        const stablesatsBlockedCountries = getRemoteConfigStringList(
-          StablesatsBlockedCountriesKey,
-          defaultRemoteConfig.stablesatsBlockedCountries,
+        const custodialDollarBalanceBlockedCountries = getRemoteConfigStringList(
+          CustodialDollarBalanceBlockedCountriesKey,
+          defaultRemoteConfig.custodialDollarBalanceBlockedCountries,
+        )
+
+        const selfCustodialDollarBalanceBlockedCountries = getRemoteConfigStringList(
+          SelfCustodialDollarBalanceBlockedCountriesKey,
+          defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
+        )
+
+        const selfCustodialTransferBlockedCountries = getRemoteConfigStringList(
+          SelfCustodialTransferBlockedCountriesKey,
+          defaultRemoteConfig.selfCustodialTransferBlockedCountries,
+        )
+
+        const custodialTransferBlockedCountries = getRemoteConfigStringList(
+          CustodialTransferBlockedCountriesKey,
+          defaultRemoteConfig.custodialTransferBlockedCountries,
+        )
+
+        const custodialCreationBlockedCountries = getRemoteConfigStringList(
+          CustodialCreationBlockedCountriesKey,
+          defaultRemoteConfig.custodialCreationBlockedCountries,
+        )
+
+        const selfCustodialCreationBlockedCountries = getRemoteConfigStringList(
+          SelfCustodialCreationBlockedCountriesKey,
+          defaultRemoteConfig.selfCustodialCreationBlockedCountries,
         )
 
         setRemoteConfig({
@@ -316,9 +371,13 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           autoConvertPollMaxAttempts,
           autoConvertPollIntervalMs,
           autoConvertAmountMatchToleranceBps,
-          custodialSignupBlockedCountries,
           custodialFirstSignupBlockedCountries,
-          stablesatsBlockedCountries,
+          custodialDollarBalanceBlockedCountries,
+          selfCustodialDollarBalanceBlockedCountries,
+          selfCustodialTransferBlockedCountries,
+          custodialTransferBlockedCountries,
+          custodialCreationBlockedCountries,
+          selfCustodialCreationBlockedCountries,
         })
       } catch (err) {
         logError({

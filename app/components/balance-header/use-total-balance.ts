@@ -1,7 +1,7 @@
 import { WalletBalance, getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
+import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
 import { usePriceConversion } from "@app/hooks"
 import {
   addMoneyAmounts,
@@ -20,7 +20,7 @@ export const useTotalBalance = (
 } => {
   const { formatMoneyAmount } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
-  const isStablesatsRestricted = useStablesatsRestricted()
+  const isDollarBalanceRestricted = useDollarBalanceRestricted()
 
   // TODO: check that there are 2 wallets.
   // otherwise fail (account with more/less 2 wallets will not be working with the current mobile app)
@@ -32,7 +32,7 @@ export const useTotalBalance = (
     toBtcMoneyAmount(btcWallet?.balance),
     DisplayCurrency,
   )
-  const usdAmount = isStablesatsRestricted
+  const usdAmount = isDollarBalanceRestricted
     ? convertMoneyAmount?.(toUsdMoneyAmount(0), DisplayCurrency)
     : convertMoneyAmount?.(toUsdMoneyAmount(usdWallet?.balance), DisplayCurrency)
 

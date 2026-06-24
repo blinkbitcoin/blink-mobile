@@ -23,6 +23,7 @@ import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 export type RootStackParamList = {
   getStarted: undefined
   accountTypeSelection: { mode: AccountTypeMode }
+  unsupportedRegion: undefined
   selfCustodialWalletCreation: undefined
   liteDeviceAccount: {
     appCheckToken: string

@@ -2457,17 +2457,16 @@
     "removedAccount": "Uklonili ste račun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats nije dostupan u vašoj regiji",
-    "modalBody": "Za pristup dolarskom računu, izradite ne-skrbnički račun.",
-    "createNew": "Izradi novi",
     "walletLabel": "nije dostupan u vašoj regiji"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Račun u dolarima više nije dostupan u vašoj regiji",
-    "body": "Prebacite svoje stanje u dolarima u Bitcoin",
+    "title": "Dolarski saldo nije dostupan u vašoj regiji",
+    "body": "Prebacite s dolarskog stanja na Bitcoin stanje",
     "youHave": "Imate",
-    "youGet": "Dobivate",
-    "approve": "Odobri"
+    "youGet": "Dobivate"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvofaktorska autentifikacija",
@@ -3569,6 +3568,10 @@
     "restoreComingSoonDescription": "Funkcija vraćanja bit će dostupna u budućem ažuriranju.",
     "createFailed": "Neuspjelo stvaranje novčanika. Molimo pokušajte ponovno.",
     "selfCustodialDisabled": "Nekustodijska opcija je privremeno nedostupna."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Nepodržana regija",
+    "description": "Nažalost ne možemo pružati uslugu korisnicima iz vaše trenutne regije."
   },
   "RestoreScreen": {
     "title": "Vraćanje novčanika",

@@ -2594,17 +2594,16 @@ const en: BaseTranslation = {
     learnMoreSelfCustodial: "Learn more",
   },
   StablesatsRestriction: {
-    modalTitle: "Stablesats is not available in your region",
-    modalBody: "To get access to a Dollar Balance, create a non-custodial account.",
-    createNew: "Create new",
     walletLabel: "not available in your region",
   },
+  DollarBalanceRestriction: {
+    modalTitle: "Dollar Balance is not available in your region",
+  },
   ConvertDollarToBitcoinModal: {
-    title: "Dollar Balance is no longer available in your region",
-    body: "Transfer your Dollar balance to Bitcoin",
+    title: "Dollar Balance is not available in your region",
+    body: "Transfer from Dollar Balance to Bitcoin Balance",
     youHave: "You have",
     youGet: "You get",
-    approve: "Approve",
   },
   SplashScreen: {
     update:
@@ -3740,6 +3739,10 @@ const en: BaseTranslation = {
     restoreComingSoonDescription:
       "Restore flow will be available in a future update.",
     createFailed: "Failed to create wallet. Please try again.",
+  },
+  UnsupportedRegionScreen: {
+    title: "Unsupported region",
+    description: "Unfortunately we can not serve users from your current region.",
   },
   RestoreScreen: {
     title: "Restore wallet",
