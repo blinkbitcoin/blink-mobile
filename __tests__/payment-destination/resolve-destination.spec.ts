@@ -51,7 +51,7 @@ describe("resolveDestination", () => {
   })
 
   describe("custodial path (sdk = null)", () => {
-    it("returns parseDestination output unchanged", async () => {
+    it("returns a resolved destination unchanged without an LNURL fallback", async () => {
       const parsed = { valid: true, validDestination: { paymentType: "Lightning" } }
       mockParseDestination.mockResolvedValue(parsed)
 
@@ -61,10 +61,47 @@ describe("resolveDestination", () => {
         lnAddressHostname,
       )
 
+      expect(mockParseDestination).toHaveBeenCalledTimes(1)
       expect(mockParseSparkAddress).not.toHaveBeenCalled()
       expect(mockResolveUsername).not.toHaveBeenCalled()
       expect(mockWrapDestination).not.toHaveBeenCalled()
       expect(result).toBe(parsed)
+    })
+
+    it("re-resolves an unresolved Blink username as a lightning address over LNURL", async () => {
+      const unresolved = { valid: false, invalidReason: "UsernameDoesNotExist" }
+      const lnurlResolved = { valid: true, validDestination: { paymentType: "Lnurl" } }
+      mockParseDestination
+        .mockResolvedValueOnce(unresolved)
+        .mockResolvedValueOnce(lnurlResolved)
+
+      const result = await resolveDestination(
+        baseParams,
+        { sdk: null, network: SparkNetwork.Regtest },
+        lnAddressHostname,
+      )
+
+      expect(mockParseDestination).toHaveBeenNthCalledWith(1, baseParams)
+      expect(mockParseDestination).toHaveBeenNthCalledWith(2, {
+        ...baseParams,
+        preferLnurlForInternalHandles: true,
+      })
+      expect(mockResolveUsername).not.toHaveBeenCalled()
+      expect(result).toBe(lnurlResolved)
+    })
+
+    it("does not fall back when the destination is invalid for a reason other than a missing username", async () => {
+      const invalid = { valid: false, invalidReason: "WrongNetwork" }
+      mockParseDestination.mockResolvedValue(invalid)
+
+      const result = await resolveDestination(
+        baseParams,
+        { sdk: null, network: SparkNetwork.Regtest },
+        lnAddressHostname,
+      )
+
+      expect(mockParseDestination).toHaveBeenCalledTimes(1)
+      expect(result).toBe(invalid)
     })
 
     it("does not attempt the Spark pre-check when sdk is null", async () => {

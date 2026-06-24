@@ -29,6 +29,7 @@ export type ParseDestinationParams = {
   accountDefaultWalletQuery: AccountDefaultWalletLazyQueryHookResult[0]
   inputSource?: InputSource
   displayCurrency?: string
+  preferLnurlForInternalHandles?: boolean
 }
 
 export const DestinationDirection = {
@@ -88,6 +89,9 @@ export const InvalidDestinationReason = {
 
 export type InvalidDestinationReason =
   (typeof InvalidDestinationReason)[keyof typeof InvalidDestinationReason]
+
+export const isUnresolvedUsername = (result: ParseDestinationResult): boolean =>
+  !result.valid && result.invalidReason === InvalidDestinationReason.UsernameDoesNotExist
 
 export type ValidParsedPaymentDestination = (
   | ResolvedLnurlPaymentDestination
