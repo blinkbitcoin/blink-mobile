@@ -29,6 +29,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "accountTypeSelection">>()
   const { mode } = route.params
+  const isCreateMode = mode === AccountTypeMode.Create
   const {
     options,
     defaultSelected,
@@ -45,7 +46,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
   const handleContinue = () => {
     if (!selected) return
 
-    if (mode === AccountTypeMode.Create) {
+    if (isCreateMode) {
       if (isCreationBlocked(selected)) {
         navigation.navigate("unsupportedRegion")
         return
@@ -69,13 +70,15 @@ export const AccountTypeSelectionScreen: React.FC = () => {
   const isSelected = (option: AccountOption) => selected === option
   const showSelfCustodial = options.includes(AccountOption.SelfCustodial)
   const showCustodial = options.includes(AccountOption.Custodial)
+  const isContinueDisabled =
+    !selected || detectingCountry || (isCreateMode && detectingRegion)
 
   return (
     <Screen>
       <View style={styles.wrapper}>
         <View style={styles.body}>
           <Text style={styles.description}>
-            {mode === AccountTypeMode.Create
+            {isCreateMode
               ? LL.AccountTypeSelectionScreen.descriptionDefault()
               : LL.AccountTypeSelectionScreen.descriptionSelected()}
           </Text>
@@ -153,11 +156,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
                 : LL.AccountTypeSelectionScreen.chooseMethod()
             }
             onPress={handleContinue}
-            disabled={
-              !selected ||
-              detectingCountry ||
-              (mode === AccountTypeMode.Create && detectingRegion)
-            }
+            disabled={isContinueDisabled}
             {...testProps("continue-button")}
           />
         </View>

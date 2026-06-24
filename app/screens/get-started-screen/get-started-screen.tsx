@@ -52,6 +52,7 @@ export const GetStartedScreen: React.FC = () => {
   const { options, defaultSelected, loading: detectingCountry } = useAccountTypeOptions()
   const { isCreationBlocked, loading: detectingRegion } = useCreationBlock()
   const canCreateAccount = options.length > 0
+  const isCreateAccountDisabled = !canCreateAccount || detectingCountry || detectingRegion
 
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
 
@@ -126,7 +127,7 @@ export const GetStartedScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.GetStartedScreen.createAccount()}
             onPress={handleCreateAccount}
-            disabled={!canCreateAccount || detectingCountry || detectingRegion}
+            disabled={isCreateAccountDisabled}
           />
           <GaloySecondaryButton
             title={
