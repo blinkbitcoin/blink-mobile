@@ -9,6 +9,17 @@ const createValidResult = (paymentType: PaymentType, extra = {}) =>
     validDestination: { paymentType, ...extra },
   }) as never
 
+const createInvalidResult = (
+  paymentType: PaymentType,
+  invalidReason: string,
+  extra = {},
+) =>
+  ({
+    valid: false,
+    invalidReason,
+    invalidPaymentDestination: { paymentType, ...extra },
+  }) as never
+
 describe("resolveUsername", () => {
   const lnAddressHostname = "blink.sv"
 
@@ -40,6 +51,46 @@ describe("resolveUsername", () => {
     expect(result).toBe(lnurl)
   })
 
+  it("re-resolves an unresolved username (not a custodial account) as a Lightning Address", async () => {
+    const invalid = createInvalidResult(PaymentType.Intraledger, "UsernameDoesNotExist", {
+      handle: "bulus",
+    })
+    const lnurl = createValidResult(PaymentType.Lnurl, { lnurl: "bulus@blink.sv" })
+    const resolveLnAddress = jest.fn().mockResolvedValue(lnurl)
+
+    const result = await resolveUsername(invalid, lnAddressHostname, resolveLnAddress)
+
+    expect(resolveLnAddress).toHaveBeenCalledWith("bulus@blink.sv")
+    expect(result).toBe(lnurl)
+  })
+
+  it("re-resolves an unresolved intraledger-with-flag username as a Lightning Address", async () => {
+    const invalid = createInvalidResult(
+      PaymentType.IntraledgerWithFlag,
+      "UsernameDoesNotExist",
+      { handle: "bulus" },
+    )
+    const lnurl = createValidResult(PaymentType.Lnurl, { lnurl: "bulus@blink.sv" })
+    const resolveLnAddress = jest.fn().mockResolvedValue(lnurl)
+
+    const result = await resolveUsername(invalid, lnAddressHostname, resolveLnAddress)
+
+    expect(resolveLnAddress).toHaveBeenCalledWith("bulus@blink.sv")
+    expect(result).toBe(lnurl)
+  })
+
+  it("does not re-resolve an intraledger result invalid for a reason other than a missing username", async () => {
+    const invalid = createInvalidResult(PaymentType.Intraledger, "WrongDomain", {
+      handle: "bob",
+    })
+    const resolveLnAddress = jest.fn()
+
+    const result = await resolveUsername(invalid, lnAddressHostname, resolveLnAddress)
+
+    expect(resolveLnAddress).not.toHaveBeenCalled()
+    expect(result).toBe(invalid)
+  })
+
   it("passes a Lnurl destination through unchanged (no re-resolution)", async () => {
     const lnurl = createValidResult(PaymentType.Lnurl, { lnurl: "alice@blink.sv" })
     const resolveLnAddress = jest.fn()
@@ -48,16 +99,6 @@ describe("resolveUsername", () => {
 
     expect(resolveLnAddress).not.toHaveBeenCalled()
     expect(result).toBe(lnurl)
-  })
-
-  it("passes invalid destinations through unchanged", async () => {
-    const invalid = { valid: false } as never
-    const resolveLnAddress = jest.fn()
-
-    const result = await resolveUsername(invalid, lnAddressHostname, resolveLnAddress)
-
-    expect(resolveLnAddress).not.toHaveBeenCalled()
-    expect(result).toBe(invalid)
   })
 
   it("passes Receive-direction destinations through unchanged", async () => {
