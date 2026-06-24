@@ -2582,10 +2582,10 @@
     "@noble/hashes" "^1.1.5"
     "@noble/secp256k1" "^1.7.1"
 
-"@blinkbitcoin/blink-client@0.5.3":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-0.5.3.tgz#7ef372f264e1fb94f7638c35e1eb5ec8dd3601f5"
-  integrity sha512-jdd9qJEnMvceZzzI2iLVf4ArHqNC2RcusL9qYP1F2O4AK5XEkh7HMW1KB3t0MXS4DqjYmMeIFW169o1WEIahCA==
+"@blinkbitcoin/blink-client@0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-0.6.0.tgz#2d404c0c24f3ea65ac52ed63c49750d0accd10ce"
+  integrity sha512-ikW6liGeFAoi3SJB9i+C5d2QICVhEzdP9lJYdMZnEaL1WoitRO4uiG1n6vQTFEQwg0Q0OOeBK1Qoa3rNKbcF2Q==
 
 "@breeztech/breez-sdk-spark-react-native@0.15.0":
   version "0.15.0"

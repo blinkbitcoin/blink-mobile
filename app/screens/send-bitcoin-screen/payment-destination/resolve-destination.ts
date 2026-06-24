@@ -7,7 +7,11 @@ import { parseSparkAddress } from "@app/self-custodial/bridge"
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 
 import { parseDestination } from "./index"
-import { type ParseDestinationParams, type ParseDestinationResult } from "./index.types"
+import {
+  isUnresolvedUsername,
+  type ParseDestinationParams,
+  type ParseDestinationResult,
+} from "./index.types"
 import { resolveSparkDestination } from "./spark"
 import { resolveUsername } from "./resolve-username"
 
@@ -16,14 +20,24 @@ export type SparkSession = {
   network: Network
 }
 
-/** parseDestination + self-custodial-aware resolution and wrap when an SDK is connected. */
+/**
+ * parseDestination with account-aware resolution: a custodial sender re-tries a Blink
+ * username that is not a custodial account as a lightning address over LNURL; a
+ * self-custodial sender resolves and wraps through the connected SDK.
+ */
 export const resolveDestination = async (
   params: ParseDestinationParams,
   session: SparkSession,
   lnAddressHostname: string,
 ): Promise<ParseDestinationResult> => {
   const { sdk, network } = session
-  if (!sdk) return parseDestination(params)
+  if (!sdk) {
+    const parsed = await parseDestination(params)
+    if (isUnresolvedUsername(parsed)) {
+      return parseDestination({ ...params, preferLnurlForInternalHandles: true })
+    }
+    return parsed
+  }
 
   const sparkParsed = await parseSparkAddress(sdk, params.rawInput, network)
   if (sparkParsed) {
