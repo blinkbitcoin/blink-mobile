@@ -47,8 +47,8 @@ const baseState: PersistentState = {
 }
 
 const remoteConfig = {
-  stablesatsBlockedCountries: ["HK"],
-  stableTokenBlockedCountries: ["FR"],
+  custodialDollarBalanceBlockedCountries: ["HK"],
+  selfCustodialDollarBalanceBlockedCountries: ["FR"],
 }
 
 const setup = (accountType: AccountType): void => {
@@ -201,8 +201,8 @@ describe("useDollarBalanceRestrictionSync", () => {
     setup(AccountType.Custodial)
     mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", source: "phone" })
     mockUseRemoteConfig.mockReturnValue({
-      stablesatsBlockedCountries: ["HK"],
-      stableTokenBlockedCountries: ["HK"],
+      custodialDollarBalanceBlockedCountries: ["HK"],
+      selfCustodialDollarBalanceBlockedCountries: ["HK"],
     })
 
     const { rerender } = renderHook(() => useDollarBalanceRestrictionSync())

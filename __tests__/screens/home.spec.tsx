@@ -85,8 +85,8 @@ jest.mock("@app/config/feature-flags-context", () => {
         nonCustodialEnabled: false,
         stableBalanceEnabled: false,
       },
-      stablesatsBlockedCountries: [],
-      stableTokenBlockedCountries: [],
+      custodialDollarBalanceBlockedCountries: [],
+      selfCustodialDollarBalanceBlockedCountries: [],
     }),
   }
 })

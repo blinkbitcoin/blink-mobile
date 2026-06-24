@@ -35,10 +35,11 @@ const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
 const AutoConvertPollIntervalMsKey = "autoConvertPollIntervalMs"
 const AutoConvertAmountMatchToleranceBpsKey = "autoConvertAmountMatchToleranceBps"
 const CustodialFirstSignupBlockedCountriesKey = "custodialFirstSignupBlockedCountries"
-const StablesatsBlockedCountriesKey = "stablesatsBlockedCountries"
-const StableTokenBlockedCountriesKey = "stableTokenBlockedCountries"
-const StableTokenTransferBlockedCountriesKey = "stableTokenTransferBlockedCountries"
-const StablesatsTransferBlockedCountriesKey = "stablesatsTransferBlockedCountries"
+const CustodialDollarBalanceBlockedCountriesKey = "custodialDollarBalanceBlockedCountries"
+const SelfCustodialDollarBalanceBlockedCountriesKey =
+  "selfCustodialDollarBalanceBlockedCountries"
+const SelfCustodialTransferBlockedCountriesKey = "selfCustodialTransferBlockedCountries"
+const CustodialTransferBlockedCountriesKey = "custodialTransferBlockedCountries"
 const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
 const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
 
@@ -81,10 +82,10 @@ type RemoteConfig = {
   [AutoConvertPollIntervalMsKey]: number
   [AutoConvertAmountMatchToleranceBpsKey]: number
   [CustodialFirstSignupBlockedCountriesKey]: string[]
-  [StablesatsBlockedCountriesKey]: string[]
-  [StableTokenBlockedCountriesKey]: string[]
-  [StableTokenTransferBlockedCountriesKey]: string[]
-  [StablesatsTransferBlockedCountriesKey]: string[]
+  [CustodialDollarBalanceBlockedCountriesKey]: string[]
+  [SelfCustodialDollarBalanceBlockedCountriesKey]: string[]
+  [SelfCustodialTransferBlockedCountriesKey]: string[]
+  [CustodialTransferBlockedCountriesKey]: string[]
   [CustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialCreationBlockedCountriesKey]: string[]
 }
@@ -150,10 +151,10 @@ export const defaultRemoteConfig: RemoteConfig = {
   autoConvertPollIntervalMs: 500,
   autoConvertAmountMatchToleranceBps: 500,
   custodialFirstSignupBlockedCountries: custodialFirstSignupBlockedDefault,
-  stablesatsBlockedCountries: ["HK"],
-  stableTokenBlockedCountries: ["HK"],
-  stableTokenTransferBlockedCountries: transferBlockedDefault,
-  stablesatsTransferBlockedCountries: transferBlockedDefault,
+  custodialDollarBalanceBlockedCountries: ["HK"],
+  selfCustodialDollarBalanceBlockedCountries: ["HK"],
+  selfCustodialTransferBlockedCountries: transferBlockedDefault,
+  custodialTransferBlockedCountries: transferBlockedDefault,
   custodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialCreationBlockedCountries: creationBlockedDefault,
 }
@@ -173,17 +174,17 @@ remoteConfigInstance().setDefaults({
   custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
     custodialFirstSignupBlockedDefault,
   ),
-  stablesatsBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.stablesatsBlockedCountries,
+  custodialDollarBalanceBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.custodialDollarBalanceBlockedCountries,
   ),
-  stableTokenBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.stableTokenBlockedCountries,
+  selfCustodialDollarBalanceBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
   ),
-  stableTokenTransferBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.stableTokenTransferBlockedCountries,
+  selfCustodialTransferBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.selfCustodialTransferBlockedCountries,
   ),
-  stablesatsTransferBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.stablesatsTransferBlockedCountries,
+  custodialTransferBlockedCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.custodialTransferBlockedCountries,
   ),
   custodialCreationBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.custodialCreationBlockedCountries,
@@ -317,24 +318,24 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           custodialFirstSignupBlockedDefault,
         )
 
-        const stablesatsBlockedCountries = getRemoteConfigStringList(
-          StablesatsBlockedCountriesKey,
-          defaultRemoteConfig.stablesatsBlockedCountries,
+        const custodialDollarBalanceBlockedCountries = getRemoteConfigStringList(
+          CustodialDollarBalanceBlockedCountriesKey,
+          defaultRemoteConfig.custodialDollarBalanceBlockedCountries,
         )
 
-        const stableTokenBlockedCountries = getRemoteConfigStringList(
-          StableTokenBlockedCountriesKey,
-          defaultRemoteConfig.stableTokenBlockedCountries,
+        const selfCustodialDollarBalanceBlockedCountries = getRemoteConfigStringList(
+          SelfCustodialDollarBalanceBlockedCountriesKey,
+          defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
         )
 
-        const stableTokenTransferBlockedCountries = getRemoteConfigStringList(
-          StableTokenTransferBlockedCountriesKey,
-          defaultRemoteConfig.stableTokenTransferBlockedCountries,
+        const selfCustodialTransferBlockedCountries = getRemoteConfigStringList(
+          SelfCustodialTransferBlockedCountriesKey,
+          defaultRemoteConfig.selfCustodialTransferBlockedCountries,
         )
 
-        const stablesatsTransferBlockedCountries = getRemoteConfigStringList(
-          StablesatsTransferBlockedCountriesKey,
-          defaultRemoteConfig.stablesatsTransferBlockedCountries,
+        const custodialTransferBlockedCountries = getRemoteConfigStringList(
+          CustodialTransferBlockedCountriesKey,
+          defaultRemoteConfig.custodialTransferBlockedCountries,
         )
 
         const custodialCreationBlockedCountries = getRemoteConfigStringList(
@@ -371,10 +372,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           autoConvertPollIntervalMs,
           autoConvertAmountMatchToleranceBps,
           custodialFirstSignupBlockedCountries,
-          stablesatsBlockedCountries,
-          stableTokenBlockedCountries,
-          stableTokenTransferBlockedCountries,
-          stablesatsTransferBlockedCountries,
+          custodialDollarBalanceBlockedCountries,
+          selfCustodialDollarBalanceBlockedCountries,
+          selfCustodialTransferBlockedCountries,
+          custodialTransferBlockedCountries,
           custodialCreationBlockedCountries,
           selfCustodialCreationBlockedCountries,
         })

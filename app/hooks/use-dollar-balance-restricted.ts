@@ -32,18 +32,21 @@ type DollarBalanceRestrictionPolicy = {
  */
 const useDollarBalanceRestrictionPolicy = (): DollarBalanceRestrictionPolicy => {
   const { accountType } = useActiveWallet()
-  const { stablesatsBlockedCountries, stableTokenBlockedCountries } = useRemoteConfig()
+  const {
+    custodialDollarBalanceBlockedCountries,
+    selfCustodialDollarBalanceBlockedCountries,
+  } = useRemoteConfig()
   const { persistentState } = usePersistentStateContext()
 
   if (accountType === AccountType.SelfCustodial) {
     return {
-      blockedCountries: stableTokenBlockedCountries,
+      blockedCountries: selfCustodialDollarBalanceBlockedCountries,
       isPersisted: getStableTokenRestricted(persistentState),
       persist: withStableTokenRestricted,
     }
   }
   return {
-    blockedCountries: stablesatsBlockedCountries,
+    blockedCountries: custodialDollarBalanceBlockedCountries,
     isPersisted: getStablesatsRestricted(persistentState),
     persist: withStablesatsRestricted,
   }

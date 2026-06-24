@@ -48,8 +48,8 @@ const setup = (): void => {
   jest.clearAllMocks()
   mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
   mockUseRemoteConfig.mockReturnValue({
-    stablesatsTransferBlockedCountries: ["DE"],
-    stableTokenTransferBlockedCountries: ["FR"],
+    custodialTransferBlockedCountries: ["DE"],
+    selfCustodialTransferBlockedCountries: ["FR"],
   })
   mockUseActiveWallet.mockReturnValue({ accountType: AccountType.SelfCustodial })
   mockUseIpCountryCode.mockReturnValue(undefined)
@@ -154,8 +154,8 @@ describe("useTransferBlockedSync", () => {
 
   it("re-fires on a custodial-to-self-custodial switch in a blocked country, writing the self-custodial flag too", () => {
     mockUseRemoteConfig.mockReturnValue({
-      stablesatsTransferBlockedCountries: ["FR"],
-      stableTokenTransferBlockedCountries: ["FR"],
+      custodialTransferBlockedCountries: ["FR"],
+      selfCustodialTransferBlockedCountries: ["FR"],
     })
     mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", source: "phone" })
     const writes: PersistentState[] = []

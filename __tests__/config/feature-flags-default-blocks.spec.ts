@@ -54,31 +54,31 @@ describe("defaultRemoteConfig: compliance country lists", () => {
     assertCanonical(defaultRemoteConfig.custodialFirstSignupBlockedCountries)
   })
 
-  it("stableTokenTransferBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
-    assertCanonical(defaultRemoteConfig.stableTokenTransferBlockedCountries)
+  it("selfCustodialTransferBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.selfCustodialTransferBlockedCountries)
   })
 
-  it("stableTokenTransferBlockedCountries defaults to the 27 EU member states", () => {
-    expect(defaultRemoteConfig.stableTokenTransferBlockedCountries).toHaveLength(27)
+  it("selfCustodialTransferBlockedCountries defaults to the 27 EU member states", () => {
+    expect(defaultRemoteConfig.selfCustodialTransferBlockedCountries).toHaveLength(27)
   })
 
-  it("stablesatsTransferBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
-    assertCanonical(defaultRemoteConfig.stablesatsTransferBlockedCountries)
+  it("custodialTransferBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.custodialTransferBlockedCountries)
   })
 
   it("both account-type transfer blocks default to the same 27 EU member states", () => {
-    expect(defaultRemoteConfig.stablesatsTransferBlockedCountries).toEqual(
-      defaultRemoteConfig.stableTokenTransferBlockedCountries,
+    expect(defaultRemoteConfig.custodialTransferBlockedCountries).toEqual(
+      defaultRemoteConfig.selfCustodialTransferBlockedCountries,
     )
-    expect(defaultRemoteConfig.stablesatsTransferBlockedCountries).toHaveLength(27)
+    expect(defaultRemoteConfig.custodialTransferBlockedCountries).toHaveLength(27)
   })
 
-  it("stableTokenBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
-    assertCanonical(defaultRemoteConfig.stableTokenBlockedCountries)
+  it("selfCustodialDollarBalanceBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries)
   })
 
-  it("stableTokenBlockedCountries defaults to Hong Kong", () => {
-    expect(defaultRemoteConfig.stableTokenBlockedCountries).toEqual(["HK"])
+  it("selfCustodialDollarBalanceBlockedCountries defaults to Hong Kong", () => {
+    expect(defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries).toEqual(["HK"])
   })
 
   it("custodialCreationBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {

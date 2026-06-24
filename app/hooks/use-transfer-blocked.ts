@@ -29,19 +29,19 @@ type TransferBlockPolicy = {
 /** Gating on accountType (not isSelfCustodial) stays stable through the self-custodial cold-start. */
 const useTransferBlockPolicy = (): TransferBlockPolicy => {
   const { accountType } = useActiveWallet()
-  const { stablesatsTransferBlockedCountries, stableTokenTransferBlockedCountries } =
+  const { custodialTransferBlockedCountries, selfCustodialTransferBlockedCountries } =
     useRemoteConfig()
   const { persistentState } = usePersistentStateContext()
 
   if (accountType === AccountType.SelfCustodial) {
     return {
-      blockedCountries: stableTokenTransferBlockedCountries,
+      blockedCountries: selfCustodialTransferBlockedCountries,
       isPersisted: getStableTokenTransferBlocked(persistentState),
       persist: withStableTokenTransferBlocked,
     }
   }
   return {
-    blockedCountries: stablesatsTransferBlockedCountries,
+    blockedCountries: custodialTransferBlockedCountries,
     isPersisted: getStablesatsTransferBlocked(persistentState),
     persist: withStablesatsTransferBlocked,
   }
