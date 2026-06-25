@@ -14,7 +14,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>
 const Config = require("react-native-config")
 
 const makeAdapter = (result: string | undefined | Error): IpLookupAdapter =>
-  jest.fn(async () => {
+  jest.fn(async (_timeout: number) => {
     if (result instanceof Error) throw result
     return result as any
   })
