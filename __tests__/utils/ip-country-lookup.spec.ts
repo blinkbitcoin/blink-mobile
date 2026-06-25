@@ -1,6 +1,12 @@
 import axios from "axios"
+import { CountryCode } from "libphonenumber-js/mobile"
+import Config from "react-native-config"
 
-import { IpLookupAdapter, DEFAULT_ADAPTERS, resolveIpCountryCode } from "@app/utils/ip-country-lookup"
+import {
+  IpLookupAdapter,
+  DEFAULT_ADAPTERS,
+  resolveIpCountryCode,
+} from "@app/utils/ip-country-lookup"
 
 jest.mock("axios")
 jest.mock("@app/utils/error-logging", () => ({
@@ -8,15 +14,13 @@ jest.mock("@app/utils/error-logging", () => ({
 }))
 
 const mockedAxios = axios as jest.Mocked<typeof axios>
+// Cast for mutation in tests — the __mocks__ module is a plain object
+const mutableConfig = Config as Record<string, string>
 
-// react-native-config mock is at __mocks__/react-native-config.js
-// IPIFY_API_KEY and IPINFO_TOKEN default to "" (absent)
-const Config = require("react-native-config")
-
-const makeAdapter = (result: string | undefined | Error): IpLookupAdapter =>
+const makeAdapter = (result: CountryCode | undefined | Error): IpLookupAdapter =>
   jest.fn(async (_timeout: number) => {
     if (result instanceof Error) throw result
-    return result as any
+    return result
   })
 
 describe("resolveIpCountryCode", () => {
@@ -77,9 +81,9 @@ describe("resolveIpCountryCode", () => {
 describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    Config.GEO_IPIFY_API_KEY = ""
-    Config.IPINFO_API_KEY = ""
-    Config.IPAPI_API_KEY = ""
+    mutableConfig.GEO_IPIFY_API_KEY = ""
+    mutableConfig.IPINFO_API_KEY = ""
+    mutableConfig.IPAPI_API_KEY = ""
   })
 
   it("uses ipinfo first (free tier, no key needed)", async () => {
@@ -96,8 +100,8 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
   })
 
   it("uses api.ipinfo.io/lite with Bearer header when IPINFO_API_KEY is set", async () => {
-    Config.IPINFO_API_KEY = "test-ipinfo-key"
-    mockedAxios.get.mockResolvedValue({ data: { country_code: "DE" } })
+    mutableConfig.IPINFO_API_KEY = "test-ipinfo-key"
+    mockedAxios.get.mockResolvedValue({ data: { "country_code": "DE" } })
 
     const result = await resolveIpCountryCode(DEFAULT_ADAPTERS)
 
@@ -123,7 +127,7 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
   })
 
   it("uses ipify when key is present and ipinfo fails", async () => {
-    Config.GEO_IPIFY_API_KEY = "test-ipify-key"
+    mutableConfig.GEO_IPIFY_API_KEY = "test-ipify-key"
     mockedAxios.get
       .mockRejectedValueOnce(new Error("ipinfo down"))
       .mockResolvedValueOnce({ data: { location: { country: "JP" } } })
@@ -139,8 +143,8 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
   })
 
   it("appends the api key to the ipapi.co url when IPAPI_KEY is set", async () => {
-    Config.IPAPI_API_KEY = "test-ipapi-key"
-    mockedAxios.get.mockResolvedValue({ data: { country_code: "SV" } })
+    mutableConfig.IPAPI_API_KEY = "test-ipapi-key"
+    mockedAxios.get.mockResolvedValue({ data: { "country_code": "SV" } })
 
     await resolveIpCountryCode(DEFAULT_ADAPTERS)
 
@@ -151,7 +155,7 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
   })
 
   it("calls ipapi.co without a key when IPAPI_KEY is absent", async () => {
-    mockedAxios.get.mockResolvedValue({ data: { country_code: "SV" } })
+    mockedAxios.get.mockResolvedValue({ data: { "country_code": "SV" } })
 
     await resolveIpCountryCode(DEFAULT_ADAPTERS)
 
@@ -162,7 +166,7 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
   })
 
   it("falls through from ipinfo to ipify when ipinfo fails", async () => {
-    Config.GEO_IPIFY_API_KEY = "test-ipify-key"
+    mutableConfig.GEO_IPIFY_API_KEY = "test-ipify-key"
     mockedAxios.get
       .mockRejectedValueOnce(new Error("ipinfo down"))
       .mockResolvedValueOnce({ data: { location: { country: "PL" } } })
@@ -198,7 +202,7 @@ describe("no-key warning", () => {
         IPINFO_API_KEY: "",
         IPAPI_API_KEY: "",
       }))
-      require("@app/utils/ip-country-lookup")
+      require("@app/utils/ip-country-lookup") // eslint-disable-line @typescript-eslint/no-var-requires
     })
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("No API key configured"))
   })
@@ -210,7 +214,7 @@ describe("no-key warning", () => {
         IPINFO_API_KEY: "",
         IPAPI_API_KEY: "",
       }))
-      require("@app/utils/ip-country-lookup")
+      require("@app/utils/ip-country-lookup") // eslint-disable-line @typescript-eslint/no-var-requires
     })
     expect(warnSpy).not.toHaveBeenCalled()
   })
