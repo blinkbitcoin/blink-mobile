@@ -23,6 +23,9 @@ trim = true
 footer = """"""
 
 [git]
+commit_preprocessors = [
+    { pattern = '\n +\(#([0-9]+)\)', replace = ' (#${1})' },
+]
 # parse the commits based on https://www.conventionalcommits.org
 conventional_commits = true
 # filter out the commits that are not conventional
