@@ -213,6 +213,22 @@ describe("useDollarBalanceRestrictionSync", () => {
       expect(mockUpdateState).toHaveBeenCalledTimes(1)
     })
 
+    it("persists the stable-token flag when phone fallback fails but IP is blocked", () => {
+      mockUseDeviceLocation.mockReturnValue({
+        countryCode: "SV",
+        source: "phone",
+        detectionFailed: true,
+      })
+      mockUseIpCountryCode.mockReturnValue("FR")
+
+      renderHook(() => useDollarBalanceRestrictionSync())
+
+      expect(mockUseIpCountryCode).toHaveBeenCalledWith(true)
+      expect(mockUpdateState).toHaveBeenCalledTimes(1)
+      const updater = mockUpdateState.mock.calls[0][0]
+      expect(getStableTokenRestricted(updater(baseState))).toBe(true)
+    })
+
     it("does not persist the stable-token flag when the blocked country came from a failed location fallback", () => {
       mockUseRemoteConfig.mockReturnValue({
         ...remoteConfig,

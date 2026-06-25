@@ -70,16 +70,11 @@ export const useDollarBalanceRestrictionSync = (): void => {
     !detectionFailed && isBlockedCountry(countryCode, blockedCountries)
 
   const ipCountryCode = useIpCountryCode(
-    source === LocationSource.Phone &&
-      !detectionFailed &&
-      !isPersisted &&
-      !primaryBlocked,
+    source === LocationSource.Phone && !isPersisted && !primaryBlocked,
   )
 
   const shouldPersist =
-    !isPersisted &&
-    !detectionFailed &&
-    (primaryBlocked || isBlockedCountry(ipCountryCode, blockedCountries))
+    !isPersisted && (primaryBlocked || isBlockedCountry(ipCountryCode, blockedCountries))
 
   /**
    * `persist` is in the deps on purpose: its identity flips with accountType, so
