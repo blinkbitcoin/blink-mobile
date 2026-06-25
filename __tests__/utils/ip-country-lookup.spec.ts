@@ -151,3 +151,40 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
     )
   })
 })
+
+describe("no-key warning", () => {
+  let warnSpy: jest.SpyInstance
+
+  beforeEach(() => {
+    warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    warnSpy.mockRestore()
+    jest.resetModules()
+  })
+
+  it("warns on module load when no API keys are configured", () => {
+    jest.isolateModules(() => {
+      jest.mock("react-native-config", () => ({
+        GEO_IPIFY_API_KEY: "",
+        IPINFO_API_KEY: "",
+        IPAPI_API_KEY: "",
+      }))
+      require("@app/utils/ip-country-lookup")
+    })
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("No API key configured"))
+  })
+
+  it("does not warn when at least one API key is configured", () => {
+    jest.isolateModules(() => {
+      jest.mock("react-native-config", () => ({
+        GEO_IPIFY_API_KEY: "test-key",
+        IPINFO_API_KEY: "",
+        IPAPI_API_KEY: "",
+      }))
+      require("@app/utils/ip-country-lookup")
+    })
+    expect(warnSpy).not.toHaveBeenCalled()
+  })
+})

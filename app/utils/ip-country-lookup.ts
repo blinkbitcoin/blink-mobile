@@ -44,6 +44,12 @@ export const DEFAULT_ADAPTERS: IpLookupAdapter[] = [
   ipapiAdapter,
 ]
 
+if (!Config.GEO_IPIFY_API_KEY && !Config.IPINFO_API_KEY && !Config.IPAPI_API_KEY) {
+  console.warn(
+    "[ip-country-lookup] No API key configured. Falling back to ipapi.co free tier, which is rate-limited. Set GEO_IPIFY_API_KEY, IPINFO_API_KEY, or IPAPI_API_KEY in .env.local.",
+  )
+}
+
 export const resolveIpCountryCode = async (
   adapters: IpLookupAdapter[] = DEFAULT_ADAPTERS,
   timeout: number = DEFAULT_TIMEOUT_MS,
