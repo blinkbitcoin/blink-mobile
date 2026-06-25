@@ -50,6 +50,7 @@ const setup = (): void => {
   mockUseRemoteConfig.mockReturnValue({
     custodialTransferBlockedCountries: ["DE"],
     selfCustodialTransferBlockedCountries: ["FR"],
+    dollarRestrictionCacheEnabled: true,
   })
   mockUseActiveWallet.mockReturnValue({ accountType: AccountType.SelfCustodial })
   mockUseIpCountryCode.mockReturnValue(undefined)
@@ -101,6 +102,27 @@ describe("useTransferBlocked", () => {
     mockPersistentState = { ...baseState, stablesatsTransferBlocked: true }
     mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
     expect(renderHook(() => useTransferBlocked()).result.current).toBe(true)
+  })
+
+  describe("with the restriction cache disabled remotely", () => {
+    beforeEach(() => {
+      mockUseRemoteConfig.mockReturnValue({
+        custodialTransferBlockedCountries: ["DE"],
+        selfCustodialTransferBlockedCountries: ["FR"],
+        dollarRestrictionCacheEnabled: false,
+      })
+    })
+
+    it("ignores the persisted flag so a stale block can be lifted", () => {
+      mockPersistentState = { ...baseState, stableTokenTransferBlocked: true }
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
+      expect(renderHook(() => useTransferBlocked()).result.current).toBe(false)
+    })
+
+    it("still blocks from the live device country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+      expect(renderHook(() => useTransferBlocked()).result.current).toBe(true)
+    })
   })
 })
 
@@ -156,6 +178,7 @@ describe("useTransferBlockedSync", () => {
     mockUseRemoteConfig.mockReturnValue({
       custodialTransferBlockedCountries: ["FR"],
       selfCustodialTransferBlockedCountries: ["FR"],
+      dollarRestrictionCacheEnabled: true,
     })
     mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", source: "phone" })
     const writes: PersistentState[] = []
@@ -183,5 +206,27 @@ describe("useTransferBlockedSync", () => {
     renderHook(() => useTransferBlockedSync())
 
     expect(mockUpdateState).not.toHaveBeenCalled()
+  })
+
+  describe("with the restriction cache disabled remotely", () => {
+    beforeEach(() => {
+      mockUseRemoteConfig.mockReturnValue({
+        custodialTransferBlockedCountries: ["DE"],
+        selfCustodialTransferBlockedCountries: ["FR"],
+        dollarRestrictionCacheEnabled: false,
+      })
+    })
+
+    it("does not persist even in a blocked country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", source: "phone" })
+      renderHook(() => useTransferBlockedSync())
+      expect(mockUpdateState).not.toHaveBeenCalled()
+    })
+
+    it("does not consult IP", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "AR", source: "phone" })
+      renderHook(() => useTransferBlockedSync())
+      expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
+    })
   })
 })
