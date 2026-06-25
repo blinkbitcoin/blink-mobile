@@ -72,8 +72,8 @@
     "infoBitcoin": "Bitcoin yupaynin asllata t'aqwirisqa kachkan. Asllata tikrakuyta atinmi.",
     "infoDollar": "Dólar yupaynin asllata t'aqwirisqa kachkan. Asllata tikrakuyta atinmi.",
     "transferButtonText": "{fromWallet} manta {toWallet} man apachimuq",
-    "feeLabel": "Conversionpa pagon",
-    "feeError": "Conversionpa pagon mana apaykachay atinchu"
+    "feeLabel": "Apachiypa pagon",
+    "feeError": "Apachiypa pagon mana apaykachay atinchu"
   },
   "ConversionSuccessScreen": {
     "message": "Unanchayninmi kamarichik"
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Dolar qillqay-niyki Stablesats-wan llamk'achisqa",
-    "body": "Dolar qillqay Stablesats yachaykunata llamk'achin Bitcoin-ta USD chaniman sayasqata waqaychispa. Wiñaypaq Bitcoin-ta hap'inki — mana chiqap dólar-tachu — ichaqa USD chanin mana kuyunchu. Bitcoin-ta apachiy hinaspa chaskiy atikunki imaynatachus, ichaqa mana banco kay pachap sistemanwan tupanchu.",
+    "body": "Waqaychaq Modopi, Dólar cuentaykiqa Stablesats yachayta llamk'achin — Bitcoin-ta hap'inki, mana chiqap dólar-tachu, ichaqa chaninqa USDpi kikin chanin takyananpaq kamasqa. Bitcoin-ta apachiyta hinaspa chaskiyta atinki imaynatachus.",
     "termsAndConditions": "Qillqata sutichinaqinmi t'ikrayninmi yachanakuyta munayniyta rikuchiy",
-    "learnMore": "Stablesat kawsayniyta tukuyta yachanakuyta munanki",
-    "headerSelfCustodial": "Dólar cuentaykipi stablecoinkuna kachkanku",
-    "bodySelfCustodial": "Dólar cuentapi stablecoinkunata waqaychanki. Tokenkuna activokunawan saywanachasqa, USDwan kuska valormi takyan. Manaraqmi stablecoinkunata apachiyta nitaq chaskiyta atinkichu. Dólar cuentamanta apachiqtiykiqa, stablecoinkunaykita trukaspa Bitcoin hina chaskiqman apachisun.",
+    "learnMore": "Dólar cuentamanta astawan yachay",
+    "headerSelfCustodial": "Dólar cuentaykimanta",
+    "bodySelfCustodial": "Mana Waqaychaq Modopi, Dólar cuentaykiqa saywanachasqa stablecoinkunata llamk'achin, USDpi kikin chanin takyananpaq kamasqa. Stablecoinkunata cheqanta apachiy hinaspa chaskiyqa manaraqmi atikunchu kunan. Dólar cuentaykimanta apachiqtiykiqa, chaniykita trukaspa Bitcoin hina chaskiqman apachisun.",
     "learnMoreSelfCustodial": "Astawan yachay"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "Email {email: string} confirmed successfully"
   },
   "common": {
+    "country": "Suyu",
+    "unknown": "Mana yachakuq",
     "enabled": "Hapichisqa",
     "switch": "Interruptor",
     "notifications": "Willanakuykuna",
@@ -3625,8 +3627,8 @@
       "deactivateConfirm": "Wañuchiy",
       "cancel": "T'akuy"
     },
-    "minimumConversion": "Aswan aslla tikray: {amount:string}",
-    "conversionUnavailable": "Tikrachiy mana atikuyniyuqchu kachkan. Yapamanta intentay."
+    "minimumConversion": "Aswan aslla apachiy: {amount:string}",
+    "conversionUnavailable": "Apachiy mana atikuyniyuqchu kachkan. Yapamanta intentay."
   },
   "BackendFeatureGate": {
     "title": "Kay mana kanchu",

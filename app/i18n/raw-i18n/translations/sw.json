@@ -72,8 +72,8 @@
     "infoBitcoin": "Kiasi cha Bitcoin ni takriban tu. Kinaweza kubadilika kwa kiasi kidogo.",
     "infoDollar": "Kiasi cha Dola ni takriban tu. Kinaweza kubadilika kwa kiasi kidogo.",
     "transferButtonText": "Hamisha {fromWallet} kwenda {toWallet}",
-    "feeLabel": "Ada ya ubadilishaji",
-    "feeError": "Imeshindikana kupata ada ya ubadilishaji"
+    "feeLabel": "Ada ya uhamishaji",
+    "feeError": "Imeshindikana kupata ada ya uhamishaji"
   },
   "ConversionSuccessScreen": {
     "message": "Ubadilishaji umekamilika"
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Akaunti ya Dola yako inaendeshwa na Stablesats",
-    "body": "Akaunti ya Dola inatumia teknolojia ya Stablesats kushikilia Bitcoin thabiti kwa bei ya USD. Daima unashikilia Bitcoin — si dola halisi — lakini thamani ya USD haisumbui. Unaweza kutuma na kupokea Bitcoin kama kawaida, lakini haiendani na mfumo wa benki wa jadi.",
+    "body": "Katika Hali ya Uangalizi, Akaunti yako ya Dola hutumia teknolojia ya Stablesats — unashikilia Bitcoin, si dola halisi, lakini thamani imeundwa kudumisha kiasi sawa kwa kipimo cha USD. Unaweza kutuma na kupokea Bitcoin kama kawaida.",
     "termsAndConditions": "Soma Sheria na Masharti",
-    "learnMore": "Soma zaidi kuhusu Stablesats",
-    "headerSelfCustodial": "Akaunti yako ya Dola inashika stablecoins",
-    "bodySelfCustodial": "Katika akaunti ya Dola unashika stablecoins. Tokeni zinazoungwa mkono na rasilimali zenye thamani inayodumishwa imara dhidi ya USD. Bado huwezi kutuma na kupokea stablecoins. Unapotuma kutoka kwenye akaunti ya Dola, stablecoins zako zitabadilishwa na kutumwa kama Bitcoin kwa mpokeaji.",
+    "learnMore": "Jifunze zaidi kuhusu Akaunti ya Dola",
+    "headerSelfCustodial": "Kuhusu Akaunti yako ya Dola",
+    "bodySelfCustodial": "Katika Hali Isiyo ya Uangalizi, Akaunti yako ya Dola hutumia stablecoins zinazoungwa mkono, zilizoundwa kudumisha thamani sawa kwa kipimo cha USD. Kutuma na kupokea stablecoins moja kwa moja bado hakuungwi mkono kwa sasa. Unapotuma kutoka kwenye Akaunti yako ya Dola, salio lako hubadilishwa na kutumwa kama Bitcoin kwa mpokeaji.",
     "learnMoreSelfCustodial": "Jifunze zaidi"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "Barua pepe {email: string} imethibitishwa kwa mafanikio"
   },
   "common": {
+    "country": "Nchi",
+    "unknown": "Haijulikani",
     "enabled": "Imewashwa",
     "switch": "Swichi",
     "notifications": "Arifa",
@@ -3625,8 +3627,8 @@
       "deactivateConfirm": "Zima",
       "cancel": "Futa"
     },
-    "minimumConversion": "Ubadilishaji mdogo zaidi: {amount:string}",
-    "conversionUnavailable": "Ubadilishaji haupatikani kwa muda. Tafadhali jaribu tena."
+    "minimumConversion": "Uhamishaji mdogo zaidi: {amount:string}",
+    "conversionUnavailable": "Uhamishaji haupatikani kwa muda. Tafadhali jaribu tena."
   },
   "BackendFeatureGate": {
     "title": "Kipengele hakipatikani",

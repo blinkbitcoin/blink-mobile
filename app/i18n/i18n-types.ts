@@ -291,11 +291,11 @@ type RootTranslation = {
 		 */
 		transferButtonText: RequiredParams<'fromWallet' | 'toWallet'>
 		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​f​e​e
+		 * T​r​a​n​s​f​e​r​ ​f​e​e
 		 */
 		feeLabel: string
 		/**
-		 * C​o​u​l​d​n​'​t​ ​f​e​t​c​h​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e
+		 * C​o​u​l​d​n​'​t​ ​f​e​t​c​h​ ​t​h​e​ ​t​r​a​n​s​f​e​r​ ​f​e​e
 		 */
 		feeError: string
 	}
@@ -8116,7 +8116,7 @@ type RootTranslation = {
 		 */
 		header: string
 		/**
-		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​u​s​e​s​ ​S​t​a​b​l​e​s​a​t​s​ ​t​e​c​h​n​o​l​o​g​y​ ​t​o​ ​h​o​l​d​ ​B​i​t​c​o​i​n​ ​s​t​a​b​l​e​ ​t​o​ ​U​S​D​ ​p​r​i​c​e​.​ ​Y​o​u​'​r​e​ ​a​l​w​a​y​s​ ​h​o​l​d​i​n​g​ ​B​i​t​c​o​i​n​ ​—​ ​n​o​t​ ​a​c​t​u​a​l​ ​d​o​l​l​a​r​s​ ​—​ ​b​u​t​ ​t​h​e​ ​U​S​D​ ​v​a​l​u​e​ ​d​o​e​s​n​'​t​ ​f​l​u​c​t​u​a​t​e​.​ ​Y​o​u​ ​c​a​n​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​a​s​ ​u​s​u​a​l​,​ ​b​u​t​ ​t​h​i​s​ ​i​s​ ​n​o​t​ ​c​o​m​p​a​t​i​b​l​e​ ​w​i​t​h​ ​t​h​e​ ​t​r​a​d​i​t​i​o​n​a​l​ ​b​a​n​k​i​n​g​ ​s​y​s​t​e​m​.
+		 * I​n​ ​C​u​s​t​o​d​i​a​l​ ​M​o​d​e​,​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​u​s​e​s​ ​S​t​a​b​l​e​s​a​t​s​ ​t​e​c​h​n​o​l​o​g​y​ ​—​ ​y​o​u​ ​h​o​l​d​ ​B​i​t​c​o​i​n​,​ ​n​o​t​ ​a​c​t​u​a​l​ ​d​o​l​l​a​r​s​,​ ​b​u​t​ ​t​h​e​ ​v​a​l​u​e​ ​i​s​ ​d​e​s​i​g​n​e​d​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​t​h​e​ ​s​a​m​e​ ​a​m​o​u​n​t​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​Y​o​u​ ​c​a​n​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​a​s​ ​u​s​u​a​l​.
 		 */
 		body: string
 		/**
@@ -8124,15 +8124,15 @@ type RootTranslation = {
 		 */
 		termsAndConditions: string
 		/**
-		 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​S​t​a​b​l​e​s​a​t​s
+		 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
 		 */
 		learnMore: string
 		/**
-		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​h​o​l​d​s​ ​s​t​a​b​l​e​c​o​i​n​s
+		 * A​b​o​u​t​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
 		 */
 		headerSelfCustodial: string
 		/**
-		 * I​n​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​y​o​u​ ​h​o​l​d​ ​s​t​a​b​l​e​c​o​i​n​s​.​ ​T​o​k​e​n​s​ ​b​a​c​k​e​d​ ​b​y​ ​a​s​s​e​t​s​ ​w​i​t​h​ ​v​a​l​u​e​ ​h​e​l​d​ ​s​t​a​b​l​e​ ​t​o​ ​t​h​e​ ​U​S​D​.​ ​Y​o​u​ ​c​a​n​'​t​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​s​t​a​b​l​e​c​o​i​n​s​ ​(​y​e​t​)​.​ ​W​h​e​n​ ​y​o​u​ ​s​e​n​d​ ​f​r​o​m​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​,​ ​y​o​u​ ​w​i​l​l​ ​s​w​a​p​ ​y​o​u​r​ ​s​t​a​b​l​e​c​o​i​n​s​ ​a​n​d​ ​s​e​n​d​ ​a​s​ ​B​i​t​c​o​i​n​ ​t​o​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​.
+		 * I​n​ ​N​o​n​-​C​u​s​t​o​d​i​a​l​ ​M​o​d​e​,​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​u​s​e​s​ ​s​u​p​p​o​r​t​e​d​ ​s​t​a​b​l​e​c​o​i​n​s​,​ ​d​e​s​i​g​n​e​d​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​t​h​e​ ​s​a​m​e​ ​v​a​l​u​e​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​S​e​n​d​i​n​g​ ​a​n​d​ ​r​e​c​e​i​v​i​n​g​ ​s​t​a​b​l​e​c​o​i​n​s​ ​d​i​r​e​c​t​l​y​ ​i​s​ ​n​o​t​ ​c​u​r​r​e​n​t​l​y​ ​s​u​p​p​o​r​t​e​d​.​ ​W​h​e​n​ ​y​o​u​ ​s​e​n​d​ ​f​r​o​m​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​,​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​t​r​a​n​s​f​e​r​r​e​d​ ​a​n​d​ ​s​e​n​t​ ​a​s​ ​B​i​t​c​o​i​n​ ​t​o​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​.
 		 */
 		bodySelfCustodial: string
 		/**
@@ -8832,6 +8832,14 @@ type RootTranslation = {
 		success: RequiredParams<'email'>
 	}
 	common: {
+		/**
+		 * C​o​u​n​t​r​y
+		 */
+		country: string
+		/**
+		 * U​n​k​n​o​w​n
+		 */
+		unknown: string
 		/**
 		 * E​n​a​b​l​e​d
 		 */
@@ -12230,12 +12238,12 @@ type RootTranslation = {
 			cancel: string
 		}
 		/**
-		 * M​i​n​i​m​u​m​ ​c​o​n​v​e​r​s​i​o​n​:​ ​{​a​m​o​u​n​t​}
+		 * M​i​n​i​m​u​m​ ​t​r​a​n​s​f​e​r​:​ ​{​a​m​o​u​n​t​}
 		 * @param {string} amount
 		 */
 		minimumConversion: RequiredParams<'amount'>
 		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 * T​r​a​n​s​f​e​r​s​ ​a​r​e​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
 		 */
 		conversionUnavailable: string
 	}
@@ -12612,11 +12620,11 @@ export type TranslationFunctions = {
 		 */
 		transferButtonText: (arg: { fromWallet: unknown, toWallet: unknown }) => LocalizedString
 		/**
-		 * Conversion fee
+		 * Transfer fee
 		 */
 		feeLabel: () => LocalizedString
 		/**
-		 * Couldn't fetch the conversion fee
+		 * Couldn't fetch the transfer fee
 		 */
 		feeError: () => LocalizedString
 	}
@@ -20382,7 +20390,7 @@ export type TranslationFunctions = {
 		 */
 		header: () => LocalizedString
 		/**
-		 * Your Dollar Balance uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.
+		 * In Custodial Mode, your Dollar Balance uses Stablesats technology — you hold Bitcoin, not actual dollars, but the value is designed to maintain the same amount in USD terms. You can send and receive Bitcoin as usual.
 		 */
 		body: () => LocalizedString
 		/**
@@ -20390,15 +20398,15 @@ export type TranslationFunctions = {
 		 */
 		termsAndConditions: () => LocalizedString
 		/**
-		 * Learn more about Stablesats
+		 * Learn more about Dollar Balance
 		 */
 		learnMore: () => LocalizedString
 		/**
-		 * Your Dollar Balance holds stablecoins
+		 * About your Dollar Balance
 		 */
 		headerSelfCustodial: () => LocalizedString
 		/**
-		 * In your Dollar Balance you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from your Dollar Balance, you will swap your stablecoins and send as Bitcoin to the recipient.
+		 * In Non-Custodial Mode, your Dollar Balance uses supported stablecoins, designed to maintain the same value in USD terms. Sending and receiving stablecoins directly is not currently supported. When you send from your Dollar Balance, your balance is transferred and sent as Bitcoin to the recipient.
 		 */
 		bodySelfCustodial: () => LocalizedString
 		/**
@@ -21079,6 +21087,14 @@ export type TranslationFunctions = {
 		success: (arg: { email: string }) => LocalizedString
 	}
 	common: {
+		/**
+		 * Country
+		 */
+		country: () => LocalizedString
+		/**
+		 * Unknown
+		 */
+		unknown: () => LocalizedString
 		/**
 		 * Enabled
 		 */
@@ -24416,11 +24432,11 @@ export type TranslationFunctions = {
 			cancel: () => LocalizedString
 		}
 		/**
-		 * Minimum conversion: {amount}
+		 * Minimum transfer: {amount}
 		 */
 		minimumConversion: (arg: { amount: string }) => LocalizedString
 		/**
-		 * Conversion is temporarily unavailable. Please try again.
+		 * Transfers are temporarily unavailable. Please try again.
 		 */
 		conversionUnavailable: () => LocalizedString
 	}

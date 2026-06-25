@@ -72,8 +72,8 @@
     "infoBitcoin": "Jumlah Bitcoin hanya perkiraan. Bisa sedikit berbeda.",
     "infoDollar": "Jumlah Dolar hanya perkiraan. Bisa sedikit berbeda.",
     "transferButtonText": "Transfer {fromWallet} ke {toWallet}",
-    "feeLabel": "Biaya konversi",
-    "feeError": "Tidak dapat mengambil biaya konversi"
+    "feeLabel": "Biaya transfer",
+    "feeError": "Tidak dapat mengambil biaya transfer"
   },
   "ConversionSuccessScreen": {
     "message": "Konversi Berhasil"
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Akun Dolar Anda didukung oleh Stablesats",
-    "body": "Akun Dolar menggunakan teknologi Stablesats untuk menjaga Bitcoin tetap stabil pada harga USD. Anda selalu memegang Bitcoin — bukan dolar sungguhan — tetapi nilai USD tidak berfluktuasi. Anda dapat mengirim dan menerima Bitcoin seperti biasa, tetapi ini tidak kompatibel dengan sistem perbankan tradisional.",
+    "body": "Dalam Mode Kustodial, Akun Dolar Anda menggunakan teknologi Stablesats — Anda memegang Bitcoin, bukan dolar sungguhan, tetapi nilainya dirancang untuk mempertahankan jumlah yang sama dalam satuan USD. Anda dapat mengirim dan menerima Bitcoin seperti biasa.",
     "termsAndConditions": "Baca Syarat & Ketentuan",
-    "learnMore": "Pelajari lebih lanjut tentang Stablesats",
-    "headerSelfCustodial": "Akun Dolar Anda menyimpan stablecoin",
-    "bodySelfCustodial": "Di akun Dolar Anda menyimpan stablecoin. Token yang didukung oleh aset dengan nilai yang dijaga stabil terhadap USD. Anda belum bisa mengirim dan menerima stablecoin. Saat mengirim dari akun Dolar, stablecoin Anda akan ditukar dan dikirim sebagai Bitcoin kepada penerima.",
+    "learnMore": "Pelajari lebih lanjut tentang Akun Dolar",
+    "headerSelfCustodial": "Tentang Akun Dolar Anda",
+    "bodySelfCustodial": "Dalam Mode Non-Kustodial, Akun Dolar Anda menggunakan stablecoin yang didukung, dirancang untuk mempertahankan nilai yang sama dalam satuan USD. Mengirim dan menerima stablecoin secara langsung belum didukung saat ini. Saat Anda mengirim dari Akun Dolar, saldo Anda ditukar dan dikirim sebagai Bitcoin kepada penerima.",
     "learnMoreSelfCustodial": "Pelajari selengkapnya"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "Email {email: string} berhasil dikonfirmasi"
   },
   "common": {
+    "country": "Negara",
+    "unknown": "Tidak diketahui",
     "enabled": "Diaktifkan",
     "switch": "Sakelar",
     "notifications": "Notifikasi",
@@ -3625,8 +3627,8 @@
       "deactivateConfirm": "Nonaktifkan",
       "cancel": "Batal"
     },
-    "minimumConversion": "Konversi minimum: {amount:string}",
-    "conversionUnavailable": "Konversi sementara tidak tersedia. Silakan coba lagi."
+    "minimumConversion": "Transfer minimum: {amount:string}",
+    "conversionUnavailable": "Transfer sementara tidak tersedia. Silakan coba lagi."
   },
   "BackendFeatureGate": {
     "title": "Fitur tidak tersedia",

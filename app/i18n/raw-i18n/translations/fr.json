@@ -72,8 +72,8 @@
         "infoBitcoin": "Le montant en Bitcoin est approximatif. Il peut varier légèrement.",
         "infoDollar": "Le montant en dollars est approximatif. Il peut varier légèrement.",
         "transferButtonText": "Transférer de {fromWallet} vers {toWallet}",
-        "feeLabel": "Frais de conversion",
-        "feeError": "Impossible de récupérer les frais de conversion"
+        "feeLabel": "Frais de transfert",
+        "feeError": "Impossible de récupérer les frais de transfert"
     },
     "ConversionSuccessScreen": {
         "message": "Conversion réussie"
@@ -2507,11 +2507,11 @@
     },
     "StablesatsModal": {
         "header": "Votre Solde Dollar est propulsé par Stablesats",
-        "body": "Le Solde Dollar utilise la technologie Stablesats pour maintenir le Bitcoin stable au prix USD. Vous détenez toujours du Bitcoin — pas de vrais dollars — mais la valeur USD ne fluctue pas. Vous pouvez envoyer et recevoir du Bitcoin normalement, mais ce n'est pas compatible avec le système bancaire traditionnel.",
+        "body": "En Mode Custodial, votre Solde Dollar utilise la technologie Stablesats — vous détenez du Bitcoin, pas de vrais dollars, mais la valeur est conçue pour maintenir le même montant en termes d'USD. Vous pouvez envoyer et recevoir du Bitcoin normalement.",
         "termsAndConditions": "Lire les Termes & Conditions",
-        "learnMore": "En savoir plus sur Stablesats",
-        "headerSelfCustodial": "Votre Solde Dollar contient des stablecoins",
-        "bodySelfCustodial": "Dans votre Solde Dollar, vous détenez des stablecoins. Des jetons adossés à des actifs et dont la valeur est maintenue stable par rapport au dollar américain. Vous ne pouvez pas encore envoyer ni recevoir de stablecoins. Lorsque vous envoyez depuis votre Solde Dollar, vos stablecoins sont échangés et envoyés en Bitcoin au destinataire.",
+        "learnMore": "En savoir plus sur le Solde Dollar",
+        "headerSelfCustodial": "À propos de votre Solde Dollar",
+        "bodySelfCustodial": "En Mode Non Custodial, votre Solde Dollar utilise des stablecoins pris en charge, conçus pour maintenir la même valeur en termes d'USD. L'envoi et la réception directs de stablecoins ne sont pas pris en charge pour le moment. Lorsque vous envoyez depuis votre Solde Dollar, votre solde est converti et envoyé en Bitcoin au destinataire.",
         "learnMoreSelfCustodial": "En savoir plus"
     },
     "SplashScreen": {
@@ -2699,6 +2699,8 @@
         "success": "E-mail {email: string} a été validé avec succès"
     },
     "common": {
+        "country": "Pays",
+        "unknown": "Inconnu",
         "enabled": "Activé",
         "switch": "Interrupteur",
         "notifications": "Notifications",
@@ -3625,8 +3627,8 @@
             "deactivateConfirm": "Désactiver",
             "cancel": "Annuler"
         },
-        "minimumConversion": "Conversion minimale : {amount:string}",
-        "conversionUnavailable": "La conversion est temporairement indisponible. Veuillez réessayer."
+        "minimumConversion": "Transfert minimal : {amount:string}",
+        "conversionUnavailable": "Les transferts sont temporairement indisponibles. Veuillez réessayer."
     },
     "BackendFeatureGate": {
         "title": "Fonctionnalité indisponible",

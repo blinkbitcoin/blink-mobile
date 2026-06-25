@@ -72,8 +72,8 @@
     "infoBitcoin": "Bitcoin miktarı yalnızca yaklaşık bir değerdir. Küçük bir miktar farklılık gösterebilir.",
     "infoDollar": "Dolar miktarı yalnızca yaklaşık bir değerdir. Küçük bir miktar farklılık gösterebilir.",
     "transferButtonText": "{fromWallet} hesabından {toWallet} hesabına transfer et",
-    "feeLabel": "Dönüştürme ücreti",
-    "feeError": "Dönüştürme ücreti alınamadı"
+    "feeLabel": "Transfer ücreti",
+    "feeError": "Transfer ücreti alınamadı"
   },
   "ConversionSuccessScreen": {
     "message": "Çevirme başarılı"
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Dolar Bakiyeniz Stablesats tarafından desteklenmektedir",
-    "body": "Dolar Bakiyesi, Bitcoin'i USD fiyatında sabit tutmak için Stablesats teknolojisini kullanır. Her zaman Bitcoin tutarsınız — gerçek dolar değil — ama USD değeri dalgalanmaz. Her zamanki gibi Bitcoin gönderip alabilirsiniz, ancak geleneksel bankacılık sistemiyle uyumlu değildir.",
+    "body": "Saklamalı Modda, Dolar Bakiyeniz Stablesats teknolojisini kullanır — gerçek dolar değil Bitcoin tutarsınız, ancak değer USD cinsinden aynı miktarı korumak üzere tasarlanmıştır. Her zamanki gibi Bitcoin gönderip alabilirsiniz.",
     "termsAndConditions": "Hükümler ve koşulları oku",
-    "learnMore": "Stablesats'i öğrenin",
-    "headerSelfCustodial": "Dolar Bakiyen stablecoin tutar",
-    "bodySelfCustodial": "Dolar Bakiyende stablecoin tutarsın. Varlıklarla teminatlandırılmış ve değeri ABD doları karşısında sabit tutulan tokenler. Stablecoin'leri henüz gönderip alamazsın. Dolar Bakiyenden gönderdiğinde, stablecoin'lerin takas edilir ve alıcıya Bitcoin olarak gönderilir.",
+    "learnMore": "Dolar Bakiyesi hakkında daha fazla bilgi edinin",
+    "headerSelfCustodial": "Dolar Bakiyeniz hakkında",
+    "bodySelfCustodial": "Saklamasız Modda, Dolar Bakiyeniz USD cinsinden aynı değeri korumak üzere tasarlanmış desteklenen stablecoin'leri kullanır. Stablecoin'leri doğrudan gönderme ve alma şu anda desteklenmemektedir. Dolar Bakiyenizden gönderdiğinizde, bakiyeniz dönüştürülür ve alıcıya Bitcoin olarak gönderilir.",
     "learnMoreSelfCustodial": "Daha fazla bilgi"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "E-posta {email: string} başarıyla onaylandı"
   },
   "common": {
+    "country": "Ülke",
+    "unknown": "Bilinmiyor",
     "enabled": "Etkin",
     "switch": "Anahtar",
     "notifications": "Bildirimler",
@@ -3625,8 +3627,8 @@
       "deactivateConfirm": "Devre dışı bırak",
       "cancel": "İptal"
     },
-    "minimumConversion": "Minimum dönüşüm: {amount:string}",
-    "conversionUnavailable": "Dönüşüm geçici olarak kullanılamıyor. Lütfen tekrar deneyin."
+    "minimumConversion": "Minimum transfer: {amount:string}",
+    "conversionUnavailable": "Transferler geçici olarak kullanılamıyor. Lütfen tekrar deneyin."
   },
   "BackendFeatureGate": {
     "title": "Özellik kullanılamıyor",

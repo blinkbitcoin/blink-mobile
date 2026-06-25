@@ -72,8 +72,8 @@
     "infoBitcoin": "Suma v Bitcoin je len približná. Môže sa mierne líšiť.",
     "infoDollar": "Suma v dolároch je len približná. Môže sa mierne líšiť.",
     "transferButtonText": "Previesť {fromWallet} na {toWallet}",
-    "feeLabel": "Poplatok za konverziu",
-    "feeError": "Nepodarilo sa načítať poplatok za konverziu"
+    "feeLabel": "Poplatok za prevod",
+    "feeError": "Nepodarilo sa načítať poplatok za prevod"
   },
   "ConversionSuccessScreen": {
     "message": "Úspešná konverzia"
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Váš Dolárový zostatok je poháňaný technológiou Stablesats",
-    "body": "Dolárový zostatok využíva technológiu Stablesats na udržanie Bitcoinu stabilného na cene USD. Vždy držíte Bitcoin — nie skutočné doláre — ale hodnota USD nekolíše. Môžete odosielať a prijímať Bitcoin ako zvyčajne, ale nie je to kompatibilné s tradičným bankovým systémom.",
+    "body": "V kustodiálnom režime váš Dolárový zostatok využíva technológiu Stablesats — držíte Bitcoin, nie skutočné doláre, ale hodnota je navrhnutá tak, aby si udržala rovnakú sumu voči USD. Bitcoin môžete odosielať a prijímať ako zvyčajne.",
     "termsAndConditions": "Prečítajte si podmienky používania",
-    "learnMore": "Zistite viac o Stablesats",
-    "headerSelfCustodial": "Váš Dolárový zostatok drží stablecoiny",
-    "bodySelfCustodial": "Na Dolárovom zostatku držíte stablecoiny. Tokeny kryté aktívami s hodnotou udržiavanou stabilnou voči USD. Stablecoiny zatiaľ nemôžete posielať ani prijímať. Keď pošlete z Dolárového zostatku, vaše stablecoiny budú zamenené a odoslané ako Bitcoin príjemcovi.",
+    "learnMore": "Zistite viac o Dolárovom zostatku",
+    "headerSelfCustodial": "O vašom Dolárovom zostatku",
+    "bodySelfCustodial": "V nekustodiálnom režime váš Dolárový zostatok využíva podporované stablecoiny, ktoré sú navrhnuté tak, aby si udržali rovnakú hodnotu voči USD. Priame odosielanie a prijímanie stablecoinov zatiaľ nie je podporované. Keď odošlete z Dolárového zostatku, váš zostatok sa prevedie a odošle sa príjemcovi ako Bitcoin.",
     "learnMoreSelfCustodial": "Zistiť viac"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "E-mail {email: string} bol úspešne potvrdený"
   },
   "common": {
+    "country": "Krajina",
+    "unknown": "Neznáme",
     "enabled": "Povolený",
     "switch": "Prepínač",
     "notifications": "Notifikácie",
@@ -3625,8 +3627,8 @@
       "deactivateConfirm": "Deaktivovať",
       "cancel": "Zrušiť"
     },
-    "minimumConversion": "Minimálna konverzia: {amount:string}",
-    "conversionUnavailable": "Konverzia je dočasne nedostupná. Skúste to znova."
+    "minimumConversion": "Minimálny prevod: {amount:string}",
+    "conversionUnavailable": "Prevody sú dočasne nedostupné. Skúste to znova."
   },
   "BackendFeatureGate": {
     "title": "Funkcia nedostupná",

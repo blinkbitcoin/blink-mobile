@@ -72,8 +72,8 @@
         "infoBitcoin": "Der Bitcoin-Betrag ist nur ungefähr. Er kann geringfügig abweichen.",
         "infoDollar": "Der Dollar-Betrag ist nur ungefähr. Er kann geringfügig abweichen.",
         "transferButtonText": "{fromWallet} zu {toWallet} transferieren",
-        "feeLabel": "Konvertierungsgebühr",
-        "feeError": "Konvertierungsgebühr konnte nicht abgerufen werden"
+        "feeLabel": "Übertragungsgebühr",
+        "feeError": "Übertragungsgebühr konnte nicht abgerufen werden"
     },
     "ConversionSuccessScreen": {
         "message": "Das hat geklappt!"
@@ -2507,11 +2507,11 @@
     },
     "StablesatsModal": {
         "header": "Dein Dollar-Guthaben wird von Stablesats betrieben",
-        "body": "Das Dollar-Guthaben nutzt Stablesats-Technologie, um Bitcoin stabil zum USD-Preis zu halten. Du hältst immer Bitcoin — keine echten Dollar — aber der USD-Wert schwankt nicht. Du kannst Bitcoin wie gewohnt senden und empfangen, aber es ist nicht mit dem traditionellen Bankensystem kompatibel.",
+        "body": "Im Verwahrungsmodus nutzt dein Dollar-Guthaben Stablesats-Technologie — du hältst Bitcoin, keine echten Dollar, aber der Wert ist darauf ausgelegt, denselben Betrag in USD zu behalten. Du kannst Bitcoin wie gewohnt senden und empfangen.",
         "termsAndConditions": "Allgemeine Geschäftsbedingungen lesen",
-        "learnMore": "Mehr über Stablesats erfahren",
-        "headerSelfCustodial": "Dein Dollar-Guthaben hält Stablecoins",
-        "bodySelfCustodial": "In deinem Dollar-Guthaben hältst du Stablecoins. Tokens, die durch Vermögenswerte gedeckt sind und deren Wert stabil zum USD gehalten wird. Du kannst Stablecoins (noch) nicht senden und empfangen. Wenn du von deinem Dollar-Guthaben sendest, werden deine Stablecoins getauscht und als Bitcoin an den Empfänger geschickt.",
+        "learnMore": "Mehr über das Dollar-Guthaben erfahren",
+        "headerSelfCustodial": "Über dein Dollar-Guthaben",
+        "bodySelfCustodial": "Im Nicht-Verwahrungsmodus nutzt dein Dollar-Guthaben unterstützte Stablecoins, die darauf ausgelegt sind, denselben Wert in USD zu behalten. Das direkte Senden und Empfangen von Stablecoins wird derzeit nicht unterstützt. Wenn du von deinem Dollar-Guthaben sendest, wird dein Guthaben umgewandelt und als Bitcoin an den Empfänger gesendet.",
         "learnMoreSelfCustodial": "Mehr erfahren"
     },
     "SplashScreen": {
@@ -2699,6 +2699,8 @@
         "success": "Email-Adresse {email: string} erfolgreich bestätigt"
     },
     "common": {
+        "country": "Land",
+        "unknown": "Unbekannt",
         "enabled": "Aktiviert",
         "switch": "Schalter",
         "notifications": "Benachrichtigungen",
@@ -3625,8 +3627,8 @@
             "deactivateConfirm": "Deaktivieren",
             "cancel": "Abbrechen"
         },
-        "minimumConversion": "Mindestumwandlung: {amount:string}",
-        "conversionUnavailable": "Die Umwandlung ist vorübergehend nicht verfügbar. Bitte versuche es erneut."
+        "minimumConversion": "Mindestübertragung: {amount:string}",
+        "conversionUnavailable": "Übertragungen sind vorübergehend nicht verfügbar. Bitte versuche es erneut."
     },
     "BackendFeatureGate": {
         "title": "Funktion nicht verfügbar",

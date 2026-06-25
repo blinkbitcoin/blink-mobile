@@ -72,8 +72,8 @@
         "infoBitcoin": "Bitcoin金額は概算です。少額の変動が生じる場合があります。",
         "infoDollar": "ドル金額は概算です。少額の変動が生じる場合があります。",
         "transferButtonText": "{fromWallet}から{toWallet}へ振替",
-        "feeLabel": "変換手数料",
-        "feeError": "変換手数料を取得できませんでした"
+        "feeLabel": "振替手数料",
+        "feeError": "振替手数料を取得できませんでした"
     },
     "ConversionSuccessScreen": {
         "message": "両替が完了しました"
@@ -2507,11 +2507,11 @@
     },
     "StablesatsModal": {
         "header": "あなたのドルウォレットはStablesatsで動いています",
-        "body": "ドルウォレットはStablesats技術を使用してBitcoinをUSD価格で安定させます。常にBitcoinを保有しています — 実際のドルではありません — がUSD価値は変動しません。通常どおりBitcoinの送受信ができますが、従来の銀行システムとは互換性がありません。",
+        "body": "カストディアルモードでは、ドル口座はStablesats技術を使用します — 保有しているのは実際のドルではなくBitcoinですが、その価値はUSD建てで同じ金額を維持するように設計されています。通常どおりBitcoinの送受信ができます。",
         "termsAndConditions": "利用規約を読む",
-        "learnMore": "ステーブル satsについて詳しく見る",
-        "headerSelfCustodial": "ドル口座にはステーブルコインが保管されています",
-        "bodySelfCustodial": "ドル口座ではステーブルコインを保有しています。資産に裏付けられ、米ドルに対して価値を安定させたトークンです。ステーブルコインの送受信はまだできません。ドル口座から送金すると、ステーブルコインが交換され、ビットコインとして受取人に送られます。",
+        "learnMore": "ドル口座について詳しく見る",
+        "headerSelfCustodial": "ドル口座について",
+        "bodySelfCustodial": "ノンカストディアルモードでは、ドル口座はUSD建てで同じ価値を維持するように設計された対応ステーブルコインを使用します。ステーブルコインを直接送受信することは現在サポートされていません。ドル口座から送金すると、残高は変換され、ビットコインとして受取人に送られます。",
         "learnMoreSelfCustodial": "詳しく見る"
     },
     "SplashScreen": {
@@ -2699,6 +2699,8 @@
         "success": "メールアドレス{email: string}が正常に認証されました"
     },
     "common": {
+        "country": "国",
+        "unknown": "不明",
         "enabled": "有効",
         "switch": "スイッチ",
         "notifications": "通知",
@@ -3625,8 +3627,8 @@
             "deactivateConfirm": "無効化",
             "cancel": "キャンセル"
         },
-        "minimumConversion": "最小変換額: {amount:string}",
-        "conversionUnavailable": "変換は一時的に利用できません。もう一度お試しください。"
+        "minimumConversion": "最小振替額: {amount:string}",
+        "conversionUnavailable": "振替は一時的に利用できません。もう一度お試しください。"
     },
     "BackendFeatureGate": {
         "title": "機能が利用できません",
