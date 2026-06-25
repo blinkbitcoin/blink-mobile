@@ -148,7 +148,7 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
   it("uses proxycheck.io free tier and parses country_code from nested IP entry", async () => {
     mockedAxios.get.mockResolvedValue({
       data: {
-        status: "ok",
+        "status": "ok",
         // eslint-disable-next-line camelcase
         "1.2.3.4": { location: { country_code: "SE" } },
       },
@@ -167,7 +167,7 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
     mutableConfig.PROXYCHECK_API_KEY = "test-proxycheck-key"
     mockedAxios.get.mockResolvedValue({
       data: {
-        status: "ok",
+        "status": "ok",
         // eslint-disable-next-line camelcase
         "1.2.3.4": { location: { country_code: "SE" } },
       },
