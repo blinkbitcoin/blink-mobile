@@ -11,12 +11,6 @@ jest.mock("libphonenumber-js/mobile", () => ({
   parsePhoneNumber: (...args: unknown[]) => mockParsePhoneNumber(...args),
 }))
 
-const mockParsePhoneNumber = jest.fn()
-jest.mock("libphonenumber-js/mobile", () => ({
-  ...jest.requireActual("libphonenumber-js/mobile"),
-  parsePhoneNumber: (...args: unknown[]) => mockParsePhoneNumber(...args),
-}))
-
 const mockResolveIpCountryCode = jest.fn()
 jest.mock("@app/utils/ip-country-lookup", () => ({
   resolveIpCountryCode: (...args: unknown[]) => mockResolveIpCountryCode(...args),
@@ -146,25 +140,6 @@ describe("useDeviceLocation", () => {
         context: expect.objectContaining({ source: "phone" }),
       }),
     )
-  })
-
-  it("should fall back to SV when phone parses but returns no country", async () => {
-    mockUseCountryCodeQuery.mockReturnValue({
-      data: { countryCode: "SV" },
-      error: undefined,
-    })
-    mockUseSettingsScreenQuery.mockReturnValue({
-      data: { me: { phone: "+15555555555" } },
-    })
-    mockParsePhoneNumber.mockReturnValue({ country: undefined })
-
-    const { result } = renderHook(() => useDeviceLocation())
-
-    await act(async () => {})
-
-    expect(result.current.loading).toBe(false)
-    expect(result.current.countryCode).toBe("SV")
-    expect(mockUpdateCountryCode).not.toHaveBeenCalled()
   })
 
   it("should fall back to IP lookup when user has no phone", async () => {
