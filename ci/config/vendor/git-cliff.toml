@@ -23,6 +23,11 @@ trim = true
 footer = """"""
 
 [git]
+commit_preprocessors = [
+    # GitHub squash merges can leave the PR number as a second line like " (#1234)".
+    # Move that back onto the subject before Conventional Commit parsing.
+    { pattern = '\n +\(#([0-9]+)\)', replace = ' (#${1})' },
+]
 # parse the commits based on https://www.conventionalcommits.org
 conventional_commits = true
 # filter out the commits that are not conventional
