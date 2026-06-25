@@ -149,6 +149,9 @@ jobs:
         APPSTORE_ISSUER_ID: #@ data.values.appstore_issuer_id
         SPARK_TOKEN_IDENTIFIER: #@ data.values.spark_token_identifier
         BREEZ_API_KEY: #@ data.values.breez_api_key
+        GEO_IPIFY_API_KEY: #@ data.values.geo_ipify_api_key
+        IPINFO_API_KEY: #@ data.values.ipinfo_api_key
+        IPAPI_API_KEY: #@ data.values.ipapi_api_key
         MIN_BUILD_FREE_GB: 30
   - task: upload-to-gcs
     config:
@@ -317,6 +320,9 @@ jobs:
         APPSTORE_ISSUER_ID: #@ data.values.appstore_issuer_id
         SPARK_TOKEN_IDENTIFIER: #@ data.values.spark_token_identifier
         BREEZ_API_KEY: #@ data.values.breez_api_key
+        GEO_IPIFY_API_KEY: #@ data.values.geo_ipify_api_key
+        IPINFO_API_KEY: #@ data.values.ipinfo_api_key
+        IPAPI_API_KEY: #@ data.values.ipapi_api_key
         MIN_BUILD_FREE_GB: 30
   - task: upload-to-gcs
     config:
