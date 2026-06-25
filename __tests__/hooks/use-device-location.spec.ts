@@ -1,12 +1,20 @@
 import { renderHook, act } from "@testing-library/react-hooks"
-import axios from "axios"
 
 import useDeviceLocation, { useIpCountryCode } from "@app/hooks/use-device-location"
 
 const mockLogError = jest.fn()
 const mockUpdateCountryCode = jest.fn()
 
-jest.mock("axios")
+const mockParsePhoneNumber = jest.fn()
+jest.mock("libphonenumber-js/mobile", () => ({
+  ...jest.requireActual("libphonenumber-js/mobile"),
+  parsePhoneNumber: (...args: unknown[]) => mockParsePhoneNumber(...args),
+}))
+
+const mockResolveIpCountryCode = jest.fn()
+jest.mock("@app/utils/ip-country-lookup", () => ({
+  resolveIpCountryCode: (...args: unknown[]) => mockResolveIpCountryCode(...args),
+}))
 
 jest.mock("@app/utils/log-error", () => ({
   logError: (...args: unknown[]) => mockLogError(...args),
@@ -28,12 +36,14 @@ jest.mock("@app/graphql/generated", () => ({
   useSettingsScreenQuery: (...args: unknown[]) => mockUseSettingsScreenQuery(...args),
 }))
 
-const mockedAxios = axios as jest.Mocked<typeof axios>
-
 describe("useDeviceLocation", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockResolveIpCountryCode.mockResolvedValue(undefined)
     mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
+    mockParsePhoneNumber.mockImplementation(
+      jest.requireActual("libphonenumber-js/mobile").parsePhoneNumber,
+    )
   })
 
   it("should not expose any country code while loading", () => {
@@ -46,7 +56,7 @@ describe("useDeviceLocation", () => {
     expect(result.current.detectionFailed).toBe(false)
   })
 
-  it("should resolve country from logged-in user phone without calling ipapi", async () => {
+  it("should resolve country from logged-in user phone without calling IP lookup", async () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: "SV" },
       error: undefined,
@@ -63,7 +73,7 @@ describe("useDeviceLocation", () => {
     expect(result.current.countryCode).toBe("DE")
     expect(result.current.detectionFailed).toBe(false)
     expect(result.current.source).toBe("phone")
-    expect(mockedAxios.get).not.toHaveBeenCalled()
+    expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
   })
 
   it("should update Apollo cache when resolving from user phone", async () => {
@@ -106,7 +116,33 @@ describe("useDeviceLocation", () => {
     )
   })
 
-  it("should fall back to ipapi when user has no phone", async () => {
+  it("should fall back to SV when phone parses but returns no country", async () => {
+    mockUseCountryCodeQuery.mockReturnValue({
+      data: { countryCode: "SV" },
+      error: undefined,
+    })
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { phone: "+15555555555" } },
+    })
+    mockParsePhoneNumber.mockReturnValue({ country: undefined })
+
+    const { result } = renderHook(() => useDeviceLocation())
+
+    await act(async () => {})
+
+    expect(result.current.loading).toBe(false)
+    expect(result.current.countryCode).toBe("SV")
+    expect(result.current.detectionFailed).toBe(true)
+    expect(mockUpdateCountryCode).not.toHaveBeenCalled()
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: "device-location",
+        context: expect.objectContaining({ source: "phone" }),
+      }),
+    )
+  })
+
+  it("should fall back to IP lookup when user has no phone", async () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: "SV" },
       error: undefined,
@@ -114,8 +150,7 @@ describe("useDeviceLocation", () => {
     mockUseSettingsScreenQuery.mockReturnValue({
       data: { me: { phone: null } },
     })
-    // eslint-disable-next-line camelcase
-    mockedAxios.get.mockResolvedValue({ data: { country_code: "PL" } })
+    mockResolveIpCountryCode.mockResolvedValue("PL")
 
     const { result } = renderHook(() => useDeviceLocation())
 
@@ -125,17 +160,30 @@ describe("useDeviceLocation", () => {
     expect(result.current.countryCode).toBe("PL")
     expect(result.current.detectionFailed).toBe(false)
     expect(result.current.source).toBe("ip")
-    expect(mockedAxios.get).toHaveBeenCalled()
+    expect(mockResolveIpCountryCode).toHaveBeenCalled()
   })
 
-  it("should resolve to the ipapi country code and never flash SV as intermediate value", async () => {
+  it("should fall back to IP lookup when user is not logged in", async () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: "SV" },
       error: undefined,
     })
+    mockResolveIpCountryCode.mockResolvedValue("JP")
 
-    // eslint-disable-next-line camelcase
-    mockedAxios.get.mockResolvedValue({ data: { country_code: "PL" } })
+    const { result } = renderHook(() => useDeviceLocation())
+
+    await act(async () => {})
+
+    expect(result.current.loading).toBe(false)
+    expect(result.current.countryCode).toBe("JP")
+  })
+
+  it("should resolve to the IP lookup country code and never flash SV as intermediate value", async () => {
+    mockUseCountryCodeQuery.mockReturnValue({
+      data: { countryCode: "SV" },
+      error: undefined,
+    })
+    mockResolveIpCountryCode.mockResolvedValue("PL")
 
     const emittedValues: Array<{ countryCode: string | undefined; loading: boolean }> = []
 
@@ -159,13 +207,12 @@ describe("useDeviceLocation", () => {
     expect(allCountryCodes).not.toContain("SV")
   })
 
-  it("uses the cached country and does NOT mark detection failed when ipapi fails but cache exists", async () => {
+  it("uses the cached country and does not mark detection failed when all adapters return nothing", async () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: "PL" },
       error: undefined,
     })
-
-    mockedAxios.get.mockRejectedValue(new Error("429 Too Many Requests"))
+    mockResolveIpCountryCode.mockResolvedValue(undefined)
 
     const { result } = renderHook(() => useDeviceLocation())
 
@@ -174,21 +221,14 @@ describe("useDeviceLocation", () => {
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("PL")
     expect(result.current.detectionFailed).toBe(false)
-    expect(mockLogError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: "device-location",
-        context: expect.objectContaining({ source: "ipapi", hasCached: true }),
-      }),
-    )
   })
 
-  it("marks detection failed when ipapi fails and no cached value exists (falls back to SV)", async () => {
+  it("marks detection failed when all adapters return nothing and no cached value exists", async () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: null },
       error: undefined,
     })
-
-    mockedAxios.get.mockRejectedValue(new Error("Network Error"))
+    mockResolveIpCountryCode.mockResolvedValue(undefined)
 
     const { result } = renderHook(() => useDeviceLocation())
 
@@ -197,12 +237,6 @@ describe("useDeviceLocation", () => {
     expect(result.current.loading).toBe(false)
     expect(result.current.countryCode).toBe("SV")
     expect(result.current.detectionFailed).toBe(true)
-    expect(mockLogError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: "device-location",
-        context: expect.objectContaining({ source: "ipapi", hasCached: false }),
-      }),
-    )
   })
 
   it("marks detection failed on Apollo query error (falls back to SV)", () => {
@@ -224,14 +258,12 @@ describe("useDeviceLocation", () => {
     )
   })
 
-  it("should update Apollo cache when ipapi succeeds", async () => {
+  it("should update Apollo cache when IP lookup succeeds", async () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: { countryCode: "SV" },
       error: undefined,
     })
-
-    // eslint-disable-next-line camelcase
-    mockedAxios.get.mockResolvedValue({ data: { country_code: "DE" } })
+    mockResolveIpCountryCode.mockResolvedValue("DE")
 
     renderHook(() => useDeviceLocation())
 
@@ -239,58 +271,39 @@ describe("useDeviceLocation", () => {
 
     expect(mockUpdateCountryCode).toHaveBeenCalledWith(expect.anything(), "DE")
   })
-
-  it("marks detection failed when ipapi returns no country_code and no cache exists", async () => {
-    mockUseCountryCodeQuery.mockReturnValue({
-      data: { countryCode: null },
-      error: undefined,
-    })
-
-    mockedAxios.get.mockResolvedValue({ data: {} })
-
-    const { result } = renderHook(() => useDeviceLocation())
-
-    await act(async () => {})
-
-    expect(result.current.loading).toBe(false)
-    expect(result.current.countryCode).toBe("SV")
-    expect(result.current.detectionFailed).toBe(true)
-    expect(mockLogError).toHaveBeenCalled()
-  })
 })
 
 describe("useIpCountryCode", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockResolveIpCountryCode.mockResolvedValue(undefined)
   })
 
-  it("does not call ipapi while disabled", () => {
+  it("does not call IP lookup while disabled", () => {
     const { result } = renderHook(() => useIpCountryCode(false))
 
-    expect(mockedAxios.get).not.toHaveBeenCalled()
+    expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
     expect(result.current).toBeUndefined()
   })
 
-  it("resolves the country from ipapi when enabled", async () => {
-    // eslint-disable-next-line camelcase
-    mockedAxios.get.mockResolvedValue({ data: { country_code: "HK" } })
+  it("resolves the country from the adapter chain when enabled", async () => {
+    mockResolveIpCountryCode.mockResolvedValue("HK")
 
     const { result } = renderHook(() => useIpCountryCode(true))
 
     await act(async () => {})
 
-    expect(mockedAxios.get).toHaveBeenCalled()
+    expect(mockResolveIpCountryCode).toHaveBeenCalled()
     expect(result.current).toBe("HK")
   })
 
-  it("stays undefined when ipapi fails", async () => {
-    mockedAxios.get.mockRejectedValue(new Error("403 Forbidden"))
+  it("stays undefined when all adapters return nothing", async () => {
+    mockResolveIpCountryCode.mockResolvedValue(undefined)
 
     const { result } = renderHook(() => useIpCountryCode(true))
 
     await act(async () => {})
 
     expect(result.current).toBeUndefined()
-    expect(mockLogError).toHaveBeenCalled()
   })
 })
