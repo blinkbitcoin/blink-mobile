@@ -82,29 +82,57 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
     Config.IPAPI_API_KEY = ""
   })
 
-  it("skips ipify and ipinfo when keys are absent, falls through to ipapi", async () => {
+  it("uses ipinfo first (free tier, no key needed)", async () => {
+    mockedAxios.get.mockResolvedValue({ data: { country: "DE" } })
+
+    const result = await resolveIpCountryCode(DEFAULT_ADAPTERS)
+
+    expect(result).toBe("DE")
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1)
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect.stringContaining("ipinfo.io"),
+      expect.anything(),
+    )
+  })
+
+  it("uses api.ipinfo.io/lite with Bearer header when IPINFO_API_KEY is set", async () => {
+    Config.IPINFO_API_KEY = "test-ipinfo-key"
     mockedAxios.get.mockResolvedValue({ data: { country_code: "DE" } })
 
     const result = await resolveIpCountryCode(DEFAULT_ADAPTERS)
 
     expect(result).toBe("DE")
-    // Only one axios call — to ipapi.co (ipify and ipinfo were skipped)
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1)
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining("ipapi.co"),
-      expect.anything(),
+      expect.stringContaining("api.ipinfo.io/lite"),
+      expect.objectContaining({
+        headers: expect.objectContaining({ Authorization: "Bearer test-ipinfo-key" }),
+      }),
     )
   })
 
-  it("uses ipify first when key is present", async () => {
-    Config.GEO_IPIFY_API_KEY = "test-ipify-key"
-    mockedAxios.get.mockResolvedValue({ data: { location: { country: "JP" } } })
+  it("skips ipify when key is absent, uses ipinfo free tier", async () => {
+    mockedAxios.get.mockResolvedValue({ data: { country: "JP" } })
 
     const result = await resolveIpCountryCode(DEFAULT_ADAPTERS)
 
     expect(result).toBe("JP")
-    expect(mockedAxios.get).toHaveBeenCalledTimes(1)
-    expect(mockedAxios.get).toHaveBeenCalledWith(
+    expect(mockedAxios.get).not.toHaveBeenCalledWith(
+      expect.stringContaining("ipify"),
+      expect.anything(),
+    )
+  })
+
+  it("uses ipify when key is present and ipinfo fails", async () => {
+    Config.GEO_IPIFY_API_KEY = "test-ipify-key"
+    mockedAxios.get
+      .mockRejectedValueOnce(new Error("ipinfo down"))
+      .mockResolvedValueOnce({ data: { location: { country: "JP" } } })
+
+    const result = await resolveIpCountryCode(DEFAULT_ADAPTERS)
+
+    expect(result).toBe("JP")
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      2,
       expect.stringContaining("ipify"),
       expect.anything(),
     )
@@ -133,12 +161,11 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
     )
   })
 
-  it("falls through from ipify to ipinfo when ipify fails", async () => {
+  it("falls through from ipinfo to ipify when ipinfo fails", async () => {
     Config.GEO_IPIFY_API_KEY = "test-ipify-key"
-    Config.IPINFO_API_KEY = "test-ipinfo-token"
     mockedAxios.get
-      .mockRejectedValueOnce(new Error("ipify down"))
-      .mockResolvedValueOnce({ data: { country: "PL" } })
+      .mockRejectedValueOnce(new Error("ipinfo down"))
+      .mockResolvedValueOnce({ data: { location: { country: "PL" } } })
 
     const result = await resolveIpCountryCode(DEFAULT_ADAPTERS)
 
@@ -146,7 +173,7 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
     expect(mockedAxios.get).toHaveBeenCalledTimes(2)
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
       2,
-      expect.stringContaining("ipinfo.io"),
+      expect.stringContaining("ipify"),
       expect.anything(),
     )
   })
