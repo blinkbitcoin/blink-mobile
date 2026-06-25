@@ -36,9 +36,9 @@ mailslurp_api_key: ((galoy-tokens.mailslurp_api_key))
 
 spark_token_identifier: ((mobile-self-custodial.spark_token_identifier))
 breez_api_key: ((mobile-self-custodial.breez_api_key))
-geo_ipify_api_key: ((mobile-self-custodial.geo_ipify_api_key))
-ipinfo_api_key: ((mobile-self-custodial.ipinfo_api_key))
-ipapi_api_key: ((mobile-self-custodial.ipapi_api_key))
+geo_ipify_api_key: ((mobile-ip-country-lookup.geo_ipify_api_key))
+ipinfo_api_key: ((mobile-ip-country-lookup.ipinfo_api_key))
+ipapi_api_key: ((mobile-ip-country-lookup.ipapi_api_key))
 
 android_keystore: ((android.keystore))
 fastlane_match_password: ((fastlane.match_password))
