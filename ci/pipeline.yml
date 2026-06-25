@@ -152,6 +152,7 @@ jobs:
         GEO_IPIFY_API_KEY: #@ data.values.geo_ipify_api_key
         IPINFO_API_KEY: #@ data.values.ipinfo_api_key
         IPAPI_API_KEY: #@ data.values.ipapi_api_key
+        PROXYCHECK_API_KEY: #@ data.values.proxycheck_api_key
         MIN_BUILD_FREE_GB: 30
   - task: upload-to-gcs
     config:
@@ -323,6 +324,7 @@ jobs:
         GEO_IPIFY_API_KEY: #@ data.values.geo_ipify_api_key
         IPINFO_API_KEY: #@ data.values.ipinfo_api_key
         IPAPI_API_KEY: #@ data.values.ipapi_api_key
+        PROXYCHECK_API_KEY: #@ data.values.proxycheck_api_key
         MIN_BUILD_FREE_GB: 30
   - task: upload-to-gcs
     config:
