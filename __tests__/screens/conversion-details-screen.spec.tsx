@@ -2047,7 +2047,7 @@ describe("Self-custodial conversion limits gating", () => {
     expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
     await waitFor(() => {
       expect(getByTestId("amount-field-error").props.children).toContain(
-        "Conversion is temporarily unavailable",
+        "Transfers are temporarily unavailable",
       )
     })
   })
