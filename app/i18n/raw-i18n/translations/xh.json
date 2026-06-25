@@ -72,8 +72,8 @@
     "infoBitcoin": "Isixa se-Bitcoin siqikelelo kuphela. Singatshintsha ngesixa esincinci.",
     "infoDollar": "Isixa seDola siqikelelo kuphela. Singatshintsha ngesixa esincinci.",
     "transferButtonText": "Dlulisela {fromWallet} kuya ku {toWallet}",
-    "feeLabel": "Imali yotshintsho",
-    "feeError": "Ayikwazanga ukufumana imali yotshintsho"
+    "feeLabel": "Imali yokudlulisela",
+    "feeError": "Ayikwazanga ukufumana imali yokudlulisela"
   },
   "ConversionSuccessScreen": {
     "message": "Uguqulo luphumelele"
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "I-Akhawunti ye-Idola yakho ixhaswa yi-Stablesats",
-    "body": "I-Akhawunti ye-Idola isebenzisa iteknoloji ye-Stablesats ukugcina i-Bitcoin izinzile ngexabiso le-USD. Usoloko ugcine i-Bitcoin — hayi iidola zenene — kodwa ixabiso le-USD aliguquguquki. Ungakwazi ukuthumela nokufumana i-Bitcoin njengoko uqhele ukwenza, kodwa ayihambelani nenkqubo yebhanki yesithethe.",
+    "body": "KwiMowudi yoKugcina, i-Akhawunti yakho ye-Idola isebenzisa iteknoloji ye-Stablesats — ugcine i-Bitcoin, hayi iidola zenene, kodwa ixabiso liyilelwe ukugcina isixa esifanayo ngokwe-USD. Ungakwazi ukuthumela nokufumana i-Bitcoin njengesiqhelo.",
     "termsAndConditions": "Funda iMigaqo neMiqathango",
-    "learnMore": "Funda ngakumbi malunga neStablesats",
-    "headerSelfCustodial": "Iakhawunti yakho yeDola igcina ii-stablecoin",
-    "bodySelfCustodial": "Kwiakhawunti yeDola ugcina ii-stablecoin. Iitokheni ezixhaswe ngeempahla ezigcine ixabiso lizinzile kwiUSD. Awukakwazi ukuthumela nokufumana ii-stablecoin. Xa uthumela kusuka kwiakhawunti yeDola, ii-stablecoin zakho ziya kutshintshwa zize zithunyelwe njengeBitcoin kumamkeli.",
+    "learnMore": "Funda ngakumbi malunga ne-Akhawunti ye-Idola",
+    "headerSelfCustodial": "Malunga ne-Akhawunti yakho ye-Idola",
+    "bodySelfCustodial": "KwiMowudi engeyiyo yoKugcina, i-Akhawunti yakho ye-Idola isebenzisa ii-stablecoin ezixhaswayo, eziyilelwe ukugcina ixabiso elifanayo ngokwe-USD. Ukuthumela nokufumana ii-stablecoin ngokuthe ngqo akukaxhaswa okwangoku. Xa uthumela kusuka kwi-Akhawunti yakho ye-Idola, ibhalansi yakho iyatshintshwa ize ithunyelwe njenge-Bitcoin kumamkeli.",
     "learnMoreSelfCustodial": "Funda okungakumbi"
   },
   "SplashScreen": {
@@ -3625,8 +3625,8 @@
       "deactivateConfirm": "Yicima",
       "cancel": "Rhoxisa"
     },
-    "minimumConversion": "Inguqulo encinci: {amount:string}",
-    "conversionUnavailable": "Uguqulo aluxhanyiwe okwexeshana. Nceda uzame kwakhona."
+    "minimumConversion": "Ukudlulisela okuncinci: {amount:string}",
+    "conversionUnavailable": "Ukudlulisela akufumaneki okwexeshana. Nceda uzame kwakhona."
   },
   "BackendFeatureGate": {
     "title": "Isici asifumaneki",

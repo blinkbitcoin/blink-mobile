@@ -72,8 +72,8 @@
         "infoBitcoin": "L'importo in Bitcoin è solo approssimativo. Può variare leggermente.",
         "infoDollar": "L'importo in dollari è solo approssimativo. Può variare leggermente.",
         "transferButtonText": "Trasferisci {fromWallet} a {toWallet}",
-        "feeLabel": "Commissione di conversione",
-        "feeError": "Impossibile recuperare la commissione di conversione"
+        "feeLabel": "Commissione di trasferimento",
+        "feeError": "Impossibile recuperare la commissione di trasferimento"
     },
     "ConversionSuccessScreen": {
         "message": "Conversione riuscita"
@@ -2507,11 +2507,11 @@
     },
     "StablesatsModal": {
         "header": "Il tuo Conto Dollaro è alimentato da Stablesats",
-        "body": "Conto Dollaro utilizza la tecnologia Stablesats per mantenere il Bitcoin stabile al prezzo USD. Detieni sempre Bitcoin — non dollari veri — ma il valore USD non fluttua. Puoi inviare e ricevere Bitcoin normalmente, ma non è compatibile con il sistema bancario tradizionale.",
+        "body": "In Modalità Custodial, il tuo Conto Dollaro utilizza la tecnologia Stablesats — detieni Bitcoin, non dollari veri, ma il valore è progettato per mantenere lo stesso importo in termini di USD. Puoi inviare e ricevere Bitcoin normalmente.",
         "termsAndConditions": "Leggi i Terms & Conditions",
-        "learnMore": "Scopri di più su Stablesats",
-        "headerSelfCustodial": "Il tuo conto Dollaro contiene stablecoin",
-        "bodySelfCustodial": "Nel conto Dollaro detieni stablecoin. Token garantiti da attività il cui valore è mantenuto stabile rispetto al dollaro USA. Non puoi ancora inviare e ricevere stablecoin. Quando invii dal conto Dollaro, i tuoi stablecoin vengono scambiati e inviati come Bitcoin al destinatario.",
+        "learnMore": "Scopri di più sul Conto Dollaro",
+        "headerSelfCustodial": "Informazioni sul tuo Conto Dollaro",
+        "bodySelfCustodial": "In Modalità Non Custodial, il tuo Conto Dollaro utilizza stablecoin supportate, progettate per mantenere lo stesso valore in termini di USD. L'invio e la ricezione diretti di stablecoin non sono attualmente supportati. Quando invii dal tuo Conto Dollaro, il tuo saldo viene convertito e inviato come Bitcoin al destinatario.",
         "learnMoreSelfCustodial": "Scopri di più"
     },
     "SplashScreen": {
@@ -3625,8 +3625,8 @@
             "deactivateConfirm": "Disattiva",
             "cancel": "Annulla"
         },
-        "minimumConversion": "Conversione minima: {amount:string}",
-        "conversionUnavailable": "La conversione è temporaneamente non disponibile. Riprova."
+        "minimumConversion": "Trasferimento minimo: {amount:string}",
+        "conversionUnavailable": "I trasferimenti sono temporaneamente non disponibili. Riprova."
     },
     "BackendFeatureGate": {
         "title": "Funzione non disponibile",

@@ -72,8 +72,8 @@
     "infoBitcoin": "Bitcoin-beløbet er kun omtrentligt. Det kan variere med et lille beløb.",
     "infoDollar": "Dollar-beløbet er kun omtrentligt. Det kan variere med et lille beløb.",
     "transferButtonText": "Overfør {fromWallet} til {toWallet}",
-    "feeLabel": "Konverteringsgebyr",
-    "feeError": "Kunne ikke hente konverteringsgebyret"
+    "feeLabel": "Overførselsgebyr",
+    "feeError": "Kunne ikke hente overførselsgebyret"
   },
   "ConversionSuccessScreen": {
     "message": "Konvertering vel afsluttet"
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Din Dollar-konto er drevet af Stablesats",
-    "body": "Dollar-konto bruger Stablesats-teknologi til at holde Bitcoin stabil på USD-prisen. Du holder altid Bitcoin — ikke rigtige dollars — men USD-værdien svinger ikke. Du kan sende og modtage Bitcoin som normalt, men det er ikke kompatibelt med det traditionelle banksystem.",
+    "body": "I depotmodus bruger din Dollar-konto Stablesats-teknologi — du holder Bitcoin, ikke rigtige dollars, men værdien er designet til at bevare det samme beløb i USD. Du kan sende og modtage Bitcoin som normalt.",
     "termsAndConditions": "Læs vilkårene",
-    "learnMore": "Læs mere om Stablesats",
-    "headerSelfCustodial": "Din Dollar-konto indeholder stablecoins",
-    "bodySelfCustodial": "På Dollar-kontoen holder du stablecoins. Tokens, der er bakket op af aktiver, hvis værdi holdes stabil i forhold til USD. Du kan endnu ikke sende og modtage stablecoins. Når du sender fra Dollar-kontoen, ombyttes dine stablecoins og sendes som Bitcoin til modtageren.",
+    "learnMore": "Læs mere om Dollar-kontoen",
+    "headerSelfCustodial": "Om din Dollar-konto",
+    "bodySelfCustodial": "I ikke-depotmodus bruger din Dollar-konto understøttede stablecoins, der er designet til at bevare den samme værdi i USD. Det er i øjeblikket ikke muligt at sende og modtage stablecoins direkte. Når du sender fra din Dollar-konto, overføres din saldo og sendes som Bitcoin til modtageren.",
     "learnMoreSelfCustodial": "Lær mere"
   },
   "SplashScreen": {
@@ -3625,8 +3625,8 @@
       "deactivateConfirm": "Deaktivér",
       "cancel": "Annullér"
     },
-    "minimumConversion": "Minimum konvertering: {amount:string}",
-    "conversionUnavailable": "Konvertering er midlertidigt utilgængelig. Prøv igen."
+    "minimumConversion": "Minimum overførsel: {amount:string}",
+    "conversionUnavailable": "Overførsler er midlertidigt utilgængelige. Prøv igen."
   },
   "BackendFeatureGate": {
     "title": "Funktion ikke tilgængelig",

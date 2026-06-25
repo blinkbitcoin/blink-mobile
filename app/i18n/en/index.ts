@@ -82,8 +82,8 @@ const en: BaseTranslation = {
     infoBitcoin: "Bitcoin amount is only approximate. It can vary by a small amount.",
     infoDollar: "Dollar amount is only approximate. It can vary by a small amount.",
     transferButtonText: "Transfer {fromWallet} to {toWallet}",
-    feeLabel: "Conversion fee",
-    feeError: "Couldn't fetch the conversion fee",
+    feeLabel: "Transfer fee",
+    feeError: "Couldn't fetch the transfer fee",
   },
   ConversionSuccessScreen: {
     message: "Transfer successful",
@@ -2585,12 +2585,12 @@ const en: BaseTranslation = {
   },
   StablesatsModal: {
     header: "Your Dollar Balance is powered by Stablesats",
-    body: "Your Dollar Balance uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.",
+    body: "In Custodial Mode, your Dollar Balance uses Stablesats technology — you hold Bitcoin, not actual dollars, but the value is designed to maintain the same amount in USD terms. You can send and receive Bitcoin as usual.",
     termsAndConditions: "Read the Terms & Conditions.",
-    learnMore: "Learn more about Stablesats",
-    headerSelfCustodial: "Your Dollar Balance holds stablecoins",
+    learnMore: "Learn more about Dollar Balance",
+    headerSelfCustodial: "About your Dollar Balance",
     bodySelfCustodial:
-      "In your Dollar Balance you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from your Dollar Balance, you will swap your stablecoins and send as Bitcoin to the recipient.",
+      "In Non-Custodial Mode, your Dollar Balance uses supported stablecoins, designed to maintain the same value in USD terms. Sending and receiving stablecoins directly is not currently supported. When you send from your Dollar Balance, your balance is transferred and sent as Bitcoin to the recipient.",
     learnMoreSelfCustodial: "Learn more",
   },
   StablesatsRestriction: {
@@ -3853,8 +3853,8 @@ const en: BaseTranslation = {
       deactivateConfirm: "Deactivate",
       cancel: "Cancel",
     },
-    minimumConversion: "Minimum conversion: {amount:string}",
-    conversionUnavailable: "Conversion is temporarily unavailable. Please try again.",
+    minimumConversion: "Minimum transfer: {amount:string}",
+    conversionUnavailable: "Transfers are temporarily unavailable. Please try again.",
   },
   WalletCreationScreen: {
     creating: "Creating your wallet...",

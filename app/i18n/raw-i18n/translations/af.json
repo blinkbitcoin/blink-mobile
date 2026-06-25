@@ -72,8 +72,8 @@
     "infoBitcoin": "Bitcoin-bedrag is slegs 'n skatting. Dit kan met 'n klein bedrag wissel.",
     "infoDollar": "Dollar-bedrag is slegs 'n skatting. Dit kan met 'n klein bedrag wissel.",
     "transferButtonText": "Dra {fromWallet} oor na {toWallet}",
-    "feeLabel": "Omskakelingsfooi",
-    "feeError": "Kon nie die omskakelingsfooi haal nie"
+    "feeLabel": "Oordragfooi",
+    "feeError": "Kon nie die oordragfooi haal nie"
   },
   "ConversionSuccessScreen": {
     "message": "Omskakeling suksesvol"
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Jou Dollar-rekening word aangedryf deur Stablesats",
-    "body": "Die Dollar-rekening gebruik Stablesats-tegnologie om Bitcoin stabiel teen USD-prys te hou. Jy hou altyd Bitcoin — nie werklike dollars nie — maar die USD-waarde fluktueer nie. Jy kan Bitcoin stuur en ontvang soos gewoonlik, maar dit is nie versoenbaar met die tradisionele bankstelsel nie.",
+    "body": "In Bewaringsmodus gebruik jou Dollar-rekening Stablesats-tegnologie — jy hou Bitcoin, nie werklike dollars nie, maar die waarde is ontwerp om dieselfde bedrag in USD-terme te behou. Jy kan Bitcoin stuur en ontvang soos gewoonlik.",
     "termsAndConditions": "Lees die Terme en Voorwaardes",
-    "learnMore": "Leer meer van Stablesats",
-    "headerSelfCustodial": "Jou Dollar-rekening hou stablecoins",
-    "bodySelfCustodial": "In die Dollar-rekening hou jy stablecoins. Tokens gerugsteun deur bates met waarde gestabiliseer aan die USD. Jy kan nog nie stablecoins stuur en ontvang nie. Wanneer jy van die Dollar-rekening stuur, sal jy jou stablecoins omruil en as Bitcoin aan die ontvanger stuur.",
+    "learnMore": "Leer meer oor die Dollar-rekening",
+    "headerSelfCustodial": "Oor jou Dollar-rekening",
+    "bodySelfCustodial": "In Nie-bewaringsmodus gebruik jou Dollar-rekening ondersteunde stablecoins, ontwerp om dieselfde waarde in USD-terme te behou. Om stablecoins direk te stuur en te ontvang word tans nie ondersteun nie. Wanneer jy van jou Dollar-rekening stuur, word jou rekening oorgedra en as Bitcoin aan die ontvanger gestuur.",
     "learnMoreSelfCustodial": "Lees meer"
   },
   "SplashScreen": {
@@ -3625,8 +3625,8 @@
       "deactivateConfirm": "Deaktiveer",
       "cancel": "Kanselleer"
     },
-    "minimumConversion": "Minimum omskakeling: {amount:string}",
-    "conversionUnavailable": "Omskakeling is tydelik onbeskikbaar. Probeer asseblief weer."
+    "minimumConversion": "Minimum oordrag: {amount:string}",
+    "conversionUnavailable": "Oordragte is tydelik onbeskikbaar. Probeer asseblief weer."
   },
   "BackendFeatureGate": {
     "title": "Funksie nie beskikbaar nie",

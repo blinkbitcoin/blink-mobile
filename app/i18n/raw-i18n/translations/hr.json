@@ -72,8 +72,8 @@
     "infoBitcoin": "Bitcoin iznos je samo približan. Može varirati za mali iznos.",
     "infoDollar": "Dolarski iznos je samo približan. Može varirati za mali iznos.",
     "transferButtonText": "Prenesi {fromWallet} u {toWallet}",
-    "feeLabel": "Naknada za konverziju",
-    "feeError": "Nije bilo moguće dohvatiti naknadu za konverziju"
+    "feeLabel": "Naknada za prijenos",
+    "feeError": "Nije bilo moguće dohvatiti naknadu za prijenos"
   },
   "ConversionSuccessScreen": {
     "message": "Konverzija uspješna"
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Vaš Dolar račun pokreće Stablesats",
-    "body": "Dolar račun koristi Stablesats tehnologiju za održavanje Bitcoina stabilnim na USD cijeni. Uvijek držite Bitcoin — ne prave dolare — ali USD vrijednost ne fluktuira. Možete slati i primati Bitcoin kao i obično, ali nije kompatibilan s tradicionalnim bankarskim sustavom.",
+    "body": "U kustodijalnom načinu rada vaš Dolar račun koristi Stablesats tehnologiju — držite Bitcoin, a ne prave dolare, ali vrijednost je osmišljena da zadrži isti iznos u odnosu na USD. Bitcoin možete slati i primati kao i obično.",
     "termsAndConditions": "Pročitajte Uvjete i odredbe",
-    "learnMore": "Saznajte više o Stablesats-u",
-    "headerSelfCustodial": "Vaš dolarski račun drži stablecoine",
-    "bodySelfCustodial": "Na dolarskom računu držite stablecoine. Tokeni potpomognuti imovinom čija je vrijednost stabilna u odnosu na USD. Stablecoine zasad ne možete slati ni primati. Kada šaljete s dolarskog računa, vaši stablecoini se zamjenjuju i šalju kao Bitcoin primatelju.",
+    "learnMore": "Saznajte više o Dolar računu",
+    "headerSelfCustodial": "O vašem Dolar računu",
+    "bodySelfCustodial": "U nekustodijalnom načinu rada vaš Dolar račun koristi podržane stablecoine, koji su osmišljeni da zadrže istu vrijednost u odnosu na USD. Izravno slanje i primanje stablecoina trenutačno nije podržano. Kada šaljete s Dolar računa, vaš se saldo prebacuje i šalje primatelju kao Bitcoin.",
     "learnMoreSelfCustodial": "Saznajte više"
   },
   "SplashScreen": {
@@ -3625,8 +3625,8 @@
       "deactivateConfirm": "Deaktiviraj",
       "cancel": "Odustani"
     },
-    "minimumConversion": "Minimalna pretvorba: {amount:string}",
-    "conversionUnavailable": "Konverzija je privremeno nedostupna. Pokušajte ponovno."
+    "minimumConversion": "Minimalni prijenos: {amount:string}",
+    "conversionUnavailable": "Prijenosi su privremeno nedostupni. Pokušajte ponovno."
   },
   "BackendFeatureGate": {
     "title": "Značajka nedostupna",

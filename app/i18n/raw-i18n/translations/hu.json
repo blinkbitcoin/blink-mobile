@@ -72,8 +72,8 @@
     "infoBitcoin": "A Bitcoin összeg csak hozzávetőleges. Kis mértékben változhat.",
     "infoDollar": "A dollár összeg csak hozzávetőleges. Kis mértékben változhat.",
     "transferButtonText": "Átutalás {fromWallet}-ból/ből {toWallet}-ba/be",
-    "feeLabel": "Átváltási díj",
-    "feeError": "Nem sikerült lekérni az átváltási díjat"
+    "feeLabel": "Átutalási díj",
+    "feeError": "Nem sikerült lekérni az átutalási díjat"
   },
   "ConversionSuccessScreen": {
     "message": "Sikeres átváltás"
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "A Dollár Egyenlegedet a Stablesats működteti",
-    "body": "A Dollár Egyenleg Stablesats technológiát használ a Bitcoin USD árhoz stabilizálásához. Mindig Bitcoint tartasz — nem valódi dollárt — de az USD érték nem ingadozik. Bitcoint küldhetsz és fogadhatsz a szokásos módon, de nem kompatibilis a hagyományos bankrendszerrel.",
+    "body": "Letétkezelői módban a Dollár Egyenleged Stablesats technológiát használ — Bitcoint tartasz, nem valódi dollárt, de az értéket úgy tervezték, hogy megőrizze ugyanazt az összeget USD-ben kifejezve. Bitcoint küldhetsz és fogadhatsz a szokásos módon.",
     "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket",
-    "learnMore": "Tudj meg többet a Stablesatsról",
-    "headerSelfCustodial": "A Dollár Egyenleged stablecoinokat tárol",
-    "bodySelfCustodial": "A Dollár Egyenlegeden stablecoinokat tartasz. Olyan tokenek, amelyeket eszközök fedezetnek, és értékük stabil marad a USD-hez képest. Stablecoinokat egyelőre nem küldhetsz és nem fogadhatsz. Amikor a Dollár Egyenlegedről küldesz, a stablecoinjaidat átváltjuk és Bitcoinként küldjük a címzettnek.",
+    "learnMore": "Tudj meg többet a Dollár Egyenlegről",
+    "headerSelfCustodial": "A Dollár Egyenlegedről",
+    "bodySelfCustodial": "Nem-letétkezelői módban a Dollár Egyenleged támogatott stablecoinokat használ, amelyeket úgy terveztek, hogy megőrizzék ugyanazt az értéket USD-ben kifejezve. A stablecoinok közvetlen küldése és fogadása jelenleg nem támogatott. Amikor a Dollár Egyenlegedről küldesz, az egyenleged átváltásra kerül, és Bitcoinként küldjük el a címzettnek.",
     "learnMoreSelfCustodial": "Tudj meg többet"
   },
   "SplashScreen": {
@@ -3625,8 +3625,8 @@
       "deactivateConfirm": "Kikapcsolás",
       "cancel": "Mégse"
     },
-    "minimumConversion": "Minimum konverzió: {amount:string}",
-    "conversionUnavailable": "A konverzió ideiglenesen nem érhető el. Próbáld újra."
+    "minimumConversion": "Minimum átutalás: {amount:string}",
+    "conversionUnavailable": "Az átutalások ideiglenesen nem érhetők el. Próbáld újra."
   },
   "BackendFeatureGate": {
     "title": "Funkció nem elérhető",

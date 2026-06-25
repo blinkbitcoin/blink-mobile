@@ -72,8 +72,8 @@
         "infoBitcoin": "O valor em Bitcoin é apenas aproximado. Ele pode variar uma pequena quantia.",
         "infoDollar": "O valor em Dólar é apenas aproximado. Ele pode variar uma pequena quantia.",
         "transferButtonText": "Transferir {fromWallet} para {toWallet}",
-        "feeLabel": "Taxa de conversão",
-        "feeError": "Não foi possível obter a taxa de conversão"
+        "feeLabel": "Taxa de transferência",
+        "feeError": "Não foi possível obter a taxa de transferência"
     },
     "ConversionSuccessScreen": {
         "message": "Conversão bem sucedida"
@@ -2507,11 +2507,11 @@
     },
     "StablesatsModal": {
         "header": "Seu Saldo Dólar é powered by Stablesats",
-        "body": "O Saldo Dólar usa tecnologia Stablesats para manter o Bitcoin estável no preço USD. Você sempre tem Bitcoin — não dólares reais — mas o valor USD não flutua. Você pode enviar e receber Bitcoin normalmente, mas não é compatível com o sistema bancário tradicional.",
+        "body": "No Modo Custodial, o seu Saldo Dólar usa a tecnologia Stablesats — você detém Bitcoin, não dólares reais, mas o valor é projetado para manter a mesma quantia em termos de USD. Você pode enviar e receber Bitcoin normalmente.",
         "termsAndConditions": "Leia os Termos e Condições",
-        "learnMore": "Aprenda mais sobre Stablesats",
-        "headerSelfCustodial": "O seu Saldo Dólar contém stablecoins",
-        "bodySelfCustodial": "No seu Saldo Dólar você detém stablecoins. Tokens lastreados em ativos cujo valor é mantido estável em relação ao USD. Você ainda não pode enviar e receber stablecoins. Ao enviar a partir do seu Saldo Dólar, seus stablecoins serão trocados e enviados como Bitcoin ao destinatário.",
+        "learnMore": "Saiba mais sobre o Saldo Dólar",
+        "headerSelfCustodial": "Sobre o seu Saldo Dólar",
+        "bodySelfCustodial": "No Modo Não Custodial, o seu Saldo Dólar usa stablecoins compatíveis, projetadas para manter o mesmo valor em termos de USD. O envio e o recebimento diretos de stablecoins não são suportados no momento. Quando você envia a partir do seu Saldo Dólar, o seu saldo é convertido e enviado como Bitcoin ao destinatário.",
         "learnMoreSelfCustodial": "Saiba mais"
     },
     "SplashScreen": {
@@ -3625,8 +3625,8 @@
             "deactivateConfirm": "Desativar",
             "cancel": "Cancelar"
         },
-        "minimumConversion": "Conversão mínima: {amount:string}",
-        "conversionUnavailable": "A conversão está temporariamente indisponível. Tenta novamente."
+        "minimumConversion": "Transferência mínima: {amount:string}",
+        "conversionUnavailable": "As transferências estão temporariamente indisponíveis. Tenta novamente."
     },
     "BackendFeatureGate": {
         "title": "Recurso indisponível",

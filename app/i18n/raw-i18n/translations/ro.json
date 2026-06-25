@@ -72,8 +72,8 @@
     "infoBitcoin": "Suma în Bitcoin este doar aproximativă. Poate varia cu o mică diferență.",
     "infoDollar": "Suma în dolari este doar aproximativă. Poate varia cu o mică diferență.",
     "transferButtonText": "Transferă {fromWallet} către {toWallet}",
-    "feeLabel": "Comision de conversie",
-    "feeError": "Nu s-a putut obține comisionul de conversie"
+    "feeLabel": "Comision de transfer",
+    "feeError": "Nu s-a putut obține comisionul de transfer"
   },
   "ConversionSuccessScreen": {
     "message": "Conversie reușită"
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Cont Dolar-ul tău este alimentat de Stablesats",
-    "body": "Cont Dolar folosește tehnologia Stablesats pentru a menține Bitcoin stabil la prețul USD. Mereu deții Bitcoin — nu dolari reali — dar valoarea USD nu fluctuează. Poți trimite și primi Bitcoin ca de obicei, dar nu este compatibil cu sistemul bancar tradițional.",
+    "body": "În Modul Custodial, Contul tău Dolar utilizează tehnologia Stablesats — deții Bitcoin, nu dolari reali, dar valoarea este concepută pentru a menține aceeași sumă în termeni USD. Poți trimite și primi Bitcoin ca de obicei.",
     "termsAndConditions": "Citiți Termenii și condițiile",
-    "learnMore": "Aflați mai multe despre Stablesats",
-    "headerSelfCustodial": "Contul tău în Dolari deține stablecoins",
-    "bodySelfCustodial": "În contul în Dolari deții stablecoins. Tokenuri susținute de active a căror valoare este menținută stabilă față de USD. Nu poți încă trimite și primi stablecoins. Când trimiți din contul în Dolari, stablecoins-ul tău va fi schimbat și trimis ca Bitcoin către destinatar.",
+    "learnMore": "Află mai multe despre Contul Dolar",
+    "headerSelfCustodial": "Despre Contul tău Dolar",
+    "bodySelfCustodial": "În Modul Non-Custodial, Contul tău Dolar utilizează stablecoins compatibile, concepute pentru a menține aceeași valoare în termeni USD. Trimiterea și primirea directă de stablecoins nu sunt acceptate momentan. Când trimiți din Contul tău Dolar, soldul tău este convertit și trimis ca Bitcoin către destinatar.",
     "learnMoreSelfCustodial": "Află mai multe"
   },
   "SplashScreen": {
@@ -3625,8 +3625,8 @@
       "deactivateConfirm": "Dezactivează",
       "cancel": "Anulează"
     },
-    "minimumConversion": "Conversie minimă: {amount:string}",
-    "conversionUnavailable": "Conversia este temporar indisponibilă. Încearcă din nou."
+    "minimumConversion": "Transfer minim: {amount:string}",
+    "conversionUnavailable": "Transferurile sunt temporar indisponibile. Încearcă din nou."
   },
   "BackendFeatureGate": {
     "title": "Funcție indisponibilă",
