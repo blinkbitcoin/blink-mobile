@@ -101,7 +101,8 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
 
   it("uses api.ipinfo.io/lite with Bearer header when IPINFO_API_KEY is set", async () => {
     mutableConfig.IPINFO_API_KEY = "test-ipinfo-key"
-    mockedAxios.get.mockResolvedValue({ data: { "country_code": "DE" } })
+    // eslint-disable-next-line camelcase
+    mockedAxios.get.mockResolvedValue({ data: { country_code: "DE" } })
 
     const result = await resolveIpCountryCode(DEFAULT_ADAPTERS)
 
@@ -144,7 +145,8 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
 
   it("appends the api key to the ipapi.co url when IPAPI_KEY is set", async () => {
     mutableConfig.IPAPI_API_KEY = "test-ipapi-key"
-    mockedAxios.get.mockResolvedValue({ data: { "country_code": "SV" } })
+    // eslint-disable-next-line camelcase
+    mockedAxios.get.mockResolvedValue({ data: { country_code: "SV" } })
 
     await resolveIpCountryCode(DEFAULT_ADAPTERS)
 
@@ -155,7 +157,8 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
   })
 
   it("calls ipapi.co without a key when IPAPI_KEY is absent", async () => {
-    mockedAxios.get.mockResolvedValue({ data: { "country_code": "SV" } })
+    // eslint-disable-next-line camelcase
+    mockedAxios.get.mockResolvedValue({ data: { country_code: "SV" } })
 
     await resolveIpCountryCode(DEFAULT_ADAPTERS)
 
