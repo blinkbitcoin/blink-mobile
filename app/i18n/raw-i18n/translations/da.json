@@ -2699,6 +2699,8 @@
     "success": "E-mail {email: string} bekræftet med succes"
   },
   "common": {
+    "country": "Land",
+    "unknown": "Ukendt",
     "enabled": "Aktiveret",
     "switch": "Afbryder",
     "notifications": "Notifikationer",

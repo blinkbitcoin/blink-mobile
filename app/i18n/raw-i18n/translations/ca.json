@@ -2699,6 +2699,8 @@
     "success": "El correu electrònic {email: string} s'ha confirmat correctament"
   },
   "common": {
+    "country": "País",
+    "unknown": "Desconegut",
     "enabled": "Habilitat",
     "switch": "Interruptor",
     "notifications": "Notificacions",

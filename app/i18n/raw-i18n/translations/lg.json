@@ -2699,6 +2699,8 @@
     "success": "Email {email: string} ekakasiddwa bulungi"
   },
   "common": {
+    "country": "Eggwanga",
+    "unknown": "Tekimanyiddwa",
     "enabled": "Esobozeseddwa",
     "switch": "Swichi",
     "notifications": "Okumanyisibwa",

@@ -8833,6 +8833,14 @@ type RootTranslation = {
 	}
 	common: {
 		/**
+		 * C​o​u​n​t​r​y
+		 */
+		country: string
+		/**
+		 * U​n​k​n​o​w​n
+		 */
+		unknown: string
+		/**
 		 * E​n​a​b​l​e​d
 		 */
 		enabled: string
@@ -21079,6 +21087,14 @@ export type TranslationFunctions = {
 		success: (arg: { email: string }) => LocalizedString
 	}
 	common: {
+		/**
+		 * Country
+		 */
+		country: () => LocalizedString
+		/**
+		 * Unknown
+		 */
+		unknown: () => LocalizedString
 		/**
 		 * Enabled
 		 */

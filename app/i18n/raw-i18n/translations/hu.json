@@ -2699,6 +2699,8 @@
     "success": "Az {email: string} email cím sikeresen megerősítve"
   },
   "common": {
+    "country": "Ország",
+    "unknown": "Ismeretlen",
     "enabled": "Engedélyezve",
     "switch": "Kapcsoló",
     "notifications": "Értesítések",

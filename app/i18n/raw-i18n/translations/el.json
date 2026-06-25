@@ -2699,6 +2699,8 @@
     "success": "Email {email: string} επιτυχής επιβεβαίωση "
   },
   "common": {
+    "country": "Χώρα",
+    "unknown": "Άγνωστο",
     "enabled": "Ενεργοποιημένο",
     "switch": "Διακόπτης",
     "notifications": "Ειδοποιήσεις",

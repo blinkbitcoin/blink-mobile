@@ -2699,6 +2699,8 @@
     "success": "Barua pepe {email: string} imethibitishwa kwa mafanikio"
   },
   "common": {
+    "country": "Nchi",
+    "unknown": "Haijulikani",
     "enabled": "Imewashwa",
     "switch": "Swichi",
     "notifications": "Arifa",

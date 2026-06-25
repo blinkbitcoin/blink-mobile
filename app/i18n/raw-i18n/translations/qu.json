@@ -2699,6 +2699,8 @@
     "success": "Email {email: string} confirmed successfully"
   },
   "common": {
+    "country": "Suyu",
+    "unknown": "Mana yachakuq",
     "enabled": "Hapichisqa",
     "switch": "Interruptor",
     "notifications": "Willanakuykuna",

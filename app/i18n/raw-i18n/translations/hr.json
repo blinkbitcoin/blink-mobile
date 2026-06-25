@@ -2699,6 +2699,8 @@
     "success": "E-pošta {email: string} uspješno je potvrđena"
   },
   "common": {
+    "country": "Zemlja",
+    "unknown": "Nepoznato",
     "enabled": "Omogućeno",
     "switch": "Prekidač",
     "notifications": "Obavijesti",

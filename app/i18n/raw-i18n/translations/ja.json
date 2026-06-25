@@ -2699,6 +2699,8 @@
         "success": "メールアドレス{email: string}が正常に認証されました"
     },
     "common": {
+        "country": "国",
+        "unknown": "不明",
         "enabled": "有効",
         "switch": "スイッチ",
         "notifications": "通知",

@@ -2699,6 +2699,8 @@
     "success": "Emel {email: string} telah berjaya disahkan"
   },
   "common": {
+    "country": "Negara",
+    "unknown": "Tidak diketahui",
     "enabled": "Diaktifkan",
     "switch": "Suis",
     "notifications": "Notifikasi",

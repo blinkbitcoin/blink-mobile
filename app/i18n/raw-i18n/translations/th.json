@@ -2699,6 +2699,8 @@
     "success": "Email {email: string} confirmed successfully"
   },
   "common": {
+    "country": "ประเทศ",
+    "unknown": "ไม่ทราบ",
     "enabled": "เปิดใช้งาน",
     "switch": "สวิตช์",
     "notifications": "การแจ้งเตือน",

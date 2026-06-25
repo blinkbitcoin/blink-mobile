@@ -2699,6 +2699,8 @@
     "success": "Email {email: string} confirmed successfully"
   },
   "common": {
+    "country": "Земља",
+    "unknown": "Непознато",
     "enabled": "Омогућено",
     "switch": "Прекидач",
     "notifications": "Обавештења",

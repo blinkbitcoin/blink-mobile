@@ -2699,6 +2699,8 @@
     "success": "E-posta {email: string} başarıyla onaylandı"
   },
   "common": {
+    "country": "Ülke",
+    "unknown": "Bilinmiyor",
     "enabled": "Etkin",
     "switch": "Anahtar",
     "notifications": "Bildirimler",

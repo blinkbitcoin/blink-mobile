@@ -2699,6 +2699,8 @@
         "success": "Email-Adresse {email: string} erfolgreich bestätigt"
     },
     "common": {
+        "country": "Land",
+        "unknown": "Unbekannt",
         "enabled": "Aktiviert",
         "switch": "Schalter",
         "notifications": "Benachrichtigungen",

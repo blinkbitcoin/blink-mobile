@@ -2819,6 +2819,8 @@ const en: BaseTranslation = {
     success: "Email {email: string} confirmed successfully",
   },
   common: {
+    country: "Country",
+    unknown: "Unknown",
     enabled: "Enabled",
     switch: "Switch",
     notifications: "Notifications",

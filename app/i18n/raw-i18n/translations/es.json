@@ -2699,6 +2699,8 @@
         "success": "El correo electrónico {email: string} ha sido confirmado con éxito"
     },
     "common": {
+        "country": "País",
+        "unknown": "Desconocido",
         "enabled": "Activado",
         "switch": "Interruptor",
         "notifications": "Notificaciones",

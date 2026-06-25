@@ -2699,6 +2699,8 @@
     "success": "Էլ․ հասցեն {email: string} հաջողությամբ հաստատվել է"
   },
   "common": {
+    "country": "Երկիր",
+    "unknown": "Անհայտ",
     "enabled": "Միացված",
     "switch": "Անջատիչ",
     "notifications": "Ծանուցումներ",

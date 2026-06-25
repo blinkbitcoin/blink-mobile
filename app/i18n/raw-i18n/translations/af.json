@@ -2699,6 +2699,8 @@
     "success": "Epos {email: string} suksesvol bevestig"
   },
   "common": {
+    "country": "Land",
+    "unknown": "Onbekend",
     "enabled": "Geaktiveer",
     "switch": "Skakelaar",
     "notifications": "Kennisgewings",

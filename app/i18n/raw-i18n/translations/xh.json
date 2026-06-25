@@ -2699,6 +2699,8 @@
     "success": "I-imeyile {email: string} iqinisekiswe ngempumelelo"
   },
   "common": {
+    "country": "Ilizwe",
+    "unknown": "Ayaziwa",
     "enabled": "Ivuliwe",
     "switch": "Iswitshi",
     "notifications": "Izaziso",

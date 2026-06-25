@@ -2699,6 +2699,8 @@
         "success": "E-mail {email: string} a été validé avec succès"
     },
     "common": {
+        "country": "Pays",
+        "unknown": "Inconnu",
         "enabled": "Activé",
         "switch": "Interrupteur",
         "notifications": "Notifications",

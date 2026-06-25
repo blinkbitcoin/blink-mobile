@@ -2699,6 +2699,8 @@
     "success": "E-mail {email: string} bol úspešne potvrdený"
   },
   "common": {
+    "country": "Krajina",
+    "unknown": "Neznáme",
     "enabled": "Povolený",
     "switch": "Prepínač",
     "notifications": "Notifikácie",

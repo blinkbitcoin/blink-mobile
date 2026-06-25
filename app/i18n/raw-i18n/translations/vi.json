@@ -2699,6 +2699,8 @@
     "success": "Email {email: string} confirmed successfully"
   },
   "common": {
+    "country": "Quốc gia",
+    "unknown": "Không xác định",
     "enabled": "Đã bật",
     "switch": "Công tắc",
     "notifications": "Thông báo",
