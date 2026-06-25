@@ -56,7 +56,10 @@ export const useDollarBalanceRestricted = (): boolean => {
   const { blockedCountries, isPersisted } = useDollarBalanceRestrictionPolicy()
   const { countryCode, detectionFailed } = useDeviceLocation()
 
-  return isPersisted || (!detectionFailed && isBlockedCountry(countryCode, blockedCountries))
+  return (
+    isPersisted ||
+    (!detectionFailed && isBlockedCountry(countryCode, blockedCountries))
+  )
 }
 
 export const useDollarBalanceRestrictionSync = (): void => {
