@@ -4,5 +4,6 @@ module.exports = {
   IGNORE_LOGS: "",
   GEO_IPIFY_API_KEY: "",
   IPINFO_API_KEY: "",
+  PROXYCHECK_API_KEY: "",
   IPAPI_API_KEY: "",
 }

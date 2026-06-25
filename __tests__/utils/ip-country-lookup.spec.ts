@@ -83,6 +83,7 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
     jest.clearAllMocks()
     mutableConfig.GEO_IPIFY_API_KEY = ""
     mutableConfig.IPINFO_API_KEY = ""
+    mutableConfig.PROXYCHECK_API_KEY = ""
     mutableConfig.IPAPI_API_KEY = ""
   })
 
@@ -127,18 +128,55 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
     )
   })
 
-  it("uses ipify when key is present and ipinfo fails", async () => {
+  it("uses ipify when key is present and ipinfo+proxycheck fail", async () => {
     mutableConfig.GEO_IPIFY_API_KEY = "test-ipify-key"
     mockedAxios.get
       .mockRejectedValueOnce(new Error("ipinfo down"))
+      .mockRejectedValueOnce(new Error("proxycheck down"))
       .mockResolvedValueOnce({ data: { location: { country: "JP" } } })
 
     const result = await resolveIpCountryCode(DEFAULT_ADAPTERS)
 
     expect(result).toBe("JP")
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
-      2,
+      3,
       expect.stringContaining("ipify"),
+      expect.anything(),
+    )
+  })
+
+  it("uses proxycheck.io free tier and parses country_code from nested IP entry", async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: {
+        status: "ok",
+        // eslint-disable-next-line camelcase
+        "1.2.3.4": { location: { country_code: "SE" } },
+      },
+    })
+
+    const result = await resolveIpCountryCode(DEFAULT_ADAPTERS)
+
+    expect(result).toBe("SE")
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect.stringContaining("proxycheck.io"),
+      expect.anything(),
+    )
+  })
+
+  it("appends the api key to the proxycheck.io url when PROXYCHECK_API_KEY is set", async () => {
+    mutableConfig.PROXYCHECK_API_KEY = "test-proxycheck-key"
+    mockedAxios.get.mockResolvedValue({
+      data: {
+        status: "ok",
+        // eslint-disable-next-line camelcase
+        "1.2.3.4": { location: { country_code: "SE" } },
+      },
+    })
+
+    await resolveIpCountryCode(DEFAULT_ADAPTERS)
+
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect.stringContaining("key=test-proxycheck-key"),
       expect.anything(),
     )
   })
@@ -168,18 +206,19 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
     )
   })
 
-  it("falls through from ipinfo to ipify when ipinfo fails", async () => {
+  it("falls through ipinfo → proxycheck → ipify in order", async () => {
     mutableConfig.GEO_IPIFY_API_KEY = "test-ipify-key"
     mockedAxios.get
       .mockRejectedValueOnce(new Error("ipinfo down"))
+      .mockRejectedValueOnce(new Error("proxycheck down"))
       .mockResolvedValueOnce({ data: { location: { country: "PL" } } })
 
     const result = await resolveIpCountryCode(DEFAULT_ADAPTERS)
 
     expect(result).toBe("PL")
-    expect(mockedAxios.get).toHaveBeenCalledTimes(2)
+    expect(mockedAxios.get).toHaveBeenCalledTimes(3)
     expect(mockedAxios.get).toHaveBeenNthCalledWith(
-      2,
+      3,
       expect.stringContaining("ipify"),
       expect.anything(),
     )
@@ -203,6 +242,7 @@ describe("no-key warning", () => {
       jest.mock("react-native-config", () => ({
         GEO_IPIFY_API_KEY: "",
         IPINFO_API_KEY: "",
+        PROXYCHECK_API_KEY: "",
         IPAPI_API_KEY: "",
       }))
       require("@app/utils/ip-country-lookup") // eslint-disable-line @typescript-eslint/no-var-requires

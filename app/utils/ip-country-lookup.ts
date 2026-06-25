@@ -33,6 +33,20 @@ const ipifyAdapter: IpLookupAdapter = async (timeout) => {
   return data?.location?.country as CountryCode | undefined
 }
 
+// Free fallback with optional key; response nests data under the detected IP key
+// e.g. { "status": "ok", "1.2.3.4": { "location": { "country_code": "SE" } } }
+const proxycheckAdapter: IpLookupAdapter = async (timeout) => {
+  const url = Config.PROXYCHECK_API_KEY
+    ? `https://proxycheck.io/v3/?key=${Config.PROXYCHECK_API_KEY}`
+    : "https://proxycheck.io/v3/"
+  const { data } = await axios.get(url, { timeout })
+  type IpEntry = { location?: { country_code?: string } }
+  const ipEntry = Object.values(data as Record<string, IpEntry>).find(
+    (v) => v && typeof v === "object" && v.location?.country_code,
+  )
+  return ipEntry?.location?.country_code as CountryCode | undefined
+}
+
 // Free fallback with optional key to avoid rate limits
 const ipapiAdapter: IpLookupAdapter = async (timeout) => {
   const url = Config.IPAPI_API_KEY
@@ -44,13 +58,19 @@ const ipapiAdapter: IpLookupAdapter = async (timeout) => {
 
 export const DEFAULT_ADAPTERS: IpLookupAdapter[] = [
   ipinfoAdapter,
+  proxycheckAdapter,
   ipifyAdapter,
   ipapiAdapter,
 ]
 
-if (!Config.GEO_IPIFY_API_KEY && !Config.IPINFO_API_KEY && !Config.IPAPI_API_KEY) {
+if (
+  !Config.GEO_IPIFY_API_KEY &&
+  !Config.IPINFO_API_KEY &&
+  !Config.PROXYCHECK_API_KEY &&
+  !Config.IPAPI_API_KEY
+) {
   console.warn(
-    "[ip-country-lookup] No API key configured. Running on free tiers only (rate-limited). Set GEO_IPIFY_API_KEY, IPINFO_API_KEY, or IPAPI_API_KEY in .env.local.",
+    "[ip-country-lookup] No API key configured. Running on free tiers only (rate-limited). Set GEO_IPIFY_API_KEY, IPINFO_API_KEY, PROXYCHECK_API_KEY, or IPAPI_API_KEY in .env.local.",
   )
 }
 
