@@ -49,6 +49,7 @@ const baseState: PersistentState = {
 const remoteConfig = {
   custodialDollarBalanceBlockedCountries: ["HK"],
   selfCustodialDollarBalanceBlockedCountries: ["FR"],
+  dollarRestrictionCacheEnabled: true,
 }
 
 const setup = (accountType: AccountType): void => {
@@ -117,6 +118,27 @@ describe("useDollarBalanceRestricted", () => {
       mockPersistentState = { ...baseState, stablesatsRestrictedCustodial: true }
       mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
       expect(read()).toBe(false)
+    })
+  })
+
+  describe("with the restriction cache disabled remotely", () => {
+    beforeEach(() => {
+      setup(AccountType.Custodial)
+      mockUseRemoteConfig.mockReturnValue({
+        ...remoteConfig,
+        dollarRestrictionCacheEnabled: false,
+      })
+    })
+
+    it("ignores the persisted flag so a stale restriction can be lifted", () => {
+      mockPersistentState = { ...baseState, stablesatsRestrictedCustodial: true }
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
+      expect(read()).toBe(false)
+    })
+
+    it("still restricts from the live device country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
+      expect(read()).toBe(true)
     })
   })
 })
@@ -197,12 +219,35 @@ describe("useDollarBalanceRestrictionSync", () => {
     expect(mockUpdateState).not.toHaveBeenCalled()
   })
 
+  describe("with the restriction cache disabled remotely", () => {
+    beforeEach(() => {
+      setup(AccountType.Custodial)
+      mockUseRemoteConfig.mockReturnValue({
+        ...remoteConfig,
+        dollarRestrictionCacheEnabled: false,
+      })
+    })
+
+    it("does not persist even in a blocked country", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", source: "phone" })
+      renderHook(() => useDollarBalanceRestrictionSync())
+      expect(mockUpdateState).not.toHaveBeenCalled()
+    })
+
+    it("does not consult IP", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "SV", source: "phone" })
+      renderHook(() => useDollarBalanceRestrictionSync())
+      expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
+    })
+  })
+
   it("writes the self-custodial flag too when a blocked-country user switches from custodial to self-custodial", () => {
     setup(AccountType.Custodial)
     mockUseDeviceLocation.mockReturnValue({ countryCode: "HK", source: "phone" })
     mockUseRemoteConfig.mockReturnValue({
       custodialDollarBalanceBlockedCountries: ["HK"],
       selfCustodialDollarBalanceBlockedCountries: ["HK"],
+      dollarRestrictionCacheEnabled: true,
     })
 
     const { rerender } = renderHook(() => useDollarBalanceRestrictionSync())

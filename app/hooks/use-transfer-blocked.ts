@@ -49,24 +49,31 @@ const useTransferBlockPolicy = (): TransferBlockPolicy => {
 
 export const useTransferBlocked = (): boolean => {
   const { blockedCountries, isPersisted } = useTransferBlockPolicy()
+  const { dollarRestrictionCacheEnabled } = useRemoteConfig()
   const { countryCode } = useDeviceLocation()
 
-  return isPersisted || isBlockedCountry(countryCode, blockedCountries)
+  const isCachedRestriction = dollarRestrictionCacheEnabled && isPersisted
+
+  return isCachedRestriction || isBlockedCountry(countryCode, blockedCountries)
 }
 
 export const useTransferBlockedSync = (): void => {
   const { blockedCountries, isPersisted, persist } = useTransferBlockPolicy()
+  const { dollarRestrictionCacheEnabled } = useRemoteConfig()
   const { countryCode, source } = useDeviceLocation()
   const { updateState } = usePersistentStateContext()
 
+  const canPersistRestriction = dollarRestrictionCacheEnabled && !isPersisted
   const primaryBlocked = isBlockedCountry(countryCode, blockedCountries)
+  const isPhoneSource = source === LocationSource.Phone
 
-  const ipCountryCode = useIpCountryCode(
-    source === LocationSource.Phone && !isPersisted && !primaryBlocked,
-  )
+  const shouldConsultIp = canPersistRestriction && isPhoneSource && !primaryBlocked
+
+  const ipCountryCode = useIpCountryCode(shouldConsultIp)
 
   const shouldPersist =
-    !isPersisted && (primaryBlocked || isBlockedCountry(ipCountryCode, blockedCountries))
+    canPersistRestriction &&
+    (primaryBlocked || isBlockedCountry(ipCountryCode, blockedCountries))
 
   /** `persist` is in the deps so an accountType switch re-fires and writes the other flag too (anti-bypass). */
   useEffect(() => {

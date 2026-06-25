@@ -54,24 +54,31 @@ const useDollarBalanceRestrictionPolicy = (): DollarBalanceRestrictionPolicy => 
 
 export const useDollarBalanceRestricted = (): boolean => {
   const { blockedCountries, isPersisted } = useDollarBalanceRestrictionPolicy()
+  const { dollarRestrictionCacheEnabled } = useRemoteConfig()
   const { countryCode } = useDeviceLocation()
 
-  return isPersisted || isBlockedCountry(countryCode, blockedCountries)
+  const isCachedRestriction = dollarRestrictionCacheEnabled && isPersisted
+
+  return isCachedRestriction || isBlockedCountry(countryCode, blockedCountries)
 }
 
 export const useDollarBalanceRestrictionSync = (): void => {
   const { blockedCountries, isPersisted, persist } = useDollarBalanceRestrictionPolicy()
+  const { dollarRestrictionCacheEnabled } = useRemoteConfig()
   const { countryCode, source } = useDeviceLocation()
   const { updateState } = usePersistentStateContext()
 
+  const canPersistRestriction = dollarRestrictionCacheEnabled && !isPersisted
   const primaryBlocked = isBlockedCountry(countryCode, blockedCountries)
+  const isPhoneSource = source === LocationSource.Phone
 
-  const ipCountryCode = useIpCountryCode(
-    source === LocationSource.Phone && !isPersisted && !primaryBlocked,
-  )
+  const shouldConsultIp = canPersistRestriction && isPhoneSource && !primaryBlocked
+
+  const ipCountryCode = useIpCountryCode(shouldConsultIp)
 
   const shouldPersist =
-    !isPersisted && (primaryBlocked || isBlockedCountry(ipCountryCode, blockedCountries))
+    canPersistRestriction &&
+    (primaryBlocked || isBlockedCountry(ipCountryCode, blockedCountries))
 
   /**
    * `persist` is in the deps on purpose: its identity flips with accountType, so
