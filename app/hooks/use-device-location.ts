@@ -1,14 +1,13 @@
-import axios from "axios"
 import { CountryCode, parsePhoneNumber } from "libphonenumber-js/mobile"
 import { useEffect, useState } from "react"
 
 import { useApolloClient } from "@apollo/client"
 import { updateCountryCode } from "@app/graphql/client-only-query"
 import { useCountryCodeQuery, useSettingsScreenQuery } from "@app/graphql/generated"
+import { resolveIpCountryCode } from "@app/utils/ip-country-lookup"
 import { logError } from "@app/utils/log-error"
 
 const DEFAULT_COUNTRY_CODE: CountryCode = "SV"
-const IPAPI_URL = "https://ipapi.co/json/"
 
 export const LocationSource = {
   Phone: "phone",
@@ -21,34 +20,6 @@ export const isBlockedCountry = (
   countryCode: string | undefined,
   blockedCountries: string[],
 ): boolean => Boolean(countryCode && blockedCountries.includes(countryCode.toUpperCase()))
-
-const fetchCountryFromIp = async (): Promise<CountryCode | undefined> => {
-  const { data } = await axios.get(IPAPI_URL, { timeout: 5000 })
-  return data?.country_code as CountryCode | undefined
-}
-
-const resolveIpCountryCode = async (
-  context: Record<string, unknown> = {},
-): Promise<CountryCode | undefined> => {
-  try {
-    const countryCode = await fetchCountryFromIp()
-    if (!countryCode) {
-      logError({
-        scope: "device-location",
-        error: new Error("ipapi returned no country"),
-        context: { source: "ipapi", ...context },
-      })
-    }
-    return countryCode
-  } catch (err) {
-    logError({
-      scope: "device-location",
-      error: err,
-      context: { source: "ipapi", ...context },
-    })
-    return undefined
-  }
-}
 
 type DeviceLocation = {
   countryCode: CountryCode | undefined
@@ -121,7 +92,7 @@ const useDeviceLocation = (): DeviceLocation => {
     setSource(LocationSource.Ip)
     const getLocation = async () => {
       const cached = data.countryCode as CountryCode | undefined
-      const ipCountryCode = await resolveIpCountryCode({ hasCached: Boolean(cached) })
+      const ipCountryCode = await resolveIpCountryCode()
       if (ipCountryCode) {
         setCountryCode(ipCountryCode)
         setDetectionFailed(false)
