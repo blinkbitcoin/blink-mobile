@@ -1,6 +1,9 @@
 import { renderHook, act } from "@testing-library/react-hooks"
 
-import useDeviceLocation, { useIpCountryCode } from "@app/hooks/use-device-location"
+import useDeviceLocation, {
+  isBlockedCountry,
+  useIpCountryCode,
+} from "@app/hooks/use-device-location"
 
 const mockLogError = jest.fn()
 const mockUpdateCountryCode = jest.fn()
@@ -305,5 +308,23 @@ describe("useIpCountryCode", () => {
     await act(async () => {})
 
     expect(result.current).toBeUndefined()
+  })
+})
+
+describe("isBlockedCountry", () => {
+  it("returns true when country is in the blocked list", () => {
+    expect(isBlockedCountry("US", ["US", "CN"])).toBe(true)
+  })
+
+  it("is case-insensitive", () => {
+    expect(isBlockedCountry("us", ["US"])).toBe(true)
+  })
+
+  it("returns false when country is not in the blocked list", () => {
+    expect(isBlockedCountry("DE", ["US", "CN"])).toBe(false)
+  })
+
+  it("returns false when countryCode is undefined", () => {
+    expect(isBlockedCountry(undefined, ["US"])).toBe(false)
   })
 })
