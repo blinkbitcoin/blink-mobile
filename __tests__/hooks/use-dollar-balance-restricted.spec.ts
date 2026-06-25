@@ -113,6 +113,31 @@ describe("useDollarBalanceRestricted", () => {
       expect(read()).toBe(true)
     })
 
+    it("does not restrict when the blocked country came from a failed location fallback", () => {
+      mockUseRemoteConfig.mockReturnValue({
+        ...remoteConfig,
+        selfCustodialDollarBalanceBlockedCountries: ["SV"],
+      })
+      mockUseDeviceLocation.mockReturnValue({
+        countryCode: "SV",
+        detectionFailed: true,
+      })
+      expect(read()).toBe(false)
+    })
+
+    it("still honors an existing persisted stable-token flag after location detection fails", () => {
+      mockPersistentState = { ...baseState, stableTokenRestricted: true }
+      mockUseRemoteConfig.mockReturnValue({
+        ...remoteConfig,
+        selfCustodialDollarBalanceBlockedCountries: ["SV"],
+      })
+      mockUseDeviceLocation.mockReturnValue({
+        countryCode: "SV",
+        detectionFailed: true,
+      })
+      expect(read()).toBe(true)
+    })
+
     it("ignores the custodial persisted flag", () => {
       mockPersistentState = { ...baseState, stablesatsRestrictedCustodial: true }
       mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
@@ -186,6 +211,23 @@ describe("useDollarBalanceRestrictionSync", () => {
       renderHook(() => useDollarBalanceRestrictionSync())
       expect(mockUseIpCountryCode).toHaveBeenCalledWith(true)
       expect(mockUpdateState).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not persist the stable-token flag when the blocked country came from a failed location fallback", () => {
+      mockUseRemoteConfig.mockReturnValue({
+        ...remoteConfig,
+        selfCustodialDollarBalanceBlockedCountries: ["SV"],
+      })
+      mockUseDeviceLocation.mockReturnValue({
+        countryCode: "SV",
+        source: "ip",
+        detectionFailed: true,
+      })
+
+      renderHook(() => useDollarBalanceRestrictionSync())
+
+      expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
+      expect(mockUpdateState).not.toHaveBeenCalled()
     })
   })
 

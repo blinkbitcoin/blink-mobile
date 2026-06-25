@@ -54,24 +54,30 @@ const useDollarBalanceRestrictionPolicy = (): DollarBalanceRestrictionPolicy => 
 
 export const useDollarBalanceRestricted = (): boolean => {
   const { blockedCountries, isPersisted } = useDollarBalanceRestrictionPolicy()
-  const { countryCode } = useDeviceLocation()
+  const { countryCode, detectionFailed } = useDeviceLocation()
 
-  return isPersisted || isBlockedCountry(countryCode, blockedCountries)
+  return isPersisted || (!detectionFailed && isBlockedCountry(countryCode, blockedCountries))
 }
 
 export const useDollarBalanceRestrictionSync = (): void => {
   const { blockedCountries, isPersisted, persist } = useDollarBalanceRestrictionPolicy()
-  const { countryCode, source } = useDeviceLocation()
+  const { countryCode, source, detectionFailed } = useDeviceLocation()
   const { updateState } = usePersistentStateContext()
 
-  const primaryBlocked = isBlockedCountry(countryCode, blockedCountries)
+  const primaryBlocked =
+    !detectionFailed && isBlockedCountry(countryCode, blockedCountries)
 
   const ipCountryCode = useIpCountryCode(
-    source === LocationSource.Phone && !isPersisted && !primaryBlocked,
+    source === LocationSource.Phone &&
+      !detectionFailed &&
+      !isPersisted &&
+      !primaryBlocked,
   )
 
   const shouldPersist =
-    !isPersisted && (primaryBlocked || isBlockedCountry(ipCountryCode, blockedCountries))
+    !isPersisted &&
+    !detectionFailed &&
+    (primaryBlocked || isBlockedCountry(ipCountryCode, blockedCountries))
 
   /**
    * `persist` is in the deps on purpose: its identity flips with accountType, so
