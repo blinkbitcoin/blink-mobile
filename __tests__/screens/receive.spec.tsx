@@ -156,8 +156,8 @@ jest.mock("@app/hooks", () => {
   }
 })
 
-jest.mock("@app/hooks/use-stablesats-restricted", () => ({
-  useStablesatsRestricted: () => false,
+jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
+  useDollarBalanceRestricted: () => false,
 }))
 
 jest.mock("@app/hooks/use-device-location", () => ({

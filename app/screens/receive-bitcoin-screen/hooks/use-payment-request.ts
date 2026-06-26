@@ -9,7 +9,7 @@ import {
   useOnChainAddressCurrentMutation,
 } from "@app/graphql/generated"
 import useDeviceLocation from "@app/hooks/use-device-location"
-import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
+import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { BtcWalletDescriptor } from "@app/types/wallets"
 
@@ -79,7 +79,7 @@ const DEFAULT_EXPIRATION_MINUTES: Record<WalletCurrency, number> = {
 
 export const usePaymentRequest = () => {
   const wallets = useWalletResolution()
-  const isStablesatsRestricted = useStablesatsRestricted()
+  const isDollarBalanceRestricted = useDollarBalanceRestricted()
   const { loading: locationLoading } = useDeviceLocation()
 
   const [lnNoAmountInvoiceCreate] = useLnNoAmountInvoiceCreateMutation()
@@ -104,7 +104,9 @@ export const usePaymentRequest = () => {
 
     if (!defaultWallet || !bitcoinWallet) return
 
-    const effectiveDefaultWallet = isStablesatsRestricted ? bitcoinWallet : defaultWallet
+    const effectiveDefaultWallet = isDollarBalanceRestricted
+      ? bitcoinWallet
+      : defaultWallet
     const defaultWalletDescriptor = {
       currency: effectiveDefaultWallet.walletCurrency,
       id: effectiveDefaultWallet.id,
@@ -130,7 +132,7 @@ export const usePaymentRequest = () => {
       expirationTime: DEFAULT_EXPIRATION_MINUTES[defaultWalletDescriptor.currency],
     }
     setPRCD(createPaymentRequestCreationData(initialPRParams))
-  }, [prcd, wallets, isStablesatsRestricted, locationLoading])
+  }, [prcd, wallets, isDollarBalanceRestricted, locationLoading])
 
   const mutations = useMemo(
     () => ({

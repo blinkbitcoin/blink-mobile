@@ -72,8 +72,8 @@
     "infoBitcoin": "Het Bitcoin-bedrag is slechts een schatting. Het kan enigszins afwijken.",
     "infoDollar": "Het dollarbedrag is slechts een schatting. Het kan enigszins afwijken.",
     "transferButtonText": "Overschrijven van {fromWallet} naar {toWallet}",
-    "feeLabel": "Conversiekosten",
-    "feeError": "Kon de conversiekosten niet ophalen"
+    "feeLabel": "Overschrijvingskosten",
+    "feeError": "Kon de overschrijvingskosten niet ophalen"
   },
   "ConversionSuccessScreen": {
     "message": "Wissel geslaagd"
@@ -2457,17 +2457,16 @@
     "removedAccount": "Je hebt account {identifier: string} verwijderd."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats is niet beschikbaar in jouw regio",
-    "modalBody": "Maak een non-custodial account aan om toegang te krijgen tot een Dollarsaldo.",
-    "createNew": "Nieuw aanmaken",
     "walletLabel": "niet beschikbaar in jouw regio"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Het Dollarsaldo is niet langer beschikbaar in jouw regio",
-    "body": "Breng je dollarsaldo over naar Bitcoin",
+    "title": "Dollar-saldo is niet beschikbaar in jouw regio",
+    "body": "Zet over van dollarsaldo naar Bitcoin-saldo",
     "youHave": "Je hebt",
-    "youGet": "Je krijgt",
-    "approve": "Goedkeuren"
+    "youGet": "Je krijgt"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Tweefactorauthenticatie",
@@ -2508,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Je Dollarsaldo wordt aangedreven door Stablesats",
-    "body": "Het Dollarsaldo gebruikt Stablesats-technologie om Bitcoin stabiel te houden op de USD-prijs. Je houdt altijd Bitcoin — geen echte dollars — maar de USD-waarde fluctueert niet. Je kunt Bitcoin versturen en ontvangen zoals gewoonlijk, maar het is niet compatibel met het traditionele banksysteem.",
+    "body": "In Bewaarmodus gebruikt je Dollarsaldo Stablesats-technologie — je houdt Bitcoin, geen echte USD, maar de waarde is ontworpen om hetzelfde bedrag in USD te behouden. Je kunt Bitcoin versturen en ontvangen zoals gewoonlijk.",
     "termsAndConditions": "Lees de Algemene voorwaarden",
-    "learnMore": "Meer informatie over Stablesats",
-    "headerSelfCustodial": "Je Dollarsaldo bevat stablecoins",
-    "bodySelfCustodial": "In je Dollarsaldo houd je stablecoins. Tokens die gedekt worden door activa en waarvan de waarde stabiel wordt gehouden ten opzichte van de USD. Je kunt nog geen stablecoins versturen en ontvangen. Wanneer je vanaf je Dollarsaldo stuurt, worden je stablecoins omgewisseld en als Bitcoin naar de ontvanger gestuurd.",
+    "learnMore": "Meer informatie over het Dollarsaldo",
+    "headerSelfCustodial": "Over je Dollarsaldo",
+    "bodySelfCustodial": "In Niet-bewaarmodus gebruikt je Dollarsaldo ondersteunde stablecoins, ontworpen om dezelfde waarde in USD te behouden.",
     "learnMoreSelfCustodial": "Meer informatie"
   },
   "SplashScreen": {
@@ -2700,6 +2699,8 @@
     "success": "E-mail {email: string} succesvol bevestigd"
   },
   "common": {
+    "country": "Land",
+    "unknown": "Onbekend",
     "enabled": "Ingeschakeld",
     "switch": "Schakelaar",
     "notifications": "Meldingen",
@@ -3570,6 +3571,10 @@
     "createFailed": "Kon portemonnee niet aanmaken. Probeer het opnieuw.",
     "selfCustodialDisabled": "Niet-bewarend is tijdelijk niet beschikbaar."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Niet-ondersteunde regio",
+    "description": "Helaas kunnen we geen gebruikers uit je huidige regio bedienen."
+  },
   "RestoreScreen": {
     "title": "Portemonnee herstellen",
     "description": "Herstel je portemonnee vanuit een back-up",
@@ -3622,8 +3627,8 @@
       "deactivateConfirm": "Deactiveren",
       "cancel": "Annuleren"
     },
-    "minimumConversion": "Minimale conversie: {amount:string}",
-    "conversionUnavailable": "Conversie is tijdelijk niet beschikbaar. Probeer het opnieuw."
+    "minimumConversion": "Minimale overschrijving: {amount:string}",
+    "conversionUnavailable": "Overschrijvingen zijn tijdelijk niet beschikbaar. Probeer het opnieuw."
   },
   "BackendFeatureGate": {
     "title": "Functie niet beschikbaar",

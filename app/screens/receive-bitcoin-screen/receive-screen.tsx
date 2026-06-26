@@ -18,7 +18,7 @@ import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useNotificationPermission, usePriceConversion } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
+import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
@@ -104,7 +104,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
 
   useNotificationPermission()
 
-  const isStablesatsRestricted = useStablesatsRestricted()
+  const isDollarBalanceRestricted = useDollarBalanceRestricted()
 
   const [isTrialModalVisible, setIsTrialModalVisible] = useState(false)
   const openTrialModal = useCallback(() => setIsTrialModalVisible(true), [])
@@ -205,7 +205,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
 
   const canToggleWallet = isSelfCustodial
     ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
-    : !isStablesatsRestricted
+    : !isDollarBalanceRestricted
 
   return (
     <Screen

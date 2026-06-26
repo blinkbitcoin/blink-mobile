@@ -43,6 +43,19 @@ jest.mock("@app/hooks/use-intra-ledger-conversion", () => ({
     mockUseIntraLedgerConversion(config),
 }))
 
+jest.mock("react-native-modal", () => {
+  const ReactNs = jest.requireActual<typeof import("react")>("react")
+  const RN = jest.requireActual<typeof import("react-native")>("react-native")
+  const MockModal = ({
+    children,
+    isVisible,
+  }: {
+    children: React.ReactNode
+    isVisible: boolean
+  }) => (isVisible ? ReactNs.createElement(RN.View, null, children) : null)
+  return { __esModule: true, default: MockModal }
+})
+
 import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
 
 loadLocale("en")
@@ -81,8 +94,8 @@ describe("UsdConvertToBtcModal", () => {
   it("renders the title and body", () => {
     const { getByText } = renderModal()
 
-    expect(getByText("Dollar Balance is no longer available in your region")).toBeTruthy()
-    expect(getByText("Transfer your Dollar balance to Bitcoin")).toBeTruthy()
+    expect(getByText("Dollar Balance is not available in your region")).toBeTruthy()
+    expect(getByText("Transfer from Dollar Balance to Bitcoin Balance")).toBeTruthy()
   })
 
   it("renders the You have and You get labels", () => {
@@ -110,10 +123,10 @@ describe("UsdConvertToBtcModal", () => {
     expect(getByText("~ BTC:129184")).toBeTruthy()
   })
 
-  it("triggers the conversion when Approve is pressed", () => {
+  it("triggers the conversion when Transfer is pressed", () => {
     const { getByText } = renderModal()
 
-    fireEvent.press(getByText("Approve"))
+    fireEvent.press(getByText("Transfer"))
 
     expect(mockExecute).toHaveBeenCalledTimes(1)
   })
@@ -133,7 +146,7 @@ describe("UsdConvertToBtcModal", () => {
   it("renders nothing when isVisible is false", () => {
     const { queryByText } = renderModal({ isVisible: false })
 
-    expect(queryByText("Dollar Balance is no longer available in your region")).toBeNull()
+    expect(queryByText("Dollar Balance is not available in your region")).toBeNull()
   })
 
   it("shows the warning icon", () => {

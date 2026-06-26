@@ -82,8 +82,8 @@ const en: BaseTranslation = {
     infoBitcoin: "Bitcoin amount is only approximate. It can vary by a small amount.",
     infoDollar: "Dollar amount is only approximate. It can vary by a small amount.",
     transferButtonText: "Transfer {fromWallet} to {toWallet}",
-    feeLabel: "Conversion fee",
-    feeError: "Couldn't fetch the conversion fee",
+    feeLabel: "Transfer fee",
+    feeError: "Couldn't fetch the transfer fee",
   },
   ConversionSuccessScreen: {
     message: "Transfer successful",
@@ -2585,26 +2585,25 @@ const en: BaseTranslation = {
   },
   StablesatsModal: {
     header: "Your Dollar Balance is powered by Stablesats",
-    body: "Your Dollar Balance uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.",
+    body: "In Custodial Mode, your Dollar Balance uses Stablesats technology — you hold Bitcoin, not actual USD, but the value is designed to maintain the same amount in USD terms. You can send and receive Bitcoin as usual.",
     termsAndConditions: "Read the Terms & Conditions.",
-    learnMore: "Learn more about Stablesats",
-    headerSelfCustodial: "Your Dollar Balance holds stablecoins",
+    learnMore: "Learn more about Dollar Balance",
+    headerSelfCustodial: "About your Dollar Balance",
     bodySelfCustodial:
-      "In your Dollar Balance you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from your Dollar Balance, you will swap your stablecoins and send as Bitcoin to the recipient.",
+      "In Non-Custodial Mode, your Dollar Balance uses supported stablecoins, designed to maintain the same value in USD terms.",
     learnMoreSelfCustodial: "Learn more",
   },
   StablesatsRestriction: {
-    modalTitle: "Stablesats is not available in your region",
-    modalBody: "To get access to a Dollar Balance, create a non-custodial account.",
-    createNew: "Create new",
     walletLabel: "not available in your region",
   },
+  DollarBalanceRestriction: {
+    modalTitle: "Dollar Balance is not available in your region",
+  },
   ConvertDollarToBitcoinModal: {
-    title: "Dollar Balance is no longer available in your region",
-    body: "Transfer your Dollar balance to Bitcoin",
+    title: "Dollar Balance is not available in your region",
+    body: "Transfer from Dollar Balance to Bitcoin Balance",
     youHave: "You have",
     youGet: "You get",
-    approve: "Approve",
   },
   SplashScreen: {
     update:
@@ -2820,6 +2819,8 @@ const en: BaseTranslation = {
     success: "Email {email: string} confirmed successfully",
   },
   common: {
+    country: "Country",
+    unknown: "Unknown",
     enabled: "Enabled",
     switch: "Switch",
     notifications: "Notifications",
@@ -3741,6 +3742,10 @@ const en: BaseTranslation = {
       "Restore flow will be available in a future update.",
     createFailed: "Failed to create wallet. Please try again.",
   },
+  UnsupportedRegionScreen: {
+    title: "Unsupported region",
+    description: "Unfortunately we can not serve users from your current region.",
+  },
   RestoreScreen: {
     title: "Restore wallet",
     description: "Recover your wallet from a backup",
@@ -3850,8 +3855,8 @@ const en: BaseTranslation = {
       deactivateConfirm: "Deactivate",
       cancel: "Cancel",
     },
-    minimumConversion: "Minimum conversion: {amount:string}",
-    conversionUnavailable: "Conversion is temporarily unavailable. Please try again.",
+    minimumConversion: "Minimum transfer: {amount:string}",
+    conversionUnavailable: "Transfers are temporarily unavailable. Please try again.",
   },
   WalletCreationScreen: {
     creating: "Creating your wallet...",

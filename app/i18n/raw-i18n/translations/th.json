@@ -72,8 +72,8 @@
     "infoBitcoin": "จำนวน Bitcoin เป็นเพียงค่าประมาณ อาจเปลี่ยนแปลงเล็กน้อยได้",
     "infoDollar": "จำนวนดอลลาร์เป็นเพียงค่าประมาณ อาจเปลี่ยนแปลงเล็กน้อยได้",
     "transferButtonText": "โอนจาก {fromWallet} ไป {toWallet}",
-    "feeLabel": "ค่าธรรมเนียมการแปลง",
-    "feeError": "ไม่สามารถดึงค่าธรรมเนียมการแปลงได้"
+    "feeLabel": "ค่าธรรมเนียมการโอน",
+    "feeError": "ไม่สามารถดึงค่าธรรมเนียมการโอนได้"
   },
   "ConversionSuccessScreen": {
     "message": "การแลกเปลี่ยนสำเร็จแล้ว"
@@ -2457,17 +2457,16 @@
     "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว"
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats ไม่พร้อมใช้งานในภูมิภาคของคุณ",
-    "modalBody": "หากต้องการเข้าถึงบัญชีดอลลาร์ ให้สร้างบัญชีแบบ non-custodial",
-    "createNew": "สร้างใหม่",
     "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "บัญชีดอลลาร์ไม่สามารถใช้งานได้ในภูมิภาคของคุณอีกต่อไป",
-    "body": "โอนยอดเงินดอลลาร์ของคุณเป็น Bitcoin",
+    "title": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ",
+    "body": "โอนจากยอดดอลลาร์ไปยังยอดบิตคอยน์",
     "youHave": "คุณมี",
-    "youGet": "คุณจะได้รับ",
-    "approve": "อนุมัติ"
+    "youGet": "คุณจะได้รับ"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -2508,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "บัญชีเงินดอลล่าร์ ของคุณขับเคลื่อนโดย Stablesats",
-    "body": "บัญชีเงินดอลล่าร์ ใช้เทคโนโลยี Stablesats เพื่อรักษา Bitcoin ให้มีเสถียรภาพตามราคา USD คุณถือ Bitcoin ตลอดเวลา — ไม่ใช่ดอลลาร์จริง — แต่มูลค่า USD ไม่ผันผวน คุณสามารถส่งและรับ Bitcoin ได้ตามปกติ แต่ไม่รองรับระบบธนาคารแบบดั้งเดิม",
+    "body": "ในโหมดเก็บรักษาทรัพย์สิน บัญชีดอลลาร์ของคุณใช้เทคโนโลยี Stablesats — คุณถือ Bitcoin ไม่ใช่ USD จริง แต่มูลค่าถูกออกแบบมาเพื่อรักษาจำนวนเดิมในรูป USD คุณสามารถส่งและรับ Bitcoin ได้ตามปกติ",
     "termsAndConditions": "อ่านข้อกำหนดและเงื่อนไข",
-    "learnMore": "เรียนรู้เพิ่มเติมเกี่ยวกับ Stablesats",
-    "headerSelfCustodial": "บัญชีดอลลาร์ของคุณถือ stablecoins",
-    "bodySelfCustodial": "ในบัญชีดอลลาร์คุณถือ stablecoins โทเคนที่หนุนด้วยสินทรัพย์ซึ่งมีมูลค่าคงที่เทียบกับดอลลาร์สหรัฐ คุณยังไม่สามารถส่งและรับ stablecoins ได้ เมื่อคุณส่งจากบัญชีดอลลาร์ stablecoins ของคุณจะถูกสลับและส่งเป็น Bitcoin ไปยังผู้รับ",
+    "learnMore": "เรียนรู้เพิ่มเติมเกี่ยวกับบัญชีดอลลาร์",
+    "headerSelfCustodial": "เกี่ยวกับบัญชีดอลลาร์ของคุณ",
+    "bodySelfCustodial": "ในโหมดไม่เก็บรักษาทรัพย์สิน บัญชีดอลลาร์ของคุณใช้ stablecoins ที่รองรับ ซึ่งออกแบบมาเพื่อรักษามูลค่าให้คงที่ในรูป USD",
     "learnMoreSelfCustodial": "เรียนรู้เพิ่มเติม"
   },
   "SplashScreen": {
@@ -2700,6 +2699,8 @@
     "success": "Email {email: string} confirmed successfully"
   },
   "common": {
+    "country": "ประเทศ",
+    "unknown": "ไม่ทราบ",
     "enabled": "เปิดใช้งาน",
     "switch": "สวิตช์",
     "notifications": "การแจ้งเตือน",
@@ -3570,6 +3571,10 @@
     "createFailed": "สร้างกระเป๋าเงินไม่สำเร็จ กรุณาลองอีกครั้ง",
     "selfCustodialDisabled": "ไม่ใช่การคุ้มครองไม่พร้อมใช้งานชั่วคราว"
   },
+  "UnsupportedRegionScreen": {
+    "title": "ภูมิภาคที่ไม่รองรับ",
+    "description": "ขออภัย เราไม่สามารถให้บริการผู้ใช้จากภูมิภาคปัจจุบันของคุณได้"
+  },
   "RestoreScreen": {
     "title": "กู้คืนกระเป๋าเงิน",
     "description": "กู้คืนกระเป๋าเงินจากข้อมูลสำรอง",
@@ -3622,8 +3627,8 @@
       "deactivateConfirm": "ปิดใช้",
       "cancel": "ยกเลิก"
     },
-    "minimumConversion": "จำนวนขั้นต่ำที่แปลงได้: {amount:string}",
-    "conversionUnavailable": "ขณะนี้ไม่สามารถแปลงได้ โปรดลองอีกครั้ง"
+    "minimumConversion": "จำนวนขั้นต่ำที่โอนได้: {amount:string}",
+    "conversionUnavailable": "ขณะนี้ไม่สามารถโอนได้ โปรดลองอีกครั้ง"
   },
   "BackendFeatureGate": {
     "title": "ฟีเจอร์ไม่พร้อมใช้งาน",

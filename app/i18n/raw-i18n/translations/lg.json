@@ -72,8 +72,8 @@
     "infoBitcoin": "Omuwendo gwa Bitcoin gwa mugerageranyo gwokka. Guyinza okukyuka katono.",
     "infoDollar": "Omuwendo gwa Doola gwa mugerageranyo gwokka. Guyinza okukyuka katono.",
     "transferButtonText": "Weereza {fromWallet} eri {toWallet}",
-    "feeLabel": "Ssente z'okukyusa",
-    "feeError": "Tekisoboka kuggya ssente z'okukyusa"
+    "feeLabel": "Ssente z'okuweereza",
+    "feeError": "Tekisoboka kuggya ssente z'okuweereza"
   },
   "ConversionSuccessScreen": {
     "message": "Okukyusa kutuuse kubuwanguzi"
@@ -2457,17 +2457,16 @@
     "removedAccount": "Oggyewo akawunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats teriiwo mu kitundu kyo",
-    "modalBody": "Okusobola okufuna akawunti ya doola, kola akawunti etali ya kuterekebwa.",
-    "createNew": "Kola eppya",
     "walletLabel": "teriiwo mu kitundu kyo"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Akawunti ya Doola tekikyaliwo mu kitundu kyo",
-    "body": "Tambuza ssente zo eza Doola zibe Bitcoin",
+    "title": "Bbalansi ya doola teriiwo mu kitundu kyo",
+    "body": "Tambuza okuva ku bbalansi ya doola okudda ku bbalansi ya Bitcoin",
     "youHave": "Olina",
-    "youGet": "Ofuna",
-    "approve": "Kkiriza"
+    "youGet": "Ofuna"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Okukakasa emirundi ebiri",
@@ -2508,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Akawunti ya Dola yo etambulizibwa Stablesats",
-    "body": "Akawunti ya Dola ekozesa tekinologiya ya Stablesats okukuuma Bitcoin ennywevu ku bbeeyi ya USD. Bulijjo okutta Bitcoin — si ddoola ennyangu — naye omuwendo gwa USD teguyunjuluka. Osobola okusindika n'okufuna Bitcoin nga bulijjo, naye tekitukayanganye na sisitemu y'amabanka eya bulijjo.",
+    "body": "Mu Engeri eya Kuwanga, Akawunti yo eya Dollar ekozesa tekinologiya ya Stablesats — okwata Bitcoin, si USD ennyangu, naye omuwendo gwakolebwa okukuuma omuwendo gwe gumu mu USD. Osobola okusindika n'okufuna Bitcoin nga bulijjo.",
     "termsAndConditions": "Soma amateeka n'ebiragiro",
-    "learnMore": "Yiga ebisingawo ku Stablesats",
-    "headerSelfCustodial": "Akawunti yo eya Dollar elina stablecoins",
-    "bodySelfCustodial": "Mu akawunti ya Dollar olina stablecoins. Tokens eziwagirwa ebintu nga omuwendo gwazo gugume nga gwekuusa ku USD. Tosobola kusindika oba kufuna stablecoins (nga kati). Bw'osindika okuva mu akawunti ya Dollar, stablecoins zo zinaakyusibwa ne zisindikibwa nga Bitcoin eri omufunisi.",
+    "learnMore": "Yiga ebisingawo ku Akawunti ya Dollar",
+    "headerSelfCustodial": "Ku Akawunti yo eya Dollar",
+    "bodySelfCustodial": "Mu Engeri etali ya Kuwanga, Akawunti yo eya Dollar ekozesa stablecoins ezisemberezebwa, ezakolebwa okukuuma omuwendo gwe gumu mu USD.",
     "learnMoreSelfCustodial": "Manya ebisingawo"
   },
   "SplashScreen": {
@@ -2700,6 +2699,8 @@
     "success": "Email {email: string} ekakasiddwa bulungi"
   },
   "common": {
+    "country": "Eggwanga",
+    "unknown": "Tekimanyiddwa",
     "enabled": "Esobozeseddwa",
     "switch": "Swichi",
     "notifications": "Okumanyisibwa",
@@ -3570,6 +3571,10 @@
     "createFailed": "Tekisobose okukola wallet. Tugezeeyo nate.",
     "selfCustodialDisabled": "Tekikola kati ku non-custodial."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Ekitundu ekitawagirwa",
+    "description": "Eky'embi, tetusobola kuweereza bakozesa abava mu kitundu kyo eky'okaakano."
+  },
   "RestoreScreen": {
     "title": "Zzaawo wallet",
     "description": "Zzaawo wallet yo okuva mu koppi",
@@ -3622,8 +3627,8 @@
       "deactivateConfirm": "Kusalako",
       "cancel": "Sazaamu"
     },
-    "minimumConversion": "Ekitono ekisinga okukyusa: {amount:string}",
-    "conversionUnavailable": "Okukyusa tekikolaako kati. Gezaako nate."
+    "minimumConversion": "Ekitono ekisinga okuweereza: {amount:string}",
+    "conversionUnavailable": "Okuweereza tekikolaako kati. Gezaako nate."
   },
   "BackendFeatureGate": {
     "title": "Ekikola tekiriwo",

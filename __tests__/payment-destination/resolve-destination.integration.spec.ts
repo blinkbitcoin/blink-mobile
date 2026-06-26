@@ -89,6 +89,28 @@ describe("resolveDestination (integration: real parser)", () => {
     expect(mockWrapDestination).toHaveBeenCalled()
   })
 
+  it("routes a custodial send to a non-custodial Blink username through LNURL via the flag fallback", async () => {
+    // No custodial wallet for the handle: the recipient is self-custodial, not custodial.
+    const accountDefaultWalletQuery = jest.fn().mockResolvedValue({
+      data: { accountDefaultWallet: null },
+    })
+
+    const result = await resolveDestination(
+      {
+        rawInput: "esaudeveloper@blink.sv",
+        myWalletIds: ["my-wallet-id"],
+        bitcoinNetwork: Network.Mainnet,
+        lnurlDomains: [lnAddressHostname],
+        accountDefaultWalletQuery: accountDefaultWalletQuery as never,
+      },
+      { sdk: null, network: mockSparkNetwork.Regtest },
+      lnAddressHostname,
+    )
+
+    expect(result.valid).toBe(true)
+    expect(result.valid && result.validDestination.paymentType).toBe(PaymentType.Lnurl)
+  })
+
   it("resolves a matching-network Spark address to a valid Spark destination", async () => {
     mockParseSparkAddress.mockResolvedValue({
       address: "sparkrt1qabcdefghijklmn",

@@ -15,6 +15,7 @@ import {
   type WalletBalance,
 } from "@app/graphql/wallets-utils"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { getSelfCustodialDefaultCurrency } from "@app/store/persistent-state/self-custodial-default-currency"
 import { type WalletState } from "@app/types/wallet"
@@ -36,11 +37,25 @@ type SendWallets = {
   isSelfCustodial: boolean
 }
 
+const restrictToBitcoinWhenBlocked = (
+  result: SendWallets,
+  blocked: boolean,
+): SendWallets =>
+  blocked && result.btcWallet
+    ? {
+        ...result,
+        wallets: [result.btcWallet],
+        defaultWallet: result.btcWallet,
+        usdWallet: undefined,
+      }
+    : result
+
 export const useSendWallets = (): SendWallets => {
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
   const { isSelfCustodial } = activeWallet
   const { persistentState } = usePersistentStateContext()
+  const isDollarBalanceRestricted = useDollarBalanceRestricted()
 
   const { data, loading: custodialLoading } = useSendBitcoinDetailsScreenQuery({
     fetchPolicy: "cache-first",
@@ -64,7 +79,7 @@ export const useSendWallets = (): SendWallets => {
     )
     const preferred = getSelfCustodialDefaultCurrency(persistentState)
     const defaultWallet = preferred === WalletCurrency.Usd ? usd ?? btc : btc
-    return {
+    const result: SendWallets = {
       wallets: selfCustodialWallets,
       defaultWallet,
       btcWallet: btc,
@@ -73,10 +88,11 @@ export const useSendWallets = (): SendWallets => {
       loading: !activeWallet.isReady,
       isSelfCustodial: true,
     }
+    return restrictToBitcoinWhenBlocked(result, isDollarBalanceRestricted)
   }
 
   const custodialWallets = data?.me?.defaultAccount?.wallets
-  return {
+  const result: SendWallets = {
     wallets: custodialWallets,
     defaultWallet: getDefaultWallet(
       custodialWallets,
@@ -88,6 +104,7 @@ export const useSendWallets = (): SendWallets => {
     loading: custodialLoading,
     isSelfCustodial: false,
   }
+  return restrictToBitcoinWhenBlocked(result, isDollarBalanceRestricted)
 }
 
 export const useSendBalances = (): {

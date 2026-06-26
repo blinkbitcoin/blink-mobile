@@ -72,8 +72,8 @@
     "infoBitcoin": "Jumlah Bitcoin hanyalah anggaran. Ia mungkin berbeza sedikit.",
     "infoDollar": "Jumlah Dolar hanyalah anggaran. Ia mungkin berbeza sedikit.",
     "transferButtonText": "Pindahkan {fromWallet} ke {toWallet}",
-    "feeLabel": "Yuran pertukaran",
-    "feeError": "Tidak dapat mendapatkan yuran pertukaran"
+    "feeLabel": "Yuran pemindahan",
+    "feeError": "Tidak dapat mendapatkan yuran pemindahan"
   },
   "ConversionSuccessScreen": {
     "message": "Penukaran telah berjaya"
@@ -2457,17 +2457,16 @@
     "removedAccount": "Anda telah mengalih keluar akaun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats tidak tersedia di rantau anda",
-    "modalBody": "Untuk mengakses akaun dolar, cipta akaun bukan kustodian.",
-    "createNew": "Cipta baharu",
     "walletLabel": "tidak tersedia di rantau anda"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Baki dolar tidak tersedia di rantau anda"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Akaun Dolar tidak lagi tersedia di rantau anda",
-    "body": "Pindahkan baki Dolar anda kepada Bitcoin",
+    "title": "Baki dolar tidak tersedia di rantau anda",
+    "body": "Pindahkan daripada Baki Dolar ke Baki Bitcoin",
     "youHave": "Anda ada",
-    "youGet": "Anda dapat",
-    "approve": "Luluskan"
+    "youGet": "Anda dapat"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Pengesahan dua kali",
@@ -2508,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Akaun Dolar anda dikuasakan oleh Stablesats",
-    "body": "Akaun Dolar menggunakan teknologi Stablesats untuk mengekalkan Bitcoin stabil pada harga USD. Anda sentiasa memegang Bitcoin — bukan dolar sebenar — tetapi nilai USD tidak turun naik. Anda boleh menghantar dan menerima Bitcoin seperti biasa, tetapi ia tidak serasi dengan sistem perbankan tradisional.",
+    "body": "Dalam Mod Kustodian, Akaun Dolar anda menggunakan teknologi Stablesats — anda memegang Bitcoin, bukan USD sebenar, tetapi nilainya direka untuk mengekalkan jumlah yang sama dalam sebutan USD. Anda boleh menghantar dan menerima Bitcoin seperti biasa.",
     "termsAndConditions": "Baca terma & syarat",
-    "learnMore": "Ketahui lebih lanjut tentang stablesats",
-    "headerSelfCustodial": "Akaun Dolar anda menyimpan stablecoin",
-    "bodySelfCustodial": "Dalam akaun Dolar anda menyimpan stablecoin. Token yang disokong oleh aset dengan nilai dikekalkan stabil terhadap USD. Anda belum boleh menghantar dan menerima stablecoin. Apabila anda menghantar dari akaun Dolar, stablecoin anda akan ditukar dan dihantar sebagai Bitcoin kepada penerima.",
+    "learnMore": "Ketahui lebih lanjut tentang Akaun Dolar",
+    "headerSelfCustodial": "Tentang Akaun Dolar anda",
+    "bodySelfCustodial": "Dalam Mod Bukan Kustodian, Akaun Dolar anda menggunakan stablecoin yang disokong, direka untuk mengekalkan nilai yang sama dalam sebutan USD.",
     "learnMoreSelfCustodial": "Ketahui lebih lanjut"
   },
   "SplashScreen": {
@@ -2700,6 +2699,8 @@
     "success": "Emel {email: string} telah berjaya disahkan"
   },
   "common": {
+    "country": "Negara",
+    "unknown": "Tidak diketahui",
     "enabled": "Diaktifkan",
     "switch": "Suis",
     "notifications": "Notifikasi",
@@ -3570,6 +3571,10 @@
     "createFailed": "Gagal mencipta dompet. Sila cuba lagi.",
     "selfCustodialDisabled": "Bukan kustodial tidak tersedia buat sementara waktu."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Wilayah tidak disokong",
+    "description": "Malangnya kami tidak dapat melayani pengguna dari wilayah semasa anda."
+  },
   "RestoreScreen": {
     "title": "Pulihkan dompet",
     "description": "Pulihkan dompet anda daripada sandaran",
@@ -3622,8 +3627,8 @@
       "deactivateConfirm": "Nyahaktifkan",
       "cancel": "Batal"
     },
-    "minimumConversion": "Penukaran minimum: {amount:string}",
-    "conversionUnavailable": "Penukaran tidak tersedia buat sementara waktu. Sila cuba lagi."
+    "minimumConversion": "Pemindahan minimum: {amount:string}",
+    "conversionUnavailable": "Pemindahan tidak tersedia buat sementara waktu. Sila cuba lagi."
   },
   "BackendFeatureGate": {
     "title": "Ciri tidak tersedia",

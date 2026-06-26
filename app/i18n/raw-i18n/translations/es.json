@@ -72,8 +72,8 @@
         "infoBitcoin": "La cantidad de Bitcoin es solo aproximada. Puede variar en una pequeña cantidad.",
         "infoDollar": "La cantidad de Dólares es solo aproximada. Puede variar en una pequeña cantidad.",
         "transferButtonText": "Transferir {fromWallet} a {toWallet}",
-        "feeLabel": "Comisión de conversión",
-        "feeError": "No se pudo obtener la comisión de conversión"
+        "feeLabel": "Comisión de transferencia",
+        "feeError": "No se pudo obtener la comisión de transferencia"
     },
     "ConversionSuccessScreen": {
         "message": "Transferencia exitosa"
@@ -2457,17 +2457,16 @@
         "removedAccount": "Eliminaste la cuenta {identifier: string}."
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats no está disponible en tu región",
-        "modalBody": "Para acceder a un Saldo Dólar, crea una cuenta no custodial.",
-        "createNew": "Crear nueva",
         "walletLabel": "no está disponible en tu región"
     },
+    "DollarBalanceRestriction": {
+        "modalTitle": "El saldo en dólares no está disponible en tu región"
+    },
     "ConvertDollarToBitcoinModal": {
-        "title": "El Saldo Dólar ya no está disponible en tu región",
-        "body": "Transfiere tu saldo Dólar a Bitcoin",
+        "title": "El saldo en dólares no está disponible en tu región",
+        "body": "Transfiere del saldo en dólares al saldo en Bitcoin",
         "youHave": "Tienes",
-        "youGet": "Recibes",
-        "approve": "Aprobar"
+        "youGet": "Recibes"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticación de dos factores",
@@ -2508,11 +2507,11 @@
     },
     "StablesatsModal": {
         "header": "Tu Saldo Dólar está impulsado por Stablesats",
-        "body": "El Saldo Dólar utiliza la tecnología Stablesats para mantener Bitcoin estable al precio USD. Siempre tienes Bitcoin — no dólares reales — pero el valor USD no fluctúa. Puedes enviar y recibir Bitcoin como siempre, pero no es compatible con el sistema bancario tradicional.",
+        "body": "En Modo Custodial, tu Saldo Dólar utiliza la tecnología Stablesats — tienes Bitcoin, no USD reales, pero el valor está diseñado para mantener el mismo monto en términos de USD. Puedes enviar y recibir Bitcoin como siempre.",
         "termsAndConditions": "Lee los términos y condiciones",
-        "learnMore": "Aprende más sobre StableSats",
-        "headerSelfCustodial": "Tu Saldo Dólar tiene stablecoins",
-        "bodySelfCustodial": "En tu Saldo Dólar tienes stablecoins. Tokens respaldados por activos cuyo valor se mantiene estable respecto al USD. Aún no puedes enviar ni recibir stablecoins. Cuando envíes desde tu Saldo Dólar, intercambiarás tus stablecoins y se enviarán como Bitcoin al destinatario.",
+        "learnMore": "Aprende más sobre el Saldo Dólar",
+        "headerSelfCustodial": "Acerca de tu Saldo Dólar",
+        "bodySelfCustodial": "En Modo No Custodial, tu Saldo Dólar utiliza stablecoins compatibles, diseñadas para mantener el mismo valor en términos de USD.",
         "learnMoreSelfCustodial": "Saber más"
     },
     "SplashScreen": {
@@ -2700,6 +2699,8 @@
         "success": "El correo electrónico {email: string} ha sido confirmado con éxito"
     },
     "common": {
+        "country": "País",
+        "unknown": "Desconocido",
         "enabled": "Activado",
         "switch": "Interruptor",
         "notifications": "Notificaciones",
@@ -3570,6 +3571,10 @@
         "createFailed": "Error al crear la billetera. Por favor intenta de nuevo.",
         "selfCustodialDisabled": "La modalidad no custodial no está disponible temporalmente."
     },
+    "UnsupportedRegionScreen": {
+        "title": "Región no compatible",
+        "description": "Lamentablemente no podemos atender a usuarios de tu región actual."
+    },
     "RestoreScreen": {
         "title": "Restaurar billetera",
         "description": "Recupera tu billetera desde un respaldo",
@@ -3622,8 +3627,8 @@
             "deactivateConfirm": "Desactivar",
             "cancel": "Cancelar"
         },
-        "minimumConversion": "Conversión mínima: {amount:string}",
-        "conversionUnavailable": "La conversión no está disponible temporalmente. Inténtalo de nuevo."
+        "minimumConversion": "Transferencia mínima: {amount:string}",
+        "conversionUnavailable": "Las transferencias no están disponibles temporalmente. Inténtalo de nuevo."
     },
     "BackendFeatureGate": {
         "title": "Función no disponible",

@@ -72,8 +72,8 @@
     "infoBitcoin": "Số lượng Bitcoin chỉ là gần đúng. Nó có thể thay đổi một lượng nhỏ.",
     "infoDollar": "Số tiền Đô la chỉ là gần đúng. Nó có thể thay đổi một lượng nhỏ.",
     "transferButtonText": "Chuyển {fromWallet} sang {toWallet}",
-    "feeLabel": "Phí chuyển đổi",
-    "feeError": "Không thể lấy phí chuyển đổi"
+    "feeLabel": "Phí chuyển khoản",
+    "feeError": "Không thể lấy phí chuyển khoản"
   },
   "ConversionSuccessScreen": {
     "message": "Chuyễn đổi đã thành công"
@@ -2457,17 +2457,16 @@
     "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats không khả dụng tại khu vực của bạn",
-    "modalBody": "Để truy cập Số dư Đô la, hãy tạo tài khoản không lưu ký.",
-    "createNew": "Tạo mới",
     "walletLabel": "không khả dụng tại khu vực của bạn"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Số dư đô la không khả dụng tại khu vực của bạn"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Số dư Đô la không còn khả dụng ở khu vực của bạn",
-    "body": "Chuyển số dư Đô la của bạn sang Bitcoin",
+    "title": "Số dư đô la không khả dụng tại khu vực của bạn",
+    "body": "Chuyển từ Số dư Đô la sang Số dư Bitcoin",
     "youHave": "Bạn có",
-    "youGet": "Bạn nhận được",
-    "approve": "Phê duyệt"
+    "youGet": "Bạn nhận được"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -2508,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Số dư Đô la của bạn được hỗ trợ bởi Stablesats",
-    "body": "Số dư Đô la sử dụng công nghệ Stablesats để giữ Bitcoin ổn định theo giá USD. Bạn luôn nắm giữ Bitcoin — không phải đô la thật — nhưng giá trị USD không biến động. Bạn có thể gửi và nhận Bitcoin như bình thường, nhưng không tương thích với hệ thống ngân hàng truyền thống.",
+    "body": "Ở Chế độ Lưu ký, Số dư Đô la của bạn sử dụng công nghệ Stablesats — bạn nắm giữ Bitcoin, không phải USD thật, nhưng giá trị được thiết kế để duy trì cùng số tiền theo USD. Bạn có thể gửi và nhận Bitcoin như bình thường.",
     "termsAndConditions": "Đọc các Điều khoản & Điều kiện",
-    "learnMore": "Tìm hiểu thêm về Stablesats",
-    "headerSelfCustodial": "Số dư Đô la của bạn giữ stablecoin",
-    "bodySelfCustodial": "Trong Số dư Đô la, bạn nắm giữ stablecoin. Token được bảo đảm bởi tài sản với giá trị giữ ổn định so với USD. Bạn chưa thể gửi và nhận stablecoin. Khi bạn gửi từ Số dư Đô la, stablecoin của bạn sẽ được hoán đổi và gửi dưới dạng Bitcoin cho người nhận.",
+    "learnMore": "Tìm hiểu thêm về Số dư Đô la",
+    "headerSelfCustodial": "Về Số dư Đô la của bạn",
+    "bodySelfCustodial": "Ở Chế độ Không lưu ký, Số dư Đô la của bạn sử dụng các stablecoin được hỗ trợ, được thiết kế để duy trì cùng giá trị theo USD.",
     "learnMoreSelfCustodial": "Tìm hiểu thêm"
   },
   "SplashScreen": {
@@ -2700,6 +2699,8 @@
     "success": "Email {email: string} confirmed successfully"
   },
   "common": {
+    "country": "Quốc gia",
+    "unknown": "Không xác định",
     "enabled": "Đã bật",
     "switch": "Công tắc",
     "notifications": "Thông báo",
@@ -3570,6 +3571,10 @@
     "createFailed": "Không thể tạo ví. Vui lòng thử lại.",
     "selfCustodialDisabled": "Phi giám sát hiện không khả dụng."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Khu vực không được hỗ trợ",
+    "description": "Rất tiếc, chúng tôi không thể phục vụ người dùng từ khu vực hiện tại của bạn."
+  },
   "RestoreScreen": {
     "title": "Khôi phục ví",
     "description": "Khôi phục ví của bạn từ bản sao lưu",
@@ -3622,8 +3627,8 @@
       "deactivateConfirm": "Tắt",
       "cancel": "Hủy"
     },
-    "minimumConversion": "Chuyển đổi tối thiểu: {amount:string}",
-    "conversionUnavailable": "Chuyển đổi tạm thời không khả dụng. Vui lòng thử lại."
+    "minimumConversion": "Chuyển khoản tối thiểu: {amount:string}",
+    "conversionUnavailable": "Chuyển khoản tạm thời không khả dụng. Vui lòng thử lại."
   },
   "BackendFeatureGate": {
     "title": "Tính năng không khả dụng",
