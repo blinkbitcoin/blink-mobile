@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Je Dollarsaldo wordt aangedreven door Stablesats",
-    "body": "In Bewaarmodus gebruikt je Dollarsaldo Stablesats-technologie — je houdt Bitcoin, geen echte dollars, maar de waarde is ontworpen om hetzelfde bedrag in USD te behouden. Je kunt Bitcoin versturen en ontvangen zoals gewoonlijk.",
+    "body": "In Bewaarmodus gebruikt je Dollarsaldo Stablesats-technologie — je houdt Bitcoin, geen echte USD, maar de waarde is ontworpen om hetzelfde bedrag in USD te behouden. Je kunt Bitcoin versturen en ontvangen zoals gewoonlijk.",
     "termsAndConditions": "Lees de Algemene voorwaarden",
     "learnMore": "Meer informatie over het Dollarsaldo",
     "headerSelfCustodial": "Over je Dollarsaldo",
-    "bodySelfCustodial": "In Niet-bewaarmodus gebruikt je Dollarsaldo ondersteunde stablecoins, ontworpen om dezelfde waarde in USD te behouden. Het rechtstreeks versturen en ontvangen van stablecoins wordt momenteel niet ondersteund. Wanneer je vanaf je Dollarsaldo stuurt, wordt je saldo omgezet en als Bitcoin naar de ontvanger verzonden.",
+    "bodySelfCustodial": "In Niet-bewaarmodus gebruikt je Dollarsaldo ondersteunde stablecoins, ontworpen om dezelfde waarde in USD te behouden.",
     "learnMoreSelfCustodial": "Meer informatie"
   },
   "SplashScreen": {

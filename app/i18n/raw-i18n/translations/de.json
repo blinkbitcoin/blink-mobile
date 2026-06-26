@@ -2507,11 +2507,11 @@
     },
     "StablesatsModal": {
         "header": "Dein Dollar-Guthaben wird von Stablesats betrieben",
-        "body": "Im Verwahrungsmodus nutzt dein Dollar-Guthaben Stablesats-Technologie — du hältst Bitcoin, keine echten Dollar, aber der Wert ist darauf ausgelegt, denselben Betrag in USD zu behalten. Du kannst Bitcoin wie gewohnt senden und empfangen.",
+        "body": "Im Verwahrungsmodus nutzt dein Dollar-Guthaben Stablesats-Technologie — du hältst Bitcoin, keine echten USD, aber der Wert ist darauf ausgelegt, denselben Betrag in USD zu behalten. Du kannst Bitcoin wie gewohnt senden und empfangen.",
         "termsAndConditions": "Allgemeine Geschäftsbedingungen lesen",
         "learnMore": "Mehr über das Dollar-Guthaben erfahren",
         "headerSelfCustodial": "Über dein Dollar-Guthaben",
-        "bodySelfCustodial": "Im Nicht-Verwahrungsmodus nutzt dein Dollar-Guthaben unterstützte Stablecoins, die darauf ausgelegt sind, denselben Wert in USD zu behalten. Das direkte Senden und Empfangen von Stablecoins wird derzeit nicht unterstützt. Wenn du von deinem Dollar-Guthaben sendest, wird dein Guthaben umgewandelt und als Bitcoin an den Empfänger gesendet.",
+        "bodySelfCustodial": "Im Nicht-Verwahrungsmodus nutzt dein Dollar-Guthaben unterstützte Stablecoins, die darauf ausgelegt sind, denselben Wert in USD zu behalten.",
         "learnMoreSelfCustodial": "Mehr erfahren"
     },
     "SplashScreen": {

@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Akaun Dolar anda dikuasakan oleh Stablesats",
-    "body": "Dalam Mod Kustodian, Akaun Dolar anda menggunakan teknologi Stablesats — anda memegang Bitcoin, bukan dolar sebenar, tetapi nilainya direka untuk mengekalkan jumlah yang sama dalam sebutan USD. Anda boleh menghantar dan menerima Bitcoin seperti biasa.",
+    "body": "Dalam Mod Kustodian, Akaun Dolar anda menggunakan teknologi Stablesats — anda memegang Bitcoin, bukan USD sebenar, tetapi nilainya direka untuk mengekalkan jumlah yang sama dalam sebutan USD. Anda boleh menghantar dan menerima Bitcoin seperti biasa.",
     "termsAndConditions": "Baca terma & syarat",
     "learnMore": "Ketahui lebih lanjut tentang Akaun Dolar",
     "headerSelfCustodial": "Tentang Akaun Dolar anda",
-    "bodySelfCustodial": "Dalam Mod Bukan Kustodian, Akaun Dolar anda menggunakan stablecoin yang disokong, direka untuk mengekalkan nilai yang sama dalam sebutan USD. Menghantar dan menerima stablecoin secara langsung belum disokong buat masa ini. Apabila anda menghantar daripada Akaun Dolar anda, baki anda akan ditukar dan dihantar sebagai Bitcoin kepada penerima.",
+    "bodySelfCustodial": "Dalam Mod Bukan Kustodian, Akaun Dolar anda menggunakan stablecoin yang disokong, direka untuk mengekalkan nilai yang sama dalam sebutan USD.",
     "learnMoreSelfCustodial": "Ketahui lebih lanjut"
   },
   "SplashScreen": {

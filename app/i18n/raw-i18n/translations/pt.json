@@ -2507,11 +2507,11 @@
     },
     "StablesatsModal": {
         "header": "Seu Saldo Dólar é powered by Stablesats",
-        "body": "No Modo Custodial, o seu Saldo Dólar usa a tecnologia Stablesats — você detém Bitcoin, não dólares reais, mas o valor é projetado para manter a mesma quantia em termos de USD. Você pode enviar e receber Bitcoin normalmente.",
+        "body": "No Modo Custodial, o seu Saldo Dólar usa a tecnologia Stablesats — você detém Bitcoin, não USD reais, mas o valor é projetado para manter a mesma quantia em termos de USD. Você pode enviar e receber Bitcoin normalmente.",
         "termsAndConditions": "Leia os Termos e Condições",
         "learnMore": "Saiba mais sobre o Saldo Dólar",
         "headerSelfCustodial": "Sobre o seu Saldo Dólar",
-        "bodySelfCustodial": "No Modo Não Custodial, o seu Saldo Dólar usa stablecoins compatíveis, projetadas para manter o mesmo valor em termos de USD. O envio e o recebimento diretos de stablecoins não são suportados no momento. Quando você envia a partir do seu Saldo Dólar, o seu saldo é convertido e enviado como Bitcoin ao destinatário.",
+        "bodySelfCustodial": "No Modo Não Custodial, o seu Saldo Dólar usa stablecoins compatíveis, projetadas para manter o mesmo valor em termos de USD.",
         "learnMoreSelfCustodial": "Saiba mais"
     },
     "SplashScreen": {

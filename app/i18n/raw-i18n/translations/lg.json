@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Akawunti ya Dola yo etambulizibwa Stablesats",
-    "body": "Mu Engeri eya Kuwanga, Akawunti yo eya Dollar ekozesa tekinologiya ya Stablesats — okwata Bitcoin, si ddoola ennyangu, naye omuwendo gwakolebwa okukuuma omuwendo gwe gumu mu USD. Osobola okusindika n'okufuna Bitcoin nga bulijjo.",
+    "body": "Mu Engeri eya Kuwanga, Akawunti yo eya Dollar ekozesa tekinologiya ya Stablesats — okwata Bitcoin, si USD ennyangu, naye omuwendo gwakolebwa okukuuma omuwendo gwe gumu mu USD. Osobola okusindika n'okufuna Bitcoin nga bulijjo.",
     "termsAndConditions": "Soma amateeka n'ebiragiro",
     "learnMore": "Yiga ebisingawo ku Akawunti ya Dollar",
     "headerSelfCustodial": "Ku Akawunti yo eya Dollar",
-    "bodySelfCustodial": "Mu Engeri etali ya Kuwanga, Akawunti yo eya Dollar ekozesa stablecoins ezisemberezebwa, ezakolebwa okukuuma omuwendo gwe gumu mu USD. Okusindika n'okufuna stablecoins butereevu (nga kati) tekikkirizibwa. Bw'osindika okuva mu Akawunti yo eya Dollar, ssente zo zikyusibwa ne zisindikibwa nga Bitcoin eri omufunisi.",
+    "bodySelfCustodial": "Mu Engeri etali ya Kuwanga, Akawunti yo eya Dollar ekozesa stablecoins ezisemberezebwa, ezakolebwa okukuuma omuwendo gwe gumu mu USD.",
     "learnMoreSelfCustodial": "Manya ebisingawo"
   },
   "SplashScreen": {

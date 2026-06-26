@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Dolar Bakiyeniz Stablesats tarafından desteklenmektedir",
-    "body": "Saklamalı Modda, Dolar Bakiyeniz Stablesats teknolojisini kullanır — gerçek dolar değil Bitcoin tutarsınız, ancak değer USD cinsinden aynı miktarı korumak üzere tasarlanmıştır. Her zamanki gibi Bitcoin gönderip alabilirsiniz.",
+    "body": "Saklamalı Modda, Dolar Bakiyeniz Stablesats teknolojisini kullanır — gerçek USD değil Bitcoin tutarsınız, ancak değer USD cinsinden aynı miktarı korumak üzere tasarlanmıştır. Her zamanki gibi Bitcoin gönderip alabilirsiniz.",
     "termsAndConditions": "Hükümler ve koşulları oku",
     "learnMore": "Dolar Bakiyesi hakkında daha fazla bilgi edinin",
     "headerSelfCustodial": "Dolar Bakiyeniz hakkında",
-    "bodySelfCustodial": "Saklamasız Modda, Dolar Bakiyeniz USD cinsinden aynı değeri korumak üzere tasarlanmış desteklenen stablecoin'leri kullanır. Stablecoin'leri doğrudan gönderme ve alma şu anda desteklenmemektedir. Dolar Bakiyenizden gönderdiğinizde, bakiyeniz dönüştürülür ve alıcıya Bitcoin olarak gönderilir.",
+    "bodySelfCustodial": "Saklamasız Modda, Dolar Bakiyeniz USD cinsinden aynı değeri korumak üzere tasarlanmış desteklenen stablecoin'leri kullanır.",
     "learnMoreSelfCustodial": "Daha fazla bilgi"
   },
   "SplashScreen": {

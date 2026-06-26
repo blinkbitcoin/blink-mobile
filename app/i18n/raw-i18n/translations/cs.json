@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Váš Dolarový zůstatek je poháněný technologií Stablesats",
-    "body": "V kustodiálním režimu váš Dolarový zůstatek využívá technologii Stablesats — držíte Bitcoin, nikoli skutečné dolary, ale hodnota je navržena tak, aby si udržela stejnou částku vůči USD. Bitcoin můžete odesílat a přijímat jako obvykle.",
+    "body": "V kustodiálním režimu váš Dolarový zůstatek využívá technologii Stablesats — držíte Bitcoin, nikoli skutečné USD, ale hodnota je navržena tak, aby si udržela stejnou částku vůči USD. Bitcoin můžete odesílat a přijímat jako obvykle.",
     "termsAndConditions": "Přečtěte si smluvní podmínky",
     "learnMore": "Zjistěte více o Dolarovém zůstatku",
     "headerSelfCustodial": "O vašem Dolarovém zůstatku",
-    "bodySelfCustodial": "V nekustodiálním režimu váš Dolarový zůstatek využívá podporované stablecoiny, které jsou navrženy tak, aby si udržely stejnou hodnotu vůči USD. Přímé odesílání a přijímání stablecoinů zatím není podporováno. Když odešlete z Dolarového zůstatku, váš zůstatek se převede a odešle se příjemci jako Bitcoin.",
+    "bodySelfCustodial": "V nekustodiálním režimu váš Dolarový zůstatek využívá podporované stablecoiny, které jsou navrženy tak, aby si udržely stejnou hodnotu vůči USD.",
     "learnMoreSelfCustodial": "Zjistit více"
   },
   "SplashScreen": {
