@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "I-Akhawunti ye-Idola yakho ixhaswa yi-Stablesats",
-    "body": "KwiMowudi yoKugcina, i-Akhawunti yakho ye-Idola isebenzisa iteknoloji ye-Stablesats — ugcine i-Bitcoin, hayi iidola zenene, kodwa ixabiso liyilelwe ukugcina isixa esifanayo ngokwe-USD. Ungakwazi ukuthumela nokufumana i-Bitcoin njengesiqhelo.",
+    "body": "KwiMowudi yoKugcina, i-Akhawunti yakho ye-Idola isebenzisa iteknoloji ye-Stablesats — ugcine i-Bitcoin, hayi i-USD, kodwa ixabiso liyilelwe ukugcina isixa esifanayo ngokwe-USD. Ungakwazi ukuthumela nokufumana i-Bitcoin njengesiqhelo.",
     "termsAndConditions": "Funda iMigaqo neMiqathango",
     "learnMore": "Funda ngakumbi malunga ne-Akhawunti ye-Idola",
     "headerSelfCustodial": "Malunga ne-Akhawunti yakho ye-Idola",
-    "bodySelfCustodial": "KwiMowudi engeyiyo yoKugcina, i-Akhawunti yakho ye-Idola isebenzisa ii-stablecoin ezixhaswayo, eziyilelwe ukugcina ixabiso elifanayo ngokwe-USD. Ukuthumela nokufumana ii-stablecoin ngokuthe ngqo akukaxhaswa okwangoku. Xa uthumela kusuka kwi-Akhawunti yakho ye-Idola, ibhalansi yakho iyatshintshwa ize ithunyelwe njenge-Bitcoin kumamkeli.",
+    "bodySelfCustodial": "KwiMowudi engeyiyo yoKugcina, i-Akhawunti yakho ye-Idola isebenzisa ii-stablecoin ezixhaswayo, eziyilelwe ukugcina ixabiso elifanayo ngokwe-USD.",
     "learnMoreSelfCustodial": "Funda okungakumbi"
   },
   "SplashScreen": {

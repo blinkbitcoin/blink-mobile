@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Vaš Dolar račun pokreće Stablesats",
-    "body": "U kustodijalnom načinu rada vaš Dolar račun koristi Stablesats tehnologiju — držite Bitcoin, a ne prave dolare, ali vrijednost je osmišljena da zadrži isti iznos u odnosu na USD. Bitcoin možete slati i primati kao i obično.",
+    "body": "U kustodijalnom načinu rada vaš Dolar račun koristi Stablesats tehnologiju — držite Bitcoin, a ne prave USD, ali vrijednost je osmišljena da zadrži isti iznos u odnosu na USD. Bitcoin možete slati i primati kao i obično.",
     "termsAndConditions": "Pročitajte Uvjete i odredbe",
     "learnMore": "Saznajte više o Dolar računu",
     "headerSelfCustodial": "O vašem Dolar računu",
-    "bodySelfCustodial": "U nekustodijalnom načinu rada vaš Dolar račun koristi podržane stablecoine, koji su osmišljeni da zadrže istu vrijednost u odnosu na USD. Izravno slanje i primanje stablecoina trenutačno nije podržano. Kada šaljete s Dolar računa, vaš se saldo prebacuje i šalje primatelju kao Bitcoin.",
+    "bodySelfCustodial": "U nekustodijalnom načinu rada vaš Dolar račun koristi podržane stablecoine, koji su osmišljeni da zadrže istu vrijednost u odnosu na USD.",
     "learnMoreSelfCustodial": "Saznajte više"
   },
   "SplashScreen": {

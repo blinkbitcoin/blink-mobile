@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Số dư Đô la của bạn được hỗ trợ bởi Stablesats",
-    "body": "Ở Chế độ Lưu ký, Số dư Đô la của bạn sử dụng công nghệ Stablesats — bạn nắm giữ Bitcoin, không phải đô la thật, nhưng giá trị được thiết kế để duy trì cùng số tiền theo USD. Bạn có thể gửi và nhận Bitcoin như bình thường.",
+    "body": "Ở Chế độ Lưu ký, Số dư Đô la của bạn sử dụng công nghệ Stablesats — bạn nắm giữ Bitcoin, không phải USD thật, nhưng giá trị được thiết kế để duy trì cùng số tiền theo USD. Bạn có thể gửi và nhận Bitcoin như bình thường.",
     "termsAndConditions": "Đọc các Điều khoản & Điều kiện",
     "learnMore": "Tìm hiểu thêm về Số dư Đô la",
     "headerSelfCustodial": "Về Số dư Đô la của bạn",
-    "bodySelfCustodial": "Ở Chế độ Không lưu ký, Số dư Đô la của bạn sử dụng các stablecoin được hỗ trợ, được thiết kế để duy trì cùng giá trị theo USD. Hiện tại chưa hỗ trợ gửi và nhận trực tiếp stablecoin. Khi bạn gửi từ Số dư Đô la, số dư của bạn được chuyển đổi và gửi dưới dạng Bitcoin cho người nhận.",
+    "bodySelfCustodial": "Ở Chế độ Không lưu ký, Số dư Đô la của bạn sử dụng các stablecoin được hỗ trợ, được thiết kế để duy trì cùng giá trị theo USD.",
     "learnMoreSelfCustodial": "Tìm hiểu thêm"
   },
   "SplashScreen": {

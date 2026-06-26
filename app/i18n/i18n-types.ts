@@ -8116,7 +8116,7 @@ type RootTranslation = {
 		 */
 		header: string
 		/**
-		 * I​n​ ​C​u​s​t​o​d​i​a​l​ ​M​o​d​e​,​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​u​s​e​s​ ​S​t​a​b​l​e​s​a​t​s​ ​t​e​c​h​n​o​l​o​g​y​ ​—​ ​y​o​u​ ​h​o​l​d​ ​B​i​t​c​o​i​n​,​ ​n​o​t​ ​a​c​t​u​a​l​ ​d​o​l​l​a​r​s​,​ ​b​u​t​ ​t​h​e​ ​v​a​l​u​e​ ​i​s​ ​d​e​s​i​g​n​e​d​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​t​h​e​ ​s​a​m​e​ ​a​m​o​u​n​t​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​Y​o​u​ ​c​a​n​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​a​s​ ​u​s​u​a​l​.
+		 * I​n​ ​C​u​s​t​o​d​i​a​l​ ​M​o​d​e​,​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​u​s​e​s​ ​S​t​a​b​l​e​s​a​t​s​ ​t​e​c​h​n​o​l​o​g​y​ ​—​ ​y​o​u​ ​h​o​l​d​ ​B​i​t​c​o​i​n​,​ ​n​o​t​ ​a​c​t​u​a​l​ ​U​S​D​,​ ​b​u​t​ ​t​h​e​ ​v​a​l​u​e​ ​i​s​ ​d​e​s​i​g​n​e​d​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​t​h​e​ ​s​a​m​e​ ​a​m​o​u​n​t​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​Y​o​u​ ​c​a​n​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​a​s​ ​u​s​u​a​l​.
 		 */
 		body: string
 		/**
@@ -8132,7 +8132,7 @@ type RootTranslation = {
 		 */
 		headerSelfCustodial: string
 		/**
-		 * I​n​ ​N​o​n​-​C​u​s​t​o​d​i​a​l​ ​M​o​d​e​,​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​u​s​e​s​ ​s​u​p​p​o​r​t​e​d​ ​s​t​a​b​l​e​c​o​i​n​s​,​ ​d​e​s​i​g​n​e​d​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​t​h​e​ ​s​a​m​e​ ​v​a​l​u​e​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​S​e​n​d​i​n​g​ ​a​n​d​ ​r​e​c​e​i​v​i​n​g​ ​s​t​a​b​l​e​c​o​i​n​s​ ​d​i​r​e​c​t​l​y​ ​i​s​ ​n​o​t​ ​c​u​r​r​e​n​t​l​y​ ​s​u​p​p​o​r​t​e​d​.​ ​W​h​e​n​ ​y​o​u​ ​s​e​n​d​ ​f​r​o​m​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​,​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​t​r​a​n​s​f​e​r​r​e​d​ ​a​n​d​ ​s​e​n​t​ ​a​s​ ​B​i​t​c​o​i​n​ ​t​o​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​.
+		 * I​n​ ​N​o​n​-​C​u​s​t​o​d​i​a​l​ ​M​o​d​e​,​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​u​s​e​s​ ​s​u​p​p​o​r​t​e​d​ ​s​t​a​b​l​e​c​o​i​n​s​,​ ​d​e​s​i​g​n​e​d​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​t​h​e​ ​s​a​m​e​ ​v​a​l​u​e​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.
 		 */
 		bodySelfCustodial: string
 		/**
@@ -20390,7 +20390,7 @@ export type TranslationFunctions = {
 		 */
 		header: () => LocalizedString
 		/**
-		 * In Custodial Mode, your Dollar Balance uses Stablesats technology — you hold Bitcoin, not actual dollars, but the value is designed to maintain the same amount in USD terms. You can send and receive Bitcoin as usual.
+		 * In Custodial Mode, your Dollar Balance uses Stablesats technology — you hold Bitcoin, not actual USD, but the value is designed to maintain the same amount in USD terms. You can send and receive Bitcoin as usual.
 		 */
 		body: () => LocalizedString
 		/**
@@ -20406,7 +20406,7 @@ export type TranslationFunctions = {
 		 */
 		headerSelfCustodial: () => LocalizedString
 		/**
-		 * In Non-Custodial Mode, your Dollar Balance uses supported stablecoins, designed to maintain the same value in USD terms. Sending and receiving stablecoins directly is not currently supported. When you send from your Dollar Balance, your balance is transferred and sent as Bitcoin to the recipient.
+		 * In Non-Custodial Mode, your Dollar Balance uses supported stablecoins, designed to maintain the same value in USD terms.
 		 */
 		bodySelfCustodial: () => LocalizedString
 		/**

@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Akaunti ya Dola yako inaendeshwa na Stablesats",
-    "body": "Katika Hali ya Uangalizi, Akaunti yako ya Dola hutumia teknolojia ya Stablesats — unashikilia Bitcoin, si dola halisi, lakini thamani imeundwa kudumisha kiasi sawa kwa kipimo cha USD. Unaweza kutuma na kupokea Bitcoin kama kawaida.",
+    "body": "Katika Hali ya Uangalizi, Akaunti yako ya Dola hutumia teknolojia ya Stablesats — unashikilia Bitcoin, si USD halisi, lakini thamani imeundwa kudumisha kiasi sawa kwa kipimo cha USD. Unaweza kutuma na kupokea Bitcoin kama kawaida.",
     "termsAndConditions": "Soma Sheria na Masharti",
     "learnMore": "Jifunze zaidi kuhusu Akaunti ya Dola",
     "headerSelfCustodial": "Kuhusu Akaunti yako ya Dola",
-    "bodySelfCustodial": "Katika Hali Isiyo ya Uangalizi, Akaunti yako ya Dola hutumia stablecoins zinazoungwa mkono, zilizoundwa kudumisha thamani sawa kwa kipimo cha USD. Kutuma na kupokea stablecoins moja kwa moja bado hakuungwi mkono kwa sasa. Unapotuma kutoka kwenye Akaunti yako ya Dola, salio lako hubadilishwa na kutumwa kama Bitcoin kwa mpokeaji.",
+    "bodySelfCustodial": "Katika Hali Isiyo ya Uangalizi, Akaunti yako ya Dola hutumia stablecoins zinazoungwa mkono, zilizoundwa kudumisha thamani sawa kwa kipimo cha USD.",
     "learnMoreSelfCustodial": "Jifunze zaidi"
   },
   "SplashScreen": {

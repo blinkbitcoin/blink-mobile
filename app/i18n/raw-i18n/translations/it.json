@@ -2507,11 +2507,11 @@
     },
     "StablesatsModal": {
         "header": "Il tuo Conto Dollaro è alimentato da Stablesats",
-        "body": "In Modalità Custodial, il tuo Conto Dollaro utilizza la tecnologia Stablesats — detieni Bitcoin, non dollari veri, ma il valore è progettato per mantenere lo stesso importo in termini di USD. Puoi inviare e ricevere Bitcoin normalmente.",
+        "body": "In Modalità Custodial, il tuo Conto Dollaro utilizza la tecnologia Stablesats — detieni Bitcoin, non USD veri, ma il valore è progettato per mantenere lo stesso importo in termini di USD. Puoi inviare e ricevere Bitcoin normalmente.",
         "termsAndConditions": "Leggi i Terms & Conditions",
         "learnMore": "Scopri di più sul Conto Dollaro",
         "headerSelfCustodial": "Informazioni sul tuo Conto Dollaro",
-        "bodySelfCustodial": "In Modalità Non Custodial, il tuo Conto Dollaro utilizza stablecoin supportate, progettate per mantenere lo stesso valore in termini di USD. L'invio e la ricezione diretti di stablecoin non sono attualmente supportati. Quando invii dal tuo Conto Dollaro, il tuo saldo viene convertito e inviato come Bitcoin al destinatario.",
+        "bodySelfCustodial": "In Modalità Non Custodial, il tuo Conto Dollaro utilizza stablecoin supportate, progettate per mantenere lo stesso valore in termini di USD.",
         "learnMoreSelfCustodial": "Scopri di più"
     },
     "SplashScreen": {

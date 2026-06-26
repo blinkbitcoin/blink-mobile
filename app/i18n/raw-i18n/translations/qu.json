@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Dolar qillqay-niyki Stablesats-wan llamk'achisqa",
-    "body": "Waqaychaq Modopi, Dólar cuentaykiqa Stablesats yachayta llamk'achin — Bitcoin-ta hap'inki, mana chiqap dólar-tachu, ichaqa chaninqa USDpi kikin chanin takyananpaq kamasqa. Bitcoin-ta apachiyta hinaspa chaskiyta atinki imaynatachus.",
+    "body": "Waqaychaq Modopi, Dólar cuentaykiqa Stablesats yachayta llamk'achin — Bitcoin-ta hap'inki, mana chiqap USD-tachu, ichaqa chaninqa USDpi kikin chanin takyananpaq kamasqa. Bitcoin-ta apachiyta hinaspa chaskiyta atinki imaynatachus.",
     "termsAndConditions": "Qillqata sutichinaqinmi t'ikrayninmi yachanakuyta munayniyta rikuchiy",
     "learnMore": "Dólar cuentamanta astawan yachay",
     "headerSelfCustodial": "Dólar cuentaykimanta",
-    "bodySelfCustodial": "Mana Waqaychaq Modopi, Dólar cuentaykiqa saywanachasqa stablecoinkunata llamk'achin, USDpi kikin chanin takyananpaq kamasqa. Stablecoinkunata cheqanta apachiy hinaspa chaskiyqa manaraqmi atikunchu kunan. Dólar cuentaykimanta apachiqtiykiqa, chaniykita trukaspa Bitcoin hina chaskiqman apachisun.",
+    "bodySelfCustodial": "Mana Waqaychaq Modopi, Dólar cuentaykiqa saywanachasqa stablecoinkunata llamk'achin, USDpi kikin chanin takyananpaq kamasqa.",
     "learnMoreSelfCustodial": "Astawan yachay"
   },
   "SplashScreen": {

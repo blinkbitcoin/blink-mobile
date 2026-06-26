@@ -2495,11 +2495,11 @@
     },
     "StablesatsModal": {
         "header": "Your Dollar Balance is powered by Stablesats",
-        "body": "In Custodial Mode, your Dollar Balance uses Stablesats technology — you hold Bitcoin, not actual dollars, but the value is designed to maintain the same amount in USD terms. You can send and receive Bitcoin as usual.",
+        "body": "In Custodial Mode, your Dollar Balance uses Stablesats technology — you hold Bitcoin, not actual USD, but the value is designed to maintain the same amount in USD terms. You can send and receive Bitcoin as usual.",
         "termsAndConditions": "Read the Terms & Conditions.",
         "learnMore": "Learn more about Dollar Balance",
         "headerSelfCustodial": "About your Dollar Balance",
-        "bodySelfCustodial": "In Non-Custodial Mode, your Dollar Balance uses supported stablecoins, designed to maintain the same value in USD terms. Sending and receiving stablecoins directly is not currently supported. When you send from your Dollar Balance, your balance is transferred and sent as Bitcoin to the recipient.",
+        "bodySelfCustodial": "In Non-Custodial Mode, your Dollar Balance uses supported stablecoins, designed to maintain the same value in USD terms.",
         "learnMoreSelfCustodial": "Learn more"
     },
     "StablesatsRestriction": {

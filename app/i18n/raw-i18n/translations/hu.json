@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "A Dollár Egyenlegedet a Stablesats működteti",
-    "body": "Letétkezelői módban a Dollár Egyenleged Stablesats technológiát használ — Bitcoint tartasz, nem valódi dollárt, de az értéket úgy tervezték, hogy megőrizze ugyanazt az összeget USD-ben kifejezve. Bitcoint küldhetsz és fogadhatsz a szokásos módon.",
+    "body": "Letétkezelői módban a Dollár Egyenleged Stablesats technológiát használ — Bitcoint tartasz, nem valódi USD, de az értéket úgy tervezték, hogy megőrizze ugyanazt az összeget USD-ben kifejezve. Bitcoint küldhetsz és fogadhatsz a szokásos módon.",
     "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket",
     "learnMore": "Tudj meg többet a Dollár Egyenlegről",
     "headerSelfCustodial": "A Dollár Egyenlegedről",
-    "bodySelfCustodial": "Nem-letétkezelői módban a Dollár Egyenleged támogatott stablecoinokat használ, amelyeket úgy terveztek, hogy megőrizzék ugyanazt az értéket USD-ben kifejezve. A stablecoinok közvetlen küldése és fogadása jelenleg nem támogatott. Amikor a Dollár Egyenlegedről küldesz, az egyenleged átváltásra kerül, és Bitcoinként küldjük el a címzettnek.",
+    "bodySelfCustodial": "Nem-letétkezelői módban a Dollár Egyenleged támogatott stablecoinokat használ, amelyeket úgy terveztek, hogy megőrizzék ugyanazt az értéket USD-ben kifejezve.",
     "learnMoreSelfCustodial": "Tudj meg többet"
   },
   "SplashScreen": {

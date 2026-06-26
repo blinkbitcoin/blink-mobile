@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "El teu Compte Dòlar està impulsat per Stablesats",
-    "body": "En Mode Custodial, el teu Compte Dòlar utilitza la tecnologia Stablesats — tens Bitcoin, no dòlars reals, però el valor està dissenyat per mantenir el mateix import en termes d'USD. Pots enviar i rebre Bitcoin com de costum.",
+    "body": "En Mode Custodial, el teu Compte Dòlar utilitza la tecnologia Stablesats — tens Bitcoin, no USD reals, però el valor està dissenyat per mantenir el mateix import en termes d'USD. Pots enviar i rebre Bitcoin com de costum.",
     "termsAndConditions": "Llegeix els Termes i Condicions",
     "learnMore": "Més informació sobre el Compte Dòlar",
     "headerSelfCustodial": "Sobre el teu Compte Dòlar",
-    "bodySelfCustodial": "En Mode No Custodial, el teu Compte Dòlar utilitza stablecoins compatibles, dissenyades per mantenir el mateix valor en termes d'USD. L'enviament i la recepció directes de stablecoins no són compatibles ara mateix. Quan envies des del teu Compte Dòlar, el teu saldo es transfereix i s'envia com a Bitcoin al destinatari.",
+    "bodySelfCustodial": "En Mode No Custodial, el teu Compte Dòlar utilitza stablecoins compatibles, dissenyades per mantenir el mateix valor en termes d'USD.",
     "learnMoreSelfCustodial": "Més informació"
   },
   "SplashScreen": {
