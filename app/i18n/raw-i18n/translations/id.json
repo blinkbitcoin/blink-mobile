@@ -3663,7 +3663,8 @@
         "savedConfirm": "Saya sudah menyimpannya",
         "copy": "Salin",
         "continueButton": "Lanjutkan",
-        "testBackup": "Uji cadanganmu"
+        "testBackup": "Uji cadanganmu",
+        "doNotShareWarning": "Jangan tunjukkan ini kepada siapa pun, termasuk tim dukungan"
       },
       "Confirm": {
         "headerTitle": "Konfirmasi frasa cadangan",
@@ -3829,7 +3830,9 @@
     "enterPassword": "Masukkan kata sandi enkripsi Anda",
     "wrongPassword": "Kata sandi salah. Silakan coba lagi.",
     "pickBackupTitle": "Pilih dompet",
-    "pickBackupDescription": "Pilih cadangan untuk dipulihkan"
+    "pickBackupDescription": "Pilih cadangan untuk dipulihkan",
+    "recognizePhraseTitle": "Apakah Anda mengenali frasa cadangan ini?",
+    "recognizePhraseBody": "Jangan pernah memasukkan kata-kata yang dikirim orang lain kepada Anda."
   },
   "BackupNudge": {
     "title": "Dana Anda dalam bahaya",
