@@ -4,6 +4,7 @@ import { ScrollView, View } from "react-native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { Card } from "@app/components/card"
 import { IconTextButton } from "@app/components/icon-text-button"
 import { InfoBanner } from "@app/components/info-banner"
 import { MnemonicWordsGrid } from "@app/components/mnemonic-words-grid"
@@ -32,6 +33,11 @@ export const ViewBackupPhraseScreen: React.FC = () => {
   return (
     <Screen preset="fixed">
       <ScrollView contentContainerStyle={styles.content}>
+        <Card
+          type="warning"
+          title={LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()}
+        />
+
         <MnemonicWordsGrid words={words} />
 
         <IconTextButton

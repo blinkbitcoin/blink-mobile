@@ -3506,7 +3506,8 @@
         "savedConfirm": "Ñam waqaychani",
         "copy": "Kopiyay",
         "continueButton": "Hinaspa",
-        "testBackup": "Bakuyniykita pruwaspay"
+        "testBackup": "Bakuyniykita pruwaspay",
+        "doNotShareWarning": "Aman pimanpas rikuchiychu, yanapaqkunamanpas"
       },
       "Confirm": {
         "headerTitle": "Waqaychay rimayta takyachiy",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Cifrado contraseñaykita qillqay",
     "wrongPassword": "Mana allin contraseña. Watiqmanta ruway.",
     "pickBackupTitle": "Akllay wallet",
-    "pickBackupDescription": "Akllay huk waqaychasqa kutichinaykipaq"
+    "pickBackupDescription": "Akllay huk waqaychasqa kutichinaykipaq",
+    "recognizePhraseTitle": "¿Kay waqaychana rimaykunata reqsinkichu?",
+    "recognizePhraseBody": "Ama hayk'aqpas hukkuna apachisqan simikunata churaychu."
   },
   "BackupNudge": {
     "title": "Qullqiykikuna sasachakuypi kachkan",

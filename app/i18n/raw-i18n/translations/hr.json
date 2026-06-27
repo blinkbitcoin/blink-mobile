@@ -3506,7 +3506,8 @@
         "savedConfirm": "Spremio sam je",
         "copy": "Kopiraj",
         "continueButton": "Nastavi",
-        "testBackup": "Testirajte sigurnosnu kopiju"
+        "testBackup": "Testirajte sigurnosnu kopiju",
+        "doNotShareWarning": "Nemojte ovo pokazivati nikome, uključujući podršku"
       },
       "Confirm": {
         "headerTitle": "Potvrdite sigurnosnu frazu",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Unesite lozinku za šifriranje",
     "wrongPassword": "Netočna lozinka. Pokušajte ponovo.",
     "pickBackupTitle": "Odaberite novčanik",
-    "pickBackupDescription": "Odaberite sigurnosnu kopiju za vraćanje"
+    "pickBackupDescription": "Odaberite sigurnosnu kopiju za vraćanje",
+    "recognizePhraseTitle": "Prepoznajete li ovu frazu za sigurnosnu kopiju?",
+    "recognizePhraseBody": "Nikada ne unosite riječi koje vam je poslao netko drugi."
   },
   "BackupNudge": {
     "title": "Vaša sredstva su u opasnosti",

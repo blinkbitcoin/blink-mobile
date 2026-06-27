@@ -3506,7 +3506,8 @@
         "savedConfirm": "ฉันบันทึกแล้ว",
         "copy": "คัดลอก",
         "continueButton": "ดำเนินการต่อ",
-        "testBackup": "ทดสอบข้อมูลสำรองของคุณ"
+        "testBackup": "ทดสอบข้อมูลสำรองของคุณ",
+        "doNotShareWarning": "อย่าแสดงสิ่งนี้ให้ใครเห็น รวมถึงฝ่ายสนับสนุน"
       },
       "Confirm": {
         "headerTitle": "ยืนยันวลีสำรอง",
@@ -3594,7 +3595,9 @@
     "enterPassword": "ป้อนรหัสผ่านการเข้ารหัสของคุณ",
     "wrongPassword": "รหัสผ่านไม่ถูกต้อง โปรดลองอีกครั้ง",
     "pickBackupTitle": "เลือกกระเป๋าเงิน",
-    "pickBackupDescription": "เลือกการสำรองข้อมูลเพื่อกู้คืน"
+    "pickBackupDescription": "เลือกการสำรองข้อมูลเพื่อกู้คืน",
+    "recognizePhraseTitle": "คุณจำวลีสำรองข้อมูลนี้ได้ไหม",
+    "recognizePhraseBody": "อย่าป้อนคำที่คนอื่นส่งมาให้คุณเด็ดขาด"
   },
   "BackupNudge": {
     "title": "เงินของคุณมีความเสี่ยง",

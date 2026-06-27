@@ -3506,7 +3506,8 @@
         "savedConfirm": "Jeg har gemt den",
         "copy": "Kopiér",
         "continueButton": "Fortsæt",
-        "testBackup": "Test din backup"
+        "testBackup": "Test din backup",
+        "doNotShareWarning": "Vis ikke dette til nogen, heller ikke support"
       },
       "Confirm": {
         "headerTitle": "Bekræft backup-sætning",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Indtast din krypteringsadgangskode",
     "wrongPassword": "Forkert adgangskode. Prøv venligst igen.",
     "pickBackupTitle": "Vælg en tegnebog",
-    "pickBackupDescription": "Vælg en sikkerhedskopi at gendanne"
+    "pickBackupDescription": "Vælg en sikkerhedskopi at gendanne",
+    "recognizePhraseTitle": "Genkender du denne backup-sætning?",
+    "recognizePhraseBody": "Indtast aldrig ord, som en anden har sendt dig."
   },
   "BackupNudge": {
     "title": "Dine midler er i fare",

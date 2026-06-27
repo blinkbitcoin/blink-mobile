@@ -3506,7 +3506,8 @@
         "savedConfirm": "Tôi đã lưu",
         "copy": "Sao chép",
         "continueButton": "Tiếp tục",
-        "testBackup": "Kiểm tra bản sao lưu của bạn"
+        "testBackup": "Kiểm tra bản sao lưu của bạn",
+        "doNotShareWarning": "Không cho bất kỳ ai xem điều này, kể cả bộ phận hỗ trợ"
       },
       "Confirm": {
         "headerTitle": "Xác nhận cụm từ sao lưu",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Nhập mật khẩu mã hóa của bạn",
     "wrongPassword": "Mật khẩu không đúng. Vui lòng thử lại.",
     "pickBackupTitle": "Chọn một ví",
-    "pickBackupDescription": "Chọn bản sao lưu để khôi phục"
+    "pickBackupDescription": "Chọn bản sao lưu để khôi phục",
+    "recognizePhraseTitle": "Bạn có nhận ra cụm từ sao lưu này không?",
+    "recognizePhraseBody": "Không bao giờ nhập các từ mà người khác gửi cho bạn."
   },
   "BackupNudge": {
     "title": "Tiền của bạn đang gặp rủi ro",

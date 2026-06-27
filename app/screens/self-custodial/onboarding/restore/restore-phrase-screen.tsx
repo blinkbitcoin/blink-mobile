@@ -7,6 +7,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { Card } from "@app/components/card"
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -179,6 +180,14 @@ export const RestorePhraseScreen: React.FC = () => {
           </>
         )}
       </View>
+
+      {isStep1 && (
+        <View style={styles.warningCard}>
+          <Card type="warning" title={LL.RestoreScreen.recognizePhraseTitle()}>
+            {LL.RestoreScreen.recognizePhraseBody()}
+          </Card>
+        </View>
+      )}
     </OnboardingScreenLayout>
   )
 }
@@ -188,6 +197,9 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 16,
     lineHeight: 22,
     color: colors.grey2,
+    marginBottom: 20,
+  },
+  warningCard: {
     marginBottom: 20,
   },
   inputList: {

@@ -32,6 +32,7 @@ declare module "@rn-vui/themed" {
     blue5: string
 
     grey6: string
+    grey7: string
 
     loaderForeground: string
     loaderBackground: string

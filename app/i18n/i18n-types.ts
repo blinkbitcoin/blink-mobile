@@ -11755,6 +11755,10 @@ type RootTranslation = {
 				 * T​e​s​t​ ​y​o​u​r​ ​b​a​c​k​u​p
 				 */
 				testBackup: string
+				/**
+				 * D​o​ ​n​o​t​ ​s​h​o​w​ ​t​h​i​s​ ​t​o​ ​a​n​y​o​n​e​ ​i​n​c​l​u​d​i​n​g​ ​s​u​p​p​o​r​t
+				 */
+				doNotShareWarning: string
 			}
 			Confirm: {
 				/**
@@ -11961,6 +11965,14 @@ type RootTranslation = {
 		 * S​e​l​e​c​t​ ​a​ ​b​a​c​k​u​p​ ​t​o​ ​r​e​s​t​o​r​e
 		 */
 		pickBackupDescription: string
+		/**
+		 * D​o​ ​y​o​u​ ​r​e​c​o​g​n​i​z​e​ ​t​h​i​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​?
+		 */
+		recognizePhraseTitle: string
+		/**
+		 * N​e​v​e​r​ ​e​n​t​e​r​ ​w​o​r​d​s​ ​s​o​m​e​o​n​e​ ​e​l​s​e​ ​s​e​n​t​ ​y​o​u​.
+		 */
+		recognizePhraseBody: string
 	}
 	BackupNudge: {
 		/**
@@ -23963,6 +23975,10 @@ export type TranslationFunctions = {
 				 * Test your backup
 				 */
 				testBackup: () => LocalizedString
+				/**
+				 * Do not show this to anyone including support
+				 */
+				doNotShareWarning: () => LocalizedString
 			}
 			Confirm: {
 				/**
@@ -24169,6 +24185,14 @@ export type TranslationFunctions = {
 		 * Select a backup to restore
 		 */
 		pickBackupDescription: () => LocalizedString
+		/**
+		 * Do you recognize this backup phrase?
+		 */
+		recognizePhraseTitle: () => LocalizedString
+		/**
+		 * Never enter words someone else sent you.
+		 */
+		recognizePhraseBody: () => LocalizedString
 	}
 	BackupNudge: {
 		/**

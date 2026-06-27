@@ -3506,7 +3506,8 @@
         "savedConfirm": "Ndigcinile",
         "copy": "Kopa",
         "continueButton": "Qhubeka",
-        "testBackup": "Vavanya ugcino lwakho"
+        "testBackup": "Vavanya ugcino lwakho",
+        "doNotShareWarning": "Musa ukuyibonisa nakubani na, kuquka nenkxaso"
       },
       "Confirm": {
         "headerTitle": "Qinisekisa ibinzana lokugcina",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Faka iphasiwedi yakho yokufihla",
     "wrongPassword": "Iphasiwedi engalunganga. Nceda uzame kwakhona.",
     "pickBackupTitle": "Khetha isipaji",
-    "pickBackupDescription": "Khetha ugcino lokubuyisela"
+    "pickBackupDescription": "Khetha ugcino lokubuyisela",
+    "recognizePhraseTitle": "Ngaba uyayazi le binzana yokhuselo?",
+    "recognizePhraseBody": "Ungaze ufake amagama akuthunyelwe ngomnye umntu."
   },
   "BackupNudge": {
     "title": "Imali yakho isengozini",

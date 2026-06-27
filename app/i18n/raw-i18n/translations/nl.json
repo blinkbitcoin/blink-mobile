@@ -3506,7 +3506,8 @@
         "savedConfirm": "Ik heb het opgeslagen",
         "copy": "Kopiëren",
         "continueButton": "Doorgaan",
-        "testBackup": "Test je back-up"
+        "testBackup": "Test je back-up",
+        "doNotShareWarning": "Laat dit aan niemand zien, ook niet aan support"
       },
       "Confirm": {
         "headerTitle": "Bevestig back-upzin",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Voer je versleutelingswachtwoord in",
     "wrongPassword": "Onjuist wachtwoord. Probeer opnieuw.",
     "pickBackupTitle": "Kies een wallet",
-    "pickBackupDescription": "Kies een back-up om te herstellen"
+    "pickBackupDescription": "Kies een back-up om te herstellen",
+    "recognizePhraseTitle": "Herken je deze back-upzin?",
+    "recognizePhraseBody": "Voer nooit woorden in die iemand anders je heeft gestuurd."
   },
   "BackupNudge": {
     "title": "Uw fondsen lopen gevaar",

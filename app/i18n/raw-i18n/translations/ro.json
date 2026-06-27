@@ -3506,7 +3506,8 @@
         "savedConfirm": "Am salvat-o",
         "copy": "Copiază",
         "continueButton": "Continuă",
-        "testBackup": "Testează-ți copia de rezervă"
+        "testBackup": "Testează-ți copia de rezervă",
+        "doNotShareWarning": "Nu arăta acest lucru nimănui, inclusiv asistenței"
       },
       "Confirm": {
         "headerTitle": "Confirmă fraza de backup",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Introduceți parola de criptare",
     "wrongPassword": "Parolă incorectă. Încercați din nou.",
     "pickBackupTitle": "Alege un portofel",
-    "pickBackupDescription": "Selectează o copie de rezervă pentru restaurare"
+    "pickBackupDescription": "Selectează o copie de rezervă pentru restaurare",
+    "recognizePhraseTitle": "Recunoști această frază de backup?",
+    "recognizePhraseBody": "Nu introduce niciodată cuvinte trimise de altcineva."
   },
   "BackupNudge": {
     "title": "Fondurile dumneavoastră sunt în pericol",

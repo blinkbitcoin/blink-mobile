@@ -3506,7 +3506,8 @@
         "savedConfirm": "Ek het dit gestoor",
         "copy": "Kopieer",
         "continueButton": "Gaan voort",
-        "testBackup": "Toets jou rugsteun"
+        "testBackup": "Toets jou rugsteun",
+        "doNotShareWarning": "Moenie dit vir enigiemand wys nie, ook nie ondersteuning nie"
       },
       "Confirm": {
         "headerTitle": "Bevestig rugsteunfrase",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Voer jou enkripsierwagwoord in",
     "wrongPassword": "Verkeerde wagwoord. Probeer asseblief weer.",
     "pickBackupTitle": "Kies 'n beursie",
-    "pickBackupDescription": "Kies 'n rugsteun om te herstel"
+    "pickBackupDescription": "Kies 'n rugsteun om te herstel",
+    "recognizePhraseTitle": "Herken jy hierdie rugsteunfrase?",
+    "recognizePhraseBody": "Moet nooit woorde invoer wat iemand anders aan jou gestuur het nie."
   },
   "BackupNudge": {
     "title": "Jou fondse is in gevaar",

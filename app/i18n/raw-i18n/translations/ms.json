@@ -3506,7 +3506,8 @@
         "savedConfirm": "Saya telah menyimpannya",
         "copy": "Salin",
         "continueButton": "Teruskan",
-        "testBackup": "Uji sandaran anda"
+        "testBackup": "Uji sandaran anda",
+        "doNotShareWarning": "Jangan tunjukkan ini kepada sesiapa termasuk sokongan"
       },
       "Confirm": {
         "headerTitle": "Sahkan frasa sandaran",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Masukkan kata laluan penyulitan anda",
     "wrongPassword": "Kata laluan salah. Sila cuba lagi.",
     "pickBackupTitle": "Pilih dompet",
-    "pickBackupDescription": "Pilih sandaran untuk dipulihkan"
+    "pickBackupDescription": "Pilih sandaran untuk dipulihkan",
+    "recognizePhraseTitle": "Adakah anda mengenali frasa sandaran ini?",
+    "recognizePhraseBody": "Jangan sekali-kali masukkan perkataan yang dihantar oleh orang lain."
   },
   "BackupNudge": {
     "title": "Dana anda dalam bahaya",

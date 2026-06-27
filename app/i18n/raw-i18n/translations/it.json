@@ -3506,7 +3506,8 @@
                 "savedConfirm": "L'ho salvata",
                 "copy": "Copia",
                 "continueButton": "Continua",
-                "testBackup": "Verifica il tuo backup"
+                "testBackup": "Verifica il tuo backup",
+                "doNotShareWarning": "Non mostrarlo a nessuno, nemmeno all'assistenza"
             },
             "Confirm": {
                 "headerTitle": "Conferma frase di backup",
@@ -3594,7 +3595,9 @@
         "enterPassword": "Inserisci la password di crittografia",
         "wrongPassword": "Password errata. Riprova.",
         "pickBackupTitle": "Scegli un portafoglio",
-        "pickBackupDescription": "Seleziona un backup da ripristinare"
+        "pickBackupDescription": "Seleziona un backup da ripristinare",
+        "recognizePhraseTitle": "Riconosci questa frase di backup?",
+        "recognizePhraseBody": "Non inserire mai parole che ti ha inviato qualcun altro."
     },
     "BackupNudge": {
         "title": "I tuoi fondi sono a rischio",
