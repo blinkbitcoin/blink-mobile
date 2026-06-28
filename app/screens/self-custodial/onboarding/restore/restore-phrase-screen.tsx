@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react"
-import { ActivityIndicator, Pressable, View } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -7,6 +7,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { Card } from "@app/components/card"
 import { SuggestionBar } from "@app/components/suggestion-bar"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -71,13 +72,13 @@ export const RestorePhraseScreen: React.FC = () => {
     if (!isStep1) return
     navigation.setOptions({
       headerRight: () => (
-        <Pressable
+        <GaloyTertiaryButton
+          clear
+          title={pasteLabel}
           onPress={handlePasteFromClipboard}
-          style={styles.headerPaste}
+          containerStyle={styles.headerButton}
           {...testProps("restore-paste-button")}
-        >
-          <Text style={styles.headerPasteText}>{pasteLabel}</Text>
-        </Pressable>
+        />
       ),
     })
   }, [navigation, isStep1, handlePasteFromClipboard, pasteLabel, styles])
@@ -205,13 +206,8 @@ const useStyles = makeStyles(({ colors }) => ({
   inputList: {
     gap: 10,
   },
-  headerPaste: {
+  headerButton: {
     marginRight: 16,
-  },
-  headerPasteText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "700",
   },
   errorContainer: {
     flexDirection: "row",

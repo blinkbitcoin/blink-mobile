@@ -1,12 +1,13 @@
-import React from "react"
+import React, { useLayoutEffect } from "react"
 import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
-import { useRoute, RouteProp } from "@react-navigation/native"
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { Card } from "@app/components/card"
-import { IconTextButton } from "@app/components/icon-text-button"
 import { InfoBanner } from "@app/components/info-banner"
 import { Screen } from "@app/components/screen"
 import { useScreenSecurity } from "@app/hooks/use-screen-security"
@@ -24,6 +25,7 @@ type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase"
 export const BackupPhraseScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { step } = useRoute<PhraseRouteProp>().params
 
   useScreenSecurity()
@@ -37,6 +39,22 @@ export const BackupPhraseScreen: React.FC = () => {
     buttonTitle,
     isButtonDisabled,
   } = useBackupPhrase(step)
+
+  const copyLabel = LL.BackupScreen.ManualBackup.Phrase.copy()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <GaloyTertiaryButton
+          clear
+          title={copyLabel}
+          onPress={handleCopy}
+          containerStyle={styles.headerButton}
+          {...testProps("backup-phrase-copy")}
+        />
+      ),
+    })
+  }, [navigation, copyLabel, handleCopy, styles])
 
   const infoText = LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
     sparkCompatibleLink: LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink(),
@@ -75,13 +93,6 @@ export const BackupPhraseScreen: React.FC = () => {
         <InfoBanner>
           <Text style={styles.infoText}>{infoText}</Text>
         </InfoBanner>
-
-        <IconTextButton
-          icon="copy-paste"
-          label={LL.BackupScreen.ManualBackup.Phrase.copy()}
-          onPress={handleCopy}
-          {...testProps("backup-phrase-copy")}
-        />
       </ScrollView>
 
       <View style={styles.buttonsContainer}>
@@ -102,6 +113,9 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingTop: 10,
     paddingBottom: 20,
     gap: 20,
+  },
+  headerButton: {
+    marginRight: 16,
   },
   seedWords: {
     gap: 20,

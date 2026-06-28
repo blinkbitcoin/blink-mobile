@@ -1,16 +1,19 @@
-import React from "react"
+import React, { useLayoutEffect } from "react"
 import { ScrollView, View } from "react-native"
 
+import { useNavigation } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { Card } from "@app/components/card"
-import { IconTextButton } from "@app/components/icon-text-button"
 import { InfoBanner } from "@app/components/info-banner"
 import { MnemonicWordsGrid } from "@app/components/mnemonic-words-grid"
 import { Screen } from "@app/components/screen"
 import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 
 import { useViewBackupPhrase } from "../hooks"
@@ -18,11 +21,28 @@ import { useViewBackupPhrase } from "../hooks"
 export const ViewBackupPhraseScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   useScreenSecurity()
 
   const { words, handleCopy, handleOpenSparkLink, handleTestBackup } =
     useViewBackupPhrase()
+
+  const copyLabel = LL.BackupScreen.ManualBackup.Phrase.copy()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <GaloyTertiaryButton
+          clear
+          title={copyLabel}
+          onPress={handleCopy}
+          containerStyle={styles.headerButton}
+          {...testProps("backup-phrase-copy")}
+        />
+      ),
+    })
+  }, [navigation, copyLabel, handleCopy, styles])
 
   const sparkLink = LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()
   const infoText = LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
@@ -39,13 +59,6 @@ export const ViewBackupPhraseScreen: React.FC = () => {
         />
 
         <MnemonicWordsGrid words={words} />
-
-        <IconTextButton
-          icon="copy-paste"
-          label={LL.BackupScreen.ManualBackup.Phrase.copy()}
-          onPress={handleCopy}
-          {...testProps("backup-phrase-copy")}
-        />
 
         <InfoBanner>
           <Text style={styles.infoText}>
@@ -80,6 +93,9 @@ const useStyles = makeStyles(() => ({
     paddingTop: 10,
     paddingBottom: 20,
     gap: 20,
+  },
+  headerButton: {
+    marginRight: 16,
   },
   infoText: {
     fontSize: 12,
