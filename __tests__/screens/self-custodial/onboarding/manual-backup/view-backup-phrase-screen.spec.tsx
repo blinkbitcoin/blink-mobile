@@ -68,6 +68,19 @@ describe("ViewBackupPhraseScreen", () => {
     ).toBeTruthy()
   })
 
+  it("renders the do-not-share warning card", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <ViewBackupPhraseScreen />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => expect(getByText("youth")).toBeTruthy())
+    expect(
+      getByText(LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()),
+    ).toBeTruthy()
+  })
+
   it("copies the full mnemonic to the clipboard", async () => {
     const { getByText } = render(
       <ContextForScreen>

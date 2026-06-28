@@ -202,7 +202,7 @@ describe("BackupPhraseScreen", () => {
       )
     })
 
-    it("renders spark compatible link", () => {
+    it("renders spark compatible info text", () => {
       const { getByText } = render(
         <ContextForScreen>
           <BackupPhraseScreen />
@@ -210,7 +210,24 @@ describe("BackupPhraseScreen", () => {
       )
 
       expect(
-        getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
+        getByText(
+          LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
+            sparkCompatibleLink:
+              LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink(),
+          }),
+        ),
+      ).toBeTruthy()
+    })
+
+    it("renders the do-not-share warning card", () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+
+      expect(
+        getByText(LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()),
       ).toBeTruthy()
     })
   })
