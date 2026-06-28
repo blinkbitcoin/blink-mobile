@@ -418,4 +418,27 @@ describe("RestorePhraseScreen", () => {
 
     expect(updateWord).toHaveBeenCalledWith(0, "aba")
   })
+
+  it("renders the recognize-phrase warning card on step 1", () => {
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      isStep1: true,
+    })
+
+    const { getByText } = renderScreen()
+
+    expect(getByText(LL.RestoreScreen.recognizePhraseTitle())).toBeTruthy()
+    expect(getByText(LL.RestoreScreen.recognizePhraseBody())).toBeTruthy()
+  })
+
+  it("does not render the recognize-phrase warning card on step 2", () => {
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      isStep1: false,
+    })
+
+    const { queryByText } = renderScreen()
+
+    expect(queryByText(LL.RestoreScreen.recognizePhraseTitle())).toBeNull()
+  })
 })

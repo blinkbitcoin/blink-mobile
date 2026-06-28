@@ -284,7 +284,24 @@ describe("BackupPhraseScreen", () => {
       await flushEffects()
 
       expect(
-        getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
+        getByText(
+          LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
+            sparkCompatibleLink:
+              LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink(),
+          }),
+        ),
+      ).toBeTruthy()
+    })
+
+    it("renders the do-not-share warning card", () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+
+      expect(
+        getByText(LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()),
       ).toBeTruthy()
     })
   })
