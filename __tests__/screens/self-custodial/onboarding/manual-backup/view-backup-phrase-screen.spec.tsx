@@ -11,9 +11,14 @@ import { ContextForScreen } from "../../../helper"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+const mockSetOptions = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    goBack: mockGoBack,
+    setOptions: mockSetOptions,
+  }),
 }))
 
 const mockIsSensorAvailable = jest.fn()
@@ -25,6 +30,13 @@ jest.mock("@app/utils/biometricAuthentication", () => ({
     authenticate: (...args: unknown[]) => mockAuthenticate(...args),
   },
 }))
+
+const renderHeaderRight = () => {
+  const calls = mockSetOptions.mock.calls
+  const lastOptions = calls[calls.length - 1]?.[0]
+  if (!lastOptions?.headerRight) throw new Error("headerRight was not set")
+  return render(<ContextForScreen>{lastOptions.headerRight()}</ContextForScreen>)
+}
 
 const mockCopyToClipboard = jest.fn()
 jest.mock("@app/hooks", () => ({
@@ -73,7 +85,7 @@ describe("ViewBackupPhraseScreen", () => {
     expect(getByText("genuine")).toBeTruthy()
   })
 
-  it("shows the Copy button and the spark-compatible wallet link", async () => {
+  it("shows the Copy button in the header and the spark-compatible wallet link", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <ViewBackupPhraseScreen />
@@ -81,10 +93,12 @@ describe("ViewBackupPhraseScreen", () => {
     )
 
     await waitFor(() => expect(getByText("youth")).toBeTruthy())
-    expect(getByText(LL.BackupScreen.ManualBackup.Phrase.copy())).toBeTruthy()
     expect(
       getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
     ).toBeTruthy()
+
+    const { getByText: getHeaderText } = renderHeaderRight()
+    expect(getHeaderText(LL.BackupScreen.ManualBackup.Phrase.copy())).toBeTruthy()
   })
 
   it("renders the do-not-share warning card", async () => {
@@ -108,7 +122,8 @@ describe("ViewBackupPhraseScreen", () => {
     )
 
     await waitFor(() => expect(getByText("youth")).toBeTruthy())
-    fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.copy()))
+    const { getByText: getHeaderText } = renderHeaderRight()
+    fireEvent.press(getHeaderText(LL.BackupScreen.ManualBackup.Phrase.copy()))
 
     expect(mockCopyToClipboard).toHaveBeenCalledWith(
       expect.objectContaining({

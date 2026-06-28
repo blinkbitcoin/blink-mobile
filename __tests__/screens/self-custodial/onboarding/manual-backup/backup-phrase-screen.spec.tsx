@@ -8,11 +8,12 @@ import { ContextForScreen } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
+const mockSetOptions = jest.fn()
 let mockStep: unknown = 1
 let mockHasParams = true
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, setOptions: mockSetOptions }),
   useRoute: () => ({ params: mockHasParams ? { step: mockStep } : undefined }),
 }))
 
@@ -21,6 +22,13 @@ jest.mock("@app/utils/error-logging", () => ({
   ...jest.requireActual("@app/utils/error-logging"),
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
+
+const renderHeaderRight = () => {
+  const calls = mockSetOptions.mock.calls
+  const lastOptions = calls[calls.length - 1]?.[0]
+  if (!lastOptions?.headerRight) throw new Error("headerRight was not set")
+  return render(<ContextForScreen>{lastOptions.headerRight()}</ContextForScreen>)
+}
 
 const mockCopyToClipboard = jest.fn()
 let mockCountdown = { remainingSeconds: 0, isExpired: true }
@@ -246,14 +254,15 @@ describe("BackupPhraseScreen", () => {
   })
 
   describe("shared", () => {
-    it("renders copy button", async () => {
-      const { getByText } = render(
+    it("renders copy button in the header", async () => {
+      render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
       await flushEffects()
 
+      const { getByText } = renderHeaderRight()
       expect(getByText(LL.BackupScreen.ManualBackup.Phrase.copy())).toBeTruthy()
     })
 
@@ -266,7 +275,8 @@ describe("BackupPhraseScreen", () => {
       await flushEffects()
 
       await waitFor(() => expect(getByText("youth")).toBeTruthy())
-      fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.copy()))
+      const { getByText: getHeaderText } = renderHeaderRight()
+      fireEvent.press(getHeaderText(LL.BackupScreen.ManualBackup.Phrase.copy()))
       expect(mockCopyToClipboard).toHaveBeenCalledWith(
         expect.objectContaining({
           content: expect.stringContaining("youth"),

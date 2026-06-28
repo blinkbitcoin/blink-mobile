@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useLayoutEffect } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -6,8 +6,9 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { Card } from "@app/components/card"
-import { IconTextButton } from "@app/components/icon-text-button"
+import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
 import { InfoBanner } from "@app/components/info-banner"
 import { MnemonicWordsGrid } from "@app/components/mnemonic-words-grid"
 import { Screen } from "@app/components/screen"
@@ -40,6 +41,22 @@ export const ViewBackupPhraseScreen: React.FC = () => {
   const { words, handleCopy, handleOpenSparkLink, handleTestBackup } =
     useViewBackupPhrase()
 
+  const copyLabel = LL.BackupScreen.ManualBackup.Phrase.copy()
+
+  useLayoutEffect(() => {
+    navigation.setOptions(
+      headerRightNoGlass(() => (
+        <GaloyTertiaryButton
+          clear
+          title={copyLabel}
+          onPress={handleCopy}
+          containerStyle={styles.headerButton}
+          {...testProps("backup-phrase-copy")}
+        />
+      )),
+    )
+  }, [navigation, copyLabel, handleCopy, styles])
+
   const sparkLink = LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()
   const infoText = LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
     sparkCompatibleLink: sparkLink,
@@ -63,13 +80,6 @@ export const ViewBackupPhraseScreen: React.FC = () => {
         />
 
         <MnemonicWordsGrid words={words} />
-
-        <IconTextButton
-          icon="copy-paste"
-          label={LL.BackupScreen.ManualBackup.Phrase.copy()}
-          onPress={handleCopy}
-          {...testProps("backup-phrase-copy")}
-        />
 
         <InfoBanner>
           <Text style={styles.infoText}>
@@ -109,6 +119,9 @@ const useStyles = makeStyles(() => ({
     paddingTop: 10,
     paddingBottom: 20,
     gap: 20,
+  },
+  headerButton: {
+    marginRight: 16,
   },
   infoText: {
     fontSize: 12,
