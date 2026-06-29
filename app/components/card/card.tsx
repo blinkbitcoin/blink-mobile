@@ -38,8 +38,13 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
     <View style={styles.content}>
       {title ? (
         <View style={styles.titleBox}>
-          <GaloyIcon name="warning" size={16} color={colors.warning} />
-          <Text type="p2" bold color={colors.warning} style={styles.titleText}>
+          {isWarning && <GaloyIcon name="warning" size={16} color={colors.warning} />}
+          <Text
+            type="p2"
+            bold
+            color={isWarning ? colors.warning : undefined}
+            style={styles.titleText}
+          >
             {title}
           </Text>
         </View>
@@ -78,7 +83,6 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
   }
 
   const breatheOut = () => {
-    onPress()
     Animated.timing(scaleAnim, {
       toValue: 1,
       duration: 100,
@@ -88,7 +92,7 @@ export const Card: React.FC<React.PropsWithChildren<CardProps>> = ({
   }
 
   return (
-    <Pressable onPressIn={breatheIn} onPressOut={breatheOut}>
+    <Pressable onPress={onPress} onPressIn={breatheIn} onPressOut={breatheOut}>
       <Animated.View
         style={[
           containerStyle,
