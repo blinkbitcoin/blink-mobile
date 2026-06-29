@@ -3,9 +3,8 @@ import {
   SyncWalletRequest,
   defaultExternalSigner,
   type BreezSdkInterface,
+  type Network,
 } from "@breeztech/breez-sdk-spark-react-native"
-
-import { SparkConfig } from "../config"
 
 export const getWalletInfo = (sdk: BreezSdkInterface) =>
   sdk.getInfo({ ensureSynced: false })
@@ -14,13 +13,11 @@ export const getWalletInfo = (sdk: BreezSdkInterface) =>
  * Derives the wallet identity pubkey from the mnemonic without a connected SDK, matching
  * getWalletInfo().identityPubkey so the account is identifiable before the SDK connects.
  */
-export const deriveWalletIdentityPubkey = (mnemonic: string): string => {
-  const signer = defaultExternalSigner(
-    mnemonic,
-    undefined,
-    SparkConfig.network,
-    undefined,
-  )
+export const deriveWalletIdentityPubkey = (
+  mnemonic: string,
+  network: Network,
+): string => {
+  const signer = defaultExternalSigner(mnemonic, undefined, network, undefined)
   const { bytes } = signer.identityPublicKey()
   return Buffer.from(new Uint8Array(bytes)).toString("hex")
 }

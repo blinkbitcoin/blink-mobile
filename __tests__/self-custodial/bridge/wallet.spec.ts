@@ -1,4 +1,4 @@
-import { defaultExternalSigner } from "@breeztech/breez-sdk-spark-react-native"
+import { Network, defaultExternalSigner } from "@breeztech/breez-sdk-spark-react-native"
 
 import {
   checkLightningAddressAvailable,
@@ -8,7 +8,6 @@ import {
   listPayments,
   registerLightningAddress,
 } from "@app/self-custodial/bridge/wallet"
-import { SparkConfig } from "@app/self-custodial/config"
 
 describe("deriveWalletIdentityPubkey", () => {
   it("derives the identity pubkey offline from the mnemonic as a hex string", () => {
@@ -17,13 +16,13 @@ describe("deriveWalletIdentityPubkey", () => {
       .mockReturnValue({ bytes: Uint8Array.from([0x02, 0xab, 0xff]).buffer })
     ;(defaultExternalSigner as jest.Mock).mockReturnValue({ identityPublicKey })
 
-    const pubkey = deriveWalletIdentityPubkey("youth indicate void")
+    const pubkey = deriveWalletIdentityPubkey("youth indicate void", Network.Regtest)
 
     expect(pubkey).toBe("02abff")
     expect(defaultExternalSigner).toHaveBeenCalledWith(
       "youth indicate void",
       undefined,
-      SparkConfig.network,
+      Network.Regtest,
       undefined,
     )
   })

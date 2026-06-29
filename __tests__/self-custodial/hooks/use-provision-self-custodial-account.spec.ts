@@ -4,13 +4,19 @@ import { useProvisionSelfCustodialAccount } from "@app/self-custodial/hooks/use-
 
 const mockCreateWallet = jest.fn()
 const mockReloadSelfCustodialAccounts = jest.fn()
+const mockNetwork = "regtest"
 
 jest.mock("react-native-quick-crypto", () => ({
   randomUUID: () => "provisioned-account-id",
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  selfCustodialCreateWallet: (accountId: string) => mockCreateWallet(accountId),
+  selfCustodialCreateWallet: (accountId: string, network: string) =>
+    mockCreateWallet(accountId, network),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockNetwork,
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -32,7 +38,7 @@ describe("useProvisionSelfCustodialAccount", () => {
     const accountId = await result.current.provision()
 
     expect(accountId).toBe("provisioned-account-id")
-    expect(mockCreateWallet).toHaveBeenCalledWith("provisioned-account-id")
+    expect(mockCreateWallet).toHaveBeenCalledWith("provisioned-account-id", mockNetwork)
     expect(mockReloadSelfCustodialAccounts).toHaveBeenCalledTimes(1)
   })
 

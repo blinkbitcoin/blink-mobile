@@ -11,6 +11,7 @@ const mockUseActiveWallet = jest.fn()
 const mockUseAccountRegistry = jest.fn()
 const mockUseMigrationCheckpoint = jest.fn()
 const mockDeriveWalletIdentityPubkey = jest.fn()
+const mockNetwork = "regtest"
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -32,8 +33,12 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint", () =>
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  deriveWalletIdentityPubkey: (mnemonic: string) =>
-    mockDeriveWalletIdentityPubkey(mnemonic),
+  deriveWalletIdentityPubkey: (mnemonic: string, network: string) =>
+    mockDeriveWalletIdentityPubkey(mnemonic, network),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockNetwork,
 }))
 
 const ACCOUNT_ID = "self-custodial-uuid-1"
@@ -128,7 +133,10 @@ describe("useWalletIdentity", () => {
     const { result } = renderHook(() => useWalletIdentity("youth indicate void"))
 
     expect(result.current).toBe("derived-pubkey")
-    expect(mockDeriveWalletIdentityPubkey).toHaveBeenCalledWith("youth indicate void")
+    expect(mockDeriveWalletIdentityPubkey).toHaveBeenCalledWith(
+      "youth indicate void",
+      mockNetwork,
+    )
   })
 
   it("returns an empty string and skips derivation while the mnemonic is empty", () => {
