@@ -78,6 +78,13 @@ describe("Card", () => {
 
       expect(queryByTestId("galoy-icon-warning")).toBeNull()
     })
+
+    it("does not render a warning icon for a default card with a title", () => {
+      const { getByText, queryByTestId } = render(<Card title="Plain heading" />)
+
+      expect(getByText("Plain heading")).toBeTruthy()
+      expect(queryByTestId("galoy-icon-warning")).toBeNull()
+    })
   })
 
   describe("press behavior", () => {
@@ -85,7 +92,7 @@ describe("Card", () => {
       const onPress = jest.fn()
       const { getByText } = render(<Card onPress={onPress}>Tap me</Card>)
 
-      fireEvent(getByText("Tap me"), "pressOut")
+      fireEvent.press(getByText("Tap me"))
 
       expect(onPress).toHaveBeenCalledTimes(1)
     })
