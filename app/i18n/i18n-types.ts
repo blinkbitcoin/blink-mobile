@@ -148,7 +148,7 @@ type RootTranslation = {
 	}
 	SetAccountModal: {
 		/**
-		 * S​e​t​ ​u​p​ ​y​o​u​r​ ​r​e​c​e​i​v​e​ ​a​c​c​o​u​n​t
+		 * S​e​t​ ​u​p​ ​y​o​u​r​ ​d​e​f​a​u​l​t​ ​B​a​l​a​n​c​e
 		 */
 		title: string
 		/**
@@ -156,11 +156,11 @@ type RootTranslation = {
 		 */
 		description: string
 		/**
-		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​—​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s
+		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​—​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s
 		 */
 		stablesatsTag: string
 		/**
-		 * B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​m​a​x​i​m​a​l​i​s​t​s
+		 * B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​f​o​r​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s
 		 */
 		bitcoinTag: string
 	}
@@ -273,7 +273,7 @@ type RootTranslation = {
 		 */
 		youreConverting: string
 		/**
-		 * R​e​c​e​i​v​i​n​g​ ​a​c​c​o​u​n​t
+		 * R​e​c​e​i​v​i​n​g​ ​B​a​l​a​n​c​e
 		 */
 		receivingAccount: string
 		/**
@@ -291,11 +291,11 @@ type RootTranslation = {
 		 */
 		transferButtonText: RequiredParams<'fromWallet' | 'toWallet'>
 		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​f​e​e
+		 * T​r​a​n​s​f​e​r​ ​f​e​e
 		 */
 		feeLabel: string
 		/**
-		 * C​o​u​l​d​n​'​t​ ​f​e​t​c​h​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​f​e​e
+		 * C​o​u​l​d​n​'​t​ ​f​e​t​c​h​ ​t​h​e​ ​t​r​a​n​s​f​e​r​ ​f​e​e
 		 */
 		feeError: string
 	}
@@ -6559,7 +6559,7 @@ type RootTranslation = {
 		 */
 		useLightning: string
 		/**
-		 * M​y​ ​A​c​c​o​u​n​t​s
+		 * B​a​l​a​n​c​e​s
 		 */
 		myAccounts: string
 		/**
@@ -6696,7 +6696,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * R​e​c​e​i​v​e​ ​t​o​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t
+		 * R​e​c​e​i​v​e​ ​t​o​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
 		 */
 		usdTitle: string
 		/**
@@ -6886,7 +6886,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * R​e​d​e​e​m​ ​t​o​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t
+		 * R​e​d​e​e​m​ ​t​o​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
 		 */
 		usdTitle: string
 		/**
@@ -7588,7 +7588,7 @@ type RootTranslation = {
 		 */
 		copyClipboardLnurl: string
 		/**
-		 * D​e​f​a​u​l​t​ ​A​c​c​o​u​n​t
+		 * D​e​f​a​u​l​t​ ​r​e​c​e​i​v​e
 		 */
 		defaultWallet: string
 		/**
@@ -7835,7 +7835,7 @@ type RootTranslation = {
 		 */
 		logoutAlertContentPhoneEmail: RequiredParams<'email' | 'phoneNumber'>
 		/**
-		 * Y​o​u​ ​h​a​v​e​ ​a​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.
+		 * Y​o​u​ ​h​a​v​e​ ​a​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}​.
 		 * @param {string} balance
 		 */
 		usdBalanceWarning: RequiredParams<'balance'>
@@ -8054,21 +8054,25 @@ type RootTranslation = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * D​e​f​a​u​l​t​ ​r​e​c​e​i​v​e​ ​a​c​c​o​u​n​t
+		 * D​e​f​a​u​l​t​ ​r​e​c​e​i​v​e
 		 */
 		title: string
 		/**
-		 * D​e​f​a​u​l​t​ ​a​c​c​o​u​n​t
+		 * D​e​f​a​u​l​t​ ​r​e​c​e​i​v​e
 		 */
 		titleSelfCustodial: string
 		/**
-		 * Y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​ ​i​s​ ​f​o​r​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s​,​ ​w​h​e​r​e​ ​t​h​e​ ​U​S​D​ ​v​a​l​u​e​ ​m​o​v​e​s​ ​w​i​t​h​ ​t​h​e​ ​m​a​r​k​e​t​.​ ​Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s​ ​—​ ​i​t​ ​h​o​l​d​s​ ​B​i​t​c​o​i​n​ ​t​h​a​t​ ​i​s​ ​h​e​d​g​e​d​ ​t​o​ ​s​t​a​y​ ​s​t​a​b​l​e​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​Y​o​u​'​r​e​ ​a​l​w​a​y​s​ ​h​o​l​d​i​n​g​ ​B​i​t​c​o​i​n​,​ ​b​u​t​ ​t​h​e​ ​d​o​l​l​a​r​ ​v​a​l​u​e​ ​d​o​e​s​n​'​t​ ​c​h​a​n​g​e​.
+		 * Y​o​u​r​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​i​s​ ​f​o​r​ ​s​t​a​c​k​i​n​g​ ​s​a​t​s​,​ ​w​h​e​r​e​ ​t​h​e​ ​v​a​l​u​e​ ​m​o​v​e​s​ ​w​i​t​h​ ​t​h​e​ ​m​a​r​k​e​t​.
 		 */
-		info: string
+		infoBtc: string
 		/**
-		 * T​h​i​s​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​u​s​e​d​ ​b​y​ ​d​e​f​a​u​l​t​ ​w​h​e​n​ ​r​e​c​e​i​v​i​n​g​ ​a​n​d​ ​s​e​n​d​i​n​g​.​ ​Y​o​u​ ​c​a​n​ ​s​w​i​t​c​h​ ​a​n​y​ ​t​i​m​e​.
+		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s​ ​—​ ​i​t​ ​h​o​l​d​s​ ​B​i​t​c​o​i​n​ ​t​h​a​t​ ​i​s​ ​h​e​d​g​e​d​ ​t​o​ ​s​t​a​y​ ​s​t​a​b​l​e​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​Y​o​u​'​r​e​ ​a​l​w​a​y​s​ ​h​o​l​d​i​n​g​ ​B​i​t​c​o​i​n​,​ ​b​u​t​ ​t​h​e​ ​U​S​D​ ​v​a​l​u​e​ ​d​o​e​s​n​'​t​ ​c​h​a​n​g​e​.
 		 */
-		infoSelfCustodial: string
+		infoUsd: string
+		/**
+		 * D​o​l​l​a​r​ ​r​e​c​e​i​v​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​a​s​ ​a​ ​d​e​f​a​u​l​t​ ​r​e​c​e​i​v​e​ ​o​p​t​i​o​n​ ​f​o​r​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​.
+		 */
+		infoUsdSelfCustodial: string
 	}
 	ThemeScreen: {
 		/**
@@ -8108,11 +8112,11 @@ type RootTranslation = {
 	}
 	StablesatsModal: {
 		/**
-		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s
+		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​p​o​w​e​r​e​d​ ​b​y​ ​S​t​a​b​l​e​s​a​t​s
 		 */
 		header: string
 		/**
-		 * T​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​u​s​e​s​ ​S​t​a​b​l​e​s​a​t​s​ ​t​e​c​h​n​o​l​o​g​y​ ​t​o​ ​h​o​l​d​ ​B​i​t​c​o​i​n​ ​s​t​a​b​l​e​ ​t​o​ ​U​S​D​ ​p​r​i​c​e​.​ ​Y​o​u​'​r​e​ ​a​l​w​a​y​s​ ​h​o​l​d​i​n​g​ ​B​i​t​c​o​i​n​ ​—​ ​n​o​t​ ​a​c​t​u​a​l​ ​d​o​l​l​a​r​s​ ​—​ ​b​u​t​ ​t​h​e​ ​U​S​D​ ​v​a​l​u​e​ ​d​o​e​s​n​'​t​ ​f​l​u​c​t​u​a​t​e​.​ ​Y​o​u​ ​c​a​n​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​a​s​ ​u​s​u​a​l​,​ ​b​u​t​ ​t​h​i​s​ ​i​s​ ​n​o​t​ ​c​o​m​p​a​t​i​b​l​e​ ​w​i​t​h​ ​t​h​e​ ​t​r​a​d​i​t​i​o​n​a​l​ ​b​a​n​k​i​n​g​ ​s​y​s​t​e​m​.
+		 * I​n​ ​C​u​s​t​o​d​i​a​l​ ​M​o​d​e​,​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​u​s​e​s​ ​S​t​a​b​l​e​s​a​t​s​ ​t​e​c​h​n​o​l​o​g​y​ ​—​ ​y​o​u​ ​h​o​l​d​ ​B​i​t​c​o​i​n​,​ ​n​o​t​ ​a​c​t​u​a​l​ ​U​S​D​,​ ​b​u​t​ ​t​h​e​ ​v​a​l​u​e​ ​i​s​ ​d​e​s​i​g​n​e​d​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​t​h​e​ ​s​a​m​e​ ​a​m​o​u​n​t​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.​ ​Y​o​u​ ​c​a​n​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​a​s​ ​u​s​u​a​l​.
 		 */
 		body: string
 		/**
@@ -8120,15 +8124,15 @@ type RootTranslation = {
 		 */
 		termsAndConditions: string
 		/**
-		 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​S​t​a​b​l​e​s​a​t​s
+		 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
 		 */
 		learnMore: string
 		/**
-		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​h​o​l​d​s​ ​s​t​a​b​l​e​c​o​i​n​s
+		 * A​b​o​u​t​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
 		 */
 		headerSelfCustodial: string
 		/**
-		 * I​n​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​y​o​u​ ​h​o​l​d​ ​s​t​a​b​l​e​c​o​i​n​s​.​ ​T​o​k​e​n​s​ ​b​a​c​k​e​d​ ​b​y​ ​a​s​s​e​t​s​ ​w​i​t​h​ ​v​a​l​u​e​ ​h​e​l​d​ ​s​t​a​b​l​e​ ​t​o​ ​t​h​e​ ​U​S​D​.​ ​Y​o​u​ ​c​a​n​'​t​ ​s​e​n​d​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​s​t​a​b​l​e​c​o​i​n​s​ ​(​y​e​t​)​.​ ​W​h​e​n​ ​y​o​u​ ​s​e​n​d​ ​f​r​o​m​ ​t​h​e​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​,​ ​y​o​u​ ​w​i​l​l​ ​s​w​a​p​ ​y​o​u​r​ ​s​t​a​b​l​e​c​o​i​n​s​ ​a​n​d​ ​s​e​n​d​ ​a​s​ ​B​i​t​c​o​i​n​ ​t​o​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t​.
+		 * I​n​ ​N​o​n​-​C​u​s​t​o​d​i​a​l​ ​M​o​d​e​,​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​u​s​e​s​ ​s​u​p​p​o​r​t​e​d​ ​s​t​a​b​l​e​c​o​i​n​s​,​ ​d​e​s​i​g​n​e​d​ ​t​o​ ​m​a​i​n​t​a​i​n​ ​t​h​e​ ​s​a​m​e​ ​v​a​l​u​e​ ​i​n​ ​U​S​D​ ​t​e​r​m​s​.
 		 */
 		bodySelfCustodial: string
 		/**
@@ -8138,29 +8142,23 @@ type RootTranslation = {
 	}
 	StablesatsRestriction: {
 		/**
-		 * S​t​a​b​l​e​s​a​t​s​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
-		 */
-		modalTitle: string
-		/**
-		 * T​o​ ​g​e​t​ ​a​c​c​e​s​s​ ​t​o​ ​a​ ​d​o​l​l​a​r​ ​a​c​c​o​u​n​t​,​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
-		 */
-		modalBody: string
-		/**
-		 * C​r​e​a​t​e​ ​n​e​w
-		 */
-		createNew: string
-		/**
 		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		walletLabel: string
 	}
+	DollarBalanceRestriction: {
+		/**
+		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 */
+		modalTitle: string
+	}
 	ConvertDollarToBitcoinModal: {
 		/**
-		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
+		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
 		 */
 		title: string
 		/**
-		 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n
+		 * T​r​a​n​s​f​e​r​ ​f​r​o​m​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​t​o​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e
 		 */
 		body: string
 		/**
@@ -8171,10 +8169,6 @@ type RootTranslation = {
 		 * Y​o​u​ ​g​e​t
 		 */
 		youGet: string
-		/**
-		 * A​p​p​r​o​v​e
-		 */
-		approve: string
 	}
 	SplashScreen: {
 		/**
@@ -8252,11 +8246,11 @@ type RootTranslation = {
 		 */
 		sending: string
 		/**
-		 * R​e​c​e​i​v​i​n​g​ ​A​c​c​o​u​n​t
+		 * R​e​c​e​i​v​i​n​g​ ​B​a​l​a​n​c​e
 		 */
 		receivingAccount: string
 		/**
-		 * S​e​n​d​i​n​g​ ​A​c​c​o​u​n​t
+		 * S​e​n​d​i​n​g​ ​B​a​l​a​n​c​e
 		 */
 		sendingAccount: string
 		/**
@@ -8295,7 +8289,7 @@ type RootTranslation = {
 		 */
 		remaining: string
 		/**
-		 * D​o​l​l​a​r​ ​a​c​c​o​u​n​t​ ​t​r​a​n​s​f​e​r​s
+		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​t​r​a​n​s​f​e​r​s
 		 */
 		stablesatTransfers: string
 		/**
@@ -8839,6 +8833,14 @@ type RootTranslation = {
 	}
 	common: {
 		/**
+		 * C​o​u​n​t​r​y
+		 */
+		country: string
+		/**
+		 * U​n​k​n​o​w​n
+		 */
+		unknown: string
+		/**
 		 * E​n​a​b​l​e​d
 		 */
 		enabled: string
@@ -8957,7 +8959,7 @@ type RootTranslation = {
 		 */
 		bitcoinPrice: string
 		/**
-		 * B​i​t​c​o​i​n​ ​A​c​c​o​u​n​t
+		 * B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e
 		 */
 		btcAccount: string
 		/**
@@ -9245,7 +9247,7 @@ type RootTranslation = {
 		 */
 		type: string
 		/**
-		 * D​o​l​l​a​r​ ​A​c​c​o​u​n​t
+		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e
 		 */
 		usdAccount: string
 		/**
@@ -11872,6 +11874,16 @@ type RootTranslation = {
 		 */
 		createFailed: string
 	}
+	UnsupportedRegionScreen: {
+		/**
+		 * U​n​s​u​p​p​o​r​t​e​d​ ​r​e​g​i​o​n
+		 */
+		title: string
+		/**
+		 * U​n​f​o​r​t​u​n​a​t​e​l​y​ ​w​e​ ​c​a​n​ ​n​o​t​ ​s​e​r​v​e​ ​u​s​e​r​s​ ​f​r​o​m​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​r​e​g​i​o​n​.
+		 */
+		description: string
+	}
 	RestoreScreen: {
 		/**
 		 * R​e​s​t​o​r​e​ ​w​a​l​l​e​t
@@ -12015,6 +12027,13 @@ type RootTranslation = {
 		 * T​h​e​ ​p​a​y​m​e​n​t​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​c​o​m​p​l​e​t​e​d​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​,​ ​o​r​ ​u​s​e​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
 		 */
 		generic: string
+	}
+	SelfCustodialNetworkMismatch: {
+		/**
+		 * T​h​i​s​ ​a​c​c​o​u​n​t​ ​w​a​s​ ​c​r​e​a​t​e​d​ ​o​n​ ​{​n​e​t​w​o​r​k​}​.​ ​S​w​i​t​c​h​ ​t​o​ ​{​n​e​t​w​o​r​k​}​ ​t​o​ ​u​s​e​ ​i​t​.
+		 * @param {string} network
+		 */
+		toast: RequiredParams<'network' | 'network'>
 	}
 	UnclaimedDeposit: {
 		/**
@@ -12219,12 +12238,12 @@ type RootTranslation = {
 			cancel: string
 		}
 		/**
-		 * M​i​n​i​m​u​m​ ​c​o​n​v​e​r​s​i​o​n​:​ ​{​a​m​o​u​n​t​}
+		 * M​i​n​i​m​u​m​ ​t​r​a​n​s​f​e​r​:​ ​{​a​m​o​u​n​t​}
 		 * @param {string} amount
 		 */
 		minimumConversion: RequiredParams<'amount'>
 		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 * T​r​a​n​s​f​e​r​s​ ​a​r​e​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
 		 */
 		conversionUnavailable: string
 	}
@@ -12461,7 +12480,7 @@ export type TranslationFunctions = {
 	}
 	SetAccountModal: {
 		/**
-		 * Set up your receive account
+		 * Set up your default Balance
 		 */
 		title: () => LocalizedString
 		/**
@@ -12469,11 +12488,11 @@ export type TranslationFunctions = {
 		 */
 		description: () => LocalizedString
 		/**
-		 * Dollar account — powered by Stablesats
+		 * Dollar Balance — powered by Stablesats
 		 */
 		stablesatsTag: () => LocalizedString
 		/**
-		 * Bitcoin account for maximalists
+		 * Bitcoin Balance for stacking sats
 		 */
 		bitcoinTag: () => LocalizedString
 	}
@@ -12585,7 +12604,7 @@ export type TranslationFunctions = {
 		 */
 		youreConverting: () => LocalizedString
 		/**
-		 * Receiving account
+		 * Receiving Balance
 		 */
 		receivingAccount: () => LocalizedString
 		/**
@@ -12601,11 +12620,11 @@ export type TranslationFunctions = {
 		 */
 		transferButtonText: (arg: { fromWallet: unknown, toWallet: unknown }) => LocalizedString
 		/**
-		 * Conversion fee
+		 * Transfer fee
 		 */
 		feeLabel: () => LocalizedString
 		/**
-		 * Couldn't fetch the conversion fee
+		 * Couldn't fetch the transfer fee
 		 */
 		feeError: () => LocalizedString
 	}
@@ -18865,7 +18884,7 @@ export type TranslationFunctions = {
 		 */
 		useLightning: () => LocalizedString
 		/**
-		 * My Accounts
+		 * Balances
 		 */
 		myAccounts: () => LocalizedString
 		/**
@@ -19001,7 +19020,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Receive to Dollar account
+		 * Receive to Dollar Balance
 		 */
 		usdTitle: () => LocalizedString
 		/**
@@ -19181,7 +19200,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Redeem to Dollar account
+		 * Redeem to Dollar Balance
 		 */
 		usdTitle: () => LocalizedString
 		/**
@@ -19853,7 +19872,7 @@ export type TranslationFunctions = {
 		 */
 		copyClipboardLnurl: () => LocalizedString
 		/**
-		 * Default Account
+		 * Default receive
 		 */
 		defaultWallet: () => LocalizedString
 		/**
@@ -20093,7 +20112,7 @@ export type TranslationFunctions = {
 		 */
 		logoutAlertContentPhoneEmail: (arg: { email: string, phoneNumber: string }) => LocalizedString
 		/**
-		 * You have a Dollar account balance of {balance}.
+		 * You have a Dollar balance of {balance}.
 		 */
 		usdBalanceWarning: (arg: { balance: string }) => LocalizedString
 		/**
@@ -20309,21 +20328,25 @@ export type TranslationFunctions = {
 	}
 	DefaultWalletScreen: {
 		/**
-		 * Default receive account
+		 * Default receive
 		 */
 		title: () => LocalizedString
 		/**
-		 * Default account
+		 * Default receive
 		 */
 		titleSelfCustodial: () => LocalizedString
 		/**
-		 * Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change.
+		 * Your Bitcoin Balance is for stacking sats, where the value moves with the market.
 		 */
-		info: () => LocalizedString
+		infoBtc: () => LocalizedString
 		/**
-		 * This account will be used by default when receiving and sending. You can switch any time.
+		 * Your Dollar Balance is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the USD value doesn't change.
 		 */
-		infoSelfCustodial: () => LocalizedString
+		infoUsd: () => LocalizedString
+		/**
+		 * Dollar receive is not available as a default receive option for non-custodial accounts.
+		 */
+		infoUsdSelfCustodial: () => LocalizedString
 	}
 	ThemeScreen: {
 		/**
@@ -20363,11 +20386,11 @@ export type TranslationFunctions = {
 	}
 	StablesatsModal: {
 		/**
-		 * Your Dollar account is powered by Stablesats
+		 * Your Dollar Balance is powered by Stablesats
 		 */
 		header: () => LocalizedString
 		/**
-		 * The Dollar account uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.
+		 * In Custodial Mode, your Dollar Balance uses Stablesats technology — you hold Bitcoin, not actual USD, but the value is designed to maintain the same amount in USD terms. You can send and receive Bitcoin as usual.
 		 */
 		body: () => LocalizedString
 		/**
@@ -20375,15 +20398,15 @@ export type TranslationFunctions = {
 		 */
 		termsAndConditions: () => LocalizedString
 		/**
-		 * Learn more about Stablesats
+		 * Learn more about Dollar Balance
 		 */
 		learnMore: () => LocalizedString
 		/**
-		 * Your Dollar account holds stablecoins
+		 * About your Dollar Balance
 		 */
 		headerSelfCustodial: () => LocalizedString
 		/**
-		 * In the Dollar account you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from the Dollar account, you will swap your stablecoins and send as Bitcoin to the recipient.
+		 * In Non-Custodial Mode, your Dollar Balance uses supported stablecoins, designed to maintain the same value in USD terms.
 		 */
 		bodySelfCustodial: () => LocalizedString
 		/**
@@ -20393,29 +20416,23 @@ export type TranslationFunctions = {
 	}
 	StablesatsRestriction: {
 		/**
-		 * Stablesats is not available in your region
-		 */
-		modalTitle: () => LocalizedString
-		/**
-		 * To get access to a dollar account, create a non-custodial account.
-		 */
-		modalBody: () => LocalizedString
-		/**
-		 * Create new
-		 */
-		createNew: () => LocalizedString
-		/**
 		 * not available in your region
 		 */
 		walletLabel: () => LocalizedString
 	}
+	DollarBalanceRestriction: {
+		/**
+		 * Dollar Balance is not available in your region
+		 */
+		modalTitle: () => LocalizedString
+	}
 	ConvertDollarToBitcoinModal: {
 		/**
-		 * Dollar account is no longer available in your region
+		 * Dollar Balance is not available in your region
 		 */
 		title: () => LocalizedString
 		/**
-		 * Transfer your Dollar balance to Bitcoin
+		 * Transfer from Dollar Balance to Bitcoin Balance
 		 */
 		body: () => LocalizedString
 		/**
@@ -20426,10 +20443,6 @@ export type TranslationFunctions = {
 		 * You get
 		 */
 		youGet: () => LocalizedString
-		/**
-		 * Approve
-		 */
-		approve: () => LocalizedString
 	}
 	SplashScreen: {
 		/**
@@ -20503,11 +20516,11 @@ export type TranslationFunctions = {
 		 */
 		sending: () => LocalizedString
 		/**
-		 * Receiving Account
+		 * Receiving Balance
 		 */
 		receivingAccount: () => LocalizedString
 		/**
-		 * Sending Account
+		 * Sending Balance
 		 */
 		sendingAccount: () => LocalizedString
 		/**
@@ -20545,7 +20558,7 @@ export type TranslationFunctions = {
 		 */
 		remaining: () => LocalizedString
 		/**
-		 * Dollar account transfers
+		 * Dollar Balance transfers
 		 */
 		stablesatTransfers: () => LocalizedString
 		/**
@@ -21075,6 +21088,14 @@ export type TranslationFunctions = {
 	}
 	common: {
 		/**
+		 * Country
+		 */
+		country: () => LocalizedString
+		/**
+		 * Unknown
+		 */
+		unknown: () => LocalizedString
+		/**
 		 * Enabled
 		 */
 		enabled: () => LocalizedString
@@ -21191,7 +21212,7 @@ export type TranslationFunctions = {
 		 */
 		bitcoinPrice: () => LocalizedString
 		/**
-		 * Bitcoin Account
+		 * Bitcoin Balance
 		 */
 		btcAccount: () => LocalizedString
 		/**
@@ -21479,7 +21500,7 @@ export type TranslationFunctions = {
 		 */
 		type: () => LocalizedString
 		/**
-		 * Dollar Account
+		 * Dollar Balance
 		 */
 		usdAccount: () => LocalizedString
 		/**
@@ -24061,6 +24082,16 @@ export type TranslationFunctions = {
 		 */
 		createFailed: () => LocalizedString
 	}
+	UnsupportedRegionScreen: {
+		/**
+		 * Unsupported region
+		 */
+		title: () => LocalizedString
+		/**
+		 * Unfortunately we can not serve users from your current region.
+		 */
+		description: () => LocalizedString
+	}
 	RestoreScreen: {
 		/**
 		 * Restore wallet
@@ -24204,6 +24235,12 @@ export type TranslationFunctions = {
 		 * The payment could not be completed. Try again in a moment, or use a smaller amount.
 		 */
 		generic: () => LocalizedString
+	}
+	SelfCustodialNetworkMismatch: {
+		/**
+		 * This account was created on {network}. Switch to {network} to use it.
+		 */
+		toast: (arg: { network: string }) => LocalizedString
 	}
 	UnclaimedDeposit: {
 		/**
@@ -24395,11 +24432,11 @@ export type TranslationFunctions = {
 			cancel: () => LocalizedString
 		}
 		/**
-		 * Minimum conversion: {amount}
+		 * Minimum transfer: {amount}
 		 */
 		minimumConversion: (arg: { amount: string }) => LocalizedString
 		/**
-		 * Conversion is temporarily unavailable. Please try again.
+		 * Transfers are temporarily unavailable. Please try again.
 		 */
 		conversionUnavailable: () => LocalizedString
 	}

@@ -1,3 +1,4 @@
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { renderHook, act } from "@testing-library/react-native"
 
 import {
@@ -28,6 +29,10 @@ jest.mock("@app/utils/mnemonic", () => ({
 
 jest.mock("react-native-quick-crypto", () => ({
   randomUUID: () => "test-account-id-123",
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockSparkNetwork.Regtest,
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
@@ -106,7 +111,11 @@ describe("useRestoreWallet", () => {
       await result.current.restore("word1 word2 word3")
     })
 
-    expect(mockRestore).toHaveBeenCalledWith(TEST_ACCOUNT_ID, "word1 word2 word3")
+    expect(mockRestore).toHaveBeenCalledWith(
+      TEST_ACCOUNT_ID,
+      "word1 word2 word3",
+      mockSparkNetwork.Regtest,
+    )
     expect(mockReloadSelfCustodialAccounts).toHaveBeenCalledTimes(1)
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)

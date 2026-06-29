@@ -1,9 +1,11 @@
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { renderHook, act, waitFor } from "@testing-library/react-native"
 
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { useSdkLifecycle } from "@app/self-custodial/hooks/use-sdk-lifecycle"
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
+  Network: { Mainnet: 0, Regtest: 1 },
   // eslint-disable-next-line camelcase
   SdkEvent_Tags: {
     Synced: "Synced",
@@ -14,6 +16,10 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     PaymentFailed: "PaymentFailed",
     Optimization: "Optimization",
   },
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockSparkNetwork.Regtest,
 }))
 
 const mockGetMnemonicForAccount = jest.fn()
@@ -40,7 +46,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
 
 const mockValidateStoredNetwork = jest.fn()
 jest.mock("@app/self-custodial/providers/validate-network", () => ({
-  validateStoredNetwork: (id: string) => mockValidateStoredNetwork(id),
+  validateStoredNetwork: (...args: unknown[]) => mockValidateStoredNetwork(...args),
 }))
 
 const mockGetSnapshot = jest.fn()
@@ -178,8 +184,15 @@ describe("useSdkLifecycle", () => {
       })
 
       expect(mockGetMnemonicForAccount).toHaveBeenCalledWith("acct-1")
-      expect(mockValidateStoredNetwork).toHaveBeenCalledWith("acct-1")
-      expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3", "/tmp/acct-1")
+      expect(mockValidateStoredNetwork).toHaveBeenCalledWith(
+        "acct-1",
+        mockSparkNetwork.Regtest,
+      )
+      expect(mockInitSdk).toHaveBeenCalledWith(
+        "word1 word2 word3",
+        "/tmp/acct-1",
+        mockSparkNetwork.Regtest,
+      )
       expect(result.current.connectedAccountId).toBe("acct-1")
 
       await waitFor(() => {
@@ -239,7 +252,11 @@ describe("useSdkLifecycle", () => {
       )
 
       await waitFor(() => {
-        expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3", "/tmp/acct-A")
+        expect(mockInitSdk).toHaveBeenCalledWith(
+          "word1 word2 word3",
+          "/tmp/acct-A",
+          mockSparkNetwork.Regtest,
+        )
       })
 
       rerender({ accountId: "acct-B" })
@@ -248,7 +265,11 @@ describe("useSdkLifecycle", () => {
         expect(mockDisconnectSdk).toHaveBeenCalledWith(sdkA)
       })
       await waitFor(() => {
-        expect(mockInitSdk).toHaveBeenCalledWith("word1 word2 word3", "/tmp/acct-B")
+        expect(mockInitSdk).toHaveBeenCalledWith(
+          "word1 word2 word3",
+          "/tmp/acct-B",
+          mockSparkNetwork.Regtest,
+        )
       })
 
       expect(mockDisconnectSdk.mock.invocationCallOrder[0]).toBeLessThan(

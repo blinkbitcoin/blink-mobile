@@ -72,8 +72,8 @@
     "infoBitcoin": "Kiasi cha Bitcoin ni takriban tu. Kinaweza kubadilika kwa kiasi kidogo.",
     "infoDollar": "Kiasi cha Dola ni takriban tu. Kinaweza kubadilika kwa kiasi kidogo.",
     "transferButtonText": "Hamisha {fromWallet} kwenda {toWallet}",
-    "feeLabel": "Ada ya ubadilishaji",
-    "feeError": "Imeshindikana kupata ada ya ubadilishaji"
+    "feeLabel": "Ada ya uhamishaji",
+    "feeError": "Imeshindikana kupata ada ya uhamishaji"
   },
   "ConversionSuccessScreen": {
     "message": "Ubadilishaji umekamilika"
@@ -2081,7 +2081,7 @@
     "scan": "Skeni",
     "updateAvailable": "Sasisho lipo.\nGusa ili kusasisha sasa",
     "useLightning": "Tunatumia mtandao wa Lighting.",
-    "myAccounts": "Akaunti Zangu",
+    "myAccounts": "Salio",
     "walletCountNotTwo": "Idadi ya mifuko haitoshi. Tafadhali tumia kiolesura ili kuona mifuko yote na fedha za akaunti hii"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Haikuweza kupeleka malipo kwenye csv. Kitu kilienda mrama. Ikiwa tatizo hili litaendelea tafadhali wasiliana na usaidizi. ",
     "lnurlNoUsername": "Ukitaka kuunda anwani ya lnurl, lazima kwanza uandikishe jina la mtumiaji. Unataka kuandikisha jina la mtumiaji saa hii?",
     "copyClipboardLnurl": "Anwani ya lnurl imenakiliwa kwenye ubao wa kunakili",
-    "defaultWallet": "Akaunti ya Msingi",
+    "defaultWallet": "Pokea chaguo-msingi",
     "rateUs": "Tupie ukadiriaji kwenye {storeName: string}",
     "theme": "Mandhari",
     "nfc": "Pokea kutoka NFC",
@@ -2457,17 +2457,16 @@
     "removedAccount": "Umeondoa akaunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats haipatikani katika eneo lako",
-    "modalBody": "Ili kufikia akaunti ya dola, unda akaunti isiyo ya ulinzi.",
-    "createNew": "Unda mpya",
     "walletLabel": "haipatikani katika eneo lako"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Salio la dola haipatikani katika eneo lako"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Akaunti ya Dola haipatikani tena katika eneo lako",
-    "body": "Hamisha salio lako la Dola kuwa Bitcoin",
+    "title": "Salio la dola haipatikani katika eneo lako",
+    "body": "Hamisha kutoka Salio la Dola hadi Salio la Bitcoin",
     "youHave": "Una",
-    "youGet": "Unapata",
-    "approve": "Idhinisha"
+    "youGet": "Unapata"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "uthibitishaji wa hatua mbili",
@@ -2488,10 +2487,11 @@
     "toastMessage": "Siri imeakiliwa kwenye ubao wa kunakili!"
   },
   "DefaultWalletScreen": {
-    "title": "Akaunti ya kupokea chaguo-msingi",
-    "info": "Akaunti ya Bitcoin yako ni ya kukusanya sats, ambapo thamani ya USD inasogea na soko. Akaunti ya Dola yako inaendeshwa na Stablesats — inashikilia Bitcoin iliyolindwa ili ibaki thabiti kwa thamani ya USD. Daima unashikilia Bitcoin, lakini thamani ya dola haibadiliki.",
-    "titleSelfCustodial": "Akaunti chaguomsingi",
-    "infoSelfCustodial": "Akaunti hii itatumika kwa chaguomsingi wakati wa kupokea na kutuma. Unaweza kubadilisha wakati wowote."
+    "title": "Pokea chaguo-msingi",
+    "titleSelfCustodial": "Pokea chaguo-msingi",
+    "infoBtc": "Akaunti ya Bitcoin yako ni ya kukusanya sats, ambapo thamani ya USD inasogea na soko.",
+    "infoUsd": "Akaunti ya Dola yako inaendeshwa na Stablesats — inashikilia Bitcoin iliyolindwa ili ibaki thabiti kwa thamani ya USD. Daima unashikilia Bitcoin, lakini thamani ya dola haibadiliki.",
+    "infoUsdSelfCustodial": "Kupokea Dola hakupatikani kama chaguo la kupokea la chaguo-msingi kwa akaunti zisizo za ulinzi."
   },
   "ThemeScreen": {
     "title": "Mandhari",
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Akaunti ya Dola yako inaendeshwa na Stablesats",
-    "body": "Akaunti ya Dola inatumia teknolojia ya Stablesats kushikilia Bitcoin thabiti kwa bei ya USD. Daima unashikilia Bitcoin — si dola halisi — lakini thamani ya USD haisumbui. Unaweza kutuma na kupokea Bitcoin kama kawaida, lakini haiendani na mfumo wa benki wa jadi.",
+    "body": "Katika Hali ya Uangalizi, Akaunti yako ya Dola hutumia teknolojia ya Stablesats — unashikilia Bitcoin, si USD halisi, lakini thamani imeundwa kudumisha kiasi sawa kwa kipimo cha USD. Unaweza kutuma na kupokea Bitcoin kama kawaida.",
     "termsAndConditions": "Soma Sheria na Masharti",
-    "learnMore": "Soma zaidi kuhusu Stablesats",
-    "headerSelfCustodial": "Akaunti yako ya Dola inashika stablecoins",
-    "bodySelfCustodial": "Katika akaunti ya Dola unashika stablecoins. Tokeni zinazoungwa mkono na rasilimali zenye thamani inayodumishwa imara dhidi ya USD. Bado huwezi kutuma na kupokea stablecoins. Unapotuma kutoka kwenye akaunti ya Dola, stablecoins zako zitabadilishwa na kutumwa kama Bitcoin kwa mpokeaji.",
+    "learnMore": "Jifunze zaidi kuhusu Akaunti ya Dola",
+    "headerSelfCustodial": "Kuhusu Akaunti yako ya Dola",
+    "bodySelfCustodial": "Katika Hali Isiyo ya Uangalizi, Akaunti yako ya Dola hutumia stablecoins zinazoungwa mkono, zilizoundwa kudumisha thamani sawa kwa kipimo cha USD.",
     "learnMoreSelfCustodial": "Jifunze zaidi"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "Barua pepe {email: string} imethibitishwa kwa mafanikio"
   },
   "common": {
+    "country": "Nchi",
+    "unknown": "Haijulikani",
     "enabled": "Imewashwa",
     "switch": "Swichi",
     "notifications": "Arifa",
@@ -3569,6 +3571,10 @@
     "createFailed": "Imeshindwa kuunda mkoba. Tafadhali jaribu tena.",
     "selfCustodialDisabled": "Isiyo na ulinzi haipatikani kwa muda."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Eneo lisilotumika",
+    "description": "Kwa bahati mbaya hatuwezi kuhudumia watumiaji kutoka eneo lako la sasa."
+  },
   "RestoreScreen": {
     "title": "Rejesha mkoba",
     "description": "Rejesha mkoba wako kutoka kwa nakala",
@@ -3621,8 +3627,8 @@
       "deactivateConfirm": "Zima",
       "cancel": "Futa"
     },
-    "minimumConversion": "Ubadilishaji mdogo zaidi: {amount:string}",
-    "conversionUnavailable": "Ubadilishaji haupatikani kwa muda. Tafadhali jaribu tena."
+    "minimumConversion": "Uhamishaji mdogo zaidi: {amount:string}",
+    "conversionUnavailable": "Uhamishaji haupatikani kwa muda. Tafadhali jaribu tena."
   },
   "BackendFeatureGate": {
     "title": "Kipengele hakipatikani",
@@ -3665,6 +3671,9 @@
     "networkError": "Tatizo la muunganisho wa mtandao. Angalia muunganisho wako na ujaribu tena.",
     "invalidInput": "Maelezo ya malipo yanaonekana batili. Tafadhali kagua na ujaribu tena.",
     "generic": "Malipo hayakuweza kukamilika. Jaribu tena baada ya muda mfupi, au tumia kiasi kidogo."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Akaunti hii iliundwa kwenye {network}. Badilisha hadi {network} ili kuitumia."
   },
   "UnclaimedDeposit": {
     "title": "Una amana {count} ambazo hazijaombwa",

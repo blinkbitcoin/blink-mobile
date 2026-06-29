@@ -6,7 +6,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import {
   type CreatePaymentDetailParams,
-  DestinationDirection,
+  isSendDestination,
   type ParseDestinationResult,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { toBtcMoneyAmount } from "@app/types/amounts"
@@ -115,8 +115,7 @@ export const wrapDestination = (
   sdk: BreezSdkInterface,
   options: WrapOptions = {},
 ): ParseDestinationResult => {
-  if (!result.valid) return result
-  if (result.destinationDirection !== DestinationDirection.Send) return result
+  if (!isSendDestination(result)) return result
 
   const original = result.validDestination
 

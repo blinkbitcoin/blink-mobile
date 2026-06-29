@@ -1,4 +1,7 @@
-import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  type BreezSdkInterface,
+  type Network,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import { type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
@@ -34,13 +37,14 @@ const toProbeFailed = (err: unknown): ProbeAccountWalletsResult => ({
  */
 export const probeSelfCustodialAccountWallets = async (
   accountId: string,
+  network: Network,
 ): Promise<ProbeAccountWalletsResult> => {
   const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
   if (!mnemonic) return { status: ProbeAccountWalletsStatus.NoMnemonic }
 
   let sdk: BreezSdkInterface | undefined
   try {
-    sdk = await initSdk(mnemonic, storageDirFor(accountId))
+    sdk = await initSdk(mnemonic, storageDirFor(accountId, network), network)
     const snapshot = await getSelfCustodialWalletSnapshot(sdk)
     return { status: ProbeAccountWalletsStatus.Ok, wallets: snapshot.wallets }
   } catch (err) {

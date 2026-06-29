@@ -28,6 +28,7 @@ export const parseDestination = async ({
   accountDefaultWalletQuery,
   inputSource,
   displayCurrency,
+  preferLnurlForInternalHandles,
 }: ParseDestinationParams): Promise<ParseDestinationResult> => {
   const parsedDestination = parsePaymentDestination({
     destination: rawInput,
@@ -35,6 +36,7 @@ export const parseDestination = async ({
     lnAddressDomains: lnurlDomains,
     inputSource,
     displayCurrency,
+    preferLnurlForInternalHandles,
   })
 
   switch (parsedDestination.paymentType) {

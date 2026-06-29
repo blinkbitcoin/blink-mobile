@@ -2,10 +2,10 @@ import { useEffect } from "react"
 
 import { CommonActions, useNavigation } from "@react-navigation/native"
 
-import { useStablesatsRestricted } from "./use-stablesats-restricted"
+import { useDollarBalanceRestricted } from "./use-dollar-balance-restricted"
 
-export const useStablesatsRestrictionGuard = (): boolean => {
-  const isRestricted = useStablesatsRestricted()
+export const useDollarBalanceRestrictionGuard = (): boolean => {
+  const isRestricted = useDollarBalanceRestricted()
   const navigation = useNavigation()
 
   useEffect(() => {

@@ -45,6 +45,15 @@ jest.mock("@app/hooks/use-account-type-options", () => ({
   useAccountTypeOptions: (mode: string) => mockUseAccountTypeOptions(mode),
 }))
 
+const mockIsCreationBlocked = jest.fn()
+const mockRegionLoading = jest.fn(() => false)
+jest.mock("@app/hooks/use-creation-block", () => ({
+  useCreationBlock: () => ({
+    isCreationBlocked: mockIsCreationBlocked,
+    loading: mockRegionLoading(),
+  }),
+}))
+
 const mockCardDefaultBg = "#1d1d1d"
 const mockCardSelectedBg = "#2B2B2B"
 const mockPrimary = "#fc5805"
@@ -105,6 +114,8 @@ jest.mock("@app/screens/phone-auth-screen", () => ({
 describe("AccountTypeSelectionScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsCreationBlocked.mockReturnValue(false)
+    mockRegionLoading.mockReturnValue(false)
     mockMode.mockReturnValue("create")
     mockUseAccountTypeOptions.mockReturnValue({
       options: ["selfCustodial", "custodial"],
@@ -152,6 +163,51 @@ describe("AccountTypeSelectionScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
       flow: "trial",
+    })
+  })
+
+  it("redirects to Unsupported region when the selected option is blocked in create mode", () => {
+    mockIsCreationBlocked.mockReturnValue(true)
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+
+    fireEvent.press(getByTestId("custodial-option"))
+    fireEvent.press(getByTestId("continue-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("unsupportedRegion")
+    expect(mockNavigate).not.toHaveBeenCalledWith("acceptTermsAndConditions", {
+      flow: "trial",
+    })
+  })
+
+  it("proceeds with the available option when only the other option is region-blocked", () => {
+    mockIsCreationBlocked.mockImplementation((option: string) => option === "custodial")
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+
+    fireEvent.press(getByTestId("self-custodial-option"))
+    fireEvent.press(getByTestId("continue-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+      flow: "selfCustodial",
+    })
+    expect(mockNavigate).not.toHaveBeenCalledWith("unsupportedRegion")
+  })
+
+  it("does not redirect to Unsupported region in restore mode", () => {
+    mockIsCreationBlocked.mockReturnValue(true)
+    mockMode.mockReturnValue("restore")
+
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+
+    fireEvent.press(getByTestId("custodial-option"))
+    fireEvent.press(getByTestId("continue-button"))
+
+    expect(mockNavigate).not.toHaveBeenCalledWith("unsupportedRegion")
+    expect(mockNavigate).toHaveBeenCalledWith("login", {
+      type: "Login",
+      title: undefined,
+      onboarding: undefined,
     })
   })
 

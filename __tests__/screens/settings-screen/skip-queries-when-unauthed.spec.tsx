@@ -25,8 +25,8 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: jest.fn() }),
 }))
 
-jest.mock("@app/hooks/use-stablesats-restricted", () => ({
-  useStablesatsRestricted: () => false,
+jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
+  useDollarBalanceRestricted: () => false,
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({

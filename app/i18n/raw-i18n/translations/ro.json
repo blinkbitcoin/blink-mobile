@@ -72,8 +72,8 @@
     "infoBitcoin": "Suma în Bitcoin este doar aproximativă. Poate varia cu o mică diferență.",
     "infoDollar": "Suma în dolari este doar aproximativă. Poate varia cu o mică diferență.",
     "transferButtonText": "Transferă {fromWallet} către {toWallet}",
-    "feeLabel": "Comision de conversie",
-    "feeError": "Nu s-a putut obține comisionul de conversie"
+    "feeLabel": "Comision de transfer",
+    "feeError": "Nu s-a putut obține comisionul de transfer"
   },
   "ConversionSuccessScreen": {
     "message": "Conversie reușită"
@@ -2081,7 +2081,7 @@
     "scan": "Scanare",
     "updateAvailable": "Este disponibilă o actualizare.\nAtingeți pentru actualizare",
     "useLightning": "Folosim Lightning Network.",
-    "myAccounts": "Conturile mele",
+    "myAccounts": "Solduri",
     "walletCountNotTwo": "Numărul portofelelor nu este 2. Vă rugăm să utilizați tabloul de bord pentru a vedea toate portofelele și fondurile acestui cont"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Nu se pot exporta tranzacții în CSV. Ceva nu a mers bine. Dacă problema persistă, vă rugăm să contactați asistența.",
     "lnurlNoUsername": "Pentru a genera o adresă lnurl trebuie mai întâi să setați un nume de utilizator. Doriți să setați un nume de utilizator acum?",
     "copyClipboardLnurl": "Adresa Lnurl a fost copiată în clipboard",
-    "defaultWallet": "Cont implicit - Default",
+    "defaultWallet": "Primire implicită",
     "rateUs": "Evaluați-ne pe {storeName: string}",
     "theme": "Temă",
     "nfc": "Primiți de la NFC",
@@ -2457,17 +2457,16 @@
     "removedAccount": "Ați eliminat contul {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats nu este disponibil în regiunea ta",
-    "modalBody": "Pentru a accesa un cont în dolari, creează un cont non-custodial.",
-    "createNew": "Crează cont nou",
     "walletLabel": "nu este disponibil în regiunea ta"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Contul în dolari nu mai este disponibil în regiunea ta",
-    "body": "Transferă soldul tău în dolari în Bitcoin",
+    "title": "Soldul în dolari nu este disponibil în regiunea ta",
+    "body": "Transferă din soldul în dolari în soldul în Bitcoin",
     "youHave": "Ai",
-    "youGet": "Primești",
-    "approve": "Aprobă"
+    "youGet": "Primești"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificare cu doi factori",
@@ -2488,10 +2487,11 @@
     "toastMessage": "Secret copiat în clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "Cont implicit de primire",
-    "info": "Cont Bitcoin-ul tău este pentru acumularea de sats, unde valoarea USD se mișcă cu piața. Cont Dolar-ul tău este alimentat de Stablesats — deține Bitcoin acoperit pentru a rămâne stabil în valoare USD. Mereu deții Bitcoin, dar valoarea în dolari nu se schimbă.",
-    "titleSelfCustodial": "Cont implicit",
-    "infoSelfCustodial": "Acest cont va fi folosit în mod implicit la primire și trimitere. Poți schimba oricând."
+    "title": "Primire implicită",
+    "titleSelfCustodial": "Primire implicită",
+    "infoBtc": "Cont Bitcoin-ul tău este pentru acumularea de sats, unde valoarea USD se mișcă cu piața.",
+    "infoUsd": "Cont Dolar-ul tău este alimentat de Stablesats — deține Bitcoin acoperit pentru a rămâne stabil în valoare USD. Mereu deții Bitcoin, dar valoarea în dolari nu se schimbă.",
+    "infoUsdSelfCustodial": "Primirea în dolari nu este disponibilă ca opțiune de primire implicită pentru conturile non-custodial."
   },
   "ThemeScreen": {
     "title": "Temă",
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Cont Dolar-ul tău este alimentat de Stablesats",
-    "body": "Cont Dolar folosește tehnologia Stablesats pentru a menține Bitcoin stabil la prețul USD. Mereu deții Bitcoin — nu dolari reali — dar valoarea USD nu fluctuează. Poți trimite și primi Bitcoin ca de obicei, dar nu este compatibil cu sistemul bancar tradițional.",
+    "body": "În Modul Custodial, Contul tău Dolar utilizează tehnologia Stablesats — deții Bitcoin, nu USD reali, dar valoarea este concepută pentru a menține aceeași sumă în termeni USD. Poți trimite și primi Bitcoin ca de obicei.",
     "termsAndConditions": "Citiți Termenii și condițiile",
-    "learnMore": "Aflați mai multe despre Stablesats",
-    "headerSelfCustodial": "Contul tău în Dolari deține stablecoins",
-    "bodySelfCustodial": "În contul în Dolari deții stablecoins. Tokenuri susținute de active a căror valoare este menținută stabilă față de USD. Nu poți încă trimite și primi stablecoins. Când trimiți din contul în Dolari, stablecoins-ul tău va fi schimbat și trimis ca Bitcoin către destinatar.",
+    "learnMore": "Află mai multe despre Contul Dolar",
+    "headerSelfCustodial": "Despre Contul tău Dolar",
+    "bodySelfCustodial": "În Modul Non-Custodial, Contul tău Dolar utilizează stablecoins compatibile, concepute pentru a menține aceeași valoare în termeni USD.",
     "learnMoreSelfCustodial": "Află mai multe"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "E-mail {email: string} confirmat cu succes"
   },
   "common": {
+    "country": "Țară",
+    "unknown": "Necunoscut",
     "enabled": "Activat",
     "switch": "Comutator",
     "notifications": "Notificări",
@@ -3569,6 +3571,10 @@
     "createFailed": "Crearea portofelului a eșuat. Vă rugăm să încercați din nou.",
     "selfCustodialDisabled": "Non-custodial este temporar indisponibil."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Regiune neacceptată",
+    "description": "Din păcate nu putem deservi utilizatorii din regiunea ta actuală."
+  },
   "RestoreScreen": {
     "title": "Restaurare portofel",
     "description": "Recuperați portofelul dintr-o copie de siguranță",
@@ -3621,8 +3627,8 @@
       "deactivateConfirm": "Dezactivează",
       "cancel": "Anulează"
     },
-    "minimumConversion": "Conversie minimă: {amount:string}",
-    "conversionUnavailable": "Conversia este temporar indisponibilă. Încearcă din nou."
+    "minimumConversion": "Transfer minim: {amount:string}",
+    "conversionUnavailable": "Transferurile sunt temporar indisponibile. Încearcă din nou."
   },
   "BackendFeatureGate": {
     "title": "Funcție indisponibilă",
@@ -3665,6 +3671,9 @@
     "networkError": "Problemă de conexiune la rețea. Verifică conexiunea și încearcă din nou.",
     "invalidInput": "Detaliile plății par invalide. Te rog verifică și încearcă din nou.",
     "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Acest cont a fost creat pe {network}. Comută la {network} pentru a-l folosi."
   },
   "UnclaimedDeposit": {
     "title": "Ai {count} depozit(e) nerevendicate",

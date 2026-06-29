@@ -28,10 +28,10 @@
     "text": "Az 'Elfogadom' gombra kattintva elfogadod a Felhasználási Feltételeinket. Azzal is egyetértesz, hogy nem egy tiltott ország lakosa vagy állampolgára vagy."
   },
   "SetAccountModal": {
-    "title": "Állítsd be a fogadó számládat",
+    "title": "Állítsd be az alapértelmezett egyenleged",
     "description": "Ezt később bármikor módosíthatod a Beállításokban",
-    "stablesatsTag": "Dollár Számla — Stablesats technológiával",
-    "bitcoinTag": "Bitcoin számla maximalistáknak"
+    "stablesatsTag": "Dollár Egyenleg — Stablesats technológiával",
+    "bitcoinTag": "Bitcoin Egyenleg a sats gyűjtéséhez"
   },
   "NoteInput": {
     "addNote": "Jegyzet hozzáadása"
@@ -68,12 +68,12 @@
   "ConversionConfirmationScreen": {
     "title": "Átváltás ellenörzése",
     "youreConverting": "Átváltasz",
-    "receivingAccount": "Fogadó számla",
+    "receivingAccount": "Fogadó egyenleg",
     "infoBitcoin": "A Bitcoin összeg csak hozzávetőleges. Kis mértékben változhat.",
     "infoDollar": "A dollár összeg csak hozzávetőleges. Kis mértékben változhat.",
     "transferButtonText": "Átutalás {fromWallet}-ból/ből {toWallet}-ba/be",
-    "feeLabel": "Átváltási díj",
-    "feeError": "Nem sikerült lekérni az átváltási díjat"
+    "feeLabel": "Átutalási díj",
+    "feeError": "Nem sikerült lekérni az átutalási díjat"
   },
   "ConversionSuccessScreen": {
     "message": "Sikeres átváltás"
@@ -2081,7 +2081,7 @@
     "scan": "Beolvasás",
     "updateAvailable": "Frissítés elérhető.\nKoppints a frissítéshez most",
     "useLightning": "Mi a Lightning Hálózatot használjuk.",
-    "myAccounts": "Számláim",
+    "myAccounts": "Egyenlegek",
     "walletCountNotTwo": "A tárca száma nem 2. Kérlek használd az irányítópultot az összes tárca és azok egyenlegeinek megtekintéséhez."
   },
   "PinScreen": {
@@ -2121,7 +2121,7 @@
     "setNote": "jegyzet beállítása",
     "tapQrCodeCopy": "QR kód másolása érintéssel",
     "title": "Bitcoin fogadása",
-    "usdTitle": "Fogadás Dollár Számla-ra",
+    "usdTitle": "Fogadás Dollár Egyenlegre",
     "error": "Számla létrehozása sikertelen. Kérjük, vedd fel a kapcsolatot az ügyfélszolgálattal, ha a probléma továbbra is fennáll.",
     "copyInvoice": "Másolás",
     "shareInvoice": "Megosztás",
@@ -2171,7 +2171,7 @@
     "walletNotConnected": "A pénztárcád még csatlakozik. Várj egy pillanatot, és próbáld újra.",
     "paymentPending": "Lehet, hogy a fizetésed még folyamatban van. Ellenőrizd az egyenlegedet, mielőtt újrapróbálkozol.",
     "title": "Bitcoin beváltása",
-    "usdTitle": "Beváltás Dollár Számla-ra",
+    "usdTitle": "Beváltás Dollár Egyenlegre",
     "error": "Nem sikerült fizetési kérelmet generálni. Kérjük, ha a probléma továbbra is fennáll, vedd fel a kapcsolatot az ügyfélszolgálattal.",
     "redeemingError": "Nem sikerült beváltani a Bitcoint. Kérjük, ha a probléma továbbra is fennáll, vedd fel a kapcsolatot az ügyfélszolgálattal.",
     "submissionError": "Nem sikerült benyújtani a kifizetési kérelmet. Kérjük, ha a probléma továbbra is fennáll, vedd fel a kapcsolatot az ügyfélszolgálattal.",
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Nem sikerült az tranzakciók CSV fájlba exportálása. Valami hiba történt. Ha a probléma továbbra is fennáll, kérjük, lépj kapcsolatba az ügyfélszolgálattal.",
     "lnurlNoUsername": "Az LNURL cím létrehozásához először be kell állítanod egy felhasználónevet. Szeretnél most beállítani egy felhasználónevet?",
     "copyClipboardLnurl": "LNURL cím a vágólapra másolva",
-    "defaultWallet": "Alapértelmezett számla",
+    "defaultWallet": "Alapért. fogadás",
     "rateUs": "Értékelj minket a {storeName: string} oldalon",
     "theme": "Téma",
     "nfc": "Fogadás NFC-ből",
@@ -2413,7 +2413,7 @@
     "logoutAlertContentPhone": "Újra meg kell adnod a telefonszámodat a bejelentkezéshez.\nA telefonszámod: {phoneNumber: string}, győződj meg róla, hogy hozzáférsz a bejelentkezéshez.",
     "logoutAlertContentEmail": "Újra meg kell adnod az email címedet a bejelentkezéshez.\nAz email címed: {email: string}, győződj meg róla, hogy hozzáférsz a bejelentkezéshez.",
     "logoutAlertContentPhoneEmail": "Újra meg kell adnod a telefonszámodat vagy az email címedet a bejelentkezéshez.\nA telefonszámod: {phoneNumber: string}, az email címed pedig: {email: string}, győződj meg róla, hogy hozzájuk férsz a bejelentkezéshez.",
-    "usdBalanceWarning": "Dollár Számla egyenleged: {balance: string}.",
+    "usdBalanceWarning": "Dollár egyenleged: {balance: string}.",
     "btcBalanceWarning": "Bitcoin egyenleged: {balance: string}.",
     "secureYourAccount": "Regisztrálj a fiókod biztonságossá tételéhez",
     "tapToAdd": "Koppints a hozzáadáshoz",
@@ -2457,17 +2457,16 @@
     "removedAccount": "Eltávolítottad a(z) {identifier: string} fiókot."
   },
   "StablesatsRestriction": {
-    "modalTitle": "A Stablesats nem érhető el a régiódban",
-    "modalBody": "A dollárszámlához való hozzáféréshez hozz létre egy nem letétkezelői fiókot.",
-    "createNew": "Új létrehozása",
     "walletLabel": "nem érhető el a régiódban"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "A dolláregyenleg nem érhető el a régiódban"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "A dollárszámla már nem érhető el a régiódban",
-    "body": "Utald át a dolláregyenleged Bitcoinra",
+    "title": "A dolláregyenleg nem érhető el a régiódban",
+    "body": "Utald át a dolláregyenlegről a Bitcoin-egyenlegre",
     "youHave": "Nálad van",
-    "youGet": "Kapsz",
-    "approve": "Jóváhagyás"
+    "youGet": "Kapsz"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Kétlépcsős azonosítás",
@@ -2488,10 +2487,11 @@
     "toastMessage": "Titok másolva a vágólapra!"
   },
   "DefaultWalletScreen": {
-    "title": "Alapértelmezett fogadási fiók",
-    "info": "A Bitcoin Számla-od sats gyűjtésére való, ahol az USD érték a piaccal mozog. A Dollár Számla-odat a Stablesats működteti — Bitcoint tart, amely fedezve van, hogy USD értékben stabil maradjon. Mindig Bitcoint tartasz, de a dollárérték nem változik.",
-    "titleSelfCustodial": "Alapértelmezett fiók",
-    "infoSelfCustodial": "Ezt a fiókot fogja használni alapértelmezetten fogadáskor és küldéskor. Bármikor válthat."
+    "title": "Alapért. fogadás",
+    "titleSelfCustodial": "Alapért. fogadás",
+    "infoBtc": "A Bitcoin Egyenleged sats gyűjtésére való, ahol az USD érték a piaccal mozog.",
+    "infoUsd": "A Dollár Egyenlegedet a Stablesats működteti — Bitcoint tart, amely fedezve van, hogy USD értékben stabil maradjon. Mindig Bitcoint tartasz, de a dollárérték nem változik.",
+    "infoUsdSelfCustodial": "A dollár fogadása nem érhető el alapértelmezett fogadási lehetőségként a non-custodial fiókoknál."
   },
   "ThemeScreen": {
     "title": "Téma",
@@ -2506,12 +2506,12 @@
     "DEFAULT": "Alapértelmezett"
   },
   "StablesatsModal": {
-    "header": "A Dollár Számla-odat a Stablesats működteti",
-    "body": "A Dollár Számla Stablesats technológiát használ a Bitcoin USD árhoz stabilizálásához. Mindig Bitcoint tartasz — nem valódi dollárt — de az USD érték nem ingadozik. Bitcoint küldhetsz és fogadhatsz a szokásos módon, de nem kompatibilis a hagyományos bankrendszerrel.",
+    "header": "A Dollár Egyenlegedet a Stablesats működteti",
+    "body": "Letétkezelői módban a Dollár Egyenleged Stablesats technológiát használ — Bitcoint tartasz, nem valódi USD, de az értéket úgy tervezték, hogy megőrizze ugyanazt az összeget USD-ben kifejezve. Bitcoint küldhetsz és fogadhatsz a szokásos módon.",
     "termsAndConditions": "Olvassa el az Általános Szerződési Feltételeket",
-    "learnMore": "Tudj meg többet a Stablesatsról",
-    "headerSelfCustodial": "A Dollár-számlád stablecoinokat tárol",
-    "bodySelfCustodial": "A Dollár-számlán stablecoinokat tartasz. Olyan tokenek, amelyeket eszközök fedezetnek, és értékük stabil marad a USD-hez képest. Stablecoinokat egyelőre nem küldhetsz és nem fogadhatsz. Amikor a Dollár-számláról küldesz, a stablecoinjaidat átváltjuk és Bitcoinként küldjük a címzettnek.",
+    "learnMore": "Tudj meg többet a Dollár Egyenlegről",
+    "headerSelfCustodial": "A Dollár Egyenlegedről",
+    "bodySelfCustodial": "Nem-letétkezelői módban a Dollár Egyenleged támogatott stablecoinokat használ, amelyeket úgy terveztek, hogy megőrizzék ugyanazt az értéket USD-ben kifejezve.",
     "learnMoreSelfCustodial": "Tudj meg többet"
   },
   "SplashScreen": {
@@ -2522,8 +2522,8 @@
     "received": "Fogadott",
     "spent": "Elköltött",
     "sending": "Küld",
-    "receivingAccount": "Fogadó számla",
-    "sendingAccount": "Küldő számla",
+    "receivingAccount": "Fogadó egyenleg",
+    "sendingAccount": "Küldő egyenleg",
     "txNotBroadcast": "Az Ön tranzakciója sorban áll. Meg fog jelenni a mempoolban {countdown: string}.",
     "momentarily": "pillanatokon belül"
   },
@@ -2534,7 +2534,7 @@
     "perWeek": "hetente",
     "unlimited": "Korlátlan",
     "remaining": "Hátralévő",
-    "stablesatTransfers": "Dollár Számla átutalások",
+    "stablesatTransfers": "Dollár Egyenleg átutalások",
     "internalSend": "Küldés {bankName: string} felhasználónak",
     "error": "Jelenleg nem lehet lekérdezni a limitet",
     "increaseLimits": "Növelje a limitet"
@@ -2699,6 +2699,8 @@
     "success": "Az {email: string} email cím sikeresen megerősítve"
   },
   "common": {
+    "country": "Ország",
+    "unknown": "Ismeretlen",
     "enabled": "Engedélyezve",
     "switch": "Kapcsoló",
     "notifications": "Értesítések",
@@ -2728,7 +2730,7 @@
     "beta": "béta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin Ár",
-    "btcAccount": "Bitcoin Számla",
+    "btcAccount": "Bitcoin Egyenleg",
     "cancel": "Mégse",
     "close": "Bezárás",
     "confirm": "Megerősítés",
@@ -2799,7 +2801,7 @@
     "transactionsError": "Hiba a tranzakciók betöltése közben",
     "tryAgain": "Próbáld újra",
     "type": "Típus",
-    "usdAccount": "Dollár Számla",
+    "usdAccount": "Dollár Egyenleg",
     "username": "Felhasználónév",
     "usernameRequired": "Felhasználónév szükséges",
     "backupAccount": "Biztonsági Mentése / Magasabb szintű fiókra váltás",
@@ -2862,7 +2864,7 @@
     }
   },
   "support": {
-    "contactUs": "Segítségre van szükséged? Írj nekünk.",
+    "contactUs": "Segítségre van szükséged? Írj nekünk!",
     "joinTheCommunity": "Csatlakozz a közösséghez",
     "whatsapp": "WhatsApp",
     "email": "Email",
@@ -3486,13 +3488,13 @@
       "manualBackup": "Kézi biztonsági mentés",
       "passwordManagerBackupSaved": "Biztonsági mentés elmentve a jelszókezelőbe",
       "passwordManagerBackupFailed": "Nem sikerült elmenteni a biztonsági mentést",
-      "passwordManagerUnavailable": "Ezen az eszközön nem érhető el jelszókezelő. Használja a Drive biztonsági mentését, vagy mentse el a 12 szavas kifejezését manuálisan."
+      "passwordManagerUnavailable": "Ezen az eszközön nem érhető el jelszókezelő. Használd a Drive biztonsági mentését, vagy mentsd el a 12 szavas kifejezésedet manuálisan."
     },
     "ManualBackup": {
       "Alerts": {
         "title": "Tartsd titokban a biztonsági mentési kifejezésed!",
-        "check1": "Megértem, hogy senki sem tudja visszaállítani a pénztárcámat, ha elveszítem ezt a kifejezést",
-        "check2": "Megértem, hogy ha valaki megszerzi ezt a kifejezést, ellophatja az összes pénzemet.",
+        "check1": "Megértettem, hogy senki sem tudja visszaállítani a pénztárcámat, ha elveszítem ezt a kifejezést",
+        "check2": "Megértettem, hogy ha valaki megszerzi ezt a kifejezést, ellophatja az összes pénzemet",
         "check3": "Senki nem kéri tőlem ezeket az információkat üzenetben vagy hívásban"
       },
       "Phrase": {
@@ -3504,7 +3506,7 @@
         "savedConfirm": "Elmentettem",
         "copy": "Másolás",
         "continueButton": "Tovább",
-        "testBackup": "Tesztelje a biztonsági másolatot"
+        "testBackup": "Teszteld a biztonsági mentést"
       },
       "Confirm": {
         "headerTitle": "Biztonsági mentés megerősítése",
@@ -3515,7 +3517,7 @@
         "incorrectWord": "Helytelen szó, kérlek ellenőrizd a sorrendet"
       },
       "Success": {
-        "title": "Üdvözöljük a nem letétkezelő Blinkben",
+        "title": "Üdvözlünk az önrendelkező Blinkben",
         "testSuccess": "A biztonsági mentési kifejezésed helyes"
       }
     },
@@ -3547,31 +3549,35 @@
     }
   },
   "AccountMigration": {
-    "moveToNonCustodial": "Áttérés non-custodial-ra",
-    "explainerTitle": "Mit jelent a non-custodial-ra való áttérés?",
-    "explainerStep1": "Létrehozol egy non-custodial fiókot a Spark protokollon, <link>tudj meg többet itt</link>",
-    "explainerStep2": "Átutaljuk az egyenlegedet az új non-custodial fiókodba, és a jelenlegi fiókod törlésre kerül",
+    "moveToNonCustodial": "Áttérés önrendelkezőre",
+    "explainerTitle": "Mit jelent az önrendelkező módra való áttérés?",
+    "explainerStep1": "Létrehozol egy önrendelkező fiókot a Spark protokollon, <link>tudj meg többet itt</link>",
+    "explainerStep2": "Átutaljuk az egyenlegedet az új önrendelkező fiókodba, és a jelenlegi fiókod törlésre kerül",
     "explainerStep3": "Használd tovább a Blinket a megszokott módon",
     "letsMove": "Rajta",
     "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik."
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Letéti",
-    "selfCustodialLabel": "Önletéti",
-    "custodialDescription": "Mi kezeljük a pénzeszközöket az Ön nevében",
-    "selfCustodialDescription": "Csak Ön férhet hozzá a pénzeszközökhöz",
+    "selfCustodialLabel": "Önrendelkező",
+    "custodialDescription": "Mi kezeljük a pénzeszközeidet a nevedben",
+    "selfCustodialDescription": "Csak te férhetsz hozzá a pénzeszközeidhez",
     "continueButton": "Folytatás",
-    "descriptionDefault": "Kérjük, válassza ki a kívánt Blink típust.",
-    "descriptionSelected": "Kérjük, válassza ki a fiók típusát.",
-    "chooseMethod": "Válasszon módszert",
+    "descriptionDefault": "Válaszd ki a kívánt Blink típust.",
+    "descriptionSelected": "Válaszd ki a fiók típusát.",
+    "chooseMethod": "Válassz módszert",
     "restoreComingSoonTitle": "Hamarosan elérhető",
     "restoreComingSoonDescription": "A visszaállítási funkció egy jövőbeli frissítésben lesz elérhető.",
     "createFailed": "Nem sikerült létrehozni a pénztárcát. Kérjük, próbáld újra.",
-    "selfCustodialDisabled": "A nem-letétkezelői mód átmenetileg nem érhető el."
+    "selfCustodialDisabled": "Az önrendelkező mód átmenetileg nem érhető el."
+  },
+  "UnsupportedRegionScreen": {
+    "title": "Nem támogatott régió",
+    "description": "Sajnos nem tudjuk kiszolgálni a jelenlegi régiódból érkező felhasználókat."
   },
   "RestoreScreen": {
     "title": "Tárca visszaállítása",
-    "description": "Állítsa vissza tárcáját biztonsági mentésből",
+    "description": "Állítsd vissza a tárcádat biztonsági mentésből",
     "phraseTitle": "Tárca visszaállítása",
     "phraseSubtitleStep1": "Add meg a biztonsági kifejezésed első 6 szavát",
     "phraseSubtitleStep2": "Add meg a biztonsági kifejezésed többi szavát",
@@ -3591,12 +3597,12 @@
     "pickBackupDescription": "Válassz egy biztonsági mentést a visszaállításhoz"
   },
   "BackupNudge": {
-    "title": "Az Ön pénzeszközei veszélyben vannak",
-    "description": "Biztosítsa tárcáját most. Csak egy percet vesz igénybe.",
+    "title": "Pénzeszközeid veszélyben vannak",
+    "description": "Biztosítsd a tárcádat most. Csak egy percet vesz igénybe.",
     "cta": "Tárca biztosítása",
-    "settingsWarning": "Készíts biztonsági mentést. Ha elveszíted ezt az eszközt, elveszíted a pénzedet.",
-    "modalTitle": "Biztosítsa pénzeszközeit",
-    "modalDescription": "Nyomatékosan javasoljuk, hogy készítsen biztonsági mentést a tárcájáról, hogy megelőzze a pénzeszközök teljes elvesztését, ha elveszíti ezt az eszközt.",
+    "settingsWarning": "Készíts biztonsági mentést! Ha elveszíted ezt az eszközt, elveszíted a pénzedet.",
+    "modalTitle": "Biztosítsd a pénzeszközeidet",
+    "modalDescription": "Nyomatékosan javasoljuk, hogy készíts biztonsági mentést a tárcádról, hogy megelőzd a pénzeszközeid teljes elvesztését, ha elveszíted ezt az eszközt.",
     "secureMe": "Tárca biztosítása"
   },
   "StableBalance": {
@@ -3621,8 +3627,8 @@
       "deactivateConfirm": "Kikapcsolás",
       "cancel": "Mégse"
     },
-    "minimumConversion": "Minimum konverzió: {amount:string}",
-    "conversionUnavailable": "A konverzió ideiglenesen nem érhető el. Próbáld újra."
+    "minimumConversion": "Minimum átutalás: {amount:string}",
+    "conversionUnavailable": "Az átutalások ideiglenesen nem érhetők el. Próbáld újra."
   },
   "BackendFeatureGate": {
     "title": "Funkció nem elérhető",
@@ -3665,6 +3671,9 @@
     "networkError": "Hálózati kapcsolódási probléma. Ellenőrizd a kapcsolatot, és próbáld újra.",
     "invalidInput": "A fizetés adatai érvénytelennek tűnnek. Kérjük, ellenőrizd, és próbáld újra.",
     "generic": "A fizetés nem sikerült. Próbáld újra egy pillanat múlva, vagy használj kisebb összeget."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Ez a fiók a(z) {network} hálózaton jött létre. Használatához váltson a(z) {network} hálózatra."
   },
   "UnclaimedDeposit": {
     "title": "{count} nem igényelt befizetésed van",

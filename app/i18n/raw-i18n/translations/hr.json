@@ -72,8 +72,8 @@
     "infoBitcoin": "Bitcoin iznos je samo približan. Može varirati za mali iznos.",
     "infoDollar": "Dolarski iznos je samo približan. Može varirati za mali iznos.",
     "transferButtonText": "Prenesi {fromWallet} u {toWallet}",
-    "feeLabel": "Naknada za konverziju",
-    "feeError": "Nije bilo moguće dohvatiti naknadu za konverziju"
+    "feeLabel": "Naknada za prijenos",
+    "feeError": "Nije bilo moguće dohvatiti naknadu za prijenos"
   },
   "ConversionSuccessScreen": {
     "message": "Konverzija uspješna"
@@ -2081,7 +2081,7 @@
     "scan": "Skeniraj",
     "updateAvailable": "Ažuriranje je dostupno.\nDodirnite za ažuriranje sada",
     "useLightning": "Koristimo Lightning Network.",
-    "myAccounts": "Moji računi",
+    "myAccounts": "Stanja",
     "walletCountNotTwo": "Broj novčanika nije 2. Molimo koristite nadzornu ploču za pregled svih novčanika i sredstava ovog računa"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Nije moguće izvesti transakcije u csv. Nešto je pošlo po zlu. Ako se problem nastavi, kontaktirajte podršku.",
     "lnurlNoUsername": "Za generiranje lnurl adrese prvo morate postaviti korisničko ime. Želite li sada postaviti korisničko ime?",
     "copyClipboardLnurl": "Lnurl adresa je kopirana u međuspremnik",
-    "defaultWallet": "Zadani račun",
+    "defaultWallet": "Zadano primanje",
     "rateUs": "Ocijenite nas na {storeName: string}",
     "theme": "Tema",
     "nfc": "Primanje od NFC-a",
@@ -2457,17 +2457,16 @@
     "removedAccount": "Uklonili ste račun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats nije dostupan u vašoj regiji",
-    "modalBody": "Za pristup dolarskom računu, izradite ne-skrbnički račun.",
-    "createNew": "Izradi novi",
     "walletLabel": "nije dostupan u vašoj regiji"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Račun u dolarima više nije dostupan u vašoj regiji",
-    "body": "Prebacite svoje stanje u dolarima u Bitcoin",
+    "title": "Dolarski saldo nije dostupan u vašoj regiji",
+    "body": "Prebacite s dolarskog stanja na Bitcoin stanje",
     "youHave": "Imate",
-    "youGet": "Dobivate",
-    "approve": "Odobri"
+    "youGet": "Dobivate"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Dvofaktorska autentifikacija",
@@ -2488,10 +2487,11 @@
     "toastMessage": "Tajna kopirana u međuspremnik!"
   },
   "DefaultWalletScreen": {
-    "title": "Zadani račun za primanje",
-    "info": "Vaš Bitcoin račun je za skupljanje satova, gdje se USD vrijednost kreće s tržištem. Vaš Dolar račun pokreće Stablesats — drži Bitcoin zaštićen da ostane stabilan u USD vrijednosti. Uvijek držite Bitcoin, ali dolarska vrijednost se ne mijenja.",
-    "titleSelfCustodial": "Zadani račun",
-    "infoSelfCustodial": "Ovaj račun će se koristiti kao zadani za primanje i slanje. Možete prebaciti u bilo kojem trenutku."
+    "title": "Zadano primanje",
+    "titleSelfCustodial": "Zadano primanje",
+    "infoBtc": "Vaš Bitcoin račun je za skupljanje satova, gdje se USD vrijednost kreće s tržištem.",
+    "infoUsd": "Vaš Dolar račun pokreće Stablesats — drži Bitcoin zaštićen da ostane stabilan u USD vrijednosti. Uvijek držite Bitcoin, ali dolarska vrijednost se ne mijenja.",
+    "infoUsdSelfCustodial": "Primanje dolara nije dostupno kao zadana opcija primanja za non-custodial račune."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Vaš Dolar račun pokreće Stablesats",
-    "body": "Dolar račun koristi Stablesats tehnologiju za održavanje Bitcoina stabilnim na USD cijeni. Uvijek držite Bitcoin — ne prave dolare — ali USD vrijednost ne fluktuira. Možete slati i primati Bitcoin kao i obično, ali nije kompatibilan s tradicionalnim bankarskim sustavom.",
+    "body": "U kustodijalnom načinu rada vaš Dolar račun koristi Stablesats tehnologiju — držite Bitcoin, a ne prave USD, ali vrijednost je osmišljena da zadrži isti iznos u odnosu na USD. Bitcoin možete slati i primati kao i obično.",
     "termsAndConditions": "Pročitajte Uvjete i odredbe",
-    "learnMore": "Saznajte više o Stablesats-u",
-    "headerSelfCustodial": "Vaš dolarski račun drži stablecoine",
-    "bodySelfCustodial": "Na dolarskom računu držite stablecoine. Tokeni potpomognuti imovinom čija je vrijednost stabilna u odnosu na USD. Stablecoine zasad ne možete slati ni primati. Kada šaljete s dolarskog računa, vaši stablecoini se zamjenjuju i šalju kao Bitcoin primatelju.",
+    "learnMore": "Saznajte više o Dolar računu",
+    "headerSelfCustodial": "O vašem Dolar računu",
+    "bodySelfCustodial": "U nekustodijalnom načinu rada vaš Dolar račun koristi podržane stablecoine, koji su osmišljeni da zadrže istu vrijednost u odnosu na USD.",
     "learnMoreSelfCustodial": "Saznajte više"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "E-pošta {email: string} uspješno je potvrđena"
   },
   "common": {
+    "country": "Zemlja",
+    "unknown": "Nepoznato",
     "enabled": "Omogućeno",
     "switch": "Prekidač",
     "notifications": "Obavijesti",
@@ -3569,6 +3571,10 @@
     "createFailed": "Neuspjelo stvaranje novčanika. Molimo pokušajte ponovno.",
     "selfCustodialDisabled": "Nekustodijska opcija je privremeno nedostupna."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Nepodržana regija",
+    "description": "Nažalost ne možemo pružati uslugu korisnicima iz vaše trenutne regije."
+  },
   "RestoreScreen": {
     "title": "Vraćanje novčanika",
     "description": "Vratite novčanik iz sigurnosne kopije",
@@ -3621,8 +3627,8 @@
       "deactivateConfirm": "Deaktiviraj",
       "cancel": "Odustani"
     },
-    "minimumConversion": "Minimalna pretvorba: {amount:string}",
-    "conversionUnavailable": "Konverzija je privremeno nedostupna. Pokušajte ponovno."
+    "minimumConversion": "Minimalni prijenos: {amount:string}",
+    "conversionUnavailable": "Prijenosi su privremeno nedostupni. Pokušajte ponovno."
   },
   "BackendFeatureGate": {
     "title": "Značajka nedostupna",
@@ -3665,6 +3671,9 @@
     "networkError": "Problem s mrežnom vezom. Provjerite vezu i pokušajte ponovno.",
     "invalidInput": "Detalji plaćanja izgledaju nevažeći. Molimo provjerite i pokušajte ponovno.",
     "generic": "Plaćanje nije moglo biti dovršeno. Pokušajte ponovno za trenutak ili upotrijebite manji iznos."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Ovaj račun je stvoren na mreži {network}. Prebacite se na {network} kako biste ga koristili."
   },
   "UnclaimedDeposit": {
     "title": "Imate {count} nezatraženi(h) polog(a)",

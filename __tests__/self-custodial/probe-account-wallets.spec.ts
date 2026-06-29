@@ -1,3 +1,5 @@
+import { Network } from "@breeztech/breez-sdk-spark-react-native"
+
 import {
   probeSelfCustodialAccountWallets,
   ProbeAccountWalletsStatus,
@@ -63,7 +65,10 @@ describe("probeSelfCustodialAccountWallets", () => {
   it("returns no-mnemonic without initializing the SDK when no mnemonic is stored", async () => {
     mockGetMnemonic.mockResolvedValue(null)
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(
+      TEST_ACCOUNT_ID,
+      Network.Regtest,
+    )
 
     expect(result).toEqual({ status: ProbeAccountWalletsStatus.NoMnemonic })
     expect(mockInitSdk).not.toHaveBeenCalled()
@@ -79,11 +84,15 @@ describe("probeSelfCustodialAccountWallets", () => {
       rawTransactionCount: 0,
     })
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(
+      TEST_ACCOUNT_ID,
+      Network.Regtest,
+    )
 
     expect(mockInitSdk).toHaveBeenCalledWith(
       TEST_MNEMONIC,
       `/storage/spark/${TEST_ACCOUNT_ID}`,
+      Network.Regtest,
     )
     expect(mockGetSnapshot).toHaveBeenCalledWith(FAKE_SDK)
     expect(result).toEqual({
@@ -101,7 +110,7 @@ describe("probeSelfCustodialAccountWallets", () => {
       rawTransactionCount: 0,
     })
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest)
 
     expect(mockDisconnectSdk).toHaveBeenCalledWith(FAKE_SDK)
   })
@@ -111,7 +120,10 @@ describe("probeSelfCustodialAccountWallets", () => {
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockRejectedValue(new Error("getInfo failed"))
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(
+      TEST_ACCOUNT_ID,
+      Network.Regtest,
+    )
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
     if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
@@ -124,7 +136,10 @@ describe("probeSelfCustodialAccountWallets", () => {
     mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
     mockInitSdk.mockRejectedValue(new Error("connect failed"))
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(
+      TEST_ACCOUNT_ID,
+      Network.Regtest,
+    )
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
     if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
@@ -138,7 +153,10 @@ describe("probeSelfCustodialAccountWallets", () => {
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockRejectedValue("opaque string failure")
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(
+      TEST_ACCOUNT_ID,
+      Network.Regtest,
+    )
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
     if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
@@ -157,7 +175,10 @@ describe("probeSelfCustodialAccountWallets", () => {
     })
     mockDisconnectSdk.mockRejectedValueOnce(new Error("disconnect failed"))
 
-    const result = await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    const result = await probeSelfCustodialAccountWallets(
+      TEST_ACCOUNT_ID,
+      Network.Regtest,
+    )
 
     expect(result).toEqual({
       status: ProbeAccountWalletsStatus.Ok,
@@ -176,7 +197,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     const disconnectError = new Error("SQLite handle locked")
     mockDisconnectSdk.mockRejectedValueOnce(disconnectError)
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest)
 
     expect(mockRecordError).toHaveBeenCalledWith(disconnectError)
   })
@@ -191,7 +212,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     })
     mockDisconnectSdk.mockRejectedValueOnce("native handle invalid")
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID)
+    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest)
 
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({

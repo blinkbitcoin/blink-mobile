@@ -72,8 +72,8 @@
     "infoBitcoin": "Jumlah Bitcoin hanya perkiraan. Bisa sedikit berbeda.",
     "infoDollar": "Jumlah Dolar hanya perkiraan. Bisa sedikit berbeda.",
     "transferButtonText": "Transfer {fromWallet} ke {toWallet}",
-    "feeLabel": "Biaya konversi",
-    "feeError": "Tidak dapat mengambil biaya konversi"
+    "feeLabel": "Biaya transfer",
+    "feeError": "Tidak dapat mengambil biaya transfer"
   },
   "ConversionSuccessScreen": {
     "message": "Konversi Berhasil"
@@ -2081,7 +2081,7 @@
     "scan": "Pindai",
     "updateAvailable": "Pembaruan tersedia.\nKetuk untuk memperbarui sekarang",
     "useLightning": "Kami menggunakan Jaringan Lightning.",
-    "myAccounts": "Akun Saya",
+    "myAccounts": "Saldo",
     "walletCountNotTwo": "Jumlah dompet bukan 2. Silakan gunakan dasbor untuk melihat semua dompet dan dana akun ini"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Tidak dapat mengekspor transaksi ke CSV. Terjadi kesalahan. Jika masalah berlanjut, silakan hubungi dukungan.",
     "lnurlNoUsername": "Untuk membuat alamat lnurl, Anda harus mengatur nama pengguna terlebih dahulu. Apakah Anda ingin mengatur nama pengguna sekarang?",
     "copyClipboardLnurl": "Alamat Lnurl telah disalin ke papan klip",
-    "defaultWallet": "Akun Default",
+    "defaultWallet": "Penerimaan default",
     "rateUs": "Beri peringkat kami di {storeName: string}",
     "theme": "Tema",
     "nfc": "Terima melalui NFC",
@@ -2457,17 +2457,16 @@
     "removedAccount": "Anda menghapus akun {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats tidak tersedia di wilayah Anda",
-    "modalBody": "Untuk mengakses akun dolar, buat akun non-custodial.",
-    "createNew": "Buat baru",
     "walletLabel": "tidak tersedia di wilayah Anda"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Akun Dolar tidak lagi tersedia di wilayah Anda",
-    "body": "Pindahkan saldo Dolar Anda ke Bitcoin",
+    "title": "Saldo dolar tidak tersedia di wilayah Anda",
+    "body": "Transfer dari Saldo Dolar ke Saldo Bitcoin",
     "youHave": "Anda punya",
-    "youGet": "Anda dapat",
-    "approve": "Setujui"
+    "youGet": "Anda dapat"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Otentikasi dua faktor",
@@ -2488,10 +2487,11 @@
     "toastMessage": "Rahasia disalin ke papan klip!"
   },
   "DefaultWalletScreen": {
-    "title": "Akun penerima default",
-    "info": "Akun Bitcoin Anda untuk mengumpulkan sats, di mana nilai USD bergerak sesuai pasar. Akun Dolar Anda didukung oleh Stablesats — menyimpan Bitcoin yang dilindungi agar tetap stabil dalam nilai USD. Anda selalu memegang Bitcoin, tetapi nilai dolarnya tidak berubah.",
-    "titleSelfCustodial": "Akun default",
-    "infoSelfCustodial": "Akun ini akan digunakan secara default saat menerima dan mengirim. Anda dapat beralih kapan saja."
+    "title": "Penerimaan default",
+    "titleSelfCustodial": "Penerimaan default",
+    "infoBtc": "Akun Bitcoin Anda untuk mengumpulkan sats, di mana nilai USD bergerak sesuai pasar.",
+    "infoUsd": "Akun Dolar Anda didukung oleh Stablesats — menyimpan Bitcoin yang dilindungi agar tetap stabil dalam nilai USD. Anda selalu memegang Bitcoin, tetapi nilai dolarnya tidak berubah.",
+    "infoUsdSelfCustodial": "Penerimaan Dolar tidak tersedia sebagai opsi penerimaan default untuk akun non-kustodian."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Akun Dolar Anda didukung oleh Stablesats",
-    "body": "Akun Dolar menggunakan teknologi Stablesats untuk menjaga Bitcoin tetap stabil pada harga USD. Anda selalu memegang Bitcoin — bukan dolar sungguhan — tetapi nilai USD tidak berfluktuasi. Anda dapat mengirim dan menerima Bitcoin seperti biasa, tetapi ini tidak kompatibel dengan sistem perbankan tradisional.",
+    "body": "Dalam Mode Kustodial, Akun Dolar Anda menggunakan teknologi Stablesats — Anda memegang Bitcoin, bukan USD sungguhan, tetapi nilainya dirancang untuk mempertahankan jumlah yang sama dalam satuan USD. Anda dapat mengirim dan menerima Bitcoin seperti biasa.",
     "termsAndConditions": "Baca Syarat & Ketentuan",
-    "learnMore": "Pelajari lebih lanjut tentang Stablesats",
-    "headerSelfCustodial": "Akun Dolar Anda menyimpan stablecoin",
-    "bodySelfCustodial": "Di akun Dolar Anda menyimpan stablecoin. Token yang didukung oleh aset dengan nilai yang dijaga stabil terhadap USD. Anda belum bisa mengirim dan menerima stablecoin. Saat mengirim dari akun Dolar, stablecoin Anda akan ditukar dan dikirim sebagai Bitcoin kepada penerima.",
+    "learnMore": "Pelajari lebih lanjut tentang Akun Dolar",
+    "headerSelfCustodial": "Tentang Akun Dolar Anda",
+    "bodySelfCustodial": "Dalam Mode Non-Kustodial, Akun Dolar Anda menggunakan stablecoin yang didukung, dirancang untuk mempertahankan nilai yang sama dalam satuan USD.",
     "learnMoreSelfCustodial": "Pelajari selengkapnya"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "Email {email: string} berhasil dikonfirmasi"
   },
   "common": {
+    "country": "Negara",
+    "unknown": "Tidak diketahui",
     "enabled": "Diaktifkan",
     "switch": "Sakelar",
     "notifications": "Notifikasi",
@@ -3569,6 +3571,10 @@
     "createFailed": "Gagal membuat dompet. Silakan coba lagi.",
     "selfCustodialDisabled": "Non-kustodial sementara tidak tersedia."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Wilayah tidak didukung",
+    "description": "Sayangnya kami tidak dapat melayani pengguna dari wilayah Anda saat ini."
+  },
   "RestoreScreen": {
     "title": "Pulihkan dompet",
     "description": "Pulihkan dompet Anda dari cadangan",
@@ -3621,8 +3627,8 @@
       "deactivateConfirm": "Nonaktifkan",
       "cancel": "Batal"
     },
-    "minimumConversion": "Konversi minimum: {amount:string}",
-    "conversionUnavailable": "Konversi sementara tidak tersedia. Silakan coba lagi."
+    "minimumConversion": "Transfer minimum: {amount:string}",
+    "conversionUnavailable": "Transfer sementara tidak tersedia. Silakan coba lagi."
   },
   "BackendFeatureGate": {
     "title": "Fitur tidak tersedia",
@@ -3665,6 +3671,9 @@
     "networkError": "Masalah koneksi jaringan. Periksa koneksi Anda dan coba lagi.",
     "invalidInput": "Detail pembayaran tampak tidak valid. Harap periksa dan coba lagi.",
     "generic": "Pembayaran tidak dapat diselesaikan. Coba lagi sebentar, atau gunakan jumlah yang lebih kecil."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Akun ini dibuat di {network}. Beralih ke {network} untuk menggunakannya."
   },
   "UnclaimedDeposit": {
     "title": "Anda memiliki {count} deposit yang belum diklaim",

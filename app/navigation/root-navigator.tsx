@@ -74,6 +74,7 @@ import { EarnQuiz, EarnSection } from "../screens/earns-screen"
 import { SectionCompleted } from "../screens/earns-screen/section-completed"
 import { AccountTypeSelectionScreen } from "../screens/account-type-selection"
 import { GetStartedScreen } from "../screens/get-started-screen"
+import { UnsupportedRegionScreen } from "../screens/unsupported-region-screen"
 import { HomeScreen } from "../screens/home-screen"
 import { MapScreen } from "../screens/map-screen/map-screen"
 import { ContactsDetailScreen, PeopleScreen } from "../screens/people-screen"
@@ -220,6 +221,11 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="accountTypeSelection"
         component={AccountTypeSelectionScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="unsupportedRegion"
+        component={UnsupportedRegionScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
@@ -383,7 +389,7 @@ export const RootStack = () => {
         name="defaultWallet"
         component={DefaultWalletScreen}
         options={() => ({
-          title: LL.SettingsScreen.receiveCurrency(),
+          title: LL.DefaultWalletScreen.title(),
         })}
       />
       <RootNavigator.Screen

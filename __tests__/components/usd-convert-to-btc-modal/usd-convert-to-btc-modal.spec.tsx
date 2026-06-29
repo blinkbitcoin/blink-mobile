@@ -32,15 +32,29 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
 }))
 
 const mockExecute = jest.fn()
-const mockUseIntraLedgerConversion = jest.fn(() => ({
+const mockUseIntraLedgerConversion = jest.fn((_config?: { onSuccess: () => void }) => ({
   execute: mockExecute,
   loading: false,
   errorMessage: undefined as string | undefined,
 }))
 
 jest.mock("@app/hooks/use-intra-ledger-conversion", () => ({
-  useIntraLedgerConversion: () => mockUseIntraLedgerConversion(),
+  useIntraLedgerConversion: (config: { onSuccess: () => void }) =>
+    mockUseIntraLedgerConversion(config),
 }))
+
+jest.mock("react-native-modal", () => {
+  const ReactNs = jest.requireActual<typeof import("react")>("react")
+  const RN = jest.requireActual<typeof import("react-native")>("react-native")
+  const MockModal = ({
+    children,
+    isVisible,
+  }: {
+    children: React.ReactNode
+    isVisible: boolean
+  }) => (isVisible ? ReactNs.createElement(RN.View, null, children) : null)
+  return { __esModule: true, default: MockModal }
+})
 
 import { UsdConvertToBtcModal } from "@app/components/usd-convert-to-btc-modal"
 
@@ -80,8 +94,8 @@ describe("UsdConvertToBtcModal", () => {
   it("renders the title and body", () => {
     const { getByText } = renderModal()
 
-    expect(getByText("Dollar account is no longer available in your region")).toBeTruthy()
-    expect(getByText("Transfer your Dollar balance to Bitcoin")).toBeTruthy()
+    expect(getByText("Dollar Balance is not available in your region")).toBeTruthy()
+    expect(getByText("Transfer from Dollar Balance to Bitcoin Balance")).toBeTruthy()
   })
 
   it("renders the You have and You get labels", () => {
@@ -109,10 +123,10 @@ describe("UsdConvertToBtcModal", () => {
     expect(getByText("~ BTC:129184")).toBeTruthy()
   })
 
-  it("triggers the conversion when Approve is pressed", () => {
+  it("triggers the conversion when Transfer is pressed", () => {
     const { getByText } = renderModal()
 
-    fireEvent.press(getByText("Approve"))
+    fireEvent.press(getByText("Transfer"))
 
     expect(mockExecute).toHaveBeenCalledTimes(1)
   })
@@ -132,7 +146,7 @@ describe("UsdConvertToBtcModal", () => {
   it("renders nothing when isVisible is false", () => {
     const { queryByText } = renderModal({ isVisible: false })
 
-    expect(queryByText("Dollar account is no longer available in your region")).toBeNull()
+    expect(queryByText("Dollar Balance is not available in your region")).toBeNull()
   })
 
   it("shows the warning icon", () => {
@@ -145,5 +159,17 @@ describe("UsdConvertToBtcModal", () => {
     const { queryByTestId } = renderModal()
 
     expect(queryByTestId("icon-close")).toBeNull()
+  })
+
+  it("closes only on success: the conversion onSuccess handler is wired to toggleModal", () => {
+    const toggleModal = jest.fn()
+    renderModal({ toggleModal })
+
+    const { onSuccess } = mockUseIntraLedgerConversion.mock.calls[0][0] as {
+      onSuccess: () => void
+    }
+    onSuccess()
+
+    expect(toggleModal).toHaveBeenCalledTimes(1)
   })
 })

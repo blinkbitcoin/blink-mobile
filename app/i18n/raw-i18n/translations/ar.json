@@ -2081,7 +2081,7 @@
     "scan": "Scan",
     "updateAvailable": "تحديث متاح.\nانقر للتحديث الآن",
     "useLightning": "نحن نستخدم شبكة البرق.",
-    "myAccounts": "My Accounts",
+    "myAccounts": "أرصدة",
     "walletCountNotTwo": "عدد المحافظ ليس 2. يرجى استخدام لوحة التحكم لعرض جميع المحافظ وأموال هذا الحساب"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "لم يمكن تصدير المعاملات في ملف csv. حدث خطأ. إذا استمرت المشكلة راجع الدعم.",
     "lnurlNoUsername": "لتوليد عنوان lnurl عليك أولًا أن تنشئ اسم مستخدم. هل تريد أن تحدد اسم مستخدمك الآن؟",
     "copyClipboardLnurl": "نُسخ عنوان Lnurl إلى الحافظة",
-    "defaultWallet": "Default Account",
+    "defaultWallet": "الاستلام الافتراضي",
     "rateUs": "Rate us on {storeName: string}",
     "theme": "Theme",
     "nfc": "Receive from NFC",
@@ -2457,17 +2457,16 @@
     "removedAccount": "لقد أزلت الحساب {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats غير متاح في منطقتك",
-    "modalBody": "للوصول إلى حساب الدولار، أنشئ حسابًا غير حافظ.",
-    "createNew": "إنشاء جديد",
     "walletLabel": "غير متاح في منطقتك"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "رصيد الدولار غير متاح في منطقتك"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "لم يعد حساب الدولار متاحًا في منطقتك",
-    "body": "انقل رصيدك بالدولار إلى بيتكوين",
+    "title": "رصيد الدولار غير متاح في منطقتك",
+    "body": "حوّل من رصيد الدولار إلى رصيد البيتكوين",
     "youHave": "لديك",
-    "youGet": "تحصل على",
-    "approve": "موافقة"
+    "youGet": "تحصل على"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Two-factor authentication",
@@ -2488,10 +2487,11 @@
     "toastMessage": "Secret copied to clipboard!"
   },
   "DefaultWalletScreen": {
-    "title": "حساب الاستلام الافتراضي",
-    "info": "حساب البيتكوين الخاص بك لتجميع الساتوشي، حيث تتحرك قيمة USD مع السوق. حساب بالدولار الخاص بك مدعوم بتقنية Stablesats — يحتفظ بـ Bitcoin محمي ليبقى مستقراً بقيمة USD. أنت دائماً تحتفظ بـ Bitcoin، لكن قيمة الدولار لا تتغير.",
-    "titleSelfCustodial": "الحساب الافتراضي",
-    "infoSelfCustodial": "سيتم استخدام هذا الحساب افتراضيًا عند الاستلام والإرسال. يمكنك التبديل في أي وقت."
+    "title": "الاستلام الافتراضي",
+    "titleSelfCustodial": "الاستلام الافتراضي",
+    "infoBtc": "حساب البيتكوين الخاص بك لتجميع الساتوشي، حيث تتحرك قيمة USD مع السوق.",
+    "infoUsd": "حساب بالدولار الخاص بك مدعوم بتقنية Stablesats — يحتفظ بـ Bitcoin محمي ليبقى مستقراً بقيمة USD. أنت دائماً تحتفظ بـ Bitcoin، لكن قيمة الدولار لا تتغير.",
+    "infoUsdSelfCustodial": "استقبال الدولار غير متاح كخيار استقبال افتراضي للحسابات غير الوصائية."
   },
   "ThemeScreen": {
     "title": "Theme",
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "حساب بالدولار الخاص بك مدعوم بتقنية Stablesats",
-    "body": "يستخدم حساب بالدولار تقنية Stablesats للحفاظ على Bitcoin مستقراً بسعر USD. أنت دائماً تحتفظ بـ Bitcoin — وليس دولارات حقيقية — لكن قيمة USD لا تتقلب. يمكنك إرسال واستقبال Bitcoin كالمعتاد، لكنه غير متوافق مع النظام المصرفي التقليدي.",
+    "body": "في الوضع الحاضن، يستخدم حساب الدولار الخاص بك تقنية Stablesats — أنت تحتفظ بـ Bitcoin، وليس USD حقيقية، لكن القيمة مصممة للحفاظ على المبلغ نفسه بسعر USD. يمكنك إرسال واستقبال Bitcoin كالمعتاد.",
     "termsAndConditions": "إقرأ الشروط والأحكام",
-    "learnMore": "تعلم المزيد عن Stablesats",
-    "headerSelfCustodial": "حساب الدولار الخاص بك يحتفظ بالعملات المستقرة",
-    "bodySelfCustodial": "في حساب الدولار، أنت تحتفظ بعملات مستقرة. وهي رموز مدعومة بأصول وقيمتها مرتبطة بالدولار الأمريكي. لا يمكنك إرسال واستقبال العملات المستقرة (حتى الآن). عندما ترسل من حساب الدولار، سيتم تحويل عملاتك المستقرة وإرسالها كبيتكوين إلى المستلم.",
+    "learnMore": "تعلم المزيد عن حساب الدولار",
+    "headerSelfCustodial": "حول حساب الدولار الخاص بك",
+    "bodySelfCustodial": "في الوضع غير الحاضن، يستخدم حساب الدولار الخاص بك عملات مستقرة مدعومة، مصممة للحفاظ على القيمة نفسها بسعر USD.",
     "learnMoreSelfCustodial": "اعرف المزيد"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "Email {email: string} confirmed successfully"
   },
   "common": {
+    "country": "البلد",
+    "unknown": "غير معروف",
     "enabled": "مُفعَّل",
     "switch": "مفتاح",
     "notifications": "الإشعارات",
@@ -3569,6 +3571,10 @@
     "createFailed": "فشل في إنشاء المحفظة. يرجى المحاولة مرة أخرى.",
     "selfCustodialDisabled": "غير الحفظ غير متاح مؤقتًا."
   },
+  "UnsupportedRegionScreen": {
+    "title": "منطقة غير مدعومة",
+    "description": "للأسف لا يمكننا خدمة المستخدمين من منطقتك الحالية."
+  },
   "RestoreScreen": {
     "title": "استعادة المحفظة",
     "description": "استعد محفظتك من نسخة احتياطية",
@@ -3665,6 +3671,9 @@
     "networkError": "مشكلة في اتصال الشبكة. تحقق من اتصالك وحاول مرة أخرى.",
     "invalidInput": "تبدو تفاصيل الدفع غير صالحة. يرجى المراجعة والمحاولة مرة أخرى.",
     "generic": "تعذر إكمال الدفع. حاول مرة أخرى بعد لحظة، أو استخدم مبلغًا أصغر."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "تم إنشاء هذا الحساب على {network}. بدّل إلى {network} لاستخدامه."
   },
   "UnclaimedDeposit": {
     "title": "لديك {count} إيداع(ات) غير مطالب بها",

@@ -100,8 +100,28 @@ type PersistentState_13 = {
   defaultAccountModalShownByAccountId?: Record<string, boolean>
 }
 
-const migrate13ToCurrent = (state: PersistentState_13): Promise<PersistentState> =>
+type PersistentState_14 = {
+  schemaVersion: 14
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+  stablesatsRestrictedCustodial?: boolean
+  stableTokenTransferBlocked?: boolean
+  stablesatsTransferBlocked?: boolean
+  stableTokenRestricted?: boolean
+}
+
+const migrate14ToCurrent = (state: PersistentState_14): Promise<PersistentState> =>
   Promise.resolve(state)
+
+const migrate13ToCurrent = (state: PersistentState_13): Promise<PersistentState> =>
+  migrate14ToCurrent({ ...state, schemaVersion: 14 })
 
 const migrate12ToCurrent = (state: PersistentState_12): Promise<PersistentState> =>
   migrate13ToCurrent({ ...state, schemaVersion: 13 })
@@ -220,6 +240,7 @@ type StateMigrations = {
   11: (state: PersistentState_11) => Promise<PersistentState>
   12: (state: PersistentState_12) => Promise<PersistentState>
   13: (state: PersistentState_13) => Promise<PersistentState>
+  14: (state: PersistentState_14) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -234,12 +255,13 @@ const stateMigrations: StateMigrations = {
   11: migrate11ToCurrent,
   12: migrate12ToCurrent,
   13: migrate13ToCurrent,
+  14: migrate14ToCurrent,
 }
 
-export type PersistentState = PersistentState_13
+export type PersistentState = PersistentState_14
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 13,
+  schemaVersion: 14,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -266,7 +288,8 @@ export const migratePersistentState = async (
   if (!data || !(data.schemaVersion in stateMigrations)) {
     return { status: MigrationStatus.NoData }
   }
-  const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 = data.schemaVersion
+  const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 =
+    data.schemaVersion
   try {
     const migration = stateMigrations[schemaVersion]
     const state = await migration(data)

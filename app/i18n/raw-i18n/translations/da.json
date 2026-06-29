@@ -72,8 +72,8 @@
     "infoBitcoin": "Bitcoin-beløbet er kun omtrentligt. Det kan variere med et lille beløb.",
     "infoDollar": "Dollar-beløbet er kun omtrentligt. Det kan variere med et lille beløb.",
     "transferButtonText": "Overfør {fromWallet} til {toWallet}",
-    "feeLabel": "Konverteringsgebyr",
-    "feeError": "Kunne ikke hente konverteringsgebyret"
+    "feeLabel": "Overførselsgebyr",
+    "feeError": "Kunne ikke hente overførselsgebyret"
   },
   "ConversionSuccessScreen": {
     "message": "Konvertering vel afsluttet"
@@ -2081,7 +2081,7 @@
     "scan": "Scan",
     "updateAvailable": "Der er en opdatering tilgængelig.\nTryk for at opdatere nu",
     "useLightning": "Vi bruger Lightning-netværket.",
-    "myAccounts": "Mine konti",
+    "myAccounts": "Saldi",
     "walletCountNotTwo": "Antallet af tegnebøger er ikke 2. Brug venligst kontrolpanelet for at se alle tegnebøger og midler på denne konto"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Kunne ikke eksportere transaktioner til csv. Noget gik galt. Hvis problemet fortsætter, kontakt venligst support.",
     "lnurlNoUsername": "For at generere en LNURL-adresse skal du først vælge et brugernavn. Vil du vælge et brugernavn nu?",
     "copyClipboardLnurl": "LNURL-adresse er blevet kopieret til udklipsholderen",
-    "defaultWallet": "Standardkonto",
+    "defaultWallet": "Standardmodtagelse",
     "rateUs": "Bedøm os på {storeName: string}",
     "theme": "Tema",
     "nfc": "Modtag fra NFC",
@@ -2457,17 +2457,16 @@
     "removedAccount": "Du fjernede kontoen {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats er ikke tilgængelig i din region",
-    "modalBody": "For at få adgang til en dollarkonto skal du oprette en non-custodial konto.",
-    "createNew": "Opret ny",
     "walletLabel": "ikke tilgængelig i din region"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dollar-saldo er ikke tilgængelig i din region"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dollarkontoen er ikke længere tilgængelig i din region",
-    "body": "Overfør din dollarsaldo til Bitcoin",
+    "title": "Dollar-saldo er ikke tilgængelig i din region",
+    "body": "Overfør fra dollarsaldo til Bitcoin-saldo",
     "youHave": "Du har",
-    "youGet": "Du får",
-    "approve": "Godkend"
+    "youGet": "Du får"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "To-faktor godkendelse",
@@ -2488,10 +2487,11 @@
     "toastMessage": "Hemmelig nøgle kopieret til udklipsholderen!"
   },
   "DefaultWalletScreen": {
-    "title": "Standard modtagekonto",
-    "info": "Din Bitcoin-konto er til at samle sats, hvor USD-værdien bevæger sig med markedet. Din Dollar-konto er drevet af Stablesats — den holder Bitcoin, der er sikret til at forblive stabil i USD-værdi. Du holder altid Bitcoin, men dollarværdien ændrer sig ikke.",
-    "titleSelfCustodial": "Standardkonto",
-    "infoSelfCustodial": "Denne konto vil blive brugt som standard ved modtagelse og afsendelse. Du kan skifte når som helst."
+    "title": "Standardmodtagelse",
+    "titleSelfCustodial": "Standardmodtagelse",
+    "infoBtc": "Din Bitcoin-konto er til at samle sats, hvor USD-værdien bevæger sig med markedet.",
+    "infoUsd": "Din Dollar-konto er drevet af Stablesats — den holder Bitcoin, der er sikret til at forblive stabil i USD-værdi. Du holder altid Bitcoin, men dollarværdien ændrer sig ikke.",
+    "infoUsdSelfCustodial": "Dollar-modtagelse er ikke tilgængelig som en standard modtagelsesmulighed for non-custodial-konti."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Din Dollar-konto er drevet af Stablesats",
-    "body": "Dollar-konto bruger Stablesats-teknologi til at holde Bitcoin stabil på USD-prisen. Du holder altid Bitcoin — ikke rigtige dollars — men USD-værdien svinger ikke. Du kan sende og modtage Bitcoin som normalt, men det er ikke kompatibelt med det traditionelle banksystem.",
+    "body": "I depotmodus bruger din Dollar-konto Stablesats-teknologi — du holder Bitcoin, ikke rigtige USD, men værdien er designet til at bevare det samme beløb i USD. Du kan sende og modtage Bitcoin som normalt.",
     "termsAndConditions": "Læs vilkårene",
-    "learnMore": "Læs mere om Stablesats",
-    "headerSelfCustodial": "Din Dollar-konto indeholder stablecoins",
-    "bodySelfCustodial": "På Dollar-kontoen holder du stablecoins. Tokens, der er bakket op af aktiver, hvis værdi holdes stabil i forhold til USD. Du kan endnu ikke sende og modtage stablecoins. Når du sender fra Dollar-kontoen, ombyttes dine stablecoins og sendes som Bitcoin til modtageren.",
+    "learnMore": "Læs mere om Dollar-kontoen",
+    "headerSelfCustodial": "Om din Dollar-konto",
+    "bodySelfCustodial": "I ikke-depotmodus bruger din Dollar-konto understøttede stablecoins, der er designet til at bevare den samme værdi i USD.",
     "learnMoreSelfCustodial": "Lær mere"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "E-mail {email: string} bekræftet med succes"
   },
   "common": {
+    "country": "Land",
+    "unknown": "Ukendt",
     "enabled": "Aktiveret",
     "switch": "Afbryder",
     "notifications": "Notifikationer",
@@ -3569,6 +3571,10 @@
     "createFailed": "Kunne ikke oprette tegnebog. Prøv venligst igen.",
     "selfCustodialDisabled": "Ikke-forvaltning er midlertidigt utilgængelig."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Ikke-understøttet region",
+    "description": "Desværre kan vi ikke betjene brugere fra din nuværende region."
+  },
   "RestoreScreen": {
     "title": "Gendan tegnebog",
     "description": "Gendan din tegnebog fra en sikkerhedskopi",
@@ -3621,8 +3627,8 @@
       "deactivateConfirm": "Deaktivér",
       "cancel": "Annullér"
     },
-    "minimumConversion": "Minimum konvertering: {amount:string}",
-    "conversionUnavailable": "Konvertering er midlertidigt utilgængelig. Prøv igen."
+    "minimumConversion": "Minimum overførsel: {amount:string}",
+    "conversionUnavailable": "Overførsler er midlertidigt utilgængelige. Prøv igen."
   },
   "BackendFeatureGate": {
     "title": "Funktion ikke tilgængelig",
@@ -3665,6 +3671,9 @@
     "networkError": "Problem med netværksforbindelsen. Tjek din forbindelse og prøv igen.",
     "invalidInput": "Betalingsoplysningerne ser ugyldige ud. Tjek dem og prøv igen.",
     "generic": "Betalingen kunne ikke gennemføres. Prøv igen om et øjeblik eller brug et mindre beløb."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Denne konto blev oprettet på {network}. Skift til {network} for at bruge den."
   },
   "UnclaimedDeposit": {
     "title": "Du har {count} uafhentede indbetalinger",

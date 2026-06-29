@@ -71,6 +71,12 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
+jest.mock("@app/hooks/use-device-location", () => ({
+  __esModule: true,
+  ...jest.requireActual("@app/hooks/use-device-location"),
+  default: () => ({ countryCode: "SV", loading: false }),
+}))
+
 jest.mock("@app/self-custodial/hooks", () => ({
   useNonCustodialConversionLimits: (...args: unknown[]) =>
     mockUseNonCustodialConversionLimits(...args),
@@ -2041,7 +2047,7 @@ describe("Self-custodial conversion limits gating", () => {
     expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(true)
     await waitFor(() => {
       expect(getByTestId("amount-field-error").props.children).toContain(
-        "Conversion is temporarily unavailable",
+        "Transfers are temporarily unavailable",
       )
     })
   })

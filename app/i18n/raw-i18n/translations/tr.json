@@ -28,10 +28,10 @@
     "text": "'Kabul Et' seçeneğine tıklayarak Hüküm ve Koşullarımızı kabul etmiş olursunuz. Ayrıca, yasaklı ülkelerden birinde ikamet etmediğinizi veya vatandaşı olmadığınızı da kabul edersiniz."
   },
   "SetAccountModal": {
-    "title": "Alım hesabını ayarla",
+    "title": "Varsayılan bakiyeni ayarla",
     "description": "Bunu daha sonra Ayarlar'da her zaman değiştirebilirsin",
-    "stablesatsTag": "Dolar Hesabı — Stablesats tarafından desteklenmektedir",
-    "bitcoinTag": "Maksimalistler için Bitcoin hesabı"
+    "stablesatsTag": "Dolar Bakiyesi — Stablesats tarafından desteklenmektedir",
+    "bitcoinTag": "Sats biriktirmek için Bitcoin Bakiyesi"
   },
   "NoteInput": {
     "addNote": "Not ekle"
@@ -68,12 +68,12 @@
   "ConversionConfirmationScreen": {
     "title": "Çevirmeyi incele",
     "youreConverting": "Çeviriliyor",
-    "receivingAccount": "Alınacak miktar",
+    "receivingAccount": "Alıcı bakiye",
     "infoBitcoin": "Bitcoin miktarı yalnızca yaklaşık bir değerdir. Küçük bir miktar farklılık gösterebilir.",
     "infoDollar": "Dolar miktarı yalnızca yaklaşık bir değerdir. Küçük bir miktar farklılık gösterebilir.",
     "transferButtonText": "{fromWallet} hesabından {toWallet} hesabına transfer et",
-    "feeLabel": "Dönüştürme ücreti",
-    "feeError": "Dönüştürme ücreti alınamadı"
+    "feeLabel": "Transfer ücreti",
+    "feeError": "Transfer ücreti alınamadı"
   },
   "ConversionSuccessScreen": {
     "message": "Çevirme başarılı"
@@ -2081,7 +2081,7 @@
     "scan": "Tara",
     "updateAvailable": "Bir güncelleme mevcut\nGüncellemek için dokun",
     "useLightning": "Lightning ağını kullanıyoruz. ",
-    "myAccounts": "Hesabım",
+    "myAccounts": "Bakiyeler",
     "walletCountNotTwo": "Cüzdan sayısı 2 değil. Bu hesabın tüm cüzdanlarını ve fonlarını görmek için lütfen kontrol panelini kullanın"
   },
   "PinScreen": {
@@ -2121,7 +2121,7 @@
     "setNote": "Not yazın",
     "tapQrCodeCopy": "QR koda tıklayarak kopyalayın",
     "title": "Bitcoin alın",
-    "usdTitle": "Dolar Hesabı'a al",
+    "usdTitle": "Dolar Bakiyesine al",
     "error": "Fatura oluşturulamadı. Sorun devam ederse lütfen destekle iletişime geçin.",
     "copyInvoice": "Kopyala",
     "shareInvoice": "Paylaş",
@@ -2171,7 +2171,7 @@
     "walletNotConnected": "Cüzdanınız hâlâ bağlanıyor. Lütfen bir an bekleyip tekrar deneyin.",
     "paymentPending": "Ödemeniz hâlâ tamamlanıyor olabilir. Tekrar denemeden önce bakiyenizi kontrol edin.",
     "title": "Bitcoin olarak kullan",
-    "usdTitle": "Dolar Hesabı'a aktar",
+    "usdTitle": "Dolar Bakiyesine aktar",
     "error": "Fatura oluşturulamadı. Sorun devam ederse lütfen destekle iletişime geçin.",
     "redeemingError": "Bitcoin paraya çevrilemedi. Bu sorun devam ederse lütfen destek ekibiyle iletişime geçin.",
     "submissionError": "Para çekme talebi gönderilemedi. Bu sorun devam ederse lütfen destek ekibiyle iletişime geçin.",
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "İşlemler csv'ye aktarılamıyor. Bir şeyler yanlış gitti. Sorun devam ederse lütfen destek ekibiyle iletişime geçin.",
     "lnurlNoUsername": "Bir lnurl adresi oluşturmak için önce bir kullanıcı adı belirlemelisiniz. Şimdi bir kullanıcı adı belirlemek istiyor musunuz?",
     "copyClipboardLnurl": "Lnurl adresi panodan kopyalandı",
-    "defaultWallet": "Varsayılan Hesap",
+    "defaultWallet": "Varsayılan alım",
     "rateUs": "{storeName: string}'da bizi değerlendirin",
     "theme": "Tema",
     "nfc": "NFC ile ödeme alın",
@@ -2413,7 +2413,7 @@
     "logoutAlertContentPhone": "Yeniden giriş yapabilmek için telefon numaranızı tekrardan girmeniz gerekiyor.\ntelefon numaranız {phoneNumber: string} olduğundan tekrar giriş yapmak için bu numaraya erişiminiz olduğundan emin olun",
     "logoutAlertContentEmail": "Tekrar giriş yapmak için e-postanızı tekrar girmeniz gerekecektir.\ne-postanız {email: string} olduğundan tekrar giriş yapmak için ona erişiminiz olduğundan emin olun",
     "logoutAlertContentPhoneEmail": "Tekrar giriş yapmak için telefon numaranızı veya e-postanızı tekrar girmeniz gerekecektir.\ntelefon numaranız {phoneNumber: string} ve e-postanız {email: string} olduğundan tekrar giriş yapmak için bunlara erişiminiz olduğundan emin olun",
-    "usdBalanceWarning": "Dolar Hesabı bakiyeniz: {balance: string}.",
+    "usdBalanceWarning": "Dolar bakiyeniz: {balance: string}.",
     "btcBalanceWarning": "Bitcoin bakiyeniz {balance: string}.",
     "secureYourAccount": "Hesabınızı korumak almak için kaydolun",
     "tapToAdd": "Eklemek için dokunun",
@@ -2457,17 +2457,16 @@
     "removedAccount": "{identifier: string} hesabını kaldırdınız."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats bölgenizde kullanılamıyor",
-    "modalBody": "Dolar hesabına erişmek için saklamasız bir hesap oluşturun.",
-    "createNew": "Yeni oluştur",
     "walletLabel": "bölgenizde kullanılamıyor"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Dolar hesabı artık bölgenizde kullanılamıyor",
-    "body": "Dolar bakiyenizi Bitcoin'e aktarın",
+    "title": "Dolar bakiyesi bölgenizde kullanılamıyor",
+    "body": "Dolar Bakiyesinden Bitcoin Bakiyesine aktarın",
     "youHave": "Sahip olduğunuz",
-    "youGet": "Alacağınız",
-    "approve": "Onayla"
+    "youGet": "Alacağınız"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "İki aşamalı doğrulama",
@@ -2488,10 +2487,11 @@
     "toastMessage": "Sır panoya kopyalandı"
   },
   "DefaultWalletScreen": {
-    "title": "Varsayılan alma hesabı",
-    "info": "Bitcoin Hesabı'ınız sats biriktirmek içindir, burada USD değeri piyasayla hareket eder. Dolar Hesabı'ınız Stablesats tarafından desteklenmektedir — USD değerinde sabit kalacak şekilde korunan Bitcoin tutar. Her zaman Bitcoin tutarsınız ama dolar değeri değişmez.",
-    "titleSelfCustodial": "Varsayılan hesap",
-    "infoSelfCustodial": "Bu hesap alma ve gönderme sırasında varsayılan olarak kullanılacaktır. İstediğiniz zaman değiştirebilirsiniz."
+    "title": "Varsayılan alım",
+    "titleSelfCustodial": "Varsayılan alım",
+    "infoBtc": "Bitcoin Bakiyeniz sats biriktirmek içindir, burada USD değeri piyasayla hareket eder.",
+    "infoUsd": "Dolar Bakiyeniz Stablesats tarafından desteklenmektedir — USD değerinde sabit kalacak şekilde korunan Bitcoin tutar. Her zaman Bitcoin tutarsınız ama dolar değeri değişmez.",
+    "infoUsdSelfCustodial": "Dolar alımı, non-custodial hesaplar için varsayılan alma seçeneği olarak kullanılamaz."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2506,12 +2506,12 @@
     "DEFAULT": "Varsayılan (OS)"
   },
   "StablesatsModal": {
-    "header": "Dolar Hesabı'ınız Stablesats tarafından desteklenmektedir",
-    "body": "Dolar Hesabı, Bitcoin'i USD fiyatında sabit tutmak için Stablesats teknolojisini kullanır. Her zaman Bitcoin tutarsınız — gerçek dolar değil — ama USD değeri dalgalanmaz. Her zamanki gibi Bitcoin gönderip alabilirsiniz, ancak geleneksel bankacılık sistemiyle uyumlu değildir.",
+    "header": "Dolar Bakiyeniz Stablesats tarafından desteklenmektedir",
+    "body": "Saklamalı Modda, Dolar Bakiyeniz Stablesats teknolojisini kullanır — gerçek USD değil Bitcoin tutarsınız, ancak değer USD cinsinden aynı miktarı korumak üzere tasarlanmıştır. Her zamanki gibi Bitcoin gönderip alabilirsiniz.",
     "termsAndConditions": "Hükümler ve koşulları oku",
-    "learnMore": "Stablesats'i öğrenin",
-    "headerSelfCustodial": "Dolar hesabın stablecoin tutar",
-    "bodySelfCustodial": "Dolar hesabında stablecoin tutarsın. Varlıklarla teminatlandırılmış ve değeri ABD doları karşısında sabit tutulan tokenler. Stablecoin'leri henüz gönderip alamazsın. Dolar hesabından gönderdiğinde, stablecoin'lerin takas edilir ve alıcıya Bitcoin olarak gönderilir.",
+    "learnMore": "Dolar Bakiyesi hakkında daha fazla bilgi edinin",
+    "headerSelfCustodial": "Dolar Bakiyeniz hakkında",
+    "bodySelfCustodial": "Saklamasız Modda, Dolar Bakiyeniz USD cinsinden aynı değeri korumak üzere tasarlanmış desteklenen stablecoin'leri kullanır.",
     "learnMoreSelfCustodial": "Daha fazla bilgi"
   },
   "SplashScreen": {
@@ -2522,8 +2522,8 @@
     "received": "Size geldi",
     "spent": "Harcadınız",
     "sending": "Gönderiliyor",
-    "receivingAccount": "Ödeme Alacak Hesap",
-    "sendingAccount": "Gönderen Hesap",
+    "receivingAccount": "Alıcı Bakiye",
+    "sendingAccount": "Gönderen Bakiye",
     "txNotBroadcast": "İşleminiz sıraya alındı. Mempool'da görünmelidir {countdown: string}.",
     "momentarily": "anlık olarak"
   },
@@ -2534,7 +2534,7 @@
     "perWeek": "hafta başına",
     "unlimited": "Limitsiz",
     "remaining": "Kalan",
-    "stablesatTransfers": "Dolar Hesabı transferleri",
+    "stablesatTransfers": "Dolar Bakiyesi transferleri",
     "internalSend": "{bankName: string} kullanıcısına gönder",
     "error": "Şu an için limitlere ulaşamıyoruz",
     "increaseLimits": "Limitinizi artırın"
@@ -2699,6 +2699,8 @@
     "success": "E-posta {email: string} başarıyla onaylandı"
   },
   "common": {
+    "country": "Ülke",
+    "unknown": "Bilinmiyor",
     "enabled": "Etkin",
     "switch": "Anahtar",
     "notifications": "Bildirimler",
@@ -2728,7 +2730,7 @@
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Bitcoin fiyatı",
-    "btcAccount": "Bitcoin Hesabı",
+    "btcAccount": "Bitcoin Bakiyesi",
     "cancel": "İptal",
     "close": "Kapat",
     "confirm": "Onayla",
@@ -2799,7 +2801,7 @@
     "transactionsError": "İşlemleri yüklerken hata oluştu",
     "tryAgain": "Tekrar deneyin",
     "type": "Tip",
-    "usdAccount": "Dolar Hesabı",
+    "usdAccount": "Dolar Bakiyesi",
     "username": "Kullanıcı adı",
     "usernameRequired": "Kullanıcı adı gerekiyor",
     "backupAccount": "Hesabı yedekleme/yükseltme",
@@ -3569,6 +3571,10 @@
     "createFailed": "Cüzdan oluşturulamadı. Lütfen tekrar deneyin.",
     "selfCustodialDisabled": "Saklamasız mod geçici olarak kullanılamıyor."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Desteklenmeyen bölge",
+    "description": "Maalesef mevcut bölgenizdeki kullanıcılara hizmet veremiyoruz."
+  },
   "RestoreScreen": {
     "title": "Cüzdanı geri yükle",
     "description": "Cüzdanınızı bir yedekten geri yükleyin",
@@ -3621,8 +3627,8 @@
       "deactivateConfirm": "Devre dışı bırak",
       "cancel": "İptal"
     },
-    "minimumConversion": "Minimum dönüşüm: {amount:string}",
-    "conversionUnavailable": "Dönüşüm geçici olarak kullanılamıyor. Lütfen tekrar deneyin."
+    "minimumConversion": "Minimum transfer: {amount:string}",
+    "conversionUnavailable": "Transferler geçici olarak kullanılamıyor. Lütfen tekrar deneyin."
   },
   "BackendFeatureGate": {
     "title": "Özellik kullanılamıyor",
@@ -3665,6 +3671,9 @@
     "networkError": "Ağ bağlantısı sorunu. Bağlantınızı kontrol edip tekrar deneyin.",
     "invalidInput": "Ödeme bilgileri geçersiz görünüyor. Lütfen gözden geçirip tekrar deneyin.",
     "generic": "Ödeme tamamlanamadı. Bir an sonra tekrar deneyin veya daha küçük bir tutar kullanın."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Bu hesap {network} ağında oluşturuldu. Kullanmak için {network} ağına geçin."
   },
   "UnclaimedDeposit": {
     "title": "{count} talep edilmemiş yatırmanız var",

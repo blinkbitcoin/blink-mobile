@@ -1,19 +1,31 @@
-import axios from "axios"
 import { CountryCode, parsePhoneNumber } from "libphonenumber-js/mobile"
 import { useEffect, useState } from "react"
 
 import { useApolloClient } from "@apollo/client"
 import { updateCountryCode } from "@app/graphql/client-only-query"
 import { useCountryCodeQuery, useSettingsScreenQuery } from "@app/graphql/generated"
+import { resolveIpCountryCode } from "@app/utils/ip-country-lookup"
 import { logError } from "@app/utils/log-error"
 
 const DEFAULT_COUNTRY_CODE: CountryCode = "SV"
-const IPAPI_URL = "https://ipapi.co/json/"
+
+export const LocationSource = {
+  Phone: "phone",
+  Ip: "ip",
+} as const
+
+export type LocationSource = (typeof LocationSource)[keyof typeof LocationSource]
+
+export const isBlockedCountry = (
+  countryCode: string | undefined,
+  blockedCountries: string[],
+): boolean => Boolean(countryCode && blockedCountries.includes(countryCode.toUpperCase()))
 
 type DeviceLocation = {
   countryCode: CountryCode | undefined
   loading: boolean
   detectionFailed: boolean
+  source: LocationSource | undefined
 }
 
 const useDeviceLocation = (): DeviceLocation => {
@@ -26,11 +38,13 @@ const useDeviceLocation = (): DeviceLocation => {
   const [loading, setLoading] = useState(true)
   const [countryCode, setCountryCode] = useState<CountryCode | undefined>()
   const [detectionFailed, setDetectionFailed] = useState(false)
+  const [source, setSource] = useState<LocationSource | undefined>()
 
   const userPhone = settingsData?.me?.phone
 
   useEffect(() => {
     if (!userPhone) return
+    setSource(LocationSource.Phone)
     try {
       const parsed = parsePhoneNumber(userPhone)
       if (!parsed?.country) {
@@ -62,6 +76,7 @@ const useDeviceLocation = (): DeviceLocation => {
   useEffect(() => {
     if (error && !userPhone) {
       setCountryCode(DEFAULT_COUNTRY_CODE)
+      setSource(LocationSource.Ip)
       setDetectionFailed(true)
       setLoading(false)
       logError({
@@ -74,36 +89,17 @@ const useDeviceLocation = (): DeviceLocation => {
 
   useEffect(() => {
     if (!data || userPhone) return
+    setSource(LocationSource.Ip)
     const getLocation = async () => {
-      try {
-        const response = await axios.get(IPAPI_URL, {
-          timeout: 5000,
-        })
-        const _countryCode = response?.data?.country_code
-        if (!_countryCode) {
-          const cached = data.countryCode as CountryCode | undefined
-          setCountryCode(cached ?? DEFAULT_COUNTRY_CODE)
-          setDetectionFailed(!cached)
-          setLoading(false)
-          logError({
-            scope: "device-location",
-            error: new Error("ipapi returned no country, using cached or fallback"),
-            context: { source: "ipapi", hasCached: Boolean(cached) },
-          })
-          return
-        }
-        setCountryCode(_countryCode)
+      const cached = data.countryCode as CountryCode | undefined
+      const ipCountryCode = await resolveIpCountryCode()
+      if (ipCountryCode) {
+        setCountryCode(ipCountryCode)
         setDetectionFailed(false)
-        updateCountryCode(client, _countryCode)
-      } catch (err) {
-        const cached = data.countryCode as CountryCode | undefined
+        updateCountryCode(client, ipCountryCode)
+      } else {
         setCountryCode(cached ?? DEFAULT_COUNTRY_CODE)
         setDetectionFailed(!cached)
-        logError({
-          scope: "device-location",
-          error: err,
-          context: { source: "ipapi", hasCached: Boolean(cached) },
-        })
       }
       setLoading(false)
     }
@@ -114,7 +110,25 @@ const useDeviceLocation = (): DeviceLocation => {
     countryCode,
     loading,
     detectionFailed,
+    source,
   }
+}
+
+export const useIpCountryCode = (enabled: boolean): CountryCode | undefined => {
+  const [ipCountryCode, setIpCountryCode] = useState<CountryCode | undefined>()
+
+  useEffect(() => {
+    if (!enabled) return undefined
+    let active = true
+    resolveIpCountryCode().then((code) => {
+      if (active && code) setIpCountryCode(code)
+    })
+    return () => {
+      active = false
+    }
+  }, [enabled])
+
+  return ipCountryCode
 }
 
 export default useDeviceLocation

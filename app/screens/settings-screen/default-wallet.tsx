@@ -13,7 +13,7 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useStablesatsRestrictionGuard } from "@app/hooks/use-stablesats-restriction-guard"
+import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
@@ -58,6 +58,7 @@ type WalletOption = {
   key: string
   name: string
   isSelected: boolean
+  disabled?: boolean
   onSelect: () => void
 }
 
@@ -85,7 +86,12 @@ const DefaultWalletPicker: React.FC<DefaultWalletPickerProps> = ({ options, info
                 activeOpacity={0.7}
                 {...testProps(option.name)}
               >
-                <ListItem containerStyle={styles.listItemContainer}>
+                <ListItem
+                  containerStyle={[
+                    styles.listItemContainer,
+                    option.disabled && styles.disabledOption,
+                  ]}
+                >
                   <View>
                     {option.isSelected ? (
                       <Icon
@@ -162,7 +168,12 @@ const CustodialDefaultWallet: React.FC = () => {
     },
   ]
 
-  return <DefaultWalletPicker options={options} info={LL.DefaultWalletScreen.info()} />
+  const info =
+    selectedWalletId === usdWalletId
+      ? LL.DefaultWalletScreen.infoUsd()
+      : LL.DefaultWalletScreen.infoBtc()
+
+  return <DefaultWalletPicker options={options} info={info} />
 }
 
 const SelfCustodialDefaultWallet: React.FC = () => {
@@ -170,6 +181,13 @@ const SelfCustodialDefaultWallet: React.FC = () => {
   const { persistentState, updateState } = usePersistentStateContext()
 
   const selectedCurrency = getSelfCustodialDefaultCurrency(persistentState)
+
+  // The Dollar account cannot be set as the default in self-custodial mode, but
+  // tapping it still surfaces its description. Track which description to show
+  // independently from the actual default currency.
+  const [descriptionCurrency, setDescriptionCurrency] = React.useState<"BTC" | "USD">(
+    selectedCurrency,
+  )
 
   const setCurrency = (currency: "BTC" | "USD") => {
     updateState((prev) => prev && withSelfCustodialDefaultCurrency(prev, currency))
@@ -180,26 +198,30 @@ const SelfCustodialDefaultWallet: React.FC = () => {
       key: WalletCurrency.Btc,
       name: LL.common.bitcoin(),
       isSelected: selectedCurrency === WalletCurrency.Btc,
-      onSelect: () => setCurrency(WalletCurrency.Btc),
+      onSelect: () => {
+        setDescriptionCurrency("BTC")
+        setCurrency("BTC")
+      },
     },
     {
       key: WalletCurrency.Usd,
       name: LL.common.dollarStablecoin(),
       isSelected: selectedCurrency === WalletCurrency.Usd,
-      onSelect: () => setCurrency(WalletCurrency.Usd),
+      disabled: true,
+      onSelect: () => setDescriptionCurrency("USD"),
     },
   ]
 
-  return (
-    <DefaultWalletPicker
-      options={options}
-      info={LL.DefaultWalletScreen.infoSelfCustodial()}
-    />
-  )
+  const info =
+    descriptionCurrency === "USD"
+      ? LL.DefaultWalletScreen.infoUsdSelfCustodial()
+      : LL.DefaultWalletScreen.infoBtc()
+
+  return <DefaultWalletPicker options={options} info={info} />
 }
 
 export const DefaultWalletScreen: React.FC = () => {
-  if (useStablesatsRestrictionGuard()) return null
+  if (useDollarBalanceRestrictionGuard()) return null
   return <DefaultWalletScreenContent />
 }
 
@@ -223,6 +245,9 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.transparent,
     paddingVertical: 16,
     paddingHorizontal: 16,
+  },
+  disabledOption: {
+    opacity: 0.5,
   },
   itemTitle: {
     fontSize: 16,

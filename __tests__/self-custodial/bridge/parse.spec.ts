@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { Network } from "@breeztech/breez-sdk-spark-react-native"
+
 import {
   parseSparkAddress,
   parseSparkAddressDetailed,
@@ -7,20 +9,15 @@ import {
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   BitcoinNetwork: { Bitcoin: 0, Regtest: 4 },
+  Network: { Mainnet: 0, Regtest: 1 },
   InputType_Tags: { SparkAddress: "SparkAddress", BitcoinAddress: "BitcoinAddress" },
 }))
 
-jest.mock("@app/self-custodial/config", () => ({
-  SparkConfig: { network: 1 },
-  hasSparkAddressShape: (input: string): boolean => /^(?:sp1|sprt1)/i.test(input.trim()),
-}))
+jest.mock("react-native-config", () => ({}))
+jest.mock("react-native-fs", () => ({ DocumentDirectoryPath: "/test" }))
 
-jest.mock("react-native-config", () => ({
-  BREEZ_NETWORK: "regtest",
-}))
-
-const SPARK_REGTEST_INPUT = "sprt1qabcdefghijklmn"
-const SPARK_MAINNET_INPUT = "sp1qabcdefghijklmn"
+const SPARK_REGTEST_INPUT = "sparkrt1qabcdefghijklmn"
+const SPARK_MAINNET_INPUT = "spark1qabcdefghijklmn"
 const LNURL_INPUT = "lnurl1examplefixtureonly"
 
 const createMockSdk = (parseResult: unknown) =>
@@ -44,7 +41,7 @@ describe("parseSparkAddress", () => {
       ],
     })
 
-    const result = await parseSparkAddress(sdk, SPARK_REGTEST_INPUT)
+    const result = await parseSparkAddress(sdk, SPARK_REGTEST_INPUT, Network.Regtest)
 
     expect(result).not.toBeNull()
     expect(result?.address).toBe(SPARK_REGTEST_INPUT)
@@ -64,7 +61,7 @@ describe("parseSparkAddress", () => {
       ],
     })
 
-    const result = await parseSparkAddress(sdk, SPARK_MAINNET_INPUT)
+    const result = await parseSparkAddress(sdk, SPARK_MAINNET_INPUT, Network.Regtest)
 
     expect(result).not.toBeNull()
     expect(result?.networkMatch).toBe(false)
@@ -76,7 +73,7 @@ describe("parseSparkAddress", () => {
       inner: [{ address: "bc1q..." }],
     })
 
-    const result = await parseSparkAddress(sdk, SPARK_REGTEST_INPUT)
+    const result = await parseSparkAddress(sdk, SPARK_REGTEST_INPUT, Network.Regtest)
 
     expect(result).toBeNull()
   })
@@ -86,7 +83,7 @@ describe("parseSparkAddress", () => {
       parse: jest.fn().mockRejectedValue(new Error("parse failed")),
     } as never
 
-    const result = await parseSparkAddress(sdk, SPARK_REGTEST_INPUT)
+    const result = await parseSparkAddress(sdk, SPARK_REGTEST_INPUT, Network.Regtest)
 
     expect(result).toBeNull()
   })
@@ -105,7 +102,11 @@ describe("parseSparkAddressDetailed", () => {
       ],
     })
 
-    const result = await parseSparkAddressDetailed(sdk, SPARK_REGTEST_INPUT)
+    const result = await parseSparkAddressDetailed(
+      sdk,
+      SPARK_REGTEST_INPUT,
+      Network.Regtest,
+    )
 
     expect(result.outcome).toBe(ParseSparkAddressOutcome.Match)
     if (result.outcome === ParseSparkAddressOutcome.Match) {
@@ -120,7 +121,11 @@ describe("parseSparkAddressDetailed", () => {
       inner: [{ address: "bc1q..." }],
     })
 
-    const result = await parseSparkAddressDetailed(sdk, SPARK_REGTEST_INPUT)
+    const result = await parseSparkAddressDetailed(
+      sdk,
+      SPARK_REGTEST_INPUT,
+      Network.Regtest,
+    )
 
     expect(result.outcome).toBe(ParseSparkAddressOutcome.NotSparkAddress)
   })
@@ -131,7 +136,11 @@ describe("parseSparkAddressDetailed", () => {
       parse: jest.fn().mockRejectedValue(sdkErr),
     } as never
 
-    const result = await parseSparkAddressDetailed(sdk, SPARK_REGTEST_INPUT)
+    const result = await parseSparkAddressDetailed(
+      sdk,
+      SPARK_REGTEST_INPUT,
+      Network.Regtest,
+    )
 
     expect(result.outcome).toBe(ParseSparkAddressOutcome.ParseError)
     if (result.outcome === ParseSparkAddressOutcome.ParseError) {
@@ -145,7 +154,7 @@ describe("parseSparkAddressDetailed — shape gate integration with hasSparkAddr
     const parseFn = jest.fn()
     const sdk = { parse: parseFn } as never
 
-    const result = await parseSparkAddressDetailed(sdk, LNURL_INPUT)
+    const result = await parseSparkAddressDetailed(sdk, LNURL_INPUT, Network.Regtest)
 
     expect(result.outcome).toBe(ParseSparkAddressOutcome.NotSparkAddress)
     expect(parseFn).not.toHaveBeenCalled()
@@ -158,7 +167,7 @@ describe("parseSparkAddressDetailed — shape gate integration with hasSparkAddr
       inner: [{ address: SPARK_REGTEST_INPUT, identityPublicKey: "pk", network: 4 }],
     })
 
-    await parseSparkAddressDetailed(sdk, padded)
+    await parseSparkAddressDetailed(sdk, padded, Network.Regtest)
 
     expect(parseFn).toHaveBeenCalledWith(SPARK_REGTEST_INPUT)
   })

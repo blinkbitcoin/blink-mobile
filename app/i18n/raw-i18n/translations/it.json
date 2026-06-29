@@ -72,8 +72,8 @@
         "infoBitcoin": "L'importo in Bitcoin è solo approssimativo. Può variare leggermente.",
         "infoDollar": "L'importo in dollari è solo approssimativo. Può variare leggermente.",
         "transferButtonText": "Trasferisci {fromWallet} a {toWallet}",
-        "feeLabel": "Commissione di conversione",
-        "feeError": "Impossibile recuperare la commissione di conversione"
+        "feeLabel": "Commissione di trasferimento",
+        "feeError": "Impossibile recuperare la commissione di trasferimento"
     },
     "ConversionSuccessScreen": {
         "message": "Conversione riuscita"
@@ -2081,7 +2081,7 @@
         "scan": "Scansione",
         "updateAvailable": "É disponibile un aggiornamento.\nClicca per aggiornare",
         "useLightning": "Usiamo il Lightning Network",
-        "myAccounts": "Il mio conto",
+        "myAccounts": "Saldo",
         "walletCountNotTwo": "Il conteggio del portafoglio non è 2. Si prega di utilizzare la dashboard per visualizzare tutti i portafogli e i fondi di questo account"
     },
     "PinScreen": {
@@ -2342,7 +2342,7 @@
         "csvTransactionsError": "Impossibile esportare le transazioni in csv. Qualcosa è andato storto. Se il problema persiste contattare l'assistenza.",
         "lnurlNoUsername": "Per generare un indirizzo lnurl è necessario prima impostare un username. Vuoi impostare un username ora?",
         "copyClipboardLnurl": "L'indirizzo Lnurl è stato copiato negli appunti",
-        "defaultWallet": "Account predefinito",
+        "defaultWallet": "Ricezione predef.",
         "rateUs": "Valutaci su {storeName: string}",
         "theme": "Tema",
         "nfc": "Ricevi da NFC",
@@ -2457,17 +2457,16 @@
         "removedAccount": "Hai rimosso l'account {identifier: string}."
     },
     "StablesatsRestriction": {
-        "modalTitle": "Stablesats non è disponibile nella tua regione",
-        "modalBody": "Per accedere a un conto in dollari, crea un account non-custodial.",
-        "createNew": "Crea nuovo",
         "walletLabel": "non è disponibile nella tua regione"
     },
+    "DollarBalanceRestriction": {
+        "modalTitle": "Il saldo in dollari non è disponibile nella tua regione"
+    },
     "ConvertDollarToBitcoinModal": {
-        "title": "Il conto in dollari non è più disponibile nella tua regione",
-        "body": "Trasferisci il tuo saldo in dollari in Bitcoin",
+        "title": "Il saldo in dollari non è disponibile nella tua regione",
+        "body": "Trasferisci dal saldo in dollari al saldo in Bitcoin",
         "youHave": "Hai",
-        "youGet": "Ricevi",
-        "approve": "Approva"
+        "youGet": "Ricevi"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Autenticazione a due fattori",
@@ -2488,10 +2487,11 @@
         "toastMessage": "Segreto copiato negli appunti!"
     },
     "DefaultWalletScreen": {
-        "title": "Conto di ricezione predefinito",
-        "info": "Il tuo Conto Bitcoin è per accumulare sats, dove il valore USD si muove con il mercato. Il tuo Conto Dollaro è alimentato da Stablesats — contiene Bitcoin coperto per rimanere stabile in valore USD. Detieni sempre Bitcoin, ma il valore in dollari non cambia.",
-        "titleSelfCustodial": "Account predefinito",
-        "infoSelfCustodial": "Questo account verrà usato di default per ricevere e inviare. Puoi cambiarlo in qualsiasi momento."
+        "title": "Ricezione predef.",
+        "titleSelfCustodial": "Ricezione predef.",
+        "infoBtc": "Il tuo Conto Bitcoin è per accumulare sats, dove il valore USD si muove con il mercato.",
+        "infoUsd": "Il tuo Conto Dollaro è alimentato da Stablesats — contiene Bitcoin coperto per rimanere stabile in valore USD. Detieni sempre Bitcoin, ma il valore in dollari non cambia.",
+        "infoUsdSelfCustodial": "La ricezione in dollari non è disponibile come opzione di ricezione predefinita per gli account non custodial."
     },
     "ThemeScreen": {
         "title": "Tema",
@@ -2507,11 +2507,11 @@
     },
     "StablesatsModal": {
         "header": "Il tuo Conto Dollaro è alimentato da Stablesats",
-        "body": "Conto Dollaro utilizza la tecnologia Stablesats per mantenere il Bitcoin stabile al prezzo USD. Detieni sempre Bitcoin — non dollari veri — ma il valore USD non fluttua. Puoi inviare e ricevere Bitcoin normalmente, ma non è compatibile con il sistema bancario tradizionale.",
+        "body": "In Modalità Custodial, il tuo Conto Dollaro utilizza la tecnologia Stablesats — detieni Bitcoin, non USD veri, ma il valore è progettato per mantenere lo stesso importo in termini di USD. Puoi inviare e ricevere Bitcoin normalmente.",
         "termsAndConditions": "Leggi i Terms & Conditions",
-        "learnMore": "Scopri di più su Stablesats",
-        "headerSelfCustodial": "Il tuo conto Dollaro contiene stablecoin",
-        "bodySelfCustodial": "Nel conto Dollaro detieni stablecoin. Token garantiti da attività il cui valore è mantenuto stabile rispetto al dollaro USA. Non puoi ancora inviare e ricevere stablecoin. Quando invii dal conto Dollaro, i tuoi stablecoin vengono scambiati e inviati come Bitcoin al destinatario.",
+        "learnMore": "Scopri di più sul Conto Dollaro",
+        "headerSelfCustodial": "Informazioni sul tuo Conto Dollaro",
+        "bodySelfCustodial": "In Modalità Non Custodial, il tuo Conto Dollaro utilizza stablecoin supportate, progettate per mantenere lo stesso valore in termini di USD.",
         "learnMoreSelfCustodial": "Scopri di più"
     },
     "SplashScreen": {
@@ -2699,6 +2699,8 @@
         "success": "Email {email: string} confermata con successo"
     },
     "common": {
+        "country": "Paese",
+        "unknown": "Sconosciuto",
         "enabled": "Abilitato",
         "switch": "Interruttore",
         "notifications": "Notifiche",
@@ -3569,6 +3571,10 @@
         "createFailed": "Impossibile creare il wallet. Riprova.",
         "selfCustodialDisabled": "La modalità non custodial è temporaneamente non disponibile."
     },
+    "UnsupportedRegionScreen": {
+        "title": "Regione non supportata",
+        "description": "Purtroppo non possiamo servire gli utenti dalla tua regione attuale."
+    },
     "RestoreScreen": {
         "title": "Ripristina portafoglio",
         "description": "Recupera il tuo portafoglio da un backup",
@@ -3621,8 +3627,8 @@
             "deactivateConfirm": "Disattiva",
             "cancel": "Annulla"
         },
-        "minimumConversion": "Conversione minima: {amount:string}",
-        "conversionUnavailable": "La conversione è temporaneamente non disponibile. Riprova."
+        "minimumConversion": "Trasferimento minimo: {amount:string}",
+        "conversionUnavailable": "I trasferimenti sono temporaneamente non disponibili. Riprova."
     },
     "BackendFeatureGate": {
         "title": "Funzione non disponibile",
@@ -3665,6 +3671,9 @@
         "networkError": "Problema di connessione di rete. Controlla la connessione e riprova.",
         "invalidInput": "I dettagli del pagamento sembrano non validi. Verificali e riprova.",
         "generic": "Il pagamento non è stato completato. Riprova tra un momento, o usa un importo più piccolo."
+    },
+    "SelfCustodialNetworkMismatch": {
+        "toast": "Questo account è stato creato su {network}. Passa a {network} per usarlo."
     },
     "UnclaimedDeposit": {
         "title": "Hai {count} deposito/i non reclamato/i",

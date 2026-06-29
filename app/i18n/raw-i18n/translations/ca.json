@@ -72,8 +72,8 @@
     "infoBitcoin": "La quantitat de Bitcoin és només aproximada. Pot variar lleugerament.",
     "infoDollar": "La quantitat en dòlars és només aproximada. Pot variar lleugerament.",
     "transferButtonText": "Transferir {fromWallet} a {toWallet}",
-    "feeLabel": "Comissió de conversió",
-    "feeError": "No s'ha pogut obtenir la comissió de conversió"
+    "feeLabel": "Comissió de transferència",
+    "feeError": "No s'ha pogut obtenir la comissió de transferència"
   },
   "ConversionSuccessScreen": {
     "message": "Conversió efectuada amb èxit"
@@ -2081,7 +2081,7 @@
     "scan": "Escaneja",
     "updateAvailable": "Hi ha una actualització.\nToca per actualitzar ara",
     "useLightning": "Utilitzem la xaxa Lightning.",
-    "myAccounts": "Els meus comptes",
+    "myAccounts": "Saldos",
     "walletCountNotTwo": "El recompte de moneders no és 2. Utilitza el tauler per veure tots els moneders i els fons d'aquest compte"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "No es poden exportar transaccions a csv. Alguna cosa ha anat malament. Si el problema persisteix,  contacta amb el servei d'assistència.",
     "lnurlNoUsername": "Per generar una adreça lnurl primer has d'establir un nom d'usuari. Vols configurar un nom d'usuari ara?",
     "copyClipboardLnurl": "L'adreça Lnurl s'ha copiat al porta-retalls",
-    "defaultWallet": "Compte predeterminat",
+    "defaultWallet": "Rebre per defecte",
     "rateUs": "Valora'ns a {storeName: string}",
     "theme": "Tema",
     "nfc": "Rep per NFC",
@@ -2457,17 +2457,16 @@
     "removedAccount": "Has eliminat el compte {identifier: string}."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats no està disponible a la teva regió",
-    "modalBody": "Per accedir a un compte en dòlars, crea un compte no custodial.",
-    "createNew": "Crea nou",
     "walletLabel": "no està disponible a la teva regió"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "El saldo en dòlars no està disponible a la teva regió"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "El compte en dòlars ja no està disponible a la teva regió",
-    "body": "Transfereix el teu saldo en dòlars a Bitcoin",
+    "title": "El saldo en dòlars no està disponible a la teva regió",
+    "body": "Transfereix del saldo en dòlars al saldo en Bitcoin",
     "youHave": "Tens",
-    "youGet": "Reps",
-    "approve": "Aprova"
+    "youGet": "Reps"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Autentificació de dos factors",
@@ -2488,10 +2487,11 @@
     "toastMessage": "El secret s'ha copiat al porta-retalls!"
   },
   "DefaultWalletScreen": {
-    "title": "Compte de recepció predeterminat",
-    "info": "El teu Compte Bitcoin és per acumular sats, on el valor USD es mou amb el mercat. El teu Compte Dòlar està impulsat per Stablesats — conté Bitcoin cobert per mantenir-se estable en termes USD. Sempre tens Bitcoin, però el valor en dòlars no canvia.",
-    "titleSelfCustodial": "Compte per defecte",
-    "infoSelfCustodial": "Aquest compte s'utilitzarà per defecte en rebre i enviar. Pots canviar en qualsevol moment."
+    "title": "Rebre per defecte",
+    "titleSelfCustodial": "Rebre per defecte",
+    "infoBtc": "El teu Compte Bitcoin és per acumular sats, on el valor USD es mou amb el mercat.",
+    "infoUsd": "El teu Compte Dòlar està impulsat per Stablesats — conté Bitcoin cobert per mantenir-se estable en termes USD. Sempre tens Bitcoin, però el valor en dòlars no canvia.",
+    "infoUsdSelfCustodial": "La recepció en dòlars no està disponible com a opció de recepció predeterminada per als comptes no custodials."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "El teu Compte Dòlar està impulsat per Stablesats",
-    "body": "Compte Dòlar utilitza la tecnologia Stablesats per mantenir Bitcoin estable al preu USD. Sempre tens Bitcoin — no dòlars reals — però el valor USD no fluctua. Pots enviar i rebre Bitcoin com de costum, però no és compatible amb el sistema bancari tradicional.",
+    "body": "En Mode Custodial, el teu Compte Dòlar utilitza la tecnologia Stablesats — tens Bitcoin, no USD reals, però el valor està dissenyat per mantenir el mateix import en termes d'USD. Pots enviar i rebre Bitcoin com de costum.",
     "termsAndConditions": "Llegeix els Termes i Condicions",
-    "learnMore": "Apren més sobre els Stablesats",
-    "headerSelfCustodial": "El teu compte Dòlar té stablecoins",
-    "bodySelfCustodial": "Al compte Dòlar tens stablecoins. Tokens recolzats per actius amb el valor estable respecte al dòlar. Encara no pots enviar ni rebre stablecoins. Quan enviïs des del compte Dòlar, canviaràs els teus stablecoins i els enviaràs com a Bitcoin al destinatari.",
+    "learnMore": "Més informació sobre el Compte Dòlar",
+    "headerSelfCustodial": "Sobre el teu Compte Dòlar",
+    "bodySelfCustodial": "En Mode No Custodial, el teu Compte Dòlar utilitza stablecoins compatibles, dissenyades per mantenir el mateix valor en termes d'USD.",
     "learnMoreSelfCustodial": "Més informació"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "El correu electrònic {email: string} s'ha confirmat correctament"
   },
   "common": {
+    "country": "País",
+    "unknown": "Desconegut",
     "enabled": "Habilitat",
     "switch": "Interruptor",
     "notifications": "Notificacions",
@@ -3569,6 +3571,10 @@
     "createFailed": "No s'ha pogut crear la cartera. Si us plau, torna-ho a provar.",
     "selfCustodialDisabled": "El mode no custodial està temporalment no disponible."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Regió no admesa",
+    "description": "Malauradament, no podem atendre usuaris de la vostra regió actual."
+  },
   "RestoreScreen": {
     "title": "Restaura la cartera",
     "description": "Recupera la teva cartera des d'una còpia de seguretat",
@@ -3621,8 +3627,8 @@
       "deactivateConfirm": "Desactivar",
       "cancel": "Cancel·la"
     },
-    "minimumConversion": "Conversió mínima: {amount:string}",
-    "conversionUnavailable": "La conversió no està disponible temporalment. Torna-ho a provar."
+    "minimumConversion": "Transferència mínima: {amount:string}",
+    "conversionUnavailable": "Les transferències no estan disponibles temporalment. Torna-ho a provar."
   },
   "BackendFeatureGate": {
     "title": "Funció no disponible",
@@ -3665,6 +3671,9 @@
     "networkError": "Problema de connexió de xarxa. Comprova la teva connexió i torna-ho a provar.",
     "invalidInput": "Els detalls del pagament semblen invàlids. Si us plau, revisa'ls i torna-ho a provar.",
     "generic": "No s'ha pogut completar el pagament. Torna-ho a provar en un moment, o utilitza un import més petit."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Aquest compte es va crear a {network}. Canvia a {network} per utilitzar-lo."
   },
   "UnclaimedDeposit": {
     "title": "Tens {count} dipòsit(s) no reclamat(s)",

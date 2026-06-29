@@ -7,6 +7,7 @@ import {
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { createSelfCustodialScanContext } from "@app/self-custodial/adapters/scan-context"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { type ScanContextAdapter } from "@app/types/scan-context"
 
 import { useActiveWallet } from "./use-active-wallet"
@@ -22,15 +23,16 @@ export const useScanContext = (): ScanContextAdapter => {
   } = useAppConfig()
   const { data } = useScanningQrCodeScreenQuery({ skip: !isAuthed })
   const { data: unauthedData } = useHomeUnauthedQuery({ fetchPolicy: "cache-first" })
+  const network = useSparkNetwork()
 
   return useMemo((): ScanContextAdapter => {
     if (isSelfCustodial) {
-      return createSelfCustodialScanContext(wallets)
+      return createSelfCustodialScanContext(wallets, network)
     }
     return createCustodialScanContext(
       data,
       unauthedData?.globals?.network ?? null,
       lnAddressHostname,
     )
-  }, [isSelfCustodial, wallets, data, unauthedData, lnAddressHostname])
+  }, [isSelfCustodial, wallets, data, unauthedData, lnAddressHostname, network])
 }

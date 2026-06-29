@@ -9,7 +9,7 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useStablesatsRestricted } from "@app/hooks/use-stablesats-restricted"
+import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
@@ -72,7 +72,7 @@ const WalletOverview: React.FC<Props> = ({
   showBtcNotification = false,
   showUsdNotification = false,
 }) => {
-  const isStablesatsRestricted = useStablesatsRestricted()
+  const isDollarBalanceRestricted = useDollarBalanceRestricted()
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
 
   const { LL } = useI18nContext()
@@ -184,7 +184,7 @@ const WalletOverview: React.FC<Props> = ({
       <View style={styles.separator} />
 
       <DisabledFeature
-        disabled={isStablesatsRestricted}
+        disabled={isDollarBalanceRestricted}
         onDisabledPress={onRestrictedTap}
       >
         <Pressable
@@ -213,9 +213,12 @@ const WalletOverview: React.FC<Props> = ({
             </View>
             {loading ? (
               <Loader />
-            ) : isStablesatsRestricted ? (
-              <View style={styles.hideableArea}>
-                <Text type="p2">{LL.StablesatsRestriction.walletLabel()}</Text>
+            ) : isDollarBalanceRestricted ? (
+              <View style={[styles.hideableArea, styles.restrictionLabel]}>
+                <Text type="p2" style={styles.restrictionLabelText}>
+                  {/* Shared across custodial and self-custodial restricted accounts: the copy is identical, so both reuse the Stablesats key. */}
+                  {LL.StablesatsRestriction.walletLabel()}
+                </Text>
               </View>
             ) : (
               <View style={[styles.hideableArea, pressedUsd && styles.pressedOpacity]}>
@@ -273,7 +276,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    height: 45,
+    minHeight: 45,
     marginVertical: 4,
     marginTop: 5,
   },
@@ -296,6 +299,13 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   hideableArea: {
     alignItems: "flex-end",
+  },
+  restrictionLabel: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  restrictionLabelText: {
+    textAlign: "right",
   },
   loaderContainer: {
     flex: 1,

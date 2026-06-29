@@ -72,8 +72,8 @@
     "infoBitcoin": "Bitcoin-bedrag is slegs 'n skatting. Dit kan met 'n klein bedrag wissel.",
     "infoDollar": "Dollar-bedrag is slegs 'n skatting. Dit kan met 'n klein bedrag wissel.",
     "transferButtonText": "Dra {fromWallet} oor na {toWallet}",
-    "feeLabel": "Omskakelingsfooi",
-    "feeError": "Kon nie die omskakelingsfooi haal nie"
+    "feeLabel": "Oordragfooi",
+    "feeError": "Kon nie die oordragfooi haal nie"
   },
   "ConversionSuccessScreen": {
     "message": "Omskakeling suksesvol"
@@ -2081,7 +2081,7 @@
     "scan": "Skandeer",
     "updateAvailable": "'n Opdatering is beskikbaar.\nTik om nou op te dateer",
     "useLightning": "Ons gebruik die Lightning-network - Bliksemnet ",
-    "myAccounts": "My Rekeninge",
+    "myAccounts": "Saldo's",
     "walletCountNotTwo": "Beursietelling is nie 2 nie. Gebruik asseblief die kontroleskerm om al die beursies en fondse van hierdie rekening te sien"
   },
   "PinScreen": {
@@ -2342,7 +2342,7 @@
     "csvTransactionsError": "Kan nie nou die transaksielys na csv uitvoer nie. Iets het verkeerd geloop. As die probleem voortduur, kontak asseblief ondersteuning. ",
     "lnurlNoUsername": "Om 'n LNURL-adres te genereer moet jy eers 'n gebruikersnaak kies. Wil jy dit nou doen? ",
     "copyClipboardLnurl": "LNURL-adres is na die klipbord oorgedra",
-    "defaultWallet": "Verstekrekening",
+    "defaultWallet": "Verstek ontvangs",
     "rateUs": "Gradeer ons op {storeName: string}",
     "theme": "Tema",
     "nfc": "Ontvang van NFC",
@@ -2457,17 +2457,16 @@
     "removedAccount": "Jy het rekening {identifier: string} verwyder."
   },
   "StablesatsRestriction": {
-    "modalTitle": "Stablesats is nie beskikbaar in jou streek nie",
-    "modalBody": "Om toegang tot 'n dollar-rekening te kry, skep 'n nie-bewaarende rekening.",
-    "createNew": "Skep nuwe",
     "walletLabel": "nie beskikbaar in jou streek nie"
   },
+  "DollarBalanceRestriction": {
+    "modalTitle": "Dollar-saldo is nie beskikbaar in jou streek nie"
+  },
   "ConvertDollarToBitcoinModal": {
-    "title": "Die Dollar-rekening is nie meer in jou streek beskikbaar nie",
-    "body": "Dra jou Dollar-saldo oor na Bitcoin",
+    "title": "Dollar-saldo is nie beskikbaar in jou streek nie",
+    "body": "Dra oor van Dollar-saldo na Bitcoin-saldo",
     "youHave": "Jy het",
-    "youGet": "Jy kry",
-    "approve": "Keur goed"
+    "youGet": "Jy kry"
   },
   "TotpRegistrationInitiateScreen": {
     "title": "Twee-faktor-verifikasie",
@@ -2488,10 +2487,11 @@
     "toastMessage": "Geheim na knipbord!"
   },
   "DefaultWalletScreen": {
-    "title": "Verstek ontvangrekening",
-    "info": "Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg. Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie.",
-    "titleSelfCustodial": "Verstek-rekening",
-    "infoSelfCustodial": "Hierdie rekening sal by verstek gebruik word vir ontvang en stuur. Jy kan enige tyd wissel."
+    "title": "Verstek ontvangs",
+    "titleSelfCustodial": "Verstek ontvangs",
+    "infoBtc": "Jou Bitcoin-rekening is vir die opbou van sats, waar die USD-waarde met die mark beweeg.",
+    "infoUsd": "Jou Dollar-rekening word aangedryf deur Stablesats — dit hou Bitcoin wat verseker is om stabiel in USD-terme te bly. Jy hou altyd Bitcoin, maar die dollarwaarde verander nie.",
+    "infoUsdSelfCustodial": "Dollar-ontvangs is nie beskikbaar as 'n verstek-ontvangopsie vir nie-bewarende rekeninge nie."
   },
   "ThemeScreen": {
     "title": "Tema",
@@ -2507,11 +2507,11 @@
   },
   "StablesatsModal": {
     "header": "Jou Dollar-rekening word aangedryf deur Stablesats",
-    "body": "Die Dollar-rekening gebruik Stablesats-tegnologie om Bitcoin stabiel teen USD-prys te hou. Jy hou altyd Bitcoin — nie werklike dollars nie — maar die USD-waarde fluktueer nie. Jy kan Bitcoin stuur en ontvang soos gewoonlik, maar dit is nie versoenbaar met die tradisionele bankstelsel nie.",
+    "body": "In Bewaringsmodus gebruik jou Dollar-rekening Stablesats-tegnologie — jy hou Bitcoin, nie werklike USD nie, maar die waarde is ontwerp om dieselfde bedrag in USD-terme te behou. Jy kan Bitcoin stuur en ontvang soos gewoonlik.",
     "termsAndConditions": "Lees die Terme en Voorwaardes",
-    "learnMore": "Leer meer van Stablesats",
-    "headerSelfCustodial": "Jou Dollar-rekening hou stablecoins",
-    "bodySelfCustodial": "In die Dollar-rekening hou jy stablecoins. Tokens gerugsteun deur bates met waarde gestabiliseer aan die USD. Jy kan nog nie stablecoins stuur en ontvang nie. Wanneer jy van die Dollar-rekening stuur, sal jy jou stablecoins omruil en as Bitcoin aan die ontvanger stuur.",
+    "learnMore": "Leer meer oor die Dollar-rekening",
+    "headerSelfCustodial": "Oor jou Dollar-rekening",
+    "bodySelfCustodial": "In Nie-bewaringsmodus gebruik jou Dollar-rekening ondersteunde stablecoins, ontwerp om dieselfde waarde in USD-terme te behou.",
     "learnMoreSelfCustodial": "Lees meer"
   },
   "SplashScreen": {
@@ -2699,6 +2699,8 @@
     "success": "Epos {email: string} suksesvol bevestig"
   },
   "common": {
+    "country": "Land",
+    "unknown": "Onbekend",
     "enabled": "Geaktiveer",
     "switch": "Skakelaar",
     "notifications": "Kennisgewings",
@@ -3569,6 +3571,10 @@
     "createFailed": "Kon nie tronk skep nie. Probeer asseblief weer.",
     "selfCustodialDisabled": "Nie-bewaring is tydelik onbeskikbaar."
   },
+  "UnsupportedRegionScreen": {
+    "title": "Nie-ondersteunde streek",
+    "description": "Ongelukkig kan ons nie gebruikers uit jou huidige streek bedien nie."
+  },
   "RestoreScreen": {
     "title": "Herstel beursie",
     "description": "Herstel jou beursie vanaf 'n rugsteun",
@@ -3621,8 +3627,8 @@
       "deactivateConfirm": "Deaktiveer",
       "cancel": "Kanselleer"
     },
-    "minimumConversion": "Minimum omskakeling: {amount:string}",
-    "conversionUnavailable": "Omskakeling is tydelik onbeskikbaar. Probeer asseblief weer."
+    "minimumConversion": "Minimum oordrag: {amount:string}",
+    "conversionUnavailable": "Oordragte is tydelik onbeskikbaar. Probeer asseblief weer."
   },
   "BackendFeatureGate": {
     "title": "Funksie nie beskikbaar nie",
@@ -3665,6 +3671,9 @@
     "networkError": "Netwerkverbindingsprobleem. Kyk jou verbinding en probeer weer.",
     "invalidInput": "Die betaalbesonderhede lyk ongeldig. Kyk asseblief en probeer weer.",
     "generic": "Die betaling kon nie voltooi word nie. Probeer oor 'n oomblik weer, of gebruik 'n kleiner bedrag."
+  },
+  "SelfCustodialNetworkMismatch": {
+    "toast": "Hierdie rekening is op {network} geskep. Skakel oor na {network} om dit te gebruik."
   },
   "UnclaimedDeposit": {
     "title": "Jy het {count} onopgeëiste deposito('s)",

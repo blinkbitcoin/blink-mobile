@@ -36,10 +36,10 @@ const en: BaseTranslation = {
     text: "By clicking 'Accept', you agree to our Terms And Conditions. You also agree that you are not a resident or citizen from one of the prohibited countries.",
   },
   SetAccountModal: {
-    title: "Set up your receive account",
+    title: "Set up your default Balance",
     description: "You can always change this later in the Settings",
-    stablesatsTag: "Dollar account — powered by Stablesats",
-    bitcoinTag: "Bitcoin account for maximalists",
+    stablesatsTag: "Dollar Balance — powered by Stablesats",
+    bitcoinTag: "Bitcoin Balance for stacking sats",
   },
   NoteInput: {
     addNote: "Add note",
@@ -78,12 +78,12 @@ const en: BaseTranslation = {
   ConversionConfirmationScreen: {
     title: "Confirm transfer",
     youreConverting: "You're converting",
-    receivingAccount: "Receiving account",
+    receivingAccount: "Receiving Balance",
     infoBitcoin: "Bitcoin amount is only approximate. It can vary by a small amount.",
     infoDollar: "Dollar amount is only approximate. It can vary by a small amount.",
     transferButtonText: "Transfer {fromWallet} to {toWallet}",
-    feeLabel: "Conversion fee",
-    feeError: "Couldn't fetch the conversion fee",
+    feeLabel: "Transfer fee",
+    feeError: "Couldn't fetch the transfer fee",
   },
   ConversionSuccessScreen: {
     message: "Transfer successful",
@@ -2118,7 +2118,7 @@ const en: BaseTranslation = {
     scan: "Scan",
     updateAvailable: "An update is available.\nTap to update now",
     useLightning: "We use the Lightning Network.",
-    myAccounts: "My Accounts",
+    myAccounts: "Balances",
     walletCountNotTwo:
       "Wallet count is not 2. Please use the dashboard to see all the wallets and funds of this account",
   },
@@ -2160,7 +2160,7 @@ const en: BaseTranslation = {
     setNote: "set a note",
     tapQrCodeCopy: "Tap QR Code to Copy",
     title: "Receive Bitcoin",
-    usdTitle: "Receive to Dollar account",
+    usdTitle: "Receive to Dollar Balance",
     error: "Failed to generate invoice. Please contact support if this problem persists.",
     copyInvoice: "Copy",
     shareInvoice: "Share",
@@ -2212,7 +2212,7 @@ const en: BaseTranslation = {
   },
   RedeemBitcoinScreen: {
     title: "Redeem Bitcoin",
-    usdTitle: "Redeem to Dollar account",
+    usdTitle: "Redeem to Dollar Balance",
     error: "Failed to generate invoice. Please contact support if this problem persists.",
     redeemingError:
       "Failed to redeem Bitcoin. Please contact support if this problem persists.",
@@ -2418,7 +2418,7 @@ const en: BaseTranslation = {
     lnurlNoUsername:
       "To generate an lnurl address you must first set a username.  Do you want to set a username now?",
     copyClipboardLnurl: "Lnurl address has been copied in the clipboard",
-    defaultWallet: "Default Account",
+    defaultWallet: "Default receive",
     rateUs: "Rate us on {storeName: string}",
     theme: "Theme",
     nfc: "Receive from NFC",
@@ -2494,7 +2494,7 @@ const en: BaseTranslation = {
       "You will need to re-enter your email to log back in.\nyour email is {email: string} so make sure you have access to it to log back in",
     logoutAlertContentPhoneEmail:
       "You will need to re-enter either your phone number or email to log back in.\nyour phone number is {phoneNumber: string} and your email is {email: string} so make sure you have access to those to log back in",
-    usdBalanceWarning: "You have a Dollar account balance of {balance: string}.",
+    usdBalanceWarning: "You have a Dollar balance of {balance: string}.",
     btcBalanceWarning: "You have a bitcoin balance of {balance: string}.",
     secureYourAccount: "Register to secure your account",
     tapToAdd: "Tap to add",
@@ -2565,10 +2565,11 @@ const en: BaseTranslation = {
     toastMessage: "Secret copied to clipboard!",
   },
   DefaultWalletScreen: {
-    title: "Default receive account",
-    titleSelfCustodial: "Default account",
-    info: "Your Bitcoin account is for stacking sats, where the USD value moves with the market. Your Dollar account is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the dollar value doesn't change.",
-    infoSelfCustodial: "This account will be used by default when receiving and sending. You can switch any time.",
+    title: "Default receive",
+    titleSelfCustodial: "Default receive",
+    infoBtc: "Your Bitcoin Balance is for stacking sats, where the value moves with the market.",
+    infoUsd: "Your Dollar Balance is powered by Stablesats — it holds Bitcoin that is hedged to stay stable in USD terms. You're always holding Bitcoin, but the USD value doesn't change.",
+    infoUsdSelfCustodial: "Dollar receive is not available as a default receive option for non-custodial accounts.",
   },
   ThemeScreen: {
     title: "Theme",
@@ -2583,27 +2584,26 @@ const en: BaseTranslation = {
     DEFAULT: "Default (OS)",
   },
   StablesatsModal: {
-    header: "Your Dollar account is powered by Stablesats",
-    body: "The Dollar account uses Stablesats technology to hold Bitcoin stable to USD price. You're always holding Bitcoin — not actual dollars — but the USD value doesn't fluctuate. You can send and receive Bitcoin as usual, but this is not compatible with the traditional banking system.",
+    header: "Your Dollar Balance is powered by Stablesats",
+    body: "In Custodial Mode, your Dollar Balance uses Stablesats technology — you hold Bitcoin, not actual USD, but the value is designed to maintain the same amount in USD terms. You can send and receive Bitcoin as usual.",
     termsAndConditions: "Read the Terms & Conditions.",
-    learnMore: "Learn more about Stablesats",
-    headerSelfCustodial: "Your Dollar account holds stablecoins",
+    learnMore: "Learn more about Dollar Balance",
+    headerSelfCustodial: "About your Dollar Balance",
     bodySelfCustodial:
-      "In the Dollar account you hold stablecoins. Tokens backed by assets with value held stable to the USD. You can't send and receive stablecoins (yet). When you send from the Dollar account, you will swap your stablecoins and send as Bitcoin to the recipient.",
+      "In Non-Custodial Mode, your Dollar Balance uses supported stablecoins, designed to maintain the same value in USD terms.",
     learnMoreSelfCustodial: "Learn more",
   },
   StablesatsRestriction: {
-    modalTitle: "Stablesats is not available in your region",
-    modalBody: "To get access to a dollar account, create a non-custodial account.",
-    createNew: "Create new",
     walletLabel: "not available in your region",
   },
+  DollarBalanceRestriction: {
+    modalTitle: "Dollar Balance is not available in your region",
+  },
   ConvertDollarToBitcoinModal: {
-    title: "Dollar account is no longer available in your region",
-    body: "Transfer your Dollar balance to Bitcoin",
+    title: "Dollar Balance is not available in your region",
+    body: "Transfer from Dollar Balance to Bitcoin Balance",
     youHave: "You have",
     youGet: "You get",
-    approve: "Approve",
   },
   SplashScreen: {
     update:
@@ -2627,8 +2627,8 @@ const en: BaseTranslation = {
     received: "You received",
     spent: "You spent",
     sending: "Sending",
-    receivingAccount: "Receiving Account",
-    sendingAccount: "Sending Account",
+    receivingAccount: "Receiving Balance",
+    sendingAccount: "Sending Balance",
     txNotBroadcast:
       "Your transaction is queued. It should appear in the mempool {countdown: string}.",
     momentarily: "momentarily",
@@ -2640,7 +2640,7 @@ const en: BaseTranslation = {
     perWeek: "per week",
     unlimited: "Unlimited",
     remaining: "Remaining",
-    stablesatTransfers: "Dollar account transfers",
+    stablesatTransfers: "Dollar Balance transfers",
     internalSend: "Send to {bankName: string} user",
     error: "Unable to fetch limits at this time",
     increaseLimits: "Increase your limits",
@@ -2819,6 +2819,8 @@ const en: BaseTranslation = {
     success: "Email {email: string} confirmed successfully",
   },
   common: {
+    country: "Country",
+    unknown: "Unknown",
     enabled: "Enabled",
     switch: "Switch",
     notifications: "Notifications",
@@ -2848,7 +2850,7 @@ const en: BaseTranslation = {
     beta: "beta",
     bitcoin: "Bitcoin",
     bitcoinPrice: "Bitcoin Price",
-    btcAccount: "Bitcoin Account",
+    btcAccount: "Bitcoin Balance",
     cancel: "Cancel",
     close: "Close",
     confirm: "Confirm",
@@ -2920,7 +2922,7 @@ const en: BaseTranslation = {
     transactionsError: "Error loading transactions",
     tryAgain: "Try Again",
     type: "Type",
-    usdAccount: "Dollar Account",
+    usdAccount: "Dollar Balance",
     username: "Username",
     usernameRequired: "Username is required",
     backupAccount: "Backup/upgrade account",
@@ -3740,6 +3742,10 @@ const en: BaseTranslation = {
       "Restore flow will be available in a future update.",
     createFailed: "Failed to create wallet. Please try again.",
   },
+  UnsupportedRegionScreen: {
+    title: "Unsupported region",
+    description: "Unfortunately we can not serve users from your current region.",
+  },
   RestoreScreen: {
     title: "Restore wallet",
     description: "Recover your wallet from a backup",
@@ -3788,6 +3794,10 @@ const en: BaseTranslation = {
     invalidInput: "The payment details look invalid. Please review and try again.",
     generic:
       "The payment could not be completed. Try again in a moment, or use a smaller amount.",
+  },
+  SelfCustodialNetworkMismatch: {
+    toast:
+      "This account was created on {network: string}. Switch to {network} to use it.",
   },
   UnclaimedDeposit: {
     screenTitle: "Unclaimed Deposits",
@@ -3845,8 +3855,8 @@ const en: BaseTranslation = {
       deactivateConfirm: "Deactivate",
       cancel: "Cancel",
     },
-    minimumConversion: "Minimum conversion: {amount:string}",
-    conversionUnavailable: "Conversion is temporarily unavailable. Please try again.",
+    minimumConversion: "Minimum transfer: {amount:string}",
+    conversionUnavailable: "Transfers are temporarily unavailable. Please try again.",
   },
   WalletCreationScreen: {
     creating: "Creating your wallet...",

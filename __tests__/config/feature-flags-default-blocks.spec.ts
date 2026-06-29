@@ -50,22 +50,48 @@ const assertCanonical = (list: string[]) => {
 }
 
 describe("defaultRemoteConfig: compliance country lists", () => {
-  it("custodialSignupBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
-    assertCanonical(defaultRemoteConfig.custodialSignupBlockedCountries)
-  })
-
   it("custodialFirstSignupBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
     assertCanonical(defaultRemoteConfig.custodialFirstSignupBlockedCountries)
   })
 
-  it("custodialSignupBlockedCountries always includes US as the baked-in floor", () => {
-    expect(defaultRemoteConfig.custodialSignupBlockedCountries).toContain("US")
+  it("selfCustodialTransferBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.selfCustodialTransferBlockedCountries)
   })
 
-  it("does not allow a country to appear in both lists (always-block already covers first-signup)", () => {
-    const always = new Set(defaultRemoteConfig.custodialSignupBlockedCountries)
-    for (const code of defaultRemoteConfig.custodialFirstSignupBlockedCountries) {
-      expect(always.has(code)).toBe(false)
-    }
+  it("selfCustodialTransferBlockedCountries defaults to the 27 EU member states", () => {
+    expect(defaultRemoteConfig.selfCustodialTransferBlockedCountries).toHaveLength(27)
+  })
+
+  it("custodialTransferBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.custodialTransferBlockedCountries)
+  })
+
+  it("both account-type transfer blocks default to the same 27 EU member states", () => {
+    expect(defaultRemoteConfig.custodialTransferBlockedCountries).toEqual(
+      defaultRemoteConfig.selfCustodialTransferBlockedCountries,
+    )
+    expect(defaultRemoteConfig.custodialTransferBlockedCountries).toHaveLength(27)
+  })
+
+  it("selfCustodialDollarBalanceBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries)
+  })
+
+  it("selfCustodialDollarBalanceBlockedCountries defaults to Hong Kong", () => {
+    expect(defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries).toEqual(["HK"])
+  })
+
+  it("custodialCreationBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.custodialCreationBlockedCountries)
+  })
+
+  it("selfCustodialCreationBlockedCountries contains only uppercase ISO-3166 alpha-2 codes with no duplicates", () => {
+    assertCanonical(defaultRemoteConfig.selfCustodialCreationBlockedCountries)
+  })
+
+  it("creation blocks default to the comprehensively sanctioned regions plus Russia and Belarus, identically for both account types", () => {
+    const expected = ["CU", "IR", "KP", "SY", "RU", "BY"]
+    expect(defaultRemoteConfig.custodialCreationBlockedCountries).toEqual(expected)
+    expect(defaultRemoteConfig.selfCustodialCreationBlockedCountries).toEqual(expected)
   })
 })
