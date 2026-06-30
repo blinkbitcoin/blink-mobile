@@ -2,16 +2,14 @@ import React from "react"
 import { render } from "@testing-library/react-native"
 
 import { PushNotificationComponent } from "@app/components/push-notification/push-notification"
+import { BulletinsDocument } from "@app/graphql/generated"
 
 const mockRefetchQueries = jest.fn()
 jest.mock("@apollo/client", () => ({
+  ...jest.requireActual("@apollo/client"),
   useApolloClient: () => ({
     refetchQueries: mockRefetchQueries,
   }),
-}))
-
-jest.mock("@app/graphql/generated", () => ({
-  BulletinsDocument: "BulletinsDocument",
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -48,7 +46,7 @@ describe("PushNotificationComponent", () => {
   })
 
   it("renders without crashing", () => {
-    render(<PushNotificationComponent />)
+    expect(() => render(<PushNotificationComponent />)).not.toThrow()
   })
 
   it("refetches bulletins when foreground message arrives", () => {
@@ -56,9 +54,7 @@ describe("PushNotificationComponent", () => {
 
     onMessageCallback({ data: {}, notification: { title: "Test" } })
 
-    expect(mockRefetchQueries).toHaveBeenCalledWith(
-      expect.objectContaining({ include: expect.any(Array) }),
-    )
+    expect(mockRefetchQueries).toHaveBeenCalledWith({ include: [BulletinsDocument] })
   })
 
   it("unsubscribes on unmount", () => {

@@ -37,8 +37,7 @@ export const PushNotificationComponent = (): JSX.Element => {
       },
     )
 
-    const unsubscribeInApp = messaging().onMessage(async (remoteMessage) => {
-      console.log("A new FCM message arrived!", remoteMessage)
+    const unsubscribeInApp = messaging().onMessage(async () => {
       client.refetchQueries({ include: [BulletinsDocument] })
     })
 
