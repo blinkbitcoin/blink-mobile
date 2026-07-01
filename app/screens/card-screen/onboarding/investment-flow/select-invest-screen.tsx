@@ -1,7 +1,7 @@
 import * as React from "react"
 import { ScrollView, TouchableOpacity, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -15,7 +15,7 @@ import { MOCK_CREDIT_LIMIT_VALUES } from "../onboarding-mock-data"
 export const SelectInvestScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const CREDIT_LIMITS = React.useMemo(
     () =>
