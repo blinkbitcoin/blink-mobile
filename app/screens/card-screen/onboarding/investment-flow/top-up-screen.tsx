@@ -40,6 +40,8 @@ export const TopUpScreen: React.FC = () => {
 
   const qrItems: QRItem[] = MOCK_QR_ITEMS
 
+  const currentQrItem = qrItems[currentIndex]
+
   const handleCopy = () => console.log("TODO: copy to clipboard")
 
   const handleShare = () => console.log("TODO: share")
@@ -91,12 +93,10 @@ export const TopUpScreen: React.FC = () => {
             }}
           />
 
-          {qrItems.map((item, index) =>
-            index === currentIndex ? (
-              <Text key={item.id} type="p2" style={styles.addressText}>
-                {item.address}
-              </Text>
-            ) : null,
+          {currentQrItem && (
+            <Text type="p2" style={styles.addressText}>
+              {currentQrItem.address}
+            </Text>
           )}
           <View style={styles.actionButtons}>
             <TouchableOpacity style={styles.actionButton} onPress={handleCopy}>
