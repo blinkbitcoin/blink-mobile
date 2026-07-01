@@ -34,6 +34,8 @@ export const SelectInvestScreen: React.FC = () => {
     }
   }
 
+  const isContinueDisabled = selectedLimit === null
+
   return (
     <Screen>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
@@ -49,23 +51,22 @@ export const SelectInvestScreen: React.FC = () => {
           </Text>
 
           <View style={styles.limitsContainer}>
-            {CREDIT_LIMITS.map((item, index) => (
-              <TouchableOpacity
-                key={item.value}
-                style={[
-                  styles.limitOption,
-                  selectedLimit === item.value && styles.limitOptionSelected,
-                ]}
-                onPress={() => setSelectedLimit(item.value)}
-              >
-                <Text type="p2" style={styles.limitText}>
-                  ${item.value.toLocaleString()} {item.percent}
-                </Text>
-                {index < CREDIT_LIMITS.length - 1 && (
-                  <View style={styles.limitBgOptionSelected} />
-                )}
-              </TouchableOpacity>
-            ))}
+            {CREDIT_LIMITS.map((item, index) => {
+              const isSelected = selectedLimit === item.value
+              const isNotLastItem = index < CREDIT_LIMITS.length - 1
+              return (
+                <TouchableOpacity
+                  key={item.value}
+                  style={[styles.limitOption, isSelected && styles.limitOptionSelected]}
+                  onPress={() => setSelectedLimit(item.value)}
+                >
+                  <Text type="p2" style={styles.limitText}>
+                    ${item.value.toLocaleString()} {item.percent}
+                  </Text>
+                  {isNotLastItem && <View style={styles.limitBgOptionSelected} />}
+                </TouchableOpacity>
+              )
+            })}
           </View>
         </View>
       </ScrollView>
@@ -73,7 +74,7 @@ export const SelectInvestScreen: React.FC = () => {
         <GaloyPrimaryButton
           title={LL.common.next()}
           onPress={handleNext}
-          disabled={!selectedLimit}
+          disabled={isContinueDisabled}
         />
       </View>
     </Screen>
