@@ -3,9 +3,8 @@ import { View } from "react-native"
 import { makeStyles, Text, TextProps, useTheme } from "@rn-vui/themed"
 
 import { WalletCurrency } from "@app/graphql/generated"
+import { useI18nContext } from "@app/i18n/i18n-react"
 
-const BTC_TEXT = "Bitcoin"
-const USD_TEXT = "Dollar"
 const DEFAULT_TEXT_SIZE = "p3"
 
 type ContainerSize = "small" | "medium" | "large"
@@ -30,12 +29,13 @@ export const GaloyCurrencyBubbleText = ({
   const {
     theme: { colors },
   } = useTheme()
+  const { LL } = useI18nContext()
 
   const isBtc = currency === WalletCurrency.Btc
 
   return (
     <ContainerBubble
-      text={isBtc ? BTC_TEXT : USD_TEXT}
+      text={isBtc ? LL.common.bitcoin() : LL.common.dollar()}
       textSize={textSize}
       highlighted={highlighted}
       color={highlighted ? (isBtc ? colors.white : colors._white) : colors._white}

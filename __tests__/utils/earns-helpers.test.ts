@@ -261,7 +261,7 @@ const expectedEnglishQuizSections = [
           "The look and design of paper bills is updated every 10 years or so.",
         ],
         feedback: [
-          "Correct. This is true even for USD, which has lost 97% of its value during the last 100 years.",
+          "Correct. This is true even for the US Dollar, which has lost 97% of its value during the last 100 years.",
           "Incorrect. Please try again.",
           "Not quite. Although the design of papers bills may change, this has nothing to do with their value.",
         ],
