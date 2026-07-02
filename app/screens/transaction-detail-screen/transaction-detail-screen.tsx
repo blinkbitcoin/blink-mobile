@@ -360,7 +360,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="explorer"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 10, right: 10 }}
+                    hitSlop={{ left: 5, right: 5 }}
                     onPress={() =>
                       viewInExplorer(
                         ("transactionHash" in settlementVia &&
@@ -379,7 +379,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="copy"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 10, right: 10 }}
+                    hitSlop={{ left: 5, right: 5 }}
                     onPress={() =>
                       handleCopyToClipboard({
                         content:
@@ -424,7 +424,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               <Pressable
                 key="copy"
                 style={styles.iconPressable}
-                hitSlop={{ left: 10, right: 10 }}
+                hitSlop={{ left: 5, right: 5 }}
                 onPress={() =>
                   handleCopyToClipboard({
                     content: description || "",
@@ -460,7 +460,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="copy"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 10, right: 10 }}
+                    hitSlop={{ left: 5, right: 5 }}
                     onPress={() =>
                       handleCopyToClipboard({
                         content: initiationVia?.paymentHash ?? "",
@@ -489,7 +489,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="copy"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 10, right: 10 }}
+                    hitSlop={{ left: 5, right: 5 }}
                     onPress={() =>
                       handleCopyToClipboard({
                         content: settlementVia?.preImage || "",
@@ -516,7 +516,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="explorer"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 10, right: 10 }}
+                    hitSlop={{ left: 5, right: 5 }}
                     onPress={() =>
                       viewInLightningDecoder(initiationVia?.paymentRequest || "")
                     }
@@ -531,7 +531,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="copy"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 10, right: 10 }}
+                    hitSlop={{ left: 5, right: 5 }}
                     onPress={() =>
                       handleCopyToClipboard({
                         content: initiationVia?.paymentRequest ?? "",
@@ -557,7 +557,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 <Pressable
                   key="copy"
                   style={styles.iconPressable}
-                  hitSlop={{ left: 10, right: 10 }}
+                  hitSlop={{ left: 5, right: 5 }}
                   onPress={() =>
                     handleCopyToClipboard({
                       content: id,
@@ -635,6 +635,8 @@ const useStyles = makeStyles(({ colors }) => ({
     // ...and cancel valueContainer's vertical padding so it spans the whole field
     marginVertical: -14,
     marginLeft: 12,
+    // spacing between adjacent icon actions
+    gap: 10,
   },
   iconPressable: {
     // fill 100% of the input height; horizontal tap area handled via hitSlop
