@@ -3474,10 +3474,6 @@
           "valuation": "Ở định giá trước vốn $10M",
           "units": "Bạn nhận được 10,000 đơn vị ~0,1% của Blink"
         },
-        "creditBoostSection": {
-          "title": "Tăng Tín dụng",
-          "totalCredit": "Tổng Tín dụng $11,000"
-        },
         "buttonText": "Tiến hành Ký"
       },
       "TransferInvest": {

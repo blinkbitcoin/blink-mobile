@@ -3630,10 +3630,6 @@ const en: BaseTranslation = {
           valuation: "At $10M pre-money valuation",
           units: "You receive 10,000 units ~0.1% of Blink",
         },
-        creditBoostSection: {
-          title: "Credit Boost",
-          totalCredit: "$11,000 Total Credit",
-        },
         buttonText: "Proceed to Sign",
       },
       TransferInvest: {

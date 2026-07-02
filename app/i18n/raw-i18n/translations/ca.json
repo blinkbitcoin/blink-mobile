@@ -3474,10 +3474,6 @@
           "valuation": "Amb valoració pre-money de $10M",
           "units": "Reps 10,000 unitats ~0.1% de Blink"
         },
-        "creditBoostSection": {
-          "title": "Impuls de Crèdit",
-          "totalCredit": "Crèdit Total de $11,000"
-        },
         "buttonText": "Procedir a Signar"
       },
       "TransferInvest": {

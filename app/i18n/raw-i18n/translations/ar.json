@@ -3474,10 +3474,6 @@
           "valuation": "بتقييم 10 مليون$ قبل التمويل",
           "units": "تحصل على 10,000 وحدة ~0.1% من Blink"
         },
-        "creditBoostSection": {
-          "title": "تعزيز الائتمان",
-          "totalCredit": "إجمالي ائتمان 11,000$"
-        },
         "buttonText": "المتابعة للتوقيع"
       },
       "TransferInvest": {

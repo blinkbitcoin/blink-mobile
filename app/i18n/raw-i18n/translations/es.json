@@ -3506,10 +3506,6 @@
                     "valuation": "Con valoración pre-money de $10M",
                     "units": "Recibes 10,000 unidades ~0.1% de Blink"
                 },
-                "creditBoostSection": {
-                    "title": "Impulso de Crédito",
-                    "totalCredit": "Crédito Total de $11,000"
-                },
                 "buttonText": "Proceder a Firmar"
             },
             "TransferInvest": {

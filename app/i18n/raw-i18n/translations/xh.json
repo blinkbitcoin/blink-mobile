@@ -3474,10 +3474,6 @@
           "valuation": "Ngoxabiso lwangaphambi kwemali lwe-$10M",
           "units": "Ufumana iiyunithi ezili-10,000 ~0.1% yeBlink"
         },
-        "creditBoostSection": {
-          "title": "Ukuphakamisa iKredithi",
-          "totalCredit": "Iyonke iKredithi $11,000"
-        },
         "buttonText": "Qhubeka ukuya kuSayina"
       },
       "TransferInvest": {

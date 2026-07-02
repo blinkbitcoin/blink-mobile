@@ -3474,10 +3474,6 @@
           "valuation": "10M $ ön para değerlemesinde",
           "units": "10.000 birim alırsınız ~Blink'in %0,1'i"
         },
-        "creditBoostSection": {
-          "title": "Kredi Artışı",
-          "totalCredit": "11.000 $ Toplam Kredi"
-        },
         "buttonText": "İmzaya Geç"
       },
       "TransferInvest": {

@@ -3474,10 +3474,6 @@
           "valuation": "$10M pre-money értékelésnél",
           "units": "10,000 egységet kapsz ~0,1%-ot a Blinkből"
         },
-        "creditBoostSection": {
-          "title": "Hitel Növelés",
-          "totalCredit": "$11,000 Teljes Hitel"
-        },
         "buttonText": "Tovább az Aláíráshoz"
       },
       "TransferInvest": {

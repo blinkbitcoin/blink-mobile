@@ -3506,10 +3506,6 @@
                     "valuation": "Bei $10M Pre-Money-Bewertung",
                     "units": "Du erhältst 10.000 Einheiten ~0,1% von Blink"
                 },
-                "creditBoostSection": {
-                    "title": "Kredit-Boost",
-                    "totalCredit": "$11.000 Gesamtkredit"
-                },
                 "buttonText": "Weiter zur Unterschrift"
             },
             "TransferInvest": {

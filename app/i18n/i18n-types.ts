@@ -11524,16 +11524,6 @@ type RootTranslation = {
 					 */
 					units: string
 				}
-				creditBoostSection: {
-					/**
-					 * C​r​e​d​i​t​ ​B​o​o​s​t
-					 */
-					title: string
-					/**
-					 * $​1​1​,​0​0​0​ ​T​o​t​a​l​ ​C​r​e​d​i​t
-					 */
-					totalCredit: string
-				}
 				/**
 				 * P​r​o​c​e​e​d​ ​t​o​ ​S​i​g​n
 				 */
@@ -23881,16 +23871,6 @@ export type TranslationFunctions = {
 					 * You receive 10,000 units ~0.1% of Blink
 					 */
 					units: () => LocalizedString
-				}
-				creditBoostSection: {
-					/**
-					 * Credit Boost
-					 */
-					title: () => LocalizedString
-					/**
-					 * $11,000 Total Credit
-					 */
-					totalCredit: () => LocalizedString
 				}
 				/**
 				 * Proceed to Sign

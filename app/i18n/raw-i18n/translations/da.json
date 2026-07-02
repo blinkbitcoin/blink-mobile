@@ -3474,10 +3474,6 @@
           "valuation": "Ved $10M pre-money vurdering",
           "units": "Du modtager 10,000 enheder ~0.1% af Blink"
         },
-        "creditBoostSection": {
-          "title": "Kredit Boost",
-          "totalCredit": "$11,000 Samlet Kredit"
-        },
         "buttonText": "Fortsæt til Underskrift"
       },
       "TransferInvest": {

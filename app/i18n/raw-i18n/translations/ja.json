@@ -3506,10 +3506,6 @@
                     "valuation": "プレマネー評価額1,000万ドル",
                     "units": "10,000ユニット（Blinkの約0.1%）を受け取ります"
                 },
-                "creditBoostSection": {
-                    "title": "クレジットブースト",
-                    "totalCredit": "合計クレジット11,000ドル"
-                },
                 "buttonText": "署名に進む"
             },
             "TransferInvest": {
