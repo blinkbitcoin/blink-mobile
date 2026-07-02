@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Weka"
       },
-      "TopUp": {
-        "title": "Jaza",
-        "qrTitle": "Fedha hazitoshi katika pochi yako ya Blink.\nJaza kiwango cha chini cha {minAmount: string}.",
-        "copy": "Nakili",
-        "share": "Shiriki",
-        "placeholder": "Weka kiasi"
-      },
       "PersonalInformation": {
         "title": "Hatua ya mwisho",
         "fields": {

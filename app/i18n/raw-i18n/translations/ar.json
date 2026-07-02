@@ -3497,13 +3497,6 @@
         },
         "buttonText": "إيداع"
       },
-      "TopUp": {
-        "title": "إعادة شحن",
-        "qrTitle": "رصيد غير كافٍ في محفظة Blink الخاصة بك.\nإعادة شحن بحد أدنى {minAmount: string}.",
-        "copy": "نسخ",
-        "share": "مشاركة",
-        "placeholder": "حدد المبلغ"
-      },
       "PersonalInformation": {
         "title": "الخطوة الأخيرة",
         "fields": {

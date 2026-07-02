@@ -3653,13 +3653,6 @@ const en: BaseTranslation = {
         },
         buttonText: "Deposit",
       },
-      TopUp: {
-        title: "Top-up",
-        qrTitle: "Insufficient funds in your Blink wallet.\nTop-up minimum of {minAmount: string}.",
-        copy: "Copy",
-        share: "Share",
-        placeholder: "Set amount",
-      },
       PersonalInformation: {
         title: "Final step",
         fields: {

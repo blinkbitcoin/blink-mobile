@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Faka imali"
       },
-      "TopUp": {
-        "title": "Gcwalisa",
-        "qrTitle": "Imali enganelanga kwisipaji sakho seBlink.\nGcwalisa ubuncinane be-{minAmount: string}.",
-        "copy": "Khuphela",
-        "share": "Yabelana",
-        "placeholder": "Cwangcisa isixa"
-      },
       "PersonalInformation": {
         "title": "Inyathelo lokugqibela",
         "fields": {

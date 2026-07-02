@@ -3497,13 +3497,6 @@
         },
         "buttonText": "ฝากเงิน"
       },
-      "TopUp": {
-        "title": "เติมเงิน",
-        "qrTitle": "ยอดเงินไม่เพียงพอในกระเป๋า Blink ของคุณ\nเติมเงินขั้นต่ำ {minAmount: string}",
-        "copy": "คัดลอก",
-        "share": "แชร์",
-        "placeholder": "ตั้งจำนวนเงิน"
-      },
       "PersonalInformation": {
         "title": "ขั้นตอนสุดท้าย",
         "fields": {

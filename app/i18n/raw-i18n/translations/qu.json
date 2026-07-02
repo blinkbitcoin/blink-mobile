@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Churay"
       },
-      "TopUp": {
-        "title": "Huntachiy",
-        "qrTitle": "Mana allin qullqi Blink billetera-ykipi.\nHuntachiy {minAmount: string} aswan pisita.",
-        "copy": "Kopiyay",
-        "share": "Rakiy",
-        "placeholder": "Qullqita churay"
-      },
       "PersonalInformation": {
         "title": "Qhipa taki",
         "fields": {

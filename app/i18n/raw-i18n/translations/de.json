@@ -3528,13 +3528,6 @@
                     "body3": "Stelle sicher, dass sich der gesamte Betrag auf einem deiner Konten befindet; Bitcoin oder Dollar."
                 },
                 "buttonText": "Einzahlen"
-            },
-            "TopUp": {
-                "title": "Aufladen",
-                "qrTitle": "Unzureichende Mittel in deiner Blink-Wallet.\nMindestaufladung von {minAmount: string}.",
-                "copy": "Kopieren",
-                "share": "Teilen",
-                "placeholder": "Betrag festlegen"
             }
         }
     },

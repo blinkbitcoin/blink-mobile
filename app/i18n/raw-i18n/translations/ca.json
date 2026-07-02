@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Diposita"
       },
-      "TopUp": {
-        "title": "Recarregar",
-        "qrTitle": "Fons insuficients a la teva cartera Blink.\nRecàrrega un mínim de {minAmount: string}.",
-        "copy": "Copiar",
-        "share": "Compartir",
-        "placeholder": "Establir import"
-      },
       "PersonalInformation": {
         "title": "Últim pas",
         "fields": {

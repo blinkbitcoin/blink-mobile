@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Deposit"
       },
-      "TopUp": {
-        "title": "Tambah nilai",
-        "qrTitle": "Dana tidak mencukupi dalam dompet Blink anda.\nTambah nilai minimum {minAmount: string}.",
-        "copy": "Salin",
-        "share": "Kongsi",
-        "placeholder": "Tetapkan jumlah"
-      },
       "PersonalInformation": {
         "title": "Langkah terakhir",
         "fields": {

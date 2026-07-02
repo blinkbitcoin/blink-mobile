@@ -11586,30 +11586,6 @@ type RootTranslation = {
 				 */
 				buttonText: string
 			}
-			TopUp: {
-				/**
-				 * T​o​p​-​u​p
-				 */
-				title: string
-				/**
-				 * I​n​s​u​f​f​i​c​i​e​n​t​ ​f​u​n​d​s​ ​i​n​ ​y​o​u​r​ ​B​l​i​n​k​ ​w​a​l​l​e​t​.​
-			​T​o​p​-​u​p​ ​m​i​n​i​m​u​m​ ​o​f​ ​{​m​i​n​A​m​o​u​n​t​}​.
-				 * @param {string} minAmount
-				 */
-				qrTitle: RequiredParams<'minAmount'>
-				/**
-				 * C​o​p​y
-				 */
-				copy: string
-				/**
-				 * S​h​a​r​e
-				 */
-				share: string
-				/**
-				 * S​e​t​ ​a​m​o​u​n​t
-				 */
-				placeholder: string
-			}
 			PersonalInformation: {
 				/**
 				 * F​i​n​a​l​ ​s​t​e​p
@@ -23964,29 +23940,6 @@ export type TranslationFunctions = {
 				 * Deposit
 				 */
 				buttonText: () => LocalizedString
-			}
-			TopUp: {
-				/**
-				 * Top-up
-				 */
-				title: () => LocalizedString
-				/**
-				 * Insufficient funds in your Blink wallet.
-			Top-up minimum of {minAmount}.
-				 */
-				qrTitle: (arg: { minAmount: string }) => LocalizedString
-				/**
-				 * Copy
-				 */
-				copy: () => LocalizedString
-				/**
-				 * Share
-				 */
-				share: () => LocalizedString
-				/**
-				 * Set amount
-				 */
-				placeholder: () => LocalizedString
 			}
 			PersonalInformation: {
 				/**

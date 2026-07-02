@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Уплати"
       },
-      "TopUp": {
-        "title": "Допуна",
-        "qrTitle": "Недовољно средстава у вашем Блинк новчанику.\nДопуните минимално {minAmount: string}.",
-        "copy": "Копирај",
-        "share": "Подели",
-        "placeholder": "Постави износ"
-      },
       "PersonalInformation": {
         "title": "Последњи корак",
         "fields": {

@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Nạp tiền"
       },
-      "TopUp": {
-        "title": "Nạp tiền",
-        "qrTitle": "Số dư không đủ trong ví Blink của bạn.\nNạp tối thiểu {minAmount: string}.",
-        "copy": "Sao chép",
-        "share": "Chia sẻ",
-        "placeholder": "Đặt số tiền"
-      },
       "PersonalInformation": {
         "title": "Bước cuối cùng",
         "fields": {

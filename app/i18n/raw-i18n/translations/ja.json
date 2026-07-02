@@ -3528,13 +3528,6 @@
                     "body3": "全額がBitcoinまたはドルのいずれかのアカウントにあることを確認してください。"
                 },
                 "buttonText": "入金"
-            },
-            "TopUp": {
-                "title": "チャージ",
-                "qrTitle": "Blinkウォレットの残高が不足しています。\n最低{minAmount: string}をチャージしてください。",
-                "copy": "コピー",
-                "share": "共有",
-                "placeholder": "金額を設定"
             }
         }
     },

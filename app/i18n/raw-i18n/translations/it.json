@@ -3528,13 +3528,6 @@
                     "body3": "Assicurati che l'intero importo sia in uno dei tuoi conti; Bitcoin o dollaro."
                 },
                 "buttonText": "Deposita"
-            },
-            "TopUp": {
-                "title": "Ricarica",
-                "qrTitle": "Fondi insufficienti nel tuo portafoglio Blink.\nRicarica un minimo di {minAmount: string}.",
-                "copy": "Copia",
-                "share": "Condividi",
-                "placeholder": "Imposta importo"
             }
         }
     },

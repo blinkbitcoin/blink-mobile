@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Setor"
       },
-      "TopUp": {
-        "title": "Isi ulang",
-        "qrTitle": "Dana tidak mencukupi di dompet Blink Anda.\nIsi ulang minimum {minAmount: string}.",
-        "copy": "Salin",
-        "share": "Bagikan",
-        "placeholder": "Tentukan jumlah"
-      },
       "PersonalInformation": {
         "title": "Langkah terakhir",
         "fields": {

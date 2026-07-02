@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Teekamu ssente"
       },
-      "TopUp": {
-        "title": "Jjuzuza",
-        "qrTitle": "Ssente tezimala mu Blink wallet yo.\nJjuzuza obunene bwa {minAmount: string}.",
-        "copy": "Koppa",
-        "share": "Gabana",
-        "placeholder": "Teeka omuwendo"
-      },
       "PersonalInformation": {
         "title": "Olugendo olw'enkomerero",
         "fields": {

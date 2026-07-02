@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Vložiť"
       },
-      "TopUp": {
-        "title": "Dobitie",
-        "qrTitle": "Nedostatočné prostriedky vo vašej peňaženke Blink.\nDobite minimálne {minAmount: string}.",
-        "copy": "Kopírovať",
-        "share": "Zdieľať",
-        "placeholder": "Nastaviť sumu"
-      },
       "PersonalInformation": {
         "title": "Posledný krok",
         "fields": {

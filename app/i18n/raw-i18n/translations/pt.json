@@ -3528,13 +3528,6 @@
                     "body3": "Certifique-se de que o valor total esteja em uma das suas contas; Bitcoin ou Dólar."
                 },
                 "buttonText": "Depositar"
-            },
-            "TopUp": {
-                "title": "Recarregar",
-                "qrTitle": "Fundos insuficientes na sua carteira Blink.\nRecarregue um mínimo de {minAmount: string}.",
-                "copy": "Copiar",
-                "share": "Compartilhar",
-                "placeholder": "Definir valor"
             }
         }
     },

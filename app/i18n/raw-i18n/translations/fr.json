@@ -3528,13 +3528,6 @@
                     "body3": "Assure-toi que le montant total se trouve sur l'un de tes comptes ; Bitcoin ou dollar."
                 },
                 "buttonText": "Déposer"
-            },
-            "TopUp": {
-                "title": "Recharger",
-                "qrTitle": "Fonds insuffisants dans votre portefeuille Blink.\nRechargez un minimum de {minAmount: string}.",
-                "copy": "Copier",
-                "share": "Partager",
-                "placeholder": "Définir le montant"
             }
         }
     },

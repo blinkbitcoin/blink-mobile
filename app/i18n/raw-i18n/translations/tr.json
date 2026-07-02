@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Yatır"
       },
-      "TopUp": {
-        "title": "Yükleme",
-        "qrTitle": "Blink cüzdanınızda yetersiz bakiye.\nMinimum {minAmount: string} yükleyin.",
-        "copy": "Kopyala",
-        "share": "Paylaş",
-        "placeholder": "Tutar belirle"
-      },
       "PersonalInformation": {
         "title": "Son adım",
         "fields": {

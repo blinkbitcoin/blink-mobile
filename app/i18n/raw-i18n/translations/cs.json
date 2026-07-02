@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Vložit"
       },
-      "TopUp": {
-        "title": "Dobití",
-        "qrTitle": "Nedostatečné prostředky ve vaší peněžence Blink.\nDobijte minimálně {minAmount: string}.",
-        "copy": "Kopírovat",
-        "share": "Sdílet",
-        "placeholder": "Nastavit částku"
-      },
       "PersonalInformation": {
         "title": "Poslední krok",
         "fields": {

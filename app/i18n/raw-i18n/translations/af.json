@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Deponeer"
       },
-      "TopUp": {
-        "title": "Herlaai",
-        "qrTitle": "Onvoldoende fondse in jou Blink-beursie.\nHerlaai minimum van {minAmount: string}.",
-        "copy": "Kopieer",
-        "share": "Deel",
-        "placeholder": "Stel bedrag"
-      },
       "PersonalInformation": {
         "title": "Laaste stap",
         "fields": {

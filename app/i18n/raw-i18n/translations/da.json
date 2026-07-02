@@ -3497,13 +3497,6 @@
         },
         "buttonText": "Indbetal"
       },
-      "TopUp": {
-        "title": "Opfyldning",
-        "qrTitle": "Utilstrækkelige midler i din Blink-tegnebog.\nOpfyld minimum {minAmount: string}.",
-        "copy": "Kopiér",
-        "share": "Del",
-        "placeholder": "Angiv beløb"
-      },
       "PersonalInformation": {
         "title": "Sidste trin",
         "fields": {
