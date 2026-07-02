@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Linking, TouchableWithoutFeedback, View } from "react-native"
+import { Linking, Pressable, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
 import { useFragment } from "@apollo/client"
@@ -357,44 +357,46 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   ""
                 }
                 icons={[
-                  <View key="explorer">
-                    <TouchableWithoutFeedback
-                      onPress={() =>
-                        viewInExplorer(
+                  <Pressable
+                    key="explorer"
+                    style={styles.iconPressable}
+                    hitSlop={{ left: 10, right: 10 }}
+                    onPress={() =>
+                      viewInExplorer(
+                        ("transactionHash" in settlementVia &&
+                          settlementVia?.transactionHash) ||
+                          "",
+                      )
+                    }
+                  >
+                    <GaloyIcon
+                      name="arrow-square-out"
+                      size={22}
+                      color={colors.primary}
+                      style={styles.icon}
+                    />
+                  </Pressable>,
+                  <Pressable
+                    key="copy"
+                    style={styles.iconPressable}
+                    hitSlop={{ left: 10, right: 10 }}
+                    onPress={() =>
+                      handleCopyToClipboard({
+                        content:
                           ("transactionHash" in settlementVia &&
                             settlementVia?.transactionHash) ||
-                            "",
-                        )
-                      }
-                    >
-                      <GaloyIcon
-                        name="arrow-square-out"
-                        size={22}
-                        color={colors.primary}
-                        style={styles.icon}
-                      />
-                    </TouchableWithoutFeedback>
-                  </View>,
-                  <View key="copy">
-                    <TouchableWithoutFeedback
-                      onPress={() =>
-                        handleCopyToClipboard({
-                          content:
-                            ("transactionHash" in settlementVia &&
-                              settlementVia?.transactionHash) ||
-                            "",
-                          type: "Transaction Hash",
-                        })
-                      }
-                    >
-                      <GaloyIcon
-                        name="copy-paste"
-                        size={22}
-                        color={colors.primary}
-                        style={styles.icon}
-                      />
-                    </TouchableWithoutFeedback>
-                  </View>,
+                          "",
+                        type: "Transaction Hash",
+                      })
+                    }
+                  >
+                    <GaloyIcon
+                      name="copy-paste"
+                      size={22}
+                      color={colors.primary}
+                      style={styles.icon}
+                    />
+                  </Pressable>,
                 ]}
               />
             </View>
@@ -419,23 +421,24 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
             entry={LL.common.description()}
             value={description}
             icons={[
-              <View key="copy">
-                <TouchableWithoutFeedback
-                  onPress={() =>
-                    handleCopyToClipboard({
-                      content: description || "",
-                      type: LL.common.description(),
-                    })
-                  }
-                >
-                  <GaloyIcon
-                    name="copy-paste"
-                    size={22}
-                    color={colors.primary}
-                    style={styles.icon}
-                  />
-                </TouchableWithoutFeedback>
-              </View>,
+              <Pressable
+                key="copy"
+                style={styles.iconPressable}
+                hitSlop={{ left: 10, right: 10 }}
+                onPress={() =>
+                  handleCopyToClipboard({
+                    content: description || "",
+                    type: LL.common.description(),
+                  })
+                }
+              >
+                <GaloyIcon
+                  name="copy-paste"
+                  size={22}
+                  color={colors.primary}
+                  style={styles.icon}
+                />
+              </Pressable>,
             ]}
           />
           {settlementVia?.__typename === "SettlementViaIntraLedger" && (
@@ -454,23 +457,24 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 entry="Hash"
                 value={initiationVia?.paymentHash}
                 icons={[
-                  <View key="copy">
-                    <TouchableWithoutFeedback
-                      onPress={() =>
-                        handleCopyToClipboard({
-                          content: initiationVia?.paymentHash ?? "",
-                          type: "Hash",
-                        })
-                      }
-                    >
-                      <GaloyIcon
-                        name="copy-paste"
-                        size={22}
-                        color={colors.primary}
-                        style={styles.icon}
-                      />
-                    </TouchableWithoutFeedback>
-                  </View>,
+                  <Pressable
+                    key="copy"
+                    style={styles.iconPressable}
+                    hitSlop={{ left: 10, right: 10 }}
+                    onPress={() =>
+                      handleCopyToClipboard({
+                        content: initiationVia?.paymentHash ?? "",
+                        type: "Hash",
+                      })
+                    }
+                  >
+                    <GaloyIcon
+                      name="copy-paste"
+                      size={22}
+                      color={colors.primary}
+                      style={styles.icon}
+                    />
+                  </Pressable>,
                 ]}
               />
             )}
@@ -482,77 +486,14 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 entry={LL.common.preimageProofOfPayment()}
                 value={settlementVia?.preImage}
                 icons={[
-                  <View key="copy">
-                    <TouchableWithoutFeedback
-                      onPress={() =>
-                        handleCopyToClipboard({
-                          content: settlementVia?.preImage || "",
-                          type: LL.common.preimageProofOfPayment(),
-                        })
-                      }
-                    >
-                      <GaloyIcon
-                        name="copy-paste"
-                        size={22}
-                        color={colors.primary}
-                        style={styles.icon}
-                      />
-                    </TouchableWithoutFeedback>
-                  </View>,
-                ]}
-              />
-            )}
-          {initiationVia?.__typename === "InitiationViaLn" &&
-            initiationVia?.paymentRequest && (
-              <Row
-                entry={LL.common.paymentRequest()}
-                value={initiationVia?.paymentRequest}
-                icons={[
-                  <View key="explorer">
-                    <TouchableWithoutFeedback
-                      onPress={() =>
-                        viewInLightningDecoder(initiationVia?.paymentRequest || "")
-                      }
-                    >
-                      <GaloyIcon
-                        name="arrow-square-out"
-                        size={22}
-                        color={colors.primary}
-                        style={styles.icon}
-                      />
-                    </TouchableWithoutFeedback>
-                  </View>,
-                  <View key="copy">
-                    <TouchableWithoutFeedback
-                      onPress={() =>
-                        handleCopyToClipboard({
-                          content: initiationVia?.paymentRequest ?? "",
-                          type: LL.common.paymentRequest(),
-                        })
-                      }
-                    >
-                      <GaloyIcon
-                        name="copy-paste"
-                        size={22}
-                        color={colors.primary}
-                        style={styles.icon}
-                      />
-                    </TouchableWithoutFeedback>
-                  </View>,
-                ]}
-              />
-            )}
-          {id && !isSelfCustodial && (
-            <Row
-              entry="Blink Internal Id"
-              value={id}
-              icons={[
-                <View key="copy">
-                  <TouchableWithoutFeedback
+                  <Pressable
+                    key="copy"
+                    style={styles.iconPressable}
+                    hitSlop={{ left: 10, right: 10 }}
                     onPress={() =>
                       handleCopyToClipboard({
-                        content: id,
-                        type: "Blink Internal Id",
+                        content: settlementVia?.preImage || "",
+                        type: LL.common.preimageProofOfPayment(),
                       })
                     }
                   >
@@ -562,8 +503,75 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                       color={colors.primary}
                       style={styles.icon}
                     />
-                  </TouchableWithoutFeedback>
-                </View>,
+                  </Pressable>,
+                ]}
+              />
+            )}
+          {initiationVia?.__typename === "InitiationViaLn" &&
+            initiationVia?.paymentRequest && (
+              <Row
+                entry={LL.common.paymentRequest()}
+                value={initiationVia?.paymentRequest}
+                icons={[
+                  <Pressable
+                    key="explorer"
+                    style={styles.iconPressable}
+                    hitSlop={{ left: 10, right: 10 }}
+                    onPress={() =>
+                      viewInLightningDecoder(initiationVia?.paymentRequest || "")
+                    }
+                  >
+                    <GaloyIcon
+                      name="arrow-square-out"
+                      size={22}
+                      color={colors.primary}
+                      style={styles.icon}
+                    />
+                  </Pressable>,
+                  <Pressable
+                    key="copy"
+                    style={styles.iconPressable}
+                    hitSlop={{ left: 10, right: 10 }}
+                    onPress={() =>
+                      handleCopyToClipboard({
+                        content: initiationVia?.paymentRequest ?? "",
+                        type: LL.common.paymentRequest(),
+                      })
+                    }
+                  >
+                    <GaloyIcon
+                      name="copy-paste"
+                      size={22}
+                      color={colors.primary}
+                      style={styles.icon}
+                    />
+                  </Pressable>,
+                ]}
+              />
+            )}
+          {id && !isSelfCustodial && (
+            <Row
+              entry="Blink Internal Id"
+              value={id}
+              icons={[
+                <Pressable
+                  key="copy"
+                  style={styles.iconPressable}
+                  hitSlop={{ left: 10, right: 10 }}
+                  onPress={() =>
+                    handleCopyToClipboard({
+                      content: id,
+                      type: "Blink Internal Id",
+                    })
+                  }
+                >
+                  <GaloyIcon
+                    name="copy-paste"
+                    size={22}
+                    color={colors.primary}
+                    style={styles.icon}
+                  />
+                </Pressable>,
               ]}
             />
           )}
@@ -622,16 +630,24 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   valueIcons: {
     flexDirection: "row",
-    alignItems: "center",
+    // stretch to fill the full height of the input (valueContainer)...
+    alignSelf: "stretch",
+    // ...and cancel valueContainer's vertical padding so it spans the whole field
+    marginVertical: -14,
     marginLeft: 12,
+  },
+  iconPressable: {
+    // fill 100% of the input height; horizontal tap area handled via hitSlop
+    alignSelf: "stretch",
+    alignItems: "center",
+    justifyContent: "center",
   },
   txNotBroadcast: {
     marginBottom: 16,
   },
 
   icon: {
-    marginBottom: 2,
-    marginHorizontal: 6,
+    marginBottom: 0,
   },
 
   container: {
