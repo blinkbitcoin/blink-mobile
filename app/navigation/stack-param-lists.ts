@@ -271,6 +271,7 @@ export type RootStackParamList = {
   cardOnboardingTermSheetScreen: undefined
   cardOnboardingTransferInvestScreen: undefined
   cardOnboardingInsufficientBalanceScreen: undefined
+  cardOnboardingDepositPendingScreen: undefined
   cardOnboardingCompanyValuationScreen: undefined
   cardOnboardingPersonalInfoScreen: undefined
   cardOnboardingAcknowledgementScreen: undefined

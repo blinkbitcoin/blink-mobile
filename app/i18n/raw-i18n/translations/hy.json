@@ -3735,6 +3735,10 @@
         },
         "buttonText": "Ավանդ"
       },
+      "DepositPending": {
+        "message": "Սպասում ենք քո ավանդի հաստատմանը. խնդրում ենք սպասել շղթայի 2 հաստատման։",
+        "buttonText": "Լավ"
+      },
       "PersonalInformation": {
         "title": "Վերջին քայլը",
         "fields": {
