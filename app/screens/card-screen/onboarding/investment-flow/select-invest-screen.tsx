@@ -90,6 +90,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   limitsContainer: {
     width: "100%",
+    marginTop: 20,
   },
   limitOption: {
     position: "relative",
