@@ -3735,13 +3735,6 @@
         },
         "buttonText": "Befizetés"
       },
-      "TopUp": {
-        "title": "Feltöltés",
-        "qrTitle": "Nincs elegendő egyenleg a Blink tárcádban.\nTölts fel minimum {minAmount: string}-t.",
-        "copy": "Másolás",
-        "share": "Megosztás",
-        "placeholder": "Összeg beállítása"
-      },
       "PersonalInformation": {
         "title": "Utolsó lépés",
         "fields": {

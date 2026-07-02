@@ -3735,13 +3735,6 @@
         },
         "buttonText": "Κατάθεση"
       },
-      "TopUp": {
-        "title": "Αναπλήρωση",
-        "qrTitle": "Ανεπαρκές υπόλοιπο στο πορτοφόλι Blink.\nΚάντε αναπλήρωση τουλάχιστον {minAmount: string}.",
-        "copy": "Αντιγραφή",
-        "share": "Κοινοποίηση",
-        "placeholder": "Ορίστε ποσό"
-      },
       "PersonalInformation": {
         "title": "Τελικό βήμα",
         "fields": {

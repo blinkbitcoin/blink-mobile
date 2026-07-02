@@ -3735,13 +3735,6 @@
         },
         "buttonText": "Ավանդ"
       },
-      "TopUp": {
-        "title": "Լիցքավորում",
-        "qrTitle": "Ձեր Blink դրամապանակում բավարար միջոցներ չկան։\nԼիցքավորեք առնվազն {minAmount: string}։",
-        "copy": "Պատճենել",
-        "share": "Կիսվել",
-        "placeholder": "Սահմանել գումարը"
-      },
       "PersonalInformation": {
         "title": "Վերջին քայլը",
         "fields": {
