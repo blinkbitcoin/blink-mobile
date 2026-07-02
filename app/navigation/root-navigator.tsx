@@ -127,7 +127,6 @@ import {
   TermSheetScreen,
   TransferInvestScreen,
   InsufficientBalanceScreen,
-  TopUpScreen,
   CompanyValuationScreen,
   CardPersonalInformationScreen,
   CardAcknowledgementScreen,
@@ -877,14 +876,6 @@ export const RootStack = () => {
         options={{
           title: "",
           headerLeft: () => <></>,
-          headerRight: headerCloseControl(),
-        }}
-      />
-      <RootNavigator.Screen
-        name="cardOnboardingTopUpScreen"
-        component={TopUpScreen}
-        options={{
-          title: LL.CardFlow.Onboarding.TopUp.title(),
           headerRight: headerCloseControl(),
         }}
       />

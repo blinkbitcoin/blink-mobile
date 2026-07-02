@@ -10,21 +10,6 @@ export const MOCK_CARD_PAYMENT = {
   renewalDate: "Aug 21, 2026",
 }
 
-export const MOCK_QR_ITEMS = [
-  {
-    id: "1",
-    address: "lnbc1dwdja....widjwdawid",
-    type: "lightning" as const,
-  },
-  {
-    id: "2",
-    address: "bc1qxy2kgd....493p83kkfjhx0wlh",
-    type: "onchain" as const,
-  },
-]
-
-export const MOCK_TOP_UP_MIN_AMOUNT = "$999"
-
 export const MOCK_INVESTMENT_AMOUNT = "$10,000"
 
 export const MOCK_BITCOIN_BALANCE = "$3,333"

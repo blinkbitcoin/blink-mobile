@@ -3739,13 +3739,6 @@
         },
         "buttonText": "Storten"
       },
-      "TopUp": {
-        "title": "Opwaarderen",
-        "qrTitle": "Onvoldoende saldo in je Blink-wallet.\nWaardeer op met minimaal {minAmount: string}.",
-        "copy": "Kopiëren",
-        "share": "Delen",
-        "placeholder": "Bedrag instellen"
-      },
       "PersonalInformation": {
         "title": "Laatste stap",
         "fields": {
