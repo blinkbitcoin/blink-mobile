@@ -82,11 +82,11 @@ describe("InsufficientBalanceScreen", () => {
     expect(getByText("Deposit")).toBeTruthy()
   })
 
-  it("navigates to the top up screen when deposit is pressed", async () => {
+  it("navigates to the receive screen when deposit is pressed", async () => {
     const { getByText } = await renderScreen()
     await act(async () => {
       fireEvent.press(getByText("Deposit"))
     })
-    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingTopUpScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("receiveBitcoin")
   })
 })
