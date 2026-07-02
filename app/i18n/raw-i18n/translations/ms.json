@@ -3732,6 +3732,10 @@
         },
         "buttonText": "Deposit"
       },
+      "DepositPending": {
+        "message": "Menunggu deposit anda diselesaikan; sila tunggu 2 pengesahan pada rantai.",
+        "buttonText": "OK"
+      },
       "PersonalInformation": {
         "title": "Langkah terakhir",
         "fields": {

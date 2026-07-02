@@ -3732,6 +3732,10 @@
         },
         "buttonText": "Befizetés"
       },
+      "DepositPending": {
+        "message": "Várakozás a befizetésed teljesülésére; kérjük, várj 2 megerősítésre a láncon.",
+        "buttonText": "Rendben"
+      },
       "PersonalInformation": {
         "title": "Utolsó lépés",
         "fields": {

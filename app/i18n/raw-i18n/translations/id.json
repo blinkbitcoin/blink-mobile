@@ -3732,6 +3732,10 @@
         },
         "buttonText": "Setor"
       },
+      "DepositPending": {
+        "message": "Menunggu setoranmu diselesaikan; harap tunggu 2 konfirmasi di rantai.",
+        "buttonText": "Oke"
+      },
       "PersonalInformation": {
         "title": "Langkah terakhir",
         "fields": {
