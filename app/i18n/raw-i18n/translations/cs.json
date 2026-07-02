@@ -3731,6 +3731,10 @@
         },
         "buttonText": "Vložit"
       },
+      "DepositPending": {
+        "message": "Čeká se na vypořádání tvého vkladu; počkej prosím na 2 potvrzení v řetězci.",
+        "buttonText": "Dobře"
+      },
       "PersonalInformation": {
         "title": "Poslední krok",
         "fields": {

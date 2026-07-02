@@ -3731,6 +3731,10 @@
         },
         "buttonText": "Storten"
       },
+      "DepositPending": {
+        "message": "Wachten tot je storting is afgewikkeld; wacht op 2 bevestigingen op de keten.",
+        "buttonText": "Oké"
+      },
       "PersonalInformation": {
         "title": "Laatste stap",
         "fields": {

@@ -3731,6 +3731,10 @@
         },
         "buttonText": "Nạp tiền"
       },
+      "DepositPending": {
+        "message": "Đang chờ khoản tiền gửi của bạn được xử lý; vui lòng chờ 2 xác nhận trên chuỗi.",
+        "buttonText": "Được"
+      },
       "PersonalInformation": {
         "title": "Bước cuối cùng",
         "fields": {

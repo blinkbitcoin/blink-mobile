@@ -3902,6 +3902,10 @@ const en: BaseTranslation = {
         },
         buttonText: "Deposit",
       },
+      DepositPending: {
+        message: "Waiting for your deposit to settle, please wait 2 on-chain confirmations",
+        buttonText: "Okay",
+      },
       PersonalInformation: {
         title: "Final step",
         fields: {

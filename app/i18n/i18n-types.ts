@@ -12409,6 +12409,16 @@ type RootTranslation = {
 				 */
 				buttonText: string
 			}
+			DepositPending: {
+				/**
+				 * W​a​i​t​i​n​g​ ​f​o​r​ ​y​o​u​r​ ​d​e​p​o​s​i​t​ ​t​o​ ​s​e​t​t​l​e​,​ ​p​l​e​a​s​e​ ​w​a​i​t​ ​2​ ​o​n​-​c​h​a​i​n​ ​c​o​n​f​i​r​m​a​t​i​o​n​s
+				 */
+				message: string
+				/**
+				 * O​k​a​y
+				 */
+				buttonText: string
+			}
 			PersonalInformation: {
 				/**
 				 * F​i​n​a​l​ ​s​t​e​p
@@ -26067,6 +26077,16 @@ export type TranslationFunctions = {
 				}
 				/**
 				 * Deposit
+				 */
+				buttonText: () => LocalizedString
+			}
+			DepositPending: {
+				/**
+				 * Waiting for your deposit to settle, please wait 2 on-chain confirmations
+				 */
+				message: () => LocalizedString
+				/**
+				 * Okay
 				 */
 				buttonText: () => LocalizedString
 			}

@@ -3731,6 +3731,10 @@
         },
         "buttonText": "Uplati"
       },
+      "DepositPending": {
+        "message": "Čeka se namira tvog pologa; pričekaj 2 potvrde na lancu.",
+        "buttonText": "U redu"
+      },
       "PersonalInformation": {
         "title": "Posljednji korak",
         "fields": {
