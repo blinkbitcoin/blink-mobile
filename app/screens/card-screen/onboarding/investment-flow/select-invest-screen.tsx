@@ -109,6 +109,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginBottom: 40,
     textAlign: "center",
     fontWeight: "bold",
+    width: "100%",
   },
   limitsContainer: {
     width: "100%",
