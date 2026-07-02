@@ -3493,6 +3493,10 @@
         },
         "buttonText": "Уплати"
       },
+      "DepositPending": {
+        "message": "Чека се намирење твог депозита; сачекај 2 потврде на ланцу.",
+        "buttonText": "У реду"
+      },
       "PersonalInformation": {
         "title": "Последњи корак",
         "fields": {

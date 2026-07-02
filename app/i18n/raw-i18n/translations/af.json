@@ -3493,6 +3493,10 @@
         },
         "buttonText": "Deponeer"
       },
+      "DepositPending": {
+        "message": "Wag dat jou deposito afgehandel word; wag asseblief vir 2 kettingbevestigings.",
+        "buttonText": "OK"
+      },
       "PersonalInformation": {
         "title": "Laaste stap",
         "fields": {

@@ -3493,6 +3493,10 @@
         },
         "buttonText": "Yatır"
       },
+      "DepositPending": {
+        "message": "Yatırılan tutarın kesinleşmesi bekleniyor; lütfen zincir üzerinde 2 onay bekle.",
+        "buttonText": "Tamam"
+      },
       "PersonalInformation": {
         "title": "Son adım",
         "fields": {

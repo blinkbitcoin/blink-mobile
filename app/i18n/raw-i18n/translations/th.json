@@ -3493,6 +3493,10 @@
         },
         "buttonText": "ฝากเงิน"
       },
+      "DepositPending": {
+        "message": "กำลังรอให้เงินฝากของคุณชำระเสร็จสิ้น โปรดรอการยืนยันบนเชน 2 ครั้ง",
+        "buttonText": "ตกลง"
+      },
       "PersonalInformation": {
         "title": "ขั้นตอนสุดท้าย",
         "fields": {

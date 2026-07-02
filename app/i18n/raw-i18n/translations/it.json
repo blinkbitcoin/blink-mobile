@@ -3524,6 +3524,10 @@
                     "body3": "Assicurati che l'intero importo sia in uno dei tuoi conti; Bitcoin o dollaro."
                 },
                 "buttonText": "Deposita"
+            },
+            "DepositPending": {
+                "message": "In attesa del regolamento del tuo deposito; attendi 2 conferme sulla catena.",
+                "buttonText": "Okay"
             }
         }
     },

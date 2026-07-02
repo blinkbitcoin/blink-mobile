@@ -3493,6 +3493,10 @@
         },
         "buttonText": "Weka"
       },
+      "DepositPending": {
+        "message": "Inasubiri amana yako ikamilike; tafadhali subiri uthibitisho 2 kwenye mnyororo.",
+        "buttonText": "Sawa"
+      },
       "PersonalInformation": {
         "title": "Hatua ya mwisho",
         "fields": {

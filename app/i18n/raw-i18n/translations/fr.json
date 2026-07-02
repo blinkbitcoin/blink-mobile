@@ -3524,6 +3524,10 @@
                     "body3": "Assure-toi que le montant total se trouve sur l'un de tes comptes ; Bitcoin ou dollar."
                 },
                 "buttonText": "Déposer"
+            },
+            "DepositPending": {
+                "message": "En attente du règlement de ton dépôt ; patiente pour 2 confirmations sur la chaîne.",
+                "buttonText": "D'accord"
             }
         }
     },

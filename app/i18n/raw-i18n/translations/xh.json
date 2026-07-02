@@ -3493,6 +3493,10 @@
         },
         "buttonText": "Faka imali"
       },
+      "DepositPending": {
+        "message": "Kulindwe ukuba idiphozithi yakho igqitywe; nceda ulinde iiqinisekiso ezi-2 kwitsheyini.",
+        "buttonText": "Kulungile"
+      },
       "PersonalInformation": {
         "title": "Inyathelo lokugqibela",
         "fields": {

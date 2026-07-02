@@ -3493,6 +3493,10 @@
         },
         "buttonText": "Churay"
       },
+      "DepositPending": {
+        "message": "Depositoyki hunt'akunankama suyachkanchik; iskay cadena-pi takyachiykama suyay.",
+        "buttonText": "Allinmi"
+      },
       "PersonalInformation": {
         "title": "Qhipa taki",
         "fields": {

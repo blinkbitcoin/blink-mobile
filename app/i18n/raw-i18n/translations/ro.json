@@ -3493,6 +3493,10 @@
         },
         "buttonText": "Depune"
       },
+      "DepositPending": {
+        "message": "Se așteaptă decontarea depozitului tău; te rugăm să aștepți 2 confirmări pe lanț.",
+        "buttonText": "OK"
+      },
       "PersonalInformation": {
         "title": "Ultimul pas",
         "fields": {

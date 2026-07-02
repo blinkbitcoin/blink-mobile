@@ -3493,6 +3493,10 @@
         },
         "buttonText": "Indbetal"
       },
+      "DepositPending": {
+        "message": "Venter på, at dit indskud afregnes; vent venligst på 2 bekræftelser på kæden.",
+        "buttonText": "OK"
+      },
       "PersonalInformation": {
         "title": "Sidste trin",
         "fields": {

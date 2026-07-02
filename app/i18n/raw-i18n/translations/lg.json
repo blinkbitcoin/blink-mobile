@@ -3493,6 +3493,10 @@
         },
         "buttonText": "Teekamu ssente"
       },
+      "DepositPending": {
+        "message": "Tulindirira ssente zo okumalirizibwa; tusaba olinde okukakasibwa emirundi 2 ku lujegere.",
+        "buttonText": "Kale"
+      },
       "PersonalInformation": {
         "title": "Olugendo olw'enkomerero",
         "fields": {

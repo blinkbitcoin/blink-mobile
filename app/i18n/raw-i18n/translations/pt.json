@@ -3524,6 +3524,10 @@
                     "body3": "Certifique-se de que o valor total esteja em uma das suas contas; Bitcoin ou Dólar."
                 },
                 "buttonText": "Depositar"
+            },
+            "DepositPending": {
+                "message": "Aguardando a liquidação do seu depósito; aguarde 2 confirmações na cadeia.",
+                "buttonText": "Ok"
             }
         }
     },

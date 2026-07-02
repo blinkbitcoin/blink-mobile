@@ -3524,6 +3524,10 @@
                     "body3": "Stelle sicher, dass sich der gesamte Betrag auf einem deiner Konten befindet; Bitcoin oder Dollar."
                 },
                 "buttonText": "Einzahlen"
+            },
+            "DepositPending": {
+                "message": "Warten auf die Abwicklung deiner Einzahlung; bitte warte auf 2 On-Chain-Bestätigungen.",
+                "buttonText": "Okay"
             }
         }
     },

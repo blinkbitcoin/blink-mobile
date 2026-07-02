@@ -3493,6 +3493,10 @@
         },
         "buttonText": "Diposita"
       },
+      "DepositPending": {
+        "message": "Esperant que el teu dipòsit es liquidi; espera 2 confirmacions a la cadena.",
+        "buttonText": "D'acord"
+      },
       "PersonalInformation": {
         "title": "Últim pas",
         "fields": {

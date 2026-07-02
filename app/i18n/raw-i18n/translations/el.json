@@ -3493,6 +3493,10 @@
         },
         "buttonText": "Κατάθεση"
       },
+      "DepositPending": {
+        "message": "Αναμονή για την εκκαθάριση της κατάθεσής σου· περίμενε 2 επιβεβαιώσεις στην αλυσίδα.",
+        "buttonText": "Εντάξει"
+      },
       "PersonalInformation": {
         "title": "Τελικό βήμα",
         "fields": {

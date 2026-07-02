@@ -123,6 +123,7 @@ import {
   TermSheetScreen,
   TransferInvestScreen,
   InsufficientBalanceScreen,
+  DepositPendingScreen,
   CompanyValuationScreen,
   CardPersonalInformationScreen,
   CardPreapprovedScreen,
@@ -767,6 +768,15 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="cardOnboardingInsufficientBalanceScreen"
         component={InsufficientBalanceScreen}
+        options={{
+          title: "",
+          headerLeft: () => <></>,
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingDepositPendingScreen"
+        component={DepositPendingScreen}
         options={{
           title: "",
           headerLeft: () => <></>,
