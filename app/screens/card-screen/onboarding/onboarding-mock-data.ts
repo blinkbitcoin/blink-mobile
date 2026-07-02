@@ -1,15 +1,4 @@
 // Mock/placeholder data — labels will come from backend when available
-export const MOCK_CARD_DISPLAY = {
-  cardNumber: "2121212121212121",
-  holderName: "SATOSHI NAKAMOTO",
-  validThruDate: "2028-01-01",
-}
-
-export const MOCK_CARD_PAYMENT = {
-  price: "$1,000",
-  renewalDate: "Aug 21, 2026",
-}
-
 export const MOCK_INVESTMENT_AMOUNT = "$10,000"
 
 export const MOCK_BITCOIN_BALANCE = "$3,333"
