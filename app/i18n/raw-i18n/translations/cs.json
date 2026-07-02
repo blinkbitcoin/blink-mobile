@@ -3488,6 +3488,15 @@
         },
         "buttonText": "Pokračovat"
       },
+      "InsufficientBalance": {
+        "title": "Nedostatečný zůstatek",
+        "paragraphs": {
+          "body1": "Na svém bitcoinovém účtu máš pouze {bitcoinBalance: string}.",
+          "body2": "Vlož na svůj účet více než {shortfall: string}, abys dosáhl investiční částky {investmentAmount: string}.",
+          "body3": "Ujisti se, že je celá částka na jednom z tvých účtů; bitcoinovém, nebo dolarovém."
+        },
+        "buttonText": "Vložit"
+      },
       "TopUp": {
         "title": "Dobití",
         "qrTitle": "Nedostatečné prostředky ve vaší peněžence Blink.\nDobijte minimálně {minAmount: string}.",

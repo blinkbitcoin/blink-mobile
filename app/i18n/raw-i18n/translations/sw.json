@@ -3488,6 +3488,15 @@
         },
         "buttonText": "Endelea"
       },
+      "InsufficientBalance": {
+        "title": "Salio halitoshi",
+        "paragraphs": {
+          "body1": "Una {bitcoinBalance: string} pekee katika akaunti yako ya Bitcoin.",
+          "body2": "Weka zaidi ya {shortfall: string} kwenye akaunti yako ili kufikia kiasi cha uwekezaji cha {investmentAmount: string}.",
+          "body3": "Hakikisha kiasi kamili kiko katika mojawapo ya akaunti zako; Bitcoin au Dola."
+        },
+        "buttonText": "Weka"
+      },
       "TopUp": {
         "title": "Jaza",
         "qrTitle": "Fedha hazitoshi katika pochi yako ya Blink.\nJaza kiwango cha chini cha {minAmount: string}.",

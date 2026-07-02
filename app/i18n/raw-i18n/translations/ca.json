@@ -3488,6 +3488,15 @@
         },
         "buttonText": "Continuar"
       },
+      "InsufficientBalance": {
+        "title": "Saldo insuficient",
+        "paragraphs": {
+          "body1": "Només tens {bitcoinBalance: string} al teu compte de Bitcoin.",
+          "body2": "Diposita més de {shortfall: string} al teu compte per assolir l'import de la inversió de {investmentAmount: string}.",
+          "body3": "Assegura't que l'import complet es trobi en algun dels teus comptes; Bitcoin o dòlar."
+        },
+        "buttonText": "Diposita"
+      },
       "TopUp": {
         "title": "Recarregar",
         "qrTitle": "Fons insuficients a la teva cartera Blink.\nRecàrrega un mínim de {minAmount: string}.",

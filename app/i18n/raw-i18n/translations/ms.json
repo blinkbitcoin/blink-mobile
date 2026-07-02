@@ -3488,6 +3488,15 @@
         },
         "buttonText": "Teruskan"
       },
+      "InsufficientBalance": {
+        "title": "Baki tidak mencukupi",
+        "paragraphs": {
+          "body1": "Anda hanya mempunyai {bitcoinBalance: string} dalam akaun Bitcoin anda.",
+          "body2": "Deposit lebih daripada {shortfall: string} ke dalam akaun anda untuk mencapai jumlah pelaburan sebanyak {investmentAmount: string}.",
+          "body3": "Pastikan jumlah penuh berada dalam salah satu akaun anda; Bitcoin atau Dolar."
+        },
+        "buttonText": "Deposit"
+      },
       "TopUp": {
         "title": "Tambah nilai",
         "qrTitle": "Dana tidak mencukupi dalam dompet Blink anda.\nTambah nilai minimum {minAmount: string}.",

@@ -3488,6 +3488,15 @@
         },
         "buttonText": "ดำเนินการต่อ"
       },
+      "InsufficientBalance": {
+        "title": "ยอดเงินไม่เพียงพอ",
+        "paragraphs": {
+          "body1": "คุณมี {bitcoinBalance: string} ในบัญชี Bitcoin ของคุณเท่านั้น",
+          "body2": "ฝากเงินมากกว่า {shortfall: string} เข้าบัญชีของคุณเพื่อให้ถึงจำนวนเงินลงทุน {investmentAmount: string}",
+          "body3": "ตรวจสอบให้แน่ใจว่ามีจำนวนเงินเต็มจำนวนอยู่ในบัญชีใดบัญชีหนึ่งของคุณ ไม่ว่าจะเป็น Bitcoin หรือ Dollar"
+        },
+        "buttonText": "ฝากเงิน"
+      },
       "TopUp": {
         "title": "เติมเงิน",
         "qrTitle": "ยอดเงินไม่เพียงพอในกระเป๋า Blink ของคุณ\nเติมเงินขั้นต่ำ {minAmount: string}",

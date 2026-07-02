@@ -3520,6 +3520,15 @@
                 },
                 "buttonText": "Continuar"
             },
+            "InsufficientBalance": {
+                "title": "Saldo insuficiente",
+                "paragraphs": {
+                    "body1": "Você só tem {bitcoinBalance: string} na sua conta Bitcoin.",
+                    "body2": "Deposite mais de {shortfall: string} na sua conta para atingir o valor de investimento de {investmentAmount: string}.",
+                    "body3": "Certifique-se de que o valor total esteja em uma das suas contas; Bitcoin ou Dólar."
+                },
+                "buttonText": "Depositar"
+            },
             "TopUp": {
                 "title": "Recarregar",
                 "qrTitle": "Fundos insuficientes na sua carteira Blink.\nRecarregue um mínimo de {minAmount: string}.",

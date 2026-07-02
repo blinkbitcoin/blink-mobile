@@ -3488,6 +3488,15 @@
         },
         "buttonText": "Συνέχεια"
       },
+      "InsufficientBalance": {
+        "title": "Ανεπαρκές υπόλοιπο",
+        "paragraphs": {
+          "body1": "Έχεις μόνο {bitcoinBalance: string} στον λογαριασμό Bitcoin σου.",
+          "body2": "Κατάθεσε περισσότερα από {shortfall: string} στον λογαριασμό σου για να φτάσεις το ποσό επένδυσης των {investmentAmount: string}.",
+          "body3": "Βεβαιώσου ότι ολόκληρο το ποσό βρίσκεται σε έναν από τους λογαριασμούς σου· Bitcoin ή δολάριο."
+        },
+        "buttonText": "Κατάθεση"
+      },
       "TopUp": {
         "title": "Αναπλήρωση",
         "qrTitle": "Ανεπαρκές υπόλοιπο στο πορτοφόλι Blink.\nΚάντε αναπλήρωση τουλάχιστον {minAmount: string}.",

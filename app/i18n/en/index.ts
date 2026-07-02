@@ -3644,6 +3644,15 @@ const en: BaseTranslation = {
         },
         buttonText: "Continue",
       },
+      InsufficientBalance: {
+        title: "Insufficient balance",
+        paragraphs: {
+          body1: "You only have {bitcoinBalance: string} in your Bitcoin account.",
+          body2: "Deposit more than {shortfall: string} to your account to reach the investment amount of {investmentAmount: string}.",
+          body3: "Make sure that the full amount is in either of your accounts; Bitcoin or Dollar.",
+        },
+        buttonText: "Deposit",
+      },
       TopUp: {
         title: "Top-up",
         qrTitle: "Insufficient funds in your Blink wallet.\nTop-up minimum of {minAmount: string}.",

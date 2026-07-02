@@ -3488,6 +3488,15 @@
         },
         "buttonText": "Շարունակել"
       },
+      "InsufficientBalance": {
+        "title": "Անբավարար մնացորդ",
+        "paragraphs": {
+          "body1": "Դու քո Bitcoin հաշվին ունես ընդամենը {bitcoinBalance: string}։",
+          "body2": "Ավելացրու քո հաշվին ավելի քան {shortfall: string}՝ {investmentAmount: string} ներդրման գումարին հասնելու համար։",
+          "body3": "Համոզվիր, որ ամբողջ գումարը քո հաշիվներից մեկում է՝ Bitcoin կամ դոլար։"
+        },
+        "buttonText": "Ավանդ"
+      },
       "TopUp": {
         "title": "Լիցքավորում",
         "qrTitle": "Ձեր Blink դրամապանակում բավարար միջոցներ չկան։\nԼիցքավորեք առնվազն {minAmount: string}։",

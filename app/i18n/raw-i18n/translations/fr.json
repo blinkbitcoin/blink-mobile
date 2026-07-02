@@ -3520,6 +3520,15 @@
                 },
                 "buttonText": "Continuer"
             },
+            "InsufficientBalance": {
+                "title": "Solde insuffisant",
+                "paragraphs": {
+                    "body1": "Tu n'as que {bitcoinBalance: string} sur ton compte Bitcoin.",
+                    "body2": "Dépose plus de {shortfall: string} sur ton compte pour atteindre le montant d'investissement de {investmentAmount: string}.",
+                    "body3": "Assure-toi que le montant total se trouve sur l'un de tes comptes ; Bitcoin ou dollar."
+                },
+                "buttonText": "Déposer"
+            },
             "TopUp": {
                 "title": "Recharger",
                 "qrTitle": "Fonds insuffisants dans votre portefeuille Blink.\nRechargez un minimum de {minAmount: string}.",

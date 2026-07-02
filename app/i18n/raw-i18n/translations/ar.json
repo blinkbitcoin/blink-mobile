@@ -3488,6 +3488,15 @@
         },
         "buttonText": "متابعة"
       },
+      "InsufficientBalance": {
+        "title": "رصيد غير كافٍ",
+        "paragraphs": {
+          "body1": "لديك {bitcoinBalance: string} فقط في حساب البيتكوين الخاص بك.",
+          "body2": "أودِع أكثر من {shortfall: string} في حسابك للوصول إلى مبلغ الاستثمار وهو {investmentAmount: string}.",
+          "body3": "تأكد من وجود المبلغ الكامل في أحد حسابيك؛ البيتكوين أو الدولار."
+        },
+        "buttonText": "إيداع"
+      },
       "TopUp": {
         "title": "إعادة شحن",
         "qrTitle": "رصيد غير كافٍ في محفظة Blink الخاصة بك.\nإعادة شحن بحد أدنى {minAmount: string}.",

@@ -3520,6 +3520,15 @@
                 },
                 "buttonText": "Weiter"
             },
+            "InsufficientBalance": {
+                "title": "Unzureichendes Guthaben",
+                "paragraphs": {
+                    "body1": "Du hast nur {bitcoinBalance: string} auf deinem Bitcoin-Konto.",
+                    "body2": "Zahle mehr als {shortfall: string} auf dein Konto ein, um den Investitionsbetrag von {investmentAmount: string} zu erreichen.",
+                    "body3": "Stelle sicher, dass sich der gesamte Betrag auf einem deiner Konten befindet; Bitcoin oder Dollar."
+                },
+                "buttonText": "Einzahlen"
+            },
             "TopUp": {
                 "title": "Aufladen",
                 "qrTitle": "Unzureichende Mittel in deiner Blink-Wallet.\nMindestaufladung von {minAmount: string}.",

@@ -11559,6 +11559,33 @@ type RootTranslation = {
 				 */
 				buttonText: string
 			}
+			InsufficientBalance: {
+				/**
+				 * I​n​s​u​f​f​i​c​i​e​n​t​ ​b​a​l​a​n​c​e
+				 */
+				title: string
+				paragraphs: {
+					/**
+					 * Y​o​u​ ​o​n​l​y​ ​h​a​v​e​ ​{​b​i​t​c​o​i​n​B​a​l​a​n​c​e​}​ ​i​n​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​.
+					 * @param {string} bitcoinBalance
+					 */
+					body1: RequiredParams<'bitcoinBalance'>
+					/**
+					 * D​e​p​o​s​i​t​ ​m​o​r​e​ ​t​h​a​n​ ​{​s​h​o​r​t​f​a​l​l​}​ ​t​o​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​r​e​a​c​h​ ​t​h​e​ ​i​n​v​e​s​t​m​e​n​t​ ​a​m​o​u​n​t​ ​o​f​ ​{​i​n​v​e​s​t​m​e​n​t​A​m​o​u​n​t​}​.
+					 * @param {string} investmentAmount
+					 * @param {string} shortfall
+					 */
+					body2: RequiredParams<'investmentAmount' | 'shortfall'>
+					/**
+					 * M​a​k​e​ ​s​u​r​e​ ​t​h​a​t​ ​t​h​e​ ​f​u​l​l​ ​a​m​o​u​n​t​ ​i​s​ ​i​n​ ​e​i​t​h​e​r​ ​o​f​ ​y​o​u​r​ ​a​c​c​o​u​n​t​s​;​ ​B​i​t​c​o​i​n​ ​o​r​ ​D​o​l​l​a​r​.
+					 */
+					body3: string
+				}
+				/**
+				 * D​e​p​o​s​i​t
+				 */
+				buttonText: string
+			}
 			TopUp: {
 				/**
 				 * T​o​p​-​u​p
@@ -23911,6 +23938,30 @@ export type TranslationFunctions = {
 				}
 				/**
 				 * Continue
+				 */
+				buttonText: () => LocalizedString
+			}
+			InsufficientBalance: {
+				/**
+				 * Insufficient balance
+				 */
+				title: () => LocalizedString
+				paragraphs: {
+					/**
+					 * You only have {bitcoinBalance} in your Bitcoin account.
+					 */
+					body1: (arg: { bitcoinBalance: string }) => LocalizedString
+					/**
+					 * Deposit more than {shortfall} to your account to reach the investment amount of {investmentAmount}.
+					 */
+					body2: (arg: { investmentAmount: string, shortfall: string }) => LocalizedString
+					/**
+					 * Make sure that the full amount is in either of your accounts; Bitcoin or Dollar.
+					 */
+					body3: () => LocalizedString
+				}
+				/**
+				 * Deposit
 				 */
 				buttonText: () => LocalizedString
 			}
