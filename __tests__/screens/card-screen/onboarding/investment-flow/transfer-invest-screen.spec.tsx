@@ -93,7 +93,7 @@ describe("TransferInvestScreen", () => {
     expect(getByText("Continue")).toBeTruthy()
   })
 
-  it("navigates to top up screen on button press", async () => {
+  it("navigates to the insufficient balance screen on button press", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <TransferInvestScreen />
@@ -107,6 +107,6 @@ describe("TransferInvestScreen", () => {
       fireEvent.press(button)
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingTopUpScreen")
+    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingInsufficientBalanceScreen")
   })
 })
