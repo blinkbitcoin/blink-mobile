@@ -2,7 +2,7 @@ import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
-import { InsufficientBalanceScreen } from "@app/screens/card-screen/onboarding/investment-flow/insufficient-balance-screen"
+import { InsufficientBalanceScreen } from "@app/screens/card-screen/onboarding/investment-flow"
 import {
   MOCK_BITCOIN_BALANCE,
   MOCK_INVESTMENT_AMOUNT,

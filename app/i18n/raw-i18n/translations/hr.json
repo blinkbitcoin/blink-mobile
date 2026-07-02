@@ -3736,13 +3736,6 @@
         },
         "buttonText": "Uplati"
       },
-      "TopUp": {
-        "title": "Nadoplata",
-        "qrTitle": "Nedovoljno sredstava u vašem Blink novčaniku.\nNadoplatite minimalno {minAmount: string}.",
-        "copy": "Kopiraj",
-        "share": "Podijeli",
-        "placeholder": "Postavi iznos"
-      },
       "PersonalInformation": {
         "title": "Posljednji korak",
         "fields": {

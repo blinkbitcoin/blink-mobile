@@ -3736,13 +3736,6 @@
         },
         "buttonText": "Depune"
       },
-      "TopUp": {
-        "title": "Încărcare",
-        "qrTitle": "Fonduri insuficiente în portofelul tău Blink.\nÎncarcă minim {minAmount: string}.",
-        "copy": "Copiază",
-        "share": "Distribuie",
-        "placeholder": "Setează suma"
-      },
       "PersonalInformation": {
         "title": "Ultimul pas",
         "fields": {
