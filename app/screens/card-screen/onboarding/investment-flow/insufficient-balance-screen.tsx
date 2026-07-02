@@ -26,7 +26,7 @@ export const InsufficientBalanceScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const handleDeposit = () => {
-    navigation.navigate("cardOnboardingTopUpScreen")
+    navigation.navigate("receiveBitcoin")
   }
 
   return (
@@ -38,22 +38,24 @@ export const InsufficientBalanceScreen: React.FC = () => {
           title={LL.CardFlow.Onboarding.InsufficientBalance.title()}
         />
 
-        <Text type="p1" style={styles.bodyText}>
-          {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body1({
-            bitcoinBalance: MOCK_BITCOIN_BALANCE,
-          })}
-        </Text>
+        <View style={styles.content}>
+          <Text type="p2" style={styles.bodyText}>
+            {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body1({
+              bitcoinBalance: MOCK_BITCOIN_BALANCE,
+            })}
+          </Text>
 
-        <Text type="p1" style={styles.bodyText}>
-          {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body2({
-            shortfall: MOCK_INVESTMENT_SHORTFALL,
-            investmentAmount: MOCK_INVESTMENT_AMOUNT,
-          })}
-        </Text>
+          <Text type="p2" style={styles.bodyText}>
+            {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body2({
+              shortfall: MOCK_INVESTMENT_SHORTFALL,
+              investmentAmount: MOCK_INVESTMENT_AMOUNT,
+            })}
+          </Text>
 
-        <Text type="p1" style={styles.bodyText}>
-          {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body3()}
-        </Text>
+          <Text type="p2" style={styles.bodyText}>
+            {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body3()}
+          </Text>
+        </View>
       </ScrollView>
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
@@ -74,9 +76,12 @@ const useStyles = makeStyles(() => ({
     paddingBottom: 20,
     paddingTop: 40,
   },
+  content: {
+    marginTop: 20,
+    gap: 22,
+  },
   bodyText: {
-    marginBottom: 24,
-    lineHeight: 26,
+    lineHeight: 22,
     textAlign: "left",
     width: "100%",
   },

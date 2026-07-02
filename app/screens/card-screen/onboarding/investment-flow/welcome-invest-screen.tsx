@@ -32,13 +32,15 @@ export const WelcomeInvestScreen: React.FC = () => {
           title={LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.title()}
         />
 
-        <Text type="p2" style={styles.bodyText}>
-          {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.paragraphs.body1()}
-        </Text>
+        <View style={styles.content}>
+          <Text type="p2" style={styles.bodyText}>
+            {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.paragraphs.body1()}
+          </Text>
 
-        <Text type="p2" style={styles.bodyText}>
-          {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.paragraphs.body2()}
-        </Text>
+          <Text type="p2" style={styles.bodyText}>
+            {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.paragraphs.body2()}
+          </Text>
+        </View>
       </ScrollView>
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
@@ -59,9 +61,12 @@ const useStyles = makeStyles(() => ({
     paddingBottom: 20,
     paddingTop: 40,
   },
+  content: {
+    marginTop: 20,
+    gap: 22,
+  },
   bodyText: {
-    marginBottom: 24,
-    lineHeight: 26,
+    lineHeight: 22,
     textAlign: "left",
     width: "100%",
   },
