@@ -2,10 +2,10 @@ import * as React from "react"
 import { ScrollView, TouchableOpacity, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, Text } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -14,6 +14,10 @@ import { MOCK_CREDIT_LIMIT_VALUES } from "../onboarding-mock-data"
 
 export const SelectInvestScreen: React.FC = () => {
   const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -39,35 +43,29 @@ export const SelectInvestScreen: React.FC = () => {
   return (
     <Screen>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.contentContainer}>
-          <View style={styles.iconContainer}>
-            <View style={styles.iconCircle}>
-              <GaloyIcon name={"btc-outline"} size={35} />
-            </View>
-          </View>
+        <IconHero
+          icon="btc-outline"
+          iconColor={colors.primary}
+          title={LL.CardFlow.Onboarding.SelectInvest.desiredCreditLimit()}
+        />
 
-          <Text type="h2" style={styles.title}>
-            {LL.CardFlow.Onboarding.SelectInvest.desiredCreditLimit()}
-          </Text>
-
-          <View style={styles.limitsContainer}>
-            {CREDIT_LIMITS.map((item, index) => {
-              const isSelected = selectedLimit === item.value
-              const isNotLastItem = index < CREDIT_LIMITS.length - 1
-              return (
-                <TouchableOpacity
-                  key={item.value}
-                  style={[styles.limitOption, isSelected && styles.limitOptionSelected]}
-                  onPress={() => setSelectedLimit(item.value)}
-                >
-                  <Text type="p2" style={styles.limitText}>
-                    ${item.value.toLocaleString()} {item.percent}
-                  </Text>
-                  {isNotLastItem && <View style={styles.limitBgOptionSelected} />}
-                </TouchableOpacity>
-              )
-            })}
-          </View>
+        <View style={styles.limitsContainer}>
+          {CREDIT_LIMITS.map((item, index) => {
+            const isSelected = selectedLimit === item.value
+            const isNotLastItem = index < CREDIT_LIMITS.length - 1
+            return (
+              <TouchableOpacity
+                key={item.value}
+                style={[styles.limitOption, isSelected && styles.limitOptionSelected]}
+                onPress={() => setSelectedLimit(item.value)}
+              >
+                <Text type="p2" style={styles.limitText}>
+                  ${item.value.toLocaleString()} {item.percent}
+                </Text>
+                {isNotLastItem && <View style={styles.limitBgOptionSelected} />}
+              </TouchableOpacity>
+            )
+          })}
         </View>
       </ScrollView>
       <View style={styles.buttonsContainer}>
@@ -89,27 +87,6 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 20,
     paddingBottom: 20,
     paddingTop: 40,
-  },
-  contentContainer: {
-    alignItems: "center",
-    flex: 1,
-  },
-  iconContainer: {
-    marginBottom: 15,
-  },
-  iconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.grey5,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    marginBottom: 40,
-    textAlign: "center",
-    fontWeight: "bold",
-    width: "100%",
   },
   limitsContainer: {
     width: "100%",
