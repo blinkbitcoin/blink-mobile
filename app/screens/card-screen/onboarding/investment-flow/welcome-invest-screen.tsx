@@ -4,8 +4,8 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -26,25 +26,19 @@ export const WelcomeInvestScreen: React.FC = () => {
   return (
     <Screen>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.contentContainer}>
-          <View style={styles.iconContainer}>
-            <View style={styles.iconCircle}>
-              <GaloyIcon name={"heart-outline"} color={colors._green} size={35} />
-            </View>
-          </View>
+        <IconHero
+          icon="heart-outline"
+          iconColor={colors._green}
+          title={LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.title()}
+        />
 
-          <Text type="h2" style={styles.welcomeTitle}>
-            {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.title()}
-          </Text>
+        <Text type="p2" style={styles.bodyText}>
+          {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.paragraphs.body1()}
+        </Text>
 
-          <Text type="p2" style={styles.bodyText}>
-            {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.paragraphs.body1()}
-          </Text>
-
-          <Text type="p2" style={styles.bodyText}>
-            {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.paragraphs.body2()}
-          </Text>
-        </View>
+        <Text type="p2" style={styles.bodyText}>
+          {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.paragraphs.body2()}
+        </Text>
       </ScrollView>
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
@@ -56,7 +50,7 @@ export const WelcomeInvestScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   scrollView: {
     flex: 1,
   },
@@ -64,26 +58,6 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 20,
     paddingBottom: 20,
     paddingTop: 40,
-  },
-  contentContainer: {
-    alignItems: "center",
-  },
-  iconContainer: {
-    marginBottom: 15,
-  },
-  iconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.grey5,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  welcomeTitle: {
-    marginBottom: 40,
-    textAlign: "center",
-    fontWeight: "bold",
-    width: "100%",
   },
   bodyText: {
     marginBottom: 24,

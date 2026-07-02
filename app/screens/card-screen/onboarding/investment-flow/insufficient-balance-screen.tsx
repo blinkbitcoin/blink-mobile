@@ -4,8 +4,8 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -32,34 +32,28 @@ export const InsufficientBalanceScreen: React.FC = () => {
   return (
     <Screen>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.contentContainer}>
-          <View style={styles.iconContainer}>
-            <View style={styles.iconCircle}>
-              <GaloyIcon name={"info"} color={colors.primary} size={35} />
-            </View>
-          </View>
+        <IconHero
+          icon="info"
+          iconColor={colors.primary}
+          title={LL.CardFlow.Onboarding.InsufficientBalance.title()}
+        />
 
-          <Text type="h2" style={styles.title}>
-            {LL.CardFlow.Onboarding.InsufficientBalance.title()}
-          </Text>
+        <Text type="p1" style={styles.bodyText}>
+          {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body1({
+            bitcoinBalance: MOCK_BITCOIN_BALANCE,
+          })}
+        </Text>
 
-          <Text type="p1" style={styles.bodyText}>
-            {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body1({
-              bitcoinBalance: MOCK_BITCOIN_BALANCE,
-            })}
-          </Text>
+        <Text type="p1" style={styles.bodyText}>
+          {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body2({
+            shortfall: MOCK_INVESTMENT_SHORTFALL,
+            investmentAmount: MOCK_INVESTMENT_AMOUNT,
+          })}
+        </Text>
 
-          <Text type="p1" style={styles.bodyText}>
-            {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body2({
-              shortfall: MOCK_INVESTMENT_SHORTFALL,
-              investmentAmount: MOCK_INVESTMENT_AMOUNT,
-            })}
-          </Text>
-
-          <Text type="p1" style={styles.bodyText}>
-            {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body3()}
-          </Text>
-        </View>
+        <Text type="p1" style={styles.bodyText}>
+          {LL.CardFlow.Onboarding.InsufficientBalance.paragraphs.body3()}
+        </Text>
       </ScrollView>
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
@@ -71,7 +65,7 @@ export const InsufficientBalanceScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   scrollView: {
     flex: 1,
   },
@@ -79,26 +73,6 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 20,
     paddingBottom: 20,
     paddingTop: 40,
-  },
-  contentContainer: {
-    alignItems: "center",
-  },
-  iconContainer: {
-    marginBottom: 15,
-  },
-  iconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.grey5,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    marginBottom: 40,
-    textAlign: "center",
-    fontWeight: "bold",
-    width: "100%",
   },
   bodyText: {
     marginBottom: 24,
