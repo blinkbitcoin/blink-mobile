@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Spracúvame vašu žiadosť",
-        "subtitle": "Odhadovaný čas čakania: {waitTime: string}",
+        "subtitle": "Dáme ti vedieť, hneď ako budeme pripravení",
         "buttonText": "Zavrieť"
       }
     }

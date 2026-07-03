@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Siqhuba isicelo sakho",
-        "subtitle": "Ixesha lokulinda eliqikelelweyo: {waitTime: string}",
+        "subtitle": "Siza kukwazisa xa sele silungile",
         "buttonText": "Vala"
       }
     }

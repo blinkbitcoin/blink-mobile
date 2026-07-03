@@ -3476,7 +3476,7 @@
             },
             "CardProcessing": {
                 "title": "申請を処理中",
-                "subtitle": "推定待ち時間: {waitTime: string}",
+                "subtitle": "準備ができ次第、お知らせします",
                 "buttonText": "閉じる"
             }
         }

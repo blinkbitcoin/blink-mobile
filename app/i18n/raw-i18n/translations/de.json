@@ -3476,7 +3476,7 @@
             },
             "CardProcessing": {
                 "title": "Dein Antrag wird bearbeitet",
-                "subtitle": "Geschätzte Wartezeit: {waitTime: string}",
+                "subtitle": "Wir benachrichtigen dich, sobald wir bereit sind",
                 "buttonText": "Schließen"
             }
         }

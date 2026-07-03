@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Obrađujemo vašu prijavu",
-        "subtitle": "Procijenjeno vrijeme čekanja: {waitTime: string}",
+        "subtitle": "Obavijestit ćemo te čim budemo spremni",
         "buttonText": "Zatvori"
       }
     }

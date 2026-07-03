@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Başvurunuz işleniyor",
-        "subtitle": "Tahmini bekleme süresi: {waitTime: string}",
+        "subtitle": "Hazır olduğumuzda sizi bilgilendireceğiz",
         "buttonText": "Kapat"
       }
     }

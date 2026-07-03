@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "جارٍ معالجة طلبك",
-        "subtitle": "وقت الانتظار المقدر: {waitTime: string}",
+        "subtitle": "سنُعلمك بمجرد أن نكون جاهزين",
         "buttonText": "إغلاق"
       }
     }

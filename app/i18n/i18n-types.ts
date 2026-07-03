@@ -11533,10 +11533,9 @@ type RootTranslation = {
 				 */
 				title: string
 				/**
-				 * E​s​t​i​m​a​t​e​d​ ​w​a​i​t​ ​t​i​m​e​:​ ​{​w​a​i​t​T​i​m​e​}
-				 * @param {string} waitTime
+				 * W​e​ ​w​i​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​w​e​ ​a​r​e​ ​r​e​a​d​y
 				 */
-				subtitle: RequiredParams<'waitTime'>
+				subtitle: string
 				/**
 				 * C​l​o​s​e
 				 */
@@ -23766,9 +23765,9 @@ export type TranslationFunctions = {
 				 */
 				title: () => LocalizedString
 				/**
-				 * Estimated wait time: {waitTime}
+				 * We will notify you once we are ready
 				 */
-				subtitle: (arg: { waitTime: string }) => LocalizedString
+				subtitle: () => LocalizedString
 				/**
 				 * Close
 				 */

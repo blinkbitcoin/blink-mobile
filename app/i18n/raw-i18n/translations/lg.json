@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Tukola ku sabiibu yo",
-        "subtitle": "Obudde obw'okulinda obusuubirwa: {waitTime: string}",
+        "subtitle": "Tujja kukumanyisa nga tumaze okuteekateeka",
         "buttonText": "Ggala"
       }
     }

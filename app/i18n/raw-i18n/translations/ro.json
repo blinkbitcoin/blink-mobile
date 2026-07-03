@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Se procesează cererea ta",
-        "subtitle": "Timp estimat de așteptare: {waitTime: string}",
+        "subtitle": "Te vom anunța de îndată ce vom fi pregătiți",
         "buttonText": "Închide"
       }
     }

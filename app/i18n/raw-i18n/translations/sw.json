@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Tunashughulikia maombi yako",
-        "subtitle": "Muda wa kusubiri unaokadiriwa: {waitTime: string}",
+        "subtitle": "Tutakujulisha mara tu tutakapokuwa tayari",
         "buttonText": "Funga"
       }
     }

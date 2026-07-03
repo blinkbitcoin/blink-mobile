@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Memproses permohonan anda",
-        "subtitle": "Anggaran masa menunggu: {waitTime: string}",
+        "subtitle": "Kami akan memberitahu anda sebaik sahaja kami bersedia",
         "buttonText": "Tutup"
       }
     }

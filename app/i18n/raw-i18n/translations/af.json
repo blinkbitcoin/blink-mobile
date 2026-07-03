@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Verwerk jou aansoek",
-        "subtitle": "Geskatte wagtyd: {waitTime: string}",
+        "subtitle": "Ons sal jou in kennis stel sodra ons gereed is",
         "buttonText": "Sluit"
       }
     }

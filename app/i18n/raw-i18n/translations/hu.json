@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Pályázatod feldolgozása",
-        "subtitle": "Becsült várakozási idő: {waitTime: string}",
+        "subtitle": "Értesítünk, amint készen állunk",
         "buttonText": "Bezárás"
       }
     }

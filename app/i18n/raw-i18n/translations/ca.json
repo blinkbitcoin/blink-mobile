@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Processant la teva sol·licitud",
-        "subtitle": "Temps d'espera estimat: {waitTime: string}",
+        "subtitle": "T'avisarem quan estiguem preparats",
         "buttonText": "Tancar"
       }
     }

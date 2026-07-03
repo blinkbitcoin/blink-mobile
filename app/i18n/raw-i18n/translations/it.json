@@ -3476,7 +3476,7 @@
             },
             "CardProcessing": {
                 "title": "Elaborazione della tua richiesta",
-                "subtitle": "Tempo di attesa stimato: {waitTime: string}",
+                "subtitle": "Ti avviseremo non appena saremo pronti",
                 "buttonText": "Chiudi"
             }
         }

@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Behandler din ansøgning",
-        "subtitle": "Estimeret ventetid: {waitTime: string}",
+        "subtitle": "Vi giver dig besked, så snart vi er klar",
         "buttonText": "Luk"
       }
     }

@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Je aanvraag wordt verwerkt",
-        "subtitle": "Geschatte wachttijd: {waitTime: string}",
+        "subtitle": "We laten het je weten zodra we klaar zijn",
         "buttonText": "Sluiten"
       }
     }

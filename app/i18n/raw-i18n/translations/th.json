@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "กำลังดำเนินการใบสมัครของคุณ",
-        "subtitle": "เวลารอโดยประมาณ: {waitTime: string}",
+        "subtitle": "เราจะแจ้งให้คุณทราบเมื่อเราพร้อม",
         "buttonText": "ปิด"
       }
     }

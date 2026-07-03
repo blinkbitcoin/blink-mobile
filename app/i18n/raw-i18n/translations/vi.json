@@ -3476,7 +3476,7 @@
       },
       "CardProcessing": {
         "title": "Đang xử lý đơn đăng ký của bạn",
-        "subtitle": "Thời gian chờ ước tính: {waitTime: string}",
+        "subtitle": "Chúng tôi sẽ thông báo cho bạn ngay khi chúng tôi sẵn sàng",
         "buttonText": "Đóng"
       }
     }
