@@ -3390,6 +3390,7 @@
         "perYear": "per år",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Særtilbud",
           "paymentPending": "Betaling Afventer",
           "firstYearFree": "Første år gratis"
         },

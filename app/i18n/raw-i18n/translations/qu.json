@@ -3390,6 +3390,7 @@
         "perYear": "watanpi",
         "status": {
           "label": "Kayninpi",
+          "specialOfferLabel": "Sapaq ofrecimiento",
           "paymentPending": "Pagay Suyachkan",
           "firstYearFree": "Ñawpaq wata qhasilla"
         },

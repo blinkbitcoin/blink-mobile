@@ -3390,6 +3390,7 @@
         "perYear": "տարեկան",
         "status": {
           "label": "Կարգավիճակ",
+          "specialOfferLabel": "Հատուկ առաջարկ",
           "paymentPending": "Վճարումը սպասման մեջ է",
           "firstYearFree": "Առաջին տարին անվճար է"
         },

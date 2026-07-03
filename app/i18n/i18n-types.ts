@@ -11387,6 +11387,10 @@ type RootTranslation = {
 					 */
 					label: string
 					/**
+					 * S​p​e​c​i​a​l​ ​o​f​f​e​r
+					 */
+					specialOfferLabel: string
+					/**
 					 * P​a​y​m​e​n​t​ ​P​e​n​d​i​n​g
 					 */
 					paymentPending: string
@@ -23616,6 +23620,10 @@ export type TranslationFunctions = {
 					 * Status
 					 */
 					label: () => LocalizedString
+					/**
+					 * Special offer
+					 */
+					specialOfferLabel: () => LocalizedString
 					/**
 					 * Payment Pending
 					 */

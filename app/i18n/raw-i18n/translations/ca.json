@@ -3390,6 +3390,7 @@
         "perYear": "per any",
         "status": {
           "label": "Estat",
+          "specialOfferLabel": "Oferta especial",
           "paymentPending": "Pagament Pendent",
           "firstYearFree": "Primer any gratuït"
         },

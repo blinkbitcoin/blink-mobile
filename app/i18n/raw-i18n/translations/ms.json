@@ -3390,6 +3390,7 @@
         "perYear": "setahun",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Tawaran istimewa",
           "paymentPending": "Pembayaran Tertangguh",
           "firstYearFree": "Tahun pertama percuma"
         },

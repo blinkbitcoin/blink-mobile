@@ -3390,6 +3390,7 @@
         "perYear": "سنوياً",
         "status": {
           "label": "الحالة",
+          "specialOfferLabel": "عرض خاص",
           "paymentPending": "الدفع معلق",
           "firstYearFree": "السنة الأولى مجانية"
         },

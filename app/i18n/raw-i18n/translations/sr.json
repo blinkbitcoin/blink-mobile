@@ -3390,6 +3390,7 @@
         "perYear": "годишње",
         "status": {
           "label": "Статус",
+          "specialOfferLabel": "Посебна понуда",
           "paymentPending": "Плаћање на Чекању",
           "firstYearFree": "Прва година бесплатно"
         },

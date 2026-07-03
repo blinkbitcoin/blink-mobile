@@ -3390,6 +3390,7 @@
                 "perYear": "par an",
                 "status": {
                     "label": "Statut",
+                    "specialOfferLabel": "Offre spéciale",
                     "paymentPending": "Paiement en Attente",
                     "firstYearFree": "Première année gratuite"
                 },

@@ -3390,6 +3390,7 @@
         "perYear": "buli mwaka",
         "status": {
           "label": "Embeera",
+          "specialOfferLabel": "Ekirabo eky'enjawulo",
           "paymentPending": "Okusasula Kulindirira",
           "firstYearFree": "Omwaka ogusooka ogw'obwereere"
         },

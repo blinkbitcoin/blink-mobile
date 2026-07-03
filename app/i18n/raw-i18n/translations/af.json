@@ -3390,6 +3390,7 @@
         "perYear": "per jaar",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Spesiale aanbod",
           "paymentPending": "Betaling Hangende",
           "firstYearFree": "Eerste jaar gratis"
         },

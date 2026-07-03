@@ -3390,6 +3390,7 @@
         "perYear": "za rok",
         "status": {
           "label": "Stav",
+          "specialOfferLabel": "Špeciálna ponuka",
           "paymentPending": "Platba Čaká",
           "firstYearFree": "Prvý rok zadarmo"
         },

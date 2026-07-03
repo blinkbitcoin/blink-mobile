@@ -3390,6 +3390,7 @@
         "perYear": "ngonyaka",
         "status": {
           "label": "Isimo",
+          "specialOfferLabel": "Inikelo elikhethekileyo",
           "paymentPending": "Intlawulo Ilindile",
           "firstYearFree": "Unyaka wokuqala simahla"
         },

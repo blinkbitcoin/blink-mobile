@@ -3577,6 +3577,7 @@ const en: BaseTranslation = {
         perYear: "per year",
         status: {
           label: "Status",
+          specialOfferLabel: "Special offer",
           paymentPending: "Payment Pending",
           firstYearFree: "First year free",
         },

@@ -3390,6 +3390,7 @@
         "perYear": "yıllık",
         "status": {
           "label": "Durum",
+          "specialOfferLabel": "Özel teklif",
           "paymentPending": "Ödeme Bekliyor",
           "firstYearFree": "İlk yıl ücretsiz"
         },

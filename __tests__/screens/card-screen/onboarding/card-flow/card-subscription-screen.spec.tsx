@@ -129,6 +129,18 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
     expect(getByText("First year free")).toBeTruthy()
   })
 
+  it("displays the special offer label", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(getByText("Special offer")).toBeTruthy()
+  })
+
   it("displays renew checkbox text", async () => {
     const { getByText } = render(
       <ContextForScreen>
@@ -302,6 +314,18 @@ describe("CardSubscriptionScreen - payment variant", () => {
     await act(async () => {})
 
     expect(getByText("Payment Pending")).toBeTruthy()
+  })
+
+  it("displays the status label", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(getByText("Status")).toBeTruthy()
   })
 
   it("does not display renew checkbox", async () => {

@@ -3390,6 +3390,7 @@
         "perYear": "pe an",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Ofertă specială",
           "paymentPending": "Plată în Așteptare",
           "firstYearFree": "Primul an gratuit"
         },

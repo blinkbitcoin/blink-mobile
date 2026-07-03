@@ -3390,6 +3390,7 @@
         "perYear": "ανά έτος",
         "status": {
           "label": "Κατάσταση",
+          "specialOfferLabel": "Ειδική προσφορά",
           "paymentPending": "Η πληρωμή εκκρεμεί",
           "firstYearFree": "Πρώτος χρόνος δωρεάν"
         },

@@ -3390,6 +3390,7 @@
         "perYear": "mỗi năm",
         "status": {
           "label": "Trạng thái",
+          "specialOfferLabel": "Ưu đãi đặc biệt",
           "paymentPending": "Đang Chờ Thanh toán",
           "firstYearFree": "Năm đầu tiên miễn phí"
         },

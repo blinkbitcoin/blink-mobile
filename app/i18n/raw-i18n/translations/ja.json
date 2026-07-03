@@ -3390,6 +3390,7 @@
                 "perYear": "年額",
                 "status": {
                     "label": "ステータス",
+                    "specialOfferLabel": "特別オファー",
                     "paymentPending": "支払い保留中",
                     "firstYearFree": "初年度無料"
                 },

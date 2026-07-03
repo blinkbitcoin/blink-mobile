@@ -59,6 +59,10 @@ export const CardSubscriptionScreen: React.FC = () => {
   const isSubscribeReady = isRenew && isFeeScheduleAgreed
   const isAcceptDisabled = isSubscribeVariant ? !isSubscribeReady : !isAgreed
 
+  const statusLabel = isSubscribeVariant
+    ? LL.CardFlow.Onboarding.CardSubscription.status.specialOfferLabel()
+    : LL.CardFlow.Onboarding.CardSubscription.status.label()
+
   const handleAccept = () => {
     if (isSubscribeVariant) {
       startKyc()
@@ -86,7 +90,7 @@ export const CardSubscriptionScreen: React.FC = () => {
 
           <View style={styles.infoRow}>
             <Text type="p3" style={styles.label}>
-              {LL.CardFlow.Onboarding.CardSubscription.status.label()}
+              {statusLabel}
             </Text>
             {isSubscribeVariant ? (
               <Text type="p3" style={styles.statusSubscribe}>

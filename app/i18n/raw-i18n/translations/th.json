@@ -3390,6 +3390,7 @@
         "perYear": "ต่อปี",
         "status": {
           "label": "สถานะ",
+          "specialOfferLabel": "ข้อเสนอพิเศษ",
           "paymentPending": "รอการชำระเงิน",
           "firstYearFree": "ปีแรกฟรี"
         },

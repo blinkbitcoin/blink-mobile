@@ -3390,6 +3390,7 @@
         "perYear": "kwa mwaka",
         "status": {
           "label": "Hali",
+          "specialOfferLabel": "Ofa maalum",
           "paymentPending": "Malipo Yanasubiri",
           "firstYearFree": "Mwaka wa kwanza bure"
         },

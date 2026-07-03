@@ -3390,6 +3390,7 @@
         "perYear": "évente",
         "status": {
           "label": "Állapot",
+          "specialOfferLabel": "Különleges ajánlat",
           "paymentPending": "Fizetés Függőben",
           "firstYearFree": "Első év ingyenes"
         },

@@ -3421,6 +3421,7 @@
                 "perYear": "por año",
                 "status": {
                     "label": "Estado",
+                    "specialOfferLabel": "Oferta especial",
                     "paymentPending": "Pago Pendiente",
                     "firstYearFree": "Primer año gratis"
                 },
