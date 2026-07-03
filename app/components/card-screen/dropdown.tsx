@@ -1,5 +1,10 @@
 import React, { useState } from "react"
-import { View, TouchableOpacity, TouchableWithoutFeedback, ScrollView } from "react-native"
+import {
+  View,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  ScrollView,
+} from "react-native"
 import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 import Icon from "react-native-vector-icons/Ionicons"
 import ReactNativeModal from "react-native-modal"
