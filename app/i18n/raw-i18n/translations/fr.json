@@ -3403,7 +3403,11 @@
                     "cardholderAgreement": "Accord du Titulaire de la Carte",
                     "and": "et"
                 },
-                "renew": "Je comprends que mon abonnement sera automatiquement renouvelé dans 1 an"
+                "feeSchedule": {
+                    "text": "J'ai examiné et j'accepte le",
+                    "linkText": "Barème des Frais de Blink Card"
+                },
+                "renew": "Je comprends que mon abonnement se renouvellera automatiquement dans {months: number} mois"
             },
             "CardIntroducing": {
                 "title": "Présentation",

@@ -22,6 +22,7 @@ const SuccessIconDurationKey = "successIconDuration"
 const CardTermsAndConditionsUrlKey = "cardTermsAndConditionsUrl"
 const CardPrivacyPolicyUrlKey = "cardPrivacyPolicyUrl"
 const CardCardholderAgreementUrlKey = "cardCardholderAgreementUrl"
+const CardFeeScheduleUrlKey = "cardFeeScheduleUrl"
 const CardSubscriptionPriceUsdKey = "cardSubscriptionPriceUsd"
 const CardProcessingWaitTimeHoursKey = "cardProcessingWaitTimeHours"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
@@ -71,6 +72,7 @@ type RemoteConfig = {
   [CardTermsAndConditionsUrlKey]: string
   [CardPrivacyPolicyUrlKey]: string
   [CardCardholderAgreementUrlKey]: string
+  [CardFeeScheduleUrlKey]: string
   [CardSubscriptionPriceUsdKey]: number
   [CardProcessingWaitTimeHoursKey]: number
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
@@ -142,6 +144,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   cardTermsAndConditionsUrl: "https://www.blink.sv/en/terms-conditions",
   cardPrivacyPolicyUrl: "https://www.blink.sv/en/privacy-policy",
   cardCardholderAgreementUrl: "https://www.blink.sv",
+  cardFeeScheduleUrl: "https://www.blink.sv/en/blink-card-cardholder-agreement",
   cardSubscriptionPriceUsd: 1000,
   cardProcessingWaitTimeHours: 24,
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
@@ -265,6 +268,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(CardCardholderAgreementUrlKey)
           .asString()
 
+        const cardFeeScheduleUrl = remoteConfigInstance()
+          .getValue(CardFeeScheduleUrlKey)
+          .asString()
+
         const cardSubscriptionPriceUsd = remoteConfigInstance()
           .getValue(CardSubscriptionPriceUsdKey)
           .asNumber()
@@ -373,6 +380,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           cardTermsAndConditionsUrl,
           cardPrivacyPolicyUrl,
           cardCardholderAgreementUrl,
+          cardFeeScheduleUrl,
           cardSubscriptionPriceUsd,
           cardProcessingWaitTimeHours,
           replaceCardDeliveryConfig,

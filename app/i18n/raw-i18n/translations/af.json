@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Kaarthouer-ooreenkoms",
           "and": "en"
         },
-        "renew": "Ek verstaan dat my intekening outomaties oor 1 jaar hernu sal word"
+        "feeSchedule": {
+          "text": "Ek het nagegaan en stem in tot die",
+          "linkText": "Blink Card-fooiskedule"
+        },
+        "renew": "Ek verstaan dat my intekening outomaties oor {months: number} maande sal hernu"
       },
       "CardIntroducing": {
         "title": "Bekendstelling",

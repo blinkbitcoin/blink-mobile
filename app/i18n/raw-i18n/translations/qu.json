@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Tarjeta Hap'iq Rimanakuy",
           "and": "chaymanta"
         },
-        "renew": "Entiendeni qillqakuyniyta kikinmanta musuqyachinqa 1 watapi"
+        "feeSchedule": {
+          "text": "Qhawarini hinaspa arinini",
+          "linkText": "Blink Card qullqi tabla"
+        },
+        "renew": "Yachani suscripciónníy {months: number} killapi automáticamente musuqchakunanta"
       },
       "CardIntroducing": {
         "title": "Riqsichispa",

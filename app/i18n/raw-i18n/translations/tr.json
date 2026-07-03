@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Kart Sahibi Sözleşmesi",
           "and": "ve"
         },
-        "renew": "Aboneliğimin 1 yıl içinde otomatik olarak yenileneceğini anlıyorum"
+        "feeSchedule": {
+          "text": "İnceledim ve şunu kabul ediyorum:",
+          "linkText": "Blink Card Ücret Çizelgesi"
+        },
+        "renew": "Aboneliğimin {months: number} ay içinde otomatik olarak yenileneceğini anlıyorum"
       },
       "CardIntroducing": {
         "title": "Tanıtım",

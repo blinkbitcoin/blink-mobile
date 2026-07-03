@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Perjanjian Pemegang Kartu",
           "and": "dan"
         },
-        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam 1 tahun"
+        "feeSchedule": {
+          "text": "Saya telah meninjau dan menyetujui",
+          "linkText": "Jadwal Biaya Blink Card"
+        },
+        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam {months: number} bulan"
       },
       "CardIntroducing": {
         "title": "Memperkenalkan",

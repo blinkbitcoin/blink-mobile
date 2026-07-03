@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Kaarthouderovereenkomst",
           "and": "en"
         },
-        "renew": "Ik begrijp dat mijn abonnement automatisch wordt verlengd over 1 jaar"
+        "feeSchedule": {
+          "text": "Ik heb beoordeeld en ga akkoord met het",
+          "linkText": "Blink Card-tarievenoverzicht"
+        },
+        "renew": "Ik begrijp dat mijn abonnement automatisch over {months: number} maanden wordt verlengd"
       },
       "CardIntroducing": {
         "title": "Introductie",

@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Smlouvou držitele karty",
           "and": "a"
         },
-        "renew": "Rozumím, že mé předplatné se automaticky obnoví za 1 rok"
+        "feeSchedule": {
+          "text": "Zkontroloval jsem a souhlasím se dokumentem",
+          "linkText": "Sazebník poplatků Blink Card"
+        },
+        "renew": "Rozumím, že mé předplatné se automaticky obnoví za {months: number} měsíců"
       },
       "CardIntroducing": {
         "title": "Představujeme",

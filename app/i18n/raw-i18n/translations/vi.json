@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Thỏa thuận Chủ thẻ",
           "and": "và"
         },
-        "renew": "Tôi hiểu rằng đăng ký của tôi sẽ tự động gia hạn sau 1 năm"
+        "feeSchedule": {
+          "text": "Tôi đã xem xét và đồng ý với",
+          "linkText": "Biểu Phí Blink Card"
+        },
+        "renew": "Tôi hiểu rằng gói đăng ký của tôi sẽ tự động gia hạn sau {months: number} tháng"
       },
       "CardIntroducing": {
         "title": "Giới thiệu",

@@ -3590,7 +3590,11 @@ const en: BaseTranslation = {
           cardholderAgreement: "Cardholder Agreement",
           and: "and",
         },
-        renew: "I understand that my subscription will automatically renew in 1 year",
+        feeSchedule: {
+          text: "I have reviewed and agree to the",
+          linkText: "Blink Card Fee Schedule",
+        },
+        renew: "I understand my subscription will automatically renew in {months: number} months",
       },
       LoadingCard: {
         title: "We're working on your card",

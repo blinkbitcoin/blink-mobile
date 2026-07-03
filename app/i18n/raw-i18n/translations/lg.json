@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Endagaano y'Omukozesa Kaadi",
           "and": "ne"
         },
-        "renew": "Ntegeera nti obuwandiisi bwange bujja kuddamu okuwandiisibwa mu mwaka 1"
+        "feeSchedule": {
+          "text": "Nkakasizza era nkkiriza",
+          "linkText": "Oluwendo lw'ebisale bya Blink Card"
+        },
+        "renew": "Ntegeera nti okwewandiisa kwange kujja kuddaabirizibwa okwokwokka nga wayiseewo emyezi {months: number}"
       },
       "CardIntroducing": {
         "title": "Okwanjula",

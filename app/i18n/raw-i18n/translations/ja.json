@@ -3403,7 +3403,11 @@
                     "cardholderAgreement": "カード会員契約",
                     "and": "および"
                 },
-                "renew": "サブスクリプションが1年後に自動更新されることを理解しています"
+                "feeSchedule": {
+                    "text": "以下を確認し、同意します：",
+                    "linkText": "Blink Card 手数料表"
+                },
+                "renew": "サブスクリプションが{months: number}か月後に自動的に更新されることを理解しています"
             },
             "CardIntroducing": {
                 "title": "ご紹介",

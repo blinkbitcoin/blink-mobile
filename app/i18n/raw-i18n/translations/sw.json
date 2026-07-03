@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Mkataba wa Mmiliki wa Kadi",
           "and": "na"
         },
-        "renew": "Ninaelewa kuwa usajili wangu utahuishwa moja kwa moja baada ya mwaka 1"
+        "feeSchedule": {
+          "text": "Nimekagua na ninakubali",
+          "linkText": "Ratiba ya Ada ya Blink Card"
+        },
+        "renew": "Ninaelewa kuwa usajili wangu utahuishwa kiotomatiki baada ya miezi {months: number}"
       },
       "CardIntroducing": {
         "title": "Kuanzisha",

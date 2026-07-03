@@ -1,5 +1,6 @@
 import React from "react"
 import { render, fireEvent, act } from "@testing-library/react-native"
+import InAppBrowser from "react-native-inappbrowser-reborn"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { CardSubscriptionScreen } from "@app/screens/card-screen/onboarding/card-flow/card-subscription-screen"
@@ -74,6 +75,7 @@ jest.mock("@app/config/feature-flags-context", () => ({
     cardTermsAndConditionsUrl: "https://example.com/terms",
     cardPrivacyPolicyUrl: "https://example.com/privacy",
     cardCardholderAgreementUrl: "https://example.com/cardholder",
+    cardFeeScheduleUrl: "https://example.com/fee-schedule",
     cardSubscriptionPriceUsd: 1000,
   }),
 }))
@@ -137,8 +139,59 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
     await act(async () => {})
 
     expect(
-      getByText("I understand that my subscription will automatically renew in 1 year"),
+      getByText("I understand my subscription will automatically renew in 12 months"),
     ).toBeTruthy()
+  })
+
+  it("displays the fee schedule checkbox text and link", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    expect(getByText(/I have reviewed and agree to the/)).toBeTruthy()
+    expect(getByText("Blink Card Fee Schedule")).toBeTruthy()
+  })
+
+  it("opens the fee schedule link when pressed", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText("Blink Card Fee Schedule"))
+    })
+
+    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/fee-schedule")
+  })
+
+  it("keeps the button disabled when only the renew checkbox is checked", async () => {
+    const { getByText, getAllByTestId } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    const uncheckedBoxes = getAllByTestId("checkbox-unchecked")
+    await act(async () => {
+      fireEvent.press(uncheckedBoxes[0])
+    })
+
+    const button = getByText("Accept")
+    await act(async () => {
+      fireEvent.press(button)
+    })
+
+    expect(mockStartKyc).not.toHaveBeenCalled()
   })
 
   it("displays accept button", async () => {
@@ -153,7 +206,7 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
     expect(getByText("Accept")).toBeTruthy()
   })
 
-  it("button is disabled when agreement is not checked", async () => {
+  it("button is disabled when no checkbox is checked", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardSubscriptionScreen />
@@ -261,7 +314,7 @@ describe("CardSubscriptionScreen - payment variant", () => {
     await act(async () => {})
 
     expect(
-      queryByText("I understand that my subscription will automatically renew in 1 year"),
+      queryByText("I understand my subscription will automatically renew in 12 months"),
     ).toBeNull()
   })
 
@@ -298,5 +351,23 @@ describe("CardSubscriptionScreen - payment variant", () => {
     })
 
     expect(mockStartKyc).not.toHaveBeenCalled()
+  })
+
+  it("opens the agreement links when pressed", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByText("Terms of Service"))
+      fireEvent.press(getByText("Privacy Policy"))
+      fireEvent.press(getByText("Cardholder Agreement"))
+    })
+
+    expect(InAppBrowser.open).toHaveBeenCalledTimes(3)
   })
 })

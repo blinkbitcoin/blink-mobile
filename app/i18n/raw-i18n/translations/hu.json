@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Kártyabirtokosi Megállapodást",
           "and": "és"
         },
-        "renew": "Megértem, hogy az előfizetésem automatikusan megújul 1 év múlva"
+        "feeSchedule": {
+          "text": "Átnéztem és elfogadom a következőt:",
+          "linkText": "Blink Card díjszabása"
+        },
+        "renew": "Megértem, hogy az előfizetésem {months: number} hónap múlva automatikusan megújul"
       },
       "CardIntroducing": {
         "title": "Bemutatjuk",

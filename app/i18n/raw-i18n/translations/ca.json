@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Acord del Titular de la Targeta",
           "and": "i"
         },
-        "renew": "Entenc que la meva subscripció es renovarà automàticament en 1 any"
+        "feeSchedule": {
+          "text": "He revisat i accepto la",
+          "linkText": "Taula de Tarifes de Blink Card"
+        },
+        "renew": "Entenc que la meva subscripció es renovarà automàticament en {months: number} mesos"
       },
       "CardIntroducing": {
         "title": "Presentant",

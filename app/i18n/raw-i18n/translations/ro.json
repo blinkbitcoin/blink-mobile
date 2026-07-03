@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Acordul Deținătorului de Card",
           "and": "și"
         },
-        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în 1 an"
+        "feeSchedule": {
+          "text": "Am examinat și sunt de acord cu",
+          "linkText": "Grila de Tarife Blink Card"
+        },
+        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în {months: number} luni"
       },
       "CardIntroducing": {
         "title": "Prezentare",

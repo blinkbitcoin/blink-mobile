@@ -3403,7 +3403,11 @@
                     "cardholderAgreement": "Karteninhabervereinbarung",
                     "and": "und"
                 },
-                "renew": "Ich verstehe, dass mein Abonnement automatisch in 1 Jahr verlängert wird"
+                "feeSchedule": {
+                    "text": "Ich habe geprüft und akzeptiere die",
+                    "linkText": "Blink Card-Gebührenübersicht"
+                },
+                "renew": "Ich verstehe, dass mein Abonnement automatisch in {months: number} Monaten verlängert wird"
             },
             "CardIntroducing": {
                 "title": "Vorstellung",

@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Kortholderaftalen",
           "and": "og"
         },
-        "renew": "Jeg forstår, at mit abonnement automatisk fornyes om 1 år"
+        "feeSchedule": {
+          "text": "Jeg har gennemgået og accepterer",
+          "linkText": "Blink Card-gebyroversigt"
+        },
+        "renew": "Jeg forstår, at mit abonnement automatisk fornyes om {months: number} måneder"
       },
       "CardIntroducing": {
         "title": "Introduktion",

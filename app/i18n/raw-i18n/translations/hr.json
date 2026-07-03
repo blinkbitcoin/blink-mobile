@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Ugovor vlasnika kartice",
           "and": "i"
         },
-        "renew": "Razumijem da će se moja pretplata automatski obnoviti za 1 godinu"
+        "feeSchedule": {
+          "text": "Pregledao sam i slažem se s dokumentom",
+          "linkText": "Cjenik naknada za Blink Card"
+        },
+        "renew": "Razumijem da će se moja pretplata automatski obnoviti za {months: number} mjeseci"
       },
       "CardIntroducing": {
         "title": "Predstavljamo",

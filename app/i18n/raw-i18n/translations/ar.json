@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "اتفاقية حامل البطاقة",
           "and": "و"
         },
-        "renew": "أفهم أن اشتراكي سيتجدد تلقائياً خلال سنة واحدة"
+        "feeSchedule": {
+          "text": "لقد راجعتُ وأوافق على",
+          "linkText": "جدول رسوم Blink Card"
+        },
+        "renew": "أفهم أن اشتراكي سيتجدد تلقائيًا خلال {months: number} شهرًا"
       },
       "CardIntroducing": {
         "title": "تقديم",

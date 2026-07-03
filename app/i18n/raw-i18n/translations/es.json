@@ -3434,7 +3434,11 @@
                     "cardholderAgreement": "Acuerdo del Titular de la Tarjeta",
                     "and": "y"
                 },
-                "renew": "Entiendo que mi suscripción se renovará automáticamente en 1 año"
+                "feeSchedule": {
+                    "text": "He revisado y acepto la",
+                    "linkText": "Tabla de Tarifas de Blink Card"
+                },
+                "renew": "Entiendo que mi suscripción se renovará automáticamente en {months: number} meses"
             },
             "LoadingCard": {
                 "title": "Estamos trabajando en tu tarjeta",

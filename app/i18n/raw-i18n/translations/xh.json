@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Isivumelwano soMpathi weKhadi",
           "and": "kunye"
         },
-        "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwisithuba sonyaka omnye"
+        "feeSchedule": {
+          "text": "Ndiyiphengululile kwaye ndiyavuma",
+          "linkText": "Ishedyuli Yeentlawulo ye-Blink Card"
+        },
+        "renew": "Ndiyaqonda ukuba ubhaliso lwam luya kuhlaziywa ngokuzenzekelayo kwiinyanga ezili-{months: number}"
       },
       "CardIntroducing": {
         "title": "Ukwazisa",

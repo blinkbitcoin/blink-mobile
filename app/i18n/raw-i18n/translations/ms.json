@@ -3403,7 +3403,11 @@
           "cardholderAgreement": "Perjanjian Pemegang Kad",
           "and": "dan"
         },
-        "renew": "Saya faham bahawa langganan saya akan diperbaharui secara automatik dalam 1 tahun"
+        "feeSchedule": {
+          "text": "Saya telah menyemak dan bersetuju dengan",
+          "linkText": "Jadual Fi Blink Card"
+        },
+        "renew": "Saya faham bahawa langganan saya akan diperbaharui secara automatik dalam {months: number} bulan"
       },
       "CardIntroducing": {
         "title": "Memperkenalkan",

@@ -11423,10 +11423,21 @@ type RootTranslation = {
 					 */
 					and: string
 				}
+				feeSchedule: {
+					/**
+					 * I​ ​h​a​v​e​ ​r​e​v​i​e​w​e​d​ ​a​n​d​ ​a​g​r​e​e​ ​t​o​ ​t​h​e
+					 */
+					text: string
+					/**
+					 * B​l​i​n​k​ ​C​a​r​d​ ​F​e​e​ ​S​c​h​e​d​u​l​e
+					 */
+					linkText: string
+				}
 				/**
-				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​t​h​a​t​ ​m​y​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​w​i​l​l​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​r​e​n​e​w​ ​i​n​ ​1​ ​y​e​a​r
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​m​y​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​w​i​l​l​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​r​e​n​e​w​ ​i​n​ ​{​m​o​n​t​h​s​}​ ​m​o​n​t​h​s
+				 * @param {number} months
 				 */
-				renew: string
+				renew: RequiredParams<'months'>
 			}
 			LoadingCard: {
 				/**
@@ -23642,10 +23653,20 @@ export type TranslationFunctions = {
 					 */
 					and: () => LocalizedString
 				}
+				feeSchedule: {
+					/**
+					 * I have reviewed and agree to the
+					 */
+					text: () => LocalizedString
+					/**
+					 * Blink Card Fee Schedule
+					 */
+					linkText: () => LocalizedString
+				}
 				/**
-				 * I understand that my subscription will automatically renew in 1 year
+				 * I understand my subscription will automatically renew in {months} months
 				 */
-				renew: () => LocalizedString
+				renew: (arg: { months: number }) => LocalizedString
 			}
 			LoadingCard: {
 				/**
