@@ -119,6 +119,7 @@ import {
   CardSubscriptionScreen,
   LoadingCardScreen,
   CardPersonalInformationScreen,
+  CardAcknowledgementScreen,
   CardPreapprovedScreen,
   CardProcessingScreen,
   CardApprovedScreen,
@@ -723,6 +724,14 @@ export const RootStack = () => {
         options={{
           title: LL.CardFlow.Onboarding.PersonalInformation.title(),
           headerLeft: () => <></>,
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingAcknowledgementScreen"
+        component={CardAcknowledgementScreen}
+        options={{
+          title: "",
           headerRight: headerCloseControl(),
         }}
       />

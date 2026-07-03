@@ -3470,6 +3470,22 @@
         "buttonText": "Indsend ansøgning",
         "select": "vælg"
       },
+      "Acknowledgement": {
+        "title": "Vilkår og betingelser",
+        "acceptButton": "Accepter",
+        "eSignConsent": {
+          "text": "Jeg accepterer",
+          "linkText": "E-Sign-samtykke"
+        },
+        "privacyAndTerms": {
+          "text": "Jeg accepterer",
+          "privacyPolicyLinkText": "udstederens privatlivspolitik",
+          "and": ", og",
+          "cardTermsLinkText": "Blink-kortvilkår"
+        },
+        "certifyAccuracy": "Jeg bekræfter, at de oplysninger, jeg har givet, er korrekte, og at jeg vil overholde alle regler og krav vedrørende mit Blink Visa-kort",
+        "acknowledgeSolicitation": "Jeg anerkender, at ansøgning om Blink Visa-kortet ikke udgør uautoriseret henvendelse"
+      },
       "CardPreapproved": {
         "title": "Du er blevet forhåndsgodkendt til Blink Visa-kortet!",
         "buttonText": "Luk"

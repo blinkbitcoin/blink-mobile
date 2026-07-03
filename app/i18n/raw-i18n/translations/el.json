@@ -3470,6 +3470,22 @@
         "buttonText": "Υποβολή αίτησης",
         "select": "επιλογή"
       },
+      "Acknowledgement": {
+        "title": "Όροι και προϋποθέσεις",
+        "acceptButton": "Αποδοχή",
+        "eSignConsent": {
+          "text": "Αποδέχομαι",
+          "linkText": "τη συναίνεση ηλεκτρονικής υπογραφής"
+        },
+        "privacyAndTerms": {
+          "text": "Αποδέχομαι",
+          "privacyPolicyLinkText": "την Πολιτική Απορρήτου του εκδότη",
+          "and": ", και",
+          "cardTermsLinkText": "τους Όρους της κάρτας Blink"
+        },
+        "certifyAccuracy": "Βεβαιώνω ότι οι πληροφορίες που παρείχα είναι ακριβείς και ότι θα τηρώ όλους τους κανόνες και τις απαιτήσεις που σχετίζονται με την κάρτα μου Blink Visa",
+        "acknowledgeSolicitation": "Αναγνωρίζω ότι η αίτηση για την κάρτα Blink Visa δεν συνιστά μη εξουσιοδοτημένη προσέλκυση"
+      },
       "CardPreapproved": {
         "title": "You have been pre-approved for the Blink Visa card!",
         "buttonText": "Close"

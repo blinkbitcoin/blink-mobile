@@ -3470,6 +3470,22 @@
         "buttonText": "Mañakuyta apachiy",
         "select": "akllay"
       },
+      "Acknowledgement": {
+        "title": "Kamachikuykuna",
+        "acceptButton": "Chaskiy",
+        "eSignConsent": {
+          "text": "Chaskini",
+          "linkText": "electronico firma consentimiento"
+        },
+        "privacyAndTerms": {
+          "text": "Chaskini",
+          "privacyPolicyLinkText": "qillqaqpa privacidad kamachiynin",
+          "and": ", chaymanta",
+          "cardTermsLinkText": "Blink tarjeta kamachikuykuna"
+        },
+        "certifyAccuracy": "Willakuni chay willayniykuna cheqaq kasqanta, Blink Visa tarjetaywan tupaq llapan kamachikuykunata hunt'anaytawan",
+        "acknowledgeSolicitation": "Riqsini Blink Visa tarjetata mañakuyqa mana saqisqa mañakuychu kasqanta"
+      },
       "CardPreapproved": {
         "title": "Blink Visa tarjetapaq ñawpaqta aprobado kasqanki!",
         "buttonText": "Wisq'ay"

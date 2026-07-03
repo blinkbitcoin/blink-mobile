@@ -3470,6 +3470,22 @@
         "buttonText": "Ուղարկել հայտը",
         "select": "ընտրել"
       },
+      "Acknowledgement": {
+        "title": "Դրույթներ և պայմաններ",
+        "acceptButton": "Ընդունել",
+        "eSignConsent": {
+          "text": "Ես ընդունում եմ",
+          "linkText": "էլեկտրոնային ստորագրության համաձայնությունը"
+        },
+        "privacyAndTerms": {
+          "text": "Ես ընդունում եմ",
+          "privacyPolicyLinkText": "թողարկողի գաղտնիության քաղաքականությունը",
+          "and": ", և",
+          "cardTermsLinkText": "Blink քարտի պայմանները"
+        },
+        "certifyAccuracy": "Ես հաստատում եմ, որ իմ տրամադրած տեղեկատվությունը ճշգրիտ է և որ ես կհետևեմ իմ Blink Visa քարտի հետ կապված բոլոր կանոններին ու պահանջներին",
+        "acknowledgeSolicitation": "Ես գիտակցում եմ, որ Blink Visa քարտի համար դիմելը չի համարվում չարտոնված դիմում"
+      },
       "CardPreapproved": {
         "title": "You have been pre-approved for the Blink Visa card!",
         "buttonText": "Close"

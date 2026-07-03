@@ -3470,6 +3470,22 @@
         "buttonText": "تقديم الطلب",
         "select": "اختر"
       },
+      "Acknowledgement": {
+        "title": "الشروط والأحكام",
+        "acceptButton": "قبول",
+        "eSignConsent": {
+          "text": "أوافق على",
+          "linkText": "موافقة التوقيع الإلكتروني"
+        },
+        "privacyAndTerms": {
+          "text": "أوافق على",
+          "privacyPolicyLinkText": "سياسة خصوصية المُصدِر",
+          "and": "، و",
+          "cardTermsLinkText": "شروط بطاقة Blink"
+        },
+        "certifyAccuracy": "أُقر بأن المعلومات التي قدمتها دقيقة وأنني سألتزم بجميع القواعد والمتطلبات المتعلقة ببطاقة Blink Visa الخاصة بي",
+        "acknowledgeSolicitation": "أُقر بأن التقدم بطلب للحصول على بطاقة Blink Visa لا يشكل التماسًا غير مصرح به"
+      },
       "CardPreapproved": {
         "title": "لقد تمت الموافقة المسبقة على بطاقة Blink Visa الخاصة بك!",
         "buttonText": "إغلاق"

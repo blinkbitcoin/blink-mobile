@@ -11517,6 +11517,52 @@ type RootTranslation = {
 				 */
 				select: string
 			}
+			Acknowledgement: {
+				/**
+				 * T​e​r​m​s​ ​a​n​d​ ​c​o​n​d​i​t​i​o​n​s
+				 */
+				title: string
+				/**
+				 * A​c​c​e​p​t
+				 */
+				acceptButton: string
+				eSignConsent: {
+					/**
+					 * I​ ​a​c​c​e​p​t​ ​t​h​e
+					 */
+					text: string
+					/**
+					 * E​-​S​i​g​n​ ​C​o​n​s​e​n​t
+					 */
+					linkText: string
+				}
+				privacyAndTerms: {
+					/**
+					 * I​ ​a​c​c​e​p​t​ ​t​h​e
+					 */
+					text: string
+					/**
+					 * I​s​s​u​e​r​'​s​ ​P​r​i​v​a​c​y​ ​P​o​l​i​c​y
+					 */
+					privacyPolicyLinkText: string
+					/**
+					 * ,​ ​a​n​d
+					 */
+					and: string
+					/**
+					 * B​l​i​n​k​ ​C​a​r​d​ ​T​e​r​m​s
+					 */
+					cardTermsLinkText: string
+				}
+				/**
+				 * I​ ​c​e​r​t​i​f​y​ ​t​h​a​t​ ​t​h​e​ ​i​n​f​o​r​m​a​t​i​o​n​ ​I​ ​h​a​v​e​ ​p​r​o​v​i​d​e​d​ ​i​s​ ​a​c​c​u​r​a​t​e​ ​a​n​d​ ​t​h​a​t​ ​I​ ​w​i​l​l​ ​a​b​i​d​e​ ​b​y​ ​a​l​l​ ​t​h​e​ ​r​u​l​e​s​ ​a​n​d​ ​r​e​q​u​i​r​e​m​e​n​t​s​ ​r​e​l​a​t​e​d​ ​t​o​ ​m​y​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d
+				 */
+				certifyAccuracy: string
+				/**
+				 * I​ ​a​c​k​n​o​w​l​e​d​g​e​ ​t​h​a​t​ ​a​p​p​l​y​i​n​g​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​d​o​e​s​ ​n​o​t​ ​c​o​n​s​t​i​t​u​t​e​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​s​o​l​i​c​i​t​a​t​i​o​n
+				 */
+				acknowledgeSolicitation: string
+			}
 			CardPreapproved: {
 				/**
 				 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​p​r​e​-​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​!
@@ -23748,6 +23794,52 @@ export type TranslationFunctions = {
 				 * Select
 				 */
 				select: () => LocalizedString
+			}
+			Acknowledgement: {
+				/**
+				 * Terms and conditions
+				 */
+				title: () => LocalizedString
+				/**
+				 * Accept
+				 */
+				acceptButton: () => LocalizedString
+				eSignConsent: {
+					/**
+					 * I accept the
+					 */
+					text: () => LocalizedString
+					/**
+					 * E-Sign Consent
+					 */
+					linkText: () => LocalizedString
+				}
+				privacyAndTerms: {
+					/**
+					 * I accept the
+					 */
+					text: () => LocalizedString
+					/**
+					 * Issuer's Privacy Policy
+					 */
+					privacyPolicyLinkText: () => LocalizedString
+					/**
+					 * , and
+					 */
+					and: () => LocalizedString
+					/**
+					 * Blink Card Terms
+					 */
+					cardTermsLinkText: () => LocalizedString
+				}
+				/**
+				 * I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card
+				 */
+				certifyAccuracy: () => LocalizedString
+				/**
+				 * I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation
+				 */
+				acknowledgeSolicitation: () => LocalizedString
 			}
 			CardPreapproved: {
 				/**

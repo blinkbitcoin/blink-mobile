@@ -3470,6 +3470,22 @@
                 "buttonText": "申請を提出",
                 "select": "選択"
             },
+            "Acknowledgement": {
+                "title": "利用規約",
+                "acceptButton": "同意する",
+                "eSignConsent": {
+                    "text": "次に同意します：",
+                    "linkText": "電子署名への同意"
+                },
+                "privacyAndTerms": {
+                    "text": "次に同意します：",
+                    "privacyPolicyLinkText": "発行者のプライバシーポリシー",
+                    "and": "、および",
+                    "cardTermsLinkText": "Blink カードの規約"
+                },
+                "certifyAccuracy": "提供した情報が正確であること、および Blink Visa カードに関するすべての規則と要件を遵守することを証明します",
+                "acknowledgeSolicitation": "Blink Visa カードの申し込みが不正な勧誘に該当しないことを認めます"
+            },
             "CardPreapproved": {
                 "title": "Blink Visaカードの事前承認が完了しました！",
                 "buttonText": "閉じる"

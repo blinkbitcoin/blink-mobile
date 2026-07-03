@@ -154,6 +154,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         cardOnboardingSubscribeScreen: "card/onboarding/subscribe",
         cardOnboardingLoadingScreen: "card/onboarding/loading",
         cardOnboardingPersonalInfoScreen: "card/onboarding/personal-info",
+        cardOnboardingAcknowledgementScreen: "card/onboarding/acknowledgement",
         cardOnboardingProcessingScreen: "card/onboarding/processing",
         cardOnboardingPreapprovedScreen: "card/onboarding/preapproved",
         cardOnboardingApprovedScreen: "card/onboarding/approved",

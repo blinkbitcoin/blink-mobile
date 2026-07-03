@@ -3470,6 +3470,22 @@
         "buttonText": "Pályázat beküldése",
         "select": "kiválaszt"
       },
+      "Acknowledgement": {
+        "title": "Általános szerződési feltételek",
+        "acceptButton": "Elfogadás",
+        "eSignConsent": {
+          "text": "Elfogadom az",
+          "linkText": "elektronikus aláírási hozzájárulást"
+        },
+        "privacyAndTerms": {
+          "text": "Elfogadom az",
+          "privacyPolicyLinkText": "a kibocsátó adatvédelmi szabályzatát",
+          "and": ", és a",
+          "cardTermsLinkText": "Blink kártya feltételeit"
+        },
+        "certifyAccuracy": "Igazolom, hogy az általam megadott információk pontosak, és hogy betartok minden, a Blink Visa kártyámmal kapcsolatos szabályt és követelményt",
+        "acknowledgeSolicitation": "Tudomásul veszem, hogy a Blink Visa kártya igénylése nem minősül jogosulatlan megkeresésnek"
+      },
       "CardPreapproved": {
         "title": "Előzetesen jóváhagyták a Blink Visa kártyáját!",
         "buttonText": "Bezárás"

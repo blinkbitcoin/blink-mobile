@@ -3470,6 +3470,22 @@
         "buttonText": "Pošalji prijavu",
         "select": "odaberi"
       },
+      "Acknowledgement": {
+        "title": "Uvjeti i odredbe",
+        "acceptButton": "Prihvati",
+        "eSignConsent": {
+          "text": "Prihvaćam",
+          "linkText": "privolu za elektronički potpis"
+        },
+        "privacyAndTerms": {
+          "text": "Prihvaćam",
+          "privacyPolicyLinkText": "Pravila o privatnosti izdavatelja",
+          "and": ", i",
+          "cardTermsLinkText": "Uvjete kartice Blink"
+        },
+        "certifyAccuracy": "Potvrđujem da su podaci koje sam dao točni i da ću se pridržavati svih pravila i zahtjeva povezanih s mojom karticom Blink Visa",
+        "acknowledgeSolicitation": "Potvrđujem da podnošenje zahtjeva za karticu Blink Visa ne predstavlja neovlašteno oglašavanje"
+      },
       "CardPreapproved": {
         "title": "Unaprijed ste odobreni za Blink Visa karticu!",
         "buttonText": "Zatvori"

@@ -3470,6 +3470,22 @@
         "buttonText": "Sindika esabibu",
         "select": "londa"
       },
+      "Acknowledgement": {
+        "title": "Ebiragiro n'embeera",
+        "acceptButton": "Kkiriza",
+        "eSignConsent": {
+          "text": "Nkkiriza",
+          "linkText": "okukkiriza okussaako omukono ogwa elekitulooniki"
+        },
+        "privacyAndTerms": {
+          "text": "Nkkiriza",
+          "privacyPolicyLinkText": "Enkola y'eby'ekyama ey'omuwi",
+          "and": ", ne",
+          "cardTermsLinkText": "Ebiragiro bya kaadi ya Blink"
+        },
+        "certifyAccuracy": "Nkakasa nti amawulire ge mpadeeyo matuufu era nti nnaagobereranga amateeka gonna n'ebyetaagisa ebikwata ku kaadi yange eya Blink Visa",
+        "acknowledgeSolicitation": "Ntegeera nti okusaba kaadi ya Blink Visa tekitegeeza kusaba okutakkirizibwa"
+      },
       "CardPreapproved": {
         "title": "Okakasiddwa okusookera ku kaadi ya Blink Visa!",
         "buttonText": "Ggalawo"

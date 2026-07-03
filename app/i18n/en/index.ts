@@ -3626,6 +3626,24 @@ const en: BaseTranslation = {
         buttonText: "Submit application",
         select: "Select",
       },
+      Acknowledgement: {
+        title: "Terms and conditions",
+        acceptButton: "Accept",
+        eSignConsent: {
+          text: "I accept the",
+          linkText: "E-Sign Consent",
+        },
+        privacyAndTerms: {
+          text: "I accept the",
+          privacyPolicyLinkText: "Issuer's Privacy Policy",
+          and: ", and",
+          cardTermsLinkText: "Blink Card Terms",
+        },
+        certifyAccuracy:
+          "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card",
+        acknowledgeSolicitation:
+          "I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation",
+      },
       CardPreapproved: {
         title: "You have been pre-approved for the Blink Visa card!",
         buttonText: "Close",

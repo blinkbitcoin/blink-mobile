@@ -3470,6 +3470,22 @@
                 "buttonText": "Antrag einreichen",
                 "select": "auswählen"
             },
+            "Acknowledgement": {
+                "title": "Geschäftsbedingungen",
+                "acceptButton": "Akzeptieren",
+                "eSignConsent": {
+                    "text": "Ich akzeptiere die",
+                    "linkText": "E-Sign-Einwilligung"
+                },
+                "privacyAndTerms": {
+                    "text": "Ich akzeptiere die",
+                    "privacyPolicyLinkText": "Datenschutzrichtlinie des Ausstellers",
+                    "and": " und die",
+                    "cardTermsLinkText": "Blink Card-Bedingungen"
+                },
+                "certifyAccuracy": "Ich bestätige, dass die von mir angegebenen Informationen korrekt sind und dass ich alle Regeln und Anforderungen im Zusammenhang mit meiner Blink Visa Card einhalten werde",
+                "acknowledgeSolicitation": "Ich erkenne an, dass die Beantragung der Blink Visa Card keine unbefugte Aufforderung darstellt"
+            },
             "CardPreapproved": {
                 "title": "Sie wurden für die Blink Visa-Karte vorab genehmigt!",
                 "buttonText": "Schließen"

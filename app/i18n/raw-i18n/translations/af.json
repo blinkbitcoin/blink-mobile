@@ -3470,6 +3470,22 @@
         "buttonText": "Dien aansoek in",
         "select": "kies"
       },
+      "Acknowledgement": {
+        "title": "Bepalings en voorwaardes",
+        "acceptButton": "Aanvaar",
+        "eSignConsent": {
+          "text": "Ek aanvaar die",
+          "linkText": "E-Sign-toestemming"
+        },
+        "privacyAndTerms": {
+          "text": "Ek aanvaar die",
+          "privacyPolicyLinkText": "Uitreiker se Privaatheidsbeleid",
+          "and": ", en",
+          "cardTermsLinkText": "Blink-kaartvoorwaardes"
+        },
+        "certifyAccuracy": "Ek bevestig dat die inligting wat ek verskaf het akkuraat is en dat ek alle reëls en vereistes met betrekking tot my Blink Visa-kaart sal nakom",
+        "acknowledgeSolicitation": "Ek erken dat die aansoek om die Blink Visa-kaart nie ongemagtigde werwing uitmaak nie"
+      },
       "CardPreapproved": {
         "title": "Jy is vooraf goedgekeur vir die Blink Visa-kaart!",
         "buttonText": "Sluit"

@@ -3470,6 +3470,22 @@
         "buttonText": "Gửi đơn đăng ký",
         "select": "chọn"
       },
+      "Acknowledgement": {
+        "title": "Điều khoản và điều kiện",
+        "acceptButton": "Chấp nhận",
+        "eSignConsent": {
+          "text": "Tôi chấp nhận",
+          "linkText": "Đồng ý Chữ ký Điện tử"
+        },
+        "privacyAndTerms": {
+          "text": "Tôi chấp nhận",
+          "privacyPolicyLinkText": "Chính sách Bảo mật của nhà phát hành",
+          "and": ", và",
+          "cardTermsLinkText": "Điều khoản Thẻ Blink"
+        },
+        "certifyAccuracy": "Tôi xác nhận rằng thông tin tôi đã cung cấp là chính xác và tôi sẽ tuân thủ mọi quy tắc và yêu cầu liên quan đến Thẻ Blink Visa của tôi",
+        "acknowledgeSolicitation": "Tôi thừa nhận rằng việc đăng ký Thẻ Blink Visa không cấu thành hành vi chào mời trái phép"
+      },
       "CardPreapproved": {
         "title": "Bạn đã được phê duyệt trước cho thẻ Blink Visa!",
         "buttonText": "Đóng"

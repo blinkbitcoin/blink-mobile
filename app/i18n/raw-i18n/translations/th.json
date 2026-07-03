@@ -3470,6 +3470,22 @@
         "buttonText": "ส่งใบสมัคร",
         "select": "เลือก"
       },
+      "Acknowledgement": {
+        "title": "ข้อกำหนดและเงื่อนไข",
+        "acceptButton": "ยอมรับ",
+        "eSignConsent": {
+          "text": "ฉันยอมรับ",
+          "linkText": "ความยินยอมในการลงนามอิเล็กทรอนิกส์"
+        },
+        "privacyAndTerms": {
+          "text": "ฉันยอมรับ",
+          "privacyPolicyLinkText": "นโยบายความเป็นส่วนตัวของผู้ออกบัตร",
+          "and": " และ",
+          "cardTermsLinkText": "ข้อกำหนดบัตร Blink"
+        },
+        "certifyAccuracy": "ฉันรับรองว่าข้อมูลที่ให้ไว้ถูกต้อง และฉันจะปฏิบัติตามกฎและข้อกำหนดทั้งหมดที่เกี่ยวข้องกับบัตร Blink Visa ของฉัน",
+        "acknowledgeSolicitation": "ฉันรับทราบว่าการสมัครบัตร Blink Visa ไม่ถือเป็นการชักชวนที่ไม่ได้รับอนุญาต"
+      },
       "CardPreapproved": {
         "title": "คุณได้รับการอนุมัติล่วงหน้าสำหรับบัตร Blink Visa แล้ว!",
         "buttonText": "ปิด"

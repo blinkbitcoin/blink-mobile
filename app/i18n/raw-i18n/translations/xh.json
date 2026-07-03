@@ -3470,6 +3470,22 @@
         "buttonText": "Ngenisa isicelo",
         "select": "khetha"
       },
+      "Acknowledgement": {
+        "title": "Imigaqo nemiqathango",
+        "acceptButton": "Yamkela",
+        "eSignConsent": {
+          "text": "Ndiyamkela",
+          "linkText": "Imvume yoSayino lweElektroniki"
+        },
+        "privacyAndTerms": {
+          "text": "Ndiyamkela",
+          "privacyPolicyLinkText": "uMgaqo-nkqubo wabucala womkhuphi",
+          "and": ", kunye",
+          "cardTermsLinkText": "neMigaqo yeKhadi leBlink"
+        },
+        "certifyAccuracy": "Ndiqinisekisa ukuba ulwazi endilunikile luchanekile nokuba ndiza kuthobela yonke imithetho neemfuno ezinxulumene neKhadi lam leBlink Visa",
+        "acknowledgeSolicitation": "Ndiyavuma ukuba ukufaka isicelo seKhadi leBlink Visa akubuyisi sicelo esingagunyaziswanga"
+      },
       "CardPreapproved": {
         "title": "Uvunyiwe ngaphambili ikhadi le-Blink Visa!",
         "buttonText": "Vala"

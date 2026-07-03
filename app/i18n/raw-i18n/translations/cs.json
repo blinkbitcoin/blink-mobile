@@ -3470,6 +3470,22 @@
         "buttonText": "Odeslat žádost",
         "select": "vybrat"
       },
+      "Acknowledgement": {
+        "title": "Smluvní podmínky",
+        "acceptButton": "Přijmout",
+        "eSignConsent": {
+          "text": "Souhlasím s",
+          "linkText": "souhlasem s elektronickým podpisem"
+        },
+        "privacyAndTerms": {
+          "text": "Souhlasím s",
+          "privacyPolicyLinkText": "zásadami ochrany osobních údajů vydavatele",
+          "and": " a",
+          "cardTermsLinkText": "podmínkami karty Blink"
+        },
+        "certifyAccuracy": "Potvrzuji, že informace, které jsem poskytl, jsou přesné a že budu dodržovat všechna pravidla a požadavky týkající se mé karty Blink Visa",
+        "acknowledgeSolicitation": "Beru na vědomí, že žádost o kartu Blink Visa nepředstavuje neoprávněné oslovení"
+      },
       "CardPreapproved": {
         "title": "Byli jste předschváleni pro kartu Blink Visa!",
         "buttonText": "Zavřít"

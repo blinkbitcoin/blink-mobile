@@ -3470,6 +3470,22 @@
         "buttonText": "Trimite cererea",
         "select": "selectează"
       },
+      "Acknowledgement": {
+        "title": "Termeni și condiții",
+        "acceptButton": "Accept",
+        "eSignConsent": {
+          "text": "Accept",
+          "linkText": "Consimțământul pentru semnătura electronică"
+        },
+        "privacyAndTerms": {
+          "text": "Accept",
+          "privacyPolicyLinkText": "Politica de confidențialitate a emitentului",
+          "and": ", și",
+          "cardTermsLinkText": "Termenii cardului Blink"
+        },
+        "certifyAccuracy": "Certific că informațiile pe care le-am furnizat sunt exacte și că voi respecta toate regulile și cerințele legate de cardul meu Blink Visa",
+        "acknowledgeSolicitation": "Recunosc că solicitarea cardului Blink Visa nu constituie o solicitare neautorizată"
+      },
       "CardPreapproved": {
         "title": "Ați fost pre-aprobat pentru cardul Blink Visa!",
         "buttonText": "Închide"

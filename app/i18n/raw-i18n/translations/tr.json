@@ -3470,6 +3470,22 @@
         "buttonText": "Başvuruyu gönder",
         "select": "seç"
       },
+      "Acknowledgement": {
+        "title": "Şartlar ve koşullar",
+        "acceptButton": "Kabul et",
+        "eSignConsent": {
+          "text": "Kabul ediyorum:",
+          "linkText": "Elektronik İmza Onayı'nı"
+        },
+        "privacyAndTerms": {
+          "text": "Kabul ediyorum:",
+          "privacyPolicyLinkText": "ihraç edenin Gizlilik Politikası'nı",
+          "and": " ve",
+          "cardTermsLinkText": "Blink Kart Koşulları'nı"
+        },
+        "certifyAccuracy": "Sağladığım bilgilerin doğru olduğunu ve Blink Visa Kartımla ilgili tüm kural ve gerekliliklere uyacağımı beyan ederim",
+        "acknowledgeSolicitation": "Blink Visa Kartı için başvurmanın yetkisiz bir talep oluşturmadığını kabul ediyorum"
+      },
       "CardPreapproved": {
         "title": "Blink Visa kartı için ön onay aldınız!",
         "buttonText": "Kapat"

@@ -182,6 +182,7 @@ export type RootStackParamList = {
   cardOnboardingPaymentScreen: undefined
   cardOnboardingLoadingScreen: undefined
   cardOnboardingPersonalInfoScreen: undefined
+  cardOnboardingAcknowledgementScreen: undefined
   cardOnboardingPreapprovedScreen: undefined
   cardOnboardingProcessingScreen: undefined
   cardOnboardingApprovedScreen: undefined

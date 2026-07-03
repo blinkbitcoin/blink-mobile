@@ -3470,6 +3470,22 @@
         "buttonText": "Hantar permohonan",
         "select": "pilih"
       },
+      "Acknowledgement": {
+        "title": "Terma dan syarat",
+        "acceptButton": "Terima",
+        "eSignConsent": {
+          "text": "Saya menerima",
+          "linkText": "Persetujuan Tandatangan Elektronik"
+        },
+        "privacyAndTerms": {
+          "text": "Saya menerima",
+          "privacyPolicyLinkText": "Dasar Privasi penerbit",
+          "and": ", dan",
+          "cardTermsLinkText": "Terma Kad Blink"
+        },
+        "certifyAccuracy": "Saya mengesahkan bahawa maklumat yang saya berikan adalah tepat dan bahawa saya akan mematuhi semua peraturan dan keperluan berkaitan Kad Blink Visa saya",
+        "acknowledgeSolicitation": "Saya mengakui bahawa memohon Kad Blink Visa bukan merupakan permohonan yang tidak dibenarkan"
+      },
       "CardPreapproved": {
         "title": "Anda telah dipra-luluskan untuk kad Blink Visa!",
         "buttonText": "Tutup"
