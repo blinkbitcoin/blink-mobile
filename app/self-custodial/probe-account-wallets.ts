@@ -38,13 +38,19 @@ const toProbeFailed = (err: unknown): ProbeAccountWalletsResult => ({
 export const probeSelfCustodialAccountWallets = async (
   accountId: string,
   network: Network,
+  leewaySatPerVbyte: number,
 ): Promise<ProbeAccountWalletsResult> => {
   const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
   if (!mnemonic) return { status: ProbeAccountWalletsStatus.NoMnemonic }
 
   let sdk: BreezSdkInterface | undefined
   try {
-    sdk = await initSdk(mnemonic, storageDirFor(accountId, network), network)
+    sdk = await initSdk({
+      mnemonic,
+      storageDir: storageDirFor(accountId, network),
+      network,
+      leewaySatPerVbyte,
+    })
     const snapshot = await getSelfCustodialWalletSnapshot(sdk)
     return { status: ProbeAccountWalletsStatus.Ok, wallets: snapshot.wallets }
   } catch (err) {

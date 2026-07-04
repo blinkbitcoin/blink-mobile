@@ -43,6 +43,7 @@ const SelfCustodialTransferBlockedCountriesKey = "selfCustodialTransferBlockedCo
 const CustodialTransferBlockedCountriesKey = "custodialTransferBlockedCountries"
 const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
 const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
+const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -90,6 +91,7 @@ type RemoteConfig = {
   [CustodialTransferBlockedCountriesKey]: string[]
   [CustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialCreationBlockedCountriesKey]: string[]
+  [SelfCustodialDepositClaimLeewayVbyteKey]: number
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -160,6 +162,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   custodialTransferBlockedCountries: transferBlockedDefault,
   custodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialCreationBlockedCountries: creationBlockedDefault,
+  selfCustodialDepositClaimLeewayVbyte: 1,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -355,6 +358,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           defaultRemoteConfig.selfCustodialCreationBlockedCountries,
         )
 
+        const selfCustodialDepositClaimLeewayVbyte = remoteConfigInstance()
+          .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
+          .asNumber()
+
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
@@ -386,6 +393,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           custodialTransferBlockedCountries,
           custodialCreationBlockedCountries,
           selfCustodialCreationBlockedCountries,
+          selfCustodialDepositClaimLeewayVbyte,
         })
       } catch (err) {
         logError({

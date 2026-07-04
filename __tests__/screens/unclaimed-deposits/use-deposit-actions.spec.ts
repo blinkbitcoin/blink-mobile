@@ -162,6 +162,73 @@ describe("useDepositActions", () => {
     })
   })
 
+  describe("handleClaim — max fee override", () => {
+    it("overrides the auto-claim cap with the SDK-reported required fee", async () => {
+      const { result } = renderHook(() => useDepositActions())
+      const deposit = buildDeposit({
+        errorReason: DepositErrorReason.FeeExceeded,
+        requiredFeeSats: 198,
+      })
+
+      await act(async () => {
+        await result.current.handleClaim(deposit)
+      })
+
+      expect(mockClaimDeposit).toHaveBeenCalledWith({
+        depositId: "deposit-1",
+        maxFeeSats: 198,
+      })
+    })
+
+    it("claims without a fee override when no required fee is known", async () => {
+      const { result } = renderHook(() => useDepositActions())
+      const deposit = buildDeposit()
+
+      await act(async () => {
+        await result.current.handleClaim(deposit)
+      })
+
+      expect(mockClaimDeposit).toHaveBeenCalledWith({
+        depositId: "deposit-1",
+        maxFeeSats: undefined,
+      })
+    })
+
+    it("toasts success when the claim is accepted", async () => {
+      const { result } = renderHook(() => useDepositActions())
+      const deposit = buildDeposit()
+
+      await act(async () => {
+        await result.current.handleClaim(deposit)
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Deposit claimed", type: "success" }),
+      )
+    })
+
+    it("surfaces the required-fee message when the claim still exceeds the cap", async () => {
+      mockClaimDeposit.mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "MaxDepositClaimFeeExceeded" }],
+      })
+
+      const { result } = renderHook(() => useDepositActions())
+      const deposit = buildDeposit({
+        errorReason: DepositErrorReason.FeeExceeded,
+        requiredFeeSats: 198,
+      })
+
+      await act(async () => {
+        await result.current.handleClaim(deposit)
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Fee exceeded 198" }),
+      )
+    })
+  })
+
   describe("refresh", () => {
     it("filters out refunded deposits", async () => {
       mockListPendingDeposits.mockResolvedValue({
