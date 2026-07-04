@@ -360,7 +360,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="explorer"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 5, right: 5 }}
+                    hitSlop={{ top: 16, bottom: 16, left: 5, right: 5 }}
                     onPress={() =>
                       viewInExplorer(
                         ("transactionHash" in settlementVia &&
@@ -379,7 +379,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="copy"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 5, right: 5 }}
+                    hitSlop={{ top: 16, bottom: 16, left: 5, right: 5 }}
                     onPress={() =>
                       handleCopyToClipboard({
                         content:
@@ -424,10 +424,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               <Pressable
                 key="copy"
                 style={styles.iconPressable}
-                hitSlop={{ left: 5, right: 5 }}
+                hitSlop={{ top: 16, bottom: 16, left: 5, right: 5 }}
                 onPress={() =>
                   handleCopyToClipboard({
-                    content: description || "",
+                    content: description ?? "",
                     type: LL.common.description(),
                   })
                 }
@@ -460,7 +460,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="copy"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 5, right: 5 }}
+                    hitSlop={{ top: 16, bottom: 16, left: 5, right: 5 }}
                     onPress={() =>
                       handleCopyToClipboard({
                         content: initiationVia?.paymentHash ?? "",
@@ -489,10 +489,10 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="copy"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 5, right: 5 }}
+                    hitSlop={{ top: 16, bottom: 16, left: 5, right: 5 }}
                     onPress={() =>
                       handleCopyToClipboard({
-                        content: settlementVia?.preImage || "",
+                        content: settlementVia?.preImage ?? "",
                         type: LL.common.preimageProofOfPayment(),
                       })
                     }
@@ -516,9 +516,9 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="explorer"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 5, right: 5 }}
+                    hitSlop={{ top: 16, bottom: 16, left: 5, right: 5 }}
                     onPress={() =>
-                      viewInLightningDecoder(initiationVia?.paymentRequest || "")
+                      viewInLightningDecoder(initiationVia?.paymentRequest ?? "")
                     }
                   >
                     <GaloyIcon
@@ -531,7 +531,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key="copy"
                     style={styles.iconPressable}
-                    hitSlop={{ left: 5, right: 5 }}
+                    hitSlop={{ top: 16, bottom: 16, left: 5, right: 5 }}
                     onPress={() =>
                       handleCopyToClipboard({
                         content: initiationVia?.paymentRequest ?? "",
@@ -557,7 +557,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                 <Pressable
                   key="copy"
                   style={styles.iconPressable}
-                  hitSlop={{ left: 5, right: 5 }}
+                  hitSlop={{ top: 16, bottom: 16, left: 5, right: 5 }}
                   onPress={() =>
                     handleCopyToClipboard({
                       content: id,
@@ -630,17 +630,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   valueIcons: {
     flexDirection: "row",
-    // stretch to fill the full height of the input (valueContainer)...
-    alignSelf: "stretch",
-    // ...and cancel valueContainer's vertical padding so it spans the whole field
-    marginVertical: -14,
+    alignItems: "center",
     marginLeft: 12,
-    // spacing between adjacent icon actions
     gap: 10,
   },
   iconPressable: {
-    // fill 100% of the input height; horizontal tap area handled via hitSlop
-    alignSelf: "stretch",
     alignItems: "center",
     justifyContent: "center",
   },
