@@ -7,15 +7,11 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { WalletCurrency } from "@app/graphql/generated"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-
-const ANNUAL_FEE_AMOUNT = "$1,000"
-const CARD_REPLACEMENT_AMOUNT = "$10.00"
-const USD_TRANSACTION_FEE_AMOUNT = "1.21%"
-const FOREIGN_TRANSACTION_FEE_AMOUNT = "2.21%"
-const MAXIMUM_OVERDRAFT_AMOUNT = "$200"
-const LATE_REPAYMENT_FEE_AMOUNT = "$25"
 
 type Fee = {
   title: string
@@ -65,41 +61,61 @@ export const CardFeeScheduleScreen: React.FC = () => {
   const { fees, sections, btcConversion, feesUpdateNotice, additionalDetails } =
     feeSchedule
 
+  const { formatCurrency } = useDisplayCurrency()
+  const {
+    cardSubscriptionPriceUsd,
+    cardReplacementFeeUsd,
+    cardUsdTransactionFeePercent,
+    cardForeignTransactionFeePercent,
+    cardMaxOverdraftUsd,
+    cardLateRepaymentFeeUsd,
+  } = useRemoteConfig()
+
+  const formatUsd = (amountInMajorUnits: number) =>
+    formatCurrency({ amountInMajorUnits, currency: WalletCurrency.Usd })
+
+  const annualFeeAmount = formatUsd(cardSubscriptionPriceUsd)
+  const cardReplacementAmount = formatUsd(cardReplacementFeeUsd)
+  const usdTransactionFeeAmount = `${cardUsdTransactionFeePercent}%`
+  const foreignTransactionFeeAmount = `${cardForeignTransactionFeePercent}%`
+  const maximumOverdraftAmount = formatUsd(cardMaxOverdraftUsd)
+  const lateRepaymentFeeAmount = formatUsd(cardLateRepaymentFeeUsd)
+
   const [isDetailsExpanded, setIsDetailsExpanded] = React.useState(true)
 
   const cardFees: Fee[] = [
     {
       title: fees.annualFee.title(),
       subtitle: fees.annualFee.subtitle(),
-      value: fees.annualFee.value({ amount: ANNUAL_FEE_AMOUNT }),
+      value: fees.annualFee.value({ amount: annualFeeAmount }),
     },
     {
       title: fees.cardReplacement.title(),
-      value: CARD_REPLACEMENT_AMOUNT,
+      value: cardReplacementAmount,
     },
   ]
   const transactionFees: Fee[] = [
     {
       title: fees.usdTransactionFee.title(),
       subtitle: fees.usdTransactionFee.subtitle(),
-      value: USD_TRANSACTION_FEE_AMOUNT,
+      value: usdTransactionFeeAmount,
     },
     {
       title: fees.foreignTransactionFee.title(),
       subtitle: fees.foreignTransactionFee.subtitle(),
-      value: FOREIGN_TRANSACTION_FEE_AMOUNT,
+      value: foreignTransactionFeeAmount,
     },
   ]
   const overdraftFees: Fee[] = [
     {
       title: fees.maximumOverdraft.title(),
       subtitle: fees.maximumOverdraft.subtitle(),
-      value: MAXIMUM_OVERDRAFT_AMOUNT,
+      value: maximumOverdraftAmount,
     },
     {
       title: fees.lateRepaymentFee.title(),
       subtitle: fees.lateRepaymentFee.subtitle(),
-      value: LATE_REPAYMENT_FEE_AMOUNT,
+      value: lateRepaymentFeeAmount,
     },
   ]
 
@@ -150,7 +166,7 @@ export const CardFeeScheduleScreen: React.FC = () => {
                 {additionalDetails.overdraft.label()}
               </Text>
               {additionalDetails.overdraft.text({
-                maxOverdraft: MAXIMUM_OVERDRAFT_AMOUNT,
+                maxOverdraft: maximumOverdraftAmount,
               })}
             </Text>
             <Text style={styles.detailsParagraph}>

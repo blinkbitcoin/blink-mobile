@@ -17,6 +17,24 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
+jest.mock("@app/config/feature-flags-context", () => ({
+  useRemoteConfig: () => ({
+    cardSubscriptionPriceUsd: 1000,
+    cardReplacementFeeUsd: 10,
+    cardUsdTransactionFeePercent: 1.21,
+    cardForeignTransactionFeePercent: 2.21,
+    cardMaxOverdraftUsd: 200,
+    cardLateRepaymentFeeUsd: 25,
+  }),
+}))
+
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({
+    formatCurrency: ({ amountInMajorUnits }: { amountInMajorUnits: number }) =>
+      `$${amountInMajorUnits}`,
+  }),
+}))
+
 describe("CardFeeScheduleScreen", () => {
   beforeEach(() => {
     loadLocale("en")
@@ -59,7 +77,7 @@ describe("CardFeeScheduleScreen", () => {
     await flushEffects()
 
     expect(getByText("Annual fee")).toBeTruthy()
-    expect(getByText("$1,000 / year")).toBeTruthy()
+    expect(getByText("$1000 / year")).toBeTruthy()
   })
 
   it("renders every fee amount", async () => {
@@ -71,7 +89,7 @@ describe("CardFeeScheduleScreen", () => {
 
     await flushEffects()
 
-    expect(getByText("$10.00")).toBeTruthy()
+    expect(getByText("$10")).toBeTruthy()
     expect(getByText("1.21%")).toBeTruthy()
     expect(getByText("2.21%")).toBeTruthy()
     expect(getByText("$200")).toBeTruthy()
