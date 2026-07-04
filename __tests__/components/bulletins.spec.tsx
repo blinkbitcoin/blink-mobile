@@ -178,6 +178,17 @@ describe("BulletinsCard", () => {
     expect(queryByTestId("galoy-icon-payment-success")).toBeTruthy()
   })
 
+  it("replaces every underscore in a multi-word icon enum", () => {
+    const bulletins = makeBulletinsQuery([
+      makeBulletin({ icon: "WARNING_WITH_BACKGROUND" as Icon }),
+    ])
+    const { queryByTestId } = render(
+      <BulletinsCard loading={false} bulletins={bulletins} />,
+    )
+
+    expect(queryByTestId("galoy-icon-warning-with-background")).toBeTruthy()
+  })
+
   it("does not render icon when icon is null", () => {
     const bulletins = makeBulletinsQuery([makeBulletin()])
     const { queryByTestId } = render(
