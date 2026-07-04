@@ -27,6 +27,11 @@ const CardESignConsentUrlKey = "cardESignConsentUrl"
 const CardIssuerPrivacyPolicyUrlKey = "cardIssuerPrivacyPolicyUrl"
 const CardSubscriptionPriceUsdKey = "cardSubscriptionPriceUsd"
 const CardProcessingWaitTimeHoursKey = "cardProcessingWaitTimeHours"
+const CardReplacementFeeUsdKey = "cardReplacementFeeUsd"
+const CardUsdTransactionFeePercentKey = "cardUsdTransactionFeePercent"
+const CardForeignTransactionFeePercentKey = "cardForeignTransactionFeePercent"
+const CardMaxOverdraftUsdKey = "cardMaxOverdraftUsd"
+const CardLateRepaymentFeeUsdKey = "cardLateRepaymentFeeUsd"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
 const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
@@ -79,6 +84,11 @@ type RemoteConfig = {
   [CardIssuerPrivacyPolicyUrlKey]: string
   [CardSubscriptionPriceUsdKey]: number
   [CardProcessingWaitTimeHoursKey]: number
+  [CardReplacementFeeUsdKey]: number
+  [CardUsdTransactionFeePercentKey]: number
+  [CardForeignTransactionFeePercentKey]: number
+  [CardMaxOverdraftUsdKey]: number
+  [CardLateRepaymentFeeUsdKey]: number
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
   [BackupNudgeBannerThresholdKey]: number
@@ -154,6 +164,11 @@ export const defaultRemoteConfig: RemoteConfig = {
   cardIssuerPrivacyPolicyUrl: "https://www.third-national.com/privacypolicy",
   cardSubscriptionPriceUsd: 1000,
   cardProcessingWaitTimeHours: 24,
+  cardReplacementFeeUsd: 10,
+  cardUsdTransactionFeePercent: 1.21,
+  cardForeignTransactionFeePercent: 2.21,
+  cardMaxOverdraftUsd: 200,
+  cardLateRepaymentFeeUsd: 25,
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
   sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
   backupNudgeBannerThreshold: 2100,
@@ -295,6 +310,26 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(CardProcessingWaitTimeHoursKey)
           .asNumber()
 
+        const cardReplacementFeeUsd = remoteConfigInstance()
+          .getValue(CardReplacementFeeUsdKey)
+          .asNumber()
+
+        const cardUsdTransactionFeePercent = remoteConfigInstance()
+          .getValue(CardUsdTransactionFeePercentKey)
+          .asNumber()
+
+        const cardForeignTransactionFeePercent = remoteConfigInstance()
+          .getValue(CardForeignTransactionFeePercentKey)
+          .asNumber()
+
+        const cardMaxOverdraftUsd = remoteConfigInstance()
+          .getValue(CardMaxOverdraftUsdKey)
+          .asNumber()
+
+        const cardLateRepaymentFeeUsd = remoteConfigInstance()
+          .getValue(CardLateRepaymentFeeUsdKey)
+          .asNumber()
+
         const sparkCompatibleWalletsUrl = remoteConfigInstance()
           .getValue(SparkCompatibleWalletsUrlKey)
           .asString()
@@ -400,6 +435,11 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           cardIssuerPrivacyPolicyUrl,
           cardSubscriptionPriceUsd,
           cardProcessingWaitTimeHours,
+          cardReplacementFeeUsd,
+          cardUsdTransactionFeePercent,
+          cardForeignTransactionFeePercent,
+          cardMaxOverdraftUsd,
+          cardLateRepaymentFeeUsd,
           replaceCardDeliveryConfig,
           sparkCompatibleWalletsUrl,
           backupNudgeBannerThreshold,
