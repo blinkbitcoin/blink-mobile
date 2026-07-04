@@ -208,6 +208,7 @@ export const RootStack = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerShadowVisible: false,
         headerLeft: headerBackControl(),
       }}
       initialRouteName={hasAccount ? "authenticationCheck" : "getStarted"}
@@ -488,7 +489,6 @@ export const RootStack = () => {
         component={SwitchAccount}
         options={{
           title: LL.common.accounts(),
-          headerShadowVisible: false,
         }}
       />
       <RootNavigator.Screen
@@ -854,6 +854,7 @@ export const OnboardingNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerShadowVisible: false,
       }}
     >
       <Onboarding.Screen
@@ -908,6 +909,7 @@ export const ContactNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerShadowVisible: false,
         headerLeft: headerBackControl(),
       }}
       initialRouteName="peopleHome"
@@ -965,6 +967,7 @@ export const PhoneLoginNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerShadowVisible: false,
         headerLeft: headerBackControl(),
       }}
     >
