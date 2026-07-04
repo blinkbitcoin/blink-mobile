@@ -333,6 +333,16 @@ export const GaloyIcon = ({
     )
   }
 
+  /**
+   * `name` is typed as a valid icon key, but callers can cast an arbitrary
+   * runtime string (e.g. a backend-provided icon name) through `as IconNamesType`,
+   * so an unmapped name can reach here. Render nothing rather than `undefined`,
+   * which would otherwise crash the whole subtree with "Element type is invalid".
+   */
+  if (!(name in customSvgMap)) {
+    return null
+  }
+
   const SvgIcon = customSvgMap[name as keyof typeof customSvgMap]
   if (backgroundColor) {
     return (
