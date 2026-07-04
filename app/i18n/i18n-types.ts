@@ -8967,6 +8967,10 @@ type RootTranslation = {
 		 */
 		cancel: string
 		/**
+		 * C​a​r​d
+		 */
+		card: string
+		/**
 		 * C​l​o​s​e
 		 */
 		close: string
@@ -21431,6 +21435,10 @@ export type TranslationFunctions = {
 		 * Cancel
 		 */
 		cancel: () => LocalizedString
+		/**
+		 * Card
+		 */
+		card: () => LocalizedString
 		/**
 		 * Close
 		 */

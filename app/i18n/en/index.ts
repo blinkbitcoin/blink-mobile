@@ -2852,6 +2852,7 @@ const en: BaseTranslation = {
     bitcoinPrice: "Bitcoin Price",
     btcAccount: "Bitcoin Balance",
     cancel: "Cancel",
+    card: "Card",
     close: "Close",
     confirm: "Confirm",
     convert: "Convert",

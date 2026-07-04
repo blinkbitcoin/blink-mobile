@@ -20,6 +20,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
 import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
 
 const Loader = () => {
@@ -131,6 +132,9 @@ const WalletOverview: React.FC<Props> = ({
   const [pressedBtc, setPressedBtc] = useState(false)
   const [pressedUsd, setPressedUsd] = useState(false)
   const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth()
+
+  const { card } = useCardData()
+  const hasCard = Boolean(card)
 
   return (
     <View style={styles.container}>
@@ -244,6 +248,28 @@ const WalletOverview: React.FC<Props> = ({
           </View>
         </Pressable>
       </DisabledFeature>
+
+      {hasCard && (
+        <>
+          <View style={styles.separator} />
+          <Pressable onPress={() => navigation.navigate("cardDashboardScreen")}>
+            <View style={styles.displayTextView}>
+              <View style={styles.currency}>
+                <CurrencyPill
+                  currency={WalletCurrency.Usd}
+                  label={LL.common.card()}
+                  highlighted={false}
+                  containerSize="medium"
+                  containerStyle={[pillWidthStyle, styles.cardPillBackground]}
+                />
+              </View>
+              <Text type="p1" bold>
+                ****
+              </Text>
+            </View>
+          </Pressable>
+        </>
+      )}
     </View>
   )
 }
@@ -315,4 +341,7 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: 5,
   },
   pressedOpacity: { opacity: 0.7 },
+  cardPillBackground: {
+    backgroundColor: colors._grey4,
+  },
 }))
