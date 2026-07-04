@@ -75,7 +75,7 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
             <NotificationCardUI
               icon={
                 bulletin.icon
-                  ? (bulletin.icon.toLowerCase().replace("_", "-") as IconNamesType)
+                  ? (bulletin.icon.toLowerCase().replace(/_/g, "-") as IconNamesType)
                   : undefined
               }
               key={bulletin.id}
