@@ -3045,6 +3045,66 @@
       "limitUpdateError": "Mana atikurqanchu limite musuqyachiyta",
       "limitMustBePositive": "Limite nisqaqa cero nisqamanta hatunraq kanan"
     },
+    "CardFeeSchedule": {
+      "title": "Blink tarjeta pagana lista",
+      "effectiveDate": "Julio 1, 2026 manta puriq",
+      "sections": {
+        "cardFees": "Tarjeta paganakuna",
+        "transactionFees": "Ranti-rantikuy paganakuna",
+        "overdraft": "Sobregiro (qullqiwan hunt'asqa)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Watapaq pagana",
+          "subtitle": "Ñawpaq watapi mana pagana tarjeta qusqan p'unchawmanta",
+          "value": "{amount: string} / wata"
+        },
+        "cardReplacement": {
+          "title": "Tarjeta rantipuy"
+        },
+        "usdTransactionFee": {
+          "title": "USD ranti-rantikuy pagana",
+          "subtitle": "Sapa ranti-rantikuypi USD dolarpi churasqa"
+        },
+        "foreignTransactionFee": {
+          "title": "Hawa suyu ranti-rantikuy pagana",
+          "subtitle": "Sapa ranti-rantikuypi USD dolarmanta huk qullqipi churasqa"
+        },
+        "maximumOverdraft": {
+          "title": "Aswan hatun sobregiro",
+          "subtitle": "7 p'unchawpi kutichina"
+        },
+        "lateRepaymentFee": {
+          "title": "Qhipaman kutichiy pagana",
+          "subtitle": "Cobrakun sichus sobregiro mana 7 p'unchawpi kutichisqachu"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC tikray",
+        "body": "Ranti-rantikuy BTC-ta USD-man tikrayta munaptin, tikray kunan pacha cambio precio-wan ruwakun, chaymi tikray costo-ta rikuchiq marga-ta churayta atin."
+      },
+      "feesUpdateNotice": {
+        "text": "Paganakunaqa mit'anmanta mit'anmanta musuqchakuyta atinku. Blink-qa 30 p'unchaw ñawpaqta willanqa ima pagana tikraypas ruwakunanpaq, kayman hina:",
+        "linkText": "Tarjeta apaq rimanakuy"
+      },
+      "creditModeNotice": "Kredito ruway kunan mana purichkanchu. Sichus Kredito ruway purichisqa, chay interes precios, paganakuna, factura derechos willakuykuna qusqa kanqa ruway ñawpaqta.",
+      "additionalDetails": {
+        "title": "Paganakunamanta yapa willakuykuna",
+        "overdraft": {
+          "label": "Sobregiro",
+          "text": ". Wakin kutikunapi, huk ranti-rantikuy chaskisqa kanman tarjetayki qullqi ziro urapi urmananpaq. Aswan hatun sobregiro {maxOverdraft: string} kan. Sobregiro-ta 7 p'unchawpi kutichina tarjetayki qullqiman yapa qullqi apachispa."
+        },
+        "foreignCurrency": {
+          "label": "Hawa suyu qullqi",
+          "text": ". Sichus hawa suyu qullqipi ranti-rantikuy ruwanki, tarjeta red-qa USD-man tikran kikin tikray procedimientos-wan. Ruway p'unchaw precio ranti-rantikuy p'unchawmanta huk kanman."
+        },
+        "noHiddenFees": {
+          "label": "Mana pakasqa paganakuna",
+          "text": ". Mana paganakuna kanchu cuenta kicharikuypaq, mana ruwaypaq, qullqi tapukuykunapaq, tarjetayki wisq'aykunapaqpas."
+        }
+      },
+      "backButton": "Kutiy"
+    },
     "CardDetails": {
       "title": "Tarjeta willayninkunap detallenkunan",
       "cardNumber": "Tarjeta yupaynin",

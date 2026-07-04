@@ -3016,6 +3016,66 @@
         "networkVisa": "Visa",
         "cardFrozenTitle": "Cartão congelado",
         "cardFrozenSubtitle": "O cartão está temporariamente desativado",
+        "CardFeeSchedule": {
+            "title": "Tabela de tarifas do Cartão Blink",
+            "effectiveDate": "Em vigor a partir de 1 de julho de 2026",
+            "sections": {
+                "cardFees": "Tarifas do cartão",
+                "transactionFees": "Tarifas de transação",
+                "overdraft": "Cheque especial (modo financiado)"
+            },
+            "fees": {
+                "annualFee": {
+                    "title": "Tarifa anual",
+                    "subtitle": "Isenta no primeiro ano a partir da data de emissão do Cartão",
+                    "value": "{amount: string} / ano"
+                },
+                "cardReplacement": {
+                    "title": "Substituição do cartão"
+                },
+                "usdTransactionFee": {
+                    "title": "Tarifa de transação em USD",
+                    "subtitle": "Aplicada a cada transação em dólares americanos"
+                },
+                "foreignTransactionFee": {
+                    "title": "Tarifa de transação estrangeira",
+                    "subtitle": "Aplicada a cada transação em uma moeda diferente do dólar americano"
+                },
+                "maximumOverdraft": {
+                    "title": "Cheque especial máximo",
+                    "subtitle": "Deve ser reembolsado em até 7 dias"
+                },
+                "lateRepaymentFee": {
+                    "title": "Tarifa de reembolso atrasado",
+                    "subtitle": "Cobrada se o cheque especial não for reembolsado em até 7 dias"
+                }
+            },
+            "btcConversion": {
+                "title": "Conversão de BTC",
+                "body": "Quando uma transação requer a conversão de BTC para USD, a conversão é executada pela taxa de câmbio vigente, que pode incluir um spread que reflete o custo da conversão."
+            },
+            "feesUpdateNotice": {
+                "text": "As tarifas podem ser atualizadas periodicamente. A Blink avisará com pelo menos 30 dias de antecedência antes que qualquer alteração de tarifas entre em vigor, de acordo com o",
+                "linkText": "Contrato do Titular do Cartão"
+            },
+            "creditModeNotice": "O Modo Crédito não está ativo no momento. Se o Modo Crédito for ativado, as taxas de juros, tarifas e divulgações de direitos de faturamento aplicáveis serão fornecidas antes da ativação.",
+            "additionalDetails": {
+                "title": "Detalhes adicionais de tarifas",
+                "overdraft": {
+                    "label": "Cheque especial",
+                    "text": ". Em certas circunstâncias, uma transação pode ser aprovada que faça o saldo do seu Cartão cair abaixo de zero. O cheque especial máximo é de {maxOverdraft: string}. Você deve reembolsar o cheque especial em até 7 dias transferindo fundos adicionais para o saldo do seu Cartão."
+                },
+                "foreignCurrency": {
+                    "label": "Moeda estrangeira",
+                    "text": ". Se você fizer uma transação em moeda estrangeira, a rede do cartão a converte para USD usando seus próprios procedimentos de conversão. A taxa na data de processamento pode diferir da data da transação."
+                },
+                "noHiddenFees": {
+                    "label": "Sem tarifas ocultas",
+                    "text": ". Não há tarifas para abertura de conta, inatividade, consultas de saldo ou encerramento do seu cartão."
+                }
+            },
+            "backButton": "Voltar"
+        },
         "CardDetails": {
             "title": "Detalhes do cartão",
             "cardNumber": "Número do cartão",

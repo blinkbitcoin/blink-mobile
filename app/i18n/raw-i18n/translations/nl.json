@@ -3045,6 +3045,66 @@
       "limitUpdateError": "Limiet bijwerken mislukt",
       "limitMustBePositive": "Limiet moet groter zijn dan nul"
     },
+    "CardFeeSchedule": {
+      "title": "Blink Card-tariefoverzicht",
+      "effectiveDate": "Van kracht vanaf 1 juli 2026",
+      "sections": {
+        "cardFees": "Kaartkosten",
+        "transactionFees": "Transactiekosten",
+        "overdraft": "Roodstand (gefinancierde modus)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Jaarlijkse kosten",
+          "subtitle": "Kwijtgescholden voor het eerste jaar vanaf de uitgiftedatum van de kaart",
+          "value": "{amount: string} / jaar"
+        },
+        "cardReplacement": {
+          "title": "Kaartvervanging"
+        },
+        "usdTransactionFee": {
+          "title": "USD-transactiekosten",
+          "subtitle": "Van toepassing op elke transactie in Amerikaanse dollar"
+        },
+        "foreignTransactionFee": {
+          "title": "Buitenlandse transactiekosten",
+          "subtitle": "Van toepassing op elke transactie in een andere valuta dan de Amerikaanse dollar"
+        },
+        "maximumOverdraft": {
+          "title": "Maximale roodstand",
+          "subtitle": "Moet binnen 7 dagen worden terugbetaald"
+        },
+        "lateRepaymentFee": {
+          "title": "Kosten voor late terugbetaling",
+          "subtitle": "In rekening gebracht als de roodstand niet binnen 7 dagen wordt terugbetaald"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC-conversie",
+        "body": "Wanneer een transactie conversie van BTC naar USD vereist, wordt de conversie uitgevoerd tegen de geldende wisselkoers, die een marge kan bevatten die de conversiekosten weerspiegelt."
+      },
+      "feesUpdateNotice": {
+        "text": "Kosten kunnen van tijd tot tijd worden bijgewerkt. Blink geeft ten minste 30 dagen van tevoren kennis voordat eventuele kostenwijzigingen van kracht worden, in overeenstemming met de",
+        "linkText": "Kaarthouderovereenkomst"
+      },
+      "creditModeNotice": "Kredietmodus is momenteel niet actief. Als Kredietmodus wordt geactiveerd, worden de toepasselijke rentetarieven, kosten en openbaarmakingen van factureringsrechten vóór activering verstrekt.",
+      "additionalDetails": {
+        "title": "Aanvullende kostendetails",
+        "overdraft": {
+          "label": "Roodstand",
+          "text": ". In bepaalde omstandigheden kan een transactie worden goedgekeurd waardoor uw kaartsaldo onder nul komt. De maximale roodstand is {maxOverdraft: string}. U moet de roodstand binnen 7 dagen terugbetalen door extra geld naar uw kaartsaldo over te maken."
+        },
+        "foreignCurrency": {
+          "label": "Vreemde valuta",
+          "text": ". Als u een transactie in een vreemde valuta uitvoert, converteert het kaartnetwerk deze naar USD met zijn eigen conversieprocedures. De koers op de verwerkingsdatum kan afwijken van de transactiedatum."
+        },
+        "noHiddenFees": {
+          "label": "Geen verborgen kosten",
+          "text": ". Er zijn geen kosten voor het openen van een account, inactiviteit, saldo-opvragingen of het sluiten van uw kaart."
+        }
+      },
+      "backButton": "Terug"
+    },
     "CardDetails": {
       "title": "Kaartgegevens",
       "cardNumber": "Kaartnummer",

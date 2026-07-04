@@ -94,6 +94,7 @@ import { OfflineGate } from "@app/self-custodial/components"
 import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unavailable"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
+import { CardFeeScheduleScreen } from "@app/screens/card-screen/card-fee-schedule-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { headerCloseControl } from "@app/components/header-close-control"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
@@ -595,6 +596,13 @@ export const RootStack = () => {
         component={CardDashboardScreen}
         options={{
           title: LL.CardFlow.CardDashboard.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardFeeScheduleScreen"
+        component={CardFeeScheduleScreen}
+        options={{
+          title: LL.CardFlow.CardFeeSchedule.title(),
         }}
       />
       <RootNavigator.Screen

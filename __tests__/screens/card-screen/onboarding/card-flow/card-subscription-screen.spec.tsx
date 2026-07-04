@@ -168,7 +168,7 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
     expect(getByText("Blink Card Fee Schedule")).toBeTruthy()
   })
 
-  it("opens the fee schedule link when pressed", async () => {
+  it("navigates to the fee schedule screen when the link is pressed", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CardSubscriptionScreen />
@@ -181,7 +181,7 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
       fireEvent.press(getByText("Blink Card Fee Schedule"))
     })
 
-    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/fee-schedule")
+    expect(mockNavigate).toHaveBeenCalledWith("cardFeeScheduleScreen")
   })
 
   it("keeps the button disabled when only the renew checkbox is checked", async () => {

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { View } from "react-native"
-import { RouteProp, useRoute } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { CheckBox, makeStyles, Text } from "@rn-vui/themed"
 import InAppBrowser from "react-native-inappbrowser-reborn"
 
@@ -21,6 +22,7 @@ export const CardSubscriptionScreen: React.FC = () => {
   const styles = useStyles()
   const { LL, locale } = useI18nContext()
   const route = useRoute<RouteProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const isSubscribeVariant = route.name === SUBSCRIBE_ROUTE
 
@@ -28,7 +30,6 @@ export const CardSubscriptionScreen: React.FC = () => {
     cardTermsAndConditionsUrl,
     cardPrivacyPolicyUrl,
     cardCardholderAgreementUrl,
-    cardFeeScheduleUrl,
     cardSubscriptionPriceUsd,
   } = useRemoteConfig()
   const { formatCurrency } = useDisplayCurrency()
@@ -148,7 +149,7 @@ export const CardSubscriptionScreen: React.FC = () => {
                   <Text
                     type="p3"
                     style={styles.feeScheduleLink}
-                    onPress={() => InAppBrowser.open(cardFeeScheduleUrl)}
+                    onPress={() => navigation.navigate("cardFeeScheduleScreen")}
                   >
                     {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.linkText()}
                   </Text>

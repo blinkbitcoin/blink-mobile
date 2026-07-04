@@ -3045,6 +3045,66 @@
       "limitUpdateError": "Ayiphumelelanga ukuhlaziya umda",
       "limitMustBePositive": "Umda kufuneka ube ngaphezu kwezero"
     },
+    "CardFeeSchedule": {
+      "title": "Uludwe lweentlawulo zeKhadi leBlink",
+      "effectiveDate": "Iqala ngomhla woku-1 kuJulayi 2026",
+      "sections": {
+        "cardFees": "Iintlawulo zekhadi",
+        "transactionFees": "Iintlawulo zentengiselwano",
+        "overdraft": "Ukubhatala ngaphezulu (imowudi exhaswe ngemali)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Intlawulo yonyaka",
+          "subtitle": "Ixolelwe unyaka wokuqala ukususela kumhla wokukhutshwa kweKhadi",
+          "value": "{amount: string} / ngonyaka"
+        },
+        "cardReplacement": {
+          "title": "Ukutshintshwa kwekhadi"
+        },
+        "usdTransactionFee": {
+          "title": "Intlawulo yentengiselwano yeUSD",
+          "subtitle": "Isetyenziswa kuyo yonke intengiselwano ngeedola zaseMelika"
+        },
+        "foreignTransactionFee": {
+          "title": "Intlawulo yentengiselwano yangaphandle",
+          "subtitle": "Isetyenziswa kuyo yonke intengiselwano ngemali engeyodola yaseMelika"
+        },
+        "maximumOverdraft": {
+          "title": "Ukubhatala ngaphezulu okuphezulu",
+          "subtitle": "Kufuneka kubuyiselwe kwiintsuku ezi-7"
+        },
+        "lateRepaymentFee": {
+          "title": "Intlawulo yokubuyisela kade",
+          "subtitle": "Ihlawuliswa ukuba ukubhatala ngaphezulu akubuyiselwanga kwiintsuku ezi-7"
+        }
+      },
+      "btcConversion": {
+        "title": "Uguqulo lweBTC",
+        "body": "Xa intengiselwano ifuna uguqulo lweBTC ukuya kwiUSD, uguqulo lwenziwa ngezinga lotshintshiselwano elikhoyo, elinokuquka umahluko obonisa iindleko zoguqulo."
+      },
+      "feesUpdateNotice": {
+        "text": "Iintlawulo zinokuhlaziywa ngamaxesha athile. IBlink iya kwazisa ubuncinane iintsuku ezingama-30 ngaphambi kokuba naluphi na utshintsho lweentlawulo luqalise ukusebenza, ngokuvumelana",
+        "linkText": "neSivumelwano soMniniKhadi"
+      },
+      "creditModeNotice": "Imowudi yeKredithi ayisebenzi okwangoku. Ukuba iMowudi yeKredithi iyavulwa, amazinga enzala asebenzayo, iintlawulo, kunye nokuchazwa kwamalungelo okubhatala kuya kunikwa ngaphambi kokuvulwa.",
+      "additionalDetails": {
+        "title": "Iinkcukacha ezongezelelweyo zeentlawulo",
+        "overdraft": {
+          "label": "Ukubhatala ngaphezulu",
+          "text": ". Kwiimeko ezithile, intengiselwano inokuvunywa ebangela ukuba iBhalansi yeKhadi lakho ihle ngaphantsi kweqanda. Ukubhatala ngaphezulu okuphezulu yi-{maxOverdraft: string}. Kufuneka ubuyisele ukubhatala ngaphezulu kwiintsuku ezi-7 ngokudlulisela imali eyongezelelweyo kwiBhalansi yeKhadi lakho."
+        },
+        "foreignCurrency": {
+          "label": "Imali yangaphandle",
+          "text": ". Ukuba wenza intengiselwano ngemali yangaphandle, uthungelwano lwekhadi luyiguqula ibe yiUSD lusebenzisa iinkqubo zalo zoguqulo. Izinga ngomhla wokuqhutywa linokwahluka kumhla wentengiselwano."
+        },
+        "noHiddenFees": {
+          "label": "Akukho ntlawulo zifihlakeleyo",
+          "text": ". Akukho ntlawulo zokusetha iakhawunti, ukungasebenzi, imibuzo yebhalansi, okanye ukuvala ikhadi lakho."
+        }
+      },
+      "backButton": "Emva"
+    },
     "CardDetails": {
       "title": "Iinkcukacha zekhadi",
       "cardNumber": "Inombolo yekhadi",

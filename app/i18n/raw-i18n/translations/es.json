@@ -3016,6 +3016,66 @@
         "networkVisa": "Visa",
         "cardFrozenTitle": "Tarjeta congelada",
         "cardFrozenSubtitle": "La tarjeta está temporalmente deshabilitada",
+        "CardFeeSchedule": {
+            "title": "Programa de tarifas de la tarjeta Blink",
+            "effectiveDate": "Vigente desde el 1 de julio de 2026",
+            "sections": {
+                "cardFees": "Tarifas de la tarjeta",
+                "transactionFees": "Tarifas de transacción",
+                "overdraft": "Sobregiro (modo fondeado)"
+            },
+            "fees": {
+                "annualFee": {
+                    "title": "Tarifa anual",
+                    "subtitle": "Exenta el primer año desde la fecha de emisión de la tarjeta",
+                    "value": "{amount: string} / año"
+                },
+                "cardReplacement": {
+                    "title": "Reemplazo de tarjeta"
+                },
+                "usdTransactionFee": {
+                    "title": "Tarifa de transacción en USD",
+                    "subtitle": "Aplicada a cada transacción en dólares estadounidenses"
+                },
+                "foreignTransactionFee": {
+                    "title": "Tarifa de transacción extranjera",
+                    "subtitle": "Aplicada a cada transacción en una moneda distinta del dólar estadounidense"
+                },
+                "maximumOverdraft": {
+                    "title": "Sobregiro máximo",
+                    "subtitle": "Debe reembolsarse dentro de 7 días"
+                },
+                "lateRepaymentFee": {
+                    "title": "Tarifa por pago tardío",
+                    "subtitle": "Se cobra si el sobregiro no se reembolsa dentro de 7 días"
+                }
+            },
+            "btcConversion": {
+                "title": "Conversión de BTC",
+                "body": "Cuando una transacción requiere la conversión de BTC a USD, la conversión se ejecuta al tipo de cambio vigente, que puede incluir un margen que refleja el costo de la conversión."
+            },
+            "feesUpdateNotice": {
+                "text": "Las tarifas pueden actualizarse ocasionalmente. Blink avisará con al menos 30 días de anticipación antes de que cualquier cambio de tarifas entre en vigencia, de acuerdo con el",
+                "linkText": "Acuerdo del titular de la tarjeta"
+            },
+            "creditModeNotice": "El Modo Crédito no está activo actualmente. Si se activa el Modo Crédito, las tasas de interés, tarifas y divulgaciones de derechos de facturación aplicables se proporcionarán antes de la activación.",
+            "additionalDetails": {
+                "title": "Detalles adicionales de tarifas",
+                "overdraft": {
+                    "label": "Sobregiro",
+                    "text": ". En ciertas circunstancias, se puede aprobar una transacción que haga que el saldo de tu tarjeta caiga por debajo de cero. El sobregiro máximo es de {maxOverdraft: string}. Debes reembolsar el sobregiro dentro de 7 días transfiriendo fondos adicionales al saldo de tu tarjeta."
+                },
+                "foreignCurrency": {
+                    "label": "Moneda extranjera",
+                    "text": ". Si realizas una transacción en una moneda extranjera, la red de la tarjeta la convierte a USD usando sus propios procedimientos de conversión. La tasa en la fecha de procesamiento puede diferir de la fecha de la transacción."
+                },
+                "noHiddenFees": {
+                    "label": "Sin tarifas ocultas",
+                    "text": ". No hay tarifas por apertura de cuenta, inactividad, consultas de saldo ni por cerrar tu tarjeta."
+                }
+            },
+            "backButton": "Volver"
+        },
         "CardDetails": {
             "title": "Detalles de la tarjeta",
             "cardNumber": "Número de tarjeta",

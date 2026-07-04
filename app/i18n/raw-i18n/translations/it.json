@@ -3016,6 +3016,66 @@
         "networkVisa": "Visa",
         "cardFrozenTitle": "Carta bloccata",
         "cardFrozenSubtitle": "La carta è temporaneamente disabilitata",
+        "CardFeeSchedule": {
+            "title": "Programma tariffe della carta Blink",
+            "effectiveDate": "In vigore dal 1° luglio 2026",
+            "sections": {
+                "cardFees": "Costi della carta",
+                "transactionFees": "Costi di transazione",
+                "overdraft": "Scoperto (modalità finanziata)"
+            },
+            "fees": {
+                "annualFee": {
+                    "title": "Canone annuale",
+                    "subtitle": "Esente per il primo anno dalla data di emissione della Carta",
+                    "value": "{amount: string} / anno"
+                },
+                "cardReplacement": {
+                    "title": "Sostituzione della carta"
+                },
+                "usdTransactionFee": {
+                    "title": "Costo di transazione in USD",
+                    "subtitle": "Applicato a ogni transazione in dollari statunitensi"
+                },
+                "foreignTransactionFee": {
+                    "title": "Costo di transazione estera",
+                    "subtitle": "Applicato a ogni transazione in una valuta diversa dal dollaro statunitense"
+                },
+                "maximumOverdraft": {
+                    "title": "Scoperto massimo",
+                    "subtitle": "Deve essere rimborsato entro 7 giorni"
+                },
+                "lateRepaymentFee": {
+                    "title": "Costo per rimborso tardivo",
+                    "subtitle": "Addebitato se lo scoperto non viene rimborsato entro 7 giorni"
+                }
+            },
+            "btcConversion": {
+                "title": "Conversione BTC",
+                "body": "Quando una transazione richiede la conversione da BTC a USD, la conversione viene eseguita al tasso di cambio vigente, che può includere uno spread che riflette il costo della conversione."
+            },
+            "feesUpdateNotice": {
+                "text": "I costi possono essere aggiornati di volta in volta. Blink fornirà un preavviso di almeno 30 giorni prima che qualsiasi modifica dei costi abbia effetto, in conformità con il",
+                "linkText": "Contratto del titolare della carta"
+            },
+            "creditModeNotice": "La Modalità Credito non è attualmente attiva. Se la Modalità Credito viene attivata, i tassi di interesse, i costi e le informative sui diritti di fatturazione applicabili saranno forniti prima dell'attivazione.",
+            "additionalDetails": {
+                "title": "Ulteriori dettagli sui costi",
+                "overdraft": {
+                    "label": "Scoperto",
+                    "text": ". In determinate circostanze, può essere approvata una transazione che fa scendere il saldo della tua Carta sotto lo zero. Lo scoperto massimo è di {maxOverdraft: string}. Devi rimborsare lo scoperto entro 7 giorni trasferendo fondi aggiuntivi sul saldo della tua Carta."
+                },
+                "foreignCurrency": {
+                    "label": "Valuta estera",
+                    "text": ". Se effettui una transazione in una valuta estera, il circuito della carta la converte in USD utilizzando le proprie procedure di conversione. Il tasso alla data di elaborazione può differire dalla data della transazione."
+                },
+                "noHiddenFees": {
+                    "label": "Nessun costo nascosto",
+                    "text": ". Non ci sono costi per l'apertura del conto, l'inattività, le richieste di saldo o la chiusura della tua carta."
+                }
+            },
+            "backButton": "Indietro"
+        },
         "CardDetails": {
             "title": "Dettagli della carta",
             "cardNumber": "Numero di carta",

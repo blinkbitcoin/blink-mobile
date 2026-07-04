@@ -3045,6 +3045,66 @@
       "limitUpdateError": "No s'ha pogut actualitzar el límit",
       "limitMustBePositive": "El límit ha de ser superior a zero"
     },
+    "CardFeeSchedule": {
+      "title": "Programa de tarifes de la targeta Blink",
+      "effectiveDate": "Vigent des de l'1 de juliol de 2026",
+      "sections": {
+        "cardFees": "Tarifes de la targeta",
+        "transactionFees": "Tarifes de transacció",
+        "overdraft": "Descobert (mode finançat)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Tarifa anual",
+          "subtitle": "Exempta el primer any des de la data d'emissió de la targeta",
+          "value": "{amount: string} / any"
+        },
+        "cardReplacement": {
+          "title": "Reemplaçament de targeta"
+        },
+        "usdTransactionFee": {
+          "title": "Tarifa de transacció en USD",
+          "subtitle": "Aplicada a cada transacció en dòlars dels EUA"
+        },
+        "foreignTransactionFee": {
+          "title": "Tarifa de transacció estrangera",
+          "subtitle": "Aplicada a cada transacció en una moneda diferent del dòlar dels EUA"
+        },
+        "maximumOverdraft": {
+          "title": "Descobert màxim",
+          "subtitle": "S'ha de reemborsar en un termini de 7 dies"
+        },
+        "lateRepaymentFee": {
+          "title": "Tarifa per pagament tardà",
+          "subtitle": "Es cobra si el descobert no es reemborsa en un termini de 7 dies"
+        }
+      },
+      "btcConversion": {
+        "title": "Conversió de BTC",
+        "body": "Quan una transacció requereix la conversió de BTC a USD, la conversió s'executa al tipus de canvi vigent, que pot incloure un marge que reflecteix el cost de la conversió."
+      },
+      "feesUpdateNotice": {
+        "text": "Les tarifes es poden actualitzar de tant en tant. Blink avisarà amb almenys 30 dies d'antelació abans que qualsevol canvi de tarifes entri en vigor, d'acord amb l'",
+        "linkText": "Acord del titular de la targeta"
+      },
+      "creditModeNotice": "El Mode Crèdit no està actiu actualment. Si s'activa el Mode Crèdit, els tipus d'interès, les tarifes i les divulgacions de drets de facturació aplicables es proporcionaran abans de l'activació.",
+      "additionalDetails": {
+        "title": "Detalls addicionals de tarifes",
+        "overdraft": {
+          "label": "Descobert",
+          "text": ". En determinades circumstàncies, es pot aprovar una transacció que faci que el saldo de la teva targeta caigui per sota de zero. El descobert màxim és de {maxOverdraft: string}. Has de reemborsar el descobert en un termini de 7 dies transferint fons addicionals al saldo de la teva targeta."
+        },
+        "foreignCurrency": {
+          "label": "Moneda estrangera",
+          "text": ". Si fas una transacció en una moneda estrangera, la xarxa de la targeta la converteix a USD amb els seus propis procediments de conversió. El tipus a la data de processament pot diferir de la data de la transacció."
+        },
+        "noHiddenFees": {
+          "label": "Sense tarifes ocultes",
+          "text": ". No hi ha tarifes per obertura de compte, inactivitat, consultes de saldo ni per tancar la teva targeta."
+        }
+      },
+      "backButton": "Enrere"
+    },
     "CardDetails": {
       "title": "Detalls de la targeta",
       "cardNumber": "Número de targeta",

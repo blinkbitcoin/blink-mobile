@@ -3045,6 +3045,66 @@
       "limitUpdateError": "Limit güncellenemedi",
       "limitMustBePositive": "Limit sıfırdan büyük olmalıdır"
     },
+    "CardFeeSchedule": {
+      "title": "Blink Kart ücret çizelgesi",
+      "effectiveDate": "1 Temmuz 2026 tarihinden itibaren geçerlidir",
+      "sections": {
+        "cardFees": "Kart ücretleri",
+        "transactionFees": "İşlem ücretleri",
+        "overdraft": "Ek hesap (fonlanmış mod)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Yıllık ücret",
+          "subtitle": "Kartın verildiği tarihten itibaren ilk yıl için muaf",
+          "value": "{amount: string} / yıl"
+        },
+        "cardReplacement": {
+          "title": "Kart değişimi"
+        },
+        "usdTransactionFee": {
+          "title": "USD işlem ücreti",
+          "subtitle": "ABD doları cinsinden her işleme uygulanır"
+        },
+        "foreignTransactionFee": {
+          "title": "Yurt dışı işlem ücreti",
+          "subtitle": "ABD doları dışındaki bir para biriminde yapılan her işleme uygulanır"
+        },
+        "maximumOverdraft": {
+          "title": "Maksimum ek hesap",
+          "subtitle": "7 gün içinde geri ödenmelidir"
+        },
+        "lateRepaymentFee": {
+          "title": "Geç ödeme ücreti",
+          "subtitle": "Ek hesap 7 gün içinde geri ödenmezse tahsil edilir"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC dönüşümü",
+        "body": "Bir işlem BTC'nin USD'ye dönüştürülmesini gerektirdiğinde, dönüşüm geçerli döviz kuru üzerinden gerçekleştirilir ve bu, dönüşüm maliyetini yansıtan bir spread içerebilir."
+      },
+      "feesUpdateNotice": {
+        "text": "Ücretler zaman zaman güncellenebilir. Blink, herhangi bir ücret değişikliği yürürlüğe girmeden önce en az 30 gün önceden bildirimde bulunacaktır;",
+        "linkText": "Kart Sahibi Sözleşmesi"
+      },
+      "creditModeNotice": "Kredi Modu şu anda etkin değil. Kredi Modu etkinleştirilirse, geçerli faiz oranları, ücretler ve faturalandırma hakları açıklamaları etkinleştirmeden önce sağlanacaktır.",
+      "additionalDetails": {
+        "title": "Ek ücret ayrıntıları",
+        "overdraft": {
+          "label": "Ek hesap",
+          "text": ". Belirli durumlarda, Kart Bakiyenizin sıfırın altına düşmesine neden olan bir işlem onaylanabilir. Maksimum ek hesap {maxOverdraft: string}'dur. Ek hesabı, Kart Bakiyenize ek fon aktararak 7 gün içinde geri ödemelisiniz."
+        },
+        "foreignCurrency": {
+          "label": "Yabancı para birimi",
+          "text": ". Yabancı bir para biriminde işlem yaparsanız, kart ağı kendi dönüşüm prosedürlerini kullanarak bunu USD'ye dönüştürür. İşlem tarihindeki kur, işlem tarihinden farklı olabilir."
+        },
+        "noHiddenFees": {
+          "label": "Gizli ücret yok",
+          "text": ". Hesap kurulumu, işlem yapılmaması, bakiye sorgulamaları veya kartınızı kapatma için ücret alınmaz."
+        }
+      },
+      "backButton": "Geri"
+    },
     "CardDetails": {
       "title": "Kart detayları",
       "cardNumber": "Kart numarası",

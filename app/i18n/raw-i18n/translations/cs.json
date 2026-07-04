@@ -3045,6 +3045,66 @@
       "limitUpdateError": "Nepodařilo se aktualizovat limit",
       "limitMustBePositive": "Limit musí být větší než nula"
     },
+    "CardFeeSchedule": {
+      "title": "Sazebník poplatků karty Blink",
+      "effectiveDate": "Platné od 1. července 2026",
+      "sections": {
+        "cardFees": "Poplatky za kartu",
+        "transactionFees": "Poplatky za transakce",
+        "overdraft": "Přečerpání (financovaný režim)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Roční poplatek",
+          "subtitle": "Prominut na první rok od data vydání karty",
+          "value": "{amount: string} / rok"
+        },
+        "cardReplacement": {
+          "title": "Výměna karty"
+        },
+        "usdTransactionFee": {
+          "title": "Poplatek za transakci v USD",
+          "subtitle": "Účtováno za každou transakci v amerických dolarech"
+        },
+        "foreignTransactionFee": {
+          "title": "Poplatek za zahraniční transakci",
+          "subtitle": "Účtováno za každou transakci v jiné měně než v amerických dolarech"
+        },
+        "maximumOverdraft": {
+          "title": "Maximální přečerpání",
+          "subtitle": "Musí být splaceno do 7 dnů"
+        },
+        "lateRepaymentFee": {
+          "title": "Poplatek za pozdní splacení",
+          "subtitle": "Účtuje se, pokud přečerpání není splaceno do 7 dnů"
+        }
+      },
+      "btcConversion": {
+        "title": "Konverze BTC",
+        "body": "Pokud transakce vyžaduje konverzi BTC na USD, konverze se provádí za aktuální směnný kurz, který může zahrnovat rozpětí odrážející náklady na konverzi."
+      },
+      "feesUpdateNotice": {
+        "text": "Poplatky mohou být čas od času aktualizovány. Blink poskytne oznámení nejméně 30 dní předem, než jakékoli změny poplatků vstoupí v platnost, v souladu se",
+        "linkText": "Smlouvou s držitelem karty"
+      },
+      "creditModeNotice": "Kreditní režim není momentálně aktivní. Pokud bude Kreditní režim aktivován, budou příslušné úrokové sazby, poplatky a informace o fakturačních právech poskytnuty před aktivací.",
+      "additionalDetails": {
+        "title": "Další podrobnosti o poplatcích",
+        "overdraft": {
+          "label": "Přečerpání",
+          "text": ". Za určitých okolností může být schválena transakce, která způsobí pokles zůstatku vaší karty pod nulu. Maximální přečerpání je {maxOverdraft: string}. Přečerpání musíte splatit do 7 dnů převodem dalších prostředků na zůstatek vaší karty."
+        },
+        "foreignCurrency": {
+          "label": "Cizí měna",
+          "text": ". Pokud provedete transakci v cizí měně, karetní síť ji převede na USD pomocí vlastních konverzních postupů. Kurz v den zpracování se může lišit od data transakce."
+        },
+        "noHiddenFees": {
+          "label": "Žádné skryté poplatky",
+          "text": ". Neúčtují se žádné poplatky za založení účtu, nečinnost, dotazy na zůstatek ani za zrušení karty."
+        }
+      },
+      "backButton": "Zpět"
+    },
     "CardDetails": {
       "title": "Detaily karty",
       "cardNumber": "Číslo karty",

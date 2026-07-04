@@ -3016,6 +3016,66 @@
         "networkVisa": "Visa",
         "cardFrozenTitle": "Karte eingefroren",
         "cardFrozenSubtitle": "Die Karte ist vorübergehend deaktiviert",
+        "CardFeeSchedule": {
+            "title": "Blink Card-Gebührenübersicht",
+            "effectiveDate": "Gültig ab 1. Juli 2026",
+            "sections": {
+                "cardFees": "Kartengebühren",
+                "transactionFees": "Transaktionsgebühren",
+                "overdraft": "Überziehung (finanzierter Modus)"
+            },
+            "fees": {
+                "annualFee": {
+                    "title": "Jahresgebühr",
+                    "subtitle": "Im ersten Jahr ab dem Ausstellungsdatum der Karte erlassen",
+                    "value": "{amount: string} / Jahr"
+                },
+                "cardReplacement": {
+                    "title": "Kartenersatz"
+                },
+                "usdTransactionFee": {
+                    "title": "USD-Transaktionsgebühr",
+                    "subtitle": "Gilt für jede Transaktion in US-Dollar"
+                },
+                "foreignTransactionFee": {
+                    "title": "Auslandstransaktionsgebühr",
+                    "subtitle": "Gilt für jede Transaktion in einer anderen Währung als US-Dollar"
+                },
+                "maximumOverdraft": {
+                    "title": "Maximale Überziehung",
+                    "subtitle": "Muss innerhalb von 7 Tagen zurückgezahlt werden"
+                },
+                "lateRepaymentFee": {
+                    "title": "Gebühr für verspätete Rückzahlung",
+                    "subtitle": "Wird erhoben, wenn die Überziehung nicht innerhalb von 7 Tagen zurückgezahlt wird"
+                }
+            },
+            "btcConversion": {
+                "title": "BTC-Umrechnung",
+                "body": "Wenn eine Transaktion die Umrechnung von BTC in USD erfordert, wird die Umrechnung zum aktuellen Wechselkurs durchgeführt, der einen Aufschlag enthalten kann, der die Umrechnungskosten widerspiegelt."
+            },
+            "feesUpdateNotice": {
+                "text": "Die Gebühren können von Zeit zu Zeit aktualisiert werden. Blink wird mindestens 30 Tage im Voraus benachrichtigen, bevor Gebührenänderungen in Kraft treten, gemäß der",
+                "linkText": "Karteninhabervereinbarung"
+            },
+            "creditModeNotice": "Der Kreditmodus ist derzeit nicht aktiv. Wenn der Kreditmodus aktiviert wird, werden die geltenden Zinssätze, Gebühren und Offenlegungen zu Abrechnungsrechten vor der Aktivierung bereitgestellt.",
+            "additionalDetails": {
+                "title": "Weitere Gebührendetails",
+                "overdraft": {
+                    "label": "Überziehung",
+                    "text": ". Unter bestimmten Umständen kann eine Transaktion genehmigt werden, die dazu führt, dass Ihr Kartenguthaben unter null fällt. Die maximale Überziehung beträgt {maxOverdraft: string}. Sie müssen die Überziehung innerhalb von 7 Tagen zurückzahlen, indem Sie zusätzliche Mittel auf Ihr Kartenguthaben überweisen."
+                },
+                "foreignCurrency": {
+                    "label": "Fremdwährung",
+                    "text": ". Wenn Sie eine Transaktion in einer Fremdwährung durchführen, rechnet das Kartennetzwerk sie mit seinen eigenen Umrechnungsverfahren in USD um. Der Kurs am Verarbeitungsdatum kann vom Transaktionsdatum abweichen."
+                },
+                "noHiddenFees": {
+                    "label": "Keine versteckten Gebühren",
+                    "text": ". Es fallen keine Gebühren für Kontoeinrichtung, Inaktivität, Saldoabfragen oder das Schließen Ihrer Karte an."
+                }
+            },
+            "backButton": "Zurück"
+        },
         "CardDetails": {
             "title": "Kartendetails",
             "cardNumber": "Kartennummer",

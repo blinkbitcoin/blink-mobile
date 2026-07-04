@@ -3045,6 +3045,66 @@
       "limitUpdateError": "Nu s-a putut actualiza limita",
       "limitMustBePositive": "Limita trebuie să fie mai mare decât zero"
     },
+    "CardFeeSchedule": {
+      "title": "Grila de taxe a cardului Blink",
+      "effectiveDate": "În vigoare de la 1 iulie 2026",
+      "sections": {
+        "cardFees": "Taxe pentru card",
+        "transactionFees": "Taxe de tranzacție",
+        "overdraft": "Descoperit de cont (mod finanțat)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Taxă anuală",
+          "subtitle": "Scutită în primul an de la data emiterii cardului",
+          "value": "{amount: string} / an"
+        },
+        "cardReplacement": {
+          "title": "Înlocuirea cardului"
+        },
+        "usdTransactionFee": {
+          "title": "Taxă de tranzacție în USD",
+          "subtitle": "Aplicată fiecărei tranzacții în dolari americani"
+        },
+        "foreignTransactionFee": {
+          "title": "Taxă de tranzacție externă",
+          "subtitle": "Aplicată fiecărei tranzacții într-o monedă diferită de dolarul american"
+        },
+        "maximumOverdraft": {
+          "title": "Descoperit maxim",
+          "subtitle": "Trebuie rambursat în termen de 7 zile"
+        },
+        "lateRepaymentFee": {
+          "title": "Taxă de rambursare întârziată",
+          "subtitle": "Se percepe dacă descoperitul nu este rambursat în termen de 7 zile"
+        }
+      },
+      "btcConversion": {
+        "title": "Conversie BTC",
+        "body": "Când o tranzacție necesită conversia BTC în USD, conversia se execută la cursul de schimb în vigoare, care poate include o marjă ce reflectă costul conversiei."
+      },
+      "feesUpdateNotice": {
+        "text": "Taxele pot fi actualizate din când în când. Blink va notifica cu cel puțin 30 de zile înainte ca orice modificare a taxelor să intre în vigoare, în conformitate cu",
+        "linkText": "Acordul deținătorului de card"
+      },
+      "creditModeNotice": "Modul Credit nu este activ în prezent. Dacă Modul Credit este activat, ratele dobânzii, taxele și informațiile privind drepturile de facturare aplicabile vor fi furnizate înainte de activare.",
+      "additionalDetails": {
+        "title": "Detalii suplimentare despre taxe",
+        "overdraft": {
+          "label": "Descoperit de cont",
+          "text": ". În anumite circumstanțe, o tranzacție poate fi aprobată, ceea ce face ca soldul cardului tău să scadă sub zero. Descoperitul maxim este de {maxOverdraft: string}. Trebuie să rambursezi descoperitul în termen de 7 zile transferând fonduri suplimentare în soldul cardului tău."
+        },
+        "foreignCurrency": {
+          "label": "Monedă străină",
+          "text": ". Dacă efectuezi o tranzacție într-o monedă străină, rețeaua cardului o convertește în USD folosind propriile proceduri de conversie. Cursul de la data procesării poate diferi de data tranzacției."
+        },
+        "noHiddenFees": {
+          "label": "Fără taxe ascunse",
+          "text": ". Nu există taxe pentru deschiderea contului, inactivitate, interogări de sold sau închiderea cardului tău."
+        }
+      },
+      "backButton": "Înapoi"
+    },
     "CardDetails": {
       "title": "Detalii card",
       "cardNumber": "Număr card",

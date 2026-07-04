@@ -3045,6 +3045,66 @@
       "limitUpdateError": "Kon limiet nie opdateer nie",
       "limitMustBePositive": "Limiet moet groter as nul wees"
     },
+    "CardFeeSchedule": {
+      "title": "Blink-kaart fooiskedule",
+      "effectiveDate": "Geldig vanaf 1 Julie 2026",
+      "sections": {
+        "cardFees": "Kaartfooie",
+        "transactionFees": "Transaksiefooie",
+        "overdraft": "Oortrekking (befondsde modus)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Jaarlikse fooi",
+          "subtitle": "Kwytgeskeld vir die eerste jaar vanaf die datum van kaartuitreiking",
+          "value": "{amount: string} / jaar"
+        },
+        "cardReplacement": {
+          "title": "Kaartvervanging"
+        },
+        "usdTransactionFee": {
+          "title": "USD-transaksiefooi",
+          "subtitle": "Van toepassing op elke transaksie in Amerikaanse dollar"
+        },
+        "foreignTransactionFee": {
+          "title": "Buitelandse transaksiefooi",
+          "subtitle": "Van toepassing op elke transaksie in 'n ander geldeenheid as Amerikaanse dollar"
+        },
+        "maximumOverdraft": {
+          "title": "Maksimum oortrekking",
+          "subtitle": "Moet binne 7 dae terugbetaal word"
+        },
+        "lateRepaymentFee": {
+          "title": "Laat-terugbetalingsfooi",
+          "subtitle": "Gehef indien die oortrekking nie binne 7 dae terugbetaal word nie"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC-omskakeling",
+        "body": "Wanneer 'n transaksie omskakeling van BTC na USD vereis, word die omskakeling teen die heersende wisselkoers uitgevoer, wat 'n marge kan insluit wat die koste van omskakeling weerspieël."
+      },
+      "feesUpdateNotice": {
+        "text": "Fooie kan van tyd tot tyd bygewerk word. Blink sal ten minste 30 dae kennis gee voordat enige fooiveranderinge in werking tree, in ooreenstemming met die",
+        "linkText": "Kaarthouerooreenkoms"
+      },
+      "creditModeNotice": "Kredietmodus is tans nie aktief nie. As Kredietmodus geaktiveer word, sal die toepaslike rentekoerse, fooie en faktureringsregte-openbaarmakings voor aktivering verskaf word.",
+      "additionalDetails": {
+        "title": "Bykomende fooibesonderhede",
+        "overdraft": {
+          "label": "Oortrekking",
+          "text": ". In sekere omstandighede kan 'n transaksie goedgekeur word wat jou kaartsaldo onder nul laat val. Die maksimum oortrekking is {maxOverdraft: string}. Jy moet die oortrekking binne 7 dae terugbetaal deur bykomende fondse na jou kaartsaldo oor te dra."
+        },
+        "foreignCurrency": {
+          "label": "Buitelandse geldeenheid",
+          "text": ". As jy 'n transaksie in 'n buitelandse geldeenheid doen, skakel die kaartnetwerk dit na USD om met sy eie omskakelingsprosedures. Die koers op die verwerkingsdatum kan verskil van die transaksiedatum."
+        },
+        "noHiddenFees": {
+          "label": "Geen verborge fooie nie",
+          "text": ". Daar is geen fooie vir rekeningopstelling, onaktiwiteit, saldo-navrae of om jou kaart te sluit nie."
+        }
+      },
+      "backButton": "Terug"
+    },
     "CardDetails": {
       "title": "Kaartbesonderhede",
       "cardNumber": "Kaartnommer",
