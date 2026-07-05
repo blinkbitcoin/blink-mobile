@@ -4,6 +4,7 @@ import { AppState } from "react-native"
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { type NormalizedTransaction } from "@app/types/transaction"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
@@ -77,6 +78,7 @@ export const useSdkLifecycle = (
   retryCount: number,
 ): SdkLifecycleState => {
   const network = useSparkNetwork()
+  const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [allTransactions, setAllTransactions] = useState<NormalizedTransaction[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
@@ -92,6 +94,12 @@ export const useSdkLifecycle = (
   const refreshingRef = useRef(false)
   const pendingRefreshRef = useRef(false)
   const rawTxOffsetRef = useRef(0)
+  /**
+   * The leeway only feeds the SDK config at connect time, so hold it in a ref:
+   * a remote-config change must not tear down and reconnect the live wallet.
+   */
+  const depositClaimLeewayRef = useRef(selfCustodialDepositClaimLeewayVbyte)
+  depositClaimLeewayRef.current = selfCustodialDepositClaimLeewayVbyte
   const { schedule: scheduleBackoffRetry, reset: resetBackoff } =
     useBackoffRetry(RECONNECT_BACKOFF_MS)
 
@@ -183,11 +191,12 @@ export const useSdkLifecycle = (
     const accountId = activeSelfCustodialAccountId
 
     const connectAndListen = async (mnemonic: string) => {
-      const connectedSdk = await initSdk(
+      const connectedSdk = await initSdk({
         mnemonic,
-        storageDirFor(accountId, network),
+        storageDir: storageDirFor(accountId, network),
         network,
-      )
+        leewaySatPerVbyte: depositClaimLeewayRef.current,
+      })
       if (abortRef.current || !mounted) {
         await teardownSdk(connectedSdk, null)
         return

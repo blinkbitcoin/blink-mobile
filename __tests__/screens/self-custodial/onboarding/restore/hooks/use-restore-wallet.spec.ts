@@ -36,7 +36,11 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
-  selfCustodialRestoreWallet: (...args: string[]) => mockRestore(...args),
+  selfCustodialRestoreWallet: (...args: unknown[]) => mockRestore(...args),
+}))
+
+jest.mock("@app/config/feature-flags-context", () => ({
+  useRemoteConfig: () => ({ selfCustodialDepositClaimLeewayVbyte: 5 }),
 }))
 
 jest.mock("@app/self-custodial/storage/account-index", () => ({
@@ -111,11 +115,12 @@ describe("useRestoreWallet", () => {
       await result.current.restore("word1 word2 word3")
     })
 
-    expect(mockRestore).toHaveBeenCalledWith(
-      TEST_ACCOUNT_ID,
-      "word1 word2 word3",
-      mockSparkNetwork.Regtest,
-    )
+    expect(mockRestore).toHaveBeenCalledWith({
+      accountId: TEST_ACCOUNT_ID,
+      mnemonic: "word1 word2 word3",
+      network: mockSparkNetwork.Regtest,
+      leewaySatPerVbyte: 5,
+    })
     expect(mockReloadSelfCustodialAccounts).toHaveBeenCalledTimes(1)
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)

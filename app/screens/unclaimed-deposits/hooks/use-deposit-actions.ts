@@ -95,7 +95,14 @@ export const useDepositActions = () => {
       }
       setActiveAction({ depositId: deposit.id, type: DepositActionType.Claim })
       try {
-        const result = await claimDeposit.claimDeposit({ depositId: deposit.id })
+        /**
+         * Override the auto-claim cap with the fee the SDK reported as required, so
+         * an explicit "Claim now" is not blocked by the same MaxDepositClaimFeeExceeded.
+         */
+        const result = await claimDeposit.claimDeposit({
+          depositId: deposit.id,
+          maxFeeSats: deposit.requiredFeeSats,
+        })
         if (result.status === PaymentResultStatus.Failed) {
           const message = resolveClaimErrorMessage(deposit, result.errors, LL)
           toastShow({ message, LL })

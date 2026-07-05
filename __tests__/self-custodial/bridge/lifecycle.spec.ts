@@ -41,6 +41,12 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   StableBalanceActiveLabel: {
     Set: jest.fn().mockImplementation((args: unknown) => ({ tag: "Set", inner: args })),
   },
+  MaxFee: {
+    NetworkRecommended: jest
+      .fn()
+      .mockImplementation((inner: unknown) => ({ tag: "NetworkRecommended", inner })),
+    Fixed: jest.fn().mockImplementation((inner: unknown) => ({ tag: "Fixed", inner })),
+  },
   connect: (...args: unknown[]) => mockConnect(...args),
   defaultConfig: (...args: unknown[]) => mockDefaultConfig(...args),
   initLogging: jest.fn(),
@@ -110,7 +116,12 @@ describe("initSdk", () => {
     const sdk = makeSdk()
     mockConnect.mockResolvedValue(sdk)
 
-    const result = await initSdk("word1 word2 word3", "/test/storage", Network.Regtest)
+    const result = await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
 
     expect(mockDefaultConfig).toHaveBeenCalledWith(Network.Regtest)
     expect(mockConnect).toHaveBeenCalledTimes(1)
@@ -126,11 +137,104 @@ describe("initSdk", () => {
     expect(result).toBe(sdk)
   })
 
+  it("caps the automatic deposit claim fee at the network-recommended rate plus leeway", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+
+    expect(mockConnect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({
+          maxDepositClaimFee: {
+            tag: "NetworkRecommended",
+            inner: { leewaySatPerVbyte: 1n },
+          },
+        }),
+      }),
+    )
+  })
+
+  it("uses the provided leeway for the deposit claim fee cap", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 3,
+    })
+
+    expect(mockConnect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({
+          maxDepositClaimFee: {
+            tag: "NetworkRecommended",
+            inner: { leewaySatPerVbyte: 3n },
+          },
+        }),
+      }),
+    )
+  })
+
+  it("truncates a fractional leeway so BigInt does not throw on it", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 2.9,
+    })
+
+    expect(mockConnect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({
+          maxDepositClaimFee: {
+            tag: "NetworkRecommended",
+            inner: { leewaySatPerVbyte: 2n },
+          },
+        }),
+      }),
+    )
+  })
+
+  it("clamps a negative leeway to zero", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: -5,
+    })
+
+    expect(mockConnect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({
+          maxDepositClaimFee: {
+            tag: "NetworkRecommended",
+            inner: { leewaySatPerVbyte: 0n },
+          },
+        }),
+      }),
+    )
+  })
+
   it("propagates connection errors from the SDK", async () => {
     mockConnect.mockRejectedValue(new Error("connect refused"))
 
     await expect(
-      initSdk("word1 word2 word3", "/test/storage", Network.Regtest),
+      initSdk({
+        mnemonic: "word1 word2 word3",
+        storageDir: "/test/storage",
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+      }),
     ).rejects.toThrow("connect refused")
   })
 })
@@ -220,33 +324,36 @@ describe("selfCustodialRestoreWallet", () => {
   })
 
   it("trims/normalises whitespace before validating the mnemonic", async () => {
-    await selfCustodialRestoreWallet(
-      "test-account",
-      "  alpha   beta  gamma  ",
-      Network.Regtest,
-    )
+    await selfCustodialRestoreWallet({
+      accountId: "test-account",
+      mnemonic: "  alpha   beta  gamma  ",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
   })
 
   it("normalises tabs and newlines before validating the mnemonic", async () => {
-    await selfCustodialRestoreWallet(
-      "test-account",
-      "\talpha\tbeta\ngamma\r\n",
-      Network.Regtest,
-    )
+    await selfCustodialRestoreWallet({
+      accountId: "test-account",
+      mnemonic: "\talpha\tbeta\ngamma\r\n",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
   })
 
   it("normalises mixed whitespace runs before validating the mnemonic", async () => {
-    await selfCustodialRestoreWallet(
-      "test-account",
-      "  alpha\t\tbeta \n gamma  ",
-      Network.Regtest,
-    )
+    await selfCustodialRestoreWallet({
+      accountId: "test-account",
+      mnemonic: "  alpha\t\tbeta \n gamma  ",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
     expect(mockSetMnemonic).toHaveBeenCalledWith("alpha beta gamma")
@@ -256,7 +363,12 @@ describe("selfCustodialRestoreWallet", () => {
     mockValidateMnemonic.mockReturnValueOnce(false)
 
     await expect(
-      selfCustodialRestoreWallet("test-account", "totally invalid", Network.Regtest),
+      selfCustodialRestoreWallet({
+        accountId: "test-account",
+        mnemonic: "totally invalid",
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+      }),
     ).rejects.toThrow("Invalid BIP39 mnemonic")
 
     expect(mockSetMnemonic).not.toHaveBeenCalled()
@@ -265,11 +377,12 @@ describe("selfCustodialRestoreWallet", () => {
   })
 
   it("stores the mnemonic and writes the active network label on success", async () => {
-    await selfCustodialRestoreWallet(
-      "test-account",
-      "provided mnemonic words",
-      Network.Regtest,
-    )
+    await selfCustodialRestoreWallet({
+      accountId: "test-account",
+      mnemonic: "provided mnemonic words",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
 
     expect(mockSetMnemonic).toHaveBeenCalledWith("provided mnemonic words")
     expect(mockSetMnemonicNetwork).toHaveBeenCalledTimes(1)
@@ -282,7 +395,12 @@ describe("selfCustodialRestoreWallet", () => {
     mockSetMnemonic.mockResolvedValueOnce(false)
 
     await expect(
-      selfCustodialRestoreWallet("test-account", "any words", Network.Regtest),
+      selfCustodialRestoreWallet({
+        accountId: "test-account",
+        mnemonic: "any words",
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+      }),
     ).rejects.toThrow("Failed to store mnemonic")
     expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
     expect(mockConnect).not.toHaveBeenCalled()
@@ -292,7 +410,12 @@ describe("selfCustodialRestoreWallet", () => {
     mockConnect.mockRejectedValueOnce(new Error("SDK init refused"))
 
     await expect(
-      selfCustodialRestoreWallet("test-account", "any valid words", Network.Regtest),
+      selfCustodialRestoreWallet({
+        accountId: "test-account",
+        mnemonic: "any valid words",
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+      }),
     ).rejects.toThrow("SDK init refused")
 
     expect(mockSetMnemonic).toHaveBeenCalledTimes(1)

@@ -5,6 +5,7 @@ import Crypto from "react-native-quick-crypto"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -43,6 +44,7 @@ export const useRestoreWallet = () => {
   const [status, setStatus] = useState<RestoreWalletStatus>(RestoreWalletStatus.Idle)
   const guard = useInFlightGuard()
   const network = useSparkNetwork()
+  const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
 
   const activateAccount = useCallback(
     (accountId: string) => {
@@ -79,7 +81,12 @@ export const useRestoreWallet = () => {
           }
 
           const accountId = Crypto.randomUUID()
-          await selfCustodialRestoreWallet(accountId, normalized, network)
+          await selfCustodialRestoreWallet({
+            accountId,
+            mnemonic: normalized,
+            network,
+            leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
+          })
           await markBackupCompletedFor(accountId, BackupMethod.Manual)
           await reloadSelfCustodialAccounts()
 
@@ -103,6 +110,7 @@ export const useRestoreWallet = () => {
       navigation,
       LL,
       network,
+      selfCustodialDepositClaimLeewayVbyte,
     ],
   )
 
