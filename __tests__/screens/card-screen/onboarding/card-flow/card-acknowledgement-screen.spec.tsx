@@ -14,31 +14,9 @@ jest.mock("react-native-linear-gradient", () => ({
   LinearGradient: "LinearGradient",
 }))
 
-jest.mock("@rn-vui/themed", () => {
-  const actual = jest.requireActual("@rn-vui/themed")
-  const { TouchableOpacity } = jest.requireActual("react-native")
-  return {
-    ...actual,
-    CheckBox: ({
-      checked,
-      onPress,
-      containerStyle,
-    }: {
-      checked: boolean
-      onPress: () => void
-      containerStyle: Record<string, number>
-      iconType: string
-      checkedIcon: string
-      uncheckedIcon: string
-    }) => (
-      <TouchableOpacity
-        testID={`checkbox-${checked ? "checked" : "unchecked"}`}
-        onPress={onPress}
-        style={containerStyle}
-      />
-    ),
-  }
-})
+jest.mock("@rn-vui/themed", () =>
+  jest.requireActual("../../../../helpers/card-flow-mocks").mockThemedWithCheckbox(),
+)
 
 const mockNavigate = jest.fn()
 
@@ -132,27 +110,30 @@ describe("CardAcknowledgementScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("keeps the button disabled when not all checkboxes are checked", async () => {
-    const { getByText, getAllByTestId } = render(
-      <ContextForScreen>
-        <CardAcknowledgementScreen />
-      </ContextForScreen>,
-    )
+  for (const skipIndex of [0, 1, 2, 3]) {
+    it(`keeps the button disabled when only checkbox ${skipIndex} is left unchecked`, async () => {
+      const { getByText, getAllByTestId } = render(
+        <ContextForScreen>
+          <CardAcknowledgementScreen />
+        </ContextForScreen>,
+      )
 
-    await act(async () => {})
+      await act(async () => {})
 
-    const unchecked = getAllByTestId("checkbox-unchecked")
-    await act(async () => {
-      fireEvent.press(unchecked[0])
+      const unchecked = getAllByTestId("checkbox-unchecked")
+      await act(async () => {
+        unchecked.forEach((checkbox, index) => {
+          if (index !== skipIndex) fireEvent.press(checkbox)
+        })
+      })
+
+      await act(async () => {
+        fireEvent.press(getByText("Accept"))
+      })
+
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
-
-    const button = getByText("Accept")
-    await act(async () => {
-      fireEvent.press(button)
-    })
-
-    expect(mockNavigate).not.toHaveBeenCalled()
-  })
+  }
 
   it("navigates to the processing screen when all checkboxes are checked", async () => {
     const { getByText, getAllByTestId } = render(

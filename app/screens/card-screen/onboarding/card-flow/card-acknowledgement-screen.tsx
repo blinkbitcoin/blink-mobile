@@ -2,39 +2,16 @@ import * as React from "react"
 import { ScrollView, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { CheckBox, makeStyles, Text, useTheme } from "@rn-vui/themed"
-import InAppBrowser from "react-native-inappbrowser-reborn"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { CheckboxRow } from "@app/components/card-screen/checkbox-row"
 import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-
-type CheckboxRowProps = {
-  checked: boolean
-  onPress: () => void
-  children: React.ReactNode
-}
-
-const CheckboxRow: React.FC<CheckboxRowProps> = ({ checked, onPress, children }) => {
-  const styles = useStyles()
-
-  return (
-    <View style={styles.checkboxRow}>
-      <CheckBox
-        checked={checked}
-        iconType="ionicon"
-        checkedIcon={"checkbox"}
-        uncheckedIcon={"square-outline"}
-        onPress={onPress}
-        containerStyle={styles.checkboxStyle}
-      />
-      <View style={styles.agreementTextContainer}>{children}</View>
-    </View>
-  )
-}
+import { openExternalUrl } from "@app/utils/external"
 
 export const CardAcknowledgementScreen: React.FC = () => {
   const styles = useStyles()
@@ -85,7 +62,7 @@ export const CardAcknowledgementScreen: React.FC = () => {
               {acknowledgementLL.eSignConsent.text()}{" "}
               <Text
                 style={styles.link}
-                onPress={() => InAppBrowser.open(cardESignConsentUrl)}
+                onPress={() => openExternalUrl(cardESignConsentUrl)}
               >
                 {acknowledgementLL.eSignConsent.linkText()}
               </Text>
@@ -100,14 +77,14 @@ export const CardAcknowledgementScreen: React.FC = () => {
               {acknowledgementLL.privacyAndTerms.text()}{" "}
               <Text
                 style={styles.link}
-                onPress={() => InAppBrowser.open(cardIssuerPrivacyPolicyUrl)}
+                onPress={() => openExternalUrl(cardIssuerPrivacyPolicyUrl)}
               >
                 {acknowledgementLL.privacyAndTerms.privacyPolicyLinkText()}
               </Text>
               {acknowledgementLL.privacyAndTerms.and()}{" "}
               <Text
                 style={styles.link}
-                onPress={() => InAppBrowser.open(cardCardholderAgreementUrl)}
+                onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
               >
                 {acknowledgementLL.privacyAndTerms.cardTermsLinkText()}
               </Text>
@@ -156,19 +133,6 @@ const useStyles = makeStyles(({ colors }) => ({
   checkboxesContainer: {
     marginTop: 40,
     gap: 18,
-  },
-  checkboxRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-  },
-  checkboxStyle: {
-    padding: 0,
-    margin: 0,
-    marginRight: 15,
-    marginLeft: 0,
-  },
-  agreementTextContainer: {
-    flex: 1,
   },
   agreementText: {
     color: colors.black,

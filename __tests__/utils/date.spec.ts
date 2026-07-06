@@ -314,6 +314,18 @@ describe("date utils", () => {
     it("returns ISO format", () => {
       expect(formatDateFromNow({ years: 5, format: "iso" })).toBe("2031-03-12")
     })
+
+    it("advances by months without truncating to whole years", () => {
+      expect(formatDateFromNow({ months: 6, locale: "en-US" })).toBe("Sep 12, 2026")
+    })
+
+    it("treats 12 months the same as one year", () => {
+      expect(formatDateFromNow({ months: 12, locale: "en-US" })).toBe("Mar 12, 2027")
+    })
+
+    it("rolls months over into the following year", () => {
+      expect(formatDateFromNow({ months: 18, locale: "en-US" })).toBe("Sep 12, 2027")
+    })
   })
 
   describe("formatDuration", () => {

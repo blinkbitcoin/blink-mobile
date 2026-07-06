@@ -2,10 +2,10 @@ import * as React from "react"
 import { View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { CheckBox, makeStyles, Text } from "@rn-vui/themed"
-import InAppBrowser from "react-native-inappbrowser-reborn"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { CheckboxRow } from "@app/components/card-screen/checkbox-row"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useKycFlow } from "@app/hooks"
@@ -14,6 +14,7 @@ import { KycFlowType, WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatDateFromNow } from "@app/utils/date"
+import { openExternalUrl } from "@app/utils/external"
 
 const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen"
 const SUBSCRIPTION_RENEWAL_MONTHS = 12
@@ -49,7 +50,7 @@ export const CardSubscriptionScreen: React.FC = () => {
   )
 
   const renewalDate = React.useMemo(
-    () => formatDateFromNow({ years: SUBSCRIPTION_RENEWAL_MONTHS / 12, locale }),
+    () => formatDateFromNow({ months: SUBSCRIPTION_RENEWAL_MONTHS, locale }),
     [locale],
   )
 
@@ -57,7 +58,7 @@ export const CardSubscriptionScreen: React.FC = () => {
   const [isRenew, setIsRenew] = React.useState(false)
   const [isFeeScheduleAgreed, setIsFeeScheduleAgreed] = React.useState(false)
 
-  const isSubscribeReady = isRenew && isFeeScheduleAgreed
+  const isSubscribeReady = isRenew && isFeeScheduleAgreed && isAgreed
   const isAcceptDisabled = isSubscribeVariant ? !isSubscribeReady : !isAgreed
 
   const statusLabel = isSubscribeVariant
@@ -114,36 +115,21 @@ export const CardSubscriptionScreen: React.FC = () => {
           </View>
         </View>
 
-        {isSubscribeVariant ? (
-          <>
-            <View style={styles.checkboxContainer}>
-              <CheckBox
-                checked={isRenew}
-                iconType="ionicon"
-                checkedIcon={"checkbox"}
-                uncheckedIcon={"square-outline"}
-                onPress={() => setIsRenew(!isRenew)}
-                containerStyle={styles.checkboxStyle}
-              />
-              <View style={styles.agreementTextContainer}>
+        <View style={styles.checkboxesContainer}>
+          {isSubscribeVariant && (
+            <>
+              <CheckboxRow checked={isRenew} onPress={() => setIsRenew(!isRenew)}>
                 <Text type="p3" style={styles.agreementText}>
                   {LL.CardFlow.Onboarding.CardSubscription.renew({
                     months: SUBSCRIPTION_RENEWAL_MONTHS,
                   })}
                 </Text>
-              </View>
-            </View>
+              </CheckboxRow>
 
-            <View style={styles.checkboxContainer}>
-              <CheckBox
+              <CheckboxRow
                 checked={isFeeScheduleAgreed}
-                iconType="ionicon"
-                checkedIcon={"checkbox"}
-                uncheckedIcon={"square-outline"}
                 onPress={() => setIsFeeScheduleAgreed(!isFeeScheduleAgreed)}
-                containerStyle={styles.checkboxStyle}
-              />
-              <View style={styles.agreementTextContainer}>
+              >
                 <Text type="p3" style={styles.agreementText}>
                   {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.text()}{" "}
                   <Text
@@ -154,46 +140,36 @@ export const CardSubscriptionScreen: React.FC = () => {
                     {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.linkText()}
                   </Text>
                 </Text>
-              </View>
-            </View>
-          </>
-        ) : (
-          <View style={styles.checkboxContainer}>
-            <CheckBox
-              checked={isAgreed}
-              iconType="ionicon"
-              checkedIcon={"checkbox"}
-              uncheckedIcon={"square-outline"}
-              onPress={() => setIsAgreed(!isAgreed)}
-              containerStyle={styles.checkboxStyle}
-            />
-            <View style={styles.agreementTextContainer}>
-              <Text type="p3" style={styles.agreementText}>
-                {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
-                <Text
-                  style={styles.link}
-                  onPress={() => InAppBrowser.open(cardTermsAndConditionsUrl)}
-                >
-                  {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
-                </Text>
-                ,{" "}
-                <Text
-                  style={styles.link}
-                  onPress={() => InAppBrowser.open(cardPrivacyPolicyUrl)}
-                >
-                  {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
-                </Text>
-                , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
-                <Text
-                  style={styles.link}
-                  onPress={() => InAppBrowser.open(cardCardholderAgreementUrl)}
-                >
-                  {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
-                </Text>
+              </CheckboxRow>
+            </>
+          )}
+
+          <CheckboxRow checked={isAgreed} onPress={() => setIsAgreed(!isAgreed)}>
+            <Text type="p3" style={styles.agreementText}>
+              {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
+              <Text
+                style={styles.link}
+                onPress={() => openExternalUrl(cardTermsAndConditionsUrl)}
+              >
+                {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
               </Text>
-            </View>
-          </View>
-        )}
+              ,{" "}
+              <Text
+                style={styles.link}
+                onPress={() => openExternalUrl(cardPrivacyPolicyUrl)}
+              >
+                {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
+              </Text>
+              , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
+              <Text
+                style={styles.link}
+                onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
+              >
+                {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
+              </Text>
+            </Text>
+          </CheckboxRow>
+        </View>
       </View>
 
       <View style={styles.buttonsContainer}>
@@ -268,19 +244,9 @@ const useStyles = makeStyles(({ colors }) => ({
     fontWeight: "700",
     lineHeight: 20,
   },
-  checkboxContainer: {
+  checkboxesContainer: {
     marginTop: 17,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  checkboxStyle: {
-    padding: 0,
-    margin: 0,
-    marginRight: 15,
-    marginLeft: 0,
-  },
-  agreementTextContainer: {
-    flex: 1,
+    gap: 17,
   },
   agreementText: {
     color: colors.black,

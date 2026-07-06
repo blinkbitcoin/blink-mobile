@@ -58,6 +58,8 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
+import { isCardUsable } from "@app/screens/card-screen/utils/card-display"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
@@ -287,6 +289,18 @@ export const HomeScreen: React.FC = () => {
         walletCurrency: w.walletCurrency,
       }))
     : dataAuthed?.me?.defaultAccount?.wallets
+
+  /**
+   * TODO(card): `cards` on ConsumerAccount only exists on the staging backend
+   * today, so gate the home card row to staging until the card service ships to
+   * every instance; then drop `isCardBackendAvailable` and query unconditionally.
+   * Ref PR #3899.
+   */
+  const isCardBackendAvailable = galoyInstanceId === "Staging"
+  const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
+  const hasCard = homeCard !== undefined && isCardUsable(homeCard.status)
+  const cardLastFour = homeCard?.lastFour
+
   const {
     formattedBalance: defaultFormattedBalance,
     satsBalance,
@@ -663,6 +677,8 @@ export const HomeScreen: React.FC = () => {
           setIsStablesatModalVisible={setIsStablesatModalVisible}
           onRestrictedTap={() => setIsRestrictionModalVisible(true)}
           wallets={wallets}
+          hasCard={hasCard}
+          cardLastFour={cardLastFour}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
         />

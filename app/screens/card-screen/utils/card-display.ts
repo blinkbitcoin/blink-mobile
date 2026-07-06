@@ -3,6 +3,9 @@ import { CardTransactionUiStatus } from "@app/components/card-screen/types"
 
 export const isCardFrozen = (status: CardStatus): boolean => status === CardStatus.Locked
 
+export const isCardUsable = (status: CardStatus): boolean =>
+  status === CardStatus.Active || status === CardStatus.Locked
+
 export const formatCardType = (
   cardType: CardType,
   LL: { cardTypeVirtual: () => string; cardTypePhysical: () => string },

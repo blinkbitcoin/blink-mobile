@@ -22,11 +22,9 @@ const SuccessIconDurationKey = "successIconDuration"
 const CardTermsAndConditionsUrlKey = "cardTermsAndConditionsUrl"
 const CardPrivacyPolicyUrlKey = "cardPrivacyPolicyUrl"
 const CardCardholderAgreementUrlKey = "cardCardholderAgreementUrl"
-const CardFeeScheduleUrlKey = "cardFeeScheduleUrl"
 const CardESignConsentUrlKey = "cardESignConsentUrl"
 const CardIssuerPrivacyPolicyUrlKey = "cardIssuerPrivacyPolicyUrl"
 const CardSubscriptionPriceUsdKey = "cardSubscriptionPriceUsd"
-const CardProcessingWaitTimeHoursKey = "cardProcessingWaitTimeHours"
 const CardReplacementFeeUsdKey = "cardReplacementFeeUsd"
 const CardUsdTransactionFeePercentKey = "cardUsdTransactionFeePercent"
 const CardForeignTransactionFeePercentKey = "cardForeignTransactionFeePercent"
@@ -79,11 +77,9 @@ type RemoteConfig = {
   [CardTermsAndConditionsUrlKey]: string
   [CardPrivacyPolicyUrlKey]: string
   [CardCardholderAgreementUrlKey]: string
-  [CardFeeScheduleUrlKey]: string
   [CardESignConsentUrlKey]: string
   [CardIssuerPrivacyPolicyUrlKey]: string
   [CardSubscriptionPriceUsdKey]: number
-  [CardProcessingWaitTimeHoursKey]: number
   [CardReplacementFeeUsdKey]: number
   [CardUsdTransactionFeePercentKey]: number
   [CardForeignTransactionFeePercentKey]: number
@@ -158,12 +154,10 @@ export const defaultRemoteConfig: RemoteConfig = {
   cardTermsAndConditionsUrl: "https://www.blink.sv/en/terms-conditions",
   cardPrivacyPolicyUrl: "https://www.blink.sv/en/privacy-policy",
   cardCardholderAgreementUrl: "https://www.blink.sv/en/blink-card-cardholder-agreement",
-  cardFeeScheduleUrl: "https://www.blink.sv/en/blink-card-cardholder-agreement",
   cardESignConsentUrl:
     "https://legal.raincards.xyz/legal/electronic-communications-notice",
   cardIssuerPrivacyPolicyUrl: "https://www.third-national.com/privacypolicy",
   cardSubscriptionPriceUsd: 1000,
-  cardProcessingWaitTimeHours: 24,
   cardReplacementFeeUsd: 10,
   cardUsdTransactionFeePercent: 1.21,
   cardForeignTransactionFeePercent: 2.21,
@@ -290,10 +284,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(CardCardholderAgreementUrlKey)
           .asString()
 
-        const cardFeeScheduleUrl = remoteConfigInstance()
-          .getValue(CardFeeScheduleUrlKey)
-          .asString()
-
         const cardESignConsentUrl = remoteConfigInstance()
           .getValue(CardESignConsentUrlKey)
           .asString()
@@ -304,10 +294,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
 
         const cardSubscriptionPriceUsd = remoteConfigInstance()
           .getValue(CardSubscriptionPriceUsdKey)
-          .asNumber()
-
-        const cardProcessingWaitTimeHours = remoteConfigInstance()
-          .getValue(CardProcessingWaitTimeHoursKey)
           .asNumber()
 
         const cardReplacementFeeUsd = remoteConfigInstance()
@@ -430,11 +416,9 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           cardTermsAndConditionsUrl,
           cardPrivacyPolicyUrl,
           cardCardholderAgreementUrl,
-          cardFeeScheduleUrl,
           cardESignConsentUrl,
           cardIssuerPrivacyPolicyUrl,
           cardSubscriptionPriceUsd,
-          cardProcessingWaitTimeHours,
           cardReplacementFeeUsd,
           cardUsdTransactionFeePercent,
           cardForeignTransactionFeePercent,

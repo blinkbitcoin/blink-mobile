@@ -2,9 +2,15 @@ import React from "react"
 import { render, fireEvent } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import InAppBrowser from "react-native-inappbrowser-reborn"
+
 import { CardFeeScheduleScreen } from "@app/screens/card-screen/card-fee-schedule-screen"
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
+
+jest.mock("react-native-inappbrowser-reborn", () => ({
+  open: jest.fn(),
+}))
 
 const mockGoBack = jest.fn()
 jest.mock("@react-navigation/native", () => {
@@ -25,6 +31,7 @@ jest.mock("@app/config/feature-flags-context", () => ({
     cardForeignTransactionFeePercent: 2.21,
     cardMaxOverdraftUsd: 200,
     cardLateRepaymentFeeUsd: 25,
+    cardCardholderAgreementUrl: "https://example.com/cardholder",
   }),
 }))
 
@@ -107,6 +114,21 @@ describe("CardFeeScheduleScreen", () => {
 
     expect(getByText("BTC Conversion")).toBeTruthy()
     expect(getByText("Cardholder Agreement")).toBeTruthy()
+  })
+
+  it("opens the cardholder agreement when the notice link is pressed", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <CardFeeScheduleScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByText("Cardholder Agreement"))
+    await flushEffects()
+
+    expect(InAppBrowser.open).toHaveBeenCalledWith("https://example.com/cardholder")
   })
 
   it("shows the additional fee details expanded by default", async () => {

@@ -3,7 +3,7 @@ import { render, fireEvent } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import WalletOverview from "@app/components/wallet-overview/wallet-overview"
-import { CardStatus, CardType, WalletCurrency } from "@app/graphql/generated"
+import { WalletCurrency } from "@app/graphql/generated"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { WalletBalance } from "@app/graphql/wallets-utils"
@@ -21,11 +21,6 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
-const mockUseCardData = jest.fn()
-jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
-  useCardData: () => mockUseCardData(),
-}))
-
 const mockIsRestricted = jest.fn()
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockIsRestricted(),
@@ -41,18 +36,6 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
-const activeCard = {
-  __typename: "Card",
-  id: "card-1",
-  lastFour: "4242",
-  cardType: CardType.Virtual,
-  status: CardStatus.Active,
-  createdAt: "2026-01-01T00:00:00.000Z",
-  dailyLimitCents: 0,
-  monthlyLimitCents: 0,
-}
-const frozenCard = { ...activeCard, status: CardStatus.Locked }
-
 const walletsFixture: readonly WalletBalance[] = [
   { id: "btc-id", walletCurrency: WalletCurrency.Btc, balance: 174726 },
   { id: "usd-id", walletCurrency: WalletCurrency.Usd, balance: 6942 },
@@ -67,6 +50,8 @@ type RenderOptions = {
   switchMemoryHideAmount?: () => void
   isAuthed?: boolean
   onRestrictedTap?: () => void
+  hasCard?: boolean
+  cardLastFour?: string | null
 }
 
 const renderOverview = ({
@@ -76,6 +61,8 @@ const renderOverview = ({
   switchMemoryHideAmount = jest.fn(),
   isAuthed = true,
   onRestrictedTap,
+  hasCard = false,
+  cardLastFour,
 }: RenderOptions = {}) =>
   render(
     <ContextForScreen>
@@ -86,6 +73,8 @@ const renderOverview = ({
             wallets={wallets}
             setIsStablesatModalVisible={mockSetStablesatModalVisible}
             onRestrictedTap={onRestrictedTap}
+            hasCard={hasCard}
+            cardLastFour={cardLastFour}
           />
         </HideAmountContextProvider>
       </IsAuthedContextProvider>
@@ -96,43 +85,41 @@ describe("WalletOverview", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
-    mockUseCardData.mockReturnValue({ card: undefined })
     mockIsRestricted.mockReturnValue(false)
     mockDisplayCurrency.mockReturnValue("USD")
   })
 
   describe("Card row", () => {
-    it("shows the Card row when the account has a card", async () => {
-      mockUseCardData.mockReturnValue({ card: activeCard })
-
-      const { getByText } = renderOverview()
+    it("shows the Card row with the masked last four when hasCard is true", async () => {
+      const { getByText } = renderOverview({ hasCard: true, cardLastFour: "4242" })
       await flushEffects()
 
       expect(getByText("Card")).toBeTruthy()
+      expect(getByText("•••• 4242")).toBeTruthy()
     })
 
-    it("hides the Card row when the account has no card", async () => {
-      mockUseCardData.mockReturnValue({ card: undefined })
-
-      const { queryByText } = renderOverview()
+    it("hides the Card row when hasCard is false", async () => {
+      const { queryByText } = renderOverview({ hasCard: false })
       await flushEffects()
 
       expect(queryByText("Card")).toBeNull()
     })
 
-    it("shows the Card row for a frozen card", async () => {
-      mockUseCardData.mockReturnValue({ card: frozenCard })
-
-      const { getByText } = renderOverview()
+    it("hides the card last four when hide amount is enabled", async () => {
+      const { getByText, queryByText } = renderOverview({
+        hasCard: true,
+        cardLastFour: "4242",
+        hideAmount: true,
+      })
       await flushEffects()
 
       expect(getByText("Card")).toBeTruthy()
+      expect(queryByText("•••• 4242")).toBeNull()
+      expect(getByText("••••")).toBeTruthy()
     })
 
     it("navigates to the card dashboard when the Card row is pressed", async () => {
-      mockUseCardData.mockReturnValue({ card: activeCard })
-
-      const { getByText } = renderOverview()
+      const { getByText } = renderOverview({ hasCard: true, cardLastFour: "4242" })
       await flushEffects()
 
       fireEvent.press(getByText("Card"))

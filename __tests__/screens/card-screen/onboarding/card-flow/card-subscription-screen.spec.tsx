@@ -14,31 +14,9 @@ jest.mock("react-native-linear-gradient", () => ({
   LinearGradient: "LinearGradient",
 }))
 
-jest.mock("@rn-vui/themed", () => {
-  const actual = jest.requireActual("@rn-vui/themed")
-  const { TouchableOpacity } = jest.requireActual("react-native")
-  return {
-    ...actual,
-    CheckBox: ({
-      checked,
-      onPress,
-      containerStyle,
-    }: {
-      checked: boolean
-      onPress: () => void
-      containerStyle: Record<string, number>
-      iconType: string
-      checkedIcon: string
-      uncheckedIcon: string
-    }) => (
-      <TouchableOpacity
-        testID={`checkbox-${checked ? "checked" : "unchecked"}`}
-        onPress={onPress}
-        style={containerStyle}
-      />
-    ),
-  }
-})
+jest.mock("@rn-vui/themed", () =>
+  jest.requireActual("../../../../helpers/card-flow-mocks").mockThemedWithCheckbox(),
+)
 
 const mockNavigate = jest.fn()
 const mockUseRoute = jest.fn()
@@ -75,7 +53,6 @@ jest.mock("@app/config/feature-flags-context", () => ({
     cardTermsAndConditionsUrl: "https://example.com/terms",
     cardPrivacyPolicyUrl: "https://example.com/privacy",
     cardCardholderAgreementUrl: "https://example.com/cardholder",
-    cardFeeScheduleUrl: "https://example.com/fee-schedule",
     cardSubscriptionPriceUsd: 1000,
   }),
 }))
@@ -97,6 +74,9 @@ beforeEach(() => {
 afterEach(() => {
   consoleLogSpy.mockRestore()
 })
+
+const RENEW_CHECKBOX_INDEX = 0
+const FEE_SCHEDULE_CHECKBOX_INDEX = 1
 
 describe("CardSubscriptionScreen - subscribe variant", () => {
   beforeEach(() => {
@@ -235,7 +215,7 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
     expect(mockStartKyc).not.toHaveBeenCalled()
   })
 
-  it("button is enabled when both checkboxes are checked", async () => {
+  it("keeps the button disabled when only the fee schedule checkbox is checked", async () => {
     const { getByText, getAllByTestId } = render(
       <ContextForScreen>
         <CardSubscriptionScreen />
@@ -244,20 +224,18 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
 
     await act(async () => {})
 
-    const uncheckedBoxes = getAllByTestId("checkbox-unchecked")
-
     await act(async () => {
-      fireEvent.press(uncheckedBoxes[0])
+      fireEvent.press(getAllByTestId("checkbox-unchecked")[FEE_SCHEDULE_CHECKBOX_INDEX])
     })
 
     await act(async () => {
-      fireEvent.press(uncheckedBoxes[1])
+      fireEvent.press(getByText("Accept"))
     })
 
-    expect(getByText("Accept")).toBeTruthy()
+    expect(mockStartKyc).not.toHaveBeenCalled()
   })
 
-  it("calls startKyc when accept pressed with both checkboxes checked", async () => {
+  it("keeps the button disabled when the terms are not accepted", async () => {
     const { getByText, getAllByTestId } = render(
       <ContextForScreen>
         <CardSubscriptionScreen />
@@ -267,18 +245,34 @@ describe("CardSubscriptionScreen - subscribe variant", () => {
     await act(async () => {})
 
     const uncheckedBoxes = getAllByTestId("checkbox-unchecked")
-
     await act(async () => {
-      fireEvent.press(uncheckedBoxes[0])
+      fireEvent.press(uncheckedBoxes[RENEW_CHECKBOX_INDEX])
+      fireEvent.press(uncheckedBoxes[FEE_SCHEDULE_CHECKBOX_INDEX])
     })
 
     await act(async () => {
-      fireEvent.press(uncheckedBoxes[1])
+      fireEvent.press(getByText("Accept"))
     })
 
-    const button = getByText("Accept")
+    expect(mockStartKyc).not.toHaveBeenCalled()
+  })
+
+  it("calls startKyc when renew, fee schedule, and terms are all accepted", async () => {
+    const { getByText, getAllByTestId } = render(
+      <ContextForScreen>
+        <CardSubscriptionScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    const uncheckedBoxes = getAllByTestId("checkbox-unchecked")
     await act(async () => {
-      fireEvent.press(button)
+      uncheckedBoxes.forEach((checkbox) => fireEvent.press(checkbox))
+    })
+
+    await act(async () => {
+      fireEvent.press(getByText("Accept"))
     })
 
     expect(mockStartKyc).toHaveBeenCalled()

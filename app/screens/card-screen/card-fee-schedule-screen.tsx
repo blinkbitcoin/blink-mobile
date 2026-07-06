@@ -12,6 +12,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { openExternalUrl } from "@app/utils/external"
 
 type Fee = {
   title: string
@@ -69,6 +70,7 @@ export const CardFeeScheduleScreen: React.FC = () => {
     cardForeignTransactionFeePercent,
     cardMaxOverdraftUsd,
     cardLateRepaymentFeeUsd,
+    cardCardholderAgreementUrl,
   } = useRemoteConfig()
 
   const formatUsd = (amountInMajorUnits: number) =>
@@ -139,7 +141,13 @@ export const CardFeeScheduleScreen: React.FC = () => {
         <View style={styles.infoBox}>
           <Text style={styles.infoText}>
             {feesUpdateNotice.text()}{" "}
-            <Text style={styles.infoLink}>{feesUpdateNotice.linkText()}</Text>.
+            <Text
+              style={styles.infoLink}
+              onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
+            >
+              {feesUpdateNotice.linkText()}
+            </Text>
+            .
           </Text>
         </View>
 
