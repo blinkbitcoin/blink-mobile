@@ -3550,11 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "حان وقت الترقية",
-    "migrationRequiredBody": "حان الوقت لترحيل حسابك الحافظ إلى حساب غير حافظ. هذا مطلوب لأسباب تنظيمية. وأيضًا، إنه أفضل لك!",
+    "migrationRequiredBody": "حان الوقت لترحيل حسابك الحافظ إلى حساب غير حافظ.",
     "bitcoinBalance": "رصيد البيتكوين",
     "dollarBalance": "رصيد الدولار",
     "migrationRequiredSmallBalanceWarning": "رصيد الدولار لديك صغير جدًا بحيث لا يمكن إرساله، وسنرسل لك بيتكوين بدلًا من ذلك",
-    "migrateNow": "رحّل الآن",
     "moveToNonCustodial": "الانتقال إلى غير حفظي",
     "explainerTitle": "ماذا يعني الانتقال إلى غير حفظي؟",
     "explainerCheck1": "ستقوم بإنشاء حساب غير حفظي على بروتوكول Spark",

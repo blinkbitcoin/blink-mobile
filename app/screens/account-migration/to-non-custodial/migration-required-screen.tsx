@@ -78,7 +78,7 @@ export const MigrationRequiredScreen: React.FC = () => {
 
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
-            title={LL.AccountMigration.migrateNow()}
+            title={LL.common.continue()}
             onPress={handleMigrate}
             {...testProps("migration-required-cta")}
           />

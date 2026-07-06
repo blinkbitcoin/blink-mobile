@@ -125,11 +125,11 @@ describe("MigrationRequiredScreen", () => {
     ).toBeNull()
   })
 
-  it("sends the user into the migration flow when Migrate now is pressed", async () => {
+  it("sends the user into the migration flow when Continue is pressed", async () => {
     renderScreen()
     await flushEffects()
 
-    fireEvent.press(screen.getByText(LL.AccountMigration.migrateNow()))
+    fireEvent.press(screen.getByText(LL.common.continue()))
 
     expect(mockNavigate).toHaveBeenCalledWith(MIGRATION_ROUTE)
   })

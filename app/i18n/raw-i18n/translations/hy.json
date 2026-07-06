@@ -3554,7 +3554,6 @@
     "bitcoinBalance": "Bitcoin-ի մնացորդ",
     "dollarBalance": "Դոլարի մնացորդ",
     "migrationRequiredSmallBalanceWarning": "Ձեր դոլարի մնացորդը չափազանց փոքր է ուղարկելու համար, փոխարենը մենք ձեզ bitcoin կուղարկենք",
-    "migrateNow": "Տեղափոխել հիմա",
     "moveToNonCustodial": "Տեղափոխվել ոչ պահառուի",
     "explainerTitle": "Ի՞նչ է նշանակում տեղափոխվել ոչ պահառուի:",
     "explainerCheck1": "Դուք կստեղծեք ոչ պահառու հաշիվ Spark արձանագրության վրա",

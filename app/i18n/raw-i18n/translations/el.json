@@ -3550,11 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Ώρα για αναβάθμιση",
-    "migrationRequiredBody": "Ήρθε η ώρα να μεταφέρετε τον λογαριασμό φύλαξής σας σε έναν λογαριασμό μη φύλαξης. Απαιτείται για κανονιστικούς λόγους. Αλλά και είναι καλύτερο για εσάς!",
+    "migrationRequiredBody": "Ήρθε η ώρα να μεταφέρετε τον λογαριασμό φύλαξής σας σε έναν λογαριασμό μη φύλαξης.",
     "bitcoinBalance": "Υπόλοιπο Bitcoin",
     "dollarBalance": "Υπόλοιπο σε δολάρια",
     "migrationRequiredSmallBalanceWarning": "Το υπόλοιπό σας σε δολάρια είναι πολύ μικρό για να σταλεί, θα σας στείλουμε bitcoin αντ' αυτού",
-    "migrateNow": "Μετεγκατάσταση τώρα",
     "moveToNonCustodial": "Μετάβαση σε non-custodial",
     "explainerTitle": "Τι σημαίνει η μετάβαση σε non-custodial;",
     "explainerCheck1": "Θα δημιουργήσετε έναν non-custodial λογαριασμό στο πρωτόκολλο Spark",

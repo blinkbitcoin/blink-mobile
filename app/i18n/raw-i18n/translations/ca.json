@@ -3550,11 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Hora d'actualitzar",
-    "migrationRequiredBody": "És hora de migrar el teu compte custodial a un compte no custodi. És obligatori per motius reguladors. A més, és millor per a tu!",
+    "migrationRequiredBody": "És hora de migrar el teu compte custodial a un compte no custodi.",
     "bitcoinBalance": "Saldo de Bitcoin",
     "dollarBalance": "Saldo en dòlars",
     "migrationRequiredSmallBalanceWarning": "El teu saldo en dòlars és massa petit per enviar-lo; en lloc d'això t'enviarem bitcoin",
-    "migrateNow": "Migra ara",
     "moveToNonCustodial": "Passa a no custodial",
     "explainerTitle": "Què significa passar a no custodial?",
     "explainerCheck1": "Crearàs un compte no custodial al protocol Spark",

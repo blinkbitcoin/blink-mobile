@@ -3550,11 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Yükseltme zamanı",
-    "migrationRequiredBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi. Düzenleyici nedenlerle zorunludur. Ama ayrıca, sizin için daha iyidir!",
+    "migrationRequiredBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi.",
     "bitcoinBalance": "Bitcoin bakiyesi",
     "dollarBalance": "Dolar bakiyesi",
     "migrationRequiredSmallBalanceWarning": "Dolar bakiyeniz gönderilemeyecek kadar küçük, bunun yerine size bitcoin göndereceğiz",
-    "migrateNow": "Şimdi taşı",
     "moveToNonCustodial": "Non-custodial'a geç",
     "explainerTitle": "Non-custodial'a geçmek ne anlama gelir?",
     "explainerCheck1": "Spark protokolünde bir non-custodial hesap oluşturacaksınız",

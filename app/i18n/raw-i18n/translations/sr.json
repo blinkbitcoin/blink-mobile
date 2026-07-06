@@ -3550,11 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Време је за надоградњу",
-    "migrationRequiredBody": "Време је да мигрирате свој кастодијални налог на не-кастодијални налог. То је обавезно из регулаторних разлога. Али такође, боље је за вас!",
+    "migrationRequiredBody": "Време је да мигрирате свој кастодијални налог на не-кастодијални налог.",
     "bitcoinBalance": "Стање Bitcoin-а",
     "dollarBalance": "Стање у доларима",
     "migrationRequiredSmallBalanceWarning": "Ваше стање у доларима премало је за слање, уместо тога ћемо вам послати bitcoin",
-    "migrateNow": "Мигрирај сада",
     "moveToNonCustodial": "Пребаци на non-custodial",
     "explainerTitle": "Шта значи пребацити на non-custodial?",
     "explainerCheck1": "Креираћете non-custodial налог на Spark протоколу",

@@ -3550,11 +3550,10 @@
     },
     "AccountMigration": {
         "migrationRequiredTitle": "È ora di aggiornare",
-        "migrationRequiredBody": "È ora di migrare il tuo account custodiale verso un account non custodiale. È obbligatorio per motivi normativi. Ma è anche meglio per te!",
+        "migrationRequiredBody": "È ora di migrare il tuo account custodiale verso un account non custodiale.",
         "bitcoinBalance": "Saldo Bitcoin",
         "dollarBalance": "Saldo in dollari",
         "migrationRequiredSmallBalanceWarning": "Il tuo saldo in dollari è troppo piccolo per essere inviato, ti invieremo bitcoin al suo posto",
-        "migrateNow": "Migra ora",
         "moveToNonCustodial": "Passa a non-custodial",
         "explainerTitle": "Cosa significa passare a non-custodial?",
         "explainerCheck1": "Creerai un account non-custodial sul protocollo Spark",

@@ -3550,11 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Wakati wa kuboresha",
-    "migrationRequiredBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini. Inahitajika kwa sababu za udhibiti. Lakini pia, ni bora kwako!",
+    "migrationRequiredBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini.",
     "bitcoinBalance": "Salio la Bitcoin",
     "dollarBalance": "Salio la dola",
     "migrationRequiredSmallBalanceWarning": "Salio lako la dola ni dogo mno kutumwa, badala yake tutakutumia bitcoin",
-    "migrateNow": "Hamisha sasa",
     "moveToNonCustodial": "Hamia kwa non-custodial",
     "explainerTitle": "Inamaanisha nini kuhamia kwa non-custodial?",
     "explainerCheck1": "Utaunda akaunti ya non-custodial kwenye itifaki ya Spark",

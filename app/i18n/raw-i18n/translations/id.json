@@ -3550,11 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Saatnya memutakhirkan",
-    "migrationRequiredBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial. Ini diwajibkan karena alasan regulasi. Tapi juga, ini lebih baik untuk Anda!",
+    "migrationRequiredBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial.",
     "bitcoinBalance": "Saldo Bitcoin",
     "dollarBalance": "Saldo dolar",
     "migrationRequiredSmallBalanceWarning": "Saldo dolar Anda terlalu kecil untuk dikirim, kami akan mengirimkan bitcoin sebagai gantinya",
-    "migrateNow": "Migrasikan sekarang",
     "moveToNonCustodial": "Pindah ke non-custodial",
     "explainerTitle": "Apa artinya pindah ke non-custodial?",
     "explainerCheck1": "Anda akan membuat akun non-custodial di protokol Spark",

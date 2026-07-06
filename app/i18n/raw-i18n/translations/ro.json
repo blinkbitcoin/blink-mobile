@@ -3550,11 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "E timpul pentru un upgrade",
-    "migrationRequiredBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial. Este obligatoriu din motive de reglementare. Dar, în plus, este mai bine pentru tine!",
+    "migrationRequiredBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial.",
     "bitcoinBalance": "Sold Bitcoin",
     "dollarBalance": "Sold în dolari",
     "migrationRequiredSmallBalanceWarning": "Soldul tău în dolari este prea mic pentru a fi trimis, îți vom trimite bitcoin în schimb",
-    "migrateNow": "Migrează acum",
     "moveToNonCustodial": "Treci la non-custodial",
     "explainerTitle": "Ce înseamnă să treci la non-custodial?",
     "explainerCheck1": "Vei crea un cont non-custodial pe protocolul Spark",

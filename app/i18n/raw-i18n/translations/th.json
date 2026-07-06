@@ -3554,7 +3554,6 @@
     "bitcoinBalance": "ยอดคงเหลือ Bitcoin",
     "dollarBalance": "ยอดคงเหลือดอลลาร์",
     "migrationRequiredSmallBalanceWarning": "ยอดคงเหลือดอลลาร์ของคุณน้อยเกินไปที่จะส่ง เราจะส่ง bitcoin ให้คุณแทน",
-    "migrateNow": "ย้ายตอนนี้",
     "moveToNonCustodial": "ย้ายไปแบบ non-custodial",
     "explainerTitle": "การย้ายไปแบบ non-custodial หมายความว่าอย่างไร?",
     "explainerCheck1": "คุณจะสร้างบัญชีแบบ non-custodial บนโปรโตคอล Spark",

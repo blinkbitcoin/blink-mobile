@@ -3550,11 +3550,10 @@
     },
     "AccountMigration": {
         "migrationRequiredTitle": "Il est temps de passer à la version supérieure",
-        "migrationRequiredBody": "Il est temps de migrer votre compte custodial vers un compte non-custodial. C'est requis pour des raisons réglementaires. Mais aussi, c'est mieux pour vous !",
+        "migrationRequiredBody": "Il est temps de migrer votre compte custodial vers un compte non-custodial.",
         "bitcoinBalance": "Solde Bitcoin",
         "dollarBalance": "Solde en dollars",
         "migrationRequiredSmallBalanceWarning": "Votre solde en dollars est trop petit pour être envoyé, nous vous enverrons des bitcoins à la place",
-        "migrateNow": "Migrer maintenant",
         "moveToNonCustodial": "Passer au non-custodial",
         "explainerTitle": "Que signifie passer au non-custodial ?",
         "explainerCheck1": "Vous allez créer un compte non-custodial sur le protocole Spark",

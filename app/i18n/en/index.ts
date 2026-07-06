@@ -3730,12 +3730,11 @@ const en: BaseTranslation = {
       "Transferring your funds. It should be done in a few seconds.",
     migrationRequiredTitle: "Time to upgrade",
     migrationRequiredBody:
-      "It's time to migrate your custodial account to a non-custodial account. It's required for regulatory reasons. But also, it's better for you!",
+      "It's time to migrate your custodial account to a non-custodial account.",
     bitcoinBalance: "Bitcoin balance",
     dollarBalance: "Dollar balance",
     migrationRequiredSmallBalanceWarning:
       "Your dollar balance is too small to be sent, we will send you bitcoin instead",
-    migrateNow: "Migrate now",
   },
   AccountTypeSelectionScreen: {
     descriptionDefault: "Please choose your preferred type of Blink.",
