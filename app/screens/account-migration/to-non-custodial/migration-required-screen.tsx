@@ -70,7 +70,7 @@ export const MigrationRequiredScreen: React.FC = () => {
         <View style={styles.content}>
           <IconHero
             icon="caret-up-circle"
-            iconColor={colors.success}
+            iconColor={colors._green}
             title={LL.AccountMigration.migrationRequiredTitle()}
             subtitle={LL.AccountMigration.migrationRequiredBody()}
           />

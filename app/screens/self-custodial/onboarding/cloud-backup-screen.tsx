@@ -48,7 +48,7 @@ export const CloudBackupScreen: React.FC = () => {
           <View style={styles.heroContainer}>
             <IconHero
               icon="cloud"
-              iconColor={colors.success}
+              iconColor={colors._green}
               title={LL.BackupScreen.CloudBackup.title()}
               subtitle={LL.BackupScreen.CloudBackup.description({
                 provider: cloudProvider,
