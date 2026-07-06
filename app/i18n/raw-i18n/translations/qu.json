@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Mosoqyanapaq pacha",
+    "keepReceivingTitle": "Chaskikuyta qatiy imayna sapa kutipas",
+    "keepReceivingBody": "Lightning tinkunaykiqa musuq non-custodial akawuntiykiman apachkanqa.",
+    "keepReceivingLnAddressLabel": "LN tinkunayki",
+    "keepReceivingCta": "Allinmi",
     "migrationRequiredBody": "Waqaychasqa kuentaykita mana waqaychasqa kuentaman astanaykipaq pachan.",
     "bitcoinBalance": "Bitcoin saldo",
     "dollarBalance": "Dólar saldo",

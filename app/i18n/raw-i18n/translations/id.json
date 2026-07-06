@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Saatnya memutakhirkan",
+    "keepReceivingTitle": "Terus terima seperti biasa",
+    "keepReceivingBody": "Alamat Lightning Anda akan dipindahkan ke akun non-custodial baru Anda.",
+    "keepReceivingLnAddressLabel": "Alamat LN Anda",
+    "keepReceivingCta": "Bagus",
     "migrationRequiredBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial.",
     "bitcoinBalance": "Saldo Bitcoin",
     "dollarBalance": "Saldo dolar",

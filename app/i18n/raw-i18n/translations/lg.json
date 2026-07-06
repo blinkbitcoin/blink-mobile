@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Ekiseera ky'okuzza omu maaso",
+    "keepReceivingTitle": "Weyongere okufuna nga bulijjo",
+    "keepReceivingBody": "Endagiriro yo eya Lightning ejja kusengulwa mu kawunti yo empya eya non-custodial.",
+    "keepReceivingLnAddressLabel": "Endagiriro yo eya LN",
+    "keepReceivingCta": "Kirungi",
     "migrationRequiredBody": "Kiseera ky'okujja akawunti yo ekuumibwa ogigirre mu akawunti etakuumibwa.",
     "bitcoinBalance": "Bbalansi ya Bitcoin",
     "dollarBalance": "Bbalansi ya doola",

@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Ժամանակն է թարմացնելու",
+    "keepReceivingTitle": "Շարունակեք ստանալ ինչպես միշտ",
+    "keepReceivingBody": "Ձեր Lightning հասցեն կփոխանցվի ձեր նոր ոչ պահառու հաշվին։",
+    "keepReceivingLnAddressLabel": "Ձեր LN հասցեն",
+    "keepReceivingCta": "Հիանալի է",
     "migrationRequiredBody": "Ժամանակն է ձեր պահպանվող հաշիվը տեղափոխել ոչ պահպանող հաշիվ։ Դա պարտադիր է կարգավորող պատճառներով։ Բայց նաև՝ դա ավելի լավ է ձեզ համար։",
     "bitcoinBalance": "Bitcoin-ի մնացորդ",
     "dollarBalance": "Դոլարի մնացորդ",

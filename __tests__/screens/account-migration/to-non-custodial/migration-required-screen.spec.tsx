@@ -12,9 +12,11 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const MIGRATION_ROUTE = "accountMigrationExplainer"
+const KEEP_RECEIVING_ROUTE = "accountMigrationKeepReceiving"
 
 const mockNavigate = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
+const mockUseAddressScreenQuery = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -24,6 +26,7 @@ jest.mock("@react-navigation/native", () => ({
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   useWalletOverviewScreenQuery: () => mockUseWalletOverviewScreenQuery(),
+  useAddressScreenQuery: () => mockUseAddressScreenQuery(),
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -75,6 +78,7 @@ describe("MigrationRequiredScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdCents(0))
+    mockUseAddressScreenQuery.mockReturnValue({ data: undefined })
   })
 
   it("renders the upgrade hero icon, title and body", async () => {
@@ -125,12 +129,24 @@ describe("MigrationRequiredScreen", () => {
     ).toBeNull()
   })
 
-  it("sends the user into the migration flow when Continue is pressed", async () => {
+  it("skips straight into the migration flow when there is no lightning address", async () => {
     renderScreen()
     await flushEffects()
 
     fireEvent.press(screen.getByText(LL.common.continue()))
 
     expect(mockNavigate).toHaveBeenCalledWith(MIGRATION_ROUTE)
+  })
+
+  it("routes through the keep-receiving screen when the user has a lightning address", async () => {
+    mockUseAddressScreenQuery.mockReturnValue({
+      data: { me: { username: "satoshin21" } },
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.common.continue()))
+
+    expect(mockNavigate).toHaveBeenCalledWith(KEEP_RECEIVING_ROUTE)
   })
 })

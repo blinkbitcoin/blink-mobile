@@ -3550,6 +3550,10 @@
     },
     "AccountMigration": {
         "migrationRequiredTitle": "Zeit für ein Upgrade",
+        "keepReceivingTitle": "Empfange weiterhin wie gewohnt",
+        "keepReceivingBody": "Deine Lightning-Adresse wird auf dein neues Non-Custodial-Konto übertragen.",
+        "keepReceivingLnAddressLabel": "Deine LN-Adresse",
+        "keepReceivingCta": "Super",
         "migrationRequiredBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren.",
         "bitcoinBalance": "Bitcoin-Guthaben",
         "dollarBalance": "Dollar-Guthaben",

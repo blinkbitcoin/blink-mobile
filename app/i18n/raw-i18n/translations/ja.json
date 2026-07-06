@@ -3550,6 +3550,10 @@
     },
     "AccountMigration": {
         "migrationRequiredTitle": "アップグレードの時間です",
+        "keepReceivingTitle": "これまで通り受け取りを続けられます",
+        "keepReceivingBody": "あなたのLightningアドレスは、新しいノンカストディアルアカウントに引き継がれます。",
+        "keepReceivingLnAddressLabel": "あなたのLNアドレス",
+        "keepReceivingCta": "いいね",
         "migrationRequiredBody": "カストディアルアカウントを非カストディアルアカウントに移行する時です。",
         "bitcoinBalance": "ビットコイン残高",
         "dollarBalance": "ドル残高",

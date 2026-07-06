@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Tijd om te upgraden",
+    "keepReceivingTitle": "Blijf ontvangen zoals gewoonlijk",
+    "keepReceivingBody": "Jouw Lightning-adres wordt overgezet naar je nieuwe non-custodial account.",
+    "keepReceivingLnAddressLabel": "Jouw LN-adres",
+    "keepReceivingCta": "Mooi",
     "migrationRequiredBody": "Het is tijd om je bewaarde rekening te migreren naar een niet-bewaarde rekening.",
     "bitcoinBalance": "Bitcoin-saldo",
     "dollarBalance": "Dollarsaldo",

@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Lixesha lokuphucula",
+    "keepReceivingTitle": "Qhubeka ufumana njengesiqhelo",
+    "keepReceivingBody": "Idilesi yakho ye-Lightning iya kudluliselwa kwi-akhawunti yakho entsha ye-non-custodial.",
+    "keepReceivingLnAddressLabel": "Idilesi yakho ye-LN",
+    "keepReceivingCta": "Kuhle",
     "migrationRequiredBody": "Lixesha lokufudusela iakhawunti yakho egcinwayo kwiakhawunti engagcinwanga.",
     "bitcoinBalance": "Ibhalansi yeBitcoin",
     "dollarBalance": "Ibhalansi yedola",

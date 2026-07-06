@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "حان وقت الترقية",
+    "keepReceivingTitle": "استمر في الاستلام كالمعتاد",
+    "keepReceivingBody": "سيتم نقل عنوان Lightning الخاص بك إلى حسابك الجديد غير الحفظي.",
+    "keepReceivingLnAddressLabel": "عنوان LN الخاص بك",
+    "keepReceivingCta": "رائع",
     "migrationRequiredBody": "حان الوقت لترحيل حسابك الحافظ إلى حساب غير حافظ.",
     "bitcoinBalance": "رصيد البيتكوين",
     "dollarBalance": "رصيد الدولار",

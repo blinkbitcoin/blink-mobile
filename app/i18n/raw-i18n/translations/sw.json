@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Wakati wa kuboresha",
+    "keepReceivingTitle": "Endelea kupokea kama kawaida",
+    "keepReceivingBody": "Anwani yako ya Lightning itahamishiwa kwenye akaunti yako mpya ya non-custodial.",
+    "keepReceivingLnAddressLabel": "Anwani yako ya LN",
+    "keepReceivingCta": "Vizuri",
     "migrationRequiredBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini.",
     "bitcoinBalance": "Salio la Bitcoin",
     "dollarBalance": "Salio la dola",

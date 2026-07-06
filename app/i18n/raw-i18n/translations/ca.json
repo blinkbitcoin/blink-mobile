@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Hora d'actualitzar",
+    "keepReceivingTitle": "Continua rebent com sempre",
+    "keepReceivingBody": "La teva adreça Lightning es transferirà al teu nou compte no custodial.",
+    "keepReceivingLnAddressLabel": "La teva adreça LN",
+    "keepReceivingCta": "Genial",
     "migrationRequiredBody": "És hora de migrar el teu compte custodial a un compte no custodi.",
     "bitcoinBalance": "Saldo de Bitcoin",
     "dollarBalance": "Saldo en dòlars",

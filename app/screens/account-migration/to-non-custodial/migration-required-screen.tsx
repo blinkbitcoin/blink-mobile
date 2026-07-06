@@ -10,7 +10,10 @@ import { InfoRow } from "@app/components/card-screen/info-row"
 import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { WarningBanner } from "@app/components/warning-banner"
-import { useWalletOverviewScreenQuery } from "@app/graphql/generated"
+import {
+  useAddressScreenQuery,
+  useWalletOverviewScreenQuery,
+} from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -40,6 +43,12 @@ export const MigrationRequiredScreen: React.FC = () => {
   const wallets = data?.me?.defaultAccount?.wallets
   const { formatMoneyAmount } = useDisplayCurrency()
 
+  const { data: addressData } = useAddressScreenQuery({
+    fetchPolicy: "cache-first",
+    skip: !isAuthed,
+  })
+  const hasLightningAddress = Boolean(addressData?.me?.username)
+
   const btcBalance = formatMoneyAmount({
     moneyAmount: toBtcMoneyAmount(getBtcWallet(wallets)?.balance ?? 0),
   })
@@ -49,8 +58,11 @@ export const MigrationRequiredScreen: React.FC = () => {
     usdBalanceCents > 0 && usdBalanceCents < MINIMUM_TRANSFERABLE_USD_CENTS
 
   const handleMigrate = useCallback(() => {
-    navigation.navigate(getRouteForCheckpoint())
-  }, [navigation, getRouteForCheckpoint])
+    const nextRoute = hasLightningAddress
+      ? "accountMigrationKeepReceiving"
+      : getRouteForCheckpoint()
+    navigation.navigate(nextRoute)
+  }, [navigation, hasLightningAddress, getRouteForCheckpoint])
 
   return (
     <Screen preset="fixed" headerShown={false}>

@@ -11848,6 +11848,22 @@ type RootTranslation = {
 		 * Y​o​u​r​ ​d​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​t​o​o​ ​s​m​a​l​l​ ​t​o​ ​b​e​ ​s​e​n​t​,​ ​w​e​ ​w​i​l​l​ ​s​e​n​d​ ​y​o​u​ ​b​i​t​c​o​i​n​ ​i​n​s​t​e​a​d
 		 */
 		migrationRequiredSmallBalanceWarning: string
+		/**
+		 * K​e​e​p​ ​r​e​c​e​i​v​i​n​g​ ​a​s​ ​u​s​u​a​l
+		 */
+		keepReceivingTitle: string
+		/**
+		 * Y​o​u​r​ ​l​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​w​i​l​l​ ​b​e​ ​t​r​a​n​s​f​e​r​r​e​d​ ​t​o​ ​y​o​u​r​ ​n​e​w​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+		 */
+		keepReceivingBody: string
+		/**
+		 * Y​o​u​r​ ​L​N​ ​a​d​d​r​e​s​s
+		 */
+		keepReceivingLnAddressLabel: string
+		/**
+		 * N​i​c​e
+		 */
+		keepReceivingCta: string
 	}
 	AccountTypeSelectionScreen: {
 		/**
@@ -24094,6 +24110,22 @@ export type TranslationFunctions = {
 		 * Your dollar balance is too small to be sent, we will send you bitcoin instead
 		 */
 		migrationRequiredSmallBalanceWarning: () => LocalizedString
+		/**
+		 * Keep receiving as usual
+		 */
+		keepReceivingTitle: () => LocalizedString
+		/**
+		 * Your lightning address will be transferred to your new non-custodial account.
+		 */
+		keepReceivingBody: () => LocalizedString
+		/**
+		 * Your LN address
+		 */
+		keepReceivingLnAddressLabel: () => LocalizedString
+		/**
+		 * Nice
+		 */
+		keepReceivingCta: () => LocalizedString
 	}
 	AccountTypeSelectionScreen: {
 		/**

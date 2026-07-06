@@ -3735,6 +3735,11 @@ const en: BaseTranslation = {
     dollarBalance: "Dollar balance",
     migrationRequiredSmallBalanceWarning:
       "Your dollar balance is too small to be sent, we will send you bitcoin instead",
+    keepReceivingTitle: "Keep receiving as usual",
+    keepReceivingBody:
+      "Your lightning address will be transferred to your new non-custodial account.",
+    keepReceivingLnAddressLabel: "Your LN address",
+    keepReceivingCta: "Nice",
   },
   AccountTypeSelectionScreen: {
     descriptionDefault: "Please choose your preferred type of Blink.",

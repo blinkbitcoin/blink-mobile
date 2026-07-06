@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Masa untuk menaik taraf",
+    "keepReceivingTitle": "Terus terima seperti biasa",
+    "keepReceivingBody": "Alamat Lightning anda akan dipindahkan ke akaun non-custodial baharu anda.",
+    "keepReceivingLnAddressLabel": "Alamat LN anda",
+    "keepReceivingCta": "Bagus",
     "migrationRequiredBody": "Sudah tiba masanya untuk memindahkan akaun kustodial anda ke akaun bukan kustodial.",
     "bitcoinBalance": "Baki Bitcoin",
     "dollarBalance": "Baki dolar",

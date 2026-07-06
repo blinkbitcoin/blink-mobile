@@ -3550,6 +3550,10 @@
     },
     "AccountMigration": {
         "migrationRequiredTitle": "È ora di aggiornare",
+        "keepReceivingTitle": "Continua a ricevere come sempre",
+        "keepReceivingBody": "Il tuo indirizzo Lightning verrà trasferito sul tuo nuovo account non-custodial.",
+        "keepReceivingLnAddressLabel": "Il tuo indirizzo LN",
+        "keepReceivingCta": "Ottimo",
         "migrationRequiredBody": "È ora di migrare il tuo account custodiale verso un account non custodiale.",
         "bitcoinBalance": "Saldo Bitcoin",
         "dollarBalance": "Saldo in dollari",

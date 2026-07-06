@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Tyd om op te gradeer",
+    "keepReceivingTitle": "Ontvang steeds soos gewoonlik",
+    "keepReceivingBody": "Jou Lightning-adres sal na jou nuwe nie-bewaarde rekening oorgedra word.",
+    "keepReceivingLnAddressLabel": "Jou LN-adres",
+    "keepReceivingCta": "Lekker",
     "migrationRequiredBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer.",
     "bitcoinBalance": "Bitcoin-saldo",
     "dollarBalance": "Dollar-saldo",

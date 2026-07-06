@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Ώρα για αναβάθμιση",
+    "keepReceivingTitle": "Συνεχίστε να λαμβάνετε όπως πάντα",
+    "keepReceivingBody": "Η διεύθυνσή σας στο Lightning θα μεταφερθεί στον νέο σας non-custodial λογαριασμό.",
+    "keepReceivingLnAddressLabel": "Η διεύθυνσή σας LN",
+    "keepReceivingCta": "Τέλεια",
     "migrationRequiredBody": "Ήρθε η ώρα να μεταφέρετε τον λογαριασμό φύλαξής σας σε έναν λογαριασμό μη φύλαξης.",
     "bitcoinBalance": "Υπόλοιπο Bitcoin",
     "dollarBalance": "Υπόλοιπο σε δολάρια",

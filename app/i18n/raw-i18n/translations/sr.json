@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Време је за надоградњу",
+    "keepReceivingTitle": "Наставите да примате као и обично",
+    "keepReceivingBody": "Ваша Lightning адреса биће пренета на ваш нови non-custodial налог.",
+    "keepReceivingLnAddressLabel": "Ваша LN адреса",
+    "keepReceivingCta": "Одлично",
     "migrationRequiredBody": "Време је да мигрирате свој кастодијални налог на не-кастодијални налог.",
     "bitcoinBalance": "Стање Bitcoin-а",
     "dollarBalance": "Стање у доларима",

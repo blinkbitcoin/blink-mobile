@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Ideje frissíteni",
+    "keepReceivingTitle": "Fogadj továbbra is a megszokott módon",
+    "keepReceivingBody": "A Lightning címed átkerül az új önrendelkező fiókodba.",
+    "keepReceivingLnAddressLabel": "Az LN címed",
+    "keepReceivingCta": "Remek",
     "migrationRequiredBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba.",
     "bitcoinBalance": "Bitcoin-egyenleg",
     "dollarBalance": "Dollár-egyenleg",

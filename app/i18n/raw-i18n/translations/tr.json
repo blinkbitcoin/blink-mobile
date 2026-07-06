@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Yükseltme zamanı",
+    "keepReceivingTitle": "Her zamanki gibi almaya devam et",
+    "keepReceivingBody": "Lightning adresin yeni non-custodial hesabına aktarılacak.",
+    "keepReceivingLnAddressLabel": "LN Adresin",
+    "keepReceivingCta": "Harika",
     "migrationRequiredBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi.",
     "bitcoinBalance": "Bitcoin bakiyesi",
     "dollarBalance": "Dolar bakiyesi",

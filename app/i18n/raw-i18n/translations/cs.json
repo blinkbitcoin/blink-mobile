@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Čas na upgrade",
+    "keepReceivingTitle": "Přijímejte platby jako obvykle",
+    "keepReceivingBody": "Vaše Lightning adresa bude přenesena na váš nový non-custodial účet.",
+    "keepReceivingLnAddressLabel": "Vaše LN adresa",
+    "keepReceivingCta": "Skvělé",
     "migrationRequiredBody": "Je čas migrovat váš svěřenský účet na nesvěřenský účet.",
     "bitcoinBalance": "Zůstatek Bitcoinu",
     "dollarBalance": "Zůstatek v dolarech",

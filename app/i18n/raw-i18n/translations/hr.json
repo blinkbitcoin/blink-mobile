@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Vrijeme je za nadogradnju",
+    "keepReceivingTitle": "Nastavite primati kao i obično",
+    "keepReceivingBody": "Vaša Lightning adresa bit će prenesena na vaš novi ne-skrbnički račun.",
+    "keepReceivingLnAddressLabel": "Vaša LN adresa",
+    "keepReceivingCta": "Super",
     "migrationRequiredBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva.",
     "bitcoinBalance": "Stanje Bitcoina",
     "dollarBalance": "Stanje u dolarima",

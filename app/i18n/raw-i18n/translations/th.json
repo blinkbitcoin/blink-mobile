@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "ถึงเวลาอัปเกรด",
+    "keepReceivingTitle": "รับเงินต่อได้ตามปกติ",
+    "keepReceivingBody": "แอดเดรส Lightning ของคุณจะถูกโอนไปยังบัญชี non-custodial ใหม่ของคุณ",
+    "keepReceivingLnAddressLabel": "แอดเดรส LN ของคุณ",
+    "keepReceivingCta": "เยี่ยม",
     "migrationRequiredBody": "ถึงเวลาย้ายบัญชีแบบฝากดูแลของคุณไปยังบัญชีแบบไม่ฝากดูแลแล้ว จำเป็นต้องทำด้วยเหตุผลด้านกฎระเบียบ แต่ก็ดีต่อคุณด้วย!",
     "bitcoinBalance": "ยอดคงเหลือ Bitcoin",
     "dollarBalance": "ยอดคงเหลือดอลลาร์",

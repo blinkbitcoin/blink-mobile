@@ -3550,6 +3550,10 @@
   },
   "AccountMigration": {
     "migrationRequiredTitle": "Tid til at opgradere",
+    "keepReceivingTitle": "Fortsæt med at modtage som sædvanligt",
+    "keepReceivingBody": "Din Lightning-adresse vil blive overført til din nye non-custodial konto.",
+    "keepReceivingLnAddressLabel": "Din LN-adresse",
+    "keepReceivingCta": "Fint",
     "migrationRequiredBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto.",
     "bitcoinBalance": "Bitcoin-saldo",
     "dollarBalance": "Dollar-saldo",
