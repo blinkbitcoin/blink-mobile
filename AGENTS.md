@@ -10,6 +10,7 @@ Based on the PR's changed files, read relevant docs thoroughly:
 | /docs/api-reference.md | GraphQL queries/mutations, Apollo client changes |
 | /docs/source-tree-analysis.md | New files, directory structure questions |
 | /docs/technology-stack.md | Dependency changes, build config, new packages |
+| /docs/pr-review.md | Reviewing a PR, or authoring one (conventions, checklists, review standards) |
 
 **Then read /docs/index.md** - it's the master index linking to additional docs (dev setup, E2E testing, i18n guide, etc.). Follow relevant references if they apply to the PR.
 
