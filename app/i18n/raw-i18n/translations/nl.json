@@ -3557,7 +3557,6 @@
     "downloadHistoryTitle": "Download je transactiegeschiedenis",
     "downloadHistoryBody": "Je nieuwe account begint opnieuw. Als je een overzicht van je transacties wilt bewaren, download ze dan nu als CSV.",
     "downloadHistoryDownloadCta": "Downloaden",
-    "downloadHistorySkipCta": "Overslaan",
     "migrationRequiredBody": "Het is tijd om je bewaarde rekening te migreren naar een niet-bewaarde rekening.",
     "bitcoinBalance": "Bitcoin-saldo",
     "dollarBalance": "Dollarsaldo",

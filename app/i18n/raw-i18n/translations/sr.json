@@ -3557,7 +3557,6 @@
     "downloadHistoryTitle": "Преузмите историју трансакција",
     "downloadHistoryBody": "Ваш нови налог почиње испочетка. Ако желите да сачувате евиденцију својих трансакција, преузмите их сада као CSV.",
     "downloadHistoryDownloadCta": "Преузми",
-    "downloadHistorySkipCta": "Прескочи",
     "migrationRequiredBody": "Време је да мигрирате свој кастодијални налог на не-кастодијални налог.",
     "bitcoinBalance": "Стање Bitcoin-а",
     "dollarBalance": "Стање у доларима",

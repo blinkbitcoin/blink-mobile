@@ -44,13 +44,12 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
     setIsDownloading(true)
     try {
       await exportCsv(walletIds)
-      goToNextStep()
     } catch (err) {
       reportError("Migration transaction history export", err)
     } finally {
       setIsDownloading(false)
     }
-  }, [exportCsv, walletIds, goToNextStep])
+  }, [exportCsv, walletIds])
 
   return (
     <Screen preset="fixed">
@@ -73,10 +72,10 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
             {...testProps("migration-download-history-cta")}
           />
           <GaloySecondaryButton
-            title={LL.AccountMigration.downloadHistorySkipCta()}
+            title={LL.common.continue()}
             disabled={isBusy}
             onPress={goToNextStep}
-            {...testProps("migration-download-history-skip")}
+            {...testProps("migration-download-history-continue")}
           />
         </View>
       </View>

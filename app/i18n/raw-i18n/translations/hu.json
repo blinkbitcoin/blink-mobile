@@ -3557,7 +3557,6 @@
     "downloadHistoryTitle": "Töltsd le a tranzakciós előzményeidet",
     "downloadHistoryBody": "Az új fiókod tiszta lappal indul. Ha meg szeretnéd őrizni a tranzakcióid nyilvántartását, töltsd le őket most CSV formátumban.",
     "downloadHistoryDownloadCta": "Letöltés",
-    "downloadHistorySkipCta": "Kihagy",
     "migrationRequiredBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba.",
     "bitcoinBalance": "Bitcoin-egyenleg",
     "dollarBalance": "Dollár-egyenleg",

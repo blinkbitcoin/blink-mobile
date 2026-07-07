@@ -3557,7 +3557,6 @@
     "downloadHistoryTitle": "Descarcă-ți istoricul tranzacțiilor",
     "downloadHistoryBody": "Noul tău cont va porni de la zero. Dacă vrei să păstrezi o evidență a tranzacțiilor tale, descarcă-le acum ca CSV.",
     "downloadHistoryDownloadCta": "Descarcă",
-    "downloadHistorySkipCta": "Săriți peste",
     "migrationRequiredBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial.",
     "bitcoinBalance": "Sold Bitcoin",
     "dollarBalance": "Sold în dolari",

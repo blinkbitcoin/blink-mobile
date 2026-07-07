@@ -3557,7 +3557,6 @@
     "downloadHistoryTitle": "Unduh riwayat transaksi Anda",
     "downloadHistoryBody": "Akun baru Anda akan dimulai dari awal. Jika Anda ingin menyimpan catatan transaksi Anda, unduh sekarang sebagai CSV.",
     "downloadHistoryDownloadCta": "Unduh",
-    "downloadHistorySkipCta": "Lewati",
     "migrationRequiredBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial.",
     "bitcoinBalance": "Saldo Bitcoin",
     "dollarBalance": "Saldo dolar",

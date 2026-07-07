@@ -1,5 +1,5 @@
 import React from "react"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -70,6 +70,12 @@ const renderScreen = () =>
 const pressDownload = () =>
   fireEvent.press(screen.getByText(LL.AccountMigration.downloadHistoryDownloadCta()))
 
+const pressContinue = () => fireEvent.press(screen.getByText(LL.common.continue()))
+
+const isContinueDisabled = () =>
+  screen.getByTestId("migration-download-history-continue").props.accessibilityState
+    ?.disabled
+
 describe("MigrationDownloadHistoryScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -92,17 +98,17 @@ describe("MigrationDownloadHistoryScreen", () => {
     expect(
       screen.getByText(LL.AccountMigration.downloadHistoryDownloadCta()),
     ).toBeTruthy()
-    expect(screen.getByText(LL.AccountMigration.downloadHistorySkipCta())).toBeTruthy()
+    expect(screen.getByText(LL.common.continue())).toBeTruthy()
   })
 
-  it("exports the account wallets as a CSV and continues when it finishes", async () => {
+  it("downloads the CSV without leaving the screen", async () => {
     renderScreen()
     await flushEffects()
 
     pressDownload()
 
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith(NEXT_ROUTE))
-    expect(mockExportCsv).toHaveBeenCalledWith(["btc-1", "usd-1"])
+    await waitFor(() => expect(mockExportCsv).toHaveBeenCalledWith(["btc-1", "usd-1"]))
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("reports the error and stays on screen when the export fails", async () => {
@@ -116,7 +122,20 @@ describe("MigrationDownloadHistoryScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("blocks navigation and disables Skip while the export is in progress", async () => {
+  it("allows downloading multiple times before continuing", async () => {
+    renderScreen()
+    await flushEffects()
+
+    pressDownload()
+    await flushEffects()
+    pressDownload()
+    await flushEffects()
+
+    expect(mockExportCsv).toHaveBeenCalledTimes(2)
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("disables Continue while a download is in progress", async () => {
     let resolveExport: () => void = () => {}
     mockExportCsv.mockReturnValue(
       new Promise<void>((resolve) => {
@@ -127,15 +146,13 @@ describe("MigrationDownloadHistoryScreen", () => {
     await flushEffects()
 
     pressDownload()
-    expect(mockNavigate).not.toHaveBeenCalled()
-    expect(
-      screen.getByTestId("migration-download-history-skip").props.accessibilityState
-        ?.disabled,
-    ).toBe(true)
+    expect(isContinueDisabled()).toBe(true)
 
-    resolveExport()
+    await act(async () => {
+      resolveExport()
+    })
 
-    await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith(NEXT_ROUTE))
+    expect(isContinueDisabled()).toBe(false)
   })
 
   it("disables both actions while the migration checkpoint is loading", async () => {
@@ -150,17 +167,14 @@ describe("MigrationDownloadHistoryScreen", () => {
       screen.getByTestId("migration-download-history-cta").props.accessibilityState
         ?.disabled,
     ).toBe(true)
-    expect(
-      screen.getByTestId("migration-download-history-skip").props.accessibilityState
-        ?.disabled,
-    ).toBe(true)
+    expect(isContinueDisabled()).toBe(true)
   })
 
-  it("continues the migration flow when Skip is pressed", async () => {
+  it("continues the migration flow when Continue is pressed", async () => {
     renderScreen()
     await flushEffects()
 
-    fireEvent.press(screen.getByText(LL.AccountMigration.downloadHistorySkipCta()))
+    pressContinue()
 
     expect(mockNavigate).toHaveBeenCalledWith(NEXT_ROUTE)
   })

@@ -3557,7 +3557,6 @@
         "downloadHistoryTitle": "Lade deinen Transaktionsverlauf herunter",
         "downloadHistoryBody": "Dein neues Konto startet neu. Wenn du eine Aufzeichnung deiner Transaktionen behalten möchtest, lade sie jetzt als CSV herunter.",
         "downloadHistoryDownloadCta": "Herunterladen",
-        "downloadHistorySkipCta": "Überspringen",
         "migrationRequiredBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren.",
         "bitcoinBalance": "Bitcoin-Guthaben",
         "dollarBalance": "Dollar-Guthaben",

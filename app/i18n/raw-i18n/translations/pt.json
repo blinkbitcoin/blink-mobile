@@ -3557,7 +3557,6 @@
         "downloadHistoryTitle": "Baixe seu histórico de transações",
         "downloadHistoryBody": "Sua nova conta começará do zero. Se você quiser manter um registro das suas transações, baixe-as agora como CSV.",
         "downloadHistoryDownloadCta": "Baixar",
-        "downloadHistorySkipCta": "Pular",
         "migrationRequiredBody": "É hora de migrar a sua conta custodial para uma conta não custodial.",
         "bitcoinBalance": "Saldo de Bitcoin",
         "dollarBalance": "Saldo em dólares",

@@ -3557,7 +3557,6 @@
     "downloadHistoryTitle": "İşlem geçmişini indir",
     "downloadHistoryBody": "Yeni hesabın sıfırdan başlayacak. İşlemlerinin bir kaydını tutmak istersen, şimdi CSV olarak indir.",
     "downloadHistoryDownloadCta": "İndir",
-    "downloadHistorySkipCta": "Atla",
     "migrationRequiredBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi.",
     "bitcoinBalance": "Bitcoin bakiyesi",
     "dollarBalance": "Dolar bakiyesi",

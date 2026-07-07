@@ -3744,7 +3744,6 @@ const en: BaseTranslation = {
     downloadHistoryBody:
       "Your new account will start fresh. If you want to keep record of your transactions, download them as CSV now.",
     downloadHistoryDownloadCta: "Download",
-    downloadHistorySkipCta: "Skip",
   },
   AccountTypeSelectionScreen: {
     descriptionDefault: "Please choose your preferred type of Blink.",

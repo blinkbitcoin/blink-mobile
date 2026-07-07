@@ -3557,7 +3557,6 @@
     "downloadHistoryTitle": "Stáhněte si historii transakcí",
     "downloadHistoryBody": "Váš nový účet začne od začátku. Pokud si chcete uchovat záznam o svých transakcích, stáhněte si je nyní jako CSV.",
     "downloadHistoryDownloadCta": "Stáhnout",
-    "downloadHistorySkipCta": "Přeskočit",
     "migrationRequiredBody": "Je čas migrovat váš svěřenský účet na nesvěřenský účet.",
     "bitcoinBalance": "Zůstatek Bitcoinu",
     "dollarBalance": "Zůstatek v dolarech",

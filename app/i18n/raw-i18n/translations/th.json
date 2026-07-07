@@ -3557,7 +3557,6 @@
     "downloadHistoryTitle": "ดาวน์โหลดประวัติธุรกรรมของคุณ",
     "downloadHistoryBody": "บัญชีใหม่ของคุณจะเริ่มต้นใหม่ หากคุณต้องการเก็บบันทึกธุรกรรมของคุณ ให้ดาวน์โหลดเป็นไฟล์ CSV ตอนนี้",
     "downloadHistoryDownloadCta": "ดาวน์โหลด",
-    "downloadHistorySkipCta": "ข้าม",
     "migrationRequiredBody": "ถึงเวลาย้ายบัญชีแบบฝากดูแลของคุณไปยังบัญชีแบบไม่ฝากดูแลแล้ว จำเป็นต้องทำด้วยเหตุผลด้านกฎระเบียบ แต่ก็ดีต่อคุณด้วย!",
     "bitcoinBalance": "ยอดคงเหลือ Bitcoin",
     "dollarBalance": "ยอดคงเหลือดอลลาร์",

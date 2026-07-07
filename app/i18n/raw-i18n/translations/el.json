@@ -3557,7 +3557,6 @@
     "downloadHistoryTitle": "Κατεβάστε το ιστορικό συναλλαγών σας",
     "downloadHistoryBody": "Ο νέος σας λογαριασμός θα ξεκινήσει από την αρχή. Αν θέλετε να κρατήσετε αρχείο των συναλλαγών σας, κατεβάστε τις τώρα ως CSV.",
     "downloadHistoryDownloadCta": "Λήψη",
-    "downloadHistorySkipCta": "Παραλείψτε το",
     "migrationRequiredBody": "Ήρθε η ώρα να μεταφέρετε τον λογαριασμό φύλαξής σας σε έναν λογαριασμό μη φύλαξης.",
     "bitcoinBalance": "Υπόλοιπο Bitcoin",
     "dollarBalance": "Υπόλοιπο σε δολάρια",

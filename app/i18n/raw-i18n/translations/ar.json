@@ -3557,7 +3557,6 @@
     "downloadHistoryTitle": "نزّل سجل معاملاتك",
     "downloadHistoryBody": "سيبدأ حسابك الجديد من جديد. إذا كنت ترغب في الاحتفاظ بسجل لمعاملاتك، فنزّلها الآن كملف CSV.",
     "downloadHistoryDownloadCta": "تنزيل",
-    "downloadHistorySkipCta": "تخطى",
     "migrationRequiredBody": "حان الوقت لترحيل حسابك الحافظ إلى حساب غير حافظ.",
     "bitcoinBalance": "رصيد البيتكوين",
     "dollarBalance": "رصيد الدولار",

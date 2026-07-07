@@ -11876,10 +11876,6 @@ type RootTranslation = {
 		 * D​o​w​n​l​o​a​d
 		 */
 		downloadHistoryDownloadCta: string
-		/**
-		 * S​k​i​p
-		 */
-		downloadHistorySkipCta: string
 	}
 	AccountTypeSelectionScreen: {
 		/**
@@ -24154,10 +24150,6 @@ export type TranslationFunctions = {
 		 * Download
 		 */
 		downloadHistoryDownloadCta: () => LocalizedString
-		/**
-		 * Skip
-		 */
-		downloadHistorySkipCta: () => LocalizedString
 	}
 	AccountTypeSelectionScreen: {
 		/**

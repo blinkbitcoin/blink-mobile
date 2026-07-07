@@ -3557,7 +3557,6 @@
     "downloadHistoryTitle": "Preuzmite povijest transakcija",
     "downloadHistoryBody": "Vaš novi račun počinje iznova. Ako želite zadržati evidenciju svojih transakcija, preuzmite ih sada kao CSV.",
     "downloadHistoryDownloadCta": "Preuzmi",
-    "downloadHistorySkipCta": "Preskoči",
     "migrationRequiredBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva.",
     "bitcoinBalance": "Stanje Bitcoina",
     "dollarBalance": "Stanje u dolarima",

@@ -3557,7 +3557,6 @@
         "downloadHistoryTitle": "取引履歴をダウンロード",
         "downloadHistoryBody": "新しいアカウントはゼロから始まります。取引の記録を残したい場合は、今すぐCSVとしてダウンロードしてください。",
         "downloadHistoryDownloadCta": "ダウンロード",
-        "downloadHistorySkipCta": "スキップ",
         "migrationRequiredBody": "カストディアルアカウントを非カストディアルアカウントに移行する時です。",
         "bitcoinBalance": "ビットコイン残高",
         "dollarBalance": "ドル残高",
