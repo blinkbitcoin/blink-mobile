@@ -1026,9 +1026,16 @@ export const PrimaryNavigator = () => {
 
   const { LL } = useI18nContext()
 
+  const [migrationBlockerDismissed, setMigrationBlockerDismissed] = React.useState(false)
+  const dismissMigrationBlocker = React.useCallback(
+    () => setMigrationBlockerDismissed(true),
+    [],
+  )
+
   useCustodialMigrationRequiredSync()
   const migrationRequired = useCustodialMigrationRequired()
-  if (migrationRequired) return <MigrationGate />
+  const showMigrationBlocker = migrationRequired && !migrationBlockerDismissed
+  if (showMigrationBlocker) return <MigrationGate onClose={dismissMigrationBlocker} />
 
   // The cacheId is updated after every mutation that affects current user data (balanace, contacts, ...)
   // It's used to re-mount this component and thus reset what's cached in Apollo (and React)

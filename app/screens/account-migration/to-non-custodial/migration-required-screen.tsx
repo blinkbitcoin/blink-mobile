@@ -1,15 +1,17 @@
 import React, { useCallback } from "react"
-import { View } from "react-native"
+import { Linking, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { InfoRow } from "@app/components/card-screen/info-row"
 import { IconHero } from "@app/components/icon-hero"
+import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
-import { WarningBanner } from "@app/components/warning-banner"
+import { CONTACT_EMAIL_ADDRESS } from "@app/config"
 import {
   useAddressScreenQuery,
   useWalletOverviewScreenQuery,
@@ -24,12 +26,23 @@ import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 
 /**
- * $0.50 is the smallest custodial dollar (Stablesats) balance that can be transferred as
- * dollars; below it the balance is sent as bitcoin instead, so the warning is shown.
+ * The single "Time to upgrade" intro screen rendered in three modes (FR7):
+ * - voluntary: the user opted in from Settings; can close (back to the app).
+ * - forcedPreDeadline: the user is in the migration cohort but the deadline has not
+ *   passed; can still close and wait.
+ * - gate: the account is closed server-side (post-deadline); no close, balances shown.
  */
-const MINIMUM_TRANSFERABLE_USD_CENTS = 50
+export type MigrationMode = "voluntary" | "forcedPreDeadline" | "gate"
 
-export const MigrationRequiredScreen: React.FC = () => {
+type MigrationRequiredScreenProps = {
+  mode: MigrationMode
+  onClose?: () => void
+}
+
+export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = ({
+  mode,
+  onClose,
+}) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {
@@ -39,9 +52,9 @@ export const MigrationRequiredScreen: React.FC = () => {
   const { getRouteForCheckpoint } = useMigrationCheckpoint()
 
   const isAuthed = useIsAuthed()
-  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed })
-  const wallets = data?.me?.defaultAccount?.wallets
-  const { formatMoneyAmount } = useDisplayCurrency()
+  const isGate = mode === "gate"
+  const showCloseButton = !isGate
+  const shouldLoadBalances = isAuthed && isGate
 
   const { data: addressData } = useAddressScreenQuery({
     fetchPolicy: "cache-first",
@@ -49,13 +62,15 @@ export const MigrationRequiredScreen: React.FC = () => {
   })
   const hasLightningAddress = Boolean(addressData?.me?.username)
 
+  const { data: walletData } = useWalletOverviewScreenQuery({ skip: !shouldLoadBalances })
+  const wallets = walletData?.me?.defaultAccount?.wallets
+  const { formatMoneyAmount } = useDisplayCurrency()
   const btcBalance = formatMoneyAmount({
     moneyAmount: toBtcMoneyAmount(getBtcWallet(wallets)?.balance ?? 0),
   })
-  const usdBalanceCents = getUsdWallet(wallets)?.balance ?? 0
-  const usdBalance = formatMoneyAmount({ moneyAmount: toUsdMoneyAmount(usdBalanceCents) })
-  const isDollarBalanceBelowTransferMinimum =
-    usdBalanceCents > 0 && usdBalanceCents < MINIMUM_TRANSFERABLE_USD_CENTS
+  const usdBalance = formatMoneyAmount({
+    moneyAmount: toUsdMoneyAmount(getUsdWallet(wallets)?.balance ?? 0),
+  })
 
   const handleMigrate = useCallback(() => {
     const nextRoute = hasLightningAddress
@@ -64,28 +79,66 @@ export const MigrationRequiredScreen: React.FC = () => {
     navigation.navigate(nextRoute)
   }, [navigation, hasLightningAddress, getRouteForCheckpoint])
 
+  const handleClose = useCallback(() => {
+    if (onClose) {
+      onClose()
+      return
+    }
+    navigation.goBack()
+  }, [onClose, navigation])
+
+  const handleContactSupport = useCallback(() => {
+    Linking.openURL(`mailto:${CONTACT_EMAIL_ADDRESS}`)
+  }, [])
+
+  const heroIcon = isGate ? "warning" : "upgrade"
+  const heroIconColor = isGate ? colors.warning : colors._green
+  const heroTitle = isGate
+    ? LL.AccountMigration.migrationGateTitle()
+    : LL.AccountMigration.migrationRequiredTitle()
+
+  const gateBody = (
+    <RichText
+      text={LL.AccountMigration.migrationGateBody({ email: CONTACT_EMAIL_ADDRESS })}
+      style={styles.gateBody}
+      tags={{ link: { style: styles.gateLink, onPress: handleContactSupport } }}
+    />
+  )
+  const subtitleByMode: Record<MigrationMode, React.ReactNode> = {
+    voluntary: LL.AccountMigration.migrationRequiredBody(),
+    forcedPreDeadline: LL.AccountMigration.migrationRequiredForcedBody(),
+    gate: gateBody,
+  }
+
   return (
     <Screen preset="fixed" headerShown={false}>
       <View style={styles.container}>
+        <View style={styles.header}>
+          {showCloseButton ? (
+            <GaloyIconButton
+              name="close"
+              size="medium"
+              backgroundColor={colors.grey5}
+              onPress={handleClose}
+              {...testProps("migration-close")}
+            />
+          ) : null}
+        </View>
+
         <View style={styles.content}>
           <IconHero
-            icon="caret-up-circle"
-            iconColor={colors._green}
-            title={LL.AccountMigration.migrationRequiredTitle()}
-            subtitle={LL.AccountMigration.migrationRequiredBody()}
+            icon={heroIcon}
+            iconColor={heroIconColor}
+            title={heroTitle}
+            subtitle={subtitleByMode[mode]}
           />
 
-          <View style={styles.details}>
+          {isGate ? (
             <View style={styles.balances}>
               <InfoRow label={LL.AccountMigration.bitcoinBalance()} value={btcBalance} />
               <InfoRow label={LL.AccountMigration.dollarBalance()} value={usdBalance} />
             </View>
-            {isDollarBalanceBelowTransferMinimum ? (
-              <WarningBanner>
-                {LL.AccountMigration.migrationRequiredSmallBalanceWarning()}
-              </WarningBanner>
-            ) : null}
-          </View>
+          ) : null}
         </View>
 
         <View style={styles.buttonsContainer}>
@@ -100,18 +153,21 @@ export const MigrationRequiredScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   container: {
     flex: 1,
     justifyContent: "space-between",
   },
+  header: {
+    minHeight: 44,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
   content: {
     flex: 1,
-    paddingTop: 60,
-    gap: 20,
-  },
-  details: {
-    paddingHorizontal: 20,
     gap: 20,
   },
   balances: {
@@ -119,11 +175,22 @@ const useStyles = makeStyles(() => ({
     width: "100%",
     maxWidth: 260,
     gap: 5,
+    paddingHorizontal: 20,
   },
   buttonsContainer: {
     gap: 10,
     paddingHorizontal: 20,
     paddingBottom: 20,
     paddingTop: 10,
+  },
+  gateBody: {
+    fontSize: 16,
+    lineHeight: 22,
+    textAlign: "center",
+    color: colors.black,
+  },
+  gateLink: {
+    textDecorationLine: "underline",
+    color: colors.black,
   },
 }))

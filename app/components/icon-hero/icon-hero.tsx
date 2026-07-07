@@ -9,7 +9,7 @@ type IconHeroProps = {
   icon: IconNamesType
   iconColor: string
   title: string
-  subtitle?: string
+  subtitle?: React.ReactNode
 }
 
 export const IconHero: React.FC<IconHeroProps> = ({
@@ -20,6 +20,8 @@ export const IconHero: React.FC<IconHeroProps> = ({
 }) => {
   const styles = useStyles()
 
+  const isPlainTextSubtitle = typeof subtitle === "string"
+
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
@@ -27,7 +29,7 @@ export const IconHero: React.FC<IconHeroProps> = ({
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
-        {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+        {isPlainTextSubtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : subtitle}
       </View>
     </View>
   )

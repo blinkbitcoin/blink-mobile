@@ -11840,6 +11840,21 @@ type RootTranslation = {
 		 */
 		migrationRequiredBody: string
 		/**
+		 * I​t​'​s​ ​t​i​m​e​ ​t​o​ ​m​i​g​r​a​t​e​ ​y​o​u​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.​ ​I​t​'​s​ ​r​e​q​u​i​r​e​d​ ​f​o​r​ ​r​e​g​u​l​a​t​o​r​y​ ​r​e​a​s​o​n​s​.​
+	​
+	​N​o​ ​n​e​e​d​ ​t​o​ ​w​o​r​r​y​,​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​w​i​l​l​ ​b​e​ ​b​e​t​t​e​r​ ​f​o​r​ ​y​o​u​ ​i​n​ ​t​h​e​ ​l​o​n​g​ ​t​e​r​m​.
+		 */
+		migrationRequiredForcedBody: string
+		/**
+		 * A​c​c​o​u​n​t​ ​n​o​t​ ​a​c​c​e​s​s​i​b​l​e
+		 */
+		migrationGateTitle: string
+		/**
+		 * F​o​r​ ​r​e​g​u​l​a​t​o​r​y​ ​r​e​a​s​o​n​s​ ​w​e​ ​c​a​n​n​o​t​ ​p​r​o​v​i​d​e​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​f​u​n​d​s​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​w​i​t​h​ ​B​l​i​n​k​ ​b​y​ ​f​o​l​l​o​w​i​n​g​ ​t​h​e​ ​n​e​x​t​ ​s​t​e​p​s​ ​o​r​ ​c​o​n​t​a​c​t​ ​u​s​ ​a​t​ ​<​l​i​n​k​>​{​e​m​a​i​l​}​<​/​l​i​n​k​>
+		 * @param {unknown} email
+		 */
+		migrationGateBody: RequiredParams<'email'>
+		/**
 		 * B​i​t​c​o​i​n​ ​b​a​l​a​n​c​e
 		 */
 		bitcoinBalance: string
@@ -11847,10 +11862,6 @@ type RootTranslation = {
 		 * D​o​l​l​a​r​ ​b​a​l​a​n​c​e
 		 */
 		dollarBalance: string
-		/**
-		 * Y​o​u​r​ ​d​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​t​o​o​ ​s​m​a​l​l​ ​t​o​ ​b​e​ ​s​e​n​t​,​ ​w​e​ ​w​i​l​l​ ​s​e​n​d​ ​y​o​u​ ​b​i​t​c​o​i​n​ ​i​n​s​t​e​a​d
-		 */
-		migrationRequiredSmallBalanceWarning: string
 		/**
 		 * K​e​e​p​ ​r​e​c​e​i​v​i​n​g​ ​a​s​ ​u​s​u​a​l
 		 */
@@ -24138,6 +24149,20 @@ export type TranslationFunctions = {
 		 */
 		migrationRequiredBody: () => LocalizedString
 		/**
+		 * It's time to migrate your custodial account to a non-custodial account. It's required for regulatory reasons.
+
+	No need to worry, non-custodial will be better for you in the long term.
+		 */
+		migrationRequiredForcedBody: () => LocalizedString
+		/**
+		 * Account not accessible
+		 */
+		migrationGateTitle: () => LocalizedString
+		/**
+		 * For regulatory reasons we cannot provide custodial accounts in your region. Transfer your funds to a non-custodial account with Blink by following the next steps or contact us at <link>{email}</link>
+		 */
+		migrationGateBody: (arg: { email: unknown }) => LocalizedString
+		/**
 		 * Bitcoin balance
 		 */
 		bitcoinBalance: () => LocalizedString
@@ -24145,10 +24170,6 @@ export type TranslationFunctions = {
 		 * Dollar balance
 		 */
 		dollarBalance: () => LocalizedString
-		/**
-		 * Your dollar balance is too small to be sent, we will send you bitcoin instead
-		 */
-		migrationRequiredSmallBalanceWarning: () => LocalizedString
 		/**
 		 * Keep receiving as usual
 		 */

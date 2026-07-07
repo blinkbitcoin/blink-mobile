@@ -1,8 +1,10 @@
 import React from "react"
+import { Text } from "react-native"
 import { render } from "@testing-library/react-native"
 
 import { IconHero } from "@app/components/icon-hero"
 import { ContextForScreen } from "../screens/helper"
+import { flushEffects } from "../helpers/flush-effects"
 
 jest.mock("@app/components/atomic/galoy-icon", () => {
   const { Text } = jest.requireActual("react-native")
@@ -14,16 +16,17 @@ jest.mock("@app/components/atomic/galoy-icon", () => {
 })
 
 describe("IconHero", () => {
-  it("renders title", () => {
+  it("renders title", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <IconHero icon="cloud-arrow-up" iconColor="green" title="Test Title" />
       </ContextForScreen>,
     )
+    await flushEffects()
     expect(getByText("Test Title")).toBeTruthy()
   })
 
-  it("renders subtitle when provided", () => {
+  it("renders subtitle when provided", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <IconHero
@@ -34,24 +37,42 @@ describe("IconHero", () => {
         />
       </ContextForScreen>,
     )
+    await flushEffects()
     expect(getByText("Test Subtitle")).toBeTruthy()
   })
 
-  it("does not render subtitle when not provided", () => {
+  it("renders a React node subtitle as-is", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <IconHero
+          icon="cloud-arrow-up"
+          iconColor="green"
+          title="Title"
+          subtitle={<Text>Node Subtitle</Text>}
+        />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+    expect(getByText("Node Subtitle")).toBeTruthy()
+  })
+
+  it("does not render subtitle when not provided", async () => {
     const { queryByText } = render(
       <ContextForScreen>
         <IconHero icon="cloud-arrow-up" iconColor="green" title="Title" />
       </ContextForScreen>,
     )
+    await flushEffects()
     expect(queryByText("Test Subtitle")).toBeNull()
   })
 
-  it("renders the icon", () => {
+  it("renders the icon", async () => {
     const { getByTestId } = render(
       <ContextForScreen>
         <IconHero icon="cloud-arrow-up" iconColor="green" title="Title" />
       </ContextForScreen>,
     )
+    await flushEffects()
     expect(getByTestId("icon-cloud-arrow-up")).toBeTruthy()
   })
 })
