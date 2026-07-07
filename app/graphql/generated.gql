@@ -1383,6 +1383,19 @@ query level {
   }
 }
 
+query migrationApiKeys {
+  me {
+    id
+    apiKeys {
+      id
+      revoked
+      expired
+      __typename
+    }
+    __typename
+  }
+}
+
 query mobileUpdate {
   mobileVersions {
     platform

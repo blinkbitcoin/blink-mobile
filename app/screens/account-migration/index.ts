@@ -1,5 +1,6 @@
 export { MigrationDownloadHistoryScreen } from "./to-non-custodial/download-history-screen"
 export { MigrationExplainerScreen } from "./to-non-custodial/explainer-screen"
+export { MigrationGate } from "./to-non-custodial/migration-gate"
 export { MigrationKeepReceivingScreen } from "./to-non-custodial/keep-receiving-screen"
 export { MigrationRequiredScreen } from "./to-non-custodial/migration-required-screen"
 export { TransferringFundsScreen } from "./to-non-custodial/transferring-funds-screen"

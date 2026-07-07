@@ -3300,6 +3300,11 @@ export type GetUsernamesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetUsernamesQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string }, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null } | null };
 
+export type MigrationApiKeysQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MigrationApiKeysQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly apiKeys: ReadonlyArray<{ readonly __typename: 'ApiKey', readonly id: string, readonly revoked: boolean, readonly expired: boolean }> } | null };
+
 export type CardBalanceQueryVariables = Exact<{
   cardId: Scalars['ID']['input'];
 }>;
@@ -5229,6 +5234,50 @@ export type GetUsernamesQueryHookResult = ReturnType<typeof useGetUsernamesQuery
 export type GetUsernamesLazyQueryHookResult = ReturnType<typeof useGetUsernamesLazyQuery>;
 export type GetUsernamesSuspenseQueryHookResult = ReturnType<typeof useGetUsernamesSuspenseQuery>;
 export type GetUsernamesQueryResult = Apollo.QueryResult<GetUsernamesQuery, GetUsernamesQueryVariables>;
+export const MigrationApiKeysDocument = gql`
+    query migrationApiKeys {
+  me {
+    id
+    apiKeys {
+      id
+      revoked
+      expired
+    }
+  }
+}
+    `;
+
+/**
+ * __useMigrationApiKeysQuery__
+ *
+ * To run a query within a React component, call `useMigrationApiKeysQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMigrationApiKeysQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMigrationApiKeysQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMigrationApiKeysQuery(baseOptions?: Apollo.QueryHookOptions<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>(MigrationApiKeysDocument, options);
+      }
+export function useMigrationApiKeysLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>(MigrationApiKeysDocument, options);
+        }
+export function useMigrationApiKeysSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>(MigrationApiKeysDocument, options);
+        }
+export type MigrationApiKeysQueryHookResult = ReturnType<typeof useMigrationApiKeysQuery>;
+export type MigrationApiKeysLazyQueryHookResult = ReturnType<typeof useMigrationApiKeysLazyQuery>;
+export type MigrationApiKeysSuspenseQueryHookResult = ReturnType<typeof useMigrationApiKeysSuspenseQuery>;
+export type MigrationApiKeysQueryResult = Apollo.QueryResult<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>;
 export const CardBalanceDocument = gql`
     query cardBalance($cardId: ID!) {
   cardBalance(cardId: $cardId) {

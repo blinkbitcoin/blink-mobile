@@ -152,8 +152,8 @@ import {
 import {
   MigrationDownloadHistoryScreen,
   MigrationExplainerScreen,
+  MigrationGate,
   MigrationKeepReceivingScreen,
-  MigrationRequiredScreen,
   TransferringFundsScreen,
 } from "@app/screens/account-migration"
 import {
@@ -1023,7 +1023,7 @@ export const PrimaryNavigator = () => {
 
   useCustodialMigrationRequiredSync()
   const migrationRequired = useCustodialMigrationRequired()
-  if (migrationRequired) return <MigrationRequiredScreen />
+  if (migrationRequired) return <MigrationGate />
 
   // The cacheId is updated after every mutation that affects current user data (balanace, contacts, ...)
   // It's used to re-mount this component and thus reset what's cached in Apollo (and React)
