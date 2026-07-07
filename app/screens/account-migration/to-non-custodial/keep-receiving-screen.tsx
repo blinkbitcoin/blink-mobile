@@ -48,15 +48,12 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
   const hasLightningAddress = Boolean(username)
   const shouldSkipScreen = isCheckReady && !hasLightningAddress
 
+  /** TODO: only route to download-history when the account has at least one transaction. */
   const goToNextStep = useCallback(() => {
-    navigation.navigate(getRouteForCheckpoint())
-  }, [navigation, getRouteForCheckpoint])
+    navigation.navigate("accountMigrationDownloadHistory")
+  }, [navigation])
 
-  /**
-   * Safety guard: this screen only makes sense for accounts that own a lightning
-   * address to transfer. If it is missing, skip straight into the migration flow
-   * rather than presenting an empty address.
-   */
+  /** Guard: this screen needs a lightning address; without one, skip into the flow. */
   useEffect(() => {
     if (shouldSkipScreen) navigation.replace(getRouteForCheckpoint())
   }, [shouldSkipScreen, navigation, getRouteForCheckpoint])

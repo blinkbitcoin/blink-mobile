@@ -3740,6 +3740,11 @@ const en: BaseTranslation = {
       "Your lightning address will be transferred to your new non-custodial account.",
     keepReceivingLnAddressLabel: "Your LN address",
     keepReceivingCta: "Nice",
+    downloadHistoryTitle: "Download your transaction history",
+    downloadHistoryBody:
+      "Your new account will start fresh. If you want to keep record of your transactions, download them as CSV now.",
+    downloadHistoryDownloadCta: "Download",
+    downloadHistorySkipCta: "Skip",
   },
   AccountTypeSelectionScreen: {
     descriptionDefault: "Please choose your preferred type of Blink.",

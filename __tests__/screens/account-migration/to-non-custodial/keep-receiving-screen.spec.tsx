@@ -12,6 +12,7 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const NEXT_ROUTE = "accountMigrationExplainer"
+const DOWNLOAD_HISTORY_ROUTE = "accountMigrationDownloadHistory"
 
 const mockNavigate = jest.fn()
 const mockReplace = jest.fn()
@@ -90,13 +91,13 @@ describe("MigrationKeepReceivingScreen", () => {
     expect(address.props.ellipsizeMode).toBe("middle")
   })
 
-  it("continues into the migration flow when the CTA is pressed", async () => {
+  it("goes to the download-history step when the CTA is pressed", async () => {
     renderScreen()
     await flushEffects()
 
     fireEvent.press(screen.getByText(LL.AccountMigration.keepReceivingCta()))
 
-    expect(mockNavigate).toHaveBeenCalledWith(NEXT_ROUTE)
+    expect(mockNavigate).toHaveBeenCalledWith(DOWNLOAD_HISTORY_ROUTE)
   })
 
   it("skips itself when the user has no lightning address", async () => {

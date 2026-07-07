@@ -11864,6 +11864,22 @@ type RootTranslation = {
 		 * N​i​c​e
 		 */
 		keepReceivingCta: string
+		/**
+		 * D​o​w​n​l​o​a​d​ ​y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y
+		 */
+		downloadHistoryTitle: string
+		/**
+		 * Y​o​u​r​ ​n​e​w​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​s​t​a​r​t​ ​f​r​e​s​h​.​ ​I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​k​e​e​p​ ​r​e​c​o​r​d​ ​o​f​ ​y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​s​,​ ​d​o​w​n​l​o​a​d​ ​t​h​e​m​ ​a​s​ ​C​S​V​ ​n​o​w​.
+		 */
+		downloadHistoryBody: string
+		/**
+		 * D​o​w​n​l​o​a​d
+		 */
+		downloadHistoryDownloadCta: string
+		/**
+		 * S​k​i​p
+		 */
+		downloadHistorySkipCta: string
 	}
 	AccountTypeSelectionScreen: {
 		/**
@@ -24126,6 +24142,22 @@ export type TranslationFunctions = {
 		 * Nice
 		 */
 		keepReceivingCta: () => LocalizedString
+		/**
+		 * Download your transaction history
+		 */
+		downloadHistoryTitle: () => LocalizedString
+		/**
+		 * Your new account will start fresh. If you want to keep record of your transactions, download them as CSV now.
+		 */
+		downloadHistoryBody: () => LocalizedString
+		/**
+		 * Download
+		 */
+		downloadHistoryDownloadCta: () => LocalizedString
+		/**
+		 * Skip
+		 */
+		downloadHistorySkipCta: () => LocalizedString
 	}
 	AccountTypeSelectionScreen: {
 		/**
