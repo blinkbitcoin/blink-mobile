@@ -3568,10 +3568,11 @@
     "moveToNonCustodial": "Flyt til non-custodial",
     "explainerTitle": "Hvad betyder det at flytte til non-custodial?",
     "explainerCheck1": "Du opretter en non-custodial konto på Spark-protokollen",
-    "explainerCheck2": "Vi overfører dine midler til din nye non-custodial konto; din nuværende konto og alle dens data, herunder transaktionshistorik, vil blive slettet",
-    "explainerCheck3": "Blink POS, Blink API, Blink Donate-knappen og enhver anden tjeneste, der er afhængig af custodial-kontoen, vil ikke være tilgængelig",
-    "explainerCheck4": "Der trækkes et Spark-indbetalingsgebyr på {feePercent: number}% fra din konto",
-    "letsMove": "Lad os gå",
+    "explainerCheck2": "Vi overfører dine midler til din nye non-custodial konto",
+    "explainerCheck3": "Din nuværende konto og alle dens data, herunder transaktionshistorik, vil blive lukket",
+    "explainerCheck4": "Blink API vil ikke være tilgængelig",
+    "explainerCheck5": "Din konto vil blive trukket et Spark-netværksgebyr",
+    "explainerCta": "Jeg forstår",
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder."
   },
   "AccountTypeSelectionScreen": {

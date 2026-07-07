@@ -3568,10 +3568,11 @@
     "moveToNonCustodial": "Hamia kwa non-custodial",
     "explainerTitle": "Inamaanisha nini kuhamia kwa non-custodial?",
     "explainerCheck1": "Utaunda akaunti ya non-custodial kwenye itifaki ya Spark",
-    "explainerCheck2": "Tunahamisha fedha zako kwenye akaunti yako mpya ya non-custodial; akaunti yako ya sasa na data yake yote ikiwa ni pamoja na historia ya miamala itafutwa",
-    "explainerCheck3": "Blink POS, Blink API, Kitufe cha Kuchangia cha Blink na huduma nyingine yoyote inayotegemea akaunti ya custodial hazitapatikana",
-    "explainerCheck4": "Akaunti yako itakatwa ada ya amana ya Spark ya {feePercent: number}%",
-    "letsMove": "Twende",
+    "explainerCheck2": "Tunahamisha fedha zako kwenye akaunti yako mpya ya non-custodial",
+    "explainerCheck3": "Akaunti yako ya sasa na data zake zote ikiwa ni pamoja na historia ya miamala zitafungwa",
+    "explainerCheck4": "Blink API haitapatikana",
+    "explainerCheck5": "Akaunti yako itakatwa ada ya mtandao wa Spark",
+    "explainerCta": "Naelewa",
     "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache."
   },
   "AccountTypeSelectionScreen": {

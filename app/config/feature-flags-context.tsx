@@ -26,7 +26,6 @@ const CardSubscriptionPriceUsdKey = "cardSubscriptionPriceUsd"
 const CardProcessingWaitTimeHoursKey = "cardProcessingWaitTimeHours"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
-const SparkDepositFeePercentKey = "sparkDepositFeePercent"
 const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
 const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const NonCustodialEnabledKey = "nonCustodialEnabled"
@@ -77,7 +76,6 @@ type RemoteConfig = {
   [CardProcessingWaitTimeHoursKey]: number
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
-  [SparkDepositFeePercentKey]: number
   [BackupNudgeBannerThresholdKey]: number
   [BackupNudgeModalThresholdKey]: number
   [NonCustodialEnabledKey]: boolean
@@ -150,7 +148,6 @@ export const defaultRemoteConfig: RemoteConfig = {
   cardProcessingWaitTimeHours: 24,
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
   sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
-  sparkDepositFeePercent: 0.5,
   backupNudgeBannerThreshold: 2100,
   backupNudgeModalThreshold: 21000,
   nonCustodialEnabled: false,
@@ -286,10 +283,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SparkCompatibleWalletsUrlKey)
           .asString()
 
-        const sparkDepositFeePercent = remoteConfigInstance()
-          .getValue(SparkDepositFeePercentKey)
-          .asNumber()
-
         const backupNudgeBannerThreshold = remoteConfigInstance()
           .getValue(BackupNudgeBannerThresholdKey)
           .asNumber()
@@ -395,7 +388,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           cardProcessingWaitTimeHours,
           replaceCardDeliveryConfig,
           sparkCompatibleWalletsUrl,
-          sparkDepositFeePercent,
           backupNudgeBannerThreshold,
           backupNudgeModalThreshold,
           nonCustodialEnabled,

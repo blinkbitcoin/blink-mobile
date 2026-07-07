@@ -3719,13 +3719,12 @@ const en: BaseTranslation = {
     moveToNonCustodial: "Move to non-custodial",
     explainerTitle: "What does it mean to move to non-custodial?",
     explainerCheck1: "You will create a non-custodial account on the Spark protocol",
-    explainerCheck2:
-      "We transfer your funds into your new non-custodial account, your current account and all its data including transaction history will be deleted",
+    explainerCheck2: "We transfer your funds into your new non-custodial account",
     explainerCheck3:
-      "Blink POS, Blink API, Blink Donate Button and any other service relying on the custodial account will not be available",
-    explainerCheck4:
-      "Your account will be deducted with a Spark deposit fee of {feePercent: number}%",
-    letsMove: "Let's move",
+      "Your current account and all its data including transaction history will be closed",
+    explainerCheck4: "Blink API will not be available",
+    explainerCheck5: "Your account will be deducted with a Spark network fee",
+    explainerCta: "I understand",
     transferringFunds:
       "Transferring your funds. It should be done in a few seconds.",
     migrationRequiredTitle: "Time to upgrade",

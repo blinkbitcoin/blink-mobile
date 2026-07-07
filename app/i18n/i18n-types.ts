@@ -11808,22 +11808,25 @@ type RootTranslation = {
 		 */
 		explainerCheck1: string
 		/**
-		 * W​e​ ​t​r​a​n​s​f​e​r​ ​y​o​u​r​ ​f​u​n​d​s​ ​i​n​t​o​ ​y​o​u​r​ ​n​e​w​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​,​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​a​c​c​o​u​n​t​ ​a​n​d​ ​a​l​l​ ​i​t​s​ ​d​a​t​a​ ​i​n​c​l​u​d​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y​ ​w​i​l​l​ ​b​e​ ​d​e​l​e​t​e​d
+		 * W​e​ ​t​r​a​n​s​f​e​r​ ​y​o​u​r​ ​f​u​n​d​s​ ​i​n​t​o​ ​y​o​u​r​ ​n​e​w​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
 		 */
 		explainerCheck2: string
 		/**
-		 * B​l​i​n​k​ ​P​O​S​,​ ​B​l​i​n​k​ ​A​P​I​,​ ​B​l​i​n​k​ ​D​o​n​a​t​e​ ​B​u​t​t​o​n​ ​a​n​d​ ​a​n​y​ ​o​t​h​e​r​ ​s​e​r​v​i​c​e​ ​r​e​l​y​i​n​g​ ​o​n​ ​t​h​e​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​v​a​i​l​a​b​l​e
+		 * Y​o​u​r​ ​c​u​r​r​e​n​t​ ​a​c​c​o​u​n​t​ ​a​n​d​ ​a​l​l​ ​i​t​s​ ​d​a​t​a​ ​i​n​c​l​u​d​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y​ ​w​i​l​l​ ​b​e​ ​c​l​o​s​e​d
 		 */
 		explainerCheck3: string
 		/**
-		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​d​e​d​u​c​t​e​d​ ​w​i​t​h​ ​a​ ​S​p​a​r​k​ ​d​e​p​o​s​i​t​ ​f​e​e​ ​o​f​ ​{​f​e​e​P​e​r​c​e​n​t​}​%
-		 * @param {number} feePercent
+		 * B​l​i​n​k​ ​A​P​I​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​v​a​i​l​a​b​l​e
 		 */
-		explainerCheck4: RequiredParams<'feePercent'>
+		explainerCheck4: string
 		/**
-		 * L​e​t​'​s​ ​m​o​v​e
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​d​e​d​u​c​t​e​d​ ​w​i​t​h​ ​a​ ​S​p​a​r​k​ ​n​e​t​w​o​r​k​ ​f​e​e
 		 */
-		letsMove: string
+		explainerCheck5: string
+		/**
+		 * I​ ​u​n​d​e​r​s​t​a​n​d
+		 */
+		explainerCta: string
 		/**
 		 * T​r​a​n​s​f​e​r​r​i​n​g​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​I​t​ ​s​h​o​u​l​d​ ​b​e​ ​d​o​n​e​ ​i​n​ ​a​ ​f​e​w​ ​s​e​c​o​n​d​s​.
 		 */
@@ -24103,21 +24106,25 @@ export type TranslationFunctions = {
 		 */
 		explainerCheck1: () => LocalizedString
 		/**
-		 * We transfer your funds into your new non-custodial account, your current account and all its data including transaction history will be deleted
+		 * We transfer your funds into your new non-custodial account
 		 */
 		explainerCheck2: () => LocalizedString
 		/**
-		 * Blink POS, Blink API, Blink Donate Button and any other service relying on the custodial account will not be available
+		 * Your current account and all its data including transaction history will be closed
 		 */
 		explainerCheck3: () => LocalizedString
 		/**
-		 * Your account will be deducted with a Spark deposit fee of {feePercent}%
+		 * Blink API will not be available
 		 */
-		explainerCheck4: (arg: { feePercent: number }) => LocalizedString
+		explainerCheck4: () => LocalizedString
 		/**
-		 * Let's move
+		 * Your account will be deducted with a Spark network fee
 		 */
-		letsMove: () => LocalizedString
+		explainerCheck5: () => LocalizedString
+		/**
+		 * I understand
+		 */
+		explainerCta: () => LocalizedString
 		/**
 		 * Transferring your funds. It should be done in a few seconds.
 		 */

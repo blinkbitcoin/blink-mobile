@@ -3568,10 +3568,11 @@
     "moveToNonCustodial": "Non-custodial'a geç",
     "explainerTitle": "Non-custodial'a geçmek ne anlama gelir?",
     "explainerCheck1": "Spark protokolünde bir non-custodial hesap oluşturacaksınız",
-    "explainerCheck2": "Bakiyenizi yeni non-custodial hesabınıza aktarıyoruz; mevcut hesabınız ve işlem geçmişi dahil tüm verileri silinecek",
-    "explainerCheck3": "Blink POS, Blink API, Blink Bağış Düğmesi ve custodial hesaba dayanan diğer hizmetler kullanılamayacak",
-    "explainerCheck4": "Hesabınızdan {feePercent: number}%'lik bir Spark yatırma ücreti düşülecek",
-    "letsMove": "Hadi başlayalım",
+    "explainerCheck2": "Fonlarını yeni non-custodial hesabına aktarıyoruz",
+    "explainerCheck3": "Mevcut hesabın ve işlem geçmişi dahil tüm verileri kapatılacak",
+    "explainerCheck4": "Blink API kullanılamayacak",
+    "explainerCheck5": "Hesabından bir Spark ağ ücreti düşülecek",
+    "explainerCta": "Anladım",
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır."
   },
   "AccountTypeSelectionScreen": {

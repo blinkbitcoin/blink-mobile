@@ -3568,10 +3568,11 @@
         "moveToNonCustodial": "Zu Non-Custodial wechseln",
         "explainerTitle": "Was bedeutet es, zu Non-Custodial zu wechseln?",
         "explainerCheck1": "Du erstellst ein Non-Custodial-Konto auf dem Spark-Protokoll",
-        "explainerCheck2": "Wir übertragen deine Guthaben auf dein neues Non-Custodial-Konto; dein aktuelles Konto und alle seine Daten einschließlich des Transaktionsverlaufs werden gelöscht",
-        "explainerCheck3": "Blink POS, Blink API, der Blink-Spenden-Button und alle anderen Dienste, die auf dem Custodial-Konto basieren, sind nicht mehr verfügbar",
-        "explainerCheck4": "Deinem Konto wird eine Spark-Einzahlungsgebühr von {feePercent: number}% abgezogen",
-        "letsMove": "Los geht's",
+        "explainerCheck2": "Wir übertragen deine Gelder auf dein neues Non-Custodial-Konto",
+        "explainerCheck3": "Dein aktuelles Konto und alle seine Daten einschließlich des Transaktionsverlaufs werden geschlossen",
+        "explainerCheck4": "Blink API wird nicht verfügbar sein",
+        "explainerCheck5": "Deinem Konto wird eine Spark-Netzwerkgebühr abgezogen",
+        "explainerCta": "Ich verstehe",
         "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein."
     },
     "AccountTypeSelectionScreen": {

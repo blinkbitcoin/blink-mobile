@@ -3568,10 +3568,11 @@
     "moveToNonCustodial": "Non-custodial nisqaman kutiy",
     "explainerTitle": "Imataq niyta munan non-custodial nisqaman kutiy?",
     "explainerCheck1": "Spark protocol nisqapi non-custodial akawuntita ruwanki",
-    "explainerCheck2": "Qullqiykita musuq non-custodial akawuntiykiman apasun; kunan akawuntiykiwan llapan willaynintinwan, ranti qillqakunatawan, puchukanqa",
-    "explainerCheck3": "Blink POS, Blink API, Blink Donate ñit'ana, custodial akawuntipi sayaq ima servicios ima mana kanqachu",
-    "explainerCheck4": "Akawuntiykimanta Spark deposit qullqi {feePercent: number}% qichusqa kanqa",
-    "letsMove": "Haku",
+    "explainerCheck2": "Qullqiykikunata musuq non-custodial akawuntiykiman apachkaniku",
+    "explainerCheck3": "Kunan akawuntiyki hinaspa llapa datosnin, transaksiykikuna willakuywan, wisq'akunqa",
+    "explainerCheck4": "Blink API mana kanqachu",
+    "explainerCheck5": "Akawuntiykimanta Spark red pagota qichunqaku",
+    "explainerCta": "Entiendini",
     "transferringFunds": "Qullqiykita apachkaniku. Iskay kinsa sikundullapi tukurunqa."
   },
   "AccountTypeSelectionScreen": {

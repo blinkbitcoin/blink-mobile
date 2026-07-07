@@ -3568,10 +3568,11 @@
     "moveToNonCustodial": "Přejít na non-custodial",
     "explainerTitle": "Co znamená přejít na non-custodial?",
     "explainerCheck1": "Vytvoříte non-custodial účet na protokolu Spark",
-    "explainerCheck2": "Převedeme vaše prostředky na váš nový non-custodial účet; váš stávající účet a všechna jeho data včetně historie transakcí budou smazána",
-    "explainerCheck3": "Blink POS, Blink API, tlačítko Blink Donate a jakákoli další služba závislá na custodial účtu nebudou k dispozici",
-    "explainerCheck4": "Z vašeho účtu bude stržen vkladový poplatek Spark ve výši {feePercent: number}%",
-    "letsMove": "Pojďme na to",
+    "explainerCheck2": "Převedeme tvé prostředky na tvůj nový non-custodial účet",
+    "explainerCheck3": "Tvůj současný účet a všechna jeho data včetně historie transakcí budou uzavřeny",
+    "explainerCheck4": "Blink API nebude k dispozici",
+    "explainerCheck5": "Z tvého účtu bude stržen síťový poplatek Spark",
+    "explainerCta": "Rozumím",
     "transferringFunds": "Převádíme vaše prostředky. Mělo by to být hotové za několik sekund."
   },
   "AccountTypeSelectionScreen": {

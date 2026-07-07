@@ -3568,10 +3568,11 @@
     "moveToNonCustodial": "Tuuka ku non-custodial",
     "explainerTitle": "Kitegeeza ki okutuuka ku non-custodial?",
     "explainerCheck1": "Ojja okukola akawunti ya non-custodial ku Spark protocol",
-    "explainerCheck2": "Tutwala ssente zo ku akawunti yo empya eya non-custodial; akawunti yo eriwo n'ebikwatagana nayo byonna, omuli n'ebyafaayo by'emirimu, bijja kusangulwa",
-    "explainerCheck3": "Blink POS, Blink API, akabonero k'okuwaayo aka Blink n'empeereza endala yonna eyeesigamye ku kawunti ya custodial tebijja kubaawo",
-    "explainerCheck4": "Ku kawunti yo kujja kuggibwako ssente za Spark deposit eza {feePercent: number}%",
-    "letsMove": "Ka tugende",
+    "explainerCheck2": "Tutambuza ssente zo mu kawunti yo empya eya non-custodial",
+    "explainerCheck3": "Akawunti yo eya kati n'ebiwandiiko byayo byonna omuli n'ebyafaayo by'ensimbi bijja kuggalwa",
+    "explainerCheck4": "Blink API tejja kubaawo",
+    "explainerCheck5": "Ku kawunti yo kujja kusalibwako ssente z'omukutu gwa Spark",
+    "explainerCta": "Ntegedde",
     "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono."
   },
   "AccountTypeSelectionScreen": {

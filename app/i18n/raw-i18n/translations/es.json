@@ -3568,10 +3568,11 @@
         "moveToNonCustodial": "Migrar a no custodia",
         "explainerTitle": "¿Qué significa migrar a no custodia?",
         "explainerCheck1": "Crearás una cuenta no custodial en el protocolo Spark",
-        "explainerCheck2": "Transferiremos tus fondos a tu nueva cuenta no custodial; tu cuenta actual y todos sus datos, incluido el historial de transacciones, serán eliminados",
-        "explainerCheck3": "Blink POS, Blink API, el Botón de Donaciones de Blink y cualquier otro servicio que dependa de la cuenta custodial dejarán de estar disponibles",
-        "explainerCheck4": "Se descontará de tu cuenta una comisión de depósito de Spark del {feePercent: number}%",
-        "letsMove": "¡Vamos!",
+        "explainerCheck2": "Transferimos tus fondos a tu nueva cuenta no custodial",
+        "explainerCheck3": "Tu cuenta actual y todos sus datos, incluido el historial de transacciones, se cerrarán",
+        "explainerCheck4": "La API de Blink no estará disponible",
+        "explainerCheck5": "Se descontará una comisión de red de Spark de tu cuenta",
+        "explainerCta": "Entiendo",
         "transferringFunds": "Transfiriendo tus fondos. Debería completarse en unos segundos."
     },
     "AccountTypeSelectionScreen": {

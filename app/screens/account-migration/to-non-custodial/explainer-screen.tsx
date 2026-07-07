@@ -5,7 +5,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { RevealedCheckboxList } from "@app/components/revealed-checkbox-list"
@@ -22,7 +21,6 @@ export const MigrationExplainerScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { sparkDepositFeePercent } = useRemoteConfig()
   const { ensureAccount, loading: checkpointLoading } = useMigrationAccount()
 
   const [allChecked, setAllChecked] = useState(false)
@@ -32,7 +30,8 @@ export const MigrationExplainerScreen: React.FC = () => {
     LL.AccountMigration.explainerCheck1(),
     LL.AccountMigration.explainerCheck2(),
     LL.AccountMigration.explainerCheck3(),
-    LL.AccountMigration.explainerCheck4({ feePercent: sparkDepositFeePercent }),
+    LL.AccountMigration.explainerCheck4(),
+    LL.AccountMigration.explainerCheck5(),
   ]
 
   const handleMove = useCallback(async () => {
@@ -60,7 +59,7 @@ export const MigrationExplainerScreen: React.FC = () => {
 
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
-            title={LL.AccountMigration.letsMove()}
+            title={LL.AccountMigration.explainerCta()}
             disabled={!allChecked || provisioning || checkpointLoading}
             loading={provisioning}
             onPress={handleMove}

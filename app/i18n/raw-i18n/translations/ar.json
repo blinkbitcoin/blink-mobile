@@ -3568,10 +3568,11 @@
     "moveToNonCustodial": "الانتقال إلى غير حفظي",
     "explainerTitle": "ماذا يعني الانتقال إلى غير حفظي؟",
     "explainerCheck1": "ستقوم بإنشاء حساب غير حفظي على بروتوكول Spark",
-    "explainerCheck2": "سننقل أموالك إلى حسابك الجديد غير الحفظي، وسيتم حذف حسابك الحالي وجميع بياناته بما في ذلك سجل المعاملات",
-    "explainerCheck3": "لن تتوفر خدمة Blink POS وBlink API وزر التبرع Blink وأي خدمة أخرى تعتمد على الحساب الحفظي",
-    "explainerCheck4": "سيتم خصم رسوم إيداع Spark بنسبة {feePercent: number}% من حسابك",
-    "letsMove": "هيا بنا",
+    "explainerCheck2": "ننقل أموالك إلى حسابك الجديد غير الحفظي",
+    "explainerCheck3": "سيتم إغلاق حسابك الحالي وجميع بياناته بما في ذلك سجل المعاملات",
+    "explainerCheck4": "لن تكون واجهة برمجة تطبيقات Blink متاحة",
+    "explainerCheck5": "سيتم خصم رسوم شبكة Spark من حسابك",
+    "explainerCta": "فهمت",
     "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة."
   },
   "AccountTypeSelectionScreen": {

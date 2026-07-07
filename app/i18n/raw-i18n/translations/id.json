@@ -3568,10 +3568,11 @@
     "moveToNonCustodial": "Pindah ke non-custodial",
     "explainerTitle": "Apa artinya pindah ke non-custodial?",
     "explainerCheck1": "Anda akan membuat akun non-custodial di protokol Spark",
-    "explainerCheck2": "Kami mentransfer dana Anda ke akun non-custodial baru; akun Anda saat ini dan semua datanya termasuk riwayat transaksi akan dihapus",
-    "explainerCheck3": "Blink POS, Blink API, Tombol Donasi Blink, dan layanan lain yang bergantung pada akun custodial tidak akan tersedia",
-    "explainerCheck4": "Akun Anda akan dikenakan biaya setoran Spark sebesar {feePercent: number}%",
-    "letsMove": "Ayo mulai",
+    "explainerCheck2": "Kami memindahkan dana Anda ke akun non-custodial baru Anda",
+    "explainerCheck3": "Akun Anda saat ini dan semua datanya termasuk riwayat transaksi akan ditutup",
+    "explainerCheck4": "Blink API tidak akan tersedia",
+    "explainerCheck5": "Akun Anda akan dikenakan biaya jaringan Spark",
+    "explainerCta": "Saya mengerti",
     "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik."
   },
   "AccountTypeSelectionScreen": {

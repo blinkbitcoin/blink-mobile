@@ -3568,10 +3568,11 @@
     "moveToNonCustodial": "Prebaci na ne-skrbnički",
     "explainerTitle": "Što znači prebaciti na ne-skrbnički?",
     "explainerCheck1": "Stvorit ćete ne-skrbnički račun na Spark protokolu",
-    "explainerCheck2": "Prebacujemo vaša sredstva na vaš novi ne-skrbnički račun; vaš trenutni račun i svi njegovi podaci, uključujući povijest transakcija, bit će izbrisani",
-    "explainerCheck3": "Blink POS, Blink API, Blink Donate gumb i sve druge usluge koje se oslanjaju na skrbnički račun neće biti dostupne",
-    "explainerCheck4": "S vašeg računa bit će naplaćena Spark naknada za polog od {feePercent: number}%",
-    "letsMove": "Idemo",
+    "explainerCheck2": "Prenosimo tvoja sredstva na tvoj novi ne-skrbnički račun",
+    "explainerCheck3": "Tvoj trenutni račun i svi njegovi podaci, uključujući povijest transakcija, bit će zatvoreni",
+    "explainerCheck4": "Blink API neće biti dostupan",
+    "explainerCheck5": "S tvog računa bit će naplaćena mrežna naknada Spark",
+    "explainerCta": "Razumijem",
     "transferringFunds": "Prebacujemo vaša sredstva. Trebalo bi biti gotovo za nekoliko sekundi."
   },
   "AccountTypeSelectionScreen": {

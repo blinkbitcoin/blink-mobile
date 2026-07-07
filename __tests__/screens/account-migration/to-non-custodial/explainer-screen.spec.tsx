@@ -25,11 +25,6 @@ jest.mock("@app/components/icon-hero", () => ({
   },
 }))
 
-const FEE_PERCENT = 0.5
-jest.mock("@app/config/feature-flags-context", () => ({
-  useRemoteConfig: () => ({ sparkDepositFeePercent: FEE_PERCENT }),
-}))
-
 const mockEnsureAccount = jest.fn()
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationAccount: () => ({ ensureAccount: mockEnsureAccount, loading: false }),
@@ -71,22 +66,24 @@ describe("MigrationExplainerScreen", () => {
 
     fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck3()))
     expect(screen.getAllByRole("checkbox")).toHaveLength(4)
+
+    fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck4()))
+    expect(screen.getAllByRole("checkbox")).toHaveLength(5)
   })
 
   const acceptAllChecks = () => {
     fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck1()))
     fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck2()))
     fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck3()))
-    fireEvent.press(
-      screen.getByText(LL.AccountMigration.explainerCheck4({ feePercent: FEE_PERCENT })),
-    )
+    fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck4()))
+    fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck5()))
   }
 
-  it("keeps Let's move inert until every checkbox is accepted, then provisions and navigates", async () => {
+  it("keeps the CTA inert until every checkbox is accepted, then provisions and navigates", async () => {
     renderScreen()
     await flushEffects()
 
-    const cta = screen.getByText(LL.AccountMigration.letsMove())
+    const cta = screen.getByText(LL.AccountMigration.explainerCta())
 
     fireEvent.press(cta)
     expect(mockEnsureAccount).not.toHaveBeenCalled()
@@ -107,7 +104,7 @@ describe("MigrationExplainerScreen", () => {
     await flushEffects()
 
     acceptAllChecks()
-    fireEvent.press(screen.getByText(LL.AccountMigration.letsMove()))
+    fireEvent.press(screen.getByText(LL.AccountMigration.explainerCta()))
 
     await waitFor(() => expect(mockEnsureAccount).toHaveBeenCalled())
     expect(mockNavigate).not.toHaveBeenCalled()

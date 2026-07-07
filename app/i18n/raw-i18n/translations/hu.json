@@ -3568,10 +3568,11 @@
     "moveToNonCustodial": "Áttérés önrendelkezőre",
     "explainerTitle": "Mit jelent az önrendelkező módra való áttérés?",
     "explainerCheck1": "Létrehozol egy önrendelkező fiókot a Spark protokollon",
-    "explainerCheck2": "Átutaljuk az egyenlegedet az új önrendelkező fiókodba; a jelenlegi fiókod és minden adata, beleértve a tranzakciós előzményeket, törlésre kerül",
-    "explainerCheck3": "A Blink POS, a Blink API, a Blink adományozó gomb és minden más, a custodial fiókra támaszkodó szolgáltatás nem lesz elérhető",
-    "explainerCheck4": "A fiókodból {feePercent: number}%-os Spark befizetési díj kerül levonásra",
-    "letsMove": "Rajta",
+    "explainerCheck2": "Átvezetjük a pénzed az új önrendelkező fiókodba",
+    "explainerCheck3": "A jelenlegi fiókod és minden adata, beleértve a tranzakciós előzményeket, lezárásra kerül",
+    "explainerCheck4": "A Blink API nem lesz elérhető",
+    "explainerCheck5": "A fiókodból levonásra kerül egy Spark hálózati díj",
+    "explainerCta": "Megértettem",
     "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik."
   },
   "AccountTypeSelectionScreen": {

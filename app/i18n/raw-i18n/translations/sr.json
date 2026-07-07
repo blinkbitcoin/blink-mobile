@@ -3568,10 +3568,11 @@
     "moveToNonCustodial": "Пребаци на non-custodial",
     "explainerTitle": "Шта значи пребацити на non-custodial?",
     "explainerCheck1": "Креираћете non-custodial налог на Spark протоколу",
-    "explainerCheck2": "Пребацујемо ваша средства на ваш нови non-custodial налог; ваш тренутни налог и сви његови подаци, укључујући историју трансакција, биће обрисани",
-    "explainerCheck3": "Blink POS, Blink API, Blink Donate дугме и било која друга услуга која се ослања на скрбнички налог неће бити доступни",
-    "explainerCheck4": "Са вашег налога биће одбијена Spark накнада за депозит од {feePercent: number}%",
-    "letsMove": "Идемо",
+    "explainerCheck2": "Пребацујемо твоја средства на твој нови non-custodial налог",
+    "explainerCheck3": "Твој тренутни налог и сви његови подаци, укључујући историју трансакција, биће затворени",
+    "explainerCheck4": "Blink API неће бити доступан",
+    "explainerCheck5": "Са твог налога биће наплаћена мрежна накнада Spark",
+    "explainerCta": "Разумем",
     "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди."
   },
   "AccountTypeSelectionScreen": {

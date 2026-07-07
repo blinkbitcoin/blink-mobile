@@ -3568,10 +3568,11 @@
         "moveToNonCustodial": "ノンカストディアルに移行",
         "explainerTitle": "ノンカストディアルへの移行とは？",
         "explainerCheck1": "Sparkプロトコル上にノンカストディアルアカウントを作成します",
-        "explainerCheck2": "お客様の資金を新しいノンカストディアルアカウントに転送します。現在のアカウントと取引履歴を含むすべてのデータは削除されます",
-        "explainerCheck3": "Blink POS、Blink API、Blink寄付ボタン、その他カストディアルアカウントに依存するサービスは利用できなくなります",
-        "explainerCheck4": "お客様のアカウントからSparkの入金手数料{feePercent: number}%が差し引かれます",
-        "letsMove": "移行する",
+        "explainerCheck2": "資金を新しいノンカストディアルアカウントに移します",
+        "explainerCheck3": "現在のアカウントと、取引履歴を含むすべてのデータは閉鎖されます",
+        "explainerCheck4": "Blink APIは利用できなくなります",
+        "explainerCheck5": "アカウントからSparkネットワーク手数料が差し引かれます",
+        "explainerCta": "理解しました",
         "transferringFunds": "資金を転送中です。数秒で完了するはずです。"
     },
     "AccountTypeSelectionScreen": {
