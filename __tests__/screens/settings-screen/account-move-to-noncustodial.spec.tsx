@@ -1,11 +1,12 @@
 import React from "react"
-import { render } from "@testing-library/react-native"
+import { render, screen, fireEvent } from "@testing-library/react-native"
 
 import { MoveToNonCustodialSetting } from "@app/screens/settings-screen/settings/account-move-to-noncustodial"
 import { AccountType } from "@app/types/wallet"
 
 const mockNavigate = jest.fn()
 const mockActiveAccount = jest.fn()
+const mockUseMigrationCheckpoint = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -17,10 +18,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
-  useMigrationCheckpoint: () => ({
-    loading: false,
-    getRouteForCheckpoint: () => "accountMigrationExplainer",
-  }),
+  useMigrationCheckpoint: () => mockUseMigrationCheckpoint(),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -34,42 +32,68 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 jest.mock("@app/screens/settings-screen/row", () => ({
-  SettingsRow: ({ title }: { title: string }) => {
+  SettingsRow: ({ title, action }: { title: string; action: () => void }) => {
     const { Text } = jest.requireActual("react-native")
-    return <Text testID="settings-row">{title}</Text>
+    return (
+      <Text testID="settings-row" onPress={action}>
+        {title}
+      </Text>
+    )
   },
 }))
 
 describe("MoveToNonCustodialSetting", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
+    mockUseMigrationCheckpoint.mockReturnValue({
+      loading: false,
+      getRouteForCheckpoint: () => "selfCustodialBackupMethod",
+      hasResumableCheckpoint: false,
+    })
   })
 
   it("renders for custodial accounts", () => {
-    mockActiveAccount.mockReturnValue({
-      type: AccountType.Custodial,
-    })
+    render(<MoveToNonCustodialSetting />)
 
-    const { getByTestId } = render(<MoveToNonCustodialSetting />)
-
-    expect(getByTestId("settings-row")).toBeTruthy()
+    expect(screen.getByTestId("settings-row")).toBeTruthy()
   })
 
   it("does not render for self-custodial accounts", () => {
-    mockActiveAccount.mockReturnValue({
-      type: AccountType.SelfCustodial,
-    })
+    mockActiveAccount.mockReturnValue({ type: AccountType.SelfCustodial })
 
-    const { queryByTestId } = render(<MoveToNonCustodialSetting />)
+    render(<MoveToNonCustodialSetting />)
 
-    expect(queryByTestId("settings-row")).toBeNull()
+    expect(screen.queryByTestId("settings-row")).toBeNull()
   })
 
   it("renders when no active account", () => {
     mockActiveAccount.mockReturnValue(undefined)
 
-    const { getByTestId } = render(<MoveToNonCustodialSetting />)
+    render(<MoveToNonCustodialSetting />)
 
-    expect(getByTestId("settings-row")).toBeTruthy()
+    expect(screen.getByTestId("settings-row")).toBeTruthy()
+  })
+
+  it("starts the migration flow when there is no resumable checkpoint", () => {
+    render(<MoveToNonCustodialSetting />)
+
+    fireEvent.press(screen.getByTestId("settings-row"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationStart")
+  })
+
+  it("resumes the saved checkpoint route when there is one", () => {
+    mockUseMigrationCheckpoint.mockReturnValue({
+      loading: false,
+      getRouteForCheckpoint: () => "selfCustodialBackupMethod",
+      hasResumableCheckpoint: true,
+    })
+
+    render(<MoveToNonCustodialSetting />)
+
+    fireEvent.press(screen.getByTestId("settings-row"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
   })
 })

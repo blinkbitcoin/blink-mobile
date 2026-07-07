@@ -816,6 +816,11 @@ export const RootStack = () => {
         options={{ title: LL.StableBalance.settingsTitle() }}
       />
       <RootNavigator.Screen
+        name="accountMigrationStart"
+        component={MigrationGate}
+        options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
         name="accountMigrationExplainer"
         component={MigrationExplainerScreen}
         options={{ title: "" }}

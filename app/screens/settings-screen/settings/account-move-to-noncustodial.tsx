@@ -15,16 +15,24 @@ export const MoveToNonCustodialSetting: React.FC = () => {
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
-  const { loading, getRouteForCheckpoint } = useMigrationCheckpoint()
+  const { loading, getRouteForCheckpoint, hasResumableCheckpoint } =
+    useMigrationCheckpoint()
 
   if (activeAccount?.type === AccountType.SelfCustodial) return null
+
+  const handleMove = () => {
+    const destination = hasResumableCheckpoint
+      ? getRouteForCheckpoint()
+      : "accountMigrationStart"
+    navigate(destination)
+  }
 
   return (
     <SettingsRow
       title={LL.AccountMigration.moveToNonCustodial()}
       leftGaloyIcon="arrow-right"
       loading={loading}
-      action={() => navigate(getRouteForCheckpoint())}
+      action={handleMove}
     />
   )
 }

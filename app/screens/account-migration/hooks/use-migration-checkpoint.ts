@@ -76,6 +76,9 @@ export const useMigrationCheckpoint = () => {
     [checkpoint, accountId],
   )
 
+  // A provisioned account is only stored alongside a checkpoint, so it gates resumability.
+  const hasResumableCheckpoint = Boolean(accountId)
+
   return {
     checkpoint,
     accountId,
@@ -83,5 +86,6 @@ export const useMigrationCheckpoint = () => {
     saveCheckpoint,
     clearCheckpoint,
     getRouteForCheckpoint,
+    hasResumableCheckpoint,
   }
 }

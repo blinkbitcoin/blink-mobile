@@ -200,6 +200,43 @@ describe("useMigrationCheckpoint", () => {
     expect(result.current.getRouteForCheckpoint()).toBe("accountMigrationExplainer")
   })
 
+  it("reports a resumable checkpoint only when a provisioned account exists", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.hasResumableCheckpoint).toBe(true)
+  })
+
+  it("has no resumable checkpoint when none is stored", async () => {
+    mockLoadCheckpoint.mockResolvedValue(null)
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.hasResumableCheckpoint).toBe(false)
+  })
+
+  it("has no resumable checkpoint when the stored checkpoint has no account", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.hasResumableCheckpoint).toBe(false)
+  })
+
   it("resumes from checkpoint after unmount and remount", async () => {
     mockLoadCheckpoint.mockResolvedValue(null)
 
