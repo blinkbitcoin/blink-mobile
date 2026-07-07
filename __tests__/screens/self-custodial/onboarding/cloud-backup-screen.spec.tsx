@@ -145,7 +145,7 @@ describe("CloudBackupScreen", () => {
     expect(props.title).toBe(LL.BackupScreen.CloudBackup.importantTitle())
   })
 
-  it("renders the hero icon with the success color", () => {
+  it("renders the hero icon with the green color", () => {
     render(
       <ContextForScreen>
         <CloudBackupScreen />
@@ -155,7 +155,7 @@ describe("CloudBackupScreen", () => {
     const iconHeroMock = IconHero as unknown as jest.Mock
     const props = iconHeroMock.mock.calls[0][0]
 
-    expect(props.iconColor).toBe(theme.lightColors?.success)
+    expect(props.iconColor).toBe(theme.lightColors?._green)
     expect(props.icon).toBe("cloud")
   })
 })

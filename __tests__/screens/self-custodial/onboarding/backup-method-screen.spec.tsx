@@ -201,7 +201,7 @@ describe("BackupMethodScreen", () => {
     expect(mockSaveCheckpoint).toHaveBeenCalledWith("backupMethod")
   })
 
-  it("renders the hero icon with the success color", () => {
+  it("renders the hero icon with the green color", () => {
     render(
       <ContextForScreen>
         <BackupMethodScreen />
@@ -211,7 +211,7 @@ describe("BackupMethodScreen", () => {
     const iconHeroMock = IconHero as unknown as jest.Mock
     const props = iconHeroMock.mock.calls[0][0]
 
-    expect(props.iconColor).toBe(theme.lightColors?.success)
+    expect(props.iconColor).toBe(theme.lightColors?._green)
     expect(props.icon).toBe("cloud")
   })
 })
