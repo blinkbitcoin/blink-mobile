@@ -3550,6 +3550,19 @@
         }
     },
     "AccountMigration": {
+        "balancesOverview": {
+            "title": "Mueve tu saldo",
+            "body": "Mueve tus fondos de forma segura a tu nueva cuenta.",
+            "currentBitcoinBalance": "Saldo de Bitcoin actual",
+            "currentDollarBalance": "Saldo en dólares actual",
+            "newBitcoinBalance": "Nuevo saldo de Bitcoin",
+            "newDollarBalance": "Nuevo saldo en dólares",
+            "dollarBalanceNotAvailable": "no disponible",
+            "networkFee": "Comisión de red: <bold>{fee: string}</bold>",
+            "exchangeRate": "Tipo de cambio actual 1 BTC = {rate: string}",
+            "approveCta": "Aprobar",
+            "contactSupportCta": "Contactar con soporte"
+        },
         "migrationRequiredTitle": "Hora de actualizar",
         "keepReceivingTitle": "Sigue recibiendo como siempre",
         "keepReceivingBody": "Tu dirección Lightning se transferirá a tu nueva cuenta no custodial.",

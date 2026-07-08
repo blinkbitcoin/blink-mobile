@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Flyt din saldo",
+      "body": "Flyt dine midler sikkert til din nye konto.",
+      "currentBitcoinBalance": "Nuværende Bitcoin-saldo",
+      "currentDollarBalance": "Nuværende dollarsaldo",
+      "newBitcoinBalance": "Ny Bitcoin-saldo",
+      "newDollarBalance": "Ny dollarsaldo",
+      "dollarBalanceNotAvailable": "ikke tilgængelig",
+      "networkFee": "Netværksgebyr: <bold>{fee: string}</bold>",
+      "exchangeRate": "Nuværende vekselkurs 1 BTC = {rate: string}",
+      "approveCta": "Godkend",
+      "contactSupportCta": "Kontakt support"
+    },
     "migrationRequiredTitle": "Tid til at opgradere",
     "keepReceivingTitle": "Fortsæt med at modtage som sædvanligt",
     "keepReceivingBody": "Din Lightning-adresse vil blive overført til din nye non-custodial konto.",

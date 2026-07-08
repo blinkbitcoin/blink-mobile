@@ -11914,6 +11914,54 @@ type RootTranslation = {
 		 * C​o​n​t​i​n​u​e​ ​a​n​y​w​a​y​s
 		 */
 		apiServiceContinueCta: string
+		balancesOverview: {
+			/**
+			 * M​o​v​e​ ​y​o​u​r​ ​b​a​l​a​n​c​e
+			 */
+			title: string
+			/**
+			 * S​a​f​e​l​y​ ​m​o​v​e​ ​y​o​u​r​ ​f​u​n​d​s​ ​t​o​ ​y​o​u​r​ ​n​e​w​ ​a​c​c​o​u​n​t​.
+			 */
+			body: string
+			/**
+			 * C​u​r​r​e​n​t​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e
+			 */
+			currentBitcoinBalance: string
+			/**
+			 * C​u​r​r​e​n​t​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
+			 */
+			currentDollarBalance: string
+			/**
+			 * N​e​w​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e
+			 */
+			newBitcoinBalance: string
+			/**
+			 * N​e​w​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
+			 */
+			newDollarBalance: string
+			/**
+			 * n​o​t​ ​a​v​a​i​l​a​b​l​e
+			 */
+			dollarBalanceNotAvailable: string
+			/**
+			 * N​e​t​w​o​r​k​ ​f​e​e​:​ ​<​b​o​l​d​>​{​f​e​e​}​<​/​b​o​l​d​>
+			 * @param {string} fee
+			 */
+			networkFee: RequiredParams<'fee'>
+			/**
+			 * C​u​r​r​e​n​t​ ​e​x​c​h​a​n​g​e​ ​r​a​t​e​ ​1​ ​B​T​C​ ​=​ ​{​r​a​t​e​}
+			 * @param {string} rate
+			 */
+			exchangeRate: RequiredParams<'rate'>
+			/**
+			 * A​p​p​r​o​v​e
+			 */
+			approveCta: string
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			contactSupportCta: string
+		}
 	}
 	AccountTypeSelectionScreen: {
 		/**
@@ -24226,6 +24274,52 @@ export type TranslationFunctions = {
 		 * Continue anyways
 		 */
 		apiServiceContinueCta: () => LocalizedString
+		balancesOverview: {
+			/**
+			 * Move your balance
+			 */
+			title: () => LocalizedString
+			/**
+			 * Safely move your funds to your new account.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Current Bitcoin Balance
+			 */
+			currentBitcoinBalance: () => LocalizedString
+			/**
+			 * Current Dollar Balance
+			 */
+			currentDollarBalance: () => LocalizedString
+			/**
+			 * New Bitcoin Balance
+			 */
+			newBitcoinBalance: () => LocalizedString
+			/**
+			 * New Dollar Balance
+			 */
+			newDollarBalance: () => LocalizedString
+			/**
+			 * not available
+			 */
+			dollarBalanceNotAvailable: () => LocalizedString
+			/**
+			 * Network fee: <bold>{fee}</bold>
+			 */
+			networkFee: (arg: { fee: string }) => LocalizedString
+			/**
+			 * Current exchange rate 1 BTC = {rate}
+			 */
+			exchangeRate: (arg: { rate: string }) => LocalizedString
+			/**
+			 * Approve
+			 */
+			approveCta: () => LocalizedString
+			/**
+			 * Contact support
+			 */
+			contactSupportCta: () => LocalizedString
+		}
 	}
 	AccountTypeSelectionScreen: {
 		/**

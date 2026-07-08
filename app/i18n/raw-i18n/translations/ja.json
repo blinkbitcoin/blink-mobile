@@ -3550,6 +3550,19 @@
         }
     },
     "AccountMigration": {
+        "balancesOverview": {
+            "title": "残高を移動する",
+            "body": "資金を安全に新しいアカウントに移動します。",
+            "currentBitcoinBalance": "現在のビットコイン残高",
+            "currentDollarBalance": "現在のドル残高",
+            "newBitcoinBalance": "新しいビットコイン残高",
+            "newDollarBalance": "新しいドル残高",
+            "dollarBalanceNotAvailable": "利用不可",
+            "networkFee": "ネットワーク手数料: <bold>{fee: string}</bold>",
+            "exchangeRate": "現在の為替レート 1 BTC = {rate: string}",
+            "approveCta": "承認",
+            "contactSupportCta": "サポートに連絡"
+        },
         "migrationRequiredTitle": "アップグレードの時間です",
         "keepReceivingTitle": "これまで通り受け取りを続けられます",
         "keepReceivingBody": "あなたのLightningアドレスは、新しいノンカストディアルアカウントに引き継がれます。",

@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Mută-ți soldul",
+      "body": "Mută-ți fondurile în siguranță în noul tău cont.",
+      "currentBitcoinBalance": "Sold Bitcoin curent",
+      "currentDollarBalance": "Sold în dolari curent",
+      "newBitcoinBalance": "Sold Bitcoin nou",
+      "newDollarBalance": "Sold în dolari nou",
+      "dollarBalanceNotAvailable": "indisponibil",
+      "networkFee": "Comision de rețea: <bold>{fee: string}</bold>",
+      "exchangeRate": "Curs de schimb curent 1 BTC = {rate: string}",
+      "approveCta": "Aprobă",
+      "contactSupportCta": "Contactează asistența"
+    },
     "migrationRequiredTitle": "E timpul pentru un upgrade",
     "keepReceivingTitle": "Continuați să primiți ca de obicei",
     "keepReceivingBody": "Adresa dvs. Lightning va fi transferată în noul dvs. cont non-custodial.",

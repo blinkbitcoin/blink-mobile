@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Pindahkan saldo Anda",
+      "body": "Pindahkan dana Anda dengan aman ke akun baru Anda.",
+      "currentBitcoinBalance": "Saldo Bitcoin saat ini",
+      "currentDollarBalance": "Saldo Dolar saat ini",
+      "newBitcoinBalance": "Saldo Bitcoin baru",
+      "newDollarBalance": "Saldo Dolar baru",
+      "dollarBalanceNotAvailable": "tidak tersedia",
+      "networkFee": "Biaya jaringan: <bold>{fee: string}</bold>",
+      "exchangeRate": "Nilai tukar saat ini 1 BTC = {rate: string}",
+      "approveCta": "Setujui",
+      "contactSupportCta": "Hubungi dukungan"
+    },
     "migrationRequiredTitle": "Saatnya memutakhirkan",
     "keepReceivingTitle": "Terus terima seperti biasa",
     "keepReceivingBody": "Alamat Lightning Anda akan dipindahkan ke akun non-custodial baru Anda.",

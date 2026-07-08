@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Chuyển số dư của bạn",
+      "body": "Chuyển tiền của bạn một cách an toàn sang tài khoản mới.",
+      "currentBitcoinBalance": "Số dư Bitcoin hiện tại",
+      "currentDollarBalance": "Số dư Đô la hiện tại",
+      "newBitcoinBalance": "Số dư Bitcoin mới",
+      "newDollarBalance": "Số dư Đô la mới",
+      "dollarBalanceNotAvailable": "không khả dụng",
+      "networkFee": "Phí mạng: <bold>{fee: string}</bold>",
+      "exchangeRate": "Tỷ giá hiện tại 1 BTC = {rate: string}",
+      "approveCta": "Phê duyệt",
+      "contactSupportCta": "Liên hệ hỗ trợ"
+    },
     "migrationRequiredTitle": "Đã đến lúc nâng cấp",
     "keepReceivingTitle": "Tiếp tục nhận như bình thường",
     "keepReceivingBody": "Địa chỉ Lightning của bạn sẽ được chuyển sang tài khoản non-custodial mới của bạn.",

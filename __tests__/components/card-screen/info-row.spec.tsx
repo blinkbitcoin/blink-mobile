@@ -19,7 +19,10 @@ jest.mock("@rn-vui/themed", () => ({
   makeStyles: () => () => ({
     container: {},
     label: {},
+    regularLabel: {},
     value: {},
+    mutedValue: {},
+    secondaryValue: {},
   }),
 }))
 
@@ -123,6 +126,40 @@ describe("InfoRow", () => {
 
       const valueElement = getByText("Test Value")
       expect(valueElement).toBeTruthy()
+    })
+  })
+
+  describe("with valueMuted", () => {
+    it("renders a muted value", () => {
+      const { getByText } = render(
+        <InfoRow label="New Dollar Balance" value="not available" valueMuted />,
+      )
+
+      expect(getByText("not available")).toBeTruthy()
+    })
+  })
+
+  describe("with regularLabel", () => {
+    it("renders the label", () => {
+      const { getByText } = render(
+        <InfoRow label="Current Bitcoin Balance" value="21,493 SAT" regularLabel />,
+      )
+
+      expect(getByText("Current Bitcoin Balance")).toBeTruthy()
+    })
+  })
+
+  describe("with secondaryValue", () => {
+    it("renders the value together with its secondary part", () => {
+      const { getByText } = render(
+        <InfoRow
+          label="Current Bitcoin Balance"
+          value="21,493 SAT"
+          secondaryValue=" ($22.42)"
+        />,
+      )
+
+      expect(getByText("21,493 SAT ($22.42)")).toBeTruthy()
     })
   })
 })

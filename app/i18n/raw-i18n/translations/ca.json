@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Mou el teu saldo",
+      "body": "Mou els teus fons de manera segura al teu nou compte.",
+      "currentBitcoinBalance": "Saldo de Bitcoin actual",
+      "currentDollarBalance": "Saldo en dòlars actual",
+      "newBitcoinBalance": "Nou saldo de Bitcoin",
+      "newDollarBalance": "Nou saldo en dòlars",
+      "dollarBalanceNotAvailable": "no disponible",
+      "networkFee": "Comissió de xarxa: <bold>{fee: string}</bold>",
+      "exchangeRate": "Tipus de canvi actual 1 BTC = {rate: string}",
+      "approveCta": "Aprovar",
+      "contactSupportCta": "Contacta amb suport"
+    },
     "migrationRequiredTitle": "Hora d'actualitzar",
     "keepReceivingTitle": "Continua rebent com sempre",
     "keepReceivingBody": "La teva adreça Lightning es transferirà al teu nou compte no custodial.",

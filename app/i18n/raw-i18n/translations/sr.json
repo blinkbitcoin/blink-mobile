@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Премести свој салдо",
+      "body": "Безбедно премести своја средства на свој нови налог.",
+      "currentBitcoinBalance": "Тренутни Bitcoin салдо",
+      "currentDollarBalance": "Тренутни доларски салдо",
+      "newBitcoinBalance": "Нови Bitcoin салдо",
+      "newDollarBalance": "Нови доларски салдо",
+      "dollarBalanceNotAvailable": "није доступно",
+      "networkFee": "Мрежна накнада: <bold>{fee: string}</bold>",
+      "exchangeRate": "Тренутни курс 1 BTC = {rate: string}",
+      "approveCta": "Одобри",
+      "contactSupportCta": "Контактирај подршку"
+    },
     "migrationRequiredTitle": "Време је за надоградњу",
     "keepReceivingTitle": "Наставите да примате као и обично",
     "keepReceivingBody": "Ваша Lightning адреса биће пренета на ваш нови non-custodial налог.",

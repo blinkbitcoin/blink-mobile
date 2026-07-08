@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Presuňte svoj zostatok",
+      "body": "Bezpečne presuňte svoje prostriedky na svoj nový účet.",
+      "currentBitcoinBalance": "Aktuálny zostatok Bitcoinu",
+      "currentDollarBalance": "Aktuálny dolárový zostatok",
+      "newBitcoinBalance": "Nový zostatok Bitcoinu",
+      "newDollarBalance": "Nový dolárový zostatok",
+      "dollarBalanceNotAvailable": "nie je k dispozícii",
+      "networkFee": "Sieťový poplatok: <bold>{fee: string}</bold>",
+      "exchangeRate": "Aktuálny výmenný kurz 1 BTC = {rate: string}",
+      "approveCta": "Schváliť",
+      "contactSupportCta": "Kontaktovať podporu"
+    },
     "migrationRequiredTitle": "Čas na upgrade",
     "keepReceivingTitle": "Prijímajte platby ako zvyčajne",
     "keepReceivingBody": "Vaša Lightning adresa bude prenesená na váš nový non-custodial účet.",

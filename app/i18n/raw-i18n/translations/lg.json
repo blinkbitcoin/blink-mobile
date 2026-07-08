@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Tambuza ssente zo",
+      "body": "Tambuza ssente zo mu bukuumi ku kawunti yo empya.",
+      "currentBitcoinBalance": "Ssente za Bitcoin eziriwo kati",
+      "currentDollarBalance": "Ssente za ddoola eziriwo kati",
+      "newBitcoinBalance": "Ssente za Bitcoin empya",
+      "newDollarBalance": "Ssente za ddoola empya",
+      "dollarBalanceNotAvailable": "tezeewo",
+      "networkFee": "Ssente z'omukutu: <bold>{fee: string}</bold>",
+      "exchangeRate": "Omuwendo gw'okuwaanyisiganya ogwa kati 1 BTC = {rate: string}",
+      "approveCta": "Kkiriza",
+      "contactSupportCta": "Tuukirira obuyambi"
+    },
     "migrationRequiredTitle": "Ekiseera ky'okuzza omu maaso",
     "keepReceivingTitle": "Weyongere okufuna nga bulijjo",
     "keepReceivingBody": "Endagiriro yo eya Lightning ejja kusengulwa mu kawunti yo empya eya non-custodial.",

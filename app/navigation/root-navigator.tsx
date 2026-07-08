@@ -150,6 +150,7 @@ import {
   CloudRestoreScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
 import {
+  MigrationBalancesOverviewScreen,
   MigrationDownloadHistoryScreen,
   MigrationExplainerScreen,
   MigrationGate,
@@ -834,6 +835,11 @@ export const RootStack = () => {
         name="accountMigrationDownloadHistory"
         component={MigrationDownloadHistoryScreen}
         options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationBalancesOverview"
+        component={MigrationBalancesOverviewScreen}
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="accountMigrationTransferringFunds"

@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Bakiyeni taşı",
+      "body": "Fonlarını güvenle yeni hesabına taşı.",
+      "currentBitcoinBalance": "Mevcut Bitcoin bakiyesi",
+      "currentDollarBalance": "Mevcut Dolar bakiyesi",
+      "newBitcoinBalance": "Yeni Bitcoin bakiyesi",
+      "newDollarBalance": "Yeni Dolar bakiyesi",
+      "dollarBalanceNotAvailable": "kullanılamıyor",
+      "networkFee": "Ağ ücreti: <bold>{fee: string}</bold>",
+      "exchangeRate": "Güncel döviz kuru 1 BTC = {rate: string}",
+      "approveCta": "Onayla",
+      "contactSupportCta": "Desteğe ulaş"
+    },
     "migrationRequiredTitle": "Yükseltme zamanı",
     "keepReceivingTitle": "Her zamanki gibi almaya devam et",
     "keepReceivingBody": "Lightning adresin yeni non-custodial hesabına aktarılacak.",

@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Mozgasd az egyenleged",
+      "body": "Mozgasd biztonságosan a pénzed az új fiókodba.",
+      "currentBitcoinBalance": "Jelenlegi Bitcoin-egyenleg",
+      "currentDollarBalance": "Jelenlegi dolláregyenleg",
+      "newBitcoinBalance": "Új Bitcoin-egyenleg",
+      "newDollarBalance": "Új dolláregyenleg",
+      "dollarBalanceNotAvailable": "nem elérhető",
+      "networkFee": "Hálózati díj: <bold>{fee: string}</bold>",
+      "exchangeRate": "Jelenlegi árfolyam 1 BTC = {rate: string}",
+      "approveCta": "Jóváhagyás",
+      "contactSupportCta": "Kapcsolat a támogatással"
+    },
     "migrationRequiredTitle": "Ideje frissíteni",
     "keepReceivingTitle": "Fogadj továbbra is a megszokott módon",
     "keepReceivingBody": "A Lightning címed átkerül az új önrendelkező fiókodba.",

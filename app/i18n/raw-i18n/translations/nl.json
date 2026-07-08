@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Verplaats je saldo",
+      "body": "Verplaats je geld veilig naar je nieuwe account.",
+      "currentBitcoinBalance": "Huidig Bitcoin-saldo",
+      "currentDollarBalance": "Huidig dollarsaldo",
+      "newBitcoinBalance": "Nieuw Bitcoin-saldo",
+      "newDollarBalance": "Nieuw dollarsaldo",
+      "dollarBalanceNotAvailable": "niet beschikbaar",
+      "networkFee": "Netwerkkosten: <bold>{fee: string}</bold>",
+      "exchangeRate": "Huidige wisselkoers 1 BTC = {rate: string}",
+      "approveCta": "Goedkeuren",
+      "contactSupportCta": "Contact met support"
+    },
     "migrationRequiredTitle": "Tijd om te upgraden",
     "keepReceivingTitle": "Blijf ontvangen zoals gewoonlijk",
     "keepReceivingBody": "Jouw Lightning-adres wordt overgezet naar je nieuwe non-custodial account.",

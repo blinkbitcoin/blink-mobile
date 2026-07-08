@@ -121,6 +121,30 @@ describe("useDollarBalanceRestricted", () => {
     })
   })
 
+  describe("with an account-type override", () => {
+    // A still-custodial migration session predicting the new self-custodial account.
+    beforeEach(() => setup(AccountType.Custodial))
+
+    const readOverride = (accountType: AccountType) =>
+      renderHook(() => useDollarBalanceRestricted(accountType)).result.current
+
+    it("evaluates the self-custodial policy from a custodial session", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+      expect(readOverride(AccountType.SelfCustodial)).toBe(true)
+    })
+
+    it("uses the self-custodial blocked list, not the custodial one", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
+      expect(readOverride(AccountType.SelfCustodial)).toBe(false)
+    })
+
+    it("honours the persisted self-custodial flag from a custodial session", () => {
+      mockPersistentState = { ...baseState, stableTokenRestricted: true }
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
+      expect(readOverride(AccountType.SelfCustodial)).toBe(true)
+    })
+  })
+
   describe("with the restriction cache disabled remotely", () => {
     beforeEach(() => {
       setup(AccountType.Custodial)

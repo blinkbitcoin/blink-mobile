@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "ย้ายยอดเงินของคุณ",
+      "body": "ย้ายเงินของคุณไปยังบัญชีใหม่อย่างปลอดภัย",
+      "currentBitcoinBalance": "ยอด Bitcoin ปัจจุบัน",
+      "currentDollarBalance": "ยอดดอลลาร์ปัจจุบัน",
+      "newBitcoinBalance": "ยอด Bitcoin ใหม่",
+      "newDollarBalance": "ยอดดอลลาร์ใหม่",
+      "dollarBalanceNotAvailable": "ไม่พร้อมใช้งาน",
+      "networkFee": "ค่าธรรมเนียมเครือข่าย: <bold>{fee: string}</bold>",
+      "exchangeRate": "อัตราแลกเปลี่ยนปัจจุบัน 1 BTC = {rate: string}",
+      "approveCta": "อนุมัติ",
+      "contactSupportCta": "ติดต่อฝ่ายสนับสนุน"
+    },
     "migrationRequiredTitle": "ถึงเวลาอัปเกรด",
     "keepReceivingTitle": "รับเงินต่อได้ตามปกติ",
     "keepReceivingBody": "แอดเดรส Lightning ของคุณจะถูกโอนไปยังบัญชี non-custodial ใหม่ของคุณ",

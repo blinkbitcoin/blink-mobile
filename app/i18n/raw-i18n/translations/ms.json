@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Pindahkan baki anda",
+      "body": "Pindahkan dana anda dengan selamat ke akaun baharu anda.",
+      "currentBitcoinBalance": "Baki Bitcoin semasa",
+      "currentDollarBalance": "Baki Dolar semasa",
+      "newBitcoinBalance": "Baki Bitcoin baharu",
+      "newDollarBalance": "Baki Dolar baharu",
+      "dollarBalanceNotAvailable": "tidak tersedia",
+      "networkFee": "Yuran rangkaian: <bold>{fee: string}</bold>",
+      "exchangeRate": "Kadar pertukaran semasa 1 BTC = {rate: string}",
+      "approveCta": "Luluskan",
+      "contactSupportCta": "Hubungi sokongan"
+    },
     "migrationRequiredTitle": "Masa untuk menaik taraf",
     "keepReceivingTitle": "Terus terima seperti biasa",
     "keepReceivingBody": "Alamat Lightning anda akan dipindahkan ke akaun non-custodial baharu anda.",

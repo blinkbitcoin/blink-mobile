@@ -217,7 +217,7 @@ describe("BackupPhraseConfirmScreen", () => {
     )
   }
 
-  it("routes to migration transferring screen when migrating with funds", () => {
+  it("routes to the balances overview when migrating", async () => {
     mockCheckpoint.mockReturnValue("backupAlerts")
     mockBackupStateValue.mockReturnValue({
       backupState: { status: "none", method: null },
@@ -235,8 +235,10 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
+    await act(async () => {})
+
     expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "manual")
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
   it("routes to backup success screen with reBackup=true when re-backing-up from settings", () => {
@@ -284,7 +286,7 @@ describe("BackupPhraseConfirmScreen", () => {
     )
   })
 
-  it("does not route to migration when migrating but no funds", async () => {
+  it("routes a no-funds migration to the balances overview too", async () => {
     mockCheckpoint.mockReturnValue("backupAlerts")
     mockActiveWalletValue.mockReturnValue({
       wallets: [{ id: "btc-1", balance: { amount: 0 }, walletCurrency: "BTC" }],
@@ -300,14 +302,10 @@ describe("BackupPhraseConfirmScreen", () => {
     act(() => {
       jest.advanceTimersByTime(500)
     })
-    // The no-funds migration finishes asynchronously before it navigates to success.
+    // The migration persists the backup asynchronously before navigating.
     await act(async () => {})
 
-    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationTransferringFunds")
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "selfCustodialBackupSuccess",
-      expect.objectContaining({ reBackup: false }),
-    )
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
   it("forwards the route's successMessage to the success screen when provided", () => {
@@ -344,7 +342,7 @@ describe("BackupPhraseConfirmScreen", () => {
     )
   })
 
-  it("does not auto-navigate while the migration checkpoint is still loading", () => {
+  it("does not auto-navigate while the migration checkpoint is still loading", async () => {
     mockCheckpoint.mockReturnValue(null)
     mockCheckpointLoading.mockReturnValue(true)
 
@@ -371,7 +369,8 @@ describe("BackupPhraseConfirmScreen", () => {
     act(() => {
       jest.advanceTimersByTime(500)
     })
+    await act(async () => {})
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 })

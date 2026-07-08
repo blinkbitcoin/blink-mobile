@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "انقل رصيدك",
+      "body": "انقل أموالك بأمان إلى حسابك الجديد.",
+      "currentBitcoinBalance": "رصيد البيتكوين الحالي",
+      "currentDollarBalance": "رصيد الدولار الحالي",
+      "newBitcoinBalance": "رصيد البيتكوين الجديد",
+      "newDollarBalance": "رصيد الدولار الجديد",
+      "dollarBalanceNotAvailable": "غير متاح",
+      "networkFee": "رسوم الشبكة: <bold>{fee: string}</bold>",
+      "exchangeRate": "سعر الصرف الحالي 1 BTC = {rate: string}",
+      "approveCta": "موافقة",
+      "contactSupportCta": "تواصل مع الدعم"
+    },
     "migrationRequiredTitle": "حان وقت الترقية",
     "keepReceivingTitle": "استمر في الاستلام كالمعتاد",
     "keepReceivingBody": "سيتم نقل عنوان Lightning الخاص بك إلى حسابك الجديد غير الحفظي.",

@@ -10,9 +10,8 @@ jest.mock("@react-navigation/native", () => ({
 }))
 
 let mockIsSelfCustodial = false
-let mockWallets: Array<{ balance: { amount: number } }> = [{ balance: { amount: 1000 } }]
 jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ wallets: mockWallets, isSelfCustodial: mockIsSelfCustodial }),
+  useActiveWallet: () => ({ isSelfCustodial: mockIsSelfCustodial }),
 }))
 
 let mockBackupStatus = "none"
@@ -31,12 +30,10 @@ jest.mock("@app/self-custodial/providers/backup-state", () => ({
 
 let mockCheckpoint: string | null = "backupAlerts"
 let mockMigrationAccountId: string | null = "migration-uuid"
-const mockCompleteMigration = jest.fn()
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useCompleteMigration: () => ({
     migrationCheckpoint: mockCheckpoint,
     migrationAccountId: mockMigrationAccountId,
-    completeMigration: mockCompleteMigration,
   }),
 }))
 
@@ -48,39 +45,20 @@ describe("useCompleteBackup", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockIsSelfCustodial = false
-    mockWallets = [{ balance: { amount: 1000 } }]
     mockBackupStatus = "none"
     mockCheckpoint = "backupAlerts"
     mockMigrationAccountId = "migration-uuid"
-    mockCompleteMigration.mockResolvedValue(true)
+    mockMarkBackupCompletedFor.mockResolvedValue(undefined)
   })
 
-  it("marks the provisioned account and continues to the transfer during a funded migration", () => {
+  it("marks the provisioned account and continues to the balance summary during a migration", async () => {
     const { result } = renderHook(() => useCompleteBackup())
 
-    result.current({ method: "manual" })
+    await result.current({ method: "manual" })
 
     expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "manual")
     expect(mockSetBackupCompleted).not.toHaveBeenCalled()
-    // Completion is deferred to the transfer screen on the funded path.
-    expect(mockCompleteMigration).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
-  })
-
-  it("completes the migration without a transfer in a no-funds migration", async () => {
-    mockWallets = [{ balance: { amount: 0 } }]
-
-    const { result } = renderHook(() => useCompleteBackup())
-
-    await result.current({ method: "cloud" })
-
-    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "cloud")
-    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationTransferringFunds")
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
-      reBackup: false,
-      message: undefined,
-    })
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
   it("marks the active self-custodial account on a standalone backup (no migration)", () => {
@@ -92,14 +70,13 @@ describe("useCompleteBackup", () => {
 
     expect(mockSetBackupCompleted).toHaveBeenCalledWith("keychain")
     expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
-    expect(mockCompleteMigration).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
       reBackup: false,
       message: "All set",
     })
   })
 
-  it("never routes to the transfer while migrating without a provisioned account", () => {
+  it("does not route to the balance summary while migrating without a provisioned account", () => {
     // App killed between saving a step checkpoint and provisioning: checkpoint set, no id.
     mockMigrationAccountId = null
 
@@ -108,7 +85,7 @@ describe("useCompleteBackup", () => {
     result.current({ method: "manual" })
 
     expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
-    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationTransferringFunds")
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
       reBackup: false,
       message: undefined,
@@ -120,14 +97,13 @@ describe("useCompleteBackup", () => {
 
     const { result } = renderHook(() => useCompleteBackup())
 
-    result.current({ method: "manual" })
+    await result.current({ method: "manual" })
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
-    await Promise.resolve()
     expect(reportError).toHaveBeenCalledWith(
       "Migration backup state persist",
       expect.any(Error),
     )
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
   it("marks the active account as a re-backup when it was already backed up", () => {

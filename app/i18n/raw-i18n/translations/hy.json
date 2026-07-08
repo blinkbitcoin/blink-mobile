@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Տեղափոխեք ձեր մնացորդը",
+      "body": "Ապահով կերպով տեղափոխեք ձեր միջոցները ձեր նոր հաշվին:",
+      "currentBitcoinBalance": "Ընթացիկ Bitcoin-ի մնացորդ",
+      "currentDollarBalance": "Ընթացիկ դոլարային մնացորդ",
+      "newBitcoinBalance": "Նոր Bitcoin-ի մնացորդ",
+      "newDollarBalance": "Նոր դոլարային մնացորդ",
+      "dollarBalanceNotAvailable": "հասանելի չէ",
+      "networkFee": "Ցանցի վճար. <bold>{fee: string}</bold>",
+      "exchangeRate": "Ընթացիկ փոխարժեք 1 BTC = {rate: string}",
+      "approveCta": "Հաստատել",
+      "contactSupportCta": "Կապ աջակցման հետ"
+    },
     "migrationRequiredTitle": "Ժամանակն է թարմացնելու",
     "keepReceivingTitle": "Շարունակեք ստանալ ինչպես միշտ",
     "keepReceivingBody": "Ձեր Lightning հասցեն կփոխանցվի ձեր նոր ոչ պահառու հաշվին։",

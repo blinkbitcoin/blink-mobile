@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Hamisha salio lako",
+      "body": "Hamisha fedha zako kwa usalama kwenye akaunti yako mpya.",
+      "currentBitcoinBalance": "Salio la sasa la Bitcoin",
+      "currentDollarBalance": "Salio la sasa la Dola",
+      "newBitcoinBalance": "Salio jipya la Bitcoin",
+      "newDollarBalance": "Salio jipya la Dola",
+      "dollarBalanceNotAvailable": "haipatikani",
+      "networkFee": "Ada ya mtandao: <bold>{fee: string}</bold>",
+      "exchangeRate": "Kiwango cha ubadilishaji cha sasa 1 BTC = {rate: string}",
+      "approveCta": "Idhinisha",
+      "contactSupportCta": "Wasiliana na usaidizi"
+    },
     "migrationRequiredTitle": "Wakati wa kuboresha",
     "keepReceivingTitle": "Endelea kupokea kama kawaida",
     "keepReceivingBody": "Anwani yako ya Lightning itahamishiwa kwenye akaunti yako mpya ya non-custodial.",

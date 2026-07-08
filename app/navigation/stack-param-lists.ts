@@ -200,6 +200,7 @@ export type RootStackParamList = {
   accountMigrationExplainer: undefined
   accountMigrationKeepReceiving: undefined
   accountMigrationDownloadHistory: undefined
+  accountMigrationBalancesOverview: { isPostGate?: boolean } | undefined
   accountMigrationTransferringFunds: undefined
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined

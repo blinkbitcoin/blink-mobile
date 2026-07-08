@@ -3550,6 +3550,19 @@
     }
   },
   "AccountMigration": {
+    "balancesOverview": {
+      "title": "Hambisa ibhalansi yakho",
+      "body": "Hambisa imali yakho ngokukhuselekileyo kwiakhawunti yakho entsha.",
+      "currentBitcoinBalance": "Ibhalansi ye-Bitcoin yangoku",
+      "currentDollarBalance": "Ibhalansi yeDola yangoku",
+      "newBitcoinBalance": "Ibhalansi entsha ye-Bitcoin",
+      "newDollarBalance": "Ibhalansi entsha yeDola",
+      "dollarBalanceNotAvailable": "ayifumaneki",
+      "networkFee": "Umrhumo wothungelwano: <bold>{fee: string}</bold>",
+      "exchangeRate": "Izinga langoku lotshintshiselwano 1 BTC = {rate: string}",
+      "approveCta": "Yamkela",
+      "contactSupportCta": "Qhagamshelana nenkxaso"
+    },
     "migrationRequiredTitle": "Lixesha lokuphucula",
     "keepReceivingTitle": "Qhubeka ufumana njengesiqhelo",
     "keepReceivingBody": "Idilesi yakho ye-Lightning iya kudluliselwa kwi-akhawunti yakho entsha ye-non-custodial.",

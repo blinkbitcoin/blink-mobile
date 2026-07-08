@@ -27,11 +27,16 @@ type DollarBalanceRestrictionPolicy = {
 }
 
 /**
- * Gating on accountType (not isSelfCustodial) keeps the restriction stable
- * through the self-custodial cold-start window while the SDK connects.
+ * Gating on accountType (not isSelfCustodial) keeps the restriction stable through the
+ * self-custodial cold-start window while the SDK connects; passing `accountTypeOverride`
+ * evaluates a specific account type's policy (e.g. predicting the self-custodial dollar
+ * restriction from the still-custodial session during migration).
  */
-const useDollarBalanceRestrictionPolicy = (): DollarBalanceRestrictionPolicy => {
-  const { accountType } = useActiveWallet()
+const useDollarBalanceRestrictionPolicy = (
+  accountTypeOverride?: AccountType,
+): DollarBalanceRestrictionPolicy => {
+  const { accountType: activeAccountType } = useActiveWallet()
+  const accountType = accountTypeOverride ?? activeAccountType
   const {
     custodialDollarBalanceBlockedCountries,
     selfCustodialDollarBalanceBlockedCountries,
@@ -52,8 +57,11 @@ const useDollarBalanceRestrictionPolicy = (): DollarBalanceRestrictionPolicy => 
   }
 }
 
-export const useDollarBalanceRestricted = (): boolean => {
-  const { blockedCountries, isPersisted } = useDollarBalanceRestrictionPolicy()
+export const useDollarBalanceRestricted = (
+  accountTypeOverride?: AccountType,
+): boolean => {
+  const { blockedCountries, isPersisted } =
+    useDollarBalanceRestrictionPolicy(accountTypeOverride)
   const { dollarRestrictionCacheEnabled } = useRemoteConfig()
   const { countryCode } = useDeviceLocation()
 
