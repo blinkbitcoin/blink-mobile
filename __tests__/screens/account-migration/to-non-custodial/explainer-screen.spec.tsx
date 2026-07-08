@@ -79,7 +79,7 @@ describe("MigrationExplainerScreen", () => {
     fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck5()))
   }
 
-  it("keeps the CTA inert until every checkbox is accepted, then provisions and navigates", async () => {
+  it("keeps the CTA inert until every checkbox is accepted, then provisions and navigates to the terms screen", async () => {
     renderScreen()
     await flushEffects()
 
@@ -93,7 +93,9 @@ describe("MigrationExplainerScreen", () => {
     fireEvent.press(cta)
 
     await waitFor(() =>
-      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod"),
+      expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+        flow: "migration",
+      }),
     )
     expect(mockEnsureAccount).toHaveBeenCalledTimes(1)
   })

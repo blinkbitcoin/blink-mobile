@@ -255,4 +255,6 @@ export type PrimaryStackParamList = {
   Web: undefined
 }
 
-export type NewAccountFlowParamsList = { flow: "phone" | "trial" | "selfCustodial" }
+export type NewAccountFlowParamsList = {
+  flow: "phone" | "trial" | "selfCustodial" | "migration"
+}

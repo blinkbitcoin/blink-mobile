@@ -38,7 +38,9 @@ export const MigrationExplainerScreen: React.FC = () => {
     setProvisioning(true)
     const provisionedAccountId = await ensureAccount()
     setProvisioning(false)
-    if (provisionedAccountId) navigation.navigate("selfCustodialBackupMethod")
+    if (provisionedAccountId) {
+      navigation.navigate("acceptTermsAndConditions", { flow: "migration" })
+    }
   }, [ensureAccount, navigation])
 
   return (

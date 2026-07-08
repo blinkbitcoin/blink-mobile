@@ -38,6 +38,11 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
   }
 
   const action = async () => {
+    if (flow === "migration") {
+      navigation.navigate("selfCustodialBackupMethod")
+      return
+    }
+
     if (flow === "selfCustodial") {
       navigation.navigate("selfCustodialWalletCreation")
       return
