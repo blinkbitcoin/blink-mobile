@@ -17,7 +17,7 @@ const LL = i18nObject("en")
 
 const CHECKPOINT_ROUTE = "accountMigrationExplainer"
 const KEEP_RECEIVING_ROUTE = "accountMigrationKeepReceiving"
-const SUPPORT_EMAIL = "support@blink.sv"
+const CONTACT_EMAIL = "feedback@blink.sv"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
@@ -35,6 +35,10 @@ jest.mock("@app/graphql/generated", () => ({
   useAddressScreenQuery: () => mockUseAddressScreenQuery(),
 }))
 
+jest.mock("@app/config/feature-flags-context", () => ({
+  useRemoteConfig: () => ({ feedbackEmailAddress: "feedback@blink.sv" }),
+}))
+
 jest.mock("@app/graphql/is-authed-context", () => ({
   ...jest.requireActual("@app/graphql/is-authed-context"),
   useIsAuthed: () => true,
@@ -44,6 +48,9 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({ getRouteForCheckpoint: () => CHECKPOINT_ROUTE }),
 }))
 
+let mockConvertReady = true
+const mockConvert = (moneyAmount: { amount: number; currency: string }) => moneyAmount
+
 jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({
     formatMoneyAmount: ({
@@ -51,6 +58,17 @@ jest.mock("@app/hooks/use-display-currency", () => ({
     }: {
       moneyAmount: { amount: number; currency: string }
     }) => `${moneyAmount.currency} ${moneyAmount.amount}`,
+    formatDisplayAndWalletAmount: ({
+      walletAmount,
+    }: {
+      walletAmount: { amount: number; currency: string }
+    }) => `${walletAmount.currency} ${walletAmount.amount} (display)`,
+  }),
+}))
+
+jest.mock("@app/hooks/use-price-conversion", () => ({
+  usePriceConversion: () => ({
+    convertMoneyAmount: mockConvertReady ? mockConvert : undefined,
   }),
 }))
 
@@ -83,6 +101,7 @@ describe("MigrationRequiredScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    mockConvertReady = true
     mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdCents(2500))
     mockUseAddressScreenQuery.mockReturnValue({ data: undefined })
     jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve())
@@ -128,7 +147,7 @@ describe("MigrationRequiredScreen", () => {
 
       expect(screen.getByTestId("icon-warning")).toBeTruthy()
       expect(screen.getByText(LL.AccountMigration.migrationGateTitle())).toBeTruthy()
-      expect(screen.getByText("BTC 1000")).toBeTruthy()
+      expect(screen.getByText("BTC 1000 (display)")).toBeTruthy()
       expect(screen.getByText("USD 2500")).toBeTruthy()
       expect(screen.queryByTestId("migration-close")).toBeNull()
     })
@@ -137,9 +156,9 @@ describe("MigrationRequiredScreen", () => {
       renderScreen("gate")
       await flushEffects()
 
-      fireEvent.press(screen.getByText(SUPPORT_EMAIL))
+      fireEvent.press(screen.getByText(CONTACT_EMAIL))
 
-      expect(Linking.openURL).toHaveBeenCalledWith(`mailto:${SUPPORT_EMAIL}`)
+      expect(Linking.openURL).toHaveBeenCalledWith(`mailto:${CONTACT_EMAIL}`)
     })
 
     it("falls back to zero balances when wallet data is unavailable", async () => {
@@ -147,8 +166,16 @@ describe("MigrationRequiredScreen", () => {
       renderScreen("gate")
       await flushEffects()
 
-      expect(screen.getByText("BTC 0")).toBeTruthy()
+      expect(screen.getByText("BTC 0 (display)")).toBeTruthy()
       expect(screen.getByText("USD 0")).toBeTruthy()
+    })
+
+    it("shows the plain bitcoin balance when price conversion is unavailable", async () => {
+      mockConvertReady = false
+      renderScreen("gate")
+      await flushEffects()
+
+      expect(screen.getByText("BTC 1000")).toBeTruthy()
     })
   })
 

@@ -11,7 +11,7 @@ import { InfoRow } from "@app/components/card-screen/info-row"
 import { IconHero } from "@app/components/icon-hero"
 import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
-import { CONTACT_EMAIL_ADDRESS } from "@app/config"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import {
   useAddressScreenQuery,
   useWalletOverviewScreenQuery,
@@ -19,10 +19,11 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 
 /**
@@ -50,6 +51,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { getRouteForCheckpoint } = useMigrationCheckpoint()
+  const { feedbackEmailAddress } = useRemoteConfig()
 
   const isAuthed = useIsAuthed()
   const isGate = mode === "gate"
@@ -64,13 +66,19 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
 
   const { data: walletData } = useWalletOverviewScreenQuery({ skip: !shouldLoadBalances })
   const wallets = walletData?.me?.defaultAccount?.wallets
-  const { formatMoneyAmount } = useDisplayCurrency()
-  const btcBalance = formatMoneyAmount({
-    moneyAmount: toBtcMoneyAmount(getBtcWallet(wallets)?.balance ?? 0),
-  })
-  const usdBalance = formatMoneyAmount({
-    moneyAmount: toUsdMoneyAmount(getUsdWallet(wallets)?.balance ?? 0),
-  })
+  const { formatMoneyAmount, formatDisplayAndWalletAmount } = useDisplayCurrency()
+  const { convertMoneyAmount } = usePriceConversion()
+
+  const btcWalletAmount = toBtcMoneyAmount(getBtcWallet(wallets)?.balance ?? 0)
+  const usdWalletAmount = toUsdMoneyAmount(getUsdWallet(wallets)?.balance ?? 0)
+  const btcBalance = convertMoneyAmount
+    ? formatDisplayAndWalletAmount({
+        primaryAmount: btcWalletAmount,
+        walletAmount: btcWalletAmount,
+        displayAmount: convertMoneyAmount(btcWalletAmount, DisplayCurrency),
+      })
+    : formatMoneyAmount({ moneyAmount: btcWalletAmount })
+  const usdBalance = formatMoneyAmount({ moneyAmount: usdWalletAmount })
 
   const handleMigrate = useCallback(() => {
     const nextRoute = hasLightningAddress
@@ -88,8 +96,8 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   }, [onClose, navigation])
 
   const handleContactSupport = useCallback(() => {
-    Linking.openURL(`mailto:${CONTACT_EMAIL_ADDRESS}`)
-  }, [])
+    Linking.openURL(`mailto:${feedbackEmailAddress}`)
+  }, [feedbackEmailAddress])
 
   const heroIcon = isGate ? "warning" : "upgrade"
   const heroIconColor = isGate ? colors.warning : colors._green
@@ -99,7 +107,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
 
   const gateBody = (
     <RichText
-      text={LL.AccountMigration.migrationGateBody({ email: CONTACT_EMAIL_ADDRESS })}
+      text={LL.AccountMigration.migrationGateBody({ email: feedbackEmailAddress })}
       style={styles.gateBody}
       tags={{ link: { style: styles.gateLink, onPress: handleContactSupport } }}
     />
