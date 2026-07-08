@@ -2815,6 +2815,7 @@
     "problemMaybeReauth": "Ada masalah dengan permohonan anda. Silancuba lagi dalam seminit dua. Jika masalah masih terjadi, kami cadangkan anda untuk log keluar dan log masuk semula. Anda boleh log keluar dengan pergi ke bahagian Tetapan > Akaun > Log Keluar",
     "warning": "Amaran",
     "continue": "Teruskan",
+    "skip": "Langkau",
     "correct": "Betul",
     "recommended": "Disyorkan",
     "expirationTime": "Masa Tamat Tempoh",

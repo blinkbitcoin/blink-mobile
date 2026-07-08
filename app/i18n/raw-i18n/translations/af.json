@@ -2815,6 +2815,7 @@
     "problemMaybeReauth": "Daar was 'n probleem met jou versoek. Probeer asseblief weer oor 1 minuut. Indien die probleem voortduur, beveel ons aan dat jy uitteken en dan weer intteken. Gaan na Verstellings > Rekening > Teken uit",
     "warning": "Waarskuwing",
     "continue": "Gaan voort",
+    "skip": "Slaan oor",
     "correct": "Korrek",
     "recommended": "Aanbeveel",
     "expirationTime": "Vervaltyd",

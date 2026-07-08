@@ -70,7 +70,8 @@ const renderScreen = () =>
 const pressDownload = () =>
   fireEvent.press(screen.getByText(LL.AccountMigration.downloadHistoryDownloadCta()))
 
-const pressContinue = () => fireEvent.press(screen.getByText(LL.common.continue()))
+const pressSecondary = () =>
+  fireEvent.press(screen.getByTestId("migration-download-history-continue"))
 
 const isContinueDisabled = () =>
   screen.getByTestId("migration-download-history-continue").props.accessibilityState
@@ -98,7 +99,20 @@ describe("MigrationDownloadHistoryScreen", () => {
     expect(
       screen.getByText(LL.AccountMigration.downloadHistoryDownloadCta()),
     ).toBeTruthy()
-    expect(screen.getByText(LL.common.continue())).toBeTruthy()
+    expect(screen.getByText(LL.common.skip())).toBeTruthy()
+  })
+
+  it("labels the secondary action Skip until the CSV is downloaded, then Continue", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByText(LL.common.skip())).toBeTruthy()
+    expect(screen.queryByText(LL.common.continue())).toBeNull()
+
+    pressDownload()
+
+    await waitFor(() => expect(screen.getByText(LL.common.continue())).toBeTruthy())
+    expect(screen.queryByText(LL.common.skip())).toBeNull()
   })
 
   it("downloads the CSV without leaving the screen", async () => {
@@ -170,11 +184,11 @@ describe("MigrationDownloadHistoryScreen", () => {
     expect(isContinueDisabled()).toBe(true)
   })
 
-  it("continues the migration flow when Continue is pressed", async () => {
+  it("continues the migration flow when the secondary action is pressed", async () => {
     renderScreen()
     await flushEffects()
 
-    pressContinue()
+    pressSecondary()
 
     expect(mockNavigate).toHaveBeenCalledWith(NEXT_ROUTE)
   })

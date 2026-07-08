@@ -2815,6 +2815,7 @@
     "problemMaybeReauth": "Došlo je do problema s vašim zahtjevom. Pokušajte ponovno za jednu minutu. Ako se problem nastavi, preporučujemo da se odjavite i ponovno prijavite. Možete se odjaviti tako da odete u Postavke > Račun > Odjava",
     "warning": "Upozorenje",
     "continue": "Nastavi",
+    "skip": "Preskoči",
     "correct": "Točno",
     "recommended": "Preporučeno",
     "expirationTime": "Vrijeme isteka",

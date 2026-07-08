@@ -9303,6 +9303,10 @@ type RootTranslation = {
 		 */
 		'continue': string
 		/**
+		 * S​k​i​p
+		 */
+		skip: string
+		/**
 		 * C​o​r​r​e​c​t
 		 */
 		correct: string
@@ -21656,6 +21660,10 @@ export type TranslationFunctions = {
 		 * Continue
 		 */
 		'continue': () => LocalizedString
+		/**
+		 * Skip
+		 */
+		skip: () => LocalizedString
 		/**
 		 * Correct
 		 */

@@ -2815,6 +2815,7 @@
     "problemMaybeReauth": "Ada masalah dengan permintaan Anda. Silakan coba lagi dalam satu menit. Jika masalah berlanjut, kami sarankan Anda keluar dan masuk kembali. Anda dapat keluar melalui Pengaturan > Akun > Keluar",
     "warning": "Peringatan",
     "continue": "Lanjutkan",
+    "skip": "Lewati",
     "correct": "Benar",
     "recommended": "Direkomendasikan",
     "expirationTime": "Waktu Kedaluwarsa",

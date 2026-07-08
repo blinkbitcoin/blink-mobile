@@ -2815,6 +2815,7 @@
     "problemMaybeReauth": "Vyskytol sa problém s vašou požiadavkou. Skúste to prosím znova o minútu. Ak problém pretrváva, odporúčame odhlásiť sa a prihlásiť sa znova. Odhlásiť sa môžete v Nastavenia > Účet > Odhlásiť.",
     "warning": "Upozornenie",
     "continue": "Pokračovať",
+    "skip": "Preskočiť",
     "correct": "Správne",
     "recommended": "Odporúčané",
     "expirationTime": "Čas expirácie",

@@ -2816,6 +2816,7 @@
         "problemMaybeReauth": "Houve um problema com o seu pedido. Tente novamente em um minuto. Se o problema persistir, recomendamos que você saia e entre no app novamente. Você pode sair acessando Configurações > Conta > Sair",
         "warning": "Aviso",
         "continue": "Continuar",
+        "skip": "Pular",
         "correct": "Correto",
         "recommended": "Recomendado",
         "expirationTime": "Tempo de Expiração",

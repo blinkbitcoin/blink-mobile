@@ -2816,6 +2816,7 @@
         "problemMaybeReauth": "Il y a eu un problème avec votre demande. Merci de réessayer dans une minute. Si le problème persiste, nous vous conseillons de vous déconnecter et de vous connecter à nouveau. Vous pouvez vous déconnecter en allant dans Réglages > Compte > Déconnexion",
         "warning": "Alerte",
         "continue": "Continuer",
+        "skip": "Ignorer",
         "correct": "Correct",
         "recommended": "Recommandé",
         "expirationTime": "Délai d'expiration",

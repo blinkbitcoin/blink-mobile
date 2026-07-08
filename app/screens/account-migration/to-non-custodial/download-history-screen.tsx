@@ -34,7 +34,9 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
 
   const { exportCsv } = useExportTransactionsCsv()
   const [isDownloading, setIsDownloading] = useState(false)
+  const [hasDownloaded, setHasDownloaded] = useState(false)
   const isBusy = checkpointLoading || isDownloading
+  const secondaryButtonTitle = hasDownloaded ? LL.common.continue() : LL.common.skip()
 
   const goToNextStep = useCallback(() => {
     navigation.navigate(getRouteForCheckpoint())
@@ -44,6 +46,7 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
     setIsDownloading(true)
     try {
       await exportCsv(walletIds)
+      setHasDownloaded(true)
     } catch (err) {
       reportError("Migration transaction history export", err)
     } finally {
@@ -72,7 +75,7 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
             {...testProps("migration-download-history-cta")}
           />
           <GaloySecondaryButton
-            title={LL.common.continue()}
+            title={secondaryButtonTitle}
             disabled={isBusy}
             onPress={goToNextStep}
             {...testProps("migration-download-history-continue")}

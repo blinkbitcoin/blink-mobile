@@ -2815,6 +2815,7 @@
     "problemMaybeReauth": "Der opstod et problem med din anmodning. Prøv igen om et minut. Hvis problemet fortsætter, anbefaler vi, at du logger ud og logger ind igen. Du kan logge ud ved at gå til Indstillinger > Konto > Log ud",
     "warning": "Advarsel",
     "continue": "Fortsæt",
+    "skip": "Spring over",
     "correct": "Korrekt",
     "recommended": "Anbefalet",
     "expirationTime": "Udløbstid",

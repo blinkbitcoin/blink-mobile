@@ -2815,6 +2815,7 @@
     "problemMaybeReauth": "Probléma merült fel a kérés során. Kérjük, próbáld újra egy perc múlva. Ha a probléma továbbra is fennáll, javasoljuk, hogy jelentkezz ki, majd jelentkezz be újra. Kijelentkezni a Beállítások > Számla > Kijelentkezés menüpontban tudsz.",
     "warning": "Figyelmeztetés",
     "continue": "Folytatás",
+    "skip": "Kihagyás",
     "correct": "Helyes",
     "recommended": "Ajánlott",
     "expirationTime": "Lejárati idő",

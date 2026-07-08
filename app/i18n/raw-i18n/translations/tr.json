@@ -2815,6 +2815,7 @@
     "problemMaybeReauth": "İsteğinizle ilgili bir sorun oluştu. Lütfen bir dakika içinde tekrar deneyin. Sorun devam ederse, oturumu kapatıp tekrar giriş yapmanızı öneririz. Ayarlar > Hesap > Oturumu kapat seçeneğine giderek oturumu kapatabilirsiniz",
     "warning": "Uyarı",
     "continue": "Devam",
+    "skip": "Atla",
     "correct": "Doğru",
     "recommended": "Önerilen",
     "expirationTime": "Son Kullanma Süresi",

@@ -2815,6 +2815,7 @@
     "problemMaybeReauth": "Kulikuwa na tatizo na ombi lako. Tafadhali jaribu baada ya dakika moja. Ikiwa tatizo litasistea, tunapendekeza ujitoke nje na uingie tena. Unaweza kujitokeza kwa kwenda kwenye Mipangilio > Akaunti > Toka",
     "warning": "Onyo",
     "continue": "Endelea",
+    "skip": "Ruka",
     "correct": "Sahihi",
     "recommended": "Inayopendekezwa",
     "expirationTime": "Muda wa Kumalizika",

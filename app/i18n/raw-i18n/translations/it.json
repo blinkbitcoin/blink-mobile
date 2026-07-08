@@ -2816,6 +2816,7 @@
         "problemMaybeReauth": "Si è verificato un problema con la tua richiesta. Riprova tra un minuto. Se il problema persiste, ti consigliamo di uscire e di accedere nuovamente. Puoi uscire andando in Impostazioni > Account > Esci",
         "warning": "Avvertimento",
         "continue": "Continua",
+        "skip": "Salta",
         "correct": "Corretto",
         "recommended": "Consigliato",
         "expirationTime": "Scadenza",
