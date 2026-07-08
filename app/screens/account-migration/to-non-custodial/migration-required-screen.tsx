@@ -1,5 +1,5 @@
 import React, { useCallback } from "react"
-import { Linking, View } from "react-native"
+import { View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -11,13 +11,13 @@ import { InfoRow } from "@app/components/card-screen/info-row"
 import { IconHero } from "@app/components/icon-hero"
 import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
 import {
   useAddressScreenQuery,
   useWalletOverviewScreenQuery,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
+import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -27,7 +27,7 @@ import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/
 import { testProps } from "@app/utils/testProps"
 
 /**
- * The single "Time to upgrade" intro screen rendered in three modes (FR7):
+ * The single "Time to upgrade" intro screen rendered in three modes:
  * - voluntary: the user opted in from Settings; can close (back to the app).
  * - forcedPreDeadline: the user is in the migration cohort but the deadline has not
  *   passed; can still close and wait.
@@ -51,7 +51,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { getRouteForCheckpoint } = useMigrationCheckpoint()
-  const { feedbackEmailAddress } = useRemoteConfig()
+  const { feedbackEmailAddress, openSupport } = useContactSupport()
 
   const isAuthed = useIsAuthed()
   const isGate = mode === "gate"
@@ -95,10 +95,6 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     navigation.goBack()
   }, [onClose, navigation])
 
-  const handleContactSupport = useCallback(() => {
-    Linking.openURL(`mailto:${feedbackEmailAddress}`)
-  }, [feedbackEmailAddress])
-
   const heroIcon = isGate ? "warning" : "upgrade"
   const heroIconColor = isGate ? colors.warning : colors._green
   const heroTitle = isGate
@@ -109,7 +105,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     <RichText
       text={LL.AccountMigration.migrationGateBody({ email: feedbackEmailAddress })}
       style={styles.gateBody}
-      tags={{ link: { style: styles.gateLink, onPress: handleContactSupport } }}
+      tags={{ link: { style: styles.gateLink, onPress: openSupport } }}
     />
   )
   const subtitleByMode: Record<MigrationMode, React.ReactNode> = {

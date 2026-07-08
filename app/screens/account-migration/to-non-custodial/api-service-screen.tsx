@@ -1,5 +1,5 @@
-import React, { useCallback } from "react"
-import { Linking, View } from "react-native"
+import React from "react"
+import { View } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -7,7 +7,7 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 
@@ -23,11 +23,7 @@ export const MigrationApiServiceScreen: React.FC<MigrationApiServiceScreenProps>
   const {
     theme: { colors },
   } = useTheme()
-  const { feedbackEmailAddress } = useRemoteConfig()
-
-  const handleContactSupport = useCallback(() => {
-    Linking.openURL(`mailto:${feedbackEmailAddress}`)
-  }, [feedbackEmailAddress])
+  const { openSupport } = useContactSupport()
 
   return (
     <Screen preset="fixed" headerShown={false}>
@@ -44,7 +40,7 @@ export const MigrationApiServiceScreen: React.FC<MigrationApiServiceScreenProps>
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
             title={LL.AccountMigration.apiServiceContactCta()}
-            onPress={handleContactSupport}
+            onPress={openSupport}
             {...testProps("migration-api-contact-cta")}
           />
           <GaloySecondaryButton
