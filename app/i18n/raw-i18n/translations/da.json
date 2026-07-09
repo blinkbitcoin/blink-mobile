@@ -3551,6 +3551,11 @@
     }
   },
   "AccountMigration": {
+    "migrateNowModal": {
+      "title": "Migrér nu til en ikke-depotkonto",
+      "body": "Du kan ikke længere modtage midler på din depotkonto. Blink har indstillet depottjenesten i din region, og denne konto vil blive deaktiveret ved udgangen af {date}.\n\nMigrér nu til en ikke-depotkonto.",
+      "migrateCta": "Migrér nu"
+    },
     "dollarBalanceModal": {
       "title": "Vi kan ikke migrere din dollarsaldo",
       "body": "Tøm først din dollarsaldo. Du kan overføre den til din Bitcoin-saldo i Blink eller et andet sted."

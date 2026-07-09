@@ -3551,6 +3551,11 @@
     }
   },
   "AccountMigration": {
+    "migrateNowModal": {
+      "title": "Şimdi saklamasız bir hesaba taşının",
+      "body": "Saklamalı hesabınıza artık para alamazsınız. Blink bölgenizde saklama hizmetini sonlandırdı ve bu hesap {date} sonuna kadar devre dışı bırakılacak.\n\nŞimdi saklamasız bir hesaba taşının.",
+      "migrateCta": "Şimdi taşı"
+    },
     "dollarBalanceModal": {
       "title": "Dolar bakiyenizi taşıyamıyoruz",
       "body": "Önce dolar bakiyenizi boşaltın. Blink içindeki Bitcoin bakiyenize veya başka bir yere aktarabilirsiniz."

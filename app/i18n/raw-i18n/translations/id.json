@@ -3551,6 +3551,11 @@
     }
   },
   "AccountMigration": {
+    "migrateNowModal": {
+      "title": "Migrasikan sekarang ke akun non-kustodial",
+      "body": "Anda tidak dapat lagi menerima dana di akun kustodial Anda. Blink telah menghentikan layanan kustodial di wilayah Anda dan akun ini akan dinonaktifkan pada akhir {date}.\n\nMigrasikan sekarang ke akun non-kustodial.",
+      "migrateCta": "Migrasi sekarang"
+    },
     "dollarBalanceModal": {
       "title": "Kami tidak dapat memigrasikan Saldo Dolar Anda",
       "body": "Kosongkan Saldo Dolar Anda terlebih dahulu. Anda dapat mentransfernya ke Saldo Bitcoin di Blink atau ke tempat lain."

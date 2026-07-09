@@ -88,6 +88,21 @@ export const formatShortDate = ({
   return new Date(createdAt * 1000).toLocaleDateString("en-CA", options)
 }
 
+export const formatDayAndMonth = ({
+  timestampSeconds,
+  locale,
+  timezone,
+}: {
+  timestampSeconds: number
+  locale?: string
+  timezone?: string
+}): string =>
+  new Date(timestampSeconds * 1000).toLocaleDateString(locale ?? "en-US", {
+    day: "numeric",
+    month: "long",
+    timeZone: timezone,
+  })
+
 export const parseCardValidThru = (
   value: string | Date,
 ): { month: string; year: string } | null => {

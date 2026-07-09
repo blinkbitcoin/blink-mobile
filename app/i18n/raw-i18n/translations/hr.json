@@ -3551,6 +3551,11 @@
     }
   },
   "AccountMigration": {
+    "migrateNowModal": {
+      "title": "Migrirajte sada na račun bez skrbništva",
+      "body": "Više ne možete primati sredstva na svoj skrbnički račun. Blink je ukinuo skrbničku uslugu u vašoj regiji i ovaj će račun biti deaktiviran do kraja dana {date}.\n\nMigrirajte sada na račun bez skrbništva.",
+      "migrateCta": "Migriraj sada"
+    },
     "dollarBalanceModal": {
       "title": "Ne možemo migrirati vaš dolarski saldo",
       "body": "Najprije ispraznite svoj dolarski saldo. Možete ga prenijeti na svoj Bitcoin saldo u Blinku ili drugamo."

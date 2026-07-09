@@ -3551,6 +3551,11 @@
     }
   },
   "AccountMigration": {
+    "migrateNowModal": {
+      "title": "Мигрирајте сада на не-кастодијални налог",
+      "body": "Више не можете примати средства на свој кастодијални налог. Blink је укинуо кастодијалну услугу у вашем региону и овај налог ће бити деактивиран до краја дана {date}.\n\nМигрирајте сада на не-кастодијални налог.",
+      "migrateCta": "Мигрирај сада"
+    },
     "dollarBalanceModal": {
       "title": "Ne možemo da migriramo vaš dolarski saldo",
       "body": "Prvo ispraznite svoj dolarski saldo. Možete ga preneti na svoj Bitcoin saldo u Blinku ili na drugo mesto."

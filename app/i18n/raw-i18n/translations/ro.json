@@ -3551,6 +3551,11 @@
     }
   },
   "AccountMigration": {
+    "migrateNowModal": {
+      "title": "Migrează acum către un cont non-custodial",
+      "body": "Nu mai poți primi fonduri în contul tău custodial. Blink a întrerupt serviciul custodial în regiunea ta, iar acest cont va fi inactivat până la sfârșitul zilei de {date}.\n\nMigrează acum către un cont non-custodial.",
+      "migrateCta": "Migrează acum"
+    },
     "dollarBalanceModal": {
       "title": "Nu îți putem migra soldul în dolari",
       "body": "Golește mai întâi soldul în dolari. Îl poți transfera în soldul tău Bitcoin din Blink sau în altă parte."

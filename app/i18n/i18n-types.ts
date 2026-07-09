@@ -11976,6 +11976,23 @@ type RootTranslation = {
 			 */
 			body: string
 		}
+		migrateNowModal: {
+			/**
+			 * M​i​g​r​a​t​e​ ​n​o​w​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
+			 */
+			title: string
+			/**
+			 * Y​o​u​ ​c​a​n​ ​n​o​ ​l​o​n​g​e​r​ ​r​e​c​e​i​v​e​ ​f​u​n​d​s​ ​t​o​ ​y​o​u​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.​ ​B​l​i​n​k​ ​h​a​s​ ​d​i​s​c​o​n​t​i​n​u​e​d​ ​c​u​s​t​o​d​i​a​l​ ​s​e​r​v​i​c​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​ ​a​n​d​ ​t​h​i​s​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​i​n​a​c​t​i​v​a​t​e​d​ ​b​y​ ​t​h​e​ ​e​n​d​ ​o​f​ ​{​d​a​t​e​}​.​
+		​
+		​M​i​g​r​a​t​e​ ​n​o​w​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+			 * @param {string} date
+			 */
+			body: RequiredParams<'date'>
+			/**
+			 * M​i​g​r​a​t​e​ ​n​o​w
+			 */
+			migrateCta: string
+		}
 	}
 	AccountTypeSelectionScreen: {
 		/**
@@ -24347,6 +24364,22 @@ export type TranslationFunctions = {
 			 * Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere.
 			 */
 			body: () => LocalizedString
+		}
+		migrateNowModal: {
+			/**
+			 * Migrate now to a non-custodial account
+			 */
+			title: () => LocalizedString
+			/**
+			 * You can no longer receive funds to your custodial account. Blink has discontinued custodial service in your region and this account will be inactivated by the end of {date}.
+	
+		Migrate now to a non-custodial account.
+			 */
+			body: (arg: { date: string }) => LocalizedString
+			/**
+			 * Migrate now
+			 */
+			migrateCta: () => LocalizedString
 		}
 	}
 	AccountTypeSelectionScreen: {

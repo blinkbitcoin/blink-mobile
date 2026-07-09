@@ -3551,6 +3551,11 @@
     }
   },
   "AccountMigration": {
+    "migrateNowModal": {
+      "title": "Fudukela ngoku kwiakhawunti engagcinwanga",
+      "body": "Awusakwazi ukufumana imali kwiakhawunti yakho egcinwayo. UBlink uyekile inkonzo yokugcina kummandla wakho kwaye le akhawunti iza kuvalwa ekupheleni kuka-{date}.\n\nFudukela ngoku kwiakhawunti engagcinwanga.",
+      "migrateCta": "Fuduka ngoku"
+    },
     "dollarBalanceModal": {
       "title": "Asikwazi ukufudusa ibhalansi yakho yedola",
       "body": "Qala ukhuphe yonke ibhalansi yakho yedola. Ungayidlulisela kwibhalansi yakho yeBitcoin kuBlink okanye kwenye indawo."

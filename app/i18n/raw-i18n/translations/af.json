@@ -3551,6 +3551,11 @@
     }
   },
   "AccountMigration": {
+    "migrateNowModal": {
+      "title": "Migreer nou na 'n nie-bewaarrekening",
+      "body": "Jy kan nie meer fondse in jou bewaarrekening ontvang nie. Blink het die bewaardiens in jou streek gestaak en hierdie rekening sal teen die einde van {date} gedeaktiveer word.\n\nMigreer nou na 'n nie-bewaarrekening.",
+      "migrateCta": "Migreer nou"
+    },
     "dollarBalanceModal": {
       "title": "Ons kan nie jou dollarsaldo migreer nie",
       "body": "Maak eers jou dollarsaldo leeg. Jy kan dit na jou Bitcoin-saldo in Blink of elders oordra."

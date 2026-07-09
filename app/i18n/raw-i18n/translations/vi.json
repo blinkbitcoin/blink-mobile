@@ -3551,6 +3551,11 @@
     }
   },
   "AccountMigration": {
+    "migrateNowModal": {
+      "title": "Hãy chuyển ngay sang tài khoản không lưu ký",
+      "body": "Bạn không còn có thể nhận tiền vào tài khoản lưu ký của mình. Blink đã ngừng dịch vụ lưu ký tại khu vực của bạn và tài khoản này sẽ bị vô hiệu hóa vào cuối ngày {date}.\n\nHãy chuyển ngay sang tài khoản không lưu ký.",
+      "migrateCta": "Chuyển ngay"
+    },
     "dollarBalanceModal": {
       "title": "Chúng tôi không thể di chuyển số dư đô la của bạn",
       "body": "Trước tiên hãy rút hết số dư đô la của bạn. Bạn có thể chuyển nó sang số dư Bitcoin trong Blink hoặc nơi khác."
