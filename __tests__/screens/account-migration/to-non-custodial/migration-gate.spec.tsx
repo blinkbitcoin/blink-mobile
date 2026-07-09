@@ -2,20 +2,63 @@ import React from "react"
 import { render, act } from "@testing-library/react-native"
 
 import { MigrationGate } from "@app/screens/account-migration/to-non-custodial/migration-gate"
+import { WindDownStatus } from "@app/screens/account-migration/utils/backend-mock"
 
+const mockNavigate = jest.fn()
+const mockGoBack = jest.fn()
 const mockUseActiveApiKeys = jest.fn()
 const mockUseCustodialMigrationRequired = jest.fn()
+const mockUseWindDownStatus = jest.fn()
+const mockUseTransferBlocked = jest.fn()
+const mockUseDollarBalanceRestricted = jest.fn()
+const mockUseWalletOverviewScreenQuery = jest.fn()
 const mockApiServiceScreen = jest.fn((_props: { onContinue: () => void }) => null)
 const mockRequiredScreen = jest.fn(
   (_props: { mode: string; onClose?: () => void }) => null,
 )
+const mockDollarBalanceModal = jest.fn(
+  (_props: { isVisible: boolean; toggleModal: () => void; onTransfer?: () => void }) =>
+    null,
+)
+
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+}))
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useActiveApiKeys: () => mockUseActiveApiKeys(),
+  useWindDownStatus: () => mockUseWindDownStatus(),
 }))
 
 jest.mock("@app/hooks/use-custodial-migration-required", () => ({
   useCustodialMigrationRequired: () => mockUseCustodialMigrationRequired(),
+}))
+
+jest.mock("@app/hooks/use-transfer-blocked", () => ({
+  useTransferBlocked: () => mockUseTransferBlocked(),
+}))
+
+jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
+  useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
+}))
+
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useWalletOverviewScreenQuery: () => mockUseWalletOverviewScreenQuery(),
+}))
+
+jest.mock("@app/graphql/is-authed-context", () => ({
+  ...jest.requireActual("@app/graphql/is-authed-context"),
+  useIsAuthed: () => true,
+}))
+
+jest.mock("@app/components/dollar-balance-migration-modal", () => ({
+  DollarBalanceMigrationModal: (props: {
+    isVisible: boolean
+    toggleModal: () => void
+    onTransfer?: () => void
+  }) => mockDollarBalanceModal(props),
 }))
 
 jest.mock("@app/screens/account-migration/to-non-custodial/api-service-screen", () => ({
@@ -31,19 +74,140 @@ jest.mock(
   }),
 )
 
+const walletsWithUsdBalance = (usdCents: number) => ({
+  loading: false,
+  data: {
+    me: {
+      defaultAccount: {
+        wallets: [
+          {
+            __typename: "UsdWallet",
+            id: "usd-1",
+            walletCurrency: "USD",
+            balance: usdCents,
+          },
+        ],
+      },
+    },
+  },
+})
+
 describe("MigrationGate", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseCustodialMigrationRequired.mockReturnValue(false)
+    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: false, loading: false })
+    mockUseWindDownStatus.mockReturnValue({ status: WindDownStatus.PreCutoff })
+    mockUseTransferBlocked.mockReturnValue(false)
+    mockUseDollarBalanceRestricted.mockReturnValue(false)
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(0))
   })
 
-  it("renders neither screen while the API-key check is loading", () => {
+  it("renders nothing while the API-key check is loading", () => {
     mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: false, loading: true })
 
     render(<MigrationGate />)
 
+    expect(mockDollarBalanceModal).not.toHaveBeenCalled()
     expect(mockApiServiceScreen).not.toHaveBeenCalled()
     expect(mockRequiredScreen).not.toHaveBeenCalled()
+  })
+
+  it("renders nothing while the wallet balances are loading", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue({ loading: true, data: undefined })
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal).not.toHaveBeenCalled()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+  })
+
+  it("treats missing wallet data as a zero dollar balance", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue({ loading: false, data: undefined })
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal).not.toHaveBeenCalled()
+    expect(mockRequiredScreen).toHaveBeenCalled()
+  })
+
+  it("blocks entry with the dollar-balance modal when the custodial Dollar Balance is above zero", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal).toHaveBeenCalled()
+    expect(mockApiServiceScreen).not.toHaveBeenCalled()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+  })
+
+  it("offers the transfer action when the region permits the dollar transfer", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+
+    render(<MigrationGate />)
+    const { onTransfer } = mockDollarBalanceModal.mock.calls[0][0]
+
+    expect(onTransfer).toBeDefined()
+    act(() => {
+      onTransfer?.()
+    })
+    expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
+  })
+
+  it("shows the close-only variant when the region blocks the dollar transfer", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseTransferBlocked.mockReturnValue(true)
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal.mock.calls[0][0].onTransfer).toBeUndefined()
+  })
+
+  it("shows the close-only variant when the dollar balance is restricted in the region", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseDollarBalanceRestricted.mockReturnValue(true)
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal.mock.calls[0][0].onTransfer).toBeUndefined()
+  })
+
+  it("exits the flow when the dollar-balance modal is dismissed", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+
+    render(<MigrationGate />)
+    const { toggleModal } = mockDollarBalanceModal.mock.calls[0][0]
+
+    act(() => {
+      toggleModal()
+    })
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  it("dismisses through onClose instead of goBack when the blocker provides it", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    const onClose = jest.fn()
+
+    render(<MigrationGate onClose={onClose} />)
+    const { toggleModal } = mockDollarBalanceModal.mock.calls[0][0]
+
+    act(() => {
+      toggleModal()
+    })
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  it("skips the dollar-balance check after the gate arms, where the flow converts dollars", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWindDownStatus.mockReturnValue({ status: WindDownStatus.GatedClosed })
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal).not.toHaveBeenCalled()
+    expect(mockRequiredScreen).toHaveBeenCalled()
   })
 
   it("shows the API-service warning when there are active API keys", () => {
@@ -55,9 +219,17 @@ describe("MigrationGate", () => {
     expect(mockRequiredScreen).not.toHaveBeenCalled()
   })
 
-  it("shows the required screen directly when there are no active API keys", () => {
-    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: false, loading: false })
+  it("checks the dollar balance before the API keys", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: true, loading: false })
 
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal).toHaveBeenCalled()
+    expect(mockApiServiceScreen).not.toHaveBeenCalled()
+  })
+
+  it("shows the required screen directly when there are no active API keys", () => {
     render(<MigrationGate />)
 
     expect(mockRequiredScreen).toHaveBeenCalled()
@@ -78,7 +250,6 @@ describe("MigrationGate", () => {
   })
 
   it("uses the voluntary mode when migration is not required", () => {
-    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: false, loading: false })
     mockUseCustodialMigrationRequired.mockReturnValue(false)
 
     render(<MigrationGate />)
@@ -87,7 +258,6 @@ describe("MigrationGate", () => {
   })
 
   it("uses the forced pre-deadline mode when migration is required", () => {
-    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: false, loading: false })
     mockUseCustodialMigrationRequired.mockReturnValue(true)
 
     render(<MigrationGate />)
@@ -96,7 +266,6 @@ describe("MigrationGate", () => {
   })
 
   it("forwards onClose to the required screen", () => {
-    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: false, loading: false })
     const onClose = jest.fn()
 
     render(<MigrationGate onClose={onClose} />)
