@@ -11993,6 +11993,66 @@ type RootTranslation = {
 			 */
 			migrateCta: string
 		}
+		contactSupport: {
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			title: string
+			/**
+			 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​ ​b​u​t​ ​d​o​n​'​t​ ​w​o​r​r​y​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​,​ ​p​l​e​a​s​e​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​f​o​r​ ​a​s​s​i​s​t​a​n​c​e​.​
+		​
+		​Y​o​u​ ​m​a​y​ ​n​e​e​d​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​t​o​ ​h​e​l​p​ ​s​u​p​p​o​r​t​ ​r​e​s​o​l​v​e​ ​y​o​u​r​ ​c​a​s​e​:
+			 */
+			body: string
+			/**
+			 * A​c​c​o​u​n​t​ ​I​D
+			 */
+			accountIdLabel: string
+			/**
+			 * p​u​b​K​e​y
+			 */
+			pubKeyLabel: string
+			/**
+			 * U​s​e​r​n​a​m​e
+			 */
+			usernameLabel: string
+			/**
+			 * E​m​a​i​l
+			 */
+			emailLabel: string
+			/**
+			 * P​h​o​n​e​ ​n​u​m​b​e​r
+			 */
+			phoneLabel: string
+			/**
+			 * A​p​p​ ​v​e​r​s​i​o​n
+			 */
+			appVersionLabel: string
+			/**
+			 * P​l​a​t​f​o​r​m
+			 */
+			platformLabel: string
+			/**
+			 * C​o​u​n​t​r​y
+			 */
+			countryLabel: string
+			/**
+			 * M​i​g​r​a​t​i​o​n​ ​s​u​p​p​o​r​t​ ​r​e​q​u​e​s​t
+			 */
+			emailSubject: string
+			/**
+			 * D​e​s​c​r​i​b​e​ ​t​h​e​ ​p​r​o​b​l​e​m​:
+			 */
+			emailDescribeProblem: string
+			/**
+			 * A​c​c​o​u​n​t​ ​i​n​f​o​r​m​a​t​i​o​n​ ​f​o​r​ ​s​u​p​p​o​r​t​:
+			 */
+			emailAccountInfo: string
+			/**
+			 * C​o​n​t​a​c​t​ ​u​s
+			 */
+			contactUsCta: string
+		}
 	}
 	AccountTypeSelectionScreen: {
 		/**
@@ -24380,6 +24440,66 @@ export type TranslationFunctions = {
 			 * Migrate now
 			 */
 			migrateCta: () => LocalizedString
+		}
+		contactSupport: {
+			/**
+			 * Contact support
+			 */
+			title: () => LocalizedString
+			/**
+			 * Something went wrong but don't worry your funds are safe, please contact support for assistance.
+	
+		You may need this information to help support resolve your case:
+			 */
+			body: () => LocalizedString
+			/**
+			 * Account ID
+			 */
+			accountIdLabel: () => LocalizedString
+			/**
+			 * pubKey
+			 */
+			pubKeyLabel: () => LocalizedString
+			/**
+			 * Username
+			 */
+			usernameLabel: () => LocalizedString
+			/**
+			 * Email
+			 */
+			emailLabel: () => LocalizedString
+			/**
+			 * Phone number
+			 */
+			phoneLabel: () => LocalizedString
+			/**
+			 * App version
+			 */
+			appVersionLabel: () => LocalizedString
+			/**
+			 * Platform
+			 */
+			platformLabel: () => LocalizedString
+			/**
+			 * Country
+			 */
+			countryLabel: () => LocalizedString
+			/**
+			 * Migration support request
+			 */
+			emailSubject: () => LocalizedString
+			/**
+			 * Describe the problem:
+			 */
+			emailDescribeProblem: () => LocalizedString
+			/**
+			 * Account information for support:
+			 */
+			emailAccountInfo: () => LocalizedString
+			/**
+			 * Contact us
+			 */
+			contactUsCta: () => LocalizedString
 		}
 	}
 	AccountTypeSelectionScreen: {

@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Kontaktirajte podršku",
+      "body": "Nešto je pošlo po zlu, ali ne brinite, vaša su sredstva sigurna. Obratite se podršci za pomoć.\n\nOve informacije mogu pomoći podršci da riješi vaš slučaj:",
+      "accountIdLabel": "ID računa",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Korisničko ime",
+      "emailLabel": "E-pošta",
+      "phoneLabel": "Broj telefona",
+      "appVersionLabel": "Verzija aplikacije",
+      "platformLabel": "Platforma",
+      "countryLabel": "Država",
+      "emailSubject": "Zahtjev za podršku pri migraciji",
+      "emailDescribeProblem": "Opišite problem:",
+      "emailAccountInfo": "Podaci o računu za podršku:",
+      "contactUsCta": "Kontaktirajte nas"
+    },
     "migrateNowModal": {
       "title": "Migrirajte sada na račun bez skrbništva",
       "body": "Više ne možete primati sredstva na svoj skrbnički račun. Blink je ukinuo skrbničku uslugu u vašoj regiji i ovaj će račun biti deaktiviran do kraja dana {date}.\n\nMigrirajte sada na račun bez skrbništva.",

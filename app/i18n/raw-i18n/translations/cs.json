@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Kontaktovat podporu",
+      "body": "Něco se pokazilo, ale nebojte se, vaše prostředky jsou v bezpečí. Obraťte se prosím na podporu.\n\nTyto informace mohou podpoře pomoci vyřešit váš případ:",
+      "accountIdLabel": "ID účtu",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Uživatelské jméno",
+      "emailLabel": "E-mail",
+      "phoneLabel": "Telefonní číslo",
+      "appVersionLabel": "Verze aplikace",
+      "platformLabel": "Platforma",
+      "countryLabel": "Země",
+      "emailSubject": "Žádost o podporu při migraci",
+      "emailDescribeProblem": "Popište problém:",
+      "emailAccountInfo": "Informace o účtu pro podporu:",
+      "contactUsCta": "Kontaktujte nás"
+    },
     "migrateNowModal": {
       "title": "Přejděte nyní na nesvěřenský účet",
       "body": "Na svůj svěřenský účet již nemůžete přijímat prostředky. Blink ukončil svěřenskou službu ve vašem regionu a tento účet bude deaktivován do konce dne {date}.\n\nPřejděte nyní na nesvěřenský účet.",

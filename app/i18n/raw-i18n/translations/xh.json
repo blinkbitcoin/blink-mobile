@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Qhagamshelana nenkxaso",
+      "body": "Kukho into engahambanga kakuhle, kodwa ungakhathazeki, imali yakho ikhuselekile. Nceda uqhagamshelane nenkxaso ukuze ufumane uncedo.\n\nUsenokufuna olu lwazi ukunceda inkxaso isombulule ityala lakho:",
+      "accountIdLabel": "I-ID yeakhawunti",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Igama lomsebenzisi",
+      "emailLabel": "I-imeyile",
+      "phoneLabel": "Inombolo yefowuni",
+      "appVersionLabel": "Uhlelo lwe-app",
+      "platformLabel": "Iqonga",
+      "countryLabel": "Ilizwe",
+      "emailSubject": "Isicelo senkxaso yofuduso",
+      "emailDescribeProblem": "Chaza ingxaki:",
+      "emailAccountInfo": "Inkcazelo yeakhawunti yenkxaso:",
+      "contactUsCta": "Qhagamshelana nathi"
+    },
     "migrateNowModal": {
       "title": "Fudukela ngoku kwiakhawunti engagcinwanga",
       "body": "Awusakwazi ukufumana imali kwiakhawunti yakho egcinwayo. UBlink uyekile inkonzo yokugcina kummandla wakho kwaye le akhawunti iza kuvalwa ekupheleni kuka-{date}.\n\nFudukela ngoku kwiakhawunti engagcinwanga.",

@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Contacta amb suport",
+      "body": "Alguna cosa ha anat malament, però no et preocupis, els teus fons estan segurs. Contacta amb suport per obtenir ajuda.\n\nPotser necessitaràs aquesta informació per ajudar el suport a resoldre el teu cas:",
+      "accountIdLabel": "ID del compte",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Nom d'usuari",
+      "emailLabel": "Correu electrònic",
+      "phoneLabel": "Número de telèfon",
+      "appVersionLabel": "Versió de l'aplicació",
+      "platformLabel": "Plataforma",
+      "countryLabel": "País",
+      "emailSubject": "Sol·licitud de suport de migració",
+      "emailDescribeProblem": "Descriu el problema:",
+      "emailAccountInfo": "Informació del compte per al suport:",
+      "contactUsCta": "Contacta'ns"
+    },
     "migrateNowModal": {
       "title": "Migra ara a un compte no custodi",
       "body": "Ja no pots rebre fons al teu compte custodial. Blink ha discontinuat el servei de custòdia a la teva regió i aquest compte quedarà inactivat al final del {date}.\n\nMigra ara a un compte no custodi.",

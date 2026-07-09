@@ -3551,6 +3551,22 @@
         }
     },
     "AccountMigration": {
+        "contactSupport": {
+            "title": "サポートに連絡",
+            "body": "問題が発生しましたが、ご安心ください。資金は安全です。サポートにお問い合わせください。\n\nサポートが問題を解決するために、次の情報が必要になる場合があります：",
+            "accountIdLabel": "アカウントID",
+            "pubKeyLabel": "pubKey",
+            "usernameLabel": "ユーザー名",
+            "emailLabel": "メールアドレス",
+            "phoneLabel": "電話番号",
+            "appVersionLabel": "アプリのバージョン",
+            "platformLabel": "プラットフォーム",
+            "countryLabel": "国",
+            "emailSubject": "移行サポートのリクエスト",
+            "emailDescribeProblem": "問題の内容をご記入ください：",
+            "emailAccountInfo": "サポート用アカウント情報：",
+            "contactUsCta": "お問い合わせ"
+        },
         "migrateNowModal": {
             "title": "今すぐ非カストディアルアカウントに移行してください",
             "body": "カストディアルアカウントでは資金を受け取れなくなりました。Blinkはお住まいの地域でカストディアルサービスを終了し、このアカウントは{date}の終わりまでに無効化されます。\n\n今すぐ非カストディアルアカウントに移行してください。",

@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Kontak ondersteuning",
+      "body": "Iets het verkeerd geloop, maar moenie bekommerd wees nie, jou fondse is veilig. Kontak asseblief ondersteuning vir hulp.\n\nJy mag dalk hierdie inligting nodig hê om ondersteuning te help om jou saak op te los:",
+      "accountIdLabel": "Rekening-ID",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Gebruikersnaam",
+      "emailLabel": "E-pos",
+      "phoneLabel": "Telefoonnommer",
+      "appVersionLabel": "Toepassingweergawe",
+      "platformLabel": "Platform",
+      "countryLabel": "Land",
+      "emailSubject": "Migrasie-ondersteuningsversoek",
+      "emailDescribeProblem": "Beskryf die probleem:",
+      "emailAccountInfo": "Rekeninginligting vir ondersteuning:",
+      "contactUsCta": "Kontak ons"
+    },
     "migrateNowModal": {
       "title": "Migreer nou na 'n nie-bewaarrekening",
       "body": "Jy kan nie meer fondse in jou bewaarrekening ontvang nie. Blink het die bewaardiens in jou streek gestaak en hierdie rekening sal teen die einde van {date} gedeaktiveer word.\n\nMigreer nou na 'n nie-bewaarrekening.",

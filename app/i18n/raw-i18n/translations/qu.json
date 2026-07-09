@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Yanapakuyta maskay",
+      "body": "Imapas mana allinchu karqan, ichaqa ama llakikuychu, qullqiykikuna waqaychasqam kachkan. Ama hina kaspa yanapakuyta maskay.\n\nKay willakuykunata munawaq yanapakuqkuna hawkachinankupaq:",
+      "accountIdLabel": "Kuenta ID",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Ruraqpa sutin",
+      "emailLabel": "Correo electrónico",
+      "phoneLabel": "Telefono yupay",
+      "appVersionLabel": "App versión",
+      "platformLabel": "Plataforma",
+      "countryLabel": "Suyu",
+      "emailSubject": "Astakuypaq yanapakuy mañakuy",
+      "emailDescribeProblem": "Sasachakuyta willay:",
+      "emailAccountInfo": "Kuenta willakuykuna yanapakuypaq:",
+      "contactUsCta": "Willawayku"
+    },
     "migrateNowModal": {
       "title": "Kunan astakuy mana waqaychasqa kuentaman",
       "body": "Manañam qullqita chaskiyta atinkichu waqaychasqa kuentaykipi. Blink-qa waqaychay ruwayta tukurqun llaqtaykipi, kay kuentaqa {date} tukukuyninpi wichq'asqa kanqa.\n\nKunan astakuy mana waqaychasqa kuentaman.",

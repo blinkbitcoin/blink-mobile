@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Tuukirire ab'obuyambi",
+      "body": "Waliwo ekitagenze bulungi, naye tofaayo, ssente zo nnywevu. Tuukirira ab'obuyambi bakuyambe.\n\nOyinza okwetaaga ebikwata ku bino okuyamba ab'obuyambi okugonjoola ensonga yo:",
+      "accountIdLabel": "ID ya akawunti",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Erinnya ly'omukozesa",
+      "emailLabel": "Email",
+      "phoneLabel": "Ennamba y'essimu",
+      "appVersionLabel": "Ekika kya app",
+      "platformLabel": "Pulatifomu",
+      "countryLabel": "Ensi",
+      "emailSubject": "Okusaba obuyambi ku kutambuza akawunti",
+      "emailDescribeProblem": "Nnyonnyola ekizibu:",
+      "emailAccountInfo": "Ebikwata ku akawunti eby'obuyambi:",
+      "contactUsCta": "Tutuukirire"
+    },
     "migrateNowModal": {
       "title": "Kyusa kaakano ogende ku akawunti etakuumibwa",
       "body": "Tokyasobola kufuna ssente ku akawunti yo ekuumibwa. Blink evuddeyo mu mpeereza y'okukuuma ssente mu kitundu kyo, era akawunti eno ejja kuggalwawo nga {date} ewedde.\n\nKyusa kaakano ogende ku akawunti etakuumibwa.",

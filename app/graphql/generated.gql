@@ -1396,6 +1396,23 @@ query migrationApiKeys {
   }
 }
 
+query migrationSupportDetails {
+  me {
+    id
+    phone
+    username
+    email {
+      address
+      __typename
+    }
+    defaultAccount {
+      id
+      __typename
+    }
+    __typename
+  }
+}
+
 query mobileUpdate {
   mobileVersions {
     platform

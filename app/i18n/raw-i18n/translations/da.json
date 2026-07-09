@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Kontakt support",
+      "body": "Noget gik galt, men bare rolig, dine midler er sikre. Kontakt venligst support for at få hjælp.\n\nDu kan få brug for disse oplysninger, så support kan løse din sag:",
+      "accountIdLabel": "Konto-ID",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Brugernavn",
+      "emailLabel": "E-mail",
+      "phoneLabel": "Telefonnummer",
+      "appVersionLabel": "Appversion",
+      "platformLabel": "Platform",
+      "countryLabel": "Land",
+      "emailSubject": "Supportanmodning om migrering",
+      "emailDescribeProblem": "Beskriv problemet:",
+      "emailAccountInfo": "Kontooplysninger til support:",
+      "contactUsCta": "Kontakt os"
+    },
     "migrateNowModal": {
       "title": "Migrér nu til en ikke-depotkonto",
       "body": "Du kan ikke længere modtage midler på din depotkonto. Blink har indstillet depottjenesten i din region, og denne konto vil blive deaktiveret ved udgangen af {date}.\n\nMigrér nu til en ikke-depotkonto.",

@@ -24,4 +24,15 @@ describe("useContactSupport", () => {
 
     expect(openURL).toHaveBeenCalledWith(`mailto:${SUPPORT_EMAIL}`)
   })
+
+  it("opens a pre-filled mailto link with the encoded subject and body", () => {
+    const openURL = jest.spyOn(Linking, "openURL").mockResolvedValue(undefined)
+    const { result } = renderHook(() => useContactSupport())
+
+    result.current.composeSupport({ subject: "Case 42", body: "Account ID: abc\nOk" })
+
+    expect(openURL).toHaveBeenCalledWith(
+      `mailto:${SUPPORT_EMAIL}?subject=Case%2042&body=Account%20ID%3A%20abc%0AOk`,
+    )
+  })
 })

@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Wasiliana na usaidizi",
+      "body": "Kuna kitu kimeenda vibaya, lakini usiwe na wasiwasi, fedha zako ziko salama. Tafadhali wasiliana na usaidizi kwa msaada.\n\nUnaweza kuhitaji taarifa hizi ili kusaidia usaidizi kutatua kesi yako:",
+      "accountIdLabel": "Kitambulisho cha akaunti",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Jina la mtumiaji",
+      "emailLabel": "Barua pepe",
+      "phoneLabel": "Namba ya simu",
+      "appVersionLabel": "Toleo la programu",
+      "platformLabel": "Jukwaa",
+      "countryLabel": "Nchi",
+      "emailSubject": "Ombi la usaidizi wa uhamishaji",
+      "emailDescribeProblem": "Eleza tatizo:",
+      "emailAccountInfo": "Taarifa za akaunti kwa usaidizi:",
+      "contactUsCta": "Wasiliana nasi"
+    },
     "migrateNowModal": {
       "title": "Hamia sasa kwenye akaunti isiyo ya udhamini",
       "body": "Huwezi tena kupokea fedha kwenye akaunti yako ya udhamini. Blink imesitisha huduma ya udhamini katika eneo lako na akaunti hii itazimwa ifikapo mwisho wa {date}.\n\nHamia sasa kwenye akaunti isiyo ya udhamini.",

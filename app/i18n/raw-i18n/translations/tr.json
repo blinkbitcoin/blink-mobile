@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Destek ile iletişime geçin",
+      "body": "Bir şeyler ters gitti ama endişelenmeyin, paranız güvende. Yardım için lütfen destek ile iletişime geçin.\n\nDesteğin durumunuzu çözmesine yardımcı olmak için bu bilgilere ihtiyacınız olabilir:",
+      "accountIdLabel": "Hesap kimliği",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Kullanıcı adı",
+      "emailLabel": "E-posta",
+      "phoneLabel": "Telefon numarası",
+      "appVersionLabel": "Uygulama sürümü",
+      "platformLabel": "Platform",
+      "countryLabel": "Ülke",
+      "emailSubject": "Taşıma destek talebi",
+      "emailDescribeProblem": "Sorunu açıklayın:",
+      "emailAccountInfo": "Destek için hesap bilgileri:",
+      "contactUsCta": "Bize ulaşın"
+    },
     "migrateNowModal": {
       "title": "Şimdi saklamasız bir hesaba taşının",
       "body": "Saklamalı hesabınıza artık para alamazsınız. Blink bölgenizde saklama hizmetini sonlandırdı ve bu hesap {date} sonuna kadar devre dışı bırakılacak.\n\nŞimdi saklamasız bir hesaba taşının.",

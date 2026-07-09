@@ -3551,6 +3551,22 @@
         }
     },
     "AccountMigration": {
+        "contactSupport": {
+            "title": "Contate o suporte",
+            "body": "Algo deu errado, mas não se preocupe, seus fundos estão seguros. Entre em contato com o suporte para obter assistência.\n\nVocê pode precisar destas informações para ajudar o suporte a resolver o seu caso:",
+            "accountIdLabel": "ID da conta",
+            "pubKeyLabel": "pubKey",
+            "usernameLabel": "Nome de usuário",
+            "emailLabel": "E-mail",
+            "phoneLabel": "Número de telefone",
+            "appVersionLabel": "Versão do aplicativo",
+            "platformLabel": "Plataforma",
+            "countryLabel": "País",
+            "emailSubject": "Solicitação de suporte de migração",
+            "emailDescribeProblem": "Descreva o problema:",
+            "emailAccountInfo": "Informações da conta para o suporte:",
+            "contactUsCta": "Fale conosco"
+        },
         "migrateNowModal": {
             "title": "Migre agora para uma conta não custodial",
             "body": "Você não pode mais receber fundos na sua conta custodial. A Blink descontinuou o serviço custodial na sua região e esta conta será inativada até o final de {date}.\n\nMigre agora para uma conta não custodial.",

@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "تواصل مع الدعم",
+      "body": "حدث خطأ ما، لكن لا تقلق، أموالك آمنة. يرجى التواصل مع الدعم للمساعدة.\n\nقد تحتاج إلى هذه المعلومات لمساعدة الدعم في حل حالتك:",
+      "accountIdLabel": "معرّف الحساب",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "اسم المستخدم",
+      "emailLabel": "البريد الإلكتروني",
+      "phoneLabel": "رقم الهاتف",
+      "appVersionLabel": "إصدار التطبيق",
+      "platformLabel": "المنصة",
+      "countryLabel": "البلد",
+      "emailSubject": "طلب دعم للترحيل",
+      "emailDescribeProblem": "صف المشكلة:",
+      "emailAccountInfo": "معلومات الحساب للدعم:",
+      "contactUsCta": "تواصل معنا"
+    },
     "migrateNowModal": {
       "title": "رحّل الآن إلى حساب غير حافظ",
       "body": "لم يعد بإمكانك استقبال الأموال في حسابك الحافظ. أوقفت Blink خدمة الحفظ في منطقتك وسيتم تعطيل هذا الحساب بحلول نهاية {date}.\n\nرحّل الآن إلى حساب غير حافظ.",

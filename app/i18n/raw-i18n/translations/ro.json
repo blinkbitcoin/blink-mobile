@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Contactează suportul",
+      "body": "Ceva nu a mers bine, dar nu-ți face griji, fondurile tale sunt în siguranță. Te rugăm să contactezi suportul pentru asistență.\n\nS-ar putea să ai nevoie de aceste informații pentru ca suportul să îți rezolve cazul:",
+      "accountIdLabel": "ID-ul contului",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Nume de utilizator",
+      "emailLabel": "E-mail",
+      "phoneLabel": "Număr de telefon",
+      "appVersionLabel": "Versiunea aplicației",
+      "platformLabel": "Platformă",
+      "countryLabel": "Țara",
+      "emailSubject": "Cerere de suport pentru migrare",
+      "emailDescribeProblem": "Descrieți problema:",
+      "emailAccountInfo": "Informații despre cont pentru suport:",
+      "contactUsCta": "Contactează-ne"
+    },
     "migrateNowModal": {
       "title": "Migrează acum către un cont non-custodial",
       "body": "Nu mai poți primi fonduri în contul tău custodial. Blink a întrerupt serviciul custodial în regiunea ta, iar acest cont va fi inactivat până la sfârșitul zilei de {date}.\n\nMigrează acum către un cont non-custodial.",

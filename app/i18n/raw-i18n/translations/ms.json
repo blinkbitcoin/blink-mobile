@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Hubungi sokongan",
+      "body": "Sesuatu telah berlaku, tetapi jangan risau, dana anda selamat. Sila hubungi sokongan untuk mendapatkan bantuan.\n\nAnda mungkin memerlukan maklumat ini untuk membantu sokongan menyelesaikan kes anda:",
+      "accountIdLabel": "ID akaun",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Nama pengguna",
+      "emailLabel": "E-mel",
+      "phoneLabel": "Nombor telefon",
+      "appVersionLabel": "Versi aplikasi",
+      "platformLabel": "Platform",
+      "countryLabel": "Negara",
+      "emailSubject": "Permintaan sokongan pemindahan",
+      "emailDescribeProblem": "Terangkan masalah:",
+      "emailAccountInfo": "Maklumat akaun untuk sokongan:",
+      "contactUsCta": "Hubungi kami"
+    },
     "migrateNowModal": {
       "title": "Berpindah sekarang ke akaun bukan kustodial",
       "body": "Anda tidak lagi boleh menerima dana ke akaun kustodial anda. Blink telah menghentikan perkhidmatan kustodial di wilayah anda dan akaun ini akan dinyahaktifkan menjelang akhir {date}.\n\nBerpindah sekarang ke akaun bukan kustodial.",

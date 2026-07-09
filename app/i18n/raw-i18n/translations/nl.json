@@ -3551,6 +3551,22 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Contact opnemen met support",
+      "body": "Er is iets misgegaan, maar maak je geen zorgen, je geld is veilig. Neem contact op met support voor hulp.\n\nMogelijk heb je deze informatie nodig zodat support je zaak kan oplossen:",
+      "accountIdLabel": "Account-ID",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Gebruikersnaam",
+      "emailLabel": "E-mail",
+      "phoneLabel": "Telefoonnummer",
+      "appVersionLabel": "App-versie",
+      "platformLabel": "Platform",
+      "countryLabel": "Land",
+      "emailSubject": "Supportverzoek migratie",
+      "emailDescribeProblem": "Beschrijf het probleem:",
+      "emailAccountInfo": "Accountinformatie voor support:",
+      "contactUsCta": "Neem contact op"
+    },
     "migrateNowModal": {
       "title": "Migreer nu naar een niet-bewaarde rekening",
       "body": "Je kunt geen geld meer ontvangen op je bewaarde rekening. Blink heeft de bewaardienst in jouw regio stopgezet en deze rekening wordt tegen het einde van {date} gedeactiveerd.\n\nMigreer nu naar een niet-bewaarde rekening.",

@@ -10,6 +10,7 @@ import { StatusScreenLayout } from "@app/components/status-screen-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useCompleteMigration } from "@app/screens/account-migration/hooks"
+import { reportError } from "@app/utils/error-logging"
 
 // TODO: replace with the backend funds-transfer request; this 3s delay simulates it.
 const TRANSFER_SIMULATION_MS = 3000
@@ -27,8 +28,14 @@ export const TransferringFundsScreen: React.FC = () => {
     if (!migrationAccountId) return
 
     const timer = setTimeout(async () => {
-      if (await completeMigration()) {
-        navigation.navigate("selfCustodialBackupSuccess", { reBackup: false })
+      try {
+        if (await completeMigration()) {
+          navigation.navigate("selfCustodialBackupSuccess", { reBackup: false })
+        }
+      } catch (err) {
+        /** Funds stay safe on a failed transfer; support resolves it from the contact screen. */
+        reportError("Migration funds transfer", err)
+        navigation.navigate("accountMigrationContactSupport")
       }
     }, TRANSFER_SIMULATION_MS)
 

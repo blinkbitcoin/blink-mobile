@@ -3551,6 +3551,22 @@
         }
     },
     "AccountMigration": {
+        "contactSupport": {
+            "title": "Support kontaktieren",
+            "body": "Etwas ist schiefgelaufen, aber keine Sorge, dein Guthaben ist sicher. Bitte kontaktiere den Support für Hilfe.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
+            "accountIdLabel": "Konto-ID",
+            "pubKeyLabel": "pubKey",
+            "usernameLabel": "Benutzername",
+            "emailLabel": "E-Mail",
+            "phoneLabel": "Telefonnummer",
+            "appVersionLabel": "App-Version",
+            "platformLabel": "Plattform",
+            "countryLabel": "Land",
+            "emailSubject": "Support-Anfrage zur Migration",
+            "emailDescribeProblem": "Beschreibe das Problem:",
+            "emailAccountInfo": "Kontoinformationen für den Support:",
+            "contactUsCta": "Kontaktiere uns"
+        },
         "migrateNowModal": {
             "title": "Migriere jetzt auf ein nicht-verwahrtes Konto",
             "body": "Du kannst keine Gelder mehr auf deinem verwahrten Konto empfangen. Blink hat den Verwahrdienst in deiner Region eingestellt und dieses Konto wird zum Ende des {date} deaktiviert.\n\nMigriere jetzt auf ein nicht-verwahrtes Konto.",

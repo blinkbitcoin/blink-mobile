@@ -23,6 +23,10 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   }),
 }))
 
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: jest.fn(),
+}))
+
 jest.mock("@app/components/status-screen-layout", () => ({
   StatusScreenLayout: ({ children }: { children: React.ReactNode }) => {
     const { View } = jest.requireActual("react-native")
@@ -104,5 +108,22 @@ describe("TransferringFundsScreen", () => {
 
     expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("routes to the contact support screen when the transfer fails", async () => {
+    mockCompleteMigration.mockRejectedValue(new Error("no route found"))
+    renderScreen()
+    await flushEffects()
+
+    act(() => {
+      jest.advanceTimersByTime(TRANSFER_DELAY_MS)
+    })
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialBackupSuccess",
+      expect.anything(),
+    )
   })
 })
