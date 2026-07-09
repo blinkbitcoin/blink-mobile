@@ -17,7 +17,7 @@ const LL = i18nObject("en")
 
 const CHECKPOINT_ROUTE = "accountMigrationExplainer"
 const KEEP_RECEIVING_ROUTE = "accountMigrationKeepReceiving"
-const CONTACT_EMAIL = "feedback@blink.sv"
+const CONTACT_EMAIL = "support@blink.sv"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
@@ -36,7 +36,7 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
-  useRemoteConfig: () => ({ feedbackEmailAddress: "feedback@blink.sv" }),
+  useRemoteConfig: () => ({ supportEmailAddress: "support@blink.sv" }),
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({

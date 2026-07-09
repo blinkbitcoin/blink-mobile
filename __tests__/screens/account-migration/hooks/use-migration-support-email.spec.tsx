@@ -11,7 +11,7 @@ import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/u
 loadLocale("en")
 const LL = i18nObject("en")
 const LLSupport = LL.AccountMigration.contactSupport
-const SUPPORT_EMAIL = "feedback@blink.sv"
+const SUPPORT_EMAIL = "support@blink.sv"
 const APP_VERSION = "1.2.3-test"
 const DIVIDER = "-".repeat(40)
 
@@ -37,7 +37,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-support-details", 
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
-  useRemoteConfig: () => ({ feedbackEmailAddress: "feedback@blink.sv" }),
+  useRemoteConfig: () => ({ supportEmailAddress: "support@blink.sv" }),
 }))
 
 jest.mock("@app/hooks/use-device-location", () => ({

@@ -51,7 +51,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { getRouteForCheckpoint } = useMigrationCheckpoint()
-  const { feedbackEmailAddress, openSupport } = useContactSupport()
+  const { supportEmailAddress, openSupport } = useContactSupport()
 
   const isAuthed = useIsAuthed()
   const isGate = mode === "gate"
@@ -103,7 +103,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
 
   const gateBody = (
     <RichText
-      text={LL.AccountMigration.migrationGateBody({ email: feedbackEmailAddress })}
+      text={LL.AccountMigration.migrationGateBody({ email: supportEmailAddress })}
       style={styles.gateBody}
       tags={{ link: { style: styles.gateLink, onPress: openSupport } }}
     />

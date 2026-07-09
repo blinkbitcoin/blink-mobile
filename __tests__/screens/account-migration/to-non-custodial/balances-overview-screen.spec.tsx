@@ -12,7 +12,7 @@ import { flushEffects } from "../../../helpers/flush-effects"
 loadLocale("en")
 const LL = i18nObject("en")
 const LLOverview = LL.AccountMigration.balancesOverview
-const CONTACT_EMAIL = "feedback@blink.sv"
+const CONTACT_EMAIL = "support@blink.sv"
 
 const mockNavigate = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
@@ -37,7 +37,7 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
-  useRemoteConfig: () => ({ feedbackEmailAddress: "feedback@blink.sv" }),
+  useRemoteConfig: () => ({ supportEmailAddress: "support@blink.sv" }),
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({

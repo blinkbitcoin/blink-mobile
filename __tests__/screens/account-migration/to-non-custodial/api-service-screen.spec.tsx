@@ -13,7 +13,7 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 jest.mock("@app/config/feature-flags-context", () => ({
-  useRemoteConfig: () => ({ feedbackEmailAddress: "feedback@blink.sv" }),
+  useRemoteConfig: () => ({ supportEmailAddress: "support@blink.sv" }),
 }))
 
 const mockOnContinue = jest.fn()
@@ -49,7 +49,7 @@ describe("MigrationApiServiceScreen", () => {
 
     fireEvent.press(screen.getByText(LL.AccountMigration.apiServiceContactCta()))
 
-    expect(Linking.openURL).toHaveBeenCalledWith("mailto:feedback@blink.sv")
+    expect(Linking.openURL).toHaveBeenCalledWith("mailto:support@blink.sv")
   })
 
   it("acknowledges the warning when Continue anyways is pressed", async () => {

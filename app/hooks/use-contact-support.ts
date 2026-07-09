@@ -9,7 +9,7 @@ type SupportEmailDraft = {
 }
 
 type UseContactSupport = {
-  feedbackEmailAddress: string
+  supportEmailAddress: string
   openSupport: () => void
   composeSupport: (draft: SupportEmailDraft) => void
 }
@@ -17,26 +17,26 @@ type UseContactSupport = {
 /**
  * Opens the configured support inbox and exposes the address for display. It centralizes
  * the `mailto:` action that several screens would otherwise inline against
- * useRemoteConfig().feedbackEmailAddress. composeSupport opens the same inbox with a
+ * useRemoteConfig().supportEmailAddress. composeSupport opens the same inbox with a
  * pre-filled subject and body, for flows that attach diagnostics.
  */
 export const useContactSupport = (): UseContactSupport => {
-  const { feedbackEmailAddress } = useRemoteConfig()
+  const { supportEmailAddress } = useRemoteConfig()
 
   const openSupport = useCallback(
-    () => Linking.openURL(`mailto:${feedbackEmailAddress}`),
-    [feedbackEmailAddress],
+    () => Linking.openURL(`mailto:${supportEmailAddress}`),
+    [supportEmailAddress],
   )
 
   const composeSupport = useCallback(
     ({ subject, body }: SupportEmailDraft) =>
       Linking.openURL(
-        `mailto:${feedbackEmailAddress}?subject=${encodeURIComponent(
+        `mailto:${supportEmailAddress}?subject=${encodeURIComponent(
           subject,
         )}&body=${encodeURIComponent(body)}`,
       ),
-    [feedbackEmailAddress],
+    [supportEmailAddress],
   )
 
-  return { feedbackEmailAddress, openSupport, composeSupport }
+  return { supportEmailAddress, openSupport, composeSupport }
 }
