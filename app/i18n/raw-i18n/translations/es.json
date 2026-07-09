@@ -2799,6 +2799,7 @@
         "total": "Total",
         "transactions": "Transacciones",
         "transactionsError": "Error al cargar las transacciones",
+        "transfer": "Transferir",
         "tryAgain": "Inténtalo de Nuevo",
         "type": "tipo",
         "usdAccount": "Saldo Dólar",
@@ -3550,6 +3551,10 @@
         }
     },
     "AccountMigration": {
+        "dollarBalanceModal": {
+            "title": "No podemos migrar tu Saldo Dólar",
+            "body": "Primero vacía tu Saldo Dólar. Puedes transferirlo a tu Saldo Bitcoin en Blink o a otro lugar."
+        },
         "balancesOverview": {
             "title": "Mueve tu saldo",
             "body": "Mueve tus fondos de forma segura a tu nueva cuenta.",

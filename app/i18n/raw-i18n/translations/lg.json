@@ -2799,6 +2799,7 @@
     "total": "Omugatte",
     "transactions": "Empaanyisiganya",
     "transactionsError": "Ensobi mu kutikka empaanyisiganya",
+    "transfer": "Weereza",
     "tryAgain": "Ddamu ogezeeko",
     "type": "Kika",
     "usdAccount": "Akawunti ya Dola",
@@ -3550,6 +3551,10 @@
     }
   },
   "AccountMigration": {
+    "dollarBalanceModal": {
+      "title": "Tetusobola kutambuza ssente zo eza doola",
+      "body": "Sooka omalewo ssente zo eza doola. Osobola okuzisindika ku ssente zo eza Bitcoin mu Blink oba awalala."
+    },
     "balancesOverview": {
       "title": "Tambuza ssente zo",
       "body": "Tambuza ssente zo mu bukuumi ku kawunti yo empya.",

@@ -2799,6 +2799,7 @@
     "total": "Celkem",
     "transactions": "Transakce",
     "transactionsError": "Chyba při načítání transakcí",
+    "transfer": "Převod",
     "tryAgain": "Zkusit znovu",
     "type": "Typ",
     "usdAccount": "Dolarový zůstatek",
@@ -3550,6 +3551,10 @@
     }
   },
   "AccountMigration": {
+    "dollarBalanceModal": {
+      "title": "Váš dolarový zůstatek nemůžeme migrovat",
+      "body": "Nejprve vyprázdněte svůj dolarový zůstatek. Můžete jej převést na svůj bitcoinový zůstatek v Blinku nebo jinam."
+    },
     "balancesOverview": {
       "title": "Přesuňte svůj zůstatek",
       "body": "Bezpečně přesuňte své prostředky na svůj nový účet.",

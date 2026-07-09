@@ -2799,6 +2799,7 @@
     "total": "Összesen",
     "transactions": "Tranzakciók",
     "transactionsError": "Hiba a tranzakciók betöltése közben",
+    "transfer": "Átutalás",
     "tryAgain": "Próbáld újra",
     "type": "Típus",
     "usdAccount": "Dollár Egyenleg",
@@ -3550,6 +3551,10 @@
     }
   },
   "AccountMigration": {
+    "dollarBalanceModal": {
+      "title": "Nem tudjuk átköltöztetni a dollár egyenlegedet",
+      "body": "Először ürítsd ki a dollár egyenlegedet. Átutalhatod a Bitcoin egyenlegedre a Blinkben vagy máshová."
+    },
     "balancesOverview": {
       "title": "Mozgasd az egyenleged",
       "body": "Mozgasd biztonságosan a pénzed az új fiókodba.",

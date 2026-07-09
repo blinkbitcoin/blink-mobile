@@ -2799,6 +2799,7 @@
     "total": "Suma",
     "transactions": "Willanakuy ",
     "transactionsError": "Qillqaykuna kargamanta kanilla",
+    "transfer": "Apachimuq",
     "tryAgain": "Rikuchiyta kani",
     "type": "Rikch'a",
     "usdAccount": "Dolar qillqay",
@@ -3550,6 +3551,10 @@
     }
   },
   "AccountMigration": {
+    "dollarBalanceModal": {
+      "title": "Manam dólar qullqiykita astayta atinikuchu",
+      "body": "Ñawpaqta dólar qullqiykita ch'usaqyachiy. Blinkpi Bitcoin qullqiykiman utaq huk lawman apachiyta atinki."
+    },
     "balancesOverview": {
       "title": "Qullqiykita astiy",
       "body": "Qullqiykikunata mana ima llakiwan musuq cuentaykiman astiy.",

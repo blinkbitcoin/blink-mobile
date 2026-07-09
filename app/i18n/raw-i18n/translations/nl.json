@@ -2799,6 +2799,7 @@
     "total": "Totaal",
     "transactions": "Transacties",
     "transactionsError": "Fout bij het laden van transacties",
+    "transfer": "Overschrijven",
     "tryAgain": "Probeer opnieuw",
     "type": "Type",
     "usdAccount": "Dollarsaldo",
@@ -3550,6 +3551,10 @@
     }
   },
   "AccountMigration": {
+    "dollarBalanceModal": {
+      "title": "We kunnen je dollarsaldo niet migreren",
+      "body": "Maak eerst je dollarsaldo leeg. Je kunt het overboeken naar je Bitcoin-saldo in Blink of ergens anders."
+    },
     "balancesOverview": {
       "title": "Verplaats je saldo",
       "body": "Verplaats je geld veilig naar je nieuwe account.",

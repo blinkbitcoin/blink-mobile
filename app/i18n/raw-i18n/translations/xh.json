@@ -2799,6 +2799,7 @@
     "total": "Total",
     "transactions": "Iintengiselwano/ utshintshwelano",
     "transactionsError": "Error loading transactions",
+    "transfer": "Dlulisela",
     "tryAgain": "Try Again",
     "type": "Type",
     "usdAccount": "I-Akhawunti ye-Idola",
@@ -3550,6 +3551,10 @@
     }
   },
   "AccountMigration": {
+    "dollarBalanceModal": {
+      "title": "Asikwazi ukufudusa ibhalansi yakho yedola",
+      "body": "Qala ukhuphe yonke ibhalansi yakho yedola. Ungayidlulisela kwibhalansi yakho yeBitcoin kuBlink okanye kwenye indawo."
+    },
     "balancesOverview": {
       "title": "Hambisa ibhalansi yakho",
       "body": "Hambisa imali yakho ngokukhuselekileyo kwiakhawunti yakho entsha.",

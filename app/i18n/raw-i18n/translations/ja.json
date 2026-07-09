@@ -2800,6 +2800,7 @@
         "total": "合計",
         "transactions": "トランザクション",
         "transactionsError": "トランザクションの読み込みエラー",
+        "transfer": "振替",
         "tryAgain": "再トライする",
         "type": "入力する",
         "usdAccount": "ドルウォレット",
@@ -3550,6 +3551,10 @@
         }
     },
     "AccountMigration": {
+        "dollarBalanceModal": {
+            "title": "ドル残高は移行できません",
+            "body": "まずドル残高を空にしてください。Blinkのビットコイン残高、または他の場所へ移すことができます。"
+        },
         "balancesOverview": {
             "title": "残高を移動する",
             "body": "資金を安全に新しいアカウントに移動します。",

@@ -2800,6 +2800,7 @@
         "total": "Gesamt",
         "transactions": "Transaktionen",
         "transactionsError": "Transaktionen konnten nicht geladen werden",
+        "transfer": "Übertragen",
         "tryAgain": "Erneut versuchen",
         "type": "Typ",
         "usdAccount": "Dollar-Guthaben",
@@ -3550,6 +3551,10 @@
         }
     },
     "AccountMigration": {
+        "dollarBalanceModal": {
+            "title": "Wir können dein Dollar-Guthaben nicht migrieren",
+            "body": "Leere zuerst dein Dollar-Guthaben. Du kannst es auf dein Bitcoin-Guthaben in Blink oder anderswohin übertragen."
+        },
         "balancesOverview": {
             "title": "Verschiebe dein Guthaben",
             "body": "Verschiebe deine Gelder sicher auf dein neues Konto.",

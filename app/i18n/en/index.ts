@@ -2920,6 +2920,7 @@ const en: BaseTranslation = {
     total: "Total",
     transactions: "Transactions",
     transactionsError: "Error loading transactions",
+    transfer: "Transfer",
     tryAgain: "Try Again",
     type: "Type",
     usdAccount: "Dollar Balance",
@@ -3764,6 +3765,10 @@ const en: BaseTranslation = {
       exchangeRate: "Current exchange rate 1 BTC = {rate: string}",
       approveCta: "Approve",
       contactSupportCta: "Contact support",
+    },
+    dollarBalanceModal: {
+      title: "We cannot migrate your Dollar Balance",
+      body: "Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere.",
     },
   },
   AccountTypeSelectionScreen: {

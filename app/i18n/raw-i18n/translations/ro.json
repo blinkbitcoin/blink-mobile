@@ -2799,6 +2799,7 @@
     "total": "Total",
     "transactions": "Tranzacții",
     "transactionsError": "Eroare la încărcarea tranzacțiilor",
+    "transfer": "Transfer",
     "tryAgain": "Încearcă din nou",
     "type": "Tip",
     "usdAccount": "Cont Dolar",
@@ -3550,6 +3551,10 @@
     }
   },
   "AccountMigration": {
+    "dollarBalanceModal": {
+      "title": "Nu îți putem migra soldul în dolari",
+      "body": "Golește mai întâi soldul în dolari. Îl poți transfera în soldul tău Bitcoin din Blink sau în altă parte."
+    },
     "balancesOverview": {
       "title": "Mută-ți soldul",
       "body": "Mută-ți fondurile în siguranță în noul tău cont.",

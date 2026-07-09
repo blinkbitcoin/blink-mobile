@@ -2800,6 +2800,7 @@
         "total": "Total",
         "transactions": "Transactions",
         "transactionsError": "Erreur de chargement des transactions",
+        "transfer": "Transférer",
         "tryAgain": "Essayer à nouveau",
         "type": "Type",
         "usdAccount": "Solde Dollar",
@@ -3550,6 +3551,10 @@
         }
     },
     "AccountMigration": {
+        "dollarBalanceModal": {
+            "title": "Nous ne pouvons pas migrer votre solde en dollars",
+            "body": "Videz d'abord votre solde en dollars. Vous pouvez le transférer vers votre solde Bitcoin dans Blink ou ailleurs."
+        },
         "balancesOverview": {
             "title": "Déplacez votre solde",
             "body": "Déplacez vos fonds en toute sécurité vers votre nouveau compte.",

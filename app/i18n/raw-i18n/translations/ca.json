@@ -2799,6 +2799,7 @@
     "total": "Total",
     "transactions": "Transaccions",
     "transactionsError": "S'ha produït un error en carregar les transaccions",
+    "transfer": "Transferència",
     "tryAgain": "Torna-ho a intentar",
     "type": "Tipus",
     "usdAccount": "Compte Dòlar",
@@ -3550,6 +3551,10 @@
     }
   },
   "AccountMigration": {
+    "dollarBalanceModal": {
+      "title": "No podem migrar el teu saldo en dòlars",
+      "body": "Primer buida el teu saldo en dòlars. Pots transferir-lo al teu saldo en bitcoins a Blink o en un altre lloc."
+    },
     "balancesOverview": {
       "title": "Mou el teu saldo",
       "body": "Mou els teus fons de manera segura al teu nou compte.",

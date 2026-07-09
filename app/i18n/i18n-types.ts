@@ -9239,6 +9239,10 @@ type RootTranslation = {
 		 */
 		transactionsError: string
 		/**
+		 * T​r​a​n​s​f​e​r
+		 */
+		transfer: string
+		/**
 		 * T​r​y​ ​A​g​a​i​n
 		 */
 		tryAgain: string
@@ -11961,6 +11965,16 @@ type RootTranslation = {
 			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
 			 */
 			contactSupportCta: string
+		}
+		dollarBalanceModal: {
+			/**
+			 * W​e​ ​c​a​n​n​o​t​ ​m​i​g​r​a​t​e​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
+			 */
+			title: string
+			/**
+			 * E​m​p​t​y​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​f​i​r​s​t​.​ ​Y​o​u​ ​c​a​n​ ​t​r​a​n​s​f​e​r​ ​t​o​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​i​n​ ​B​l​i​n​k​ ​o​r​ ​e​l​s​e​w​h​e​r​e​.
+			 */
+			body: string
 		}
 	}
 	AccountTypeSelectionScreen: {
@@ -21645,6 +21659,10 @@ export type TranslationFunctions = {
 		 */
 		transactionsError: () => LocalizedString
 		/**
+		 * Transfer
+		 */
+		transfer: () => LocalizedString
+		/**
 		 * Try Again
 		 */
 		tryAgain: () => LocalizedString
@@ -24319,6 +24337,16 @@ export type TranslationFunctions = {
 			 * Contact support
 			 */
 			contactSupportCta: () => LocalizedString
+		}
+		dollarBalanceModal: {
+			/**
+			 * We cannot migrate your Dollar Balance
+			 */
+			title: () => LocalizedString
+			/**
+			 * Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere.
+			 */
+			body: () => LocalizedString
 		}
 	}
 	AccountTypeSelectionScreen: {

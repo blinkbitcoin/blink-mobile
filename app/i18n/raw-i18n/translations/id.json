@@ -2799,6 +2799,7 @@
     "total": "Total",
     "transactions": "Transaksi",
     "transactionsError": "Kesalahan memuat transaksi",
+    "transfer": "Transfer",
     "tryAgain": "Coba Lagi",
     "type": "Tipe",
     "usdAccount": "Akun Dolar",
@@ -3550,6 +3551,10 @@
     }
   },
   "AccountMigration": {
+    "dollarBalanceModal": {
+      "title": "Kami tidak dapat memigrasikan Saldo Dolar Anda",
+      "body": "Kosongkan Saldo Dolar Anda terlebih dahulu. Anda dapat mentransfernya ke Saldo Bitcoin di Blink atau ke tempat lain."
+    },
     "balancesOverview": {
       "title": "Pindahkan saldo Anda",
       "body": "Pindahkan dana Anda dengan aman ke akun baru Anda.",

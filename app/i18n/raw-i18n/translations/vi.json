@@ -2799,6 +2799,7 @@
     "total": "Tổng cộng",
     "transactions": "Các giao dịch",
     "transactionsError": "Lỗi tải các giao dịch",
+    "transfer": "Chuyển khoản",
     "tryAgain": "Vui lòng thử lại",
     "type": "Loại",
     "usdAccount": "Số dư Đô la",
@@ -3550,6 +3551,10 @@
     }
   },
   "AccountMigration": {
+    "dollarBalanceModal": {
+      "title": "Chúng tôi không thể di chuyển số dư đô la của bạn",
+      "body": "Trước tiên hãy rút hết số dư đô la của bạn. Bạn có thể chuyển nó sang số dư Bitcoin trong Blink hoặc nơi khác."
+    },
     "balancesOverview": {
       "title": "Chuyển số dư của bạn",
       "body": "Chuyển tiền của bạn một cách an toàn sang tài khoản mới.",

@@ -2799,6 +2799,7 @@
     "total": "Ukupno",
     "transactions": "Transakcije",
     "transactionsError": "Pogreška pri učitavanju transakcija",
+    "transfer": "Prijenos",
     "tryAgain": "Pokušajte ponovno",
     "type": "Vrsta",
     "usdAccount": "Dolar račun",
@@ -3550,6 +3551,10 @@
     }
   },
   "AccountMigration": {
+    "dollarBalanceModal": {
+      "title": "Ne možemo migrirati vaš dolarski saldo",
+      "body": "Najprije ispraznite svoj dolarski saldo. Možete ga prenijeti na svoj Bitcoin saldo u Blinku ili drugamo."
+    },
     "balancesOverview": {
       "title": "Premjesti svoj saldo",
       "body": "Sigurno premjesti svoja sredstva na svoj novi račun.",
