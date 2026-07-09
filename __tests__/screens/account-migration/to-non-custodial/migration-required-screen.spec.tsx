@@ -17,6 +17,7 @@ const LL = i18nObject("en")
 
 const CHECKPOINT_ROUTE = "accountMigrationExplainer"
 const KEEP_RECEIVING_ROUTE = "accountMigrationKeepReceiving"
+const DOWNLOAD_HISTORY_ROUTE = "accountMigrationDownloadHistory"
 const CONTACT_EMAIL = "support@blink.sv"
 
 const mockNavigate = jest.fn()
@@ -44,8 +45,19 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => true,
 }))
 
+let mockHasResumableCheckpoint = false
+let mockHasTransactions = false
+let mockTransactionsLoading = false
+
 jest.mock("@app/screens/account-migration/hooks", () => ({
-  useMigrationCheckpoint: () => ({ getRouteForCheckpoint: () => CHECKPOINT_ROUTE }),
+  useMigrationCheckpoint: () => ({
+    getRouteForCheckpoint: () => CHECKPOINT_ROUTE,
+    hasResumableCheckpoint: mockHasResumableCheckpoint,
+  }),
+  useHasTransactions: () => ({
+    hasTransactions: mockHasTransactions,
+    loading: mockTransactionsLoading,
+  }),
 }))
 
 let mockConvertReady = true
@@ -102,6 +114,9 @@ describe("MigrationRequiredScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockConvertReady = true
+    mockHasResumableCheckpoint = false
+    mockHasTransactions = false
+    mockTransactionsLoading = false
     mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdCents(2500))
     mockUseAddressScreenQuery.mockReturnValue({ data: undefined })
     jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve())
@@ -203,6 +218,27 @@ describe("MigrationRequiredScreen", () => {
 
   describe("continue", () => {
     it("skips straight into the migration flow when there is no lightning address", async () => {
+      renderScreen("voluntary")
+      await flushEffects()
+
+      fireEvent.press(screen.getByText(LL.common.continue()))
+
+      expect(mockNavigate).toHaveBeenCalledWith(CHECKPOINT_ROUTE)
+    })
+
+    it("offers the history download when there is no lightning address but there is history", async () => {
+      mockHasTransactions = true
+      renderScreen("voluntary")
+      await flushEffects()
+
+      fireEvent.press(screen.getByText(LL.common.continue()))
+
+      expect(mockNavigate).toHaveBeenCalledWith(DOWNLOAD_HISTORY_ROUTE)
+    })
+
+    it("returns to the checkpoint when resuming even with history", async () => {
+      mockHasTransactions = true
+      mockHasResumableCheckpoint = true
       renderScreen("voluntary")
       await flushEffects()
 

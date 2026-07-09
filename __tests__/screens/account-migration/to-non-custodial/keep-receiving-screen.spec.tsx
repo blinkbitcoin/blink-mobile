@@ -33,10 +33,19 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => true,
 }))
 
+let mockHasResumableCheckpoint = false
+let mockHasTransactions = true
+let mockTransactionsLoading = false
+
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
     getRouteForCheckpoint: () => NEXT_ROUTE,
+    hasResumableCheckpoint: mockHasResumableCheckpoint,
     loading: false,
+  }),
+  useHasTransactions: () => ({
+    hasTransactions: mockHasTransactions,
+    loading: mockTransactionsLoading,
   }),
 }))
 
@@ -59,6 +68,9 @@ describe("MigrationKeepReceivingScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    mockHasResumableCheckpoint = false
+    mockHasTransactions = true
+    mockTransactionsLoading = false
     mockUseAddressScreenQuery.mockReturnValue({
       data: { me: { username: "satoshin21" } },
       loading: false,
@@ -98,6 +110,34 @@ describe("MigrationKeepReceivingScreen", () => {
     fireEvent.press(screen.getByText(LL.AccountMigration.keepReceivingCta()))
 
     expect(mockNavigate).toHaveBeenCalledWith(DOWNLOAD_HISTORY_ROUTE)
+  })
+
+  it("skips the download step when the account has no transactions", async () => {
+    mockHasTransactions = false
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AccountMigration.keepReceivingCta()))
+
+    expect(mockNavigate).toHaveBeenCalledWith(NEXT_ROUTE)
+  })
+
+  it("returns to the checkpoint when resuming instead of re-offering the download", async () => {
+    mockHasResumableCheckpoint = true
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AccountMigration.keepReceivingCta()))
+
+    expect(mockNavigate).toHaveBeenCalledWith(NEXT_ROUTE)
+  })
+
+  it("renders nothing while the transaction check is loading", async () => {
+    mockTransactionsLoading = true
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByText(LL.AccountMigration.keepReceivingTitle())).toBeNull()
   })
 
   it("skips itself when the user has no lightning address", async () => {

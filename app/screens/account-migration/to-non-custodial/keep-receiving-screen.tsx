@@ -13,7 +13,10 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
+import {
+  useHasTransactions,
+  useMigrationCheckpoint,
+} from "@app/screens/account-migration/hooks"
 import { getLightningAddress } from "@app/utils/pay-links"
 import { testProps } from "@app/utils/testProps"
 
@@ -31,7 +34,12 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
     },
   } = useAppConfig()
 
-  const { getRouteForCheckpoint, loading: checkpointLoading } = useMigrationCheckpoint()
+  const {
+    getRouteForCheckpoint,
+    hasResumableCheckpoint,
+    loading: checkpointLoading,
+  } = useMigrationCheckpoint()
+  const { hasTransactions, loading: transactionsLoading } = useHasTransactions()
 
   const isAuthed = useIsAuthed()
   const { data, loading: addressLoading } = useAddressScreenQuery({
@@ -44,14 +52,19 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
     ? getLightningAddress(lnAddressHostname, username)
     : ""
 
-  const isCheckReady = !addressLoading && !checkpointLoading
+  const isCheckReady = !addressLoading && !checkpointLoading && !transactionsLoading
   const hasLightningAddress = Boolean(username)
   const shouldSkipScreen = isCheckReady && !hasLightningAddress
 
-  /** TODO: only route to download-history when the account has at least one transaction. */
+  /** A resumed migration already passed the download step so it returns to its
+   *  checkpoint; a fresh one only sees the step when there is history to download. */
   const goToNextStep = useCallback(() => {
-    navigation.navigate("accountMigrationDownloadHistory")
-  }, [navigation])
+    const shouldOfferHistoryDownload = hasTransactions && !hasResumableCheckpoint
+    const nextRoute = shouldOfferHistoryDownload
+      ? "accountMigrationDownloadHistory"
+      : getRouteForCheckpoint()
+    navigation.navigate(nextRoute)
+  }, [navigation, hasTransactions, hasResumableCheckpoint, getRouteForCheckpoint])
 
   /** Guard: this screen needs a lightning address; without one, skip into the flow. */
   useEffect(() => {

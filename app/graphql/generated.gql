@@ -1413,6 +1413,24 @@ query migrationSupportDetails {
   }
 }
 
+query migrationTransactionsPresence {
+  me {
+    id
+    defaultAccount {
+      id
+      transactions(first: 1) {
+        edges {
+          cursor
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query mobileUpdate {
   mobileVersions {
     platform
