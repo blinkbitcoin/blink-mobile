@@ -2,16 +2,16 @@ import React, { useCallback, useEffect, useRef } from "react"
 import { AppState, AppStateStatus } from "react-native"
 
 import { useApolloClient } from "@apollo/client"
-import { useNavigation } from "@react-navigation/native"
-import { StackNavigationProp } from "@react-navigation/stack"
 
 import { HomeAuthedDocument } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { logEnterBackground, logEnterForeground } from "@app/utils/analytics"
 import BiometricWrapper from "@app/utils/biometricAuthentication"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
-import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
-import type { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  navigationRef,
+  useAuthenticationContext,
+} from "@app/navigation/navigation-container-wrapper"
 
 const LOCK_GRACE_PERIOD_MS = 5000
 
@@ -21,8 +21,6 @@ export const AppStateWrapper: React.FC = () => {
   const backgroundTimestamp = useRef<number | null>(null)
   const client = useApolloClient()
   const { setAppLocked, isAppLocked } = useAuthenticationContext()
-  const navigation =
-    useNavigation<StackNavigationProp<RootStackParamList, "authenticationCheck">>()
 
   const handleAppStateChange = useCallback(
     async (nextAppState: AppStateStatus) => {
@@ -42,10 +40,12 @@ export const AppStateWrapper: React.FC = () => {
 
           if (isPinEnabled || isBiometricsEnabled) {
             setAppLocked()
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "authenticationCheck" }],
-            })
+            if (navigationRef.isReady()) {
+              navigationRef.reset({
+                index: 0,
+                routes: [{ name: "authenticationCheck" }],
+              })
+            }
             return
           }
         }
@@ -60,7 +60,7 @@ export const AppStateWrapper: React.FC = () => {
 
       appState.current = nextAppState
     },
-    [client, isAuthed, isAppLocked, setAppLocked, navigation],
+    [client, isAuthed, isAppLocked, setAppLocked],
   )
 
   useEffect(() => {

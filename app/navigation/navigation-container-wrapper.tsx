@@ -10,6 +10,7 @@ import {
   NavigationState,
   PartialState,
   DarkTheme,
+  createNavigationContainerRef,
 } from "@react-navigation/native"
 import { useTheme } from "@rn-vui/themed"
 
@@ -34,6 +35,8 @@ const AuthenticationContext = React.createContext<AuthenticationContextType>(nul
 export const AuthenticationContextProvider = AuthenticationContext.Provider
 
 export const useAuthenticationContext = () => React.useContext(AuthenticationContext)
+
+export const navigationRef = createNavigationContainerRef<RootStackParamList>()
 
 export const processLinkForAction = (url: string): Action | null => {
   // grab action query param
@@ -194,6 +197,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
   return (
     <AuthenticationContextProvider value={{ isAppLocked, setAppUnlocked, setAppLocked }}>
       <NavigationContainer
+        ref={navigationRef}
         {...(mode === "dark" ? { theme: DarkTheme } : {})}
         linking={linking}
         onReady={() => {
