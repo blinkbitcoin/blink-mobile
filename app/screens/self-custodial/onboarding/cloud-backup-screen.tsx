@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { View } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -13,7 +13,7 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   MigrationCheckpoint,
-  useMigrationCheckpoint,
+  useMigrationBackupCheckpoint,
 } from "@app/screens/account-migration/hooks"
 import { testProps } from "@app/utils/testProps"
 
@@ -45,19 +45,7 @@ export const CloudBackupScreen: React.FC = () => {
 
   const { handleBackup, loading } = useCloudBackup({ isEncrypted, password })
 
-  const {
-    hasResumableCheckpoint,
-    loading: checkpointLoading,
-    saveCheckpoint,
-  } = useMigrationCheckpoint()
-
-  /** This screen is shared with the plain self-custodial onboarding, so the checkpoint
-   *  only advances when a migration is in progress; killing the app here resumes at the
-   *  cloud backup instead of the explainer. */
-  useEffect(() => {
-    if (checkpointLoading || !hasResumableCheckpoint) return
-    saveCheckpoint(MigrationCheckpoint.CloudBackup)
-  }, [checkpointLoading, hasResumableCheckpoint, saveCheckpoint])
+  useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
 
   return (
     <Screen preset="fixed">

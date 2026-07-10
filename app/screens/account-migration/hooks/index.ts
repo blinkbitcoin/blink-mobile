@@ -1,6 +1,7 @@
 export { useActiveApiKeys } from "./use-active-api-keys"
 export { useHasTransactions } from "./use-has-transactions"
 export { useMigrationCheckpoint, MigrationCheckpoint } from "./use-migration-checkpoint"
+export { useMigrationBackupCheckpoint } from "./use-migration-backup-checkpoint"
 export { useMigrationAccount } from "./use-migration-account"
 export { useCompleteMigration } from "./use-complete-migration"
 export { useMigrationSupportDetails } from "./use-migration-support-details"

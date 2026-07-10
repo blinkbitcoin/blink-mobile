@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { Platform } from "react-native"
 
 import { useTheme } from "@rn-vui/themed"
@@ -11,7 +11,7 @@ import { testProps } from "@app/utils/testProps"
 
 import {
   MigrationCheckpoint,
-  useMigrationCheckpoint,
+  useMigrationBackupCheckpoint,
 } from "../../account-migration/hooks"
 
 import { useBackupMethods } from "./hooks"
@@ -24,7 +24,6 @@ export const BackupMethodScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
 
-  const { saveCheckpoint } = useMigrationCheckpoint()
   const {
     isCredentialBackupAvailable,
     credentialLoading,
@@ -33,9 +32,7 @@ export const BackupMethodScreen: React.FC = () => {
     handleManualBackup,
   } = useBackupMethods()
 
-  useEffect(() => {
-    saveCheckpoint(MigrationCheckpoint.BackupMethod)
-  }, [saveCheckpoint])
+  useMigrationBackupCheckpoint(MigrationCheckpoint.BackupMethod)
 
   const cloudProvider = getCloudProviderName(LL)
 

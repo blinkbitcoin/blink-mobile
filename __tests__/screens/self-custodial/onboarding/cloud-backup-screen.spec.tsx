@@ -37,16 +37,11 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
   }),
 }))
 
-const mockSaveCheckpoint = jest.fn()
-let mockHasResumableCheckpoint = false
+const mockUseMigrationBackupCheckpoint = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
-  useMigrationCheckpoint: () => ({
-    hasResumableCheckpoint: mockHasResumableCheckpoint,
-    loading: false,
-    saveCheckpoint: mockSaveCheckpoint,
-  }),
+  useMigrationBackupCheckpoint: (step: string) => mockUseMigrationBackupCheckpoint(step),
 }))
 
 jest.mock("@app/components/icon-hero", () => {
@@ -84,7 +79,6 @@ describe("CloudBackupScreen", () => {
     mockLoading = false
     mockIsValid = true
     mockIsEncrypted = false
-    mockHasResumableCheckpoint = false
   })
 
   it("renders title and subtitle", async () => {
@@ -181,9 +175,7 @@ describe("CloudBackupScreen", () => {
     expect(props.icon).toBe("cloud")
   })
 
-  it("advances the migration checkpoint to the cloud backup on mount", async () => {
-    mockHasResumableCheckpoint = true
-
+  it("delegates the CloudBackup checkpoint to the migration backup hook", async () => {
     render(
       <ContextForScreen>
         <CloudBackupScreen />
@@ -191,17 +183,8 @@ describe("CloudBackupScreen", () => {
     )
     await flushEffects()
 
-    expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.CloudBackup)
-  })
-
-  it("does not touch the checkpoint outside a migration", async () => {
-    render(
-      <ContextForScreen>
-        <CloudBackupScreen />
-      </ContextForScreen>,
+    expect(mockUseMigrationBackupCheckpoint).toHaveBeenCalledWith(
+      MigrationCheckpoint.CloudBackup,
     )
-    await flushEffects()
-
-    expect(mockSaveCheckpoint).not.toHaveBeenCalled()
   })
 })
