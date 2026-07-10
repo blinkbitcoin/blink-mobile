@@ -54,7 +54,7 @@ export const AppStateWrapper: React.FC = () => {
       }
 
       if (appState.current.match(/active/) && nextAppState === "background") {
-        backgroundTimestamp.current = Date.now()
+        backgroundTimestamp.current = Date.now() // eslint-disable-line require-atomic-updates
         logEnterBackground()
       }
 
