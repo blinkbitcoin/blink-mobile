@@ -306,7 +306,7 @@ export const HomeScreen: React.FC = () => {
       : defaultFormattedBalance
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
-  const levelAccount = dataAuthed?.me?.defaultAccount.level
+  const levelAccount = dataAuthed?.me?.defaultAccount?.level
   const pendingIncomingTransactions =
     dataAuthed?.me?.defaultAccount?.pendingIncomingTransactions
   const transactionsEdges = dataAuthed?.me?.defaultAccount?.transactions?.edges
