@@ -10,6 +10,7 @@ import { Screen } from "@app/components/screen"
 import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { isIos } from "@app/utils/helper"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { makeStyles, Text } from "@rn-vui/themed"
@@ -26,6 +27,7 @@ export const ErrorScreen = ({
   const [isContactModalVisible, setIsContactModalVisible] = React.useState(false)
   const { logout } = useLogout()
   const { LL } = useI18nContext()
+  const { data } = useSettingsScreenQuery()
   const { appConfig } = useAppConfig()
   const { name: bankName } = appConfig.galoyInstance
   const styles = useStyles()
@@ -41,7 +43,10 @@ export const ErrorScreen = ({
     setIsContactModalVisible(!isContactModalVisible)
   }
 
+  const accountId = data?.me?.defaultAccount?.id || "Unknown"
+
   const contactMessageBody = LL.support.defaultSupportMessage({
+    accountId,
     os: isIos ? "iOS" : "Android",
     version: getReadableVersion(),
     bankName,
