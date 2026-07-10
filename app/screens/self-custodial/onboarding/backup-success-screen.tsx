@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 import {
@@ -17,6 +17,8 @@ import { useMigrationCheckpoint } from "../../account-migration/hooks"
 
 type SuccessRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupSuccess">
 
+const NAVIGATE_HOME_DELAY_MS = 2000
+
 export const BackupSuccessScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -25,11 +27,18 @@ export const BackupSuccessScreen: React.FC = () => {
   const params = useRoute<SuccessRouteProp>().params
   const reBackup = params?.reBackup ?? false
   const customMessage = params?.message
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const navigateToHome = useCallback(() => {
     clearCheckpoint()
     navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
   }, [navigation, clearCheckpoint])
+
+  const handleAnimationComplete = useCallback(() => {
+    holdTimerRef.current = setTimeout(navigateToHome, NAVIGATE_HOME_DELAY_MS)
+  }, [navigateToHome])
+
+  useEffect(() => () => clearTimeout(holdTimerRef.current), [])
 
   const fallbackMessage = reBackup
     ? LL.common.success()
@@ -39,7 +48,7 @@ export const BackupSuccessScreen: React.FC = () => {
 
   return (
     <Screen preset="fixed">
-      <SuccessScreenLayout onAnimationComplete={navigateToHome}>
+      <SuccessScreenLayout onAnimationComplete={handleAnimationComplete}>
         <Text style={styles.message}>{message}</Text>
       </SuccessScreenLayout>
     </Screen>
