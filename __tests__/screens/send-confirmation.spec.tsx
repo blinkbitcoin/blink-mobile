@@ -5,6 +5,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
+import { AccountType } from "@app/types/wallet"
 import { WalletCurrency } from "@app/graphql/generated"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
@@ -974,5 +975,70 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
     await flushEffects()
 
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — probing gate scoped to self-custodial (#803)", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    mockUseFee.mockReturnValue({ status: "loading" })
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 100000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  it("keeps the slider enabled while the fee probe is loading on a custodial account (skip probing restored)", async () => {
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: false,
+      isReady: true,
+      needsBackendAuth: true,
+      wallets: [],
+      status: "ready",
+      accountType: AccountType.Custodial,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+
+  it("keeps the slider disabled while the fee quote is loading on a self-custodial account (protection preserved)", async () => {
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: true,
+      isReady: true,
+      needsBackendAuth: false,
+      wallets: [],
+      status: "ready",
+      accountType: AccountType.SelfCustodial,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
   })
 })
