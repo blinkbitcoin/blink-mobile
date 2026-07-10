@@ -35,7 +35,8 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
   } = useAppConfig()
 
   const {
-    getRouteForCheckpoint,
+    navigateToCheckpoint,
+    replaceToCheckpoint,
     hasResumableCheckpoint,
     loading: checkpointLoading,
   } = useMigrationCheckpoint()
@@ -64,16 +65,17 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
    *  checkpoint; a fresh one only sees the step when there is history to download. */
   const goToNextStep = useCallback(() => {
     const shouldOfferHistoryDownload = hasTransactions && !hasResumableCheckpoint
-    const nextRoute = shouldOfferHistoryDownload
-      ? "accountMigrationDownloadHistory"
-      : getRouteForCheckpoint()
-    navigation.navigate(nextRoute)
-  }, [navigation, hasTransactions, hasResumableCheckpoint, getRouteForCheckpoint])
+    if (shouldOfferHistoryDownload) {
+      navigation.navigate("accountMigrationDownloadHistory")
+      return
+    }
+    navigateToCheckpoint()
+  }, [navigation, hasTransactions, hasResumableCheckpoint, navigateToCheckpoint])
 
   /** Guard: this screen needs a lightning address; without one, skip into the flow. */
   useEffect(() => {
-    if (shouldSkipScreen) navigation.replace(getRouteForCheckpoint())
-  }, [shouldSkipScreen, navigation, getRouteForCheckpoint])
+    if (shouldSkipScreen) replaceToCheckpoint()
+  }, [shouldSkipScreen, replaceToCheckpoint])
 
   if (!isCheckReady || !hasLightningAddress) return null
 

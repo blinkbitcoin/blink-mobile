@@ -4,10 +4,12 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
 import { IconHero } from "@app/components/icon-hero"
+import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { InfoBanner } from "@app/components/info-banner"
 import { CloudBackupScreen } from "@app/screens/self-custodial/onboarding/cloud-backup-screen"
 import theme from "@app/rne-theme/theme"
 import { ContextForScreen } from "../../helper"
+import { flushEffects } from "../../../helpers/flush-effects"
 
 const mockHandleBackup = jest.fn()
 let mockLoading = false
@@ -32,6 +34,18 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
   useCloudBackup: () => ({
     handleBackup: mockHandleBackup,
     loading: mockLoading,
+  }),
+}))
+
+const mockSaveCheckpoint = jest.fn()
+let mockHasResumableCheckpoint = false
+
+jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
+  useMigrationCheckpoint: () => ({
+    hasResumableCheckpoint: mockHasResumableCheckpoint,
+    loading: false,
+    saveCheckpoint: mockSaveCheckpoint,
   }),
 }))
 
@@ -70,40 +84,44 @@ describe("CloudBackupScreen", () => {
     mockLoading = false
     mockIsValid = true
     mockIsEncrypted = false
+    mockHasResumableCheckpoint = false
   })
 
-  it("renders title and subtitle", () => {
+  it("renders title and subtitle", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CloudBackupScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByText(LL.BackupScreen.CloudBackup.title())).toBeTruthy()
   })
 
-  it("renders checkbox and continue button", () => {
+  it("renders checkbox and continue button", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CloudBackupScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByText(LL.BackupScreen.CloudBackup.encryptCheckbox())).toBeTruthy()
     expect(getByText(LL.BackupScreen.CloudBackup.continueButton())).toBeTruthy()
   })
 
-  it("does not show password fields when encryption is off", () => {
+  it("does not show password fields when encryption is off", async () => {
     const { queryByText } = render(
       <ContextForScreen>
         <CloudBackupScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(queryByText(LL.BackupScreen.CloudBackup.password())).toBeNull()
   })
 
-  it("shows password fields and warning when encryption is on", () => {
+  it("shows password fields and warning when encryption is on", async () => {
     mockIsEncrypted = true
 
     const { getByText } = render(
@@ -111,24 +129,26 @@ describe("CloudBackupScreen", () => {
         <CloudBackupScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByText(LL.BackupScreen.CloudBackup.password())).toBeTruthy()
     expect(getByText(LL.BackupScreen.CloudBackup.confirmPassword())).toBeTruthy()
     expect(getByText(LL.BackupScreen.CloudBackup.importantTitle())).toBeTruthy()
   })
 
-  it("calls handleBackup on continue press", () => {
+  it("calls handleBackup on continue press", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <CloudBackupScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.press(getByText(LL.BackupScreen.CloudBackup.continueButton()))
     expect(mockHandleBackup).toHaveBeenCalled()
   })
 
-  it("renders the Important InfoBanner with warning icon color", () => {
+  it("renders the Important InfoBanner with warning icon color", async () => {
     mockIsEncrypted = true
 
     render(
@@ -136,6 +156,7 @@ describe("CloudBackupScreen", () => {
         <CloudBackupScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     const infoBannerMock = InfoBanner as unknown as jest.Mock
     const props = infoBannerMock.mock.calls[0][0]
@@ -145,17 +166,42 @@ describe("CloudBackupScreen", () => {
     expect(props.title).toBe(LL.BackupScreen.CloudBackup.importantTitle())
   })
 
-  it("renders the hero icon with the green color", () => {
+  it("renders the hero icon with the green color", async () => {
     render(
       <ContextForScreen>
         <CloudBackupScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     const iconHeroMock = IconHero as unknown as jest.Mock
     const props = iconHeroMock.mock.calls[0][0]
 
     expect(props.iconColor).toBe(theme.lightColors?._green)
     expect(props.icon).toBe("cloud")
+  })
+
+  it("advances the migration checkpoint to the cloud backup on mount", async () => {
+    mockHasResumableCheckpoint = true
+
+    render(
+      <ContextForScreen>
+        <CloudBackupScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.CloudBackup)
+  })
+
+  it("does not touch the checkpoint outside a migration", async () => {
+    render(
+      <ContextForScreen>
+        <CloudBackupScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).not.toHaveBeenCalled()
   })
 })

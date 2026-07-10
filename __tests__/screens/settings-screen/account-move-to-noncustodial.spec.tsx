@@ -5,6 +5,7 @@ import { MoveToNonCustodialSetting } from "@app/screens/settings-screen/settings
 import { AccountType } from "@app/types/wallet"
 
 const mockNavigate = jest.fn()
+const mockNavigateToCheckpoint = jest.fn()
 const mockActiveAccount = jest.fn()
 const mockUseMigrationCheckpoint = jest.fn()
 
@@ -48,7 +49,7 @@ describe("MoveToNonCustodialSetting", () => {
     mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
     mockUseMigrationCheckpoint.mockReturnValue({
       loading: false,
-      getRouteForCheckpoint: () => "selfCustodialBackupMethod",
+      navigateToCheckpoint: mockNavigateToCheckpoint,
       hasResumableCheckpoint: false,
     })
   })
@@ -83,10 +84,10 @@ describe("MoveToNonCustodialSetting", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationStart")
   })
 
-  it("resumes the saved checkpoint route when there is one", () => {
+  it("resumes the saved checkpoint when there is one", () => {
     mockUseMigrationCheckpoint.mockReturnValue({
       loading: false,
-      getRouteForCheckpoint: () => "selfCustodialBackupMethod",
+      navigateToCheckpoint: mockNavigateToCheckpoint,
       hasResumableCheckpoint: true,
     })
 
@@ -94,6 +95,7 @@ describe("MoveToNonCustodialSetting", () => {
 
     fireEvent.press(screen.getByTestId("settings-row"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 })

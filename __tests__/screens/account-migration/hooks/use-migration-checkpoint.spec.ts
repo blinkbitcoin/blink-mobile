@@ -5,10 +5,17 @@ import {
   MigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
 
+const mockNavigate = jest.fn()
+const mockReplace = jest.fn()
 const mockLoadCheckpoint = jest.fn()
 const mockSaveCheckpointToStorage = jest.fn()
 const mockClearCheckpointFromStorage = jest.fn()
 const mockReportError = jest.fn()
+
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => ({ navigate: mockNavigate, replace: mockReplace }),
+}))
 
 jest.mock("@app/screens/account-migration/utils/migration-checkpoint-storage", () => ({
   ...jest.requireActual(
@@ -165,15 +172,38 @@ describe("useMigrationCheckpoint", () => {
     )
   })
 
-  it("returns default route when no checkpoint", async () => {
+  it("clears the local state even when the storage removal fails", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+    })
+    mockClearCheckpointFromStorage.mockRejectedValue(new Error("remove failed"))
+
     const { result } = renderHook(() => useMigrationCheckpoint())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.getRouteForCheckpoint()).toBe("accountMigrationExplainer")
+    act(() => {
+      result.current.clearCheckpoint()
+    })
+
+    expect(result.current.checkpoint).toBeNull()
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
-  it("returns correct route for a provisioned checkpoint", async () => {
+  it("navigates to the explainer when no checkpoint exists", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.navigateToCheckpoint()
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
+  })
+
+  it("navigates to the checkpoint's screen for a provisioned checkpoint", async () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.BackupMethod,
       savedAt: Date.now(),
@@ -184,7 +214,88 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.getRouteForCheckpoint()).toBe("selfCustodialBackupMethod")
+    act(() => {
+      result.current.navigateToCheckpoint()
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
+  })
+
+  it("forwards the migration flow param when resuming at the terms screen", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.TermsAndConditions,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.navigateToCheckpoint()
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+      flow: "migration",
+    })
+  })
+
+  it("resumes at the balances overview after reaching the commit point", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.navigateToCheckpoint()
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
+  it("replaces the current screen when resuming through replaceToCheckpoint", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.TermsAndConditions,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.replaceToCheckpoint()
+    })
+
+    expect(mockReplace).toHaveBeenCalledWith("acceptTermsAndConditions", {
+      flow: "migration",
+    })
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("replaces to a param-less destination when the checkpoint is past the terms", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.replaceToCheckpoint()
+    })
+
+    expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupMethod")
   })
 
   it("resumes from the explainer when the checkpoint has no provisioned account", async () => {
@@ -197,7 +308,11 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.getRouteForCheckpoint()).toBe("accountMigrationExplainer")
+    act(() => {
+      result.current.navigateToCheckpoint()
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
   })
 
   it("reports a resumable checkpoint only when a provisioned account exists", async () => {
@@ -268,9 +383,30 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result2.current.loading).toBe(false))
 
     expect(result2.current.checkpoint).toBe(MigrationCheckpoint.BackupAlerts)
-    expect(result2.current.getRouteForCheckpoint()).toBe(
-      "selfCustodialBackupSecurityChecks",
+
+    act(() => {
+      result2.current.navigateToCheckpoint()
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSecurityChecks")
+  })
+
+  it("does not update state when the load fails after unmount", async () => {
+    let rejectLoad: (reason: Error) => void = () => {}
+    mockLoadCheckpoint.mockReturnValue(
+      new Promise((_resolve, reject) => {
+        rejectLoad = reject
+      }),
     )
+
+    const { unmount } = renderHook(() => useMigrationCheckpoint())
+    unmount()
+
+    await act(async () => {
+      rejectLoad(new Error("load failed"))
+    })
+
+    expect(mockReportError).toHaveBeenCalled()
   })
 
   it("does not update state after unmount", async () => {

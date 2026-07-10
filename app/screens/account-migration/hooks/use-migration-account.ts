@@ -23,8 +23,9 @@ export const useMigrationAccount = () => {
     try {
       const created = await guard.run(async () => {
         const newAccountId = await provision()
-        // Await before navigating so the next screen's checkpoint save preserves the id.
-        await saveCheckpoint(MigrationCheckpoint.BackupMethod, newAccountId)
+        /** Await before navigating so later checkpoint saves preserve the id. The step
+         *  is the terms screen: resuming may never skip past an unaccepted T&C. */
+        await saveCheckpoint(MigrationCheckpoint.TermsAndConditions, newAccountId)
         return newAccountId
       })
       return created ?? null

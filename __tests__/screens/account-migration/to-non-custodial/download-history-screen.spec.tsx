@@ -11,9 +11,8 @@ import { flushEffects } from "../../../helpers/flush-effects"
 loadLocale("en")
 const LL = i18nObject("en")
 
-const NEXT_ROUTE = "accountMigrationExplainer"
-
 const mockNavigate = jest.fn()
+const mockNavigateToCheckpoint = jest.fn()
 const mockExportCsv = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
 const mockUseMigrationCheckpoint = jest.fn()
@@ -83,7 +82,7 @@ describe("MigrationDownloadHistoryScreen", () => {
     loadLocale("en")
     mockUseWalletOverviewScreenQuery.mockReturnValue(walletsData)
     mockUseMigrationCheckpoint.mockReturnValue({
-      getRouteForCheckpoint: () => NEXT_ROUTE,
+      navigateToCheckpoint: mockNavigateToCheckpoint,
       loading: false,
     })
     mockExportCsv.mockResolvedValue(undefined)
@@ -171,7 +170,7 @@ describe("MigrationDownloadHistoryScreen", () => {
 
   it("disables both actions while the migration checkpoint is loading", async () => {
     mockUseMigrationCheckpoint.mockReturnValue({
-      getRouteForCheckpoint: () => NEXT_ROUTE,
+      navigateToCheckpoint: mockNavigateToCheckpoint,
       loading: true,
     })
     renderScreen()
@@ -190,6 +189,6 @@ describe("MigrationDownloadHistoryScreen", () => {
 
     pressSecondary()
 
-    expect(mockNavigate).toHaveBeenCalledWith(NEXT_ROUTE)
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
   })
 })

@@ -11,7 +11,6 @@ import { flushEffects } from "../../../helpers/flush-effects"
 loadLocale("en")
 const LL = i18nObject("en")
 
-const NEXT_ROUTE = "accountMigrationExplainer"
 const DOWNLOAD_HISTORY_ROUTE = "accountMigrationDownloadHistory"
 
 const mockNavigate = jest.fn()
@@ -36,13 +35,16 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => true,
 }))
 
+const mockNavigateToCheckpoint = jest.fn()
+const mockReplaceToCheckpoint = jest.fn()
 let mockHasResumableCheckpoint = false
 let mockHasTransactions = true
 let mockTransactionsLoading = false
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
-    getRouteForCheckpoint: () => NEXT_ROUTE,
+    navigateToCheckpoint: mockNavigateToCheckpoint,
+    replaceToCheckpoint: mockReplaceToCheckpoint,
     hasResumableCheckpoint: mockHasResumableCheckpoint,
     loading: false,
   }),
@@ -123,7 +125,7 @@ describe("MigrationKeepReceivingScreen", () => {
 
     fireEvent.press(screen.getByText(LL.AccountMigration.keepReceivingCta()))
 
-    expect(mockNavigate).toHaveBeenCalledWith(NEXT_ROUTE)
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
   })
 
   it("returns to the checkpoint when resuming instead of re-offering the download", async () => {
@@ -133,7 +135,7 @@ describe("MigrationKeepReceivingScreen", () => {
 
     fireEvent.press(screen.getByText(LL.AccountMigration.keepReceivingCta()))
 
-    expect(mockNavigate).toHaveBeenCalledWith(NEXT_ROUTE)
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
   })
 
   it("renders nothing while the transaction check is loading", async () => {
@@ -152,7 +154,7 @@ describe("MigrationKeepReceivingScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockReplace).toHaveBeenCalledWith(NEXT_ROUTE)
+    expect(mockReplaceToCheckpoint).toHaveBeenCalledTimes(1)
     expect(screen.queryByText(LL.AccountMigration.keepReceivingTitle())).toBeNull()
   })
 
@@ -162,7 +164,7 @@ describe("MigrationKeepReceivingScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
   })
 
   it("renders nothing while the address is still loading", async () => {
@@ -171,6 +173,6 @@ describe("MigrationKeepReceivingScreen", () => {
     await flushEffects()
 
     expect(screen.queryByText(LL.AccountMigration.keepReceivingTitle())).toBeNull()
-    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
   })
 })

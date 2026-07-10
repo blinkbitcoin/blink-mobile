@@ -1,7 +1,5 @@
 import React, { useCallback, useState } from "react"
 import { View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -14,7 +12,6 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getWalletIds } from "@app/graphql/wallets-utils"
 import { useExportTransactionsCsv } from "@app/hooks/use-export-transactions-csv"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -25,8 +22,7 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { getRouteForCheckpoint, loading: checkpointLoading } = useMigrationCheckpoint()
+  const { navigateToCheckpoint, loading: checkpointLoading } = useMigrationCheckpoint()
 
   const isAuthed = useIsAuthed()
   const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed })
@@ -39,8 +35,8 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
   const secondaryButtonTitle = hasDownloaded ? LL.common.continue() : LL.common.skip()
 
   const goToNextStep = useCallback(() => {
-    navigation.navigate(getRouteForCheckpoint())
-  }, [navigation, getRouteForCheckpoint])
+    navigateToCheckpoint()
+  }, [navigateToCheckpoint])
 
   const handleDownload = useCallback(async () => {
     setIsDownloading(true)

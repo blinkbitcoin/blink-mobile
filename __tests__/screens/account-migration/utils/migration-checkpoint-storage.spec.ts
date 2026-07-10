@@ -98,41 +98,68 @@ describe("migration-checkpoint-storage", () => {
     })
   })
 
+  describe("validateStoredCheckpoint accountId type", () => {
+    it("rejects a stored checkpoint whose accountId is not a string", () => {
+      expect(
+        validateStoredCheckpoint({
+          step: MigrationCheckpoint.BackupMethod,
+          savedAt: Date.now(),
+          accountId: 123,
+        }),
+      ).toBeNull()
+    })
+  })
+
   describe("resolveCheckpointRoute", () => {
-    it("returns default for null checkpoint", () => {
-      expect(resolveCheckpointRoute(null)).toBe("accountMigrationExplainer")
+    it("returns the default destination for a null checkpoint", () => {
+      expect(resolveCheckpointRoute(null)).toEqual({
+        name: "accountMigrationExplainer",
+      })
     })
 
-    it("returns correct route for BackupMethod", () => {
-      expect(resolveCheckpointRoute(MigrationCheckpoint.BackupMethod)).toBe(
-        "selfCustodialBackupMethod",
-      )
+    it("resumes the terms screen with the migration flow param", () => {
+      expect(resolveCheckpointRoute(MigrationCheckpoint.TermsAndConditions)).toEqual({
+        name: "acceptTermsAndConditions",
+        params: { flow: "migration" },
+      })
     })
 
-    it("returns correct route for BackupAlerts", () => {
-      expect(resolveCheckpointRoute(MigrationCheckpoint.BackupAlerts)).toBe(
-        "selfCustodialBackupSecurityChecks",
-      )
+    it("returns the backup-method destination for BackupMethod", () => {
+      expect(resolveCheckpointRoute(MigrationCheckpoint.BackupMethod)).toEqual({
+        name: "selfCustodialBackupMethod",
+      })
     })
 
-    it("returns correct route for CloudBackup on Android", () => {
+    it("returns the security-checks destination for BackupAlerts", () => {
+      expect(resolveCheckpointRoute(MigrationCheckpoint.BackupAlerts)).toEqual({
+        name: "selfCustodialBackupSecurityChecks",
+      })
+    })
+
+    it("returns the balances-overview destination for the commit point", () => {
+      expect(resolveCheckpointRoute(MigrationCheckpoint.BalancesOverview)).toEqual({
+        name: "accountMigrationBalancesOverview",
+      })
+    })
+
+    it("returns the cloud-backup destination for CloudBackup on Android", () => {
       const original = Platform.OS
       Object.defineProperty(Platform, "OS", { value: "android" })
 
-      expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toBe(
-        "selfCustodialCloudBackup",
-      )
+      expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toEqual({
+        name: "selfCustodialCloudBackup",
+      })
 
       Object.defineProperty(Platform, "OS", { value: original })
     })
 
-    it("returns default route for CloudBackup on iOS", () => {
+    it("returns the default destination for CloudBackup on iOS", () => {
       const original = Platform.OS
       Object.defineProperty(Platform, "OS", { value: "ios" })
 
-      expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toBe(
-        "accountMigrationExplainer",
-      )
+      expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toEqual({
+        name: "accountMigrationExplainer",
+      })
 
       Object.defineProperty(Platform, "OS", { value: original })
     })
@@ -175,6 +202,13 @@ describe("migration-checkpoint-storage", () => {
 
       await expect(loadCheckpoint("test-key")).rejects.toThrow("corrupt")
       expect(mockRemove).toHaveBeenCalledWith("test-key")
+    })
+
+    it("re-throws the original error even when the cleanup removal fails", async () => {
+      mockLoadJson.mockRejectedValue(new Error("corrupt"))
+      mockRemove.mockRejectedValue(new Error("remove failed"))
+
+      await expect(loadCheckpoint("test-key")).rejects.toThrow("corrupt")
     })
 
     it("returns null for null storage", async () => {
@@ -225,6 +259,17 @@ describe("migration-checkpoint-storage", () => {
         step: MigrationCheckpoint.BackupAlerts,
         savedAt: expect.any(Number),
         accountId: "sc-1",
+      })
+    })
+
+    it("saves the step even when reading the previous checkpoint fails", async () => {
+      mockLoadJson.mockRejectedValue(new Error("read failed"))
+
+      await saveCheckpointToStorage("test-key", MigrationCheckpoint.BackupAlerts)
+
+      expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
+        step: MigrationCheckpoint.BackupAlerts,
+        savedAt: expect.any(Number),
       })
     })
   })

@@ -5,6 +5,7 @@ import { render, screen, fireEvent } from "@testing-library/react-native"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { MigrationBalancesOverviewScreen } from "@app/screens/account-migration/to-non-custodial/balances-overview-screen"
 import { ContextForScreen } from "../../helper"
 import { flushEffects } from "../../../helpers/flush-effects"
@@ -34,6 +35,17 @@ jest.mock("@app/graphql/generated", () => ({
 jest.mock("@app/graphql/is-authed-context", () => ({
   ...jest.requireActual("@app/graphql/is-authed-context"),
   useIsAuthed: () => true,
+}))
+
+const mockSaveCheckpoint = jest.fn()
+let mockCheckpointLoading = false
+
+jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
+  useMigrationCheckpoint: () => ({
+    loading: mockCheckpointLoading,
+    saveCheckpoint: mockSaveCheckpoint,
+  }),
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -90,6 +102,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     loadLocale("en")
     mockDollarRestricted = false
     mockConvertReady = true
+    mockCheckpointLoading = false
     mockRouteParams = undefined
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletsWithBalances({ sats: 1000, usdCents: 0 }),
@@ -130,6 +143,21 @@ describe("MigrationBalancesOverviewScreen", () => {
     fireEvent.press(screen.getByText(LLOverview.approveCta()))
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
+  })
+
+  it("persists the commit-point checkpoint on landing", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.BalancesOverview)
+  })
+
+  it("waits for the checkpoint to load before persisting the commit point", async () => {
+    mockCheckpointLoading = true
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).not.toHaveBeenCalled()
   })
 
   it("opens the support email when Contact support is pressed", async () => {

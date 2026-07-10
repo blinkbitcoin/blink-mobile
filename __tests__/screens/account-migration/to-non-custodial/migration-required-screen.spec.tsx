@@ -15,12 +15,12 @@ import { flushEffects } from "../../../helpers/flush-effects"
 loadLocale("en")
 const LL = i18nObject("en")
 
-const CHECKPOINT_ROUTE = "accountMigrationExplainer"
 const KEEP_RECEIVING_ROUTE = "accountMigrationKeepReceiving"
 const DOWNLOAD_HISTORY_ROUTE = "accountMigrationDownloadHistory"
 const CONTACT_EMAIL = "support@blink.sv"
 
 const mockNavigate = jest.fn()
+const mockNavigateToCheckpoint = jest.fn()
 const mockGoBack = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
 const mockUseAddressScreenQuery = jest.fn()
@@ -51,7 +51,7 @@ let mockTransactionsLoading = false
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
-    getRouteForCheckpoint: () => CHECKPOINT_ROUTE,
+    navigateToCheckpoint: mockNavigateToCheckpoint,
     hasResumableCheckpoint: mockHasResumableCheckpoint,
   }),
   useHasTransactions: () => ({
@@ -223,7 +223,7 @@ describe("MigrationRequiredScreen", () => {
 
       fireEvent.press(screen.getByText(LL.common.continue()))
 
-      expect(mockNavigate).toHaveBeenCalledWith(CHECKPOINT_ROUTE)
+      expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
     })
 
     it("offers the history download when there is no lightning address but there is history", async () => {
@@ -244,7 +244,7 @@ describe("MigrationRequiredScreen", () => {
 
       fireEvent.press(screen.getByText(LL.common.continue()))
 
-      expect(mockNavigate).toHaveBeenCalledWith(CHECKPOINT_ROUTE)
+      expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
     })
 
     it("routes through the keep-receiving screen when the user has a lightning address", async () => {

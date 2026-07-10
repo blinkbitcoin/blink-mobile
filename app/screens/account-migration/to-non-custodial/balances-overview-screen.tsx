@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect } from "react"
 import { ScrollView, View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -21,6 +21,10 @@ import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restri
 import { SATS_PER_BTC } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  MigrationCheckpoint,
+  useMigrationCheckpoint,
+} from "@app/screens/account-migration/hooks"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { AccountType } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
@@ -60,6 +64,15 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const isNewDollarBalanceRestricted = useDollarBalanceRestricted(
     AccountType.SelfCustodial,
   )
+  const { loading: checkpointLoading, saveCheckpoint } = useMigrationCheckpoint()
+
+  /** Landing here is the commit point, so an app relaunch returns to this screen.
+   *  TODO: the backend will hold this server-side once the migration state query ships
+   *  (reinstalls cannot be covered locally); this checkpoint covers the relaunch. */
+  useEffect(() => {
+    if (checkpointLoading) return
+    saveCheckpoint(MigrationCheckpoint.BalancesOverview)
+  }, [checkpointLoading, saveCheckpoint])
 
   const currentSats = getBtcWallet(wallets)?.balance ?? 0
   const currentUsdCents = getUsdWallet(wallets)?.balance ?? 0

@@ -53,7 +53,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { getRouteForCheckpoint, hasResumableCheckpoint } = useMigrationCheckpoint()
+  const { navigateToCheckpoint, hasResumableCheckpoint } = useMigrationCheckpoint()
   const { hasTransactions, loading: transactionsLoading } = useHasTransactions()
   const { supportEmailAddress, openSupport } = useContactSupport()
 
@@ -97,13 +97,13 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
       navigation.navigate("accountMigrationDownloadHistory")
       return
     }
-    navigation.navigate(getRouteForCheckpoint())
+    navigateToCheckpoint()
   }, [
     navigation,
     hasLightningAddress,
     hasTransactions,
     hasResumableCheckpoint,
-    getRouteForCheckpoint,
+    navigateToCheckpoint,
   ])
 
   const handleClose = useCallback(() => {

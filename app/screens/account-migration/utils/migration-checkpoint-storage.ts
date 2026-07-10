@@ -4,9 +4,11 @@ import { loadJson, remove, saveJson } from "@app/utils/storage"
 
 // Values are persisted to AsyncStorage — do not rename
 export enum MigrationCheckpoint {
+  TermsAndConditions = "termsAndConditions",
   BackupMethod = "backupMethod",
   CloudBackup = "cloudBackup",
   BackupAlerts = "backupAlerts",
+  BalancesOverview = "balancesOverview",
 }
 
 type StoredCheckpoint = {
@@ -15,23 +17,38 @@ type StoredCheckpoint = {
   accountId?: string
 }
 
-type ResumeRoute =
-  | "accountMigrationExplainer"
-  | "selfCustodialBackupMethod"
-  | "selfCustodialCloudBackup"
-  | "selfCustodialBackupSecurityChecks"
+/**
+ * Where a checkpoint resumes. Every destination is a param-less route except the
+ * terms screen, which is shared across flows and needs the migration flow param.
+ */
+export type CheckpointDestination =
+  | {
+      name:
+        | "accountMigrationExplainer"
+        | "selfCustodialBackupMethod"
+        | "selfCustodialCloudBackup"
+        | "selfCustodialBackupSecurityChecks"
+        | "accountMigrationBalancesOverview"
+      params?: undefined
+    }
+  | { name: "acceptTermsAndConditions"; params: { flow: "migration" } }
 
 const STORAGE_KEY_PREFIX = "migrationCheckpoint"
 
 const CHECKPOINT_EXPIRATION_MS = 48 * 60 * 60 * 1000 // 48h
 
-const CHECKPOINT_ROUTE_MAP: Record<MigrationCheckpoint, ResumeRoute> = {
-  [MigrationCheckpoint.BackupMethod]: "selfCustodialBackupMethod",
-  [MigrationCheckpoint.CloudBackup]: "selfCustodialCloudBackup",
-  [MigrationCheckpoint.BackupAlerts]: "selfCustodialBackupSecurityChecks",
+const CHECKPOINT_DESTINATION_MAP: Record<MigrationCheckpoint, CheckpointDestination> = {
+  [MigrationCheckpoint.TermsAndConditions]: {
+    name: "acceptTermsAndConditions",
+    params: { flow: "migration" },
+  },
+  [MigrationCheckpoint.BackupMethod]: { name: "selfCustodialBackupMethod" },
+  [MigrationCheckpoint.CloudBackup]: { name: "selfCustodialCloudBackup" },
+  [MigrationCheckpoint.BackupAlerts]: { name: "selfCustodialBackupSecurityChecks" },
+  [MigrationCheckpoint.BalancesOverview]: { name: "accountMigrationBalancesOverview" },
 }
 
-const DEFAULT_ROUTE: ResumeRoute = "accountMigrationExplainer"
+const DEFAULT_DESTINATION: CheckpointDestination = { name: "accountMigrationExplainer" }
 
 export const getStorageKey = (environment: string): string =>
   `${STORAGE_KEY_PREFIX}_${environment.toLowerCase()}`
@@ -55,14 +72,14 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
 
 export const resolveCheckpointRoute = (
   checkpoint: MigrationCheckpoint | null,
-): ResumeRoute => {
-  if (!checkpoint) return DEFAULT_ROUTE
+): CheckpointDestination => {
+  if (!checkpoint) return DEFAULT_DESTINATION
 
   if (checkpoint === MigrationCheckpoint.CloudBackup && Platform.OS === "ios") {
-    return DEFAULT_ROUTE
+    return DEFAULT_DESTINATION
   }
 
-  return CHECKPOINT_ROUTE_MAP[checkpoint]
+  return CHECKPOINT_DESTINATION_MAP[checkpoint]
 }
 
 export const loadCheckpoint = async (

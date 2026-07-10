@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
+import { useNavigation } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+
 import { useAppConfig } from "@app/hooks/use-app-config"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { reportError } from "@app/utils/error-logging"
 
 import {
@@ -15,6 +19,7 @@ import {
 export { MigrationCheckpoint }
 
 export const useMigrationCheckpoint = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const [checkpoint, setCheckpoint] = useState<MigrationCheckpoint | null>(null)
   const [accountId, setAccountId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -71,10 +76,30 @@ export const useMigrationCheckpoint = () => {
   }, [storageKey])
 
   // Without a provisioned account, resume from the explainer so it gets provisioned.
-  const getRouteForCheckpoint = useCallback(
+  const resolveDestination = useCallback(
     () => resolveCheckpointRoute(accountId ? checkpoint : null),
     [checkpoint, accountId],
   )
+
+  /** Resumes at the checkpoint's screen, forwarding the terms screen its flow param. */
+  const navigateToCheckpoint = useCallback(() => {
+    const destination = resolveDestination()
+    if (destination.name === "acceptTermsAndConditions") {
+      navigation.navigate(destination.name, destination.params)
+      return
+    }
+    navigation.navigate(destination.name)
+  }, [resolveDestination, navigation])
+
+  /** Same as navigateToCheckpoint but replacing the current screen (skip guards). */
+  const replaceToCheckpoint = useCallback(() => {
+    const destination = resolveDestination()
+    if (destination.name === "acceptTermsAndConditions") {
+      navigation.replace(destination.name, destination.params)
+      return
+    }
+    navigation.replace(destination.name)
+  }, [resolveDestination, navigation])
 
   // A provisioned account is only stored alongside a checkpoint, so it gates resumability.
   const hasResumableCheckpoint = Boolean(accountId)
@@ -85,7 +110,8 @@ export const useMigrationCheckpoint = () => {
     loading,
     saveCheckpoint,
     clearCheckpoint,
-    getRouteForCheckpoint,
+    navigateToCheckpoint,
+    replaceToCheckpoint,
     hasResumableCheckpoint,
   }
 }
