@@ -87,6 +87,7 @@ export const BalanceHeader: React.FC<Props> = ({
                 style={styles.primaryBalanceText}
                 allowFontScaling
                 adjustsFontSizeToFit
+                numberOfLines={1}
               >
                 {formattedBalance}
               </Text>
