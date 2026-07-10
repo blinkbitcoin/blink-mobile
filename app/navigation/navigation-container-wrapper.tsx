@@ -150,6 +150,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         cardTransactionDetailsScreen: {
           path: "card/transaction/:transactionId",
         },
+        accountMigrationEntry: "account-migration",
         cardOnboardingWelcomeScreen: "card/onboarding",
         cardOnboardingLoadingScreen: "card/onboarding/loading",
         cardOnboardingPersonalInfoScreen: "card/onboarding/personal-info",

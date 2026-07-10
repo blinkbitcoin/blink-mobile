@@ -1,6 +1,7 @@
 export { MigrationBalancesOverviewScreen } from "./to-non-custodial/balances-overview-screen"
 export { MigrationContactSupportScreen } from "./to-non-custodial/contact-support-screen"
 export { MigrationDownloadHistoryScreen } from "./to-non-custodial/download-history-screen"
+export { MigrationEntryScreen } from "./to-non-custodial/migration-entry-screen"
 export { MigrationExplainerScreen } from "./to-non-custodial/explainer-screen"
 export { MigrationGate } from "./to-non-custodial/migration-gate"
 export { MigrationKeepReceivingScreen } from "./to-non-custodial/keep-receiving-screen"

@@ -153,6 +153,7 @@ import {
   MigrationBalancesOverviewScreen,
   MigrationContactSupportScreen,
   MigrationDownloadHistoryScreen,
+  MigrationEntryScreen,
   MigrationExplainerScreen,
   MigrationGate,
   MigrationKeepReceivingScreen,
@@ -820,6 +821,11 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="accountMigrationStart"
         component={MigrationGate}
+        options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationEntry"
+        component={MigrationEntryScreen}
         options={{ headerShown: false }}
       />
       <RootNavigator.Screen

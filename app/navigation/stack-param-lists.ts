@@ -196,6 +196,7 @@ export type RootStackParamList = {
     successMessage?: string
   }
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
+  accountMigrationEntry: undefined
   accountMigrationStart: undefined
   accountMigrationExplainer: undefined
   accountMigrationKeepReceiving: undefined
