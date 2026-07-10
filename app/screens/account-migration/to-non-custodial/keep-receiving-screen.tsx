@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from "react"
 import { View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -52,9 +52,13 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
     ? getLightningAddress(lnAddressHostname, username)
     : ""
 
+  const isFocused = useIsFocused()
   const isCheckReady = !addressLoading && !checkpointLoading && !transactionsLoading
   const hasLightningAddress = Boolean(username)
-  const shouldSkipScreen = isCheckReady && !hasLightningAddress
+  /** Focus-gated: this screen stays mounted under the stack for the whole migration,
+   *  and the post-migration session swap drops the username, which must not make a
+   *  background instance replace itself into the flow again. */
+  const shouldSkipScreen = isFocused && isCheckReady && !hasLightningAddress
 
   /** A resumed migration already passed the download step so it returns to its
    *  checkpoint; a fresh one only sees the step when there is history to download. */

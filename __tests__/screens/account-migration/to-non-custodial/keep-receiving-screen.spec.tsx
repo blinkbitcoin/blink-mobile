@@ -18,9 +18,12 @@ const mockNavigate = jest.fn()
 const mockReplace = jest.fn()
 const mockUseAddressScreenQuery = jest.fn()
 
+let mockIsFocused = true
+
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate, replace: mockReplace }),
+  useIsFocused: () => mockIsFocused,
 }))
 
 jest.mock("@app/graphql/generated", () => ({
@@ -68,6 +71,7 @@ describe("MigrationKeepReceivingScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    mockIsFocused = true
     mockHasResumableCheckpoint = false
     mockHasTransactions = true
     mockTransactionsLoading = false
@@ -150,6 +154,15 @@ describe("MigrationKeepReceivingScreen", () => {
 
     expect(mockReplace).toHaveBeenCalledWith(NEXT_ROUTE)
     expect(screen.queryByText(LL.AccountMigration.keepReceivingTitle())).toBeNull()
+  })
+
+  it("does not replace itself from the background when the session swap drops the username", async () => {
+    mockIsFocused = false
+    mockUseAddressScreenQuery.mockReturnValue({ data: { me: {} }, loading: false })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockReplace).not.toHaveBeenCalled()
   })
 
   it("renders nothing while the address is still loading", async () => {
