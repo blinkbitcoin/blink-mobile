@@ -3598,7 +3598,7 @@
     "downloadHistoryBody": "Akun baru Anda akan dimulai dari awal. Jika Anda ingin menyimpan catatan transaksi Anda, unduh sekarang sebagai CSV.",
     "downloadHistoryDownloadCta": "Unduh",
     "apiServiceTitle": "Layanan API tidak tersedia",
-    "apiServiceBody": "Kami melihat bahwa Anda memiliki kunci API aktif. Blink tidak dapat menyediakan API dalam mode non-custodial.\n\nJika Anda bergantung pada API Blink, hubungi kami segera dan kami akan berusaha sebaik mungkin untuk membantu transisi yang mulus.\n\nKami memiliki POS dan Tombol Donasi baru yang berfungsi dengan akun non-custodial.",
+    "apiServiceBody": "Kami melihat bahwa Anda memiliki kunci API aktif. Blink tidak dapat menyediakan API dalam mode non-custodial.\n\nJika Anda bergantung pada API Blink, hubungi kami segera dan kami akan berusaha sebaik mungkin untuk membantu transisi yang mulus.",
     "apiServiceContactCta": "Hubungi kami",
     "apiServiceContinueCta": "Tetap lanjutkan",
     "migrationRequiredBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial.",

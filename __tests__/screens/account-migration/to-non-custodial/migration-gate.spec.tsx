@@ -12,7 +12,9 @@ const mockUseWindDownStatus = jest.fn()
 const mockUseTransferBlocked = jest.fn()
 const mockUseDollarBalanceRestricted = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
-const mockApiServiceScreen = jest.fn((_props: { onContinue: () => void }) => null)
+const mockApiServiceScreen = jest.fn(
+  (_props: { onContinue: () => void; onClose?: () => void }) => null,
+)
 const mockRequiredScreen = jest.fn(
   (_props: { mode: string; onClose?: () => void }) => null,
 )
@@ -62,8 +64,10 @@ jest.mock("@app/components/dollar-balance-migration-modal", () => ({
 }))
 
 jest.mock("@app/screens/account-migration/to-non-custodial/api-service-screen", () => ({
-  MigrationApiServiceScreen: (props: { onContinue: () => void }) =>
-    mockApiServiceScreen(props),
+  MigrationApiServiceScreen: (props: {
+    onContinue: () => void
+    onClose?: () => void
+  }) => mockApiServiceScreen(props),
 }))
 
 jest.mock(
@@ -234,6 +238,43 @@ describe("MigrationGate", () => {
 
     expect(mockRequiredScreen).toHaveBeenCalled()
     expect(mockApiServiceScreen).not.toHaveBeenCalled()
+  })
+
+  it("closes the API-service warning through goBack on the voluntary route", () => {
+    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: true, loading: false })
+
+    render(<MigrationGate />)
+    const { onClose } = mockApiServiceScreen.mock.calls[0][0]
+
+    act(() => {
+      onClose?.()
+    })
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  it("closes the API-service warning through the blocker's onClose when provided", () => {
+    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: true, loading: false })
+    const onClose = jest.fn()
+
+    render(<MigrationGate onClose={onClose} />)
+    const apiProps = mockApiServiceScreen.mock.calls[0][0]
+
+    act(() => {
+      apiProps.onClose?.()
+    })
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  it("keeps the API-service warning unclosable after the gate arms", () => {
+    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: true, loading: false })
+    mockUseWindDownStatus.mockReturnValue({ status: WindDownStatus.GatedClosed })
+
+    render(<MigrationGate />)
+
+    expect(mockApiServiceScreen.mock.calls[0][0].onClose).toBeUndefined()
   })
 
   it("moves on to the required screen once the API warning is acknowledged", () => {

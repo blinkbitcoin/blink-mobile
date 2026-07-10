@@ -3598,7 +3598,7 @@
     "downloadHistoryBody": "Jou nuwe rekening begin vars. As jy 'n rekord van jou transaksies wil hou, laai dit nou as CSV af.",
     "downloadHistoryDownloadCta": "Laai af",
     "apiServiceTitle": "API-diens nie beskikbaar nie",
-    "apiServiceBody": "Ons let op dat jy aktiewe API-sleutels het. Blink kan nie die API in nie-bewaarende modus verskaf nie.\n\nAs jy van Blink se API afhanklik is, kontak ons gou en ons sal ons bes doen om 'n gladde oorgang te help.\n\nOns het 'n nuwe POS en Skenkknoppie wat met nie-bewaarende rekeninge werk.",
+    "apiServiceBody": "Ons let op dat jy aktiewe API-sleutels het. Blink kan nie die API in nie-bewaarende modus verskaf nie.\n\nAs jy van Blink se API afhanklik is, kontak ons gou en ons sal ons bes doen om 'n gladde oorgang te help.",
     "apiServiceContactCta": "Kontak ons",
     "apiServiceContinueCta": "Gaan tog voort",
     "migrationRequiredBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer.",

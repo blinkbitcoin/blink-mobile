@@ -11905,9 +11905,7 @@ type RootTranslation = {
 		/**
 		 * W​e​ ​n​o​t​e​ ​t​h​a​t​ ​y​o​u​ ​h​a​v​e​ ​a​c​t​i​v​e​ ​A​P​I​ ​k​e​y​s​.​ ​B​l​i​n​k​ ​c​a​n​'​t​ ​p​r​o​v​i​d​e​ ​t​h​e​ ​A​P​I​ ​i​n​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​m​o​d​e​.​
 	​
-	​I​f​ ​y​o​u​ ​a​r​e​ ​d​e​p​e​n​d​e​n​t​ ​o​n​ ​B​l​i​n​k​'​s​ ​A​P​I​,​ ​c​o​n​t​a​c​t​ ​u​s​ ​p​r​o​m​p​t​l​y​ ​a​n​d​ ​w​e​ ​w​i​l​l​ ​d​o​ ​o​u​r​ ​b​e​s​t​ ​t​o​ ​a​s​s​i​s​t​ ​a​ ​s​m​o​o​t​h​ ​t​r​a​n​s​i​t​i​o​n​.​
-	​
-	​W​e​ ​h​a​v​e​ ​a​ ​n​e​w​ ​P​O​S​ ​a​n​d​ ​D​o​n​a​t​e​ ​B​u​t​t​o​n​ ​t​h​a​t​ ​w​o​r​k​ ​w​i​t​h​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​.
+	​I​f​ ​y​o​u​ ​a​r​e​ ​d​e​p​e​n​d​e​n​t​ ​o​n​ ​B​l​i​n​k​'​s​ ​A​P​I​,​ ​c​o​n​t​a​c​t​ ​u​s​ ​p​r​o​m​p​t​l​y​ ​a​n​d​ ​w​e​ ​w​i​l​l​ ​d​o​ ​o​u​r​ ​b​e​s​t​ ​t​o​ ​a​s​s​i​s​t​ ​a​ ​s​m​o​o​t​h​ ​t​r​a​n​s​i​t​i​o​n​.
 		 */
 		apiServiceBody: string
 		/**
@@ -24357,8 +24355,6 @@ export type TranslationFunctions = {
 		 * We note that you have active API keys. Blink can't provide the API in non-custodial mode.
 
 	If you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.
-
-	We have a new POS and Donate Button that work with non-custodial accounts.
 		 */
 		apiServiceBody: () => LocalizedString
 		/**

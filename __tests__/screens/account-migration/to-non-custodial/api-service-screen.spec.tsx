@@ -18,10 +18,10 @@ jest.mock("@app/config/feature-flags-context", () => ({
 
 const mockOnContinue = jest.fn()
 
-const renderScreen = () =>
+const renderScreen = (onClose?: () => void) =>
   render(
     <ContextForScreen>
-      <MigrationApiServiceScreen onContinue={mockOnContinue} />
+      <MigrationApiServiceScreen onContinue={mockOnContinue} onClose={onClose} />
     </ContextForScreen>,
   )
 
@@ -59,5 +59,22 @@ describe("MigrationApiServiceScreen", () => {
     fireEvent.press(screen.getByText(LL.AccountMigration.apiServiceContinueCta()))
 
     expect(mockOnContinue).toHaveBeenCalled()
+  })
+
+  it("exits through the close button when a close action is provided", async () => {
+    const onClose = jest.fn()
+    renderScreen(onClose)
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-api-close"))
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it("hides the close button without a close action", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-api-close")).toBeNull()
   })
 })

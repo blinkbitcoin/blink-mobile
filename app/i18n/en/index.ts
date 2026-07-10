@@ -3750,7 +3750,7 @@ const en: BaseTranslation = {
     downloadHistoryDownloadCta: "Download",
     apiServiceTitle: "API service not available",
     apiServiceBody:
-      "We note that you have active API keys. Blink can't provide the API in non-custodial mode.\n\nIf you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.\n\nWe have a new POS and Donate Button that work with non-custodial accounts.",
+      "We note that you have active API keys. Blink can't provide the API in non-custodial mode.\n\nIf you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.",
     apiServiceContactCta: "Contact us",
     apiServiceContinueCta: "Continue anyways",
     balancesOverview: {

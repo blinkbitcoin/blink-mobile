@@ -3598,7 +3598,7 @@
     "downloadHistoryBody": "El teu compte nou començarà de zero. Si vols conservar un registre de les teves transaccions, baixa-les ara com a CSV.",
     "downloadHistoryDownloadCta": "Baixa",
     "apiServiceTitle": "Servei d'API no disponible",
-    "apiServiceBody": "Observem que tens claus API actives. Blink no pot oferir l'API en mode no custodial.\n\nSi depens de l'API de Blink, contacta'ns aviat i farem tot el possible per ajudar-te en una transició fluida.\n\nTenim un nou POS i botó de donació que funcionen amb comptes no custodials.",
+    "apiServiceBody": "Observem que tens claus API actives. Blink no pot oferir l'API en mode no custodial.\n\nSi depens de l'API de Blink, contacta'ns aviat i farem tot el possible per ajudar-te en una transició fluida.",
     "apiServiceContactCta": "Contacta'ns",
     "apiServiceContinueCta": "Continua igualment",
     "migrationRequiredBody": "És hora de migrar el teu compte custodial a un compte no custodi.",

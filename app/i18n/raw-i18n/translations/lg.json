@@ -3598,7 +3598,7 @@
     "downloadHistoryBody": "Akaawunti yo empya ejja kutandika bupya. Bw'oba oyagala okukuuma ebiwandiiko by'ensimbi zo, bisike kati nga CSV.",
     "downloadHistoryDownloadCta": "Sika",
     "apiServiceTitle": "Empeereza ya API tekolawo",
-    "apiServiceBody": "Tulaba nti olina ebisumuluzo bya API ebikola. Blink tesobola kuwa API mu ngeri ya non-custodial.\n\nBw'oba weesigamye ku API ya Blink, tukwatagane naffe amangu era tujja kukola kyonna ekisoboka okuyamba mu nkyukakyuka enteefu.\n\nTulina POS empya n'akapeesa k'okuwaayo ebirabo ebikola n'akawunti za non-custodial.",
+    "apiServiceBody": "Tulaba nti olina ebisumuluzo bya API ebikola. Blink tesobola kuwa API mu ngeri ya non-custodial.\n\nBw'oba weesigamye ku API ya Blink, tukwatagane naffe amangu era tujja kukola kyonna ekisoboka okuyamba mu nkyukakyuka enteefu.",
     "apiServiceContactCta": "Tukwatagane naffe",
     "apiServiceContinueCta": "Weeyongereyo wadde kiri kityo",
     "migrationRequiredBody": "Kiseera ky'okujja akawunti yo ekuumibwa ogigirre mu akawunti etakuumibwa.",

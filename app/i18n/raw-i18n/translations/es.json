@@ -3598,7 +3598,7 @@
         "downloadHistoryBody": "Tu cuenta nueva comenzará desde cero. Si quieres conservar un registro de tus transacciones, descárgalas ahora como CSV.",
         "downloadHistoryDownloadCta": "Descargar",
         "apiServiceTitle": "Servicio de API no disponible",
-        "apiServiceBody": "Notamos que tienes claves API activas. Blink no puede ofrecer la API en modo no custodial.\n\nSi dependes de la API de Blink, contáctanos pronto y haremos todo lo posible para ayudarte con una transición fluida.\n\nTenemos un nuevo POS y botón de donaciones que funcionan con cuentas no custodiales.",
+        "apiServiceBody": "Notamos que tienes claves API activas. Blink no puede ofrecer la API en modo no custodial.\n\nSi dependes de la API de Blink, contáctanos pronto y haremos todo lo posible para ayudarte con una transición fluida.",
         "apiServiceContactCta": "Contáctanos",
         "apiServiceContinueCta": "Continuar de todos modos",
         "migrationRequiredBody": "Es hora de migrar tu cuenta custodial a una cuenta no custodial.",

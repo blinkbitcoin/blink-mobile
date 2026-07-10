@@ -3,6 +3,7 @@ import { View } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { IconHero } from "@app/components/icon-hero"
@@ -13,10 +14,12 @@ import { testProps } from "@app/utils/testProps"
 
 type MigrationApiServiceScreenProps = {
   onContinue: () => void
+  onClose?: () => void
 }
 
 export const MigrationApiServiceScreen: React.FC<MigrationApiServiceScreenProps> = ({
   onContinue,
+  onClose,
 }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -28,6 +31,18 @@ export const MigrationApiServiceScreen: React.FC<MigrationApiServiceScreenProps>
   return (
     <Screen preset="fixed" headerShown={false}>
       <View style={styles.container}>
+        <View style={styles.header}>
+          {onClose ? (
+            <GaloyIconButton
+              name="close"
+              size="medium"
+              backgroundColor={colors.grey5}
+              onPress={onClose}
+              {...testProps("migration-api-close")}
+            />
+          ) : null}
+        </View>
+
         <View style={styles.content}>
           <IconHero
             icon="key-outline"
@@ -59,9 +74,16 @@ const useStyles = makeStyles(() => ({
     flex: 1,
     justifyContent: "space-between",
   },
+  header: {
+    minHeight: 44,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
   content: {
     flex: 1,
-    paddingTop: 60,
   },
   buttonsContainer: {
     gap: 10,

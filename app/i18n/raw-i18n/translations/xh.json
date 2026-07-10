@@ -3598,7 +3598,7 @@
     "downloadHistoryBody": "I-akhawunti yakho entsha iza kuqala kwakhona. Ukuba ufuna ukugcina irekhodi lezenzo zakho zemali, zikhuphele ngoku njenge-CSV.",
     "downloadHistoryDownloadCta": "Khuphela",
     "apiServiceTitle": "Inkonzo ye-API ayifumaneki",
-    "apiServiceBody": "Siyaqaphela ukuba unezitshixo ze-API ezisebenzayo. I-Blink ayikwazi ukubonelela nge-API kwimo ye-non-custodial.\n\nUkuba uxhomekeke kwi-API ye-Blink, qhagamshelana nathi ngokukhawuleza kwaye siya kwenza konke okusemandleni ukunceda utshintsho olugudileyo.\n\nSine-POS entsha kunye neQhosha loNikelo esebenza kwii-akhawunti ze-non-custodial.",
+    "apiServiceBody": "Siyaqaphela ukuba unezitshixo ze-API ezisebenzayo. I-Blink ayikwazi ukubonelela nge-API kwimo ye-non-custodial.\n\nUkuba uxhomekeke kwi-API ye-Blink, qhagamshelana nathi ngokukhawuleza kwaye siya kwenza konke okusemandleni ukunceda utshintsho olugudileyo.",
     "apiServiceContactCta": "Qhagamshelana nathi",
     "apiServiceContinueCta": "Qhubeka nokuba kunjalo",
     "migrationRequiredBody": "Lixesha lokufudusela iakhawunti yakho egcinwayo kwiakhawunti engagcinwanga.",

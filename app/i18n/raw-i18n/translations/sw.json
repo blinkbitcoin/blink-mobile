@@ -3598,7 +3598,7 @@
     "downloadHistoryBody": "Akaunti yako mpya itaanza upya. Ikiwa unataka kuweka kumbukumbu ya miamala yako, ipakue sasa kama CSV.",
     "downloadHistoryDownloadCta": "Pakua",
     "apiServiceTitle": "Huduma ya API haipatikani",
-    "apiServiceBody": "Tunaona kuwa una funguo za API zinazotumika. Blink haiwezi kutoa API katika hali ya non-custodial.\n\nIkiwa unategemea API ya Blink, wasiliana nasi haraka na tutafanya tuwezalo kusaidia mpito laini.\n\nTuna POS mpya na Kitufe cha Kuchangia vinavyofanya kazi na akaunti za non-custodial.",
+    "apiServiceBody": "Tunaona kuwa una funguo za API zinazotumika. Blink haiwezi kutoa API katika hali ya non-custodial.\n\nIkiwa unategemea API ya Blink, wasiliana nasi haraka na tutafanya tuwezalo kusaidia mpito laini.",
     "apiServiceContactCta": "Wasiliana nasi",
     "apiServiceContinueCta": "Endelea hata hivyo",
     "migrationRequiredBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini.",

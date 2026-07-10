@@ -90,7 +90,14 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
 
   const shouldWarnAboutApiKeys = hasActiveApiKeys && !apiWarningAcknowledged
   if (shouldWarnAboutApiKeys) {
-    return <MigrationApiServiceScreen onContinue={acknowledgeApiWarning} />
+    /** Same close rules as the "Time to upgrade" screen: closable until the gate arms. */
+    const apiCloseAction = isGated ? undefined : exitFlow
+    return (
+      <MigrationApiServiceScreen
+        onContinue={acknowledgeApiWarning}
+        onClose={apiCloseAction}
+      />
+    )
   }
 
   const mode = isForced ? "forcedPreDeadline" : "voluntary"

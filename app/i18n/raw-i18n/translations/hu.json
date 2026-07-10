@@ -3598,7 +3598,7 @@
     "downloadHistoryBody": "Az új fiókod tiszta lappal indul. Ha meg szeretnéd őrizni a tranzakcióid nyilvántartását, töltsd le őket most CSV formátumban.",
     "downloadHistoryDownloadCta": "Letöltés",
     "apiServiceTitle": "Az API szolgáltatás nem elérhető",
-    "apiServiceBody": "Észrevettük, hogy aktív API-kulcsaid vannak. A Blink nem tudja biztosítani az API-t önrendelkező módban.\n\nHa a Blink API-jától függsz, vedd fel velünk mielőbb a kapcsolatot, és mindent megteszünk a zökkenőmentes átállásért.\n\nVan egy új POS és adományozás gombunk, amelyek önrendelkező fiókokkal működnek.",
+    "apiServiceBody": "Észrevettük, hogy aktív API-kulcsaid vannak. A Blink nem tudja biztosítani az API-t önrendelkező módban.\n\nHa a Blink API-jától függsz, vedd fel velünk mielőbb a kapcsolatot, és mindent megteszünk a zökkenőmentes átállásért.",
     "apiServiceContactCta": "Lépj kapcsolatba velünk",
     "apiServiceContinueCta": "Folytatás mindenképp",
     "migrationRequiredBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba.",

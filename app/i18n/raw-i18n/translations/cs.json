@@ -3598,7 +3598,7 @@
     "downloadHistoryBody": "Váš nový účet začne od začátku. Pokud si chcete uchovat záznam o svých transakcích, stáhněte si je nyní jako CSV.",
     "downloadHistoryDownloadCta": "Stáhnout",
     "apiServiceTitle": "Služba API není dostupná",
-    "apiServiceBody": "Všimli jsme si, že máte aktivní API klíče. Blink nemůže poskytovat API v non-custodial režimu.\n\nPokud jste na API Blinku závislí, kontaktujte nás co nejdříve a uděláme maximum pro hladký přechod.\n\nMáme nové POS a tlačítko darů, která fungují s non-custodial účty.",
+    "apiServiceBody": "Všimli jsme si, že máte aktivní API klíče. Blink nemůže poskytovat API v non-custodial režimu.\n\nPokud jste na API Blinku závislí, kontaktujte nás co nejdříve a uděláme maximum pro hladký přechod.",
     "apiServiceContactCta": "Kontaktujte nás",
     "apiServiceContinueCta": "Přesto pokračovat",
     "migrationRequiredBody": "Je čas migrovat váš svěřenský účet na nesvěřenský účet.",
