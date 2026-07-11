@@ -1,11 +1,11 @@
 import { act, renderHook } from "@testing-library/react-native"
 
-import { useStablesatsForcedConversion } from "@app/hooks/use-stablesats-forced-conversion"
+import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
 
-describe("useStablesatsForcedConversion", () => {
+describe("useDollarBalanceForcedConversion", () => {
   it("opens the convert modal when restricted and the balance is positive", () => {
     const { result } = renderHook(() =>
-      useStablesatsForcedConversion({ isRestricted: true, usdWalletBalance: 5000 }),
+      useDollarBalanceForcedConversion({ isRestricted: true, usdWalletBalance: 5000 }),
     )
 
     expect(result.current.isConvertModalVisible).toBe(true)
@@ -13,7 +13,7 @@ describe("useStablesatsForcedConversion", () => {
 
   it("does not open when the account is not restricted", () => {
     const { result } = renderHook(() =>
-      useStablesatsForcedConversion({ isRestricted: false, usdWalletBalance: 5000 }),
+      useDollarBalanceForcedConversion({ isRestricted: false, usdWalletBalance: 5000 }),
     )
 
     expect(result.current.isConvertModalVisible).toBe(false)
@@ -21,7 +21,7 @@ describe("useStablesatsForcedConversion", () => {
 
   it("does not open when the restricted account has no balance", () => {
     const { result } = renderHook(() =>
-      useStablesatsForcedConversion({ isRestricted: true, usdWalletBalance: 0 }),
+      useDollarBalanceForcedConversion({ isRestricted: true, usdWalletBalance: 0 }),
     )
 
     expect(result.current.isConvertModalVisible).toBe(false)
@@ -30,7 +30,10 @@ describe("useStablesatsForcedConversion", () => {
   it("stays closed after the user dismisses it while still restricted", () => {
     const { result, rerender } = renderHook(
       ({ balance }: { balance: number }) =>
-        useStablesatsForcedConversion({ isRestricted: true, usdWalletBalance: balance }),
+        useDollarBalanceForcedConversion({
+          isRestricted: true,
+          usdWalletBalance: balance,
+        }),
       { initialProps: { balance: 5000 } },
     )
     expect(result.current.isConvertModalVisible).toBe(true)
@@ -45,7 +48,10 @@ describe("useStablesatsForcedConversion", () => {
   it("re-opens when a positive balance arrives after being zero", () => {
     const { result, rerender } = renderHook(
       ({ balance }: { balance: number }) =>
-        useStablesatsForcedConversion({ isRestricted: true, usdWalletBalance: balance }),
+        useDollarBalanceForcedConversion({
+          isRestricted: true,
+          usdWalletBalance: balance,
+        }),
       { initialProps: { balance: 0 } },
     )
     expect(result.current.isConvertModalVisible).toBe(false)
@@ -57,7 +63,10 @@ describe("useStablesatsForcedConversion", () => {
   it("stays closed after a successful conversion zeroes the balance", () => {
     const { result, rerender } = renderHook(
       ({ balance }: { balance: number }) =>
-        useStablesatsForcedConversion({ isRestricted: true, usdWalletBalance: balance }),
+        useDollarBalanceForcedConversion({
+          isRestricted: true,
+          usdWalletBalance: balance,
+        }),
       { initialProps: { balance: 5000 } },
     )
     expect(result.current.isConvertModalVisible).toBe(true)

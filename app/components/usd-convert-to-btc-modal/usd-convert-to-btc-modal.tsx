@@ -1,17 +1,10 @@
 import * as React from "react"
-import { View } from "react-native"
 
-import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useIntraLedgerConversion } from "@app/hooks/use-intra-ledger-conversion"
-import { useI18nContext } from "@app/i18n/i18n-react"
 import { UsdMoneyAmount } from "@app/types/amounts"
-import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import CustomModal from "../custom-modal/custom-modal"
-
-import { UsdConvertAmountRows } from "./usd-convert-amount-rows"
+import { ConvertToBtcModalUI } from "./convert-to-btc-modal-ui"
 
 type Props = {
   isVisible: boolean
@@ -28,12 +21,6 @@ export const UsdConvertToBtcModal: React.FC<Props> = ({
   usdWalletId,
   btcWalletId,
 }) => {
-  const { LL } = useI18nContext()
-  const {
-    theme: { colors },
-  } = useTheme()
-  const styles = useStyles()
-
   const { execute, loading, errorMessage } = useIntraLedgerConversion({
     onSuccess: toggleModal,
   })
@@ -46,34 +33,13 @@ export const UsdConvertToBtcModal: React.FC<Props> = ({
     })
 
   return (
-    <CustomModal
+    <ConvertToBtcModalUI
       isVisible={isVisible}
       toggleModal={toggleModal}
-      image={<GaloyIcon name="warning" size={80} color={colors.primary} />}
-      title={LL.ConvertDollarToBitcoinModal.title()}
-      titleMaxWidth="100%"
-      body={
-        <>
-          <UsdConvertAmountRows usdWalletBalance={usdWalletBalance} />
-          {errorMessage ? (
-            <View style={styles.errorContainer}>
-              <GaloyErrorBox errorMessage={errorMessage} />
-            </View>
-          ) : null}
-        </>
-      }
-      primaryButtonTitle={LL.ConversionDetailsScreen.transfer()}
-      primaryButtonOnPress={convertBalance}
-      primaryButtonLoading={loading}
-      primaryButtonDisabled={loading}
-      showCloseIconButton={false}
-      dismissable={false}
+      usdWalletBalance={usdWalletBalance}
+      onConvert={convertBalance}
+      loading={loading}
+      errorMessage={errorMessage}
     />
   )
 }
-
-const useStyles = makeStyles(() => ({
-  errorContainer: {
-    marginTop: 16,
-  },
-}))

@@ -24,7 +24,7 @@ import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { AccountType } from "@app/types/wallet"
+import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
@@ -48,7 +48,7 @@ import {
   useDollarBalanceRestricted,
   useDollarBalanceRestrictionSync,
 } from "@app/hooks/use-dollar-balance-restricted"
-import { useStablesatsForcedConversion } from "@app/hooks/use-stablesats-forced-conversion"
+import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
 import {
   useTransferBlocked,
   useTransferBlockedSync,
@@ -189,7 +189,7 @@ export const HomeScreen: React.FC = () => {
 
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
-  const { isSelfCustodial, accountType } = activeWallet
+  const { isSelfCustodial } = activeWallet
   useSelfCustodialNetworkMismatchToast()
   const {
     refreshWallets: refreshSelfCustodialWallets,
@@ -373,10 +373,16 @@ export const HomeScreen: React.FC = () => {
 
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
-  const restrictedUsdWalletBalance = restrictedUsdWallet?.balance ?? 0
+  /** `wallets` resolves per account type, so this balance covers both variants. */
+  const restrictedUsdWalletBalance = getUsdWallet(wallets)?.balance ?? 0
+  /** Memoized so the self-custodial quote does not refire on unrelated re-renders. */
+  const restrictedUsdMoneyAmount = useMemo(
+    () => toUsdMoneyAmount(restrictedUsdWalletBalance),
+    [restrictedUsdWalletBalance],
+  )
 
-  const { isConvertModalVisible, closeConvertModal } = useStablesatsForcedConversion({
-    isRestricted: isDollarBalanceRestricted && accountType === AccountType.Custodial,
+  const { isConvertModalVisible, closeConvertModal } = useDollarBalanceForcedConversion({
+    isRestricted: isDollarBalanceRestricted,
     usdWalletBalance: restrictedUsdWalletBalance,
   })
 
@@ -593,9 +599,16 @@ export const HomeScreen: React.FC = () => {
         <UsdConvertToBtcModal
           isVisible={isConvertModalVisible}
           toggleModal={closeConvertModal}
-          usdWalletBalance={toUsdMoneyAmount(restrictedUsdWalletBalance)}
+          usdWalletBalance={restrictedUsdMoneyAmount}
           usdWalletId={restrictedUsdWallet.id}
           btcWalletId={restrictedBtcWallet.id}
+        />
+      )}
+      {isSelfCustodial && (
+        <StableTokenConvertToBtcModal
+          isVisible={isConvertModalVisible}
+          toggleModal={closeConvertModal}
+          usdWalletBalance={restrictedUsdMoneyAmount}
         />
       )}
       <View style={styles.balanceContainer}>

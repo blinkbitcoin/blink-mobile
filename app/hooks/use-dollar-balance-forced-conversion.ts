@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react"
  * State mirror, not derived: closes on success immediately, before the balance
  * refetches to zero.
  */
-export const useStablesatsForcedConversion = ({
+export const useDollarBalanceForcedConversion = ({
   isRestricted,
   usdWalletBalance,
 }: {

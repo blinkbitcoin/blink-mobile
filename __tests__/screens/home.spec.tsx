@@ -101,8 +101,8 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestrictionSync: () => undefined,
 }))
 
-jest.mock("@app/hooks/use-stablesats-forced-conversion", () => ({
-  useStablesatsForcedConversion: ({
+jest.mock("@app/hooks/use-dollar-balance-forced-conversion", () => ({
+  useDollarBalanceForcedConversion: ({
     isRestricted,
     usdWalletBalance,
   }: {
@@ -144,6 +144,27 @@ jest.mock("@app/components/usd-convert-to-btc-modal", () => {
         ? ReactActual.createElement(
             View,
             { testID: "convert-modal" },
+            ReactActual.createElement(Text, null, String(usdWalletBalance.amount)),
+          )
+        : null,
+  }
+})
+
+jest.mock("@app/screens/conversion-flow", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View, Text } = jest.requireActual("react-native")
+  return {
+    StableTokenConvertToBtcModal: ({
+      isVisible,
+      usdWalletBalance,
+    }: {
+      isVisible: boolean
+      usdWalletBalance: { amount: number }
+    }) =>
+      isVisible
+        ? ReactActual.createElement(
+            View,
+            { testID: "sc-convert-modal" },
             ReactActual.createElement(Text, null, String(usdWalletBalance.amount)),
           )
         : null,
@@ -547,7 +568,7 @@ describe("HomeScreen", () => {
       usdBalance: 5000,
     })
 
-    const { findByTestId, getByText } = render(
+    const { findByTestId, getByText, queryByTestId } = render(
       <ContextForScreen>
         <HomeScreen />
       </ContextForScreen>,
@@ -555,6 +576,7 @@ describe("HomeScreen", () => {
 
     expect(await findByTestId("convert-modal")).toBeTruthy()
     expect(getByText("5000")).toBeTruthy()
+    expect(queryByTestId("sc-convert-modal")).toBeNull()
 
     await flushEffects()
   })
@@ -579,7 +601,7 @@ describe("HomeScreen", () => {
     expect(queryByTestId("convert-modal")).toBeNull()
   })
 
-  it("shows the dollar-balance restriction modal and skips forced conversion for self-custodial", async () => {
+  it("forces the self-custodial conversion when a restricted account holds a stable-token balance", async () => {
     mockDollarBalanceRestrictedOverride = true
     mockActiveWalletOverride = {
       wallets: [
@@ -609,7 +631,53 @@ describe("HomeScreen", () => {
       usdBalance: 5000,
     })
 
-    const { getByTestId, queryByTestId } = render(
+    const { findByTestId, getByTestId, getByText, queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("sc-convert-modal")).toBeTruthy()
+    expect(getByText("5000")).toBeTruthy()
+    expect(queryByTestId("convert-modal")).toBeNull()
+    expect(getByTestId("dollar-balance-restriction-modal")).toBeTruthy()
+
+    await flushEffects()
+
+    mockActiveWalletOverride = null
+  })
+
+  it("does not force the self-custodial conversion without a stable-token balance", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 0, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { queryByTestId } = render(
       <ContextForScreen>
         <HomeScreen />
       </ContextForScreen>,
@@ -617,8 +685,7 @@ describe("HomeScreen", () => {
 
     await flushEffects()
 
-    expect(getByTestId("dollar-balance-restriction-modal")).toBeTruthy()
-    expect(queryByTestId("convert-modal")).toBeNull()
+    expect(queryByTestId("sc-convert-modal")).toBeNull()
 
     mockActiveWalletOverride = null
   })
