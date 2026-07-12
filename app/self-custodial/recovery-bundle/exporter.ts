@@ -31,7 +31,13 @@ import {
   type RecoveryBundle,
 } from "./types"
 
-/** Operator id 0 is the pool coordinator in the Spark SDK's default config. */
+/**
+ * Operator id 0 is the pool coordinator in the Spark SDK's default config.
+ * The public pool coordinator serves every non-local network - the target
+ * network travels in each request (see protoNetworkFor) - so mainnet and
+ * regtest share this URL, same as the spark-unilateral-exit reference
+ * exporter, whose --coordinator override exists only for LOCAL stacks.
+ */
 export const SPARK_COORDINATOR_URL = "https://0.spark.lightspark.com"
 const OPERATOR_SET = "breez-sdk"
 
@@ -42,10 +48,18 @@ const QUERY_NODES_PATH = "/spark.SparkService/query_nodes"
 const PAGE_SIZE = 100
 /** Chain walks converge in one refetch round; the cap only guards operator misbehavior. */
 const MAX_ANCESTOR_REFETCH_ROUNDS = 10
+/**
+ * Upper bound on owner-query pages (200 pages x 100 nodes = 20k nodes, far
+ * beyond any real wallet). Guards the same threat as the ancestor-round cap:
+ * a misbehaving coordinator that keeps returning data must not keep a
+ * background refresh looping forever on a phone.
+ */
+const MAX_OWNER_QUERY_PAGES = 200
 
 export const RecoveryBundleExportErrorReason = {
   NoLeaves: "no-leaves",
   IncompleteChain: "incomplete-chain",
+  PagingLimitExceeded: "paging-limit-exceeded",
 } as const
 
 export type RecoveryBundleExportErrorReason =
@@ -109,7 +123,13 @@ const queryNodesByOwner = async (
   const nodes = new Map<string, DecodedTreeNode>()
   let offset = 0
 
-  for (;;) {
+  for (let page = 0; ; page += 1) {
+    if (page >= MAX_OWNER_QUERY_PAGES) {
+      throw new RecoveryBundleExportError(
+        RecoveryBundleExportErrorReason.PagingLimitExceeded,
+        `Owner query did not terminate within ${MAX_OWNER_QUERY_PAGES} pages`,
+      )
+    }
     const response = decodeQueryNodesResponse(
       await grpcWebUnaryCall({
         baseUrl: context.baseUrl,
@@ -221,26 +241,41 @@ export const fetchRecoveryBundle = async ({
   )
 
   if (leaves.length === 0) {
+    // The identity and status histogram distinguish "wrong account derived a
+    // different wallet" from "wallet genuinely empty" - the known footgun
+    // this error usually means.
+    const statusCounts: Record<string, number> = {}
+    for (const node of nodes.values()) {
+      const status = node.status || String(node.treenodeStatus)
+      statusCounts[status] = (statusCounts[status] ?? 0) + 1
+    }
     throw new RecoveryBundleExportError(
       RecoveryBundleExportErrorReason.NoLeaves,
-      "Spark operators returned no available leaves for this wallet",
+      "Spark operators returned no available leaves for this wallet " +
+        `(identity=${hexEncode(keyPair.publicKey)}, queriedNodes=${nodes.size}, ` +
+        `statuses=${JSON.stringify(statusCounts)})`,
     )
   }
 
   // The bulk owner query can omit tree roots on legacy mainnet trees; by-id
   // queries do not, so re-fetch missing ancestors until every chain closes.
+  // A round may itself be truncated by the response limit, so keep looping
+  // while rounds make progress and only fail when one resolves nothing.
   for (let round = 0; round < MAX_ANCESTOR_REFETCH_ROUNDS; round += 1) {
     const missing = findMissingAncestors(leaves, nodes)
     if (missing.length === 0) break
     const fetched = await queryNodesByIds(context, missing)
-    const stillMissing = missing.filter((id) => !fetched.has(id))
-    if (stillMissing.length > 0) {
+    let progressed = false
+    for (const [id, node] of fetched) {
+      if (!nodes.has(id)) progressed = true
+      nodes.set(id, node)
+    }
+    if (!progressed) {
       throw new RecoveryBundleExportError(
         RecoveryBundleExportErrorReason.IncompleteChain,
-        `Exit chain incomplete: ancestors not returned by operators: ${stillMissing.join(", ")}`,
+        `Exit chain incomplete: ancestors not returned by operators: ${missing.join(", ")}`,
       )
     }
-    for (const [id, node] of fetched) nodes.set(id, node)
   }
 
   const unresolved = findMissingAncestors(leaves, nodes)

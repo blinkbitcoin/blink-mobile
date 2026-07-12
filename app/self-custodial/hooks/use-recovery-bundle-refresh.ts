@@ -12,11 +12,12 @@ import {
   RecoveryBundleExportErrorReason,
 } from "../recovery-bundle/exporter"
 import {
+  isBundleFresh,
   refreshRecoveryBundle,
   syncExistingBundleToCloud,
 } from "../recovery-bundle/refresh"
 import { readRecoveryBundleState } from "../recovery-bundle/storage"
-import { BackupMethod, BackupStatus, useBackupState } from "../providers/backup-state"
+import { isCloudSeedBackupCompleted, useBackupState } from "../providers/backup-state"
 import { useSelfCustodialWallet } from "../providers/wallet"
 
 import { useSparkNetwork } from "./use-spark-network"
@@ -37,9 +38,9 @@ const isBenignExportError = (error: unknown): boolean =>
 /**
  * Keeps the unilateral-exit recovery bundle fresh: refreshes it after every
  * send/receive (the SDK's PaymentSucceeded fires for both directions) and on
- * startup when the saved bundle is stale or missing. Errors are logged, never
- * surfaced - the Recovery Backup screen shows freshness and offers a manual
- * refresh.
+ * startup when the saved bundle is stale or missing. Errors are recorded to
+ * crashlytics, never surfaced - the Recovery Backup screen shows freshness
+ * and offers a manual refresh.
  */
 export const useRecoveryBundleRefresh = (): void => {
   const { activeAccount } = useAccountRegistry()
@@ -48,15 +49,29 @@ export const useRecoveryBundleRefresh = (): void => {
   const network = useSparkNetwork()
   const { status, lastReceivedPaymentId } = useSelfCustodialWallet()
   const { backupState } = useBackupState()
-  const cloudSeedBackupActive =
-    backupState.status === BackupStatus.Completed &&
-    backupState.method === BackupMethod.Cloud
+  const cloudSeedBackupActive = isCloudSeedBackupCompleted(backupState)
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lastHandledPaymentIdRef = useRef<string | null>(null)
 
   const walletReady =
     status === ActiveWalletStatus.Ready || status === ActiveWalletStatus.Degraded
+
+  // A pending timer closes over the previous account's id, network, and
+  // mnemonic lookup, so it must not survive an account or network switch -
+  // and the payment-id dedupe must restart, since payment ids are
+  // per-account. Clearing on a network-only change also lets the new
+  // network's startup-staleness check run instead of being suppressed by the
+  // old timer's non-null ref.
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
+      lastHandledPaymentIdRef.current = null
+    }
+  }, [accountId, network])
 
   useEffect(() => {
     if (!accountId) return undefined
@@ -74,10 +89,14 @@ export const useRecoveryBundleRefresh = (): void => {
       })
       if (result.success) {
         crashlytics().log(`[recovery-bundle] refreshed: ${result.state.leafCount} leaves`)
-      } else if (!isBenignExportError(result.error)) {
-        const message =
-          result.error instanceof Error ? result.error.message : String(result.error)
-        crashlytics().log(`[recovery-bundle] refresh failed: ${message}`)
+      } else if (isBenignExportError(result.error)) {
+        crashlytics().log("[recovery-bundle] refresh skipped: empty wallet")
+      } else {
+        // recordError, not a breadcrumb: background failures are otherwise
+        // invisible until the user happens to open the Recovery Backup screen.
+        const wrapped =
+          result.error instanceof Error ? result.error : new Error(String(result.error))
+        crashlytics().recordError(wrapped, "recovery-bundle-refresh")
       }
     }
 
@@ -86,7 +105,10 @@ export const useRecoveryBundleRefresh = (): void => {
       timerRef.current = setTimeout(() => {
         timerRef.current = null
         runRefresh().catch((err) => {
-          crashlytics().log(`[recovery-bundle] refresh error: ${err}`)
+          crashlytics().recordError(
+            err instanceof Error ? err : new Error(String(err)),
+            "recovery-bundle-refresh",
+          )
         })
       }, delayMs)
     }
@@ -104,12 +126,14 @@ export const useRecoveryBundleRefresh = (): void => {
 
     // Startup/staleness: no bundle yet, or last save older than the threshold
     if (walletReady && !timerRef.current) {
-      readRecoveryBundleState(currentAccountId)
+      readRecoveryBundleState(currentAccountId, network)
         .then((state) => {
-          if (state && Date.now() - state.savedAt < STALE_AFTER_MS) return
+          if (isBundleFresh(state, Date.now(), STALE_AFTER_MS)) return
           schedule(STARTUP_DELAY_MS)
         })
-        .catch(() => {})
+        .catch((err) => {
+          crashlytics().log(`[recovery-bundle] state read failed: ${err}`)
+        })
     }
 
     return undefined
@@ -123,7 +147,7 @@ export const useRecoveryBundleRefresh = (): void => {
     let cancelled = false
     const currentAccountId = accountId
 
-    readRecoveryBundleState(currentAccountId)
+    readRecoveryBundleState(currentAccountId, network)
       .then(async (state) => {
         if (cancelled || !state || state.cloudSyncedAt) return
         await syncExistingBundleToCloud(currentAccountId, network)
@@ -137,7 +161,7 @@ export const useRecoveryBundleRefresh = (): void => {
     }
   }, [accountId, network, cloudSeedBackupActive])
 
-  // Cancel pending work when the account disconnects or the app unmounts
+  // Cancel pending work while the wallet is not ready and on unmount
   useEffect(() => {
     if (accountId && walletReady) return undefined
     if (timerRef.current) {

@@ -11,8 +11,10 @@
  */
 
 import { type Network } from "@breeztech/breez-sdk-spark-react-native"
+import crashlytics from "@react-native-firebase/crashlytics"
 
-import { BackupMethod, BackupStatus, readBackupStateFor } from "../providers/backup-state"
+import { networkLabelFor } from "../config"
+import { isCloudSeedBackupCompleted, readBackupStateFor } from "../providers/backup-state"
 
 import { attemptSilentCloudUpload, getRecoveryBundleFilename } from "./cloud"
 import { buildEncryptedBundlePayload, parseBundleBackupMetadata } from "./encryption"
@@ -36,12 +38,30 @@ export type RefreshBundleResult =
   | { success: true; state: RecoveryBundleState }
   | { success: false; error: unknown }
 
-const isCloudSeedBackupActive = async (accountId: string): Promise<boolean> => {
-  const backupState = await readBackupStateFor(accountId)
-  return (
-    backupState?.status === BackupStatus.Completed &&
-    backupState.method === BackupMethod.Cloud
-  )
+/** True when a saved bundle exists and is younger than maxAgeMs. Pure so the
+ * staleness policy is testable without timers or hooks. */
+export const isBundleFresh = (
+  state: RecoveryBundleState | null,
+  now: number,
+  maxAgeMs: number,
+): boolean => state !== null && now - state.savedAt < maxAgeMs
+
+/**
+ * Stamps the last successful cloud upload. Shared by the silent sync below
+ * and the screen's interactive upload so both paths stamp identically.
+ * (runRefresh also carries the previous stamp forward in its own write, so a
+ * stamp landing between its read and write can be reverted until the next
+ * successful sync - UI-freshness only, self-healing.)
+ */
+export const markCloudSynced = async (
+  accountId: string,
+  network: Network,
+): Promise<RecoveryBundleState | null> => {
+  const state = await readRecoveryBundleState(accountId, network)
+  if (!state) return null
+  const next = { ...state, cloudSyncedAt: Date.now() }
+  await writeRecoveryBundleState(accountId, network, next)
+  return next
 }
 
 /**
@@ -54,23 +74,31 @@ export const syncExistingBundleToCloud = async (
   accountId: string,
   network: Network,
 ): Promise<boolean> => {
-  if (!(await isCloudSeedBackupActive(accountId))) return false
+  const backupState = await readBackupStateFor(accountId)
+  if (!isCloudSeedBackupCompleted(backupState)) return false
 
   const payload = await loadEncryptedBundleFile(accountId, network)
   if (!payload) return false
   const metadata = parseBundleBackupMetadata(payload)
-  if (!metadata) return false
+  if (!metadata) {
+    // A saved file that no longer parses means on-disk corruption, not an
+    // expected state - record it, the refresh path will rewrite the file.
+    crashlytics().recordError(
+      new Error("[recovery-bundle] saved bundle payload failed to parse"),
+    )
+    return false
+  }
 
   const upload = await attemptSilentCloudUpload(
     payload,
     getRecoveryBundleFilename(metadata.network, metadata.walletIdentityPublicKey),
   )
-  if (!upload.success) return false
-
-  const state = await readRecoveryBundleState(accountId)
-  if (state) {
-    await writeRecoveryBundleState(accountId, { ...state, cloudSyncedAt: Date.now() })
+  if (!upload.success) {
+    crashlytics().log(`[recovery-bundle] silent cloud upload failed: ${upload.reason}`)
+    return false
   }
+
+  await markCloudSynced(accountId, network)
   return true
 }
 
@@ -87,7 +115,7 @@ const runRefresh = async ({
     const payload = buildEncryptedBundlePayload(bundle, mnemonic)
     await saveEncryptedBundleFile(accountId, network, payload)
 
-    const previous = await readRecoveryBundleState(accountId)
+    const previous = await readRecoveryBundleState(accountId, network)
     const state: RecoveryBundleState = {
       savedAt: Date.now(),
       bundleCreatedAt: bundle.createdAt,
@@ -95,11 +123,11 @@ const runRefresh = async ({
       totalSats: bundle.balances.btcSats,
       cloudSyncedAt: previous?.cloudSyncedAt ?? null,
     }
-    await writeRecoveryBundleState(accountId, state)
+    await writeRecoveryBundleState(accountId, network, state)
 
     await syncExistingBundleToCloud(accountId, network)
 
-    const finalState = (await readRecoveryBundleState(accountId)) ?? state
+    const finalState = (await readRecoveryBundleState(accountId, network)) ?? state
     return { success: true, state: finalState }
   } catch (error) {
     return { success: false, error }
@@ -109,12 +137,16 @@ const runRefresh = async ({
 export const refreshRecoveryBundle = (
   params: RefreshBundleParams,
 ): Promise<RefreshBundleResult> => {
-  const existing = inFlight.get(params.accountId)
+  // Keyed per (account, network) like the storage: a refresh started on one
+  // network must not be handed to a caller on the other after an instance
+  // switch.
+  const key = `${params.accountId}:${networkLabelFor(params.network)}`
+  const existing = inFlight.get(key)
   if (existing) return existing
 
   const run = runRefresh(params).finally(() => {
-    inFlight.delete(params.accountId)
+    inFlight.delete(key)
   })
-  inFlight.set(params.accountId, run)
+  inFlight.set(key, run)
   return run
 }

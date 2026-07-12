@@ -81,6 +81,14 @@ export const readBackupStateFor = async (
   accountId: string,
 ): Promise<BackupState | null> => readBackupState(backupStateKeyFor(accountId))
 
+/**
+ * Single definition of "the seed is backed up to the cloud" - the gate the
+ * recovery-bundle cloud sync follows. Screen, refresh hook, and refresh core
+ * all use this so they cannot diverge on it.
+ */
+export const isCloudSeedBackupCompleted = (state: BackupState | null): boolean =>
+  state?.status === BackupStatus.Completed && state.method === BackupMethod.Cloud
+
 export const markBackupCompletedFor = async (
   accountId: string,
   method: BackupMethod,

@@ -47,8 +47,11 @@ export const deleteRecoveryBundleFile = async (
 
 const RECOVERY_BUNDLE_STATE_KEY_PREFIX = "recoveryBundleState"
 
-const stateKeyFor = (accountId: string): string =>
-  `${RECOVERY_BUNDLE_STATE_KEY_PREFIX}:${accountId}`
+// Keyed per (account, network) to mirror the bundle file: after a mainnet <->
+// regtest instance switch the UI must not show the other network's freshness
+// or suppress the staleness refresh with the wrong network's timestamp.
+const stateKeyFor = (accountId: string, network: Network): string =>
+  `${RECOVERY_BUNDLE_STATE_KEY_PREFIX}:${networkLabelFor(network)}:${accountId}`
 
 export type RecoveryBundleState = {
   /** Unix ms of the last successful fetch+save. */
@@ -63,12 +66,19 @@ export type RecoveryBundleState = {
 
 export const readRecoveryBundleState = async (
   accountId: string,
+  network: Network,
 ): Promise<RecoveryBundleState | null> => {
-  const raw = await AsyncStorage.getItem(stateKeyFor(accountId))
+  const raw = await AsyncStorage.getItem(stateKeyFor(accountId, network))
   if (!raw) return null
   try {
     const parsed = JSON.parse(raw)
-    if (typeof parsed?.savedAt !== "number") return null
+    if (
+      typeof parsed?.savedAt !== "number" ||
+      typeof parsed?.leafCount !== "number" ||
+      typeof parsed?.totalSats !== "string"
+    ) {
+      return null
+    }
     return parsed as RecoveryBundleState
   } catch {
     return null
@@ -77,11 +87,15 @@ export const readRecoveryBundleState = async (
 
 export const writeRecoveryBundleState = async (
   accountId: string,
+  network: Network,
   state: RecoveryBundleState,
 ): Promise<void> => {
-  await AsyncStorage.setItem(stateKeyFor(accountId), JSON.stringify(state))
+  await AsyncStorage.setItem(stateKeyFor(accountId, network), JSON.stringify(state))
 }
 
-export const removeRecoveryBundleState = async (accountId: string): Promise<void> => {
-  await AsyncStorage.removeItem(stateKeyFor(accountId))
+export const removeRecoveryBundleState = async (
+  accountId: string,
+  network: Network,
+): Promise<void> => {
+  await AsyncStorage.removeItem(stateKeyFor(accountId, network))
 }

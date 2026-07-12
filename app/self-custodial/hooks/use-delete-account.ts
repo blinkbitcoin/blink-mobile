@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react"
 
+import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 import RNFS from "react-native-fs"
 
@@ -88,14 +89,18 @@ export const useDeleteAccount = (): DeleteAccountResult => {
         await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
           crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)
         })
-        // Best-effort: leftover recovery-bundle files must not block deletion
-        await deleteRecoveryBundleFile(accountId, network)
-          .then(() => removeRecoveryBundleState(accountId))
-          .catch((err) => {
-            crashlytics().log(
-              `[self-custodial delete] recovery bundle cleanup failed: ${err}`,
-            )
-          })
+        // Best-effort: leftover recovery-bundle files must not block deletion.
+        // Both networks are swept - the account may have been used on the
+        // other network under a different galoy instance.
+        for (const bundleNetwork of [Network.Mainnet, Network.Regtest]) {
+          await deleteRecoveryBundleFile(accountId, bundleNetwork)
+            .then(() => removeRecoveryBundleState(accountId, bundleNetwork))
+            .catch((err) => {
+              crashlytics().log(
+                `[self-custodial delete] recovery bundle cleanup failed: ${err}`,
+              )
+            })
+        }
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)
         await reloadSelfCustodialAccounts()
