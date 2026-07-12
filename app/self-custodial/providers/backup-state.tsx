@@ -76,6 +76,11 @@ export const removeBackupStateFor = async (accountId: string): Promise<void> => 
   await AsyncStorage.removeItem(backupStateKeyFor(accountId))
 }
 
+/** Non-hook read for code that runs outside the provider (e.g. bundle sync). */
+export const readBackupStateFor = async (
+  accountId: string,
+): Promise<BackupState | null> => readBackupState(backupStateKeyFor(accountId))
+
 export const markBackupCompletedFor = async (
   accountId: string,
   method: BackupMethod,
