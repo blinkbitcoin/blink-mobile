@@ -149,7 +149,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
       toastShow({ message: LL.RecoveryBundleScreen.exportFailed(), LL })
       return null
     }
-    const bundle = decryptBundleBackupPayload(payload, mnemonic)
+    const bundle = await decryptBundleBackupPayload(payload, mnemonic)
     return JSON.stringify(bundle, null, 2)
   }
 

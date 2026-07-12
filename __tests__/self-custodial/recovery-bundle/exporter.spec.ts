@@ -203,12 +203,14 @@ describe("findMissingAncestors", () => {
 })
 
 describe("fetchRecoveryBundle", () => {
-  const owner = () =>
-    Uint8Array.from(deriveIdentityKeyPair(TEST_MNEMONIC, Network.Mainnet).publicKey)
+  let identity: Uint8Array
+  beforeAll(async () => {
+    const keyPair = await deriveIdentityKeyPair(TEST_MNEMONIC, Network.Mainnet)
+    identity = Uint8Array.from(keyPair.publicKey)
+  })
   const otherOwner = Uint8Array.from(Buffer.alloc(33, 0x03))
 
   it("assembles a bundle, re-fetching the root omitted by the owner query", async () => {
-    const identity = owner()
     const leaf: TestNode = {
       id: "leaf-1",
       valueSats: 32768,
@@ -260,7 +262,6 @@ describe("fetchRecoveryBundle", () => {
   })
 
   it("refuses to build a bundle with an open exit chain", async () => {
-    const identity = owner()
     const leaf: TestNode = {
       id: "leaf-1",
       valueSats: 1000,
@@ -292,7 +293,6 @@ describe("fetchRecoveryBundle", () => {
   })
 
   it("excludes leaves owned by other identities", async () => {
-    const identity = owner()
     const mine: TestNode = {
       id: "leaf-mine",
       valueSats: 100,
@@ -317,7 +317,6 @@ describe("fetchRecoveryBundle", () => {
   })
 
   it("excludes own leaves that are not AVAILABLE", async () => {
-    const identity = owner()
     const available: TestNode = {
       id: "leaf-available",
       valueSats: 700,
@@ -342,7 +341,6 @@ describe("fetchRecoveryBundle", () => {
   })
 
   it("accepts leaves signalled by only the legacy status string or only the status enum", async () => {
-    const identity = owner()
     // Carries "AVAILABLE" in field 11 only; field 19 is absent and decodes
     // to 0, which is NOT TREE_NODE_STATUS_AVAILABLE.
     const stringOnly: TestNode = {
@@ -378,7 +376,6 @@ describe("fetchRecoveryBundle", () => {
   })
 
   it("pages through the owner query until the operator returns offset 0", async () => {
-    const identity = owner()
     const pageOneLeaf: TestNode = {
       id: "leaf-page-1",
       valueSats: 100,
@@ -413,7 +410,6 @@ describe("fetchRecoveryBundle", () => {
   })
 
   it("rejects when a hostile operator never terminates the owner query", async () => {
-    const identity = owner()
     const leaf: TestNode = {
       id: "leaf-endless",
       valueSats: 1,
@@ -436,7 +432,6 @@ describe("fetchRecoveryBundle", () => {
   })
 
   it("resolves ancestors that themselves need a second by-id round", async () => {
-    const identity = owner()
     const leaf: TestNode = {
       id: "leaf-1",
       valueSats: 4096,
@@ -477,7 +472,6 @@ describe("fetchRecoveryBundle", () => {
   })
 
   it("tolerates a truncated by-id round and completes on the next one", async () => {
-    const identity = owner()
     const leafA: TestNode = {
       id: "leaf-a",
       valueSats: 100,

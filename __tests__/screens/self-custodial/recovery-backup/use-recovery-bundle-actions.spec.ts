@@ -155,7 +155,7 @@ describe("useRecoveryBundleActions", () => {
     mockGetMnemonicForAccount.mockResolvedValue("test mnemonic words")
     mockReadRecoveryBundleState.mockResolvedValue(savedState)
     mockLoadEncryptedBundleFile.mockResolvedValue("encrypted-payload")
-    mockDecryptBundleBackupPayload.mockReturnValue({ schema: 1, leaves: [] })
+    mockDecryptBundleBackupPayload.mockResolvedValue({ schema: 1, leaves: [] })
     // The metadata network deliberately differs from the mocked active network
     // (regtest): the interactive-upload filename must be built from the saved
     // bundle's metadata, not from whatever network the app is currently on.
@@ -421,7 +421,7 @@ describe("useRecoveryBundleActions", () => {
     })
 
     it("copies the decrypted bundle JSON to the clipboard", async () => {
-      mockDecryptBundleBackupPayload.mockReturnValue({ schema: 1, leafCount: 3 })
+      mockDecryptBundleBackupPayload.mockResolvedValue({ schema: 1, leafCount: 3 })
       const { result } = renderHook(() => useRecoveryBundleActions())
 
       await act(async () => {

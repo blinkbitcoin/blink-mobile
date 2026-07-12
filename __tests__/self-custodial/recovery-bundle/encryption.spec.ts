@@ -50,13 +50,15 @@ const bundle: RecoveryBundle = {
 }
 
 describe("recovery bundle encrypted payload", () => {
-  it("roundtrips encrypt/decrypt with the seed-derived key", () => {
-    const payload = buildEncryptedBundlePayload(bundle, TEST_MNEMONIC)
-    expect(decryptBundleBackupPayload(payload, TEST_MNEMONIC)).toEqual(bundle)
+  it("roundtrips encrypt/decrypt with the seed-derived key", async () => {
+    const payload = await buildEncryptedBundlePayload(bundle, TEST_MNEMONIC)
+    await expect(decryptBundleBackupPayload(payload, TEST_MNEMONIC)).resolves.toEqual(
+      bundle,
+    )
   })
 
-  it("keeps only non-sensitive metadata in plaintext", () => {
-    const payload = buildEncryptedBundlePayload(bundle, TEST_MNEMONIC)
+  it("keeps only non-sensitive metadata in plaintext", async () => {
+    const payload = await buildEncryptedBundlePayload(bundle, TEST_MNEMONIC)
     expect(payload).not.toContain("deadbeef")
     expect(payload).not.toContain("32768")
 
@@ -68,19 +70,33 @@ describe("recovery bundle encrypted payload", () => {
     })
   })
 
-  it("fails to decrypt with a different seed", () => {
-    const payload = buildEncryptedBundlePayload(bundle, TEST_MNEMONIC)
+  it("fails to decrypt with a different seed", async () => {
+    const payload = await buildEncryptedBundlePayload(bundle, TEST_MNEMONIC)
     const otherMnemonic =
       "youth indicate void nation bundle execute ritual artwork harvest genuine plunge captain"
-    expect(() => decryptBundleBackupPayload(payload, otherMnemonic)).toThrow(
+    await expect(decryptBundleBackupPayload(payload, otherMnemonic)).rejects.toThrow(
       RecoveryBundlePayloadError,
     )
   })
 
-  it("rejects payloads with an unknown schema", () => {
-    expect(() =>
+  it("rejects payloads with an unknown schema", async () => {
+    await expect(
       decryptBundleBackupPayload(JSON.stringify({ schema: "other" }), TEST_MNEMONIC),
-    ).toThrow(/Unsupported/)
+    ).rejects.toThrow(/Unsupported/)
+  })
+
+  it("rejects a payload whose plaintext envelope disagrees with the encrypted bundle", async () => {
+    const payload = await buildEncryptedBundlePayload(bundle, TEST_MNEMONIC)
+    const tampered = JSON.parse(payload)
+    // The encrypted bundle still says MAINNET; only the plaintext envelope lies.
+    tampered.network = "REGTEST"
+
+    await expect(
+      decryptBundleBackupPayload(JSON.stringify(tampered), TEST_MNEMONIC),
+    ).rejects.toMatchObject({
+      name: "RecoveryBundlePayloadError",
+      reason: "envelope-mismatch",
+    })
   })
 
   it("returns null metadata for non-bundle JSON", () => {

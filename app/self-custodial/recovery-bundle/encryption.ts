@@ -48,6 +48,7 @@ export const RecoveryBundlePayloadErrorReason = {
   InvalidPayload: "invalid-payload",
   UnsupportedSchema: "unsupported-schema",
   DecryptFailed: "decrypt-failed",
+  EnvelopeMismatch: "envelope-mismatch",
 } as const
 
 export type RecoveryBundlePayloadErrorReason =
@@ -63,11 +64,11 @@ export class RecoveryBundlePayloadError extends Error {
   }
 }
 
-export const buildEncryptedBundlePayload = (
+export const buildEncryptedBundlePayload = async (
   bundle: RecoveryBundle,
   mnemonic: string,
-): string => {
-  const key = deriveBundleEncryptionKeyHex(mnemonic)
+): Promise<string> => {
+  const key = await deriveBundleEncryptionKeyHex(mnemonic)
   const { data, iv } = encryptAesGcm(JSON.stringify(bundle), key, {
     ivLength: GCM_IV_LENGTH,
   })
@@ -110,10 +111,10 @@ export const parseBundleBackupMetadata = (
   }
 }
 
-export const decryptBundleBackupPayload = (
+export const decryptBundleBackupPayload = async (
   raw: string,
   mnemonic: string,
-): RecoveryBundle => {
+): Promise<RecoveryBundle> => {
   let parsed: Partial<RecoveryBundleBackupPayload>
   try {
     parsed = JSON.parse(raw)
@@ -137,7 +138,7 @@ export const decryptBundleBackupPayload = (
     )
   }
 
-  const key = deriveBundleEncryptionKeyHex(mnemonic)
+  const key = await deriveBundleEncryptionKeyHex(mnemonic)
   let plaintext: string
   try {
     plaintext = decryptAesGcm({ data: parsed.data, key, iv: parsed.iv })
@@ -153,6 +154,21 @@ export const decryptBundleBackupPayload = (
     throw new RecoveryBundlePayloadError(
       RecoveryBundlePayloadErrorReason.UnsupportedSchema,
       `Decrypted payload has unexpected bundle schema: ${String(bundle.schema)}`,
+    )
+  }
+
+  // The envelope fields are plaintext and not AEAD-bound (the shared AES-GCM
+  // util has no AAD support yet), so cross-check them against the
+  // authenticated bundle contents: a tampered envelope must not go unnoticed
+  // by anything that actually uses the bundle.
+  if (
+    parsed.network !== bundle.network ||
+    parsed.walletIdentityPublicKey !== bundle.walletIdentityPublicKey ||
+    parsed.bundleCreatedAt !== bundle.createdAt
+  ) {
+    throw new RecoveryBundlePayloadError(
+      RecoveryBundlePayloadErrorReason.EnvelopeMismatch,
+      "Envelope metadata does not match the encrypted bundle contents",
     )
   }
   return bundle

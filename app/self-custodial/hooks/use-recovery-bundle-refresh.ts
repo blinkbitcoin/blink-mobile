@@ -74,7 +74,18 @@ export const useRecoveryBundleRefresh = (): void => {
   }, [accountId, network])
 
   useEffect(() => {
-    if (!accountId) return undefined
+    // No account, or the wallet dropped out of Ready: a pending refresh would
+    // run against a signed-out account or a disconnected SDK, so cancel it
+    // and wait for the next Ready render. Handling this here keeps the
+    // scheduler the only effect that manages the timer besides the
+    // identity-change cleanup above.
+    if (!accountId || !walletReady) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
+      return undefined
+    }
     const currentAccountId = accountId
 
     const runRefresh = async () => {
@@ -115,7 +126,6 @@ export const useRecoveryBundleRefresh = (): void => {
 
     // Event-driven: a payment completed or was claimed
     if (
-      walletReady &&
       lastReceivedPaymentId &&
       lastReceivedPaymentId !== lastHandledPaymentIdRef.current
     ) {
@@ -125,15 +135,23 @@ export const useRecoveryBundleRefresh = (): void => {
     }
 
     // Startup/staleness: no bundle yet, or last save older than the threshold
-    if (walletReady && !timerRef.current) {
+    if (!timerRef.current) {
+      // The read can settle after this render is gone (account switched or
+      // wallet no longer Ready); without the guard it would arm a timer for
+      // the old closure that nothing then cancels.
+      let cancelled = false
       readRecoveryBundleState(currentAccountId, network)
         .then((state) => {
+          if (cancelled) return
           if (isBundleFresh(state, Date.now(), STALE_AFTER_MS)) return
           schedule(STARTUP_DELAY_MS)
         })
         .catch((err) => {
           crashlytics().log(`[recovery-bundle] state read failed: ${err}`)
         })
+      return () => {
+        cancelled = true
+      }
     }
 
     return undefined
@@ -160,16 +178,4 @@ export const useRecoveryBundleRefresh = (): void => {
       cancelled = true
     }
   }, [accountId, network, cloudSeedBackupActive])
-
-  // Cancel pending work while the wallet is not ready and on unmount
-  useEffect(() => {
-    if (accountId && walletReady) return undefined
-    if (timerRef.current) {
-      clearTimeout(timerRef.current)
-      timerRef.current = null
-    }
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
-    }
-  }, [accountId, walletReady])
 }

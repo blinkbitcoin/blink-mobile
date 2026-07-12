@@ -28,7 +28,7 @@ jest.mock("@app/self-custodial/recovery-bundle/cloud", () => ({
 }))
 
 jest.mock("@app/self-custodial/recovery-bundle/encryption", () => ({
-  buildEncryptedBundlePayload: (bundle: { walletIdentityPublicKey: string }) =>
+  buildEncryptedBundlePayload: async (bundle: { walletIdentityPublicKey: string }) =>
     JSON.stringify({
       network: "MAINNET",
       walletIdentityPublicKey: bundle.walletIdentityPublicKey,

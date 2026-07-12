@@ -12,7 +12,7 @@
 
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import * as secp256k1 from "@bitcoinerlab/secp256k1"
-import { mnemonicToSeedSync } from "bip39"
+import { mnemonicToSeed } from "bip39"
 import Crypto from "react-native-quick-crypto"
 
 const SPARK_PURPOSE = 8797555
@@ -54,12 +54,15 @@ const deriveHardenedChild = (parent: ExtendedKey, index: number): ExtendedKey =>
   return { privateKey: Uint8Array.from(childKey), chainCode: digest.slice(32) }
 }
 
-export const deriveIdentityKeyPair = (
+// bip39's PBKDF2 is pure JS (noble); the async variant yields between blocks
+// instead of freezing the JS thread for the 2048 rounds (100-300ms on low-end
+// devices), which matters for the background refresh after every payment.
+export const deriveIdentityKeyPair = async (
   mnemonic: string,
   network: Network,
   accountNumber?: number,
-): IdentityKeyPair => {
-  const seed = Uint8Array.from(mnemonicToSeedSync(mnemonic))
+): Promise<IdentityKeyPair> => {
+  const seed = Uint8Array.from(await mnemonicToSeed(mnemonic))
   const account = accountNumber ?? defaultAccountNumber(network)
 
   let key = masterKeyFromSeed(seed)
@@ -79,8 +82,8 @@ export const deriveIdentityKeyPair = (
  */
 export const RECOVERY_BUNDLE_ENCRYPTION_CONTEXT = "blink:recovery-bundle:aes-128-gcm:v1"
 
-export const deriveBundleEncryptionKeyHex = (mnemonic: string): string => {
-  const seed = Uint8Array.from(mnemonicToSeedSync(mnemonic))
+export const deriveBundleEncryptionKeyHex = async (mnemonic: string): Promise<string> => {
+  const seed = Uint8Array.from(await mnemonicToSeed(mnemonic))
   const digest = Uint8Array.from(
     Crypto.createHmac("sha256", seed)
       .update(Uint8Array.from(Buffer.from(RECOVERY_BUNDLE_ENCRYPTION_CONTEXT, "utf8")))

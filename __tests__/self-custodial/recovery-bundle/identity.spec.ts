@@ -51,26 +51,26 @@ describe("spark identity derivation", () => {
     expect(defaultAccountNumber(Network.Regtest)).toBe(0)
   })
 
-  it("derives the mainnet identity key at m/8797555'/1'/0'", () => {
-    const keyPair = deriveIdentityKeyPair(TEST_MNEMONIC, Network.Mainnet)
+  it("derives the mainnet identity key at m/8797555'/1'/0'", async () => {
+    const keyPair = await deriveIdentityKeyPair(TEST_MNEMONIC, Network.Mainnet)
     expect(Buffer.from(keyPair.privateKey).toString("hex")).toBe(MAINNET_IDENTITY_PRIV)
     expect(Buffer.from(keyPair.publicKey).toString("hex")).toBe(MAINNET_IDENTITY_PUB)
   })
 
-  it("derives the regtest identity key at m/8797555'/0'/0'", () => {
-    const keyPair = deriveIdentityKeyPair(TEST_MNEMONIC, Network.Regtest)
+  it("derives the regtest identity key at m/8797555'/0'/0'", async () => {
+    const keyPair = await deriveIdentityKeyPair(TEST_MNEMONIC, Network.Regtest)
     expect(Buffer.from(keyPair.publicKey).toString("hex")).toBe(REGTEST_IDENTITY_PUB)
   })
 
-  it("respects an explicit account number override", () => {
-    const withOverride = deriveIdentityKeyPair(TEST_MNEMONIC, Network.Regtest, 1)
+  it("respects an explicit account number override", async () => {
+    const withOverride = await deriveIdentityKeyPair(TEST_MNEMONIC, Network.Regtest, 1)
     expect(Buffer.from(withOverride.publicKey).toString("hex")).toBe(MAINNET_IDENTITY_PUB)
   })
 })
 
 describe("challenge signing", () => {
-  it("produces a DER-encoded ECDSA signature over sha256(message) that verifies", () => {
-    const keyPair = deriveIdentityKeyPair(TEST_MNEMONIC, Network.Mainnet)
+  it("produces a DER-encoded ECDSA signature over sha256(message) that verifies", async () => {
+    const keyPair = await deriveIdentityKeyPair(TEST_MNEMONIC, Network.Mainnet)
     const message = Uint8Array.from(Buffer.from("challenge-bytes", "utf8"))
 
     const der = signChallenge(message, keyPair.privateKey)
@@ -115,14 +115,14 @@ describe("challenge signing", () => {
 })
 
 describe("bundle encryption key derivation", () => {
-  it("is deterministic and produces a 16-byte hex key", () => {
-    const key1 = deriveBundleEncryptionKeyHex(TEST_MNEMONIC)
-    const key2 = deriveBundleEncryptionKeyHex(TEST_MNEMONIC)
+  it("is deterministic and produces a 16-byte hex key", async () => {
+    const key1 = await deriveBundleEncryptionKeyHex(TEST_MNEMONIC)
+    const key2 = await deriveBundleEncryptionKeyHex(TEST_MNEMONIC)
     expect(key1).toBe(key2)
     expect(key1).toMatch(/^[0-9a-f]{32}$/)
   })
 
-  it("matches the documented derivation: HMAC-SHA256(seed, context) first 16 bytes", () => {
+  it("matches the documented derivation: HMAC-SHA256(seed, context) first 16 bytes", async () => {
     const seed = nodeCrypto.pbkdf2Sync(
       TEST_MNEMONIC.normalize("NFKD"),
       "mnemonic",
@@ -136,6 +136,6 @@ describe("bundle encryption key derivation", () => {
       .digest()
       .subarray(0, 16)
       .toString("hex")
-    expect(deriveBundleEncryptionKeyHex(TEST_MNEMONIC)).toBe(expected)
+    expect(await deriveBundleEncryptionKeyHex(TEST_MNEMONIC)).toBe(expected)
   })
 })

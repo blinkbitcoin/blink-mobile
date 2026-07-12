@@ -203,6 +203,27 @@ describe("useRecoveryBundleRefresh", () => {
       await advance(PAYMENT_DEBOUNCE_MS)
       expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
     })
+
+    it("cancels a pending refresh when the wallet drops out of Ready before the deadline", async () => {
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+      const { rerender } = renderHook(() => useRecoveryBundleRefresh())
+
+      // The 15s debounce timer is pending but has not fired yet.
+      await advance(PAYMENT_DEBOUNCE_MS - 5_000)
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+
+      // Wallet leaves Ready before the deadline: the pending timer must be
+      // cleared, and nothing may be scheduled while not ready.
+      setWallet(ActiveWalletStatus.Loading, "payment-1")
+      rerender(undefined)
+      await flushMicrotasks()
+
+      await advance(PAYMENT_DEBOUNCE_MS + STARTUP_DELAY_MS)
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+      // The startup-staleness path is gated on walletReady too: the not-ready
+      // render must not even read the saved bundle state to schedule from it.
+      expect(mockReadRecoveryBundleState).not.toHaveBeenCalled()
+    })
   })
 
   describe("startup staleness refresh", () => {

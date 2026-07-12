@@ -112,7 +112,7 @@ const runRefresh = async ({
 }: RefreshBundleParams): Promise<RefreshBundleResult> => {
   try {
     const bundle = await fetchRecoveryBundle({ mnemonic, network, appVersion })
-    const payload = buildEncryptedBundlePayload(bundle, mnemonic)
+    const payload = await buildEncryptedBundlePayload(bundle, mnemonic)
     await saveEncryptedBundleFile(accountId, network, payload)
 
     const previous = await readRecoveryBundleState(accountId, network)

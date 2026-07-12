@@ -3,6 +3,12 @@
  * the device filesystem (sibling of the Breez SDK storage dir, cleaned up on
  * account deletion), and lightweight refresh/cloud-sync state lives in
  * AsyncStorage for the UI.
+ *
+ * Filesystem rather than keychain is deliberate: the payload is already
+ * AES-GCM encrypted with a seed-derived key (the seed itself lives in the
+ * keychain), and a bundle can reach hundreds of KB, beyond practical keychain
+ * item sizes on Android. The AsyncStorage state holds only non-secret
+ * metadata (timestamps, leaf count).
  */
 
 import AsyncStorage from "@react-native-async-storage/async-storage"

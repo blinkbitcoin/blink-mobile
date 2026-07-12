@@ -145,6 +145,11 @@ const queryNodesByOwner = async (
       }),
     )
     for (const [id, node] of response.nodes) nodes.set(id, node)
+    // The request offset is a skip count and the response offset only signals
+    // "more pages" - the arithmetic advance matches the spark-unilateral-exit
+    // reference exporter, which validated these semantics against the real
+    // operators. Should an operator ever return a short page with a positive
+    // offset, MAX_OWNER_QUERY_PAGES bounds the damage.
     if (response.nodes.size === 0 || response.offset <= 0n) break
     offset += PAGE_SIZE
   }
@@ -227,7 +232,7 @@ export const fetchRecoveryBundle = async ({
   accountNumber,
   coordinatorUrl = SPARK_COORDINATOR_URL,
 }: FetchRecoveryBundleParams): Promise<RecoveryBundle> => {
-  const keyPair = deriveIdentityKeyPair(mnemonic, network, accountNumber)
+  const keyPair = await deriveIdentityKeyPair(mnemonic, network, accountNumber)
 
   const context: QueryContext = {
     baseUrl: coordinatorUrl,
@@ -306,6 +311,8 @@ export const fetchRecoveryBundle = async ({
         (leaf.treenodeStatus === TREE_NODE_STATUS_AVAILABLE
           ? "AVAILABLE"
           : String(leaf.treenodeStatus)),
+      // Safe: a single leaf cannot exceed 21M BTC = 2.1e15 sats, well below
+      // Number.MAX_SAFE_INTEGER (~9e15); the total stays a bigint string.
       valueSats: Number(leaf.valueSats),
       treeNodeHex: hexEncode(leaf.raw),
     })),
