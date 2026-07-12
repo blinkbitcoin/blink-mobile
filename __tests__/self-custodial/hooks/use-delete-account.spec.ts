@@ -12,6 +12,8 @@ const mockDeleteMnemonicForAccount = jest.fn()
 const mockUnlink = jest.fn()
 const mockRemoveSelfCustodialAccountId = jest.fn()
 const mockRemoveBackupStateFor = jest.fn()
+const mockDeleteRecoveryBundleFile = jest.fn()
+const mockRemoveRecoveryBundleState = jest.fn()
 const mockReloadSelfCustodialAccounts = jest.fn()
 const mockSetActiveAccountId = jest.fn()
 const mockUpdateState = jest.fn()
@@ -46,6 +48,12 @@ jest.mock("@app/self-custodial/config", () => ({
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   removeBackupStateFor: (...args: unknown[]) => mockRemoveBackupStateFor(...args),
+}))
+
+jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
+  deleteRecoveryBundleFile: (...args: unknown[]) => mockDeleteRecoveryBundleFile(...args),
+  removeRecoveryBundleState: (...args: unknown[]) =>
+    mockRemoveRecoveryBundleState(...args),
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
@@ -108,6 +116,8 @@ describe("useDeleteAccount", () => {
     mockUnlink.mockResolvedValue(undefined)
     mockRemoveSelfCustodialAccountId.mockResolvedValue(undefined)
     mockRemoveBackupStateFor.mockResolvedValue(undefined)
+    mockDeleteRecoveryBundleFile.mockResolvedValue(undefined)
+    mockRemoveRecoveryBundleState.mockResolvedValue(undefined)
     mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
   })
 
@@ -130,6 +140,18 @@ describe("useDeleteAccount", () => {
     expect(mockDeleteMnemonicForAccount).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
     expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
     expect(mockRemoveBackupStateFor).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+    // Both networks are swept: the account may have been used on the other
+    // network under a different galoy instance.
+    for (const bundleNetwork of [mockSparkNetwork.Mainnet, mockSparkNetwork.Regtest]) {
+      expect(mockDeleteRecoveryBundleFile).toHaveBeenCalledWith(
+        TEST_SC_ACCOUNT_ID,
+        bundleNetwork,
+      )
+      expect(mockRemoveRecoveryBundleState).toHaveBeenCalledWith(
+        TEST_SC_ACCOUNT_ID,
+        bundleNetwork,
+      )
+    }
     expect(mockUpdateState).toHaveBeenCalled()
     expect(outcome).toBe("logged-out")
     expect(result.current.state).toBe("idle")
@@ -239,6 +261,24 @@ describe("useDeleteAccount", () => {
     expect(result.current.state).toBe("idle")
   })
 
+  it("does not fail the delete when recovery-bundle cleanup rejects (best-effort, logged)", async () => {
+    mockDeleteRecoveryBundleFile.mockRejectedValue(new Error("bundle unlink failed"))
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+      expect.stringContaining("recovery bundle cleanup failed"),
+    )
+    expect(outcome).toBe("logged-out")
+    expect(result.current.state).toBe("idle")
+    expect(result.current.error).toBeNull()
+    expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+  })
+
   it("captures the error and returns undefined when deleteMnemonicForAccount fails", async () => {
     mockDeleteMnemonicForAccount.mockRejectedValue(new Error("storage error"))
     const { result } = renderHook(() => useDeleteAccount())
@@ -298,6 +338,24 @@ describe("useDeleteAccount", () => {
     const disconnectOrder = mockDisconnectSdk.mock.invocationCallOrder[0]
 
     expect(updateOrder).toBeLessThan(disconnectOrder)
+
+    // The updater passed to updateState must clear ONLY activeAccountId and
+    // carry every other persistent-state field through untouched.
+    const updater = mockUpdateState.mock.calls[0][0]
+    const previousState = {
+      schemaVersion: 7,
+      activeAccountId: TEST_SC_ACCOUNT_ID,
+      galoyInstance: { id: "Main" },
+      isAnalyticsEnabled: true,
+    }
+    expect(updater(previousState)).toEqual({
+      schemaVersion: 7,
+      activeAccountId: undefined,
+      galoyInstance: { id: "Main" },
+      isAnalyticsEnabled: true,
+    })
+    // Undefined persistent state passes through unchanged (no crash, no write).
+    expect(updater(undefined)).toBeUndefined()
   })
 
   it("switches to the custodial account BEFORE disconnecting (custodial-fallback path)", async () => {

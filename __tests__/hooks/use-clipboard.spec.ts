@@ -179,21 +179,47 @@ describe("useClipboard", () => {
       expect(mockSetString).toHaveBeenCalledWith("")
     })
 
-    it("cleans up timer on unmount", () => {
+    it("still clears the clipboard after unmount (auto-clear is a security guarantee)", () => {
       const { result, unmount } = renderHook(() => useClipboard(5000))
 
       act(() => {
-        result.current.copyToClipboard({ content: "test" })
+        result.current.copyToClipboard({ content: "secret" })
       })
 
       mockSetString.mockClear()
       unmount()
 
       act(() => {
-        jest.advanceTimersByTime(10_000)
+        jest.advanceTimersByTime(5000)
       })
 
-      expect(mockSetString).not.toHaveBeenCalled()
+      expect(mockSetString).toHaveBeenCalledWith("")
+    })
+
+    it("does not let a departed screen's pending clear wipe a newer copy from another instance", () => {
+      const secretScreen = renderHook(() => useClipboard(5000))
+      const otherScreen = renderHook(() => useClipboard())
+
+      act(() => {
+        secretScreen.result.current.copyToClipboard({ content: "secret" })
+      })
+      secretScreen.unmount()
+
+      act(() => {
+        jest.advanceTimersByTime(3000)
+      })
+      act(() => {
+        otherScreen.result.current.copyToClipboard({ content: "tx-id" })
+      })
+
+      mockSetString.mockClear()
+      act(() => {
+        jest.advanceTimersByTime(60_000)
+      })
+
+      // The stale 5s clear from the secret screen must have been cancelled by
+      // the newer copy; nothing may blank the clipboard now.
+      expect(mockSetString).not.toHaveBeenCalledWith("")
     })
   })
 })

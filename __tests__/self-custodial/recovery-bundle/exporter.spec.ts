@@ -57,6 +57,13 @@ type TestNode = {
   parentNodeId?: string
   owner: Uint8Array
   available: boolean
+  /**
+   * Which availability field(s) the encoded node carries. Default: both.
+   * "string-only" omits field 19 (a missing varint decodes to 0, not
+   * AVAILABLE=1); "enum-only" omits field 11 (a missing string decodes to ""),
+   * so each variant is a genuinely single-signal fixture.
+   */
+  statusSignal?: "string-only" | "enum-only"
 }
 
 const encodeTreeNode = (node: TestNode): Uint8Array => {
@@ -65,14 +72,17 @@ const encodeTreeNode = (node: TestNode): Uint8Array => {
     .string(2, "tree-1")
     .varint(3, node.valueSats)
   if (node.parentNodeId) writer.string(4, node.parentNodeId)
-  return writer
-    .bytes(9, node.owner)
-    .string(11, node.available ? "AVAILABLE" : "SPLITTED")
-    .varint(19, node.available ? 1 : 5)
-    .finish()
+  writer.bytes(9, node.owner)
+  if (node.statusSignal !== "enum-only") {
+    writer.string(11, node.available ? "AVAILABLE" : "SPLITTED")
+  }
+  if (node.statusSignal !== "string-only") {
+    writer.varint(19, node.available ? 1 : 5)
+  }
+  return writer.finish()
 }
 
-const encodeQueryNodesResponse = (nodes: TestNode[]): Uint8Array => {
+const encodeQueryNodesResponse = (nodes: TestNode[], offset = 0): Uint8Array => {
   const writer = new ProtoWriter()
   for (const node of nodes) {
     writer.bytes(
@@ -80,8 +90,10 @@ const encodeQueryNodesResponse = (nodes: TestNode[]): Uint8Array => {
       new ProtoWriter().string(1, node.id).bytes(2, encodeTreeNode(node)).finish(),
     )
   }
-  // offset omitted (0) terminates the exporter's paging loop
-  return writer.finish()
+  // offset omitted (0) terminates the exporter's paging loop; a positive
+  // offset (field 2 varint, mirroring decodeQueryNodesResponse) signals
+  // another page
+  return writer.varint(2, offset).finish()
 }
 
 const encodeChallengeResponse = (): Uint8Array => {
@@ -101,15 +113,21 @@ const encodeChallengeResponse = (): Uint8Array => {
 const encodeVerifyResponse = (): Uint8Array =>
   new ProtoWriter().string(1, "session-token").varint(2, 9999999999).finish()
 
+type OwnerQueryPage = { nodes: TestNode[]; offset: number }
+
 /** Mounts a fake operator behind global.fetch. */
 const mockOperator = ({
   ownerQueryNodes,
+  ownerQueryPage,
   byIdNodes,
 }: {
-  ownerQueryNodes: TestNode[]
+  ownerQueryNodes?: TestNode[]
+  /** Per-request owner-query pages, keyed by the offset the request carried. */
+  ownerQueryPage?: (requestOffset: number) => OwnerQueryPage
   byIdNodes: Record<string, TestNode>
 }) => {
   const byIdRequests: string[][] = []
+  const ownerQueryOffsets: number[] = []
 
   global.fetch = jest.fn(async (url: string, init: { body: Uint8Array }) => {
     const respond = (message: Uint8Array) => ({
@@ -132,7 +150,12 @@ const mockOperator = ({
       const request = decodeFields(Uint8Array.from(init.body).subarray(5))
       const nodeIdsField = firstField(request, 2)
       if (!nodeIdsField?.bytes) {
-        return respond(encodeQueryNodesResponse(ownerQueryNodes))
+        const requestOffset = Number(firstField(request, 5)?.varint ?? 0n)
+        ownerQueryOffsets.push(requestOffset)
+        const page = ownerQueryPage
+          ? ownerQueryPage(requestOffset)
+          : { nodes: ownerQueryNodes ?? [], offset: 0 }
+        return respond(encodeQueryNodesResponse(page.nodes, page.offset))
       }
       const requestedIds = decodeFields(nodeIdsField.bytes).map((f) =>
         Buffer.from(f.bytes ?? []).toString("utf8"),
@@ -146,7 +169,7 @@ const mockOperator = ({
     throw new Error(`unexpected url: ${url}`)
   }) as unknown as typeof fetch
 
-  return { byIdRequests }
+  return { byIdRequests, ownerQueryOffsets }
 }
 
 describe("findMissingAncestors", () => {
@@ -291,5 +314,224 @@ describe("fetchRecoveryBundle", () => {
     })
     expect(bundle.leaves.map((l) => l.id)).toEqual(["leaf-mine"])
     expect(bundle.balances.btcSats).toBe("100")
+  })
+
+  it("excludes own leaves that are not AVAILABLE", async () => {
+    const identity = owner()
+    const available: TestNode = {
+      id: "leaf-available",
+      valueSats: 700,
+      owner: identity,
+      available: true,
+    }
+    const splitted: TestNode = {
+      id: "leaf-splitted",
+      valueSats: 999,
+      owner: identity,
+      available: false,
+    }
+    mockOperator({ ownerQueryNodes: [available, splitted], byIdNodes: {} })
+
+    const bundle = await fetchRecoveryBundle({
+      mnemonic: TEST_MNEMONIC,
+      network: Network.Mainnet,
+      appVersion: "1.0.1-test",
+    })
+    expect(bundle.leaves.map((l) => l.id)).toEqual(["leaf-available"])
+    expect(bundle.balances.btcSats).toBe("700")
+  })
+
+  it("accepts leaves signalled by only the legacy status string or only the status enum", async () => {
+    const identity = owner()
+    // Carries "AVAILABLE" in field 11 only; field 19 is absent and decodes
+    // to 0, which is NOT TREE_NODE_STATUS_AVAILABLE.
+    const stringOnly: TestNode = {
+      id: "leaf-string-only",
+      valueSats: 100,
+      owner: identity,
+      available: true,
+      statusSignal: "string-only",
+    }
+    // Carries treenodeStatus 1 in field 19 only; field 11 is absent and
+    // decodes to "", which is not "AVAILABLE".
+    const enumOnly: TestNode = {
+      id: "leaf-enum-only",
+      valueSats: 200,
+      owner: identity,
+      available: true,
+      statusSignal: "enum-only",
+    }
+    mockOperator({ ownerQueryNodes: [stringOnly, enumOnly], byIdNodes: {} })
+
+    const bundle = await fetchRecoveryBundle({
+      mnemonic: TEST_MNEMONIC,
+      network: Network.Mainnet,
+      appVersion: "1.0.1-test",
+    })
+
+    // Both halves of the availability OR must admit a leaf on their own.
+    expect(bundle.leaves.map((l) => l.id)).toEqual(["leaf-enum-only", "leaf-string-only"])
+    expect(bundle.balances.btcSats).toBe("300")
+    // The enum-only leaf has an empty status string; the bundle backfills the
+    // human-readable status from the enum.
+    expect(bundle.leaves.map((l) => l.status)).toEqual(["AVAILABLE", "AVAILABLE"])
+  })
+
+  it("pages through the owner query until the operator returns offset 0", async () => {
+    const identity = owner()
+    const pageOneLeaf: TestNode = {
+      id: "leaf-page-1",
+      valueSats: 100,
+      owner: identity,
+      available: true,
+    }
+    const pageTwoLeaf: TestNode = {
+      id: "leaf-page-2",
+      valueSats: 200,
+      owner: identity,
+      available: true,
+    }
+
+    // Positive response offset means more pages; 0 means this page is the last
+    const { ownerQueryOffsets } = mockOperator({
+      ownerQueryPage: (requestOffset) =>
+        requestOffset === 0
+          ? { nodes: [pageOneLeaf], offset: 100 }
+          : { nodes: [pageTwoLeaf], offset: 0 },
+      byIdNodes: {},
+    })
+
+    const bundle = await fetchRecoveryBundle({
+      mnemonic: TEST_MNEMONIC,
+      network: Network.Mainnet,
+      appVersion: "1.0.1-test",
+    })
+
+    expect(ownerQueryOffsets).toEqual([0, 100])
+    expect(bundle.leaves.map((l) => l.id)).toEqual(["leaf-page-1", "leaf-page-2"])
+    expect(bundle.balances.btcSats).toBe("300")
+  })
+
+  it("rejects when a hostile operator never terminates the owner query", async () => {
+    const identity = owner()
+    const leaf: TestNode = {
+      id: "leaf-endless",
+      valueSats: 1,
+      owner: identity,
+      available: true,
+    }
+    // Every page is non-empty with a positive offset, promising more forever
+    mockOperator({
+      ownerQueryPage: () => ({ nodes: [leaf], offset: 100 }),
+      byIdNodes: {},
+    })
+
+    await expect(
+      fetchRecoveryBundle({
+        mnemonic: TEST_MNEMONIC,
+        network: Network.Mainnet,
+        appVersion: "1.0.1-test",
+      }),
+    ).rejects.toMatchObject({ reason: "paging-limit-exceeded" })
+  })
+
+  it("resolves ancestors that themselves need a second by-id round", async () => {
+    const identity = owner()
+    const leaf: TestNode = {
+      id: "leaf-1",
+      valueSats: 4096,
+      parentNodeId: "mid-1",
+      owner: identity,
+      available: true,
+    }
+    const mid: TestNode = {
+      id: "mid-1",
+      valueSats: 8192,
+      parentNodeId: "root-1",
+      owner: otherOwner,
+      available: false,
+    }
+    const root: TestNode = {
+      id: "root-1",
+      valueSats: 16384,
+      owner: otherOwner,
+      available: false,
+    }
+
+    // Owner query omits both ancestors; the refetched mid reveals a missing
+    // root, so closing the chain takes a second by-id round
+    const { byIdRequests } = mockOperator({
+      ownerQueryNodes: [leaf],
+      byIdNodes: { "mid-1": mid, "root-1": root },
+    })
+
+    const bundle = await fetchRecoveryBundle({
+      mnemonic: TEST_MNEMONIC,
+      network: Network.Mainnet,
+      appVersion: "1.0.1-test",
+    })
+
+    expect(byIdRequests).toEqual([["mid-1"], ["root-1"]])
+    expect(bundle.leaves.map((l) => l.id)).toEqual(["leaf-1"])
+    expect(bundle.nodes.map((n) => n.id)).toEqual(["leaf-1", "mid-1", "root-1"])
+  })
+
+  it("tolerates a truncated by-id round and completes on the next one", async () => {
+    const identity = owner()
+    const leafA: TestNode = {
+      id: "leaf-a",
+      valueSats: 100,
+      parentNodeId: "mid-a",
+      owner: identity,
+      available: true,
+    }
+    const leafB: TestNode = {
+      id: "leaf-b",
+      valueSats: 200,
+      parentNodeId: "mid-b",
+      owner: identity,
+      available: true,
+    }
+    const midA: TestNode = {
+      id: "mid-a",
+      valueSats: 300,
+      owner: otherOwner,
+      available: false,
+    }
+    const midB: TestNode = {
+      id: "mid-b",
+      valueSats: 400,
+      owner: otherOwner,
+      available: false,
+    }
+
+    // The first by-id round returns a strict subset of what was requested
+    // (mid-a but not mid-b), as if the response were truncated by the
+    // operator's limit; the round made progress, so the exporter must retry
+    // instead of refusing the bundle.
+    let midBLookups = 0
+    const byIdNodes = new Proxy<Record<string, TestNode>>(
+      { "mid-a": midA },
+      {
+        get: (target, id) => {
+          if (id === "mid-b") {
+            midBLookups += 1
+            return midBLookups > 1 ? midB : undefined
+          }
+          return target[id as string]
+        },
+      },
+    )
+    const { byIdRequests } = mockOperator({ ownerQueryNodes: [leafA, leafB], byIdNodes })
+
+    const bundle = await fetchRecoveryBundle({
+      mnemonic: TEST_MNEMONIC,
+      network: Network.Mainnet,
+      appVersion: "1.0.1-test",
+    })
+
+    expect(byIdRequests).toEqual([["mid-a", "mid-b"], ["mid-b"]])
+    expect(bundle.nodes.map((n) => n.id)).toEqual(["leaf-a", "leaf-b", "mid-a", "mid-b"])
+    expect(bundle.balances.btcSats).toBe("300")
   })
 })
