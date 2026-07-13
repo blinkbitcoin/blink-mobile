@@ -146,9 +146,8 @@ describe("MigrationBalancesOverviewScreen", () => {
   })
 
   it("swallows the hardware back at the commit point", async () => {
-    const { BackHandler } = jest.requireActual<
-      typeof import("react-native")
-    >("react-native")
+    const { BackHandler } =
+      jest.requireActual<typeof import("react-native")>("react-native")
     const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
     renderScreen()
     await flushEffects()

@@ -63,10 +63,8 @@ jest.mock("@app/components/dollar-balance-migration-modal", () => ({
 }))
 
 jest.mock("@app/screens/account-migration/to-non-custodial/api-service-screen", () => ({
-  MigrationApiServiceScreen: (props: {
-    onContinue: () => void
-    onClose?: () => void
-  }) => mockApiServiceScreen(props),
+  MigrationApiServiceScreen: (props: { onContinue: () => void; onClose?: () => void }) =>
+    mockApiServiceScreen(props),
 }))
 
 jest.mock(

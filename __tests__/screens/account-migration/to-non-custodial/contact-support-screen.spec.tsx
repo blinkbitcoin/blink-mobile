@@ -61,9 +61,8 @@ describe("MigrationContactSupportScreen", () => {
   })
 
   it("redirects the hardware back to the commit point instead of exiting", async () => {
-    const { BackHandler } = jest.requireActual<
-      typeof import("react-native")
-    >("react-native")
+    const { BackHandler } =
+      jest.requireActual<typeof import("react-native")>("react-native")
     const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
     renderScreen()
     await flushEffects()

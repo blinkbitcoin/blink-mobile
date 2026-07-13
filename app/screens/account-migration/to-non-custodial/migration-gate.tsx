@@ -15,10 +15,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useActiveApiKeys, useMigrationGateArmed } from "../hooks"
 
 import { MigrationApiServiceScreen } from "./api-service-screen"
-import {
-  MigrationMode,
-  MigrationRequiredScreen,
-} from "./migration-required-screen"
+import { MigrationMode, MigrationRequiredScreen } from "./migration-required-screen"
 
 type MigrationGateProps = {
   onClose?: () => void
