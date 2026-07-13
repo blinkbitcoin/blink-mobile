@@ -31,8 +31,7 @@ import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { AccountType } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 
-/** TODO: replace with the backend transfer network fee; mocked at zero until it exists. */
-const MOCK_NETWORK_FEE_SATS = 0
+import { getMigrationPreviewMock } from "../utils/backend-mock"
 
 const fiatSuffix = (fiat: string | undefined): string | undefined =>
   fiat ? ` (${fiat})` : undefined
@@ -83,9 +82,13 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const currentSats = getBtcWallet(wallets)?.balance ?? 0
   const currentUsdCents = getUsdWallet(wallets)?.balance ?? 0
 
-  const currentBtcAmount = toBtcMoneyAmount(currentSats)
-  const newBtcAmount = toBtcMoneyAmount(currentSats - MOCK_NETWORK_FEE_SATS)
-  const feeBtcAmount = toBtcMoneyAmount(MOCK_NETWORK_FEE_SATS)
+  /** The server owns the fee, the de-minimis subsidy, and the resulting amount; the
+   *  screen renders the preview verbatim and never does the arithmetic itself. */
+  const preview = getMigrationPreviewMock(currentSats)
+
+  const currentBtcAmount = toBtcMoneyAmount(preview.balanceSats)
+  const newBtcAmount = toBtcMoneyAmount(preview.receiveSats)
+  const feeBtcAmount = toBtcMoneyAmount(preview.feeSats)
 
   const currentBitcoinBalance = formatMoneyAmount({ moneyAmount: currentBtcAmount })
   const currentBitcoinFiat = fiatSuffix(
@@ -108,6 +111,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     isApproximate: true,
   })
   const networkFee = feeFiat ? `${feeSats} (${feeFiat})` : feeSats
+  const networkFeeLine = preview.feeCoveredByBlink
+    ? LLOverview.networkFeeCoveredByBlink({ fee: networkFee })
+    : LLOverview.networkFee({ fee: networkFee })
   const exchangeRate = isPostGate
     ? moneyAmountToDisplayCurrencyString({ moneyAmount: toBtcMoneyAmount(SATS_PER_BTC) })
     : undefined
@@ -142,10 +148,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
             />
           </View>
 
-          <RichText
-            text={LLOverview.networkFee({ fee: networkFee })}
-            style={styles.networkFee}
-          />
+          <RichText text={networkFeeLine} style={styles.networkFee} />
 
           <View style={styles.arrowCircle}>
             <GaloyIcon name="arrow-down" size={24} color={colors.grey3} />

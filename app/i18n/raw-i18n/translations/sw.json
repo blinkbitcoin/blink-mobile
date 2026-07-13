@@ -3585,6 +3585,7 @@
       "newDollarBalance": "Salio jipya la Dola",
       "dollarBalanceNotAvailable": "haipatikani",
       "networkFee": "Ada ya mtandao: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Ada ya mtandao: <bold>{fee: string}</bold> (inalipwa na Blink)",
       "exchangeRate": "Kiwango cha ubadilishaji cha sasa 1 BTC = {rate: string}",
       "approveCta": "Idhinisha",
       "contactSupportCta": "Wasiliana na usaidizi"

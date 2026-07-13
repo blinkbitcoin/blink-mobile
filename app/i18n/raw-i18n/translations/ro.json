@@ -3585,6 +3585,7 @@
       "newDollarBalance": "Sold în dolari nou",
       "dollarBalanceNotAvailable": "indisponibil",
       "networkFee": "Comision de rețea: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Comision de rețea: <bold>{fee: string}</bold> (acoperit de Blink)",
       "exchangeRate": "Curs de schimb curent 1 BTC = {rate: string}",
       "approveCta": "Aprobă",
       "contactSupportCta": "Contactează asistența"

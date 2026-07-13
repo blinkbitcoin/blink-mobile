@@ -3585,6 +3585,7 @@
       "newDollarBalance": "Nový dolárový zostatok",
       "dollarBalanceNotAvailable": "nie je k dispozícii",
       "networkFee": "Sieťový poplatok: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Sieťový poplatok: <bold>{fee: string}</bold> (hradí Blink)",
       "exchangeRate": "Aktuálny výmenný kurz 1 BTC = {rate: string}",
       "approveCta": "Schváliť",
       "contactSupportCta": "Kontaktovať podporu"

@@ -3585,6 +3585,7 @@
             "newDollarBalance": "Nuovo saldo in dollari",
             "dollarBalanceNotAvailable": "non disponibile",
             "networkFee": "Commissione di rete: <bold>{fee: string}</bold>",
+            "networkFeeCoveredByBlink": "Commissione di rete: <bold>{fee: string}</bold> (coperta da Blink)",
             "exchangeRate": "Tasso di cambio attuale 1 BTC = {rate: string}",
             "approveCta": "Approva",
             "contactSupportCta": "Contatta il supporto"

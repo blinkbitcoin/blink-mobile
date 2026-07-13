@@ -3585,6 +3585,7 @@
       "newDollarBalance": "Nieuw dollarsaldo",
       "dollarBalanceNotAvailable": "niet beschikbaar",
       "networkFee": "Netwerkkosten: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Netwerkkosten: <bold>{fee: string}</bold> (gedekt door Blink)",
       "exchangeRate": "Huidige wisselkoers 1 BTC = {rate: string}",
       "approveCta": "Goedkeuren",
       "contactSupportCta": "Contact met support"

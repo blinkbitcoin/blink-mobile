@@ -3762,6 +3762,7 @@ const en: BaseTranslation = {
       newDollarBalance: "New Dollar Balance",
       dollarBalanceNotAvailable: "not available",
       networkFee: "Network fee: <bold>{fee: string}</bold>",
+      networkFeeCoveredByBlink: "Network fee: <bold>{fee: string}</bold> (covered by Blink)",
       exchangeRate: "Current exchange rate 1 BTC = {rate: string}",
       approveCta: "Approve",
       contactSupportCta: "Contact support",

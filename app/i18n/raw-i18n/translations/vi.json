@@ -3585,6 +3585,7 @@
       "newDollarBalance": "Số dư Đô la mới",
       "dollarBalanceNotAvailable": "không khả dụng",
       "networkFee": "Phí mạng: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Phí mạng: <bold>{fee: string}</bold> (do Blink chi trả)",
       "exchangeRate": "Tỷ giá hiện tại 1 BTC = {rate: string}",
       "approveCta": "Phê duyệt",
       "contactSupportCta": "Liên hệ hỗ trợ"

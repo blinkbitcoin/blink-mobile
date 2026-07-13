@@ -119,13 +119,28 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(screen.getByText(LLOverview.body())).toBeTruthy()
     expect(screen.getByText(LLOverview.currentBitcoinBalance())).toBeTruthy()
     expect(screen.getByText(LLOverview.newBitcoinBalance())).toBeTruthy()
-    // Current and new bitcoin: sats value + fiat suffix (fee is zero, so they match).
-    expect(screen.getAllByText("BTC 1000 ($FIAT)")).toHaveLength(2)
+    // The server preview mocks the 10-sat network fee: new = receiveSats, never
+    // client arithmetic.
+    expect(screen.getByText("BTC 1000 ($FIAT)")).toBeTruthy()
+    expect(screen.getByText("BTC 990 ($FIAT)")).toBeTruthy()
     expect(screen.getByText(/Network fee:/)).toBeTruthy()
+    expect(screen.queryByText(/covered by Blink/)).toBeNull()
     // The voluntary flow never quotes a rate; only the post-gate variant does.
     expect(screen.queryByText(/Current exchange rate/)).toBeNull()
     expect(screen.getByText(LLOverview.approveCta())).toBeTruthy()
     expect(screen.getByText(LLOverview.contactSupportCta())).toBeTruthy()
+  })
+
+  it("marks the fee as covered by Blink for a de-minimis balance", async () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletsWithBalances({ sats: 80, usdCents: 0 }),
+    )
+    renderScreen()
+    await flushEffects()
+
+    // Blink covers the fee below the de-minimis threshold: the whole balance moves.
+    expect(screen.getAllByText("BTC 80 ($FIAT)")).toHaveLength(2)
+    expect(screen.getByText(/covered by Blink/)).toBeTruthy()
   })
 
   it("shows the exchange rate only on the post-gate variant", async () => {
@@ -214,7 +229,8 @@ describe("MigrationBalancesOverviewScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(screen.getAllByText("BTC 1000")).toHaveLength(2)
+    expect(screen.getByText("BTC 1000")).toBeTruthy()
+    expect(screen.getByText("BTC 990")).toBeTruthy()
   })
 
   it("hides the exchange rate on the post-gate variant when conversion is unavailable", async () => {

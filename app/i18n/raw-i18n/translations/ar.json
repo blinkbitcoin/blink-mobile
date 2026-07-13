@@ -3585,6 +3585,7 @@
       "newDollarBalance": "رصيد الدولار الجديد",
       "dollarBalanceNotAvailable": "غير متاح",
       "networkFee": "رسوم الشبكة: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "رسوم الشبكة: <bold>{fee: string}</bold> (تغطيها Blink)",
       "exchangeRate": "سعر الصرف الحالي 1 BTC = {rate: string}",
       "approveCta": "موافقة",
       "contactSupportCta": "تواصل مع الدعم"

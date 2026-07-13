@@ -11951,6 +11951,11 @@ type RootTranslation = {
 			 */
 			networkFee: RequiredParams<'fee'>
 			/**
+			 * N​e​t​w​o​r​k​ ​f​e​e​:​ ​<​b​o​l​d​>​{​f​e​e​}​<​/​b​o​l​d​>​ ​(​c​o​v​e​r​e​d​ ​b​y​ ​B​l​i​n​k​)
+			 * @param {string} fee
+			 */
+			networkFeeCoveredByBlink: RequiredParams<'fee'>
+			/**
 			 * C​u​r​r​e​n​t​ ​e​x​c​h​a​n​g​e​ ​r​a​t​e​ ​1​ ​B​T​C​ ​=​ ​{​r​a​t​e​}
 			 * @param {string} rate
 			 */
@@ -24398,6 +24403,10 @@ export type TranslationFunctions = {
 			 * Network fee: <bold>{fee}</bold>
 			 */
 			networkFee: (arg: { fee: string }) => LocalizedString
+			/**
+			 * Network fee: <bold>{fee}</bold> (covered by Blink)
+			 */
+			networkFeeCoveredByBlink: (arg: { fee: string }) => LocalizedString
 			/**
 			 * Current exchange rate 1 BTC = {rate}
 			 */

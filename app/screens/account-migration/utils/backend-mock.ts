@@ -79,3 +79,48 @@ export const windDownMock: WindDown | null = IS_ACCOUNT_AFFECTED
  * dates to decide the phase, it obeys `status`.
  */
 export const nowMock: number = toUnixSeconds(Date.UTC(2026, 6, 9, 12, 0, 0))
+
+/**
+ * Shape of the backend migration preview (Account.migration.preview in the integration
+ * contract): the server computes the network fee, whether Blink covers it, and the
+ * resulting amount. The client renders these four fields verbatim and never does the
+ * arithmetic itself.
+ */
+export type AccountMigrationPreview = {
+  balanceSats: number
+  feeSats: number
+  feeCoveredByBlink: boolean
+  receiveSats: number
+}
+
+const MOCK_NETWORK_FEE_SATS = 10
+const MOCK_DE_MINIMIS_THRESHOLD_SATS = 100
+
+/**
+ * TODO: TEMPORARY — replace with the backend migration preview query once it ships.
+ * Replicates the backend getMigrationPreview branch by branch: zero balance gets a zero
+ * preview, a balance at or below the de-minimis threshold (100 sats) has its fee covered
+ * by Blink and transfers whole, and anything above pays the network fee (mocked at the
+ * 10-sat Lightning-to-Spark minimum).
+ */
+export const getMigrationPreviewMock = (balanceSats: number): AccountMigrationPreview => {
+  if (balanceSats <= 0) {
+    return { balanceSats: 0, feeSats: 0, feeCoveredByBlink: false, receiveSats: 0 }
+  }
+
+  if (balanceSats <= MOCK_DE_MINIMIS_THRESHOLD_SATS) {
+    return {
+      balanceSats,
+      feeSats: MOCK_NETWORK_FEE_SATS,
+      feeCoveredByBlink: true,
+      receiveSats: balanceSats,
+    }
+  }
+
+  return {
+    balanceSats,
+    feeSats: MOCK_NETWORK_FEE_SATS,
+    feeCoveredByBlink: false,
+    receiveSats: balanceSats - MOCK_NETWORK_FEE_SATS,
+  }
+}

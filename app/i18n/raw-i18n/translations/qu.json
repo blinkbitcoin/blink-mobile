@@ -3585,6 +3585,7 @@
       "newDollarBalance": "Musuq dólar qullqi",
       "dollarBalanceNotAvailable": "mana kapunchu",
       "networkFee": "Red pago: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Red pago: <bold>{fee: string}</bold> (Blinkmi pagan)",
       "exchangeRate": "Kunan cambio 1 BTC = {rate: string}",
       "approveCta": "Ariy niy",
       "contactSupportCta": "Yanapaqwan rimay"

@@ -3585,6 +3585,7 @@
       "newDollarBalance": "Ibhalansi entsha yeDola",
       "dollarBalanceNotAvailable": "ayifumaneki",
       "networkFee": "Umrhumo wothungelwano: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Umrhumo wothungelwano: <bold>{fee: string}</bold> (uhlawulwa nguBlink)",
       "exchangeRate": "Izinga langoku lotshintshiselwano 1 BTC = {rate: string}",
       "approveCta": "Yamkela",
       "contactSupportCta": "Qhagamshelana nenkxaso"

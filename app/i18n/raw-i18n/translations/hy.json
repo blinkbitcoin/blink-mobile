@@ -3585,6 +3585,7 @@
       "newDollarBalance": "Նոր դոլարային մնացորդ",
       "dollarBalanceNotAvailable": "հասանելի չէ",
       "networkFee": "Ցանցի վճար. <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Ցանցի վճար. <bold>{fee: string}</bold> (ծածկում է Blink-ը)",
       "exchangeRate": "Ընթացիկ փոխարժեք 1 BTC = {rate: string}",
       "approveCta": "Հաստատել",
       "contactSupportCta": "Կապ աջակցման հետ"

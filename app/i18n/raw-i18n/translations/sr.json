@@ -3585,6 +3585,7 @@
       "newDollarBalance": "Нови доларски салдо",
       "dollarBalanceNotAvailable": "није доступно",
       "networkFee": "Мрежна накнада: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Мрежна накнада: <bold>{fee: string}</bold> (сноси Blink)",
       "exchangeRate": "Тренутни курс 1 BTC = {rate: string}",
       "approveCta": "Одобри",
       "contactSupportCta": "Контактирај подршку"
