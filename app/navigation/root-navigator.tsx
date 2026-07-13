@@ -164,6 +164,7 @@ import {
 } from "./stack-param-lists"
 /** Deep import on purpose: its device-location chain stays out of the hooks barrel. */
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
+import { WindDownReceiveGate } from "@app/screens/account-migration/components/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
@@ -185,7 +186,12 @@ const ScanningQRCodeGated = withOfflineGate(ScanningQRCodeScreen)
 const SendBitcoinDestinationGated = withOfflineGate(SendBitcoinDestinationScreen)
 const SendBitcoinDetailsGated = withOfflineGate(SendBitcoinDetailsScreen)
 const SendBitcoinConfirmationGated = withOfflineGate(SendBitcoinConfirmationScreen)
-const ReceiveGated = withOfflineGate(ReceiveScreen)
+const ReceiveOfflineGated = withOfflineGate(ReceiveScreen)
+const ReceiveGated: React.FC = () => (
+  <WindDownReceiveGate>
+    <ReceiveOfflineGated />
+  </WindDownReceiveGate>
+)
 const RedeemBitcoinDetailGated = withOfflineGate(RedeemBitcoinDetailScreen)
 const ConversionDetailsGated = withOfflineGate(ConversionDetailsScreen)
 const ConversionConfirmationGated = withOfflineGate(ConversionConfirmationScreen)
