@@ -18,6 +18,7 @@ const CONTACT_EMAIL = "support@blink.sv"
 const mockNavigate = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
 let mockDollarRestricted = false
+let mockCurrentDollarRestricted = false
 let mockConvertReady = true
 let mockGateArmed = false
 
@@ -53,7 +54,8 @@ jest.mock("@app/config/feature-flags-context", () => ({
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => mockDollarRestricted,
+  useDollarBalanceRestricted: (accountType: string) =>
+    accountType === "custodial" ? mockCurrentDollarRestricted : mockDollarRestricted,
 }))
 
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -101,6 +103,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockDollarRestricted = false
+    mockCurrentDollarRestricted = false
     mockConvertReady = true
     mockCheckpointLoading = false
     mockGateArmed = false
@@ -214,6 +217,27 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(screen.getByText(LLOverview.dollarBalanceNotAvailable())).toBeTruthy()
     // Only the current dollar balance keeps a value.
     expect(screen.getAllByText("USD 0")).toHaveLength(1)
+  })
+
+  it("shows 'not available' for the current dollar balance under the custodial restriction", async () => {
+    mockCurrentDollarRestricted = true
+    renderScreen()
+    await flushEffects()
+
+    // Never zero, never blank: the restricted current row hides the amount while
+    // the unrestricted new row keeps its zero.
+    expect(screen.getByText(LLOverview.dollarBalanceNotAvailable())).toBeTruthy()
+    expect(screen.getAllByText("USD 0")).toHaveLength(1)
+  })
+
+  it("shows 'not available' on both dollar rows in a fully restricted region", async () => {
+    mockCurrentDollarRestricted = true
+    mockDollarRestricted = true
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getAllByText(LLOverview.dollarBalanceNotAvailable())).toHaveLength(2)
+    expect(screen.queryByText("USD 0")).toBeNull()
   })
 
   it("falls back to zero balances when wallet data is unavailable", async () => {

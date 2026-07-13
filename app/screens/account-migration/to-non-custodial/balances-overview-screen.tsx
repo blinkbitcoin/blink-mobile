@@ -38,11 +38,13 @@ const fiatSuffix = (fiat: string | undefined): string | undefined =>
 
 /**
  * The migration commit screen: it shows the current and resulting balances plus the network
- * fee before the funds transfer. New Dollar Balance reads "not available" when the
- * self-custodial dollar balance is restricted in the user's region, so a still-custodial
- * user knows the new account will not hold dollars. The exchange-rate line is shown only on
- * the post-gate variant, where a Dollar-to-Bitcoin conversion actually happens; the
- * voluntary and forced-pre-deadline flows never quote a rate.
+ * fee before the funds transfer. Each Dollar Balance row reads "not available" (never zero,
+ * never blank) when the dollar balance is restricted in the user's region for that row's
+ * account type: current follows the custodial restriction, new follows the self-custodial
+ * one, so a still-custodial user knows the new account will not hold dollars. The
+ * exchange-rate line is shown only on the post-gate variant, where a Dollar-to-Bitcoin
+ * conversion actually happens; the voluntary and forced-pre-deadline flows never quote a
+ * rate.
  */
 export const MigrationBalancesOverviewScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -64,6 +66,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const { openSupport } = useContactSupport()
   const isNewDollarBalanceRestricted = useDollarBalanceRestricted(
     AccountType.SelfCustodial,
+  )
+  const isCurrentDollarBalanceRestricted = useDollarBalanceRestricted(
+    AccountType.Custodial,
   )
   const { loading: checkpointLoading, saveCheckpoint } = useMigrationCheckpoint()
 
@@ -98,9 +103,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const newBitcoinFiat = fiatSuffix(
     moneyAmountToDisplayCurrencyString({ moneyAmount: newBtcAmount }),
   )
-  const currentDollarBalance = formatMoneyAmount({
-    moneyAmount: toUsdMoneyAmount(currentUsdCents),
-  })
+  const currentDollarBalance = isCurrentDollarBalanceRestricted
+    ? LLOverview.dollarBalanceNotAvailable()
+    : formatMoneyAmount({ moneyAmount: toUsdMoneyAmount(currentUsdCents) })
   const newDollarBalance = isNewDollarBalanceRestricted
     ? LLOverview.dollarBalanceNotAvailable()
     : formatMoneyAmount({ moneyAmount: toUsdMoneyAmount(0) })
@@ -144,6 +149,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
             <InfoRow
               label={LLOverview.currentDollarBalance()}
               value={currentDollarBalance}
+              valueMuted={isCurrentDollarBalanceRestricted}
               regularLabel
             />
           </View>
