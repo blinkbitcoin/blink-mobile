@@ -2,13 +2,12 @@ import React from "react"
 import { render, act } from "@testing-library/react-native"
 
 import { MigrationGate } from "@app/screens/account-migration/to-non-custodial/migration-gate"
-import { WindDownStatus } from "@app/screens/account-migration/utils/backend-mock"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 const mockUseActiveApiKeys = jest.fn()
 const mockUseCustodialMigrationRequired = jest.fn()
-const mockUseWindDownStatus = jest.fn()
+const mockUseMigrationGateArmed = jest.fn()
 const mockUseTransferBlocked = jest.fn()
 const mockUseDollarBalanceRestricted = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
@@ -30,7 +29,7 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useActiveApiKeys: () => mockUseActiveApiKeys(),
-  useWindDownStatus: () => mockUseWindDownStatus(),
+  useMigrationGateArmed: () => mockUseMigrationGateArmed(),
 }))
 
 jest.mock("@app/hooks/use-custodial-migration-required", () => ({
@@ -101,7 +100,7 @@ describe("MigrationGate", () => {
     jest.clearAllMocks()
     mockUseCustodialMigrationRequired.mockReturnValue(false)
     mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: false, loading: false })
-    mockUseWindDownStatus.mockReturnValue({ status: WindDownStatus.PreCutoff })
+    mockUseMigrationGateArmed.mockReturnValue(false)
     mockUseTransferBlocked.mockReturnValue(false)
     mockUseDollarBalanceRestricted.mockReturnValue(false)
     mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(0))
@@ -206,7 +205,7 @@ describe("MigrationGate", () => {
 
   it("skips the dollar-balance check after the gate arms, where the flow converts dollars", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
-    mockUseWindDownStatus.mockReturnValue({ status: WindDownStatus.GatedClosed })
+    mockUseMigrationGateArmed.mockReturnValue(true)
 
     render(<MigrationGate />)
 
@@ -270,7 +269,7 @@ describe("MigrationGate", () => {
 
   it("keeps the API-service warning unclosable after the gate arms", () => {
     mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: true, loading: false })
-    mockUseWindDownStatus.mockReturnValue({ status: WindDownStatus.GatedClosed })
+    mockUseMigrationGateArmed.mockReturnValue(true)
 
     render(<MigrationGate />)
 
@@ -296,6 +295,23 @@ describe("MigrationGate", () => {
     render(<MigrationGate />)
 
     expect(mockRequiredScreen.mock.calls[0][0].mode).toBe("voluntary")
+  })
+
+  it("uses the gate mode when the post-deadline gate is armed", () => {
+    mockUseMigrationGateArmed.mockReturnValue(true)
+
+    render(<MigrationGate />)
+
+    expect(mockRequiredScreen.mock.calls[0][0].mode).toBe("gate")
+  })
+
+  it("prefers the gate mode over the forced one", () => {
+    mockUseMigrationGateArmed.mockReturnValue(true)
+    mockUseCustodialMigrationRequired.mockReturnValue(true)
+
+    render(<MigrationGate />)
+
+    expect(mockRequiredScreen.mock.calls[0][0].mode).toBe("gate")
   })
 
   it("uses the forced pre-deadline mode when migration is required", () => {

@@ -92,10 +92,6 @@ import { UnclaimedDepositsScreen } from "../screens/unclaimed-deposits/unclaimed
 
 import { OfflineGate } from "@app/self-custodial/components"
 import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unavailable"
-import {
-  useCustodialMigrationRequired,
-  useCustodialMigrationRequiredSync,
-} from "@app/hooks/use-custodial-migration-required"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
@@ -166,6 +162,8 @@ import {
   PrimaryStackParamList,
   RootStackParamList,
 } from "./stack-param-lists"
+/** Deep import on purpose: its device-location chain stays out of the hooks barrel. */
+import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
@@ -1044,16 +1042,8 @@ export const PrimaryNavigator = () => {
 
   const { LL } = useI18nContext()
 
-  const [migrationBlockerDismissed, setMigrationBlockerDismissed] = React.useState(false)
-  const dismissMigrationBlocker = React.useCallback(
-    () => setMigrationBlockerDismissed(true),
-    [],
-  )
-
-  useCustodialMigrationRequiredSync()
-  const migrationRequired = useCustodialMigrationRequired()
-  const showMigrationBlocker = migrationRequired && !migrationBlockerDismissed
-  if (showMigrationBlocker) return <MigrationGate onClose={dismissMigrationBlocker} />
+  const migrationBlocker = useMigrationBlocker()
+  if (migrationBlocker.isVisible) return <MigrationGate onClose={migrationBlocker.onClose} />
 
   // The cacheId is updated after every mutation that affects current user data (balanace, contacts, ...)
   // It's used to re-mount this component and thus reset what's cached in Apollo (and React)

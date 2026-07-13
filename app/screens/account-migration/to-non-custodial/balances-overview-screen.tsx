@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from "react"
 import { ScrollView, View } from "react-native"
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -25,6 +25,7 @@ import {
   MigrationCheckpoint,
   useHardwareBackGuard,
   useMigrationCheckpoint,
+  useMigrationGateArmed,
 } from "@app/screens/account-migration/hooks"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { AccountType } from "@app/types/wallet"
@@ -52,9 +53,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const route =
-    useRoute<RouteProp<RootStackParamList, "accountMigrationBalancesOverview">>()
-  const isPostGate = route.params?.isPostGate ?? false
+  /** Gate-ness is server state, not navigation state: the post-gate flow converts
+   *  dollars, so this variant quotes the reference exchange rate (FR69). */
+  const isPostGate = useMigrationGateArmed()
 
   const isAuthed = useIsAuthed()
   const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed })

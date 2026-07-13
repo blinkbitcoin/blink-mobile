@@ -12,14 +12,22 @@ import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restri
 import { useTransferBlocked } from "@app/hooks/use-transfer-blocked"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { useActiveApiKeys, useWindDownStatus } from "../hooks"
-import { WindDownStatus } from "../utils/backend-mock"
+import { useActiveApiKeys, useMigrationGateArmed } from "../hooks"
 
 import { MigrationApiServiceScreen } from "./api-service-screen"
-import { MigrationRequiredScreen } from "./migration-required-screen"
+import {
+  MigrationMode,
+  MigrationRequiredScreen,
+} from "./migration-required-screen"
 
 type MigrationGateProps = {
   onClose?: () => void
+}
+
+const resolveMigrationMode = (isGated: boolean, isForced: boolean): MigrationMode => {
+  if (isGated) return "gate"
+  if (isForced) return "forcedPreDeadline"
+  return "voluntary"
 }
 
 /**
@@ -27,19 +35,14 @@ type MigrationGateProps = {
  * (Settings and the forced root blocker). Order of checks: a custodial Dollar Balance
  * blocks entry first (the user empties it manually; post-gate this does not apply since
  * the flow itself converts dollars), then accounts with active API keys see the
- * API-service warning, and finally the "Time to upgrade" screen.
- *
- * The mode is inferred from the entry: a forced-cohort account reaches the gate as
- * the root blocker (migration required), while the voluntary route from Settings is
- * not. The wind-down status (mocked until the backend query ships) already drives the
- * dollar-precondition exception; selecting the post-deadline "gate" mode from it is
- * wired separately.
+ * API-service warning, and finally the "Time to upgrade" screen in the mode the
+ * account's situation demands (voluntary, forced pre-deadline, or the armed gate).
  */
 export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { hasActiveApiKeys, loading: apiKeysLoading } = useActiveApiKeys()
   const isForced = useCustodialMigrationRequired()
-  const { status: windDownStatus } = useWindDownStatus()
+  const isGated = useMigrationGateArmed()
   const isTransferBlocked = useTransferBlocked()
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
   const [apiWarningAcknowledged, setApiWarningAcknowledged] = useState(false)
@@ -67,7 +70,6 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
 
   const usdBalance = getUsdWallet(data?.me?.defaultAccount?.wallets)?.balance ?? 0
   const hasCustodialDollarBalance = usdBalance > 0
-  const isGated = windDownStatus === WindDownStatus.GatedClosed
   /** Post-gate the user enters WITH dollars and the flow converts them at the final
    *  step, so the empty-your-dollars precondition only guards the pre-deadline paths.
    *  TODO: the backend re-enforces this precondition on migrationStart; this modal is
@@ -100,6 +102,6 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
     )
   }
 
-  const mode = isForced ? "forcedPreDeadline" : "voluntary"
+  const mode = resolveMigrationMode(isGated, isForced)
   return <MigrationRequiredScreen mode={mode} onClose={onClose} />
 }

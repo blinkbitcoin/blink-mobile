@@ -19,12 +19,11 @@ const mockNavigate = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
 let mockDollarRestricted = false
 let mockConvertReady = true
-let mockRouteParams: { isPostGate?: boolean } | undefined
+let mockGateArmed = false
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
-  useRoute: () => ({ params: mockRouteParams }),
 }))
 
 jest.mock("@app/graphql/generated", () => ({
@@ -46,6 +45,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     loading: mockCheckpointLoading,
     saveCheckpoint: mockSaveCheckpoint,
   }),
+  useMigrationGateArmed: () => mockGateArmed,
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -103,7 +103,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     mockDollarRestricted = false
     mockConvertReady = true
     mockCheckpointLoading = false
-    mockRouteParams = undefined
+    mockGateArmed = false
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletsWithBalances({ sats: 1000, usdCents: 0 }),
     )
@@ -129,7 +129,7 @@ describe("MigrationBalancesOverviewScreen", () => {
   })
 
   it("shows the exchange rate only on the post-gate variant", async () => {
-    mockRouteParams = { isPostGate: true }
+    mockGateArmed = true
     renderScreen()
     await flushEffects()
 
@@ -219,7 +219,7 @@ describe("MigrationBalancesOverviewScreen", () => {
   })
 
   it("hides the exchange rate on the post-gate variant when conversion is unavailable", async () => {
-    mockRouteParams = { isPostGate: true }
+    mockGateArmed = true
     mockConvertReady = false
     renderScreen()
     await flushEffects()
