@@ -150,7 +150,7 @@ jest.mock("@app/components/usd-convert-to-btc-modal", () => {
   }
 })
 
-jest.mock("@app/screens/conversion-flow", () => {
+jest.mock("@app/screens/conversion-flow/stable-token-convert-to-btc-modal", () => {
   const ReactActual = jest.requireActual("react")
   const { View, Text } = jest.requireActual("react-native")
   return {

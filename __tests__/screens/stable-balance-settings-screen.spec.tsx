@@ -39,6 +39,10 @@ jest.mock("@react-native-firebase/crashlytics", () => ({
   default: () => ({ recordError: mockRecordError }),
 }))
 
+jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
+  useDollarBalanceRestricted: () => false,
+}))
+
 jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))

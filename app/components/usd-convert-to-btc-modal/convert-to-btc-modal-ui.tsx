@@ -17,7 +17,7 @@ type Props = {
   usdWalletBalance: UsdMoneyAmount
   onConvert: () => void
   loading: boolean
-  disabled?: boolean
+  dismissable?: boolean
   errorMessage?: string
 }
 
@@ -27,7 +27,7 @@ export const ConvertToBtcModalUI: React.FC<Props> = ({
   usdWalletBalance,
   onConvert,
   loading,
-  disabled = false,
+  dismissable = false,
   errorMessage,
 }) => {
   const { LL } = useI18nContext()
@@ -35,8 +35,6 @@ export const ConvertToBtcModalUI: React.FC<Props> = ({
     theme: { colors },
   } = useTheme()
   const styles = useStyles()
-
-  const isConvertDisabled = loading || disabled
 
   return (
     <CustomModal
@@ -58,9 +56,9 @@ export const ConvertToBtcModalUI: React.FC<Props> = ({
       primaryButtonTitle={LL.ConversionDetailsScreen.transfer()}
       primaryButtonOnPress={onConvert}
       primaryButtonLoading={loading}
-      primaryButtonDisabled={isConvertDisabled}
-      showCloseIconButton={false}
-      dismissable={false}
+      primaryButtonDisabled={loading}
+      showCloseIconButton={dismissable}
+      dismissable={dismissable}
     />
   )
 }

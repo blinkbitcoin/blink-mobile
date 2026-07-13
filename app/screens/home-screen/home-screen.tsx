@@ -24,7 +24,7 @@ import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow"
+import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow/stable-token-convert-to-btc-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
@@ -386,6 +386,14 @@ export const HomeScreen: React.FC = () => {
     usdWalletBalance: restrictedUsdWalletBalance,
   })
 
+  /** Each account type renders its own convert modal; the guards keep them exclusive
+   *  locally instead of relying on the skipped custodial query staying empty. */
+  const custodialConvertWallets =
+    !isSelfCustodial && restrictedUsdWallet && restrictedBtcWallet
+      ? { usdWalletId: restrictedUsdWallet.id, btcWalletId: restrictedBtcWallet.id }
+      : null
+  const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible
+
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
   const openUpgradeModal = React.useCallback(() => {
@@ -595,16 +603,16 @@ export const HomeScreen: React.FC = () => {
         isVisible={isRestrictionModalVisible}
         toggleModal={closeRestrictionModal}
       />
-      {restrictedUsdWallet && restrictedBtcWallet && (
+      {custodialConvertWallets && (
         <UsdConvertToBtcModal
           isVisible={isConvertModalVisible}
           toggleModal={closeConvertModal}
           usdWalletBalance={restrictedUsdMoneyAmount}
-          usdWalletId={restrictedUsdWallet.id}
-          btcWalletId={restrictedBtcWallet.id}
+          usdWalletId={custodialConvertWallets.usdWalletId}
+          btcWalletId={custodialConvertWallets.btcWalletId}
         />
       )}
-      {isSelfCustodial && (
+      {shouldShowStableTokenConvertModal && (
         <StableTokenConvertToBtcModal
           isVisible={isConvertModalVisible}
           toggleModal={closeConvertModal}
