@@ -47,22 +47,30 @@ export type WindDown = {
 const toUnixSeconds = (utcMilliseconds: number): number => utcMilliseconds / 1000
 
 /**
+ * Flip to false to simulate an account the wind-down does not affect: the backend then
+ * omits `Account.windDown` entirely (null) and no wind-down UI may render at all.
+ */
+const IS_ACCOUNT_AFFECTED: boolean = true
+
+/**
  * TODO: TEMPORARY — replace with the backend wind-down status query (Account.windDown)
  * once it is ready. The dates below are the published wind-down timeline; 00:00 in
  * Europe/Paris is 22:00 UTC of the previous day because August/September fall in CEST
  * (UTC+2). Change `status` here (or via the developer-screen simulations later) to see
  * each phase's UI.
  */
-export const windDownMock: WindDown = {
-  status: WindDownStatus.PreCutoff,
-  /** Aug 1 2026, 00:00 Europe/Paris — receiving disabled from this moment. */
-  receiveDisabledAt: toUnixSeconds(Date.UTC(2026, 6, 31, 22, 0, 0)),
-  /** Aug 31 2026, end of day Europe/Paris — last day to initiate an exit. */
-  finalDeadline: toUnixSeconds(Date.UTC(2026, 7, 31, 21, 59, 59)),
-  /** Sep 1 2026, 00:00 Europe/Paris — the blocking migration gate arms. */
-  gateArmsAt: toUnixSeconds(Date.UTC(2026, 7, 31, 22, 0, 0)),
-  timezone: "Europe/Paris",
-}
+export const windDownMock: WindDown | null = IS_ACCOUNT_AFFECTED
+  ? {
+      status: WindDownStatus.PreCutoff,
+      /** Aug 1 2026, 00:00 Europe/Paris — receiving disabled from this moment. */
+      receiveDisabledAt: toUnixSeconds(Date.UTC(2026, 6, 31, 22, 0, 0)),
+      /** Aug 31 2026, end of day Europe/Paris — last day to initiate an exit. */
+      finalDeadline: toUnixSeconds(Date.UTC(2026, 7, 31, 21, 59, 59)),
+      /** Sep 1 2026, 00:00 Europe/Paris — the blocking migration gate arms. */
+      gateArmsAt: toUnixSeconds(Date.UTC(2026, 7, 31, 22, 0, 0)),
+      timezone: "Europe/Paris",
+    }
+  : null
 
 /**
  * TODO: TEMPORARY — remove once the backend serves the wind-down state. A mocked "today"

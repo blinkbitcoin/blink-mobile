@@ -10,10 +10,10 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ accountType: mockAccountType }),
 }))
 
-let mockStatus: WindDownStatus = WindDownStatus.PreCutoff
+let mockStatus: WindDownStatus | null = WindDownStatus.PreCutoff
 
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
-  useWindDownStatus: () => ({ status: mockStatus }),
+  useWindDownStatus: () => (mockStatus === null ? null : { status: mockStatus }),
 }))
 
 describe("useMigrationGateArmed", () => {
@@ -31,6 +31,14 @@ describe("useMigrationGateArmed", () => {
   })
 
   it("stays unarmed before the closure", () => {
+    const { result } = renderHook(() => useMigrationGateArmed())
+
+    expect(result.current).toBe(false)
+  })
+
+  it("stays unarmed for an account the wind-down does not affect", () => {
+    mockStatus = null
+
     const { result } = renderHook(() => useMigrationGateArmed())
 
     expect(result.current).toBe(false)

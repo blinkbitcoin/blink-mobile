@@ -18,6 +18,7 @@ export const useWindDownReceiveBlocked = (): boolean => {
 
   return (
     accountType === AccountType.Custodial &&
+    windDown !== null &&
     RECEIVE_BLOCKED_STATUSES.includes(windDown.status)
   )
 }

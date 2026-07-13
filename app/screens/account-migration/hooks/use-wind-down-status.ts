@@ -5,6 +5,7 @@ import { WindDown, windDownMock } from "../utils/backend-mock"
  * (Account.windDown) once it is ready. Serves the account's wind-down state to the
  * migration surfaces (gate mode, dollar precondition, receive-disabled home, deadline
  * dates); the status is server-authoritative and the client must never derive it
- * from dates.
+ * from dates. Null means the wind-down does not affect this account (the backend
+ * omits the field), so every wind-down surface must stay off.
  */
-export const useWindDownStatus = (): WindDown => windDownMock
+export const useWindDownStatus = (): WindDown | null => windDownMock

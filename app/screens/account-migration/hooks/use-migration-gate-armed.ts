@@ -9,7 +9,10 @@ import { useWindDownStatus } from "./use-wind-down-status"
  *  wind-down status reports the closure; the client never derives it from dates. */
 export const useMigrationGateArmed = (): boolean => {
   const { accountType } = useActiveWallet()
-  const { status } = useWindDownStatus()
+  const windDown = useWindDownStatus()
 
-  return accountType === AccountType.Custodial && status === WindDownStatus.GatedClosed
+  return (
+    accountType === AccountType.Custodial &&
+    windDown?.status === WindDownStatus.GatedClosed
+  )
 }

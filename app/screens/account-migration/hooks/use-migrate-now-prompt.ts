@@ -11,7 +11,7 @@ type MigrateNowPrompt = {
   isVisible: boolean
   isReceiveDisabled: boolean
   deadlineTimestamp: number
-  timezone: string
+  timezone: string | undefined
   dismissForSession: () => void
   reopen: () => void
 }
@@ -29,13 +29,14 @@ export const useMigrateNowPrompt = (): MigrateNowPrompt => {
 
   const isReceiveDisabled =
     accountType === AccountType.Custodial &&
-    windDown.status === WindDownStatus.ReceiveDisabled
+    windDown?.status === WindDownStatus.ReceiveDisabled
 
+  /** The deadline fields are display data for the modal, only read while visible. */
   return {
     isVisible: isReceiveDisabled && !isDismissedForSession,
     isReceiveDisabled,
-    deadlineTimestamp: windDown.finalDeadline,
-    timezone: windDown.timezone,
+    deadlineTimestamp: windDown?.finalDeadline ?? 0,
+    timezone: windDown?.timezone,
     dismissForSession,
     reopen,
   }

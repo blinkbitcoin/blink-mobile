@@ -10,10 +10,10 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ accountType: mockAccountType }),
 }))
 
-let mockStatus: WindDownStatus = WindDownStatus.PreCutoff
+let mockStatus: WindDownStatus | null = WindDownStatus.PreCutoff
 
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
-  useWindDownStatus: () => ({ status: mockStatus }),
+  useWindDownStatus: () => (mockStatus === null ? null : { status: mockStatus }),
 }))
 
 describe("useWindDownReceiveBlocked", () => {
@@ -39,6 +39,14 @@ describe("useWindDownReceiveBlocked", () => {
   })
 
   it("stays open before the receive cutoff", () => {
+    const { result } = renderHook(() => useWindDownReceiveBlocked())
+
+    expect(result.current).toBe(false)
+  })
+
+  it("stays open for an account the wind-down does not affect", () => {
+    mockStatus = null
+
     const { result } = renderHook(() => useWindDownReceiveBlocked())
 
     expect(result.current).toBe(false)

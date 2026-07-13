@@ -2,6 +2,7 @@ import { act, renderHook } from "@testing-library/react-native"
 
 import { useMigrateNowPrompt } from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
 import {
+  WindDown,
   windDownMock,
   WindDownStatus,
 } from "@app/screens/account-migration/utils/backend-mock"
@@ -13,10 +14,14 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ accountType: mockAccountType }),
 }))
 
-let mockStatus: WindDownStatus = WindDownStatus.ReceiveDisabled
+if (windDownMock === null) throw new Error("These tests exercise the affected mock")
+const affectedWindDown: WindDown = windDownMock
+
+let mockStatus: WindDownStatus | null = WindDownStatus.ReceiveDisabled
 
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
-  useWindDownStatus: () => ({ ...windDownMock, status: mockStatus }),
+  useWindDownStatus: () =>
+    mockStatus === null ? null : { ...affectedWindDown, status: mockStatus },
 }))
 
 describe("useMigrateNowPrompt", () => {
@@ -30,8 +35,8 @@ describe("useMigrateNowPrompt", () => {
 
     expect(result.current.isVisible).toBe(true)
     expect(result.current.isReceiveDisabled).toBe(true)
-    expect(result.current.deadlineTimestamp).toBe(windDownMock.finalDeadline)
-    expect(result.current.timezone).toBe(windDownMock.timezone)
+    expect(result.current.deadlineTimestamp).toBe(affectedWindDown.finalDeadline)
+    expect(result.current.timezone).toBe(affectedWindDown.timezone)
   })
 
   it("stays quiet before the receive cutoff", () => {
@@ -49,6 +54,15 @@ describe("useMigrateNowPrompt", () => {
     const { result } = renderHook(() => useMigrateNowPrompt())
 
     expect(result.current.isVisible).toBe(false)
+  })
+
+  it("stays quiet for an account the wind-down does not affect", () => {
+    mockStatus = null
+
+    const { result } = renderHook(() => useMigrateNowPrompt())
+
+    expect(result.current.isVisible).toBe(false)
+    expect(result.current.isReceiveDisabled).toBe(false)
   })
 
   it("never prompts a self-custodial account", () => {
