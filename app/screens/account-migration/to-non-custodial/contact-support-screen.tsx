@@ -1,13 +1,20 @@
-import React, { useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { useNavigation } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+
 import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useMigrationSupportDetails } from "@app/screens/account-migration/hooks"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  useHardwareBackGuard,
+  useMigrationSupportDetails,
+} from "@app/screens/account-migration/hooks"
 /** Deep import on purpose: its device-location chain stays out of the hooks barrel. */
 import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/use-migration-support-email"
 import { ellipsizeMiddle } from "@app/utils/helper"
@@ -41,8 +48,15 @@ export const MigrationContactSupportScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
 
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { sendSupportEmail } = useMigrationSupportEmail()
   const { accountId, pubKey, username, email, phone } = useMigrationSupportDetails()
+
+  /** Back never exits the migration: it returns to the commit point (Step 8). */
+  const returnToBalanceSummary = useCallback(() => {
+    navigation.navigate("accountMigrationBalancesOverview")
+  }, [navigation])
+  useHardwareBackGuard(returnToBalanceSummary)
 
   const rows: DiagnosticsRow[] = useMemo(
     () =>

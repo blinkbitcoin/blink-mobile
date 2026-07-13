@@ -23,6 +23,14 @@ let mockDetails = {
   phone: "+1 374 9383 993",
 }
 
+const mockNavigate = jest.fn()
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => ({ navigate: mockNavigate }),
+  useFocusEffect: (callback: () => void | (() => void)) =>
+    jest.requireActual<typeof import("react")>("react").useEffect(callback, [callback]),
+}))
+
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationSupportDetails: () => mockDetails,
@@ -50,6 +58,20 @@ describe("MigrationContactSupportScreen", () => {
       email: "email@email.com",
       phone: "+1 374 9383 993",
     }
+  })
+
+  it("redirects the hardware back to the commit point instead of exiting", async () => {
+    const { BackHandler } = jest.requireActual<
+      typeof import("react-native")
+    >("react-native")
+    const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
+    renderScreen()
+    await flushEffects()
+
+    const handler = addListenerSpy.mock.calls[0][1] as () => boolean
+
+    expect(handler()).toBe(true)
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
   it("renders the hero, every diagnostics row and the contact action", async () => {

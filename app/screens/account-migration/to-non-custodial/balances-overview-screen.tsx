@@ -23,6 +23,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
   MigrationCheckpoint,
+  useHardwareBackGuard,
   useMigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
@@ -65,6 +66,10 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     AccountType.SelfCustodial,
   )
   const { loading: checkpointLoading, saveCheckpoint } = useMigrationCheckpoint()
+
+  /** The commit point has no return path (FR10): the gesture is disabled on the
+   *  route, and the hardware back is swallowed here. */
+  useHardwareBackGuard()
 
   /** Landing here is the commit point, so an app relaunch returns to this screen.
    *  TODO: the backend will hold this server-side once the migration state query ships

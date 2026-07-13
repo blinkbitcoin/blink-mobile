@@ -16,11 +16,14 @@ jest.mock("@react-navigation/native", () => ({
 
 const mockCompleteMigration = jest.fn()
 let mockMigrationAccountId: string | null = "sc-account-1"
+const mockUseHardwareBackGuard = jest.fn()
+
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useCompleteMigration: () => ({
     migrationAccountId: mockMigrationAccountId,
     completeMigration: mockCompleteMigration,
   }),
+  useHardwareBackGuard: (onBack?: () => void) => mockUseHardwareBackGuard(onBack),
 }))
 
 jest.mock("@app/utils/error-logging", () => ({
@@ -54,6 +57,13 @@ describe("TransferringFundsScreen", () => {
 
   afterEach(() => {
     jest.useRealTimers()
+  })
+
+  it("swallows the hardware back while the funds move", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseHardwareBackGuard).toHaveBeenCalledWith(undefined)
   })
 
   it("renders the transferring funds message in the status layout", async () => {

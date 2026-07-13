@@ -9,7 +9,10 @@ import { Screen } from "@app/components/screen"
 import { StatusScreenLayout } from "@app/components/status-screen-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useCompleteMigration } from "@app/screens/account-migration/hooks"
+import {
+  useCompleteMigration,
+  useHardwareBackGuard,
+} from "@app/screens/account-migration/hooks"
 import { reportError } from "@app/utils/error-logging"
 
 // TODO: replace with the backend funds-transfer request; this 3s delay simulates it.
@@ -23,6 +26,9 @@ export const TransferringFundsScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { migrationAccountId, completeMigration } = useCompleteMigration()
+
+  /** No navigation at all while the funds move (FR59). */
+  useHardwareBackGuard()
 
   useEffect(() => {
     if (!migrationAccountId) return

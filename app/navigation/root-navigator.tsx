@@ -846,17 +846,17 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="accountMigrationBalancesOverview"
         component={MigrationBalancesOverviewScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="accountMigrationTransferringFunds"
         component={TransferringFundsScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="accountMigrationContactSupport"
         component={MigrationContactSupportScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialRestoreMethod"
