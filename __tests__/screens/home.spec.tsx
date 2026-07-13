@@ -135,6 +135,31 @@ jest.mock("@app/hooks/use-dollar-balance-forced-conversion", () => ({
   },
 }))
 
+let mockMigratePromptVisible = false
+const mockDismissMigratePrompt = jest.fn()
+
+jest.mock("@app/screens/account-migration/hooks/use-migrate-now-prompt", () => ({
+  useMigrateNowPrompt: () => ({
+    isVisible: mockMigratePromptVisible,
+    deadlineTimestamp: 1787003999,
+    timezone: "Europe/Paris",
+    dismissForSession: mockDismissMigratePrompt,
+  }),
+}))
+
+const mockMigrateNowModal = jest.fn()
+
+jest.mock("@app/components/migrate-now-modal", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View } = jest.requireActual("react-native")
+  return {
+    MigrateNowModal: (props: { onMigrate: () => void; toggleModal: () => void }) => {
+      mockMigrateNowModal(props)
+      return ReactActual.createElement(View, { testID: "migrate-now-modal" })
+    },
+  }
+})
+
 const mockUseNonCustodialConversionLimits = jest.fn()
 
 jest.mock("@app/self-custodial/hooks", () => ({
@@ -547,6 +572,7 @@ describe("HomeScreen", () => {
     currentMocks = []
     mockActiveWalletOverride = null
     mockDollarBalanceRestrictedOverride = false
+    mockMigratePromptVisible = false
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
     mockForcedConversionParams = null
@@ -656,6 +682,73 @@ describe("HomeScreen", () => {
     await flushEffects()
 
     expect(queryByTestId("convert-modal")).toBeNull()
+  })
+
+  it("pushes the migrate-now prompt when receiving is disabled", async () => {
+    mockMigratePromptVisible = true
+
+    const { findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("migrate-now-modal")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  it("keeps the migrate-now prompt hidden while nothing disables receiving", async () => {
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+  })
+
+  it("lets the forced conversion outrank the migrate-now prompt", async () => {
+    mockMigratePromptVisible = true
+    mockDollarBalanceRestrictedOverride = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { findByTestId, queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("convert-modal")).toBeTruthy()
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+
+    await flushEffects()
+  })
+
+  it("enters the migration flow from the migrate-now prompt", async () => {
+    mockMigratePromptVisible = true
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const { onMigrate, toggleModal } = mockMigrateNowModal.mock.calls[0][0]
+    onMigrate()
+    toggleModal()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
+    expect(mockDismissMigratePrompt).toHaveBeenCalledTimes(1)
   })
 
   it("forces the self-custodial conversion when a restricted account holds a stable-token balance", async () => {

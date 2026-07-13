@@ -50,6 +50,9 @@ import {
   useDollarBalanceRestrictionSync,
 } from "@app/hooks/use-dollar-balance-restricted"
 import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
+import { MigrateNowModal } from "@app/components/migrate-now-modal"
+/** Deep import on purpose: keeps the migration hooks barrel out of the home graph. */
+import { useMigrateNowPrompt } from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
 import {
   useTransferBlocked,
   useTransferBlockedSync,
@@ -445,6 +448,13 @@ export const HomeScreen: React.FC = () => {
       : null
   const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible
 
+  const migrateNowPrompt = useMigrateNowPrompt()
+  const goToMigration = React.useCallback(() => {
+    navigation.navigate("accountMigrationEntry")
+  }, [navigation])
+  /** The non-dismissible forced conversion outranks the migrate-now push. */
+  const shouldShowMigrateNowPrompt = migrateNowPrompt.isVisible && !isConvertModalVisible
+
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
   const openUpgradeModal = React.useCallback(() => {
@@ -669,6 +679,15 @@ export const HomeScreen: React.FC = () => {
           toggleModal={closeConvertModal}
           usdWalletBalance={restrictedUsdMoneyAmount}
           conversionMinimum={stableTokenConversionMinimum}
+        />
+      )}
+      {shouldShowMigrateNowPrompt && (
+        <MigrateNowModal
+          isVisible
+          toggleModal={migrateNowPrompt.dismissForSession}
+          onMigrate={goToMigration}
+          deadlineTimestamp={migrateNowPrompt.deadlineTimestamp}
+          timezone={migrateNowPrompt.timezone}
         />
       )}
       <View style={styles.balanceContainer}>
