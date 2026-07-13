@@ -16,7 +16,7 @@ type MigrateNowPrompt = {
   reopen: () => void
 }
 
-/** The post-cutoff prompt (FR37): once the server reports receiving disabled, each
+/** The post-cutoff prompt: once the server reports receiving disabled, each
  *  session opens with a dismissible push into the migration, dated by the server.
  *  The same state greys out the home Receive action, whose tap reopens the prompt. */
 export const useMigrateNowPrompt = (): MigrateNowPrompt => {

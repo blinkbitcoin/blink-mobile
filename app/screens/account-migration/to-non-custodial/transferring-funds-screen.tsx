@@ -27,7 +27,7 @@ export const TransferringFundsScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { migrationAccountId, completeMigration } = useCompleteMigration()
 
-  /** No navigation at all while the funds move (FR59). */
+  /** No navigation at all while the funds move. */
   useHardwareBackGuard()
 
   useEffect(() => {

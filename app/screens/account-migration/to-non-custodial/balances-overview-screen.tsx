@@ -54,7 +54,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   /** Gate-ness is server state, not navigation state: the post-gate flow converts
-   *  dollars, so this variant quotes the reference exchange rate (FR69). */
+   *  dollars, so this variant quotes the reference exchange rate. */
   const isPostGate = useMigrationGateArmed()
 
   const isAuthed = useIsAuthed()
@@ -68,7 +68,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   )
   const { loading: checkpointLoading, saveCheckpoint } = useMigrationCheckpoint()
 
-  /** The commit point has no return path (FR10): the gesture is disabled on the
+  /** The commit point has no return path: the gesture is disabled on the
    *  route, and the hardware back is swallowed here. */
   useHardwareBackGuard()
 

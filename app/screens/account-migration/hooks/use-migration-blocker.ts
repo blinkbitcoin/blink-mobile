@@ -13,7 +13,7 @@ type MigrationBlocker = {
 }
 
 /** Decides the forced root blocker: a forced-cohort account may dismiss it for the
- *  session, while an armed gate (FR53) ignores the dismissal and offers no close. */
+ *  session, while an armed gate ignores the dismissal and offers no close. */
 export const useMigrationBlocker = (): MigrationBlocker => {
   const [isDismissedForSession, setIsDismissedForSession] = useState(false)
   const dismissForSession = useCallback(() => setIsDismissedForSession(true), [])

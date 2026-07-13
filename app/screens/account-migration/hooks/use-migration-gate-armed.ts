@@ -5,7 +5,7 @@ import { WindDownStatus } from "../utils/backend-mock"
 
 import { useWindDownStatus } from "./use-wind-down-status"
 
-/** The post-deadline gate (FR53) arms only for custodial accounts whose server
+/** The post-deadline gate arms only for custodial accounts whose server
  *  wind-down status reports the closure; the client never derives it from dates. */
 export const useMigrationGateArmed = (): boolean => {
   const { accountType } = useActiveWallet()
