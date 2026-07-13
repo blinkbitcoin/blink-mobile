@@ -1,12 +1,13 @@
 /**
  * Fetches a fresh unilateral-exit recovery bundle from the Spark operators.
  *
- * Mirrors the spark-unilateral-exit Rust exporter: authenticate to the
- * coordinator with the seed-derived identity key, page through
- * query_nodes(owner, include_parents=true), then verify every leaf's ancestor
- * chain is closed - re-fetching missing ancestors by node id, which bypasses
- * the operators' root-skip bug on legacy mainnet trees. A bundle with an open
- * chain is unusable for exit, so incompleteness is an error, not a warning.
+ * Mirrors the spark-unilateral-exit reference exporter (src/operator/):
+ * authenticate to the coordinator with the seed-derived identity key, page
+ * through query_nodes(owner, include_parents=true), then verify every leaf's
+ * ancestor chain is closed - re-fetching missing ancestors by node id, which
+ * bypasses the operators' root-skip bug on legacy mainnet trees. A bundle
+ * with an open chain is unusable for exit, so incompleteness is an error,
+ * not a warning.
  */
 
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
