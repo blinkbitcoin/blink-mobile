@@ -136,14 +136,18 @@ jest.mock("@app/hooks/use-dollar-balance-forced-conversion", () => ({
 }))
 
 let mockMigratePromptVisible = false
+let mockReceiveDisabled = false
 const mockDismissMigratePrompt = jest.fn()
+const mockReopenMigratePrompt = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks/use-migrate-now-prompt", () => ({
   useMigrateNowPrompt: () => ({
     isVisible: mockMigratePromptVisible,
+    isReceiveDisabled: mockReceiveDisabled,
     deadlineTimestamp: 1787003999,
     timezone: "Europe/Paris",
     dismissForSession: mockDismissMigratePrompt,
+    reopen: mockReopenMigratePrompt,
   }),
 }))
 
@@ -573,6 +577,7 @@ describe("HomeScreen", () => {
     mockActiveWalletOverride = null
     mockDollarBalanceRestrictedOverride = false
     mockMigratePromptVisible = false
+    mockReceiveDisabled = false
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
     mockForcedConversionParams = null
@@ -1407,5 +1412,137 @@ describe("HomeScreen", () => {
 
       expect(mockSelfCustodialInfoBulletin).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe("HomeScreen wind-down states", () => {
+  beforeEach(() => {
+    currentMocks = []
+    mockActiveWalletOverride = null
+    mockDollarBalanceRestrictedOverride = false
+    mockMigratePromptVisible = false
+    mockReceiveDisabled = false
+    mockTransferBlockedOverride = false
+    mockDollarBalanceModalVisible = false
+    jest.clearAllMocks()
+  })
+
+  it("pushes the migrate-now prompt when receiving is disabled", async () => {
+    mockMigratePromptVisible = true
+
+    const { findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("migrate-now-modal")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  it("keeps the migrate-now prompt hidden while nothing disables receiving", async () => {
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+  })
+
+  it("lets the forced conversion outrank the migrate-now prompt", async () => {
+    mockMigratePromptVisible = true
+    mockDollarBalanceRestrictedOverride = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { findByTestId, queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("convert-modal")).toBeTruthy()
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+
+    await flushEffects()
+  })
+
+  it("enters the migration flow from the migrate-now prompt", async () => {
+    mockMigratePromptVisible = true
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const { onMigrate, toggleModal } = mockMigrateNowModal.mock.calls[0][0]
+    onMigrate()
+    toggleModal()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
+    expect(mockDismissMigratePrompt).toHaveBeenCalledTimes(1)
+  })
+
+  it("greys out the receive action while receiving is disabled, reopening the prompt", async () => {
+    mockReceiveDisabled = true
+    mockNavigate.mockClear()
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("receive"))
+
+    expect(mockReopenMigratePrompt).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("receiveBitcoin")
+  })
+
+  it("keeps the receive action live while receiving stays enabled", async () => {
+    mockNavigate.mockClear()
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("receive"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("receiveBitcoin")
+    expect(mockReopenMigratePrompt).not.toHaveBeenCalled()
+
+    mockActiveWalletOverride = null
   })
 })

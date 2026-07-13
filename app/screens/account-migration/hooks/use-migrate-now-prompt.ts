@@ -9,16 +9,20 @@ import { useWindDownStatus } from "./use-wind-down-status"
 
 type MigrateNowPrompt = {
   isVisible: boolean
+  isReceiveDisabled: boolean
   deadlineTimestamp: number
   timezone: string
   dismissForSession: () => void
+  reopen: () => void
 }
 
 /** The post-cutoff prompt (FR37): once the server reports receiving disabled, each
- *  session opens with a dismissible push into the migration, dated by the server. */
+ *  session opens with a dismissible push into the migration, dated by the server.
+ *  The same state greys out the home Receive action, whose tap reopens the prompt. */
 export const useMigrateNowPrompt = (): MigrateNowPrompt => {
   const [isDismissedForSession, setIsDismissedForSession] = useState(false)
   const dismissForSession = useCallback(() => setIsDismissedForSession(true), [])
+  const reopen = useCallback(() => setIsDismissedForSession(false), [])
 
   const { accountType } = useActiveWallet()
   const windDown = useWindDownStatus()
@@ -29,8 +33,10 @@ export const useMigrateNowPrompt = (): MigrateNowPrompt => {
 
   return {
     isVisible: isReceiveDisabled && !isDismissedForSession,
+    isReceiveDisabled,
     deadlineTimestamp: windDown.finalDeadline,
     timezone: windDown.timezone,
     dismissForSession,
+    reopen,
   }
 }

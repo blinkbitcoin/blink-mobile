@@ -29,6 +29,7 @@ describe("useMigrateNowPrompt", () => {
     const { result } = renderHook(() => useMigrateNowPrompt())
 
     expect(result.current.isVisible).toBe(true)
+    expect(result.current.isReceiveDisabled).toBe(true)
     expect(result.current.deadlineTimestamp).toBe(windDownMock.finalDeadline)
     expect(result.current.timezone).toBe(windDownMock.timezone)
   })
@@ -39,6 +40,7 @@ describe("useMigrateNowPrompt", () => {
     const { result } = renderHook(() => useMigrateNowPrompt())
 
     expect(result.current.isVisible).toBe(false)
+    expect(result.current.isReceiveDisabled).toBe(false)
   })
 
   it("stays quiet once the gate closes, where the blocker takes over", () => {
@@ -65,5 +67,19 @@ describe("useMigrateNowPrompt", () => {
     })
 
     expect(result.current.isVisible).toBe(false)
+    expect(result.current.isReceiveDisabled).toBe(true)
+  })
+
+  it("prompts again when reopened after a dismissal", () => {
+    const { result } = renderHook(() => useMigrateNowPrompt())
+
+    act(() => {
+      result.current.dismissForSession()
+    })
+    act(() => {
+      result.current.reopen()
+    })
+
+    expect(result.current.isVisible).toBe(true)
   })
 })

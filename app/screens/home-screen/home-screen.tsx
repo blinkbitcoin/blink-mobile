@@ -579,6 +579,8 @@ export const HomeScreen: React.FC = () => {
       title: LL.HomeScreen.receive(),
       target: "receiveBitcoin",
       icon: "receive",
+      disabled: migrateNowPrompt.isReceiveDisabled,
+      onDisabledPress: migrateNowPrompt.reopen,
     },
     {
       title: LL.HomeScreen.send(),
