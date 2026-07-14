@@ -11,8 +11,6 @@ import { flushEffects } from "../../../helpers/flush-effects"
 loadLocale("en")
 const LL = i18nObject("en")
 
-const DOWNLOAD_HISTORY_ROUTE = "accountMigrationDownloadHistory"
-
 const mockNavigate = jest.fn()
 const mockReplace = jest.fn()
 const mockUseAddressScreenQuery = jest.fn()
@@ -35,22 +33,16 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => true,
 }))
 
-const mockNavigateToCheckpoint = jest.fn()
+const mockGoToNextStep = jest.fn()
 const mockReplaceToCheckpoint = jest.fn()
-let mockHasResumableCheckpoint = false
-let mockHasTransactions = true
-let mockTransactionsLoading = false
+let mockNextStepLoading = false
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
-  useMigrationCheckpoint: () => ({
-    navigateToCheckpoint: mockNavigateToCheckpoint,
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
+  useMigrationNextStep: () => ({
+    goToNextStep: mockGoToNextStep,
     replaceToCheckpoint: mockReplaceToCheckpoint,
-    hasResumableCheckpoint: mockHasResumableCheckpoint,
-    loading: false,
-  }),
-  useHasTransactions: () => ({
-    hasTransactions: mockHasTransactions,
-    loading: mockTransactionsLoading,
+    loading: mockNextStepLoading,
   }),
 }))
 
@@ -74,9 +66,7 @@ describe("MigrationKeepReceivingScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockIsFocused = true
-    mockHasResumableCheckpoint = false
-    mockHasTransactions = true
-    mockTransactionsLoading = false
+    mockNextStepLoading = false
     mockUseAddressScreenQuery.mockReturnValue({
       data: { me: { username: "satoshin21" } },
       loading: false,
@@ -109,37 +99,17 @@ describe("MigrationKeepReceivingScreen", () => {
     expect(address.props.ellipsizeMode).toBe("middle")
   })
 
-  it("goes to the download-history step when the CTA is pressed", async () => {
+  it("hands off to the flow's next step when the CTA is pressed", async () => {
     renderScreen()
     await flushEffects()
 
     fireEvent.press(screen.getByText(LL.AccountMigration.keepReceivingCta()))
 
-    expect(mockNavigate).toHaveBeenCalledWith(DOWNLOAD_HISTORY_ROUTE)
+    expect(mockGoToNextStep).toHaveBeenCalledTimes(1)
   })
 
-  it("skips the download step when the account has no transactions", async () => {
-    mockHasTransactions = false
-    renderScreen()
-    await flushEffects()
-
-    fireEvent.press(screen.getByText(LL.AccountMigration.keepReceivingCta()))
-
-    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
-  })
-
-  it("returns to the checkpoint when resuming instead of re-offering the download", async () => {
-    mockHasResumableCheckpoint = true
-    renderScreen()
-    await flushEffects()
-
-    fireEvent.press(screen.getByText(LL.AccountMigration.keepReceivingCta()))
-
-    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
-  })
-
-  it("renders nothing while the transaction check is loading", async () => {
-    mockTransactionsLoading = true
+  it("renders nothing while the next-step checks are loading", async () => {
+    mockNextStepLoading = true
     renderScreen()
     await flushEffects()
 

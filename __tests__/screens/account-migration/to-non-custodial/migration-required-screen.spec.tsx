@@ -17,11 +17,9 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const KEEP_RECEIVING_ROUTE = "accountMigrationKeepReceiving"
-const DOWNLOAD_HISTORY_ROUTE = "accountMigrationDownloadHistory"
 const CONTACT_EMAIL = "support@blink.sv"
 
 const mockNavigate = jest.fn()
-const mockNavigateToCheckpoint = jest.fn()
 const mockGoBack = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
 const mockUseAddressScreenQuery = jest.fn()
@@ -47,19 +45,15 @@ jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => true,
 }))
 
-let mockHasResumableCheckpoint = false
-let mockHasTransactions = false
-let mockTransactionsLoading = false
+const mockGoToNextStep = jest.fn()
+let mockNextStepLoading = false
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
-  useMigrationCheckpoint: () => ({
-    navigateToCheckpoint: mockNavigateToCheckpoint,
-    hasResumableCheckpoint: mockHasResumableCheckpoint,
-  }),
-  useHasTransactions: () => ({
-    hasTransactions: mockHasTransactions,
-    loading: mockTransactionsLoading,
+  useMigrationNextStep: () => ({
+    goToNextStep: mockGoToNextStep,
+    replaceToCheckpoint: jest.fn(),
+    loading: mockNextStepLoading,
   }),
 }))
 
@@ -99,9 +93,7 @@ describe("MigrationRequiredScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockConvertReady = true
-    mockHasResumableCheckpoint = false
-    mockHasTransactions = false
-    mockTransactionsLoading = false
+    mockNextStepLoading = false
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 2500 }),
     )
@@ -213,34 +205,14 @@ describe("MigrationRequiredScreen", () => {
   })
 
   describe("continue", () => {
-    it("skips straight into the migration flow when there is no lightning address", async () => {
+    it("hands off to the flow's next step when there is no lightning address", async () => {
       renderScreen("voluntary")
       await flushEffects()
 
       fireEvent.press(screen.getByText(LL.common.continue()))
 
-      expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
-    })
-
-    it("offers the history download when there is no lightning address but there is history", async () => {
-      mockHasTransactions = true
-      renderScreen("voluntary")
-      await flushEffects()
-
-      fireEvent.press(screen.getByText(LL.common.continue()))
-
-      expect(mockNavigate).toHaveBeenCalledWith(DOWNLOAD_HISTORY_ROUTE)
-    })
-
-    it("returns to the checkpoint when resuming even with history", async () => {
-      mockHasTransactions = true
-      mockHasResumableCheckpoint = true
-      renderScreen("voluntary")
-      await flushEffects()
-
-      fireEvent.press(screen.getByText(LL.common.continue()))
-
-      expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+      expect(mockGoToNextStep).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).not.toHaveBeenCalledWith(KEEP_RECEIVING_ROUTE)
     })
 
     it("routes through the keep-receiving screen when the user has a lightning address", async () => {
@@ -253,6 +225,17 @@ describe("MigrationRequiredScreen", () => {
       fireEvent.press(screen.getByText(LL.common.continue()))
 
       expect(mockNavigate).toHaveBeenCalledWith(KEEP_RECEIVING_ROUTE)
+      expect(mockGoToNextStep).not.toHaveBeenCalled()
+    })
+
+    it("marks the CTA as loading while the next-step checks load", async () => {
+      mockNextStepLoading = true
+      renderScreen("voluntary")
+      await flushEffects()
+
+      expect(
+        screen.getByTestId("migration-required-cta").props.accessibilityState?.busy,
+      ).toBe(true)
     })
   })
 })

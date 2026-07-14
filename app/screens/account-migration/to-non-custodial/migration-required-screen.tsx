@@ -20,8 +20,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
   useCustodialWalletBalances,
-  useHasTransactions,
-  useMigrationCheckpoint,
+  useMigrationNextStep,
 } from "@app/screens/account-migration/hooks"
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
@@ -50,8 +49,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { navigateToCheckpoint, hasResumableCheckpoint } = useMigrationCheckpoint()
-  const { hasTransactions, loading: transactionsLoading } = useHasTransactions()
+  const { goToNextStep, loading: nextStepLoading } = useMigrationNextStep()
   const { supportEmailAddress, openSupport } = useContactSupport()
 
   const isAuthed = useIsAuthed()
@@ -88,27 +86,15 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     : formatMoneyAmount({ moneyAmount: btcWalletAmount })
   const usdBalance = formatMoneyAmount({ moneyAmount: usdWalletAmount })
 
-  /** Without a lightning address the intro routes straight into the flow: a resumed
-   *  migration returns to its checkpoint, and a fresh one only gets the
-   *  history-download step when there is history to download. */
+  /** With a lightning address the intro passes through the keep-receiving screen;
+   *  otherwise it routes straight into the flow's next step. */
   const handleMigrate = useCallback(() => {
     if (hasLightningAddress) {
       navigation.navigate("accountMigrationKeepReceiving")
       return
     }
-    const shouldOfferHistoryDownload = hasTransactions && !hasResumableCheckpoint
-    if (shouldOfferHistoryDownload) {
-      navigation.navigate("accountMigrationDownloadHistory")
-      return
-    }
-    navigateToCheckpoint()
-  }, [
-    navigation,
-    hasLightningAddress,
-    hasTransactions,
-    hasResumableCheckpoint,
-    navigateToCheckpoint,
-  ])
+    goToNextStep()
+  }, [navigation, hasLightningAddress, goToNextStep])
 
   const handleClose = useCallback(() => {
     if (onClose) {
@@ -172,7 +158,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
           <GaloyPrimaryButton
             title={LL.common.continue()}
             onPress={handleMigrate}
-            loading={transactionsLoading}
+            loading={nextStepLoading}
             {...testProps("migration-required-cta")}
           />
         </View>

@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect } from "react"
+import React, { useEffect } from "react"
 import { View } from "react-native"
-import { useIsFocused, useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { useIsFocused } from "@react-navigation/native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -12,11 +11,7 @@ import { useAddressScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import {
-  useHasTransactions,
-  useMigrationCheckpoint,
-} from "@app/screens/account-migration/hooks"
+import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
 import { getLightningAddress } from "@app/utils/pay-links"
 import { testProps } from "@app/utils/testProps"
 
@@ -26,7 +21,6 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const {
     appConfig: {
@@ -35,12 +29,10 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
   } = useAppConfig()
 
   const {
-    navigateToCheckpoint,
+    goToNextStep,
     replaceToCheckpoint,
-    hasResumableCheckpoint,
-    loading: checkpointLoading,
-  } = useMigrationCheckpoint()
-  const { hasTransactions, loading: transactionsLoading } = useHasTransactions()
+    loading: nextStepLoading,
+  } = useMigrationNextStep()
 
   const isAuthed = useIsAuthed()
   const { data, loading: addressLoading } = useAddressScreenQuery({
@@ -54,23 +46,12 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
     : ""
 
   const isFocused = useIsFocused()
-  const isCheckReady = !addressLoading && !checkpointLoading && !transactionsLoading
+  const isCheckReady = !addressLoading && !nextStepLoading
   const hasLightningAddress = Boolean(username)
   /** Focus-gated: this screen stays mounted under the stack for the whole migration,
    *  and the post-migration session swap drops the username, which must not make a
    *  background instance replace itself into the flow again. */
   const shouldSkipScreen = isFocused && isCheckReady && !hasLightningAddress
-
-  /** A resumed migration already passed the download step so it returns to its
-   *  checkpoint; a fresh one only sees the step when there is history to download. */
-  const goToNextStep = useCallback(() => {
-    const shouldOfferHistoryDownload = hasTransactions && !hasResumableCheckpoint
-    if (shouldOfferHistoryDownload) {
-      navigation.navigate("accountMigrationDownloadHistory")
-      return
-    }
-    navigateToCheckpoint()
-  }, [navigation, hasTransactions, hasResumableCheckpoint, navigateToCheckpoint])
 
   /** Guard: this screen needs a lightning address; without one, skip into the flow. */
   useEffect(() => {
