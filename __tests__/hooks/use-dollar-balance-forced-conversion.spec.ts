@@ -5,7 +5,11 @@ import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-
 describe("useDollarBalanceForcedConversion", () => {
   it("opens the convert modal when restricted and the balance is positive", () => {
     const { result } = renderHook(() =>
-      useDollarBalanceForcedConversion({ isRestricted: true, usdWalletBalance: 5000 }),
+      useDollarBalanceForcedConversion({
+        accountId: "account-a",
+        isRestricted: true,
+        usdWalletBalance: 5000,
+      }),
     )
 
     expect(result.current.isConvertModalVisible).toBe(true)
@@ -13,7 +17,11 @@ describe("useDollarBalanceForcedConversion", () => {
 
   it("does not open when the account is not restricted", () => {
     const { result } = renderHook(() =>
-      useDollarBalanceForcedConversion({ isRestricted: false, usdWalletBalance: 5000 }),
+      useDollarBalanceForcedConversion({
+        accountId: "account-a",
+        isRestricted: false,
+        usdWalletBalance: 5000,
+      }),
     )
 
     expect(result.current.isConvertModalVisible).toBe(false)
@@ -21,7 +29,11 @@ describe("useDollarBalanceForcedConversion", () => {
 
   it("does not open when the restricted account has no balance", () => {
     const { result } = renderHook(() =>
-      useDollarBalanceForcedConversion({ isRestricted: true, usdWalletBalance: 0 }),
+      useDollarBalanceForcedConversion({
+        accountId: "account-a",
+        isRestricted: true,
+        usdWalletBalance: 0,
+      }),
     )
 
     expect(result.current.isConvertModalVisible).toBe(false)
@@ -31,6 +43,7 @@ describe("useDollarBalanceForcedConversion", () => {
     const { result, rerender } = renderHook(
       ({ balance }: { balance: number }) =>
         useDollarBalanceForcedConversion({
+          accountId: "account-a",
           isRestricted: true,
           usdWalletBalance: balance,
         }),
@@ -49,6 +62,7 @@ describe("useDollarBalanceForcedConversion", () => {
     const { result, rerender } = renderHook(
       ({ balance }: { balance: number }) =>
         useDollarBalanceForcedConversion({
+          accountId: "account-a",
           isRestricted: true,
           usdWalletBalance: balance,
         }),
@@ -64,6 +78,7 @@ describe("useDollarBalanceForcedConversion", () => {
     const { result, rerender } = renderHook(
       ({ balance }: { balance: number }) =>
         useDollarBalanceForcedConversion({
+          accountId: "account-a",
           isRestricted: true,
           usdWalletBalance: balance,
         }),
@@ -75,5 +90,38 @@ describe("useDollarBalanceForcedConversion", () => {
     rerender({ balance: 0 })
 
     expect(result.current.isConvertModalVisible).toBe(false)
+  })
+
+  it("closes when switching to an account that is not restricted", () => {
+    const { result, rerender } = renderHook(
+      ({ accountId, isRestricted }: { accountId: string; isRestricted: boolean }) =>
+        useDollarBalanceForcedConversion({
+          accountId,
+          isRestricted,
+          usdWalletBalance: 5000,
+        }),
+      { initialProps: { accountId: "account-a", isRestricted: true } },
+    )
+    expect(result.current.isConvertModalVisible).toBe(true)
+
+    rerender({ accountId: "account-b", isRestricted: false })
+    expect(result.current.isConvertModalVisible).toBe(false)
+  })
+
+  it("re-opens for a new account that is itself restricted with a balance", () => {
+    const { result, rerender } = renderHook(
+      ({ accountId }: { accountId: string }) =>
+        useDollarBalanceForcedConversion({
+          accountId,
+          isRestricted: true,
+          usdWalletBalance: 5000,
+        }),
+      { initialProps: { accountId: "account-a" } },
+    )
+    act(() => result.current.closeConvertModal())
+    expect(result.current.isConvertModalVisible).toBe(false)
+
+    rerender({ accountId: "account-b" })
+    expect(result.current.isConvertModalVisible).toBe(true)
   })
 })

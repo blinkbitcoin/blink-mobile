@@ -4,11 +4,9 @@ import type { BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
 import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
 import { logSelfCustodialStableBalanceActivated } from "@app/self-custodial/analytics"
-import {
-  activateStableBalance,
-  deactivateStableBalance,
-} from "@app/self-custodial/bridge"
+import { activateStableBalance } from "@app/self-custodial/bridge"
 import { SparkToken } from "@app/self-custodial/config"
+import { deactivateStableBalanceAndRefresh } from "@app/self-custodial/stable-balance"
 import type { TranslationFunctions } from "@app/i18n/i18n-types"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
@@ -66,11 +64,17 @@ export const useStableBalanceToggle = ({
         if (activate) {
           await activateStableBalance(sdk, SparkToken.Label)
           logSelfCustodialStableBalanceActivated({ label: SparkToken.Label })
+          await refreshStableBalanceActive()
+          await refreshWallets()
         } else {
-          await deactivateStableBalance(sdk)
+          const deactivated = await deactivateStableBalanceAndRefresh({
+            sdk,
+            refreshWallets,
+            refreshStableBalanceActive,
+            LL,
+          })
+          if (!deactivated) resyncSwitch()
         }
-        await refreshStableBalanceActive()
-        await refreshWallets()
       } catch (err) {
         reportError("Stable Balance toggle", err)
         toastShow({

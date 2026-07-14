@@ -690,6 +690,40 @@ describe("HomeScreen", () => {
     mockActiveWalletOverride = null
   })
 
+  it("shows neither convert modal in the account-switch window, while the SDK still connects", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    /** Right after switching to self-custodial: the restriction already applies
+     *  the self-custodial policy (accountType) but the SDK has not connected yet
+     *  (isSelfCustodial false), and the custodial query data is still cached. */
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "unavailable",
+      accountType: "self-custodial",
+      isReady: false,
+      isSelfCustodial: false,
+      needsBackendAuth: false,
+    }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("convert-modal")).toBeNull()
+    expect(queryByTestId("sc-convert-modal")).toBeNull()
+
+    mockActiveWalletOverride = null
+  })
+
   it("opens the dollar-balance restriction modal from the disabled transfer button", async () => {
     mockDollarBalanceRestrictedOverride = true
     mockActiveWalletOverride = {

@@ -78,7 +78,9 @@ import {
   useHomeUnauthedQuery,
   useRealtimePriceQuery,
   useSettingsScreenQuery,
+  WalletCurrency,
 } from "@app/graphql/generated"
+import { AccountType } from "@app/types/wallet"
 import { useLevel } from "@app/graphql/level-context"
 
 const TransactionCountToTriggerSetDefaultAccountModal = 1
@@ -196,7 +198,7 @@ export const HomeScreen: React.FC = () => {
     isStableBalanceActive,
     lightningAddress: selfCustodialLightningAddress,
   } = useSelfCustodialWallet()
-  const { accounts } = useAccountRegistry()
+  const { accounts, activeAccount } = useAccountRegistry()
   const hasMultipleAccounts = accounts.length > 1
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
@@ -373,8 +375,20 @@ export const HomeScreen: React.FC = () => {
 
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
-  /** `wallets` resolves per account type, so this balance covers both variants. */
-  const restrictedUsdWalletBalance = getUsdWallet(wallets)?.balance ?? 0
+  /** Balance and restriction policy must resolve for the SAME account type: right
+   *  after switching to self-custodial the SDK is still connecting (so
+   *  `isSelfCustodial` is false) while the restriction already applies the
+   *  self-custodial policy; reading the cached custodial balance in that window
+   *  would trigger the previous account's modal. */
+  const isCustodialAccount = activeWallet.accountType === AccountType.Custodial
+  const selfCustodialUsdWallet = activeWallet.wallets.find(
+    (w) => w.walletCurrency === WalletCurrency.Usd,
+  )
+  const custodialUsdWalletBalance = restrictedUsdWallet?.balance ?? 0
+  const selfCustodialUsdWalletBalance = selfCustodialUsdWallet?.balance.amount ?? 0
+  const restrictedUsdWalletBalance = isCustodialAccount
+    ? custodialUsdWalletBalance
+    : selfCustodialUsdWalletBalance
   /** Memoized so the self-custodial quote does not refire on unrelated re-renders. */
   const restrictedUsdMoneyAmount = useMemo(
     () => toUsdMoneyAmount(restrictedUsdWalletBalance),
@@ -382,6 +396,7 @@ export const HomeScreen: React.FC = () => {
   )
 
   const { isConvertModalVisible, closeConvertModal } = useDollarBalanceForcedConversion({
+    accountId: activeAccount?.id,
     isRestricted: isDollarBalanceRestricted,
     usdWalletBalance: restrictedUsdWalletBalance,
   })
@@ -389,7 +404,7 @@ export const HomeScreen: React.FC = () => {
   /** Each account type renders its own convert modal; the guards keep them exclusive
    *  locally instead of relying on the skipped custodial query staying empty. */
   const custodialConvertWallets =
-    !isSelfCustodial && restrictedUsdWallet && restrictedBtcWallet
+    isCustodialAccount && restrictedUsdWallet && restrictedBtcWallet
       ? { usdWalletId: restrictedUsdWallet.id, btcWalletId: restrictedBtcWallet.id }
       : null
   const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible

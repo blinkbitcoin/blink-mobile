@@ -373,8 +373,10 @@ describe("StableBalanceSettingsScreen", () => {
       expect(mockRecordError).toHaveBeenCalledWith(failure)
       expect(mockToastShow).toHaveBeenCalledTimes(1)
     })
-    expect(mockRefresh).not.toHaveBeenCalled()
-    expect(mockRefreshStableBalanceActive).not.toHaveBeenCalled()
+    /** The refresh still runs after a failed deactivation, re-syncing the
+     *  switch with the source of truth. */
+    expect(mockRefresh).toHaveBeenCalledTimes(1)
+    expect(mockRefreshStableBalanceActive).toHaveBeenCalledTimes(1)
 
     await flushEffects()
   })

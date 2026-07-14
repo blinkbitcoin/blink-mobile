@@ -152,10 +152,10 @@ jest.mock("@app/screens/conversion-flow/hooks/self-custodial/use-conversion", ()
 }))
 
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
-  type Props = { onSwipe: () => void; initialText: string }
+  type Props = { onSwipe: () => void; initialText: string; disabled?: boolean }
 
-  const MockGaloySliderButton = ({ onSwipe, initialText }: Props) => (
-    <TouchableOpacity onPress={onSwipe}>
+  const MockGaloySliderButton = ({ onSwipe, initialText, disabled }: Props) => (
+    <TouchableOpacity onPress={onSwipe} disabled={disabled}>
       <Text>{initialText}</Text>
     </TouchableOpacity>
   )
@@ -561,6 +561,100 @@ describe("conversion-confirmation-screen — self-custodial submit path", () => 
       expect(executeMock).toHaveBeenCalledTimes(1)
     })
     expect(dispatchMock).not.toHaveBeenCalled()
+  })
+
+  it("retries the quote on swipe after a quote error instead of executing", async () => {
+    const executeMock = jest.fn()
+    const requoteMock = jest.fn()
+    mockSelfCustodialConversion.mockReturnValue({
+      isQuoting: false,
+      hasQuoteError: true,
+      feeText: "",
+      adjustmentText: null,
+      canExecute: false,
+      loading: false,
+      execute: executeMock,
+      requote: requoteMock,
+    })
+
+    const route = {
+      key: "conversionConfirmation",
+      name: "conversionConfirmation",
+      params: {
+        fromWalletCurrency: WalletCurrency.Btc,
+        moneyAmount: {
+          amount: 10000,
+          currency: WalletCurrency.Btc,
+          currencyCode: WalletCurrency.Btc,
+        },
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <ConversionConfirmationScreen route={route} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.press(
+      screen.getByText(
+        LL.ConversionConfirmationScreen.transferButtonText({
+          fromWallet: LL.common.bitcoin(),
+          toWallet: LL.common.dollar(),
+        }),
+      ),
+    )
+
+    await waitFor(() => {
+      expect(requoteMock).toHaveBeenCalledTimes(1)
+    })
+    expect(executeMock).not.toHaveBeenCalled()
+  })
+
+  it("keeps the slider disabled while the quote is still pending", () => {
+    const executeMock = jest.fn()
+    const requoteMock = jest.fn()
+    mockSelfCustodialConversion.mockReturnValue({
+      isQuoting: true,
+      hasQuoteError: false,
+      feeText: "",
+      adjustmentText: null,
+      canExecute: false,
+      loading: false,
+      execute: executeMock,
+      requote: requoteMock,
+    })
+
+    const route = {
+      key: "conversionConfirmation",
+      name: "conversionConfirmation",
+      params: {
+        fromWalletCurrency: WalletCurrency.Btc,
+        moneyAmount: {
+          amount: 10000,
+          currency: WalletCurrency.Btc,
+          currencyCode: WalletCurrency.Btc,
+        },
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <ConversionConfirmationScreen route={route} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.press(
+      screen.getByText(
+        LL.ConversionConfirmationScreen.transferButtonText({
+          fromWallet: LL.common.bitcoin(),
+          toWallet: LL.common.dollar(),
+        }),
+      ),
+    )
+
+    expect(executeMock).not.toHaveBeenCalled()
+    expect(requoteMock).not.toHaveBeenCalled()
   })
 
   it("renders nothing while the wallets are unavailable", () => {

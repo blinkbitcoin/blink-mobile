@@ -286,6 +286,64 @@ describe("useSelfCustodialConversion", () => {
     expect(succeedingExecute).toHaveBeenCalledTimes(1)
   })
 
+  it("re-quotes the live amount when the balance changed while the conversion was in flight", async () => {
+    let rejectExecute: (err: Error) => void
+    const hangingExecute = jest.fn().mockImplementation(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectExecute = reject
+        }),
+    )
+    mockGetQuote.mockResolvedValue(makeQuote({ execute: hangingExecute }))
+
+    const { result, rerender } = renderHook(
+      (params: typeof defaultParams) => useSelfCustodialConversion(params),
+      { initialProps: defaultParams },
+    )
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    let executePromise: Promise<unknown> = Promise.resolve()
+    act(() => {
+      executePromise = result.current.execute()
+    })
+
+    rerender({ ...defaultParams, moneyAmount: toUsdMoneyAmount(700) })
+    await waitFor(() => expect(mockGetQuote).toHaveBeenCalledTimes(2))
+
+    await act(async () => {
+      rejectExecute!(new Error("conversion failed"))
+      await executePromise
+    })
+
+    /** The failure re-quote must pin the live 700-cent amount, not the
+     *  press-time 500-cent one. */
+    await waitFor(() => expect(mockGetQuote).toHaveBeenCalledTimes(3))
+    expect(mockGetQuote).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        fromAmount: expect.objectContaining({ amount: 70000 }),
+      }),
+    )
+  })
+
+  it("execute() surfaces a generic error and re-quotes when the SDK throws a non-Error", async () => {
+    const execute = jest.fn().mockRejectedValue("string failure")
+    mockGetQuote.mockResolvedValue(makeQuote({ execute }))
+
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    await act(async () => {
+      await result.current.execute()
+    })
+
+    expect(result.current.errorMessage).toBe("Generic error")
+    expect(mockRecordError).toHaveBeenCalledWith(expect.any(Error))
+    expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith("notificationError", {
+      ignoreAndroidSystemSettings: true,
+    })
+    expect(mockOnSuccess).not.toHaveBeenCalled()
+  })
+
   it("ignores a second execute() while the first is still in flight", async () => {
     const execute = jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success })
     mockGetQuote.mockResolvedValue(makeQuote({ execute }))

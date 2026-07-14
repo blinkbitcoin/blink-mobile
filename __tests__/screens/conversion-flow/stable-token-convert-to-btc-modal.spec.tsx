@@ -283,7 +283,7 @@ describe("StableTokenConvertToBtcModal", () => {
     expect(mockRefreshStableBalanceActive).toHaveBeenCalledTimes(1)
     expect(mockRefreshWallets).toHaveBeenCalledTimes(1)
     expect(mockReportError).toHaveBeenCalledWith(
-      "Stable token forced conversion deactivate",
+      "Stable Balance deactivate",
       expect.any(Error),
     )
   })
@@ -297,12 +297,12 @@ describe("StableTokenConvertToBtcModal", () => {
 
     expect(toggleModal).toHaveBeenCalledTimes(1)
     expect(mockReportError).toHaveBeenCalledWith(
-      "Stable token forced conversion refresh",
+      "Stable Balance refresh",
       expect.any(Error),
     )
   })
 
-  it("skips the deactivation without a connected SDK but still closes and refreshes", async () => {
+  it("skips the deactivation and refresh without a connected SDK but still closes", async () => {
     mockHasSdk = false
     const toggleModal = jest.fn()
     renderModal({ toggleModal })
@@ -311,6 +311,6 @@ describe("StableTokenConvertToBtcModal", () => {
 
     expect(mockDeactivateStableBalance).not.toHaveBeenCalled()
     expect(toggleModal).toHaveBeenCalledTimes(1)
-    expect(mockRefreshWallets).toHaveBeenCalledTimes(1)
+    expect(mockRefreshWallets).not.toHaveBeenCalled()
   })
 })

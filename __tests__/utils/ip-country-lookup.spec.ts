@@ -6,6 +6,7 @@ import {
   IpLookupAdapter,
   DEFAULT_ADAPTERS,
   resolveIpCountryCode,
+  resolveIpCountryCodeCached,
 } from "@app/utils/ip-country-lookup"
 
 jest.mock("axios")
@@ -75,6 +76,37 @@ describe("resolveIpCountryCode", () => {
   it("returns undefined with an empty adapter list", async () => {
     const result = await resolveIpCountryCode([])
     expect(result).toBeUndefined()
+  })
+})
+
+describe("resolveIpCountryCodeCached", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mutableConfig.GEO_IPIFY_API_KEY = ""
+    mutableConfig.IPINFO_API_KEY = ""
+    mutableConfig.PROXYCHECK_API_KEY = ""
+    mutableConfig.IPAPI_API_KEY = ""
+  })
+
+  /** One sequential test: the cache is module state, so the phases (failure
+   *  retries, concurrent dedupe, cached reuse) must run in a known order. */
+  it("shares one lookup per session, retrying failures and caching successes", async () => {
+    mockedAxios.get.mockRejectedValue(new Error("offline"))
+    await expect(resolveIpCountryCodeCached()).resolves.toBeUndefined()
+
+    mockedAxios.get.mockReset()
+    mockedAxios.get.mockResolvedValue({ data: { country: "DE" } })
+    const [first, second] = await Promise.all([
+      resolveIpCountryCodeCached(),
+      resolveIpCountryCodeCached(),
+    ])
+    expect(first).toBe("DE")
+    expect(second).toBe("DE")
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1)
+
+    mockedAxios.get.mockClear()
+    await expect(resolveIpCountryCodeCached()).resolves.toBe("DE")
+    expect(mockedAxios.get).not.toHaveBeenCalled()
   })
 })
 

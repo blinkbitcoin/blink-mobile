@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
@@ -12,6 +11,7 @@ import {
   type ConvertParams,
 } from "@app/types/payment"
 import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
+import { reportError } from "@app/utils/error-logging"
 import { triggerHapticFeedback } from "@app/utils/helper"
 
 import { buildConvertParams } from "../../build-convert-params"
@@ -70,10 +70,19 @@ export const useSelfCustodialConversion = ({
     }
   }, [quote, snapshotParams, liveQuoteParams])
 
-  /** Cloning gives the params a fresh identity, which re-runs the quote fetch. */
-  const requote = useCallback(() => {
-    setSnapshotParams(liveQuoteParams ? { ...liveQuoteParams } : null)
+  const liveQuoteParamsRef = useRef(liveQuoteParams)
+  useEffect(() => {
+    liveQuoteParamsRef.current = liveQuoteParams
   }, [liveQuoteParams])
+
+  /** Cloning gives the params a fresh identity, which re-runs the quote fetch.
+   *  Reads through a ref because `execute` captures this callback at press time:
+   *  if the balance changes while the conversion is in flight, the retry must
+   *  re-pin the live amount, not the one from the press-time render. */
+  const requote = useCallback(() => {
+    const live = liveQuoteParamsRef.current
+    setSnapshotParams(live ? { ...live } : null)
+  }, [])
 
   const execute = () =>
     guard.run(async () => {
@@ -114,12 +123,10 @@ export const useSelfCustodialConversion = ({
         setErrorMessage(result.errors?.[0]?.message ?? LL.errors.generic())
         triggerHapticFeedback("notificationError")
       } catch (err) {
-        if (err instanceof Error) {
-          crashlytics().recordError(err)
-          requote()
-          setErrorMessage(err.message)
-          triggerHapticFeedback("notificationError")
-        }
+        reportError("Self-custodial conversion execute", err)
+        requote()
+        setErrorMessage(err instanceof Error ? err.message : LL.errors.generic())
+        triggerHapticFeedback("notificationError")
       } finally {
         setLoading(false)
       }

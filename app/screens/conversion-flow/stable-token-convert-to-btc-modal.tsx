@@ -4,11 +4,9 @@ import { ConvertToBtcModalUI } from "@app/components/usd-convert-to-btc-modal"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { deactivateStableBalance } from "@app/self-custodial/bridge"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { deactivateStableBalanceAndRefresh } from "@app/self-custodial/stable-balance"
 import { UsdMoneyAmount } from "@app/types/amounts"
-import { reportError } from "@app/utils/error-logging"
-import { toastShow } from "@app/utils/toast"
 
 import { useSelfCustodialConversion } from "./hooks/self-custodial/use-conversion"
 
@@ -34,19 +32,13 @@ export const StableTokenConvertToBtcModal: React.FC<Props> = ({
    *  zero the amount and fire a useless re-quote behind a modal reporting success. */
   const stopRetrappingAndClose = async () => {
     toggleModal()
-    if (sdk) {
-      await deactivateStableBalance(sdk).catch((err) => {
-        reportError("Stable token forced conversion deactivate", err)
-        toastShow({
-          message: (tr) => tr.StableBalance.toggleFailedToast(),
-          LL,
-          type: "error",
-        })
-      })
-    }
-    await Promise.all([refreshStableBalanceActive(), refreshWallets()]).catch((err) =>
-      reportError("Stable token forced conversion refresh", err),
-    )
+    if (!sdk) return
+    await deactivateStableBalanceAndRefresh({
+      sdk,
+      refreshWallets,
+      refreshStableBalanceActive,
+      LL,
+    })
   }
 
   /** Quoting waits for the wallet to finish its startup sync AND for a settled

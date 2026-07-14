@@ -135,6 +135,23 @@ describe("useStableBalanceToggle", () => {
     expect(mockToastShow).not.toHaveBeenCalled()
   })
 
+  it("resyncs the switch and toasts when the deactivation fails", async () => {
+    mockDeactivateStableBalance.mockRejectedValue(new Error("deactivate failed"))
+    const { result } = renderToggle({ isStableBalanceActive: true })
+    const initialSwitchKey = result.current.switchKey
+
+    await act(async () => {
+      await result.current.apply(false)
+    })
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Stable Balance deactivate",
+      expect.any(Error),
+    )
+    expect(mockToastShow).toHaveBeenCalledTimes(1)
+    expect(result.current.switchKey).toBe(initialSwitchKey + 1)
+  })
+
   it("reports and resyncs the switch when the toggle fails", async () => {
     mockActivateStableBalance.mockRejectedValue(new Error("toggle failed"))
     const { result } = renderToggle()

@@ -16,7 +16,7 @@ jest.mock("libphonenumber-js/mobile", () => ({
 
 const mockResolveIpCountryCode = jest.fn()
 jest.mock("@app/utils/ip-country-lookup", () => ({
-  resolveIpCountryCode: (...args: unknown[]) => mockResolveIpCountryCode(...args),
+  resolveIpCountryCodeCached: (...args: unknown[]) => mockResolveIpCountryCode(...args),
 }))
 
 jest.mock("@app/utils/log-error", () => ({

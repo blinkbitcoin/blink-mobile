@@ -161,6 +161,12 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const payWallet = async () => {
     if (isSelfCustodial) {
+      /** A failed conversion invalidates the pinned quote, so the next swipe
+       *  retries the quote instead of stranding a permanently disabled slider. */
+      if (nonCustodialConversion.hasQuoteError) {
+        nonCustodialConversion.requote()
+        return
+      }
       await nonCustodialConversion.execute()
       return
     }
@@ -172,6 +178,13 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
   }
 
   const visibleErrorMessage = activeConversion.errorMessage
+
+  const isSelfCustodialQuotePending =
+    isSelfCustodial &&
+    !nonCustodialConversion.canExecute &&
+    !nonCustodialConversion.hasQuoteError
+
+  const isSliderDisabled = isLoading || isSelfCustodialQuotePending
 
   return (
     <Screen>
@@ -252,9 +265,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
             })}
             loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
             onSwipe={payWallet}
-            disabled={
-              isLoading || (isSelfCustodial && !nonCustodialConversion.canExecute)
-            }
+            disabled={isSliderDisabled}
           />
         </View>
       </PanGestureHandler>
