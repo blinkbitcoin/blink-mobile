@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect } from "react"
 import { Text } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -25,28 +25,52 @@ export const TransferringFundsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { migrationAccountId, completeMigration } = useCompleteMigration()
+  const { migrationAccountId, migrationLoading, completeMigration } =
+    useCompleteMigration()
 
   /** No navigation at all while the funds move. */
   useHardwareBackGuard()
 
+  const goToContactSupport = useCallback(() => {
+    navigation.navigate("accountMigrationContactSupport")
+  }, [navigation])
+
   useEffect(() => {
-    if (!migrationAccountId) return
+    if (migrationLoading) return
+
+    /** A checkpoint that lost its provisioned account (expired, or a failed write) would
+     *  leave this screen spinning forever with every exit blocked, so route to support. */
+    if (!migrationAccountId) {
+      reportError(
+        "Migration transfer without provisioned account",
+        new Error("Checkpoint has no accountId"),
+      )
+      goToContactSupport()
+      return
+    }
 
     const timer = setTimeout(async () => {
       try {
         if (await completeMigration()) {
           navigation.navigate("selfCustodialBackupSuccess", { reBackup: false })
+          return
         }
+        goToContactSupport()
       } catch (err) {
         /** Funds stay safe on a failed transfer; support resolves it from the contact screen. */
         reportError("Migration funds transfer", err)
-        navigation.navigate("accountMigrationContactSupport")
+        goToContactSupport()
       }
     }, TRANSFER_SIMULATION_MS)
 
     return () => clearTimeout(timer)
-  }, [migrationAccountId, completeMigration, navigation])
+  }, [
+    migrationLoading,
+    migrationAccountId,
+    completeMigration,
+    navigation,
+    goToContactSupport,
+  ])
 
   return (
     <Screen preset="fixed">

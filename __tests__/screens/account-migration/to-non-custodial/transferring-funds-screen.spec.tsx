@@ -16,11 +16,13 @@ jest.mock("@react-navigation/native", () => ({
 
 const mockCompleteMigration = jest.fn()
 let mockMigrationAccountId: string | null = "sc-account-1"
+let mockMigrationLoading = false
 const mockUseHardwareBackGuard = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useCompleteMigration: () => ({
     migrationAccountId: mockMigrationAccountId,
+    migrationLoading: mockMigrationLoading,
     completeMigration: mockCompleteMigration,
   }),
   useHardwareBackGuard: (onBack?: () => void) => mockUseHardwareBackGuard(onBack),
@@ -51,6 +53,7 @@ describe("TransferringFundsScreen", () => {
     jest.clearAllMocks()
     jest.useFakeTimers({ doNotFake: ["setImmediate"] })
     mockMigrationAccountId = "sc-account-1"
+    mockMigrationLoading = false
     mockCompleteMigration.mockResolvedValue(true)
     loadLocale("en")
   })
@@ -93,7 +96,8 @@ describe("TransferringFundsScreen", () => {
     })
   })
 
-  it("waits without swapping until the provisioned account is available", async () => {
+  it("waits without acting while the checkpoint is still loading", async () => {
+    mockMigrationLoading = true
     mockMigrationAccountId = null
     renderScreen()
     await flushEffects()
@@ -106,7 +110,16 @@ describe("TransferringFundsScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("does not navigate to success when the swap does not happen", async () => {
+  it("routes to contact support when the checkpoint has no provisioned account", async () => {
+    mockMigrationAccountId = null
+    renderScreen()
+    await flushEffects()
+
+    expect(mockCompleteMigration).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+  })
+
+  it("routes to contact support when the swap does not happen", async () => {
     mockCompleteMigration.mockResolvedValue(false)
     renderScreen()
     await flushEffects()
@@ -117,7 +130,11 @@ describe("TransferringFundsScreen", () => {
     await flushEffects()
 
     expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialBackupSuccess",
+      expect.anything(),
+    )
   })
 
   it("routes to the contact support screen when the transfer fails", async () => {

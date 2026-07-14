@@ -9,7 +9,7 @@ import { useMigrationCheckpoint } from "./use-migration-checkpoint"
  *  custodial session so it no longer appears on the device, and clears the checkpoint. Also
  *  surfaces the migration's checkpoint and account id from a single source of truth. */
 export const useCompleteMigration = () => {
-  const { checkpoint, accountId, clearCheckpoint } = useMigrationCheckpoint()
+  const { checkpoint, accountId, loading, clearCheckpoint } = useMigrationCheckpoint()
   const { setActiveAccountId } = useAccountRegistry()
   const { discardCustodialSession } = useDiscardCustodialSession()
 
@@ -24,6 +24,7 @@ export const useCompleteMigration = () => {
   return {
     migrationCheckpoint: checkpoint,
     migrationAccountId: accountId,
+    migrationLoading: loading,
     completeMigration,
   }
 }
