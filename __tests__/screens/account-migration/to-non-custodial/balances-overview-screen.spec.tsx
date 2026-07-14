@@ -49,8 +49,8 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   }),
 }))
 
-jest.mock("@app/screens/account-migration/hooks/use-migration-gate-armed", () => ({
-  useMigrationGateArmed: () => mockGateArmed,
+jest.mock("@app/screens/account-migration/hooks/use-wind-down-gate-armed", () => ({
+  useWindDownGateArmed: () => mockGateArmed,
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({

@@ -4,7 +4,7 @@ import {
 } from "@app/hooks/use-custodial-migration-required"
 
 import { useAccountSessionDismissal } from "./use-account-session-dismissal"
-import { useMigrationGateArmed } from "./use-migration-gate-armed"
+import { useWindDownGateArmed } from "./use-wind-down-gate-armed"
 
 type MigrationBlocker = {
   isVisible: boolean
@@ -18,7 +18,7 @@ export const useMigrationBlocker = (): MigrationBlocker => {
 
   useCustodialMigrationRequiredSync()
   const isMigrationRequired = useCustodialMigrationRequired()
-  const isGateArmed = useMigrationGateArmed()
+  const isGateArmed = useWindDownGateArmed()
 
   if (isGateArmed) return { isVisible: true }
 

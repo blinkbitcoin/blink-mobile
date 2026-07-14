@@ -18,7 +18,7 @@ import { reportError } from "@app/utils/error-logging"
 /** TODO: replace with the backend funds-transfer request; this 3s delay simulates it. */
 const TRANSFER_SIMULATION_MS = 3000
 
-export const TransferringFundsScreen: React.FC = () => {
+export const MigrationTransferringFundsScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {

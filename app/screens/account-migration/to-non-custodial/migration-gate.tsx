@@ -16,7 +16,7 @@ import { testProps } from "@app/utils/testProps"
 import {
   useActiveApiKeys,
   useCustodialWalletBalances,
-  useMigrationGateArmed,
+  useWindDownGateArmed,
 } from "@app/screens/account-migration/hooks"
 
 import { MigrationApiServiceScreen } from "./api-service-screen"
@@ -48,7 +48,7 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
   } = useTheme()
   const { hasActiveApiKeys, loading: apiKeysLoading } = useActiveApiKeys()
   const isForced = useCustodialMigrationRequired()
-  const isGated = useMigrationGateArmed()
+  const isGated = useWindDownGateArmed()
   const isTransferBlocked = useTransferBlocked()
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
   const [isApiWarningAcknowledged, setIsApiWarningAcknowledged] = useState(false)

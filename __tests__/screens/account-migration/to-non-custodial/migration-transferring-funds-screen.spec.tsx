@@ -2,7 +2,7 @@ import React from "react"
 import { act, render, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
-import { TransferringFundsScreen } from "@app/screens/account-migration/to-non-custodial/transferring-funds-screen"
+import { MigrationTransferringFundsScreen } from "@app/screens/account-migration/to-non-custodial/migration-transferring-funds-screen"
 import { ContextForScreen } from "../../helper"
 import { flushEffects } from "../../../helpers/flush-effects"
 
@@ -45,11 +45,11 @@ const TRANSFER_DELAY_MS = 3000
 const renderScreen = () =>
   render(
     <ContextForScreen>
-      <TransferringFundsScreen />
+      <MigrationTransferringFundsScreen />
     </ContextForScreen>,
   )
 
-describe("TransferringFundsScreen", () => {
+describe("MigrationTransferringFundsScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.useFakeTimers({ doNotFake: ["setImmediate"] })

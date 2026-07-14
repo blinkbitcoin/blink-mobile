@@ -6,7 +6,7 @@ import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { AccountType } from "@app/types/wallet"
 
 import { useCustodialWalletBalances } from "./use-custodial-wallet-balances"
-import { useMigrationGateArmed } from "./use-migration-gate-armed"
+import { useWindDownGateArmed } from "./use-wind-down-gate-armed"
 import { useMigrationPreview } from "./use-migration-preview"
 
 const fiatSuffix = (fiat: string | undefined): string | undefined =>
@@ -27,7 +27,7 @@ export const useMigrationBalancesPreview = () => {
 
   const { btcBalanceSats, usdBalanceCents, isReady } = useCustodialWalletBalances()
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
-  const isPostGate = useMigrationGateArmed()
+  const isPostGate = useWindDownGateArmed()
   const isNewDollarBalanceRestricted = useDollarBalanceRestricted(
     AccountType.SelfCustodial,
   )

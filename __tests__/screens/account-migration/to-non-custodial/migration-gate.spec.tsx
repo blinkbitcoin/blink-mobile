@@ -43,7 +43,7 @@ jest.mock("@app/components/screen", () => ({
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useActiveApiKeys: () => mockUseActiveApiKeys(),
-  useMigrationGateArmed: () => mockUseMigrationGateArmed(),
+  useWindDownGateArmed: () => mockUseMigrationGateArmed(),
 }))
 
 jest.mock("@app/hooks/use-custodial-migration-required", () => ({

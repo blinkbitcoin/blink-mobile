@@ -153,7 +153,7 @@ import {
   MigrationExplainerScreen,
   MigrationGate,
   MigrationKeepReceivingScreen,
-  TransferringFundsScreen,
+  MigrationTransferringFundsScreen,
 } from "@app/screens/account-migration"
 import {
   OnboardingStackParamList,
@@ -854,7 +854,7 @@ export const RootStack = () => {
       />
       <RootNavigator.Screen
         name="accountMigrationTransferringFunds"
-        component={TransferringFundsScreen}
+        component={MigrationTransferringFundsScreen}
         options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
