@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Etkin API anahtarlarınız olduğunu fark ettik. Blink, non-custodial modda API sağlayamaz.\n\nBlink'in API'sine bağımlıysanız, lütfen bizimle en kısa sürede iletişime geçin; sorunsuz bir geçiş için elimizden geleni yapacağız.",
     "apiServiceContactCta": "Bize ulaşın",
     "apiServiceContinueCta": "Yine de devam et",
+    "resumeFailed": "Taşıma işleminiz devam ettirilirken bir sorun oluştu. Lütfen yeniden başlatın.",
     "migrationRequiredBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi.",
     "migrationRequiredForcedBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi. Bu, düzenleyici nedenlerle zorunludur.\n\nEndişelenme, non-custodial uzun vadede senin için daha iyi olacak.",
     "migrationGateTitle": "Hesap erişilebilir değil",

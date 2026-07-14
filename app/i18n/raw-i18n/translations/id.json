@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Kami melihat bahwa Anda memiliki kunci API aktif. Blink tidak dapat menyediakan API dalam mode non-custodial.\n\nJika Anda bergantung pada API Blink, hubungi kami segera dan kami akan berusaha sebaik mungkin untuk membantu transisi yang mulus.",
     "apiServiceContactCta": "Hubungi kami",
     "apiServiceContinueCta": "Tetap lanjutkan",
+    "resumeFailed": "Terjadi kesalahan saat melanjutkan migrasi Anda. Silakan mulai lagi dari awal.",
     "migrationRequiredBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial.",
     "migrationRequiredForcedBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial. Ini diperlukan karena alasan regulasi.\n\nTidak perlu khawatir, non-custodial akan lebih baik untukmu dalam jangka panjang.",
     "migrationGateTitle": "Akun tidak dapat diakses",

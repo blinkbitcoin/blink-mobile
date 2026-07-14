@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Observem que tens claus API actives. Blink no pot oferir l'API en mode no custodial.\n\nSi depens de l'API de Blink, contacta'ns aviat i farem tot el possible per ajudar-te en una transició fluida.",
     "apiServiceContactCta": "Contacta'ns",
     "apiServiceContinueCta": "Continua igualment",
+    "resumeFailed": "Alguna cosa ha fallat en reprendre la migració. Si us plau, torna-la a començar.",
     "migrationRequiredBody": "És hora de migrar el teu compte custodial a un compte no custodi.",
     "migrationRequiredForcedBody": "És hora de migrar el teu compte custodial a un compte no custodi. És obligatori per motius reguladors.\n\nNo et preocupis, la modalitat no custodial serà millor per a tu a llarg termini.",
     "migrationGateTitle": "Compte no accessible",

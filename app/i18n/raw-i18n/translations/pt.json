@@ -3602,6 +3602,7 @@
         "apiServiceBody": "Notamos que você tem chaves de API ativas. A Blink não pode fornecer a API no modo não custodial.\n\nSe você depende da API da Blink, entre em contato conosco o quanto antes e faremos o possível para ajudar em uma transição tranquila.",
         "apiServiceContactCta": "Fale conosco",
         "apiServiceContinueCta": "Continuar mesmo assim",
+        "resumeFailed": "Algo deu errado ao retomar a sua migração. Por favor, comece novamente.",
         "migrationRequiredBody": "É hora de migrar a sua conta custodial para uma conta não custodial.",
         "migrationRequiredForcedBody": "É hora de migrar a sua conta custodial para uma conta não custodial. É obrigatório por motivos regulatórios.\n\nNão se preocupe, a modalidade não custodial será melhor para você a longo prazo.",
         "migrationGateTitle": "Conta não acessível",

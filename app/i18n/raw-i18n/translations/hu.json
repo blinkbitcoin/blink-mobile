@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Észrevettük, hogy aktív API-kulcsaid vannak. A Blink nem tudja biztosítani az API-t önrendelkező módban.\n\nHa a Blink API-jától függsz, vedd fel velünk mielőbb a kapcsolatot, és mindent megteszünk a zökkenőmentes átállásért.",
     "apiServiceContactCta": "Lépj kapcsolatba velünk",
     "apiServiceContinueCta": "Folytatás mindenképp",
+    "resumeFailed": "Hiba történt az átköltözés folytatása közben. Kérjük, kezdje újra.",
     "migrationRequiredBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba.",
     "migrationRequiredForcedBody": "Itt az ideje átköltöztetni letétkezelt fiókját egy nem letétkezelt fiókba. Ez szabályozási okokból kötelező.\n\nNe aggódj, a nem letéti mód hosszú távon jobb lesz neked.",
     "migrationGateTitle": "A fiók nem elérhető",

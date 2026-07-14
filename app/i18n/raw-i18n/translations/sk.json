@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Všimli sme si, že máte aktívne API kľúče. Blink nemôže poskytovať API v non-custodial režime.\n\nAk ste závislí od API Blinku, kontaktujte nás čo najskôr a urobíme maximum pre hladký prechod.",
     "apiServiceContactCta": "Kontaktujte nás",
     "apiServiceContinueCta": "Napriek tomu pokračovať",
+    "resumeFailed": "Pri pokračovaní migrácie sa niečo pokazilo. Začnite ju, prosím, znova.",
     "migrationRequiredBody": "Je čas migrovať váš zverenský účet na nesverenecký účet.",
     "migrationRequiredForcedBody": "Je čas migrovať váš zverenský účet na nesverenecký účet. Je to vyžadované z regulačných dôvodov.\n\nNeboj sa, non-custodial pre teba bude z dlhodobého hľadiska lepší.",
     "migrationGateTitle": "Účet nie je prístupný",

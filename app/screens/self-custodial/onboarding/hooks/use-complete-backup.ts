@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useCompleteMigration } from "@app/screens/account-migration/hooks"
 import {
@@ -13,6 +14,7 @@ import {
   useBackupState,
 } from "@app/self-custodial/providers/backup-state"
 import { reportError } from "@app/utils/error-logging"
+import { toastShow } from "@app/utils/toast"
 
 type CompleteBackupOptions = {
   method: BackupMethod
@@ -26,22 +28,34 @@ type CompleteBackupOptions = {
  */
 export const useCompleteBackup = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { LL } = useI18nContext()
   const { isSelfCustodial } = useActiveWallet()
   const { backupState, setBackupCompleted } = useBackupState()
   const { migrationCheckpoint, migrationAccountId } = useCompleteMigration()
 
   const alreadyBackedUp = backupState.status === BackupStatus.Completed
-  // Migration only applies on a custodial account; self-custodial backups are standalone.
+  /** Migration only applies on a custodial account; self-custodial backups are standalone. */
   const isMigrating = !isSelfCustodial && migrationCheckpoint !== null && !alreadyBackedUp
-  // Only treat it as a migration once an account has actually been provisioned.
-  const migratingAccountId = isMigrating ? migrationAccountId : null
 
   return useCallback(
     async ({ method, message }: CompleteBackupOptions) => {
-      if (migratingAccountId) {
-        // Persist the provisioned account's backup before the balance summary, so the swap
-        // that follows Approve reads the committed backup state.
-        await markBackupCompletedFor(migratingAccountId, method).catch((err) =>
+      if (isMigrating && !migrationAccountId) {
+        /** A checkpoint without its provisioned account means the resume state was lost;
+         *  a fake standalone success would dead-end the migration silently, so surface
+         *  the failure and restart the flow from the explainer. */
+        reportError(
+          "Migration backup without provisioned account",
+          new Error("Checkpoint has no accountId"),
+        )
+        toastShow({ message: LL.AccountMigration.resumeFailed(), LL })
+        navigation.navigate("accountMigrationExplainer")
+        return
+      }
+
+      if (isMigrating && migrationAccountId) {
+        /** Persist the provisioned account's backup before the balance summary, so the
+         *  swap that follows Approve reads the committed backup state. */
+        await markBackupCompletedFor(migrationAccountId, method).catch((err) =>
           reportError("Migration backup state persist", err),
         )
         navigation.navigate("accountMigrationBalancesOverview")
@@ -54,6 +68,13 @@ export const useCompleteBackup = () => {
         message,
       })
     },
-    [navigation, migratingAccountId, alreadyBackedUp, setBackupCompleted],
+    [
+      navigation,
+      isMigrating,
+      migrationAccountId,
+      alreadyBackedUp,
+      setBackupCompleted,
+      LL,
+    ],
   )
 }

@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Tunaona kuwa una funguo za API zinazotumika. Blink haiwezi kutoa API katika hali ya non-custodial.\n\nIkiwa unategemea API ya Blink, wasiliana nasi haraka na tutafanya tuwezalo kusaidia mpito laini.",
     "apiServiceContactCta": "Wasiliana nasi",
     "apiServiceContinueCta": "Endelea hata hivyo",
+    "resumeFailed": "Hitilafu imetokea wakati wa kuendelea na uhamishaji wako. Tafadhali anza tena.",
     "migrationRequiredBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini.",
     "migrationRequiredForcedBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini. Inahitajika kwa sababu za udhibiti.\n\nUsiwe na wasiwasi, non-custodial itakuwa bora kwako kwa muda mrefu.",
     "migrationGateTitle": "Akaunti haipatikani",

@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Vi bemærker, at du har aktive API-nøgler. Blink kan ikke levere API'en i non-custodial tilstand.\n\nHvis du er afhængig af Blinks API, så kontakt os hurtigt, og vi vil gøre vores bedste for at hjælpe med en glidende overgang.",
     "apiServiceContactCta": "Kontakt os",
     "apiServiceContinueCta": "Fortsæt alligevel",
+    "resumeFailed": "Noget gik galt under genoptagelsen af din migrering. Start den venligst igen.",
     "migrationRequiredBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto.",
     "migrationRequiredForcedBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto. Det er påkrævet af regulatoriske årsager.\n\nIngen grund til bekymring, non-custodial vil være bedre for dig i det lange løb.",
     "migrationGateTitle": "Konto ikke tilgængelig",

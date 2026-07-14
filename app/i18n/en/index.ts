@@ -3753,6 +3753,7 @@ const en: BaseTranslation = {
       "We note that you have active API keys. Blink can't provide the API in non-custodial mode.\n\nIf you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.",
     apiServiceContactCta: "Contact us",
     apiServiceContinueCta: "Continue anyways",
+    resumeFailed: "Something went wrong resuming your migration. Please start it again.",
     balancesOverview: {
       title: "Move your balance",
       body: "Safely move your funds to your new account.",

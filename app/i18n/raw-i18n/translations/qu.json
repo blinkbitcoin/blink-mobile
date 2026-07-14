@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Rikunchik API llavesniyki activo kasqanta. Blink mana atinchu API-ta non-custodial modopi qoyta.\n\nBlink API-manta dependespaqa, usqhaylla ñoqaykuwan rimanakuy, allin tikraymanpaq yanapasqaykiku.",
     "apiServiceContactCta": "Ñoqaykuwan rimanakuy",
     "apiServiceContinueCta": "Chaynapas qatiy",
+    "resumeFailed": "Astakuyniykita qatichiypi imapas mana allinchu rikhurirqan. Ama hina kaspa, musuqmanta qallariy.",
     "migrationRequiredBody": "Waqaychasqa kuentaykita mana waqaychasqa kuentaman astanaykipaq pachan.",
     "migrationRequiredForcedBody": "Waqaychasqa kuentaykita mana waqaychasqa kuentaman astanaykipaq pachan. Kamachiykuna raykumi necesitakun.\n\nAma llakikuychu, non-custodial nisqaqa unay pachapaqmi aswan allin kanqa qanpaq.",
     "migrationGateTitle": "Cuentaqa mana haykunallachu",

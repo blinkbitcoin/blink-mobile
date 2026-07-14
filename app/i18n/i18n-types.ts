@@ -11916,6 +11916,10 @@ type RootTranslation = {
 		 * C​o​n​t​i​n​u​e​ ​a​n​y​w​a​y​s
 		 */
 		apiServiceContinueCta: string
+		/**
+		 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​ ​r​e​s​u​m​i​n​g​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​.​ ​P​l​e​a​s​e​ ​s​t​a​r​t​ ​i​t​ ​a​g​a​i​n​.
+		 */
+		resumeFailed: string
 		balancesOverview: {
 			/**
 			 * M​o​v​e​ ​y​o​u​r​ ​b​a​l​a​n​c​e
@@ -24370,6 +24374,10 @@ export type TranslationFunctions = {
 		 * Continue anyways
 		 */
 		apiServiceContinueCta: () => LocalizedString
+		/**
+		 * Something went wrong resuming your migration. Please start it again.
+		 */
+		resumeFailed: () => LocalizedString
 		balancesOverview: {
 			/**
 			 * Move your balance

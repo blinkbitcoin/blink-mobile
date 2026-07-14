@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Observăm că ai chei API active. Blink nu poate oferi API-ul în modul non-custodial.\n\nDacă depinzi de API-ul Blink, contactează-ne cât mai repede și vom face tot posibilul pentru a te ajuta cu o tranziție lină.",
     "apiServiceContactCta": "Contactează-ne",
     "apiServiceContinueCta": "Continuă oricum",
+    "resumeFailed": "Ceva nu a mers bine la reluarea migrării. Te rugăm să o începi din nou.",
     "migrationRequiredBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial.",
     "migrationRequiredForcedBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial. Este necesar din motive de reglementare.\n\nNu-ți face griji, non-custodial va fi mai bun pentru tine pe termen lung.",
     "migrationGateTitle": "Cont inaccesibil",

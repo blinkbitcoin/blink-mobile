@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Tulaba nti olina ebisumuluzo bya API ebikola. Blink tesobola kuwa API mu ngeri ya non-custodial.\n\nBw'oba weesigamye ku API ya Blink, tukwatagane naffe amangu era tujja kukola kyonna ekisoboka okuyamba mu nkyukakyuka enteefu.",
     "apiServiceContactCta": "Tukwatagane naffe",
     "apiServiceContinueCta": "Weeyongereyo wadde kiri kityo",
+    "resumeFailed": "Waliwo ekitagenze bulungi nga tuddamu okukyusa kwo. Bambi ddamu okitandike.",
     "migrationRequiredBody": "Kiseera ky'okujja akawunti yo ekuumibwa ogigirre mu akawunti etakuumibwa.",
     "migrationRequiredForcedBody": "Kiseera ky'okujja akawunti yo ekuumibwa ogigirre mu akawunti etakuumibwa. Kyetaagisa olw'ensonga z'amateeka.\n\nTeweeraliikirira, non-custodial ejja kuba nnungi gy'oli mu kiseera ekiwanvu.",
     "migrationGateTitle": "Akawunti tesobola kutuukirirwa",

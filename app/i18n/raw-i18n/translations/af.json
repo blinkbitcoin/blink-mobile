@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Ons let op dat jy aktiewe API-sleutels het. Blink kan nie die API in nie-bewaarende modus verskaf nie.\n\nAs jy van Blink se API afhanklik is, kontak ons gou en ons sal ons bes doen om 'n gladde oorgang te help.",
     "apiServiceContactCta": "Kontak ons",
     "apiServiceContinueCta": "Gaan tog voort",
+    "resumeFailed": "Iets het verkeerd geloop met die hervatting van jou migrasie. Begin dit asseblief weer.",
     "migrationRequiredBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer.",
     "migrationRequiredForcedBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer. Dit word om regulatoriese redes vereis.\n\nGeen rede tot kommer nie, nie-bewaring sal op die lange duur beter vir jou wees.",
     "migrationGateTitle": "Rekening nie toeganklik nie",

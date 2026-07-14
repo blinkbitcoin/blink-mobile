@@ -3602,6 +3602,7 @@
     "apiServiceBody": "We zien dat je actieve API-sleutels hebt. Blink kan de API niet aanbieden in non-custodial modus.\n\nAls je afhankelijk bent van de API van Blink, neem dan snel contact met ons op en we doen ons best om een soepele overgang te helpen.",
     "apiServiceContactCta": "Neem contact op",
     "apiServiceContinueCta": "Toch doorgaan",
+    "resumeFailed": "Er is iets misgegaan bij het hervatten van je migratie. Begin deze opnieuw.",
     "migrationRequiredBody": "Het is tijd om je bewaarde rekening te migreren naar een niet-bewaarde rekening.",
     "migrationRequiredForcedBody": "Het is tijd om je bewaarde rekening te migreren naar een niet-bewaarde rekening. Dit is vereist om regelgevende redenen.\n\nGeen zorgen, non-custodial is op de lange termijn beter voor je.",
     "migrationGateTitle": "Account niet toegankelijk",

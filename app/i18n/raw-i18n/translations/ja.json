@@ -3602,6 +3602,7 @@
         "apiServiceBody": "有効なAPIキーをお持ちのようです。BlinkはノンカストディアルモードではAPIを提供できません。\n\nBlinkのAPIに依存している場合は、早めにお問い合わせください。スムーズな移行をできる限りサポートします。",
         "apiServiceContactCta": "お問い合わせ",
         "apiServiceContinueCta": "このまま続行",
+        "resumeFailed": "移行の再開中に問題が発生しました。もう一度最初からやり直してください。",
         "migrationRequiredBody": "カストディアルアカウントを非カストディアルアカウントに移行する時です。",
         "migrationRequiredForcedBody": "カストディアルアカウントを非カストディアルアカウントに移行する時です。これは規制上の理由により必須です。\n\nご心配なく。長期的にはノンカストディアルの方があなたにとって良い選択です。",
         "migrationGateTitle": "アカウントにアクセスできません",

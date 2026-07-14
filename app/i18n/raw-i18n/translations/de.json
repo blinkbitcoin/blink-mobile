@@ -3602,6 +3602,7 @@
         "apiServiceBody": "Uns ist aufgefallen, dass du aktive API-Schlüssel hast. Blink kann die API im Non-Custodial-Modus nicht bereitstellen.\n\nWenn du auf die API von Blink angewiesen bist, kontaktiere uns bitte umgehend, und wir werden unser Bestes für einen reibungslosen Übergang tun.",
         "apiServiceContactCta": "Kontaktiere uns",
         "apiServiceContinueCta": "Trotzdem fortfahren",
+        "resumeFailed": "Beim Fortsetzen deiner Migration ist etwas schiefgelaufen. Bitte starte sie erneut.",
         "migrationRequiredBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren.",
         "migrationRequiredForcedBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren. Dies ist aus regulatorischen Gründen erforderlich.\n\nKeine Sorge, Non-Custodial wird auf lange Sicht besser für dich sein.",
         "migrationGateTitle": "Konto nicht zugänglich",

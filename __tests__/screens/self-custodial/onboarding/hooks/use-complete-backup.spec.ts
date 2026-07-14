@@ -41,6 +41,17 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: jest.fn(),
 }))
 
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
+}))
+
+jest.mock("@app/i18n/i18n-react", () => ({
+  useI18nContext: () => ({
+    LL: { AccountMigration: { resumeFailed: () => "resume failed" } },
+  }),
+}))
+
 describe("useCompleteBackup", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -76,8 +87,8 @@ describe("useCompleteBackup", () => {
     })
   })
 
-  it("does not route to the balance summary while migrating without a provisioned account", () => {
-    // App killed between saving a step checkpoint and provisioning: checkpoint set, no id.
+  it("surfaces a lost resume state instead of faking a standalone success", () => {
+    /** App killed between saving a step checkpoint and provisioning: checkpoint set, no id. */
     mockMigrationAccountId = null
 
     const { result } = renderHook(() => useCompleteBackup())
@@ -85,11 +96,16 @@ describe("useCompleteBackup", () => {
     result.current({ method: "manual" })
 
     expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
-    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
-      reBackup: false,
-      message: undefined,
-    })
+    expect(mockSetBackupCompleted).not.toHaveBeenCalled()
+    expect(reportError).toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "resume failed" }),
+    )
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialBackupSuccess",
+      expect.anything(),
+    )
   })
 
   it("reports the error and still navigates when the migration mark fails to persist", async () => {

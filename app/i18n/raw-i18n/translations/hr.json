@@ -3602,6 +3602,7 @@
     "apiServiceBody": "Primjećujemo da imate aktivne API ključeve. Blink ne može pružati API u ne-skrbničkom načinu rada.\n\nAko ovisite o Blinkovom API-ju, kontaktirajte nas što prije i dat ćemo sve od sebe da vam pomognemo s glatkim prijelazom.",
     "apiServiceContactCta": "Kontaktirajte nas",
     "apiServiceContinueCta": "Ipak nastavi",
+    "resumeFailed": "Nešto je pošlo po zlu pri nastavku migracije. Molimo započnite je ponovno.",
     "migrationRequiredBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva.",
     "migrationRequiredForcedBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva. To je obavezno iz regulatornih razloga.\n\nBez brige, non-custodial će ti dugoročno biti bolji.",
     "migrationGateTitle": "Račun nije dostupan",
