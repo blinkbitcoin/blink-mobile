@@ -53,7 +53,7 @@ describe("useCompleteMigration", () => {
     expect(mockClearCheckpoint).not.toHaveBeenCalled()
   })
 
-  it("swaps to the provisioned account, discards the custodial session, then clears the checkpoint", async () => {
+  it("discards the custodial session, swaps to the provisioned account, then clears the checkpoint", async () => {
     expect(await complete()).toBe(true)
 
     expect(mockSetActiveAccountId).toHaveBeenCalledWith("sc-account-1")
@@ -61,12 +61,26 @@ describe("useCompleteMigration", () => {
     expect(mockClearCheckpoint).toHaveBeenCalledTimes(1)
   })
 
-  it("swaps the active account before discarding the custodial session", async () => {
+  it("discards the fallible custodial session before activating the new account", async () => {
     await complete()
 
-    expect(mockSetActiveAccountId.mock.invocationCallOrder[0]).toBeLessThan(
-      mockDiscardCustodialSession.mock.invocationCallOrder[0],
+    expect(mockDiscardCustodialSession.mock.invocationCallOrder[0]).toBeLessThan(
+      mockSetActiveAccountId.mock.invocationCallOrder[0],
     )
+  })
+
+  it("keeps the custodial session active and the checkpoint intact when the discard fails", async () => {
+    mockDiscardCustodialSession.mockRejectedValue(new Error("keystore failure"))
+
+    const { result } = renderHook(() => useCompleteMigration())
+    await act(async () => {
+      await expect(result.current.completeMigration()).rejects.toThrow(
+        "keystore failure",
+      )
+    })
+
+    expect(mockSetActiveAccountId).not.toHaveBeenCalled()
+    expect(mockClearCheckpoint).not.toHaveBeenCalled()
   })
 
   it("surfaces the migration checkpoint and provisioned account id", () => {
