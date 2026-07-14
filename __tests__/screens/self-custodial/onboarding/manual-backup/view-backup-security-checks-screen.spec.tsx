@@ -39,7 +39,7 @@ const tickAllChecks = (getByText: ReturnType<typeof render>["getByText"]) => {
   fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check3()))
 }
 
-describe("ViewBackupSecurityChecksScreen — Settings flow", () => {
+describe("ViewBackupSecurityChecksScreen (Settings flow)", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -51,7 +51,7 @@ describe("ViewBackupSecurityChecksScreen — Settings flow", () => {
     expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check1())).toBeTruthy()
   })
 
-  it("does not depend on the migration-checkpoint hook — that responsibility belongs to the onboarding screen alone", () => {
+  it("does not depend on the migration-checkpoint hook, a responsibility of the onboarding screen alone", () => {
     /** Static guarantee: the screen source must not pull in `@app/screens/account-migration/hooks`. */
     const source = readFileSync(
       require.resolve(
@@ -63,7 +63,7 @@ describe("ViewBackupSecurityChecksScreen — Settings flow", () => {
     expect(source).not.toContain("useMigrationCheckpoint")
   })
 
-  it("is registered in root-navigator under the matching route name — a missing registration would crash the Settings entry at runtime with no compile error", () => {
+  it("is registered in root-navigator under the matching route name, since a missing registration would crash the Settings entry at runtime with no compile error", () => {
     const navigatorSource = readFileSync(
       require.resolve("@app/navigation/root-navigator"),
       "utf8",
@@ -87,7 +87,7 @@ describe("ViewBackupSecurityChecksScreen — Settings flow", () => {
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialViewBackupPhrase")
   })
 
-  it("never navigates to the onboarding phrase screen — Settings stays separate from the onboarding flow", async () => {
+  it("never navigates to the onboarding phrase screen, keeping onboarding separate from the Settings flow", async () => {
     const { getByText } = renderScreen()
     await flushEffects()
     tickAllChecks(getByText)
