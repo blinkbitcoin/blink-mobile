@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react"
 
-import { useNavigation } from "@react-navigation/native"
+import { useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { DollarBalanceMigrationModal } from "@app/components/dollar-balance-migration-modal"
@@ -44,6 +44,10 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
   const [apiWarningAcknowledged, setApiWarningAcknowledged] = useState(false)
 
+  /** While a pushed screen (the dollar transfer) has focus the modal hides instead of
+   *  floating over it; regaining focus shows it again with a fresh balance check. */
+  const isFocused = useIsFocused()
+
   const isAuthed = useIsAuthed()
   const { data, loading: walletsLoading } = useWalletOverviewScreenQuery({
     skip: !isAuthed,
@@ -80,7 +84,7 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
     const transferAction = canTransferInApp ? goToDollarTransfer : undefined
     return (
       <DollarBalanceMigrationModal
-        isVisible={true}
+        isVisible={isFocused}
         toggleModal={exitFlow}
         onTransfer={transferAction}
       />

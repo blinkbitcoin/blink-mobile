@@ -5,6 +5,7 @@ import { MigrationGate } from "@app/screens/account-migration/to-non-custodial/m
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+let mockIsFocused = true
 const mockUseActiveApiKeys = jest.fn()
 const mockUseCustodialMigrationRequired = jest.fn()
 const mockUseMigrationGateArmed = jest.fn()
@@ -25,6 +26,7 @@ const mockDollarBalanceModal = jest.fn(
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useIsFocused: () => mockIsFocused,
 }))
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
@@ -96,6 +98,7 @@ const walletsWithUsdBalance = (usdCents: number) => ({
 describe("MigrationGate", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsFocused = true
     mockUseCustodialMigrationRequired.mockReturnValue(false)
     mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: false, loading: false })
     mockUseMigrationGateArmed.mockReturnValue(false)
@@ -140,6 +143,23 @@ describe("MigrationGate", () => {
     expect(mockDollarBalanceModal).toHaveBeenCalled()
     expect(mockApiServiceScreen).not.toHaveBeenCalled()
     expect(mockRequiredScreen).not.toHaveBeenCalled()
+  })
+
+  it("shows the dollar-balance modal only while the gate has focus", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal.mock.calls[0][0].isVisible).toBe(true)
+  })
+
+  it("hides the dollar-balance modal while a pushed screen has focus", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockIsFocused = false
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal.mock.calls[0][0].isVisible).toBe(false)
   })
 
   it("offers the transfer action when the region permits the dollar transfer", () => {
