@@ -6,23 +6,17 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { InfoRow } from "@app/components/card-screen/info-row"
 import { IconHero } from "@app/components/icon-hero"
 import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
 import { useAddressScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useContactSupport } from "@app/hooks/use-contact-support"
-import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import {
-  useCustodialWalletBalances,
-  useMigrationNextStep,
-} from "@app/screens/account-migration/hooks"
+import { GateBalances } from "@app/screens/account-migration/gate-balances"
+import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
 import { MigrationCloseHeader } from "@app/screens/account-migration/migration-close-header"
-import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 
 /**
@@ -39,6 +33,15 @@ type MigrationRequiredScreenProps = {
   onClose?: () => void
 }
 
+type ModePresentation = {
+  heroIcon: React.ComponentProps<typeof IconHero>["icon"]
+  heroIconColor: string
+  title: string
+  subtitle: React.ReactNode
+  shouldShowClose: boolean
+  shouldShowBalances: boolean
+}
+
 export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = ({
   mode,
   onClose,
@@ -53,38 +56,11 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   const { supportEmailAddress, openSupport } = useContactSupport()
 
   const isAuthed = useIsAuthed()
-  const isGate = mode === "gate"
-  const shouldShowCloseButton = !isGate
-  const shouldLoadBalances = isAuthed && isGate
-
   const { data: addressData } = useAddressScreenQuery({
     fetchPolicy: "cache-first",
     skip: !isAuthed,
   })
   const hasLightningAddress = Boolean(addressData?.me?.username)
-
-  const {
-    btcBalanceSats,
-    usdBalanceCents,
-    isReady: areBalancesReady,
-  } = useCustodialWalletBalances({ skip: !shouldLoadBalances })
-
-  /** Unknown balances must never render as zeros: the rows only appear once the
-   *  query has settled with data. */
-  const shouldShowGateBalances = isGate && areBalancesReady
-  const { formatMoneyAmount, formatDisplayAndWalletAmount } = useDisplayCurrency()
-  const { convertMoneyAmount } = usePriceConversion()
-
-  const btcWalletAmount = toBtcMoneyAmount(btcBalanceSats)
-  const usdWalletAmount = toUsdMoneyAmount(usdBalanceCents)
-  const btcBalance = convertMoneyAmount
-    ? formatDisplayAndWalletAmount({
-        primaryAmount: btcWalletAmount,
-        walletAmount: btcWalletAmount,
-        displayAmount: convertMoneyAmount(btcWalletAmount, DisplayCurrency),
-      })
-    : formatMoneyAmount({ moneyAmount: btcWalletAmount })
-  const usdBalance = formatMoneyAmount({ moneyAmount: usdWalletAmount })
 
   /** With a lightning address the intro passes through the keep-receiving screen;
    *  otherwise it routes straight into the flow's next step. */
@@ -104,12 +80,6 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     navigation.goBack()
   }, [onClose, navigation])
 
-  const heroIcon = isGate ? "warning" : "upgrade"
-  const heroIconColor = isGate ? colors.warning : colors._green
-  const heroTitle = isGate
-    ? LL.AccountMigration.migrationGateTitle()
-    : LL.AccountMigration.migrationRequiredTitle()
-
   const gateBody = (
     <RichText
       text={LL.AccountMigration.migrationGateBody({ email: supportEmailAddress })}
@@ -117,34 +87,53 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
       tags={{ link: { style: styles.gateLink, onPress: openSupport } }}
     />
   )
-  const subtitleByMode: Record<MigrationMode, React.ReactNode> = {
-    voluntary: LL.AccountMigration.migrationRequiredBody(),
-    forcedPreDeadline: LL.AccountMigration.migrationRequiredForcedBody(),
-    gate: gateBody,
+
+  /** Everything the mode drives lives here, so a fourth mode is one new entry. */
+  const presentationByMode: Record<MigrationMode, ModePresentation> = {
+    voluntary: {
+      heroIcon: "upgrade",
+      heroIconColor: colors._green,
+      title: LL.AccountMigration.migrationRequiredTitle(),
+      subtitle: LL.AccountMigration.migrationRequiredBody(),
+      shouldShowClose: true,
+      shouldShowBalances: false,
+    },
+    forcedPreDeadline: {
+      heroIcon: "upgrade",
+      heroIconColor: colors._green,
+      title: LL.AccountMigration.migrationRequiredTitle(),
+      subtitle: LL.AccountMigration.migrationRequiredForcedBody(),
+      shouldShowClose: true,
+      shouldShowBalances: false,
+    },
+    gate: {
+      heroIcon: "warning",
+      heroIconColor: colors.warning,
+      title: LL.AccountMigration.migrationGateTitle(),
+      subtitle: gateBody,
+      shouldShowClose: false,
+      shouldShowBalances: true,
+    },
   }
+  const presentation = presentationByMode[mode]
 
   return (
     <Screen preset="fixed" headerShown={false}>
       <View style={styles.container}>
         <MigrationCloseHeader
-          onClose={shouldShowCloseButton ? handleClose : undefined}
+          onClose={presentation.shouldShowClose ? handleClose : undefined}
           testID="migration-close"
         />
 
         <View style={styles.content}>
           <IconHero
-            icon={heroIcon}
-            iconColor={heroIconColor}
-            title={heroTitle}
-            subtitle={subtitleByMode[mode]}
+            icon={presentation.heroIcon}
+            iconColor={presentation.heroIconColor}
+            title={presentation.title}
+            subtitle={presentation.subtitle}
           />
 
-          {shouldShowGateBalances ? (
-            <View style={styles.balances}>
-              <InfoRow label={LL.AccountMigration.bitcoinBalance()} value={btcBalance} />
-              <InfoRow label={LL.AccountMigration.dollarBalance()} value={usdBalance} />
-            </View>
-          ) : null}
+          {presentation.shouldShowBalances ? <GateBalances /> : null}
         </View>
 
         <View style={styles.buttonsContainer}>
@@ -168,13 +157,6 @@ const useStyles = makeStyles(({ colors }) => ({
   content: {
     flex: 1,
     gap: 20,
-  },
-  balances: {
-    alignSelf: "center",
-    width: "100%",
-    maxWidth: 260,
-    gap: 5,
-    paddingHorizontal: 20,
   },
   buttonsContainer: {
     gap: 10,
