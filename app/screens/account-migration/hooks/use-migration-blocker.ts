@@ -1,3 +1,4 @@
+import { useFeatureFlags } from "@app/config/feature-flags-context"
 import {
   useCustodialMigrationRequired,
   useCustodialMigrationRequiredSync,
@@ -12,13 +13,19 @@ type MigrationBlocker = {
 }
 
 /** Decides the forced root blocker: a forced-cohort account may dismiss it for the
- *  session, while an armed gate ignores the dismissal and offers no close. */
+ *  session, while an armed gate ignores the dismissal and offers no close. The
+ *  self-custodial kill-switch outranks everything: with it off, nobody gets pushed
+ *  to migrate toward a stack that is disabled by emergency. */
 export const useMigrationBlocker = (): MigrationBlocker => {
   const { isDismissedForSession, dismissForSession } = useAccountSessionDismissal()
+  const { nonCustodialEnabled, remoteConfigReady } = useFeatureFlags()
 
   useCustodialMigrationRequiredSync()
   const isMigrationRequired = useCustodialMigrationRequired()
   const isGateArmed = useWindDownGateArmed()
+
+  const isSelfCustodialDisabled = remoteConfigReady && !nonCustodialEnabled
+  if (isSelfCustodialDisabled) return { isVisible: false }
 
   if (isGateArmed) return { isVisible: true }
 

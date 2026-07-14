@@ -7,6 +7,13 @@ import { AccountType } from "@app/types/wallet"
 
 let mockAccountType: AccountType = AccountType.Custodial
 
+let mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+
+jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
+  useFeatureFlags: () => mockFeatureFlags,
+}))
+
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ accountType: mockAccountType }),
 }))
@@ -32,6 +39,7 @@ describe("useMigrateNowPrompt", () => {
     mockAccountType = AccountType.Custodial
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
     mockStatus = WindDownStatus.ReceiveDisabled
+    mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
   })
 
   it("prompts a custodial account once the server disables receiving", () => {
@@ -113,5 +121,14 @@ describe("useMigrateNowPrompt", () => {
     rerender({})
 
     expect(result.current.isVisible).toBe(true)
+  })
+
+  it("pauses the prompt while the self-custodial kill-switch is off, keeping the receive state", () => {
+    mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+
+    const { result } = renderHook(() => useMigrateNowPrompt())
+
+    expect(result.current.isVisible).toBe(false)
+    expect(result.current.isReceiveDisabled).toBe(true)
   })
 })

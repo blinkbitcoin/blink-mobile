@@ -5,6 +5,13 @@ import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-mi
 let mockMigrationRequired = false
 const mockSync = jest.fn()
 
+let mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+
+jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
+  useFeatureFlags: () => mockFeatureFlags,
+}))
+
 jest.mock("@app/hooks/use-custodial-migration-required", () => ({
   useCustodialMigrationRequired: () => mockMigrationRequired,
   useCustodialMigrationRequiredSync: () => mockSync(),
@@ -28,6 +35,7 @@ describe("useMigrationBlocker", () => {
     mockMigrationRequired = false
     mockGateArmed = false
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
+    mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
   })
 
   it("stays hidden when nothing forces the migration", () => {
@@ -85,6 +93,25 @@ describe("useMigrationBlocker", () => {
 
     mockActiveAccount = { id: "custodial-2", type: "custodial" }
     rerender({})
+
+    expect(result.current.isVisible).toBe(true)
+  })
+
+  it("stays hidden while the self-custodial kill-switch is off, even with the gate armed", () => {
+    mockMigrationRequired = true
+    mockGateArmed = true
+    mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+
+    const { result } = renderHook(() => useMigrationBlocker())
+
+    expect(result.current.isVisible).toBe(false)
+  })
+
+  it("keeps blocking while the remote config has not settled yet", () => {
+    mockMigrationRequired = true
+    mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: false }
+
+    const { result } = renderHook(() => useMigrationBlocker())
 
     expect(result.current.isVisible).toBe(true)
   })
