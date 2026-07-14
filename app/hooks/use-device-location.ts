@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useApolloClient } from "@apollo/client"
 import { updateCountryCode } from "@app/graphql/client-only-query"
 import { useCountryCodeQuery, useSettingsScreenQuery } from "@app/graphql/generated"
-import { resolveIpCountryCode } from "@app/utils/ip-country-lookup"
+import { resolveIpCountryCodeCached } from "@app/utils/ip-country-lookup"
 import { logError } from "@app/utils/log-error"
 
 const DEFAULT_COUNTRY_CODE: CountryCode = "SV"
@@ -92,7 +92,7 @@ const useDeviceLocation = (): DeviceLocation => {
     setSource(LocationSource.Ip)
     const getLocation = async () => {
       const cached = data.countryCode as CountryCode | undefined
-      const ipCountryCode = await resolveIpCountryCode()
+      const ipCountryCode = await resolveIpCountryCodeCached()
       if (ipCountryCode) {
         setCountryCode(ipCountryCode)
         setDetectionFailed(false)
@@ -120,7 +120,7 @@ export const useIpCountryCode = (enabled: boolean): CountryCode | undefined => {
   useEffect(() => {
     if (!enabled) return undefined
     let active = true
-    resolveIpCountryCode().then((code) => {
+    resolveIpCountryCodeCached().then((code) => {
       if (active && code) setIpCountryCode(code)
     })
     return () => {

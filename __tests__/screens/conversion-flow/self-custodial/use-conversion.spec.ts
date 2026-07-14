@@ -11,12 +11,16 @@ const mockConvertMoneyAmount = jest.fn()
 const mockOnSuccess = jest.fn()
 const mockRecordError = jest.fn()
 
+let mockConvertReady = true
+
 jest.mock("@app/hooks/use-payments", () => ({
   usePayments: () => ({ getConversionQuote: mockGetQuote }),
 }))
 
 jest.mock("@app/hooks/use-price-conversion", () => ({
-  usePriceConversion: () => ({ convertMoneyAmount: mockConvertMoneyAmount }),
+  usePriceConversion: () => ({
+    convertMoneyAmount: mockConvertReady ? mockConvertMoneyAmount : undefined,
+  }),
 }))
 
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -68,12 +72,24 @@ const makeQuote = (
 describe("useSelfCustodialConversion", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockConvertReady = true
     mockConvertMoneyAmount.mockImplementation(
       (amount: { amount: number }, currency: WalletCurrency) =>
         currency === WalletCurrency.Btc
           ? toBtcMoneyAmount(amount.amount * 100)
           : toUsdMoneyAmount(amount.amount),
     )
+  })
+
+  it("stays idle without error while enabled but the price feed is unavailable", async () => {
+    mockConvertReady = false
+
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+
+    await waitFor(() => expect(result.current.isQuoting).toBe(false))
+    expect(result.current.hasQuoteError).toBe(false)
+    expect(result.current.canExecute).toBe(false)
+    expect(mockGetQuote).not.toHaveBeenCalled()
   })
 
   it("stays idle when enabled is false and does not call getQuote", async () => {
@@ -237,6 +253,165 @@ describe("useSelfCustodialConversion", () => {
       setTimeout(resolve, 600)
     })
     expect(mockGetQuote).toHaveBeenCalledTimes(1)
+  })
+
+  it("re-quotes after a failed execute so the retry never replays a stale quote", async () => {
+    const failingExecute = jest.fn().mockResolvedValue({
+      status: PaymentResultStatus.Failed,
+      errors: [{ message: "SDK boom" }],
+    })
+    const succeedingExecute = jest
+      .fn()
+      .mockResolvedValue({ status: PaymentResultStatus.Success })
+    mockGetQuote
+      .mockResolvedValueOnce(makeQuote({ execute: failingExecute }))
+      .mockResolvedValueOnce(makeQuote({ execute: succeedingExecute }))
+
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    await act(async () => {
+      await result.current.execute()
+    })
+
+    expect(result.current.errorMessage).toBe("SDK boom")
+    await waitFor(() => expect(mockGetQuote).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    await act(async () => {
+      await result.current.execute()
+    })
+
+    expect(failingExecute).toHaveBeenCalledTimes(1)
+    expect(succeedingExecute).toHaveBeenCalledTimes(1)
+  })
+
+  it("re-quotes the live amount when the balance changed while the conversion was in flight", async () => {
+    let rejectExecute: (err: Error) => void
+    const hangingExecute = jest.fn().mockImplementation(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectExecute = reject
+        }),
+    )
+    mockGetQuote.mockResolvedValue(makeQuote({ execute: hangingExecute }))
+
+    const { result, rerender } = renderHook(
+      (params: typeof defaultParams) => useSelfCustodialConversion(params),
+      { initialProps: defaultParams },
+    )
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    let executePromise: Promise<unknown> = Promise.resolve()
+    act(() => {
+      executePromise = result.current.execute()
+    })
+
+    rerender({ ...defaultParams, moneyAmount: toUsdMoneyAmount(700) })
+    await waitFor(() => expect(mockGetQuote).toHaveBeenCalledTimes(2))
+
+    await act(async () => {
+      rejectExecute!(new Error("conversion failed"))
+      await executePromise
+    })
+
+    /** The failure re-quote must pin the live 700-cent amount, not the
+     *  press-time 500-cent one. */
+    await waitFor(() => expect(mockGetQuote).toHaveBeenCalledTimes(3))
+    expect(mockGetQuote).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        fromAmount: expect.objectContaining({ amount: 70000 }),
+      }),
+    )
+  })
+
+  it("execute() surfaces a generic error and re-quotes when the SDK throws a non-Error", async () => {
+    const execute = jest.fn().mockRejectedValue("string failure")
+    mockGetQuote.mockResolvedValue(makeQuote({ execute }))
+
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    await act(async () => {
+      await result.current.execute()
+    })
+
+    expect(result.current.errorMessage).toBe("Generic error")
+    expect(mockRecordError).toHaveBeenCalledWith(expect.any(Error))
+    expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith("notificationError", {
+      ignoreAndroidSystemSettings: true,
+    })
+    expect(mockOnSuccess).not.toHaveBeenCalled()
+  })
+
+  it("ignores a second execute() while the first is still in flight", async () => {
+    const execute = jest.fn().mockResolvedValue({ status: PaymentResultStatus.Success })
+    mockGetQuote.mockResolvedValue(makeQuote({ execute }))
+
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    await act(async () => {
+      await Promise.all([result.current.execute(), result.current.execute()])
+    })
+
+    expect(execute).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps loading until the awaited onSuccess settles", async () => {
+    let resolveSuccess: () => void
+    mockOnSuccess.mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveSuccess = resolve
+      }),
+    )
+    mockGetQuote.mockResolvedValue(makeQuote())
+
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+
+    let executePromise: Promise<unknown> = Promise.resolve()
+    act(() => {
+      executePromise = result.current.execute()
+    })
+
+    await waitFor(() => expect(mockOnSuccess).toHaveBeenCalledTimes(1))
+    expect(result.current.loading).toBe(true)
+
+    await act(async () => {
+      resolveSuccess!()
+      await executePromise
+    })
+
+    expect(result.current.loading).toBe(false)
+  })
+
+  it("requote() stays put while the price feed is unavailable", async () => {
+    mockConvertReady = false
+
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    await waitFor(() => expect(result.current.isQuoting).toBe(false))
+
+    act(() => {
+      result.current.requote()
+    })
+
+    expect(mockGetQuote).not.toHaveBeenCalled()
+  })
+
+  it("requote() fetches a fresh quote after a quote error", async () => {
+    mockGetQuote.mockRejectedValueOnce(new Error("quote down"))
+
+    const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+    await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
+
+    mockGetQuote.mockResolvedValue(makeQuote())
+    act(() => {
+      result.current.requote()
+    })
+
+    await waitFor(() => expect(result.current.canExecute).toBe(true))
+    expect(mockGetQuote).toHaveBeenCalledTimes(2)
   })
 
   it("re-quotes when moneyAmount changes and execute() runs the latest quote", async () => {

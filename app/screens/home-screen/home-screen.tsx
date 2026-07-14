@@ -24,7 +24,7 @@ import { BalanceHeader, useTotalBalance } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { AccountType } from "@app/types/wallet"
+import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow/stable-token-convert-to-btc-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
@@ -48,13 +48,15 @@ import {
   useDollarBalanceRestricted,
   useDollarBalanceRestrictionSync,
 } from "@app/hooks/use-dollar-balance-restricted"
-import { useStablesatsForcedConversion } from "@app/hooks/use-stablesats-forced-conversion"
+import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
 import {
   useTransferBlocked,
   useTransferBlockedSync,
 } from "@app/hooks/use-transfer-blocked"
 import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
+import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { ConvertDirection } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
@@ -78,11 +80,16 @@ import {
   useHomeUnauthedQuery,
   useRealtimePriceQuery,
   useSettingsScreenQuery,
+  WalletCurrency,
 } from "@app/graphql/generated"
+import { AccountType } from "@app/types/wallet"
 import { useLevel } from "@app/graphql/level-context"
 
 const TransactionCountToTriggerSetDefaultAccountModal = 1
 const UPGRADE_MODAL_INITIAL_DELAY_MS = 1500
+/** Floor for conversions without a pool minimum (custodial intraledger always,
+ *  self-custodial when the SDK reports none): any positive cent converts. */
+const ANY_POSITIVE_CENT_MINIMUM = 1
 
 gql`
   query homeAuthed {
@@ -189,14 +196,14 @@ export const HomeScreen: React.FC = () => {
 
   const isAuthed = useIsAuthed()
   const activeWallet = useActiveWallet()
-  const { isSelfCustodial, accountType } = activeWallet
+  const { isSelfCustodial } = activeWallet
   useSelfCustodialNetworkMismatchToast()
   const {
     refreshWallets: refreshSelfCustodialWallets,
     isStableBalanceActive,
     lightningAddress: selfCustodialLightningAddress,
   } = useSelfCustodialWallet()
-  const { accounts } = useAccountRegistry()
+  const { accounts, activeAccount } = useAccountRegistry()
   const hasMultipleAccounts = accounts.length > 1
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
@@ -373,12 +380,64 @@ export const HomeScreen: React.FC = () => {
 
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
-  const restrictedUsdWalletBalance = restrictedUsdWallet?.balance ?? 0
+  /** Balance and restriction policy must resolve for the SAME account type: right
+   *  after switching to self-custodial the SDK is still connecting (so
+   *  `isSelfCustodial` is false) while the restriction already applies the
+   *  self-custodial policy; reading the cached custodial balance in that window
+   *  would trigger the previous account's modal. */
+  const isCustodialAccount = activeWallet.accountType === AccountType.Custodial
+  const selfCustodialUsdWallet = activeWallet.wallets.find(
+    (w) => w.walletCurrency === WalletCurrency.Usd,
+  )
+  const custodialUsdWalletBalance = restrictedUsdWallet?.balance ?? 0
+  const selfCustodialUsdWalletBalance = selfCustodialUsdWallet?.balance.amount ?? 0
+  const restrictedUsdWalletBalance = isCustodialAccount
+    ? custodialUsdWalletBalance
+    : selfCustodialUsdWalletBalance
+  /** Memoized so the self-custodial quote does not refire on unrelated re-renders. */
+  const restrictedUsdMoneyAmount = useMemo(
+    () => toUsdMoneyAmount(restrictedUsdWalletBalance),
+    [restrictedUsdWalletBalance],
+  )
 
-  const { isConvertModalVisible, closeConvertModal } = useStablesatsForcedConversion({
-    isRestricted: isDollarBalanceRestricted && accountType === AccountType.Custodial,
+  /** The limits fetch only runs when a forced conversion is actually on the
+   *  table (the hook skips entirely on an undefined direction), and gating on
+   *  focus re-runs it on each home visit, so one failed fetch cannot mute the
+   *  trigger for the whole session. Below the Breez pool minimum the trigger
+   *  stays closed: the bridge rejects below-minimum conversions, so the modal
+   *  would nag with a retry that can never succeed. */
+  const shouldCheckConversionMinimum =
+    !isCustodialAccount &&
+    isDollarBalanceRestricted &&
+    restrictedUsdWalletBalance > 0 &&
+    isFocused
+  const { limits: stableTokenConversionLimits } = useNonCustodialConversionLimits(
+    shouldCheckConversionMinimum ? ConvertDirection.UsdToBtc : undefined,
+  )
+  /** A fetched limits response without a minimum means "none": mirror the bridge
+   *  (`checkConversionMinimum`), which lets any positive amount through. */
+  const stableTokenConversionMinimum = stableTokenConversionLimits
+    ? stableTokenConversionLimits.minFromAmount ?? ANY_POSITIVE_CENT_MINIMUM
+    : null
+  const minimumConvertibleBalance = isCustodialAccount
+    ? ANY_POSITIVE_CENT_MINIMUM
+    : stableTokenConversionMinimum
+
+  const { isConvertModalVisible, closeConvertModal } = useDollarBalanceForcedConversion({
+    accountId: activeAccount?.id,
+    isRestricted: isDollarBalanceRestricted,
     usdWalletBalance: restrictedUsdWalletBalance,
+    minimumBalance: minimumConvertibleBalance,
+    isFocused,
   })
+
+  /** Each account type renders its own convert modal; the guards keep them exclusive
+   *  locally instead of relying on the skipped custodial query staying empty. */
+  const custodialConvertWallets =
+    isCustodialAccount && restrictedUsdWallet && restrictedBtcWallet
+      ? { usdWalletId: restrictedUsdWallet.id, btcWalletId: restrictedBtcWallet.id }
+      : null
+  const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
@@ -589,13 +648,21 @@ export const HomeScreen: React.FC = () => {
         isVisible={isRestrictionModalVisible}
         toggleModal={closeRestrictionModal}
       />
-      {restrictedUsdWallet && restrictedBtcWallet && (
+      {custodialConvertWallets && (
         <UsdConvertToBtcModal
           isVisible={isConvertModalVisible}
           toggleModal={closeConvertModal}
-          usdWalletBalance={toUsdMoneyAmount(restrictedUsdWalletBalance)}
-          usdWalletId={restrictedUsdWallet.id}
-          btcWalletId={restrictedBtcWallet.id}
+          usdWalletBalance={restrictedUsdMoneyAmount}
+          usdWalletId={custodialConvertWallets.usdWalletId}
+          btcWalletId={custodialConvertWallets.btcWalletId}
+        />
+      )}
+      {shouldShowStableTokenConvertModal && (
+        <StableTokenConvertToBtcModal
+          isVisible={isConvertModalVisible}
+          toggleModal={closeConvertModal}
+          usdWalletBalance={restrictedUsdMoneyAmount}
+          conversionMinimum={stableTokenConversionMinimum}
         />
       )}
       <View style={styles.balanceContainer}>
