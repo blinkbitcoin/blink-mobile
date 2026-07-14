@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -11,15 +11,18 @@ import { MigrationCheckpoint } from "../utils/migration-checkpoint-storage"
 import { useMigrationCheckpoint } from "./use-migration-checkpoint"
 
 /** Provisions (without activating) the migration's self-custodial account so the shared
- *  backup screens show its phrase; the id is persisted in the checkpoint for resume. */
+ *  backup screens show its phrase; the id is persisted in the checkpoint for resume.
+ *  isProvisioning drives the caller's in-flight UI, owned here with the operation. */
 export const useMigrationAccount = () => {
   const { accountId, loading, saveCheckpoint } = useMigrationCheckpoint()
   const { provision } = useProvisionSelfCustodialAccount()
   const { LL } = useI18nContext()
   const guard = useInFlightGuard()
+  const [isProvisioning, setIsProvisioning] = useState(false)
 
   const ensureAccount = useCallback(async (): Promise<string | null> => {
     if (accountId) return accountId
+    setIsProvisioning(true)
     try {
       const created = await guard.run(async () => {
         const newAccountId = await provision()
@@ -38,8 +41,10 @@ export const useMigrationAccount = () => {
       reportError("Migration account creation", err)
       toastShow({ message: LL.AccountTypeSelectionScreen.createFailed(), LL })
       return null
+    } finally {
+      setIsProvisioning(false)
     }
   }, [accountId, guard, provision, saveCheckpoint, LL])
 
-  return { ensureAccount, loading }
+  return { ensureAccount, isProvisioning, loading }
 }

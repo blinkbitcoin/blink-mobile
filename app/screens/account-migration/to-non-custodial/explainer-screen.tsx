@@ -21,10 +21,13 @@ export const MigrationExplainerScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { ensureAccount, loading: checkpointLoading } = useMigrationAccount()
+  const {
+    ensureAccount,
+    isProvisioning,
+    loading: checkpointLoading,
+  } = useMigrationAccount()
 
   const [areAllChecked, setAreAllChecked] = useState(false)
-  const [isProvisioning, setIsProvisioning] = useState(false)
 
   const checkLabels = [
     LL.AccountMigration.explainerCheck1(),
@@ -37,9 +40,7 @@ export const MigrationExplainerScreen: React.FC = () => {
   const isMoveDisabled = !areAllChecked || isProvisioning || checkpointLoading
 
   const handleMove = useCallback(async () => {
-    setIsProvisioning(true)
     const provisionedAccountId = await ensureAccount()
-    setIsProvisioning(false)
     if (provisionedAccountId) {
       navigation.navigate("acceptTermsAndConditions", { flow: "migration" })
     }
