@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { useWindDownReceiveBlocked } from "@app/screens/account-migration/hooks/use-wind-down-receive-blocked"
-import { WindDownStatus } from "@app/screens/account-migration/utils/backend-mock"
+import { WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
 let mockAccountType: AccountType = AccountType.Custodial

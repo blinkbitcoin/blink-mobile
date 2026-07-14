@@ -1,4 +1,4 @@
-import { WindDownStatus } from "../utils/backend-mock"
+import { WindDownStatus } from "@app/types/wind-down"
 
 import { useCustodialWindDown } from "./use-custodial-wind-down"
 

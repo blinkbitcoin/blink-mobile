@@ -1,7 +1,7 @@
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { AccountType } from "@app/types/wallet"
 
-import type { WindDown } from "../utils/backend-mock"
+import type { WindDown } from "@app/types/wind-down"
 
 import { useWindDownStatus } from "./use-wind-down-status"
 

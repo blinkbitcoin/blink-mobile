@@ -12,5 +12,6 @@ export { useMigrationCheckpoint, MigrationCheckpoint } from "./use-migration-che
 export { useMigrationBackupCheckpoint } from "./use-migration-backup-checkpoint"
 export { useMigrationAccount } from "./use-migration-account"
 export { useCompleteMigration } from "./use-complete-migration"
+export { useMigrationPreview } from "./use-migration-preview"
 export { useMigrationSupportDetails } from "./use-migration-support-details"
 export { useMigrationGateArmed } from "./use-migration-gate-armed"

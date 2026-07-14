@@ -24,12 +24,11 @@ import {
   useHardwareBackGuard,
   useMigrationCheckpoint,
   useMigrationGateArmed,
+  useMigrationPreview,
 } from "@app/screens/account-migration/hooks"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { AccountType } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
-
-import { getMigrationPreviewMock } from "../utils/backend-mock"
 
 const fiatSuffix = (fiat: string | undefined): string | undefined =>
   fiat ? ` (${fiat})` : undefined
@@ -88,7 +87,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
 
   /** The server owns the fee, the de-minimis subsidy, and the resulting amount; the
    *  screen renders the preview verbatim and never does the arithmetic itself. */
-  const preview = getMigrationPreviewMock(btcBalanceSats)
+  const preview = useMigrationPreview(btcBalanceSats)
 
   const currentBtcAmount = toBtcMoneyAmount(preview.balanceSats)
   const newBtcAmount = toBtcMoneyAmount(preview.receiveSats)

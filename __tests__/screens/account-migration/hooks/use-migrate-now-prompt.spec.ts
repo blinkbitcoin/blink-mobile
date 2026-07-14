@@ -1,11 +1,8 @@
 import { act, renderHook } from "@testing-library/react-native"
 
 import { useMigrateNowPrompt } from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
-import {
-  WindDown,
-  windDownMock,
-  WindDownStatus,
-} from "@app/screens/account-migration/utils/backend-mock"
+import { windDownMock } from "@app/screens/account-migration/utils/backend-mock"
+import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
 let mockAccountType: AccountType = AccountType.Custodial

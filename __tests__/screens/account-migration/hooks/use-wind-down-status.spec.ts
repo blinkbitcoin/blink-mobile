@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { useWindDownStatus } from "@app/screens/account-migration/hooks/use-wind-down-status"
-import { WindDownStatus } from "@app/screens/account-migration/utils/backend-mock"
+import { WindDownStatus } from "@app/types/wind-down"
 
 describe("useWindDownStatus", () => {
   it("serves either an unaffected account (null) or a wind-down that honors the contract", () => {

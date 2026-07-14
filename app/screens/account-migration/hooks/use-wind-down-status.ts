@@ -1,4 +1,6 @@
-import { WindDown, windDownMock } from "../utils/backend-mock"
+import { WindDown } from "@app/types/wind-down"
+
+import { windDownMock } from "../utils/backend-mock"
 
 /**
  * TODO: TEMPORARY mock, replace with the backend wind-down status query

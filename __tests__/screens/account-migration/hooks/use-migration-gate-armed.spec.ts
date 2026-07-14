@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { useMigrationGateArmed } from "@app/screens/account-migration/hooks/use-migration-gate-armed"
-import { WindDownStatus } from "@app/screens/account-migration/utils/backend-mock"
+import { WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
 let mockAccountType: AccountType = AccountType.Custodial
