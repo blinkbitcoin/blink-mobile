@@ -23,7 +23,7 @@ export const usePendingMigrationAccounts = () => {
   const { activeAccount } = useAccountRegistry()
   const [pendingByOwner, setPendingByOwner] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
-  const mountedRef = useRef(true)
+  const isMountedRef = useRef(true)
 
   const activeAccountId = activeAccount?.id ?? null
 
@@ -36,22 +36,22 @@ export const usePendingMigrationAccounts = () => {
   const storageKey = getPendingAccountsStorageKey(environment)
 
   const reloadPendingAccounts = useCallback(() => {
-    mountedRef.current = true
+    isMountedRef.current = true
 
     loadPendingProvisionedAccounts(storageKey)
       .then((pending) => {
-        if (!mountedRef.current) return
+        if (!isMountedRef.current) return
         setPendingByOwner(pending)
         setLoading(false)
       })
       .catch((err) => {
         reportError("Pending migration accounts load", err)
-        if (!mountedRef.current) return
+        if (!isMountedRef.current) return
         setLoading(false)
       })
 
     return () => {
-      mountedRef.current = false
+      isMountedRef.current = false
     }
   }, [storageKey])
 

@@ -25,7 +25,7 @@ export const useMigrationCheckpointState = () => {
   const { activeAccount } = useAccountRegistry()
   const [stored, setStored] = useState<StoredCheckpoint | null>(null)
   const [loading, setLoading] = useState(true)
-  const mountedRef = useRef(true)
+  const isMountedRef = useRef(true)
 
   const activeAccountId = activeAccount?.id ?? null
 
@@ -38,22 +38,22 @@ export const useMigrationCheckpointState = () => {
   const storageKey = getStorageKey(environment)
 
   const reloadCheckpoint = useCallback(() => {
-    mountedRef.current = true
+    isMountedRef.current = true
 
     loadCheckpoint(storageKey)
       .then((storedCheckpoint) => {
-        if (!mountedRef.current) return
+        if (!isMountedRef.current) return
         setStored(storedCheckpoint ?? null)
         setLoading(false)
       })
       .catch((err) => {
         reportError("Checkpoint load", err)
-        if (!mountedRef.current) return
+        if (!isMountedRef.current) return
         setLoading(false)
       })
 
     return () => {
-      mountedRef.current = false
+      isMountedRef.current = false
     }
   }, [storageKey])
 
