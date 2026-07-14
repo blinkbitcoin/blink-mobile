@@ -164,7 +164,7 @@ import {
 } from "./stack-param-lists"
 /** Deep import on purpose: its device-location chain stays out of the hooks barrel. */
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
-import { WindDownReceiveGate } from "@app/screens/account-migration/components/wind-down-receive-gate"
+import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"

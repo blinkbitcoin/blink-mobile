@@ -2,7 +2,7 @@ import React from "react"
 import { Text } from "react-native"
 import { render } from "@testing-library/react-native"
 
-import { WindDownReceiveGate } from "@app/screens/account-migration/components/wind-down-receive-gate"
+import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 
 let mockReceiveBlocked = false
 

@@ -4,7 +4,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
-import { useWindDownReceiveBlocked } from "../hooks/use-wind-down-receive-blocked"
+import { useWindDownReceiveBlocked } from "./hooks/use-wind-down-receive-blocked"
 
 type Props = {
   children: React.ReactNode
