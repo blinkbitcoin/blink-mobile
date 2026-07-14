@@ -58,32 +58,44 @@ export const useMigrationCheckpoint = () => {
     }
   }, [storageKey])
 
-  const saveCheckpoint = useCallback(
-    (step: MigrationCheckpoint, provisionedAccountId?: string) => {
-      const update = {
-        step,
-        accountId: provisionedAccountId,
-        custodialAccountId: activeAccountId ?? undefined,
-      }
-      setStored((existing) => mergeCheckpoint(existing, update))
-      return saveCheckpointToStorage(storageKey, update).catch((err) => {
-        reportError("Checkpoint save", err)
-      })
-    },
-    [storageKey, activeAccountId],
-  )
-
-  const clearCheckpoint = useCallback(() => {
-    setStored(null)
-    clearCheckpointFromStorage(storageKey).catch(() => {})
-  }, [storageKey])
-
   /** A checkpoint belongs to the custodial account that saved it; another profile on the
    *  same device starts its own flow instead of resuming, and inheriting, this one. */
   const isOwnedByActiveAccount =
     !stored?.custodialAccountId || stored.custodialAccountId === activeAccountId
   const checkpoint = isOwnedByActiveAccount ? stored?.step ?? null : null
   const accountId = isOwnedByActiveAccount ? stored?.accountId ?? null : null
+
+  /** Resolves false when the write fails, so callers can stop the flow instead of
+   *  advancing on a checkpoint that only exists in memory. Re-sending the known
+   *  accountId lets a later successful save heal a write that failed. */
+  const saveCheckpoint = useCallback(
+    async (
+      step: MigrationCheckpoint,
+      provisionedAccountId?: string,
+    ): Promise<boolean> => {
+      const update = {
+        step,
+        accountId: provisionedAccountId ?? accountId ?? undefined,
+        custodialAccountId: activeAccountId ?? undefined,
+      }
+      setStored((existing) => mergeCheckpoint(existing, update))
+      try {
+        await saveCheckpointToStorage(storageKey, update)
+        return true
+      } catch (err) {
+        reportError("Checkpoint save", err)
+        return false
+      }
+    },
+    [storageKey, activeAccountId, accountId],
+  )
+
+  const clearCheckpoint = useCallback(() => {
+    setStored(null)
+    return clearCheckpointFromStorage(storageKey).catch((err) => {
+      reportError("Checkpoint clear", err)
+    })
+  }, [storageKey])
 
   // Without a provisioned account, resume from the explainer so it gets provisioned.
   const resolveDestination = useCallback(

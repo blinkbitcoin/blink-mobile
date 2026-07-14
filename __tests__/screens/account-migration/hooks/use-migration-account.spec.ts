@@ -48,7 +48,7 @@ describe("useMigrationAccount", () => {
     jest.clearAllMocks()
     mockAccountId = null
     mockGuardBlocked = false
-    mockSaveCheckpoint.mockResolvedValue(undefined)
+    mockSaveCheckpoint.mockResolvedValue(true)
     mockProvision.mockResolvedValue("sc-account-1")
   })
 
@@ -92,6 +92,20 @@ describe("useMigrationAccount", () => {
 
     expect(ensured).toBeNull()
     expect(mockProvision).not.toHaveBeenCalled()
+  })
+
+  it("stops the flow with the failure toast when the checkpoint write fails", async () => {
+    mockSaveCheckpoint.mockResolvedValue(false)
+    const { result } = renderHook(() => useMigrationAccount())
+
+    let ensured: string | null = "unset"
+    await act(async () => {
+      ensured = await result.current.ensureAccount()
+    })
+
+    expect(ensured).toBeNull()
+    expect(mockReportError).toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalled()
   })
 
   it("reports the error and returns null when provisioning fails", async () => {

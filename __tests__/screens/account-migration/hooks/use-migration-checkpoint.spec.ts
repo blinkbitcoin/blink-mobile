@@ -143,19 +143,53 @@ describe("useMigrationCheckpoint", () => {
     expect(result.current.checkpoint).toBeNull()
   })
 
-  it("reports the error when saveCheckpointToStorage rejects", async () => {
+  it("resolves true when the storage write succeeds", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let saved: boolean | undefined
+    await act(async () => {
+      saved = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+    })
+
+    expect(saved).toBe(true)
+  })
+
+  it("reports the error and resolves false when saveCheckpointToStorage rejects", async () => {
     mockSaveCheckpointToStorage.mockRejectedValue(new Error("disk full"))
 
     const { result } = renderHook(() => useMigrationCheckpoint())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+    let saved: boolean | undefined
+    await act(async () => {
+      saved = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
     })
 
-    await waitFor(() =>
-      expect(mockReportError).toHaveBeenCalledWith("Checkpoint save", expect.any(Error)),
-    )
+    expect(saved).toBe(false)
+    expect(mockReportError).toHaveBeenCalledWith("Checkpoint save", expect.any(Error))
+  })
+
+  it("re-sends the known account id on step saves so a failed write can heal", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+      custodialAccountId: "custodial-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BackupAlerts)
+    })
+
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
+      step: MigrationCheckpoint.BackupAlerts,
+      accountId: "sc-account-1",
+      custodialAccountId: "custodial-1",
+    })
   })
 
   it("clears checkpoint from storage", async () => {
@@ -178,7 +212,7 @@ describe("useMigrationCheckpoint", () => {
     )
   })
 
-  it("clears the local state even when the storage removal fails", async () => {
+  it("clears the local state and reports when the storage removal fails", async () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.BackupMethod,
       savedAt: Date.now(),
@@ -189,12 +223,12 @@ describe("useMigrationCheckpoint", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    act(() => {
-      result.current.clearCheckpoint()
+    await act(async () => {
+      await result.current.clearCheckpoint()
     })
 
     expect(result.current.checkpoint).toBeNull()
-    expect(mockReportError).not.toHaveBeenCalled()
+    expect(mockReportError).toHaveBeenCalledWith("Checkpoint clear", expect.any(Error))
   })
 
   it("navigates to the explainer when no checkpoint exists", async () => {
