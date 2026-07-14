@@ -47,6 +47,9 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     loading: mockCheckpointLoading,
     saveCheckpoint: mockSaveCheckpoint,
   }),
+}))
+
+jest.mock("@app/screens/account-migration/hooks/use-migration-gate-armed", () => ({
   useMigrationGateArmed: () => mockGateArmed,
 }))
 
