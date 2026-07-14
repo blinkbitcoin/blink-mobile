@@ -57,24 +57,24 @@ describe("useExportTransactionsCsv", () => {
   it("resolves true when the share sheet completes", async () => {
     const { result } = renderHook(() => useExportTransactionsCsv())
 
-    let didShare: boolean | undefined
+    let hasShared: boolean | undefined
     await act(async () => {
-      didShare = await result.current.exportCsv(["btc-1"])
+      hasShared = await result.current.exportCsv(["btc-1"])
     })
 
-    expect(didShare).toBe(true)
+    expect(hasShared).toBe(true)
   })
 
   it("resolves false without rejecting when the user dismisses the share sheet", async () => {
     mockShareOpen.mockResolvedValue({ success: false, dismissedAction: true })
     const { result } = renderHook(() => useExportTransactionsCsv())
 
-    let didShare: boolean | undefined
+    let hasShared: boolean | undefined
     await act(async () => {
-      didShare = await result.current.exportCsv(["btc-1"])
+      hasShared = await result.current.exportCsv(["btc-1"])
     })
 
-    expect(didShare).toBe(false)
+    expect(hasShared).toBe(false)
   })
 
   it("names the file with a single .csv extension on iOS", async () => {

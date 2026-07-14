@@ -40,8 +40,8 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
     try {
       /** A dismissed share sheet resolves false: not an error, but not a download
        *  either, so the secondary action keeps reading Skip. */
-      const didShare = await exportCsv(walletIds)
-      if (didShare) setHasDownloaded(true)
+      const hasShared = await exportCsv(walletIds)
+      if (hasShared) setHasDownloaded(true)
     } catch (err) {
       reportError("Migration transaction history export", err)
       toastShow({ message: LL.SettingsScreen.csvTransactionsError(), LL })
