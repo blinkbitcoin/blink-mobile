@@ -99,6 +99,7 @@ const renderModal = (toggleModal: () => void = jest.fn()) =>
         isVisible={true}
         toggleModal={toggleModal}
         usdWalletBalance={usdBalance}
+        conversionMinimum={null}
       />,
     ),
   )

@@ -29,10 +29,12 @@ jest.mock("react-native-modal", () => {
     children,
     isVisible,
     onBackdropPress,
+    onBackButtonPress,
   }: {
     children: React.ReactNode
     isVisible: boolean
     onBackdropPress?: () => void
+    onBackButtonPress?: () => void
   }) =>
     isVisible
       ? ReactNs.createElement(
@@ -41,6 +43,10 @@ jest.mock("react-native-modal", () => {
           ReactNs.createElement(RN.Pressable, {
             testID: "backdrop",
             onPress: onBackdropPress,
+          }),
+          ReactNs.createElement(RN.Pressable, {
+            testID: "back-button",
+            onPress: onBackButtonPress,
           }),
           children,
         )
@@ -102,6 +108,28 @@ describe("CustomModal", () => {
     )
 
     fireEvent.press(getByTestId("backdrop"))
+
+    expect(toggleModal).not.toHaveBeenCalled()
+  })
+
+  it("closes on the Android back button by default", () => {
+    const toggleModal = jest.fn()
+    const { getByTestId } = render(
+      <CustomModal {...baseProps} toggleModal={toggleModal} />,
+    )
+
+    fireEvent.press(getByTestId("back-button"))
+
+    expect(toggleModal).toHaveBeenCalledTimes(1)
+  })
+
+  it("ignores the Android back button when not dismissable", () => {
+    const toggleModal = jest.fn()
+    const { getByTestId } = render(
+      <CustomModal {...baseProps} toggleModal={toggleModal} dismissable={false} />,
+    )
+
+    fireEvent.press(getByTestId("back-button"))
 
     expect(toggleModal).not.toHaveBeenCalled()
   })

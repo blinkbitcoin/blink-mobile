@@ -54,7 +54,9 @@ import {
   useTransferBlockedSync,
 } from "@app/hooks/use-transfer-blocked"
 import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
+import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { ConvertDirection } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
@@ -85,6 +87,8 @@ import { useLevel } from "@app/graphql/level-context"
 
 const TransactionCountToTriggerSetDefaultAccountModal = 1
 const UPGRADE_MODAL_INITIAL_DELAY_MS = 1500
+/** Custodial intraledger conversions have no pool minimum: any positive cent converts. */
+const CUSTODIAL_MINIMUM_CONVERTIBLE_BALANCE = 1
 
 gql`
   query homeAuthed {
@@ -395,10 +399,26 @@ export const HomeScreen: React.FC = () => {
     [restrictedUsdWalletBalance],
   )
 
+  /** The limits fetch only runs when a forced conversion is actually on the
+   *  table (the hook skips entirely on an undefined direction). Below the Breez
+   *  pool minimum the trigger stays closed: the bridge rejects below-minimum
+   *  conversions, so the modal would nag with a retry that can never succeed. */
+  const shouldCheckConversionMinimum =
+    !isCustodialAccount && isDollarBalanceRestricted && restrictedUsdWalletBalance > 0
+  const { limits: stableTokenConversionLimits } = useNonCustodialConversionLimits(
+    shouldCheckConversionMinimum ? ConvertDirection.UsdToBtc : undefined,
+  )
+  const stableTokenConversionMinimum = stableTokenConversionLimits?.minFromAmount ?? null
+  const minimumConvertibleBalance = isCustodialAccount
+    ? CUSTODIAL_MINIMUM_CONVERTIBLE_BALANCE
+    : stableTokenConversionMinimum
+
   const { isConvertModalVisible, closeConvertModal } = useDollarBalanceForcedConversion({
     accountId: activeAccount?.id,
     isRestricted: isDollarBalanceRestricted,
     usdWalletBalance: restrictedUsdWalletBalance,
+    minimumBalance: minimumConvertibleBalance,
+    isFocused,
   })
 
   /** Each account type renders its own convert modal; the guards keep them exclusive
@@ -632,6 +652,7 @@ export const HomeScreen: React.FC = () => {
           isVisible={isConvertModalVisible}
           toggleModal={closeConvertModal}
           usdWalletBalance={restrictedUsdMoneyAmount}
+          conversionMinimum={stableTokenConversionMinimum}
         />
       )}
       <View style={styles.balanceContainer}>

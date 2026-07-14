@@ -117,13 +117,18 @@ const wrap = (ui: React.ReactElement) => (
   </ThemeProvider>
 )
 
-const renderModal = (props?: { toggleModal?: () => void; isVisible?: boolean }) =>
+const renderModal = (props?: {
+  toggleModal?: () => void
+  isVisible?: boolean
+  conversionMinimum?: number | null
+}) =>
   render(
     wrap(
       <StableTokenConvertToBtcModal
         isVisible={props?.isVisible ?? true}
         toggleModal={props?.toggleModal ?? jest.fn()}
         usdWalletBalance={usdBalance}
+        conversionMinimum={props?.conversionMinimum ?? null}
       />,
     ),
   )
@@ -186,6 +191,7 @@ describe("StableTokenConvertToBtcModal", () => {
           isVisible={true}
           toggleModal={jest.fn()}
           usdWalletBalance={toUsdMoneyAmount(0)}
+          conversionMinimum={null}
         />,
       ),
     )
@@ -204,13 +210,13 @@ describe("StableTokenConvertToBtcModal", () => {
     expect(mockRequote).not.toHaveBeenCalled()
   })
 
-  it("stays busy but escapable while no quote is executable yet", () => {
+  it("stays busy and locked while no quote is executable yet, so the forced conversion cannot be skipped", () => {
     mockConversionState.canExecute = false
     mockConversionState.hasQuoteError = false
-    const { queryByText, getByTestId } = renderModal()
+    const { queryByText, queryByTestId } = renderModal()
 
     expect(queryByText("Transfer")).toBeNull()
-    expect(getByTestId("icon-close")).toBeTruthy()
+    expect(queryByTestId("icon-close")).toBeNull()
   })
 
   it("shows the conversion in progress while executing", () => {
@@ -234,10 +240,26 @@ describe("StableTokenConvertToBtcModal", () => {
     expect(mockExecute).not.toHaveBeenCalled()
   })
 
-  it("locks the modal only once the conversion is executable", () => {
+  it("locks the modal while the quote has not failed", () => {
     const { queryByTestId } = renderModal()
 
     expect(queryByTestId("icon-close")).toBeNull()
+  })
+
+  it("shows the minimum transfer amount when the quote fails below the minimum", () => {
+    mockConversionState.hasQuoteError = true
+    mockConversionState.canExecute = false
+    const { getByText } = renderModal({ conversionMinimum: 20000 })
+
+    expect(getByText("Minimum transfer: USD:20000")).toBeTruthy()
+  })
+
+  it("keeps the generic quote error when the balance meets the minimum", () => {
+    mockConversionState.hasQuoteError = true
+    mockConversionState.canExecute = false
+    const { getByText } = renderModal({ conversionMinimum: 500 })
+
+    expect(getByText("There was an error.\nPlease try again later.")).toBeTruthy()
   })
 
   it("prefers the execution error over the quote error", () => {

@@ -8,13 +8,20 @@ export const useDollarBalanceForcedConversion = ({
   accountId,
   isRestricted,
   usdWalletBalance,
+  minimumBalance,
+  isFocused,
 }: {
   accountId: string | undefined
   isRestricted: boolean
   usdWalletBalance: number
+  /** null while unknown: a quote cannot succeed before the conversion minimum
+   *  resolves, so the trigger stays closed instead of opening a doomed modal. */
+  minimumBalance: number | null
+  isFocused: boolean
 }): { isConvertModalVisible: boolean; closeConvertModal: () => void } => {
   const [isConvertModalVisible, setIsConvertModalVisible] = useState(false)
-  const hasConvertibleBalance = isRestricted && usdWalletBalance > 0
+  const hasConvertibleBalance =
+    isRestricted && minimumBalance !== null && usdWalletBalance >= minimumBalance
 
   /** The home screen survives account switches, so a latch set by one account
    *  must not leak the modal into the next one. */
@@ -22,11 +29,12 @@ export const useDollarBalanceForcedConversion = ({
     setIsConvertModalVisible(false)
   }, [accountId])
 
-  /** `accountId` re-arms the trigger after the reset above, so an account that
-   *  is itself restricted with a positive balance still opens its own modal. */
+  /** `accountId` re-arms the trigger after the reset above; `isFocused` re-arms
+   *  it after a manual close (possible only on a failed quote), so closing is
+   *  never final: the next visit to the home screen retries. */
   useEffect(() => {
-    if (hasConvertibleBalance) setIsConvertModalVisible(true)
-  }, [accountId, hasConvertibleBalance])
+    if (hasConvertibleBalance && isFocused) setIsConvertModalVisible(true)
+  }, [accountId, hasConvertibleBalance, isFocused])
 
   const closeConvertModal = useCallback(() => setIsConvertModalVisible(false), [])
 
