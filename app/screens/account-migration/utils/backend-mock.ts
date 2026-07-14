@@ -73,14 +73,6 @@ export const windDownMock: WindDown | null = IS_ACCOUNT_AFFECTED
   : null
 
 /**
- * TODO: TEMPORARY, remove once the backend serves the wind-down state. A mocked "today"
- * (Jul 9 2026, inside the pre-cutoff window) so simulations can reason about "where in
- * the timeline are we" consistently with the dates above; the real client never compares
- * dates to decide the phase, it obeys `status`.
- */
-export const nowMock: number = toUnixSeconds(Date.UTC(2026, 6, 9, 12, 0, 0))
-
-/**
  * Shape of the backend migration preview (Account.migration.preview in the integration
  * contract): the server computes the network fee, whether Blink covers it, and the
  * resulting amount. The client renders these four fields verbatim and never does the

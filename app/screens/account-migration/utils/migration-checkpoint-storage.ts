@@ -22,7 +22,7 @@ export type StoredCheckpoint = {
  * Where a checkpoint resumes. Every destination is a param-less route except the
  * terms screen, which is shared across flows and needs the migration flow param.
  */
-export type CheckpointDestination =
+type CheckpointDestination =
   | {
       name:
         | "accountMigrationExplainer"

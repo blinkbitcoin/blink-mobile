@@ -16,7 +16,10 @@ import { useTransferBlocked } from "@app/hooks/use-transfer-blocked"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 
-import { useActiveApiKeys, useMigrationGateArmed } from "../hooks"
+import {
+  useActiveApiKeys,
+  useMigrationGateArmed,
+} from "@app/screens/account-migration/hooks"
 
 import { MigrationApiServiceScreen } from "./api-service-screen"
 import { MigrationMode, MigrationRequiredScreen } from "./migration-required-screen"
