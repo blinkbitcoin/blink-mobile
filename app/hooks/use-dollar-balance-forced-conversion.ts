@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from "react"
 
 /**
  * State mirror, not derived: closes on success immediately, before the balance
- * refetches to zero.
+ * refetches to zero. The latch still drops once the balance stops being
+ * convertible, so a stale re-open cannot outlive the refetch.
  */
 export const useDollarBalanceForcedConversion = ({
   accountId,
@@ -31,9 +32,16 @@ export const useDollarBalanceForcedConversion = ({
 
   /** `accountId` re-arms the trigger after the reset above; `isFocused` re-arms
    *  it after a manual close (possible only on a failed quote), so closing is
-   *  never final: the next visit to the home screen retries. */
+   *  never final: the next visit to the home screen retries. Losing the
+   *  convertible balance closes the latch, because a focus re-open can race the
+   *  post-conversion refetch and resurrect the modal on a stale balance; without
+   *  the close it would stay locked on funds that no longer exist. */
   useEffect(() => {
-    if (hasConvertibleBalance && isFocused) setIsConvertModalVisible(true)
+    if (!hasConvertibleBalance) {
+      setIsConvertModalVisible(false)
+      return
+    }
+    if (isFocused) setIsConvertModalVisible(true)
   }, [accountId, hasConvertibleBalance, isFocused])
 
   const closeConvertModal = useCallback(() => setIsConvertModalVisible(false), [])

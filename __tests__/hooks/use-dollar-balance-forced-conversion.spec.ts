@@ -102,6 +102,28 @@ describe("useDollarBalanceForcedConversion", () => {
     expect(result.current.isConvertModalVisible).toBe(false)
   })
 
+  it("closes an open modal once the balance stops being convertible", () => {
+    const { result, rerender } = renderTrigger()
+    expect(result.current.isConvertModalVisible).toBe(true)
+
+    rerender({ usdWalletBalance: 0 })
+    expect(result.current.isConvertModalVisible).toBe(false)
+  })
+
+  it("self-heals a stale focus re-open when the refetched balance arrives at zero", () => {
+    const { result, rerender } = renderTrigger()
+    act(() => result.current.closeConvertModal())
+
+    /** Refocusing between the success-close and the balance refetch re-opens
+     *  the modal on the stale balance; the refetch must close it again. */
+    rerender({ isFocused: false })
+    rerender({ isFocused: true })
+    expect(result.current.isConvertModalVisible).toBe(true)
+
+    rerender({ usdWalletBalance: 0 })
+    expect(result.current.isConvertModalVisible).toBe(false)
+  })
+
   it("closes when switching to an account that is not restricted", () => {
     const { result, rerender } = renderTrigger()
     expect(result.current.isConvertModalVisible).toBe(true)

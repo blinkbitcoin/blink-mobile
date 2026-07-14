@@ -13,6 +13,7 @@ import {
   Network,
 } from "@app/graphql/generated"
 import { mockCurrencyList } from "@app/graphql/mocks"
+import { ConvertDirection } from "@app/types/payment"
 
 let currentMocks: MockedResponse[] = []
 
@@ -101,17 +102,29 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestrictionSync: () => undefined,
 }))
 
+type ForcedConversionParams = {
+  isRestricted: boolean
+  usdWalletBalance: number
+  minimumBalance: number | null
+}
+let mockForcedConversionParams: ForcedConversionParams | null = null
+
 jest.mock("@app/hooks/use-dollar-balance-forced-conversion", () => ({
-  useDollarBalanceForcedConversion: ({
-    isRestricted,
-    usdWalletBalance,
-  }: {
-    isRestricted: boolean
-    usdWalletBalance: number
-  }) => ({
-    isConvertModalVisible: isRestricted && usdWalletBalance > 0,
-    closeConvertModal: jest.fn(),
-  }),
+  useDollarBalanceForcedConversion: (params: ForcedConversionParams) => {
+    mockForcedConversionParams = params
+    return {
+      isConvertModalVisible: params.isRestricted && params.usdWalletBalance > 0,
+      closeConvertModal: jest.fn(),
+    }
+  },
+}))
+
+const mockUseNonCustodialConversionLimits = jest.fn()
+
+jest.mock("@app/self-custodial/hooks", () => ({
+  ...jest.requireActual("@app/self-custodial/hooks"),
+  useNonCustodialConversionLimits: (direction: string | undefined) =>
+    mockUseNonCustodialConversionLimits(direction),
 }))
 
 jest.mock("@app/components/dollar-balance-restriction-modal", () => {
@@ -491,6 +504,28 @@ const androidCases: ConvertButtonCase[] = [
   },
 ]
 
+const selfCustodialReadyWalletOverride = (usdBalance: number) => ({
+  wallets: [
+    {
+      id: "btc-1",
+      walletCurrency: "BTC",
+      balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+      transactions: [],
+    },
+    {
+      id: "usd-1",
+      walletCurrency: "USD",
+      balance: { amount: usdBalance, currency: "USD", currencyCode: "USD" },
+      transactions: [],
+    },
+  ],
+  status: "ready",
+  accountType: "self-custodial",
+  isReady: true,
+  isSelfCustodial: true,
+  needsBackendAuth: false,
+})
+
 describe("HomeScreen", () => {
   beforeEach(() => {
     currentMocks = []
@@ -498,7 +533,13 @@ describe("HomeScreen", () => {
     mockDollarBalanceRestrictedOverride = false
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
+    mockForcedConversionParams = null
     jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: null,
+    })
   })
 
   it("renders home screen for custodial user", async () => {
@@ -721,6 +762,64 @@ describe("HomeScreen", () => {
     expect(queryByTestId("convert-modal")).toBeNull()
     expect(queryByTestId("sc-convert-modal")).toBeNull()
 
+    mockActiveWalletOverride = null
+  })
+
+  it("treats a self-custodial limits response without a minimum as any positive cent", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: { minFromAmount: null, minToAmount: null },
+      loading: false,
+      error: null,
+    })
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(mockUseNonCustodialConversionLimits).toHaveBeenLastCalledWith(
+      ConvertDirection.UsdToBtc,
+    )
+    /** Mirrors the bridge: a null `minFromAmount` means "no minimum, allow",
+     *  so the forced-conversion trigger must not read it as "unknown". */
+    expect(mockForcedConversionParams?.minimumBalance).toBe(1)
+
+    mockActiveWalletOverride = null
+  })
+
+  it("skips the limits fetch while the home screen is unfocused", async () => {
+    mockIsFocused = false
+    mockDollarBalanceRestrictedOverride = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(mockUseNonCustodialConversionLimits).toHaveBeenLastCalledWith(undefined)
+
+    mockIsFocused = true
     mockActiveWalletOverride = null
   })
 

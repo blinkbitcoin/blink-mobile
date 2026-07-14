@@ -87,8 +87,9 @@ import { useLevel } from "@app/graphql/level-context"
 
 const TransactionCountToTriggerSetDefaultAccountModal = 1
 const UPGRADE_MODAL_INITIAL_DELAY_MS = 1500
-/** Custodial intraledger conversions have no pool minimum: any positive cent converts. */
-const CUSTODIAL_MINIMUM_CONVERTIBLE_BALANCE = 1
+/** Floor for conversions without a pool minimum (custodial intraledger always,
+ *  self-custodial when the SDK reports none): any positive cent converts. */
+const ANY_POSITIVE_CENT_MINIMUM = 1
 
 gql`
   query homeAuthed {
@@ -400,17 +401,26 @@ export const HomeScreen: React.FC = () => {
   )
 
   /** The limits fetch only runs when a forced conversion is actually on the
-   *  table (the hook skips entirely on an undefined direction). Below the Breez
-   *  pool minimum the trigger stays closed: the bridge rejects below-minimum
-   *  conversions, so the modal would nag with a retry that can never succeed. */
+   *  table (the hook skips entirely on an undefined direction), and gating on
+   *  focus re-runs it on each home visit, so one failed fetch cannot mute the
+   *  trigger for the whole session. Below the Breez pool minimum the trigger
+   *  stays closed: the bridge rejects below-minimum conversions, so the modal
+   *  would nag with a retry that can never succeed. */
   const shouldCheckConversionMinimum =
-    !isCustodialAccount && isDollarBalanceRestricted && restrictedUsdWalletBalance > 0
+    !isCustodialAccount &&
+    isDollarBalanceRestricted &&
+    restrictedUsdWalletBalance > 0 &&
+    isFocused
   const { limits: stableTokenConversionLimits } = useNonCustodialConversionLimits(
     shouldCheckConversionMinimum ? ConvertDirection.UsdToBtc : undefined,
   )
-  const stableTokenConversionMinimum = stableTokenConversionLimits?.minFromAmount ?? null
+  /** A fetched limits response without a minimum means "none": mirror the bridge
+   *  (`checkConversionMinimum`), which lets any positive amount through. */
+  const stableTokenConversionMinimum = stableTokenConversionLimits
+    ? stableTokenConversionLimits.minFromAmount ?? ANY_POSITIVE_CENT_MINIMUM
+    : null
   const minimumConvertibleBalance = isCustodialAccount
-    ? CUSTODIAL_MINIMUM_CONVERTIBLE_BALANCE
+    ? ANY_POSITIVE_CENT_MINIMUM
     : stableTokenConversionMinimum
 
   const { isConvertModalVisible, closeConvertModal } = useDollarBalanceForcedConversion({
