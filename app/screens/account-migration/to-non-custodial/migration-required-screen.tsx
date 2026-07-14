@@ -115,16 +115,12 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     },
   }
   const presentation = presentationByMode[mode]
+  const closeAction = presentation.shouldShowClose ? handleClose : undefined
 
   return (
     <MigrationStepLayout
       headerShown={false}
-      header={
-        <MigrationCloseHeader
-          onClose={presentation.shouldShowClose ? handleClose : undefined}
-          testID="migration-close"
-        />
-      }
+      header={<MigrationCloseHeader onClose={closeAction} testID="migration-close" />}
       contentStyle={styles.contentGap}
       footer={
         <GaloyPrimaryButton
