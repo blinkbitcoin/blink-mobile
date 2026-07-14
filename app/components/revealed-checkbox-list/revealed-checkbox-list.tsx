@@ -10,7 +10,7 @@ const REVEAL_DURATION_MS = 300
 type Props = {
   labels: readonly string[]
   testIdPrefix: string
-  onAllCheckedChange: (allChecked: boolean) => void
+  onAllCheckedChange: (areAllChecked: boolean) => void
 }
 
 /**
@@ -28,13 +28,13 @@ export const RevealedCheckboxList: React.FC<Props> = ({
   const [checks, setChecks] = useState<readonly boolean[]>(() => labels.map(() => false))
   const [revealedCount, setRevealedCount] = useState(1)
 
-  const allChecked = checks.every(Boolean)
+  const areAllChecked = checks.every(Boolean)
 
   const reportRef = useRef(onAllCheckedChange)
   reportRef.current = onAllCheckedChange
   useEffect(() => {
-    reportRef.current(allChecked)
-  }, [allChecked])
+    reportRef.current(areAllChecked)
+  }, [areAllChecked])
 
   // Reveal up to the first unchecked box; monotonic, so unchecking never re-hides.
   useEffect(() => {

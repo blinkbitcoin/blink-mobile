@@ -20,10 +20,10 @@ type SelfCustodialInfoBulletinState = {
 
 type DismissalState = {
   accountId: string | null
-  dismissed: boolean
+  isDismissed: boolean
 }
 
-const INITIAL_DISMISSAL: DismissalState = { accountId: null, dismissed: false }
+const INITIAL_DISMISSAL: DismissalState = { accountId: null, isDismissed: false }
 
 /**
  * Controls the one-time "this is a non-custodial account" home bulletin shown to
@@ -45,19 +45,19 @@ export const useSelfCustodialInfoBulletinState = (): SelfCustodialInfoBulletinSt
       setDismissal(INITIAL_DISMISSAL)
       return
     }
-    let mounted = true
+    let isMounted = true
     const accountId = activeSelfCustodialAccountId
     AsyncStorage.getItem(dismissedKeyFor(accountId)).then((raw) => {
-      if (mounted) setDismissal({ accountId, dismissed: raw === "true" })
+      if (isMounted) setDismissal({ accountId, isDismissed: raw === "true" })
     })
     return () => {
-      mounted = false
+      isMounted = false
     }
   }, [activeSelfCustodialAccountId])
 
   const dismiss = useCallback(() => {
     if (!activeSelfCustodialAccountId) return
-    setDismissal({ accountId: activeSelfCustodialAccountId, dismissed: true })
+    setDismissal({ accountId: activeSelfCustodialAccountId, isDismissed: true })
     AsyncStorage.setItem(dismissedKeyFor(activeSelfCustodialAccountId), "true").catch(
       (err) => reportError("Self-custodial info bulletin dismiss write", err),
     )
@@ -67,7 +67,7 @@ export const useSelfCustodialInfoBulletinState = (): SelfCustodialInfoBulletinSt
     Boolean(activeSelfCustodialAccountId) &&
     isReady &&
     dismissal.accountId === activeSelfCustodialAccountId &&
-    !dismissal.dismissed
+    !dismissal.isDismissed
 
   return { shouldShow, dismiss }
 }

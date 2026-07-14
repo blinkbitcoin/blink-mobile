@@ -153,14 +153,14 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
                 label={LLOverview.currentBitcoinBalance()}
                 value={currentBitcoinBalance}
                 secondaryValue={currentBitcoinFiat}
-                regularLabel
+                isLabelRegular
               />
               <View style={styles.separator} />
               <InfoRow
                 label={LLOverview.currentDollarBalance()}
                 value={currentDollarBalance}
-                valueMuted={isCurrentDollarBalanceRestricted}
-                regularLabel
+                isValueMuted={isCurrentDollarBalanceRestricted}
+                isLabelRegular
               />
             </View>
 
@@ -175,14 +175,14 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
                 label={LLOverview.newBitcoinBalance()}
                 value={newBitcoinBalance}
                 secondaryValue={newBitcoinFiat}
-                regularLabel
+                isLabelRegular
               />
               <View style={styles.separator} />
               <InfoRow
                 label={LLOverview.newDollarBalance()}
                 value={newDollarBalance}
-                valueMuted={isNewDollarBalanceRestricted}
-                regularLabel
+                isValueMuted={isNewDollarBalanceRestricted}
+                isLabelRegular
               />
             </View>
 

@@ -129,20 +129,20 @@ describe("InfoRow", () => {
     })
   })
 
-  describe("with valueMuted", () => {
+  describe("with isValueMuted", () => {
     it("renders a muted value", () => {
       const { getByText } = render(
-        <InfoRow label="New Dollar Balance" value="not available" valueMuted />,
+        <InfoRow label="New Dollar Balance" value="not available" isValueMuted />,
       )
 
       expect(getByText("not available")).toBeTruthy()
     })
   })
 
-  describe("with regularLabel", () => {
+  describe("with isLabelRegular", () => {
     it("renders the label", () => {
       const { getByText } = render(
-        <InfoRow label="Current Bitcoin Balance" value="21,493 SAT" regularLabel />,
+        <InfoRow label="Current Bitcoin Balance" value="21,493 SAT" isLabelRegular />,
       )
 
       expect(getByText("Current Bitcoin Balance")).toBeTruthy()

@@ -7,8 +7,8 @@ type InfoRowProps = {
   value: string
   secondaryValue?: string
   valueColor?: string
-  valueMuted?: boolean
-  regularLabel?: boolean
+  isValueMuted?: boolean
+  isLabelRegular?: boolean
 }
 
 export const InfoRow: React.FC<InfoRowProps> = ({
@@ -16,16 +16,16 @@ export const InfoRow: React.FC<InfoRowProps> = ({
   value,
   secondaryValue,
   valueColor,
-  valueMuted,
-  regularLabel,
+  isValueMuted,
+  isLabelRegular,
 }) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
 
-  const labelStyle = regularLabel ? [styles.label, styles.regularLabel] : styles.label
-  const valueStyle = valueMuted
+  const labelStyle = isLabelRegular ? [styles.label, styles.regularLabel] : styles.label
+  const valueStyle = isValueMuted
     ? [styles.value, styles.mutedValue]
     : [styles.value, { color: valueColor ?? colors.black }]
 

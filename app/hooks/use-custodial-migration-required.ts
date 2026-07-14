@@ -47,23 +47,24 @@ export const useCustodialMigrationRequiredSync = (): void => {
   const { countryCode, source } = useDeviceLocation()
   const { custodialMigrationRequiredCountries } = useRemoteConfig()
   const { persistentState, updateState } = usePersistentStateContext()
-  const alreadyPersisted = getCustodialMigrationRequired(persistentState)
-  const primaryBlocked = isBlockedCountry(
+  const isAlreadyPersisted = getCustodialMigrationRequired(persistentState)
+  const isPrimaryCountryBlocked = isBlockedCountry(
     countryCode,
     custodialMigrationRequiredCountries,
   )
 
-  const ipCountryCode = useIpCountryCode(
+  const isPhoneLocationSource = source === LocationSource.Phone
+  const shouldCheckIpCountry =
     isCustodial &&
-      source === LocationSource.Phone &&
-      !alreadyPersisted &&
-      !primaryBlocked,
-  )
+    isPhoneLocationSource &&
+    !isAlreadyPersisted &&
+    !isPrimaryCountryBlocked
+  const ipCountryCode = useIpCountryCode(shouldCheckIpCountry)
 
   const shouldPersist =
     isCustodial &&
-    !alreadyPersisted &&
-    (primaryBlocked ||
+    !isAlreadyPersisted &&
+    (isPrimaryCountryBlocked ||
       isBlockedCountry(ipCountryCode, custodialMigrationRequiredCountries))
 
   useEffect(() => {

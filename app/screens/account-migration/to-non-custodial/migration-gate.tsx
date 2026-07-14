@@ -50,7 +50,7 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
   const isGated = useMigrationGateArmed()
   const isTransferBlocked = useTransferBlocked()
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
-  const [apiWarningAcknowledged, setApiWarningAcknowledged] = useState(false)
+  const [isApiWarningAcknowledged, setIsApiWarningAcknowledged] = useState(false)
 
   /** While a pushed screen (the dollar transfer) has focus the modal hides instead of
    *  floating over it; regaining focus shows it again with a fresh balance check. */
@@ -61,7 +61,7 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
     skip: !isAuthed,
   })
 
-  const acknowledgeApiWarning = useCallback(() => setApiWarningAcknowledged(true), [])
+  const acknowledgeApiWarning = useCallback(() => setIsApiWarningAcknowledged(true), [])
 
   const exitFlow = useCallback(() => {
     if (onClose) {
@@ -119,7 +119,7 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
     )
   }
 
-  const shouldWarnAboutApiKeys = hasActiveApiKeys && !apiWarningAcknowledged
+  const shouldWarnAboutApiKeys = hasActiveApiKeys && !isApiWarningAcknowledged
   if (shouldWarnAboutApiKeys) {
     /** Same close rules as the "Time to upgrade" screen: closable until the gate arms. */
     const apiCloseAction = isGated ? undefined : exitFlow

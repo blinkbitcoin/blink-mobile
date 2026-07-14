@@ -23,8 +23,8 @@ export const MigrationExplainerScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { ensureAccount, loading: checkpointLoading } = useMigrationAccount()
 
-  const [allChecked, setAllChecked] = useState(false)
-  const [provisioning, setProvisioning] = useState(false)
+  const [areAllChecked, setAreAllChecked] = useState(false)
+  const [isProvisioning, setIsProvisioning] = useState(false)
 
   const checkLabels = [
     LL.AccountMigration.explainerCheck1(),
@@ -35,9 +35,9 @@ export const MigrationExplainerScreen: React.FC = () => {
   ]
 
   const handleMove = useCallback(async () => {
-    setProvisioning(true)
+    setIsProvisioning(true)
     const provisionedAccountId = await ensureAccount()
-    setProvisioning(false)
+    setIsProvisioning(false)
     if (provisionedAccountId) {
       navigation.navigate("acceptTermsAndConditions", { flow: "migration" })
     }
@@ -55,15 +55,15 @@ export const MigrationExplainerScreen: React.FC = () => {
           <RevealedCheckboxList
             labels={checkLabels}
             testIdPrefix="migration-explainer-check"
-            onAllCheckedChange={setAllChecked}
+            onAllCheckedChange={setAreAllChecked}
           />
         </View>
 
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
             title={LL.AccountMigration.explainerCta()}
-            disabled={!allChecked || provisioning || checkpointLoading}
-            loading={provisioning}
+            disabled={!areAllChecked || isProvisioning || checkpointLoading}
+            loading={isProvisioning}
             onPress={handleMove}
             {...testProps("migration-explainer-cta")}
           />

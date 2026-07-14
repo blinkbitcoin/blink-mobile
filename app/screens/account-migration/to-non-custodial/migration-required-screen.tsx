@@ -59,7 +59,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
 
   const isAuthed = useIsAuthed()
   const isGate = mode === "gate"
-  const showCloseButton = !isGate
+  const shouldShowCloseButton = !isGate
   const shouldLoadBalances = isAuthed && isGate
 
   const { data: addressData } = useAddressScreenQuery({
@@ -143,7 +143,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     <Screen preset="fixed" headerShown={false}>
       <View style={styles.container}>
         <View style={styles.header}>
-          {showCloseButton ? (
+          {shouldShowCloseButton ? (
             <GaloyIconButton
               name="close"
               size="medium"

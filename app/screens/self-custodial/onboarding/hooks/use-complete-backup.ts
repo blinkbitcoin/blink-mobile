@@ -33,9 +33,10 @@ export const useCompleteBackup = () => {
   const { backupState, setBackupCompleted } = useBackupState()
   const { migrationCheckpoint, migrationAccountId } = useCompleteMigration()
 
-  const alreadyBackedUp = backupState.status === BackupStatus.Completed
+  const isAlreadyBackedUp = backupState.status === BackupStatus.Completed
   /** Migration only applies on a custodial account; self-custodial backups are standalone. */
-  const isMigrating = !isSelfCustodial && migrationCheckpoint !== null && !alreadyBackedUp
+  const isMigrating =
+    !isSelfCustodial && migrationCheckpoint !== null && !isAlreadyBackedUp
 
   return useCallback(
     async ({ method, message }: CompleteBackupOptions) => {
@@ -64,7 +65,7 @@ export const useCompleteBackup = () => {
 
       setBackupCompleted(method)
       navigation.navigate("selfCustodialBackupSuccess", {
-        reBackup: alreadyBackedUp,
+        reBackup: isAlreadyBackedUp,
         message,
       })
     },
@@ -72,7 +73,7 @@ export const useCompleteBackup = () => {
       navigation,
       isMigrating,
       migrationAccountId,
-      alreadyBackedUp,
+      isAlreadyBackedUp,
       setBackupCompleted,
       LL,
     ],

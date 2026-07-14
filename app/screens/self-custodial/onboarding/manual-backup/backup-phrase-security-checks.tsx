@@ -21,7 +21,7 @@ export const BackupPhraseSecurityChecks: React.FC<Props> = ({ onContinue }) => {
     theme: { colors },
   } = useTheme()
 
-  const [allChecked, setAllChecked] = useState(false)
+  const [areAllChecked, setAreAllChecked] = useState(false)
 
   const checkLabels = [
     LL.BackupScreen.ManualBackup.Alerts.check1(),
@@ -41,14 +41,14 @@ export const BackupPhraseSecurityChecks: React.FC<Props> = ({ onContinue }) => {
           <RevealedCheckboxList
             labels={checkLabels}
             testIdPrefix="backup-alert-check"
-            onAllCheckedChange={setAllChecked}
+            onAllCheckedChange={setAreAllChecked}
           />
         </View>
 
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
             title={LL.common.continue()}
-            disabled={!allChecked}
+            disabled={!areAllChecked}
             onPress={onContinue}
             {...testProps("backup-alerts-continue")}
           />
