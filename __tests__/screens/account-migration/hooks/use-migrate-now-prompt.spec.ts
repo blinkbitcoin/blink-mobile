@@ -14,6 +14,12 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ accountType: mockAccountType }),
 }))
 
+let mockActiveAccount: { id: string; type: string } | undefined
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
+}))
+
 if (windDownMock === null) throw new Error("These tests exercise the affected mock")
 const affectedWindDown: WindDown = windDownMock
 
@@ -27,6 +33,7 @@ jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
 describe("useMigrateNowPrompt", () => {
   beforeEach(() => {
     mockAccountType = AccountType.Custodial
+    mockActiveAccount = { id: "custodial-1", type: "custodial" }
     mockStatus = WindDownStatus.ReceiveDisabled
   })
 
@@ -93,6 +100,20 @@ describe("useMigrateNowPrompt", () => {
     act(() => {
       result.current.reopen()
     })
+
+    expect(result.current.isVisible).toBe(true)
+  })
+
+  it("does not carry a dismissal across an account switch", () => {
+    const { result, rerender } = renderHook(() => useMigrateNowPrompt())
+
+    act(() => {
+      result.current.dismissForSession()
+    })
+    expect(result.current.isVisible).toBe(false)
+
+    mockActiveAccount = { id: "custodial-2", type: "custodial" }
+    rerender({})
 
     expect(result.current.isVisible).toBe(true)
   })

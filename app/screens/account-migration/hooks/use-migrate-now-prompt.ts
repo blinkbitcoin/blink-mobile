@@ -1,10 +1,9 @@
-import { useCallback, useState } from "react"
-
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { AccountType } from "@app/types/wallet"
 
 import { WindDownStatus } from "../utils/backend-mock"
 
+import { useAccountSessionDismissal } from "./use-account-session-dismissal"
 import { useWindDownStatus } from "./use-wind-down-status"
 
 type MigrateNowPrompt = {
@@ -20,9 +19,8 @@ type MigrateNowPrompt = {
  *  session opens with a dismissible push into the migration, dated by the server.
  *  The same state greys out the home Receive action, whose tap reopens the prompt. */
 export const useMigrateNowPrompt = (): MigrateNowPrompt => {
-  const [isDismissedForSession, setIsDismissedForSession] = useState(false)
-  const dismissForSession = useCallback(() => setIsDismissedForSession(true), [])
-  const reopen = useCallback(() => setIsDismissedForSession(false), [])
+  const { isDismissedForSession, dismissForSession, reopen } =
+    useAccountSessionDismissal()
 
   const { accountType } = useActiveWallet()
   const windDown = useWindDownStatus()

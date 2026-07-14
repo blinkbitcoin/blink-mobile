@@ -16,11 +16,18 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-gate-armed", () =>
   useMigrationGateArmed: () => mockGateArmed,
 }))
 
+let mockActiveAccount: { id: string; type: string } | undefined
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
+}))
+
 describe("useMigrationBlocker", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockMigrationRequired = false
     mockGateArmed = false
+    mockActiveAccount = { id: "custodial-1", type: "custodial" }
   })
 
   it("stays hidden when nothing forces the migration", () => {
@@ -64,5 +71,21 @@ describe("useMigrationBlocker", () => {
     renderHook(() => useMigrationBlocker())
 
     expect(mockSync).toHaveBeenCalled()
+  })
+
+  it("does not carry a dismissal across an account switch", () => {
+    mockMigrationRequired = true
+
+    const { result, rerender } = renderHook(() => useMigrationBlocker())
+
+    act(() => {
+      result.current.onClose?.()
+    })
+    expect(result.current.isVisible).toBe(false)
+
+    mockActiveAccount = { id: "custodial-2", type: "custodial" }
+    rerender({})
+
+    expect(result.current.isVisible).toBe(true)
   })
 })
