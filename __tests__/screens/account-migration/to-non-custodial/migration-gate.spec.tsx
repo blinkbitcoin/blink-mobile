@@ -29,6 +29,15 @@ jest.mock("@react-navigation/native", () => ({
   useIsFocused: () => mockIsFocused,
 }))
 
+jest.mock("@rn-vui/themed", () => ({
+  ...jest.requireActual("@rn-vui/themed"),
+  useTheme: () => ({ theme: { colors: { primary: "#fb5607" } } }),
+}))
+
+jest.mock("@app/components/screen", () => ({
+  Screen: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}))
+
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useActiveApiKeys: () => mockUseActiveApiKeys(),
   useMigrationGateArmed: () => mockUseMigrationGateArmed(),
@@ -107,21 +116,23 @@ describe("MigrationGate", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(0))
   })
 
-  it("renders nothing while the API-key check is loading", () => {
+  it("holds a loading screen while the API-key check loads", () => {
     mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: false, loading: true })
 
-    render(<MigrationGate />)
+    const { getByTestId } = render(<MigrationGate />)
 
+    expect(getByTestId("migration-gate-loading")).toBeTruthy()
     expect(mockDollarBalanceModal).not.toHaveBeenCalled()
     expect(mockApiServiceScreen).not.toHaveBeenCalled()
     expect(mockRequiredScreen).not.toHaveBeenCalled()
   })
 
-  it("renders nothing while the wallet balances are loading", () => {
+  it("holds a loading screen while the wallet balances load", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue({ loading: true, data: undefined })
 
-    render(<MigrationGate />)
+    const { getByTestId } = render(<MigrationGate />)
 
+    expect(getByTestId("migration-gate-loading")).toBeTruthy()
     expect(mockDollarBalanceModal).not.toHaveBeenCalled()
     expect(mockRequiredScreen).not.toHaveBeenCalled()
   })
@@ -142,7 +153,15 @@ describe("MigrationGate", () => {
 
     expect(mockDollarBalanceModal).toHaveBeenCalled()
     expect(mockApiServiceScreen).not.toHaveBeenCalled()
-    expect(mockRequiredScreen).not.toHaveBeenCalled()
+  })
+
+  it("keeps the required screen behind the dollar-balance modal instead of a blank background", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal).toHaveBeenCalled()
+    expect(mockRequiredScreen).toHaveBeenCalled()
   })
 
   it("shows the dollar-balance modal only while the gate has focus", () => {
