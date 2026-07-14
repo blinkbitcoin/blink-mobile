@@ -34,10 +34,10 @@ const resolveMigrationMode = (isGated: boolean, isForced: boolean): MigrationMod
 
 /**
  * Entry gate for the migration flow, the single choke point for both entry points
- * (Settings and the forced root blocker). Order of checks: a custodial Dollar Balance
- * blocks entry first (the user empties it manually; post-gate this does not apply since
- * the flow itself converts dollars), then accounts with active API keys see the
- * API-service warning, and finally the "Time to upgrade" screen in the mode the
+ * (Settings and the forced root blocker). Order of checks per the PRD: accounts with
+ * API keys see the API-service warning first, then a custodial Dollar Balance blocks
+ * entry (the user empties it manually; post-gate this does not apply since the flow
+ * itself converts dollars), and finally the "Time to upgrade" screen in the mode the
  * account's situation demands (voluntary, forced pre-deadline, or the armed gate).
  */
 export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
@@ -93,6 +93,20 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
   const hasCustodialDollarBalance = usdBalanceCents > 0
   const mode = resolveMigrationMode(isGated, isForced)
 
+  /** The PRD's entry order: the API-key warning comes before the Dollar-Balance
+   *  precondition (Entry, API-key check, Dollar Balance check, intro). */
+  const shouldWarnAboutApiKeys = hasActiveApiKeys && !isApiWarningAcknowledged
+  if (shouldWarnAboutApiKeys) {
+    /** Same close rules as the "Time to upgrade" screen: closable until the gate arms. */
+    const apiCloseAction = isGated ? undefined : exitFlow
+    return (
+      <MigrationApiServiceScreen
+        onContinue={acknowledgeApiWarning}
+        onClose={apiCloseAction}
+      />
+    )
+  }
+
   /** Post-gate the user enters WITH dollars and the flow converts them at the final
    *  step, so the empty-your-dollars precondition only guards the pre-deadline paths.
    *  TODO: the backend re-enforces this precondition on migrationStart; this modal is
@@ -113,18 +127,6 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
           onTransfer={transferAction}
         />
       </>
-    )
-  }
-
-  const shouldWarnAboutApiKeys = hasActiveApiKeys && !isApiWarningAcknowledged
-  if (shouldWarnAboutApiKeys) {
-    /** Same close rules as the "Time to upgrade" screen: closable until the gate arms. */
-    const apiCloseAction = isGated ? undefined : exitFlow
-    return (
-      <MigrationApiServiceScreen
-        onContinue={acknowledgeApiWarning}
-        onClose={apiCloseAction}
-      />
     )
   }
 

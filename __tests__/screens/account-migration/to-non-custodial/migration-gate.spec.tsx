@@ -266,7 +266,7 @@ describe("MigrationGate", () => {
     expect(mockRequiredScreen).not.toHaveBeenCalled()
   })
 
-  it("checks the dollar balance before the API keys", () => {
+  it("warns about the API keys before the dollar-balance check, per the PRD entry order", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ usdBalance: 20 }),
     )
@@ -274,8 +274,8 @@ describe("MigrationGate", () => {
 
     render(<MigrationGate />)
 
-    expect(mockDollarBalanceModal).toHaveBeenCalled()
-    expect(mockApiServiceScreen).not.toHaveBeenCalled()
+    expect(mockApiServiceScreen).toHaveBeenCalled()
+    expect(mockDollarBalanceModal).not.toHaveBeenCalled()
   })
 
   it("shows the required screen directly when there are no active API keys", () => {
