@@ -1514,6 +1514,55 @@ describe("HomeScreen wind-down states", () => {
     expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationEntry")
   })
 
+  it("lets the dollar-restriction modal outrank the migrate-now prompt", async () => {
+    mockMigratePromptVisible = true
+    mockDollarBalanceRestrictedOverride = true
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 5000, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId, queryByTestId, findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(await findByTestId("migrate-now-modal")).toBeTruthy()
+
+    fireEvent.press(getByTestId("transfer"))
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+
+    mockActiveWalletOverride = null
+  })
+
   it("greys out the receive action while receiving is disabled, reopening the prompt", async () => {
     mockReceiveDisabled = true
     mockNavigate.mockClear()

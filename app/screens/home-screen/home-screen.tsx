@@ -455,8 +455,16 @@ export const HomeScreen: React.FC = () => {
     dismissMigrateNowPrompt()
     navigation.navigate("accountMigrationEntry")
   }, [dismissMigrateNowPrompt, navigation])
-  /** The non-dismissible forced conversion outranks the migrate-now push. */
-  const shouldShowMigrateNowPrompt = migrateNowPrompt.isVisible && !isConvertModalVisible
+  /** The migrate-now push is the lowest-priority nudge: two native modals cannot
+   *  present at once on iOS, so it waits while any other home modal is up. */
+  const isAnotherHomeModalVisible =
+    isConvertModalVisible ||
+    isUpgradeModalVisible ||
+    isRestrictionModalVisible ||
+    isStablesatModalVisible ||
+    modalVisible
+  const shouldShowMigrateNowPrompt =
+    migrateNowPrompt.isVisible && !isAnotherHomeModalVisible
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
