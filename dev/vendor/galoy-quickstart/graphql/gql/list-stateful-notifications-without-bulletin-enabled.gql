@@ -1,0 +1,20 @@
+query listStatefulNotificationsWithoutBulletinEnabled($first: Int = 2, $after: String = null) {
+  me {
+    id
+    statefulNotificationsWithoutBulletinEnabled(first: $first, after: $after) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      nodes {
+        id
+        body
+        title
+        deepLink
+        acknowledgedAt
+        createdAt
+        bulletinEnabled
+      }
+    }
+  }
+}

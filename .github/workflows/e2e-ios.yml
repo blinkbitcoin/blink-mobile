@@ -1,0 +1,180 @@
+name: iOS E2E Tests
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-test:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v14
+
+      - name: Run the Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v8
+
+      - name: Set up Docker and pull images in background
+        run: |
+          brew install docker docker-compose colima
+          colima start --cpu 4 --memory 8 --disk 60 --vm-type=vz --mount-type=virtiofs
+          colima status
+
+          # Wait for Docker to be ready and configure socket
+          while ! docker info > /dev/null 2>&1; do
+            echo "Waiting for Docker to be ready..."
+            sleep 5
+          done
+
+          # Ensure correct Docker context
+          echo "DOCKER_HOST=unix://${HOME}/.colima/default/docker.sock" >> $GITHUB_ENV
+
+          # Start pulling images
+          docker compose -f dev/vendor/galoy-quickstart/docker-compose.yml pull --include-deps --quiet &
+
+      - name: Initialize ci deps
+        env:
+          DOCKER_HOST: "unix://${HOME}/.colima/default/docker.sock"
+        run: nix develop -c tilt -f ./dev/Tiltfile ci --timeout 0
+
+      - name: Restore Node Modules Cache
+        id: cache-node-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Restore Pods Cache
+        id: cache-pods-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Restore iOS Build Cache
+        id: cache-ios-build-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ios/build
+            ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-ios-build-${{ hashFiles('ios/**/*.pbxproj') }}-${{ hashFiles('ios/**/*.xcconfig') }}
+          restore-keys: |
+            ${{ runner.os }}-ios-build-
+
+      - name: Install dependencies
+        run: nix develop -c yarn install --frozen-lockfile --prefer-offline
+
+      - name: Save Node Modules Cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Build E2E tests
+        run: nix develop -c yarn e2e:build ios.sim.debug -i
+
+      - name: Save Pods Cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+
+      - name: Save iOS Build Cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ios/build
+            ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-ios-build-${{ hashFiles('ios/**/*.pbxproj') }}-${{ hashFiles('ios/**/*.xcconfig') }}
+
+      - name: Create iOS Simulator
+        run: |
+          DEVICE_ID=$(xcrun simctl create "iPhone SE (3rd generation)" com.apple.CoreSimulator.SimDeviceType.iPhone-SE-3rd-generation)
+          echo "DEVICE_ID=$DEVICE_ID" >> $GITHUB_ENV
+
+      - name: Boot Simulator
+        run: xcrun simctl boot $DEVICE_ID
+
+      - name: Start Metro
+        run: |
+          mkdir -p /tmp/pids
+          nix develop -c yarn start &
+          echo $! > /tmp/pids/metro.pid
+
+          # Wait for Metro to be ready
+          while ! lsof -i:8081 >/dev/null 2>&1; do
+            echo "Waiting for Metro to be ready..."
+            sleep 5
+          done
+
+      - name: Run E2E Tests
+        id: run-tests
+        env:
+          DOCKER_HOST: "unix://${HOME}/.colima/default/docker.sock"
+        run: |
+          # Wait for device to be ready
+          while ! xcrun simctl list devices | grep "(Booted)"; do
+            sleep 5
+            echo "Waiting for Simulator device to come online..."
+          done
+
+          # Start screen recording
+          mkdir -p ios-recordings
+          rm -rf ios-recordings/* || true
+          xcrun simctl io booted recordVideo ios-recordings/screenRecord.mov &
+          echo $! > /tmp/pids/sim_record.pid
+
+          # Run the E2E tests
+          nix develop -c tilt -f ./dev/Tiltfile ci -- --test ios-e2e-tests
+
+      - name: Cleanup Processes
+        if: always()
+        run: |
+          # Function to kill process by PID file
+          kill_process() {
+            local pidfile=$1
+            if [ -f "$pidfile" ]; then
+              PID=$(cat "$pidfile")
+              if ps -p $PID > /dev/null; then
+                echo "Killing process $(basename "$pidfile" .pid) (PID: $PID)"
+                kill $PID || kill -9 $PID
+              fi
+              rm "$pidfile"
+            fi
+          }
+
+          # Kill all processes
+          for pidfile in /tmp/pids/*.pid; do
+            [ -f "$pidfile" ] && kill_process "$pidfile"
+          done
+
+          # Additional cleanup commands
+          DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock" nix develop -c tilt down -f ./dev/Tiltfile
+          pkill -f "node.*metro" || true
+          pkill -f "tilt" || true
+          colima stop || true
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-artifacts
+          path: |
+            ios-recordings/
+            ios-recordings/screenRecord.mov
