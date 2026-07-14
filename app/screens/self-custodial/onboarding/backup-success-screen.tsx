@@ -13,8 +13,6 @@ import { SuccessScreenLayout } from "@app/components/success-screen-layout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { useMigrationCheckpoint } from "../../account-migration/hooks"
-
 type SuccessRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupSuccess">
 
 const NAVIGATE_HOME_DELAY_MS = 2000
@@ -23,16 +21,16 @@ export const BackupSuccessScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const navigation = useNavigation()
-  const { clearCheckpoint } = useMigrationCheckpoint()
   const params = useRoute<SuccessRouteProp>().params
   const reBackup = params?.reBackup ?? false
   const customMessage = params?.message
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
+  /** Never clears the migration checkpoint: a standalone backup by another account must
+   *  not wipe a pending migration, and a completed migration already cleared its own. */
   const navigateToHome = useCallback(() => {
-    clearCheckpoint()
     navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
-  }, [navigation, clearCheckpoint])
+  }, [navigation])
 
   const handleAnimationComplete = useCallback(() => {
     holdTimerRef.current = setTimeout(navigateToHome, NAVIGATE_HOME_DELAY_MS)

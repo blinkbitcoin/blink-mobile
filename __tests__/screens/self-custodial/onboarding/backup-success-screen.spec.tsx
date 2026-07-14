@@ -157,7 +157,7 @@ describe("BackupSuccessScreen", () => {
     )
   })
 
-  it("clears migration checkpoint on navigation", async () => {
+  it("leaves any pending migration checkpoint untouched", async () => {
     jest.useFakeTimers({ doNotFake: ["setImmediate"] })
     render(
       <ContextForScreen>
@@ -170,6 +170,6 @@ describe("BackupSuccessScreen", () => {
     })
     jest.useRealTimers()
 
-    expect(mockClearCheckpoint).toHaveBeenCalled()
+    expect(mockClearCheckpoint).not.toHaveBeenCalled()
   })
 })
