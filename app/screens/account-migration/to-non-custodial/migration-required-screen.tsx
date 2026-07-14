@@ -11,18 +11,15 @@ import { InfoRow } from "@app/components/card-screen/info-row"
 import { IconHero } from "@app/components/icon-hero"
 import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
-import {
-  useAddressScreenQuery,
-  useWalletOverviewScreenQuery,
-} from "@app/graphql/generated"
+import { useAddressScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
+  useCustodialWalletBalances,
   useHasTransactions,
   useMigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
@@ -68,19 +65,20 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   })
   const hasLightningAddress = Boolean(addressData?.me?.username)
 
-  const { data: walletData, loading: walletsLoading } = useWalletOverviewScreenQuery({
-    skip: !shouldLoadBalances,
-  })
-  const wallets = walletData?.me?.defaultAccount?.wallets
+  const {
+    btcBalanceSats,
+    usdBalanceCents,
+    isReady: areBalancesReady,
+  } = useCustodialWalletBalances({ skip: !shouldLoadBalances })
 
   /** Unknown balances must never render as zeros: the rows only appear once the
    *  query has settled with data. */
-  const shouldShowGateBalances = isGate && !walletsLoading && walletData !== undefined
+  const shouldShowGateBalances = isGate && areBalancesReady
   const { formatMoneyAmount, formatDisplayAndWalletAmount } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
 
-  const btcWalletAmount = toBtcMoneyAmount(getBtcWallet(wallets)?.balance ?? 0)
-  const usdWalletAmount = toUsdMoneyAmount(getUsdWallet(wallets)?.balance ?? 0)
+  const btcWalletAmount = toBtcMoneyAmount(btcBalanceSats)
+  const usdWalletAmount = toUsdMoneyAmount(usdBalanceCents)
   const btcBalance = convertMoneyAmount
     ? formatDisplayAndWalletAmount({
         primaryAmount: btcWalletAmount,

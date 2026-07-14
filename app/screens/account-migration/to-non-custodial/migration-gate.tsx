@@ -7,9 +7,6 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { DollarBalanceMigrationModal } from "@app/components/dollar-balance-migration-modal"
 import { Screen } from "@app/components/screen"
-import { useWalletOverviewScreenQuery } from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getUsdWallet } from "@app/graphql/wallets-utils"
 import { useCustodialMigrationRequired } from "@app/hooks/use-custodial-migration-required"
 import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
 import { useTransferBlocked } from "@app/hooks/use-transfer-blocked"
@@ -18,6 +15,7 @@ import { testProps } from "@app/utils/testProps"
 
 import {
   useActiveApiKeys,
+  useCustodialWalletBalances,
   useMigrationGateArmed,
 } from "@app/screens/account-migration/hooks"
 
@@ -59,10 +57,7 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
    *  floating over it; regaining focus shows it again with a fresh balance check. */
   const isFocused = useIsFocused()
 
-  const isAuthed = useIsAuthed()
-  const { data, loading: walletsLoading } = useWalletOverviewScreenQuery({
-    skip: !isAuthed,
-  })
+  const { usdBalanceCents, loading: walletsLoading } = useCustodialWalletBalances()
 
   const acknowledgeApiWarning = useCallback(() => setIsApiWarningAcknowledged(true), [])
 
@@ -95,8 +90,7 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
     )
   }
 
-  const usdBalance = getUsdWallet(data?.me?.defaultAccount?.wallets)?.balance ?? 0
-  const hasCustodialDollarBalance = usdBalance > 0
+  const hasCustodialDollarBalance = usdBalanceCents > 0
   const mode = resolveMigrationMode(isGated, isForced)
 
   /** Post-gate the user enters WITH dollars and the flow converts them at the final

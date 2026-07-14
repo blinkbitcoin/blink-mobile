@@ -5,6 +5,7 @@
  * discard) are deep-imported at their call site to keep this surface narrow.
  */
 export { useActiveApiKeys } from "./use-active-api-keys"
+export { useCustodialWalletBalances } from "./use-custodial-wallet-balances"
 export { useHasTransactions } from "./use-has-transactions"
 export { useHardwareBackGuard } from "./use-hardware-back-guard"
 export { useMigrationCheckpoint, MigrationCheckpoint } from "./use-migration-checkpoint"

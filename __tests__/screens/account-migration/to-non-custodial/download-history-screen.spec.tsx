@@ -35,6 +35,7 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 }))
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => mockUseMigrationCheckpoint(),
 }))
 

@@ -7,12 +7,12 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
-import { useWalletOverviewScreenQuery } from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getWalletIds } from "@app/graphql/wallets-utils"
 import { useExportTransactionsCsv } from "@app/hooks/use-export-transactions-csv"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
+import {
+  useCustodialWalletBalances,
+  useMigrationCheckpoint,
+} from "@app/screens/account-migration/hooks"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
@@ -25,9 +25,7 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
   } = useTheme()
   const { navigateToCheckpoint, loading: checkpointLoading } = useMigrationCheckpoint()
 
-  const isAuthed = useIsAuthed()
-  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed })
-  const walletIds = getWalletIds(data?.me?.defaultAccount?.wallets)
+  const { walletIds } = useCustodialWalletBalances()
 
   const { exportCsv } = useExportTransactionsCsv()
   const [isDownloading, setIsDownloading] = useState(false)

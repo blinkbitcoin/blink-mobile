@@ -12,9 +12,6 @@ import { InfoRow } from "@app/components/card-screen/info-row"
 import { IconHero } from "@app/components/icon-hero"
 import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
-import { useWalletOverviewScreenQuery } from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
@@ -23,6 +20,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
   MigrationCheckpoint,
+  useCustodialWalletBalances,
   useHardwareBackGuard,
   useMigrationCheckpoint,
   useMigrationGateArmed,
@@ -58,18 +56,13 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  dollars, so this variant quotes the reference exchange rate. */
   const isPostGate = useMigrationGateArmed()
 
-  const isAuthed = useIsAuthed()
-  const {
-    data,
-    loading: walletsLoading,
-    error: walletsError,
-  } = useWalletOverviewScreenQuery({ skip: !isAuthed })
-  const wallets = data?.me?.defaultAccount?.wallets
-
   /** The commit screen must never present unknown balances as zeros: until the wallet
    *  query settles with data, the preview area holds a spinner and Approve stays off. */
-  const isBalancePreviewReady =
-    !walletsLoading && !walletsError && wallets !== undefined
+  const {
+    btcBalanceSats,
+    usdBalanceCents,
+    isReady: isBalancePreviewReady,
+  } = useCustodialWalletBalances()
 
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
   const { openSupport } = useContactSupport()
@@ -93,12 +86,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     saveCheckpoint(MigrationCheckpoint.BalancesOverview)
   }, [checkpointLoading, saveCheckpoint])
 
-  const currentSats = getBtcWallet(wallets)?.balance ?? 0
-  const currentUsdCents = getUsdWallet(wallets)?.balance ?? 0
-
   /** The server owns the fee, the de-minimis subsidy, and the resulting amount; the
    *  screen renders the preview verbatim and never does the arithmetic itself. */
-  const preview = getMigrationPreviewMock(currentSats)
+  const preview = getMigrationPreviewMock(btcBalanceSats)
 
   const currentBtcAmount = toBtcMoneyAmount(preview.balanceSats)
   const newBtcAmount = toBtcMoneyAmount(preview.receiveSats)
@@ -114,7 +104,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   )
   const currentDollarBalance = isCurrentDollarBalanceRestricted
     ? LLOverview.dollarBalanceNotAvailable()
-    : formatMoneyAmount({ moneyAmount: toUsdMoneyAmount(currentUsdCents) })
+    : formatMoneyAmount({ moneyAmount: toUsdMoneyAmount(usdBalanceCents) })
   const newDollarBalance = isNewDollarBalanceRestricted
     ? LLOverview.dollarBalanceNotAvailable()
     : formatMoneyAmount({ moneyAmount: toUsdMoneyAmount(0) })

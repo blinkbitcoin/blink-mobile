@@ -52,6 +52,7 @@ let mockHasTransactions = false
 let mockTransactionsLoading = false
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => ({
     navigateToCheckpoint: mockNavigateToCheckpoint,
     hasResumableCheckpoint: mockHasResumableCheckpoint,
