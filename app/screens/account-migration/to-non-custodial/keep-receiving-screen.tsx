@@ -6,12 +6,12 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
-import { Screen } from "@app/components/screen"
 import { useAddressScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
+import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
 import { getLightningAddress } from "@app/utils/pay-links"
 import { testProps } from "@app/utils/testProps"
 
@@ -61,51 +61,40 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
   if (!isCheckReady || !hasLightningAddress) return null
 
   return (
-    <Screen preset="fixed">
-      <View style={styles.container}>
-        <View style={styles.content}>
-          <IconHero
-            icon="lightning-address"
-            iconColor={colors._green}
-            title={LL.AccountMigration.keepReceivingTitle()}
-            subtitle={LL.AccountMigration.keepReceivingBody()}
-          />
+    <MigrationStepLayout
+      footer={
+        <GaloyPrimaryButton
+          title={LL.AccountMigration.keepReceivingCta()}
+          onPress={goToNextStep}
+          {...testProps("migration-keep-receiving-cta")}
+        />
+      }
+    >
+      <IconHero
+        icon="lightning-address"
+        iconColor={colors._green}
+        title={LL.AccountMigration.keepReceivingTitle()}
+        subtitle={LL.AccountMigration.keepReceivingBody()}
+      />
 
-          <View style={styles.addressBlock}>
-            <Text style={styles.addressLabel}>
-              {LL.AccountMigration.keepReceivingLnAddressLabel()}
-            </Text>
-            <Text
-              style={styles.addressValue}
-              numberOfLines={1}
-              ellipsizeMode="middle"
-              {...testProps("migration-ln-address")}
-            >
-              {lightningAddress}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.buttonsContainer}>
-          <GaloyPrimaryButton
-            title={LL.AccountMigration.keepReceivingCta()}
-            onPress={goToNextStep}
-            {...testProps("migration-keep-receiving-cta")}
-          />
-        </View>
+      <View style={styles.addressBlock}>
+        <Text style={styles.addressLabel}>
+          {LL.AccountMigration.keepReceivingLnAddressLabel()}
+        </Text>
+        <Text
+          style={styles.addressValue}
+          numberOfLines={1}
+          ellipsizeMode="middle"
+          {...testProps("migration-ln-address")}
+        >
+          {lightningAddress}
+        </Text>
       </View>
-    </Screen>
+    </MigrationStepLayout>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  container: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  content: {
-    flex: 1,
-  },
   addressBlock: {
     paddingTop: 30,
     paddingHorizontal: 20,

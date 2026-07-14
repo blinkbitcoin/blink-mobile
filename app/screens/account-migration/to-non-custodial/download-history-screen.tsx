@@ -1,25 +1,23 @@
 import React, { useCallback, useState } from "react"
-import { View } from "react-native"
 
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { IconHero } from "@app/components/icon-hero"
-import { Screen } from "@app/components/screen"
 import { useExportTransactionsCsv } from "@app/hooks/use-export-transactions-csv"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   useCustodialWalletBalances,
   useMigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
+import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
 export const MigrationDownloadHistoryScreen: React.FC = () => {
   const { LL } = useI18nContext()
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
@@ -53,18 +51,9 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
   }, [exportCsv, walletIds, LL])
 
   return (
-    <Screen preset="fixed">
-      <View style={styles.container}>
-        <View style={styles.content}>
-          <IconHero
-            icon="clock"
-            iconColor={colors.primary}
-            title={LL.AccountMigration.downloadHistoryTitle()}
-            subtitle={LL.AccountMigration.downloadHistoryBody()}
-          />
-        </View>
-
-        <View style={styles.buttonsContainer}>
+    <MigrationStepLayout
+      footer={
+        <>
           <GaloyPrimaryButton
             title={LL.AccountMigration.downloadHistoryDownloadCta()}
             loading={isDownloading}
@@ -78,24 +67,15 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
             onPress={goToNextStep}
             {...testProps("migration-download-history-continue")}
           />
-        </View>
-      </View>
-    </Screen>
+        </>
+      }
+    >
+      <IconHero
+        icon="clock"
+        iconColor={colors.primary}
+        title={LL.AccountMigration.downloadHistoryTitle()}
+        subtitle={LL.AccountMigration.downloadHistoryBody()}
+      />
+    </MigrationStepLayout>
   )
 }
-
-const useStyles = makeStyles(() => ({
-  container: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  content: {
-    flex: 1,
-  },
-  buttonsContainer: {
-    gap: 10,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: 10,
-  },
-}))

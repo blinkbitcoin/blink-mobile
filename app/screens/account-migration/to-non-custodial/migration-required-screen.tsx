@@ -1,5 +1,4 @@
 import React, { useCallback } from "react"
-import { View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -8,7 +7,6 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { RichText } from "@app/components/rich-text"
-import { Screen } from "@app/components/screen"
 import { useAddressScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useContactSupport } from "@app/hooks/use-contact-support"
@@ -17,6 +15,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GateBalances } from "@app/screens/account-migration/gate-balances"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
 import { MigrationCloseHeader } from "@app/screens/account-migration/migration-close-header"
+import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
 import { testProps } from "@app/utils/testProps"
 
 /**
@@ -118,51 +117,39 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   const presentation = presentationByMode[mode]
 
   return (
-    <Screen preset="fixed" headerShown={false}>
-      <View style={styles.container}>
+    <MigrationStepLayout
+      headerShown={false}
+      header={
         <MigrationCloseHeader
           onClose={presentation.shouldShowClose ? handleClose : undefined}
           testID="migration-close"
         />
+      }
+      contentStyle={styles.contentGap}
+      footer={
+        <GaloyPrimaryButton
+          title={LL.common.continue()}
+          onPress={handleMigrate}
+          loading={nextStepLoading}
+          {...testProps("migration-required-cta")}
+        />
+      }
+    >
+      <IconHero
+        icon={presentation.heroIcon}
+        iconColor={presentation.heroIconColor}
+        title={presentation.title}
+        subtitle={presentation.subtitle}
+      />
 
-        <View style={styles.content}>
-          <IconHero
-            icon={presentation.heroIcon}
-            iconColor={presentation.heroIconColor}
-            title={presentation.title}
-            subtitle={presentation.subtitle}
-          />
-
-          {presentation.shouldShowBalances ? <GateBalances /> : null}
-        </View>
-
-        <View style={styles.buttonsContainer}>
-          <GaloyPrimaryButton
-            title={LL.common.continue()}
-            onPress={handleMigrate}
-            loading={nextStepLoading}
-            {...testProps("migration-required-cta")}
-          />
-        </View>
-      </View>
-    </Screen>
+      {presentation.shouldShowBalances ? <GateBalances /> : null}
+    </MigrationStepLayout>
   )
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  container: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  content: {
-    flex: 1,
+  contentGap: {
     gap: 20,
-  },
-  buttonsContainer: {
-    gap: 10,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: 10,
   },
   gateBody: {
     fontSize: 16,
