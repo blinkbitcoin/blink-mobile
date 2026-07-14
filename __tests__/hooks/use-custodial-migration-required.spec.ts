@@ -5,7 +5,7 @@ import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
 const mockUseRemoteConfig = jest.fn()
-const mockUseActiveWallet = jest.fn()
+const mockUseAccountRegistry = jest.fn()
 const mockUpdateState = jest.fn()
 const mockUseIpCountryCode = jest.fn()
 
@@ -22,8 +22,8 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => mockUseRemoteConfig(),
 }))
 
-jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => mockUseActiveWallet(),
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => mockUseAccountRegistry(),
 }))
 
 jest.mock("@app/store/persistent-state", () => ({
@@ -53,9 +53,8 @@ const setup = (): void => {
   jest.clearAllMocks()
   mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
   mockUseRemoteConfig.mockReturnValue({ custodialMigrationRequiredCountries: ["US"] })
-  mockUseActiveWallet.mockReturnValue({
-    isSelfCustodial: false,
-    accountType: AccountType.Custodial,
+  mockUseAccountRegistry.mockReturnValue({
+    activeAccount: { type: AccountType.Custodial },
   })
   mockUseIpCountryCode.mockReturnValue(undefined)
   mockPersistentState = baseState
@@ -80,10 +79,16 @@ describe("useCustodialMigrationRequired", () => {
   })
 
   it("returns false for self-custodial accounts even in a required country", () => {
-    mockUseActiveWallet.mockReturnValue({
-      isSelfCustodial: true,
-      accountType: AccountType.SelfCustodial,
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: { type: AccountType.SelfCustodial },
     })
+    mockUseDeviceLocation.mockReturnValue({ countryCode: "US" })
+    expect(renderHook(() => useCustodialMigrationRequired()).result.current).toBe(false)
+  })
+
+  it("returns false when no account is active, even with the flag persisted in a required country", () => {
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: undefined })
+    mockPersistentState = flaggedState
     mockUseDeviceLocation.mockReturnValue({ countryCode: "US" })
     expect(renderHook(() => useCustodialMigrationRequired()).result.current).toBe(false)
   })
@@ -112,13 +117,20 @@ describe("useCustodialMigrationRequiredSync", () => {
   })
 
   it("does not persist for self-custodial accounts", () => {
-    mockUseActiveWallet.mockReturnValue({
-      isSelfCustodial: true,
-      accountType: AccountType.SelfCustodial,
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: { type: AccountType.SelfCustodial },
     })
     mockUseDeviceLocation.mockReturnValue({ countryCode: "US", source: "phone" })
     renderHook(() => useCustodialMigrationRequiredSync())
     expect(mockUpdateState).not.toHaveBeenCalled()
+  })
+
+  it("does not persist when no account is active", () => {
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: undefined })
+    mockUseDeviceLocation.mockReturnValue({ countryCode: "US", source: "phone" })
+    renderHook(() => useCustodialMigrationRequiredSync())
+    expect(mockUpdateState).not.toHaveBeenCalled()
+    expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
   })
 
   it("does not persist again when it is already flagged", () => {
