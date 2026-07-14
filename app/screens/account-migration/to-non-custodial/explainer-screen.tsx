@@ -34,6 +34,8 @@ export const MigrationExplainerScreen: React.FC = () => {
     LL.AccountMigration.explainerCheck5(),
   ]
 
+  const isMoveDisabled = !areAllChecked || isProvisioning || checkpointLoading
+
   const handleMove = useCallback(async () => {
     setIsProvisioning(true)
     const provisionedAccountId = await ensureAccount()
@@ -62,7 +64,7 @@ export const MigrationExplainerScreen: React.FC = () => {
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
             title={LL.AccountMigration.explainerCta()}
-            disabled={!areAllChecked || isProvisioning || checkpointLoading}
+            disabled={isMoveDisabled}
             loading={isProvisioning}
             onPress={handleMove}
             {...testProps("migration-explainer-cta")}
