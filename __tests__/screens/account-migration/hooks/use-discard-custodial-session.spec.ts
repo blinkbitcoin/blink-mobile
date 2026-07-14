@@ -1,16 +1,13 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-const mockRemoveSessionProfileByToken = jest.fn()
+const mockLogout = jest.fn()
 const mockSaveToken = jest.fn()
 
 let mockGaloyAuthToken: string
 
-jest.mock("@app/utils/storage/secureStorage", () => ({
+jest.mock("@app/hooks/use-logout", () => ({
   __esModule: true,
-  default: {
-    removeSessionProfileByToken: (...args: readonly unknown[]) =>
-      mockRemoveSessionProfileByToken(...args),
-  },
+  default: () => ({ logout: mockLogout }),
 }))
 
 jest.mock("@app/hooks/use-app-config", () => ({
@@ -35,15 +32,18 @@ const discard = async (): Promise<void> => {
 describe("useDiscardCustodialSession", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockRemoveSessionProfileByToken.mockResolvedValue(true)
+    mockLogout.mockResolvedValue(undefined)
     mockSaveToken.mockResolvedValue(undefined)
     mockGaloyAuthToken = "custodial-token"
   })
 
-  it("removes the stored profile for the live token and clears the token", async () => {
+  it("logs the session out server-side without resetting the device state", async () => {
     await discard()
 
-    expect(mockRemoveSessionProfileByToken).toHaveBeenCalledWith("custodial-token")
+    expect(mockLogout).toHaveBeenCalledWith({
+      stateToDefault: false,
+      token: "custodial-token",
+    })
     expect(mockSaveToken).toHaveBeenCalledWith("")
   })
 
@@ -51,7 +51,7 @@ describe("useDiscardCustodialSession", () => {
     mockGaloyAuthToken = ""
     await discard()
 
-    expect(mockRemoveSessionProfileByToken).not.toHaveBeenCalled()
+    expect(mockLogout).not.toHaveBeenCalled()
     expect(mockSaveToken).toHaveBeenCalledWith("")
   })
 })
