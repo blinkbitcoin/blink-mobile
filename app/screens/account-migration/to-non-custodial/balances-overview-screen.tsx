@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react"
-import { ScrollView, View } from "react-native"
+import { ActivityIndicator, ScrollView, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -59,8 +59,17 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const isPostGate = useMigrationGateArmed()
 
   const isAuthed = useIsAuthed()
-  const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed })
+  const {
+    data,
+    loading: walletsLoading,
+    error: walletsError,
+  } = useWalletOverviewScreenQuery({ skip: !isAuthed })
   const wallets = data?.me?.defaultAccount?.wallets
+
+  /** The commit screen must never present unknown balances as zeros: until the wallet
+   *  query settles with data, the preview area holds a spinner and Approve stays off. */
+  const isBalancePreviewReady =
+    !walletsLoading && !walletsError && wallets !== undefined
 
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
   const { openSupport } = useContactSupport()
@@ -137,58 +146,69 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
           subtitle={LLOverview.body()}
         />
 
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
-          <View style={styles.card}>
-            <InfoRow
-              label={LLOverview.currentBitcoinBalance()}
-              value={currentBitcoinBalance}
-              secondaryValue={currentBitcoinFiat}
-              regularLabel
-            />
-            <View style={styles.separator} />
-            <InfoRow
-              label={LLOverview.currentDollarBalance()}
-              value={currentDollarBalance}
-              valueMuted={isCurrentDollarBalanceRestricted}
-              regularLabel
-            />
-          </View>
-
-          <RichText text={networkFeeLine} style={styles.networkFee} />
-
-          <View style={styles.arrowCircle}>
-            <GaloyIcon name="arrow-down" size={24} color={colors.grey3} />
-          </View>
-
-          <View style={styles.card}>
-            <InfoRow
-              label={LLOverview.newBitcoinBalance()}
-              value={newBitcoinBalance}
-              secondaryValue={newBitcoinFiat}
-              regularLabel
-            />
-            <View style={styles.separator} />
-            <InfoRow
-              label={LLOverview.newDollarBalance()}
-              value={newDollarBalance}
-              valueMuted={isNewDollarBalanceRestricted}
-              regularLabel
-            />
-          </View>
-
-          {exchangeRate ? (
-            <View style={styles.exchangeRateBox}>
-              <Text style={styles.exchangeRateText}>
-                {LLOverview.exchangeRate({ rate: exchangeRate })}
-              </Text>
+        {isBalancePreviewReady ? (
+          <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
+            <View style={styles.card}>
+              <InfoRow
+                label={LLOverview.currentBitcoinBalance()}
+                value={currentBitcoinBalance}
+                secondaryValue={currentBitcoinFiat}
+                regularLabel
+              />
+              <View style={styles.separator} />
+              <InfoRow
+                label={LLOverview.currentDollarBalance()}
+                value={currentDollarBalance}
+                valueMuted={isCurrentDollarBalanceRestricted}
+                regularLabel
+              />
             </View>
-          ) : null}
-        </ScrollView>
+
+            <RichText text={networkFeeLine} style={styles.networkFee} />
+
+            <View style={styles.arrowCircle}>
+              <GaloyIcon name="arrow-down" size={24} color={colors.grey3} />
+            </View>
+
+            <View style={styles.card}>
+              <InfoRow
+                label={LLOverview.newBitcoinBalance()}
+                value={newBitcoinBalance}
+                secondaryValue={newBitcoinFiat}
+                regularLabel
+              />
+              <View style={styles.separator} />
+              <InfoRow
+                label={LLOverview.newDollarBalance()}
+                value={newDollarBalance}
+                valueMuted={isNewDollarBalanceRestricted}
+                regularLabel
+              />
+            </View>
+
+            {exchangeRate ? (
+              <View style={styles.exchangeRateBox}>
+                <Text style={styles.exchangeRateText}>
+                  {LLOverview.exchangeRate({ rate: exchangeRate })}
+                </Text>
+              </View>
+            ) : null}
+          </ScrollView>
+        ) : (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator
+              size="large"
+              color={colors.primary}
+              {...testProps("migration-balances-overview-loading")}
+            />
+          </View>
+        )}
 
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
             title={LLOverview.approveCta()}
             onPress={handleApprove}
+            disabled={!isBalancePreviewReady}
             {...testProps("migration-balances-overview-approve")}
           />
           <GaloySecondaryButton
@@ -208,6 +228,11 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   scroll: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   body: {
     gap: 20,

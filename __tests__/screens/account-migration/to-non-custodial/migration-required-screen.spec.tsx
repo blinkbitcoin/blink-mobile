@@ -176,13 +176,22 @@ describe("MigrationRequiredScreen", () => {
       expect(Linking.openURL).toHaveBeenCalledWith(`mailto:${CONTACT_EMAIL}`)
     })
 
-    it("falls back to zero balances when wallet data is unavailable", async () => {
+    it("hides the balance rows when wallet data is unavailable", async () => {
       mockUseWalletOverviewScreenQuery.mockReturnValue({ data: undefined })
       renderScreen("gate")
       await flushEffects()
 
-      expect(screen.getByText("BTC 0 (display)")).toBeTruthy()
-      expect(screen.getByText("USD 0")).toBeTruthy()
+      expect(screen.queryByText("BTC 0 (display)")).toBeNull()
+      expect(screen.queryByText("USD 0")).toBeNull()
+    })
+
+    it("hides the balance rows while the wallet query loads", async () => {
+      mockUseWalletOverviewScreenQuery.mockReturnValue({ data: undefined, loading: true })
+      renderScreen("gate")
+      await flushEffects()
+
+      expect(screen.queryByText("Bitcoin balance")).toBeNull()
+      expect(screen.queryByText("Dollar balance")).toBeNull()
     })
 
     it("shows the plain bitcoin balance when price conversion is unavailable", async () => {

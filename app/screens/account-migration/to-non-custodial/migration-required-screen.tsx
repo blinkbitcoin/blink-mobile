@@ -68,8 +68,14 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   })
   const hasLightningAddress = Boolean(addressData?.me?.username)
 
-  const { data: walletData } = useWalletOverviewScreenQuery({ skip: !shouldLoadBalances })
+  const { data: walletData, loading: walletsLoading } = useWalletOverviewScreenQuery({
+    skip: !shouldLoadBalances,
+  })
   const wallets = walletData?.me?.defaultAccount?.wallets
+
+  /** Unknown balances must never render as zeros: the rows only appear once the
+   *  query has settled with data. */
+  const shouldShowGateBalances = isGate && !walletsLoading && walletData !== undefined
   const { formatMoneyAmount, formatDisplayAndWalletAmount } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
 
@@ -156,7 +162,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
             subtitle={subtitleByMode[mode]}
           />
 
-          {isGate ? (
+          {shouldShowGateBalances ? (
             <View style={styles.balances}>
               <InfoRow label={LL.AccountMigration.bitcoinBalance()} value={btcBalance} />
               <InfoRow label={LL.AccountMigration.dollarBalance()} value={usdBalance} />

@@ -240,12 +240,41 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(screen.queryByText("USD 0")).toBeNull()
   })
 
-  it("falls back to zero balances when wallet data is unavailable", async () => {
+  it("holds a spinner with Approve disabled when wallet data is unavailable", async () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue({ data: undefined })
     renderScreen()
     await flushEffects()
 
-    expect(screen.getAllByText("BTC 0 ($FIAT)")).toHaveLength(2)
+    expect(screen.queryByText("Current Bitcoin Balance")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-loading")).toBeTruthy()
+    expect(
+      screen.getByTestId("migration-balances-overview-approve"),
+    ).toBeDisabled()
+  })
+
+  it("holds a spinner with Approve disabled while the wallet query loads", async () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue({ data: undefined, loading: true })
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-loading")).toBeTruthy()
+    expect(
+      screen.getByTestId("migration-balances-overview-approve"),
+    ).toBeDisabled()
+  })
+
+  it("holds a spinner with Approve disabled when the wallet query fails", async () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      data: undefined,
+      error: new Error("network"),
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-loading")).toBeTruthy()
+    expect(
+      screen.getByTestId("migration-balances-overview-approve"),
+    ).toBeDisabled()
   })
 
   it("hides the fiat suffix when price conversion is unavailable", async () => {
