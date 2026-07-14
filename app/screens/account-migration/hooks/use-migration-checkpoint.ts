@@ -27,7 +27,10 @@ export const useMigrationCheckpoint = () => {
     [checkpoint, accountId],
   )
 
-  /** Resumes at the checkpoint's screen, forwarding the terms screen its flow param. */
+  /** Resumes at the checkpoint's screen, forwarding the terms screen its flow param.
+   *  TODO: known gap: resuming skips the gate's preconditions (empty Dollar Balance and
+   *  the API-key warning), so dollars received after provisioning are ignored client-side
+   *  until the backend re-validates them on migrationStart once that mutation ships. */
   const navigateToCheckpoint = useCallback(() => {
     const destination = resolveDestination()
     if (destination.name === "acceptTermsAndConditions") {
