@@ -6,7 +6,7 @@ import useDeviceLocation from "@app/hooks/use-device-location"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { isIos } from "@app/utils/helper"
 
-import { useMigrationSupportDetails } from "./use-migration-support-details"
+import { useMigrationDiagnostics } from "./use-migration-diagnostics"
 
 const EMAIL_DIVIDER = "-".repeat(40)
 
@@ -14,29 +14,27 @@ const EMAIL_DIVIDER = "-".repeat(40)
  * Composes and opens the migration support email: the account diagnostics plus the
  * platform, app version and country, framed so the user writes at the bottom. Mail
  * clients drop the cursor at the END of a mailto body, so the write-here prompt goes
- * last: the user lands right under it and the details block stays untouched.
+ * last: the user lands right under it and the details block stays untouched. The
+ * diagnostics are returned too, so the support screen renders the same single source.
  */
 export const useMigrationSupportEmail = () => {
   const { LL } = useI18nContext()
   const LLSupport = LL.AccountMigration.contactSupport
   const { composeSupport } = useContactSupport()
   const { countryCode } = useDeviceLocation()
-  const { accountId, pubKey, username, email, phone } = useMigrationSupportDetails()
+  const diagnostics = useMigrationDiagnostics()
 
   const sendSupportEmail = useCallback(() => {
     const platform = isIos ? "iOS" : "Android"
-    const infoLines = [
-      { label: LLSupport.accountIdLabel(), value: accountId },
-      { label: LLSupport.pubKeyLabel(), value: pubKey },
-      { label: LLSupport.usernameLabel(), value: username },
-      { label: LLSupport.emailLabel(), value: email },
-      { label: LLSupport.phoneLabel(), value: phone },
+    const environmentLines = [
       { label: LLSupport.platformLabel(), value: platform },
       { label: LLSupport.appVersionLabel(), value: getReadableVersion() },
       { label: LLSupport.countryLabel(), value: countryCode ?? "" },
-    ]
-      .filter((line) => Boolean(line.value))
-      .map((line) => `${line.label}: ${line.value}`)
+    ].filter((line) => Boolean(line.value))
+
+    const infoLines = [...diagnostics, ...environmentLines].map(
+      (line) => `${line.label}: ${line.value}`,
+    )
 
     const body = [
       LLSupport.emailAccountInfo(),
@@ -49,7 +47,7 @@ export const useMigrationSupportEmail = () => {
     ].join("\n")
 
     composeSupport({ subject: LLSupport.emailSubject(), body })
-  }, [LLSupport, accountId, pubKey, username, email, phone, countryCode, composeSupport])
+  }, [LLSupport, diagnostics, countryCode, composeSupport])
 
-  return { sendSupportEmail }
+  return { diagnostics, sendSupportEmail }
 }

@@ -33,11 +33,31 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
-  useMigrationSupportDetails: () => mockDetails,
 }))
 
+/** Mirrors useMigrationDiagnostics' shape, built from mockDetails at render time. */
+const mockBuildDiagnostics = () =>
+  [
+    {
+      label: LLSupport.accountIdLabel(),
+      value: mockDetails.accountId,
+      isIdentifier: true,
+    },
+    { label: LLSupport.pubKeyLabel(), value: mockDetails.pubKey, isIdentifier: true },
+    {
+      label: LLSupport.usernameLabel(),
+      value: mockDetails.username,
+      isIdentifier: false,
+    },
+    { label: LLSupport.emailLabel(), value: mockDetails.email, isIdentifier: false },
+    { label: LLSupport.phoneLabel(), value: mockDetails.phone, isIdentifier: false },
+  ].filter((diagnostic) => Boolean(diagnostic.value))
+
 jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
-  useMigrationSupportEmail: () => ({ sendSupportEmail: mockSendSupportEmail }),
+  useMigrationSupportEmail: () => ({
+    diagnostics: mockBuildDiagnostics(),
+    sendSupportEmail: mockSendSupportEmail,
+  }),
 }))
 
 const renderScreen = () =>

@@ -11,10 +11,7 @@ import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import {
-  useHardwareBackGuard,
-  useMigrationSupportDetails,
-} from "@app/screens/account-migration/hooks"
+import { useHardwareBackGuard } from "@app/screens/account-migration/hooks"
 /** Deep import on purpose: its device-location chain stays out of the hooks barrel. */
 import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/use-migration-support-email"
 import { ellipsizeMiddle } from "@app/utils/helper"
@@ -49,8 +46,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
   } = useTheme()
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { sendSupportEmail } = useMigrationSupportEmail()
-  const { accountId, pubKey, username, email, phone } = useMigrationSupportDetails()
+  const { diagnostics, sendSupportEmail } = useMigrationSupportEmail()
 
   /** Back never exits the migration: it returns to the commit point (Step 8). */
   const returnToBalanceSummary = useCallback(() => {
@@ -60,22 +56,15 @@ export const MigrationContactSupportScreen: React.FC = () => {
 
   const rows: DiagnosticsRow[] = useMemo(
     () =>
-      [
-        {
-          label: LLSupport.accountIdLabel(),
-          value: accountId,
-          display: ellipsizeMiddle(accountId, IDENTIFIER_ELLIPSIS),
-        },
-        {
-          label: LLSupport.pubKeyLabel(),
-          value: pubKey,
-          display: ellipsizeMiddle(pubKey, IDENTIFIER_ELLIPSIS),
-        },
-        { label: LLSupport.usernameLabel(), value: username, isSmallValue: true },
-        { label: LLSupport.emailLabel(), value: email, isSmallValue: true },
-        { label: LLSupport.phoneLabel(), value: phone, isSmallValue: true },
-      ].filter((row) => Boolean(row.value)),
-    [LLSupport, accountId, pubKey, username, email, phone],
+      diagnostics.map((diagnostic) => ({
+        label: diagnostic.label,
+        value: diagnostic.value,
+        display: diagnostic.isIdentifier
+          ? ellipsizeMiddle(diagnostic.value, IDENTIFIER_ELLIPSIS)
+          : undefined,
+        isSmallValue: !diagnostic.isIdentifier,
+      })),
+    [diagnostics],
   )
 
   return (
