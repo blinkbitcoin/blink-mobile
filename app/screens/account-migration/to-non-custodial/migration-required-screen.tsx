@@ -5,7 +5,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
-import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { InfoRow } from "@app/components/card-screen/info-row"
 import { IconHero } from "@app/components/icon-hero"
@@ -22,6 +21,7 @@ import {
   useCustodialWalletBalances,
   useMigrationNextStep,
 } from "@app/screens/account-migration/hooks"
+import { MigrationCloseHeader } from "@app/screens/account-migration/migration-close-header"
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 
@@ -126,17 +126,10 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   return (
     <Screen preset="fixed" headerShown={false}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          {shouldShowCloseButton ? (
-            <GaloyIconButton
-              name="close"
-              size="medium"
-              backgroundColor={colors.grey5}
-              onPress={handleClose}
-              {...testProps("migration-close")}
-            />
-          ) : null}
-        </View>
+        <MigrationCloseHeader
+          onClose={shouldShowCloseButton ? handleClose : undefined}
+          testID="migration-close"
+        />
 
         <View style={styles.content}>
           <IconHero
@@ -171,14 +164,6 @@ const useStyles = makeStyles(({ colors }) => ({
   container: {
     flex: 1,
     justifyContent: "space-between",
-  },
-  header: {
-    minHeight: 44,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 10,
   },
   content: {
     flex: 1,
