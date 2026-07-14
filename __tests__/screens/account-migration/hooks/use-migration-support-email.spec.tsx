@@ -37,6 +37,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-support-details", 
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
   useRemoteConfig: () => ({ supportEmailAddress: "support@blink.sv" }),
 }))
 

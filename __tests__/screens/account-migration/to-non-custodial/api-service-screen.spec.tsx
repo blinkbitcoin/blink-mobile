@@ -13,6 +13,7 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
   useRemoteConfig: () => ({ supportEmailAddress: "support@blink.sv" }),
 }))
 

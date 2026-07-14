@@ -74,9 +74,7 @@ describe("useCompleteMigration", () => {
 
     const { result } = renderHook(() => useCompleteMigration())
     await act(async () => {
-      await expect(result.current.completeMigration()).rejects.toThrow(
-        "keystore failure",
-      )
+      await expect(result.current.completeMigration()).rejects.toThrow("keystore failure")
     })
 
     expect(mockSetActiveAccountId).not.toHaveBeenCalled()

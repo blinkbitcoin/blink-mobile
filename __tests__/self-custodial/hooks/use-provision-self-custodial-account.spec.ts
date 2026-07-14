@@ -11,6 +11,7 @@ jest.mock("react-native-quick-crypto", () => ({
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
+  ...jest.requireActual("@app/self-custodial/bridge"),
   selfCustodialCreateWallet: (accountId: string, network: string) =>
     mockCreateWallet(accountId, network),
 }))

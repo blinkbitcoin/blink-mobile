@@ -17,8 +17,8 @@ jest.mock("@react-navigation/native", () => ({
 
 const mockUseMigrationBackupCheckpoint = jest.fn()
 jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationBackupCheckpoint: (step: string) => mockUseMigrationBackupCheckpoint(step),
-  MigrationCheckpoint: { BackupAlerts: "backupAlerts" },
 }))
 
 jest.mock("@app/components/icon-hero", () => {

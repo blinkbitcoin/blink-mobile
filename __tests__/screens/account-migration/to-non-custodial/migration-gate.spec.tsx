@@ -3,6 +3,8 @@ import { render, act } from "@testing-library/react-native"
 
 import { MigrationGate } from "@app/screens/account-migration/to-non-custodial/migration-gate"
 
+import { walletOverviewQueryResult } from "../helpers"
+
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 let mockIsFocused = true
@@ -39,6 +41,7 @@ jest.mock("@app/components/screen", () => ({
 }))
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
   useActiveApiKeys: () => mockUseActiveApiKeys(),
   useMigrationGateArmed: () => mockUseMigrationGateArmed(),
 }))
@@ -86,24 +89,6 @@ jest.mock(
   }),
 )
 
-const walletsWithUsdBalance = (usdCents: number) => ({
-  loading: false,
-  data: {
-    me: {
-      defaultAccount: {
-        wallets: [
-          {
-            __typename: "UsdWallet",
-            id: "usd-1",
-            walletCurrency: "USD",
-            balance: usdCents,
-          },
-        ],
-      },
-    },
-  },
-})
-
 describe("MigrationGate", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -113,7 +98,9 @@ describe("MigrationGate", () => {
     mockUseMigrationGateArmed.mockReturnValue(false)
     mockUseTransferBlocked.mockReturnValue(false)
     mockUseDollarBalanceRestricted.mockReturnValue(false)
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(0))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 0 }),
+    )
   })
 
   it("holds a loading screen while the API-key check loads", () => {
@@ -147,7 +134,9 @@ describe("MigrationGate", () => {
   })
 
   it("blocks entry with the dollar-balance modal when the custodial Dollar Balance is above zero", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
 
     render(<MigrationGate />)
 
@@ -156,7 +145,9 @@ describe("MigrationGate", () => {
   })
 
   it("keeps the required screen behind the dollar-balance modal instead of a blank background", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
 
     render(<MigrationGate />)
 
@@ -165,7 +156,9 @@ describe("MigrationGate", () => {
   })
 
   it("shows the dollar-balance modal only while the gate has focus", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
 
     render(<MigrationGate />)
 
@@ -173,7 +166,9 @@ describe("MigrationGate", () => {
   })
 
   it("hides the dollar-balance modal while a pushed screen has focus", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
     mockIsFocused = false
 
     render(<MigrationGate />)
@@ -182,7 +177,9 @@ describe("MigrationGate", () => {
   })
 
   it("offers the transfer action when the region permits the dollar transfer", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
 
     render(<MigrationGate />)
     const { onTransfer } = mockDollarBalanceModal.mock.calls[0][0]
@@ -195,7 +192,9 @@ describe("MigrationGate", () => {
   })
 
   it("shows the close-only variant when the region blocks the dollar transfer", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
     mockUseTransferBlocked.mockReturnValue(true)
 
     render(<MigrationGate />)
@@ -204,7 +203,9 @@ describe("MigrationGate", () => {
   })
 
   it("shows the close-only variant when the dollar balance is restricted in the region", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
     mockUseDollarBalanceRestricted.mockReturnValue(true)
 
     render(<MigrationGate />)
@@ -213,7 +214,9 @@ describe("MigrationGate", () => {
   })
 
   it("exits the flow when the dollar-balance modal is dismissed", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
 
     render(<MigrationGate />)
     const { toggleModal } = mockDollarBalanceModal.mock.calls[0][0]
@@ -226,7 +229,9 @@ describe("MigrationGate", () => {
   })
 
   it("dismisses through onClose instead of goBack when the blocker provides it", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
     const onClose = jest.fn()
 
     render(<MigrationGate onClose={onClose} />)
@@ -241,7 +246,9 @@ describe("MigrationGate", () => {
   })
 
   it("skips the dollar-balance check after the gate arms, where the flow converts dollars", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
     mockUseMigrationGateArmed.mockReturnValue(true)
 
     render(<MigrationGate />)
@@ -260,7 +267,9 @@ describe("MigrationGate", () => {
   })
 
   it("checks the dollar balance before the API keys", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdBalance(20))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
     mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: true, loading: false })
 
     render(<MigrationGate />)

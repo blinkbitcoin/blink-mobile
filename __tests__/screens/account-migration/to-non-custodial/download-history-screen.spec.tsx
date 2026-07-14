@@ -6,6 +6,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationDownloadHistoryScreen } from "@app/screens/account-migration/to-non-custodial/download-history-screen"
 import { ContextForScreen } from "../../helper"
+import { walletOverviewQueryResult } from "../helpers"
 import { flushEffects } from "../../../helpers/flush-effects"
 
 loadLocale("en")
@@ -52,19 +53,6 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
-const walletsData = {
-  data: {
-    me: {
-      defaultAccount: {
-        wallets: [
-          { __typename: "BTCWallet", id: "btc-1", walletCurrency: "BTC", balance: 1 },
-          { __typename: "USDWallet", id: "usd-1", walletCurrency: "USD", balance: 1 },
-        ],
-      },
-    },
-  },
-}
-
 const renderScreen = () =>
   render(
     <ContextForScreen>
@@ -86,7 +74,9 @@ describe("MigrationDownloadHistoryScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsData)
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ btcBalance: 1, usdBalance: 1 }),
+    )
     mockUseMigrationCheckpoint.mockReturnValue({
       navigateToCheckpoint: mockNavigateToCheckpoint,
       loading: false,

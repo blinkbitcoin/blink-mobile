@@ -33,8 +33,8 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
 const mockUseMigrationBackupCheckpoint = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationBackupCheckpoint: (step: string) => mockUseMigrationBackupCheckpoint(step),
-  MigrationCheckpoint: { BackupMethod: "backupMethod" },
 }))
 
 jest.mock("@app/components/atomic/galoy-primary-button", () => ({

@@ -17,23 +17,27 @@ jest.mock("@app/components/success-animation/success-icon-animation", () => {
 })
 
 jest.mock("@app/components/success-animation/success-text-animation", () => {
+  const { useEffect } = jest.requireActual("react")
   const { View } = jest.requireActual("react-native")
-  return {
-    CompletedTextAnimation: ({
-      children,
-      onComplete,
-    }: {
-      children: React.ReactNode
-      onComplete?: () => void
-    }) => {
-      if (onComplete) setTimeout(onComplete, 0)
-      return <View>{children}</View>
-    },
+  const CompletedTextAnimation = ({
+    children,
+    onComplete,
+  }: {
+    children: React.ReactNode
+    onComplete?: () => void
+  }) => {
+    /** Firing from an effect keeps the callback inside React's act() scope. */
+    useEffect(() => {
+      onComplete?.()
+    }, [onComplete])
+    return <View>{children}</View>
   }
+  return { CompletedTextAnimation }
 })
 
 const mockClearCheckpoint = jest.fn()
 jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => ({
     clearCheckpoint: mockClearCheckpoint,
   }),

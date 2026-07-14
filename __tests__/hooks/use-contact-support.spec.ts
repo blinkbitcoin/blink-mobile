@@ -6,6 +6,7 @@ import { useContactSupport } from "@app/hooks/use-contact-support"
 const SUPPORT_EMAIL = "support@blink.sv"
 
 jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
   useRemoteConfig: () => ({ supportEmailAddress: SUPPORT_EMAIL }),
 }))
 

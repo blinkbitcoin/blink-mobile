@@ -33,6 +33,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint", () =>
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
+  ...jest.requireActual("@app/self-custodial/bridge"),
   deriveWalletIdentityPubkey: (mnemonic: string, network: string) =>
     mockDeriveWalletIdentityPubkey(mnemonic, network),
 }))

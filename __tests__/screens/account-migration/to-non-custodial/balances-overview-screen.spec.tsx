@@ -8,6 +8,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { MigrationBalancesOverviewScreen } from "@app/screens/account-migration/to-non-custodial/balances-overview-screen"
 import { ContextForScreen } from "../../helper"
+import { walletOverviewQueryResult } from "../helpers"
 import { flushEffects } from "../../../helpers/flush-effects"
 
 loadLocale("en")
@@ -50,6 +51,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
   useRemoteConfig: () => ({ supportEmailAddress: "support@blink.sv" }),
 }))
 
@@ -73,24 +75,6 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
-const walletsWithBalances = ({ sats, usdCents }: { sats: number; usdCents: number }) => ({
-  data: {
-    me: {
-      defaultAccount: {
-        wallets: [
-          { __typename: "BTCWallet", id: "btc-1", walletCurrency: "BTC", balance: sats },
-          {
-            __typename: "USDWallet",
-            id: "usd-1",
-            walletCurrency: "USD",
-            balance: usdCents,
-          },
-        ],
-      },
-    },
-  },
-})
-
 const renderScreen = () =>
   render(
     <ContextForScreen>
@@ -108,7 +92,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     mockCheckpointLoading = false
     mockGateArmed = false
     mockUseWalletOverviewScreenQuery.mockReturnValue(
-      walletsWithBalances({ sats: 1000, usdCents: 0 }),
+      walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
     )
     jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve())
   })
@@ -136,7 +120,7 @@ describe("MigrationBalancesOverviewScreen", () => {
 
   it("marks the fee as covered by Blink for a de-minimis balance", async () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(
-      walletsWithBalances({ sats: 80, usdCents: 0 }),
+      walletOverviewQueryResult({ btcBalance: 80, usdBalance: 0 }),
     )
     renderScreen()
     await flushEffects()
@@ -247,9 +231,7 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(screen.queryByText("Current Bitcoin Balance")).toBeNull()
     expect(screen.getByTestId("migration-balances-overview-loading")).toBeTruthy()
-    expect(
-      screen.getByTestId("migration-balances-overview-approve"),
-    ).toBeDisabled()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
   })
 
   it("holds a spinner with Approve disabled while the wallet query loads", async () => {
@@ -258,9 +240,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     await flushEffects()
 
     expect(screen.getByTestId("migration-balances-overview-loading")).toBeTruthy()
-    expect(
-      screen.getByTestId("migration-balances-overview-approve"),
-    ).toBeDisabled()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
   })
 
   it("holds a spinner with Approve disabled when the wallet query fails", async () => {
@@ -272,9 +252,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     await flushEffects()
 
     expect(screen.getByTestId("migration-balances-overview-loading")).toBeTruthy()
-    expect(
-      screen.getByTestId("migration-balances-overview-approve"),
-    ).toBeDisabled()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
   })
 
   it("hides the fiat suffix when price conversion is unavailable", async () => {

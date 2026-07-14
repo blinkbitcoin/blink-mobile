@@ -35,7 +35,6 @@ jest.mock("@app/screens/account-migration/utils/migration-checkpoint-storage", (
     mockSaveCheckpointToStorage(...args),
   clearCheckpointFromStorage: (...args: readonly unknown[]) =>
     mockClearCheckpointFromStorage(...args),
-  getStorageKey: (env: string) => `migrationCheckpoint_${env.toLowerCase()}`,
 }))
 
 jest.mock("@app/utils/error-logging", () => ({

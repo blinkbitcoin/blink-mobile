@@ -20,6 +20,7 @@ let mockMigrationLoading = false
 const mockUseHardwareBackGuard = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
   useCompleteMigration: () => ({
     migrationAccountId: mockMigrationAccountId,
     migrationLoading: mockMigrationLoading,

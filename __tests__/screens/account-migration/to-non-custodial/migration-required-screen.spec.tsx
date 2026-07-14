@@ -10,6 +10,7 @@ import {
   MigrationRequiredScreen,
 } from "@app/screens/account-migration/to-non-custodial/migration-required-screen"
 import { ContextForScreen } from "../../helper"
+import { walletOverviewQueryResult } from "../helpers"
 import { flushEffects } from "../../../helpers/flush-effects"
 
 loadLocale("en")
@@ -37,6 +38,7 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
   useRemoteConfig: () => ({ supportEmailAddress: "support@blink.sv" }),
 }))
 
@@ -84,24 +86,6 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
   }),
 }))
 
-const walletsWithUsdCents = (usdBalanceCents: number) => ({
-  data: {
-    me: {
-      defaultAccount: {
-        wallets: [
-          { __typename: "BTCWallet", id: "btc-1", walletCurrency: "BTC", balance: 1000 },
-          {
-            __typename: "USDWallet",
-            id: "usd-1",
-            walletCurrency: "USD",
-            balance: usdBalanceCents,
-          },
-        ],
-      },
-    },
-  },
-})
-
 const renderScreen = (mode: MigrationMode, onClose?: () => void) =>
   render(
     <ContextForScreen>
@@ -117,7 +101,9 @@ describe("MigrationRequiredScreen", () => {
     mockHasResumableCheckpoint = false
     mockHasTransactions = false
     mockTransactionsLoading = false
-    mockUseWalletOverviewScreenQuery.mockReturnValue(walletsWithUsdCents(2500))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 2500 }),
+    )
     mockUseAddressScreenQuery.mockReturnValue({ data: undefined })
     jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve())
   })

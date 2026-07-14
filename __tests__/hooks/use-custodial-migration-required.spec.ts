@@ -19,6 +19,7 @@ jest.mock("@app/hooks/use-device-location", () => ({
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
   useRemoteConfig: () => mockUseRemoteConfig(),
 }))
 
