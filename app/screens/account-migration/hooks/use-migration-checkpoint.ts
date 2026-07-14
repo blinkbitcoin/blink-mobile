@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
-import { useNavigation } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
@@ -38,13 +38,13 @@ export const useMigrationCheckpoint = () => {
 
   const storageKey = getStorageKey(environment)
 
-  useEffect(() => {
+  const reloadCheckpoint = useCallback(() => {
     mountedRef.current = true
 
     loadCheckpoint(storageKey)
       .then((storedCheckpoint) => {
         if (!mountedRef.current) return
-        if (storedCheckpoint) setStored(storedCheckpoint)
+        setStored(storedCheckpoint ?? null)
         setLoading(false)
       })
       .catch((err) => {
@@ -57,6 +57,11 @@ export const useMigrationCheckpoint = () => {
       mountedRef.current = false
     }
   }, [storageKey])
+
+  /** Reloads on every focus: the root blocker and the settings entry stay mounted below
+   *  the flow while it advances, so a mount-only read would keep offering a restart
+   *  after the user already has a resumable step. */
+  useFocusEffect(reloadCheckpoint)
 
   /** A checkpoint belongs to the custodial account that saved it; another profile on the
    *  same device starts its own flow instead of resuming, and inheriting, this one. */

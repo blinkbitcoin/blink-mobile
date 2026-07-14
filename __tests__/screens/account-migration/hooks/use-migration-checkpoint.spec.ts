@@ -12,10 +12,18 @@ const mockSaveCheckpointToStorage = jest.fn()
 const mockClearCheckpointFromStorage = jest.fn()
 const mockReportError = jest.fn()
 let mockActiveAccount: { id: string; type: string } | undefined
+let mockFocusCallback: (() => void | (() => void)) | null = null
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate, replace: mockReplace }),
+  useFocusEffect: (callback: () => void | (() => void)) => {
+    const { useEffect } = jest.requireActual("react")
+    useEffect(() => {
+      mockFocusCallback = callback
+      return callback()
+    }, [callback])
+  },
 }))
 
 jest.mock("@app/screens/account-migration/utils/migration-checkpoint-storage", () => ({
@@ -48,6 +56,7 @@ describe("useMigrationCheckpoint", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
+    mockFocusCallback = null
     mockLoadCheckpoint.mockResolvedValue(null)
     mockSaveCheckpointToStorage.mockResolvedValue(undefined)
     mockClearCheckpointFromStorage.mockResolvedValue(undefined)
@@ -442,6 +451,49 @@ describe("useMigrationCheckpoint", () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(result.current.hasResumableCheckpoint).toBe(true)
+  })
+
+  it("picks up a checkpoint saved elsewhere when the screen regains focus", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.hasResumableCheckpoint).toBe(false)
+
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+      custodialAccountId: "custodial-1",
+    })
+
+    await act(async () => {
+      mockFocusCallback?.()
+    })
+
+    await waitFor(() => expect(result.current.hasResumableCheckpoint).toBe(true))
+    expect(result.current.checkpoint).toBe(MigrationCheckpoint.BackupMethod)
+  })
+
+  it("drops a checkpoint cleared elsewhere when the screen regains focus", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+      custodialAccountId: "custodial-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.hasResumableCheckpoint).toBe(true))
+
+    mockLoadCheckpoint.mockResolvedValue(null)
+
+    await act(async () => {
+      mockFocusCallback?.()
+    })
+
+    await waitFor(() => expect(result.current.hasResumableCheckpoint).toBe(false))
+    expect(result.current.checkpoint).toBeNull()
   })
 
   it("resumes from checkpoint after unmount and remount", async () => {
