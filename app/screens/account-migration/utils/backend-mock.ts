@@ -11,12 +11,12 @@ const toUnixSeconds = (utcMilliseconds: number): number => utcMilliseconds / 100
 
 /**
  * Flip to false to simulate an account the wind-down does not affect: the backend then
- * omits `Account.windDown` entirely (null) and no wind-down UI may render at all.
+ * omits `Query.windDown` entirely (null) and no wind-down UI may render at all.
  */
 const IS_ACCOUNT_AFFECTED: boolean = true
 
 /**
- * TODO: TEMPORARY, replace with the backend wind-down status query (Account.windDown)
+ * TODO: TEMPORARY, replace with the backend wind-down status query (Query.windDown)
  * once it is ready. The dates below are the published wind-down timeline; 00:00 in
  * Europe/Paris is 22:00 UTC of the previous day because August/September fall in CEST
  * (UTC+2). Change `status` here (or via the developer-screen simulations later) to see

@@ -20,10 +20,11 @@ export const WindDownStatus = {
 export type WindDownStatus = (typeof WindDownStatus)[keyof typeof WindDownStatus]
 
 /**
- * Shape of the backend wind-down state (Account.windDown in the integration contract).
- * Dates are Unix SECONDS and exist only for display copy ("by the end of 31st of
- * August"); the timezone is the IANA zone the backend defines per region so every date
- * renders in the enforcement timezone (00:00 CET baseline) instead of the device's.
+ * Shape of the backend wind-down state (the authed top-level Query.windDown in the
+ * integration contract). Dates are Unix SECONDS and exist only for display copy ("by
+ * the end of 31st of August"); the timezone is the IANA zone the backend defines per
+ * region so every date renders in the enforcement timezone (00:00 CET baseline)
+ * instead of the device's.
  */
 export type WindDown = {
   status: WindDownStatus
