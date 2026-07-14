@@ -22,7 +22,18 @@ jest.mock("@app/screens/account-migration/hooks/use-discard-custodial-session", 
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
-  useAccountRegistry: () => ({ setActiveAccountId: mockSetActiveAccountId }),
+  useAccountRegistry: () => ({
+    activeAccount: { id: "custodial-1", type: "custodial" },
+    setActiveAccountId: mockSetActiveAccountId,
+  }),
+}))
+
+const mockClearPendingAccount = jest.fn()
+
+jest.mock("@app/screens/account-migration/hooks/use-pending-migration-accounts", () => ({
+  usePendingMigrationAccounts: () => ({
+    clearPendingAccount: mockClearPendingAccount,
+  }),
 }))
 
 import { useCompleteMigration } from "@app/screens/account-migration/hooks/use-complete-migration"
@@ -86,5 +97,11 @@ describe("useCompleteMigration", () => {
 
     expect(result.current.migrationCheckpoint).toBe("backupAlerts")
     expect(result.current.migrationAccountId).toBe("sc-account-1")
+  })
+
+  it("clears the custodial owner's pending wallet record after the swap", async () => {
+    await complete()
+
+    expect(mockClearPendingAccount).toHaveBeenCalledWith("custodial-1")
   })
 })

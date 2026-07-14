@@ -9,6 +9,22 @@ const mockReportError = jest.fn()
 const mockToastShow = jest.fn()
 let mockAccountId: string | null = null
 
+let mockPendingForActiveAccount: string | null = null
+let mockRegistryAccounts: { id: string }[] = []
+const mockSavePendingAccount = jest.fn()
+
+jest.mock("@app/screens/account-migration/hooks/use-pending-migration-accounts", () => ({
+  usePendingMigrationAccounts: () => ({
+    pendingForActiveAccount: mockPendingForActiveAccount,
+    savePendingAccount: mockSavePendingAccount,
+    loading: false,
+  }),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({ accounts: mockRegistryAccounts }),
+}))
+
 jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state", () => ({
   useMigrationCheckpointState: () => ({
     accountId: mockAccountId,
@@ -49,6 +65,9 @@ describe("useMigrationAccount", () => {
     mockAccountId = null
     mockGuardBlocked = false
     mockSaveCheckpoint.mockResolvedValue(true)
+    mockSavePendingAccount.mockResolvedValue(undefined)
+    mockPendingForActiveAccount = null
+    mockRegistryAccounts = []
     mockProvision.mockResolvedValue("sc-account-1")
   })
 
@@ -120,5 +139,51 @@ describe("useMigrationAccount", () => {
     expect(ensured).toBeNull()
     expect(mockReportError).toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalled()
+  })
+
+  it("records the freshly provisioned wallet as pending for reuse", async () => {
+    const { result } = renderHook(() => useMigrationAccount())
+
+    await act(async () => {
+      await result.current.ensureAccount()
+    })
+
+    expect(mockSavePendingAccount).toHaveBeenCalledWith("sc-account-1")
+  })
+
+  it("reuses the pending wallet of an earlier abandoned run", async () => {
+    mockPendingForActiveAccount = "sc-pending-1"
+    mockRegistryAccounts = [{ id: "sc-pending-1" }]
+
+    const { result } = renderHook(() => useMigrationAccount())
+
+    let ensured: string | null = null
+    await act(async () => {
+      ensured = await result.current.ensureAccount()
+    })
+
+    expect(ensured).toBe("sc-pending-1")
+    expect(mockProvision).not.toHaveBeenCalled()
+    expect(mockSavePendingAccount).not.toHaveBeenCalled()
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+      MigrationCheckpoint.TermsAndConditions,
+      "sc-pending-1",
+    )
+  })
+
+  it("provisions fresh when the pending wallet no longer exists on the device", async () => {
+    mockPendingForActiveAccount = "sc-gone-1"
+    mockRegistryAccounts = []
+
+    const { result } = renderHook(() => useMigrationAccount())
+
+    let ensured: string | null = null
+    await act(async () => {
+      ensured = await result.current.ensureAccount()
+    })
+
+    expect(ensured).toBe("sc-account-1")
+    expect(mockProvision).toHaveBeenCalledTimes(1)
+    expect(mockSavePendingAccount).toHaveBeenCalledWith("sc-account-1")
   })
 })

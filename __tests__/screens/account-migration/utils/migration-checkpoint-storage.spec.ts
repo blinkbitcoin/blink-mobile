@@ -8,6 +8,10 @@ import {
   loadCheckpoint,
   resolveCheckpointRoute,
   saveCheckpointToStorage,
+  getPendingAccountsStorageKey,
+  loadPendingProvisionedAccounts,
+  savePendingProvisionedAccount,
+  clearPendingProvisionedAccount,
   validateStoredCheckpoint,
 } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
 
@@ -233,7 +237,9 @@ describe("migration-checkpoint-storage", () => {
     it("persists step and timestamp", async () => {
       mockLoadJson.mockResolvedValue(null)
       const before = Date.now()
-      await saveCheckpointToStorage("test-key", { step: MigrationCheckpoint.BackupAlerts })
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BackupAlerts,
+      })
 
       expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
         step: MigrationCheckpoint.BackupAlerts,
@@ -326,7 +332,9 @@ describe("migration-checkpoint-storage", () => {
     it("saves the step even when reading the previous checkpoint fails", async () => {
       mockLoadJson.mockRejectedValue(new Error("read failed"))
 
-      await saveCheckpointToStorage("test-key", { step: MigrationCheckpoint.BackupAlerts })
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BackupAlerts,
+      })
 
       expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
         step: MigrationCheckpoint.BackupAlerts,
@@ -339,6 +347,47 @@ describe("migration-checkpoint-storage", () => {
     it("removes key from storage", async () => {
       await clearCheckpointFromStorage("test-key")
       expect(mockRemove).toHaveBeenCalledWith("test-key")
+    })
+  })
+
+  describe("pending provisioned accounts", () => {
+    it("namespaces the pending key by environment", () => {
+      expect(getPendingAccountsStorageKey("Main")).toBe("migrationPendingAccounts_main")
+    })
+
+    it("returns an empty map for missing or malformed storage", async () => {
+      mockLoadJson.mockResolvedValue(null)
+      expect(await loadPendingProvisionedAccounts("pending-key")).toEqual({})
+
+      mockLoadJson.mockResolvedValue(["not", "a", "map"])
+      expect(await loadPendingProvisionedAccounts("pending-key")).toEqual({})
+
+      mockLoadJson.mockResolvedValue({ "custodial-1": 42, "custodial-2": "sc-2" })
+      expect(await loadPendingProvisionedAccounts("pending-key")).toEqual({
+        "custodial-2": "sc-2",
+      })
+    })
+
+    it("saves a pending wallet without touching other owners", async () => {
+      mockLoadJson.mockResolvedValue({ "custodial-2": "sc-2" })
+
+      await savePendingProvisionedAccount("pending-key", {
+        custodialAccountId: "custodial-1",
+        accountId: "sc-1",
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith("pending-key", {
+        "custodial-1": "sc-1",
+        "custodial-2": "sc-2",
+      })
+    })
+
+    it("clears only the given owner's pending wallet", async () => {
+      mockLoadJson.mockResolvedValue({ "custodial-1": "sc-1", "custodial-2": "sc-2" })
+
+      await clearPendingProvisionedAccount("pending-key", "custodial-1")
+
+      expect(mockSaveJson).toHaveBeenCalledWith("pending-key", { "custodial-2": "sc-2" })
     })
   })
 })

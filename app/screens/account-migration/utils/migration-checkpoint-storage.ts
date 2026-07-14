@@ -145,3 +145,47 @@ export const saveCheckpointToStorage = async (
 export const clearCheckpointFromStorage = async (storageKey: string): Promise<void> => {
   await remove(storageKey)
 }
+
+/**
+ * Wallets provisioned for a migration but not yet activated, keyed by the custodial
+ * account that started the flow. Unlike the checkpoint this record never expires: the
+ * wallet exists (its phrase may already be written down), so a restarted flow must
+ * reuse it instead of provisioning a zombie, and the account switcher must not offer it.
+ */
+type PendingProvisionedAccounts = Record<string, string>
+
+const PENDING_ACCOUNTS_KEY_PREFIX = "migrationPendingAccounts"
+
+export const getPendingAccountsStorageKey = (environment: string): string =>
+  `${PENDING_ACCOUNTS_KEY_PREFIX}_${environment.toLowerCase()}`
+
+export const loadPendingProvisionedAccounts = async (
+  storageKey: string,
+): Promise<PendingProvisionedAccounts> => {
+  const raw = await loadJson(storageKey).catch(() => null)
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {}
+  const entries = Object.entries(raw as Record<string, unknown>).filter(
+    (entry): entry is [string, string] => typeof entry[1] === "string",
+  )
+  return Object.fromEntries(entries)
+}
+
+export const savePendingProvisionedAccount = async (
+  storageKey: string,
+  update: { custodialAccountId: string; accountId: string },
+): Promise<void> => {
+  const existing = await loadPendingProvisionedAccounts(storageKey)
+  await saveJson(storageKey, {
+    ...existing,
+    [update.custodialAccountId]: update.accountId,
+  })
+}
+
+export const clearPendingProvisionedAccount = async (
+  storageKey: string,
+  custodialAccountId: string,
+): Promise<void> => {
+  const existing = await loadPendingProvisionedAccounts(storageKey)
+  const { [custodialAccountId]: cleared, ...rest } = existing
+  await saveJson(storageKey, rest)
+}
