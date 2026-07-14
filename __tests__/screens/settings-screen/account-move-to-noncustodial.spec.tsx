@@ -26,6 +26,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => mockUseMigrationCheckpoint(),
 }))
 

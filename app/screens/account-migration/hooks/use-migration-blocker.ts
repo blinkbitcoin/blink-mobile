@@ -1,10 +1,10 @@
-import { useFeatureFlags } from "@app/config/feature-flags-context"
 import {
   useCustodialMigrationRequired,
   useCustodialMigrationRequiredSync,
 } from "@app/hooks/use-custodial-migration-required"
 
 import { useAccountSessionDismissal } from "./use-account-session-dismissal"
+import { useSelfCustodialDisabled } from "./use-self-custodial-disabled"
 import { useWindDownGateArmed } from "./use-wind-down-gate-armed"
 
 type MigrationBlocker = {
@@ -18,13 +18,12 @@ type MigrationBlocker = {
  *  to migrate toward a stack that is disabled by emergency. */
 export const useMigrationBlocker = (): MigrationBlocker => {
   const { isDismissedForSession, dismissForSession } = useAccountSessionDismissal()
-  const { nonCustodialEnabled, remoteConfigReady } = useFeatureFlags()
+  const isSelfCustodialDisabled = useSelfCustodialDisabled()
 
   useCustodialMigrationRequiredSync()
   const isMigrationRequired = useCustodialMigrationRequired()
   const isGateArmed = useWindDownGateArmed()
 
-  const isSelfCustodialDisabled = remoteConfigReady && !nonCustodialEnabled
   if (isSelfCustodialDisabled) return { isVisible: false }
 
   if (isGateArmed) return { isVisible: true }

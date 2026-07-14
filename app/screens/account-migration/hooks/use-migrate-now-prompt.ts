@@ -1,8 +1,8 @@
-import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { WindDownStatus } from "@app/types/wind-down"
 
 import { useAccountSessionDismissal } from "./use-account-session-dismissal"
 import { useCustodialWindDown } from "./use-custodial-wind-down"
+import { useSelfCustodialDisabled } from "./use-self-custodial-disabled"
 
 type MigrateNowPrompt = {
   isVisible: boolean
@@ -19,14 +19,11 @@ type MigrateNowPrompt = {
 export const useMigrateNowPrompt = (): MigrateNowPrompt => {
   const { isDismissedForSession, dismissForSession, reopen } =
     useAccountSessionDismissal()
-  const { nonCustodialEnabled, remoteConfigReady } = useFeatureFlags()
+  const isSelfCustodialDisabled = useSelfCustodialDisabled()
 
   const windDown = useCustodialWindDown()
 
   const isReceiveDisabled = windDown?.status === WindDownStatus.ReceiveDisabled
-  /** The kill-switch pauses the push into the migration (there is nothing working to
-   *  migrate toward), while the receive greying stays: that reflects server state. */
-  const isSelfCustodialDisabled = remoteConfigReady && !nonCustodialEnabled
 
   /** The deadline fields are display data for the modal, only read while visible. */
   return {
