@@ -13,6 +13,12 @@ const mockUseIpCountryCode = jest.fn()
 
 let mockPersistentState: PersistentState
 
+/** Mocked wholesale: the real module warns at load time when no API key is configured. */
+jest.mock("@app/utils/ip-country-lookup", () => ({
+  DEFAULT_ADAPTERS: [],
+  resolveIpCountryCode: jest.fn(async () => undefined),
+}))
+
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
   ...jest.requireActual("@app/hooks/use-device-location"),

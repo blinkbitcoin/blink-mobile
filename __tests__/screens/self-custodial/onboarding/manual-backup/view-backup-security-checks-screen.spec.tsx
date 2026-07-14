@@ -8,6 +8,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { ViewBackupSecurityChecksScreen } from "@app/screens/self-custodial/onboarding/manual-backup/view-backup-security-checks-screen"
 
 import { ContextForScreen } from "../../../helper"
+import { flushEffects } from "../../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => ({
@@ -43,8 +44,9 @@ describe("ViewBackupSecurityChecksScreen — Settings flow", () => {
     jest.clearAllMocks()
   })
 
-  it("renders the same alerts content as the onboarding flow (shared component)", () => {
+  it("renders the same alerts content as the onboarding flow (shared component)", async () => {
     const { getByText } = renderScreen()
+    await flushEffects()
     expect(getByText(LL.BackupScreen.ManualBackup.Alerts.title())).toBeTruthy()
     expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check1())).toBeTruthy()
   })
@@ -70,21 +72,24 @@ describe("ViewBackupSecurityChecksScreen — Settings flow", () => {
     expect(navigatorSource).toContain('name="selfCustodialViewBackupSecurityChecks"')
   })
 
-  it("Continue does not navigate while any check is missing", () => {
+  it("Continue does not navigate while any check is missing", async () => {
     const { getByText } = renderScreen()
+    await flushEffects()
     fireEvent.press(getByText(LL.common.continue()))
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("Continue navigates to the Settings view-phrase screen (no PhraseStep) once all three are checked", () => {
+  it("Continue navigates to the Settings view-phrase screen (no PhraseStep) once all three are checked", async () => {
     const { getByText } = renderScreen()
+    await flushEffects()
     tickAllChecks(getByText)
     fireEvent.press(getByText(LL.common.continue()))
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialViewBackupPhrase")
   })
 
-  it("never navigates to the onboarding phrase screen — Settings stays separate from the onboarding flow", () => {
+  it("never navigates to the onboarding phrase screen — Settings stays separate from the onboarding flow", async () => {
     const { getByText } = renderScreen()
+    await flushEffects()
     tickAllChecks(getByText)
     fireEvent.press(getByText(LL.common.continue()))
     expect(mockNavigate).not.toHaveBeenCalledWith(

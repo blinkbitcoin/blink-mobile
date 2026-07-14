@@ -17,6 +17,12 @@ import { ConvertDirection } from "@app/types/payment"
 
 let currentMocks: MockedResponse[] = []
 
+/** Mocked wholesale: the real module warns at load time when no API key is configured. */
+jest.mock("@app/utils/ip-country-lookup", () => ({
+  DEFAULT_ADAPTERS: [],
+  resolveIpCountryCode: jest.fn(async () => undefined),
+}))
+
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
   default: {

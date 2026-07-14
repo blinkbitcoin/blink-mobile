@@ -5,6 +5,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 
 import { BackupPhraseConfirmScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-confirm-screen"
 import { ContextForScreen } from "../../../helper"
+import { flushEffects } from "../../../../helpers/flush-effects"
 
 jest.mock("react-native-inappbrowser-reborn", () => ({
   __esModule: true,
@@ -95,7 +96,7 @@ const mockSetBackupCompleted = jest.fn()
 describe("BackupPhraseConfirmScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.useFakeTimers()
+    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
     mockCheckpoint.mockReturnValue(null)
     mockMigrationAccountId.mockReturnValue("migration-uuid")
     mockCheckpointLoading.mockReturnValue(false)
@@ -125,6 +126,7 @@ describe("BackupPhraseConfirmScreen", () => {
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByText(LL.BackupScreen.ManualBackup.Confirm.subtitle())).toBeTruthy()
     expect(
@@ -138,22 +140,24 @@ describe("BackupPhraseConfirmScreen", () => {
     ).toBeTruthy()
   })
 
-  it("shows enter words label when inputs are empty", () => {
+  it("shows enter words label when inputs are empty", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByText(LL.BackupScreen.ManualBackup.Confirm.enterWords())).toBeTruthy()
   })
 
-  it("shows autocomplete suggestions when typing 3+ characters", () => {
+  it("shows autocomplete suggestions when typing 3+ characters", async () => {
     const { getByPlaceholderText, getByText } = render(
       <ContextForScreen>
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.changeText(
       getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`),
@@ -164,12 +168,13 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(getByText("youth")).toBeTruthy()
   })
 
-  it("fills input when suggestion is selected", () => {
+  it("fills input when suggestion is selected", async () => {
     const { getByPlaceholderText, getByText } = render(
       <ContextForScreen>
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     const input = getByPlaceholderText(
       `${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`,
@@ -180,12 +185,13 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(input.props.value).toBe("youth")
   })
 
-  it("shows word number when input has content", () => {
+  it("shows word number when input has content", async () => {
     const { getByPlaceholderText, getByText } = render(
       <ContextForScreen>
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.changeText(
       getByPlaceholderText(`${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`),
@@ -229,6 +235,7 @@ describe("BackupPhraseConfirmScreen", () => {
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fillAllChallenges(getByPlaceholderText)
     act(() => {
@@ -241,7 +248,7 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
-  it("routes to backup success screen with reBackup=true when re-backing-up from settings", () => {
+  it("routes to backup success screen with reBackup=true when re-backing-up from settings", async () => {
     mockCheckpoint.mockReturnValue("backupAlerts")
     mockBackupStateValue.mockReturnValue({
       backupState: { status: "completed", method: "manual" },
@@ -253,6 +260,7 @@ describe("BackupPhraseConfirmScreen", () => {
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fillAllChallenges(getByPlaceholderText)
     act(() => {
@@ -265,7 +273,7 @@ describe("BackupPhraseConfirmScreen", () => {
     )
   })
 
-  it("routes to backup success screen with reBackup=false during fresh manual backup without checkpoint", () => {
+  it("routes to backup success screen with reBackup=false during fresh manual backup without checkpoint", async () => {
     mockCheckpoint.mockReturnValue(null)
 
     const { getByPlaceholderText } = render(
@@ -273,6 +281,7 @@ describe("BackupPhraseConfirmScreen", () => {
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fillAllChallenges(getByPlaceholderText)
     act(() => {
@@ -297,6 +306,7 @@ describe("BackupPhraseConfirmScreen", () => {
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fillAllChallenges(getByPlaceholderText)
     act(() => {
@@ -308,7 +318,7 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
-  it("forwards the route's successMessage to the success screen when provided", () => {
+  it("forwards the route's successMessage to the success screen when provided", async () => {
     mockRouteParams.mockReturnValue({
       challenges: [
         { index: 0, word: "youth" },
@@ -327,6 +337,7 @@ describe("BackupPhraseConfirmScreen", () => {
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fillAllChallenges(getByPlaceholderText)
     act(() => {
@@ -351,6 +362,7 @@ describe("BackupPhraseConfirmScreen", () => {
         <BackupPhraseConfirmScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fillAllChallenges(getByPlaceholderText)
     act(() => {

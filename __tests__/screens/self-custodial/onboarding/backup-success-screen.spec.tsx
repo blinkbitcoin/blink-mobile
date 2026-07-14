@@ -142,6 +142,7 @@ describe("BackupSuccessScreen", () => {
         <BackupSuccessScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     act(() => {
       jest.advanceTimersByTime(0)
@@ -168,6 +169,7 @@ describe("BackupSuccessScreen", () => {
         <BackupSuccessScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     act(() => {
       jest.advanceTimersByTime(2000)
