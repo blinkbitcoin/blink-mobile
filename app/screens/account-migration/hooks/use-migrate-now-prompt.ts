@@ -1,10 +1,7 @@
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { AccountType } from "@app/types/wallet"
-
 import { WindDownStatus } from "../utils/backend-mock"
 
 import { useAccountSessionDismissal } from "./use-account-session-dismissal"
-import { useWindDownStatus } from "./use-wind-down-status"
+import { useCustodialWindDown } from "./use-custodial-wind-down"
 
 type MigrateNowPrompt = {
   isVisible: boolean
@@ -22,12 +19,9 @@ export const useMigrateNowPrompt = (): MigrateNowPrompt => {
   const { isDismissedForSession, dismissForSession, reopen } =
     useAccountSessionDismissal()
 
-  const { accountType } = useActiveWallet()
-  const windDown = useWindDownStatus()
+  const windDown = useCustodialWindDown()
 
-  const isReceiveDisabled =
-    accountType === AccountType.Custodial &&
-    windDown?.status === WindDownStatus.ReceiveDisabled
+  const isReceiveDisabled = windDown?.status === WindDownStatus.ReceiveDisabled
 
   /** The deadline fields are display data for the modal, only read while visible. */
   return {
