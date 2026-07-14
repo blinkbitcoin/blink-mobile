@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useCompleteMigration } from "@app/screens/account-migration/hooks"
+import { useMigrationCheckpointState } from "@app/screens/account-migration/hooks"
 import {
   BackupMethod,
   BackupStatus,
@@ -31,7 +31,8 @@ export const useCompleteBackup = () => {
   const { LL } = useI18nContext()
   const { isSelfCustodial } = useActiveWallet()
   const { backupState, setBackupCompleted } = useBackupState()
-  const { migrationCheckpoint, migrationAccountId } = useCompleteMigration()
+  const { checkpoint: migrationCheckpoint, accountId: migrationAccountId } =
+    useMigrationCheckpointState()
 
   const isAlreadyBackedUp = backupState.status === BackupStatus.Completed
   /** Migration only applies on a custodial account; self-custodial backups are standalone. */

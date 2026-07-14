@@ -31,9 +31,10 @@ jest.mock("@app/self-custodial/providers/backup-state", () => ({
 let mockCheckpoint: string | null = "backupAlerts"
 let mockMigrationAccountId: string | null = "migration-uuid"
 jest.mock("@app/screens/account-migration/hooks", () => ({
-  useCompleteMigration: () => ({
-    migrationCheckpoint: mockCheckpoint,
-    migrationAccountId: mockMigrationAccountId,
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
+  useMigrationCheckpointState: () => ({
+    checkpoint: mockCheckpoint,
+    accountId: mockMigrationAccountId,
   }),
 }))
 

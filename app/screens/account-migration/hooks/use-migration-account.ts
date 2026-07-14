@@ -8,13 +8,13 @@ import { toastShow } from "@app/utils/toast"
 
 import { MigrationCheckpoint } from "../utils/migration-checkpoint-storage"
 
-import { useMigrationCheckpoint } from "./use-migration-checkpoint"
+import { useMigrationCheckpointState } from "./use-migration-checkpoint-state"
 
 /** Provisions (without activating) the migration's self-custodial account so the shared
  *  backup screens show its phrase; the id is persisted in the checkpoint for resume.
  *  isProvisioning drives the caller's in-flight UI, owned here with the operation. */
 export const useMigrationAccount = () => {
-  const { accountId, loading, saveCheckpoint } = useMigrationCheckpoint()
+  const { accountId, loading, saveCheckpoint } = useMigrationCheckpointState()
   const { provision } = useProvisionSelfCustodialAccount()
   const { LL } = useI18nContext()
   const guard = useInFlightGuard()

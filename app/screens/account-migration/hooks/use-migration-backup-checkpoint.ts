@@ -4,12 +4,13 @@ import { useActiveWallet } from "@app/hooks/use-active-wallet"
 
 import { MigrationCheckpoint } from "../utils/migration-checkpoint-storage"
 
-import { useMigrationCheckpoint } from "./use-migration-checkpoint"
+import { useMigrationCheckpointState } from "./use-migration-checkpoint-state"
 
 /** Mid-migration the active account is still custodial; onboarding and re-backups run self-custodial. */
 export const useMigrationBackupCheckpoint = (step: MigrationCheckpoint) => {
   const { isSelfCustodial } = useActiveWallet()
-  const { hasResumableCheckpoint, loading, saveCheckpoint } = useMigrationCheckpoint()
+  const { hasResumableCheckpoint, loading, saveCheckpoint } =
+    useMigrationCheckpointState()
 
   useEffect(() => {
     const isMigrationBackup = !isSelfCustodial && hasResumableCheckpoint

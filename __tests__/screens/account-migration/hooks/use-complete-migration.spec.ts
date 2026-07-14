@@ -7,8 +7,8 @@ const mockDiscardCustodialSession = jest.fn()
 let mockAccountId: string | undefined
 let mockCheckpoint: string | null
 
-jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint", () => ({
-  useMigrationCheckpoint: () => ({
+jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state", () => ({
+  useMigrationCheckpointState: () => ({
     checkpoint: mockCheckpoint,
     accountId: mockAccountId,
     clearCheckpoint: mockClearCheckpoint,

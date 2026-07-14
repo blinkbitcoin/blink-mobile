@@ -28,8 +28,8 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => mockUseAccountRegistry(),
 }))
 
-jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint", () => ({
-  useMigrationCheckpoint: () => mockUseMigrationCheckpoint(),
+jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state", () => ({
+  useMigrationCheckpointState: () => mockUseMigrationCheckpoint(),
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({

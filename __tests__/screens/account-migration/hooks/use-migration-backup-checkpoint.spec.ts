@@ -12,8 +12,8 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ isSelfCustodial: mockIsSelfCustodial }),
 }))
 
-jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint", () => ({
-  useMigrationCheckpoint: () => ({
+jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state", () => ({
+  useMigrationCheckpointState: () => ({
     hasResumableCheckpoint: mockHasResumableCheckpoint,
     loading: mockLoading,
     saveCheckpoint: mockSaveCheckpoint,

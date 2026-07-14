@@ -9,8 +9,8 @@ const mockReportError = jest.fn()
 const mockToastShow = jest.fn()
 let mockAccountId: string | null = null
 
-jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint", () => ({
-  useMigrationCheckpoint: () => ({
+jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state", () => ({
+  useMigrationCheckpointState: () => ({
     accountId: mockAccountId,
     loading: false,
     saveCheckpoint: mockSaveCheckpoint,
