@@ -16,7 +16,14 @@ const mockCheckpoint = jest.fn<string | null, []>()
 const mockCheckpointLoading = jest.fn<boolean, []>()
 const mockMigrationAccountId = jest.fn<string | null, []>()
 jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => ({
+    saveCheckpoint: jest.fn(),
+    checkpoint: mockCheckpoint(),
+    accountId: mockMigrationAccountId(),
+    loading: mockCheckpointLoading(),
+  }),
+  useMigrationCheckpointState: () => ({
     saveCheckpoint: jest.fn(),
     checkpoint: mockCheckpoint(),
     accountId: mockMigrationAccountId(),
