@@ -6,13 +6,13 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useWindDownReceiveBlocked } from "./hooks/use-wind-down-receive-blocked"
 
-type Props = {
+type WindDownReceiveGateProps = {
   children: React.ReactNode
 }
 
 /** Route-level guard: once the wind-down blocks receiving, every path into the
  *  receive screen (home button, modal, deeplink) bounces straight back home. */
-export const WindDownReceiveGate: React.FC<Props> = ({ children }) => {
+export const WindDownReceiveGate: React.FC<WindDownReceiveGateProps> = ({ children }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const isReceiveBlocked = useWindDownReceiveBlocked()
 
