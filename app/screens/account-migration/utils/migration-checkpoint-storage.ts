@@ -11,10 +11,11 @@ export enum MigrationCheckpoint {
   BalancesOverview = "balancesOverview",
 }
 
-type StoredCheckpoint = {
+export type StoredCheckpoint = {
   step: MigrationCheckpoint
   savedAt: number
   accountId?: string
+  custodialAccountId?: string
 }
 
 /**
@@ -61,13 +62,16 @@ export const isExpired = (
 export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null => {
   if (!raw || typeof raw !== "object") return null
 
-  const { step, savedAt, accountId } = raw as StoredCheckpoint
+  const { step, savedAt, accountId, custodialAccountId } = raw as StoredCheckpoint
 
   if (!Object.values(MigrationCheckpoint).includes(step)) return null
   if (typeof savedAt !== "number") return null
   if (accountId !== undefined && typeof accountId !== "string") return null
+  if (custodialAccountId !== undefined && typeof custodialAccountId !== "string") {
+    return null
+  }
 
-  return { step, savedAt, accountId }
+  return { step, savedAt, accountId, custodialAccountId }
 }
 
 export const resolveCheckpointRoute = (
@@ -103,18 +107,39 @@ export const loadCheckpoint = async (
   }
 }
 
+export type CheckpointUpdate = {
+  step: MigrationCheckpoint
+  accountId?: string
+  custodialAccountId?: string
+}
+
+/**
+ * Builds the record for a step update: the provisioned accountId survives step-to-step
+ * for resume, but never across a different custodial owner, so another profile's fresh
+ * flow cannot inherit it. A record saved before owners existed is claimed by the first
+ * account that saves onto it.
+ */
+export const mergeCheckpoint = (
+  existing: StoredCheckpoint | null,
+  update: CheckpointUpdate,
+): StoredCheckpoint => {
+  const hasSameOwner =
+    existing?.custodialAccountId === undefined ||
+    existing.custodialAccountId === update.custodialAccountId
+  return {
+    step: update.step,
+    savedAt: Date.now(),
+    accountId: update.accountId ?? (hasSameOwner ? existing?.accountId : undefined),
+    custodialAccountId: update.custodialAccountId,
+  }
+}
+
 export const saveCheckpointToStorage = async (
   storageKey: string,
-  step: MigrationCheckpoint,
-  accountId?: string,
+  update: CheckpointUpdate,
 ): Promise<void> => {
-  // Preserve the provisioned accountId across step updates for resume.
   const existing = validateStoredCheckpoint(await loadJson(storageKey).catch(() => null))
-  await saveJson(storageKey, {
-    step,
-    savedAt: Date.now(),
-    accountId: accountId ?? existing?.accountId,
-  })
+  await saveJson(storageKey, mergeCheckpoint(existing, update))
 }
 
 export const clearCheckpointFromStorage = async (storageKey: string): Promise<void> => {

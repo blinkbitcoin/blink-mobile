@@ -3,15 +3,18 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { reportError } from "@app/utils/error-logging"
 
 import {
   MigrationCheckpoint,
+  type StoredCheckpoint,
   clearCheckpointFromStorage,
   getStorageKey,
   loadCheckpoint,
+  mergeCheckpoint,
   resolveCheckpointRoute,
   saveCheckpointToStorage,
 } from "../utils/migration-checkpoint-storage"
@@ -20,10 +23,12 @@ export { MigrationCheckpoint }
 
 export const useMigrationCheckpoint = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const [checkpoint, setCheckpoint] = useState<MigrationCheckpoint | null>(null)
-  const [accountId, setAccountId] = useState<string | null>(null)
+  const { activeAccount } = useAccountRegistry()
+  const [stored, setStored] = useState<StoredCheckpoint | null>(null)
   const [loading, setLoading] = useState(true)
   const mountedRef = useRef(true)
+
+  const activeAccountId = activeAccount?.id ?? null
 
   const {
     appConfig: {
@@ -37,12 +42,9 @@ export const useMigrationCheckpoint = () => {
     mountedRef.current = true
 
     loadCheckpoint(storageKey)
-      .then((stored) => {
+      .then((storedCheckpoint) => {
         if (!mountedRef.current) return
-        if (stored) {
-          setCheckpoint(stored.step)
-          setAccountId(stored.accountId ?? null)
-        }
+        if (storedCheckpoint) setStored(storedCheckpoint)
         setLoading(false)
       })
       .catch((err) => {
@@ -58,22 +60,30 @@ export const useMigrationCheckpoint = () => {
 
   const saveCheckpoint = useCallback(
     (step: MigrationCheckpoint, provisionedAccountId?: string) => {
-      setCheckpoint(step)
-      if (provisionedAccountId) setAccountId(provisionedAccountId)
-      return saveCheckpointToStorage(storageKey, step, provisionedAccountId).catch(
-        (err) => {
-          reportError("Checkpoint save", err)
-        },
-      )
+      const update = {
+        step,
+        accountId: provisionedAccountId,
+        custodialAccountId: activeAccountId ?? undefined,
+      }
+      setStored((existing) => mergeCheckpoint(existing, update))
+      return saveCheckpointToStorage(storageKey, update).catch((err) => {
+        reportError("Checkpoint save", err)
+      })
     },
-    [storageKey],
+    [storageKey, activeAccountId],
   )
 
   const clearCheckpoint = useCallback(() => {
-    setCheckpoint(null)
-    setAccountId(null)
+    setStored(null)
     clearCheckpointFromStorage(storageKey).catch(() => {})
   }, [storageKey])
+
+  /** A checkpoint belongs to the custodial account that saved it; another profile on the
+   *  same device starts its own flow instead of resuming, and inheriting, this one. */
+  const isOwnedByActiveAccount =
+    !stored?.custodialAccountId || stored.custodialAccountId === activeAccountId
+  const checkpoint = isOwnedByActiveAccount ? stored?.step ?? null : null
+  const accountId = isOwnedByActiveAccount ? stored?.accountId ?? null : null
 
   // Without a provisioned account, resume from the explainer so it gets provisioned.
   const resolveDestination = useCallback(

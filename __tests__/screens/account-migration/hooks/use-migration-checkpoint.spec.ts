@@ -11,6 +11,7 @@ const mockLoadCheckpoint = jest.fn()
 const mockSaveCheckpointToStorage = jest.fn()
 const mockClearCheckpointFromStorage = jest.fn()
 const mockReportError = jest.fn()
+let mockActiveAccount: { id: string; type: string } | undefined
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -33,6 +34,10 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
+}))
+
 jest.mock("@app/hooks/use-app-config", () => ({
   useAppConfig: () => ({
     appConfig: { galoyInstance: { name: "Main" } },
@@ -42,6 +47,7 @@ jest.mock("@app/hooks/use-app-config", () => ({
 describe("useMigrationCheckpoint", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockActiveAccount = { id: "custodial-1", type: "custodial" }
     mockLoadCheckpoint.mockResolvedValue(null)
     mockSaveCheckpointToStorage.mockResolvedValue(undefined)
     mockClearCheckpointFromStorage.mockResolvedValue(undefined)
@@ -89,11 +95,11 @@ describe("useMigrationCheckpoint", () => {
     })
 
     expect(result.current.checkpoint).toBe(MigrationCheckpoint.BackupMethod)
-    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
-      "migrationCheckpoint_main",
-      MigrationCheckpoint.BackupMethod,
-      undefined,
-    )
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
+      step: MigrationCheckpoint.BackupMethod,
+      accountId: undefined,
+      custodialAccountId: "custodial-1",
+    })
   })
 
   it("persists and exposes the provisioned account id", async () => {
@@ -106,11 +112,11 @@ describe("useMigrationCheckpoint", () => {
     })
 
     expect(result.current.accountId).toBe("sc-account-1")
-    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
-      "migrationCheckpoint_main",
-      MigrationCheckpoint.BackupMethod,
-      "sc-account-1",
-    )
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
+      step: MigrationCheckpoint.BackupMethod,
+      accountId: "sc-account-1",
+      custodialAccountId: "custodial-1",
+    })
   })
 
   it("loads the provisioned account id from storage", async () => {
@@ -352,6 +358,58 @@ describe("useMigrationCheckpoint", () => {
     expect(result.current.hasResumableCheckpoint).toBe(false)
   })
 
+  it("hides a checkpoint owned by a different custodial account", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+      custodialAccountId: "custodial-2",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.checkpoint).toBeNull()
+    expect(result.current.accountId).toBeNull()
+    expect(result.current.hasResumableCheckpoint).toBe(false)
+
+    act(() => {
+      result.current.navigateToCheckpoint()
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
+  })
+
+  it("keeps resuming a checkpoint owned by the active custodial account", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+      custodialAccountId: "custodial-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.hasResumableCheckpoint).toBe(true)
+  })
+
+  it("keeps resuming a checkpoint saved before owners existed", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(result.current.hasResumableCheckpoint).toBe(true)
+  })
+
   it("resumes from checkpoint after unmount and remount", async () => {
     mockLoadCheckpoint.mockResolvedValue(null)
 
@@ -364,11 +422,11 @@ describe("useMigrationCheckpoint", () => {
     })
 
     expect(result.current.checkpoint).toBe(MigrationCheckpoint.BackupAlerts)
-    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
-      "migrationCheckpoint_main",
-      MigrationCheckpoint.BackupAlerts,
-      undefined,
-    )
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
+      step: MigrationCheckpoint.BackupAlerts,
+      accountId: undefined,
+      custodialAccountId: "custodial-1",
+    })
 
     unmount()
 

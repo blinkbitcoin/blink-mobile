@@ -108,6 +108,16 @@ describe("migration-checkpoint-storage", () => {
         }),
       ).toBeNull()
     })
+
+    it("rejects a stored checkpoint whose custodialAccountId is not a string", () => {
+      expect(
+        validateStoredCheckpoint({
+          step: MigrationCheckpoint.BackupMethod,
+          savedAt: Date.now(),
+          custodialAccountId: 123,
+        }),
+      ).toBeNull()
+    })
   })
 
   describe("resolveCheckpointRoute", () => {
@@ -223,7 +233,7 @@ describe("migration-checkpoint-storage", () => {
     it("persists step and timestamp", async () => {
       mockLoadJson.mockResolvedValue(null)
       const before = Date.now()
-      await saveCheckpointToStorage("test-key", MigrationCheckpoint.BackupAlerts)
+      await saveCheckpointToStorage("test-key", { step: MigrationCheckpoint.BackupAlerts })
 
       expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
         step: MigrationCheckpoint.BackupAlerts,
@@ -235,37 +245,88 @@ describe("migration-checkpoint-storage", () => {
       expect(savedAt).toBeLessThanOrEqual(Date.now())
     })
 
-    it("stores the provided account id", async () => {
+    it("stores the provided account id and custodial owner", async () => {
       mockLoadJson.mockResolvedValue(null)
-      await saveCheckpointToStorage("test-key", MigrationCheckpoint.BackupMethod, "sc-1")
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BackupMethod,
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+      })
 
       expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
         step: MigrationCheckpoint.BackupMethod,
         savedAt: expect.any(Number),
         accountId: "sc-1",
+        custodialAccountId: "cust-1",
       })
     })
 
-    it("preserves an existing account id across step updates", async () => {
+    it("preserves an existing account id across step updates by the same owner", async () => {
+      mockLoadJson.mockResolvedValue({
+        step: MigrationCheckpoint.BackupMethod,
+        savedAt: Date.now(),
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+      })
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BackupAlerts,
+        custodialAccountId: "cust-1",
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
+        step: MigrationCheckpoint.BackupAlerts,
+        savedAt: expect.any(Number),
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+      })
+    })
+
+    it("drops the previous owner's account id when another account starts a flow", async () => {
+      mockLoadJson.mockResolvedValue({
+        step: MigrationCheckpoint.BackupMethod,
+        savedAt: Date.now(),
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+      })
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.TermsAndConditions,
+        custodialAccountId: "cust-2",
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
+        step: MigrationCheckpoint.TermsAndConditions,
+        savedAt: expect.any(Number),
+        accountId: undefined,
+        custodialAccountId: "cust-2",
+      })
+    })
+
+    it("claims an ownerless record without dropping its account id", async () => {
       mockLoadJson.mockResolvedValue({
         step: MigrationCheckpoint.BackupMethod,
         savedAt: Date.now(),
         accountId: "sc-1",
       })
 
-      await saveCheckpointToStorage("test-key", MigrationCheckpoint.BackupAlerts)
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BackupAlerts,
+        custodialAccountId: "cust-2",
+      })
 
       expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
         step: MigrationCheckpoint.BackupAlerts,
         savedAt: expect.any(Number),
         accountId: "sc-1",
+        custodialAccountId: "cust-2",
       })
     })
 
     it("saves the step even when reading the previous checkpoint fails", async () => {
       mockLoadJson.mockRejectedValue(new Error("read failed"))
 
-      await saveCheckpointToStorage("test-key", MigrationCheckpoint.BackupAlerts)
+      await saveCheckpointToStorage("test-key", { step: MigrationCheckpoint.BackupAlerts })
 
       expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
         step: MigrationCheckpoint.BackupAlerts,
