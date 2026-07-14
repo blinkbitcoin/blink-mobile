@@ -449,9 +449,12 @@ export const HomeScreen: React.FC = () => {
   const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible
 
   const migrateNowPrompt = useMigrateNowPrompt()
+  const { dismissForSession: dismissMigrateNowPrompt } = migrateNowPrompt
+  /** Dismissing first keeps the modal from floating over the pushed migration flow. */
   const goToMigration = React.useCallback(() => {
+    dismissMigrateNowPrompt()
     navigation.navigate("accountMigrationEntry")
-  }, [navigation])
+  }, [dismissMigrateNowPrompt, navigation])
   /** The non-dismissible forced conversion outranks the migrate-now push. */
   const shouldShowMigrateNowPrompt = migrateNowPrompt.isVisible && !isConvertModalVisible
 

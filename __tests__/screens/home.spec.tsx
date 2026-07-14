@@ -1475,7 +1475,7 @@ describe("HomeScreen wind-down states", () => {
     await flushEffects()
   })
 
-  it("enters the migration flow from the migrate-now prompt", async () => {
+  it("enters the migration flow from the migrate-now prompt, dismissing it first", async () => {
     mockMigratePromptVisible = true
 
     render(
@@ -1486,12 +1486,32 @@ describe("HomeScreen wind-down states", () => {
 
     await flushEffects()
 
-    const { onMigrate, toggleModal } = mockMigrateNowModal.mock.calls[0][0]
+    const { onMigrate } = mockMigrateNowModal.mock.calls[0][0]
     onMigrate()
+
+    expect(mockDismissMigratePrompt).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
+    expect(mockDismissMigratePrompt.mock.invocationCallOrder[0]).toBeLessThan(
+      mockNavigate.mock.invocationCallOrder[0],
+    )
+  })
+
+  it("dismisses the prompt for the session from the modal close action", async () => {
+    mockMigratePromptVisible = true
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const { toggleModal } = mockMigrateNowModal.mock.calls[0][0]
     toggleModal()
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
     expect(mockDismissMigratePrompt).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationEntry")
   })
 
   it("greys out the receive action while receiving is disabled, reopening the prompt", async () => {
