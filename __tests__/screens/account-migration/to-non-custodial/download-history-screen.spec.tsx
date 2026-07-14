@@ -46,6 +46,12 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  ...jest.requireActual("@app/utils/toast"),
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
+}))
+
 const walletsData = {
   data: {
     me: {
@@ -85,7 +91,7 @@ describe("MigrationDownloadHistoryScreen", () => {
       navigateToCheckpoint: mockNavigateToCheckpoint,
       loading: false,
     })
-    mockExportCsv.mockResolvedValue(undefined)
+    mockExportCsv.mockResolvedValue(true)
   })
 
   it("renders the clock hero, title, body and both actions", async () => {
@@ -124,7 +130,7 @@ describe("MigrationDownloadHistoryScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("reports the error and stays on screen when the export fails", async () => {
+  it("reports the error with a visible toast and stays on screen when the export fails", async () => {
     mockExportCsv.mockRejectedValue(new Error("export failed"))
     renderScreen()
     await flushEffects()
@@ -132,7 +138,22 @@ describe("MigrationDownloadHistoryScreen", () => {
     pressDownload()
 
     await waitFor(() => expect(mockReportError).toHaveBeenCalled())
+    expect(mockToastShow).toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
+    expect(screen.getByText(LL.common.skip())).toBeTruthy()
+  })
+
+  it("keeps the secondary action on Skip when the user dismisses the share sheet", async () => {
+    mockExportCsv.mockResolvedValue(false)
+    renderScreen()
+    await flushEffects()
+
+    pressDownload()
+
+    await waitFor(() => expect(mockExportCsv).toHaveBeenCalled())
+    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(screen.getByText(LL.common.skip())).toBeTruthy()
+    expect(screen.queryByText(LL.common.continue())).toBeNull()
   })
 
   it("allows downloading multiple times before continuing", async () => {

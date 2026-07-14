@@ -25,22 +25,28 @@ const CSV_MIME_TYPE = "text/comma-separated-values"
 const buildCsvFilename = (): string =>
   Platform.OS === "android" ? CSV_BASENAME : `${CSV_BASENAME}.${CSV_EXTENSION}`
 
-/** Fetches the backend-rendered transaction CSV and opens the native share sheet. */
+/**
+ * Fetches the backend-rendered transaction CSV and opens the native share sheet.
+ * Resolves true when the sheet completes and false when the user dismisses it; a
+ * dismissal is a choice, not a failure, so only real errors reject.
+ */
 export const useExportTransactionsCsv = () => {
   const [fetchCsvTransactions, { loading }] = useExportCsvSettingLazyQuery({
     fetchPolicy: "network-only",
   })
 
-  const exportCsv = async (walletIds: string[]): Promise<void> => {
+  const exportCsv = async (walletIds: string[]): Promise<boolean> => {
     const { data } = await fetchCsvTransactions({ variables: { walletIds } })
     const csvEncoded = data?.me?.defaultAccount?.csvTransactions
     if (!csvEncoded) throw new Error("csvTransactions missing from the response")
-    await Share.open({
+    const result = await Share.open({
       title: CSV_BASENAME,
       filename: buildCsvFilename(),
       url: `data:${CSV_MIME_TYPE};base64,${csvEncoded}`,
       type: CSV_MIME_TYPE,
+      failOnCancel: false,
     })
+    return result.success
   }
 
   return { exportCsv, loading }

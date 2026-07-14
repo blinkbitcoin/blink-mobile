@@ -5,6 +5,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getWalletIds } from "@app/graphql/wallets-utils"
 import { useExportTransactionsCsv } from "@app/hooks/use-export-transactions-csv"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { toastShow } from "@app/utils/toast"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { SettingsRow } from "../row"
@@ -25,7 +26,7 @@ export const ExportCsvSetting: React.FC = () => {
       if (err instanceof Error) {
         crashlytics().recordError(err)
       }
-      console.error(err)
+      toastShow({ message: LL.SettingsScreen.csvTransactionsError(), LL })
     }
   }
 

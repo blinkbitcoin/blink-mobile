@@ -15,6 +15,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useMigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
+import { toastShow } from "@app/utils/toast"
 
 export const MigrationDownloadHistoryScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -41,14 +42,17 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
   const handleDownload = useCallback(async () => {
     setIsDownloading(true)
     try {
-      await exportCsv(walletIds)
-      setHasDownloaded(true)
+      /** A dismissed share sheet resolves false: not an error, but not a download
+       *  either, so the secondary action keeps reading Skip. */
+      const didShare = await exportCsv(walletIds)
+      if (didShare) setHasDownloaded(true)
     } catch (err) {
       reportError("Migration transaction history export", err)
+      toastShow({ message: LL.SettingsScreen.csvTransactionsError(), LL })
     } finally {
       setIsDownloading(false)
     }
-  }, [exportCsv, walletIds])
+  }, [exportCsv, walletIds, LL])
 
   return (
     <Screen preset="fixed">

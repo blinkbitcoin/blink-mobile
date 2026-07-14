@@ -49,8 +49,32 @@ describe("useExportTransactionsCsv", () => {
         title: "blink-transactions",
         url: `data:text/comma-separated-values;base64,${CSV_BASE64}`,
         type: "text/comma-separated-values",
+        failOnCancel: false,
       }),
     )
+  })
+
+  it("resolves true when the share sheet completes", async () => {
+    const { result } = renderHook(() => useExportTransactionsCsv())
+
+    let didShare: boolean | undefined
+    await act(async () => {
+      didShare = await result.current.exportCsv(["btc-1"])
+    })
+
+    expect(didShare).toBe(true)
+  })
+
+  it("resolves false without rejecting when the user dismisses the share sheet", async () => {
+    mockShareOpen.mockResolvedValue({ success: false, dismissedAction: true })
+    const { result } = renderHook(() => useExportTransactionsCsv())
+
+    let didShare: boolean | undefined
+    await act(async () => {
+      didShare = await result.current.exportCsv(["btc-1"])
+    })
+
+    expect(didShare).toBe(false)
   })
 
   it("names the file with a single .csv extension on iOS", async () => {
