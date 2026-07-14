@@ -122,8 +122,8 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(screen.getByText(LLOverview.body())).toBeTruthy()
     expect(screen.getByText(LLOverview.currentBitcoinBalance())).toBeTruthy()
     expect(screen.getByText(LLOverview.newBitcoinBalance())).toBeTruthy()
-    // The server preview mocks the 10-sat network fee: new = receiveSats, never
-    // client arithmetic.
+    /** The server preview mocks the 10-sat network fee: the new balance is receiveSats
+     *  verbatim, never client arithmetic. */
     expect(screen.getByText("BTC 1000 ($FIAT)")).toBeTruthy()
     expect(screen.getByText("BTC 990 ($FIAT)")).toBeTruthy()
     expect(screen.getByText(/Network fee:/)).toBeTruthy()
@@ -224,8 +224,8 @@ describe("MigrationBalancesOverviewScreen", () => {
     renderScreen()
     await flushEffects()
 
-    // Never zero, never blank: the restricted current row hides the amount while
-    // the unrestricted new row keeps its zero.
+    /** Never zero, never blank: the restricted current row hides the amount while the
+     *  unrestricted new row keeps its zero. */
     expect(screen.getByText(LLOverview.dollarBalanceNotAvailable())).toBeTruthy()
     expect(screen.getAllByText("USD 0")).toHaveLength(1)
   })

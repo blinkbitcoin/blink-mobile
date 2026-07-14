@@ -15,7 +15,7 @@ import {
 } from "@app/screens/account-migration/hooks"
 import { reportError } from "@app/utils/error-logging"
 
-// TODO: replace with the backend funds-transfer request; this 3s delay simulates it.
+/** TODO: replace with the backend funds-transfer request; this 3s delay simulates it. */
 const TRANSFER_SIMULATION_MS = 3000
 
 export const TransferringFundsScreen: React.FC = () => {

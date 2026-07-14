@@ -102,7 +102,7 @@ export const useMigrationCheckpoint = () => {
     })
   }, [storageKey])
 
-  // Without a provisioned account, resume from the explainer so it gets provisioned.
+  /** Without a provisioned account, resume from the explainer so it gets provisioned. */
   const resolveDestination = useCallback(
     () => resolveCheckpointRoute(accountId ? checkpoint : null),
     [checkpoint, accountId],
@@ -128,7 +128,7 @@ export const useMigrationCheckpoint = () => {
     navigation.replace(destination.name)
   }, [resolveDestination, navigation])
 
-  // A provisioned account is only stored alongside a checkpoint, so it gates resumability.
+  /** A provisioned account is only stored alongside a checkpoint, so it gates resumability. */
   const hasResumableCheckpoint = Boolean(accountId)
 
   return {

@@ -13,7 +13,7 @@ export const useWalletMnemonic = (): string => {
   const { activeAccount } = useAccountRegistry()
   const { accountId: migrationAccountId } = useMigrationCheckpoint()
 
-  // Mid-migration the active account is still custodial, so read the provisioned account.
+  /** Mid-migration the active account is still custodial, so read the provisioned account. */
   const targetAccountId = isSelfCustodial ? activeAccount?.id ?? null : migrationAccountId
 
   useEffect(() => {

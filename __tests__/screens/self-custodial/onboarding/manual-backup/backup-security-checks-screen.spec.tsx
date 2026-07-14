@@ -47,7 +47,7 @@ const tickAllChecks = (getByText: ReturnType<typeof render>["getByText"]) => {
   fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check3()))
 }
 
-describe("BackupSecurityChecksScreen — onboarding flow", () => {
+describe("BackupSecurityChecksScreen onboarding flow", () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -78,7 +78,7 @@ describe("BackupSecurityChecksScreen — onboarding flow", () => {
     })
   })
 
-  it("never navigates to the Settings view-phrase screen — onboarding stays separate from the Settings flow", async () => {
+  it("never navigates to the Settings view-phrase screen, keeping onboarding separate from the Settings flow", async () => {
     const { getByText } = await renderScreen()
     tickAllChecks(getByText)
     fireEvent.press(getByText(LL.common.continue()))

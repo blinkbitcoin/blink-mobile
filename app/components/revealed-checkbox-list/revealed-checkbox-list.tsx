@@ -36,7 +36,7 @@ export const RevealedCheckboxList: React.FC<Props> = ({
     reportRef.current(areAllChecked)
   }, [areAllChecked])
 
-  // Reveal up to the first unchecked box; monotonic, so unchecking never re-hides.
+  /** Reveal up to the first unchecked box; monotonic, so unchecking never re-hides. */
   useEffect(() => {
     const firstUnchecked = checks.findIndex((checked) => !checked)
     const target = firstUnchecked === -1 ? labels.length : firstUnchecked + 1

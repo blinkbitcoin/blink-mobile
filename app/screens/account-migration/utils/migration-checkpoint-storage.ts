@@ -2,7 +2,7 @@ import { Platform } from "react-native"
 
 import { loadJson, remove, saveJson } from "@app/utils/storage"
 
-// Values are persisted to AsyncStorage — do not rename
+/** Values are persisted to AsyncStorage: do not rename them. */
 export enum MigrationCheckpoint {
   TermsAndConditions = "termsAndConditions",
   BackupMethod = "backupMethod",

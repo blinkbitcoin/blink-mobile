@@ -11,7 +11,7 @@ type Props = {
 }
 
 /** Route-level guard: once the wind-down blocks receiving, every path into the
- *  receive screen — home button, modal, deeplink — bounces straight back home. */
+ *  receive screen (home button, modal, deeplink) bounces straight back home. */
 export const WindDownReceiveGate: React.FC<Props> = ({ children }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const isReceiveBlocked = useWindDownReceiveBlocked()

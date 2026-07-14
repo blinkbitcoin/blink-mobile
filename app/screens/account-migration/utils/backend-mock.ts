@@ -1,5 +1,5 @@
 /**
- * TODO: TEMPORARY central mock of the backend migration/wind-down contract — every value
+ * TODO: TEMPORARY central mock of the backend migration/wind-down contract: every value
  * here must be replaced by the real backend query once it is ready. Nothing outside this
  * file hardcodes wind-down data: screens read it through hooks (useWindDownStatus), so
  * swapping the mock for the real query later touches only this layer.
@@ -53,7 +53,7 @@ const toUnixSeconds = (utcMilliseconds: number): number => utcMilliseconds / 100
 const IS_ACCOUNT_AFFECTED: boolean = true
 
 /**
- * TODO: TEMPORARY — replace with the backend wind-down status query (Account.windDown)
+ * TODO: TEMPORARY, replace with the backend wind-down status query (Account.windDown)
  * once it is ready. The dates below are the published wind-down timeline; 00:00 in
  * Europe/Paris is 22:00 UTC of the previous day because August/September fall in CEST
  * (UTC+2). Change `status` here (or via the developer-screen simulations later) to see
@@ -62,18 +62,18 @@ const IS_ACCOUNT_AFFECTED: boolean = true
 export const windDownMock: WindDown | null = IS_ACCOUNT_AFFECTED
   ? {
       status: WindDownStatus.PreCutoff,
-      /** Aug 1 2026, 00:00 Europe/Paris — receiving disabled from this moment. */
+      /** Aug 1 2026, 00:00 Europe/Paris: receiving disabled from this moment. */
       receiveDisabledAt: toUnixSeconds(Date.UTC(2026, 6, 31, 22, 0, 0)),
-      /** Aug 31 2026, end of day Europe/Paris — last day to initiate an exit. */
+      /** Aug 31 2026, end of day Europe/Paris: last day to initiate an exit. */
       finalDeadline: toUnixSeconds(Date.UTC(2026, 7, 31, 21, 59, 59)),
-      /** Sep 1 2026, 00:00 Europe/Paris — the blocking migration gate arms. */
+      /** Sep 1 2026, 00:00 Europe/Paris: the blocking migration gate arms. */
       gateArmsAt: toUnixSeconds(Date.UTC(2026, 7, 31, 22, 0, 0)),
       timezone: "Europe/Paris",
     }
   : null
 
 /**
- * TODO: TEMPORARY — remove once the backend serves the wind-down state. A mocked "today"
+ * TODO: TEMPORARY, remove once the backend serves the wind-down state. A mocked "today"
  * (Jul 9 2026, inside the pre-cutoff window) so simulations can reason about "where in
  * the timeline are we" consistently with the dates above; the real client never compares
  * dates to decide the phase, it obeys `status`.
@@ -97,7 +97,7 @@ const MOCK_NETWORK_FEE_SATS = 10
 const MOCK_DE_MINIMIS_THRESHOLD_SATS = 100
 
 /**
- * TODO: TEMPORARY — replace with the backend migration preview query once it ships.
+ * TODO: TEMPORARY, replace with the backend migration preview query once it ships.
  * Replicates the backend getMigrationPreview branch by branch: zero balance gets a zero
  * preview, a balance at or below the de-minimis threshold (100 sats) has its fee covered
  * by Blink and transfers whole, and anything above pays the network fee (mocked at the

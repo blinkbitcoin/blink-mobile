@@ -23,7 +23,7 @@ type CompleteBackupOptions = {
 
 /**
  * Records a finished backup and routes onward, shared by every backup method. A migration
- * continues to the balances overview — the commit point where Approve starts the transfer; a
+ * continues to the balances overview (the commit point where Approve starts the transfer); a
  * standalone backup marks the active self-custodial account and finishes.
  */
 export const useCompleteBackup = () => {
