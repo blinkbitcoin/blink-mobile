@@ -10,6 +10,7 @@ import { disconnectSdk } from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
+import { removeRecoveryBundleSettings } from "@app/self-custodial/recovery-bundle/settings"
 import {
   deleteRecoveryBundleFile,
   removeRecoveryBundleState,
@@ -101,6 +102,11 @@ export const useDeleteAccount = (): DeleteAccountResult => {
               )
             })
         }
+        await removeRecoveryBundleSettings(accountId).catch((err) => {
+          crashlytics().log(
+            `[self-custodial delete] recovery bundle settings cleanup failed: ${err}`,
+          )
+        })
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)
         await reloadSelfCustodialAccounts()

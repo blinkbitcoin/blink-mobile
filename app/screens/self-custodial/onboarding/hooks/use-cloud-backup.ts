@@ -124,7 +124,9 @@ export const useCloudBackup = ({
       return
     }
 
-    setBackupCompleted(BackupMethod.Cloud)
+    setBackupCompleted(BackupMethod.Cloud, {
+      cloudPasswordProtected: isEncrypted && password.length > 0,
+    })
     logSelfCustodialBackupCompleted({
       backupMethod: Platform.OS === "ios" ? "icloud" : "google_drive",
     })

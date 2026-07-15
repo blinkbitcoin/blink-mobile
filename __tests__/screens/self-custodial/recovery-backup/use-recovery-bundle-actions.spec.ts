@@ -17,7 +17,10 @@ const mockUseClipboard = jest.fn()
 const mockUseAccountRegistry = jest.fn()
 const mockRefreshRecoveryBundle = jest.fn()
 const mockSyncExistingBundleToCloud = jest.fn()
+const mockIsCloudSyncAllowedFor = jest.fn()
 const mockMarkCloudSynced = jest.fn()
+const mockReadRecoveryBundleSettings = jest.fn()
+const mockWriteRecoveryBundleSettings = jest.fn()
 const mockLoadEncryptedBundleFile = jest.fn()
 const mockReadRecoveryBundleState = jest.fn()
 const mockDecryptBundleBackupPayload = jest.fn()
@@ -81,7 +84,17 @@ jest.mock("@app/self-custodial/recovery-bundle/refresh", () => ({
     mockRefreshRecoveryBundle(...args),
   syncExistingBundleToCloud: (...args: readonly unknown[]) =>
     mockSyncExistingBundleToCloud(...args),
+  isCloudSyncAllowedFor: (...args: readonly unknown[]) =>
+    mockIsCloudSyncAllowedFor(...args),
   markCloudSynced: (...args: readonly unknown[]) => mockMarkCloudSynced(...args),
+}))
+
+jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
+  ...jest.requireActual("@app/self-custodial/recovery-bundle/settings"),
+  readRecoveryBundleSettings: (...args: readonly unknown[]) =>
+    mockReadRecoveryBundleSettings(...args),
+  writeRecoveryBundleSettings: (...args: readonly unknown[]) =>
+    mockWriteRecoveryBundleSettings(...args),
 }))
 
 jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
@@ -125,6 +138,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         noBundleToExport: () => "No recovery backup saved yet",
         exportFailed: () => "Could not export the recovery backup",
         cloudUploadSuccess: () => "Recovery backup uploaded",
+        settingUpdateFailed: () => "Could not save the setting",
       },
     },
   }),
@@ -165,6 +179,12 @@ describe("useRecoveryBundleActions", () => {
     })
     mockRefreshRecoveryBundle.mockResolvedValue({ success: true, state: savedState })
     mockSyncExistingBundleToCloud.mockResolvedValue(false)
+    mockIsCloudSyncAllowedFor.mockResolvedValue(true)
+    mockReadRecoveryBundleSettings.mockResolvedValue({
+      autoRefresh: true,
+      cloudSync: false,
+    })
+    mockWriteRecoveryBundleSettings.mockResolvedValue(undefined)
     mockMarkCloudSynced.mockResolvedValue(null)
     mockStartSession.mockResolvedValue({ success: true, session })
     mockUpload.mockResolvedValue({ success: true })
@@ -302,6 +322,21 @@ describe("useRecoveryBundleActions", () => {
   })
 
   describe("handleCloudUpload", () => {
+    it("does nothing when cloud sync is not allowed (opt-out or passwordless seed backup)", async () => {
+      mockIsCloudSyncAllowedFor.mockResolvedValue(false)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleCloudUpload()
+      })
+
+      // The interactive fallback would bypass the sync path's internal gate,
+      // so the action must not reach either upload path (PRD rule D9).
+      expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
+      expect(mockStartSession).not.toHaveBeenCalled()
+      expect(mockUpload).not.toHaveBeenCalled()
+    })
+
     it("silent path: reloads state and shows the upload-success toast without an interactive session", async () => {
       mockSyncExistingBundleToCloud.mockResolvedValue(true)
       const synced = { ...savedState, cloudSyncedAt: 1_700_000_222_000 }
@@ -375,6 +410,100 @@ describe("useRecoveryBundleActions", () => {
         expect.objectContaining({ message: "Could not export the recovery backup" }),
       )
       expect(result.current.uploading).toBe(false)
+    })
+  })
+
+  describe("settings toggles", () => {
+    it("exposes the defaults before the first load: auto refresh on, cloud sync off", () => {
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      expect(result.current.settings).toEqual({ autoRefresh: true, cloudSync: false })
+    })
+
+    it("reloadState loads the stored settings alongside the bundle state", async () => {
+      mockReadRecoveryBundleSettings.mockResolvedValue({
+        autoRefresh: false,
+        cloudSync: true,
+      })
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.reloadState()
+      })
+
+      expect(mockReadRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID)
+      expect(result.current.settings).toEqual({ autoRefresh: false, cloudSync: true })
+    })
+
+    it("handleSetAutoRefresh persists the flag for the account", async () => {
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleSetAutoRefresh(false)
+      })
+
+      expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID, {
+        autoRefresh: false,
+        cloudSync: false,
+      })
+      expect(result.current.settings.autoRefresh).toBe(false)
+      expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
+    })
+
+    it("handleSetCloudSync(true) persists the opt-in and syncs the existing bundle right away", async () => {
+      mockSyncExistingBundleToCloud.mockResolvedValue(true)
+      const synced = { ...savedState, cloudSyncedAt: 1_700_000_444_000 }
+      mockReadRecoveryBundleState.mockResolvedValue(synced)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleSetCloudSync(true)
+      })
+
+      expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID, {
+        autoRefresh: true,
+        cloudSync: true,
+      })
+      expect(mockSyncExistingBundleToCloud).toHaveBeenCalledWith(
+        ACCOUNT_ID,
+        mockSparkNetwork.Regtest,
+      )
+      expect(result.current.bundleState).toEqual(synced)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Recovery backup uploaded",
+          type: "success",
+        }),
+      )
+    })
+
+    it("handleSetCloudSync(false) persists the opt-out without syncing", async () => {
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleSetCloudSync(false)
+      })
+
+      expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID, {
+        autoRefresh: true,
+        cloudSync: false,
+      })
+      expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
+    })
+
+    it("reverts the toggle and toasts when persisting fails", async () => {
+      mockWriteRecoveryBundleSettings.mockRejectedValue(new Error("disk full"))
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleSetCloudSync(true)
+      })
+
+      expect(result.current.settings.cloudSync).toBe(false)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Could not save the setting" }),
+      )
+      expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
     })
   })
 

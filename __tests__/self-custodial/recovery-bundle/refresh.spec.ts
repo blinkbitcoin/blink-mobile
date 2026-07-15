@@ -3,6 +3,7 @@ import { Network } from "@breeztech/breez-sdk-spark-react-native"
 const mockFetchRecoveryBundle = jest.fn()
 const mockAttemptSilentCloudUpload = jest.fn()
 const mockReadBackupStateFor = jest.fn()
+const mockReadRecoveryBundleSettings = jest.fn()
 const mockSaveEncryptedBundleFile = jest.fn()
 const mockLoadEncryptedBundleFile = jest.fn()
 const mockReadRecoveryBundleState = jest.fn()
@@ -46,7 +47,7 @@ jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
   writeRecoveryBundleState: (...args: unknown[]) => mockWriteRecoveryBundleState(...args),
 }))
 
-// Keep the real gate (and the real status/method constants) so the cloud
+// Keep the real gates (and the real status/method constants) so the cloud
 // gating under test is production code, not a spec-side re-implementation.
 // Only the storage read is stubbed.
 jest.mock("@app/self-custodial/providers/backup-state", () => {
@@ -55,9 +56,16 @@ jest.mock("@app/self-custodial/providers/backup-state", () => {
     BackupStatus: actual.BackupStatus,
     BackupMethod: actual.BackupMethod,
     isCloudSeedBackupCompleted: actual.isCloudSeedBackupCompleted,
+    isPasswordProtectedCloudSeedBackup: actual.isPasswordProtectedCloudSeedBackup,
     readBackupStateFor: (...args: unknown[]) => mockReadBackupStateFor(...args),
   }
 })
+
+jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
+  ...jest.requireActual("@app/self-custodial/recovery-bundle/settings"),
+  readRecoveryBundleSettings: (...args: unknown[]) =>
+    mockReadRecoveryBundleSettings(...args),
+}))
 
 import { BackupMethod, BackupStatus } from "@app/self-custodial/providers/backup-state"
 import {
@@ -91,7 +99,17 @@ const testState = {
   cloudSyncedAt: null,
 }
 
-const cloudBackupState = { status: BackupStatus.Completed, method: BackupMethod.Cloud }
+const cloudBackupState = {
+  status: BackupStatus.Completed,
+  method: BackupMethod.Cloud,
+  cloudPasswordProtected: true,
+}
+// A cloud seed backup saved WITHOUT an extra password: the seed-encrypted
+// bundle must never be uploaded next to it (PRD rule D9).
+const passwordlessCloudBackupState = {
+  status: BackupStatus.Completed,
+  method: BackupMethod.Cloud,
+}
 const manualBackupState = { status: BackupStatus.Completed, method: BackupMethod.Manual }
 
 const refreshParams = {
@@ -106,6 +124,11 @@ beforeEach(() => {
   mockFetchRecoveryBundle.mockResolvedValue(testBundle)
   mockReadRecoveryBundleState.mockResolvedValue(null)
   mockAttemptSilentCloudUpload.mockResolvedValue({ success: true })
+  // Cloud sync opted in by default here; the opt-out cases flip it per test.
+  mockReadRecoveryBundleSettings.mockResolvedValue({
+    autoRefresh: true,
+    cloudSync: true,
+  })
   mockParseBundleBackupMetadata.mockImplementation((raw: string) => {
     const parsed = JSON.parse(raw)
     return {
@@ -117,7 +140,7 @@ beforeEach(() => {
 })
 
 describe("refreshRecoveryBundle cloud gating", () => {
-  it("uploads to the cloud when the seed backup method is cloud", async () => {
+  it("uploads to the cloud when sync is opted in and the cloud seed backup is password-protected", async () => {
     mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
     mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
 
@@ -133,6 +156,31 @@ describe("refreshRecoveryBundle cloud gating", () => {
       expect.any(String),
       "blink-spark-recovery-bundle-mainnet-02abcdef.json",
     )
+  })
+
+  it("skips the cloud upload when the user has not opted in to cloud sync", async () => {
+    mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
+    mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
+    mockReadRecoveryBundleSettings.mockResolvedValue({
+      autoRefresh: true,
+      cloudSync: false,
+    })
+
+    const result = await refreshRecoveryBundle(refreshParams)
+
+    expect(result.success).toBe(true)
+    expect(mockSaveEncryptedBundleFile).toHaveBeenCalledTimes(1)
+    expect(mockAttemptSilentCloudUpload).not.toHaveBeenCalled()
+  })
+
+  it("skips the cloud upload when the cloud seed backup has no password (D9)", async () => {
+    mockReadBackupStateFor.mockResolvedValue(passwordlessCloudBackupState)
+    mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
+
+    const result = await refreshRecoveryBundle(refreshParams)
+
+    expect(result.success).toBe(true)
+    expect(mockAttemptSilentCloudUpload).not.toHaveBeenCalled()
   })
 
   it("skips the cloud upload when the seed backup is manual", async () => {
@@ -258,6 +306,25 @@ describe("syncExistingBundleToCloud", () => {
 
     expect(await syncExistingBundleToCloud(ACCOUNT_ID, Network.Mainnet)).toBe(false)
     expect(mockLoadEncryptedBundleFile).not.toHaveBeenCalled()
+  })
+
+  it("does nothing when cloud sync is not opted in", async () => {
+    mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
+    mockReadRecoveryBundleSettings.mockResolvedValue({
+      autoRefresh: true,
+      cloudSync: false,
+    })
+
+    expect(await syncExistingBundleToCloud(ACCOUNT_ID, Network.Mainnet)).toBe(false)
+    expect(mockLoadEncryptedBundleFile).not.toHaveBeenCalled()
+  })
+
+  it("does nothing when the cloud seed backup is not password-protected (D9)", async () => {
+    mockReadBackupStateFor.mockResolvedValue(passwordlessCloudBackupState)
+
+    expect(await syncExistingBundleToCloud(ACCOUNT_ID, Network.Mainnet)).toBe(false)
+    expect(mockLoadEncryptedBundleFile).not.toHaveBeenCalled()
+    expect(mockAttemptSilentCloudUpload).not.toHaveBeenCalled()
   })
 
   it("does nothing when no bundle is saved yet", async () => {

@@ -4,21 +4,27 @@
  * Single-flight per account - payment bursts and manual refreshes share the
  * in-flight run instead of hammering the operators.
  *
- * Cloud sync follows the wallet's seed backup: the bundle is uploaded only
- * when the user completed a cloud seed backup (iCloud/Google Drive), and it
- * goes to the same provider. The uploaded payload is always the seed-encrypted
- * one, regardless of whether the seed backup itself used an extra password.
+ * Cloud sync follows the wallet's seed backup and is opt-in: the bundle is
+ * uploaded only when the user enabled cloud sync AND completed a cloud seed
+ * backup (iCloud/Google Drive) protected by an extra password, and it goes to
+ * the same provider. The password gate exists because the uploaded payload is
+ * seed-encrypted - next to an unencrypted seed in the same cloud account it
+ * would be decryptable on the spot (blink-specs PRD rule D9).
  */
 
 import { type Network } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { networkLabelFor } from "../config"
-import { isCloudSeedBackupCompleted, readBackupStateFor } from "../providers/backup-state"
+import {
+  isPasswordProtectedCloudSeedBackup,
+  readBackupStateFor,
+} from "../providers/backup-state"
 
 import { attemptSilentCloudUpload, getRecoveryBundleFilename } from "./cloud"
 import { buildEncryptedBundlePayload, parseBundleBackupMetadata } from "./encryption"
 import { fetchRecoveryBundle } from "./exporter"
+import { readRecoveryBundleSettings } from "./settings"
 import {
   loadEncryptedBundleFile,
   readRecoveryBundleState,
@@ -65,17 +71,30 @@ export const markCloudSynced = async (
 }
 
 /**
+ * Single definition of "the bundle may be stored in the cloud": the user
+ * opted in AND the cloud seed backup is password-protected (D9). Screen and
+ * sync path both use this so they cannot diverge on it.
+ */
+export const isCloudSyncAllowedFor = async (accountId: string): Promise<boolean> => {
+  const [settings, backupState] = await Promise.all([
+    readRecoveryBundleSettings(accountId),
+    readBackupStateFor(accountId),
+  ])
+  return settings.cloudSync && isPasswordProtectedCloudSeedBackup(backupState)
+}
+
+/**
  * Uploads the already-saved encrypted bundle to the seed backup's cloud
- * provider. No-op (false) when no cloud seed backup is set up, no bundle is
- * saved yet, or the silent upload fails. Used after each refresh and when the
- * user completes cloud seed backup with a bundle already on disk.
+ * provider. No-op (false) when cloud sync is not allowed (not opted in, or no
+ * password-protected cloud seed backup), no bundle is saved yet, or the
+ * silent upload fails. Used after each refresh and when the user turns cloud
+ * sync on with a bundle already on disk.
  */
 export const syncExistingBundleToCloud = async (
   accountId: string,
   network: Network,
 ): Promise<boolean> => {
-  const backupState = await readBackupStateFor(accountId)
-  if (!isCloudSeedBackupCompleted(backupState)) return false
+  if (!(await isCloudSyncAllowedFor(accountId))) return false
 
   const payload = await loadEncryptedBundleFile(accountId, network)
   if (!payload) return false

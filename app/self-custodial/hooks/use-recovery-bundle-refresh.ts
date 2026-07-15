@@ -16,6 +16,7 @@ import {
   refreshRecoveryBundle,
   syncExistingBundleToCloud,
 } from "../recovery-bundle/refresh"
+import { readRecoveryBundleSettings } from "../recovery-bundle/settings"
 import { readRecoveryBundleState } from "../recovery-bundle/storage"
 import { isCloudSeedBackupCompleted, useBackupState } from "../providers/backup-state"
 import { useSelfCustodialWallet } from "../providers/wallet"
@@ -38,9 +39,12 @@ const isBenignExportError = (error: unknown): boolean =>
 /**
  * Keeps the unilateral-exit recovery bundle fresh: refreshes it after every
  * send/receive (the SDK's PaymentSucceeded fires for both directions) and on
- * startup when the saved bundle is stale or missing. Errors are recorded to
- * crashlytics, never surfaced - the Recovery Backup screen shows freshness
- * and offers a manual refresh.
+ * startup when the saved bundle is stale or missing. The user can opt out of
+ * automatic refresh (to save mobile data); the setting is checked when a
+ * scheduled refresh fires, so a change on the Recovery Backup screen takes
+ * effect without this hook remounting. Errors are recorded to crashlytics,
+ * never surfaced - the Recovery Backup screen shows freshness and offers a
+ * manual refresh.
  */
 export const useRecoveryBundleRefresh = (): void => {
   const { activeAccount } = useAccountRegistry()
@@ -89,6 +93,9 @@ export const useRecoveryBundleRefresh = (): void => {
     const currentAccountId = accountId
 
     const runRefresh = async () => {
+      const settings = await readRecoveryBundleSettings(currentAccountId)
+      if (!settings.autoRefresh) return
+
       const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(currentAccountId)
       if (!mnemonic) return
 

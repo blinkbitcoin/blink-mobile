@@ -20,6 +20,7 @@ const MNEMONIC = "test mnemonic words"
 const mockRefreshRecoveryBundle = jest.fn()
 const mockSyncExistingBundleToCloud = jest.fn()
 const mockReadRecoveryBundleState = jest.fn()
+const mockReadRecoveryBundleSettings = jest.fn()
 const mockGetMnemonicForAccount = jest.fn()
 const mockUseAccountRegistry = jest.fn()
 const mockUseSelfCustodialWallet = jest.fn()
@@ -69,6 +70,12 @@ jest.mock("@app/self-custodial/recovery-bundle/refresh", () => {
 
 jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
   readRecoveryBundleState: (...args: unknown[]) => mockReadRecoveryBundleState(...args),
+}))
+
+jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
+  ...jest.requireActual("@app/self-custodial/recovery-bundle/settings"),
+  readRecoveryBundleSettings: (...args: unknown[]) =>
+    mockReadRecoveryBundleSettings(...args),
 }))
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
@@ -131,6 +138,10 @@ describe("useRecoveryBundleRefresh", () => {
       backupState: { status: "none", method: null },
     })
     mockGetMnemonicForAccount.mockResolvedValue(MNEMONIC)
+    mockReadRecoveryBundleSettings.mockResolvedValue({
+      autoRefresh: true,
+      cloudSync: false,
+    })
     mockRefreshRecoveryBundle.mockResolvedValue({
       success: true,
       state: bundleState(),
@@ -268,6 +279,41 @@ describe("useRecoveryBundleRefresh", () => {
       await flushMicrotasks()
 
       await advance(STALE_AFTER_MS)
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("auto-refresh opt-out", () => {
+    it("skips the payment-driven refresh when automatic refresh is turned off", async () => {
+      mockReadRecoveryBundleSettings.mockResolvedValue({
+        autoRefresh: false,
+        cloudSync: false,
+      })
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+
+      renderHook(() => useRecoveryBundleRefresh())
+      await advance(PAYMENT_DEBOUNCE_MS)
+
+      // The setting is read when the timer fires, so a change made on the
+      // Recovery Backup screen applies without a remount - and no mnemonic
+      // is even fetched for a skipped run.
+      expect(mockReadRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_A_ID)
+      expect(mockGetMnemonicForAccount).not.toHaveBeenCalled()
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+    })
+
+    it("skips the startup staleness refresh when automatic refresh is turned off", async () => {
+      mockReadRecoveryBundleSettings.mockResolvedValue({
+        autoRefresh: false,
+        cloudSync: false,
+      })
+      setWallet(ActiveWalletStatus.Ready, null)
+      mockReadRecoveryBundleState.mockResolvedValue(null)
+
+      renderHook(() => useRecoveryBundleRefresh())
+      await flushMicrotasks()
+      await advance(STARTUP_DELAY_MS)
+
       expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
     })
   })

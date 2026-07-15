@@ -3788,7 +3788,16 @@ const en: BaseTranslation = {
     cloudSynced: "Cloud backup: {when: string}",
     cloudNotSynced: "Cloud backup: not uploaded yet",
     cloudFollowsSeedBackup:
-      "Back up your wallet to {provider: string} first and the recovery backup will be uploaded there automatically, encrypted with your backup phrase.",
+      "Back up your wallet to {provider: string} first, then you can turn on automatic cloud upload of the recovery backup here, encrypted with your backup phrase.",
+    autoRefreshLabel: "Automatic refresh",
+    autoRefreshHint:
+      "Keeps the backup fresh after every payment. Turn off to save mobile data; you can still refresh manually.",
+    cloudSyncLabel: "Cloud backup",
+    cloudSyncHint:
+      "Automatically uploads the encrypted recovery backup to {provider: string}.",
+    cloudSyncNeedsPassword:
+      "Uploading the recovery backup to {provider: string} requires your wallet backup there to be protected with a password. Re-do the wallet backup with a password to enable it.",
+    settingUpdateFailed: "Could not save the setting. Try again.",
     noBundleYet:
       "No recovery backup saved yet. It is created automatically after your first payment, or you can refresh now.",
     refreshNow: "Refresh now",

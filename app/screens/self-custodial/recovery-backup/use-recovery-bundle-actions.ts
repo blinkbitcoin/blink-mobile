@@ -18,10 +18,17 @@ import {
   RecoveryBundleExportErrorReason,
 } from "@app/self-custodial/recovery-bundle/exporter"
 import {
+  isCloudSyncAllowedFor,
   markCloudSynced,
   refreshRecoveryBundle,
   syncExistingBundleToCloud,
 } from "@app/self-custodial/recovery-bundle/refresh"
+import {
+  defaultRecoveryBundleSettings,
+  readRecoveryBundleSettings,
+  writeRecoveryBundleSettings,
+  type RecoveryBundleSettings,
+} from "@app/self-custodial/recovery-bundle/settings"
 import {
   loadEncryptedBundleFile,
   readRecoveryBundleState,
@@ -41,6 +48,7 @@ const CLIPBOARD_CLEAR_MS = 60_000
 export type RecoveryBundleActions = {
   /** undefined while the first read is in flight, null when no bundle saved. */
   bundleState: RecoveryBundleState | null | undefined
+  settings: RecoveryBundleSettings
   refreshing: boolean
   uploading: boolean
   exporting: boolean
@@ -49,6 +57,8 @@ export type RecoveryBundleActions = {
   handleShare: () => Promise<void>
   handleCopy: () => Promise<void>
   handleCloudUpload: () => Promise<void>
+  handleSetAutoRefresh: (enabled: boolean) => Promise<void>
+  handleSetCloudSync: (enabled: boolean) => Promise<void>
 }
 
 /**
@@ -70,6 +80,9 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
   const [bundleState, setBundleState] = useState<RecoveryBundleState | null | undefined>(
     undefined,
   )
+  const [settings, setSettings] = useState<RecoveryBundleSettings>(
+    defaultRecoveryBundleSettings,
+  )
   const [refreshing, setRefreshing] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [exporting, setExporting] = useState(false)
@@ -77,11 +90,16 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
   const reloadState = useCallback(async () => {
     if (!accountId) {
       setBundleState(null)
+      setSettings(defaultRecoveryBundleSettings)
       return
     }
     try {
-      const state = await readRecoveryBundleState(accountId, network)
+      const [state, storedSettings] = await Promise.all([
+        readRecoveryBundleState(accountId, network),
+        readRecoveryBundleSettings(accountId),
+      ])
       setBundleState(state)
+      setSettings(storedSettings)
     } catch (err) {
       // Degrade to "no bundle yet" instead of stranding the screen on the
       // loading spinner; the manual refresh still works from there.
@@ -192,10 +210,56 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     }
   }
 
+  const persistSettings = async (next: RecoveryBundleSettings) => {
+    if (!accountId) return
+    const previous = settings
+    setSettings(next)
+    try {
+      await writeRecoveryBundleSettings(accountId, next)
+    } catch (err) {
+      setSettings(previous)
+      recordAndToast(err, LL.RecoveryBundleScreen.settingUpdateFailed())
+      throw err
+    }
+  }
+
+  const handleSetAutoRefresh = async (enabled: boolean) => {
+    await persistSettings({ ...settings, autoRefresh: enabled }).catch(() => {})
+  }
+
+  const handleSetCloudSync = async (enabled: boolean) => {
+    try {
+      await persistSettings({ ...settings, cloudSync: enabled })
+    } catch {
+      return
+    }
+    if (!enabled || !accountId) return
+    // Opting in with a bundle already on disk: sync right away instead of
+    // waiting for the next refresh. Best-effort - the background sync path
+    // retries after every refresh.
+    try {
+      const synced = await syncExistingBundleToCloud(accountId, network)
+      if (synced) {
+        await reloadState()
+        toastShow({
+          message: LL.RecoveryBundleScreen.cloudUploadSuccess(),
+          type: "success",
+          LL,
+        })
+      }
+    } catch (err) {
+      recordAndToast(err, LL.RecoveryBundleScreen.exportFailed())
+    }
+  }
+
   const handleCloudUpload = async () => {
     if (!accountId || uploading) return
     setUploading(true)
     try {
+      // The screen only offers the button when cloud sync is enabled, but the
+      // interactive fallback below bypasses the sync path's internal gate, so
+      // re-check here (D9: never next to an unencrypted seed).
+      if (!(await isCloudSyncAllowedFor(accountId))) return
       // Silent path first (same provider the seed backup uses); fall back to
       // an interactive session when e.g. the Drive token needs a re-sign-in.
       const syncedSilently = await syncExistingBundleToCloud(accountId, network)
@@ -251,6 +315,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
 
   return {
     bundleState,
+    settings,
     refreshing,
     uploading,
     exporting,
@@ -259,5 +324,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     handleShare,
     handleCopy,
     handleCloudUpload,
+    handleSetAutoRefresh,
+    handleSetCloudSync,
   }
 }

@@ -12025,10 +12025,36 @@ type RootTranslation = {
 		 */
 		cloudNotSynced: string
 		/**
-		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}​ ​f​i​r​s​t​ ​a​n​d​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​w​i​l​l​ ​b​e​ ​u​p​l​o​a​d​e​d​ ​t​h​e​r​e​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​,​ ​e​n​c​r​y​p​t​e​d​ ​w​i​t​h​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.
+		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}​ ​f​i​r​s​t​,​ ​t​h​e​n​ ​y​o​u​ ​c​a​n​ ​t​u​r​n​ ​o​n​ ​a​u​t​o​m​a​t​i​c​ ​c​l​o​u​d​ ​u​p​l​o​a​d​ ​o​f​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​h​e​r​e​,​ ​e​n​c​r​y​p​t​e​d​ ​w​i​t​h​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.
 		 * @param {string} provider
 		 */
 		cloudFollowsSeedBackup: RequiredParams<'provider'>
+		/**
+		 * A​u​t​o​m​a​t​i​c​ ​r​e​f​r​e​s​h
+		 */
+		autoRefreshLabel: string
+		/**
+		 * K​e​e​p​s​ ​t​h​e​ ​b​a​c​k​u​p​ ​f​r​e​s​h​ ​a​f​t​e​r​ ​e​v​e​r​y​ ​p​a​y​m​e​n​t​.​ ​T​u​r​n​ ​o​f​f​ ​t​o​ ​s​a​v​e​ ​m​o​b​i​l​e​ ​d​a​t​a​;​ ​y​o​u​ ​c​a​n​ ​s​t​i​l​l​ ​r​e​f​r​e​s​h​ ​m​a​n​u​a​l​l​y​.
+		 */
+		autoRefreshHint: string
+		/**
+		 * C​l​o​u​d​ ​b​a​c​k​u​p
+		 */
+		cloudSyncLabel: string
+		/**
+		 * A​u​t​o​m​a​t​i​c​a​l​l​y​ ​u​p​l​o​a​d​s​ ​t​h​e​ ​e​n​c​r​y​p​t​e​d​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}​.
+		 * @param {string} provider
+		 */
+		cloudSyncHint: RequiredParams<'provider'>
+		/**
+		 * U​p​l​o​a​d​i​n​g​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}​ ​r​e​q​u​i​r​e​s​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​b​a​c​k​u​p​ ​t​h​e​r​e​ ​t​o​ ​b​e​ ​p​r​o​t​e​c​t​e​d​ ​w​i​t​h​ ​a​ ​p​a​s​s​w​o​r​d​.​ ​R​e​-​d​o​ ​t​h​e​ ​w​a​l​l​e​t​ ​b​a​c​k​u​p​ ​w​i​t​h​ ​a​ ​p​a​s​s​w​o​r​d​ ​t​o​ ​e​n​a​b​l​e​ ​i​t​.
+		 * @param {string} provider
+		 */
+		cloudSyncNeedsPassword: RequiredParams<'provider'>
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​s​a​v​e​ ​t​h​e​ ​s​e​t​t​i​n​g​.​ ​T​r​y​ ​a​g​a​i​n​.
+		 */
+		settingUpdateFailed: string
 		/**
 		 * N​o​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​s​a​v​e​d​ ​y​e​t​.​ ​I​t​ ​i​s​ ​c​r​e​a​t​e​d​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​a​f​t​e​r​ ​y​o​u​r​ ​f​i​r​s​t​ ​p​a​y​m​e​n​t​,​ ​o​r​ ​y​o​u​ ​c​a​n​ ​r​e​f​r​e​s​h​ ​n​o​w​.
 		 */
@@ -24321,9 +24347,33 @@ export type TranslationFunctions = {
 		 */
 		cloudNotSynced: () => LocalizedString
 		/**
-		 * Back up your wallet to {provider} first and the recovery backup will be uploaded there automatically, encrypted with your backup phrase.
+		 * Back up your wallet to {provider} first, then you can turn on automatic cloud upload of the recovery backup here, encrypted with your backup phrase.
 		 */
 		cloudFollowsSeedBackup: (arg: { provider: string }) => LocalizedString
+		/**
+		 * Automatic refresh
+		 */
+		autoRefreshLabel: () => LocalizedString
+		/**
+		 * Keeps the backup fresh after every payment. Turn off to save mobile data; you can still refresh manually.
+		 */
+		autoRefreshHint: () => LocalizedString
+		/**
+		 * Cloud backup
+		 */
+		cloudSyncLabel: () => LocalizedString
+		/**
+		 * Automatically uploads the encrypted recovery backup to {provider}.
+		 */
+		cloudSyncHint: (arg: { provider: string }) => LocalizedString
+		/**
+		 * Uploading the recovery backup to {provider} requires your wallet backup there to be protected with a password. Re-do the wallet backup with a password to enable it.
+		 */
+		cloudSyncNeedsPassword: (arg: { provider: string }) => LocalizedString
+		/**
+		 * Could not save the setting. Try again.
+		 */
+		settingUpdateFailed: () => LocalizedString
 		/**
 		 * No recovery backup saved yet. It is created automatically after your first payment, or you can refresh now.
 		 */
