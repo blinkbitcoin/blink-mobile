@@ -3572,6 +3572,11 @@
       "body": "Ja no pots rebre fons al teu compte custodial. Blink ha discontinuat el servei de custòdia a la teva regió i aquest compte quedarà inactivat al final del {date}.\n\nMigra ara a un compte no custodi.",
       "migrateCta": "Migra ara"
     },
+    "reminderBulletin": {
+      "title": "Important",
+      "body": "Migra el teu compte al nou mode no custodi abans del {date}",
+      "migrateCta": "Migra"
+    },
     "dollarBalanceModal": {
       "title": "No podem migrar el teu saldo en dòlars",
       "body": "Primer buida el teu saldo en dòlars. Pots transferir-lo al teu saldo en bitcoins a Blink o en un altre lloc."

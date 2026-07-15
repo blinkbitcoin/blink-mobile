@@ -3572,6 +3572,11 @@
       "body": "Már nem fogadhat pénzt a letétkezelt fiókjába. A Blink megszüntette a letétkezelési szolgáltatást az Ön régiójában, és ez a fiók {date} végéig inaktiválásra kerül.\n\nKöltözzön át most egy nem letétkezelt fiókba.",
       "migrateCta": "Átköltözés most"
     },
+    "reminderBulletin": {
+      "title": "Fontos",
+      "body": "Költöztesse át fiókját az új, nem letétkezelt módba {date} előtt",
+      "migrateCta": "Átköltözés"
+    },
     "dollarBalanceModal": {
       "title": "Nem tudjuk átköltöztetni a dollár egyenlegedet",
       "body": "Először ürítsd ki a dollár egyenlegedet. Átutalhatod a Bitcoin egyenlegedre a Blinkben vagy máshová."

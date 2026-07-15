@@ -3572,6 +3572,11 @@
       "body": "Huwezi tena kupokea fedha kwenye akaunti yako ya udhamini. Blink imesitisha huduma ya udhamini katika eneo lako na akaunti hii itazimwa ifikapo mwisho wa {date}.\n\nHamia sasa kwenye akaunti isiyo ya udhamini.",
       "migrateCta": "Hamia sasa"
     },
+    "reminderBulletin": {
+      "title": "Muhimu",
+      "body": "Hamisha akaunti yako kwenye hali mpya isiyo ya udhamini kabla ya {date}",
+      "migrateCta": "Hamia"
+    },
     "dollarBalanceModal": {
       "title": "Hatuwezi kuhamisha Salio lako la Dola",
       "body": "Kwanza ondoa Salio lako la Dola. Unaweza kulihamishia kwenye Salio lako la Bitcoin kwenye Blink au mahali pengine."

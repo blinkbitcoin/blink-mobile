@@ -3572,6 +3572,11 @@
       "body": "Tokyasobola kufuna ssente ku akawunti yo ekuumibwa. Blink evuddeyo mu mpeereza y'okukuuma ssente mu kitundu kyo, era akawunti eno ejja kuggalwawo nga {date} ewedde.\n\nKyusa kaakano ogende ku akawunti etakuumibwa.",
       "migrateCta": "Kyusa kaakano"
     },
+    "reminderBulletin": {
+      "title": "Kikulu",
+      "body": "Kyusa akkaawunti yo ogende ku enkola empya etakuumibwa nga {date} tennatuuka",
+      "migrateCta": "Kyusa"
+    },
     "dollarBalanceModal": {
       "title": "Tetusobola kutambuza ssente zo eza doola",
       "body": "Sooka omalewo ssente zo eza doola. Osobola okuzisindika ku ssente zo eza Bitcoin mu Blink oba awalala."

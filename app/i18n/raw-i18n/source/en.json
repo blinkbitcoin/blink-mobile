@@ -3615,6 +3615,11 @@
             "body": "You can no longer receive funds to your custodial account. Blink has discontinued custodial service in your region and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",
             "migrateCta": "Migrate now"
         },
+        "reminderBulletin": {
+            "title": "Important",
+            "body": "Migrate your account to new, non-custodial mode before {date: string}",
+            "migrateCta": "Migrate"
+        },
         "contactSupport": {
             "title": "Contact support",
             "body": "Something went wrong but don't worry your funds are safe, please contact support for assistance.\n\nYou may need this information to help support resolve your case:",

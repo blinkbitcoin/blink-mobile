@@ -171,6 +171,29 @@ jest.mock("@app/components/migrate-now-modal", () => {
   }
 })
 
+let mockReminderBulletinVisible = false
+
+jest.mock("@app/screens/account-migration/hooks/use-migration-reminder-bulletin", () => ({
+  useMigrationReminderBulletin: () => ({
+    isVisible: mockReminderBulletinVisible,
+    deadlineTimestamp: 1787003999,
+    timezone: "Europe/Paris",
+  }),
+}))
+
+const mockMigrationReminderBulletin = jest.fn()
+
+jest.mock("@app/components/migration-reminder-bulletin", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View } = jest.requireActual("react-native")
+  return {
+    MigrationReminderBulletin: (props: { onMigrate: () => void }) => {
+      mockMigrationReminderBulletin(props)
+      return ReactActual.createElement(View, { testID: "migration-reminder-bulletin" })
+    },
+  }
+})
+
 const mockUseNonCustodialConversionLimits = jest.fn()
 
 jest.mock("@app/self-custodial/hooks", () => ({
@@ -585,6 +608,7 @@ describe("HomeScreen", () => {
     mockDollarBalanceRestrictedOverride = false
     mockMigratePromptVisible = false
     mockReceiveDisabled = false
+    mockReminderBulletinVisible = false
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
     mockForcedConversionParams = null
@@ -1370,6 +1394,7 @@ describe("HomeScreen wind-down states", () => {
     mockDollarBalanceRestrictedOverride = false
     mockMigratePromptVisible = false
     mockReceiveDisabled = false
+    mockReminderBulletinVisible = false
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
     jest.clearAllMocks()
@@ -1569,5 +1594,48 @@ describe("HomeScreen wind-down states", () => {
     expect(mockReopenMigratePrompt).not.toHaveBeenCalled()
 
     mockActiveWalletOverride = null
+  })
+
+  it("shows the migration reminder bulletin in the pre-cutoff phase", async () => {
+    mockReminderBulletinVisible = true
+
+    const { findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("migration-reminder-bulletin")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  it("keeps the reminder bulletin hidden outside the pre-cutoff phase", async () => {
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("migration-reminder-bulletin")).toBeNull()
+  })
+
+  it("enters the migration flow from the reminder bulletin", async () => {
+    mockReminderBulletinVisible = true
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const { onMigrate } = mockMigrationReminderBulletin.mock.calls[0][0]
+    onMigrate()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
   })
 })

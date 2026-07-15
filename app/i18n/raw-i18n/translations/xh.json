@@ -3572,6 +3572,11 @@
       "body": "Awusakwazi ukufumana imali kwiakhawunti yakho egcinwayo. UBlink uyekile inkonzo yokugcina kummandla wakho kwaye le akhawunti iza kuvalwa ekupheleni kuka-{date}.\n\nFudukela ngoku kwiakhawunti engagcinwanga.",
       "migrateCta": "Fuduka ngoku"
     },
+    "reminderBulletin": {
+      "title": "Kubalulekile",
+      "body": "Fudukisela iakhawunti yakho kwimodi entsha engagcinwanga phambi kwe-{date}",
+      "migrateCta": "Fuduka"
+    },
     "dollarBalanceModal": {
       "title": "Asikwazi ukufudusa ibhalansi yakho yedola",
       "body": "Qala ukhuphe yonke ibhalansi yakho yedola. Ungayidlulisela kwibhalansi yakho yeBitcoin kuBlink okanye kwenye indawo."

@@ -3572,6 +3572,11 @@
             "body": "Du kannst keine Gelder mehr auf deinem verwahrten Konto empfangen. Blink hat den Verwahrdienst in deiner Region eingestellt und dieses Konto wird zum Ende des {date} deaktiviert.\n\nMigriere jetzt auf ein nicht-verwahrtes Konto.",
             "migrateCta": "Jetzt migrieren"
         },
+        "reminderBulletin": {
+            "title": "Wichtig",
+            "body": "Migriere dein Konto vor dem {date} in den neuen, nicht-verwahrten Modus",
+            "migrateCta": "Migrieren"
+        },
         "dollarBalanceModal": {
             "title": "Wir können dein Dollar-Guthaben nicht migrieren",
             "body": "Leere zuerst dein Dollar-Guthaben. Du kannst es auf dein Bitcoin-Guthaben in Blink oder anderswohin übertragen."

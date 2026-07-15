@@ -3572,6 +3572,11 @@
             "body": "Ya no puedes recibir fondos en tu cuenta custodial. Blink descontinuó el servicio custodial en tu región y esta cuenta quedará inactivada al finalizar el {date}.\n\nMigra ahora a una cuenta no custodial.",
             "migrateCta": "Migrar ahora"
         },
+        "reminderBulletin": {
+            "title": "Importante",
+            "body": "Migra tu cuenta al nuevo modo no custodial antes del {date}",
+            "migrateCta": "Migrar"
+        },
         "dollarBalanceModal": {
             "title": "No podemos migrar tu Saldo Dólar",
             "body": "Primero vacía tu Saldo Dólar. Puedes transferirlo a tu Saldo Bitcoin en Blink o a otro lugar."

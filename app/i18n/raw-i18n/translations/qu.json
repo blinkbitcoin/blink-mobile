@@ -3572,6 +3572,11 @@
       "body": "Manañam qullqita chaskiyta atinkichu waqaychasqa kuentaykipi. Blink-qa waqaychay ruwayta tukurqun llaqtaykipi, kay kuentaqa {date} tukukuyninpi wichq'asqa kanqa.\n\nKunan astakuy mana waqaychasqa kuentaman.",
       "migrateCta": "Kunan astakuy"
     },
+    "reminderBulletin": {
+      "title": "Ancha allin",
+      "body": "Astakuy kuentaykita musuq mana waqaychasqa modoman {date} manaraq chayamuchkaptin",
+      "migrateCta": "Astakuy"
+    },
     "dollarBalanceModal": {
       "title": "Manam dólar qullqiykita astayta atinikuchu",
       "body": "Ñawpaqta dólar qullqiykita ch'usaqyachiy. Blinkpi Bitcoin qullqiykiman utaq huk lawman apachiyta atinki."

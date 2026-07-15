@@ -3572,6 +3572,11 @@
       "body": "Na svoj zverenský účet už nemôžete prijímať prostriedky. Blink ukončil zverenskú službu vo vašom regióne a tento účet bude deaktivovaný do konca dňa {date}.\n\nPrejdite teraz na nesverenecký účet.",
       "migrateCta": "Migrovať teraz"
     },
+    "reminderBulletin": {
+      "title": "Dôležité",
+      "body": "Prejdite so svojím účtom na nový nesverenecký režim pred {date}",
+      "migrateCta": "Migrovať"
+    },
     "dollarBalanceModal": {
       "title": "Váš dolárový zostatok nemôžeme migrovať",
       "body": "Najprv vyprázdnite svoj dolárový zostatok. Môžete ho previesť na svoj bitcoinový zostatok v Blinku alebo inam."

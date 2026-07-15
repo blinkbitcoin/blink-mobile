@@ -12000,6 +12000,21 @@ type RootTranslation = {
 			 */
 			migrateCta: string
 		}
+		reminderBulletin: {
+			/**
+			 * I​m​p​o​r​t​a​n​t
+			 */
+			title: string
+			/**
+			 * M​i​g​r​a​t​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​n​e​w​,​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​m​o​d​e​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}
+			 * @param {string} date
+			 */
+			body: RequiredParams<'date'>
+			/**
+			 * M​i​g​r​a​t​e
+			 */
+			migrateCta: string
+		}
 		contactSupport: {
 			/**
 			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
@@ -24451,6 +24466,20 @@ export type TranslationFunctions = {
 			body: (arg: { date: string }) => LocalizedString
 			/**
 			 * Migrate now
+			 */
+			migrateCta: () => LocalizedString
+		}
+		reminderBulletin: {
+			/**
+			 * Important
+			 */
+			title: () => LocalizedString
+			/**
+			 * Migrate your account to new, non-custodial mode before {date}
+			 */
+			body: (arg: { date: string }) => LocalizedString
+			/**
+			 * Migrate
 			 */
 			migrateCta: () => LocalizedString
 		}

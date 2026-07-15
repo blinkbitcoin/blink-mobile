@@ -3572,6 +3572,11 @@
       "body": "Je kunt geen geld meer ontvangen op je bewaarde rekening. Blink heeft de bewaardienst in jouw regio stopgezet en deze rekening wordt tegen het einde van {date} gedeactiveerd.\n\nMigreer nu naar een niet-bewaarde rekening.",
       "migrateCta": "Migreer nu"
     },
+    "reminderBulletin": {
+      "title": "Belangrijk",
+      "body": "Migreer je rekening naar de nieuwe, niet-bewaarde modus vóór {date}",
+      "migrateCta": "Migreer"
+    },
     "dollarBalanceModal": {
       "title": "We kunnen je dollarsaldo niet migreren",
       "body": "Maak eerst je dollarsaldo leeg. Je kunt het overboeken naar je Bitcoin-saldo in Blink of ergens anders."

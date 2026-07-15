@@ -3572,6 +3572,11 @@
       "body": "Anda tidak lagi boleh menerima dana ke akaun kustodial anda. Blink telah menghentikan perkhidmatan kustodial di wilayah anda dan akaun ini akan dinyahaktifkan menjelang akhir {date}.\n\nBerpindah sekarang ke akaun bukan kustodial.",
       "migrateCta": "Pindah sekarang"
     },
+    "reminderBulletin": {
+      "title": "Penting",
+      "body": "Pindahkan akaun anda ke mod bukan kustodial yang baharu sebelum {date}",
+      "migrateCta": "Pindah"
+    },
     "dollarBalanceModal": {
       "title": "Kami tidak dapat memindahkan Baki Dolar anda",
       "body": "Kosongkan Baki Dolar anda terlebih dahulu. Anda boleh memindahkannya ke Baki Bitcoin dalam Blink atau ke tempat lain."
