@@ -160,6 +160,7 @@ jest.mock("@apollo/client", () => {
 jest.mock("@app/utils/ip-country-lookup", () => ({
   DEFAULT_ADAPTERS: [],
   resolveIpCountryCode: jest.fn(async () => undefined),
+  resolveIpCountryCodeCached: jest.fn(async () => undefined),
 }))
 
 /** The fake Apollo client above has no writeQuery, so the real updateCountryCode would throw and warn on every device-location render. */
