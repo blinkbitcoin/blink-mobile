@@ -1,6 +1,7 @@
 import {
   getStableTokenTransferBlocked,
   withStableTokenTransferBlocked,
+  withoutStableTokenTransferBlocked,
 } from "@app/store/persistent-state/stable-token-transfer-block"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 
@@ -43,6 +44,31 @@ describe("withStableTokenTransferBlocked", () => {
     const snapshot = JSON.parse(JSON.stringify(original))
 
     withStableTokenTransferBlocked(original)
+
+    expect(original).toEqual(snapshot)
+  })
+})
+
+describe("withoutStableTokenTransferBlocked", () => {
+  it("clears the flag when set", () => {
+    expect(
+      getStableTokenTransferBlocked(
+        withoutStableTokenTransferBlocked(withStableTokenTransferBlocked(baseState)),
+      ),
+    ).toBe(false)
+  })
+
+  it("keeps the flag cleared when already unset", () => {
+    expect(
+      getStableTokenTransferBlocked(withoutStableTokenTransferBlocked(baseState)),
+    ).toBe(false)
+  })
+
+  it("does not mutate the input state", () => {
+    const original: PersistentState = { ...baseState, stableTokenTransferBlocked: true }
+    const snapshot = JSON.parse(JSON.stringify(original))
+
+    withoutStableTokenTransferBlocked(original)
 
     expect(original).toEqual(snapshot)
   })

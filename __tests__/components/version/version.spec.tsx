@@ -4,11 +4,10 @@ import { render } from "@testing-library/react-native"
 
 import { VersionComponent } from "@app/components/version"
 
-const mockUseDeviceLocation = jest.fn()
+const mockUseRegistrationCountry = jest.fn()
 
-jest.mock("@app/hooks/use-device-location", () => ({
-  __esModule: true,
-  default: () => mockUseDeviceLocation(),
+jest.mock("@app/hooks/use-registration-country", () => ({
+  useRegistrationCountry: () => mockUseRegistrationCountry(),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -43,11 +42,11 @@ jest.mock("@rn-vui/themed", () => ({
 
 describe("VersionComponent", () => {
   beforeEach(() => {
-    mockUseDeviceLocation.mockReset()
+    mockUseRegistrationCountry.mockReset()
   })
 
-  it("shows the device-detected country below the version", () => {
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
+  it("shows the registration country below the version", () => {
+    mockUseRegistrationCountry.mockReturnValue({ countryCode: "HK" })
 
     const { getByText } = render(<VersionComponent />)
 
@@ -55,7 +54,7 @@ describe("VersionComponent", () => {
   })
 
   it("falls back to the unknown label when the country is not detected", () => {
-    mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
+    mockUseRegistrationCountry.mockReturnValue({ countryCode: undefined })
 
     const { getByText } = render(<VersionComponent />)
 

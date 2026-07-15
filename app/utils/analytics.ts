@@ -186,3 +186,48 @@ export const logAppFeedback = (params: LogAppFeedbackParams) => {
     is_enjoying_app: params.isEnjoingApp,
   })
 }
+
+type LogRegistrationCountryPersistedParams = {
+  countryCode: string
+  source: "phone" | "ip"
+}
+
+/** The wallet's registration country was pinned (first-seen or phone-derived). */
+export const logRegistrationCountryPersisted = (
+  params: LogRegistrationCountryPersistedParams,
+) => {
+  analytics().logEvent("registration_country_persisted", {
+    country_code: params.countryCode,
+    source: params.source,
+  })
+}
+
+type LogRegistrationCountryDeferredParams = {
+  countryCode: string
+}
+
+/** Pinning was skipped because the IP is a flagged VPN/proxy exit (#3907). */
+export const logRegistrationCountryPersistDeferred = (
+  params: LogRegistrationCountryDeferredParams,
+) => {
+  analytics().logEvent("registration_country_persist_deferred", {
+    country_code: params.countryCode,
+  })
+}
+
+type LogRegionRestrictionClearedParams = {
+  restriction: "dollar_balance" | "transfer"
+  accountType: string
+  countryCode: string
+}
+
+/** A persisted region-restriction flag self-healed off trusted allowed evidence. */
+export const logRegionRestrictionCleared = (
+  params: LogRegionRestrictionClearedParams,
+) => {
+  analytics().logEvent("region_restriction_cleared", {
+    restriction: params.restriction,
+    account_type: params.accountType,
+    country_code: params.countryCode,
+  })
+}

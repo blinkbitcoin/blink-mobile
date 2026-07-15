@@ -1,6 +1,7 @@
 import {
   getStableTokenRestricted,
   withStableTokenRestricted,
+  withoutStableTokenRestricted,
 } from "@app/store/persistent-state/stable-token-restriction"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 
@@ -39,6 +40,29 @@ describe("withStableTokenRestricted", () => {
     const snapshot = JSON.parse(JSON.stringify(original))
 
     withStableTokenRestricted(original)
+
+    expect(original).toEqual(snapshot)
+  })
+})
+
+describe("withoutStableTokenRestricted", () => {
+  it("clears the flag when set", () => {
+    expect(
+      getStableTokenRestricted(
+        withoutStableTokenRestricted(withStableTokenRestricted(baseState)),
+      ),
+    ).toBe(false)
+  })
+
+  it("keeps the flag cleared when already unset", () => {
+    expect(getStableTokenRestricted(withoutStableTokenRestricted(baseState))).toBe(false)
+  })
+
+  it("does not mutate the input state", () => {
+    const original: PersistentState = { ...baseState, stableTokenRestricted: true }
+    const snapshot = JSON.parse(JSON.stringify(original))
+
+    withoutStableTokenRestricted(original)
 
     expect(original).toEqual(snapshot)
   })

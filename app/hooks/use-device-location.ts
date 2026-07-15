@@ -114,21 +114,4 @@ const useDeviceLocation = (): DeviceLocation => {
   }
 }
 
-export const useIpCountryCode = (enabled: boolean): CountryCode | undefined => {
-  const [ipCountryCode, setIpCountryCode] = useState<CountryCode | undefined>()
-
-  useEffect(() => {
-    if (!enabled) return undefined
-    let active = true
-    resolveIpCountryCodeCached().then((code) => {
-      if (active && code) setIpCountryCode(code)
-    })
-    return () => {
-      active = false
-    }
-  }, [enabled])
-
-  return ipCountryCode
-}
-
 export default useDeviceLocation

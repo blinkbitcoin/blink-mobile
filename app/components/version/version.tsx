@@ -2,7 +2,7 @@ import * as React from "react"
 import { Pressable } from "react-native"
 import DeviceInfo from "react-native-device-info"
 
-import useDeviceLocation from "@app/hooks/use-device-location"
+import { useRegistrationCountry } from "@app/hooks/use-registration-country"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useNavigation } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -28,7 +28,8 @@ export const VersionComponent = () => {
   const styles = useStyles()
   const { navigate } = useNavigation<VersionComponentNavigationProp>()
   const { LL } = useI18nContext()
-  const { countryCode } = useDeviceLocation()
+  /** Shows the same country the region restrictions gate on, for support triage (#3907). */
+  const { countryCode } = useRegistrationCountry()
   const detectedCountry = countryCode ?? LL.common.unknown()
   const [secretMenuCounter, setSecretMenuCounter] = React.useState(0)
   React.useEffect(() => {

@@ -7,3 +7,8 @@ export const withStablesatsRestricted = (state: PersistentState): PersistentStat
   ...state,
   stablesatsRestrictedCustodial: true,
 })
+
+export const withoutStablesatsRestricted = (state: PersistentState): PersistentState => ({
+  ...state,
+  stablesatsRestrictedCustodial: false,
+})

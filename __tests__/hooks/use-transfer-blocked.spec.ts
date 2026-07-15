@@ -3,23 +3,21 @@ import { renderHook } from "@testing-library/react-native"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { AccountType } from "@app/types/wallet"
 
-const mockUseDeviceLocation = jest.fn()
+const mockUseRegistrationCountry = jest.fn()
 const mockUseRemoteConfig = jest.fn()
+const mockUseFeatureFlags = jest.fn()
 const mockUseActiveWallet = jest.fn()
 const mockUpdateState = jest.fn()
-const mockUseIpCountryCode = jest.fn()
 
 let mockPersistentState: PersistentState
 
-jest.mock("@app/hooks/use-device-location", () => ({
-  __esModule: true,
-  ...jest.requireActual("@app/hooks/use-device-location"),
-  default: () => mockUseDeviceLocation(),
-  useIpCountryCode: (enabled: boolean) => mockUseIpCountryCode(enabled),
+jest.mock("@app/hooks/use-registration-country", () => ({
+  useRegistrationCountry: () => mockUseRegistrationCountry(),
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => mockUseRemoteConfig(),
+  useFeatureFlags: () => mockUseFeatureFlags(),
 }))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
@@ -33,6 +31,12 @@ jest.mock("@app/store/persistent-state", () => ({
   }),
 }))
 
+const mockLogRegionRestrictionCleared = jest.fn()
+jest.mock("@app/utils/analytics", () => ({
+  logRegionRestrictionCleared: (...args: unknown[]) =>
+    mockLogRegionRestrictionCleared(...args),
+}))
+
 import {
   useTransferBlocked,
   useTransferBlockedSync,
@@ -44,16 +48,27 @@ const baseState: PersistentState = {
   galoyAuthToken: "",
 }
 
+const country = (countryCode: string | undefined) => ({
+  countryCode,
+  loading: false,
+  trusted: Boolean(countryCode),
+})
+
 const setup = (): void => {
   jest.clearAllMocks()
-  mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
+  mockUseRegistrationCountry.mockReturnValue({
+    countryCode: undefined,
+    loading: true,
+    trusted: false,
+  })
   mockUseRemoteConfig.mockReturnValue({
     custodialTransferBlockedCountries: ["DE"],
     selfCustodialTransferBlockedCountries: ["FR"],
     dollarRestrictionCacheEnabled: true,
+    restrictionSelfHealEnabled: true,
   })
+  mockUseFeatureFlags.mockReturnValue({ remoteConfigLoaded: true })
   mockUseActiveWallet.mockReturnValue({ accountType: AccountType.SelfCustodial })
-  mockUseIpCountryCode.mockReturnValue(undefined)
   mockPersistentState = baseState
 }
 
@@ -61,18 +76,18 @@ describe("useTransferBlocked", () => {
   beforeEach(setup)
 
   it("blocks a self-custodial transfer when the country is in the self-custodial list", () => {
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+    mockUseRegistrationCountry.mockReturnValue(country("FR"))
     expect(renderHook(() => useTransferBlocked()).result.current).toBe(true)
   })
 
   it("blocks a custodial transfer when the country is in the custodial list", () => {
     mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "DE" })
+    mockUseRegistrationCountry.mockReturnValue(country("DE"))
     expect(renderHook(() => useTransferBlocked()).result.current).toBe(true)
   })
 
   it("reads each account type from its own list, so the lists can diverge", () => {
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+    mockUseRegistrationCountry.mockReturnValue(country("FR"))
 
     mockUseActiveWallet.mockReturnValue({ accountType: AccountType.SelfCustodial })
     expect(renderHook(() => useTransferBlocked()).result.current).toBe(true)
@@ -82,25 +97,25 @@ describe("useTransferBlocked", () => {
   })
 
   it("returns false when the country is in neither list", () => {
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "AR" })
+    mockUseRegistrationCountry.mockReturnValue(country("AR"))
     expect(renderHook(() => useTransferBlocked()).result.current).toBe(false)
   })
 
-  it("is case-insensitive on the device country", () => {
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "fr" })
+  it("is case-insensitive on the registration country", () => {
+    mockUseRegistrationCountry.mockReturnValue(country("fr"))
     expect(renderHook(() => useTransferBlocked()).result.current).toBe(true)
   })
 
   it("stays blocked from the self-custodial persisted flag without a detected country", () => {
     mockPersistentState = { ...baseState, stableTokenTransferBlocked: true }
-    mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
+    mockUseRegistrationCountry.mockReturnValue(country(undefined))
     expect(renderHook(() => useTransferBlocked()).result.current).toBe(true)
   })
 
   it("stays blocked from the custodial persisted flag without a detected country", () => {
     mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
     mockPersistentState = { ...baseState, stablesatsTransferBlocked: true }
-    mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
+    mockUseRegistrationCountry.mockReturnValue(country(undefined))
     expect(renderHook(() => useTransferBlocked()).result.current).toBe(true)
   })
 
@@ -115,12 +130,12 @@ describe("useTransferBlocked", () => {
 
     it("ignores the persisted flag so a stale block can be lifted", () => {
       mockPersistentState = { ...baseState, stableTokenTransferBlocked: true }
-      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
+      mockUseRegistrationCountry.mockReturnValue(country(undefined))
       expect(renderHook(() => useTransferBlocked()).result.current).toBe(false)
     })
 
-    it("still blocks from the live device country", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+    it("still blocks from the live registration country", () => {
+      mockUseRegistrationCountry.mockReturnValue(country("FR"))
       expect(renderHook(() => useTransferBlocked()).result.current).toBe(true)
     })
   })
@@ -129,8 +144,8 @@ describe("useTransferBlocked", () => {
 describe("useTransferBlockedSync", () => {
   beforeEach(setup)
 
-  it("persists the self-custodial flag when the phone country is in the self-custodial list", () => {
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", source: "phone" })
+  it("persists the self-custodial flag when the registration country is in the self-custodial list", () => {
+    mockUseRegistrationCountry.mockReturnValue(country("FR"))
     const updates: Array<PersistentState | undefined> = []
     mockUpdateState.mockImplementation(
       (fn: (state: PersistentState | undefined) => PersistentState | undefined) => {
@@ -144,9 +159,9 @@ describe("useTransferBlockedSync", () => {
     expect(updates[1]).toBeUndefined()
   })
 
-  it("persists the custodial flag when the phone country is in the custodial list", () => {
+  it("persists the custodial flag when the registration country is in the custodial list", () => {
     mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "DE", source: "phone" })
+    mockUseRegistrationCountry.mockReturnValue(country("DE"))
     const updates: Array<PersistentState | undefined> = []
     mockUpdateState.mockImplementation(
       (fn: (state: PersistentState | undefined) => PersistentState | undefined) => {
@@ -159,19 +174,20 @@ describe("useTransferBlockedSync", () => {
     expect(updates[0]?.stablesatsTransferBlocked).toBe(true)
   })
 
-  it("persists the self-custodial flag via the IP country fallback when the phone country is not blocked", () => {
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "AR", source: "phone" })
-    mockUseIpCountryCode.mockReturnValue("FR")
-    const updates: Array<PersistentState | undefined> = []
-    mockUpdateState.mockImplementation(
-      (fn: (state: PersistentState | undefined) => PersistentState | undefined) => {
-        updates.push(fn(baseState))
-      },
-    )
-
+  it("does not persist when the registration country is not blocked", () => {
+    mockUseRegistrationCountry.mockReturnValue(country("AR"))
     renderHook(() => useTransferBlockedSync())
+    expect(mockUpdateState).not.toHaveBeenCalled()
+  })
 
-    expect(updates[0]?.stableTokenTransferBlocked).toBe(true)
+  it("does not persist while the country is still resolving", () => {
+    mockUseRegistrationCountry.mockReturnValue({
+      countryCode: undefined,
+      loading: true,
+      trusted: false,
+    })
+    renderHook(() => useTransferBlockedSync())
+    expect(mockUpdateState).not.toHaveBeenCalled()
   })
 
   it("re-fires on a custodial-to-self-custodial switch in a blocked country, writing the self-custodial flag too", () => {
@@ -180,7 +196,7 @@ describe("useTransferBlockedSync", () => {
       selfCustodialTransferBlockedCountries: ["FR"],
       dollarRestrictionCacheEnabled: true,
     })
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", source: "phone" })
+    mockUseRegistrationCountry.mockReturnValue(country("FR"))
     const writes: PersistentState[] = []
     mockUpdateState.mockImplementation(
       (fn: (state: PersistentState | undefined) => PersistentState | undefined) => {
@@ -201,10 +217,113 @@ describe("useTransferBlockedSync", () => {
 
   it("does not persist again when it is already blocked", () => {
     mockPersistentState = { ...baseState, stableTokenTransferBlocked: true }
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", source: "phone" })
+    mockUseRegistrationCountry.mockReturnValue(country("FR"))
 
     renderHook(() => useTransferBlockedSync())
 
+    expect(mockUpdateState).not.toHaveBeenCalled()
+  })
+
+  it("clears the self-custodial flag when the trusted country is allowed", () => {
+    mockPersistentState = { ...baseState, stableTokenTransferBlocked: true }
+    mockUseRegistrationCountry.mockReturnValue(country("AR"))
+    const updates: Array<PersistentState | undefined> = []
+    mockUpdateState.mockImplementation(
+      (fn: (state: PersistentState | undefined) => PersistentState | undefined) => {
+        updates.push(fn(mockPersistentState), fn(undefined))
+      },
+    )
+
+    renderHook(() => useTransferBlockedSync())
+
+    expect(updates[0]?.stableTokenTransferBlocked).toBe(false)
+    expect(updates[1]).toBeUndefined()
+    expect(mockLogRegionRestrictionCleared).toHaveBeenCalledWith({
+      restriction: "transfer",
+      accountType: AccountType.SelfCustodial,
+      countryCode: "AR",
+    })
+  })
+
+  it("logs 'unknown' defensively if trusted is ever reported without a country", () => {
+    mockPersistentState = { ...baseState, stableTokenTransferBlocked: true }
+    mockUseRegistrationCountry.mockReturnValue({
+      countryCode: undefined,
+      loading: false,
+      trusted: true,
+    })
+
+    renderHook(() => useTransferBlockedSync())
+
+    expect(mockLogRegionRestrictionCleared).toHaveBeenCalledWith(
+      expect.objectContaining({ countryCode: "unknown" }),
+    )
+  })
+
+  it("does not clear when self-healing is remotely disabled", () => {
+    mockPersistentState = { ...baseState, stableTokenTransferBlocked: true }
+    mockUseRemoteConfig.mockReturnValue({
+      custodialTransferBlockedCountries: ["DE"],
+      selfCustodialTransferBlockedCountries: ["FR"],
+      dollarRestrictionCacheEnabled: true,
+      restrictionSelfHealEnabled: false,
+    })
+    mockUseRegistrationCountry.mockReturnValue(country("AR"))
+    renderHook(() => useTransferBlockedSync())
+    expect(mockUpdateState).not.toHaveBeenCalled()
+    expect(mockLogRegionRestrictionCleared).not.toHaveBeenCalled()
+  })
+
+  it("clears the custodial flag when the trusted country is allowed", () => {
+    mockUseActiveWallet.mockReturnValue({ accountType: AccountType.Custodial })
+    mockPersistentState = { ...baseState, stablesatsTransferBlocked: true }
+    mockUseRegistrationCountry.mockReturnValue(country("AR"))
+    const updates: Array<PersistentState | undefined> = []
+    mockUpdateState.mockImplementation(
+      (fn: (state: PersistentState | undefined) => PersistentState | undefined) => {
+        updates.push(fn(mockPersistentState))
+      },
+    )
+
+    renderHook(() => useTransferBlockedSync())
+
+    expect(updates[0]?.stablesatsTransferBlocked).toBe(false)
+  })
+
+  it("does not clear while the country is still resolving", () => {
+    mockPersistentState = { ...baseState, stableTokenTransferBlocked: true }
+    mockUseRegistrationCountry.mockReturnValue({
+      countryCode: undefined,
+      loading: true,
+      trusted: false,
+    })
+    renderHook(() => useTransferBlockedSync())
+    expect(mockUpdateState).not.toHaveBeenCalled()
+  })
+
+  it("does not clear while remote config has not loaded (default lists in use)", () => {
+    mockPersistentState = { ...baseState, stableTokenTransferBlocked: true }
+    mockUseFeatureFlags.mockReturnValue({ remoteConfigLoaded: false })
+    mockUseRegistrationCountry.mockReturnValue(country("AR"))
+    renderHook(() => useTransferBlockedSync())
+    expect(mockUpdateState).not.toHaveBeenCalled()
+  })
+
+  it("still persists while remote config has not loaded", () => {
+    mockUseFeatureFlags.mockReturnValue({ remoteConfigLoaded: false })
+    mockUseRegistrationCountry.mockReturnValue(country("FR"))
+    renderHook(() => useTransferBlockedSync())
+    expect(mockUpdateState).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not clear when country detection failed", () => {
+    mockPersistentState = { ...baseState, stableTokenTransferBlocked: true }
+    mockUseRegistrationCountry.mockReturnValue({
+      countryCode: undefined,
+      loading: false,
+      trusted: false,
+    })
+    renderHook(() => useTransferBlockedSync())
     expect(mockUpdateState).not.toHaveBeenCalled()
   })
 
@@ -214,19 +333,29 @@ describe("useTransferBlockedSync", () => {
         custodialTransferBlockedCountries: ["DE"],
         selfCustodialTransferBlockedCountries: ["FR"],
         dollarRestrictionCacheEnabled: false,
+        restrictionSelfHealEnabled: true,
       })
     })
 
     it("does not persist even in a blocked country", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", source: "phone" })
+      mockUseRegistrationCountry.mockReturnValue(country("FR"))
       renderHook(() => useTransferBlockedSync())
       expect(mockUpdateState).not.toHaveBeenCalled()
     })
 
-    it("does not consult IP", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "AR", source: "phone" })
+    it("still clears a stale flag so it cannot resurface when the cache is re-enabled", () => {
+      mockPersistentState = { ...baseState, stableTokenTransferBlocked: true }
+      mockUseRegistrationCountry.mockReturnValue(country("AR"))
+      const updates: Array<PersistentState | undefined> = []
+      mockUpdateState.mockImplementation(
+        (fn: (state: PersistentState | undefined) => PersistentState | undefined) => {
+          updates.push(fn(mockPersistentState))
+        },
+      )
+
       renderHook(() => useTransferBlockedSync())
-      expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
+
+      expect(updates[0]?.stableTokenTransferBlocked).toBe(false)
     })
   })
 })

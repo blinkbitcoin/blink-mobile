@@ -5,6 +5,8 @@ import Config from "react-native-config"
 import {
   IpLookupAdapter,
   DEFAULT_ADAPTERS,
+  detectAnonymizingIp,
+  detectAnonymizingIpCached,
   resolveIpCountryCode,
   resolveIpCountryCodeCached,
 } from "@app/utils/ip-country-lookup"
@@ -106,6 +108,121 @@ describe("resolveIpCountryCodeCached", () => {
 
     mockedAxios.get.mockClear()
     await expect(resolveIpCountryCodeCached()).resolves.toBe("DE")
+    expect(mockedAxios.get).not.toHaveBeenCalled()
+  })
+})
+
+describe("detectAnonymizingIp", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mutableConfig.PROXYCHECK_API_KEY = ""
+  })
+
+  it("returns true when proxycheck flags the IP as a VPN", async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: {
+        "status": "ok",
+        "1.2.3.4": { detections: { proxy: true, vpn: true } },
+      },
+    })
+
+    await expect(detectAnonymizingIp()).resolves.toBe(true)
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect.stringContaining("proxycheck.io"),
+      expect.anything(),
+    )
+  })
+
+  it("returns false when proxycheck reports the IP clean", async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: {
+        "status": "ok",
+        "1.2.3.4": { detections: { proxy: false, vpn: false } },
+      },
+    })
+
+    await expect(detectAnonymizingIp()).resolves.toBe(false)
+  })
+
+  it("parses the v2-style flat proxy flag", async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: { "status": "ok", "1.2.3.4": { proxy: "yes" } },
+    })
+    await expect(detectAnonymizingIp()).resolves.toBe(true)
+
+    mockedAxios.get.mockResolvedValue({
+      data: { "status": "ok", "1.2.3.4": { proxy: "no" } },
+    })
+    await expect(detectAnonymizingIp()).resolves.toBe(false)
+  })
+
+  it("returns undefined when the response carries no detection fields", async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: {
+        "status": "ok",
+        // eslint-disable-next-line camelcase
+        "1.2.3.4": { location: { country_code: "SE" } },
+      },
+    })
+
+    await expect(detectAnonymizingIp()).resolves.toBeUndefined()
+  })
+
+  it("returns undefined for an unrecognized flat proxy value", async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: { "status": "ok", "1.2.3.4": { proxy: "maybe" } },
+    })
+
+    await expect(detectAnonymizingIp()).resolves.toBeUndefined()
+  })
+
+  it("returns undefined and reports when the request fails", async () => {
+    mockedAxios.get.mockRejectedValue(new Error("proxycheck down"))
+
+    await expect(detectAnonymizingIp()).resolves.toBeUndefined()
+  })
+
+  it("appends the api key when PROXYCHECK_API_KEY is set", async () => {
+    mutableConfig.PROXYCHECK_API_KEY = "test-proxycheck-key"
+    mockedAxios.get.mockResolvedValue({
+      data: { "status": "ok", "1.2.3.4": { detections: { proxy: false } } },
+    })
+
+    await detectAnonymizingIp()
+
+    expect(mockedAxios.get).toHaveBeenCalledWith(
+      expect.stringContaining("key=test-proxycheck-key"),
+      expect.anything(),
+    )
+  })
+})
+
+describe("detectAnonymizingIpCached", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mutableConfig.PROXYCHECK_API_KEY = ""
+  })
+
+  /** One sequential test: the cache is module state, so the phases (inconclusive
+   *  retries, conclusive reuse) must run in a known order. */
+  it("retries inconclusive detections and caches conclusive ones", async () => {
+    mockedAxios.get.mockRejectedValue(new Error("offline"))
+    await expect(detectAnonymizingIpCached()).resolves.toBeUndefined()
+
+    mockedAxios.get.mockReset()
+    mockedAxios.get.mockResolvedValue({
+      data: { "status": "ok", "1.2.3.4": { detections: { vpn: true } } },
+    })
+    const [first, second] = await Promise.all([
+      detectAnonymizingIpCached(),
+      detectAnonymizingIpCached(),
+    ])
+    expect(first).toBe(true)
+    expect(second).toBe(true)
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1)
+
+    mockedAxios.get.mockClear()
+    await expect(detectAnonymizingIpCached()).resolves.toBe(true)
     expect(mockedAxios.get).not.toHaveBeenCalled()
   })
 })
