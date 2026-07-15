@@ -3400,6 +3400,11 @@ export type MigrationSupportDetailsQueryVariables = Exact<{ [key: string]: never
 
 export type MigrationSupportDetailsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly username?: string | null, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
 
+export type WindDownQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type WindDownQuery = { readonly __typename: 'Query', readonly windDown?: { readonly __typename: 'AccountWindDown', readonly status: WindDownStatus, readonly receiveDisabledAt: number, readonly finalDeadline: number, readonly gateArmsAt: number, readonly timezone: string } | null };
+
 export type CardBalanceQueryVariables = Exact<{
   cardId: Scalars['ID']['input'];
 }>;
@@ -5509,6 +5514,49 @@ export type MigrationSupportDetailsQueryHookResult = ReturnType<typeof useMigrat
 export type MigrationSupportDetailsLazyQueryHookResult = ReturnType<typeof useMigrationSupportDetailsLazyQuery>;
 export type MigrationSupportDetailsSuspenseQueryHookResult = ReturnType<typeof useMigrationSupportDetailsSuspenseQuery>;
 export type MigrationSupportDetailsQueryResult = Apollo.QueryResult<MigrationSupportDetailsQuery, MigrationSupportDetailsQueryVariables>;
+export const WindDownDocument = gql`
+    query windDown {
+  windDown {
+    status
+    receiveDisabledAt
+    finalDeadline
+    gateArmsAt
+    timezone
+  }
+}
+    `;
+
+/**
+ * __useWindDownQuery__
+ *
+ * To run a query within a React component, call `useWindDownQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWindDownQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWindDownQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useWindDownQuery(baseOptions?: Apollo.QueryHookOptions<WindDownQuery, WindDownQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<WindDownQuery, WindDownQueryVariables>(WindDownDocument, options);
+      }
+export function useWindDownLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WindDownQuery, WindDownQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<WindDownQuery, WindDownQueryVariables>(WindDownDocument, options);
+        }
+export function useWindDownSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<WindDownQuery, WindDownQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<WindDownQuery, WindDownQueryVariables>(WindDownDocument, options);
+        }
+export type WindDownQueryHookResult = ReturnType<typeof useWindDownQuery>;
+export type WindDownLazyQueryHookResult = ReturnType<typeof useWindDownLazyQuery>;
+export type WindDownSuspenseQueryHookResult = ReturnType<typeof useWindDownSuspenseQuery>;
+export type WindDownQueryResult = Apollo.QueryResult<WindDownQuery, WindDownQueryVariables>;
 export const CardBalanceDocument = gql`
     query cardBalance($cardId: ID!) {
   cardBalance(cardId: $cardId) {

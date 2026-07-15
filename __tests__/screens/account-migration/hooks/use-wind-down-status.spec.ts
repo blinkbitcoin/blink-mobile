@@ -1,20 +1,24 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { useWindDownStatus } from "@app/screens/account-migration/hooks/use-wind-down-status"
-import { WindDown, WindDownStatus } from "@app/types/wind-down"
+import { WindDownStatus } from "@app/types/wind-down"
 
-let mockWindDown: WindDown | null = null
+const mockUseWindDownQuery = jest.fn()
 
-jest.mock("@app/screens/account-migration/utils/migration-preview-mock", () => ({
-  ...jest.requireActual("@app/screens/account-migration/utils/migration-preview-mock"),
-  get windDownMock() {
-    return mockWindDown
-  },
+let mockIsAuthed = true
+
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useWindDownQuery: (options: unknown) => mockUseWindDownQuery(options),
 }))
 
-/** A synthetic affected account with an obviously fabricated but contract-coherent
- *  timeline: receive cutoff, then the final deadline, then the gate arming. */
-const affectedWindDown: WindDown = {
+jest.mock("@app/graphql/is-authed-context", () => ({
+  ...jest.requireActual("@app/graphql/is-authed-context"),
+  useIsAuthed: () => mockIsAuthed,
+}))
+
+const serverWindDown = {
+  __typename: "AccountWindDown" as const,
   status: WindDownStatus.PreCutoff,
   receiveDisabledAt: 1_790_000_000,
   finalDeadline: 1_790_100_000,
@@ -23,28 +27,43 @@ const affectedWindDown: WindDown = {
 }
 
 describe("useWindDownStatus", () => {
-  it("returns null for an account the wind-down does not affect", () => {
-    mockWindDown = null
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockIsAuthed = true
+  })
+
+  it("serves the account's wind-down state, mapped to the domain shape", () => {
+    mockUseWindDownQuery.mockReturnValue({ data: { windDown: serverWindDown } })
+
+    const { result } = renderHook(() => useWindDownStatus())
+
+    const { __typename, ...domainWindDown } = serverWindDown
+    expect(result.current).toEqual(domainWindDown)
+  })
+
+  it("returns null when the wind-down does not affect the account", () => {
+    mockUseWindDownQuery.mockReturnValue({ data: { windDown: null } })
 
     const { result } = renderHook(() => useWindDownStatus())
 
     expect(result.current).toBeNull()
   })
 
-  it("serves an affected account's status on a contract-coherent timeline", () => {
-    mockWindDown = affectedWindDown
+  it("returns null while the query has no data yet", () => {
+    mockUseWindDownQuery.mockReturnValue({ data: undefined })
 
     const { result } = renderHook(() => useWindDownStatus())
 
-    /** The contract the consumers rely on: a known phase, a coherent timeline in unix
-     *  seconds (receive cutoff, then deadline, then gate), and an IANA timezone. */
-    expect(Object.values(WindDownStatus)).toContain(result.current?.status)
-    expect(result.current?.finalDeadline).toBeGreaterThan(
-      result.current?.receiveDisabledAt ?? 0,
-    )
-    expect(result.current?.gateArmsAt).toBeGreaterThanOrEqual(
-      result.current?.finalDeadline ?? 0,
-    )
-    expect(result.current?.timezone).not.toHaveLength(0)
+    expect(result.current).toBeNull()
+  })
+
+  it("skips the query and stays null while the user is not authenticated", () => {
+    mockIsAuthed = false
+    mockUseWindDownQuery.mockReturnValue({ data: undefined })
+
+    const { result } = renderHook(() => useWindDownStatus())
+
+    expect(mockUseWindDownQuery).toHaveBeenCalledWith({ skip: true })
+    expect(result.current).toBeNull()
   })
 })

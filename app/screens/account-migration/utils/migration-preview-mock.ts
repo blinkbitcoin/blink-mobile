@@ -1,40 +1,10 @@
 /**
- * TODO: TEMPORARY central mock of the backend migration/wind-down contract: every value
- * here must be replaced by the real backend query once it is ready. Nothing outside this
- * file hardcodes wind-down data: screens read it through hooks (useWindDownStatus,
- * useMigrationPreview), so swapping the mock for the real query later touches only this
- * layer. The durable contract types live in @app/types/wind-down and survive this file.
+ * TODO: TEMPORARY mock of the backend migration preview: the fee/drain math below mirrors
+ * the backend so the balance summary renders correct numbers until the real preview query
+ * ships. The wind-down status is served by the real `Query.windDown`, not mocked here.
+ * The durable contract types live in @app/types/wind-down.
  */
-import { AccountMigrationPreview, WindDown, WindDownStatus } from "@app/types/wind-down"
-
-const toUnixSeconds = (utcMilliseconds: number): number => utcMilliseconds / 1000
-
-/**
- * Flip to true to simulate an account the wind-down affects: the mock then returns the
- * state below and the wind-down surfaces render. Left false so the mock omits it (null),
- * exactly as the backend does for an unaffected account, and no wind-down UI shows.
- */
-const IS_ACCOUNT_AFFECTED: boolean = false
-
-/**
- * TODO: TEMPORARY, replace with the backend wind-down status query (Query.windDown)
- * once it is ready. The dates below are the published wind-down timeline; 00:00 in
- * Europe/Paris is 22:00 UTC of the previous day because August/September fall in CEST
- * (UTC+2). Change `status` here (or via the developer-screen simulations later) to see
- * each phase's UI.
- */
-export const windDownMock: WindDown | null = IS_ACCOUNT_AFFECTED
-  ? {
-      status: WindDownStatus.PreCutoff,
-      /** Aug 1 2026, 00:00 Europe/Paris: receiving disabled from this moment. */
-      receiveDisabledAt: toUnixSeconds(Date.UTC(2026, 6, 31, 22, 0, 0)),
-      /** Aug 31 2026, end of day Europe/Paris: last day to initiate an exit. */
-      finalDeadline: toUnixSeconds(Date.UTC(2026, 7, 31, 21, 59, 59)),
-      /** Sep 1 2026, 00:00 Europe/Paris: the blocking migration gate arms. */
-      gateArmsAt: toUnixSeconds(Date.UTC(2026, 7, 31, 22, 0, 0)),
-      timezone: "Europe/Paris",
-    }
-  : null
+import { AccountMigrationPreview } from "@app/types/wind-down"
 
 /** Backend FEECAP_BASIS_POINTS: the fee reserve percentage, 50 bps = 0.5%. */
 const FEE_CAP_BASIS_POINTS = 50
