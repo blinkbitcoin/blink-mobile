@@ -1927,6 +1927,17 @@ query warningSecureAccount {
   }
 }
 
+query windDown {
+  windDown {
+    status
+    receiveDisabledAt
+    finalDeadline
+    gateArmsAt
+    timezone
+    __typename
+  }
+}
+
 subscription myLnUpdates {
   myUpdates {
     errors {
