@@ -1,7 +1,6 @@
 import { act, renderHook } from "@testing-library/react-native"
 
 import { useMigrateNowPrompt } from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
-import { windDownMock } from "@app/screens/account-migration/utils/backend-mock"
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
@@ -24,8 +23,14 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
 }))
 
-if (windDownMock === null) throw new Error("These tests exercise the affected mock")
-const affectedWindDown: WindDown = windDownMock
+/** A synthetic affected wind-down; each test swaps `status` on top of it. */
+const affectedWindDown: WindDown = {
+  status: WindDownStatus.ReceiveDisabled,
+  receiveDisabledAt: 1_790_000_000,
+  finalDeadline: 1_790_100_000,
+  gateArmsAt: 1_790_200_000,
+  timezone: "Europe/Paris",
+}
 
 let mockStatus: WindDownStatus | null = WindDownStatus.ReceiveDisabled
 

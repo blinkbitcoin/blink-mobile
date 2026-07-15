@@ -10,10 +10,11 @@ import { AccountMigrationPreview, WindDown, WindDownStatus } from "@app/types/wi
 const toUnixSeconds = (utcMilliseconds: number): number => utcMilliseconds / 1000
 
 /**
- * Flip to false to simulate an account the wind-down does not affect: the backend then
- * omits `Query.windDown` entirely (null) and no wind-down UI may render at all.
+ * Flip to true to simulate an account the wind-down affects: the mock then returns the
+ * state below and the wind-down surfaces render. Left false so the mock omits it (null),
+ * exactly as the backend does for an unaffected account, and no wind-down UI shows.
  */
-const IS_ACCOUNT_AFFECTED: boolean = true
+const IS_ACCOUNT_AFFECTED: boolean = false
 
 /**
  * TODO: TEMPORARY, replace with the backend wind-down status query (Query.windDown)
