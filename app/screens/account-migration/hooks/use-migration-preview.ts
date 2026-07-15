@@ -1,6 +1,6 @@
 import { AccountMigrationPreview } from "@app/types/wind-down"
 
-import { getMigrationPreviewMock } from "../utils/backend-mock"
+import { getMigrationPreviewMock } from "../utils/migration-preview-mock"
 
 /**
  * TODO: TEMPORARY boundary over the mocked migration preview (Account.migration.preview

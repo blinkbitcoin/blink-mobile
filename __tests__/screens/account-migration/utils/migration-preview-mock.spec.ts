@@ -1,4 +1,4 @@
-import { getMigrationPreviewMock } from "@app/screens/account-migration/utils/backend-mock"
+import { getMigrationPreviewMock } from "@app/screens/account-migration/utils/migration-preview-mock"
 
 describe("getMigrationPreviewMock", () => {
   it("returns an all-zero preview for a zero balance", () => {
