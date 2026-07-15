@@ -40,7 +40,8 @@ const FEE_CAP_BASIS_POINTS = 50
 const BASIS_POINTS_DIVISOR = 10_000
 /** Backend FEECAP_MIN: the reserve floor in sats, which micro payments always pay. */
 const MINIMUM_FEE_SATS = 10
-const MOCK_DE_MINIMIS_THRESHOLD_SATS = 100
+/** Backend de-minimis threshold: balances at or below it migrate with the fee on Blink. */
+const DE_MINIMIS_THRESHOLD_SATS = 100
 
 /**
  * Replicates the backend fee reserve (LnFees().maxProtocolAndBankFee) for a candidate
@@ -88,7 +89,7 @@ export const getMigrationPreviewMock = (balanceSats: number): AccountMigrationPr
     return { balanceSats: 0, feeSats: 0, feeCoveredByBlink: false, receiveSats: 0 }
   }
 
-  if (balanceSats <= MOCK_DE_MINIMIS_THRESHOLD_SATS) {
+  if (balanceSats <= DE_MINIMIS_THRESHOLD_SATS) {
     return {
       balanceSats,
       feeSats: MINIMUM_FEE_SATS,
