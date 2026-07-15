@@ -9,11 +9,13 @@ const DEFAULT_TIMEOUT_MS = 5000
 export type IpLookupAdapter = (timeout: number) => Promise<CountryCode | undefined>
 
 // ipinfoAdapter runs first: free tier available without a key (IPINFO_API_KEY raises rate limits)
-// Authenticated: api.ipinfo.io/lite + Bearer header → field "country_code"
-// Free tier:     ipinfo.io/json (no auth)            → field "country"
+// Authenticated: api.ipinfo.io/lite/me + Bearer header → field "country_code"
+// Free tier:     ipinfo.io/json (no auth)               → field "country"
+// The /me segment is required: api.ipinfo.io/lite/ (no IP) is not a real endpoint and
+// returns a 404, which would drop this adapter and let the country default to a fallback.
 const ipinfoAdapter: IpLookupAdapter = async (timeout) => {
   if (Config.IPINFO_API_KEY) {
-    const { data } = await axios.get("https://api.ipinfo.io/lite/", {
+    const { data } = await axios.get("https://api.ipinfo.io/lite/me", {
       headers: { Authorization: `Bearer ${Config.IPINFO_API_KEY}` },
       timeout,
     })

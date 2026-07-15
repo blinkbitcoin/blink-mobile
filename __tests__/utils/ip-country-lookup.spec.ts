@@ -132,7 +132,7 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
     )
   })
 
-  it("uses api.ipinfo.io/lite with Bearer header when IPINFO_API_KEY is set", async () => {
+  it("calls the api.ipinfo.io/lite/me endpoint with the Bearer header when IPINFO_API_KEY is set", async () => {
     mutableConfig.IPINFO_API_KEY = "test-ipinfo-key"
     // eslint-disable-next-line camelcase
     mockedAxios.get.mockResolvedValue({ data: { country_code: "DE" } })
@@ -141,10 +141,23 @@ describe("DEFAULT_ADAPTERS key-gated behaviour", () => {
 
     expect(result).toBe("DE")
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      expect.stringContaining("api.ipinfo.io/lite"),
+      "https://api.ipinfo.io/lite/me",
       expect.objectContaining({
         headers: expect.objectContaining({ Authorization: "Bearer test-ipinfo-key" }),
       }),
+    )
+  })
+
+  it("never calls the /lite/ endpoint without the /me segment, which 404s and defaults the country", async () => {
+    mutableConfig.IPINFO_API_KEY = "test-ipinfo-key"
+    // eslint-disable-next-line camelcase
+    mockedAxios.get.mockResolvedValue({ data: { country_code: "DE" } })
+
+    await resolveIpCountryCode(DEFAULT_ADAPTERS)
+
+    expect(mockedAxios.get).not.toHaveBeenCalledWith(
+      "https://api.ipinfo.io/lite/",
+      expect.anything(),
     )
   })
 
