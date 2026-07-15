@@ -695,73 +695,6 @@ describe("HomeScreen", () => {
     expect(queryByTestId("convert-modal")).toBeNull()
   })
 
-  it("pushes the migrate-now prompt when receiving is disabled", async () => {
-    mockMigratePromptVisible = true
-
-    const { findByTestId } = render(
-      <ContextForScreen>
-        <HomeScreen />
-      </ContextForScreen>,
-    )
-
-    expect(await findByTestId("migrate-now-modal")).toBeTruthy()
-
-    await flushEffects()
-  })
-
-  it("keeps the migrate-now prompt hidden while nothing disables receiving", async () => {
-    const { queryByTestId } = render(
-      <ContextForScreen>
-        <HomeScreen />
-      </ContextForScreen>,
-    )
-
-    await flushEffects()
-
-    expect(queryByTestId("migrate-now-modal")).toBeNull()
-  })
-
-  it("lets the forced conversion outrank the migrate-now prompt", async () => {
-    mockMigratePromptVisible = true
-    mockDollarBalanceRestrictedOverride = true
-    currentMocks = generateHomeMock({
-      level: AccountLevel.One,
-      network: Network.Mainnet,
-      btcBalance: 1000,
-      usdBalance: 5000,
-    })
-
-    const { findByTestId, queryByTestId } = render(
-      <ContextForScreen>
-        <HomeScreen />
-      </ContextForScreen>,
-    )
-
-    expect(await findByTestId("convert-modal")).toBeTruthy()
-    expect(queryByTestId("migrate-now-modal")).toBeNull()
-
-    await flushEffects()
-  })
-
-  it("enters the migration flow from the migrate-now prompt", async () => {
-    mockMigratePromptVisible = true
-
-    render(
-      <ContextForScreen>
-        <HomeScreen />
-      </ContextForScreen>,
-    )
-
-    await flushEffects()
-
-    const { onMigrate, toggleModal } = mockMigrateNowModal.mock.calls[0][0]
-    onMigrate()
-    toggleModal()
-
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
-    expect(mockDismissMigratePrompt).toHaveBeenCalledTimes(1)
-  })
-
   it("forces the self-custodial conversion when a restricted account holds a stable-token balance", async () => {
     mockDollarBalanceRestrictedOverride = true
     mockActiveWalletOverride = {
@@ -1376,48 +1309,56 @@ describe("HomeScreen", () => {
       expect(getByTestId("balance-value")).toBeTruthy()
     })
   })
+})
 
-  describe("SelfCustodialInfoBulletin gating", () => {
-    beforeEach(() => {
-      mockSelfCustodialInfoBulletinState.shouldShow = false
+describe("SelfCustodialInfoBulletin gating", () => {
+  beforeEach(() => {
+    currentMocks = []
+    mockActiveWalletOverride = null
+    jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: null,
     })
+    mockSelfCustodialInfoBulletinState.shouldShow = false
+  })
 
-    afterEach(() => {
-      mockSelfCustodialInfoBulletinState.shouldShow = false
-      mockActiveWalletOverride = null
-    })
+  afterEach(() => {
+    mockSelfCustodialInfoBulletinState.shouldShow = false
+    mockActiveWalletOverride = null
+  })
 
-    const renderForSelfCustodial = () => {
-      mockActiveWalletOverride = {
-        wallets: [],
-        status: "ready",
-        accountType: "self-custodial",
-        isReady: true,
-        isSelfCustodial: true,
-        needsBackendAuth: false,
-      }
-      return render(
-        <ContextForScreen>
-          <HomeScreen />
-        </ContextForScreen>,
-      )
+  const renderForSelfCustodial = () => {
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
     }
+    return render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+  }
 
-    it("renders the bulletin when the hook says it should show", async () => {
-      mockSelfCustodialInfoBulletinState.shouldShow = true
+  it("renders the bulletin when the hook says it should show", async () => {
+    mockSelfCustodialInfoBulletinState.shouldShow = true
 
-      renderForSelfCustodial()
-      await flushEffects()
+    renderForSelfCustodial()
+    await flushEffects()
 
-      expect(mockSelfCustodialInfoBulletin).toHaveBeenCalled()
-    })
+    expect(mockSelfCustodialInfoBulletin).toHaveBeenCalled()
+  })
 
-    it("does not render the bulletin when the hook says it should not show", async () => {
-      renderForSelfCustodial()
-      await flushEffects()
+  it("does not render the bulletin when the hook says it should not show", async () => {
+    renderForSelfCustodial()
+    await flushEffects()
 
-      expect(mockSelfCustodialInfoBulletin).not.toHaveBeenCalled()
-    })
+    expect(mockSelfCustodialInfoBulletin).not.toHaveBeenCalled()
   })
 })
 
@@ -1431,6 +1372,11 @@ describe("HomeScreen wind-down states", () => {
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
     jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: null,
+    })
   })
 
   it("pushes the migrate-now prompt when receiving is disabled", async () => {
@@ -1523,6 +1469,9 @@ describe("HomeScreen wind-down states", () => {
   it("lets the dollar-restriction modal outrank the migrate-now prompt", async () => {
     mockMigratePromptVisible = true
     mockDollarBalanceRestrictedOverride = true
+    /** A restricted account with no dollars left: the forced conversion never fires
+     *  (nothing to convert), so this isolates the restriction modal outranking the
+     *  migrate-now prompt when the disabled transfer button is pressed. */
     mockActiveWalletOverride = {
       wallets: [
         {
@@ -1534,7 +1483,7 @@ describe("HomeScreen wind-down states", () => {
         {
           id: "usd-1",
           walletCurrency: "USD",
-          balance: { amount: 5000, currency: "USD", currencyCode: "USD" },
+          balance: { amount: 0, currency: "USD", currencyCode: "USD" },
           transactions: [],
         },
       ],
@@ -1548,7 +1497,7 @@ describe("HomeScreen wind-down states", () => {
       level: AccountLevel.One,
       network: Network.Mainnet,
       btcBalance: 1000,
-      usdBalance: 5000,
+      usdBalance: 0,
     })
 
     const { getByTestId, queryByTestId, findByTestId } = render(
