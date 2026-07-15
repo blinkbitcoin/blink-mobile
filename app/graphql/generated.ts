@@ -233,6 +233,15 @@ export type AccountUpdateNotificationSettingsPayload = {
   readonly errors: ReadonlyArray<Error>;
 };
 
+export type AccountWindDown = {
+  readonly __typename: 'AccountWindDown';
+  readonly finalDeadline: Scalars['Timestamp']['output'];
+  readonly gateArmsAt: Scalars['Timestamp']['output'];
+  readonly receiveDisabledAt: Scalars['Timestamp']['output'];
+  readonly status: WindDownStatus;
+  readonly timezone: Scalars['String']['output'];
+};
+
 export type AddressInput = {
   readonly city: Scalars['String']['input'];
   readonly country?: InputMaybe<Scalars['String']['input']>;
@@ -2228,6 +2237,7 @@ export type Query = {
   readonly userDefaultWalletId: Scalars['WalletId']['output'];
   readonly usernameAvailable?: Maybe<Scalars['Boolean']['output']>;
   readonly welcomeLeaderboard: Leaderboard;
+  readonly windDown?: Maybe<AccountWindDown>;
 };
 
 
@@ -3110,6 +3120,13 @@ export const WelcomeRange = {
 } as const;
 
 export type WelcomeRange = typeof WelcomeRange[keyof typeof WelcomeRange];
+export const WindDownStatus = {
+  GatedClosed: 'GATED_CLOSED',
+  PreCutoff: 'PRE_CUTOFF',
+  ReceiveDisabled: 'RECEIVE_DISABLED'
+} as const;
+
+export type WindDownStatus = typeof WindDownStatus[keyof typeof WindDownStatus];
 export type MobileUpdateQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -9348,6 +9365,7 @@ export type ResolversTypes = {
   AccountUpdateDisplayCurrencyInput: AccountUpdateDisplayCurrencyInput;
   AccountUpdateDisplayCurrencyPayload: ResolverTypeWrapper<AccountUpdateDisplayCurrencyPayload>;
   AccountUpdateNotificationSettingsPayload: ResolverTypeWrapper<AccountUpdateNotificationSettingsPayload>;
+  AccountWindDown: ResolverTypeWrapper<AccountWindDown>;
   AddressInput: AddressInput;
   ApiKey: ResolverTypeWrapper<ApiKey>;
   ApiKeyCreateInput: ApiKeyCreateInput;
@@ -9623,6 +9641,7 @@ export type ResolversTypes = {
   WelcomeLeaderboardInput: WelcomeLeaderboardInput;
   WelcomeProfile: ResolverTypeWrapper<WelcomeProfile>;
   WelcomeRange: WelcomeRange;
+  WindDownStatus: WindDownStatus;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -9644,6 +9663,7 @@ export type ResolversParentTypes = {
   AccountUpdateDisplayCurrencyInput: AccountUpdateDisplayCurrencyInput;
   AccountUpdateDisplayCurrencyPayload: AccountUpdateDisplayCurrencyPayload;
   AccountUpdateNotificationSettingsPayload: AccountUpdateNotificationSettingsPayload;
+  AccountWindDown: AccountWindDown;
   AddressInput: AddressInput;
   ApiKey: ApiKey;
   ApiKeyCreateInput: ApiKeyCreateInput;
@@ -9959,6 +9979,15 @@ export type AccountUpdateDisplayCurrencyPayloadResolvers<ContextType = any, Pare
 export type AccountUpdateNotificationSettingsPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccountUpdateNotificationSettingsPayload'] = ResolversParentTypes['AccountUpdateNotificationSettingsPayload']> = {
   account?: Resolver<Maybe<ResolversTypes['ConsumerAccount']>, ParentType, ContextType>;
   errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AccountWindDownResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccountWindDown'] = ResolversParentTypes['AccountWindDown']> = {
+  finalDeadline?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
+  gateArmsAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
+  receiveDisabledAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['WindDownStatus'], ParentType, ContextType>;
+  timezone?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -10882,6 +10911,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   userDefaultWalletId?: Resolver<ResolversTypes['WalletId'], ParentType, ContextType, RequireFields<QueryUserDefaultWalletIdArgs, 'username'>>;
   usernameAvailable?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<QueryUsernameAvailableArgs, 'username'>>;
   welcomeLeaderboard?: Resolver<ResolversTypes['Leaderboard'], ParentType, ContextType, RequireFields<QueryWelcomeLeaderboardArgs, 'input'>>;
+  windDown?: Resolver<Maybe<ResolversTypes['AccountWindDown']>, ParentType, ContextType>;
 };
 
 export type QuizResolvers<ContextType = any, ParentType extends ResolversParentTypes['Quiz'] = ResolversParentTypes['Quiz']> = {
@@ -11304,6 +11334,7 @@ export type Resolvers<ContextType = any> = {
   AccountUpdateDefaultWalletIdPayload?: AccountUpdateDefaultWalletIdPayloadResolvers<ContextType>;
   AccountUpdateDisplayCurrencyPayload?: AccountUpdateDisplayCurrencyPayloadResolvers<ContextType>;
   AccountUpdateNotificationSettingsPayload?: AccountUpdateNotificationSettingsPayloadResolvers<ContextType>;
+  AccountWindDown?: AccountWindDownResolvers<ContextType>;
   ApiKey?: ApiKeyResolvers<ContextType>;
   ApiKeyCreatePayload?: ApiKeyCreatePayloadResolvers<ContextType>;
   ApiKeyLimits?: ApiKeyLimitsResolvers<ContextType>;
