@@ -266,7 +266,7 @@ describe("MigrationGate", () => {
     expect(mockRequiredScreen).not.toHaveBeenCalled()
   })
 
-  it("warns about the API keys before the dollar-balance check, per the PRD entry order", () => {
+  it("warns about the API keys before the dollar-balance check", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ usdBalance: 20 }),
     )
