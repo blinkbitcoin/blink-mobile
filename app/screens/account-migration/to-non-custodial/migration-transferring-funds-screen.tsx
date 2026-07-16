@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import { Text } from "react-native"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -35,12 +35,18 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     navigation.navigate("accountMigrationContactSupport")
   }, [navigation])
 
+  /** Completing the transfer clears the checkpoint and swaps the session, so once it starts a
+   *  missing provisioned account is the expected outcome, not the fault the guard below
+   *  watches for. Without this, the success itself would trip that guard. */
+  const hasTransferStartedRef = useRef(false)
+
   useEffect(() => {
     if (migrationLoading) return
 
     /** A checkpoint that lost its provisioned account (expired, or a failed write) would
      *  leave this screen spinning forever with every exit blocked, so route to support. */
     if (!migrationAccountId) {
+      if (hasTransferStartedRef.current) return
       reportError(
         "Migration transfer without provisioned account",
         new Error("Checkpoint has no accountId"),
@@ -50,6 +56,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     }
 
     const timer = setTimeout(async () => {
+      hasTransferStartedRef.current = true
       try {
         if (await completeMigration()) {
           navigation.navigate("selfCustodialBackupSuccess", { reBackup: false })

@@ -3,6 +3,8 @@ import { act, render, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationTransferringFundsScreen } from "@app/screens/account-migration/to-non-custodial/migration-transferring-funds-screen"
+import { reportError } from "@app/utils/error-logging"
+
 import { ContextForScreen } from "../../helper"
 import { flushEffects } from "../../../helpers/flush-effects"
 
@@ -118,6 +120,41 @@ describe("MigrationTransferringFundsScreen", () => {
 
     expect(mockCompleteMigration).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(jest.mocked(reportError)).toHaveBeenCalledWith(
+      "Migration transfer without provisioned account",
+      expect.any(Error),
+    )
+  })
+
+  it("does not route to support when the successful transfer clears the checkpoint", async () => {
+    /** The real completeMigration clears the checkpoint and swaps the session, so the
+     *  provisioned account disappears on the very success that must not be flagged. */
+    mockCompleteMigration.mockImplementation(async () => {
+      mockMigrationAccountId = null
+      return true
+    })
+
+    const { rerender } = renderScreen()
+    await flushEffects()
+
+    act(() => {
+      jest.advanceTimersByTime(TRANSFER_DELAY_MS)
+    })
+    await flushEffects()
+
+    /** The re-render the cleared checkpoint triggers in the real hook. */
+    rerender(
+      <ContextForScreen>
+        <MigrationTransferringFundsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
+      reBackup: false,
+    })
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(jest.mocked(reportError)).not.toHaveBeenCalled()
   })
 
   it("routes to contact support when the swap does not happen", async () => {
