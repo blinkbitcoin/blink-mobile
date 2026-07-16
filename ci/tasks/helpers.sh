@@ -31,7 +31,7 @@ function unpack_deps() {
 # Echos Closes Text for all existing PRs which this PR supersedes
 # Usage: get_closes (beta|public) (version-number)
 function get_closes() {
-  gh pr list --state open --json url,headRefName --label $1 --label "galoybot" --limit 100 | jq -c '.[]' | while read item; do
+  gh pr list --state open --json url,headRefName --label $1 --label "blinkbitcoinbot" --limit 100 | jq -c '.[]' | while read item; do
   gh_pr_branch_version=$(echo $item | jq -r '.headRefName' | cut -d "-" -f2)
   if [[ $(semver-compare $gh_pr_branch_version $2) == "-1" ]]; then
     gh_pr_url=$(echo $item | jq -r '.url')
@@ -41,7 +41,7 @@ done
 }
 
 function get_changelog_from_merged_pr() {
-  gh pr list --state merged --json body,number,headRefName --label $1 --label "galoybot" | jq -c 'sort_by(.number) | reverse | .[]' | while IFS="" read -r item || [ -n "$item" ]; do
+  gh pr list --state merged --json body,number,headRefName --label $1 --label "blinkbitcoinbot" | jq -c 'sort_by(.number) | reverse | .[]' | while IFS="" read -r item || [ -n "$item" ]; do
     gh_pr_branch_version=$(echo -E $item | jq -r '.headRefName' | cut -d "-" -f2)
 
     if [[ $(semver-compare $gh_pr_branch_version $2) == "0" ]]; then
@@ -64,7 +64,7 @@ function echo_custom_release_notes_defaults() {
 }
 
 function __get_custom_release_notes() {
-  gh pr list --state $3 --json body,number,headRefName --label $1 --label "galoybot" | jq -c 'sort_by(.number) | reverse | .[]' | while IFS="" read -r item || [ -n "$item" ]; do
+  gh pr list --state $3 --json body,number,headRefName --label $1 --label "blinkbitcoinbot" | jq -c 'sort_by(.number) | reverse | .[]' | while IFS="" read -r item || [ -n "$item" ]; do
     gh_pr_branch_version=$(echo -E $item | jq -r '.headRefName' | cut -d "-" -f2)
 
     if [[ $(semver-compare $gh_pr_branch_version $2) == "0" ]]; then
@@ -103,7 +103,7 @@ function get_custom_release_notes() {
 # Fetch Older Ref from the latest merged PR
 # Usage: get_custom_release_notes (beta|public) (version-number)
 function get_old_ref_from_merged() {
-  gh pr list --state merged --label $1 --label "galoybot" --json body,number,headRefName | jq -c 'sort_by(.number) | reverse | .[]' | while IFS="" read -r item || [ -n "$item" ]; do
+  gh pr list --state merged --label $1 --label "blinkbitcoinbot" --json body,number,headRefName | jq -c 'sort_by(.number) | reverse | .[]' | while IFS="" read -r item || [ -n "$item" ]; do
     gh_pr_branch_version=$(echo -E $item | jq -r '.headRefName' | cut -d "-" -f2)
 
     if [[ $(semver-compare $gh_pr_branch_version $2) == "0" ]]; then

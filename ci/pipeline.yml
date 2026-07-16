@@ -481,7 +481,7 @@ resources:
     initial_version: 0.0.1
     driver: git
     file: testflight-version
-    git_user: galoybot <bot@galoy.io>
+    git_user: blinkbitcoinbot <202112752+blinkbitcoinbot@users.noreply.github.com>
     commit_message: "release(testflight): v%version%"
     uri: #@ data.values.git_mobile_deployments_uri
     branch: #@ data.values.git_version_branch
