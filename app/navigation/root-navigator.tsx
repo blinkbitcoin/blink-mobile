@@ -68,6 +68,7 @@ import {
   LoginMethodScreen,
 } from "../screens/authentication-screen"
 import { PinScreen } from "../screens/authentication-screen/pin-screen"
+import { unlockScreenOptions } from "../screens/authentication-screen/unlock-screen"
 import { DeveloperScreen } from "../screens/developer-screen"
 import { EarnMapScreen } from "../screens/earns-map-screen"
 import { EarnQuiz, EarnSection } from "../screens/earns-screen"
@@ -230,12 +231,12 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="authenticationCheck"
         component={AuthenticationCheckScreen}
-        options={{ headerShown: false }}
+        options={unlockScreenOptions}
       />
       <RootNavigator.Screen
         name="authentication"
         component={AuthenticationScreen}
-        options={{ headerShown: false }}
+        options={unlockScreenOptions}
       />
       <RootNavigator.Screen
         name="login"
@@ -252,7 +253,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="pin"
         component={PinScreen}
-        options={{ headerShown: false }}
+        options={unlockScreenOptions}
       />
       <RootNavigator.Screen
         name="Primary"

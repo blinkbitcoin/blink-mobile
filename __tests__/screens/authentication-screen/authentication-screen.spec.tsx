@@ -1,22 +1,32 @@
 import React from "react"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render, screen } from "@testing-library/react-native"
 
 import { AuthenticationScreen } from "@app/screens/authentication-screen/authentication-screen"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import BiometricWrapper from "@app/utils/biometricAuthentication"
-import { AuthenticationScreenPurpose } from "@app/utils/enum"
+import { AuthenticationScreenPurpose, PinScreenPurpose } from "@app/utils/enum"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { RouteProp } from "@react-navigation/native"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
 
+/** The app loads the catalogue at boot; without it every label renders empty and the
+ *  buttons become indistinguishable. */
+loadLocale("en")
+
 const mockReplace = jest.fn()
 const mockGoBack = jest.fn()
+const mockNavigate = jest.fn()
 const mockSetAppUnlocked = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ replace: mockReplace, goBack: mockGoBack }),
+  useNavigation: () => ({
+    replace: mockReplace,
+    goBack: mockGoBack,
+    navigate: mockNavigate,
+  }),
 }))
 
 jest.mock("@app/navigation/navigation-container-wrapper", () => ({
@@ -108,5 +118,36 @@ describe("AuthenticationScreen", () => {
     expect(mockSetAppUnlocked).not.toHaveBeenCalled()
     expect(mockGoBack).not.toHaveBeenCalled()
     expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  describe("falling back to the pin", () => {
+    beforeEach(() => {
+      /** The prompt has to go unanswered, or the screen unlocks before the fallback. */
+      mockedBiometrics.authenticate.mockImplementation(async () => {})
+    })
+
+    it("carries the resume flag along, so the pin steps back too", async () => {
+      renderScreen(true)
+      await flushEffects()
+
+      fireEvent.press(screen.getByLabelText("Use PIN"))
+
+      expect(mockNavigate).toHaveBeenCalledWith("pin", {
+        screenPurpose: PinScreenPurpose.AuthenticatePin,
+        isResume: true,
+      })
+    })
+
+    it("leaves a cold start unmarked", async () => {
+      renderScreen(false)
+      await flushEffects()
+
+      fireEvent.press(screen.getByLabelText("Use PIN"))
+
+      expect(mockNavigate).toHaveBeenCalledWith("pin", {
+        screenPurpose: PinScreenPurpose.AuthenticatePin,
+        isResume: false,
+      })
+    })
   })
 })

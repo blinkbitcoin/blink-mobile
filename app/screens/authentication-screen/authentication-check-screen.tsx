@@ -9,7 +9,8 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useApolloClient } from "@apollo/client"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { updateDeviceSessionCount } from "@app/graphql/client-only-query"
-import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
+
+import { useUnlockScreen } from "./unlock-screen"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
 import AppLogoLightMode from "../../assets/logo/blink-logo-light.svg"
@@ -31,9 +32,9 @@ export const AuthenticationCheckScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "authenticationCheck">>()
   const route = useRoute<RouteProp<RootStackParamList, "authenticationCheck">>()
   const isAuthed = useIsAuthed()
-  const { setAppUnlocked } = useAuthenticationContext()
 
   const isResume = route.params?.isResume ?? false
+  const { completeUnlock } = useUnlockScreen({ isResume })
 
   useEffect(() => {
     ;(async () => {
@@ -54,20 +55,15 @@ export const AuthenticationCheckScreen: React.FC = () => {
           isResume,
         })
       } else {
-        setAppUnlocked()
-
         /** Only a cold start opens a device session, and only it owes the user the home
          *  screen; a resume whose lock was turned off meanwhile just steps back. */
-        if (isResume) {
-          navigation.goBack()
-          return
-        }
-
-        updateDeviceSessionCount(client)
-        navigation.replace("Primary")
+        completeUnlock(() => {
+          updateDeviceSessionCount(client)
+          navigation.replace("Primary")
+        })
       }
     })()
-  }, [isAuthed, navigation, setAppUnlocked, client, isResume])
+  }, [isAuthed, navigation, completeUnlock, client, isResume])
 
   return (
     <Screen>
