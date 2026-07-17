@@ -92,6 +92,60 @@ export const resolveIpCountryCode = async (
 }
 
 /**
+ * Whether the current IP is a known anonymizer (VPN/proxy/Tor exit), from
+ * proxycheck.io — the one adapter in the chain whose core product is proxy
+ * detection.
+ *
+ * - `true`  → the IP is a flagged anonymizer
+ * - `false` → proxycheck answered and did not flag it
+ * - `undefined` → detection unavailable (request failed or fields missing)
+ *
+ * Callers must treat `undefined` as "no evidence", not as "clean".
+ */
+export const detectAnonymizingIp = async (
+  timeout: number = DEFAULT_TIMEOUT_MS,
+): Promise<boolean | undefined> => {
+  try {
+    // vpn=1 explicitly requests proxy/VPN detection (v2-documented, harmless on v3)
+    const url = Config.PROXYCHECK_API_KEY
+      ? `https://proxycheck.io/v3/?key=${Config.PROXYCHECK_API_KEY}&vpn=1`
+      : "https://proxycheck.io/v3/?vpn=1"
+    const { data } = await axios.get(url, { timeout })
+    type Detections = { proxy?: boolean; vpn?: boolean; tor?: boolean }
+    type IpEntry = { detections?: Detections; proxy?: string }
+    const ipEntry = Object.values(data as Record<string, IpEntry>).find(
+      (v) => v && typeof v === "object" && ("detections" in v || "proxy" in v),
+    )
+    if (!ipEntry) return undefined
+    if (ipEntry.detections) {
+      return Boolean(
+        ipEntry.detections.proxy || ipEntry.detections.vpn || ipEntry.detections.tor,
+      )
+    }
+    // v2-style flat flag
+    if (ipEntry.proxy === "yes") return true
+    if (ipEntry.proxy === "no") return false
+    return undefined
+  } catch (err) {
+    reportError("ip-country-lookup", err)
+    return undefined
+  }
+}
+
+/** Session cache mirroring resolveIpCountryCodeCached: conclusive answers are cached, `undefined` is retried. */
+let sharedAnonymityLookup: Promise<boolean | undefined> | null = null
+
+export const detectAnonymizingIpCached = (): Promise<boolean | undefined> => {
+  if (!sharedAnonymityLookup) {
+    sharedAnonymityLookup = detectAnonymizingIp().then((result) => {
+      if (result === undefined) sharedAnonymityLookup = null
+      return result
+    })
+  }
+  return sharedAnonymityLookup
+}
+
+/**
  * One shared lookup per app session: the device's country rarely changes
  * mid-session and several screens mount hooks that need it, so the external
  * services are hit once instead of once per mount. A failed lookup is not

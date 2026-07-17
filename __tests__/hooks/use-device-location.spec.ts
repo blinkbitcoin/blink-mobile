@@ -1,9 +1,6 @@
 import { renderHook, act } from "@testing-library/react-hooks"
 
-import useDeviceLocation, {
-  isBlockedCountry,
-  useIpCountryCode,
-} from "@app/hooks/use-device-location"
+import useDeviceLocation, { isBlockedCountry } from "@app/hooks/use-device-location"
 
 const mockLogError = jest.fn()
 const mockUpdateCountryCode = jest.fn()
@@ -273,41 +270,6 @@ describe("useDeviceLocation", () => {
     await act(async () => {})
 
     expect(mockUpdateCountryCode).toHaveBeenCalledWith(expect.anything(), "DE")
-  })
-})
-
-describe("useIpCountryCode", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockResolveIpCountryCode.mockResolvedValue(undefined)
-  })
-
-  it("does not call IP lookup while disabled", () => {
-    const { result } = renderHook(() => useIpCountryCode(false))
-
-    expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
-    expect(result.current).toBeUndefined()
-  })
-
-  it("resolves the country from the adapter chain when enabled", async () => {
-    mockResolveIpCountryCode.mockResolvedValue("HK")
-
-    const { result } = renderHook(() => useIpCountryCode(true))
-
-    await act(async () => {})
-
-    expect(mockResolveIpCountryCode).toHaveBeenCalled()
-    expect(result.current).toBe("HK")
-  })
-
-  it("stays undefined when all adapters return nothing", async () => {
-    mockResolveIpCountryCode.mockResolvedValue(undefined)
-
-    const { result } = renderHook(() => useIpCountryCode(true))
-
-    await act(async () => {})
-
-    expect(result.current).toBeUndefined()
   })
 })
 

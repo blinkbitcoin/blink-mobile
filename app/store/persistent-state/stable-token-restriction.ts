@@ -7,3 +7,10 @@ export const withStableTokenRestricted = (state: PersistentState): PersistentSta
   ...state,
   stableTokenRestricted: true,
 })
+
+export const withoutStableTokenRestricted = (
+  state: PersistentState,
+): PersistentState => ({
+  ...state,
+  stableTokenRestricted: false,
+})

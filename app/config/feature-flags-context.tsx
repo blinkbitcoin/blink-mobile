@@ -31,6 +31,7 @@ const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const NonCustodialEnabledKey = "nonCustodialEnabled"
 const StableBalanceEnabledKey = "stableBalanceEnabled"
 const DollarRestrictionCacheEnabledKey = "dollarRestrictionCacheEnabled"
+const RestrictionSelfHealEnabledKey = "restrictionSelfHealEnabled"
 const AutoConvertMaxAttemptsKey = "autoConvertMaxAttempts"
 const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
 const AutoConvertPollIntervalMsKey = "autoConvertPollIntervalMs"
@@ -58,6 +59,13 @@ type FeatureFlags = {
   nonCustodialEnabled: boolean
   stableBalanceEnabled: boolean
   remoteConfigReady: boolean
+  /**
+   * True only after a successful fetchAndActivate. `remoteConfigReady` flips
+   * true even on failure (defaults in use) — anything that must not act on
+   * default values (e.g. clearing a persisted region restriction) gates on
+   * this instead.
+   */
+  remoteConfigLoaded: boolean
 }
 
 type RemoteConfig = {
@@ -80,6 +88,7 @@ type RemoteConfig = {
   [NonCustodialEnabledKey]: boolean
   [StableBalanceEnabledKey]: boolean
   [DollarRestrictionCacheEnabledKey]: boolean
+  [RestrictionSelfHealEnabledKey]: boolean
   [AutoConvertMaxAttemptsKey]: number
   [AutoConvertPollMaxAttemptsKey]: number
   [AutoConvertPollIntervalMsKey]: number
@@ -151,6 +160,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
   dollarRestrictionCacheEnabled: true,
+  restrictionSelfHealEnabled: true,
   autoConvertMaxAttempts: 3,
   autoConvertPollMaxAttempts: 30,
   autoConvertPollIntervalMs: 500,
@@ -170,6 +180,7 @@ const defaultFeatureFlags: FeatureFlags = {
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
   remoteConfigReady: false,
+  remoteConfigLoaded: false,
 }
 
 remoteConfigInstance().setDefaults({
@@ -214,6 +225,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
 
   const { currentLevel } = useLevel()
   const [remoteConfigReady, setRemoteConfigReady] = useState(false)
+  const [remoteConfigLoaded, setRemoteConfigLoaded] = useState(false)
   const rolloutLoggedRef = useRef(false)
 
   const {
@@ -295,6 +307,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
 
         const dollarRestrictionCacheEnabled = remoteConfigInstance()
           .getValue(DollarRestrictionCacheEnabledKey)
+          .asBoolean()
+
+        const restrictionSelfHealEnabled = remoteConfigInstance()
+          .getValue(RestrictionSelfHealEnabledKey)
           .asBoolean()
 
         const autoConvertMaxAttempts = remoteConfigInstance()
@@ -382,6 +398,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           nonCustodialEnabled,
           stableBalanceEnabled,
           dollarRestrictionCacheEnabled,
+          restrictionSelfHealEnabled,
           autoConvertMaxAttempts,
           autoConvertPollMaxAttempts,
           autoConvertPollIntervalMs,
@@ -395,6 +412,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           selfCustodialCreationBlockedCountries,
           selfCustodialDepositClaimLeewayVbyte,
         })
+        setRemoteConfigLoaded(true)
       } catch (err) {
         logError({
           scope: "remote-config",
@@ -414,6 +432,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     stableBalanceEnabled:
       remoteConfig.nonCustodialEnabled && remoteConfig.stableBalanceEnabled,
     remoteConfigReady,
+    remoteConfigLoaded,
   }
 
   useEffect(() => {

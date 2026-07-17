@@ -9,3 +9,10 @@ export const withStablesatsTransferBlocked = (
   ...state,
   stablesatsTransferBlocked: true,
 })
+
+export const withoutStablesatsTransferBlocked = (
+  state: PersistentState,
+): PersistentState => ({
+  ...state,
+  stablesatsTransferBlocked: false,
+})

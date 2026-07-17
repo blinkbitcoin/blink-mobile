@@ -9,3 +9,10 @@ export const withStableTokenTransferBlocked = (
   ...state,
   stableTokenTransferBlocked: true,
 })
+
+export const withoutStableTokenTransferBlocked = (
+  state: PersistentState,
+): PersistentState => ({
+  ...state,
+  stableTokenTransferBlocked: false,
+})

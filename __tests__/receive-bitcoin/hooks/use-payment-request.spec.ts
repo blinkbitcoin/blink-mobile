@@ -56,10 +56,16 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
 }))
 
-const mockUseDeviceLocation = jest.fn(() => ({ countryCode: "SV", loading: false }))
-jest.mock("@app/hooks/use-device-location", () => ({
-  __esModule: true,
-  default: () => mockUseDeviceLocation(),
+type MockRegistrationCountry = {
+  countryCode: string | undefined
+  loading: boolean
+  trusted: boolean
+}
+const mockUseRegistrationCountry = jest.fn(
+  (): MockRegistrationCountry => ({ countryCode: "SV", loading: false, trusted: true }),
+)
+jest.mock("@app/hooks/use-registration-country", () => ({
+  useRegistrationCountry: () => mockUseRegistrationCountry(),
 }))
 
 const mockUseCountdown = jest.fn()
@@ -165,7 +171,11 @@ describe("usePaymentRequest", () => {
     mockUseLnUpdateHashPaid.mockReturnValue(null)
     mockUseCountdown.mockReturnValue({ remainingSeconds: null, isExpired: false })
     mockUseDollarBalanceRestricted.mockReturnValue(false)
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "SV", loading: false })
+    mockUseRegistrationCountry.mockReturnValue({
+      countryCode: "SV",
+      loading: false,
+      trusted: true,
+    })
   })
 
   it("returns null when wallet resolution is null", () => {
@@ -290,7 +300,11 @@ describe("usePaymentRequest", () => {
 
   it("defers invoice creation until country detection settles", async () => {
     setupMocksWithPR()
-    mockUseDeviceLocation.mockReturnValue({ countryCode: "SV", loading: true })
+    mockUseRegistrationCountry.mockReturnValue({
+      countryCode: undefined,
+      loading: true,
+      trusted: false,
+    })
 
     renderHook(() => usePaymentRequest())
 

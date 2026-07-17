@@ -1,6 +1,7 @@
 import {
   getStablesatsRestricted,
   withStablesatsRestricted,
+  withoutStablesatsRestricted,
 } from "@app/store/persistent-state/stablesats-restriction"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
 
@@ -43,6 +44,32 @@ describe("withStablesatsRestricted", () => {
     const snapshot = JSON.parse(JSON.stringify(original))
 
     withStablesatsRestricted(original)
+
+    expect(original).toEqual(snapshot)
+  })
+})
+
+describe("withoutStablesatsRestricted", () => {
+  it("clears the flag when set", () => {
+    expect(
+      getStablesatsRestricted(
+        withoutStablesatsRestricted(withStablesatsRestricted(baseState)),
+      ),
+    ).toBe(false)
+  })
+
+  it("keeps the flag cleared when already unset", () => {
+    expect(getStablesatsRestricted(withoutStablesatsRestricted(baseState))).toBe(false)
+  })
+
+  it("does not mutate the input state", () => {
+    const original: PersistentState = {
+      ...baseState,
+      stablesatsRestrictedCustodial: true,
+    }
+    const snapshot = JSON.parse(JSON.stringify(original))
+
+    withoutStablesatsRestricted(original)
 
     expect(original).toEqual(snapshot)
   })

@@ -165,6 +165,10 @@ jest.mock("@app/hooks/use-device-location", () => ({
   default: () => ({ countryCode: "SV", loading: false }),
 }))
 
+jest.mock("@app/hooks/use-registration-country", () => ({
+  useRegistrationCountry: () => ({ countryCode: "SV", loading: false, trusted: true }),
+}))
+
 jest.mock("@app/hooks/use-display-currency", () => {
   const info = {
     BTC: {

@@ -8,8 +8,8 @@ import {
   useLnUsdInvoiceCreateMutation,
   useOnChainAddressCurrentMutation,
 } from "@app/graphql/generated"
-import useDeviceLocation from "@app/hooks/use-device-location"
 import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useRegistrationCountry } from "@app/hooks/use-registration-country"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { BtcWalletDescriptor } from "@app/types/wallets"
 
@@ -80,7 +80,7 @@ const DEFAULT_EXPIRATION_MINUTES: Record<WalletCurrency, number> = {
 export const usePaymentRequest = () => {
   const wallets = useWalletResolution()
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
-  const { loading: locationLoading } = useDeviceLocation()
+  const { loading: locationLoading } = useRegistrationCountry()
 
   const [lnNoAmountInvoiceCreate] = useLnNoAmountInvoiceCreateMutation()
   const [lnUsdInvoiceCreate] = useLnUsdInvoiceCreateMutation()
