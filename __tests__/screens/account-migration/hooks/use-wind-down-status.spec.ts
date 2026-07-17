@@ -63,7 +63,21 @@ describe("useWindDownStatus", () => {
 
     const { result } = renderHook(() => useWindDownStatus())
 
-    expect(mockUseWindDownQuery).toHaveBeenCalledWith({ skip: true })
+    expect(mockUseWindDownQuery).toHaveBeenCalledWith({
+      skip: true,
+      fetchPolicy: "no-cache",
+    })
     expect(result.current).toBeNull()
+  })
+
+  it("fetches without touching the cache so a switch never serves the previous account's status", () => {
+    mockUseWindDownQuery.mockReturnValue({ data: { windDown: null } })
+
+    renderHook(() => useWindDownStatus())
+
+    expect(mockUseWindDownQuery).toHaveBeenCalledWith({
+      skip: false,
+      fetchPolicy: "no-cache",
+    })
   })
 })

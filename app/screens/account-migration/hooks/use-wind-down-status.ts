@@ -36,7 +36,15 @@ const toWindDown = (node: WindDownQuery["windDown"]): WindDown | null => {
  */
 export const useWindDownStatus = (): WindDown | null => {
   const isAuthed = useIsAuthed()
-  const { data } = useWindDownQuery({ skip: !isAuthed })
+
+  /**
+   * no-cache, never cache-first: windDown is an argument-less top-level field that would be
+   * cached under a single global key and persisted, so any cache read serves the previous
+   * account's status after a switch (an unaffected account inheriting an affected one's
+   * PRE_CUTOFF). Skipping the cache entirely keeps the phase tied to the active account and
+   * never writes account-scoped data under the shared key.
+   */
+  const { data } = useWindDownQuery({ skip: !isAuthed, fetchPolicy: "no-cache" })
 
   return toWindDown(data?.windDown)
 }
