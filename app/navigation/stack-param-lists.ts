@@ -34,12 +34,15 @@ export type RootStackParamList = {
     title?: string
     onboarding?: boolean
   }
-  authenticationCheck: undefined
+  /** `isResume` marks the lock raised on returning from background: unlocking pops back to
+   *  the screen the user was on, instead of resetting to Primary the way a cold start does. */
+  authenticationCheck: { isResume?: boolean } | undefined
   authentication: {
     screenPurpose: AuthenticationScreenPurpose
     isPinEnabled: boolean
+    isResume?: boolean
   }
-  pin: { screenPurpose: PinScreenPurpose }
+  pin: { screenPurpose: PinScreenPurpose; isResume?: boolean }
   Primary: undefined
   earnsSection: { section: EarnSectionType; isAvailable: boolean }
   earnsQuiz: { id: string; isAvailable: boolean }
