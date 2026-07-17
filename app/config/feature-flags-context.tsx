@@ -45,7 +45,6 @@ const CustodialTransferBlockedCountriesKey = "custodialTransferBlockedCountries"
 const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
 const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
-const CustodialMigrationRequiredCountriesKey = "custodialMigrationRequiredCountries"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -95,7 +94,6 @@ type RemoteConfig = {
   [CustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
-  [CustodialMigrationRequiredCountriesKey]: string[]
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -168,7 +166,6 @@ export const defaultRemoteConfig: RemoteConfig = {
   custodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialDepositClaimLeewayVbyte: 1,
-  custodialMigrationRequiredCountries: ["US"],
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -203,9 +200,6 @@ remoteConfigInstance().setDefaults({
   ),
   selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.selfCustodialCreationBlockedCountries,
-  ),
-  custodialMigrationRequiredCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.custodialMigrationRequiredCountries,
   ),
 })
 
@@ -375,11 +369,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
           .asNumber()
 
-        const custodialMigrationRequiredCountries = getRemoteConfigStringList(
-          CustodialMigrationRequiredCountriesKey,
-          defaultRemoteConfig.custodialMigrationRequiredCountries,
-        )
-
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
@@ -413,7 +402,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           custodialCreationBlockedCountries,
           selfCustodialCreationBlockedCountries,
           selfCustodialDepositClaimLeewayVbyte,
-          custodialMigrationRequiredCountries,
         })
       } catch (err) {
         logError({

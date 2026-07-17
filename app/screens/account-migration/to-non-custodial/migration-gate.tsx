@@ -7,48 +7,52 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { DollarBalanceMigrationModal } from "@app/components/dollar-balance-migration-modal"
 import { Screen } from "@app/components/screen"
-import { useCustodialMigrationRequired } from "@app/hooks/use-custodial-migration-required"
 import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
 import { useTransferBlocked } from "@app/hooks/use-transfer-blocked"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { WindDownStatus } from "@app/types/wind-down"
 import { testProps } from "@app/utils/testProps"
 
 import {
   useActiveApiKeys,
   useCustodialWalletBalances,
-  useWindDownGateArmed,
 } from "@app/screens/account-migration/hooks"
+import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
 
 import { MigrationApiServiceScreen } from "./api-service-screen"
 import { MigrationMode, MigrationRequiredScreen } from "./migration-required-screen"
 
-type MigrationGateProps = {
-  onClose?: () => void
-}
-
-const resolveMigrationMode = (isGated: boolean, isForced: boolean): MigrationMode => {
-  if (isGated) return "gate"
-  if (isForced) return "forcedPreDeadline"
+/**
+ * The intro mode is the server wind-down phase, never a local guess: the closed account is
+ * the gate, an affected account still before closure is forced, and an unaffected account
+ * (only ever reached from Settings) is voluntary.
+ */
+const resolveMigrationMode = (status: WindDownStatus | undefined): MigrationMode => {
+  if (status === WindDownStatus.GatedClosed) return "gate"
+  const isPreClosurePhase =
+    status === WindDownStatus.PreCutoff || status === WindDownStatus.ReceiveDisabled
+  if (isPreClosurePhase) return "forcedPreDeadline"
   return "voluntary"
 }
 
 /**
- * Entry gate for the migration flow, the single choke point for both entry points
- * (Settings and the forced root blocker). Order of checks: accounts with API keys see
- * the API-service warning first, then a custodial Dollar Balance blocks
- * entry (the user empties it manually; post-gate this does not apply since the flow
- * itself converts dollars), and finally the "Time to upgrade" screen in the mode the
- * account's situation demands (voluntary, forced pre-deadline, or the armed gate).
+ * Entry gate for the migration flow, the single choke point for both the Settings entry
+ * (tapping Migrate) and the armed gate that replaces the app after closure. Order of
+ * checks: accounts with API keys see the API-service warning first, then a custodial
+ * Dollar Balance blocks entry (the user empties it manually; post-gate this does not apply
+ * since the flow itself converts dollars), and finally the "Time to upgrade" screen in the
+ * mode the wind-down phase demands (voluntary, forced pre-deadline, or the armed gate).
  */
-export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
+export const MigrationGate: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const { hasActiveApiKeys, loading: apiKeysLoading } = useActiveApiKeys()
-  const isForced = useCustodialMigrationRequired()
-  const isGated = useWindDownGateArmed()
+  const windDown = useCustodialWindDown()
+  const mode = resolveMigrationMode(windDown?.status)
+  const isGated = mode === "gate"
   const isTransferBlocked = useTransferBlocked()
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
   const [isApiWarningAcknowledged, setIsApiWarningAcknowledged] = useState(false)
@@ -62,12 +66,8 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
   const acknowledgeApiWarning = useCallback(() => setIsApiWarningAcknowledged(true), [])
 
   const exitFlow = useCallback(() => {
-    if (onClose) {
-      onClose()
-      return
-    }
     navigation.goBack()
-  }, [onClose, navigation])
+  }, [navigation])
 
   const goToDollarTransfer = useCallback(() => {
     navigation.navigate("conversionDetails")
@@ -91,7 +91,6 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
   }
 
   const hasCustodialDollarBalance = usdBalanceCents > 0
-  const mode = resolveMigrationMode(isGated, isForced)
 
   /** The API-key warning outranks the Dollar-Balance precondition in the entry order
    *  (entry, API-key check, Dollar Balance check, intro). */
@@ -120,7 +119,7 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
     const transferAction = canTransferInApp ? goToDollarTransfer : undefined
     return (
       <>
-        <MigrationRequiredScreen mode={mode} onClose={onClose} />
+        <MigrationRequiredScreen mode={mode} />
         <DollarBalanceMigrationModal
           isVisible={isFocused}
           toggleModal={exitFlow}
@@ -130,7 +129,7 @@ export const MigrationGate: React.FC<MigrationGateProps> = ({ onClose }) => {
     )
   }
 
-  return <MigrationRequiredScreen mode={mode} onClose={onClose} />
+  return <MigrationRequiredScreen mode={mode} />
 }
 
 const useStyles = makeStyles(() => ({

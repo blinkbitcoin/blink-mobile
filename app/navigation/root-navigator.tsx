@@ -1049,8 +1049,7 @@ export const PrimaryNavigator = () => {
   const { LL } = useI18nContext()
 
   const migrationBlocker = useMigrationBlocker()
-  if (migrationBlocker.isVisible)
-    return <MigrationGate onClose={migrationBlocker.onClose} />
+  if (migrationBlocker.isVisible) return <MigrationGate />
 
   return (
     <Tab.Navigator
