@@ -4,17 +4,11 @@ import { useMigrateNowPrompt } from "@app/screens/account-migration/hooks/use-mi
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
-let mockAccountType: AccountType = AccountType.Custodial
-
 let mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
 
 jest.mock("@app/config/feature-flags-context", () => ({
   ...jest.requireActual("@app/config/feature-flags-context"),
   useFeatureFlags: () => mockFeatureFlags,
-}))
-
-jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ accountType: mockAccountType }),
 }))
 
 let mockActiveAccount: { id: string; type: string } | undefined
@@ -41,7 +35,6 @@ jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
 
 describe("useMigrateNowPrompt", () => {
   beforeEach(() => {
-    mockAccountType = AccountType.Custodial
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
     mockStatus = WindDownStatus.ReceiveDisabled
     mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
@@ -83,7 +76,7 @@ describe("useMigrateNowPrompt", () => {
   })
 
   it("never prompts a self-custodial account", () => {
-    mockAccountType = AccountType.SelfCustodial
+    mockActiveAccount = { id: "sc-1", type: AccountType.SelfCustodial }
 
     const { result } = renderHook(() => useMigrateNowPrompt())
 

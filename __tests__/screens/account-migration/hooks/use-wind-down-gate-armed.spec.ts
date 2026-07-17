@@ -6,8 +6,8 @@ import { AccountType } from "@app/types/wallet"
 
 let mockAccountType: AccountType = AccountType.Custodial
 
-jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ accountType: mockAccountType }),
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({ activeAccount: { type: mockAccountType } }),
 }))
 
 let mockStatus: WindDownStatus | null = WindDownStatus.PreCutoff

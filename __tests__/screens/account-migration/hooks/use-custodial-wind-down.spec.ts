@@ -4,11 +4,11 @@ import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-c
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
-let mockAccountType: AccountType = AccountType.Custodial
+let mockActiveAccount: { type: AccountType } | undefined
 let mockWindDown: WindDown | null = null
 
-jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ accountType: mockAccountType }),
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
@@ -25,7 +25,7 @@ const affectedWindDown: WindDown = {
 
 describe("useCustodialWindDown", () => {
   beforeEach(() => {
-    mockAccountType = AccountType.Custodial
+    mockActiveAccount = { type: AccountType.Custodial }
     mockWindDown = affectedWindDown
   })
 
@@ -36,7 +36,15 @@ describe("useCustodialWindDown", () => {
   })
 
   it("returns null for a self-custodial account even when the server reports a wind-down", () => {
-    mockAccountType = AccountType.SelfCustodial
+    mockActiveAccount = { type: AccountType.SelfCustodial }
+
+    const { result } = renderHook(() => useCustodialWindDown())
+
+    expect(result.current).toBeNull()
+  })
+
+  it("returns null when no account is active, so the placeholder never arms the gate", () => {
+    mockActiveAccount = undefined
 
     const { result } = renderHook(() => useCustodialWindDown())
 
