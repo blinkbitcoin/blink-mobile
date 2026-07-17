@@ -19,6 +19,7 @@ const UpgradeModalCooldownDaysKey = "upgradeModalCooldownDays"
 const UpgradeModalShowAtSessionNumberKey = "upgradeModalShowAtSessionNumber"
 const FeeReimbursementMemoKey = "feeReimbursementMemo"
 const SuccessIconDurationKey = "successIconDuration"
+const AppLockGracePeriodSecondsKey = "appLockGracePeriodSeconds"
 const CardTermsAndConditionsUrlKey = "cardTermsAndConditionsUrl"
 const CardPrivacyPolicyUrlKey = "cardPrivacyPolicyUrl"
 const CardCardholderAgreementUrlKey = "cardCardholderAgreementUrl"
@@ -68,6 +69,7 @@ type RemoteConfig = {
   [UpgradeModalShowAtSessionNumberKey]: number
   [FeeReimbursementMemoKey]: string
   [SuccessIconDurationKey]: number
+  [AppLockGracePeriodSecondsKey]: number
   [CardTermsAndConditionsUrlKey]: string
   [CardPrivacyPolicyUrlKey]: string
   [CardCardholderAgreementUrlKey]: string
@@ -139,6 +141,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   upgradeModalShowAtSessionNumber: 1,
   feeReimbursementMemo: "fee reimbursement",
   successIconDuration: 2300,
+  appLockGracePeriodSeconds: 60,
   cardTermsAndConditionsUrl: "https://www.blink.sv/en/terms-conditions",
   cardPrivacyPolicyUrl: "https://www.blink.sv/en/privacy-policy",
   cardCardholderAgreementUrl: "https://www.blink.sv",
@@ -251,6 +254,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .asString()
         const successIconDuration = remoteConfigInstance()
           .getValue(SuccessIconDurationKey)
+          .asNumber()
+
+        const appLockGracePeriodSeconds = remoteConfigInstance()
+          .getValue(AppLockGracePeriodSecondsKey)
           .asNumber()
 
         const cardTermsAndConditionsUrl = remoteConfigInstance()
@@ -370,6 +377,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           upgradeModalShowAtSessionNumber,
           feeReimbursementMemo,
           successIconDuration,
+          appLockGracePeriodSeconds,
           cardTermsAndConditionsUrl,
           cardPrivacyPolicyUrl,
           cardCardholderAgreementUrl,

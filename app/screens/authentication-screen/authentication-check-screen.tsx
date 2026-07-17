@@ -2,7 +2,7 @@ import * as React from "react"
 import { useEffect } from "react"
 import { View } from "react-native"
 
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -29,8 +29,11 @@ export const AuthenticationCheckScreen: React.FC = () => {
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "authenticationCheck">>()
+  const route = useRoute<RouteProp<RootStackParamList, "authenticationCheck">>()
   const isAuthed = useIsAuthed()
   const { setAppUnlocked } = useAuthenticationContext()
+
+  const isResume = route.params?.isResume ?? false
 
   useEffect(() => {
     ;(async () => {
@@ -43,16 +46,28 @@ export const AuthenticationCheckScreen: React.FC = () => {
         navigation.replace("authentication", {
           screenPurpose: AuthenticationScreenPurpose.Authenticate,
           isPinEnabled,
+          isResume,
         })
       } else if (isPinEnabled) {
-        navigation.replace("pin", { screenPurpose: PinScreenPurpose.AuthenticatePin })
+        navigation.replace("pin", {
+          screenPurpose: PinScreenPurpose.AuthenticatePin,
+          isResume,
+        })
       } else {
         setAppUnlocked()
+
+        /** Only a cold start opens a device session, and only it owes the user the home
+         *  screen; a resume whose lock was turned off meanwhile just steps back. */
+        if (isResume) {
+          navigation.goBack()
+          return
+        }
+
         updateDeviceSessionCount(client)
         navigation.replace("Primary")
       }
     })()
-  }, [isAuthed, navigation, setAppUnlocked, client])
+  }, [isAuthed, navigation, setAppUnlocked, client, isResume])
 
   return (
     <Screen>

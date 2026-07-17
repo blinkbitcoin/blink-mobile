@@ -33,7 +33,7 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
 
   const styles = useStyles()
   const { logout } = useLogout()
-  const { screenPurpose, isPinEnabled } = route.params
+  const { screenPurpose, isPinEnabled, isResume } = route.params
   const { setAppUnlocked } = useAuthenticationContext()
   const { LL } = useI18nContext()
 
@@ -44,8 +44,14 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
       KeyStoreWrapper.setIsBiometricsEnabled()
     }
     setAppUnlocked()
+
+    if (isResume) {
+      navigation.goBack()
+      return
+    }
+
     navigation.replace("Primary")
-  }, [navigation, screenPurpose, setAppUnlocked])
+  }, [navigation, screenPurpose, setAppUnlocked, isResume])
 
   const attemptAuthentication = React.useCallback(() => {
     let description = "attemptAuthentication. should not be displayed?"

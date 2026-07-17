@@ -26,7 +26,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, "pin">>()
 
   const { logout } = useLogout()
-  const { screenPurpose } = route.params
+  const { screenPurpose, isResume } = route.params
   const { setAppUnlocked } = useAuthenticationContext()
   const { LL } = useI18nContext()
   const [enteredPIN, setEnteredPIN] = useState("")
@@ -48,6 +48,12 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     if (newEnteredPIN === (await KeyStoreWrapper.getPinOrEmptyString())) {
       KeyStoreWrapper.resetPinAttempts()
       setAppUnlocked()
+
+      if (isResume) {
+        navigation.goBack()
+        return
+      }
+
       navigation.reset({
         index: 0,
         routes: [{ name: "Primary" }],
