@@ -28,6 +28,16 @@ export const AppStateWrapper: React.FC = () => {
    *  path already locks through the cold start. */
   const backgroundedAtRef = React.useRef<number | null>(null)
 
+  /** Read through refs so that flipping the lock, or a remote-config refresh, never tears
+   *  down and re-subscribes the AppState listener underneath a transition in flight. */
+  const isAppLockedRef = React.useRef(isAppLocked)
+  const gracePeriodSecondsRef = React.useRef(appLockGracePeriodSeconds)
+
+  useEffect(() => {
+    isAppLockedRef.current = isAppLocked
+    gracePeriodSecondsRef.current = appLockGracePeriodSeconds
+  }, [isAppLocked, appLockGracePeriodSeconds])
+
   /** The lock the user configured only ever guarded the cold start, leaving a backgrounded
    *  session open indefinitely. Re-raise it on return, past a grace period so the common
    *  hop to another app and straight back does not demand the PIN again. */
@@ -38,10 +48,16 @@ export const AppStateWrapper: React.FC = () => {
 
     /** A cold start left at the unlock screen is already locked; raising it again would
      *  stack a second unlock screen over the first, and demand the PIN twice. */
-    if (isAppLocked) return
+    if (isAppLockedRef.current) return
 
+    /** React Native exposes no monotonic clock, so the trip is measured against the wall
+     *  clock, which the user can move. Winding it forward only locks sooner; winding it
+     *  back is the bypass, so a clock that went backwards is treated as a trip that cannot
+     *  be trusted, and locks rather than being let through. */
     const secondsInBackground = (Date.now() - backgroundedAt) / MILLISECONDS_PER_SECOND
-    if (secondsInBackground < appLockGracePeriodSeconds) return
+    const isWithinGracePeriod =
+      secondsInBackground >= 0 && secondsInBackground < gracePeriodSecondsRef.current
+    if (isWithinGracePeriod) return
 
     const isLockEnabled =
       (await KeyStoreWrapper.getIsPinEnabled()) ||
@@ -52,11 +68,26 @@ export const AppStateWrapper: React.FC = () => {
      *  the navigation is what actually puts the lock in front of the user. */
     setAppLocked()
     navigation.navigate("authenticationCheck", { isResume: true })
-  }, [appLockGracePeriodSeconds, isAppLocked, navigation, setAppLocked])
+  }, [navigation, setAppLocked])
 
   const handleAppStateChange = useCallback(
     async (nextAppState: AppStateStatus) => {
-      if (appState.current.match(/background/) && nextAppState === "active") {
+      /** Recorded before the await below, so that a transition arriving while the relock is
+       *  still running reads the state this one already moved to, rather than a stale one. */
+      const previousAppState = appState.current
+      appState.current = nextAppState
+
+      /** iOS reaches the background through "inactive", which is where `RCTAppState` maps
+       *  `willResignActive`, while Android leaves straight from "active". Both are spelled
+       *  out rather than matched loosely, since /active/ also matches "inactive" and the
+       *  relock would quietly depend on that substring accident. */
+      const isEnteringForeground =
+        previousAppState === "background" && nextAppState === "active"
+      const isLeavingForeground =
+        (previousAppState === "active" || previousAppState === "inactive") &&
+        nextAppState === "background"
+
+      if (isEnteringForeground) {
         isAuthed && client.refetchQueries({ include: [HomeAuthedDocument] })
 
         console.info("App has come to the foreground!")
@@ -65,12 +96,10 @@ export const AppStateWrapper: React.FC = () => {
         await relockIfGracePeriodExpired()
       }
 
-      if (appState.current.match(/active/) && nextAppState === "background") {
+      if (isLeavingForeground) {
         backgroundedAtRef.current = Date.now()
         logEnterBackground()
       }
-
-      appState.current = nextAppState
     },
     [client, isAuthed, relockIfGracePeriodExpired],
   )

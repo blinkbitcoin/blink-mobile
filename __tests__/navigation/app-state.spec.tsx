@@ -165,6 +165,21 @@ describe("AppStateWrapper", () => {
       expect(mockSetAppLocked).not.toHaveBeenCalled()
     })
 
+    it("locks when the clock was wound back to fake a short trip", async () => {
+      /** The trip is measured against the wall clock for want of a monotonic one, so winding
+       *  the clock back would otherwise report a negative stay and slip under the grace
+       *  period. A clock that moved backwards is not trusted, and locks. */
+      renderWrapper()
+      await flushEffects()
+
+      await emitAppState("background")
+      jest.setSystemTime(START_TIME_MS - 60 * 60 * 1000)
+      await emitAppState("active")
+
+      expect(mockSetAppLocked).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledWith("authenticationCheck", { isResume: true })
+    })
+
     it("locks across the ios sequence, which reaches the background through inactive", async () => {
       renderWrapper()
       await flushEffects()
