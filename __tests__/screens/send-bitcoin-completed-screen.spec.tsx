@@ -35,6 +35,29 @@ jest.mock("react-native-view-shot", () => {
   }
 })
 
+const mockNavigate = jest.fn()
+const mockNavigation = { navigate: mockNavigate, popToTop: jest.fn() }
+jest.mock("@react-navigation/native", () => {
+  const actual = jest.requireActual("@react-navigation/native")
+  return {
+    ...actual,
+    useNavigation: () => mockNavigation,
+  }
+})
+
+const mockAppStateListeners: Array<(state: string) => void> = []
+jest.mock("react-native/Libraries/AppState/AppState", () => ({
+  __esModule: true,
+  default: {
+    currentState: "active",
+    addEventListener: (_event: string, handler: (state: string) => void) => {
+      mockAppStateListeners.push(handler)
+      return { remove: jest.fn() }
+    },
+    removeEventListener: jest.fn(),
+  },
+}))
+
 jest.useFakeTimers()
 
 describe("SendBitcoinCompletedScreen", () => {
@@ -445,6 +468,51 @@ describe("SendBitcoinCompletedScreen", () => {
     })
 
     expect(screen.queryByText(LL.SendBitcoinScreen.noteLabel())).toBeNull()
+  })
+
+  describe("dismiss on app background", () => {
+    beforeEach(() => {
+      mockNavigate.mockClear()
+      mockAppStateListeners.length = 0
+    })
+
+    const triggerAppStateChange = (nextState: string) => {
+      const notify = mockAppStateListeners[mockAppStateListeners.length - 1]
+      act(() => {
+        notify(nextState)
+      })
+    }
+
+    it("navigates home when the app transitions from active to background", async () => {
+      render(
+        <ContextForScreen>
+          <Success />
+        </ContextForScreen>,
+      )
+      await waitFor(() => screen.findByTestId("Success Text"))
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+
+      triggerAppStateChange("background")
+
+      expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    })
+
+    it("does not navigate home for transitions other than active to background", async () => {
+      render(
+        <ContextForScreen>
+          <Success />
+        </ContextForScreen>,
+      )
+      await waitFor(() => screen.findByTestId("Success Text"))
+
+      // active -> inactive should be ignored
+      triggerAppStateChange("inactive")
+      // inactive -> background is not an active -> background transition
+      triggerAppStateChange("background")
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
   })
 
   describe("ViewShot background color for screenshot", () => {
