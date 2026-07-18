@@ -3595,6 +3595,7 @@
       "networkFee": "Biaya jaringan: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Biaya jaringan: <bold>{fee: string}</bold> (ditanggung oleh Blink)",
       "exchangeRate": "Nilai tukar saat ini 1 BTC = {rate: string}",
+      "retryCta": "Coba lagi",
       "approveCta": "Setujui",
       "contactSupportCta": "Hubungi dukungan"
     },

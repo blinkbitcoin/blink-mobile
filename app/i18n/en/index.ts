@@ -3769,6 +3769,7 @@ const en: BaseTranslation = {
       networkFee: "Network fee: <bold>{fee: string}</bold>",
       networkFeeCoveredByBlink: "Network fee: <bold>{fee: string}</bold> (covered by Blink)",
       exchangeRate: "Current exchange rate 1 BTC = {rate: string}",
+      retryCta: "Try again",
       approveCta: "Approve",
       contactSupportCta: "Contact support",
     },

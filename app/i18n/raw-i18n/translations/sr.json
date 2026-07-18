@@ -3595,6 +3595,7 @@
       "networkFee": "Мрежна накнада: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Мрежна накнада: <bold>{fee: string}</bold> (сноси Blink)",
       "exchangeRate": "Тренутни курс 1 BTC = {rate: string}",
+      "retryCta": "Покушај поново",
       "approveCta": "Одобри",
       "contactSupportCta": "Контактирај подршку"
     },

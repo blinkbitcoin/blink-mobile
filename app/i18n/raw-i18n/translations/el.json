@@ -3595,6 +3595,7 @@
       "networkFee": "Τέλος δικτύου: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Τέλος δικτύου: <bold>{fee: string}</bold> (καλύπτεται από το Blink)",
       "exchangeRate": "Τρέχουσα ισοτιμία 1 BTC = {rate: string}",
+      "retryCta": "Δοκιμάστε ξανά",
       "approveCta": "Έγκριση",
       "contactSupportCta": "Επικοινωνία με υποστήριξη"
     },

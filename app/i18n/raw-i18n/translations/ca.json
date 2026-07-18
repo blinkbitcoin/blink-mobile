@@ -3595,6 +3595,7 @@
       "networkFee": "Comissió de xarxa: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Comissió de xarxa: <bold>{fee: string}</bold> (coberta per Blink)",
       "exchangeRate": "Tipus de canvi actual 1 BTC = {rate: string}",
+      "retryCta": "Torna-ho a provar",
       "approveCta": "Aprovar",
       "contactSupportCta": "Contacta amb suport"
     },

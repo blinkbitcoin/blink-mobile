@@ -11981,6 +11981,10 @@ type RootTranslation = {
 			 */
 			exchangeRate: RequiredParams<'rate'>
 			/**
+			 * T​r​y​ ​a​g​a​i​n
+			 */
+			retryCta: string
+			/**
 			 * A​p​p​r​o​v​e
 			 */
 			approveCta: string
@@ -24466,6 +24470,10 @@ export type TranslationFunctions = {
 			 * Current exchange rate 1 BTC = {rate}
 			 */
 			exchangeRate: (arg: { rate: string }) => LocalizedString
+			/**
+			 * Try again
+			 */
+			retryCta: () => LocalizedString
 			/**
 			 * Approve
 			 */
