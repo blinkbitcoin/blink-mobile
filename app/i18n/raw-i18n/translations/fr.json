@@ -2732,6 +2732,7 @@
         "bitcoinPrice": "Prix Bitcoin",
         "btcAccount": "Solde Bitcoin",
         "cancel": "Annuler",
+        "card": "Carte",
         "close": "Fermer",
         "confirm": "Confirmer",
         "convert": "Convertir",
@@ -3016,6 +3017,66 @@
         "networkVisa": "Visa",
         "cardFrozenTitle": "Carte gelée",
         "cardFrozenSubtitle": "La carte est temporairement désactivée",
+        "CardFeeSchedule": {
+            "title": "Grille tarifaire de la carte Blink",
+            "effectiveDate": "En vigueur à compter du 1er juillet 2026",
+            "sections": {
+                "cardFees": "Frais de carte",
+                "transactionFees": "Frais de transaction",
+                "overdraft": "Découvert (mode financé)"
+            },
+            "fees": {
+                "annualFee": {
+                    "title": "Frais annuels",
+                    "subtitle": "Offerts la première année à compter de la date d'émission de la carte",
+                    "value": "{amount: string} / an"
+                },
+                "cardReplacement": {
+                    "title": "Remplacement de carte"
+                },
+                "usdTransactionFee": {
+                    "title": "Frais de transaction en USD",
+                    "subtitle": "Appliqués à chaque transaction en dollars américains"
+                },
+                "foreignTransactionFee": {
+                    "title": "Frais de transaction à l'étranger",
+                    "subtitle": "Appliqués à chaque transaction dans une devise autre que le dollar américain"
+                },
+                "maximumOverdraft": {
+                    "title": "Découvert maximum",
+                    "subtitle": "Doit être remboursé sous 7 jours"
+                },
+                "lateRepaymentFee": {
+                    "title": "Frais de remboursement tardif",
+                    "subtitle": "Facturés si le découvert n'est pas remboursé sous 7 jours"
+                }
+            },
+            "btcConversion": {
+                "title": "Conversion BTC",
+                "body": "Lorsqu'une transaction nécessite la conversion de BTC en USD, la conversion est exécutée au taux de change en vigueur, qui peut inclure une marge reflétant le coût de la conversion."
+            },
+            "feesUpdateNotice": {
+                "text": "Les frais peuvent être mis à jour de temps à autre. Blink fournira un préavis d'au moins 30 jours avant que tout changement de frais ne prenne effet, conformément à l'",
+                "linkText": "Accord du titulaire de la carte"
+            },
+            "creditModeNotice": "Le Mode Crédit n'est pas actif actuellement. Si le Mode Crédit est activé, les taux d'intérêt, frais et informations sur les droits de facturation applicables seront fournis avant l'activation.",
+            "additionalDetails": {
+                "title": "Détails supplémentaires des frais",
+                "overdraft": {
+                    "label": "Découvert",
+                    "text": ". Dans certaines circonstances, une transaction peut être approuvée qui fait passer le solde de votre carte en dessous de zéro. Le découvert maximum est de {maxOverdraft: string}. Vous devez rembourser le découvert sous 7 jours en transférant des fonds supplémentaires sur le solde de votre carte."
+                },
+                "foreignCurrency": {
+                    "label": "Devise étrangère",
+                    "text": ". Si vous effectuez une transaction dans une devise étrangère, le réseau de la carte la convertit en USD selon ses propres procédures de conversion. Le taux à la date de traitement peut différer de la date de la transaction."
+                },
+                "noHiddenFees": {
+                    "label": "Aucuns frais cachés",
+                    "text": ". Il n'y a aucuns frais pour l'ouverture de compte, l'inactivité, les demandes de solde ou la fermeture de votre carte."
+                }
+            },
+            "backButton": "Retour"
+        },
         "CardDetails": {
             "title": "Détails de la carte",
             "cardNumber": "Numéro de carte",
@@ -3390,6 +3451,7 @@
                 "perYear": "par an",
                 "status": {
                     "label": "Statut",
+                    "specialOfferLabel": "Offre spéciale",
                     "paymentPending": "Paiement en Attente",
                     "firstYearFree": "Première année gratuite"
                 },
@@ -3403,7 +3465,11 @@
                     "cardholderAgreement": "Accord du Titulaire de la Carte",
                     "and": "et"
                 },
-                "renew": "Je comprends que mon abonnement sera automatiquement renouvelé dans 1 an"
+                "feeSchedule": {
+                    "text": "J'ai examiné et j'accepte le",
+                    "linkText": "Barème des Frais de Blink Card"
+                },
+                "renew": "Je comprends que mon abonnement se renouvellera automatiquement dans {months: number} mois"
             },
             "CardIntroducing": {
                 "title": "Présentation",
@@ -3465,13 +3531,29 @@
                 "buttonText": "Soumettre la demande",
                 "select": "sélectionner"
             },
+            "Acknowledgement": {
+                "title": "Conditions générales",
+                "acceptButton": "Accepter",
+                "eSignConsent": {
+                    "text": "J'accepte le",
+                    "linkText": "Consentement à la signature électronique"
+                },
+                "privacyAndTerms": {
+                    "text": "J'accepte le",
+                    "privacyPolicyLinkText": "la Politique de confidentialité de l'émetteur",
+                    "and": ", et les",
+                    "cardTermsLinkText": "Conditions de la carte Blink"
+                },
+                "certifyAccuracy": "Je certifie que les informations que j'ai fournies sont exactes et que je respecterai toutes les règles et exigences liées à ma carte Blink Visa",
+                "acknowledgeSolicitation": "Je reconnais que demander la carte Blink Visa ne constitue pas une sollicitation non autorisée"
+            },
             "CardPreapproved": {
                 "title": "Vous avez été pré-approuvé pour la carte Blink Visa !",
                 "buttonText": "Fermer"
             },
             "CardProcessing": {
                 "title": "Traitement de votre demande",
-                "subtitle": "Temps d'attente estimé : {waitTime: string}",
+                "subtitle": "Nous vous préviendrons dès que nous serons prêts",
                 "buttonText": "Fermer"
             }
         }

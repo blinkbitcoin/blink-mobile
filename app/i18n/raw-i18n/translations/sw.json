@@ -2732,6 +2732,7 @@
     "bitcoinPrice": "Bei ya Bitcoin",
     "btcAccount": "Akaunti ya Bitcoin",
     "cancel": "Futa",
+    "card": "Kadi",
     "close": "Funga",
     "confirm": "Thibitisha",
     "convert": "Badilisha",
@@ -3044,6 +3045,66 @@
       "limitUpdateSuccess": "Kikomo kimesasishwa kwa mafanikio",
       "limitUpdateError": "Imeshindikana kusasisha kikomo",
       "limitMustBePositive": "Kikomo lazima kiwe kikubwa kuliko sifuri"
+    },
+    "CardFeeSchedule": {
+      "title": "Ratiba ya ada za Kadi ya Blink",
+      "effectiveDate": "Inatumika kuanzia tarehe 1 Julai 2026",
+      "sections": {
+        "cardFees": "Ada za kadi",
+        "transactionFees": "Ada za muamala",
+        "overdraft": "Utumiaji zaidi (hali ya kufadhiliwa)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Ada ya mwaka",
+          "subtitle": "Imesamehewa mwaka wa kwanza kuanzia tarehe ya kutolewa kwa Kadi",
+          "value": "{amount: string} / mwaka"
+        },
+        "cardReplacement": {
+          "title": "Kubadilisha kadi"
+        },
+        "usdTransactionFee": {
+          "title": "Ada ya muamala wa USD",
+          "subtitle": "Inatozwa kwa kila muamala kwa dola za Marekani"
+        },
+        "foreignTransactionFee": {
+          "title": "Ada ya muamala wa kigeni",
+          "subtitle": "Inatozwa kwa kila muamala kwa sarafu isiyokuwa dola za Marekani"
+        },
+        "maximumOverdraft": {
+          "title": "Utumiaji zaidi wa juu",
+          "subtitle": "Lazima urejeshwe ndani ya siku 7"
+        },
+        "lateRepaymentFee": {
+          "title": "Ada ya kulipa kwa kuchelewa",
+          "subtitle": "Hutozwa iwapo utumiaji zaidi haujarejeshwa ndani ya siku 7"
+        }
+      },
+      "btcConversion": {
+        "title": "Ubadilishaji wa BTC",
+        "body": "Muamala unapohitaji ubadilishaji wa BTC kuwa USD, ubadilishaji hufanywa kwa kiwango cha ubadilishaji kinachotumika, ambacho kinaweza kujumuisha tofauti inayoakisi gharama ya ubadilishaji."
+      },
+      "feesUpdateNotice": {
+        "text": "Ada zinaweza kusasishwa mara kwa mara. Blink itatoa taarifa angalau siku 30 kabla ya mabadiliko yoyote ya ada kuanza kutumika, kulingana na",
+        "linkText": "Mkataba wa Mwenye Kadi"
+      },
+      "creditModeNotice": "Hali ya Mkopo haiko hai kwa sasa. Iwapo Hali ya Mkopo itawashwa, viwango vya riba, ada, na ufichuzi wa haki za bili vinavyotumika vitatolewa kabla ya kuwashwa.",
+      "additionalDetails": {
+        "title": "Maelezo ya ziada ya ada",
+        "overdraft": {
+          "label": "Utumiaji zaidi",
+          "text": ". Katika mazingira fulani, muamala unaweza kuidhinishwa unaosababisha Salio la Kadi yako kushuka chini ya sifuri. Utumiaji zaidi wa juu ni {maxOverdraft: string}. Lazima urejeshe utumiaji zaidi ndani ya siku 7 kwa kuhamisha fedha za ziada kwenye Salio la Kadi yako."
+        },
+        "foreignCurrency": {
+          "label": "Sarafu ya kigeni",
+          "text": ". Ukifanya muamala kwa sarafu ya kigeni, mtandao wa kadi huubadilisha kuwa USD kwa kutumia taratibu zake za ubadilishaji. Kiwango katika tarehe ya uchakataji kinaweza kutofautiana na tarehe ya muamala."
+        },
+        "noHiddenFees": {
+          "label": "Hakuna ada zilizofichwa",
+          "text": ". Hakuna ada za kuanzisha akaunti, kutotumika, maswali ya salio, au kufunga kadi yako."
+        }
+      },
+      "backButton": "Rudi"
     },
     "CardDetails": {
       "title": "Maelezo ya kadi",
@@ -3390,6 +3451,7 @@
         "perYear": "kwa mwaka",
         "status": {
           "label": "Hali",
+          "specialOfferLabel": "Ofa maalum",
           "paymentPending": "Malipo Yanasubiri",
           "firstYearFree": "Mwaka wa kwanza bure"
         },
@@ -3403,7 +3465,11 @@
           "cardholderAgreement": "Mkataba wa Mmiliki wa Kadi",
           "and": "na"
         },
-        "renew": "Ninaelewa kuwa usajili wangu utahuishwa moja kwa moja baada ya mwaka 1"
+        "feeSchedule": {
+          "text": "Nimekagua na ninakubali",
+          "linkText": "Ratiba ya Ada ya Blink Card"
+        },
+        "renew": "Ninaelewa kuwa usajili wangu utahuishwa kiotomatiki baada ya miezi {months: number}"
       },
       "CardIntroducing": {
         "title": "Kuanzisha",
@@ -3465,13 +3531,29 @@
         "buttonText": "Wasilisha maombi",
         "select": "chagua"
       },
+      "Acknowledgement": {
+        "title": "Sheria na masharti",
+        "acceptButton": "Kubali",
+        "eSignConsent": {
+          "text": "Ninakubali",
+          "linkText": "Idhini ya Sahihi ya Kielektroniki"
+        },
+        "privacyAndTerms": {
+          "text": "Ninakubali",
+          "privacyPolicyLinkText": "Sera ya Faragha ya mtoaji",
+          "and": ", na",
+          "cardTermsLinkText": "Masharti ya Kadi ya Blink"
+        },
+        "certifyAccuracy": "Ninathibitisha kwamba maelezo niliyotoa ni sahihi na kwamba nitazingatia sheria na mahitaji yote yanayohusiana na Kadi yangu ya Blink Visa",
+        "acknowledgeSolicitation": "Ninatambua kwamba kuomba Kadi ya Blink Visa si ombi lisiloidhinishwa"
+      },
       "CardPreapproved": {
         "title": "Umeidhinishwa mapema kwa kadi ya Blink Visa!",
         "buttonText": "Funga"
       },
       "CardProcessing": {
         "title": "Tunashughulikia maombi yako",
-        "subtitle": "Muda wa kusubiri unaokadiriwa: {waitTime: string}",
+        "subtitle": "Tutakujulisha mara tu tutakapokuwa tayari",
         "buttonText": "Funga"
       }
     }

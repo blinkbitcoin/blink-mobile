@@ -2732,6 +2732,7 @@
         "bitcoinPrice": "ビットコイン価格",
         "btcAccount": "ビットコインウォレット",
         "cancel": "キャンセル",
+        "card": "カード",
         "close": "閉じる",
         "confirm": "承認する",
         "convert": "両替",
@@ -3016,6 +3017,66 @@
         "networkVisa": "Visa",
         "cardFrozenTitle": "カードが凍結されました",
         "cardFrozenSubtitle": "カードは一時的に無効になっています",
+        "CardFeeSchedule": {
+            "title": "Blink カード手数料スケジュール",
+            "effectiveDate": "2026年7月1日より有効",
+            "sections": {
+                "cardFees": "カード手数料",
+                "transactionFees": "取引手数料",
+                "overdraft": "当座貸越（資金供給モード）"
+            },
+            "fees": {
+                "annualFee": {
+                    "title": "年会費",
+                    "subtitle": "カード発行日から最初の1年間は免除",
+                    "value": "{amount: string} / 年"
+                },
+                "cardReplacement": {
+                    "title": "カード再発行"
+                },
+                "usdTransactionFee": {
+                    "title": "USD取引手数料",
+                    "subtitle": "米ドルでの各取引に適用されます"
+                },
+                "foreignTransactionFee": {
+                    "title": "外貨取引手数料",
+                    "subtitle": "米ドル以外の通貨での各取引に適用されます"
+                },
+                "maximumOverdraft": {
+                    "title": "最大当座貸越額",
+                    "subtitle": "7日以内に返済する必要があります"
+                },
+                "lateRepaymentFee": {
+                    "title": "延滞返済手数料",
+                    "subtitle": "当座貸越が7日以内に返済されない場合に請求されます"
+                }
+            },
+            "btcConversion": {
+                "title": "BTC変換",
+                "body": "取引にBTCからUSDへの変換が必要な場合、変換は実勢為替レートで実行され、変換コストを反映したスプレッドが含まれる場合があります。"
+            },
+            "feesUpdateNotice": {
+                "text": "手数料は随時更新される場合があります。Blinkは、手数料の変更が有効になる少なくとも30日前に、次に従って通知します：",
+                "linkText": "カード会員規約"
+            },
+            "creditModeNotice": "クレジットモードは現在有効ではありません。クレジットモードが有効化された場合、適用される金利、手数料、および請求権に関する開示は、有効化の前に提供されます。",
+            "additionalDetails": {
+                "title": "手数料の追加詳細",
+                "overdraft": {
+                    "label": "当座貸越",
+                    "text": "。特定の状況では、カード残高がゼロを下回る取引が承認される場合があります。最大当座貸越額は {maxOverdraft: string} です。7日以内に追加資金をカード残高に送金して当座貸越を返済する必要があります。"
+                },
+                "foreignCurrency": {
+                    "label": "外貨",
+                    "text": "。外貨で取引を行う場合、カードネットワークが独自の変換手順を使用してUSDに変換します。処理日のレートは取引日と異なる場合があります。"
+                },
+                "noHiddenFees": {
+                    "label": "隠れた手数料なし",
+                    "text": "。口座開設、非アクティブ、残高照会、カードの解約に手数料はかかりません。"
+                }
+            },
+            "backButton": "戻る"
+        },
         "CardDetails": {
             "title": "カード詳細",
             "cardNumber": "カード番号",
@@ -3390,6 +3451,7 @@
                 "perYear": "年額",
                 "status": {
                     "label": "ステータス",
+                    "specialOfferLabel": "特別オファー",
                     "paymentPending": "支払い保留中",
                     "firstYearFree": "初年度無料"
                 },
@@ -3403,7 +3465,11 @@
                     "cardholderAgreement": "カード会員契約",
                     "and": "および"
                 },
-                "renew": "サブスクリプションが1年後に自動更新されることを理解しています"
+                "feeSchedule": {
+                    "text": "以下を確認し、同意します：",
+                    "linkText": "Blink Card 手数料表"
+                },
+                "renew": "サブスクリプションが{months: number}か月後に自動的に更新されることを理解しています"
             },
             "CardIntroducing": {
                 "title": "ご紹介",
@@ -3465,13 +3531,29 @@
                 "buttonText": "申請を提出",
                 "select": "選択"
             },
+            "Acknowledgement": {
+                "title": "利用規約",
+                "acceptButton": "同意する",
+                "eSignConsent": {
+                    "text": "次に同意します：",
+                    "linkText": "電子署名への同意"
+                },
+                "privacyAndTerms": {
+                    "text": "次に同意します：",
+                    "privacyPolicyLinkText": "発行者のプライバシーポリシー",
+                    "and": "、および",
+                    "cardTermsLinkText": "Blink カードの規約"
+                },
+                "certifyAccuracy": "提供した情報が正確であること、および Blink Visa カードに関するすべての規則と要件を遵守することを証明します",
+                "acknowledgeSolicitation": "Blink Visa カードの申し込みが不正な勧誘に該当しないことを認めます"
+            },
             "CardPreapproved": {
                 "title": "Blink Visaカードの事前承認が完了しました！",
                 "buttonText": "閉じる"
             },
             "CardProcessing": {
                 "title": "申請を処理中",
-                "subtitle": "推定待ち時間: {waitTime: string}",
+                "subtitle": "準備ができ次第、お知らせします",
                 "buttonText": "閉じる"
             }
         }

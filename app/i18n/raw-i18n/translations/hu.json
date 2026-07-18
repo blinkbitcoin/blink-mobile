@@ -2732,6 +2732,7 @@
     "bitcoinPrice": "Bitcoin Ár",
     "btcAccount": "Bitcoin Egyenleg",
     "cancel": "Mégse",
+    "card": "Kártya",
     "close": "Bezárás",
     "confirm": "Megerősítés",
     "convert": "Átváltás",
@@ -3044,6 +3045,66 @@
       "limitUpdateSuccess": "Korlát sikeresen frissítve",
       "limitUpdateError": "Nem sikerült frissíteni a korlátot",
       "limitMustBePositive": "A korlátnak nullánál nagyobbnak kell lennie"
+    },
+    "CardFeeSchedule": {
+      "title": "Blink kártya díjszabása",
+      "effectiveDate": "Hatályos 2026. július 1-jétől",
+      "sections": {
+        "cardFees": "Kártyadíjak",
+        "transactionFees": "Tranzakciós díjak",
+        "overdraft": "Folyószámlahitel (finanszírozott mód)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Éves díj",
+          "subtitle": "Az első évben elengedve a kártya kibocsátásának dátumától",
+          "value": "{amount: string} / év"
+        },
+        "cardReplacement": {
+          "title": "Kártyacsere"
+        },
+        "usdTransactionFee": {
+          "title": "USD tranzakciós díj",
+          "subtitle": "Minden amerikai dollárban végzett tranzakcióra vonatkozik"
+        },
+        "foreignTransactionFee": {
+          "title": "Külföldi tranzakciós díj",
+          "subtitle": "Minden nem amerikai dollárban végzett tranzakcióra vonatkozik"
+        },
+        "maximumOverdraft": {
+          "title": "Maximális folyószámlahitel",
+          "subtitle": "7 napon belül vissza kell fizetni"
+        },
+        "lateRepaymentFee": {
+          "title": "Késedelmes visszafizetési díj",
+          "subtitle": "Felszámításra kerül, ha a folyószámlahitelt nem fizetik vissza 7 napon belül"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC átváltás",
+        "body": "Amikor egy tranzakció BTC USD-re való átváltását igényli, az átváltás az aktuális árfolyamon történik, amely tartalmazhat egy felárat, amely az átváltás költségét tükrözi."
+      },
+      "feesUpdateNotice": {
+        "text": "A díjak időről időre módosulhatnak. A Blink legalább 30 nappal korábban értesítést küld, mielőtt bármely díjváltozás hatályba lépne, a",
+        "linkText": "Kártyabirtokosi szerződéssel"
+      },
+      "creditModeNotice": "A Hitel mód jelenleg nem aktív. Ha a Hitel mód aktiválásra kerül, az alkalmazandó kamatlábak, díjak és számlázási jogokra vonatkozó közlemények az aktiválás előtt kerülnek megadásra.",
+      "additionalDetails": {
+        "title": "További díjrészletek",
+        "overdraft": {
+          "label": "Folyószámlahitel",
+          "text": ". Bizonyos körülmények között jóváhagyható olyan tranzakció, amely miatt a kártyaegyenlege nulla alá csökken. A maximális folyószámlahitel {maxOverdraft: string}. A folyószámlahitelt 7 napon belül vissza kell fizetnie további összegek átutalásával a kártyaegyenlegére."
+        },
+        "foreignCurrency": {
+          "label": "Külföldi pénznem",
+          "text": ". Ha külföldi pénznemben végez tranzakciót, a kártyahálózat saját átváltási eljárásaival átváltja USD-re. A feldolgozás napján érvényes árfolyam eltérhet a tranzakció dátumától."
+        },
+        "noHiddenFees": {
+          "label": "Nincsenek rejtett díjak",
+          "text": ". Nincs díj a számlanyitásért, inaktivitásért, egyenleglekérdezésekért vagy a kártya lezárásáért."
+        }
+      },
+      "backButton": "Vissza"
     },
     "CardDetails": {
       "title": "Kártya részletei",
@@ -3390,6 +3451,7 @@
         "perYear": "évente",
         "status": {
           "label": "Állapot",
+          "specialOfferLabel": "Különleges ajánlat",
           "paymentPending": "Fizetés Függőben",
           "firstYearFree": "Első év ingyenes"
         },
@@ -3403,7 +3465,11 @@
           "cardholderAgreement": "Kártyabirtokosi Megállapodást",
           "and": "és"
         },
-        "renew": "Megértem, hogy az előfizetésem automatikusan megújul 1 év múlva"
+        "feeSchedule": {
+          "text": "Átnéztem és elfogadom a következőt:",
+          "linkText": "Blink Card díjszabása"
+        },
+        "renew": "Megértem, hogy az előfizetésem {months: number} hónap múlva automatikusan megújul"
       },
       "CardIntroducing": {
         "title": "Bemutatjuk",
@@ -3465,13 +3531,29 @@
         "buttonText": "Pályázat beküldése",
         "select": "kiválaszt"
       },
+      "Acknowledgement": {
+        "title": "Általános szerződési feltételek",
+        "acceptButton": "Elfogadás",
+        "eSignConsent": {
+          "text": "Elfogadom az",
+          "linkText": "elektronikus aláírási hozzájárulást"
+        },
+        "privacyAndTerms": {
+          "text": "Elfogadom az",
+          "privacyPolicyLinkText": "a kibocsátó adatvédelmi szabályzatát",
+          "and": ", és a",
+          "cardTermsLinkText": "Blink kártya feltételeit"
+        },
+        "certifyAccuracy": "Igazolom, hogy az általam megadott információk pontosak, és hogy betartok minden, a Blink Visa kártyámmal kapcsolatos szabályt és követelményt",
+        "acknowledgeSolicitation": "Tudomásul veszem, hogy a Blink Visa kártya igénylése nem minősül jogosulatlan megkeresésnek"
+      },
       "CardPreapproved": {
         "title": "Előzetesen jóváhagyták a Blink Visa kártyáját!",
         "buttonText": "Bezárás"
       },
       "CardProcessing": {
         "title": "Pályázatod feldolgozása",
-        "subtitle": "Becsült várakozási idő: {waitTime: string}",
+        "subtitle": "Értesítünk, amint készen állunk",
         "buttonText": "Bezárás"
       }
     }

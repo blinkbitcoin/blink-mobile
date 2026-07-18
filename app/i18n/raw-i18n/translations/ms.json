@@ -2732,6 +2732,7 @@
     "bitcoinPrice": "Harga Bitcoin",
     "btcAccount": "Akaun Bitcoin",
     "cancel": "Batal",
+    "card": "Kad",
     "close": "Keluar",
     "confirm": "Pasti",
     "convert": "Penukaran",
@@ -3044,6 +3045,66 @@
       "limitUpdateSuccess": "Had berjaya dikemas kini",
       "limitUpdateError": "Gagal mengemas kini had",
       "limitMustBePositive": "Had mestilah lebih besar daripada sifar"
+    },
+    "CardFeeSchedule": {
+      "title": "Jadual yuran Kad Blink",
+      "effectiveDate": "Berkuat kuasa mulai 1 Julai 2026",
+      "sections": {
+        "cardFees": "Yuran kad",
+        "transactionFees": "Yuran transaksi",
+        "overdraft": "Overdraf (mod dibiayai)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Yuran tahunan",
+          "subtitle": "Dikecualikan untuk tahun pertama dari tarikh pengeluaran Kad",
+          "value": "{amount: string} / tahun"
+        },
+        "cardReplacement": {
+          "title": "Penggantian kad"
+        },
+        "usdTransactionFee": {
+          "title": "Yuran transaksi USD",
+          "subtitle": "Dikenakan pada setiap transaksi dalam dolar AS"
+        },
+        "foreignTransactionFee": {
+          "title": "Yuran transaksi asing",
+          "subtitle": "Dikenakan pada setiap transaksi dalam mata wang selain dolar AS"
+        },
+        "maximumOverdraft": {
+          "title": "Overdraf maksimum",
+          "subtitle": "Mesti dibayar balik dalam 7 hari"
+        },
+        "lateRepaymentFee": {
+          "title": "Yuran pembayaran lewat",
+          "subtitle": "Dikenakan jika overdraf tidak dibayar balik dalam 7 hari"
+        }
+      },
+      "btcConversion": {
+        "title": "Penukaran BTC",
+        "body": "Apabila transaksi memerlukan penukaran BTC kepada USD, penukaran dilaksanakan pada kadar pertukaran semasa, yang mungkin termasuk spread yang mencerminkan kos penukaran."
+      },
+      "feesUpdateNotice": {
+        "text": "Yuran boleh dikemas kini dari semasa ke semasa. Blink akan memberi notis sekurang-kurangnya 30 hari sebelum sebarang perubahan yuran berkuat kuasa, selaras dengan",
+        "linkText": "Perjanjian Pemegang Kad"
+      },
+      "creditModeNotice": "Mod Kredit tidak aktif buat masa ini. Jika Mod Kredit diaktifkan, kadar faedah, yuran dan pendedahan hak pengebilan yang berkenaan akan disediakan sebelum pengaktifan.",
+      "additionalDetails": {
+        "title": "Butiran yuran tambahan",
+        "overdraft": {
+          "label": "Overdraf",
+          "text": ". Dalam keadaan tertentu, transaksi mungkin diluluskan yang menyebabkan Baki Kad anda jatuh di bawah sifar. Overdraf maksimum ialah {maxOverdraft: string}. Anda mesti membayar balik overdraf dalam 7 hari dengan memindahkan dana tambahan ke Baki Kad anda."
+        },
+        "foreignCurrency": {
+          "label": "Mata wang asing",
+          "text": ". Jika anda membuat transaksi dalam mata wang asing, rangkaian kad menukarkannya kepada USD menggunakan prosedur penukarannya sendiri. Kadar pada tarikh pemprosesan mungkin berbeza daripada tarikh transaksi."
+        },
+        "noHiddenFees": {
+          "label": "Tiada yuran tersembunyi",
+          "text": ". Tiada yuran untuk penyediaan akaun, ketidakaktifan, pertanyaan baki atau penutupan kad anda."
+        }
+      },
+      "backButton": "Kembali"
     },
     "CardDetails": {
       "title": "Butiran kad",
@@ -3390,6 +3451,7 @@
         "perYear": "setahun",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Tawaran istimewa",
           "paymentPending": "Pembayaran Tertangguh",
           "firstYearFree": "Tahun pertama percuma"
         },
@@ -3403,7 +3465,11 @@
           "cardholderAgreement": "Perjanjian Pemegang Kad",
           "and": "dan"
         },
-        "renew": "Saya faham bahawa langganan saya akan diperbaharui secara automatik dalam 1 tahun"
+        "feeSchedule": {
+          "text": "Saya telah menyemak dan bersetuju dengan",
+          "linkText": "Jadual Fi Blink Card"
+        },
+        "renew": "Saya faham bahawa langganan saya akan diperbaharui secara automatik dalam {months: number} bulan"
       },
       "CardIntroducing": {
         "title": "Memperkenalkan",
@@ -3465,13 +3531,29 @@
         "buttonText": "Hantar permohonan",
         "select": "pilih"
       },
+      "Acknowledgement": {
+        "title": "Terma dan syarat",
+        "acceptButton": "Terima",
+        "eSignConsent": {
+          "text": "Saya menerima",
+          "linkText": "Persetujuan Tandatangan Elektronik"
+        },
+        "privacyAndTerms": {
+          "text": "Saya menerima",
+          "privacyPolicyLinkText": "Dasar Privasi penerbit",
+          "and": ", dan",
+          "cardTermsLinkText": "Terma Kad Blink"
+        },
+        "certifyAccuracy": "Saya mengesahkan bahawa maklumat yang saya berikan adalah tepat dan bahawa saya akan mematuhi semua peraturan dan keperluan berkaitan Kad Blink Visa saya",
+        "acknowledgeSolicitation": "Saya mengakui bahawa memohon Kad Blink Visa bukan merupakan permohonan yang tidak dibenarkan"
+      },
       "CardPreapproved": {
         "title": "Anda telah dipra-luluskan untuk kad Blink Visa!",
         "buttonText": "Tutup"
       },
       "CardProcessing": {
         "title": "Memproses permohonan anda",
-        "subtitle": "Anggaran masa menunggu: {waitTime: string}",
+        "subtitle": "Kami akan memberitahu anda sebaik sahaja kami bersedia",
         "buttonText": "Tutup"
       }
     }

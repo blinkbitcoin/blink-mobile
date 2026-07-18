@@ -2732,6 +2732,7 @@
     "bitcoinPrice": "Preț Bitcoin",
     "btcAccount": "Cont Bitcoin",
     "cancel": "Anulare",
+    "card": "Card",
     "close": "Închide",
     "confirm": "Confirmare",
     "convert": "Conversie",
@@ -3044,6 +3045,66 @@
       "limitUpdateSuccess": "Limita a fost actualizată cu succes",
       "limitUpdateError": "Nu s-a putut actualiza limita",
       "limitMustBePositive": "Limita trebuie să fie mai mare decât zero"
+    },
+    "CardFeeSchedule": {
+      "title": "Grila de taxe a cardului Blink",
+      "effectiveDate": "În vigoare de la 1 iulie 2026",
+      "sections": {
+        "cardFees": "Taxe pentru card",
+        "transactionFees": "Taxe de tranzacție",
+        "overdraft": "Descoperit de cont (mod finanțat)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Taxă anuală",
+          "subtitle": "Scutită în primul an de la data emiterii cardului",
+          "value": "{amount: string} / an"
+        },
+        "cardReplacement": {
+          "title": "Înlocuirea cardului"
+        },
+        "usdTransactionFee": {
+          "title": "Taxă de tranzacție în USD",
+          "subtitle": "Aplicată fiecărei tranzacții în dolari americani"
+        },
+        "foreignTransactionFee": {
+          "title": "Taxă de tranzacție externă",
+          "subtitle": "Aplicată fiecărei tranzacții într-o monedă diferită de dolarul american"
+        },
+        "maximumOverdraft": {
+          "title": "Descoperit maxim",
+          "subtitle": "Trebuie rambursat în termen de 7 zile"
+        },
+        "lateRepaymentFee": {
+          "title": "Taxă de rambursare întârziată",
+          "subtitle": "Se percepe dacă descoperitul nu este rambursat în termen de 7 zile"
+        }
+      },
+      "btcConversion": {
+        "title": "Conversie BTC",
+        "body": "Când o tranzacție necesită conversia BTC în USD, conversia se execută la cursul de schimb în vigoare, care poate include o marjă ce reflectă costul conversiei."
+      },
+      "feesUpdateNotice": {
+        "text": "Taxele pot fi actualizate din când în când. Blink va notifica cu cel puțin 30 de zile înainte ca orice modificare a taxelor să intre în vigoare, în conformitate cu",
+        "linkText": "Acordul deținătorului de card"
+      },
+      "creditModeNotice": "Modul Credit nu este activ în prezent. Dacă Modul Credit este activat, ratele dobânzii, taxele și informațiile privind drepturile de facturare aplicabile vor fi furnizate înainte de activare.",
+      "additionalDetails": {
+        "title": "Detalii suplimentare despre taxe",
+        "overdraft": {
+          "label": "Descoperit de cont",
+          "text": ". În anumite circumstanțe, o tranzacție poate fi aprobată, ceea ce face ca soldul cardului tău să scadă sub zero. Descoperitul maxim este de {maxOverdraft: string}. Trebuie să rambursezi descoperitul în termen de 7 zile transferând fonduri suplimentare în soldul cardului tău."
+        },
+        "foreignCurrency": {
+          "label": "Monedă străină",
+          "text": ". Dacă efectuezi o tranzacție într-o monedă străină, rețeaua cardului o convertește în USD folosind propriile proceduri de conversie. Cursul de la data procesării poate diferi de data tranzacției."
+        },
+        "noHiddenFees": {
+          "label": "Fără taxe ascunse",
+          "text": ". Nu există taxe pentru deschiderea contului, inactivitate, interogări de sold sau închiderea cardului tău."
+        }
+      },
+      "backButton": "Înapoi"
     },
     "CardDetails": {
       "title": "Detalii card",
@@ -3390,6 +3451,7 @@
         "perYear": "pe an",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Ofertă specială",
           "paymentPending": "Plată în Așteptare",
           "firstYearFree": "Primul an gratuit"
         },
@@ -3403,7 +3465,11 @@
           "cardholderAgreement": "Acordul Deținătorului de Card",
           "and": "și"
         },
-        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în 1 an"
+        "feeSchedule": {
+          "text": "Am examinat și sunt de acord cu",
+          "linkText": "Grila de Tarife Blink Card"
+        },
+        "renew": "Înțeleg că abonamentul meu se va reînnoi automat în {months: number} luni"
       },
       "CardIntroducing": {
         "title": "Prezentare",
@@ -3465,13 +3531,29 @@
         "buttonText": "Trimite cererea",
         "select": "selectează"
       },
+      "Acknowledgement": {
+        "title": "Termeni și condiții",
+        "acceptButton": "Accept",
+        "eSignConsent": {
+          "text": "Accept",
+          "linkText": "Consimțământul pentru semnătura electronică"
+        },
+        "privacyAndTerms": {
+          "text": "Accept",
+          "privacyPolicyLinkText": "Politica de confidențialitate a emitentului",
+          "and": ", și",
+          "cardTermsLinkText": "Termenii cardului Blink"
+        },
+        "certifyAccuracy": "Certific că informațiile pe care le-am furnizat sunt exacte și că voi respecta toate regulile și cerințele legate de cardul meu Blink Visa",
+        "acknowledgeSolicitation": "Recunosc că solicitarea cardului Blink Visa nu constituie o solicitare neautorizată"
+      },
       "CardPreapproved": {
         "title": "Ați fost pre-aprobat pentru cardul Blink Visa!",
         "buttonText": "Închide"
       },
       "CardProcessing": {
         "title": "Se procesează cererea ta",
-        "subtitle": "Timp estimat de așteptare: {waitTime: string}",
+        "subtitle": "Te vom anunța de îndată ce vom fi pregătiți",
         "buttonText": "Închide"
       }
     }

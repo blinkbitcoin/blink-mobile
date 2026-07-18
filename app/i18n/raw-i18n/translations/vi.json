@@ -2732,6 +2732,7 @@
     "bitcoinPrice": "Giá Bitcoin",
     "btcAccount": "Số dư Bitcoin",
     "cancel": "Hủy",
+    "card": "Thẻ",
     "close": "Đóng",
     "confirm": "Xác nhận",
     "convert": "Chuyển đổi",
@@ -3044,6 +3045,66 @@
       "limitUpdateSuccess": "Cập nhật giới hạn thành công",
       "limitUpdateError": "Không thể cập nhật giới hạn",
       "limitMustBePositive": "Giới hạn phải lớn hơn không"
+    },
+    "CardFeeSchedule": {
+      "title": "Biểu phí Thẻ Blink",
+      "effectiveDate": "Có hiệu lực từ ngày 1 tháng 7 năm 2026",
+      "sections": {
+        "cardFees": "Phí thẻ",
+        "transactionFees": "Phí giao dịch",
+        "overdraft": "Thấu chi (chế độ được cấp vốn)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Phí thường niên",
+          "subtitle": "Được miễn trong năm đầu tiên kể từ ngày phát hành Thẻ",
+          "value": "{amount: string} / năm"
+        },
+        "cardReplacement": {
+          "title": "Thay thế thẻ"
+        },
+        "usdTransactionFee": {
+          "title": "Phí giao dịch USD",
+          "subtitle": "Áp dụng cho mỗi giao dịch bằng đô la Mỹ"
+        },
+        "foreignTransactionFee": {
+          "title": "Phí giao dịch nước ngoài",
+          "subtitle": "Áp dụng cho mỗi giao dịch bằng loại tiền tệ khác đô la Mỹ"
+        },
+        "maximumOverdraft": {
+          "title": "Thấu chi tối đa",
+          "subtitle": "Phải được hoàn trả trong vòng 7 ngày"
+        },
+        "lateRepaymentFee": {
+          "title": "Phí hoàn trả trễ hạn",
+          "subtitle": "Được tính nếu khoản thấu chi không được hoàn trả trong vòng 7 ngày"
+        }
+      },
+      "btcConversion": {
+        "title": "Chuyển đổi BTC",
+        "body": "Khi một giao dịch yêu cầu chuyển đổi BTC sang USD, việc chuyển đổi được thực hiện theo tỷ giá hối đoái hiện hành, có thể bao gồm khoản chênh lệch phản ánh chi phí chuyển đổi."
+      },
+      "feesUpdateNotice": {
+        "text": "Phí có thể được cập nhật theo thời gian. Blink sẽ thông báo trước ít nhất 30 ngày trước khi bất kỳ thay đổi phí nào có hiệu lực, theo",
+        "linkText": "Thỏa thuận Chủ thẻ"
+      },
+      "creditModeNotice": "Chế độ Tín dụng hiện không hoạt động. Nếu Chế độ Tín dụng được kích hoạt, lãi suất, phí và các công bố về quyền lập hóa đơn hiện hành sẽ được cung cấp trước khi kích hoạt.",
+      "additionalDetails": {
+        "title": "Chi tiết phí bổ sung",
+        "overdraft": {
+          "label": "Thấu chi",
+          "text": ". Trong một số trường hợp nhất định, một giao dịch có thể được chấp thuận khiến Số dư Thẻ của bạn giảm xuống dưới 0. Thấu chi tối đa là {maxOverdraft: string}. Bạn phải hoàn trả khoản thấu chi trong vòng 7 ngày bằng cách chuyển thêm tiền vào Số dư Thẻ của bạn."
+        },
+        "foreignCurrency": {
+          "label": "Ngoại tệ",
+          "text": ". Nếu bạn thực hiện giao dịch bằng ngoại tệ, mạng lưới thẻ sẽ chuyển đổi sang USD bằng quy trình chuyển đổi riêng của mình. Tỷ giá vào ngày xử lý có thể khác với ngày giao dịch."
+        },
+        "noHiddenFees": {
+          "label": "Không có phí ẩn",
+          "text": ". Không có phí cho việc thiết lập tài khoản, không hoạt động, truy vấn số dư hoặc đóng thẻ của bạn."
+        }
+      },
+      "backButton": "Quay lại"
     },
     "CardDetails": {
       "title": "Chi tiết thẻ",
@@ -3390,6 +3451,7 @@
         "perYear": "mỗi năm",
         "status": {
           "label": "Trạng thái",
+          "specialOfferLabel": "Ưu đãi đặc biệt",
           "paymentPending": "Đang Chờ Thanh toán",
           "firstYearFree": "Năm đầu tiên miễn phí"
         },
@@ -3403,7 +3465,11 @@
           "cardholderAgreement": "Thỏa thuận Chủ thẻ",
           "and": "và"
         },
-        "renew": "Tôi hiểu rằng đăng ký của tôi sẽ tự động gia hạn sau 1 năm"
+        "feeSchedule": {
+          "text": "Tôi đã xem xét và đồng ý với",
+          "linkText": "Biểu Phí Blink Card"
+        },
+        "renew": "Tôi hiểu rằng gói đăng ký của tôi sẽ tự động gia hạn sau {months: number} tháng"
       },
       "CardIntroducing": {
         "title": "Giới thiệu",
@@ -3465,13 +3531,29 @@
         "buttonText": "Gửi đơn đăng ký",
         "select": "chọn"
       },
+      "Acknowledgement": {
+        "title": "Điều khoản và điều kiện",
+        "acceptButton": "Chấp nhận",
+        "eSignConsent": {
+          "text": "Tôi chấp nhận",
+          "linkText": "Đồng ý Chữ ký Điện tử"
+        },
+        "privacyAndTerms": {
+          "text": "Tôi chấp nhận",
+          "privacyPolicyLinkText": "Chính sách Bảo mật của nhà phát hành",
+          "and": ", và",
+          "cardTermsLinkText": "Điều khoản Thẻ Blink"
+        },
+        "certifyAccuracy": "Tôi xác nhận rằng thông tin tôi đã cung cấp là chính xác và tôi sẽ tuân thủ mọi quy tắc và yêu cầu liên quan đến Thẻ Blink Visa của tôi",
+        "acknowledgeSolicitation": "Tôi thừa nhận rằng việc đăng ký Thẻ Blink Visa không cấu thành hành vi chào mời trái phép"
+      },
       "CardPreapproved": {
         "title": "Bạn đã được phê duyệt trước cho thẻ Blink Visa!",
         "buttonText": "Đóng"
       },
       "CardProcessing": {
         "title": "Đang xử lý đơn đăng ký của bạn",
-        "subtitle": "Thời gian chờ ước tính: {waitTime: string}",
+        "subtitle": "Chúng tôi sẽ thông báo cho bạn ngay khi chúng tôi sẵn sàng",
         "buttonText": "Đóng"
       }
     }

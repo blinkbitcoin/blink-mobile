@@ -2732,6 +2732,7 @@
     "bitcoinPrice": "Cijena Bitcoina",
     "btcAccount": "Bitcoin račun",
     "cancel": "Poništi",
+    "card": "Kartica",
     "close": "Zatvori",
     "confirm": "Potvrdi",
     "convert": "Pretvori",
@@ -3044,6 +3045,66 @@
       "limitUpdateSuccess": "Ograničenje uspješno ažurirano",
       "limitUpdateError": "Nije moguće ažurirati ograničenje",
       "limitMustBePositive": "Ograničenje mora biti veće od nule"
+    },
+    "CardFeeSchedule": {
+      "title": "Raspored naknada Blink kartice",
+      "effectiveDate": "Vrijedi od 1. srpnja 2026.",
+      "sections": {
+        "cardFees": "Naknade za karticu",
+        "transactionFees": "Naknade za transakcije",
+        "overdraft": "Prekoračenje (financirani način)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Godišnja naknada",
+          "subtitle": "Oslobođena prve godine od datuma izdavanja kartice",
+          "value": "{amount: string} / godišnje"
+        },
+        "cardReplacement": {
+          "title": "Zamjena kartice"
+        },
+        "usdTransactionFee": {
+          "title": "Naknada za transakciju u USD",
+          "subtitle": "Primjenjuje se na svaku transakciju u američkim dolarima"
+        },
+        "foreignTransactionFee": {
+          "title": "Naknada za inozemnu transakciju",
+          "subtitle": "Primjenjuje se na svaku transakciju u valuti različitoj od američkog dolara"
+        },
+        "maximumOverdraft": {
+          "title": "Maksimalno prekoračenje",
+          "subtitle": "Mora se vratiti unutar 7 dana"
+        },
+        "lateRepaymentFee": {
+          "title": "Naknada za zakašnjelu otplatu",
+          "subtitle": "Naplaćuje se ako se prekoračenje ne vrati unutar 7 dana"
+        }
+      },
+      "btcConversion": {
+        "title": "Konverzija BTC-a",
+        "body": "Kada transakcija zahtijeva konverziju BTC-a u USD, konverzija se izvršava po važećem tečaju, koji može uključivati maržu koja odražava trošak konverzije."
+      },
+      "feesUpdateNotice": {
+        "text": "Naknade se s vremena na vrijeme mogu ažurirati. Blink će obavijestiti najmanje 30 dana unaprijed prije nego što bilo koja promjena naknada stupi na snagu, u skladu s",
+        "linkText": "Ugovorom o korištenju kartice"
+      },
+      "creditModeNotice": "Kreditni način trenutno nije aktivan. Ako se Kreditni način aktivira, primjenjive kamatne stope, naknade i objave prava naplate bit će dostavljene prije aktivacije.",
+      "additionalDetails": {
+        "title": "Dodatni detalji o naknadama",
+        "overdraft": {
+          "label": "Prekoračenje",
+          "text": ". U određenim okolnostima može se odobriti transakcija koja uzrokuje pad stanja na vašoj kartici ispod nule. Maksimalno prekoračenje iznosi {maxOverdraft: string}. Prekoračenje morate vratiti unutar 7 dana prijenosom dodatnih sredstava na stanje vaše kartice."
+        },
+        "foreignCurrency": {
+          "label": "Strana valuta",
+          "text": ". Ako izvršite transakciju u stranoj valuti, mreža kartice pretvara je u USD koristeći vlastite postupke konverzije. Tečaj na datum obrade može se razlikovati od datuma transakcije."
+        },
+        "noHiddenFees": {
+          "label": "Bez skrivenih naknada",
+          "text": ". Nema naknada za otvaranje računa, neaktivnost, upite o stanju ni za zatvaranje vaše kartice."
+        }
+      },
+      "backButton": "Natrag"
     },
     "CardDetails": {
       "title": "Detalji kartice",
@@ -3390,6 +3451,7 @@
         "perYear": "godišnje",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Posebna ponuda",
           "paymentPending": "Plaćanje na Čekanju",
           "firstYearFree": "Prva godina besplatno"
         },
@@ -3403,7 +3465,11 @@
           "cardholderAgreement": "Ugovor vlasnika kartice",
           "and": "i"
         },
-        "renew": "Razumijem da će se moja pretplata automatski obnoviti za 1 godinu"
+        "feeSchedule": {
+          "text": "Pregledao sam i slažem se s dokumentom",
+          "linkText": "Cjenik naknada za Blink Card"
+        },
+        "renew": "Razumijem da će se moja pretplata automatski obnoviti za {months: number} mjeseci"
       },
       "CardIntroducing": {
         "title": "Predstavljamo",
@@ -3465,13 +3531,29 @@
         "buttonText": "Pošalji prijavu",
         "select": "odaberi"
       },
+      "Acknowledgement": {
+        "title": "Uvjeti i odredbe",
+        "acceptButton": "Prihvati",
+        "eSignConsent": {
+          "text": "Prihvaćam",
+          "linkText": "privolu za elektronički potpis"
+        },
+        "privacyAndTerms": {
+          "text": "Prihvaćam",
+          "privacyPolicyLinkText": "Pravila o privatnosti izdavatelja",
+          "and": ", i",
+          "cardTermsLinkText": "Uvjete kartice Blink"
+        },
+        "certifyAccuracy": "Potvrđujem da su podaci koje sam dao točni i da ću se pridržavati svih pravila i zahtjeva povezanih s mojom karticom Blink Visa",
+        "acknowledgeSolicitation": "Potvrđujem da podnošenje zahtjeva za karticu Blink Visa ne predstavlja neovlašteno oglašavanje"
+      },
       "CardPreapproved": {
         "title": "Unaprijed ste odobreni za Blink Visa karticu!",
         "buttonText": "Zatvori"
       },
       "CardProcessing": {
         "title": "Obrađujemo vašu prijavu",
-        "subtitle": "Procijenjeno vrijeme čekanja: {waitTime: string}",
+        "subtitle": "Obavijestit ćemo te čim budemo spremni",
         "buttonText": "Zatvori"
       }
     }

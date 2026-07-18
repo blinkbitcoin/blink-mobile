@@ -2732,6 +2732,7 @@
     "bitcoinPrice": "Harga Bitcoin",
     "btcAccount": "Akun Bitcoin",
     "cancel": "Batal",
+    "card": "Kartu",
     "close": "Tutup",
     "confirm": "Konfirmasi",
     "convert": "Konversi",
@@ -3044,6 +3045,66 @@
       "limitUpdateSuccess": "Batas berhasil diperbarui",
       "limitUpdateError": "Gagal memperbarui batas",
       "limitMustBePositive": "Batas harus lebih besar dari nol"
+    },
+    "CardFeeSchedule": {
+      "title": "Jadwal biaya Kartu Blink",
+      "effectiveDate": "Berlaku mulai 1 Juli 2026",
+      "sections": {
+        "cardFees": "Biaya kartu",
+        "transactionFees": "Biaya transaksi",
+        "overdraft": "Cerukan (mode terdanai)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Biaya tahunan",
+          "subtitle": "Dibebaskan untuk tahun pertama sejak tanggal penerbitan Kartu",
+          "value": "{amount: string} / tahun"
+        },
+        "cardReplacement": {
+          "title": "Penggantian kartu"
+        },
+        "usdTransactionFee": {
+          "title": "Biaya transaksi USD",
+          "subtitle": "Dikenakan pada setiap transaksi dalam dolar AS"
+        },
+        "foreignTransactionFee": {
+          "title": "Biaya transaksi luar negeri",
+          "subtitle": "Dikenakan pada setiap transaksi dalam mata uang selain dolar AS"
+        },
+        "maximumOverdraft": {
+          "title": "Cerukan maksimum",
+          "subtitle": "Harus dilunasi dalam 7 hari"
+        },
+        "lateRepaymentFee": {
+          "title": "Biaya pembayaran terlambat",
+          "subtitle": "Dikenakan jika cerukan tidak dilunasi dalam 7 hari"
+        }
+      },
+      "btcConversion": {
+        "title": "Konversi BTC",
+        "body": "Ketika transaksi memerlukan konversi BTC ke USD, konversi dilakukan pada nilai tukar yang berlaku, yang mungkin mencakup spread yang mencerminkan biaya konversi."
+      },
+      "feesUpdateNotice": {
+        "text": "Biaya dapat diperbarui dari waktu ke waktu. Blink akan memberikan pemberitahuan setidaknya 30 hari sebelum perubahan biaya berlaku, sesuai dengan",
+        "linkText": "Perjanjian Pemegang Kartu"
+      },
+      "creditModeNotice": "Mode Kredit saat ini tidak aktif. Jika Mode Kredit diaktifkan, suku bunga, biaya, dan pengungkapan hak penagihan yang berlaku akan diberikan sebelum aktivasi.",
+      "additionalDetails": {
+        "title": "Detail biaya tambahan",
+        "overdraft": {
+          "label": "Cerukan",
+          "text": ". Dalam keadaan tertentu, transaksi dapat disetujui yang menyebabkan saldo Kartu Anda turun di bawah nol. Cerukan maksimum adalah {maxOverdraft: string}. Anda harus melunasi cerukan dalam 7 hari dengan mentransfer dana tambahan ke saldo Kartu Anda."
+        },
+        "foreignCurrency": {
+          "label": "Mata uang asing",
+          "text": ". Jika Anda melakukan transaksi dalam mata uang asing, jaringan kartu mengonversinya ke USD menggunakan prosedur konversinya sendiri. Nilai tukar pada tanggal pemrosesan dapat berbeda dari tanggal transaksi."
+        },
+        "noHiddenFees": {
+          "label": "Tanpa biaya tersembunyi",
+          "text": ". Tidak ada biaya untuk pembukaan akun, ketidakaktifan, pemeriksaan saldo, atau penutupan kartu Anda."
+        }
+      },
+      "backButton": "Kembali"
     },
     "CardDetails": {
       "title": "Detail kartu",
@@ -3390,6 +3451,7 @@
         "perYear": "per tahun",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Penawaran khusus",
           "paymentPending": "Pembayaran Tertunda",
           "firstYearFree": "Tahun pertama gratis"
         },
@@ -3403,7 +3465,11 @@
           "cardholderAgreement": "Perjanjian Pemegang Kartu",
           "and": "dan"
         },
-        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam 1 tahun"
+        "feeSchedule": {
+          "text": "Saya telah meninjau dan menyetujui",
+          "linkText": "Jadwal Biaya Blink Card"
+        },
+        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam {months: number} bulan"
       },
       "CardIntroducing": {
         "title": "Memperkenalkan",
@@ -3465,13 +3531,29 @@
         "buttonText": "Kirim aplikasi",
         "select": "pilih"
       },
+      "Acknowledgement": {
+        "title": "Syarat dan ketentuan",
+        "acceptButton": "Terima",
+        "eSignConsent": {
+          "text": "Saya menerima",
+          "linkText": "Persetujuan Tanda Tangan Elektronik"
+        },
+        "privacyAndTerms": {
+          "text": "Saya menerima",
+          "privacyPolicyLinkText": "Kebijakan Privasi penerbit",
+          "and": ", dan",
+          "cardTermsLinkText": "Ketentuan Kartu Blink"
+        },
+        "certifyAccuracy": "Saya menyatakan bahwa informasi yang saya berikan akurat dan bahwa saya akan mematuhi semua aturan dan persyaratan terkait Kartu Blink Visa saya",
+        "acknowledgeSolicitation": "Saya mengakui bahwa mengajukan permohonan Kartu Blink Visa bukan merupakan permintaan yang tidak sah"
+      },
       "CardPreapproved": {
         "title": "Anda telah disetujui sebelumnya untuk kartu Blink Visa!",
         "buttonText": "Tutup"
       },
       "CardProcessing": {
         "title": "Memproses aplikasi Anda",
-        "subtitle": "Perkiraan waktu tunggu: {waitTime: string}",
+        "subtitle": "Kami akan memberi tahu Anda setelah kami siap",
         "buttonText": "Tutup"
       }
     }

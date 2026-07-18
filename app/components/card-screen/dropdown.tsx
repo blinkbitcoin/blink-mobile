@@ -1,5 +1,10 @@
 import React, { useState } from "react"
-import { View, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
+import {
+  View,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  ScrollView,
+} from "react-native"
 import { makeStyles, useTheme, Text } from "@rn-vui/themed"
 import Icon from "react-native-vector-icons/Ionicons"
 import ReactNativeModal from "react-native-modal"
@@ -93,7 +98,7 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
         onBackButtonPress={toggleModal}
         onModalHide={handleModalHide}
       >
-        <View>
+        <ScrollView style={styles.optionsScroll}>
           {options.map((option) => (
             <TouchableOpacity
               key={option.value}
@@ -119,7 +124,7 @@ export const DropdownComponent: React.FC<DropdownProps> = ({
               </View>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       </ReactNativeModal>
     </>
   )
@@ -153,7 +158,10 @@ const useStyles = makeStyles(({ colors }) => ({
     opacity: 0.5,
   },
   modal: {
-    marginBottom: "90%",
+    justifyContent: "center",
+  },
+  optionsScroll: {
+    maxHeight: "80%",
   },
   optionContainer: {
     flexDirection: "row",

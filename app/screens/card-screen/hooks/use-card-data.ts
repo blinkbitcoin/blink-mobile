@@ -29,11 +29,11 @@ gql`
   }
 `
 
-export const useCardData = () => {
+export const useCardData = ({ skip = false }: { skip?: boolean } = {}) => {
   const isAuthed = useIsAuthed()
 
   const { data, loading, error, refetch } = useCardQuery({
-    skip: !isAuthed,
+    skip: !isAuthed || skip,
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
   })

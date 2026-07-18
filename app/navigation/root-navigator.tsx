@@ -95,6 +95,7 @@ import { OfflineGate } from "@app/self-custodial/components"
 import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unavailable"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
+import { CardFeeScheduleScreen } from "@app/screens/card-screen/card-fee-schedule-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { headerCloseControl } from "@app/components/header-close-control"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
@@ -120,6 +121,7 @@ import {
   CardSubscriptionScreen,
   LoadingCardScreen,
   CardPersonalInformationScreen,
+  CardAcknowledgementScreen,
   CardPreapprovedScreen,
   CardProcessingScreen,
   CardApprovedScreen,
@@ -598,6 +600,13 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
+        name="cardFeeScheduleScreen"
+        component={CardFeeScheduleScreen}
+        options={{
+          title: LL.CardFlow.CardFeeSchedule.title(),
+        }}
+      />
+      <RootNavigator.Screen
         name="cardDetailsScreen"
         component={CardDetailsScreen}
         options={{ title: LL.CardFlow.CardDetails.title() }}
@@ -724,6 +733,14 @@ export const RootStack = () => {
         options={{
           title: LL.CardFlow.Onboarding.PersonalInformation.title(),
           headerLeft: () => <></>,
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardOnboardingAcknowledgementScreen"
+        component={CardAcknowledgementScreen}
+        options={{
+          title: "",
           headerRight: headerCloseControl(),
         }}
       />

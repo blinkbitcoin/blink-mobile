@@ -8967,6 +8967,10 @@ type RootTranslation = {
 		 */
 		cancel: string
 		/**
+		 * C​a​r​d
+		 */
+		card: string
+		/**
 		 * C​l​o​s​e
 		 */
 		close: string
@@ -10009,6 +10013,158 @@ type RootTranslation = {
 			 * T​h​i​s​ ​c​a​r​d​ ​i​s​ ​n​o​t​ ​c​u​r​r​e​n​t​l​y​ ​a​v​a​i​l​a​b​l​e​ ​f​o​r​ ​u​s​e
 			 */
 			cardNotUsable: string
+		}
+		CardFeeSchedule: {
+			/**
+			 * B​l​i​n​k​ ​C​a​r​d​ ​F​e​e​ ​S​c​h​e​d​u​l​e
+			 */
+			title: string
+			/**
+			 * E​f​f​e​c​t​i​v​e​ ​J​u​l​y​ ​1​,​ ​2​0​2​6
+			 */
+			effectiveDate: string
+			sections: {
+				/**
+				 * C​a​r​d​ ​f​e​e​s
+				 */
+				cardFees: string
+				/**
+				 * T​r​a​n​s​a​c​t​i​o​n​ ​f​e​e​s
+				 */
+				transactionFees: string
+				/**
+				 * O​v​e​r​d​r​a​f​t​ ​(​f​u​n​d​e​d​ ​m​o​d​e​)
+				 */
+				overdraft: string
+			}
+			fees: {
+				annualFee: {
+					/**
+					 * A​n​n​u​a​l​ ​f​e​e
+					 */
+					title: string
+					/**
+					 * W​a​i​v​e​d​ ​f​o​r​ ​t​h​e​ ​f​i​r​s​t​ ​y​e​a​r​ ​f​r​o​m​ ​t​h​e​ ​d​a​t​e​ ​o​f​ ​C​a​r​d​ ​i​s​s​u​a​n​c​e
+					 */
+					subtitle: string
+					/**
+					 * {​a​m​o​u​n​t​}​ ​/​ ​y​e​a​r
+					 * @param {string} amount
+					 */
+					value: RequiredParams<'amount'>
+				}
+				cardReplacement: {
+					/**
+					 * C​a​r​d​ ​R​e​p​l​a​c​e​m​e​n​t
+					 */
+					title: string
+				}
+				usdTransactionFee: {
+					/**
+					 * U​S​D​ ​t​r​a​n​s​a​c​t​i​o​n​ ​f​e​e
+					 */
+					title: string
+					/**
+					 * A​p​p​l​i​e​d​ ​t​o​ ​e​a​c​h​ ​t​r​a​n​s​a​c​t​i​o​n​ ​i​n​ ​U​.​S​.​ ​d​o​l​l​a​r​s
+					 */
+					subtitle: string
+				}
+				foreignTransactionFee: {
+					/**
+					 * F​o​r​e​i​g​n​ ​t​r​a​n​s​a​c​t​i​o​n​ ​f​e​e
+					 */
+					title: string
+					/**
+					 * A​p​p​l​i​e​d​ ​t​o​ ​e​a​c​h​ ​t​r​a​n​s​a​c​t​i​o​n​ ​i​n​ ​a​ ​c​u​r​r​e​n​c​y​ ​o​t​h​e​r​ ​t​h​a​n​ ​U​.​S​.​ ​d​o​l​l​a​r​s
+					 */
+					subtitle: string
+				}
+				maximumOverdraft: {
+					/**
+					 * M​a​x​i​m​u​m​ ​o​v​e​r​d​r​a​f​t
+					 */
+					title: string
+					/**
+					 * M​u​s​t​ ​b​e​ ​r​e​p​a​i​d​ ​w​i​t​h​i​n​ ​7​ ​d​a​y​s
+					 */
+					subtitle: string
+				}
+				lateRepaymentFee: {
+					/**
+					 * L​a​t​e​ ​R​e​p​a​y​m​e​n​t​ ​F​e​e
+					 */
+					title: string
+					/**
+					 * C​h​a​r​g​e​d​ ​i​f​ ​o​v​e​r​d​r​a​f​t​ ​i​s​ ​n​o​t​ ​r​e​p​a​i​d​ ​w​i​t​h​i​n​ ​7​ ​d​a​y​s
+					 */
+					subtitle: string
+				}
+			}
+			btcConversion: {
+				/**
+				 * B​T​C​ ​C​o​n​v​e​r​s​i​o​n
+				 */
+				title: string
+				/**
+				 * W​h​e​n​ ​a​ ​t​r​a​n​s​a​c​t​i​o​n​ ​r​e​q​u​i​r​e​s​ ​c​o​n​v​e​r​s​i​o​n​ ​o​f​ ​B​T​C​ ​t​o​ ​U​S​D​,​ ​t​h​e​ ​c​o​n​v​e​r​s​i​o​n​ ​i​s​ ​e​x​e​c​u​t​e​d​ ​a​t​ ​t​h​e​ ​p​r​e​v​a​i​l​i​n​g​ ​e​x​c​h​a​n​g​e​ ​r​a​t​e​,​ ​w​h​i​c​h​ ​m​a​y​ ​i​n​c​l​u​d​e​ ​a​ ​s​p​r​e​a​d​ ​r​e​f​l​e​c​t​i​n​g​ ​t​h​e​ ​c​o​s​t​ ​o​f​ ​c​o​n​v​e​r​s​i​o​n​.
+				 */
+				body: string
+			}
+			feesUpdateNotice: {
+				/**
+				 * F​e​e​s​ ​m​a​y​ ​b​e​ ​u​p​d​a​t​e​d​ ​f​r​o​m​ ​t​i​m​e​ ​t​o​ ​t​i​m​e​.​ ​B​l​i​n​k​ ​w​i​l​l​ ​p​r​o​v​i​d​e​ ​a​t​ ​l​e​a​s​t​ ​3​0​ ​d​a​y​s​'​ ​n​o​t​i​c​e​ ​b​e​f​o​r​e​ ​a​n​y​ ​f​e​e​ ​c​h​a​n​g​e​s​ ​t​a​k​e​ ​e​f​f​e​c​t​,​ ​i​n​ ​a​c​c​o​r​d​a​n​c​e​ ​w​i​t​h​ ​t​h​e
+				 */
+				text: string
+				/**
+				 * C​a​r​d​h​o​l​d​e​r​ ​A​g​r​e​e​m​e​n​t
+				 */
+				linkText: string
+			}
+			/**
+			 * C​r​e​d​i​t​ ​M​o​d​e​ ​i​s​ ​n​o​t​ ​c​u​r​r​e​n​t​l​y​ ​a​c​t​i​v​e​.​ ​I​f​ ​C​r​e​d​i​t​ ​M​o​d​e​ ​i​s​ ​a​c​t​i​v​a​t​e​d​,​ ​t​h​e​ ​a​p​p​l​i​c​a​b​l​e​ ​i​n​t​e​r​e​s​t​ ​r​a​t​e​s​,​ ​f​e​e​s​,​ ​a​n​d​ ​b​i​l​l​i​n​g​ ​r​i​g​h​t​s​ ​d​i​s​c​l​o​s​u​r​e​s​ ​w​i​l​l​ ​b​e​ ​p​r​o​v​i​d​e​d​ ​b​e​f​o​r​e​ ​a​c​t​i​v​a​t​i​o​n​.
+			 */
+			creditModeNotice: string
+			additionalDetails: {
+				/**
+				 * A​d​d​i​t​i​o​n​a​l​ ​f​e​e​ ​d​e​t​a​i​l​s
+				 */
+				title: string
+				overdraft: {
+					/**
+					 * O​v​e​r​d​r​a​f​t
+					 */
+					label: string
+					/**
+					 * .​ ​I​n​ ​c​e​r​t​a​i​n​ ​c​i​r​c​u​m​s​t​a​n​c​e​s​,​ ​a​ ​t​r​a​n​s​a​c​t​i​o​n​ ​m​a​y​ ​b​e​ ​a​p​p​r​o​v​e​d​ ​t​h​a​t​ ​c​a​u​s​e​s​ ​y​o​u​r​ ​C​a​r​d​ ​B​a​l​a​n​c​e​ ​t​o​ ​f​a​l​l​ ​b​e​l​o​w​ ​z​e​r​o​.​ ​T​h​e​ ​m​a​x​i​m​u​m​ ​o​v​e​r​d​r​a​f​t​ ​i​s​ ​{​m​a​x​O​v​e​r​d​r​a​f​t​}​.​ ​Y​o​u​ ​m​u​s​t​ ​r​e​p​a​y​ ​t​h​e​ ​o​v​e​r​d​r​a​f​t​ ​w​i​t​h​i​n​ ​7​ ​d​a​y​s​ ​b​y​ ​t​r​a​n​s​f​e​r​r​i​n​g​ ​a​d​d​i​t​i​o​n​a​l​ ​f​u​n​d​s​ ​t​o​ ​y​o​u​r​ ​C​a​r​d​ ​B​a​l​a​n​c​e​.
+					 * @param {string} maxOverdraft
+					 */
+					text: RequiredParams<'maxOverdraft'>
+				}
+				foreignCurrency: {
+					/**
+					 * F​o​r​e​i​g​n​ ​c​u​r​r​e​n​c​y
+					 */
+					label: string
+					/**
+					 * .​ ​I​f​ ​y​o​u​ ​m​a​k​e​ ​a​ ​t​r​a​n​s​a​c​t​i​o​n​ ​i​n​ ​a​ ​f​o​r​e​i​g​n​ ​c​u​r​r​e​n​c​y​,​ ​t​h​e​ ​c​a​r​d​ ​n​e​t​w​o​r​k​ ​c​o​n​v​e​r​t​s​ ​i​t​ ​t​o​ ​U​S​D​ ​u​s​i​n​g​ ​i​t​s​ ​o​w​n​ ​c​o​n​v​e​r​s​i​o​n​ ​p​r​o​c​e​d​u​r​e​s​.​ ​T​h​e​ ​r​a​t​e​ ​o​n​ ​t​h​e​ ​p​r​o​c​e​s​s​i​n​g​ ​d​a​t​e​ ​m​a​y​ ​d​i​f​f​e​r​ ​f​r​o​m​ ​t​h​e​ ​t​r​a​n​s​a​c​t​i​o​n​ ​d​a​t​e​.
+					 */
+					text: string
+				}
+				noHiddenFees: {
+					/**
+					 * N​o​ ​h​i​d​d​e​n​ ​f​e​e​s
+					 */
+					label: string
+					/**
+					 * .​ ​T​h​e​r​e​ ​a​r​e​ ​n​o​ ​f​e​e​s​ ​f​o​r​ ​a​c​c​o​u​n​t​ ​s​e​t​u​p​,​ ​i​n​a​c​t​i​v​i​t​y​,​ ​b​a​l​a​n​c​e​ ​i​n​q​u​i​r​i​e​s​,​ ​o​r​ ​c​l​o​s​i​n​g​ ​y​o​u​r​ ​c​a​r​d​.
+					 */
+					text: string
+				}
+			}
+			/**
+			 * B​a​c​k
+			 */
+			backButton: string
 		}
 		CardDetails: {
 			/**
@@ -11387,6 +11543,10 @@ type RootTranslation = {
 					 */
 					label: string
 					/**
+					 * S​p​e​c​i​a​l​ ​o​f​f​e​r
+					 */
+					specialOfferLabel: string
+					/**
 					 * P​a​y​m​e​n​t​ ​P​e​n​d​i​n​g
 					 */
 					paymentPending: string
@@ -11423,10 +11583,21 @@ type RootTranslation = {
 					 */
 					and: string
 				}
+				feeSchedule: {
+					/**
+					 * I​ ​h​a​v​e​ ​r​e​v​i​e​w​e​d​ ​a​n​d​ ​a​g​r​e​e​ ​t​o​ ​t​h​e
+					 */
+					text: string
+					/**
+					 * B​l​i​n​k​ ​C​a​r​d​ ​F​e​e​ ​S​c​h​e​d​u​l​e
+					 */
+					linkText: string
+				}
 				/**
-				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​t​h​a​t​ ​m​y​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​w​i​l​l​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​r​e​n​e​w​ ​i​n​ ​1​ ​y​e​a​r
+				 * I​ ​u​n​d​e​r​s​t​a​n​d​ ​m​y​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​w​i​l​l​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​r​e​n​e​w​ ​i​n​ ​{​m​o​n​t​h​s​}​ ​m​o​n​t​h​s
+				 * @param {number} months
 				 */
-				renew: string
+				renew: RequiredParams<'months'>
 			}
 			LoadingCard: {
 				/**
@@ -11502,6 +11673,52 @@ type RootTranslation = {
 				 */
 				select: string
 			}
+			Acknowledgement: {
+				/**
+				 * T​e​r​m​s​ ​a​n​d​ ​c​o​n​d​i​t​i​o​n​s
+				 */
+				title: string
+				/**
+				 * A​c​c​e​p​t
+				 */
+				acceptButton: string
+				eSignConsent: {
+					/**
+					 * I​ ​a​c​c​e​p​t​ ​t​h​e
+					 */
+					text: string
+					/**
+					 * E​-​S​i​g​n​ ​C​o​n​s​e​n​t
+					 */
+					linkText: string
+				}
+				privacyAndTerms: {
+					/**
+					 * I​ ​a​c​c​e​p​t​ ​t​h​e
+					 */
+					text: string
+					/**
+					 * I​s​s​u​e​r​'​s​ ​P​r​i​v​a​c​y​ ​P​o​l​i​c​y
+					 */
+					privacyPolicyLinkText: string
+					/**
+					 * ,​ ​a​n​d
+					 */
+					and: string
+					/**
+					 * B​l​i​n​k​ ​C​a​r​d​ ​T​e​r​m​s
+					 */
+					cardTermsLinkText: string
+				}
+				/**
+				 * I​ ​c​e​r​t​i​f​y​ ​t​h​a​t​ ​t​h​e​ ​i​n​f​o​r​m​a​t​i​o​n​ ​I​ ​h​a​v​e​ ​p​r​o​v​i​d​e​d​ ​i​s​ ​a​c​c​u​r​a​t​e​ ​a​n​d​ ​t​h​a​t​ ​I​ ​w​i​l​l​ ​a​b​i​d​e​ ​b​y​ ​a​l​l​ ​t​h​e​ ​r​u​l​e​s​ ​a​n​d​ ​r​e​q​u​i​r​e​m​e​n​t​s​ ​r​e​l​a​t​e​d​ ​t​o​ ​m​y​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d
+				 */
+				certifyAccuracy: string
+				/**
+				 * I​ ​a​c​k​n​o​w​l​e​d​g​e​ ​t​h​a​t​ ​a​p​p​l​y​i​n​g​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​d​o​e​s​ ​n​o​t​ ​c​o​n​s​t​i​t​u​t​e​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​s​o​l​i​c​i​t​a​t​i​o​n
+				 */
+				acknowledgeSolicitation: string
+			}
 			CardPreapproved: {
 				/**
 				 * Y​o​u​ ​h​a​v​e​ ​b​e​e​n​ ​p​r​e​-​a​p​p​r​o​v​e​d​ ​f​o​r​ ​t​h​e​ ​B​l​i​n​k​ ​V​i​s​a​ ​c​a​r​d​!
@@ -11518,10 +11735,9 @@ type RootTranslation = {
 				 */
 				title: string
 				/**
-				 * E​s​t​i​m​a​t​e​d​ ​w​a​i​t​ ​t​i​m​e​:​ ​{​w​a​i​t​T​i​m​e​}
-				 * @param {string} waitTime
+				 * W​e​ ​w​i​l​l​ ​n​o​t​i​f​y​ ​y​o​u​ ​o​n​c​e​ ​w​e​ ​a​r​e​ ​r​e​a​d​y
 				 */
-				subtitle: RequiredParams<'waitTime'>
+				subtitle: string
 				/**
 				 * C​l​o​s​e
 				 */
@@ -21220,6 +21436,10 @@ export type TranslationFunctions = {
 		 */
 		cancel: () => LocalizedString
 		/**
+		 * Card
+		 */
+		card: () => LocalizedString
+		/**
 		 * Close
 		 */
 		close: () => LocalizedString
@@ -22239,6 +22459,156 @@ export type TranslationFunctions = {
 			 * This card is not currently available for use
 			 */
 			cardNotUsable: () => LocalizedString
+		}
+		CardFeeSchedule: {
+			/**
+			 * Blink Card Fee Schedule
+			 */
+			title: () => LocalizedString
+			/**
+			 * Effective July 1, 2026
+			 */
+			effectiveDate: () => LocalizedString
+			sections: {
+				/**
+				 * Card fees
+				 */
+				cardFees: () => LocalizedString
+				/**
+				 * Transaction fees
+				 */
+				transactionFees: () => LocalizedString
+				/**
+				 * Overdraft (funded mode)
+				 */
+				overdraft: () => LocalizedString
+			}
+			fees: {
+				annualFee: {
+					/**
+					 * Annual fee
+					 */
+					title: () => LocalizedString
+					/**
+					 * Waived for the first year from the date of Card issuance
+					 */
+					subtitle: () => LocalizedString
+					/**
+					 * {amount} / year
+					 */
+					value: (arg: { amount: string }) => LocalizedString
+				}
+				cardReplacement: {
+					/**
+					 * Card Replacement
+					 */
+					title: () => LocalizedString
+				}
+				usdTransactionFee: {
+					/**
+					 * USD transaction fee
+					 */
+					title: () => LocalizedString
+					/**
+					 * Applied to each transaction in U.S. dollars
+					 */
+					subtitle: () => LocalizedString
+				}
+				foreignTransactionFee: {
+					/**
+					 * Foreign transaction fee
+					 */
+					title: () => LocalizedString
+					/**
+					 * Applied to each transaction in a currency other than U.S. dollars
+					 */
+					subtitle: () => LocalizedString
+				}
+				maximumOverdraft: {
+					/**
+					 * Maximum overdraft
+					 */
+					title: () => LocalizedString
+					/**
+					 * Must be repaid within 7 days
+					 */
+					subtitle: () => LocalizedString
+				}
+				lateRepaymentFee: {
+					/**
+					 * Late Repayment Fee
+					 */
+					title: () => LocalizedString
+					/**
+					 * Charged if overdraft is not repaid within 7 days
+					 */
+					subtitle: () => LocalizedString
+				}
+			}
+			btcConversion: {
+				/**
+				 * BTC Conversion
+				 */
+				title: () => LocalizedString
+				/**
+				 * When a transaction requires conversion of BTC to USD, the conversion is executed at the prevailing exchange rate, which may include a spread reflecting the cost of conversion.
+				 */
+				body: () => LocalizedString
+			}
+			feesUpdateNotice: {
+				/**
+				 * Fees may be updated from time to time. Blink will provide at least 30 days' notice before any fee changes take effect, in accordance with the
+				 */
+				text: () => LocalizedString
+				/**
+				 * Cardholder Agreement
+				 */
+				linkText: () => LocalizedString
+			}
+			/**
+			 * Credit Mode is not currently active. If Credit Mode is activated, the applicable interest rates, fees, and billing rights disclosures will be provided before activation.
+			 */
+			creditModeNotice: () => LocalizedString
+			additionalDetails: {
+				/**
+				 * Additional fee details
+				 */
+				title: () => LocalizedString
+				overdraft: {
+					/**
+					 * Overdraft
+					 */
+					label: () => LocalizedString
+					/**
+					 * . In certain circumstances, a transaction may be approved that causes your Card Balance to fall below zero. The maximum overdraft is {maxOverdraft}. You must repay the overdraft within 7 days by transferring additional funds to your Card Balance.
+					 */
+					text: (arg: { maxOverdraft: string }) => LocalizedString
+				}
+				foreignCurrency: {
+					/**
+					 * Foreign currency
+					 */
+					label: () => LocalizedString
+					/**
+					 * . If you make a transaction in a foreign currency, the card network converts it to USD using its own conversion procedures. The rate on the processing date may differ from the transaction date.
+					 */
+					text: () => LocalizedString
+				}
+				noHiddenFees: {
+					/**
+					 * No hidden fees
+					 */
+					label: () => LocalizedString
+					/**
+					 * . There are no fees for account setup, inactivity, balance inquiries, or closing your card.
+					 */
+					text: () => LocalizedString
+				}
+			}
+			/**
+			 * Back
+			 */
+			backButton: () => LocalizedString
 		}
 		CardDetails: {
 			/**
@@ -23606,6 +23976,10 @@ export type TranslationFunctions = {
 					 */
 					label: () => LocalizedString
 					/**
+					 * Special offer
+					 */
+					specialOfferLabel: () => LocalizedString
+					/**
 					 * Payment Pending
 					 */
 					paymentPending: () => LocalizedString
@@ -23642,10 +24016,20 @@ export type TranslationFunctions = {
 					 */
 					and: () => LocalizedString
 				}
+				feeSchedule: {
+					/**
+					 * I have reviewed and agree to the
+					 */
+					text: () => LocalizedString
+					/**
+					 * Blink Card Fee Schedule
+					 */
+					linkText: () => LocalizedString
+				}
 				/**
-				 * I understand that my subscription will automatically renew in 1 year
+				 * I understand my subscription will automatically renew in {months} months
 				 */
-				renew: () => LocalizedString
+				renew: (arg: { months: number }) => LocalizedString
 			}
 			LoadingCard: {
 				/**
@@ -23721,6 +24105,52 @@ export type TranslationFunctions = {
 				 */
 				select: () => LocalizedString
 			}
+			Acknowledgement: {
+				/**
+				 * Terms and conditions
+				 */
+				title: () => LocalizedString
+				/**
+				 * Accept
+				 */
+				acceptButton: () => LocalizedString
+				eSignConsent: {
+					/**
+					 * I accept the
+					 */
+					text: () => LocalizedString
+					/**
+					 * E-Sign Consent
+					 */
+					linkText: () => LocalizedString
+				}
+				privacyAndTerms: {
+					/**
+					 * I accept the
+					 */
+					text: () => LocalizedString
+					/**
+					 * Issuer's Privacy Policy
+					 */
+					privacyPolicyLinkText: () => LocalizedString
+					/**
+					 * , and
+					 */
+					and: () => LocalizedString
+					/**
+					 * Blink Card Terms
+					 */
+					cardTermsLinkText: () => LocalizedString
+				}
+				/**
+				 * I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card
+				 */
+				certifyAccuracy: () => LocalizedString
+				/**
+				 * I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation
+				 */
+				acknowledgeSolicitation: () => LocalizedString
+			}
 			CardPreapproved: {
 				/**
 				 * You have been pre-approved for the Blink Visa card!
@@ -23737,9 +24167,9 @@ export type TranslationFunctions = {
 				 */
 				title: () => LocalizedString
 				/**
-				 * Estimated wait time: {waitTime}
+				 * We will notify you once we are ready
 				 */
-				subtitle: (arg: { waitTime: string }) => LocalizedString
+				subtitle: () => LocalizedString
 				/**
 				 * Close
 				 */

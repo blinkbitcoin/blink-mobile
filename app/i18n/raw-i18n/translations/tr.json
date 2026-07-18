@@ -2732,6 +2732,7 @@
     "bitcoinPrice": "Bitcoin fiyatı",
     "btcAccount": "Bitcoin Bakiyesi",
     "cancel": "İptal",
+    "card": "Kart",
     "close": "Kapat",
     "confirm": "Onayla",
     "convert": "Çevir",
@@ -3044,6 +3045,66 @@
       "limitUpdateSuccess": "Limit başarıyla güncellendi",
       "limitUpdateError": "Limit güncellenemedi",
       "limitMustBePositive": "Limit sıfırdan büyük olmalıdır"
+    },
+    "CardFeeSchedule": {
+      "title": "Blink Kart ücret çizelgesi",
+      "effectiveDate": "1 Temmuz 2026 tarihinden itibaren geçerlidir",
+      "sections": {
+        "cardFees": "Kart ücretleri",
+        "transactionFees": "İşlem ücretleri",
+        "overdraft": "Ek hesap (fonlanmış mod)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Yıllık ücret",
+          "subtitle": "Kartın verildiği tarihten itibaren ilk yıl için muaf",
+          "value": "{amount: string} / yıl"
+        },
+        "cardReplacement": {
+          "title": "Kart değişimi"
+        },
+        "usdTransactionFee": {
+          "title": "USD işlem ücreti",
+          "subtitle": "ABD doları cinsinden her işleme uygulanır"
+        },
+        "foreignTransactionFee": {
+          "title": "Yurt dışı işlem ücreti",
+          "subtitle": "ABD doları dışındaki bir para biriminde yapılan her işleme uygulanır"
+        },
+        "maximumOverdraft": {
+          "title": "Maksimum ek hesap",
+          "subtitle": "7 gün içinde geri ödenmelidir"
+        },
+        "lateRepaymentFee": {
+          "title": "Geç ödeme ücreti",
+          "subtitle": "Ek hesap 7 gün içinde geri ödenmezse tahsil edilir"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC dönüşümü",
+        "body": "Bir işlem BTC'nin USD'ye dönüştürülmesini gerektirdiğinde, dönüşüm geçerli döviz kuru üzerinden gerçekleştirilir ve bu, dönüşüm maliyetini yansıtan bir spread içerebilir."
+      },
+      "feesUpdateNotice": {
+        "text": "Ücretler zaman zaman güncellenebilir. Blink, herhangi bir ücret değişikliği yürürlüğe girmeden önce en az 30 gün önceden bildirimde bulunacaktır;",
+        "linkText": "Kart Sahibi Sözleşmesi"
+      },
+      "creditModeNotice": "Kredi Modu şu anda etkin değil. Kredi Modu etkinleştirilirse, geçerli faiz oranları, ücretler ve faturalandırma hakları açıklamaları etkinleştirmeden önce sağlanacaktır.",
+      "additionalDetails": {
+        "title": "Ek ücret ayrıntıları",
+        "overdraft": {
+          "label": "Ek hesap",
+          "text": ". Belirli durumlarda, Kart Bakiyenizin sıfırın altına düşmesine neden olan bir işlem onaylanabilir. Maksimum ek hesap {maxOverdraft: string}'dur. Ek hesabı, Kart Bakiyenize ek fon aktararak 7 gün içinde geri ödemelisiniz."
+        },
+        "foreignCurrency": {
+          "label": "Yabancı para birimi",
+          "text": ". Yabancı bir para biriminde işlem yaparsanız, kart ağı kendi dönüşüm prosedürlerini kullanarak bunu USD'ye dönüştürür. İşlem tarihindeki kur, işlem tarihinden farklı olabilir."
+        },
+        "noHiddenFees": {
+          "label": "Gizli ücret yok",
+          "text": ". Hesap kurulumu, işlem yapılmaması, bakiye sorgulamaları veya kartınızı kapatma için ücret alınmaz."
+        }
+      },
+      "backButton": "Geri"
     },
     "CardDetails": {
       "title": "Kart detayları",
@@ -3390,6 +3451,7 @@
         "perYear": "yıllık",
         "status": {
           "label": "Durum",
+          "specialOfferLabel": "Özel teklif",
           "paymentPending": "Ödeme Bekliyor",
           "firstYearFree": "İlk yıl ücretsiz"
         },
@@ -3403,7 +3465,11 @@
           "cardholderAgreement": "Kart Sahibi Sözleşmesi",
           "and": "ve"
         },
-        "renew": "Aboneliğimin 1 yıl içinde otomatik olarak yenileneceğini anlıyorum"
+        "feeSchedule": {
+          "text": "İnceledim ve şunu kabul ediyorum:",
+          "linkText": "Blink Card Ücret Çizelgesi"
+        },
+        "renew": "Aboneliğimin {months: number} ay içinde otomatik olarak yenileneceğini anlıyorum"
       },
       "CardIntroducing": {
         "title": "Tanıtım",
@@ -3465,13 +3531,29 @@
         "buttonText": "Başvuruyu gönder",
         "select": "seç"
       },
+      "Acknowledgement": {
+        "title": "Şartlar ve koşullar",
+        "acceptButton": "Kabul et",
+        "eSignConsent": {
+          "text": "Kabul ediyorum:",
+          "linkText": "Elektronik İmza Onayı'nı"
+        },
+        "privacyAndTerms": {
+          "text": "Kabul ediyorum:",
+          "privacyPolicyLinkText": "ihraç edenin Gizlilik Politikası'nı",
+          "and": " ve",
+          "cardTermsLinkText": "Blink Kart Koşulları'nı"
+        },
+        "certifyAccuracy": "Sağladığım bilgilerin doğru olduğunu ve Blink Visa Kartımla ilgili tüm kural ve gerekliliklere uyacağımı beyan ederim",
+        "acknowledgeSolicitation": "Blink Visa Kartı için başvurmanın yetkisiz bir talep oluşturmadığını kabul ediyorum"
+      },
       "CardPreapproved": {
         "title": "Blink Visa kartı için ön onay aldınız!",
         "buttonText": "Kapat"
       },
       "CardProcessing": {
         "title": "Başvurunuz işleniyor",
-        "subtitle": "Tahmini bekleme süresi: {waitTime: string}",
+        "subtitle": "Hazır olduğumuzda sizi bilgilendireceğiz",
         "buttonText": "Kapat"
       }
     }

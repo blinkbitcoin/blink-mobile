@@ -1,10 +1,11 @@
 import * as React from "react"
 import { View } from "react-native"
-import { RouteProp, useRoute } from "@react-navigation/native"
-import { CheckBox, makeStyles, Text } from "@rn-vui/themed"
-import InAppBrowser from "react-native-inappbrowser-reborn"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { CheckboxRow } from "@app/components/card-screen/checkbox-row"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useKycFlow } from "@app/hooks"
@@ -13,13 +14,16 @@ import { KycFlowType, WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { formatDateFromNow } from "@app/utils/date"
+import { openExternalUrl } from "@app/utils/external"
 
 const SUBSCRIBE_ROUTE: keyof RootStackParamList = "cardOnboardingSubscribeScreen"
+const SUBSCRIPTION_RENEWAL_MONTHS = 12
 
 export const CardSubscriptionScreen: React.FC = () => {
   const styles = useStyles()
   const { LL, locale } = useI18nContext()
   const route = useRoute<RouteProp<RootStackParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const isSubscribeVariant = route.name === SUBSCRIBE_ROUTE
 
@@ -46,17 +50,22 @@ export const CardSubscriptionScreen: React.FC = () => {
   )
 
   const renewalDate = React.useMemo(
-    () => formatDateFromNow({ years: 1, locale }),
+    () => formatDateFromNow({ months: SUBSCRIPTION_RENEWAL_MONTHS, locale }),
     [locale],
   )
 
   const [isAgreed, setIsAgreed] = React.useState(false)
   const [isRenew, setIsRenew] = React.useState(false)
+  const [isFeeScheduleAgreed, setIsFeeScheduleAgreed] = React.useState(false)
+
+  const isSubscribeReady = isRenew && isFeeScheduleAgreed && isAgreed
+  const isAcceptDisabled = isSubscribeVariant ? !isSubscribeReady : !isAgreed
+
+  const statusLabel = isSubscribeVariant
+    ? LL.CardFlow.Onboarding.CardSubscription.status.specialOfferLabel()
+    : LL.CardFlow.Onboarding.CardSubscription.status.label()
 
   const handleAccept = () => {
-    if (!isAgreed) return
-    if (isSubscribeVariant && !isRenew) return
-
     if (isSubscribeVariant) {
       startKyc()
       return
@@ -83,7 +92,7 @@ export const CardSubscriptionScreen: React.FC = () => {
 
           <View style={styles.infoRow}>
             <Text type="p3" style={styles.label}>
-              {LL.CardFlow.Onboarding.CardSubscription.status.label()}
+              {statusLabel}
             </Text>
             {isSubscribeVariant ? (
               <Text type="p3" style={styles.statusSubscribe}>
@@ -106,58 +115,61 @@ export const CardSubscriptionScreen: React.FC = () => {
           </View>
         </View>
 
-        <View style={styles.checkboxContainer}>
-          <CheckBox
-            checked={isAgreed}
-            iconType="ionicon"
-            checkedIcon={"checkbox"}
-            uncheckedIcon={"square-outline"}
-            onPress={() => setIsAgreed(!isAgreed)}
-            containerStyle={styles.checkboxStyle}
-          />
-          <View style={styles.agreementTextContainer}>
+        <View style={styles.checkboxesContainer}>
+          {isSubscribeVariant && (
+            <>
+              <CheckboxRow checked={isRenew} onPress={() => setIsRenew(!isRenew)}>
+                <Text type="p3" style={styles.agreementText}>
+                  {LL.CardFlow.Onboarding.CardSubscription.renew({
+                    months: SUBSCRIPTION_RENEWAL_MONTHS,
+                  })}
+                </Text>
+              </CheckboxRow>
+
+              <CheckboxRow
+                checked={isFeeScheduleAgreed}
+                onPress={() => setIsFeeScheduleAgreed(!isFeeScheduleAgreed)}
+              >
+                <Text type="p3" style={styles.agreementText}>
+                  {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.text()}{" "}
+                  <Text
+                    type="p3"
+                    style={styles.feeScheduleLink}
+                    onPress={() => navigation.navigate("cardFeeScheduleScreen")}
+                  >
+                    {LL.CardFlow.Onboarding.CardSubscription.feeSchedule.linkText()}
+                  </Text>
+                </Text>
+              </CheckboxRow>
+            </>
+          )}
+
+          <CheckboxRow checked={isAgreed} onPress={() => setIsAgreed(!isAgreed)}>
             <Text type="p3" style={styles.agreementText}>
               {LL.CardFlow.Onboarding.CardSubscription.agreement.text()}{" "}
               <Text
                 style={styles.link}
-                onPress={() => InAppBrowser.open(cardTermsAndConditionsUrl)}
+                onPress={() => openExternalUrl(cardTermsAndConditionsUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.termsOfService()}
               </Text>
               ,{" "}
               <Text
                 style={styles.link}
-                onPress={() => InAppBrowser.open(cardPrivacyPolicyUrl)}
+                onPress={() => openExternalUrl(cardPrivacyPolicyUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.privacyPolicy()}
               </Text>
               , {LL.CardFlow.Onboarding.CardSubscription.agreement.and()}{" "}
               <Text
                 style={styles.link}
-                onPress={() => InAppBrowser.open(cardCardholderAgreementUrl)}
+                onPress={() => openExternalUrl(cardCardholderAgreementUrl)}
               >
                 {LL.CardFlow.Onboarding.CardSubscription.agreement.cardholderAgreement()}
               </Text>
             </Text>
-          </View>
+          </CheckboxRow>
         </View>
-        {isSubscribeVariant && (
-          <View style={styles.checkboxContainer}>
-            <CheckBox
-              checked={isRenew}
-              iconType="ionicon"
-              checkedIcon={"checkbox"}
-              uncheckedIcon={"square-outline"}
-              onPress={() => setIsRenew(!isRenew)}
-              containerStyle={styles.checkboxStyle}
-            />
-            <View style={styles.agreementTextContainer}>
-              <Text type="p3" style={styles.agreementText}>
-                {LL.CardFlow.Onboarding.CardSubscription.renew()}
-              </Text>
-            </View>
-          </View>
-        )}
       </View>
 
       <View style={styles.buttonsContainer}>
@@ -168,7 +180,7 @@ export const CardSubscriptionScreen: React.FC = () => {
               : LL.CardFlow.Onboarding.CardSubscription.payButton()
           }
           onPress={handleAccept}
-          disabled={!isAgreed || (isSubscribeVariant && !isRenew)}
+          disabled={isAcceptDisabled}
         />
       </View>
     </Screen>
@@ -191,18 +203,21 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.black,
     textAlign: "center",
     marginBottom: 5,
-    fontWeight: "600",
+    fontWeight: "700",
+    lineHeight: 22,
   },
   price: {
     color: colors.primary,
     textAlign: "center",
-    fontWeight: "600",
     marginBottom: 5,
+    fontWeight: "700",
+    lineHeight: 32,
   },
   perYear: {
     color: colors.grey2,
     textAlign: "center",
     marginBottom: 15,
+    lineHeight: 16,
   },
   infoRow: {
     flexDirection: "row",
@@ -212,41 +227,39 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   label: {
     color: colors.grey2,
+    lineHeight: 20,
   },
   statusPending: {
     color: colors.primary,
-    fontWeight: "500",
+    fontWeight: "700",
+    lineHeight: 20,
   },
   statusSubscribe: {
     color: colors._green,
-    fontWeight: "500",
+    fontWeight: "700",
+    lineHeight: 20,
   },
   value: {
     color: colors.black,
-    fontWeight: "500",
+    fontWeight: "700",
+    lineHeight: 20,
   },
-  checkboxContainer: {
+  checkboxesContainer: {
     marginTop: 17,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  checkboxStyle: {
-    padding: 0,
-    margin: 0,
-    marginRight: 15,
-    marginLeft: 0,
-  },
-  agreementTextContainer: {
-    flex: 1,
-    marginTop: 2,
+    gap: 17,
   },
   agreementText: {
     color: colors.black,
-    lineHeight: 22,
+    lineHeight: 16,
   },
   link: {
     color: colors.primary,
     fontWeight: "500",
+  },
+  feeScheduleLink: {
+    color: colors.primary,
+    fontWeight: "700",
+    lineHeight: 16,
   },
   buttonsContainer: {
     justifyContent: "flex-end",

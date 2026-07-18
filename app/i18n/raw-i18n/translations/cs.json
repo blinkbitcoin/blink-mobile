@@ -2732,6 +2732,7 @@
     "bitcoinPrice": "Cena bitcoinu",
     "btcAccount": "Bitcoinový zůstatek",
     "cancel": "Zrušit",
+    "card": "Karta",
     "close": "Zavřít",
     "confirm": "Potvrdit",
     "convert": "Převést",
@@ -3044,6 +3045,66 @@
       "limitUpdateSuccess": "Limit úspěšně aktualizován",
       "limitUpdateError": "Nepodařilo se aktualizovat limit",
       "limitMustBePositive": "Limit musí být větší než nula"
+    },
+    "CardFeeSchedule": {
+      "title": "Sazebník poplatků karty Blink",
+      "effectiveDate": "Platné od 1. července 2026",
+      "sections": {
+        "cardFees": "Poplatky za kartu",
+        "transactionFees": "Poplatky za transakce",
+        "overdraft": "Přečerpání (financovaný režim)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Roční poplatek",
+          "subtitle": "Prominut na první rok od data vydání karty",
+          "value": "{amount: string} / rok"
+        },
+        "cardReplacement": {
+          "title": "Výměna karty"
+        },
+        "usdTransactionFee": {
+          "title": "Poplatek za transakci v USD",
+          "subtitle": "Účtováno za každou transakci v amerických dolarech"
+        },
+        "foreignTransactionFee": {
+          "title": "Poplatek za zahraniční transakci",
+          "subtitle": "Účtováno za každou transakci v jiné měně než v amerických dolarech"
+        },
+        "maximumOverdraft": {
+          "title": "Maximální přečerpání",
+          "subtitle": "Musí být splaceno do 7 dnů"
+        },
+        "lateRepaymentFee": {
+          "title": "Poplatek za pozdní splacení",
+          "subtitle": "Účtuje se, pokud přečerpání není splaceno do 7 dnů"
+        }
+      },
+      "btcConversion": {
+        "title": "Konverze BTC",
+        "body": "Pokud transakce vyžaduje konverzi BTC na USD, konverze se provádí za aktuální směnný kurz, který může zahrnovat rozpětí odrážející náklady na konverzi."
+      },
+      "feesUpdateNotice": {
+        "text": "Poplatky mohou být čas od času aktualizovány. Blink poskytne oznámení nejméně 30 dní předem, než jakékoli změny poplatků vstoupí v platnost, v souladu se",
+        "linkText": "Smlouvou s držitelem karty"
+      },
+      "creditModeNotice": "Kreditní režim není momentálně aktivní. Pokud bude Kreditní režim aktivován, budou příslušné úrokové sazby, poplatky a informace o fakturačních právech poskytnuty před aktivací.",
+      "additionalDetails": {
+        "title": "Další podrobnosti o poplatcích",
+        "overdraft": {
+          "label": "Přečerpání",
+          "text": ". Za určitých okolností může být schválena transakce, která způsobí pokles zůstatku vaší karty pod nulu. Maximální přečerpání je {maxOverdraft: string}. Přečerpání musíte splatit do 7 dnů převodem dalších prostředků na zůstatek vaší karty."
+        },
+        "foreignCurrency": {
+          "label": "Cizí měna",
+          "text": ". Pokud provedete transakci v cizí měně, karetní síť ji převede na USD pomocí vlastních konverzních postupů. Kurz v den zpracování se může lišit od data transakce."
+        },
+        "noHiddenFees": {
+          "label": "Žádné skryté poplatky",
+          "text": ". Neúčtují se žádné poplatky za založení účtu, nečinnost, dotazy na zůstatek ani za zrušení karty."
+        }
+      },
+      "backButton": "Zpět"
     },
     "CardDetails": {
       "title": "Detaily karty",
@@ -3390,6 +3451,7 @@
         "perYear": "za rok",
         "status": {
           "label": "Stav",
+          "specialOfferLabel": "Speciální nabídka",
           "paymentPending": "Platba Čeká",
           "firstYearFree": "První rok zdarma"
         },
@@ -3403,7 +3465,11 @@
           "cardholderAgreement": "Smlouvou držitele karty",
           "and": "a"
         },
-        "renew": "Rozumím, že mé předplatné se automaticky obnoví za 1 rok"
+        "feeSchedule": {
+          "text": "Zkontroloval jsem a souhlasím se dokumentem",
+          "linkText": "Sazebník poplatků Blink Card"
+        },
+        "renew": "Rozumím, že mé předplatné se automaticky obnoví za {months: number} měsíců"
       },
       "CardIntroducing": {
         "title": "Představujeme",
@@ -3465,13 +3531,29 @@
         "buttonText": "Odeslat žádost",
         "select": "vybrat"
       },
+      "Acknowledgement": {
+        "title": "Smluvní podmínky",
+        "acceptButton": "Přijmout",
+        "eSignConsent": {
+          "text": "Souhlasím s",
+          "linkText": "souhlasem s elektronickým podpisem"
+        },
+        "privacyAndTerms": {
+          "text": "Souhlasím s",
+          "privacyPolicyLinkText": "zásadami ochrany osobních údajů vydavatele",
+          "and": " a",
+          "cardTermsLinkText": "podmínkami karty Blink"
+        },
+        "certifyAccuracy": "Potvrzuji, že informace, které jsem poskytl, jsou přesné a že budu dodržovat všechna pravidla a požadavky týkající se mé karty Blink Visa",
+        "acknowledgeSolicitation": "Beru na vědomí, že žádost o kartu Blink Visa nepředstavuje neoprávněné oslovení"
+      },
       "CardPreapproved": {
         "title": "Byli jste předschváleni pro kartu Blink Visa!",
         "buttonText": "Zavřít"
       },
       "CardProcessing": {
         "title": "Zpracováváme vaši žádost",
-        "subtitle": "Odhadovaná doba čekání: {waitTime: string}",
+        "subtitle": "Dáme ti vědět, jakmile budeme připraveni",
         "buttonText": "Zavřít"
       }
     }
