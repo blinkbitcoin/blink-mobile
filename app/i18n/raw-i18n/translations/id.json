@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Hubungi dukungan",
       "body": "Terjadi kesalahan, tetapi jangan khawatir, dana Anda aman. Silakan hubungi dukungan untuk mendapatkan bantuan.\n\nAnda mungkin memerlukan informasi ini untuk membantu dukungan menyelesaikan kasus Anda:",
+      "reasonLabel": "Alasan",
       "accountIdLabel": "ID akun",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Nama pengguna",

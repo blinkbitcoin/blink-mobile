@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Liên hệ hỗ trợ",
       "body": "Đã xảy ra sự cố, nhưng đừng lo lắng, tiền của bạn vẫn an toàn. Vui lòng liên hệ bộ phận hỗ trợ để được trợ giúp.\n\nBạn có thể cần thông tin này để giúp bộ phận hỗ trợ giải quyết trường hợp của bạn:",
+      "reasonLabel": "Lý do",
       "accountIdLabel": "ID tài khoản",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Tên người dùng",

@@ -3557,6 +3557,7 @@
         "contactSupport": {
             "title": "Contacter le support",
             "body": "Une erreur s'est produite, mais ne vous inquiétez pas, vos fonds sont en sécurité. Veuillez contacter le support pour obtenir de l'aide.\n\nCes informations peuvent aider le support à résoudre votre cas :",
+            "reasonLabel": "Motif",
             "accountIdLabel": "ID du compte",
             "pubKeyLabel": "pubKey",
             "usernameLabel": "Nom d'utilisateur",

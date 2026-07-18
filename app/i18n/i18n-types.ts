@@ -12047,6 +12047,10 @@ type RootTranslation = {
 			 */
 			body: string
 			/**
+			 * R​e​a​s​o​n
+			 */
+			reasonLabel: string
+			/**
 			 * A​c​c​o​u​n​t​ ​I​D
 			 */
 			accountIdLabel: string
@@ -24534,6 +24538,10 @@ export type TranslationFunctions = {
 		You may need this information to help support resolve your case:
 			 */
 			body: () => LocalizedString
+			/**
+			 * Reason
+			 */
+			reasonLabel: () => LocalizedString
 			/**
 			 * Account ID
 			 */

@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Kapcsolatfelvétel az ügyfélszolgálattal",
       "body": "Valami hiba történt, de ne aggódjon, a pénze biztonságban van. Kérjük, forduljon az ügyfélszolgálathoz segítségért.\n\nEzekre az adatokra szüksége lehet, hogy az ügyfélszolgálat megoldja az esetét:",
+      "reasonLabel": "Ok",
       "accountIdLabel": "Fiókazonosító",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Felhasználónév",

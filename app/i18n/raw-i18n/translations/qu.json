@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Yanapakuyta maskay",
       "body": "Imapas mana allinchu karqan, ichaqa ama llakikuychu, qullqiykikuna waqaychasqam kachkan. Ama hina kaspa yanapakuyta maskay.\n\nKay willakuykunata munawaq yanapakuqkuna hawkachinankupaq:",
+      "reasonLabel": "Imarayku",
       "accountIdLabel": "Kuenta ID",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Ruraqpa sutin",

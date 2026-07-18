@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Destek ile iletişime geçin",
       "body": "Bir şeyler ters gitti ama endişelenmeyin, paranız güvende. Yardım için lütfen destek ile iletişime geçin.\n\nDesteğin durumunuzu çözmesine yardımcı olmak için bu bilgilere ihtiyacınız olabilir:",
+      "reasonLabel": "Neden",
       "accountIdLabel": "Hesap kimliği",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Kullanıcı adı",
