@@ -3595,6 +3595,7 @@
       "networkFee": "Ağ ücreti: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ağ ücreti: <bold>{fee: string}</bold> (Blink tarafından karşılanır)",
       "exchangeRate": "Güncel döviz kuru 1 BTC = {rate: string}",
+      "retryCta": "Tekrar dene",
       "approveCta": "Onayla",
       "contactSupportCta": "Desteğe ulaş"
     },

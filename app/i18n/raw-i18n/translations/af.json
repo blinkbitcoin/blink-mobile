@@ -3595,6 +3595,7 @@
       "networkFee": "Netwerkfooi: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Netwerkfooi: <bold>{fee: string}</bold> (deur Blink gedek)",
       "exchangeRate": "Huidige wisselkoers 1 BTC = {rate: string}",
+      "retryCta": "Probeer weer",
       "approveCta": "Keur goed",
       "contactSupportCta": "Kontak ondersteuning"
     },

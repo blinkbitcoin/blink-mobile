@@ -3595,6 +3595,7 @@
       "networkFee": "رسوم الشبكة: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "رسوم الشبكة: <bold>{fee: string}</bold> (تغطيها Blink)",
       "exchangeRate": "سعر الصرف الحالي 1 BTC = {rate: string}",
+      "retryCta": "حاول مرة أخرى",
       "approveCta": "موافقة",
       "contactSupportCta": "تواصل مع الدعم"
     },

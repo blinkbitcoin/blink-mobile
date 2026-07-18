@@ -3595,6 +3595,7 @@
       "networkFee": "Hálózati díj: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Hálózati díj: <bold>{fee: string}</bold> (a Blink fedezi)",
       "exchangeRate": "Jelenlegi árfolyam 1 BTC = {rate: string}",
+      "retryCta": "Próbáld újra",
       "approveCta": "Jóváhagyás",
       "contactSupportCta": "Kapcsolat a támogatással"
     },

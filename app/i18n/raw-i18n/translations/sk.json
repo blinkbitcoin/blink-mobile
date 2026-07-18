@@ -3595,6 +3595,7 @@
       "networkFee": "Sieťový poplatok: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Sieťový poplatok: <bold>{fee: string}</bold> (hradí Blink)",
       "exchangeRate": "Aktuálny výmenný kurz 1 BTC = {rate: string}",
+      "retryCta": "Skúsiť znova",
       "approveCta": "Schváliť",
       "contactSupportCta": "Kontaktovať podporu"
     },

@@ -3595,6 +3595,7 @@
       "networkFee": "Ցանցի վճար. <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ցանցի վճար. <bold>{fee: string}</bold> (ծածկում է Blink-ը)",
       "exchangeRate": "Ընթացիկ փոխարժեք 1 BTC = {rate: string}",
+      "retryCta": "Փորձել կրկին",
       "approveCta": "Հաստատել",
       "contactSupportCta": "Կապ աջակցման հետ"
     },

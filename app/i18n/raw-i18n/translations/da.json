@@ -3595,6 +3595,7 @@
       "networkFee": "Netværksgebyr: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Netværksgebyr: <bold>{fee: string}</bold> (dækkes af Blink)",
       "exchangeRate": "Nuværende vekselkurs 1 BTC = {rate: string}",
+      "retryCta": "Prøv igen",
       "approveCta": "Godkend",
       "contactSupportCta": "Kontakt support"
     },

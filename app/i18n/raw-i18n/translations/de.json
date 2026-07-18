@@ -3595,6 +3595,7 @@
             "networkFee": "Netzwerkgebühr: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "Netzwerkgebühr: <bold>{fee: string}</bold> (von Blink übernommen)",
             "exchangeRate": "Aktueller Wechselkurs 1 BTC = {rate: string}",
+            "retryCta": "Erneut versuchen",
             "approveCta": "Bestätigen",
             "contactSupportCta": "Support kontaktieren"
         },
