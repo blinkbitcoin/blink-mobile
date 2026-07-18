@@ -39,10 +39,9 @@ export type WindDown = {
 }
 
 /**
- * Shape of the backend migration preview (Account.migration.preview in the integration
- * contract): the server computes the network fee, whether Blink covers it, and the
- * resulting amount. The client renders these four fields verbatim and never does the
- * arithmetic itself.
+ * Shape of the backend migration preview (the authed top-level Query.migration.preview):
+ * the server computes the network fee, whether Blink covers it, and the resulting amount.
+ * The client renders these four fields verbatim and never does the arithmetic itself.
  */
 export type AccountMigrationPreview = {
   balanceSats: number
