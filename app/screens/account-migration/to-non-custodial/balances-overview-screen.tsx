@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
-import { useIsFocused, useNavigation } from "@react-navigation/native"
+import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -21,6 +21,8 @@ import {
   useMigrationCheckpoint,
   useHardwareBackGuard,
 } from "@app/screens/account-migration/hooks"
+import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/use-ensure-migration-started"
+import { MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
@@ -49,44 +51,75 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   useHardwareBackGuard()
 
   /**
-   * Landing here WITH figures is the commit point, so an app relaunch resumes on this
-   * screen. Recording it before the preview resolves would strand a user whose figures
-   * never arrive; gating on focus also keeps a background instance (this screen stays
-   * mounted under the completion screen) from re-saving the checkpoint the migration just
-   * cleared. Approve only unlocks once the write is durable: a failed write keeps Approve
-   * disabled (Contact support stays available) and a later focus re-save heals it.
-   * TODO: Part 2 moves the lock to the backend (`migration.status`), which is what covers
-   * reinstalls; this checkpoint only remembers which screen to resume on.
+   * Landing here WITH figures declares the migration started server-side, which is what
+   * makes this the point of no return: the lock then lives on the backend and survives a
+   * reinstall, where the checkpoint below only remembers which screen to resume on. It
+   * waits for the figures because a screen that cannot show what is being migrated has no
+   * business claiming the user consented to migrating it.
    */
-  const [isCheckpointSaved, setIsCheckpointSaved] = useState(false)
+  const migrationStart = useEnsureMigrationStarted({ skip: !preview.isReady })
+
+  /** The checkpoint only remembers which screen to resume on. Gated on focus so a
+   *  background instance (this screen stays mounted under the completion screen) never
+   *  re-saves the checkpoint the migration just cleared, and on ready figures so it is
+   *  never recorded before the commit point exists. */
   useEffect(() => {
     if (!isFocused || checkpointLoading || !preview.isReady) return
-    let isActive = true
-    saveCheckpoint(MigrationCheckpoint.BalancesOverview).then((saved) => {
-      if (isActive) setIsCheckpointSaved(saved)
-    })
-    return () => {
-      isActive = false
-    }
+    saveCheckpoint(MigrationCheckpoint.BalancesOverview)
   }, [isFocused, checkpointLoading, preview.isReady, saveCheckpoint])
 
-  /** A preview that settled without figures is never coming: the query failed, or the
-   *  server reports no migration for this account. Holding the spinner would strand the
-   *  user here, where the hardware back is swallowed, so support takes over instead. */
-  useEffect(() => {
-    if (!preview.isUnavailable) return
-    reportError(
-      "Migration preview unavailable",
-      new Error(`the commit screen has no ${preview.unavailableSource}`),
-    )
-    navigation.navigate("accountMigrationContactSupport")
-  }, [preview.isUnavailable, preview.unavailableSource, navigation])
+  /**
+   * The three ways this screen ends without figures to approve, as one value: the preview
+   * settled empty, the wallet query failed, or the server refused to start. All three
+   * strand the user here where the hardware back is swallowed, and a refusal is as final
+   * as the other two, so support takes over rather than leaving an Approve that would
+   * commit into a flow the backend already declined to open. Null means none of them.
+   */
+  const handoverReason = migrationStart.isRejected
+    ? MigrationSupportReason.StartRefused
+    : preview.unavailableReason
+
+  const hasReportedHandoverRef = useRef(false)
+
+  /**
+   * Reported once but routed on every focus. Backing out of the support screen returns
+   * here, and a screen that has handed over has nothing left to offer: its Approve is
+   * dead and its hardware back is swallowed, so landing on it would be a worse dead end
+   * than the support screen the user just left. Telemetry stays at one report because the
+   * failure is one event however many times the user bounces off it.
+   */
+  useFocusEffect(
+    useCallback(() => {
+      if (!handoverReason) return
+
+      if (!hasReportedHandoverRef.current) {
+        hasReportedHandoverRef.current = true
+        reportError("Migration handed over to support", new Error(handoverReason))
+      }
+
+      navigation.navigate("accountMigrationContactSupport", { reason: handoverReason })
+    }, [handoverReason, navigation]),
+  )
 
   const handleApprove = useCallback(() => {
     navigation.navigate("accountMigrationTransferringFunds")
   }, [navigation])
 
-  const isApproveDisabled = !preview.isReady || !isCheckpointSaved
+  /** Either source losing the network earns the same retry, and it refreshes both:
+   *  figures without a started migration are as useless as the reverse. */
+  const isRetryable = preview.isRetryable || migrationStart.hasConnectionIssue
+
+  const { retry: retryPreview } = preview
+  const { retry: retryMigrationStart } = migrationStart
+
+  const handleRetry = useCallback(() => {
+    retryPreview()
+    retryMigrationStart()
+  }, [retryPreview, retryMigrationStart])
+
+  /** Approve commits against a server-side flow, so it stays off until the server has
+   *  confirmed one exists, not merely until the figures render. */
+  const isApproveDisabled = !preview.isReady || !migrationStart.isStarted
 
   return (
     <Screen preset="fixed" headerShown={false}>
@@ -124,19 +157,17 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
               isDollarValueMuted={preview.isNewDollarBalanceRestricted}
             />
 
-            {preview.exchangeRate && (
+            {preview.exchangeRate ? (
               <View style={styles.exchangeRateBox}>
                 <Text style={styles.exchangeRateText}>
                   {LLOverview.exchangeRate({ rate: preview.exchangeRate })}
                 </Text>
               </View>
-            )}
+            ) : null}
           </ScrollView>
         ) : (
           <View style={styles.loadingContainer}>
-            {preview.isRetryable ? (
-              <Text style={styles.connectionIssue}>{LL.errors.network.connection()}</Text>
-            ) : (
+            {isRetryable ? null : (
               <ActivityIndicator
                 size="large"
                 color={colors.primary}
@@ -147,10 +178,16 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
         )}
 
         <View style={styles.buttonsContainer}>
-          {preview.isRetryable ? (
+          {/** Sits with the buttons, not in the figures' place: the start can fail over a
+           *   preview that loaded, leaving a retry under visible balances with no reason. */}
+          {isRetryable ? (
+            <Text style={styles.connectionIssue}>{LL.errors.network.connection()}</Text>
+          ) : null}
+
+          {isRetryable ? (
             <GaloyPrimaryButton
               title={LLOverview.retryCta()}
-              onPress={preview.retry}
+              onPress={handleRetry}
               {...testProps("migration-balances-overview-retry")}
             />
           ) : (

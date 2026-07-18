@@ -1,0 +1,201 @@
+import { act, renderHook } from "@testing-library/react-native"
+
+import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/use-ensure-migration-started"
+
+import { flushEffects } from "../../../helpers/flush-effects"
+
+const mockMigrationStart = jest.fn()
+const mockReportError = jest.fn()
+
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useMigrationStartMutation: () => [mockMigrationStart],
+}))
+
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (operation: string, err: unknown) => mockReportError(operation, err),
+}))
+
+const accepted = { data: { migrationStart: { errors: [] } } }
+
+const refusedWith = (message: string) => ({
+  data: { migrationStart: { errors: [{ message, code: "MIGRATION_NOT_ELIGIBLE" }] } },
+})
+
+const networkFailure = () => {
+  const err = new Error("Network request failed")
+  return Object.assign(err, { networkError: new Error("offline") })
+}
+
+describe("useEnsureMigrationStarted", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockMigrationStart.mockResolvedValue(accepted)
+  })
+
+  it("declares the migration started once the caller stops skipping", async () => {
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(result.current.isStarted).toBe(true)
+    expect(result.current.isRejected).toBe(false)
+  })
+
+  /** The commit screen must not claim the user consented to migrating figures it cannot
+   *  show, so the mutation waits for them. */
+  it("does not fire while the caller is skipping", async () => {
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: true }))
+    await flushEffects()
+
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+    expect(result.current.isStarted).toBe(false)
+  })
+
+  it("fires once the caller stops skipping, not before", async () => {
+    const { rerender } = renderHook(
+      ({ skip }: { skip: boolean }) => useEnsureMigrationStarted({ skip }),
+      { initialProps: { skip: true } },
+    )
+    await flushEffects()
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+
+    rerender({ skip: false })
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+  })
+
+  /** Re-rendering must not open a second flow: the claim is taken before the request
+   *  goes out, not after it answers. */
+  it("fires only once across re-renders", async () => {
+    const { rerender } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+    rerender({})
+    rerender({})
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+  })
+
+  it("treats a refusal in the payload as final and reports it", async () => {
+    mockMigrationStart.mockResolvedValue(refusedWith("This account is not eligible"))
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+
+    expect(result.current.isRejected).toBe(true)
+    expect(result.current.isStarted).toBe(false)
+    expect(result.current.hasConnectionIssue).toBe(false)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration start rejected",
+      expect.objectContaining({ message: "This account is not eligible" }),
+    )
+  })
+
+  it("treats a thrown server error as final", async () => {
+    mockMigrationStart.mockRejectedValue(new Error("boom"))
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+
+    expect(result.current.isRejected).toBe(true)
+    expect(result.current.hasConnectionIssue).toBe(false)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration start failed",
+      expect.any(Error),
+    )
+  })
+
+  /** A start the network never delivered can still succeed, so it must not hand the user
+   *  to support, and support must never hear about it. */
+  it("treats a network failure as retryable and never reports it", async () => {
+    mockMigrationStart.mockRejectedValue(networkFailure())
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+
+    expect(result.current.hasConnectionIssue).toBe(true)
+    expect(result.current.isRejected).toBe(false)
+    expect(result.current.isStarted).toBe(false)
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("fires again when a retry follows a network failure", async () => {
+    mockMigrationStart.mockRejectedValueOnce(networkFailure())
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+    expect(result.current.hasConnectionIssue).toBe(true)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+    expect(result.current.isStarted).toBe(true)
+    expect(result.current.hasConnectionIssue).toBe(false)
+  })
+
+  /** A refusal is final, so retrying it would only replay the same answer. */
+  it("does not fire again when a retry follows a refusal", async () => {
+    mockMigrationStart.mockResolvedValue(refusedWith("not eligible"))
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+  })
+
+  it("survives a payload with no errors array", async () => {
+    mockMigrationStart.mockResolvedValue({ data: undefined })
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+
+    expect(result.current.isStarted).toBe(true)
+    expect(result.current.isRejected).toBe(false)
+  })
+
+  /** Unmounting mid-flight must not write state into a torn-down hook. */
+  it("drops the outcome when the screen leaves before the answer arrives", async () => {
+    let settle: (value: unknown) => void = () => undefined
+    mockMigrationStart.mockReturnValue(
+      new Promise((resolve) => {
+        settle = resolve
+      }),
+    )
+
+    const { unmount } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    unmount()
+
+    await act(async () => {
+      settle(accepted)
+    })
+
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("drops the failure when the screen leaves before the error arrives", async () => {
+    let fail: (reason: unknown) => void = () => undefined
+    mockMigrationStart.mockReturnValue(
+      new Promise((_resolve, reject) => {
+        fail = reject
+      }),
+    )
+
+    const { result, unmount } = renderHook(() =>
+      useEnsureMigrationStarted({ skip: false }),
+    )
+    unmount()
+
+    await act(async () => {
+      fail(networkFailure())
+    })
+
+    expect(result.current.hasConnectionIssue).toBe(false)
+  })
+})

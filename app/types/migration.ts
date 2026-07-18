@@ -1,0 +1,32 @@
+/**
+ * Shape of the backend migration preview (the authed top-level Query.migration.preview):
+ * the server computes the network fee, whether Blink covers it, and the resulting amount.
+ * The client renders these four fields verbatim and never does the arithmetic itself.
+ */
+export type AccountMigrationPreview = {
+  balanceSats: number
+  feeSats: number
+  feeCoveredByBlink: boolean
+  receiveSats: number
+}
+
+/**
+ * Why the migration handed the user to support. Deliberately NOT translated: the value is
+ * copied out of an email by a human, so it has to stay greppable whatever locale produced
+ * the ticket, and only its label is localized.
+ */
+export const MigrationSupportReason = {
+  /** The server answered but had no preview to give. */
+  PreviewUnavailable: "preview-unavailable",
+  /** The wallet query settled without balances, so the dollar row has nothing to show. */
+  BalancesUnavailable: "balances-unavailable",
+  /** The server refused to open the migration flow (cohort, dollars, state conflict). */
+  StartRefused: "start-refused",
+  /** The checkpoint reached the transfer with no provisioned self-custodial account. */
+  SelfCustodialAccountMissing: "self-custodial-account-missing",
+  /** The transfer itself failed or threw. */
+  TransferFailed: "transfer-failed",
+} as const
+
+export type MigrationSupportReason =
+  (typeof MigrationSupportReason)[keyof typeof MigrationSupportReason]

@@ -4,6 +4,7 @@ import { getReadableVersion } from "react-native-device-info"
 import { useContactSupport } from "@app/hooks/use-contact-support"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { MigrationSupportReason } from "@app/types/migration"
 import { isIos } from "@app/utils/helper"
 
 import { useMigrationDiagnostics } from "./use-migration-diagnostics"
@@ -17,12 +18,12 @@ const EMAIL_DIVIDER = "-".repeat(40)
  * last: the user lands right under it and the details block stays untouched. The
  * diagnostics are returned too, so the support screen renders the same single source.
  */
-export const useMigrationSupportEmail = () => {
+export const useMigrationSupportEmail = (reason: MigrationSupportReason) => {
   const { LL } = useI18nContext()
   const LLSupport = LL.AccountMigration.contactSupport
   const { composeSupport } = useContactSupport()
   const { countryCode } = useDeviceLocation()
-  const diagnostics = useMigrationDiagnostics()
+  const diagnostics = useMigrationDiagnostics(reason)
 
   const sendSupportEmail = useCallback(() => {
     const platform = isIos ? "iOS" : "Android"

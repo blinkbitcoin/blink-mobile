@@ -11,6 +11,10 @@ const mockGoBack = jest.fn()
 let mockIsFocused = true
 const mockUseActiveApiKeys = jest.fn()
 let mockWindDown: WindDown | null = null
+let mockIsMigrationLocked = false
+let mockLockLoading = false
+let mockCheckpointLoading = false
+const mockNavigateToCheckpoint = jest.fn()
 const mockUseTransferBlocked = jest.fn()
 const mockUseDollarBalanceRestricted = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
@@ -18,7 +22,7 @@ const mockApiServiceScreen = jest.fn(
   (_props: { onContinue: () => void; onClose?: () => void }) => null,
 )
 const mockRequiredScreen = jest.fn(
-  (_props: { mode: string; onClose?: () => void }) => null,
+  (_props: { mode: string; onClose?: () => void; isExitBlocked?: boolean }) => null,
 )
 const mockDollarBalanceModal = jest.fn(
   (_props: { isVisible: boolean; toggleModal: () => void; onTransfer?: () => void }) =>
@@ -68,10 +72,21 @@ jest.mock("@app/components/screen", () => ({
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useActiveApiKeys: () => mockUseActiveApiKeys(),
+  useMigrationCheckpoint: () => ({
+    navigateToCheckpoint: mockNavigateToCheckpoint,
+    loading: mockCheckpointLoading,
+  }),
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => ({
   useCustodialWindDown: () => mockWindDown,
+}))
+
+jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
+  useMigrationLock: () => ({
+    isLocked: mockIsMigrationLocked,
+    loading: mockLockLoading,
+  }),
 }))
 
 jest.mock("@app/hooks/use-transfer-blocked", () => ({
@@ -108,8 +123,11 @@ jest.mock("@app/screens/account-migration/to-non-custodial/api-service-screen", 
 jest.mock(
   "@app/screens/account-migration/to-non-custodial/migration-required-screen",
   () => ({
-    MigrationRequiredScreen: (props: { mode: string; onClose?: () => void }) =>
-      mockRequiredScreen(props),
+    MigrationRequiredScreen: (props: {
+      mode: string
+      onClose?: () => void
+      isExitBlocked?: boolean
+    }) => mockRequiredScreen(props),
   }),
 )
 
@@ -145,6 +163,9 @@ describe("MigrationGate", () => {
     mockIsFocused = true
     mockWindDown = null
     mockSelfCustodialDisabled = false
+    mockIsMigrationLocked = false
+    mockLockLoading = false
+    mockCheckpointLoading = false
     mockUseActiveApiKeys.mockReturnValue(apiKeysState())
     mockUseTransferBlocked.mockReturnValue(false)
     mockUseDollarBalanceRestricted.mockReturnValue(false)
@@ -398,7 +419,10 @@ describe("MigrationGate", () => {
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
-  it("skips the dollar-balance check after the gate arms, where the flow converts dollars", () => {
+  /** The backend rejects a migration whose USD wallet holds anything and never converts
+   *  it, so letting the armed gate through would only move the refusal to a screen the
+   *  user cannot leave. Every phase blocks on the same precondition. */
+  it("blocks on the dollar balance after the gate arms too", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ usdBalance: 20 }),
     )
@@ -406,8 +430,85 @@ describe("MigrationGate", () => {
 
     render(<MigrationGate />)
 
-    expect(mockDollarBalanceModal).not.toHaveBeenCalled()
+    expect(mockDollarBalanceModal).toHaveBeenCalled()
+  })
+
+  /** The intro exists to convince someone who has not started. The server already
+   *  recorded this account as migrating, so it resumes instead of re-pitching. */
+  it("resumes a locked migration at its checkpoint instead of showing the intro", () => {
+    mockIsMigrationLocked = true
+
+    render(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+  })
+
+  /** The gate must not decide before it knows: rendering the intro while the lock is
+   *  still in flight is what flashed the pitch at a user about to be resumed. */
+  it("holds a loading screen while the lock is still in flight", () => {
+    mockLockLoading = true
+
+    const { getByTestId } = render(<MigrationGate />)
+
+    expect(getByTestId("migration-gate-loading")).toBeTruthy()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+  })
+
+  it("waits for the checkpoint to load before resuming a locked migration", () => {
+    mockIsMigrationLocked = true
+    mockCheckpointLoading = true
+
+    render(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The preconditions still outrank the resume: a Dollar Balance that arrived mid-flow
+   * has to be emptied whatever the phase, or the commit is refused. The intro shows
+   * behind the modal, in the wind-down's own mode, with no way out.
+   */
+  it("empties the dollars before resuming, even for a locked migration", () => {
+    mockIsMigrationLocked = true
+    mockWindDown = windDownWith(WindDownStatus.PreCutoff)
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+    expect(mockDollarBalanceModal).toHaveBeenCalled()
+    expect(mockRequiredScreen).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: "forcedPreDeadline", isExitBlocked: true }),
+    )
+  })
+
+  it("does not resume an account the server has not locked", () => {
+    render(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
     expect(mockRequiredScreen).toHaveBeenCalled()
+  })
+
+  it("leaves the way out open when nothing is locked or gated", () => {
+    render(<MigrationGate />)
+
+    expect(mockRequiredScreen).toHaveBeenCalledWith(
+      expect.objectContaining({ isExitBlocked: false }),
+    )
+  })
+
+  it("keeps the API-service warning unclosable for a locked migration", () => {
+    mockIsMigrationLocked = true
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
+
+    render(<MigrationGate />)
+
+    expect(mockApiServiceScreen).toHaveBeenCalledWith(
+      expect.objectContaining({ onClose: undefined }),
+    )
   })
 
   it("shows the API-service warning when there are active API keys", () => {

@@ -5,6 +5,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationContactSupportScreen } from "@app/screens/account-migration/to-non-custodial/contact-support-screen"
+import { MigrationSupportReason } from "@app/types/migration"
 import { ContextForScreen } from "../../helper"
 import { flushEffects } from "../../../helpers/flush-effects"
 
@@ -23,10 +24,13 @@ let mockDetails = {
   phone: "+1 374 9383 993",
 }
 
+let mockReason: MigrationSupportReason = MigrationSupportReason.PreviewUnavailable
+
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
+  useRoute: () => ({ params: { reason: mockReason } }),
   useFocusEffect: (callback: () => void | (() => void)) =>
     jest.requireActual<typeof import("react")>("react").useEffect(callback, [callback]),
 }))
@@ -38,6 +42,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
 /** Mirrors useMigrationDiagnostics' shape, built from mockDetails at render time. */
 const mockBuildDiagnostics = () =>
   [
+    { label: LLSupport.reasonLabel(), value: mockReason, isIdentifier: false },
     {
       label: LLSupport.accountIdLabel(),
       value: mockDetails.accountId,
@@ -54,10 +59,12 @@ const mockBuildDiagnostics = () =>
   ].filter((diagnostic) => Boolean(diagnostic.value))
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
-  useMigrationSupportEmail: () => ({
-    diagnostics: mockBuildDiagnostics(),
-    sendSupportEmail: mockSendSupportEmail,
-  }),
+  useMigrationSupportEmail: (reason: string) => mockUseMigrationSupportEmail(reason),
+}))
+
+const mockUseMigrationSupportEmail = jest.fn((_reason: string) => ({
+  diagnostics: mockBuildDiagnostics(),
+  sendSupportEmail: mockSendSupportEmail,
 }))
 
 const renderScreen = () =>
@@ -71,6 +78,7 @@ describe("MigrationContactSupportScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    mockReason = MigrationSupportReason.PreviewUnavailable
     mockDetails = {
       accountId: "18A4242",
       pubKey: "spbc1pdjsovJFPej9i2vuK",
@@ -142,6 +150,27 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.queryByText(LLSupport.usernameLabel())).toBeNull()
     expect(screen.queryByText(LLSupport.emailLabel())).toBeNull()
     expect(screen.getByText(LLSupport.phoneLabel())).toBeTruthy()
+  })
+
+  /** The reason is what tells support WHAT failed, so it reaches the email builder from
+   *  the route rather than being guessed on this screen. */
+  it("passes the route's reason through to the support email", async () => {
+    mockReason = MigrationSupportReason.StartRefused
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("start-refused")
+  })
+
+  /** Untranslated on purpose: the value is copied out of an email by a human and has to
+   *  stay greppable whatever locale produced the ticket. */
+  it("shows the reason code verbatim, only its label localized", async () => {
+    mockReason = MigrationSupportReason.SelfCustodialAccountMissing
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByText(LLSupport.reasonLabel())).toBeTruthy()
+    expect(screen.getByText("self-custodial-account-missing")).toBeTruthy()
   })
 
   it("sends the support email from the contact action", async () => {

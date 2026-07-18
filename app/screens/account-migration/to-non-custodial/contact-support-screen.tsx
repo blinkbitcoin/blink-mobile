@@ -5,7 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { IconHero } from "@app/components/icon-hero"
@@ -48,7 +48,10 @@ export const MigrationContactSupportScreen: React.FC = () => {
   } = useTheme()
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { diagnostics, sendSupportEmail } = useMigrationSupportEmail()
+
+  const { params } =
+    useRoute<RouteProp<RootStackParamList, "accountMigrationContactSupport">>()
+  const { diagnostics, sendSupportEmail } = useMigrationSupportEmail(params.reason)
 
   /** Back never exits the migration: it returns to the commit point (Step 8). */
   const returnToBalanceSummary = useCallback(() => {
