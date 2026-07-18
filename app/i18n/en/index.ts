@@ -3598,6 +3598,61 @@ const en: BaseTranslation = {
         codingBackend: "...coding the backend",
         buttonText: "Nice",
       },
+      WelcomeInvest: {
+        welcomeMessage: {
+          title: "Welcome to become part of Blink",
+          paragraphs: {
+            body1: "Before we raise more funds from professional investors we decided to extend an invitation to the Blink family, our superusers and supporters. Why bring onboard strangers when we can first invite someone like you?",
+            body2: "This is a personal invitation. Please do not forward or share publicly.",
+          },
+        },
+        buttonText: "Continue",
+      },
+      SelectInvest: {
+        desiredCreditLimit: "How much would you like to invest?",
+        percent: "for ~{percent: number}%",
+      },
+      CompanyValuation: {
+        welcomeMessage: {
+          title: "Company valuation",
+          paragraphs: {
+            body1: "In this investment round the pre-money valuation of Blink is $10 million.",
+            body2: "We could raise at a higher price from VCs. However, we see long-term mutual benefits in partnering with our superusers. Therefore, we are extending this offer at better terms for you.",
+          },
+        },
+        buttonText: "Got it",
+      },
+      TermSheet: {
+        title: "Term Sheet",
+        equitySection: {
+          title: "Equity in Blink",
+          investment: "$10,000 Investment",
+          valuation: "At $10M pre-money valuation",
+          units: "You receive 10,000 units ~0.1% of Blink",
+        },
+        buttonText: "Proceed to Sign",
+      },
+      TransferInvest: {
+        title: "Transfer your investment",
+        paragraphs: {
+          body1: "You have signed the subscription agreement for 10,000 units in Blink.",
+          body2: "Time to transfer the investment amount of $10,000. You will pay with Bitcoin.",
+        },
+        buttonText: "Continue",
+      },
+      InsufficientBalance: {
+        title: "Insufficient balance",
+        paragraphs: {
+          body1: "You only have {bitcoinBalance: string} in your Bitcoin account.",
+          body2: "Deposit more than {shortfall: string} to your account to reach the investment amount of {investmentAmount: string}.",
+          body3: "Make sure that the full amount is in either of your accounts; Bitcoin or Dollar.",
+        },
+        buttonText: "Deposit",
+      },
+      DepositPending: {
+        message: "Waiting for your deposit to settle, please wait 2 on-chain confirmations",
+        buttonText: "Okay",
+      },
       PersonalInformation: {
         title: "Final step",
         fields: {

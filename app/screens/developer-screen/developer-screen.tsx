@@ -319,6 +319,34 @@ export const DeveloperScreen: React.FC = () => {
               })
             }
           />
+          <Button
+            title="Onboarding Phase 2: Investment"
+            containerStyle={styles.button}
+            disabled={true}
+            onPress={() =>
+              testBulletinsStore.add({
+                id: `test-deeplink-invest-${Date.now()}`,
+                title: "Welcome to become part of Blink",
+                body: "You are invited to participate in the Blink financing round. For Blink fans only.",
+                type: "deep-link",
+                deepLink: "card/onboarding-investment",
+              })
+            }
+          />
+          <Button
+            title="Onboarding Phase 3: Card Dashboard"
+            containerStyle={styles.button}
+            disabled={true}
+            onPress={() =>
+              testBulletinsStore.add({
+                id: `test-deeplink-dashboard-${Date.now()}`,
+                title: "Your Card is now live!",
+                body: "You can start using it instantly.",
+                type: "deep-link",
+                deepLink: "card/onboarding/approved",
+              })
+            }
+          />
           {testBulletins.length > 0 && (
             <Button
               title="Clear All Test Notifications"

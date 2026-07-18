@@ -156,6 +156,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         cardOnboardingProcessingScreen: "card/onboarding/processing",
         cardOnboardingPreapprovedScreen: "card/onboarding/preapproved",
         cardOnboardingApprovedScreen: "card/onboarding/approved",
+        cardOnboardingWelcomeInvestScreen: "card/onboarding-investment",
+        cardOnboardingTransferInvestScreen: "card/onboarding-investment/transfer",
+        cardOnboardingDepositPendingScreen: "card/onboarding-investment/deposit-pending",
         transactionDetail: {
           path: "transaction/:txid",
         },

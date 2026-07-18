@@ -3442,6 +3442,61 @@
         "codingBackend": "...kodeer die agterkant",
         "buttonText": "Lekker"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Welkom om deel van Blink te word",
+          "paragraphs": {
+            "body1": "Voordat ons meer fondse van professionele beleggers insamel, het ons besluit om 'n uitnodiging aan die Blink-familie, ons supergebruikers en ondersteuners, te rig. Hoekom vreemdelinge aan boord bring as ons eers iemand soos jy kan nooi?",
+            "body2": "Dit is 'n persoonlike uitnodiging. Moet dit asseblief nie aanstuur of openbaar deel nie."
+          }
+        },
+        "buttonText": "Gaan voort"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Hoeveel wil jy belê?",
+        "percent": "vir ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Maatskappywaardasie",
+          "paragraphs": {
+            "body1": "In hierdie beleggingsronde is die pre-geld-waardasie van Blink $10 miljoen.",
+            "body2": "Ons kan teen 'n hoër prys by risikokapitaliste fondse insamel. Ons sien egter langtermyn wedersydse voordele in 'n vennootskap met ons supergebruikers. Daarom bied ons hierdie aanbod teen beter voorwaardes vir jou aan."
+          }
+        },
+        "buttonText": "Verstaan"
+      },
+      "TermSheet": {
+        "title": "Termynstaat",
+        "equitySection": {
+          "title": "Aandeel in Blink",
+          "investment": "$10,000 Belegging",
+          "valuation": "Teen $10M pre-geld-waardasie",
+          "units": "Jy ontvang 10,000 eenhede ~0.1% van Blink"
+        },
+        "buttonText": "Gaan voort om te Teken"
+      },
+      "TransferInvest": {
+        "title": "Dra jou belegging oor",
+        "paragraphs": {
+          "body1": "Jy het die intekeningsooreenkoms vir 10,000 eenhede in Blink onderteken.",
+          "body2": "Dit is tyd om die beleggingsbedrag van $10,000 oor te dra. Jy sal met Bitcoin betaal."
+        },
+        "buttonText": "Gaan voort"
+      },
+      "InsufficientBalance": {
+        "title": "Onvoldoende saldo",
+        "paragraphs": {
+          "body1": "Jy het net {bitcoinBalance: string} in jou Bitcoin-rekening.",
+          "body2": "Deponeer meer as {shortfall: string} in jou rekening om die beleggingsbedrag van {investmentAmount: string} te bereik.",
+          "body3": "Maak seker dat die volle bedrag in een van jou rekeninge is; Bitcoin of Dollar."
+        },
+        "buttonText": "Deponeer"
+      },
+      "DepositPending": {
+        "message": "Wag dat jou deposito afgehandel word; wag asseblief vir 2 kettingbevestigings.",
+        "buttonText": "OK"
+      },
       "PersonalInformation": {
         "title": "Laaste stap",
         "fields": {

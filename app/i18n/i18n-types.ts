@@ -11446,6 +11446,146 @@ type RootTranslation = {
 				 */
 				buttonText: string
 			}
+			WelcomeInvest: {
+				welcomeMessage: {
+					/**
+					 * W​e​l​c​o​m​e​ ​t​o​ ​b​e​c​o​m​e​ ​p​a​r​t​ ​o​f​ ​B​l​i​n​k
+					 */
+					title: string
+					paragraphs: {
+						/**
+						 * B​e​f​o​r​e​ ​w​e​ ​r​a​i​s​e​ ​m​o​r​e​ ​f​u​n​d​s​ ​f​r​o​m​ ​p​r​o​f​e​s​s​i​o​n​a​l​ ​i​n​v​e​s​t​o​r​s​ ​w​e​ ​d​e​c​i​d​e​d​ ​t​o​ ​e​x​t​e​n​d​ ​a​n​ ​i​n​v​i​t​a​t​i​o​n​ ​t​o​ ​t​h​e​ ​B​l​i​n​k​ ​f​a​m​i​l​y​,​ ​o​u​r​ ​s​u​p​e​r​u​s​e​r​s​ ​a​n​d​ ​s​u​p​p​o​r​t​e​r​s​.​ ​W​h​y​ ​b​r​i​n​g​ ​o​n​b​o​a​r​d​ ​s​t​r​a​n​g​e​r​s​ ​w​h​e​n​ ​w​e​ ​c​a​n​ ​f​i​r​s​t​ ​i​n​v​i​t​e​ ​s​o​m​e​o​n​e​ ​l​i​k​e​ ​y​o​u​?
+						 */
+						body1: string
+						/**
+						 * T​h​i​s​ ​i​s​ ​a​ ​p​e​r​s​o​n​a​l​ ​i​n​v​i​t​a​t​i​o​n​.​ ​P​l​e​a​s​e​ ​d​o​ ​n​o​t​ ​f​o​r​w​a​r​d​ ​o​r​ ​s​h​a​r​e​ ​p​u​b​l​i​c​l​y​.
+						 */
+						body2: string
+					}
+				}
+				/**
+				 * C​o​n​t​i​n​u​e
+				 */
+				buttonText: string
+			}
+			SelectInvest: {
+				/**
+				 * H​o​w​ ​m​u​c​h​ ​w​o​u​l​d​ ​y​o​u​ ​l​i​k​e​ ​t​o​ ​i​n​v​e​s​t​?
+				 */
+				desiredCreditLimit: string
+				/**
+				 * f​o​r​ ​~​{​p​e​r​c​e​n​t​}​%
+				 * @param {number} percent
+				 */
+				percent: RequiredParams<'percent'>
+			}
+			CompanyValuation: {
+				welcomeMessage: {
+					/**
+					 * C​o​m​p​a​n​y​ ​v​a​l​u​a​t​i​o​n
+					 */
+					title: string
+					paragraphs: {
+						/**
+						 * I​n​ ​t​h​i​s​ ​i​n​v​e​s​t​m​e​n​t​ ​r​o​u​n​d​ ​t​h​e​ ​p​r​e​-​m​o​n​e​y​ ​v​a​l​u​a​t​i​o​n​ ​o​f​ ​B​l​i​n​k​ ​i​s​ ​$​1​0​ ​m​i​l​l​i​o​n​.
+						 */
+						body1: string
+						/**
+						 * W​e​ ​c​o​u​l​d​ ​r​a​i​s​e​ ​a​t​ ​a​ ​h​i​g​h​e​r​ ​p​r​i​c​e​ ​f​r​o​m​ ​V​C​s​.​ ​H​o​w​e​v​e​r​,​ ​w​e​ ​s​e​e​ ​l​o​n​g​-​t​e​r​m​ ​m​u​t​u​a​l​ ​b​e​n​e​f​i​t​s​ ​i​n​ ​p​a​r​t​n​e​r​i​n​g​ ​w​i​t​h​ ​o​u​r​ ​s​u​p​e​r​u​s​e​r​s​.​ ​T​h​e​r​e​f​o​r​e​,​ ​w​e​ ​a​r​e​ ​e​x​t​e​n​d​i​n​g​ ​t​h​i​s​ ​o​f​f​e​r​ ​a​t​ ​b​e​t​t​e​r​ ​t​e​r​m​s​ ​f​o​r​ ​y​o​u​.
+						 */
+						body2: string
+					}
+				}
+				/**
+				 * G​o​t​ ​i​t
+				 */
+				buttonText: string
+			}
+			TermSheet: {
+				/**
+				 * T​e​r​m​ ​S​h​e​e​t
+				 */
+				title: string
+				equitySection: {
+					/**
+					 * E​q​u​i​t​y​ ​i​n​ ​B​l​i​n​k
+					 */
+					title: string
+					/**
+					 * $​1​0​,​0​0​0​ ​I​n​v​e​s​t​m​e​n​t
+					 */
+					investment: string
+					/**
+					 * A​t​ ​$​1​0​M​ ​p​r​e​-​m​o​n​e​y​ ​v​a​l​u​a​t​i​o​n
+					 */
+					valuation: string
+					/**
+					 * Y​o​u​ ​r​e​c​e​i​v​e​ ​1​0​,​0​0​0​ ​u​n​i​t​s​ ​~​0​.​1​%​ ​o​f​ ​B​l​i​n​k
+					 */
+					units: string
+				}
+				/**
+				 * P​r​o​c​e​e​d​ ​t​o​ ​S​i​g​n
+				 */
+				buttonText: string
+			}
+			TransferInvest: {
+				/**
+				 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​i​n​v​e​s​t​m​e​n​t
+				 */
+				title: string
+				paragraphs: {
+					/**
+					 * Y​o​u​ ​h​a​v​e​ ​s​i​g​n​e​d​ ​t​h​e​ ​s​u​b​s​c​r​i​p​t​i​o​n​ ​a​g​r​e​e​m​e​n​t​ ​f​o​r​ ​1​0​,​0​0​0​ ​u​n​i​t​s​ ​i​n​ ​B​l​i​n​k​.
+					 */
+					body1: string
+					/**
+					 * T​i​m​e​ ​t​o​ ​t​r​a​n​s​f​e​r​ ​t​h​e​ ​i​n​v​e​s​t​m​e​n​t​ ​a​m​o​u​n​t​ ​o​f​ ​$​1​0​,​0​0​0​.​ ​Y​o​u​ ​w​i​l​l​ ​p​a​y​ ​w​i​t​h​ ​B​i​t​c​o​i​n​.
+					 */
+					body2: string
+				}
+				/**
+				 * C​o​n​t​i​n​u​e
+				 */
+				buttonText: string
+			}
+			InsufficientBalance: {
+				/**
+				 * I​n​s​u​f​f​i​c​i​e​n​t​ ​b​a​l​a​n​c​e
+				 */
+				title: string
+				paragraphs: {
+					/**
+					 * Y​o​u​ ​o​n​l​y​ ​h​a​v​e​ ​{​b​i​t​c​o​i​n​B​a​l​a​n​c​e​}​ ​i​n​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​.
+					 * @param {string} bitcoinBalance
+					 */
+					body1: RequiredParams<'bitcoinBalance'>
+					/**
+					 * D​e​p​o​s​i​t​ ​m​o​r​e​ ​t​h​a​n​ ​{​s​h​o​r​t​f​a​l​l​}​ ​t​o​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​r​e​a​c​h​ ​t​h​e​ ​i​n​v​e​s​t​m​e​n​t​ ​a​m​o​u​n​t​ ​o​f​ ​{​i​n​v​e​s​t​m​e​n​t​A​m​o​u​n​t​}​.
+					 * @param {string} investmentAmount
+					 * @param {string} shortfall
+					 */
+					body2: RequiredParams<'investmentAmount' | 'shortfall'>
+					/**
+					 * M​a​k​e​ ​s​u​r​e​ ​t​h​a​t​ ​t​h​e​ ​f​u​l​l​ ​a​m​o​u​n​t​ ​i​s​ ​i​n​ ​e​i​t​h​e​r​ ​o​f​ ​y​o​u​r​ ​a​c​c​o​u​n​t​s​;​ ​B​i​t​c​o​i​n​ ​o​r​ ​D​o​l​l​a​r​.
+					 */
+					body3: string
+				}
+				/**
+				 * D​e​p​o​s​i​t
+				 */
+				buttonText: string
+			}
+			DepositPending: {
+				/**
+				 * W​a​i​t​i​n​g​ ​f​o​r​ ​y​o​u​r​ ​d​e​p​o​s​i​t​ ​t​o​ ​s​e​t​t​l​e​,​ ​p​l​e​a​s​e​ ​w​a​i​t​ ​2​ ​o​n​-​c​h​a​i​n​ ​c​o​n​f​i​r​m​a​t​i​o​n​s
+				 */
+				message: string
+				/**
+				 * O​k​a​y
+				 */
+				buttonText: string
+			}
 			PersonalInformation: {
 				/**
 				 * F​i​n​a​l​ ​s​t​e​p
@@ -23662,6 +23802,142 @@ export type TranslationFunctions = {
 				codingBackend: () => LocalizedString
 				/**
 				 * Nice
+				 */
+				buttonText: () => LocalizedString
+			}
+			WelcomeInvest: {
+				welcomeMessage: {
+					/**
+					 * Welcome to become part of Blink
+					 */
+					title: () => LocalizedString
+					paragraphs: {
+						/**
+						 * Before we raise more funds from professional investors we decided to extend an invitation to the Blink family, our superusers and supporters. Why bring onboard strangers when we can first invite someone like you?
+						 */
+						body1: () => LocalizedString
+						/**
+						 * This is a personal invitation. Please do not forward or share publicly.
+						 */
+						body2: () => LocalizedString
+					}
+				}
+				/**
+				 * Continue
+				 */
+				buttonText: () => LocalizedString
+			}
+			SelectInvest: {
+				/**
+				 * How much would you like to invest?
+				 */
+				desiredCreditLimit: () => LocalizedString
+				/**
+				 * for ~{percent}%
+				 */
+				percent: (arg: { percent: number }) => LocalizedString
+			}
+			CompanyValuation: {
+				welcomeMessage: {
+					/**
+					 * Company valuation
+					 */
+					title: () => LocalizedString
+					paragraphs: {
+						/**
+						 * In this investment round the pre-money valuation of Blink is $10 million.
+						 */
+						body1: () => LocalizedString
+						/**
+						 * We could raise at a higher price from VCs. However, we see long-term mutual benefits in partnering with our superusers. Therefore, we are extending this offer at better terms for you.
+						 */
+						body2: () => LocalizedString
+					}
+				}
+				/**
+				 * Got it
+				 */
+				buttonText: () => LocalizedString
+			}
+			TermSheet: {
+				/**
+				 * Term Sheet
+				 */
+				title: () => LocalizedString
+				equitySection: {
+					/**
+					 * Equity in Blink
+					 */
+					title: () => LocalizedString
+					/**
+					 * $10,000 Investment
+					 */
+					investment: () => LocalizedString
+					/**
+					 * At $10M pre-money valuation
+					 */
+					valuation: () => LocalizedString
+					/**
+					 * You receive 10,000 units ~0.1% of Blink
+					 */
+					units: () => LocalizedString
+				}
+				/**
+				 * Proceed to Sign
+				 */
+				buttonText: () => LocalizedString
+			}
+			TransferInvest: {
+				/**
+				 * Transfer your investment
+				 */
+				title: () => LocalizedString
+				paragraphs: {
+					/**
+					 * You have signed the subscription agreement for 10,000 units in Blink.
+					 */
+					body1: () => LocalizedString
+					/**
+					 * Time to transfer the investment amount of $10,000. You will pay with Bitcoin.
+					 */
+					body2: () => LocalizedString
+				}
+				/**
+				 * Continue
+				 */
+				buttonText: () => LocalizedString
+			}
+			InsufficientBalance: {
+				/**
+				 * Insufficient balance
+				 */
+				title: () => LocalizedString
+				paragraphs: {
+					/**
+					 * You only have {bitcoinBalance} in your Bitcoin account.
+					 */
+					body1: (arg: { bitcoinBalance: string }) => LocalizedString
+					/**
+					 * Deposit more than {shortfall} to your account to reach the investment amount of {investmentAmount}.
+					 */
+					body2: (arg: { investmentAmount: string, shortfall: string }) => LocalizedString
+					/**
+					 * Make sure that the full amount is in either of your accounts; Bitcoin or Dollar.
+					 */
+					body3: () => LocalizedString
+				}
+				/**
+				 * Deposit
+				 */
+				buttonText: () => LocalizedString
+			}
+			DepositPending: {
+				/**
+				 * Waiting for your deposit to settle, please wait 2 on-chain confirmations
+				 */
+				message: () => LocalizedString
+				/**
+				 * Okay
 				 */
 				buttonText: () => LocalizedString
 			}
