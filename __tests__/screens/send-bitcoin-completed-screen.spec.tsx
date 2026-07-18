@@ -19,11 +19,6 @@ import { ContextForScreen, ContextForScreenWithTheme } from "./helper"
 import { Linking, View, ViewStyle } from "react-native"
 import { light, dark } from "@app/rne-theme/colors"
 
-jest.mock("react-native-in-app-review", () => ({
-  isAvailable: () => true,
-  RequestInAppReview: jest.fn(),
-}))
-
 jest.mock("react-native-view-shot", () => {
   return {
     __esModule: true,
