@@ -64,9 +64,10 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
   }),
 }))
 
+const mockSetBackupCompleted = jest.fn()
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   useBackupState: () => ({
-    setBackupCompleted: jest.fn(),
+    setBackupCompleted: (...args: readonly unknown[]) => mockSetBackupCompleted(...args),
   }),
   BackupMethod: { Cloud: "cloud", Keychain: "keychain", Manual: "manual" },
 }))
@@ -169,6 +170,11 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
+    // Recorded as NOT password-protected: the recovery-bundle cloud sync gate
+    // (D9) must stay closed next to this unencrypted seed backup.
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("cloud", {
+      cloudPasswordProtected: false,
+    })
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
@@ -188,6 +194,9 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("cloud", {
+      cloudPasswordProtected: true,
+    })
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 

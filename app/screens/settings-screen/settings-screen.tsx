@@ -45,6 +45,7 @@ import { AccountStaticQR } from "./settings/account-static-qr"
 // import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
 import { SwitchAccountSetting } from "./settings/multi-account"
 import { StableBalanceSetting } from "./settings/stable-balance"
+import { RecoveryBackupSetting } from "./settings/recovery-backup"
 import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
 
 // All queries in settings have to be set here so that the server is not hit with
@@ -118,7 +119,12 @@ export const SettingsScreen: React.FC = () => {
       ThemeSetting,
       StableBalanceSetting,
     ],
-    securityAndPrivacy: [TotpSetting, OnDeviceSecuritySetting, ViewBackupPhraseSetting],
+    securityAndPrivacy: [
+      TotpSetting,
+      OnDeviceSecuritySetting,
+      ViewBackupPhraseSetting,
+      RecoveryBackupSetting,
+    ],
     advanced: [ExportCsvSetting, ApiAccessSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],
   }

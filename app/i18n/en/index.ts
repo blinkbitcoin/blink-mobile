@@ -3778,6 +3778,43 @@ const en: BaseTranslation = {
       "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
     secureMe: "Secure wallet",
   },
+  RecoveryBundleScreen: {
+    settingsTitle: "Recovery backup",
+    title: "Recovery backup",
+    description:
+      "A snapshot of your wallet's exit data. Combined with your backup phrase, it lets you withdraw your funds on-chain even if the Spark network disappears. It refreshes automatically after every payment.",
+    lastRefreshed: "Last refreshed: {when: string}",
+    leavesCovered: "Leaves covered: {count: number}",
+    cloudSynced: "Cloud backup: {when: string}",
+    cloudNotSynced: "Cloud backup: not uploaded yet",
+    cloudFollowsSeedBackup:
+      "Back up your wallet to {provider: string} first, then you can turn on automatic cloud upload of the recovery backup here, encrypted with your backup phrase.",
+    autoRefreshLabel: "Automatic refresh",
+    autoRefreshHint:
+      "Keeps the backup fresh after every payment. Turn off to save mobile data; you can still refresh manually.",
+    cloudSyncLabel: "Cloud backup",
+    cloudSyncHint:
+      "Automatically uploads the encrypted recovery backup to {provider: string}.",
+    cloudSyncNeedsPassword:
+      "Uploading the recovery backup to {provider: string} requires your wallet backup there to be protected with a password. Re-do the wallet backup with a password to enable it.",
+    settingUpdateFailed: "Could not save the setting. Try again.",
+    noBundleYet:
+      "No recovery backup saved yet. It is created automatically after your first payment, or you can refresh now.",
+    refreshNow: "Refresh now",
+    uploadToCloud: "Back up to {provider: string}",
+    exportFile: "Export as file",
+    copyJson: "Copy JSON",
+    exportWarningTitle: "Exports are unencrypted",
+    exportWarningMessage:
+      "The exported file contains your wallet's exit data as plain JSON. It cannot be used to spend your funds, but it reveals your balance and payment structure. Store it somewhere safe.",
+    refreshSuccess: "Recovery backup refreshed",
+    refreshEmptyWallet: "Your wallet is empty, so there is nothing to back up yet.",
+    refreshFailed:
+      "Could not refresh the recovery backup. Check your connection and try again.",
+    noBundleToExport: "No recovery backup saved yet. Refresh first.",
+    exportFailed: "Could not export the recovery backup.",
+    cloudUploadSuccess: "Recovery backup uploaded",
+  },
   SelfCustodialOffline: {
     title: "Wallet is offline",
     description:

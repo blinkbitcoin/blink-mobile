@@ -11992,6 +11992,123 @@ type RootTranslation = {
 		 */
 		secureMe: string
 	}
+	RecoveryBundleScreen: {
+		/**
+		 * R​e​c​o​v​e​r​y​ ​b​a​c​k​u​p
+		 */
+		settingsTitle: string
+		/**
+		 * R​e​c​o​v​e​r​y​ ​b​a​c​k​u​p
+		 */
+		title: string
+		/**
+		 * A​ ​s​n​a​p​s​h​o​t​ ​o​f​ ​y​o​u​r​ ​w​a​l​l​e​t​'​s​ ​e​x​i​t​ ​d​a​t​a​.​ ​C​o​m​b​i​n​e​d​ ​w​i​t​h​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​,​ ​i​t​ ​l​e​t​s​ ​y​o​u​ ​w​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​o​n​-​c​h​a​i​n​ ​e​v​e​n​ ​i​f​ ​t​h​e​ ​S​p​a​r​k​ ​n​e​t​w​o​r​k​ ​d​i​s​a​p​p​e​a​r​s​.​ ​I​t​ ​r​e​f​r​e​s​h​e​s​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​a​f​t​e​r​ ​e​v​e​r​y​ ​p​a​y​m​e​n​t​.
+		 */
+		description: string
+		/**
+		 * L​a​s​t​ ​r​e​f​r​e​s​h​e​d​:​ ​{​w​h​e​n​}
+		 * @param {string} when
+		 */
+		lastRefreshed: RequiredParams<'when'>
+		/**
+		 * L​e​a​v​e​s​ ​c​o​v​e​r​e​d​:​ ​{​c​o​u​n​t​}
+		 * @param {number} count
+		 */
+		leavesCovered: RequiredParams<'count'>
+		/**
+		 * C​l​o​u​d​ ​b​a​c​k​u​p​:​ ​{​w​h​e​n​}
+		 * @param {string} when
+		 */
+		cloudSynced: RequiredParams<'when'>
+		/**
+		 * C​l​o​u​d​ ​b​a​c​k​u​p​:​ ​n​o​t​ ​u​p​l​o​a​d​e​d​ ​y​e​t
+		 */
+		cloudNotSynced: string
+		/**
+		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}​ ​f​i​r​s​t​,​ ​t​h​e​n​ ​y​o​u​ ​c​a​n​ ​t​u​r​n​ ​o​n​ ​a​u​t​o​m​a​t​i​c​ ​c​l​o​u​d​ ​u​p​l​o​a​d​ ​o​f​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​h​e​r​e​,​ ​e​n​c​r​y​p​t​e​d​ ​w​i​t​h​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.
+		 * @param {string} provider
+		 */
+		cloudFollowsSeedBackup: RequiredParams<'provider'>
+		/**
+		 * A​u​t​o​m​a​t​i​c​ ​r​e​f​r​e​s​h
+		 */
+		autoRefreshLabel: string
+		/**
+		 * K​e​e​p​s​ ​t​h​e​ ​b​a​c​k​u​p​ ​f​r​e​s​h​ ​a​f​t​e​r​ ​e​v​e​r​y​ ​p​a​y​m​e​n​t​.​ ​T​u​r​n​ ​o​f​f​ ​t​o​ ​s​a​v​e​ ​m​o​b​i​l​e​ ​d​a​t​a​;​ ​y​o​u​ ​c​a​n​ ​s​t​i​l​l​ ​r​e​f​r​e​s​h​ ​m​a​n​u​a​l​l​y​.
+		 */
+		autoRefreshHint: string
+		/**
+		 * C​l​o​u​d​ ​b​a​c​k​u​p
+		 */
+		cloudSyncLabel: string
+		/**
+		 * A​u​t​o​m​a​t​i​c​a​l​l​y​ ​u​p​l​o​a​d​s​ ​t​h​e​ ​e​n​c​r​y​p​t​e​d​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}​.
+		 * @param {string} provider
+		 */
+		cloudSyncHint: RequiredParams<'provider'>
+		/**
+		 * U​p​l​o​a​d​i​n​g​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}​ ​r​e​q​u​i​r​e​s​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​b​a​c​k​u​p​ ​t​h​e​r​e​ ​t​o​ ​b​e​ ​p​r​o​t​e​c​t​e​d​ ​w​i​t​h​ ​a​ ​p​a​s​s​w​o​r​d​.​ ​R​e​-​d​o​ ​t​h​e​ ​w​a​l​l​e​t​ ​b​a​c​k​u​p​ ​w​i​t​h​ ​a​ ​p​a​s​s​w​o​r​d​ ​t​o​ ​e​n​a​b​l​e​ ​i​t​.
+		 * @param {string} provider
+		 */
+		cloudSyncNeedsPassword: RequiredParams<'provider'>
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​s​a​v​e​ ​t​h​e​ ​s​e​t​t​i​n​g​.​ ​T​r​y​ ​a​g​a​i​n​.
+		 */
+		settingUpdateFailed: string
+		/**
+		 * N​o​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​s​a​v​e​d​ ​y​e​t​.​ ​I​t​ ​i​s​ ​c​r​e​a​t​e​d​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​a​f​t​e​r​ ​y​o​u​r​ ​f​i​r​s​t​ ​p​a​y​m​e​n​t​,​ ​o​r​ ​y​o​u​ ​c​a​n​ ​r​e​f​r​e​s​h​ ​n​o​w​.
+		 */
+		noBundleYet: string
+		/**
+		 * R​e​f​r​e​s​h​ ​n​o​w
+		 */
+		refreshNow: string
+		/**
+		 * B​a​c​k​ ​u​p​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}
+		 * @param {string} provider
+		 */
+		uploadToCloud: RequiredParams<'provider'>
+		/**
+		 * E​x​p​o​r​t​ ​a​s​ ​f​i​l​e
+		 */
+		exportFile: string
+		/**
+		 * C​o​p​y​ ​J​S​O​N
+		 */
+		copyJson: string
+		/**
+		 * E​x​p​o​r​t​s​ ​a​r​e​ ​u​n​e​n​c​r​y​p​t​e​d
+		 */
+		exportWarningTitle: string
+		/**
+		 * T​h​e​ ​e​x​p​o​r​t​e​d​ ​f​i​l​e​ ​c​o​n​t​a​i​n​s​ ​y​o​u​r​ ​w​a​l​l​e​t​'​s​ ​e​x​i​t​ ​d​a​t​a​ ​a​s​ ​p​l​a​i​n​ ​J​S​O​N​.​ ​I​t​ ​c​a​n​n​o​t​ ​b​e​ ​u​s​e​d​ ​t​o​ ​s​p​e​n​d​ ​y​o​u​r​ ​f​u​n​d​s​,​ ​b​u​t​ ​i​t​ ​r​e​v​e​a​l​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​a​n​d​ ​p​a​y​m​e​n​t​ ​s​t​r​u​c​t​u​r​e​.​ ​S​t​o​r​e​ ​i​t​ ​s​o​m​e​w​h​e​r​e​ ​s​a​f​e​.
+		 */
+		exportWarningMessage: string
+		/**
+		 * R​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​r​e​f​r​e​s​h​e​d
+		 */
+		refreshSuccess: string
+		/**
+		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​e​m​p​t​y​,​ ​s​o​ ​t​h​e​r​e​ ​i​s​ ​n​o​t​h​i​n​g​ ​t​o​ ​b​a​c​k​ ​u​p​ ​y​e​t​.
+		 */
+		refreshEmptyWallet: string
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​r​e​f​r​e​s​h​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		refreshFailed: string
+		/**
+		 * N​o​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​s​a​v​e​d​ ​y​e​t​.​ ​R​e​f​r​e​s​h​ ​f​i​r​s​t​.
+		 */
+		noBundleToExport: string
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​e​x​p​o​r​t​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​.
+		 */
+		exportFailed: string
+		/**
+		 * R​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​u​p​l​o​a​d​e​d
+		 */
+		cloudUploadSuccess: string
+	}
 	SelfCustodialOffline: {
 		/**
 		 * W​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e
@@ -24199,6 +24316,116 @@ export type TranslationFunctions = {
 		 * Secure wallet
 		 */
 		secureMe: () => LocalizedString
+	}
+	RecoveryBundleScreen: {
+		/**
+		 * Recovery backup
+		 */
+		settingsTitle: () => LocalizedString
+		/**
+		 * Recovery backup
+		 */
+		title: () => LocalizedString
+		/**
+		 * A snapshot of your wallet's exit data. Combined with your backup phrase, it lets you withdraw your funds on-chain even if the Spark network disappears. It refreshes automatically after every payment.
+		 */
+		description: () => LocalizedString
+		/**
+		 * Last refreshed: {when}
+		 */
+		lastRefreshed: (arg: { when: string }) => LocalizedString
+		/**
+		 * Leaves covered: {count}
+		 */
+		leavesCovered: (arg: { count: number }) => LocalizedString
+		/**
+		 * Cloud backup: {when}
+		 */
+		cloudSynced: (arg: { when: string }) => LocalizedString
+		/**
+		 * Cloud backup: not uploaded yet
+		 */
+		cloudNotSynced: () => LocalizedString
+		/**
+		 * Back up your wallet to {provider} first, then you can turn on automatic cloud upload of the recovery backup here, encrypted with your backup phrase.
+		 */
+		cloudFollowsSeedBackup: (arg: { provider: string }) => LocalizedString
+		/**
+		 * Automatic refresh
+		 */
+		autoRefreshLabel: () => LocalizedString
+		/**
+		 * Keeps the backup fresh after every payment. Turn off to save mobile data; you can still refresh manually.
+		 */
+		autoRefreshHint: () => LocalizedString
+		/**
+		 * Cloud backup
+		 */
+		cloudSyncLabel: () => LocalizedString
+		/**
+		 * Automatically uploads the encrypted recovery backup to {provider}.
+		 */
+		cloudSyncHint: (arg: { provider: string }) => LocalizedString
+		/**
+		 * Uploading the recovery backup to {provider} requires your wallet backup there to be protected with a password. Re-do the wallet backup with a password to enable it.
+		 */
+		cloudSyncNeedsPassword: (arg: { provider: string }) => LocalizedString
+		/**
+		 * Could not save the setting. Try again.
+		 */
+		settingUpdateFailed: () => LocalizedString
+		/**
+		 * No recovery backup saved yet. It is created automatically after your first payment, or you can refresh now.
+		 */
+		noBundleYet: () => LocalizedString
+		/**
+		 * Refresh now
+		 */
+		refreshNow: () => LocalizedString
+		/**
+		 * Back up to {provider}
+		 */
+		uploadToCloud: (arg: { provider: string }) => LocalizedString
+		/**
+		 * Export as file
+		 */
+		exportFile: () => LocalizedString
+		/**
+		 * Copy JSON
+		 */
+		copyJson: () => LocalizedString
+		/**
+		 * Exports are unencrypted
+		 */
+		exportWarningTitle: () => LocalizedString
+		/**
+		 * The exported file contains your wallet's exit data as plain JSON. It cannot be used to spend your funds, but it reveals your balance and payment structure. Store it somewhere safe.
+		 */
+		exportWarningMessage: () => LocalizedString
+		/**
+		 * Recovery backup refreshed
+		 */
+		refreshSuccess: () => LocalizedString
+		/**
+		 * Your wallet is empty, so there is nothing to back up yet.
+		 */
+		refreshEmptyWallet: () => LocalizedString
+		/**
+		 * Could not refresh the recovery backup. Check your connection and try again.
+		 */
+		refreshFailed: () => LocalizedString
+		/**
+		 * No recovery backup saved yet. Refresh first.
+		 */
+		noBundleToExport: () => LocalizedString
+		/**
+		 * Could not export the recovery backup.
+		 */
+		exportFailed: () => LocalizedString
+		/**
+		 * Recovery backup uploaded
+		 */
+		cloudUploadSuccess: () => LocalizedString
 	}
 	SelfCustodialOffline: {
 		/**

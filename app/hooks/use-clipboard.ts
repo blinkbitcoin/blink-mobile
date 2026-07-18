@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback } from "react"
 import Clipboard from "@react-native-clipboard/clipboard"
 
 import { toastShow } from "@app/utils/toast"
@@ -9,18 +9,23 @@ type CopyToClipboardParams = {
   message?: string
 }
 
+// One shared pending clear across all hook instances, deliberately surviving
+// unmount: clearAfterMs exists so secrets (seed phrase, recovery bundle)
+// don't linger in the clipboard, and users typically navigate away right
+// after copying. The clipboard is a single global slot, so ANY newer copy -
+// from any screen - makes an older pending clear obsolete; keeping the timer
+// per-instance would let a departed screen wipe content copied later
+// elsewhere. The timer only writes to the clipboard, never to React state,
+// so firing after unmount is safe.
+let pendingClearTimer: ReturnType<typeof setTimeout> | undefined
+
 export const useClipboard = (clearAfterMs?: number) => {
   const { LL } = useI18nContext()
-  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-
-  useEffect(() => {
-    if (!clearAfterMs) clearTimeout(timerRef.current)
-    return () => clearTimeout(timerRef.current)
-  }, [clearAfterMs])
 
   const copyToClipboard = useCallback(
     ({ content, message }: CopyToClipboardParams): void => {
-      clearTimeout(timerRef.current)
+      clearTimeout(pendingClearTimer)
+      pendingClearTimer = undefined
       Clipboard.setString(content)
       toastShow({
         type: "success",
@@ -28,7 +33,7 @@ export const useClipboard = (clearAfterMs?: number) => {
         LL,
       })
       if (clearAfterMs) {
-        timerRef.current = setTimeout(() => Clipboard.setString(""), clearAfterMs)
+        pendingClearTimer = setTimeout(() => Clipboard.setString(""), clearAfterMs)
       }
     },
     [LL, clearAfterMs],

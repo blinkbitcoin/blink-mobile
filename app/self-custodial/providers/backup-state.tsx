@@ -37,11 +37,22 @@ type BackupMethod = (typeof BackupMethod)[keyof typeof BackupMethod]
 type BackupState = {
   status: BackupStatus
   method: BackupMethod | null
+  /**
+   * True when the cloud seed backup was encrypted with an extra user password.
+   * Absent for pre-existing states and non-cloud methods; treated as false, so
+   * bundle cloud sync stays unavailable until the user re-runs the cloud
+   * backup with a password.
+   */
+  cloudPasswordProtected?: boolean
+}
+
+type BackupCompletedOptions = {
+  cloudPasswordProtected?: boolean
 }
 
 type BackupStateContextValue = {
   backupState: BackupState
-  setBackupCompleted: (method: BackupMethod) => void
+  setBackupCompleted: (method: BackupMethod, options?: BackupCompletedOptions) => void
   resetBackupState: () => void
 }
 
@@ -75,6 +86,28 @@ const readBackupState = async (key: string): Promise<BackupState | null> => {
 export const removeBackupStateFor = async (accountId: string): Promise<void> => {
   await AsyncStorage.removeItem(backupStateKeyFor(accountId))
 }
+
+/** Non-hook read for code that runs outside the provider (e.g. bundle sync). */
+export const readBackupStateFor = async (
+  accountId: string,
+): Promise<BackupState | null> => readBackupState(backupStateKeyFor(accountId))
+
+/**
+ * Single definition of "the seed is backed up to the cloud" - the gate the
+ * recovery-bundle cloud sync follows. Screen, refresh hook, and refresh core
+ * all use this so they cannot diverge on it.
+ */
+export const isCloudSeedBackupCompleted = (state: BackupState | null): boolean =>
+  state?.status === BackupStatus.Completed && state.method === BackupMethod.Cloud
+
+/**
+ * The gate for storing the seed-encrypted bundle in the cloud: the bundle must
+ * never sit next to an unencrypted seed (the co-located seed would decrypt it
+ * on the spot), so the cloud seed backup must carry an extra password. See the
+ * spark-unilateral-exit PRD in blink-specs (rule D9).
+ */
+export const isPasswordProtectedCloudSeedBackup = (state: BackupState | null): boolean =>
+  isCloudSeedBackupCompleted(state) && state?.cloudPasswordProtected === true
 
 export const markBackupCompletedFor = async (
   accountId: string,
@@ -125,8 +158,12 @@ export const BackupStateProvider: React.FC<React.PropsWithChildren> = ({ childre
   )
 
   const setBackupCompleted = useCallback(
-    (method: BackupMethod) => {
-      persist({ status: BackupStatus.Completed, method })
+    (method: BackupMethod, options?: BackupCompletedOptions) => {
+      persist({
+        status: BackupStatus.Completed,
+        method,
+        cloudPasswordProtected: options?.cloudPasswordProtected,
+      })
     },
     [persist],
   )
