@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Contact opnemen met support",
       "body": "Er is iets misgegaan, maar maak je geen zorgen, je geld is veilig. Neem contact op met support voor hulp.\n\nMogelijk heb je deze informatie nodig zodat support je zaak kan oplossen:",
+      "reasonLabel": "Reden",
       "accountIdLabel": "Account-ID",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Gebruikersnaam",

@@ -3557,6 +3557,7 @@
         "contactSupport": {
             "title": "Support kontaktieren",
             "body": "Etwas ist schiefgelaufen, aber keine Sorge, dein Guthaben ist sicher. Bitte kontaktiere den Support für Hilfe.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
+            "reasonLabel": "Grund",
             "accountIdLabel": "Konto-ID",
             "pubKeyLabel": "pubKey",
             "usernameLabel": "Benutzername",

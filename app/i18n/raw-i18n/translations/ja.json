@@ -3557,6 +3557,7 @@
         "contactSupport": {
             "title": "サポートに連絡",
             "body": "問題が発生しましたが、ご安心ください。資金は安全です。サポートにお問い合わせください。\n\nサポートが問題を解決するために、次の情報が必要になる場合があります：",
+            "reasonLabel": "理由",
             "accountIdLabel": "アカウントID",
             "pubKeyLabel": "pubKey",
             "usernameLabel": "ユーザー名",

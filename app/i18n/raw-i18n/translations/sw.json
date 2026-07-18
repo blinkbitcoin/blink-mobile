@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Wasiliana na usaidizi",
       "body": "Kuna kitu kimeenda vibaya, lakini usiwe na wasiwasi, fedha zako ziko salama. Tafadhali wasiliana na usaidizi kwa msaada.\n\nUnaweza kuhitaji taarifa hizi ili kusaidia usaidizi kutatua kesi yako:",
+      "reasonLabel": "Sababu",
       "accountIdLabel": "Kitambulisho cha akaunti",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Jina la mtumiaji",

@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Contactează suportul",
       "body": "Ceva nu a mers bine, dar nu-ți face griji, fondurile tale sunt în siguranță. Te rugăm să contactezi suportul pentru asistență.\n\nS-ar putea să ai nevoie de aceste informații pentru ca suportul să îți rezolve cazul:",
+      "reasonLabel": "Motiv",
       "accountIdLabel": "ID-ul contului",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Nume de utilizator",

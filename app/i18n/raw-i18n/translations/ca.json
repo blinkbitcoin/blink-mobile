@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Contacta amb suport",
       "body": "Alguna cosa ha anat malament, però no et preocupis, els teus fons estan segurs. Contacta amb suport per obtenir ajuda.\n\nPotser necessitaràs aquesta informació per ajudar el suport a resoldre el teu cas:",
+      "reasonLabel": "Motiu",
       "accountIdLabel": "ID del compte",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Nom d'usuari",

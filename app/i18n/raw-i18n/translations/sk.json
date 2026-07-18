@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Kontaktovať podporu",
       "body": "Niečo sa pokazilo, ale nebojte sa, vaše prostriedky sú v bezpečí. Obráťte sa prosím na podporu.\n\nTieto informácie môžu podpore pomôcť vyriešiť váš prípad:",
+      "reasonLabel": "Dôvod",
       "accountIdLabel": "ID účtu",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Používateľské meno",

@@ -3557,6 +3557,7 @@
         "contactSupport": {
             "title": "Contatta il supporto",
             "body": "Qualcosa è andato storto, ma non preoccuparti, i tuoi fondi sono al sicuro. Contatta il supporto per ricevere assistenza.\n\nPotresti aver bisogno di queste informazioni per aiutare il supporto a risolvere il tuo caso:",
+            "reasonLabel": "Motivo",
             "accountIdLabel": "ID account",
             "pubKeyLabel": "pubKey",
             "usernameLabel": "Nome utente",

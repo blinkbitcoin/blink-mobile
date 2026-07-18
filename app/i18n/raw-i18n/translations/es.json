@@ -3557,6 +3557,7 @@
         "contactSupport": {
             "title": "Contacta a soporte",
             "body": "Algo salió mal, pero no te preocupes, tus fondos están seguros. Por favor contacta a soporte para recibir asistencia.\n\nPuede que necesites esta información para ayudar a soporte a resolver tu caso:",
+            "reasonLabel": "Motivo",
             "accountIdLabel": "ID de cuenta",
             "pubKeyLabel": "pubKey",
             "usernameLabel": "Usuario",

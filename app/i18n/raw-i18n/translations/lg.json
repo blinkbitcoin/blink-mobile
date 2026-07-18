@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Tuukirire ab'obuyambi",
       "body": "Waliwo ekitagenze bulungi, naye tofaayo, ssente zo nnywevu. Tuukirira ab'obuyambi bakuyambe.\n\nOyinza okwetaaga ebikwata ku bino okuyamba ab'obuyambi okugonjoola ensonga yo:",
+      "reasonLabel": "Ensonga",
       "accountIdLabel": "ID ya akawunti",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Erinnya ly'omukozesa",
