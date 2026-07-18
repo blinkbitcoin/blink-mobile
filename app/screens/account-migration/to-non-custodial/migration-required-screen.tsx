@@ -30,6 +30,10 @@ export type MigrationMode = "voluntary" | "forcedPreDeadline" | "gate"
 type MigrationRequiredScreenProps = {
   mode: MigrationMode
   onClose?: () => void
+  /** Suppresses the close the mode would otherwise allow, for a user the server has
+   *  already locked into the flow: the mode still picks the copy, but a migration past
+   *  its point of no return has no way out whatever phase the wind-down is in. */
+  isExitBlocked?: boolean
 }
 
 type ModePresentation = {
@@ -44,6 +48,7 @@ type ModePresentation = {
 export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = ({
   mode,
   onClose,
+  isExitBlocked = false,
 }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -127,7 +132,8 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     },
   }
   const presentation = presentationByMode[mode]
-  const closeAction = presentation.shouldShowClose ? handleClose : undefined
+  const canClose = presentation.shouldShowClose && !isExitBlocked
+  const closeAction = canClose ? handleClose : undefined
 
   return (
     <MigrationStepLayout

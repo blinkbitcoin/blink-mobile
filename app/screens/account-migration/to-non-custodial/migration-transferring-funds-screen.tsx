@@ -13,6 +13,7 @@ import {
   useCompleteMigration,
   useHardwareBackGuard,
 } from "@app/screens/account-migration/hooks"
+import { MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 
 /** TODO: replace with the backend funds-transfer request; this 3s delay simulates it. */
@@ -31,9 +32,12 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   /** No navigation at all while the funds move. */
   useHardwareBackGuard()
 
-  const goToContactSupport = useCallback(() => {
-    navigation.navigate("accountMigrationContactSupport")
-  }, [navigation])
+  const goToContactSupport = useCallback(
+    (reason: MigrationSupportReason) => {
+      navigation.navigate("accountMigrationContactSupport", { reason })
+    },
+    [navigation],
+  )
 
   /** Completing the transfer clears the checkpoint and swaps the session, so once it starts a
    *  missing provisioned account is the expected outcome, not the fault the guard below
@@ -51,7 +55,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
         "Migration transfer without provisioned account",
         new Error("Checkpoint has no accountId"),
       )
-      goToContactSupport()
+      goToContactSupport(MigrationSupportReason.SelfCustodialAccountMissing)
       return
     }
 
@@ -67,11 +71,11 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
           })
           return
         }
-        goToContactSupport()
+        goToContactSupport(MigrationSupportReason.TransferFailed)
       } catch (err) {
         /** Funds stay safe on a failed transfer; support resolves it from the contact screen. */
         reportError("Migration funds transfer", err)
-        goToContactSupport()
+        goToContactSupport(MigrationSupportReason.TransferFailed)
       }
     }, TRANSFER_SIMULATION_MS)
 

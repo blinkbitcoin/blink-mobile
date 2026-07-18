@@ -523,6 +523,21 @@ mutation lnUsdInvoiceFeeProbe($input: LnUsdInvoiceFeeProbeInput!) {
   }
 }
 
+mutation migrationStart {
+  migrationStart {
+    errors {
+      message
+      code
+      __typename
+    }
+    migration {
+      status
+      __typename
+    }
+    __typename
+  }
+}
+
 mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
   onChainAddressCurrent(input: $input) {
     errors {
@@ -1416,6 +1431,13 @@ query migrationOwner {
       id
       __typename
     }
+    __typename
+  }
+}
+
+query migrationStatus {
+  migration {
+    status
     __typename
   }
 }

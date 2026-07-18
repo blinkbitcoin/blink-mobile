@@ -2,7 +2,7 @@ import { gql } from "@apollo/client"
 
 import { MigrationQuery, useMigrationQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { AccountMigrationPreview } from "@app/types/wind-down"
+import { AccountMigrationPreview } from "@app/types/migration"
 
 gql`
   query migration {

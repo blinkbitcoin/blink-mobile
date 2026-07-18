@@ -19,8 +19,13 @@ const CONTACT_EMAIL = "support@blink.sv"
 const mockNavigate = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
 const mockUseMigrationQuery = jest.fn()
+const mockMigrationStart = jest.fn()
 const mockRefetchMigration = jest.fn()
 const mockRefetchWallets = jest.fn()
+
+/** The server accepting the start is what arms the lock, so the default across the suite
+ *  is an accepted start and each failure case states its own refusal. */
+const acceptedMigrationStart = { data: { migrationStart: { errors: [] } } }
 let mockDollarRestricted = false
 let mockCurrentDollarRestricted = false
 let mockConvertReady = true
@@ -55,6 +60,7 @@ jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   useWalletOverviewScreenQuery: () => mockUseWalletOverviewScreenQuery(),
   useMigrationQuery: () => mockUseMigrationQuery(),
+  useMigrationStartMutation: () => [mockMigrationStart],
 }))
 
 let mockIsAuthed = true
@@ -141,6 +147,7 @@ describe("MigrationBalancesOverviewScreen", () => {
         receiveSats: 990,
       }),
     )
+    mockMigrationStart.mockResolvedValue(acceptedMigrationStart)
     jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve())
   })
 
@@ -201,7 +208,10 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     /** A settled answer with no preview never becomes one, so spinning here would
      *  strand the user at the commit point where the hardware back is swallowed. */
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "accountMigrationContactSupport",
+      expect.objectContaining({ reason: expect.any(String) }),
+    )
   })
 
   it("hands over to support when the server rejects the query", async () => {
@@ -213,7 +223,10 @@ describe("MigrationBalancesOverviewScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "accountMigrationContactSupport",
+      expect.objectContaining({ reason: expect.any(String) }),
+    )
   })
 
   /**
@@ -233,20 +246,25 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(screen.getByTestId("migration-balances-overview-loading")).toBeTruthy()
   })
 
-  it("reports the migration preview as the missing source when the server has none", async () => {
+  /** One code serves the Crashlytics report and the ticket the user carries, so support
+   *  can correlate the two. */
+  it("reports the same code the user's ticket will carry", async () => {
     mockUseMigrationQuery.mockReturnValue({ data: { migration: null }, loading: false })
     renderScreen()
     await flushEffects()
 
     expect(mockReportError).toHaveBeenCalledWith(
-      "Migration preview unavailable",
-      expect.objectContaining({ message: "the commit screen has no migration preview" }),
+      "Migration handed over to support",
+      expect.objectContaining({ message: "preview-unavailable" }),
     )
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "preview-unavailable",
+    })
   })
 
   /** Blaming the migration query for a wallet-query failure points support and
    *  Crashlytics at the wrong subsystem. */
-  it("reports the wallet balances as the missing source when they are what failed", async () => {
+  it("blames the wallet balances when they are what failed", async () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue({
       data: undefined,
       loading: false,
@@ -256,12 +274,163 @@ describe("MigrationBalancesOverviewScreen", () => {
     await flushEffects()
 
     expect(mockReportError).toHaveBeenCalledWith(
-      "Migration preview unavailable",
-      expect.objectContaining({ message: "the commit screen has no wallet balances" }),
+      "Migration handed over to support",
+      expect.objectContaining({ message: "balances-unavailable" }),
     )
   })
 
-  it("reports both sources when neither one answered", async () => {
+  /** Landing with figures is what declares the migration started server-side; that is
+   *  the whole point of no return, and it must not fire before the figures exist. */
+  it("declares the migration started once the figures are on screen", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  it("does not declare a migration started while the preview is in flight", async () => {
+    mockUseMigrationQuery.mockReturnValue({ data: undefined, loading: true })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+  })
+
+  /** Approve commits against a server-side flow, so a screen that has figures but no
+   *  accepted start must not let the user commit into a flow that does not exist. */
+  it("keeps Approve off until the server accepts the start", async () => {
+    /** Never settles, so the screen is observed exactly while the start is in flight. */
+    mockMigrationStart.mockReturnValue(
+      new Promise(() => {
+        /* left pending on purpose */
+      }),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+  })
+
+  it("hands over to support when the server refuses to start the migration", async () => {
+    mockMigrationStart.mockResolvedValue({
+      data: { migrationStart: { errors: [{ message: "not eligible", code: "X" }] } },
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "accountMigrationContactSupport",
+      expect.objectContaining({ reason: expect.any(String) }),
+    )
+
+    /** Blaming the preview for a refused start would point support at a query that
+     *  answered perfectly well. */
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration handed over to support",
+      expect.objectContaining({ message: "start-refused" }),
+    )
+  })
+
+  /** The figures loading is not enough: without a started migration there is nothing to
+   *  commit to, so a start the network dropped earns the same retry. */
+  /** The two failures on this screen are different tickets, so support must not have to
+   *  guess which one it is looking at. */
+  it("tells support the server refused the start", async () => {
+    mockMigrationStart.mockResolvedValue({
+      data: { migrationStart: { errors: [{ message: "not eligible", code: "X" }] } },
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "start-refused",
+    })
+  })
+
+  it("tells support the preview never arrived", async () => {
+    mockUseMigrationQuery.mockReturnValue({ data: { migration: null }, loading: false })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "preview-unavailable",
+    })
+  })
+
+  it("offers a retry when the connection is what stopped the start", async () => {
+    const offline = Object.assign(new Error("Network request failed"), {
+      networkError: new Error("offline"),
+    })
+    mockMigrationStart.mockRejectedValue(offline)
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The start can fail over a preview that loaded fine, so the balances are on screen
+   *  and a bare retry underneath them would carry no reason at all. */
+  it("explains the retry even when the figures loaded", async () => {
+    const offline = Object.assign(new Error("Network request failed"), {
+      networkError: new Error("offline"),
+    })
+    mockMigrationStart.mockRejectedValue(offline)
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByText(LLOverview.currentBitcoinBalance())).toBeTruthy()
+    expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  /** One failure is one event however many times the user bounces off this screen. */
+  it("reports the handover once even as the screen re-renders", async () => {
+    mockUseMigrationQuery.mockReturnValue({ data: { migration: null }, loading: false })
+    const { rerender } = renderScreen()
+    await flushEffects()
+    rerender(
+      <ContextForScreen>
+        <MigrationBalancesOverviewScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledTimes(1)
+  })
+
+  it("retries the start alongside the queries", async () => {
+    const offline = Object.assign(new Error("Network request failed"), {
+      networkError: new Error("offline"),
+    })
+    mockMigrationStart.mockRejectedValueOnce(offline)
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: mockRefetchMigration,
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: mockRefetchWallets,
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+    expect(mockRefetchMigration).toHaveBeenCalled()
+  })
+
+  /** The preview answers for the case where neither source did: every figure on the
+   *  screen comes from it, so it is the more useful of the two to chase first. */
+  it("blames the preview when neither source answered", async () => {
     mockUseMigrationQuery.mockReturnValue({ data: { migration: null }, loading: false })
     mockUseWalletOverviewScreenQuery.mockReturnValue({
       data: undefined,
@@ -271,12 +440,9 @@ describe("MigrationBalancesOverviewScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockReportError).toHaveBeenCalledWith(
-      "Migration preview unavailable",
-      expect.objectContaining({
-        message: "the commit screen has no migration preview and wallet balances",
-      }),
-    )
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "preview-unavailable",
+    })
   })
 
   it("offers a retry instead of support when the connection is what failed", async () => {
@@ -474,7 +640,10 @@ describe("MigrationBalancesOverviewScreen", () => {
     await flushEffects()
 
     expect(mockSaveCheckpoint).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "accountMigrationContactSupport",
+      expect.objectContaining({ reason: expect.any(String) }),
+    )
   })
 
   it("does not record the commit point while the preview is still in flight", async () => {
@@ -542,7 +711,10 @@ describe("MigrationBalancesOverviewScreen", () => {
     await flushEffects()
 
     expect(screen.queryByText("Current Bitcoin Balance")).toBeNull()
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "accountMigrationContactSupport",
+      expect.objectContaining({ reason: expect.any(String) }),
+    )
   })
 
   it("holds a spinner with Approve disabled while the wallet query loads", async () => {
@@ -562,7 +734,10 @@ describe("MigrationBalancesOverviewScreen", () => {
     renderScreen()
     await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "accountMigrationContactSupport",
+      expect.objectContaining({ reason: expect.any(String) }),
+    )
   })
 
   it("offers a retry when the connection is what failed on the wallet query", async () => {

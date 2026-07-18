@@ -121,7 +121,12 @@ describe("MigrationTransferringFundsScreen", () => {
     await flushEffects()
 
     expect(mockCompleteMigration).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+
+    /** A device with no provisioned wallet is a different ticket from a transfer that
+     *  failed, and only the reason tells support which one arrived. */
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "self-custodial-account-missing",
+    })
     expect(jest.mocked(reportError)).toHaveBeenCalledWith(
       "Migration transfer without provisioned account",
       expect.any(Error),
@@ -171,8 +176,13 @@ describe("MigrationTransferringFundsScreen", () => {
     await flushEffects()
 
     expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
-    expect(mockReset).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "transfer-failed",
+    })
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialBackupSuccess",
+      expect.anything(),
+    )
   })
 
   it("routes to the contact support screen when the transfer fails", async () => {
@@ -185,7 +195,12 @@ describe("MigrationTransferringFundsScreen", () => {
     })
     await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
-    expect(mockReset).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "transfer-failed",
+    })
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialBackupSuccess",
+      expect.anything(),
+    )
   })
 })

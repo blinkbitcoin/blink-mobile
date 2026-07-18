@@ -28,9 +28,10 @@ export const useMigrationCheckpoint = () => {
   )
 
   /** Resumes at the checkpoint's screen, forwarding the terms screen its flow param.
-   *  TODO: known gap: resuming skips the gate's preconditions (empty Dollar Balance and
-   *  the API-key warning), so dollars received after provisioning are ignored client-side
-   *  until the backend re-validates them on migrationStart once that mutation ships. */
+   *  Dollars received after provisioning are caught by the backend, which re-validates an
+   *  empty USD wallet on both migrationStart and migrationCommit. The API-key warning has
+   *  no such backstop: the backend only refuses callers authenticating WITH an API key,
+   *  never accounts that merely hold one, so that precondition stays client-side. */
   const navigateToCheckpoint = useCallback(() => {
     const destination = resolveDestination()
     if (destination.name === "acceptTermsAndConditions") {

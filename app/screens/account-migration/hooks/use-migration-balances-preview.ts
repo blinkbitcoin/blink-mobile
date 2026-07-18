@@ -6,7 +6,7 @@ import { SATS_PER_BTC } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { AccountType } from "@app/types/wallet"
-import { AccountMigrationPreview } from "@app/types/wind-down"
+import { AccountMigrationPreview, MigrationSupportReason } from "@app/types/migration"
 
 import { useCustodialWalletBalances } from "./use-custodial-wallet-balances"
 import { useWindDownGateArmed } from "./use-wind-down-gate-armed"
@@ -28,27 +28,12 @@ const UNKNOWN_PREVIEW: AccountMigrationPreview = {
 }
 
 /**
- * Names the sources that left the screen without figures, for the telemetry filed before
- * the handover to support. A report that blames the migration query when the wallet
- * query is what failed points support and Crashlytics at the wrong subsystem.
- */
-const describeMissingSources = (
-  hasPreview: boolean,
-  areBalancesReady: boolean,
-): string => {
-  if (!hasPreview && !areBalancesReady) return "migration preview and wallet balances"
-  if (!hasPreview) return "migration preview"
-  return "wallet balances"
-}
-
-/**
  * The commit screen's presentation model: current and resulting balances plus the
  * network fee, formatted for display. Each Dollar Balance reads "not available" (never
  * zero, never blank) when the dollar balance is restricted in the user's region for that
  * side's account type: current follows the custodial restriction, new follows the
  * self-custodial one, so a still-custodial user knows the new account will not hold
- * dollars. The exchange rate only exists on the post-gate variant, where a
- * Dollar-to-Bitcoin conversion actually happens.
+ * dollars. The exchange rate line only exists on the post-gate variant.
  */
 export const useMigrationBalancesPreview = () => {
   const { LL } = useI18nContext()
@@ -110,6 +95,17 @@ export const useMigrationBalancesPreview = () => {
   const isUnavailable = isSettledWithoutFigures && !hasConnectionIssue
 
   /**
+   * Which source left the screen without figures, as one code that serves both the
+   * telemetry filed before the handover and the ticket the user carries to support, so a
+   * report and its ticket can be correlated. The preview answers for the case where
+   * neither source did, since every figure on the screen comes from it.
+   */
+  const missingFiguresReason = hasPreview
+    ? MigrationSupportReason.BalancesUnavailable
+    : MigrationSupportReason.PreviewUnavailable
+  const unavailableReason = isUnavailable ? missingFiguresReason : null
+
+  /**
    * Both queries feed the screen, so a retry that refreshed only one would leave the
    * other stale and drop straight back into a failed state. A refetch that fails again
    * rejects, and that rejection carries nothing the hooks' own error state does not
@@ -138,9 +134,7 @@ export const useMigrationBalancesPreview = () => {
     isReady,
     isRetryable,
     isUnavailable,
-    unavailableSource: isUnavailable
-      ? describeMissingSources(hasPreview, areBalancesReady)
-      : null,
+    unavailableReason,
     retry,
     currentBitcoinBalance: formatMoneyAmount({ moneyAmount: currentBtcAmount }),
     currentBitcoinFiat: fiatSuffix(

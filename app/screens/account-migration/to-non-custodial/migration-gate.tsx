@@ -21,8 +21,10 @@ import { testProps } from "@app/utils/testProps"
 import {
   useActiveApiKeys,
   useCustodialWalletBalances,
+  useMigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
 import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
+import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
 import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 
 import { MigrationApiServiceScreen } from "./api-service-screen"
@@ -42,12 +44,12 @@ const resolveMigrationMode = (status: WindDownStatus | undefined): MigrationMode
 }
 
 /**
- * Entry gate for the migration flow, the single choke point for both the Settings entry
- * (tapping Migrate) and the armed gate that replaces the app after closure. Order of
- * checks: accounts with API keys see the API-service warning first, then a custodial
- * Dollar Balance blocks entry (the user empties it manually; post-gate this does not apply
- * since the flow itself converts dollars), and finally the "Time to upgrade" screen in the
- * mode the wind-down phase demands (voluntary, forced pre-deadline, or the armed gate).
+ * Entry gate for the migration flow, the single choke point for the Settings entry
+ * (tapping Migrate), the armed gate that replaces the app after closure, and a migration
+ * the server has locked. Order of checks: accounts with API keys see the API-service
+ * warning first, then any custodial Dollar Balance blocks entry because the user has to
+ * empty it manually, and finally the "Time to upgrade" screen in the mode the wind-down
+ * phase demands (voluntary, forced pre-deadline, or the armed gate).
  */
 export const MigrationGate: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -66,6 +68,11 @@ export const MigrationGate: React.FC = () => {
   const windDown = useCustodialWindDown()
   const mode = resolveMigrationMode(windDown?.status)
   const isGated = mode === "gate"
+
+  /** A locked migration removes the way out just as the armed gate does: the server
+   *  already recorded this account as migrating and the transfer will claim its balance. */
+  const { isLocked: isMigrationLocked, loading: lockLoading } = useMigrationLock()
+  const isExitBlocked = isGated || isMigrationLocked
   const isTransferBlocked = useTransferBlocked()
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
   const [isApiWarningAcknowledged, setIsApiWarningAcknowledged] = useState(false)
@@ -80,6 +87,7 @@ export const MigrationGate: React.FC = () => {
     hasError: balancesError,
     refetch: refetchBalances,
   } = useCustodialWalletBalances()
+  const { navigateToCheckpoint, loading: checkpointLoading } = useMigrationCheckpoint()
 
   const acknowledgeApiWarning = useCallback(() => setIsApiWarningAcknowledged(true), [])
 
@@ -118,15 +126,59 @@ export const MigrationGate: React.FC = () => {
     refetchBalances()
   }, [isFocused, refetchBalances])
 
+  /** Ready only once every source has settled WITH data, so a failed query never reads as
+   *  an empty answer; the lock is part of it, or the gate decides before it knows, renders
+   *  the intro, and only then learns it should have resumed. */
+  const isGateDataLoading = !apiKeysReady || !balancesReady || lockLoading
+
+  /** A failed query read as its empty default would wave a user with API keys or a live
+   *  dollar balance straight in, so a settled error blocks with a retry instead. */
+  const hasGateDataError = apiKeysError || balancesError
+
+  /** The API-key warning outranks the Dollar-Balance precondition in the entry order
+   *  (entry, API-key check, Dollar Balance check, intro). */
+  const shouldWarnAboutApiKeys = hasActiveApiKeys && !isApiWarningAcknowledged
+
+  /**
+   * Every phase blocks on a Dollar Balance, the armed gate included. The backend rejects
+   * `migrationStart` and `migrationCommit` outright while the USD wallet holds anything
+   * and it never converts on the user's behalf, so letting a gated account through would
+   * only move the refusal to a screen with no way back. The user empties it manually.
+   */
+  const shouldBlockOnDollarBalance = usdBalanceCents > 0
+
+  /**
+   * A locked migration skips the intro and resumes where it left off. That screen exists
+   * to convince someone who has not started; the server has already recorded this account
+   * as migrating, so re-pitching it would be both wrong and an extra tap between the user
+   * and finishing. The preconditions still run first: a dollar balance that arrived
+   * mid-flow has to be emptied whatever the phase, or the commit is refused. The
+   * kill-switch outranks even this, since a disabled stack shows unavailable, never resumes.
+   */
+  const shouldResumeLockedMigration =
+    isMigrationLocked &&
+    !isSelfCustodialDisabled &&
+    !isGateDataLoading &&
+    !shouldWarnAboutApiKeys &&
+    !shouldBlockOnDollarBalance
+
+  const hasResumedRef = useRef(false)
+
+  useEffect(() => {
+    if (!shouldResumeLockedMigration || checkpointLoading || hasResumedRef.current) return
+
+    /** Claimed once per mount: the checkpoint moves as the user advances, and a second
+     *  run would yank them back from wherever they got to. */
+    hasResumedRef.current = true
+    navigateToCheckpoint()
+  }, [shouldResumeLockedMigration, checkpointLoading, navigateToCheckpoint])
+
   /** The kill-switch net. Every entry funnels through the gate, so blocking here pauses the
    *  whole flow the moment ops disables the stack, whatever path the user arrived by. */
   if (isSelfCustodialDisabled) {
     return <TemporarilyUnavailableScreen />
   }
 
-  /** A safety check reading a failed query as its empty default would wave a user with
-   *  API keys or a live dollar balance straight in. Block on error and offer a retry. */
-  const hasGateDataError = apiKeysError || balancesError
   if (hasGateDataError) {
     return (
       <Screen preset="fixed">
@@ -148,9 +200,9 @@ export const MigrationGate: React.FC = () => {
   }
 
   /** In blocker mode the gate replaces the whole app, so returning null here would
-   *  leave a blank screen on every launch until the queries settle WITH data. */
-  const isGateDataReady = apiKeysReady && balancesReady
-  if (!isGateDataReady) {
+   *  leave a blank screen on every launch until the queries settle WITH data, and a locked
+   *  migration would flash the intro it is about to navigate away from. */
+  if (isGateDataLoading || shouldResumeLockedMigration) {
     return (
       <Screen preset="fixed">
         <View style={styles.loadingContainer}>
@@ -164,14 +216,10 @@ export const MigrationGate: React.FC = () => {
     )
   }
 
-  const hasCustodialDollarBalance = usdBalanceCents > 0
-
-  /** The API-key warning outranks the Dollar-Balance precondition in the entry order
-   *  (entry, API-key check, Dollar Balance check, intro). */
-  const shouldWarnAboutApiKeys = hasActiveApiKeys && !isApiWarningAcknowledged
   if (shouldWarnAboutApiKeys) {
-    /** Same close rules as the "Time to upgrade" screen: closable until the gate arms. */
-    const apiCloseAction = isGated ? undefined : exitFlow
+    /** Same close rules as the "Time to upgrade" screen: closable until the way out is
+     *  blocked by the armed gate or by a locked migration. */
+    const apiCloseAction = isExitBlocked ? undefined : exitFlow
     return (
       <MigrationApiServiceScreen
         onContinue={acknowledgeApiWarning}
@@ -180,11 +228,6 @@ export const MigrationGate: React.FC = () => {
     )
   }
 
-  /** Post-gate the user enters WITH dollars and the flow converts them at the final
-   *  step, so the empty-your-dollars precondition only guards the pre-deadline paths.
-   *  TODO: the backend re-enforces this precondition on migrationStart; this modal is
-   *  the UX half of the check. */
-  const shouldBlockOnDollarBalance = hasCustodialDollarBalance && !isGated
   if (shouldBlockOnDollarBalance) {
     /** The conversion screen bounces blocked or dollar-restricted regions back home, so
      *  the Transfer variant only shows when the user can actually reach it; restricted
@@ -193,7 +236,7 @@ export const MigrationGate: React.FC = () => {
     const transferAction = canTransferInApp ? goToDollarTransfer : undefined
     return (
       <>
-        <MigrationRequiredScreen mode={mode} />
+        <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />
         <DollarBalanceMigrationModal
           isVisible={isFocused}
           toggleModal={exitFlow}
@@ -203,7 +246,7 @@ export const MigrationGate: React.FC = () => {
     )
   }
 
-  return <MigrationRequiredScreen mode={mode} />
+  return <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />
 }
 
 const useStyles = makeStyles(() => ({
