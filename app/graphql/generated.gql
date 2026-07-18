@@ -1383,6 +1383,19 @@ query level {
   }
 }
 
+query migration {
+  migration {
+    preview {
+      balanceSats
+      feeSats
+      feeCoveredByBlink
+      receiveSats
+      __typename
+    }
+    __typename
+  }
+}
+
 query migrationApiKeys {
   me {
     id

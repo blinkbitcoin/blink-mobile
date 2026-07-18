@@ -21,6 +21,7 @@ import {
   useMigrationCheckpoint,
   useHardwareBackGuard,
 } from "@app/screens/account-migration/hooks"
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
 /**
@@ -47,44 +48,39 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  route, and the hardware back is swallowed here. */
   useHardwareBackGuard()
 
-  /** Landing here is the commit point, so an app relaunch returns to this screen.
-   *  Gated on focus: this screen stays mounted under the completion screen, and once the
-   *  migration clears the checkpoint a background re-save would resurrect it.
-   *  TODO: the backend will hold this server-side once the migration state query ships
-   *  (reinstalls cannot be covered locally); this checkpoint covers the relaunch. */
-  /** Approve is the point of no return, so it only unlocks once this checkpoint is durably
-   *  written: tapping before the write lands could resume a post-crash relaunch at the wrong
-   *  step. */
+  /**
+   * Landing here WITH figures is the commit point, so an app relaunch resumes on this
+   * screen. Recording it before the preview resolves would strand a user whose figures
+   * never arrive; gating on focus also keeps a background instance (this screen stays
+   * mounted under the completion screen) from re-saving the checkpoint the migration just
+   * cleared. Approve only unlocks once the write is durable: a failed write keeps Approve
+   * disabled (Contact support stays available) and a later focus re-save heals it.
+   * TODO: Part 2 moves the lock to the backend (`migration.status`), which is what covers
+   * reinstalls; this checkpoint only remembers which screen to resume on.
+   */
   const [isCheckpointSaved, setIsCheckpointSaved] = useState(false)
-  const [hasCheckpointSaveFailed, setHasCheckpointSaveFailed] = useState(false)
-  const [isSavingCheckpoint, setIsSavingCheckpoint] = useState(false)
-  const [saveAttempt, setSaveAttempt] = useState(0)
-
   useEffect(() => {
-    if (!isFocused || checkpointLoading) return
+    if (!isFocused || checkpointLoading || !preview.isReady) return
     let isActive = true
-    setIsSavingCheckpoint(true)
-    saveCheckpoint(MigrationCheckpoint.BalancesOverview)
-      .then((saved) => {
-        if (!isActive) return
-        setIsCheckpointSaved(saved)
-        setHasCheckpointSaveFailed(!saved)
-      })
-      .finally(() => {
-        if (isActive) setIsSavingCheckpoint(false)
-      })
+    saveCheckpoint(MigrationCheckpoint.BalancesOverview).then((saved) => {
+      if (isActive) setIsCheckpointSaved(saved)
+    })
     return () => {
       isActive = false
     }
-  }, [isFocused, checkpointLoading, saveCheckpoint, saveAttempt])
+  }, [isFocused, checkpointLoading, preview.isReady, saveCheckpoint])
 
-  /** A failed save (an offline owner query, a failed write) leaves Approve disabled, and
-   *  nothing else on this exit-sealed screen re-runs it: the effect's dependencies never
-   *  change once it has settled, so without a manual retry the user would be stranded at the
-   *  commit point with no way back. Retry re-runs the save, exactly as the gate's does. */
-  const retryCheckpointSave = useCallback(() => {
-    setSaveAttempt((previous) => previous + 1)
-  }, [])
+  /** A preview that settled without figures is never coming: the query failed, or the
+   *  server reports no migration for this account. Holding the spinner would strand the
+   *  user here, where the hardware back is swallowed, so support takes over instead. */
+  useEffect(() => {
+    if (!preview.isUnavailable) return
+    reportError(
+      "Migration preview unavailable",
+      new Error(`the commit screen has no ${preview.unavailableSource}`),
+    )
+    navigation.navigate("accountMigrationContactSupport")
+  }, [preview.isUnavailable, preview.unavailableSource, navigation])
 
   const handleApprove = useCallback(() => {
     navigation.navigate("accountMigrationTransferringFunds")
@@ -138,26 +134,25 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
           </ScrollView>
         ) : (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator
-              size="large"
-              color={colors.primary}
-              {...testProps("migration-balances-overview-loading")}
-            />
+            {preview.isRetryable ? (
+              <Text style={styles.connectionIssue}>{LL.errors.network.connection()}</Text>
+            ) : (
+              <ActivityIndicator
+                size="large"
+                color={colors.primary}
+                {...testProps("migration-balances-overview-loading")}
+              />
+            )}
           </View>
         )}
 
         <View style={styles.buttonsContainer}>
-          {hasCheckpointSaveFailed ? (
-            <>
-              <Text style={styles.saveErrorText}>{LL.errors.generic()}</Text>
-              <GaloyPrimaryButton
-                title={LL.common.tryAgain()}
-                onPress={retryCheckpointSave}
-                loading={isSavingCheckpoint}
-                disabled={isSavingCheckpoint}
-                {...testProps("migration-balances-overview-retry")}
-              />
-            </>
+          {preview.isRetryable ? (
+            <GaloyPrimaryButton
+              title={LLOverview.retryCta()}
+              onPress={preview.retry}
+              {...testProps("migration-balances-overview-retry")}
+            />
           ) : (
             <GaloyPrimaryButton
               title={LLOverview.approveCta()}
@@ -188,6 +183,13 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  connectionIssue: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: colors.error,
+    textAlign: "center",
+    paddingHorizontal: 20,
   },
   body: {
     gap: 20,
@@ -230,12 +232,5 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 20,
     paddingBottom: 20,
     paddingTop: 10,
-  },
-  saveErrorText: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: colors.error,
-    textAlign: "center",
-    paddingHorizontal: 20,
   },
 }))

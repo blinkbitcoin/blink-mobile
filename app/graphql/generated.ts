@@ -3395,6 +3395,11 @@ export type MigrationTransactionsPresenceQueryVariables = Exact<{ [key: string]:
 
 export type MigrationTransactionsPresenceQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly transactions?: { readonly __typename: 'TransactionConnection', readonly edges?: ReadonlyArray<{ readonly __typename: 'TransactionEdge', readonly cursor: string }> | null } | null } } | null };
 
+export type MigrationQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MigrationQuery = { readonly __typename: 'Query', readonly migration?: { readonly __typename: 'AccountMigration', readonly preview: { readonly __typename: 'AccountMigrationPreview', readonly balanceSats: number, readonly feeSats: number, readonly feeCoveredByBlink: boolean, readonly receiveSats: number } } | null };
+
 export type MigrationSupportDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5467,6 +5472,50 @@ export type MigrationTransactionsPresenceQueryHookResult = ReturnType<typeof use
 export type MigrationTransactionsPresenceLazyQueryHookResult = ReturnType<typeof useMigrationTransactionsPresenceLazyQuery>;
 export type MigrationTransactionsPresenceSuspenseQueryHookResult = ReturnType<typeof useMigrationTransactionsPresenceSuspenseQuery>;
 export type MigrationTransactionsPresenceQueryResult = Apollo.QueryResult<MigrationTransactionsPresenceQuery, MigrationTransactionsPresenceQueryVariables>;
+export const MigrationDocument = gql`
+    query migration {
+  migration {
+    preview {
+      balanceSats
+      feeSats
+      feeCoveredByBlink
+      receiveSats
+    }
+  }
+}
+    `;
+
+/**
+ * __useMigrationQuery__
+ *
+ * To run a query within a React component, call `useMigrationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMigrationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMigrationQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMigrationQuery(baseOptions?: Apollo.QueryHookOptions<MigrationQuery, MigrationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MigrationQuery, MigrationQueryVariables>(MigrationDocument, options);
+      }
+export function useMigrationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MigrationQuery, MigrationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MigrationQuery, MigrationQueryVariables>(MigrationDocument, options);
+        }
+export function useMigrationSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MigrationQuery, MigrationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MigrationQuery, MigrationQueryVariables>(MigrationDocument, options);
+        }
+export type MigrationQueryHookResult = ReturnType<typeof useMigrationQuery>;
+export type MigrationLazyQueryHookResult = ReturnType<typeof useMigrationLazyQuery>;
+export type MigrationSuspenseQueryHookResult = ReturnType<typeof useMigrationSuspenseQuery>;
+export type MigrationQueryResult = Apollo.QueryResult<MigrationQuery, MigrationQueryVariables>;
 export const MigrationSupportDetailsDocument = gql`
     query migrationSupportDetails {
   me {
