@@ -12,7 +12,11 @@ type UseCustodialWalletBalancesOptions = {
 /**
  * The custodial BTC/USD balances every migration surface reads, from the shared
  * wallet-overview query. isReady stays false until the query settles WITH data, so
- * consumers never present unknown balances as zeros. fetchPolicy defaults to the query's
+ * consumers never present unknown balances as zeros. isSkipped marks a query that never
+ * ran, which a consumer must not read as an empty answer; hasConnectionIssue separates a
+ * failure the network caused (retrying can still resolve) from one the server answered,
+ * while hasError flags any error at all so a gate blocks rather than waving the user in;
+ * refetch is what a caller offering a retry calls. fetchPolicy defaults to the query's
  * cache-first; the commit screen overrides it so the figure the user approves is fresh.
  */
 export const useCustodialWalletBalances = ({
@@ -20,8 +24,13 @@ export const useCustodialWalletBalances = ({
   fetchPolicy,
 }: UseCustodialWalletBalancesOptions = {}) => {
   const isAuthed = useIsAuthed()
+  const isSkipped = !isAuthed || skip
+
+  /** notifyOnNetworkStatusChange reopens `loading` for a refetch, so a caller offering a
+   *  retry can show it running instead of leaving the screen unchanged for seconds. */
   const { data, loading, error, refetch } = useWalletOverviewScreenQuery({
-    skip: !isAuthed || skip,
+    skip: isSkipped,
+    notifyOnNetworkStatusChange: true,
     fetchPolicy,
   })
 
@@ -32,8 +41,10 @@ export const useCustodialWalletBalances = ({
     usdBalanceCents: getUsdWallet(wallets)?.balance ?? 0,
     walletIds: getWalletIds(wallets),
     isReady: !loading && !error && wallets !== undefined,
-    loading,
+    isSkipped,
+    hasConnectionIssue: Boolean(error?.networkError),
     hasError: Boolean(error),
+    loading,
     refetch,
   }
 }
