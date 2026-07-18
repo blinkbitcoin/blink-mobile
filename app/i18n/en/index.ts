@@ -3700,6 +3700,7 @@ const en: BaseTranslation = {
         savedConfirm: "I have saved it",
         copy: "Copy",
         testBackup: "Test your backup",
+        doNotShareWarning: "Do not show this to anyone including support",
       },
       Confirm: {
         headerTitle: "Confirm backup phrase",
@@ -3767,6 +3768,8 @@ const en: BaseTranslation = {
     wrongPassword: "Incorrect password. Please try again.",
     pickBackupTitle: "Choose a wallet",
     pickBackupDescription: "Select a backup to restore",
+    recognizePhraseTitle: "Do you recognize this backup phrase?",
+    recognizePhraseBody: "Never enter words someone else sent you.",
   },
   BackupNudge: {
     title: "Your funds are at risk",

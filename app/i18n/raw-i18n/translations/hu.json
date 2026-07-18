@@ -3506,7 +3506,8 @@
         "savedConfirm": "Elmentettem",
         "copy": "Másolás",
         "continueButton": "Tovább",
-        "testBackup": "Teszteld a biztonsági mentést"
+        "testBackup": "Teszteld a biztonsági mentést",
+        "doNotShareWarning": "Ne mutasd meg senkinek, az ügyfélszolgálatnak sem"
       },
       "Confirm": {
         "headerTitle": "Biztonsági mentés megerősítése",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Add meg a titkosítási jelszavadat",
     "wrongPassword": "Helytelen jelszó. Kérjük, próbáld újra.",
     "pickBackupTitle": "Válassz tárcát",
-    "pickBackupDescription": "Válassz egy biztonsági mentést a visszaállításhoz"
+    "pickBackupDescription": "Válassz egy biztonsági mentést a visszaállításhoz",
+    "recognizePhraseTitle": "Felismered ezt a biztonsági mentési kifejezést?",
+    "recognizePhraseBody": "Soha ne írj be olyan szavakat, amelyeket valaki más küldött neked."
   },
   "BackupNudge": {
     "title": "Pénzeszközeid veszélyben vannak",

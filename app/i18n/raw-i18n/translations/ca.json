@@ -3506,7 +3506,8 @@
         "savedConfirm": "Ja l'he desat",
         "copy": "Copiar",
         "continueButton": "Continua",
-        "testBackup": "Prova la teva còpia de seguretat"
+        "testBackup": "Prova la teva còpia de seguretat",
+        "doNotShareWarning": "No ho mostris a ningú, ni tan sols a l'assistència"
       },
       "Confirm": {
         "headerTitle": "Confirma la frase de còpia de seguretat",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Introdueix la teva contrasenya de xifratge",
     "wrongPassword": "Contrasenya incorrecta. Si us plau, torna-ho a provar.",
     "pickBackupTitle": "Tria una cartera",
-    "pickBackupDescription": "Selecciona una còpia de seguretat per restaurar"
+    "pickBackupDescription": "Selecciona una còpia de seguretat per restaurar",
+    "recognizePhraseTitle": "Reconeixes aquesta frase de còpia de seguretat?",
+    "recognizePhraseBody": "No introdueixis mai paraules que t'hagi enviat algú altre."
   },
   "BackupNudge": {
     "title": "Els teus fons estan en risc",

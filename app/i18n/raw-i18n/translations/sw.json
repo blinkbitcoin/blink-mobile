@@ -3506,7 +3506,8 @@
         "savedConfirm": "Nimehifadhi",
         "copy": "Nakili",
         "continueButton": "Endelea",
-        "testBackup": "Jaribu hifadhi yako"
+        "testBackup": "Jaribu hifadhi yako",
+        "doNotShareWarning": "Usimwonyeshe mtu yeyote ikiwa ni pamoja na timu ya usaidizi"
       },
       "Confirm": {
         "headerTitle": "Thibitisha maneno ya nakala",
@@ -3594,7 +3595,9 @@
     "enterPassword": "Ingiza nenosiri lako la usimbaji",
     "wrongPassword": "Nenosiri si sahihi. Tafadhali jaribu tena.",
     "pickBackupTitle": "Chagua pochi",
-    "pickBackupDescription": "Chagua nakala rudufu ya kurejesha"
+    "pickBackupDescription": "Chagua nakala rudufu ya kurejesha",
+    "recognizePhraseTitle": "Je, unaitambua kaulisiri hii ya nakala rudufu?",
+    "recognizePhraseBody": "Kamwe usiweke maneno uliyotumiwa na mtu mwingine."
   },
   "BackupNudge": {
     "title": "Fedha zako ziko hatarini",

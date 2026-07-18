@@ -7,12 +7,20 @@ import { BackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manua
 import { ContextForScreen } from "../../../helper"
 
 const mockNavigate = jest.fn()
+const mockSetOptions = jest.fn()
 let mockStep = 1
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, setOptions: mockSetOptions }),
   useRoute: () => ({ params: { step: mockStep } }),
 }))
+
+const renderHeaderRight = () => {
+  const calls = mockSetOptions.mock.calls
+  const lastOptions = calls[calls.length - 1]?.[0]
+  if (!lastOptions?.headerRight) throw new Error("headerRight was not set")
+  return render(<ContextForScreen>{lastOptions.headerRight()}</ContextForScreen>)
+}
 
 const mockCopyToClipboard = jest.fn()
 let mockCountdown = { remainingSeconds: 0, isExpired: true }
@@ -175,13 +183,14 @@ describe("BackupPhraseScreen", () => {
   })
 
   describe("shared", () => {
-    it("renders copy button", () => {
-      const { getByText } = render(
+    it("renders copy button in the header", () => {
+      render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
 
+      const { getByText } = renderHeaderRight()
       expect(getByText(LL.BackupScreen.ManualBackup.Phrase.copy())).toBeTruthy()
     })
 
@@ -193,7 +202,8 @@ describe("BackupPhraseScreen", () => {
       )
 
       await waitFor(() => expect(getByText("youth")).toBeTruthy())
-      fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Phrase.copy()))
+      const { getByText: getHeaderText } = renderHeaderRight()
+      fireEvent.press(getHeaderText(LL.BackupScreen.ManualBackup.Phrase.copy()))
       expect(mockCopyToClipboard).toHaveBeenCalledWith(
         expect.objectContaining({
           content: expect.stringContaining("youth"),
@@ -202,7 +212,7 @@ describe("BackupPhraseScreen", () => {
       )
     })
 
-    it("renders spark compatible link", () => {
+    it("renders spark compatible info text", () => {
       const { getByText } = render(
         <ContextForScreen>
           <BackupPhraseScreen />
@@ -210,7 +220,24 @@ describe("BackupPhraseScreen", () => {
       )
 
       expect(
-        getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
+        getByText(
+          LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
+            sparkCompatibleLink:
+              LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink(),
+          }),
+        ),
+      ).toBeTruthy()
+    })
+
+    it("renders the do-not-share warning card", () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+
+      expect(
+        getByText(LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()),
       ).toBeTruthy()
     })
   })

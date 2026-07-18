@@ -33,6 +33,7 @@ const light = {
   grey4: "#E2E2E4", // grey8-ish
   grey5: "#F2F2F4", // grey9-ish
   grey6: "#E7E7E7", // grey6-ish
+  grey7: "#F9F9F9", // static card surface
 
   loaderForeground: "#ecebeb",
   loaderBackground: "#f3f3f3",
@@ -47,7 +48,7 @@ const light = {
   // same as error
   red: "#DC2626",
 
-  warning: "#F59E0B",
+  warning: "#E18E02",
 }
 
 const dark = {
@@ -85,6 +86,7 @@ const dark = {
   grey4: "#393939", // grey8
   grey5: "#1d1d1d", // after grey9
   grey6: "#2B2B2B", // grey6
+  grey7: "#0F0F0F", // static card surface
 
   loaderBackground: "#131313",
   loaderForeground: "#3c3b3b",
@@ -99,7 +101,7 @@ const dark = {
   // same as error
   red: "#DC2626",
 
-  warning: "#F59E0B",
+  warning: "#FFC563",
 }
 
 export { light, dark }

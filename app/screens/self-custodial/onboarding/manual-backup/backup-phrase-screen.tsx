@@ -1,11 +1,13 @@
-import React from "react"
+import React, { useLayoutEffect } from "react"
 import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
-import { useRoute, RouteProp } from "@react-navigation/native"
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { IconTextButton } from "@app/components/icon-text-button"
+import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
+import { Card } from "@app/components/card"
 import { InfoBanner } from "@app/components/info-banner"
 import { Screen } from "@app/components/screen"
 import { useScreenSecurity } from "@app/hooks/use-screen-security"
@@ -23,6 +25,7 @@ type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase"
 export const BackupPhraseScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { step } = useRoute<PhraseRouteProp>().params
 
   useScreenSecurity()
@@ -32,17 +35,30 @@ export const BackupPhraseScreen: React.FC = () => {
     secondCard,
     offset,
     handleCopy,
-    handleOpenLink,
     handleContinue,
     buttonTitle,
     isButtonDisabled,
   } = useBackupPhrase(step)
 
-  const sparkLink = LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()
+  const copyLabel = LL.BackupScreen.ManualBackup.Phrase.copy()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <GaloyTertiaryButton
+          clear
+          title={copyLabel}
+          onPress={handleCopy}
+          containerStyle={styles.headerButton}
+          {...testProps("backup-phrase-copy")}
+        />
+      ),
+    })
+  }, [navigation, copyLabel, handleCopy, styles])
+
   const infoText = LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
-    sparkCompatibleLink: sparkLink,
+    sparkCompatibleLink: LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink(),
   })
-  const [infoBefore, infoAfter] = infoText.split(sparkLink)
 
   const renderWord = (word: string, index: number) => (
     <View key={index} style={styles.wordRow}>
@@ -54,6 +70,11 @@ export const BackupPhraseScreen: React.FC = () => {
   return (
     <Screen preset="fixed">
       <ScrollView contentContainerStyle={styles.content}>
+        <Card
+          type="warning"
+          title={LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()}
+        />
+
         <View style={styles.seedWords}>
           <SettingsGroup
             items={firstCard.map((word, i) => () => renderWord(word, i))}
@@ -70,25 +91,8 @@ export const BackupPhraseScreen: React.FC = () => {
         </View>
 
         <InfoBanner>
-          <Text style={styles.infoText}>
-            {infoBefore}
-            <Text
-              style={styles.linkText}
-              accessibilityRole="link"
-              onPress={handleOpenLink}
-            >
-              {sparkLink}
-            </Text>
-            {infoAfter}
-          </Text>
+          <Text style={styles.infoText}>{infoText}</Text>
         </InfoBanner>
-
-        <IconTextButton
-          icon="copy-paste"
-          label={LL.BackupScreen.ManualBackup.Phrase.copy()}
-          onPress={handleCopy}
-          {...testProps("backup-phrase-copy")}
-        />
       </ScrollView>
 
       <View style={styles.buttonsContainer}>
@@ -109,6 +113,9 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingTop: 10,
     paddingBottom: 20,
     gap: 20,
+  },
+  headerButton: {
+    marginRight: 16,
   },
   seedWords: {
     gap: 20,
@@ -138,11 +145,6 @@ const useStyles = makeStyles(({ colors }) => ({
   infoText: {
     fontSize: 12,
     lineHeight: 18,
-  },
-  linkText: {
-    fontSize: 12,
-    lineHeight: 18,
-    textDecorationLine: "underline",
   },
   buttonsContainer: {
     gap: 10,

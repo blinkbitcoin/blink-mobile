@@ -3506,7 +3506,8 @@
                 "savedConfirm": "保存しました",
                 "copy": "コピー",
                 "continueButton": "続行",
-                "testBackup": "バックアップをテスト"
+                "testBackup": "バックアップをテスト",
+                "doNotShareWarning": "サポートを含め、誰にも見せないでください"
             },
             "Confirm": {
                 "headerTitle": "バックアップフレーズの確認",
@@ -3594,7 +3595,9 @@
         "enterPassword": "暗号化パスワードを入力してください",
         "wrongPassword": "パスワードが正しくありません。再試行してください.",
         "pickBackupTitle": "ウォレットを選択",
-        "pickBackupDescription": "復元するバックアップを選択"
+        "pickBackupDescription": "復元するバックアップを選択",
+        "recognizePhraseTitle": "このバックアップフレーズに見覚えがありますか？",
+        "recognizePhraseBody": "他人から送られた単語は絶対に入力しないでください。"
     },
     "BackupNudge": {
         "title": "あなたの資金が危険にさらされています",
