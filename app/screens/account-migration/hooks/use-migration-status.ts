@@ -11,6 +11,15 @@ gql`
   }
 `
 
+type UseMigrationStatusOptions = {
+  /** Milliseconds between re-reads, for the transfer screen watching a phase it expects
+   *  to move. Omitted, the status is read once per mount. */
+  pollInterval?: number
+  /** For callers that already know the question does not apply, so the phase is not asked
+   *  for on every launch by readers who cannot act on the answer. */
+  skip?: boolean
+}
+
 type UseMigrationStatus = {
   status: MigrationStatus | null
   loading: boolean
@@ -25,9 +34,12 @@ type UseMigrationStatus = {
  * query may still be in flight, skipped for a signed-out user, or failed, and nothing here
  * guesses on the server's behalf.
  */
-export const useMigrationStatus = (): UseMigrationStatus => {
+export const useMigrationStatus = ({
+  pollInterval,
+  skip = false,
+}: UseMigrationStatusOptions = {}): UseMigrationStatus => {
   const isAuthed = useIsAuthed()
-  const isSkipped = !isAuthed
+  const isSkipped = !isAuthed || skip
 
   /** no-cache for the same reason as the wind-down status and the preview, with a
    *  sharper consequence here: a cached read would let one account's migration phase
@@ -35,6 +47,7 @@ export const useMigrationStatus = (): UseMigrationStatus => {
   const { data, loading } = useMigrationStatusQuery({
     skip: isSkipped,
     fetchPolicy: "no-cache",
+    pollInterval,
   })
 
   return {

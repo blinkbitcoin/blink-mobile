@@ -76,6 +76,43 @@ describe("useMigrationStatus", () => {
     expect(result.current.status).toBeNull()
   })
 
+  /** Readers who cannot act on the answer should not be asking for it on every launch. */
+  it("skips the query when the caller says the question does not apply", () => {
+    mockUseMigrationStatusQuery.mockReturnValue({ data: undefined, loading: false })
+
+    const { result } = renderHook(() => useMigrationStatus({ skip: true }))
+
+    expect(mockUseMigrationStatusQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ skip: true }),
+    )
+    expect(result.current.isSkipped).toBe(true)
+    expect(result.current.status).toBeNull()
+  })
+
+  /** The transfer screen watches a phase it expects to move; every other reader wants
+   *  one read per mount. */
+  it("re-reads on the interval a caller asks for", () => {
+    mockUseMigrationStatusQuery.mockReturnValue(
+      migrationWith(MigrationStatus.Transferring),
+    )
+
+    renderHook(() => useMigrationStatus({ pollInterval: 2000 }))
+
+    expect(mockUseMigrationStatusQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ pollInterval: 2000 }),
+    )
+  })
+
+  it("reads once per mount when no interval is asked for", () => {
+    mockUseMigrationStatusQuery.mockReturnValue(migrationWith(MigrationStatus.NotStarted))
+
+    renderHook(() => useMigrationStatus())
+
+    expect(mockUseMigrationStatusQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ pollInterval: undefined }),
+    )
+  })
+
   it("fetches without touching the cache so one account's phase never locks another", () => {
     mockUseMigrationStatusQuery.mockReturnValue(migrationWith(MigrationStatus.NotStarted))
 

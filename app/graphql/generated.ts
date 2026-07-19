@@ -3415,6 +3415,13 @@ export type MigrationSupportDetailsQueryVariables = Exact<{ [key: string]: never
 
 export type MigrationSupportDetailsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly username?: string | null, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
 
+export type MigrationCommitMutationVariables = Exact<{
+  input: MigrationCommitInput;
+}>;
+
+
+export type MigrationCommitMutation = { readonly __typename: 'Mutation', readonly migrationCommit: { readonly __typename: 'MigrationPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
+
 export type WindDownQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5650,6 +5657,42 @@ export type MigrationSupportDetailsQueryHookResult = ReturnType<typeof useMigrat
 export type MigrationSupportDetailsLazyQueryHookResult = ReturnType<typeof useMigrationSupportDetailsLazyQuery>;
 export type MigrationSupportDetailsSuspenseQueryHookResult = ReturnType<typeof useMigrationSupportDetailsSuspenseQuery>;
 export type MigrationSupportDetailsQueryResult = Apollo.QueryResult<MigrationSupportDetailsQuery, MigrationSupportDetailsQueryVariables>;
+export const MigrationCommitDocument = gql`
+    mutation migrationCommit($input: MigrationCommitInput!) {
+  migrationCommit(input: $input) {
+    errors {
+      message
+      code
+    }
+  }
+}
+    `;
+export type MigrationCommitMutationFn = Apollo.MutationFunction<MigrationCommitMutation, MigrationCommitMutationVariables>;
+
+/**
+ * __useMigrationCommitMutation__
+ *
+ * To run a mutation, you first call `useMigrationCommitMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMigrationCommitMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [migrationCommitMutation, { data, loading, error }] = useMigrationCommitMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useMigrationCommitMutation(baseOptions?: Apollo.MutationHookOptions<MigrationCommitMutation, MigrationCommitMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MigrationCommitMutation, MigrationCommitMutationVariables>(MigrationCommitDocument, options);
+      }
+export type MigrationCommitMutationHookResult = ReturnType<typeof useMigrationCommitMutation>;
+export type MigrationCommitMutationResult = Apollo.MutationResult<MigrationCommitMutation>;
+export type MigrationCommitMutationOptions = Apollo.BaseMutationOptions<MigrationCommitMutation, MigrationCommitMutationVariables>;
 export const WindDownDocument = gql`
     query windDown {
   windDown {

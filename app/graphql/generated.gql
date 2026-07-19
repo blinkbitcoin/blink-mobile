@@ -523,6 +523,17 @@ mutation lnUsdInvoiceFeeProbe($input: LnUsdInvoiceFeeProbeInput!) {
   }
 }
 
+mutation migrationCommit($input: MigrationCommitInput!) {
+  migrationCommit(input: $input) {
+    errors {
+      message
+      code
+      __typename
+    }
+    __typename
+  }
+}
+
 mutation migrationStart {
   migrationStart {
     errors {
