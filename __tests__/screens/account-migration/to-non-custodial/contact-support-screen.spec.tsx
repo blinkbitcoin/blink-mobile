@@ -42,7 +42,6 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
 /** Mirrors useMigrationDiagnostics' shape, built from mockDetails at render time. */
 const mockBuildDiagnostics = () =>
   [
-    { label: LLSupport.reasonLabel(), value: mockReason, isIdentifier: false },
     {
       label: LLSupport.accountIdLabel(),
       value: mockDetails.accountId,
@@ -162,15 +161,15 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("start-refused")
   })
 
-  /** Untranslated on purpose: the value is copied out of an email by a human and has to
-   *  stay greppable whatever locale produced the ticket. */
-  it("shows the reason code verbatim, only its label localized", async () => {
+  /** The screen shows identity for the user to copy; the reason is a code for support
+   *  and travels in the email body instead. */
+  it("keeps the reason code off the screen", async () => {
     mockReason = MigrationSupportReason.SelfCustodialAccountMissing
     renderScreen()
     await flushEffects()
 
-    expect(screen.getByText(LLSupport.reasonLabel())).toBeTruthy()
-    expect(screen.getByText("self-custodial-account-missing")).toBeTruthy()
+    expect(screen.queryByText(LLSupport.reasonLabel())).toBeNull()
+    expect(screen.queryByText("self-custodial-account-missing")).toBeNull()
   })
 
   it("sends the support email from the contact action", async () => {

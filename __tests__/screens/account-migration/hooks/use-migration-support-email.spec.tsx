@@ -146,6 +146,24 @@ describe("useMigrationSupportEmail", () => {
     expect(Linking.openURL).toHaveBeenCalledWith(expectedMailto(expectedBody))
   })
 
+  /** The reason no longer travels with the account diagnostics, so it has to survive a
+   *  device that can supply none of them. */
+  it("carries the reason even when every account detail is missing", () => {
+    mockDetails = { accountId: "", pubKey: "", username: "", email: "", phone: "" }
+    const { result } = renderHook(
+      () => useMigrationSupportEmail(MigrationSupportReason.StartRefused),
+      { wrapper },
+    )
+
+    result.current.sendSupportEmail()
+
+    expect(Linking.openURL).toHaveBeenCalledWith(
+      expect.stringContaining(
+        encodeURIComponent(`${LLSupport.reasonLabel()}: start-refused`),
+      ),
+    )
+  })
+
   it("labels the platform as Android on non-iOS devices", async () => {
     mockIsIos = false
     const { result } = renderHook(

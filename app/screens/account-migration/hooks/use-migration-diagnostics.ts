@@ -1,7 +1,6 @@
 import { useMemo } from "react"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { MigrationSupportReason } from "@app/types/migration"
 
 import { useMigrationSupportDetails } from "./use-migration-support-details"
 
@@ -15,12 +14,10 @@ export type MigrationDiagnostic = {
 /**
  * The labeled account diagnostics shared by the contact-support screen and the support
  * email: the custodial identity plus the provisioned wallet's pubkey, with the empty
- * values already filtered out. The reason leads the list because support triages on what
- * failed before it looks at any identifier.
+ * values already filtered out. Identity only, no failure reason: the screen exists so the
+ * user can copy who they are, and the reason is a code for support that the email carries.
  */
-export const useMigrationDiagnostics = (
-  reason: MigrationSupportReason,
-): readonly MigrationDiagnostic[] => {
+export const useMigrationDiagnostics = (): readonly MigrationDiagnostic[] => {
   const { LL } = useI18nContext()
   const LLSupport = LL.AccountMigration.contactSupport
   const { accountId, pubKey, username, email, phone } = useMigrationSupportDetails()
@@ -28,13 +25,12 @@ export const useMigrationDiagnostics = (
   return useMemo(
     () =>
       [
-        { label: LLSupport.reasonLabel(), value: reason, isIdentifier: false },
         { label: LLSupport.accountIdLabel(), value: accountId, isIdentifier: true },
         { label: LLSupport.pubKeyLabel(), value: pubKey, isIdentifier: true },
         { label: LLSupport.usernameLabel(), value: username, isIdentifier: false },
         { label: LLSupport.emailLabel(), value: email, isIdentifier: false },
         { label: LLSupport.phoneLabel(), value: phone, isIdentifier: false },
       ].filter((diagnostic) => Boolean(diagnostic.value)),
-    [LLSupport, reason, accountId, pubKey, username, email, phone],
+    [LLSupport, accountId, pubKey, username, email, phone],
   )
 }
