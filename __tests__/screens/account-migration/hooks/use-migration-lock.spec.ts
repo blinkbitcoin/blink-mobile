@@ -8,7 +8,7 @@ const mockUseMigrationStatus = jest.fn()
 let mockActiveAccountType: string | undefined = "custodial"
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
-  useMigrationStatus: () => mockUseMigrationStatus(),
+  useMigrationStatus: (options: unknown) => mockUseMigrationStatus(options),
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -23,7 +23,6 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 const serverReports = (status: MigrationStatus | null, loading = false) => ({
   status,
   loading,
-  isSkipped: false,
 })
 
 describe("useMigrationLock", () => {
@@ -111,6 +110,25 @@ describe("useMigrationLock", () => {
     const { result } = renderHook(() => useMigrationLock())
 
     expect(result.current.isLocked).toBe(false)
+  })
+
+  /** Only a custodial account can be mid-migration, so a self-custodial launch must not
+   *  pay for a no-cache status query whose result it discards. */
+  it("does not query the phase for a non-custodial account", () => {
+    mockActiveAccountType = "selfCustodial"
+    mockUseMigrationStatus.mockReturnValue(serverReports(null))
+
+    renderHook(() => useMigrationLock())
+
+    expect(mockUseMigrationStatus).toHaveBeenCalledWith({ skip: true })
+  })
+
+  it("queries the phase for a custodial account", () => {
+    mockUseMigrationStatus.mockReturnValue(serverReports(MigrationStatus.NotStarted))
+
+    renderHook(() => useMigrationLock())
+
+    expect(mockUseMigrationStatus).toHaveBeenCalledWith({ skip: false })
   })
 
   /**

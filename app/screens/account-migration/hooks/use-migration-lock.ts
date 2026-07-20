@@ -23,9 +23,13 @@ type MigrationLock = {
  */
 export const useMigrationLock = (): MigrationLock => {
   const { activeAccount } = useAccountRegistry()
-  const { status, loading } = useMigrationStatus()
 
-  if (activeAccount?.type !== AccountType.Custodial) {
+  /** Only a custodial account can be mid-migration, so the phase is never even asked for
+   *  on a self-custodial launch, whose result would be discarded anyway. */
+  const isCustodial = activeAccount?.type === AccountType.Custodial
+  const { status, loading } = useMigrationStatus({ skip: !isCustodial })
+
+  if (!isCustodial) {
     return { isLocked: false, loading: false }
   }
 

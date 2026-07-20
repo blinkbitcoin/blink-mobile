@@ -23,7 +23,6 @@ type UseMigrationStatusOptions = {
 type UseMigrationStatus = {
   status: MigrationStatus | null
   loading: boolean
-  isSkipped: boolean
 }
 
 /**
@@ -39,13 +38,12 @@ export const useMigrationStatus = ({
   skip = false,
 }: UseMigrationStatusOptions = {}): UseMigrationStatus => {
   const isAuthed = useIsAuthed()
-  const isSkipped = !isAuthed || skip
 
   /** no-cache for the same reason as the wind-down status and the preview, with a
    *  sharper consequence here: a cached read would let one account's migration phase
    *  lock a different account out of the app. */
   const { data, loading } = useMigrationStatusQuery({
-    skip: isSkipped,
+    skip: !isAuthed || skip,
     fetchPolicy: "no-cache",
     pollInterval,
   })
@@ -53,6 +51,5 @@ export const useMigrationStatus = ({
   return {
     status: data?.migration?.status ?? null,
     loading,
-    isSkipped,
   }
 }

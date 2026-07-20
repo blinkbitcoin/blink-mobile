@@ -47,10 +47,11 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
   const isAccountMissing =
     !migrationLoading && !hasProvisionedAccount && !hasSwappedRef.current
 
+  const isTransferSkipped = migrationLoading || isAccountMissing
   const { isTransferred, failureReason } = useMigrationTransfer({
     custodialAccountId: activeAccount?.id ?? null,
     selfCustodialAccountId: migrationAccountId,
-    skip: migrationLoading || isAccountMissing,
+    skip: isTransferSkipped,
   })
 
   useEffect(() => {

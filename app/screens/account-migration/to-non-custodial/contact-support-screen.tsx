@@ -15,6 +15,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks"
 /** Deep import on purpose: its device-location chain stays out of the hooks barrel. */
 import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/use-migration-support-email"
+import { MigrationSupportReason } from "@app/types/migration"
 import { ellipsizeMiddle } from "@app/utils/helper"
 import { testProps } from "@app/utils/testProps"
 
@@ -51,7 +52,11 @@ export const MigrationContactSupportScreen: React.FC = () => {
 
   const { params } =
     useRoute<RouteProp<RootStackParamList, "accountMigrationContactSupport">>()
-  const { diagnostics, sendSupportEmail } = useMigrationSupportEmail(params.reason)
+
+  /** Callers must pass a reason, but a navigation-state restore can land here with none;
+   *  a named fallback keeps the ticket meaningful instead of crashing on a missing param. */
+  const reason = params?.reason ?? MigrationSupportReason.Unknown
+  const { diagnostics, sendSupportEmail } = useMigrationSupportEmail(reason)
 
   /** Back never exits the migration: it returns to the commit point (Step 8). */
   const returnToBalanceSummary = useCallback(() => {

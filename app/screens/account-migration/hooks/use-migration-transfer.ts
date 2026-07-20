@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 import { gql } from "@apollo/client"
 
@@ -41,6 +41,20 @@ const DISCLOSURE_VERSION = "v1"
  *  immediate without turning a slow settle into a burst of reads. */
 const STATUS_POLL_INTERVAL_MS = 2000
 
+/**
+ * Custodial accounts whose commit has already fired this session. Unlike a per-mount ref
+ * this survives a remount, so a screen that re-mounts while the first commit is still in
+ * flight cannot fire a second one with a fresh invoice, which the backend refuses as a
+ * state conflict. A genuine relaunch starts empty but reads TRANSFERRING, which already
+ * blocks a re-commit.
+ */
+const accountsWithCommitStarted = new Set<string>()
+
+/** Clears the module-level commit guard; for test isolation, never called in production. */
+export const resetMigrationCommitGuard = (): void => {
+  accountsWithCommitStarted.clear()
+}
+
 type UseMigrationTransferArgs = {
   custodialAccountId: string | null
   selfCustodialAccountId: string | null
@@ -68,95 +82,102 @@ export const useMigrationTransfer = ({
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [commitMigration] = useMigrationCommitMutation()
   const [failureReason, setFailureReason] = useState<MigrationSupportReason | null>(null)
-  const hasCommittedRef = useRef(false)
 
-  /** Polling stops for good once the phase settles: reading `migration` runs the server's
-   *  resume routine every time, and this screen stays mounted under the one it hands over
-   *  to, so a finished transfer would otherwise be watched forever. */
-  const [hasSettled, setHasSettled] = useState(false)
+  /**
+   * Polling stops for good once there is nothing left to watch: a terminal phase, a
+   * client-side failure, or a caller that is skipping. Reading `migration` runs the
+   * server's resume routine every time and this screen stays mounted under the one it
+   * hands over to, so an unstopped poll would hammer the server forever. `pollInterval: 0`
+   * rather than `undefined` because Apollo drops an undefined option in its options merge,
+   * leaving the previous interval in place, where 0 actually clears the timer.
+   */
+  const [hasStopped, setHasStopped] = useState(false)
   const { status } = useMigrationStatus({
-    pollInterval: hasSettled ? undefined : STATUS_POLL_INTERVAL_MS,
+    skip,
+    pollInterval: hasStopped ? 0 : STATUS_POLL_INTERVAL_MS,
   })
 
-  const isTransferred = status === MigrationStatus.Completed
   const hasServerFailed = status === MigrationStatus.Failed
 
+  /** A failure already handed the user to support, so a later COMPLETED from a stray poll
+   *  must not also swap the session out from under that screen. */
+  const isTransferred = status === MigrationStatus.Completed && failureReason === null
+
   useEffect(() => {
-    if (!isTransferred && !hasServerFailed) return
-    setHasSettled(true)
-  }, [isTransferred, hasServerFailed])
+    if (isTransferred || hasServerFailed || failureReason !== null) setHasStopped(true)
+  }, [isTransferred, hasServerFailed, failureReason])
 
   const fail = useCallback((reason: MigrationSupportReason, err: unknown) => {
     reportError("Migration transfer", err)
     setFailureReason(reason)
   }, [])
 
-  const commit = useCallback(async () => {
-    if (!custodialAccountId || !selfCustodialAccountId) return
+  const commit = useCallback(
+    async (custodialId: string, selfCustodialId: string) => {
+      const proofTimestamp = currentProofTimestamp()
+      const result = await buildMigrationTransferRequest({
+        accountId: selfCustodialId,
+        network,
+        leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
+        signChallenge: (sparkPubkey) =>
+          buildMigrationProofChallenge({
+            custodialAccountId: custodialId,
+            sparkPubkey,
+            timestamp: proofTimestamp,
+          }),
+      })
 
-    const proofTimestamp = currentProofTimestamp()
-    const result = await buildMigrationTransferRequest({
-      accountId: selfCustodialAccountId,
-      network,
-      leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
-      signChallenge: (sparkPubkey) =>
-        buildMigrationProofChallenge({
-          custodialAccountId,
-          sparkPubkey,
-          timestamp: proofTimestamp,
-        }),
-    })
+      if (result.status === MigrationTransferRequestStatus.NoMnemonic) {
+        fail(
+          MigrationSupportReason.SelfCustodialAccountMissing,
+          new Error("No mnemonic for the provisioned account"),
+        )
+        return
+      }
 
-    if (result.status === MigrationTransferRequestStatus.NoMnemonic) {
-      fail(
-        MigrationSupportReason.SelfCustodialAccountMissing,
-        new Error("No mnemonic for the provisioned account"),
-      )
-      return
-    }
+      if (result.status === MigrationTransferRequestStatus.Failed) {
+        fail(MigrationSupportReason.TransferFailed, result.error)
+        return
+      }
 
-    if (result.status === MigrationTransferRequestStatus.Failed) {
-      fail(MigrationSupportReason.TransferFailed, result.error)
-      return
-    }
-
-    const { data } = await commitMigration({
-      variables: {
-        input: {
-          ...result.request,
-          proofTimestamp,
-          backupAttested: true,
-          disclosureVersion: DISCLOSURE_VERSION,
+      const { data } = await commitMigration({
+        variables: {
+          input: {
+            ...result.request,
+            proofTimestamp,
+            backupAttested: true,
+            disclosureVersion: DISCLOSURE_VERSION,
+          },
         },
-      },
-    })
+      })
 
-    const [rejection] = data?.migrationCommit.errors ?? []
-    if (rejection) {
-      fail(MigrationSupportReason.TransferFailed, new Error(rejection.message))
-    }
-  }, [
-    custodialAccountId,
-    selfCustodialAccountId,
-    network,
-    selfCustodialDepositClaimLeewayVbyte,
-    commitMigration,
-    fail,
-  ])
+      const [rejection] = data?.migrationCommit.errors ?? []
+      if (rejection) {
+        fail(MigrationSupportReason.TransferFailed, new Error(rejection.message))
+      }
+    },
+    [network, selfCustodialDepositClaimLeewayVbyte, commitMigration, fail],
+  )
 
   /** The server is waiting for a destination only while IN_PROGRESS: TRANSFERRING already
    *  has one, and committing a second invoice is refused as a state conflict. */
   const isAwaitingDestination = status === MigrationStatus.InProgress
   const hasFailed = failureReason !== null
+  const canCommit = isAwaitingDestination && !skip && !hasFailed
 
   useEffect(() => {
-    const shouldCommit = isAwaitingDestination && !skip && !hasFailed
-    if (!shouldCommit || hasCommittedRef.current) return
+    if (!canCommit) return
 
-    /** Claimed before the request goes out, since the commit is single-shot server-side. */
-    hasCommittedRef.current = true
-    commit().catch((err) => fail(MigrationSupportReason.TransferFailed, err))
-  }, [isAwaitingDestination, skip, hasFailed, commit, fail])
+    /** Both ids checked before the guard is claimed, so a transient null never latches
+     *  out a commit that could still fire once the id arrives. */
+    if (!custodialAccountId || !selfCustodialAccountId) return
+    if (accountsWithCommitStarted.has(custodialAccountId)) return
+
+    accountsWithCommitStarted.add(custodialAccountId)
+    commit(custodialAccountId, selfCustodialAccountId).catch((err) =>
+      fail(MigrationSupportReason.TransferFailed, err),
+    )
+  }, [canCommit, custodialAccountId, selfCustodialAccountId, commit, fail])
 
   /** FAILED has no client-side way back: the phase machine only leaves it when a late
    *  payment settles server-side, so offering a retry would loop on a refusal. */

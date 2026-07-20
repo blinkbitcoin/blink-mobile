@@ -24,7 +24,7 @@ jest.mock("@app/screens/account-migration/hooks/use-complete-migration", () => (
 jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
   useMigrationStatus: (options: unknown) => {
     mockUseMigrationStatus(options)
-    return { status: mockStatus, loading: false, isSkipped: false }
+    return { status: mockStatus, loading: false }
   },
 }))
 
@@ -97,16 +97,32 @@ describe("useResumeCompletedMigration", () => {
     expect(mockUseMigrationStatus).toHaveBeenCalledWith({ skip: false })
   })
 
-  /** The funds have already landed, so a failed swap is a launch that can retry, not a
-   *  reason to strand the user anywhere. */
-  it("reports a swap that throws without escaping", async () => {
+  /** The funds have already landed, so a transient failure (a briefly locked keystore)
+   *  is retried a few times rather than stranding the user, and each attempt is reported. */
+  it("retries a throwing swap a bounded number of times", async () => {
     mockCompleteMigration.mockRejectedValue(new Error("keystore locked"))
     renderHook(() => useResumeCompletedMigration())
     await flushEffects()
 
-    expect(mockReportError).toHaveBeenCalledWith(
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(3)
+    expect(mockReportError).toHaveBeenLastCalledWith(
       "Migration resume swap",
       expect.objectContaining({ message: "keystore locked" }),
     )
+  })
+
+  /** A retry that succeeds stops there: the swap clears the checkpoint, so there is
+   *  nothing left to finish. */
+  it("stops retrying once a swap succeeds", async () => {
+    mockCompleteMigration
+      .mockRejectedValueOnce(new Error("keystore locked"))
+      .mockImplementationOnce(async () => {
+        mockMigrationAccountId = null
+        return true
+      })
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(2)
   })
 })

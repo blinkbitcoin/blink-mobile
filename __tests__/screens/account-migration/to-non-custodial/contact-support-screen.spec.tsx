@@ -25,12 +25,13 @@ let mockDetails = {
 }
 
 let mockReason: MigrationSupportReason = MigrationSupportReason.PreviewUnavailable
+let mockHasParams = true
 
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
-  useRoute: () => ({ params: { reason: mockReason } }),
+  useRoute: () => ({ params: mockHasParams ? { reason: mockReason } : undefined }),
   useFocusEffect: (callback: () => void | (() => void)) =>
     jest.requireActual<typeof import("react")>("react").useEffect(callback, [callback]),
 }))
@@ -78,6 +79,7 @@ describe("MigrationContactSupportScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockReason = MigrationSupportReason.PreviewUnavailable
+    mockHasParams = true
     mockDetails = {
       accountId: "18A4242",
       pubKey: "spbc1pdjsovJFPej9i2vuK",
@@ -170,6 +172,16 @@ describe("MigrationContactSupportScreen", () => {
 
     expect(screen.queryByText(LLSupport.reasonLabel())).toBeNull()
     expect(screen.queryByText("self-custodial-account-missing")).toBeNull()
+  })
+
+  /** A navigation-state restore can land here with no params; a named fallback keeps the
+   *  ticket meaningful instead of crashing on the screen a stranded user was handed. */
+  it("falls back to an unknown reason when the screen is reached without params", async () => {
+    mockHasParams = false
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("unknown")
   })
 
   it("sends the support email from the contact action", async () => {
