@@ -7532,6 +7532,14 @@ type RootTranslation = {
 		 */
 		setYourLightningAddress: string
 		/**
+		 * C​r​e​a​t​e​ ​a​d​d​r​e​s​s
+		 */
+		createAddress: string
+		/**
+		 * D​o​n​a​t​i​o​n​ ​b​u​t​t​o​n
+		 */
+		donationButton: string
+		/**
 		 * A​c​t​i​v​a​t​e​d
 		 */
 		activated: string
@@ -19815,6 +19823,14 @@ export type TranslationFunctions = {
 		 * Set your lightning address
 		 */
 		setYourLightningAddress: () => LocalizedString
+		/**
+		 * Create address
+		 */
+		createAddress: () => LocalizedString
+		/**
+		 * Donation button
+		 */
+		donationButton: () => LocalizedString
 		/**
 		 * Activated
 		 */

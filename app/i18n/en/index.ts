@@ -2402,6 +2402,8 @@ const en: BaseTranslation = {
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
     setYourLightningAddress: "Set your lightning address",
+    createAddress: "Create address",
+    donationButton: "Donation button",
     activated: "Activated",
     addressScreen: "Ways to get paid",
     nonCustodialAccount: "Non-custodial account",

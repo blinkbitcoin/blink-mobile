@@ -9,11 +9,11 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig, useClipboard } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 import { getLightningAddress } from "@app/utils/pay-links"
 
 import { SettingsRow } from "../row"
+import { useSelfCustodialLightningAddress } from "./use-self-custodial-lightning-address"
 
 const SUBTITLE_SHORTER_LENGTH = 22
 
@@ -29,12 +29,14 @@ export const AccountLNAddress: React.FC = () => {
 type LightningAddressRowProps = {
   address: string | null
   loading?: boolean
+  noAddressLabel?: string
   renderModal: (modal: { isVisible: boolean; toggleModal: () => void }) => React.ReactNode
 }
 
 const LightningAddressRow: React.FC<LightningAddressRowProps> = ({
   address,
   loading,
+  noAddressLabel,
   renderModal,
 }) => {
   const {
@@ -55,7 +57,7 @@ const LightningAddressRow: React.FC<LightningAddressRowProps> = ({
     <>
       <SettingsRow
         loading={loading}
-        title={address ?? LL.SettingsScreen.setYourLightningAddress()}
+        title={address ?? noAddressLabel ?? LL.SettingsScreen.setYourLightningAddress()}
         subtitleShorter={(address ?? "").length > SUBTITLE_SHORTER_LENGTH}
         leftGaloyIcon="lightning-address"
         rightIcon={
@@ -92,22 +94,13 @@ const CustodialLightningAddressRow: React.FC = () => {
 }
 
 const SelfCustodialLightningAddressRow: React.FC = () => {
-  const { activeAccount, selfCustodialEntries } = useAccountRegistry()
-  const { lightningAddress: liveLightningAddress } = useSelfCustodialWallet()
-
-  const persistedLightningAddress =
-    selfCustodialEntries.find((entry) => entry.id === activeAccount?.id)
-      ?.lightningAddress ?? null
-
-  /**
-   * Prefer the live SDK address but fall back to the persisted one while the SDK
-   * reconnects, so a user who already registered never sees the "set" prompt.
-   */
-  const address = liveLightningAddress ?? persistedLightningAddress
+  const { LL } = useI18nContext()
+  const address = useSelfCustodialLightningAddress()
 
   return (
     <LightningAddressRow
       address={address}
+      noAddressLabel={LL.SettingsScreen.createAddress()}
       renderModal={({ isVisible, toggleModal }) => (
         <SetSelfCustodialLightningAddressModal
           isVisible={isVisible}
