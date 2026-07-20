@@ -2319,6 +2319,7 @@
     "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف."
   },
   "SettingsScreen": {
+    "donationButton": "زر",
     "staticQr": "رمز QR ثابت قابل للطباعة",
     "staticQrCopied": "تم نسخ رابط رمز QR الثابت الخاص بك",
     "setByOs": "محدد بواسطة نظام التشغيل",

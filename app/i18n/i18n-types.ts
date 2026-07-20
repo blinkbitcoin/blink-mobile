@@ -19828,7 +19828,7 @@ export type TranslationFunctions = {
 		 */
 		createAddress: () => LocalizedString
 		/**
-		 * Donation button
+		 * Button
 		 */
 		donationButton: () => LocalizedString
 		/**

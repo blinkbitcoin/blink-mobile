@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Հնարավոր չէ հաշվարկել վճարները։ Խնդրում ենք փորձել այլ գումար։"
   },
   "SettingsScreen": {
+    "donationButton": "Կոճակ",
     "staticQr": "Տպելի ստատիկ QR",
     "staticQrCopied": "Ձեր ստատիկ QR կոդի հղումը պատծենվել է",
     "setByOs": "Սահմանված է ՕՍ-ի կողմից",
