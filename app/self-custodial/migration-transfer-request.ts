@@ -47,6 +47,17 @@ const toFailed = (err: unknown): MigrationTransferRequestResult => ({
   error: err instanceof Error ? err : new Error(String(err)),
 })
 
+const SECONDS_PER_DAY = 24 * 60 * 60
+
+/**
+ * A full day of invoice lifetime. The backend settles the drain within seconds of the
+ * commit, so this is far beyond any real payment or retry window, and Spark holds an
+ * incoming payment for an offline wallet and claims it on the next sync, so the disconnect
+ * right after does not lose it. A long explicit expiry beats leaving it to the SDK's
+ * unspecified default: a migration invoice that lapses would strand the transfer.
+ */
+const MIGRATION_INVOICE_EXPIRY_SECONDS = SECONDS_PER_DAY
+
 /**
  * Collects what the backend needs to pay a migration into a self-custodial wallet that is
  * provisioned but not the active session, so no connected SDK exists for it. One
@@ -73,16 +84,23 @@ export const buildMigrationTransferRequest = async ({
       leewaySatPerVbyte,
     })
 
-    const { identityPubkey } = await getWalletInfo(sdk)
+    /** The pubkey and the invoice are independent, so they resolve together; only the
+     *  signature depends on the pubkey and follows it. No amount on the invoice: the
+     *  server drains what it can and decides the figure, so one naming an amount would
+     *  only be a second opinion it has to refuse. */
+    const [{ identityPubkey }, { invoice, errors }] = await Promise.all([
+      getWalletInfo(sdk),
+      createReceiveLightning(sdk)({
+        memo: undefined,
+        expirySecs: MIGRATION_INVOICE_EXPIRY_SECONDS,
+      }),
+    ])
+    if (!invoice) throw new Error(errors?.[0]?.message ?? "No invoice returned")
+
     const { signature } = await sdk.signMessage({
       message: signChallenge(identityPubkey),
       compact: true,
     })
-
-    /** No amount: the server drains what it can and decides the figure, so an invoice
-     *  naming one would only be a second opinion it has to refuse. */
-    const { invoice, errors } = await createReceiveLightning(sdk)({ memo: undefined })
-    if (!invoice) throw new Error(errors?.[0]?.message ?? "No invoice returned")
 
     return {
       status: MigrationTransferRequestStatus.Ok,

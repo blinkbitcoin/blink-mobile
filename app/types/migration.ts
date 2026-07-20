@@ -26,6 +26,9 @@ export const MigrationSupportReason = {
   SelfCustodialAccountMissing: "self-custodial-account-missing",
   /** The transfer itself failed or threw. */
   TransferFailed: "transfer-failed",
+  /** The support screen was reached without a reason, e.g. after a navigation-state
+   *  restore; a named fallback so the ticket is never blank and never a bare string. */
+  Unknown: "unknown",
 } as const
 
 export type MigrationSupportReason =

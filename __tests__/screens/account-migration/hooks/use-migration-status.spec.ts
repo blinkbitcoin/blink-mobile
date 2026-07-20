@@ -37,7 +37,6 @@ describe("useMigrationStatus", () => {
 
     expect(result.current.status).toBe(MigrationStatus.InProgress)
     expect(result.current.loading).toBe(false)
-    expect(result.current.isSkipped).toBe(false)
   })
 
   it("reports loading while the query is in flight, with no status yet", () => {
@@ -62,7 +61,7 @@ describe("useMigrationStatus", () => {
     expect(result.current.status).toBeNull()
   })
 
-  it("flags the query as skipped while the user is not authenticated", () => {
+  it("skips the query while the user is not authenticated", () => {
     mockIsAuthed = false
     mockUseMigrationStatusQuery.mockReturnValue({ data: undefined, loading: false })
 
@@ -71,8 +70,8 @@ describe("useMigrationStatus", () => {
     expect(mockUseMigrationStatusQuery).toHaveBeenCalledWith({
       skip: true,
       fetchPolicy: "no-cache",
+      pollInterval: undefined,
     })
-    expect(result.current.isSkipped).toBe(true)
     expect(result.current.status).toBeNull()
   })
 
@@ -85,7 +84,6 @@ describe("useMigrationStatus", () => {
     expect(mockUseMigrationStatusQuery).toHaveBeenCalledWith(
       expect.objectContaining({ skip: true }),
     )
-    expect(result.current.isSkipped).toBe(true)
     expect(result.current.status).toBeNull()
   })
 

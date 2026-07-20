@@ -89,13 +89,17 @@ describe("buildMigrationTransferRequest", () => {
   })
 
   /** A no-amount invoice: the server decides the figure, and one naming an amount would
-   *  only be a second opinion it has to refuse. */
-  it("asks for an invoice with no amount", async () => {
+   *  only be a second opinion it has to refuse. A day of expiry outlives the prompt drain
+   *  rather than leaving the lifetime to the SDK's unspecified default. */
+  it("asks for a no-amount invoice with an explicit long expiry", async () => {
     withSignMessage(jest.fn().mockResolvedValue({ signature: "deadbeef" }))
 
     await buildRequest()
 
-    expect(mockReceiveLightning).toHaveBeenCalledWith({ memo: undefined })
+    expect(mockReceiveLightning).toHaveBeenCalledWith({
+      memo: undefined,
+      expirySecs: 24 * 60 * 60,
+    })
   })
 
   it("connects once, against the provisioned account's own storage", async () => {

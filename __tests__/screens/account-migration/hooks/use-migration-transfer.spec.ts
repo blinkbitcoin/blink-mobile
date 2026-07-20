@@ -1,7 +1,10 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
-import { useMigrationTransfer } from "@app/screens/account-migration/hooks/use-migration-transfer"
+import {
+  resetMigrationCommitGuard,
+  useMigrationTransfer,
+} from "@app/screens/account-migration/hooks/use-migration-transfer"
 import { MigrationTransferRequestStatus } from "@app/self-custodial/migration-transfer-request"
 import { MigrationSupportReason } from "@app/types/migration"
 
@@ -22,7 +25,7 @@ const mockUseMigrationStatus = jest.fn()
 jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
   useMigrationStatus: (options: unknown) => {
     mockUseMigrationStatus(options)
-    return { status: mockStatus, loading: false, isSkipped: false }
+    return { status: mockStatus, loading: false }
   },
 }))
 
@@ -66,6 +69,7 @@ const renderTransfer = (
 describe("useMigrationTransfer", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    resetMigrationCommitGuard()
     mockStatus = MigrationStatus.InProgress
     mockBuildTransferRequest.mockResolvedValue({
       status: MigrationTransferRequestStatus.Ok,
@@ -126,6 +130,20 @@ describe("useMigrationTransfer", () => {
     expect(mockCommitMigration).toHaveBeenCalledTimes(1)
   })
 
+  /** A per-mount ref would reset on a remount; the module guard does not, so a screen that
+   *  re-mounts while the first commit is still in flight never sends a second invoice the
+   *  backend would refuse as a state conflict. */
+  it("commits once for an account even across a remount", async () => {
+    const first = renderTransfer()
+    await flushEffects()
+    first.unmount()
+
+    renderTransfer()
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+  })
+
   it("does not commit while the caller is skipping", async () => {
     renderTransfer({ skip: true })
     await flushEffects()
@@ -140,21 +158,51 @@ describe("useMigrationTransfer", () => {
     expect(mockBuildTransferRequest).not.toHaveBeenCalled()
   })
 
+  /** A transiently null account id must not consume the single-shot commit: the guard is
+   *  in shouldCommit, so the commit still fires once the id arrives rather than being
+   *  latched out forever. */
+  it("commits once the custodial account id arrives, not before", async () => {
+    const { rerender } = renderHook(
+      ({ custodialAccountId }: { custodialAccountId: string | null }) =>
+        useMigrationTransfer({
+          custodialAccountId,
+          selfCustodialAccountId: "sc-account-1",
+          skip: false,
+        }),
+      { initialProps: { custodialAccountId: null as string | null } },
+    )
+    await flushEffects()
+    expect(mockCommitMigration).not.toHaveBeenCalled()
+
+    rerender({ custodialAccountId: "custodial-1" })
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+  })
+
   /** Reading `migration` runs the server's resume routine every time, and this hook's
    *  screen stays mounted under the one it hands over to. */
   it("watches the phase while the transfer is still moving", async () => {
     renderTransfer()
     await flushEffects()
 
-    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith({ pollInterval: 2000 })
+    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith({
+      skip: false,
+      pollInterval: 2000,
+    })
   })
 
+  /** pollInterval 0, not undefined: Apollo drops an undefined option in its merge and
+   *  keeps polling, where 0 clears the timer. */
   it("stops watching once the phase settles", async () => {
     mockStatus = MigrationStatus.Completed
     renderTransfer()
     await flushEffects()
 
-    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith({ pollInterval: undefined })
+    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith({
+      skip: false,
+      pollInterval: 0,
+    })
   })
 
   it("stops watching a transfer the server failed", async () => {
@@ -162,7 +210,56 @@ describe("useMigrationTransfer", () => {
     renderTransfer()
     await flushEffects()
 
-    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith({ pollInterval: undefined })
+    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith({
+      skip: false,
+      pollInterval: 0,
+    })
+  })
+
+  /** A client-side failure hands the user to support; the poll must stop too, or a later
+   *  COMPLETED would swap the session out from under that screen. */
+  it("stops watching once a client-side failure is recorded", async () => {
+    mockBuildTransferRequest.mockResolvedValue({
+      status: MigrationTransferRequestStatus.Failed,
+      error: new Error("signer unavailable"),
+    })
+    renderTransfer()
+    await flushEffects()
+
+    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith({
+      skip: false,
+      pollInterval: 0,
+    })
+  })
+
+  /** The poll is silenced entirely while the caller is skipping, not just throttled. */
+  it("does not watch the phase while the caller is skipping", async () => {
+    renderTransfer({ skip: true })
+    await flushEffects()
+
+    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith(
+      expect.objectContaining({ skip: true }),
+    )
+  })
+
+  /** A COMPLETED that arrives after a failure must not report the transfer as done, or
+   *  the screen swaps the session while the user sits on the support screen. */
+  it("does not report done once a failure has handed over to support", async () => {
+    mockStatus = MigrationStatus.InProgress
+    mockCommitMigration.mockResolvedValue({
+      data: { migrationCommit: { errors: [{ message: "refused" }] } },
+    })
+    const { result, rerender } = renderTransfer()
+    await flushEffects()
+    expect(result.current.failureReason).toBe(MigrationSupportReason.TransferFailed)
+
+    /** The server nonetheless reaches COMPLETED and a stray poll observes it. */
+    mockStatus = MigrationStatus.Completed
+    rerender({})
+    await flushEffects()
+
+    expect(result.current.isTransferred).toBe(false)
+    expect(result.current.failureReason).toBe(MigrationSupportReason.TransferFailed)
   })
 
   it("reports the transfer done once the server says so", async () => {

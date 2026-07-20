@@ -1,10 +1,14 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import { reportError } from "@app/utils/error-logging"
 
 import { useCompleteMigration } from "./use-complete-migration"
 import { useMigrationStatus } from "./use-migration-status"
+
+/** A transient swap failure (a briefly locked keystore) can clear on a retry, so a few
+ *  are attempted before leaving the rest to the next launch, which starts the count over. */
+const MAX_SWAP_ATTEMPTS = 3
 
 /**
  * Finishes a migration the server completed but this device never swapped away from. The
@@ -22,17 +26,26 @@ export const useResumeCompletedMigration = (): void => {
   const hasUnfinishedMigration = Boolean(migrationAccountId)
   const { status } = useMigrationStatus({ skip: !hasUnfinishedMigration })
 
-  const hasResumedRef = useRef(false)
+  const [attempts, setAttempts] = useState(0)
+  const isSwapInFlightRef = useRef(false)
   const isSwapPending =
     status === MigrationStatus.Completed && hasUnfinishedMigration && !migrationLoading
 
   useEffect(() => {
-    if (!isSwapPending || hasResumedRef.current) return
+    const canAttempt = isSwapPending && attempts < MAX_SWAP_ATTEMPTS
+    if (!canAttempt || isSwapInFlightRef.current) return
 
-    /** Claimed once per launch: the swap discards a session and cannot be half-run. */
-    hasResumedRef.current = true
-    completeMigration().catch((err) => {
-      reportError("Migration resume swap", err)
-    })
-  }, [isSwapPending, completeMigration])
+    /** One swap in flight at a time: it discards a session and cannot be half-run. A
+     *  failure bumps the count, which both re-runs this effect for the retry and stops it
+     *  once the attempts are spent. */
+    isSwapInFlightRef.current = true
+    completeMigration()
+      .catch((err) => {
+        reportError("Migration resume swap", err)
+        setAttempts((previous) => previous + 1)
+      })
+      .finally(() => {
+        isSwapInFlightRef.current = false
+      })
+  }, [isSwapPending, attempts, completeMigration])
 }
