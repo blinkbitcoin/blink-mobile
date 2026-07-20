@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Anwani yako ya Lightning itahamishiwa kwenye akaunti yako mpya ya non-custodial.",
     "keepReceivingLnAddressLabel": "Anwani yako ya LN",
     "keepReceivingCta": "Vizuri",
+    "receivingDisabledToast": "Kupokea kumezimwa kwa sasa.",
     "downloadHistoryTitle": "Pakua historia ya miamala yako",
     "downloadHistoryBody": "Akaunti yako mpya itaanza upya. Ikiwa unataka kuweka kumbukumbu ya miamala yako, ipakue sasa kama CSV.",
     "downloadHistoryDownloadCta": "Pakua",

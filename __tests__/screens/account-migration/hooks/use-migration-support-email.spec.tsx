@@ -1,6 +1,6 @@
 import React from "react"
 import { Linking } from "react-native"
-import { renderHook } from "@testing-library/react-native"
+import { act, renderHook } from "@testing-library/react-native"
 
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -82,10 +82,12 @@ describe("useMigrationSupportEmail", () => {
     jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve())
   })
 
-  it("opens the structured support email with the full diagnostics", () => {
+  it("opens the structured support email with the full diagnostics", async () => {
     const { result } = renderHook(() => useMigrationSupportEmail(), { wrapper })
 
-    result.current.sendSupportEmail()
+    await act(async () => {
+      result.current.sendSupportEmail()
+    })
 
     const expectedBody = [
       LLSupport.emailAccountInfo(),
@@ -106,12 +108,14 @@ describe("useMigrationSupportEmail", () => {
     expect(Linking.openURL).toHaveBeenCalledWith(expectedMailto(expectedBody))
   })
 
-  it("skips the empty diagnostics and the country when they are unavailable", () => {
+  it("skips the empty diagnostics and the country when they are unavailable", async () => {
     mockDetails = { ...mockDetails, username: "", email: "" }
     mockCountryCode = undefined
     const { result } = renderHook(() => useMigrationSupportEmail(), { wrapper })
 
-    result.current.sendSupportEmail()
+    await act(async () => {
+      result.current.sendSupportEmail()
+    })
 
     const expectedBody = [
       LLSupport.emailAccountInfo(),
@@ -129,11 +133,13 @@ describe("useMigrationSupportEmail", () => {
     expect(Linking.openURL).toHaveBeenCalledWith(expectedMailto(expectedBody))
   })
 
-  it("labels the platform as Android on non-iOS devices", () => {
+  it("labels the platform as Android on non-iOS devices", async () => {
     mockIsIos = false
     const { result } = renderHook(() => useMigrationSupportEmail(), { wrapper })
 
-    result.current.sendSupportEmail()
+    await act(async () => {
+      result.current.sendSupportEmail()
+    })
 
     expect(Linking.openURL).toHaveBeenCalledWith(
       expect.stringContaining(

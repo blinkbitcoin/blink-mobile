@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Lightning tinkunaykiqa musuq non-custodial akawuntiykiman apachkanqa.",
     "keepReceivingLnAddressLabel": "LN tinkunayki",
     "keepReceivingCta": "Allinmi",
+    "receivingDisabledToast": "Chaskiyqa kunanqa harkasqam.",
     "downloadHistoryTitle": "Transaksiykikunaq willakuyninta uraqichiy",
     "downloadHistoryBody": "Musuq akawuntiyki mosoqmanta qallarinqa. Transaksiykikunaq willakuyninta waqaychayta munaspaqa, kunan CSV hina uraqichiy.",
     "downloadHistoryDownloadCta": "Uraqichiy",

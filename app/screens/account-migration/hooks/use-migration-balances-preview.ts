@@ -25,7 +25,11 @@ export const useMigrationBalancesPreview = () => {
   const { LL } = useI18nContext()
   const LLOverview = LL.AccountMigration.balancesOverview
 
-  const { btcBalanceSats, usdBalanceCents, isReady } = useCustodialWalletBalances()
+  /** cache-and-network so a payment received moments before this commit screen still
+   *  lands in the balance the user is about to approve, not a stale cache-first figure. */
+  const { btcBalanceSats, usdBalanceCents, isReady } = useCustodialWalletBalances({
+    fetchPolicy: "cache-and-network",
+  })
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
   const isPostGate = useWindDownGateArmed()
   const isNewDollarBalanceRestricted = useDollarBalanceRestricted(

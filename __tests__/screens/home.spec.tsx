@@ -164,9 +164,17 @@ jest.mock("@app/components/migrate-now-modal", () => {
   const ReactActual = jest.requireActual("react")
   const { View } = jest.requireActual("react-native")
   return {
-    MigrateNowModal: (props: { onMigrate: () => void; toggleModal: () => void }) => {
+    MigrateNowModal: (props: {
+      isVisible: boolean
+      onMigrate: () => void
+      toggleModal: () => void
+    }) => {
       mockMigrateNowModal(props)
-      return ReactActual.createElement(View, { testID: "migrate-now-modal" })
+      /** Always mounted now, toggled by isVisible: mirror the real modal so a hidden
+       *  instance is absent from the tree, as the "not shown" assertions expect. */
+      return props.isVisible
+        ? ReactActual.createElement(View, { testID: "migrate-now-modal" })
+        : null
     },
   }
 })
@@ -179,6 +187,12 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-reminder-bulletin"
     deadlineTimestamp: 1787003999,
     timezone: "Europe/Paris",
   }),
+}))
+
+let mockReceiveBlocked = false
+
+jest.mock("@app/screens/account-migration/hooks/use-wind-down-receive-blocked", () => ({
+  useWindDownReceiveBlocked: () => mockReceiveBlocked,
 }))
 
 const mockMigrationReminderBulletin = jest.fn()
@@ -608,6 +622,7 @@ describe("HomeScreen", () => {
     mockDollarBalanceRestrictedOverride = false
     mockMigratePromptVisible = false
     mockReceiveDisabled = false
+    mockReceiveBlocked = false
     mockReminderBulletinVisible = false
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
@@ -1394,6 +1409,7 @@ describe("HomeScreen wind-down states", () => {
     mockDollarBalanceRestrictedOverride = false
     mockMigratePromptVisible = false
     mockReceiveDisabled = false
+    mockReceiveBlocked = false
     mockReminderBulletinVisible = false
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
@@ -1546,6 +1562,7 @@ describe("HomeScreen wind-down states", () => {
 
   it("greys out the receive action while receiving is disabled, reopening the prompt", async () => {
     mockReceiveDisabled = true
+    mockReceiveBlocked = true
     mockNavigate.mockClear()
 
     const { getByTestId } = render(

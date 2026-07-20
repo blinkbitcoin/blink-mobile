@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Adresa dvs. Lightning va fi transferată în noul dvs. cont non-custodial.",
     "keepReceivingLnAddressLabel": "Adresa dvs. LN",
     "keepReceivingCta": "Excelent",
+    "receivingDisabledToast": "Primirea este momentan dezactivată.",
     "downloadHistoryTitle": "Descarcă-ți istoricul tranzacțiilor",
     "downloadHistoryBody": "Noul tău cont va porni de la zero. Dacă vrei să păstrezi o evidență a tranzacțiilor tale, descarcă-le acum ca CSV.",
     "downloadHistoryDownloadCta": "Descarcă",

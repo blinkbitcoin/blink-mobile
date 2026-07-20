@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Ваша Lightning адреса биће пренета на ваш нови non-custodial налог.",
     "keepReceivingLnAddressLabel": "Ваша LN адреса",
     "keepReceivingCta": "Одлично",
+    "receivingDisabledToast": "Примање је тренутно онемогућено.",
     "downloadHistoryTitle": "Преузмите историју трансакција",
     "downloadHistoryBody": "Ваш нови налог почиње испочетка. Ако желите да сачувате евиденцију својих трансакција, преузмите их сада као CSV.",
     "downloadHistoryDownloadCta": "Преузми",

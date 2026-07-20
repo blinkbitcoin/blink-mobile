@@ -112,10 +112,4 @@ const useStyles = makeStyles(({ colors }) => ({
     lineHeight: 24,
     textAlign: "center",
   },
-  buttonsContainer: {
-    gap: 10,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: 10,
-  },
 }))

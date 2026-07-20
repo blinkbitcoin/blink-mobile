@@ -1,6 +1,6 @@
 import React from "react"
 import { Linking } from "react-native"
-import { render, screen, fireEvent } from "@testing-library/react-native"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -50,7 +50,9 @@ describe("MigrationApiServiceScreen", () => {
 
     fireEvent.press(screen.getByText(LL.AccountMigration.apiServiceContactCta()))
 
-    expect(Linking.openURL).toHaveBeenCalledWith("mailto:support@blink.sv")
+    await waitFor(() =>
+      expect(Linking.openURL).toHaveBeenCalledWith("mailto:support@blink.sv"),
+    )
   })
 
   it("acknowledges the warning when Continue anyways is pressed", async () => {

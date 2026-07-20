@@ -2,6 +2,7 @@ import { useCallback } from "react"
 import { Linking } from "react-native"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { useClipboard } from "@app/hooks/use-clipboard"
 
 type SupportEmailDraft = {
   subject: string
@@ -22,20 +23,36 @@ type UseContactSupport = {
  */
 export const useContactSupport = (): UseContactSupport => {
   const { supportEmailAddress } = useRemoteConfig()
+  const { copyToClipboard } = useClipboard()
+
+  /** Without a mail app Linking.openURL rejects; catch it and copy the address so the user
+   *  is never stranded on screens whose only action is Contact us. We try-then-catch rather
+   *  than gate on canOpenURL, which needs a per-scheme manifest declaration (mailto has none
+   *  here) and so reports false negatives on Android 11+, wrongly copying when mail exists. */
+  const openMailto = useCallback(
+    async (url: string): Promise<void> => {
+      try {
+        await Linking.openURL(url)
+      } catch {
+        copyToClipboard({ content: supportEmailAddress })
+      }
+    },
+    [supportEmailAddress, copyToClipboard],
+  )
 
   const openSupport = useCallback(
-    () => Linking.openURL(`mailto:${supportEmailAddress}`),
-    [supportEmailAddress],
+    () => openMailto(`mailto:${supportEmailAddress}`),
+    [openMailto, supportEmailAddress],
   )
 
   const composeSupport = useCallback(
     ({ subject, body }: SupportEmailDraft) =>
-      Linking.openURL(
+      openMailto(
         `mailto:${supportEmailAddress}?subject=${encodeURIComponent(
           subject,
         )}&body=${encodeURIComponent(body)}`,
       ),
-    [supportEmailAddress],
+    [openMailto, supportEmailAddress],
   )
 
   return { supportEmailAddress, openSupport, composeSupport }

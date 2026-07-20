@@ -1,5 +1,10 @@
 import { it } from "@jest/globals"
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
+}))
+
 import {
   formatCardValidThruDisplay,
   formatDateFromNow,
@@ -376,6 +381,22 @@ describe("date utils", () => {
           timezone: "America/El_Salvador",
         }),
       ).toBe("August 31")
+    })
+
+    it("falls back to the device timezone and reports when the timezone is malformed", () => {
+      mockReportError.mockClear()
+
+      const formatted = formatDayAndMonth({
+        timestampSeconds: AUG_31_2026_NOON_UTC,
+        locale: "en-US",
+        timezone: "Not/A_Timezone",
+      })
+
+      expect(formatted).toContain("August")
+      expect(mockReportError).toHaveBeenCalledWith(
+        "formatDayAndMonth timezone",
+        expect.any(Error),
+      )
     })
   })
 })

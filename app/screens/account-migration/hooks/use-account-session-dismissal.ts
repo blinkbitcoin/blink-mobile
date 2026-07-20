@@ -1,19 +1,20 @@
 import { useCallback, useState } from "react"
 
-import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useCustodialOwnerId } from "./use-custodial-owner-id"
 
 /**
- * Session-scoped dismissal keyed by account: a dismissal made on one account must not
- * suppress the prompt for another one after a profile switch, so each account carries
- * its own mark for the rest of the session.
+ * Session-scoped dismissal keyed by the real custodial owner: a dismissal made on one
+ * profile must not suppress the prompt for another after a switch, so each carries its own
+ * mark for the rest of the session. The Galoy account id is the key, since the registry's
+ * `custodial-default` is shared across profiles.
  */
 export const useAccountSessionDismissal = () => {
-  const { activeAccount } = useAccountRegistry()
+  const { ownerId } = useCustodialOwnerId()
   const [dismissedAccountIds, setDismissedAccountIds] = useState<ReadonlySet<string>>(
     new Set(),
   )
 
-  const activeAccountId = activeAccount?.id ?? null
+  const activeAccountId = ownerId
 
   const dismissForSession = useCallback(() => {
     if (!activeAccountId) return

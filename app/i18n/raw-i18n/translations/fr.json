@@ -3600,6 +3600,7 @@
         "keepReceivingBody": "Votre adresse Lightning sera transférée vers votre nouveau compte non-custodial.",
         "keepReceivingLnAddressLabel": "Votre adresse LN",
         "keepReceivingCta": "Parfait",
+        "receivingDisabledToast": "La réception est actuellement désactivée.",
         "downloadHistoryTitle": "Téléchargez votre historique de transactions",
         "downloadHistoryBody": "Votre nouveau compte démarrera à zéro. Si vous souhaitez conserver une trace de vos transactions, téléchargez-les maintenant au format CSV.",
         "downloadHistoryDownloadCta": "Télécharger",

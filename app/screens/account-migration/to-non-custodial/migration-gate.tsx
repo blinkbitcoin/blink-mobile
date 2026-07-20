@@ -3,13 +3,17 @@ import { ActivityIndicator, View } from "react-native"
 
 import { useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { DollarBalanceMigrationModal } from "@app/components/dollar-balance-migration-modal"
 import { Screen } from "@app/components/screen"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
 import { useTransferBlocked } from "@app/hooks/use-transfer-blocked"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { TemporarilyUnavailableScreen } from "@app/screens/feature-unavailable/temporarily-unavailable-screen"
 import { WindDownStatus } from "@app/types/wind-down"
 import { testProps } from "@app/utils/testProps"
 
@@ -18,6 +22,7 @@ import {
   useCustodialWalletBalances,
 } from "@app/screens/account-migration/hooks"
 import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
+import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 
 import { MigrationApiServiceScreen } from "./api-service-screen"
 import { MigrationMode, MigrationRequiredScreen } from "./migration-required-screen"
@@ -49,7 +54,14 @@ export const MigrationGate: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const { hasActiveApiKeys, loading: apiKeysLoading } = useActiveApiKeys()
+  const { LL } = useI18nContext()
+  const isSelfCustodialDisabled = useSelfCustodialDisabled()
+  const {
+    hasActiveApiKeys,
+    isReady: apiKeysReady,
+    hasError: apiKeysError,
+    refetch: refetchApiKeys,
+  } = useActiveApiKeys()
   const windDown = useCustodialWindDown()
   const mode = resolveMigrationMode(windDown?.status)
   const isGated = mode === "gate"
@@ -61,7 +73,12 @@ export const MigrationGate: React.FC = () => {
    *  floating over it; regaining focus shows it again with a fresh balance check. */
   const isFocused = useIsFocused()
 
-  const { usdBalanceCents, loading: walletsLoading } = useCustodialWalletBalances()
+  const {
+    usdBalanceCents,
+    isReady: balancesReady,
+    hasError: balancesError,
+    refetch: refetchBalances,
+  } = useCustodialWalletBalances()
 
   const acknowledgeApiWarning = useCallback(() => setIsApiWarningAcknowledged(true), [])
 
@@ -73,10 +90,42 @@ export const MigrationGate: React.FC = () => {
     navigation.navigate("conversionDetails")
   }, [navigation])
 
+  const retryGateData = useCallback(
+    () => Promise.all([refetchApiKeys(), refetchBalances()]),
+    [refetchApiKeys, refetchBalances],
+  )
+
+  /** The kill-switch net. Every entry funnels through the gate, so blocking here pauses the
+   *  whole flow the moment ops disables the stack, whatever path the user arrived by. */
+  if (isSelfCustodialDisabled) {
+    return <TemporarilyUnavailableScreen />
+  }
+
+  /** A safety check reading a failed query as its empty default would wave a user with
+   *  API keys or a live dollar balance straight in. Block on error and offer a retry. */
+  const hasGateDataError = apiKeysError || balancesError
+  if (hasGateDataError) {
+    return (
+      <Screen preset="fixed">
+        <View style={styles.messageContainer}>
+          <GaloyIcon name="warning" size={64} color={colors.warning} />
+          <Text type="p1" style={styles.messageText}>
+            {LL.errors.generic()}
+          </Text>
+          <GaloyPrimaryButton
+            title={LL.common.tryAgain()}
+            onPress={() => retryGateData()}
+            {...testProps("migration-gate-retry")}
+          />
+        </View>
+      </Screen>
+    )
+  }
+
   /** In blocker mode the gate replaces the whole app, so returning null here would
-   *  leave a blank screen on every launch until the queries resolve. */
-  const isGateDataLoading = apiKeysLoading || walletsLoading
-  if (isGateDataLoading) {
+   *  leave a blank screen on every launch until the queries settle WITH data. */
+  const isGateDataReady = apiKeysReady && balancesReady
+  if (!isGateDataReady) {
     return (
       <Screen preset="fixed">
         <View style={styles.loadingContainer}>
@@ -137,5 +186,15 @@ const useStyles = makeStyles(() => ({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  messageContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 32,
+    gap: 16,
+  },
+  messageText: {
+    textAlign: "center",
   },
 }))

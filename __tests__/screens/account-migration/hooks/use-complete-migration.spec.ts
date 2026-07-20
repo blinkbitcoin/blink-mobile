@@ -23,9 +23,12 @@ jest.mock("@app/screens/account-migration/hooks/use-discard-custodial-session", 
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({
-    activeAccount: { id: "custodial-1", type: "custodial" },
     setActiveAccountId: mockSetActiveAccountId,
   }),
+}))
+
+jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => ({
+  useCustodialOwnerId: () => ({ ownerId: "custodial-1", loading: false }),
 }))
 
 const mockClearPendingAccount = jest.fn()

@@ -1,10 +1,11 @@
 import * as React from "react"
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { Linking } from "react-native"
 import RNBootSplash from "react-native-bootsplash"
 
 import analytics from "@react-native-firebase/analytics"
 import {
+  createNavigationContainerRef,
   LinkingOptions,
   NavigationContainer,
   NavigationState,
@@ -17,8 +18,27 @@ import { Action, useActionsContext } from "@app/components/actions"
 import { PREFIX_LINKING, TELEGRAM_CALLBACK_PATH } from "@app/config"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useWindDownGateArmed } from "@app/screens/account-migration/hooks/use-wind-down-gate-armed"
 
 import { RootStackParamList } from "./stack-param-lists"
+
+const navigationRef = createNavigationContainerRef<RootStackParamList>()
+
+/** The one deeplink the account-closed gate still allows through: the migration entry. */
+const MIGRATION_DEEPLINK_PATH = "account-migration"
+
+/** Matches the migration entry by its path SEGMENT, not a loose substring: a crafted link
+ *  like `blink://home?x=account-migration` must not slip past the armed-gate guard. An
+ *  unparseable url is treated as non-migration, so it stays blocked while the gate is armed. */
+export const isMigrationDeeplink = (url: string): boolean => {
+  try {
+    const { hostname, pathname } = new URL(url)
+    const segment = pathname.replace(/^\/+/, "") || hostname
+    return segment === MIGRATION_DEEPLINK_PATH
+  } catch {
+    return false
+  }
+}
 
 export type AuthenticationContextType = {
   isAppLocked: boolean
@@ -62,6 +82,26 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     null,
   )
   const { setActiveAction } = useActionsContext()
+
+  /** The linking listener is set up once and closes over stale values, so the armed state
+   *  it must read lives in a ref kept current by the effect below. */
+  const isGateArmed = useWindDownGateArmed()
+  const isGateArmedRef = useRef(isGateArmed)
+  useEffect(() => {
+    isGateArmedRef.current = isGateArmed
+  }, [isGateArmed])
+
+  /** Pop anything a deeplink opened above the blocker so nothing keeps working over the
+   *  closed account; resetting to Primary leaves only the blocker visible. */
+  const resetToPrimary = useCallback(() => {
+    navigationRef.reset({ index: 0, routes: [{ name: "Primary" }] })
+  }, [])
+
+  /** Covers arming mid-session. The container-not-ready-yet case (armed at cold start) is
+   *  handled from onReady below, since this effect can fire before isReady() is true. */
+  useEffect(() => {
+    if (isGateArmed && navigationRef.isReady()) resetToPrimary()
+  }, [isGateArmed, resetToPrimary])
 
   useEffect(() => {
     if (canHandlePayments && !isAppLocked && urlAfterUnlockAndAuth) {
@@ -172,6 +212,10 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
       const onReceiveURL = ({ url }: { url: string }) => {
         if (url.includes(TELEGRAM_CALLBACK_PATH)) return
 
+        /** With the account-closed gate armed, only the migration deeplink is honoured; any
+         *  other would open a working screen on top of the blocker, so it is dropped. */
+        if (isGateArmedRef.current && !isMigrationDeeplink(url)) return
+
         if (!isAppLocked && canHandlePayments) {
           const maybeAction = processLinkForAction(url)
           if (maybeAction) {
@@ -195,11 +239,15 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
   return (
     <AuthenticationContextProvider value={{ isAppLocked, setAppUnlocked, setAppLocked }}>
       <NavigationContainer
+        ref={navigationRef}
         {...(mode === "dark" ? { theme: DarkTheme } : {})}
         linking={linking}
         onReady={() => {
           RNBootSplash.hide({ fade: true })
           console.log("NavigationContainer onReady")
+          /** Cold-started already gated: reset now that the container is ready, since the
+           *  effect above may have run before isReady() turned true. */
+          if (isGateArmedRef.current) resetToPrimary()
         }}
         onStateChange={(state) => {
           const currentRouteName = getActiveRouteName(state)

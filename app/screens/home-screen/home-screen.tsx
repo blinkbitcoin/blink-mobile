@@ -449,7 +449,7 @@ export const HomeScreen: React.FC = () => {
       : null
   const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible
 
-  const { migrateNowPrompt, reminderBulletin } = useWindDownHomeNudges()
+  const { migrateNowPrompt, reminderBulletin, receiveBlocked } = useWindDownHomeNudges()
   const { dismissForSession: dismissMigrateNowPrompt } = migrateNowPrompt
   /** Dismissing first keeps the modal from floating over the pushed migration flow. */
   const goToMigration = React.useCallback(() => {
@@ -591,8 +591,8 @@ export const HomeScreen: React.FC = () => {
       title: LL.HomeScreen.receive(),
       target: "receiveBitcoin",
       icon: "receive",
-      disabled: migrateNowPrompt.isReceiveDisabled,
-      onDisabledPress: migrateNowPrompt.reopen,
+      disabled: receiveBlocked.isBlocked,
+      onDisabledPress: receiveBlocked.onDisabledPress,
     },
     {
       title: LL.HomeScreen.send(),
@@ -695,15 +695,14 @@ export const HomeScreen: React.FC = () => {
           conversionMinimum={stableTokenConversionMinimum}
         />
       )}
-      {shouldShowMigrateNowPrompt && (
-        <MigrateNowModal
-          isVisible
-          toggleModal={migrateNowPrompt.dismissForSession}
-          onMigrate={goToMigration}
-          deadlineTimestamp={migrateNowPrompt.deadlineTimestamp}
-          timezone={migrateNowPrompt.timezone}
-        />
-      )}
+      {/* Kept mounted (not conditionally rendered) so its exit animation plays on dismiss. */}
+      <MigrateNowModal
+        isVisible={shouldShowMigrateNowPrompt}
+        toggleModal={migrateNowPrompt.dismissForSession}
+        onMigrate={goToMigration}
+        deadlineTimestamp={migrateNowPrompt.deadlineTimestamp}
+        timezone={migrateNowPrompt.timezone}
+      />
       <View style={styles.balanceContainer}>
         <View style={styles.header}>
           <GaloyIconButton

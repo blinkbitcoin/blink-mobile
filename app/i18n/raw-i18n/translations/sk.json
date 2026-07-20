@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Vaša Lightning adresa bude prenesená na váš nový non-custodial účet.",
     "keepReceivingLnAddressLabel": "Vaša LN adresa",
     "keepReceivingCta": "Skvelé",
+    "receivingDisabledToast": "Prijímanie je momentálne zakázané.",
     "downloadHistoryTitle": "Stiahnite si históriu transakcií",
     "downloadHistoryBody": "Váš nový účet začne odznova. Ak si chcete uchovať záznam o svojich transakciách, stiahnite si ich teraz ako CSV.",
     "downloadHistoryDownloadCta": "Stiahnuť",

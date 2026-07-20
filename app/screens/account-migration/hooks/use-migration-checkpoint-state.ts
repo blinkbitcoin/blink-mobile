@@ -2,7 +2,6 @@ import { useCallback, useRef, useState } from "react"
 
 import { useFocusEffect } from "@react-navigation/native"
 
-import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { reportError } from "@app/utils/error-logging"
 
@@ -16,18 +15,18 @@ import {
   saveCheckpointToStorage,
 } from "../utils/migration-checkpoint-storage"
 
+import { useCustodialOwnerId } from "./use-custodial-owner-id"
+
 /**
  * The persisted migration checkpoint's state and writes, free of any navigation
  * coupling so pure-logic consumers (backup routing, the session swap) can read the
  * resume state without instantiating a navigator-bound hook.
  */
 export const useMigrationCheckpointState = () => {
-  const { activeAccount } = useAccountRegistry()
+  const { ownerId, loading: ownerLoading } = useCustodialOwnerId()
   const [stored, setStored] = useState<StoredCheckpoint | null>(null)
   const [loading, setLoading] = useState(true)
   const isMountedRef = useRef(true)
-
-  const activeAccountId = activeAccount?.id ?? null
 
   const {
     appConfig: {
@@ -65,7 +64,7 @@ export const useMigrationCheckpointState = () => {
   /** A checkpoint belongs to the custodial account that saved it; another profile on the
    *  same device starts its own flow instead of resuming, and inheriting, this one. */
   const isOwnedByActiveAccount =
-    !stored?.custodialAccountId || stored.custodialAccountId === activeAccountId
+    !stored?.custodialAccountId || stored.custodialAccountId === ownerId
   const checkpoint = isOwnedByActiveAccount ? stored?.step ?? null : null
   const accountId = isOwnedByActiveAccount ? stored?.accountId ?? null : null
 
@@ -80,7 +79,7 @@ export const useMigrationCheckpointState = () => {
       const update = {
         step,
         accountId: provisionedAccountId ?? accountId ?? undefined,
-        custodialAccountId: activeAccountId ?? undefined,
+        custodialAccountId: ownerId ?? undefined,
       }
       setStored((existing) => mergeCheckpoint(existing, update))
       try {
@@ -91,7 +90,7 @@ export const useMigrationCheckpointState = () => {
         return false
       }
     },
-    [storageKey, activeAccountId, accountId],
+    [storageKey, ownerId, accountId],
   )
 
   const clearCheckpoint = useCallback(() => {
@@ -107,7 +106,7 @@ export const useMigrationCheckpointState = () => {
   return {
     checkpoint,
     accountId,
-    loading,
+    loading: loading || ownerLoading,
     saveCheckpoint,
     clearCheckpoint,
     hasResumableCheckpoint,

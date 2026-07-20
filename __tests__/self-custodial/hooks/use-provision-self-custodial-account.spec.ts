@@ -66,4 +66,20 @@ describe("useProvisionSelfCustodialAccount", () => {
     await expect(result.current.provision()).rejects.toThrow("create failed")
     expect(mockReloadSelfCustodialAccounts).not.toHaveBeenCalled()
   })
+
+  it("runs beforeCreate with the new id before the wallet exists", async () => {
+    const order: string[] = []
+    const beforeCreate = jest.fn(async (accountId: string) => {
+      order.push(`before:${accountId}`)
+    })
+    mockCreateWallet.mockImplementation(async () => {
+      order.push("create")
+    })
+
+    const { result } = renderHook(() => useProvisionSelfCustodialAccount())
+    await result.current.provision(beforeCreate)
+
+    expect(beforeCreate).toHaveBeenCalledWith("provisioned-account-id")
+    expect(order).toEqual(["before:provisioned-account-id", "create"])
+  })
 })

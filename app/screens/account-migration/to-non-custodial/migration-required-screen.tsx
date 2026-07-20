@@ -55,7 +55,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   const { supportEmailAddress, openSupport } = useContactSupport()
 
   const isAuthed = useIsAuthed()
-  const { data: addressData } = useAddressScreenQuery({
+  const { data: addressData, loading: addressLoading } = useAddressScreenQuery({
     fetchPolicy: "cache-first",
     skip: !isAuthed,
   })
@@ -70,6 +70,10 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
     }
     goToNextStep()
   }, [navigation, hasLightningAddress, goToNextStep])
+
+  /** Held until the address query settles so a fast cold-start tap can't route past the
+   *  keep-receiving warning for a user who actually has an address. */
+  const isMigrateLoading = nextStepLoading || addressLoading
 
   const handleClose = useCallback(() => {
     if (onClose) {
@@ -126,7 +130,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
         <GaloyPrimaryButton
           title={LL.common.continue()}
           onPress={handleMigrate}
-          loading={nextStepLoading}
+          loading={isMigrateLoading}
           {...testProps("migration-required-cta")}
         />
       }

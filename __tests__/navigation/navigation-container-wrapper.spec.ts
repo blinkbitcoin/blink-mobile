@@ -21,7 +21,10 @@ jest.mock("@app/components/upgrade-account-modal", () => ({
 }))
 
 import { Action } from "@app/components/actions"
-import { processLinkForAction } from "@app/navigation/navigation-container-wrapper"
+import {
+  isMigrationDeeplink,
+  processLinkForAction,
+} from "@app/navigation/navigation-container-wrapper"
 
 describe("processLinkForAction", () => {
   it("returns null when no action query parameter is present", () => {
@@ -68,5 +71,34 @@ describe("processLinkForAction", () => {
         "https://app.blink.sv/scan?other=set-ln-address&action=upgrade-account",
       ),
     ).toBe(Action.UpgradeAccount)
+  })
+})
+
+describe("isMigrationDeeplink", () => {
+  it("recognises the custom-scheme migration entry", () => {
+    expect(isMigrationDeeplink("blink://account-migration")).toBe(true)
+  })
+
+  it("recognises the app-link migration entry", () => {
+    expect(isMigrationDeeplink("https://app.blink.sv/account-migration")).toBe(true)
+  })
+
+  it("rejects a payment deeplink that would open over the blocker", () => {
+    expect(isMigrationDeeplink("lightning:lnbc1exampleinvoice")).toBe(false)
+  })
+
+  it("rejects other in-app deeplinks", () => {
+    expect(isMigrationDeeplink("https://app.blink.sv/convert")).toBe(false)
+  })
+
+  it("rejects a crafted link that only contains the path as a query value", () => {
+    expect(isMigrationDeeplink("blink://home?x=account-migration")).toBe(false)
+    expect(isMigrationDeeplink("https://app.blink.sv/scan?to=account-migration")).toBe(
+      false,
+    )
+  })
+
+  it("rejects an unparseable url so it stays blocked while the gate is armed", () => {
+    expect(isMigrationDeeplink("not a url")).toBe(false)
   })
 })

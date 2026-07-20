@@ -11887,6 +11887,10 @@ type RootTranslation = {
 		 */
 		keepReceivingCta: string
 		/**
+		 * R​e​c​e​i​v​i​n​g​ ​i​s​ ​c​u​r​r​e​n​t​l​y​ ​d​i​s​a​b​l​e​d​.
+		 */
+		receivingDisabledToast: string
+		/**
 		 * D​o​w​n​l​o​a​d​ ​y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y
 		 */
 		downloadHistoryTitle: string
@@ -24359,6 +24363,10 @@ export type TranslationFunctions = {
 		 * Nice
 		 */
 		keepReceivingCta: () => LocalizedString
+		/**
+		 * Receiving is currently disabled.
+		 */
+		receivingDisabledToast: () => LocalizedString
 		/**
 		 * Download your transaction history
 		 */

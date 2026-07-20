@@ -9,12 +9,19 @@ export const useProvisionSelfCustodialAccount = () => {
   const { reloadSelfCustodialAccounts } = useAccountRegistry()
   const network = useSparkNetwork()
 
-  const provision = useCallback(async (): Promise<string> => {
-    const accountId = Crypto.randomUUID()
-    await selfCustodialCreateWallet(accountId, network)
-    await reloadSelfCustodialAccounts()
-    return accountId
-  }, [reloadSelfCustodialAccounts, network])
+  /** beforeCreate runs with the new id in hand but before the wallet exists, so a caller
+   *  can persist a record first and a crash mid-create leaves a harmless dangling record
+   *  instead of an orphaned wallet. */
+  const provision = useCallback(
+    async (beforeCreate?: (accountId: string) => Promise<void>): Promise<string> => {
+      const accountId = Crypto.randomUUID()
+      if (beforeCreate) await beforeCreate(accountId)
+      await selfCustodialCreateWallet(accountId, network)
+      await reloadSelfCustodialAccounts()
+      return accountId
+    },
+    [reloadSelfCustodialAccounts, network],
+  )
 
   return { provision }
 }

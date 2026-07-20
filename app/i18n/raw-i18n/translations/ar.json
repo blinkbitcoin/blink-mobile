@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "سيتم نقل عنوان Lightning الخاص بك إلى حسابك الجديد غير الحفظي.",
     "keepReceivingLnAddressLabel": "عنوان LN الخاص بك",
     "keepReceivingCta": "رائع",
+    "receivingDisabledToast": "الاستلام معطّل حاليًا.",
     "downloadHistoryTitle": "نزّل سجل معاملاتك",
     "downloadHistoryBody": "سيبدأ حسابك الجديد من جديد. إذا كنت ترغب في الاحتفاظ بسجل لمعاملاتك، فنزّلها الآن كملف CSV.",
     "downloadHistoryDownloadCta": "تنزيل",

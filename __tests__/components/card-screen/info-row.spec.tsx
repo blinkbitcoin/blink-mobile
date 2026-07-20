@@ -1,9 +1,11 @@
 import React from "react"
-import { Text as RNText } from "react-native"
+import { StyleSheet, Text as RNText } from "react-native"
 import { render } from "@testing-library/react-native"
 
 import { InfoRow } from "@app/components/card-screen/info-row"
 
+/** Real style fragments (not empty stubs) so a prop that fails to apply its style is
+ *  actually caught by the assertions below, instead of passing against `{}`. */
 jest.mock("@rn-vui/themed", () => ({
   Text: (props: React.ComponentProps<typeof RNText>) => <RNText {...props} />,
   useTheme: () => ({
@@ -17,12 +19,12 @@ jest.mock("@rn-vui/themed", () => ({
     },
   }),
   makeStyles: () => () => ({
-    container: {},
-    label: {},
-    regularLabel: {},
-    value: {},
-    mutedValue: {},
-    secondaryValue: {},
+    container: { flexDirection: "row" },
+    label: { fontWeight: "600" },
+    regularLabel: { fontWeight: "400" },
+    value: { fontWeight: "700" },
+    mutedValue: { color: "#666666", fontWeight: "400" },
+    secondaryValue: { fontWeight: "400" },
   }),
 }))
 
@@ -60,27 +62,27 @@ describe("InfoRow", () => {
   })
 
   describe("with custom value color", () => {
-    it("renders with custom valueColor", () => {
+    it("paints the value with the given valueColor", () => {
       const { getByText } = render(<InfoRow {...defaultProps} valueColor="#00C853" />)
 
-      const valueElement = getByText("Test Value")
-      expect(valueElement).toBeTruthy()
+      const style = StyleSheet.flatten(getByText("Test Value").props.style)
+      expect(style.color).toBe("#00C853")
     })
 
-    it("renders with success color for active status", () => {
+    it("uses success color for an active status", () => {
       const { getByText } = render(
         <InfoRow label="Status" value="Active" valueColor="#00C853" />,
       )
 
-      expect(getByText("Active")).toBeTruthy()
+      expect(StyleSheet.flatten(getByText("Active").props.style).color).toBe("#00C853")
     })
 
-    it("renders with error color for inactive status", () => {
+    it("uses error color for an inactive status", () => {
       const { getByText } = render(
         <InfoRow label="Status" value="Frozen" valueColor="#FF1744" />,
       )
 
-      expect(getByText("Frozen")).toBeTruthy()
+      expect(StyleSheet.flatten(getByText("Frozen").props.style).color).toBe("#FF1744")
     })
   })
 
@@ -121,31 +123,57 @@ describe("InfoRow", () => {
   })
 
   describe("without valueColor", () => {
-    it("uses default color when valueColor is not provided", () => {
+    it("falls back to the theme's default color", () => {
       const { getByText } = render(<InfoRow {...defaultProps} />)
 
-      const valueElement = getByText("Test Value")
-      expect(valueElement).toBeTruthy()
+      expect(StyleSheet.flatten(getByText("Test Value").props.style).color).toBe(
+        "#000000",
+      )
     })
   })
 
   describe("with isValueMuted", () => {
-    it("renders a muted value", () => {
+    it("applies the muted value style and ignores valueColor", () => {
       const { getByText } = render(
-        <InfoRow label="New Dollar Balance" value="not available" isValueMuted />,
+        <InfoRow
+          label="New Dollar Balance"
+          value="not available"
+          valueColor="#00C853"
+          isValueMuted
+        />,
       )
 
-      expect(getByText("not available")).toBeTruthy()
+      const style = StyleSheet.flatten(getByText("not available").props.style)
+      expect(style.color).toBe("#666666")
+      expect(style.fontWeight).toBe("400")
+    })
+
+    it("keeps the bold value style when not muted", () => {
+      const { getByText } = render(<InfoRow {...defaultProps} />)
+
+      expect(StyleSheet.flatten(getByText("Test Value").props.style).fontWeight).toBe(
+        "700",
+      )
     })
   })
 
   describe("with isLabelRegular", () => {
-    it("renders the label", () => {
+    it("renders the label at regular weight", () => {
       const { getByText } = render(
         <InfoRow label="Current Bitcoin Balance" value="21,493 SAT" isLabelRegular />,
       )
 
-      expect(getByText("Current Bitcoin Balance")).toBeTruthy()
+      expect(
+        StyleSheet.flatten(getByText("Current Bitcoin Balance").props.style).fontWeight,
+      ).toBe("400")
+    })
+
+    it("keeps the label bold by default", () => {
+      const { getByText } = render(<InfoRow {...defaultProps} />)
+
+      expect(StyleSheet.flatten(getByText("Test Label").props.style).fontWeight).toBe(
+        "600",
+      )
     })
   })
 

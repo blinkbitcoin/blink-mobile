@@ -1396,6 +1396,16 @@ query migrationApiKeys {
   }
 }
 
+query migrationOwner {
+  me {
+    defaultAccount {
+      id
+      __typename
+    }
+    __typename
+  }
+}
+
 query migrationSupportDetails {
   me {
     id

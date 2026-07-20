@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Endagiriro yo eya Lightning ejja kusengulwa mu kawunti yo empya eya non-custodial.",
     "keepReceivingLnAddressLabel": "Endagiriro yo eya LN",
     "keepReceivingCta": "Kirungi",
+    "receivingDisabledToast": "Okufuna kaakati tekusoboka.",
     "downloadHistoryTitle": "Sika ebyafaayo by'ensimbi zo",
     "downloadHistoryBody": "Akaawunti yo empya ejja kutandika bupya. Bw'oba oyagala okukuuma ebiwandiiko by'ensimbi zo, bisike kati nga CSV.",
     "downloadHistoryDownloadCta": "Sika",

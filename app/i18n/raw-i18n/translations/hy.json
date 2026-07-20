@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Ձեր Lightning հասցեն կփոխանցվի ձեր նոր ոչ պահառու հաշվին։",
     "keepReceivingLnAddressLabel": "Ձեր LN հասցեն",
     "keepReceivingCta": "Հիանալի է",
+    "receivingDisabledToast": "Ստացումը ներկայումս անջատված է։",
     "downloadHistoryTitle": "Ներբեռնեք ձեր գործարքների պատմությունը",
     "downloadHistoryBody": "Ձեր նոր հաշիվը կսկսվի զրոյից։ Եթե ցանկանում եք պահպանել ձեր գործարքների գրառումը, ներբեռնեք դրանք հիմա որպես CSV։",
     "downloadHistoryDownloadCta": "Ներբեռնել",

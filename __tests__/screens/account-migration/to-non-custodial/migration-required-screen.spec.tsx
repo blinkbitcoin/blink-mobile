@@ -1,6 +1,6 @@
 import React from "react"
 import { Linking } from "react-native"
-import { render, screen, fireEvent } from "@testing-library/react-native"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -152,7 +152,9 @@ describe("MigrationRequiredScreen", () => {
 
       fireEvent.press(screen.getByText(CONTACT_EMAIL))
 
-      expect(Linking.openURL).toHaveBeenCalledWith(`mailto:${CONTACT_EMAIL}`)
+      await waitFor(() =>
+        expect(Linking.openURL).toHaveBeenCalledWith(`mailto:${CONTACT_EMAIL}`),
+      )
     })
 
     it("hides the balance rows when wallet data is unavailable", async () => {
@@ -230,6 +232,16 @@ describe("MigrationRequiredScreen", () => {
 
     it("marks the CTA as loading while the next-step checks load", async () => {
       mockNextStepLoading = true
+      renderScreen("voluntary")
+      await flushEffects()
+
+      expect(
+        screen.getByTestId("migration-required-cta").props.accessibilityState?.busy,
+      ).toBe(true)
+    })
+
+    it("holds the CTA until the lightning-address query settles, so a fast tap can't misroute", async () => {
+      mockUseAddressScreenQuery.mockReturnValue({ data: undefined, loading: true })
       renderScreen("voluntary")
       await flushEffects()
 

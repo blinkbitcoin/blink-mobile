@@ -13,6 +13,9 @@ type MigrationReminderBulletin = {
  * non-dismissible home bulletin reminds the user to migrate before the server-dated
  * deadline. It shows only in the pre-cutoff phase; once receiving is disabled the
  * migrate-now modal takes over, and once the gate arms the blocker takes the whole home.
+ * The kill-switch is intentionally NOT checked here: the bulletin's Migrate button routes
+ * through the gate, which shows the "temporarily unavailable" screen, so the single
+ * choke point covers the disabled case with no per-entry button logic.
  */
 export const useMigrationReminderBulletin = (): MigrationReminderBulletin => {
   const windDown = useCustodialWindDown()

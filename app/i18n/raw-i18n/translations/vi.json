@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Địa chỉ Lightning của bạn sẽ được chuyển sang tài khoản non-custodial mới của bạn.",
     "keepReceivingLnAddressLabel": "Địa chỉ LN của bạn",
     "keepReceivingCta": "Tuyệt",
+    "receivingDisabledToast": "Việc nhận hiện đang bị vô hiệu hóa.",
     "downloadHistoryTitle": "Tải xuống lịch sử giao dịch của bạn",
     "downloadHistoryBody": "Tài khoản mới của bạn sẽ bắt đầu lại từ đầu. Nếu bạn muốn lưu lại hồ sơ giao dịch, hãy tải xuống dưới dạng CSV ngay bây giờ.",
     "downloadHistoryDownloadCta": "Tải xuống",

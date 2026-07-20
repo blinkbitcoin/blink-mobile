@@ -21,6 +21,8 @@ export const IconHero: React.FC<IconHeroProps> = ({
   const styles = useStyles()
 
   const isPlainTextSubtitle = typeof subtitle === "string"
+  /** An empty string skips the subtitle Text entirely, so it never adds a blank line. */
+  const hasVisibleTextSubtitle = isPlainTextSubtitle && subtitle.length > 0
 
   return (
     <View style={styles.container}>
@@ -29,7 +31,8 @@ export const IconHero: React.FC<IconHeroProps> = ({
       </View>
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
-        {isPlainTextSubtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : subtitle}
+        {hasVisibleTextSubtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+        {isPlainTextSubtitle ? null : subtitle}
       </View>
     </View>
   )

@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Lightning adresin yeni non-custodial hesabına aktarılacak.",
     "keepReceivingLnAddressLabel": "LN Adresin",
     "keepReceivingCta": "Harika",
+    "receivingDisabledToast": "Alma şu anda devre dışı.",
     "downloadHistoryTitle": "İşlem geçmişini indir",
     "downloadHistoryBody": "Yeni hesabın sıfırdan başlayacak. İşlemlerinin bir kaydını tutmak istersen, şimdi CSV olarak indir.",
     "downloadHistoryDownloadCta": "İndir",

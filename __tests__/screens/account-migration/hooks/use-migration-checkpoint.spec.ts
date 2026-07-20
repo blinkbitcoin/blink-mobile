@@ -12,6 +12,7 @@ const mockSaveCheckpointToStorage = jest.fn()
 const mockClearCheckpointFromStorage = jest.fn()
 const mockReportError = jest.fn()
 let mockActiveAccount: { id: string; type: string } | undefined
+let mockOwnerId: string | null = "custodial-1"
 let mockFocusCallback: (() => void | (() => void)) | null = null
 
 jest.mock("@react-navigation/native", () => ({
@@ -45,6 +46,10 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
 }))
 
+jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => ({
+  useCustodialOwnerId: () => ({ ownerId: mockOwnerId, loading: false }),
+}))
+
 jest.mock("@app/hooks/use-app-config", () => ({
   useAppConfig: () => ({
     appConfig: { galoyInstance: { name: "Main" } },
@@ -55,6 +60,7 @@ describe("useMigrationCheckpoint", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
+    mockOwnerId = "custodial-1"
     mockFocusCallback = null
     mockLoadCheckpoint.mockResolvedValue(null)
     mockSaveCheckpointToStorage.mockResolvedValue(undefined)
@@ -107,6 +113,24 @@ describe("useMigrationCheckpoint", () => {
       step: MigrationCheckpoint.BackupMethod,
       accountId: undefined,
       custodialAccountId: "custodial-1",
+    })
+  })
+
+  it("omits the owner when no custodial account is resolved", async () => {
+    mockOwnerId = null
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+    })
+
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
+      step: MigrationCheckpoint.BackupMethod,
+      accountId: undefined,
+      custodialAccountId: undefined,
     })
   })
 

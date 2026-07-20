@@ -26,8 +26,13 @@ jest.mock("@app/components/icon-hero", () => ({
 }))
 
 const mockEnsureAccount = jest.fn()
+let mockIsProvisioning = false
 jest.mock("@app/screens/account-migration/hooks", () => ({
-  useMigrationAccount: () => ({ ensureAccount: mockEnsureAccount, loading: false }),
+  useMigrationAccount: () => ({
+    ensureAccount: mockEnsureAccount,
+    isProvisioning: mockIsProvisioning,
+    loading: false,
+  }),
 }))
 
 const renderScreen = () =>
@@ -41,6 +46,7 @@ describe("MigrationExplainerScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockEnsureAccount.mockResolvedValue("sc-account-1")
+    mockIsProvisioning = false
     loadLocale("en")
   })
 
@@ -110,5 +116,20 @@ describe("MigrationExplainerScreen", () => {
 
     await waitFor(() => expect(mockEnsureAccount).toHaveBeenCalled())
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("keeps the CTA disabled and busy while the wallet is being provisioned", async () => {
+    mockIsProvisioning = true
+    renderScreen()
+    await flushEffects()
+
+    acceptAllChecks()
+
+    const cta = screen.getByTestId("migration-explainer-cta")
+    expect(cta.props.accessibilityState?.disabled).toBe(true)
+    expect(cta.props.accessibilityState?.busy).toBe(true)
+
+    fireEvent.press(cta)
+    expect(mockEnsureAccount).not.toHaveBeenCalled()
   })
 })

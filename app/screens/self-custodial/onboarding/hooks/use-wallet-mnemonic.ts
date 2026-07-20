@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
@@ -7,8 +7,12 @@ import { deriveWalletIdentityPubkey } from "@app/self-custodial/bridge"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-export const useWalletMnemonic = (): string => {
-  const [mnemonic, setMnemonic] = useState("")
+/**
+ * On-demand keychain read for the active backup account's phrase. Screens that must show or
+ * save the phrase eagerly use useWalletMnemonic; the method picker uses this so the key
+ * material is only pulled into memory once a method is actually chosen.
+ */
+export const useLoadWalletMnemonic = (): (() => Promise<string>) => {
   const { isSelfCustodial } = useActiveWallet()
   const { activeAccount } = useAccountRegistry()
   const { accountId: migrationAccountId } = useMigrationCheckpointState()
@@ -16,19 +20,25 @@ export const useWalletMnemonic = (): string => {
   /** Mid-migration the active account is still custodial, so read the provisioned account. */
   const targetAccountId = isSelfCustodial ? activeAccount?.id ?? null : migrationAccountId
 
+  return useCallback(async () => {
+    if (!targetAccountId) return ""
+    return (await KeyStoreWrapper.getMnemonicForAccount(targetAccountId)) ?? ""
+  }, [targetAccountId])
+}
+
+export const useWalletMnemonic = (): string => {
+  const [mnemonic, setMnemonic] = useState("")
+  const loadMnemonic = useLoadWalletMnemonic()
+
   useEffect(() => {
-    if (!targetAccountId) {
-      setMnemonic("")
-      return
-    }
     let mounted = true
-    KeyStoreWrapper.getMnemonicForAccount(targetAccountId).then((stored) => {
-      if (mounted && stored) setMnemonic(stored)
+    loadMnemonic().then((stored) => {
+      if (mounted) setMnemonic(stored)
     })
     return () => {
       mounted = false
     }
-  }, [targetAccountId])
+  }, [loadMnemonic])
 
   return mnemonic
 }

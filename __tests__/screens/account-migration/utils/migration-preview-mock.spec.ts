@@ -1,5 +1,16 @@
 import { getMigrationPreviewMock } from "@app/screens/account-migration/utils/migration-preview-mock"
 
+/** The backend reserve rule the drain solve must satisfy: max(0.5% half-down, 10 sats).
+ *  Replicated here so the sweep tests that real contract, not the mock's own
+ *  feeSats = balance - receive identity (which can never disagree with itself). */
+const reserveForAmount = (amountSats: number): number => {
+  const scaled = amountSats * 50
+  const quotient = Math.floor(scaled / 10_000)
+  const remainder = scaled % 10_000
+  const percentageFee = remainder > 5_000 ? quotient + 1 : quotient
+  return Math.max(percentageFee, 10)
+}
+
 describe("getMigrationPreviewMock", () => {
   it("returns an all-zero preview for a zero balance", () => {
     expect(getMigrationPreviewMock(0)).toEqual({
@@ -82,16 +93,31 @@ describe("getMigrationPreviewMock", () => {
     })
   })
 
-  it("accounts for every sat between the fee and the receive amount across the backend sweep", () => {
-    const backendSweepBalances = [
-      0, 1, 10, 11, 50, 99, 100, 101, 500, 2110, 2111, 5000, 100_000, 10_000_000,
-    ]
+  it("hands out the largest payout whose own reserve still fits the balance", () => {
+    const drainRegimeBalances = [101, 500, 2110, 2111, 5000, 100_000, 10_000_000]
 
-    backendSweepBalances.forEach((balanceSats) => {
-      const preview = getMigrationPreviewMock(balanceSats)
-      const feePaidByUser = preview.feeCoveredByBlink ? 0 : preview.feeSats
-      expect(preview.balanceSats).toBe(balanceSats)
-      expect(preview.receiveSats + feePaidByUser).toBe(balanceSats)
+    drainRegimeBalances.forEach((balanceSats) => {
+      const { receiveSats, feeSats } = getMigrationPreviewMock(balanceSats)
+
+      /** No sat vanishes between the payout and the fee. */
+      expect(receiveSats + feeSats).toBe(balanceSats)
+      /** The payout plus its own reserve fits inside the balance. */
+      expect(receiveSats + reserveForAmount(receiveSats)).toBeLessThanOrEqual(balanceSats)
+      /** One more sat would not fit, so the payout is the largest possible. */
+      expect(receiveSats + 1 + reserveForAmount(receiveSats + 1)).toBeGreaterThan(
+        balanceSats,
+      )
+    })
+  })
+
+  it("rounds an exact-half percentage reserve down, keeping one more sat in the payout", () => {
+    /** At 2512 the drain lands on 2500, whose 0.5% reserve is exactly 12.5 sats. Half-down
+     *  keeps the reserve at 12 and the payout at 2500; half-up would shrink it to 2499. */
+    expect(getMigrationPreviewMock(2512)).toEqual({
+      balanceSats: 2512,
+      feeSats: 12,
+      feeCoveredByBlink: false,
+      receiveSats: 2500,
     })
   })
 })

@@ -12,9 +12,14 @@ jest.mock("@app/config/feature-flags-context", () => ({
 }))
 
 let mockActiveAccount: { id: string; type: string } | undefined
+let mockOwnerId: string | null = "custodial-1"
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
+}))
+
+jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => ({
+  useCustodialOwnerId: () => ({ ownerId: mockOwnerId, loading: false }),
 }))
 
 /** A synthetic affected wind-down; each test swaps `status` on top of it. */
@@ -36,6 +41,7 @@ jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
 describe("useMigrateNowPrompt", () => {
   beforeEach(() => {
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
+    mockOwnerId = "custodial-1"
     mockStatus = WindDownStatus.ReceiveDisabled
     mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
   })
@@ -116,6 +122,7 @@ describe("useMigrateNowPrompt", () => {
     expect(result.current.isVisible).toBe(false)
 
     mockActiveAccount = { id: "custodial-2", type: "custodial" }
+    mockOwnerId = "custodial-2"
     rerender({})
 
     expect(result.current.isVisible).toBe(true)

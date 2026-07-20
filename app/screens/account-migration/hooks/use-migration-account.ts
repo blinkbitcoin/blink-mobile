@@ -26,7 +26,7 @@ export const useMigrationAccount = () => {
     savePendingAccount,
     loading: pendingLoading,
   } = usePendingMigrationAccounts()
-  const { accounts } = useAccountRegistry()
+  const { accounts, loading: registryLoading } = useAccountRegistry()
   const { provision } = useProvisionSelfCustodialAccount()
   const { LL } = useI18nContext()
   const guard = useInFlightGuard()
@@ -46,8 +46,7 @@ export const useMigrationAccount = () => {
     setIsProvisioning(true)
     try {
       const created = await guard.run(async () => {
-        const newAccountId = reusableAccountId ?? (await provision())
-        if (!reusableAccountId) await savePendingAccount(newAccountId)
+        const newAccountId = reusableAccountId ?? (await provision(savePendingAccount))
         /** The step is the terms screen: resuming may never skip past an unaccepted T&C.
          *  A failed write stops the flow here; the provisioned id survives in the hook's
          *  local state, so retrying resumes it instead of provisioning a second account. */
@@ -76,5 +75,9 @@ export const useMigrationAccount = () => {
     LL,
   ])
 
-  return { ensureAccount, isProvisioning, loading: checkpointLoading || pendingLoading }
+  return {
+    ensureAccount,
+    isProvisioning,
+    loading: checkpointLoading || pendingLoading || registryLoading,
+  }
 }

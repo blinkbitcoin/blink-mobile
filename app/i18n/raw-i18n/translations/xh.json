@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Idilesi yakho ye-Lightning iya kudluliselwa kwi-akhawunti yakho entsha ye-non-custodial.",
     "keepReceivingLnAddressLabel": "Idilesi yakho ye-LN",
     "keepReceivingCta": "Kuhle",
+    "receivingDisabledToast": "Ukufumana kuvaliwe okwangoku.",
     "downloadHistoryTitle": "Khuphela imbali yezenzo zakho zemali",
     "downloadHistoryBody": "I-akhawunti yakho entsha iza kuqala kwakhona. Ukuba ufuna ukugcina irekhodi lezenzo zakho zemali, zikhuphele ngoku njenge-CSV.",
     "downloadHistoryDownloadCta": "Khuphela",

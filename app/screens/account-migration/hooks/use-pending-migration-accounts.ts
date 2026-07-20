@@ -13,14 +13,19 @@ import {
   savePendingProvisionedAccount,
 } from "../utils/migration-checkpoint-storage"
 
+import { useCustodialOwnerId } from "./use-custodial-owner-id"
+
 /**
- * Wallets provisioned for a migration but not yet activated, keyed by the custodial
- * account that started the flow. The record never expires: a restarted flow reuses the
- * owner's wallet instead of provisioning a zombie, and the account switcher hides every
- * pending wallet until its migration activates it.
+ * Wallets provisioned for a migration but not yet activated, keyed by the custodial owner
+ * (the real Galoy account id, so two profiles on one device stay separate). The record
+ * never expires: a restarted flow reuses the owner's wallet instead of provisioning a
+ * zombie, and the switcher hides every pending wallet until its migration activates it. A
+ * record whose wallet is already the active account is self-healed away on load, so a
+ * cleanup write lost to a crash can't hide a funded wallet forever.
  */
 export const usePendingMigrationAccounts = () => {
   const { activeAccount } = useAccountRegistry()
+  const { ownerId, loading: ownerLoading } = useCustodialOwnerId()
   const [pendingByOwner, setPendingByOwner] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const isMountedRef = useRef(true)
@@ -41,6 +46,20 @@ export const usePendingMigrationAccounts = () => {
     loadPendingProvisionedAccounts(storageKey)
       .then((pending) => {
         if (!isMountedRef.current) return
+
+        const activatedOwner = Object.keys(pending).find(
+          (owner) => pending[owner] === activeAccountId,
+        )
+        if (activatedOwner) {
+          const { [activatedOwner]: activated, ...rest } = pending
+          setPendingByOwner(rest)
+          setLoading(false)
+          clearPendingProvisionedAccount(storageKey, activatedOwner).catch((err) => {
+            reportError("Pending migration account self-heal", err)
+          })
+          return
+        }
+
         setPendingByOwner(pending)
         setLoading(false)
       })
@@ -53,7 +72,7 @@ export const usePendingMigrationAccounts = () => {
     return () => {
       isMountedRef.current = false
     }
-  }, [storageKey])
+  }, [storageKey, activeAccountId])
 
   useFocusEffect(reloadPendingAccounts)
 
@@ -61,22 +80,24 @@ export const usePendingMigrationAccounts = () => {
     () => new Set(Object.values(pendingByOwner)),
     [pendingByOwner],
   )
-  const pendingForActiveAccount = activeAccountId
-    ? pendingByOwner[activeAccountId] ?? null
-    : null
+  const pendingForActiveAccount = ownerId ? pendingByOwner[ownerId] ?? null : null
 
+  /** Run as provision's beforeCreate, so it MUST throw on failure: a swallowed error (or a
+   *  missing owner) would let the wallet be created with no record behind it, the orphan
+   *  #6 guards against. The write lands before the in-memory update so a failed write
+   *  leaves no phantom record either. The caller (ensureAccount) reports and toasts. */
   const savePendingAccount = useCallback(
     async (accountId: string): Promise<void> => {
-      if (!activeAccountId) return
-      setPendingByOwner((previous) => ({ ...previous, [activeAccountId]: accountId }))
+      if (!ownerId) {
+        throw new Error("Cannot record a pending migration account without an owner id")
+      }
       await savePendingProvisionedAccount(storageKey, {
-        custodialAccountId: activeAccountId,
+        custodialAccountId: ownerId,
         accountId,
-      }).catch((err) => {
-        reportError("Pending migration account save", err)
       })
+      setPendingByOwner((previous) => ({ ...previous, [ownerId]: accountId }))
     },
-    [storageKey, activeAccountId],
+    [storageKey, ownerId],
   )
 
   const clearPendingAccount = useCallback(
@@ -97,8 +118,9 @@ export const usePendingMigrationAccounts = () => {
   return {
     pendingAccountIds,
     pendingForActiveAccount,
+    ownerId,
     savePendingAccount,
     clearPendingAccount,
-    loading,
+    loading: loading || ownerLoading,
   }
 }

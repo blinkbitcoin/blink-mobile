@@ -156,26 +156,17 @@ describe("migration-checkpoint-storage", () => {
       })
     })
 
-    it("returns the cloud-backup destination for CloudBackup on Android", () => {
-      const original = Platform.OS
-      Object.defineProperty(Platform, "OS", { value: "android" })
+    it("resumes forward to the cloud-backup destination on every platform", () => {
+      for (const os of ["android", "ios"] as const) {
+        const original = Platform.OS
+        Object.defineProperty(Platform, "OS", { value: os })
 
-      expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toEqual({
-        name: "selfCustodialCloudBackup",
-      })
+        expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toEqual({
+          name: "selfCustodialCloudBackup",
+        })
 
-      Object.defineProperty(Platform, "OS", { value: original })
-    })
-
-    it("returns the default destination for CloudBackup on iOS", () => {
-      const original = Platform.OS
-      Object.defineProperty(Platform, "OS", { value: "ios" })
-
-      expect(resolveCheckpointRoute(MigrationCheckpoint.CloudBackup)).toEqual({
-        name: "accountMigrationExplainer",
-      })
-
-      Object.defineProperty(Platform, "OS", { value: original })
+        Object.defineProperty(Platform, "OS", { value: original })
+      }
     })
   })
 

@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Η διεύθυνσή σας στο Lightning θα μεταφερθεί στον νέο σας non-custodial λογαριασμό.",
     "keepReceivingLnAddressLabel": "Η διεύθυνσή σας LN",
     "keepReceivingCta": "Τέλεια",
+    "receivingDisabledToast": "Η λήψη είναι προς το παρόν απενεργοποιημένη.",
     "downloadHistoryTitle": "Κατεβάστε το ιστορικό συναλλαγών σας",
     "downloadHistoryBody": "Ο νέος σας λογαριασμός θα ξεκινήσει από την αρχή. Αν θέλετε να κρατήσετε αρχείο των συναλλαγών σας, κατεβάστε τις τώρα ως CSV.",
     "downloadHistoryDownloadCta": "Λήψη",

@@ -3744,6 +3744,7 @@ const en: BaseTranslation = {
       "Your lightning address will be transferred to your new non-custodial account.",
     keepReceivingLnAddressLabel: "Your LN address",
     keepReceivingCta: "Nice",
+    receivingDisabledToast: "Receiving is currently disabled.",
     downloadHistoryTitle: "Download your transaction history",
     downloadHistoryBody:
       "Your new account will start fresh. If you want to keep record of your transactions, download them as CSV now.",

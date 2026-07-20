@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "A Lightning címed átkerül az új önrendelkező fiókodba.",
     "keepReceivingLnAddressLabel": "Az LN címed",
     "keepReceivingCta": "Remek",
+    "receivingDisabledToast": "A fogadás jelenleg le van tiltva.",
     "downloadHistoryTitle": "Töltsd le a tranzakciós előzményeidet",
     "downloadHistoryBody": "Az új fiókod tiszta lappal indul. Ha meg szeretnéd őrizni a tranzakcióid nyilvántartását, töltsd le őket most CSV formátumban.",
     "downloadHistoryDownloadCta": "Letöltés",

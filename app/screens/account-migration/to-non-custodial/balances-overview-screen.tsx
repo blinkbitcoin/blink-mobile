@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -41,18 +41,21 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const preview = useMigrationBalancesPreview()
   const { openSupport } = useContactSupport()
   const { loading: checkpointLoading, saveCheckpoint } = useMigrationCheckpoint()
+  const isFocused = useIsFocused()
 
   /** The commit point has no return path: the gesture is disabled on the
    *  route, and the hardware back is swallowed here. */
   useHardwareBackGuard()
 
   /** Landing here is the commit point, so an app relaunch returns to this screen.
+   *  Gated on focus: this screen stays mounted under the completion screen, and once the
+   *  migration clears the checkpoint a background re-save would resurrect it.
    *  TODO: the backend will hold this server-side once the migration state query ships
    *  (reinstalls cannot be covered locally); this checkpoint covers the relaunch. */
   useEffect(() => {
-    if (checkpointLoading) return
+    if (!isFocused || checkpointLoading) return
     saveCheckpoint(MigrationCheckpoint.BalancesOverview)
-  }, [checkpointLoading, saveCheckpoint])
+  }, [isFocused, checkpointLoading, saveCheckpoint])
 
   const handleApprove = useCallback(() => {
     navigation.navigate("accountMigrationTransferringFunds")

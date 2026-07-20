@@ -3600,6 +3600,7 @@
         "keepReceivingBody": "Deine Lightning-Adresse wird auf dein neues Non-Custodial-Konto übertragen.",
         "keepReceivingLnAddressLabel": "Deine LN-Adresse",
         "keepReceivingCta": "Super",
+        "receivingDisabledToast": "Empfangen ist derzeit deaktiviert.",
         "downloadHistoryTitle": "Lade deinen Transaktionsverlauf herunter",
         "downloadHistoryBody": "Dein neues Konto startet neu. Wenn du eine Aufzeichnung deiner Transaktionen behalten möchtest, lade sie jetzt als CSV herunter.",
         "downloadHistoryDownloadCta": "Herunterladen",

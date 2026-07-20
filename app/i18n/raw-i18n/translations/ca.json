@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "La teva adreça Lightning es transferirà al teu nou compte no custodial.",
     "keepReceivingLnAddressLabel": "La teva adreça LN",
     "keepReceivingCta": "Genial",
+    "receivingDisabledToast": "La recepció està desactivada actualment.",
     "downloadHistoryTitle": "Baixa el teu historial de transaccions",
     "downloadHistoryBody": "El teu compte nou començarà de zero. Si vols conservar un registre de les teves transaccions, baixa-les ara com a CSV.",
     "downloadHistoryDownloadCta": "Baixa",

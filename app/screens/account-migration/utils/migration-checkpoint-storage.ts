@@ -1,5 +1,3 @@
-import { Platform } from "react-native"
-
 import { loadJson, remove, saveJson } from "@app/utils/storage"
 
 /** Values are persisted to AsyncStorage: do not rename them. */
@@ -78,10 +76,6 @@ export const resolveCheckpointRoute = (
   checkpoint: MigrationCheckpoint | null,
 ): CheckpointDestination => {
   if (!checkpoint) return DEFAULT_DESTINATION
-
-  if (checkpoint === MigrationCheckpoint.CloudBackup && Platform.OS === "ios") {
-    return DEFAULT_DESTINATION
-  }
 
   return CHECKPOINT_DESTINATION_MAP[checkpoint]
 }

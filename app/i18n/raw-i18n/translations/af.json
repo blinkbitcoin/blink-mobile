@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Jou Lightning-adres sal na jou nuwe nie-bewaarde rekening oorgedra word.",
     "keepReceivingLnAddressLabel": "Jou LN-adres",
     "keepReceivingCta": "Lekker",
+    "receivingDisabledToast": "Ontvangs is tans gedeaktiveer.",
     "downloadHistoryTitle": "Laai jou transaksiegeskiedenis af",
     "downloadHistoryBody": "Jou nuwe rekening begin vars. As jy 'n rekord van jou transaksies wil hou, laai dit nou as CSV af.",
     "downloadHistoryDownloadCta": "Laai af",

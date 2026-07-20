@@ -110,8 +110,19 @@ export const selfCustodialCreateWallet = async (
   const stored = await KeyStoreWrapper.setMnemonicForAccount(accountId, mnemonic)
   if (!stored) throw new Error("Failed to store mnemonic")
 
-  await KeyStoreWrapper.setMnemonicNetworkForAccount(accountId, networkLabelFor(network))
-  await addSelfCustodialAccountId(accountId)
+  /** Mirror the restore path: a failure after the phrase is written would otherwise leave
+   *  orphaned key material in the keychain for an account that never finished registering. */
+  try {
+    await KeyStoreWrapper.setMnemonicNetworkForAccount(
+      accountId,
+      networkLabelFor(network),
+    )
+    await addSelfCustodialAccountId(accountId)
+  } catch (err) {
+    await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
+    reportError("Wallet create", err)
+    throw err
+  }
 }
 
 type RestoreWalletParams = {

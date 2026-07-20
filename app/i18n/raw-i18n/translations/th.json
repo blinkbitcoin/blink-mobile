@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "แอดเดรส Lightning ของคุณจะถูกโอนไปยังบัญชี non-custodial ใหม่ของคุณ",
     "keepReceivingLnAddressLabel": "แอดเดรส LN ของคุณ",
     "keepReceivingCta": "เยี่ยม",
+    "receivingDisabledToast": "ขณะนี้การรับถูกปิดใช้งาน",
     "downloadHistoryTitle": "ดาวน์โหลดประวัติธุรกรรมของคุณ",
     "downloadHistoryBody": "บัญชีใหม่ของคุณจะเริ่มต้นใหม่ หากคุณต้องการเก็บบันทึกธุรกรรมของคุณ ให้ดาวน์โหลดเป็นไฟล์ CSV ตอนนี้",
     "downloadHistoryDownloadCta": "ดาวน์โหลด",

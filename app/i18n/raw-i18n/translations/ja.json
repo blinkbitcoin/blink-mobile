@@ -3600,6 +3600,7 @@
         "keepReceivingBody": "あなたのLightningアドレスは、新しいノンカストディアルアカウントに引き継がれます。",
         "keepReceivingLnAddressLabel": "あなたのLNアドレス",
         "keepReceivingCta": "いいね",
+        "receivingDisabledToast": "現在、受け取りは無効になっています。",
         "downloadHistoryTitle": "取引履歴をダウンロード",
         "downloadHistoryBody": "新しいアカウントはゼロから始まります。取引の記録を残したい場合は、今すぐCSVとしてダウンロードしてください。",
         "downloadHistoryDownloadCta": "ダウンロード",

@@ -1,6 +1,6 @@
 import React from "react"
 import { Linking } from "react-native"
-import { render, screen, fireEvent } from "@testing-library/react-native"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -23,9 +23,12 @@ let mockCurrentDollarRestricted = false
 let mockConvertReady = true
 let mockGateArmed = false
 
+let mockIsFocused = true
+
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
+  useIsFocused: () => mockIsFocused,
 }))
 
 jest.mock("@app/graphql/generated", () => ({
@@ -94,6 +97,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     mockConvertReady = true
     mockCheckpointLoading = false
     mockGateArmed = false
+    mockIsFocused = true
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
     )
@@ -178,13 +182,23 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(mockSaveCheckpoint).not.toHaveBeenCalled()
   })
 
+  it("does not re-save the checkpoint while the screen is unfocused", async () => {
+    mockIsFocused = false
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+  })
+
   it("opens the support email when Contact support is pressed", async () => {
     renderScreen()
     await flushEffects()
 
     fireEvent.press(screen.getByText(LLOverview.contactSupportCta()))
 
-    expect(Linking.openURL).toHaveBeenCalledWith(`mailto:${CONTACT_EMAIL}`)
+    await waitFor(() =>
+      expect(Linking.openURL).toHaveBeenCalledWith(`mailto:${CONTACT_EMAIL}`),
+    )
   })
 
   it("shows a zero new dollar balance when self-custodial dollars are available", async () => {

@@ -3600,6 +3600,7 @@
     "keepReceivingBody": "Alamat Lightning anda akan dipindahkan ke akaun non-custodial baharu anda.",
     "keepReceivingLnAddressLabel": "Alamat LN anda",
     "keepReceivingCta": "Bagus",
+    "receivingDisabledToast": "Penerimaan kini dilumpuhkan.",
     "downloadHistoryTitle": "Muat turun sejarah transaksi anda",
     "downloadHistoryBody": "Akaun baharu anda akan bermula dari awal. Jika anda mahu menyimpan rekod transaksi anda, muat turun sekarang sebagai CSV.",
     "downloadHistoryDownloadCta": "Muat turun",

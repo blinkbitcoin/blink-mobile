@@ -2,15 +2,15 @@ import { act, renderHook } from "@testing-library/react-native"
 
 import { useAccountSessionDismissal } from "@app/screens/account-migration/hooks/use-account-session-dismissal"
 
-let mockActiveAccount: { id: string; type: string } | undefined
+let mockOwnerId: string | null = "custodial-1"
 
-jest.mock("@app/hooks/use-account-registry", () => ({
-  useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
+jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => ({
+  useCustodialOwnerId: () => ({ ownerId: mockOwnerId, loading: false }),
 }))
 
 describe("useAccountSessionDismissal", () => {
   beforeEach(() => {
-    mockActiveAccount = { id: "custodial-1", type: "custodial" }
+    mockOwnerId = "custodial-1"
   })
 
   it("starts undismissed", () => {
@@ -49,22 +49,25 @@ describe("useAccountSessionDismissal", () => {
       result.current.dismissForSession()
     })
 
-    mockActiveAccount = { id: "custodial-2", type: "custodial" }
+    mockOwnerId = "custodial-2"
     rerender({})
     expect(result.current.isDismissedForSession).toBe(false)
 
-    mockActiveAccount = { id: "custodial-1", type: "custodial" }
+    mockOwnerId = "custodial-1"
     rerender({})
     expect(result.current.isDismissedForSession).toBe(true)
   })
 
   it("never reports dismissed while no account is active", () => {
-    mockActiveAccount = undefined
+    mockOwnerId = null
 
     const { result } = renderHook(() => useAccountSessionDismissal())
 
     act(() => {
       result.current.dismissForSession()
+    })
+    act(() => {
+      result.current.reopen()
     })
 
     expect(result.current.isDismissedForSession).toBe(false)

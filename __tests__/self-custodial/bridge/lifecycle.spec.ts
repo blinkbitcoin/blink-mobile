@@ -309,6 +309,15 @@ describe("selfCustodialCreateWallet", () => {
     ).rejects.toThrow("Failed to store mnemonic")
     expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
   })
+
+  it("deletes the stored phrase and rethrows when a later step fails", async () => {
+    mockSetMnemonicNetwork.mockRejectedValueOnce(new Error("keychain write failed"))
+
+    await expect(
+      selfCustodialCreateWallet("test-account", Network.Regtest),
+    ).rejects.toThrow("keychain write failed")
+    expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe("selfCustodialRestoreWallet", () => {

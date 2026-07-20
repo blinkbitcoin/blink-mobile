@@ -49,7 +49,10 @@ jest.mock("@app/utils/toast", () => ({
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
-    LL: { AccountMigration: { resumeFailed: () => "resume failed" } },
+    LL: {
+      AccountMigration: { resumeFailed: () => "resume failed" },
+      errors: { generic: () => "generic error" },
+    },
   }),
 }))
 
@@ -109,7 +112,7 @@ describe("useCompleteBackup", () => {
     )
   })
 
-  it("reports the error and still navigates when the migration mark fails to persist", async () => {
+  it("stops at the backup screen and toasts instead of advancing when the mark fails", async () => {
     mockMarkBackupCompletedFor.mockRejectedValueOnce(new Error("disk full"))
 
     const { result } = renderHook(() => useCompleteBackup())
@@ -120,7 +123,10 @@ describe("useCompleteBackup", () => {
       "Migration backup state persist",
       expect.any(Error),
     )
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "generic error" }),
+    )
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
   it("marks the active account as a re-backup when it was already backed up", () => {

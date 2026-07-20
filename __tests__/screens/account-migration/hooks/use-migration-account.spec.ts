@@ -21,8 +21,13 @@ jest.mock("@app/screens/account-migration/hooks/use-pending-migration-accounts",
   }),
 }))
 
+let mockRegistryLoading = false
+
 jest.mock("@app/hooks/use-account-registry", () => ({
-  useAccountRegistry: () => ({ accounts: mockRegistryAccounts }),
+  useAccountRegistry: () => ({
+    accounts: mockRegistryAccounts,
+    loading: mockRegistryLoading,
+  }),
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state", () => ({
@@ -68,7 +73,13 @@ describe("useMigrationAccount", () => {
     mockSavePendingAccount.mockResolvedValue(undefined)
     mockPendingForActiveAccount = null
     mockRegistryAccounts = []
-    mockProvision.mockResolvedValue("sc-account-1")
+    mockRegistryLoading = false
+    mockProvision.mockImplementation(
+      async (beforeCreate?: (accountId: string) => Promise<void>) => {
+        if (beforeCreate) await beforeCreate("sc-account-1")
+        return "sc-account-1"
+      },
+    )
   })
 
   it("returns the already provisioned account without provisioning again", async () => {
@@ -138,6 +149,20 @@ describe("useMigrationAccount", () => {
 
     expect(ensured).toBeNull()
     expect(mockReportError).toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalled()
+  })
+
+  it("aborts provisioning with the failure toast when the pending-record save throws", async () => {
+    mockSavePendingAccount.mockRejectedValue(new Error("record write failed"))
+    const { result } = renderHook(() => useMigrationAccount())
+
+    let ensured: string | null = "unset"
+    await act(async () => {
+      ensured = await result.current.ensureAccount()
+    })
+
+    expect(ensured).toBeNull()
+    expect(mockSaveCheckpoint).not.toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalled()
   })
 

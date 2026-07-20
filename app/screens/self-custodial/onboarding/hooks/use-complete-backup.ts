@@ -56,10 +56,19 @@ export const useCompleteBackup = () => {
 
       if (isMigrating && migrationAccountId) {
         /** Persist the provisioned account's backup before the balance summary, so the
-         *  swap that follows Approve reads the committed backup state. */
-        await markBackupCompletedFor(migrationAccountId, method).catch((err) =>
-          reportError("Migration backup state persist", err),
-        )
+         *  swap that follows Approve reads the committed backup state. A failed write must
+         *  stop here, like the checkpoint saves: advancing would later nag the user that a
+         *  backup they just completed is missing. The screen stays so a retry re-runs it. */
+        const isBackupPersisted = await markBackupCompletedFor(migrationAccountId, method)
+          .then(() => true)
+          .catch((err) => {
+            reportError("Migration backup state persist", err)
+            return false
+          })
+        if (!isBackupPersisted) {
+          toastShow({ message: LL.errors.generic(), LL })
+          return
+        }
         navigation.navigate("accountMigrationBalancesOverview")
         return
       }

@@ -24,6 +24,22 @@ const mockDollarBalanceModal = jest.fn(
   (_props: { isVisible: boolean; toggleModal: () => void; onTransfer?: () => void }) =>
     null,
 )
+const mockUnavailableScreen = jest.fn(() => null)
+const mockPrimaryButton = jest.fn(
+  (_props: { title: string; onPress: () => void }) => null,
+)
+let mockSelfCustodialDisabled = false
+
+/** The api-keys hook now reports readiness and errors, not just loading; tests override
+ *  only the fields they care about on top of a settled, no-keys default. */
+const apiKeysState = (overrides: Record<string, unknown> = {}) => ({
+  hasActiveApiKeys: false,
+  loading: false,
+  isReady: true,
+  hasError: false,
+  refetch: jest.fn(),
+  ...overrides,
+})
 
 /** Only the status drives the intro mode, so the display fields stay fixed across cases. */
 const windDownWith = (status: WindDownStatus): WindDown => ({
@@ -42,7 +58,7 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@rn-vui/themed", () => ({
   ...jest.requireActual("@rn-vui/themed"),
-  useTheme: () => ({ theme: { colors: { primary: "#fb5607" } } }),
+  useTheme: () => ({ theme: { colors: { primary: "#fb5607", warning: "#f0a202" } } }),
 }))
 
 jest.mock("@app/components/screen", () => ({
@@ -97,12 +113,39 @@ jest.mock(
   }),
 )
 
+jest.mock("@app/screens/account-migration/hooks/use-self-custodial-disabled", () => ({
+  useSelfCustodialDisabled: () => mockSelfCustodialDisabled,
+}))
+
+jest.mock("@app/screens/feature-unavailable/temporarily-unavailable-screen", () => ({
+  TemporarilyUnavailableScreen: () => mockUnavailableScreen(),
+}))
+
+jest.mock("@app/i18n/i18n-react", () => ({
+  useI18nContext: () => ({
+    LL: {
+      errors: { generic: () => "generic error" },
+      common: { tryAgain: () => "Try Again" },
+    },
+  }),
+}))
+
+jest.mock("@app/components/atomic/galoy-primary-button", () => ({
+  GaloyPrimaryButton: (props: { title: string; onPress: () => void }) =>
+    mockPrimaryButton(props),
+}))
+
+jest.mock("@app/components/atomic/galoy-icon", () => ({
+  GaloyIcon: () => null,
+}))
+
 describe("MigrationGate", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockIsFocused = true
     mockWindDown = null
-    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: false, loading: false })
+    mockSelfCustodialDisabled = false
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState())
     mockUseTransferBlocked.mockReturnValue(false)
     mockUseDollarBalanceRestricted.mockReturnValue(false)
     mockUseWalletOverviewScreenQuery.mockReturnValue(
@@ -110,8 +153,24 @@ describe("MigrationGate", () => {
     )
   })
 
+  it("shows the temporarily-unavailable screen while the kill-switch is on, whatever the entry", () => {
+    mockSelfCustodialDisabled = true
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockUnavailableScreen).toHaveBeenCalled()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+    expect(mockApiServiceScreen).not.toHaveBeenCalled()
+    expect(mockDollarBalanceModal).not.toHaveBeenCalled()
+  })
+
   it("holds a loading screen while the API-key check loads", () => {
-    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: false, loading: true })
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ loading: true, isReady: false }))
 
     const { getByTestId } = render(<MigrationGate />)
 
@@ -131,13 +190,61 @@ describe("MigrationGate", () => {
     expect(mockRequiredScreen).not.toHaveBeenCalled()
   })
 
-  it("treats missing wallet data as a zero dollar balance", () => {
+  it("waits instead of assuming zero when the wallet balance is not yet available", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue({ loading: false, data: undefined })
+
+    const { getByTestId } = render(<MigrationGate />)
+
+    expect(getByTestId("migration-gate-loading")).toBeTruthy()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+    expect(mockDollarBalanceModal).not.toHaveBeenCalled()
+  })
+
+  it("shows a retry instead of waving the user in when the API-keys query fails", () => {
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasError: true, isReady: false }))
 
     render(<MigrationGate />)
 
+    expect(mockPrimaryButton).toHaveBeenCalled()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+    expect(mockApiServiceScreen).not.toHaveBeenCalled()
+  })
+
+  it("shows a retry instead of assuming zero when the balance query fails", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      loading: false,
+      error: new Error("network"),
+      data: undefined,
+      refetch: jest.fn(),
+    })
+
+    render(<MigrationGate />)
+
+    expect(mockPrimaryButton).toHaveBeenCalled()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
     expect(mockDollarBalanceModal).not.toHaveBeenCalled()
-    expect(mockRequiredScreen).toHaveBeenCalled()
+  })
+
+  it("refetches both queries when the retry button is pressed", () => {
+    const refetchApiKeys = jest.fn()
+    const refetchBalances = jest.fn()
+    mockUseActiveApiKeys.mockReturnValue(
+      apiKeysState({ hasError: true, isReady: false, refetch: refetchApiKeys }),
+    )
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      loading: false,
+      error: new Error("network"),
+      data: undefined,
+      refetch: refetchBalances,
+    })
+
+    render(<MigrationGate />)
+    act(() => {
+      mockPrimaryButton.mock.calls[0][0].onPress()
+    })
+
+    expect(refetchApiKeys).toHaveBeenCalledTimes(1)
+    expect(refetchBalances).toHaveBeenCalledTimes(1)
   })
 
   it("blocks entry with the dollar-balance modal when the custodial Dollar Balance is above zero", () => {
@@ -248,7 +355,7 @@ describe("MigrationGate", () => {
   })
 
   it("shows the API-service warning when there are active API keys", () => {
-    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: true, loading: false })
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
 
     render(<MigrationGate />)
 
@@ -260,7 +367,7 @@ describe("MigrationGate", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ usdBalance: 20 }),
     )
-    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: true, loading: false })
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
 
     render(<MigrationGate />)
 
@@ -276,7 +383,7 @@ describe("MigrationGate", () => {
   })
 
   it("closes the API-service warning through goBack on the voluntary route", () => {
-    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: true, loading: false })
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
 
     render(<MigrationGate />)
     const { onClose } = mockApiServiceScreen.mock.calls[0][0]
@@ -289,7 +396,7 @@ describe("MigrationGate", () => {
   })
 
   it("keeps the API-service warning unclosable after the gate arms", () => {
-    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: true, loading: false })
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
     mockWindDown = windDownWith(WindDownStatus.GatedClosed)
 
     render(<MigrationGate />)
@@ -298,7 +405,7 @@ describe("MigrationGate", () => {
   })
 
   it("moves on to the required screen once the API warning is acknowledged", () => {
-    mockUseActiveApiKeys.mockReturnValue({ hasActiveApiKeys: true, loading: false })
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
 
     render(<MigrationGate />)
     const { onContinue } = mockApiServiceScreen.mock.calls[0][0]

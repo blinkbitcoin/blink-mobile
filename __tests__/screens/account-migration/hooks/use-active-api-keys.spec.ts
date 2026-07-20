@@ -16,9 +16,15 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 
 type ApiKeyStub = { id: string; revoked: boolean; expired: boolean }
 
-const queryResult = (apiKeys: ApiKeyStub[] | undefined, loading = false) => ({
+const queryResult = (
+  apiKeys: ApiKeyStub[] | undefined,
+  loading = false,
+  error: Error | undefined = undefined,
+) => ({
   data: apiKeys === undefined ? undefined : { me: { id: "me-1", apiKeys } },
   loading,
+  error,
+  refetch: jest.fn(),
 })
 
 describe("useActiveApiKeys", () => {
@@ -68,5 +74,36 @@ describe("useActiveApiKeys", () => {
 
     expect(result.current.hasActiveApiKeys).toBe(false)
     expect(result.current.loading).toBe(true)
+    expect(result.current.isReady).toBe(false)
+    expect(result.current.hasError).toBe(false)
+  })
+
+  it("is ready once the query settles with data", () => {
+    mockUseMigrationApiKeysQuery.mockReturnValue(queryResult([]))
+
+    const { result } = renderHook(() => useActiveApiKeys())
+
+    expect(result.current.isReady).toBe(true)
+    expect(result.current.hasError).toBe(false)
+  })
+
+  it("flags an error and never reports ready when the query fails", () => {
+    mockUseMigrationApiKeysQuery.mockReturnValue(
+      queryResult(undefined, false, new Error("network")),
+    )
+
+    const { result } = renderHook(() => useActiveApiKeys())
+
+    expect(result.current.hasError).toBe(true)
+    expect(result.current.isReady).toBe(false)
+    expect(result.current.hasActiveApiKeys).toBe(false)
+  })
+
+  it("exposes the query's refetch for a manual retry", () => {
+    mockUseMigrationApiKeysQuery.mockReturnValue(queryResult([]))
+
+    const { result } = renderHook(() => useActiveApiKeys())
+
+    expect(typeof result.current.refetch).toBe("function")
   })
 })
