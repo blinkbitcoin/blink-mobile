@@ -19,9 +19,13 @@ jest.mock("@app/utils/error-logging", () => ({
 
 const accepted = { data: { migrationStart: { errors: [] } } }
 
+/** A representative start refusal now that eligibility is no longer one: the backend
+ *  still refuses a non-empty dollar balance, mapped to MIGRATION_STATE_CONFLICT. */
 const refusedWith = (message: string) => ({
-  data: { migrationStart: { errors: [{ message, code: "MIGRATION_NOT_ELIGIBLE" }] } },
+  data: { migrationStart: { errors: [{ message, code: "MIGRATION_STATE_CONFLICT" }] } },
 })
+
+const DOLLAR_BALANCE_REFUSAL = "Dollar balance must be empty before migration"
 
 const networkFailure = () => {
   const err = new Error("Network request failed")
@@ -80,7 +84,7 @@ describe("useEnsureMigrationStarted", () => {
   })
 
   it("treats a refusal in the payload as final and reports it", async () => {
-    mockMigrationStart.mockResolvedValue(refusedWith("This account is not eligible"))
+    mockMigrationStart.mockResolvedValue(refusedWith(DOLLAR_BALANCE_REFUSAL))
 
     const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
     await flushEffects()
@@ -90,7 +94,7 @@ describe("useEnsureMigrationStarted", () => {
     expect(result.current.hasConnectionIssue).toBe(false)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration start rejected",
-      expect.objectContaining({ message: "This account is not eligible" }),
+      expect.objectContaining({ message: DOLLAR_BALANCE_REFUSAL }),
     )
   })
 
@@ -139,7 +143,7 @@ describe("useEnsureMigrationStarted", () => {
 
   /** A refusal is final, so retrying it would only replay the same answer. */
   it("does not fire again when a retry follows a refusal", async () => {
-    mockMigrationStart.mockResolvedValue(refusedWith("not eligible"))
+    mockMigrationStart.mockResolvedValue(refusedWith(DOLLAR_BALANCE_REFUSAL))
 
     const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
     await flushEffects()

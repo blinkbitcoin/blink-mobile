@@ -218,7 +218,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     mockUseMigrationQuery.mockReturnValue({
       data: undefined,
       loading: false,
-      error: { graphQLErrors: [new Error("not eligible")] },
+      error: { graphQLErrors: [new Error("Unexpected server error")] },
     })
     renderScreen()
     await flushEffects()
@@ -314,7 +314,16 @@ describe("MigrationBalancesOverviewScreen", () => {
 
   it("hands over to support when the server refuses to start the migration", async () => {
     mockMigrationStart.mockResolvedValue({
-      data: { migrationStart: { errors: [{ message: "not eligible", code: "X" }] } },
+      data: {
+        migrationStart: {
+          errors: [
+            {
+              message: "Dollar balance must be empty before migration",
+              code: "MIGRATION_STATE_CONFLICT",
+            },
+          ],
+        },
+      },
     })
     renderScreen()
     await flushEffects()
@@ -338,7 +347,16 @@ describe("MigrationBalancesOverviewScreen", () => {
    *  guess which one it is looking at. */
   it("tells support the server refused the start", async () => {
     mockMigrationStart.mockResolvedValue({
-      data: { migrationStart: { errors: [{ message: "not eligible", code: "X" }] } },
+      data: {
+        migrationStart: {
+          errors: [
+            {
+              message: "Dollar balance must be empty before migration",
+              code: "MIGRATION_STATE_CONFLICT",
+            },
+          ],
+        },
+      },
     })
     renderScreen()
     await flushEffects()
