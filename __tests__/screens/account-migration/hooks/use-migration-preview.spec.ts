@@ -89,7 +89,7 @@ describe("useMigrationPreview", () => {
     mockUseMigrationQuery.mockReturnValue({
       data: undefined,
       loading: false,
-      error: { graphQLErrors: [new Error("not eligible")] },
+      error: { graphQLErrors: [new Error("Unexpected server error")] },
     })
 
     const { result } = renderHook(() => useMigrationPreview())
