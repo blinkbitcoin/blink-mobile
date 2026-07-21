@@ -84,7 +84,14 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
           goToContactSupport(MigrationSupportReason.SelfCustodialAccountMissing)
           return
         }
-        navigation.navigate("selfCustodialBackupSuccess", { reBackup: false })
+
+        /** Point of no return: reset so the finished transfer screen (whose work is done
+         *  and which swallows back) is gone from the stack, not left mounted under success
+         *  where a back press before success auto-navigates home would land on it. */
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
+        })
       })
       .catch((err) => {
         reportError("Migration session swap", err)
