@@ -59,7 +59,12 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
       hasTransferStartedRef.current = true
       try {
         if (await completeMigration()) {
-          navigation.navigate("selfCustodialBackupSuccess", { reBackup: false })
+          /** Point of no return: reset so the finished transfer screen (whose work is done and
+           *  which swallows back) is gone from the stack, not left mounted under success. */
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
+          })
           return
         }
         goToContactSupport()

@@ -17,7 +17,7 @@ export const useCompleteMigration = () => {
   const { checkpoint, accountId, loading, clearCheckpoint } =
     useMigrationCheckpointState()
   const { clearPendingAccount } = usePendingMigrationAccounts()
-  const { setActiveAccountId } = useAccountRegistry()
+  const { setActiveAccountId, accounts } = useAccountRegistry()
   const { ownerId: custodialOwnerId } = useCustodialOwnerId()
   const { discardCustodialSession } = useDiscardCustodialSession()
 
@@ -26,6 +26,11 @@ export const useCompleteMigration = () => {
    *  forever and hide the now-funded wallet from the switcher. */
   const completeMigration = useCallback(async (): Promise<boolean> => {
     if (!accountId) return false
+    /** The provisioned account must still exist before discarding the working custodial
+     *  session: a keychain loss in the resume window would otherwise switch to an account
+     *  that is gone, stranding the user with neither. A false result routes to support. */
+    const accountExists = accounts.some((account) => account.id === accountId)
+    if (!accountExists) return false
     await discardCustodialSession()
     setActiveAccountId(accountId)
     await clearCheckpoint()
@@ -33,6 +38,7 @@ export const useCompleteMigration = () => {
     return true
   }, [
     accountId,
+    accounts,
     custodialOwnerId,
     setActiveAccountId,
     discardCustodialSession,

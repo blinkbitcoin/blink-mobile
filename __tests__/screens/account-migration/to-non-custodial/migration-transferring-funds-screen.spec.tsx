@@ -11,9 +11,10 @@ import { flushEffects } from "../../../helpers/flush-effects"
 loadLocale("en")
 
 const mockNavigate = jest.fn()
+const mockReset = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, reset: mockReset }),
 }))
 
 const mockCompleteMigration = jest.fn()
@@ -94,8 +95,9 @@ describe("MigrationTransferringFundsScreen", () => {
     await flushEffects()
 
     expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
-      reBackup: false,
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
     })
   })
 
@@ -150,8 +152,9 @@ describe("MigrationTransferringFundsScreen", () => {
     )
     await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
-      reBackup: false,
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
     })
     expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationContactSupport")
     expect(jest.mocked(reportError)).not.toHaveBeenCalled()
@@ -169,10 +172,7 @@ describe("MigrationTransferringFundsScreen", () => {
 
     expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
-    expect(mockNavigate).not.toHaveBeenCalledWith(
-      "selfCustodialBackupSuccess",
-      expect.anything(),
-    )
+    expect(mockReset).not.toHaveBeenCalled()
   })
 
   it("routes to the contact support screen when the transfer fails", async () => {
@@ -186,9 +186,6 @@ describe("MigrationTransferringFundsScreen", () => {
     await flushEffects()
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
-    expect(mockNavigate).not.toHaveBeenCalledWith(
-      "selfCustodialBackupSuccess",
-      expect.anything(),
-    )
+    expect(mockReset).not.toHaveBeenCalled()
   })
 })

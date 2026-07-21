@@ -21,9 +21,12 @@ jest.mock("@app/screens/account-migration/hooks/use-discard-custodial-session", 
   }),
 }))
 
+let mockAccounts: { id: string }[] = []
+
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({
     setActiveAccountId: mockSetActiveAccountId,
+    accounts: mockAccounts,
   }),
 }))
 
@@ -54,6 +57,7 @@ describe("useCompleteMigration", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockAccountId = "sc-account-1"
+    mockAccounts = [{ id: "sc-account-1" }]
     mockCheckpoint = "backupAlerts"
     mockDiscardCustodialSession.mockResolvedValue(undefined)
   })
@@ -64,6 +68,15 @@ describe("useCompleteMigration", () => {
     expect(await complete()).toBe(false)
     expect(mockSetActiveAccountId).not.toHaveBeenCalled()
     expect(mockDiscardCustodialSession).not.toHaveBeenCalled()
+    expect(mockClearCheckpoint).not.toHaveBeenCalled()
+  })
+
+  it("keeps the custodial session and returns false when the provisioned account is gone", async () => {
+    mockAccounts = []
+
+    expect(await complete()).toBe(false)
+    expect(mockDiscardCustodialSession).not.toHaveBeenCalled()
+    expect(mockSetActiveAccountId).not.toHaveBeenCalled()
     expect(mockClearCheckpoint).not.toHaveBeenCalled()
   })
 
