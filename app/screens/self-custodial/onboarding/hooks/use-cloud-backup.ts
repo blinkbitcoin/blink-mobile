@@ -66,7 +66,9 @@ export const useCloudBackup = ({
     const provider = getCloudProviderName(LL)
 
     if (!identityPubkey) {
-      toastShow({ message: LL.BackupScreen.CloudBackup.signInFailed({ provider }), LL })
+      /** The pubkey is derived locally from the phrase, with no cloud involved, so a missing
+       *  one is a local failure: signInFailed would misdirect the user to their cloud account. */
+      toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
       return
     }
 

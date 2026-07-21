@@ -421,7 +421,7 @@ describe("useCloudBackup", () => {
     )
   })
 
-  it("aborts and toasts when identityPubkey is missing", async () => {
+  it("aborts with a local backup error (not a sign-in error) when identityPubkey is missing", async () => {
     mockIdentityPubkey = null
 
     const { result } = renderHook(() =>
@@ -435,7 +435,7 @@ describe("useCloudBackup", () => {
     expect(mockStartSession).not.toHaveBeenCalled()
     expect(mockUpload).not.toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Sign in failed" }),
+      expect.objectContaining({ message: "Upload failed" }),
     )
   })
 
