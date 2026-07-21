@@ -26,7 +26,7 @@ export const useMigrationCheckpointState = () => {
   const { ownerId, loading: ownerLoading } = useCustodialOwnerId()
   const [stored, setStored] = useState<StoredCheckpoint | null>(null)
   const [loading, setLoading] = useState(true)
-  const isMountedRef = useRef(true)
+  const isFocusedRef = useRef(true)
 
   const {
     appConfig: {
@@ -37,22 +37,22 @@ export const useMigrationCheckpointState = () => {
   const storageKey = getStorageKey(environment)
 
   const reloadCheckpoint = useCallback(() => {
-    isMountedRef.current = true
+    isFocusedRef.current = true
 
     loadCheckpoint(storageKey)
       .then((storedCheckpoint) => {
-        if (!isMountedRef.current) return
+        if (!isFocusedRef.current) return
         setStored(storedCheckpoint ?? null)
         setLoading(false)
       })
       .catch((err) => {
         reportError("Checkpoint load", err)
-        if (!isMountedRef.current) return
+        if (!isFocusedRef.current) return
         setLoading(false)
       })
 
     return () => {
-      isMountedRef.current = false
+      isFocusedRef.current = false
     }
   }, [storageKey])
 

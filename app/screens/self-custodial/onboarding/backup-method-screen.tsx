@@ -35,6 +35,9 @@ export const BackupMethodScreen: React.FC = () => {
   useMigrationBackupCheckpoint(MigrationCheckpoint.BackupMethod)
 
   const cloudProvider = getCloudProviderName(LL)
+  /** Credential-based backup is not yet wired on iOS (see the TODO below). */
+  const isNonIosPlatform = Platform.OS !== "ios"
+  const canShowCredentialBackup = isNonIosPlatform && isCredentialBackupAvailable
 
   return (
     <OnboardingScreenLayout
@@ -46,7 +49,7 @@ export const BackupMethodScreen: React.FC = () => {
             {...testProps("backup-cloud-button")}
           />
           {/* TODO: disabled on iOS while credential-based backup integration is completed */}
-          {Platform.OS !== "ios" && isCredentialBackupAvailable && (
+          {canShowCredentialBackup && (
             <GaloySecondaryButton
               title={LL.BackupScreen.BackupMethod.passwordManager()}
               onPress={handleCredentialBackup}
