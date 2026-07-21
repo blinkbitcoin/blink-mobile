@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback } from "react"
 import { ScrollView, View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -16,22 +16,7 @@ import { useHardwareBackGuard } from "@app/screens/account-migration/hooks"
 /** Deep import on purpose: its device-location chain stays out of the hooks barrel. */
 import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/use-migration-support-email"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
-import { ellipsizeMiddle } from "@app/utils/helper"
 import { testProps } from "@app/utils/testProps"
-
-/**
- * The Account ID and the pubKey render as 10 + "..." + 10 characters so the bold 16px
- * value always fits the design's 200px column on a single line; the support email still
- * carries both values complete.
- */
-const IDENTIFIER_ELLIPSIS = { maxLength: 23, maxResultLeft: 10, maxResultRight: 10 }
-
-type DiagnosticsRow = {
-  label: string
-  value: string
-  display?: string
-  isSmallValue?: boolean
-}
 
 /**
  * The migration failure and help screen: funds are safe, but the transfer needs support
@@ -71,19 +56,6 @@ export const MigrationContactSupportScreen: React.FC = () => {
   }, [isResumeOrigin, navigation])
   useHardwareBackGuard(handleBack)
 
-  const rows: DiagnosticsRow[] = useMemo(
-    () =>
-      diagnostics.map((diagnostic) => ({
-        label: diagnostic.label,
-        value: diagnostic.value,
-        display: diagnostic.isIdentifier
-          ? ellipsizeMiddle(diagnostic.value, IDENTIFIER_ELLIPSIS)
-          : undefined,
-        isSmallValue: !diagnostic.isIdentifier,
-      })),
-    [diagnostics],
-  )
-
   return (
     <Screen preset="fixed" headerShown={false}>
       <View style={styles.container}>
@@ -96,18 +68,17 @@ export const MigrationContactSupportScreen: React.FC = () => {
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
           <View style={styles.card}>
-            {rows.map((row) => {
-              const valueStyle = row.isSmallValue
-                ? [styles.value, styles.smallValue]
-                : styles.value
-              const isSingleLineIdentifier = row.display !== undefined
-              const valueNumberOfLines = isSingleLineIdentifier ? 1 : undefined
+            {diagnostics.map((diagnostic) => {
+              /** Identifiers (account id, pubkey) keep the larger value font; the rest use
+               *  the smaller one. Every value renders complete, wrapping as needed, because
+               *  support needs the whole string, never a truncated one. */
+              const valueStyle = diagnostic.isIdentifier
+                ? styles.value
+                : [styles.value, styles.smallValue]
               return (
-                <View key={row.label} style={styles.row}>
-                  <Text style={styles.label}>{row.label}</Text>
-                  <Text style={valueStyle} numberOfLines={valueNumberOfLines}>
-                    {row.display ?? row.value}
-                  </Text>
+                <View key={diagnostic.label} style={styles.row}>
+                  <Text style={styles.label}>{diagnostic.label}</Text>
+                  <Text style={valueStyle}>{diagnostic.value}</Text>
                 </View>
               )
             })}

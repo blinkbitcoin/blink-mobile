@@ -166,14 +166,18 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.queryByText(SUPPORT_EMAIL)).toBeNull()
   })
 
-  it("middle-ellipsizes the account id and the pubKey to a single line", async () => {
+  /** Sensitive identifiers are shown complete for support to copy: the account id and the
+   *  pubKey are never middle-ellipsized to fit one line. */
+  it("renders the account id and the pubKey complete, never truncated", async () => {
     const longAccountId = "0aa9dd75-4eaa-4bcd-9139-bb957c7c05e"
     mockDetails = { ...mockDetails, accountId: longAccountId, pubKey: LONG_PUBKEY }
     renderScreen()
     await flushEffects()
 
-    expect(screen.getByText("0aa9dd75-4...b957c7c05e")).toBeTruthy()
-    expect(screen.getByText("0123456789...klmnopqrst")).toBeTruthy()
+    expect(screen.getByText(longAccountId)).toBeTruthy()
+    expect(screen.getByText(LONG_PUBKEY)).toBeTruthy()
+    expect(screen.queryByText("0aa9dd75-4...b957c7c05e")).toBeNull()
+    expect(screen.queryByText("0123456789...klmnopqrst")).toBeNull()
   })
 
   it("hides the rows whose value is missing", async () => {
