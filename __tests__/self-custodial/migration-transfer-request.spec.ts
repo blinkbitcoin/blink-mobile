@@ -1,8 +1,9 @@
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
 
 import {
+  buildMigrationLnAddressProof,
   buildMigrationTransferRequest,
-  MigrationTransferRequestStatus,
+  MigrationSdkStatus,
 } from "@app/self-custodial/migration-transfer-request"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
@@ -63,8 +64,8 @@ describe("buildMigrationTransferRequest", () => {
     const result = await buildRequest()
 
     expect(result).toEqual({
-      status: MigrationTransferRequestStatus.Ok,
-      request: {
+      status: MigrationSdkStatus.Ok,
+      value: {
         sparkInvoice: "lnbcrt1invoice",
         sparkPubkey: SPARK_PUBKEY,
         proofSignature: "deadbeef",
@@ -121,7 +122,7 @@ describe("buildMigrationTransferRequest", () => {
 
     const result = await buildRequest()
 
-    expect(result).toEqual({ status: MigrationTransferRequestStatus.NoMnemonic })
+    expect(result).toEqual({ status: MigrationSdkStatus.NoMnemonic })
     expect(mockInitSdk).not.toHaveBeenCalled()
   })
 
@@ -131,21 +132,24 @@ describe("buildMigrationTransferRequest", () => {
     const result = await buildRequest()
 
     expect(result).toEqual({
-      status: MigrationTransferRequestStatus.Failed,
+      status: MigrationSdkStatus.Failed,
       error: expect.objectContaining({ message: "signer unavailable" }),
     })
   })
 
-  it("reports a failure when no invoice comes back", async () => {
-    withSignMessage(jest.fn().mockResolvedValue({ signature: "deadbeef" }))
+  /** The signature follows the invoice check, so a failed invoice never spends one. */
+  it("reports a failure when no invoice comes back, without signing", async () => {
+    const signMessage = jest.fn().mockResolvedValue({ signature: "deadbeef" })
+    withSignMessage(signMessage)
     mockReceiveLightning.mockResolvedValue({ errors: [{ message: "receive is down" }] })
 
     const result = await buildRequest()
 
     expect(result).toEqual({
-      status: MigrationTransferRequestStatus.Failed,
+      status: MigrationSdkStatus.Failed,
       error: expect.objectContaining({ message: "receive is down" }),
     })
+    expect(signMessage).not.toHaveBeenCalled()
   })
 
   it("survives an invoice failure that carries no message", async () => {
@@ -155,7 +159,7 @@ describe("buildMigrationTransferRequest", () => {
     const result = await buildRequest()
 
     expect(result).toEqual({
-      status: MigrationTransferRequestStatus.Failed,
+      status: MigrationSdkStatus.Failed,
       error: expect.objectContaining({ message: "No invoice returned" }),
     })
   })
@@ -166,7 +170,7 @@ describe("buildMigrationTransferRequest", () => {
     const result = await buildRequest()
 
     expect(result).toEqual({
-      status: MigrationTransferRequestStatus.Failed,
+      status: MigrationSdkStatus.Failed,
       error: expect.objectContaining({ message: "connection refused" }),
     })
   })
@@ -196,10 +200,39 @@ describe("buildMigrationTransferRequest", () => {
 
     const result = await buildRequest()
 
-    expect(result.status).toBe(MigrationTransferRequestStatus.Ok)
+    expect(result.status).toBe(MigrationSdkStatus.Ok)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration transfer SDK disconnect",
       expect.any(Error),
     )
+  })
+})
+
+describe("buildMigrationLnAddressProof", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockGetMnemonic.mockResolvedValue("abandon abandon ability")
+    mockInitSdk.mockResolvedValue({
+      signMessage: jest.fn().mockResolvedValue({ signature: "deadbeef" }),
+    })
+    mockGetWalletInfo.mockResolvedValue({ identityPubkey: SPARK_PUBKEY })
+    mockDisconnectSdk.mockResolvedValue(undefined)
+  })
+
+  /** The re-point moves no funds, so it needs the proof of possession and nothing else:
+   *  the same signed challenge as the commit, but no invoice. */
+  it("collects only the proof fields, without asking for an invoice", async () => {
+    const result = await buildMigrationLnAddressProof({
+      accountId: "sc-account-1",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+      signChallenge: () => "migrate:challenge",
+    })
+
+    expect(result).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { sparkPubkey: SPARK_PUBKEY, proofSignature: "deadbeef" },
+    })
+    expect(mockReceiveLightning).not.toHaveBeenCalled()
   })
 })

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { gql } from "@apollo/client"
 
 import { useMigrationStartMutation } from "@app/graphql/generated"
+import { isNetworkFailure } from "@app/graphql/is-network-failure"
 import { reportError } from "@app/utils/error-logging"
 
 gql`
@@ -29,9 +30,6 @@ type UseEnsureMigrationStarted = {
   hasConnectionIssue: boolean
   retry: () => void
 }
-
-const isNetworkFailure = (err: unknown): boolean =>
-  Boolean(err instanceof Error && "networkError" in err && err.networkError)
 
 /**
  * Arms the server-side lock by declaring the migration started, once per visit to the

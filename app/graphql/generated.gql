@@ -534,6 +534,23 @@ mutation migrationCommit($input: MigrationCommitInput!) {
   }
 }
 
+mutation migrationLnAddressTransfer($input: MigrationLnAddressTransferInput!) {
+  migrationLnAddressTransfer(input: $input) {
+    errors {
+      message
+      code
+      __typename
+    }
+    results {
+      identifier
+      lightningAddress
+      status
+      __typename
+    }
+    __typename
+  }
+}
+
 mutation migrationStart {
   migrationStart {
     errors {

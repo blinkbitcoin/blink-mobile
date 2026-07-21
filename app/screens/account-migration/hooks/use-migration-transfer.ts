@@ -8,7 +8,7 @@ import { isDeviceClockSkewed } from "@app/graphql/server-time"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   buildMigrationTransferRequest,
-  MigrationTransferRequestStatus,
+  MigrationSdkStatus,
 } from "@app/self-custodial/migration-transfer-request"
 import { MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
@@ -139,7 +139,7 @@ export const useMigrationTransfer = ({
           }),
       })
 
-      if (result.status === MigrationTransferRequestStatus.NoMnemonic) {
+      if (result.status === MigrationSdkStatus.NoMnemonic) {
         fail(
           MigrationSupportReason.SelfCustodialAccountMissing,
           new Error("No mnemonic for the provisioned account"),
@@ -147,7 +147,7 @@ export const useMigrationTransfer = ({
         return
       }
 
-      if (result.status === MigrationTransferRequestStatus.Failed) {
+      if (result.status === MigrationSdkStatus.Failed) {
         fail(MigrationSupportReason.TransferFailed, result.error)
         return
       }
@@ -155,7 +155,7 @@ export const useMigrationTransfer = ({
       const { data } = await commitMigration({
         variables: {
           input: {
-            ...result.request,
+            ...result.value,
             proofTimestamp,
             backupAttested: true,
             disclosureVersion: DISCLOSURE_VERSION,
