@@ -106,6 +106,21 @@ describe("MigrationExplainerScreen", () => {
     expect(mockEnsureAccount).toHaveBeenCalledTimes(1)
   })
 
+  it("re-disables the CTA when a box is unchecked after all were accepted", async () => {
+    renderScreen()
+    await flushEffects()
+
+    acceptAllChecks()
+    /** People change their mind: unticking a box must close the consent gate again. */
+    fireEvent.press(screen.getByText(LL.AccountMigration.explainerCheck1()))
+
+    const cta = screen.getByTestId("migration-explainer-cta")
+    expect(cta.props.accessibilityState?.disabled).toBe(true)
+
+    fireEvent.press(cta)
+    expect(mockEnsureAccount).not.toHaveBeenCalled()
+  })
+
   it("does not navigate when account provisioning fails", async () => {
     mockEnsureAccount.mockResolvedValue(null)
     renderScreen()

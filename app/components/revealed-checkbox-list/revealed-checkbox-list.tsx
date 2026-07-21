@@ -50,7 +50,7 @@ export const RevealedCheckboxList: React.FC<Props> = ({
     <View style={styles.list}>
       {labels.map((label, index) =>
         index < revealedCount ? (
-          <RevealingCard key={label} style={styles.card}>
+          <RevealingCard key={index} style={styles.card}>
             <CheckboxRow
               label={label}
               isChecked={checks[index]}
