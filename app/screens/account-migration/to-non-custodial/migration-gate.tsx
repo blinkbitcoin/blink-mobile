@@ -153,7 +153,8 @@ export const MigrationGate: React.FC = () => {
    * as migrating, so re-pitching it would be both wrong and an extra tap between the user
    * and finishing. The preconditions still run first: a dollar balance that arrived
    * mid-flow has to be emptied whatever the phase, or the commit is refused. The
-   * kill-switch outranks even this, since a disabled stack shows unavailable, never resumes.
+   * self-custodial disable outranks even this, since a disabled stack shows unavailable,
+   * never resumes.
    */
   const shouldResumeLockedMigration =
     isMigrationLocked &&
@@ -173,8 +174,9 @@ export const MigrationGate: React.FC = () => {
     navigateToCheckpoint()
   }, [shouldResumeLockedMigration, checkpointLoading, navigateToCheckpoint])
 
-  /** The kill-switch net. Every entry funnels through the gate, so blocking here pauses the
-   *  whole flow the moment ops disables the stack, whatever path the user arrived by. */
+  /** The emergency-disable net. Every entry funnels through the gate, so blocking here
+   *  pauses the whole flow the moment ops disables the stack, whatever path the user
+   *  arrived by. */
   if (isSelfCustodialDisabled) {
     return <TemporarilyUnavailableScreen />
   }
