@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo."
   },
   "SettingsScreen": {
+    "donationButton": "Iqhosha lomnikelo",
     "staticQr": "I-QR esisigxina enokuprintwa",
     "staticQrCopied": "Ilinki yakho ye-QR esisigxina ikopishiwe",
     "setByOs": "Isetwe yi-OS",

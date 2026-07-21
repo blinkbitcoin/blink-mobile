@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Haiwezekani kukadiri ada. Tafadhali jaribu kiasi tofauti."
   },
   "SettingsScreen": {
+    "donationButton": "Kitufe cha mchango",
     "staticQr": "Msimbo Tuli wa QR unaoweza kuchapishwa",
     "staticQrCopied": "Kiungo chako tuli cha msimbo wa QR kimenakiliwa",
     "setByOs": "Imewekwa na OS",

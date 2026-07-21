@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb."
   },
   "SettingsScreen": {
+    "donationButton": "Donationsknap",
     "staticQr": "Printbar statisk QR",
     "staticQrCopied": "Dit statiske QR-kode link er blevet kopieret",
     "setByOs": "Indstillet af OS",

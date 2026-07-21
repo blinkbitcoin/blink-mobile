@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Nelze odhadnout poplatky. Zkuste jiný částku."
   },
   "SettingsScreen": {
+    "donationButton": "Darovací tlačítko",
     "staticQr": "Tisknutelný statický QR",
     "staticQrCopied": "Odkaz na váš statický QR kód byl zkopírován",
     "setByOs": "Systémové nastavení",

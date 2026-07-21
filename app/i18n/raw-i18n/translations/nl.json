@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Kan kosten niet schatten. Probeer een ander bedrag."
   },
   "SettingsScreen": {
+    "donationButton": "Donatieknop",
     "staticQr": "Afdrukbare statische QR",
     "staticQrCopied": "Je statische QR-code link is gekopieerd",
     "setByOs": "Ingesteld door OS",

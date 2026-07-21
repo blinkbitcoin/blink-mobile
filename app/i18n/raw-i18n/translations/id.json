@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda."
   },
   "SettingsScreen": {
+    "donationButton": "Tombol donasi",
     "staticQr": "Kode QR Statis yang Dapat Dicetak",
     "staticQrCopied": "Tautan kode QR statis Anda telah disalin",
     "setByOs": "Ditentukan oleh OS",

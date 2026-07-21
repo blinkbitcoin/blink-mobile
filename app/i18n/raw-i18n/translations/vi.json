@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác."
   },
   "SettingsScreen": {
+    "donationButton": "Nút quyên góp",
     "staticQr": "QR tĩnh có thể in",
     "staticQrCopied": "Liên kết mã QR tĩnh của bạn đã được sao chép",
     "setByOs": "Đặt bởi hệ điều hành",

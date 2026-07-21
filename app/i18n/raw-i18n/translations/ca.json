@@ -2319,6 +2319,7 @@
     "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent."
   },
   "SettingsScreen": {
+    "donationButton": "Botó de donació",
     "staticQr": "Codi QR estàtic imprimible",
     "staticQrCopied": "S'ha copiat l'enllaç del teu codi QR estàtic",
     "setByOs": "Establert pel sistema operatiu",

@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Tesobola kusoma ssente z'obukozi. Gezaako omuwendo omulala."
   },
   "SettingsScreen": {
+    "donationButton": "Bbatani y'okuwaayo",
     "staticQr": "Koodi ya QR etali ya kukyukakyuka eyinza okwokyebwaamu",
     "staticQrCopied": "Enyunga yo etakyuuka eya QR code ekoppeddwa",
     "setByOs": "Eteekebwawo OS",

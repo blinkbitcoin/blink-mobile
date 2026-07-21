@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită."
   },
   "SettingsScreen": {
+    "donationButton": "Buton de donație",
     "staticQr": "Cod QR static imprimabil",
     "staticQrCopied": "Linkul codului QR static a fost copiat",
     "setByOs": "Setat de OS",

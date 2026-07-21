@@ -2319,6 +2319,7 @@
         "sdkGenericError": "Impossible d'estimer les frais. Essayez un montant différent."
     },
     "SettingsScreen": {
+        "donationButton": "Bouton de don",
         "staticQr": "QR statique imprimable",
         "staticQrCopied": "Votre lien de QR code statique a été copié",
         "setByOs": "Défini par le système",
