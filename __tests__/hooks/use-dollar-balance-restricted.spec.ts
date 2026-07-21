@@ -141,9 +141,15 @@ describe("useDollarBalanceRestricted", () => {
       expect(readOverride(AccountType.SelfCustodial)).toBe(true)
     })
 
-    it("ignores the session phone country that would otherwise block", () => {
+    it("falls back to the session country when the IP does not resolve", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
       mockUseIpCountryCode.mockReturnValue(undefined)
+      expect(readOverride(AccountType.SelfCustodial)).toBe(true)
+    })
+
+    it("prefers the IP over the session country when both resolve", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+      mockUseIpCountryCode.mockReturnValue("HK")
       expect(readOverride(AccountType.SelfCustodial)).toBe(false)
     })
 

@@ -60,8 +60,11 @@ const useDollarBalanceRestrictionPolicy = (
 
 /**
  * The country whose block-list decides the restriction. A self-custodial account has no
- * phone, so evaluating its policy resolves by IP; every other case reads the device's
- * own country.
+ * phone, so evaluating its policy resolves by IP; every other case reads the device's own
+ * country. The IP wins whenever it resolves, but while predicting the self-custodial policy
+ * from a still-custodial session an unreachable IP falls back to the session country, so a
+ * failed IP lookup does not read as unrestricted and preview a dollar balance the account
+ * cannot hold.
  */
 const useRestrictionRegion = (
   accountTypeOverride?: AccountType,
@@ -71,7 +74,9 @@ const useRestrictionRegion = (
   const isSelfCustodialPrediction = accountTypeOverride === AccountType.SelfCustodial
   const ipCountryCode = useIpCountryCode(isSelfCustodialPrediction)
 
-  return isSelfCustodialPrediction ? ipCountryCode : deviceCountryCode
+  return isSelfCustodialPrediction
+    ? ipCountryCode ?? deviceCountryCode
+    : deviceCountryCode
 }
 
 export const useDollarBalanceRestricted = (
