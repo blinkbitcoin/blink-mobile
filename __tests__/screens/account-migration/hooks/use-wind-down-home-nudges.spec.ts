@@ -5,7 +5,7 @@ import { useWindDownHomeNudges } from "@app/screens/account-migration/hooks/use-
 const mockReopen = jest.fn()
 const mockMigrateNowPrompt = {
   isVisible: true,
-  isReceiveDisabled: true,
+  canReopen: true,
   reopen: mockReopen,
 }
 const mockReminderBulletin = { isVisible: false, deadlineTimestamp: 123, timezone: "UTC" }
@@ -37,7 +37,7 @@ jest.mock("@app/utils/toast", () => ({
 describe("useWindDownHomeNudges", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockMigrateNowPrompt.isReceiveDisabled = true
+    mockMigrateNowPrompt.canReopen = true
     mockReceiveBlocked = false
   })
 
@@ -56,9 +56,9 @@ describe("useWindDownHomeNudges", () => {
     expect(result.current.receiveBlocked.isBlocked).toBe(true)
   })
 
-  it("reopens the migrate-now nudge on a blocked tap in the receive-disabled phase", () => {
+  it("reopens the migrate-now nudge on a blocked tap when the prompt can reopen", () => {
     mockReceiveBlocked = true
-    mockMigrateNowPrompt.isReceiveDisabled = true
+    mockMigrateNowPrompt.canReopen = true
 
     const { result } = renderHook(() => useWindDownHomeNudges())
     result.current.receiveBlocked.onDisabledPress()
@@ -67,9 +67,9 @@ describe("useWindDownHomeNudges", () => {
     expect(mockToastShow).not.toHaveBeenCalled()
   })
 
-  it("explains with a toast on a blocked tap in the terminal gate phase", () => {
+  it("explains with a toast on a blocked tap when the prompt cannot reopen", () => {
     mockReceiveBlocked = true
-    mockMigrateNowPrompt.isReceiveDisabled = false
+    mockMigrateNowPrompt.canReopen = false
 
     const { result } = renderHook(() => useWindDownHomeNudges())
     result.current.receiveBlocked.onDisabledPress()

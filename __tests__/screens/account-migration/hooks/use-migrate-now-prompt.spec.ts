@@ -50,7 +50,7 @@ describe("useMigrateNowPrompt", () => {
     const { result } = renderHook(() => useMigrateNowPrompt())
 
     expect(result.current.isVisible).toBe(true)
-    expect(result.current.isReceiveDisabled).toBe(true)
+    expect(result.current.canReopen).toBe(true)
     expect(result.current.deadlineTimestamp).toBe(affectedWindDown.finalDeadline)
     expect(result.current.timezone).toBe(affectedWindDown.timezone)
   })
@@ -61,7 +61,7 @@ describe("useMigrateNowPrompt", () => {
     const { result } = renderHook(() => useMigrateNowPrompt())
 
     expect(result.current.isVisible).toBe(false)
-    expect(result.current.isReceiveDisabled).toBe(false)
+    expect(result.current.canReopen).toBe(false)
   })
 
   it("stays quiet once the gate closes, where the blocker takes over", () => {
@@ -78,7 +78,7 @@ describe("useMigrateNowPrompt", () => {
     const { result } = renderHook(() => useMigrateNowPrompt())
 
     expect(result.current.isVisible).toBe(false)
-    expect(result.current.isReceiveDisabled).toBe(false)
+    expect(result.current.canReopen).toBe(false)
   })
 
   it("never prompts a self-custodial account", () => {
@@ -97,7 +97,7 @@ describe("useMigrateNowPrompt", () => {
     })
 
     expect(result.current.isVisible).toBe(false)
-    expect(result.current.isReceiveDisabled).toBe(true)
+    expect(result.current.canReopen).toBe(true)
   })
 
   it("prompts again when reopened after a dismissal", () => {
@@ -128,12 +128,12 @@ describe("useMigrateNowPrompt", () => {
     expect(result.current.isVisible).toBe(true)
   })
 
-  it("pauses the prompt while the self-custodial kill-switch is off, keeping the receive state", () => {
+  it("cannot reopen while the self-custodial flag is off, so the home falls back to a toast", () => {
     mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
 
     const { result } = renderHook(() => useMigrateNowPrompt())
 
     expect(result.current.isVisible).toBe(false)
-    expect(result.current.isReceiveDisabled).toBe(true)
+    expect(result.current.canReopen).toBe(false)
   })
 })

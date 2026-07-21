@@ -6,7 +6,7 @@ import { useSelfCustodialDisabled } from "./use-self-custodial-disabled"
 
 type MigrateNowPrompt = {
   isVisible: boolean
-  isReceiveDisabled: boolean
+  canReopen: boolean
   deadlineTimestamp: number
   timezone: string | undefined
   dismissForSession: () => void
@@ -25,10 +25,14 @@ export const useMigrateNowPrompt = (): MigrateNowPrompt => {
 
   const isReceiveDisabled = windDown?.status === WindDownStatus.ReceiveDisabled
 
+  /** Reopening the greyed-Receive nudge only surfaces the prompt when receiving is disabled
+   *  and the self-custodial flag is on; the home falls back to a toast otherwise. */
+  const canReopen = isReceiveDisabled && !isSelfCustodialDisabled
+
   /** The deadline fields are display data for the modal, only read while visible. */
   return {
-    isVisible: isReceiveDisabled && !isDismissedForSession && !isSelfCustodialDisabled,
-    isReceiveDisabled,
+    isVisible: canReopen && !isDismissedForSession,
+    canReopen,
     deadlineTimestamp: windDown?.finalDeadline ?? 0,
     timezone: windDown?.timezone,
     dismissForSession,

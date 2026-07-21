@@ -19,13 +19,13 @@ export const useWindDownHomeNudges = () => {
   const reminderBulletin = useMigrationReminderBulletin()
   const isReceiveBlocked = useWindDownReceiveBlocked()
 
-  /** Both blocked phases grey Receive. The receive-disabled phase reopens the migrate-now
-   *  nudge; the terminal gate (reachable on the home only with the kill-switch on) has no
-   *  nudge, so a tap explains with a toast instead of silently bouncing off the gate.
-   *  Depends on the prompt's stable members, not the object it recreates each render. */
-  const { isReceiveDisabled, reopen } = migrateNowPrompt
+  /** Both blocked phases grey Receive. A tap reopens the migrate-now nudge when that nudge
+   *  can actually surface; when it cannot (the terminal gate, or the self-custodial flag is
+   *  off) a toast explains, so the tap is never a silent no-op. Depends on the prompt's
+   *  stable members, not the object it recreates each render. */
+  const { canReopen, reopen } = migrateNowPrompt
   const onReceiveBlockedPress = useCallback(() => {
-    if (isReceiveDisabled) {
+    if (canReopen) {
       reopen()
       return
     }
@@ -34,7 +34,7 @@ export const useWindDownHomeNudges = () => {
       type: "warning",
       LL,
     })
-  }, [isReceiveDisabled, reopen, LL])
+  }, [canReopen, reopen, LL])
 
   return {
     migrateNowPrompt,

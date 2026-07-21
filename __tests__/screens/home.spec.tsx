@@ -143,14 +143,14 @@ jest.mock("@app/hooks/use-dollar-balance-forced-conversion", () => ({
 }))
 
 let mockMigratePromptVisible = false
-let mockReceiveDisabled = false
+let mockCanReopen = false
 const mockDismissMigratePrompt = jest.fn()
 const mockReopenMigratePrompt = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks/use-migrate-now-prompt", () => ({
   useMigrateNowPrompt: () => ({
     isVisible: mockMigratePromptVisible,
-    isReceiveDisabled: mockReceiveDisabled,
+    canReopen: mockCanReopen,
     deadlineTimestamp: 1787003999,
     timezone: "Europe/Paris",
     dismissForSession: mockDismissMigratePrompt,
@@ -621,7 +621,7 @@ describe("HomeScreen", () => {
     mockActiveWalletOverride = null
     mockDollarBalanceRestrictedOverride = false
     mockMigratePromptVisible = false
-    mockReceiveDisabled = false
+    mockCanReopen = false
     mockReceiveBlocked = false
     mockReminderBulletinVisible = false
     mockTransferBlockedOverride = false
@@ -1408,7 +1408,7 @@ describe("HomeScreen wind-down states", () => {
     mockActiveWalletOverride = null
     mockDollarBalanceRestrictedOverride = false
     mockMigratePromptVisible = false
-    mockReceiveDisabled = false
+    mockCanReopen = false
     mockReceiveBlocked = false
     mockReminderBulletinVisible = false
     mockTransferBlockedOverride = false
@@ -1561,7 +1561,7 @@ describe("HomeScreen wind-down states", () => {
   })
 
   it("greys out the receive action while receiving is disabled, reopening the prompt", async () => {
-    mockReceiveDisabled = true
+    mockCanReopen = true
     mockReceiveBlocked = true
     mockNavigate.mockClear()
 
