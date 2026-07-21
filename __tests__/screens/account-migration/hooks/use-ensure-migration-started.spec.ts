@@ -164,8 +164,10 @@ describe("useEnsureMigrationStarted", () => {
     expect(result.current.isRejected).toBe(false)
   })
 
-  /** Unmounting mid-flight must not write state into a torn-down hook. */
-  it("drops the outcome when the screen leaves before the answer arrives", async () => {
+  /** A rejection that arrives after the screen has left is still worth logging, so the
+   *  report fires before the unmount guard; only the state write the guard protects is
+   *  dropped. Moving reportError below the guard would silence it here. */
+  it("still reports a rejection that arrives after the screen has left", async () => {
     let settle: (value: unknown) => void = () => undefined
     mockMigrationStart.mockReturnValue(
       new Promise((resolve) => {
@@ -173,14 +175,20 @@ describe("useEnsureMigrationStarted", () => {
       }),
     )
 
-    const { unmount } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    const { result, unmount } = renderHook(() =>
+      useEnsureMigrationStarted({ skip: false }),
+    )
     unmount()
 
     await act(async () => {
-      settle(accepted)
+      settle(refusedWith(DOLLAR_BALANCE_REFUSAL))
     })
 
-    expect(mockReportError).not.toHaveBeenCalled()
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration start rejected",
+      expect.objectContaining({ message: DOLLAR_BALANCE_REFUSAL }),
+    )
+    expect(result.current.isRejected).toBe(false)
   })
 
   it("drops the failure when the screen leaves before the error arrives", async () => {
