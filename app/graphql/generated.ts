@@ -207,21 +207,6 @@ export type AccountLimits = {
   readonly withdrawal: ReadonlyArray<AccountLimit>;
 };
 
-export type AccountMigration = {
-  readonly __typename: 'AccountMigration';
-  readonly preview: AccountMigrationPreview;
-  readonly status: MigrationStatus;
-  readonly transferPaymentHash?: Maybe<Scalars['String']['output']>;
-};
-
-export type AccountMigrationPreview = {
-  readonly __typename: 'AccountMigrationPreview';
-  readonly balanceSats: Scalars['SatAmount']['output'];
-  readonly feeCoveredByBlink: Scalars['Boolean']['output'];
-  readonly feeSats: Scalars['SatAmount']['output'];
-  readonly receiveSats: Scalars['SatAmount']['output'];
-};
-
 export type AccountUpdateDefaultWalletIdInput = {
   readonly walletId: Scalars['WalletId']['input'];
 };
@@ -1415,57 +1400,6 @@ export type MerchantPayload = {
   readonly merchant?: Maybe<Merchant>;
 };
 
-export type MigrationCommitInput = {
-  readonly backupAttested: Scalars['Boolean']['input'];
-  readonly disclosureVersion: Scalars['String']['input'];
-  readonly proofSignature: Scalars['String']['input'];
-  readonly proofTimestamp: Scalars['SafeInt']['input'];
-  readonly sparkInvoice: Scalars['LnPaymentRequest']['input'];
-  readonly sparkPubkey: Scalars['String']['input'];
-};
-
-export type MigrationLnAddressTransferInput = {
-  readonly proofSignature: Scalars['String']['input'];
-  readonly proofTimestamp: Scalars['SafeInt']['input'];
-  readonly sparkPubkey: Scalars['String']['input'];
-};
-
-export type MigrationLnAddressTransferPayload = {
-  readonly __typename: 'MigrationLnAddressTransferPayload';
-  readonly errors: ReadonlyArray<Error>;
-  readonly results: ReadonlyArray<MigrationLnAddressTransferResult>;
-};
-
-export type MigrationLnAddressTransferResult = {
-  readonly __typename: 'MigrationLnAddressTransferResult';
-  readonly identifier: Scalars['String']['output'];
-  readonly lightningAddress?: Maybe<Scalars['String']['output']>;
-  readonly status: MigrationLnAddressTransferStatus;
-};
-
-export const MigrationLnAddressTransferStatus = {
-  AlreadyTransferred: 'ALREADY_TRANSFERRED',
-  Failed: 'FAILED',
-  SkippedNotRegistered: 'SKIPPED_NOT_REGISTERED',
-  Transferred: 'TRANSFERRED'
-} as const;
-
-export type MigrationLnAddressTransferStatus = typeof MigrationLnAddressTransferStatus[keyof typeof MigrationLnAddressTransferStatus];
-export type MigrationPayload = {
-  readonly __typename: 'MigrationPayload';
-  readonly errors: ReadonlyArray<Error>;
-  readonly migration?: Maybe<AccountMigration>;
-};
-
-export const MigrationStatus = {
-  Completed: 'COMPLETED',
-  Failed: 'FAILED',
-  InProgress: 'IN_PROGRESS',
-  NotStarted: 'NOT_STARTED',
-  Transferring: 'TRANSFERRING'
-} as const;
-
-export type MigrationStatus = typeof MigrationStatus[keyof typeof MigrationStatus];
 export type MobileVersions = {
   readonly __typename: 'MobileVersions';
   readonly currentSupported: Scalars['Int']['output'];
@@ -1591,9 +1525,6 @@ export type Mutation = {
   /** Sends a payment to a lightning address. */
   readonly lnurlPaymentSend: PaymentSendPayload;
   readonly merchantMapSuggest: MerchantPayload;
-  readonly migrationCommit: MigrationPayload;
-  readonly migrationLnAddressTransfer: MigrationLnAddressTransferPayload;
-  readonly migrationStart: MigrationPayload;
   readonly onChainAddressCreate: OnChainAddressPayload;
   readonly onChainAddressCurrent: OnChainAddressPayload;
   readonly onChainPaymentSend: PaymentSendPayload;
@@ -1863,16 +1794,6 @@ export type MutationLnurlPaymentSendArgs = {
 
 export type MutationMerchantMapSuggestArgs = {
   input: MerchantMapSuggestInput;
-};
-
-
-export type MutationMigrationCommitArgs = {
-  input: MigrationCommitInput;
-};
-
-
-export type MutationMigrationLnAddressTransferArgs = {
-  input: MigrationLnAddressTransferInput;
 };
 
 
@@ -2299,7 +2220,6 @@ export type Query = {
   readonly lnInvoicePaymentStatusByHash: LnInvoicePaymentStatus;
   readonly lnInvoicePaymentStatusByPaymentRequest: LnInvoicePaymentStatus;
   readonly me?: Maybe<User>;
-  readonly migration?: Maybe<AccountMigration>;
   readonly mobileVersions?: Maybe<ReadonlyArray<Maybe<MobileVersions>>>;
   readonly onChainTxFee: OnChainTxFee;
   readonly onChainUsdTxFee: OnChainUsdTxFee;
@@ -9440,8 +9360,6 @@ export type ResolversTypes = {
   AccountLevel: AccountLevel;
   AccountLimit: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['AccountLimit']>;
   AccountLimits: ResolverTypeWrapper<AccountLimits>;
-  AccountMigration: ResolverTypeWrapper<AccountMigration>;
-  AccountMigrationPreview: ResolverTypeWrapper<AccountMigrationPreview>;
   AccountUpdateDefaultWalletIdInput: AccountUpdateDefaultWalletIdInput;
   AccountUpdateDefaultWalletIdPayload: ResolverTypeWrapper<AccountUpdateDefaultWalletIdPayload>;
   AccountUpdateDisplayCurrencyInput: AccountUpdateDisplayCurrencyInput;
@@ -9590,13 +9508,6 @@ export type ResolversTypes = {
   Merchant: ResolverTypeWrapper<Merchant>;
   MerchantMapSuggestInput: MerchantMapSuggestInput;
   MerchantPayload: ResolverTypeWrapper<MerchantPayload>;
-  MigrationCommitInput: MigrationCommitInput;
-  MigrationLnAddressTransferInput: MigrationLnAddressTransferInput;
-  MigrationLnAddressTransferPayload: ResolverTypeWrapper<MigrationLnAddressTransferPayload>;
-  MigrationLnAddressTransferResult: ResolverTypeWrapper<MigrationLnAddressTransferResult>;
-  MigrationLnAddressTransferStatus: MigrationLnAddressTransferStatus;
-  MigrationPayload: ResolverTypeWrapper<MigrationPayload>;
-  MigrationStatus: MigrationStatus;
   Minutes: ResolverTypeWrapper<Scalars['Minutes']['output']>;
   MobileVersions: ResolverTypeWrapper<MobileVersions>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -9747,8 +9658,6 @@ export type ResolversParentTypes = {
   AccountEnableNotificationChannelInput: AccountEnableNotificationChannelInput;
   AccountLimit: ResolversInterfaceTypes<ResolversParentTypes>['AccountLimit'];
   AccountLimits: AccountLimits;
-  AccountMigration: AccountMigration;
-  AccountMigrationPreview: AccountMigrationPreview;
   AccountUpdateDefaultWalletIdInput: AccountUpdateDefaultWalletIdInput;
   AccountUpdateDefaultWalletIdPayload: AccountUpdateDefaultWalletIdPayload;
   AccountUpdateDisplayCurrencyInput: AccountUpdateDisplayCurrencyInput;
@@ -9888,11 +9797,6 @@ export type ResolversParentTypes = {
   Merchant: Merchant;
   MerchantMapSuggestInput: MerchantMapSuggestInput;
   MerchantPayload: MerchantPayload;
-  MigrationCommitInput: MigrationCommitInput;
-  MigrationLnAddressTransferInput: MigrationLnAddressTransferInput;
-  MigrationLnAddressTransferPayload: MigrationLnAddressTransferPayload;
-  MigrationLnAddressTransferResult: MigrationLnAddressTransferResult;
-  MigrationPayload: MigrationPayload;
   Minutes: Scalars['Minutes']['output'];
   MobileVersions: MobileVersions;
   Mutation: {};
@@ -10057,21 +9961,6 @@ export type AccountLimitsResolvers<ContextType = any, ParentType extends Resolve
   convert?: Resolver<ReadonlyArray<ResolversTypes['AccountLimit']>, ParentType, ContextType>;
   internalSend?: Resolver<ReadonlyArray<ResolversTypes['AccountLimit']>, ParentType, ContextType>;
   withdrawal?: Resolver<ReadonlyArray<ResolversTypes['AccountLimit']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type AccountMigrationResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccountMigration'] = ResolversParentTypes['AccountMigration']> = {
-  preview?: Resolver<ResolversTypes['AccountMigrationPreview'], ParentType, ContextType>;
-  status?: Resolver<ResolversTypes['MigrationStatus'], ParentType, ContextType>;
-  transferPaymentHash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type AccountMigrationPreviewResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccountMigrationPreview'] = ResolversParentTypes['AccountMigrationPreview']> = {
-  balanceSats?: Resolver<ResolversTypes['SatAmount'], ParentType, ContextType>;
-  feeCoveredByBlink?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  feeSats?: Resolver<ResolversTypes['SatAmount'], ParentType, ContextType>;
-  receiveSats?: Resolver<ResolversTypes['SatAmount'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -10713,25 +10602,6 @@ export type MerchantPayloadResolvers<ContextType = any, ParentType extends Resol
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MigrationLnAddressTransferPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrationLnAddressTransferPayload'] = ResolversParentTypes['MigrationLnAddressTransferPayload']> = {
-  errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
-  results?: Resolver<ReadonlyArray<ResolversTypes['MigrationLnAddressTransferResult']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type MigrationLnAddressTransferResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrationLnAddressTransferResult'] = ResolversParentTypes['MigrationLnAddressTransferResult']> = {
-  identifier?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  lightningAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  status?: Resolver<ResolversTypes['MigrationLnAddressTransferStatus'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type MigrationPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrationPayload'] = ResolversParentTypes['MigrationPayload']> = {
-  errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
-  migration?: Resolver<Maybe<ResolversTypes['AccountMigration']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export interface MinutesScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Minutes'], any> {
   name: 'Minutes';
 }
@@ -10794,9 +10664,6 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   lnUsdInvoiceFeeProbe?: Resolver<ResolversTypes['SatAmountPayload'], ParentType, ContextType, RequireFields<MutationLnUsdInvoiceFeeProbeArgs, 'input'>>;
   lnurlPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationLnurlPaymentSendArgs, 'input'>>;
   merchantMapSuggest?: Resolver<ResolversTypes['MerchantPayload'], ParentType, ContextType, RequireFields<MutationMerchantMapSuggestArgs, 'input'>>;
-  migrationCommit?: Resolver<ResolversTypes['MigrationPayload'], ParentType, ContextType, RequireFields<MutationMigrationCommitArgs, 'input'>>;
-  migrationLnAddressTransfer?: Resolver<ResolversTypes['MigrationLnAddressTransferPayload'], ParentType, ContextType, RequireFields<MutationMigrationLnAddressTransferArgs, 'input'>>;
-  migrationStart?: Resolver<ResolversTypes['MigrationPayload'], ParentType, ContextType>;
   onChainAddressCreate?: Resolver<ResolversTypes['OnChainAddressPayload'], ParentType, ContextType, RequireFields<MutationOnChainAddressCreateArgs, 'input'>>;
   onChainAddressCurrent?: Resolver<ResolversTypes['OnChainAddressPayload'], ParentType, ContextType, RequireFields<MutationOnChainAddressCurrentArgs, 'input'>>;
   onChainPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationOnChainPaymentSendArgs, 'input'>>;
@@ -11030,7 +10897,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   lnInvoicePaymentStatusByHash?: Resolver<ResolversTypes['LnInvoicePaymentStatus'], ParentType, ContextType, RequireFields<QueryLnInvoicePaymentStatusByHashArgs, 'input'>>;
   lnInvoicePaymentStatusByPaymentRequest?: Resolver<ResolversTypes['LnInvoicePaymentStatus'], ParentType, ContextType, RequireFields<QueryLnInvoicePaymentStatusByPaymentRequestArgs, 'input'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  migration?: Resolver<Maybe<ResolversTypes['AccountMigration']>, ParentType, ContextType>;
   mobileVersions?: Resolver<Maybe<ReadonlyArray<Maybe<ResolversTypes['MobileVersions']>>>, ParentType, ContextType>;
   onChainTxFee?: Resolver<ResolversTypes['OnChainTxFee'], ParentType, ContextType, RequireFields<QueryOnChainTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   onChainUsdTxFee?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
@@ -11465,8 +11331,6 @@ export type Resolvers<ContextType = any> = {
   AccountDeletePayload?: AccountDeletePayloadResolvers<ContextType>;
   AccountLimit?: AccountLimitResolvers<ContextType>;
   AccountLimits?: AccountLimitsResolvers<ContextType>;
-  AccountMigration?: AccountMigrationResolvers<ContextType>;
-  AccountMigrationPreview?: AccountMigrationPreviewResolvers<ContextType>;
   AccountUpdateDefaultWalletIdPayload?: AccountUpdateDefaultWalletIdPayloadResolvers<ContextType>;
   AccountUpdateDisplayCurrencyPayload?: AccountUpdateDisplayCurrencyPayloadResolvers<ContextType>;
   AccountUpdateNotificationSettingsPayload?: AccountUpdateNotificationSettingsPayloadResolvers<ContextType>;
@@ -11557,9 +11421,6 @@ export type Resolvers<ContextType = any> = {
   Memo?: GraphQLScalarType;
   Merchant?: MerchantResolvers<ContextType>;
   MerchantPayload?: MerchantPayloadResolvers<ContextType>;
-  MigrationLnAddressTransferPayload?: MigrationLnAddressTransferPayloadResolvers<ContextType>;
-  MigrationLnAddressTransferResult?: MigrationLnAddressTransferResultResolvers<ContextType>;
-  MigrationPayload?: MigrationPayloadResolvers<ContextType>;
   Minutes?: GraphQLScalarType;
   MobileVersions?: MobileVersionsResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
