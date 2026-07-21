@@ -6,6 +6,10 @@ import {
   type Network,
 } from "@breeztech/breez-sdk-spark-react-native"
 
+/** defaultExternalSigner is typed as the bare ExternalSigner interface, which omits the
+ *  uniffi lifecycle method, though the concrete object always carries it. */
+type DisposableSigner = { uniffiDestroy: () => void }
+
 export const getWalletInfo = (sdk: BreezSdkInterface) =>
   sdk.getInfo({ ensureSynced: false })
 
@@ -18,8 +22,15 @@ export const deriveWalletIdentityPubkey = (
   network: Network,
 ): string => {
   const signer = defaultExternalSigner(mnemonic, undefined, network, undefined)
-  const { bytes } = signer.identityPublicKey()
-  return Buffer.from(new Uint8Array(bytes)).toString("hex")
+  /** The signer holds key material derived from the seed in native memory; free it as soon
+   *  as the pubkey is read instead of waiting for GC to run the destructor guard. */
+  try {
+    const { bytes } = signer.identityPublicKey()
+    return Buffer.from(new Uint8Array(bytes)).toString("hex")
+  } finally {
+    const disposableSigner = signer as unknown as DisposableSigner
+    disposableSigner.uniffiDestroy()
+  }
 }
 
 export const syncSelfCustodialWallet = (sdk: BreezSdkInterface) =>
