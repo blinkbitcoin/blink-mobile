@@ -23,12 +23,15 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
   } = useTheme()
   const { navigateToCheckpoint, loading: checkpointLoading } = useMigrationCheckpoint()
 
-  const { walletIds } = useCustodialWalletBalances()
+  const { walletIds, isReady: areWalletsReady } = useCustodialWalletBalances()
 
   const { exportCsv } = useExportTransactionsCsv()
   const [isDownloading, setIsDownloading] = useState(false)
   const [hasDownloaded, setHasDownloaded] = useState(false)
   const isBusy = checkpointLoading || isDownloading
+  /** The export needs the wallet ids, so Download waits for the balances query; Skip never
+   *  does, so a still-loading or failed query can never trap the user on this optional step. */
+  const isDownloadDisabled = isBusy || !areWalletsReady
   const secondaryButtonTitle = hasDownloaded ? LL.common.continue() : LL.common.skip()
 
   const goToNextStep = useCallback(() => {
@@ -57,7 +60,7 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.AccountMigration.downloadHistoryDownloadCta()}
             loading={isDownloading}
-            disabled={isBusy}
+            disabled={isDownloadDisabled}
             onPress={handleDownload}
             {...testProps("migration-download-history-cta")}
           />

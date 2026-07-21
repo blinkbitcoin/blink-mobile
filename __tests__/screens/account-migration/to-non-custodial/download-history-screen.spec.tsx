@@ -180,6 +180,40 @@ describe("MigrationDownloadHistoryScreen", () => {
     expect(isContinueDisabled()).toBe(false)
   })
 
+  it("disables Download but keeps Skip available while the wallet balances load", async () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      data: undefined,
+      loading: true,
+      error: undefined,
+      refetch: jest.fn(),
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByTestId("migration-download-history-cta").props.accessibilityState
+        ?.disabled,
+    ).toBe(true)
+    expect(isContinueDisabled()).toBe(false)
+  })
+
+  it("keeps Download disabled but Skip available when the wallet query errors", async () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error: new Error("wallets failed"),
+      refetch: jest.fn(),
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByTestId("migration-download-history-cta").props.accessibilityState
+        ?.disabled,
+    ).toBe(true)
+    expect(isContinueDisabled()).toBe(false)
+  })
+
   it("disables both actions while the migration checkpoint is loading", async () => {
     mockUseMigrationCheckpoint.mockReturnValue({
       navigateToCheckpoint: mockNavigateToCheckpoint,
