@@ -1,5 +1,5 @@
 import React from "react"
-import { render, act } from "@testing-library/react-native"
+import { render, act, fireEvent } from "@testing-library/react-native"
 
 import { MigrationGate } from "@app/screens/account-migration/to-non-custodial/migration-gate"
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
@@ -18,19 +18,54 @@ const mockNavigateToCheckpoint = jest.fn()
 const mockUseTransferBlocked = jest.fn()
 const mockUseDollarBalanceRestricted = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
+const mockReportError = jest.fn()
+/** The child mocks render a Pressable per action instead of returning null, so tests drive
+ *  them with real fireEvent (which honours `disabled`) rather than calling captured props;
+ *  the children stay mocked, so no real screen or its dependency tree is pulled in. */
 const mockApiServiceScreen = jest.fn(
-  (_props: { onContinue: () => void; onClose?: () => void }) => null,
+  (props: { onContinue: () => void; onClose?: () => void }) => {
+    const { Pressable } = jest.requireActual("react-native")
+    return (
+      <>
+        <Pressable testID="gate-api-continue" onPress={props.onContinue} />
+        {props.onClose ? (
+          <Pressable testID="gate-api-close" onPress={props.onClose} />
+        ) : null}
+      </>
+    )
+  },
 )
 const mockRequiredScreen = jest.fn(
   (_props: { mode: string; onClose?: () => void; isExitBlocked?: boolean }) => null,
 )
 const mockDollarBalanceModal = jest.fn(
-  (_props: { isVisible: boolean; toggleModal: () => void; onTransfer?: () => void }) =>
-    null,
+  (props: { isVisible: boolean; toggleModal: () => void; onTransfer?: () => void }) => {
+    const { Pressable } = jest.requireActual("react-native")
+    return (
+      <>
+        <Pressable testID="gate-modal-dismiss" onPress={props.toggleModal} />
+        {props.onTransfer ? (
+          <Pressable testID="gate-modal-transfer" onPress={props.onTransfer} />
+        ) : null}
+      </>
+    )
+  },
 )
 const mockUnavailableScreen = jest.fn(() => null)
 const mockPrimaryButton = jest.fn(
-  (_props: { title: string; onPress: () => void }) => null,
+  (props: { title: string; onPress: () => void; disabled?: boolean }) => {
+    const { Pressable, Text } = jest.requireActual("react-native")
+    return (
+      <Pressable
+        testID="gate-retry-button"
+        onPress={props.onPress}
+        disabled={props.disabled}
+        accessibilityState={{ disabled: Boolean(props.disabled) }}
+      >
+        <Text>{props.title}</Text>
+      </Pressable>
+    )
+  },
 )
 let mockSelfCustodialDisabled = false
 
@@ -157,6 +192,11 @@ jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: () => null,
 }))
 
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (operation: string, err: unknown) => mockReportError(operation, err),
+}))
+
 describe("MigrationGate", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -259,10 +299,9 @@ describe("MigrationGate", () => {
       refetch: refetchBalances,
     })
 
-    render(<MigrationGate />)
-    await act(async () => {
-      mockPrimaryButton.mock.calls[0][0].onPress()
-    })
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-retry-button"))
+    await act(async () => {})
 
     expect(refetchApiKeys).toHaveBeenCalledTimes(1)
     expect(refetchBalances).toHaveBeenCalledTimes(1)
@@ -286,14 +325,13 @@ describe("MigrationGate", () => {
       refetch: jest.fn().mockResolvedValue(undefined),
     })
 
-    render(<MigrationGate />)
+    const { getByTestId } = render(<MigrationGate />)
     expect(mockPrimaryButton).toHaveBeenLastCalledWith(
       expect.objectContaining({ disabled: false }),
     )
 
-    await act(async () => {
-      mockPrimaryButton.mock.calls[0][0].onPress()
-    })
+    fireEvent.press(getByTestId("gate-retry-button"))
+    await act(async () => {})
     expect(mockPrimaryButton).toHaveBeenLastCalledWith(
       expect.objectContaining({ disabled: true }),
     )
@@ -301,6 +339,34 @@ describe("MigrationGate", () => {
     await act(async () => {
       resolveRetry()
     })
+    expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({ disabled: false }),
+    )
+  })
+
+  /** A retry whose own refetch rejects must not fail silently: the rejection is reported
+   *  and the button re-enables so the user can try again rather than being stuck on a
+   *  spinner. */
+  it("reports a retry whose refetch rejects and re-enables the button", async () => {
+    const refetchApiKeys = jest.fn().mockRejectedValue(new Error("still offline"))
+    mockUseActiveApiKeys.mockReturnValue(
+      apiKeysState({ hasError: true, isReady: false, refetch: refetchApiKeys }),
+    )
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      loading: false,
+      error: new Error("network"),
+      data: undefined,
+      refetch: jest.fn().mockResolvedValue(undefined),
+    })
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-retry-button"))
+    await act(async () => {})
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration gate retry",
+      expect.objectContaining({ message: "still offline" }),
+    )
     expect(mockPrimaryButton).toHaveBeenLastCalledWith(
       expect.objectContaining({ disabled: false }),
     )
@@ -372,13 +438,10 @@ describe("MigrationGate", () => {
       walletOverviewQueryResult({ usdBalance: 20 }),
     )
 
-    render(<MigrationGate />)
-    const { onTransfer } = mockDollarBalanceModal.mock.calls[0][0]
+    const { getByTestId } = render(<MigrationGate />)
 
-    expect(onTransfer).toBeDefined()
-    act(() => {
-      onTransfer?.()
-    })
+    fireEvent.press(getByTestId("gate-modal-transfer"))
+
     expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
   })
 
@@ -409,12 +472,9 @@ describe("MigrationGate", () => {
       walletOverviewQueryResult({ usdBalance: 20 }),
     )
 
-    render(<MigrationGate />)
-    const { toggleModal } = mockDollarBalanceModal.mock.calls[0][0]
+    const { getByTestId } = render(<MigrationGate />)
 
-    act(() => {
-      toggleModal()
-    })
+    fireEvent.press(getByTestId("gate-modal-dismiss"))
 
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
@@ -542,12 +602,9 @@ describe("MigrationGate", () => {
   it("closes the API-service warning through goBack on the voluntary route", () => {
     mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
 
-    render(<MigrationGate />)
-    const { onClose } = mockApiServiceScreen.mock.calls[0][0]
+    const { getByTestId } = render(<MigrationGate />)
 
-    act(() => {
-      onClose?.()
-    })
+    fireEvent.press(getByTestId("gate-api-close"))
 
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
@@ -564,12 +621,9 @@ describe("MigrationGate", () => {
   it("moves on to the required screen once the API warning is acknowledged", () => {
     mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasActiveApiKeys: true }))
 
-    render(<MigrationGate />)
-    const { onContinue } = mockApiServiceScreen.mock.calls[0][0]
+    const { getByTestId } = render(<MigrationGate />)
 
-    act(() => {
-      onContinue()
-    })
+    fireEvent.press(getByTestId("gate-api-continue"))
 
     expect(mockRequiredScreen).toHaveBeenCalled()
   })
