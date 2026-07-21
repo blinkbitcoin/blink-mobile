@@ -2319,7 +2319,7 @@
         "sdkGenericError": "手数料を見積もれません。別の金額をお試しください。"
     },
     "SettingsScreen": {
-        "donationButton": "ボタン",
+        "donationButton": "寄付ボタン",
         "staticQr": "印刷用静的QR",
         "staticQrCopied": "静的QRコードのリンクをコピーしました",
         "setByOs": "OSの設定に準拠",

@@ -2319,7 +2319,7 @@
     "sdkGenericError": "ไม่สามารถประมาณค่าธรรมเนียมได้ กรุณาลองจำนวนอื่น"
   },
   "SettingsScreen": {
-    "donationButton": "ปุ่ม",
+    "donationButton": "ปุ่มบริจาค",
     "staticQr": "QR แบบคงที่สำหรับพิมพ์",
     "staticQrCopied": "คัดลอกลิงก์ QR แบบคงที่ของคุณแล้ว",
     "setByOs": "ตั้งค่าโดยระบบปฏิบัติการ",
