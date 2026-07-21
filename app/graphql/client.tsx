@@ -38,6 +38,7 @@ import { useEffectiveAuthToken } from "./hooks/use-effective-auth-token"
 import { AnalyticsContainer } from "./analytics"
 import { createCache } from "./cache"
 import { useRealtimePriceQuery } from "./generated"
+import { createServerTimeLink } from "./server-time"
 import { HideAmountContainer } from "./hide-amount-component"
 import { IsAuthedContextProvider, useIsAuthed } from "./is-authed-context"
 import { LevelContainer } from "./level-component"
@@ -242,6 +243,10 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         uri: appConfig.galoyInstance.graphqlUri,
       })
 
+      /** Records the server clock from each response's Date header, so a migration proof
+       *  the backend later rejects for device clock skew can be told from a real failure. */
+      const serverTimeLink = createServerTimeLink()
+
       const link = split(
         ({ query }) => {
           const definition = getMainDefinition(query)
@@ -253,6 +258,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         wsLink,
         ApolloLink.from([
           errorLink,
+          serverTimeLink,
           retryLink,
           appCheckLink,
           authLink,

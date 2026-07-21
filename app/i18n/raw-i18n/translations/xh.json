@@ -3628,7 +3628,11 @@
     "explainerCheck4": "I-Blink API ayiyi kufumaneka",
     "explainerCheck5": "I-akhawunti yakho iya kukhutshelwa intlawulo yothungelwano lwe-Spark",
     "explainerCta": "Ndiyaqonda",
-    "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje."
+    "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje.",
+    "clockOutOfSync": {
+      "body": "Umhla nexesha lesixhobo sakho azihambelani. Zimisele ukuba zizenzekele ukuze uqhubeke.",
+      "retryCta": "Zama kwakhona"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Igciniwe",

@@ -3628,7 +3628,11 @@
     "explainerCheck4": "L'API de Blink no estarà disponible",
     "explainerCheck5": "Es descomptarà una comissió de xarxa de Spark del teu compte",
     "explainerCta": "Ho entenc",
-    "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons."
+    "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons.",
+    "clockOutOfSync": {
+      "body": "La data i l'hora del teu dispositiu no estan sincronitzades. Configura-les en automàtic per continuar.",
+      "retryCta": "Torna-ho a provar"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Custodiat",

@@ -3628,7 +3628,11 @@
         "explainerCheck4": "La API de Blink no estará disponible",
         "explainerCheck5": "Se descontará una comisión de red de Spark de tu cuenta",
         "explainerCta": "Entiendo",
-        "transferringFunds": "Transfiriendo tus fondos. Debería completarse en unos segundos."
+        "transferringFunds": "Transfiriendo tus fondos. Debería completarse en unos segundos.",
+        "clockOutOfSync": {
+            "body": "La fecha y la hora de tu dispositivo están desincronizadas. Ponlas en automático para continuar.",
+            "retryCta": "Reintentar"
+        }
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Custodiada",

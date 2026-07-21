@@ -3628,7 +3628,11 @@
     "explainerCheck4": "Blink API sal nie beskikbaar wees nie",
     "explainerCheck5": "Jou rekening sal met 'n Spark-netwerkfooi belas word",
     "explainerCta": "Ek verstaan",
-    "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees."
+    "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees.",
+    "clockOutOfSync": {
+      "body": "Die datum en tyd van jou toestel is nie in sinkronisasie nie. Stel dit op outomaties om voort te gaan.",
+      "retryCta": "Probeer weer"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Bewaard",

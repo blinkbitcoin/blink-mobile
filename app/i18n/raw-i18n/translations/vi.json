@@ -3628,7 +3628,11 @@
     "explainerCheck4": "API của Blink sẽ không khả dụng",
     "explainerCheck5": "Tài khoản của bạn sẽ bị trừ phí mạng Spark",
     "explainerCta": "Tôi hiểu",
-    "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây."
+    "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây.",
+    "clockOutOfSync": {
+      "body": "Ngày và giờ trên thiết bị của bạn không đồng bộ. Đặt về tự động để tiếp tục.",
+      "retryCta": "Thử lại"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Lưu ký",

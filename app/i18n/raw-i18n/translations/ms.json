@@ -3628,7 +3628,11 @@
     "explainerCheck4": "Blink API tidak akan tersedia",
     "explainerCheck5": "Akaun anda akan dikenakan yuran rangkaian Spark",
     "explainerCta": "Saya faham",
-    "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat."
+    "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat.",
+    "clockOutOfSync": {
+      "body": "Tarikh dan masa peranti anda tidak segerak. Tetapkan kepada automatik untuk meneruskan.",
+      "retryCta": "Cuba lagi"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Kustodian",

@@ -4,6 +4,7 @@ import { gql } from "@apollo/client"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { MigrationStatus, useMigrationCommitMutation } from "@app/graphql/generated"
+import { isDeviceClockSkewed } from "@app/graphql/server-time"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   buildMigrationTransferRequest,
@@ -41,6 +42,10 @@ const DISCLOSURE_VERSION = "v1"
  *  immediate without turning a slow settle into a burst of reads. */
 const STATUS_POLL_INTERVAL_MS = 2000
 
+/** The backend gives a stale proof and a bad destination the same code; the clock skew
+ *  tells them apart, and any other code falls through to support (fail-safe). */
+const STALE_PROOF_REJECTION_CODE = "MIGRATION_INVALID_DESTINATION"
+
 /**
  * Custodial accounts whose commit has already fired this session. Unlike a per-mount ref
  * this survives a remount, so a screen that re-mounts while the first commit is still in
@@ -64,6 +69,8 @@ type UseMigrationTransferArgs = {
 type UseMigrationTransfer = {
   isTransferred: boolean
   failureReason: MigrationSupportReason | null
+  isClockOutOfSync: boolean
+  retry: () => void
 }
 
 /**
@@ -82,6 +89,7 @@ export const useMigrationTransfer = ({
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [commitMigration] = useMigrationCommitMutation()
   const [failureReason, setFailureReason] = useState<MigrationSupportReason | null>(null)
+  const [isClockOutOfSync, setIsClockOutOfSync] = useState(false)
 
   /**
    * Polling stops for good once there is nothing left to watch: a terminal phase, a
@@ -92,9 +100,13 @@ export const useMigrationTransfer = ({
    * leaving the previous interval in place, where 0 actually clears the timer.
    */
   const [hasStopped, setHasStopped] = useState(false)
+
+  /** Also paused while out of sync: nothing advances until the retry fires a fresh commit,
+   *  so polling would only re-run the server's resume routine for nothing. */
+  const shouldStopPolling = hasStopped || isClockOutOfSync
   const { status } = useMigrationStatus({
     skip,
-    pollInterval: hasStopped ? 0 : STATUS_POLL_INTERVAL_MS,
+    pollInterval: shouldStopPolling ? 0 : STATUS_POLL_INTERVAL_MS,
   })
 
   const hasServerFailed = status === MigrationStatus.Failed
@@ -152,9 +164,18 @@ export const useMigrationTransfer = ({
       })
 
       const [rejection] = data?.migrationCommit.errors ?? []
-      if (rejection) {
-        fail(MigrationSupportReason.TransferFailed, new Error(rejection.message))
+      if (!rejection) return
+
+      /** A skewed clock makes the proof stale, which the backend rejects under the
+       *  bad-destination code; that code plus a real skew is what earns a retry rather
+       *  than a handover to support. */
+      const isStaleProofRejection =
+        rejection.code === STALE_PROOF_REJECTION_CODE && isDeviceClockSkewed()
+      if (isStaleProofRejection) {
+        setIsClockOutOfSync(true)
+        return
       }
+      fail(MigrationSupportReason.TransferFailed, new Error(rejection.message))
     },
     [network, selfCustodialDepositClaimLeewayVbyte, commitMigration, fail],
   )
@@ -163,7 +184,9 @@ export const useMigrationTransfer = ({
    *  has one, and committing a second invoice is refused as a state conflict. */
   const isAwaitingDestination = status === MigrationStatus.InProgress
   const hasFailed = failureReason !== null
-  const canCommit = isAwaitingDestination && !skip && !hasFailed
+  /** `!isClockOutOfSync` also re-arms the commit: clearing it on retry flips canCommit
+   *  back to true and re-fires the effect, which the module guard alone would not. */
+  const canCommit = isAwaitingDestination && !skip && !hasFailed && !isClockOutOfSync
 
   useEffect(() => {
     if (!canCommit) return
@@ -183,8 +206,21 @@ export const useMigrationTransfer = ({
    *  payment settles server-side, so offering a retry would loop on a refusal. */
   const serverFailure = hasServerFailed ? MigrationSupportReason.TransferFailed : null
 
+  /** After the clock is corrected, a fresh commit can pass: drop the once-only guard and
+   *  clear the flag so the commit effect fires again with a new timestamp. */
+  const retry = useCallback(() => {
+    if (custodialAccountId) accountsWithCommitStarted.delete(custodialAccountId)
+    setIsClockOutOfSync(false)
+  }, [custodialAccountId])
+
+  /** Clock-fix and support are mutually exclusive: while out of sync the user has a retry,
+   *  so a server failure on the same render must not also route to support. */
+  const activeFailureReason = isClockOutOfSync ? null : failureReason ?? serverFailure
+
   return {
     isTransferred,
-    failureReason: failureReason ?? serverFailure,
+    failureReason: activeFailureReason,
+    isClockOutOfSync,
+    retry,
   }
 }

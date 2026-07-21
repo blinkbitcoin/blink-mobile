@@ -3628,7 +3628,11 @@
     "explainerCheck4": "لن تكون واجهة برمجة تطبيقات Blink متاحة",
     "explainerCheck5": "سيتم خصم رسوم شبكة Spark من حسابك",
     "explainerCta": "فهمت",
-    "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة."
+    "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة.",
+    "clockOutOfSync": {
+      "body": "تاريخ ووقت جهازك غير متزامنين. اضبطهما على الوضع التلقائي للمتابعة.",
+      "retryCta": "حاول مرة أخرى"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "محفوظ",

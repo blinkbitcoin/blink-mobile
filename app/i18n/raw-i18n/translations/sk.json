@@ -3628,7 +3628,11 @@
     "explainerCheck4": "Blink API nebude k dispozícii",
     "explainerCheck5": "Z tvojho účtu bude stiahnutý sieťový poplatok Spark",
     "explainerCta": "Rozumiem",
-    "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd."
+    "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd.",
+    "clockOutOfSync": {
+      "body": "Dátum a čas vášho zariadenia nie sú synchronizované. Nastavte ich na automatické, aby ste mohli pokračovať.",
+      "retryCta": "Skúsiť znova"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Spravovaný",

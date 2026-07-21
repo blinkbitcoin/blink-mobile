@@ -3628,7 +3628,11 @@
     "explainerCheck4": "Blink API mana kanqachu",
     "explainerCheck5": "Akawuntiykimanta Spark red pagota qichunqaku",
     "explainerCta": "Entiendini",
-    "transferringFunds": "Qullqiykita apachkaniku. Iskay kinsa sikundullapi tukurunqa."
+    "transferringFunds": "Qullqiykita apachkaniku. Iskay kinsa sikundullapi tukurunqa.",
+    "clockOutOfSync": {
+      "body": "Dispositivoykipa p'unchawnin hinaspa horan mana huñusqachu. Automáticoman churay qatinaykipaq.",
+      "retryCta": "Kutiy yapamuy"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Waqaychasqa",

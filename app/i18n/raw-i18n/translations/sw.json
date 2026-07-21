@@ -3628,7 +3628,11 @@
     "explainerCheck4": "Blink API haitapatikana",
     "explainerCheck5": "Akaunti yako itakatwa ada ya mtandao wa Spark",
     "explainerCta": "Naelewa",
-    "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache."
+    "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache.",
+    "clockOutOfSync": {
+      "body": "Tarehe na saa za kifaa chako hazijaoanishwa. Ziweke kwa kiotomatiki ili kuendelea.",
+      "retryCta": "Jaribu tena"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Iliyohifadhiwa",

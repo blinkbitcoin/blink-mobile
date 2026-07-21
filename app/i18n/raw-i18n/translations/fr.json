@@ -3628,7 +3628,11 @@
         "explainerCheck4": "L'API de Blink ne sera pas disponible",
         "explainerCheck5": "Des frais de réseau Spark seront déduits de votre compte",
         "explainerCta": "Je comprends",
-        "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes."
+        "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes.",
+        "clockOutOfSync": {
+            "body": "La date et l'heure de votre appareil sont désynchronisées. Réglez-les sur automatique pour continuer.",
+            "retryCta": "Réessayer"
+        }
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Sous garde",
