@@ -132,7 +132,11 @@ export const saveCheckpointToStorage = async (
   storageKey: string,
   update: CheckpointUpdate,
 ): Promise<void> => {
-  const existing = validateStoredCheckpoint(await loadJson(storageKey).catch(() => null))
+  const stored = validateStoredCheckpoint(await loadJson(storageKey).catch(() => null))
+  /** An expired prior record must not lend its accountId to the fresh save; treat it as
+   *  absent, matching loadCheckpoint, so the 48h expiry stays authoritative for the id. */
+  const isReusableRecord = stored !== null && !isExpired(stored)
+  const existing = isReusableRecord ? stored : null
   await saveJson(storageKey, mergeCheckpoint(existing, update))
 }
 

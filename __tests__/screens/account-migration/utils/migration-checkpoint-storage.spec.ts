@@ -332,6 +332,27 @@ describe("migration-checkpoint-storage", () => {
         savedAt: expect.any(Number),
       })
     })
+
+    it("drops an expired prior record's account id instead of lending it to the fresh save", async () => {
+      mockLoadJson.mockResolvedValue({
+        step: MigrationCheckpoint.BackupMethod,
+        savedAt: Date.now() - 49 * 60 * 60 * 1000,
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+      })
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BackupAlerts,
+        custodialAccountId: "cust-1",
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
+        step: MigrationCheckpoint.BackupAlerts,
+        savedAt: expect.any(Number),
+        accountId: undefined,
+        custodialAccountId: "cust-1",
+      })
+    })
   })
 
   describe("clearCheckpointFromStorage", () => {
