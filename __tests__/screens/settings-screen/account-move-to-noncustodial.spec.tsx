@@ -5,9 +5,7 @@ import { MoveToNonCustodialSetting } from "@app/screens/settings-screen/settings
 import { AccountType } from "@app/types/wallet"
 
 const mockNavigate = jest.fn()
-const mockNavigateToCheckpoint = jest.fn()
 const mockActiveAccount = jest.fn()
-const mockUseMigrationCheckpoint = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -27,7 +25,6 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
-  useMigrationCheckpoint: () => mockUseMigrationCheckpoint(),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -56,11 +53,6 @@ describe("MoveToNonCustodialSetting", () => {
     jest.clearAllMocks()
     mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
     mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
-    mockUseMigrationCheckpoint.mockReturnValue({
-      loading: false,
-      navigateToCheckpoint: mockNavigateToCheckpoint,
-      hasResumableCheckpoint: false,
-    })
   })
 
   it("renders for custodial accounts", () => {
@@ -85,27 +77,12 @@ describe("MoveToNonCustodialSetting", () => {
     expect(screen.getByTestId("settings-row")).toBeTruthy()
   })
 
-  it("starts the migration flow when there is no resumable checkpoint", () => {
+  it("routes every entry through the migration dispatcher instead of deciding resume here", () => {
     render(<MoveToNonCustodialSetting />)
 
     fireEvent.press(screen.getByTestId("settings-row"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationStart")
-  })
-
-  it("resumes the saved checkpoint when there is one", () => {
-    mockUseMigrationCheckpoint.mockReturnValue({
-      loading: false,
-      navigateToCheckpoint: mockNavigateToCheckpoint,
-      hasResumableCheckpoint: true,
-    })
-
-    render(<MoveToNonCustodialSetting />)
-
-    fireEvent.press(screen.getByTestId("settings-row"))
-
-    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
   })
 
   it("hides the entry while the self-custodial kill-switch is off", () => {

@@ -14,8 +14,9 @@ type MigrationReminderBulletin = {
  * deadline. It shows only in the pre-cutoff phase; once receiving is disabled the
  * migrate-now modal takes over, and once the gate arms the blocker takes the whole home.
  * The kill-switch is intentionally NOT checked here: the bulletin's Migrate button routes
- * through the gate, which shows the "temporarily unavailable" screen, so the single
- * choke point covers the disabled case with no per-entry button logic.
+ * through the migration entry dispatcher, which enforces the kill-switch before any resume
+ * and shows the gate's "temporarily unavailable" screen when disabled, so the single choke
+ * point covers the disabled case with no per-entry button logic.
  */
 export const useMigrationReminderBulletin = (): MigrationReminderBulletin => {
   const windDown = useCustodialWindDown()

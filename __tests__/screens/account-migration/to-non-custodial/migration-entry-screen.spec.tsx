@@ -18,20 +18,36 @@ jest.mock("@react-navigation/native", () => ({
 }))
 
 let mockActiveAccountType: AccountType = AccountType.Custodial
+let mockRegistryLoading = false
 
 jest.mock("@app/hooks/use-account-registry", () => ({
-  useAccountRegistry: () => ({ activeAccount: { type: mockActiveAccountType } }),
+  useAccountRegistry: () => ({
+    activeAccount: { type: mockActiveAccountType },
+    loading: mockRegistryLoading,
+  }),
 }))
 
 const mockReplaceToCheckpoint = jest.fn()
 let mockHasResumableCheckpoint = false
 let mockCheckpointLoading = false
+let mockSelfCustodialDisabled = false
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
     loading: mockCheckpointLoading,
     replaceToCheckpoint: mockReplaceToCheckpoint,
     hasResumableCheckpoint: mockHasResumableCheckpoint,
+  }),
+  useSelfCustodialDisabled: () => mockSelfCustodialDisabled,
+}))
+
+let mockRemoteConfigReady = true
+
+jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
+  useFeatureFlags: () => ({
+    remoteConfigReady: mockRemoteConfigReady,
+    nonCustodialEnabled: true,
   }),
 }))
 
@@ -42,6 +58,9 @@ describe("MigrationEntryScreen", () => {
     mockActiveAccountType = AccountType.Custodial
     mockHasResumableCheckpoint = false
     mockCheckpointLoading = false
+    mockSelfCustodialDisabled = false
+    mockRemoteConfigReady = true
+    mockRegistryLoading = false
   })
 
   it("renders nothing and starts the flow for a fresh migration", () => {
@@ -58,6 +77,35 @@ describe("MigrationEntryScreen", () => {
 
     expect(mockReplaceToCheckpoint).toHaveBeenCalledTimes(1)
     expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  it("routes to the gate instead of resuming when the kill-switch is off", () => {
+    mockSelfCustodialDisabled = true
+    mockHasResumableCheckpoint = true
+
+    render(<MigrationEntryScreen />)
+
+    expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
+    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+  })
+
+  it("waits for the remote config to resolve before dispatching", () => {
+    mockRemoteConfigReady = false
+    mockHasResumableCheckpoint = true
+
+    render(<MigrationEntryScreen />)
+
+    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+  })
+
+  it("waits for the account registry to hydrate before dispatching", () => {
+    mockRegistryLoading = true
+
+    render(<MigrationEntryScreen />)
+
+    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
   })
 
   it("waits for the checkpoint to load before dispatching", () => {
