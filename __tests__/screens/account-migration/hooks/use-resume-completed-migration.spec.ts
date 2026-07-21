@@ -8,6 +8,17 @@ import { flushEffects } from "../../../helpers/flush-effects"
 const mockCompleteMigration = jest.fn()
 const mockUseMigrationStatus = jest.fn()
 const mockReportError = jest.fn()
+const mockNavigate = jest.fn()
+
+/** A single stable object, as React Navigation's own useNavigation returns: a fresh one
+ *  per render would change the effect's navigation dependency and re-run it on every
+ *  render, which production never does. */
+const mockNavigation = { navigate: mockNavigate }
+
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => mockNavigation,
+}))
 
 let mockStatus: MigrationStatus | null = MigrationStatus.Completed
 let mockMigrationAccountId: string | null = "sc-account-1"
@@ -115,6 +126,54 @@ describe("useResumeCompletedMigration", () => {
       "Migration resume swap",
       expect.objectContaining({ message: "keystore locked" }),
     )
+  })
+
+  /** A resolved-true swap is the funds landing on this device: the checkpoint clears and
+   *  nobody is sent anywhere. */
+  it("does not hand over when the swap succeeds", async () => {
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  /**
+   * A swap that resolves false is the reinstall case: the migration finished server-side,
+   * but the destination self-custodial account is no longer on this device, so no retry
+   * can finish it and the user is handed to support with a reason that names exactly that.
+   */
+  it("hands over to support when the destination account is not on the device", async () => {
+    mockCompleteMigration.mockResolvedValue(false)
+    renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration resume without destination account",
+      expect.any(Error),
+    )
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "self-custodial-account-not-on-device",
+    })
+  })
+
+  /** Backing out of support returns to this launch's tree, which re-enters the effect (a
+   *  wallet-registry refresh rebuilds completeMigration); the handover is one event, so it
+   *  fires once however often the effect re-runs. */
+  it("hands over to support only once", async () => {
+    mockCompleteMigration.mockResolvedValue(false)
+    const secondSwap = jest.fn().mockResolvedValue(false)
+
+    const { rerender } = renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+
+    mockCompleteMigrationRef = secondSwap
+    rerender({})
+    await flushEffects()
+
+    expect(secondSwap).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
   })
 
   /** A retry that succeeds stops there: the swap clears the checkpoint, so there is

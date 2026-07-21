@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react"
 
+import { useNavigation } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+
 import { MigrationStatus } from "@app/graphql/generated"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 
 import { useCompleteMigration } from "./use-complete-migration"
@@ -20,6 +25,7 @@ const MAX_SWAP_ATTEMPTS = 3
  * nobody else pays for a question they cannot act on.
  */
 export const useResumeCompletedMigration = (): void => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { migrationAccountId, migrationLoading, completeMigration } =
     useCompleteMigration()
 
@@ -28,18 +34,40 @@ export const useResumeCompletedMigration = (): void => {
 
   const [attempts, setAttempts] = useState(0)
   const isSwapInFlightRef = useRef(false)
+
+  /** A swap that resolves false is terminal, not transient: the destination account is
+   *  gone from the device, so no retry brings it back. Blocks the effect from re-entering
+   *  once the user has been handed to support, so the handover happens exactly once. */
+  const hasHandedOverRef = useRef(false)
   const isSwapPending =
     status === MigrationStatus.Completed && hasUnfinishedMigration && !migrationLoading
 
   useEffect(() => {
-    const canAttempt = isSwapPending && attempts < MAX_SWAP_ATTEMPTS
+    const canAttempt =
+      isSwapPending && attempts < MAX_SWAP_ATTEMPTS && !hasHandedOverRef.current
     if (!canAttempt || isSwapInFlightRef.current) return
 
     /** One swap in flight at a time: it discards a session and cannot be half-run. A
-     *  failure bumps the count, which both re-runs this effect for the retry and stops it
+     *  throw bumps the count, which both re-runs this effect for the retry and stops it
      *  once the attempts are spent. */
     isSwapInFlightRef.current = true
     completeMigration()
+      .then((hasSwapped) => {
+        if (hasSwapped) return
+
+        /** The funds landed server-side but the destination self-custodial account is no
+         *  longer on this device (a reinstall wiped its key), so there is no retry that
+         *  finishes the swap: hand the user to support with a reason that names exactly
+         *  that, and report it once. */
+        hasHandedOverRef.current = true
+        reportError(
+          "Migration resume without destination account",
+          new Error("Provisioned self-custodial account is not on this device"),
+        )
+        navigation.navigate("accountMigrationContactSupport", {
+          reason: MigrationSupportReason.SelfCustodialAccountNotOnDevice,
+        })
+      })
       .catch((err) => {
         reportError("Migration resume swap", err)
         setAttempts((previous) => previous + 1)
@@ -47,5 +75,5 @@ export const useResumeCompletedMigration = (): void => {
       .finally(() => {
         isSwapInFlightRef.current = false
       })
-  }, [isSwapPending, attempts, completeMigration])
+  }, [isSwapPending, attempts, completeMigration, navigation])
 }

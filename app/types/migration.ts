@@ -24,6 +24,10 @@ export const MigrationSupportReason = {
   StartRefused: "start-refused",
   /** The checkpoint reached the transfer with no provisioned self-custodial account. */
   SelfCustodialAccountMissing: "self-custodial-account-missing",
+  /** The migration finished server-side, but the destination self-custodial account is no
+   *  longer on this device (its key is gone, e.g. after a reinstall), so the resume swap
+   *  cannot run and no retry brings it back. */
+  SelfCustodialAccountNotOnDevice: "self-custodial-account-not-on-device",
   /** The transfer itself failed or threw. */
   TransferFailed: "transfer-failed",
   /** The lightning-address re-point onto the migrated account failed. */
