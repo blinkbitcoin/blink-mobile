@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -52,14 +52,27 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  migration clears the checkpoint a background re-save would resurrect it.
    *  TODO: the backend will hold this server-side once the migration state query ships
    *  (reinstalls cannot be covered locally); this checkpoint covers the relaunch. */
+  /** Approve is the point of no return, so it only unlocks once this checkpoint is durably
+   *  written: tapping before the write lands could resume a post-crash relaunch at the wrong
+   *  step. A failed write keeps Approve disabled (Contact support stays available) and a later
+   *  focus re-save heals it. */
+  const [isCheckpointSaved, setIsCheckpointSaved] = useState(false)
   useEffect(() => {
     if (!isFocused || checkpointLoading) return
-    saveCheckpoint(MigrationCheckpoint.BalancesOverview)
+    let isActive = true
+    saveCheckpoint(MigrationCheckpoint.BalancesOverview).then((saved) => {
+      if (isActive) setIsCheckpointSaved(saved)
+    })
+    return () => {
+      isActive = false
+    }
   }, [isFocused, checkpointLoading, saveCheckpoint])
 
   const handleApprove = useCallback(() => {
     navigation.navigate("accountMigrationTransferringFunds")
   }, [navigation])
+
+  const isApproveDisabled = !preview.isReady || !isCheckpointSaved
 
   return (
     <Screen preset="fixed" headerShown={false}>
@@ -119,7 +132,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LLOverview.approveCta()}
             onPress={handleApprove}
-            disabled={!preview.isReady}
+            disabled={isApproveDisabled}
             {...testProps("migration-balances-overview-approve")}
           />
           <GaloySecondaryButton

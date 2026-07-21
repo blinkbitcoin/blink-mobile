@@ -45,9 +45,11 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
 
   const action = async () => {
     if (flow === "migration") {
-      /** The acceptance is part of the migration's consent trail, so the checkpoint
-       *  only moves past the terms once Accept is pressed. */
-      saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      /** The acceptance is part of the migration's consent trail, so advance only once the
+       *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
+       *  user already accepted. */
+      const saved = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      if (!saved) return
       navigation.navigate("selfCustodialBackupMethod")
       return
     }

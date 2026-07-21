@@ -91,6 +91,7 @@ const renderScreen = () =>
 describe("MigrationBalancesOverviewScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockSaveCheckpoint.mockResolvedValue(true)
     loadLocale("en")
     mockDollarRestricted = false
     mockCurrentDollarRestricted = false
@@ -172,6 +173,14 @@ describe("MigrationBalancesOverviewScreen", () => {
     await flushEffects()
 
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.BalancesOverview)
+  })
+
+  it("keeps Approve disabled until the commit-point checkpoint is durably written", async () => {
+    mockSaveCheckpoint.mockResolvedValue(false)
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
   })
 
   it("waits for the checkpoint to load before persisting the commit point", async () => {
