@@ -18,7 +18,7 @@ import { Action, useActionsContext } from "@app/components/actions"
 import { PREFIX_LINKING, TELEGRAM_CALLBACK_PATH } from "@app/config"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { useWindDownGateArmed } from "@app/screens/account-migration/hooks/use-wind-down-gate-armed"
+import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 
 import { RootStackParamList } from "./stack-param-lists"
 
@@ -33,12 +33,21 @@ const MIGRATION_DEEPLINK_PATH = "account-migration"
 export const isMigrationDeeplink = (url: string): boolean => {
   try {
     const { hostname, pathname } = new URL(url)
-    const segment = pathname.replace(/^\/+/, "") || hostname
+    const segment = pathname.replace(/^\/+|\/+$/g, "") || hostname
     return segment === MIGRATION_DEEPLINK_PATH
   } catch {
     return false
   }
 }
+
+/** The armed-gate reset is lock-aware: while the app is still locked it must land on
+ *  authenticationCheck so the PIN/biometric unlock is never skipped. Jumping straight to
+ *  Primary would strand isAppLocked at true, hiding the gate behind an app that never
+ *  unlocked and freezing the queued migration deeplink (which waits on !isAppLocked). Once
+ *  unlocked, Primary is correct: the blocker renders the gate with no jarring re-prompt. */
+export const blockerEntryRoute = (
+  isAppLocked: boolean,
+): "authenticationCheck" | "Primary" => (isAppLocked ? "authenticationCheck" : "Primary")
 
 export type AuthenticationContextType = {
   isAppLocked: boolean
@@ -83,25 +92,37 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
   )
   const { setActiveAction } = useActionsContext()
 
-  /** The linking listener is set up once and closes over stale values, so the armed state
-   *  it must read lives in a ref kept current by the effect below. */
-  const isGateArmed = useWindDownGateArmed()
-  const isGateArmedRef = useRef(isGateArmed)
+  /** Keyed on the blocker's own visibility, not the raw armed status: when the kill-switch
+   *  hides the blocker the app functions normally, so payment deeplinks must keep working
+   *  and the stack must not be reset out from under the user. The linking listener closes
+   *  over stale values, so this lives in a ref kept current by the effect below. */
+  const isBlockerVisible = useMigrationBlocker().isVisible
+  const isBlockerVisibleRef = useRef(isBlockerVisible)
   useEffect(() => {
-    isGateArmedRef.current = isGateArmed
-  }, [isGateArmed])
+    isBlockerVisibleRef.current = isBlockerVisible
+  }, [isBlockerVisible])
+
+  /** Kept current for resetToBlocker, which reads the lock state from a stable callback
+   *  and from onReady, both of which would otherwise close over a stale value. */
+  const isAppLockedRef = useRef(isAppLocked)
+  useEffect(() => {
+    isAppLockedRef.current = isAppLocked
+  }, [isAppLocked])
 
   /** Pop anything a deeplink opened above the blocker so nothing keeps working over the
-   *  closed account; resetting to Primary leaves only the blocker visible. */
-  const resetToPrimary = useCallback(() => {
-    navigationRef.reset({ index: 0, routes: [{ name: "Primary" }] })
+   *  closed account, landing on the lock-aware entry so arming never skips the unlock. */
+  const resetToBlocker = useCallback(() => {
+    navigationRef.reset({
+      index: 0,
+      routes: [{ name: blockerEntryRoute(isAppLockedRef.current) }],
+    })
   }, [])
 
   /** Covers arming mid-session. The container-not-ready-yet case (armed at cold start) is
    *  handled from onReady below, since this effect can fire before isReady() is true. */
   useEffect(() => {
-    if (isGateArmed && navigationRef.isReady()) resetToPrimary()
-  }, [isGateArmed, resetToPrimary])
+    if (isBlockerVisible && navigationRef.isReady()) resetToBlocker()
+  }, [isBlockerVisible, resetToBlocker])
 
   useEffect(() => {
     if (canHandlePayments && !isAppLocked && urlAfterUnlockAndAuth) {
@@ -214,7 +235,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
 
         /** With the account-closed gate armed, only the migration deeplink is honoured; any
          *  other would open a working screen on top of the blocker, so it is dropped. */
-        if (isGateArmedRef.current && !isMigrationDeeplink(url)) return
+        if (isBlockerVisibleRef.current && !isMigrationDeeplink(url)) return
 
         if (!isAppLocked && canHandlePayments) {
           const maybeAction = processLinkForAction(url)
@@ -247,7 +268,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
           console.log("NavigationContainer onReady")
           /** Cold-started already gated: reset now that the container is ready, since the
            *  effect above may have run before isReady() turned true. */
-          if (isGateArmedRef.current) resetToPrimary()
+          if (isBlockerVisibleRef.current) resetToBlocker()
         }}
         onStateChange={(state) => {
           const currentRouteName = getActiveRouteName(state)
