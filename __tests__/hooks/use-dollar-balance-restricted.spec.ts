@@ -129,26 +129,45 @@ describe("useDollarBalanceRestricted", () => {
   })
 
   describe("with an account-type override", () => {
-    // A still-custodial migration session predicting the new self-custodial account.
+    // A still-custodial session predicting the phone-less self-custodial account.
     beforeEach(() => setup(AccountType.Custodial))
 
     const readOverride = (accountType: AccountType) =>
       renderHook(() => useDollarBalanceRestricted(accountType)).result.current
 
-    it("evaluates the self-custodial policy from a custodial session", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+    it("predicts the self-custodial restriction from the IP, not the session phone", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
+      mockUseIpCountryCode.mockReturnValue("FR")
       expect(readOverride(AccountType.SelfCustodial)).toBe(true)
     })
 
-    it("uses the self-custodial blocked list, not the custodial one", () => {
-      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
+    it("ignores the session phone country that would otherwise block", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+      mockUseIpCountryCode.mockReturnValue(undefined)
       expect(readOverride(AccountType.SelfCustodial)).toBe(false)
     })
 
-    it("honours the persisted self-custodial flag from a custodial session", () => {
+    it("uses the self-custodial blocked list, not the custodial one", () => {
+      mockUseIpCountryCode.mockReturnValue("HK")
+      expect(readOverride(AccountType.SelfCustodial)).toBe(false)
+    })
+
+    it("honours the persisted self-custodial flag without any country", () => {
       mockPersistentState = { ...baseState, stableTokenRestricted: true }
-      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined })
+      mockUseIpCountryCode.mockReturnValue(undefined)
       expect(readOverride(AccountType.SelfCustodial)).toBe(true)
+    })
+
+    it("consults IP for the self-custodial prediction", () => {
+      readOverride(AccountType.SelfCustodial)
+      expect(mockUseIpCountryCode).toHaveBeenCalledWith(true)
+    })
+
+    it("never consults IP for the custodial or default evaluations", () => {
+      readOverride(AccountType.Custodial)
+      read()
+      expect(mockUseIpCountryCode).not.toHaveBeenCalledWith(true)
+      expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
     })
   })
 

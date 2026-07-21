@@ -1,3 +1,4 @@
+import { CountryCode } from "libphonenumber-js/mobile"
 import { useEffect } from "react"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
@@ -57,17 +58,33 @@ const useDollarBalanceRestrictionPolicy = (
   }
 }
 
+/**
+ * The country whose block-list decides the restriction. A self-custodial account has no
+ * phone, so evaluating its policy resolves by IP; every other case reads the device's
+ * own country.
+ */
+const useRestrictionRegion = (
+  accountTypeOverride?: AccountType,
+): CountryCode | undefined => {
+  const { countryCode: deviceCountryCode } = useDeviceLocation()
+
+  const isSelfCustodialPrediction = accountTypeOverride === AccountType.SelfCustodial
+  const ipCountryCode = useIpCountryCode(isSelfCustodialPrediction)
+
+  return isSelfCustodialPrediction ? ipCountryCode : deviceCountryCode
+}
+
 export const useDollarBalanceRestricted = (
   accountTypeOverride?: AccountType,
 ): boolean => {
   const { blockedCountries, isPersisted } =
     useDollarBalanceRestrictionPolicy(accountTypeOverride)
   const { dollarRestrictionCacheEnabled } = useRemoteConfig()
-  const { countryCode } = useDeviceLocation()
+  const regionCountryCode = useRestrictionRegion(accountTypeOverride)
 
   const isCachedRestriction = dollarRestrictionCacheEnabled && isPersisted
 
-  return isCachedRestriction || isBlockedCountry(countryCode, blockedCountries)
+  return isCachedRestriction || isBlockedCountry(regionCountryCode, blockedCountries)
 }
 
 export const useDollarBalanceRestrictionSync = (): void => {
