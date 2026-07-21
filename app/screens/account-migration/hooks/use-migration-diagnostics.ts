@@ -1,3 +1,5 @@
+import { useMemo } from "react"
+
 import { useI18nContext } from "@app/i18n/i18n-react"
 
 import { useMigrationSupportDetails } from "./use-migration-support-details"
@@ -19,11 +21,15 @@ export const useMigrationDiagnostics = (): readonly MigrationDiagnostic[] => {
   const LLSupport = LL.AccountMigration.contactSupport
   const { accountId, pubKey, username, email, phone } = useMigrationSupportDetails()
 
-  return [
-    { label: LLSupport.accountIdLabel(), value: accountId, isIdentifier: true },
-    { label: LLSupport.pubKeyLabel(), value: pubKey, isIdentifier: true },
-    { label: LLSupport.usernameLabel(), value: username, isIdentifier: false },
-    { label: LLSupport.emailLabel(), value: email, isIdentifier: false },
-    { label: LLSupport.phoneLabel(), value: phone, isIdentifier: false },
-  ].filter((diagnostic) => Boolean(diagnostic.value))
+  return useMemo(
+    () =>
+      [
+        { label: LLSupport.accountIdLabel(), value: accountId, isIdentifier: true },
+        { label: LLSupport.pubKeyLabel(), value: pubKey, isIdentifier: true },
+        { label: LLSupport.usernameLabel(), value: username, isIdentifier: false },
+        { label: LLSupport.emailLabel(), value: email, isIdentifier: false },
+        { label: LLSupport.phoneLabel(), value: phone, isIdentifier: false },
+      ].filter((diagnostic) => Boolean(diagnostic.value)),
+    [LLSupport, accountId, pubKey, username, email, phone],
+  )
 }

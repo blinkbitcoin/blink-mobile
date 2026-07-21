@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-native"
+import { renderHook, waitFor } from "@testing-library/react-native"
 
 import { useMigrationSupportDetails } from "@app/screens/account-migration/hooks/use-migration-support-details"
 
@@ -16,8 +16,15 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 }))
 
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
-  useWalletMnemonic: () => mockMnemonic,
-  useWalletIdentity: (mnemonic: string) => (mnemonic ? "02abc123pubkey" : ""),
+  useLoadWalletMnemonic: () => () => Promise.resolve(mockMnemonic),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => "Regtest",
+}))
+
+jest.mock("@app/self-custodial/bridge", () => ({
+  deriveWalletIdentityPubkey: (mnemonic: string) => (mnemonic ? "02abc123pubkey" : ""),
 }))
 
 describe("useMigrationSupportDetails", () => {
@@ -38,8 +45,10 @@ describe("useMigrationSupportDetails", () => {
     })
   })
 
-  it("maps the custodial identity and the derived wallet pubkey", () => {
+  it("maps the custodial identity and the pubkey derived from a lazily-loaded phrase", async () => {
     const { result } = renderHook(() => useMigrationSupportDetails())
+
+    await waitFor(() => expect(result.current.pubKey).toBe("02abc123pubkey"))
 
     expect(result.current).toEqual({
       accountId: "18A4242",
@@ -50,7 +59,7 @@ describe("useMigrationSupportDetails", () => {
     })
   })
 
-  it("falls back to empty strings while the data is unavailable", () => {
+  it("falls back to empty strings while the data is unavailable", async () => {
     mockMnemonic = ""
     mockUseMigrationSupportDetailsQuery.mockReturnValue({
       loading: true,
@@ -59,12 +68,14 @@ describe("useMigrationSupportDetails", () => {
 
     const { result } = renderHook(() => useMigrationSupportDetails())
 
-    expect(result.current).toEqual({
-      accountId: "",
-      pubKey: "",
-      username: "",
-      email: "",
-      phone: "",
+    await waitFor(() => {
+      expect(result.current).toEqual({
+        accountId: "",
+        pubKey: "",
+        username: "",
+        email: "",
+        phone: "",
+      })
     })
   })
 })
