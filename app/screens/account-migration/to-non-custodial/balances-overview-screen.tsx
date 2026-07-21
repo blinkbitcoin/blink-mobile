@@ -54,19 +54,37 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  (reinstalls cannot be covered locally); this checkpoint covers the relaunch. */
   /** Approve is the point of no return, so it only unlocks once this checkpoint is durably
    *  written: tapping before the write lands could resume a post-crash relaunch at the wrong
-   *  step. A failed write keeps Approve disabled (Contact support stays available) and a later
-   *  focus re-save heals it. */
+   *  step. */
   const [isCheckpointSaved, setIsCheckpointSaved] = useState(false)
+  const [hasCheckpointSaveFailed, setHasCheckpointSaveFailed] = useState(false)
+  const [isSavingCheckpoint, setIsSavingCheckpoint] = useState(false)
+  const [saveAttempt, setSaveAttempt] = useState(0)
+
   useEffect(() => {
     if (!isFocused || checkpointLoading) return
     let isActive = true
-    saveCheckpoint(MigrationCheckpoint.BalancesOverview).then((saved) => {
-      if (isActive) setIsCheckpointSaved(saved)
-    })
+    setIsSavingCheckpoint(true)
+    saveCheckpoint(MigrationCheckpoint.BalancesOverview)
+      .then((saved) => {
+        if (!isActive) return
+        setIsCheckpointSaved(saved)
+        setHasCheckpointSaveFailed(!saved)
+      })
+      .finally(() => {
+        if (isActive) setIsSavingCheckpoint(false)
+      })
     return () => {
       isActive = false
     }
-  }, [isFocused, checkpointLoading, saveCheckpoint])
+  }, [isFocused, checkpointLoading, saveCheckpoint, saveAttempt])
+
+  /** A failed save (an offline owner query, a failed write) leaves Approve disabled, and
+   *  nothing else on this exit-sealed screen re-runs it: the effect's dependencies never
+   *  change once it has settled, so without a manual retry the user would be stranded at the
+   *  commit point with no way back. Retry re-runs the save, exactly as the gate's does. */
+  const retryCheckpointSave = useCallback(() => {
+    setSaveAttempt((previous) => previous + 1)
+  }, [])
 
   const handleApprove = useCallback(() => {
     navigation.navigate("accountMigrationTransferringFunds")
@@ -129,12 +147,25 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
         )}
 
         <View style={styles.buttonsContainer}>
-          <GaloyPrimaryButton
-            title={LLOverview.approveCta()}
-            onPress={handleApprove}
-            disabled={isApproveDisabled}
-            {...testProps("migration-balances-overview-approve")}
-          />
+          {hasCheckpointSaveFailed ? (
+            <>
+              <Text style={styles.saveErrorText}>{LL.errors.generic()}</Text>
+              <GaloyPrimaryButton
+                title={LL.common.tryAgain()}
+                onPress={retryCheckpointSave}
+                loading={isSavingCheckpoint}
+                disabled={isSavingCheckpoint}
+                {...testProps("migration-balances-overview-retry")}
+              />
+            </>
+          ) : (
+            <GaloyPrimaryButton
+              title={LLOverview.approveCta()}
+              onPress={handleApprove}
+              disabled={isApproveDisabled}
+              {...testProps("migration-balances-overview-approve")}
+            />
+          )}
           <GaloySecondaryButton
             title={LLOverview.contactSupportCta()}
             onPress={openSupport}
@@ -199,5 +230,12 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 20,
     paddingBottom: 20,
     paddingTop: 10,
+  },
+  saveErrorText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.error,
+    textAlign: "center",
+    paddingHorizontal: 20,
   },
 }))

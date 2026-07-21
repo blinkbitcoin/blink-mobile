@@ -176,11 +176,71 @@ describe("MigrationBalancesOverviewScreen", () => {
   })
 
   it("keeps Approve disabled until the commit-point checkpoint is durably written", async () => {
-    mockSaveCheckpoint.mockResolvedValue(false)
+    let resolveSave: (saved: boolean) => void = () => undefined
+    mockSaveCheckpoint.mockReturnValue(
+      new Promise<boolean>((resolve) => {
+        resolveSave = resolve
+      }),
+    )
     renderScreen()
     await flushEffects()
 
     expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+
+    resolveSave(true)
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
+  })
+
+  /**
+   * A failed save must not silently brick this exit-sealed screen: it swaps the dead Approve
+   * for a retry with an error message, the way the gate already surfaces a query failure.
+   */
+  it("surfaces a retry and an error when the checkpoint save fails", async () => {
+    mockSaveCheckpoint.mockResolvedValue(false)
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+    expect(screen.getByText(LL.errors.generic())).toBeTruthy()
+    expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+  })
+
+  it("re-runs the save and enables Approve when the retry succeeds", async () => {
+    mockSaveCheckpoint.mockResolvedValueOnce(false).mockResolvedValue(true)
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(2)
+    expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).not.toBeDisabled()
+  })
+
+  /** The save can still be in flight when the screen unmounts (a background completion swaps
+   *  the session under it), so a late resolution must be ignored, not set state on a dead
+   *  screen. */
+  it("ignores a checkpoint save that resolves after the screen unmounts", async () => {
+    let resolveSave: (saved: boolean) => void = () => undefined
+    mockSaveCheckpoint.mockReturnValue(
+      new Promise<boolean>((resolve) => {
+        resolveSave = resolve
+      }),
+    )
+    const { unmount } = renderScreen()
+    await flushEffects()
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(1)
+
+    /** Resolving after unmount must be a no-op: the isActive guard drops it rather than
+     *  setting state on the dead screen. Reaching the end without throwing is the proof. */
+    unmount()
+    expect(() => {
+      resolveSave(true)
+    }).not.toThrow()
+    await flushEffects()
   })
 
   it("waits for the checkpoint to load before persisting the commit point", async () => {
