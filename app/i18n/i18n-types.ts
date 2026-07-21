@@ -7540,7 +7540,7 @@ type RootTranslation = {
 		 */
 		btcpayServer: string
 		/**
-		 * W​o​o​c​o​m​m​e​r​c​e
+		 * W​o​o​C​o​m​m​e​r​c​e
 		 */
 		woocommerce: string
 		/**
