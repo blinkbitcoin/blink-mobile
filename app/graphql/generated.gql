@@ -1398,6 +1398,7 @@ query migrationApiKeys {
 
 query migrationOwner {
   me {
+    id
     defaultAccount {
       id
       __typename

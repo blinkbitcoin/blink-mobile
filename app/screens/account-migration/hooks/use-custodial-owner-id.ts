@@ -8,6 +8,7 @@ import { AccountType } from "@app/types/wallet"
 gql`
   query migrationOwner {
     me {
+      id
       defaultAccount {
         id
       }

@@ -3388,7 +3388,7 @@ export type MigrationApiKeysQuery = { readonly __typename: 'Query', readonly me?
 export type MigrationOwnerQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MigrationOwnerQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
+export type MigrationOwnerQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
 
 export type MigrationTransactionsPresenceQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -5376,6 +5376,7 @@ export type MigrationApiKeysQueryResult = Apollo.QueryResult<MigrationApiKeysQue
 export const MigrationOwnerDocument = gql`
     query migrationOwner {
   me {
+    id
     defaultAccount {
       id
     }
