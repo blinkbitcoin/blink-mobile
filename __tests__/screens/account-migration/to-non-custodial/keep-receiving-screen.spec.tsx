@@ -14,6 +14,7 @@ const LL = i18nObject("en")
 const mockNavigate = jest.fn()
 const mockReplace = jest.fn()
 const mockUseAddressScreenQuery = jest.fn()
+const mockRefetch = jest.fn()
 
 let mockIsFocused = true
 
@@ -31,6 +32,12 @@ jest.mock("@app/graphql/generated", () => ({
 jest.mock("@app/graphql/is-authed-context", () => ({
   ...jest.requireActual("@app/graphql/is-authed-context"),
   useIsAuthed: () => true,
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
 const mockGoToNextStep = jest.fn()
@@ -67,9 +74,11 @@ describe("MigrationKeepReceivingScreen", () => {
     loadLocale("en")
     mockIsFocused = true
     mockNextStepLoading = false
+    mockRefetch.mockResolvedValue({})
     mockUseAddressScreenQuery.mockReturnValue({
       data: { me: { username: "satoshin21" } },
       loading: false,
+      refetch: mockRefetch,
     })
   })
 
@@ -147,17 +156,75 @@ describe("MigrationKeepReceivingScreen", () => {
     expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
   })
 
-  it("shows a spinner and does not skip when the address query errors", async () => {
+  it("shows a retry state, not a spinner, and does not skip when the address query errors", async () => {
     mockUseAddressScreenQuery.mockReturnValue({
       data: undefined,
       loading: false,
       error: new Error("offline"),
+      refetch: mockRefetch,
     })
     renderScreen()
     await flushEffects()
 
-    expect(screen.getByTestId("migration-keep-receiving-loading")).toBeTruthy()
+    expect(screen.getByText(LL.errors.generic())).toBeTruthy()
+    expect(screen.getByTestId("migration-keep-receiving-retry")).toBeTruthy()
+    /** The spinner-forever bug: an errored query must render a way forward, not a spinner. */
+    expect(screen.queryByTestId("migration-keep-receiving-loading")).toBeNull()
     /** A failed query must not read as "no address" and skip the warning. */
+    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+  })
+
+  it("refetches the address when Try Again is pressed on the error state", async () => {
+    mockUseAddressScreenQuery.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error: new Error("offline"),
+      refetch: mockRefetch,
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.common.tryAgain()))
+    await flushEffects()
+
+    expect(mockRefetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps the retry available and reports when the refetch itself fails", async () => {
+    mockRefetch.mockRejectedValueOnce(new Error("still offline"))
+    mockUseAddressScreenQuery.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error: new Error("offline"),
+      refetch: mockRefetch,
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.common.tryAgain()))
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration keep-receiving address retry",
+      expect.any(Error),
+    )
+    /** A failed retry must leave the button tappable for another attempt, not lock it. */
+    expect(screen.getByTestId("migration-keep-receiving-retry")).toBeTruthy()
+  })
+
+  it("advances the flow when Continue is pressed on the error state, without blocking the migration", async () => {
+    mockUseAddressScreenQuery.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error: new Error("offline"),
+      refetch: mockRefetch,
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.common.continue()))
+
+    expect(mockGoToNextStep).toHaveBeenCalledTimes(1)
     expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
   })
 })
