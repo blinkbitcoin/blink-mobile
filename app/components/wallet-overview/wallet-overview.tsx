@@ -15,6 +15,7 @@ import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -169,10 +170,15 @@ const WalletOverview: React.FC<Props> = ({
           {loading ? (
             <Loader />
           ) : hideAmount ? (
-            <Text>****</Text>
+            <HiddenBalancePlaceholder size="small" />
           ) : (
             <View style={[styles.hideableArea, pressedBtc && styles.pressedOpacity]}>
-              <Text type="p1" bold {...testProps("bitcoin-balance")}>
+              <Text
+                type="p1"
+                bold
+                style={styles.boldBalance}
+                {...testProps("bitcoin-balance")}
+              >
                 {btcInUnderlyingCurrency}
               </Text>
               <Text type="p3">{btcInDisplayCurrencyFormatted}</Text>
@@ -225,7 +231,7 @@ const WalletOverview: React.FC<Props> = ({
                 {!hideAmount && (
                   <>
                     {usdInUnderlyingCurrency ? (
-                      <Text type="p1" bold>
+                      <Text type="p1" bold style={styles.boldBalance}>
                         {usdInUnderlyingCurrency}
                       </Text>
                     ) : null}
@@ -233,12 +239,13 @@ const WalletOverview: React.FC<Props> = ({
                       {...testProps("stablesats-balance")}
                       type={usdInUnderlyingCurrency ? "p3" : "p1"}
                       bold={!usdInUnderlyingCurrency}
+                      style={!usdInUnderlyingCurrency && styles.boldBalance}
                     >
                       {usdInDisplayCurrencyFormatted}
                     </Text>
                   </>
                 )}
-                {hideAmount && <Text>****</Text>}
+                {hideAmount && <HiddenBalancePlaceholder size="small" />}
               </View>
             )}
           </View>
@@ -306,6 +313,9 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   restrictionLabelText: {
     textAlign: "right",
+  },
+  boldBalance: {
+    fontFamily: "SourceSansPro-Bold",
   },
   loaderContainer: {
     flex: 1,

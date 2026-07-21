@@ -4,6 +4,7 @@ import { Pressable, TouchableOpacity, View, Text } from "react-native"
 
 import { makeStyles } from "@rn-vui/themed"
 
+import { HiddenBalancePlaceholder } from "@app/components/hidden-balance-placeholder/hidden-balance-placeholder"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { BalanceMode } from "@app/hooks/use-balance-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -65,8 +66,8 @@ export const BalanceHeader: React.FC<Props> = ({
   return (
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
       {hideAmount ? (
-        <TouchableOpacity onPress={switchMemoryHideAmount}>
-          <Text style={styles.balanceHiddenText}>****</Text>
+        <TouchableOpacity style={styles.balanceWrapper} onPress={switchMemoryHideAmount}>
+          <HiddenBalancePlaceholder size="large" />
         </TouchableOpacity>
       ) : (
         <TouchableOpacity onPress={switchMemoryHideAmount}>
@@ -121,13 +122,20 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     textAlign: "center",
   },
+  balanceWrapper: {
+    height: 48,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   amountWrapper: {
+    height: 48,
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     alignSelf: "center",
   },
   primaryBalanceText: {
     fontSize: 32,
+    fontWeight: "bold",
     color: colors.black,
   },
   loaderBackground: {
@@ -135,11 +143,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   loaderForefound: {
     color: colors.loaderForeground,
-  },
-  balanceHiddenText: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: colors.black,
   },
   modeToggle: {
     marginTop: 4,
