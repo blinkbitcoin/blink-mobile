@@ -2321,6 +2321,8 @@
   "SettingsScreen": {
     "createAddress": "Tạo địa chỉ",
     "donationButton": "Nút quyên góp",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "Woocommerce",
     "staticQr": "QR tĩnh có thể in",
     "staticQrCopied": "Liên kết mã QR tĩnh của bạn đã được sao chép",
     "setByOs": "Đặt bởi hệ điều hành",
@@ -2329,7 +2331,6 @@
     "apiDashboard": "Truy cập và bảng điều khiển API",
     "pos": "Điểm bán hàng",
     "posCopied": "Liên kết điểm bán hàng của bạn đã được sao chép",
-    "setYourLightningAddress": "Đặt địa chỉ Lightning của bạn",
     "activated": "Đã kích hoạt",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "Tài khoản không lưu ký",

@@ -2321,6 +2321,8 @@
   "SettingsScreen": {
     "createAddress": "Adres aanmaken",
     "donationButton": "Donatieknop",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "Woocommerce",
     "staticQr": "Afdrukbare statische QR",
     "staticQrCopied": "Je statische QR-code link is gekopieerd",
     "setByOs": "Ingesteld door OS",
@@ -2329,7 +2331,6 @@
     "apiDashboard": "API-toegang en dashboard",
     "pos": "Kassasysteem",
     "posCopied": "Je kassasysteem-link is gekopieerd",
-    "setYourLightningAddress": "Stel je Lightning-adres in",
     "activated": "Geactiveerd",
     "addressScreen": "Manieren om betaald te krijgen",
     "nonCustodialAccount": "Niet-bewaarde rekening",

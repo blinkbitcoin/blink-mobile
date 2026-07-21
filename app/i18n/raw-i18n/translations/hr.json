@@ -2321,6 +2321,8 @@
   "SettingsScreen": {
     "createAddress": "Stvori adresu",
     "donationButton": "Gumb za donacije",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "Woocommerce",
     "staticQr": "Statični QR za ispis",
     "staticQrCopied": "Vaša poveznica statičnog QR koda je kopirana",
     "setByOs": "Postavljeno od OS-a",
@@ -2329,7 +2331,6 @@
     "apiDashboard": "API pristup i nadzorna ploča",
     "pos": "Prodajno mjesto",
     "posCopied": "Vaša poveznica prodajnog mjesta je kopirana",
-    "setYourLightningAddress": "Postavite svoju Lightning adresu",
     "activated": "Aktivirano",
     "addressScreen": "Načini plaćanja",
     "nonCustodialAccount": "Račun bez skrbništva",

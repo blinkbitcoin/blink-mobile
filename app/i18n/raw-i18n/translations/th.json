@@ -2321,6 +2321,8 @@
   "SettingsScreen": {
     "createAddress": "สร้างแอดเดรส",
     "donationButton": "ปุ่มบริจาค",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "Woocommerce",
     "staticQr": "QR แบบคงที่สำหรับพิมพ์",
     "staticQrCopied": "คัดลอกลิงก์ QR แบบคงที่ของคุณแล้ว",
     "setByOs": "ตั้งค่าโดยระบบปฏิบัติการ",
@@ -2329,7 +2331,6 @@
     "apiDashboard": "การเข้าถึงและแดชบอร์ด API",
     "pos": "จุดขาย",
     "posCopied": "คัดลอกลิงก์จุดขายของคุณแล้ว",
-    "setYourLightningAddress": "ตั้งค่าแอดเดรส Lightning ของคุณ",
     "activated": "เปิดใช้งานเป็นที่เรียบร้อย",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "บัญชีแบบไม่ฝากดูแล",

@@ -7528,10 +7528,6 @@ type RootTranslation = {
 		 */
 		posCopied: string
 		/**
-		 * S​e​t​ ​y​o​u​r​ ​l​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
-		 */
-		setYourLightningAddress: string
-		/**
 		 * C​r​e​a​t​e​ ​a​d​d​r​e​s​s
 		 */
 		createAddress: string
@@ -7539,6 +7535,14 @@ type RootTranslation = {
 		 * D​o​n​a​t​i​o​n​ ​B​u​t​t​o​n
 		 */
 		donationButton: string
+		/**
+		 * B​T​C​P​a​y​ ​S​e​r​v​e​r
+		 */
+		btcpayServer: string
+		/**
+		 * W​o​o​c​o​m​m​e​r​c​e
+		 */
+		woocommerce: string
 		/**
 		 * A​c​t​i​v​a​t​e​d
 		 */
@@ -19820,10 +19824,6 @@ export type TranslationFunctions = {
 		 */
 		posCopied: () => LocalizedString
 		/**
-		 * Set your lightning address
-		 */
-		setYourLightningAddress: () => LocalizedString
-		/**
 		 * Create address
 		 */
 		createAddress: () => LocalizedString
@@ -19831,6 +19831,14 @@ export type TranslationFunctions = {
 		 * Donation Button
 		 */
 		donationButton: () => LocalizedString
+		/**
+		 * BTCPay Server
+		 */
+		btcpayServer: () => LocalizedString
+		/**
+		 * Woocommerce
+		 */
+		woocommerce: () => LocalizedString
 		/**
 		 * Activated
 		 */

@@ -2321,6 +2321,8 @@
   "SettingsScreen": {
     "createAddress": "Adres oluştur",
     "donationButton": "Bağış düğmesi",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "Woocommerce",
     "staticQr": "Basılabilir Statik QR Kodu",
     "staticQrCopied": "Statik QR kod bağlantınız kopyalandı",
     "setByOs": "İşletim sistemi tarafından ayarlandı",
@@ -2329,7 +2331,6 @@
     "apiDashboard": "API erişimi ve kontrol paneli",
     "pos": "Satış Noktası",
     "posCopied": "Satış noktası bağlantınız kopyalandı",
-    "setYourLightningAddress": "Lightning Adresinizi Ayarlayın",
     "activated": "Aktive edildi",
     "addressScreen": "Ödeme alma yolları",
     "nonCustodialAccount": "Saklamasız hesap",

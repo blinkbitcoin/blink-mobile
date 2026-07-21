@@ -2321,6 +2321,8 @@
   "SettingsScreen": {
     "createAddress": "Vytvořit adresu",
     "donationButton": "Darovací tlačítko",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "Woocommerce",
     "staticQr": "Tisknutelný statický QR",
     "staticQrCopied": "Odkaz na váš statický QR kód byl zkopírován",
     "setByOs": "Systémové nastavení",
@@ -2329,7 +2331,6 @@
     "apiDashboard": "Přístup k API a nástěnka",
     "pos": "Pokladní místo",
     "posCopied": "Odkaz na vaše pokladní místo byl zkopírován",
-    "setYourLightningAddress": "Nastavte svou Lightning adresu",
     "activated": "Aktivováno",
     "addressScreen": "Způsoby platby",
     "nonCustodialAccount": "Nesvěřenský účet",

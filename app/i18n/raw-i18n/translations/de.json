@@ -2321,6 +2321,8 @@
     "SettingsScreen": {
         "createAddress": "Adresse erstellen",
         "donationButton": "Spenden-Button",
+        "btcpayServer": "BTCPay Server",
+        "woocommerce": "Woocommerce",
         "staticQr": "Druckbarer statischer QR-Code",
         "staticQrCopied": "Ihr statischer QR-Code Link wurde kopiert",
         "setByOs": "Durch Betriebssystem gesetzt",
@@ -2329,7 +2331,6 @@
         "apiDashboard": "API-Zugang und Dashboard",
         "pos": "Point of Sale",
         "posCopied": "Ihr Point of Sale Link wurde kopiert",
-        "setYourLightningAddress": "Setze Deine Lightning Adresse",
         "activated": "Aktiviert",
         "addressScreen": "Zahlungsmöglichkeiten",
         "nonCustodialAccount": "Nicht-verwahrtes Konto",

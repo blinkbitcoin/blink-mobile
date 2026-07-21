@@ -2321,6 +2321,8 @@
   "SettingsScreen": {
     "createAddress": "Unda anwani",
     "donationButton": "Kitufe cha mchango",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "Woocommerce",
     "staticQr": "Msimbo Tuli wa QR unaoweza kuchapishwa",
     "staticQrCopied": "Kiungo chako tuli cha msimbo wa QR kimenakiliwa",
     "setByOs": "Imewekwa na OS",
@@ -2329,7 +2331,6 @@
     "apiDashboard": "Ufikiaji wa API na dashibodi",
     "pos": "Sehemu ya Uuzaji",
     "posCopied": "Kiungo chako cha mauzo kimenakiliwa",
-    "setYourLightningAddress": "Weka Anwani yako ya Umeme",
     "activated": "Imewezeshwa",
     "addressScreen": "Njia za kupokea malipo",
     "nonCustodialAccount": "Akaunti isiyo ya udhamini",

@@ -29,14 +29,12 @@ export const AccountLNAddress: React.FC = () => {
 type LightningAddressRowProps = {
   address: string | null
   loading?: boolean
-  noAddressLabel?: string
   renderModal: (modal: { isVisible: boolean; toggleModal: () => void }) => React.ReactNode
 }
 
 const LightningAddressRow: React.FC<LightningAddressRowProps> = ({
   address,
   loading,
-  noAddressLabel,
   renderModal,
 }) => {
   const {
@@ -57,7 +55,7 @@ const LightningAddressRow: React.FC<LightningAddressRowProps> = ({
     <>
       <SettingsRow
         loading={loading}
-        title={address ?? noAddressLabel ?? LL.SettingsScreen.setYourLightningAddress()}
+        title={address ?? LL.SettingsScreen.createAddress()}
         subtitleShorter={(address ?? "").length > SUBTITLE_SHORTER_LENGTH}
         leftGaloyIcon="lightning-address"
         rightIcon={
@@ -94,13 +92,11 @@ const CustodialLightningAddressRow: React.FC = () => {
 }
 
 const SelfCustodialLightningAddressRow: React.FC = () => {
-  const { LL } = useI18nContext()
   const address = useSelfCustodialLightningAddress()
 
   return (
     <LightningAddressRow
       address={address}
-      noAddressLabel={LL.SettingsScreen.createAddress()}
       renderModal={({ isVisible, toggleModal }) => (
         <SetSelfCustodialLightningAddressModal
           isVisible={isVisible}

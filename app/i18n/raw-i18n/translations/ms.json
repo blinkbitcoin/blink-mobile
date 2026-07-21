@@ -2321,6 +2321,8 @@
   "SettingsScreen": {
     "createAddress": "Cipta alamat",
     "donationButton": "Butang derma",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "Woocommerce",
     "staticQr": "QR statik boleh cetak",
     "staticQrCopied": "Pautan kod QR statik anda telah disalin",
     "setByOs": "Ditetapkan oleh OS",
@@ -2329,7 +2331,6 @@
     "apiDashboard": "Akses dan papan pemuka API",
     "pos": "Point of Sale",
     "posCopied": "Pautan Point of Sale anda telah disalin",
-    "setYourLightningAddress": "Tetapkan alamat Lightning anda",
     "activated": "Telah diaktifkan",
     "addressScreen": "Cara untuk terima bayaran",
     "nonCustodialAccount": "Akaun bukan kustodial",

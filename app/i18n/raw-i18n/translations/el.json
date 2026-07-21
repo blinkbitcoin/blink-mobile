@@ -2321,6 +2321,8 @@
   "SettingsScreen": {
     "createAddress": "Δημιουργία διεύθυνσης",
     "donationButton": "Κουμπί δωρεάς",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "Woocommerce",
     "staticQr": "Εκτυπώσιμος στατικός κώδικος QR",
     "staticQrCopied": "Ο στατικός σύνδεσμος του κωδικού QR έχει αντιγραφεί",
     "setByOs": "Ορισμός από OS",
@@ -2329,7 +2331,6 @@
     "apiDashboard": "Πρόσβαση API και πίνακας ελέγχου",
     "pos": "Σημείο πώλησης",
     "posCopied": "Ο σύνδεσμος του σημείου πώλησής σας έχει αντιγραφεί",
-    "setYourLightningAddress": "Ορίστε την διεύθυνσή σας στο Lightning",
     "activated": "Ενεργοποιήθηκε ",
     "addressScreen": "Τρόποι για να πληρωθείτε ",
     "nonCustodialAccount": "Λογαριασμός μη φύλαξης",
