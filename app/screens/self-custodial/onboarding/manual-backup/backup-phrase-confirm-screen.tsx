@@ -51,6 +51,7 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
   } = useBackupConfirm({ challenges, onComplete, disabled: checkpointLoading })
 
   const anyWrong = challenges.some((_, i) => isWordWrong(i))
+  const isConfirmDisabled = !allCorrect || checkpointLoading
 
   const inputRefs = useRef<Array<TextInput | null>>([])
 
@@ -135,7 +136,7 @@ export const BackupPhraseConfirmScreen: React.FC = () => {
                 ? LL.BackupScreen.ManualBackup.Confirm.confirm()
                 : LL.BackupScreen.ManualBackup.Confirm.enterWords()
             }
-            disabled={!allCorrect || checkpointLoading}
+            disabled={isConfirmDisabled}
             onPress={onComplete}
             {...testProps("backup-confirm-button")}
           />

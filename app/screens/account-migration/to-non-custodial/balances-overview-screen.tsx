@@ -110,13 +110,13 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
               isDollarValueMuted={preview.isNewDollarBalanceRestricted}
             />
 
-            {preview.exchangeRate ? (
+            {preview.exchangeRate && (
               <View style={styles.exchangeRateBox}>
                 <Text style={styles.exchangeRateText}>
                   {LLOverview.exchangeRate({ rate: preview.exchangeRate })}
                 </Text>
               </View>
-            ) : null}
+            )}
           </ScrollView>
         ) : (
           <View style={styles.loadingContainer}>
