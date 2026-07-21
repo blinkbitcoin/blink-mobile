@@ -3400,6 +3400,13 @@ export type MigrationTransactionsPresenceQueryVariables = Exact<{ [key: string]:
 
 export type MigrationTransactionsPresenceQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly transactions?: { readonly __typename: 'TransactionConnection', readonly edges?: ReadonlyArray<{ readonly __typename: 'TransactionEdge', readonly cursor: string }> | null } | null } } | null };
 
+export type MigrationLnAddressTransferMutationVariables = Exact<{
+  input: MigrationLnAddressTransferInput;
+}>;
+
+
+export type MigrationLnAddressTransferMutation = { readonly __typename: 'Mutation', readonly migrationLnAddressTransfer: { readonly __typename: 'MigrationLnAddressTransferPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }>, readonly results: ReadonlyArray<{ readonly __typename: 'MigrationLnAddressTransferResult', readonly identifier: string, readonly lightningAddress?: string | null, readonly status: MigrationLnAddressTransferStatus }> } };
+
 export type MigrationQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5527,6 +5534,47 @@ export type MigrationTransactionsPresenceQueryHookResult = ReturnType<typeof use
 export type MigrationTransactionsPresenceLazyQueryHookResult = ReturnType<typeof useMigrationTransactionsPresenceLazyQuery>;
 export type MigrationTransactionsPresenceSuspenseQueryHookResult = ReturnType<typeof useMigrationTransactionsPresenceSuspenseQuery>;
 export type MigrationTransactionsPresenceQueryResult = Apollo.QueryResult<MigrationTransactionsPresenceQuery, MigrationTransactionsPresenceQueryVariables>;
+export const MigrationLnAddressTransferDocument = gql`
+    mutation migrationLnAddressTransfer($input: MigrationLnAddressTransferInput!) {
+  migrationLnAddressTransfer(input: $input) {
+    errors {
+      message
+      code
+    }
+    results {
+      identifier
+      lightningAddress
+      status
+    }
+  }
+}
+    `;
+export type MigrationLnAddressTransferMutationFn = Apollo.MutationFunction<MigrationLnAddressTransferMutation, MigrationLnAddressTransferMutationVariables>;
+
+/**
+ * __useMigrationLnAddressTransferMutation__
+ *
+ * To run a mutation, you first call `useMigrationLnAddressTransferMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMigrationLnAddressTransferMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [migrationLnAddressTransferMutation, { data, loading, error }] = useMigrationLnAddressTransferMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useMigrationLnAddressTransferMutation(baseOptions?: Apollo.MutationHookOptions<MigrationLnAddressTransferMutation, MigrationLnAddressTransferMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MigrationLnAddressTransferMutation, MigrationLnAddressTransferMutationVariables>(MigrationLnAddressTransferDocument, options);
+      }
+export type MigrationLnAddressTransferMutationHookResult = ReturnType<typeof useMigrationLnAddressTransferMutation>;
+export type MigrationLnAddressTransferMutationResult = Apollo.MutationResult<MigrationLnAddressTransferMutation>;
+export type MigrationLnAddressTransferMutationOptions = Apollo.BaseMutationOptions<MigrationLnAddressTransferMutation, MigrationLnAddressTransferMutationVariables>;
 export const MigrationDocument = gql`
     query migration {
   migration {

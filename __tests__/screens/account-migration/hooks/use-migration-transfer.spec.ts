@@ -5,7 +5,7 @@ import {
   resetMigrationCommitGuard,
   useMigrationTransfer,
 } from "@app/screens/account-migration/hooks/use-migration-transfer"
-import { MigrationTransferRequestStatus } from "@app/self-custodial/migration-transfer-request"
+import { MigrationSdkStatus } from "@app/self-custodial/migration-transfer-request"
 import { MigrationSupportReason } from "@app/types/migration"
 
 import { flushEffects } from "../../../helpers/flush-effects"
@@ -83,8 +83,8 @@ describe("useMigrationTransfer", () => {
     resetMigrationCommitGuard()
     mockStatus = MigrationStatus.InProgress
     mockBuildTransferRequest.mockResolvedValue({
-      status: MigrationTransferRequestStatus.Ok,
-      request: collectedRequest,
+      status: MigrationSdkStatus.Ok,
+      value: collectedRequest,
     })
     mockCommitMigration.mockResolvedValue({ data: { migrationCommit: { errors: [] } } })
     mockIsDeviceClockSkewed.mockReturnValue(false)
@@ -233,7 +233,7 @@ describe("useMigrationTransfer", () => {
    *  COMPLETED would swap the session out from under that screen. */
   it("stops watching once a client-side failure is recorded", async () => {
     mockBuildTransferRequest.mockResolvedValue({
-      status: MigrationTransferRequestStatus.Failed,
+      status: MigrationSdkStatus.Failed,
       error: new Error("signer unavailable"),
     })
     renderTransfer()
@@ -297,7 +297,7 @@ describe("useMigrationTransfer", () => {
 
   it("names the missing wallet when the device has no mnemonic for it", async () => {
     mockBuildTransferRequest.mockResolvedValue({
-      status: MigrationTransferRequestStatus.NoMnemonic,
+      status: MigrationSdkStatus.NoMnemonic,
     })
     const { result } = renderTransfer()
     await flushEffects()
@@ -310,7 +310,7 @@ describe("useMigrationTransfer", () => {
 
   it("hands a wallet that would not produce a destination to support", async () => {
     mockBuildTransferRequest.mockResolvedValue({
-      status: MigrationTransferRequestStatus.Failed,
+      status: MigrationSdkStatus.Failed,
       error: new Error("signer unavailable"),
     })
     const { result } = renderTransfer()

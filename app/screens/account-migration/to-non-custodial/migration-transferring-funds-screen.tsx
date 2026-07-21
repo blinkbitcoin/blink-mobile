@@ -8,7 +8,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { StatusScreenLayout } from "@app/components/status-screen-layout"
-import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useCustodialOwnerId } from "@app/screens/account-migration/hooks/use-custodial-owner-id"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -28,7 +28,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { activeAccount } = useAccountRegistry()
+  const { ownerId } = useCustodialOwnerId()
   const { migrationAccountId, migrationLoading, completeMigration } =
     useCompleteMigration()
 
@@ -52,7 +52,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
 
   const isTransferSkipped = migrationLoading || isAccountMissing
   const { isTransferred, failureReason, isClockOutOfSync, retry } = useMigrationTransfer({
-    custodialAccountId: activeAccount?.id ?? null,
+    custodialAccountId: ownerId,
     selfCustodialAccountId: migrationAccountId,
     skip: isTransferSkipped,
   })

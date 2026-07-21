@@ -80,13 +80,39 @@ jest.mock("@app/utils/error-logging", () => ({
 const mockSaveCheckpoint = jest.fn()
 let mockCheckpointLoading = false
 
+let mockCheckpointAccountId: string | null = "sc-account-1"
+let mockOwnerId: string | null = "owner-1"
+const mockLnRetry = jest.fn()
+let mockLnAddressTransfer = {
+  isTransferred: true,
+  isRejected: false,
+  hasConnectionIssue: false,
+  retry: mockLnRetry,
+}
+
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => ({
+    accountId: mockCheckpointAccountId,
     loading: mockCheckpointLoading,
     saveCheckpoint: mockSaveCheckpoint,
   }),
 }))
+
+jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => ({
+  useCustodialOwnerId: () => ({ ownerId: mockOwnerId, loading: false }),
+}))
+
+const mockUseLnAddressTransfer = jest.fn()
+jest.mock(
+  "@app/screens/account-migration/hooks/use-migration-ln-address-transfer",
+  () => ({
+    useMigrationLnAddressTransfer: (args: unknown) => {
+      mockUseLnAddressTransfer(args)
+      return mockLnAddressTransfer
+    },
+  }),
+)
 
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-gate-armed", () => ({
   useWindDownGateArmed: () => mockGateArmed,
@@ -133,6 +159,14 @@ describe("MigrationBalancesOverviewScreen", () => {
     mockCurrentDollarRestricted = false
     mockConvertReady = true
     mockCheckpointLoading = false
+    mockCheckpointAccountId = "sc-account-1"
+    mockOwnerId = "owner-1"
+    mockLnAddressTransfer = {
+      isTransferred: true,
+      isRejected: false,
+      hasConnectionIssue: false,
+      retry: mockLnRetry,
+    }
     mockGateArmed = false
     mockIsFocused = true
     mockIsAuthed = true
@@ -788,5 +822,78 @@ describe("MigrationBalancesOverviewScreen", () => {
     await flushEffects()
 
     expect(screen.queryByText(/Current exchange rate/)).toBeNull()
+  })
+
+  /** The re-point is a precondition of the commit, so a settled failure hands over exactly
+   *  like a refused start. */
+  it("hands over to support when the lightning-address re-point fails", async () => {
+    mockLnAddressTransfer = {
+      isTransferred: false,
+      isRejected: true,
+      hasConnectionIssue: false,
+      retry: mockLnRetry,
+    }
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "ln-address-transfer-failed",
+    })
+  })
+
+  /** In-flight is not a failure: Approve stays off, but the user is NOT sent to support. */
+  it("keeps Approve off until the lightning address has moved, without a handover", async () => {
+    mockLnAddressTransfer = {
+      isTransferred: false,
+      isRejected: false,
+      hasConnectionIssue: false,
+      retry: mockLnRetry,
+    }
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The re-point signs its proof against the real Galoy owner id, not the registry's
+   *  shared placeholder, so the challenge names the account the backend verifies against. */
+  it("drives the re-point with the custodial owner id and the provisioned account", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseLnAddressTransfer).toHaveBeenCalledWith({
+      custodialAccountId: "owner-1",
+      selfCustodialAccountId: "sc-account-1",
+      skip: false,
+    })
+  })
+
+  it("retries the re-point along with the rest when it loses the network", async () => {
+    mockLnAddressTransfer = {
+      isTransferred: false,
+      isRejected: false,
+      hasConnectionIssue: true,
+      retry: mockLnRetry,
+    }
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: mockRefetchMigration,
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: mockRefetchWallets,
+    })
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+
+    expect(mockLnRetry).toHaveBeenCalledTimes(1)
   })
 })

@@ -21,7 +21,9 @@ import {
   useMigrationCheckpoint,
   useHardwareBackGuard,
 } from "@app/screens/account-migration/hooks"
+import { useCustodialOwnerId } from "@app/screens/account-migration/hooks/use-custodial-owner-id"
 import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/use-ensure-migration-started"
+import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -43,7 +45,11 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  is ready, its area holds a spinner and Approve stays off. */
   const preview = useMigrationBalancesPreview()
   const { openSupport } = useContactSupport()
-  const { loading: checkpointLoading, saveCheckpoint } = useMigrationCheckpoint()
+  const {
+    accountId: selfCustodialAccountId,
+    loading: checkpointLoading,
+    saveCheckpoint,
+  } = useMigrationCheckpoint()
   const isFocused = useIsFocused()
 
   /** The commit point has no return path: the gesture is disabled on the
@@ -59,6 +65,20 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    */
   const migrationStart = useEnsureMigrationStarted({ skip: !preview.isReady })
 
+  const { ownerId } = useCustodialOwnerId()
+
+  /**
+   * The lightning-address re-point runs here, as a precondition of Approve. The mutation
+   * needs the custodial session, which the completion swap discards, so the commit screen
+   * is the last place it can fire; Approve stays off until it settles, and a failure hands
+   * over exactly like the start refusal.
+   */
+  const lnAddressTransfer = useMigrationLnAddressTransfer({
+    custodialAccountId: ownerId,
+    selfCustodialAccountId,
+    skip: !preview.isReady,
+  })
+
   /** The checkpoint only remembers which screen to resume on. Gated on focus so a
    *  background instance (this screen stays mounted under the completion screen) never
    *  re-saves the checkpoint the migration just cleared, and on ready figures so it is
@@ -69,15 +89,23 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   }, [isFocused, checkpointLoading, preview.isReady, saveCheckpoint])
 
   /**
-   * The three ways this screen ends without figures to approve, as one value: the preview
-   * settled empty, the wallet query failed, or the server refused to start. All three
-   * strand the user here where the hardware back is swallowed, and a refusal is as final
-   * as the other two, so support takes over rather than leaving an Approve that would
-   * commit into a flow the backend already declined to open. Null means none of them.
+   * The ways this screen ends without an Approve to offer, as one value: the preview
+   * settled empty, the wallet query failed, the server refused to start, or the
+   * lightning-address re-point failed. Each strands the user here where the hardware back
+   * is swallowed, and each is as final as the others, so support takes over rather than
+   * leaving an Approve that would commit into a flow the backend already declined. A
+   * re-point still waiting on its account ids only keeps Approve off (never a false
+   * handover on a transient skip); the always-present contact-support button is its escape.
+   * Null means none of them.
    */
-  const handoverReason = migrationStart.isRejected
+  const startFailureReason = migrationStart.isRejected
     ? MigrationSupportReason.StartRefused
-    : preview.unavailableReason
+    : null
+  const lnAddressFailureReason = lnAddressTransfer.isRejected
+    ? MigrationSupportReason.LnAddressTransferFailed
+    : null
+  const handoverReason =
+    startFailureReason ?? lnAddressFailureReason ?? preview.unavailableReason
 
   const hasReportedHandoverRef = useRef(false)
 
@@ -107,19 +135,26 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
 
   /** Either source losing the network earns the same retry, and it refreshes both:
    *  figures without a started migration are as useless as the reverse. */
-  const isRetryable = preview.isRetryable || migrationStart.hasConnectionIssue
+  const isRetryable =
+    preview.isRetryable ||
+    migrationStart.hasConnectionIssue ||
+    lnAddressTransfer.hasConnectionIssue
 
   const { retry: retryPreview } = preview
   const { retry: retryMigrationStart } = migrationStart
+  const { retry: retryLnAddressTransfer } = lnAddressTransfer
 
   const handleRetry = useCallback(() => {
     retryPreview()
     retryMigrationStart()
-  }, [retryPreview, retryMigrationStart])
+    retryLnAddressTransfer()
+  }, [retryPreview, retryMigrationStart, retryLnAddressTransfer])
 
   /** Approve commits against a server-side flow, so it stays off until the server has
-   *  confirmed one exists, not merely until the figures render. */
-  const isApproveDisabled = !preview.isReady || !migrationStart.isStarted
+   *  confirmed one exists and the lightning address has moved, not merely until the
+   *  figures render. */
+  const isApproveDisabled =
+    !preview.isReady || !migrationStart.isStarted || !lnAddressTransfer.isTransferred
 
   return (
     <Screen preset="fixed" headerShown={false}>

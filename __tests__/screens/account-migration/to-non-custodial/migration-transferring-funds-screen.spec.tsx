@@ -50,15 +50,10 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-transfer", () => (
   },
 }))
 
-let mockActiveAccountId: string | null = "custodial-1"
+let mockOwnerId: string | null = "custodial-1"
 
-jest.mock("@app/hooks/use-account-registry", () => ({
-  ...jest.requireActual("@app/hooks/use-account-registry"),
-  useAccountRegistry: () => ({
-    activeAccount: mockActiveAccountId
-      ? { id: mockActiveAccountId, type: "custodial" }
-      : undefined,
-  }),
+jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => ({
+  useCustodialOwnerId: () => ({ ownerId: mockOwnerId, loading: false }),
 }))
 
 jest.mock("@app/utils/error-logging", () => ({
@@ -100,7 +95,7 @@ const rerenderScreen = (rerender: (ui: React.ReactElement) => void) =>
 describe("MigrationTransferringFundsScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockActiveAccountId = "custodial-1"
+    mockOwnerId = "custodial-1"
     mockMigrationAccountId = "sc-account-1"
     mockMigrationLoading = false
     mockIsTransferred = false
@@ -143,7 +138,7 @@ describe("MigrationTransferringFundsScreen", () => {
   /** The session can end under the screen; the transfer then has no account to bill and
    *  declines to commit rather than guessing one. */
   it("passes no custodial account when the session has gone", async () => {
-    mockActiveAccountId = null
+    mockOwnerId = null
     renderScreen()
     await flushEffects()
 
