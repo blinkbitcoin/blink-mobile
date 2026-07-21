@@ -38,7 +38,12 @@ export const useExportTransactionsCsv = () => {
   const exportCsv = async (walletIds: string[]): Promise<boolean> => {
     const { data } = await fetchCsvTransactions({ variables: { walletIds } })
     const csvEncoded = data?.me?.defaultAccount?.csvTransactions
-    if (!csvEncoded) throw new Error("csvTransactions missing from the response")
+    /** A missing field is a real failure, but an empty string is a valid empty export with
+     *  no transactions: nothing to share rather than an error, so it resolves false. */
+    if (csvEncoded === undefined) {
+      throw new Error("csvTransactions missing from the response")
+    }
+    if (csvEncoded === "") return false
     const result = await Share.open({
       title: CSV_BASENAME,
       filename: buildCsvFilename(),

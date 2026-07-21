@@ -103,11 +103,26 @@ describe("useExportTransactionsCsv", () => {
     )
   })
 
-  it("throws and does not share when the backend returns no CSV", async () => {
+  it("throws and does not share when the CSV field is missing from the response", async () => {
     mockFetchCsvTransactions.mockResolvedValue({ data: undefined })
     const { result } = renderHook(() => useExportTransactionsCsv())
 
     await expect(result.current.exportCsv([])).rejects.toThrow()
+    expect(mockShareOpen).not.toHaveBeenCalled()
+  })
+
+  it("resolves false without sharing when the backend returns an empty CSV", async () => {
+    mockFetchCsvTransactions.mockResolvedValue({
+      data: { me: { defaultAccount: { csvTransactions: "" } } },
+    })
+    const { result } = renderHook(() => useExportTransactionsCsv())
+
+    let hasShared: boolean | undefined
+    await act(async () => {
+      hasShared = await result.current.exportCsv(["btc-1"])
+    })
+
+    expect(hasShared).toBe(false)
     expect(mockShareOpen).not.toHaveBeenCalled()
   })
 
