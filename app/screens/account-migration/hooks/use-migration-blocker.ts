@@ -13,9 +13,9 @@ type MigrationBlocker = {
  * says: past the point of no return the custodial account is being emptied, so handing it
  * back would let the user spend a balance the transfer is about to claim. The pre-deadline
  * nudge is neither of those, it stays the home bulletin reached by tapping Migrate, never
- * a screen imposed on launch. The self-custodial kill-switch outranks both: with the stack
- * disabled by emergency there is no target to push anyone toward, and a locked user cannot
- * finish a migration whose destination is switched off.
+ * a screen imposed on launch. The self-custodial disable outranks both: with the stack
+ * turned off there is no target to push anyone toward, and a locked user cannot finish a
+ * migration whose destination is gone.
  */
 export const useMigrationBlocker = (): MigrationBlocker => {
   const isSelfCustodialDisabled = useSelfCustodialDisabled()
