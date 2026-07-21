@@ -1,1 +1,1 @@
-export { headerCloseControl } from "./header-close-control"
+export { headerCloseControl, headerCloseControlOptions } from "./header-close-control"

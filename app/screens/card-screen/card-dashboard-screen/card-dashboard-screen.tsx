@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { BackendFeatureGate } from "@app/components/backend-feature-gate"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { BlinkCard } from "@app/components/blink-card"
+import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
 import {
   CardActionButtons,
   CardBalanceSection,
@@ -73,13 +74,13 @@ const CardDashboardScreenContent: React.FC = () => {
   }, [navigation])
 
   useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
+    navigation.setOptions(
+      headerRightNoGlass(() => (
         <TouchableOpacity style={styles.headerRight} onPress={handleSettingsPress}>
           <GaloyIcon name="settings" size={24} color={colors.black} />
         </TouchableOpacity>
-      ),
-    })
+      )),
+    )
   }, [navigation, styles.headerRight, colors.black, handleSettingsPress])
 
   useEffect(() => {

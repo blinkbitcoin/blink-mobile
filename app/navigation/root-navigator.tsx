@@ -96,7 +96,8 @@ import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unava
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
-import { headerCloseControl } from "@app/components/header-close-control"
+import { headerCloseControlOptions } from "@app/components/header-close-control"
+import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import {
   CardAddToMobileWalletScreen,
@@ -276,14 +277,14 @@ export const RootStack = () => {
         component={SendBitcoinDestinationGated}
         options={{
           title: LL.SendBitcoinScreen.destinationScreenTitle(),
-          headerRight: () => (
+          ...headerRightNoGlass(() => (
             <TouchableOpacity
               onPress={() => navigation.setParams({ scanPressed: Date.now() })}
               style={styles.SendBitcoinScreenScanIcon}
             >
               <ScanIcon fill={colors.black} />
             </TouchableOpacity>
-          ),
+          )),
         }}
       />
       <RootNavigator.Screen
@@ -677,7 +678,7 @@ export const RootStack = () => {
         component={CardIntroducingScreen}
         options={{
           title: LL.CardFlow.Onboarding.CardIntroducing.title(),
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -685,7 +686,7 @@ export const RootStack = () => {
         component={OnboardingCardDetailsScreen}
         options={{
           title: LL.CardFlow.Onboarding.CardDetails.title(),
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -700,7 +701,7 @@ export const RootStack = () => {
         component={CardSubscriptionScreen}
         options={{
           title: LL.CardFlow.Onboarding.CardSubscription.subscribeTitle(),
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -715,7 +716,7 @@ export const RootStack = () => {
         component={LoadingCardScreen}
         options={{
           title: "",
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -724,7 +725,7 @@ export const RootStack = () => {
         options={{
           title: LL.CardFlow.Onboarding.PersonalInformation.title(),
           headerLeft: () => <></>,
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -733,7 +734,7 @@ export const RootStack = () => {
         options={{
           title: "",
           headerLeft: () => <></>,
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -742,7 +743,7 @@ export const RootStack = () => {
         options={{
           title: "",
           headerLeft: () => <></>,
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
@@ -750,7 +751,7 @@ export const RootStack = () => {
         component={CardApprovedScreen}
         options={{
           title: LL.CardFlow.CardStatus.title(),
-          headerRight: headerCloseControl(),
+          ...headerCloseControlOptions(),
         }}
       />
       <RootNavigator.Screen
