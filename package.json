@@ -305,8 +305,7 @@
     "shell-quote": "^1.8.4",
     "@react-native/codegen": "0.85.3",
     "handlebars": ">=4.7.9",
-    "protobufjs": ">=7.5.5",
-    "tar": ">=7.5.19"
+    "protobufjs": ">=7.5.5"
   },
   "engines": {
     "node": ">=24"
