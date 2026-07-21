@@ -14,11 +14,11 @@ export const AccountPOS: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const { username, baseUrl, loading } = usePayLinks()
+  const { username, loading } = usePayLinks()
 
   if (!username) return null
 
-  const pos = getPosUrl(baseUrl, username)
+  const pos = getPosUrl(username)
 
   return (
     <SettingsRow

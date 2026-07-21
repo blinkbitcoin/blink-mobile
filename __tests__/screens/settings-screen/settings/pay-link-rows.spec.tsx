@@ -28,12 +28,6 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 
-jest.mock("@app/hooks", () => ({
-  useAppConfig: () => ({
-    appConfig: { galoyInstance: { posUrl: "https://pay.blink.sv" } },
-  }),
-}))
-
 jest.mock("@app/graphql/is-authed-context", () => ({ useIsAuthed: () => true }))
 const mockSettingsScreenQuery = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
@@ -98,19 +92,23 @@ describe("ways to get paid rows", () => {
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
   })
 
-  describe("custodial links use the galoy pay server and account username", () => {
+  // The POS and its printable QR are served by the terminal for custodial accounts
+  // too, not by the galoy instance pay-server they used to be built from.
+  describe("custodial links use the terminal and the account username", () => {
     beforeEach(asCustodial)
 
     it("POS", () => {
       render(<AccountPOS />)
       pressRow()
-      expect(Linking.openURL).toHaveBeenCalledWith("https://pay.blink.sv/bob")
+      expect(Linking.openURL).toHaveBeenCalledWith("https://terminal.blinkbtc.com/bob")
     })
 
     it("printable QR", () => {
       render(<AccountStaticQR />)
       pressRow()
-      expect(Linking.openURL).toHaveBeenCalledWith("https://pay.blink.sv/bob/print")
+      expect(Linking.openURL).toHaveBeenCalledWith(
+        "https://terminal.blinkbtc.com/bob/print",
+      )
     })
 
     it("donation button", () => {
