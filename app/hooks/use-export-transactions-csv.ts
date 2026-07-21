@@ -19,7 +19,7 @@ gql`
 
 const CSV_BASENAME = "blink-transactions"
 const CSV_EXTENSION = "csv"
-const CSV_MIME_TYPE = "text/comma-separated-values"
+const CSV_MIME_TYPE = "text/csv"
 
 /** Android's react-native-share appends the mime extension, iOS does not, so only iOS carries ".csv". */
 const buildCsvFilename = (): string =>

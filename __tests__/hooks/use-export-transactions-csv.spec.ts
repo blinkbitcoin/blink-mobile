@@ -47,8 +47,8 @@ describe("useExportTransactionsCsv", () => {
     expect(mockShareOpen).toHaveBeenCalledWith(
       expect.objectContaining({
         title: "blink-transactions",
-        url: `data:text/comma-separated-values;base64,${CSV_BASE64}`,
-        type: "text/comma-separated-values",
+        url: `data:text/csv;base64,${CSV_BASE64}`,
+        type: "text/csv",
         failOnCancel: false,
       }),
     )
