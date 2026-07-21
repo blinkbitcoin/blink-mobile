@@ -3628,7 +3628,11 @@
     "explainerCheck4": "Blink API neće biti dostupan",
     "explainerCheck5": "S tvog računa bit će naplaćena mrežna naknada Spark",
     "explainerCta": "Razumijem",
-    "transferringFunds": "Prebacujemo vaša sredstva. Trebalo bi biti gotovo za nekoliko sekundi."
+    "transferringFunds": "Prebacujemo vaša sredstva. Trebalo bi biti gotovo za nekoliko sekundi.",
+    "clockOutOfSync": {
+      "body": "Datum i vrijeme vašeg uređaja nisu usklađeni. Postavite ih na automatski način rada za nastavak.",
+      "retryCta": "Pokušaj ponovno"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Pod skrbništvom",

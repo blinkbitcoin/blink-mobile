@@ -3628,7 +3628,11 @@
     "explainerCheck4": "Blink API zal niet beschikbaar zijn",
     "explainerCheck5": "Er worden Spark-netwerkkosten van je account afgeschreven",
     "explainerCta": "Ik begrijp het",
-    "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn."
+    "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn.",
+    "clockOutOfSync": {
+      "body": "De datum en tijd van je apparaat lopen niet gelijk. Zet ze op automatisch om door te gaan.",
+      "retryCta": "Opnieuw proberen"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Bewaard",

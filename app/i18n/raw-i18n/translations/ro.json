@@ -3628,7 +3628,11 @@
     "explainerCheck4": "API-ul Blink nu va fi disponibil",
     "explainerCheck5": "Din contul tău se va deduce un comision de rețea Spark",
     "explainerCta": "Am înțeles",
-    "transferringFunds": "Se transferă fondurile tale. Ar trebui să fie gata în câteva secunde."
+    "transferringFunds": "Se transferă fondurile tale. Ar trebui să fie gata în câteva secunde.",
+    "clockOutOfSync": {
+      "body": "Data și ora dispozitivului tău nu sunt sincronizate. Setează-le pe automat pentru a continua.",
+      "retryCta": "Încearcă din nou"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Custodial",

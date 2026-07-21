@@ -3628,7 +3628,11 @@
     "explainerCheck4": "Blink API tidak akan tersedia",
     "explainerCheck5": "Akun Anda akan dikenakan biaya jaringan Spark",
     "explainerCta": "Saya mengerti",
-    "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik."
+    "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik.",
+    "clockOutOfSync": {
+      "body": "Tanggal dan waktu perangkat Anda tidak sinkron. Atur ke otomatis untuk melanjutkan.",
+      "retryCta": "Coba lagi"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Kustodian",

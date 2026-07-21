@@ -3628,7 +3628,11 @@
     "explainerCheck4": "Blink API kullanılamayacak",
     "explainerCheck5": "Hesabından bir Spark ağ ücreti düşülecek",
     "explainerCta": "Anladım",
-    "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır."
+    "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır.",
+    "clockOutOfSync": {
+      "body": "Cihazının tarih ve saati eşitlenmemiş. Devam etmek için otomatik olarak ayarla.",
+      "retryCta": "Tekrar dene"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Emanetli",

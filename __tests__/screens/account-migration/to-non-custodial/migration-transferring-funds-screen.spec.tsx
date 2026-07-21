@@ -1,5 +1,5 @@
 import React from "react"
-import { render, screen } from "@testing-library/react-native"
+import { fireEvent, render, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationTransferringFundsScreen } from "@app/screens/account-migration/to-non-custodial/migration-transferring-funds-screen"
@@ -35,11 +35,18 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
 const mockUseMigrationTransfer = jest.fn()
 let mockIsTransferred = false
 let mockFailureReason: MigrationSupportReason | null = null
+let mockIsClockOutOfSync = false
+const mockRetry = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-transfer", () => ({
   useMigrationTransfer: (args: unknown) => {
     mockUseMigrationTransfer(args)
-    return { isTransferred: mockIsTransferred, failureReason: mockFailureReason }
+    return {
+      isTransferred: mockIsTransferred,
+      failureReason: mockFailureReason,
+      isClockOutOfSync: mockIsClockOutOfSync,
+      retry: mockRetry,
+    }
   },
 }))
 
@@ -59,9 +66,20 @@ jest.mock("@app/utils/error-logging", () => ({
 }))
 
 jest.mock("@app/components/status-screen-layout", () => ({
-  StatusScreenLayout: ({ children }: { children: React.ReactNode }) => {
+  StatusScreenLayout: ({
+    children,
+    footer,
+  }: {
+    children: React.ReactNode
+    footer?: React.ReactNode
+  }) => {
     const { View } = jest.requireActual("react-native")
-    return <View testID="status-layout">{children}</View>
+    return (
+      <View testID="status-layout">
+        {children}
+        {footer}
+      </View>
+    )
   },
 }))
 
@@ -87,6 +105,7 @@ describe("MigrationTransferringFundsScreen", () => {
     mockMigrationLoading = false
     mockIsTransferred = false
     mockFailureReason = null
+    mockIsClockOutOfSync = false
     mockCompleteMigration.mockResolvedValue(true)
     loadLocale("en")
   })
@@ -244,5 +263,34 @@ describe("MigrationTransferringFundsScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "transfer-failed",
     })
+  })
+
+  /** A skewed clock is the user's to fix, so the screen says so and offers a retry rather
+   *  than the one-way handover to support a real failure gets. */
+  it("asks the user to fix the clock and offers a retry when it is out of sync", async () => {
+    mockIsClockOutOfSync = true
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByText(
+        "Your device's date and time are out of sync. Set them to automatic to continue.",
+      ),
+    ).toBeTruthy()
+    expect(
+      screen.queryByText("Transferring your funds. It should be done in a few seconds."),
+    ).toBeNull()
+    expect(screen.getByTestId("migration-clock-out-of-sync-retry")).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("retries the transfer when the clock-fix button is pressed", async () => {
+    mockIsClockOutOfSync = true
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-clock-out-of-sync-retry"))
+
+    expect(mockRetry).toHaveBeenCalledTimes(1)
   })
 })

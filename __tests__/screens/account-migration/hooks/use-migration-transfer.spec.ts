@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-native"
+import { act, renderHook } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import {
@@ -13,6 +13,8 @@ import { flushEffects } from "../../../helpers/flush-effects"
 const mockBuildTransferRequest = jest.fn()
 const mockCommitMigration = jest.fn()
 const mockReportError = jest.fn()
+const mockIsDeviceClockSkewed = jest.fn()
+const mockCurrentProofTimestamp = jest.fn()
 let mockStatus: MigrationStatus | null = MigrationStatus.InProgress
 
 jest.mock("@app/graphql/generated", () => ({
@@ -48,6 +50,15 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (operation: string, err: unknown) => mockReportError(operation, err),
 }))
 
+jest.mock("@app/graphql/server-time", () => ({
+  isDeviceClockSkewed: () => mockIsDeviceClockSkewed(),
+}))
+
+jest.mock("@app/screens/account-migration/utils/migration-proof", () => ({
+  ...jest.requireActual("@app/screens/account-migration/utils/migration-proof"),
+  currentProofTimestamp: () => mockCurrentProofTimestamp(),
+}))
+
 const collectedRequest = {
   sparkInvoice: "lnbcrt1invoice",
   sparkPubkey: "03abc",
@@ -76,6 +87,8 @@ describe("useMigrationTransfer", () => {
       request: collectedRequest,
     })
     mockCommitMigration.mockResolvedValue({ data: { migrationCommit: { errors: [] } } })
+    mockIsDeviceClockSkewed.mockReturnValue(false)
+    mockCurrentProofTimestamp.mockReturnValue(1_700_000_000)
   })
 
   it("commits the collected destination while the server awaits one", async () => {
@@ -351,5 +364,146 @@ describe("useMigrationTransfer", () => {
     await flushEffects()
 
     expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+  })
+
+  /** A proof the backend rejects because the device clock sits outside its freshness
+   *  window is the user's to fix — flagged by that collapsed code AND a measurably skewed
+   *  clock — so it earns a retry rather than reporting an error and handing over to
+   *  support. */
+  it("flags a clock skew instead of handing a stale proof to support", async () => {
+    mockIsDeviceClockSkewed.mockReturnValue(true)
+    mockCommitMigration.mockResolvedValue({
+      data: {
+        migrationCommit: {
+          errors: [
+            { message: "invalid destination", code: "MIGRATION_INVALID_DESTINATION" },
+          ],
+        },
+      },
+    })
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.isClockOutOfSync).toBe(true)
+    expect(result.current.failureReason).toBeNull()
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  /** The device heuristic must not hijack an unrelated failure: a rejection under a
+   *  different code is a genuine problem for support even on a skewed clock. */
+  it("hands a non-proof rejection to support even when the clock is skewed", async () => {
+    mockIsDeviceClockSkewed.mockReturnValue(true)
+    mockCommitMigration.mockResolvedValue({
+      data: {
+        migrationCommit: {
+          errors: [{ message: "state conflict", code: "MIGRATION_STATE_CONFLICT" }],
+        },
+      },
+    })
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.isClockOutOfSync).toBe(false)
+    expect(result.current.failureReason).toBe(MigrationSupportReason.TransferFailed)
+  })
+
+  /** The same collapsed code with a healthy clock is a genuinely invalid destination, not
+   *  a stale proof, so it belongs with support. */
+  it("hands a genuine invalid destination to support when the clock is healthy", async () => {
+    mockIsDeviceClockSkewed.mockReturnValue(false)
+    mockCommitMigration.mockResolvedValue({
+      data: {
+        migrationCommit: {
+          errors: [{ message: "bad invoice", code: "MIGRATION_INVALID_DESTINATION" }],
+        },
+      },
+    })
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.isClockOutOfSync).toBe(false)
+    expect(result.current.failureReason).toBe(MigrationSupportReason.TransferFailed)
+  })
+
+  /** Out of sync there is nothing to poll for until the retry fires a fresh commit, so the
+   *  phase read is paused rather than re-running the server's resume routine every 2s. */
+  it("pauses the phase poll while the clock is out of sync", async () => {
+    mockIsDeviceClockSkewed.mockReturnValue(true)
+    mockCommitMigration.mockResolvedValue({
+      data: {
+        migrationCommit: {
+          errors: [{ message: "stale", code: "MIGRATION_INVALID_DESTINATION" }],
+        },
+      },
+    })
+    renderTransfer()
+    await flushEffects()
+
+    expect(mockUseMigrationStatus).toHaveBeenLastCalledWith({
+      skip: false,
+      pollInterval: 0,
+    })
+  })
+
+  /** The retry screen and the support handover are mutually exclusive: a server failure
+   *  landing while out of sync must not also route to support behind the retry. */
+  it("suppresses the support handover while the clock is out of sync", async () => {
+    mockIsDeviceClockSkewed.mockReturnValue(true)
+    mockCommitMigration.mockResolvedValue({
+      data: {
+        migrationCommit: {
+          errors: [{ message: "stale", code: "MIGRATION_INVALID_DESTINATION" }],
+        },
+      },
+    })
+    const { result, rerender } = renderTransfer()
+    await flushEffects()
+    expect(result.current.isClockOutOfSync).toBe(true)
+
+    mockStatus = MigrationStatus.Failed
+    rerender({})
+    await flushEffects()
+
+    expect(result.current.isClockOutOfSync).toBe(true)
+    expect(result.current.failureReason).toBeNull()
+  })
+
+  it("commits again with a fresh timestamp once the user retries", async () => {
+    mockCurrentProofTimestamp
+      .mockReturnValueOnce(1_700_000_000)
+      .mockReturnValueOnce(1_700_000_060)
+    mockIsDeviceClockSkewed.mockReturnValue(true)
+    mockCommitMigration.mockResolvedValue({
+      data: {
+        migrationCommit: {
+          errors: [{ message: "stale", code: "MIGRATION_INVALID_DESTINATION" }],
+        },
+      },
+    })
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.isClockOutOfSync).toBe(true)
+
+    mockIsDeviceClockSkewed.mockReturnValue(false)
+    mockCommitMigration.mockResolvedValue({ data: { migrationCommit: { errors: [] } } })
+    act(() => result.current.retry())
+    await flushEffects()
+
+    const firstTimestamp =
+      mockCommitMigration.mock.calls[0][0].variables.input.proofTimestamp
+    const secondTimestamp =
+      mockCommitMigration.mock.calls[1][0].variables.input.proofTimestamp
+    expect(firstTimestamp).toBe(1_700_000_000)
+    expect(secondTimestamp).toBe(1_700_000_060)
+    expect(result.current.isClockOutOfSync).toBe(false)
+  })
+
+  it("retries without a spurious commit when there is no custodial account id", async () => {
+    const { result } = renderTransfer({ custodialAccountId: null })
+    await flushEffects()
+
+    act(() => result.current.retry())
+
+    expect(mockCommitMigration).not.toHaveBeenCalled()
   })
 })

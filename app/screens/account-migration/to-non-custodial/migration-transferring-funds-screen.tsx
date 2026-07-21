@@ -5,6 +5,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { StatusScreenLayout } from "@app/components/status-screen-layout"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
@@ -17,9 +18,11 @@ import {
 import { useMigrationTransfer } from "@app/screens/account-migration/hooks/use-migration-transfer"
 import { MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
+import { testProps } from "@app/utils/testProps"
 
 export const MigrationTransferringFundsScreen: React.FC = () => {
   const { LL } = useI18nContext()
+  const LLMigration = LL.AccountMigration
   const styles = useStyles()
   const {
     theme: { colors },
@@ -48,7 +51,7 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     !migrationLoading && !hasProvisionedAccount && !hasSwappedRef.current
 
   const isTransferSkipped = migrationLoading || isAccountMissing
-  const { isTransferred, failureReason } = useMigrationTransfer({
+  const { isTransferred, failureReason, isClockOutOfSync, retry } = useMigrationTransfer({
     custodialAccountId: activeAccount?.id ?? null,
     selfCustodialAccountId: migrationAccountId,
     skip: isTransferSkipped,
@@ -88,14 +91,27 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
       })
   }, [isTransferred, completeMigration, navigation, goToContactSupport])
 
+  const message = isClockOutOfSync
+    ? LLMigration.clockOutOfSync.body()
+    : LLMigration.transferringFunds()
+
+  const retryFooter = isClockOutOfSync ? (
+    <GaloyPrimaryButton
+      title={LLMigration.clockOutOfSync.retryCta()}
+      onPress={retry}
+      {...testProps("migration-clock-out-of-sync-retry")}
+    />
+  ) : undefined
+
   return (
     <Screen preset="fixed">
       <StatusScreenLayout
         icon="clock"
         iconColor={colors.warning}
         iconBackgroundColor={colors._warningLight}
+        footer={retryFooter}
       >
-        <Text style={styles.message}>{LL.AccountMigration.transferringFunds()}</Text>
+        <Text style={styles.message}>{message}</Text>
       </StatusScreenLayout>
     </Screen>
   )

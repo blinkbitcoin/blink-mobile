@@ -3628,7 +3628,11 @@
     "explainerCheck4": "A Blink API nem lesz elérhető",
     "explainerCheck5": "A fiókodból levonásra kerül egy Spark hálózati díj",
     "explainerCta": "Megértettem",
-    "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik."
+    "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik.",
+    "clockOutOfSync": {
+      "body": "Az eszközöd dátuma és ideje nincs szinkronban. Állítsd automatikusra a folytatáshoz.",
+      "retryCta": "Próbáld újra"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Letéti",

@@ -3628,7 +3628,11 @@
         "explainerCheck4": "Blink API wird nicht verfügbar sein",
         "explainerCheck5": "Deinem Konto wird eine Spark-Netzwerkgebühr abgezogen",
         "explainerCta": "Ich verstehe",
-        "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein."
+        "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein.",
+        "clockOutOfSync": {
+            "body": "Datum und Uhrzeit deines Geräts sind nicht synchron. Stelle sie auf automatisch, um fortzufahren.",
+            "retryCta": "Erneut versuchen"
+        }
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Verwahrt",

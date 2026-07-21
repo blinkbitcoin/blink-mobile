@@ -3628,7 +3628,11 @@
         "explainerCheck4": "L'API di Blink non sarà disponibile",
         "explainerCheck5": "Verrà addebitata una commissione di rete Spark sul tuo account",
         "explainerCta": "Ho capito",
-        "transferringFunds": "Trasferimento dei tuoi fondi in corso. Dovrebbe completarsi in pochi secondi."
+        "transferringFunds": "Trasferimento dei tuoi fondi in corso. Dovrebbe completarsi in pochi secondi.",
+        "clockOutOfSync": {
+            "body": "La data e l'ora del tuo dispositivo non sono sincronizzate. Impostale su automatico per continuare.",
+            "retryCta": "Riprova"
+        }
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Custodito",

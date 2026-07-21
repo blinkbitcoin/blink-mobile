@@ -3732,6 +3732,10 @@ const en: BaseTranslation = {
     explainerCta: "I understand",
     transferringFunds:
       "Transferring your funds. It should be done in a few seconds.",
+    clockOutOfSync: {
+      body: "Your device's date and time are out of sync. Set them to automatic to continue.",
+      retryCta: "Try again",
+    },
     migrationRequiredTitle: "Time to upgrade",
     migrationRequiredBody:
       "It's time to migrate your custodial account to a non-custodial account.",

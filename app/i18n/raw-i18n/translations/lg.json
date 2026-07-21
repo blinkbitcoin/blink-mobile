@@ -3628,7 +3628,11 @@
     "explainerCheck4": "Blink API tejja kubaawo",
     "explainerCheck5": "Ku kawunti yo kujja kusalibwako ssente z'omukutu gwa Spark",
     "explainerCta": "Ntegedde",
-    "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono."
+    "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono.",
+    "clockOutOfSync": {
+      "body": "Ennaku n'obudde bw'ekyuma kyo tebituukagana. Bisseeko ku otomatiki osobole okweyongerayo.",
+      "retryCta": "Ddamu ogezaako"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Eterekeddwa",

@@ -3628,7 +3628,11 @@
     "explainerCheck4": "Blink API จะไม่พร้อมใช้งาน",
     "explainerCheck5": "บัญชีของคุณจะถูกหักค่าธรรมเนียมเครือข่าย Spark",
     "explainerCta": "เข้าใจแล้ว",
-    "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที"
+    "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที",
+    "clockOutOfSync": {
+      "body": "วันที่และเวลาของอุปกรณ์ของคุณไม่ตรงกัน ตั้งค่าเป็นอัตโนมัติเพื่อดำเนินการต่อ",
+      "retryCta": "ลองอีกครั้ง"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "ควบคุมโดยผู้ดูแล",
