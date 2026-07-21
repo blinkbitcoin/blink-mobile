@@ -772,6 +772,35 @@ describe("MigrationBalancesOverviewScreen", () => {
     })
   })
 
+  /** When both preconditions fail at once, the start is the cause support hears about: it
+   *  leads the handover chain, so one ticket names the root rather than the follow-on. */
+  it("names the refused start when both the start and the re-point fail", async () => {
+    mockMigrationStart.mockResolvedValue({
+      data: {
+        migrationStart: {
+          errors: [
+            {
+              message: "Dollar balance must be empty before migration",
+              code: "MIGRATION_STATE_CONFLICT",
+            },
+          ],
+        },
+      },
+    })
+    mockLnAddressTransfer = {
+      isTransferred: false,
+      isRejected: true,
+      hasConnectionIssue: false,
+      retry: mockLnRetry,
+    }
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "start-refused",
+    })
+  })
+
   /** In-flight is not a failure: Approve stays off, but the user is NOT sent to support. */
   it("keeps Approve off until the lightning address has moved, without a handover", async () => {
     mockLnAddressTransfer = {
