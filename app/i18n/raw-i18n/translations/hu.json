@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
   },
   "SettingsScreen": {
+    "createAddress": "Cím létrehozása",
     "donationButton": "Adományozás gomb",
     "staticQr": "Nyomtatható statikus QR-kód",
     "staticQrCopied": "A statikus QR-kód hivatkozásod másolva lett",

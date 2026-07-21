@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Հնարավոր չէ հաշվարկել վճարները։ Խնդրում ենք փորձել այլ գումար։"
   },
   "SettingsScreen": {
+    "createAddress": "Ստեղծել հասցե",
     "donationButton": "Նվիրատվության կոճակ",
     "staticQr": "Տպելի ստատիկ QR",
     "staticQrCopied": "Ձեր ստատիկ QR կոդի հղումը պատծենվել է",

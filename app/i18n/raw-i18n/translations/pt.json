@@ -2319,6 +2319,7 @@
         "sdkGenericError": "Não foi possível estimar as taxas. Tente um valor diferente."
     },
     "SettingsScreen": {
+        "createAddress": "Criar endereço",
         "donationButton": "Botão de doação",
         "staticQr": "QR Code estático imprimível",
         "staticQrCopied": "O link do seu QR Code estático foi copiado",

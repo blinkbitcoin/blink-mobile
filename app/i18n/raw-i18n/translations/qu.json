@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway."
   },
   "SettingsScreen": {
+    "createAddress": "Tinkunata ruray",
     "donationButton": "Qaray ñit'ana",
     "staticQr": "Ñit'iy atikuq QR nisqa",
     "staticQrCopied": "QR código t'inkiykita copiasqañam",

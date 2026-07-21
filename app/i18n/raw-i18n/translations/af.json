@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Kan nie fooie skat nie. Probeer asseblief 'n ander bedrag."
   },
   "SettingsScreen": {
+    "createAddress": "Skep adres",
     "donationButton": "Skenkingsknoppie",
     "staticQr": "Drukbare statiese QR",
     "staticQrCopied": "Jou statiese QR-kodeskakel is gekopieer",

@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Tidak dapat menganggarkan yuran. Sila cuba jumlah yang berbeza."
   },
   "SettingsScreen": {
+    "createAddress": "Cipta alamat",
     "donationButton": "Butang derma",
     "staticQr": "QR statik boleh cetak",
     "staticQrCopied": "Pautan kod QR statik anda telah disalin",

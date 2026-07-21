@@ -2319,6 +2319,7 @@
         "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente."
     },
     "SettingsScreen": {
+        "createAddress": "Crear dirección",
         "donationButton": "Botón de donación",
         "staticQr": "QR estático imprimible",
         "staticQrCopied": "Tu enlace de código QR estático se ha copiado",

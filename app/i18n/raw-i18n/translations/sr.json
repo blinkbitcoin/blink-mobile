@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Nije moguće proceniti naknade. Pokušajte sa drugim iznosom."
   },
   "SettingsScreen": {
+    "createAddress": "Направи адресу",
     "donationButton": "Дугме за донације",
     "staticQr": "QR код за штампање",
     "staticQrCopied": "Линк вашег статичног QR кода је копиран",

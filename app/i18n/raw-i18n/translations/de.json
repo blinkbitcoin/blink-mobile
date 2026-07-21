@@ -2319,6 +2319,7 @@
         "sdkGenericError": "Gebühren können nicht geschätzt werden. Bitte versuchen Sie einen anderen Betrag."
     },
     "SettingsScreen": {
+        "createAddress": "Adresse erstellen",
         "donationButton": "Spenden-Button",
         "staticQr": "Druckbarer statischer QR-Code",
         "staticQrCopied": "Ihr statischer QR-Code Link wurde kopiert",

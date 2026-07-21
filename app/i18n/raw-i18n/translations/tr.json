@@ -2319,6 +2319,7 @@
     "sdkGenericError": "Ücretler tahmin edilemiyor. Lütfen farklı bir tutar deneyin."
   },
   "SettingsScreen": {
+    "createAddress": "Adres oluştur",
     "donationButton": "Bağış düğmesi",
     "staticQr": "Basılabilir Statik QR Kodu",
     "staticQrCopied": "Statik QR kod bağlantınız kopyalandı",
