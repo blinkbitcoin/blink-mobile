@@ -137,12 +137,27 @@ describe("MigrationKeepReceivingScreen", () => {
     expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
   })
 
-  it("renders nothing while the address is still loading", async () => {
+  it("shows a spinner (not a blank screen) while the address is still loading", async () => {
     mockUseAddressScreenQuery.mockReturnValue({ data: undefined, loading: true })
     renderScreen()
     await flushEffects()
 
+    expect(screen.getByTestId("migration-keep-receiving-loading")).toBeTruthy()
     expect(screen.queryByText(LL.AccountMigration.keepReceivingTitle())).toBeNull()
+    expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+  })
+
+  it("shows a spinner and does not skip when the address query errors", async () => {
+    mockUseAddressScreenQuery.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error: new Error("offline"),
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-keep-receiving-loading")).toBeTruthy()
+    /** A failed query must not read as "no address" and skip the warning. */
     expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
   })
 })

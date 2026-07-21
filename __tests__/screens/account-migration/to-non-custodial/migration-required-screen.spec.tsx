@@ -230,6 +230,21 @@ describe("MigrationRequiredScreen", () => {
       expect(mockGoToNextStep).not.toHaveBeenCalled()
     })
 
+    it("routes through keep-receiving when the address query errored (cannot rule one out)", async () => {
+      mockUseAddressScreenQuery.mockReturnValue({
+        data: undefined,
+        loading: false,
+        error: new Error("offline"),
+      })
+      renderScreen("voluntary")
+      await flushEffects()
+
+      fireEvent.press(screen.getByText(LL.common.continue()))
+
+      expect(mockNavigate).toHaveBeenCalledWith(KEEP_RECEIVING_ROUTE)
+      expect(mockGoToNextStep).not.toHaveBeenCalled()
+    })
+
     it("marks the CTA as loading while the next-step checks load", async () => {
       mockNextStepLoading = true
       renderScreen("voluntary")

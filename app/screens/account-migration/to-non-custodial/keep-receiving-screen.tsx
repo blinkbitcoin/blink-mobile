@@ -1,11 +1,12 @@
 import React, { useEffect } from "react"
-import { View } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 import { useIsFocused } from "@react-navigation/native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
+import { Screen } from "@app/components/screen"
 import { useAddressScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig } from "@app/hooks"
@@ -35,7 +36,11 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
   } = useMigrationNextStep()
 
   const isAuthed = useIsAuthed()
-  const { data, loading: addressLoading } = useAddressScreenQuery({
+  const {
+    data,
+    loading: addressLoading,
+    error: addressError,
+  } = useAddressScreenQuery({
     fetchPolicy: "cache-first",
     skip: !isAuthed,
   })
@@ -46,7 +51,9 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
     : ""
 
   const isFocused = useIsFocused()
-  const isCheckReady = !addressLoading && !nextStepLoading
+  /** Errored counts as not-ready, never as "no address": a failed query must not skip the
+   *  warning for a user who actually has an address. */
+  const isCheckReady = !addressLoading && !nextStepLoading && !addressError
   const hasLightningAddress = Boolean(username)
   /** Focus-gated: this screen stays mounted under the stack for the whole migration,
    *  and the post-migration session swap drops the username, which must not make a
@@ -58,7 +65,21 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
     if (shouldSkipScreen) replaceToCheckpoint()
   }, [shouldSkipScreen, replaceToCheckpoint])
 
-  if (!isCheckReady || !hasLightningAddress) return null
+  /** Spinner (not a blank screen) while the check is unresolved, matching the gate. */
+  if (!isCheckReady) {
+    return (
+      <Screen preset="fixed">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            {...testProps("migration-keep-receiving-loading")}
+          />
+        </View>
+      </Screen>
+    )
+  }
+  if (!hasLightningAddress) return null
 
   return (
     <MigrationStepLayout
@@ -95,6 +116,11 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   addressBlock: {
     paddingTop: 30,
     paddingHorizontal: 20,

@@ -55,7 +55,11 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   const { supportEmailAddress, openSupport } = useContactSupport()
 
   const isAuthed = useIsAuthed()
-  const { data: addressData, loading: addressLoading } = useAddressScreenQuery({
+  const {
+    data: addressData,
+    loading: addressLoading,
+    error: addressError,
+  } = useAddressScreenQuery({
     fetchPolicy: "cache-first",
     skip: !isAuthed,
   })
@@ -64,12 +68,16 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   /** With a lightning address the intro passes through the keep-receiving screen;
    *  otherwise it routes straight into the flow's next step. */
   const handleMigrate = useCallback(() => {
-    if (hasLightningAddress) {
+    /** Route through keep-receiving whenever an address cannot be ruled out (has one, or the
+     *  query errored): skipping to the next step would drop the warning for a user whose
+     *  address an offline query just failed to return. */
+    const shouldRouteToKeepReceiving = hasLightningAddress || Boolean(addressError)
+    if (shouldRouteToKeepReceiving) {
       navigation.navigate("accountMigrationKeepReceiving")
       return
     }
     goToNextStep()
-  }, [navigation, hasLightningAddress, goToNextStep])
+  }, [navigation, hasLightningAddress, addressError, goToNextStep])
 
   /** Held until the address query settles so a fast cold-start tap can't route past the
    *  keep-receiving warning for a user who actually has an address. */
