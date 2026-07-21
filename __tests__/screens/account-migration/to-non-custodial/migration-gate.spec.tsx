@@ -225,9 +225,9 @@ describe("MigrationGate", () => {
     expect(mockDollarBalanceModal).not.toHaveBeenCalled()
   })
 
-  it("refetches both queries when the retry button is pressed", () => {
-    const refetchApiKeys = jest.fn()
-    const refetchBalances = jest.fn()
+  it("refetches both queries when the retry button is pressed", async () => {
+    const refetchApiKeys = jest.fn().mockResolvedValue(undefined)
+    const refetchBalances = jest.fn().mockResolvedValue(undefined)
     mockUseActiveApiKeys.mockReturnValue(
       apiKeysState({ hasError: true, isReady: false, refetch: refetchApiKeys }),
     )
@@ -239,11 +239,67 @@ describe("MigrationGate", () => {
     })
 
     render(<MigrationGate />)
-    act(() => {
+    await act(async () => {
       mockPrimaryButton.mock.calls[0][0].onPress()
     })
 
     expect(refetchApiKeys).toHaveBeenCalledTimes(1)
+    expect(refetchBalances).toHaveBeenCalledTimes(1)
+  })
+
+  it("disables the retry button while a retry is in flight, re-enabling it after", async () => {
+    let resolveRetry: () => void = () => {}
+    const refetchApiKeys = jest.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveRetry = resolve
+        }),
+    )
+    mockUseActiveApiKeys.mockReturnValue(
+      apiKeysState({ hasError: true, isReady: false, refetch: refetchApiKeys }),
+    )
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      loading: false,
+      error: new Error("network"),
+      data: undefined,
+      refetch: jest.fn().mockResolvedValue(undefined),
+    })
+
+    render(<MigrationGate />)
+    expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({ disabled: false }),
+    )
+
+    await act(async () => {
+      mockPrimaryButton.mock.calls[0][0].onPress()
+    })
+    expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({ disabled: true }),
+    )
+
+    await act(async () => {
+      resolveRetry()
+    })
+    expect(mockPrimaryButton).toHaveBeenLastCalledWith(
+      expect.objectContaining({ disabled: false }),
+    )
+  })
+
+  it("refetches balances when the gate regains focus after the dollar transfer", () => {
+    const refetchBalances = jest.fn().mockResolvedValue(undefined)
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ usdBalance: 20 }),
+      refetch: refetchBalances,
+    })
+
+    const { rerender } = render(<MigrationGate />)
+    expect(refetchBalances).not.toHaveBeenCalled()
+
+    mockIsFocused = false
+    rerender(<MigrationGate />)
+    mockIsFocused = true
+    rerender(<MigrationGate />)
+
     expect(refetchBalances).toHaveBeenCalledTimes(1)
   })
 
