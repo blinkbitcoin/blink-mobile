@@ -76,10 +76,14 @@ export const useMigrationCheckpointState = () => {
       step: MigrationCheckpoint,
       provisionedAccountId?: string,
     ): Promise<boolean> => {
+      /** Without a resolved owner the checkpoint cannot be keyed, and saving would erase the
+       *  stored owner + account id via mergeCheckpoint; refuse so a null-owner window (an
+       *  offline owner query) never wipes real progress. Callers gate on the false. */
+      if (!ownerId) return false
       const update = {
         step,
         accountId: provisionedAccountId ?? accountId ?? undefined,
-        custodialAccountId: ownerId ?? undefined,
+        custodialAccountId: ownerId,
       }
       setStored((existing) => mergeCheckpoint(existing, update))
       try {

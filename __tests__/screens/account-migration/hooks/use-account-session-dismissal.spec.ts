@@ -58,18 +58,21 @@ describe("useAccountSessionDismissal", () => {
     expect(result.current.isDismissedForSession).toBe(true)
   })
 
-  it("never reports dismissed while no account is active", () => {
+  it("falls back to a session-global dismissal while the owner id has not resolved", () => {
     mockOwnerId = null
 
     const { result } = renderHook(() => useAccountSessionDismissal())
 
+    /** Before the fix a null owner made dismiss a no-op, so the prompt could never be
+     *  closed for the session; now it dismisses against the session-global key. */
     act(() => {
       result.current.dismissForSession()
     })
+    expect(result.current.isDismissedForSession).toBe(true)
+
     act(() => {
       result.current.reopen()
     })
-
     expect(result.current.isDismissedForSession).toBe(false)
   })
 })

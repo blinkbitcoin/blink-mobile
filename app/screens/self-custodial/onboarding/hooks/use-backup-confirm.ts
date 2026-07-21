@@ -43,8 +43,11 @@ export const useBackupConfirm = ({
   const isWordWrong = (index: number): boolean =>
     inputs[index].trim().length > 0 && !isWordCorrect(index)
 
-  const allCorrect = challenges.every((_, i) => isWordCorrect(i))
-  const allFilled = inputs.every((input) => input.trim().length > 0)
+  /** No challenges means the phrase never loaded; treat it as not-confirmed so an empty
+   *  list cannot report success via [].every() === true. */
+  const hasChallenges = challenges.length > 0
+  const allCorrect = hasChallenges && challenges.every((_, i) => isWordCorrect(i))
+  const allFilled = hasChallenges && inputs.every((input) => input.trim().length > 0)
 
   const activeSuggestions =
     activeIndex === undefined

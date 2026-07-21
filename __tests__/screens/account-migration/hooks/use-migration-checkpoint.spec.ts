@@ -116,24 +116,6 @@ describe("useMigrationCheckpoint", () => {
     })
   })
 
-  it("omits the owner when no custodial account is resolved", async () => {
-    mockOwnerId = null
-
-    const { result } = renderHook(() => useMigrationCheckpoint())
-
-    await waitFor(() => expect(result.current.loading).toBe(false))
-
-    act(() => {
-      result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
-    })
-
-    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith("migrationCheckpoint_main", {
-      step: MigrationCheckpoint.BackupMethod,
-      accountId: undefined,
-      custodialAccountId: undefined,
-    })
-  })
-
   it("persists and exposes the provisioned account id", async () => {
     const { result } = renderHook(() => useMigrationCheckpoint())
 
@@ -200,6 +182,23 @@ describe("useMigrationCheckpoint", () => {
 
     expect(saved).toBe(false)
     expect(mockReportError).toHaveBeenCalledWith("Checkpoint save", expect.any(Error))
+  })
+
+  it("refuses to save (resolves false) when the owner id has not resolved", async () => {
+    mockOwnerId = null
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let saved: boolean | undefined
+    await act(async () => {
+      saved = await result.current.saveCheckpoint(MigrationCheckpoint.BackupMethod)
+    })
+
+    /** A null-owner save would erase the stored owner + account id via mergeCheckpoint,
+     *  wiping real progress; it must refuse instead of writing. */
+    expect(saved).toBe(false)
+    expect(mockSaveCheckpointToStorage).not.toHaveBeenCalled()
   })
 
   it("re-sends the known account id on step saves so a failed write can heal", async () => {
