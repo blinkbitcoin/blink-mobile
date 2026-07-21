@@ -113,14 +113,14 @@ export const selfCustodialCreateWallet = async (
   /** Mirror the restore path: a failure after the phrase is written would otherwise leave
    *  orphaned key material in the keychain for an account that never finished registering. */
   try {
-    await KeyStoreWrapper.setMnemonicNetworkForAccount(
+    const labelled = await KeyStoreWrapper.setMnemonicNetworkForAccount(
       accountId,
       networkLabelFor(network),
     )
+    if (!labelled) throw new Error("Failed to store mnemonic network")
     await addSelfCustodialAccountId(accountId)
   } catch (err) {
     await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
-    reportError("Wallet create", err)
     throw err
   }
 }
@@ -148,10 +148,11 @@ export const selfCustodialRestoreWallet = async ({
   if (!stored) throw new Error("Failed to store mnemonic")
 
   try {
-    await KeyStoreWrapper.setMnemonicNetworkForAccount(
+    const labelled = await KeyStoreWrapper.setMnemonicNetworkForAccount(
       accountId,
       networkLabelFor(network),
     )
+    if (!labelled) throw new Error("Failed to store mnemonic network")
     const sdk = await initSdk({
       mnemonic: normalized,
       storageDir: storageDirFor(accountId, network),
