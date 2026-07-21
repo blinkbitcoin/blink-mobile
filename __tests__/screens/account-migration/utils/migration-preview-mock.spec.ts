@@ -1,4 +1,7 @@
-import { getMigrationPreviewMock } from "@app/screens/account-migration/utils/migration-preview-mock"
+import {
+  getMigrationPreviewMock,
+  windDownMock,
+} from "@app/screens/account-migration/utils/migration-preview-mock"
 
 /** The backend reserve rule the drain solve must satisfy: max(0.5% half-down, 10 sats).
  *  Replicated here so the sweep tests that real contract, not the mock's own
@@ -119,5 +122,13 @@ describe("getMigrationPreviewMock", () => {
       feeCoveredByBlink: false,
       receiveSats: 2500,
     })
+  })
+})
+
+describe("windDownMock dev switch", () => {
+  it("stays off (null) so the account-closed lockout is never shipped to real users", () => {
+    /** windDownMock is null exactly when IS_ACCOUNT_AFFECTED is false; this fails loudly if
+     *  the developer toggle is ever committed as true. */
+    expect(windDownMock).toBeNull()
   })
 })
