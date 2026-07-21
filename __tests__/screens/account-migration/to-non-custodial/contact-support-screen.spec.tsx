@@ -93,6 +93,15 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
+  it("returns to the commit point from the visible Back button (iOS has no hardware back)", async () => {
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.common.back()))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
   it("renders the hero, every diagnostics row and the contact action", async () => {
     renderScreen()
     await flushEffects()

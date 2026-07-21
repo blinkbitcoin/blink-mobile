@@ -4,6 +4,7 @@ import { ScrollView, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -35,7 +36,8 @@ type DiagnosticsRow = {
  * The migration failure and help screen: funds are safe, but the transfer needs support
  * assistance. It shows the diagnostics support needs (custodial account identity plus the
  * provisioned wallet's pubkey) and pre-fills them, with the app version, into the support
- * email. It never exits the migration, so there is no back or close affordance.
+ * email. Back never exits the migration; it returns to the commit point (Step 8) on both
+ * platforms, since the hardware-back guard alone would leave iOS with no way back.
  */
 export const MigrationContactSupportScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -102,6 +104,11 @@ export const MigrationContactSupportScreen: React.FC = () => {
             title={LLSupport.contactUsCta()}
             onPress={sendSupportEmail}
             {...testProps("migration-contact-support-cta")}
+          />
+          <GaloySecondaryButton
+            title={LL.common.back()}
+            onPress={returnToBalanceSummary}
+            {...testProps("migration-contact-support-back")}
           />
         </View>
       </View>
