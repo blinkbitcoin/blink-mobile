@@ -19836,7 +19836,7 @@ export type TranslationFunctions = {
 		 */
 		btcpayServer: () => LocalizedString
 		/**
-		 * Woocommerce
+		 * WooCommerce
 		 */
 		woocommerce: () => LocalizedString
 		/**

@@ -2404,7 +2404,7 @@ const en: BaseTranslation = {
     createAddress: "Create address",
     donationButton: "Donation Button",
     btcpayServer: "BTCPay Server",
-    woocommerce: "Woocommerce",
+    woocommerce: "WooCommerce",
     activated: "Activated",
     addressScreen: "Ways to get paid",
     nonCustodialAccount: "Non-custodial account",
