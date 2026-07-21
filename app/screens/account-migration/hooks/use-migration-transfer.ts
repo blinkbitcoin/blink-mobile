@@ -4,6 +4,7 @@ import { gql } from "@apollo/client"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { MigrationStatus, useMigrationCommitMutation } from "@app/graphql/generated"
+import { isNetworkFailure } from "@app/graphql/is-network-failure"
 import { isDeviceClockSkewed } from "@app/graphql/server-time"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
@@ -70,6 +71,7 @@ type UseMigrationTransfer = {
   isTransferred: boolean
   failureReason: MigrationSupportReason | null
   isClockOutOfSync: boolean
+  hasConnectionIssue: boolean
   retry: () => void
 }
 
@@ -90,6 +92,7 @@ export const useMigrationTransfer = ({
   const [commitMigration] = useMigrationCommitMutation()
   const [failureReason, setFailureReason] = useState<MigrationSupportReason | null>(null)
   const [isClockOutOfSync, setIsClockOutOfSync] = useState(false)
+  const [hasConnectionIssue, setHasConnectionIssue] = useState(false)
 
   /**
    * Polling stops for good once there is nothing left to watch: a terminal phase, a
@@ -118,6 +121,13 @@ export const useMigrationTransfer = ({
   useEffect(() => {
     if (isTransferred || hasServerFailed || failureReason !== null) setHasStopped(true)
   }, [isTransferred, hasServerFailed, failureReason])
+
+  /** A phase past IN_PROGRESS means the commit did land (the drop hit the response, not the
+   *  request): the transfer is under way, so the notice clears and the screen watches it. */
+  useEffect(() => {
+    const hasAdvancedPastCommit = status !== null && status !== MigrationStatus.InProgress
+    if (hasAdvancedPastCommit) setHasConnectionIssue(false)
+  }, [status])
 
   const fail = useCallback((reason: MigrationSupportReason, err: unknown) => {
     reportError("Migration transfer", err)
@@ -184,9 +194,10 @@ export const useMigrationTransfer = ({
    *  has one, and committing a second invoice is refused as a state conflict. */
   const isAwaitingDestination = status === MigrationStatus.InProgress
   const hasFailed = failureReason !== null
-  /** `!isClockOutOfSync` also re-arms the commit: clearing it on retry flips canCommit
-   *  back to true and re-fires the effect, which the module guard alone would not. */
-  const canCommit = isAwaitingDestination && !skip && !hasFailed && !isClockOutOfSync
+  /** A recoverable issue (skewed clock or lost connection) pauses the commit; clearing the
+   *  flag on retry flips canCommit back to true and re-fires the effect. */
+  const hasRecoverableIssue = isClockOutOfSync || hasConnectionIssue
+  const canCommit = isAwaitingDestination && !skip && !hasFailed && !hasRecoverableIssue
 
   useEffect(() => {
     if (!canCommit) return
@@ -197,9 +208,15 @@ export const useMigrationTransfer = ({
     if (accountsWithCommitStarted.has(custodialAccountId)) return
 
     accountsWithCommitStarted.add(custodialAccountId)
-    commit(custodialAccountId, selfCustodialAccountId).catch((err) =>
-      fail(MigrationSupportReason.TransferFailed, err),
-    )
+    commit(custodialAccountId, selfCustodialAccountId).catch((err) => {
+      /** A commit lost to the network can still have landed: it earns the shared retry, not
+       *  a handover, and the guard stays claimed until the user's retry clears it. */
+      if (isNetworkFailure(err)) {
+        setHasConnectionIssue(true)
+        return
+      }
+      fail(MigrationSupportReason.TransferFailed, err)
+    })
   }, [canCommit, custodialAccountId, selfCustodialAccountId, commit, fail])
 
   /** FAILED has no client-side way back: the phase machine only leaves it when a late
@@ -211,16 +228,18 @@ export const useMigrationTransfer = ({
   const retry = useCallback(() => {
     if (custodialAccountId) accountsWithCommitStarted.delete(custodialAccountId)
     setIsClockOutOfSync(false)
+    setHasConnectionIssue(false)
   }, [custodialAccountId])
 
-  /** Clock-fix and support are mutually exclusive: while out of sync the user has a retry,
-   *  so a server failure on the same render must not also route to support. */
-  const activeFailureReason = isClockOutOfSync ? null : failureReason ?? serverFailure
+  /** A recoverable issue and support are mutually exclusive: while the user has a retry, a
+   *  server failure on the same render must not also route to support. */
+  const activeFailureReason = hasRecoverableIssue ? null : failureReason ?? serverFailure
 
   return {
     isTransferred,
     failureReason: activeFailureReason,
     isClockOutOfSync,
+    hasConnectionIssue,
     retry,
   }
 }

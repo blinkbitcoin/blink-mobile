@@ -65,6 +65,11 @@ const collectedRequest = {
   proofSignature: "deadbeef",
 }
 
+/** A dropped connection: an Apollo error carrying a truthy networkError, the same shape
+ *  isNetworkFailure keys on, as opposed to a plain throw the server actually answered. */
+const networkError = () =>
+  Object.assign(new Error("offline"), { networkError: new Error("net") })
+
 const renderTransfer = (
   overrides: Partial<Parameters<typeof useMigrationTransfer>[0]> = {},
 ) =>
@@ -338,12 +343,62 @@ describe("useMigrationTransfer", () => {
     )
   })
 
-  it("hands a commit that threw to support", async () => {
-    mockCommitMigration.mockRejectedValue(new Error("network down"))
+  /** A throw the server actually answered (no networkError on it) is a real failure, not a
+   *  dropped connection, so it hands over to support rather than offering a retry. */
+  it("hands a commit that failed for a non-network reason to support", async () => {
+    mockCommitMigration.mockRejectedValue(new Error("boom"))
     const { result } = renderTransfer()
     await flushEffects()
 
     expect(result.current.failureReason).toBe(MigrationSupportReason.TransferFailed)
+    expect(result.current.hasConnectionIssue).toBe(false)
+  })
+
+  /** A commit lost to the network is the one throw that is not a settled failure: it may
+   *  still have landed, so it offers the shared retry and support never hears about it,
+   *  exactly as the start and ln-address steps already do. */
+  it("offers a retry instead of support when the commit is lost to the network", async () => {
+    mockCommitMigration.mockRejectedValue(networkError())
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.hasConnectionIssue).toBe(true)
+    expect(result.current.failureReason).toBeNull()
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("recommits on retry once the connection is back", async () => {
+    mockCommitMigration.mockRejectedValueOnce(networkError())
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.hasConnectionIssue).toBe(true)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(2)
+    expect(result.current.hasConnectionIssue).toBe(false)
+    expect(result.current.failureReason).toBeNull()
+  })
+
+  /** The property that lets a lost connection retry safely: if the commit actually landed
+   *  (the drop hit the response), the phase advances to TRANSFERRING, the notice clears,
+   *  and the retry only watches it, never sending a second invoice the backend refuses. */
+  it("does not recommit once the phase has advanced past the commit", async () => {
+    mockCommitMigration.mockRejectedValue(networkError())
+    const { result, rerender } = renderTransfer()
+    await flushEffects()
+    expect(result.current.hasConnectionIssue).toBe(true)
+
+    mockStatus = MigrationStatus.Transferring
+    rerender({})
+    await flushEffects()
+    expect(result.current.hasConnectionIssue).toBe(false)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
   })
 
   it("survives a commit payload with no errors array", async () => {
