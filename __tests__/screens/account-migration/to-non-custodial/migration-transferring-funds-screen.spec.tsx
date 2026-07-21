@@ -12,9 +12,10 @@ import { flushEffects } from "../../../helpers/flush-effects"
 loadLocale("en")
 
 const mockNavigate = jest.fn()
+const mockReset = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, reset: mockReset }),
 }))
 
 const mockCompleteMigration = jest.fn()
@@ -162,15 +163,19 @@ describe("MigrationTransferringFundsScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("swaps the session and navigates to success once the funds land", async () => {
+  /** Success resets the stack rather than pushing onto it, so the finished transfer screen
+   *  (which swallows back) is gone and a back press on success cannot land on it. */
+  it("swaps the session and resets to success once the funds land", async () => {
     mockIsTransferred = true
     renderScreen()
     await flushEffects()
 
     expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
-      reBackup: false,
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
     })
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("swaps the session once, however often it re-renders", async () => {
@@ -197,8 +202,9 @@ describe("MigrationTransferringFundsScreen", () => {
     rerenderScreen(rerender)
     await flushEffects()
 
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
-      reBackup: false,
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
     })
     expect(mockNavigate).not.toHaveBeenCalledWith(
       "accountMigrationContactSupport",
