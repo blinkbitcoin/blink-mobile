@@ -36,6 +36,7 @@ const mockUseMigrationTransfer = jest.fn()
 let mockIsTransferred = false
 let mockFailureReason: MigrationSupportReason | null = null
 let mockIsClockOutOfSync = false
+let mockHasConnectionIssue = false
 const mockRetry = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-transfer", () => ({
@@ -45,6 +46,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-transfer", () => (
       isTransferred: mockIsTransferred,
       failureReason: mockFailureReason,
       isClockOutOfSync: mockIsClockOutOfSync,
+      hasConnectionIssue: mockHasConnectionIssue,
       retry: mockRetry,
     }
   },
@@ -101,6 +103,7 @@ describe("MigrationTransferringFundsScreen", () => {
     mockIsTransferred = false
     mockFailureReason = null
     mockIsClockOutOfSync = false
+    mockHasConnectionIssue = false
     mockCompleteMigration.mockResolvedValue(true)
     loadLocale("en")
   })
@@ -285,6 +288,33 @@ describe("MigrationTransferringFundsScreen", () => {
     await flushEffects()
 
     fireEvent.press(screen.getByTestId("migration-clock-out-of-sync-retry"))
+
+    expect(mockRetry).toHaveBeenCalledTimes(1)
+  })
+
+  /** A dropped connection is recoverable, not a failure: the screen names it and offers a
+   *  retry instead of handing a transient blip to support. */
+  it("shows a connection message and a retry when the commit is lost to the network", async () => {
+    mockHasConnectionIssue = true
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByText("Connection issue.\nVerify your internet connection"),
+    ).toBeTruthy()
+    expect(
+      screen.queryByText("Transferring your funds. It should be done in a few seconds."),
+    ).toBeNull()
+    expect(screen.getByTestId("migration-connection-issue-retry")).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("retries the transfer when the connection-issue button is pressed", async () => {
+    mockHasConnectionIssue = true
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-connection-issue-retry"))
 
     expect(mockRetry).toHaveBeenCalledTimes(1)
   })

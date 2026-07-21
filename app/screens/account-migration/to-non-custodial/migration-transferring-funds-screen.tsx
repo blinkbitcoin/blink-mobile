@@ -51,11 +51,12 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     !migrationLoading && !hasProvisionedAccount && !hasSwappedRef.current
 
   const isTransferSkipped = migrationLoading || isAccountMissing
-  const { isTransferred, failureReason, isClockOutOfSync, retry } = useMigrationTransfer({
-    custodialAccountId: ownerId,
-    selfCustodialAccountId: migrationAccountId,
-    skip: isTransferSkipped,
-  })
+  const { isTransferred, failureReason, isClockOutOfSync, hasConnectionIssue, retry } =
+    useMigrationTransfer({
+      custodialAccountId: ownerId,
+      selfCustodialAccountId: migrationAccountId,
+      skip: isTransferSkipped,
+    })
 
   useEffect(() => {
     if (!isAccountMissing) return
@@ -91,16 +92,24 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
       })
   }, [isTransferred, completeMigration, navigation, goToContactSupport])
 
-  const message = isClockOutOfSync
-    ? LLMigration.clockOutOfSync.body()
-    : LLMigration.transferringFunds()
+  /** Two recoverable states share the retry footer: a skewed clock and a lost connection.
+   *  Each keeps its own message; only a real failure leaves this screen for support. */
+  const isRecoverable = isClockOutOfSync || hasConnectionIssue
 
-  const retryFooter = isClockOutOfSync ? (
-    <GaloyPrimaryButton
-      title={LLMigration.clockOutOfSync.retryCta()}
-      onPress={retry}
-      {...testProps("migration-clock-out-of-sync-retry")}
-    />
+  const recoverableMessage = isClockOutOfSync
+    ? LLMigration.clockOutOfSync.body()
+    : LL.errors.network.connection()
+  const message = isRecoverable ? recoverableMessage : LLMigration.transferringFunds()
+
+  const retryTitle = isClockOutOfSync
+    ? LLMigration.clockOutOfSync.retryCta()
+    : LL.common.tryAgain()
+  const retryTestId = isClockOutOfSync
+    ? "migration-clock-out-of-sync-retry"
+    : "migration-connection-issue-retry"
+
+  const retryFooter = isRecoverable ? (
+    <GaloyPrimaryButton title={retryTitle} onPress={retry} {...testProps(retryTestId)} />
   ) : undefined
 
   return (
