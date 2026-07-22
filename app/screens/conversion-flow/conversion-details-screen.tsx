@@ -238,6 +238,7 @@ const ConversionDetailsScreenContent = ({
   const [uiLocked, setUiLocked] = useState(false)
   const [overlaysReady, setOverlaysReady] = useState(false)
   const [loadingPercent, setLoadingPercent] = useState<number | null>(null)
+  const [selectedPercent, setSelectedPercent] = useState<number | null>(null)
   const pillLabels = useMemo(
     () => ({ BTC: LL.common.bitcoin(), USD: LL.common.dollar() }),
     [LL.common],
@@ -377,6 +378,7 @@ const ConversionDetailsScreenContent = ({
       setLockFormattingInputId(null)
       setUiLocked(true)
       setLoadingPercent(percentage)
+      setSelectedPercent(percentage)
       setInitialAmount(
         toWalletAmount({
           amount: Math.round((fromWallet.balance * percentage) / 100),
@@ -389,6 +391,7 @@ const ConversionDetailsScreenContent = ({
       setLockFormattingInputId,
       setUiLocked,
       setLoadingPercent,
+      setSelectedPercent,
       setInitialAmount,
     ],
   )
@@ -442,6 +445,7 @@ const ConversionDetailsScreenContent = ({
 
     setLockFormattingInputId(null)
     setIsTyping(false)
+    setSelectedPercent(null)
 
     const currentFocusedId = focusedInputValues?.id ?? null
     const newFocusedId =
@@ -589,6 +593,11 @@ const ConversionDetailsScreenContent = ({
 
   const hasError = Boolean(amountFieldError)
 
+  /** A recalculation in flight (a wallet toggle, live typing, or a percentage chip applying
+   *  its amount), during which the amount inputs must not be re-driven. */
+  const isRecalculating = toggleInitiated.current || isTyping || Boolean(loadingPercent)
+  const isPercentageSelectorLocked = uiLocked || isRecalculating
+
   const setAmountToBalancePercentage = (percentage: number) => {
     if (uiLocked) return
     applyBalancePercentage(percentage)
@@ -665,7 +674,7 @@ const ConversionDetailsScreenContent = ({
               pointerEvents="none"
             />
             <WalletToggleButton
-              loading={toggleInitiated.current || isTyping || Boolean(loadingPercent)}
+              loading={isRecalculating}
               disabled={!canToggleWallet || uiLocked}
               onPress={toggleInputs}
               containerStyle={styles.switchButton}
@@ -763,10 +772,9 @@ const ConversionDetailsScreenContent = ({
 
       <View style={styles.bottomStack}>
         <PercentageSelector
-          isLocked={
-            uiLocked || toggleInitiated.current || isTyping || Boolean(loadingPercent)
-          }
+          isLocked={isPercentageSelectorLocked}
           loadingPercent={loadingPercent}
+          selectedPercent={selectedPercent}
           onSelect={setAmountToBalancePercentage}
           testIdPrefix="convert"
           containerStyle={styles.percentageContainer}
@@ -789,6 +797,8 @@ const ConversionDetailsScreenContent = ({
               setIsTyping(typing)
               setTypingInputId(typing ? focusedId : null)
               if (typing && focusedId) setLockFormattingInputId(focusedId)
+              /** A hand-typed amount no longer matches a preset, so drop the pressed chip. */
+              if (typing) setSelectedPercent(null)
             }}
             onAfterRecalc={() => {
               setUiLocked(false)

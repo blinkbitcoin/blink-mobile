@@ -1216,6 +1216,89 @@ describe("Percentage selector functionality", () => {
       { timeout: 3000 },
     )
   })
+
+  const pressChipAndSettle = async (
+    getByTestId: ReturnType<typeof render>["getByTestId"],
+    percent: number,
+  ) => {
+    await act(async () => {
+      fireEvent.press(getByTestId(`convert-${percent}%`))
+    })
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+    await waitFor(() => {
+      expect(getByTestId(`convert-${percent}%`).props.accessibilityState?.selected).toBe(
+        true,
+      )
+    })
+  }
+
+  it("draws the pressed chip and leaves the others unpressed", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("convert-50%")).toBeTruthy()
+    })
+
+    await pressChipAndSettle(getByTestId, 50)
+
+    expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(false)
+  })
+
+  it("clears the pressed chip when a wallet toggle recalculates the amount", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%")).toBeTruthy()
+    })
+
+    await pressChipAndSettle(getByTestId, 100)
+
+    await act(async () => {
+      fireEvent.press(getByTestId("wallet-toggle-button"))
+    })
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(false)
+    })
+  })
+
+  it("clears the pressed chip when the amount is typed by hand", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%")).toBeTruthy()
+    })
+
+    await pressChipAndSettle(getByTestId, 100)
+
+    await act(async () => {
+      pressKeys(getByTestId, ["5"])
+    })
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(false)
+    })
+  })
 })
 
 describe("Migration conversion prefill", () => {
@@ -1265,6 +1348,10 @@ describe("Migration conversion prefill", () => {
       },
       { timeout: 3000 },
     )
+
+    /** The 100% chip stays visibly pressed once the amount settles, so the migration user
+     *  sees the whole balance is the active selection. */
+    expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(true)
   })
 })
 

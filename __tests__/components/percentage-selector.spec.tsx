@@ -19,8 +19,10 @@ jest.mock("@rn-vui/themed", () => ({
   makeStyles: () => () => ({
     row: {},
     chip: {},
+    chipSelected: {},
     chipDisabled: {},
     chipText: {},
+    chipTextSelected: {},
   }),
 }))
 
@@ -139,5 +141,34 @@ describe("PercentageSelector", () => {
     )
 
     expect(getByTestId("custom-25%")).toBeTruthy()
+  })
+
+  it("marks the selected percentage as pressed and leaves the rest unpressed", () => {
+    const { getByTestId } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        selectedPercent={100}
+        onSelect={mockOnSelect}
+        testIdPrefix="convert"
+      />,
+    )
+
+    expect(getByTestId("convert-100%").props.accessibilityState.selected).toBe(true)
+    expect(getByTestId("convert-50%").props.accessibilityState.selected).toBe(false)
+  })
+
+  it("does not mark a chip as pressed while it is loading", () => {
+    const { getByTestId } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={100}
+        selectedPercent={100}
+        onSelect={mockOnSelect}
+        testIdPrefix="convert"
+      />,
+    )
+
+    expect(getByTestId("convert-100%").props.accessibilityState.selected).toBe(false)
   })
 })

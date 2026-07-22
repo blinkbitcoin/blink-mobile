@@ -16,6 +16,9 @@ const DEFAULT_TEST_ID_PREFIX = "convert"
 export type PercentageSelectorProps = {
   isLocked: boolean
   loadingPercent: number | null
+  /** The active percentage, drawn as a pressed chip so the current selection stays visible
+   *  after its amount settles (the migration lands here already on 100%). */
+  selectedPercent?: number | null
   onSelect: (percentage: number) => void
   options?: Readonly<number[]>
   testIdPrefix?: string
@@ -25,6 +28,7 @@ export type PercentageSelectorProps = {
 export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
   isLocked,
   loadingPercent,
+  selectedPercent,
   onSelect,
   options,
   testIdPrefix = DEFAULT_TEST_ID_PREFIX,
@@ -43,19 +47,27 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
     <View style={[styles.row, containerStyle]}>
       {opts.map((p) => {
         const loading = loadingPercent === p
+        const isSelected = !loading && selectedPercent === p
         return (
           <TouchableOpacity
             key={p}
             {...testProps(`${testIdPrefix}-${p}%`)}
-            style={[styles.chip, isLocked && styles.chipDisabled]}
+            style={[
+              styles.chip,
+              isSelected && styles.chipSelected,
+              isLocked && styles.chipDisabled,
+            ]}
             disabled={isLocked}
             onPress={() => onSelect(p)}
             accessibilityLabel={testIdPrefix}
+            accessibilityState={{ selected: isSelected }}
           >
             {loading ? (
               <ActivityIndicator color={colors.primary} />
             ) : (
-              <Text style={styles.chipText}>{p}%</Text>
+              <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
+                {p}%
+              </Text>
             )}
           </TouchableOpacity>
         )
@@ -79,11 +91,17 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 16,
     minWidth: 64,
   },
+  chipSelected: {
+    backgroundColor: colors.primary,
+  },
   chipDisabled: {
     opacity: 0.5,
   },
   chipText: {
     color: colors.primary,
     fontWeight: "bold",
+  },
+  chipTextSelected: {
+    color: colors.white,
   },
 }))
