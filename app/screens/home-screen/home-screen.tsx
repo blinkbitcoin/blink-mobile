@@ -69,7 +69,6 @@ import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
-import { isIos } from "@app/utils/helper"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
 import {
   useAppConfig,
@@ -249,11 +248,7 @@ export const HomeScreen: React.FC = () => {
     nextFetchPolicy: "cache-and-network",
   })
 
-  const {
-    refetch: refetchUnauthed,
-    loading: loadingUnauthed,
-    data: dataUnauthed,
-  } = useHomeUnauthedQuery({
+  const { refetch: refetchUnauthed, loading: loadingUnauthed } = useHomeUnauthedQuery({
     skip: !isAuthed,
     fetchPolicy: "network-only",
 
@@ -606,26 +601,16 @@ export const HomeScreen: React.FC = () => {
     },
   ]
 
-  const isIosWithBalance = isIos && satsBalance > 0
+  const isTransferDisabled =
+    isDollarBalanceRestricted || (isSelfCustodial && !isTransferBlocked)
 
-  const shouldShowTransferButton =
-    !isTransferBlocked &&
-    (isSelfCustodial ||
-      !isIos ||
-      dataUnauthed?.globals?.network !== "mainnet" ||
-      levelAccount === AccountLevel.Two ||
-      levelAccount === AccountLevel.Three ||
-      isIosWithBalance)
-
-  if (shouldShowTransferButton) {
-    buttons.unshift({
-      title: LL.ConversionDetailsScreen.transfer(),
-      target: "conversionDetails",
-      icon: "transfer",
-      disabled: isDollarBalanceRestricted,
-      onDisabledPress: () => setIsRestrictionModalVisible(true),
-    })
-  }
+  buttons.unshift({
+    title: LL.ConversionDetailsScreen.transfer(),
+    target: "conversionDetails",
+    icon: "transfer",
+    disabled: isTransferDisabled,
+    onDisabledPress: () => setIsRestrictionModalVisible(true),
+  })
 
   const AccountCreationNeededModal = (
     <Modal
