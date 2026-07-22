@@ -11731,6 +11731,10 @@ type RootTranslation = {
 				 */
 				headerTitle: string
 				/**
+				 * A​u​t​h​e​n​t​i​c​a​t​e​ ​t​o​ ​v​i​e​w​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e
+				 */
+				authDescription: string
+				/**
 				 * T​h​i​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​w​o​r​k​s​ ​i​n​ ​a​n​y​ ​{​s​p​a​r​k​C​o​m​p​a​t​i​b​l​e​L​i​n​k​}
 				 * @param {string} sparkCompatibleLink
 				 */
@@ -24209,6 +24213,10 @@ export type TranslationFunctions = {
 				 * Backup phrase
 				 */
 				headerTitle: () => LocalizedString
+				/**
+				 * Authenticate to view your backup phrase
+				 */
+				authDescription: () => LocalizedString
 				/**
 				 * This backup phrase works in any {sparkCompatibleLink}
 				 */

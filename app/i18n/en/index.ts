@@ -3693,6 +3693,7 @@ const en: BaseTranslation = {
       },
       Phrase: {
         headerTitle: "Backup phrase",
+        authDescription: "Authenticate to view your backup phrase",
         sparkCompatible:
           "This backup phrase works in any {sparkCompatibleLink: string}",
         sparkCompatibleLink: "Spark-compatible wallet",
