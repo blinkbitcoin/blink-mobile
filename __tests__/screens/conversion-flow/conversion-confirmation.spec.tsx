@@ -343,7 +343,7 @@ describe("conversion-confirmation-screen", () => {
     const resetAction = dispatchMock.mock.calls[0][0]({ routes: [], index: 0 })
     expect(resetAction.payload.routes).toEqual([
       { name: "Primary" },
-      { name: "conversionSuccess", params: { returnToMigration: undefined } },
+      { name: "conversionSuccess" },
     ])
   })
 

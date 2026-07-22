@@ -67,8 +67,8 @@ export type RootStackParamList = {
   conversionConfirmation: {
     fromWalletCurrency: WalletCurrency
     moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
-    /** Set when the convert is a migration step, so a completed conversion returns to the
-     *  migration flow instead of Home. */
+    /** Where a completed migration convert lands (back in the flow, not Home). Navigation-only,
+     *  never a privilege: the region waiver comes from the armed flag, not this forgeable param. */
     isMigrationConversion?: boolean
   }
   conversionSuccess:

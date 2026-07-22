@@ -99,7 +99,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
         { name: "Primary" },
         {
           name: "conversionSuccess",
-          params: { returnToMigration: isMigrationConversion },
+          ...(isMigrationConversion ? { params: { returnToMigration: true } } : {}),
         },
       ]
       return CommonActions.reset({ ...state, routes, index: routes.length - 1 })
