@@ -199,6 +199,7 @@ export const DeveloperScreen: React.FC = () => {
           lnAddressHostname: newLnAddressHostname,
           name: "Custom", // TODO: make configurable
           blockExplorer: "https://mempool.space/tx/", // TODO make configurable
+          sparkExplorer: "https://sparkscan.io/tx/",
         },
         token: newToken || "",
       })
