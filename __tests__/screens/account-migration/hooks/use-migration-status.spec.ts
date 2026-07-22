@@ -121,4 +121,23 @@ describe("useMigrationStatus", () => {
       fetchPolicy: "no-cache",
     })
   })
+
+  /** A failed read must be distinguishable from "the server has not said": the error and a
+   *  way to re-run it travel with the null status for a caller to block and retry on. */
+  it("surfaces the read error and a refetch for a caller to retry", () => {
+    const error = new Error("offline")
+    const refetch = jest.fn()
+    mockUseMigrationStatusQuery.mockReturnValue({
+      data: undefined,
+      loading: false,
+      error,
+      refetch,
+    })
+
+    const { result } = renderHook(() => useMigrationStatus())
+
+    expect(result.current.status).toBeNull()
+    expect(result.current.error).toBe(error)
+    expect(result.current.refetch).toBe(refetch)
+  })
 })
