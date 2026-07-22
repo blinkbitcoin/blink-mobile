@@ -2319,6 +2319,10 @@
     "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway."
   },
   "SettingsScreen": {
+    "createAddress": "Tinkunata ruray",
+    "donationButton": "Qaray ñit'ana",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Ñit'iy atikuq QR nisqa",
     "staticQrCopied": "QR código t'inkiykita copiasqañam",
     "setByOs": "OS nisqawan churasqa",
@@ -2327,7 +2331,6 @@
     "apiDashboard": "API yaykuna dashboard nisqapas",
     "pos": "Rantikuna",
     "posCopied": "Rantikuna t'inkiykita copiasqañam",
-    "setYourLightningAddress": "Lightning tinkunaykita churay",
     "activated": "Kawsayniyta rikuchiykachkanki",
     "addressScreen": "Kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanman",
     "nonCustodialAccount": "Mana waqaychasqa kuenta",

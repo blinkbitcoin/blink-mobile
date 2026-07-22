@@ -2319,6 +2319,10 @@
         "sdkGenericError": "Não foi possível estimar as taxas. Tente um valor diferente."
     },
     "SettingsScreen": {
+        "createAddress": "Criar endereço",
+        "donationButton": "Botão de doação",
+        "btcpayServer": "BTCPay Server",
+        "woocommerce": "WooCommerce",
         "staticQr": "QR Code estático imprimível",
         "staticQrCopied": "O link do seu QR Code estático foi copiado",
         "setByOs": "Definido pelo sistema",
@@ -2327,7 +2331,6 @@
         "apiDashboard": "Acesso à API e painel",
         "pos": "Ponto de venda",
         "posCopied": "O link do seu ponto de venda foi copiado",
-        "setYourLightningAddress": "Defina seu endereço Lightning",
         "activated": "Ativado",
         "addressScreen": "Formas de receber pagamentos",
         "nonCustodialAccount": "Conta não custodial",

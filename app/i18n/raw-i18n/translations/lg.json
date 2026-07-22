@@ -2319,6 +2319,10 @@
     "sdkGenericError": "Tesobola kusoma ssente z'obukozi. Gezaako omuwendo omulala."
   },
   "SettingsScreen": {
+    "createAddress": "Kola endagiriro",
+    "donationButton": "Bbatani y'okuwaayo",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Koodi ya QR etali ya kukyukakyuka eyinza okwokyebwaamu",
     "staticQrCopied": "Enyunga yo etakyuuka eya QR code ekoppeddwa",
     "setByOs": "Eteekebwawo OS",
@@ -2327,7 +2331,6 @@
     "apiDashboard": "Okuyingira mu API ne dashiboodi",
     "pos": "Ekifo we Batunda",
     "posCopied": "Ennyunga ku kifo kyo eky'okutunda ekoppeddwa",
-    "setYourLightningAddress": "Kola Endagiriro yo eya Lightning",
     "activated": "Ekoleddwa",
     "addressScreen": "Engeri y'okusasulwa",
     "nonCustodialAccount": "Akawunti etakuumibwa",

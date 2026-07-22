@@ -2319,6 +2319,10 @@
     "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف."
   },
   "SettingsScreen": {
+    "createAddress": "إنشاء عنوان",
+    "donationButton": "زر التبرع",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "رمز QR ثابت قابل للطباعة",
     "staticQrCopied": "تم نسخ رابط رمز QR الثابت الخاص بك",
     "setByOs": "محدد بواسطة نظام التشغيل",
@@ -2327,7 +2331,6 @@
     "apiDashboard": "الوصول إلى API ولوحة التحكم",
     "pos": "نقطة البيع",
     "posCopied": "تم نسخ رابط نقطة البيع الخاص بك",
-    "setYourLightningAddress": "اضبط عنوان Lightning الخاص بك",
     "activated": "تم التفعيل",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "حساب غير حافظ",

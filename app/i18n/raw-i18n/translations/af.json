@@ -2319,6 +2319,10 @@
     "sdkGenericError": "Kan nie fooie skat nie. Probeer asseblief 'n ander bedrag."
   },
   "SettingsScreen": {
+    "createAddress": "Skep adres",
+    "donationButton": "Skenkingsknoppie",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Drukbare statiese QR",
     "staticQrCopied": "Jou statiese QR-kodeskakel is gekopieer",
     "setByOs": "Gestel deur bedryfstelsel",
@@ -2327,7 +2331,6 @@
     "apiDashboard": "API-toegang en kontroleskerm",
     "pos": "Punt van Verkoop",
     "posCopied": "Jou punt van verkoop-skakel is gekopieer",
-    "setYourLightningAddress": "Stel jou Lightning-adres",
     "activated": "Geaktiveer ",
     "addressScreen": "Maniere om betaal te word",
     "nonCustodialAccount": "Nie-bewaarrekening",

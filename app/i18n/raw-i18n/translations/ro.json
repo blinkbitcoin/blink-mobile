@@ -2319,6 +2319,10 @@
     "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită."
   },
   "SettingsScreen": {
+    "createAddress": "Creează adresă",
+    "donationButton": "Buton de donație",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Cod QR static imprimabil",
     "staticQrCopied": "Linkul codului QR static a fost copiat",
     "setByOs": "Setat de OS",
@@ -2327,7 +2331,6 @@
     "apiDashboard": "Acces API și panou de control",
     "pos": "Punct de vânzare POS",
     "posCopied": "Link-ul punctului de vânzare a fost copiat",
-    "setYourLightningAddress": "Setați-vă adresa Lightning",
     "activated": "Activat",
     "addressScreen": "Modalități de a fi plătit",
     "nonCustodialAccount": "Cont non-custodial",

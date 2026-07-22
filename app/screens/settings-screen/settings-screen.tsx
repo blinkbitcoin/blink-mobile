@@ -29,6 +29,9 @@ import { AccountLevelSetting } from "./settings/account-level"
 import { AccountLNAddress } from "./settings/account-ln-address"
 import { PhoneLnAddress } from "./settings/phone-ln-address"
 import { AccountPOS } from "./settings/account-pos"
+import { AccountDonationButton } from "./settings/account-donation-button"
+import { AccountBtcpay } from "./settings/account-btcpay"
+import { AccountWoocommerce } from "./settings/account-woocommerce"
 import { TxLimits } from "./settings/account-tx-limits"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
@@ -106,7 +109,15 @@ export const SettingsScreen: React.FC = () => {
       SwitchAccountSetting,
       MoveToNonCustodialSetting,
     ],
-    waysToGetPaid: [AccountLNAddress, PhoneLnAddress, AccountPOS, AccountStaticQR],
+    waysToGetPaid: [
+      AccountLNAddress,
+      PhoneLnAddress,
+      AccountPOS,
+      AccountStaticQR,
+      AccountDonationButton,
+      AccountBtcpay,
+      AccountWoocommerce,
+    ],
     loginMethods: [EmailSetting, PhoneSetting],
     preferences: [
       NotificationSetting,

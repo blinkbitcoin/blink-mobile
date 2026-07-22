@@ -2319,6 +2319,10 @@
     "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb."
   },
   "SettingsScreen": {
+    "createAddress": "Opret adresse",
+    "donationButton": "Donationsknap",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Printbar statisk QR",
     "staticQrCopied": "Dit statiske QR-kode link er blevet kopieret",
     "setByOs": "Indstillet af OS",
@@ -2327,7 +2331,6 @@
     "apiDashboard": "API-adgang og dashboard",
     "pos": "Kasseterminal",
     "posCopied": "Dit kasseterminal-link er blevet kopieret",
-    "setYourLightningAddress": "Indstil din Lightning-adresse",
     "activated": "Aktiveret",
     "addressScreen": "Måder at modtage betaling",
     "nonCustodialAccount": "Ikke-depotkonto",

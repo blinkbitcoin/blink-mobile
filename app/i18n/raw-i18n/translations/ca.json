@@ -2319,6 +2319,10 @@
     "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent."
   },
   "SettingsScreen": {
+    "createAddress": "Crea una adreça",
+    "donationButton": "Botó de donació",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Codi QR estàtic imprimible",
     "staticQrCopied": "S'ha copiat l'enllaç del teu codi QR estàtic",
     "setByOs": "Establert pel sistema operatiu",
@@ -2327,7 +2331,6 @@
     "apiDashboard": "Accés a l'API i tauler de control",
     "pos": "Punt de venda",
     "posCopied": "S'ha copiat l'enllaç del teu punt de venda",
-    "setYourLightningAddress": "Configura la teva adreça Lightning",
     "activated": "Activat",
     "addressScreen": "Maneres de cobrar",
     "nonCustodialAccount": "Compte no custodi",

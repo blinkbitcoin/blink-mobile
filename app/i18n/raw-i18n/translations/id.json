@@ -2319,6 +2319,10 @@
     "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda."
   },
   "SettingsScreen": {
+    "createAddress": "Buat alamat",
+    "donationButton": "Tombol donasi",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Kode QR Statis yang Dapat Dicetak",
     "staticQrCopied": "Tautan kode QR statis Anda telah disalin",
     "setByOs": "Ditentukan oleh OS",
@@ -2327,7 +2331,6 @@
     "apiDashboard": "Akses API dan dasbor",
     "pos": "Tempat Penjualan",
     "posCopied": "Tautan tempat penjualan Anda telah disalin",
-    "setYourLightningAddress": "Atur Alamat Lightning Anda",
     "activated": "Diaktifkan",
     "addressScreen": "Cara menerima pembayaran",
     "nonCustodialAccount": "Akun non-kustodial",

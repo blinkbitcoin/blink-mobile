@@ -2319,6 +2319,10 @@
         "sdkGenericError": "Impossible d'estimer les frais. Essayez un montant différent."
     },
     "SettingsScreen": {
+        "createAddress": "Créer une adresse",
+        "donationButton": "Bouton de don",
+        "btcpayServer": "BTCPay Server",
+        "woocommerce": "WooCommerce",
         "staticQr": "QR statique imprimable",
         "staticQrCopied": "Votre lien de QR code statique a été copié",
         "setByOs": "Défini par le système",
@@ -2327,7 +2331,6 @@
         "apiDashboard": "Accès API et tableau de bord",
         "pos": "Point de vente",
         "posCopied": "Votre lien de point de vente a été copié",
-        "setYourLightningAddress": "Définir votre adresse Lightning",
         "activated": "Activé",
         "addressScreen": "Moyens de se faire payer",
         "nonCustodialAccount": "Compte non-custodial",

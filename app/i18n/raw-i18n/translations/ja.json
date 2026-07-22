@@ -2319,6 +2319,10 @@
         "sdkGenericError": "手数料を見積もれません。別の金額をお試しください。"
     },
     "SettingsScreen": {
+        "createAddress": "アドレスを作成",
+        "donationButton": "寄付ボタン",
+        "btcpayServer": "BTCPay Server",
+        "woocommerce": "WooCommerce",
         "staticQr": "印刷用静的QR",
         "staticQrCopied": "静的QRコードのリンクをコピーしました",
         "setByOs": "OSの設定に準拠",
@@ -2327,7 +2331,6 @@
         "apiDashboard": "APIアクセスとダッシュボード",
         "pos": "ポイント・オブ・セール",
         "posCopied": "ポイント・オブ・セールのリンクをコピーしました",
-        "setYourLightningAddress": "Lightningアドレスを設定",
         "activated": "アクティベーション",
         "addressScreen": "さまざまな受金方法を見る",
         "nonCustodialAccount": "非カストディアルアカウント",

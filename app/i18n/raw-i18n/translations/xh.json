@@ -2319,6 +2319,10 @@
     "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo."
   },
   "SettingsScreen": {
+    "createAddress": "Yenza idilesi",
+    "donationButton": "Iqhosha lomnikelo",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "I-QR esisigxina enokuprintwa",
     "staticQrCopied": "Ilinki yakho ye-QR esisigxina ikopishiwe",
     "setByOs": "Isetwe yi-OS",
@@ -2327,7 +2331,6 @@
     "apiDashboard": "Ukufikelela kwi-API nedashbhodi",
     "pos": "Indawo Yokuthengisa",
     "posCopied": "Ilinki yakho yendawo yokuthengisa ikopishiwe",
-    "setYourLightningAddress": "Seta idilesi yakho ye-Lightning",
     "activated": "Yenziwe yasebenza",
     "addressScreen": "Iindlela zokuhlawulwa",
     "nonCustodialAccount": "Iakhawunti engagcinwanga",

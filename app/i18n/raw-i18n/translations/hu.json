@@ -2319,6 +2319,10 @@
     "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
   },
   "SettingsScreen": {
+    "createAddress": "Cím létrehozása",
+    "donationButton": "Adományozás gomb",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Nyomtatható statikus QR-kód",
     "staticQrCopied": "A statikus QR-kód hivatkozásod másolva lett",
     "setByOs": "Az operációs rendszer által beállítva",
@@ -2327,7 +2331,6 @@
     "apiDashboard": "API hozzáférés és kezelőpanel",
     "pos": "Értékesítési pont",
     "posCopied": "Az értékesítési pont hivatkozásod másolva lett",
-    "setYourLightningAddress": "Állítsd be a Lightning címed",
     "activated": "Aktiválva",
     "addressScreen": "Fizetési módok",
     "nonCustodialAccount": "Nem letétkezelt fiók",

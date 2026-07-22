@@ -2319,6 +2319,10 @@
     "sdkGenericError": "Nie je možné odhadnúť poplatky. Skúste inú sumu."
   },
   "SettingsScreen": {
+    "createAddress": "Vytvoriť adresu",
+    "donationButton": "Darovacie tlačidlo",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Vytlačiteľný statický QR kód",
     "staticQrCopied": "Odkaz na váš statický QR kód bol skopírovaný",
     "setByOs": "Prevzaté z OS",
@@ -2327,7 +2331,6 @@
     "apiDashboard": "API prístup a dashboard",
     "pos": "Terminál PoS",
     "posCopied": "Váš Terminál PoS bol skopírovaný",
-    "setYourLightningAddress": "Nastavte svoju Lightning adresu",
     "activated": "Aktivované",
     "addressScreen": "Spôsoby, ako dostať zaplatené",
     "nonCustodialAccount": "Nesvereneský účet",

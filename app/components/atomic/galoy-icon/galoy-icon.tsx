@@ -84,6 +84,7 @@ import ApplePay from "@app/assets/icons/apple-pay.svg"
 import Bitcoin from "@app/assets/icons-redesign/bitcoin.svg"
 import BlinkIcon from "@app/assets/icons-redesign/blink-icon.svg"
 import BtcBook from "@app/assets/icons-redesign/btc-book.svg"
+import Btcpay from "@app/assets/icons-redesign/btcpay.svg"
 import CloseCrossWithBackground from "@app/assets/icons-redesign/close-cross-with-background.svg"
 import GooglePay from "@app/assets/icons/google-pay.svg"
 import LightningAddress from "@app/assets/icons-redesign/lightning-address.svg"
@@ -105,6 +106,8 @@ import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
 import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
 import CloudArrowUp from "@app/assets/icons-redesign/cloud-arrow-up.svg"
 import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
+import DonationButton from "@app/assets/icons-redesign/donation-button.svg"
+import Woocommerce from "@app/assets/icons-redesign/woocommerce.svg"
 import CaretUpCircle from "@app/assets/icons-redesign/caret-up-circle.svg"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
@@ -233,6 +236,9 @@ const customSvgMap = {
   "check-badge": CheckBadge,
   "cloud-arrow-up": CloudArrowUp,
   "heart-outline": HeartOutline,
+  "btcpay": Btcpay,
+  "donation-button": DonationButton,
+  "woocommerce": Woocommerce,
   "caret-up-circle": CaretUpCircle,
 } as const
 
