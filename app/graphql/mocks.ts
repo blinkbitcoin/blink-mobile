@@ -31,7 +31,6 @@ import {
 } from "./generated"
 
 // TODO: put in __tests__ folder?
-// will it work for storybooks?
 // should not be in production build
 // no harm but will increase bundle size
 
