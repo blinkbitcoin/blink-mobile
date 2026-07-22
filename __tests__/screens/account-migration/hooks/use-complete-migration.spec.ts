@@ -22,11 +22,13 @@ jest.mock("@app/screens/account-migration/hooks/use-discard-custodial-session", 
 }))
 
 let mockAccounts: { id: string }[] = []
+let mockRegistryLoading = false
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({
     setActiveAccountId: mockSetActiveAccountId,
     accounts: mockAccounts,
+    loading: mockRegistryLoading,
   }),
 }))
 
@@ -58,6 +60,7 @@ describe("useCompleteMigration", () => {
     jest.clearAllMocks()
     mockAccountId = "sc-account-1"
     mockAccounts = [{ id: "sc-account-1" }]
+    mockRegistryLoading = false
     mockCheckpoint = "backupAlerts"
     mockDiscardCustodialSession.mockResolvedValue(undefined)
   })
@@ -113,6 +116,16 @@ describe("useCompleteMigration", () => {
 
     expect(result.current.migrationCheckpoint).toBe("backupAlerts")
     expect(result.current.migrationAccountId).toBe("sc-account-1")
+  })
+
+  /** The account check reads the registry's accounts, which start empty and fill after an
+   *  async keystore read on a resume launch; reporting loading until the registry hydrates
+   *  stops a swap decided too early from reading a present destination as missing. */
+  it("stays loading until the account registry has hydrated", () => {
+    mockRegistryLoading = true
+    const { result } = renderHook(() => useCompleteMigration())
+
+    expect(result.current.migrationLoading).toBe(true)
   })
 
   it("clears the custodial owner's pending wallet record after the swap", async () => {
