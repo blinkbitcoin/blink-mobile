@@ -22,7 +22,6 @@
     "get-stories": "sb-rn-get-stories --config-path=./.storybook",
     "storybook-watcher": "sb-rn-watcher --config-path=./.storybook",
     "storybook": "NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 9001",
-    "sb-server": "NODE_OPTIONS=--openssl-legacy-provider yarn storybook-server",
     "dev:codegen": "graphql-codegen --config codegen.yml && yarn dev:gengql",
     "dev:gengql": "yarn node utils/create-gql.ts",
     "adb": "adb reverse tcp:9090 tcp:9090 && adb reverse tcp:3000 tcp:3000 && adb reverse tcp:4000 tcp:4000 && adb reverse tcp:9001 tcp:9001 && adb reverse tcp:8081 tcp:8081 && adb reverse tcp:4002 tcp:4002 && adb reverse tcp:4455 tcp:4455",
