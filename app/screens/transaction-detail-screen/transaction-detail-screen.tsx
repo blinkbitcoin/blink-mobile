@@ -331,7 +331,6 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     spendOrReceiveText = LL.TransactionDetailScreen.spent()
   }
 
-  console.log("settlementVia: ", settlementVia)
   return (
     <Screen unsafe preset="fixed">
       <View style={[styles.outerContainer, { paddingBottom: insets.bottom }]}>
