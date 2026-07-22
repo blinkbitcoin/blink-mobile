@@ -241,7 +241,9 @@ export const MigrationGate: React.FC = () => {
     /** Every affected user converts in-app from here, restricted regions included: the
      *  convert screen waives its usual region bounce when it is reached as a migration step
      *  (confirmed by the server wind-down, not the deep-linkable param alone), so the modal
-     *  always offers the conversion instead of a dead-end Close. */
+     *  always offers the conversion. The close icon is hidden where the exit is blocked (the
+     *  armed gate or a locked migration): no way back, so Transfer is the only action. */
+    const canCloseDollarModal = !isExitBlocked
     return (
       <>
         <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />
@@ -249,6 +251,7 @@ export const MigrationGate: React.FC = () => {
           isVisible={isFocused}
           toggleModal={exitFlow}
           onTransfer={goToDollarTransfer}
+          showCloseIconButton={canCloseDollarModal}
         />
       </>
     )
