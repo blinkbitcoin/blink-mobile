@@ -20,10 +20,11 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   }),
 }))
 
-const serverReports = (status: MigrationStatus | null, loading = false) => ({
-  status,
-  loading,
-})
+const serverReports = (
+  status: MigrationStatus | null,
+  loading = false,
+  error: Error | undefined = undefined,
+) => ({ status, loading, error, refetch: jest.fn() })
 
 describe("useMigrationLock", () => {
   beforeEach(() => {
@@ -153,5 +154,48 @@ describe("useMigrationLock", () => {
     const { result } = renderHook(() => useMigrationLock())
 
     expect(result.current.loading).toBe(false)
+  })
+
+  /**
+   * A read the app could not make is not an unlocked account: it reports an error so the
+   * gate blocks with a retry, instead of the failed read silently re-pitching the intro to
+   * a user the server has already locked into the migration.
+   */
+  it("reports a read error instead of reading as unlocked", () => {
+    mockUseMigrationStatus.mockReturnValue(
+      serverReports(null, false, new Error("offline")),
+    )
+
+    const { result } = renderHook(() => useMigrationLock())
+
+    expect(result.current.hasError).toBe(true)
+    expect(result.current.isLocked).toBe(false)
+  })
+
+  /** A session that can never be locked has no lock read to fail. */
+  it("never reports an error for a self-custodial session", () => {
+    mockActiveAccountType = "selfCustodial"
+    mockUseMigrationStatus.mockReturnValue(
+      serverReports(null, false, new Error("offline")),
+    )
+
+    const { result } = renderHook(() => useMigrationLock())
+
+    expect(result.current.hasError).toBe(false)
+  })
+
+  /** The gate's retry re-runs the lock read through this passthrough. */
+  it("passes the status refetch through for the gate's retry", () => {
+    const refetch = jest.fn()
+    mockUseMigrationStatus.mockReturnValue({
+      status: null,
+      loading: false,
+      error: new Error("offline"),
+      refetch,
+    })
+
+    const { result } = renderHook(() => useMigrationLock())
+
+    expect(result.current.refetch).toBe(refetch)
   })
 })

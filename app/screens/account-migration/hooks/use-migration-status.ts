@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client"
+import { ApolloError, gql } from "@apollo/client"
 
 import { MigrationStatus, useMigrationStatusQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -23,6 +23,11 @@ type UseMigrationStatusOptions = {
 type UseMigrationStatus = {
   status: MigrationStatus | null
   loading: boolean
+  /** Set when the read itself failed, so a caller can tell "the server has not said" apart
+   *  from "we could not ask" and block with a retry rather than treat it as not-started. */
+  error?: ApolloError
+  /** Re-runs the read, for a caller wiring the failed status into a retry control. */
+  refetch: () => Promise<unknown>
 }
 
 /**
@@ -42,7 +47,7 @@ export const useMigrationStatus = ({
   /** no-cache for the same reason as the wind-down status and the preview, with a
    *  sharper consequence here: a cached read would let one account's migration phase
    *  lock a different account out of the app. */
-  const { data, loading } = useMigrationStatusQuery({
+  const { data, loading, error, refetch } = useMigrationStatusQuery({
     skip: !isAuthed || skip,
     fetchPolicy: "no-cache",
     pollInterval,
@@ -51,5 +56,7 @@ export const useMigrationStatus = ({
   return {
     status: data?.migration?.status ?? null,
     loading,
+    error,
+    refetch,
   }
 }

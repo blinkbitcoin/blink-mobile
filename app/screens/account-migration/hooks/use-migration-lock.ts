@@ -9,6 +9,11 @@ type MigrationLock = {
   /** Travels with the lock so a caller that would otherwise render the wrong screen can
    *  wait: an unknown lock is not an unlocked one, it is an answer still on its way. */
   loading: boolean
+  /** A failed read is not an unlocked account either: it travels too, so the gate can block
+   *  with a retry instead of silently re-pitching the intro to a locked user. */
+  hasError: boolean
+  /** Re-runs the read behind the gate's retry control. */
+  refetch: () => Promise<unknown>
 }
 
 /**
@@ -27,14 +32,19 @@ export const useMigrationLock = (): MigrationLock => {
   /** Only a custodial account can be mid-migration, so the phase is never even asked for
    *  on a self-custodial launch, whose result would be discarded anyway. */
   const isCustodial = activeAccount?.type === AccountType.Custodial
-  const { status, loading } = useMigrationStatus({ skip: !isCustodial })
+  const { status, loading, error, refetch } = useMigrationStatus({ skip: !isCustodial })
 
   if (!isCustodial) {
-    return { isLocked: false, loading: false }
+    return { isLocked: false, loading: false, hasError: false, refetch }
   }
 
   const isInProgress = status === MigrationStatus.InProgress
   const isTransferring = status === MigrationStatus.Transferring
 
-  return { isLocked: isInProgress || isTransferring, loading }
+  return {
+    isLocked: isInProgress || isTransferring,
+    loading,
+    hasError: Boolean(error),
+    refetch,
+  }
 }

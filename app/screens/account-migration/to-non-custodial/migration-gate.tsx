@@ -71,7 +71,12 @@ export const MigrationGate: React.FC = () => {
 
   /** A locked migration removes the way out just as the armed gate does: the server
    *  already recorded this account as migrating and the transfer will claim its balance. */
-  const { isLocked: isMigrationLocked, loading: lockLoading } = useMigrationLock()
+  const {
+    isLocked: isMigrationLocked,
+    loading: lockLoading,
+    hasError: lockError,
+    refetch: refetchLock,
+  } = useMigrationLock()
   const isExitBlocked = isGated || isMigrationLocked
   const isTransferBlocked = useTransferBlocked()
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
@@ -105,13 +110,13 @@ export const MigrationGate: React.FC = () => {
   const retryGateData = useCallback(async () => {
     setIsRetrying(true)
     try {
-      await Promise.all([refetchApiKeys(), refetchBalances()])
+      await Promise.all([refetchApiKeys(), refetchBalances(), refetchLock()])
     } catch (err) {
       reportError("Migration gate retry", err)
     } finally {
       setIsRetrying(false)
     }
-  }, [refetchApiKeys, refetchBalances])
+  }, [refetchApiKeys, refetchBalances, refetchLock])
 
   /** Returning from the dollar-transfer conversion, refetch so the balance reflects the
    *  now-empty dollars instead of the cached pre-transfer figure. */
@@ -132,8 +137,9 @@ export const MigrationGate: React.FC = () => {
   const isGateDataLoading = !apiKeysReady || !balancesReady || lockLoading
 
   /** A failed query read as its empty default would wave a user with API keys or a live
-   *  dollar balance straight in, so a settled error blocks with a retry instead. */
-  const hasGateDataError = apiKeysError || balancesError
+   *  dollar balance straight in, or re-pitch the intro to a user a failed lock read makes
+   *  look unlocked, so a settled error blocks with a retry instead. */
+  const hasGateDataError = apiKeysError || balancesError || lockError
 
   /** The API-key warning outranks the Dollar-Balance precondition in the entry order
    *  (entry, API-key check, Dollar Balance check, intro). */

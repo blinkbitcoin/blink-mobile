@@ -13,6 +13,8 @@ const mockUseActiveApiKeys = jest.fn()
 let mockWindDown: WindDown | null = null
 let mockIsMigrationLocked = false
 let mockLockLoading = false
+let mockLockError = false
+const mockRefetchLock = jest.fn()
 let mockCheckpointLoading = false
 const mockNavigateToCheckpoint = jest.fn()
 const mockUseTransferBlocked = jest.fn()
@@ -121,6 +123,8 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
   useMigrationLock: () => ({
     isLocked: mockIsMigrationLocked,
     loading: mockLockLoading,
+    hasError: mockLockError,
+    refetch: mockRefetchLock,
   }),
 }))
 
@@ -205,6 +209,7 @@ describe("MigrationGate", () => {
     mockSelfCustodialDisabled = false
     mockIsMigrationLocked = false
     mockLockLoading = false
+    mockLockError = false
     mockCheckpointLoading = false
     mockUseActiveApiKeys.mockReturnValue(apiKeysState())
     mockUseTransferBlocked.mockReturnValue(false)
@@ -513,6 +518,34 @@ describe("MigrationGate", () => {
 
     expect(getByTestId("migration-gate-loading")).toBeTruthy()
     expect(mockRequiredScreen).not.toHaveBeenCalled()
+  })
+
+  /** A failed lock read must block with a retry, not read as unlocked and re-pitch the intro
+   *  to a user the server has already locked into the migration. */
+  it("shows a retry instead of the intro when the lock read fails", () => {
+    mockLockError = true
+
+    render(<MigrationGate />)
+
+    expect(mockPrimaryButton).toHaveBeenCalled()
+    expect(mockRequiredScreen).not.toHaveBeenCalled()
+  })
+
+  it("refetches the lock too when the retry button is pressed", async () => {
+    const refetchApiKeys = jest.fn().mockResolvedValue(undefined)
+    const refetchBalances = jest.fn().mockResolvedValue(undefined)
+    mockLockError = true
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ refetch: refetchApiKeys }))
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ usdBalance: 0 }),
+      refetch: refetchBalances,
+    })
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-retry-button"))
+    await act(async () => {})
+
+    expect(mockRefetchLock).toHaveBeenCalledTimes(1)
   })
 
   it("waits for the checkpoint to load before resuming a locked migration", () => {
