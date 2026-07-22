@@ -58,7 +58,8 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  useWalletOverviewScreenQuery: () => mockUseWalletOverviewScreenQuery(),
+  useWalletOverviewScreenQuery: (options: unknown) =>
+    mockUseWalletOverviewScreenQuery(options),
   useMigrationQuery: () => mockUseMigrationQuery(),
   useMigrationStartMutation: () => [mockMigrationStart],
 }))
@@ -202,6 +203,18 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(screen.queryByText(/Current exchange rate/)).toBeNull()
     expect(screen.getByText(LLOverview.approveCta())).toBeTruthy()
     expect(screen.getByText(LLOverview.contactSupportCta())).toBeTruthy()
+  })
+
+  /** The dollar figure is approved in an irreversible step, so it is fetched fresh: a
+   *  deposit that landed after the last cache write must not stay invisible until the
+   *  backend refuses the migration. */
+  it("fetches the dollar balance fresh for the figure the user approves", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseWalletOverviewScreenQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ fetchPolicy: "cache-and-network" }),
+    )
   })
 
   it("marks the fee as covered by Blink for a de-minimis balance", async () => {
