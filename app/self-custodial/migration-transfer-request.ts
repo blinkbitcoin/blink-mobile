@@ -1,4 +1,6 @@
 import {
+  ReceivePaymentMethod,
+  ReceivePaymentRequest,
   type BreezSdkInterface,
   type Network,
 } from "@breeztech/breez-sdk-spark-react-native"
@@ -6,7 +8,7 @@ import {
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { createReceiveLightning, disconnectSdk, getWalletInfo, initSdk } from "./bridge"
+import { disconnectSdk, getWalletInfo, initSdk } from "./bridge"
 import { storageDirFor } from "./config"
 import { classifySdkError, SelfCustodialErrorCode } from "./sdk-error"
 
@@ -161,14 +163,24 @@ export const buildMigrationTransferRequest = (
   args: WithMigrationSdkArgs,
 ): Promise<MigrationSdkResult<MigrationTransferRequest>> =>
   withMigrationSdk(args, async (sdk) => {
-    const [{ identityPubkey }, { invoice, errors }] = await Promise.all([
+    /** Called directly, not through createReceiveLightning, which flattens a thrown SdkError
+     *  to a string: the raw error keeps its tag so a dropped connection stays retryable
+     *  rather than a settled handover, exactly as getWalletInfo relies on. */
+    const [{ identityPubkey }, response] = await Promise.all([
       getWalletInfo(sdk),
-      createReceiveLightning(sdk)({
-        memo: undefined,
-        expirySecs: MIGRATION_INVOICE_EXPIRY_SECONDS,
-      }),
+      sdk.receivePayment(
+        ReceivePaymentRequest.create({
+          paymentMethod: new ReceivePaymentMethod.Bolt11Invoice({
+            description: "",
+            amountSats: undefined,
+            expirySecs: MIGRATION_INVOICE_EXPIRY_SECONDS,
+            paymentHash: undefined,
+          }),
+        }),
+      ),
     ])
-    if (!invoice) throw new Error(errors?.[0]?.message ?? "No invoice returned")
+    const invoice = response.paymentRequest
+    if (!invoice) throw new Error("No invoice returned")
 
     const proofSignature = await signChallengeWith(
       sdk,

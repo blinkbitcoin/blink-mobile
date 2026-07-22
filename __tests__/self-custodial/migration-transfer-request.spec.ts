@@ -11,7 +11,7 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 const mockInitSdk = jest.fn()
 const mockDisconnectSdk = jest.fn()
 const mockGetWalletInfo = jest.fn()
-const mockReceiveLightning = jest.fn()
+const mockReceivePayment = jest.fn()
 const mockReportError = jest.fn()
 const mockClassifySdkError = jest.fn()
 
@@ -19,7 +19,6 @@ jest.mock("@app/self-custodial/bridge", () => ({
   initSdk: (args: unknown) => mockInitSdk(args),
   disconnectSdk: (sdk: unknown) => mockDisconnectSdk(sdk),
   getWalletInfo: (sdk: unknown) => mockGetWalletInfo(sdk),
-  createReceiveLightning: () => mockReceiveLightning,
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
@@ -59,19 +58,26 @@ const flushMicrotasks = (): Promise<void> =>
     setImmediate(resolve)
   })
 
+/** A connected SDK stub carrying both the message signer and the invoice mint the transfer
+ *  request drives directly, so a network mint failure reaches the classifier with its tag. */
+const sdkWith = (signMessage: jest.Mock = jest.fn()) => ({
+  signMessage,
+  receivePayment: mockReceivePayment,
+})
+
 describe("buildMigrationTransferRequest", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockGetMnemonic.mockResolvedValue("abandon abandon ability")
-    mockInitSdk.mockResolvedValue({ signMessage: jest.fn() })
+    mockInitSdk.mockResolvedValue(sdkWith())
     mockGetWalletInfo.mockResolvedValue({ identityPubkey: SPARK_PUBKEY })
     mockDisconnectSdk.mockResolvedValue(undefined)
-    mockReceiveLightning.mockResolvedValue({ invoice: "lnbcrt1invoice" })
+    mockReceivePayment.mockResolvedValue({ paymentRequest: "lnbcrt1invoice" })
     mockClassifySdkError.mockReturnValue(SelfCustodialErrorCode.Generic)
   })
 
   const withSignMessage = (signMessage: jest.Mock) =>
-    mockInitSdk.mockResolvedValue({ signMessage })
+    mockInitSdk.mockResolvedValue(sdkWith(signMessage))
 
   it("collects the three destination fields the backend takes", async () => {
     withSignMessage(jest.fn().mockResolvedValue({ signature: "deadbeef" }))
@@ -112,9 +118,16 @@ describe("buildMigrationTransferRequest", () => {
 
     await buildRequest()
 
-    expect(mockReceiveLightning).toHaveBeenCalledWith({
-      memo: undefined,
-      expirySecs: 24 * 60 * 60,
+    expect(mockReceivePayment).toHaveBeenCalledWith({
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: {
+          description: "",
+          amountSats: undefined,
+          expirySecs: 24 * 60 * 60,
+          paymentHash: undefined,
+        },
+      },
     })
   })
 
@@ -152,11 +165,12 @@ describe("buildMigrationTransferRequest", () => {
     })
   })
 
-  /** The signature follows the invoice check, so a failed invoice never spends one. */
-  it("reports a failure when no invoice comes back, without signing", async () => {
+  /** The signature follows the invoice, so a mint that throws never spends one; a settled
+   *  (non-network) failure hands the user to support. */
+  it("hands over on a settled invoice mint failure, without signing", async () => {
     const signMessage = jest.fn().mockResolvedValue({ signature: "deadbeef" })
     withSignMessage(signMessage)
-    mockReceiveLightning.mockResolvedValue({ errors: [{ message: "receive is down" }] })
+    mockReceivePayment.mockRejectedValue(new Error("receive is down"))
 
     const result = await buildRequest()
 
@@ -167,9 +181,30 @@ describe("buildMigrationTransferRequest", () => {
     expect(signMessage).not.toHaveBeenCalled()
   })
 
-  it("survives an invoice failure that carries no message", async () => {
-    withSignMessage(jest.fn().mockResolvedValue({ signature: "deadbeef" }))
-    mockReceiveLightning.mockResolvedValue({})
+  /** The mint is called on the SDK directly, not through the adapter that flattens an
+   *  SdkError to a string, so a network-tagged failure reaches the classifier with its tag
+   *  intact and stays a retryable connection error rather than a settled handover. */
+  it("keeps a network-tagged invoice mint failure retryable", async () => {
+    const signMessage = jest.fn().mockResolvedValue({ signature: "deadbeef" })
+    withSignMessage(signMessage)
+    const mintError = new Error("invoice mint: connection reset")
+    mockClassifySdkError.mockReturnValue(SelfCustodialErrorCode.NetworkError)
+    mockReceivePayment.mockRejectedValue(mintError)
+
+    const result = await buildRequest()
+
+    expect(mockClassifySdkError).toHaveBeenCalledWith(mintError)
+    expect(result).toEqual({
+      status: MigrationSdkStatus.ConnectionError,
+      error: mintError,
+    })
+    expect(signMessage).not.toHaveBeenCalled()
+  })
+
+  it("reports a failure when the mint returns no invoice, without signing", async () => {
+    const signMessage = jest.fn().mockResolvedValue({ signature: "deadbeef" })
+    withSignMessage(signMessage)
+    mockReceivePayment.mockResolvedValue({})
 
     const result = await buildRequest()
 
@@ -177,6 +212,7 @@ describe("buildMigrationTransferRequest", () => {
       status: MigrationSdkStatus.Failed,
       error: expect.objectContaining({ message: "No invoice returned" }),
     })
+    expect(signMessage).not.toHaveBeenCalled()
   })
 
   it("wraps a thrown non-error so the caller always gets an Error", async () => {
@@ -241,9 +277,7 @@ describe("buildMigrationTransferRequest", () => {
   it("serializes overlapping runs on the same storage directory", async () => {
     withSignMessage(jest.fn().mockResolvedValue({ signature: "deadbeef" }))
     let releaseFirstConnect: () => void = () => {}
-    const connectedSdk = {
-      signMessage: jest.fn().mockResolvedValue({ signature: "deadbeef" }),
-    }
+    const connectedSdk = sdkWith(jest.fn().mockResolvedValue({ signature: "deadbeef" }))
     mockInitSdk.mockImplementationOnce(
       () =>
         new Promise((resolve) => {
@@ -289,6 +323,6 @@ describe("buildMigrationLnAddressProof", () => {
       status: MigrationSdkStatus.Ok,
       value: { sparkPubkey: SPARK_PUBKEY, proofSignature: "deadbeef" },
     })
-    expect(mockReceiveLightning).not.toHaveBeenCalled()
+    expect(mockReceivePayment).not.toHaveBeenCalled()
   })
 })
