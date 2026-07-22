@@ -124,9 +124,11 @@ describe("useMigrationStatus", () => {
 
   /** A failed read must be distinguishable from "the server has not said": the error and a
    *  way to re-run it travel with the null status for a caller to block and retry on. */
-  it("surfaces the read error and a refetch for a caller to retry", () => {
+  it("surfaces the read error and re-reads the fresh status on refetch", async () => {
     const error = new Error("offline")
-    const refetch = jest.fn()
+    const refetch = jest.fn().mockResolvedValue({
+      data: { migration: { status: MigrationStatus.InProgress } },
+    })
     mockUseMigrationStatusQuery.mockReturnValue({
       data: undefined,
       loading: false,
@@ -138,6 +140,7 @@ describe("useMigrationStatus", () => {
 
     expect(result.current.status).toBeNull()
     expect(result.current.error).toBe(error)
-    expect(result.current.refetch).toBe(refetch)
+    await expect(result.current.refetch()).resolves.toBe(MigrationStatus.InProgress)
+    expect(refetch).toHaveBeenCalledTimes(1)
   })
 })
