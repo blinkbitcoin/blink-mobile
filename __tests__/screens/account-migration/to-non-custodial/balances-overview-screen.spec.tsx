@@ -39,7 +39,6 @@ const rejectedMigrationStart = {
 let mockDollarRestricted = false
 let mockCurrentDollarRestricted = false
 let mockConvertReady = true
-let mockGateArmed = false
 
 let mockIsFocused = true
 
@@ -136,8 +135,23 @@ jest.mock(
   }),
 )
 
-jest.mock("@app/screens/account-migration/hooks/use-wind-down-gate-armed", () => ({
-  useWindDownGateArmed: () => mockGateArmed,
+const mockDollarModal = jest.fn()
+jest.mock("@app/components/dollar-balance-migration-modal", () => ({
+  DollarBalanceMigrationModal: (props: {
+    isVisible: boolean
+    onTransfer: () => void
+  }) => {
+    mockDollarModal(props)
+    const ReactNs = jest.requireActual<typeof import("react")>("react")
+    const RN = jest.requireActual<typeof import("react-native")>("react-native")
+    return props.isVisible
+      ? ReactNs.createElement(
+          RN.Text,
+          { testID: "dollar-balance-modal-transfer", onPress: props.onTransfer },
+          "transfer",
+        )
+      : null
+  },
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -188,7 +202,6 @@ const resetScreenMocks = () => {
     hasConnectionIssue: false,
     retry: mockLnRetry,
   }
-  mockGateArmed = false
   mockIsFocused = true
   mockIsAuthed = true
   mockUseWalletOverviewScreenQuery.mockReturnValue(
@@ -224,8 +237,6 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(screen.getByText("BTC 990 ($FIAT)")).toBeTruthy()
     expect(screen.getByText(/Network fee:/)).toBeTruthy()
     expect(screen.queryByText(/covered by Blink/)).toBeNull()
-    // The voluntary flow never quotes a rate; only the post-gate variant does.
-    expect(screen.queryByText(/Current exchange rate/)).toBeNull()
     expect(screen.getByText(LLOverview.approveCta())).toBeTruthy()
     expect(screen.getByText(LLOverview.contactSupportCta())).toBeTruthy()
   })
@@ -597,14 +608,6 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
   })
 
-  it("shows the exchange rate only on the post-gate variant", async () => {
-    mockGateArmed = true
-    renderScreen()
-    await flushEffects()
-
-    expect(screen.getByText(/Current exchange rate/)).toBeTruthy()
-  })
-
   it("commits to the transfer when Approve is pressed", async () => {
     renderScreen()
     await flushEffects()
@@ -612,6 +615,38 @@ describe("MigrationBalancesOverviewScreen", () => {
     fireEvent.press(screen.getByText(LLOverview.approveCta()))
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationTransferringFunds")
+  })
+
+  /** The migration only ever moves bitcoin: a remaining dollar balance is emptied through the
+   *  in-app conversion first, so the commit never arms while dollars are present. */
+  it("blocks the start and offers the conversion while a dollar balance remains", async () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 5000 }),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("dollar-balance-modal-transfer")).toBeTruthy()
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+  })
+
+  it("sends the remaining dollars to the in-app conversion from the modal", async () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 5000 }),
+    )
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("dollar-balance-modal-transfer"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
+  })
+
+  it("shows no dollar-balance modal once the dollar balance is empty", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("dollar-balance-modal-transfer")).toBeNull()
   })
 
   it("swallows the hardware back at the commit point", async () => {
@@ -779,15 +814,6 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(screen.getByText("BTC 1000")).toBeTruthy()
     expect(screen.getByText("BTC 990")).toBeTruthy()
-  })
-
-  it("hides the exchange rate on the post-gate variant when conversion is unavailable", async () => {
-    mockGateArmed = true
-    mockConvertReady = false
-    renderScreen()
-    await flushEffects()
-
-    expect(screen.queryByText(/Current exchange rate/)).toBeNull()
   })
 
   /** The re-point is a precondition of the commit, so a settled failure hands over exactly

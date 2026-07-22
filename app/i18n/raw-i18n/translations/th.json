@@ -3596,7 +3596,6 @@
       "dollarBalanceNotAvailable": "ไม่พร้อมใช้งาน",
       "networkFee": "ค่าธรรมเนียมเครือข่าย: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "ค่าธรรมเนียมเครือข่าย: <bold>{fee: string}</bold> (Blink ออกให้)",
-      "exchangeRate": "อัตราแลกเปลี่ยนปัจจุบัน 1 BTC = {rate: string}",
       "retryCta": "ลองอีกครั้ง",
       "approveCta": "อนุมัติ",
       "contactSupportCta": "ติดต่อฝ่ายสนับสนุน"

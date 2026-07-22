@@ -11,14 +11,18 @@ type DollarBalanceMigrationModalProps = {
   toggleModal: () => void
   /** Runs the in-app dollar-to-bitcoin conversion: the modal's only action, since emptying
    *  the dollar balance is the one way forward and every affected user, restricted regions
-   *  included, can now do it here. The corner close still dismisses the modal. */
+   *  included, can now do it here. */
   onTransfer: () => void
+  /** Off where there is no way back but the conversion, e.g. the commit screen, so the only
+   *  exit is Transfer. */
+  showCloseIconButton?: boolean
 }
 
 export const DollarBalanceMigrationModal: React.FC<DollarBalanceMigrationModalProps> = ({
   isVisible,
   toggleModal,
   onTransfer,
+  showCloseIconButton = true,
 }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -37,7 +41,7 @@ export const DollarBalanceMigrationModal: React.FC<DollarBalanceMigrationModalPr
       }
       primaryButtonTitle={LL.common.transfer()}
       primaryButtonOnPress={onTransfer}
-      showCloseIconButton={true}
+      showCloseIconButton={showCloseIconButton}
     />
   )
 }

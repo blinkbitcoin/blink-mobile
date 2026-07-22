@@ -8,6 +8,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { DollarBalanceMigrationModal } from "@app/components/dollar-balance-migration-modal"
 import { IconHero } from "@app/components/icon-hero"
 import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
@@ -24,6 +25,7 @@ import {
 } from "@app/screens/account-migration/hooks"
 import { useCustodialOwnerId } from "@app/screens/account-migration/hooks/use-custodial-owner-id"
 import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/use-ensure-migration-started"
+import { armMigrationConversion } from "@app/screens/account-migration/hooks/use-migration-conversion"
 import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { useMigrationStatus } from "@app/screens/account-migration/hooks/use-migration-status"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
@@ -64,6 +66,14 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const { status: migrationStatus } = useMigrationStatus()
   const isMigrationFailed = migrationStatus === MigrationStatus.Failed
 
+  /** A remaining dollar balance goes to the in-app conversion first: the backend refuses a
+   *  non-empty USD wallet and never converts it, so it is emptied before the start arms. */
+  const hasDollarBalance = preview.hasDollarBalance
+  const goToDollarTransfer = useCallback(() => {
+    armMigrationConversion()
+    navigation.navigate("conversionDetails")
+  }, [navigation])
+
   /**
    * Landing here WITH figures declares the migration started server-side, which is what
    * makes this the point of no return: the lock then lives on the backend and survives a
@@ -72,7 +82,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    * business claiming the user consented to migrating it.
    */
   const migrationStart = useEnsureMigrationStarted({
-    skip: !preview.isReady || isMigrationFailed,
+    skip: !preview.isReady || isMigrationFailed || hasDollarBalance,
   })
 
   const { ownerId } = useCustodialOwnerId()
@@ -213,14 +223,6 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
               dollarValue={preview.newDollarBalance}
               isDollarValueMuted={preview.isNewDollarBalanceRestricted}
             />
-
-            {preview.exchangeRate ? (
-              <View style={styles.exchangeRateBox}>
-                <Text style={styles.exchangeRateText}>
-                  {LLOverview.exchangeRate({ rate: preview.exchangeRate })}
-                </Text>
-              </View>
-            ) : null}
           </ScrollView>
         ) : (
           <View style={styles.loadingContainer}>
@@ -262,6 +264,14 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
           />
         </View>
       </View>
+      {hasDollarBalance ? (
+        <DollarBalanceMigrationModal
+          isVisible={isFocused}
+          toggleModal={goToDollarTransfer}
+          onTransfer={goToDollarTransfer}
+          showCloseIconButton={false}
+        />
+      ) : null}
     </Screen>
   )
 }
@@ -305,21 +315,6 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey4,
     alignItems: "center",
     justifyContent: "center",
-  },
-  exchangeRateBox: {
-    width: "100%",
-    backgroundColor: colors.grey5,
-    borderLeftWidth: 2,
-    borderLeftColor: colors.black,
-    borderRadius: 6,
-    paddingLeft: 14,
-    paddingRight: 10,
-    paddingVertical: 10,
-  },
-  exchangeRateText: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: colors.black,
   },
   buttonsContainer: {
     gap: 10,

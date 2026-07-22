@@ -89,6 +89,23 @@ describe("DollarBalanceMigrationModal", () => {
     expect(toggleModal).toHaveBeenCalledTimes(1)
   })
 
+  /** On a screen whose only way forward is the conversion (the commit screen), the close is
+   *  suppressed so the modal cannot be dismissed into a dead end. */
+  it("hides the X icon when the close button is suppressed", () => {
+    const { queryByTestId } = render(
+      wrap(
+        <DollarBalanceMigrationModal
+          isVisible={true}
+          toggleModal={jest.fn()}
+          onTransfer={jest.fn()}
+          showCloseIconButton={false}
+        />,
+      ),
+    )
+
+    expect(queryByTestId("icon-close")).toBeNull()
+  })
+
   it("renders nothing when isVisible is false", () => {
     const { queryByText } = render(
       wrap(
