@@ -79,7 +79,7 @@ describe("getTransactionDescription", () => {
       tokenTicker: "USDB",
       direction: TransactionDirection.Send,
     })
-    expect(getTransactionDescription(tx, mockLL)).toBe("Transfer from USD")
+    expect(getTransactionDescription(tx, mockLL)).toBe("Transfer from USD balance")
   })
 
   it("returns transferToTokenBalance for receive conversion with token", () => {
