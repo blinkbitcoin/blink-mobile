@@ -8208,23 +8208,23 @@ type RootTranslation = {
 		 */
 		onchainWithdrawal: string
 		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​f​r​o​m​ ​B​i​t​c​o​i​n
+		 * T​r​a​n​s​f​e​r​ ​f​r​o​m​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e
 		 */
-		conversionFromBitcoin: string
+		transferFromBitcoinBalance: string
 		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​t​o​ ​B​i​t​c​o​i​n
+		 * T​r​a​n​s​f​e​r​ ​t​o​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e
 		 */
-		conversionToBitcoin: string
+		transferToBitcoinBalance: string
 		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​f​r​o​m​ ​{​t​o​k​e​n​}
+		 * T​r​a​n​s​f​e​r​ ​f​r​o​m​ ​{​t​o​k​e​n​}​ ​B​a​l​a​n​c​e
 		 * @param {string} token
 		 */
-		conversionFromToken: RequiredParams<'token'>
+		transferFromTokenBalance: RequiredParams<'token'>
 		/**
-		 * C​o​n​v​e​r​s​i​o​n​ ​t​o​ ​{​t​o​k​e​n​}
+		 * T​r​a​n​s​f​e​r​ ​t​o​ ​{​t​o​k​e​n​}​ ​B​a​l​a​n​c​e
 		 * @param {string} token
 		 */
-		conversionToToken: RequiredParams<'token'>
+		transferToTokenBalance: RequiredParams<'token'>
 		/**
 		 * {​t​o​k​e​n​}​ ​T​r​a​n​s​f​e​r
 		 * @param {string} token
@@ -20764,21 +20764,21 @@ export type TranslationFunctions = {
 		 */
 		onchainWithdrawal: () => LocalizedString
 		/**
-		 * Conversion from Bitcoin
+		 * Transfer from Bitcoin Balance
 		 */
-		conversionFromBitcoin: () => LocalizedString
+		transferFromBitcoinBalance: () => LocalizedString
 		/**
-		 * Conversion to Bitcoin
+		 * Transfer to Bitcoin Balance
 		 */
-		conversionToBitcoin: () => LocalizedString
+		transferToBitcoinBalance: () => LocalizedString
 		/**
-		 * Conversion from {token}
+		 * Transfer from {token} Balance
 		 */
-		conversionFromToken: (arg: { token: string }) => LocalizedString
+		transferFromTokenBalance: (arg: { token: string }) => LocalizedString
 		/**
-		 * Conversion to {token}
+		 * Transfer to {token} Balance
 		 */
-		conversionToToken: (arg: { token: string }) => LocalizedString
+		transferToTokenBalance: (arg: { token: string }) => LocalizedString
 		/**
 		 * {token} Transfer
 		 */
