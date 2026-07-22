@@ -1353,6 +1353,40 @@ describe("Migration conversion prefill", () => {
      *  sees the whole balance is the active selection. */
     expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(true)
   })
+
+  it("locks the amount controls to the full balance during a migration conversion", async () => {
+    armMigrationConversion()
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("convert-100%").props.accessibilityState?.disabled).toBe(false)
+      },
+      { timeout: 3000 },
+    )
+
+    expect(getByTestId("wallet-toggle-button").props.accessibilityState?.disabled).toBe(
+      true,
+    )
+    expect(getByTestId("convert-25%").props.accessibilityState?.disabled).toBe(true)
+    expect(getByTestId("convert-50%").props.accessibilityState?.disabled).toBe(true)
+    expect(getByTestId("convert-75%").props.accessibilityState?.disabled).toBe(true)
+    expect(getByTestId("Key 5").props.accessibilityState?.disabled).toBe(true)
+  })
 })
 
 describe("Navigation", () => {

@@ -70,8 +70,16 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
+const mockAmountInputScreenUI = jest.fn()
 jest.mock("@app/components/transfer-amount-input/amount-input-screen-ui", () => ({
-  AmountInputScreenUI: ({ errorMessage }: { errorMessage: string }) => {
+  AmountInputScreenUI: ({
+    errorMessage,
+    disabled,
+  }: {
+    errorMessage: string
+    disabled?: boolean
+  }) => {
+    mockAmountInputScreenUI({ errorMessage, disabled })
     const ReactNative = jest.requireActual("react-native")
     return (
       <ReactNative.View testID="amount-input-screen-ui">
@@ -140,6 +148,23 @@ describe("AmountInputScreen", () => {
 
     const errorElement = getByTestId("error-message")
     expect(errorElement.props.children).toBe("")
+  })
+
+  it("passes the disabled flag through to the UI", () => {
+    render(
+      <AmountInputScreen
+        inputValues={defaultInputValues}
+        onAmountChange={mockOnAmountChange}
+        convertMoneyAmount={mockConvertMoneyAmount}
+        onSetFormattedAmount={mockOnSetFormattedAmount}
+        focusedInput={null}
+        disabled
+      />,
+    )
+
+    expect(mockAmountInputScreenUI).toHaveBeenCalledWith(
+      expect.objectContaining({ disabled: true }),
+    )
   })
 
   it("propagates a fresh initialAmount even when focusedInput identity changes in the same render", () => {

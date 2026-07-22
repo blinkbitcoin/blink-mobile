@@ -39,7 +39,10 @@ import { useTransferBlockedGuard } from "@app/hooks/use-transfer-blocked-guard"
 import { useConsumeMigrationConversionArmed } from "@app/screens/account-migration/hooks/use-migration-conversion"
 import { resolveInitialConvertWallets } from "@app/screens/conversion-flow/migration-convert-wallets"
 import { CurrencyInput } from "@app/components/currency-input"
-import { PercentageSelector } from "@app/components/percentage-selector"
+import {
+  PercentageSelector,
+  PERCENTAGE_OPTIONS,
+} from "@app/components/percentage-selector"
 import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { useEqualPillWidth } from "@app/components/atomic/currency-pill/use-equal-pill-width"
@@ -609,6 +612,11 @@ const ConversionDetailsScreenContent = ({
     conversionGuard.hasQuoteError ||
     isSelfCustodialBooting
 
+  const isWalletToggleDisabled = !canToggleWallet || uiLocked || isMigrationConversion
+  const migrationLockedPercentages = isMigrationConversion
+    ? PERCENTAGE_OPTIONS.filter((percentage) => percentage !== FULL_BALANCE_PERCENTAGE)
+    : undefined
+
   const setAmountToBalancePercentage = (percentage: number) => {
     if (uiLocked) return
     applyBalancePercentage(percentage)
@@ -686,7 +694,7 @@ const ConversionDetailsScreenContent = ({
             />
             <WalletToggleButton
               loading={isRecalculating}
-              disabled={!canToggleWallet || uiLocked}
+              disabled={isWalletToggleDisabled}
               onPress={toggleInputs}
               containerStyle={styles.switchButton}
               testID="wallet-toggle-button"
@@ -786,6 +794,7 @@ const ConversionDetailsScreenContent = ({
           isLocked={isPercentageSelectorLocked}
           loadingPercent={loadingPercent}
           selectedPercent={selectedPercent}
+          disabledOptions={migrationLockedPercentages}
           onSelect={setAmountToBalancePercentage}
           testIdPrefix="convert"
           containerStyle={styles.percentageContainer}
@@ -797,6 +806,7 @@ const ConversionDetailsScreenContent = ({
         >
           <AmountInputScreen
             inputValues={inputValues}
+            disabled={isMigrationConversion}
             convertMoneyAmount={convertMoneyAmount}
             onAmountChange={handleSetMoneyAmount}
             onSetFormattedAmount={onSetFormattedValues}

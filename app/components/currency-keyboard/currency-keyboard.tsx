@@ -13,12 +13,14 @@ type CurrencyKeyboardProps = {
   onPress: (pressed: KeyType) => void
   safeMode?: boolean
   disabledKeys?: ReadonlySet<KeyType>
+  disabled?: boolean
 }
 
 export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
   onPress,
   safeMode = false,
   disabledKeys,
+  disabled = false,
 }) => {
   const styles = useStyles()
 
@@ -33,15 +35,18 @@ export const CurrencyKeyboard: React.FC<CurrencyKeyboardProps> = ({
     <View style={styles.keyboard}>
       {keyRows.map((row, rowIndex) => (
         <View key={`${KEY_ROW_PREFIX}${rowIndex}`} style={styles.keyRow}>
-          {row.map((key) => (
-            <Key
-              key={key}
-              numberPadKey={key}
-              handleKeyPress={onPress}
-              safeMode={safeMode}
-              disabled={disabledKeys?.has(key) ?? false}
-            />
-          ))}
+          {row.map((key) => {
+            const isKeyDisabled = disabled || (disabledKeys?.has(key) ?? false)
+            return (
+              <Key
+                key={key}
+                numberPadKey={key}
+                handleKeyPress={onPress}
+                safeMode={safeMode}
+                disabled={isKeyDisabled}
+              />
+            )
+          })}
         </View>
       ))}
     </View>

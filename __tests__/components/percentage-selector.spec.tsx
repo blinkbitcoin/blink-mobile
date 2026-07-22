@@ -171,4 +171,25 @@ describe("PercentageSelector", () => {
 
     expect(getByTestId("convert-100%").props.accessibilityState.selected).toBe(false)
   })
+
+  it("disables the chips in disabledOptions while the rest stay tappable", () => {
+    const { getByText, getByTestId } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        onSelect={mockOnSelect}
+        disabledOptions={[25, 50, 75]}
+        testIdPrefix="convert"
+      />,
+    )
+
+    expect(getByTestId("convert-25%").props.accessibilityState.disabled).toBe(true)
+    expect(getByTestId("convert-100%").props.accessibilityState.disabled).toBe(false)
+
+    fireEvent.press(getByText("25%"))
+    expect(mockOnSelect).not.toHaveBeenCalled()
+
+    fireEvent.press(getByText("100%"))
+    expect(mockOnSelect).toHaveBeenCalledWith(100)
+  })
 })

@@ -10,7 +10,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "@app/utils/testProps"
 
-const DEFAULT_OPTIONS = [25, 50, 75, 100] as const
+export const PERCENTAGE_OPTIONS = [25, 50, 75, 100] as const
 const DEFAULT_TEST_ID_PREFIX = "convert"
 
 export type PercentageSelectorProps = {
@@ -21,6 +21,7 @@ export type PercentageSelectorProps = {
   selectedPercent?: number | null
   onSelect: (percentage: number) => void
   options?: Readonly<number[]>
+  disabledOptions?: Readonly<number[]>
   testIdPrefix?: string
   containerStyle?: StyleProp<ViewStyle>
 }
@@ -31,6 +32,7 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
   selectedPercent,
   onSelect,
   options,
+  disabledOptions,
   testIdPrefix = DEFAULT_TEST_ID_PREFIX,
   containerStyle,
 }) => {
@@ -39,7 +41,7 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
   } = useTheme()
   const styles = useStyles()
   const opts = useMemo(
-    () => (options && options.length ? options : DEFAULT_OPTIONS),
+    () => (options && options.length ? options : PERCENTAGE_OPTIONS),
     [options],
   )
 
@@ -48,6 +50,7 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
       {opts.map((p) => {
         const loading = loadingPercent === p
         const isSelected = !loading && selectedPercent === p
+        const isDisabled = isLocked || (disabledOptions?.includes(p) ?? false)
         return (
           <TouchableOpacity
             key={p}
@@ -55,12 +58,12 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
             style={[
               styles.chip,
               isSelected && styles.chipSelected,
-              isLocked && styles.chipDisabled,
+              isDisabled && styles.chipDisabled,
             ]}
-            disabled={isLocked}
+            disabled={isDisabled}
             onPress={() => onSelect(p)}
             accessibilityLabel={testIdPrefix}
-            accessibilityState={{ selected: isSelected }}
+            accessibilityState={{ selected: isSelected, disabled: isDisabled }}
           >
             {loading ? (
               <ActivityIndicator color={colors.primary} />
