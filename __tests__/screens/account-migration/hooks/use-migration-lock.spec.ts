@@ -2,10 +2,11 @@ import { renderHook } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
+import { AccountType } from "@app/types/wallet"
 
 const mockUseMigrationStatus = jest.fn()
 
-let mockActiveAccountType: string | undefined = "custodial"
+let mockActiveAccountType: AccountType | undefined = AccountType.Custodial
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
   useMigrationStatus: (options: unknown) => mockUseMigrationStatus(options),
@@ -29,7 +30,7 @@ const serverReports = (
 describe("useMigrationLock", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockActiveAccountType = "custodial"
+    mockActiveAccountType = AccountType.Custodial
   })
 
   it("locks an account the server reports as in progress", () => {
@@ -96,7 +97,7 @@ describe("useMigrationLock", () => {
    * a device that has no account at all.
    */
   it("never locks a self-custodial session", () => {
-    mockActiveAccountType = "selfCustodial"
+    mockActiveAccountType = AccountType.SelfCustodial
     mockUseMigrationStatus.mockReturnValue(serverReports(MigrationStatus.InProgress))
 
     const { result } = renderHook(() => useMigrationLock())
@@ -116,7 +117,7 @@ describe("useMigrationLock", () => {
   /** Only a custodial account can be mid-migration, so a self-custodial launch must not
    *  pay for a no-cache status query whose result it discards. */
   it("does not query the phase for a non-custodial account", () => {
-    mockActiveAccountType = "selfCustodial"
+    mockActiveAccountType = AccountType.SelfCustodial
     mockUseMigrationStatus.mockReturnValue(serverReports(null))
 
     renderHook(() => useMigrationLock())
@@ -148,7 +149,7 @@ describe("useMigrationLock", () => {
 
   /** A session that can never be locked has nothing to wait for. */
   it("never waits on a self-custodial session", () => {
-    mockActiveAccountType = "selfCustodial"
+    mockActiveAccountType = AccountType.SelfCustodial
     mockUseMigrationStatus.mockReturnValue(serverReports(null, true))
 
     const { result } = renderHook(() => useMigrationLock())
@@ -174,7 +175,7 @@ describe("useMigrationLock", () => {
 
   /** A session that can never be locked has no lock read to fail. */
   it("never reports an error for a self-custodial session", () => {
-    mockActiveAccountType = "selfCustodial"
+    mockActiveAccountType = AccountType.SelfCustodial
     mockUseMigrationStatus.mockReturnValue(
       serverReports(null, false, new Error("offline")),
     )

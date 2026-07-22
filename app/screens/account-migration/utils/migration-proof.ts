@@ -2,6 +2,9 @@
  * The proof of possession the backend verifies before paying a migration out: it hashes
  * this exact string and checks the signature against the destination wallet's key, so any
  * drift here reads as a forged proof. Mirrors `buildMigrationProofChallenge` server-side.
+ * It binds neither the invoice nor a purpose tag, so one signature serves both migration
+ * mutations within the window; the payout stays safe because the backend ties it to the
+ * invoice whose key it checks against this same sparkPubkey.
  */
 export const buildMigrationProofChallenge = ({
   custodialAccountId,

@@ -26,7 +26,8 @@ export const createServerTimeLink = (): ApolloLink =>
 
 /** The backend rejects a proof more than ten minutes off its own clock, so matching that
  *  window (not a smaller one) keeps an unrelated rejection on a merely off clock from
- *  being mislabelled as a clock fault. */
+ *  being mislabelled as a clock fault. The reading carries a few seconds of network latency
+ *  and the Date header's one-second resolution, negligible against ten minutes and fail-safe. */
 const CLOCK_SKEW_LIMIT_MS = 10 * 60 * 1000
 
 export const isDeviceClockSkewed = (): boolean =>
