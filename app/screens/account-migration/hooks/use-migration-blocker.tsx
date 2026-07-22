@@ -1,3 +1,5 @@
+import React, { createContext, useContext } from "react"
+
 import { useMigrationLock } from "./use-migration-lock"
 import { useSelfCustodialDisabled } from "./use-self-custodial-disabled"
 import { useWindDownGateArmed } from "./use-wind-down-gate-armed"
@@ -5,6 +7,11 @@ import { useWindDownGateArmed } from "./use-wind-down-gate-armed"
 type MigrationBlocker = {
   isVisible: boolean
 }
+
+/** One shared answer for the two consumers (the container wrapper's deeplink reset and the
+ *  primary navigator's gate): separate no-cache reads could disagree and leave a deeplinked
+ *  screen operating over a locked account. */
+const MigrationBlockerContext = createContext<MigrationBlocker>({ isVisible: false })
 
 /**
  * Decides the forced root blocker, from two independent server signals. The armed gate
@@ -17,7 +24,7 @@ type MigrationBlocker = {
  * turned off there is no target to push anyone toward, and a locked user cannot finish a
  * migration whose destination is gone.
  */
-export const useMigrationBlocker = (): MigrationBlocker => {
+const useComputeMigrationBlocker = (): MigrationBlocker => {
   const isSelfCustodialDisabled = useSelfCustodialDisabled()
   const isGateArmed = useWindDownGateArmed()
 
@@ -31,3 +38,18 @@ export const useMigrationBlocker = (): MigrationBlocker => {
   const isBlocking = isGateArmed || isLocked
   return { isVisible: isBlocking }
 }
+
+/** Reads the blocker signals once and shares them, so the two consumers never disagree. */
+export const MigrationBlockerProvider: React.FC<React.PropsWithChildren> = ({
+  children,
+}) => {
+  const blocker = useComputeMigrationBlocker()
+  return (
+    <MigrationBlockerContext.Provider value={blocker}>
+      {children}
+    </MigrationBlockerContext.Provider>
+  )
+}
+
+export const useMigrationBlocker = (): MigrationBlocker =>
+  useContext(MigrationBlockerContext)
