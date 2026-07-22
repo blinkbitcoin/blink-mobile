@@ -87,6 +87,7 @@ const mockLnRetry = jest.fn()
 let mockLnAddressTransfer = {
   isTransferred: true,
   isRejected: false,
+  isAccountMissing: false,
   hasConnectionIssue: false,
   retry: mockLnRetry,
 }
@@ -164,6 +165,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     mockLnAddressTransfer = {
       isTransferred: true,
       isRejected: false,
+      isAccountMissing: false,
       hasConnectionIssue: false,
       retry: mockLnRetry,
     }
@@ -778,6 +780,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     mockLnAddressTransfer = {
       isTransferred: false,
       isRejected: true,
+      isAccountMissing: false,
       hasConnectionIssue: false,
       retry: mockLnRetry,
     }
@@ -786,6 +789,25 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "ln-address-transfer-failed",
+      origin: "commit",
+    })
+  })
+
+  /** A re-point that failed for a missing device key is the same cause the commit reports,
+   *  so support gets that reason, not the generic re-point failure. */
+  it("names a missing device key on the re-point as account-missing", async () => {
+    mockLnAddressTransfer = {
+      isTransferred: false,
+      isRejected: false,
+      isAccountMissing: true,
+      hasConnectionIssue: false,
+      retry: mockLnRetry,
+    }
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "self-custodial-account-missing",
       origin: "commit",
     })
   })
@@ -808,6 +830,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     mockLnAddressTransfer = {
       isTransferred: false,
       isRejected: true,
+      isAccountMissing: false,
       hasConnectionIssue: false,
       retry: mockLnRetry,
     }
@@ -825,6 +848,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     mockLnAddressTransfer = {
       isTransferred: false,
       isRejected: false,
+      isAccountMissing: false,
       hasConnectionIssue: false,
       retry: mockLnRetry,
     }
@@ -852,6 +876,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     mockLnAddressTransfer = {
       isTransferred: false,
       isRejected: false,
+      isAccountMissing: false,
       hasConnectionIssue: true,
       retry: mockLnRetry,
     }

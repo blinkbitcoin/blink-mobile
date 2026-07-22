@@ -45,16 +45,21 @@ type UseMigrationLnAddressTransferArgs = {
 type UseMigrationLnAddressTransfer = {
   isTransferred: boolean
   isRejected: boolean
+  /** No device key for the account (reinstall); distinct so the screen reuses the commit reason. */
+  isAccountMissing: boolean
   hasConnectionIssue: boolean
   retry: () => void
 }
 
 /** transferred = every identifier settled (moved, already moved, or nothing to move);
  *  connection-issue = the network never delivered the mutation, so a retry can still land;
- *  rejected = a settled failure that a retry only replays, so support takes over. */
+ *  account-missing = the device has no key for the account (a reinstall), the same cause the
+ *  commit reports; rejected = any other settled failure a retry only replays, so support
+ *  takes over. */
 const LnAddressOutcome = {
   Transferred: "transferred",
   ConnectionIssue: "connection-issue",
+  AccountMissing: "account-missing",
   Rejected: "rejected",
 } as const
 
@@ -79,6 +84,7 @@ export const useMigrationLnAddressTransfer = ({
 
   const [isTransferred, setIsTransferred] = useState(false)
   const [isRejected, setIsRejected] = useState(false)
+  const [isAccountMissing, setIsAccountMissing] = useState(false)
   const [hasConnectionIssue, setHasConnectionIssue] = useState(false)
   const [attempt, setAttempt] = useState(0)
 
@@ -87,14 +93,14 @@ export const useMigrationLnAddressTransfer = ({
    *  or turn a failure into a loop. */
   const firedAttemptRef = useRef(-1)
 
-  /** Only an unsettled connection issue retries: a settled rejection would replay the same
-   *  answer, and a completed transfer would re-run the expensive connect-and-sign for
-   *  nothing (the shared retry fires for any of the screen's sources). */
+  /** Only an unsettled connection issue retries: a settled rejection or a missing device key
+   *  would replay the same answer, and a completed transfer would re-run the expensive
+   *  connect-and-sign for nothing (the shared retry fires for any of the screen's sources). */
   const retry = useCallback(() => {
-    if (isRejected || isTransferred) return
+    if (isRejected || isTransferred || isAccountMissing) return
     setHasConnectionIssue(false)
     setAttempt((previous) => previous + 1)
-  }, [isRejected, isTransferred])
+  }, [isRejected, isTransferred, isAccountMissing])
 
   const run = useCallback(
     async (custodialId: string, selfCustodialId: string): Promise<LnAddressOutcome> => {
@@ -116,13 +122,17 @@ export const useMigrationLnAddressTransfer = ({
       if (proof.status === MigrationSdkStatus.ConnectionError)
         return LnAddressOutcome.ConnectionIssue
 
-      if (proof.status !== MigrationSdkStatus.Ok) {
+      /** No device key (reinstall): hand over as account-missing, like the commit path. */
+      if (proof.status === MigrationSdkStatus.NoMnemonic) {
         reportError(
-          "Migration ln-address proof",
-          proof.status === MigrationSdkStatus.Failed
-            ? proof.error
-            : new Error(proof.status),
+          "Migration ln-address account missing",
+          new Error("No mnemonic for the provisioned account"),
         )
+        return LnAddressOutcome.AccountMissing
+      }
+
+      if (proof.status !== MigrationSdkStatus.Ok) {
+        reportError("Migration ln-address proof", proof.error)
         return LnAddressOutcome.Rejected
       }
 
@@ -187,6 +197,7 @@ export const useMigrationLnAddressTransfer = ({
       if (!isActive) return
       if (outcome === LnAddressOutcome.Transferred) setIsTransferred(true)
       else if (outcome === LnAddressOutcome.ConnectionIssue) setHasConnectionIssue(true)
+      else if (outcome === LnAddressOutcome.AccountMissing) setIsAccountMissing(true)
       else setIsRejected(true)
     })
 
@@ -195,5 +206,5 @@ export const useMigrationLnAddressTransfer = ({
     }
   }, [skip, attempt, custodialAccountId, selfCustodialAccountId, run])
 
-  return { isTransferred, isRejected, hasConnectionIssue, retry }
+  return { isTransferred, isRejected, isAccountMissing, hasConnectionIssue, retry }
 }

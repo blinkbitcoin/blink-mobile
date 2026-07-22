@@ -168,17 +168,31 @@ describe("useMigrationLnAddressTransfer", () => {
     )
   })
 
-  it("hands a proof with no mnemonic to support without calling the mutation", async () => {
+  it("hands a missing device key to support as account-missing, without the mutation", async () => {
     mockBuildProof.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
+    expect(result.current.isAccountMissing).toBe(true)
+    expect(result.current.isRejected).toBe(false)
     expect(mockTransfer).not.toHaveBeenCalled()
     expect(mockReportError).toHaveBeenCalledWith(
-      "Migration ln-address proof",
+      "Migration ln-address account missing",
       expect.any(Error),
     )
+  })
+
+  /** A missing device key is terminal: a retry would only replay the same answer. */
+  it("does not retry after a missing device key", async () => {
+    mockBuildProof.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.isAccountMissing).toBe(true)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockBuildProof).toHaveBeenCalledTimes(1)
   })
 
   it("hands a failed proof to support", async () => {

@@ -101,9 +101,14 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const startFailureReason = migrationStart.isRejected
     ? MigrationSupportReason.StartRefused
     : null
-  const lnAddressFailureReason = lnAddressTransfer.isRejected
+  /** A missing device key is the same cause the commit reports; anything else is generic. */
+  const lnAddressMissingReason = lnAddressTransfer.isAccountMissing
+    ? MigrationSupportReason.SelfCustodialAccountMissing
+    : null
+  const lnAddressRejectedReason = lnAddressTransfer.isRejected
     ? MigrationSupportReason.LnAddressTransferFailed
     : null
+  const lnAddressFailureReason = lnAddressMissingReason ?? lnAddressRejectedReason
   const handoverReason =
     startFailureReason ?? lnAddressFailureReason ?? preview.unavailableReason
 
