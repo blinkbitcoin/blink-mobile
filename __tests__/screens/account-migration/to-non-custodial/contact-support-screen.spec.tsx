@@ -5,7 +5,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationContactSupportScreen } from "@app/screens/account-migration/to-non-custodial/contact-support-screen"
-import { MigrationSupportReason } from "@app/types/migration"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { ContextForScreen } from "../../helper"
 import { flushEffects } from "../../../helpers/flush-effects"
 
@@ -28,10 +28,14 @@ let mockReason: MigrationSupportReason = MigrationSupportReason.PreviewUnavailab
 let mockHasParams = true
 
 const mockNavigate = jest.fn()
+const mockGoBack = jest.fn()
+let mockOrigin: MigrationSupportOrigin | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
-  useRoute: () => ({ params: mockHasParams ? { reason: mockReason } : undefined }),
+  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useRoute: () => ({
+    params: mockHasParams ? { reason: mockReason, origin: mockOrigin } : undefined,
+  }),
   useFocusEffect: (callback: () => void | (() => void)) =>
     jest.requireActual<typeof import("react")>("react").useEffect(callback, [callback]),
 }))
@@ -80,6 +84,7 @@ describe("MigrationContactSupportScreen", () => {
     loadLocale("en")
     mockReason = MigrationSupportReason.PreviewUnavailable
     mockHasParams = true
+    mockOrigin = undefined
     mockDetails = {
       accountId: "18A4242",
       pubKey: "spbc1pdjsovJFPej9i2vuK",
@@ -109,6 +114,34 @@ describe("MigrationContactSupportScreen", () => {
     fireEvent.press(screen.getByText(LL.common.back()))
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
+  /** From the resume handover there is no commit screen underneath, so Back dismisses rather
+   *  than pushing a fresh one that would re-arm a completed migration and overwrite the reason. */
+  it("dismisses the hardware back when opened from the resume handover", async () => {
+    mockOrigin = MigrationSupportOrigin.Resume
+    const { BackHandler } =
+      jest.requireActual<typeof import("react-native")>("react-native")
+    const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
+    renderScreen()
+    await flushEffects()
+
+    const handler = addListenerSpy.mock.calls[0][1] as () => boolean
+
+    expect(handler()).toBe(true)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
+  it("dismisses the visible Back button when opened from the resume handover", async () => {
+    mockOrigin = MigrationSupportOrigin.Resume
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.common.back()))
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
   it("renders the hero, every diagnostics row and the contact action", async () => {

@@ -292,6 +292,7 @@ describe("MigrationBalancesOverviewScreen", () => {
     )
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "preview-unavailable",
+      origin: "commit",
     })
   })
 
@@ -396,6 +397,7 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "start-refused",
+      origin: "commit",
     })
   })
 
@@ -406,6 +408,7 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "preview-unavailable",
+      origin: "commit",
     })
   })
 
@@ -493,6 +496,7 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "preview-unavailable",
+      origin: "commit",
     })
   })
 
@@ -769,6 +773,7 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "ln-address-transfer-failed",
+      origin: "commit",
     })
   })
 
@@ -798,6 +803,7 @@ describe("MigrationBalancesOverviewScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "start-refused",
+      origin: "commit",
     })
   })
 

@@ -154,6 +154,7 @@ describe("useResumeCompletedMigration", () => {
     )
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "self-custodial-account-not-on-device",
+      origin: "resume",
     })
   })
 

@@ -220,6 +220,7 @@ describe("MigrationTransferringFundsScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "self-custodial-account-missing",
+      origin: "commit",
     })
     expect(jest.mocked(reportError)).toHaveBeenCalledWith(
       "Migration transfer without provisioned account",
@@ -236,6 +237,7 @@ describe("MigrationTransferringFundsScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "transfer-failed",
+      origin: "commit",
     })
   })
 
@@ -247,6 +249,7 @@ describe("MigrationTransferringFundsScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "self-custodial-account-missing",
+      origin: "commit",
     })
     expect(mockNavigate).not.toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
@@ -266,6 +269,7 @@ describe("MigrationTransferringFundsScreen", () => {
     )
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: "transfer-failed",
+      origin: "commit",
     })
   })
 
