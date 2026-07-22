@@ -30,7 +30,8 @@ import { testProps } from "@app/utils/testProps"
 
 /**
  * The migration commit screen: the current and resulting balances plus the network fee,
- * rendered from the preview model, with Approve as the point of no return.
+ * rendered from the preview model. Landing here (not Approve) is the point of no return: it
+ * declares the migration started; Approve then commits the transfer on the next screen.
  */
 export const MigrationBalancesOverviewScreen: React.FC = () => {
   const { LL } = useI18nContext()
