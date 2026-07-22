@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { gql } from "@apollo/client"
 
@@ -209,7 +209,7 @@ export const useMigrationTransfer = ({
         },
       })
 
-      const [rejection] = data?.migrationCommit.errors ?? []
+      const [rejection] = data?.migrationCommit?.errors ?? []
       if (!rejection) return
 
       /** A skewed clock makes the proof stale, which the backend rejects under the
@@ -263,7 +263,7 @@ export const useMigrationTransfer = ({
    *  network may have landed, so after a connection issue the phase is re-read first: if it
    *  advanced past IN_PROGRESS, watch rather than send a second invoice refused as a state
    *  conflict. */
-  const retry = useCallback(async () => {
+  const runRetry = useCallback(async () => {
     setIsClockOutOfSync(false)
 
     if (hasConnectionIssue) {
@@ -285,6 +285,16 @@ export const useMigrationTransfer = ({
     if (custodialAccountId) accountsWithCommitStarted.delete(custodialAccountId)
     setHasConnectionIssue(false)
   }, [custodialAccountId, hasConnectionIssue, refetchStatus])
+
+  /** One retry at a time so a double-tap cannot clear the commit guard mid-flight. */
+  const isRetryingRef = useRef(false)
+  const retry = useCallback(async () => {
+    if (isRetryingRef.current) return
+    isRetryingRef.current = true
+    await runRetry().finally(() => {
+      isRetryingRef.current = false
+    })
+  }, [runRetry])
 
   /** A recoverable issue and support are mutually exclusive: while the user has a retry, a
    *  server failure on the same render must not also route to support. */

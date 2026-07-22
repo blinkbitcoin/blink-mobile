@@ -39,7 +39,10 @@ describe("useCustodialOwnerId", () => {
 
     expect(result.current.ownerId).toBe("galoy-account-1")
     expect(result.current.loading).toBe(false)
-    expect(mockUseMigrationOwnerQuery).toHaveBeenCalledWith({ skip: false })
+    expect(mockUseMigrationOwnerQuery).toHaveBeenCalledWith({
+      skip: false,
+      fetchPolicy: "no-cache",
+    })
   })
 
   it("stays loading while the custodial owner query is in flight", () => {
@@ -67,7 +70,10 @@ describe("useCustodialOwnerId", () => {
 
     expect(result.current.ownerId).toBeNull()
     expect(result.current.loading).toBe(false)
-    expect(mockUseMigrationOwnerQuery).toHaveBeenCalledWith({ skip: true })
+    expect(mockUseMigrationOwnerQuery).toHaveBeenCalledWith({
+      skip: true,
+      fetchPolicy: "no-cache",
+    })
   })
 
   it("skips the query until the session is authenticated", () => {
@@ -75,6 +81,9 @@ describe("useCustodialOwnerId", () => {
 
     renderHook(() => useCustodialOwnerId())
 
-    expect(mockUseMigrationOwnerQuery).toHaveBeenCalledWith({ skip: true })
+    expect(mockUseMigrationOwnerQuery).toHaveBeenCalledWith({
+      skip: true,
+      fetchPolicy: "no-cache",
+    })
   })
 })
