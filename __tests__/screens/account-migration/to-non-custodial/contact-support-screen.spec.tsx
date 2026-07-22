@@ -80,8 +80,14 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", ()
   useMigrationSupportEmail: (reason: string) => mockUseMigrationSupportEmail(reason),
 }))
 
-const mockUseMigrationSupportEmail = jest.fn((_reason: string) => ({
-  diagnostics: mockBuildDiagnostics(),
+const MOCK_SUPPORT_DETAILS_TEXT = "reason and identity and environment block"
+
+const mockUseMigrationSupportEmail = jest.fn((reason: string) => ({
+  cardDetails: [
+    { label: LLSupport.reasonLabel(), value: reason, isIdentifier: false },
+    ...mockBuildDiagnostics(),
+  ],
+  supportDetailsText: MOCK_SUPPORT_DETAILS_TEXT,
   sendSupportEmail: mockSendSupportEmail,
 }))
 
@@ -170,6 +176,8 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.getByTestId("icon-headset")).toBeTruthy()
     expect(screen.getByText(LLSupport.title())).toBeTruthy()
     expect(screen.getByText(LLSupport.body())).toBeTruthy()
+    expect(screen.getByText(LLSupport.reasonLabel())).toBeTruthy()
+    expect(screen.getByText("preview-unavailable")).toBeTruthy()
     expect(screen.getByText(LLSupport.accountIdLabel())).toBeTruthy()
     expect(screen.getByText("18A4242")).toBeTruthy()
     expect(screen.getByText(LLSupport.pubKeyLabel())).toBeTruthy()
@@ -219,15 +227,15 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("start-refused")
   })
 
-  /** The screen shows identity for the user to copy; the reason is a code for support
-   *  and travels in the email body instead. */
-  it("keeps the reason code off the screen", async () => {
+  /** Lukas's rule: the error screen is the support channel, so what failed is on the screen,
+   *  the reason code included, not just in the email. */
+  it("shows the reason code on the screen", async () => {
     mockReason = MigrationSupportReason.SelfCustodialAccountMissing
     renderScreen()
     await flushEffects()
 
-    expect(screen.queryByText(LLSupport.reasonLabel())).toBeNull()
-    expect(screen.queryByText("self-custodial-account-missing")).toBeNull()
+    expect(screen.getByText(LLSupport.reasonLabel())).toBeTruthy()
+    expect(screen.getByText("self-custodial-account-missing")).toBeTruthy()
   })
 
   /** A navigation-state restore can land here with no params; a named fallback keeps the
@@ -260,18 +268,16 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockCopyToClipboard).toHaveBeenCalledWith({ content: mockSupportEmail })
   })
 
-  /** The copy control puts the whole diagnostics block on the clipboard as `label: value`
-   *  lines, so a user can paste it into their own message to support. */
-  it("copies the whole diagnostics block to the clipboard", async () => {
+  /** The copy control puts the full support block (what the email sends) on the clipboard,
+   *  so a user can paste it into their own message to support. */
+  it("copies the full support block to the clipboard", async () => {
     renderScreen()
     await flushEffects()
 
-    const expectedDetails = mockBuildDiagnostics()
-      .map(({ label, value }) => `${label}: ${value}`)
-      .join("\n")
-
     fireEvent.press(screen.getByText(LLSupport.copy()))
 
-    expect(mockCopyToClipboard).toHaveBeenCalledWith({ content: expectedDetails })
+    expect(mockCopyToClipboard).toHaveBeenCalledWith({
+      content: MOCK_SUPPORT_DETAILS_TEXT,
+    })
   })
 })

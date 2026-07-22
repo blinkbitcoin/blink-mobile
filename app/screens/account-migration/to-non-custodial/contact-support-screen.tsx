@@ -24,9 +24,10 @@ import { testProps } from "@app/utils/testProps"
 
 /**
  * The migration failure and help screen: funds are safe, but the transfer needs support
- * assistance. It shows the diagnostics support needs (custodial account identity plus the
- * provisioned wallet's pubkey) and pre-fills them, with the app version, into the support
- * email. The support address doubles as a copy control: tapping it puts the address on the
+ * assistance. It shows what failed and the account identity (custodial id plus the
+ * provisioned wallet's pubkey) so a screenshot alone can open a ticket, and pre-fills the
+ * full block, with the platform and app version, into the support email and the copy
+ * control. The support address doubles as a copy control: tapping it puts the address on the
  * clipboard, for a user whose mail app the Contact us button cannot open. The header back
  * control and the hardware back return to the commit point (Step 8) when support was opened
  * mid-migration, or dismiss the screen when it was opened by the completed-migration resume
@@ -48,7 +49,8 @@ export const MigrationContactSupportScreen: React.FC = () => {
   /** Callers must pass a reason, but a navigation-state restore can land here with none;
    *  a named fallback keeps the ticket meaningful instead of crashing on a missing param. */
   const reason = params?.reason ?? MigrationSupportReason.Unknown
-  const { diagnostics, sendSupportEmail } = useMigrationSupportEmail(reason)
+  const { cardDetails, supportDetailsText, sendSupportEmail } =
+    useMigrationSupportEmail(reason)
 
   /**
    * Back depends on where support was opened from. Mid-migration the commit point (Step 8)
@@ -94,12 +96,11 @@ export const MigrationContactSupportScreen: React.FC = () => {
     copyToClipboard({ content: supportEmailAddress })
   }, [copyToClipboard, supportEmailAddress])
 
-  /** Copies the whole diagnostics block as `label: value` lines, so a user can paste it into
-   *  their own message to support instead of transcribing each identifier by hand. */
-  const copyDiagnostics = useCallback(() => {
-    const details = diagnostics.map(({ label, value }) => `${label}: ${value}`).join("\n")
-    copyToClipboard({ content: details })
-  }, [copyToClipboard, diagnostics])
+  /** Copies the full support block the email sends, so a user whose mail app the Contact us
+   *  button cannot open can paste it into their own message. */
+  const copyDetails = useCallback(() => {
+    copyToClipboard({ content: supportDetailsText })
+  }, [copyToClipboard, supportDetailsText])
 
   return (
     <Screen preset="fixed">
@@ -113,7 +114,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
 
         <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
           <View style={styles.card}>
-            {diagnostics.map((diagnostic) => {
+            {cardDetails.map((diagnostic) => {
               /** Identifiers (account id, pubkey) keep the larger value font; the rest use
                *  the smaller one. Every value renders complete, wrapping as needed, because
                *  support needs the whole string, never a truncated one. */
@@ -132,7 +133,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
           <IconTextButton
             icon="copy-paste"
             label={LLSupport.copy()}
-            onPress={copyDiagnostics}
+            onPress={copyDetails}
           />
         </ScrollView>
 
