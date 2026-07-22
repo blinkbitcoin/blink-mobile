@@ -23,7 +23,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button, Text, makeStyles } from "@rn-vui/themed"
 
-import { Screen } from "../../components/screen"
+import { Screen } from "@app/components/screen"
 import { usePriceConversion, useSaveSessionProfile } from "@app/hooks"
 import useLogout from "../../hooks/use-logout"
 import { addDeviceToken } from "../../utils/notifications"
