@@ -2319,7 +2319,7 @@
     "sdkGenericError": "ไม่สามารถประมาณค่าธรรมเนียมได้ กรุณาลองจำนวนอื่น"
   },
   "SettingsScreen": {
-    "createAddress": "สร้างแอดเดรส",
+    "setReceiveAddress": "ตั้งค่าแอดเดรสรับเงิน",
     "donationButton": "ปุ่มบริจาค",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

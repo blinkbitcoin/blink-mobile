@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb."
   },
   "SettingsScreen": {
-    "createAddress": "Opret adresse",
+    "setReceiveAddress": "Angiv modtageradresse",
     "donationButton": "Donationsknap",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

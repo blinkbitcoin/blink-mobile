@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Kan nie fooie skat nie. Probeer asseblief 'n ander bedrag."
   },
   "SettingsScreen": {
-    "createAddress": "Skep adres",
+    "setReceiveAddress": "Stel ontvangadres in",
     "donationButton": "Skenkingsknoppie",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

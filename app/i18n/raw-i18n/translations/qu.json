@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway."
   },
   "SettingsScreen": {
-    "createAddress": "Tinkunata ruray",
+    "setReceiveAddress": "Tinkunata churay",
     "donationButton": "Qaray ñit'ana",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

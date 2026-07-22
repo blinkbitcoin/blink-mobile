@@ -7528,9 +7528,9 @@ type RootTranslation = {
 		 */
 		posCopied: string
 		/**
-		 * C​r​e​a​t​e​ ​a​d​d​r​e​s​s
+		 * S​e​t​ ​r​e​c​e​i​v​e​ ​a​d​d​r​e​s​s
 		 */
-		createAddress: string
+		setReceiveAddress: string
 		/**
 		 * D​o​n​a​t​i​o​n​ ​B​u​t​t​o​n
 		 */
@@ -20094,9 +20094,9 @@ export type TranslationFunctions = {
 		 */
 		posCopied: () => LocalizedString
 		/**
-		 * Create address
+		 * Set receive address
 		 */
-		createAddress: () => LocalizedString
+		setReceiveAddress: () => LocalizedString
 		/**
 		 * Donation Button
 		 */

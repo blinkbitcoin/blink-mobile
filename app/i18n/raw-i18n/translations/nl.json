@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Kan kosten niet schatten. Probeer een ander bedrag."
   },
   "SettingsScreen": {
-    "createAddress": "Adres aanmaken",
+    "setReceiveAddress": "Ontvangstadres instellen",
     "donationButton": "Donatieknop",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác."
   },
   "SettingsScreen": {
-    "createAddress": "Tạo địa chỉ",
+    "setReceiveAddress": "Đặt địa chỉ nhận",
     "donationButton": "Nút quyên góp",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

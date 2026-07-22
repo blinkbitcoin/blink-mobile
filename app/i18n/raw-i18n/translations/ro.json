@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită."
   },
   "SettingsScreen": {
-    "createAddress": "Creează adresă",
+    "setReceiveAddress": "Setează adresa",
     "donationButton": "Buton de donație",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

@@ -2319,7 +2319,7 @@
         "sdkGenericError": "手数料を見積もれません。別の金額をお試しください。"
     },
     "SettingsScreen": {
-        "createAddress": "アドレスを作成",
+        "setReceiveAddress": "受取アドレスを設定",
         "donationButton": "寄付ボタン",
         "btcpayServer": "BTCPay Server",
         "woocommerce": "WooCommerce",

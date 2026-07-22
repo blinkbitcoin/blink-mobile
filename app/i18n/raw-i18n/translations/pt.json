@@ -2319,7 +2319,7 @@
         "sdkGenericError": "Não foi possível estimar as taxas. Tente um valor diferente."
     },
     "SettingsScreen": {
-        "createAddress": "Criar endereço",
+        "setReceiveAddress": "Definir endereço",
         "donationButton": "Botão de doação",
         "btcpayServer": "BTCPay Server",
         "woocommerce": "WooCommerce",
