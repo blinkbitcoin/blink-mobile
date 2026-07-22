@@ -46,6 +46,7 @@ const CustodialTransferBlockedCountriesKey = "custodialTransferBlockedCountries"
 const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
 const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
+const FeeRatesConfigKey = "feeRatesConfig"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -54,6 +55,15 @@ type DeliveryOptionConfig = {
 }
 
 type ReplaceCardDeliveryConfig = Record<string, DeliveryOptionConfig>
+
+export type FeeRatesConfig = {
+  lightningSendBps: number
+  lightningRoutingBps: number
+  onchainPriorityBps: number
+  onchainStandardBps: number
+  onchainEconomyBps: number
+  transferBps: number
+}
 
 type FeatureFlags = {
   deviceAccountEnabled: boolean
@@ -96,11 +106,21 @@ type RemoteConfig = {
   [CustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
+  [FeeRatesConfigKey]: FeeRatesConfig
 }
 
 const defaultReplaceCardDeliveryConfig = {
   standard: { minDays: 7, maxDays: 10, priceUsd: 0 },
   express: { minDays: 1, maxDays: 2, priceUsd: 15 },
+}
+
+export const defaultFeeRatesConfig: FeeRatesConfig = {
+  lightningSendBps: 20,
+  lightningRoutingBps: 10,
+  onchainPriorityBps: 90,
+  onchainStandardBps: 60,
+  onchainEconomyBps: 40,
+  transferBps: 35,
 }
 
 /** Default transfer/swap block, read by both account types. */
@@ -169,6 +189,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   custodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialDepositClaimLeewayVbyte: 1,
+  feeRatesConfig: defaultFeeRatesConfig,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -204,6 +225,7 @@ remoteConfigInstance().setDefaults({
   selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.selfCustodialCreationBlockedCountries,
   ),
+  feeRatesConfig: serializeRemoteConfigDefault(defaultFeeRatesConfig),
 })
 
 remoteConfigInstance().setConfigSettings({
@@ -376,6 +398,16 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
           .asNumber()
 
+        const parsedFeeRatesConfig = getRemoteConfigObject<Partial<FeeRatesConfig>>(
+          FeeRatesConfigKey,
+          {},
+        )
+
+        const feeRatesConfig: FeeRatesConfig = {
+          ...defaultFeeRatesConfig,
+          ...parsedFeeRatesConfig,
+        }
+
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
@@ -410,6 +442,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           custodialCreationBlockedCountries,
           selfCustodialCreationBlockedCountries,
           selfCustodialDepositClaimLeewayVbyte,
+          feeRatesConfig,
         })
       } catch (err) {
         logError({

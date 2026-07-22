@@ -45,6 +45,7 @@ import { DefaultWalletScreen } from "@app/screens/settings-screen/default-wallet
 import { DisplayCurrencyScreen } from "@app/screens/settings-screen/display-currency-screen"
 import { NotificationSettingsScreen } from "@app/screens/settings-screen/notifications-screen"
 import { ThemeScreen } from "@app/screens/settings-screen/theme-screen"
+import { FeeRatesScreen } from "@app/screens/settings-screen/fee-rates-screen"
 import { TransactionLimitsScreen } from "@app/screens/settings-screen/transaction-limits-screen"
 import {
   TotpLoginValidateScreen,
@@ -533,6 +534,13 @@ export const RootStack = () => {
         component={TransactionLimitsScreen}
         options={{
           title: LL.common.transactionLimits(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="feeRatesScreen"
+        component={FeeRatesScreen}
+        options={{
+          title: LL.FeeRatesScreen.title(),
         }}
       />
       <RootNavigator.Screen

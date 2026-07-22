@@ -8275,6 +8275,86 @@ type RootTranslation = {
 		 */
 		momentarily: string
 	}
+	FeeRatesScreen: {
+		/**
+		 * F​e​e​ ​r​a​t​e​s
+		 */
+		title: string
+		/**
+		 * S​e​n​d
+		 */
+		send: string
+		/**
+		 * R​e​c​e​i​v​e
+		 */
+		receive: string
+		/**
+		 * T​r​a​n​s​f​e​r
+		 */
+		transfer: string
+		/**
+		 * L​i​g​h​t​n​i​n​g
+		 */
+		lightning: string
+		/**
+		 * I​n​t​r​a​l​e​d​g​e​r
+		 */
+		intraledger: string
+		/**
+		 * O​n​c​h​a​i​n​ ​p​r​i​o​r​i​t​y​ ​(​a​s​a​p​)
+		 */
+		onchainPriority: string
+		/**
+		 * O​n​c​h​a​i​n​ ​s​t​a​n​d​a​r​d​ ​(​~​4​h​)
+		 */
+		onchainStandard: string
+		/**
+		 * O​n​c​h​a​i​n​ ​e​c​o​n​o​m​y
+		 */
+		onchainEconomy: string
+		/**
+		 * L​i​g​h​t​n​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​s
+		 */
+		lightningTransactions: string
+		/**
+		 * O​n​c​h​a​i​n​ ​b​e​l​o​w​ ​{​t​h​r​e​s​h​o​l​d​}​ ​S​A​T
+		 * @param {string} threshold
+		 */
+		onchainBelowThreshold: RequiredParams<'threshold'>
+		/**
+		 * O​n​c​h​a​i​n​ ​a​b​o​v​e​ ​{​t​h​r​e​s​h​o​l​d​}​ ​S​A​T
+		 * @param {string} threshold
+		 */
+		onchainAboveThreshold: RequiredParams<'threshold'>
+		/**
+		 * T​r​a​n​s​f​e​r​ ​f​e​e
+		 */
+		transferFee: string
+		/**
+		 * n​o​ ​f​e​e
+		 */
+		noFee: string
+		/**
+		 * {​f​e​e​}​ ​+​ ​~​{​r​o​u​t​i​n​g​F​e​e​}​ ​r​o​u​t​i​n​g​ ​f​e​e
+		 * @param {string} fee
+		 * @param {string} routingFee
+		 */
+		lightningSendFee: RequiredParams<'fee' | 'routingFee'>
+		/**
+		 * f​r​o​m​ ​~​{​f​e​e​}
+		 * @param {string} fee
+		 */
+		fromApprox: RequiredParams<'fee'>
+		/**
+		 * {​a​m​o​u​n​t​}​ ​S​A​T
+		 * @param {string} amount
+		 */
+		satAmount: RequiredParams<'amount'>
+		/**
+		 * U​n​a​b​l​e​ ​t​o​ ​f​e​t​c​h​ ​f​e​e​s​ ​a​t​ ​t​h​i​s​ ​t​i​m​e
+		 */
+		error: string
+	}
 	TransactionLimitsScreen: {
 		/**
 		 * R​e​c​e​i​v​e
@@ -8924,6 +9004,10 @@ type RootTranslation = {
 		 * T​r​a​n​s​a​c​t​i​o​n​ ​l​i​m​i​t​s
 		 */
 		transactionLimits: string
+		/**
+		 * F​e​e​ ​r​a​t​e​s
+		 */
+		feeRates: string
 		/**
 		 * A​c​t​i​v​a​t​e​ ​W​a​l​l​e​t
 		 */
@@ -20826,6 +20910,80 @@ export type TranslationFunctions = {
 		 */
 		momentarily: () => LocalizedString
 	}
+	FeeRatesScreen: {
+		/**
+		 * Fee rates
+		 */
+		title: () => LocalizedString
+		/**
+		 * Send
+		 */
+		send: () => LocalizedString
+		/**
+		 * Receive
+		 */
+		receive: () => LocalizedString
+		/**
+		 * Transfer
+		 */
+		transfer: () => LocalizedString
+		/**
+		 * Lightning
+		 */
+		lightning: () => LocalizedString
+		/**
+		 * Intraledger
+		 */
+		intraledger: () => LocalizedString
+		/**
+		 * Onchain priority (asap)
+		 */
+		onchainPriority: () => LocalizedString
+		/**
+		 * Onchain standard (~4h)
+		 */
+		onchainStandard: () => LocalizedString
+		/**
+		 * Onchain economy
+		 */
+		onchainEconomy: () => LocalizedString
+		/**
+		 * Lightning transactions
+		 */
+		lightningTransactions: () => LocalizedString
+		/**
+		 * Onchain below {threshold} SAT
+		 */
+		onchainBelowThreshold: (arg: { threshold: string }) => LocalizedString
+		/**
+		 * Onchain above {threshold} SAT
+		 */
+		onchainAboveThreshold: (arg: { threshold: string }) => LocalizedString
+		/**
+		 * Transfer fee
+		 */
+		transferFee: () => LocalizedString
+		/**
+		 * no fee
+		 */
+		noFee: () => LocalizedString
+		/**
+		 * {fee} + ~{routingFee} routing fee
+		 */
+		lightningSendFee: (arg: { fee: string, routingFee: string }) => LocalizedString
+		/**
+		 * from ~{fee}
+		 */
+		fromApprox: (arg: { fee: string }) => LocalizedString
+		/**
+		 * {amount} SAT
+		 */
+		satAmount: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Unable to fetch fees at this time
+		 */
+		error: () => LocalizedString
+	}
 	TransactionLimitsScreen: {
 		/**
 		 * Receive
@@ -21461,6 +21619,10 @@ export type TranslationFunctions = {
 		 * Transaction limits
 		 */
 		transactionLimits: () => LocalizedString
+		/**
+		 * Fee rates
+		 */
+		feeRates: () => LocalizedString
 		/**
 		 * Activate Wallet
 		 */
