@@ -44,34 +44,7 @@ import { IsAuthedContextProvider, useIsAuthed } from "./is-authed-context"
 import { LevelContainer } from "./level-component"
 import { MessagingContainer } from "./messaging"
 import { NetworkErrorContextProvider } from "./network-error-context"
-
-const noRetryOperations = [
-  "intraLedgerPaymentSend",
-  "intraLedgerUsdPaymentSend",
-
-  "lnInvoiceFeeProbe",
-  "lnInvoicePaymentSend",
-  "lnNoAmountInvoiceFeeProbe",
-  "lnNoAmountInvoicePaymentSend",
-  "lnNoAmountUsdInvoiceFeeProbe",
-  "lnUsdInvoiceFeeProbe",
-  "lnNoAmountUsdInvoicePaymentSend",
-
-  "onChainPaymentSend",
-  "onChainUsdPaymentSend",
-  "onChainUsdPaymentSendAsBtcDenominated",
-  "onChainTxFee",
-  "onChainUsdTxFee",
-  "onChainUsdTxFeeAsBtcDenominated",
-
-  // no need to retry to upload the token
-  // specially as it's running on app start
-  // and can create some unwanted loop when token is not valid
-  "deviceNotificationTokenCreate",
-
-  // Self-custodial payments go through Breez SDK directly, not Apollo.
-  // Add any future self-custodial GraphQL operations here if needed.
-]
+import { shouldRetryOperation } from "./retry-policy"
 
 const getAuthorizationHeader = (token: string): string => {
   return `Bearer ${token}`
@@ -186,11 +159,7 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
           max: 5,
           retryIf: (error, operation) => {
             console.debug(JSON.stringify(error), "retry on error")
-            return (
-              Boolean(error) &&
-              !noRetryOperations.includes(operation.operationName) &&
-              error.statusCode !== 401
-            )
+            return shouldRetryOperation(error, operation.operationName)
           },
         },
       })
