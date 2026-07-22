@@ -154,8 +154,41 @@ describe("useEnsureMigrationStarted", () => {
     expect(mockMigrationStart).toHaveBeenCalledTimes(1)
   })
 
-  it("survives a payload with no errors array", async () => {
+  /** A settled response with no payload is not a started migration: the answer never
+   *  arrived, so it earns the shared retry rather than arming the lock on no answer. */
+  it("treats a settled response with no payload as a retryable connection issue", async () => {
     mockMigrationStart.mockResolvedValue({ data: undefined })
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+
+    expect(result.current.hasConnectionIssue).toBe(true)
+    expect(result.current.isStarted).toBe(false)
+    expect(result.current.isRejected).toBe(false)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration start empty payload",
+      expect.any(Error),
+    )
+  })
+
+  it("fires again when a retry follows an empty payload", async () => {
+    mockMigrationStart.mockResolvedValueOnce({ data: undefined })
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+    expect(result.current.hasConnectionIssue).toBe(true)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+    expect(result.current.isStarted).toBe(true)
+    expect(result.current.hasConnectionIssue).toBe(false)
+  })
+
+  /** A payload present but without an errors array is a started migration, not a failure. */
+  it("treats a payload with no errors array as started", async () => {
+    mockMigrationStart.mockResolvedValue({ data: { migrationStart: {} } })
 
     const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
     await flushEffects()

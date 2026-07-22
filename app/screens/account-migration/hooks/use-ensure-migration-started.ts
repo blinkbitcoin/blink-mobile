@@ -76,7 +76,22 @@ export const useEnsureMigrationStarted = ({
     const run = async () => {
       try {
         const { data } = await startMigration()
-        const [rejection] = data?.migrationStart.errors ?? []
+        const payload = data?.migrationStart
+
+        /** A settled response with no payload is not a started migration: the answer never
+         *  arrived, so it earns the shared retry rather than arming the lock on the strength
+         *  of no answer. Reported because a 200 with no data is not a plain network drop. */
+        if (!payload) {
+          reportError(
+            "Migration start empty payload",
+            new Error("migrationStart returned no payload"),
+          )
+          if (!isActive) return
+          setHasConnectionIssue(true)
+          return
+        }
+
+        const [rejection] = payload.errors ?? []
         if (rejection)
           reportError("Migration start rejected", new Error(rejection.message))
         if (!isActive) return
