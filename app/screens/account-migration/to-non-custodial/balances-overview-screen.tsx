@@ -11,6 +11,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { IconHero } from "@app/components/icon-hero"
 import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
+import { MigrationStatus } from "@app/graphql/generated"
 import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -24,6 +25,7 @@ import {
 import { useCustodialOwnerId } from "@app/screens/account-migration/hooks/use-custodial-owner-id"
 import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/use-ensure-migration-started"
 import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
+import { useMigrationStatus } from "@app/screens/account-migration/hooks/use-migration-status"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -57,6 +59,11 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  route, and the hardware back is swallowed here. */
   useHardwareBackGuard()
 
+  /** A migration the server already reports as FAILED skips arming and the re-point and
+   *  hands straight over to support. */
+  const { status: migrationStatus } = useMigrationStatus()
+  const isMigrationFailed = migrationStatus === MigrationStatus.Failed
+
   /**
    * Landing here WITH figures declares the migration started server-side, which is what
    * makes this the point of no return: the lock then lives on the backend and survives a
@@ -64,7 +71,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    * waits for the figures because a screen that cannot show what is being migrated has no
    * business claiming the user consented to migrating it.
    */
-  const migrationStart = useEnsureMigrationStarted({ skip: !preview.isReady })
+  const migrationStart = useEnsureMigrationStarted({
+    skip: !preview.isReady || isMigrationFailed,
+  })
 
   const { ownerId } = useCustodialOwnerId()
 
@@ -108,8 +117,14 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     ? MigrationSupportReason.LnAddressTransferFailed
     : null
   const lnAddressFailureReason = lnAddressMissingReason ?? lnAddressRejectedReason
+  /** A migration already failed server-side leads the handover: nothing else on this screen
+   *  matters once the phase is FAILED. */
+  const failedReason = isMigrationFailed ? MigrationSupportReason.TransferFailed : null
   const handoverReason =
-    startFailureReason ?? lnAddressFailureReason ?? preview.unavailableReason
+    failedReason ??
+    startFailureReason ??
+    lnAddressFailureReason ??
+    preview.unavailableReason
 
   const hasReportedHandoverRef = useRef(false)
 

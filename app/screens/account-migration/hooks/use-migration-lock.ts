@@ -40,9 +40,12 @@ export const useMigrationLock = (): MigrationLock => {
 
   const isInProgress = status === MigrationStatus.InProgress
   const isTransferring = status === MigrationStatus.Transferring
+  /** A failed migration stays locked too: the funds may still settle server-side, so the
+   *  account is kept in the flow (routed to support) instead of handed back to spend. */
+  const isFailed = status === MigrationStatus.Failed
 
   return {
-    isLocked: isInProgress || isTransferring,
+    isLocked: isInProgress || isTransferring || isFailed,
     loading,
     hasError: Boolean(error),
     refetch,

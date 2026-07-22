@@ -2,6 +2,7 @@ import React from "react"
 import { Linking } from "react-native"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
+import { MigrationStatus } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -71,6 +72,16 @@ jest.mock("@app/graphql/generated", () => ({
     mockUseWalletOverviewScreenQuery(options),
   useMigrationQuery: () => mockUseMigrationQuery(),
   useMigrationStartMutation: () => [mockMigrationStart],
+}))
+
+let mockMigrationStatus: MigrationStatus | null = null
+
+jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
+  useMigrationStatus: () => ({
+    status: mockMigrationStatus,
+    loading: false,
+    refetch: jest.fn(),
+  }),
 }))
 
 let mockIsAuthed = true
@@ -192,6 +203,7 @@ const resetScreenMocks = () => {
     }),
   )
   mockMigrationStart.mockResolvedValue(acceptedMigrationStart)
+  mockMigrationStatus = null
   jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve())
 }
 
@@ -403,6 +415,21 @@ describe("MigrationBalancesOverviewScreen", () => {
       reason: "start-refused",
       origin: "commit",
     })
+  })
+
+  /** A migration the server already failed hands over to support at once, without arming or
+   *  re-pointing again. */
+  it("hands over to support when the migration already failed", async () => {
+    mockMigrationStatus = MigrationStatus.Failed
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "transfer-failed",
+      origin: "commit",
+    })
+    expect(mockMigrationStart).not.toHaveBeenCalled()
   })
 
   it("tells support the preview never arrived", async () => {
