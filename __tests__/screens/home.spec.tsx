@@ -17,6 +17,13 @@ import { ConvertDirection } from "@app/types/payment"
 
 let currentMocks: MockedResponse[] = []
 
+/** Mocked wholesale: the real module warns at load time when no API key is configured. */
+jest.mock("@app/utils/ip-country-lookup", () => ({
+  DEFAULT_ADAPTERS: [],
+  resolveIpCountryCode: jest.fn(async () => undefined),
+  resolveIpCountryCodeCached: jest.fn(async () => undefined),
+}))
+
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
   default: {
@@ -40,6 +47,22 @@ type NudgeModalProps = { isVisible: boolean; onClose: () => void }
 const mockBackupNudgeModal = jest.fn<null, [NudgeModalProps]>(() => null)
 jest.mock("@app/components/backup-nudge-modal", () => ({
   BackupNudgeModal: (props: NudgeModalProps) => mockBackupNudgeModal(props),
+}))
+
+const mockSelfCustodialInfoBulletinState = {
+  shouldShow: false,
+  dismiss: jest.fn(),
+}
+jest.mock("@app/hooks/use-self-custodial-info-bulletin-state", () => ({
+  useSelfCustodialInfoBulletinState: () => mockSelfCustodialInfoBulletinState,
+}))
+
+const mockSelfCustodialInfoBulletin = jest.fn<null, [{ onDismiss: () => void }]>(
+  () => null,
+)
+jest.mock("@app/components/self-custodial-info-bulletin", () => ({
+  SelfCustodialInfoBulletin: (props: { onDismiss: () => void }) =>
+    mockSelfCustodialInfoBulletin(props),
 }))
 
 let mockIsFocused = true
@@ -118,6 +141,72 @@ jest.mock("@app/hooks/use-dollar-balance-forced-conversion", () => ({
     }
   },
 }))
+
+let mockMigratePromptVisible = false
+let mockCanReopen = false
+const mockDismissMigratePrompt = jest.fn()
+const mockReopenMigratePrompt = jest.fn()
+
+jest.mock("@app/screens/account-migration/hooks/use-migrate-now-prompt", () => ({
+  useMigrateNowPrompt: () => ({
+    isVisible: mockMigratePromptVisible,
+    canReopen: mockCanReopen,
+    deadlineTimestamp: 1787003999,
+    timezone: "Europe/Paris",
+    dismissForSession: mockDismissMigratePrompt,
+    reopen: mockReopenMigratePrompt,
+  }),
+}))
+
+const mockMigrateNowModal = jest.fn()
+
+jest.mock("@app/components/migrate-now-modal", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View } = jest.requireActual("react-native")
+  return {
+    MigrateNowModal: (props: {
+      isVisible: boolean
+      onMigrate: () => void
+      toggleModal: () => void
+    }) => {
+      mockMigrateNowModal(props)
+      /** Always mounted now, toggled by isVisible: mirror the real modal so a hidden
+       *  instance is absent from the tree, as the "not shown" assertions expect. */
+      return props.isVisible
+        ? ReactActual.createElement(View, { testID: "migrate-now-modal" })
+        : null
+    },
+  }
+})
+
+let mockReminderBulletinVisible = false
+
+jest.mock("@app/screens/account-migration/hooks/use-migration-reminder-bulletin", () => ({
+  useMigrationReminderBulletin: () => ({
+    isVisible: mockReminderBulletinVisible,
+    deadlineTimestamp: 1787003999,
+    timezone: "Europe/Paris",
+  }),
+}))
+
+let mockReceiveBlocked = false
+
+jest.mock("@app/screens/account-migration/hooks/use-wind-down-receive-blocked", () => ({
+  useWindDownReceiveBlocked: () => mockReceiveBlocked,
+}))
+
+const mockMigrationReminderBulletin = jest.fn()
+
+jest.mock("@app/components/migration-reminder-bulletin", () => {
+  const ReactActual = jest.requireActual("react")
+  const { View } = jest.requireActual("react-native")
+  return {
+    MigrationReminderBulletin: (props: { onMigrate: () => void }) => {
+      mockMigrationReminderBulletin(props)
+      return ReactActual.createElement(View, { testID: "migration-reminder-bulletin" })
+    },
+  }
+})
 
 const mockUseNonCustodialConversionLimits = jest.fn()
 
@@ -531,6 +620,10 @@ describe("HomeScreen", () => {
     currentMocks = []
     mockActiveWalletOverride = null
     mockDollarBalanceRestrictedOverride = false
+    mockMigratePromptVisible = false
+    mockCanReopen = false
+    mockReceiveBlocked = false
+    mockReminderBulletinVisible = false
     mockTransferBlockedOverride = false
     mockDollarBalanceModalVisible = false
     mockForcedConversionParams = null
@@ -1255,5 +1348,311 @@ describe("HomeScreen", () => {
 
       expect(getByTestId("balance-value")).toBeTruthy()
     })
+  })
+})
+
+describe("SelfCustodialInfoBulletin gating", () => {
+  beforeEach(() => {
+    currentMocks = []
+    mockActiveWalletOverride = null
+    jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: null,
+    })
+    mockSelfCustodialInfoBulletinState.shouldShow = false
+  })
+
+  afterEach(() => {
+    mockSelfCustodialInfoBulletinState.shouldShow = false
+    mockActiveWalletOverride = null
+  })
+
+  const renderForSelfCustodial = () => {
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    return render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+  }
+
+  it("renders the bulletin when the hook says it should show", async () => {
+    mockSelfCustodialInfoBulletinState.shouldShow = true
+
+    renderForSelfCustodial()
+    await flushEffects()
+
+    expect(mockSelfCustodialInfoBulletin).toHaveBeenCalled()
+  })
+
+  it("does not render the bulletin when the hook says it should not show", async () => {
+    renderForSelfCustodial()
+    await flushEffects()
+
+    expect(mockSelfCustodialInfoBulletin).not.toHaveBeenCalled()
+  })
+})
+
+describe("HomeScreen wind-down states", () => {
+  beforeEach(() => {
+    currentMocks = []
+    mockActiveWalletOverride = null
+    mockDollarBalanceRestrictedOverride = false
+    mockMigratePromptVisible = false
+    mockCanReopen = false
+    mockReceiveBlocked = false
+    mockReminderBulletinVisible = false
+    mockTransferBlockedOverride = false
+    mockDollarBalanceModalVisible = false
+    jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: null,
+    })
+  })
+
+  it("pushes the migrate-now prompt when receiving is disabled", async () => {
+    mockMigratePromptVisible = true
+
+    const { findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("migrate-now-modal")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  it("keeps the migrate-now prompt hidden while nothing disables receiving", async () => {
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+  })
+
+  it("lets the forced conversion outrank the migrate-now prompt", async () => {
+    mockMigratePromptVisible = true
+    mockDollarBalanceRestrictedOverride = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { findByTestId, queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("convert-modal")).toBeTruthy()
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+
+    await flushEffects()
+  })
+
+  it("enters the migration flow from the migrate-now prompt, dismissing it first", async () => {
+    mockMigratePromptVisible = true
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const { onMigrate } = mockMigrateNowModal.mock.calls[0][0]
+    onMigrate()
+
+    expect(mockDismissMigratePrompt).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
+    expect(mockDismissMigratePrompt.mock.invocationCallOrder[0]).toBeLessThan(
+      mockNavigate.mock.invocationCallOrder[0],
+    )
+  })
+
+  it("dismisses the prompt for the session from the modal close action", async () => {
+    mockMigratePromptVisible = true
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const { toggleModal } = mockMigrateNowModal.mock.calls[0][0]
+    toggleModal()
+
+    expect(mockDismissMigratePrompt).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationEntry")
+  })
+
+  it("lets the dollar-restriction modal outrank the migrate-now prompt", async () => {
+    mockMigratePromptVisible = true
+    mockDollarBalanceRestrictedOverride = true
+    /** A restricted account with no dollars left: the forced conversion never fires
+     *  (nothing to convert), so this isolates the restriction modal outranking the
+     *  migrate-now prompt when the disabled transfer button is pressed. */
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 0, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId, queryByTestId, findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(await findByTestId("migrate-now-modal")).toBeTruthy()
+
+    fireEvent.press(getByTestId("transfer"))
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(queryByTestId("migrate-now-modal")).toBeNull()
+
+    mockActiveWalletOverride = null
+  })
+
+  it("greys out the receive action while receiving is disabled, reopening the prompt", async () => {
+    mockCanReopen = true
+    mockReceiveBlocked = true
+    mockNavigate.mockClear()
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("receive"))
+
+    expect(mockReopenMigratePrompt).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("receiveBitcoin")
+  })
+
+  it("keeps the receive action live while receiving stays enabled", async () => {
+    mockNavigate.mockClear()
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("receive"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("receiveBitcoin")
+    expect(mockReopenMigratePrompt).not.toHaveBeenCalled()
+
+    mockActiveWalletOverride = null
+  })
+
+  it("shows the migration reminder bulletin in the pre-cutoff phase", async () => {
+    mockReminderBulletinVisible = true
+
+    const { findByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByTestId("migration-reminder-bulletin")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  it("keeps the reminder bulletin hidden outside the pre-cutoff phase", async () => {
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(queryByTestId("migration-reminder-bulletin")).toBeNull()
+  })
+
+  it("enters the migration flow from the reminder bulletin", async () => {
+    mockReminderBulletinVisible = true
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const { onMigrate } = mockMigrationReminderBulletin.mock.calls[0][0]
+    onMigrate()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
   })
 })

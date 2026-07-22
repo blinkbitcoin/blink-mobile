@@ -8,6 +8,7 @@ import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 type StatusScreenLayoutProps = {
   icon: IconNamesType
   iconSize?: number
+  iconColor?: string
   iconBackgroundColor?: string
   children: React.ReactNode
   footer?: React.ReactNode
@@ -16,6 +17,7 @@ type StatusScreenLayoutProps = {
 export const StatusScreenLayout: React.FC<StatusScreenLayoutProps> = ({
   icon,
   iconSize = 72,
+  iconColor,
   iconBackgroundColor = "transparent",
   children,
   footer,
@@ -26,7 +28,7 @@ export const StatusScreenLayout: React.FC<StatusScreenLayoutProps> = ({
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.iconCircle}>
-          <GaloyIcon name={icon} size={iconSize} />
+          <GaloyIcon name={icon} size={iconSize} color={iconColor} />
         </View>
         {children}
       </View>

@@ -6,6 +6,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
 import { ContextForScreen } from "../../../helper"
+import { flushEffects } from "../../../../helpers/flush-effects"
 
 const mockUseRestorePhrase = jest.fn()
 jest.mock(
@@ -82,7 +83,7 @@ describe("RestorePhraseScreen", () => {
     mockUseRestorePhrase.mockReturnValue(defaultHookReturn)
   })
 
-  it("renders the inline invalidMnemonic message when step 2 is fully filled but invalid", () => {
+  it("renders the inline invalidMnemonic message when step 2 is fully filled but invalid", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       allFilled: true,
@@ -90,11 +91,12 @@ describe("RestorePhraseScreen", () => {
     })
 
     const { getByText } = renderScreen()
+    await flushEffects()
 
     expect(getByText(LL.RestoreScreen.invalidMnemonic())).toBeTruthy()
   })
 
-  it("does not render the inline invalidMnemonic message while still typing", () => {
+  it("does not render the inline invalidMnemonic message while still typing", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       allFilled: false,
@@ -102,11 +104,12 @@ describe("RestorePhraseScreen", () => {
     })
 
     const { queryByText } = renderScreen()
+    await flushEffects()
 
     expect(queryByText(LL.RestoreScreen.invalidMnemonic())).toBeNull()
   })
 
-  it("propagates wrong=true to MnemonicWordInput when showError is active", () => {
+  it("propagates wrong=true to MnemonicWordInput when showError is active", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       allFilled: true,
@@ -114,6 +117,7 @@ describe("RestorePhraseScreen", () => {
     })
 
     renderScreen()
+    await flushEffects()
 
     expect(mockMnemonicWordInput).toHaveBeenCalled()
     const lastCall =
@@ -121,7 +125,7 @@ describe("RestorePhraseScreen", () => {
     expect(lastCall[0].wrong).toBe(true)
   })
 
-  it("propagates wrong=false to MnemonicWordInput when no error is active", () => {
+  it("propagates wrong=false to MnemonicWordInput when no error is active", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       allFilled: false,
@@ -130,42 +134,46 @@ describe("RestorePhraseScreen", () => {
     })
 
     renderScreen()
+    await flushEffects()
 
     const lastCall =
       mockMnemonicWordInput.mock.calls[mockMnemonicWordInput.mock.calls.length - 1]
     expect(lastCall[0].wrong).toBe(false)
   })
 
-  it("renders the restoring spinner while status is Restoring", () => {
+  it("renders the restoring spinner while status is Restoring", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       status: "restoring",
     })
 
     const { getByText } = renderScreen()
+    await flushEffects()
 
     expect(getByText(LL.RestoreScreen.restoring())).toBeTruthy()
   })
 
-  it("renders the error screen with retry CTA when status is Error", () => {
+  it("renders the error screen with retry CTA when status is Error", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       status: "error",
     })
 
     const { getByText } = renderScreen()
+    await flushEffects()
 
     expect(getByText(LL.RestoreScreen.restoreFailed())).toBeTruthy()
     expect(getByText(LL.common.tryAgain())).toBeTruthy()
   })
 
-  it("renders a custom validationError text when set", () => {
+  it("renders a custom validationError text when set", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       validationError: "Custom validation error",
     })
 
     const { getByText } = renderScreen()
+    await flushEffects()
 
     expect(getByText("Custom validation error")).toBeTruthy()
   })

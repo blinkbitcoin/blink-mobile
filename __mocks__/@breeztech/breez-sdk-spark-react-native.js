@@ -56,6 +56,11 @@ const SdkError = {
 module.exports = {
   connect: jest.fn(),
   defaultConfig: jest.fn().mockReturnValue({}),
+  defaultExternalSigner: jest.fn().mockReturnValue({
+    identityPublicKey: jest
+      .fn()
+      .mockReturnValue({ bytes: Uint8Array.from([2, 26, 33]).buffer }),
+  }),
   initLogging: jest.fn(),
   BitcoinNetwork: { Bitcoin: 0, Testnet3: 1, Testnet4: 2, Signet: 3, Regtest: 4 },
   InputType_Tags: { SparkAddress: "SparkAddress", BitcoinAddress: "BitcoinAddress" },

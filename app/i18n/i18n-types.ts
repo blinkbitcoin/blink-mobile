@@ -9239,6 +9239,10 @@ type RootTranslation = {
 		 */
 		transactionsError: string
 		/**
+		 * T​r​a​n​s​f​e​r
+		 */
+		transfer: string
+		/**
 		 * T​r​y​ ​A​g​a​i​n
 		 */
 		tryAgain: string
@@ -9302,6 +9306,10 @@ type RootTranslation = {
 		 * C​o​n​t​i​n​u​e
 		 */
 		'continue': string
+		/**
+		 * S​k​i​p
+		 */
+		skip: string
 		/**
 		 * C​o​r​r​e​c​t
 		 */
@@ -11804,25 +11812,273 @@ type RootTranslation = {
 		 */
 		explainerTitle: string
 		/**
-		 * Y​o​u​ ​w​i​l​l​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​o​n​ ​t​h​e​ ​S​p​a​r​k​ ​p​r​o​t​o​c​o​l​,​ ​<​l​i​n​k​>​l​e​a​r​n​ ​m​o​r​e​ ​h​e​r​e​<​/​l​i​n​k​>
+		 * Y​o​u​ ​w​i​l​l​ ​c​r​e​a​t​e​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​o​n​ ​t​h​e​ ​S​p​a​r​k​ ​p​r​o​t​o​c​o​l
 		 */
-		explainerStep1: string
+		explainerCheck1: string
 		/**
-		 * W​e​ ​t​r​a​n​s​f​e​r​ ​y​o​u​r​ ​f​u​n​d​s​ ​i​n​t​o​ ​y​o​u​r​ ​n​e​w​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​,​ ​a​n​d​ ​y​o​u​r​ ​c​u​r​r​e​n​t​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​d​e​l​e​t​e​d
+		 * W​e​ ​t​r​a​n​s​f​e​r​ ​y​o​u​r​ ​f​u​n​d​s​ ​i​n​t​o​ ​y​o​u​r​ ​n​e​w​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
 		 */
-		explainerStep2: string
+		explainerCheck2: string
 		/**
-		 * C​o​n​t​i​n​u​e​ ​u​s​i​n​g​ ​B​l​i​n​k​ ​a​s​ ​u​s​u​a​l
+		 * Y​o​u​r​ ​c​u​r​r​e​n​t​ ​a​c​c​o​u​n​t​ ​a​n​d​ ​a​l​l​ ​i​t​s​ ​d​a​t​a​ ​i​n​c​l​u​d​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y​ ​w​i​l​l​ ​b​e​ ​c​l​o​s​e​d
 		 */
-		explainerStep3: string
+		explainerCheck3: string
 		/**
-		 * L​e​t​'​s​ ​m​o​v​e
+		 * B​l​i​n​k​ ​A​P​I​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​v​a​i​l​a​b​l​e
 		 */
-		letsMove: string
+		explainerCheck4: string
+		/**
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​d​e​d​u​c​t​e​d​ ​w​i​t​h​ ​a​ ​S​p​a​r​k​ ​n​e​t​w​o​r​k​ ​f​e​e
+		 */
+		explainerCheck5: string
+		/**
+		 * I​ ​u​n​d​e​r​s​t​a​n​d
+		 */
+		explainerCta: string
 		/**
 		 * T​r​a​n​s​f​e​r​r​i​n​g​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​I​t​ ​s​h​o​u​l​d​ ​b​e​ ​d​o​n​e​ ​i​n​ ​a​ ​f​e​w​ ​s​e​c​o​n​d​s​.
 		 */
 		transferringFunds: string
+		/**
+		 * T​i​m​e​ ​t​o​ ​u​p​g​r​a​d​e
+		 */
+		migrationRequiredTitle: string
+		/**
+		 * I​t​'​s​ ​t​i​m​e​ ​t​o​ ​m​i​g​r​a​t​e​ ​y​o​u​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+		 */
+		migrationRequiredBody: string
+		/**
+		 * I​t​'​s​ ​t​i​m​e​ ​t​o​ ​m​i​g​r​a​t​e​ ​y​o​u​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.​ ​I​t​'​s​ ​r​e​q​u​i​r​e​d​ ​f​o​r​ ​r​e​g​u​l​a​t​o​r​y​ ​r​e​a​s​o​n​s​.​
+	​
+	​N​o​ ​n​e​e​d​ ​t​o​ ​w​o​r​r​y​,​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​w​i​l​l​ ​b​e​ ​b​e​t​t​e​r​ ​f​o​r​ ​y​o​u​ ​i​n​ ​t​h​e​ ​l​o​n​g​ ​t​e​r​m​.
+		 */
+		migrationRequiredForcedBody: string
+		/**
+		 * A​c​c​o​u​n​t​ ​n​o​t​ ​a​c​c​e​s​s​i​b​l​e
+		 */
+		migrationGateTitle: string
+		/**
+		 * F​o​r​ ​r​e​g​u​l​a​t​o​r​y​ ​r​e​a​s​o​n​s​ ​w​e​ ​c​a​n​n​o​t​ ​p​r​o​v​i​d​e​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​s​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​.​ ​T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​f​u​n​d​s​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​w​i​t​h​ ​B​l​i​n​k​ ​b​y​ ​f​o​l​l​o​w​i​n​g​ ​t​h​e​ ​n​e​x​t​ ​s​t​e​p​s​ ​o​r​ ​c​o​n​t​a​c​t​ ​u​s​ ​a​t​ ​<​l​i​n​k​>​{​e​m​a​i​l​}​<​/​l​i​n​k​>
+		 * @param {unknown} email
+		 */
+		migrationGateBody: RequiredParams<'email'>
+		/**
+		 * B​i​t​c​o​i​n​ ​b​a​l​a​n​c​e
+		 */
+		bitcoinBalance: string
+		/**
+		 * D​o​l​l​a​r​ ​b​a​l​a​n​c​e
+		 */
+		dollarBalance: string
+		/**
+		 * K​e​e​p​ ​r​e​c​e​i​v​i​n​g​ ​a​s​ ​u​s​u​a​l
+		 */
+		keepReceivingTitle: string
+		/**
+		 * Y​o​u​r​ ​l​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​w​i​l​l​ ​b​e​ ​t​r​a​n​s​f​e​r​r​e​d​ ​t​o​ ​y​o​u​r​ ​n​e​w​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+		 */
+		keepReceivingBody: string
+		/**
+		 * Y​o​u​r​ ​L​N​ ​a​d​d​r​e​s​s
+		 */
+		keepReceivingLnAddressLabel: string
+		/**
+		 * N​i​c​e
+		 */
+		keepReceivingCta: string
+		/**
+		 * R​e​c​e​i​v​i​n​g​ ​i​s​ ​c​u​r​r​e​n​t​l​y​ ​d​i​s​a​b​l​e​d​.
+		 */
+		receivingDisabledToast: string
+		/**
+		 * D​o​w​n​l​o​a​d​ ​y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y
+		 */
+		downloadHistoryTitle: string
+		/**
+		 * Y​o​u​r​ ​n​e​w​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​s​t​a​r​t​ ​f​r​e​s​h​.​ ​I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​k​e​e​p​ ​r​e​c​o​r​d​ ​o​f​ ​y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​s​,​ ​d​o​w​n​l​o​a​d​ ​t​h​e​m​ ​a​s​ ​C​S​V​ ​n​o​w​.
+		 */
+		downloadHistoryBody: string
+		/**
+		 * D​o​w​n​l​o​a​d
+		 */
+		downloadHistoryDownloadCta: string
+		/**
+		 * A​P​I​ ​s​e​r​v​i​c​e​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e
+		 */
+		apiServiceTitle: string
+		/**
+		 * W​e​ ​n​o​t​e​ ​t​h​a​t​ ​y​o​u​ ​h​a​v​e​ ​a​c​t​i​v​e​ ​A​P​I​ ​k​e​y​s​.​ ​B​l​i​n​k​ ​c​a​n​'​t​ ​p​r​o​v​i​d​e​ ​t​h​e​ ​A​P​I​ ​i​n​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​m​o​d​e​.​
+	​
+	​I​f​ ​y​o​u​ ​a​r​e​ ​d​e​p​e​n​d​e​n​t​ ​o​n​ ​B​l​i​n​k​'​s​ ​A​P​I​,​ ​c​o​n​t​a​c​t​ ​u​s​ ​p​r​o​m​p​t​l​y​ ​a​n​d​ ​w​e​ ​w​i​l​l​ ​d​o​ ​o​u​r​ ​b​e​s​t​ ​t​o​ ​a​s​s​i​s​t​ ​a​ ​s​m​o​o​t​h​ ​t​r​a​n​s​i​t​i​o​n​.
+		 */
+		apiServiceBody: string
+		/**
+		 * C​o​n​t​a​c​t​ ​u​s
+		 */
+		apiServiceContactCta: string
+		/**
+		 * C​o​n​t​i​n​u​e​ ​a​n​y​w​a​y​s
+		 */
+		apiServiceContinueCta: string
+		/**
+		 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​ ​r​e​s​u​m​i​n​g​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​.​ ​P​l​e​a​s​e​ ​s​t​a​r​t​ ​i​t​ ​a​g​a​i​n​.
+		 */
+		resumeFailed: string
+		balancesOverview: {
+			/**
+			 * M​o​v​e​ ​y​o​u​r​ ​b​a​l​a​n​c​e
+			 */
+			title: string
+			/**
+			 * S​a​f​e​l​y​ ​m​o​v​e​ ​y​o​u​r​ ​f​u​n​d​s​ ​t​o​ ​y​o​u​r​ ​n​e​w​ ​a​c​c​o​u​n​t​.
+			 */
+			body: string
+			/**
+			 * C​u​r​r​e​n​t​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e
+			 */
+			currentBitcoinBalance: string
+			/**
+			 * C​u​r​r​e​n​t​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
+			 */
+			currentDollarBalance: string
+			/**
+			 * N​e​w​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e
+			 */
+			newBitcoinBalance: string
+			/**
+			 * N​e​w​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
+			 */
+			newDollarBalance: string
+			/**
+			 * n​o​t​ ​a​v​a​i​l​a​b​l​e
+			 */
+			dollarBalanceNotAvailable: string
+			/**
+			 * N​e​t​w​o​r​k​ ​f​e​e​:​ ​<​b​o​l​d​>​{​f​e​e​}​<​/​b​o​l​d​>
+			 * @param {string} fee
+			 */
+			networkFee: RequiredParams<'fee'>
+			/**
+			 * N​e​t​w​o​r​k​ ​f​e​e​:​ ​<​b​o​l​d​>​{​f​e​e​}​<​/​b​o​l​d​>​ ​(​c​o​v​e​r​e​d​ ​b​y​ ​B​l​i​n​k​)
+			 * @param {string} fee
+			 */
+			networkFeeCoveredByBlink: RequiredParams<'fee'>
+			/**
+			 * C​u​r​r​e​n​t​ ​e​x​c​h​a​n​g​e​ ​r​a​t​e​ ​1​ ​B​T​C​ ​=​ ​{​r​a​t​e​}
+			 * @param {string} rate
+			 */
+			exchangeRate: RequiredParams<'rate'>
+			/**
+			 * A​p​p​r​o​v​e
+			 */
+			approveCta: string
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			contactSupportCta: string
+		}
+		dollarBalanceModal: {
+			/**
+			 * W​e​ ​c​a​n​n​o​t​ ​m​i​g​r​a​t​e​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e
+			 */
+			title: string
+			/**
+			 * E​m​p​t​y​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​f​i​r​s​t​.​ ​Y​o​u​ ​c​a​n​ ​t​r​a​n​s​f​e​r​ ​t​o​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​i​n​ ​B​l​i​n​k​ ​o​r​ ​e​l​s​e​w​h​e​r​e​.
+			 */
+			body: string
+		}
+		migrateNowModal: {
+			/**
+			 * M​i​g​r​a​t​e​ ​n​o​w​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
+			 */
+			title: string
+			/**
+			 * Y​o​u​ ​c​a​n​ ​n​o​ ​l​o​n​g​e​r​ ​r​e​c​e​i​v​e​ ​f​u​n​d​s​ ​t​o​ ​y​o​u​r​ ​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.​ ​B​l​i​n​k​ ​h​a​s​ ​d​i​s​c​o​n​t​i​n​u​e​d​ ​c​u​s​t​o​d​i​a​l​ ​s​e​r​v​i​c​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n​ ​a​n​d​ ​t​h​i​s​ ​a​c​c​o​u​n​t​ ​w​i​l​l​ ​b​e​ ​i​n​a​c​t​i​v​a​t​e​d​ ​b​y​ ​t​h​e​ ​e​n​d​ ​o​f​ ​{​d​a​t​e​}​.​
+		​
+		​M​i​g​r​a​t​e​ ​n​o​w​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​.
+			 * @param {string} date
+			 */
+			body: RequiredParams<'date'>
+			/**
+			 * M​i​g​r​a​t​e​ ​n​o​w
+			 */
+			migrateCta: string
+		}
+		reminderBulletin: {
+			/**
+			 * I​m​p​o​r​t​a​n​t
+			 */
+			title: string
+			/**
+			 * M​i​g​r​a​t​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​n​e​w​,​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​m​o​d​e​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}
+			 * @param {string} date
+			 */
+			body: RequiredParams<'date'>
+			/**
+			 * M​i​g​r​a​t​e
+			 */
+			migrateCta: string
+		}
+		contactSupport: {
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			title: string
+			/**
+			 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​ ​b​u​t​ ​d​o​n​'​t​ ​w​o​r​r​y​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​,​ ​p​l​e​a​s​e​ ​c​o​n​t​a​c​t​ ​s​u​p​p​o​r​t​ ​f​o​r​ ​a​s​s​i​s​t​a​n​c​e​.​
+		​
+		​Y​o​u​ ​m​a​y​ ​n​e​e​d​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​t​o​ ​h​e​l​p​ ​s​u​p​p​o​r​t​ ​r​e​s​o​l​v​e​ ​y​o​u​r​ ​c​a​s​e​:
+			 */
+			body: string
+			/**
+			 * A​c​c​o​u​n​t​ ​I​D
+			 */
+			accountIdLabel: string
+			/**
+			 * p​u​b​K​e​y
+			 */
+			pubKeyLabel: string
+			/**
+			 * U​s​e​r​n​a​m​e
+			 */
+			usernameLabel: string
+			/**
+			 * E​m​a​i​l
+			 */
+			emailLabel: string
+			/**
+			 * P​h​o​n​e​ ​n​u​m​b​e​r
+			 */
+			phoneLabel: string
+			/**
+			 * A​p​p​ ​v​e​r​s​i​o​n
+			 */
+			appVersionLabel: string
+			/**
+			 * P​l​a​t​f​o​r​m
+			 */
+			platformLabel: string
+			/**
+			 * C​o​u​n​t​r​y
+			 */
+			countryLabel: string
+			/**
+			 * M​i​g​r​a​t​i​o​n​ ​s​u​p​p​o​r​t​ ​r​e​q​u​e​s​t
+			 */
+			emailSubject: string
+			/**
+			 * D​e​s​c​r​i​b​e​ ​t​h​e​ ​p​r​o​b​l​e​m​:
+			 */
+			emailDescribeProblem: string
+			/**
+			 * A​c​c​o​u​n​t​ ​i​n​f​o​r​m​a​t​i​o​n​ ​f​o​r​ ​s​u​p​p​o​r​t​:
+			 */
+			emailAccountInfo: string
+			/**
+			 * C​o​n​t​a​c​t​ ​u​s
+			 */
+			contactUsCta: string
+		}
 	}
 	AccountTypeSelectionScreen: {
 		/**
@@ -11991,6 +12247,20 @@ type RootTranslation = {
 		 * S​e​c​u​r​e​ ​w​a​l​l​e​t
 		 */
 		secureMe: string
+	}
+	NonCustodialInfoBulletin: {
+		/**
+		 * T​h​i​s​ ​i​s​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
+		 */
+		title: string
+		/**
+		 * T​o​ ​l​e​a​r​n​ ​m​o​r​e​ ​r​e​a​d​ ​o​u​r​ ​b​l​o​g​ ​p​o​s​t
+		 */
+		body: string
+		/**
+		 * R​e​a​d
+		 */
+		cta: string
 	}
 	SelfCustodialOffline: {
 		/**
@@ -21492,6 +21762,10 @@ export type TranslationFunctions = {
 		 */
 		transactionsError: () => LocalizedString
 		/**
+		 * Transfer
+		 */
+		transfer: () => LocalizedString
+		/**
 		 * Try Again
 		 */
 		tryAgain: () => LocalizedString
@@ -21555,6 +21829,10 @@ export type TranslationFunctions = {
 		 * Continue
 		 */
 		'continue': () => LocalizedString
+		/**
+		 * Skip
+		 */
+		skip: () => LocalizedString
 		/**
 		 * Correct
 		 */
@@ -24012,25 +24290,267 @@ export type TranslationFunctions = {
 		 */
 		explainerTitle: () => LocalizedString
 		/**
-		 * You will create a non-custodial account on the Spark protocol, <link>learn more here</link>
+		 * You will create a non-custodial account on the Spark protocol
 		 */
-		explainerStep1: () => LocalizedString
+		explainerCheck1: () => LocalizedString
 		/**
-		 * We transfer your funds into your new non-custodial account, and your current account will be deleted
+		 * We transfer your funds into your new non-custodial account
 		 */
-		explainerStep2: () => LocalizedString
+		explainerCheck2: () => LocalizedString
 		/**
-		 * Continue using Blink as usual
+		 * Your current account and all its data including transaction history will be closed
 		 */
-		explainerStep3: () => LocalizedString
+		explainerCheck3: () => LocalizedString
 		/**
-		 * Let's move
+		 * Blink API will not be available
 		 */
-		letsMove: () => LocalizedString
+		explainerCheck4: () => LocalizedString
+		/**
+		 * Your account will be deducted with a Spark network fee
+		 */
+		explainerCheck5: () => LocalizedString
+		/**
+		 * I understand
+		 */
+		explainerCta: () => LocalizedString
 		/**
 		 * Transferring your funds. It should be done in a few seconds.
 		 */
 		transferringFunds: () => LocalizedString
+		/**
+		 * Time to upgrade
+		 */
+		migrationRequiredTitle: () => LocalizedString
+		/**
+		 * It's time to migrate your custodial account to a non-custodial account.
+		 */
+		migrationRequiredBody: () => LocalizedString
+		/**
+		 * It's time to migrate your custodial account to a non-custodial account. It's required for regulatory reasons.
+
+	No need to worry, non-custodial will be better for you in the long term.
+		 */
+		migrationRequiredForcedBody: () => LocalizedString
+		/**
+		 * Account not accessible
+		 */
+		migrationGateTitle: () => LocalizedString
+		/**
+		 * For regulatory reasons we cannot provide custodial accounts in your region. Transfer your funds to a non-custodial account with Blink by following the next steps or contact us at <link>{email}</link>
+		 */
+		migrationGateBody: (arg: { email: unknown }) => LocalizedString
+		/**
+		 * Bitcoin balance
+		 */
+		bitcoinBalance: () => LocalizedString
+		/**
+		 * Dollar balance
+		 */
+		dollarBalance: () => LocalizedString
+		/**
+		 * Keep receiving as usual
+		 */
+		keepReceivingTitle: () => LocalizedString
+		/**
+		 * Your lightning address will be transferred to your new non-custodial account.
+		 */
+		keepReceivingBody: () => LocalizedString
+		/**
+		 * Your LN address
+		 */
+		keepReceivingLnAddressLabel: () => LocalizedString
+		/**
+		 * Nice
+		 */
+		keepReceivingCta: () => LocalizedString
+		/**
+		 * Receiving is currently disabled.
+		 */
+		receivingDisabledToast: () => LocalizedString
+		/**
+		 * Download your transaction history
+		 */
+		downloadHistoryTitle: () => LocalizedString
+		/**
+		 * Your new account will start fresh. If you want to keep record of your transactions, download them as CSV now.
+		 */
+		downloadHistoryBody: () => LocalizedString
+		/**
+		 * Download
+		 */
+		downloadHistoryDownloadCta: () => LocalizedString
+		/**
+		 * API service not available
+		 */
+		apiServiceTitle: () => LocalizedString
+		/**
+		 * We note that you have active API keys. Blink can't provide the API in non-custodial mode.
+
+	If you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.
+		 */
+		apiServiceBody: () => LocalizedString
+		/**
+		 * Contact us
+		 */
+		apiServiceContactCta: () => LocalizedString
+		/**
+		 * Continue anyways
+		 */
+		apiServiceContinueCta: () => LocalizedString
+		/**
+		 * Something went wrong resuming your migration. Please start it again.
+		 */
+		resumeFailed: () => LocalizedString
+		balancesOverview: {
+			/**
+			 * Move your balance
+			 */
+			title: () => LocalizedString
+			/**
+			 * Safely move your funds to your new account.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Current Bitcoin Balance
+			 */
+			currentBitcoinBalance: () => LocalizedString
+			/**
+			 * Current Dollar Balance
+			 */
+			currentDollarBalance: () => LocalizedString
+			/**
+			 * New Bitcoin Balance
+			 */
+			newBitcoinBalance: () => LocalizedString
+			/**
+			 * New Dollar Balance
+			 */
+			newDollarBalance: () => LocalizedString
+			/**
+			 * not available
+			 */
+			dollarBalanceNotAvailable: () => LocalizedString
+			/**
+			 * Network fee: <bold>{fee}</bold>
+			 */
+			networkFee: (arg: { fee: string }) => LocalizedString
+			/**
+			 * Network fee: <bold>{fee}</bold> (covered by Blink)
+			 */
+			networkFeeCoveredByBlink: (arg: { fee: string }) => LocalizedString
+			/**
+			 * Current exchange rate 1 BTC = {rate}
+			 */
+			exchangeRate: (arg: { rate: string }) => LocalizedString
+			/**
+			 * Approve
+			 */
+			approveCta: () => LocalizedString
+			/**
+			 * Contact support
+			 */
+			contactSupportCta: () => LocalizedString
+		}
+		dollarBalanceModal: {
+			/**
+			 * We cannot migrate your Dollar Balance
+			 */
+			title: () => LocalizedString
+			/**
+			 * Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere.
+			 */
+			body: () => LocalizedString
+		}
+		migrateNowModal: {
+			/**
+			 * Migrate now to a non-custodial account
+			 */
+			title: () => LocalizedString
+			/**
+			 * You can no longer receive funds to your custodial account. Blink has discontinued custodial service in your region and this account will be inactivated by the end of {date}.
+	
+		Migrate now to a non-custodial account.
+			 */
+			body: (arg: { date: string }) => LocalizedString
+			/**
+			 * Migrate now
+			 */
+			migrateCta: () => LocalizedString
+		}
+		reminderBulletin: {
+			/**
+			 * Important
+			 */
+			title: () => LocalizedString
+			/**
+			 * Migrate your account to new, non-custodial mode before {date}
+			 */
+			body: (arg: { date: string }) => LocalizedString
+			/**
+			 * Migrate
+			 */
+			migrateCta: () => LocalizedString
+		}
+		contactSupport: {
+			/**
+			 * Contact support
+			 */
+			title: () => LocalizedString
+			/**
+			 * Something went wrong but don't worry your funds are safe, please contact support for assistance.
+	
+		You may need this information to help support resolve your case:
+			 */
+			body: () => LocalizedString
+			/**
+			 * Account ID
+			 */
+			accountIdLabel: () => LocalizedString
+			/**
+			 * pubKey
+			 */
+			pubKeyLabel: () => LocalizedString
+			/**
+			 * Username
+			 */
+			usernameLabel: () => LocalizedString
+			/**
+			 * Email
+			 */
+			emailLabel: () => LocalizedString
+			/**
+			 * Phone number
+			 */
+			phoneLabel: () => LocalizedString
+			/**
+			 * App version
+			 */
+			appVersionLabel: () => LocalizedString
+			/**
+			 * Platform
+			 */
+			platformLabel: () => LocalizedString
+			/**
+			 * Country
+			 */
+			countryLabel: () => LocalizedString
+			/**
+			 * Migration support request
+			 */
+			emailSubject: () => LocalizedString
+			/**
+			 * Describe the problem:
+			 */
+			emailDescribeProblem: () => LocalizedString
+			/**
+			 * Account information for support:
+			 */
+			emailAccountInfo: () => LocalizedString
+			/**
+			 * Contact us
+			 */
+			contactUsCta: () => LocalizedString
+		}
 	}
 	AccountTypeSelectionScreen: {
 		/**
@@ -24199,6 +24719,20 @@ export type TranslationFunctions = {
 		 * Secure wallet
 		 */
 		secureMe: () => LocalizedString
+	}
+	NonCustodialInfoBulletin: {
+		/**
+		 * This is a non-custodial account
+		 */
+		title: () => LocalizedString
+		/**
+		 * To learn more read our blog post
+		 */
+		body: () => LocalizedString
+		/**
+		 * Read
+		 */
+		cta: () => LocalizedString
 	}
 	SelfCustodialOffline: {
 		/**

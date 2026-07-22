@@ -2799,6 +2799,7 @@
     "total": "Total",
     "transactions": "Transaksi",
     "transactionsError": "Kesalahan memuat transaksi",
+    "transfer": "Transfer",
     "tryAgain": "Coba Lagi",
     "type": "Tipe",
     "usdAccount": "Akun Dolar",
@@ -2815,6 +2816,7 @@
     "problemMaybeReauth": "Ada masalah dengan permintaan Anda. Silakan coba lagi dalam satu menit. Jika masalah berlanjut, kami sarankan Anda keluar dan masuk kembali. Anda dapat keluar melalui Pengaturan > Akun > Keluar",
     "warning": "Peringatan",
     "continue": "Lanjutkan",
+    "skip": "Lewati",
     "correct": "Benar",
     "recommended": "Direkomendasikan",
     "expirationTime": "Waktu Kedaluwarsa",
@@ -3549,12 +3551,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Hubungi dukungan",
+      "body": "Terjadi kesalahan, tetapi jangan khawatir, dana Anda aman. Silakan hubungi dukungan untuk mendapatkan bantuan.\n\nAnda mungkin memerlukan informasi ini untuk membantu dukungan menyelesaikan kasus Anda:",
+      "accountIdLabel": "ID akun",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Nama pengguna",
+      "emailLabel": "Email",
+      "phoneLabel": "Nomor telepon",
+      "appVersionLabel": "Versi aplikasi",
+      "platformLabel": "Platform",
+      "countryLabel": "Negara",
+      "emailSubject": "Permintaan dukungan migrasi",
+      "emailDescribeProblem": "Jelaskan masalahnya:",
+      "emailAccountInfo": "Informasi akun untuk dukungan:",
+      "contactUsCta": "Hubungi kami"
+    },
+    "migrateNowModal": {
+      "title": "Migrasikan sekarang ke akun non-kustodial",
+      "body": "Anda tidak dapat lagi menerima dana di akun kustodial Anda. Blink telah menghentikan layanan kustodial di wilayah Anda dan akun ini akan dinonaktifkan pada akhir {date}.\n\nMigrasikan sekarang ke akun non-kustodial.",
+      "migrateCta": "Migrasi sekarang"
+    },
+    "reminderBulletin": {
+      "title": "Penting",
+      "body": "Migrasikan akun Anda ke mode non-kustodial yang baru sebelum {date}",
+      "migrateCta": "Migrasi"
+    },
+    "dollarBalanceModal": {
+      "title": "Kami tidak dapat memigrasikan Saldo Dolar Anda",
+      "body": "Kosongkan Saldo Dolar Anda terlebih dahulu. Anda dapat mentransfernya ke Saldo Bitcoin di Blink atau ke tempat lain."
+    },
+    "balancesOverview": {
+      "title": "Pindahkan saldo Anda",
+      "body": "Pindahkan dana Anda dengan aman ke akun baru Anda.",
+      "currentBitcoinBalance": "Saldo Bitcoin saat ini",
+      "currentDollarBalance": "Saldo Dolar saat ini",
+      "newBitcoinBalance": "Saldo Bitcoin baru",
+      "newDollarBalance": "Saldo Dolar baru",
+      "dollarBalanceNotAvailable": "tidak tersedia",
+      "networkFee": "Biaya jaringan: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Biaya jaringan: <bold>{fee: string}</bold> (ditanggung oleh Blink)",
+      "exchangeRate": "Nilai tukar saat ini 1 BTC = {rate: string}",
+      "approveCta": "Setujui",
+      "contactSupportCta": "Hubungi dukungan"
+    },
+    "migrationRequiredTitle": "Saatnya memutakhirkan",
+    "keepReceivingTitle": "Terus terima seperti biasa",
+    "keepReceivingBody": "Alamat Lightning Anda akan dipindahkan ke akun non-custodial baru Anda.",
+    "keepReceivingLnAddressLabel": "Alamat LN Anda",
+    "keepReceivingCta": "Bagus",
+    "receivingDisabledToast": "Penerimaan saat ini dinonaktifkan.",
+    "downloadHistoryTitle": "Unduh riwayat transaksi Anda",
+    "downloadHistoryBody": "Akun baru Anda akan dimulai dari awal. Jika Anda ingin menyimpan catatan transaksi Anda, unduh sekarang sebagai CSV.",
+    "downloadHistoryDownloadCta": "Unduh",
+    "apiServiceTitle": "Layanan API tidak tersedia",
+    "apiServiceBody": "Kami melihat bahwa Anda memiliki kunci API aktif. Blink tidak dapat menyediakan API dalam mode non-custodial.\n\nJika Anda bergantung pada API Blink, hubungi kami segera dan kami akan berusaha sebaik mungkin untuk membantu transisi yang mulus.",
+    "apiServiceContactCta": "Hubungi kami",
+    "apiServiceContinueCta": "Tetap lanjutkan",
+    "resumeFailed": "Terjadi kesalahan saat melanjutkan migrasi Anda. Silakan mulai lagi dari awal.",
+    "migrationRequiredBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial.",
+    "migrationRequiredForcedBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial. Ini diperlukan karena alasan regulasi.\n\nTidak perlu khawatir, non-custodial akan lebih baik untukmu dalam jangka panjang.",
+    "migrationGateTitle": "Akun tidak dapat diakses",
+    "migrationGateBody": "Karena alasan regulasi, kami tidak dapat menyediakan akun custodial di wilayahmu. Transfer danamu ke akun non-custodial dengan Blink dengan mengikuti langkah berikut atau hubungi kami di <link>{email}</link>",
+    "bitcoinBalance": "Saldo Bitcoin",
+    "dollarBalance": "Saldo dolar",
     "moveToNonCustodial": "Pindah ke non-custodial",
     "explainerTitle": "Apa artinya pindah ke non-custodial?",
-    "explainerStep1": "Anda akan membuat akun non-custodial di protokol Spark, <link>pelajari lebih lanjut di sini</link>",
-    "explainerStep2": "Kami mentransfer dana Anda ke akun non-custodial baru dan akun Anda saat ini akan dihapus",
-    "explainerStep3": "Terus gunakan Blink seperti biasa",
-    "letsMove": "Ayo mulai",
+    "explainerCheck1": "Anda akan membuat akun non-custodial di protokol Spark",
+    "explainerCheck2": "Kami memindahkan dana Anda ke akun non-custodial baru Anda",
+    "explainerCheck3": "Akun Anda saat ini dan semua datanya termasuk riwayat transaksi akan ditutup",
+    "explainerCheck4": "Blink API tidak akan tersedia",
+    "explainerCheck5": "Akun Anda akan dikenakan biaya jaringan Spark",
+    "explainerCta": "Saya mengerti",
     "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik."
   },
   "AccountTypeSelectionScreen": {
@@ -3604,6 +3672,11 @@
     "modalTitle": "Amankan dana Anda",
     "modalDescription": "Kami sangat menyarankan Anda untuk mencadangkan dompet Anda untuk mencegah kehilangan total dana jika Anda kehilangan perangkat ini.",
     "secureMe": "Amankan dompet"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Ini adalah akun non-kustodial",
+    "body": "Untuk mempelajari lebih lanjut, baca postingan blog kami",
+    "cta": "Baca"
   },
   "StableBalance": {
     "title": "Saldo stabil",

@@ -8,6 +8,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { usePendingMigrationAccounts } from "@app/screens/account-migration/hooks"
 
 import { ProfileRow } from "../../self-custodial/profile-row"
 
@@ -26,7 +27,14 @@ export const SwitchAccount: React.FC = () => {
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  const { selfCustodialEntries } = useAccountRegistry()
+  const { selfCustodialEntries, activeAccount } = useAccountRegistry()
+  const { pendingAccountIds } = usePendingMigrationAccounts()
+
+  /** Wallets provisioned mid-migration stay hidden until the flow activates them: an
+   *  empty, unbacked account must never be switchable from here. */
+  const visibleSelfCustodialEntries = selfCustodialEntries.filter(
+    (entry) => entry.id === activeAccount?.id || !pendingAccountIds.has(entry.id),
+  )
 
   const [profiles, setProfiles] = useState<ProfileProps[]>([])
   const [nextProfileToken, setNextProfileToken] = useState<string>()
@@ -67,7 +75,7 @@ export const SwitchAccount: React.FC = () => {
             nextProfileToken={nextProfileToken}
           />
         ))}
-        {selfCustodialEntries.map((entry, index) => (
+        {visibleSelfCustodialEntries.map((entry, index) => (
           <ProfileRow
             key={entry.id}
             entry={entry}

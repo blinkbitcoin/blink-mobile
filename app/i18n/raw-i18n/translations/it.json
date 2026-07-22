@@ -2800,6 +2800,7 @@
         "total": "Totale",
         "transactions": "Transazioni",
         "transactionsError": "Errore nel caricamento delle transazioni",
+        "transfer": "Trasferisci",
         "tryAgain": "Riprova",
         "type": "Tipo",
         "usdAccount": "Conto Dollaro",
@@ -2816,6 +2817,7 @@
         "problemMaybeReauth": "Si è verificato un problema con la tua richiesta. Riprova tra un minuto. Se il problema persiste, ti consigliamo di uscire e di accedere nuovamente. Puoi uscire andando in Impostazioni > Account > Esci",
         "warning": "Avvertimento",
         "continue": "Continua",
+        "skip": "Salta",
         "correct": "Corretto",
         "recommended": "Consigliato",
         "expirationTime": "Scadenza",
@@ -3549,12 +3551,78 @@
         }
     },
     "AccountMigration": {
+        "contactSupport": {
+            "title": "Contatta il supporto",
+            "body": "Qualcosa è andato storto, ma non preoccuparti, i tuoi fondi sono al sicuro. Contatta il supporto per ricevere assistenza.\n\nPotresti aver bisogno di queste informazioni per aiutare il supporto a risolvere il tuo caso:",
+            "accountIdLabel": "ID account",
+            "pubKeyLabel": "pubKey",
+            "usernameLabel": "Nome utente",
+            "emailLabel": "Email",
+            "phoneLabel": "Numero di telefono",
+            "appVersionLabel": "Versione dell'app",
+            "platformLabel": "Piattaforma",
+            "countryLabel": "Paese",
+            "emailSubject": "Richiesta di supporto per la migrazione",
+            "emailDescribeProblem": "Descrivi il problema:",
+            "emailAccountInfo": "Informazioni dell'account per il supporto:",
+            "contactUsCta": "Contattaci"
+        },
+        "migrateNowModal": {
+            "title": "Migra ora verso un account non custodiale",
+            "body": "Non puoi più ricevere fondi sul tuo account custodiale. Blink ha interrotto il servizio di custodia nella tua regione e questo account sarà disattivato entro la fine del {date}.\n\nMigra ora verso un account non custodiale.",
+            "migrateCta": "Migra ora"
+        },
+        "reminderBulletin": {
+            "title": "Importante",
+            "body": "Migra il tuo account alla nuova modalità non custodiale entro il {date}",
+            "migrateCta": "Migra"
+        },
+        "dollarBalanceModal": {
+            "title": "Non possiamo migrare il tuo saldo in dollari",
+            "body": "Svuota prima il tuo saldo in dollari. Puoi trasferirlo sul tuo saldo Bitcoin in Blink o altrove."
+        },
+        "balancesOverview": {
+            "title": "Sposta il tuo saldo",
+            "body": "Sposta i tuoi fondi in sicurezza sul tuo nuovo account.",
+            "currentBitcoinBalance": "Saldo Bitcoin attuale",
+            "currentDollarBalance": "Saldo in dollari attuale",
+            "newBitcoinBalance": "Nuovo saldo Bitcoin",
+            "newDollarBalance": "Nuovo saldo in dollari",
+            "dollarBalanceNotAvailable": "non disponibile",
+            "networkFee": "Commissione di rete: <bold>{fee: string}</bold>",
+            "networkFeeCoveredByBlink": "Commissione di rete: <bold>{fee: string}</bold> (coperta da Blink)",
+            "exchangeRate": "Tasso di cambio attuale 1 BTC = {rate: string}",
+            "approveCta": "Approva",
+            "contactSupportCta": "Contatta il supporto"
+        },
+        "migrationRequiredTitle": "È ora di aggiornare",
+        "keepReceivingTitle": "Continua a ricevere come sempre",
+        "keepReceivingBody": "Il tuo indirizzo Lightning verrà trasferito sul tuo nuovo account non-custodial.",
+        "keepReceivingLnAddressLabel": "Il tuo indirizzo LN",
+        "keepReceivingCta": "Ottimo",
+        "receivingDisabledToast": "La ricezione è attualmente disattivata.",
+        "downloadHistoryTitle": "Scarica la cronologia delle transazioni",
+        "downloadHistoryBody": "Il tuo nuovo account partirà da zero. Se vuoi conservare un registro delle tue transazioni, scaricale ora come CSV.",
+        "downloadHistoryDownloadCta": "Scarica",
+        "apiServiceTitle": "Servizio API non disponibile",
+        "apiServiceBody": "Notiamo che hai chiavi API attive. Blink non può fornire l'API in modalità non-custodial.\n\nSe dipendi dall'API di Blink, contattaci subito e faremo del nostro meglio per aiutarti con una transizione fluida.",
+        "apiServiceContactCta": "Contattaci",
+        "apiServiceContinueCta": "Continua comunque",
+        "resumeFailed": "Qualcosa è andato storto durante la ripresa della migrazione. Ricominciala da capo.",
+        "migrationRequiredBody": "È ora di migrare il tuo account custodiale verso un account non custodiale.",
+        "migrationRequiredForcedBody": "È ora di migrare il tuo account custodiale verso un account non custodiale. È obbligatorio per motivi normativi.\n\nNon preoccuparti, il non-custodial sarà migliore per te nel lungo periodo.",
+        "migrationGateTitle": "Account non accessibile",
+        "migrationGateBody": "Per motivi normativi non possiamo fornire account custodial nella tua regione. Trasferisci i tuoi fondi su un account non-custodial con Blink seguendo i passaggi successivi o contattaci su <link>{email}</link>",
+        "bitcoinBalance": "Saldo Bitcoin",
+        "dollarBalance": "Saldo in dollari",
         "moveToNonCustodial": "Passa a non-custodial",
         "explainerTitle": "Cosa significa passare a non-custodial?",
-        "explainerStep1": "Creerai un account non-custodial sul protocollo Spark, <link>scopri di più qui</link>",
-        "explainerStep2": "Trasferiamo i tuoi fondi nel tuo nuovo account non-custodial e il tuo account attuale verrà eliminato",
-        "explainerStep3": "Continua a usare Blink come al solito",
-        "letsMove": "Andiamo",
+        "explainerCheck1": "Creerai un account non-custodial sul protocollo Spark",
+        "explainerCheck2": "Trasferiamo i tuoi fondi sul tuo nuovo account non-custodial",
+        "explainerCheck3": "Il tuo account attuale e tutti i suoi dati, inclusa la cronologia delle transazioni, verranno chiusi",
+        "explainerCheck4": "L'API di Blink non sarà disponibile",
+        "explainerCheck5": "Verrà addebitata una commissione di rete Spark sul tuo account",
+        "explainerCta": "Ho capito",
         "transferringFunds": "Trasferimento dei tuoi fondi in corso. Dovrebbe completarsi in pochi secondi."
     },
     "AccountTypeSelectionScreen": {
@@ -3604,6 +3672,11 @@
         "modalTitle": "Metti al sicuro i tuoi fondi",
         "modalDescription": "Ti consigliamo vivamente di eseguire il backup del tuo portafoglio per prevenire una perdita totale dei fondi nel caso in cui perdessi questo dispositivo.",
         "secureMe": "Proteggi portafoglio"
+    },
+    "NonCustodialInfoBulletin": {
+        "title": "Questo è un account non custodiale",
+        "body": "Per saperne di più, leggi il nostro articolo del blog",
+        "cta": "Leggi"
     },
     "StableBalance": {
         "title": "Saldo stabile",

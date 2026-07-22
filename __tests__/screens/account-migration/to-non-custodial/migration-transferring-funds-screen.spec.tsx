@@ -1,0 +1,191 @@
+import React from "react"
+import { act, render, screen } from "@testing-library/react-native"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
+
+import { MigrationTransferringFundsScreen } from "@app/screens/account-migration/to-non-custodial/migration-transferring-funds-screen"
+import { reportError } from "@app/utils/error-logging"
+
+import { ContextForScreen } from "../../helper"
+import { flushEffects } from "../../../helpers/flush-effects"
+
+loadLocale("en")
+
+const mockNavigate = jest.fn()
+const mockReset = jest.fn()
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => ({ navigate: mockNavigate, reset: mockReset }),
+}))
+
+const mockCompleteMigration = jest.fn()
+let mockMigrationAccountId: string | null = "sc-account-1"
+let mockMigrationLoading = false
+const mockUseHardwareBackGuard = jest.fn()
+
+jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
+  useCompleteMigration: () => ({
+    migrationAccountId: mockMigrationAccountId,
+    migrationLoading: mockMigrationLoading,
+    completeMigration: mockCompleteMigration,
+  }),
+  useHardwareBackGuard: (onBack?: () => void) => mockUseHardwareBackGuard(onBack),
+}))
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: jest.fn(),
+}))
+
+jest.mock("@app/components/status-screen-layout", () => ({
+  StatusScreenLayout: ({ children }: { children: React.ReactNode }) => {
+    const { View } = jest.requireActual("react-native")
+    return <View testID="status-layout">{children}</View>
+  },
+}))
+
+const TRANSFER_DELAY_MS = 3000
+
+const renderScreen = () =>
+  render(
+    <ContextForScreen>
+      <MigrationTransferringFundsScreen />
+    </ContextForScreen>,
+  )
+
+describe("MigrationTransferringFundsScreen", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+    mockMigrationAccountId = "sc-account-1"
+    mockMigrationLoading = false
+    mockCompleteMigration.mockResolvedValue(true)
+    loadLocale("en")
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  it("swallows the hardware back while the funds move", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseHardwareBackGuard).toHaveBeenCalledWith(undefined)
+  })
+
+  it("renders the transferring funds message in the status layout", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByText("Transferring your funds. It should be done in a few seconds."),
+    ).toBeTruthy()
+    expect(screen.getByTestId("status-layout")).toBeTruthy()
+  })
+
+  it("swaps the session and navigates to success after the transfer delay", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockCompleteMigration).not.toHaveBeenCalled()
+
+    act(() => {
+      jest.advanceTimersByTime(TRANSFER_DELAY_MS)
+    })
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
+    })
+  })
+
+  it("waits without acting while the checkpoint is still loading", async () => {
+    mockMigrationLoading = true
+    mockMigrationAccountId = null
+    renderScreen()
+    await flushEffects()
+
+    act(() => {
+      jest.advanceTimersByTime(TRANSFER_DELAY_MS)
+    })
+
+    expect(mockCompleteMigration).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("routes to contact support when the checkpoint has no provisioned account", async () => {
+    mockMigrationAccountId = null
+    renderScreen()
+    await flushEffects()
+
+    expect(mockCompleteMigration).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(jest.mocked(reportError)).toHaveBeenCalledWith(
+      "Migration transfer without provisioned account",
+      expect.any(Error),
+    )
+  })
+
+  it("does not route to support when the successful transfer clears the checkpoint", async () => {
+    /** The real completeMigration clears the checkpoint and swaps the session, so the
+     *  provisioned account disappears on the very success that must not be flagged. */
+    mockCompleteMigration.mockImplementation(async () => {
+      mockMigrationAccountId = null
+      return true
+    })
+
+    const { rerender } = renderScreen()
+    await flushEffects()
+
+    act(() => {
+      jest.advanceTimersByTime(TRANSFER_DELAY_MS)
+    })
+    await flushEffects()
+
+    /** The re-render the cleared checkpoint triggers in the real hook. */
+    rerender(
+      <ContextForScreen>
+        <MigrationTransferringFundsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: "selfCustodialBackupSuccess", params: { reBackup: false } }],
+    })
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(jest.mocked(reportError)).not.toHaveBeenCalled()
+  })
+
+  it("routes to contact support when the swap does not happen", async () => {
+    mockCompleteMigration.mockResolvedValue(false)
+    renderScreen()
+    await flushEffects()
+
+    act(() => {
+      jest.advanceTimersByTime(TRANSFER_DELAY_MS)
+    })
+    await flushEffects()
+
+    expect(mockCompleteMigration).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  it("routes to the contact support screen when the transfer fails", async () => {
+    mockCompleteMigration.mockRejectedValue(new Error("no route found"))
+    renderScreen()
+    await flushEffects()
+
+    act(() => {
+      jest.advanceTimersByTime(TRANSFER_DELAY_MS)
+    })
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport")
+    expect(mockReset).not.toHaveBeenCalled()
+  })
+})

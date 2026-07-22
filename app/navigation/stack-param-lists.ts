@@ -199,8 +199,14 @@ export type RootStackParamList = {
     successMessage?: string
   }
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
+  accountMigrationEntry: undefined
+  accountMigrationStart: undefined
   accountMigrationExplainer: undefined
+  accountMigrationKeepReceiving: undefined
+  accountMigrationDownloadHistory: undefined
+  accountMigrationBalancesOverview: undefined
   accountMigrationTransferringFunds: undefined
+  accountMigrationContactSupport: undefined
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined
   selfCustodialCloudRestore: undefined
@@ -255,4 +261,6 @@ export type PrimaryStackParamList = {
   Web: undefined
 }
 
-export type NewAccountFlowParamsList = { flow: "phone" | "trial" | "selfCustodial" }
+export type NewAccountFlowParamsList = {
+  flow: "phone" | "trial" | "selfCustodial" | "migration"
+}

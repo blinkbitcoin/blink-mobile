@@ -2799,6 +2799,7 @@
     "total": "Total",
     "transactions": "Transaktioner",
     "transactionsError": "Fejl ved indlæsning af transaktioner",
+    "transfer": "Overfør",
     "tryAgain": "Prøv igen",
     "type": "Type",
     "usdAccount": "Dollar-konto",
@@ -2815,6 +2816,7 @@
     "problemMaybeReauth": "Der opstod et problem med din anmodning. Prøv igen om et minut. Hvis problemet fortsætter, anbefaler vi, at du logger ud og logger ind igen. Du kan logge ud ved at gå til Indstillinger > Konto > Log ud",
     "warning": "Advarsel",
     "continue": "Fortsæt",
+    "skip": "Spring over",
     "correct": "Korrekt",
     "recommended": "Anbefalet",
     "expirationTime": "Udløbstid",
@@ -3549,12 +3551,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Kontakt support",
+      "body": "Noget gik galt, men bare rolig, dine midler er sikre. Kontakt venligst support for at få hjælp.\n\nDu kan få brug for disse oplysninger, så support kan løse din sag:",
+      "accountIdLabel": "Konto-ID",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Brugernavn",
+      "emailLabel": "E-mail",
+      "phoneLabel": "Telefonnummer",
+      "appVersionLabel": "Appversion",
+      "platformLabel": "Platform",
+      "countryLabel": "Land",
+      "emailSubject": "Supportanmodning om migrering",
+      "emailDescribeProblem": "Beskriv problemet:",
+      "emailAccountInfo": "Kontooplysninger til support:",
+      "contactUsCta": "Kontakt os"
+    },
+    "migrateNowModal": {
+      "title": "Migrér nu til en ikke-depotkonto",
+      "body": "Du kan ikke længere modtage midler på din depotkonto. Blink har indstillet depottjenesten i din region, og denne konto vil blive deaktiveret ved udgangen af {date}.\n\nMigrér nu til en ikke-depotkonto.",
+      "migrateCta": "Migrér nu"
+    },
+    "reminderBulletin": {
+      "title": "Vigtigt",
+      "body": "Migrér din konto til den nye ikke-depot-tilstand inden {date}",
+      "migrateCta": "Migrér"
+    },
+    "dollarBalanceModal": {
+      "title": "Vi kan ikke migrere din dollarsaldo",
+      "body": "Tøm først din dollarsaldo. Du kan overføre den til din Bitcoin-saldo i Blink eller et andet sted."
+    },
+    "balancesOverview": {
+      "title": "Flyt din saldo",
+      "body": "Flyt dine midler sikkert til din nye konto.",
+      "currentBitcoinBalance": "Nuværende Bitcoin-saldo",
+      "currentDollarBalance": "Nuværende dollarsaldo",
+      "newBitcoinBalance": "Ny Bitcoin-saldo",
+      "newDollarBalance": "Ny dollarsaldo",
+      "dollarBalanceNotAvailable": "ikke tilgængelig",
+      "networkFee": "Netværksgebyr: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Netværksgebyr: <bold>{fee: string}</bold> (dækkes af Blink)",
+      "exchangeRate": "Nuværende vekselkurs 1 BTC = {rate: string}",
+      "approveCta": "Godkend",
+      "contactSupportCta": "Kontakt support"
+    },
+    "migrationRequiredTitle": "Tid til at opgradere",
+    "keepReceivingTitle": "Fortsæt med at modtage som sædvanligt",
+    "keepReceivingBody": "Din Lightning-adresse vil blive overført til din nye non-custodial konto.",
+    "keepReceivingLnAddressLabel": "Din LN-adresse",
+    "keepReceivingCta": "Fint",
+    "receivingDisabledToast": "Modtagelse er i øjeblikket deaktiveret.",
+    "downloadHistoryTitle": "Download din transaktionshistorik",
+    "downloadHistoryBody": "Din nye konto starter på en frisk. Hvis du vil bevare en oversigt over dine transaktioner, skal du downloade dem som CSV nu.",
+    "downloadHistoryDownloadCta": "Download",
+    "apiServiceTitle": "API-tjeneste ikke tilgængelig",
+    "apiServiceBody": "Vi bemærker, at du har aktive API-nøgler. Blink kan ikke levere API'en i non-custodial tilstand.\n\nHvis du er afhængig af Blinks API, så kontakt os hurtigt, og vi vil gøre vores bedste for at hjælpe med en glidende overgang.",
+    "apiServiceContactCta": "Kontakt os",
+    "apiServiceContinueCta": "Fortsæt alligevel",
+    "resumeFailed": "Noget gik galt under genoptagelsen af din migrering. Start den venligst igen.",
+    "migrationRequiredBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto.",
+    "migrationRequiredForcedBody": "Det er tid til at migrere din depotkonto til en ikke-depotkonto. Det er påkrævet af regulatoriske årsager.\n\nIngen grund til bekymring, non-custodial vil være bedre for dig i det lange løb.",
+    "migrationGateTitle": "Konto ikke tilgængelig",
+    "migrationGateBody": "Af regulatoriske årsager kan vi ikke tilbyde custodial konti i din region. Overfør dine midler til en non-custodial konto hos Blink ved at følge de næste trin, eller kontakt os på <link>{email}</link>",
+    "bitcoinBalance": "Bitcoin-saldo",
+    "dollarBalance": "Dollar-saldo",
     "moveToNonCustodial": "Flyt til non-custodial",
     "explainerTitle": "Hvad betyder det at flytte til non-custodial?",
-    "explainerStep1": "Du opretter en non-custodial konto på Spark-protokollen, <link>lær mere her</link>",
-    "explainerStep2": "Vi overfører dine midler til din nye non-custodial konto, og din nuværende konto vil blive slettet",
-    "explainerStep3": "Fortsæt med at bruge Blink som normalt",
-    "letsMove": "Lad os gå",
+    "explainerCheck1": "Du opretter en non-custodial konto på Spark-protokollen",
+    "explainerCheck2": "Vi overfører dine midler til din nye non-custodial konto",
+    "explainerCheck3": "Din nuværende konto og alle dens data, herunder transaktionshistorik, vil blive lukket",
+    "explainerCheck4": "Blink API vil ikke være tilgængelig",
+    "explainerCheck5": "Din konto vil blive trukket et Spark-netværksgebyr",
+    "explainerCta": "Jeg forstår",
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder."
   },
   "AccountTypeSelectionScreen": {
@@ -3604,6 +3672,11 @@
     "modalTitle": "Sikr dine midler",
     "modalDescription": "Vi anbefaler stærkt, at du sikkerhedskopierer din tegnebog for at forhindre et fuldstændigt tab af midler, hvis du mister denne enhed.",
     "secureMe": "Sikr tegnebog"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Dette er en ikke-depotkonto",
+    "body": "Læs vores blogindlæg for at lære mere",
+    "cta": "Læs"
   },
   "StableBalance": {
     "title": "Stabil saldo",

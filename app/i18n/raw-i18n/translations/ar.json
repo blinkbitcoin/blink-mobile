@@ -2799,6 +2799,7 @@
     "total": "المجموع",
     "transactions": "المعاملات",
     "transactionsError": "لقد حصل خطأ في تحميل المعاملات",
+    "transfer": "تحويل",
     "tryAgain": "حاول مرة اخرى",
     "type": "يتم الكتابة",
     "usdAccount": "حساب بالدولار",
@@ -2815,6 +2816,7 @@
     "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     "warning": "Warning",
     "continue": "متابعة",
+    "skip": "تخطي",
     "correct": "صحيح",
     "recommended": "مُوصى به",
     "expirationTime": "وقت انتهاء الصلاحية",
@@ -3549,12 +3551,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "تواصل مع الدعم",
+      "body": "حدث خطأ ما، لكن لا تقلق، أموالك آمنة. يرجى التواصل مع الدعم للمساعدة.\n\nقد تحتاج إلى هذه المعلومات لمساعدة الدعم في حل حالتك:",
+      "accountIdLabel": "معرّف الحساب",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "اسم المستخدم",
+      "emailLabel": "البريد الإلكتروني",
+      "phoneLabel": "رقم الهاتف",
+      "appVersionLabel": "إصدار التطبيق",
+      "platformLabel": "المنصة",
+      "countryLabel": "البلد",
+      "emailSubject": "طلب دعم للترحيل",
+      "emailDescribeProblem": "صف المشكلة:",
+      "emailAccountInfo": "معلومات الحساب للدعم:",
+      "contactUsCta": "تواصل معنا"
+    },
+    "migrateNowModal": {
+      "title": "رحّل الآن إلى حساب غير حافظ",
+      "body": "لم يعد بإمكانك استقبال الأموال في حسابك الحافظ. أوقفت Blink خدمة الحفظ في منطقتك وسيتم تعطيل هذا الحساب بحلول نهاية {date}.\n\nرحّل الآن إلى حساب غير حافظ.",
+      "migrateCta": "رحّل الآن"
+    },
+    "reminderBulletin": {
+      "title": "مهم",
+      "body": "رحّل حسابك إلى الوضع الجديد غير الحافظ قبل {date}",
+      "migrateCta": "رحّل"
+    },
+    "dollarBalanceModal": {
+      "title": "لا يمكننا ترحيل رصيدك بالدولار",
+      "body": "أفرغ رصيدك بالدولار أولًا. يمكنك تحويله إلى رصيد البيتكوين في Blink أو في مكان آخر."
+    },
+    "balancesOverview": {
+      "title": "انقل رصيدك",
+      "body": "انقل أموالك بأمان إلى حسابك الجديد.",
+      "currentBitcoinBalance": "رصيد البيتكوين الحالي",
+      "currentDollarBalance": "رصيد الدولار الحالي",
+      "newBitcoinBalance": "رصيد البيتكوين الجديد",
+      "newDollarBalance": "رصيد الدولار الجديد",
+      "dollarBalanceNotAvailable": "غير متاح",
+      "networkFee": "رسوم الشبكة: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "رسوم الشبكة: <bold>{fee: string}</bold> (تغطيها Blink)",
+      "exchangeRate": "سعر الصرف الحالي 1 BTC = {rate: string}",
+      "approveCta": "موافقة",
+      "contactSupportCta": "تواصل مع الدعم"
+    },
+    "migrationRequiredTitle": "حان وقت الترقية",
+    "keepReceivingTitle": "استمر في الاستلام كالمعتاد",
+    "keepReceivingBody": "سيتم نقل عنوان Lightning الخاص بك إلى حسابك الجديد غير الحفظي.",
+    "keepReceivingLnAddressLabel": "عنوان LN الخاص بك",
+    "keepReceivingCta": "رائع",
+    "receivingDisabledToast": "الاستلام معطّل حاليًا.",
+    "downloadHistoryTitle": "نزّل سجل معاملاتك",
+    "downloadHistoryBody": "سيبدأ حسابك الجديد من جديد. إذا كنت ترغب في الاحتفاظ بسجل لمعاملاتك، فنزّلها الآن كملف CSV.",
+    "downloadHistoryDownloadCta": "تنزيل",
+    "apiServiceTitle": "خدمة API غير متوفرة",
+    "apiServiceBody": "نلاحظ أن لديك مفاتيح API نشطة. لا يمكن لـ Blink توفير API في الوضع غير الحفظي.\n\nإذا كنت تعتمد على API الخاص بـ Blink، فتواصل معنا فورًا وسنبذل قصارى جهدنا لمساعدتك في انتقال سلس.",
+    "apiServiceContactCta": "تواصل معنا",
+    "apiServiceContinueCta": "المتابعة على أي حال",
+    "resumeFailed": "حدث خطأ ما أثناء استئناف ترحيلك. يرجى البدء من جديد.",
+    "migrationRequiredBody": "حان الوقت لترحيل حسابك الحافظ إلى حساب غير حافظ.",
+    "migrationRequiredForcedBody": "حان الوقت لترحيل حسابك الحافظ إلى حساب غير حافظ. هذا مطلوب لأسباب تنظيمية.\n\nلا داعي للقلق، سيكون الوضع غير الحفظي أفضل لك على المدى الطويل.",
+    "migrationGateTitle": "الحساب غير متاح",
+    "migrationGateBody": "لأسباب تنظيمية لا يمكننا توفير حسابات حفظية في منطقتك. حوّل أموالك إلى حساب غير حفظي مع Blink باتباع الخطوات التالية أو تواصل معنا على <link>{email}</link>",
+    "bitcoinBalance": "رصيد البيتكوين",
+    "dollarBalance": "رصيد الدولار",
     "moveToNonCustodial": "الانتقال إلى غير حفظي",
     "explainerTitle": "ماذا يعني الانتقال إلى غير حفظي؟",
-    "explainerStep1": "ستقوم بإنشاء حساب غير حفظي على بروتوكول Spark، <link>اعرف المزيد هنا</link>",
-    "explainerStep2": "سننقل أموالك إلى حسابك الجديد غير الحفظي وسيتم حذف حسابك الحالي",
-    "explainerStep3": "استمر في استخدام Blink كالمعتاد",
-    "letsMove": "هيا بنا",
+    "explainerCheck1": "ستقوم بإنشاء حساب غير حفظي على بروتوكول Spark",
+    "explainerCheck2": "ننقل أموالك إلى حسابك الجديد غير الحفظي",
+    "explainerCheck3": "سيتم إغلاق حسابك الحالي وجميع بياناته بما في ذلك سجل المعاملات",
+    "explainerCheck4": "لن تكون واجهة برمجة تطبيقات Blink متاحة",
+    "explainerCheck5": "سيتم خصم رسوم شبكة Spark من حسابك",
+    "explainerCta": "فهمت",
     "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة."
   },
   "AccountTypeSelectionScreen": {
@@ -3604,6 +3672,11 @@
     "modalTitle": "قم بتأمين أموالك",
     "modalDescription": "نوصي بشدة بعمل نسخة احتياطية لمحفظتك لمنع فقدان كامل للأموال في حال فقدت هذا الجهاز.",
     "secureMe": "تأمين المحفظة"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "هذا حساب غير حافظ",
+    "body": "لمعرفة المزيد، اقرأ منشور مدونتنا",
+    "cta": "اقرأ"
   },
   "StableBalance": {
     "title": "الرصيد المستقر",

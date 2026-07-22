@@ -1,10 +1,51 @@
+import { Network, defaultExternalSigner } from "@breeztech/breez-sdk-spark-react-native"
+
 import {
   checkLightningAddressAvailable,
+  deriveWalletIdentityPubkey,
   getUserSettings,
   getWalletInfo,
   listPayments,
   registerLightningAddress,
 } from "@app/self-custodial/bridge/wallet"
+
+describe("deriveWalletIdentityPubkey", () => {
+  it("derives the identity pubkey offline from the mnemonic and frees the signer", () => {
+    const uniffiDestroy = jest.fn()
+    const identityPublicKey = jest
+      .fn()
+      .mockReturnValue({ bytes: Uint8Array.from([0x02, 0xab, 0xff]).buffer })
+    ;(defaultExternalSigner as jest.Mock).mockReturnValue({
+      identityPublicKey,
+      uniffiDestroy,
+    })
+
+    const pubkey = deriveWalletIdentityPubkey("youth indicate void", Network.Regtest)
+
+    expect(pubkey).toBe("02abff")
+    expect(defaultExternalSigner).toHaveBeenCalledWith(
+      "youth indicate void",
+      undefined,
+      Network.Regtest,
+      undefined,
+    )
+    expect(uniffiDestroy).toHaveBeenCalledTimes(1)
+  })
+
+  it("frees the signer even when reading the pubkey throws", () => {
+    const uniffiDestroy = jest.fn()
+    const identityPublicKey = jest.fn(() => {
+      throw new Error("read failed")
+    })
+    ;(defaultExternalSigner as jest.Mock).mockReturnValue({
+      identityPublicKey,
+      uniffiDestroy,
+    })
+
+    expect(() => deriveWalletIdentityPubkey("m", Network.Regtest)).toThrow("read failed")
+    expect(uniffiDestroy).toHaveBeenCalledTimes(1)
+  })
+})
 
 describe("getWalletInfo", () => {
   it("calls sdk.getInfo with ensureSynced:false so startup does not block on SDK sync", () => {

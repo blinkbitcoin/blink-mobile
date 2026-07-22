@@ -2799,6 +2799,7 @@
     "total": "Укупно",
     "transactions": "Трансакције",
     "transactionsError": "Грешка при учитавању трансакција",
+    "transfer": "Пренос",
     "tryAgain": "Покушај поново",
     "type": "Тип",
     "usdAccount": "„Долар“ Рачун",
@@ -2815,6 +2816,7 @@
     "problemMaybeReauth": "Дошло је до проблема са вашим захтевом. Молимо вас покушајте поново за један минут. Уколико проблем и даље постоји, препоручујемо да се одјавите и поново пријавите. Можете се одјавити преко Подешавања > Налог > Одјави се",
     "warning": "Упозорење",
     "continue": "Настави",
+    "skip": "Прескочи",
     "correct": "Тачно",
     "recommended": "Препоручено",
     "expirationTime": "Време истека",
@@ -3549,12 +3551,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Контактирајте подршку",
+      "body": "Нешто је пошло по злу, али не брините, ваша средства су безбедна. Обратите се подршци за помоћ.\n\nОве информације могу помоћи подршци да реши ваш случај:",
+      "accountIdLabel": "ID налога",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Корисничко име",
+      "emailLabel": "Имејл",
+      "phoneLabel": "Број телефона",
+      "appVersionLabel": "Верзија апликације",
+      "platformLabel": "Платформа",
+      "countryLabel": "Држава",
+      "emailSubject": "Захтев за подршку при миграцији",
+      "emailDescribeProblem": "Опишите проблем:",
+      "emailAccountInfo": "Подаци о налогу за подршку:",
+      "contactUsCta": "Контактирајте нас"
+    },
+    "migrateNowModal": {
+      "title": "Мигрирајте сада на не-кастодијални налог",
+      "body": "Више не можете примати средства на свој кастодијални налог. Blink је укинуо кастодијалну услугу у вашем региону и овај налог ће бити деактивиран до краја дана {date}.\n\nМигрирајте сада на не-кастодијални налог.",
+      "migrateCta": "Мигрирај сада"
+    },
+    "reminderBulletin": {
+      "title": "Важно",
+      "body": "Мигрирајте свој налог на нови не-кастодијални режим пре {date}",
+      "migrateCta": "Мигрирај"
+    },
+    "dollarBalanceModal": {
+      "title": "Ne možemo da migriramo vaš dolarski saldo",
+      "body": "Prvo ispraznite svoj dolarski saldo. Možete ga preneti na svoj Bitcoin saldo u Blinku ili na drugo mesto."
+    },
+    "balancesOverview": {
+      "title": "Премести свој салдо",
+      "body": "Безбедно премести своја средства на свој нови налог.",
+      "currentBitcoinBalance": "Тренутни Bitcoin салдо",
+      "currentDollarBalance": "Тренутни доларски салдо",
+      "newBitcoinBalance": "Нови Bitcoin салдо",
+      "newDollarBalance": "Нови доларски салдо",
+      "dollarBalanceNotAvailable": "није доступно",
+      "networkFee": "Мрежна накнада: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Мрежна накнада: <bold>{fee: string}</bold> (сноси Blink)",
+      "exchangeRate": "Тренутни курс 1 BTC = {rate: string}",
+      "approveCta": "Одобри",
+      "contactSupportCta": "Контактирај подршку"
+    },
+    "migrationRequiredTitle": "Време је за надоградњу",
+    "keepReceivingTitle": "Наставите да примате као и обично",
+    "keepReceivingBody": "Ваша Lightning адреса биће пренета на ваш нови non-custodial налог.",
+    "keepReceivingLnAddressLabel": "Ваша LN адреса",
+    "keepReceivingCta": "Одлично",
+    "receivingDisabledToast": "Примање је тренутно онемогућено.",
+    "downloadHistoryTitle": "Преузмите историју трансакција",
+    "downloadHistoryBody": "Ваш нови налог почиње испочетка. Ако желите да сачувате евиденцију својих трансакција, преузмите их сада као CSV.",
+    "downloadHistoryDownloadCta": "Преузми",
+    "apiServiceTitle": "API услуга није доступна",
+    "apiServiceBody": "Приметили смо да имате активне API кључеве. Blink не може да пружи API у non-custodial режиму.\n\nАко зависите од Blink API-ја, контактирајте нас што пре и даћемо све од себе да вам помогнемо са глатким прелазом.",
+    "apiServiceContactCta": "Контактирајте нас",
+    "apiServiceContinueCta": "Ипак настави",
+    "resumeFailed": "Нешто је пошло по злу при наставку миграције. Молимо започните је поново.",
+    "migrationRequiredBody": "Време је да мигрирате свој кастодијални налог на не-кастодијални налог.",
+    "migrationRequiredForcedBody": "Време је да мигрирате свој кастодијални налог на не-кастодијални налог. То је обавезно из регулаторних разлога.\n\nБез бриге, non-custodial ће ти дугорочно бити бољи.",
+    "migrationGateTitle": "Налог није доступан",
+    "migrationGateBody": "Из регулаторних разлога не можемо да пружамо custodial налоге у твом региону. Пренеси своја средства на non-custodial налог уз Blink пратећи следеће кораке или нас контактирај на <link>{email}</link>",
+    "bitcoinBalance": "Стање Bitcoin-а",
+    "dollarBalance": "Стање у доларима",
     "moveToNonCustodial": "Пребаци на non-custodial",
     "explainerTitle": "Шта значи пребацити на non-custodial?",
-    "explainerStep1": "Креираћете non-custodial налог на Spark протоколу, <link>сазнајте више овде</link>",
-    "explainerStep2": "Пребацујемо ваша средства на ваш нови non-custodial налог, а ваш тренутни налог ће бити обрисан",
-    "explainerStep3": "Наставите да користите Blink као и обично",
-    "letsMove": "Идемо",
+    "explainerCheck1": "Креираћете non-custodial налог на Spark протоколу",
+    "explainerCheck2": "Пребацујемо твоја средства на твој нови non-custodial налог",
+    "explainerCheck3": "Твој тренутни налог и сви његови подаци, укључујући историју трансакција, биће затворени",
+    "explainerCheck4": "Blink API неће бити доступан",
+    "explainerCheck5": "Са твог налога биће наплаћена мрежна накнада Spark",
+    "explainerCta": "Разумем",
     "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди."
   },
   "AccountTypeSelectionScreen": {
@@ -3604,6 +3672,11 @@
     "modalTitle": "Obezbedite svoja sredstva",
     "modalDescription": "Preporučujemo da napravite rezervnu kopiju novčanika kako biste sprečili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
     "secureMe": "Obezbedi novčanik"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Ово је не-кастодијални налог",
+    "body": "Да бисте сазнали више, прочитајте наш блог пост",
+    "cta": "Прочитај"
   },
   "StableBalance": {
     "title": "Стабилан салдо",

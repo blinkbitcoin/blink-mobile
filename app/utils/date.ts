@@ -1,4 +1,5 @@
 import { MASK_CHAR } from "@app/config/appinfo"
+import { reportError } from "@app/utils/error-logging"
 /* eslint-disable no-param-reassign */
 
 export const DEC_1_12_AM_UTC_MINUS_6 = new Date(Date.UTC(2023, 11, 1, 6, 0, 0)).getTime()
@@ -86,6 +87,34 @@ export const formatShortDate = ({
   }
 
   return new Date(createdAt * 1000).toLocaleDateString("en-CA", options)
+}
+
+export const formatDayAndMonth = ({
+  timestampSeconds,
+  locale,
+  timezone,
+}: {
+  timestampSeconds: number
+  locale?: string
+  timezone?: string
+}): string => {
+  const date = new Date(timestampSeconds * 1000)
+  const resolvedLocale = locale ?? "en-US"
+  try {
+    return date.toLocaleDateString(resolvedLocale, {
+      day: "numeric",
+      month: "long",
+      timeZone: timezone,
+    })
+  } catch (err) {
+    /** A malformed backend timezone makes toLocaleDateString throw a RangeError; fall back
+     *  to the device timezone so one bad string never crashes the home for every user. */
+    reportError("formatDayAndMonth timezone", err)
+    return date.toLocaleDateString(resolvedLocale, {
+      day: "numeric",
+      month: "long",
+    })
+  }
 }
 
 export const parseCardValidThru = (

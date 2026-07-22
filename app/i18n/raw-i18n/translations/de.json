@@ -2800,6 +2800,7 @@
         "total": "Gesamt",
         "transactions": "Transaktionen",
         "transactionsError": "Transaktionen konnten nicht geladen werden",
+        "transfer": "Übertragen",
         "tryAgain": "Erneut versuchen",
         "type": "Typ",
         "usdAccount": "Dollar-Guthaben",
@@ -2816,6 +2817,7 @@
         "problemMaybeReauth": "Es gab ein Problem mit deiner Anfrage. Bitte versuche es in einer Minute erneut. Wenn das Problem weiterhin besteht, versuche dich aus- und wieder einzuloggen. Du kannst dich ausloggen unter Einstellungen > Account > Log out",
         "warning": "Warnung",
         "continue": "Weiter",
+        "skip": "Überspringen",
         "correct": "Richtig",
         "recommended": "Empfohlen",
         "expirationTime": "Ablaufzeit",
@@ -3549,12 +3551,78 @@
         }
     },
     "AccountMigration": {
+        "contactSupport": {
+            "title": "Support kontaktieren",
+            "body": "Etwas ist schiefgelaufen, aber keine Sorge, dein Guthaben ist sicher. Bitte kontaktiere den Support für Hilfe.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
+            "accountIdLabel": "Konto-ID",
+            "pubKeyLabel": "pubKey",
+            "usernameLabel": "Benutzername",
+            "emailLabel": "E-Mail",
+            "phoneLabel": "Telefonnummer",
+            "appVersionLabel": "App-Version",
+            "platformLabel": "Plattform",
+            "countryLabel": "Land",
+            "emailSubject": "Support-Anfrage zur Migration",
+            "emailDescribeProblem": "Beschreibe das Problem:",
+            "emailAccountInfo": "Kontoinformationen für den Support:",
+            "contactUsCta": "Kontaktiere uns"
+        },
+        "migrateNowModal": {
+            "title": "Migriere jetzt auf ein nicht-verwahrtes Konto",
+            "body": "Du kannst keine Gelder mehr auf deinem verwahrten Konto empfangen. Blink hat den Verwahrdienst in deiner Region eingestellt und dieses Konto wird zum Ende des {date} deaktiviert.\n\nMigriere jetzt auf ein nicht-verwahrtes Konto.",
+            "migrateCta": "Jetzt migrieren"
+        },
+        "reminderBulletin": {
+            "title": "Wichtig",
+            "body": "Migriere dein Konto vor dem {date} in den neuen, nicht-verwahrten Modus",
+            "migrateCta": "Migrieren"
+        },
+        "dollarBalanceModal": {
+            "title": "Wir können dein Dollar-Guthaben nicht migrieren",
+            "body": "Leere zuerst dein Dollar-Guthaben. Du kannst es auf dein Bitcoin-Guthaben in Blink oder anderswohin übertragen."
+        },
+        "balancesOverview": {
+            "title": "Verschiebe dein Guthaben",
+            "body": "Verschiebe deine Gelder sicher auf dein neues Konto.",
+            "currentBitcoinBalance": "Aktuelles Bitcoin-Guthaben",
+            "currentDollarBalance": "Aktuelles Dollar-Guthaben",
+            "newBitcoinBalance": "Neues Bitcoin-Guthaben",
+            "newDollarBalance": "Neues Dollar-Guthaben",
+            "dollarBalanceNotAvailable": "nicht verfügbar",
+            "networkFee": "Netzwerkgebühr: <bold>{fee: string}</bold>",
+            "networkFeeCoveredByBlink": "Netzwerkgebühr: <bold>{fee: string}</bold> (von Blink übernommen)",
+            "exchangeRate": "Aktueller Wechselkurs 1 BTC = {rate: string}",
+            "approveCta": "Bestätigen",
+            "contactSupportCta": "Support kontaktieren"
+        },
+        "migrationRequiredTitle": "Zeit für ein Upgrade",
+        "keepReceivingTitle": "Empfange weiterhin wie gewohnt",
+        "keepReceivingBody": "Deine Lightning-Adresse wird auf dein neues Non-Custodial-Konto übertragen.",
+        "keepReceivingLnAddressLabel": "Deine LN-Adresse",
+        "keepReceivingCta": "Super",
+        "receivingDisabledToast": "Empfangen ist derzeit deaktiviert.",
+        "downloadHistoryTitle": "Lade deinen Transaktionsverlauf herunter",
+        "downloadHistoryBody": "Dein neues Konto startet neu. Wenn du eine Aufzeichnung deiner Transaktionen behalten möchtest, lade sie jetzt als CSV herunter.",
+        "downloadHistoryDownloadCta": "Herunterladen",
+        "apiServiceTitle": "API-Dienst nicht verfügbar",
+        "apiServiceBody": "Uns ist aufgefallen, dass du aktive API-Schlüssel hast. Blink kann die API im Non-Custodial-Modus nicht bereitstellen.\n\nWenn du auf die API von Blink angewiesen bist, kontaktiere uns bitte umgehend, und wir werden unser Bestes für einen reibungslosen Übergang tun.",
+        "apiServiceContactCta": "Kontaktiere uns",
+        "apiServiceContinueCta": "Trotzdem fortfahren",
+        "resumeFailed": "Beim Fortsetzen deiner Migration ist etwas schiefgelaufen. Bitte starte sie erneut.",
+        "migrationRequiredBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren.",
+        "migrationRequiredForcedBody": "Es ist Zeit, dein verwahrtes Konto auf ein nicht-verwahrtes Konto zu migrieren. Dies ist aus regulatorischen Gründen erforderlich.\n\nKeine Sorge, Non-Custodial wird auf lange Sicht besser für dich sein.",
+        "migrationGateTitle": "Konto nicht zugänglich",
+        "migrationGateBody": "Aus regulatorischen Gründen können wir in deiner Region keine Custodial-Konten anbieten. Übertrage deine Gelder mit den folgenden Schritten auf ein Non-Custodial-Konto bei Blink oder kontaktiere uns unter <link>{email}</link>",
+        "bitcoinBalance": "Bitcoin-Guthaben",
+        "dollarBalance": "Dollar-Guthaben",
         "moveToNonCustodial": "Zu Non-Custodial wechseln",
         "explainerTitle": "Was bedeutet es, zu Non-Custodial zu wechseln?",
-        "explainerStep1": "Du erstellst ein Non-Custodial-Konto auf dem Spark-Protokoll, <link>hier mehr erfahren</link>",
-        "explainerStep2": "Wir übertragen deine Guthaben auf dein neues Non-Custodial-Konto und dein aktuelles Konto wird gelöscht",
-        "explainerStep3": "Nutze Blink weiterhin wie gewohnt",
-        "letsMove": "Los geht's",
+        "explainerCheck1": "Du erstellst ein Non-Custodial-Konto auf dem Spark-Protokoll",
+        "explainerCheck2": "Wir übertragen deine Gelder auf dein neues Non-Custodial-Konto",
+        "explainerCheck3": "Dein aktuelles Konto und alle seine Daten einschließlich des Transaktionsverlaufs werden geschlossen",
+        "explainerCheck4": "Blink API wird nicht verfügbar sein",
+        "explainerCheck5": "Deinem Konto wird eine Spark-Netzwerkgebühr abgezogen",
+        "explainerCta": "Ich verstehe",
         "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein."
     },
     "AccountTypeSelectionScreen": {
@@ -3604,6 +3672,11 @@
         "modalTitle": "Sichern Sie Ihre Mittel",
         "modalDescription": "Wir empfehlen dringend, Ihre Wallet zu sichern, um einen vollständigen Verlust Ihrer Mittel zu verhindern, falls Sie dieses Gerät verlieren.",
         "secureMe": "Wallet sichern"
+    },
+    "NonCustodialInfoBulletin": {
+        "title": "Dies ist ein nicht-verwahrtes Konto",
+        "body": "Lies unseren Blogbeitrag, um mehr zu erfahren",
+        "cta": "Lesen"
     },
     "StableBalance": {
         "title": "Stabiles Guthaben",

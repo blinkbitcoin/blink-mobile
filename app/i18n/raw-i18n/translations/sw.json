@@ -2799,6 +2799,7 @@
     "total": "Jumla",
     "transactions": "Malipo",
     "transactionsError": "Kosa katika kupakua malipo",
+    "transfer": "Hamisha",
     "tryAgain": "Jaribu Tena",
     "type": "Aina",
     "usdAccount": "Akaunti ya Dola",
@@ -2815,6 +2816,7 @@
     "problemMaybeReauth": "Kulikuwa na tatizo na ombi lako. Tafadhali jaribu baada ya dakika moja. Ikiwa tatizo litasistea, tunapendekeza ujitoke nje na uingie tena. Unaweza kujitokeza kwa kwenda kwenye Mipangilio > Akaunti > Toka",
     "warning": "Onyo",
     "continue": "Endelea",
+    "skip": "Ruka",
     "correct": "Sahihi",
     "recommended": "Inayopendekezwa",
     "expirationTime": "Muda wa Kumalizika",
@@ -3549,12 +3551,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Wasiliana na usaidizi",
+      "body": "Kuna kitu kimeenda vibaya, lakini usiwe na wasiwasi, fedha zako ziko salama. Tafadhali wasiliana na usaidizi kwa msaada.\n\nUnaweza kuhitaji taarifa hizi ili kusaidia usaidizi kutatua kesi yako:",
+      "accountIdLabel": "Kitambulisho cha akaunti",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Jina la mtumiaji",
+      "emailLabel": "Barua pepe",
+      "phoneLabel": "Namba ya simu",
+      "appVersionLabel": "Toleo la programu",
+      "platformLabel": "Jukwaa",
+      "countryLabel": "Nchi",
+      "emailSubject": "Ombi la usaidizi wa uhamishaji",
+      "emailDescribeProblem": "Eleza tatizo:",
+      "emailAccountInfo": "Taarifa za akaunti kwa usaidizi:",
+      "contactUsCta": "Wasiliana nasi"
+    },
+    "migrateNowModal": {
+      "title": "Hamia sasa kwenye akaunti isiyo ya udhamini",
+      "body": "Huwezi tena kupokea fedha kwenye akaunti yako ya udhamini. Blink imesitisha huduma ya udhamini katika eneo lako na akaunti hii itazimwa ifikapo mwisho wa {date}.\n\nHamia sasa kwenye akaunti isiyo ya udhamini.",
+      "migrateCta": "Hamia sasa"
+    },
+    "reminderBulletin": {
+      "title": "Muhimu",
+      "body": "Hamisha akaunti yako kwenye hali mpya isiyo ya udhamini kabla ya {date}",
+      "migrateCta": "Hamia"
+    },
+    "dollarBalanceModal": {
+      "title": "Hatuwezi kuhamisha Salio lako la Dola",
+      "body": "Kwanza ondoa Salio lako la Dola. Unaweza kulihamishia kwenye Salio lako la Bitcoin kwenye Blink au mahali pengine."
+    },
+    "balancesOverview": {
+      "title": "Hamisha salio lako",
+      "body": "Hamisha fedha zako kwa usalama kwenye akaunti yako mpya.",
+      "currentBitcoinBalance": "Salio la sasa la Bitcoin",
+      "currentDollarBalance": "Salio la sasa la Dola",
+      "newBitcoinBalance": "Salio jipya la Bitcoin",
+      "newDollarBalance": "Salio jipya la Dola",
+      "dollarBalanceNotAvailable": "haipatikani",
+      "networkFee": "Ada ya mtandao: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Ada ya mtandao: <bold>{fee: string}</bold> (inalipwa na Blink)",
+      "exchangeRate": "Kiwango cha ubadilishaji cha sasa 1 BTC = {rate: string}",
+      "approveCta": "Idhinisha",
+      "contactSupportCta": "Wasiliana na usaidizi"
+    },
+    "migrationRequiredTitle": "Wakati wa kuboresha",
+    "keepReceivingTitle": "Endelea kupokea kama kawaida",
+    "keepReceivingBody": "Anwani yako ya Lightning itahamishiwa kwenye akaunti yako mpya ya non-custodial.",
+    "keepReceivingLnAddressLabel": "Anwani yako ya LN",
+    "keepReceivingCta": "Vizuri",
+    "receivingDisabledToast": "Kupokea kumezimwa kwa sasa.",
+    "downloadHistoryTitle": "Pakua historia ya miamala yako",
+    "downloadHistoryBody": "Akaunti yako mpya itaanza upya. Ikiwa unataka kuweka kumbukumbu ya miamala yako, ipakue sasa kama CSV.",
+    "downloadHistoryDownloadCta": "Pakua",
+    "apiServiceTitle": "Huduma ya API haipatikani",
+    "apiServiceBody": "Tunaona kuwa una funguo za API zinazotumika. Blink haiwezi kutoa API katika hali ya non-custodial.\n\nIkiwa unategemea API ya Blink, wasiliana nasi haraka na tutafanya tuwezalo kusaidia mpito laini.",
+    "apiServiceContactCta": "Wasiliana nasi",
+    "apiServiceContinueCta": "Endelea hata hivyo",
+    "resumeFailed": "Hitilafu imetokea wakati wa kuendelea na uhamishaji wako. Tafadhali anza tena.",
+    "migrationRequiredBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini.",
+    "migrationRequiredForcedBody": "Ni wakati wa kuhamisha akaunti yako ya udhamini kwenda akaunti isiyo ya udhamini. Inahitajika kwa sababu za udhibiti.\n\nUsiwe na wasiwasi, non-custodial itakuwa bora kwako kwa muda mrefu.",
+    "migrationGateTitle": "Akaunti haipatikani",
+    "migrationGateBody": "Kwa sababu za udhibiti hatuwezi kutoa akaunti za custodial katika eneo lako. Hamisha fedha zako kwenye akaunti ya non-custodial na Blink kwa kufuata hatua zifuatazo au wasiliana nasi kupitia <link>{email}</link>",
+    "bitcoinBalance": "Salio la Bitcoin",
+    "dollarBalance": "Salio la dola",
     "moveToNonCustodial": "Hamia kwa non-custodial",
     "explainerTitle": "Inamaanisha nini kuhamia kwa non-custodial?",
-    "explainerStep1": "Utaunda akaunti ya non-custodial kwenye itifaki ya Spark, <link>jifunze zaidi hapa</link>",
-    "explainerStep2": "Tunahamisha fedha zako kwenye akaunti yako mpya ya non-custodial na akaunti yako ya sasa itafutwa",
-    "explainerStep3": "Endelea kutumia Blink kama kawaida",
-    "letsMove": "Twende",
+    "explainerCheck1": "Utaunda akaunti ya non-custodial kwenye itifaki ya Spark",
+    "explainerCheck2": "Tunahamisha fedha zako kwenye akaunti yako mpya ya non-custodial",
+    "explainerCheck3": "Akaunti yako ya sasa na data zake zote ikiwa ni pamoja na historia ya miamala zitafungwa",
+    "explainerCheck4": "Blink API haitapatikana",
+    "explainerCheck5": "Akaunti yako itakatwa ada ya mtandao wa Spark",
+    "explainerCta": "Naelewa",
     "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache."
   },
   "AccountTypeSelectionScreen": {
@@ -3604,6 +3672,11 @@
     "modalTitle": "Linda fedha zako",
     "modalDescription": "Tunakushauri sana uhifadhi pochi yako ili kuzuia kupoteza fedha zako zote iwapo utapoteza kifaa hiki.",
     "secureMe": "Linda pochi"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Hii ni akaunti isiyo ya udhamini",
+    "body": "Ili kujifunza zaidi, soma chapisho letu la blogu",
+    "cta": "Soma"
   },
   "StableBalance": {
     "title": "Salio thabiti",

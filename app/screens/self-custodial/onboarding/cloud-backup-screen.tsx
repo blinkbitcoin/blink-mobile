@@ -11,6 +11,10 @@ import { PasswordInput } from "@app/components/password-input"
 import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import {
+  MigrationCheckpoint,
+  useMigrationBackupCheckpoint,
+} from "@app/screens/account-migration/hooks"
 import { testProps } from "@app/utils/testProps"
 
 import { useCloudBackup, useCloudBackupForm } from "./hooks"
@@ -41,6 +45,8 @@ export const CloudBackupScreen: React.FC = () => {
 
   const { handleBackup, loading } = useCloudBackup({ isEncrypted, password })
 
+  useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
+
   return (
     <Screen preset="fixed">
       <View style={styles.container}>
@@ -48,7 +54,7 @@ export const CloudBackupScreen: React.FC = () => {
           <View style={styles.heroContainer}>
             <IconHero
               icon="cloud"
-              iconColor={colors.success}
+              iconColor={colors._green}
               title={LL.BackupScreen.CloudBackup.title()}
               subtitle={LL.BackupScreen.CloudBackup.description({
                 provider: cloudProvider,

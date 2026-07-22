@@ -38,6 +38,7 @@ import {
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
+import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -49,6 +50,10 @@ import {
   useDollarBalanceRestrictionSync,
 } from "@app/hooks/use-dollar-balance-restricted"
 import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
+import { MigrateNowModal } from "@app/components/migrate-now-modal"
+import { MigrationReminderBulletin } from "@app/components/migration-reminder-bulletin"
+/** Deep import on purpose: keeps the migration hooks barrel out of the home graph. */
+import { useWindDownHomeNudges } from "@app/screens/account-migration/hooks/use-wind-down-home-nudges"
 import {
   useTransferBlocked,
   useTransferBlockedSync,
@@ -58,6 +63,7 @@ import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
+import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -208,6 +214,10 @@ export const HomeScreen: React.FC = () => {
   const { stableBalanceEnabled } = useFeatureFlags()
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
   const { shouldShowBanner, shouldShowModal, dismissBanner } = useBackupNudgeState()
+  const {
+    shouldShow: shouldShowSelfCustodialInfoBulletin,
+    dismiss: dismissSelfCustodialInfoBulletin,
+  } = useSelfCustodialInfoBulletinState()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -439,6 +449,24 @@ export const HomeScreen: React.FC = () => {
       : null
   const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible
 
+  const { migrateNowPrompt, reminderBulletin, receiveBlocked } = useWindDownHomeNudges()
+  const { dismissForSession: dismissMigrateNowPrompt } = migrateNowPrompt
+  /** Dismissing first keeps the modal from floating over the pushed migration flow. */
+  const goToMigration = React.useCallback(() => {
+    dismissMigrateNowPrompt()
+    navigation.navigate("accountMigrationEntry")
+  }, [dismissMigrateNowPrompt, navigation])
+  /** The migrate-now push is the lowest-priority nudge: two native modals cannot
+   *  present at once on iOS, so it waits while any other home modal is up. */
+  const isAnotherHomeModalVisible =
+    isConvertModalVisible ||
+    isUpgradeModalVisible ||
+    isRestrictionModalVisible ||
+    isStablesatModalVisible ||
+    modalVisible
+  const shouldShowMigrateNowPrompt =
+    migrateNowPrompt.isVisible && !isAnotherHomeModalVisible
+
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
   const openUpgradeModal = React.useCallback(() => {
@@ -563,6 +591,8 @@ export const HomeScreen: React.FC = () => {
       title: LL.HomeScreen.receive(),
       target: "receiveBitcoin",
       icon: "receive",
+      disabled: receiveBlocked.isBlocked,
+      onDisabledPress: receiveBlocked.onDisabledPress,
     },
     {
       title: LL.HomeScreen.send(),
@@ -665,6 +695,14 @@ export const HomeScreen: React.FC = () => {
           conversionMinimum={stableTokenConversionMinimum}
         />
       )}
+      {/* Kept mounted (not conditionally rendered) so its exit animation plays on dismiss. */}
+      <MigrateNowModal
+        isVisible={shouldShowMigrateNowPrompt}
+        toggleModal={migrateNowPrompt.dismissForSession}
+        onMigrate={goToMigration}
+        deadlineTimestamp={migrateNowPrompt.deadlineTimestamp}
+        timezone={migrateNowPrompt.timezone}
+      />
       <View style={styles.balanceContainer}>
         <View style={styles.header}>
           <GaloyIconButton
@@ -758,6 +796,16 @@ export const HomeScreen: React.FC = () => {
         {isSelfCustodial && <UnclaimedDepositBanner />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
+        {reminderBulletin.isVisible && (
+          <MigrationReminderBulletin
+            onMigrate={goToMigration}
+            deadlineTimestamp={reminderBulletin.deadlineTimestamp}
+            timezone={reminderBulletin.timezone}
+          />
+        )}
+        {shouldShowSelfCustodialInfoBulletin && (
+          <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />
+        )}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />
         <SetDefaultAccountModal

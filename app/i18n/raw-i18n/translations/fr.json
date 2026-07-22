@@ -2800,6 +2800,7 @@
         "total": "Total",
         "transactions": "Transactions",
         "transactionsError": "Erreur de chargement des transactions",
+        "transfer": "Transférer",
         "tryAgain": "Essayer à nouveau",
         "type": "Type",
         "usdAccount": "Solde Dollar",
@@ -2816,6 +2817,7 @@
         "problemMaybeReauth": "Il y a eu un problème avec votre demande. Merci de réessayer dans une minute. Si le problème persiste, nous vous conseillons de vous déconnecter et de vous connecter à nouveau. Vous pouvez vous déconnecter en allant dans Réglages > Compte > Déconnexion",
         "warning": "Alerte",
         "continue": "Continuer",
+        "skip": "Ignorer",
         "correct": "Correct",
         "recommended": "Recommandé",
         "expirationTime": "Délai d'expiration",
@@ -3549,12 +3551,78 @@
         }
     },
     "AccountMigration": {
+        "contactSupport": {
+            "title": "Contacter le support",
+            "body": "Une erreur s'est produite, mais ne vous inquiétez pas, vos fonds sont en sécurité. Veuillez contacter le support pour obtenir de l'aide.\n\nCes informations peuvent aider le support à résoudre votre cas :",
+            "accountIdLabel": "ID du compte",
+            "pubKeyLabel": "pubKey",
+            "usernameLabel": "Nom d'utilisateur",
+            "emailLabel": "E-mail",
+            "phoneLabel": "Numéro de téléphone",
+            "appVersionLabel": "Version de l'application",
+            "platformLabel": "Plateforme",
+            "countryLabel": "Pays",
+            "emailSubject": "Demande de support pour la migration",
+            "emailDescribeProblem": "Décrivez le problème :",
+            "emailAccountInfo": "Informations du compte pour le support :",
+            "contactUsCta": "Contactez-nous"
+        },
+        "migrateNowModal": {
+            "title": "Migrez maintenant vers un compte non-custodial",
+            "body": "Vous ne pouvez plus recevoir de fonds sur votre compte custodial. Blink a mis fin au service custodial dans votre région et ce compte sera inactivé à la fin du {date}.\n\nMigrez maintenant vers un compte non-custodial.",
+            "migrateCta": "Migrer maintenant"
+        },
+        "reminderBulletin": {
+            "title": "Important",
+            "body": "Migrez votre compte vers le nouveau mode non-custodial avant le {date}",
+            "migrateCta": "Migrer"
+        },
+        "dollarBalanceModal": {
+            "title": "Nous ne pouvons pas migrer votre solde en dollars",
+            "body": "Videz d'abord votre solde en dollars. Vous pouvez le transférer vers votre solde Bitcoin dans Blink ou ailleurs."
+        },
+        "balancesOverview": {
+            "title": "Déplacez votre solde",
+            "body": "Déplacez vos fonds en toute sécurité vers votre nouveau compte.",
+            "currentBitcoinBalance": "Solde Bitcoin actuel",
+            "currentDollarBalance": "Solde en dollars actuel",
+            "newBitcoinBalance": "Nouveau solde Bitcoin",
+            "newDollarBalance": "Nouveau solde en dollars",
+            "dollarBalanceNotAvailable": "non disponible",
+            "networkFee": "Frais de réseau : <bold>{fee: string}</bold>",
+            "networkFeeCoveredByBlink": "Frais de réseau : <bold>{fee: string}</bold> (pris en charge par Blink)",
+            "exchangeRate": "Taux de change actuel 1 BTC = {rate: string}",
+            "approveCta": "Approuver",
+            "contactSupportCta": "Contacter le support"
+        },
+        "migrationRequiredTitle": "Il est temps de passer à la version supérieure",
+        "keepReceivingTitle": "Continuez à recevoir comme d'habitude",
+        "keepReceivingBody": "Votre adresse Lightning sera transférée vers votre nouveau compte non-custodial.",
+        "keepReceivingLnAddressLabel": "Votre adresse LN",
+        "keepReceivingCta": "Parfait",
+        "receivingDisabledToast": "La réception est actuellement désactivée.",
+        "downloadHistoryTitle": "Téléchargez votre historique de transactions",
+        "downloadHistoryBody": "Votre nouveau compte démarrera à zéro. Si vous souhaitez conserver une trace de vos transactions, téléchargez-les maintenant au format CSV.",
+        "downloadHistoryDownloadCta": "Télécharger",
+        "apiServiceTitle": "Service API non disponible",
+        "apiServiceBody": "Nous remarquons que vous avez des clés API actives. Blink ne peut pas fournir l'API en mode non-custodial.\n\nSi vous dépendez de l'API de Blink, contactez-nous rapidement et nous ferons de notre mieux pour faciliter une transition en douceur.",
+        "apiServiceContactCta": "Contactez-nous",
+        "apiServiceContinueCta": "Continuer quand même",
+        "resumeFailed": "Une erreur s'est produite lors de la reprise de votre migration. Veuillez la recommencer.",
+        "migrationRequiredBody": "Il est temps de migrer votre compte custodial vers un compte non-custodial.",
+        "migrationRequiredForcedBody": "Il est temps de migrer votre compte custodial vers un compte non-custodial. C'est requis pour des raisons réglementaires.\n\nPas d'inquiétude, le non-custodial sera meilleur pour vous à long terme.",
+        "migrationGateTitle": "Compte non accessible",
+        "migrationGateBody": "Pour des raisons réglementaires, nous ne pouvons pas fournir de comptes custodial dans votre région. Transférez vos fonds vers un compte non-custodial avec Blink en suivant les étapes suivantes ou contactez-nous à <link>{email}</link>",
+        "bitcoinBalance": "Solde Bitcoin",
+        "dollarBalance": "Solde en dollars",
         "moveToNonCustodial": "Passer au non-custodial",
         "explainerTitle": "Que signifie passer au non-custodial ?",
-        "explainerStep1": "Vous allez créer un compte non-custodial sur le protocole Spark, <link>en savoir plus ici</link>",
-        "explainerStep2": "Nous transférons vos fonds vers votre nouveau compte non-custodial et votre compte actuel sera supprimé",
-        "explainerStep3": "Continuez à utiliser Blink comme d'habitude",
-        "letsMove": "Allons-y",
+        "explainerCheck1": "Vous allez créer un compte non-custodial sur le protocole Spark",
+        "explainerCheck2": "Nous transférons vos fonds vers votre nouveau compte non-custodial",
+        "explainerCheck3": "Votre compte actuel et toutes ses données, y compris l'historique des transactions, seront fermés",
+        "explainerCheck4": "L'API de Blink ne sera pas disponible",
+        "explainerCheck5": "Des frais de réseau Spark seront déduits de votre compte",
+        "explainerCta": "Je comprends",
         "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes."
     },
     "AccountTypeSelectionScreen": {
@@ -3604,6 +3672,11 @@
         "modalTitle": "Sécurisez vos fonds",
         "modalDescription": "Nous vous recommandons vivement de sauvegarder votre portefeuille pour éviter une perte totale de fonds en cas de perte de cet appareil.",
         "secureMe": "Sécuriser le portefeuille"
+    },
+    "NonCustodialInfoBulletin": {
+        "title": "Ceci est un compte non-custodial",
+        "body": "Pour en savoir plus, lisez notre article de blog",
+        "cta": "Lire"
     },
     "StableBalance": {
         "title": "Solde stable",

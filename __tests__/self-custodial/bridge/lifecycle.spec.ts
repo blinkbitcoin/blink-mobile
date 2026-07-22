@@ -309,6 +309,17 @@ describe("selfCustodialCreateWallet", () => {
     ).rejects.toThrow("Failed to store mnemonic")
     expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
   })
+
+  it("deletes the stored phrase and rethrows when the network label write reports failure", async () => {
+    mockSetMnemonicNetwork.mockResolvedValueOnce(false)
+
+    await expect(
+      selfCustodialCreateWallet("test-account", Network.Regtest),
+    ).rejects.toThrow("Failed to store mnemonic network")
+    expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
+    /** The hook owns the single crashlytics report now, so the bridge does not double-report. */
+    expect(mockRecordError).not.toHaveBeenCalled()
+  })
 })
 
 describe("selfCustodialRestoreWallet", () => {
@@ -403,6 +414,21 @@ describe("selfCustodialRestoreWallet", () => {
       }),
     ).rejects.toThrow("Failed to store mnemonic")
     expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
+    expect(mockConnect).not.toHaveBeenCalled()
+  })
+
+  it("deletes the stored phrase when the network label write reports failure", async () => {
+    mockSetMnemonicNetwork.mockResolvedValueOnce(false)
+
+    await expect(
+      selfCustodialRestoreWallet({
+        accountId: "test-account",
+        mnemonic: "any valid words",
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+      }),
+    ).rejects.toThrow("Failed to store mnemonic network")
+    expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
     expect(mockConnect).not.toHaveBeenCalled()
   })
 

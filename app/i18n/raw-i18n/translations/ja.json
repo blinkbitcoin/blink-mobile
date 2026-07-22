@@ -2800,6 +2800,7 @@
         "total": "合計",
         "transactions": "トランザクション",
         "transactionsError": "トランザクションの読み込みエラー",
+        "transfer": "振替",
         "tryAgain": "再トライする",
         "type": "入力する",
         "usdAccount": "ドルウォレット",
@@ -2816,6 +2817,7 @@
         "problemMaybeReauth": "リクエストに失敗しました。1分後に再トライしてください。問題が解決しない場合は、一旦ログアウトし、再ログインすることをお勧めします。設定 ＞ウォレット ＞ログアウトで、ログアウトできます。",
         "warning": "警告",
         "continue": "続ける",
+        "skip": "スキップ",
         "correct": "正解",
         "recommended": "おすすめ",
         "expirationTime": "有効期限",
@@ -3549,12 +3551,78 @@
         }
     },
     "AccountMigration": {
+        "contactSupport": {
+            "title": "サポートに連絡",
+            "body": "問題が発生しましたが、ご安心ください。資金は安全です。サポートにお問い合わせください。\n\nサポートが問題を解決するために、次の情報が必要になる場合があります：",
+            "accountIdLabel": "アカウントID",
+            "pubKeyLabel": "pubKey",
+            "usernameLabel": "ユーザー名",
+            "emailLabel": "メールアドレス",
+            "phoneLabel": "電話番号",
+            "appVersionLabel": "アプリのバージョン",
+            "platformLabel": "プラットフォーム",
+            "countryLabel": "国",
+            "emailSubject": "移行サポートのリクエスト",
+            "emailDescribeProblem": "問題の内容をご記入ください：",
+            "emailAccountInfo": "サポート用アカウント情報：",
+            "contactUsCta": "お問い合わせ"
+        },
+        "migrateNowModal": {
+            "title": "今すぐ非カストディアルアカウントに移行してください",
+            "body": "カストディアルアカウントでは資金を受け取れなくなりました。Blinkはお住まいの地域でカストディアルサービスを終了し、このアカウントは{date}の終わりまでに無効化されます。\n\n今すぐ非カストディアルアカウントに移行してください。",
+            "migrateCta": "今すぐ移行"
+        },
+        "reminderBulletin": {
+            "title": "重要",
+            "body": "{date}までにアカウントを新しい非カストディアルモードに移行してください",
+            "migrateCta": "移行"
+        },
+        "dollarBalanceModal": {
+            "title": "ドル残高は移行できません",
+            "body": "まずドル残高を空にしてください。Blinkのビットコイン残高、または他の場所へ移すことができます。"
+        },
+        "balancesOverview": {
+            "title": "残高を移動する",
+            "body": "資金を安全に新しいアカウントに移動します。",
+            "currentBitcoinBalance": "現在のビットコイン残高",
+            "currentDollarBalance": "現在のドル残高",
+            "newBitcoinBalance": "新しいビットコイン残高",
+            "newDollarBalance": "新しいドル残高",
+            "dollarBalanceNotAvailable": "利用不可",
+            "networkFee": "ネットワーク手数料: <bold>{fee: string}</bold>",
+            "networkFeeCoveredByBlink": "ネットワーク手数料: <bold>{fee: string}</bold>（Blinkが負担）",
+            "exchangeRate": "現在の為替レート 1 BTC = {rate: string}",
+            "approveCta": "承認",
+            "contactSupportCta": "サポートに連絡"
+        },
+        "migrationRequiredTitle": "アップグレードの時間です",
+        "keepReceivingTitle": "これまで通り受け取りを続けられます",
+        "keepReceivingBody": "あなたのLightningアドレスは、新しいノンカストディアルアカウントに引き継がれます。",
+        "keepReceivingLnAddressLabel": "あなたのLNアドレス",
+        "keepReceivingCta": "いいね",
+        "receivingDisabledToast": "現在、受け取りは無効になっています。",
+        "downloadHistoryTitle": "取引履歴をダウンロード",
+        "downloadHistoryBody": "新しいアカウントはゼロから始まります。取引の記録を残したい場合は、今すぐCSVとしてダウンロードしてください。",
+        "downloadHistoryDownloadCta": "ダウンロード",
+        "apiServiceTitle": "APIサービスは利用できません",
+        "apiServiceBody": "有効なAPIキーをお持ちのようです。BlinkはノンカストディアルモードではAPIを提供できません。\n\nBlinkのAPIに依存している場合は、早めにお問い合わせください。スムーズな移行をできる限りサポートします。",
+        "apiServiceContactCta": "お問い合わせ",
+        "apiServiceContinueCta": "このまま続行",
+        "resumeFailed": "移行の再開中に問題が発生しました。もう一度最初からやり直してください。",
+        "migrationRequiredBody": "カストディアルアカウントを非カストディアルアカウントに移行する時です。",
+        "migrationRequiredForcedBody": "カストディアルアカウントを非カストディアルアカウントに移行する時です。これは規制上の理由により必須です。\n\nご心配なく。長期的にはノンカストディアルの方があなたにとって良い選択です。",
+        "migrationGateTitle": "アカウントにアクセスできません",
+        "migrationGateBody": "規制上の理由により、お住まいの地域ではカストディアルアカウントを提供できません。次の手順に従って資金をBlinkのノンカストディアルアカウントに移すか、<link>{email}</link>までお問い合わせください。",
+        "bitcoinBalance": "ビットコイン残高",
+        "dollarBalance": "ドル残高",
         "moveToNonCustodial": "ノンカストディアルに移行",
         "explainerTitle": "ノンカストディアルへの移行とは？",
-        "explainerStep1": "Sparkプロトコル上にノンカストディアルアカウントを作成します、<link>詳細はこちら</link>",
-        "explainerStep2": "お客様の資金を新しいノンカストディアルアカウントに転送し、現在のアカウントは削除されます",
-        "explainerStep3": "これまで通りBlinkをご利用ください",
-        "letsMove": "移行する",
+        "explainerCheck1": "Sparkプロトコル上にノンカストディアルアカウントを作成します",
+        "explainerCheck2": "資金を新しいノンカストディアルアカウントに移します",
+        "explainerCheck3": "現在のアカウントと、取引履歴を含むすべてのデータは閉鎖されます",
+        "explainerCheck4": "Blink APIは利用できなくなります",
+        "explainerCheck5": "アカウントからSparkネットワーク手数料が差し引かれます",
+        "explainerCta": "理解しました",
         "transferringFunds": "資金を転送中です。数秒で完了するはずです。"
     },
     "AccountTypeSelectionScreen": {
@@ -3604,6 +3672,11 @@
         "modalTitle": "資金を保護してください",
         "modalDescription": "このデバイスを紛失した場合の資金の完全な喪失を防ぐために、ウォレットのバックアップを強くお勧めします。",
         "secureMe": "ウォレットを保護"
+    },
+    "NonCustodialInfoBulletin": {
+        "title": "これは非カストディアルアカウントです",
+        "body": "詳しくはブログ記事をご覧ください",
+        "cta": "読む"
     },
     "StableBalance": {
         "title": "ステーブルバランス",

@@ -2,11 +2,9 @@ import { renderHook, act } from "@testing-library/react-native"
 
 import { useCloudBackup } from "@app/screens/self-custodial/onboarding/hooks/use-cloud-backup"
 
-const mockNavigate = jest.fn()
-jest.mock("@react-navigation/native", () => ({
-  ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
-  useFocusEffect: jest.fn(),
+const mockCompleteBackup = jest.fn()
+jest.mock("@app/screens/self-custodial/onboarding/hooks/use-complete-backup", () => ({
+  useCompleteBackup: () => mockCompleteBackup,
 }))
 
 const mockStartSession = jest.fn()
@@ -51,23 +49,20 @@ jest.mock("@app/utils/crypto", () => ({
   encryptAesGcm: () => ({ data: "ZW5jcnlwdGVk", iv: "aXY=" }),
 }))
 
+let mockIdentityPubkey: string | null = "test-pubkey-1234"
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () => "youth indicate void",
+  useWalletIdentity: () => mockIdentityPubkey,
 }))
 
-let mockIdentityPubkey: string | null = "test-pubkey-1234"
 let mockLightningAddress: string | null = null
 jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
   useSelfCustodialAccountInfo: () => ({
-    identityPubkey: mockIdentityPubkey,
     lightningAddress: mockLightningAddress,
   }),
 }))
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
-  useBackupState: () => ({
-    setBackupCompleted: jest.fn(),
-  }),
   BackupMethod: { Cloud: "cloud", Keychain: "keychain", Manual: "manual" },
 }))
 
@@ -169,7 +164,7 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+    expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
   })
 
   it("uploads encrypted backup when encryption enabled", async () => {
@@ -188,7 +183,7 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+    expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
   })
 
   it("shows error toast on upload failure", async () => {
@@ -205,7 +200,7 @@ describe("useCloudBackup", () => {
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ message: "Upload failed" }),
     )
-    expect(mockNavigate).not.toHaveBeenCalledWith("selfCustodialBackupSuccess")
+    expect(mockCompleteBackup).not.toHaveBeenCalled()
   })
 
   it("does not double-report to crashlytics on upload failure — the inner hook owns Drive error telemetry", async () => {
@@ -405,7 +400,7 @@ describe("useCloudBackup", () => {
     })
 
     expect(mockUpload).not.toHaveBeenCalled()
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockCompleteBackup).not.toHaveBeenCalled()
   })
 
   it("includes version in backup payload", async () => {
@@ -426,7 +421,7 @@ describe("useCloudBackup", () => {
     )
   })
 
-  it("aborts and toasts when identityPubkey is missing", async () => {
+  it("aborts with a local backup error (not a sign-in error) when identityPubkey is missing", async () => {
     mockIdentityPubkey = null
 
     const { result } = renderHook(() =>
@@ -440,7 +435,7 @@ describe("useCloudBackup", () => {
     expect(mockStartSession).not.toHaveBeenCalled()
     expect(mockUpload).not.toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Sign in failed" }),
+      expect.objectContaining({ message: "Upload failed" }),
     )
   })
 

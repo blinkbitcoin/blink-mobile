@@ -15,6 +15,7 @@ import {
 const DeviceAccountEnabledKey = "deviceAccountEnabledRestAuth"
 const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
 const FeedbackEmailKey = "feedbackEmailAddress"
+const SupportEmailKey = "supportEmailAddress"
 const UpgradeModalCooldownDaysKey = "upgradeModalCooldownDays"
 const UpgradeModalShowAtSessionNumberKey = "upgradeModalShowAtSessionNumber"
 const FeeReimbursementMemoKey = "feeReimbursementMemo"
@@ -65,6 +66,7 @@ type RemoteConfig = {
   [DeviceAccountEnabledKey]: boolean
   [BalanceLimitToTriggerUpgradeModalKey]: number
   [FeedbackEmailKey]: string
+  [SupportEmailKey]: string
   [UpgradeModalCooldownDaysKey]: number
   [UpgradeModalShowAtSessionNumberKey]: number
   [FeeReimbursementMemoKey]: string
@@ -137,6 +139,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   deviceAccountEnabledRestAuth: false,
   balanceLimitToTriggerUpgradeModal: 2100,
   feedbackEmailAddress: "feedback@blink.sv",
+  supportEmailAddress: "support@blink.sv",
   upgradeModalCooldownDays: 7,
   upgradeModalShowAtSessionNumber: 1,
   feeReimbursementMemo: "fee reimbursement",
@@ -239,6 +242,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
 
         const feedbackEmailAddress = remoteConfigInstance()
           .getValue(FeedbackEmailKey)
+          .asString()
+
+        const supportEmailAddress = remoteConfigInstance()
+          .getValue(SupportEmailKey)
           .asString()
 
         const upgradeModalCooldownDays = remoteConfigInstance()
@@ -373,6 +380,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
           feedbackEmailAddress,
+          supportEmailAddress,
           upgradeModalCooldownDays,
           upgradeModalShowAtSessionNumber,
           feeReimbursementMemo,

@@ -1,71 +1,58 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback } from "react"
 
-import { useAppConfig } from "@app/hooks/use-app-config"
-import { reportError } from "@app/utils/error-logging"
+import { useNavigation } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import {
   MigrationCheckpoint,
-  clearCheckpointFromStorage,
-  getStorageKey,
-  loadCheckpoint,
   resolveCheckpointRoute,
-  saveCheckpointToStorage,
 } from "../utils/migration-checkpoint-storage"
+
+import { useMigrationCheckpointState } from "./use-migration-checkpoint-state"
 
 export { MigrationCheckpoint }
 
+/** The checkpoint state plus its navigation: resume screens compose both, while
+ *  pure-logic consumers read useMigrationCheckpointState directly. */
 export const useMigrationCheckpoint = () => {
-  const [checkpoint, setCheckpoint] = useState<MigrationCheckpoint | null>(null)
-  const [loading, setLoading] = useState(true)
-  const mountedRef = useRef(true)
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const state = useMigrationCheckpointState()
+  const { checkpoint, accountId } = state
 
-  const {
-    appConfig: {
-      galoyInstance: { name: environment },
-    },
-  } = useAppConfig()
+  /** Without a provisioned account, resume from the explainer so it gets provisioned. */
+  const resolveDestination = useCallback(
+    () => resolveCheckpointRoute(accountId ? checkpoint : null),
+    [checkpoint, accountId],
+  )
 
-  const storageKey = getStorageKey(environment)
-
-  useEffect(() => {
-    mountedRef.current = true
-
-    loadCheckpoint(storageKey)
-      .then((stored) => {
-        if (!mountedRef.current) return
-        if (stored) setCheckpoint(stored.step)
-        setLoading(false)
-      })
-      .catch((err) => {
-        reportError("Checkpoint load", err)
-        if (!mountedRef.current) return
-        setLoading(false)
-      })
-
-    return () => {
-      mountedRef.current = false
+  /** Resumes at the checkpoint's screen, forwarding the terms screen its flow param.
+   *  TODO: known gap: resuming skips the gate's preconditions (empty Dollar Balance and
+   *  the API-key warning), so dollars received after provisioning are ignored client-side
+   *  until the backend re-validates them on migrationStart once that mutation ships. */
+  const navigateToCheckpoint = useCallback(() => {
+    const destination = resolveDestination()
+    if (destination.name === "acceptTermsAndConditions") {
+      navigation.navigate(destination.name, destination.params)
+      return
     }
-  }, [storageKey])
+    navigation.navigate(destination.name)
+  }, [resolveDestination, navigation])
 
-  const saveCheckpoint = useCallback(
-    (step: MigrationCheckpoint) => {
-      setCheckpoint(step)
-      saveCheckpointToStorage(storageKey, step).catch((err) => {
-        reportError("Checkpoint save", err)
-      })
-    },
-    [storageKey],
-  )
+  /** Same as navigateToCheckpoint but replacing the current screen (skip guards). */
+  const replaceToCheckpoint = useCallback(() => {
+    const destination = resolveDestination()
+    if (destination.name === "acceptTermsAndConditions") {
+      navigation.replace(destination.name, destination.params)
+      return
+    }
+    navigation.replace(destination.name)
+  }, [resolveDestination, navigation])
 
-  const clearCheckpoint = useCallback(() => {
-    setCheckpoint(null)
-    clearCheckpointFromStorage(storageKey).catch(() => {})
-  }, [storageKey])
-
-  const getRouteForCheckpoint = useCallback(
-    () => resolveCheckpointRoute(checkpoint),
-    [checkpoint],
-  )
-
-  return { checkpoint, loading, saveCheckpoint, clearCheckpoint, getRouteForCheckpoint }
+  return {
+    ...state,
+    navigateToCheckpoint,
+    replaceToCheckpoint,
+  }
 }

@@ -2799,6 +2799,7 @@
     "total": "รวม",
     "transactions": "ธุรกรรม",
     "transactionsError": "ไม่สามารถโหลดข้อมูลธุรกรรมได้",
+    "transfer": "โอน",
     "tryAgain": "โปรดลองใหม่อีกครั้ง",
     "type": "ประเภท",
     "usdAccount": "บัญชีเงินดอลล่าร์",
@@ -2815,6 +2816,7 @@
     "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     "warning": "Warning",
     "continue": "ดำเนินการต่อ",
+    "skip": "ข้าม",
     "correct": "ถูกต้อง",
     "recommended": "แนะนำ",
     "expirationTime": "เวลาหมดอายุ",
@@ -3549,12 +3551,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "ติดต่อฝ่ายสนับสนุน",
+      "body": "เกิดข้อผิดพลาดบางอย่าง แต่ไม่ต้องกังวล เงินของคุณปลอดภัย โปรดติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือ\n\nคุณอาจต้องใช้ข้อมูลนี้เพื่อช่วยให้ฝ่ายสนับสนุนแก้ไขกรณีของคุณ:",
+      "accountIdLabel": "รหัสบัญชี",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "ชื่อผู้ใช้",
+      "emailLabel": "อีเมล",
+      "phoneLabel": "หมายเลขโทรศัพท์",
+      "appVersionLabel": "เวอร์ชันแอป",
+      "platformLabel": "แพลตฟอร์ม",
+      "countryLabel": "ประเทศ",
+      "emailSubject": "คำขอความช่วยเหลือเรื่องการย้ายบัญชี",
+      "emailDescribeProblem": "อธิบายปัญหา:",
+      "emailAccountInfo": "ข้อมูลบัญชีสำหรับฝ่ายสนับสนุน:",
+      "contactUsCta": "ติดต่อเรา"
+    },
+    "migrateNowModal": {
+      "title": "ย้ายตอนนี้ไปยังบัญชีแบบไม่ฝากดูแล",
+      "body": "คุณไม่สามารถรับเงินเข้าบัญชีแบบฝากดูแลของคุณได้อีกต่อไป Blink ได้ยุติบริการฝากดูแลในภูมิภาคของคุณ และบัญชีนี้จะถูกปิดใช้งานภายในสิ้นวันที่ {date}\n\nย้ายตอนนี้ไปยังบัญชีแบบไม่ฝากดูแล",
+      "migrateCta": "ย้ายตอนนี้"
+    },
+    "reminderBulletin": {
+      "title": "สำคัญ",
+      "body": "ย้ายบัญชีของคุณไปยังโหมดใหม่แบบไม่ฝากดูแลก่อน {date}",
+      "migrateCta": "ย้าย"
+    },
+    "dollarBalanceModal": {
+      "title": "เราไม่สามารถย้ายยอดดอลลาร์ของคุณได้",
+      "body": "โปรดล้างยอดดอลลาร์ของคุณก่อน คุณสามารถโอนไปยังยอดบิตคอยน์ใน Blink หรือที่อื่นได้"
+    },
+    "balancesOverview": {
+      "title": "ย้ายยอดเงินของคุณ",
+      "body": "ย้ายเงินของคุณไปยังบัญชีใหม่อย่างปลอดภัย",
+      "currentBitcoinBalance": "ยอด Bitcoin ปัจจุบัน",
+      "currentDollarBalance": "ยอดดอลลาร์ปัจจุบัน",
+      "newBitcoinBalance": "ยอด Bitcoin ใหม่",
+      "newDollarBalance": "ยอดดอลลาร์ใหม่",
+      "dollarBalanceNotAvailable": "ไม่พร้อมใช้งาน",
+      "networkFee": "ค่าธรรมเนียมเครือข่าย: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "ค่าธรรมเนียมเครือข่าย: <bold>{fee: string}</bold> (Blink ออกให้)",
+      "exchangeRate": "อัตราแลกเปลี่ยนปัจจุบัน 1 BTC = {rate: string}",
+      "approveCta": "อนุมัติ",
+      "contactSupportCta": "ติดต่อฝ่ายสนับสนุน"
+    },
+    "migrationRequiredTitle": "ถึงเวลาอัปเกรด",
+    "keepReceivingTitle": "รับเงินต่อได้ตามปกติ",
+    "keepReceivingBody": "แอดเดรส Lightning ของคุณจะถูกโอนไปยังบัญชี non-custodial ใหม่ของคุณ",
+    "keepReceivingLnAddressLabel": "แอดเดรส LN ของคุณ",
+    "keepReceivingCta": "เยี่ยม",
+    "receivingDisabledToast": "ขณะนี้การรับถูกปิดใช้งาน",
+    "downloadHistoryTitle": "ดาวน์โหลดประวัติธุรกรรมของคุณ",
+    "downloadHistoryBody": "บัญชีใหม่ของคุณจะเริ่มต้นใหม่ หากคุณต้องการเก็บบันทึกธุรกรรมของคุณ ให้ดาวน์โหลดเป็นไฟล์ CSV ตอนนี้",
+    "downloadHistoryDownloadCta": "ดาวน์โหลด",
+    "apiServiceTitle": "บริการ API ไม่พร้อมใช้งาน",
+    "apiServiceBody": "เราสังเกตว่าคุณมีคีย์ API ที่ใช้งานอยู่ Blink ไม่สามารถให้บริการ API ในโหมด non-custodial ได้\n\nหากคุณต้องพึ่งพา API ของ Blink โปรดติดต่อเราโดยเร็วและเราจะพยายามอย่างเต็มที่เพื่อช่วยให้การเปลี่ยนผ่านราบรื่น",
+    "apiServiceContactCta": "ติดต่อเรา",
+    "apiServiceContinueCta": "ดำเนินการต่อไป",
+    "resumeFailed": "เกิดข้อผิดพลาดขณะดำเนินการย้ายของคุณต่อ โปรดเริ่มใหม่อีกครั้ง",
+    "migrationRequiredBody": "ถึงเวลาย้ายบัญชีแบบฝากดูแลของคุณไปยังบัญชีแบบไม่ฝากดูแลแล้ว จำเป็นต้องทำด้วยเหตุผลด้านกฎระเบียบ แต่ก็ดีต่อคุณด้วย!",
+    "migrationRequiredForcedBody": "ถึงเวลาย้ายบัญชีแบบฝากดูแลของคุณไปยังบัญชีแบบไม่ฝากดูแลแล้ว จำเป็นต้องทำด้วยเหตุผลด้านกฎระเบียบ แต่ก็ดีต่อคุณด้วย!จำเป็นต้องทำด้วยเหตุผลด้านกฎระเบียบ\n\nไม่ต้องกังวล ในระยะยาวแบบ non-custodial จะดีกว่าสำหรับคุณ",
+    "migrationGateTitle": "ไม่สามารถเข้าถึงบัญชีได้",
+    "migrationGateBody": "ด้วยเหตุผลด้านกฎระเบียบ เราไม่สามารถให้บริการบัญชีแบบ custodial ในภูมิภาคของคุณได้ โอนเงินของคุณไปยังบัญชี non-custodial กับ Blink โดยทำตามขั้นตอนถัดไป หรือติดต่อเราที่ <link>{email}</link>",
+    "bitcoinBalance": "ยอดคงเหลือ Bitcoin",
+    "dollarBalance": "ยอดคงเหลือดอลลาร์",
     "moveToNonCustodial": "ย้ายไปแบบ non-custodial",
     "explainerTitle": "การย้ายไปแบบ non-custodial หมายความว่าอย่างไร?",
-    "explainerStep1": "คุณจะสร้างบัญชีแบบ non-custodial บนโปรโตคอล Spark <link>เรียนรู้เพิ่มเติมที่นี่</link>",
-    "explainerStep2": "เราจะโอนเงินของคุณไปยังบัญชี non-custodial ใหม่และบัญชีปัจจุบันของคุณจะถูกลบ",
-    "explainerStep3": "ใช้ Blink ต่อไปได้ตามปกติ",
-    "letsMove": "ไปกันเลย",
+    "explainerCheck1": "คุณจะสร้างบัญชีแบบ non-custodial บนโปรโตคอล Spark",
+    "explainerCheck2": "เราโอนเงินของคุณไปยังบัญชี non-custodial ใหม่ของคุณ",
+    "explainerCheck3": "บัญชีปัจจุบันของคุณและข้อมูลทั้งหมดรวมถึงประวัติธุรกรรมจะถูกปิด",
+    "explainerCheck4": "Blink API จะไม่พร้อมใช้งาน",
+    "explainerCheck5": "บัญชีของคุณจะถูกหักค่าธรรมเนียมเครือข่าย Spark",
+    "explainerCta": "เข้าใจแล้ว",
     "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที"
   },
   "AccountTypeSelectionScreen": {
@@ -3604,6 +3672,11 @@
     "modalTitle": "รักษาความปลอดภัยเงินของคุณ",
     "modalDescription": "เราขอแนะนำอย่างยิ่งให้คุณสำรองข้อมูลกระเป๋าเงินเพื่อป้องกันการสูญเสียเงินทั้งหมดในกรณีที่คุณทำอุปกรณ์นี้หาย",
     "secureMe": "รักษาความปลอดภัยกระเป๋าเงิน"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "นี่คือบัญชีแบบไม่ฝากดูแล",
+    "body": "อ่านบล็อกโพสต์ของเราเพื่อเรียนรู้เพิ่มเติม",
+    "cta": "อ่าน"
   },
   "StableBalance": {
     "title": "ยอดคงเหลือมั่นคง",

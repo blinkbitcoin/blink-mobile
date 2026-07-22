@@ -2799,6 +2799,7 @@
     "total": "Suma",
     "transactions": "Willanakuy ",
     "transactionsError": "Qillqaykuna kargamanta kanilla",
+    "transfer": "Apachimuq",
     "tryAgain": "Rikuchiyta kani",
     "type": "Rikch'a",
     "usdAccount": "Dolar qillqay",
@@ -2815,6 +2816,7 @@
     "problemMaybeReauth": "Ñuqaq kaniyta munanichuqchu. Qhipa kaniyta qayna kani. Mana kaniyta munanichuqchu, ñuqaqa chaskisqa kaniyta kaniy. Chaskisqa kaniyta kaniy, Ajustisqa > Cuenta > Chaskisqa kaniyta kaniy.",
     "warning": "Warning",
     "continue": "Qatiy",
+    "skip": "Saqiy",
     "correct": "Allin",
     "recommended": "Yuyaychasqa",
     "expirationTime": "Tukuy pacha",
@@ -3549,12 +3551,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Yanapakuyta maskay",
+      "body": "Imapas mana allinchu karqan, ichaqa ama llakikuychu, qullqiykikuna waqaychasqam kachkan. Ama hina kaspa yanapakuyta maskay.\n\nKay willakuykunata munawaq yanapakuqkuna hawkachinankupaq:",
+      "accountIdLabel": "Kuenta ID",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Ruraqpa sutin",
+      "emailLabel": "Correo electrónico",
+      "phoneLabel": "Telefono yupay",
+      "appVersionLabel": "App versión",
+      "platformLabel": "Plataforma",
+      "countryLabel": "Suyu",
+      "emailSubject": "Astakuypaq yanapakuy mañakuy",
+      "emailDescribeProblem": "Sasachakuyta willay:",
+      "emailAccountInfo": "Kuenta willakuykuna yanapakuypaq:",
+      "contactUsCta": "Willawayku"
+    },
+    "migrateNowModal": {
+      "title": "Kunan astakuy mana waqaychasqa kuentaman",
+      "body": "Manañam qullqita chaskiyta atinkichu waqaychasqa kuentaykipi. Blink-qa waqaychay ruwayta tukurqun llaqtaykipi, kay kuentaqa {date} tukukuyninpi wichq'asqa kanqa.\n\nKunan astakuy mana waqaychasqa kuentaman.",
+      "migrateCta": "Kunan astakuy"
+    },
+    "reminderBulletin": {
+      "title": "Ancha allin",
+      "body": "Astakuy kuentaykita musuq mana waqaychasqa modoman {date} manaraq chayamuchkaptin",
+      "migrateCta": "Astakuy"
+    },
+    "dollarBalanceModal": {
+      "title": "Manam dólar qullqiykita astayta atinikuchu",
+      "body": "Ñawpaqta dólar qullqiykita ch'usaqyachiy. Blinkpi Bitcoin qullqiykiman utaq huk lawman apachiyta atinki."
+    },
+    "balancesOverview": {
+      "title": "Qullqiykita astiy",
+      "body": "Qullqiykikunata mana ima llakiwan musuq cuentaykiman astiy.",
+      "currentBitcoinBalance": "Kunan Bitcoin qullqi",
+      "currentDollarBalance": "Kunan dólar qullqi",
+      "newBitcoinBalance": "Musuq Bitcoin qullqi",
+      "newDollarBalance": "Musuq dólar qullqi",
+      "dollarBalanceNotAvailable": "mana kapunchu",
+      "networkFee": "Red pago: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Red pago: <bold>{fee: string}</bold> (Blinkmi pagan)",
+      "exchangeRate": "Kunan cambio 1 BTC = {rate: string}",
+      "approveCta": "Ariy niy",
+      "contactSupportCta": "Yanapaqwan rimay"
+    },
+    "migrationRequiredTitle": "Mosoqyanapaq pacha",
+    "keepReceivingTitle": "Chaskikuyta qatiy imayna sapa kutipas",
+    "keepReceivingBody": "Lightning tinkunaykiqa musuq non-custodial akawuntiykiman apachkanqa.",
+    "keepReceivingLnAddressLabel": "LN tinkunayki",
+    "keepReceivingCta": "Allinmi",
+    "receivingDisabledToast": "Chaskiyqa kunanqa harkasqam.",
+    "downloadHistoryTitle": "Transaksiykikunaq willakuyninta uraqichiy",
+    "downloadHistoryBody": "Musuq akawuntiyki mosoqmanta qallarinqa. Transaksiykikunaq willakuyninta waqaychayta munaspaqa, kunan CSV hina uraqichiy.",
+    "downloadHistoryDownloadCta": "Uraqichiy",
+    "apiServiceTitle": "API servicio mana kanchu",
+    "apiServiceBody": "Rikunchik API llavesniyki activo kasqanta. Blink mana atinchu API-ta non-custodial modopi qoyta.\n\nBlink API-manta dependespaqa, usqhaylla ñoqaykuwan rimanakuy, allin tikraymanpaq yanapasqaykiku.",
+    "apiServiceContactCta": "Ñoqaykuwan rimanakuy",
+    "apiServiceContinueCta": "Chaynapas qatiy",
+    "resumeFailed": "Astakuyniykita qatichiypi imapas mana allinchu rikhurirqan. Ama hina kaspa, musuqmanta qallariy.",
+    "migrationRequiredBody": "Waqaychasqa kuentaykita mana waqaychasqa kuentaman astanaykipaq pachan.",
+    "migrationRequiredForcedBody": "Waqaychasqa kuentaykita mana waqaychasqa kuentaman astanaykipaq pachan. Kamachiykuna raykumi necesitakun.\n\nAma llakikuychu, non-custodial nisqaqa unay pachapaqmi aswan allin kanqa qanpaq.",
+    "migrationGateTitle": "Cuentaqa mana haykunallachu",
+    "migrationGateBody": "Kamachiykuna raykumi mana atinikuchu custodial cuentakunata qan kasqaykipi qoyta. Qullqiykikunata Blink non-custodial cuentaman apachiy kay qatiq ruwaykunata qatispa utaq ñuqaykuwan rimay <link>{email}</link> nisqapi",
+    "bitcoinBalance": "Bitcoin saldo",
+    "dollarBalance": "Dólar saldo",
     "moveToNonCustodial": "Non-custodial nisqaman kutiy",
     "explainerTitle": "Imataq niyta munan non-custodial nisqaman kutiy?",
-    "explainerStep1": "Spark protocol nisqapi non-custodial akawuntita ruwanki, <link>astawanta yachay kaypi</link>",
-    "explainerStep2": "Qullqiykita musuq non-custodial akawuntiykiman apasun, kunan akawuntiykitaq puchukanqa",
-    "explainerStep3": "Blink nisqata llamkachiy imaynallapas",
-    "letsMove": "Haku",
+    "explainerCheck1": "Spark protocol nisqapi non-custodial akawuntita ruwanki",
+    "explainerCheck2": "Qullqiykikunata musuq non-custodial akawuntiykiman apachkaniku",
+    "explainerCheck3": "Kunan akawuntiyki hinaspa llapa datosnin, transaksiykikuna willakuywan, wisq'akunqa",
+    "explainerCheck4": "Blink API mana kanqachu",
+    "explainerCheck5": "Akawuntiykimanta Spark red pagota qichunqaku",
+    "explainerCta": "Entiendini",
     "transferringFunds": "Qullqiykita apachkaniku. Iskay kinsa sikundullapi tukurunqa."
   },
   "AccountTypeSelectionScreen": {
@@ -3604,6 +3672,11 @@
     "modalTitle": "Waqaychay qullqiykikunata",
     "modalDescription": "Ñuqayku mayt'a kunaykiku wallitaykita waqaychayta ama tukuy qullqiyki chinkananpaq kay aparatuykita chinkachispayki.",
     "secureMe": "Waqaychay wallita"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Kayqa mana waqaychasqa kuentam",
+    "body": "Astawan yachanaykipaq, blog qillqaykuta ñawinchay",
+    "cta": "Ñawinchay"
   },
   "StableBalance": {
     "title": "Saldo sinchi",
