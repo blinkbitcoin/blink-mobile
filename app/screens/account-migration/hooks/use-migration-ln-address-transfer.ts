@@ -147,13 +147,18 @@ export const useMigrationLnAddressTransfer = ({
         }
 
         const [rejection] = payload.errors
-        const hasFailedResult = payload.results.some(
+        const failedResults = payload.results.filter(
           (result) => result.status === MigrationLnAddressTransferStatus.Failed,
         )
 
         if (rejection)
           reportError("Migration ln-address rejected", new Error(rejection.message))
-        if (rejection || hasFailedResult) return LnAddressOutcome.Rejected
+        if (failedResults.length > 0)
+          reportError(
+            "Migration ln-address result failed",
+            new Error(failedResults.map((result) => result.identifier).join(", ")),
+          )
+        if (rejection || failedResults.length > 0) return LnAddressOutcome.Rejected
 
         return LnAddressOutcome.Transferred
       } catch (err) {

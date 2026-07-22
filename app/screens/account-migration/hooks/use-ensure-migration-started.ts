@@ -58,13 +58,13 @@ export const useEnsureMigrationStarted = ({
    */
   const firedAttemptRef = useRef(-1)
 
-  /** Retrying a refusal would only replay the same answer, so a settled rejection stays
-   *  settled however often the caller asks. */
+  /** A settled outcome stays settled however often the caller asks: retrying a refusal only
+   *  replays the same answer, and re-firing an accepted start would re-arm an armed lock. */
   const retry = useCallback(() => {
-    if (isRejected) return
+    if (isRejected || isStarted) return
     setHasConnectionIssue(false)
     setAttempt((previous) => previous + 1)
-  }, [isRejected])
+  }, [isRejected, isStarted])
 
   useEffect(() => {
     if (skip || firedAttemptRef.current === attempt) return

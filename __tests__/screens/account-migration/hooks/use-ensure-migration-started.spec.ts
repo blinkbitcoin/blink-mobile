@@ -154,6 +154,18 @@ describe("useEnsureMigrationStarted", () => {
     expect(mockMigrationStart).toHaveBeenCalledTimes(1)
   })
 
+  /** An accepted start is settled too: re-firing it would re-arm an already-armed lock. */
+  it("does not fire again when a retry follows an accepted start", async () => {
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+    expect(result.current.isStarted).toBe(true)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+  })
+
   /** A settled response with no payload is not a started migration: the answer never
    *  arrived, so it earns the shared retry rather than arming the lock on no answer. */
   it("treats a settled response with no payload as a retryable connection issue", async () => {

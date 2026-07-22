@@ -242,7 +242,7 @@ describe("useMigrationLnAddressTransfer", () => {
     )
   })
 
-  it("hands a FAILED identifier to support", async () => {
+  it("hands a FAILED identifier to support and reports which one", async () => {
     mockTransfer.mockResolvedValue(
       payload([{ identifier: "user", status: MigrationLnAddressTransferStatus.Failed }]),
     )
@@ -250,6 +250,10 @@ describe("useMigrationLnAddressTransfer", () => {
     await flushEffects()
 
     expect(result.current.isRejected).toBe(true)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration ln-address result failed",
+      expect.objectContaining({ message: "user" }),
+    )
   })
 
   it("marks a dropped network as a connection issue, not a rejection", async () => {
