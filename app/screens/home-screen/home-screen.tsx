@@ -601,8 +601,7 @@ export const HomeScreen: React.FC = () => {
     },
   ]
 
-  const isTransferDisabled =
-    isDollarBalanceRestricted || (isSelfCustodial && !isTransferBlocked)
+  const isTransferDisabled = isDollarBalanceRestricted || isTransferBlocked
 
   buttons.unshift({
     title: LL.ConversionDetailsScreen.transfer(),
