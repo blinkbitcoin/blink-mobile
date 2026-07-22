@@ -674,7 +674,7 @@ describe("HomeScreen", () => {
     },
   )
 
-  it("hides the transfer button when transfers are blocked", async () => {
+  it("Disable the transfer button when transfers are blocked and show disabled model when clicked", async () => {
     mockTransferBlockedOverride = true
     currentMocks = generateHomeMock({
       level: AccountLevel.Two,
@@ -689,8 +689,15 @@ describe("HomeScreen", () => {
       </ContextForScreen>,
     )
 
-    await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
     await flushEffects()
+
+    // Transfers are blocked, but the button is rendered in disabled stat.
+    expect(getByTestId("transfer")).toBeTruthy()
+    expect(mockDollarBalanceModalVisible).toBe(false)
+
+    fireEvent.press(getByTestId("transfer"))
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
   })
 
   it("auto-opens the convert modal when a restricted account holds a Dollar balance", async () => {
