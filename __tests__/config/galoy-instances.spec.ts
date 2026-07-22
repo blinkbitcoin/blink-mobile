@@ -24,6 +24,7 @@ it("get a full object with Custom", () => {
     fiatUrl: "https://fiat.custom.com/",
     lnAddressHostname: "custom.com",
     blockExplorer: "https://mempool.space/tx/",
+    sparkExplorer: "https://sparkscan.io/tx/",
   } as const
 
   const res = resolveGaloyInstanceOrDefault(CustomInstance)
