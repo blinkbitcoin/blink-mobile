@@ -712,11 +712,18 @@ export const HomeScreen: React.FC = () => {
             iconOnly={true}
             weight="bold"
           />
-          <View>
+          <View style={styles.usernameSlot}>
             {!loading && usernameTitle && (
               <Pressable onPress={canSwitchAccount ? handleSwitchPress : null}>
                 <View style={styles.profileContainer}>
-                  <Text type="p2">{usernameTitle}</Text>
+                  <Text
+                    type="p2"
+                    style={styles.usernameText}
+                    numberOfLines={1}
+                    maxFontSizeMultiplier={1.5}
+                  >
+                    {usernameTitle}
+                  </Text>
                   {canSwitchAccount && <GaloyIcon name={"caret-down"} size={18} />}
                 </View>
               </Pressable>
@@ -894,27 +901,33 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   balanceContainer: {
     marginTop: 7,
-    flexDirection: "column",
-    flex: 1,
-    height: 40,
-    maxHeight: 40,
+    // minHeight (not a fixed height) so the header can grow with the OS font scale
+    // instead of spilling the username onto the balance below (blink-wip#931)
+    minHeight: 40,
   },
   header: {
     flexDirection: "row",
-    flex: 1,
     justifyContent: "space-between",
     alignItems: "center",
     marginHorizontal: 20,
     marginTop: 6,
+    columnGap: 8,
   },
   error: {
     alignSelf: "center",
     color: colors.error,
   },
+  usernameSlot: {
+    flexShrink: 1,
+    alignItems: "center",
+  },
   profileContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+  },
+  usernameText: {
+    flexShrink: 1,
   },
   actionsSeparator: {
     width: 1,
@@ -922,7 +935,7 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey4,
   },
   badgeSlot: {
-    height: 35,
+    minHeight: 35,
     marginVertical: 3,
     justifyContent: "center",
     alignItems: "center",
