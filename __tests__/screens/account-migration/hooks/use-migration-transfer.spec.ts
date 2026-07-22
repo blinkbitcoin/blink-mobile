@@ -162,6 +162,56 @@ describe("useMigrationTransfer", () => {
     expect(mockCommitMigration).toHaveBeenCalledTimes(1)
   })
 
+  /** The failure outcome outlives a remount the way the commit guard does: a screen
+   *  re-entered after support restores the reason and routes back to support, rather than
+   *  blocking the re-commit and spinning with nothing to show. */
+  it("restores a settled failure across a remount instead of spinning", async () => {
+    mockCommitMigration.mockResolvedValue({
+      data: { migrationCommit: { errors: [{ message: "refused" }] } },
+    })
+    const first = renderTransfer()
+    await flushEffects()
+    expect(first.result.current.failureReason).toBe(MigrationSupportReason.TransferFailed)
+    first.unmount()
+
+    const second = renderTransfer()
+    await flushEffects()
+
+    expect(second.result.current.failureReason).toBe(
+      MigrationSupportReason.TransferFailed,
+    )
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+  })
+
+  /** The owner id often resolves a tick after mount; the remembered failure is restored as
+   *  soon as it does, so a late id cannot leave the re-entered screen spinning either. */
+  it("restores the remembered failure once the custodial account id arrives", async () => {
+    mockCommitMigration.mockResolvedValue({
+      data: { migrationCommit: { errors: [{ message: "refused" }] } },
+    })
+    const first = renderTransfer()
+    await flushEffects()
+    first.unmount()
+
+    const { result, rerender } = renderHook(
+      ({ custodialAccountId }: { custodialAccountId: string | null }) =>
+        useMigrationTransfer({
+          custodialAccountId,
+          selfCustodialAccountId: "sc-account-1",
+          skip: false,
+        }),
+      { initialProps: { custodialAccountId: null as string | null } },
+    )
+    await flushEffects()
+    expect(result.current.failureReason).toBeNull()
+
+    rerender({ custodialAccountId: "custodial-1" })
+    await flushEffects()
+
+    expect(result.current.failureReason).toBe(MigrationSupportReason.TransferFailed)
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+  })
+
   it("does not commit while the caller is skipping", async () => {
     renderTransfer({ skip: true })
     await flushEffects()
@@ -327,6 +377,40 @@ describe("useMigrationTransfer", () => {
       "Migration transfer",
       expect.objectContaining({ message: "signer unavailable" }),
     )
+  })
+
+  /** A dropped connection while collecting the destination is retryable, not settled: it
+   *  pauses on the shared retry rather than handing the user to support. */
+  it("pauses on the shared retry when the destination connect drops", async () => {
+    mockBuildTransferRequest.mockResolvedValue({
+      status: MigrationSdkStatus.ConnectionError,
+      error: new Error("connection reset"),
+    })
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.hasConnectionIssue).toBe(true)
+    expect(result.current.failureReason).toBeNull()
+    expect(mockCommitMigration).not.toHaveBeenCalled()
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("recommits after a destination connect error once the user retries", async () => {
+    mockBuildTransferRequest
+      .mockResolvedValueOnce({
+        status: MigrationSdkStatus.ConnectionError,
+        error: new Error("connection reset"),
+      })
+      .mockResolvedValue({ status: MigrationSdkStatus.Ok, value: collectedRequest })
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.hasConnectionIssue).toBe(true)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+    expect(result.current.hasConnectionIssue).toBe(false)
   })
 
   it("hands a commit the server refused to support", async () => {

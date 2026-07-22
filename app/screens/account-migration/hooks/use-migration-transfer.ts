@@ -56,9 +56,20 @@ const STALE_PROOF_REJECTION_CODE = "MIGRATION_INVALID_DESTINATION"
  */
 const accountsWithCommitStarted = new Set<string>()
 
-/** Clears the module-level commit guard; for test isolation, never called in production. */
+/**
+ * The terminal commit failure remembered for each custodial account, keyed by id. The
+ * guard above outlives a remount but the per-mount failure state does not, so a screen
+ * re-entered after a failure would block the re-commit yet show no outcome and spin.
+ * Recording the settled reason here lets a remount restore it and route to support exactly
+ * as the first mount did.
+ */
+const settledCommitFailures = new Map<string, MigrationSupportReason>()
+
+/** Clears the module-level commit guard and remembered failures; for test isolation,
+ *  never called in production. */
 export const resetMigrationCommitGuard = (): void => {
   accountsWithCommitStarted.clear()
+  settledCommitFailures.clear()
 }
 
 type UseMigrationTransferArgs = {
@@ -90,7 +101,11 @@ export const useMigrationTransfer = ({
   const network = useSparkNetwork()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [commitMigration] = useMigrationCommitMutation()
-  const [failureReason, setFailureReason] = useState<MigrationSupportReason | null>(null)
+  /** Seeded from the remembered outcome so a screen re-entered after a settled failure
+   *  shows it at once, rather than blocking the re-commit and spinning with nothing shown. */
+  const [failureReason, setFailureReason] = useState<MigrationSupportReason | null>(() =>
+    custodialAccountId ? settledCommitFailures.get(custodialAccountId) ?? null : null,
+  )
   const [isClockOutOfSync, setIsClockOutOfSync] = useState(false)
   const [hasConnectionIssue, setHasConnectionIssue] = useState(false)
 
@@ -129,10 +144,24 @@ export const useMigrationTransfer = ({
     if (hasAdvancedPastCommit) setHasConnectionIssue(false)
   }, [status])
 
-  const fail = useCallback((reason: MigrationSupportReason, err: unknown) => {
-    reportError("Migration transfer", err)
-    setFailureReason(reason)
-  }, [])
+  const fail = useCallback(
+    (reason: MigrationSupportReason, err: unknown) => {
+      reportError("Migration transfer", err)
+      /** Remember the settled failure so a re-entered screen restores it instead of
+       *  blocking the re-commit and spinning with nothing to show. */
+      if (custodialAccountId) settledCommitFailures.set(custodialAccountId, reason)
+      setFailureReason(reason)
+    },
+    [custodialAccountId],
+  )
+
+  /** The owner id can resolve a tick after mount; once it does, restore any failure the
+   *  guard already remembers so a re-entered screen routes to support rather than spinning. */
+  useEffect(() => {
+    if (!custodialAccountId || failureReason !== null) return
+    const rememberedFailure = settledCommitFailures.get(custodialAccountId)
+    if (rememberedFailure) setFailureReason(rememberedFailure)
+  }, [custodialAccountId, failureReason])
 
   const commit = useCallback(
     async (custodialId: string, selfCustodialId: string) => {
@@ -154,6 +183,13 @@ export const useMigrationTransfer = ({
           MigrationSupportReason.SelfCustodialAccountMissing,
           new Error("No mnemonic for the provisioned account"),
         )
+        return
+      }
+
+      /** A dropped connection during the connect or the sign can be sent again, so it
+       *  pauses on the shared retry rather than handing the user to support. */
+      if (result.status === MigrationSdkStatus.ConnectionError) {
+        setHasConnectionIssue(true)
         return
       }
 
