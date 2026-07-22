@@ -1,6 +1,9 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
+import {
+  MigrationBlockerProvider,
+  useMigrationBlocker,
+} from "@app/screens/account-migration/hooks/use-migration-blocker"
 
 let mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
 
@@ -20,6 +23,11 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
   useMigrationLock: () => ({ isLocked: mockMigrationLocked, loading: false }),
 }))
 
+/** Rendered through the provider, so the test reads the one shared answer both consumers
+ *  get rather than a private computation. */
+const renderBlocker = () =>
+  renderHook(() => useMigrationBlocker(), { wrapper: MigrationBlockerProvider })
+
 describe("useMigrationBlocker", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -29,7 +37,7 @@ describe("useMigrationBlocker", () => {
   })
 
   it("stays hidden before the gate arms, since the pre-deadline nudge is the home bulletin", () => {
-    const { result } = renderHook(() => useMigrationBlocker())
+    const { result } = renderBlocker()
 
     expect(result.current.isVisible).toBe(false)
   })
@@ -37,7 +45,7 @@ describe("useMigrationBlocker", () => {
   it("blocks the app once the post-deadline gate arms", () => {
     mockGateArmed = true
 
-    const { result } = renderHook(() => useMigrationBlocker())
+    const { result } = renderBlocker()
 
     expect(result.current.isVisible).toBe(true)
   })
@@ -46,7 +54,7 @@ describe("useMigrationBlocker", () => {
     mockGateArmed = true
     mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
 
-    const { result } = renderHook(() => useMigrationBlocker())
+    const { result } = renderBlocker()
 
     expect(result.current.isVisible).toBe(false)
   })
@@ -55,7 +63,7 @@ describe("useMigrationBlocker", () => {
     mockGateArmed = true
     mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: false }
 
-    const { result } = renderHook(() => useMigrationBlocker())
+    const { result } = renderBlocker()
 
     expect(result.current.isVisible).toBe(true)
   })
@@ -68,7 +76,7 @@ describe("useMigrationBlocker", () => {
   it("blocks the app for a migration the server has locked, before any deadline", () => {
     mockMigrationLocked = true
 
-    const { result } = renderHook(() => useMigrationBlocker())
+    const { result } = renderBlocker()
 
     expect(result.current.isVisible).toBe(true)
   })
@@ -78,6 +86,16 @@ describe("useMigrationBlocker", () => {
   it("stays hidden while the self-custodial kill-switch is off, even when locked", () => {
     mockMigrationLocked = true
     mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+
+    const { result } = renderBlocker()
+
+    expect(result.current.isVisible).toBe(false)
+  })
+
+  /** Without a provider the context default holds, so a stray consumer reads the app as not
+   *  blocked rather than crashing. */
+  it("defaults to not visible without a provider", () => {
+    mockGateArmed = true
 
     const { result } = renderHook(() => useMigrationBlocker())
 
