@@ -15,7 +15,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks"
 /** Deep import on purpose: its device-location chain stays out of the hooks barrel. */
 import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/use-migration-support-email"
-import { MigrationSupportReason } from "@app/types/migration"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { ellipsizeMiddle } from "@app/utils/helper"
 import { testProps } from "@app/utils/testProps"
 
@@ -58,11 +58,18 @@ export const MigrationContactSupportScreen: React.FC = () => {
   const reason = params?.reason ?? MigrationSupportReason.Unknown
   const { diagnostics, sendSupportEmail } = useMigrationSupportEmail(reason)
 
-  /** Back never exits the migration: it returns to the commit point (Step 8). */
-  const returnToBalanceSummary = useCallback(() => {
+  /** Back depends on origin: mid-migration it returns to the commit point (Step 8); the
+   *  resume handover has no commit screen beneath it, so it dismisses instead of fabricating
+   *  one over an already-completed migration. A restore with no origin keeps the commit path. */
+  const isResumeOrigin = params?.origin === MigrationSupportOrigin.Resume
+  const handleBack = useCallback(() => {
+    if (isResumeOrigin) {
+      navigation.goBack()
+      return
+    }
     navigation.navigate("accountMigrationBalancesOverview")
-  }, [navigation])
-  useHardwareBackGuard(returnToBalanceSummary)
+  }, [isResumeOrigin, navigation])
+  useHardwareBackGuard(handleBack)
 
   const rows: DiagnosticsRow[] = useMemo(
     () =>
@@ -115,7 +122,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
           />
           <GaloySecondaryButton
             title={LL.common.back()}
-            onPress={returnToBalanceSummary}
+            onPress={handleBack}
             {...testProps("migration-contact-support-back")}
           />
         </View>

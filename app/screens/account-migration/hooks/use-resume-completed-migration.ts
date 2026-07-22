@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { MigrationSupportReason } from "@app/types/migration"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 
 import { useCompleteMigration } from "./use-complete-migration"
@@ -66,6 +66,7 @@ export const useResumeCompletedMigration = (): void => {
         )
         navigation.navigate("accountMigrationContactSupport", {
           reason: MigrationSupportReason.SelfCustodialAccountNotOnDevice,
+          origin: MigrationSupportOrigin.Resume,
         })
       })
       .catch((err) => {

@@ -24,7 +24,7 @@ import {
 import { useCustodialOwnerId } from "@app/screens/account-migration/hooks/use-custodial-owner-id"
 import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/use-ensure-migration-started"
 import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
-import { MigrationSupportReason } from "@app/types/migration"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
@@ -125,7 +125,10 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
         reportError("Migration handed over to support", new Error(handoverReason))
       }
 
-      navigation.navigate("accountMigrationContactSupport", { reason: handoverReason })
+      navigation.navigate("accountMigrationContactSupport", {
+        reason: handoverReason,
+        origin: MigrationSupportOrigin.Commit,
+      })
     }, [handoverReason, navigation]),
   )
 

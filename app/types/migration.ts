@@ -39,3 +39,18 @@ export const MigrationSupportReason = {
 
 export type MigrationSupportReason =
   (typeof MigrationSupportReason)[keyof typeof MigrationSupportReason]
+
+/**
+ * Where the support screen was opened from, which decides its Back target. The commit flow
+ * has the commit point (Step 8) underneath, so Back returns there, skipping the
+ * back-swallowing transfer screen. The resume handover is pushed from the root navigator
+ * with no migration screens beneath it, so Back dismisses to where it came from rather than
+ * fabricating a fresh commit screen over an already-completed migration.
+ */
+export const MigrationSupportOrigin = {
+  Commit: "commit",
+  Resume: "resume",
+} as const
+
+export type MigrationSupportOrigin =
+  (typeof MigrationSupportOrigin)[keyof typeof MigrationSupportOrigin]

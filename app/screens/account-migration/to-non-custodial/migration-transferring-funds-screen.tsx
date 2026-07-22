@@ -16,7 +16,7 @@ import {
   useHardwareBackGuard,
 } from "@app/screens/account-migration/hooks"
 import { useMigrationTransfer } from "@app/screens/account-migration/hooks/use-migration-transfer"
-import { MigrationSupportReason } from "@app/types/migration"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
@@ -37,7 +37,10 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
 
   const goToContactSupport = useCallback(
     (reason: MigrationSupportReason) => {
-      navigation.navigate("accountMigrationContactSupport", { reason })
+      navigation.navigate("accountMigrationContactSupport", {
+        reason,
+        origin: MigrationSupportOrigin.Commit,
+      })
     },
     [navigation],
   )
