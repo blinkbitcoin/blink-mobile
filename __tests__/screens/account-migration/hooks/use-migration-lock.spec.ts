@@ -67,14 +67,14 @@ describe("useMigrationLock", () => {
     expect(result.current.isLocked).toBe(false)
   })
 
-  /** A failed migration has no client path back, so locking the app would leave the user
-   *  staring at a flow they cannot finish or leave. Support owns that case. */
-  it("releases a failed migration", () => {
+  /** A failed migration stays locked: the funds may still settle server-side, so the account
+   *  is kept in the flow (routed to support) rather than handed back to spend. */
+  it("locks a failed migration", () => {
     mockUseMigrationStatus.mockReturnValue(serverReports(MigrationStatus.Failed))
 
     const { result } = renderHook(() => useMigrationLock())
 
-    expect(result.current.isLocked).toBe(false)
+    expect(result.current.isLocked).toBe(true)
   })
 
   /**
