@@ -83,7 +83,7 @@ type UseMigrationTransfer = {
   failureReason: MigrationSupportReason | null
   isClockOutOfSync: boolean
   hasConnectionIssue: boolean
-  retry: () => void
+  retry: () => Promise<void>
 }
 
 /**
@@ -122,7 +122,7 @@ export const useMigrationTransfer = ({
   /** Also paused while out of sync: nothing advances until the retry fires a fresh commit,
    *  so polling would only re-run the server's resume routine for nothing. */
   const shouldStopPolling = hasStopped || isClockOutOfSync
-  const { status } = useMigrationStatus({
+  const { status, refetch: refetchStatus } = useMigrationStatus({
     skip,
     pollInterval: shouldStopPolling ? 0 : STATUS_POLL_INTERVAL_MS,
   })
@@ -259,13 +259,32 @@ export const useMigrationTransfer = ({
    *  payment settles server-side, so offering a retry would loop on a refusal. */
   const serverFailure = hasServerFailed ? MigrationSupportReason.TransferFailed : null
 
-  /** After the clock is corrected, a fresh commit can pass: drop the once-only guard and
-   *  clear the flag so the commit effect fires again with a new timestamp. */
-  const retry = useCallback(() => {
-    if (custodialAccountId) accountsWithCommitStarted.delete(custodialAccountId)
+  /** Clears the recoverable flag so the commit effect fires again. A commit lost to the
+   *  network may have landed, so after a connection issue the phase is re-read first: if it
+   *  advanced past IN_PROGRESS, watch rather than send a second invoice refused as a state
+   *  conflict. */
+  const retry = useCallback(async () => {
     setIsClockOutOfSync(false)
+
+    if (hasConnectionIssue) {
+      let freshStatus: MigrationStatus | null
+      try {
+        freshStatus = await refetchStatus()
+      } catch {
+        /** Phase read failed too (still offline): keep the retry, do not recommit blind. */
+        return
+      }
+      const hasAdvancedPastCommit =
+        freshStatus !== null && freshStatus !== MigrationStatus.InProgress
+      if (hasAdvancedPastCommit) {
+        setHasConnectionIssue(false)
+        return
+      }
+    }
+
+    if (custodialAccountId) accountsWithCommitStarted.delete(custodialAccountId)
     setHasConnectionIssue(false)
-  }, [custodialAccountId])
+  }, [custodialAccountId, hasConnectionIssue, refetchStatus])
 
   /** A recoverable issue and support are mutually exclusive: while the user has a retry, a
    *  server failure on the same render must not also route to support. */

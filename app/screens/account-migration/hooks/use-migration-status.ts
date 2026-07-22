@@ -1,3 +1,5 @@
+import { useCallback } from "react"
+
 import { ApolloError, gql } from "@apollo/client"
 
 import { MigrationStatus, useMigrationStatusQuery } from "@app/graphql/generated"
@@ -26,8 +28,9 @@ type UseMigrationStatus = {
   /** Set when the read itself failed, so a caller can tell "the server has not said" apart
    *  from "we could not ask" and block with a retry rather than treat it as not-started. */
   error?: ApolloError
-  /** Re-runs the read, for a caller wiring the failed status into a retry control. */
-  refetch: () => Promise<unknown>
+  /** Re-reads the phase and returns the fresh status, for a retry or a re-check of whether a
+   *  lost commit has since advanced it. */
+  refetch: () => Promise<MigrationStatus | null>
 }
 
 /**
@@ -53,10 +56,15 @@ export const useMigrationStatus = ({
     pollInterval,
   })
 
+  const refetchStatus = useCallback(async (): Promise<MigrationStatus | null> => {
+    const result = await refetch()
+    return result.data?.migration?.status ?? null
+  }, [refetch])
+
   return {
     status: data?.migration?.status ?? null,
     loading,
     error,
-    refetch,
+    refetch: refetchStatus,
   }
 }

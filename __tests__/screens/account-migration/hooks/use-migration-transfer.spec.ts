@@ -16,6 +16,8 @@ const mockReportError = jest.fn()
 const mockIsDeviceClockSkewed = jest.fn()
 const mockCurrentProofTimestamp = jest.fn()
 let mockStatus: MigrationStatus | null = MigrationStatus.InProgress
+let mockRefetchStatus: () => Promise<MigrationStatus | null> = () =>
+  Promise.resolve(mockStatus)
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
@@ -27,7 +29,11 @@ const mockUseMigrationStatus = jest.fn()
 jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
   useMigrationStatus: (options: unknown) => {
     mockUseMigrationStatus(options)
-    return { status: mockStatus, loading: false }
+    return {
+      status: mockStatus,
+      loading: false,
+      refetch: () => mockRefetchStatus(),
+    }
   },
 }))
 
@@ -87,6 +93,7 @@ describe("useMigrationTransfer", () => {
     jest.clearAllMocks()
     resetMigrationCommitGuard()
     mockStatus = MigrationStatus.InProgress
+    mockRefetchStatus = () => Promise.resolve(mockStatus)
     mockBuildTransferRequest.mockResolvedValue({
       status: MigrationSdkStatus.Ok,
       value: collectedRequest,
@@ -406,7 +413,9 @@ describe("useMigrationTransfer", () => {
     await flushEffects()
     expect(result.current.hasConnectionIssue).toBe(true)
 
-    act(() => result.current.retry())
+    await act(async () => {
+      await result.current.retry()
+    })
     await flushEffects()
 
     expect(mockCommitMigration).toHaveBeenCalledTimes(1)
@@ -457,7 +466,9 @@ describe("useMigrationTransfer", () => {
     await flushEffects()
     expect(result.current.hasConnectionIssue).toBe(true)
 
-    act(() => result.current.retry())
+    await act(async () => {
+      await result.current.retry()
+    })
     await flushEffects()
 
     expect(mockCommitMigration).toHaveBeenCalledTimes(2)
@@ -479,10 +490,49 @@ describe("useMigrationTransfer", () => {
     await flushEffects()
     expect(result.current.hasConnectionIssue).toBe(false)
 
-    act(() => result.current.retry())
+    await act(async () => {
+      await result.current.retry()
+    })
     await flushEffects()
 
     expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+  })
+
+  /** A commit lost to the network may have landed: if the phase has since advanced, a retry
+   *  must watch it, not send a second invoice the backend refuses as a state conflict while
+   *  the real transfer completes underneath. */
+  it("watches instead of recommitting when a retry finds the phase already advanced", async () => {
+    mockCommitMigration.mockRejectedValue(networkError())
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.hasConnectionIssue).toBe(true)
+
+    /** The first commit actually landed; the pre-recommit refetch now sees TRANSFERRING. */
+    mockStatus = MigrationStatus.Transferring
+    await act(async () => {
+      await result.current.retry()
+    })
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+    expect(result.current.hasConnectionIssue).toBe(false)
+    expect(result.current.failureReason).toBeNull()
+  })
+
+  /** If the phase read fails too (still offline), the retry must not recommit blind — that
+   *  second invoice is what the re-read exists to avoid — and it must not throw. */
+  it("keeps the retry without recommitting when the pre-recommit refetch fails", async () => {
+    mockCommitMigration.mockRejectedValue(networkError())
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.hasConnectionIssue).toBe(true)
+
+    mockRefetchStatus = () => Promise.reject(new Error("still offline"))
+    await act(async () => {
+      await result.current.retry()
+    })
+
+    expect(mockCommitMigration).toHaveBeenCalledTimes(1)
+    expect(result.current.hasConnectionIssue).toBe(true)
   })
 
   it("survives a commit payload with no errors array", async () => {
@@ -625,7 +675,9 @@ describe("useMigrationTransfer", () => {
 
     mockIsDeviceClockSkewed.mockReturnValue(false)
     mockCommitMigration.mockResolvedValue({ data: { migrationCommit: { errors: [] } } })
-    act(() => result.current.retry())
+    await act(async () => {
+      await result.current.retry()
+    })
     await flushEffects()
 
     const firstTimestamp =
@@ -641,7 +693,9 @@ describe("useMigrationTransfer", () => {
     const { result } = renderTransfer({ custodialAccountId: null })
     await flushEffects()
 
-    act(() => result.current.retry())
+    await act(async () => {
+      await result.current.retry()
+    })
 
     expect(mockCommitMigration).not.toHaveBeenCalled()
   })
