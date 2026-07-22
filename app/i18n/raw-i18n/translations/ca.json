@@ -2802,6 +2802,7 @@
     "total": "Total",
     "transactions": "Transaccions",
     "transactionsError": "S'ha produït un error en carregar les transaccions",
+    "transfer": "Transferència",
     "tryAgain": "Torna-ho a intentar",
     "type": "Tipus",
     "usdAccount": "Compte Dòlar",
@@ -2818,6 +2819,7 @@
     "problemMaybeReauth": "Hi va haver un problema amb la teva sol·licitud. Si us plau, torna a intentar-ho en un minut. Si el problema persisteix, et recomanem que tanquis la sessió i tornis a iniciar-la. Pots tancar la sessió anant a Configuració > Compte > Tancar sessió",
     "warning": "Advertència",
     "continue": "Continua",
+    "skip": "Omet",
     "correct": "Correcte",
     "recommended": "Recomanat",
     "expirationTime": "Temps d'expiració",
@@ -3552,12 +3554,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Contacta amb suport",
+      "body": "Alguna cosa ha anat malament, però no et preocupis, els teus fons estan segurs. Contacta amb suport per obtenir ajuda.\n\nPotser necessitaràs aquesta informació per ajudar el suport a resoldre el teu cas:",
+      "accountIdLabel": "ID del compte",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Nom d'usuari",
+      "emailLabel": "Correu electrònic",
+      "phoneLabel": "Número de telèfon",
+      "appVersionLabel": "Versió de l'aplicació",
+      "platformLabel": "Plataforma",
+      "countryLabel": "País",
+      "emailSubject": "Sol·licitud de suport de migració",
+      "emailDescribeProblem": "Descriu el problema:",
+      "emailAccountInfo": "Informació del compte per al suport:",
+      "contactUsCta": "Contacta'ns"
+    },
+    "migrateNowModal": {
+      "title": "Migra ara a un compte no custodi",
+      "body": "Ja no pots rebre fons al teu compte custodial. Blink ha discontinuat el servei de custòdia a la teva regió i aquest compte quedarà inactivat al final del {date}.\n\nMigra ara a un compte no custodi.",
+      "migrateCta": "Migra ara"
+    },
+    "reminderBulletin": {
+      "title": "Important",
+      "body": "Migra el teu compte al nou mode no custodi abans del {date}",
+      "migrateCta": "Migra"
+    },
+    "dollarBalanceModal": {
+      "title": "No podem migrar el teu saldo en dòlars",
+      "body": "Primer buida el teu saldo en dòlars. Pots transferir-lo al teu saldo en bitcoins a Blink o en un altre lloc."
+    },
+    "balancesOverview": {
+      "title": "Mou el teu saldo",
+      "body": "Mou els teus fons de manera segura al teu nou compte.",
+      "currentBitcoinBalance": "Saldo de Bitcoin actual",
+      "currentDollarBalance": "Saldo en dòlars actual",
+      "newBitcoinBalance": "Nou saldo de Bitcoin",
+      "newDollarBalance": "Nou saldo en dòlars",
+      "dollarBalanceNotAvailable": "no disponible",
+      "networkFee": "Comissió de xarxa: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Comissió de xarxa: <bold>{fee: string}</bold> (coberta per Blink)",
+      "exchangeRate": "Tipus de canvi actual 1 BTC = {rate: string}",
+      "approveCta": "Aprovar",
+      "contactSupportCta": "Contacta amb suport"
+    },
+    "migrationRequiredTitle": "Hora d'actualitzar",
+    "keepReceivingTitle": "Continua rebent com sempre",
+    "keepReceivingBody": "La teva adreça Lightning es transferirà al teu nou compte no custodial.",
+    "keepReceivingLnAddressLabel": "La teva adreça LN",
+    "keepReceivingCta": "Genial",
+    "receivingDisabledToast": "La recepció està desactivada actualment.",
+    "downloadHistoryTitle": "Baixa el teu historial de transaccions",
+    "downloadHistoryBody": "El teu compte nou començarà de zero. Si vols conservar un registre de les teves transaccions, baixa-les ara com a CSV.",
+    "downloadHistoryDownloadCta": "Baixa",
+    "apiServiceTitle": "Servei d'API no disponible",
+    "apiServiceBody": "Observem que tens claus API actives. Blink no pot oferir l'API en mode no custodial.\n\nSi depens de l'API de Blink, contacta'ns aviat i farem tot el possible per ajudar-te en una transició fluida.",
+    "apiServiceContactCta": "Contacta'ns",
+    "apiServiceContinueCta": "Continua igualment",
+    "resumeFailed": "Alguna cosa ha fallat en reprendre la migració. Si us plau, torna-la a començar.",
+    "migrationRequiredBody": "És hora de migrar el teu compte custodial a un compte no custodi.",
+    "migrationRequiredForcedBody": "És hora de migrar el teu compte custodial a un compte no custodi. És obligatori per motius reguladors.\n\nNo et preocupis, la modalitat no custodial serà millor per a tu a llarg termini.",
+    "migrationGateTitle": "Compte no accessible",
+    "migrationGateBody": "Per motius reguladors no podem oferir comptes custodials a la teva regió. Transfereix els teus fons a un compte no custodial amb Blink seguint els passos següents o contacta amb nosaltres a <link>{email}</link>",
+    "bitcoinBalance": "Saldo de Bitcoin",
+    "dollarBalance": "Saldo en dòlars",
     "moveToNonCustodial": "Passa a no custodial",
     "explainerTitle": "Què significa passar a no custodial?",
-    "explainerStep1": "Crearàs un compte no custodial al protocol Spark, <link>més informació aquí</link>",
-    "explainerStep2": "Transferirem els teus fons al teu nou compte no custodial i el teu compte actual serà eliminat",
-    "explainerStep3": "Continua fent servir Blink com sempre",
-    "letsMove": "Anem-hi",
+    "explainerCheck1": "Crearàs un compte no custodial al protocol Spark",
+    "explainerCheck2": "Transferim els teus fons al teu nou compte no custodial",
+    "explainerCheck3": "El teu compte actual i totes les seves dades, inclòs l'historial de transaccions, es tancaran",
+    "explainerCheck4": "L'API de Blink no estarà disponible",
+    "explainerCheck5": "Es descomptarà una comissió de xarxa de Spark del teu compte",
+    "explainerCta": "Ho entenc",
     "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons."
   },
   "AccountTypeSelectionScreen": {
@@ -3607,6 +3675,11 @@
     "modalTitle": "Assegura els teus fons",
     "modalDescription": "Et recomanem fermament que facis una còpia de seguretat de la teva cartera per evitar una pèrdua total de fons en cas que perdis aquest dispositiu.",
     "secureMe": "Assegurar cartera"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Aquest és un compte no custodi",
+    "body": "Per saber-ne més, llegeix la nostra entrada del blog",
+    "cta": "Llegeix"
   },
   "StableBalance": {
     "title": "Balanç estable",

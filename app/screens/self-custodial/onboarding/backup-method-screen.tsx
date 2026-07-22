@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { Platform } from "react-native"
 
 import { useTheme } from "@rn-vui/themed"
@@ -11,7 +11,7 @@ import { testProps } from "@app/utils/testProps"
 
 import {
   MigrationCheckpoint,
-  useMigrationCheckpoint,
+  useMigrationBackupCheckpoint,
 } from "../../account-migration/hooks"
 
 import { useBackupMethods } from "./hooks"
@@ -24,7 +24,6 @@ export const BackupMethodScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
 
-  const { saveCheckpoint } = useMigrationCheckpoint()
   const {
     isCredentialBackupAvailable,
     credentialLoading,
@@ -33,11 +32,12 @@ export const BackupMethodScreen: React.FC = () => {
     handleManualBackup,
   } = useBackupMethods()
 
-  useEffect(() => {
-    saveCheckpoint(MigrationCheckpoint.BackupMethod)
-  }, [saveCheckpoint])
+  useMigrationBackupCheckpoint(MigrationCheckpoint.BackupMethod)
 
   const cloudProvider = getCloudProviderName(LL)
+  /** Credential-based backup is not yet wired on iOS (see the TODO below). */
+  const isNonIosPlatform = Platform.OS !== "ios"
+  const canShowCredentialBackup = isNonIosPlatform && isCredentialBackupAvailable
 
   return (
     <OnboardingScreenLayout
@@ -49,7 +49,7 @@ export const BackupMethodScreen: React.FC = () => {
             {...testProps("backup-cloud-button")}
           />
           {/* TODO: disabled on iOS while credential-based backup integration is completed */}
-          {Platform.OS !== "ios" && isCredentialBackupAvailable && (
+          {canShowCredentialBackup && (
             <GaloySecondaryButton
               title={LL.BackupScreen.BackupMethod.passwordManager()}
               onPress={handleCredentialBackup}
@@ -67,7 +67,7 @@ export const BackupMethodScreen: React.FC = () => {
     >
       <IconHero
         icon="cloud"
-        iconColor={colors.success}
+        iconColor={colors._green}
         title={LL.BackupScreen.BackupMethod.title()}
         subtitle={LL.BackupScreen.BackupMethod.subtitle({ provider: cloudProvider })}
       />

@@ -2802,6 +2802,7 @@
     "total": "Totaal",
     "transactions": "Transaksies",
     "transactionsError": "Fout - kan nie transaksies laai nie",
+    "transfer": "Oordrag",
     "tryAgain": "Probeer weer",
     "type": "Tipe",
     "usdAccount": "Dollar-rekening",
@@ -2818,6 +2819,7 @@
     "problemMaybeReauth": "Daar was 'n probleem met jou versoek. Probeer asseblief weer oor 1 minuut. Indien die probleem voortduur, beveel ons aan dat jy uitteken en dan weer intteken. Gaan na Verstellings > Rekening > Teken uit",
     "warning": "Waarskuwing",
     "continue": "Gaan voort",
+    "skip": "Slaan oor",
     "correct": "Korrek",
     "recommended": "Aanbeveel",
     "expirationTime": "Vervaltyd",
@@ -3552,12 +3554,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Kontak ondersteuning",
+      "body": "Iets het verkeerd geloop, maar moenie bekommerd wees nie, jou fondse is veilig. Kontak asseblief ondersteuning vir hulp.\n\nJy mag dalk hierdie inligting nodig hê om ondersteuning te help om jou saak op te los:",
+      "accountIdLabel": "Rekening-ID",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Gebruikersnaam",
+      "emailLabel": "E-pos",
+      "phoneLabel": "Telefoonnommer",
+      "appVersionLabel": "Toepassingweergawe",
+      "platformLabel": "Platform",
+      "countryLabel": "Land",
+      "emailSubject": "Migrasie-ondersteuningsversoek",
+      "emailDescribeProblem": "Beskryf die probleem:",
+      "emailAccountInfo": "Rekeninginligting vir ondersteuning:",
+      "contactUsCta": "Kontak ons"
+    },
+    "migrateNowModal": {
+      "title": "Migreer nou na 'n nie-bewaarrekening",
+      "body": "Jy kan nie meer fondse in jou bewaarrekening ontvang nie. Blink het die bewaardiens in jou streek gestaak en hierdie rekening sal teen die einde van {date} gedeaktiveer word.\n\nMigreer nou na 'n nie-bewaarrekening.",
+      "migrateCta": "Migreer nou"
+    },
+    "reminderBulletin": {
+      "title": "Belangrik",
+      "body": "Migreer jou rekening na die nuwe, nie-bewaar-modus voor {date}",
+      "migrateCta": "Migreer"
+    },
+    "dollarBalanceModal": {
+      "title": "Ons kan nie jou dollarsaldo migreer nie",
+      "body": "Maak eers jou dollarsaldo leeg. Jy kan dit na jou Bitcoin-saldo in Blink of elders oordra."
+    },
+    "balancesOverview": {
+      "title": "Skuif jou saldo",
+      "body": "Skuif jou fondse veilig na jou nuwe rekening.",
+      "currentBitcoinBalance": "Huidige Bitcoin-saldo",
+      "currentDollarBalance": "Huidige Dollar-saldo",
+      "newBitcoinBalance": "Nuwe Bitcoin-saldo",
+      "newDollarBalance": "Nuwe Dollar-saldo",
+      "dollarBalanceNotAvailable": "nie beskikbaar nie",
+      "networkFee": "Netwerkfooi: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Netwerkfooi: <bold>{fee: string}</bold> (deur Blink gedek)",
+      "exchangeRate": "Huidige wisselkoers 1 BTC = {rate: string}",
+      "approveCta": "Keur goed",
+      "contactSupportCta": "Kontak ondersteuning"
+    },
+    "migrationRequiredTitle": "Tyd om op te gradeer",
+    "keepReceivingTitle": "Ontvang steeds soos gewoonlik",
+    "keepReceivingBody": "Jou Lightning-adres sal na jou nuwe nie-bewaarde rekening oorgedra word.",
+    "keepReceivingLnAddressLabel": "Jou LN-adres",
+    "keepReceivingCta": "Lekker",
+    "receivingDisabledToast": "Ontvangs is tans gedeaktiveer.",
+    "downloadHistoryTitle": "Laai jou transaksiegeskiedenis af",
+    "downloadHistoryBody": "Jou nuwe rekening begin vars. As jy 'n rekord van jou transaksies wil hou, laai dit nou as CSV af.",
+    "downloadHistoryDownloadCta": "Laai af",
+    "apiServiceTitle": "API-diens nie beskikbaar nie",
+    "apiServiceBody": "Ons let op dat jy aktiewe API-sleutels het. Blink kan nie die API in nie-bewaarende modus verskaf nie.\n\nAs jy van Blink se API afhanklik is, kontak ons gou en ons sal ons bes doen om 'n gladde oorgang te help.",
+    "apiServiceContactCta": "Kontak ons",
+    "apiServiceContinueCta": "Gaan tog voort",
+    "resumeFailed": "Iets het verkeerd geloop met die hervatting van jou migrasie. Begin dit asseblief weer.",
+    "migrationRequiredBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer.",
+    "migrationRequiredForcedBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer. Dit word om regulatoriese redes vereis.\n\nGeen rede tot kommer nie, nie-bewaring sal op die lange duur beter vir jou wees.",
+    "migrationGateTitle": "Rekening nie toeganklik nie",
+    "migrationGateBody": "Om regulatoriese redes kan ons nie bewaarde rekeninge in jou streek verskaf nie. Dra jou fondse oor na 'n nie-bewaarde rekening by Blink deur die volgende stappe te volg of kontak ons by <link>{email}</link>",
+    "bitcoinBalance": "Bitcoin-saldo",
+    "dollarBalance": "Dollar-saldo",
     "moveToNonCustodial": "Skuif na nie-bewaarde",
     "explainerTitle": "Wat beteken dit om na nie-bewaarde te skuif?",
-    "explainerStep1": "Jy sal 'n nie-bewaarde rekening op die Spark-protokol skep, <link>leer meer hier</link>",
-    "explainerStep2": "Ons dra jou fondse oor na jou nuwe nie-bewaarde rekening en jou huidige rekening sal verwyder word",
-    "explainerStep3": "Gebruik Blink voort soos gewoonlik",
-    "letsMove": "Kom ons gaan",
+    "explainerCheck1": "Jy sal 'n nie-bewaarde rekening op die Spark-protokol skep",
+    "explainerCheck2": "Ons dra jou fondse oor na jou nuwe nie-bewaarde rekening",
+    "explainerCheck3": "Jou huidige rekening en al sy data, insluitend transaksiegeskiedenis, sal gesluit word",
+    "explainerCheck4": "Blink API sal nie beskikbaar wees nie",
+    "explainerCheck5": "Jou rekening sal met 'n Spark-netwerkfooi belas word",
+    "explainerCta": "Ek verstaan",
     "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees."
   },
   "AccountTypeSelectionScreen": {
@@ -3607,6 +3675,11 @@
     "modalTitle": "Beveilig jou fondse",
     "modalDescription": "Ons beveel sterk aan dat u u beursie rugsteun om 'n algehele verlies van fondse te voorkom indien u hierdie toestel verloor.",
     "secureMe": "Beveilig beursie"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Hierdie is 'n nie-bewaarrekening",
+    "body": "Lees ons blogpos om meer te wete te kom",
+    "cta": "Lees"
   },
   "StableBalance": {
     "title": "Stabiele balans",

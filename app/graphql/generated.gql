@@ -1383,6 +1383,65 @@ query level {
   }
 }
 
+query migrationApiKeys {
+  me {
+    id
+    apiKeys {
+      id
+      revoked
+      expired
+      __typename
+    }
+    __typename
+  }
+}
+
+query migrationOwner {
+  me {
+    id
+    defaultAccount {
+      id
+      __typename
+    }
+    __typename
+  }
+}
+
+query migrationSupportDetails {
+  me {
+    id
+    phone
+    username
+    email {
+      address
+      __typename
+    }
+    defaultAccount {
+      id
+      __typename
+    }
+    __typename
+  }
+}
+
+query migrationTransactionsPresence {
+  me {
+    id
+    defaultAccount {
+      id
+      transactions(first: 1) {
+        edges {
+          cursor
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query mobileUpdate {
   mobileVersions {
     platform

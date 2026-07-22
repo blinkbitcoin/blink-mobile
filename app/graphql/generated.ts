@@ -207,6 +207,21 @@ export type AccountLimits = {
   readonly withdrawal: ReadonlyArray<AccountLimit>;
 };
 
+export type AccountMigration = {
+  readonly __typename: 'AccountMigration';
+  readonly preview: AccountMigrationPreview;
+  readonly status: MigrationStatus;
+  readonly transferPaymentHash?: Maybe<Scalars['String']['output']>;
+};
+
+export type AccountMigrationPreview = {
+  readonly __typename: 'AccountMigrationPreview';
+  readonly balanceSats: Scalars['SatAmount']['output'];
+  readonly feeCoveredByBlink: Scalars['Boolean']['output'];
+  readonly feeSats: Scalars['SatAmount']['output'];
+  readonly receiveSats: Scalars['SatAmount']['output'];
+};
+
 export type AccountUpdateDefaultWalletIdInput = {
   readonly walletId: Scalars['WalletId']['input'];
 };
@@ -1400,6 +1415,57 @@ export type MerchantPayload = {
   readonly merchant?: Maybe<Merchant>;
 };
 
+export type MigrationCommitInput = {
+  readonly backupAttested: Scalars['Boolean']['input'];
+  readonly disclosureVersion: Scalars['String']['input'];
+  readonly proofSignature: Scalars['String']['input'];
+  readonly proofTimestamp: Scalars['SafeInt']['input'];
+  readonly sparkInvoice: Scalars['LnPaymentRequest']['input'];
+  readonly sparkPubkey: Scalars['String']['input'];
+};
+
+export type MigrationLnAddressTransferInput = {
+  readonly proofSignature: Scalars['String']['input'];
+  readonly proofTimestamp: Scalars['SafeInt']['input'];
+  readonly sparkPubkey: Scalars['String']['input'];
+};
+
+export type MigrationLnAddressTransferPayload = {
+  readonly __typename: 'MigrationLnAddressTransferPayload';
+  readonly errors: ReadonlyArray<Error>;
+  readonly results: ReadonlyArray<MigrationLnAddressTransferResult>;
+};
+
+export type MigrationLnAddressTransferResult = {
+  readonly __typename: 'MigrationLnAddressTransferResult';
+  readonly identifier: Scalars['String']['output'];
+  readonly lightningAddress?: Maybe<Scalars['String']['output']>;
+  readonly status: MigrationLnAddressTransferStatus;
+};
+
+export const MigrationLnAddressTransferStatus = {
+  AlreadyTransferred: 'ALREADY_TRANSFERRED',
+  Failed: 'FAILED',
+  SkippedNotRegistered: 'SKIPPED_NOT_REGISTERED',
+  Transferred: 'TRANSFERRED'
+} as const;
+
+export type MigrationLnAddressTransferStatus = typeof MigrationLnAddressTransferStatus[keyof typeof MigrationLnAddressTransferStatus];
+export type MigrationPayload = {
+  readonly __typename: 'MigrationPayload';
+  readonly errors: ReadonlyArray<Error>;
+  readonly migration?: Maybe<AccountMigration>;
+};
+
+export const MigrationStatus = {
+  Completed: 'COMPLETED',
+  Failed: 'FAILED',
+  InProgress: 'IN_PROGRESS',
+  NotStarted: 'NOT_STARTED',
+  Transferring: 'TRANSFERRING'
+} as const;
+
+export type MigrationStatus = typeof MigrationStatus[keyof typeof MigrationStatus];
 export type MobileVersions = {
   readonly __typename: 'MobileVersions';
   readonly currentSupported: Scalars['Int']['output'];
@@ -1525,6 +1591,9 @@ export type Mutation = {
   /** Sends a payment to a lightning address. */
   readonly lnurlPaymentSend: PaymentSendPayload;
   readonly merchantMapSuggest: MerchantPayload;
+  readonly migrationCommit: MigrationPayload;
+  readonly migrationLnAddressTransfer: MigrationLnAddressTransferPayload;
+  readonly migrationStart: MigrationPayload;
   readonly onChainAddressCreate: OnChainAddressPayload;
   readonly onChainAddressCurrent: OnChainAddressPayload;
   readonly onChainPaymentSend: PaymentSendPayload;
@@ -1794,6 +1863,16 @@ export type MutationLnurlPaymentSendArgs = {
 
 export type MutationMerchantMapSuggestArgs = {
   input: MerchantMapSuggestInput;
+};
+
+
+export type MutationMigrationCommitArgs = {
+  input: MigrationCommitInput;
+};
+
+
+export type MutationMigrationLnAddressTransferArgs = {
+  input: MigrationLnAddressTransferInput;
 };
 
 
@@ -2220,6 +2299,7 @@ export type Query = {
   readonly lnInvoicePaymentStatusByHash: LnInvoicePaymentStatus;
   readonly lnInvoicePaymentStatusByPaymentRequest: LnInvoicePaymentStatus;
   readonly me?: Maybe<User>;
+  readonly migration?: Maybe<AccountMigration>;
   readonly mobileVersions?: Maybe<ReadonlyArray<Maybe<MobileVersions>>>;
   readonly onChainTxFee: OnChainTxFee;
   readonly onChainUsdTxFee: OnChainUsdTxFee;
@@ -3269,6 +3349,13 @@ export type CurrencyListQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type CurrencyListQuery = { readonly __typename: 'Query', readonly currencyList: ReadonlyArray<{ readonly __typename: 'Currency', readonly id: string, readonly flag: string, readonly name: string, readonly symbol: string, readonly fractionDigits: number }> };
 
+export type ExportCsvSettingQueryVariables = Exact<{
+  walletIds: ReadonlyArray<Scalars['WalletId']['input']> | Scalars['WalletId']['input'];
+}>;
+
+
+export type ExportCsvSettingQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly csvTransactions: string } } | null };
+
 export type CaptchaCreateChallengeMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3292,6 +3379,26 @@ export type GetUsernamesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetUsernamesQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string }, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null } | null };
+
+export type MigrationApiKeysQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MigrationApiKeysQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly apiKeys: ReadonlyArray<{ readonly __typename: 'ApiKey', readonly id: string, readonly revoked: boolean, readonly expired: boolean }> } | null };
+
+export type MigrationOwnerQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MigrationOwnerQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
+
+export type MigrationTransactionsPresenceQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MigrationTransactionsPresenceQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly transactions?: { readonly __typename: 'TransactionConnection', readonly edges?: ReadonlyArray<{ readonly __typename: 'TransactionEdge', readonly cursor: string }> | null } | null } } | null };
+
+export type MigrationSupportDetailsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MigrationSupportDetailsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly username?: string | null, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
 
 export type CardBalanceQueryVariables = Exact<{
   cardId: Scalars['ID']['input'];
@@ -3823,13 +3930,6 @@ export type SettingsScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type SettingsScreenQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly language: string, readonly totpEnabled: boolean, readonly phone?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> }, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null };
-
-export type ExportCsvSettingQueryVariables = Exact<{
-  walletIds: ReadonlyArray<Scalars['WalletId']['input']> | Scalars['WalletId']['input'];
-}>;
-
-
-export type ExportCsvSettingQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly csvTransactions: string } } | null };
 
 export type UserTotpDeleteMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -5031,6 +5131,50 @@ export type CurrencyListQueryHookResult = ReturnType<typeof useCurrencyListQuery
 export type CurrencyListLazyQueryHookResult = ReturnType<typeof useCurrencyListLazyQuery>;
 export type CurrencyListSuspenseQueryHookResult = ReturnType<typeof useCurrencyListSuspenseQuery>;
 export type CurrencyListQueryResult = Apollo.QueryResult<CurrencyListQuery, CurrencyListQueryVariables>;
+export const ExportCsvSettingDocument = gql`
+    query ExportCsvSetting($walletIds: [WalletId!]!) {
+  me {
+    id
+    defaultAccount {
+      id
+      csvTransactions(walletIds: $walletIds)
+    }
+  }
+}
+    `;
+
+/**
+ * __useExportCsvSettingQuery__
+ *
+ * To run a query within a React component, call `useExportCsvSettingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useExportCsvSettingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useExportCsvSettingQuery({
+ *   variables: {
+ *      walletIds: // value for 'walletIds'
+ *   },
+ * });
+ */
+export function useExportCsvSettingQuery(baseOptions: Apollo.QueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables> & ({ variables: ExportCsvSettingQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
+      }
+export function useExportCsvSettingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
+        }
+export function useExportCsvSettingSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
+        }
+export type ExportCsvSettingQueryHookResult = ReturnType<typeof useExportCsvSettingQuery>;
+export type ExportCsvSettingLazyQueryHookResult = ReturnType<typeof useExportCsvSettingLazyQuery>;
+export type ExportCsvSettingSuspenseQueryHookResult = ReturnType<typeof useExportCsvSettingSuspenseQuery>;
+export type ExportCsvSettingQueryResult = Apollo.QueryResult<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>;
 export const CaptchaCreateChallengeDocument = gql`
     mutation captchaCreateChallenge {
   captchaCreateChallenge {
@@ -5185,6 +5329,186 @@ export type GetUsernamesQueryHookResult = ReturnType<typeof useGetUsernamesQuery
 export type GetUsernamesLazyQueryHookResult = ReturnType<typeof useGetUsernamesLazyQuery>;
 export type GetUsernamesSuspenseQueryHookResult = ReturnType<typeof useGetUsernamesSuspenseQuery>;
 export type GetUsernamesQueryResult = Apollo.QueryResult<GetUsernamesQuery, GetUsernamesQueryVariables>;
+export const MigrationApiKeysDocument = gql`
+    query migrationApiKeys {
+  me {
+    id
+    apiKeys {
+      id
+      revoked
+      expired
+    }
+  }
+}
+    `;
+
+/**
+ * __useMigrationApiKeysQuery__
+ *
+ * To run a query within a React component, call `useMigrationApiKeysQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMigrationApiKeysQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMigrationApiKeysQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMigrationApiKeysQuery(baseOptions?: Apollo.QueryHookOptions<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>(MigrationApiKeysDocument, options);
+      }
+export function useMigrationApiKeysLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>(MigrationApiKeysDocument, options);
+        }
+export function useMigrationApiKeysSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>(MigrationApiKeysDocument, options);
+        }
+export type MigrationApiKeysQueryHookResult = ReturnType<typeof useMigrationApiKeysQuery>;
+export type MigrationApiKeysLazyQueryHookResult = ReturnType<typeof useMigrationApiKeysLazyQuery>;
+export type MigrationApiKeysSuspenseQueryHookResult = ReturnType<typeof useMigrationApiKeysSuspenseQuery>;
+export type MigrationApiKeysQueryResult = Apollo.QueryResult<MigrationApiKeysQuery, MigrationApiKeysQueryVariables>;
+export const MigrationOwnerDocument = gql`
+    query migrationOwner {
+  me {
+    id
+    defaultAccount {
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useMigrationOwnerQuery__
+ *
+ * To run a query within a React component, call `useMigrationOwnerQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMigrationOwnerQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMigrationOwnerQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMigrationOwnerQuery(baseOptions?: Apollo.QueryHookOptions<MigrationOwnerQuery, MigrationOwnerQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MigrationOwnerQuery, MigrationOwnerQueryVariables>(MigrationOwnerDocument, options);
+      }
+export function useMigrationOwnerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MigrationOwnerQuery, MigrationOwnerQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MigrationOwnerQuery, MigrationOwnerQueryVariables>(MigrationOwnerDocument, options);
+        }
+export function useMigrationOwnerSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MigrationOwnerQuery, MigrationOwnerQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MigrationOwnerQuery, MigrationOwnerQueryVariables>(MigrationOwnerDocument, options);
+        }
+export type MigrationOwnerQueryHookResult = ReturnType<typeof useMigrationOwnerQuery>;
+export type MigrationOwnerLazyQueryHookResult = ReturnType<typeof useMigrationOwnerLazyQuery>;
+export type MigrationOwnerSuspenseQueryHookResult = ReturnType<typeof useMigrationOwnerSuspenseQuery>;
+export type MigrationOwnerQueryResult = Apollo.QueryResult<MigrationOwnerQuery, MigrationOwnerQueryVariables>;
+export const MigrationTransactionsPresenceDocument = gql`
+    query migrationTransactionsPresence {
+  me {
+    id
+    defaultAccount {
+      id
+      transactions(first: 1) {
+        edges {
+          cursor
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useMigrationTransactionsPresenceQuery__
+ *
+ * To run a query within a React component, call `useMigrationTransactionsPresenceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMigrationTransactionsPresenceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMigrationTransactionsPresenceQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMigrationTransactionsPresenceQuery(baseOptions?: Apollo.QueryHookOptions<MigrationTransactionsPresenceQuery, MigrationTransactionsPresenceQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MigrationTransactionsPresenceQuery, MigrationTransactionsPresenceQueryVariables>(MigrationTransactionsPresenceDocument, options);
+      }
+export function useMigrationTransactionsPresenceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MigrationTransactionsPresenceQuery, MigrationTransactionsPresenceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MigrationTransactionsPresenceQuery, MigrationTransactionsPresenceQueryVariables>(MigrationTransactionsPresenceDocument, options);
+        }
+export function useMigrationTransactionsPresenceSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MigrationTransactionsPresenceQuery, MigrationTransactionsPresenceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MigrationTransactionsPresenceQuery, MigrationTransactionsPresenceQueryVariables>(MigrationTransactionsPresenceDocument, options);
+        }
+export type MigrationTransactionsPresenceQueryHookResult = ReturnType<typeof useMigrationTransactionsPresenceQuery>;
+export type MigrationTransactionsPresenceLazyQueryHookResult = ReturnType<typeof useMigrationTransactionsPresenceLazyQuery>;
+export type MigrationTransactionsPresenceSuspenseQueryHookResult = ReturnType<typeof useMigrationTransactionsPresenceSuspenseQuery>;
+export type MigrationTransactionsPresenceQueryResult = Apollo.QueryResult<MigrationTransactionsPresenceQuery, MigrationTransactionsPresenceQueryVariables>;
+export const MigrationSupportDetailsDocument = gql`
+    query migrationSupportDetails {
+  me {
+    id
+    phone
+    username
+    email {
+      address
+    }
+    defaultAccount {
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useMigrationSupportDetailsQuery__
+ *
+ * To run a query within a React component, call `useMigrationSupportDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMigrationSupportDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMigrationSupportDetailsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMigrationSupportDetailsQuery(baseOptions?: Apollo.QueryHookOptions<MigrationSupportDetailsQuery, MigrationSupportDetailsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MigrationSupportDetailsQuery, MigrationSupportDetailsQueryVariables>(MigrationSupportDetailsDocument, options);
+      }
+export function useMigrationSupportDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MigrationSupportDetailsQuery, MigrationSupportDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MigrationSupportDetailsQuery, MigrationSupportDetailsQueryVariables>(MigrationSupportDetailsDocument, options);
+        }
+export function useMigrationSupportDetailsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MigrationSupportDetailsQuery, MigrationSupportDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MigrationSupportDetailsQuery, MigrationSupportDetailsQueryVariables>(MigrationSupportDetailsDocument, options);
+        }
+export type MigrationSupportDetailsQueryHookResult = ReturnType<typeof useMigrationSupportDetailsQuery>;
+export type MigrationSupportDetailsLazyQueryHookResult = ReturnType<typeof useMigrationSupportDetailsLazyQuery>;
+export type MigrationSupportDetailsSuspenseQueryHookResult = ReturnType<typeof useMigrationSupportDetailsSuspenseQuery>;
+export type MigrationSupportDetailsQueryResult = Apollo.QueryResult<MigrationSupportDetailsQuery, MigrationSupportDetailsQueryVariables>;
 export const CardBalanceDocument = gql`
     query cardBalance($cardId: ID!) {
   cardBalance(cardId: $cardId) {
@@ -8823,50 +9147,6 @@ export type SettingsScreenQueryHookResult = ReturnType<typeof useSettingsScreenQ
 export type SettingsScreenLazyQueryHookResult = ReturnType<typeof useSettingsScreenLazyQuery>;
 export type SettingsScreenSuspenseQueryHookResult = ReturnType<typeof useSettingsScreenSuspenseQuery>;
 export type SettingsScreenQueryResult = Apollo.QueryResult<SettingsScreenQuery, SettingsScreenQueryVariables>;
-export const ExportCsvSettingDocument = gql`
-    query ExportCsvSetting($walletIds: [WalletId!]!) {
-  me {
-    id
-    defaultAccount {
-      id
-      csvTransactions(walletIds: $walletIds)
-    }
-  }
-}
-    `;
-
-/**
- * __useExportCsvSettingQuery__
- *
- * To run a query within a React component, call `useExportCsvSettingQuery` and pass it any options that fit your needs.
- * When your component renders, `useExportCsvSettingQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useExportCsvSettingQuery({
- *   variables: {
- *      walletIds: // value for 'walletIds'
- *   },
- * });
- */
-export function useExportCsvSettingQuery(baseOptions: Apollo.QueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables> & ({ variables: ExportCsvSettingQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
-      }
-export function useExportCsvSettingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
-        }
-export function useExportCsvSettingSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>(ExportCsvSettingDocument, options);
-        }
-export type ExportCsvSettingQueryHookResult = ReturnType<typeof useExportCsvSettingQuery>;
-export type ExportCsvSettingLazyQueryHookResult = ReturnType<typeof useExportCsvSettingLazyQuery>;
-export type ExportCsvSettingSuspenseQueryHookResult = ReturnType<typeof useExportCsvSettingSuspenseQuery>;
-export type ExportCsvSettingQueryResult = Apollo.QueryResult<ExportCsvSettingQuery, ExportCsvSettingQueryVariables>;
 export const UserTotpDeleteDocument = gql`
     mutation userTotpDelete {
   userTotpDelete {
@@ -9360,6 +9640,8 @@ export type ResolversTypes = {
   AccountLevel: AccountLevel;
   AccountLimit: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['AccountLimit']>;
   AccountLimits: ResolverTypeWrapper<AccountLimits>;
+  AccountMigration: ResolverTypeWrapper<AccountMigration>;
+  AccountMigrationPreview: ResolverTypeWrapper<AccountMigrationPreview>;
   AccountUpdateDefaultWalletIdInput: AccountUpdateDefaultWalletIdInput;
   AccountUpdateDefaultWalletIdPayload: ResolverTypeWrapper<AccountUpdateDefaultWalletIdPayload>;
   AccountUpdateDisplayCurrencyInput: AccountUpdateDisplayCurrencyInput;
@@ -9508,6 +9790,13 @@ export type ResolversTypes = {
   Merchant: ResolverTypeWrapper<Merchant>;
   MerchantMapSuggestInput: MerchantMapSuggestInput;
   MerchantPayload: ResolverTypeWrapper<MerchantPayload>;
+  MigrationCommitInput: MigrationCommitInput;
+  MigrationLnAddressTransferInput: MigrationLnAddressTransferInput;
+  MigrationLnAddressTransferPayload: ResolverTypeWrapper<MigrationLnAddressTransferPayload>;
+  MigrationLnAddressTransferResult: ResolverTypeWrapper<MigrationLnAddressTransferResult>;
+  MigrationLnAddressTransferStatus: MigrationLnAddressTransferStatus;
+  MigrationPayload: ResolverTypeWrapper<MigrationPayload>;
+  MigrationStatus: MigrationStatus;
   Minutes: ResolverTypeWrapper<Scalars['Minutes']['output']>;
   MobileVersions: ResolverTypeWrapper<MobileVersions>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -9658,6 +9947,8 @@ export type ResolversParentTypes = {
   AccountEnableNotificationChannelInput: AccountEnableNotificationChannelInput;
   AccountLimit: ResolversInterfaceTypes<ResolversParentTypes>['AccountLimit'];
   AccountLimits: AccountLimits;
+  AccountMigration: AccountMigration;
+  AccountMigrationPreview: AccountMigrationPreview;
   AccountUpdateDefaultWalletIdInput: AccountUpdateDefaultWalletIdInput;
   AccountUpdateDefaultWalletIdPayload: AccountUpdateDefaultWalletIdPayload;
   AccountUpdateDisplayCurrencyInput: AccountUpdateDisplayCurrencyInput;
@@ -9797,6 +10088,11 @@ export type ResolversParentTypes = {
   Merchant: Merchant;
   MerchantMapSuggestInput: MerchantMapSuggestInput;
   MerchantPayload: MerchantPayload;
+  MigrationCommitInput: MigrationCommitInput;
+  MigrationLnAddressTransferInput: MigrationLnAddressTransferInput;
+  MigrationLnAddressTransferPayload: MigrationLnAddressTransferPayload;
+  MigrationLnAddressTransferResult: MigrationLnAddressTransferResult;
+  MigrationPayload: MigrationPayload;
   Minutes: Scalars['Minutes']['output'];
   MobileVersions: MobileVersions;
   Mutation: {};
@@ -9961,6 +10257,21 @@ export type AccountLimitsResolvers<ContextType = any, ParentType extends Resolve
   convert?: Resolver<ReadonlyArray<ResolversTypes['AccountLimit']>, ParentType, ContextType>;
   internalSend?: Resolver<ReadonlyArray<ResolversTypes['AccountLimit']>, ParentType, ContextType>;
   withdrawal?: Resolver<ReadonlyArray<ResolversTypes['AccountLimit']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AccountMigrationResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccountMigration'] = ResolversParentTypes['AccountMigration']> = {
+  preview?: Resolver<ResolversTypes['AccountMigrationPreview'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['MigrationStatus'], ParentType, ContextType>;
+  transferPaymentHash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AccountMigrationPreviewResolvers<ContextType = any, ParentType extends ResolversParentTypes['AccountMigrationPreview'] = ResolversParentTypes['AccountMigrationPreview']> = {
+  balanceSats?: Resolver<ResolversTypes['SatAmount'], ParentType, ContextType>;
+  feeCoveredByBlink?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  feeSats?: Resolver<ResolversTypes['SatAmount'], ParentType, ContextType>;
+  receiveSats?: Resolver<ResolversTypes['SatAmount'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -10602,6 +10913,25 @@ export type MerchantPayloadResolvers<ContextType = any, ParentType extends Resol
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type MigrationLnAddressTransferPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrationLnAddressTransferPayload'] = ResolversParentTypes['MigrationLnAddressTransferPayload']> = {
+  errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
+  results?: Resolver<ReadonlyArray<ResolversTypes['MigrationLnAddressTransferResult']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MigrationLnAddressTransferResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrationLnAddressTransferResult'] = ResolversParentTypes['MigrationLnAddressTransferResult']> = {
+  identifier?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  lightningAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['MigrationLnAddressTransferStatus'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MigrationPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrationPayload'] = ResolversParentTypes['MigrationPayload']> = {
+  errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
+  migration?: Resolver<Maybe<ResolversTypes['AccountMigration']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export interface MinutesScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Minutes'], any> {
   name: 'Minutes';
 }
@@ -10664,6 +10994,9 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   lnUsdInvoiceFeeProbe?: Resolver<ResolversTypes['SatAmountPayload'], ParentType, ContextType, RequireFields<MutationLnUsdInvoiceFeeProbeArgs, 'input'>>;
   lnurlPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationLnurlPaymentSendArgs, 'input'>>;
   merchantMapSuggest?: Resolver<ResolversTypes['MerchantPayload'], ParentType, ContextType, RequireFields<MutationMerchantMapSuggestArgs, 'input'>>;
+  migrationCommit?: Resolver<ResolversTypes['MigrationPayload'], ParentType, ContextType, RequireFields<MutationMigrationCommitArgs, 'input'>>;
+  migrationLnAddressTransfer?: Resolver<ResolversTypes['MigrationLnAddressTransferPayload'], ParentType, ContextType, RequireFields<MutationMigrationLnAddressTransferArgs, 'input'>>;
+  migrationStart?: Resolver<ResolversTypes['MigrationPayload'], ParentType, ContextType>;
   onChainAddressCreate?: Resolver<ResolversTypes['OnChainAddressPayload'], ParentType, ContextType, RequireFields<MutationOnChainAddressCreateArgs, 'input'>>;
   onChainAddressCurrent?: Resolver<ResolversTypes['OnChainAddressPayload'], ParentType, ContextType, RequireFields<MutationOnChainAddressCurrentArgs, 'input'>>;
   onChainPaymentSend?: Resolver<ResolversTypes['PaymentSendPayload'], ParentType, ContextType, RequireFields<MutationOnChainPaymentSendArgs, 'input'>>;
@@ -10897,6 +11230,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   lnInvoicePaymentStatusByHash?: Resolver<ResolversTypes['LnInvoicePaymentStatus'], ParentType, ContextType, RequireFields<QueryLnInvoicePaymentStatusByHashArgs, 'input'>>;
   lnInvoicePaymentStatusByPaymentRequest?: Resolver<ResolversTypes['LnInvoicePaymentStatus'], ParentType, ContextType, RequireFields<QueryLnInvoicePaymentStatusByPaymentRequestArgs, 'input'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  migration?: Resolver<Maybe<ResolversTypes['AccountMigration']>, ParentType, ContextType>;
   mobileVersions?: Resolver<Maybe<ReadonlyArray<Maybe<ResolversTypes['MobileVersions']>>>, ParentType, ContextType>;
   onChainTxFee?: Resolver<ResolversTypes['OnChainTxFee'], ParentType, ContextType, RequireFields<QueryOnChainTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
   onChainUsdTxFee?: Resolver<ResolversTypes['OnChainUsdTxFee'], ParentType, ContextType, RequireFields<QueryOnChainUsdTxFeeArgs, 'address' | 'amount' | 'speed' | 'walletId'>>;
@@ -11331,6 +11665,8 @@ export type Resolvers<ContextType = any> = {
   AccountDeletePayload?: AccountDeletePayloadResolvers<ContextType>;
   AccountLimit?: AccountLimitResolvers<ContextType>;
   AccountLimits?: AccountLimitsResolvers<ContextType>;
+  AccountMigration?: AccountMigrationResolvers<ContextType>;
+  AccountMigrationPreview?: AccountMigrationPreviewResolvers<ContextType>;
   AccountUpdateDefaultWalletIdPayload?: AccountUpdateDefaultWalletIdPayloadResolvers<ContextType>;
   AccountUpdateDisplayCurrencyPayload?: AccountUpdateDisplayCurrencyPayloadResolvers<ContextType>;
   AccountUpdateNotificationSettingsPayload?: AccountUpdateNotificationSettingsPayloadResolvers<ContextType>;
@@ -11421,6 +11757,9 @@ export type Resolvers<ContextType = any> = {
   Memo?: GraphQLScalarType;
   Merchant?: MerchantResolvers<ContextType>;
   MerchantPayload?: MerchantPayloadResolvers<ContextType>;
+  MigrationLnAddressTransferPayload?: MigrationLnAddressTransferPayloadResolvers<ContextType>;
+  MigrationLnAddressTransferResult?: MigrationLnAddressTransferResultResolvers<ContextType>;
+  MigrationPayload?: MigrationPayloadResolvers<ContextType>;
   Minutes?: GraphQLScalarType;
   MobileVersions?: MobileVersionsResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;

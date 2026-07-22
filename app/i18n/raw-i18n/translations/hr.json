@@ -2802,6 +2802,7 @@
     "total": "Ukupno",
     "transactions": "Transakcije",
     "transactionsError": "Pogreška pri učitavanju transakcija",
+    "transfer": "Prijenos",
     "tryAgain": "Pokušajte ponovno",
     "type": "Vrsta",
     "usdAccount": "Dolar račun",
@@ -2818,6 +2819,7 @@
     "problemMaybeReauth": "Došlo je do problema s vašim zahtjevom. Pokušajte ponovno za jednu minutu. Ako se problem nastavi, preporučujemo da se odjavite i ponovno prijavite. Možete se odjaviti tako da odete u Postavke > Račun > Odjava",
     "warning": "Upozorenje",
     "continue": "Nastavi",
+    "skip": "Preskoči",
     "correct": "Točno",
     "recommended": "Preporučeno",
     "expirationTime": "Vrijeme isteka",
@@ -3552,12 +3554,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Kontaktirajte podršku",
+      "body": "Nešto je pošlo po zlu, ali ne brinite, vaša su sredstva sigurna. Obratite se podršci za pomoć.\n\nOve informacije mogu pomoći podršci da riješi vaš slučaj:",
+      "accountIdLabel": "ID računa",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Korisničko ime",
+      "emailLabel": "E-pošta",
+      "phoneLabel": "Broj telefona",
+      "appVersionLabel": "Verzija aplikacije",
+      "platformLabel": "Platforma",
+      "countryLabel": "Država",
+      "emailSubject": "Zahtjev za podršku pri migraciji",
+      "emailDescribeProblem": "Opišite problem:",
+      "emailAccountInfo": "Podaci o računu za podršku:",
+      "contactUsCta": "Kontaktirajte nas"
+    },
+    "migrateNowModal": {
+      "title": "Migrirajte sada na račun bez skrbništva",
+      "body": "Više ne možete primati sredstva na svoj skrbnički račun. Blink je ukinuo skrbničku uslugu u vašoj regiji i ovaj će račun biti deaktiviran do kraja dana {date}.\n\nMigrirajte sada na račun bez skrbništva.",
+      "migrateCta": "Migriraj sada"
+    },
+    "reminderBulletin": {
+      "title": "Važno",
+      "body": "Migrirajte svoj račun na novi način bez skrbništva prije {date}",
+      "migrateCta": "Migriraj"
+    },
+    "dollarBalanceModal": {
+      "title": "Ne možemo migrirati vaš dolarski saldo",
+      "body": "Najprije ispraznite svoj dolarski saldo. Možete ga prenijeti na svoj Bitcoin saldo u Blinku ili drugamo."
+    },
+    "balancesOverview": {
+      "title": "Premjesti svoj saldo",
+      "body": "Sigurno premjesti svoja sredstva na svoj novi račun.",
+      "currentBitcoinBalance": "Trenutni Bitcoin saldo",
+      "currentDollarBalance": "Trenutni dolarski saldo",
+      "newBitcoinBalance": "Novi Bitcoin saldo",
+      "newDollarBalance": "Novi dolarski saldo",
+      "dollarBalanceNotAvailable": "nije dostupno",
+      "networkFee": "Mrežna naknada: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Mrežna naknada: <bold>{fee: string}</bold> (snosi Blink)",
+      "exchangeRate": "Trenutni tečaj 1 BTC = {rate: string}",
+      "approveCta": "Odobri",
+      "contactSupportCta": "Kontaktiraj podršku"
+    },
+    "migrationRequiredTitle": "Vrijeme je za nadogradnju",
+    "keepReceivingTitle": "Nastavite primati kao i obično",
+    "keepReceivingBody": "Vaša Lightning adresa bit će prenesena na vaš novi ne-skrbnički račun.",
+    "keepReceivingLnAddressLabel": "Vaša LN adresa",
+    "keepReceivingCta": "Super",
+    "receivingDisabledToast": "Primanje je trenutačno onemogućeno.",
+    "downloadHistoryTitle": "Preuzmite povijest transakcija",
+    "downloadHistoryBody": "Vaš novi račun počinje iznova. Ako želite zadržati evidenciju svojih transakcija, preuzmite ih sada kao CSV.",
+    "downloadHistoryDownloadCta": "Preuzmi",
+    "apiServiceTitle": "API usluga nije dostupna",
+    "apiServiceBody": "Primjećujemo da imate aktivne API ključeve. Blink ne može pružati API u ne-skrbničkom načinu rada.\n\nAko ovisite o Blinkovom API-ju, kontaktirajte nas što prije i dat ćemo sve od sebe da vam pomognemo s glatkim prijelazom.",
+    "apiServiceContactCta": "Kontaktirajte nas",
+    "apiServiceContinueCta": "Ipak nastavi",
+    "resumeFailed": "Nešto je pošlo po zlu pri nastavku migracije. Molimo započnite je ponovno.",
+    "migrationRequiredBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva.",
+    "migrationRequiredForcedBody": "Vrijeme je da migrirate svoj skrbnički račun na račun bez skrbništva. To je obavezno iz regulatornih razloga.\n\nBez brige, non-custodial će ti dugoročno biti bolji.",
+    "migrationGateTitle": "Račun nije dostupan",
+    "migrationGateBody": "Iz regulatornih razloga ne možemo pružati custodial račune u tvojoj regiji. Prenesi svoja sredstva na non-custodial račun uz Blink slijedeći sljedeće korake ili nas kontaktiraj na <link>{email}</link>",
+    "bitcoinBalance": "Stanje Bitcoina",
+    "dollarBalance": "Stanje u dolarima",
     "moveToNonCustodial": "Prebaci na ne-skrbnički",
     "explainerTitle": "Što znači prebaciti na ne-skrbnički?",
-    "explainerStep1": "Stvorit ćete ne-skrbnički račun na Spark protokolu, <link>saznajte više ovdje</link>",
-    "explainerStep2": "Prebacujemo vaša sredstva na vaš novi ne-skrbnički račun, a vaš trenutni račun bit će izbrisan",
-    "explainerStep3": "Nastavite koristiti Blink kao i obično",
-    "letsMove": "Idemo",
+    "explainerCheck1": "Stvorit ćete ne-skrbnički račun na Spark protokolu",
+    "explainerCheck2": "Prenosimo tvoja sredstva na tvoj novi ne-skrbnički račun",
+    "explainerCheck3": "Tvoj trenutni račun i svi njegovi podaci, uključujući povijest transakcija, bit će zatvoreni",
+    "explainerCheck4": "Blink API neće biti dostupan",
+    "explainerCheck5": "S tvog računa bit će naplaćena mrežna naknada Spark",
+    "explainerCta": "Razumijem",
     "transferringFunds": "Prebacujemo vaša sredstva. Trebalo bi biti gotovo za nekoliko sekundi."
   },
   "AccountTypeSelectionScreen": {
@@ -3607,6 +3675,11 @@
     "modalTitle": "Osigurajte svoja sredstva",
     "modalDescription": "Preporučujemo da napravite sigurnosnu kopiju novčanika kako biste spriječili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
     "secureMe": "Osiguraj novčanik"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Ovo je račun bez skrbništva",
+    "body": "Da biste saznali više, pročitajte naš blog post",
+    "cta": "Pročitaj"
   },
   "StableBalance": {
     "title": "Stabilan saldo",

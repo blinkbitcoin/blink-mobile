@@ -2802,6 +2802,7 @@
     "total": "Tổng cộng",
     "transactions": "Các giao dịch",
     "transactionsError": "Lỗi tải các giao dịch",
+    "transfer": "Chuyển khoản",
     "tryAgain": "Vui lòng thử lại",
     "type": "Loại",
     "usdAccount": "Số dư Đô la",
@@ -2818,6 +2819,7 @@
     "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     "warning": "Warning",
     "continue": "Tiếp tục",
+    "skip": "Bỏ qua",
     "correct": "Đúng",
     "recommended": "Được khuyên dùng",
     "expirationTime": "Thời gian hết hạn",
@@ -3552,12 +3554,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Liên hệ hỗ trợ",
+      "body": "Đã xảy ra sự cố, nhưng đừng lo lắng, tiền của bạn vẫn an toàn. Vui lòng liên hệ bộ phận hỗ trợ để được trợ giúp.\n\nBạn có thể cần thông tin này để giúp bộ phận hỗ trợ giải quyết trường hợp của bạn:",
+      "accountIdLabel": "ID tài khoản",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Tên người dùng",
+      "emailLabel": "Email",
+      "phoneLabel": "Số điện thoại",
+      "appVersionLabel": "Phiên bản ứng dụng",
+      "platformLabel": "Nền tảng",
+      "countryLabel": "Quốc gia",
+      "emailSubject": "Yêu cầu hỗ trợ di chuyển tài khoản",
+      "emailDescribeProblem": "Mô tả vấn đề:",
+      "emailAccountInfo": "Thông tin tài khoản cho bộ phận hỗ trợ:",
+      "contactUsCta": "Liên hệ chúng tôi"
+    },
+    "migrateNowModal": {
+      "title": "Hãy chuyển ngay sang tài khoản không lưu ký",
+      "body": "Bạn không còn có thể nhận tiền vào tài khoản lưu ký của mình. Blink đã ngừng dịch vụ lưu ký tại khu vực của bạn và tài khoản này sẽ bị vô hiệu hóa vào cuối ngày {date}.\n\nHãy chuyển ngay sang tài khoản không lưu ký.",
+      "migrateCta": "Chuyển ngay"
+    },
+    "reminderBulletin": {
+      "title": "Quan trọng",
+      "body": "Hãy chuyển tài khoản của bạn sang chế độ không lưu ký mới trước {date}",
+      "migrateCta": "Chuyển"
+    },
+    "dollarBalanceModal": {
+      "title": "Chúng tôi không thể di chuyển số dư đô la của bạn",
+      "body": "Trước tiên hãy rút hết số dư đô la của bạn. Bạn có thể chuyển nó sang số dư Bitcoin trong Blink hoặc nơi khác."
+    },
+    "balancesOverview": {
+      "title": "Chuyển số dư của bạn",
+      "body": "Chuyển tiền của bạn một cách an toàn sang tài khoản mới.",
+      "currentBitcoinBalance": "Số dư Bitcoin hiện tại",
+      "currentDollarBalance": "Số dư Đô la hiện tại",
+      "newBitcoinBalance": "Số dư Bitcoin mới",
+      "newDollarBalance": "Số dư Đô la mới",
+      "dollarBalanceNotAvailable": "không khả dụng",
+      "networkFee": "Phí mạng: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Phí mạng: <bold>{fee: string}</bold> (do Blink chi trả)",
+      "exchangeRate": "Tỷ giá hiện tại 1 BTC = {rate: string}",
+      "approveCta": "Phê duyệt",
+      "contactSupportCta": "Liên hệ hỗ trợ"
+    },
+    "migrationRequiredTitle": "Đã đến lúc nâng cấp",
+    "keepReceivingTitle": "Tiếp tục nhận như bình thường",
+    "keepReceivingBody": "Địa chỉ Lightning của bạn sẽ được chuyển sang tài khoản non-custodial mới của bạn.",
+    "keepReceivingLnAddressLabel": "Địa chỉ LN của bạn",
+    "keepReceivingCta": "Tuyệt",
+    "receivingDisabledToast": "Việc nhận hiện đang bị vô hiệu hóa.",
+    "downloadHistoryTitle": "Tải xuống lịch sử giao dịch của bạn",
+    "downloadHistoryBody": "Tài khoản mới của bạn sẽ bắt đầu lại từ đầu. Nếu bạn muốn lưu lại hồ sơ giao dịch, hãy tải xuống dưới dạng CSV ngay bây giờ.",
+    "downloadHistoryDownloadCta": "Tải xuống",
+    "apiServiceTitle": "Dịch vụ API không khả dụng",
+    "apiServiceBody": "Chúng tôi nhận thấy bạn có khóa API đang hoạt động. Blink không thể cung cấp API ở chế độ non-custodial.\n\nNếu bạn phụ thuộc vào API của Blink, hãy liên hệ với chúng tôi sớm và chúng tôi sẽ cố gắng hết sức để hỗ trợ quá trình chuyển đổi suôn sẻ.",
+    "apiServiceContactCta": "Liên hệ với chúng tôi",
+    "apiServiceContinueCta": "Vẫn tiếp tục",
+    "resumeFailed": "Đã xảy ra lỗi khi tiếp tục quá trình chuyển của bạn. Vui lòng bắt đầu lại.",
+    "migrationRequiredBody": "Đã đến lúc chuyển tài khoản lưu ký của bạn sang tài khoản không lưu ký.",
+    "migrationRequiredForcedBody": "Đã đến lúc chuyển tài khoản lưu ký của bạn sang tài khoản không lưu ký. Điều này là bắt buộc vì lý do quy định.\n\nĐừng lo lắng, non-custodial sẽ tốt hơn cho bạn về lâu dài.",
+    "migrationGateTitle": "Không thể truy cập tài khoản",
+    "migrationGateBody": "Vì lý do quy định, chúng tôi không thể cung cấp tài khoản custodial ở khu vực của bạn. Hãy chuyển tiền của bạn sang tài khoản non-custodial với Blink bằng cách làm theo các bước tiếp theo hoặc liên hệ với chúng tôi tại <link>{email}</link>",
+    "bitcoinBalance": "Số dư Bitcoin",
+    "dollarBalance": "Số dư đô la",
     "moveToNonCustodial": "Chuyển sang non-custodial",
     "explainerTitle": "Chuyển sang non-custodial nghĩa là gì?",
-    "explainerStep1": "Bạn sẽ tạo một tài khoản non-custodial trên giao thức Spark, <link>tìm hiểu thêm tại đây</link>",
-    "explainerStep2": "Chúng tôi chuyển tiền của bạn vào tài khoản non-custodial mới và tài khoản hiện tại của bạn sẽ bị xóa",
-    "explainerStep3": "Tiếp tục sử dụng Blink như bình thường",
-    "letsMove": "Bắt đầu nào",
+    "explainerCheck1": "Bạn sẽ tạo một tài khoản non-custodial trên giao thức Spark",
+    "explainerCheck2": "Chúng tôi chuyển tiền của bạn sang tài khoản non-custodial mới của bạn",
+    "explainerCheck3": "Tài khoản hiện tại của bạn và tất cả dữ liệu của nó bao gồm lịch sử giao dịch sẽ bị đóng",
+    "explainerCheck4": "API của Blink sẽ không khả dụng",
+    "explainerCheck5": "Tài khoản của bạn sẽ bị trừ phí mạng Spark",
+    "explainerCta": "Tôi hiểu",
     "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây."
   },
   "AccountTypeSelectionScreen": {
@@ -3607,6 +3675,11 @@
     "modalTitle": "Bảo mật tiền của bạn",
     "modalDescription": "Chúng tôi khuyến nghị bạn sao lưu ví để ngăn chặn mất hoàn toàn tiền trong trường hợp bạn mất thiết bị này.",
     "secureMe": "Bảo mật ví"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Đây là tài khoản không lưu ký",
+    "body": "Để tìm hiểu thêm, hãy đọc bài viết trên blog của chúng tôi",
+    "cta": "Đọc"
   },
   "StableBalance": {
     "title": "Số dư ổn định",

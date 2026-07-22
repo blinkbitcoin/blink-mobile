@@ -2802,6 +2802,7 @@
     "total": "Celkem",
     "transactions": "Transakce",
     "transactionsError": "Chyba při načítání transakcí",
+    "transfer": "Převod",
     "tryAgain": "Zkusit znovu",
     "type": "Typ",
     "usdAccount": "Dolarový zůstatek",
@@ -2818,6 +2819,7 @@
     "problemMaybeReauth": "Ve vašem požadavku se vyskytl problém. Zkuste to prosím znovu za minutu. Pokud problém přetrvává, doporučujeme se odhlásit a znovu přihlásit. Odhlásit se můžete v Nastavení > Účet > Odhlásit se.",
     "warning": "Upozornění",
     "continue": "Pokračovat",
+    "skip": "Přeskočit",
     "correct": "Správně",
     "recommended": "Doporučeno",
     "expirationTime": "Doba vypršení",
@@ -3552,12 +3554,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Kontaktovat podporu",
+      "body": "Něco se pokazilo, ale nebojte se, vaše prostředky jsou v bezpečí. Obraťte se prosím na podporu.\n\nTyto informace mohou podpoře pomoci vyřešit váš případ:",
+      "accountIdLabel": "ID účtu",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Uživatelské jméno",
+      "emailLabel": "E-mail",
+      "phoneLabel": "Telefonní číslo",
+      "appVersionLabel": "Verze aplikace",
+      "platformLabel": "Platforma",
+      "countryLabel": "Země",
+      "emailSubject": "Žádost o podporu při migraci",
+      "emailDescribeProblem": "Popište problém:",
+      "emailAccountInfo": "Informace o účtu pro podporu:",
+      "contactUsCta": "Kontaktujte nás"
+    },
+    "migrateNowModal": {
+      "title": "Přejděte nyní na nesvěřenský účet",
+      "body": "Na svůj svěřenský účet již nemůžete přijímat prostředky. Blink ukončil svěřenskou službu ve vašem regionu a tento účet bude deaktivován do konce dne {date}.\n\nPřejděte nyní na nesvěřenský účet.",
+      "migrateCta": "Migrovat nyní"
+    },
+    "reminderBulletin": {
+      "title": "Důležité",
+      "body": "Přejděte se svým účtem na nový nesvěřenský režim před {date}",
+      "migrateCta": "Migrovat"
+    },
+    "dollarBalanceModal": {
+      "title": "Váš dolarový zůstatek nemůžeme migrovat",
+      "body": "Nejprve vyprázdněte svůj dolarový zůstatek. Můžete jej převést na svůj bitcoinový zůstatek v Blinku nebo jinam."
+    },
+    "balancesOverview": {
+      "title": "Přesuňte svůj zůstatek",
+      "body": "Bezpečně přesuňte své prostředky na svůj nový účet.",
+      "currentBitcoinBalance": "Aktuální zůstatek Bitcoinu",
+      "currentDollarBalance": "Aktuální dolarový zůstatek",
+      "newBitcoinBalance": "Nový zůstatek Bitcoinu",
+      "newDollarBalance": "Nový dolarový zůstatek",
+      "dollarBalanceNotAvailable": "není k dispozici",
+      "networkFee": "Síťový poplatek: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Síťový poplatek: <bold>{fee: string}</bold> (hradí Blink)",
+      "exchangeRate": "Aktuální směnný kurz 1 BTC = {rate: string}",
+      "approveCta": "Schválit",
+      "contactSupportCta": "Kontaktovat podporu"
+    },
+    "migrationRequiredTitle": "Čas na upgrade",
+    "keepReceivingTitle": "Přijímejte platby jako obvykle",
+    "keepReceivingBody": "Vaše Lightning adresa bude přenesena na váš nový non-custodial účet.",
+    "keepReceivingLnAddressLabel": "Vaše LN adresa",
+    "keepReceivingCta": "Skvělé",
+    "receivingDisabledToast": "Přijímání je momentálně zakázáno.",
+    "downloadHistoryTitle": "Stáhněte si historii transakcí",
+    "downloadHistoryBody": "Váš nový účet začne od začátku. Pokud si chcete uchovat záznam o svých transakcích, stáhněte si je nyní jako CSV.",
+    "downloadHistoryDownloadCta": "Stáhnout",
+    "apiServiceTitle": "Služba API není dostupná",
+    "apiServiceBody": "Všimli jsme si, že máte aktivní API klíče. Blink nemůže poskytovat API v non-custodial režimu.\n\nPokud jste na API Blinku závislí, kontaktujte nás co nejdříve a uděláme maximum pro hladký přechod.",
+    "apiServiceContactCta": "Kontaktujte nás",
+    "apiServiceContinueCta": "Přesto pokračovat",
+    "resumeFailed": "Při pokračování migrace se něco pokazilo. Začněte ji prosím znovu.",
+    "migrationRequiredBody": "Je čas migrovat váš svěřenský účet na nesvěřenský účet.",
+    "migrationRequiredForcedBody": "Je čas migrovat váš svěřenský účet na nesvěřenský účet. Je to vyžadováno z regulatorních důvodů.\n\nNení třeba se obávat, non-custodial pro tebe bude z dlouhodobého hlediska lepší.",
+    "migrationGateTitle": "Účet není přístupný",
+    "migrationGateBody": "Z regulatorních důvodů nemůžeme ve tvém regionu poskytovat custodial účty. Převeď své prostředky na non-custodial účet u Blink podle následujících kroků nebo nás kontaktuj na <link>{email}</link>",
+    "bitcoinBalance": "Zůstatek Bitcoinu",
+    "dollarBalance": "Zůstatek v dolarech",
     "moveToNonCustodial": "Přejít na non-custodial",
     "explainerTitle": "Co znamená přejít na non-custodial?",
-    "explainerStep1": "Vytvoříte non-custodial účet na protokolu Spark, <link>zjistit více zde</link>",
-    "explainerStep2": "Převedeme vaše prostředky na váš nový non-custodial účet a váš stávající účet bude smazán",
-    "explainerStep3": "Pokračujte v používání Blink jako obvykle",
-    "letsMove": "Pojďme na to",
+    "explainerCheck1": "Vytvoříte non-custodial účet na protokolu Spark",
+    "explainerCheck2": "Převedeme tvé prostředky na tvůj nový non-custodial účet",
+    "explainerCheck3": "Tvůj současný účet a všechna jeho data včetně historie transakcí budou uzavřeny",
+    "explainerCheck4": "Blink API nebude k dispozici",
+    "explainerCheck5": "Z tvého účtu bude stržen síťový poplatek Spark",
+    "explainerCta": "Rozumím",
     "transferringFunds": "Převádíme vaše prostředky. Mělo by to být hotové za několik sekund."
   },
   "AccountTypeSelectionScreen": {
@@ -3607,6 +3675,11 @@
     "modalTitle": "Zabezpečte své prostředky",
     "modalDescription": "Důrazně doporučujeme zálohovat peněženku, abyste předešli úplné ztrátě prostředků v případě ztráty tohoto zařízení.",
     "secureMe": "Zabezpečit peněženku"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Toto je nesvěřenský účet",
+    "body": "Chcete-li se dozvědět více, přečtěte si náš příspěvek na blogu",
+    "cta": "Číst"
   },
   "StableBalance": {
     "title": "Stabilní zůstatek",

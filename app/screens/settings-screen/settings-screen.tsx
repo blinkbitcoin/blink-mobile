@@ -44,8 +44,7 @@ import { NotificationSetting } from "./settings/sp-notifications"
 import { OnDeviceSecuritySetting } from "./settings/sp-security"
 import { TotpSetting } from "./totp"
 import { AccountStaticQR } from "./settings/account-static-qr"
-// TODO: re-enable once the custodial → non-custodial migration is complete
-// import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
+import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
 import { SwitchAccountSetting } from "./settings/multi-account"
 import { StableBalanceSetting } from "./settings/stable-balance"
 import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
@@ -108,8 +107,7 @@ export const SettingsScreen: React.FC = () => {
       AccountLevelSetting,
       TxLimits,
       SwitchAccountSetting,
-      // TODO: re-enable once the custodial → non-custodial migration is complete
-      // MoveToNonCustodialSetting,
+      MoveToNonCustodialSetting,
     ],
     waysToGetPaid: [
       AccountLNAddress,

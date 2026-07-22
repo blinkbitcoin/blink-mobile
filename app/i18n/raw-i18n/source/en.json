@@ -2816,6 +2816,7 @@
         "total": "Total",
         "transactions": "Transactions",
         "transactionsError": "Error loading transactions",
+        "transfer": "Transfer",
         "tryAgain": "Try Again",
         "type": "Type",
         "usdAccount": "Dollar Balance",
@@ -2832,6 +2833,7 @@
         "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
         "warning": "Warning",
         "continue": "Continue",
+        "skip": "Skip",
         "correct": "Correct",
         "recommended": "Recommended",
         "expirationTime": "Expiration Time",
@@ -3567,11 +3569,77 @@
     "AccountMigration": {
         "moveToNonCustodial": "Move to non-custodial",
         "explainerTitle": "What does it mean to move to non-custodial?",
-        "explainerStep1": "You will create a non-custodial account on the Spark protocol, <link>learn more here</link>",
-        "explainerStep2": "We transfer your funds into your new non-custodial account, and your current account will be deleted",
-        "explainerStep3": "Continue using Blink as usual",
-        "letsMove": "Let's move",
-        "transferringFunds": "Transferring your funds. It should be done in a few seconds."
+        "explainerCheck1": "You will create a non-custodial account on the Spark protocol",
+        "explainerCheck2": "We transfer your funds into your new non-custodial account",
+        "explainerCheck3": "Your current account and all its data including transaction history will be closed",
+        "explainerCheck4": "Blink API will not be available",
+        "explainerCheck5": "Your account will be deducted with a Spark network fee",
+        "explainerCta": "I understand",
+        "transferringFunds": "Transferring your funds. It should be done in a few seconds.",
+        "migrationRequiredTitle": "Time to upgrade",
+        "migrationRequiredBody": "It's time to migrate your custodial account to a non-custodial account.",
+        "migrationRequiredForcedBody": "It's time to migrate your custodial account to a non-custodial account. It's required for regulatory reasons.\n\nNo need to worry, non-custodial will be better for you in the long term.",
+        "migrationGateTitle": "Account not accessible",
+        "migrationGateBody": "For regulatory reasons we cannot provide custodial accounts in your region. Transfer your funds to a non-custodial account with Blink by following the next steps or contact us at <link>{email}</link>",
+        "bitcoinBalance": "Bitcoin balance",
+        "dollarBalance": "Dollar balance",
+        "keepReceivingTitle": "Keep receiving as usual",
+        "keepReceivingBody": "Your lightning address will be transferred to your new non-custodial account.",
+        "keepReceivingLnAddressLabel": "Your LN address",
+        "keepReceivingCta": "Nice",
+        "receivingDisabledToast": "Receiving is currently disabled.",
+        "downloadHistoryTitle": "Download your transaction history",
+        "downloadHistoryBody": "Your new account will start fresh. If you want to keep record of your transactions, download them as CSV now.",
+        "downloadHistoryDownloadCta": "Download",
+        "apiServiceTitle": "API service not available",
+        "apiServiceBody": "We note that you have active API keys. Blink can't provide the API in non-custodial mode.\n\nIf you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.",
+        "apiServiceContactCta": "Contact us",
+        "apiServiceContinueCta": "Continue anyways",
+        "resumeFailed": "Something went wrong resuming your migration. Please start it again.",
+        "balancesOverview": {
+            "title": "Move your balance",
+            "body": "Safely move your funds to your new account.",
+            "currentBitcoinBalance": "Current Bitcoin Balance",
+            "currentDollarBalance": "Current Dollar Balance",
+            "newBitcoinBalance": "New Bitcoin Balance",
+            "newDollarBalance": "New Dollar Balance",
+            "dollarBalanceNotAvailable": "not available",
+            "networkFee": "Network fee: <bold>{fee: string}</bold>",
+            "networkFeeCoveredByBlink": "Network fee: <bold>{fee: string}</bold> (covered by Blink)",
+            "exchangeRate": "Current exchange rate 1 BTC = {rate: string}",
+            "approveCta": "Approve",
+            "contactSupportCta": "Contact support"
+        },
+        "dollarBalanceModal": {
+            "title": "We cannot migrate your Dollar Balance",
+            "body": "Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere."
+        },
+        "migrateNowModal": {
+            "title": "Migrate now to a non-custodial account",
+            "body": "You can no longer receive funds to your custodial account. Blink has discontinued custodial service in your region and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",
+            "migrateCta": "Migrate now"
+        },
+        "reminderBulletin": {
+            "title": "Important",
+            "body": "Migrate your account to new, non-custodial mode before {date: string}",
+            "migrateCta": "Migrate"
+        },
+        "contactSupport": {
+            "title": "Contact support",
+            "body": "Something went wrong but don't worry your funds are safe, please contact support for assistance.\n\nYou may need this information to help support resolve your case:",
+            "accountIdLabel": "Account ID",
+            "pubKeyLabel": "pubKey",
+            "usernameLabel": "Username",
+            "emailLabel": "Email",
+            "phoneLabel": "Phone number",
+            "appVersionLabel": "App version",
+            "platformLabel": "Platform",
+            "countryLabel": "Country",
+            "emailSubject": "Migration support request",
+            "emailDescribeProblem": "Describe the problem:",
+            "emailAccountInfo": "Account information for support:",
+            "contactUsCta": "Contact us"
+        }
     },
     "AccountTypeSelectionScreen": {
         "descriptionDefault": "Please choose your preferred type of Blink.",
@@ -3620,6 +3688,11 @@
         "modalTitle": "Secure your funds",
         "modalDescription": "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
         "secureMe": "Secure wallet"
+    },
+    "NonCustodialInfoBulletin": {
+        "title": "This is a non-custodial account",
+        "body": "To learn more read our blog post",
+        "cta": "Read"
     },
     "SelfCustodialOffline": {
         "title": "Wallet is offline",

@@ -2802,6 +2802,7 @@
     "total": "Toplam",
     "transactions": "İşlemler",
     "transactionsError": "İşlemleri yüklerken hata oluştu",
+    "transfer": "Transfer",
     "tryAgain": "Tekrar deneyin",
     "type": "Tip",
     "usdAccount": "Dolar Bakiyesi",
@@ -2818,6 +2819,7 @@
     "problemMaybeReauth": "İsteğinizle ilgili bir sorun oluştu. Lütfen bir dakika içinde tekrar deneyin. Sorun devam ederse, oturumu kapatıp tekrar giriş yapmanızı öneririz. Ayarlar > Hesap > Oturumu kapat seçeneğine giderek oturumu kapatabilirsiniz",
     "warning": "Uyarı",
     "continue": "Devam",
+    "skip": "Atla",
     "correct": "Doğru",
     "recommended": "Önerilen",
     "expirationTime": "Son Kullanma Süresi",
@@ -3552,12 +3554,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Destek ile iletişime geçin",
+      "body": "Bir şeyler ters gitti ama endişelenmeyin, paranız güvende. Yardım için lütfen destek ile iletişime geçin.\n\nDesteğin durumunuzu çözmesine yardımcı olmak için bu bilgilere ihtiyacınız olabilir:",
+      "accountIdLabel": "Hesap kimliği",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Kullanıcı adı",
+      "emailLabel": "E-posta",
+      "phoneLabel": "Telefon numarası",
+      "appVersionLabel": "Uygulama sürümü",
+      "platformLabel": "Platform",
+      "countryLabel": "Ülke",
+      "emailSubject": "Taşıma destek talebi",
+      "emailDescribeProblem": "Sorunu açıklayın:",
+      "emailAccountInfo": "Destek için hesap bilgileri:",
+      "contactUsCta": "Bize ulaşın"
+    },
+    "migrateNowModal": {
+      "title": "Şimdi saklamasız bir hesaba taşının",
+      "body": "Saklamalı hesabınıza artık para alamazsınız. Blink bölgenizde saklama hizmetini sonlandırdı ve bu hesap {date} sonuna kadar devre dışı bırakılacak.\n\nŞimdi saklamasız bir hesaba taşının.",
+      "migrateCta": "Şimdi taşı"
+    },
+    "reminderBulletin": {
+      "title": "Önemli",
+      "body": "Hesabınızı {date} tarihinden önce yeni, saklamasız moda taşıyın",
+      "migrateCta": "Taşı"
+    },
+    "dollarBalanceModal": {
+      "title": "Dolar bakiyenizi taşıyamıyoruz",
+      "body": "Önce dolar bakiyenizi boşaltın. Blink içindeki Bitcoin bakiyenize veya başka bir yere aktarabilirsiniz."
+    },
+    "balancesOverview": {
+      "title": "Bakiyeni taşı",
+      "body": "Fonlarını güvenle yeni hesabına taşı.",
+      "currentBitcoinBalance": "Mevcut Bitcoin bakiyesi",
+      "currentDollarBalance": "Mevcut Dolar bakiyesi",
+      "newBitcoinBalance": "Yeni Bitcoin bakiyesi",
+      "newDollarBalance": "Yeni Dolar bakiyesi",
+      "dollarBalanceNotAvailable": "kullanılamıyor",
+      "networkFee": "Ağ ücreti: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Ağ ücreti: <bold>{fee: string}</bold> (Blink tarafından karşılanır)",
+      "exchangeRate": "Güncel döviz kuru 1 BTC = {rate: string}",
+      "approveCta": "Onayla",
+      "contactSupportCta": "Desteğe ulaş"
+    },
+    "migrationRequiredTitle": "Yükseltme zamanı",
+    "keepReceivingTitle": "Her zamanki gibi almaya devam et",
+    "keepReceivingBody": "Lightning adresin yeni non-custodial hesabına aktarılacak.",
+    "keepReceivingLnAddressLabel": "LN Adresin",
+    "keepReceivingCta": "Harika",
+    "receivingDisabledToast": "Alma şu anda devre dışı.",
+    "downloadHistoryTitle": "İşlem geçmişini indir",
+    "downloadHistoryBody": "Yeni hesabın sıfırdan başlayacak. İşlemlerinin bir kaydını tutmak istersen, şimdi CSV olarak indir.",
+    "downloadHistoryDownloadCta": "İndir",
+    "apiServiceTitle": "API hizmeti kullanılamıyor",
+    "apiServiceBody": "Etkin API anahtarlarınız olduğunu fark ettik. Blink, non-custodial modda API sağlayamaz.\n\nBlink'in API'sine bağımlıysanız, lütfen bizimle en kısa sürede iletişime geçin; sorunsuz bir geçiş için elimizden geleni yapacağız.",
+    "apiServiceContactCta": "Bize ulaşın",
+    "apiServiceContinueCta": "Yine de devam et",
+    "resumeFailed": "Taşıma işleminiz devam ettirilirken bir sorun oluştu. Lütfen yeniden başlatın.",
+    "migrationRequiredBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi.",
+    "migrationRequiredForcedBody": "Saklamalı hesabınızı saklamasız bir hesaba taşımanın zamanı geldi. Bu, düzenleyici nedenlerle zorunludur.\n\nEndişelenme, non-custodial uzun vadede senin için daha iyi olacak.",
+    "migrationGateTitle": "Hesap erişilebilir değil",
+    "migrationGateBody": "Düzenleyici nedenlerle bölgende custodial hesaplar sağlayamıyoruz. Sonraki adımları izleyerek fonlarını Blink'te bir non-custodial hesaba aktar ya da <link>{email}</link> adresinden bize ulaş",
+    "bitcoinBalance": "Bitcoin bakiyesi",
+    "dollarBalance": "Dolar bakiyesi",
     "moveToNonCustodial": "Non-custodial'a geç",
     "explainerTitle": "Non-custodial'a geçmek ne anlama gelir?",
-    "explainerStep1": "Spark protokolünde bir non-custodial hesap oluşturacaksınız, <link>buradan daha fazla bilgi edinin</link>",
-    "explainerStep2": "Bakiyenizi yeni non-custodial hesabınıza aktarıyoruz ve mevcut hesabınız silinecek",
-    "explainerStep3": "Blink'i her zamanki gibi kullanmaya devam edin",
-    "letsMove": "Hadi başlayalım",
+    "explainerCheck1": "Spark protokolünde bir non-custodial hesap oluşturacaksınız",
+    "explainerCheck2": "Fonlarını yeni non-custodial hesabına aktarıyoruz",
+    "explainerCheck3": "Mevcut hesabın ve işlem geçmişi dahil tüm verileri kapatılacak",
+    "explainerCheck4": "Blink API kullanılamayacak",
+    "explainerCheck5": "Hesabından bir Spark ağ ücreti düşülecek",
+    "explainerCta": "Anladım",
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır."
   },
   "AccountTypeSelectionScreen": {
@@ -3607,6 +3675,11 @@
     "modalTitle": "Fonlarınızı güvenceye alın",
     "modalDescription": "Cüzdanınızı yedeklemenizi şiddetle tavsiye ederiz. Bu cihazı kaybetmeniz durumunda fonlarınızın tamamen kaybolmasını önlemek için.",
     "secureMe": "Cüzdanı güvenceye al"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Bu, saklamasız bir hesaptır",
+    "body": "Daha fazla bilgi için blog yazımızı okuyun",
+    "cta": "Oku"
   },
   "StableBalance": {
     "title": "Sabit bakiye",

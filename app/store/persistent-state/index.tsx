@@ -3,6 +3,7 @@ import * as React from "react"
 
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import { reportError } from "@app/utils/error-logging"
 import { loadJson, saveJson, saveString } from "@app/utils/storage"
 
 import {
@@ -39,8 +40,12 @@ export const loadPersistentState = async (): Promise<PersistentState> => {
   }
 }
 
-const savePersistentState = async (state: PersistentState) => {
-  return saveJson(PERSISTENT_STATE_KEY, state)
+const savePersistentState = async (state: PersistentState): Promise<void> => {
+  try {
+    await saveJson(PERSISTENT_STATE_KEY, state)
+  } catch (err) {
+    reportError("Persistent state save", err)
+  }
 }
 
 // TODO: should not be exported

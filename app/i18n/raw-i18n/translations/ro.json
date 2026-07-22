@@ -2802,6 +2802,7 @@
     "total": "Total",
     "transactions": "Tranzacții",
     "transactionsError": "Eroare la încărcarea tranzacțiilor",
+    "transfer": "Transfer",
     "tryAgain": "Încearcă din nou",
     "type": "Tip",
     "usdAccount": "Cont Dolar",
@@ -2818,6 +2819,7 @@
     "problemMaybeReauth": "A apărut o problemă cu solicitarea dvs. Vă rugăm să încercați din nou într-un minut. Dacă problema persistă, vă recomandăm să vă deconectați și să vă conectați din nou. Vă puteți deconecta accesând Setări > Cont > Deconectare",
     "warning": "Avertizare",
     "continue": "Continuă",
+    "skip": "Omite",
     "correct": "Corect",
     "recommended": "Recomandat",
     "expirationTime": "Timp de expirare",
@@ -3552,12 +3554,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Contactează suportul",
+      "body": "Ceva nu a mers bine, dar nu-ți face griji, fondurile tale sunt în siguranță. Te rugăm să contactezi suportul pentru asistență.\n\nS-ar putea să ai nevoie de aceste informații pentru ca suportul să îți rezolve cazul:",
+      "accountIdLabel": "ID-ul contului",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Nume de utilizator",
+      "emailLabel": "E-mail",
+      "phoneLabel": "Număr de telefon",
+      "appVersionLabel": "Versiunea aplicației",
+      "platformLabel": "Platformă",
+      "countryLabel": "Țara",
+      "emailSubject": "Cerere de suport pentru migrare",
+      "emailDescribeProblem": "Descrieți problema:",
+      "emailAccountInfo": "Informații despre cont pentru suport:",
+      "contactUsCta": "Contactează-ne"
+    },
+    "migrateNowModal": {
+      "title": "Migrează acum către un cont non-custodial",
+      "body": "Nu mai poți primi fonduri în contul tău custodial. Blink a întrerupt serviciul custodial în regiunea ta, iar acest cont va fi inactivat până la sfârșitul zilei de {date}.\n\nMigrează acum către un cont non-custodial.",
+      "migrateCta": "Migrează acum"
+    },
+    "reminderBulletin": {
+      "title": "Important",
+      "body": "Migrează-ți contul în noul mod non-custodial înainte de {date}",
+      "migrateCta": "Migrează"
+    },
+    "dollarBalanceModal": {
+      "title": "Nu îți putem migra soldul în dolari",
+      "body": "Golește mai întâi soldul în dolari. Îl poți transfera în soldul tău Bitcoin din Blink sau în altă parte."
+    },
+    "balancesOverview": {
+      "title": "Mută-ți soldul",
+      "body": "Mută-ți fondurile în siguranță în noul tău cont.",
+      "currentBitcoinBalance": "Sold Bitcoin curent",
+      "currentDollarBalance": "Sold în dolari curent",
+      "newBitcoinBalance": "Sold Bitcoin nou",
+      "newDollarBalance": "Sold în dolari nou",
+      "dollarBalanceNotAvailable": "indisponibil",
+      "networkFee": "Comision de rețea: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Comision de rețea: <bold>{fee: string}</bold> (acoperit de Blink)",
+      "exchangeRate": "Curs de schimb curent 1 BTC = {rate: string}",
+      "approveCta": "Aprobă",
+      "contactSupportCta": "Contactează asistența"
+    },
+    "migrationRequiredTitle": "E timpul pentru un upgrade",
+    "keepReceivingTitle": "Continuați să primiți ca de obicei",
+    "keepReceivingBody": "Adresa dvs. Lightning va fi transferată în noul dvs. cont non-custodial.",
+    "keepReceivingLnAddressLabel": "Adresa dvs. LN",
+    "keepReceivingCta": "Excelent",
+    "receivingDisabledToast": "Primirea este momentan dezactivată.",
+    "downloadHistoryTitle": "Descarcă-ți istoricul tranzacțiilor",
+    "downloadHistoryBody": "Noul tău cont va porni de la zero. Dacă vrei să păstrezi o evidență a tranzacțiilor tale, descarcă-le acum ca CSV.",
+    "downloadHistoryDownloadCta": "Descarcă",
+    "apiServiceTitle": "Serviciul API nu este disponibil",
+    "apiServiceBody": "Observăm că ai chei API active. Blink nu poate oferi API-ul în modul non-custodial.\n\nDacă depinzi de API-ul Blink, contactează-ne cât mai repede și vom face tot posibilul pentru a te ajuta cu o tranziție lină.",
+    "apiServiceContactCta": "Contactează-ne",
+    "apiServiceContinueCta": "Continuă oricum",
+    "resumeFailed": "Ceva nu a mers bine la reluarea migrării. Te rugăm să o începi din nou.",
+    "migrationRequiredBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial.",
+    "migrationRequiredForcedBody": "Este timpul să îți migrezi contul custodial către un cont non-custodial. Este necesar din motive de reglementare.\n\nNu-ți face griji, non-custodial va fi mai bun pentru tine pe termen lung.",
+    "migrationGateTitle": "Cont inaccesibil",
+    "migrationGateBody": "Din motive de reglementare nu putem oferi conturi custodial în regiunea ta. Transferă-ți fondurile într-un cont non-custodial cu Blink urmând pașii următori sau contactează-ne la <link>{email}</link>",
+    "bitcoinBalance": "Sold Bitcoin",
+    "dollarBalance": "Sold în dolari",
     "moveToNonCustodial": "Treci la non-custodial",
     "explainerTitle": "Ce înseamnă să treci la non-custodial?",
-    "explainerStep1": "Vei crea un cont non-custodial pe protocolul Spark, <link>află mai multe aici</link>",
-    "explainerStep2": "Transferăm fondurile tale în noul tău cont non-custodial, iar contul actual va fi șters",
-    "explainerStep3": "Continuă să folosești Blink ca de obicei",
-    "letsMove": "Hai să mergem",
+    "explainerCheck1": "Vei crea un cont non-custodial pe protocolul Spark",
+    "explainerCheck2": "Îți transferăm fondurile în noul tău cont non-custodial",
+    "explainerCheck3": "Contul tău actual și toate datele sale, inclusiv istoricul tranzacțiilor, vor fi închise",
+    "explainerCheck4": "API-ul Blink nu va fi disponibil",
+    "explainerCheck5": "Din contul tău se va deduce un comision de rețea Spark",
+    "explainerCta": "Am înțeles",
     "transferringFunds": "Se transferă fondurile tale. Ar trebui să fie gata în câteva secunde."
   },
   "AccountTypeSelectionScreen": {
@@ -3607,6 +3675,11 @@
     "modalTitle": "Securizați-vă fondurile",
     "modalDescription": "Vă recomandăm insistent să faceți o copie de siguranță a portofelului pentru a preveni pierderea totală a fondurilor în cazul în care pierdeți acest dispozitiv.",
     "secureMe": "Securizare portofel"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Acesta este un cont non-custodial",
+    "body": "Pentru a afla mai multe, citește articolul nostru de blog",
+    "cta": "Citește"
   },
   "StableBalance": {
     "title": "Sold stabil",

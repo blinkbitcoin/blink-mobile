@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -6,18 +6,15 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
   MigrationCheckpoint,
-  useMigrationCheckpoint,
+  useMigrationBackupCheckpoint,
 } from "@app/screens/account-migration/hooks"
 
 import { BackupPhraseSecurityChecks } from "./backup-phrase-security-checks"
 
 export const BackupSecurityChecksScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { saveCheckpoint } = useMigrationCheckpoint()
 
-  useEffect(() => {
-    saveCheckpoint(MigrationCheckpoint.BackupAlerts)
-  }, [saveCheckpoint])
+  useMigrationBackupCheckpoint(MigrationCheckpoint.BackupAlerts)
 
   return (
     <BackupPhraseSecurityChecks

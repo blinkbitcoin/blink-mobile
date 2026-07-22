@@ -147,8 +147,14 @@ import {
   CloudRestoreScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
 import {
+  MigrationBalancesOverviewScreen,
+  MigrationContactSupportScreen,
+  MigrationDownloadHistoryScreen,
+  MigrationEntryScreen,
   MigrationExplainerScreen,
-  TransferringFundsScreen,
+  MigrationGate,
+  MigrationKeepReceivingScreen,
+  MigrationTransferringFundsScreen,
 } from "@app/screens/account-migration"
 import {
   OnboardingStackParamList,
@@ -157,6 +163,8 @@ import {
   PrimaryStackParamList,
   RootStackParamList,
 } from "./stack-param-lists"
+import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
+import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
@@ -178,8 +186,22 @@ const ScanningQRCodeGated = withOfflineGate(ScanningQRCodeScreen)
 const SendBitcoinDestinationGated = withOfflineGate(SendBitcoinDestinationScreen)
 const SendBitcoinDetailsGated = withOfflineGate(SendBitcoinDetailsScreen)
 const SendBitcoinConfirmationGated = withOfflineGate(SendBitcoinConfirmationScreen)
-const ReceiveGated = withOfflineGate(ReceiveScreen)
-const RedeemBitcoinDetailGated = withOfflineGate(RedeemBitcoinDetailScreen)
+const ReceiveOfflineGated = withOfflineGate(ReceiveScreen)
+const ReceiveGated: React.FC = () => (
+  <WindDownReceiveGate>
+    <ReceiveOfflineGated />
+  </WindDownReceiveGate>
+)
+const RedeemBitcoinDetailOfflineGated = withOfflineGate(RedeemBitcoinDetailScreen)
+/** An incoming-funds path, so it sits behind the receive block like receiveBitcoin: a
+ *  voucher scanned while receiving is disabled meets the migrate prompt, not a server error. */
+const RedeemBitcoinDetailGated: React.FC<
+  React.ComponentProps<typeof RedeemBitcoinDetailOfflineGated>
+> = (props) => (
+  <WindDownReceiveGate>
+    <RedeemBitcoinDetailOfflineGated {...props} />
+  </WindDownReceiveGate>
+)
 const ConversionDetailsGated = withOfflineGate(ConversionDetailsScreen)
 const ConversionConfirmationGated = withOfflineGate(ConversionConfirmationScreen)
 const UnclaimedDepositsGated = withOfflineGate(UnclaimedDepositsScreen)
@@ -810,14 +832,44 @@ export const RootStack = () => {
         options={{ title: LL.StableBalance.settingsTitle() }}
       />
       <RootNavigator.Screen
+        name="accountMigrationStart"
+        component={MigrationGate}
+        options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationEntry"
+        component={MigrationEntryScreen}
+        options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
         name="accountMigrationExplainer"
         component={MigrationExplainerScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
+        name="accountMigrationKeepReceiving"
+        component={MigrationKeepReceivingScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationDownloadHistory"
+        component={MigrationDownloadHistoryScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationBalancesOverview"
+        component={MigrationBalancesOverviewScreen}
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <RootNavigator.Screen
         name="accountMigrationTransferringFunds"
-        component={TransferringFundsScreen}
-        options={{ headerShown: false }}
+        component={MigrationTransferringFundsScreen}
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationContactSupport"
+        component={MigrationContactSupportScreen}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialRestoreMethod"
@@ -1004,8 +1056,9 @@ export const PrimaryNavigator = () => {
   const insets = useSafeAreaInsets()
 
   const { LL } = useI18nContext()
-  // The cacheId is updated after every mutation that affects current user data (balanace, contacts, ...)
-  // It's used to re-mount this component and thus reset what's cached in Apollo (and React)
+
+  const migrationBlocker = useMigrationBlocker()
+  if (migrationBlocker.isVisible) return <MigrationGate />
 
   return (
     <Tab.Navigator

@@ -13,6 +13,13 @@ const mockUseIpCountryCode = jest.fn()
 
 let mockPersistentState: PersistentState
 
+/** Mocked wholesale: the real module warns at load time when no API key is configured. */
+jest.mock("@app/utils/ip-country-lookup", () => ({
+  DEFAULT_ADAPTERS: [],
+  resolveIpCountryCode: jest.fn(async () => undefined),
+  resolveIpCountryCodeCached: jest.fn(async () => undefined),
+}))
+
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
   ...jest.requireActual("@app/hooks/use-device-location"),
@@ -118,6 +125,55 @@ describe("useDollarBalanceRestricted", () => {
       mockPersistentState = { ...baseState, stablesatsRestrictedCustodial: true }
       mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
       expect(read()).toBe(false)
+    })
+  })
+
+  describe("with an account-type override", () => {
+    // A still-custodial session predicting the phone-less self-custodial account.
+    beforeEach(() => setup(AccountType.Custodial))
+
+    const readOverride = (accountType: AccountType) =>
+      renderHook(() => useDollarBalanceRestricted(accountType)).result.current
+
+    it("predicts the self-custodial restriction from the IP, not the session phone", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "HK" })
+      mockUseIpCountryCode.mockReturnValue("FR")
+      expect(readOverride(AccountType.SelfCustodial)).toBe(true)
+    })
+
+    it("falls back to the session country when the IP does not resolve", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+      mockUseIpCountryCode.mockReturnValue(undefined)
+      expect(readOverride(AccountType.SelfCustodial)).toBe(true)
+    })
+
+    it("prefers the IP over the session country when both resolve", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+      mockUseIpCountryCode.mockReturnValue("HK")
+      expect(readOverride(AccountType.SelfCustodial)).toBe(false)
+    })
+
+    it("uses the self-custodial blocked list, not the custodial one", () => {
+      mockUseIpCountryCode.mockReturnValue("HK")
+      expect(readOverride(AccountType.SelfCustodial)).toBe(false)
+    })
+
+    it("honours the persisted self-custodial flag without any country", () => {
+      mockPersistentState = { ...baseState, stableTokenRestricted: true }
+      mockUseIpCountryCode.mockReturnValue(undefined)
+      expect(readOverride(AccountType.SelfCustodial)).toBe(true)
+    })
+
+    it("consults IP for the self-custodial prediction", () => {
+      readOverride(AccountType.SelfCustodial)
+      expect(mockUseIpCountryCode).toHaveBeenCalledWith(true)
+    })
+
+    it("never consults IP for the custodial or default evaluations", () => {
+      readOverride(AccountType.Custodial)
+      read()
+      expect(mockUseIpCountryCode).not.toHaveBeenCalledWith(true)
+      expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
     })
   })
 

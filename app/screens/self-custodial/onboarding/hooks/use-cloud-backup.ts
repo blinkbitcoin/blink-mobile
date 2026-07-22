@@ -1,17 +1,13 @@
 import { useCallback } from "react"
 import { Platform } from "react-native"
 
-import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-
 import { getCloudBackupFilename } from "@app/config/appinfo"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
-import { BackupMethod, useBackupState } from "@app/self-custodial/providers/backup-state"
+import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import {
   buildBackupPayload,
@@ -23,8 +19,9 @@ import { toastShow } from "@app/utils/toast"
 
 import { getCloudProviderName } from "../utils"
 
+import { useCompleteBackup } from "./use-complete-backup"
 import { usePlatformCloudBackup } from "./use-platform-cloud-backup"
-import { useWalletMnemonic } from "./use-wallet-mnemonic"
+import { useWalletIdentity, useWalletMnemonic } from "./use-wallet-mnemonic"
 
 const DEFAULT_BACKUP_VERSION = 1
 
@@ -57,19 +54,21 @@ export const useCloudBackup = ({
   version = DEFAULT_BACKUP_VERSION,
 }: UseCloudBackupParams) => {
   const { LL } = useI18nContext()
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const completeBackup = useCompleteBackup()
   const { appConfig } = useAppConfig()
   const { startSession, upload, downloadById, resolveErrorMessage, loading } =
     usePlatformCloudBackup()
   const mnemonic = useWalletMnemonic()
-  const { identityPubkey, lightningAddress } = useSelfCustodialAccountInfo()
-  const { setBackupCompleted } = useBackupState()
+  const identityPubkey = useWalletIdentity(mnemonic)
+  const { lightningAddress } = useSelfCustodialAccountInfo()
 
   const handleBackup = useCallback(async () => {
     const provider = getCloudProviderName(LL)
 
     if (!identityPubkey) {
-      toastShow({ message: LL.BackupScreen.CloudBackup.signInFailed({ provider }), LL })
+      /** The pubkey is derived locally from the phrase, with no cloud involved, so a missing
+       *  one is a local failure: signInFailed would misdirect the user to their cloud account. */
+      toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
       return
     }
 
@@ -124,7 +123,6 @@ export const useCloudBackup = ({
       return
     }
 
-    setBackupCompleted(BackupMethod.Cloud)
     logSelfCustodialBackupCompleted({
       backupMethod: Platform.OS === "ios" ? "icloud" : "google_drive",
     })
@@ -133,7 +131,7 @@ export const useCloudBackup = ({
       type: "success",
       LL,
     })
-    navigation.navigate("selfCustodialBackupSuccess")
+    completeBackup({ method: BackupMethod.Cloud })
   }, [
     isEncrypted,
     password,
@@ -142,13 +140,12 @@ export const useCloudBackup = ({
     upload,
     downloadById,
     resolveErrorMessage,
-    navigation,
+    completeBackup,
     LL,
     appConfig.galoyInstance.name,
     mnemonic,
     identityPubkey,
     lightningAddress,
-    setBackupCompleted,
   ])
 
   return { handleBackup, loading }

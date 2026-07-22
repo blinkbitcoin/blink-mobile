@@ -10,6 +10,7 @@ type CheckboxRowProps = {
   isChecked: boolean
   onPress: () => void
   centered?: boolean
+  testID?: string
 }
 
 export const CheckboxRow: React.FC<CheckboxRowProps> = ({
@@ -17,6 +18,7 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
   isChecked,
   onPress,
   centered,
+  testID,
 }) => {
   const styles = useStyles()
   const {
@@ -29,6 +31,7 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
       onPress={onPress}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: isChecked }}
+      testID={testID}
     >
       <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
         {isChecked && <GaloyIcon name="check" size={14} color={colors.white} />}

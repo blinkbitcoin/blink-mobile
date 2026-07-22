@@ -2802,6 +2802,7 @@
     "total": "Total",
     "transactions": "Iintengiselwano/ utshintshwelano",
     "transactionsError": "Error loading transactions",
+    "transfer": "Dlulisela",
     "tryAgain": "Try Again",
     "type": "Type",
     "usdAccount": "I-Akhawunti ye-Idola",
@@ -2818,6 +2819,7 @@
     "problemMaybeReauth": "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     "warning": "Warning",
     "continue": "Qhubeka",
+    "skip": "Tsiba",
     "correct": "Kulungile",
     "recommended": "Econyiweyo",
     "expirationTime": "Ixesha Lokuphelelwa",
@@ -3552,12 +3554,78 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Qhagamshelana nenkxaso",
+      "body": "Kukho into engahambanga kakuhle, kodwa ungakhathazeki, imali yakho ikhuselekile. Nceda uqhagamshelane nenkxaso ukuze ufumane uncedo.\n\nUsenokufuna olu lwazi ukunceda inkxaso isombulule ityala lakho:",
+      "accountIdLabel": "I-ID yeakhawunti",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Igama lomsebenzisi",
+      "emailLabel": "I-imeyile",
+      "phoneLabel": "Inombolo yefowuni",
+      "appVersionLabel": "Uhlelo lwe-app",
+      "platformLabel": "Iqonga",
+      "countryLabel": "Ilizwe",
+      "emailSubject": "Isicelo senkxaso yofuduso",
+      "emailDescribeProblem": "Chaza ingxaki:",
+      "emailAccountInfo": "Inkcazelo yeakhawunti yenkxaso:",
+      "contactUsCta": "Qhagamshelana nathi"
+    },
+    "migrateNowModal": {
+      "title": "Fudukela ngoku kwiakhawunti engagcinwanga",
+      "body": "Awusakwazi ukufumana imali kwiakhawunti yakho egcinwayo. UBlink uyekile inkonzo yokugcina kummandla wakho kwaye le akhawunti iza kuvalwa ekupheleni kuka-{date}.\n\nFudukela ngoku kwiakhawunti engagcinwanga.",
+      "migrateCta": "Fuduka ngoku"
+    },
+    "reminderBulletin": {
+      "title": "Kubalulekile",
+      "body": "Fudukisela iakhawunti yakho kwimodi entsha engagcinwanga phambi kwe-{date}",
+      "migrateCta": "Fuduka"
+    },
+    "dollarBalanceModal": {
+      "title": "Asikwazi ukufudusa ibhalansi yakho yedola",
+      "body": "Qala ukhuphe yonke ibhalansi yakho yedola. Ungayidlulisela kwibhalansi yakho yeBitcoin kuBlink okanye kwenye indawo."
+    },
+    "balancesOverview": {
+      "title": "Hambisa ibhalansi yakho",
+      "body": "Hambisa imali yakho ngokukhuselekileyo kwiakhawunti yakho entsha.",
+      "currentBitcoinBalance": "Ibhalansi ye-Bitcoin yangoku",
+      "currentDollarBalance": "Ibhalansi yeDola yangoku",
+      "newBitcoinBalance": "Ibhalansi entsha ye-Bitcoin",
+      "newDollarBalance": "Ibhalansi entsha yeDola",
+      "dollarBalanceNotAvailable": "ayifumaneki",
+      "networkFee": "Umrhumo wothungelwano: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Umrhumo wothungelwano: <bold>{fee: string}</bold> (uhlawulwa nguBlink)",
+      "exchangeRate": "Izinga langoku lotshintshiselwano 1 BTC = {rate: string}",
+      "approveCta": "Yamkela",
+      "contactSupportCta": "Qhagamshelana nenkxaso"
+    },
+    "migrationRequiredTitle": "Lixesha lokuphucula",
+    "keepReceivingTitle": "Qhubeka ufumana njengesiqhelo",
+    "keepReceivingBody": "Idilesi yakho ye-Lightning iya kudluliselwa kwi-akhawunti yakho entsha ye-non-custodial.",
+    "keepReceivingLnAddressLabel": "Idilesi yakho ye-LN",
+    "keepReceivingCta": "Kuhle",
+    "receivingDisabledToast": "Ukufumana kuvaliwe okwangoku.",
+    "downloadHistoryTitle": "Khuphela imbali yezenzo zakho zemali",
+    "downloadHistoryBody": "I-akhawunti yakho entsha iza kuqala kwakhona. Ukuba ufuna ukugcina irekhodi lezenzo zakho zemali, zikhuphele ngoku njenge-CSV.",
+    "downloadHistoryDownloadCta": "Khuphela",
+    "apiServiceTitle": "Inkonzo ye-API ayifumaneki",
+    "apiServiceBody": "Siyaqaphela ukuba unezitshixo ze-API ezisebenzayo. I-Blink ayikwazi ukubonelela nge-API kwimo ye-non-custodial.\n\nUkuba uxhomekeke kwi-API ye-Blink, qhagamshelana nathi ngokukhawuleza kwaye siya kwenza konke okusemandleni ukunceda utshintsho olugudileyo.",
+    "apiServiceContactCta": "Qhagamshelana nathi",
+    "apiServiceContinueCta": "Qhubeka nokuba kunjalo",
+    "resumeFailed": "Kukho into engahambanga kakuhle ekuqhubekeni nofuduko lwakho. Nceda uqale kwakhona.",
+    "migrationRequiredBody": "Lixesha lokufudusela iakhawunti yakho egcinwayo kwiakhawunti engagcinwanga.",
+    "migrationRequiredForcedBody": "Lixesha lokufudusela iakhawunti yakho egcinwayo kwiakhawunti engagcinwanga. Iyafuneka ngenxa yezizathu zolawulo.\n\nSukukhathazeka, i-non-custodial iya kuba ngcono kuwe kwixesha elide.",
+    "migrationGateTitle": "Iakhawunti ayifikeleleki",
+    "migrationGateBody": "Ngenxa yezizathu zolawulo asikwazi ukubonelela ngeeakhawunti ze-custodial kwingingqi yakho. Dlulisela imali yakho kwiakhawunti ye-non-custodial ne-Blink ngokulandela amanyathelo alandelayo okanye uqhagamshelane nathi ku-<link>{email}</link>",
+    "bitcoinBalance": "Ibhalansi yeBitcoin",
+    "dollarBalance": "Ibhalansi yedola",
     "moveToNonCustodial": "Fudukela kwi-non-custodial",
     "explainerTitle": "Kuthetha ntoni ukufudukela kwi-non-custodial?",
-    "explainerStep1": "Uza kudala i-akhawunti ye-non-custodial kwi-Spark protocol, <link>funda ngakumbi apha</link>",
-    "explainerStep2": "Sidlulisela imali yakho kwi-akhawunti yakho entsha ye-non-custodial kwaye i-akhawunti yakho yangoku iya kucinywa",
-    "explainerStep3": "Qhubeka usebenzise i-Blink njengoko uqhele",
-    "letsMove": "Masiqale",
+    "explainerCheck1": "Uza kudala i-akhawunti ye-non-custodial kwi-Spark protocol",
+    "explainerCheck2": "Sidlulisela imali yakho kwi-akhawunti yakho entsha ye-non-custodial",
+    "explainerCheck3": "I-akhawunti yakho yangoku kunye nayo yonke idata yayo kuquka imbali yezenzo zemali iya kuvalwa",
+    "explainerCheck4": "I-Blink API ayiyi kufumaneka",
+    "explainerCheck5": "I-akhawunti yakho iya kukhutshelwa intlawulo yothungelwano lwe-Spark",
+    "explainerCta": "Ndiyaqonda",
     "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje."
   },
   "AccountTypeSelectionScreen": {
@@ -3607,6 +3675,11 @@
     "modalTitle": "Khuseleka imali yakho",
     "modalDescription": "Siyakucebisa kakhulu ukuba wenze isipele songeno lwengxowa yakho ukukhusela ukuphulukana ngokupheleleyo neemali zakho xa uphulukana nale divayisi.",
     "secureMe": "Khuseleka ingxowa"
+  },
+  "NonCustodialInfoBulletin": {
+    "title": "Le yiakhawunti engagcinwanga",
+    "body": "Ukufunda okungakumbi, funda ipowusti yebhlog yethu",
+    "cta": "Funda"
   },
   "StableBalance": {
     "title": "Ibhalansi ezinzileyo",

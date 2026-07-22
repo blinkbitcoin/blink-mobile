@@ -156,6 +156,19 @@ jest.mock("@apollo/client", () => {
   }
 })
 
+/** Mocked wholesale: the real module warns at load time when no API key is configured. */
+jest.mock("@app/utils/ip-country-lookup", () => ({
+  DEFAULT_ADAPTERS: [],
+  resolveIpCountryCode: jest.fn(async () => undefined),
+  resolveIpCountryCodeCached: jest.fn(async () => undefined),
+}))
+
+/** The fake Apollo client above has no writeQuery, so the real updateCountryCode would throw and warn on every device-location render. */
+jest.mock("@app/graphql/client-only-query", () => ({
+  ...jest.requireActual("@app/graphql/client-only-query"),
+  updateCountryCode: jest.fn(),
+}))
+
 jest.mock("@app/graphql/generated", () => {
   const actual = jest.requireActual("@app/graphql/generated")
   return {
@@ -466,7 +479,7 @@ describe("Settings Screen", () => {
     await flushEffects()
   })
 
-  it("truncates long settings row titles", () => {
+  it("truncates long settings row titles", async () => {
     const longTitle = "This is a very long settings row title that should truncate"
 
     render(
@@ -474,13 +487,14 @@ describe("Settings Screen", () => {
         <SettingsRow action={null} title={longTitle} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     const titleNode = screen.getByText(longTitle)
     expect(titleNode.props.numberOfLines).toBe(1)
     expect(titleNode.props.ellipsizeMode).toBe("tail")
   })
 
-  it("truncates long settings row subtitles", () => {
+  it("truncates long settings row subtitles", async () => {
     const longTitle = "Short title"
     const longSubtitle = "This is a very long subtitle that should truncate"
 
@@ -489,13 +503,14 @@ describe("Settings Screen", () => {
         <SettingsRow action={null} title={longTitle} subtitle={longSubtitle} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     const subtitleNode = screen.getByText(longSubtitle)
     expect(subtitleNode.props.numberOfLines).toBe(1)
     expect(subtitleNode.props.ellipsizeMode).toBe("tail")
   })
 
-  it("truncates long title and subtitle together", () => {
+  it("truncates long title and subtitle together", async () => {
     const longTitle = "Another very long settings row title that should truncate"
     const longSubtitle = "Another very long subtitle that should truncate"
 
@@ -504,6 +519,7 @@ describe("Settings Screen", () => {
         <SettingsRow action={null} title={longTitle} subtitle={longSubtitle} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     const titleNode = screen.getByText(longTitle)
     const subtitleNode = screen.getByText(longSubtitle)
@@ -513,20 +529,17 @@ describe("Settings Screen", () => {
     expect(subtitleNode.props.ellipsizeMode).toBe("tail")
   })
 
-  it("does not render Move to non-custodial option until migration is complete", async () => {
+  it("renders the Move to non-custodial option for a custodial account", async () => {
     render(
       <ContextForScreen>
         <LoggedInWithUsername mock={mocksWithUsername} />
       </ContextForScreen>,
     )
 
-    // flush pending effects/microtasks, then assert on the settled output
-    await act(async () => {})
-
-    // TODO: re-enable once the custodial → non-custodial migration is complete
-    expect(screen.queryByText("Move to non-custodial")).toBeNull()
-
+    // let the migration-checkpoint load settle so the row leaves its skeleton state
     await flushEffects()
+
+    expect(screen.getByText("Move to non-custodial")).toBeTruthy()
   })
 
   it("does not render a standalone Recovery method group", async () => {

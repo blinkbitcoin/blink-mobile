@@ -6,6 +6,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { BackupPhraseSecurityChecks } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-security-checks"
 
 import { ContextForScreen } from "../../../helper"
+import { flushEffects } from "../../../../helpers/flush-effects"
 
 jest.mock("@app/components/icon-hero", () => {
   const { Text } = jest.requireActual("react-native")
@@ -18,12 +19,13 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 describe("BackupPhraseSecurityChecks", () => {
-  it("renders the title and only the first checkbox on mount", () => {
+  it("renders the title and only the first checkbox on mount", async () => {
     const { getByText, queryByText } = render(
       <ContextForScreen>
         <BackupPhraseSecurityChecks onContinue={jest.fn()} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByText(LL.BackupScreen.ManualBackup.Alerts.title())).toBeTruthy()
     expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check1())).toBeTruthy()
@@ -31,48 +33,52 @@ describe("BackupPhraseSecurityChecks", () => {
     expect(queryByText(LL.BackupScreen.ManualBackup.Alerts.check3())).toBeNull()
   })
 
-  it("reveals the second checkbox after checking the first", () => {
+  it("reveals the second checkbox after checking the first", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <BackupPhraseSecurityChecks onContinue={jest.fn()} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check1()))
     expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check2())).toBeTruthy()
   })
 
-  it("reveals the third checkbox after checking the second", () => {
+  it("reveals the third checkbox after checking the second", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <BackupPhraseSecurityChecks onContinue={jest.fn()} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check1()))
     fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check2()))
     expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check3())).toBeTruthy()
   })
 
-  it("does not call onContinue while any checkbox is unchecked", () => {
+  it("does not call onContinue while any checkbox is unchecked", async () => {
     const onContinue = jest.fn()
     const { getByText } = render(
       <ContextForScreen>
         <BackupPhraseSecurityChecks onContinue={onContinue} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.press(getByText(LL.common.continue()))
     expect(onContinue).not.toHaveBeenCalled()
   })
 
-  it("calls onContinue exactly once when all three checkboxes are checked", () => {
+  it("calls onContinue exactly once when all three checkboxes are checked", async () => {
     const onContinue = jest.fn()
     const { getByText } = render(
       <ContextForScreen>
         <BackupPhraseSecurityChecks onContinue={onContinue} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check1()))
     fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check2()))
@@ -82,12 +88,13 @@ describe("BackupPhraseSecurityChecks", () => {
     expect(onContinue).toHaveBeenCalledTimes(1)
   })
 
-  it("keeps already-revealed checkboxes visible after toggling an earlier one off", () => {
+  it("keeps already-revealed checkboxes visible after toggling an earlier one off", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <BackupPhraseSecurityChecks onContinue={jest.fn()} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check1()))
     fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check2()))
@@ -97,13 +104,14 @@ describe("BackupPhraseSecurityChecks", () => {
     expect(getByText(LL.BackupScreen.ManualBackup.Alerts.check3())).toBeTruthy()
   })
 
-  it("re-enables the Continue button after re-checking the toggled-off box, and onContinue fires (Bug guard)", () => {
+  it("re-enables the Continue button after re-checking the toggled-off box, and onContinue fires (Bug guard)", async () => {
     const onContinue = jest.fn()
     const { getByText } = render(
       <ContextForScreen>
         <BackupPhraseSecurityChecks onContinue={onContinue} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check1()))
     fireEvent.press(getByText(LL.BackupScreen.ManualBackup.Alerts.check2()))
