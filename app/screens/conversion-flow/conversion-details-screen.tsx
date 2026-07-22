@@ -598,6 +598,17 @@ const ConversionDetailsScreenContent = ({
   const isRecalculating = toggleInitiated.current || isTyping || Boolean(loadingPercent)
   const isPercentageSelectorLocked = uiLocked || isRecalculating
 
+  const isReviewDisabled =
+    !isValidAmount ||
+    uiLocked ||
+    isRecalculating ||
+    belowMinimum ||
+    selfCustodialLimitsUnavailable ||
+    quoteBlocking ||
+    conversionGuard.isQuoting ||
+    conversionGuard.hasQuoteError ||
+    isSelfCustodialBooting
+
   const setAmountToBalancePercentage = (percentage: number) => {
     if (uiLocked) return
     applyBalancePercentage(percentage)
@@ -820,19 +831,7 @@ const ConversionDetailsScreenContent = ({
         <GaloyPrimaryButton
           title={LL.ConversionDetailsScreen.reviewTransfer()}
           containerStyle={styles.buttonContainer}
-          disabled={
-            !isValidAmount ||
-            uiLocked ||
-            toggleInitiated.current ||
-            isTyping ||
-            Boolean(loadingPercent) ||
-            belowMinimum ||
-            selfCustodialLimitsUnavailable ||
-            quoteBlocking ||
-            conversionGuard.isQuoting ||
-            conversionGuard.hasQuoteError ||
-            isSelfCustodialBooting
-          }
+          disabled={isReviewDisabled}
           onPress={moveToNextScreen}
           testID="next-button"
         />
