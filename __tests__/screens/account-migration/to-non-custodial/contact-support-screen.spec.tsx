@@ -12,7 +12,7 @@ import { flushEffects } from "../../../helpers/flush-effects"
 loadLocale("en")
 const LL = i18nObject("en")
 const LLSupport = LL.AccountMigration.contactSupport
-const SUPPORT_EMAIL = "feedback@blink.sv"
+const mockSupportEmail = "feedback@blink.sv"
 const LONG_PUBKEY = "0123456789abcdefghijklmnopqrst"
 
 const mockSendSupportEmail = jest.fn()
@@ -29,10 +29,15 @@ let mockHasParams = true
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+const mockSetOptions = jest.fn()
 let mockOrigin: MigrationSupportOrigin | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    goBack: mockGoBack,
+    setOptions: mockSetOptions,
+  }),
   useRoute: () => ({
     params: mockHasParams ? { reason: mockReason, origin: mockOrigin } : undefined,
   }),
@@ -42,6 +47,15 @@ jest.mock("@react-navigation/native", () => ({
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
+}))
+
+const mockCopyToClipboard = jest.fn()
+jest.mock("@app/hooks/use-clipboard", () => ({
+  useClipboard: () => ({ copyToClipboard: mockCopyToClipboard }),
+}))
+
+jest.mock("@app/hooks/use-contact-support", () => ({
+  useContactSupport: () => ({ supportEmailAddress: mockSupportEmail }),
 }))
 
 /** Mirrors useMigrationDiagnostics' shape, built from mockDetails at render time. */
@@ -107,17 +121,21 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
-  it("returns to the commit point from the visible Back button (iOS has no hardware back)", async () => {
+  /** The back control lives in the navigator header, set from this screen so it reuses the
+   *  return path to the commit point rather than a blind goBack. */
+  it("returns to the commit point from the header back control", async () => {
     renderScreen()
     await flushEffects()
 
-    fireEvent.press(screen.getByText(LL.common.back()))
+    const options = mockSetOptions.mock.calls.at(-1)?.[0]
+    options?.headerLeft?.().props.onPress()
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
-  /** From the resume handover there is no commit screen underneath, so Back dismisses rather
-   *  than pushing a fresh one that would re-arm a completed migration and overwrite the reason. */
+  /** From the resume handover there is no commit screen underneath, so the hardware back
+   *  dismisses rather than pushing a fresh one that would re-arm a completed migration and
+   *  overwrite the reason. */
   it("dismisses the hardware back when opened from the resume handover", async () => {
     mockOrigin = MigrationSupportOrigin.Resume
     const { BackHandler } =
@@ -133,12 +151,13 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
-  it("dismisses the visible Back button when opened from the resume handover", async () => {
+  it("dismisses the header back when opened from the resume handover", async () => {
     mockOrigin = MigrationSupportOrigin.Resume
     renderScreen()
     await flushEffects()
 
-    fireEvent.press(screen.getByText(LL.common.back()))
+    const options = mockSetOptions.mock.calls.at(-1)?.[0]
+    options?.headerLeft?.().props.onPress()
 
     expect(mockGoBack).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
@@ -162,8 +181,8 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.getByText(LLSupport.phoneLabel())).toBeTruthy()
     expect(screen.getByText("+1 374 9383 993")).toBeTruthy()
     expect(screen.getByText(LLSupport.contactUsCta())).toBeTruthy()
-    // The support address is never shown on screen; it only receives the email.
-    expect(screen.queryByText(SUPPORT_EMAIL)).toBeNull()
+    // The support address is shown as the copy control's label.
+    expect(screen.getByText(mockSupportEmail)).toBeTruthy()
   })
 
   /** Sensitive identifiers are shown complete for support to copy: the account id and the
@@ -228,5 +247,31 @@ describe("MigrationContactSupportScreen", () => {
     fireEvent.press(screen.getByText(LLSupport.contactUsCta()))
 
     expect(mockSendSupportEmail).toHaveBeenCalledTimes(1)
+  })
+
+  /** Tapping the support address copies it, so a user whose mail app the Contact us button
+   *  cannot open can still paste the address into their own. */
+  it("copies the support address to the clipboard", async () => {
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByTestId("migration-contact-support-copy"))
+
+    expect(mockCopyToClipboard).toHaveBeenCalledWith({ content: mockSupportEmail })
+  })
+
+  /** The copy control puts the whole diagnostics block on the clipboard as `label: value`
+   *  lines, so a user can paste it into their own message to support. */
+  it("copies the whole diagnostics block to the clipboard", async () => {
+    renderScreen()
+    await flushEffects()
+
+    const expectedDetails = mockBuildDiagnostics()
+      .map(({ label, value }) => `${label}: ${value}`)
+      .join("\n")
+
+    fireEvent.press(screen.getByText(LLSupport.copy()))
+
+    expect(mockCopyToClipboard).toHaveBeenCalledWith({ content: expectedDetails })
   })
 })

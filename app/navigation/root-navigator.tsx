@@ -870,7 +870,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="accountMigrationContactSupport"
         component={MigrationContactSupportScreen}
-        options={{ headerShown: false, gestureEnabled: false }}
+        options={{ title: "", gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialRestoreMethod"
