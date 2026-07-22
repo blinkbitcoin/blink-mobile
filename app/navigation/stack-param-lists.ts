@@ -67,8 +67,17 @@ export type RootStackParamList = {
   conversionConfirmation: {
     fromWalletCurrency: WalletCurrency
     moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
+    /** Set when the convert is a migration step, so a completed conversion returns to the
+     *  migration flow instead of Home. */
+    isMigrationConversion?: boolean
   }
-  conversionSuccess: undefined
+  conversionSuccess:
+    | {
+        /** Set when the conversion was a migration step, so the success screen returns to the
+         *  migration flow instead of Home. */
+        returnToMigration?: boolean
+      }
+    | undefined
   sendBitcoinCompleted: {
     arrivalAtMempoolEstimate?: number
     status: PaymentSendCompletedStatus

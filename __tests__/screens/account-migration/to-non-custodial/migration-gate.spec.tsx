@@ -154,6 +154,11 @@ jest.mock("@app/components/dollar-balance-migration-modal", () => ({
   }) => mockDollarBalanceModal(props),
 }))
 
+const mockArmMigrationConversion = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-migration-conversion", () => ({
+  armMigrationConversion: () => mockArmMigrationConversion(),
+}))
+
 jest.mock("@app/screens/account-migration/to-non-custodial/api-service-screen", () => ({
   MigrationApiServiceScreen: (props: { onContinue: () => void; onClose?: () => void }) =>
     mockApiServiceScreen(props),
@@ -438,7 +443,7 @@ describe("MigrationGate", () => {
     expect(mockDollarBalanceModal.mock.calls[0][0].isVisible).toBe(false)
   })
 
-  it("offers the transfer action when the region permits the dollar transfer", () => {
+  it("arms the migration flag and opens the convert flow from the transfer action", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ usdBalance: 20 }),
     )
@@ -447,29 +452,22 @@ describe("MigrationGate", () => {
 
     fireEvent.press(getByTestId("gate-modal-transfer"))
 
+    expect(mockArmMigrationConversion).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
   })
 
-  it("shows the close-only variant when the region blocks the dollar transfer", () => {
+  /** Restricted regions used to get a dead-end Close; now every affected user converts from
+   *  here, since the convert screen waives its region bounce for a migration step. */
+  it("still offers the conversion in a region that blocks or restricts the transfer", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ usdBalance: 20 }),
     )
     mockUseTransferBlocked.mockReturnValue(true)
-
-    render(<MigrationGate />)
-
-    expect(mockDollarBalanceModal.mock.calls[0][0].onTransfer).toBeUndefined()
-  })
-
-  it("shows the close-only variant when the dollar balance is restricted in the region", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(
-      walletOverviewQueryResult({ usdBalance: 20 }),
-    )
     mockUseDollarBalanceRestricted.mockReturnValue(true)
 
     render(<MigrationGate />)
 
-    expect(mockDollarBalanceModal.mock.calls[0][0].onTransfer).toBeUndefined()
+    expect(mockDollarBalanceModal.mock.calls[0][0].onTransfer).toBeDefined()
   })
 
   it("exits the flow when the dollar-balance modal is dismissed", () => {

@@ -14,6 +14,10 @@ import { ThemeProvider } from "@rn-vui/themed"
 
 import { ConversionDetailsScreen } from "@app/screens/conversion-flow/conversion-details-screen"
 import {
+  armMigrationConversion,
+  resetMigrationConversionArmed,
+} from "@app/screens/account-migration/hooks/use-migration-conversion"
+import {
   WalletCurrency,
   ConversionScreenDocument,
   RealtimePriceDocument,
@@ -1208,6 +1212,56 @@ describe("Percentage selector functionality", () => {
       () => {
         const nextButton = getByTestId("next-button")
         expect(nextButton.props.accessibilityState?.disabled).toBe(false)
+      },
+      { timeout: 3000 },
+    )
+  })
+})
+
+describe("Migration conversion prefill", () => {
+  const buildMocks = () =>
+    createGraphQLMocks({
+      btcBalance: 100000,
+      usdBalance: 50000,
+    })
+
+  beforeEach(() => {
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+    resetMigrationConversionArmed()
+  })
+
+  /**
+   * Reaching the convert from the migration arms a flag; the screen then opens USD to BTC
+   * and drives the full-balance chip automatically, so the whole dollar balance is ready to
+   * confirm without the user touching anything. A plain convert with both balances leaves
+   * the amount empty and Next disabled (see the initial-render suite), so an enabled Next
+   * here is the prefill having fired.
+   */
+  it("prefills the whole dollar balance when armed by the migration", async () => {
+    armMigrationConversion()
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(false)
       },
       { timeout: 3000 },
     )

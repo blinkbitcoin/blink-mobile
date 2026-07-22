@@ -66,4 +66,17 @@ describe("useDollarBalanceRestrictionGuard", () => {
 
     expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
+
+  /** The migration conversion turns the guard off so a restricted user can empty their
+   *  dollar balance instead of being bounced home. */
+  it("stays off and never bounces when disabled, even while restricted", () => {
+    mockUseDollarBalanceRestricted.mockReturnValue(true)
+
+    const { result } = renderHook(() =>
+      useDollarBalanceRestrictionGuard({ enabled: false }),
+    )
+
+    expect(result.current).toBe(false)
+    expect(mockDispatch).not.toHaveBeenCalled()
+  })
 })

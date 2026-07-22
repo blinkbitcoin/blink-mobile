@@ -343,7 +343,7 @@ describe("conversion-confirmation-screen", () => {
     const resetAction = dispatchMock.mock.calls[0][0]({ routes: [], index: 0 })
     expect(resetAction.payload.routes).toEqual([
       { name: "Primary" },
-      { name: "conversionSuccess" },
+      { name: "conversionSuccess", params: { returnToMigration: undefined } },
     ])
   })
 
@@ -390,6 +390,46 @@ describe("conversion-confirmation-screen", () => {
     })
 
     expect(dispatchMock).toHaveBeenCalled()
+  })
+
+  it("hands off to the migration entry after a migration conversion", async () => {
+    const route = {
+      key: "conversionConfirmation",
+      name: "conversionConfirmation",
+      params: {
+        fromWalletCurrency: WalletCurrency.Usd,
+        moneyAmount: {
+          amount: 5000,
+          currency: WalletCurrency.Usd,
+          currencyCode: WalletCurrency.Usd,
+        },
+        isMigrationConversion: true,
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <ConversionConfirmationScreen route={route} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.press(
+      screen.getByText(
+        LL.ConversionConfirmationScreen.transferButtonText({
+          fromWallet: LL.common.dollar(),
+          toWallet: LL.common.bitcoin(),
+        }),
+      ),
+    )
+
+    await waitFor(() => {
+      expect(dispatchMock).toHaveBeenCalled()
+    })
+    const resetAction = dispatchMock.mock.calls[0][0]({ routes: [], index: 0 })
+    expect(resetAction.payload.routes).toEqual([
+      { name: "Primary" },
+      { name: "conversionSuccess", params: { returnToMigration: true } },
+    ])
   })
 })
 
