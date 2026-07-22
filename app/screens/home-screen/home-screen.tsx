@@ -70,6 +70,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
+import { isIos } from "@app/utils/helper"
 import {
   useAppConfig,
   useAutoShowUpgradeModal,
@@ -248,7 +249,11 @@ export const HomeScreen: React.FC = () => {
     nextFetchPolicy: "cache-and-network",
   })
 
-  const { refetch: refetchUnauthed, loading: loadingUnauthed } = useHomeUnauthedQuery({
+  const {
+    refetch: refetchUnauthed,
+    loading: loadingUnauthed,
+    data: dataUnauthed,
+  } = useHomeUnauthedQuery({
     skip: !isAuthed,
     fetchPolicy: "network-only",
 
@@ -601,15 +606,25 @@ export const HomeScreen: React.FC = () => {
     },
   ]
 
+  // Do not change this condition without checking with Lukas first
+  const shouldShowTransferButton =
+    !isIos ||
+    (isIos && satsBalance > 0) ||
+    dataUnauthed?.globals?.network !== "mainnet" ||
+    levelAccount === AccountLevel.Two ||
+    levelAccount === AccountLevel.Three
+
   const isTransferDisabled = isDollarBalanceRestricted || isTransferBlocked
 
-  buttons.unshift({
-    title: LL.ConversionDetailsScreen.transfer(),
-    target: "conversionDetails",
-    icon: "transfer",
-    disabled: isTransferDisabled,
-    onDisabledPress: () => setIsRestrictionModalVisible(true),
-  })
+  if (shouldShowTransferButton) {
+    buttons.unshift({
+      title: LL.ConversionDetailsScreen.transfer(),
+      target: "conversionDetails",
+      icon: "transfer",
+      disabled: isTransferDisabled,
+      onDisabledPress: () => setIsRestrictionModalVisible(true),
+    })
+  }
 
   const AccountCreationNeededModal = (
     <Modal
