@@ -45,4 +45,16 @@ describe("migration conversion arming", () => {
 
     expect(result.current).toBe(true)
   })
+
+  /** Teardown drops an arm this instance never consumed (the screen was reused, not remounted),
+   *  so the next plain conversion is not promoted into a migration one. */
+  it("clears an arm left behind when the consumer unmounts", () => {
+    const { unmount } = renderHook(() => useConsumeMigrationConversionArmed())
+    armMigrationConversion()
+
+    unmount()
+
+    const { result } = renderHook(() => useConsumeMigrationConversionArmed())
+    expect(result.current).toBe(false)
+  })
 })
