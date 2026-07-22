@@ -26,6 +26,15 @@ const mockRefetchWallets = jest.fn()
 /** The server accepting the start is what arms the lock, so the default across the suite
  *  is an accepted start and each failure case states its own refusal. */
 const acceptedMigrationStart = { data: { migrationStart: { errors: [] } } }
+const rejectedMigrationStart = {
+  data: {
+    migrationStart: {
+      errors: [
+        { message: "Dollar balance must be empty", code: "MIGRATION_STATE_CONFLICT" },
+      ],
+    },
+  },
+}
 let mockDollarRestricted = false
 let mockCurrentDollarRestricted = false
 let mockConvertReady = true
@@ -152,40 +161,42 @@ const renderScreen = () =>
     </ContextForScreen>,
   )
 
+const resetScreenMocks = () => {
+  jest.clearAllMocks()
+  loadLocale("en")
+  mockDollarRestricted = false
+  mockCurrentDollarRestricted = false
+  mockConvertReady = true
+  mockCheckpointLoading = false
+  mockCheckpointAccountId = "sc-account-1"
+  mockOwnerId = "owner-1"
+  mockLnAddressTransfer = {
+    isTransferred: true,
+    isRejected: false,
+    isAccountMissing: false,
+    hasConnectionIssue: false,
+    retry: mockLnRetry,
+  }
+  mockGateArmed = false
+  mockIsFocused = true
+  mockIsAuthed = true
+  mockUseWalletOverviewScreenQuery.mockReturnValue(
+    walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+  )
+  mockUseMigrationQuery.mockReturnValue(
+    migrationQueryResult({
+      balanceSats: 1000,
+      feeSats: 10,
+      feeCoveredByBlink: false,
+      receiveSats: 990,
+    }),
+  )
+  mockMigrationStart.mockResolvedValue(acceptedMigrationStart)
+  jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve())
+}
+
 describe("MigrationBalancesOverviewScreen", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    loadLocale("en")
-    mockDollarRestricted = false
-    mockCurrentDollarRestricted = false
-    mockConvertReady = true
-    mockCheckpointLoading = false
-    mockCheckpointAccountId = "sc-account-1"
-    mockOwnerId = "owner-1"
-    mockLnAddressTransfer = {
-      isTransferred: true,
-      isRejected: false,
-      isAccountMissing: false,
-      hasConnectionIssue: false,
-      retry: mockLnRetry,
-    }
-    mockGateArmed = false
-    mockIsFocused = true
-    mockIsAuthed = true
-    mockUseWalletOverviewScreenQuery.mockReturnValue(
-      walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
-    )
-    mockUseMigrationQuery.mockReturnValue(
-      migrationQueryResult({
-        balanceSats: 1000,
-        feeSats: 10,
-        feeCoveredByBlink: false,
-        receiveSats: 990,
-      }),
-    )
-    mockMigrationStart.mockResolvedValue(acceptedMigrationStart)
-    jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve())
-  })
+  beforeEach(resetScreenMocks)
 
   it("renders the hero, both balance cards, fee and actions without an exchange rate", async () => {
     renderScreen()
@@ -362,18 +373,7 @@ describe("MigrationBalancesOverviewScreen", () => {
   })
 
   it("hands over to support when the server refuses to start the migration", async () => {
-    mockMigrationStart.mockResolvedValue({
-      data: {
-        migrationStart: {
-          errors: [
-            {
-              message: "Dollar balance must be empty before migration",
-              code: "MIGRATION_STATE_CONFLICT",
-            },
-          ],
-        },
-      },
-    })
+    mockMigrationStart.mockResolvedValue(rejectedMigrationStart)
     renderScreen()
     await flushEffects()
 
@@ -395,18 +395,7 @@ describe("MigrationBalancesOverviewScreen", () => {
   /** The two failures on this screen are different tickets, so support must not have to
    *  guess which one it is looking at. */
   it("tells support the server refused the start", async () => {
-    mockMigrationStart.mockResolvedValue({
-      data: {
-        migrationStart: {
-          errors: [
-            {
-              message: "Dollar balance must be empty before migration",
-              code: "MIGRATION_STATE_CONFLICT",
-            },
-          ],
-        },
-      },
-    })
+    mockMigrationStart.mockResolvedValue(rejectedMigrationStart)
     renderScreen()
     await flushEffects()
 
@@ -815,18 +804,7 @@ describe("MigrationBalancesOverviewScreen", () => {
   /** When both preconditions fail at once, the start is the cause support hears about: it
    *  leads the handover chain, so one ticket names the root rather than the follow-on. */
   it("names the refused start when both the start and the re-point fail", async () => {
-    mockMigrationStart.mockResolvedValue({
-      data: {
-        migrationStart: {
-          errors: [
-            {
-              message: "Dollar balance must be empty before migration",
-              code: "MIGRATION_STATE_CONFLICT",
-            },
-          ],
-        },
-      },
-    })
+    mockMigrationStart.mockResolvedValue(rejectedMigrationStart)
     mockLnAddressTransfer = {
       isTransferred: false,
       isRejected: true,
@@ -899,5 +877,22 @@ describe("MigrationBalancesOverviewScreen", () => {
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
 
     expect(mockLnRetry).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("MigrationBalancesOverviewScreen lightning-address re-point gating", () => {
+  beforeEach(resetScreenMocks)
+
+  /** A rejected start must never let the re-point move @blink.sv: it stays skipped until the
+   *  server confirms the migration started. */
+  it("keeps the re-point skipped while the start is unconfirmed", async () => {
+    mockMigrationStart.mockResolvedValue(rejectedMigrationStart)
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseLnAddressTransfer).not.toHaveBeenCalledWith(
+      expect.objectContaining({ skip: false }),
+    )
   })
 })
