@@ -28,8 +28,8 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
-import { IconTransaction } from "../../components/icon-transactions"
-import { Screen } from "../../components/screen"
+import { IconTransaction } from "@app/components/icon-transactions"
+import { Screen } from "@app/components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
 
@@ -322,7 +322,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     })
   }
 
-  let spendOrReceiveText = ""
+  let spendOrReceiveText: string
   if (isReceive) {
     spendOrReceiveText = LL.TransactionDetailScreen.received()
   } else if (onChainTxNotBroadcasted) {
