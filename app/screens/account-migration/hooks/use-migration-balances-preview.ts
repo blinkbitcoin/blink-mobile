@@ -39,6 +39,10 @@ export const useMigrationBalancesPreview = () => {
   const { LL } = useI18nContext()
   const LLOverview = LL.AccountMigration.balancesOverview
 
+  /** cache-and-network so the dollar figure the user approves in an irreversible step is
+   *  fresh: a deposit that landed after the last cache write would otherwise stay invisible
+   *  here until migrationStart refuses it, a support handover instead of the empty-dollars
+   *  modal. */
   const {
     usdBalanceCents,
     isReady: areBalancesReady,
@@ -46,7 +50,7 @@ export const useMigrationBalancesPreview = () => {
     isSkipped: areBalancesSkipped,
     hasConnectionIssue: hasBalancesConnectionIssue,
     refetch: refetchBalances,
-  } = useCustodialWalletBalances()
+  } = useCustodialWalletBalances({ fetchPolicy: "cache-and-network" })
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
   const isPostGate = useWindDownGateArmed()
   const isNewDollarBalanceRestricted = useDollarBalanceRestricted(
