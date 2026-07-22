@@ -3569,7 +3569,8 @@
       "emailSubject": "طلب دعم للترحيل",
       "emailDescribeProblem": "صف المشكلة:",
       "emailAccountInfo": "معلومات الحساب للدعم:",
-      "contactUsCta": "تواصل معنا"
+      "contactUsCta": "تواصل معنا",
+      "copy": "Copy"
     },
     "migrateNowModal": {
       "title": "رحّل الآن إلى حساب غير حافظ",

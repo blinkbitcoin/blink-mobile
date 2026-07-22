@@ -3569,7 +3569,8 @@
       "emailSubject": "Isicelo senkxaso yofuduso",
       "emailDescribeProblem": "Chaza ingxaki:",
       "emailAccountInfo": "Inkcazelo yeakhawunti yenkxaso:",
-      "contactUsCta": "Qhagamshelana nathi"
+      "contactUsCta": "Qhagamshelana nathi",
+      "copy": "Khuphela"
     },
     "migrateNowModal": {
       "title": "Fudukela ngoku kwiakhawunti engagcinwanga",

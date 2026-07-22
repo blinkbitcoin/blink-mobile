@@ -3569,7 +3569,8 @@
       "emailSubject": "Zahtjev za podršku pri migraciji",
       "emailDescribeProblem": "Opišite problem:",
       "emailAccountInfo": "Podaci o računu za podršku:",
-      "contactUsCta": "Kontaktirajte nas"
+      "contactUsCta": "Kontaktirajte nas",
+      "copy": "Kopiraj"
     },
     "migrateNowModal": {
       "title": "Migrirajte sada na račun bez skrbništva",

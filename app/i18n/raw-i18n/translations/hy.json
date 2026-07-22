@@ -3569,7 +3569,8 @@
       "emailSubject": "Տեղափոխման աջակցության հարցում",
       "emailDescribeProblem": "Նկարագրեք խնդիրը՝",
       "emailAccountInfo": "Հաշվի տվյալներ աջակցության համար՝",
-      "contactUsCta": "Կապվեք մեզ հետ"
+      "contactUsCta": "Կապվեք մեզ հետ",
+      "copy": "Պատճենել"
     },
     "migrateNowModal": {
       "title": "Տեղափոխվեք հիմա ոչ պահպանող հաշվի",

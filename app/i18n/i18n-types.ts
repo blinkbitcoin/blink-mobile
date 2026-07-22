@@ -12108,6 +12108,10 @@ type RootTranslation = {
 			 * C​o​n​t​a​c​t​ ​u​s
 			 */
 			contactUsCta: string
+			/**
+			 * C​o​p​y
+			 */
+			copy: string
 		}
 	}
 	AccountTypeSelectionScreen: {
@@ -24610,6 +24614,10 @@ export type TranslationFunctions = {
 			 * Contact us
 			 */
 			contactUsCta: () => LocalizedString
+			/**
+			 * Copy
+			 */
+			copy: () => LocalizedString
 		}
 	}
 	AccountTypeSelectionScreen: {

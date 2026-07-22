@@ -3569,7 +3569,8 @@
       "emailSubject": "คำขอความช่วยเหลือเรื่องการย้ายบัญชี",
       "emailDescribeProblem": "อธิบายปัญหา:",
       "emailAccountInfo": "ข้อมูลบัญชีสำหรับฝ่ายสนับสนุน:",
-      "contactUsCta": "ติดต่อเรา"
+      "contactUsCta": "ติดต่อเรา",
+      "copy": "Copy"
     },
     "migrateNowModal": {
       "title": "ย้ายตอนนี้ไปยังบัญชีแบบไม่ฝากดูแล",

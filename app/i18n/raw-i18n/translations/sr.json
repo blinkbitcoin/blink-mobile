@@ -3569,7 +3569,8 @@
       "emailSubject": "Захтев за подршку при миграцији",
       "emailDescribeProblem": "Опишите проблем:",
       "emailAccountInfo": "Подаци о налогу за подршку:",
-      "contactUsCta": "Контактирајте нас"
+      "contactUsCta": "Контактирајте нас",
+      "copy": "Copy"
     },
     "migrateNowModal": {
       "title": "Мигрирајте сада на не-кастодијални налог",

@@ -3569,7 +3569,8 @@
       "emailSubject": "Permintaan dukungan migrasi",
       "emailDescribeProblem": "Jelaskan masalahnya:",
       "emailAccountInfo": "Informasi akun untuk dukungan:",
-      "contactUsCta": "Hubungi kami"
+      "contactUsCta": "Hubungi kami",
+      "copy": "Salin"
     },
     "migrateNowModal": {
       "title": "Migrasikan sekarang ke akun non-kustodial",

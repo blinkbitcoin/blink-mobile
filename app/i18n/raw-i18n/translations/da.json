@@ -3569,7 +3569,8 @@
       "emailSubject": "Supportanmodning om migrering",
       "emailDescribeProblem": "Beskriv problemet:",
       "emailAccountInfo": "Kontooplysninger til support:",
-      "contactUsCta": "Kontakt os"
+      "contactUsCta": "Kontakt os",
+      "copy": "Kopier"
     },
     "migrateNowModal": {
       "title": "Migrér nu til en ikke-depotkonto",

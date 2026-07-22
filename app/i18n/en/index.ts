@@ -3807,6 +3807,7 @@ const en: BaseTranslation = {
       emailDescribeProblem: "Describe the problem:",
       emailAccountInfo: "Account information for support:",
       contactUsCta: "Contact us",
+      copy: "Copy",
     },
   },
   AccountTypeSelectionScreen: {

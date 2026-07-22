@@ -3569,7 +3569,8 @@
             "emailSubject": "Support-Anfrage zur Migration",
             "emailDescribeProblem": "Beschreibe das Problem:",
             "emailAccountInfo": "Kontoinformationen für den Support:",
-            "contactUsCta": "Kontaktiere uns"
+            "contactUsCta": "Kontaktiere uns",
+            "copy": "Kopieren"
         },
         "migrateNowModal": {
             "title": "Migriere jetzt auf ein nicht-verwahrtes Konto",

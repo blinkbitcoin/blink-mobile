@@ -3569,7 +3569,8 @@
       "emailSubject": "Ombi la usaidizi wa uhamishaji",
       "emailDescribeProblem": "Eleza tatizo:",
       "emailAccountInfo": "Taarifa za akaunti kwa usaidizi:",
-      "contactUsCta": "Wasiliana nasi"
+      "contactUsCta": "Wasiliana nasi",
+      "copy": "Nakili"
     },
     "migrateNowModal": {
       "title": "Hamia sasa kwenye akaunti isiyo ya udhamini",

@@ -3569,7 +3569,8 @@
             "emailSubject": "移行サポートのリクエスト",
             "emailDescribeProblem": "問題の内容をご記入ください：",
             "emailAccountInfo": "サポート用アカウント情報：",
-            "contactUsCta": "お問い合わせ"
+            "contactUsCta": "お問い合わせ",
+            "copy": "コピー"
         },
         "migrateNowModal": {
             "title": "今すぐ非カストディアルアカウントに移行してください",

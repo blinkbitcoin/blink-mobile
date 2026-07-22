@@ -3644,7 +3644,8 @@
             "emailSubject": "Migration support request",
             "emailDescribeProblem": "Describe the problem:",
             "emailAccountInfo": "Account information for support:",
-            "contactUsCta": "Contact us"
+            "contactUsCta": "Contact us",
+            "copy": "Copy"
         }
     },
     "AccountTypeSelectionScreen": {

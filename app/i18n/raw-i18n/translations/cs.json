@@ -3569,7 +3569,8 @@
       "emailSubject": "Žádost o podporu při migraci",
       "emailDescribeProblem": "Popište problém:",
       "emailAccountInfo": "Informace o účtu pro podporu:",
-      "contactUsCta": "Kontaktujte nás"
+      "contactUsCta": "Kontaktujte nás",
+      "copy": "Kopírovat"
     },
     "migrateNowModal": {
       "title": "Přejděte nyní na nesvěřenský účet",

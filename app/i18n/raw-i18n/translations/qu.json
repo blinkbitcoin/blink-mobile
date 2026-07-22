@@ -3569,7 +3569,8 @@
       "emailSubject": "Astakuypaq yanapakuy mañakuy",
       "emailDescribeProblem": "Sasachakuyta willay:",
       "emailAccountInfo": "Kuenta willakuykuna yanapakuypaq:",
-      "contactUsCta": "Willawayku"
+      "contactUsCta": "Willawayku",
+      "copy": "Copy"
     },
     "migrateNowModal": {
       "title": "Kunan astakuy mana waqaychasqa kuentaman",

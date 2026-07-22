@@ -3569,7 +3569,8 @@
             "emailSubject": "Richiesta di supporto per la migrazione",
             "emailDescribeProblem": "Descrivi il problema:",
             "emailAccountInfo": "Informazioni dell'account per il supporto:",
-            "contactUsCta": "Contattaci"
+            "contactUsCta": "Contattaci",
+            "copy": "Copia"
         },
         "migrateNowModal": {
             "title": "Migra ora verso un account non custodiale",

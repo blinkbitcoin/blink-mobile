@@ -3569,7 +3569,8 @@
       "emailSubject": "Yêu cầu hỗ trợ di chuyển tài khoản",
       "emailDescribeProblem": "Mô tả vấn đề:",
       "emailAccountInfo": "Thông tin tài khoản cho bộ phận hỗ trợ:",
-      "contactUsCta": "Liên hệ chúng tôi"
+      "contactUsCta": "Liên hệ chúng tôi",
+      "copy": "Copy"
     },
     "migrateNowModal": {
       "title": "Hãy chuyển ngay sang tài khoản không lưu ký",

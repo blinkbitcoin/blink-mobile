@@ -3569,7 +3569,8 @@
       "emailSubject": "Átköltöztetési támogatási kérelem",
       "emailDescribeProblem": "Írja le a problémát:",
       "emailAccountInfo": "Fiókadatok az ügyfélszolgálat számára:",
-      "contactUsCta": "Lépjen kapcsolatba velünk"
+      "contactUsCta": "Lépjen kapcsolatba velünk",
+      "copy": "Másol"
     },
     "migrateNowModal": {
       "title": "Költözzön át most egy nem letétkezelt fiókba",

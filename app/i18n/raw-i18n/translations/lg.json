@@ -3569,7 +3569,8 @@
       "emailSubject": "Okusaba obuyambi ku kutambuza akawunti",
       "emailDescribeProblem": "Nnyonnyola ekizibu:",
       "emailAccountInfo": "Ebikwata ku akawunti eby'obuyambi:",
-      "contactUsCta": "Tutuukirire"
+      "contactUsCta": "Tutuukirire",
+      "copy": "Koppa"
     },
     "migrateNowModal": {
       "title": "Kyusa kaakano ogende ku akawunti etakuumibwa",

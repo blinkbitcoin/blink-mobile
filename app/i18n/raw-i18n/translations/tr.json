@@ -3569,7 +3569,8 @@
       "emailSubject": "Taşıma destek talebi",
       "emailDescribeProblem": "Sorunu açıklayın:",
       "emailAccountInfo": "Destek için hesap bilgileri:",
-      "contactUsCta": "Bize ulaşın"
+      "contactUsCta": "Bize ulaşın",
+      "copy": "Kopyala"
     },
     "migrateNowModal": {
       "title": "Şimdi saklamasız bir hesaba taşının",

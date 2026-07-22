@@ -3569,7 +3569,8 @@
       "emailSubject": "Sol·licitud de suport de migració",
       "emailDescribeProblem": "Descriu el problema:",
       "emailAccountInfo": "Informació del compte per al suport:",
-      "contactUsCta": "Contacta'ns"
+      "contactUsCta": "Contacta'ns",
+      "copy": "Copiar"
     },
     "migrateNowModal": {
       "title": "Migra ara a un compte no custodi",

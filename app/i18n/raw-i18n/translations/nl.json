@@ -3569,7 +3569,8 @@
       "emailSubject": "Supportverzoek migratie",
       "emailDescribeProblem": "Beschrijf het probleem:",
       "emailAccountInfo": "Accountinformatie voor support:",
-      "contactUsCta": "Neem contact op"
+      "contactUsCta": "Neem contact op",
+      "copy": "Kopiëren"
     },
     "migrateNowModal": {
       "title": "Migreer nu naar een niet-bewaarde rekening",
