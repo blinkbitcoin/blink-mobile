@@ -111,6 +111,11 @@ export const useMigrationLnAddressTransfer = ({
           }),
       })
 
+      /** A dropped connection during the connect or the sign can be sent again, so it
+       *  offers the shared retry rather than handing the user to support. */
+      if (proof.status === MigrationSdkStatus.ConnectionError)
+        return LnAddressOutcome.ConnectionIssue
+
       if (proof.status !== MigrationSdkStatus.Ok) {
         reportError(
           "Migration ln-address proof",

@@ -5,6 +5,7 @@ import {
   buildMigrationTransferRequest,
   MigrationSdkStatus,
 } from "@app/self-custodial/migration-transfer-request"
+import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 const mockInitSdk = jest.fn()
@@ -12,6 +13,7 @@ const mockDisconnectSdk = jest.fn()
 const mockGetWalletInfo = jest.fn()
 const mockReceiveLightning = jest.fn()
 const mockReportError = jest.fn()
+const mockClassifySdkError = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   initSdk: (args: unknown) => mockInitSdk(args),
@@ -27,6 +29,11 @@ jest.mock("@app/self-custodial/config", () => ({
 
 jest.mock("@app/utils/error-logging", () => ({
   reportError: (operation: string, err: unknown) => mockReportError(operation, err),
+}))
+
+jest.mock("@app/self-custodial/sdk-error", () => ({
+  ...jest.requireActual("@app/self-custodial/sdk-error"),
+  classifySdkError: (err: unknown) => mockClassifySdkError(err),
 }))
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
@@ -45,6 +52,13 @@ const buildRequest = (signChallenge = jest.fn(() => "migrate:challenge")) =>
     signChallenge,
   })
 
+/** Lets queued microtasks drain without advancing to the next run's connect, so the test
+ *  can observe a second call still waiting on the first's per-directory lock. */
+const flushMicrotasks = (): Promise<void> =>
+  new Promise((resolve) => {
+    setImmediate(resolve)
+  })
+
 describe("buildMigrationTransferRequest", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -53,6 +67,7 @@ describe("buildMigrationTransferRequest", () => {
     mockGetWalletInfo.mockResolvedValue({ identityPubkey: SPARK_PUBKEY })
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockReceiveLightning.mockResolvedValue({ invoice: "lnbcrt1invoice" })
+    mockClassifySdkError.mockReturnValue(SelfCustodialErrorCode.Generic)
   })
 
   const withSignMessage = (signMessage: jest.Mock) =>
@@ -206,6 +221,46 @@ describe("buildMigrationTransferRequest", () => {
       expect.any(Error),
     )
   })
+
+  /** A network-tagged SDK failure (a connection dropped during connect) can be sent again,
+   *  so it is a retryable connection error rather than a settled failure that hands over. */
+  it("classifies a network-tagged connect failure as a connection error", async () => {
+    mockClassifySdkError.mockReturnValue(SelfCustodialErrorCode.NetworkError)
+    mockInitSdk.mockRejectedValue(new Error("connection reset"))
+
+    const result = await buildRequest()
+
+    expect(result).toEqual({
+      status: MigrationSdkStatus.ConnectionError,
+      error: expect.objectContaining({ message: "connection reset" }),
+    })
+  })
+
+  /** Two SDKs on one storage directory race, so a second run for the same account waits for
+   *  the first to release before it connects, covering a retry fired mid-connect. */
+  it("serializes overlapping runs on the same storage directory", async () => {
+    withSignMessage(jest.fn().mockResolvedValue({ signature: "deadbeef" }))
+    let releaseFirstConnect: () => void = () => {}
+    const connectedSdk = {
+      signMessage: jest.fn().mockResolvedValue({ signature: "deadbeef" }),
+    }
+    mockInitSdk.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseFirstConnect = () => resolve(connectedSdk)
+        }),
+    )
+
+    const first = buildRequest()
+    const second = buildRequest()
+    await flushMicrotasks()
+    expect(mockInitSdk).toHaveBeenCalledTimes(1)
+
+    releaseFirstConnect()
+    await Promise.all([first, second])
+
+    expect(mockInitSdk).toHaveBeenCalledTimes(2)
+  })
 })
 
 describe("buildMigrationLnAddressProof", () => {
@@ -217,6 +272,7 @@ describe("buildMigrationLnAddressProof", () => {
     })
     mockGetWalletInfo.mockResolvedValue({ identityPubkey: SPARK_PUBKEY })
     mockDisconnectSdk.mockResolvedValue(undefined)
+    mockClassifySdkError.mockReturnValue(SelfCustodialErrorCode.Generic)
   })
 
   /** The re-point moves no funds, so it needs the proof of possession and nothing else:

@@ -196,6 +196,40 @@ describe("useMigrationLnAddressTransfer", () => {
     )
   })
 
+  /** A dropped connection while signing the proof is retryable, not settled: it offers the
+   *  shared retry rather than handing over, and support never hears about it. */
+  it("marks a connection error during the proof as a retryable connection issue", async () => {
+    mockBuildProof.mockResolvedValue({
+      status: MigrationSdkStatus.ConnectionError,
+      error: new Error("connection reset"),
+    })
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(result.current.hasConnectionIssue).toBe(true)
+    expect(result.current.isRejected).toBe(false)
+    expect(mockTransfer).not.toHaveBeenCalled()
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("retries after a proof connection error and can then settle", async () => {
+    mockBuildProof
+      .mockResolvedValueOnce({
+        status: MigrationSdkStatus.ConnectionError,
+        error: new Error("connection reset"),
+      })
+      .mockResolvedValue(okProof)
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.hasConnectionIssue).toBe(true)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(result.current.isTransferred).toBe(true)
+    expect(mockTransfer).toHaveBeenCalledTimes(1)
+  })
+
   it("hands a top-level rejection to support", async () => {
     mockTransfer.mockResolvedValue(payload([], [{ message: "flag off" }]))
     const { result } = renderTransfer()
