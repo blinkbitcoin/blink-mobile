@@ -41,7 +41,7 @@ const toError = (err: unknown): Error =>
   err instanceof Error ? err : new Error(String(err))
 
 /**
- * A network-tagged SDK error — a connection dropped during the connect or the call — can be
+ * A network-tagged SDK error (a connection dropped during the connect or the call) can be
  * sent again, so it is surfaced as a connection error the caller retries rather than a
  * settled failure that hands the user to support. Every other error is settled.
  */

@@ -4,6 +4,7 @@ import { useMigrationSupportDetails } from "@app/screens/account-migration/hooks
 
 const mockUseMigrationSupportDetailsQuery = jest.fn()
 let mockMnemonic = ""
+let mockLoadMnemonic: () => Promise<string> = () => Promise.resolve(mockMnemonic)
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
@@ -16,7 +17,7 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 }))
 
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
-  useLoadWalletMnemonic: () => () => Promise.resolve(mockMnemonic),
+  useLoadWalletMnemonic: () => () => mockLoadMnemonic(),
 }))
 
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
@@ -31,6 +32,7 @@ describe("useMigrationSupportDetails", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockMnemonic = "abandon ability able"
+    mockLoadMnemonic = () => Promise.resolve(mockMnemonic)
     mockUseMigrationSupportDetailsQuery.mockReturnValue({
       loading: false,
       data: {
@@ -57,6 +59,22 @@ describe("useMigrationSupportDetails", () => {
       email: "email@email.com",
       phone: "+1 374 9383 993",
     })
+  })
+
+  /** Unmounting before the phrase resolves must not set state on a gone component. */
+  it("skips the pubkey update when unmounted before the phrase resolves", async () => {
+    let resolvePhrase: (phrase: string) => void = () => {}
+    mockLoadMnemonic = () =>
+      new Promise((resolve) => {
+        resolvePhrase = resolve
+      })
+
+    const { result, unmount } = renderHook(() => useMigrationSupportDetails())
+    unmount()
+    resolvePhrase("abandon ability able")
+    await Promise.resolve()
+
+    expect(result.current.pubKey).toBe("")
   })
 
   it("falls back to empty strings while the data is unavailable", async () => {

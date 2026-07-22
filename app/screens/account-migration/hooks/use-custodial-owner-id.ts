@@ -34,7 +34,11 @@ export const useCustodialOwnerId = (): UseCustodialOwnerId => {
   const { activeAccount } = useAccountRegistry()
   const isCustodial = activeAccount?.type === AccountType.Custodial
 
-  const { data, loading } = useMigrationOwnerQuery({ skip: !isAuthed || !isCustodial })
+  /** no-cache: a cached me could serve the previous account's owner id after a switch. */
+  const { data, loading } = useMigrationOwnerQuery({
+    skip: !isAuthed || !isCustodial,
+    fetchPolicy: "no-cache",
+  })
 
   return {
     ownerId: isCustodial ? data?.me?.defaultAccount?.id ?? null : null,

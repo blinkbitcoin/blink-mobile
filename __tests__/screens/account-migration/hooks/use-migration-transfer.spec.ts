@@ -535,6 +535,28 @@ describe("useMigrationTransfer", () => {
     expect(result.current.hasConnectionIssue).toBe(true)
   })
 
+  /** A double-tap must not run two retries: the second would clear the commit guard while
+   *  the first is mid-flight and let a second invoice fire. */
+  it("ignores a concurrent retry while the first is still in flight", async () => {
+    mockCommitMigration.mockRejectedValue(networkError())
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.hasConnectionIssue).toBe(true)
+
+    let refetchCount = 0
+    mockStatus = MigrationStatus.InProgress
+    mockRefetchStatus = () => {
+      refetchCount += 1
+      return Promise.resolve(mockStatus)
+    }
+
+    await act(async () => {
+      await Promise.all([result.current.retry(), result.current.retry()])
+    })
+
+    expect(refetchCount).toBe(1)
+  })
+
   it("survives a commit payload with no errors array", async () => {
     mockCommitMigration.mockResolvedValue({ data: undefined })
     const { result } = renderTransfer()
