@@ -67,16 +67,14 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
 
   const { ownerId } = useCustodialOwnerId()
 
-  /**
-   * The lightning-address re-point runs here, as a precondition of Approve. The mutation
-   * needs the custodial session, which the completion swap discards, so the commit screen
-   * is the last place it can fire; Approve stays off until it settles, and a failure hands
-   * over exactly like the start refusal.
-   */
+  /** The re-point runs here, only once the start is confirmed so a rejected start never
+   *  moves the address irreversibly. It needs the custodial session the completion swap
+   *  discards, so this is the last place it can fire, and Approve waits on it. */
+  const isLnRepointBlocked = !preview.isReady || !migrationStart.isStarted
   const lnAddressTransfer = useMigrationLnAddressTransfer({
     custodialAccountId: ownerId,
     selfCustodialAccountId,
-    skip: !preview.isReady,
+    skip: isLnRepointBlocked,
   })
 
   /** The checkpoint only remembers which screen to resume on. Gated on focus so a
