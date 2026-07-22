@@ -30,10 +30,10 @@ const mockLL = {
   TransactionDescription: {
     payTo: jest.fn(({ address }: { address: string }) => `Pay to ${address}`),
     transferFromTokenBalance: jest.fn(
-      ({ token }: { token: string }) => `Transfer from ${token} balance`,
+      ({ token }: { token: string }) => `Transfer from ${token} Balance`,
     ),
     transferToTokenBalance: jest.fn(
-      ({ token }: { token: string }) => `Transfer to ${token} balance`,
+      ({ token }: { token: string }) => `Transfer to ${token} Balance`,
     ),
     transferFromBitcoinBalance: jest.fn(() => "Transfer from Bitcoin balance"),
     transferToBitcoinBalance: jest.fn(() => "Transfer to Bitcoin balance"),
@@ -79,7 +79,7 @@ describe("getTransactionDescription", () => {
       tokenTicker: "USDB",
       direction: TransactionDirection.Send,
     })
-    expect(getTransactionDescription(tx, mockLL)).toBe("Transfer from USD balance")
+    expect(getTransactionDescription(tx, mockLL)).toBe("Transfer from USD Balance")
   })
 
   it("returns transferToTokenBalance for receive conversion with token", () => {
@@ -88,7 +88,7 @@ describe("getTransactionDescription", () => {
       tokenTicker: "USDB",
       direction: TransactionDirection.Receive,
     })
-    expect(getTransactionDescription(tx, mockLL)).toBe("Transfer to USD balance")
+    expect(getTransactionDescription(tx, mockLL)).toBe("Transfer to USD Balance")
   })
 
   it("returns transferFromBitcoinBalance for send conversion without token", () => {

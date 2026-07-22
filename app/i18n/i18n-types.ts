@@ -8204,12 +8204,12 @@ type RootTranslation = {
 		 */
 		transferToBitcoinBalance: string
 		/**
-		 * T​r​a​n​s​f​e​r​ ​f​r​o​m​ ​{​t​o​k​e​n​}​ ​b​a​l​a​n​c​e
+		 * T​r​a​n​s​f​e​r​ ​f​r​o​m​ ​{​t​o​k​e​n​}​ ​B​a​l​a​n​c​e
 		 * @param {string} token
 		 */
 		transferFromTokenBalance: RequiredParams<'token'>
 		/**
-		 * T​r​a​n​s​f​e​r​ ​t​o​ ​{​t​o​k​e​n​}​ ​b​a​l​a​n​c​e
+		 * T​r​a​n​s​f​e​r​ ​t​o​ ​{​t​o​k​e​n​}​ ​B​a​l​a​n​c​e
 		 * @param {string} token
 		 */
 		transferToTokenBalance: RequiredParams<'token'>
@@ -20748,11 +20748,11 @@ export type TranslationFunctions = {
 		 */
 		transferToBitcoinBalance: () => LocalizedString
 		/**
-		 * Transfer from {token} balance
+		 * Transfer from {token} Balance
 		 */
 		transferFromTokenBalance: (arg: { token: string }) => LocalizedString
 		/**
-		 * Transfer to {token} balance
+		 * Transfer to {token} Balance
 		 */
 		transferToTokenBalance: (arg: { token: string }) => LocalizedString
 		/**

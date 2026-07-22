@@ -2524,8 +2524,8 @@
         "onchainWithdrawal": "On-chain Withdrawal",
         "transferFromBitcoinBalance": "Transfer from Bitcoin Balance",
         "transferToBitcoinBalance": "Transfer to Bitcoin Balance",
-        "transferFromTokenBalance": "Transfer from {token: string} balance",
-        "transferToTokenBalance": "Transfer to {token: string} balance",
+        "transferFromTokenBalance": "Transfer from {token: string} Balance",
+        "transferToTokenBalance": "Transfer to {token: string} Balance",
         "tokenTransfer": "{token: string} Transfer",
         "payTo": "Pay to {address: string}",
         "payment": "Payment"
