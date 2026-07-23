@@ -60,14 +60,17 @@
 
 ## Bitcoin/Lightning
 
-| Package | Purpose |
-|---------|---------|
-| bitcoinjs-lib | Bitcoin primitives |
-| js-lnurl | LNURL protocol |
-| lnurl-pay | LNURL payment |
-| @blinkbitcoin/blink-client | Blink API client |
-| bip21 | Bitcoin URI parsing |
-| bip39 | Mnemonic phrases |
+| Package | Version | Purpose |
+|---------|---------|---------|
+| @blinkbitcoin/blink-client | 1.0.0 | Blink payment destination parser and API client |
+| bitcoinjs-lib | ^6.1.5 | Bitcoin primitives |
+| bolt11 | ~1.4.1 | Lightning invoice parsing |
+| js-lnurl | 0.6.0 | LNURL protocol |
+| lnurl-pay | ^5.0.2 | LNURL payment requests |
+| @noble/hashes | ^1.8.0 | Cryptographic hash utilities used by payment parsing |
+| @scure/base | ^1.1.9 | Base encoding utilities used by payment parsing |
+| bip21 | - | Bitcoin URI parsing |
+| bip39 | ^3.1.0 | Mnemonic phrases |
 
 ## Native Capabilities
 
