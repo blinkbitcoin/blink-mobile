@@ -675,7 +675,9 @@ describe("HomeScreen", () => {
     },
   )
 
-  const testDisabledTransferButton = async (shouldShowDollarModal: boolean = true) => {
+  const testDisabledTransferButton = async (
+    shouldShowDollarTransferDisabledModal: boolean = true,
+  ) => {
     mockTransferBlockedOverride = true
     currentMocks = generateHomeMock({
       level: AccountLevel.Two,
@@ -698,7 +700,7 @@ describe("HomeScreen", () => {
 
     fireEvent.press(getByTestId("transfer"))
 
-    expect(mockDollarBalanceModalVisible).toBe(shouldShowDollarModal)
+    expect(mockDollarBalanceModalVisible).toBe(shouldShowDollarTransferDisabledModal)
   }
 
   it("Disable the transfer button when transfers are blocked and show disabled model when clicked", async () => {
@@ -750,7 +752,7 @@ describe("HomeScreen", () => {
       needsBackendAuth: false,
     }
 
-    await testDisabledTransferButton(false)
+    await testDisabledTransferButton()
 
     mockActiveWalletOverride = null
   })
