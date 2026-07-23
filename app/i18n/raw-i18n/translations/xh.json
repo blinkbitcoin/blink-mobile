@@ -2538,6 +2538,8 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "I-Onchain ephambili (ngokukhawuleza)",
+    "onchainStandard": "I-Onchain eqhelekileyo (~4h)",
+    "onchainEconomy": "I-Onchain elondolozayo",
     "lightningTransactions": "Iintengiselwano ze-Lightning",
     "onchainBelowThreshold": "I-Onchain ngaphantsi kwe-{threshold: string} SAT",
     "onchainAboveThreshold": "I-Onchain ngaphezulu kwe-{threshold: string} SAT",

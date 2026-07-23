@@ -28,6 +28,10 @@ gql`
 const formatBps = (bps: number): string =>
   `${(bps / 100).toLocaleString("en-US", { maximumFractionDigits: 2 })}%`
 
+// Remote-config contract: a negative rate hides its row (and the section when
+// no rows remain), 0 renders as "no fee", positive values render the rate.
+const isRowVisible = (bps: number): boolean => bps >= 0
+
 type FeeRateRowProps = {
   label: string
   value: string
@@ -97,12 +101,17 @@ export const FeeRatesScreen: React.FC = () => {
     refetch().catch(() => {})
   }, [refetch])
 
-  const sendItems = useMemo(
-    () => [
-      function LightningSendRow() {
+  const sendItems = useMemo(() => {
+    const tierValue = (bps: number) =>
+      bps === 0
+        ? LL.FeeRatesScreen.noFee()
+        : LL.FeeRatesScreen.fromApprox({ fee: formatBps(bps) })
+
+    const items: React.FC[] = []
+    if (isRowVisible(feeRatesConfig.lightningSendBps)) {
+      items.push(function LightningSendRow() {
         const isFree =
-          feeRatesConfig.lightningSendBps === 0 &&
-          feeRatesConfig.lightningRoutingBps === 0
+          feeRatesConfig.lightningSendBps === 0 && feeRatesConfig.lightningRoutingBps <= 0
         return (
           <FeeRateRow
             label={LL.FeeRatesScreen.lightning()}
@@ -111,33 +120,55 @@ export const FeeRatesScreen: React.FC = () => {
                 ? LL.FeeRatesScreen.noFee()
                 : LL.FeeRatesScreen.lightningSendFee({
                     fee: formatBps(feeRatesConfig.lightningSendBps),
-                    routingFee: formatBps(feeRatesConfig.lightningRoutingBps),
+                    routingFee: formatBps(
+                      Math.max(feeRatesConfig.lightningRoutingBps, 0),
+                    ),
                   })
             }
           />
         )
-      },
-      function IntraledgerRow() {
-        return (
-          <FeeRateRow
-            label={LL.FeeRatesScreen.intraledger()}
-            value={LL.FeeRatesScreen.noFee()}
-          />
-        )
-      },
-      function OnchainPriorityRow() {
+      })
+    }
+    items.push(function IntraledgerRow() {
+      return (
+        <FeeRateRow
+          label={LL.FeeRatesScreen.intraledger()}
+          value={LL.FeeRatesScreen.noFee()}
+        />
+      )
+    })
+    if (isRowVisible(feeRatesConfig.onchainPriorityBps)) {
+      items.push(function OnchainPriorityRow() {
         return (
           <FeeRateRow
             label={LL.FeeRatesScreen.onchainPriority()}
-            value={LL.FeeRatesScreen.fromApprox({
-              fee: formatBps(feeRatesConfig.onchainPriorityBps),
-            })}
+            value={tierValue(feeRatesConfig.onchainPriorityBps)}
           />
         )
-      },
-    ],
-    [LL, feeRatesConfig],
-  )
+      })
+    }
+    if (isRowVisible(feeRatesConfig.onchainStandardBps)) {
+      items.push(function OnchainStandardRow() {
+        return (
+          <FeeRateRow
+            label={LL.FeeRatesScreen.onchainStandard()}
+            value={tierValue(feeRatesConfig.onchainStandardBps)}
+          />
+        )
+      })
+    }
+    if (isRowVisible(feeRatesConfig.onchainEconomyBps)) {
+      items.push(function OnchainEconomyRow() {
+        return (
+          <FeeRateRow
+            label={LL.FeeRatesScreen.onchainEconomy()}
+            value={tierValue(feeRatesConfig.onchainEconomyBps)}
+          />
+        )
+      })
+    }
+    return items
+  }, [LL, feeRatesConfig])
 
   const receiveItems = useMemo(() => {
     const items: React.FC[] = [
@@ -184,19 +215,23 @@ export const FeeRatesScreen: React.FC = () => {
     return items
   }, [LL, deposit, loading, error, retry])
 
-  const transferItems = useMemo(
-    () => [
+  const transferItems = useMemo(() => {
+    if (!isRowVisible(feeRatesConfig.transferBps)) return []
+    return [
       function TransferFeeRow() {
         return (
           <FeeRateRow
             label={LL.FeeRatesScreen.transferFee()}
-            value={formatBps(feeRatesConfig.transferBps)}
+            value={
+              feeRatesConfig.transferBps === 0
+                ? LL.FeeRatesScreen.noFee()
+                : formatBps(feeRatesConfig.transferBps)
+            }
           />
         )
       },
-    ],
-    [LL, feeRatesConfig],
-  )
+    ]
+  }, [LL, feeRatesConfig])
 
   return (
     <Screen preset="scroll">
@@ -217,14 +252,16 @@ export const FeeRatesScreen: React.FC = () => {
             dividerStyle={styles.hiddenDivider}
           />
         </View>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{LL.FeeRatesScreen.transfer()}</Text>
-          <SettingsGroup
-            items={transferItems}
-            containerStyle={styles.groupCard}
-            dividerStyle={styles.hiddenDivider}
-          />
-        </View>
+        {transferItems.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{LL.FeeRatesScreen.transfer()}</Text>
+            <SettingsGroup
+              items={transferItems}
+              containerStyle={styles.groupCard}
+              dividerStyle={styles.hiddenDivider}
+            />
+          </View>
+        )}
       </View>
     </Screen>
   )

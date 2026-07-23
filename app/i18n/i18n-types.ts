@@ -8305,6 +8305,14 @@ type RootTranslation = {
 		 */
 		onchainPriority: string
 		/**
+		 * O​n​c​h​a​i​n​ ​s​t​a​n​d​a​r​d​ ​(​~​4​h​)
+		 */
+		onchainStandard: string
+		/**
+		 * O​n​c​h​a​i​n​ ​e​c​o​n​o​m​y
+		 */
+		onchainEconomy: string
+		/**
 		 * L​i​g​h​t​n​i​n​g​ ​t​r​a​n​s​a​c​t​i​o​n​s
 		 */
 		lightningTransactions: string
@@ -20931,6 +20939,14 @@ export type TranslationFunctions = {
 		 * Onchain priority (asap)
 		 */
 		onchainPriority: () => LocalizedString
+		/**
+		 * Onchain standard (~4h)
+		 */
+		onchainStandard: () => LocalizedString
+		/**
+		 * Onchain economy
+		 */
+		onchainEconomy: () => LocalizedString
 		/**
 		 * Lightning transactions
 		 */

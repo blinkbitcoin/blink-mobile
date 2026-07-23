@@ -61,6 +61,8 @@ export type FeeRatesConfig = {
   lightningSendBps: number
   lightningRoutingBps: number
   onchainPriorityBps: number
+  onchainStandardBps: number
+  onchainEconomyBps: number
   transferBps: number
 }
 
@@ -113,12 +115,15 @@ const defaultReplaceCardDeliveryConfig = {
   express: { minDays: 1, maxDays: 2, priceUsd: 15 },
 }
 
-// Lightning send is free for now; set non-zero bps remotely to start showing a
-// rate without an app release.
+// Fee rates page contract: a negative rate hides its row (and the section when
+// no rows remain), 0 renders as "no fee", positive values render the rate — so
+// rows can be shown/hidden and repriced remotely without an app release.
 export const defaultFeeRatesConfig: FeeRatesConfig = {
   lightningSendBps: 0,
   lightningRoutingBps: 0,
   onchainPriorityBps: 90,
+  onchainStandardBps: -1,
+  onchainEconomyBps: -1,
   transferBps: 50,
 }
 

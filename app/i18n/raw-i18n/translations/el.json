@@ -2538,6 +2538,8 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain προτεραιότητα (το συντομότερο)",
+    "onchainStandard": "Onchain κανονικό (~4ω)",
+    "onchainEconomy": "Onchain οικονομικό",
     "lightningTransactions": "Συναλλαγές Lightning",
     "onchainBelowThreshold": "Onchain κάτω από {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain πάνω από {threshold: string} SAT",

@@ -2538,6 +2538,8 @@
         "lightning": "ライトニング",
         "intraledger": "イントラレジャー",
         "onchainPriority": "オンチェーン優先 (最速)",
+        "onchainStandard": "オンチェーン標準 (~4時間)",
+        "onchainEconomy": "オンチェーン節約",
         "lightningTransactions": "ライトニング取引",
         "onchainBelowThreshold": "オンチェーン {threshold: string} SAT未満",
         "onchainAboveThreshold": "オンチェーン {threshold: string} SAT超",

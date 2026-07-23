@@ -2538,6 +2538,8 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain ưu tiên (sớm nhất)",
+    "onchainStandard": "Onchain tiêu chuẩn (~4 giờ)",
+    "onchainEconomy": "Onchain tiết kiệm",
     "lightningTransactions": "Giao dịch Lightning",
     "onchainBelowThreshold": "Onchain dưới {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain trên {threshold: string} SAT",

@@ -2538,6 +2538,8 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain առաջնահերթ (հնարավորինս շուտ)",
+    "onchainStandard": "Onchain ստանդարտ (~4ժ)",
+    "onchainEconomy": "Onchain խնայողական",
     "lightningTransactions": "Lightning գործարքներ",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT-ից ցածր",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT-ից բարձր",

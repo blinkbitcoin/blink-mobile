@@ -2538,6 +2538,8 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain keutamaan (secepat mungkin)",
+    "onchainStandard": "Onchain standard (~4 jam)",
+    "onchainEconomy": "Onchain ekonomi",
     "lightningTransactions": "Transaksi Lightning",
     "onchainBelowThreshold": "Onchain bawah {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain atas {threshold: string} SAT",

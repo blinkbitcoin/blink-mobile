@@ -91,6 +91,42 @@ describe("FeeRatesScreen", () => {
     await findByText("2,500 SAT")
   })
 
+  it("shows onchain standard and economy tiers when remote config enables them", async () => {
+    mockFeeRatesConfig = {
+      ...defaultFeeRatesConfig,
+      onchainStandardBps: 60,
+      onchainEconomyBps: 40,
+    }
+
+    const { getByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    expect(getByText("Onchain standard (~4h)")).toBeTruthy()
+    expect(getByText("from ~0.6%")).toBeTruthy()
+    expect(getByText("Onchain economy")).toBeTruthy()
+    expect(getByText("from ~0.4%")).toBeTruthy()
+
+    await findByText("2,500 SAT")
+  })
+
+  it("hides the whole Transfer section when remote config sets a negative rate", async () => {
+    mockFeeRatesConfig = { ...defaultFeeRatesConfig, transferBps: -1 }
+
+    const { queryByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText("Transfer")).toBeNull()
+    expect(queryByText("Transfer fee")).toBeNull()
+
+    await findByText("2,500 SAT")
+  })
+
   it("renders onchain receive fees from the API", async () => {
     const { findByText } = render(
       <ContextForScreen>

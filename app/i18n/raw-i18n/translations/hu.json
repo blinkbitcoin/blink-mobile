@@ -2538,6 +2538,8 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain elsőbbségi (mihamarabb)",
+    "onchainStandard": "Onchain normál (~4 óra)",
+    "onchainEconomy": "Onchain gazdaságos",
     "lightningTransactions": "Lightning tranzakciók",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT alatt",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT felett",
