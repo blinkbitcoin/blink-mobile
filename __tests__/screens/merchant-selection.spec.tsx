@@ -13,6 +13,13 @@ import { ContextForScreenWithTheme } from "./helper"
 
 const mockReplace = jest.fn()
 const mockAccountDefaultWalletQuery = jest.fn()
+const mockScanContext = {
+  myWalletIds: ["btc-wallet-id"],
+  bitcoinNetwork: "mainnet",
+  lnurlDomains: ["blink.sv"],
+}
+let mockSelfCustodialSdk: unknown
+let mockSparkNetwork = "MAINNET"
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
@@ -30,19 +37,15 @@ jest.mock("@app/hooks", () => ({
 }))
 
 jest.mock("@app/hooks/use-scan-context", () => ({
-  useScanContext: () => ({
-    myWalletIds: ["btc-wallet-id"],
-    bitcoinNetwork: "mainnet",
-    lnurlDomains: ["blink.sv"],
-  }),
+  useScanContext: () => mockScanContext,
 }))
 
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
-  useSparkNetwork: () => "MAINNET",
+  useSparkNetwork: () => mockSparkNetwork,
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
-  useSelfCustodialWallet: () => ({ sdk: undefined }),
+  useSelfCustodialWallet: () => ({ sdk: mockSelfCustodialSdk }),
 }))
 
 jest.mock(
@@ -106,6 +109,13 @@ describe("MerchantSelectionScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    Object.assign(mockScanContext, {
+      myWalletIds: ["btc-wallet-id"],
+      bitcoinNetwork: "mainnet",
+      lnurlDomains: ["blink.sv"],
+    })
+    mockSelfCustodialSdk = undefined
+    mockSparkNetwork = "MAINNET"
     resolveDestinationMock.mockResolvedValue({
       valid: true,
       destinationDirection: DestinationDirection.Send,
@@ -140,7 +150,7 @@ describe("MerchantSelectionScreen", () => {
     expect(screen.getByTestId("icon-coins")).toBeTruthy()
   })
 
-  it("selects a row and continues directly to details with the selected merchant lnurl", async () => {
+  it("selects a row and continues directly to details with the selected merchant lnurl for custodial accounts", async () => {
     renderScreen()
 
     fireEvent.press(
@@ -171,6 +181,44 @@ describe("MerchantSelectionScreen", () => {
     })
     expect(mockReplace).not.toHaveBeenCalledWith("sendBitcoinDestination", {
       payment: merchants[0].lnurl,
+    })
+  })
+
+  it("resolves the selected merchant through the Breez Spark session for self-custodial accounts", async () => {
+    const sparkSdk = { id: "spark-sdk" }
+    mockSelfCustodialSdk = sparkSdk
+    mockSparkNetwork = "REGTEST"
+    Object.assign(mockScanContext, {
+      myWalletIds: ["spark-wallet-id"],
+      bitcoinNetwork: "regtest",
+      lnurlDomains: [],
+    })
+
+    renderScreen()
+
+    fireEvent.press(
+      screen.getByLabelText(`${merchants[1].title}. ${merchants[1].description}`),
+    )
+
+    await waitFor(() =>
+      expect(resolveDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rawInput: merchants[1].lnurl,
+          myWalletIds: ["spark-wallet-id"],
+          bitcoinNetwork: "regtest",
+          lnurlDomains: [],
+          accountDefaultWalletQuery: mockAccountDefaultWalletQuery,
+          displayCurrency: "USD",
+        }),
+        { sdk: sparkSdk, network: "REGTEST" },
+        "blink.sv",
+      ),
+    )
+    expect(mockReplace).toHaveBeenCalledWith("sendBitcoinDetails", {
+      paymentDestination: expect.objectContaining({
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
+      }),
     })
   })
 
