@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Nchi",
+    "registered": "Imesajiliwa",
+    "detected": "Imegunduliwa",
     "unknown": "Haijulikani",
     "enabled": "Imewashwa",
     "switch": "Swichi",

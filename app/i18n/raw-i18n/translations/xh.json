@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Ilizwe",
+    "registered": "Bhalisiwe",
+    "detected": "Ifunyenwe",
     "unknown": "Ayaziwa",
     "enabled": "Ivuliwe",
     "switch": "Iswitshi",

@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Ország",
+    "registered": "Regisztrált",
+    "detected": "Észlelt",
     "unknown": "Ismeretlen",
     "enabled": "Engedélyezve",
     "switch": "Kapcsoló",

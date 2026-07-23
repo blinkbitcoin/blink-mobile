@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Eggwanga",
+    "registered": "Ewandiisiddwa",
+    "detected": "Ezuuliddwa",
     "unknown": "Tekimanyiddwa",
     "enabled": "Esobozeseddwa",
     "switch": "Swichi",

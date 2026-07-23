@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "البلد",
+    "registered": "مُسجّل",
+    "detected": "مُكتشَف",
     "unknown": "غير معروف",
     "enabled": "مُفعَّل",
     "switch": "مفتاح",

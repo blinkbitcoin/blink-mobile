@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Land",
+    "registered": "Geregistreerd",
+    "detected": "Gedetecteerd",
     "unknown": "Onbekend",
     "enabled": "Ingeschakeld",
     "switch": "Schakelaar",

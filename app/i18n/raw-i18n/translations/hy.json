@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Երկիր",
+    "registered": "Գրանցված",
+    "detected": "Հայտնաբերված",
     "unknown": "Անհայտ",
     "enabled": "Միացված",
     "switch": "Անջատիչ",
