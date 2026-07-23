@@ -49,31 +49,30 @@ export const parseDestination = async ({
 
   if (maybeMerchantDestination.paymentType === MerchantPaymentType) {
     const merchants = maybeMerchantDestination.merchants ?? []
-    if (merchants.length === 1) {
-      const merchant = merchants[0]
-
-      return resolveLnurlDestination({
-        parsedLnurlDestination: {
-          paymentType: PaymentType.Lnurl,
-          valid: true,
-          lnurl: merchant.lnurl,
-          isMerchant: true,
-          merchant,
+    if (merchants.length !== 1) {
+      return {
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
+        validDestination: {
+          paymentType: MerchantPaymentType,
+          merchants,
         },
-        lnurlDomains,
-        accountDefaultWalletQuery,
-        myWalletIds,
-      })
+      } as const
     }
 
-    return {
-      valid: true,
-      destinationDirection: DestinationDirection.Send,
-      validDestination: {
-        paymentType: MerchantPaymentType,
-        merchants,
+    const [merchant] = merchants
+    return resolveLnurlDestination({
+      parsedLnurlDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: true,
+        lnurl: merchant.lnurl,
+        isMerchant: true,
+        merchant,
       },
-    } as const
+      lnurlDomains,
+      accountDefaultWalletQuery,
+      myWalletIds,
+    })
   }
 
   switch (parsedDestination.paymentType) {

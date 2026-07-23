@@ -40,7 +40,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
 
   const renderMerchant = useCallback(
     ({ item, index }: { item: MerchantChoice; index: number }) => {
-      const selected = item.id === selectedMerchantId
+      const isSelected = item.id === selectedMerchantId
       const title = item.title || item.companyName
       const description = item.description
       const accessibilityLabel = `${title}. ${description}`
@@ -78,7 +78,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
               {description}
             </Text>
           </View>
-          {selected ? (
+          {isSelected ? (
             <View {...testProps(`merchant-${item.id}-selected`)}>
               <GaloyIcon name="check" size={22} color={colors._green} weight="bold" />
             </View>
