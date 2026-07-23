@@ -3504,6 +3504,7 @@
       },
       "Phrase": {
         "headerTitle": "Kifungu cha akiba",
+        "authDescription": "Thibitisha ili kuona kifungu chako cha akiba",
         "sparkCompatible": "Maneno haya ya nakala yanafanya kazi katika {sparkCompatibleLink} yoyote",
         "sparkCompatibleLink": "pochi inayoendana na Spark",
         "copiedToast": "Maneno ya nakala yamenakiliwa kwenye ubao",

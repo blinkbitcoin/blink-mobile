@@ -3504,6 +3504,7 @@
       },
       "Phrase": {
         "headerTitle": "Pričuvna fraza",
+        "authDescription": "Autentificirajte se za prikaz pričuvne fraze",
         "sparkCompatible": "Ova sigurnosna fraza radi u svakom {sparkCompatibleLink}",
         "sparkCompatibleLink": "novčaniku kompatibilnom sa Spark",
         "copiedToast": "Sigurnosna fraza kopirana u međuspremnik",

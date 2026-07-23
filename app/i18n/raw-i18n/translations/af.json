@@ -3504,6 +3504,7 @@
       },
       "Phrase": {
         "headerTitle": "Rugsteunfrase",
+        "authDescription": "Bevestig om jou rugsteunfrase te sien",
         "sparkCompatible": "Hierdie rugsteunfrase werk in enige {sparkCompatibleLink}",
         "sparkCompatibleLink": "Spark-versoenbare beursie",
         "copiedToast": "Rugsteunfrase na knipbord gekopieer",

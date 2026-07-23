@@ -3504,6 +3504,7 @@
       },
       "Phrase": {
         "headerTitle": "Ebigambo by'enkalakkalira",
+        "authDescription": "Kakasa okulaba ebigambo byo eby'enkalakkalira",
         "sparkCompatible": "Ekigambo kino eky'okukoppa kikola mu {sparkCompatibleLink} yonna",
         "sparkCompatibleLink": "nsawo eyekuvaanyizibwa ne Spark",
         "copiedToast": "Ekigambo eky'okukoppa kiwanduukuliddwa ku lutimbe",

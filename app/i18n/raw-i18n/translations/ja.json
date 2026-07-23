@@ -3504,6 +3504,7 @@
             },
             "Phrase": {
                 "headerTitle": "リカバリーフレーズ",
+                "authDescription": "認証してリカバリーフレーズを表示",
                 "sparkCompatible": "このバックアップフレーズは{sparkCompatibleLink}で使用できます",
                 "sparkCompatibleLink": "Spark対応ウォレット",
                 "copiedToast": "バックアップフレーズをクリップボードにコピーしました",

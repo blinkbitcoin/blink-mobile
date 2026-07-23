@@ -3504,6 +3504,7 @@
       },
       "Phrase": {
         "headerTitle": "Waqaychana rimay",
+        "authDescription": "Riqsichikuy waqaychana rimayniykita qhawanaykipaq",
         "sparkCompatible": "Kay waqaychay rimaykunaqa {sparkCompatibleLink} llamkan",
         "sparkCompatibleLink": "Spark wallitakunapi",
         "copiedToast": "Waqaychay rimay kopiyasqa",

@@ -3504,6 +3504,7 @@
       },
       "Phrase": {
         "headerTitle": "Gendannelsesfrase",
+        "authDescription": "Autentificer for at se din gendannelsesfrase",
         "sparkCompatible": "Denne backup-sætning fungerer i enhver {sparkCompatibleLink}",
         "sparkCompatibleLink": "Spark-kompatibel tegnebog",
         "copiedToast": "Backup-sætning kopieret til udklipsholder",

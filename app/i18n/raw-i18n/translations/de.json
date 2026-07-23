@@ -3504,6 +3504,7 @@
             },
             "Phrase": {
                 "headerTitle": "Wiederherstellungsphrase",
+                "authDescription": "Authentifizieren, um die Wiederherstellungsphrase anzuzeigen",
                 "sparkCompatible": "Diese Sicherungswörter funktionieren in jeder {sparkCompatibleLink}",
                 "sparkCompatibleLink": "Spark-kompatiblen Wallet",
                 "copiedToast": "Sicherungswörter in die Zwischenablage kopiert",

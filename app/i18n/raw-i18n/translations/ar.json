@@ -3504,6 +3504,7 @@
       },
       "Phrase": {
         "headerTitle": "عبارة النسخ الاحتياطي",
+        "authDescription": "قم بالتحقّق لعرض عبارة النسخ الاحتياطي الخاصة بك",
         "sparkCompatible": "تعمل عبارة النسخ الاحتياطي هذه في أي {sparkCompatibleLink}",
         "sparkCompatibleLink": "محفظة متوافقة مع Spark",
         "copiedToast": "تم نسخ عبارة النسخ الاحتياطي إلى الحافظة",

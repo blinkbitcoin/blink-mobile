@@ -3504,6 +3504,7 @@
       },
       "Phrase": {
         "headerTitle": "Herstelzin",
+        "authDescription": "Authenticeer om je herstelzin te bekijken",
         "sparkCompatible": "Deze back-upzin werkt in elke {sparkCompatibleLink}",
         "sparkCompatibleLink": "Spark-compatibele portemonnee",
         "copiedToast": "Back-upzin naar klembord gekopieerd",
