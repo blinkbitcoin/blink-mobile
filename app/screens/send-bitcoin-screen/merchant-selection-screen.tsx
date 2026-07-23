@@ -5,11 +5,18 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useAppConfig, useDisplayCurrency } from "@app/hooks"
+import { useAccountDefaultWalletLazyQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { logParseDestinationResult } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
+import { useScanContext } from "@app/hooks/use-scan-context"
 
-import { MerchantChoice } from "./payment-destination/index.types"
+import { resolveDestination } from "./payment-destination/resolve-destination"
+import { isSendDestination, MerchantChoice } from "./payment-destination/index.types"
 
 type Props = {
   route: RouteProp<RootStackParamList, "merchantSelection">
@@ -27,15 +34,60 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "merchantSelection">>()
   const [selectedMerchantId, setSelectedMerchantId] = useState<string | null>(null)
+  const { myWalletIds, bitcoinNetwork, lnurlDomains } = useScanContext()
+  const { displayCurrency } = useDisplayCurrency()
+  const { sdk } = useSelfCustodialWallet()
+  const sparkNetwork = useSparkNetwork()
+  const [accountDefaultWalletQuery] = useAccountDefaultWalletLazyQuery({
+    fetchPolicy: "no-cache",
+  })
+  const {
+    appConfig: {
+      galoyInstance: { lnAddressHostname },
+    },
+  } = useAppConfig()
 
   const handleMerchantPress = useCallback(
-    (merchant: MerchantChoice) => {
+    async (merchant: MerchantChoice) => {
       setSelectedMerchantId(merchant.id)
-      setTimeout(() => {
+
+      if (!bitcoinNetwork) {
         navigation.replace("sendBitcoinDestination", { payment: merchant.lnurl })
-      }, 0)
+        return
+      }
+
+      const destination = await resolveDestination(
+        {
+          rawInput: merchant.lnurl,
+          myWalletIds,
+          bitcoinNetwork,
+          lnurlDomains,
+          accountDefaultWalletQuery,
+          displayCurrency,
+        },
+        { sdk, network: sparkNetwork },
+        lnAddressHostname,
+      )
+      logParseDestinationResult(destination)
+
+      if (isSendDestination(destination)) {
+        navigation.replace("sendBitcoinDetails", { paymentDestination: destination })
+        return
+      }
+
+      navigation.replace("sendBitcoinDestination", { payment: merchant.lnurl })
     },
-    [navigation],
+    [
+      navigation,
+      myWalletIds,
+      bitcoinNetwork,
+      lnurlDomains,
+      accountDefaultWalletQuery,
+      displayCurrency,
+      sdk,
+      sparkNetwork,
+      lnAddressHostname,
+    ],
   )
 
   const renderMerchant = useCallback(

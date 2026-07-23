@@ -1,14 +1,60 @@
 import React from "react"
 import { StyleSheet } from "react-native"
 
-import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import MerchantSelectionScreen from "@app/screens/send-bitcoin-screen/merchant-selection-screen"
+import { DestinationDirection } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
+import { resolveDestination } from "@app/screens/send-bitcoin-screen/payment-destination/resolve-destination"
+import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import { ContextForScreenWithTheme } from "./helper"
 
 const mockReplace = jest.fn()
+const mockAccountDefaultWalletQuery = jest.fn()
+
+jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
+  useAccountDefaultWalletLazyQuery: () => [mockAccountDefaultWalletQuery],
+}))
+
+jest.mock("@app/hooks", () => ({
+  ...jest.requireActual("@app/hooks"),
+  useAppConfig: () => ({
+    appConfig: {
+      galoyInstance: { lnAddressHostname: "blink.sv" },
+    },
+  }),
+  useDisplayCurrency: () => ({ displayCurrency: "USD" }),
+}))
+
+jest.mock("@app/hooks/use-scan-context", () => ({
+  useScanContext: () => ({
+    myWalletIds: ["btc-wallet-id"],
+    bitcoinNetwork: "mainnet",
+    lnurlDomains: ["blink.sv"],
+  }),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => "MAINNET",
+}))
+
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => ({ sdk: undefined }),
+}))
+
+jest.mock(
+  "@app/screens/send-bitcoin-screen/payment-destination/resolve-destination",
+  () => ({
+    resolveDestination: jest.fn(),
+  }),
+)
+
+jest.mock("@app/utils/analytics", () => ({
+  logParseDestinationResult: jest.fn(),
+}))
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -53,9 +99,26 @@ const renderScreen = (mode: "light" | "dark" = "light", routeParams = route.para
   )
 
 describe("MerchantSelectionScreen", () => {
+  const resolveDestinationMock = resolveDestination as jest.MockedFunction<
+    typeof resolveDestination
+  >
+
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    resolveDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Lnurl,
+        lnurl: merchants[1].lnurl,
+        isMerchant: true,
+        merchant: merchants[1],
+        lnurlParams: {} as never,
+      },
+      createPaymentDetail: jest.fn(),
+    })
   })
 
   it("renders merchant rows in order with titles, descriptions, and fallback icons", () => {
@@ -77,8 +140,7 @@ describe("MerchantSelectionScreen", () => {
     expect(screen.getByTestId("icon-coins")).toBeTruthy()
   })
 
-  it("selects a row and continues with the selected merchant lnurl", () => {
-    jest.useFakeTimers()
+  it("selects a row and continues directly to details with the selected merchant lnurl", async () => {
     renderScreen()
 
     fireEvent.press(
@@ -87,12 +149,22 @@ describe("MerchantSelectionScreen", () => {
 
     expect(screen.getByTestId(`merchant-${merchants[1].id}-selected`)).toBeTruthy()
 
-    act(() => {
-      jest.runOnlyPendingTimers()
-    })
-
-    expect(mockReplace).toHaveBeenCalledWith("sendBitcoinDestination", {
-      payment: merchants[1].lnurl,
+    await waitFor(() =>
+      expect(resolveDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rawInput: merchants[1].lnurl,
+          displayCurrency: "USD",
+          accountDefaultWalletQuery: mockAccountDefaultWalletQuery,
+        }),
+        { sdk: undefined, network: "MAINNET" },
+        "blink.sv",
+      ),
+    )
+    expect(mockReplace).toHaveBeenCalledWith("sendBitcoinDetails", {
+      paymentDestination: expect.objectContaining({
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
+      }),
     })
     expect(mockReplace).not.toHaveBeenCalledWith("sendBitcoinDestination", {
       payment: "0x52908400098527886E0F7030069857D2E4169EE7",
@@ -100,7 +172,28 @@ describe("MerchantSelectionScreen", () => {
     expect(mockReplace).not.toHaveBeenCalledWith("sendBitcoinDestination", {
       payment: merchants[0].lnurl,
     })
-    jest.useRealTimers()
+  })
+
+  it("falls back to destination parsing screen if the selected merchant cannot resolve", async () => {
+    resolveDestinationMock.mockResolvedValue({
+      valid: false,
+      invalidReason: "UnknownDestination",
+      invalidPaymentDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: false,
+      } as never,
+    })
+    renderScreen()
+
+    fireEvent.press(
+      screen.getByLabelText(`${merchants[1].title}. ${merchants[1].description}`),
+    )
+
+    await waitFor(() =>
+      expect(mockReplace).toHaveBeenCalledWith("sendBitcoinDestination", {
+        payment: merchants[1].lnurl,
+      }),
+    )
   })
 
   it("limits long merchant text without dropping row content", () => {
