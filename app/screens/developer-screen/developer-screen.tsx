@@ -7,7 +7,11 @@ import { InAppBrowser } from "react-native-inappbrowser-reborn"
 
 import { gql, useApolloClient } from "@apollo/client"
 import { GaloyInput } from "@app/components/atomic/galoy-input"
-import { GALOY_INSTANCES, possibleGaloyInstanceNames } from "@app/config"
+import {
+  GALOY_INSTANCES,
+  possibleGaloyInstanceNames,
+  SPARK_EXPLORER_TX_URL,
+} from "@app/config"
 import {
   testBulletinsStore,
   useTestBulletins,
@@ -199,7 +203,7 @@ export const DeveloperScreen: React.FC = () => {
           lnAddressHostname: newLnAddressHostname,
           name: "Custom", // TODO: make configurable
           blockExplorer: "https://mempool.space/tx/", // TODO make configurable
-          sparkExplorer: "https://sparkscan.io/tx/",
+          sparkExplorer: SPARK_EXPLORER_TX_URL,
         },
         token: newToken || "",
       })

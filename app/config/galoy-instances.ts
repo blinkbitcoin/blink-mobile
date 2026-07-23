@@ -29,6 +29,10 @@ const scriptHostname = (): string => {
   return hostPart ?? "localhost"
 }
 
+// sparkscan indexes spark transfers by their UUID id; there is no signet
+// flavor, so every instance points at the mainnet explorer
+export const SPARK_EXPLORER_TX_URL = "https://sparkscan.io/tx/"
+
 export const possibleGaloyInstanceNames = ["Main", "Staging", "Local", "Custom"] as const
 export type GaloyInstanceName = (typeof possibleGaloyInstanceNames)[number]
 
@@ -70,7 +74,13 @@ export const resolveGaloyInstanceOrDefault = (
   input: GaloyInstanceInput,
 ): GaloyInstance => {
   if (input.id === "Custom") {
-    return input
+    // A Custom instance persisted by an older app version lacks fields added
+    // since it was saved (e.g. fiatUrl, sparkExplorer) — backfill those from
+    // the Main instance defaults while keeping every persisted custom value.
+    const persistedFields = Object.fromEntries(
+      Object.entries(input).filter(([, value]) => value !== undefined),
+    )
+    return { ...GALOY_INSTANCES[0], ...persistedFields, id: "Custom" }
   }
 
   const instance = GALOY_INSTANCES.find((instance) => instance.id === input.id)
@@ -95,7 +105,7 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     kycUrl: "https://kyc.blink.sv",
     lnAddressHostname: "blink.sv",
     blockExplorer: "https://mempool.space/tx/",
-    sparkExplorer: "https://sparkscan.io/tx/",
+    sparkExplorer: SPARK_EXPLORER_TX_URL,
     fiatUrl: "https://fiat.blink.sv",
   },
   {
@@ -108,7 +118,7 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     kycUrl: "https://kyc.staging.blink.sv",
     lnAddressHostname: "pay.staging.blink.sv",
     blockExplorer: "https://mempool.space/signet/tx/",
-    sparkExplorer: "https://sparkscan.io/tx/", // no signet for spark...
+    sparkExplorer: SPARK_EXPLORER_TX_URL,
     fiatUrl: "https://fiat.staging.blink.sv",
   },
   {
@@ -121,7 +131,7 @@ export const GALOY_INSTANCES: readonly GaloyInstance[] = [
     kycUrl: `http://${scriptHostname()}:3000`,
     lnAddressHostname: `${scriptHostname()}:3000`,
     blockExplorer: "https://mempool.space/signet/tx/",
-    sparkExplorer: "https://sparkscan.io/tx/", // no signet for spark...
+    sparkExplorer: SPARK_EXPLORER_TX_URL,
     fiatUrl: `http://${scriptHostname()}:3000`,
   },
 ] as const
