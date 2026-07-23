@@ -227,7 +227,7 @@ describe("MigrationContactSupportScreen", () => {
     expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("start-refused")
   })
 
-  /** Lukas's rule: the error screen is the support channel, so what failed is on the screen,
+  /** The error screen is the support channel, so what failed is on the screen,
    *  the reason code included, not just in the email. */
   it("shows the reason code on the screen", async () => {
     mockReason = MigrationSupportReason.SelfCustodialAccountMissing

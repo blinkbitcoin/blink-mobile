@@ -606,7 +606,7 @@ export const HomeScreen: React.FC = () => {
     },
   ]
 
-  // Do not change this condition without checking with Lukas first
+  // Do not change this condition without product sign-off
   const shouldShowTransferButton =
     !isIos ||
     (isIos && satsBalance > 0) ||
