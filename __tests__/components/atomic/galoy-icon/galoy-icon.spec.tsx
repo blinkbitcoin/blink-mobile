@@ -67,5 +67,11 @@ describe("GaloyIcon", () => {
         ).toJSON(),
       ).not.toBeNull()
     })
+
+    it("renders the limits icon", () => {
+      expect(
+        renderWithTheme(<GaloyIcon name="limits" size={24} />).toJSON(),
+      ).not.toBeNull()
+    })
   })
 })

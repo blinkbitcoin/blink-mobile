@@ -185,6 +185,25 @@ describe("ContextualInfo", () => {
       ).toBeTruthy()
     })
 
+    it("renders a zero over-threshold fee when the ratio is zero", () => {
+      const { getByText } = render(
+        <ContextualInfo
+          {...defaultProps}
+          type={Invoice.OnChain}
+          canSetExpirationTime={false}
+          feesInformation={{
+            deposit: { minBankFee: "2500", minBankFeeThreshold: "1000000", ratio: "0" },
+          }}
+        />,
+      )
+
+      expect(
+        getByText(
+          "Deposit fee: 2,500 SAT for amounts under 1M SAT or 0 SAT for deposits over 1M SAT",
+        ),
+      ).toBeTruthy()
+    })
+
     it("renders warning icon", () => {
       const { getByTestId } = render(
         <ContextualInfo

@@ -1,5 +1,5 @@
 import React from "react"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 
 import { MockedProvider, MockedResponse } from "@apollo/client/testing"
 import { NavigationContainer } from "@react-navigation/native"
@@ -106,6 +106,41 @@ describe("FeeRatesScreen", () => {
 
     expect(getByText("0.2% + ~0.1% routing fee")).toBeTruthy()
     expect(getByText("0.35%")).toBeTruthy()
+  })
+
+  it("recovers via Try Again after a failed query", async () => {
+    const errorThenSuccessMocks = [
+      {
+        request: { query: FeeRatesDocument },
+        error: new Error("network error"),
+      },
+      {
+        request: { query: FeeRatesDocument },
+        result: {
+          data: {
+            globals: {
+              __typename: "Globals",
+              feesInformation: {
+                __typename: "FeesInformation",
+                deposit: {
+                  __typename: "DepositFeesInformation",
+                  minBankFee: "2500",
+                  minBankFeeThreshold: "1000000",
+                  ratio: "50",
+                },
+              },
+            },
+          },
+        },
+      },
+    ]
+
+    const { findByText, queryByText } = renderWithApolloMocks(errorThenSuccessMocks)
+
+    fireEvent.press(await findByText("Try Again"))
+
+    expect(await findByText("2,500 SAT")).toBeTruthy()
+    expect(queryByText("Unable to fetch fees at this time")).toBeNull()
   })
 
   it("renders a zero over-threshold fee when the API reports a zero ratio", async () => {

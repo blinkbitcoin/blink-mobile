@@ -32,4 +32,14 @@ describe("formatDepositFees", () => {
       "5,000",
     )
   })
+
+  it("falls back to the default minimum fee when minBankFee is not numeric", () => {
+    expect(formatDepositFees({ ...deposit, minBankFee: "oops" }).fee).toBe("2,500")
+  })
+
+  it("falls back to the default threshold when minBankFeeThreshold is not numeric", () => {
+    expect(formatDepositFees({ ...deposit, minBankFeeThreshold: "oops" }).threshold).toBe(
+      "1M",
+    )
+  })
 })

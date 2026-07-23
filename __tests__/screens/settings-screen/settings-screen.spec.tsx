@@ -542,6 +542,18 @@ describe("Settings Screen", () => {
     expect(screen.getByText("Move to non-custodial")).toBeTruthy()
   })
 
+  it("renders the Fee rates option", async () => {
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.getByText("Fee rates")).toBeTruthy()
+  })
+
   it("does not render a standalone Recovery method group", async () => {
     render(
       <ContextForScreen>
