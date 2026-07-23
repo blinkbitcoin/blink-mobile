@@ -111,12 +111,13 @@ export const getRemoteConfigNumericObject = <T extends Record<string, number>>(
   const merged: Record<string, number> = { ...defaults }
   const droppedKeys: string[] = []
   for (const entryKey of Object.keys(defaults)) {
-    if (!(entryKey in parsed)) continue
-    const entryValue = parsed[entryKey]
-    if (typeof entryValue === "number" && Number.isFinite(entryValue)) {
-      merged[entryKey] = entryValue
-    } else {
-      droppedKeys.push(entryKey)
+    if (entryKey in parsed) {
+      const entryValue = parsed[entryKey]
+      if (typeof entryValue === "number" && Number.isFinite(entryValue)) {
+        merged[entryKey] = entryValue
+      } else {
+        droppedKeys.push(entryKey)
+      }
     }
   }
   if (droppedKeys.length > 0) {
