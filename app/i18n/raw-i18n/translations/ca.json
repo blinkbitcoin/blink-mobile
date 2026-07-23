@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "Introdueix un número de mòbil vàlid",
     "phoneNotAllowed": "Aquest camp no accepta números de telèfon"
   },
+  "MerchantSelectionScreen": {
+    "title": "Tria una opció de pagament",
+    "empty": "No hi ha opcions de pagament disponibles."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "La transacció s'ha d'enviar a la mempool.",
     "amount": "Import",

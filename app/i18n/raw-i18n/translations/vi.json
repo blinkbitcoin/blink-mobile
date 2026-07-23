@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "Nhập số điện thoại di động hợp lệ",
     "phoneNotAllowed": "Trường này không chấp nhận số điện thoại"
   },
+  "MerchantSelectionScreen": {
+    "title": "Chọn tùy chọn thanh toán",
+    "empty": "Không có tùy chọn thanh toán nào."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Giao dịch sẽ được gửi vào mempool",
     "amount": "Số tiền",

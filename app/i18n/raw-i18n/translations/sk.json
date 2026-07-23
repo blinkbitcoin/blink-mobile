@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "Zadajte platné mobilné číslo",
     "phoneNotAllowed": "Toto pole neprijíma telefónne čísla"
   },
+  "MerchantSelectionScreen": {
+    "title": "Vyberte možnosť platby",
+    "empty": "Nie sú dostupné žiadne možnosti platby."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakciu je potrebné odoslať do mempoolu",
     "amount": "Suma",

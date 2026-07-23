@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "กรุณาป้อนหมายเลขโทรศัพท์มือถือที่ถูกต้อง",
     "phoneNotAllowed": "ช่องนี้ไม่รับหมายเลขโทรศัพท์"
   },
+  "MerchantSelectionScreen": {
+    "title": "เลือกตัวเลือกการชำระเงิน",
+    "empty": "ไม่มีตัวเลือกการชำระเงิน"
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "ธุรกรรมจะถูกส่งไปยัง Mempool",
     "amount": "จำนวนเงิน",

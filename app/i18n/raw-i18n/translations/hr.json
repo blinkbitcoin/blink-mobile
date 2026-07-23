@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "Unesite valjani broj mobitela",
     "phoneNotAllowed": "Ovo polje ne prihvaća telefonske brojeve"
   },
+  "MerchantSelectionScreen": {
+    "title": "Odaberite opciju plaćanja",
+    "empty": "Nema dostupnih opcija plaćanja."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakcija bi trebala biti poslana u mempool",
     "amount": "Iznos",

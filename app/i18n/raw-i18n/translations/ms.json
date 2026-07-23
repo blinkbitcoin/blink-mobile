@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "Masukkan nombor telefon bimbit yang sah",
     "phoneNotAllowed": "Ruangan ini tidak menerima nombor telefon"
   },
+  "MerchantSelectionScreen": {
+    "title": "Pilih pilihan pembayaran",
+    "empty": "Tiada pilihan pembayaran tersedia."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi sepatutnya dihantar ke mempool",
     "amount": "Amaun",
