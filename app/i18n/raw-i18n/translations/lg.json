@@ -2538,8 +2538,6 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain eyasooka (mangu ddala)",
-    "onchainStandard": "Onchain eya bulijjo (~4h)",
-    "onchainEconomy": "Onchain ey'omuwendo omutono",
     "lightningTransactions": "Emirimu gya Lightning",
     "onchainBelowThreshold": "Onchain wansi wa {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain waggulu wa {threshold: string} SAT",

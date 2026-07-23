@@ -2538,8 +2538,6 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "أولوية Onchain (بأسرع وقت)",
-    "onchainStandard": "Onchain عادي (~4 ساعات)",
-    "onchainEconomy": "Onchain اقتصادي",
     "lightningTransactions": "معاملات Lightning",
     "onchainBelowThreshold": "Onchain أقل من {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain أكثر من {threshold: string} SAT",

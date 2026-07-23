@@ -2538,8 +2538,6 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain öncelikli (en kısa sürede)",
-    "onchainStandard": "Onchain standart (~4 saat)",
-    "onchainEconomy": "Onchain ekonomik",
     "lightningTransactions": "Lightning işlemleri",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT altı",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT üzeri",

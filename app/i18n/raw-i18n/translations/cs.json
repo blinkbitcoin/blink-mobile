@@ -2538,8 +2538,6 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain prioritní (co nejdříve)",
-    "onchainStandard": "Onchain standardní (~4h)",
-    "onchainEconomy": "Onchain ekonomický",
     "lightningTransactions": "Lightning transakce",
     "onchainBelowThreshold": "Onchain pod {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain nad {threshold: string} SAT",

@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { createCache } from "@app/graphql/cache"
+import { defaultFeeRatesConfig, FeeRatesConfig } from "@app/config/feature-flags-context"
 import { FeeRatesDocument } from "@app/graphql/generated"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -15,6 +16,12 @@ import { FeeRatesScreen } from "@app/screens/settings-screen/fee-rates-screen"
 import { detectDefaultLocale } from "@app/utils/locale-detector"
 
 import { ContextForScreen } from "../helper"
+
+let mockFeeRatesConfig: FeeRatesConfig
+jest.mock("@app/config/feature-flags-context", () => ({
+  ...jest.requireActual("@app/config/feature-flags-context"),
+  useRemoteConfig: () => ({ feeRatesConfig: mockFeeRatesConfig }),
+}))
 
 const Stack = createNativeStackNavigator()
 
@@ -40,10 +47,11 @@ const renderWithApolloMocks = (apolloMocks: ReadonlyArray<MockedResponse>) =>
 describe("FeeRatesScreen", () => {
   beforeEach(() => {
     loadLocale("en")
+    mockFeeRatesConfig = { ...defaultFeeRatesConfig }
   })
 
   it("renders Send, Receive and Transfer sections with remote-config default rates", async () => {
-    const { getByText, getAllByText, findByText } = render(
+    const { getByText, getAllByText, queryByText, findByText } = render(
       <ContextForScreen>
         <FeeRatesScreen />
       </ContextForScreen>,
@@ -54,14 +62,31 @@ describe("FeeRatesScreen", () => {
     expect(getByText("Transfer")).toBeTruthy()
 
     expect(getByText("Lightning")).toBeTruthy()
-    expect(getByText("0.2% + ~0.1% routing fee")).toBeTruthy()
-    expect(getAllByText("no fee")).toHaveLength(2)
+    expect(getAllByText("no fee")).toHaveLength(3)
     expect(getByText("from ~0.9%")).toBeTruthy()
-    expect(getByText("from ~0.6%")).toBeTruthy()
-    expect(getByText("from ~0.4%")).toBeTruthy()
+    expect(queryByText("Onchain standard (~4h)")).toBeNull()
+    expect(queryByText("Onchain economy")).toBeNull()
 
     expect(getByText("Transfer fee")).toBeTruthy()
-    expect(getByText("0.35%")).toBeTruthy()
+    expect(getByText("0.5%")).toBeTruthy()
+
+    await findByText("2,500 SAT")
+  })
+
+  it("shows the lightning send fee once remote config sets non-zero rates", async () => {
+    mockFeeRatesConfig = {
+      ...defaultFeeRatesConfig,
+      lightningSendBps: 20,
+      lightningRoutingBps: 10,
+    }
+
+    const { getByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    expect(getByText("0.2% + ~0.1% routing fee")).toBeTruthy()
 
     await findByText("2,500 SAT")
   })
@@ -104,8 +129,8 @@ describe("FeeRatesScreen", () => {
     expect(await findByText("Unable to fetch fees at this time")).toBeTruthy()
     expect(getByText("Try Again")).toBeTruthy()
 
-    expect(getByText("0.2% + ~0.1% routing fee")).toBeTruthy()
-    expect(getByText("0.35%")).toBeTruthy()
+    expect(getByText("from ~0.9%")).toBeTruthy()
+    expect(getByText("0.5%")).toBeTruthy()
   })
 
   it("recovers via Try Again after a failed query", async () => {

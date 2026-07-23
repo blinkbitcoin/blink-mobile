@@ -100,13 +100,20 @@ export const FeeRatesScreen: React.FC = () => {
   const sendItems = useMemo(
     () => [
       function LightningSendRow() {
+        const isFree =
+          feeRatesConfig.lightningSendBps === 0 &&
+          feeRatesConfig.lightningRoutingBps === 0
         return (
           <FeeRateRow
             label={LL.FeeRatesScreen.lightning()}
-            value={LL.FeeRatesScreen.lightningSendFee({
-              fee: formatBps(feeRatesConfig.lightningSendBps),
-              routingFee: formatBps(feeRatesConfig.lightningRoutingBps),
-            })}
+            value={
+              isFree
+                ? LL.FeeRatesScreen.noFee()
+                : LL.FeeRatesScreen.lightningSendFee({
+                    fee: formatBps(feeRatesConfig.lightningSendBps),
+                    routingFee: formatBps(feeRatesConfig.lightningRoutingBps),
+                  })
+            }
           />
         )
       },
@@ -124,26 +131,6 @@ export const FeeRatesScreen: React.FC = () => {
             label={LL.FeeRatesScreen.onchainPriority()}
             value={LL.FeeRatesScreen.fromApprox({
               fee: formatBps(feeRatesConfig.onchainPriorityBps),
-            })}
-          />
-        )
-      },
-      function OnchainStandardRow() {
-        return (
-          <FeeRateRow
-            label={LL.FeeRatesScreen.onchainStandard()}
-            value={LL.FeeRatesScreen.fromApprox({
-              fee: formatBps(feeRatesConfig.onchainStandardBps),
-            })}
-          />
-        )
-      },
-      function OnchainEconomyRow() {
-        return (
-          <FeeRateRow
-            label={LL.FeeRatesScreen.onchainEconomy()}
-            value={LL.FeeRatesScreen.fromApprox({
-              fee: formatBps(feeRatesConfig.onchainEconomyBps),
             })}
           />
         )

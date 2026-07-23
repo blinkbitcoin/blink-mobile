@@ -2538,8 +2538,6 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain kipaumbele (haraka iwezekanavyo)",
-    "onchainStandard": "Onchain kawaida (~saa 4)",
-    "onchainEconomy": "Onchain nafuu",
     "lightningTransactions": "Miamala ya Lightning",
     "onchainBelowThreshold": "Onchain chini ya {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain zaidi ya {threshold: string} SAT",

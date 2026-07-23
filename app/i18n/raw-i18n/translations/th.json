@@ -2538,8 +2538,6 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain ด่วน (เร็วที่สุด)",
-    "onchainStandard": "Onchain มาตรฐาน (~4 ชม.)",
-    "onchainEconomy": "Onchain ประหยัด",
     "lightningTransactions": "ธุรกรรม Lightning",
     "onchainBelowThreshold": "Onchain ต่ำกว่า {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain มากกว่า {threshold: string} SAT",

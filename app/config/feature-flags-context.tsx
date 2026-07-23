@@ -61,8 +61,6 @@ export type FeeRatesConfig = {
   lightningSendBps: number
   lightningRoutingBps: number
   onchainPriorityBps: number
-  onchainStandardBps: number
-  onchainEconomyBps: number
   transferBps: number
 }
 
@@ -115,13 +113,13 @@ const defaultReplaceCardDeliveryConfig = {
   express: { minDays: 1, maxDays: 2, priceUsd: 15 },
 }
 
+// Lightning send is free for now; set non-zero bps remotely to start showing a
+// rate without an app release.
 export const defaultFeeRatesConfig: FeeRatesConfig = {
-  lightningSendBps: 20,
-  lightningRoutingBps: 10,
+  lightningSendBps: 0,
+  lightningRoutingBps: 0,
   onchainPriorityBps: 90,
-  onchainStandardBps: 60,
-  onchainEconomyBps: 40,
-  transferBps: 35,
+  transferBps: 50,
 }
 
 /** Default transfer/swap block, read by both account types. */

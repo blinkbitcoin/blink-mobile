@@ -2538,8 +2538,6 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain ñawpaq (usqhaylla)",
-    "onchainStandard": "Onchain sapsi (~4h)",
-    "onchainEconomy": "Onchain pisi chaniyuq",
     "lightningTransactions": "Lightning ruraykuna",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT uraypi",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT hawapi",

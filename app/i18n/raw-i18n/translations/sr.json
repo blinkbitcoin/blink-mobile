@@ -2538,8 +2538,6 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain приоритетно (што пре)",
-    "onchainStandard": "Onchain стандардно (~4ч)",
-    "onchainEconomy": "Onchain економично",
     "lightningTransactions": "Lightning трансакције",
     "onchainBelowThreshold": "Onchain испод {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain изнад {threshold: string} SAT",

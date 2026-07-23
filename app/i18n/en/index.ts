@@ -2644,8 +2644,6 @@ const en: BaseTranslation = {
     lightning: "Lightning",
     intraledger: "Intraledger",
     onchainPriority: "Onchain priority (asap)",
-    onchainStandard: "Onchain standard (~4h)",
-    onchainEconomy: "Onchain economy",
     lightningTransactions: "Lightning transactions",
     onchainBelowThreshold: "Onchain below {threshold: string} SAT",
     onchainAboveThreshold: "Onchain above {threshold: string} SAT",

@@ -2538,8 +2538,6 @@
     "lightning": "Lightning",
     "intraledger": "Intraledger",
     "onchainPriority": "Onchain prioriteit (z.s.m.)",
-    "onchainStandard": "Onchain standaard (~4u)",
-    "onchainEconomy": "Onchain voordelig",
     "lightningTransactions": "Lightning-transacties",
     "onchainBelowThreshold": "Onchain onder {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain boven {threshold: string} SAT",
