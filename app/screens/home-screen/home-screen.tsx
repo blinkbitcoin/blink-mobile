@@ -69,8 +69,8 @@ import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
-import { isIos } from "@app/utils/helper"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
+import { isIos } from "@app/utils/helper"
 import {
   useAppConfig,
   useAutoShowUpgradeModal,
@@ -606,23 +606,22 @@ export const HomeScreen: React.FC = () => {
     },
   ]
 
-  const isIosWithBalance = isIos && satsBalance > 0
-
+  // Do not change this condition without checking with Lukas first
   const shouldShowTransferButton =
-    !isTransferBlocked &&
-    (isSelfCustodial ||
-      !isIos ||
-      dataUnauthed?.globals?.network !== "mainnet" ||
-      levelAccount === AccountLevel.Two ||
-      levelAccount === AccountLevel.Three ||
-      isIosWithBalance)
+    !isIos ||
+    (isIos && satsBalance > 0) ||
+    dataUnauthed?.globals?.network !== "mainnet" ||
+    levelAccount === AccountLevel.Two ||
+    levelAccount === AccountLevel.Three
+
+  const isTransferDisabled = isDollarBalanceRestricted || isTransferBlocked
 
   if (shouldShowTransferButton) {
     buttons.unshift({
       title: LL.ConversionDetailsScreen.transfer(),
       target: "conversionDetails",
       icon: "transfer",
-      disabled: isDollarBalanceRestricted,
+      disabled: isTransferDisabled,
       onDisabledPress: () => setIsRestrictionModalVisible(true),
     })
   }
