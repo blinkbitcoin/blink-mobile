@@ -132,9 +132,8 @@ internal fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManage
     val prefs = context.getSharedPreferences("bitcoinPricePrefs", Context.MODE_PRIVATE)
     val priceArray = JSONArray(prefs.getString("PRICE_ARRAY", "[]"))
 
-    val realtimePrice = JSONObject(prefs.getString("REALTIME_PRICE", "No Data") ?: "{}")
-    if (!realtimePrice.has("noData")) {
-
+    val realtimePrice = JSONObject(prefs.getString("REALTIME_PRICE", null) ?: "{}")
+    if (realtimePrice.has("btcSatPrice")) {
         val bitmap = generateChartBitmap(context, priceArray, minWidth, maxHeight)
         views.setImageViewBitmap(R.id.chart_image_view, bitmap)
 
