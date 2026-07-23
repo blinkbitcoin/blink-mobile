@@ -12,6 +12,22 @@ it("get a full object with Staging", () => {
   expect(res).toBe(GALOY_INSTANCES[1])
 })
 
+it("get a full object with Local", () => {
+  const res = resolveGaloyInstanceOrDefault({ id: "Local" })
+
+  expect(res).toBe(GALOY_INSTANCES[2])
+})
+
+it("falls back to the Main instance for an unknown standard id", () => {
+  const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {})
+
+  const res = resolveGaloyInstanceOrDefault({ id: "Nonexistent" } as never)
+
+  expect(res).toBe(GALOY_INSTANCES[0])
+  expect(consoleErrorSpy).toHaveBeenCalledWith("instance not found")
+  consoleErrorSpy.mockRestore()
+})
+
 it("get a full object with Custom", () => {
   const CustomInstance = {
     id: "Custom",
