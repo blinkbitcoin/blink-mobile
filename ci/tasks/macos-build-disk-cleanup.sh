@@ -230,6 +230,14 @@ cleanup_concourse_dead_volumes() {
   remove_all_children "$CONCOURSE_WORKDIR/volumes/dead"
 }
 
+stop_gradle_daemons() {
+  # A live daemon holds references into .gradle/caches; purging under it makes
+  # the next build fail with "Could not read workspace metadata".
+  echo "Stopping Gradle daemons before purging Gradle caches"
+  pkill -f GradleDaemon 2>/dev/null || true
+  sleep 1
+}
+
 cleanup_build_caches() {
   local dir
   local size_kb
@@ -241,6 +249,10 @@ cleanup_build_caches() {
     if free_space_below_target || (( size_kb > build_cache_max_kb )); then
       echo "Removing build cache $dir"
       echo "Reason: free disk $(free_gb) GB, cache size $((size_kb / 1024 / 1024)) GB, cap ${BUILD_CACHE_MAX_GB} GB"
+      if [[ "$dir" == */.gradle/caches ]]; then
+        stop_gradle_daemons
+        remove_path "${dir%/caches}/daemon"
+      fi
       remove_all_children "$dir"
     fi
   done < <(build_cache_dirs)
