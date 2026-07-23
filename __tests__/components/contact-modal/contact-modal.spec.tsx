@@ -2,11 +2,16 @@ import React from "react"
 import { Linking } from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 
+let mockModalProps: Record<string, unknown> = {}
 jest.mock("react-native-modal", () => {
   const ReactActual = jest.requireActual("react")
   const RN = jest.requireActual("react-native")
-  return ({ isVisible, children }: { isVisible: boolean; children: React.ReactNode }) =>
-    isVisible ? ReactActual.createElement(RN.View, null, children) : null
+  return (props: { isVisible: boolean; children: React.ReactNode }) => {
+    mockModalProps = props
+    return props.isVisible
+      ? ReactActual.createElement(RN.View, null, props.children)
+      : null
+  }
 })
 
 jest.mock("@rn-vui/themed", () => {
@@ -50,7 +55,10 @@ jest.mock("@app/config", () => ({
   WHATSAPP_CONTACT_NUMBER: "+50365555555",
 }))
 
-jest.mock("@app/utils/external", () => ({ openWhatsApp: jest.fn() }))
+const mockOpenWhatsApp = jest.fn()
+jest.mock("@app/utils/external", () => ({
+  openWhatsApp: (...args: unknown[]) => mockOpenWhatsApp(...args),
+}))
 
 const mockCopyToClipboard = jest.fn()
 jest.mock("@app/hooks/use-clipboard", () => ({
@@ -128,5 +136,96 @@ describe("ContactModal", () => {
       )}&body=${encodeURIComponent("test body")}`,
     )
     expect(mockCopyToClipboard).not.toHaveBeenCalled()
+  })
+
+  type LinkChannelCase = { channel: SupportChannels; label: string; url: string }
+  const linkChannels: LinkChannelCase[] = [
+    {
+      channel: SupportChannels.StatusPage,
+      label: "Status page",
+      url: "https://blink.statuspage.io/",
+    },
+    { channel: SupportChannels.Faq, label: "FAQ", url: "https://faq.blink.sv" },
+    {
+      channel: SupportChannels.Telegram,
+      label: "Telegram",
+      url: "https://t.me/blinkbtc",
+    },
+    {
+      channel: SupportChannels.Mattermost,
+      label: "Mattermost",
+      url: "https://chat.blink.sv",
+    },
+  ]
+
+  linkChannels.forEach(({ channel, label, url }) => {
+    it(`opens the ${label} link on press`, () => {
+      const { getByText } = render(
+        <ContactModal {...defaultProps} supportChannels={[channel]} />,
+      )
+
+      fireEvent.press(getByText(label))
+
+      expect(Linking.openURL).toHaveBeenCalledWith(url)
+    })
+  })
+
+  it("opens WhatsApp with the support number and message body", () => {
+    const { getByText } = render(
+      <ContactModal {...defaultProps} supportChannels={[SupportChannels.WhatsApp]} />,
+    )
+
+    fireEvent.press(getByText("WhatsApp"))
+
+    expect(mockOpenWhatsApp).toHaveBeenCalledWith("+50365555555", "test body")
+  })
+
+  it("renders only the requested channels", () => {
+    const { getByText, queryByText } = render(
+      <ContactModal
+        {...defaultProps}
+        supportChannels={[
+          SupportChannels.Faq,
+          SupportChannels.StatusPage,
+          SupportChannels.EmailCopy,
+        ]}
+      />,
+    )
+
+    expect(getByText("FAQ")).toBeTruthy()
+    expect(getByText("Status page")).toBeTruthy()
+    expect(getByText("support@blink.sv")).toBeTruthy()
+    expect(queryByText("Email")).toBeNull()
+    expect(queryByText("Telegram")).toBeNull()
+    expect(queryByText("Mattermost")).toBeNull()
+    expect(queryByText("WhatsApp")).toBeNull()
+  })
+
+  it("renders nothing while hidden", () => {
+    const { queryByText } = render(
+      <ContactModal
+        {...defaultProps}
+        isVisible={false}
+        supportChannels={[SupportChannels.Faq]}
+      />,
+    )
+
+    expect(queryByText("FAQ")).toBeNull()
+  })
+
+  it("dismisses on backdrop press", () => {
+    const toggleModal = jest.fn()
+    render(
+      <ContactModal
+        {...defaultProps}
+        toggleModal={toggleModal}
+        supportChannels={[SupportChannels.Faq]}
+      />,
+    )
+
+    const onBackdropPress = mockModalProps.onBackdropPress as () => void
+    onBackdropPress()
+
+    expect(toggleModal).toHaveBeenCalled()
   })
 })
