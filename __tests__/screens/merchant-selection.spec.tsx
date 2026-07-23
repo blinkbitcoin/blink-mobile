@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet } from "react-native"
+import { Alert, StyleSheet } from "react-native"
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 
@@ -13,6 +13,7 @@ import { ContextForScreenWithTheme } from "./helper"
 
 const mockReplace = jest.fn()
 const mockAccountDefaultWalletQuery = jest.fn()
+const mockRecordError = jest.fn()
 const mockScanContext = {
   myWalletIds: ["btc-wallet-id"],
   bitcoinNetwork: "mainnet",
@@ -20,6 +21,10 @@ const mockScanContext = {
 }
 let mockSelfCustodialSdk: unknown
 let mockSparkNetwork = "MAINNET"
+
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: mockRecordError,
+}))
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
@@ -108,6 +113,7 @@ describe("MerchantSelectionScreen", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.spyOn(Alert, "alert").mockImplementation(jest.fn())
     loadLocale("en")
     Object.assign(mockScanContext, {
       myWalletIds: ["btc-wallet-id"],
@@ -242,6 +248,69 @@ describe("MerchantSelectionScreen", () => {
         payment: merchants[1].lnurl,
       }),
     )
+  })
+
+  it("disables merchant rows while the selected merchant is resolving", async () => {
+    let resolveSelectedMerchant: (
+      value: Awaited<ReturnType<typeof resolveDestination>>,
+    ) => void
+    resolveDestinationMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveSelectedMerchant = resolve
+      }),
+    )
+    renderScreen()
+
+    fireEvent.press(
+      screen.getByLabelText(`${merchants[1].title}. ${merchants[1].description}`),
+    )
+
+    fireEvent.press(
+      screen.getByLabelText(`${merchants[0].title}. ${merchants[0].description}`),
+    )
+    expect(resolveDestinationMock).toHaveBeenCalledTimes(1)
+
+    resolveSelectedMerchant!({
+      valid: false,
+      invalidReason: "UnknownDestination",
+      invalidPaymentDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: false,
+      } as never,
+    })
+
+    await waitFor(() =>
+      expect(mockReplace).toHaveBeenCalledWith("sendBitcoinDestination", {
+        payment: merchants[1].lnurl,
+      }),
+    )
+  })
+
+  it("clears selection and alerts if selected merchant resolution throws", async () => {
+    const error = new Error("LNURL failed")
+    resolveDestinationMock.mockRejectedValue(error)
+    renderScreen()
+
+    fireEvent.press(
+      screen.getByLabelText(`${merchants[1].title}. ${merchants[1].description}`),
+    )
+
+    await waitFor(() => expect(mockRecordError).toHaveBeenCalledWith(error))
+    expect(Alert.alert).toHaveBeenCalledWith(error.toString(), "", [{ text: "OK" }])
+    expect(screen.queryByTestId(`merchant-${merchants[1].id}-selected`)).toBeNull()
+
+    resolveDestinationMock.mockResolvedValue({
+      valid: false,
+      invalidReason: "UnknownDestination",
+      invalidPaymentDestination: {
+        paymentType: PaymentType.Lnurl,
+        valid: false,
+      } as never,
+    })
+    fireEvent.press(
+      screen.getByLabelText(`${merchants[0].title}. ${merchants[0].description}`),
+    )
+    await waitFor(() => expect(resolveDestinationMock).toHaveBeenCalledTimes(2))
   })
 
   it("limits long merchant text without dropping row content", () => {

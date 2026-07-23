@@ -365,7 +365,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           type: SendBitcoinActions.SetUnparsedDestination,
           payload: { unparsedDestination: rawInput },
         })
-        navigation.replace("merchantSelection", {
+        navigation.navigate("merchantSelection", {
           merchants: wrappedDestination.validDestination.merchants,
         })
         return
