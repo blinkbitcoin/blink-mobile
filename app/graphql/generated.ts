@@ -3910,6 +3910,11 @@ export type AccountUpdateDisplayCurrencyMutationVariables = Exact<{
 
 export type AccountUpdateDisplayCurrencyMutation = { readonly __typename: 'Mutation', readonly accountUpdateDisplayCurrency: { readonly __typename: 'AccountUpdateDisplayCurrencyPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly account?: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly displayCurrency: string } | null } };
 
+export type FeeRatesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FeeRatesQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly ratio: string } } } | null };
+
 export type LanguageQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -9023,6 +9028,51 @@ export function useAccountUpdateDisplayCurrencyMutation(baseOptions?: Apollo.Mut
 export type AccountUpdateDisplayCurrencyMutationHookResult = ReturnType<typeof useAccountUpdateDisplayCurrencyMutation>;
 export type AccountUpdateDisplayCurrencyMutationResult = Apollo.MutationResult<AccountUpdateDisplayCurrencyMutation>;
 export type AccountUpdateDisplayCurrencyMutationOptions = Apollo.BaseMutationOptions<AccountUpdateDisplayCurrencyMutation, AccountUpdateDisplayCurrencyMutationVariables>;
+export const FeeRatesDocument = gql`
+    query feeRates {
+  globals {
+    feesInformation {
+      deposit {
+        minBankFee
+        minBankFeeThreshold
+        ratio
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useFeeRatesQuery__
+ *
+ * To run a query within a React component, call `useFeeRatesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFeeRatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFeeRatesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useFeeRatesQuery(baseOptions?: Apollo.QueryHookOptions<FeeRatesQuery, FeeRatesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FeeRatesQuery, FeeRatesQueryVariables>(FeeRatesDocument, options);
+      }
+export function useFeeRatesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FeeRatesQuery, FeeRatesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FeeRatesQuery, FeeRatesQueryVariables>(FeeRatesDocument, options);
+        }
+export function useFeeRatesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<FeeRatesQuery, FeeRatesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<FeeRatesQuery, FeeRatesQueryVariables>(FeeRatesDocument, options);
+        }
+export type FeeRatesQueryHookResult = ReturnType<typeof useFeeRatesQuery>;
+export type FeeRatesLazyQueryHookResult = ReturnType<typeof useFeeRatesLazyQuery>;
+export type FeeRatesSuspenseQueryHookResult = ReturnType<typeof useFeeRatesSuspenseQuery>;
+export type FeeRatesQueryResult = Apollo.QueryResult<FeeRatesQuery, FeeRatesQueryVariables>;
 export const LanguageDocument = gql`
     query language {
   me {

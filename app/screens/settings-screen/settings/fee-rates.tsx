@@ -9,7 +9,7 @@ import { AccountType } from "@app/types/wallet"
 
 import { SettingsRow } from "../row"
 
-export const TxLimits: React.FC = () => {
+export const FeeRatesSetting: React.FC = () => {
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
@@ -18,9 +18,9 @@ export const TxLimits: React.FC = () => {
 
   return (
     <SettingsRow
-      title={LL.common.transactionLimits()}
-      leftGaloyIcon="limits"
-      action={() => navigate("transactionLimitsScreen")}
+      title={LL.common.feeRates()}
+      leftGaloyIcon="info"
+      action={() => navigate("feeRatesScreen")}
     />
   )
 }

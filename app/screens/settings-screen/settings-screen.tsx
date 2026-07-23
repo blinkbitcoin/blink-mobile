@@ -33,6 +33,7 @@ import { AccountDonationButton } from "./settings/account-donation-button"
 import { AccountBtcpay } from "./settings/account-btcpay"
 import { AccountWoocommerce } from "./settings/account-woocommerce"
 import { TxLimits } from "./settings/account-tx-limits"
+import { FeeRatesSetting } from "./settings/fee-rates"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
 import { JoinCommunitySetting } from "./settings/community-join"
@@ -106,6 +107,7 @@ export const SettingsScreen: React.FC = () => {
     account: [
       AccountLevelSetting,
       TxLimits,
+      FeeRatesSetting,
       SwitchAccountSetting,
       MoveToNonCustodialSetting,
     ],

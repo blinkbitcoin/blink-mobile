@@ -200,6 +200,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         security: "settings/security",
         accountScreen: "settings/account",
         transactionLimitsScreen: "settings/tx-limits",
+        feeRatesScreen: "settings/fee-rates",
         notificationSettingsScreen: "settings/notifications",
         emailRegistrationInitiate: "settings/email",
         settings: "settings",

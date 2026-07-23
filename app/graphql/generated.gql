@@ -1316,6 +1316,21 @@ query displayCurrency {
   }
 }
 
+query feeRates {
+  globals {
+    feesInformation {
+      deposit {
+        minBankFee
+        minBankFeeThreshold
+        ratio
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query fullOnboardingScreen {
   me {
     id

@@ -1,5 +1,6 @@
 import {
   getRemoteConfigList,
+  getRemoteConfigNumericObject,
   getRemoteConfigObject,
   getRemoteConfigStringList,
   serializeRemoteConfigDefault,
@@ -213,6 +214,87 @@ describe("getRemoteConfigObject", () => {
     expect(mockLogError).toHaveBeenCalledWith(
       expect.objectContaining({
         context: expect.objectContaining({ actualShape: "number" }),
+      }),
+    )
+  })
+})
+
+describe("getRemoteConfigNumericObject", () => {
+  const defaults = { lightningSendBps: 20, transferBps: 35 }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("merges a full remote object of finite numbers over the defaults", () => {
+    mockAsString.mockReturnValue('{"lightningSendBps":25,"transferBps":40}')
+
+    expect(getRemoteConfigNumericObject("fees-key", defaults)).toEqual({
+      lightningSendBps: 25,
+      transferBps: 40,
+    })
+    expect(mockLogError).not.toHaveBeenCalled()
+  })
+
+  it("keeps the defaults for keys missing from a partial remote object", () => {
+    mockAsString.mockReturnValue('{"transferBps":40}')
+
+    expect(getRemoteConfigNumericObject("fees-key", defaults)).toEqual({
+      lightningSendBps: 20,
+      transferBps: 40,
+    })
+    expect(mockLogError).not.toHaveBeenCalled()
+  })
+
+  it("drops non-numeric values, keeps their defaults and logs the dropped keys", () => {
+    mockAsString.mockReturnValue('{"lightningSendBps":"25","transferBps":40}')
+
+    expect(getRemoteConfigNumericObject("fees-key", defaults)).toEqual({
+      lightningSendBps: 20,
+      transferBps: 40,
+    })
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: "remote-config",
+        context: expect.objectContaining({
+          key: "fees-key",
+          droppedKeys: ["lightningSendBps"],
+        }),
+      }),
+    )
+  })
+
+  it("drops null values in favor of the defaults", () => {
+    mockAsString.mockReturnValue('{"transferBps":null}')
+
+    expect(getRemoteConfigNumericObject("fees-key", defaults)).toEqual(defaults)
+    expect(mockLogError).toHaveBeenCalledTimes(1)
+  })
+
+  it("ignores unknown keys silently for forward compatibility", () => {
+    mockAsString.mockReturnValue('{"someFutureBps":10,"transferBps":40}')
+
+    expect(getRemoteConfigNumericObject("fees-key", defaults)).toEqual({
+      lightningSendBps: 20,
+      transferBps: 40,
+    })
+    expect(mockLogError).not.toHaveBeenCalled()
+  })
+
+  it("returns the defaults silently when the Remote Config value is empty", () => {
+    mockAsString.mockReturnValue("")
+
+    expect(getRemoteConfigNumericObject("missing-key", defaults)).toBe(defaults)
+    expect(mockLogError).not.toHaveBeenCalled()
+  })
+
+  it("returns the defaults and logs when the stored value is not an object", () => {
+    mockAsString.mockReturnValue("[1,2]")
+
+    expect(getRemoteConfigNumericObject("bad-key", defaults)).toBe(defaults)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: expect.objectContaining({ actualShape: "array" }),
       }),
     )
   })

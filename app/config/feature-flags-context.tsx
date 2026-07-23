@@ -7,6 +7,7 @@ import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
 import { logError } from "@app/utils/log-error"
 import {
+  getRemoteConfigNumericObject,
   getRemoteConfigObject,
   getRemoteConfigStringList,
   serializeRemoteConfigDefault,
@@ -46,6 +47,7 @@ const CustodialTransferBlockedCountriesKey = "custodialTransferBlockedCountries"
 const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
 const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
+const FeeRatesConfigKey = "feeRatesConfig"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -54,6 +56,15 @@ type DeliveryOptionConfig = {
 }
 
 type ReplaceCardDeliveryConfig = Record<string, DeliveryOptionConfig>
+
+export type FeeRatesConfig = {
+  lightningSendBps: number
+  lightningRoutingBps: number
+  onchainPriorityBps: number
+  onchainStandardBps: number
+  onchainEconomyBps: number
+  transferBps: number
+}
 
 type FeatureFlags = {
   deviceAccountEnabled: boolean
@@ -96,11 +107,24 @@ type RemoteConfig = {
   [CustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
+  [FeeRatesConfigKey]: FeeRatesConfig
 }
 
 const defaultReplaceCardDeliveryConfig = {
   standard: { minDays: 7, maxDays: 10, priceUsd: 0 },
   express: { minDays: 1, maxDays: 2, priceUsd: 15 },
+}
+
+// Fee rates page contract: a negative rate hides its row (and the section when
+// no rows remain), 0 renders as "no fee", positive values render the rate — so
+// rows can be shown/hidden and repriced remotely without an app release.
+export const defaultFeeRatesConfig: FeeRatesConfig = {
+  lightningSendBps: 0,
+  lightningRoutingBps: 0,
+  onchainPriorityBps: 90,
+  onchainStandardBps: -1,
+  onchainEconomyBps: -1,
+  transferBps: 50,
 }
 
 /** Default transfer/swap block, read by both account types. */
@@ -169,6 +193,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   custodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialDepositClaimLeewayVbyte: 1,
+  feeRatesConfig: defaultFeeRatesConfig,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -204,6 +229,7 @@ remoteConfigInstance().setDefaults({
   selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.selfCustodialCreationBlockedCountries,
   ),
+  feeRatesConfig: serializeRemoteConfigDefault(defaultFeeRatesConfig),
 })
 
 remoteConfigInstance().setConfigSettings({
@@ -376,6 +402,11 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
           .asNumber()
 
+        const feeRatesConfig = getRemoteConfigNumericObject(
+          FeeRatesConfigKey,
+          defaultFeeRatesConfig,
+        )
+
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
@@ -410,6 +441,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           custodialCreationBlockedCountries,
           selfCustodialCreationBlockedCountries,
           selfCustodialDepositClaimLeewayVbyte,
+          feeRatesConfig,
         })
       } catch (err) {
         logError({
