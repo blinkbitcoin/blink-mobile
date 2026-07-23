@@ -84,6 +84,7 @@ jest.mock("@app/graphql/generated", () => ({
 const galoyInstance = {
   name: "Blink",
   blockExplorer: "https://mempool.space/tx/",
+  sparkExplorer: "https://sparkscan.io/tx/",
 }
 
 const mockCopyToClipboard = jest.fn()
@@ -140,6 +141,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 const ONCHAIN_TX_HASH = "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
+const SPARK_TX_ID = "0196fe12-7fca-7d55-8d9d-1af6f9f0e7b9"
 const LN_PAYMENT_HASH = "0001020304050607080900010203040506070809000102030405060708090102"
 const LN_PRE_IMAGE = "6bb1e9a3bf6bcbe27a0c1f3a4b7a6a3b4b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e"
 const LN_PAYMENT_REQUEST = "lnbc10u1p0example000payment000request000string"
@@ -159,17 +161,17 @@ const baseTx = {
   settlementDisplayCurrency: "USD",
 }
 
-const onChainTx = {
+const broadcastedOnChainTx = (transactionHash: string) => ({
   data: {
     ...baseTx,
     settlementVia: {
       __typename: "SettlementViaOnChain",
-      transactionHash: ONCHAIN_TX_HASH,
+      transactionHash,
       arrivalInMempoolEstimatedAt: null,
     },
     initiationVia: { __typename: "InitiationViaOnChain", address: "" },
   },
-}
+})
 
 const lightningTx = {
   data: {
@@ -209,8 +211,8 @@ describe("TransactionDetailScreen row icon actions", () => {
   })
 
   describe("broadcasted onchain transaction", () => {
-    it("opens the transaction hash on the block explorer", () => {
-      const { getByTestId } = renderScreenWithTx(onChainTx)
+    it("opens the hex transaction hash on the block explorer", () => {
+      const { getByTestId } = renderScreenWithTx(broadcastedOnChainTx(ONCHAIN_TX_HASH))
 
       fireEvent.press(getByTestId("arrow-square-out"))
 
@@ -219,8 +221,16 @@ describe("TransactionDetailScreen row icon actions", () => {
       )
     })
 
+    it("opens a spark transaction (UUID hash with dashes) on the spark explorer", () => {
+      const { getByTestId } = renderScreenWithTx(broadcastedOnChainTx(SPARK_TX_ID))
+
+      fireEvent.press(getByTestId("arrow-square-out"))
+
+      expect(openURLSpy).toHaveBeenCalledWith("https://sparkscan.io/tx/" + SPARK_TX_ID)
+    })
+
     it("copies the transaction hash, description and internal id", () => {
-      const { getAllByTestId } = renderScreenWithTx(onChainTx)
+      const { getAllByTestId } = renderScreenWithTx(broadcastedOnChainTx(ONCHAIN_TX_HASH))
 
       // rows in render order: transaction hash, description, Blink internal id
       const copyIcons = getAllByTestId("copy-paste")
