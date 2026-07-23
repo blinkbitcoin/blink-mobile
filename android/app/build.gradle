@@ -133,6 +133,11 @@ android {
             ndk {
                 abiFilters "armeabi-v7a", "arm64-v8a"
             }
+            // Release strips the native libs, so without uploading the symbol files every
+            // NDK crash reaches Crashlytics as raw addresses and cannot be root-caused.
+            firebaseCrashlytics {
+                nativeSymbolUploadEnabled true
+            }
         }
     }
 }
