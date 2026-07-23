@@ -3569,7 +3569,8 @@
       "emailSubject": "Isicelo senkxaso yofuduso",
       "emailDescribeProblem": "Chaza ingxaki:",
       "emailAccountInfo": "Inkcazelo yeakhawunti yenkxaso:",
-      "contactUsCta": "Qhagamshelana nathi"
+      "contactUsCta": "Qhagamshelana nathi",
+      "copy": "Khuphela"
     },
     "migrateNowModal": {
       "title": "Fudukela ngoku kwiakhawunti engagcinwanga",
@@ -3595,7 +3596,6 @@
       "dollarBalanceNotAvailable": "ayifumaneki",
       "networkFee": "Umrhumo wothungelwano: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Umrhumo wothungelwano: <bold>{fee: string}</bold> (uhlawulwa nguBlink)",
-      "exchangeRate": "Izinga langoku lotshintshiselwano 1 BTC = {rate: string}",
       "retryCta": "Zama kwakhona",
       "approveCta": "Yamkela",
       "contactSupportCta": "Qhagamshelana nenkxaso"

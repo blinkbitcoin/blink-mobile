@@ -11986,11 +11986,6 @@ type RootTranslation = {
 			 */
 			networkFeeCoveredByBlink: RequiredParams<'fee'>
 			/**
-			 * C​u​r​r​e​n​t​ ​e​x​c​h​a​n​g​e​ ​r​a​t​e​ ​1​ ​B​T​C​ ​=​ ​{​r​a​t​e​}
-			 * @param {string} rate
-			 */
-			exchangeRate: RequiredParams<'rate'>
-			/**
 			 * T​r​y​ ​a​g​a​i​n
 			 */
 			retryCta: string
@@ -12108,6 +12103,10 @@ type RootTranslation = {
 			 * C​o​n​t​a​c​t​ ​u​s
 			 */
 			contactUsCta: string
+			/**
+			 * C​o​p​y
+			 */
+			copy: string
 		}
 	}
 	AccountTypeSelectionScreen: {
@@ -24491,10 +24490,6 @@ export type TranslationFunctions = {
 			 */
 			networkFeeCoveredByBlink: (arg: { fee: string }) => LocalizedString
 			/**
-			 * Current exchange rate 1 BTC = {rate}
-			 */
-			exchangeRate: (arg: { rate: string }) => LocalizedString
-			/**
 			 * Try again
 			 */
 			retryCta: () => LocalizedString
@@ -24610,6 +24605,10 @@ export type TranslationFunctions = {
 			 * Contact us
 			 */
 			contactUsCta: () => LocalizedString
+			/**
+			 * Copy
+			 */
+			copy: () => LocalizedString
 		}
 	}
 	AccountTypeSelectionScreen: {

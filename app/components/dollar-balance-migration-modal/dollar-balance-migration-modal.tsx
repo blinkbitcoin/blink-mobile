@@ -9,27 +9,26 @@ import CustomModal from "../custom-modal/custom-modal"
 type DollarBalanceMigrationModalProps = {
   isVisible: boolean
   toggleModal: () => void
-  /**
-   * Provided when the user's region permits the in-app Dollar-to-Bitcoin transfer: the
-   * primary action then reads "Transfer" and runs it. Omitted when the region does not
-   * permit it, so the primary action just closes the modal.
-   */
-  onTransfer?: () => void
+  /** Runs the in-app dollar-to-bitcoin conversion: the modal's only action, since emptying
+   *  the dollar balance is the one way forward and every affected user, restricted regions
+   *  included, can now do it here. */
+  onTransfer: () => void
+  /** Off where there is no way back but the conversion, e.g. the commit screen, so the only
+   *  exit is Transfer. */
+  showCloseIconButton?: boolean
 }
 
 export const DollarBalanceMigrationModal: React.FC<DollarBalanceMigrationModalProps> = ({
   isVisible,
   toggleModal,
   onTransfer,
+  showCloseIconButton = true,
 }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-
-  const primaryButtonTitle = onTransfer ? LL.common.transfer() : LL.common.close()
-  const primaryButtonOnPress = onTransfer ?? toggleModal
 
   return (
     <CustomModal
@@ -40,9 +39,9 @@ export const DollarBalanceMigrationModal: React.FC<DollarBalanceMigrationModalPr
       body={
         <Text style={styles.body}>{LL.AccountMigration.dollarBalanceModal.body()}</Text>
       }
-      primaryButtonTitle={primaryButtonTitle}
-      primaryButtonOnPress={primaryButtonOnPress}
-      showCloseIconButton={true}
+      primaryButtonTitle={LL.common.transfer()}
+      primaryButtonOnPress={onTransfer}
+      showCloseIconButton={showCloseIconButton}
     />
   )
 }

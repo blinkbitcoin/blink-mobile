@@ -33,7 +33,13 @@ const wrap = (ui: React.ReactElement) => (
 describe("DollarBalanceMigrationModal", () => {
   it("renders the title and body", () => {
     const { getByText } = render(
-      wrap(<DollarBalanceMigrationModal isVisible={true} toggleModal={jest.fn()} />),
+      wrap(
+        <DollarBalanceMigrationModal
+          isVisible={true}
+          toggleModal={jest.fn()}
+          onTransfer={jest.fn()}
+        />,
+      ),
     )
 
     expect(getByText(TITLE)).toBeTruthy()
@@ -44,19 +50,9 @@ describe("DollarBalanceMigrationModal", () => {
     ).toBeTruthy()
   })
 
-  it("closes the modal from the Close action when the region does not permit the transfer", () => {
-    const toggleModal = jest.fn()
-    const { getByText, queryByText } = render(
-      wrap(<DollarBalanceMigrationModal isVisible={true} toggleModal={toggleModal} />),
-    )
-
-    expect(queryByText("Transfer")).toBeNull()
-    fireEvent.press(getByText("Close"))
-
-    expect(toggleModal).toHaveBeenCalledTimes(1)
-  })
-
-  it("runs the transfer action instead of closing when the region permits it", () => {
+  /** The two-button variant is gone: the only action is the conversion, offered to every
+   *  affected user, so a dead-end Close is never shown. */
+  it("runs the transfer action from the single primary button", () => {
     const toggleModal = jest.fn()
     const onTransfer = jest.fn()
     const { getByText, queryByText } = render(
@@ -76,7 +72,7 @@ describe("DollarBalanceMigrationModal", () => {
     expect(toggleModal).not.toHaveBeenCalled()
   })
 
-  it("closes the modal from the X icon in both variants", () => {
+  it("closes the modal from the X icon", () => {
     const toggleModal = jest.fn()
     const { getByTestId } = render(
       wrap(
@@ -93,9 +89,32 @@ describe("DollarBalanceMigrationModal", () => {
     expect(toggleModal).toHaveBeenCalledTimes(1)
   })
 
+  /** On a screen whose only way forward is the conversion (the commit screen), the close is
+   *  suppressed so the modal cannot be dismissed into a dead end. */
+  it("hides the X icon when the close button is suppressed", () => {
+    const { queryByTestId } = render(
+      wrap(
+        <DollarBalanceMigrationModal
+          isVisible={true}
+          toggleModal={jest.fn()}
+          onTransfer={jest.fn()}
+          showCloseIconButton={false}
+        />,
+      ),
+    )
+
+    expect(queryByTestId("icon-close")).toBeNull()
+  })
+
   it("renders nothing when isVisible is false", () => {
     const { queryByText } = render(
-      wrap(<DollarBalanceMigrationModal isVisible={false} toggleModal={jest.fn()} />),
+      wrap(
+        <DollarBalanceMigrationModal
+          isVisible={false}
+          toggleModal={jest.fn()}
+          onTransfer={jest.fn()}
+        />,
+      ),
     )
 
     expect(queryByText(TITLE)).toBeNull()

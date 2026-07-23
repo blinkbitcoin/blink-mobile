@@ -45,7 +45,7 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
 
-  const { fromWalletCurrency, moneyAmount } = route.params
+  const { fromWalletCurrency, moneyAmount, isMigrationConversion } = route.params
   const isAuthed = useIsAuthed()
   const { isSelfCustodial, wallets: activeWallets } = useActiveWallet()
 
@@ -90,9 +90,18 @@ export const ConversionConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
   }, [convertMoneyAmount, formatMoneyAmount])
 
+  /** Resets to Home with the success screen on top, dropping the convert screens. A migration
+   *  conversion tags the success screen so it hands off to the migration entry (as the Settings
+   *  row does) instead of ending on Home. */
   const navigateToSuccess = () =>
     navigation.dispatch((state) => {
-      const routes = [{ name: "Primary" }, { name: "conversionSuccess" }]
+      const routes = [
+        { name: "Primary" },
+        {
+          name: "conversionSuccess",
+          ...(isMigrationConversion ? { params: { returnToMigration: true } } : {}),
+        },
+      ]
       return CommonActions.reset({ ...state, routes, index: routes.length - 1 })
     })
 

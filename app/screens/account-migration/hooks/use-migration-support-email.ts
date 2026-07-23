@@ -7,17 +7,18 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { MigrationSupportReason } from "@app/types/migration"
 import { isIos } from "@app/utils/helper"
 
-import { useMigrationDiagnostics } from "./use-migration-diagnostics"
+import { MigrationDiagnostic, useMigrationDiagnostics } from "./use-migration-diagnostics"
 
 const EMAIL_DIVIDER = "-".repeat(40)
 
 /**
- * Composes and opens the migration support email: what failed, the account diagnostics,
- * and the platform, app version and country, framed so the user writes at the bottom.
- * Mail clients drop the cursor at the END of a mailto body, so the write-here prompt goes
- * last: the user lands right under it and the details block stays untouched. The reason
- * leads, because support triages on what failed before it looks at any identifier, and it
- * lives only here: the screen shows identity for the user to copy, not a code for us.
+ * Builds the migration support payload once for the error screen, the clipboard and the
+ * email, so the three can never drift. `cardDetails` is what the screen shows: the failure
+ * reason first, then the account identity. `supportDetailsText` is the full block (the card
+ * details plus platform, app version and country) that the copy control and the email body
+ * share. The reason value stays an untranslated code, greppable whatever the user's locale;
+ * only its label is localized. The email frames the block so the write-here prompt lands
+ * last, where mail clients drop the cursor at the end of a mailto body.
  */
 export const useMigrationSupportEmail = (reason: MigrationSupportReason) => {
   const { LL } = useI18nContext()
@@ -25,23 +26,33 @@ export const useMigrationSupportEmail = (reason: MigrationSupportReason) => {
   const { composeSupport } = useContactSupport()
   const { countryCode } = useDeviceLocation()
   const diagnostics = useMigrationDiagnostics()
+  const platform = isIos ? "iOS" : "Android"
+
+  const cardDetails: MigrationDiagnostic[] = [
+    { label: LLSupport.reasonLabel(), value: reason, isIdentifier: false },
+    ...diagnostics,
+  ].filter((line) => Boolean(line.value))
+
+  const supportDetails: MigrationDiagnostic[] = [
+    ...cardDetails,
+    { label: LLSupport.platformLabel(), value: platform, isIdentifier: false },
+    {
+      label: LLSupport.appVersionLabel(),
+      value: getReadableVersion(),
+      isIdentifier: false,
+    },
+    { label: LLSupport.countryLabel(), value: countryCode ?? "", isIdentifier: false },
+  ].filter((line) => Boolean(line.value))
+
+  const supportDetailsText = supportDetails
+    .map(({ label, value }) => `${label}: ${value}`)
+    .join("\n")
 
   const sendSupportEmail = useCallback(() => {
-    const platform = isIos ? "iOS" : "Android"
-    const infoLines = [
-      { label: LLSupport.reasonLabel(), value: reason },
-      ...diagnostics,
-      { label: LLSupport.platformLabel(), value: platform },
-      { label: LLSupport.appVersionLabel(), value: getReadableVersion() },
-      { label: LLSupport.countryLabel(), value: countryCode ?? "" },
-    ]
-      .filter((line) => Boolean(line.value))
-      .map((line) => `${line.label}: ${line.value}`)
-
     const body = [
       LLSupport.emailAccountInfo(),
       EMAIL_DIVIDER,
-      ...infoLines,
+      supportDetailsText,
       EMAIL_DIVIDER,
       "",
       LLSupport.emailDescribeProblem(),
@@ -49,7 +60,7 @@ export const useMigrationSupportEmail = (reason: MigrationSupportReason) => {
     ].join("\n")
 
     composeSupport({ subject: LLSupport.emailSubject(), body })
-  }, [LLSupport, reason, diagnostics, countryCode, composeSupport])
+  }, [LLSupport, supportDetailsText, composeSupport])
 
-  return { diagnostics, sendSupportEmail }
+  return { cardDetails, supportDetailsText, sendSupportEmail }
 }

@@ -3569,7 +3569,8 @@
       "emailSubject": "Sol·licitud de suport de migració",
       "emailDescribeProblem": "Descriu el problema:",
       "emailAccountInfo": "Informació del compte per al suport:",
-      "contactUsCta": "Contacta'ns"
+      "contactUsCta": "Contacta'ns",
+      "copy": "Copiar"
     },
     "migrateNowModal": {
       "title": "Migra ara a un compte no custodi",
@@ -3595,7 +3596,6 @@
       "dollarBalanceNotAvailable": "no disponible",
       "networkFee": "Comissió de xarxa: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Comissió de xarxa: <bold>{fee: string}</bold> (coberta per Blink)",
-      "exchangeRate": "Tipus de canvi actual 1 BTC = {rate: string}",
       "retryCta": "Torna-ho a provar",
       "approveCta": "Aprovar",
       "contactSupportCta": "Contacta amb suport"

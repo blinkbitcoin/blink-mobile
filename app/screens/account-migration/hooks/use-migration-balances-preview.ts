@@ -2,14 +2,12 @@ import { useCallback } from "react"
 
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
-import { SATS_PER_BTC } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { AccountType } from "@app/types/wallet"
 import { AccountMigrationPreview, MigrationSupportReason } from "@app/types/migration"
 
 import { useCustodialWalletBalances } from "./use-custodial-wallet-balances"
-import { useWindDownGateArmed } from "./use-wind-down-gate-armed"
 import { useMigrationPreview } from "./use-migration-preview"
 
 const fiatSuffix = (fiat: string | undefined): string | undefined =>
@@ -33,7 +31,9 @@ const UNKNOWN_PREVIEW: AccountMigrationPreview = {
  * zero, never blank) when the dollar balance is restricted in the user's region for that
  * side's account type: current follows the custodial restriction, new follows the
  * self-custodial one, so a still-custodial user knows the new account will not hold
- * dollars. The exchange rate line only exists on the post-gate variant.
+ * dollars. The new Dollar Balance is always zero: the migration only ever moves bitcoin,
+ * never converts dollars, so it can never promise the user any. `hasDollarBalance` gates
+ * the commit screen, which sends any remaining dollars to convert before it arms.
  */
 export const useMigrationBalancesPreview = () => {
   const { LL } = useI18nContext()
@@ -52,7 +52,6 @@ export const useMigrationBalancesPreview = () => {
     refetch: refetchBalances,
   } = useCustodialWalletBalances({ fetchPolicy: "cache-and-network" })
   const { formatMoneyAmount, moneyAmountToDisplayCurrencyString } = useDisplayCurrency()
-  const isPostGate = useWindDownGateArmed()
   const isNewDollarBalanceRestricted = useDollarBalanceRestricted(
     AccountType.SelfCustodial,
   )
@@ -139,6 +138,7 @@ export const useMigrationBalancesPreview = () => {
     isRetryable,
     isUnavailable,
     unavailableReason,
+    hasDollarBalance: usdBalanceCents > 0,
     retry,
     currentBitcoinBalance: formatMoneyAmount({ moneyAmount: currentBtcAmount }),
     currentBitcoinFiat: fiatSuffix(
@@ -159,10 +159,5 @@ export const useMigrationBalancesPreview = () => {
     networkFeeLine: feeCoveredByBlink
       ? LLOverview.networkFeeCoveredByBlink({ fee: networkFee })
       : LLOverview.networkFee({ fee: networkFee }),
-    exchangeRate: isPostGate
-      ? moneyAmountToDisplayCurrencyString({
-          moneyAmount: toBtcMoneyAmount(SATS_PER_BTC),
-        })
-      : undefined,
   }
 }

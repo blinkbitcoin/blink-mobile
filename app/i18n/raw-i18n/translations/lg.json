@@ -3569,7 +3569,8 @@
       "emailSubject": "Okusaba obuyambi ku kutambuza akawunti",
       "emailDescribeProblem": "Nnyonnyola ekizibu:",
       "emailAccountInfo": "Ebikwata ku akawunti eby'obuyambi:",
-      "contactUsCta": "Tutuukirire"
+      "contactUsCta": "Tutuukirire",
+      "copy": "Koppa"
     },
     "migrateNowModal": {
       "title": "Kyusa kaakano ogende ku akawunti etakuumibwa",
@@ -3595,7 +3596,6 @@
       "dollarBalanceNotAvailable": "tezeewo",
       "networkFee": "Ssente z'omukutu: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ssente z'omukutu: <bold>{fee: string}</bold> (zisasulwa Blink)",
-      "exchangeRate": "Omuwendo gw'okuwaanyisiganya ogwa kati 1 BTC = {rate: string}",
       "retryCta": "Ddamu ogezeeko",
       "approveCta": "Kkiriza",
       "contactSupportCta": "Tuukirira obuyambi"

@@ -3569,7 +3569,8 @@
       "emailSubject": "Захтев за подршку при миграцији",
       "emailDescribeProblem": "Опишите проблем:",
       "emailAccountInfo": "Подаци о налогу за подршку:",
-      "contactUsCta": "Контактирајте нас"
+      "contactUsCta": "Контактирајте нас",
+      "copy": "Копирај"
     },
     "migrateNowModal": {
       "title": "Мигрирајте сада на не-кастодијални налог",
@@ -3595,7 +3596,6 @@
       "dollarBalanceNotAvailable": "није доступно",
       "networkFee": "Мрежна накнада: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Мрежна накнада: <bold>{fee: string}</bold> (сноси Blink)",
-      "exchangeRate": "Тренутни курс 1 BTC = {rate: string}",
       "retryCta": "Покушај поново",
       "approveCta": "Одобри",
       "contactSupportCta": "Контактирај подршку"

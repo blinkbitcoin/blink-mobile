@@ -44,11 +44,12 @@ export const GateBalances: React.FC = () => {
 }
 
 const useStyles = makeStyles(() => ({
+  /** Full content width, matching the body copy above, so a balance and its fiat stay on
+   *  one line instead of wrapping in a narrow column. */
   balances: {
-    alignSelf: "center",
     width: "100%",
-    maxWidth: 260,
     gap: 5,
-    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingHorizontal: 60,
   },
 }))

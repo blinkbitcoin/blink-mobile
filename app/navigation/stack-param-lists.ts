@@ -67,8 +67,17 @@ export type RootStackParamList = {
   conversionConfirmation: {
     fromWalletCurrency: WalletCurrency
     moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
+    /** Where a completed migration convert lands (back in the flow, not Home). Navigation-only,
+     *  never a privilege: the region waiver comes from the armed flag, not this forgeable param. */
+    isMigrationConversion?: boolean
   }
-  conversionSuccess: undefined
+  conversionSuccess:
+    | {
+        /** Set when the conversion was a migration step, so the success screen returns to the
+         *  migration flow instead of Home. */
+        returnToMigration?: boolean
+      }
+    | undefined
   sendBitcoinCompleted: {
     arrivalAtMempoolEstimate?: number
     status: PaymentSendCompletedStatus

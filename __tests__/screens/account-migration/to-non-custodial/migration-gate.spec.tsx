@@ -41,7 +41,12 @@ const mockRequiredScreen = jest.fn(
   (_props: { mode: string; onClose?: () => void; isExitBlocked?: boolean }) => null,
 )
 const mockDollarBalanceModal = jest.fn(
-  (props: { isVisible: boolean; toggleModal: () => void; onTransfer?: () => void }) => {
+  (props: {
+    isVisible: boolean
+    toggleModal: () => void
+    onTransfer?: () => void
+    showCloseIconButton?: boolean
+  }) => {
     const { Pressable } = jest.requireActual("react-native")
     return (
       <>
@@ -152,6 +157,11 @@ jest.mock("@app/components/dollar-balance-migration-modal", () => ({
     toggleModal: () => void
     onTransfer?: () => void
   }) => mockDollarBalanceModal(props),
+}))
+
+const mockArmMigrationConversion = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-migration-conversion", () => ({
+  armMigrationConversion: () => mockArmMigrationConversion(),
 }))
 
 jest.mock("@app/screens/account-migration/to-non-custodial/api-service-screen", () => ({
@@ -438,7 +448,7 @@ describe("MigrationGate", () => {
     expect(mockDollarBalanceModal.mock.calls[0][0].isVisible).toBe(false)
   })
 
-  it("offers the transfer action when the region permits the dollar transfer", () => {
+  it("arms the migration flag and opens the convert flow from the transfer action", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ usdBalance: 20 }),
     )
@@ -447,29 +457,22 @@ describe("MigrationGate", () => {
 
     fireEvent.press(getByTestId("gate-modal-transfer"))
 
+    expect(mockArmMigrationConversion).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
   })
 
-  it("shows the close-only variant when the region blocks the dollar transfer", () => {
+  /** Restricted regions used to get a dead-end Close; now every affected user converts from
+   *  here, since the convert screen waives its region bounce for a migration step. */
+  it("still offers the conversion in a region that blocks or restricts the transfer", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ usdBalance: 20 }),
     )
     mockUseTransferBlocked.mockReturnValue(true)
-
-    render(<MigrationGate />)
-
-    expect(mockDollarBalanceModal.mock.calls[0][0].onTransfer).toBeUndefined()
-  })
-
-  it("shows the close-only variant when the dollar balance is restricted in the region", () => {
-    mockUseWalletOverviewScreenQuery.mockReturnValue(
-      walletOverviewQueryResult({ usdBalance: 20 }),
-    )
     mockUseDollarBalanceRestricted.mockReturnValue(true)
 
     render(<MigrationGate />)
 
-    expect(mockDollarBalanceModal.mock.calls[0][0].onTransfer).toBeUndefined()
+    expect(mockDollarBalanceModal.mock.calls[0][0].onTransfer).toBeDefined()
   })
 
   it("exits the flow when the dollar-balance modal is dismissed", () => {
@@ -496,6 +499,42 @@ describe("MigrationGate", () => {
     render(<MigrationGate />)
 
     expect(mockDollarBalanceModal).toHaveBeenCalled()
+  })
+
+  /** The armed gate has no way back, so the modal drops its close: Transfer is the only
+   *  action, matching the non-dismissible gate behind it. */
+  it("hides the modal close icon once the gate is armed", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal.mock.calls[0][0].showCloseIconButton).toBe(false)
+  })
+
+  /** A locked migration is as final as the armed gate, so its modal drops the close too. */
+  it("hides the modal close icon while the migration is locked", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
+    mockIsMigrationLocked = true
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal.mock.calls[0][0].showCloseIconButton).toBe(false)
+  })
+
+  /** The voluntary flow, reached from Settings, can still be left, so the close stays. */
+  it("keeps the modal close icon in the voluntary flow", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ usdBalance: 20 }),
+    )
+
+    render(<MigrationGate />)
+
+    expect(mockDollarBalanceModal.mock.calls[0][0].showCloseIconButton).toBe(true)
   })
 
   /** The intro exists to convince someone who has not started. The server already

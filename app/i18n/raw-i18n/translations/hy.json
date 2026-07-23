@@ -3569,7 +3569,8 @@
       "emailSubject": "Տեղափոխման աջակցության հարցում",
       "emailDescribeProblem": "Նկարագրեք խնդիրը՝",
       "emailAccountInfo": "Հաշվի տվյալներ աջակցության համար՝",
-      "contactUsCta": "Կապվեք մեզ հետ"
+      "contactUsCta": "Կապվեք մեզ հետ",
+      "copy": "Պատճենել"
     },
     "migrateNowModal": {
       "title": "Տեղափոխվեք հիմա ոչ պահպանող հաշվի",
@@ -3595,7 +3596,6 @@
       "dollarBalanceNotAvailable": "հասանելի չէ",
       "networkFee": "Ցանցի վճար. <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ցանցի վճար. <bold>{fee: string}</bold> (ծածկում է Blink-ը)",
-      "exchangeRate": "Ընթացիկ փոխարժեք 1 BTC = {rate: string}",
       "retryCta": "Փորձել կրկին",
       "approveCta": "Հաստատել",
       "contactSupportCta": "Կապ աջակցման հետ"

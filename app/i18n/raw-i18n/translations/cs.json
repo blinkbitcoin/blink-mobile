@@ -3569,7 +3569,8 @@
       "emailSubject": "Žádost o podporu při migraci",
       "emailDescribeProblem": "Popište problém:",
       "emailAccountInfo": "Informace o účtu pro podporu:",
-      "contactUsCta": "Kontaktujte nás"
+      "contactUsCta": "Kontaktujte nás",
+      "copy": "Kopírovat"
     },
     "migrateNowModal": {
       "title": "Přejděte nyní na nesvěřenský účet",
@@ -3595,7 +3596,6 @@
       "dollarBalanceNotAvailable": "není k dispozici",
       "networkFee": "Síťový poplatek: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Síťový poplatek: <bold>{fee: string}</bold> (hradí Blink)",
-      "exchangeRate": "Aktuální směnný kurz 1 BTC = {rate: string}",
       "retryCta": "Zkusit znovu",
       "approveCta": "Schválit",
       "contactSupportCta": "Kontaktovat podporu"

@@ -10,8 +10,6 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { DollarBalanceMigrationModal } from "@app/components/dollar-balance-migration-modal"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
-import { useTransferBlocked } from "@app/hooks/use-transfer-blocked"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { TemporarilyUnavailableScreen } from "@app/screens/feature-unavailable/temporarily-unavailable-screen"
 import { WindDownStatus } from "@app/types/wind-down"
@@ -25,6 +23,7 @@ import {
 } from "@app/screens/account-migration/hooks"
 import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
 import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
+import { armMigrationConversion } from "@app/screens/account-migration/hooks/use-migration-conversion"
 import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 
 import { MigrationApiServiceScreen } from "./api-service-screen"
@@ -78,8 +77,6 @@ export const MigrationGate: React.FC = () => {
     refetch: refetchLock,
   } = useMigrationLock()
   const isExitBlocked = isGated || isMigrationLocked
-  const isTransferBlocked = useTransferBlocked()
-  const isDollarBalanceRestricted = useDollarBalanceRestricted()
   const [isApiWarningAcknowledged, setIsApiWarningAcknowledged] = useState(false)
 
   /** While a pushed screen (the dollar transfer) has focus the modal hides instead of
@@ -101,6 +98,10 @@ export const MigrationGate: React.FC = () => {
   }, [navigation])
 
   const goToDollarTransfer = useCallback(() => {
+    /** Arm the flag before navigating so the convert screen waives its region restriction
+     *  for this migration step (see use-migration-conversion); the deep-linkable route is
+     *  not trusted with that on its own. */
+    armMigrationConversion()
     navigation.navigate("conversionDetails")
   }, [navigation])
 
@@ -237,18 +238,20 @@ export const MigrationGate: React.FC = () => {
   }
 
   if (shouldBlockOnDollarBalance) {
-    /** The conversion screen bounces blocked or dollar-restricted regions back home, so
-     *  the Transfer variant only shows when the user can actually reach it; restricted
-     *  regions empty their dollars through the home's forced convert modal instead. */
-    const canTransferInApp = !isTransferBlocked && !isDollarBalanceRestricted
-    const transferAction = canTransferInApp ? goToDollarTransfer : undefined
+    /** Every affected user converts in-app from here, restricted regions included: the
+     *  convert screen waives its usual region bounce when it is reached as a migration step
+     *  (confirmed by the server wind-down, not the deep-linkable param alone), so the modal
+     *  always offers the conversion. The close icon is hidden where the exit is blocked (the
+     *  armed gate or a locked migration): no way back, so Transfer is the only action. */
+    const canCloseDollarModal = !isExitBlocked
     return (
       <>
         <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />
         <DollarBalanceMigrationModal
           isVisible={isFocused}
           toggleModal={exitFlow}
-          onTransfer={transferAction}
+          onTransfer={goToDollarTransfer}
+          showCloseIconButton={canCloseDollarModal}
         />
       </>
     )

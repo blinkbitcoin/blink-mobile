@@ -4,14 +4,24 @@ import { CommonActions, useNavigation } from "@react-navigation/native"
 
 import { useDollarBalanceRestricted } from "./use-dollar-balance-restricted"
 
-export const useDollarBalanceRestrictionGuard = (): boolean => {
+type UseDollarBalanceRestrictionGuardOptions = {
+  /** Turns the guard off for a caller that must let a restricted user through (the
+   *  migration's dollar-to-bitcoin conversion). Defaults to on. */
+  enabled?: boolean
+}
+
+export const useDollarBalanceRestrictionGuard = ({
+  enabled = true,
+}: UseDollarBalanceRestrictionGuardOptions = {}): boolean => {
   const isRestricted = useDollarBalanceRestricted()
   const navigation = useNavigation()
 
-  useEffect(() => {
-    if (!isRestricted) return
-    navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
-  }, [isRestricted, navigation])
+  const shouldBlock = enabled && isRestricted
 
-  return isRestricted
+  useEffect(() => {
+    if (!shouldBlock) return
+    navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
+  }, [shouldBlock, navigation])
+
+  return shouldBlock
 }

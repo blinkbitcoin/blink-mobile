@@ -3569,7 +3569,8 @@
       "emailSubject": "Supportanmodning om migrering",
       "emailDescribeProblem": "Beskriv problemet:",
       "emailAccountInfo": "Kontooplysninger til support:",
-      "contactUsCta": "Kontakt os"
+      "contactUsCta": "Kontakt os",
+      "copy": "Kopier"
     },
     "migrateNowModal": {
       "title": "Migrér nu til en ikke-depotkonto",
@@ -3595,7 +3596,6 @@
       "dollarBalanceNotAvailable": "ikke tilgængelig",
       "networkFee": "Netværksgebyr: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Netværksgebyr: <bold>{fee: string}</bold> (dækkes af Blink)",
-      "exchangeRate": "Nuværende vekselkurs 1 BTC = {rate: string}",
       "retryCta": "Prøv igen",
       "approveCta": "Godkend",
       "contactSupportCta": "Kontakt support"

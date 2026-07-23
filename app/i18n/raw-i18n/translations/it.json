@@ -3569,7 +3569,8 @@
             "emailSubject": "Richiesta di supporto per la migrazione",
             "emailDescribeProblem": "Descrivi il problema:",
             "emailAccountInfo": "Informazioni dell'account per il supporto:",
-            "contactUsCta": "Contattaci"
+            "contactUsCta": "Contattaci",
+            "copy": "Copia"
         },
         "migrateNowModal": {
             "title": "Migra ora verso un account non custodiale",
@@ -3595,7 +3596,6 @@
             "dollarBalanceNotAvailable": "non disponibile",
             "networkFee": "Commissione di rete: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "Commissione di rete: <bold>{fee: string}</bold> (coperta da Blink)",
-            "exchangeRate": "Tasso di cambio attuale 1 BTC = {rate: string}",
             "retryCta": "Riprova",
             "approveCta": "Approva",
             "contactSupportCta": "Contatta il supporto"

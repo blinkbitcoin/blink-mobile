@@ -183,4 +183,44 @@ describe("useMigrationSupportEmail", () => {
       ),
     )
   })
+
+  /** The card shows what failed then who the user is, and stops there: the environment
+   *  metadata is only for the email and the clipboard. */
+  it("exposes the card details with the reason first and no environment metadata", () => {
+    const { result } = renderHook(
+      () => useMigrationSupportEmail(MigrationSupportReason.TransferFailed),
+      { wrapper },
+    )
+
+    expect(result.current.cardDetails).toEqual([
+      { label: LLSupport.reasonLabel(), value: "transfer-failed", isIdentifier: false },
+      { label: LLSupport.accountIdLabel(), value: "18A4242", isIdentifier: true },
+      { label: LLSupport.pubKeyLabel(), value: "02abc123pubkey", isIdentifier: true },
+      { label: LLSupport.usernameLabel(), value: "satoshin21", isIdentifier: false },
+      { label: LLSupport.emailLabel(), value: "email@email.com", isIdentifier: false },
+      { label: LLSupport.phoneLabel(), value: "+1 374 9383 993", isIdentifier: false },
+    ])
+  })
+
+  /** The copyable block is the full support payload the email sends, so the two never drift. */
+  it("exposes the copyable block matching the email with the environment appended", () => {
+    const { result } = renderHook(
+      () => useMigrationSupportEmail(MigrationSupportReason.TransferFailed),
+      { wrapper },
+    )
+
+    expect(result.current.supportDetailsText).toBe(
+      [
+        `${LLSupport.reasonLabel()}: transfer-failed`,
+        `${LLSupport.accountIdLabel()}: 18A4242`,
+        `${LLSupport.pubKeyLabel()}: 02abc123pubkey`,
+        `${LLSupport.usernameLabel()}: satoshin21`,
+        `${LLSupport.emailLabel()}: email@email.com`,
+        `${LLSupport.phoneLabel()}: +1 374 9383 993`,
+        `${LLSupport.platformLabel()}: iOS`,
+        `${LLSupport.appVersionLabel()}: ${APP_VERSION}`,
+        `${LLSupport.countryLabel()}: SV`,
+      ].join("\n"),
+    )
+  })
 })

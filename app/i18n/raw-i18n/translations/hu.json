@@ -3569,7 +3569,8 @@
       "emailSubject": "Átköltöztetési támogatási kérelem",
       "emailDescribeProblem": "Írja le a problémát:",
       "emailAccountInfo": "Fiókadatok az ügyfélszolgálat számára:",
-      "contactUsCta": "Lépjen kapcsolatba velünk"
+      "contactUsCta": "Lépjen kapcsolatba velünk",
+      "copy": "Másol"
     },
     "migrateNowModal": {
       "title": "Költözzön át most egy nem letétkezelt fiókba",
@@ -3595,7 +3596,6 @@
       "dollarBalanceNotAvailable": "nem elérhető",
       "networkFee": "Hálózati díj: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Hálózati díj: <bold>{fee: string}</bold> (a Blink fedezi)",
-      "exchangeRate": "Jelenlegi árfolyam 1 BTC = {rate: string}",
       "retryCta": "Próbáld újra",
       "approveCta": "Jóváhagyás",
       "contactSupportCta": "Kapcsolat a támogatással"

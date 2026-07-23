@@ -9,22 +9,35 @@ import {
 } from "@app/components/success-animation"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles } from "@rn-vui/themed"
+
+const CALLBACK_DELAY = 3000
 
 export const ConversionSuccessScreen = () => {
   const styles = useStyles()
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "conversionSuccess">>()
+  const route = useRoute<RouteProp<RootStackParamList, "conversionSuccess">>()
 
   const { LL } = useI18nContext()
-  const CALLBACK_DELAY = 3000
+  const returnToMigration = route.params?.returnToMigration
+
   useEffect(() => {
-    const navigateToHomeTimeout = setTimeout(navigation.popToTop, CALLBACK_DELAY)
-    return () => clearTimeout(navigateToHomeTimeout)
-  }, [navigation])
+    /** A migration conversion resumes via the migration entry (as the Settings row does); a
+     *  standalone one returns to Home. */
+    const continueAfterSuccess = () => {
+      if (returnToMigration) {
+        navigation.replace("accountMigrationEntry")
+        return
+      }
+      navigation.popToTop()
+    }
+    const timeout = setTimeout(continueAfterSuccess, CALLBACK_DELAY)
+    return () => clearTimeout(timeout)
+  }, [navigation, returnToMigration])
 
   return (
     <Screen preset="scroll" style={styles.screen}>

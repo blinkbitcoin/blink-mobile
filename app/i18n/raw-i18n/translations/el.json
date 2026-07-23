@@ -3569,7 +3569,8 @@
       "emailSubject": "Αίτημα υποστήριξης μετάβασης",
       "emailDescribeProblem": "Περιγράψτε το πρόβλημα:",
       "emailAccountInfo": "Πληροφορίες λογαριασμού για την υποστήριξη:",
-      "contactUsCta": "Επικοινωνήστε μαζί μας"
+      "contactUsCta": "Επικοινωνήστε μαζί μας",
+      "copy": "Αντιγραφή"
     },
     "migrateNowModal": {
       "title": "Μεταφερθείτε τώρα σε λογαριασμό μη φύλαξης",
@@ -3595,7 +3596,6 @@
       "dollarBalanceNotAvailable": "μη διαθέσιμο",
       "networkFee": "Τέλος δικτύου: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Τέλος δικτύου: <bold>{fee: string}</bold> (καλύπτεται από το Blink)",
-      "exchangeRate": "Τρέχουσα ισοτιμία 1 BTC = {rate: string}",
       "retryCta": "Δοκιμάστε ξανά",
       "approveCta": "Έγκριση",
       "contactSupportCta": "Επικοινωνία με υποστήριξη"

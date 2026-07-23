@@ -3772,7 +3772,6 @@ const en: BaseTranslation = {
       dollarBalanceNotAvailable: "not available",
       networkFee: "Network fee: <bold>{fee: string}</bold>",
       networkFeeCoveredByBlink: "Network fee: <bold>{fee: string}</bold> (covered by Blink)",
-      exchangeRate: "Current exchange rate 1 BTC = {rate: string}",
       retryCta: "Try again",
       approveCta: "Approve",
       contactSupportCta: "Contact support",
@@ -3807,6 +3806,7 @@ const en: BaseTranslation = {
       emailDescribeProblem: "Describe the problem:",
       emailAccountInfo: "Account information for support:",
       contactUsCta: "Contact us",
+      copy: "Copy",
     },
   },
   AccountTypeSelectionScreen: {

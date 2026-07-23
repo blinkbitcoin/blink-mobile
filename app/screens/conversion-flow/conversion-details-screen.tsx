@@ -36,8 +36,13 @@ import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
 import { useTransferBlockedGuard } from "@app/hooks/use-transfer-blocked-guard"
+import { useConsumeMigrationConversionArmed } from "@app/screens/account-migration/hooks/use-migration-conversion"
+import { resolveInitialConvertWallets } from "@app/screens/conversion-flow/migration-convert-wallets"
 import { CurrencyInput } from "@app/components/currency-input"
-import { PercentageSelector } from "@app/components/percentage-selector"
+import {
+  PercentageSelector,
+  PERCENTAGE_OPTIONS,
+} from "@app/components/percentage-selector"
 import { WalletAmountRow, WalletToggleButton } from "@app/components/wallet-selector"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { useEqualPillWidth } from "@app/components/atomic/currency-pill/use-equal-pill-width"
@@ -81,15 +86,32 @@ const ANIMATION_CONFIG = {
   useNativeDriver: false,
 }
 
+/** The whole-balance percentage, as the last of the on-screen chips; the migration prefill
+ *  drives it the same way tapping that chip does. */
+const FULL_BALANCE_PERCENTAGE = 100
+
 export const ConversionDetailsScreen = () => {
-  const isDollarBalanceRestricted = useDollarBalanceRestrictionGuard()
-  const isTransferBlocked = useTransferBlockedGuard()
+  const isMigrationConversion = useConsumeMigrationConversionArmed()
+
+  /** A migration conversion waives the region restriction that would otherwise bounce a
+   *  restricted user home: emptying the dollar balance is the one way for them to migrate,
+   *  and the gate arming the flag (not a deep-linkable param) is what confirms it. */
+  const isDollarBalanceRestricted = useDollarBalanceRestrictionGuard({
+    enabled: !isMigrationConversion,
+  })
+  const isTransferBlocked = useTransferBlockedGuard({ enabled: !isMigrationConversion })
   if (isDollarBalanceRestricted || isTransferBlocked) return null
 
-  return <ConversionDetailsScreenContent />
+  return <ConversionDetailsScreenContent isMigrationConversion={isMigrationConversion} />
 }
 
-const ConversionDetailsScreenContent = () => {
+type ConversionDetailsScreenContentProps = {
+  isMigrationConversion: boolean
+}
+
+const ConversionDetailsScreenContent = ({
+  isMigrationConversion,
+}: ConversionDetailsScreenContentProps) => {
   const {
     theme: { colors },
   } = useTheme()
@@ -150,6 +172,11 @@ const ConversionDetailsScreenContent = () => {
   const usdWallet =
     selfCustodialWalletsForConvert?.usd ?? getUsdWallet(data?.me?.defaultAccount?.wallets)
 
+  const initialWallets = useMemo(
+    () => resolveInitialConvertWallets(btcWallet, usdWallet, isMigrationConversion),
+    [btcWallet, usdWallet, isMigrationConversion],
+  )
+
   const {
     fromWallet,
     toWallet,
@@ -161,11 +188,7 @@ const ConversionDetailsScreenContent = () => {
     moneyAmount,
     canToggleWallet,
     toggleWallet,
-  } = useConvertMoneyDetails(
-    btcWallet && usdWallet
-      ? { initialFromWallet: btcWallet, initialToWallet: usdWallet }
-      : undefined,
-  )
+  } = useConvertMoneyDetails(initialWallets)
 
   const convertDirection =
     isSelfCustodial && fromWallet
@@ -218,6 +241,7 @@ const ConversionDetailsScreenContent = () => {
   const [uiLocked, setUiLocked] = useState(false)
   const [overlaysReady, setOverlaysReady] = useState(false)
   const [loadingPercent, setLoadingPercent] = useState<number | null>(null)
+  const [selectedPercent, setSelectedPercent] = useState<number | null>(null)
   const pillLabels = useMemo(
     () => ({ BTC: LL.common.bitcoin(), USD: LL.common.dollar() }),
     [LL.common],
@@ -342,10 +366,49 @@ const ConversionDetailsScreenContent = () => {
   }, [focusedInputValues, lockFormattingInputId])
 
   useEffect(() => {
-    if (!fromWallet && btcWallet && usdWallet) {
-      setWallets({ fromWallet: btcWallet, toWallet: usdWallet })
+    if (fromWallet || !initialWallets) return
+    setWallets({
+      fromWallet: initialWallets.initialFromWallet,
+      toWallet: initialWallets.initialToWallet,
+    })
+  }, [fromWallet, initialWallets, setWallets])
+
+  /** Sets the amount to a percentage of the from-wallet balance with the locked-loading path,
+   *  shared by the percentage chips and the migration prefill so both stay in step. */
+  const applyBalancePercentage = useCallback(
+    (percentage: number) => {
+      if (!fromWallet) return
+      setLockFormattingInputId(null)
+      setUiLocked(true)
+      setLoadingPercent(percentage)
+      setSelectedPercent(percentage)
+      setInitialAmount(
+        toWalletAmount({
+          amount: Math.round((fromWallet.balance * percentage) / 100),
+          currency: fromWallet.walletCurrency,
+        }),
+      )
+    },
+    [
+      fromWallet,
+      setLockFormattingInputId,
+      setUiLocked,
+      setLoadingPercent,
+      setSelectedPercent,
+      setInitialAmount,
+    ],
+  )
+
+  /** Prefills the whole dollar balance once, so a migration user lands with 100% ready to
+   *  confirm; reuses the chip path so it shows the spinner instead of flashing up from zero. */
+  const hasPrefilledMigrationAmountRef = useRef(false)
+  useEffect(() => {
+    if (!isMigrationConversion || hasPrefilledMigrationAmountRef.current || !fromWallet) {
+      return
     }
-  }, [btcWallet, usdWallet, fromWallet, setWallets])
+    hasPrefilledMigrationAmountRef.current = true
+    applyBalancePercentage(FULL_BALANCE_PERCENTAGE)
+  }, [isMigrationConversion, fromWallet, applyBalancePercentage])
 
   const handleSetMoneyAmount = useCallback(
     (amount: MoneyAmount<WalletOrDisplayCurrency>) => setMoneyAmount(amount),
@@ -385,6 +448,7 @@ const ConversionDetailsScreenContent = () => {
 
     setLockFormattingInputId(null)
     setIsTyping(false)
+    setSelectedPercent(null)
 
     const currentFocusedId = focusedInputValues?.id ?? null
     const newFocusedId =
@@ -532,24 +596,37 @@ const ConversionDetailsScreenContent = () => {
 
   const hasError = Boolean(amountFieldError)
 
+  /** A recalculation in flight (a wallet toggle, live typing, or a percentage chip applying
+   *  its amount), during which the amount inputs must not be re-driven. */
+  const isRecalculating = toggleInitiated.current || isTyping || Boolean(loadingPercent)
+  const isPercentageSelectorLocked = uiLocked || isRecalculating
+
+  const isReviewDisabled =
+    !isValidAmount ||
+    uiLocked ||
+    isRecalculating ||
+    belowMinimum ||
+    selfCustodialLimitsUnavailable ||
+    quoteBlocking ||
+    conversionGuard.isQuoting ||
+    conversionGuard.hasQuoteError ||
+    isSelfCustodialBooting
+
+  const isWalletToggleDisabled = !canToggleWallet || uiLocked || isMigrationConversion
+  const migrationLockedPercentages = isMigrationConversion
+    ? PERCENTAGE_OPTIONS.filter((percentage) => percentage !== FULL_BALANCE_PERCENTAGE)
+    : undefined
+
   const setAmountToBalancePercentage = (percentage: number) => {
     if (uiLocked) return
-    setLockFormattingInputId(null)
-    setUiLocked(true)
-    setLoadingPercent(percentage)
-
-    setInitialAmount(
-      toWalletAmount({
-        amount: Math.round((fromWallet.balance * percentage) / 100),
-        currency: fromWallet.walletCurrency,
-      }),
-    )
+    applyBalancePercentage(percentage)
   }
 
   const moveToNextScreen = () => {
     navigation.navigate("conversionConfirmation", {
       fromWalletCurrency: fromWallet.walletCurrency,
       moneyAmount,
+      isMigrationConversion,
     })
   }
 
@@ -616,8 +693,8 @@ const ConversionDetailsScreenContent = () => {
               pointerEvents="none"
             />
             <WalletToggleButton
-              loading={toggleInitiated.current || isTyping || Boolean(loadingPercent)}
-              disabled={!canToggleWallet || uiLocked}
+              loading={isRecalculating}
+              disabled={isWalletToggleDisabled}
               onPress={toggleInputs}
               containerStyle={styles.switchButton}
               testID="wallet-toggle-button"
@@ -714,10 +791,10 @@ const ConversionDetailsScreenContent = () => {
 
       <View style={styles.bottomStack}>
         <PercentageSelector
-          isLocked={
-            uiLocked || toggleInitiated.current || isTyping || Boolean(loadingPercent)
-          }
+          isLocked={isPercentageSelectorLocked}
           loadingPercent={loadingPercent}
+          selectedPercent={selectedPercent}
+          disabledOptions={migrationLockedPercentages}
           onSelect={setAmountToBalancePercentage}
           testIdPrefix="convert"
           containerStyle={styles.percentageContainer}
@@ -729,6 +806,7 @@ const ConversionDetailsScreenContent = () => {
         >
           <AmountInputScreen
             inputValues={inputValues}
+            disabled={isMigrationConversion}
             convertMoneyAmount={convertMoneyAmount}
             onAmountChange={handleSetMoneyAmount}
             onSetFormattedAmount={onSetFormattedValues}
@@ -740,6 +818,8 @@ const ConversionDetailsScreenContent = () => {
               setIsTyping(typing)
               setTypingInputId(typing ? focusedId : null)
               if (typing && focusedId) setLockFormattingInputId(focusedId)
+              /** A hand-typed amount no longer matches a preset, so drop the pressed chip. */
+              if (typing) setSelectedPercent(null)
             }}
             onAfterRecalc={() => {
               setUiLocked(false)
@@ -761,19 +841,7 @@ const ConversionDetailsScreenContent = () => {
         <GaloyPrimaryButton
           title={LL.ConversionDetailsScreen.reviewTransfer()}
           containerStyle={styles.buttonContainer}
-          disabled={
-            !isValidAmount ||
-            uiLocked ||
-            toggleInitiated.current ||
-            isTyping ||
-            Boolean(loadingPercent) ||
-            belowMinimum ||
-            selfCustodialLimitsUnavailable ||
-            quoteBlocking ||
-            conversionGuard.isQuoting ||
-            conversionGuard.hasQuoteError ||
-            isSelfCustodialBooting
-          }
+          disabled={isReviewDisabled}
           onPress={moveToNextScreen}
           testID="next-button"
         />

@@ -3569,7 +3569,8 @@
       "emailSubject": "Taşıma destek talebi",
       "emailDescribeProblem": "Sorunu açıklayın:",
       "emailAccountInfo": "Destek için hesap bilgileri:",
-      "contactUsCta": "Bize ulaşın"
+      "contactUsCta": "Bize ulaşın",
+      "copy": "Kopyala"
     },
     "migrateNowModal": {
       "title": "Şimdi saklamasız bir hesaba taşının",
@@ -3595,7 +3596,6 @@
       "dollarBalanceNotAvailable": "kullanılamıyor",
       "networkFee": "Ağ ücreti: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ağ ücreti: <bold>{fee: string}</bold> (Blink tarafından karşılanır)",
-      "exchangeRate": "Güncel döviz kuru 1 BTC = {rate: string}",
       "retryCta": "Tekrar dene",
       "approveCta": "Onayla",
       "contactSupportCta": "Desteğe ulaş"
