@@ -28,8 +28,8 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
-import { IconTransaction } from "../../components/icon-transactions"
-import { Screen } from "../../components/screen"
+import { IconTransaction } from "@app/components/icon-transactions"
+import { Screen } from "@app/components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { formatTimeToMempool, timeToMempool } from "./format-time"
 
@@ -125,8 +125,14 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
 
   const { data: homeData } = useHomeAuthedQuery({ fetchPolicy: "cache-only" })
 
-  const viewInExplorer = (hash: string): Promise<Linking> =>
-    Linking.openURL(galoyInstance.blockExplorer + hash)
+  const viewInExplorer = (hash: string): Promise<Linking> => {
+    if (hash.includes("-")) {
+      // if the "hash" contains a dash then it's actually a UUID from spark
+      return Linking.openURL(galoyInstance.sparkExplorer + hash)
+    }
+
+    return Linking.openURL(galoyInstance.blockExplorer + hash)
+  }
 
   const viewInLightningDecoder = (invoice: string): Promise<Linking> =>
     Linking.openURL("https://dev.blink.sv/decode?invoice=" + invoice)
