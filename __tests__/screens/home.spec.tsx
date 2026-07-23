@@ -1824,6 +1824,35 @@ describe("HomeScreen layout under font scaling (blink-wip#931)", () => {
     expect(headerStyle.minHeight).toBeGreaterThanOrEqual(40)
   })
 
+  it("sizes the header row to its content so it cannot collapse under the min height", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    // flex: 1 gives the row a zero flex-basis, so its content would stop
+    // contributing to the auto-height parent and clip again at minHeight.
+    const rowStyle = StyleSheet.flatten(getByTestId("home-header-row").props.style)
+    expect(rowStyle.flex).toBeUndefined()
+  })
+
+  it("keeps the settings menu button wired in the header", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("home-settings-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("settings")
+  })
+
   it("caps username font scaling so the header controls stay reachable", async () => {
     const { getByTestId } = render(
       <ContextForScreen>

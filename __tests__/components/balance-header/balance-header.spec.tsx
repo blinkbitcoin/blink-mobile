@@ -8,10 +8,11 @@ import { BalanceMode } from "@app/hooks/use-balance-mode"
 import { BalanceHeader } from "@app/components/balance-header/balance-header"
 
 const mockSwitchMemoryHideAmount = jest.fn()
+let mockHideAmount = false
 
 jest.mock("@app/graphql/hide-amount-context", () => ({
   useHideAmount: () => ({
-    hideAmount: false,
+    hideAmount: mockHideAmount,
     switchMemoryHideAmount: mockSwitchMemoryHideAmount,
   }),
 }))
@@ -37,6 +38,7 @@ const renderHeader = (props: Partial<React.ComponentProps<typeof BalanceHeader>>
 describe("BalanceHeader", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockHideAmount = false
   })
 
   it("renders the formatted balance", () => {
@@ -101,6 +103,23 @@ describe("BalanceHeader", () => {
     expect(getByTestId("balance-value").props.maxFontSizeMultiplier).toBeLessThanOrEqual(
       1.5,
     )
+  })
+
+  it("renders the hidden placeholder instead of the balance when the amount is hidden", () => {
+    mockHideAmount = true
+
+    const { getByText, queryByTestId } = renderHeader({ formattedBalance: "$42.00" })
+
+    expect(getByText("****")).toBeTruthy()
+    expect(queryByTestId("balance-value")).toBeNull()
+  })
+
+  it("caps font scaling on the hidden placeholder (blink-wip#931)", () => {
+    mockHideAmount = true
+
+    const { getByText } = renderHeader()
+
+    expect(getByText("****").props.maxFontSizeMultiplier).toBeLessThanOrEqual(1.5)
   })
 
   it("does not render the status badge by default", () => {

@@ -710,7 +710,7 @@ export const HomeScreen: React.FC = () => {
         timezone={migrateNowPrompt.timezone}
       />
       <View {...testProps("home-header")} style={styles.balanceContainer}>
-        <View style={styles.header}>
+        <View {...testProps("home-header-row")} style={styles.header}>
           <GaloyIconButton
             onPress={() => navigation.navigate("priceHistory")}
             size={"medium"}
@@ -735,6 +735,7 @@ export const HomeScreen: React.FC = () => {
             )}
           </View>
           <GaloyIconButton
+            {...testProps("home-settings-button")}
             onPress={() => navigation.navigate("settings")}
             size={"medium"}
             name="menu"
