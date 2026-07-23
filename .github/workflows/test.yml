@@ -5,15 +5,14 @@ on:
 jobs:
   check-code:
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, blink, heavy]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version-file: .nvmrc
-      - run: yarn install
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v14
+      - run: nix develop -c yarn install
       # Flake handling happens at test granularity now: jest retries individual
       # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
       # error, instead of silently re-running the whole job.
-      - run: yarn test
+      - run: nix develop -c yarn test
         timeout-minutes: 20
