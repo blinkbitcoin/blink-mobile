@@ -1,5 +1,5 @@
 import { CountryCode, parsePhoneNumber } from "libphonenumber-js/mobile"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { useApolloClient } from "@apollo/client"
 import { updateCountryCode } from "@app/graphql/client-only-query"
@@ -112,6 +112,20 @@ const useDeviceLocation = (): DeviceLocation => {
     detectionFailed,
     source,
   }
+}
+
+export const usePhoneCountryCode = (): CountryCode | undefined => {
+  const { data } = useSettingsScreenQuery({ fetchPolicy: "cache-first" })
+  const phone = data?.me?.phone
+
+  return useMemo(() => {
+    if (!phone) return undefined
+    try {
+      return parsePhoneNumber(phone)?.country
+    } catch {
+      return undefined
+    }
+  }, [phone])
 }
 
 export const useIpCountryCode = (enabled: boolean): CountryCode | undefined => {

@@ -3,6 +3,7 @@ import { renderHook, act } from "@testing-library/react-hooks"
 import useDeviceLocation, {
   isBlockedCountry,
   useIpCountryCode,
+  usePhoneCountryCode,
 } from "@app/hooks/use-device-location"
 
 const mockLogError = jest.fn()
@@ -306,6 +307,46 @@ describe("useIpCountryCode", () => {
     const { result } = renderHook(() => useIpCountryCode(true))
 
     await act(async () => {})
+
+    expect(result.current).toBeUndefined()
+  })
+})
+
+describe("usePhoneCountryCode", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
+    mockParsePhoneNumber.mockImplementation(
+      jest.requireActual("libphonenumber-js/mobile").parsePhoneNumber,
+    )
+  })
+
+  it("resolves the country from the user phone", () => {
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { phone: "+4915112345678" } },
+    })
+
+    const { result } = renderHook(() => usePhoneCountryCode())
+
+    expect(result.current).toBe("DE")
+  })
+
+  it("returns undefined when the user has no phone", () => {
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { phone: null } },
+    })
+
+    const { result } = renderHook(() => usePhoneCountryCode())
+
+    expect(result.current).toBeUndefined()
+  })
+
+  it("returns undefined when the phone cannot be parsed", () => {
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { phone: "invalid-phone" } },
+    })
+
+    const { result } = renderHook(() => usePhoneCountryCode())
 
     expect(result.current).toBeUndefined()
   })

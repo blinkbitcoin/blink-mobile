@@ -2843,6 +2843,8 @@ const en: BaseTranslation = {
   },
   common: {
     country: "Country",
+    registered: "Registered",
+    detected: "Detected",
     unknown: "Unknown",
     enabled: "Enabled",
     switch: "Switch",
