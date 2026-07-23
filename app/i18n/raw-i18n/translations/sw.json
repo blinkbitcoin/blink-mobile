@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "Ingiza nambari sahihi ya simu ya mkononi",
     "phoneNotAllowed": "Sehemu hii haikubali nambari za simu"
   },
+  "MerchantSelectionScreen": {
+    "title": "Chagua chaguo la malipo",
+    "empty": "Hakuna chaguo za malipo zinazopatikana."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Muamala unapaswa kuwasilishwa kwenye mempool",
     "amount": "Kiasi",

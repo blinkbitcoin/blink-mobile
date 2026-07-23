@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "Introduceți un număr de telefon mobil valid",
     "phoneNotAllowed": "Acest câmp nu acceptă numere de telefon"
   },
+  "MerchantSelectionScreen": {
+    "title": "Alege opțiunea de plată",
+    "empty": "Nu sunt disponibile opțiuni de plată."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Tranzacția trebuie trimisă la mempool",
     "amount": "Suma",

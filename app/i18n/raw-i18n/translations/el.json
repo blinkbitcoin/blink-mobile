@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "Εισαγάγετε έγκυρο αριθμό κινητού",
     "phoneNotAllowed": "Αυτό το πεδίο δεν δέχεται αριθμούς τηλεφώνου"
   },
+  "MerchantSelectionScreen": {
+    "title": "Επιλέξτε επιλογή πληρωμής",
+    "empty": "Δεν υπάρχουν διαθέσιμες επιλογές πληρωμής."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Η συναλλαγή πρέπει να υποβληθεί στη mempool",
     "amount": "Ποσό",

@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "Indtast et gyldigt mobilnummer",
     "phoneNotAllowed": "Dette felt accepterer ikke telefonnumre"
   },
+  "MerchantSelectionScreen": {
+    "title": "Vælg betalingsmulighed",
+    "empty": "Der er ingen betalingsmuligheder tilgængelige."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaktionen skulle nu blive tilføjet til mempool",
     "amount": "Beløb",

@@ -28,6 +28,7 @@ import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
+const mockReplace = jest.fn()
 
 type MockedContact = {
   id: string
@@ -109,6 +110,10 @@ jest.mock("@app/hooks/use-app-config", () => ({
   }),
 }))
 
+jest.mock("@app/hooks/use-display-currency", () => ({
+  useDisplayCurrency: () => ({ displayCurrency: "USD" }),
+}))
+
 jest.mock("@react-native-clipboard/clipboard", () => ({
   getString: jest.fn(() => Promise.resolve("clipboard")),
   setString: jest.fn(),
@@ -118,6 +123,7 @@ jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     navigate: mockNavigate,
+    replace: mockReplace,
     setParams: jest.fn(),
   }),
 }))
@@ -544,7 +550,7 @@ describe("SendBitcoinDestinationScreen", () => {
     await flushAsync()
 
     expect(parseDestinationMock).toHaveBeenCalledWith(
-      expect.objectContaining({ rawInput: "clipboard" }),
+      expect.objectContaining({ rawInput: "clipboard", displayCurrency: "USD" }),
     )
 
     await flushEffects()
@@ -595,7 +601,8 @@ describe("SendBitcoinDestinationScreen", () => {
 
     await flushAsync()
 
-    expect(mockNavigate).toHaveBeenCalledWith("merchantSelection", { merchants })
+    expect(mockReplace).toHaveBeenCalledWith("merchantSelection", { merchants })
+    expect(mockNavigate).not.toHaveBeenCalledWith("merchantSelection", expect.anything())
     expect(mockNavigate).not.toHaveBeenCalledWith("sendBitcoinDetails", expect.anything())
   })
 

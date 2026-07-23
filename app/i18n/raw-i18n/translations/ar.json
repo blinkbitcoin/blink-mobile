@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "أدخل رقم هاتف محمول صالح",
     "phoneNotAllowed": "هذا الحقل لا يقبل أرقام الهواتف"
   },
+  "MerchantSelectionScreen": {
+    "title": "اختر خيار الدفع",
+    "empty": "لا توجد خيارات دفع متاحة."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "يجب إرسال المعاملة إلى mempool",
     "amount": "الكمية",
