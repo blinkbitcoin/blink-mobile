@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback, useMemo } from "react"
 import { ActivityIndicator, Button, View } from "react-native"
 
 import { gql } from "@apollo/client"
@@ -6,11 +6,10 @@ import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useFeeRatesQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { formatDepositFees } from "@app/utils/deposit-fees"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { SettingsGroup } from "./group"
-
-const DEFAULT_OVER_FEE = 5000
 
 gql`
   query feeRates {
@@ -29,112 +28,188 @@ gql`
 const formatBps = (bps: number): string =>
   `${(bps / 100).toLocaleString("en-US", { maximumFractionDigits: 2 })}%`
 
-export const FeeRatesScreen: React.FC = () => {
+type FeeRateRowProps = {
+  label: string
+  value: string
+}
+
+const FeeRateRow: React.FC<FeeRateRowProps> = ({ label, value }) => {
+  const styles = useStyles()
+  return (
+    <View style={styles.feeRow}>
+      <Text type="p2" style={styles.feeLabel}>
+        {label}
+      </Text>
+      <Text type="p2" style={styles.feeValue}>
+        {value}
+      </Text>
+    </View>
+  )
+}
+
+const LoadingRow: React.FC = () => {
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+  return (
+    <View style={styles.feeRow}>
+      <ActivityIndicator testID="fee-rates-loading" animating color={colors.primary} />
+    </View>
+  )
+}
+
+type ErrorRowProps = {
+  onRetry: () => void
+}
+
+const ErrorRow: React.FC<ErrorRowProps> = ({ onRetry }) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  return (
+    <View style={styles.feeRow}>
+      <Text type="p2" style={[styles.feeLabel, styles.errorText]}>
+        {LL.FeeRatesScreen.error()}
+      </Text>
+      <Button title={LL.common.tryAgain()} color={colors.error} onPress={onRetry} />
+    </View>
+  )
+}
+
+export const FeeRatesScreen: React.FC = () => {
+  const styles = useStyles()
+  const { LL } = useI18nContext()
   const { feeRatesConfig } = useRemoteConfig()
 
   const { data, loading, error, refetch } = useFeeRatesQuery({
     fetchPolicy: "cache-and-network",
+    notifyOnNetworkStatusChange: true,
   })
 
   const deposit = data?.globals?.feesInformation.deposit
 
-  const FeeRow = (label: string, value: string) => {
-    const Row: React.FC = () => (
-      <View style={styles.feeRow}>
-        <Text type="p2" style={styles.feeLabel}>
-          {label}
-        </Text>
-        <Text type="p2" style={styles.feeValue}>
-          {value}
-        </Text>
-      </View>
-    )
-    return Row
-  }
+  // The hook's error state already surfaces a failed retry; the catch only
+  // prevents an unhandled promise rejection.
+  const retry = useCallback(() => {
+    refetch().catch(() => {})
+  }, [refetch])
 
-  const sendItems = [
-    FeeRow(
-      LL.FeeRatesScreen.lightning(),
-      LL.FeeRatesScreen.lightningSendFee({
-        fee: formatBps(feeRatesConfig.lightningSendBps),
-        routingFee: formatBps(feeRatesConfig.lightningRoutingBps),
-      }),
-    ),
-    FeeRow(LL.FeeRatesScreen.intraledger(), LL.FeeRatesScreen.noFee()),
-    FeeRow(
-      LL.FeeRatesScreen.onchainPriority(),
-      LL.FeeRatesScreen.fromApprox({
-        fee: formatBps(feeRatesConfig.onchainPriorityBps),
-      }),
-    ),
-    FeeRow(
-      LL.FeeRatesScreen.onchainStandard(),
-      LL.FeeRatesScreen.fromApprox({
-        fee: formatBps(feeRatesConfig.onchainStandardBps),
-      }),
-    ),
-    FeeRow(
-      LL.FeeRatesScreen.onchainEconomy(),
-      LL.FeeRatesScreen.fromApprox({
-        fee: formatBps(feeRatesConfig.onchainEconomyBps),
-      }),
-    ),
-  ]
+  const sendItems = useMemo(
+    () => [
+      function LightningSendRow() {
+        return (
+          <FeeRateRow
+            label={LL.FeeRatesScreen.lightning()}
+            value={LL.FeeRatesScreen.lightningSendFee({
+              fee: formatBps(feeRatesConfig.lightningSendBps),
+              routingFee: formatBps(feeRatesConfig.lightningRoutingBps),
+            })}
+          />
+        )
+      },
+      function IntraledgerRow() {
+        return (
+          <FeeRateRow
+            label={LL.FeeRatesScreen.intraledger()}
+            value={LL.FeeRatesScreen.noFee()}
+          />
+        )
+      },
+      function OnchainPriorityRow() {
+        return (
+          <FeeRateRow
+            label={LL.FeeRatesScreen.onchainPriority()}
+            value={LL.FeeRatesScreen.fromApprox({
+              fee: formatBps(feeRatesConfig.onchainPriorityBps),
+            })}
+          />
+        )
+      },
+      function OnchainStandardRow() {
+        return (
+          <FeeRateRow
+            label={LL.FeeRatesScreen.onchainStandard()}
+            value={LL.FeeRatesScreen.fromApprox({
+              fee: formatBps(feeRatesConfig.onchainStandardBps),
+            })}
+          />
+        )
+      },
+      function OnchainEconomyRow() {
+        return (
+          <FeeRateRow
+            label={LL.FeeRatesScreen.onchainEconomy()}
+            value={LL.FeeRatesScreen.fromApprox({
+              fee: formatBps(feeRatesConfig.onchainEconomyBps),
+            })}
+          />
+        )
+      },
+    ],
+    [LL, feeRatesConfig],
+  )
 
-  const receiveItems = [
-    FeeRow(LL.FeeRatesScreen.lightningTransactions(), LL.FeeRatesScreen.noFee()),
-  ]
-  if (deposit) {
-    const threshold = new Intl.NumberFormat("en-US", { notation: "compact" }).format(
-      Number(deposit.minBankFeeThreshold),
-    )
-    const belowFee = Number(deposit.minBankFee).toLocaleString("en-US")
-    const computedOverFee = Math.round(
-      (Number(deposit.minBankFeeThreshold) * Number(deposit.ratio)) / 10000,
-    )
-    const aboveFee = (computedOverFee || DEFAULT_OVER_FEE).toLocaleString("en-US")
+  const receiveItems = useMemo(() => {
+    const items: React.FC[] = [
+      function LightningReceiveRow() {
+        return (
+          <FeeRateRow
+            label={LL.FeeRatesScreen.lightningTransactions()}
+            value={LL.FeeRatesScreen.noFee()}
+          />
+        )
+      },
+    ]
+    if (deposit) {
+      const { fee, threshold, overFee } = formatDepositFees(deposit)
+      items.push(
+        function OnchainBelowRow() {
+          return (
+            <FeeRateRow
+              label={LL.FeeRatesScreen.onchainBelowThreshold({ threshold })}
+              value={LL.FeeRatesScreen.satAmount({ amount: fee })}
+            />
+          )
+        },
+        function OnchainAboveRow() {
+          return (
+            <FeeRateRow
+              label={LL.FeeRatesScreen.onchainAboveThreshold({ threshold })}
+              value={LL.FeeRatesScreen.satAmount({ amount: overFee })}
+            />
+          )
+        },
+      )
+    } else if (loading) {
+      // Wrapped so SettingsGroup's `x({})` filter call creates the element
+      // without executing LoadingRow's hooks in the group's render.
+      items.push(function OnchainLoadingRow() {
+        return <LoadingRow />
+      })
+    } else if (error) {
+      items.push(function OnchainErrorRow() {
+        return <ErrorRow onRetry={retry} />
+      })
+    }
+    return items
+  }, [LL, deposit, loading, error, retry])
 
-    receiveItems.push(
-      FeeRow(
-        LL.FeeRatesScreen.onchainBelowThreshold({ threshold }),
-        LL.FeeRatesScreen.satAmount({ amount: belowFee }),
-      ),
-      FeeRow(
-        LL.FeeRatesScreen.onchainAboveThreshold({ threshold }),
-        LL.FeeRatesScreen.satAmount({ amount: aboveFee }),
-      ),
-    )
-  } else if (loading) {
-    const LoadingRow: React.FC = () => (
-      <View style={styles.feeRow}>
-        <ActivityIndicator testID="fee-rates-loading" animating color={colors.primary} />
-      </View>
-    )
-    receiveItems.push(LoadingRow)
-  } else if (error) {
-    const ErrorRow: React.FC = () => (
-      <View style={styles.feeRow}>
-        <Text type="p2" style={[styles.feeLabel, styles.errorText]}>
-          {LL.FeeRatesScreen.error()}
-        </Text>
-        <Button
-          title={LL.common.tryAgain()}
-          color={colors.error}
-          onPress={() => refetch()}
-        />
-      </View>
-    )
-    receiveItems.push(ErrorRow)
-  }
-
-  const transferItems = [
-    FeeRow(LL.FeeRatesScreen.transferFee(), formatBps(feeRatesConfig.transferBps)),
-  ]
+  const transferItems = useMemo(
+    () => [
+      function TransferFeeRow() {
+        return (
+          <FeeRateRow
+            label={LL.FeeRatesScreen.transferFee()}
+            value={formatBps(feeRatesConfig.transferBps)}
+          />
+        )
+      },
+    ],
+    [LL, feeRatesConfig],
+  )
 
   return (
     <Screen preset="scroll">

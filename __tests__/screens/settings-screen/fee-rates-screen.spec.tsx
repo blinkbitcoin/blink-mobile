@@ -107,4 +107,33 @@ describe("FeeRatesScreen", () => {
     expect(getByText("0.2% + ~0.1% routing fee")).toBeTruthy()
     expect(getByText("0.35%")).toBeTruthy()
   })
+
+  it("renders a zero over-threshold fee when the API reports a zero ratio", async () => {
+    const zeroRatioMocks = [
+      {
+        request: { query: FeeRatesDocument },
+        result: {
+          data: {
+            globals: {
+              __typename: "Globals",
+              feesInformation: {
+                __typename: "FeesInformation",
+                deposit: {
+                  __typename: "DepositFeesInformation",
+                  minBankFee: "2500",
+                  minBankFeeThreshold: "1000000",
+                  ratio: "0",
+                },
+              },
+            },
+          },
+        },
+      },
+    ]
+
+    const { findByText } = renderWithApolloMocks(zeroRatioMocks)
+
+    expect(await findByText("2,500 SAT")).toBeTruthy()
+    expect(await findByText("0 SAT")).toBeTruthy()
+  })
 })

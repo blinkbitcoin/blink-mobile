@@ -7,6 +7,7 @@ import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
 import { logError } from "@app/utils/log-error"
 import {
+  getRemoteConfigNumericObject,
   getRemoteConfigObject,
   getRemoteConfigStringList,
   serializeRemoteConfigDefault,
@@ -398,15 +399,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
           .asNumber()
 
-        const parsedFeeRatesConfig = getRemoteConfigObject<Partial<FeeRatesConfig>>(
+        const feeRatesConfig = getRemoteConfigNumericObject(
           FeeRatesConfigKey,
-          {},
+          defaultFeeRatesConfig,
         )
-
-        const feeRatesConfig: FeeRatesConfig = {
-          ...defaultFeeRatesConfig,
-          ...parsedFeeRatesConfig,
-        }
 
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
