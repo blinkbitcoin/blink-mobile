@@ -1,8 +1,9 @@
-import React, { useCallback, useState } from "react"
-import { FlatList, Pressable, View } from "react-native"
+import React, { useCallback, useRef, useState } from "react"
+import { Alert, FlatList, Pressable, View } from "react-native"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import crashlytics from "@react-native-firebase/crashlytics"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useAppConfig, useDisplayCurrency } from "@app/hooks"
@@ -34,6 +35,8 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "merchantSelection">>()
   const [selectedMerchantId, setSelectedMerchantId] = useState<string | null>(null)
+  const [resolvingMerchantId, setResolvingMerchantId] = useState<string | null>(null)
+  const resolveRequestIdRef = useRef(0)
   const { myWalletIds, bitcoinNetwork, lnurlDomains } = useScanContext()
   const { displayCurrency } = useDisplayCurrency()
   const { sdk } = useSelfCustodialWallet()
@@ -49,35 +52,58 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
 
   const handleMerchantPress = useCallback(
     async (merchant: MerchantChoice) => {
+      if (resolvingMerchantId) return
+
+      const requestId = resolveRequestIdRef.current + 1
+      resolveRequestIdRef.current = requestId
       setSelectedMerchantId(merchant.id)
+      setResolvingMerchantId(merchant.id)
 
       if (!bitcoinNetwork) {
+        setResolvingMerchantId(null)
         navigation.replace("sendBitcoinDestination", { payment: merchant.lnurl })
         return
       }
 
-      const destination = await resolveDestination(
-        {
-          rawInput: merchant.lnurl,
-          myWalletIds,
-          bitcoinNetwork,
-          lnurlDomains,
-          accountDefaultWalletQuery,
-          displayCurrency,
-        },
-        { sdk, network: sparkNetwork },
-        lnAddressHostname,
-      )
-      logParseDestinationResult(destination)
+      try {
+        const destination = await resolveDestination(
+          {
+            rawInput: merchant.lnurl,
+            myWalletIds,
+            bitcoinNetwork,
+            lnurlDomains,
+            accountDefaultWalletQuery,
+            displayCurrency,
+          },
+          { sdk, network: sparkNetwork },
+          lnAddressHostname,
+        )
+        if (requestId !== resolveRequestIdRef.current) return
 
-      if (isSendDestination(destination)) {
-        navigation.replace("sendBitcoinDetails", { paymentDestination: destination })
-        return
+        logParseDestinationResult(destination)
+
+        if (isSendDestination(destination)) {
+          navigation.replace("sendBitcoinDetails", { paymentDestination: destination })
+          return
+        }
+
+        navigation.replace("sendBitcoinDestination", { payment: merchant.lnurl })
+      } catch (err: unknown) {
+        if (requestId !== resolveRequestIdRef.current) return
+
+        setSelectedMerchantId(null)
+        if (err instanceof Error) {
+          crashlytics().recordError(err)
+          Alert.alert(err.toString(), "", [{ text: LL.common.ok() }])
+        }
+      } finally {
+        if (requestId === resolveRequestIdRef.current) {
+          setResolvingMerchantId(null)
+        }
       }
-
-      navigation.replace("sendBitcoinDestination", { payment: merchant.lnurl })
     },
     [
+      LL.common,
       navigation,
       myWalletIds,
       bitcoinNetwork,
@@ -87,6 +113,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
       sdk,
       sparkNetwork,
       lnAddressHostname,
+      resolvingMerchantId,
     ],
   )
 
@@ -101,6 +128,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
         <Pressable
           {...testProps(`merchant-${item.id}`)}
           accessibilityLabel={accessibilityLabel}
+          disabled={resolvingMerchantId !== null}
           onPress={() => handleMerchantPress(item)}
           style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
         >
@@ -140,7 +168,14 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
         </Pressable>
       )
     },
-    [colors._green, colors.primary, handleMerchantPress, selectedMerchantId, styles],
+    [
+      colors._green,
+      colors.primary,
+      handleMerchantPress,
+      resolvingMerchantId,
+      selectedMerchantId,
+      styles,
+    ],
   )
 
   return (

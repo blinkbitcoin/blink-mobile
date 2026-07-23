@@ -601,8 +601,8 @@ describe("SendBitcoinDestinationScreen", () => {
 
     await flushAsync()
 
-    expect(mockReplace).toHaveBeenCalledWith("merchantSelection", { merchants })
-    expect(mockNavigate).not.toHaveBeenCalledWith("merchantSelection", expect.anything())
+    expect(mockNavigate).toHaveBeenCalledWith("merchantSelection", { merchants })
+    expect(mockReplace).not.toHaveBeenCalledWith("merchantSelection", expect.anything())
     expect(mockNavigate).not.toHaveBeenCalledWith("sendBitcoinDetails", expect.anything())
   })
 
