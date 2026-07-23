@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Kontakt support",
       "body": "Noget gik galt, men bare rolig, dine midler er sikre. Kontakt venligst support for at få hjælp.\n\nDu kan få brug for disse oplysninger, så support kan løse din sag:",
+      "reasonLabel": "Årsag",
       "accountIdLabel": "Konto-ID",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Brugernavn",
@@ -3595,6 +3596,7 @@
       "networkFee": "Netværksgebyr: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Netværksgebyr: <bold>{fee: string}</bold> (dækkes af Blink)",
       "exchangeRate": "Nuværende vekselkurs 1 BTC = {rate: string}",
+      "retryCta": "Prøv igen",
       "approveCta": "Godkend",
       "contactSupportCta": "Kontakt support"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API vil ikke være tilgængelig",
     "explainerCheck5": "Din konto vil blive trukket et Spark-netværksgebyr",
     "explainerCta": "Jeg forstår",
-    "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder."
+    "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder.",
+    "clockOutOfSync": {
+      "body": "Din enheds dato og klokkeslæt er ude af synkronisering. Indstil dem til automatisk for at fortsætte.",
+      "retryCta": "Prøv igen"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Forvaltet",

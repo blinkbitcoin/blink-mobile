@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Tuukirire ab'obuyambi",
       "body": "Waliwo ekitagenze bulungi, naye tofaayo, ssente zo nnywevu. Tuukirira ab'obuyambi bakuyambe.\n\nOyinza okwetaaga ebikwata ku bino okuyamba ab'obuyambi okugonjoola ensonga yo:",
+      "reasonLabel": "Ensonga",
       "accountIdLabel": "ID ya akawunti",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Erinnya ly'omukozesa",
@@ -3595,6 +3596,7 @@
       "networkFee": "Ssente z'omukutu: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ssente z'omukutu: <bold>{fee: string}</bold> (zisasulwa Blink)",
       "exchangeRate": "Omuwendo gw'okuwaanyisiganya ogwa kati 1 BTC = {rate: string}",
+      "retryCta": "Ddamu ogezeeko",
       "approveCta": "Kkiriza",
       "contactSupportCta": "Tuukirira obuyambi"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API tejja kubaawo",
     "explainerCheck5": "Ku kawunti yo kujja kusalibwako ssente z'omukutu gwa Spark",
     "explainerCta": "Ntegedde",
-    "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono."
+    "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono.",
+    "clockOutOfSync": {
+      "body": "Ennaku n'obudde bw'ekyuma kyo tebituukagana. Bisseeko ku otomatiki osobole okweyongerayo.",
+      "retryCta": "Ddamu ogezaako"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Eterekeddwa",

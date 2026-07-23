@@ -3390,15 +3390,49 @@ export type MigrationOwnerQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MigrationOwnerQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
 
+export type MigrationStartMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MigrationStartMutation = { readonly __typename: 'Mutation', readonly migrationStart: { readonly __typename: 'MigrationPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }>, readonly migration?: { readonly __typename: 'AccountMigration', readonly status: MigrationStatus } | null } };
+
 export type MigrationTransactionsPresenceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MigrationTransactionsPresenceQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly transactions?: { readonly __typename: 'TransactionConnection', readonly edges?: ReadonlyArray<{ readonly __typename: 'TransactionEdge', readonly cursor: string }> | null } | null } } | null };
 
+export type MigrationLnAddressTransferMutationVariables = Exact<{
+  input: MigrationLnAddressTransferInput;
+}>;
+
+
+export type MigrationLnAddressTransferMutation = { readonly __typename: 'Mutation', readonly migrationLnAddressTransfer: { readonly __typename: 'MigrationLnAddressTransferPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }>, readonly results: ReadonlyArray<{ readonly __typename: 'MigrationLnAddressTransferResult', readonly identifier: string, readonly lightningAddress?: string | null, readonly status: MigrationLnAddressTransferStatus }> } };
+
+export type MigrationQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MigrationQuery = { readonly __typename: 'Query', readonly migration?: { readonly __typename: 'AccountMigration', readonly preview: { readonly __typename: 'AccountMigrationPreview', readonly balanceSats: number, readonly feeSats: number, readonly feeCoveredByBlink: boolean, readonly receiveSats: number } } | null };
+
+export type MigrationStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MigrationStatusQuery = { readonly __typename: 'Query', readonly migration?: { readonly __typename: 'AccountMigration', readonly status: MigrationStatus } | null };
+
 export type MigrationSupportDetailsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MigrationSupportDetailsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly username?: string | null, readonly email?: { readonly __typename: 'Email', readonly address?: string | null } | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
+
+export type MigrationCommitMutationVariables = Exact<{
+  input: MigrationCommitInput;
+}>;
+
+
+export type MigrationCommitMutation = { readonly __typename: 'Mutation', readonly migrationCommit: { readonly __typename: 'MigrationPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
+
+export type WindDownQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type WindDownQuery = { readonly __typename: 'Query', readonly windDown?: { readonly __typename: 'AccountWindDown', readonly status: WindDownStatus, readonly receiveDisabledAt: number, readonly finalDeadline: number, readonly gateArmsAt: number, readonly timezone: string } | null };
 
 export type CardBalanceQueryVariables = Exact<{
   cardId: Scalars['ID']['input'];
@@ -5415,6 +5449,44 @@ export type MigrationOwnerQueryHookResult = ReturnType<typeof useMigrationOwnerQ
 export type MigrationOwnerLazyQueryHookResult = ReturnType<typeof useMigrationOwnerLazyQuery>;
 export type MigrationOwnerSuspenseQueryHookResult = ReturnType<typeof useMigrationOwnerSuspenseQuery>;
 export type MigrationOwnerQueryResult = Apollo.QueryResult<MigrationOwnerQuery, MigrationOwnerQueryVariables>;
+export const MigrationStartDocument = gql`
+    mutation migrationStart {
+  migrationStart {
+    errors {
+      message
+      code
+    }
+    migration {
+      status
+    }
+  }
+}
+    `;
+export type MigrationStartMutationFn = Apollo.MutationFunction<MigrationStartMutation, MigrationStartMutationVariables>;
+
+/**
+ * __useMigrationStartMutation__
+ *
+ * To run a mutation, you first call `useMigrationStartMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMigrationStartMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [migrationStartMutation, { data, loading, error }] = useMigrationStartMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMigrationStartMutation(baseOptions?: Apollo.MutationHookOptions<MigrationStartMutation, MigrationStartMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MigrationStartMutation, MigrationStartMutationVariables>(MigrationStartDocument, options);
+      }
+export type MigrationStartMutationHookResult = ReturnType<typeof useMigrationStartMutation>;
+export type MigrationStartMutationResult = Apollo.MutationResult<MigrationStartMutation>;
+export type MigrationStartMutationOptions = Apollo.BaseMutationOptions<MigrationStartMutation, MigrationStartMutationVariables>;
 export const MigrationTransactionsPresenceDocument = gql`
     query migrationTransactionsPresence {
   me {
@@ -5462,6 +5534,130 @@ export type MigrationTransactionsPresenceQueryHookResult = ReturnType<typeof use
 export type MigrationTransactionsPresenceLazyQueryHookResult = ReturnType<typeof useMigrationTransactionsPresenceLazyQuery>;
 export type MigrationTransactionsPresenceSuspenseQueryHookResult = ReturnType<typeof useMigrationTransactionsPresenceSuspenseQuery>;
 export type MigrationTransactionsPresenceQueryResult = Apollo.QueryResult<MigrationTransactionsPresenceQuery, MigrationTransactionsPresenceQueryVariables>;
+export const MigrationLnAddressTransferDocument = gql`
+    mutation migrationLnAddressTransfer($input: MigrationLnAddressTransferInput!) {
+  migrationLnAddressTransfer(input: $input) {
+    errors {
+      message
+      code
+    }
+    results {
+      identifier
+      lightningAddress
+      status
+    }
+  }
+}
+    `;
+export type MigrationLnAddressTransferMutationFn = Apollo.MutationFunction<MigrationLnAddressTransferMutation, MigrationLnAddressTransferMutationVariables>;
+
+/**
+ * __useMigrationLnAddressTransferMutation__
+ *
+ * To run a mutation, you first call `useMigrationLnAddressTransferMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMigrationLnAddressTransferMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [migrationLnAddressTransferMutation, { data, loading, error }] = useMigrationLnAddressTransferMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useMigrationLnAddressTransferMutation(baseOptions?: Apollo.MutationHookOptions<MigrationLnAddressTransferMutation, MigrationLnAddressTransferMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MigrationLnAddressTransferMutation, MigrationLnAddressTransferMutationVariables>(MigrationLnAddressTransferDocument, options);
+      }
+export type MigrationLnAddressTransferMutationHookResult = ReturnType<typeof useMigrationLnAddressTransferMutation>;
+export type MigrationLnAddressTransferMutationResult = Apollo.MutationResult<MigrationLnAddressTransferMutation>;
+export type MigrationLnAddressTransferMutationOptions = Apollo.BaseMutationOptions<MigrationLnAddressTransferMutation, MigrationLnAddressTransferMutationVariables>;
+export const MigrationDocument = gql`
+    query migration {
+  migration {
+    preview {
+      balanceSats
+      feeSats
+      feeCoveredByBlink
+      receiveSats
+    }
+  }
+}
+    `;
+
+/**
+ * __useMigrationQuery__
+ *
+ * To run a query within a React component, call `useMigrationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMigrationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMigrationQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMigrationQuery(baseOptions?: Apollo.QueryHookOptions<MigrationQuery, MigrationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MigrationQuery, MigrationQueryVariables>(MigrationDocument, options);
+      }
+export function useMigrationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MigrationQuery, MigrationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MigrationQuery, MigrationQueryVariables>(MigrationDocument, options);
+        }
+export function useMigrationSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MigrationQuery, MigrationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MigrationQuery, MigrationQueryVariables>(MigrationDocument, options);
+        }
+export type MigrationQueryHookResult = ReturnType<typeof useMigrationQuery>;
+export type MigrationLazyQueryHookResult = ReturnType<typeof useMigrationLazyQuery>;
+export type MigrationSuspenseQueryHookResult = ReturnType<typeof useMigrationSuspenseQuery>;
+export type MigrationQueryResult = Apollo.QueryResult<MigrationQuery, MigrationQueryVariables>;
+export const MigrationStatusDocument = gql`
+    query migrationStatus {
+  migration {
+    status
+  }
+}
+    `;
+
+/**
+ * __useMigrationStatusQuery__
+ *
+ * To run a query within a React component, call `useMigrationStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMigrationStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMigrationStatusQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMigrationStatusQuery(baseOptions?: Apollo.QueryHookOptions<MigrationStatusQuery, MigrationStatusQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MigrationStatusQuery, MigrationStatusQueryVariables>(MigrationStatusDocument, options);
+      }
+export function useMigrationStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MigrationStatusQuery, MigrationStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MigrationStatusQuery, MigrationStatusQueryVariables>(MigrationStatusDocument, options);
+        }
+export function useMigrationStatusSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<MigrationStatusQuery, MigrationStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MigrationStatusQuery, MigrationStatusQueryVariables>(MigrationStatusDocument, options);
+        }
+export type MigrationStatusQueryHookResult = ReturnType<typeof useMigrationStatusQuery>;
+export type MigrationStatusLazyQueryHookResult = ReturnType<typeof useMigrationStatusLazyQuery>;
+export type MigrationStatusSuspenseQueryHookResult = ReturnType<typeof useMigrationStatusSuspenseQuery>;
+export type MigrationStatusQueryResult = Apollo.QueryResult<MigrationStatusQuery, MigrationStatusQueryVariables>;
 export const MigrationSupportDetailsDocument = gql`
     query migrationSupportDetails {
   me {
@@ -5509,6 +5705,85 @@ export type MigrationSupportDetailsQueryHookResult = ReturnType<typeof useMigrat
 export type MigrationSupportDetailsLazyQueryHookResult = ReturnType<typeof useMigrationSupportDetailsLazyQuery>;
 export type MigrationSupportDetailsSuspenseQueryHookResult = ReturnType<typeof useMigrationSupportDetailsSuspenseQuery>;
 export type MigrationSupportDetailsQueryResult = Apollo.QueryResult<MigrationSupportDetailsQuery, MigrationSupportDetailsQueryVariables>;
+export const MigrationCommitDocument = gql`
+    mutation migrationCommit($input: MigrationCommitInput!) {
+  migrationCommit(input: $input) {
+    errors {
+      message
+      code
+    }
+  }
+}
+    `;
+export type MigrationCommitMutationFn = Apollo.MutationFunction<MigrationCommitMutation, MigrationCommitMutationVariables>;
+
+/**
+ * __useMigrationCommitMutation__
+ *
+ * To run a mutation, you first call `useMigrationCommitMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMigrationCommitMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [migrationCommitMutation, { data, loading, error }] = useMigrationCommitMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useMigrationCommitMutation(baseOptions?: Apollo.MutationHookOptions<MigrationCommitMutation, MigrationCommitMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MigrationCommitMutation, MigrationCommitMutationVariables>(MigrationCommitDocument, options);
+      }
+export type MigrationCommitMutationHookResult = ReturnType<typeof useMigrationCommitMutation>;
+export type MigrationCommitMutationResult = Apollo.MutationResult<MigrationCommitMutation>;
+export type MigrationCommitMutationOptions = Apollo.BaseMutationOptions<MigrationCommitMutation, MigrationCommitMutationVariables>;
+export const WindDownDocument = gql`
+    query windDown {
+  windDown {
+    status
+    receiveDisabledAt
+    finalDeadline
+    gateArmsAt
+    timezone
+  }
+}
+    `;
+
+/**
+ * __useWindDownQuery__
+ *
+ * To run a query within a React component, call `useWindDownQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWindDownQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWindDownQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useWindDownQuery(baseOptions?: Apollo.QueryHookOptions<WindDownQuery, WindDownQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<WindDownQuery, WindDownQueryVariables>(WindDownDocument, options);
+      }
+export function useWindDownLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WindDownQuery, WindDownQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<WindDownQuery, WindDownQueryVariables>(WindDownDocument, options);
+        }
+export function useWindDownSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<WindDownQuery, WindDownQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<WindDownQuery, WindDownQueryVariables>(WindDownDocument, options);
+        }
+export type WindDownQueryHookResult = ReturnType<typeof useWindDownQuery>;
+export type WindDownLazyQueryHookResult = ReturnType<typeof useWindDownLazyQuery>;
+export type WindDownSuspenseQueryHookResult = ReturnType<typeof useWindDownSuspenseQuery>;
+export type WindDownQueryResult = Apollo.QueryResult<WindDownQuery, WindDownQueryVariables>;
 export const CardBalanceDocument = gql`
     query cardBalance($cardId: ID!) {
   cardBalance(cardId: $cardId) {

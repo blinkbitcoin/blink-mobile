@@ -3557,6 +3557,7 @@
         "contactSupport": {
             "title": "Contatta il supporto",
             "body": "Qualcosa è andato storto, ma non preoccuparti, i tuoi fondi sono al sicuro. Contatta il supporto per ricevere assistenza.\n\nPotresti aver bisogno di queste informazioni per aiutare il supporto a risolvere il tuo caso:",
+            "reasonLabel": "Motivo",
             "accountIdLabel": "ID account",
             "pubKeyLabel": "pubKey",
             "usernameLabel": "Nome utente",
@@ -3595,6 +3596,7 @@
             "networkFee": "Commissione di rete: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "Commissione di rete: <bold>{fee: string}</bold> (coperta da Blink)",
             "exchangeRate": "Tasso di cambio attuale 1 BTC = {rate: string}",
+            "retryCta": "Riprova",
             "approveCta": "Approva",
             "contactSupportCta": "Contatta il supporto"
         },
@@ -3626,7 +3628,11 @@
         "explainerCheck4": "L'API di Blink non sarà disponibile",
         "explainerCheck5": "Verrà addebitata una commissione di rete Spark sul tuo account",
         "explainerCta": "Ho capito",
-        "transferringFunds": "Trasferimento dei tuoi fondi in corso. Dovrebbe completarsi in pochi secondi."
+        "transferringFunds": "Trasferimento dei tuoi fondi in corso. Dovrebbe completarsi in pochi secondi.",
+        "clockOutOfSync": {
+            "body": "La data e l'ora del tuo dispositivo non sono sincronizzate. Impostale su automatico per continuare.",
+            "retryCta": "Riprova"
+        }
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Custodito",

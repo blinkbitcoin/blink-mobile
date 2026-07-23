@@ -7,6 +7,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/use-migration-support-email"
+import { MigrationSupportReason } from "@app/types/migration"
 
 loadLocale("en")
 const LL = i18nObject("en")
@@ -83,7 +84,12 @@ describe("useMigrationSupportEmail", () => {
   })
 
   it("opens the structured support email with the full diagnostics", async () => {
-    const { result } = renderHook(() => useMigrationSupportEmail(), { wrapper })
+    const { result } = renderHook(
+      () => useMigrationSupportEmail(MigrationSupportReason.TransferFailed),
+      {
+        wrapper,
+      },
+    )
 
     await act(async () => {
       result.current.sendSupportEmail()
@@ -92,6 +98,7 @@ describe("useMigrationSupportEmail", () => {
     const expectedBody = [
       LLSupport.emailAccountInfo(),
       DIVIDER,
+      `${LLSupport.reasonLabel()}: transfer-failed`,
       `${LLSupport.accountIdLabel()}: 18A4242`,
       `${LLSupport.pubKeyLabel()}: 02abc123pubkey`,
       `${LLSupport.usernameLabel()}: satoshin21`,
@@ -111,7 +118,12 @@ describe("useMigrationSupportEmail", () => {
   it("skips the empty diagnostics and the country when they are unavailable", async () => {
     mockDetails = { ...mockDetails, username: "", email: "" }
     mockCountryCode = undefined
-    const { result } = renderHook(() => useMigrationSupportEmail(), { wrapper })
+    const { result } = renderHook(
+      () => useMigrationSupportEmail(MigrationSupportReason.TransferFailed),
+      {
+        wrapper,
+      },
+    )
 
     await act(async () => {
       result.current.sendSupportEmail()
@@ -120,6 +132,7 @@ describe("useMigrationSupportEmail", () => {
     const expectedBody = [
       LLSupport.emailAccountInfo(),
       DIVIDER,
+      `${LLSupport.reasonLabel()}: transfer-failed`,
       `${LLSupport.accountIdLabel()}: 18A4242`,
       `${LLSupport.pubKeyLabel()}: 02abc123pubkey`,
       `${LLSupport.phoneLabel()}: +1 374 9383 993`,
@@ -133,9 +146,32 @@ describe("useMigrationSupportEmail", () => {
     expect(Linking.openURL).toHaveBeenCalledWith(expectedMailto(expectedBody))
   })
 
+  /** The reason no longer travels with the account diagnostics, so it has to survive a
+   *  device that can supply none of them. */
+  it("carries the reason even when every account detail is missing", () => {
+    mockDetails = { accountId: "", pubKey: "", username: "", email: "", phone: "" }
+    const { result } = renderHook(
+      () => useMigrationSupportEmail(MigrationSupportReason.StartRefused),
+      { wrapper },
+    )
+
+    result.current.sendSupportEmail()
+
+    expect(Linking.openURL).toHaveBeenCalledWith(
+      expect.stringContaining(
+        encodeURIComponent(`${LLSupport.reasonLabel()}: start-refused`),
+      ),
+    )
+  })
+
   it("labels the platform as Android on non-iOS devices", async () => {
     mockIsIos = false
-    const { result } = renderHook(() => useMigrationSupportEmail(), { wrapper })
+    const { result } = renderHook(
+      () => useMigrationSupportEmail(MigrationSupportReason.TransferFailed),
+      {
+        wrapper,
+      },
+    )
 
     await act(async () => {
       result.current.sendSupportEmail()

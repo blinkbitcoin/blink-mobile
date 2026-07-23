@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "ติดต่อฝ่ายสนับสนุน",
       "body": "เกิดข้อผิดพลาดบางอย่าง แต่ไม่ต้องกังวล เงินของคุณปลอดภัย โปรดติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือ\n\nคุณอาจต้องใช้ข้อมูลนี้เพื่อช่วยให้ฝ่ายสนับสนุนแก้ไขกรณีของคุณ:",
+      "reasonLabel": "สาเหตุ",
       "accountIdLabel": "รหัสบัญชี",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "ชื่อผู้ใช้",
@@ -3595,6 +3596,7 @@
       "networkFee": "ค่าธรรมเนียมเครือข่าย: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "ค่าธรรมเนียมเครือข่าย: <bold>{fee: string}</bold> (Blink ออกให้)",
       "exchangeRate": "อัตราแลกเปลี่ยนปัจจุบัน 1 BTC = {rate: string}",
+      "retryCta": "ลองอีกครั้ง",
       "approveCta": "อนุมัติ",
       "contactSupportCta": "ติดต่อฝ่ายสนับสนุน"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API จะไม่พร้อมใช้งาน",
     "explainerCheck5": "บัญชีของคุณจะถูกหักค่าธรรมเนียมเครือข่าย Spark",
     "explainerCta": "เข้าใจแล้ว",
-    "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที"
+    "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที",
+    "clockOutOfSync": {
+      "body": "วันที่และเวลาของอุปกรณ์ของคุณไม่ตรงกัน ตั้งค่าเป็นอัตโนมัติเพื่อดำเนินการต่อ",
+      "retryCta": "ลองอีกครั้ง"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "ควบคุมโดยผู้ดูแล",

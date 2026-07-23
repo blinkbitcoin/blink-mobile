@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Контактирајте подршку",
       "body": "Нешто је пошло по злу, али не брините, ваша средства су безбедна. Обратите се подршци за помоћ.\n\nОве информације могу помоћи подршци да реши ваш случај:",
+      "reasonLabel": "Разлог",
       "accountIdLabel": "ID налога",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Корисничко име",
@@ -3595,6 +3596,7 @@
       "networkFee": "Мрежна накнада: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Мрежна накнада: <bold>{fee: string}</bold> (сноси Blink)",
       "exchangeRate": "Тренутни курс 1 BTC = {rate: string}",
+      "retryCta": "Покушај поново",
       "approveCta": "Одобри",
       "contactSupportCta": "Контактирај подршку"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API неће бити доступан",
     "explainerCheck5": "Са твог налога биће наплаћена мрежна накнада Spark",
     "explainerCta": "Разумем",
-    "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди."
+    "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди.",
+    "clockOutOfSync": {
+      "body": "Датум и време вашег уређаја нису усклађени. Подесите их на аутоматски да бисте наставили.",
+      "retryCta": "Покушај поново"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Под старатељством",

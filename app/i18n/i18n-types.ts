@@ -11851,6 +11851,16 @@ type RootTranslation = {
 		 * T​r​a​n​s​f​e​r​r​i​n​g​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​I​t​ ​s​h​o​u​l​d​ ​b​e​ ​d​o​n​e​ ​i​n​ ​a​ ​f​e​w​ ​s​e​c​o​n​d​s​.
 		 */
 		transferringFunds: string
+		clockOutOfSync: {
+			/**
+			 * Y​o​u​r​ ​d​e​v​i​c​e​'​s​ ​d​a​t​e​ ​a​n​d​ ​t​i​m​e​ ​a​r​e​ ​o​u​t​ ​o​f​ ​s​y​n​c​.​ ​S​e​t​ ​t​h​e​m​ ​t​o​ ​a​u​t​o​m​a​t​i​c​ ​t​o​ ​c​o​n​t​i​n​u​e​.
+			 */
+			body: string
+			/**
+			 * T​r​y​ ​a​g​a​i​n
+			 */
+			retryCta: string
+		}
 		/**
 		 * T​i​m​e​ ​t​o​ ​u​p​g​r​a​d​e
 		 */
@@ -11981,6 +11991,10 @@ type RootTranslation = {
 			 */
 			exchangeRate: RequiredParams<'rate'>
 			/**
+			 * T​r​y​ ​a​g​a​i​n
+			 */
+			retryCta: string
+			/**
 			 * A​p​p​r​o​v​e
 			 */
 			approveCta: string
@@ -12042,6 +12056,10 @@ type RootTranslation = {
 		​Y​o​u​ ​m​a​y​ ​n​e​e​d​ ​t​h​i​s​ ​i​n​f​o​r​m​a​t​i​o​n​ ​t​o​ ​h​e​l​p​ ​s​u​p​p​o​r​t​ ​r​e​s​o​l​v​e​ ​y​o​u​r​ ​c​a​s​e​:
 			 */
 			body: string
+			/**
+			 * R​e​a​s​o​n
+			 */
+			reasonLabel: string
 			/**
 			 * A​c​c​o​u​n​t​ ​I​D
 			 */
@@ -24341,6 +24359,16 @@ export type TranslationFunctions = {
 		 * Transferring your funds. It should be done in a few seconds.
 		 */
 		transferringFunds: () => LocalizedString
+		clockOutOfSync: {
+			/**
+			 * Your device's date and time are out of sync. Set them to automatic to continue.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Try again
+			 */
+			retryCta: () => LocalizedString
+		}
 		/**
 		 * Time to upgrade
 		 */
@@ -24467,6 +24495,10 @@ export type TranslationFunctions = {
 			 */
 			exchangeRate: (arg: { rate: string }) => LocalizedString
 			/**
+			 * Try again
+			 */
+			retryCta: () => LocalizedString
+			/**
 			 * Approve
 			 */
 			approveCta: () => LocalizedString
@@ -24526,6 +24558,10 @@ export type TranslationFunctions = {
 		You may need this information to help support resolve your case:
 			 */
 			body: () => LocalizedString
+			/**
+			 * Reason
+			 */
+			reasonLabel: () => LocalizedString
 			/**
 			 * Account ID
 			 */

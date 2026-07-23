@@ -17,6 +17,7 @@ import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use
 import { AccountTypeMode } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 
@@ -206,7 +207,10 @@ export type RootStackParamList = {
   accountMigrationDownloadHistory: undefined
   accountMigrationBalancesOverview: undefined
   accountMigrationTransferringFunds: undefined
-  accountMigrationContactSupport: undefined
+  accountMigrationContactSupport: {
+    reason: MigrationSupportReason
+    origin?: MigrationSupportOrigin
+  }
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined
   selfCustodialCloudRestore: undefined

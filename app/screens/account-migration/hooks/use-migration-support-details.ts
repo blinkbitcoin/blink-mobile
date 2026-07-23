@@ -39,7 +39,11 @@ type MigrationSupportDetails = {
  */
 export const useMigrationSupportDetails = (): MigrationSupportDetails => {
   const isAuthed = useIsAuthed()
-  const { data } = useMigrationSupportDetailsQuery({ skip: !isAuthed })
+  /** no-cache: a cached me could serve the previous account's identity after a switch. */
+  const { data } = useMigrationSupportDetailsQuery({
+    skip: !isAuthed,
+    fetchPolicy: "no-cache",
+  })
   const loadMnemonic = useLoadWalletMnemonic()
   const network = useSparkNetwork()
   const [pubKey, setPubKey] = useState("")

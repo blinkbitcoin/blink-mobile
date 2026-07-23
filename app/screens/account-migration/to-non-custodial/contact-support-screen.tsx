@@ -5,7 +5,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { IconHero } from "@app/components/icon-hero"
@@ -15,6 +15,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks"
 /** Deep import on purpose: its device-location chain stays out of the hooks barrel. */
 import { useMigrationSupportEmail } from "@app/screens/account-migration/hooks/use-migration-support-email"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { ellipsizeMiddle } from "@app/utils/helper"
 import { testProps } from "@app/utils/testProps"
 
@@ -48,13 +49,27 @@ export const MigrationContactSupportScreen: React.FC = () => {
   } = useTheme()
 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { diagnostics, sendSupportEmail } = useMigrationSupportEmail()
 
-  /** Back never exits the migration: it returns to the commit point (Step 8). */
-  const returnToBalanceSummary = useCallback(() => {
+  const { params } =
+    useRoute<RouteProp<RootStackParamList, "accountMigrationContactSupport">>()
+
+  /** Callers must pass a reason, but a navigation-state restore can land here with none;
+   *  a named fallback keeps the ticket meaningful instead of crashing on a missing param. */
+  const reason = params?.reason ?? MigrationSupportReason.Unknown
+  const { diagnostics, sendSupportEmail } = useMigrationSupportEmail(reason)
+
+  /** Back depends on origin: mid-migration it returns to the commit point (Step 8); the
+   *  resume handover has no commit screen beneath it, so it dismisses instead of fabricating
+   *  one over an already-completed migration. A restore with no origin keeps the commit path. */
+  const isResumeOrigin = params?.origin === MigrationSupportOrigin.Resume
+  const handleBack = useCallback(() => {
+    if (isResumeOrigin) {
+      navigation.goBack()
+      return
+    }
     navigation.navigate("accountMigrationBalancesOverview")
-  }, [navigation])
-  useHardwareBackGuard(returnToBalanceSummary)
+  }, [isResumeOrigin, navigation])
+  useHardwareBackGuard(handleBack)
 
   const rows: DiagnosticsRow[] = useMemo(
     () =>
@@ -107,7 +122,7 @@ export const MigrationContactSupportScreen: React.FC = () => {
           />
           <GaloySecondaryButton
             title={LL.common.back()}
-            onPress={returnToBalanceSummary}
+            onPress={handleBack}
             {...testProps("migration-contact-support-back")}
           />
         </View>

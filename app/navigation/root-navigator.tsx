@@ -164,6 +164,7 @@ import {
   RootStackParamList,
 } from "./stack-param-lists"
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
+import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
 import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
@@ -1059,6 +1060,10 @@ export const PrimaryNavigator = () => {
   const insets = useSafeAreaInsets()
 
   const { LL } = useI18nContext()
+
+  /** A migration the server finished but this device never swapped away from is completed
+   *  here, before any screen renders, since no screen in the flow is mounted to do it. */
+  useResumeCompletedMigration()
 
   const migrationBlocker = useMigrationBlocker()
   if (migrationBlocker.isVisible) return <MigrationGate />

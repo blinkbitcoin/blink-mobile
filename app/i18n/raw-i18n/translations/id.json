@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Hubungi dukungan",
       "body": "Terjadi kesalahan, tetapi jangan khawatir, dana Anda aman. Silakan hubungi dukungan untuk mendapatkan bantuan.\n\nAnda mungkin memerlukan informasi ini untuk membantu dukungan menyelesaikan kasus Anda:",
+      "reasonLabel": "Alasan",
       "accountIdLabel": "ID akun",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Nama pengguna",
@@ -3595,6 +3596,7 @@
       "networkFee": "Biaya jaringan: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Biaya jaringan: <bold>{fee: string}</bold> (ditanggung oleh Blink)",
       "exchangeRate": "Nilai tukar saat ini 1 BTC = {rate: string}",
+      "retryCta": "Coba lagi",
       "approveCta": "Setujui",
       "contactSupportCta": "Hubungi dukungan"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API tidak akan tersedia",
     "explainerCheck5": "Akun Anda akan dikenakan biaya jaringan Spark",
     "explainerCta": "Saya mengerti",
-    "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik."
+    "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik.",
+    "clockOutOfSync": {
+      "body": "Tanggal dan waktu perangkat Anda tidak sinkron. Atur ke otomatis untuk melanjutkan.",
+      "retryCta": "Coba lagi"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Kustodian",

@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Kontak ondersteuning",
       "body": "Iets het verkeerd geloop, maar moenie bekommerd wees nie, jou fondse is veilig. Kontak asseblief ondersteuning vir hulp.\n\nJy mag dalk hierdie inligting nodig hê om ondersteuning te help om jou saak op te los:",
+      "reasonLabel": "Rede",
       "accountIdLabel": "Rekening-ID",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Gebruikersnaam",
@@ -3595,6 +3596,7 @@
       "networkFee": "Netwerkfooi: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Netwerkfooi: <bold>{fee: string}</bold> (deur Blink gedek)",
       "exchangeRate": "Huidige wisselkoers 1 BTC = {rate: string}",
+      "retryCta": "Probeer weer",
       "approveCta": "Keur goed",
       "contactSupportCta": "Kontak ondersteuning"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API sal nie beskikbaar wees nie",
     "explainerCheck5": "Jou rekening sal met 'n Spark-netwerkfooi belas word",
     "explainerCta": "Ek verstaan",
-    "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees."
+    "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees.",
+    "clockOutOfSync": {
+      "body": "Die datum en tyd van jou toestel is nie in sinkronisasie nie. Stel dit op outomaties om voort te gaan.",
+      "retryCta": "Probeer weer"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Bewaard",

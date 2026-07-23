@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Կապ աջակցության հետ",
       "body": "Ինչ-որ բան սխալ գնաց, բայց մի անհանգստացեք, ձեր միջոցներն ապահով են։ Խնդրում ենք կապվել աջակցության հետ օգնության համար։\n\nՁեզ կարող է անհրաժեշտ լինել այս տեղեկատվությունը, որպեսզի աջակցությունը լուծի ձեր հարցը․",
+      "reasonLabel": "Պատճառ",
       "accountIdLabel": "Հաշվի ID",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Օգտանուն",
@@ -3595,6 +3596,7 @@
       "networkFee": "Ցանցի վճար. <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ցանցի վճար. <bold>{fee: string}</bold> (ծածկում է Blink-ը)",
       "exchangeRate": "Ընթացիկ փոխարժեք 1 BTC = {rate: string}",
+      "retryCta": "Փորձել կրկին",
       "approveCta": "Հաստատել",
       "contactSupportCta": "Կապ աջակցման հետ"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API-ն հասանելի չի լինի",
     "explainerCheck5": "Ձեր հաշվից կպահվի Spark ցանցի վճար",
     "explainerCta": "Հասկանում եմ",
-    "transferringFunds": "Ձեր միջոցները փոխանցվում են։ Դա պետք է ավարտվի մի քանի վայրկյանի ընթացքում։"
+    "transferringFunds": "Ձեր միջոցները փոխանցվում են։ Դա պետք է ավարտվի մի քանի վայրկյանի ընթացքում։",
+    "clockOutOfSync": {
+      "body": "Ձեր սարքի ամսաթիվն ու ժամը համաժամացված չեն։ Դրանք ավտոմատ դարձրեք՝ շարունակելու համար։",
+      "retryCta": "Կրկին փորձել"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Պահառությամբ",

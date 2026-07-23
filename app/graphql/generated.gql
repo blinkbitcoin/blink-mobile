@@ -523,6 +523,49 @@ mutation lnUsdInvoiceFeeProbe($input: LnUsdInvoiceFeeProbeInput!) {
   }
 }
 
+mutation migrationCommit($input: MigrationCommitInput!) {
+  migrationCommit(input: $input) {
+    errors {
+      message
+      code
+      __typename
+    }
+    __typename
+  }
+}
+
+mutation migrationLnAddressTransfer($input: MigrationLnAddressTransferInput!) {
+  migrationLnAddressTransfer(input: $input) {
+    errors {
+      message
+      code
+      __typename
+    }
+    results {
+      identifier
+      lightningAddress
+      status
+      __typename
+    }
+    __typename
+  }
+}
+
+mutation migrationStart {
+  migrationStart {
+    errors {
+      message
+      code
+      __typename
+    }
+    migration {
+      status
+      __typename
+    }
+    __typename
+  }
+}
+
 mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
   onChainAddressCurrent(input: $input) {
     errors {
@@ -1383,6 +1426,19 @@ query level {
   }
 }
 
+query migration {
+  migration {
+    preview {
+      balanceSats
+      feeSats
+      feeCoveredByBlink
+      receiveSats
+      __typename
+    }
+    __typename
+  }
+}
+
 query migrationApiKeys {
   me {
     id
@@ -1403,6 +1459,13 @@ query migrationOwner {
       id
       __typename
     }
+    __typename
+  }
+}
+
+query migrationStatus {
+  migration {
+    status
     __typename
   }
 }
@@ -1923,6 +1986,17 @@ query warningSecureAccount {
       }
       __typename
     }
+    __typename
+  }
+}
+
+query windDown {
+  windDown {
+    status
+    receiveDisabledAt
+    finalDeadline
+    gateArmsAt
+    timezone
     __typename
   }
 }

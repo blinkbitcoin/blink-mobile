@@ -17,14 +17,14 @@ const receiveError = (message: string) => ({
 export const createReceiveLightning = (
   sdk: BreezSdkInterface,
 ): ReceiveLightningAdapter => {
-  return async ({ amount, memo }) => {
+  return async ({ amount, memo, expirySecs }) => {
     try {
       const response = await sdk.receivePayment(
         ReceivePaymentRequest.create({
           paymentMethod: new ReceivePaymentMethod.Bolt11Invoice({
             description: memo ?? "",
             amountSats: amount ? BigInt(amount.amount) : undefined,
-            expirySecs: undefined,
+            expirySecs,
             paymentHash: undefined,
           }),
         }),

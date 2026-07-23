@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Qhagamshelana nenkxaso",
       "body": "Kukho into engahambanga kakuhle, kodwa ungakhathazeki, imali yakho ikhuselekile. Nceda uqhagamshelane nenkxaso ukuze ufumane uncedo.\n\nUsenokufuna olu lwazi ukunceda inkxaso isombulule ityala lakho:",
+      "reasonLabel": "Isizathu",
       "accountIdLabel": "I-ID yeakhawunti",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Igama lomsebenzisi",
@@ -3595,6 +3596,7 @@
       "networkFee": "Umrhumo wothungelwano: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Umrhumo wothungelwano: <bold>{fee: string}</bold> (uhlawulwa nguBlink)",
       "exchangeRate": "Izinga langoku lotshintshiselwano 1 BTC = {rate: string}",
+      "retryCta": "Zama kwakhona",
       "approveCta": "Yamkela",
       "contactSupportCta": "Qhagamshelana nenkxaso"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "I-Blink API ayiyi kufumaneka",
     "explainerCheck5": "I-akhawunti yakho iya kukhutshelwa intlawulo yothungelwano lwe-Spark",
     "explainerCta": "Ndiyaqonda",
-    "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje."
+    "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje.",
+    "clockOutOfSync": {
+      "body": "Umhla nexesha lesixhobo sakho azihambelani. Zimisele ukuba zizenzekele ukuze uqhubeke.",
+      "retryCta": "Zama kwakhona"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Igciniwe",

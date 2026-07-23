@@ -3557,6 +3557,7 @@
         "contactSupport": {
             "title": "サポートに連絡",
             "body": "問題が発生しましたが、ご安心ください。資金は安全です。サポートにお問い合わせください。\n\nサポートが問題を解決するために、次の情報が必要になる場合があります：",
+            "reasonLabel": "理由",
             "accountIdLabel": "アカウントID",
             "pubKeyLabel": "pubKey",
             "usernameLabel": "ユーザー名",
@@ -3595,6 +3596,7 @@
             "networkFee": "ネットワーク手数料: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "ネットワーク手数料: <bold>{fee: string}</bold>（Blinkが負担）",
             "exchangeRate": "現在の為替レート 1 BTC = {rate: string}",
+            "retryCta": "再試行",
             "approveCta": "承認",
             "contactSupportCta": "サポートに連絡"
         },
@@ -3626,7 +3628,11 @@
         "explainerCheck4": "Blink APIは利用できなくなります",
         "explainerCheck5": "アカウントからSparkネットワーク手数料が差し引かれます",
         "explainerCta": "理解しました",
-        "transferringFunds": "資金を転送中です。数秒で完了するはずです。"
+        "transferringFunds": "資金を転送中です。数秒で完了するはずです。",
+        "clockOutOfSync": {
+            "body": "デバイスの日付と時刻がずれています。続けるには自動設定にしてください。",
+            "retryCta": "再試行"
+        }
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "カストディアル",

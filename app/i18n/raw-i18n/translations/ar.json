@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "تواصل مع الدعم",
       "body": "حدث خطأ ما، لكن لا تقلق، أموالك آمنة. يرجى التواصل مع الدعم للمساعدة.\n\nقد تحتاج إلى هذه المعلومات لمساعدة الدعم في حل حالتك:",
+      "reasonLabel": "السبب",
       "accountIdLabel": "معرّف الحساب",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "اسم المستخدم",
@@ -3595,6 +3596,7 @@
       "networkFee": "رسوم الشبكة: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "رسوم الشبكة: <bold>{fee: string}</bold> (تغطيها Blink)",
       "exchangeRate": "سعر الصرف الحالي 1 BTC = {rate: string}",
+      "retryCta": "حاول مرة أخرى",
       "approveCta": "موافقة",
       "contactSupportCta": "تواصل مع الدعم"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "لن تكون واجهة برمجة تطبيقات Blink متاحة",
     "explainerCheck5": "سيتم خصم رسوم شبكة Spark من حسابك",
     "explainerCta": "فهمت",
-    "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة."
+    "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة.",
+    "clockOutOfSync": {
+      "body": "تاريخ ووقت جهازك غير متزامنين. اضبطهما على الوضع التلقائي للمتابعة.",
+      "retryCta": "حاول مرة أخرى"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "محفوظ",

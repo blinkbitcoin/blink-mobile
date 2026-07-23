@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Wasiliana na usaidizi",
       "body": "Kuna kitu kimeenda vibaya, lakini usiwe na wasiwasi, fedha zako ziko salama. Tafadhali wasiliana na usaidizi kwa msaada.\n\nUnaweza kuhitaji taarifa hizi ili kusaidia usaidizi kutatua kesi yako:",
+      "reasonLabel": "Sababu",
       "accountIdLabel": "Kitambulisho cha akaunti",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Jina la mtumiaji",
@@ -3595,6 +3596,7 @@
       "networkFee": "Ada ya mtandao: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ada ya mtandao: <bold>{fee: string}</bold> (inalipwa na Blink)",
       "exchangeRate": "Kiwango cha ubadilishaji cha sasa 1 BTC = {rate: string}",
+      "retryCta": "Jaribu tena",
       "approveCta": "Idhinisha",
       "contactSupportCta": "Wasiliana na usaidizi"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API haitapatikana",
     "explainerCheck5": "Akaunti yako itakatwa ada ya mtandao wa Spark",
     "explainerCta": "Naelewa",
-    "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache."
+    "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache.",
+    "clockOutOfSync": {
+      "body": "Tarehe na saa za kifaa chako hazijaoanishwa. Ziweke kwa kiotomatiki ili kuendelea.",
+      "retryCta": "Jaribu tena"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Iliyohifadhiwa",

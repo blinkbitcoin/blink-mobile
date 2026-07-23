@@ -3732,6 +3732,10 @@ const en: BaseTranslation = {
     explainerCta: "I understand",
     transferringFunds:
       "Transferring your funds. It should be done in a few seconds.",
+    clockOutOfSync: {
+      body: "Your device's date and time are out of sync. Set them to automatic to continue.",
+      retryCta: "Try again",
+    },
     migrationRequiredTitle: "Time to upgrade",
     migrationRequiredBody:
       "It's time to migrate your custodial account to a non-custodial account.",
@@ -3769,6 +3773,7 @@ const en: BaseTranslation = {
       networkFee: "Network fee: <bold>{fee: string}</bold>",
       networkFeeCoveredByBlink: "Network fee: <bold>{fee: string}</bold> (covered by Blink)",
       exchangeRate: "Current exchange rate 1 BTC = {rate: string}",
+      retryCta: "Try again",
       approveCta: "Approve",
       contactSupportCta: "Contact support",
     },
@@ -3789,6 +3794,7 @@ const en: BaseTranslation = {
     contactSupport: {
       title: "Contact support",
       body: "Something went wrong but don't worry your funds are safe, please contact support for assistance.\n\nYou may need this information to help support resolve your case:",
+      reasonLabel: "Reason",
       accountIdLabel: "Account ID",
       pubKeyLabel: "pubKey",
       usernameLabel: "Username",

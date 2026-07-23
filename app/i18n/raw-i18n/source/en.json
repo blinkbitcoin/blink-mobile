@@ -3576,6 +3576,10 @@
         "explainerCheck5": "Your account will be deducted with a Spark network fee",
         "explainerCta": "I understand",
         "transferringFunds": "Transferring your funds. It should be done in a few seconds.",
+        "clockOutOfSync": {
+            "body": "Your device's date and time are out of sync. Set them to automatic to continue.",
+            "retryCta": "Try again"
+        },
         "migrationRequiredTitle": "Time to upgrade",
         "migrationRequiredBody": "It's time to migrate your custodial account to a non-custodial account.",
         "migrationRequiredForcedBody": "It's time to migrate your custodial account to a non-custodial account. It's required for regulatory reasons.\n\nNo need to worry, non-custodial will be better for you in the long term.",
@@ -3607,6 +3611,7 @@
             "networkFee": "Network fee: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "Network fee: <bold>{fee: string}</bold> (covered by Blink)",
             "exchangeRate": "Current exchange rate 1 BTC = {rate: string}",
+            "retryCta": "Try again",
             "approveCta": "Approve",
             "contactSupportCta": "Contact support"
         },
@@ -3627,6 +3632,7 @@
         "contactSupport": {
             "title": "Contact support",
             "body": "Something went wrong but don't worry your funds are safe, please contact support for assistance.\n\nYou may need this information to help support resolve your case:",
+            "reasonLabel": "Reason",
             "accountIdLabel": "Account ID",
             "pubKeyLabel": "pubKey",
             "usernameLabel": "Username",

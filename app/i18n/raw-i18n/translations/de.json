@@ -3557,6 +3557,7 @@
         "contactSupport": {
             "title": "Support kontaktieren",
             "body": "Etwas ist schiefgelaufen, aber keine Sorge, dein Guthaben ist sicher. Bitte kontaktiere den Support für Hilfe.\n\nDiese Informationen können dem Support helfen, deinen Fall zu lösen:",
+            "reasonLabel": "Grund",
             "accountIdLabel": "Konto-ID",
             "pubKeyLabel": "pubKey",
             "usernameLabel": "Benutzername",
@@ -3595,6 +3596,7 @@
             "networkFee": "Netzwerkgebühr: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "Netzwerkgebühr: <bold>{fee: string}</bold> (von Blink übernommen)",
             "exchangeRate": "Aktueller Wechselkurs 1 BTC = {rate: string}",
+            "retryCta": "Erneut versuchen",
             "approveCta": "Bestätigen",
             "contactSupportCta": "Support kontaktieren"
         },
@@ -3626,7 +3628,11 @@
         "explainerCheck4": "Blink API wird nicht verfügbar sein",
         "explainerCheck5": "Deinem Konto wird eine Spark-Netzwerkgebühr abgezogen",
         "explainerCta": "Ich verstehe",
-        "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein."
+        "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein.",
+        "clockOutOfSync": {
+            "body": "Datum und Uhrzeit deines Geräts sind nicht synchron. Stelle sie auf automatisch, um fortzufahren.",
+            "retryCta": "Erneut versuchen"
+        }
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Verwahrt",

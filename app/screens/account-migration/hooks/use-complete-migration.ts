@@ -17,7 +17,7 @@ export const useCompleteMigration = () => {
   const { checkpoint, accountId, loading, clearCheckpoint } =
     useMigrationCheckpointState()
   const { clearPendingAccount } = usePendingMigrationAccounts()
-  const { setActiveAccountId, accounts } = useAccountRegistry()
+  const { setActiveAccountId, accounts, loading: accountsLoading } = useAccountRegistry()
   const { ownerId: custodialOwnerId } = useCustodialOwnerId()
   const { discardCustodialSession } = useDiscardCustodialSession()
 
@@ -46,10 +46,16 @@ export const useCompleteMigration = () => {
     clearPendingAccount,
   ])
 
+  /** The account check completeMigration makes is only trustworthy once both the checkpoint
+   *  and the registry have hydrated: on a resume launch the registry's accounts start empty
+   *  and fill after an async keystore read, so a swap decided before then would read the
+   *  present destination as missing and hand a healthy user to support. */
+  const isMigrationDataLoading = loading || accountsLoading
+
   return {
     migrationCheckpoint: checkpoint,
     migrationAccountId: accountId,
-    migrationLoading: loading,
+    migrationLoading: isMigrationDataLoading,
     completeMigration,
   }
 }

@@ -8,8 +8,9 @@
  * - ReceiveDisabled (Aug 1 to Aug 31): receiving is turned off; the home greys out
  *   Receive, Send/Scan keep working, and the dismissible "Migrate now" modal appears.
  * - GatedClosed (from Sep 1): the account is closed for everything except the guided
- *   migration; the app shows the non-dismissible "Account not accessible" gate, and the
- *   flow accepts entering WITH dollars because its final step converts them to bitcoin.
+ *   migration; the app shows the non-dismissible "Account not accessible" gate. Like
+ *   every other phase it still requires an empty Dollar Balance, because the backend
+ *   rejects a migration whose USD wallet holds anything and never converts it itself.
  */
 export const WindDownStatus = {
   PreCutoff: "PRE_CUTOFF",
@@ -36,17 +37,4 @@ export type WindDown = {
   gateArmsAt: number
   /** IANA timezone for rendering the dates above, e.g. "Europe/Paris" (CET/CEST). */
   timezone: string
-}
-
-/**
- * Shape of the backend migration preview (Account.migration.preview in the integration
- * contract): the server computes the network fee, whether Blink covers it, and the
- * resulting amount. The client renders these four fields verbatim and never does the
- * arithmetic itself.
- */
-export type AccountMigrationPreview = {
-  balanceSats: number
-  feeSats: number
-  feeCoveredByBlink: boolean
-  receiveSats: number
 }

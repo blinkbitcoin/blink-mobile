@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Kontaktovať podporu",
       "body": "Niečo sa pokazilo, ale nebojte sa, vaše prostriedky sú v bezpečí. Obráťte sa prosím na podporu.\n\nTieto informácie môžu podpore pomôcť vyriešiť váš prípad:",
+      "reasonLabel": "Dôvod",
       "accountIdLabel": "ID účtu",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Používateľské meno",
@@ -3595,6 +3596,7 @@
       "networkFee": "Sieťový poplatok: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Sieťový poplatok: <bold>{fee: string}</bold> (hradí Blink)",
       "exchangeRate": "Aktuálny výmenný kurz 1 BTC = {rate: string}",
+      "retryCta": "Skúsiť znova",
       "approveCta": "Schváliť",
       "contactSupportCta": "Kontaktovať podporu"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API nebude k dispozícii",
     "explainerCheck5": "Z tvojho účtu bude stiahnutý sieťový poplatok Spark",
     "explainerCta": "Rozumiem",
-    "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd."
+    "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd.",
+    "clockOutOfSync": {
+      "body": "Dátum a čas vášho zariadenia nie sú synchronizované. Nastavte ich na automatické, aby ste mohli pokračovať.",
+      "retryCta": "Skúsiť znova"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Spravovaný",

@@ -5,6 +5,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { MigrationContactSupportScreen } from "@app/screens/account-migration/to-non-custodial/contact-support-screen"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { ContextForScreen } from "../../helper"
 import { flushEffects } from "../../../helpers/flush-effects"
 
@@ -23,10 +24,18 @@ let mockDetails = {
   phone: "+1 374 9383 993",
 }
 
+let mockReason: MigrationSupportReason = MigrationSupportReason.PreviewUnavailable
+let mockHasParams = true
+
 const mockNavigate = jest.fn()
+const mockGoBack = jest.fn()
+let mockOrigin: MigrationSupportOrigin | undefined
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useRoute: () => ({
+    params: mockHasParams ? { reason: mockReason, origin: mockOrigin } : undefined,
+  }),
   useFocusEffect: (callback: () => void | (() => void)) =>
     jest.requireActual<typeof import("react")>("react").useEffect(callback, [callback]),
 }))
@@ -54,10 +63,12 @@ const mockBuildDiagnostics = () =>
   ].filter((diagnostic) => Boolean(diagnostic.value))
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-support-email", () => ({
-  useMigrationSupportEmail: () => ({
-    diagnostics: mockBuildDiagnostics(),
-    sendSupportEmail: mockSendSupportEmail,
-  }),
+  useMigrationSupportEmail: (reason: string) => mockUseMigrationSupportEmail(reason),
+}))
+
+const mockUseMigrationSupportEmail = jest.fn((_reason: string) => ({
+  diagnostics: mockBuildDiagnostics(),
+  sendSupportEmail: mockSendSupportEmail,
 }))
 
 const renderScreen = () =>
@@ -71,6 +82,9 @@ describe("MigrationContactSupportScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    mockReason = MigrationSupportReason.PreviewUnavailable
+    mockHasParams = true
+    mockOrigin = undefined
     mockDetails = {
       accountId: "18A4242",
       pubKey: "spbc1pdjsovJFPej9i2vuK",
@@ -100,6 +114,34 @@ describe("MigrationContactSupportScreen", () => {
     fireEvent.press(screen.getByText(LL.common.back()))
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
+  /** From the resume handover there is no commit screen underneath, so Back dismisses rather
+   *  than pushing a fresh one that would re-arm a completed migration and overwrite the reason. */
+  it("dismisses the hardware back when opened from the resume handover", async () => {
+    mockOrigin = MigrationSupportOrigin.Resume
+    const { BackHandler } =
+      jest.requireActual<typeof import("react-native")>("react-native")
+    const addListenerSpy = jest.spyOn(BackHandler, "addEventListener")
+    renderScreen()
+    await flushEffects()
+
+    const handler = addListenerSpy.mock.calls[0][1] as () => boolean
+
+    expect(handler()).toBe(true)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
+  })
+
+  it("dismisses the visible Back button when opened from the resume handover", async () => {
+    mockOrigin = MigrationSupportOrigin.Resume
+    renderScreen()
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.common.back()))
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
   it("renders the hero, every diagnostics row and the contact action", async () => {
@@ -142,6 +184,37 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.queryByText(LLSupport.usernameLabel())).toBeNull()
     expect(screen.queryByText(LLSupport.emailLabel())).toBeNull()
     expect(screen.getByText(LLSupport.phoneLabel())).toBeTruthy()
+  })
+
+  /** The reason is what tells support WHAT failed, so it reaches the email builder from
+   *  the route rather than being guessed on this screen. */
+  it("passes the route's reason through to the support email", async () => {
+    mockReason = MigrationSupportReason.StartRefused
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("start-refused")
+  })
+
+  /** The screen shows identity for the user to copy; the reason is a code for support
+   *  and travels in the email body instead. */
+  it("keeps the reason code off the screen", async () => {
+    mockReason = MigrationSupportReason.SelfCustodialAccountMissing
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByText(LLSupport.reasonLabel())).toBeNull()
+    expect(screen.queryByText("self-custodial-account-missing")).toBeNull()
+  })
+
+  /** A navigation-state restore can land here with no params; a named fallback keeps the
+   *  ticket meaningful instead of crashing on the screen a stranded user was handed. */
+  it("falls back to an unknown reason when the screen is reached without params", async () => {
+    mockHasParams = false
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseMigrationSupportEmail).toHaveBeenCalledWith("unknown")
   })
 
   it("sends the support email from the contact action", async () => {

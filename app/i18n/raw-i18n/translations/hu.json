@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Kapcsolatfelvétel az ügyfélszolgálattal",
       "body": "Valami hiba történt, de ne aggódjon, a pénze biztonságban van. Kérjük, forduljon az ügyfélszolgálathoz segítségért.\n\nEzekre az adatokra szüksége lehet, hogy az ügyfélszolgálat megoldja az esetét:",
+      "reasonLabel": "Ok",
       "accountIdLabel": "Fiókazonosító",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Felhasználónév",
@@ -3595,6 +3596,7 @@
       "networkFee": "Hálózati díj: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Hálózati díj: <bold>{fee: string}</bold> (a Blink fedezi)",
       "exchangeRate": "Jelenlegi árfolyam 1 BTC = {rate: string}",
+      "retryCta": "Próbáld újra",
       "approveCta": "Jóváhagyás",
       "contactSupportCta": "Kapcsolat a támogatással"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "A Blink API nem lesz elérhető",
     "explainerCheck5": "A fiókodból levonásra kerül egy Spark hálózati díj",
     "explainerCta": "Megértettem",
-    "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik."
+    "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik.",
+    "clockOutOfSync": {
+      "body": "Az eszközöd dátuma és ideje nincs szinkronban. Állítsd automatikusra a folytatáshoz.",
+      "retryCta": "Próbáld újra"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Letéti",

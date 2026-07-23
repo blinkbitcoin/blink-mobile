@@ -14,7 +14,8 @@ export type MigrationDiagnostic = {
 /**
  * The labeled account diagnostics shared by the contact-support screen and the support
  * email: the custodial identity plus the provisioned wallet's pubkey, with the empty
- * values already filtered out.
+ * values already filtered out. Identity only, no failure reason: the screen exists so the
+ * user can copy who they are, and the reason is a code for support that the email carries.
  */
 export const useMigrationDiagnostics = (): readonly MigrationDiagnostic[] => {
   const { LL } = useI18nContext()

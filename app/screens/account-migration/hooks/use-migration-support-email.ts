@@ -4,6 +4,7 @@ import { getReadableVersion } from "react-native-device-info"
 import { useContactSupport } from "@app/hooks/use-contact-support"
 import useDeviceLocation from "@app/hooks/use-device-location"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { MigrationSupportReason } from "@app/types/migration"
 import { isIos } from "@app/utils/helper"
 
 import { useMigrationDiagnostics } from "./use-migration-diagnostics"
@@ -11,13 +12,14 @@ import { useMigrationDiagnostics } from "./use-migration-diagnostics"
 const EMAIL_DIVIDER = "-".repeat(40)
 
 /**
- * Composes and opens the migration support email: the account diagnostics plus the
- * platform, app version and country, framed so the user writes at the bottom. Mail
- * clients drop the cursor at the END of a mailto body, so the write-here prompt goes
- * last: the user lands right under it and the details block stays untouched. The
- * diagnostics are returned too, so the support screen renders the same single source.
+ * Composes and opens the migration support email: what failed, the account diagnostics,
+ * and the platform, app version and country, framed so the user writes at the bottom.
+ * Mail clients drop the cursor at the END of a mailto body, so the write-here prompt goes
+ * last: the user lands right under it and the details block stays untouched. The reason
+ * leads, because support triages on what failed before it looks at any identifier, and it
+ * lives only here: the screen shows identity for the user to copy, not a code for us.
  */
-export const useMigrationSupportEmail = () => {
+export const useMigrationSupportEmail = (reason: MigrationSupportReason) => {
   const { LL } = useI18nContext()
   const LLSupport = LL.AccountMigration.contactSupport
   const { composeSupport } = useContactSupport()
@@ -26,15 +28,15 @@ export const useMigrationSupportEmail = () => {
 
   const sendSupportEmail = useCallback(() => {
     const platform = isIos ? "iOS" : "Android"
-    const environmentLines = [
+    const infoLines = [
+      { label: LLSupport.reasonLabel(), value: reason },
+      ...diagnostics,
       { label: LLSupport.platformLabel(), value: platform },
       { label: LLSupport.appVersionLabel(), value: getReadableVersion() },
       { label: LLSupport.countryLabel(), value: countryCode ?? "" },
-    ].filter((line) => Boolean(line.value))
-
-    const infoLines = [...diagnostics, ...environmentLines].map(
-      (line) => `${line.label}: ${line.value}`,
-    )
+    ]
+      .filter((line) => Boolean(line.value))
+      .map((line) => `${line.label}: ${line.value}`)
 
     const body = [
       LLSupport.emailAccountInfo(),
@@ -47,7 +49,7 @@ export const useMigrationSupportEmail = () => {
     ].join("\n")
 
     composeSupport({ subject: LLSupport.emailSubject(), body })
-  }, [LLSupport, diagnostics, countryCode, composeSupport])
+  }, [LLSupport, reason, diagnostics, countryCode, composeSupport])
 
   return { diagnostics, sendSupportEmail }
 }

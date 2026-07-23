@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Contact opnemen met support",
       "body": "Er is iets misgegaan, maar maak je geen zorgen, je geld is veilig. Neem contact op met support voor hulp.\n\nMogelijk heb je deze informatie nodig zodat support je zaak kan oplossen:",
+      "reasonLabel": "Reden",
       "accountIdLabel": "Account-ID",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Gebruikersnaam",
@@ -3595,6 +3596,7 @@
       "networkFee": "Netwerkkosten: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Netwerkkosten: <bold>{fee: string}</bold> (gedekt door Blink)",
       "exchangeRate": "Huidige wisselkoers 1 BTC = {rate: string}",
+      "retryCta": "Opnieuw proberen",
       "approveCta": "Goedkeuren",
       "contactSupportCta": "Contact met support"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API zal niet beschikbaar zijn",
     "explainerCheck5": "Er worden Spark-netwerkkosten van je account afgeschreven",
     "explainerCta": "Ik begrijp het",
-    "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn."
+    "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn.",
+    "clockOutOfSync": {
+      "body": "De datum en tijd van je apparaat lopen niet gelijk. Zet ze op automatisch om door te gaan.",
+      "retryCta": "Opnieuw proberen"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Bewaard",

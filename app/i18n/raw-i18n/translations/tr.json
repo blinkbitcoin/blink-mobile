@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Destek ile iletişime geçin",
       "body": "Bir şeyler ters gitti ama endişelenmeyin, paranız güvende. Yardım için lütfen destek ile iletişime geçin.\n\nDesteğin durumunuzu çözmesine yardımcı olmak için bu bilgilere ihtiyacınız olabilir:",
+      "reasonLabel": "Neden",
       "accountIdLabel": "Hesap kimliği",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Kullanıcı adı",
@@ -3595,6 +3596,7 @@
       "networkFee": "Ağ ücreti: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ağ ücreti: <bold>{fee: string}</bold> (Blink tarafından karşılanır)",
       "exchangeRate": "Güncel döviz kuru 1 BTC = {rate: string}",
+      "retryCta": "Tekrar dene",
       "approveCta": "Onayla",
       "contactSupportCta": "Desteğe ulaş"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API kullanılamayacak",
     "explainerCheck5": "Hesabından bir Spark ağ ücreti düşülecek",
     "explainerCta": "Anladım",
-    "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır."
+    "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır.",
+    "clockOutOfSync": {
+      "body": "Cihazının tarih ve saati eşitlenmemiş. Devam etmek için otomatik olarak ayarla.",
+      "retryCta": "Tekrar dene"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Emanetli",

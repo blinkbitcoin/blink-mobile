@@ -3557,6 +3557,7 @@
     "contactSupport": {
       "title": "Hubungi sokongan",
       "body": "Sesuatu telah berlaku, tetapi jangan risau, dana anda selamat. Sila hubungi sokongan untuk mendapatkan bantuan.\n\nAnda mungkin memerlukan maklumat ini untuk membantu sokongan menyelesaikan kes anda:",
+      "reasonLabel": "Sebab",
       "accountIdLabel": "ID akaun",
       "pubKeyLabel": "pubKey",
       "usernameLabel": "Nama pengguna",
@@ -3595,6 +3596,7 @@
       "networkFee": "Yuran rangkaian: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Yuran rangkaian: <bold>{fee: string}</bold> (ditanggung oleh Blink)",
       "exchangeRate": "Kadar pertukaran semasa 1 BTC = {rate: string}",
+      "retryCta": "Cuba lagi",
       "approveCta": "Luluskan",
       "contactSupportCta": "Hubungi sokongan"
     },
@@ -3626,7 +3628,11 @@
     "explainerCheck4": "Blink API tidak akan tersedia",
     "explainerCheck5": "Akaun anda akan dikenakan yuran rangkaian Spark",
     "explainerCta": "Saya faham",
-    "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat."
+    "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat.",
+    "clockOutOfSync": {
+      "body": "Tarikh dan masa peranti anda tidak segerak. Tetapkan kepada automatik untuk meneruskan.",
+      "retryCta": "Cuba lagi"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Kustodian",
