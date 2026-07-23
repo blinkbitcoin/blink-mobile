@@ -322,7 +322,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     })
   }
 
-  let spendOrReceiveText: string
+  let spendOrReceiveText = ""
   if (isReceive) {
     spendOrReceiveText = LL.TransactionDetailScreen.received()
   } else if (onChainTxNotBroadcasted) {
