@@ -11,7 +11,9 @@ import {
   HomeAuthedDocument,
   HomeUnauthedDocument,
   Network,
+  useBulletinsQuery,
 } from "@app/graphql/generated"
+import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
 import { ConvertDirection } from "@app/types/payment"
 
@@ -336,6 +338,16 @@ jest.mock("@app/graphql/mocks", () => {
       // mounted components, keeping Apollo's MockLink warning-free.
       return [...currentMocks, ...actual.default]
     },
+  }
+})
+
+jest.mock("@app/graphql/generated", () => {
+  const actual = jest.requireActual("@app/graphql/generated")
+  return {
+    ...actual,
+    /** Passthrough spy: the real query still runs against MockedProvider; the spy
+     *  only records call args so the bulletins auth skip-gate can be asserted. */
+    useBulletinsQuery: jest.fn((opts: unknown) => actual.useBulletinsQuery(opts)),
   }
 })
 
@@ -1719,5 +1731,50 @@ describe("HomeScreen wind-down states", () => {
     onMigrate()
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
+  })
+})
+
+describe("bulletins auth gating", () => {
+  const mockUseBulletinsQuery = useBulletinsQuery as jest.Mock
+
+  beforeEach(() => {
+    currentMocks = []
+    jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: null,
+    })
+  })
+
+  it("requests bulletins when authed", async () => {
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(mockUseBulletinsQuery).toHaveBeenCalled()
+    expect(mockUseBulletinsQuery.mock.lastCall[0]).toEqual(
+      expect.objectContaining({ skip: false, variables: { first: 1 } }),
+    )
+  })
+
+  /** Regression lock: campaign bulletins are never fetched for unauthenticated
+   *  sessions — delivery is gated on auth alone, never on account state such as
+   *  a lightning address. */
+  it("skips bulletins query when not authed", async () => {
+    render(
+      <ContextForScreen>
+        <IsAuthedContextProvider value={false}>
+          <HomeScreen />
+        </IsAuthedContextProvider>
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(mockUseBulletinsQuery).toHaveBeenCalled()
+    expect(mockUseBulletinsQuery.mock.lastCall[0].skip).toBe(true)
   })
 })
