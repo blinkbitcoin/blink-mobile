@@ -26,6 +26,10 @@ free_gb() {
   awk "BEGIN { printf \"%.1f\", $(free_kb) / 1024 / 1024 }"
 }
 
+kb_to_gb() {
+  awk -v kb="$1" 'BEGIN { printf "%.1f", kb / 1024 / 1024 }'
+}
+
 free_space_below_target() {
   (( $(free_kb) < required_kb ))
 }
@@ -73,6 +77,10 @@ unique_paths() {
 }
 
 build_cache_dirs() {
+  # /private/var/root/Library/Caches is listed whole, not per-tool like the
+  # user homes: root runs of Yarn/CocoaPods/etc. scatter caches across it and
+  # everything under it is droppable on a CI worker (20 GB of mixed root
+  # caches in the 2026-07-23 incident). Keep it whole-dir.
   unique_paths \
     "/private/var/root/Library/Caches" \
     "/private/var/root/.gradle/caches" \
@@ -171,6 +179,7 @@ print_disk_report() {
     "$BUILD_HOME/Library/Developer/CoreSimulator/Devices" \
     "/Users/m1/Library/Developer/CoreSimulator/Devices")
 
+  echo "---- Build caches and trash ----"
   while IFS= read -r path; do
     if [[ -e "$path" ]]; then
       du -sh "$path" 2>/dev/null || true
@@ -221,7 +230,7 @@ cleanup_xcode_artifacts() {
   root_derived_data_size_kb="$(path_size_kb "$root_derived_data")"
   if free_space_below_target || (( root_derived_data_size_kb > root_derived_data_max_kb )); then
     echo "Removing root-owned Xcode DerivedData caches from $root_derived_data"
-    echo "Reason: free disk $(free_gb) GB, root DerivedData $((root_derived_data_size_kb / 1024 / 1024)) GB, cap ${ROOT_DERIVED_DATA_MAX_GB} GB"
+    echo "Reason: free disk $(free_gb) GB, root DerivedData $(kb_to_gb "$root_derived_data_size_kb") GB, cap ${ROOT_DERIVED_DATA_MAX_GB} GB"
     remove_all_children "$root_derived_data"
   fi
 }
@@ -230,12 +239,30 @@ cleanup_concourse_dead_volumes() {
   remove_all_children "$CONCOURSE_WORKDIR/volumes/dead"
 }
 
+gradle_daemons_stopped=""
+
 stop_gradle_daemons() {
   # A live daemon holds references into .gradle/caches; purging under it makes
-  # the next build fail with "Could not read workspace metadata".
+  # the next build fail with "Could not read workspace metadata". No build can
+  # be in flight here: build jobs and this cleanup all hold the
+  # mobile-concourse lock (ci/pipeline.yml), so any daemon found is idle.
+  [[ -n "$gradle_daemons_stopped" ]] && return
+  gradle_daemons_stopped=1
+
   echo "Stopping Gradle daemons before purging Gradle caches"
   pkill -f GradleDaemon 2>/dev/null || true
-  sleep 1
+
+  local waited=0
+  while pgrep -f GradleDaemon >/dev/null 2>&1 && (( waited < 15 )); do
+    sleep 1
+    waited=$((waited + 1))
+  done
+
+  if pgrep -f GradleDaemon >/dev/null 2>&1; then
+    echo "Gradle daemons still running after ${waited}s; force-killing"
+    pkill -9 -f GradleDaemon 2>/dev/null || true
+    sleep 1
+  fi
 }
 
 cleanup_build_caches() {
@@ -248,10 +275,11 @@ cleanup_build_caches() {
     size_kb="$(path_size_kb "$dir")"
     if free_space_below_target || (( size_kb > build_cache_max_kb )); then
       echo "Removing build cache $dir"
-      echo "Reason: free disk $(free_gb) GB, cache size $((size_kb / 1024 / 1024)) GB, cap ${BUILD_CACHE_MAX_GB} GB"
+      echo "Reason: free disk $(free_gb) GB, cache size $(kb_to_gb "$size_kb") GB, cap ${BUILD_CACHE_MAX_GB} GB"
       if [[ "$dir" == */.gradle/caches ]]; then
         stop_gradle_daemons
         remove_path "${dir%/caches}/daemon"
+        remove_path "${dir%/caches}/wrapper/dists"
       fi
       remove_all_children "$dir"
     fi
