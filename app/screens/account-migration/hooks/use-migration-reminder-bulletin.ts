@@ -5,6 +5,7 @@ import { useCustodialWindDown } from "./use-custodial-wind-down"
 type MigrationReminderBulletin = {
   isVisible: boolean
   deadlineTimestamp: number
+  receiveDisabledTimestamp: number
   timezone: string | undefined
 }
 
@@ -26,6 +27,7 @@ export const useMigrationReminderBulletin = (): MigrationReminderBulletin => {
   return {
     isVisible: isPreCutoff,
     deadlineTimestamp: windDown?.finalDeadline ?? 0,
+    receiveDisabledTimestamp: windDown?.receiveDisabledAt ?? 0,
     timezone: windDown?.timezone,
   }
 }

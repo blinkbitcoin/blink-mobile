@@ -10,6 +10,7 @@ import { MigrationReminderBulletin } from "@app/components/migration-reminder-bu
 loadLocale("en")
 
 const AUG_31_2026_NOON_UTC = Date.UTC(2026, 7, 31, 12) / 1000
+const AUG_10_2026_NOON_UTC = Date.UTC(2026, 7, 10, 12) / 1000
 
 const wrap = (ui: React.ReactElement) => (
   <ThemeProvider>
@@ -25,6 +26,7 @@ const renderBulletin = (
       <MigrationReminderBulletin
         onMigrate={jest.fn()}
         deadlineTimestamp={AUG_31_2026_NOON_UTC}
+        receiveDisabledTimestamp={AUG_10_2026_NOON_UTC}
         timezone="UTC"
         {...overrides}
       />,
@@ -32,11 +34,12 @@ const renderBulletin = (
   )
 
 describe("MigrationReminderBulletin", () => {
-  it("renders the title, the body with the formatted deadline, and the migrate CTA", () => {
+  it("renders the title, the body with both formatted dates, and the migrate CTA", () => {
     const { getByText } = renderBulletin()
 
     expect(getByText("Important")).toBeTruthy()
     expect(getByText(/before August 31/)).toBeTruthy()
+    expect(getByText(/Receiving stops August 10/)).toBeTruthy()
     expect(getByText("Migrate")).toBeTruthy()
   })
 

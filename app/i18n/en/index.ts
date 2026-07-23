@@ -3787,7 +3787,7 @@ const en: BaseTranslation = {
     },
     reminderBulletin: {
       title: "Important",
-      body: "Migrate your account to new, non-custodial mode before {date: string}",
+      body: "Move to a non-custodial account via guided migration, or withdraw, before {date: string}. Receiving stops {receiveStopsDate: string}.",
       migrateCta: "Migrate",
     },
     contactSupport: {
