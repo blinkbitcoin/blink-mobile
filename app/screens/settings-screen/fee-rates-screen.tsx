@@ -40,7 +40,7 @@ const FeeRateRow: React.FC<FeeRateRowProps> = ({ label, value }) => {
       <Text type="p2" style={styles.feeLabel}>
         {label}
       </Text>
-      <Text type="p2" style={styles.feeValue}>
+      <Text type="p2" bold style={styles.feeValue}>
         {value}
       </Text>
     </View>
@@ -216,15 +216,27 @@ export const FeeRatesScreen: React.FC = () => {
       <View style={styles.content}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{LL.FeeRatesScreen.send()}</Text>
-          <SettingsGroup items={sendItems} />
+          <SettingsGroup
+            items={sendItems}
+            containerStyle={styles.groupCard}
+            dividerStyle={styles.hiddenDivider}
+          />
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{LL.FeeRatesScreen.receive()}</Text>
-          <SettingsGroup items={receiveItems} />
+          <SettingsGroup
+            items={receiveItems}
+            containerStyle={styles.groupCard}
+            dividerStyle={styles.hiddenDivider}
+          />
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{LL.FeeRatesScreen.transfer()}</Text>
-          <SettingsGroup items={transferItems} />
+          <SettingsGroup
+            items={transferItems}
+            containerStyle={styles.groupCard}
+            dividerStyle={styles.hiddenDivider}
+          />
         </View>
       </View>
     </Screen>
@@ -233,7 +245,7 @@ export const FeeRatesScreen: React.FC = () => {
 
 const useStyles = makeStyles(({ colors }) => ({
   content: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 40,
     gap: 20,
@@ -244,23 +256,30 @@ const useStyles = makeStyles(({ colors }) => ({
   sectionTitle: {
     color: colors.black,
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "400",
     lineHeight: 24,
+  },
+  groupCard: {
+    paddingVertical: 5,
+  },
+  hiddenDivider: {
+    display: "none",
   },
   feeRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     columnGap: 16,
-    minHeight: 58,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    minHeight: 34,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
   },
   feeLabel: {
     flex: 1,
+    color: colors.grey1,
   },
   feeValue: {
-    color: colors.grey1,
+    color: colors.black,
     textAlign: "right",
     flexShrink: 0,
   },
