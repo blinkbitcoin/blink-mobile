@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "ประเทศ",
+    "registered": "ลงทะเบียนแล้ว",
+    "detected": "ตรวจพบ",
     "unknown": "ไม่ทราบ",
     "enabled": "เปิดใช้งาน",
     "switch": "สวิตช์",

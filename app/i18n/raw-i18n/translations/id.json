@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Negara",
+    "registered": "Terdaftar",
+    "detected": "Terdeteksi",
     "unknown": "Tidak diketahui",
     "enabled": "Diaktifkan",
     "switch": "Sakelar",

@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Land",
+    "registered": "Registreret",
+    "detected": "Sporet",
     "unknown": "Ukendt",
     "enabled": "Aktiveret",
     "switch": "Afbryder",

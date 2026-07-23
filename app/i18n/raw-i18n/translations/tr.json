@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Ülke",
+    "registered": "Kayıtlı",
+    "detected": "Tespit edildi",
     "unknown": "Bilinmiyor",
     "enabled": "Etkin",
     "switch": "Anahtar",

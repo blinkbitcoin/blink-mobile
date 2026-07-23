@@ -2723,6 +2723,8 @@
     },
     "common": {
         "country": "Pays",
+        "registered": "Enregistré",
+        "detected": "Détecté",
         "unknown": "Inconnu",
         "enabled": "Activé",
         "switch": "Interrupteur",

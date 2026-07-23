@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Quốc gia",
+    "registered": "Đã đăng ký",
+    "detected": "Đã phát hiện",
     "unknown": "Không xác định",
     "enabled": "Đã bật",
     "switch": "Công tắc",

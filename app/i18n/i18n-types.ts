@@ -8929,6 +8929,14 @@ type RootTranslation = {
 		 */
 		country: string
 		/**
+		 * R​e​g​i​s​t​e​r​e​d
+		 */
+		registered: string
+		/**
+		 * D​e​t​e​c​t​e​d
+		 */
+		detected: string
+		/**
 		 * U​n​k​n​o​w​n
 		 */
 		unknown: string
@@ -21565,6 +21573,14 @@ export type TranslationFunctions = {
 		 * Country
 		 */
 		country: () => LocalizedString
+		/**
+		 * Registered
+		 */
+		registered: () => LocalizedString
+		/**
+		 * Detected
+		 */
+		detected: () => LocalizedString
 		/**
 		 * Unknown
 		 */

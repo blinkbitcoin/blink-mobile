@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Zemlja",
+    "registered": "Registrirano",
+    "detected": "Otkriveno",
     "unknown": "Nepoznato",
     "enabled": "Omogućeno",
     "switch": "Prekidač",

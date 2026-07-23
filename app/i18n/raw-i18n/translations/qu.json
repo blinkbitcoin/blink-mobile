@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Suyu",
+    "registered": "Qillqasqa",
+    "detected": "Tarisqa",
     "unknown": "Mana yachakuq",
     "enabled": "Hapichisqa",
     "switch": "Interruptor",

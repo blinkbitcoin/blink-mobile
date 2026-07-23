@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Țară",
+    "registered": "Înregistrat",
+    "detected": "Detectat",
     "unknown": "Necunoscut",
     "enabled": "Activat",
     "switch": "Comutator",

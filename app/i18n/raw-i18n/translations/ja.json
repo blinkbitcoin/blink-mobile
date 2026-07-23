@@ -2723,6 +2723,8 @@
     },
     "common": {
         "country": "国",
+        "registered": "登録済み",
+        "detected": "検出",
         "unknown": "不明",
         "enabled": "有効",
         "switch": "スイッチ",

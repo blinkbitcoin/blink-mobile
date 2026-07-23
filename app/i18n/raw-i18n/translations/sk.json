@@ -2723,6 +2723,8 @@
   },
   "common": {
     "country": "Krajina",
+    "registered": "Registrované",
+    "detected": "Zistené",
     "unknown": "Neznáme",
     "enabled": "Povolený",
     "switch": "Prepínač",
