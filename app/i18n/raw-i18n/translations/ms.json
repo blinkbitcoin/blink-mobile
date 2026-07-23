@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Penting",
-      "body": "Pindahkan akaun anda ke mod bukan kustodial yang baharu sebelum {date}",
+      "body": "Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}. Penerimaan berhenti pada {receiveStopsDate}.",
       "migrateCta": "Pindah"
     },
     "dollarBalanceModal": {

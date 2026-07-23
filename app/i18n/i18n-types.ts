@@ -12031,10 +12031,11 @@ type RootTranslation = {
 			 */
 			title: string
 			/**
-			 * M​i​g​r​a​t​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​n​e​w​,​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​m​o​d​e​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}
+			 * M​o​v​e​ ​t​o​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t​ ​v​i​a​ ​g​u​i​d​e​d​ ​m​i​g​r​a​t​i​o​n​,​ ​o​r​ ​w​i​t​h​d​r​a​w​,​ ​b​e​f​o​r​e​ ​{​d​a​t​e​}​.​ ​R​e​c​e​i​v​i​n​g​ ​s​t​o​p​s​ ​{​r​e​c​e​i​v​e​S​t​o​p​s​D​a​t​e​}​.
 			 * @param {string} date
+			 * @param {string} receiveStopsDate
 			 */
-			body: RequiredParams<'date'>
+			body: RequiredParams<'date' | 'receiveStopsDate'>
 			/**
 			 * M​i​g​r​a​t​e
 			 */
@@ -24534,9 +24535,9 @@ export type TranslationFunctions = {
 			 */
 			title: () => LocalizedString
 			/**
-			 * Migrate your account to new, non-custodial mode before {date}
+			 * Move to a non-custodial account via guided migration, or withdraw, before {date}. Receiving stops {receiveStopsDate}.
 			 */
-			body: (arg: { date: string }) => LocalizedString
+			body: (arg: { date: string, receiveStopsDate: string }) => LocalizedString
 			/**
 			 * Migrate
 			 */

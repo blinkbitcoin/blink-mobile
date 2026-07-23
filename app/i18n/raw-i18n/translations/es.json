@@ -3579,7 +3579,7 @@
         },
         "reminderBulletin": {
             "title": "Importante",
-            "body": "Migra tu cuenta al nuevo modo no custodial antes del {date}",
+            "body": "Pasa a una cuenta no custodial mediante la migración guiada, o retira tus fondos, antes del {date}. La recepción se detiene el {receiveStopsDate}.",
             "migrateCta": "Migrar"
         },
         "dollarBalanceModal": {

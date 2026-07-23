@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Važno",
-      "body": "Migrirajte svoj račun na novi način bez skrbništva prije {date}",
+      "body": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}. Primanje prestaje {receiveStopsDate}.",
       "migrateCta": "Migriraj"
     },
     "dollarBalanceModal": {

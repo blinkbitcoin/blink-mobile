@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Důležité",
-      "body": "Přejděte se svým účtem na nový nesvěřenský režim před {date}",
+      "body": "Přejděte na nesvěřenský účet pomocí řízené migrace, nebo si vyberte prostředky, před {date}. Přijímání končí {receiveStopsDate}.",
       "migrateCta": "Migrovat"
     },
     "dollarBalanceModal": {

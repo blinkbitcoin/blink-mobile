@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Kikulu",
-      "body": "Kyusa akkaawunti yo ogende ku enkola empya etakuumibwa nga {date} tennatuuka",
+      "body": "Kyusa ogende ku akawunti etakuumibwa ng'oyita mu ntambuza erungamizibwa, oba oggyeyo ssente zo, nga {date} tennatuuka. Okufuna kukoma nga {receiveStopsDate}.",
       "migrateCta": "Kyusa"
     },
     "dollarBalanceModal": {

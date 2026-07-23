@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Önemli",
-      "body": "Hesabınızı {date} tarihinden önce yeni, saklamasız moda taşıyın",
+      "body": "{date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin. Alma, {receiveStopsDate} tarihinde durur.",
       "migrateCta": "Taşı"
     },
     "dollarBalanceModal": {

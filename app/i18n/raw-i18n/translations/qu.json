@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Ancha allin",
-      "body": "Astakuy kuentaykita musuq mana waqaychasqa modoman {date} manaraq chayamuchkaptin",
+      "body": "Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin. Chaskiyqa {receiveStopsDate}-pi tukukunqa.",
       "migrateCta": "Astakuy"
     },
     "dollarBalanceModal": {

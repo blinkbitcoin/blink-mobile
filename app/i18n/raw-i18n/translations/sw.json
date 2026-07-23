@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Muhimu",
-      "body": "Hamisha akaunti yako kwenye hali mpya isiyo ya udhamini kabla ya {date}",
+      "body": "Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}. Kupokea kutasimama {receiveStopsDate}.",
       "migrateCta": "Hamia"
     },
     "dollarBalanceModal": {

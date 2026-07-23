@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Belangrijk",
-      "body": "Migreer je rekening naar de nieuwe, niet-bewaarde modus vóór {date}",
+      "body": "Stap vóór {date} over naar een niet-bewaarde rekening via begeleide migratie, of neem je tegoed op. Ontvangen stopt op {receiveStopsDate}.",
       "migrateCta": "Migreer"
     },
     "dollarBalanceModal": {

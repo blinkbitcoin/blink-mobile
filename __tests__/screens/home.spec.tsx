@@ -185,6 +185,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-reminder-bulletin"
   useMigrationReminderBulletin: () => ({
     isVisible: mockReminderBulletinVisible,
     deadlineTimestamp: 1787003999,
+    receiveDisabledTimestamp: 1785189600,
     timezone: "Europe/Paris",
   }),
 }))

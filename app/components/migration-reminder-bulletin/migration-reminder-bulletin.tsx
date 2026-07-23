@@ -10,6 +10,8 @@ type MigrationReminderBulletinProps = {
   onMigrate: () => void
   /** Wind-down final deadline as a Unix timestamp in seconds, served by the backend. */
   deadlineTimestamp: number
+  /** When receiving stops, as a Unix timestamp in seconds, served by the backend. */
+  receiveDisabledTimestamp: number
   /** IANA timezone the backend defines for rendering the region date. */
   timezone?: string
 }
@@ -22,6 +24,7 @@ type MigrationReminderBulletinProps = {
 export const MigrationReminderBulletin: React.FC<MigrationReminderBulletinProps> = ({
   onMigrate,
   deadlineTimestamp,
+  receiveDisabledTimestamp,
   timezone,
 }) => {
   const { LL, locale } = useI18nContext()
@@ -32,12 +35,21 @@ export const MigrationReminderBulletin: React.FC<MigrationReminderBulletinProps>
     timezone,
   })
 
+  const receiveStopsDate = formatDayAndMonth({
+    timestampSeconds: receiveDisabledTimestamp,
+    locale,
+    timezone,
+  })
+
   const handleMigrate = async () => onMigrate()
 
   return (
     <NotificationCardUI
       title={LL.AccountMigration.reminderBulletin.title()}
-      text={LL.AccountMigration.reminderBulletin.body({ date: deadlineDate })}
+      text={LL.AccountMigration.reminderBulletin.body({
+        date: deadlineDate,
+        receiveStopsDate,
+      })}
       action={handleMigrate}
       buttonLabel={LL.AccountMigration.reminderBulletin.migrateCta()}
     />

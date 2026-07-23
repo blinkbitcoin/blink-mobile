@@ -37,6 +37,9 @@ describe("useMigrationReminderBulletin", () => {
 
     expect(result.current.isVisible).toBe(true)
     expect(result.current.deadlineTimestamp).toBe(affectedWindDown.finalDeadline)
+    expect(result.current.receiveDisabledTimestamp).toBe(
+      affectedWindDown.receiveDisabledAt,
+    )
     expect(result.current.timezone).toBe(affectedWindDown.timezone)
   })
 
