@@ -229,6 +229,45 @@ describe("ScanningQRCodeScreen", () => {
     )
   })
 
+  it("navigates merchant choices to merchantSelection", async () => {
+    const merchants = [
+      {
+        id: "blink-boltz-usdc-arbitrum",
+        lnurl: "0x52908400098527886E0F7030069857D2E4169EE7+USDC+Arbitrum@swap.blink.sv",
+        category: "swap" as const,
+        title: "USDC Arbitrum",
+        description: "Swap sats to USDC on Arbitrum",
+        companyName: "Boltz",
+        termsUrl: "https://boltz.exchange/terms",
+      },
+      {
+        id: "blink-boltz-usdt-ethereum",
+        lnurl: "0x52908400098527886E0F7030069857D2E4169EE7+USDT+Ethereum@swap.blink.sv",
+        category: "swap" as const,
+        title: "USDT Ethereum",
+        description: "Swap sats to USDT on Ethereum",
+        companyName: "Boltz",
+        termsUrl: "https://boltz.exchange/terms",
+      },
+    ]
+    mockResolveDestination.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        paymentType: "merchant",
+        merchants,
+      },
+    })
+
+    await renderScreen()
+    await fireScan("0x52908400098527886E0F7030069857D2E4169EE7")
+
+    await waitFor(() =>
+      expect(mockReplace).toHaveBeenCalledWith("merchantSelection", { merchants }),
+    )
+    expect(mockReplace).not.toHaveBeenCalledWith("sendBitcoinDetails", expect.anything())
+  })
+
   it("resets navigation to redeemBitcoinDetail on a valid Receive destination", async () => {
     const dest = {
       valid: true,

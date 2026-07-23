@@ -2261,6 +2261,10 @@
         "invalidPhoneNumber": "有効な携帯電話番号を入力してください",
         "phoneNotAllowed": "このフィールドでは電話番号を使用できません"
     },
+    "MerchantSelectionScreen": {
+        "title": "支払いオプションを選択",
+        "empty": "利用できる支払いオプションはありません。"
+    },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "トランザクションはメモリプールに送信されます",
         "amount": "金額",

@@ -11,7 +11,7 @@ import { FlatList } from "react-native-gesture-handler"
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
-import { useAppConfig } from "@app/hooks"
+import { useAppConfig, useDisplayCurrency } from "@app/hooks"
 import {
   UserContact,
   useAccountDefaultWalletLazyQuery,
@@ -47,6 +47,7 @@ import { resolveDestination } from "./payment-destination/resolve-destination"
 import {
   DestinationDirection,
   InvalidDestinationReason,
+  isMerchantChoiceDestination,
 } from "./payment-destination/index.types"
 import {
   DestinationState,
@@ -188,6 +189,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   })
 
   const { myWalletIds, bitcoinNetwork, lnurlDomains } = useScanContext()
+  const { displayCurrency } = useDisplayCurrency()
 
   // forcing price refresh
   useRealtimePriceQuery({
@@ -350,11 +352,24 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           bitcoinNetwork,
           lnurlDomains,
           accountDefaultWalletQuery,
+          displayCurrency,
         },
         { sdk, network: sparkNetwork },
         lnAddressHostname,
       )
       logParseDestinationResult(wrappedDestination)
+
+      if (isMerchantChoiceDestination(wrappedDestination)) {
+        setGoToNextScreenWhenValid(false)
+        dispatchDestinationStateAction({
+          type: SendBitcoinActions.SetUnparsedDestination,
+          payload: { unparsedDestination: rawInput },
+        })
+        navigation.navigate("merchantSelection", {
+          merchants: wrappedDestination.validDestination.merchants,
+        })
+        return
+      }
 
       if (wrappedDestination.valid === false) {
         if (wrappedDestination.invalidReason === InvalidDestinationReason.SelfPayment) {
@@ -457,6 +472,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       sdk,
       sparkNetwork,
       lnAddressHostname,
+      displayCurrency,
     ],
   )
 

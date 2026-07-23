@@ -2261,6 +2261,10 @@
     "invalidPhoneNumber": "Մուտքագրեք վավեր բջջային հեռախոսահամար",
     "phoneNotAllowed": "Այս դաշտը չի ընդունում հեռախոսահամարներ"
   },
+  "MerchantSelectionScreen": {
+    "title": "Ընտրեք վճարման տարբերակ",
+    "empty": "Վճարման տարբերակներ չկան։"
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Գործարքը պետք է ուղարկվի mempool",
     "amount": "Չափ",
