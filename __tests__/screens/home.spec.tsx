@@ -615,6 +615,7 @@ const selfCustodialReadyWalletOverride = (usdBalance: number) => ({
   needsBackendAuth: false,
 })
 
+// eslint-disable-next-line max-lines-per-function
 describe("HomeScreen", () => {
   beforeEach(() => {
     currentMocks = []
@@ -674,7 +675,7 @@ describe("HomeScreen", () => {
     },
   )
 
-  it("Disable the transfer button when transfers are blocked and show disabled model when clicked", async () => {
+  const testDisabledTransferButton = async (shouldShowDollarModal: boolean = true) => {
     mockTransferBlockedOverride = true
     currentMocks = generateHomeMock({
       level: AccountLevel.Two,
@@ -697,7 +698,61 @@ describe("HomeScreen", () => {
 
     fireEvent.press(getByTestId("transfer"))
 
-    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockDollarBalanceModalVisible).toBe(shouldShowDollarModal)
+  }
+
+  it("Disable the transfer button when transfers are blocked and show disabled model when clicked", async () => {
+    await testDisabledTransferButton()
+  })
+
+  it("self custodial with only Bitcoin disables the transfer button when transfers are blocked and show disabled model when clicked", async () => {
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 5000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+
+    await testDisabledTransferButton()
+
+    mockActiveWalletOverride = null
+  })
+
+  it("self custodial with both Bitcoin and USD disables the transfer button when transfers are blocked and show disabled model when clicked", async () => {
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 5000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 5000, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+
+    await testDisabledTransferButton(false)
+
+    mockActiveWalletOverride = null
   })
 
   it("auto-opens the convert modal when a restricted account holds a Dollar balance", async () => {
