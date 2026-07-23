@@ -2,6 +2,7 @@ import React from "react"
 import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
 import { fireEvent, render, waitFor } from "@testing-library/react-native"
+import { StyleSheet } from "react-native"
 
 import { HomeScreen } from "../../app/screens/home-screen"
 import { ContextForScreen } from "./helper"
@@ -1776,5 +1777,65 @@ describe("bulletins auth gating", () => {
 
     expect(mockUseBulletinsQuery).toHaveBeenCalled()
     expect(mockUseBulletinsQuery.mock.lastCall[0].skip).toBe(true)
+  })
+})
+
+describe("HomeScreen layout under font scaling (blink-wip#931)", () => {
+  beforeEach(() => {
+    currentMocks = []
+    mockActiveWalletOverride = null
+    jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: null,
+    })
+  })
+
+  it("pads the scroll content so the last bulletin clears the slide-up handle", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const contentStyle = StyleSheet.flatten(
+      getByTestId("home-screen").props.contentContainerStyle,
+    )
+    // The SlideUpHandle overlays the bottom 97pt (82pt touch area + 15pt offset);
+    // content must clear it so the last bulletin is readable at max scroll.
+    expect(contentStyle.paddingBottom).toBeGreaterThanOrEqual(97)
+  })
+
+  it("lets the header area grow with content instead of clipping at a fixed height", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    const headerStyle = StyleSheet.flatten(getByTestId("home-header").props.style)
+    expect(headerStyle.height).toBeUndefined()
+    expect(headerStyle.maxHeight).toBeUndefined()
+    expect(headerStyle.minHeight).toBeGreaterThanOrEqual(40)
+  })
+
+  it("caps username font scaling so the header controls stay reachable", async () => {
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    await waitFor(() => expect(getByTestId("home-username")).toBeTruthy())
+    expect(getByTestId("home-username").props.maxFontSizeMultiplier).toBeLessThanOrEqual(
+      1.5,
+    )
   })
 })

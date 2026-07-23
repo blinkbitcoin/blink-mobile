@@ -95,6 +95,14 @@ describe("BalanceHeader", () => {
     expect(queryByTestId("balance-mode-toggle")).toBeNull()
   })
 
+  it("caps font scaling on the balance so it cannot overrun the header (blink-wip#931)", () => {
+    const { getByTestId } = renderHeader({ formattedBalance: "$42.00" })
+
+    expect(getByTestId("balance-value").props.maxFontSizeMultiplier).toBeLessThanOrEqual(
+      1.5,
+    )
+  })
+
   it("does not render the status badge by default", () => {
     const { queryByTestId } = renderHeader()
 

@@ -96,6 +96,13 @@ const UPGRADE_MODAL_INITIAL_DELAY_MS = 1500
 /** Floor for conversions without a pool minimum (custodial intraledger always,
  *  self-custodial when the SDK reports none): any positive cent converts. */
 const ANY_POSITIVE_CENT_MINIMUM = 1
+/** The SlideUpHandle floats over the bottom 97pt of the scroll view (82pt touch
+ *  area anchored 15pt up); content needs at least that much bottom padding for
+ *  the last bulletin to be readable at max scroll. */
+const SCROLL_BOTTOM_CLEARANCE = 100
+/** Header chrome (username row, balance) sits between fixed-size icon buttons;
+ *  uncapped Dynamic Type pushes the settings menu out of reach. */
+const MAX_HEADER_FONT_SIZE_MULTIPLIER = 1.4
 
 gql`
   query homeAuthed {
@@ -702,7 +709,7 @@ export const HomeScreen: React.FC = () => {
         deadlineTimestamp={migrateNowPrompt.deadlineTimestamp}
         timezone={migrateNowPrompt.timezone}
       />
-      <View style={styles.balanceContainer}>
+      <View {...testProps("home-header")} style={styles.balanceContainer}>
         <View style={styles.header}>
           <GaloyIconButton
             onPress={() => navigation.navigate("priceHistory")}
@@ -715,7 +722,13 @@ export const HomeScreen: React.FC = () => {
             {!loading && usernameTitle && (
               <Pressable onPress={canSwitchAccount ? handleSwitchPress : null}>
                 <View style={styles.profileContainer}>
-                  <Text type="p2">{usernameTitle}</Text>
+                  <Text
+                    {...testProps("home-username")}
+                    type="p2"
+                    maxFontSizeMultiplier={MAX_HEADER_FONT_SIZE_MULTIPLIER}
+                  >
+                    {usernameTitle}
+                  </Text>
                   {canSwitchAccount && <GaloyIcon name={"caret-down"} size={18} />}
                 </View>
               </Pressable>
@@ -831,7 +844,7 @@ export const HomeScreen: React.FC = () => {
 const useStyles = makeStyles(({ colors }) => ({
   scrollViewContainer: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: SCROLL_BOTTOM_CLEARANCE,
     rowGap: 20,
   },
   listItemsContainer: {
@@ -895,13 +908,10 @@ const useStyles = makeStyles(({ colors }) => ({
   balanceContainer: {
     marginTop: 7,
     flexDirection: "column",
-    flex: 1,
-    height: 40,
-    maxHeight: 40,
+    minHeight: 40,
   },
   header: {
     flexDirection: "row",
-    flex: 1,
     justifyContent: "space-between",
     alignItems: "center",
     marginHorizontal: 20,
