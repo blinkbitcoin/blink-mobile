@@ -61,6 +61,30 @@ describe("wrapDestination", () => {
     expect(wrapDestination(result, mockSdk)).toBe(result)
   })
 
+  it("returns merchant choices as-is until a merchant is selected", () => {
+    const result = {
+      valid: true,
+      destinationDirection: "Send",
+      validDestination: {
+        paymentType: PaymentType.Merchant,
+        merchants: [
+          {
+            id: "blink-boltz-usdc-arbitrum",
+            lnurl:
+              "0x52908400098527886E0F7030069857D2E4169EE7+USDC+Arbitrum@swap.blink.sv",
+            category: "swap",
+            title: "USDC Arbitrum",
+            description: "Swap sats to USDC on Arbitrum",
+            companyName: "Boltz",
+            termsUrl: "https://boltz.exchange/terms",
+          },
+        ],
+      },
+    } as never
+
+    expect(wrapDestination(result, mockSdk)).toBe(result)
+  })
+
   it("wraps Lightning destination", () => {
     const result = createValidResult(PaymentType.Lightning, {
       paymentRequest: "lnbc1...",

@@ -47,6 +47,7 @@ import { resolveDestination } from "./payment-destination/resolve-destination"
 import {
   DestinationDirection,
   InvalidDestinationReason,
+  isMerchantChoiceDestination,
 } from "./payment-destination/index.types"
 import {
   DestinationState,
@@ -355,6 +356,18 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         lnAddressHostname,
       )
       logParseDestinationResult(wrappedDestination)
+
+      if (isMerchantChoiceDestination(wrappedDestination)) {
+        setGoToNextScreenWhenValid(false)
+        dispatchDestinationStateAction({
+          type: SendBitcoinActions.SetUnparsedDestination,
+          payload: { unparsedDestination: rawInput },
+        })
+        navigation.navigate("merchantSelection", {
+          merchants: wrappedDestination.validDestination.merchants,
+        })
+        return
+      }
 
       if (wrappedDestination.valid === false) {
         if (wrappedDestination.invalidReason === InvalidDestinationReason.SelfPayment) {

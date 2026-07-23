@@ -2330,6 +2330,10 @@ const en: BaseTranslation = {
     invalidPhoneNumber: "Enter a valid mobile number",
     phoneNotAllowed: "This field does not accept phone numbers",
   },
+  MerchantSelectionScreen: {
+    title: "Choose payment option",
+    empty: "No payment options are available.",
+  },
   SendBitcoinScreen: {
     willBeSentToMempoolBy: "Transaction should be submitted to mempool",
     amount: "Amount",
