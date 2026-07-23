@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Important",
-      "body": "Migra el teu compte al nou mode no custodi abans del {date}",
+      "body": "Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}. La recepció s'atura el {receiveStopsDate}.",
       "migrateCta": "Migra"
     },
     "dollarBalanceModal": {

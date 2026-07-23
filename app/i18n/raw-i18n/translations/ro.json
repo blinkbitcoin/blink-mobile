@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Important",
-      "body": "Migrează-ți contul în noul mod non-custodial înainte de {date}",
+      "body": "Treci la un cont non-custodial prin migrarea ghidată sau retrage-ți fondurile înainte de {date}. Primirea se oprește pe {receiveStopsDate}.",
       "migrateCta": "Migrează"
     },
     "dollarBalanceModal": {

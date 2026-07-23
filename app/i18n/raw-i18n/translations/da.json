@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Vigtigt",
-      "body": "Migrér din konto til den nye ikke-depot-tilstand inden {date}",
+      "body": "Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}. Modtagelse stopper den {receiveStopsDate}.",
       "migrateCta": "Migrér"
     },
     "dollarBalanceModal": {

@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Fontos",
-      "body": "Költöztesse át fiókját az új, nem letétkezelt módba {date} előtt",
+      "body": "Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt. A fogadás megszűnik: {receiveStopsDate}.",
       "migrateCta": "Átköltözés"
     },
     "dollarBalanceModal": {

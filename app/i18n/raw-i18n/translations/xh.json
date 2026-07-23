@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Kubalulekile",
-      "body": "Fudukisela iakhawunti yakho kwimodi entsha engagcinwanga phambi kwe-{date}",
+      "body": "Yiya kwiakhawunti engagcinwanga ngofuduko olukhokelwayo, okanye ukhuphe imali yakho, phambi kwe-{date}. Ukufumana kuyakuma nge-{receiveStopsDate}.",
       "migrateCta": "Fuduka"
     },
     "dollarBalanceModal": {

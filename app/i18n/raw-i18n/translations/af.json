@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Belangrik",
-      "body": "Migreer jou rekening na die nuwe, nie-bewaar-modus voor {date}",
+      "body": "Skuif na 'n nie-bewaarrekening via begeleide migrasie, of onttrek jou fondse, voor {date}. Ontvangs stop op {receiveStopsDate}.",
       "migrateCta": "Migreer"
     },
     "dollarBalanceModal": {

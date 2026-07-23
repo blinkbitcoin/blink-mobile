@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "مهم",
-      "body": "رحّل حسابك إلى الوضع الجديد غير الحافظ قبل {date}",
+      "body": "انتقل إلى حساب غير حافظ عبر الترحيل الموجّه، أو اسحب أموالك، قبل {date}. يتوقف الاستلام في {receiveStopsDate}.",
       "migrateCta": "رحّل"
     },
     "dollarBalanceModal": {

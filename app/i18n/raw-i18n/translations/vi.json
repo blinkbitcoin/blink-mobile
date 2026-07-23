@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Quan trọng",
-      "body": "Hãy chuyển tài khoản của bạn sang chế độ không lưu ký mới trước {date}",
+      "body": "Hãy chuyển sang tài khoản không lưu ký qua quy trình di chuyển có hướng dẫn, hoặc rút tiền, trước {date}. Việc nhận sẽ dừng vào {receiveStopsDate}.",
       "migrateCta": "Chuyển"
     },
     "dollarBalanceModal": {

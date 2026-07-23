@@ -3579,7 +3579,7 @@
     },
     "reminderBulletin": {
       "title": "Penting",
-      "body": "Migrasikan akun Anda ke mode non-kustodial yang baru sebelum {date}",
+      "body": "Beralihlah ke akun non-kustodial melalui migrasi terpandu, atau tarik dana Anda, sebelum {date}. Penerimaan berhenti pada {receiveStopsDate}.",
       "migrateCta": "Migrasi"
     },
     "dollarBalanceModal": {

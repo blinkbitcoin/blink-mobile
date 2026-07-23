@@ -3579,7 +3579,7 @@
         },
         "reminderBulletin": {
             "title": "Wichtig",
-            "body": "Migriere dein Konto vor dem {date} in den neuen, nicht-verwahrten Modus",
+            "body": "Wechsle bis zum {date} über die geführte Migration zu einem nicht-verwahrten Konto oder zahle dein Guthaben aus. Der Empfang endet am {receiveStopsDate}.",
             "migrateCta": "Migrieren"
         },
         "dollarBalanceModal": {
