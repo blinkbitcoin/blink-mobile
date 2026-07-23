@@ -1,8 +1,10 @@
 import React from "react"
-import { render } from "@testing-library/react-native"
+import { render, waitFor } from "@testing-library/react-native"
 
 import { PushNotificationComponent } from "@app/components/push-notification/push-notification"
 import { BulletinsDocument } from "@app/graphql/generated"
+
+import { flushEffects } from "../helpers/flush-effects"
 
 const mockRefetchQueries = jest.fn()
 jest.mock("@apollo/client", () => ({
@@ -12,13 +14,16 @@ jest.mock("@apollo/client", () => ({
   }),
 }))
 
+let mockIsAuthed = true
 jest.mock("@app/graphql/is-authed-context", () => ({
-  useIsAuthed: () => true,
+  useIsAuthed: () => mockIsAuthed,
 }))
 
+const mockHasNotificationPermission = jest.fn()
+const mockAddDeviceToken = jest.fn()
 jest.mock("@app/utils/notifications", () => ({
-  hasNotificationPermission: jest.fn(() => Promise.resolve(false)),
-  addDeviceToken: jest.fn(),
+  hasNotificationPermission: () => mockHasNotificationPermission(),
+  addDeviceToken: (client: unknown) => mockAddDeviceToken(client),
 }))
 
 let onMessageCallback: (msg: Record<string, unknown>) => void
@@ -43,6 +48,8 @@ jest.mock("@react-native-firebase/messaging", () => {
 describe("PushNotificationComponent", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsAuthed = true
+    mockHasNotificationPermission.mockResolvedValue(false)
   })
 
   it("renders without crashing", () => {
@@ -61,5 +68,36 @@ describe("PushNotificationComponent", () => {
     const { unmount } = render(<PushNotificationComponent />)
     unmount()
     expect(mockUnsubscribe).toHaveBeenCalled()
+  })
+
+  /** Delivery gates: token registration must depend on auth + permission only —
+   *  never on account state such as a lightning address. */
+  describe("device token registration", () => {
+    it("registers device token when authed with notification permission", async () => {
+      mockHasNotificationPermission.mockResolvedValue(true)
+
+      render(<PushNotificationComponent />)
+
+      await waitFor(() => expect(mockAddDeviceToken).toHaveBeenCalledTimes(1))
+    })
+
+    it("does not register device token when not authed", async () => {
+      mockIsAuthed = false
+      mockHasNotificationPermission.mockResolvedValue(true)
+
+      render(<PushNotificationComponent />)
+      await flushEffects()
+
+      expect(mockHasNotificationPermission).not.toHaveBeenCalled()
+      expect(mockAddDeviceToken).not.toHaveBeenCalled()
+    })
+
+    it("does not register device token without notification permission", async () => {
+      render(<PushNotificationComponent />)
+      await flushEffects()
+
+      expect(mockHasNotificationPermission).toHaveBeenCalledTimes(1)
+      expect(mockAddDeviceToken).not.toHaveBeenCalled()
+    })
   })
 })
