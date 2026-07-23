@@ -3501,6 +3501,7 @@
       },
       "Phrase": {
         "headerTitle": "Zálohovacia fráza",
+        "authDescription": "Overte sa, aby ste zobrazili svoju zálohovaciu frázu",
         "sparkCompatible": "Táto záložná fráza funguje v akejkoľvek {sparkCompatibleLink}",
         "sparkCompatibleLink": "peňaženke kompatibilnej so Spark",
         "copiedToast": "Záložná fráza skopírovaná do schránky",

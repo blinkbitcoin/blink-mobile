@@ -3501,6 +3501,7 @@
       },
       "Phrase": {
         "headerTitle": "Ibinzana lokugcina",
+        "authDescription": "Qinisekisa ukuze ubone ibinzana lakho lokugcina",
         "sparkCompatible": "Eli binzana lokugcina lisebenza kuyo nayiphi na {sparkCompatibleLink}",
         "sparkCompatibleLink": "isikhwama esihambisanayo ne-Spark",
         "copiedToast": "Ibinzana lokugcina likopishwe kwibhodi",

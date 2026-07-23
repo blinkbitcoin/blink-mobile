@@ -3501,6 +3501,7 @@
             },
             "Phrase": {
                 "headerTitle": "Phrase de sauvegarde",
+                "authDescription": "Authentifiez-vous pour voir votre phrase de sauvegarde",
                 "sparkCompatible": "Cette phrase de sauvegarde fonctionne dans tout {sparkCompatibleLink}",
                 "sparkCompatibleLink": "portefeuille compatible Spark",
                 "copiedToast": "Phrase de sauvegarde copiée dans le presse-papier",

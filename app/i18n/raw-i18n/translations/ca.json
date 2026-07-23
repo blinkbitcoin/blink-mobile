@@ -3501,6 +3501,7 @@
       },
       "Phrase": {
         "headerTitle": "Frase de còpia de seguretat",
+        "authDescription": "Confirma la teva identitat per veure la teva frase de còpia de seguretat",
         "sparkCompatible": "Aquesta frase de còpia de seguretat funciona en qualsevol {sparkCompatibleLink}",
         "sparkCompatibleLink": "cartera compatible amb Spark",
         "copiedToast": "Frase de còpia de seguretat copiada al porta-retalls",

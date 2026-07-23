@@ -3501,6 +3501,7 @@
       },
       "Phrase": {
         "headerTitle": "Biztonsági mentési kifejezés",
+        "authDescription": "Feloldás a biztonsági mentési kifejezés megtekintéséhez",
         "sparkCompatible": "Ez a kifejezés bármely {sparkCompatibleLink} működik",
         "sparkCompatibleLink": "Spark-kompatibilis pénztárcában",
         "copiedToast": "Biztonsági mentési kifejezés vágólapra másolva",

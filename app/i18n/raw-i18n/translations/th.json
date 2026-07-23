@@ -3501,6 +3501,7 @@
       },
       "Phrase": {
         "headerTitle": "วลีสำรอง",
+        "authDescription": "ยืนยันตัวตนเพื่อดูวลีสำรองของคุณ",
         "sparkCompatible": "วลีสำรองนี้ใช้ได้ใน{sparkCompatibleLink}",
         "sparkCompatibleLink": "กระเป๋าเงินที่รองรับ Spark",
         "copiedToast": "คัดลอกวลีสำรองไปยังคลิปบอร์ดแล้ว",

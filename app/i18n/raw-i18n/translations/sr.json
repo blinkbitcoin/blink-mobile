@@ -3501,6 +3501,7 @@
       },
       "Phrase": {
         "headerTitle": "Резервна фраза",
+        "authDescription": "Аутентификујте се да бисте видели своју резервну фразу",
         "sparkCompatible": "Ова резервна фраза ради у сваком {sparkCompatibleLink}",
         "sparkCompatibleLink": "новчанику компатибилном са Spark",
         "copiedToast": "Резервна фраза копирана у међуспремник",

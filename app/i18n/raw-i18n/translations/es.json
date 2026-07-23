@@ -3501,6 +3501,7 @@
             },
             "Phrase": {
                 "headerTitle": "Frase de recuperación",
+                "authDescription": "Autentifícate para ver tu frase de recuperación",
                 "sparkCompatible": "Esta frase de respaldo funciona en cualquier {sparkCompatibleLink}",
                 "sparkCompatibleLink": "billetera compatible con Spark",
                 "copiedToast": "Frase de respaldo copiada al portapapeles",

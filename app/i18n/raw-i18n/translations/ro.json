@@ -3501,6 +3501,7 @@
       },
       "Phrase": {
         "headerTitle": "Frază de recuperare",
+        "authDescription": "Autentificați-vă pentru a vedea fraza de recuperare",
         "sparkCompatible": "Această frază de backup funcționează în orice {sparkCompatibleLink}",
         "sparkCompatibleLink": "portofel compatibil Spark",
         "copiedToast": "Fraza de backup copiată în clipboard",
