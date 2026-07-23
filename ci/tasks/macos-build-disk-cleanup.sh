@@ -36,9 +36,14 @@ free_space_below_target() {
 
 path_size_kb() {
   local path="$1"
+  local size
 
   if [[ -e "$path" ]]; then
-    du -sk "$path" 2>/dev/null | awk 'NR == 1 { print $1 }'
+    # du exits nonzero when any entry is unreadable (TCC-protected caches do
+    # this even for root) while still printing a total for what it could read;
+    # without the || true, pipefail + set -e would silently kill the script.
+    size="$(du -sk "$path" 2>/dev/null | awk 'NR == 1 { print $1 }' || true)"
+    echo "${size:-0}"
   else
     echo 0
   fi
