@@ -27,6 +27,8 @@ import Clipboard from "@react-native-clipboard/clipboard"
 import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
 
+const mockNavigate = jest.fn()
+
 type MockedContact = {
   id: string
   handle: string
@@ -115,7 +117,8 @@ jest.mock("@react-native-clipboard/clipboard", () => ({
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
-    navigate: jest.fn(),
+    navigate: mockNavigate,
+    setParams: jest.fn(),
   }),
 }))
 
@@ -547,6 +550,55 @@ describe("SendBitcoinDestinationScreen", () => {
     await flushEffects()
   })
 
+  it("navigates merchant choices to the merchant selection screen", async () => {
+    const merchants = [
+      {
+        id: "blink-boltz-usdc-arbitrum",
+        lnurl: "0x52908400098527886E0F7030069857D2E4169EE7+USDC+Arbitrum@swap.blink.sv",
+        category: "swap" as const,
+        title: "USDC Arbitrum",
+        description: "Swap sats to USDC on Arbitrum",
+        companyName: "Boltz",
+        termsUrl: "https://boltz.exchange/terms",
+      },
+      {
+        id: "blink-boltz-usdt-ethereum",
+        lnurl: "0x52908400098527886E0F7030069857D2E4169EE7+USDT+Ethereum@swap.blink.sv",
+        category: "swap" as const,
+        title: "USDT Ethereum",
+        description: "Swap sats to USDT on Ethereum",
+        companyName: "Boltz",
+        termsUrl: "https://boltz.exchange/terms",
+      },
+    ]
+
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        paymentType: "merchant",
+        merchants,
+      },
+    } as ParseDestinationResult)
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.changeText(
+      screen.getByLabelText(LL.SendBitcoinScreen.placeholder()),
+      "0x52908400098527886E0F7030069857D2E4169EE7",
+    )
+    fireEvent.press(screen.getByLabelText(LL.common.next()))
+
+    await flushAsync()
+
+    expect(mockNavigate).toHaveBeenCalledWith("merchantSelection", { merchants })
+    expect(mockNavigate).not.toHaveBeenCalledWith("sendBitcoinDetails", expect.anything())
+  })
+
   it.each([
     {
       name: "switches focus to phone when tapping paste on the disabled phone input",
@@ -877,6 +929,31 @@ describe("SendBitcoinDestinationScreen", () => {
         expect.objectContaining({ rawInput: "lnurl1testpayment123" }),
       )
       expect(parseDestinationMock).toHaveBeenCalledTimes(1)
+
+      await settleModalAnimations()
+    })
+
+    it("processes the selected merchant lnurl from route params, not the unresolved input", async () => {
+      setupParseDestinationMock(parseDestinationMock)
+
+      const selectedLnurl =
+        "0x52908400098527886E0F7030069857D2E4169EE7+USDC+Arbitrum@swap.blink.sv"
+      const unresolvedInput = "0x52908400098527886E0F7030069857D2E4169EE7"
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={createRouteWithPayment(selectedLnurl)} />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      expect(parseDestinationMock).toHaveBeenCalledWith(
+        expect.objectContaining({ rawInput: selectedLnurl }),
+      )
+      expect(parseDestinationMock).not.toHaveBeenCalledWith(
+        expect.objectContaining({ rawInput: unresolvedInput }),
+      )
 
       await settleModalAnimations()
     })

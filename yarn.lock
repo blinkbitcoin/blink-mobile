@@ -2595,10 +2595,10 @@
     "@noble/hashes" "^1.1.5"
     "@noble/secp256k1" "^1.7.1"
 
-"@blinkbitcoin/blink-client@0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-0.6.0.tgz#2d404c0c24f3ea65ac52ed63c49750d0accd10ce"
-  integrity sha512-ikW6liGeFAoi3SJB9i+C5d2QICVhEzdP9lJYdMZnEaL1WoitRO4uiG1n6vQTFEQwg0Q0OOeBK1Qoa3rNKbcF2Q==
+"@blinkbitcoin/blink-client@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-1.0.0.tgz#305ce97b980d4b3455cd57992e82c2319510d642"
+  integrity sha512-mGPcY3//ZcCxIql3KxmWilLcFt9dTOERB0pQohqrb78ZsD6VjtDwgnr2RwhKV/H3e+C7nc7zV5XxXBsfBnBBZg==
 
 "@breeztech/breez-sdk-spark-react-native@0.15.0":
   version "0.15.0"
@@ -5642,6 +5642,11 @@
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.4.0.tgz#45814aa329f30e4fe0ba49426f49dfccdd066426"
   integrity sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==
 
+"@noble/hashes@^1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.8.0.tgz#cee43d801fcef9644b11b8194857695acd5f815a"
+  integrity sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==
+
 "@noble/secp256k1@^1.7.1":
   version "1.7.1"
   resolved "https://registry.npmjs.org/@noble/secp256k1/-/secp256k1-1.7.1.tgz#b251c70f824ce3ca7f8dc3df08d58f005cc0507c"
@@ -6605,6 +6610,11 @@
   integrity sha512-c/qwwcHyafOQuVQJj0IlBjf5yYgBI7YPJ77k4fOJYesb41jio65eaJODRUmfYKhTOFBrIZ66kgvGPlNbjuoRdQ==
   dependencies:
     any-observable "^0.3.0"
+
+"@scure/base@^1.1.9":
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.2.6.tgz#ca917184b8231394dd8847509c67a0be522e59f6"
+  integrity sha512-g/nm5FgUa//MCj1gV09zTJTaM6KBAHqLN907YVQqf7zC49+DcO4B1so4ZX07Ef10Twr6nuqYEH9GEggFXA4Fmg==
 
 "@shopify/react-native-skia@^2.6.4":
   version "2.6.4"
@@ -10690,9 +10700,9 @@ body-parser@1.20.2:
     type-is "~1.6.18"
     unpipe "1.0.0"
 
-bolt11@^1.4.1:
+bolt11@^1.4.1, bolt11@~1.4.1:
   version "1.4.1"
-  resolved "https://registry.npmjs.org/bolt11/-/bolt11-1.4.1.tgz#4363041b8c9f477b7f42c12d96e771fec39a00f1"
+  resolved "https://registry.yarnpkg.com/bolt11/-/bolt11-1.4.1.tgz#4363041b8c9f477b7f42c12d96e771fec39a00f1"
   integrity sha512-jR0Y+MO+CK2at1Cg5mltLJ+6tdOwNKoTS/DJOBDdzVkQ+R9D6UgZMayTWOsuzY7OgV1gEqlyT5Tzk6t6r4XcNQ==
   dependencies:
     "@types/bn.js" "^4.11.3"

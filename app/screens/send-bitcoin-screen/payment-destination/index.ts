@@ -6,6 +6,9 @@ import {
 
 import {
   InvalidDestinationReason,
+  DestinationDirection,
+  MerchantChoice,
+  MerchantPaymentType,
   ParseDestinationParams,
   ParseDestinationResult,
 } from "./index.types"
@@ -38,6 +41,40 @@ export const parseDestination = async ({
     displayCurrency,
     preferLnurlForInternalHandles,
   })
+
+  const maybeMerchantDestination = parsedDestination as {
+    paymentType: string
+    merchants?: MerchantChoice[]
+  }
+
+  if (maybeMerchantDestination.paymentType === MerchantPaymentType) {
+    const merchants = maybeMerchantDestination.merchants ?? []
+    if (merchants.length === 1) {
+      const merchant = merchants[0]
+
+      return resolveLnurlDestination({
+        parsedLnurlDestination: {
+          paymentType: PaymentType.Lnurl,
+          valid: true,
+          lnurl: merchant.lnurl,
+          isMerchant: true,
+          merchant,
+        },
+        lnurlDomains,
+        accountDefaultWalletQuery,
+        myWalletIds,
+      })
+    }
+
+    return {
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        paymentType: MerchantPaymentType,
+        merchants,
+      },
+    } as const
+  }
 
   switch (parsedDestination.paymentType) {
     case PaymentType.IntraledgerWithFlag:

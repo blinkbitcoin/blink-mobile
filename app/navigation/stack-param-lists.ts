@@ -10,6 +10,7 @@ import { EarnSectionType } from "@app/screens/earns-screen/sections"
 import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
 import {
   PaymentDestination,
+  MerchantChoice,
   ReceiveDestination,
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
@@ -58,6 +59,9 @@ export type RootStackParamList = {
   }
   sendBitcoinDetails: {
     paymentDestination: PaymentDestination
+  }
+  merchantSelection: {
+    merchants: MerchantChoice[]
   }
   sendBitcoinConfirmation: {
     paymentDetail: PaymentDetail<WalletCurrency>

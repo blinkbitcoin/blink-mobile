@@ -39,6 +39,7 @@ import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bi
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
 import SendBitcoinDestinationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-destination-screen"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
+import MerchantSelectionScreen from "@app/screens/send-bitcoin-screen/merchant-selection-screen"
 import { SetLightningAddressScreen } from "@app/screens/lightning-address-screen/set-lightning-address-screen"
 import { AccountScreen, SwitchAccount } from "@app/screens/settings-screen/account"
 import { DefaultWalletScreen } from "@app/screens/settings-screen/default-wallet"
@@ -186,6 +187,7 @@ const ScanningQRCodeGated = withOfflineGate(ScanningQRCodeScreen)
 const SendBitcoinDestinationGated = withOfflineGate(SendBitcoinDestinationScreen)
 const SendBitcoinDetailsGated = withOfflineGate(SendBitcoinDetailsScreen)
 const SendBitcoinConfirmationGated = withOfflineGate(SendBitcoinConfirmationScreen)
+const MerchantSelectionGated = withOfflineGate(MerchantSelectionScreen)
 const ReceiveOfflineGated = withOfflineGate(ReceiveScreen)
 const ReceiveGated: React.FC = () => (
   <WindDownReceiveGate>
@@ -312,6 +314,11 @@ export const RootStack = () => {
         name="sendBitcoinDetails"
         component={SendBitcoinDetailsGated}
         options={{ title: LL.SendBitcoinScreen.title() }}
+      />
+      <RootNavigator.Screen
+        name="merchantSelection"
+        component={MerchantSelectionGated}
+        options={{ title: LL.MerchantSelectionScreen.title() }}
       />
       <RootNavigator.Screen
         name="sendBitcoinConfirmation"

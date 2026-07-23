@@ -11,6 +11,8 @@ import {
   IntraledgerPaymentDestination,
   LightningPaymentDestination,
   LnurlPaymentDestination,
+  Merchant,
+  MerchantPaymentDestination as BlinkMerchantPaymentDestination,
   OnchainPaymentDestination,
   ParsedPaymentDestination,
   PaymentType,
@@ -19,7 +21,22 @@ import {
 
 import { ConvertMoneyAmount, PaymentDetail } from "../payment-details"
 
-export type ParseDestinationResult = Destination | InvalidDestination
+export type ParseDestinationResult =
+  | Destination
+  | MerchantChoiceDestination
+  | InvalidDestination
+
+export const MerchantPaymentType = PaymentType.Merchant
+
+export type MerchantChoice = Merchant
+
+export type MerchantPaymentDestination = BlinkMerchantPaymentDestination
+
+export type MerchantChoiceDestination = {
+  valid: true
+  validDestination: MerchantPaymentDestination
+  destinationDirection: typeof DestinationDirection.Send
+}
 
 export type ParseDestinationParams = {
   rawInput: string
@@ -65,11 +82,18 @@ export type ReceiveDestination = {
 export const isSendDestination = (
   result: ParseDestinationResult,
 ): result is PaymentDestination =>
-  result.valid && result.destinationDirection === DestinationDirection.Send
+  result.valid &&
+  result.destinationDirection === DestinationDirection.Send &&
+  !isMerchantChoiceDestination(result)
+
+export const isMerchantChoiceDestination = (
+  result: ParseDestinationResult,
+): result is MerchantChoiceDestination =>
+  result.valid && result.validDestination.paymentType === MerchantPaymentType
 
 export type InvalidDestination = {
   valid: false
-  invalidPaymentDestination: ParsedPaymentDestination
+  invalidPaymentDestination: ParsedPaymentDestination | MerchantPaymentDestination
   invalidReason: InvalidDestinationReason
 }
 
