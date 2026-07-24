@@ -52,6 +52,7 @@ import {
 import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
 import { MigrateNowModal } from "@app/components/migrate-now-modal"
 import { MigrationReminderBulletin } from "@app/components/migration-reminder-bulletin"
+import { OffboardOnlyBulletin } from "@app/components/offboard-only-bulletin"
 /** Deep import on purpose: keeps the migration hooks barrel out of the home graph. */
 import { useWindDownHomeNudges } from "@app/screens/account-migration/hooks/use-wind-down-home-nudges"
 import {
@@ -456,7 +457,8 @@ export const HomeScreen: React.FC = () => {
       : null
   const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible
 
-  const { migrateNowPrompt, reminderBulletin, receiveBlocked } = useWindDownHomeNudges()
+  const { migrateNowPrompt, offboardBulletin, reminderBulletin, receiveBlocked } =
+    useWindDownHomeNudges()
   const { dismissForSession: dismissMigrateNowPrompt } = migrateNowPrompt
   /** Dismissing first keeps the modal from floating over the pushed migration flow. */
   const goToMigration = React.useCallback(() => {
@@ -810,6 +812,7 @@ export const HomeScreen: React.FC = () => {
         {isSelfCustodial && <UnclaimedDepositBanner />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
+        {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin
             onMigrate={goToMigration}

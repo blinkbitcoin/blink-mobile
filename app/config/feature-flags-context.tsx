@@ -46,6 +46,7 @@ const SelfCustodialTransferBlockedCountriesKey = "selfCustodialTransferBlockedCo
 const CustodialTransferBlockedCountriesKey = "custodialTransferBlockedCountries"
 const CustodialCreationBlockedCountriesKey = "custodialCreationBlockedCountries"
 const SelfCustodialCreationBlockedCountriesKey = "selfCustodialCreationBlockedCountries"
+const OffboardOnlyCountriesKey = "offboardOnlyCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
 const FeeRatesConfigKey = "feeRatesConfig"
 
@@ -106,6 +107,7 @@ type RemoteConfig = {
   [CustodialTransferBlockedCountriesKey]: string[]
   [CustodialCreationBlockedCountriesKey]: string[]
   [SelfCustodialCreationBlockedCountriesKey]: string[]
+  [OffboardOnlyCountriesKey]: string[]
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
   [FeeRatesConfigKey]: FeeRatesConfig
 }
@@ -159,6 +161,14 @@ const creationBlockedDefault = [
   "CU", "IR", "KP", "SY", "RU", "BY",
 ]
 
+/**
+ * Offboard-only regions of the custodial sunset: accounts registered there cannot be
+ * offered any account, so the home shows the withdraw-your-funds bulletin instead of the
+ * migration nudges. Ops empties the remote list after the withdrawal deadline, which is
+ * what retires the bulletin — the client never compares dates.
+ */
+const offboardOnlyDefault = ["AE", "NP", "DZ"]
+
 export const defaultRemoteConfig: RemoteConfig = {
   deviceAccountEnabledRestAuth: false,
   balanceLimitToTriggerUpgradeModal: 2100,
@@ -192,6 +202,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   custodialTransferBlockedCountries: transferBlockedDefault,
   custodialCreationBlockedCountries: creationBlockedDefault,
   selfCustodialCreationBlockedCountries: creationBlockedDefault,
+  offboardOnlyCountries: offboardOnlyDefault,
   selfCustodialDepositClaimLeewayVbyte: 1,
   feeRatesConfig: defaultFeeRatesConfig,
 }
@@ -228,6 +239,9 @@ remoteConfigInstance().setDefaults({
   ),
   selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.selfCustodialCreationBlockedCountries,
+  ),
+  offboardOnlyCountries: serializeRemoteConfigDefault(
+    defaultRemoteConfig.offboardOnlyCountries,
   ),
   feeRatesConfig: serializeRemoteConfigDefault(defaultFeeRatesConfig),
 })
@@ -398,6 +412,11 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           defaultRemoteConfig.selfCustodialCreationBlockedCountries,
         )
 
+        const offboardOnlyCountries = getRemoteConfigStringList(
+          OffboardOnlyCountriesKey,
+          defaultRemoteConfig.offboardOnlyCountries,
+        )
+
         const selfCustodialDepositClaimLeewayVbyte = remoteConfigInstance()
           .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
           .asNumber()
@@ -440,6 +459,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           custodialTransferBlockedCountries,
           custodialCreationBlockedCountries,
           selfCustodialCreationBlockedCountries,
+          offboardOnlyCountries,
           selfCustodialDepositClaimLeewayVbyte,
           feeRatesConfig,
         })
