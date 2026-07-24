@@ -26,9 +26,10 @@ function ScreenWithoutScrolling(props: ScreenProps) {
 
   const edges: Edge[] | undefined = props.unsafe
     ? undefined
-    : props.headerShown === false
-      ? ["top", "left", "right", "bottom"]
-      : ["left", "right", "bottom"]
+    : props.edges ??
+      (props.headerShown === false
+        ? ["top", "left", "right", "bottom"]
+        : ["left", "right", "bottom"])
 
   return (
     <KeyboardAvoidingView
@@ -63,9 +64,10 @@ function ScreenWithScrolling(props: ScreenProps) {
 
   const edges: Edge[] | undefined = props.unsafe
     ? undefined
-    : props.headerShown === false
-      ? ["top", "left", "right", "bottom"]
-      : ["left", "right", "bottom"]
+    : props.edges ??
+      (props.headerShown === false
+        ? ["top", "left", "right", "bottom"]
+        : ["left", "right", "bottom"])
 
   return (
     <KeyboardAvoidingView
