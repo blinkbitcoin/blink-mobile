@@ -27,6 +27,24 @@ jest.mock("react-native/Libraries/AppState/AppState", () => ({
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   Network: { Mainnet: 0, Regtest: 1 },
+  SdkError: {
+    instanceOf: (obj: unknown) =>
+      typeof obj === "object" && obj !== null && "tag" in obj,
+  },
+  SdkError_Tags: {
+    SparkError: "SparkError",
+    InsufficientFunds: "InsufficientFunds",
+    InvalidUuid: "InvalidUuid",
+    InvalidInput: "InvalidInput",
+    NetworkError: "NetworkError",
+    StorageError: "StorageError",
+    ChainServiceError: "ChainServiceError",
+    MaxDepositClaimFeeExceeded: "MaxDepositClaimFeeExceeded",
+    MissingUtxo: "MissingUtxo",
+    LnurlError: "LnurlError",
+    Signer: "Signer",
+    Generic: "Generic",
+  },
   // eslint-disable-next-line camelcase
   SdkEvent_Tags: {
     Synced: "Synced",
@@ -890,7 +908,11 @@ describe("SelfCustodialWalletProvider — async ops, connectivity & polling", ()
       await flushEffects()
 
       expect(result.current.status).not.toBe(ActiveWalletStatus.Loading)
-      expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
+      // Timeouts are connectivity-class: breadcrumbed, not recorded as non-fatals.
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        expect.stringContaining("wallet snapshot timed out"),
+      )
+      expect(mockCrashlyticsRecordError).not.toHaveBeenCalledWith(
         expect.objectContaining({
           message: expect.stringContaining("wallet snapshot timed out"),
         }),
@@ -1608,6 +1630,30 @@ describe("SelfCustodialWalletProvider — stale-write safety", () => {
           }),
         )
       })
+    })
+
+    it("downgrades offline resolve failures (SdkError.NetworkError) to a breadcrumb", async () => {
+      mockGetLightningAddress.mockRejectedValue({
+        tag: "NetworkError",
+        inner: ["dns error"],
+      })
+
+      renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => {
+        expect(mockGetLightningAddress).toHaveBeenCalled()
+      })
+      await new Promise((resolve) => {
+        setTimeout(resolve, 20)
+      })
+
+      const lightningRecordCalls = mockCrashlyticsRecordError.mock.calls.filter(
+        (args) => String((args[0] as Error | undefined)?.message).includes("Lightning address"),
+      )
+      expect(lightningRecordCalls).toHaveLength(0)
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        expect.stringContaining("Lightning address resolve failed"),
+      )
     })
 
     it("still reloads the registry when setSelfCustodialLightningAddress rejects (current swallow-and-chain behaviour)", async () => {

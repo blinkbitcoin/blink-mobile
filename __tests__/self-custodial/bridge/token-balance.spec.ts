@@ -4,10 +4,11 @@ import {
 } from "@app/self-custodial/bridge/token-balance"
 
 const mockRecordError = jest.fn()
+const mockLog = jest.fn()
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
   __esModule: true,
-  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+  default: () => ({ recordError: mockRecordError, log: mockLog }),
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
@@ -131,18 +132,30 @@ describe("fetchUsdbDecimals", () => {
 describe("token-balance crashlytics reporting", () => {
   beforeEach(() => {
     mockRecordError.mockClear()
+    mockLog.mockClear()
   })
 
-  it("records to crashlytics once when the expected token is missing (dedupes within session)", () => {
+  it("leaves an expected breadcrumb when the token is missing (fresh wallet), never a non-fatal", () => {
     const fresh = loadFreshModule()
     const info = { tokenBalances: { "other-token": otherToken } } as never
 
     fresh.findUsdbToken(info)
     fresh.findUsdbToken(info)
-    fresh.findUsdbToken(info)
 
-    expect(mockRecordError).toHaveBeenCalledTimes(1)
-    expect(mockRecordError.mock.calls[0][0].message).toContain("test-token-id")
+    expect(mockRecordError).not.toHaveBeenCalled()
+    expect(mockLog).toHaveBeenCalledWith(expect.stringContaining("[expected]"))
+    expect(mockLog.mock.calls[0][0]).toContain("test-token-id")
+  })
+
+  it("does not report decimals-missing when the token itself is absent", async () => {
+    const fresh = loadFreshModule()
+    const sdk = {
+      getInfo: jest.fn().mockResolvedValue({ tokenBalances: {} }),
+    } as never
+
+    await expect(fresh.fetchUsdbDecimals(sdk)).resolves.toBe(6)
+
+    expect(mockRecordError).not.toHaveBeenCalled()
   })
 
   it("records to crashlytics once when the token is present but lacks decimals metadata", async () => {

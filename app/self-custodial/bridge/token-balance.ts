@@ -18,11 +18,14 @@ export const findUsdbToken = (info: GetInfoResponse): TokenBalance | undefined =
     (token) => token.tokenMetadata?.identifier === expectedIdentifier,
   )
   if (!match) {
+    // A wallet that never held USDB legitimately has no entry; see the
+    // USD-history guard in wallet-snapshot.ts for the defect sub-case.
     recordErrorOnce(
       `spark-token-not-found:${expectedIdentifier}`,
       new Error(
         `Spark token ${expectedIdentifier} not present in tokenBalances response`,
       ),
+      { expected: true },
     )
   }
   return match
@@ -30,7 +33,9 @@ export const findUsdbToken = (info: GetInfoResponse): TokenBalance | undefined =
 
 export const fetchUsdbDecimals = async (sdk: BreezSdkInterface): Promise<number> => {
   const info = await sdk.getInfo({ ensureSynced: false })
-  const decimals = findUsdbToken(info)?.tokenMetadata?.decimals
+  const token = findUsdbToken(info)
+  if (!token) return SparkToken.DefaultDecimals
+  const decimals = token.tokenMetadata?.decimals
   if (decimals === undefined) {
     recordErrorOnce(
       "spark-token-decimals-missing",

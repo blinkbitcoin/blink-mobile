@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react"
 
-import crashlytics from "@react-native-firebase/crashlytics"
+import { recordAppError } from "@app/utils/error-reporting"
 
 import {
   CloudBackupDownloadResult,
@@ -34,13 +34,21 @@ type ICloudOperation = (typeof ICloudOperation)[keyof typeof ICloudOperation]
 const reasonFromError = (err: unknown): CloudBackupErrorReason =>
   err instanceof ICloudError ? err.reason : CloudBackupErrorReason.Unknown
 
+// For iCloud, Auth means the device is not signed into iCloud — a user state,
+// unlike Drive where Auth after a successful sign-in indicates a token bug.
+const isExpectedICloudState = (err: unknown): boolean =>
+  err instanceof ICloudError &&
+  (err.reason === CloudBackupErrorReason.Transient ||
+    err.reason === CloudBackupErrorReason.Auth)
+
 const reportICloudError = (operation: ICloudOperation, err: unknown): void => {
-  if (err instanceof ICloudError) {
-    crashlytics().recordError(err)
-    return
-  }
-  const message = err instanceof Error ? err.message : String(err)
-  crashlytics().recordError(new Error(`iCloud ${operation} failed: ${message}`))
+  const error =
+    err instanceof ICloudError
+      ? err
+      : new Error(
+          `iCloud ${operation} failed: ${err instanceof Error ? err.message : String(err)}`,
+        )
+  recordAppError(error, { expected: isExpectedICloudState(err) })
 }
 
 /** iOS pair of `useGoogleDriveBackup`: synthetic `accessToken`, `fileId === fileName`. */
