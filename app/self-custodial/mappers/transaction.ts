@@ -1,4 +1,4 @@
-import crashlytics from "@react-native-firebase/crashlytics"
+import { recordAppError } from "@app/utils/error-reporting"
 import {
   PaymentDetails,
   PaymentDetails_Tags as PaymentDetailsTags,
@@ -21,7 +21,7 @@ import { AccountType } from "@app/types/wallet"
 import { toNumber } from "@app/utils/helper"
 
 const reportUnhandledEnum = <T>(scope: string, unhandled: unknown, fallback: T): T => {
-  crashlytics().recordError(
+  recordAppError(
     new Error(`transaction-mapper.${scope}: unhandled SDK value ${String(unhandled)}`),
   )
   return fallback

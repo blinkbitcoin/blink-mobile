@@ -18,7 +18,7 @@ import { useInviteQuery } from "@app/graphql/generated"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PeopleStackParamList } from "@app/navigation/stack-param-lists"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { reportError } from "@app/utils/error-logging"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme, Text } from "@rn-vui/themed"
@@ -92,7 +92,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
       }
     } catch (err) {
       if (err instanceof Error) {
-        crashlytics().recordError(err)
+        reportError("invite-modal", err)
         Alert.alert(err.message)
       }
     }

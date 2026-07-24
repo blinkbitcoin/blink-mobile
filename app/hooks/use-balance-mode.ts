@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react"
 
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import crashlytics from "@react-native-firebase/crashlytics"
+
+import { reportError } from "@app/utils/error-logging"
 
 export const BalanceMode = {
   Btc: "btc",
@@ -24,7 +25,7 @@ type UseBalanceModeResult = {
 
 const persistMode = (next: BalanceMode) => {
   AsyncStorage.setItem(STORAGE_KEY, next).catch((err) => {
-    if (err instanceof Error) crashlytics().recordError(err)
+    reportError("balance-mode", err)
   })
 }
 
@@ -38,7 +39,7 @@ export const useBalanceMode = (): UseBalanceModeResult => {
         if (isBalanceMode(raw)) setModeState(raw)
       })
       .catch((err) => {
-        if (err instanceof Error) crashlytics().recordError(err)
+        reportError("balance-mode", err)
       })
       .finally(() => {
         setLoaded(true)

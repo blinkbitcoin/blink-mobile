@@ -33,7 +33,7 @@ jest.mock("@react-native-firebase/crashlytics", () => {
   const recordError = jest.fn()
   return {
     __esModule: true,
-    default: () => ({ recordError }),
+    default: () => ({ recordError, log: jest.fn() }),
   }
 })
 

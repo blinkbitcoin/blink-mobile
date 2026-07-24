@@ -1,7 +1,7 @@
 import { createContext, useContext, PropsWithChildren } from "react"
 import * as React from "react"
 
-import crashlytics from "@react-native-firebase/crashlytics"
+import { recordAppError } from "@app/utils/error-reporting"
 
 import { reportError } from "@app/utils/error-logging"
 import { loadJson, saveJson, saveString } from "@app/utils/storage"
@@ -20,7 +20,9 @@ const quarantineRawState = async (rawData: unknown): Promise<void> => {
   const key = `${PERSISTENT_STATE_QUARANTINE_PREFIX}.${Date.now()}`
   const ok = await saveString(key, JSON.stringify(rawData))
   if (!ok) {
-    crashlytics().recordError(new Error(`Quarantine write failed for key ${key}`))
+    recordAppError(new Error(`Quarantine write failed for key ${key}`), {
+      alwaysRecord: true,
+    })
   }
 }
 
@@ -34,7 +36,7 @@ export const loadPersistentState = async (): Promise<PersistentState> => {
     case MigrationStatus.NoData:
       return defaultPersistentState
     case MigrationStatus.Failed:
-      crashlytics().recordError(result.error)
+      recordAppError(result.error, { alwaysRecord: true })
       await quarantineRawState(result.rawData)
       return defaultPersistentState
   }

@@ -21,6 +21,7 @@ jest.mock("@app/utils/storage", () => ({
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
+  log: jest.fn(),
 }))
 
 const TestConsumer: React.FC = () => {

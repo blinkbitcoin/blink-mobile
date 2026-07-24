@@ -78,6 +78,7 @@ jest.mock("@app/screens/send-bitcoin-screen/fee-tier-selector", () => ({
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
+  log: jest.fn(),
 }))
 
 const mockSdk = {

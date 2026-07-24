@@ -22,11 +22,11 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logParseDestinationResult } from "@app/utils/analytics"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 import Clipboard from "@react-native-clipboard/clipboard"
 import { CountryCode, PhoneNumber } from "libphonenumber-js/mobile"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { SearchBar } from "@rn-vui/base"
@@ -612,9 +612,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         waitAndValidateDestination(clipboard)
       }
     } catch (err) {
-      if (err instanceof Error) {
-        crashlytics().recordError(err)
-      }
+      reportError("send-bitcoin-destination", err)
       toastShow({
         type: "error",
         message: (translations) =>
@@ -955,9 +953,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
         setKeepCountryCode(true)
       }, 100)
     } catch (err) {
-      if (err instanceof Error) {
-        crashlytics().recordError(err)
-      }
+      reportError("send-bitcoin-destination", err)
       toastShow({
         type: "error",
         message: (translations) =>

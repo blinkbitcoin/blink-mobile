@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import crashlytics from "@react-native-firebase/crashlytics"
+
+import { recordAppError } from "@app/utils/error-reporting"
 import { utils as lnurlUtils } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
@@ -124,7 +126,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
         crashlytics().log(
           `[Self-custodial] Lightning adapter returned no invoice (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
         )
-        crashlytics().recordError(
+        recordAppError(
           new Error("Self-custodial invoice adapter returned no invoice field"),
         )
         setRequestState(PaymentRequestState.Error)
@@ -148,7 +150,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
       crashlytics().log(
         `[Self-custodial] Lightning invoice generation failed (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
       )
-      crashlytics().recordError(
+      recordAppError(
         err instanceof Error
           ? err
           : new Error(`Self-custodial invoice generation failed: ${err}`),
@@ -209,7 +211,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
       })
       .catch((err) => {
         if (cancelled) return
-        crashlytics().recordError(
+        recordAppError(
           err instanceof Error
             ? err
             : new Error(`Self-custodial receive onchain adapter failed: ${err}`),
