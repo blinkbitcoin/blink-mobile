@@ -3606,6 +3606,10 @@
       "body": "Пређите на не-кастодијални налог путем вођене миграције или подигните средства пре {date}. Примање престаје {receiveStopsDate}.",
       "migrateCta": "Мигрирај"
     },
+    "offboardBulletin": {
+      "title": "Важно",
+      "body": "Ваш налог је регистрован у региону у ком не можемо да нудимо налоге. Подигните своја средства пре 31. августа. Пријем се зауставља 10. августа."
+    },
     "dollarBalanceModal": {
       "title": "Ne možemo da migriramo vaš dolarski saldo",
       "body": "Prvo ispraznite svoj dolarski saldo. Možete ga preneti na svoj Bitcoin saldo u Blinku ili na drugo mesto."

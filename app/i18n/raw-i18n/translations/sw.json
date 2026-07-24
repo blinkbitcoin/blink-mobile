@@ -3606,6 +3606,10 @@
       "body": "Hamia kwenye akaunti isiyo ya udhamini kupitia uhamishaji unaoongozwa, au toa fedha zako, kabla ya {date}. Kupokea kutasimama {receiveStopsDate}.",
       "migrateCta": "Hamia"
     },
+    "offboardBulletin": {
+      "title": "Muhimu",
+      "body": "Akaunti yako imesajiliwa katika eneo ambalo hatuwezi kutoa akaunti. Toa fedha zako kabla ya tarehe 31 Agosti. Kupokea kunasimama tarehe 10 Agosti."
+    },
     "dollarBalanceModal": {
       "title": "Hatuwezi kuhamisha Salio lako la Dola",
       "body": "Kwanza ondoa Salio lako la Dola. Unaweza kulihamishia kwenye Salio lako la Bitcoin kwenye Blink au mahali pengine."

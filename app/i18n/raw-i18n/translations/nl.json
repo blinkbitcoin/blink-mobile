@@ -3606,6 +3606,10 @@
       "body": "Stap vóór {date} over naar een niet-bewaarde rekening via begeleide migratie, of neem je tegoed op. Ontvangen stopt op {receiveStopsDate}.",
       "migrateCta": "Migreer"
     },
+    "offboardBulletin": {
+      "title": "Belangrijk",
+      "body": "Je account is geregistreerd in een regio waar we geen accounts kunnen aanbieden. Neem je geld op vóór 31 augustus. Ontvangen stopt op 10 augustus."
+    },
     "dollarBalanceModal": {
       "title": "We kunnen je dollarsaldo niet migreren",
       "body": "Maak eerst je dollarsaldo leeg. Je kunt het overboeken naar je Bitcoin-saldo in Blink of ergens anders."

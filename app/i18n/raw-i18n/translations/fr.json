@@ -3606,6 +3606,10 @@
             "body": "Passez à un compte non-custodial via la migration guidée, ou retirez vos fonds, avant le {date}. La réception s'arrête le {receiveStopsDate}.",
             "migrateCta": "Migrer"
         },
+        "offboardBulletin": {
+            "title": "Important",
+            "body": "Votre compte est enregistré dans une région où nous ne pouvons pas proposer de comptes. Retirez vos fonds avant le 31 août. La réception s'arrête le 10 août."
+        },
         "dollarBalanceModal": {
             "title": "Nous ne pouvons pas migrer votre solde en dollars",
             "body": "Videz d'abord votre solde en dollars. Vous pouvez le transférer vers votre solde Bitcoin dans Blink ou ailleurs."

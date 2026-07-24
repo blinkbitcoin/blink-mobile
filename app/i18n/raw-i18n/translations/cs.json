@@ -3606,6 +3606,10 @@
       "body": "Přejděte na nesvěřenský účet pomocí řízené migrace, nebo si vyberte prostředky, před {date}. Přijímání končí {receiveStopsDate}.",
       "migrateCta": "Migrovat"
     },
+    "offboardBulletin": {
+      "title": "Důležité",
+      "body": "Váš účet je registrován v regionu, kde nemůžeme nabízet účty. Vyberte své prostředky před 31. srpnem. Přijímání se zastaví 10. srpna."
+    },
     "dollarBalanceModal": {
       "title": "Váš dolarový zůstatek nemůžeme migrovat",
       "body": "Nejprve vyprázdněte svůj dolarový zůstatek. Můžete jej převést na svůj bitcoinový zůstatek v Blinku nebo jinam."

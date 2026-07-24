@@ -3606,6 +3606,10 @@
       "body": "Kyusa ogende ku akawunti etakuumibwa ng'oyita mu ntambuza erungamizibwa, oba oggyeyo ssente zo, nga {date} tennatuuka. Okufuna kukoma nga {receiveStopsDate}.",
       "migrateCta": "Kyusa"
     },
+    "offboardBulletin": {
+      "title": "Kikulu",
+      "body": "Akkawunti yo ewandiisiddwa mu kitundu gye tutasobola kuwaayo kkawunti. Ggyamu ssente zo nga tennatuuka nga 31 Agusito. Okufuna kuyimirira nga 10 Agusito."
+    },
     "dollarBalanceModal": {
       "title": "Tetusobola kutambuza ssente zo eza doola",
       "body": "Sooka omalewo ssente zo eza doola. Osobola okuzisindika ku ssente zo eza Bitcoin mu Blink oba awalala."

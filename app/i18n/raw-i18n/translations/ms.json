@@ -3606,6 +3606,10 @@
       "body": "Beralih kepada akaun bukan kustodial melalui migrasi berpandu, atau keluarkan dana anda, sebelum {date}. Penerimaan berhenti pada {receiveStopsDate}.",
       "migrateCta": "Pindah"
     },
+    "offboardBulletin": {
+      "title": "Penting",
+      "body": "Akaun anda didaftarkan di wilayah yang kami tidak dapat menawarkan akaun. Keluarkan dana anda sebelum 31 Ogos. Penerimaan berhenti pada 10 Ogos."
+    },
     "dollarBalanceModal": {
       "title": "Kami tidak dapat memindahkan Baki Dolar anda",
       "body": "Kosongkan Baki Dolar anda terlebih dahulu. Anda boleh memindahkannya ke Baki Bitcoin dalam Blink atau ke tempat lain."
