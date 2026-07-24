@@ -121,6 +121,13 @@ describe("toError", () => {
   it("wraps other values via JSON", () => {
     expect(toError({ code: 7 }).message).toBe('{"code":7}')
   })
+
+  it("never throws on circular values (falls back to String)", () => {
+    const circular: { self?: unknown } = {}
+    circular.self = circular
+
+    expect(toError(circular).message).toBe("[object Object]")
+  })
 })
 
 describe("recordAppError", () => {

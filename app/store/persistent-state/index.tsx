@@ -46,7 +46,8 @@ const savePersistentState = async (state: PersistentState): Promise<void> => {
   try {
     await saveJson(PERSISTENT_STATE_KEY, state)
   } catch (err) {
-    reportError("Persistent state save", err)
+    // Storage failures are crash-adjacent: never downgrade on message wording.
+    reportError("Persistent state save", err, { alwaysRecord: true })
   }
 }
 
