@@ -503,6 +503,7 @@ export const createLnurlPaymentDetails = <T extends WalletCurrency>(
     sendingWalletDescriptor,
     unitOfAccountAmount,
     paymentType: PaymentType.Lnurl,
+    paymentRequest,
     destination: lnurl,
     settlementAmount,
     memo,
