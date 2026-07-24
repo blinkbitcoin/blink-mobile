@@ -30,9 +30,7 @@ import SlideUpHandle from "@app/components/slide-up-handle"
 import { Screen } from "@app/components/screen"
 import {
   UnseenTxAmountBadge,
-  useUnseenTxAmountBadge,
-  useOutgoingBadgeVisibility,
-  useIncomingBadgeAutoSeen,
+  useUnseenTxBadges,
 } from "@app/components/unseen-tx-amount-badge"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -66,18 +64,13 @@ import { useBackupNudgeState } from "@app/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
-import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
-import { isCardUsable } from "@app/screens/card-screen/utils/card-display"
+import { useHomeCard } from "@app/screens/card-screen/hooks/use-home-card"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
-import {
-  useAppConfig,
-  useAutoShowUpgradeModal,
-  useTransactionSeenState,
-} from "@app/hooks"
+import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
 import {
   AccountLevel,
   TransactionFragment,
@@ -314,16 +307,7 @@ export const HomeScreen: React.FC = () => {
       }))
     : dataAuthed?.me?.defaultAccount?.wallets
 
-  /**
-   * TODO(card): `cards` on ConsumerAccount only exists on the staging backend
-   * today, so gate the home card row to staging until the card service ships to
-   * every instance; then drop `isCardBackendAvailable` and query unconditionally.
-   * Ref PR #3899.
-   */
-  const isCardBackendAvailable = galoyInstanceId === "Staging"
-  const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
-  const hasCard = homeCard !== undefined && isCardUsable(homeCard.status)
-  const cardLastFour = homeCard?.lastFour
+  const { hasCard, cardLastFour } = useHomeCard()
 
   const {
     formattedBalance: defaultFormattedBalance,
@@ -362,41 +346,24 @@ export const HomeScreen: React.FC = () => {
     return txs
   }, [pendingIncomingTransactions, transactionsEdges])
 
-  const { hasUnseenBtcTx, hasUnseenUsdTx, markTxSeen } = useTransactionSeenState(
-    accountId || "",
-    transactions,
-  )
-
   const { canShowUpgradeModal, markShownUpgradeModal } = useAutoShowUpgradeModal({
     cooldownDays: upgradeModalCooldownDays,
     enabled: isAuthed && levelAccount === AccountLevel.Zero,
   })
 
-  const { latestUnseenTx, unseenAmountText, handleUnseenBadgePress, isOutgoing } =
-    useUnseenTxAmountBadge({
-      transactions,
-      hasUnseenBtcTx,
-      hasUnseenUsdTx,
-    })
-
-  const handleOutgoingBadgeHide = React.useCallback(() => {
-    if (latestUnseenTx?.settlementCurrency) {
-      markTxSeen(latestUnseenTx.settlementCurrency)
-    }
-  }, [latestUnseenTx?.settlementCurrency, markTxSeen])
-
-  const showOutgoingBadge = useOutgoingBadgeVisibility({
-    txId: latestUnseenTx?.id,
-    amountText: unseenAmountText,
+  const {
+    hasUnseenBtcTx,
+    hasUnseenUsdTx,
+    latestUnseenTx,
+    unseenAmountText,
+    handleUnseenBadgePress,
     isOutgoing,
-    onHide: handleOutgoingBadgeHide,
-  })
-
-  const showIncomingBadge = useIncomingBadgeAutoSeen({
+    showOutgoingBadge,
+    showIncomingBadge,
+  } = useUnseenTxBadges({
+    accountId: accountId || "",
+    transactions,
     isFocused,
-    isOutgoing,
-    unseenCurrency: latestUnseenTx?.settlementCurrency,
-    markTxSeen,
   })
 
   const [modalVisible, setModalVisible] = React.useState(false)
