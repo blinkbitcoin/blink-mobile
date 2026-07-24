@@ -135,6 +135,12 @@ android {
             }
         }
     }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources true
+        }
+    }
 }
 
 dependencies {
@@ -158,6 +164,10 @@ dependencies {
 
     androidTestImplementation('com.wix:detox:+')
     implementation 'androidx.appcompat:appcompat:1.1.0'
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.test:core:1.6.0")
+    testImplementation("org.robolectric:robolectric:4.16")
 }
 
 
