@@ -662,6 +662,7 @@ describe("HomeScreen", () => {
   })
 
   it("excludes the bottom safe-area edge the tab bar already reserves", async () => {
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
     const { UNSAFE_getAllByType } = render(
       <ContextForScreen>
         <HomeScreen />

@@ -12,7 +12,11 @@ jest.mock("react-native-safe-area-context", () => {
   const ReactActual = jest.requireActual<typeof React>("react")
   return {
     SafeAreaView: ({ children, ...props }: React.PropsWithChildren<object>) =>
-      ReactActual.createElement("SafeAreaView", { ...props, testID: "safe-area" }, children),
+      ReactActual.createElement(
+        "SafeAreaView",
+        { ...props, testID: "safe-area" },
+        children,
+      ),
   }
 })
 

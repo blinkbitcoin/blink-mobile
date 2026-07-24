@@ -48,6 +48,7 @@ describe("EarnMapScreen", () => {
       earnedSats: 0,
       quizServerData: [],
     })
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
     const { UNSAFE_getAllByType } = render(
       <ContextForScreen>
         <EarnMapScreen />
