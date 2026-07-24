@@ -191,6 +191,22 @@ gql`
   }
 `
 
+const useHomeCard = (galoyInstanceId: string) => {
+  /**
+   * TODO(card): `cards` on ConsumerAccount only exists on the staging backend
+   * today, so gate the home card row to staging until the card service ships to
+   * every instance; then drop `isCardBackendAvailable` and query unconditionally.
+   * Ref PR #3899.
+   */
+  const isCardBackendAvailable = galoyInstanceId === "Staging"
+  const { card } = useCardData({ skip: !isCardBackendAvailable })
+
+  return {
+    hasCard: card !== undefined && isCardUsable(card.status),
+    cardLastFour: card?.lastFour,
+  }
+}
+
 export const HomeScreen: React.FC = () => {
   const styles = useStyles()
   const {
@@ -314,16 +330,7 @@ export const HomeScreen: React.FC = () => {
       }))
     : dataAuthed?.me?.defaultAccount?.wallets
 
-  /**
-   * TODO(card): `cards` on ConsumerAccount only exists on the staging backend
-   * today, so gate the home card row to staging until the card service ships to
-   * every instance; then drop `isCardBackendAvailable` and query unconditionally.
-   * Ref PR #3899.
-   */
-  const isCardBackendAvailable = galoyInstanceId === "Staging"
-  const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
-  const hasCard = homeCard !== undefined && isCardUsable(homeCard.status)
-  const cardLastFour = homeCard?.lastFour
+  const { hasCard, cardLastFour } = useHomeCard(galoyInstanceId)
 
   const {
     formattedBalance: defaultFormattedBalance,
@@ -468,8 +475,6 @@ export const HomeScreen: React.FC = () => {
     isCustodialAccount && restrictedUsdWallet && restrictedBtcWallet
       ? { usdWalletId: restrictedUsdWallet.id, btcWalletId: restrictedBtcWallet.id }
       : null
-  const shouldShowStableTokenConvertModal = isSelfCustodial && isConvertModalVisible
-
   const { migrateNowPrompt, reminderBulletin, receiveBlocked } = useWindDownHomeNudges()
   const { dismissForSession: dismissMigrateNowPrompt } = migrateNowPrompt
   /** Dismissing first keeps the modal from floating over the pushed migration flow. */
@@ -712,7 +717,7 @@ export const HomeScreen: React.FC = () => {
           btcWalletId={custodialConvertWallets.btcWalletId}
         />
       )}
-      {shouldShowStableTokenConvertModal && (
+      {isSelfCustodial && isConvertModalVisible && (
         <StableTokenConvertToBtcModal
           isVisible={isConvertModalVisible}
           toggleModal={closeConvertModal}
