@@ -1430,6 +1430,13 @@ query level {
   }
 }
 
+query lnInvoicePaymentStatusByHash($input: LnInvoicePaymentStatusByHashInput!) {
+  lnInvoicePaymentStatusByHash(input: $input) {
+    status
+    __typename
+  }
+}
+
 query migration {
   migration {
     preview {

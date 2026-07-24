@@ -14,6 +14,7 @@ const mockSubmissionError = jest.fn(() => "submission-error")
 const mockWalletNotConnected = jest.fn(() => "wallet-not-connected")
 const mockLnInvoiceCreate = jest.fn()
 const mockApolloRefetch = jest.fn()
+const mockApolloQuery = jest.fn()
 const mockUseLnUpdateHashPaid = jest.fn(() => "no-match-hash")
 const mockFetch = jest.fn()
 
@@ -69,11 +70,18 @@ jest.mock("@app/graphql/ln-update-context", () => ({
   useLnUpdateHashPaid: () => mockUseLnUpdateHashPaid(),
 }))
 
+// The real Apollo client is referentially stable across renders; the mock must
+// be too, or effects keyed on the client identity re-fire on every render.
+const mockApolloClientInstance = {
+  refetchQueries: (...args: unknown[]) => mockApolloRefetch(...args),
+  query: (...args: unknown[]) => mockApolloQuery(...args),
+}
+
 jest.mock("@apollo/client", () => {
   const actual = jest.requireActual("@apollo/client")
   return {
     ...actual,
-    useApolloClient: () => ({ refetchQueries: mockApolloRefetch }),
+    useApolloClient: () => mockApolloClientInstance,
   }
 })
 
@@ -237,6 +245,39 @@ describe("useLnurlWithdrawRedemption — self-custodial branch", () => {
     expect(mockRedeemingError).not.toHaveBeenCalled()
   })
 
+  it("falls back to redeemingError when the self-custodial adapter rejects outright", async () => {
+    mockLnurlWithdraw.mockRejectedValueOnce(new Error("adapter exploded"))
+
+    const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+    await flushEffects()
+
+    expect(result.current.errorMessage).toBe("fallback-redeeming-error")
+    expect(result.current.paid).toBe(false)
+  })
+
+  it("ignores an adapter rejection that lands after unmount (rejection cancellation guard)", async () => {
+    let rejectAdapter: (err: Error) => void = () => {}
+    mockLnurlWithdraw.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectAdapter = reject
+        }),
+    )
+
+    const { unmount } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+    await flushEffects()
+
+    unmount()
+
+    await act(async () => {
+      rejectAdapter(new Error("late failure"))
+      await flushEffects()
+    })
+
+    expect(mockRedeemingError).not.toHaveBeenCalled()
+  })
+
   it("sets pending=true (no error) when the self-custodial adapter resolves Pending (C2)", async () => {
     mockLnurlWithdraw.mockResolvedValue({ status: PaymentResultStatus.Pending })
 
@@ -313,6 +354,9 @@ describe("useLnurlWithdrawRedemption — custodial branch", () => {
     mockLnInvoiceCreate.mockResolvedValue({
       data: { lnInvoiceCreate: { invoice: null, errors: [] } },
     })
+    mockApolloQuery.mockResolvedValue({
+      data: { lnInvoicePaymentStatusByHash: { status: "PENDING" } },
+    })
   })
 
   afterEach(() => {
@@ -385,6 +429,16 @@ describe("useLnurlWithdrawRedemption — custodial branch", () => {
 
     expect(result.current.paid).toBe(true)
     expect(mockApolloRefetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("surfaces an error when the mutation resolves without data (no-data contract)", async () => {
+    mockLnInvoiceCreate.mockResolvedValueOnce({ data: undefined })
+
+    const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+    await flushEffects()
+
+    expect(result.current.errorMessage).toContain("No data returned from lnInvoiceCreate")
   })
 
   it("sets the localized error message when the mutation returns errors[]", async () => {
@@ -480,5 +534,242 @@ describe("useLnurlWithdrawRedemption — custodial branch", () => {
     expect(result.current.paid).toBe(false)
     expect(result.current.errorMessage).toBe("")
     expect(result.current.lnServiceErrorReason).toBe("")
+  })
+
+  describe("pending state and payment-status polling fallback (#3564)", () => {
+    const invoice = { paymentRequest: "lnbc-bolt11-string", paymentHash: "hash-A" }
+
+    const arrangeAcceptedWithdrawal = () => {
+      mockLnInvoiceCreate.mockResolvedValueOnce({
+        data: { lnInvoiceCreate: { invoice, errors: [] } },
+      })
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ status: "OK" }) })
+    }
+
+    it("sets pending=true (paid=false) once the LNURL callback accepts the withdraw request", async () => {
+      arrangeAcceptedWithdrawal()
+
+      const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+      await flushEffects()
+      await flushEffects()
+
+      expect(result.current.pending).toBe(true)
+      expect(result.current.paid).toBe(false)
+      expect(result.current.errorMessage).toBe("")
+    })
+
+    it("clears pending and flips paid=true when the LN update hash confirms the payment", async () => {
+      arrangeAcceptedWithdrawal()
+      mockUseLnUpdateHashPaid.mockReturnValue("hash-A")
+
+      const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+      await flushEffects()
+      await flushEffects()
+
+      expect(result.current.paid).toBe(true)
+      expect(result.current.pending).toBe(false)
+      expect(mockApolloRefetch).toHaveBeenCalledTimes(1)
+    })
+
+    it("stays pending=false when the LNURL callback rejects the request, and never starts polling", async () => {
+      mockLnInvoiceCreate.mockResolvedValueOnce({
+        data: { lnInvoiceCreate: { invoice, errors: [] } },
+      })
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: "ERROR", reason: "voucher already used" }),
+      })
+      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+      try {
+        const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+        await flushEffects()
+        await flushEffects()
+
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(9_000)
+        })
+
+        expect(result.current.pending).toBe(false)
+        expect(mockApolloQuery).not.toHaveBeenCalled()
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
+    it("flips paid=true via the status poll when the websocket update never arrives (the #3564 bug)", async () => {
+      arrangeAcceptedWithdrawal()
+      mockApolloQuery.mockResolvedValue({
+        data: { lnInvoicePaymentStatusByHash: { status: "PAID" } },
+      })
+
+      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+      try {
+        const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+        await flushEffects()
+        await flushEffects()
+        expect(result.current.pending).toBe(true)
+
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(3_000)
+        })
+        await flushEffects()
+
+        expect(mockApolloQuery).toHaveBeenCalledTimes(1)
+        expect(mockApolloQuery.mock.calls[0][0].variables).toEqual({
+          input: { paymentHash: "hash-A" },
+        })
+        expect(result.current.paid).toBe(true)
+        expect(result.current.pending).toBe(false)
+        expect(mockApolloRefetch).toHaveBeenCalledTimes(1)
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
+    it("keeps polling while the invoice is unpaid and stops once the poll reports PAID", async () => {
+      arrangeAcceptedWithdrawal()
+      mockApolloQuery
+        .mockResolvedValueOnce({
+          data: { lnInvoicePaymentStatusByHash: { status: "PENDING" } },
+        })
+        .mockResolvedValueOnce({
+          data: { lnInvoicePaymentStatusByHash: { status: "PAID" } },
+        })
+
+      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+      try {
+        const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+        await flushEffects()
+        await flushEffects()
+
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(3_000)
+        })
+        expect(result.current.paid).toBe(false)
+        expect(result.current.pending).toBe(true)
+
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(3_000)
+        })
+        await flushEffects()
+        expect(result.current.paid).toBe(true)
+        expect(mockApolloQuery).toHaveBeenCalledTimes(2)
+
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(9_000)
+        })
+        expect(mockApolloQuery).toHaveBeenCalledTimes(2)
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
+    it("survives a transient poll error and succeeds on a later tick", async () => {
+      arrangeAcceptedWithdrawal()
+      mockApolloQuery
+        .mockRejectedValueOnce(new Error("network hiccup"))
+        .mockResolvedValueOnce({
+          data: { lnInvoicePaymentStatusByHash: { status: "PAID" } },
+        })
+
+      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+      try {
+        const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+        await flushEffects()
+        await flushEffects()
+
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(3_000)
+        })
+        expect(result.current.paid).toBe(false)
+        expect(result.current.errorMessage).toBe("")
+
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(3_000)
+        })
+        await flushEffects()
+        expect(result.current.paid).toBe(true)
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
+    it("ignores a stale poll response that resolves after the payment was already confirmed", async () => {
+      arrangeAcceptedWithdrawal()
+      let resolvePoll: (value: unknown) => void = () => {}
+      mockApolloQuery.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolvePoll = resolve
+          }),
+      )
+
+      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+      try {
+        const { result, rerender } = renderHook(
+          (props: typeof defaultParams) => useLnurlWithdrawRedemption(props),
+          { initialProps: defaultParams },
+        )
+
+        await flushEffects()
+        await flushEffects()
+        expect(result.current.pending).toBe(true)
+
+        // A poll tick fires and its query stays in flight...
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(3_000)
+        })
+        expect(mockApolloQuery).toHaveBeenCalledTimes(1)
+
+        // ...then the websocket confirms the payment first (cleanup cancels the poll)
+        mockUseLnUpdateHashPaid.mockReturnValue("hash-A")
+        rerender(defaultParams)
+        await flushEffects()
+        expect(result.current.paid).toBe(true)
+        expect(mockApolloRefetch).toHaveBeenCalledTimes(1)
+
+        // The stale response must be ignored: no extra state churn or refetches
+        await act(async () => {
+          resolvePoll({ data: { lnInvoicePaymentStatusByHash: { status: "PAID" } } })
+          await flushEffects()
+        })
+
+        expect(result.current.paid).toBe(true)
+        expect(mockApolloRefetch).toHaveBeenCalledTimes(1)
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(9_000)
+        })
+        expect(mockApolloQuery).toHaveBeenCalledTimes(1)
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
+    it("stops polling on unmount (interval cleanup)", async () => {
+      arrangeAcceptedWithdrawal()
+
+      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+      try {
+        const { unmount } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+        await flushEffects()
+        await flushEffects()
+
+        unmount()
+
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(9_000)
+        })
+        expect(mockApolloQuery).not.toHaveBeenCalled()
+      } finally {
+        jest.useRealTimers()
+      }
+    })
   })
 })

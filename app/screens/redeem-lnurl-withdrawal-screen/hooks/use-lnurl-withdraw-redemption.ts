@@ -1,8 +1,14 @@
 import fetch from "cross-fetch"
 import { useEffect, useState } from "react"
-import { useApolloClient } from "@apollo/client"
+import { gql, useApolloClient } from "@apollo/client"
 
-import { HomeAuthedDocument, useLnInvoiceCreateMutation } from "@app/graphql/generated"
+import {
+  HomeAuthedDocument,
+  InvoicePaymentStatus,
+  LnInvoicePaymentStatusByHashDocument,
+  LnInvoicePaymentStatusByHashQuery,
+  useLnInvoiceCreateMutation,
+} from "@app/graphql/generated"
 import { useLnUpdateHashPaid } from "@app/graphql/ln-update-context"
 import { usePayments } from "@app/hooks/use-payments"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -10,6 +16,14 @@ import { useTranslateSdkError } from "@app/self-custodial/hooks"
 import { PaymentResultStatus } from "@app/types/payment"
 import { AccountType } from "@app/types/wallet"
 import { satsToMsats } from "@app/utils/amounts"
+
+gql`
+  query lnInvoicePaymentStatusByHash($input: LnInvoicePaymentStatusByHashInput!) {
+    lnInvoicePaymentStatusByHash(input: $input) {
+      status
+    }
+  }
+`
 
 type WithdrawalInvoice = {
   paymentRequest: string
@@ -44,6 +58,7 @@ type SelfCustodialParams = {
 }
 
 const WALLET_CONNECT_TIMEOUT_MS = 10_000
+const PAYMENT_STATUS_POLL_INTERVAL_MS = 3_000
 
 const useSelfCustodialRedemption = ({
   enabled,
@@ -163,6 +178,8 @@ const useCustodialRedemption = ({
   const [withdrawalInvoice, setWithdrawalInvoice] = useState<WithdrawalInvoice | null>(
     null,
   )
+  const [callbackAccepted, setCallbackAccepted] = useState(false)
+  const [paidViaPoll, setPaidViaPoll] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const [lnServiceErrorReason, setLnServiceErrorReason] = useState("")
 
@@ -212,7 +229,10 @@ const useCustodialRedemption = ({
 
       if (result.ok) {
         const lnurlResponse = await result.json()
-        if (lnurlResponse?.status?.toLowerCase() !== "ok") {
+        if (lnurlResponse?.status?.toLowerCase() === "ok") {
+          // The service accepted the withdraw request; payment is now in flight
+          setCallbackAccepted(true)
+        } else {
           console.error(lnurlResponse, "error with redeeming")
           setErrorMessage(LL.RedeemBitcoinScreen.redeemingError())
           if (lnurlResponse?.reason) setLnServiceErrorReason(lnurlResponse.reason)
@@ -227,14 +247,51 @@ const useCustodialRedemption = ({
   }, [enabled, withdrawalInvoice, callback, k1, LL])
 
   const paid =
-    enabled && withdrawalInvoice !== null && withdrawalInvoice.paymentHash === lastHash
+    enabled &&
+    withdrawalInvoice !== null &&
+    (withdrawalInvoice.paymentHash === lastHash || paidViaPoll)
+
+  // The websocket update can be missed (disconnects, timing gaps), leaving the
+  // screen stuck on pending forever. Poll the invoice status as a fallback.
+  useEffect(() => {
+    if (!enabled || !callbackAccepted || paid || !withdrawalInvoice) return
+
+    let cancelled = false
+
+    const poll = async () => {
+      try {
+        const { data } = await apolloClient.query<LnInvoicePaymentStatusByHashQuery>({
+          query: LnInvoicePaymentStatusByHashDocument,
+          variables: { input: { paymentHash: withdrawalInvoice.paymentHash } },
+          fetchPolicy: "no-cache",
+        })
+        if (cancelled) return
+        if (data?.lnInvoicePaymentStatusByHash?.status === InvoicePaymentStatus.Paid) {
+          setPaidViaPoll(true)
+        }
+      } catch {
+        // Transient poll errors are ignored; the next tick retries
+      }
+    }
+
+    const interval = setInterval(poll, PAYMENT_STATUS_POLL_INTERVAL_MS)
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [enabled, callbackAccepted, paid, withdrawalInvoice, apolloClient])
 
   useEffect(() => {
     if (!paid) return
     apolloClient.refetchQueries({ include: [HomeAuthedDocument] })
   }, [paid, apolloClient])
 
-  return { paid, pending: false, errorMessage, lnServiceErrorReason }
+  return {
+    paid,
+    pending: callbackAccepted && !paid,
+    errorMessage,
+    lnServiceErrorReason,
+  }
 }
 
 export const useLnurlWithdrawRedemption = (params: Params): LnurlWithdrawRedemption => {

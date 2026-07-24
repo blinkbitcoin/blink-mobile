@@ -3695,6 +3695,13 @@ export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 export type MyLnUpdatesSubscription = { readonly __typename: 'Subscription', readonly myUpdates: { readonly __typename: 'MyUpdatesPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly update?: { readonly __typename: 'IntraLedgerUpdate' } | { readonly __typename: 'LnUpdate', readonly paymentHash: string, readonly status: InvoicePaymentStatus } | { readonly __typename: 'OnChainUpdate' } | { readonly __typename: 'Price' } | { readonly __typename: 'RealtimePrice' } | null } };
 
+export type LnInvoicePaymentStatusByHashQueryVariables = Exact<{
+  input: LnInvoicePaymentStatusByHashInput;
+}>;
+
+
+export type LnInvoicePaymentStatusByHashQuery = { readonly __typename: 'Query', readonly lnInvoicePaymentStatusByHash: { readonly __typename: 'LnInvoicePaymentStatus', readonly status?: InvoicePaymentStatus | null } };
+
 export type ScanningQrCodeScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -7624,6 +7631,46 @@ export function useMyLnUpdatesSubscription(baseOptions?: Apollo.SubscriptionHook
       }
 export type MyLnUpdatesSubscriptionHookResult = ReturnType<typeof useMyLnUpdatesSubscription>;
 export type MyLnUpdatesSubscriptionResult = Apollo.SubscriptionResult<MyLnUpdatesSubscription>;
+export const LnInvoicePaymentStatusByHashDocument = gql`
+    query lnInvoicePaymentStatusByHash($input: LnInvoicePaymentStatusByHashInput!) {
+  lnInvoicePaymentStatusByHash(input: $input) {
+    status
+  }
+}
+    `;
+
+/**
+ * __useLnInvoicePaymentStatusByHashQuery__
+ *
+ * To run a query within a React component, call `useLnInvoicePaymentStatusByHashQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLnInvoicePaymentStatusByHashQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLnInvoicePaymentStatusByHashQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useLnInvoicePaymentStatusByHashQuery(baseOptions: Apollo.QueryHookOptions<LnInvoicePaymentStatusByHashQuery, LnInvoicePaymentStatusByHashQueryVariables> & ({ variables: LnInvoicePaymentStatusByHashQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LnInvoicePaymentStatusByHashQuery, LnInvoicePaymentStatusByHashQueryVariables>(LnInvoicePaymentStatusByHashDocument, options);
+      }
+export function useLnInvoicePaymentStatusByHashLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LnInvoicePaymentStatusByHashQuery, LnInvoicePaymentStatusByHashQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LnInvoicePaymentStatusByHashQuery, LnInvoicePaymentStatusByHashQueryVariables>(LnInvoicePaymentStatusByHashDocument, options);
+        }
+export function useLnInvoicePaymentStatusByHashSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<LnInvoicePaymentStatusByHashQuery, LnInvoicePaymentStatusByHashQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<LnInvoicePaymentStatusByHashQuery, LnInvoicePaymentStatusByHashQueryVariables>(LnInvoicePaymentStatusByHashDocument, options);
+        }
+export type LnInvoicePaymentStatusByHashQueryHookResult = ReturnType<typeof useLnInvoicePaymentStatusByHashQuery>;
+export type LnInvoicePaymentStatusByHashLazyQueryHookResult = ReturnType<typeof useLnInvoicePaymentStatusByHashLazyQuery>;
+export type LnInvoicePaymentStatusByHashSuspenseQueryHookResult = ReturnType<typeof useLnInvoicePaymentStatusByHashSuspenseQuery>;
+export type LnInvoicePaymentStatusByHashQueryResult = Apollo.QueryResult<LnInvoicePaymentStatusByHashQuery, LnInvoicePaymentStatusByHashQueryVariables>;
 export const ScanningQrCodeScreenDocument = gql`
     query scanningQRCodeScreen {
   globals {
