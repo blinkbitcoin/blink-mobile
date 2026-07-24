@@ -173,6 +173,44 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     expect(detail.setSuccessAction).toBeDefined()
   })
 
+  describe("setters recreate the detail", () => {
+    it("setConvertMoneyAmount swaps the conversion function", () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      const newConvert = jest.fn((amount, target) => ({
+        amount: amount.amount,
+        currency: target,
+        currencyCode: target,
+      }))
+      const updated = detail.setConvertMoneyAmount(newConvert)
+      expect(updated.convertMoneyAmount).toBe(newConvert)
+    })
+
+    it("setInvoice recreates an equivalent lnurl detail", () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (detail.paymentType !== PaymentType.Lnurl) throw new Error("expected lnurl")
+      const updated = detail.setInvoice({} as never)
+      expect(updated.paymentType).toBe(PaymentType.Lnurl)
+      expect(updated.destination).toBe(detail.destination)
+    })
+
+    it("setSuccessAction carries the success action onto the new detail", () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (detail.paymentType !== PaymentType.Lnurl) throw new Error("expected lnurl")
+      const successAction = {
+        tag: "message" as const,
+        message: "Thanks!",
+        description: null,
+        url: null,
+        ciphertext: null,
+        iv: null,
+        decipher: () => null,
+      }
+      const updated = detail.setSuccessAction(successAction)
+      expect(updated.paymentType).toBe(PaymentType.Lnurl)
+      expect(updated.successAction).toBe(successAction)
+    })
+  })
+
   describe("amount handling", () => {
     it("locks the amount when min === max (destination-specified amount)", () => {
       const detail = createSelfCustodialLnurlPaymentDetails(
@@ -184,6 +222,20 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       expect(detail.destinationSpecifiedAmount).toEqual(
         expect.objectContaining({ amount: 5000, currency: WalletCurrency.Btc }),
       )
+    })
+
+    it("cannot send or quote a fee while the amount is still zero", () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          unitOfAccountAmount: {
+            amount: 0,
+            currency: WalletCurrency.Btc,
+            currencyCode: WalletCurrency.Btc,
+          },
+        }),
+      )
+      expect(detail.canSendPayment).toBe(false)
+      expect(detail.canGetFee).toBe(false)
     })
 
     it("allows amount changes when min !== max", () => {
@@ -269,6 +321,24 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
           tokenIdentifier: undefined,
           conversionOptions: undefined,
           feePolicy: undefined,
+        }),
+      )
+    })
+
+    it("falls back to an empty payRequest domain when lnurlParams has none", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          lnurlParams: baseLnurlParams({ domain: undefined }),
+        }),
+      )
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      await detail.getFee({} as never)
+
+      expect(mockPrepareLnurl).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({
+          payRequest: expect.objectContaining({ domain: "" }),
         }),
       )
     })
@@ -377,6 +447,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       expect(result.status).toBe(PaymentSendResult.Success)
       expect(result.extraInfo?.successAction?.tag).toBe("message")
       expect(result.extraInfo?.successAction?.message).toBe("Thanks!")
+      expect(result.extraInfo?.successAction?.decipher("any-preimage")).toBeNull()
     })
 
     it("converts a URL successAction to the lnurl-pay shape", async () => {
@@ -394,6 +465,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       expect(result.extraInfo?.successAction?.tag).toBe("url")
       expect(result.extraInfo?.successAction?.url).toBe("https://r.example/1")
       expect(result.extraInfo?.successAction?.description).toBe("Receipt")
+      expect(result.extraInfo?.successAction?.decipher("any-preimage")).toBeNull()
     })
 
     it("carries the decrypted plaintext on `message` (not via decipher) for AES Decrypted", async () => {
