@@ -1,4 +1,5 @@
 import { renderHook, act } from "@testing-library/react-native"
+import { Platform } from "react-native"
 
 import { useCloudBackup } from "@app/screens/self-custodial/onboarding/hooks/use-cloud-backup"
 
@@ -39,6 +40,12 @@ jest.mock("@app/utils/toast", () => ({
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: readonly unknown[]) => mockRecordError(...args),
+}))
+
+const mockLogBackupCompleted = jest.fn()
+jest.mock("@app/self-custodial/analytics", () => ({
+  logSelfCustodialBackupCompleted: (...args: readonly unknown[]) =>
+    mockLogBackupCompleted(...args),
 }))
 
 jest.mock("@app/utils/crypto", () => ({
@@ -165,6 +172,26 @@ describe("useCloudBackup", () => {
       noExistingFile,
     )
     expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
+  })
+
+  /** The success path tags the analytics event by platform; on android that is google_drive. */
+  it("logs the google_drive backup method on android", async () => {
+    const originalOS = Platform.OS
+    Object.defineProperty(Platform, "OS", { value: "android", configurable: true })
+    mockUpload.mockResolvedValue({ success: true })
+
+    try {
+      const { result } = renderHook(() =>
+        useCloudBackup({ isEncrypted: false, password: "" }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+    } finally {
+      Object.defineProperty(Platform, "OS", { value: originalOS, configurable: true })
+    }
+
+    expect(mockLogBackupCompleted).toHaveBeenCalledWith({ backupMethod: "google_drive" })
   })
 
   it("uploads encrypted backup when encryption enabled", async () => {
