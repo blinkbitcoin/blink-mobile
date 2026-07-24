@@ -740,6 +740,7 @@ const runRestrictionInvariantCase = async ({
   }
 }
 
+// eslint-disable-next-line max-lines-per-function
 describe("HomeScreen", () => {
   beforeEach(() => {
     currentMocks = []
