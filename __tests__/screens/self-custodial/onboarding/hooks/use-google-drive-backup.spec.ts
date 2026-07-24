@@ -42,6 +42,12 @@ jest.mock("@react-native-google-signin/google-signin", () => ({
     clearCachedAccessToken: (...args: readonly unknown[]) =>
       mockClearCachedAccessToken(...args),
   },
+  statusCodes: {
+    SIGN_IN_CANCELLED: "SIGN_IN_CANCELLED",
+    IN_PROGRESS: "IN_PROGRESS",
+    PLAY_SERVICES_NOT_AVAILABLE: "PLAY_SERVICES_NOT_AVAILABLE",
+    SIGN_IN_REQUIRED: "SIGN_IN_REQUIRED",
+  },
 }))
 
 const mockFindAppDataFile = jest.fn()
@@ -62,8 +68,10 @@ jest.mock("@app/utils/google-drive-client", () => {
 })
 
 const mockRecordError = jest.fn()
+const mockCrashlyticsLog = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: readonly unknown[]) => mockRecordError(...args),
+  log: (...args: readonly unknown[]) => mockCrashlyticsLog(...args),
 }))
 
 const { DriveError } = jest.requireActual(
@@ -73,6 +81,7 @@ const { CloudBackupErrorReason: DriveErrorReason } = jest.requireActual(
   "@app/types/cloud-backup",
 ) as typeof import("@app/types/cloud-backup")
 
+// eslint-disable-next-line max-lines-per-function
 describe("useGoogleDriveBackup", () => {
   /** clearAllMocks leaves queued *Once values behind, so an unconsumed one would be served
    *  to the next test. Reset drains them, which means re-declaring every default here. */
@@ -150,6 +159,32 @@ describe("useGoogleDriveBackup", () => {
         reason: DriveErrorReason.Unknown,
       })
       expect(mockRecordError).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not record sign-in cancellations signalled by google-signin status codes", async () => {
+      mockSignIn.mockRejectedValueOnce(
+        Object.assign(new Error("user cancelled the sign in flow"), {
+          code: "SIGN_IN_CANCELLED",
+        }),
+      )
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+
+      let sessionResult:
+        | Awaited<ReturnType<typeof result.current.startSession>>
+        | undefined
+      await act(async () => {
+        sessionResult = await result.current.startSession("backup.json")
+      })
+
+      expect(sessionResult).toEqual({
+        success: false,
+        reason: DriveErrorReason.Unknown,
+      })
+      expect(mockRecordError).not.toHaveBeenCalled()
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        expect.stringContaining("[expected]"),
+      )
     })
 
     it("checks play services before signing in on android", async () => {
@@ -582,8 +617,8 @@ describe("useGoogleDriveBackup", () => {
 
     it("reports a DriveError to crashlytics as-is, preserving the original instance", async () => {
       const original = new DriveError(
-        DriveErrorReason.Transient,
-        "Drive upload failed (503): Service unavailable",
+        DriveErrorReason.Auth,
+        "Drive upload failed (403): Forbidden",
       )
       mockUploadAppDataFile.mockRejectedValueOnce(original)
 
@@ -594,6 +629,29 @@ describe("useGoogleDriveBackup", () => {
       })
 
       expect(mockRecordError).toHaveBeenCalledWith(original)
+    })
+
+    it("downgrades transient DriveErrors (network/5xx/429) to a breadcrumb", async () => {
+      mockUploadAppDataFile.mockRejectedValueOnce(
+        new DriveError(DriveErrorReason.Transient, "Drive network error: offline"),
+      )
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+
+      let uploadResult: Awaited<ReturnType<typeof result.current.upload>> | undefined
+      await act(async () => {
+        uploadResult = await result.current.upload(
+          '{"test": true}',
+          "backup.json",
+          mockSession,
+        )
+      })
+
+      expect(uploadResult).toEqual({ success: false, reason: DriveErrorReason.Transient })
+      expect(mockRecordError).not.toHaveBeenCalled()
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        expect.stringContaining("Drive network error"),
+      )
     })
 
     it("wraps a generic Error with the upload operation context when reporting", async () => {
