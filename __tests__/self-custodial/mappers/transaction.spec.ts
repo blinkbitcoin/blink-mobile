@@ -15,6 +15,7 @@ import {
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (err: Error) => mockRecordError(err),
+  log: jest.fn(),
 }))
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => {

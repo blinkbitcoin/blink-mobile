@@ -11,7 +11,7 @@ import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { isIos } from "@app/utils/helper"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { recordAppError } from "@app/utils/error-reporting"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import HoneyBadgerShovel from "./honey-badger-shovel-01.svg"
@@ -30,7 +30,7 @@ export const ErrorScreen = ({
   const { name: bankName } = appConfig.galoyInstance
   const styles = useStyles()
 
-  useEffect(() => crashlytics().recordError(error), [error])
+  useEffect(() => recordAppError(error, { alwaysRecord: true }), [error])
 
   const resetApp = async () => {
     await logout()

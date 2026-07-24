@@ -3,9 +3,9 @@ import { Alert, Share } from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { Invoice, InvoiceType } from "../payment/index.types"
 
@@ -43,7 +43,7 @@ export const usePaymentActions = ({
       await Share.share({ message: copyableContent })
     } catch (err) {
       if (err instanceof Error) {
-        crashlytics().recordError(err)
+        reportError("payment-actions", err)
         Alert.alert(err.message)
       }
     }

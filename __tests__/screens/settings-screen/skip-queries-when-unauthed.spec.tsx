@@ -122,6 +122,7 @@ jest.mock("@app/components/set-lightning-address-modal", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: jest.fn(),
+  log: jest.fn(),
 }))
 
 jest.mock("react-native-share", () => ({
