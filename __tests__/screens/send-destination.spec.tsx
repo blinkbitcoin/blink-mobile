@@ -450,6 +450,19 @@ describe("SendBitcoinDestinationScreen", () => {
       input: "newuser",
       expectPhoneNotAllowed: false,
     },
+    {
+      // https://github.com/blinkbitcoin/blink-wip/issues/917 — the local part
+      // is a valid phone number for the detected country (SV in this suite),
+      // but user@domain input must be treated as a lightning address
+      name: "accepts lightning addresses whose local part is a valid phone number",
+      input: "70000000@bitzed.xyz",
+      expectPhoneNotAllowed: false,
+    },
+    {
+      name: "accepts lightning addresses with alphanumeric local parts",
+      input: "u66474248@rurbit.mooo.com",
+      expectPhoneNotAllowed: false,
+    },
   ])("$name", async ({ input, expectPhoneNotAllowed }) => {
     parseDestinationMock.mockResolvedValue({
       valid: true,

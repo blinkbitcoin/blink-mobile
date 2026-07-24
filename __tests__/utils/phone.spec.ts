@@ -28,6 +28,32 @@ describe("parseValidPhoneNumber", () => {
   it("returns null for invalid country code combination", () => {
     expect(parseValidPhoneNumber("123", "US")).toBeNull()
   })
+
+  it("returns null for lightning addresses whose local part is a valid phone number", () => {
+    // https://github.com/blinkbitcoin/blink-wip/issues/917 — libphonenumber
+    // extracts the phone number out of the surrounding text unless told not to,
+    // so user@domain lightning addresses were misdetected as phone numbers
+    expect(parseValidPhoneNumber("0777491011@bitzed.xyz", "ZM")).toBeNull()
+    expect(parseValidPhoneNumber("70000000@bitzed.xyz", "SV")).toBeNull()
+    expect(parseValidPhoneNumber("+256777491011@bitzed.xyz", "ZM")).toBeNull()
+    expect(parseValidPhoneNumber("+50370000000@blink.sv")).toBeNull()
+    // https://github.com/blinkbitcoin/blink-mobile/issues/4021 — Flash (Benin)
+    // uses phone numbers as lightning address usernames; BJ is the only detected
+    // country for which this local part parses as a valid phone number
+    expect(parseValidPhoneNumber("2290161757483@bitcoinflash.xyz", "BJ")).toBeNull()
+  })
+
+  it("returns null for lightning addresses with alphanumeric local parts", () => {
+    expect(parseValidPhoneNumber("u66474248@rurbit.mooo.com", "ZM")).toBeNull()
+  })
+
+  it("still parses phone numbers with common formatting characters", () => {
+    expect(parseValidPhoneNumber("+260 777 491 011")?.number).toBe("+260777491011")
+    expect(parseValidPhoneNumber("077-749-1011", "ZM")?.number).toBe("+260777491011")
+    expect(parseValidPhoneNumber("(077) 749 1011", "ZM")?.number).toBe("+260777491011")
+    // the bare number behind #4021's lightning address still parses
+    expect(parseValidPhoneNumber("2290161757483", "BJ")?.number).toBe("+2290161757483")
+  })
 })
 
 describe("isPhoneNumber", () => {
@@ -46,6 +72,11 @@ describe("isPhoneNumber", () => {
   it("returns false for usernames that look like numbers", () => {
     expect(isPhoneNumber("user123")).toBe(false)
     expect(isPhoneNumber("test@blink.sv")).toBe(false)
+  })
+
+  it("returns false for lightning addresses whose local part is a valid phone number", () => {
+    expect(isPhoneNumber("+50370000000@blink.sv")).toBe(false)
+    expect(isPhoneNumber("+14155552671@bitzed.xyz")).toBe(false)
   })
 
   it("returns false for valid phone numbers without plus sign even when format is recognized", () => {
