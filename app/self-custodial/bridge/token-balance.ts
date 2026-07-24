@@ -35,7 +35,7 @@ export const fetchUsdbDecimals = async (sdk: BreezSdkInterface): Promise<number>
     recordErrorOnce(
       "spark-token-decimals-missing",
       new Error(
-        `Spark token decimals unavailable; falling back to ${SparkToken.DefaultDecimals}`,
+        `Spark token decimals missing from metadata; falling back to ${SparkToken.DefaultDecimals}`,
       ),
     )
     return SparkToken.DefaultDecimals
