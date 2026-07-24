@@ -66,8 +66,23 @@ type AccountRegistryResult = {
 
 const AccountRegistryContext = createContext<AccountRegistryResult | null>(null)
 
-/** Owns the registry so its two device reads run once and are shared via context. */
-export const AccountRegistryProvider = ({ children }: { children: ReactNode }) => {
+/**
+ * Owns the registry so its two device reads run once and are shared via context.
+ *
+ * `skipHydration` is a test-only affordance: it skips the two async device
+ * reads so the provider settles synchronously on mount. In the jest
+ * environment those reads resolve to empty data anyway, but their promises
+ * settle after the test body finishes, tripping React's "not wrapped in
+ * act(...)" warning in every suite that mounts a screen. Production callers
+ * must never pass it.
+ */
+export const AccountRegistryProvider = ({
+  children,
+  skipHydration = false,
+}: {
+  children: ReactNode
+  skipHydration?: boolean
+}) => {
   const isAuthed = useIsAuthed()
   const { persistentState, updateState } = usePersistentStateContext()
   const { LL } = useI18nContext()
@@ -86,8 +101,8 @@ export const AccountRegistryProvider = ({ children }: { children: ReactNode }) =
   const [hasStoredCustodialProfile, setHasStoredCustodialProfile] = useState(isAuthed)
 
   // True until both async reads settle, so callers can wait before trusting `accounts`.
-  const [selfCustodialHydrating, setSelfCustodialHydrating] = useState(true)
-  const [profilesHydrating, setProfilesHydrating] = useState(true)
+  const [selfCustodialHydrating, setSelfCustodialHydrating] = useState(!skipHydration)
+  const [profilesHydrating, setProfilesHydrating] = useState(!skipHydration)
 
   // Consumers can call the reload below at any time, so a read that is still in
   // flight may resolve after a newer one has already answered. Applying it then
@@ -95,6 +110,8 @@ export const AccountRegistryProvider = ({ children }: { children: ReactNode }) =
   const reloadRequestRef = useRef(0)
 
   const reloadSelfCustodialAccounts = useCallback(async () => {
+    if (skipHydration) return
+
     const request = reloadRequestRef.current + 1
     reloadRequestRef.current = request
 
@@ -107,13 +124,14 @@ export const AccountRegistryProvider = ({ children }: { children: ReactNode }) =
       setSelfCustodialEntries(result.entries)
     }
     setSelfCustodialHydrating(false)
-  }, [])
+  }, [skipHydration])
 
   useEffect(() => {
     reloadSelfCustodialAccounts()
   }, [reloadSelfCustodialAccounts, persistentState.activeAccountId])
 
   useEffect(() => {
+    if (skipHydration) return undefined
     let mounted = true
     setProfilesHydrating(true)
     KeyStoreWrapper.getSessionProfiles().then((profiles) => {
@@ -125,7 +143,7 @@ export const AccountRegistryProvider = ({ children }: { children: ReactNode }) =
     return () => {
       mounted = false
     }
-  }, [persistentState.galoyAuthToken, persistentState.activeAccountId])
+  }, [skipHydration, persistentState.galoyAuthToken, persistentState.activeAccountId])
 
   const accounts = useMemo(() => {
     const list: AccountDescriptor[] = []
