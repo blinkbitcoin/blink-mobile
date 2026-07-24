@@ -3369,6 +3369,21 @@ export type UserLogoutMutationVariables = Exact<{
 
 export type UserLogoutMutation = { readonly __typename: 'Mutation', readonly userLogout: { readonly __typename: 'SuccessPayload', readonly success?: boolean | null } };
 
+export type TransactionOwnershipProbeQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type TransactionOwnershipProbeQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string } | { readonly __typename: 'UsdWallet', readonly id: string }>, readonly pendingIncomingTransactions: ReadonlyArray<{ readonly __typename: 'Transaction', readonly id: string }>, readonly transactions?: { readonly __typename: 'TransactionConnection', readonly edges?: ReadonlyArray<{ readonly __typename: 'TransactionEdge', readonly node: { readonly __typename: 'Transaction', readonly id: string } }> | null } | null } } | null };
+
+export type TransactionByIdForWalletQueryVariables = Exact<{
+  walletId: Scalars['WalletId']['input'];
+  txId: Scalars['ID']['input'];
+}>;
+
+
+export type TransactionByIdForWalletQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly walletById: { readonly __typename: 'BTCWallet', readonly id: string, readonly transactionById: { readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } } } | { readonly __typename: 'UsdWallet', readonly id: string, readonly transactionById: { readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly memo?: string | null, readonly createdAt: number, readonly settlementAmount: number, readonly settlementFee: number, readonly settlementDisplayFee: string, readonly settlementCurrency: WalletCurrency, readonly settlementDisplayAmount: string, readonly settlementDisplayCurrency: string, readonly settlementPrice: { readonly __typename: 'PriceOfOneSettlementMinorUnitInDisplayMinorUnit', readonly base: number, readonly offset: number, readonly currencyUnit: string, readonly formattedAmount: string }, readonly initiationVia: { readonly __typename: 'InitiationViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null } | { readonly __typename: 'InitiationViaLn', readonly paymentHash: string, readonly paymentRequest: string } | { readonly __typename: 'InitiationViaOnChain', readonly address: string }, readonly settlementVia: { readonly __typename: 'SettlementViaIntraLedger', readonly counterPartyWalletId?: string | null, readonly counterPartyUsername?: string | null, readonly preImage?: string | null } | { readonly __typename: 'SettlementViaLn', readonly preImage?: string | null } | { readonly __typename: 'SettlementViaOnChain', readonly transactionHash?: string | null, readonly arrivalInMempoolEstimatedAt?: number | null } } } } } | null };
+
 export type GetUsernamesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5271,6 +5286,112 @@ export function useUserLogoutMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UserLogoutMutationHookResult = ReturnType<typeof useUserLogoutMutation>;
 export type UserLogoutMutationResult = Apollo.MutationResult<UserLogoutMutation>;
 export type UserLogoutMutationOptions = Apollo.BaseMutationOptions<UserLogoutMutation, UserLogoutMutationVariables>;
+export const TransactionOwnershipProbeDocument = gql`
+    query transactionOwnershipProbe($first: Int) {
+  me {
+    id
+    defaultAccount {
+      id
+      wallets {
+        id
+      }
+      pendingIncomingTransactions {
+        id
+      }
+      transactions(first: $first) {
+        edges {
+          node {
+            id
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useTransactionOwnershipProbeQuery__
+ *
+ * To run a query within a React component, call `useTransactionOwnershipProbeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTransactionOwnershipProbeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTransactionOwnershipProbeQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *   },
+ * });
+ */
+export function useTransactionOwnershipProbeQuery(baseOptions?: Apollo.QueryHookOptions<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>(TransactionOwnershipProbeDocument, options);
+      }
+export function useTransactionOwnershipProbeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>(TransactionOwnershipProbeDocument, options);
+        }
+export function useTransactionOwnershipProbeSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>(TransactionOwnershipProbeDocument, options);
+        }
+export type TransactionOwnershipProbeQueryHookResult = ReturnType<typeof useTransactionOwnershipProbeQuery>;
+export type TransactionOwnershipProbeLazyQueryHookResult = ReturnType<typeof useTransactionOwnershipProbeLazyQuery>;
+export type TransactionOwnershipProbeSuspenseQueryHookResult = ReturnType<typeof useTransactionOwnershipProbeSuspenseQuery>;
+export type TransactionOwnershipProbeQueryResult = Apollo.QueryResult<TransactionOwnershipProbeQuery, TransactionOwnershipProbeQueryVariables>;
+export const TransactionByIdForWalletDocument = gql`
+    query transactionByIdForWallet($walletId: WalletId!, $txId: ID!) {
+  me {
+    id
+    defaultAccount {
+      id
+      walletById(walletId: $walletId) {
+        id
+        transactionById(transactionId: $txId) {
+          ...Transaction
+        }
+      }
+    }
+  }
+}
+    ${TransactionFragmentDoc}`;
+
+/**
+ * __useTransactionByIdForWalletQuery__
+ *
+ * To run a query within a React component, call `useTransactionByIdForWalletQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTransactionByIdForWalletQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTransactionByIdForWalletQuery({
+ *   variables: {
+ *      walletId: // value for 'walletId'
+ *      txId: // value for 'txId'
+ *   },
+ * });
+ */
+export function useTransactionByIdForWalletQuery(baseOptions: Apollo.QueryHookOptions<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables> & ({ variables: TransactionByIdForWalletQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>(TransactionByIdForWalletDocument, options);
+      }
+export function useTransactionByIdForWalletLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>(TransactionByIdForWalletDocument, options);
+        }
+export function useTransactionByIdForWalletSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>(TransactionByIdForWalletDocument, options);
+        }
+export type TransactionByIdForWalletQueryHookResult = ReturnType<typeof useTransactionByIdForWalletQuery>;
+export type TransactionByIdForWalletLazyQueryHookResult = ReturnType<typeof useTransactionByIdForWalletLazyQuery>;
+export type TransactionByIdForWalletSuspenseQueryHookResult = ReturnType<typeof useTransactionByIdForWalletSuspenseQuery>;
+export type TransactionByIdForWalletQueryResult = Apollo.QueryResult<TransactionByIdForWalletQuery, TransactionByIdForWalletQueryVariables>;
 export const GetUsernamesDocument = gql`
     query getUsernames {
   me {

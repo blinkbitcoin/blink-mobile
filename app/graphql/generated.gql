@@ -1910,6 +1910,25 @@ query totpRegistrationScreen {
   }
 }
 
+query transactionByIdForWallet($walletId: WalletId!, $txId: ID!) {
+  me {
+    id
+    defaultAccount {
+      id
+      walletById(walletId: $walletId) {
+        id
+        transactionById(transactionId: $txId) {
+          ...Transaction
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query transactionListForContact($username: Username!, $first: Int, $after: String, $last: Int, $before: String) {
   me {
     id
@@ -1935,6 +1954,35 @@ query transactionListForDefaultAccount($first: Int, $after: String, $walletIds: 
       }
       transactions(first: $first, after: $after, walletIds: $walletIds) {
         ...TransactionList
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+query transactionOwnershipProbe($first: Int) {
+  me {
+    id
+    defaultAccount {
+      id
+      wallets {
+        id
+        __typename
+      }
+      pendingIncomingTransactions {
+        id
+        __typename
+      }
+      transactions(first: $first) {
+        edges {
+          node {
+            id
+            __typename
+          }
+          __typename
+        }
         __typename
       }
       __typename

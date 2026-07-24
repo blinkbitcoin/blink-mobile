@@ -2527,7 +2527,11 @@
     "receivingAccount": "Cont de primire",
     "sendingAccount": "Cont de trimitere",
     "txNotBroadcast": "Tranzacția dvs. este în așteptare. Ar trebui să apară în mempool {countdown: string}.",
-    "momentarily": "momentan"
+    "momentarily": "momentan",
+    "findingAccount": "Se caută contul pentru această plată...",
+    "txNotFoundInAccounts": "Această plată nu a fost găsită în niciun cont de pe acest dispozitiv. Poate aparține unui cont deconectat.",
+    "txLoadFailed": "Nu s-a putut încărca această plată. Verificați conexiunea și încercați din nou.",
+    "switchedForPayment": "S-a comutat la {identifier: string} pentru a afișa această plată"
   },
   "FeeRatesScreen": {
     "title": "Ratele taxelor",

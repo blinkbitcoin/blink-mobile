@@ -2527,7 +2527,11 @@
     "receivingAccount": "Akun Penerima",
     "sendingAccount": "Akun Pengirim",
     "txNotBroadcast": "Transaksi Anda sedang antri. Itu akan muncul di mempool {countdown: string}.",
-    "momentarily": "sebentar lagi"
+    "momentarily": "sebentar lagi",
+    "findingAccount": "Mencari akun untuk pembayaran ini...",
+    "txNotFoundInAccounts": "Pembayaran ini tidak ditemukan di akun mana pun di perangkat ini. Mungkin milik akun yang telah keluar.",
+    "txLoadFailed": "Tidak dapat memuat pembayaran ini. Periksa koneksi Anda dan coba lagi.",
+    "switchedForPayment": "Beralih ke {identifier: string} untuk menampilkan pembayaran ini"
   },
   "FeeRatesScreen": {
     "title": "Tarif biaya",

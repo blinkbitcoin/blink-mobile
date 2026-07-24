@@ -2527,7 +2527,11 @@
     "receivingAccount": "Rekening waarin onvang word",
     "sendingAccount": "Rekening waaruit gestuur word",
     "txNotBroadcast": "Jou transaksie is hangend en sal na die BItcoin-netwerk uitgesaai word binne oomblikke.",
-    "momentarily": "oombliklik"
+    "momentarily": "oombliklik",
+    "findingAccount": "Soek tans die rekening vir hierdie betaling...",
+    "txNotFoundInAccounts": "Hierdie betaling kon in geen rekening op hierdie toestel gevind word nie. Dit behoort dalk aan 'n rekening wat uitgeteken is.",
+    "txLoadFailed": "Kon nie hierdie betaling laai nie. Kontroleer jou verbinding en probeer weer.",
+    "switchedForPayment": "Oorgeskakel na {identifier: string} om hierdie betaling te wys"
   },
   "FeeRatesScreen": {
     "title": "Fooitariewe",

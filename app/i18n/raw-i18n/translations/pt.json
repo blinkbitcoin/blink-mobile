@@ -2527,7 +2527,11 @@
         "receivingAccount": "Saldo de Recebimento",
         "sendingAccount": "Saldo de Envio",
         "txNotBroadcast": "Sua transação está na fila. Deve aparecer na mempool {countdown: string}.",
-        "momentarily": "momentaneamente"
+        "momentarily": "momentaneamente",
+        "findingAccount": "Procurando a conta deste pagamento...",
+        "txNotFoundInAccounts": "Este pagamento não foi encontrado em nenhuma conta neste dispositivo. Ele pode pertencer a uma conta desconectada.",
+        "txLoadFailed": "Não foi possível carregar este pagamento. Verifique sua conexão e tente novamente.",
+        "switchedForPayment": "Mudou para {identifier: string} para mostrar este pagamento"
     },
     "FeeRatesScreen": {
         "title": "Taxas",

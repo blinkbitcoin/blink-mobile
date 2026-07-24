@@ -2634,6 +2634,11 @@ const en: BaseTranslation = {
     txNotBroadcast:
       "Your transaction is queued. It should appear in the mempool {countdown: string}.",
     momentarily: "momentarily",
+    findingAccount: "Finding the account for this payment...",
+    txNotFoundInAccounts:
+      "This payment couldn't be found in any account on this device. It may belong to an account that was logged out.",
+    txLoadFailed: "Couldn't load this payment. Check your connection and try again.",
+    switchedForPayment: "Switched to {identifier: string} to show this payment",
   },
   FeeRatesScreen: {
     title: "Fee rates",

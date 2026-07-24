@@ -2527,7 +2527,11 @@
     "receivingAccount": "Kawsayniyta qillqata sutichinaqin yachachinaqin sutiyuq",
     "sendingAccount": "Kawsayniyta yachachinaqin qillqata sutiyuq",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "usqhaylla"
+    "momentarily": "usqhaylla",
+    "findingAccount": "Kay pagopaq cuentata maskachkan...",
+    "txNotFoundInAccounts": "Kay pagoqa mana tarikurqachu kay aparatopi ima cuentapipas. Huk lluqsisqa cuentapa kanman.",
+    "txLoadFailed": "Kay pagota mana cargayta atikurqachu. Conexionniykita qhaway, hukmanta ruwaykuy.",
+    "switchedForPayment": "{identifier: string}man tikrarqayku kay pagota rikuchinapaq"
   },
   "FeeRatesScreen": {
     "title": "Chaninkuna",

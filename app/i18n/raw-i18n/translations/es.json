@@ -2527,7 +2527,11 @@
         "receivingAccount": "Saldo receptor",
         "sendingAccount": "Saldo de envío",
         "txNotBroadcast": "Tu transacción está en cola. Debería aparecer en la Mempool en {countdown: string}.",
-        "momentarily": "momentáneamente"
+        "momentarily": "momentáneamente",
+        "findingAccount": "Buscando la cuenta de este pago...",
+        "txNotFoundInAccounts": "Este pago no se encontró en ninguna cuenta de este dispositivo. Puede pertenecer a una cuenta cuya sesión fue cerrada.",
+        "txLoadFailed": "No se pudo cargar este pago. Verifica tu conexión e intenta de nuevo.",
+        "switchedForPayment": "Se cambió a {identifier: string} para mostrar este pago"
     },
     "FeeRatesScreen": {
         "title": "Tarifas de comisiones",

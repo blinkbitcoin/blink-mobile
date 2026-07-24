@@ -121,7 +121,7 @@ export type RootStackParamList = {
   phoneFlow: NavigatorScreenParams<PhoneValidationStackParamList>
   phoneRegistrationInitiate: undefined
   phoneRegistrationValidate: { phone: string; channel: PhoneCodeChannelType }
-  transactionDetail: { txid: string }
+  transactionDetail: { txid: string; recipientUserId?: string }
   unclaimedDepositsScreen: undefined
   transactionHistory?: {
     wallets?: ReadonlyArray<{

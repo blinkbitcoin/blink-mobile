@@ -2527,7 +2527,11 @@
     "receivingAccount": "Рачун за примање",
     "sendingAccount": "Рачун за слање",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "ускоро"
+    "momentarily": "ускоро",
+    "findingAccount": "Тражење налога за ову уплату...",
+    "txNotFoundInAccounts": "Ова уплата није пронађена ни на једном налогу на овом уређају. Можда припада налогу који је одјављен.",
+    "txLoadFailed": "Ову уплату није могуће учитати. Проверите везу и покушајте поново.",
+    "switchedForPayment": "Пребачено на {identifier: string} ради приказа ове уплате"
   },
   "FeeRatesScreen": {
     "title": "Стопе накнада",

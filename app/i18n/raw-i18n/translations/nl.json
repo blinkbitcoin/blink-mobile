@@ -2527,7 +2527,11 @@
     "receivingAccount": "Ontvangend saldo",
     "sendingAccount": "Verzendend saldo",
     "txNotBroadcast": "Uw transactie is momenteel in behandeling en wordt binnen enkele ogenblikken naar het Bitcoin-netwerk verzonden.",
-    "momentarily": "binnenkort"
+    "momentarily": "binnenkort",
+    "findingAccount": "Account voor deze betaling zoeken...",
+    "txNotFoundInAccounts": "Deze betaling is in geen enkel account op dit apparaat gevonden. Mogelijk hoort deze bij een uitgelogd account.",
+    "txLoadFailed": "Kan deze betaling niet laden. Controleer uw verbinding en probeer het opnieuw.",
+    "switchedForPayment": "Overgeschakeld naar {identifier: string} om deze betaling te tonen"
   },
   "FeeRatesScreen": {
     "title": "Kostentarieven",

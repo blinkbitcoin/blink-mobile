@@ -2527,7 +2527,11 @@
     "receivingAccount": "Prijímajúci zostatok",
     "sendingAccount": "Odosielajúci zostatok",
     "txNotBroadcast": "Vaša transakcia je zaradená do frontu. Mala by sa objaviť v mempoole {countdown: string}.",
-    "momentarily": "momentálne"
+    "momentarily": "momentálne",
+    "findingAccount": "Hľadá sa účet pre túto platbu...",
+    "txNotFoundInAccounts": "Táto platba sa nenašla v žiadnom účte v tomto zariadení. Môže patriť k odhlásenému účtu.",
+    "txLoadFailed": "Túto platbu sa nepodarilo načítať. Skontrolujte pripojenie a skúste to znova.",
+    "switchedForPayment": "Prepnuté na {identifier: string} na zobrazenie tejto platby"
   },
   "FeeRatesScreen": {
     "title": "Sadzby poplatkov",

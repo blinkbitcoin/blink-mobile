@@ -2527,7 +2527,11 @@
     "receivingAccount": "Compte receptor",
     "sendingAccount": "Compte d'enviament",
     "txNotBroadcast": "La teva transacció està en cua. Hauria d'aparèixer a la mempool {countdown: string}.",
-    "momentarily": "momentàniament"
+    "momentarily": "momentàniament",
+    "findingAccount": "S'està cercant el compte d'aquest pagament...",
+    "txNotFoundInAccounts": "Aquest pagament no s'ha trobat en cap compte d'aquest dispositiu. Pot pertànyer a un compte desconnectat.",
+    "txLoadFailed": "No s'ha pogut carregar aquest pagament. Comprova la connexió i torna-ho a provar.",
+    "switchedForPayment": "S'ha canviat a {identifier: string} per mostrar aquest pagament"
   },
   "FeeRatesScreen": {
     "title": "Tarifes de comissions",

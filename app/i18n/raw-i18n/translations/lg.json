@@ -2527,7 +2527,11 @@
     "receivingAccount": "Akawunti Efuna",
     "sendingAccount": "Akawunti Esindika",
     "txNotBroadcast": "Empanyisiganya yo eri mu lunnyiriri. Kisaanye okulabika mu mempool {countdown: string}.",
-    "momentarily": "akaseera katono"
+    "momentarily": "akaseera katono",
+    "findingAccount": "Tunoonya akawunti y'okusasula kuno...",
+    "txNotFoundInAccounts": "Okusasula kuno tekuzuuliddwa mu kawunti yonna ku kyuma kino. Kuyinza okuba nga kwa kawunti eyaggibwamu.",
+    "txLoadFailed": "Tetusobodde kutikka kusasula kuno. Kebera omutimbagano gwo oddemu ogezeeko.",
+    "switchedForPayment": "Tukyusizza ku {identifier: string} okulaga okusasula kuno"
   },
   "FeeRatesScreen": {
     "title": "Emiwendo gy'ebisale",

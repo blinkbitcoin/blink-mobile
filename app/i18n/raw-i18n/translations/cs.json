@@ -2527,7 +2527,11 @@
     "receivingAccount": "Přijímací zůstatek",
     "sendingAccount": "Odesílající zůstatek",
     "txNotBroadcast": "Vaše transakce právě probíhá a za chvíli bude odeslána do Bitcoinové sítě.",
-    "momentarily": "za okamžik"
+    "momentarily": "za okamžik",
+    "findingAccount": "Hledání účtu pro tuto platbu...",
+    "txNotFoundInAccounts": "Tato platba nebyla nalezena v žádném účtu v tomto zařízení. Může patřit k odhlášenému účtu.",
+    "txLoadFailed": "Tuto platbu se nepodařilo načíst. Zkontrolujte připojení a zkuste to znovu.",
+    "switchedForPayment": "Přepnuto na {identifier: string} pro zobrazení této platby"
   },
   "FeeRatesScreen": {
     "title": "Sazby poplatků",

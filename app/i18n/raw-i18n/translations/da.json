@@ -2527,7 +2527,11 @@
     "receivingAccount": "Modtagelseskonto",
     "sendingAccount": "Afsendelseskonto",
     "txNotBroadcast": "Din transaktion er i kø. Den bør vises i mempoolen om {countdown: string}.",
-    "momentarily": "Et øjeblik"
+    "momentarily": "Et øjeblik",
+    "findingAccount": "Finder kontoen for denne betaling...",
+    "txNotFoundInAccounts": "Denne betaling blev ikke fundet på nogen konto på denne enhed. Den tilhører muligvis en konto, der er logget ud.",
+    "txLoadFailed": "Kunne ikke indlæse denne betaling. Tjek din forbindelse, og prøv igen.",
+    "switchedForPayment": "Skiftede til {identifier: string} for at vise denne betaling"
   },
   "FeeRatesScreen": {
     "title": "Gebyrsatser",

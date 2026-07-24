@@ -2527,7 +2527,11 @@
     "receivingAccount": "Ukufumana iAkhawunti",
     "sendingAccount": "Ukuthumela iAkhawunti",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "okwethutyana"
+    "momentarily": "okwethutyana",
+    "findingAccount": "Ikhangela i-akhawunti yale ntlawulo...",
+    "txNotFoundInAccounts": "Le ntlawulo ayifumanekanga kuyo nayiphi na i-akhawunti kwesi sixhobo. Isenokuba yeye-akhawunti ephume ngaphandle.",
+    "txLoadFailed": "Ayikwazanga ukulayisha le ntlawulo. Khangela uqhagamshelo lwakho uzame kwakhona.",
+    "switchedForPayment": "Itshintshele ku-{identifier: string} ukubonisa le ntlawulo"
   },
   "FeeRatesScreen": {
     "title": "Amazinga emirhumo",

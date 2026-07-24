@@ -2527,7 +2527,11 @@
     "receivingAccount": "Receiving Account",
     "sendingAccount": "Sending Account",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "ในอีกสักครู่"
+    "momentarily": "ในอีกสักครู่",
+    "findingAccount": "กำลังค้นหาบัญชีของการชำระเงินนี้...",
+    "txNotFoundInAccounts": "ไม่พบการชำระเงินนี้ในบัญชีใด ๆ บนอุปกรณ์นี้ อาจเป็นของบัญชีที่ออกจากระบบไปแล้ว",
+    "txLoadFailed": "ไม่สามารถโหลดการชำระเงินนี้ได้ ตรวจสอบการเชื่อมต่อของคุณแล้วลองอีกครั้ง",
+    "switchedForPayment": "สลับไปที่ {identifier: string} เพื่อแสดงการชำระเงินนี้"
   },
   "FeeRatesScreen": {
     "title": "อัตราค่าธรรมเนียม",
