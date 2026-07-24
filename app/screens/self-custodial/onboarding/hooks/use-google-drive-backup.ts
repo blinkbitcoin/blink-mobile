@@ -1,8 +1,9 @@
 import { useCallback, useState } from "react"
 import { Platform } from "react-native"
 
-import { GoogleSignin } from "@react-native-google-signin/google-signin"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin"
+
+import { recordAppError } from "@app/utils/error-reporting"
 
 import {
   CloudBackupDownloadResult,
@@ -52,13 +53,30 @@ type DriveOperation = (typeof DriveOperation)[keyof typeof DriveOperation]
 const reasonFromError = (err: unknown): CloudBackupErrorReason =>
   err instanceof DriveError ? err.reason : CloudBackupErrorReason.Unknown
 
+// Sign-in outcomes that are user/device states, not defects: cancelled, already in
+// progress, no Play services (de-Googled devices), or simply not signed in yet.
+const EXPECTED_SIGNIN_CODES: readonly string[] = [
+  statusCodes.SIGN_IN_CANCELLED,
+  statusCodes.IN_PROGRESS,
+  statusCodes.PLAY_SERVICES_NOT_AVAILABLE,
+  statusCodes.SIGN_IN_REQUIRED,
+].map(String)
+
+const hasSignInCode = (err: unknown): err is { code: unknown } =>
+  typeof err === "object" && err !== null && "code" in err
+
+const isExpectedDriveState = (err: unknown): boolean =>
+  (err instanceof DriveError && err.reason === CloudBackupErrorReason.Transient) ||
+  (hasSignInCode(err) && EXPECTED_SIGNIN_CODES.includes(String(err.code)))
+
 const reportDriveError = (operation: DriveOperation, err: unknown): void => {
-  if (err instanceof DriveError) {
-    crashlytics().recordError(err)
-    return
-  }
-  const message = err instanceof Error ? err.message : String(err)
-  crashlytics().recordError(new Error(`Drive ${operation} failed: ${message}`))
+  const error =
+    err instanceof DriveError
+      ? err
+      : new Error(
+          `Drive ${operation} failed: ${err instanceof Error ? err.message : String(err)}`,
+        )
+  recordAppError(error, { expected: isExpectedDriveState(err) })
 }
 
 export const useGoogleDriveBackup = () => {

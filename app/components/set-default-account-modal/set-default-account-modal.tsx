@@ -12,7 +12,7 @@ import {
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { reportError } from "@app/utils/error-logging"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
@@ -75,9 +75,7 @@ export const SetDefaultAccountModal = ({
           },
         })
       } catch (err) {
-        if (err instanceof Error) {
-          crashlytics().recordError(err)
-        }
+        reportError("set-default-account-modal", err)
       }
     }
     setUsdLoading(false)
@@ -97,9 +95,7 @@ export const SetDefaultAccountModal = ({
           },
         })
       } catch (err) {
-        if (err instanceof Error) {
-          crashlytics().recordError(err)
-        }
+        reportError("set-default-account-modal", err)
       }
     }
     setBtcLoading(false)

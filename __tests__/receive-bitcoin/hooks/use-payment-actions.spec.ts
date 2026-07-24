@@ -29,6 +29,7 @@ jest.mock("@react-native-clipboard/clipboard", () => ({
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: ReadonlyArray<Error>) => mockRecordError(...args),
+  log: jest.fn(),
 }))
 
 describe("usePaymentActions", () => {

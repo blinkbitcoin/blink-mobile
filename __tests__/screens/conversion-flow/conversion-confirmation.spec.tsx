@@ -124,6 +124,7 @@ jest.mock("react-native-haptic-feedback", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: jest.fn(),
+  log: jest.fn(),
 }))
 
 jest.mock("@app/utils/toast", () => ({

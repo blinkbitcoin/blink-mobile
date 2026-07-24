@@ -3,7 +3,7 @@ import { Platform, PermissionsAndroid } from "react-native"
 
 import { ApolloClient, gql } from "@apollo/client"
 import { DeviceNotificationTokenCreateDocument } from "@app/graphql/generated"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { reportError } from "@app/utils/error-logging"
 import messaging from "@react-native-firebase/messaging"
 
 // No op if the permission has already been requested
@@ -34,9 +34,9 @@ export const addDeviceToken = async (client: ApolloClient<unknown>): Promise<voi
       variables: { input: { deviceToken } },
     })
   } catch (err: unknown) {
-    if (err instanceof Error) {
-      crashlytics().recordError(err)
-    }
+    reportError("device-token-registration", err, {
+      dedupKey: "device-token-registration",
+    })
     console.error(err, "impossible to upload device token")
   }
   if (addingDeviceToken) {

@@ -20,6 +20,7 @@ jest.mock("@app/self-custodial/logging", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
+  log: jest.fn(),
 }))
 
 describe("validateStoredNetwork", () => {
@@ -49,17 +50,18 @@ describe("validateStoredNetwork", () => {
     expect(await validateStoredNetwork("test-account-id", Network.Regtest)).toBe(false)
   })
 
-  it("records the mismatch to crashlytics with the wallet/config networks in the message", async () => {
+  it("reports the mismatch only through the SDK log channel (which records via the boundary)", async () => {
     mockGetMnemonicNetworkForAccount.mockResolvedValue("mainnet")
 
     await validateStoredNetwork("test-account-id", Network.Regtest)
 
-    expect(mockRecordError).toHaveBeenCalledTimes(1)
-    const recordedError = mockRecordError.mock.calls[0][0]
-    expect(recordedError).toBeInstanceOf(Error)
-    expect(recordedError.message).toContain("Network mismatch")
-    expect(recordedError.message).toContain("wallet=mainnet")
-    expect(recordedError.message).toContain("config=regtest")
+    // No direct recordError: logSdkEvent at Error level owns recording (with
+    // session dedup) since the boundary refactor.
+    expect(mockRecordError).not.toHaveBeenCalled()
+    expect(mockLogSdkEvent).toHaveBeenCalledWith(
+      "error",
+      expect.stringContaining("Network mismatch"),
+    )
   })
 
   it("emits an SDK log event at Error level with the mismatch message", async () => {

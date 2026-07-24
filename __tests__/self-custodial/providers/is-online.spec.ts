@@ -9,10 +9,11 @@ import {
 
 const mockGetSparkStatus = jest.fn()
 const mockRecordError = jest.fn()
+const mockLog = jest.fn()
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
   __esModule: true,
-  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+  default: () => ({ recordError: mockRecordError, log: mockLog }),
 }))
 
 jest.mock("@app/self-custodial/bridge", () => ({
@@ -187,18 +188,18 @@ describe("getOnlineState (3-state)", () => {
 describe("crashlytics reporting on Spark status failures", () => {
   beforeEach(() => {
     mockRecordError.mockClear()
+    mockLog.mockClear()
   })
 
-  it("records to crashlytics once per session when getServiceStatus catches the SDK error", async () => {
+  it("downgrades connectivity failures to breadcrumbs when getServiceStatus catches the SDK error", async () => {
     const fresh = loadFreshIsOnlineModule()
     mockGetSparkStatus.mockRejectedValue(new Error("network down"))
 
     await fresh.getServiceStatus()
     await fresh.getServiceStatus()
-    await fresh.getServiceStatus()
 
-    expect(mockRecordError).toHaveBeenCalledTimes(1)
-    expect(mockRecordError.mock.calls[0][0].message).toBe("network down")
+    expect(mockRecordError).not.toHaveBeenCalled()
+    expect(mockLog).toHaveBeenCalledWith("[transient] network down")
   })
 
   it("records to crashlytics once per session when getOnlineState catches the SDK error", async () => {

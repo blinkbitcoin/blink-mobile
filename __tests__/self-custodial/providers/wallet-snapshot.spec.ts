@@ -11,10 +11,11 @@ import {
 } from "@app/self-custodial/providers/wallet-snapshot"
 
 const mockRecordError = jest.fn()
+const mockLog = jest.fn()
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
   __esModule: true,
-  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+  default: () => ({ recordError: mockRecordError, log: mockLog }),
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
@@ -487,6 +488,65 @@ describe("isKnownPayment crashlytics reporting", () => {
     })
     expect(reportedErrors).toHaveLength(1)
     expect(reportedErrors[0][0].message).toContain("expected=test-token-id")
+  })
+})
+
+describe("USDB token missing while USD history exists", () => {
+  beforeEach(() => {
+    mockRecordError.mockClear()
+    mockLog.mockClear()
+  })
+
+  const usdTokenPayment = (id: string) => ({
+    id,
+    paymentType: 1,
+    amount: BigInt(1000),
+    fees: BigInt(0),
+    timestamp: BigInt(100),
+    status: 0,
+    method: 2, // PaymentMethod.Token
+    details: {
+      tag: "Token",
+      inner: { metadata: { ticker: "USDB", decimals: 6, identifier: "test-token-id" } },
+    },
+  })
+
+  it("records a defect once when the token is absent but USD transactions exist (silent 0 balance)", async () => {
+    const fresh = loadFreshSnapshotModule()
+    const sdk = {
+      getInfo: jest.fn().mockResolvedValue({
+        identityPubkey: "pk",
+        balanceSats: 0,
+        tokenBalances: {},
+      }),
+      listPayments: jest.fn().mockResolvedValue({ payments: [usdTokenPayment("usd-1")] }),
+    } as never
+
+    await fresh.getSelfCustodialWalletSnapshot(sdk)
+    await fresh.getSelfCustodialWalletSnapshot(sdk)
+
+    const guardCalls = mockRecordError.mock.calls.filter((args) =>
+      String(args[0]?.message).includes("USD transactions exist"),
+    )
+    expect(guardCalls).toHaveLength(1)
+  })
+
+  it("does not record when the token is absent and there is no USD history (fresh wallet)", async () => {
+    const fresh = loadFreshSnapshotModule()
+    const sdk = {
+      getInfo: jest.fn().mockResolvedValue({
+        identityPubkey: "pk",
+        balanceSats: 0,
+        tokenBalances: {},
+      }),
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [buildKnownPayment("btc-only")],
+      }),
+    } as never
+
+    await fresh.getSelfCustodialWalletSnapshot(sdk)
+
+    expect(mockRecordError).not.toHaveBeenCalled()
   })
 })
 

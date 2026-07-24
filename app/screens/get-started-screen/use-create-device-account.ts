@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from "uuid"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import analytics from "@react-native-firebase/analytics"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -15,6 +14,7 @@ import {
   logCreateDeviceAccountFailure,
   logCreatedDeviceAccount,
 } from "@app/utils/analytics"
+import { reportError } from "@app/utils/error-logging"
 
 const DEVICE_ACCOUNT_CREDENTIALS_KEY = "device-account"
 
@@ -95,9 +95,7 @@ export const useCreateDeviceAccount = () => {
         setHasError(true)
         logCreateDeviceAccountFailure()
 
-        if (err instanceof Error) {
-          crashlytics().recordError(err)
-        }
+        reportError("create-device-account", err)
 
         console.error("Device account creation error:", err)
         throw err

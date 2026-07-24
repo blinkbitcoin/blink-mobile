@@ -1,20 +1,23 @@
-import crashlytics from "@react-native-firebase/crashlytics"
+import { recordAppError, toError } from "@app/utils/error-reporting"
 
 type LogErrorArgs = {
   scope: string
   error: unknown
   context?: Record<string, unknown>
+  expected?: boolean
+  dedupKey?: string
 }
 
-const formatError = (error: unknown): Error =>
-  error instanceof Error
-    ? error
-    : new Error(typeof error === "string" ? error : JSON.stringify(error))
-
-export const logError = ({ scope, error, context }: LogErrorArgs): void => {
-  const formatted = formatError(error)
+export const logError = ({
+  scope,
+  error,
+  context,
+  expected,
+  dedupKey,
+}: LogErrorArgs): void => {
+  const formatted = toError(error)
   formatted.message = `[${scope}] ${formatted.message}`
-  crashlytics().recordError(formatted)
+  recordAppError(formatted, { expected, dedupKey })
   if (__DEV__) {
     console.error(`[${scope}]`, error, context ?? "")
   }

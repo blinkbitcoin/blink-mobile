@@ -36,6 +36,7 @@ jest.mock("@app/self-custodial/providers/wallet-snapshot", () => ({
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
+  log: jest.fn(),
 }))
 
 const TEST_ACCOUNT_ID = "account-123"
