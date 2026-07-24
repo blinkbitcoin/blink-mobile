@@ -11,8 +11,9 @@ import { PaymentDestinationDisplay } from "@app/components/payment-destination-d
 import { Screen } from "@app/components/screen"
 import { WarningBanner } from "@app/components/warning-banner"
 import { HIDDEN_AMOUNT_PLACEHOLDER } from "@app/config"
-import { WalletCurrency } from "@app/graphql/generated"
+import { Transaction, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
+import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
 import { useClipboard, useDisplayCurrency } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -37,8 +38,10 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
 import { useSendBalances } from "./hooks/use-send-wallets"
+import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
+import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import useFee from "./use-fee"
-import { useSendPayment } from "./use-send-payment"
+import { PaymentSendCompletedStatus, useSendPayment } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
 import { ellipsizeMiddle } from "@app/utils/helper"
 
@@ -115,6 +118,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   })
 
   const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
+  const [isVerifying, setIsVerifying] = useState(false)
+  const verifyPaymentSettled = useVerifyPaymentSettled()
   const { LL } = useI18nContext()
   const translateSdkError = useTranslateSdkError()
   const { copyToClipboard } = useClipboard()
@@ -192,6 +197,75 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     moneyAmount: secondaryAmount ?? ZeroUsdMoneyAmount,
   })
 
+  const navigateToCompleted = React.useCallback(
+    async ({
+      status,
+      extraInfo,
+      transaction,
+    }: {
+      status: PaymentSendCompletedStatus
+      extraInfo?: PaymentSendExtraInfo
+      transaction?: Partial<Transaction> | null
+    }) => {
+      await saveLnAddressContact({
+        paymentType,
+        destination,
+        isMerchant:
+          paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
+      })
+
+      navigation.dispatch((state) => {
+        const routes = [
+          { name: "Primary" },
+          {
+            name: "sendBitcoinCompleted",
+            params: {
+              arrivalAtMempoolEstimate: extraInfo?.arrivalAtMempoolEstimate,
+              status,
+              successAction: extraInfo?.successAction ?? paymentDetail?.successAction,
+              preimage: extraInfo?.preimage,
+              note,
+              currencyAmount,
+              satAmount,
+              currencyFeeAmount,
+              satFeeAmount,
+              destination:
+                paymentDetail?.paymentType === "intraledger"
+                  ? destination
+                  : ellipsizeMiddle(destination, {
+                      maxLength: 50,
+                      maxResultLeft: 13,
+                      maxResultRight: 8,
+                    }),
+              paymentType: paymentDetail?.paymentType,
+              createdAt: transaction?.createdAt,
+            },
+          },
+        ]
+        return CommonActions.reset({
+          ...state,
+          routes,
+          index: routes.length - 1,
+        })
+      })
+      ReactNativeHapticFeedback.trigger("notificationSuccess", {
+        ignoreAndroidSystemSettings: true,
+      })
+    },
+    [
+      saveLnAddressContact,
+      navigation,
+      paymentType,
+      destination,
+      paymentDetail,
+      note,
+      currencyAmount,
+      satAmount,
+      currencyFeeAmount,
+      satFeeAmount,
+    ],
+  )
+
   const handleSendPayment = React.useCallback(async () => {
     if (!sendPayment || !sendingWalletDescriptor?.currency) {
       return sendPayment
@@ -211,50 +285,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       })
 
       if (status === "SUCCESS" || status === "PENDING") {
-        await saveLnAddressContact({
-          paymentType,
-          destination,
-          isMerchant:
-            paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
-        })
-
-        navigation.dispatch((state) => {
-          const routes = [
-            { name: "Primary" },
-            {
-              name: "sendBitcoinCompleted",
-              params: {
-                arrivalAtMempoolEstimate: extraInfo?.arrivalAtMempoolEstimate,
-                status,
-                successAction: extraInfo?.successAction ?? paymentDetail?.successAction,
-                preimage: extraInfo?.preimage,
-                note,
-                currencyAmount,
-                satAmount,
-                currencyFeeAmount,
-                satFeeAmount,
-                destination:
-                  paymentDetail?.paymentType === "intraledger"
-                    ? destination
-                    : ellipsizeMiddle(destination, {
-                        maxLength: 50,
-                        maxResultLeft: 13,
-                        maxResultRight: 8,
-                      }),
-                paymentType: paymentDetail?.paymentType,
-                createdAt: transaction?.createdAt,
-              },
-            },
-          ]
-          return CommonActions.reset({
-            ...state,
-            routes,
-            index: routes.length - 1,
-          })
-        })
-        ReactNativeHapticFeedback.trigger("notificationSuccess", {
-          ignoreAndroidSystemSettings: true,
-        })
+        await navigateToCompleted({ status, extraInfo, transaction })
         return
       }
 
@@ -277,9 +308,45 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       if (err instanceof Error) {
         crashlytics().recordError(err)
 
-        const indempotencyErrorPattern = /409: Conflict/i
-        if (indempotencyErrorPattern.test(err.message)) {
+        if (isIdempotencyConflict(err)) {
+          // The server already processed a first attempt of this payment, so it may well
+          // have succeeded — check the ledger before claiming failure.
+          const paymentRequest =
+            paymentDetail.paymentType === "lightning"
+              ? destination
+              : paymentDetail.paymentType === "lnurl"
+                ? paymentDetail.paymentRequest
+                : undefined
+
+          if (paymentRequest) {
+            setIsVerifying(true)
+            let verified
+            try {
+              verified = await verifyPaymentSettled({
+                walletId: sendingWalletDescriptor.id,
+                paymentRequest,
+              })
+            } finally {
+              setIsVerifying(false)
+            }
+            if (verified) {
+              logPaymentResult({
+                paymentType: paymentDetail.paymentType,
+                paymentStatus: verified.status,
+                sendingWallet: sendingWalletDescriptor.currency,
+              })
+              await navigateToCompleted({
+                status: verified.status,
+                transaction: { createdAt: verified.createdAt },
+              })
+              return
+            }
+          }
+
           setPaymentError(LL.SendBitcoinConfirmationScreen.paymentAlreadyAttempted())
+          ReactNativeHapticFeedback.trigger("notificationError", {
+            ignoreAndroidSystemSettings: true,
+          })
           return
         }
 
@@ -288,19 +355,13 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     }
   }, [
     LL,
-    navigation,
     paymentDetail,
     sendPayment,
     setPaymentError,
-    sendingWalletDescriptor?.currency,
-    paymentType,
+    sendingWalletDescriptor,
     destination,
-    saveLnAddressContact,
-    currencyAmount,
-    satAmount,
-    currencyFeeAmount,
-    satFeeAmount,
-    note,
+    navigateToCompleted,
+    verifyPaymentSettled,
     translateSdkError,
   ])
 
@@ -537,7 +598,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           <PanGestureHandler>
             <View style={styles.sliderContainer}>
               <GaloySliderButton
-                isLoading={sendPaymentLoading}
+                isLoading={sendPaymentLoading || isVerifying}
                 initialText={LL.SendBitcoinConfirmationScreen.slideToConfirm()}
                 loadingText={LL.SendBitcoinConfirmationScreen.slideConfirming()}
                 onSwipe={handleSendPayment}

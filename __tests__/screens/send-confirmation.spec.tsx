@@ -179,6 +179,11 @@ jest.mock("@app/screens/send-bitcoin-screen/use-fee", () => ({
   default: () => mockUseFee(),
 }))
 
+const verifyPaymentSettledMock = jest.fn()
+jest.mock("@app/screens/send-bitcoin-screen/hooks/use-verify-payment-settled", () => ({
+  useVerifyPaymentSettled: () => verifyPaymentSettledMock,
+}))
+
 const mockUseSendBalances = jest.fn()
 jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => ({
   ...jest.requireActual("@app/screens/send-bitcoin-screen/hooks/use-send-wallets"),
@@ -974,5 +979,147 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
     await flushEffects()
 
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", () => {
+  const conflictError = Object.assign(
+    new Error("HTTP fetch failed from 'galoy': 409: Conflict"),
+    { statusCode: 409 },
+  )
+
+  const buildLnurlRoute = () => {
+    const { createLnurlPaymentDetails } = PaymentDetailsLightning
+    return {
+      key: "sendBitcoinConfirmationScreen",
+      name: "sendBitcoinConfirmation",
+      params: { paymentDetail: createLnurlPaymentDetails(defaultLightningParams) },
+    } as const
+  }
+
+  const findCompletedRouteParams = () => {
+    const reducerCalls = navigationDispatchMock.mock.calls
+      .map(([reducer]) => reducer)
+      .filter(
+        (reducer): reducer is (state: unknown) => unknown =>
+          typeof reducer === "function",
+      )
+    for (const reducer of reducerCalls) {
+      const action = reducer({ index: 0, routes: [] }) as {
+        payload?: { routes?: Array<{ name: string; params?: unknown }> }
+        routes?: Array<{ name: string; params?: unknown }>
+      }
+      const routes = action.payload?.routes ?? action.routes ?? []
+      const completed = routes.find((r) => r.name === "sendBitcoinCompleted")
+      if (completed) return completed.params as { status?: unknown; createdAt?: unknown }
+    }
+    throw new Error("sendBitcoinCompleted route was not dispatched")
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 10000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  it("navigates to the completed screen when the ledger confirms the payment settled", async () => {
+    sendPaymentMock.mockRejectedValueOnce(conflictError)
+    verifyPaymentSettledMock.mockResolvedValueOnce({
+      status: "SUCCESS",
+      createdAt: 1700000000,
+    })
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(verifyPaymentSettledMock).toHaveBeenCalledWith({
+      walletId: btcSendingWalletDescriptor.id,
+      paymentRequest: defaultLightningParams.paymentRequest,
+    })
+    const params = findCompletedRouteParams()
+    expect(params.status).toBe("SUCCESS")
+    expect(params.createdAt).toBe(1700000000)
+    expect(screen.queryByText(/Payment already attempted/i)).toBeNull()
+  })
+
+  it("falls back to the already-attempted message when settlement cannot be confirmed", async () => {
+    sendPaymentMock.mockRejectedValueOnce(conflictError)
+    verifyPaymentSettledMock.mockResolvedValueOnce(undefined)
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(verifyPaymentSettledMock).toHaveBeenCalledTimes(1)
+    expect(screen.getByText(/Payment already attempted/i)).toBeTruthy()
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+  })
+
+  it("does not attempt verification for an intraledger payment", async () => {
+    sendPaymentMock.mockRejectedValueOnce(conflictError)
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={route} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
+    expect(screen.getByText(/Payment already attempted/i)).toBeTruthy()
+    expect(navigationDispatchMock).not.toHaveBeenCalled()
+  })
+
+  it("still surfaces non-conflict errors unchanged", async () => {
+    sendPaymentMock.mockRejectedValueOnce(new Error("insufficient balance"))
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
+    expect(screen.getByText("insufficient balance")).toBeTruthy()
   })
 })

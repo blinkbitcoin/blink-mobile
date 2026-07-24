@@ -3701,6 +3701,14 @@ export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 export type MyLnUpdatesSubscription = { readonly __typename: 'Subscription', readonly myUpdates: { readonly __typename: 'MyUpdatesPayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly update?: { readonly __typename: 'IntraLedgerUpdate' } | { readonly __typename: 'LnUpdate', readonly paymentHash: string, readonly status: InvoicePaymentStatus } | { readonly __typename: 'OnChainUpdate' } | { readonly __typename: 'Price' } | { readonly __typename: 'RealtimePrice' } | null } };
 
+export type TransactionsByPaymentHashQueryVariables = Exact<{
+  walletId: Scalars['WalletId']['input'];
+  paymentHash: Scalars['PaymentHash']['input'];
+}>;
+
+
+export type TransactionsByPaymentHashQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly walletById: { readonly __typename: 'BTCWallet', readonly id: string, readonly transactionsByPaymentHash: ReadonlyArray<{ readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly createdAt: number }> } | { readonly __typename: 'UsdWallet', readonly id: string, readonly transactionsByPaymentHash: ReadonlyArray<{ readonly __typename: 'Transaction', readonly id: string, readonly status: TxStatus, readonly direction: TxDirection, readonly createdAt: number }> } } } | null };
+
 export type ScanningQrCodeScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -7674,6 +7682,59 @@ export function useMyLnUpdatesSubscription(baseOptions?: Apollo.SubscriptionHook
       }
 export type MyLnUpdatesSubscriptionHookResult = ReturnType<typeof useMyLnUpdatesSubscription>;
 export type MyLnUpdatesSubscriptionResult = Apollo.SubscriptionResult<MyLnUpdatesSubscription>;
+export const TransactionsByPaymentHashDocument = gql`
+    query transactionsByPaymentHash($walletId: WalletId!, $paymentHash: PaymentHash!) {
+  me {
+    id
+    defaultAccount {
+      id
+      walletById(walletId: $walletId) {
+        id
+        transactionsByPaymentHash(paymentHash: $paymentHash) {
+          id
+          status
+          direction
+          createdAt
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useTransactionsByPaymentHashQuery__
+ *
+ * To run a query within a React component, call `useTransactionsByPaymentHashQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTransactionsByPaymentHashQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTransactionsByPaymentHashQuery({
+ *   variables: {
+ *      walletId: // value for 'walletId'
+ *      paymentHash: // value for 'paymentHash'
+ *   },
+ * });
+ */
+export function useTransactionsByPaymentHashQuery(baseOptions: Apollo.QueryHookOptions<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables> & ({ variables: TransactionsByPaymentHashQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>(TransactionsByPaymentHashDocument, options);
+      }
+export function useTransactionsByPaymentHashLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>(TransactionsByPaymentHashDocument, options);
+        }
+export function useTransactionsByPaymentHashSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>(TransactionsByPaymentHashDocument, options);
+        }
+export type TransactionsByPaymentHashQueryHookResult = ReturnType<typeof useTransactionsByPaymentHashQuery>;
+export type TransactionsByPaymentHashLazyQueryHookResult = ReturnType<typeof useTransactionsByPaymentHashLazyQuery>;
+export type TransactionsByPaymentHashSuspenseQueryHookResult = ReturnType<typeof useTransactionsByPaymentHashSuspenseQuery>;
+export type TransactionsByPaymentHashQueryResult = Apollo.QueryResult<TransactionsByPaymentHashQuery, TransactionsByPaymentHashQueryVariables>;
 export const ScanningQrCodeScreenDocument = gql`
     query scanningQRCodeScreen {
   globals {

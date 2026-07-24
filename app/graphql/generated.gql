@@ -1954,6 +1954,28 @@ query transactionListForDefaultAccount($first: Int, $after: String, $walletIds: 
   }
 }
 
+query transactionsByPaymentHash($walletId: WalletId!, $paymentHash: PaymentHash!) {
+  me {
+    id
+    defaultAccount {
+      id
+      walletById(walletId: $walletId) {
+        id
+        transactionsByPaymentHash(paymentHash: $paymentHash) {
+          id
+          status
+          direction
+          createdAt
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query walletOverviewScreen {
   me {
     id
