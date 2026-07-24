@@ -1,11 +1,29 @@
 import { renderHook, act } from "@testing-library/react-native"
+import { Platform } from "react-native"
 
+import { i18nObject } from "@app/i18n/i18n-util"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { useGoogleDriveBackup } from "@app/screens/self-custodial/onboarding/hooks/use-google-drive-backup"
+import type { CloudBackupErrorReason } from "@app/types/cloud-backup"
+
+loadLocale("en")
+const LL = i18nObject("en")
+
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata"
+
+/** Mirrors the shape the library returns, which is what the scope check reads. */
+const signInSuccess = (scopes: readonly string[] = [DRIVE_SCOPE]) => ({
+  type: "success" as const,
+  data: { scopes },
+})
 
 const mockConfigure = jest.fn()
 const mockHasPlayServices = jest.fn(() => Promise.resolve(true))
 const mockSignOut = jest.fn(() => Promise.resolve())
-const mockSignIn = jest.fn(() => Promise.resolve({ idToken: "token" }))
+const mockSignIn = jest.fn((): Promise<unknown> => Promise.resolve(signInSuccess()))
+const mockAddScopes = jest.fn(
+  (..._args: readonly unknown[]): Promise<unknown> => Promise.resolve(signInSuccess()),
+)
 const mockGetTokens = jest.fn(() =>
   Promise.resolve({ accessToken: "test-access-token", idToken: "token" }),
 )
@@ -16,6 +34,7 @@ jest.mock("@react-native-google-signin/google-signin", () => ({
     hasPlayServices: () => mockHasPlayServices(),
     signOut: () => mockSignOut(),
     signIn: () => mockSignIn(),
+    addScopes: (...args: readonly unknown[]) => mockAddScopes(...args),
     getTokens: () => mockGetTokens(),
   },
 }))
@@ -50,8 +69,18 @@ const { CloudBackupErrorReason: DriveErrorReason } = jest.requireActual(
 ) as typeof import("@app/types/cloud-backup")
 
 describe("useGoogleDriveBackup", () => {
+  /** clearAllMocks leaves queued *Once values behind, so an unconsumed one would be served
+   *  to the next test. Reset drains them, which means re-declaring every default here. */
   beforeEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
+    mockHasPlayServices.mockResolvedValue(true)
+    mockSignOut.mockResolvedValue(undefined)
+    mockSignIn.mockResolvedValue(signInSuccess())
+    mockAddScopes.mockResolvedValue(signInSuccess())
+    mockGetTokens.mockResolvedValue({
+      accessToken: "test-access-token",
+      idToken: "token",
+    })
   })
 
   it("returns initial state", () => {
@@ -115,6 +144,162 @@ describe("useGoogleDriveBackup", () => {
         reason: DriveErrorReason.Unknown,
       })
       expect(mockRecordError).toHaveBeenCalledTimes(1)
+    })
+
+    it("checks play services before signing in on android", async () => {
+      const originalOS = Platform.OS
+      Object.defineProperty(Platform, "OS", { value: "android", configurable: true })
+      mockFindAppDataFile.mockResolvedValueOnce(undefined)
+
+      try {
+        const { result } = renderHook(() => useGoogleDriveBackup())
+        await act(async () => {
+          await result.current.startSession("backup.json")
+        })
+      } finally {
+        Object.defineProperty(Platform, "OS", { value: originalOS, configurable: true })
+      }
+
+      expect(mockHasPlayServices).toHaveBeenCalled()
+    })
+
+    /** Signing out first only clears a stale session; there may be none to clear. */
+    it("signs in anyway when the preceding sign-out fails", async () => {
+      mockSignOut.mockRejectedValueOnce(new Error("no session to clear"))
+      mockFindAppDataFile.mockResolvedValueOnce(undefined)
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+      let sessionResult:
+        | Awaited<ReturnType<typeof result.current.startSession>>
+        | undefined
+      await act(async () => {
+        sessionResult = await result.current.startSession("backup.json")
+      })
+
+      expect(sessionResult).toMatchObject({ success: true })
+    })
+  })
+
+  /** Google's granular consent lets the user finish sign-in with the Drive scope
+   *  unchecked, which used to surface as a generic "sign in failed". */
+  describe("drive scope consent", () => {
+    const startSession = async () => {
+      const { result } = renderHook(() => useGoogleDriveBackup())
+      let sessionResult:
+        | Awaited<ReturnType<typeof result.current.startSession>>
+        | undefined
+      await act(async () => {
+        sessionResult = await result.current.startSession("backup.json")
+      })
+      return sessionResult
+    }
+
+    it("does not re-prompt when the scope was granted", async () => {
+      mockFindAppDataFile.mockResolvedValueOnce(undefined)
+
+      const sessionResult = await startSession()
+
+      expect(mockAddScopes).not.toHaveBeenCalled()
+      expect(sessionResult).toMatchObject({ success: true })
+    })
+
+    it("re-prompts for the scope when it was declined, and continues once granted", async () => {
+      mockSignIn.mockResolvedValueOnce(signInSuccess(["openid", "email"]))
+      mockAddScopes.mockResolvedValueOnce(signInSuccess())
+      mockFindAppDataFile.mockResolvedValueOnce(undefined)
+
+      const sessionResult = await startSession()
+
+      expect(mockAddScopes).toHaveBeenCalledWith({ scopes: [DRIVE_SCOPE] })
+      expect(sessionResult).toMatchObject({ success: true })
+    })
+
+    it("fails with permission-denied when the scope is declined twice", async () => {
+      mockSignIn.mockResolvedValueOnce(signInSuccess(["openid", "email"]))
+      mockAddScopes.mockResolvedValueOnce(signInSuccess(["openid", "email"]))
+
+      const sessionResult = await startSession()
+
+      expect(sessionResult).toEqual({
+        success: false,
+        reason: DriveErrorReason.PermissionDenied,
+      })
+    })
+
+    it("fails with permission-denied when the re-prompt is dismissed", async () => {
+      mockSignIn.mockResolvedValueOnce(signInSuccess(["openid", "email"]))
+      mockAddScopes.mockResolvedValueOnce(null)
+
+      const sessionResult = await startSession()
+
+      expect(sessionResult).toEqual({
+        success: false,
+        reason: DriveErrorReason.PermissionDenied,
+      })
+    })
+
+    it("fails with permission-denied when the re-prompt is cancelled", async () => {
+      mockSignIn.mockResolvedValueOnce(signInSuccess(["openid", "email"]))
+      mockAddScopes.mockResolvedValueOnce({ type: "cancelled", data: null })
+
+      const sessionResult = await startSession()
+
+      expect(sessionResult).toEqual({
+        success: false,
+        reason: DriveErrorReason.PermissionDenied,
+      })
+    })
+
+    /** A declined scope is the user's choice, so it must not reach the crash reports. */
+    it("does not report a declined scope to crashlytics", async () => {
+      mockSignIn.mockResolvedValueOnce(signInSuccess(["openid", "email"]))
+      mockAddScopes.mockResolvedValueOnce(null)
+
+      await startSession()
+
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    it("treats a re-prompt that does not confirm the scope as a refusal", async () => {
+      mockSignIn.mockResolvedValueOnce(signInSuccess(["openid", "email"]))
+      mockAddScopes.mockResolvedValueOnce({ type: "success", data: {} })
+
+      const sessionResult = await startSession()
+
+      expect(sessionResult).toEqual({
+        success: false,
+        reason: DriveErrorReason.PermissionDenied,
+      })
+    })
+
+    /** The proactive check cannot see a scope list the SDK never sent, so Drive answers
+     *  403 instead; it must still reach the user as a permission problem, not a crash. */
+    it("maps a scope-insufficient 403 from Drive to permission-denied", async () => {
+      mockFindAppDataFile.mockRejectedValueOnce(
+        new DriveError(
+          DriveErrorReason.PermissionDenied,
+          'Drive query failed (403): {"reason":"ACCESS_TOKEN_SCOPE_INSUFFICIENT"}',
+        ),
+      )
+
+      const sessionResult = await startSession()
+
+      expect(sessionResult).toEqual({
+        success: false,
+        reason: DriveErrorReason.PermissionDenied,
+      })
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    /** Defensive: an unexpected response shape must not trap the user in a re-prompt loop. */
+    it("skips the check when the response carries no scope list", async () => {
+      mockSignIn.mockResolvedValueOnce({ type: "cancelled", data: null })
+      mockFindAppDataFile.mockResolvedValueOnce(undefined)
+
+      const sessionResult = await startSession()
+
+      expect(mockAddScopes).not.toHaveBeenCalled()
+      expect(sessionResult).toMatchObject({ success: true })
     })
   })
 
@@ -405,6 +590,38 @@ describe("useGoogleDriveBackup", () => {
       expect(mockRecordError).toHaveBeenCalledWith(
         expect.objectContaining({
           message: "Drive download failed: plain JS error",
+        }),
+      )
+    })
+  })
+
+  describe("resolveErrorMessage", () => {
+    const resolve = (reason: CloudBackupErrorReason) => {
+      const { result } = renderHook(() => useGoogleDriveBackup())
+      return result.current.resolveErrorMessage(reason, LL)
+    }
+
+    it("tells the user to grant storage access when the scope was declined", () => {
+      const message = resolve(DriveErrorReason.PermissionDenied)
+
+      expect(message).toContain("Google Drive")
+      expect(message).not.toBe(
+        LL.BackupScreen.CloudBackup.signInFailed({
+          provider: LL.BackupScreen.BackupMethod.googleDrive(),
+        }),
+      )
+    })
+
+    it("keeps the network message for a transient failure", () => {
+      expect(resolve(DriveErrorReason.Transient)).toBe(
+        LL.BackupScreen.CloudBackup.networkError(),
+      )
+    })
+
+    it("falls back to the generic sign-in message for other reasons", () => {
+      expect(resolve(DriveErrorReason.Unknown)).toBe(
+        LL.BackupScreen.CloudBackup.signInFailed({
+          provider: LL.BackupScreen.BackupMethod.googleDrive(),
         }),
       )
     })

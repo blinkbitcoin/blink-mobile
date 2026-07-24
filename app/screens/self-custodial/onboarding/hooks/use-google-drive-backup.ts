@@ -1,7 +1,10 @@
 import { useCallback, useState } from "react"
 import { Platform } from "react-native"
 
-import { GoogleSignin } from "@react-native-google-signin/google-signin"
+import {
+  GoogleSignin,
+  type SignInResponse,
+} from "@react-native-google-signin/google-signin"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import {
@@ -29,13 +32,45 @@ const configureGoogleSignIn = () => {
   })
 }
 
+/**
+ * Google's granular consent lets the user finish sign-in with the Drive scope unchecked,
+ * so the grant is read back instead of assumed. A response with no scope list is left
+ * alone, so an unexpected shape never forces a needless re-prompt.
+ */
+const grantedScopes = (response: SignInResponse | null): readonly string[] | undefined =>
+  response?.type === "success" ? response.data.scopes : undefined
+
+const isDriveScopeDeclined = (response: SignInResponse | null): boolean => {
+  const scopes = grantedScopes(response)
+  if (!Array.isArray(scopes)) return false
+  return !scopes.includes(DRIVE_SCOPE)
+}
+
+/**
+ * Re-prompts once. A first refusal is usually a misread consent screen; a second is a
+ * decision, and asking in a loop would trap the user. The retry demands a positive grant:
+ * having just asked for this one scope, an answer that does not name it is not a yes.
+ */
+const ensureDriveScope = async (response: SignInResponse): Promise<void> => {
+  if (!isDriveScopeDeclined(response)) return
+
+  const retried = await GoogleSignin.addScopes({ scopes: [DRIVE_SCOPE] })
+  if (grantedScopes(retried)?.includes(DRIVE_SCOPE)) return
+
+  throw new DriveError(
+    CloudBackupErrorReason.PermissionDenied,
+    "Drive sign-in completed without the appdata scope",
+  )
+}
+
 const signIn = async (): Promise<string> => {
   configureGoogleSignIn()
   if (Platform.OS === "android") {
     await GoogleSignin.hasPlayServices()
   }
   await GoogleSignin.signOut().catch(() => {})
-  await GoogleSignin.signIn()
+  const response = await GoogleSignin.signIn()
+  await ensureDriveScope(response)
   const { accessToken } = await GoogleSignin.getTokens()
   return accessToken
 }
@@ -54,6 +89,9 @@ const reasonFromError = (err: unknown): CloudBackupErrorReason =>
 
 const reportDriveError = (operation: DriveOperation, err: unknown): void => {
   if (err instanceof DriveError) {
+    /** A withheld scope is the user's choice, not a defect, so it stays out of the crash
+     *  reports it would otherwise flood. */
+    if (err.reason === CloudBackupErrorReason.PermissionDenied) return
     crashlytics().recordError(err)
     return
   }
@@ -137,6 +175,11 @@ export const useGoogleDriveBackup = () => {
     (reason, LL) => {
       if (reason === CloudBackupErrorReason.Transient) {
         return LL.BackupScreen.CloudBackup.networkError()
+      }
+      if (reason === CloudBackupErrorReason.PermissionDenied) {
+        return LL.BackupScreen.CloudBackup.storageAccessRequired({
+          provider: LL.BackupScreen.BackupMethod.googleDrive(),
+        })
       }
       return LL.BackupScreen.CloudBackup.signInFailed({
         provider: LL.BackupScreen.BackupMethod.googleDrive(),

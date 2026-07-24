@@ -1,6 +1,7 @@
 export const CloudBackupErrorReason = {
   NotFound: "not-found",
   Auth: "auth",
+  PermissionDenied: "permission-denied",
   Transient: "transient",
   Unknown: "unknown",
 } as const
