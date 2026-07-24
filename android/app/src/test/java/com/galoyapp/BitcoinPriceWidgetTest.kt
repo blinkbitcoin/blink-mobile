@@ -5,6 +5,9 @@ import android.content.Context
 import android.view.View
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
+import androidx.work.Configuration
+import androidx.work.testing.SynchronousExecutor
+import androidx.work.testing.WorkManagerTestInitHelper
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -28,6 +31,14 @@ class BitcoinPriceWidgetTest {
         context = ApplicationProvider.getApplicationContext()
         appWidgetManager = AppWidgetManager.getInstance(context)
         shadowAppWidgetManager = Shadows.shadowOf(appWidgetManager)
+
+        // Build a test-friendly configuration using a SynchronousExecutor
+        val config = Configuration.Builder()
+            .setExecutor(SynchronousExecutor())
+            .build()
+
+        // Explicitly initialize WorkManager for the Robolectric environment
+        WorkManagerTestInitHelper.initializeTestWorkManager(context!!, config)
     }
 
     @Test

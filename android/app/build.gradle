@@ -168,6 +168,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.test:core:1.6.0")
     testImplementation("org.robolectric:robolectric:4.16")
+    testImplementation("androidx.work:work-testing:2.9.0")
+
 }
 
 
