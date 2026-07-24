@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Ikopi igcinwe kwi-{provider}",
       "uploadFailed": "Ukufaka ikopi akuphumelelanga",
       "signInFailed": "Akuphumelelanga ukungena ku-{provider}",
+      "storageAccessRequired": "Vumela ufikelelo lwe-{provider: string} ukuze ugcine isipare sesipaji sakho, uze uzame kwakhona.",
       "cloudNotAvailable": "I-iCloud Drive ayifumaneki. Nceda ngena ku-iCloud kwiisetingi uvule i-iCloud Drive.",
       "networkError": "Impazamo yothungelwano. Nceda ujonge uxhumano lwakho uphinde uzame.",
       "existingBackupTitle": "Ikopi ifunyenwe",

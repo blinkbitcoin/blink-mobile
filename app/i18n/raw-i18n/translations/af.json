@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Rugsteun gestoor in {provider}",
       "uploadFailed": "Kon nie rugsteun oplaai nie",
       "signInFailed": "Kon nie by {provider} aanmeld nie",
+      "storageAccessRequired": "Gee {provider: string} toegang om jou beursie te rugsteun, en probeer dan weer.",
       "cloudNotAvailable": "iCloud Drive is nie beskikbaar nie. Meld asseblief in Instellings by iCloud aan en aktiveer iCloud Drive.",
       "networkError": "Netwerkfout. Maak asseblief seker van jou verbinding en probeer weer.",
       "existingBackupTitle": "Rugsteun gevind",

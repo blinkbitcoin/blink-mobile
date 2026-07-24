@@ -3567,6 +3567,7 @@
             "uploadSuccess": "Sauvegarde enregistrée dans {provider}",
             "uploadFailed": "Échec du téléchargement de la sauvegarde",
             "signInFailed": "Échec de la connexion à {provider}",
+            "storageAccessRequired": "Autorisez l'accès à {provider: string} pour sauvegarder votre portefeuille, puis réessayez.",
             "cloudNotAvailable": "iCloud Drive n'est pas disponible. Veuillez vous connecter à iCloud dans les Réglages et activer iCloud Drive.",
             "networkError": "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
             "existingBackupTitle": "Sauvegarde trouvée",

@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Sigurnosna kopija spremljena u {provider}",
       "uploadFailed": "Učitavanje sigurnosne kopije nije uspjelo",
       "signInFailed": "Prijava na {provider} nije uspjela",
+      "storageAccessRequired": "Dopustite pristup {provider: string} kako biste sigurnosno kopirali novčanik i pokušajte ponovno.",
       "cloudNotAvailable": "iCloud Drive nije dostupan. Prijavite se na iCloud u Postavkama i omogućite iCloud Drive.",
       "networkError": "Pogreška mreže. Provjerite vezu i pokušajte ponovno.",
       "existingBackupTitle": "Sigurnosna kopija pronađena",

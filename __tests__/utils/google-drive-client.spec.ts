@@ -77,6 +77,49 @@ describe("google drive client", () => {
     expect(error.reason).toBe(DriveErrorReason.Auth)
   })
 
+  /** Google reports a withheld Drive scope inside a 403, which needs its own remedy: the
+   *  user has to grant access, not sign in again. */
+  it("throws DriveError with reason='permission-denied' on a scope-insufficient 403", async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 403,
+      text: async () =>
+        '{"error":{"code":403,"status":"PERMISSION_DENIED","details":[{"reason":"ACCESS_TOKEN_SCOPE_INSUFFICIENT"}]}}',
+    })
+
+    const error = await findAppDataFile("backup.json", "token").catch((e) => e)
+    expect(error).toBeInstanceOf(DriveError)
+    expect(error.reason).toBe(DriveErrorReason.PermissionDenied)
+    expect(error.status).toBe(403)
+  })
+
+  /** The body feeds the scope-insufficient check, so an unreadable one must degrade to a
+   *  plain status classification rather than throwing. */
+  it("classifies by status alone when the error body cannot be read", async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 403,
+      text: async () => {
+        throw new Error("stream already consumed")
+      },
+    })
+
+    const error = await findAppDataFile("backup.json", "token").catch((e) => e)
+    expect(error).toBeInstanceOf(DriveError)
+    expect(error.reason).toBe(DriveErrorReason.Auth)
+  })
+
+  it("exposes the http status on the error", async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 401,
+      text: async () => "Unauthorized",
+    })
+
+    const error = await findAppDataFile("backup.json", "token").catch((e) => e)
+    expect(error.status).toBe(401)
+  })
+
   it("throws DriveError with reason='transient' on 429", async () => {
     ;(global.fetch as jest.Mock).mockResolvedValue({
       ok: false,
@@ -122,6 +165,14 @@ describe("google drive client", () => {
     expect(error).toBeInstanceOf(DriveError)
     expect(error.reason).toBe(DriveErrorReason.Transient)
     expect(error.message).toContain("Drive network error")
+  })
+
+  it("describes a non-Error rejection from fetch", async () => {
+    ;(global.fetch as jest.Mock).mockRejectedValue("socket closed")
+
+    const error = await findAppDataFile("backup.json", "token").catch((e) => e)
+    expect(error).toBeInstanceOf(DriveError)
+    expect(error.message).toContain("socket closed")
   })
 
   it("uploads with POST when there is no existing file", async () => {

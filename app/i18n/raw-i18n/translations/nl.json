@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Back-up opgeslagen in {provider}",
       "uploadFailed": "Uploaden van back-up mislukt",
       "signInFailed": "Aanmelden bij {provider} mislukt",
+      "storageAccessRequired": "Geef {provider: string} toegang om je wallet te back-uppen en probeer het opnieuw.",
       "cloudNotAvailable": "iCloud Drive is niet beschikbaar. Meld je aan bij iCloud in Instellingen en schakel iCloud Drive in.",
       "networkError": "Netwerkfout. Controleer je verbinding en probeer het opnieuw.",
       "existingBackupTitle": "Back-up gevonden",

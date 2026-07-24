@@ -3567,6 +3567,7 @@
             "uploadSuccess": "Backup salvo no {provider}",
             "uploadFailed": "Falha ao enviar o backup",
             "signInFailed": "Falha ao iniciar sessão em {provider}",
+            "storageAccessRequired": "Permita o acesso ao {provider: string} para fazer backup da sua carteira e tente novamente.",
             "cloudNotAvailable": "O iCloud Drive não está disponível. Inicie sessão no iCloud em Ajustes e ative o iCloud Drive.",
             "networkError": "Erro de rede. Verifique a sua ligação e tente novamente.",
             "existingBackupTitle": "Backup encontrado",

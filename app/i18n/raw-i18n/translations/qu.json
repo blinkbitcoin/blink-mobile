@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Waqaychay {provider} nisqaman waqaychasqa",
       "uploadFailed": "Waqaychayta apachiy mana atikurqanchu",
       "signInFailed": "{provider}-man yaykuy mana atikurqachu",
+      "storageAccessRequired": "{provider: string} yaykuyta saqiy billeteraykita waqaychanaykipaq, chaymanta yapamanta ruway.",
       "cloudNotAvailable": "iCloud Drive mana kachkanchu. Iskayllapi iCloudman yaykuy hinaspa iCloud Drive-ta hatarichiy.",
       "networkError": "Antiska panta. Tinkichaykita qhaway hinaspa kutiy ruway.",
       "existingBackupTitle": "Waqaychay tarikusqa",

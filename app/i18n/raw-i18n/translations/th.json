@@ -3567,6 +3567,7 @@
       "uploadSuccess": "สำรองข้อมูลไปยัง {provider} แล้ว",
       "uploadFailed": "อัปโหลดข้อมูลสำรองไม่สำเร็จ",
       "signInFailed": "ลงชื่อเข้าใช้ {provider} ไม่สำเร็จ",
+      "storageAccessRequired": "อนุญาตการเข้าถึง {provider: string} เพื่อสำรองข้อมูลกระเป๋าเงินของคุณ แล้วลองอีกครั้ง",
       "cloudNotAvailable": "iCloud Drive ไม่พร้อมใช้งาน โปรดลงชื่อเข้าใช้ iCloud ในการตั้งค่าและเปิดใช้ iCloud Drive",
       "networkError": "เกิดข้อผิดพลาดของเครือข่าย โปรดตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
       "existingBackupTitle": "พบข้อมูลสำรอง",

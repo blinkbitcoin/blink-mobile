@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Nakala imehifadhiwa kwenye {provider}",
       "uploadFailed": "Imeshindwa kupakia nakala",
       "signInFailed": "Imeshindwa kuingia katika {provider}",
+      "storageAccessRequired": "Ruhusu ufikiaji wa {provider: string} ili kuhifadhi nakala ya pochi yako, kisha ujaribu tena.",
       "cloudNotAvailable": "iCloud Drive haipatikani. Tafadhali ingia katika iCloud kupitia Mipangilio na uwashe iCloud Drive.",
       "networkError": "Hitilafu ya mtandao. Tafadhali angalia muunganisho wako na ujaribu tena.",
       "existingBackupTitle": "Nakala imepatikana",

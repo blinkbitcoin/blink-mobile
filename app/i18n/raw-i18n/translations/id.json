@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Cadangan disimpan ke {provider}",
       "uploadFailed": "Gagal mengunggah cadangan",
       "signInFailed": "Gagal masuk ke {provider}",
+      "storageAccessRequired": "Izinkan akses {provider: string} untuk mencadangkan dompet Anda, lalu coba lagi.",
       "cloudNotAvailable": "iCloud Drive tidak tersedia. Silakan masuk ke iCloud di Pengaturan dan aktifkan iCloud Drive.",
       "networkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
       "existingBackupTitle": "Cadangan ditemukan",

@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Sandaran disimpan ke {provider}",
       "uploadFailed": "Gagal memuat naik sandaran",
       "signInFailed": "Gagal mendaftar masuk ke {provider}",
+      "storageAccessRequired": "Benarkan akses {provider: string} untuk membuat sandaran dompet anda, kemudian cuba lagi.",
       "cloudNotAvailable": "iCloud Drive tidak tersedia. Sila daftar masuk ke iCloud dalam Tetapan dan dayakan iCloud Drive.",
       "networkError": "Ralat rangkaian. Sila periksa sambungan anda dan cuba lagi.",
       "existingBackupTitle": "Sandaran ditemui",

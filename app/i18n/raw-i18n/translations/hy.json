@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Պահուստային պատճենը պահպանվել է {provider}-ում",
       "uploadFailed": "Պահուստային պատճենի վերբեռնումը ձախողվեց",
       "signInFailed": "{provider}-ին մուտքը ձախողվեց",
+      "storageAccessRequired": "Թույլատրեք {provider: string}-ի հասանելիությունը՝ ձեր դրամապանակը պահուստավորելու համար, ապա փորձեք կրկին։",
       "cloudNotAvailable": "iCloud Drive հասանելի չէ։ Մուտք գործեք iCloud Կարգավորումներից և միացրեք iCloud Drive-ը։",
       "networkError": "Ցանցի սխալ։ Ստուգեք միացումը և կրկին փորձեք։",
       "existingBackupTitle": "Պահուստային պատճեն գտնվել է",

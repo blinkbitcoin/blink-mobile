@@ -3567,6 +3567,7 @@
             "uploadSuccess": "Sicherung in {provider} gespeichert",
             "uploadFailed": "Fehler beim Hochladen der Sicherung",
             "signInFailed": "Anmeldung bei {provider} fehlgeschlagen",
+            "storageAccessRequired": "Erlaube den Zugriff auf {provider: string}, um deine Wallet zu sichern, und versuche es erneut.",
             "cloudNotAvailable": "iCloud Drive ist nicht verfügbar. Bitte melde dich in den Einstellungen bei iCloud an und aktiviere iCloud Drive.",
             "networkError": "Netzwerkfehler. Bitte überprüfe deine Verbindung und versuche es erneut.",
             "existingBackupTitle": "Sicherung gefunden",

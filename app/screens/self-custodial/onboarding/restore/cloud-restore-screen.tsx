@@ -32,10 +32,13 @@ export const CloudRestoreScreen: React.FC = () => {
     password,
     setPassword,
     passwordError,
+    errorMessage,
     loadCloudBackups,
     handlePick,
     handleDecrypt,
   } = useCloudRestore()
+
+  const hasErrorMessage = errorMessage !== null
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -83,6 +86,11 @@ export const CloudRestoreScreen: React.FC = () => {
         </Text>
         {isNotFound && (
           <Text style={styles.description}>{LL.RestoreScreen.noBackupDescription()}</Text>
+        )}
+        {hasErrorMessage && (
+          <Text style={styles.description} {...testProps("restore-error-description")}>
+            {errorMessage}
+          </Text>
         )}
       </OnboardingScreenLayout>
     )

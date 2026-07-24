@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Kopi eterekedwa mu {provider}",
       "uploadFailed": "Enteeka y'ekopi teeyasoboka",
       "signInFailed": "Okuyingira mu {provider} kukomye",
+      "storageAccessRequired": "Kkiriza {provider: string} okuyingira osobole okutereka wallet yo, oluvannyuma ogezeeko nate.",
       "cloudNotAvailable": "iCloud Drive teweza. Yingira mu iCloud mu Settings era okkirize iCloud Drive.",
       "networkError": "Ensobi y'omukutu. Kebera enkolagana yo era oddemu okugezaako.",
       "existingBackupTitle": "Kopi efuniddwa",

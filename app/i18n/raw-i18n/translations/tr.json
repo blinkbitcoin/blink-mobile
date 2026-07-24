@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Yedek {provider} hesabına kaydedildi",
       "uploadFailed": "Yedek yüklenemedi",
       "signInFailed": "{provider} hesabınıza giriş yapılamadı",
+      "storageAccessRequired": "Cüzdanınızı yedeklemek için {provider: string} erişimine izin verin, ardından tekrar deneyin.",
       "cloudNotAvailable": "iCloud Drive kullanılamıyor. Lütfen Ayarlar'dan iCloud'da oturum açın ve iCloud Drive'ı etkinleştirin.",
       "networkError": "Ağ hatası. Lütfen bağlantınızı kontrol edip tekrar deneyin.",
       "existingBackupTitle": "Yedek bulundu",
