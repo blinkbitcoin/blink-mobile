@@ -62,7 +62,7 @@
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| @blinkbitcoin/blink-client | 1.0.0 | Blink payment destination parser and API client |
+| @blinkbitcoin/blink-client | 1.1.0 | Blink payment destination parser and API client |
 | bitcoinjs-lib | ^6.1.5 | Bitcoin primitives |
 | bolt11 | ~1.4.1 | Lightning invoice parsing |
 | js-lnurl | 0.6.0 | LNURL protocol |
