@@ -750,7 +750,7 @@ describe("SelfCustodialWalletProvider", () => {
     )
   })
 
-  it("logs to crashlytics when getUserSettings fails (no longer silent)", async () => {
+  it("reports a getUserSettings failure through the SDK log channel (no longer silent)", async () => {
     setupConnectedWallet({
       getMnemonicForAccount: mockGetMnemonicForAccount,
       listSelfCustodialAccounts: mockListSelfCustodialAccounts,
@@ -764,11 +764,13 @@ describe("SelfCustodialWalletProvider", () => {
 
     renderHook(() => useSelfCustodialWallet(), { wrapper })
 
+    // logSdkEvent at Error level owns recording (with session dedup) since the
+    // boundary refactor; no separate direct recordError.
+    const logging = jest.requireMock("@app/self-custodial/logging")
     await waitFor(() => {
-      expect(mockCrashlyticsRecordError).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: expect.stringContaining("getUserSettings failed"),
-        }),
+      expect(logging.logSdkEvent).toHaveBeenCalledWith(
+        "error",
+        expect.stringContaining("getUserSettings failed"),
       )
     })
   })
