@@ -245,6 +245,39 @@ describe("useLnurlWithdrawRedemption — self-custodial branch", () => {
     expect(mockRedeemingError).not.toHaveBeenCalled()
   })
 
+  it("falls back to redeemingError when the self-custodial adapter rejects outright", async () => {
+    mockLnurlWithdraw.mockRejectedValueOnce(new Error("adapter exploded"))
+
+    const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+    await flushEffects()
+
+    expect(result.current.errorMessage).toBe("fallback-redeeming-error")
+    expect(result.current.paid).toBe(false)
+  })
+
+  it("ignores an adapter rejection that lands after unmount (rejection cancellation guard)", async () => {
+    let rejectAdapter: (err: Error) => void = () => {}
+    mockLnurlWithdraw.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectAdapter = reject
+        }),
+    )
+
+    const { unmount } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+    await flushEffects()
+
+    unmount()
+
+    await act(async () => {
+      rejectAdapter(new Error("late failure"))
+      await flushEffects()
+    })
+
+    expect(mockRedeemingError).not.toHaveBeenCalled()
+  })
+
   it("sets pending=true (no error) when the self-custodial adapter resolves Pending (C2)", async () => {
     mockLnurlWithdraw.mockResolvedValue({ status: PaymentResultStatus.Pending })
 
@@ -396,6 +429,16 @@ describe("useLnurlWithdrawRedemption — custodial branch", () => {
 
     expect(result.current.paid).toBe(true)
     expect(mockApolloRefetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("surfaces an error when the mutation resolves without data (no-data contract)", async () => {
+    mockLnInvoiceCreate.mockResolvedValueOnce({ data: undefined })
+
+    const { result } = renderHook(() => useLnurlWithdrawRedemption(defaultParams))
+
+    await flushEffects()
+
+    expect(result.current.errorMessage).toContain("No data returned from lnInvoiceCreate")
   })
 
   it("sets the localized error message when the mutation returns errors[]", async () => {
@@ -652,6 +695,57 @@ describe("useLnurlWithdrawRedemption — custodial branch", () => {
         })
         await flushEffects()
         expect(result.current.paid).toBe(true)
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
+    it("ignores a stale poll response that resolves after the payment was already confirmed", async () => {
+      arrangeAcceptedWithdrawal()
+      let resolvePoll: (value: unknown) => void = () => {}
+      mockApolloQuery.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolvePoll = resolve
+          }),
+      )
+
+      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+      try {
+        const { result, rerender } = renderHook(
+          (props: typeof defaultParams) => useLnurlWithdrawRedemption(props),
+          { initialProps: defaultParams },
+        )
+
+        await flushEffects()
+        await flushEffects()
+        expect(result.current.pending).toBe(true)
+
+        // A poll tick fires and its query stays in flight...
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(3_000)
+        })
+        expect(mockApolloQuery).toHaveBeenCalledTimes(1)
+
+        // ...then the websocket confirms the payment first (cleanup cancels the poll)
+        mockUseLnUpdateHashPaid.mockReturnValue("hash-A")
+        rerender(defaultParams)
+        await flushEffects()
+        expect(result.current.paid).toBe(true)
+        expect(mockApolloRefetch).toHaveBeenCalledTimes(1)
+
+        // The stale response must be ignored: no extra state churn or refetches
+        await act(async () => {
+          resolvePoll({ data: { lnInvoicePaymentStatusByHash: { status: "PAID" } } })
+          await flushEffects()
+        })
+
+        expect(result.current.paid).toBe(true)
+        expect(mockApolloRefetch).toHaveBeenCalledTimes(1)
+        await act(async () => {
+          await jest.advanceTimersByTimeAsync(9_000)
+        })
+        expect(mockApolloQuery).toHaveBeenCalledTimes(1)
       } finally {
         jest.useRealTimers()
       }
