@@ -190,6 +190,7 @@ gql`
   }
 `
 
+// eslint-disable-next-line max-statements -- HomeScreen orchestrates the entire home; splitting solely to meet the 100-statement cap would fragment cohesive setup without improving readability
 export const HomeScreen: React.FC = () => {
   const styles = useStyles()
   const {
