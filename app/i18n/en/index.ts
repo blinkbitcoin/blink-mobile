@@ -3703,7 +3703,7 @@ const en: BaseTranslation = {
       uploadSuccess: "Backup saved to {provider: string}",
       uploadFailed: "Failed to upload backup",
       signInFailed: "Failed to sign in to {provider: string}",
-      storageAccessRequired: "Allow {provider: string} access to back up your wallet, then try again.",
+      storageAccessRequired: "Allow {provider: string} access to your wallet backup, then try again.",
       cloudNotAvailable: "iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.",
       networkError: "Network error. Please check your connection and try again.",
     },

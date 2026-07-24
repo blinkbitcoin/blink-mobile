@@ -11790,7 +11790,7 @@ type RootTranslation = {
 			 */
 			signInFailed: RequiredParams<'provider'>
 			/**
-			 * A​l​l​o​w​ ​{​p​r​o​v​i​d​e​r​}​ ​a​c​c​e​s​s​ ​t​o​ ​b​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​,​ ​t​h​e​n​ ​t​r​y​ ​a​g​a​i​n​.
+			 * A​l​l​o​w​ ​{​p​r​o​v​i​d​e​r​}​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​b​a​c​k​u​p​,​ ​t​h​e​n​ ​t​r​y​ ​a​g​a​i​n​.
 			 * @param {string} provider
 			 */
 			storageAccessRequired: RequiredParams<'provider'>
@@ -24382,7 +24382,7 @@ export type TranslationFunctions = {
 			 */
 			signInFailed: (arg: { provider: string }) => LocalizedString
 			/**
-			 * Allow {provider} access to back up your wallet, then try again.
+			 * Allow {provider} access to your wallet backup, then try again.
 			 */
 			storageAccessRequired: (arg: { provider: string }) => LocalizedString
 			/**
