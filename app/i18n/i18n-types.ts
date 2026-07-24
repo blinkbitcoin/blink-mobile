@@ -7582,6 +7582,10 @@ type RootTranslation = {
 		 */
 		expired: RequiredParams<'date'>
 		/**
+		 * E​x​p​i​r​e​d
+		 */
+		expiredNoDate: string
+		/**
 		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​o​n​l​y​ ​t​i​m​e​ ​t​h​e​ ​k​e​y​ ​i​s​ ​s​h​o​w​n​.​ ​C​o​p​y​ ​o​r​ ​s​h​a​r​e​ ​i​t​ ​n​o​w​ ​a​n​d​ ​s​t​o​r​e​ ​i​t​ ​s​a​f​e​l​y​.
 		 */
 		secretWarning: string
@@ -20388,6 +20392,10 @@ export type TranslationFunctions = {
 		 * Expired {date}
 		 */
 		expired: (arg: { date: string }) => LocalizedString
+		/**
+		 * Expired
+		 */
+		expiredNoDate: () => LocalizedString
 		/**
 		 * This is the only time the key is shown. Copy or share it now and store it safely.
 		 */

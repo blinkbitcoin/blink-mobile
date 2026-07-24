@@ -25,7 +25,9 @@ export const ApiKeyRow: React.FC<Props> = ({ apiKey, onRevoke }) => {
     const statusLabel =
       status === "revoked"
         ? LL.ApiScreen.revoked()
-        : LL.ApiScreen.expired({ date: formatDate(apiKey.expiresAt ?? apiKey.createdAt) })
+        : apiKey.expiresAt
+          ? LL.ApiScreen.expired({ date: formatDate(apiKey.expiresAt) })
+          : LL.ApiScreen.expiredNoDate()
     return (
       <View style={styles.inactive}>
         <SettingsRow

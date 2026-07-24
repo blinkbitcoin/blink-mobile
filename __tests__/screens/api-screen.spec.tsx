@@ -6,6 +6,7 @@ import { Scope } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
+import { toastShow } from "@app/utils/toast"
 
 import { ContextForScreen } from "./helper"
 
@@ -117,6 +118,62 @@ describe("ApiScreen", () => {
     expect(alertSpy).not.toHaveBeenCalled()
   })
 
+  it("renders an expired key without inventing a date when expiresAt is missing", async () => {
+    apiKeysQueryMock.mockReturnValue(
+      makeQueryResult([
+        makeApiKey({ id: "key-e", name: "Stale key", expired: true, expiresAt: null }),
+      ]),
+    )
+
+    render(
+      <ContextForScreen>
+        <ApiScreen />
+      </ContextForScreen>,
+    )
+
+    expect(
+      await screen.findByText(`Read, Receive · ${LL.ApiScreen.expiredNoDate()}`),
+    ).toBeTruthy()
+  })
+
+  it("renders the expiry date on expired keys that have one", async () => {
+    apiKeysQueryMock.mockReturnValue(
+      makeQueryResult([
+        makeApiKey({
+          id: "key-e",
+          name: "Stale key",
+          expired: true,
+          expiresAt: 1897776000,
+        }),
+      ]),
+    )
+
+    render(
+      <ContextForScreen>
+        <ApiScreen />
+      </ContextForScreen>,
+    )
+
+    const expectedDate = new Date(1897776000 * 1000).toLocaleDateString()
+    expect(
+      await screen.findByText(
+        `Read, Receive · ${LL.ApiScreen.expired({ date: expectedDate })}`,
+      ),
+    ).toBeTruthy()
+  })
+
+  it("keeps the create row available while the key list is loading", async () => {
+    apiKeysQueryMock.mockReturnValue({ loading: true, error: undefined, data: undefined })
+
+    render(
+      <ContextForScreen>
+        <ApiScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await screen.findByText(LL.ApiScreen.createKey())).toBeTruthy()
+  })
+
   it("shows the empty state and the create row when there are no keys", async () => {
     apiKeysQueryMock.mockReturnValue(makeQueryResult([]))
 
@@ -158,5 +215,55 @@ describe("ApiScreen", () => {
         variables: { input: { id: "key-1" } },
       }),
     )
+    await waitFor(() =>
+      expect(toastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "success",
+          message: LL.ApiScreen.revokeSuccess(),
+        }),
+      ),
+    )
+  })
+
+  it("shows an error toast when revoking fails", async () => {
+    apiKeyRevokeMock.mockRejectedValueOnce(new Error("boom"))
+    const alertSpy = jest.spyOn(Alert, "alert")
+
+    render(
+      <ContextForScreen>
+        <ApiScreen />
+      </ContextForScreen>,
+    )
+
+    await screen.findByText("BTCPay")
+    fireEvent.press(screen.getByTestId("BTCPay-right"))
+
+    const buttons = alertSpy.mock.calls[0][2] as AlertButton[]
+    buttons.find((button) => button.style === "destructive")?.onPress?.()
+
+    await waitFor(() =>
+      expect(toastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "error",
+          message: LL.ApiScreen.revokeError(),
+        }),
+      ),
+    )
+  })
+
+  it("shows an error box when the key list cannot be loaded", async () => {
+    apiKeysQueryMock.mockReturnValue({
+      loading: false,
+      error: new Error("boom"),
+      data: undefined,
+    })
+
+    render(
+      <ContextForScreen>
+        <ApiScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await screen.findByText(LL.ApiScreen.loadError())).toBeTruthy()
   })
 })

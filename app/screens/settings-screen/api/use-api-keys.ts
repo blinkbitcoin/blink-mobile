@@ -75,12 +75,20 @@ export const formatScopes = (
     [Scope.Receive]: LL.ApiScreen.scopeReceive(),
     [Scope.Write]: LL.ApiScreen.scopeWrite(),
   }
-  return scopes.map((scope) => labels[scope]).join(", ")
+  return scopes
+    .map((scope) => labels[scope])
+    .filter(Boolean)
+    .join(", ")
 }
 
 export const useApiKeysList = () => {
   const isAuthed = useIsAuthed()
-  const { data, loading, error } = useApiKeysQuery({ skip: !isAuthed })
+  // cache-and-network so keys revoked or expired outside the app show up on
+  // revisit; loading is only surfaced before the first data arrives
+  const { data, loading, error } = useApiKeysQuery({
+    skip: !isAuthed,
+    fetchPolicy: "cache-and-network",
+  })
 
   const apiKeys = [...(data?.me?.apiKeys ?? [])].sort((a, b) => {
     const aActive = apiKeyStatus(a) === "active" ? 0 : 1
@@ -89,5 +97,5 @@ export const useApiKeysList = () => {
     return Number(b.createdAt) - Number(a.createdAt)
   })
 
-  return { apiKeys, loading, hasError: Boolean(error) }
+  return { apiKeys, loading: loading && !data, hasError: Boolean(error) }
 }

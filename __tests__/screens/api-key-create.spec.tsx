@@ -175,4 +175,46 @@ describe("ApiKeyCreateScreen", () => {
       expect(shareSpy).toHaveBeenCalledWith({ message: API_KEY_SECRET }),
     )
   })
+
+  it("shows an error and stays on the form when the mutation fails", async () => {
+    apiKeyCreateMock.mockRejectedValueOnce(new Error("boom"))
+
+    renderScreen()
+
+    typeName("CI bot")
+    pressCreate()
+
+    expect(await screen.findByText(LL.ApiScreen.createError())).toBeTruthy()
+    expect(screen.queryByText(LL.ApiScreen.secretWarning())).toBeNull()
+  })
+
+  it("shows an error when the response is missing the secret", async () => {
+    apiKeyCreateMock.mockResolvedValueOnce({
+      data: {
+        apiKeyCreate: {
+          apiKey: {
+            __typename: "ApiKey" as const,
+            id: "key-2",
+            name: "CI bot",
+            createdAt: 1700000000,
+            revoked: false,
+            expired: false,
+            lastUsedAt: null,
+            expiresAt: null,
+            scopes: ["READ"],
+            readOnly: false,
+          },
+          apiKeySecret: "",
+        },
+      },
+    })
+
+    renderScreen()
+
+    typeName("CI bot")
+    pressCreate()
+
+    expect(await screen.findByText(LL.ApiScreen.createError())).toBeTruthy()
+    expect(screen.queryByText(LL.ApiScreen.secretWarning())).toBeNull()
+  })
 })

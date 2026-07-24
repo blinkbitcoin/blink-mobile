@@ -57,33 +57,29 @@ export const ApiScreen: React.FC = () => {
     [LL, apiKeyRevoke],
   )
 
-  const apiKeyItems: React.FC[] = loading
-    ? [() => <SettingsRow title="" action={null} loading />]
-    : [
-        ...(apiKeys.length === 0
-          ? [
-              () => (
-                <SettingsRow
-                  title={LL.ApiScreen.noKeys()}
-                  action={null}
-                  rightIcon={null}
-                />
-              ),
-            ]
-          : apiKeys.map((apiKey) => {
-              const ApiKeyRowItem: React.FC = () => (
-                <ApiKeyRow apiKey={apiKey} onRevoke={revokeApiKey} />
-              )
-              return ApiKeyRowItem
-            })),
-        () => (
-          <SettingsRow
-            title={LL.ApiScreen.createKey()}
-            leftGaloyIcon="key-outline"
-            action={() => navigate("apiKeyCreateScreen")}
-          />
-        ),
-      ]
+  const apiKeyItems: React.FC[] = [
+    ...(loading
+      ? [() => <SettingsRow title="" action={null} loading />]
+      : apiKeys.length === 0
+        ? [
+            () => (
+              <SettingsRow title={LL.ApiScreen.noKeys()} action={null} rightIcon={null} />
+            ),
+          ]
+        : apiKeys.map((apiKey) => {
+            const ApiKeyRowItem: React.FC = () => (
+              <ApiKeyRow apiKey={apiKey} onRevoke={revokeApiKey} />
+            )
+            return ApiKeyRowItem
+          })),
+    () => (
+      <SettingsRow
+        title={LL.ApiScreen.createKey()}
+        leftGaloyIcon="key-outline"
+        action={() => navigate("apiKeyCreateScreen")}
+      />
+    ),
+  ]
 
   const LinkIcon = <GaloyIcon name="arrow-square-out" size={20} color={colors.primary} />
 

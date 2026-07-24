@@ -2415,6 +2415,7 @@ const en: BaseTranslation = {
     neverExpires: "Never expires",
     revoked: "Revoked",
     expired: "Expired {date: string}",
+    expiredNoDate: "Expired",
     secretWarning:
       "This is the only time the key is shown. Copy or share it now and store it safely.",
     secretCopied: "API key copied — clipboard clears in 1 minute",

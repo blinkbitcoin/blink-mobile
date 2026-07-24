@@ -33,6 +33,7 @@ export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
   } = useTheme()
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const allowLeaveRef = React.useRef(false)
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -41,6 +42,22 @@ export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
       gestureEnabled: false,
     })
   }, [navigation, LL])
+
+  // headerBackVisible/gestureEnabled don't cover the Android system back
+  // button — block every removal not initiated by the Done button so the
+  // one-time secret can't be dismissed accidentally
+  React.useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (e) => {
+        if (!allowLeaveRef.current) e.preventDefault()
+      }),
+    [navigation],
+  )
+
+  const finish = () => {
+    allowLeaveRef.current = true
+    navigation.goBack()
+  }
 
   const copySecret = () =>
     copyToClipboard({ content: secret, message: LL.ApiScreen.secretCopied() })
@@ -100,7 +117,7 @@ export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
         <GaloyPrimaryButton
           {...testProps(LL.ApiScreen.done())}
           title={LL.ApiScreen.done()}
-          onPress={() => navigation.goBack()}
+          onPress={finish}
         />
       </View>
     </Screen>
