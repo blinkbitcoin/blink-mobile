@@ -35,16 +35,16 @@ describe("isExpectedBiometricError", () => {
   })
 
   it("matches when the name only appears in the message", () => {
-    expect(
-      isExpectedBiometricError(new Error("FingerprintScannerNotEnrolled")),
-    ).toBe(true)
+    expect(isExpectedBiometricError(new Error("FingerprintScannerNotEnrolled"))).toBe(
+      true,
+    )
   })
 
   it("keeps genuine sensor faults as defects", () => {
     expect(isExpectedBiometricError(namedError("HardwareError"))).toBe(false)
-    expect(
-      isExpectedBiometricError(namedError("FingerprintScannerUnknownError")),
-    ).toBe(false)
+    expect(isExpectedBiometricError(namedError("FingerprintScannerUnknownError"))).toBe(
+      false,
+    )
   })
 })
 

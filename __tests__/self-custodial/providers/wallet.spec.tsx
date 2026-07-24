@@ -28,9 +28,9 @@ jest.mock("react-native/Libraries/AppState/AppState", () => ({
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   Network: { Mainnet: 0, Regtest: 1 },
   SdkError: {
-    instanceOf: (obj: unknown) =>
-      typeof obj === "object" && obj !== null && "tag" in obj,
+    instanceOf: (obj: unknown) => typeof obj === "object" && obj !== null && "tag" in obj,
   },
+  // eslint-disable-next-line camelcase
   SdkError_Tags: {
     SparkError: "SparkError",
     InsufficientFunds: "InsufficientFunds",
@@ -1647,8 +1647,8 @@ describe("SelfCustodialWalletProvider — stale-write safety", () => {
         setTimeout(resolve, 20)
       })
 
-      const lightningRecordCalls = mockCrashlyticsRecordError.mock.calls.filter(
-        (args) => String((args[0] as Error | undefined)?.message).includes("Lightning address"),
+      const lightningRecordCalls = mockCrashlyticsRecordError.mock.calls.filter((args) =>
+        String((args[0] as Error | undefined)?.message).includes("Lightning address"),
       )
       expect(lightningRecordCalls).toHaveLength(0)
       expect(mockCrashlyticsLog).toHaveBeenCalledWith(

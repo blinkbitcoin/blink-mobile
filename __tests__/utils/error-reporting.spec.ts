@@ -26,12 +26,16 @@ describe("isConnectivityError", () => {
   const CONNECTIVITY_MESSAGES: ReadonlyArray<{ label: string; message: string }> = [
     {
       label: "gRPC Unavailable",
-      message: 'Failed to subscribe to server events: Status { code: Unavailable, message: "dns error" }',
+      message:
+        'Failed to subscribe to server events: Status { code: Unavailable, message: "dns error" }',
     },
     { label: "bare gRPC status", message: "status: Code: Unavailable" },
     { label: "HTTP 503 text", message: "Drive upload failed (503): Service Unavailable" },
     { label: "FCM service", message: "SERVICE_NOT_AVAILABLE" },
-    { label: "dns error", message: "transport error: dns error: failed to lookup address" },
+    {
+      label: "dns error",
+      message: "transport error: dns error: failed to lookup address",
+    },
     { label: "transport error", message: "transport error: connection refused" },
     { label: "FCM timeout", message: "java.io.IOException: TIMEOUT" },
     { label: "generic timeout", message: "Request timed out after 30s" },
@@ -62,11 +66,13 @@ describe("isConnectivityError", () => {
   })
 
   it("does not match ordinary defect messages", () => {
-    expect(isConnectivityError(new Error("Cannot read property 'foo' of undefined"))).toBe(
+    expect(
+      isConnectivityError(new Error("Cannot read property 'foo' of undefined")),
+    ).toBe(false)
+    expect(isConnectivityError(new Error("Unknown token payment dropped"))).toBe(false)
+    expect(isConnectivityError(new Error("Quarantine write failed for key x"))).toBe(
       false,
     )
-    expect(isConnectivityError(new Error("Unknown token payment dropped"))).toBe(false)
-    expect(isConnectivityError(new Error("Quarantine write failed for key x"))).toBe(false)
   })
 
   it("does not treat storage-layer 'unavailable' as connectivity", () => {
