@@ -7,6 +7,7 @@ MIN_FREE_GB="${MIN_BUILD_FREE_GB:-${2:-30}}"
 HARD_MIN_FREE_GB="${MIN_BUILD_HARD_FREE_GB:-10}"
 XCODE_ARTIFACT_MAX_AGE_DAYS="${XCODE_ARTIFACT_MAX_AGE_DAYS:-14}"
 ROOT_DERIVED_DATA_MAX_GB="${ROOT_DERIVED_DATA_MAX_GB:-20}"
+BUILD_CACHE_MAX_GB="${BUILD_CACHE_MAX_GB:-5}"
 CI_ROOT="${CI_ROOT:-$(pwd)}"
 DISK_CHECK_PATH="${DISK_CHECK_PATH:-$CI_ROOT}"
 CONCOURSE_WORKDIR="${CONCOURSE_WORKDIR:-/Users/m1/concourse/workdir}"
@@ -15,6 +16,7 @@ BUILD_HOME="${HOME:-/Users/m1}"
 required_kb=$((MIN_FREE_GB * 1024 * 1024))
 hard_required_kb=$((HARD_MIN_FREE_GB * 1024 * 1024))
 root_derived_data_max_kb=$((ROOT_DERIVED_DATA_MAX_GB * 1024 * 1024))
+build_cache_max_kb=$((BUILD_CACHE_MAX_GB * 1024 * 1024))
 
 free_kb() {
   df -Pk "$DISK_CHECK_PATH" | awk 'NR == 2 { print $4 }'
@@ -24,15 +26,24 @@ free_gb() {
   awk "BEGIN { printf \"%.1f\", $(free_kb) / 1024 / 1024 }"
 }
 
+kb_to_gb() {
+  awk -v kb="$1" 'BEGIN { printf "%.1f", kb / 1024 / 1024 }'
+}
+
 free_space_below_target() {
   (( $(free_kb) < required_kb ))
 }
 
 path_size_kb() {
   local path="$1"
+  local size
 
   if [[ -e "$path" ]]; then
-    du -sk "$path" 2>/dev/null | awk 'NR == 1 { print $1 }'
+    # du exits nonzero when any entry is unreadable (TCC-protected caches do
+    # this even for root) while still printing a total for what it could read;
+    # without the || true, pipefail + set -e would silently kill the script.
+    size="$(du -sk "$path" 2>/dev/null | awk 'NR == 1 { print $1 }' || true)"
+    echo "${size:-0}"
   else
     echo 0
   fi
@@ -68,6 +79,31 @@ remove_all_children() {
 
 unique_paths() {
   printf "%s\n" "$@" | awk 'NF && !seen[$0]++'
+}
+
+build_cache_dirs() {
+  # /private/var/root/Library/Caches is listed whole, not per-tool like the
+  # user homes: root runs of Yarn/CocoaPods/etc. scatter caches across it and
+  # everything under it is droppable on a CI worker (20 GB of mixed root
+  # caches in the 2026-07-23 incident). Keep it whole-dir.
+  unique_paths \
+    "/private/var/root/Library/Caches" \
+    "/private/var/root/.gradle/caches" \
+    "$BUILD_HOME/.gradle/caches" \
+    "$BUILD_HOME/Library/Caches/Yarn" \
+    "$BUILD_HOME/Library/Caches/CocoaPods" \
+    "$BUILD_HOME/Library/Caches/node-gyp" \
+    "/Users/m1/.gradle/caches" \
+    "/Users/m1/Library/Caches/Yarn" \
+    "/Users/m1/Library/Caches/CocoaPods" \
+    "/Users/m1/Library/Caches/node-gyp"
+}
+
+trash_dirs() {
+  unique_paths \
+    "/private/var/root/.Trash" \
+    "$BUILD_HOME/.Trash" \
+    "/Users/m1/.Trash"
 }
 
 current_ios_runtime_version() {
@@ -144,7 +180,23 @@ print_disk_report() {
     "$BUILD_HOME/Library/Developer/Xcode/DerivedData" \
     "/Users/m1/Library/Developer/Xcode/Archives" \
     "/Users/m1/Library/Developer/Xcode/DerivedData" \
-    "/Library/Developer/CoreSimulator/Volumes")
+    "/Library/Developer/CoreSimulator/Volumes" \
+    "$BUILD_HOME/Library/Developer/CoreSimulator/Devices" \
+    "/Users/m1/Library/Developer/CoreSimulator/Devices")
+
+  echo "---- Build caches and trash ----"
+  while IFS= read -r path; do
+    if [[ -e "$path" ]]; then
+      du -sh "$path" 2>/dev/null || true
+    fi
+  done < <(build_cache_dirs; trash_dirs)
+
+  echo "---- Top consumers in build homes ----"
+  while IFS= read -r path; do
+    if [[ -d "$path" ]]; then
+      du -xh -d1 "$path" 2>/dev/null | sort -rh | head -10 || true
+    fi
+  done < <(unique_paths "/private/var/root" "$BUILD_HOME" "/Users/m1")
 
   echo "---- iOS simulator runtimes ----"
   if command -v xcrun >/dev/null 2>&1; then
@@ -183,13 +235,64 @@ cleanup_xcode_artifacts() {
   root_derived_data_size_kb="$(path_size_kb "$root_derived_data")"
   if free_space_below_target || (( root_derived_data_size_kb > root_derived_data_max_kb )); then
     echo "Removing root-owned Xcode DerivedData caches from $root_derived_data"
-    echo "Reason: free disk $(free_gb) GB, root DerivedData $((root_derived_data_size_kb / 1024 / 1024)) GB, cap ${ROOT_DERIVED_DATA_MAX_GB} GB"
+    echo "Reason: free disk $(free_gb) GB, root DerivedData $(kb_to_gb "$root_derived_data_size_kb") GB, cap ${ROOT_DERIVED_DATA_MAX_GB} GB"
     remove_all_children "$root_derived_data"
   fi
 }
 
 cleanup_concourse_dead_volumes() {
   remove_all_children "$CONCOURSE_WORKDIR/volumes/dead"
+}
+
+gradle_daemons_stopped=""
+
+stop_gradle_daemons() {
+  # A live daemon holds references into .gradle/caches; purging under it makes
+  # the next build fail with "Could not read workspace metadata". No build can
+  # be in flight here: build jobs and this cleanup all hold the
+  # mobile-concourse lock (ci/pipeline.yml), so any daemon found is idle.
+  [[ -n "$gradle_daemons_stopped" ]] && return
+  gradle_daemons_stopped=1
+
+  echo "Stopping Gradle daemons before purging Gradle caches"
+  pkill -f GradleDaemon 2>/dev/null || true
+
+  local waited=0
+  while pgrep -f GradleDaemon >/dev/null 2>&1 && (( waited < 15 )); do
+    sleep 1
+    waited=$((waited + 1))
+  done
+
+  if pgrep -f GradleDaemon >/dev/null 2>&1; then
+    echo "Gradle daemons still running after ${waited}s; force-killing"
+    pkill -9 -f GradleDaemon 2>/dev/null || true
+    sleep 1
+  fi
+}
+
+cleanup_build_caches() {
+  local dir
+  local size_kb
+
+  while IFS= read -r dir; do
+    [[ -d "$dir" ]] || continue
+
+    size_kb="$(path_size_kb "$dir")"
+    if free_space_below_target || (( size_kb > build_cache_max_kb )); then
+      echo "Removing build cache $dir"
+      echo "Reason: free disk $(free_gb) GB, cache size $(kb_to_gb "$size_kb") GB, cap ${BUILD_CACHE_MAX_GB} GB"
+      if [[ "$dir" == */.gradle/caches ]]; then
+        stop_gradle_daemons
+        remove_path "${dir%/caches}/daemon"
+        remove_path "${dir%/caches}/wrapper/dists"
+      fi
+      remove_all_children "$dir"
+    fi
+  done < <(build_cache_dirs)
+
+  while IFS= read -r dir; do
+    remove_all_children "$dir"
+  done < <(trash_dirs)
 }
 
 cleanup_old_ios_runtimes() {
@@ -248,14 +351,14 @@ assert_free_space() {
 
   if (( available <= hard_required_kb )); then
     echo "ERROR: Only $(free_gb) GB free on $DISK_CHECK_PATH after macOS build cleanup. Required: more than ${HARD_MIN_FREE_GB} GB."
-    echo "Manual follow-up: remove only stale Concourse live volumes with the worker stopped, or run Nix garbage collection with the worker stopped."
+    echo "Manual follow-up: check the 'Top consumers in build homes' report below for unexpected growth; remove stale Concourse live volumes or run Nix garbage collection only with the worker stopped."
     print_disk_report
     exit 1
   fi
 
   if (( available < required_kb )); then
     echo "WARNING: Only $(free_gb) GB free on $DISK_CHECK_PATH after macOS build cleanup. Target: ${MIN_FREE_GB} GB. Builds fail only at or below ${HARD_MIN_FREE_GB} GB."
-    echo "Manual follow-up: remove only stale Concourse live volumes with the worker stopped, or run Nix garbage collection with the worker stopped."
+    echo "Manual follow-up: check the 'Top consumers in build homes' report below for unexpected growth; remove stale Concourse live volumes or run Nix garbage collection only with the worker stopped."
     print_disk_report
     return
   fi
@@ -273,6 +376,7 @@ case "$MODE" in
     print_disk_report
     cleanup_workspace_build_outputs
     cleanup_xcode_artifacts
+    cleanup_build_caches
     cleanup_concourse_dead_volumes
     assert_current_ios_runtime_present
     cleanup_old_ios_runtimes
