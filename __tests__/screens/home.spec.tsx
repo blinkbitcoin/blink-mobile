@@ -740,25 +740,27 @@ const runRestrictionInvariantCase = async ({
   }
 }
 
-describe("HomeScreen", () => {
-  beforeEach(() => {
-    currentMocks = []
-    mockActiveWalletOverride = null
-    mockDollarBalanceRestrictedOverride = false
-    mockMigratePromptVisible = false
-    mockCanReopen = false
-    mockReceiveBlocked = false
-    mockReminderBulletinVisible = false
-    mockTransferBlockedOverride = false
-    mockDollarBalanceModalVisible = false
-    mockForcedConversionParams = null
-    jest.clearAllMocks()
-    mockUseNonCustodialConversionLimits.mockReturnValue({
-      limits: null,
-      loading: false,
-      error: null,
-    })
+const resetHomeScreenMocks = () => {
+  currentMocks = []
+  mockActiveWalletOverride = null
+  mockDollarBalanceRestrictedOverride = false
+  mockMigratePromptVisible = false
+  mockCanReopen = false
+  mockReceiveBlocked = false
+  mockReminderBulletinVisible = false
+  mockTransferBlockedOverride = false
+  mockDollarBalanceModalVisible = false
+  mockForcedConversionParams = null
+  jest.clearAllMocks()
+  mockUseNonCustodialConversionLimits.mockReturnValue({
+    limits: null,
+    loading: false,
+    error: null,
   })
+}
+
+describe("HomeScreen", () => {
+  beforeEach(resetHomeScreenMocks)
 
   it("renders home screen for custodial user", async () => {
     const { getByTestId } = render(
@@ -1391,104 +1393,101 @@ describe("HomeScreen", () => {
       expect(lastIsVisible()).toBe(false)
     })
   })
+})
+describe("HomeScreen self-custodial balance loading (#3852)", () => {
+  beforeEach(resetHomeScreenMocks)
 
-  describe("self-custodial balance loading (#3852)", () => {
-    afterEach(() => {
-      mockActiveWalletOverride = null
-    })
+  it("shows the loading state instead of $0.00 when the self-custodial balance failed to load", async () => {
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "error",
+      accountType: "self-custodial",
+      isReady: false,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
 
-    it("shows the loading state instead of $0.00 when the self-custodial balance failed to load", async () => {
-      mockActiveWalletOverride = {
-        wallets: [],
-        status: "error",
-        accountType: "self-custodial",
-        isReady: false,
-        isSelfCustodial: true,
-        needsBackendAuth: false,
-      }
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
 
-      const { queryByTestId } = render(
-        <ContextForScreen>
-          <HomeScreen />
-        </ContextForScreen>,
-      )
-      await flushEffects()
+    expect(queryByTestId("balance-value")).toBeNull()
+  })
 
-      expect(queryByTestId("balance-value")).toBeNull()
-    })
+  it("keeps showing the balance when a later refresh goes offline and the wallets are retained", async () => {
+    mockActiveWalletOverride = {
+      wallets: [
+        {
+          id: "btc-1",
+          walletCurrency: "BTC",
+          balance: { amount: 5000, currency: "BTC", currencyCode: "BTC" },
+          transactions: [],
+        },
+        {
+          id: "usd-1",
+          walletCurrency: "USD",
+          balance: { amount: 0, currency: "USD", currencyCode: "USD" },
+          transactions: [],
+        },
+      ],
+      status: "offline",
+      accountType: "self-custodial",
+      isReady: false,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
 
-    it("keeps showing the balance when a later refresh goes offline and the wallets are retained", async () => {
-      mockActiveWalletOverride = {
-        wallets: [
-          {
-            id: "btc-1",
-            walletCurrency: "BTC",
-            balance: { amount: 5000, currency: "BTC", currencyCode: "BTC" },
-            transactions: [],
-          },
-          {
-            id: "usd-1",
-            walletCurrency: "USD",
-            balance: { amount: 0, currency: "USD", currencyCode: "USD" },
-            transactions: [],
-          },
-        ],
-        status: "offline",
-        accountType: "self-custodial",
-        isReady: false,
-        isSelfCustodial: true,
-        needsBackendAuth: false,
-      }
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
 
-      const { getByTestId } = render(
-        <ContextForScreen>
-          <HomeScreen />
-        </ContextForScreen>,
-      )
-      await flushEffects()
+    expect(getByTestId("balance-value")).toBeTruthy()
+  })
 
-      expect(getByTestId("balance-value")).toBeTruthy()
-    })
+  it("shows the loading state during an account switch, before the new wallets load", async () => {
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "loading",
+      accountType: "self-custodial",
+      isReady: false,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
 
-    it("shows the loading state during an account switch, before the new wallets load", async () => {
-      mockActiveWalletOverride = {
-        wallets: [],
-        status: "loading",
-        accountType: "self-custodial",
-        isReady: false,
-        isSelfCustodial: true,
-        needsBackendAuth: false,
-      }
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
 
-      const { queryByTestId } = render(
-        <ContextForScreen>
-          <HomeScreen />
-        </ContextForScreen>,
-      )
-      await flushEffects()
+    expect(queryByTestId("balance-value")).toBeNull()
+  })
 
-      expect(queryByTestId("balance-value")).toBeNull()
-    })
+  it("shows a zero balance, not a skeleton, for a ready account with no wallets", async () => {
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
 
-    it("shows a zero balance, not a skeleton, for a ready account with no wallets", async () => {
-      mockActiveWalletOverride = {
-        wallets: [],
-        status: "ready",
-        accountType: "self-custodial",
-        isReady: true,
-        isSelfCustodial: true,
-        needsBackendAuth: false,
-      }
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
 
-      const { getByTestId } = render(
-        <ContextForScreen>
-          <HomeScreen />
-        </ContextForScreen>,
-      )
-      await flushEffects()
-
-      expect(getByTestId("balance-value")).toBeTruthy()
-    })
+    expect(getByTestId("balance-value")).toBeTruthy()
   })
 })
 
