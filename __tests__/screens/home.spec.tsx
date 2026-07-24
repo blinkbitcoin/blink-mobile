@@ -106,6 +106,8 @@ jest.mock("@app/config/feature-flags-context", () => {
         stableBalanceEnabled: false,
       },
     useRemoteConfig: () => ({
+      // Real defaults keep this mock complete when new remote-config keys land.
+      ...actual.defaultRemoteConfig,
       loading: false,
       remoteConfigReady: true,
       feeReimbursementMemo: "fee reimbursement",
