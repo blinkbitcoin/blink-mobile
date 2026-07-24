@@ -114,6 +114,14 @@ describe("canonicalizeLightningAddress", () => {
       "alice@bob@pay.blink.sv",
     )
   })
+
+  it("leaves input with an empty username untouched", () => {
+    expect(canonicalizeLightningAddress("@pay.blink.sv")).toBe("@pay.blink.sv")
+  })
+
+  it("leaves input with an empty domain untouched", () => {
+    expect(canonicalizeLightningAddress("alice@")).toBe("alice@")
+  })
 })
 
 describe("extractLightningAddressUsername", () => {
