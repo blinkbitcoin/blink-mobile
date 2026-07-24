@@ -4,6 +4,8 @@ import { gql, useApolloClient } from "@apollo/client"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import {
+  TransactionByIdForWalletQuery,
+  TransactionOwnershipProbeQuery,
   useTransactionByIdForWalletLazyQuery,
   useTransactionOwnershipProbeLazyQuery,
 } from "@app/graphql/generated"
@@ -76,39 +78,19 @@ type ProbeQueryResult<TData> = {
   error?: { message: string; networkError?: unknown }
 }
 
-type OwnershipProbeData = {
-  me?: {
-    defaultAccount: {
-      wallets: ReadonlyArray<{ id: string }>
-      pendingIncomingTransactions: ReadonlyArray<{ id: string }>
-      transactions?: {
-        edges?: ReadonlyArray<{ node: { id: string } }> | null
-      } | null
-    }
-  } | null
-}
-
-type WalletProbeData = {
-  me?: {
-    defaultAccount: {
-      walletById: { transactionById: { id: string } }
-    }
-  } | null
-}
-
 type ProbeExecutors = {
   probeOwnership: (options: {
     variables: { first: number }
     fetchPolicy: "no-cache"
     errorPolicy: "all"
     context?: ReturnType<typeof bearerContext>
-  }) => Promise<ProbeQueryResult<OwnershipProbeData>>
+  }) => Promise<ProbeQueryResult<TransactionOwnershipProbeQuery>>
   probeWallet: (options: {
     variables: { walletId: string; txId: string }
     fetchPolicy: "no-cache" | "network-only"
     errorPolicy: "all"
     context?: ReturnType<typeof bearerContext>
-  }) => Promise<ProbeQueryResult<WalletProbeData>>
+  }) => Promise<ProbeQueryResult<TransactionByIdForWalletQuery>>
 }
 
 /**
@@ -251,7 +233,10 @@ export const useResolveTransactionAccount = ({
 
   useEffect(() => {
     if (hasTx) {
-      setStatus((prev) => (prev === "idle" ? prev : "resolved"))
+      // Settle on "resolved" even from "idle": callers treat a lingering
+      // "idle" as still-resolving, which would spin forever when the tx is
+      // only available outside the fragment cache (self-custodial memory).
+      setStatus("resolved")
       return
     }
 
@@ -364,6 +349,17 @@ export const useResolveTransactionAccount = ({
           const { profile } = hits[0].value
           switchedRef.current = true
           setStatus("switching")
+          try {
+            await saveToken(profile.token)
+          } catch (err) {
+            switchedRef.current = false
+            if (cancelled) return
+            recordProbeError(err)
+            setStatus("probeFailed")
+            return
+          }
+          setActiveAccountId(DefaultAccountId.Custodial)
+          // Toast only once the switch has actually persisted.
           toastShow({
             type: "success",
             message: (translations) =>
@@ -372,8 +368,6 @@ export const useResolveTransactionAccount = ({
               }),
             LL: llRef.current,
           })
-          await saveToken(profile.token)
-          setActiveAccountId(DefaultAccountId.Custodial)
           // The token change rebuilds the Apollo client; the effect re-runs
           // under the new client and materializes the tx via the active path.
           return

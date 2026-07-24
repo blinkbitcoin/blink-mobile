@@ -234,17 +234,21 @@ describe("TransactionDetailScreen resolver fallback", () => {
   })
 
   it("reports hasTx when the active self-custodial wallet holds the tx in memory", () => {
-    mockResolveStatus = "idle"
+    // hasTx keeps the resolver settled on "resolved"; with the fragment still
+    // empty the screen must show the actionable failure state, not a spinner.
+    mockResolveStatus = "resolved"
     mockActiveWallet = {
       isSelfCustodial: true,
       wallets: [{ transactions: [{ id: "tx-1", paymentType: "spark" }] }],
     }
     mockUseFragment.mockReturnValue({ data: {} })
-    render(<TransactionDetailScreen route={route} />)
+    const { getByText, queryByText } = render(<TransactionDetailScreen route={route} />)
 
     expect(mockUseResolveTransactionAccount).toHaveBeenCalledWith(
       expect.objectContaining({ hasTx: true }),
     )
+    expect(getByText("tx-load-failed")).toBeTruthy()
+    expect(queryByText("finding-account")).toBeNull()
   })
 
   it("reports hasTx to the resolver when the fragment is populated", () => {

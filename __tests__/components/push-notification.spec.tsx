@@ -29,6 +29,7 @@ jest.mock("@app/utils/notifications", () => ({
 
 let onMessageCallback: (msg: Record<string, unknown>) => void
 let onNotificationOpenedAppCallback: (msg: Record<string, unknown>) => void
+let onTokenRefreshCallback: (() => void) | null = null
 let mockInitialNotification: Record<string, unknown> | null = null
 const mockUnsubscribe = jest.fn()
 
@@ -43,7 +44,10 @@ jest.mock("@react-native-firebase/messaging", () => {
       return mockUnsubscribe
     },
     getInitialNotification: jest.fn(() => Promise.resolve(mockInitialNotification)),
-    onTokenRefresh: jest.fn(() => jest.fn()),
+    onTokenRefresh: (cb: () => void) => {
+      onTokenRefreshCallback = cb
+      return jest.fn()
+    },
   })
   return {
     __esModule: true,
@@ -56,6 +60,7 @@ describe("PushNotificationComponent", () => {
     jest.clearAllMocks()
     mockIsAuthed = true
     mockInitialNotification = null
+    onTokenRefreshCallback = null
     mockHasNotificationPermission.mockResolvedValue(false)
   })
 
@@ -105,6 +110,16 @@ describe("PushNotificationComponent", () => {
       )
     })
 
+    it("does not append the hint to non-transaction links", () => {
+      render(<PushNotificationComponent />)
+
+      onNotificationOpenedAppCallback({
+        data: { linkTo: "/settings", recipientUserId: "user-b" },
+      })
+
+      expect(openURLSpy).toHaveBeenCalledWith("blink:/settings")
+    })
+
     it("leaves a linkTo that already has a query string untouched", () => {
       render(<PushNotificationComponent />)
 
@@ -115,6 +130,14 @@ describe("PushNotificationComponent", () => {
       expect(openURLSpy).toHaveBeenCalledWith("blink:/transaction/tx-1?foo=bar")
     })
 
+    it("ignores notifications without a data payload", () => {
+      render(<PushNotificationComponent />)
+
+      onNotificationOpenedAppCallback({})
+
+      expect(openURLSpy).not.toHaveBeenCalled()
+    })
+
     it("ignores links that do not start with a slash", () => {
       render(<PushNotificationComponent />)
 
@@ -123,6 +146,23 @@ describe("PushNotificationComponent", () => {
       })
 
       expect(openURLSpy).not.toHaveBeenCalled()
+    })
+
+    it("logs instead of throwing when opening the link fails", () => {
+      const consoleErrorSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => undefined)
+      openURLSpy.mockImplementationOnce(() => {
+        throw new Error("no handler for scheme")
+      })
+      render(<PushNotificationComponent />)
+
+      expect(() =>
+        onNotificationOpenedAppCallback({ data: { linkTo: "/transaction/tx-1" } }),
+      ).not.toThrow()
+
+      expect(consoleErrorSpy).toHaveBeenCalled()
+      consoleErrorSpy.mockRestore()
     })
 
     it("follows the initial notification on cold start, hint included", async () => {
@@ -149,6 +189,19 @@ describe("PushNotificationComponent", () => {
       render(<PushNotificationComponent />)
 
       await waitFor(() => expect(mockAddDeviceToken).toHaveBeenCalledTimes(1))
+    })
+
+    it("re-registers the device token when it refreshes", async () => {
+      mockHasNotificationPermission.mockResolvedValue(true)
+
+      render(<PushNotificationComponent />)
+
+      await waitFor(() => expect(mockAddDeviceToken).toHaveBeenCalledTimes(1))
+      expect(onTokenRefreshCallback).not.toBeNull()
+
+      onTokenRefreshCallback?.()
+
+      expect(mockAddDeviceToken).toHaveBeenCalledTimes(2)
     })
 
     it("does not register device token when not authed", async () => {

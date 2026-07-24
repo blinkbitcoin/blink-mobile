@@ -29,12 +29,14 @@ jest.mock("@app/graphql/generated", () => ({
   useTransactionByIdForWalletLazyQuery: () => [mockProbeWallet],
 }))
 
+let mockActiveToken = "token-active"
 jest.mock("@app/hooks/use-app-config", () => {
-  const appConfigResult = {
-    saveToken: (...args: unknown[]) => mockSaveToken(...args),
-    appConfig: { token: "token-active" },
+  // Stable saveToken identity: it sits in the resolver's effect deps, so a
+  // fresh function per render would cancel in-flight resolutions.
+  const saveToken = (...args: unknown[]) => mockSaveToken(...args)
+  return {
+    useAppConfig: () => ({ saveToken, appConfig: { token: mockActiveToken } }),
   }
-  return { useAppConfig: () => appConfigResult }
 })
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -165,15 +167,16 @@ describe("useResolveTransactionAccount", () => {
     jest.clearAllMocks()
     mockClient = {}
     mockIsAuthed = true
+    mockActiveToken = "token-active"
     mockSaveToken.mockResolvedValue(undefined)
     mockGetSessionProfiles.mockResolvedValue([profileA, profileB, profileC])
     mockProbeWallet.mockResolvedValue(walletMiss)
   })
 
-  it("does nothing when the transaction is already available", async () => {
+  it("settles to resolved without probing when the transaction is already available", async () => {
     const { result } = renderResolver({ hasTx: true })
 
-    await waitFor(() => expect(result.current.status).toBe("idle"))
+    await waitFor(() => expect(result.current.status).toBe("resolved"))
     expect(mockProbeOwnership).not.toHaveBeenCalled()
     expect(mockProbeWallet).not.toHaveBeenCalled()
     expect(mockSaveToken).not.toHaveBeenCalled()
@@ -214,10 +217,11 @@ describe("useResolveTransactionAccount", () => {
     const { result } = renderResolver()
 
     await waitFor(() => expect(result.current.status).toBe("switching"))
+    // The toast is the last step of the switch, after the token persisted.
+    await waitFor(() => expect(mockToastShow).toHaveBeenCalledTimes(1))
     expect(mockSaveToken).toHaveBeenCalledWith("token-b")
     expect(mockSetActiveAccountId).toHaveBeenCalledWith(DefaultAccountId.Custodial)
 
-    expect(mockToastShow).toHaveBeenCalledTimes(1)
     const toastArgs = mockToastShow.mock.calls[0][0]
     expect(toastArgs.type).toBe("success")
     const message = toastArgs.message({
@@ -234,16 +238,57 @@ describe("useResolveTransactionAccount", () => {
 
     const { result, rerender } = renderResolver()
     await waitFor(() => expect(result.current.status).toBe("switching"))
+    await waitFor(() => expect(mockToastShow).toHaveBeenCalled())
 
     // The token change rebuilds the Apollo client; now the tx is in the active account
     setOwnershipByToken({}, ownershipResult({ txIds: [TXID] }))
     mockProbeWallet.mockResolvedValue(walletHit)
     mockSaveToken.mockClear()
+    mockActiveToken = "token-b"
     mockClient = {}
     rerender({ txid: TXID, hasTx: false })
 
     await waitFor(() => expect(result.current.status).toBe("resolved"))
     expect(mockSaveToken).not.toHaveBeenCalled()
+  })
+
+  it("waits out renders between the token update and the client rebuild", async () => {
+    setOwnershipByToken({ "token-b": ownershipResult({ txIds: [TXID] }) })
+
+    const { result, rerender } = renderResolver()
+    await waitFor(() => expect(result.current.status).toBe("switching"))
+    await waitFor(() => expect(mockToastShow).toHaveBeenCalled())
+    const probesBeforeRebuild = mockProbeOwnership.mock.calls.length
+
+    // saveToken landed: the token context updates one render before the Apollo
+    // client rebuild. This pass must not probe through the stale client (it is
+    // still authenticated as the old account).
+    mockActiveToken = "token-b"
+    rerender({ txid: TXID, hasTx: false })
+
+    expect(mockProbeOwnership.mock.calls).toHaveLength(probesBeforeRebuild)
+    expect(result.current.status).toBe("switching")
+
+    // The rebuilt client arrives; the tx is now in the active account.
+    setOwnershipByToken({}, ownershipResult({ txIds: [TXID] }))
+    mockProbeWallet.mockResolvedValue(walletHit)
+    mockClient = {}
+    rerender({ txid: TXID, hasTx: false })
+
+    await waitFor(() => expect(result.current.status).toBe("resolved"))
+    expect(mockSaveToken).toHaveBeenCalledTimes(1)
+  })
+
+  it("reports probeFailed without a toast when persisting the switch fails", async () => {
+    setOwnershipByToken({ "token-b": ownershipResult({ txIds: [TXID] }) })
+    mockSaveToken.mockRejectedValue(new Error("keystore write failed"))
+
+    const { result } = renderResolver()
+
+    await waitFor(() => expect(result.current.status).toBe("probeFailed"))
+    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(mockSetActiveAccountId).not.toHaveBeenCalled()
+    expect(mockRecordError).toHaveBeenCalled()
   })
 
   it("reports notFound when no account on the device owns the tx", async () => {
@@ -357,10 +402,12 @@ describe("useResolveTransactionAccount", () => {
 
     const { result, rerender } = renderResolver()
     await waitFor(() => expect(result.current.status).toBe("switching"))
+    await waitFor(() => expect(mockToastShow).toHaveBeenCalled())
     expect(mockSaveToken).toHaveBeenCalledTimes(1)
 
     // Rebuilt client, but the newly-active account no longer reports the tx
     // while the (now inactive) profile B still would — must not switch again.
+    mockActiveToken = "token-b"
     mockClient = {}
     rerender({ txid: TXID, hasTx: false })
 
@@ -395,12 +442,43 @@ describe("useResolveTransactionAccount", () => {
     const { result } = renderResolver()
 
     await waitFor(() => expect(result.current.status).toBe("switching"))
+    await waitFor(() => expect(mockToastShow).toHaveBeenCalled())
     const message = mockToastShow.mock.calls[0][0].message({
       TransactionDetailScreen: {
         switchedForPayment: ({ identifier }: { identifier: string }) => identifier,
       },
     })
     expect(message).toBe("+4670000000")
+  })
+
+  it("treats an empty ownership payload without an error as a probe failure", async () => {
+    mockProbeOwnership.mockResolvedValue({ data: undefined })
+
+    const { result } = renderResolver()
+
+    await waitFor(() => expect(result.current.status).toBe("probeFailed"))
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "ownership probe returned no account" }),
+    )
+  })
+
+  it("handles an account payload without a transaction list", async () => {
+    mockProbeOwnership.mockResolvedValue({
+      data: {
+        me: {
+          defaultAccount: {
+            wallets: [{ id: "w-btc" }],
+            pendingIncomingTransactions: [],
+            transactions: null,
+          },
+        },
+      },
+    })
+    mockGetSessionProfiles.mockResolvedValue([profileA])
+
+    const { result } = renderResolver()
+
+    await waitFor(() => expect(result.current.status).toBe("notFound"))
   })
 
   it("never switches when two profiles both claim the tx", async () => {
@@ -414,5 +492,109 @@ describe("useResolveTransactionAccount", () => {
     await waitFor(() => expect(result.current.status).toBe("probeFailed"))
     expect(mockSaveToken).not.toHaveBeenCalled()
     expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  /** Results landing after unmount (or after the effect re-ran) must be dropped
+   *  on the floor: no state updates, no switches, no error records. */
+  describe("mid-flight cancellation", () => {
+    const deferred = <T>() => {
+      let resolve!: (value: T) => void
+      let reject!: (reason: unknown) => void
+      const promise = new Promise<T>((res, rej) => {
+        resolve = res
+        reject = rej
+      })
+      return { promise, resolve, reject }
+    }
+
+    const flush = () => act(async () => {})
+
+    it("drops an active-account result that lands after unmount", async () => {
+      const gate = deferred<ReturnType<typeof ownershipResult>>()
+      mockProbeOwnership.mockReturnValue(gate.promise)
+
+      const { unmount } = renderResolver()
+      await waitFor(() => expect(mockProbeOwnership).toHaveBeenCalled())
+      unmount()
+
+      gate.resolve(ownershipResult({ txIds: ["tx-other"] }))
+      await flush()
+
+      // Without the guard the run would go on to scan the saved profiles.
+      expect(mockGetSessionProfiles).not.toHaveBeenCalled()
+    })
+
+    it("drops an active-account failure that lands after unmount", async () => {
+      const gate = deferred<never>()
+      mockProbeOwnership.mockReturnValue(gate.promise)
+
+      const { unmount } = renderResolver()
+      await waitFor(() => expect(mockProbeOwnership).toHaveBeenCalled())
+      unmount()
+
+      gate.reject(new Error("late transport failure"))
+      await flush()
+
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    it("drops a keystore read that lands after unmount", async () => {
+      setOwnershipByToken({})
+      const gate = deferred<ProfileProps[]>()
+      mockGetSessionProfiles.mockReturnValue(gate.promise)
+
+      const { unmount } = renderResolver()
+      await waitFor(() => expect(mockGetSessionProfiles).toHaveBeenCalled())
+      unmount()
+
+      gate.resolve([profileA, profileB])
+      await flush()
+
+      // Without the guard the run would go on to probe profile B.
+      const foreignCalls = mockProbeOwnership.mock.calls.filter((call) =>
+        tokenOf(call[0]),
+      )
+      expect(foreignCalls).toHaveLength(0)
+    })
+
+    it("drops a foreign hit that lands after unmount", async () => {
+      const gate = deferred<ReturnType<typeof ownershipResult>>()
+      mockProbeOwnership.mockImplementation((options: ProbeOptions) => {
+        const token = tokenOf(options)
+        if (token === "token-b") return gate.promise
+        return Promise.resolve(ownershipResult({}))
+      })
+
+      const { unmount } = renderResolver()
+      await waitFor(() =>
+        expect(
+          mockProbeOwnership.mock.calls.some((call) => tokenOf(call[0]) === "token-b"),
+        ).toBe(true),
+      )
+      unmount()
+
+      gate.resolve(ownershipResult({ txIds: [TXID] }))
+      await flush()
+
+      expect(mockSaveToken).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("drops a switch-persist failure that lands after unmount", async () => {
+      setOwnershipByToken({ "token-b": ownershipResult({ txIds: [TXID] }) })
+      const gate = deferred<never>()
+      mockSaveToken.mockReturnValue(gate.promise)
+
+      const { unmount } = renderResolver()
+      await waitFor(() => expect(mockSaveToken).toHaveBeenCalledWith("token-b"))
+      unmount()
+
+      gate.reject(new Error("late keystore write failure"))
+      await flush()
+
+      expect(mockRecordError).not.toHaveBeenCalled()
+      expect(mockSetActiveAccountId).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
   })
 })
