@@ -115,11 +115,30 @@ describe("parseDestination with unified BIP-21 URIs", () => {
     )
   })
 
-  it("falls back to the onchain address when LNURL resolution fails", async () => {
+  it("prefers the LNURL even when the onchain address is on the wrong network", async () => {
+    const testnetAddress = "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx"
+
+    const destination = await parseDestination(
+      parseParams(`bitcoin:${testnetAddress}?lightning=${lnurl}`),
+    )
+
+    expect(destination).toEqual(
+      expect.objectContaining({
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
+        validDestination: expect.objectContaining({
+          paymentType: PaymentType.Lnurl,
+          lnurl,
+        }),
+      }),
+    )
+  })
+
+  it("falls back to the onchain address and amount when LNURL resolution fails", async () => {
     mockRequestPayServiceParams.mockRejectedValue(new Error("network error"))
 
     const destination = await parseDestination(
-      parseParams(`bitcoin:${onchainAddress}?lightning=${lnurl}`),
+      parseParams(`bitcoin:${onchainAddress}?amount=0.001&lightning=${lnurl}`),
     )
 
     expect(destination).toEqual(
@@ -128,6 +147,7 @@ describe("parseDestination with unified BIP-21 URIs", () => {
         validDestination: expect.objectContaining({
           paymentType: PaymentType.Onchain,
           address: onchainAddress,
+          amount: 100000,
         }),
       }),
     )
@@ -208,6 +228,15 @@ describe("getLnurlFromUnifiedUri", () => {
     expect(
       getLnurlFromUnifiedUri(
         `bitcoin:${onchainAddress}?lightning=${encodeURIComponent(lnurl.toUpperCase())}`,
+      ),
+    ).toBe(lnurl)
+  })
+
+  it("keeps the raw value when percent-decoding fails", () => {
+    // trailing bare "%" makes decodeURIComponent throw; the raw value still parses
+    expect(
+      getLnurlFromUnifiedUri(
+        `bitcoin:${onchainAddress}?lightning=${lnurl.toUpperCase()}%`,
       ),
     ).toBe(lnurl)
   })
