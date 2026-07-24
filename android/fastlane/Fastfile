@@ -46,17 +46,17 @@ platform :android do
       flags: "--no-daemon --stacktrace --info",
       properties: env_props,
     )
-    # Non-fatal on purpose: the upload needs a Firebase credential the pipeline does not
-    # carry yet, and a failed upload must not stop the release from shipping.
-    begin
+    # Skip when the Firebase credential (GOOGLE_APPLICATION_CREDENTIALS) is absent so ordinary
+    # builds don't pay for a doomed upload; when present, a failure surfaces loudly.
+    if ENV["GOOGLE_APPLICATION_CREDENTIALS"].to_s.empty?
+      UI.important("Skipping Crashlytics native symbol upload: GOOGLE_APPLICATION_CREDENTIALS is not set")
+    else
       gradle(
         task: "uploadCrashlyticsSymbolFile",
         build_type: "Release",
-        flags: "--no-daemon --stacktrace",
+        flags: "--no-daemon --stacktrace --info",
         properties: env_props,
       )
-    rescue => e
-      UI.important("Crashlytics native symbol upload failed (non-fatal): #{e.message}")
     end
   end
 
