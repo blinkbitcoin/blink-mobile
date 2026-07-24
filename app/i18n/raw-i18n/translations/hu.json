@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
   },
   "SettingsScreen": {
-    "createAddress": "Cím létrehozása",
+    "setReceiveAddress": "Fogadási cím beállítása",
     "donationButton": "Adományozás gomb",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

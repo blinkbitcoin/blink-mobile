@@ -2319,7 +2319,7 @@
     "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف."
   },
   "SettingsScreen": {
-    "createAddress": "إنشاء عنوان",
+    "setReceiveAddress": "تعيين عنوان الاستلام",
     "donationButton": "زر التبرع",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

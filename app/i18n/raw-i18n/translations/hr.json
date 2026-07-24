@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Nije moguće procijeniti naknade. Pokušajte s drugim iznosom."
   },
   "SettingsScreen": {
-    "createAddress": "Stvori adresu",
+    "setReceiveAddress": "Postavi adresu",
     "donationButton": "Gumb za donacije",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Հնարավոր չէ հաշվարկել վճարները։ Խնդրում ենք փորձել այլ գումար։"
   },
   "SettingsScreen": {
-    "createAddress": "Ստեղծել հասցե",
+    "setReceiveAddress": "Սահմանել հասցեն",
     "donationButton": "Նվիրատվության կոճակ",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

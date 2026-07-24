@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Ücretler tahmin edilemiyor. Lütfen farklı bir tutar deneyin."
   },
   "SettingsScreen": {
-    "createAddress": "Adres oluştur",
+    "setReceiveAddress": "Alım adresini ayarla",
     "donationButton": "Bağış düğmesi",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

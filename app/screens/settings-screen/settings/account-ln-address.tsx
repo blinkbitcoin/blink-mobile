@@ -55,7 +55,7 @@ const LightningAddressRow: React.FC<LightningAddressRowProps> = ({
     <>
       <SettingsRow
         loading={loading}
-        title={address ?? LL.SettingsScreen.createAddress()}
+        title={address ?? LL.SettingsScreen.setReceiveAddress()}
         subtitleShorter={(address ?? "").length > SUBTITLE_SHORTER_LENGTH}
         leftGaloyIcon="lightning-address"
         rightIcon={

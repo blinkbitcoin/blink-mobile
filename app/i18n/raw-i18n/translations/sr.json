@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Nije moguće proceniti naknade. Pokušajte sa drugim iznosom."
   },
   "SettingsScreen": {
-    "createAddress": "Направи адресу",
+    "setReceiveAddress": "Постави адресу",
     "donationButton": "Дугме за донације",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

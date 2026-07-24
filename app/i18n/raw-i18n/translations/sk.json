@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Nie je možné odhadnúť poplatky. Skúste inú sumu."
   },
   "SettingsScreen": {
-    "createAddress": "Vytvoriť adresu",
+    "setReceiveAddress": "Nastaviť adresu",
     "donationButton": "Darovacie tlačidlo",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

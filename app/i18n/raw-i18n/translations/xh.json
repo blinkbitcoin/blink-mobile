@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo."
   },
   "SettingsScreen": {
-    "createAddress": "Yenza idilesi",
+    "setReceiveAddress": "Misela idilesi",
     "donationButton": "Iqhosha lomnikelo",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",

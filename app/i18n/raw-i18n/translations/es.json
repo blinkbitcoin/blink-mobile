@@ -2319,7 +2319,7 @@
         "sdkGenericError": "No se pueden estimar las comisiones. Intenta con un monto diferente."
     },
     "SettingsScreen": {
-        "createAddress": "Crear dirección",
+        "setReceiveAddress": "Establecer dirección",
         "donationButton": "Botón de donación",
         "btcpayServer": "BTCPay Server",
         "woocommerce": "WooCommerce",

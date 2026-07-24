@@ -2319,7 +2319,7 @@
     "sdkGenericError": "Αδυναμία εκτίμησης τελών. Δοκιμάστε διαφορετικό ποσό."
   },
   "SettingsScreen": {
-    "createAddress": "Δημιουργία διεύθυνσης",
+    "setReceiveAddress": "Ορισμός διεύθυνσης",
     "donationButton": "Κουμπί δωρεάς",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
