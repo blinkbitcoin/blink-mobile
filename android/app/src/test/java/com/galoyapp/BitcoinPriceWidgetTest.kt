@@ -11,10 +11,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
+import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowAppWidgetManager
 import com.galoyapp.R
 
 @RunWith(RobolectricTestRunner::class)
+@Config(application = TestApplication::class)
 class BitcoinPriceWidgetTest {
     private var context: Context? = null
     private var appWidgetManager: AppWidgetManager? = null
@@ -37,7 +39,7 @@ class BitcoinPriceWidgetTest {
         val widgetView = shadowAppWidgetManager!!.getViewFor(widgetId)
 
         Assert.assertEquals(
-            "Loadings…",
+            "Loading…",
             (widgetView.findViewById<View?>(R.id.btc_price) as TextView).getText().toString()
         )
     }
