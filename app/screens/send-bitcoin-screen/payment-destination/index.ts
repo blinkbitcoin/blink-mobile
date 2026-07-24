@@ -7,7 +7,6 @@ import {
 import {
   InvalidDestinationReason,
   DestinationDirection,
-  MerchantChoice,
   MerchantPaymentType,
   ParseDestinationParams,
   ParseDestinationResult,
@@ -43,14 +42,10 @@ export const parseDestination = async ({
     preferLnurlForInternalHandles,
   })
 
-  const maybeMerchantDestination = parsedDestination as {
-    paymentType: string
-    merchants?: MerchantChoice[]
-  }
+  if (parsedDestination.paymentType === MerchantPaymentType) {
+    const { merchants } = parsedDestination
 
-  if (maybeMerchantDestination.paymentType === MerchantPaymentType) {
-    const merchants = maybeMerchantDestination.merchants ?? []
-    if (merchants.length !== 1) {
+    if (merchants.length > 1) {
       return {
         valid: true,
         destinationDirection: DestinationDirection.Send,
@@ -62,6 +57,15 @@ export const parseDestination = async ({
     }
 
     const [merchant] = merchants
+    if (!merchant) {
+      // Defensive only: when paymentType is Merchant, blink-client returns merchant values.
+      return {
+        valid: false,
+        invalidReason: InvalidDestinationReason.UnknownDestination,
+        invalidPaymentDestination: parsedDestination,
+      } as const
+    }
+
     return resolveLnurlDestination({
       parsedLnurlDestination: merchantChoiceToLnurlDestination(merchant),
       lnurlDomains,
