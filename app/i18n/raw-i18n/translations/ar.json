@@ -3567,6 +3567,7 @@
       "uploadSuccess": "تم حفظ النسخة الاحتياطية في {provider}",
       "uploadFailed": "فشل رفع النسخة الاحتياطية",
       "signInFailed": "فشل تسجيل الدخول إلى {provider}",
+      "storageAccessRequired": "امنح {provider: string} صلاحية الوصول لعمل نسخة احتياطية لمحفظتك، ثم حاول مرة أخرى.",
       "cloudNotAvailable": "iCloud Drive غير متوفر. يُرجى تسجيل الدخول إلى iCloud من الإعدادات وتفعيل iCloud Drive.",
       "networkError": "خطأ في الشبكة. يُرجى التحقق من اتصالك والمحاولة مرة أخرى.",
       "existingBackupTitle": "تم العثور على نسخة احتياطية",

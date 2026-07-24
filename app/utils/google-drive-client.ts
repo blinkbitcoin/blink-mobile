@@ -30,7 +30,13 @@ const HTTP_STATUS_TO_REASON: Readonly<Record<number, CloudBackupErrorReason>> = 
   429: CloudBackupErrorReason.Transient,
 }
 
-const classifyHttpStatus = (status: number): CloudBackupErrorReason => {
+/** Google reports a withheld Drive scope inside a 403, which is otherwise a plain auth error. */
+const SCOPE_INSUFFICIENT_REASON = "ACCESS_TOKEN_SCOPE_INSUFFICIENT"
+
+const classifyFailure = (status: number, body: string): CloudBackupErrorReason => {
+  if (status === 403 && body.includes(SCOPE_INSUFFICIENT_REASON)) {
+    return CloudBackupErrorReason.PermissionDenied
+  }
   const direct = HTTP_STATUS_TO_REASON[status]
   if (direct) return direct
   if (status >= 500) return CloudBackupErrorReason.Transient
@@ -64,7 +70,7 @@ const assertOkOrThrow = async (
   if (response.ok) return
   const body = await response.text().catch(() => "")
   throw new DriveError(
-    classifyHttpStatus(response.status),
+    classifyFailure(response.status, body),
     `Drive ${operation} failed (${response.status}): ${body}`,
   )
 }

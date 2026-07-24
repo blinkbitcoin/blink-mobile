@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Záloha uložena do {provider}",
       "uploadFailed": "Nahrání zálohy se nezdařilo",
       "signInFailed": "Přihlášení k {provider} se nezdařilo",
+      "storageAccessRequired": "Povolte přístup k {provider: string}, abyste mohli zálohovat peněženku, a zkuste to znovu.",
       "cloudNotAvailable": "iCloud Drive není k dispozici. Přihlaste se k iCloudu v Nastavení a zapněte iCloud Drive.",
       "networkError": "Chyba sítě. Zkontrolujte připojení a zkuste to znovu.",
       "existingBackupTitle": "Záloha nalezena",

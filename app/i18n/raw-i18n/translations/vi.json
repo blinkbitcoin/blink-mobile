@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Bản sao lưu đã được lưu vào {provider}",
       "uploadFailed": "Không thể tải lên bản sao lưu",
       "signInFailed": "Không thể đăng nhập vào {provider}",
+      "storageAccessRequired": "Cho phép truy cập {provider: string} để sao lưu ví của bạn, rồi thử lại.",
       "cloudNotAvailable": "iCloud Drive không khả dụng. Vui lòng đăng nhập iCloud trong Cài đặt và bật iCloud Drive.",
       "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.",
       "existingBackupTitle": "Đã tìm thấy bản sao lưu",

@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Còpia de seguretat desada a {provider}",
       "uploadFailed": "Error en pujar la còpia de seguretat",
       "signInFailed": "No s'ha pogut iniciar sessió a {provider}",
+      "storageAccessRequired": "Permet l'accés a {provider: string} per fer una còpia de seguretat de la teva cartera i torna-ho a provar.",
       "cloudNotAvailable": "iCloud Drive no està disponible. Inicia sessió a iCloud des de Configuració i activa iCloud Drive.",
       "networkError": "Error de xarxa. Comprova la connexió i torna-ho a provar.",
       "existingBackupTitle": "Còpia de seguretat trobada",

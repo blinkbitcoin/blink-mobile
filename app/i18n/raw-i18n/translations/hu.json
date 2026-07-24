@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Biztonsági mentés elmentve a {provider} tárhelyre",
       "uploadFailed": "A biztonsági mentés feltöltése sikertelen",
       "signInFailed": "Nem sikerült bejelentkezni a következőbe: {provider}",
+      "storageAccessRequired": "Engedélyezze a(z) {provider: string} hozzáférést a tárca mentéséhez, majd próbálja újra.",
       "cloudNotAvailable": "Az iCloud Drive nem érhető el. Jelentkezz be az iCloudba a Beállításokban, és engedélyezd az iCloud Drive-ot.",
       "networkError": "Hálózati hiba. Ellenőrizd a kapcsolatot, és próbáld újra.",
       "existingBackupTitle": "Biztonsági mentés találva",

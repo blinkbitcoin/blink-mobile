@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Copie de siguranță salvată în {provider}",
       "uploadFailed": "Încarcărea copiei de siguranță a eșuat",
       "signInFailed": "Conectarea la {provider} a eșuat",
+      "storageAccessRequired": "Permite accesul la {provider: string} pentru a face copie de rezervă a portofelului, apoi încearcă din nou.",
       "cloudNotAvailable": "iCloud Drive nu este disponibil. Conectează-te la iCloud din Setări și activează iCloud Drive.",
       "networkError": "Eroare de rețea. Verifică-ți conexiunea și încearcă din nou.",
       "existingBackupTitle": "Copie de siguranță găsită",

@@ -3567,6 +3567,7 @@
             "uploadSuccess": "Respaldo guardado en {provider}",
             "uploadFailed": "Error al subir el respaldo",
             "signInFailed": "No se pudo iniciar sesión en {provider}",
+            "storageAccessRequired": "Permite el acceso a {provider: string} para respaldar tu billetera e inténtalo de nuevo.",
             "cloudNotAvailable": "iCloud Drive no está disponible. Inicia sesión en iCloud desde Ajustes y activa iCloud Drive.",
             "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo.",
             "existingBackupTitle": "Respaldo encontrado",

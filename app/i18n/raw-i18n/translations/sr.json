@@ -3567,6 +3567,7 @@
       "uploadSuccess": "Резервна копија сачувана у {provider}",
       "uploadFailed": "Отпремање резервне копије није успело",
       "signInFailed": "Пријављивање на {provider} није успело",
+      "storageAccessRequired": "Дозволите приступ {provider: string} да бисте направили резервну копију новчаника, па покушајте поново.",
       "cloudNotAvailable": "iCloud Drive није доступан. Пријавите се на iCloud у Подешавањима и омогућите iCloud Drive.",
       "networkError": "Грешка мреже. Проверите везу и покушајте поново.",
       "existingBackupTitle": "Резервна копија пронађена",

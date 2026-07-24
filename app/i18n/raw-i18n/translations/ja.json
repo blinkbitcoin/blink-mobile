@@ -3567,6 +3567,7 @@
             "uploadSuccess": "{provider}にバックアップを保存しました",
             "uploadFailed": "バックアップのアップロードに失敗しました",
             "signInFailed": "{provider}へのサインインに失敗しました",
+            "storageAccessRequired": "ウォレットをバックアップするには {provider: string} へのアクセスを許可してから、もう一度お試しください。",
             "cloudNotAvailable": "iCloud Driveが利用できません。設定からiCloudにサインインし、iCloud Driveを有効にしてください。",
             "networkError": "ネットワークエラーが発生しました。接続を確認して、もう一度お試しください。",
             "existingBackupTitle": "バックアップが見つかりました",
