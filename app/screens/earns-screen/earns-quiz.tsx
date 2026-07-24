@@ -385,7 +385,15 @@ export const EarnQuiz = ({ route }: Props) => {
         }
       }
     })()
-  }, [recordedAnswer, claimQuizWrapper, LL, completed, quizClaimLoading, hasTriedClaim])
+  }, [
+    recordedAnswer,
+    claimQuizWrapper,
+    LL,
+    completed,
+    quizClaimLoading,
+    hasTriedClaim,
+    isAvailable,
+  ])
 
   const closeModal = () => {
     setShowModal(false)

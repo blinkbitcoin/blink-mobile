@@ -974,6 +974,8 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
     waitAndValidateDestination,
     LL,
     setRawPhoneNumber,
+    dispatchDestinationStateAction,
+    setKeepCountryCode,
   ])
 
   useEffect(() => {
@@ -1022,6 +1024,7 @@ const PhoneInputSection: React.FC<PhoneInputSectionProps> = ({
     destinationState.destinationState,
     parseValidPhone,
     setRawPhoneNumber,
+    activeInputRef,
   ])
 
   return (
