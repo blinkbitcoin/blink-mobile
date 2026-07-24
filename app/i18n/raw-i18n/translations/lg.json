@@ -2593,7 +2593,8 @@
       "tooLong": "Endagiriro eteekwa ennyo okuba n'ennukuta 50",
       "invalidCharacter": "Endagiriro esobola okubaamu ennukuta, ennamba, n'okuggumiza",
       "addressUnavailable": "Tusonyiwe, eno endagiriro yatwaliddwa dda",
-      "unknownError": "Ensobi etamanyiddwa etuseewo, tukusaba okugezaako nate oluvannyuma"
+      "unknownError": "Ensobi etamanyiddwa etuseewo, tukusaba okugezaako nate oluvannyuma",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Funa ssente okuva mu waleti za laddu endala ne {bankName: string} abakozesa ne ndagiriro eno.",
     "itCannotBeChanged": "Tekisobola kukyusibwa oluvannyuma."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Kuuma ssente zo",
     "modalDescription": "Tukutegeeza nnyo okukola backup ya wallet yo okusobola okuziyiza okufiirwa ssente zo zonna bw'onooba ofiirwa device eno.",
     "secureMe": "Kuuma wallet"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Eno ye akawunti etakuumibwa",

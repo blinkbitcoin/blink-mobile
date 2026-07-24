@@ -8505,6 +8505,10 @@ type RootTranslation = {
 			 * A​n​ ​u​n​k​n​o​w​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​,​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r
 			 */
 			unknownError: string
+			/**
+			 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​b​e​f​o​r​e​ ​c​r​e​a​t​i​n​g​ ​a​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
+			 */
+			backupRequired: string
 		}
 		/**
 		 * R​e​c​e​i​v​e​ ​m​o​n​e​y​ ​f​r​o​m​ ​o​t​h​e​r​ ​l​i​g​h​t​n​i​n​g​ ​w​a​l​l​e​t​s​ ​a​n​d​ ​{​b​a​n​k​N​a​m​e​}​ ​u​s​e​r​s​ ​w​i​t​h​ ​t​h​i​s​ ​a​d​d​r​e​s​s​.
@@ -12373,6 +12377,20 @@ type RootTranslation = {
 		 * S​e​c​u​r​e​ ​w​a​l​l​e​t
 		 */
 		secureMe: string
+	}
+	BackupRequired: {
+		/**
+		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​f​i​r​s​t
+		 */
+		modalTitle: string
+		/**
+		 * Y​o​u​r​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​i​s​ ​p​e​r​m​a​n​e​n​t​l​y​ ​l​i​n​k​e​d​ ​t​o​ ​t​h​i​s​ ​w​a​l​l​e​t​.​ ​B​a​c​k​ ​u​p​ ​y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​p​h​r​a​s​e​ ​f​i​r​s​t​,​ ​s​o​ ​y​o​u​ ​n​e​v​e​r​ ​l​o​s​e​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​a​d​d​r​e​s​s​ ​a​n​d​ ​f​u​n​d​s​.
+		 */
+		modalDescription: string
+		/**
+		 * B​a​c​k​ ​u​p​ ​w​a​l​l​e​t
+		 */
+		backupNow: string
 	}
 	NonCustodialInfoBulletin: {
 		/**
@@ -21160,6 +21178,10 @@ export type TranslationFunctions = {
 			 * An unknown error occurred, please try again later
 			 */
 			unknownError: () => LocalizedString
+			/**
+			 * Back up your wallet before creating a Lightning address
+			 */
+			backupRequired: () => LocalizedString
 		}
 		/**
 		 * Receive money from other lightning wallets and {bankName} users with this address.
@@ -24965,6 +24987,20 @@ export type TranslationFunctions = {
 		 * Secure wallet
 		 */
 		secureMe: () => LocalizedString
+	}
+	BackupRequired: {
+		/**
+		 * Back up your wallet first
+		 */
+		modalTitle: () => LocalizedString
+		/**
+		 * Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.
+		 */
+		modalDescription: () => LocalizedString
+		/**
+		 * Back up wallet
+		 */
+		backupNow: () => LocalizedString
 	}
 	NonCustodialInfoBulletin: {
 		/**

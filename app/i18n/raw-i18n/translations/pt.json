@@ -2593,7 +2593,8 @@
             "tooLong": "O endereço deve ter no máximo 50 caracteres de comprimento.",
             "invalidCharacter": "O endereço só pode conter letras, números e sublinhados.",
             "addressUnavailable": "Desculpe, este endereço já está em uso.",
-            "unknownError": "Ocorreu um erro desconhecido, por favor tente novamente mais tarde."
+            "unknownError": "Ocorreu um erro desconhecido, por favor tente novamente mais tarde.",
+            "backupRequired": "Back up your wallet before creating a Lightning address"
         },
         "receiveMoney": "Receba dinheiro de outras carteiras lightning e usuários do {bankName: string} com este endereço.",
         "itCannotBeChanged": "Não pode ser alterado posteriormente."
@@ -3705,6 +3706,11 @@
         "modalTitle": "Proteja seus fundos",
         "modalDescription": "Recomendamos fortemente que você faça backup da sua carteira para evitar uma perda total de fundos caso perca este dispositivo.",
         "secureMe": "Proteger carteira"
+    },
+    "BackupRequired": {
+        "modalTitle": "Back up your wallet first",
+        "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+        "backupNow": "Back up wallet"
     },
     "NonCustodialInfoBulletin": {
         "title": "Esta é uma conta não custodial",

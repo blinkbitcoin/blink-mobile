@@ -2593,7 +2593,8 @@
       "tooLong": "Adresa poate să aibă cel mult 50 de caractere",
       "invalidCharacter": "Adresa poate conține doar litere, cifre și caractere de subliniere",
       "addressUnavailable": "Ne pare rău, această adresă este deja luată",
-      "unknownError": "A apărut o eroare necunoscută, încercați din nou mai târziu"
+      "unknownError": "A apărut o eroare necunoscută, încercați din nou mai târziu",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Primiți bani de la alte portofele Lightning și de la utilizatorii {bankName: string} cu această adresă.",
     "itCannotBeChanged": "Nu poate fi schimbată mai târziu."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Securizați-vă fondurile",
     "modalDescription": "Vă recomandăm insistent să faceți o copie de siguranță a portofelului pentru a preveni pierderea totală a fondurilor în cazul în care pierdeți acest dispozitiv.",
     "secureMe": "Securizare portofel"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Acesta este un cont non-custodial",

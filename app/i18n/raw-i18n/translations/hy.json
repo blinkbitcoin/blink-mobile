@@ -2593,7 +2593,8 @@
       "tooLong": "Հասցեն պետք է ունենա առնվազն 50 նիշ",
       "invalidCharacter": "րՀասցեն կարող է ունենալ միայն նամակներ, թվեր, և ստորագծեր",
       "addressUnavailable": "Ներողություն, այս հասցեն արդեն կիրառվում է",
-      "unknownError": "Անհայտ սխալ։ Խնդրում ենք կրկին փորձել ավելի ուշ"
+      "unknownError": "Անհայտ սխալ։ Խնդրում ենք կրկին փորձել ավելի ուշ",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Ստանալ գումար այլ lightning դրամապանակներից և {bankName: string} օգտատերերից այս հասցեով։ ",
     "itCannotBeChanged": "Այն չի կարող փոփոխվել ավելի ուշ։"
@@ -3705,6 +3706,11 @@
     "modalTitle": "Ապահովեք ձեր միջոցները",
     "modalDescription": "Խիստ խորհուրդ ենք տալիս պահուստավորել ձեր դրամապանակը՝ միջոցների ամբողջական կորուստը կանխելու համար, եթե կորցնեք այս սարքը։",
     "secureMe": "Ապահովել դրամապանակը"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Սա ոչ պահպանող հաշիվ է",

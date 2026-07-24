@@ -2593,7 +2593,8 @@
       "tooLong": "A cím legfeljebb 50 karakter hosszú lehet",
       "invalidCharacter": "A cím csak betűket, számokat és aláhúzásjeleket tartalmazhat",
       "addressUnavailable": "Sajnáljuk, ez a cím már foglalt",
-      "unknownError": "Ismeretlen hiba történt, kérjük, próbálja újra később"
+      "unknownError": "Ismeretlen hiba történt, kérjük, próbálja újra később",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Fogadj pénzt más Lightning tárcákból és {bankName: string} felhasználóktól ezzel a címmel.",
     "itCannotBeChanged": "Később nem lehet megváltoztatni."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Biztosítsd a pénzeszközeidet",
     "modalDescription": "Nyomatékosan javasoljuk, hogy készíts biztonsági mentést a tárcádról, hogy megelőzd a pénzeszközeid teljes elvesztését, ha elveszíted ezt az eszközt.",
     "secureMe": "Tárca biztosítása"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Ez egy nem letétkezelt fiók",

@@ -2593,7 +2593,8 @@
       "tooLong": "Adres kan nie meer as 50 karakters lank wees nie",
       "invalidCharacter": "Adres kan net letters, nommers en 'n onderstreep bevat",
       "addressUnavailable": "Jammer, die adres is reeds geneem",
-      "unknownError": "'n Onbekende fout het voorgekom, probeer asseblief later weer"
+      "unknownError": "'n Onbekende fout het voorgekom, probeer asseblief later weer",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Ontvang geld van ander lightningbeursies en {bankName: string}-gebruikers met die adres",
     "itCannotBeChanged": "Dit kan nie later verander word nie."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Beveilig jou fondse",
     "modalDescription": "Ons beveel sterk aan dat u u beursie rugsteun om 'n algehele verlies van fondse te voorkom indien u hierdie toestel verloor.",
     "secureMe": "Beveilig beursie"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Hierdie is 'n nie-bewaarrekening",

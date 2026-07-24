@@ -2593,7 +2593,8 @@
       "tooLong": "Anwani lazima iwe na herufi si zaidi ya 50",
       "invalidCharacter": "Anwani inaweza kuwa na herufi, nambari, na alama ya chini pekee",
       "addressUnavailable": "Samahani, anwani hii tayari imetumika",
-      "unknownError": "Kuna hitilafu isiyofahamika, tafadhali jaribu tena baadaye"
+      "unknownError": "Kuna hitilafu isiyofahamika, tafadhali jaribu tena baadaye",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Pokea pesa kutoka kwa mkoba mwingine wa umeme na watumiaji wa {bankName: string} na anwani hii.",
     "itCannotBeChanged": "Haitaweza kubadilishwa baadaye."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Linda fedha zako",
     "modalDescription": "Tunakushauri sana uhifadhi pochi yako ili kuzuia kupoteza fedha zako zote iwapo utapoteza kifaa hiki.",
     "secureMe": "Linda pochi"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Hii ni akaunti isiyo ya udhamini",

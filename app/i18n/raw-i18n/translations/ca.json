@@ -2593,7 +2593,8 @@
       "tooLong": "L'adreça pot ser com a màxim de 50 caràcters",
       "invalidCharacter": "L'adreça només pot contenir lletres, números i guions baixos",
       "addressUnavailable": "Ho sentim, aquesta adreça ja està presa",
-      "unknownError": "S'ha produït un error desconegut. Torna-ho a provar més tard"
+      "unknownError": "S'ha produït un error desconegut. Torna-ho a provar més tard",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Rep diners d'altres moneders lightning i usuaris de {bankName: string} amb aquesta adreça.",
     "itCannotBeChanged": "No es pot canviar més endavant."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Assegura els teus fons",
     "modalDescription": "Et recomanem fermament que facis una còpia de seguretat de la teva cartera per evitar una pèrdua total de fons en cas que perdis aquest dispositiu.",
     "secureMe": "Assegurar cartera"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Aquest és un compte no custodi",

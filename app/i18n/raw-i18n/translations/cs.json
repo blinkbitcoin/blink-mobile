@@ -2593,7 +2593,8 @@
       "tooLong": "Adresa může mít maximálně 50 znaků",
       "invalidCharacter": "Adresa může obsahovat pouze písmena, číslice a podtržítka.",
       "addressUnavailable": "Tato adresa je již obsazena",
-      "unknownError": "Došlo k neznámé chybě, zkuste to prosím později"
+      "unknownError": "Došlo k neznámé chybě, zkuste to prosím později",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Přijímejte peníze z jiných Lightning peněženek a od uživatelů {bankName: string} s touto adresou.",
     "itCannotBeChanged": "Později ji nelze změnit."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Zabezpečte své prostředky",
     "modalDescription": "Důrazně doporučujeme zálohovat peněženku, abyste předešli úplné ztrátě prostředků v případě ztráty tohoto zařízení.",
     "secureMe": "Zabezpečit peněženku"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Toto je nesvěřenský účet",

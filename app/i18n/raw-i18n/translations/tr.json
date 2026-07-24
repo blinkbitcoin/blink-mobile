@@ -2593,7 +2593,8 @@
       "tooLong": "Adres en fazla 50 karakter uzunluğunda olabilir",
       "invalidCharacter": "Adres yalnızca harf, sayı ve alttan çizgi içerebilir",
       "addressUnavailable": "Üzgünüm, bu adres çoktan alındı",
-      "unknownError": "Bilinmeyen bir hata yaşandı, lütfen daha sonra tekrar deneyin"
+      "unknownError": "Bilinmeyen bir hata yaşandı, lütfen daha sonra tekrar deneyin",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Bu adresle diğer lightning cüzdanlarından ve {bankName: string} kullanıcılarından para alın.",
     "itCannotBeChanged": "Bu daha sonra değiştirilebilir."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Fonlarınızı güvenceye alın",
     "modalDescription": "Cüzdanınızı yedeklemenizi şiddetle tavsiye ederiz. Bu cihazı kaybetmeniz durumunda fonlarınızın tamamen kaybolmasını önlemek için.",
     "secureMe": "Cüzdanı güvenceye al"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Bu, saklamasız bir hesaptır",

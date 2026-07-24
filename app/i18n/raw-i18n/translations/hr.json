@@ -2593,7 +2593,8 @@
       "tooLong": "Adresa mora imati najviše 50 znakova",
       "invalidCharacter": "Adresa može sadržavati samo slova, brojke i donje crte",
       "addressUnavailable": "Nažalost, ova adresa je već zauzeta",
-      "unknownError": "Došlo je do nepoznate pogreške, molimo pokušajte ponovno kasnije"
+      "unknownError": "Došlo je do nepoznate pogreške, molimo pokušajte ponovno kasnije",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Primajte novac od drugih Lightning novčanika i korisnika {bankName: string} s ovom adresom.",
     "itCannotBeChanged": "Kasnije se ne može promijeniti."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Osigurajte svoja sredstva",
     "modalDescription": "Preporučujemo da napravite sigurnosnu kopiju novčanika kako biste spriječili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
     "secureMe": "Osiguraj novčanik"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Ovo je račun bez skrbništva",
