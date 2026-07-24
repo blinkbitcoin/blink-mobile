@@ -126,6 +126,33 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     expect(detail.destination).toBe("user@example.com")
   })
 
+  it("canonicalizes a pay.blink.sv identifier to blink.sv for display", () => {
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        lnurlParams: baseLnurlParams({ identifier: "user@pay.blink.sv" }),
+      }),
+    )
+    expect(detail.destination).toBe("user@blink.sv")
+  })
+
+  it("canonicalizes the legacy pay.bbw.sv alias to blink.sv for display", () => {
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        lnurlParams: baseLnurlParams({ identifier: "user@pay.bbw.sv" }),
+      }),
+    )
+    expect(detail.destination).toBe("user@blink.sv")
+  })
+
+  it("keeps an already-canonical blink.sv identifier unchanged", () => {
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        lnurlParams: baseLnurlParams({ identifier: "user@blink.sv" }),
+      }),
+    )
+    expect(detail.destination).toBe("user@blink.sv")
+  })
+
   it("falls back to the bech32 lnurl when no identifier is present (raw LNURL pay)", () => {
     const detail = createSelfCustodialLnurlPaymentDetails(
       createParams({

@@ -1,4 +1,5 @@
 import {
+  canonicalizeLightningAddress,
   extractLightningAddressUsername,
   getDonationButtonUrl,
   getLightningAddress,
@@ -64,6 +65,54 @@ describe("getLightningAddress", () => {
 
   it("appends @hostname when the address has no @", () => {
     expect(getLightningAddress("blink.sv", "alice")).toBe("alice@blink.sv")
+  })
+})
+
+describe("canonicalizeLightningAddress", () => {
+  it("rewrites the pay.blink.sv alias to the canonical domain", () => {
+    expect(canonicalizeLightningAddress("alice@pay.blink.sv")).toBe("alice@blink.sv")
+  })
+
+  it("rewrites the legacy pay.bbw.sv alias to the canonical domain", () => {
+    expect(canonicalizeLightningAddress("alice@pay.bbw.sv")).toBe("alice@blink.sv")
+  })
+
+  it("is a no-op for an already-canonical address", () => {
+    expect(canonicalizeLightningAddress("alice@blink.sv")).toBe("alice@blink.sv")
+  })
+
+  it("matches alias domains case-insensitively", () => {
+    expect(canonicalizeLightningAddress("alice@PAY.BLINK.SV")).toBe("alice@blink.sv")
+  })
+
+  it("leaves non-Blink addresses untouched", () => {
+    expect(canonicalizeLightningAddress("alice@walletofsatoshi.com")).toBe(
+      "alice@walletofsatoshi.com",
+    )
+  })
+
+  // Staging is self-consistent: its lnAddressHostname is pay.staging.blink.sv,
+  // so the staging domain is intentionally not treated as an alias.
+  it("leaves the staging domain untouched", () => {
+    expect(canonicalizeLightningAddress("alice@pay.staging.blink.sv")).toBe(
+      "alice@pay.staging.blink.sv",
+    )
+  })
+
+  it("leaves a bech32 lnurl string untouched", () => {
+    expect(canonicalizeLightningAddress("lnurl1dp68gurn8ghj7mrww4exctnxd3shg6tr")).toBe(
+      "lnurl1dp68gurn8ghj7mrww4exctnxd3shg6tr",
+    )
+  })
+
+  it("leaves an empty string untouched", () => {
+    expect(canonicalizeLightningAddress("")).toBe("")
+  })
+
+  it("leaves multi-@ input untouched", () => {
+    expect(canonicalizeLightningAddress("alice@bob@pay.blink.sv")).toBe(
+      "alice@bob@pay.blink.sv",
+    )
   })
 })
 

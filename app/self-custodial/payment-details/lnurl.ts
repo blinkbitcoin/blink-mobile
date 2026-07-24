@@ -31,6 +31,7 @@ import {
   type WalletOrDisplayCurrency,
 } from "@app/types/amounts"
 import { ConvertDirection } from "@app/types/payment"
+import { canonicalizeLightningAddress } from "@app/utils/pay-links"
 
 import {
   buildConversionType,
@@ -259,7 +260,9 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     })
 
   return {
-    destination: lnurlParams.identifier || lnurl,
+    destination: lnurlParams.identifier
+      ? canonicalizeLightningAddress(lnurlParams.identifier)
+      : lnurl,
     memo,
     convertMoneyAmount,
     setConvertMoneyAmount,

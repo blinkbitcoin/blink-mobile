@@ -1,3 +1,5 @@
+import { BLINK_DOMAIN, LNURL_DOMAINS } from "@app/config/appinfo"
+
 const DONATION_BUTTON_URL = "https://donation-button.blink.sv"
 
 // The point of sale and its printable QR are served by the standalone terminal for
@@ -33,6 +35,23 @@ export const getLightningAddress = (
 ): string => {
   if (address.includes("@")) return address
   return `${address}@${lnAddressHostname}`
+}
+
+/**
+ * The pay-server advertises LNURL identifiers under its own hostname
+ * (user@pay.blink.sv), while the address we show users everywhere else is
+ * user@blink.sv. Rewrites addresses on a Blink alias domain to the canonical
+ * form; anything else — non-Blink addresses, bech32 lnurl strings, malformed
+ * values — passes through unchanged.
+ */
+export const canonicalizeLightningAddress = (address: string): string => {
+  const parts = address.split("@")
+  if (parts.length !== 2) return address
+  const [username, domain] = parts
+  if (!username || !domain) return address
+  return LNURL_DOMAINS.includes(domain.toLowerCase())
+    ? `${username}@${BLINK_DOMAIN}`
+    : address
 }
 
 export const extractLightningAddressUsername = (
