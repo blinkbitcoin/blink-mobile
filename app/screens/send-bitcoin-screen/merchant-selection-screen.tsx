@@ -1,22 +1,21 @@
 import React, { useCallback, useRef, useState } from "react"
 import { Alert, FlatList, Pressable, View } from "react-native"
-import { RouteProp, useNavigation } from "@react-navigation/native"
+import { RouteProp, useFocusEffect, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useAppConfig, useDisplayCurrency } from "@app/hooks"
+import { useDisplayCurrency } from "@app/hooks"
 import { useAccountDefaultWalletLazyQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { logParseDestinationResult } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
 import { useScanContext } from "@app/hooks/use-scan-context"
 
-import { resolveDestination } from "./payment-destination/resolve-destination"
+import { resolveMerchantChoiceDestination } from "./payment-destination/merchant"
 import { isSendDestination, MerchantChoice } from "./payment-destination/index.types"
 
 type Props = {
@@ -37,18 +36,22 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
   const [selectedMerchantId, setSelectedMerchantId] = useState<string | null>(null)
   const [resolvingMerchantId, setResolvingMerchantId] = useState<string | null>(null)
   const resolveRequestIdRef = useRef(0)
+  const isActiveRef = useRef(false)
   const { myWalletIds, bitcoinNetwork, lnurlDomains } = useScanContext()
   const { displayCurrency } = useDisplayCurrency()
   const { sdk } = useSelfCustodialWallet()
-  const sparkNetwork = useSparkNetwork()
   const [accountDefaultWalletQuery] = useAccountDefaultWalletLazyQuery({
     fetchPolicy: "no-cache",
   })
-  const {
-    appConfig: {
-      galoyInstance: { lnAddressHostname },
-    },
-  } = useAppConfig()
+  useFocusEffect(
+    useCallback(() => {
+      isActiveRef.current = true
+      return () => {
+        isActiveRef.current = false
+        resolveRequestIdRef.current += 1
+      }
+    }, []),
+  )
 
   const handleMerchantPress = useCallback(
     async (merchant: MerchantChoice) => {
@@ -66,8 +69,9 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
       }
 
       try {
-        const destination = await resolveDestination(
-          {
+        const destination = await resolveMerchantChoiceDestination({
+          merchant,
+          params: {
             rawInput: merchant.lnurl,
             myWalletIds,
             bitcoinNetwork,
@@ -75,10 +79,9 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
             accountDefaultWalletQuery,
             displayCurrency,
           },
-          { sdk, network: sparkNetwork },
-          lnAddressHostname,
-        )
-        if (requestId !== resolveRequestIdRef.current) return
+          sdk: sdk ?? null,
+        })
+        if (requestId !== resolveRequestIdRef.current || !isActiveRef.current) return
 
         logParseDestinationResult(destination)
 
@@ -89,7 +92,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
 
         navigation.replace("sendBitcoinDestination", { payment: merchant.lnurl })
       } catch (err: unknown) {
-        if (requestId !== resolveRequestIdRef.current) return
+        if (requestId !== resolveRequestIdRef.current || !isActiveRef.current) return
 
         setSelectedMerchantId(null)
         if (err instanceof Error) {
@@ -97,7 +100,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
           Alert.alert(err.toString(), "", [{ text: LL.common.ok() }])
         }
       } finally {
-        if (requestId === resolveRequestIdRef.current) {
+        if (requestId === resolveRequestIdRef.current && isActiveRef.current) {
           setResolvingMerchantId(null)
         }
       }
@@ -111,8 +114,6 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
       accountDefaultWalletQuery,
       displayCurrency,
       sdk,
-      sparkNetwork,
-      lnAddressHostname,
       resolvingMerchantId,
     ],
   )

@@ -6,7 +6,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react-nativ
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import MerchantSelectionScreen from "@app/screens/send-bitcoin-screen/merchant-selection-screen"
 import { DestinationDirection } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
-import { resolveDestination } from "@app/screens/send-bitcoin-screen/payment-destination/resolve-destination"
+import { resolveMerchantChoiceDestination } from "@app/screens/send-bitcoin-screen/payment-destination/merchant"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import { ContextForScreenWithTheme } from "./helper"
@@ -21,6 +21,7 @@ const mockScanContext = {
 }
 let mockSelfCustodialSdk: unknown
 let mockSparkNetwork = "MAINNET"
+const mockFocusCleanups: Array<() => void> = []
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: mockRecordError,
@@ -53,12 +54,9 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ sdk: mockSelfCustodialSdk }),
 }))
 
-jest.mock(
-  "@app/screens/send-bitcoin-screen/payment-destination/resolve-destination",
-  () => ({
-    resolveDestination: jest.fn(),
-  }),
-)
+jest.mock("@app/screens/send-bitcoin-screen/payment-destination/merchant", () => ({
+  resolveMerchantChoiceDestination: jest.fn(),
+}))
 
 jest.mock("@app/utils/analytics", () => ({
   logParseDestinationResult: jest.fn(),
@@ -66,6 +64,10 @@ jest.mock("@app/utils/analytics", () => ({
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
+  useFocusEffect: (effect: () => void | (() => void)) => {
+    const cleanup = effect()
+    if (cleanup) mockFocusCleanups.push(cleanup)
+  },
   useNavigation: () => ({
     replace: mockReplace,
   }),
@@ -107,12 +109,14 @@ const renderScreen = (mode: "light" | "dark" = "light", routeParams = route.para
   )
 
 describe("MerchantSelectionScreen", () => {
-  const resolveDestinationMock = resolveDestination as jest.MockedFunction<
-    typeof resolveDestination
-  >
+  const resolveMerchantChoiceDestinationMock =
+    resolveMerchantChoiceDestination as jest.MockedFunction<
+      typeof resolveMerchantChoiceDestination
+    >
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockFocusCleanups.splice(0, mockFocusCleanups.length)
     jest.spyOn(Alert, "alert").mockImplementation(jest.fn())
     loadLocale("en")
     Object.assign(mockScanContext, {
@@ -122,7 +126,7 @@ describe("MerchantSelectionScreen", () => {
     })
     mockSelfCustodialSdk = undefined
     mockSparkNetwork = "MAINNET"
-    resolveDestinationMock.mockResolvedValue({
+    resolveMerchantChoiceDestinationMock.mockResolvedValue({
       valid: true,
       destinationDirection: DestinationDirection.Send,
       validDestination: {
@@ -166,14 +170,16 @@ describe("MerchantSelectionScreen", () => {
     expect(screen.getByTestId(`merchant-${merchants[1].id}-selected`)).toBeTruthy()
 
     await waitFor(() =>
-      expect(resolveDestinationMock).toHaveBeenCalledWith(
+      expect(resolveMerchantChoiceDestinationMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          rawInput: merchants[1].lnurl,
-          displayCurrency: "USD",
-          accountDefaultWalletQuery: mockAccountDefaultWalletQuery,
+          merchant: merchants[1],
+          params: expect.objectContaining({
+            rawInput: merchants[1].lnurl,
+            displayCurrency: "USD",
+            accountDefaultWalletQuery: mockAccountDefaultWalletQuery,
+          }),
+          sdk: null,
         }),
-        { sdk: undefined, network: "MAINNET" },
-        "blink.sv",
       ),
     )
     expect(mockReplace).toHaveBeenCalledWith("sendBitcoinDetails", {
@@ -207,17 +213,19 @@ describe("MerchantSelectionScreen", () => {
     )
 
     await waitFor(() =>
-      expect(resolveDestinationMock).toHaveBeenCalledWith(
+      expect(resolveMerchantChoiceDestinationMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          rawInput: merchants[1].lnurl,
-          myWalletIds: ["spark-wallet-id"],
-          bitcoinNetwork: "regtest",
-          lnurlDomains: [],
-          accountDefaultWalletQuery: mockAccountDefaultWalletQuery,
-          displayCurrency: "USD",
+          merchant: merchants[1],
+          params: expect.objectContaining({
+            rawInput: merchants[1].lnurl,
+            myWalletIds: ["spark-wallet-id"],
+            bitcoinNetwork: "regtest",
+            lnurlDomains: [],
+            accountDefaultWalletQuery: mockAccountDefaultWalletQuery,
+            displayCurrency: "USD",
+          }),
+          sdk: sparkSdk,
         }),
-        { sdk: sparkSdk, network: "REGTEST" },
-        "blink.sv",
       ),
     )
     expect(mockReplace).toHaveBeenCalledWith("sendBitcoinDetails", {
@@ -229,7 +237,7 @@ describe("MerchantSelectionScreen", () => {
   })
 
   it("falls back to destination parsing screen if the selected merchant cannot resolve", async () => {
-    resolveDestinationMock.mockResolvedValue({
+    resolveMerchantChoiceDestinationMock.mockResolvedValue({
       valid: false,
       invalidReason: "UnknownDestination",
       invalidPaymentDestination: {
@@ -252,9 +260,9 @@ describe("MerchantSelectionScreen", () => {
 
   it("disables merchant rows while the selected merchant is resolving", async () => {
     let resolveSelectedMerchant: (
-      value: Awaited<ReturnType<typeof resolveDestination>>,
+      value: Awaited<ReturnType<typeof resolveMerchantChoiceDestination>>,
     ) => void
-    resolveDestinationMock.mockReturnValue(
+    resolveMerchantChoiceDestinationMock.mockReturnValue(
       new Promise((resolve) => {
         resolveSelectedMerchant = resolve
       }),
@@ -268,7 +276,7 @@ describe("MerchantSelectionScreen", () => {
     fireEvent.press(
       screen.getByLabelText(`${merchants[0].title}. ${merchants[0].description}`),
     )
-    expect(resolveDestinationMock).toHaveBeenCalledTimes(1)
+    expect(resolveMerchantChoiceDestinationMock).toHaveBeenCalledTimes(1)
 
     resolveSelectedMerchant!({
       valid: false,
@@ -288,7 +296,7 @@ describe("MerchantSelectionScreen", () => {
 
   it("clears selection and alerts if selected merchant resolution throws", async () => {
     const error = new Error("LNURL failed")
-    resolveDestinationMock.mockRejectedValue(error)
+    resolveMerchantChoiceDestinationMock.mockRejectedValue(error)
     renderScreen()
 
     fireEvent.press(
@@ -299,7 +307,7 @@ describe("MerchantSelectionScreen", () => {
     expect(Alert.alert).toHaveBeenCalledWith(error.toString(), "", [{ text: "OK" }])
     expect(screen.queryByTestId(`merchant-${merchants[1].id}-selected`)).toBeNull()
 
-    resolveDestinationMock.mockResolvedValue({
+    resolveMerchantChoiceDestinationMock.mockResolvedValue({
       valid: false,
       invalidReason: "UnknownDestination",
       invalidPaymentDestination: {
@@ -310,7 +318,45 @@ describe("MerchantSelectionScreen", () => {
     fireEvent.press(
       screen.getByLabelText(`${merchants[0].title}. ${merchants[0].description}`),
     )
-    await waitFor(() => expect(resolveDestinationMock).toHaveBeenCalledTimes(2))
+    await waitFor(() =>
+      expect(resolveMerchantChoiceDestinationMock).toHaveBeenCalledTimes(2),
+    )
+  })
+
+  it("does not navigate or alert when resolution completes after blur", async () => {
+    let resolveSelectedMerchant: (
+      value: Awaited<ReturnType<typeof resolveMerchantChoiceDestination>>,
+    ) => void
+    resolveMerchantChoiceDestinationMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveSelectedMerchant = resolve
+      }),
+    )
+    renderScreen()
+
+    fireEvent.press(
+      screen.getByLabelText(`${merchants[1].title}. ${merchants[1].description}`),
+    )
+    mockFocusCleanups.forEach((cleanup) => cleanup())
+    mockRecordError.mockClear()
+    resolveSelectedMerchant!({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Lnurl,
+        lnurl: merchants[1].lnurl,
+        isMerchant: true,
+        merchant: merchants[1],
+        lnurlParams: {} as never,
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    await waitFor(() => expect(resolveMerchantChoiceDestinationMock).toHaveBeenCalled())
+    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockRecordError).not.toHaveBeenCalled()
+    expect(Alert.alert).not.toHaveBeenCalled()
   })
 
   it("limits long merchant text without dropping row content", () => {

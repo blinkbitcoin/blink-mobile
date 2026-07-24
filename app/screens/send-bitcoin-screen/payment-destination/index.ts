@@ -15,6 +15,7 @@ import {
 import { resolveIntraledgerDestination } from "./intraledger"
 import { resolveLightningDestination } from "./lightning"
 import { resolveLnurlDestination } from "./lnurl"
+import { merchantChoiceToLnurlDestination } from "./merchant"
 import { resolveOnchainDestination } from "./onchain"
 
 export * from "./intraledger"
@@ -62,13 +63,7 @@ export const parseDestination = async ({
 
     const [merchant] = merchants
     return resolveLnurlDestination({
-      parsedLnurlDestination: {
-        paymentType: PaymentType.Lnurl,
-        valid: true,
-        lnurl: merchant.lnurl,
-        isMerchant: true,
-        merchant,
-      },
+      parsedLnurlDestination: merchantChoiceToLnurlDestination(merchant),
       lnurlDomains,
       accountDefaultWalletQuery,
       myWalletIds,

@@ -1,5 +1,6 @@
 import { Network } from "@app/graphql/generated"
 import { parseDestination } from "@app/screens/send-bitcoin-screen/payment-destination"
+import { resolveMerchantChoiceDestination } from "@app/screens/send-bitcoin-screen/payment-destination/merchant"
 import {
   DestinationDirection,
   InvalidDestinationReason,
@@ -147,6 +148,57 @@ describe("merchant payment destination integration", () => {
           lnurl: expectedMerchant.lnurl,
           isMerchant: true,
           merchant: expectedMerchant,
+          lnurlParams,
+        }),
+      }),
+    )
+  })
+
+  it("resolves a selected real multi-merchant fixture with merchant metadata intact", async () => {
+    const merchantChoices = await parseMerchantDestination()
+    if (!isMerchantChoiceDestination(merchantChoices)) {
+      throw new Error("Expected merchant choices")
+    }
+    const selectedMerchant = merchantChoices.validDestination.merchants[0]
+    const lnurlParams = {
+      callback: "mocked_callback",
+      fixed: true,
+      min: 0 as Satoshis,
+      max: 2000 as Satoshis,
+      domain: "swap.blink.sv",
+      metadata: [["text/plain", "description"]],
+      metadataHash: "mocked_metadata_hash",
+      identifier: selectedMerchant.lnurl,
+      description: "mocked_description",
+      image: "",
+      commentAllowed: 0,
+      rawData: {},
+    }
+    requestPayServiceParamsMock.mockResolvedValue(lnurlParams)
+
+    const result = await resolveMerchantChoiceDestination({
+      merchant: selectedMerchant,
+      params: {
+        rawInput: selectedMerchant.lnurl,
+        myWalletIds: ["wallet-id"],
+        bitcoinNetwork: Network.Mainnet,
+        lnurlDomains: ["blink.sv"],
+        accountDefaultWalletQuery: jest.fn() as never,
+        inputSource: "manual",
+        displayCurrency: "USD",
+      },
+      sdk: null,
+    })
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
+        validDestination: expect.objectContaining({
+          paymentType: PaymentType.Lnurl,
+          lnurl: selectedMerchant.lnurl,
+          isMerchant: true,
+          merchant: selectedMerchant,
           lnurlParams,
         }),
       }),
