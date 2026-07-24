@@ -11,6 +11,6 @@
     ],
     "types": ["webdriverio/async", "@wdio/globals/types", "@wdio/mocha-framework", "@wdio/devtools-service", "@types/jest"]
   },
-  "include": ["app", "e2e", "__tests__", "test", "storybook", "utils/declaration.d.ts"],
+  "include": ["app", "e2e", "__tests__", "test", "utils/declaration.d.ts"],
   "exclude": ["node_modules"]
 }

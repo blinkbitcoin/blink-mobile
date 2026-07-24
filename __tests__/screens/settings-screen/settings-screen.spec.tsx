@@ -23,16 +23,26 @@ import {
   waitFor,
   within,
 } from "@testing-library/react-native"
+import { MockedProvider, MockedResponse } from "@apollo/client/testing"
+import { createCache } from "@app/graphql/cache"
 import { SettingsScreenDocument } from "@app/graphql/generated"
+import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
 import { SettingsScreen } from "@app/screens/settings-screen/settings-screen"
 import { SettingsRow } from "@app/screens/settings-screen/row"
 import { LevelContextProvider, AccountLevel } from "@app/graphql/level-context"
-import { LoggedInWithUsername } from "@app/screens/settings-screen/settings-screen.stories"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import mocks from "@app/graphql/mocks"
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
+
+const LoggedInWithUsername = ({ mock }: { mock: MockedResponse[] }) => (
+  <MockedProvider mocks={mock} cache={createCache()}>
+    <IsAuthedContextProvider value={true}>
+      <SettingsScreen />
+    </IsAuthedContextProvider>
+  </MockedProvider>
+)
 
 const notificationTitle = "Test notification"
 const notificationBody = "Test body"

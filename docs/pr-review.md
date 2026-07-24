@@ -398,7 +398,6 @@ Deep reviews label structural findings by principle, and authors answer per-prin
 | `app/graphql/generated.ts`, `app/graphql/generated.gql` | `yarn dev:codegen` |
 | `app/i18n/i18n-types.ts`, `app/i18n/<locale>/` (all non-en), `app/i18n/raw-i18n/` | `yarn update-translations` |
 | `supergraph.graphql` | `supergraph.sh` |
-| `.storybook/storyLoader.ts` | story loader (`yarn storybook`) |
 | `.github/workflows/vendor/`, `ci/vendor/`, `dev/vendor/` | vendir / shared-CI sync |
 
 A hand edit to any of these is an automatic finding; CI drift checks

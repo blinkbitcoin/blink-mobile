@@ -10,10 +10,28 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { createTheme, ThemeProvider } from "@rn-vui/themed"
 
-import { StoryScreen } from "../../.storybook/views"
 import { createCache } from "../../app/graphql/cache"
 import { IsAuthedContextProvider } from "../../app/graphql/is-authed-context"
 import { AccountRegistryProvider } from "../../app/hooks/use-account-registry"
+import { PersistentStateContext } from "../../app/store/persistent-state"
+
+const PersistentStateWrapper: React.FC<PropsWithChildren> = ({ children }) => (
+  <PersistentStateContext.Provider
+    value={{
+      persistentState: {
+        schemaVersion: 14,
+        galoyInstance: {
+          id: "Main",
+        },
+        galoyAuthToken: "",
+      },
+      updateState: () => {},
+      resetState: () => {},
+    }}
+  >
+    <>{children}</>
+  </PersistentStateContext.Provider>
+)
 
 const Stack = createNativeStackNavigator()
 
@@ -36,13 +54,13 @@ export const ContextForScreen: React.FC<PropsWithChildren<{ headerShown?: boolea
         <Stack.Screen name="Home">
           {() => (
             <MockedProvider mocks={mocks} cache={createCache()}>
-              <StoryScreen>
+              <PersistentStateWrapper>
                 <TypesafeI18n locale={detectDefaultLocale()}>
                   <IsAuthedContextProvider value={true}>
                     <AccountRegistryProvider>{children}</AccountRegistryProvider>
                   </IsAuthedContextProvider>
                 </TypesafeI18n>
-              </StoryScreen>
+              </PersistentStateWrapper>
             </MockedProvider>
           )}
         </Stack.Screen>
@@ -60,13 +78,13 @@ export const ContextForScreenWithTheme: React.FC<
         <Stack.Screen name="Home">
           {() => (
             <MockedProvider mocks={mocks} cache={createCache()}>
-              <StoryScreen>
+              <PersistentStateWrapper>
                 <TypesafeI18n locale={detectDefaultLocale()}>
                   <IsAuthedContextProvider value={true}>
                     <AccountRegistryProvider>{children}</AccountRegistryProvider>
                   </IsAuthedContextProvider>
                 </TypesafeI18n>
-              </StoryScreen>
+              </PersistentStateWrapper>
             </MockedProvider>
           )}
         </Stack.Screen>

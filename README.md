@@ -22,15 +22,6 @@ If you wish to contribute see [CONTRIBUTING.MD](./CONTRIBUTING.MD)
 
 The app currently only builds for x86_64 simulators. Simulators prior to IOS 13.7 are x86_64 by default, however starting with 13.7 they become platform specific. In order to get an x86_64 simulator of a newer IOS version, one must set XCode to open in [emulation using Rosetta](https://www.macworld.com/article/338843/how-to-force-a-native-m1-mac-app-to-run-as-an-intel-app-instead.html). To run the project, open [GaloyApp.xcworkspace](./ios/GaloyApp.xcworkspace/) in XCode, choose an x86_64 simulator, and click the play button. This should start the Metro bundler in a new terminal as well as launch the simulator with the app.
 
-## Running Storybook
-
-From the command line in your generated app's root directory, enter `yarn storybook`
-This starts up the storybook server.
-
-In `index.js`, change `SHOW_STORYBOOK` to `true` and reload the app and run `yarn storybook`.
-
-For Visual Studio Code users, there is a handy extension that makes it easy to load Storybook use cases into a running emulator via tapping on items in the editor sidebar. Install the `React Native Storybook` extension by `Orta`, hit `cmd + shift + P` and select "Reconnect Storybook to VSCode". Expand the STORYBOOK section in the sidebar to see all use cases for components that have `.story.tsx` files in their directories.
-
 ## E2E testing:
 
 see [readme](docs/e2e-testing.md).

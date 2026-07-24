@@ -233,7 +233,6 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     }
   }, [txid, tx.settlementCurrency, latestBtcTxId, latestUsdTxId, markTxSeen])
 
-  // FIXME doesn't work with storybook
   // TODO: translation
   if (!tx || Object.keys(tx).length === 0)
     return <Text>{"No transaction found with this ID (should not happen)"}</Text>

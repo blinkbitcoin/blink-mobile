@@ -9,12 +9,15 @@ import {
 } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
-import {
-  Success,
-  Queued,
-  Pending,
-  SuccessAction,
-} from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen.stories"
+import { MockedProvider } from "@apollo/client/testing"
+import { RouteProp } from "@react-navigation/native"
+
+import { createCache } from "@app/graphql/cache"
+import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
+import mocks from "@app/graphql/mocks"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen"
+
 import { ContextForScreen, ContextForScreenWithTheme } from "./helper"
 import { Linking, View, ViewStyle } from "react-native"
 import { light, dark } from "@app/rne-theme/colors"
@@ -36,6 +39,57 @@ jest.mock("react-native-view-shot", () => {
 })
 
 jest.useFakeTimers()
+
+const MockedScreen = ({
+  route,
+}: {
+  route: RouteProp<RootStackParamList, "sendBitcoinCompleted">
+}) => (
+  <MockedProvider mocks={mocks} cache={createCache()}>
+    <IsAuthedContextProvider value={true}>
+      <SendBitcoinCompletedScreen route={route} />
+    </IsAuthedContextProvider>
+  </MockedProvider>
+)
+
+const successRoute = {
+  key: "sendBitcoinCompleted",
+  name: "sendBitcoinCompleted",
+  params: {
+    status: "SUCCESS",
+    arrivalAtMempoolEstimate: undefined,
+  },
+} as const
+
+const Success = () => <MockedScreen route={successRoute} />
+
+const queuedRoute = {
+  key: "sendBitcoinCompleted",
+  name: "sendBitcoinCompleted",
+  params: {
+    status: "PENDING",
+    arrivalAtMempoolEstimate: 10000,
+  },
+} as const
+
+const Queued = () => <MockedScreen route={queuedRoute} />
+
+const pendingRoute = {
+  key: "sendBitcoinCompleted",
+  name: "sendBitcoinCompleted",
+  params: {
+    status: "PENDING",
+    arrivalAtMempoolEstimate: undefined,
+  },
+} as const
+
+const Pending = () => <MockedScreen route={pendingRoute} />
+
+const SuccessAction = ({
+  route,
+}: {
+  route: RouteProp<RootStackParamList, "sendBitcoinCompleted">
+}) => <MockedScreen route={route} />
 
 describe("SendBitcoinCompletedScreen", () => {
   let LL: ReturnType<typeof i18nObject>
