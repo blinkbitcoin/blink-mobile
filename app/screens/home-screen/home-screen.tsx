@@ -613,16 +613,20 @@ export const HomeScreen: React.FC = () => {
     },
   ]
 
-  const isIosWithBalance = isIos && satsBalance > 0
+  const passesIosGate =
+    isSelfCustodial ||
+    !isIos ||
+    dataUnauthed?.globals?.network !== "mainnet" ||
+    levelAccount === AccountLevel.Two ||
+    levelAccount === AccountLevel.Three ||
+    (isIos && satsBalance > 0)
 
+  /** A transfer-blocked country must not hide the button while the dollar
+   *  balance is restricted — the disabled button is the user's entry point to
+   *  the restriction explanation (WalletOverview greys the row from the same
+   *  hook). Only the iOS zero-balance gate may hide it in that state. */
   const shouldShowTransferButton =
-    !isTransferBlocked &&
-    (isSelfCustodial ||
-      !isIos ||
-      dataUnauthed?.globals?.network !== "mainnet" ||
-      levelAccount === AccountLevel.Two ||
-      levelAccount === AccountLevel.Three ||
-      isIosWithBalance)
+    passesIosGate && (!isTransferBlocked || isDollarBalanceRestricted)
 
   if (shouldShowTransferButton) {
     buttons.unshift({

@@ -629,6 +629,116 @@ const selfCustodialReadyWalletOverride = (usdBalance: number) => ({
   needsBackendAuth: false,
 })
 
+type RestrictionInvariantCase = {
+  description: string
+  restricted: boolean
+  transferBlocked: boolean
+  level: AccountLevel
+  btcBalance: number
+  expectButton: "disabled" | "enabled" | "hidden"
+}
+
+// Invariant: a dollar-restricted account must always see the transfer button
+// (disabled, opening the restriction modal) so the greyed-out dollar row has
+// an explanation path. The only exception is the iOS zero-balance gate.
+const restrictionInvariantCases: RestrictionInvariantCase[] = [
+  {
+    description:
+      "dollar restricted + transfers blocked --> transfer button shown but disabled",
+    restricted: true,
+    transferBlocked: true,
+    level: AccountLevel.Two,
+    btcBalance: 1000,
+    expectButton: "disabled",
+  },
+  {
+    description:
+      "dollar restricted + transfers allowed --> transfer button shown but disabled",
+    restricted: true,
+    transferBlocked: false,
+    level: AccountLevel.Two,
+    btcBalance: 1000,
+    expectButton: "disabled",
+  },
+  {
+    description: "dollar restricted + iOS zero-balance gate --> transfer button hidden",
+    restricted: true,
+    transferBlocked: false,
+    level: AccountLevel.One,
+    btcBalance: 0,
+    expectButton: "hidden",
+  },
+  {
+    description:
+      "dollar restricted + transfers blocked + iOS zero-balance gate --> transfer button hidden",
+    restricted: true,
+    transferBlocked: true,
+    level: AccountLevel.One,
+    btcBalance: 0,
+    expectButton: "hidden",
+  },
+  {
+    description:
+      "dollar active + transfers blocked + iOS zero-balance gate --> transfer button hidden",
+    restricted: false,
+    transferBlocked: true,
+    level: AccountLevel.One,
+    btcBalance: 0,
+    expectButton: "hidden",
+  },
+  {
+    description: "dollar active + transfers allowed --> transfer button enabled",
+    restricted: false,
+    transferBlocked: false,
+    level: AccountLevel.Two,
+    btcBalance: 1000,
+    expectButton: "enabled",
+  },
+]
+
+const runRestrictionInvariantCase = async ({
+  restricted,
+  transferBlocked,
+  level,
+  btcBalance,
+  expectButton,
+}: RestrictionInvariantCase) => {
+  mockDollarBalanceRestrictedOverride = restricted
+  mockTransferBlockedOverride = transferBlocked
+  // usdBalance stays 0 so the forced-conversion modal never auto-opens
+  currentMocks = generateHomeMock({
+    level,
+    network: Network.Mainnet,
+    btcBalance,
+    usdBalance: 0,
+  })
+
+  const { getByTestId } = render(
+    <ContextForScreen>
+      <HomeScreen />
+    </ContextForScreen>,
+  )
+
+  if (expectButton === "hidden") {
+    await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
+    await flushEffects()
+    return
+  }
+
+  await waitFor(() => expect(getByTestId("transfer")).toBeTruthy())
+  await flushEffects()
+
+  fireEvent.press(getByTestId("transfer"))
+
+  if (expectButton === "disabled") {
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
+  } else {
+    expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
+    expect(mockDollarBalanceModalVisible).toBe(false)
+  }
+}
+
 describe("HomeScreen", () => {
   beforeEach(() => {
     currentMocks = []
@@ -706,6 +816,8 @@ describe("HomeScreen", () => {
     await waitFor(() => expect(() => getByTestId("transfer")).toThrow())
     await flushEffects()
   })
+
+  it.each(restrictionInvariantCases)("$description", runRestrictionInvariantCase)
 
   it("auto-opens the convert modal when a restricted account holds a Dollar balance", async () => {
     mockDollarBalanceRestrictedOverride = true
