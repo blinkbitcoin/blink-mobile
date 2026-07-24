@@ -223,6 +223,43 @@ mutation accountUpdateDisplayCurrency($input: AccountUpdateDisplayCurrencyInput!
   }
 }
 
+mutation apiKeyCreate($input: ApiKeyCreateInput!) {
+  apiKeyCreate(input: $input) {
+    apiKey {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+      __typename
+    }
+    apiKeySecret
+    __typename
+  }
+}
+
+mutation apiKeyRevoke($input: ApiKeyRevokeInput!) {
+  apiKeyRevoke(input: $input) {
+    apiKey {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+      __typename
+    }
+    __typename
+  }
+}
+
 mutation captchaCreateChallenge {
   captchaCreateChallenge {
     errors {
@@ -1148,6 +1185,25 @@ query analytics {
   }
   globals {
     network
+    __typename
+  }
+}
+
+query apiKeys {
+  me {
+    id
+    apiKeys {
+      id
+      name
+      createdAt
+      revoked
+      expired
+      lastUsedAt
+      expiresAt
+      scopes
+      readOnly
+      __typename
+    }
     __typename
   }
 }

@@ -171,6 +171,7 @@ import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
+import { ApiKeyCreateScreen } from "@app/screens/settings-screen/api/api-key-create-screen"
 
 const RootNavigator = createNativeStackNavigator<RootStackParamList>()
 
@@ -528,6 +529,13 @@ export const RootStack = () => {
         component={ApiScreen}
         options={{
           title: LL.SettingsScreen.apiAcess(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="apiKeyCreateScreen"
+        component={ApiKeyCreateScreen}
+        options={{
+          title: LL.ApiScreen.createTitle(),
         }}
       />
       <RootNavigator.Screen

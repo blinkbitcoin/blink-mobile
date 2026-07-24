@@ -136,6 +136,7 @@ export type RootStackParamList = {
   profileScreen: undefined
   notificationSettingsScreen: undefined
   apiScreen: undefined
+  apiKeyCreateScreen: undefined
   transactionLimitsScreen: undefined
   feeRatesScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList
