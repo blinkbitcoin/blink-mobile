@@ -2527,7 +2527,11 @@
     "receivingAccount": "Alıcı Bakiye",
     "sendingAccount": "Gönderen Bakiye",
     "txNotBroadcast": "İşleminiz sıraya alındı. Mempool'da görünmelidir {countdown: string}.",
-    "momentarily": "anlık olarak"
+    "momentarily": "anlık olarak",
+    "findingAccount": "Bu ödemenin hesabı aranıyor...",
+    "txNotFoundInAccounts": "Bu ödeme bu cihazdaki hiçbir hesapta bulunamadı. Oturumu kapatılmış bir hesaba ait olabilir.",
+    "txLoadFailed": "Bu ödeme yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.",
+    "switchedForPayment": "Bu ödemeyi göstermek için {identifier: string} hesabına geçildi"
   },
   "FeeRatesScreen": {
     "title": "Ücret oranları",

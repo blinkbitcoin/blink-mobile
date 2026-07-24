@@ -2527,7 +2527,11 @@
     "receivingAccount": "Fogadó egyenleg",
     "sendingAccount": "Küldő egyenleg",
     "txNotBroadcast": "Az Ön tranzakciója sorban áll. Meg fog jelenni a mempoolban {countdown: string}.",
-    "momentarily": "pillanatokon belül"
+    "momentarily": "pillanatokon belül",
+    "findingAccount": "A fizetéshez tartozó fiók keresése...",
+    "txNotFoundInAccounts": "Ez a fizetés nem található az eszköz egyik fiókjában sem. Lehet, hogy egy kijelentkezett fiókhoz tartozik.",
+    "txLoadFailed": "Nem sikerült betölteni ezt a fizetést. Ellenőrizze a kapcsolatot, és próbálja újra.",
+    "switchedForPayment": "Átváltás erre: {identifier: string}, hogy megjelenjen ez a fizetés"
   },
   "FeeRatesScreen": {
     "title": "Díjszabás",

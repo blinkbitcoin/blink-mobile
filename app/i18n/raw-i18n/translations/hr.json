@@ -2527,7 +2527,11 @@
     "receivingAccount": "Račun primatelj",
     "sendingAccount": "Račun pošiljatelj",
     "txNotBroadcast": "Vaša transakcija trenutno je na čekanju i bit će emitirana na Bitcoin mrežu za koji trenutak.",
-    "momentarily": "uskoro"
+    "momentarily": "uskoro",
+    "findingAccount": "Traženje računa za ovu uplatu...",
+    "txNotFoundInAccounts": "Ova uplata nije pronađena ni na jednom računu na ovom uređaju. Možda pripada računu koji je odjavljen.",
+    "txLoadFailed": "Ovu uplatu nije moguće učitati. Provjerite vezu i pokušajte ponovno.",
+    "switchedForPayment": "Prebačeno na {identifier: string} za prikaz ove uplate"
   },
   "FeeRatesScreen": {
     "title": "Stope naknada",

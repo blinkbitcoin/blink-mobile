@@ -2527,7 +2527,11 @@
     "receivingAccount": "Akaun penerimaan",
     "sendingAccount": "Akaun penghantar",
     "txNotBroadcast": "Transaksi anda tergendala dan akan disiarkan dalam rangkaian Bitcoin sebentar lagi",
-    "momentarily": "sebentar lagi"
+    "momentarily": "sebentar lagi",
+    "findingAccount": "Mencari akaun untuk pembayaran ini...",
+    "txNotFoundInAccounts": "Pembayaran ini tidak ditemui dalam mana-mana akaun pada peranti ini. Ia mungkin milik akaun yang telah log keluar.",
+    "txLoadFailed": "Tidak dapat memuatkan pembayaran ini. Semak sambungan anda dan cuba lagi.",
+    "switchedForPayment": "Bertukar kepada {identifier: string} untuk memaparkan pembayaran ini"
   },
   "FeeRatesScreen": {
     "title": "Kadar caj",

@@ -2527,7 +2527,11 @@
         "receivingAccount": "Conto di ricezione",
         "sendingAccount": "Invio dell'account",
         "txNotBroadcast": "La tua transazione è in coda. Dovrebbe apparire nel mempool {countdown: string}.",
-        "momentarily": "momentaneamente"
+        "momentarily": "momentaneamente",
+        "findingAccount": "Ricerca dell'account per questo pagamento...",
+        "txNotFoundInAccounts": "Questo pagamento non è stato trovato in nessun account su questo dispositivo. Potrebbe appartenere a un account disconnesso.",
+        "txLoadFailed": "Impossibile caricare questo pagamento. Controlla la connessione e riprova.",
+        "switchedForPayment": "Passato a {identifier: string} per mostrare questo pagamento"
     },
     "FeeRatesScreen": {
         "title": "Tariffe delle commissioni",

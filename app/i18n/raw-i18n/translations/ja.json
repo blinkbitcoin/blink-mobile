@@ -2527,7 +2527,11 @@
         "receivingAccount": "受金ウォレット",
         "sendingAccount": "送金ウォレット",
         "txNotBroadcast": "あなたのトランザクションは現在保留中ですが、すぐにビットコインネットワークに反映されます。",
-        "momentarily": "まもなく"
+        "momentarily": "まもなく",
+        "findingAccount": "この支払いのアカウントを探しています...",
+        "txNotFoundInAccounts": "この支払いはこのデバイスのどのアカウントにも見つかりませんでした。ログアウトしたアカウントのものである可能性があります。",
+        "txLoadFailed": "この支払いを読み込めませんでした。接続を確認して、もう一度お試しください。",
+        "switchedForPayment": "この支払いを表示するため {identifier: string} に切り替えました"
     },
     "FeeRatesScreen": {
         "title": "手数料率",

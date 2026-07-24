@@ -2527,7 +2527,11 @@
     "receivingAccount": "Akaunti ya Kupokelea",
     "sendingAccount": "Akaunti ya Kutuma",
     "txNotBroadcast": "Muamala wako umeorodheshwa. Unapaswa kuonekana kwenye mempool {countdown: string}.",
-    "momentarily": "muda mfupi"
+    "momentarily": "muda mfupi",
+    "findingAccount": "Inatafuta akaunti ya malipo haya...",
+    "txNotFoundInAccounts": "Malipo haya hayakupatikana katika akaunti yoyote kwenye kifaa hiki. Huenda ni ya akaunti iliyotoka.",
+    "txLoadFailed": "Imeshindwa kupakia malipo haya. Angalia muunganisho wako kisha ujaribu tena.",
+    "switchedForPayment": "Imebadilisha hadi {identifier: string} ili kuonyesha malipo haya"
   },
   "FeeRatesScreen": {
     "title": "Viwango vya ada",

@@ -2527,7 +2527,11 @@
     "receivingAccount": "Số dư nhận",
     "sendingAccount": "Số dư gửi",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "trong giây lát"
+    "momentarily": "trong giây lát",
+    "findingAccount": "Đang tìm tài khoản cho khoản thanh toán này...",
+    "txNotFoundInAccounts": "Không tìm thấy khoản thanh toán này trong bất kỳ tài khoản nào trên thiết bị này. Nó có thể thuộc về một tài khoản đã đăng xuất.",
+    "txLoadFailed": "Không thể tải khoản thanh toán này. Kiểm tra kết nối của bạn và thử lại.",
+    "switchedForPayment": "Đã chuyển sang {identifier: string} để hiển thị khoản thanh toán này"
   },
   "FeeRatesScreen": {
     "title": "Biểu phí",
