@@ -667,7 +667,7 @@ export const HomeScreen: React.FC = () => {
   }
 
   return (
-    <Screen headerShown={false}>
+    <Screen headerShown={false} edges={["top", "left", "right"]}>
       {AccountCreationNeededModal}
       <StableSatsModal
         isVisible={isStablesatModalVisible}

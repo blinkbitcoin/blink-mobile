@@ -184,7 +184,7 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <Screen>
+    <Screen edges={["left", "right"]}>
       {initialLocation && (
         <MapComponent
           data={data}

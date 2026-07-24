@@ -269,7 +269,7 @@ const EarnMapScreenContent: React.FC = () => {
 
   if (loading) {
     return (
-      <Screen>
+      <Screen edges={["left", "right"]}>
         <View style={styles.loadingView}>
           <ActivityIndicator size="large" color={colors._blue} />
         </View>
