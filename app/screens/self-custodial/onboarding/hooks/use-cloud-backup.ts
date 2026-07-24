@@ -76,7 +76,10 @@ export const useCloudBackup = ({
 
     const sessionResult = await startSession(filename)
     if (!sessionResult.success) {
-      toastShow({ message: resolveErrorMessage(sessionResult.reason, LL), LL })
+      const isCancelled = sessionResult.reason === CloudBackupErrorReason.Cancelled
+      if (!isCancelled) {
+        toastShow({ message: resolveErrorMessage(sessionResult.reason, LL), LL })
+      }
       return
     }
     const { session } = sessionResult

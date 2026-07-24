@@ -234,6 +234,22 @@ describe("useCloudBackup", () => {
     expect(mockUpload).not.toHaveBeenCalled()
   })
 
+  it("stays silent when the user cancels the sign-in", async () => {
+    mockStartSession.mockResolvedValue({ success: false, reason: "cancelled" })
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockCompleteBackup).not.toHaveBeenCalled()
+  })
+
   it("shows overwrite confirmation when backup exists", async () => {
     mockStartSession.mockResolvedValue(sessionOk(withExistingFile))
     mockUpload.mockResolvedValue({ success: true })

@@ -24,6 +24,7 @@ const CloudStep = {
   NotFound: "not-found",
   Picker: "picker",
   Password: "password",
+  Cancelled: "cancelled",
   Error: "error",
 } as const
 
@@ -33,7 +34,7 @@ const STEP_FOR_REASON: Readonly<Record<CloudBackupErrorReason, CloudStep>> = {
   [CloudBackupErrorReason.NotFound]: CloudStep.NotFound,
   [CloudBackupErrorReason.Auth]: CloudStep.Error,
   [CloudBackupErrorReason.PermissionDenied]: CloudStep.Error,
-  [CloudBackupErrorReason.Cancelled]: CloudStep.Error,
+  [CloudBackupErrorReason.Cancelled]: CloudStep.Cancelled,
   [CloudBackupErrorReason.Transient]: CloudStep.Error,
   [CloudBackupErrorReason.Unknown]: CloudStep.Error,
 }
@@ -277,6 +278,7 @@ export const useCloudRestore = () => {
     isLoading,
     hasError,
     isNotFound: step === CloudStep.NotFound,
+    isCancelled: step === CloudStep.Cancelled,
     isPicker: step === CloudStep.Picker,
     isPassword: step === CloudStep.Password,
     entries,

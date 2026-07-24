@@ -13,10 +13,15 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
+const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, setOptions: mockSetOptions }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    goBack: mockGoBack,
+    setOptions: mockSetOptions,
+  }),
 }))
 
 const mockLoadCloudBackups = jest.fn()
@@ -28,6 +33,7 @@ type RestoreState = {
   isLoading: boolean
   hasError: boolean
   isNotFound: boolean
+  isCancelled: boolean
   isPicker: boolean
   isPassword: boolean
   entries: ReadonlyArray<{ fileId: string; metadata: { walletIdentifier: string } }>
@@ -40,6 +46,7 @@ const idleState: RestoreState = {
   isLoading: false,
   hasError: false,
   isNotFound: false,
+  isCancelled: false,
   isPicker: false,
   isPassword: false,
   entries: [],
@@ -153,6 +160,12 @@ describe("CloudRestoreScreen", () => {
     fireEvent.press(getByTestId("restore-decrypt-button"))
 
     expect(mockHandleDecrypt).toHaveBeenCalled()
+  })
+
+  it("navigates back when the user cancels the sign-in", async () => {
+    await renderScreen({ isCancelled: true })
+
+    expect(mockGoBack).toHaveBeenCalled()
   })
 
   it("renders no step when none is active", async () => {

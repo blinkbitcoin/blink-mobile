@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react"
+import React, { useEffect, useLayoutEffect } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
@@ -26,6 +26,7 @@ export const CloudRestoreScreen: React.FC = () => {
     isLoading,
     hasError,
     isNotFound,
+    isCancelled,
     isPicker,
     isPassword,
     entries,
@@ -45,6 +46,10 @@ export const CloudRestoreScreen: React.FC = () => {
       title: isPicker ? LL.RestoreScreen.pickBackupTitle() : "",
     })
   }, [isPicker, navigation, LL])
+
+  useEffect(() => {
+    if (isCancelled) navigation.goBack()
+  }, [isCancelled, navigation])
 
   if (isLoading) {
     return (
