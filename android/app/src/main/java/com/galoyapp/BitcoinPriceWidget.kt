@@ -34,6 +34,10 @@ import org.json.JSONObject
 import kotlin.math.pow
 
 class BitcoinPriceWidget : AppWidgetProvider() {
+    companion object {
+        internal const val FETCH_PRICE_WORK_TAG = "FETCH_PRICE_WORK"
+    }
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
@@ -46,10 +50,12 @@ class BitcoinPriceWidget : AppWidgetProvider() {
         val immediateWorkRequest = OneTimeWorkRequestBuilder<FetchPriceWorker>()
             .setInputData(Data.Builder().putString("RANGE", "ONE_DAY").build())
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .addTag(FETCH_PRICE_WORK_TAG)
             .build()
 
         val periodicWorkRequest = PeriodicWorkRequestBuilder<FetchPriceWorker>(15, TimeUnit.MINUTES)
             .setInputData(Data.Builder().putString("RANGE", "ONE_DAY").build())
+            .addTag(FETCH_PRICE_WORK_TAG)
             .build()
 
         WorkManager.getInstance(context).apply {
@@ -65,7 +71,7 @@ class BitcoinPriceWidget : AppWidgetProvider() {
     }
 
     override fun onDisabled(context: Context) {
-        WorkManager.getInstance(context).cancelAllWorkByTag("FETCH_PRICE_WORK")
+        WorkManager.getInstance(context).cancelAllWorkByTag(FETCH_PRICE_WORK_TAG)
     }
 }
 
@@ -134,8 +140,12 @@ internal fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManage
 
     val realtimePrice = JSONObject(prefs.getString("REALTIME_PRICE", null) ?: "{}")
     if (realtimePrice.has("btcSatPrice")) {
-        val bitmap = generateChartBitmap(context, priceArray, minWidth, maxHeight)
-        views.setImageViewBitmap(R.id.chart_image_view, bitmap)
+        // The launcher may not have provided widget dimensions yet (options can be
+        // empty right after the widget is placed); Bitmap.createBitmap(0, 0) throws.
+        if (minWidth > 0 && maxHeight > 0) {
+            val bitmap = generateChartBitmap(context, priceArray, minWidth, maxHeight)
+            views.setImageViewBitmap(R.id.chart_image_view, bitmap)
+        }
 
         val btcSatBase = realtimePrice.getJSONObject("btcSatPrice").getLong("base")
         val btcSatOffset = realtimePrice.getJSONObject("btcSatPrice").getInt("offset")
@@ -171,9 +181,14 @@ enum class BitcoinPriceRanges {
 }
 
 class FetchPriceWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+    companion object {
+        // Replaceable in unit tests to stub out the network call.
+        internal var fetch: (BitcoinPriceRanges) -> JSONObject = ::fetchBitcoinPrice
+    }
+
     override fun doWork(): Result {
         val range = BitcoinPriceRanges.valueOf(inputData.getString("RANGE") ?: "ONE_DAY")
-        val jsonResponse = fetchBitcoinPrice(range)
+        val jsonResponse = fetch(range)
         val priceArray = jsonResponse.getJSONArray("btcPriceList")
         val realtimePrice = jsonResponse.getJSONObject("realtimePrice")
         val prefs =
@@ -201,25 +216,26 @@ class FetchPriceWorker(context: Context, params: WorkerParameters) : Worker(cont
         }
     }
 
-    private fun fetchBitcoinPrice(range: BitcoinPriceRanges): JSONObject {
-        val url = URL("https://api.blink.sv/graphql")
-        val query = "query BitcoinPriceForAppWidget(\$range: PriceGraphRange!) { btcPriceList(range: \$range) { timestamp price { base offset currencyUnit formattedAmount } } realtimePrice { btcSatPrice { base offset } timestamp usdCentPrice { base offset } } }"
-        val jsonInputString = """{ "query": "$query", "variables": { "range": "$range" } }"""
+}
 
-        with(url.openConnection() as HttpURLConnection) {
-            requestMethod = "POST"
-            setRequestProperty("Content-Type", "application/json")
-            doOutput = true
-            outputStream.use { os ->
-                os.write(jsonInputString.toByteArray())
+private fun fetchBitcoinPrice(range: BitcoinPriceRanges): JSONObject {
+    val url = URL("https://api.blink.sv/graphql")
+    val query = "query BitcoinPriceForAppWidget(\$range: PriceGraphRange!) { btcPriceList(range: \$range) { timestamp price { base offset currencyUnit formattedAmount } } realtimePrice { btcSatPrice { base offset } timestamp usdCentPrice { base offset } } }"
+    val jsonInputString = """{ "query": "$query", "variables": { "range": "$range" } }"""
+
+    with(url.openConnection() as HttpURLConnection) {
+        requestMethod = "POST"
+        setRequestProperty("Content-Type", "application/json")
+        doOutput = true
+        outputStream.use { os ->
+            os.write(jsonInputString.toByteArray())
+        }
+        return if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader(InputStreamReader(inputStream)).use { br ->
+                JSONObject(br.readText()).getJSONObject("data")
             }
-            return if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader(InputStreamReader(inputStream)).use { br ->
-                    JSONObject(br.readText()).getJSONObject("data")
-                }
-            } else {
-                JSONObject("{\"btcPriceList\": [], \"realtimePrice\": { \"noData\": true } }")
-            }
+        } else {
+            JSONObject("{\"btcPriceList\": [], \"realtimePrice\": { \"noData\": true } }")
         }
     }
 }
