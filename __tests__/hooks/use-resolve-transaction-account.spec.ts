@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react-native"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { DefaultAccountId } from "@app/types/wallet"
 
@@ -313,5 +313,106 @@ describe("useResolveTransactionAccount", () => {
     for (const [options] of foreignCalls) {
       expect(options.context?.headers.authorization).toMatch(/^Bearer token-/)
     }
+  })
+
+  it("finds the tx among pending incoming transactions", async () => {
+    setOwnershipByToken({}, ownershipResult({ pendingIds: [TXID] }))
+    mockProbeWallet.mockResolvedValue(walletHit)
+
+    const { result } = renderResolver()
+
+    await waitFor(() => expect(result.current.status).toBe("resolved"))
+    expect(mockSaveToken).not.toHaveBeenCalled()
+  })
+
+  it("reports probeFailed when an active wallet probe hits a transport error", async () => {
+    setOwnershipByToken(
+      { "token-b": ownershipResult({ txIds: [TXID] }) },
+      ownershipResult({ txIds: ["tx-other"] }),
+    )
+    mockProbeWallet.mockResolvedValue(networkFailure)
+
+    const { result } = renderResolver()
+
+    await waitFor(() => expect(result.current.status).toBe("probeFailed"))
+    expect(mockSaveToken).not.toHaveBeenCalled()
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  it("retry re-runs probing after a failure", async () => {
+    setOwnershipByToken({}, networkFailure)
+
+    const { result } = renderResolver()
+    await waitFor(() => expect(result.current.status).toBe("probeFailed"))
+
+    setOwnershipByToken({}, ownershipResult({ txIds: [TXID] }))
+    mockProbeWallet.mockResolvedValue(walletHit)
+    act(() => result.current.retry())
+
+    await waitFor(() => expect(result.current.status).toBe("resolved"))
+  })
+
+  it("fails instead of switching again when the tx is gone after the switch", async () => {
+    setOwnershipByToken({ "token-b": ownershipResult({ txIds: [TXID] }) })
+
+    const { result, rerender } = renderResolver()
+    await waitFor(() => expect(result.current.status).toBe("switching"))
+    expect(mockSaveToken).toHaveBeenCalledTimes(1)
+
+    // Rebuilt client, but the newly-active account no longer reports the tx
+    // while the (now inactive) profile B still would — must not switch again.
+    mockClient = {}
+    rerender({ txid: TXID, hasTx: false })
+
+    await waitFor(() => expect(result.current.status).toBe("probeFailed"))
+    expect(mockSaveToken).toHaveBeenCalledTimes(1)
+  })
+
+  it("treats a keystore read failure as having no saved profiles", async () => {
+    mockGetSessionProfiles.mockRejectedValue(new Error("keystore unavailable"))
+
+    const { result } = renderResolver()
+
+    await waitFor(() => expect(result.current.status).toBe("notFound"))
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  it("reports notFound without foreign probes when only the active profile is saved", async () => {
+    mockGetSessionProfiles.mockResolvedValue([profileA])
+    setOwnershipByToken({})
+
+    const { result } = renderResolver()
+
+    await waitFor(() => expect(result.current.status).toBe("notFound"))
+    // Only the bearer-less active-account probe ran
+    expect(mockProbeOwnership).toHaveBeenCalledTimes(1)
+    expect(tokenOf(mockProbeOwnership.mock.calls[0][0])).toBeUndefined()
+  })
+
+  it("toasts the raw identifier for a profile without a username", async () => {
+    setOwnershipByToken({ "token-c": ownershipResult({ txIds: [TXID] }) })
+
+    const { result } = renderResolver()
+
+    await waitFor(() => expect(result.current.status).toBe("switching"))
+    const message = mockToastShow.mock.calls[0][0].message({
+      TransactionDetailScreen: {
+        switchedForPayment: ({ identifier }: { identifier: string }) => identifier,
+      },
+    })
+    expect(message).toBe("+4670000000")
+  })
+
+  it("never switches when two profiles both claim the tx", async () => {
+    setOwnershipByToken({
+      "token-b": ownershipResult({ txIds: [TXID] }),
+      "token-c": ownershipResult({ txIds: [TXID] }),
+    })
+
+    const { result } = renderResolver()
+
+    await waitFor(() => expect(result.current.status).toBe("probeFailed"))
+    expect(mockSaveToken).not.toHaveBeenCalled()
+    expect(mockToastShow).not.toHaveBeenCalled()
   })
 })

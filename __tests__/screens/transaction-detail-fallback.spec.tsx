@@ -115,8 +115,12 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   }),
 }))
 
+let mockActiveWallet: { isSelfCustodial: boolean; wallets: unknown[] } = {
+  isSelfCustodial: false,
+  wallets: [],
+}
 jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ isSelfCustodial: false, wallets: [] }),
+  useActiveWallet: () => mockActiveWallet,
 }))
 
 jest.mock("@react-navigation/native", () => ({
@@ -181,6 +185,7 @@ const renderWithStatus = (status: ResolveTransactionAccountStatus) => {
 describe("TransactionDetailScreen resolver fallback", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockActiveWallet = { isSelfCustodial: false, wallets: [] }
   })
 
   it("passes txid, cache state and the payload hint to the resolver", () => {
@@ -226,6 +231,20 @@ describe("TransactionDetailScreen resolver fallback", () => {
     const { getByText } = renderWithStatus("resolved")
 
     expect(getByText("tx-load-failed")).toBeTruthy()
+  })
+
+  it("reports hasTx when the active self-custodial wallet holds the tx in memory", () => {
+    mockResolveStatus = "idle"
+    mockActiveWallet = {
+      isSelfCustodial: true,
+      wallets: [{ transactions: [{ id: "tx-1", paymentType: "spark" }] }],
+    }
+    mockUseFragment.mockReturnValue({ data: {} })
+    render(<TransactionDetailScreen route={route} />)
+
+    expect(mockUseResolveTransactionAccount).toHaveBeenCalledWith(
+      expect.objectContaining({ hasTx: true }),
+    )
   })
 
   it("reports hasTx to the resolver when the fragment is populated", () => {

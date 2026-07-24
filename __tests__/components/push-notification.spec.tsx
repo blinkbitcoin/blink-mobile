@@ -29,6 +29,7 @@ jest.mock("@app/utils/notifications", () => ({
 
 let onMessageCallback: (msg: Record<string, unknown>) => void
 let onNotificationOpenedAppCallback: (msg: Record<string, unknown>) => void
+let mockInitialNotification: Record<string, unknown> | null = null
 const mockUnsubscribe = jest.fn()
 
 jest.mock("@react-native-firebase/messaging", () => {
@@ -41,7 +42,7 @@ jest.mock("@react-native-firebase/messaging", () => {
       onNotificationOpenedAppCallback = cb
       return mockUnsubscribe
     },
-    getInitialNotification: jest.fn(() => Promise.resolve(null)),
+    getInitialNotification: jest.fn(() => Promise.resolve(mockInitialNotification)),
     onTokenRefresh: jest.fn(() => jest.fn()),
   })
   return {
@@ -54,6 +55,7 @@ describe("PushNotificationComponent", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockIsAuthed = true
+    mockInitialNotification = null
     mockHasNotificationPermission.mockResolvedValue(false)
   })
 
@@ -121,6 +123,20 @@ describe("PushNotificationComponent", () => {
       })
 
       expect(openURLSpy).not.toHaveBeenCalled()
+    })
+
+    it("follows the initial notification on cold start, hint included", async () => {
+      mockInitialNotification = {
+        data: { linkTo: "/transaction/tx-1", recipientUserId: "user-b" },
+      }
+
+      render(<PushNotificationComponent />)
+
+      await waitFor(() =>
+        expect(openURLSpy).toHaveBeenCalledWith(
+          "blink:/transaction/tx-1?recipientUserId=user-b",
+        ),
+      )
     })
   })
 
