@@ -3686,6 +3686,10 @@
             "body": "Mude para uma conta não custodial através da migração guiada, ou retire os seus fundos, antes de {date}. O recebimento termina em {receiveStopsDate}.",
             "migrateCta": "Migrar"
         },
+        "offboardBulletin": {
+            "title": "Importante",
+            "body": "A tua conta está registada numa região onde não podemos oferecer contas. Levanta os teus fundos antes de 31 de agosto. A receção para a 10 de agosto."
+        },
         "dollarBalanceModal": {
             "title": "Não podemos migrar o seu saldo em dólares",
             "body": "Esvazie primeiro o seu saldo em dólares. Você pode transferi-lo para o seu saldo Bitcoin no Blink ou para outro lugar."

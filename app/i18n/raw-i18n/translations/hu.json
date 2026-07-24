@@ -3686,6 +3686,10 @@
       "body": "Váltson át egy nem letétkezelt fiókra az irányított átköltöztetéssel, vagy vegye fel az egyenlegét {date} előtt. A fogadás megszűnik: {receiveStopsDate}.",
       "migrateCta": "Átköltözés"
     },
+    "offboardBulletin": {
+      "title": "Fontos",
+      "body": "A fiókod olyan régióban van regisztrálva, ahol nem tudunk fiókokat kínálni. Vedd fel a pénzed augusztus 31. előtt. A fogadás augusztus 10-én leáll."
+    },
     "dollarBalanceModal": {
       "title": "Nem tudjuk átköltöztetni a dollár egyenlegedet",
       "body": "Először ürítsd ki a dollár egyenlegedet. Átutalhatod a Bitcoin egyenlegedre a Blinkben vagy máshová."

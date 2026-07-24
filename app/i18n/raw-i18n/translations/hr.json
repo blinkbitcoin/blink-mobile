@@ -3686,6 +3686,10 @@
       "body": "Prijeđite na račun bez skrbništva putem vođene migracije ili podignite sredstva prije {date}. Primanje prestaje {receiveStopsDate}.",
       "migrateCta": "Migriraj"
     },
+    "offboardBulletin": {
+      "title": "Važno",
+      "body": "Vaš račun registriran je u regiji u kojoj ne možemo nuditi račune. Podignite svoja sredstva prije 31. kolovoza. Primanje prestaje 10. kolovoza."
+    },
     "dollarBalanceModal": {
       "title": "Ne možemo migrirati vaš dolarski saldo",
       "body": "Najprije ispraznite svoj dolarski saldo. Možete ga prenijeti na svoj Bitcoin saldo u Blinku ili drugamo."

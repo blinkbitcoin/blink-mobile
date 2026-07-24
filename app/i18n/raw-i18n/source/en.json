@@ -3732,6 +3732,10 @@
             "body": "Move to a non-custodial account via guided migration, or withdraw, before {date: string}. Receiving stops {receiveStopsDate: string}.",
             "migrateCta": "Migrate"
         },
+        "offboardBulletin": {
+            "title": "Important",
+            "body": "Your account is registered in a region where we cannot offer accounts. Withdraw your funds before August 31. Receiving stops August 10."
+        },
         "contactSupport": {
             "title": "Contact support",
             "body": "Something went wrong but don't worry your funds are safe, please contact support for assistance.\n\nYou may need this information to help support resolve your case:",

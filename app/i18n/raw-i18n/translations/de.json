@@ -3686,6 +3686,10 @@
             "body": "Wechsle bis zum {date} über die geführte Migration zu einem nicht-verwahrten Konto oder zahle dein Guthaben aus. Der Empfang endet am {receiveStopsDate}.",
             "migrateCta": "Migrieren"
         },
+        "offboardBulletin": {
+            "title": "Wichtig",
+            "body": "Dein Konto ist in einer Region registriert, in der wir keine Konten anbieten können. Hebe dein Guthaben vor dem 31. August ab. Der Empfang endet am 10. August."
+        },
         "dollarBalanceModal": {
             "title": "Wir können dein Dollar-Guthaben nicht migrieren",
             "body": "Leere zuerst dein Dollar-Guthaben. Du kannst es auf dein Bitcoin-Guthaben in Blink oder anderswohin übertragen."

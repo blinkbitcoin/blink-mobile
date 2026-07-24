@@ -3686,6 +3686,10 @@
       "body": "Yiya kwiakhawunti engagcinwanga ngofuduko olukhokelwayo, okanye ukhuphe imali yakho, phambi kwe-{date}. Ukufumana kuyakuma nge-{receiveStopsDate}.",
       "migrateCta": "Fuduka"
     },
+    "offboardBulletin": {
+      "title": "Kubalulekile",
+      "body": "I-akhawunti yakho ibhaliswe kwingingqi apho singenako ukunikezela ngee-akhawunti. Rhoxisa imali yakho phambi komhla wama-31 ku-Agasti. Ukwamkela kuyayeka ngomhla we-10 ku-Agasti."
+    },
     "dollarBalanceModal": {
       "title": "Asikwazi ukufudusa ibhalansi yakho yedola",
       "body": "Qala ukhuphe yonke ibhalansi yakho yedola. Ungayidlulisela kwibhalansi yakho yeBitcoin kuBlink okanye kwenye indawo."

@@ -3686,6 +3686,10 @@
       "body": "Skuif na 'n nie-bewaarrekening via begeleide migrasie, of onttrek jou fondse, voor {date}. Ontvangs stop op {receiveStopsDate}.",
       "migrateCta": "Migreer"
     },
+    "offboardBulletin": {
+      "title": "Belangrik",
+      "body": "Jou rekening is geregistreer in 'n streek waar ons nie rekeninge kan aanbied nie. Onttrek jou fondse voor 31 Augustus. Ontvangs stop 10 Augustus."
+    },
     "dollarBalanceModal": {
       "title": "Ons kan nie jou dollarsaldo migreer nie",
       "body": "Maak eers jou dollarsaldo leeg. Jy kan dit na jou Bitcoin-saldo in Blink of elders oordra."

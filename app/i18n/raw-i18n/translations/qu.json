@@ -3686,6 +3686,10 @@
       "body": "Astakuy mana waqaychasqa kuentaman pusaykachasqa astakuywan, otaq qullqiykita hurquy, {date} manaraq chayamuchkaptin. Chaskiyqa {receiveStopsDate}-pi tukukunqa.",
       "migrateCta": "Astakuy"
     },
+    "offboardBulletin": {
+      "title": "Ancha allin",
+      "body": "Cuentaykiqa mana cuentakunata qoyta atinayku suyupim qelqasqa kashan. Qolqeykita horqokuy 31 Agosto manaraq chayamuchkaptin. Chaskiyqa 10 Agostopi sayan."
+    },
     "dollarBalanceModal": {
       "title": "Manam dólar qullqiykita astayta atinikuchu",
       "body": "Ñawpaqta dólar qullqiykita ch'usaqyachiy. Blinkpi Bitcoin qullqiykiman utaq huk lawman apachiyta atinki."

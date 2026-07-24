@@ -3686,6 +3686,10 @@
       "body": "Beralihlah ke akun non-kustodial melalui migrasi terpandu, atau tarik dana Anda, sebelum {date}. Penerimaan berhenti pada {receiveStopsDate}.",
       "migrateCta": "Migrasi"
     },
+    "offboardBulletin": {
+      "title": "Penting",
+      "body": "Akun Anda terdaftar di wilayah yang tidak dapat kami tawari akun. Tarik dana Anda sebelum 31 Agustus. Penerimaan berhenti pada 10 Agustus."
+    },
     "dollarBalanceModal": {
       "title": "Kami tidak dapat memigrasikan Saldo Dolar Anda",
       "body": "Kosongkan Saldo Dolar Anda terlebih dahulu. Anda dapat mentransfernya ke Saldo Bitcoin di Blink atau ke tempat lain."

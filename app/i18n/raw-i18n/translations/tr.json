@@ -3686,6 +3686,10 @@
       "body": "{date} tarihinden önce rehberli taşıma ile saklamasız bir hesaba geçin veya paranızı çekin. Alma, {receiveStopsDate} tarihinde durur.",
       "migrateCta": "Taşı"
     },
+    "offboardBulletin": {
+      "title": "Önemli",
+      "body": "Hesabınız, hesap sunamadığımız bir bölgede kayıtlı. Paranızı 31 Ağustos'tan önce çekin. Para alımı 10 Ağustos'ta duruyor."
+    },
     "dollarBalanceModal": {
       "title": "Dolar bakiyenizi taşıyamıyoruz",
       "body": "Önce dolar bakiyenizi boşaltın. Blink içindeki Bitcoin bakiyenize veya başka bir yere aktarabilirsiniz."

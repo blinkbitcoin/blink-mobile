@@ -3686,6 +3686,10 @@
       "body": "Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}. La recepció s'atura el {receiveStopsDate}.",
       "migrateCta": "Migra"
     },
+    "offboardBulletin": {
+      "title": "Important",
+      "body": "El teu compte està registrat en una regió on no podem oferir comptes. Retira els teus fons abans del 31 d'agost. La recepció s'atura el 10 d'agost."
+    },
     "dollarBalanceModal": {
       "title": "No podem migrar el teu saldo en dòlars",
       "body": "Primer buida el teu saldo en dòlars. Pots transferir-lo al teu saldo en bitcoins a Blink o en un altre lloc."

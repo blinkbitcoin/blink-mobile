@@ -3686,6 +3686,10 @@
       "body": "Skift til en ikke-depotkonto via guidet migrering, eller hæv dine midler, inden {date}. Modtagelse stopper den {receiveStopsDate}.",
       "migrateCta": "Migrér"
     },
+    "offboardBulletin": {
+      "title": "Vigtigt",
+      "body": "Din konto er registreret i en region, hvor vi ikke kan tilbyde konti. Hæv dine midler inden den 31. august. Modtagelse stopper den 10. august."
+    },
     "dollarBalanceModal": {
       "title": "Vi kan ikke migrere din dollarsaldo",
       "body": "Tøm først din dollarsaldo. Du kan overføre den til din Bitcoin-saldo i Blink eller et andet sted."

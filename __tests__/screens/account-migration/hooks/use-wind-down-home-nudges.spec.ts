@@ -9,6 +9,7 @@ const mockMigrateNowPrompt = {
   reopen: mockReopen,
 }
 const mockReminderBulletin = { isVisible: false, deadlineTimestamp: 123, timezone: "UTC" }
+let mockOffboardBulletin = { isVisible: false }
 let mockReceiveBlocked = false
 const mockToastShow = jest.fn()
 
@@ -18,6 +19,10 @@ jest.mock("@app/screens/account-migration/hooks/use-migrate-now-prompt", () => (
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-reminder-bulletin", () => ({
   useMigrationReminderBulletin: () => mockReminderBulletin,
+}))
+
+jest.mock("@app/screens/account-migration/hooks/use-offboard-only-bulletin", () => ({
+  useOffboardOnlyBulletin: () => mockOffboardBulletin,
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-receive-blocked", () => ({
@@ -38,14 +43,38 @@ describe("useWindDownHomeNudges", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockMigrateNowPrompt.canReopen = true
+    mockReminderBulletin.isVisible = false
+    mockOffboardBulletin = { isVisible: false }
     mockReceiveBlocked = false
   })
 
-  it("bundles the migrate-now prompt and the reminder bulletin from one call", () => {
+  it("bundles the migrate-now prompt, the reminder bulletin and the offboard bulletin from one call", () => {
     const { result } = renderHook(() => useWindDownHomeNudges())
 
     expect(result.current.migrateNowPrompt).toBe(mockMigrateNowPrompt)
-    expect(result.current.reminderBulletin).toBe(mockReminderBulletin)
+    expect(result.current.reminderBulletin).toEqual(mockReminderBulletin)
+    expect(result.current.offboardBulletin).toBe(mockOffboardBulletin)
+  })
+
+  it("replaces the reminder bulletin with the offboard bulletin when both would show", () => {
+    mockReminderBulletin.isVisible = true
+    mockOffboardBulletin = { isVisible: true }
+
+    const { result } = renderHook(() => useWindDownHomeNudges())
+
+    expect(result.current.reminderBulletin.isVisible).toBe(false)
+    expect(result.current.offboardBulletin.isVisible).toBe(true)
+  })
+
+  it("leaves the reminder bulletin untouched when the offboard bulletin is hidden", () => {
+    mockReminderBulletin.isVisible = true
+
+    const { result } = renderHook(() => useWindDownHomeNudges())
+
+    expect(result.current.reminderBulletin.isVisible).toBe(true)
+    expect(result.current.reminderBulletin.deadlineTimestamp).toBe(
+      mockReminderBulletin.deadlineTimestamp,
+    )
   })
 
   it("greys Receive whenever the wind-down blocks receiving", () => {

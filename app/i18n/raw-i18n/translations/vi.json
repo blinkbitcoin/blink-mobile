@@ -3686,6 +3686,10 @@
       "body": "Hãy chuyển sang tài khoản không lưu ký qua quy trình di chuyển có hướng dẫn, hoặc rút tiền, trước {date}. Việc nhận sẽ dừng vào {receiveStopsDate}.",
       "migrateCta": "Chuyển"
     },
+    "offboardBulletin": {
+      "title": "Quan trọng",
+      "body": "Tài khoản của bạn được đăng ký ở khu vực mà chúng tôi không thể cung cấp tài khoản. Hãy rút tiền của bạn trước ngày 31 tháng 8. Việc nhận tiền sẽ dừng vào ngày 10 tháng 8."
+    },
     "dollarBalanceModal": {
       "title": "Chúng tôi không thể di chuyển số dư đô la của bạn",
       "body": "Trước tiên hãy rút hết số dư đô la của bạn. Bạn có thể chuyển nó sang số dư Bitcoin trong Blink hoặc nơi khác."

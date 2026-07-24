@@ -12346,6 +12346,16 @@ type RootTranslation = {
 			 */
 			migrateCta: string
 		}
+		offboardBulletin: {
+			/**
+			 * I​m​p​o​r​t​a​n​t
+			 */
+			title: string
+			/**
+			 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​r​e​g​i​s​t​e​r​e​d​ ​i​n​ ​a​ ​r​e​g​i​o​n​ ​w​h​e​r​e​ ​w​e​ ​c​a​n​n​o​t​ ​o​f​f​e​r​ ​a​c​c​o​u​n​t​s​.​ ​W​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​b​e​f​o​r​e​ ​A​u​g​u​s​t​ ​3​1​.​ ​R​e​c​e​i​v​i​n​g​ ​s​t​o​p​s​ ​A​u​g​u​s​t​ ​1​0​.
+			 */
+			body: string
+		}
 		contactSupport: {
 			/**
 			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
@@ -25143,6 +25153,16 @@ export type TranslationFunctions = {
 			 * Migrate
 			 */
 			migrateCta: () => LocalizedString
+		}
+		offboardBulletin: {
+			/**
+			 * Important
+			 */
+			title: () => LocalizedString
+			/**
+			 * Your account is registered in a region where we cannot offer accounts. Withdraw your funds before August 31. Receiving stops August 10.
+			 */
+			body: () => LocalizedString
 		}
 		contactSupport: {
 			/**
