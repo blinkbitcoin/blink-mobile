@@ -19,11 +19,9 @@
     "coverage": "jest --runInBand --coverage",
     "fastlane-update": "(cd ios && bundle update fastlane && cd ../android && bundle update fastlane)",
     "increment": "(cd ios && fastlane ios increment && cd ../android && echo 'fastlane android increment')",
-    "get-stories": "sb-rn-get-stories --config-path=./.storybook",
-    "storybook-watcher": "sb-rn-watcher --config-path=./.storybook",
     "dev:codegen": "graphql-codegen --config codegen.yml && yarn dev:gengql",
     "dev:gengql": "yarn node utils/create-gql.ts",
-    "adb": "adb reverse tcp:9090 tcp:9090 && adb reverse tcp:3000 tcp:3000 && adb reverse tcp:4000 tcp:4000 && adb reverse tcp:9001 tcp:9001 && adb reverse tcp:8081 tcp:8081 && adb reverse tcp:4002 tcp:4002 && adb reverse tcp:4455 tcp:4455",
+    "adb": "adb reverse tcp:9090 tcp:9090 && adb reverse tcp:3000 tcp:3000 && adb reverse tcp:4000 tcp:4000 && adb reverse tcp:8081 tcp:8081 && adb reverse tcp:4002 tcp:4002 && adb reverse tcp:4455 tcp:4455",
     "patch": "patch-package --error-on-fail",
     "postinstall": "jetify && yarn patch-package --error-on-fail && if [ \"$(uname)\" = \"Darwin\" ] && which pod >/dev/null; then (cd ios; pod install --allow-root --repo-update); fi",
     "hack:types-react-native": "rimraf node_modules/@types/react-native/node_modules/@types",
@@ -41,7 +39,6 @@
     "e2e": "yarn test:e2e:android && yarn test:e2e:ios",
     "test:get:device": "./bin/get-testing-device.sh",
     "test:e2e:android": ". ./bin/get-testing-device.sh && E2E_DEVICE=\"android\" ./node_modules/.bin/wdio e2e/config/wdio.conf.js",
-    "test:sb:android": ". ./bin/get-testing-device.sh && E2E_DEVICE=\"android\" ./node_modules/.bin/wdio e2e/config/story-book.wdio.conf.js",
     "test:e2e:ios": ". ./bin/get-testing-device.sh && E2E_DEVICE=\"ios\" ./node_modules/.bin/wdio e2e/config/wdio.conf.js",
     "test:browserstack:android": "E2E_DEVICE=\"android\" ./node_modules/.bin/wdio e2e/config/browserstack.conf.js",
     "test:browserstack:ios": "E2E_DEVICE=\"ios\" ./node_modules/.bin/wdio e2e/config/browserstack.conf.js",
@@ -191,23 +188,6 @@
     "@react-native/metro-config": "0.85.3",
     "@react-native/typescript-config": "0.76.9",
     "@rnx-kit/align-deps": "^3.2.1",
-    "@storybook/addon-actions": "6.5.16",
-    "@storybook/addon-backgrounds": "6.5.16",
-    "@storybook/addon-controls": "6.5.16",
-    "@storybook/addon-knobs": "6.4.0",
-    "@storybook/addon-links": "6.5.16",
-    "@storybook/addon-ondevice-actions": "6.5.2",
-    "@storybook/addon-ondevice-backgrounds": "6.5.2",
-    "@storybook/addon-ondevice-controls": "6.5.2",
-    "@storybook/addon-ondevice-knobs": "6.5.2",
-    "@storybook/addon-ondevice-notes": "6.5.2",
-    "@storybook/addons": "6.5.16",
-    "@storybook/docs-tools": "6.5.16",
-    "@storybook/eslint-config-storybook": "3.1.2",
-    "@storybook/linter-config": "3.1.2",
-    "@storybook/react": "7.0.7",
-    "@storybook/react-native": "6.5.2",
-    "@storybook/test-runner": "^0.9.4",
     "@testing-library/jest-native": "^5.4.1",
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/react-native": "^13.3.3",
@@ -278,15 +258,6 @@
   },
   "peerDependencies": {
     "solidarity": "^2.3.1"
-  },
-  "config": {
-    "react-native-storybook-loader": {
-      "searchDir": [
-        "app"
-      ],
-      "pattern": "**/*.stories.tsx",
-      "outputFile": "./.storybook/storyLoader.ts"
-    }
   },
   "resolutions": {
     "basic-ftp": ">=5.2.0",

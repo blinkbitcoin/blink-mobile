@@ -11,13 +11,24 @@ import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-det
 import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payment-details/lightning"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
-import {
-  Intraledger,
-  LightningLnURL,
-} from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen.stories"
+import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { RouteProp } from "@react-navigation/native"
 
 import { flushEffects } from "../helpers/flush-effects"
 import { ContextForScreen } from "./helper"
+
+const Intraledger = ({
+  route,
+}: {
+  route: RouteProp<RootStackParamList, "sendBitcoinConfirmation">
+}) => <SendBitcoinConfirmationScreen route={route} />
+
+const LightningLnURL = ({
+  route,
+}: {
+  route: RouteProp<RootStackParamList, "sendBitcoinConfirmation">
+}) => <SendBitcoinConfirmationScreen route={route} />
 
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),

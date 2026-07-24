@@ -4,12 +4,6 @@ import { createTheme } from "@rn-vui/themed"
 
 import { light, dark } from "./colors"
 
-const isStorybook =
-  __DEV__ &&
-  Boolean(
-    (global as typeof globalThis & { STORYBOOK_ENABLED?: boolean }).STORYBOOK_ENABLED,
-  )
-
 const theme = createTheme({
   lightColors: light,
   darkColors: dark,
@@ -28,7 +22,7 @@ const theme = createTheme({
     Text: (props, { colors }) => {
       const universalStyle = {
         color: props.color || colors.black,
-        ...(isStorybook ? {} : { fontFamily: "SourceSansPro-Regular" }),
+        fontFamily: "SourceSansPro-Regular",
       }
 
       const sizeStyle = props.type

@@ -2,10 +2,21 @@ import React from "react"
 import { render, waitFor, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
-import { SwitchAccountComponent } from "@app/screens/settings-screen/account/multi-account/switch-account.stories"
+import { MockedProvider } from "@apollo/client/testing"
+import { createCache } from "@app/graphql/cache"
+import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
+import { SwitchAccount } from "@app/screens/settings-screen/account/multi-account/switch-account"
 import { fetchProfiles } from "@app/screens/settings-screen/account/multi-account/utils"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { ContextForScreen } from "../helper"
+
+const SwitchAccountComponent = () => (
+  <MockedProvider cache={createCache()}>
+    <IsAuthedContextProvider value={true}>
+      <SwitchAccount />
+    </IsAuthedContextProvider>
+  </MockedProvider>
+)
 
 const expectedProfiles = [
   {

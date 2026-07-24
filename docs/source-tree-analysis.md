@@ -108,7 +108,6 @@ blink-mobile/
 │   ├── config/                   # WebDriverIO/Detox config
 │   ├── detox/                    # Detox test specs
 │   └── utils/                    # E2E utilities
-├── .storybook/                   # Storybook configuration
 ├── .github/                      # GitHub config
 │   ├── workflows/                # 8 CI/CD workflows
 │   └── ISSUE_TEMPLATE/           # Issue templates
@@ -177,4 +176,3 @@ The GraphQL directory contains the entire data layer:
 | `__tests__/` | Unit tests | Jest + Testing Library |
 | `e2e/detox/` | E2E tests | Detox |
 | `e2e/` (root) | E2E tests | WebDriverIO + Appium |
-| `.storybook/` | Component tests | Storybook |

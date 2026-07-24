@@ -17,6 +17,5 @@
       "@types/jest"
     ]
   },
-  "exclude": ["**/*.stories.tsx"],
-  "include": ["app", "e2e", "__tests__", ".storybook"]
+  "include": ["app", "e2e", "__tests__"]
 }
