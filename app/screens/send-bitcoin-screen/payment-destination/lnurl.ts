@@ -59,9 +59,12 @@ export const resolveLnurlDestination = async ({
       })
 
       if (lnurlPayParams) {
-        // Skip intraledger optimization for fixed-amount LNURLs to preserve the
-        // min === max constraint (fixes #3583)
-        const isFixedAmount = lnurlPayParams.min === lnurlPayParams.max
+        // Skip intraledger conversion for fixed-amount LNURLs so the
+        // min === max amount constraint is preserved. A 0/0 response from a
+        // broken service is not treated as fixed since it would lock the
+        // amount at an unpayable 0 sats.
+        const isFixedAmount =
+          lnurlPayParams.min === lnurlPayParams.max && lnurlPayParams.max > 0
 
         if (!isFixedAmount) {
           const maybeIntraledgerDestination = await tryGetIntraLedgerDestinationFromLnurl(
