@@ -173,7 +173,7 @@ export const useGoogleDriveBackup = () => {
     ): Promise<CloudBackupUploadResult> => {
       setLoading(true)
       try {
-        await callDrive(session.accessToken, (t) =>
+        const { token } = await callDrive(session.accessToken, (t) =>
           uploadAppDataFile({
             content,
             fileName,
@@ -181,7 +181,7 @@ export const useGoogleDriveBackup = () => {
             existingId: session.existingFileId,
           }),
         )
-        return { success: true }
+        return { success: true, accessToken: token }
       } catch (err) {
         reportDriveError(DriveOperation.Upload, err)
         return { success: false, reason: reasonFromError(err) }
@@ -196,10 +196,10 @@ export const useGoogleDriveBackup = () => {
     async (fileId: string, accessToken: string): Promise<CloudBackupDownloadResult> => {
       setLoading(true)
       try {
-        const { value: content } = await callDrive(accessToken, (t) =>
+        const { value: content, token } = await callDrive(accessToken, (t) =>
           downloadAppDataFile(fileId, t),
         )
-        return { success: true, content }
+        return { success: true, content, accessToken: token }
       } catch (err) {
         reportDriveError(DriveOperation.Download, err)
         return { success: false, reason: reasonFromError(err) }

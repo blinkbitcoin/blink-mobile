@@ -298,6 +298,38 @@ describe("useCloudBackup", () => {
     )
   })
 
+  /** Checking the existing backup can refresh a revoked token; the upload must reuse the fresh
+   *  one instead of the dead token the session started with. */
+  it("uploads with the token refreshed while checking the existing backup", async () => {
+    mockStartSession.mockResolvedValue(sessionOk(withExistingFile))
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: JSON.stringify({
+        version: 1,
+        walletIdentifier: "test-pubkey-1234",
+        encrypted: false,
+        mnemonic: "youth indicate void",
+      }),
+      accessToken: "refreshed-token",
+    })
+    mockUpload.mockResolvedValue({ success: true })
+    mockConfirmDialog.mockResolvedValue(true)
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockUpload).toHaveBeenCalledWith(
+      expect.any(String),
+      "blink-spark-backup-blink-test-pubkey-1234.json",
+      { accessToken: "refreshed-token", existingFileId: "file-123" },
+    )
+  })
+
   it("aborts with upload-failed toast when existing-backup verification fails (non-NotFound)", async () => {
     mockStartSession.mockResolvedValue(sessionOk(withExistingFile))
     mockDownloadById.mockResolvedValue({ success: false, reason: "transient" })

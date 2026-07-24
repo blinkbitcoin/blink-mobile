@@ -751,6 +751,41 @@ describe("useCloudRestore", () => {
     expect(mockRestore).toHaveBeenCalledWith("words 2")
   })
 
+  /** A download can refresh a revoked token mid-flight; the next pick must reuse the fresh one
+   *  instead of starting from the dead token listBackups captured. */
+  it("reuses a token refreshed during picker assembly for the next pick", async () => {
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [
+        { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
+        { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
+      ],
+      accessToken: "list-token",
+    })
+    mockDownloadById.mockImplementation((fileId: string) =>
+      Promise.resolve({
+        success: true,
+        content: buildPlainBackup(fileId === "file-1" ? "pubkey1" : "pubkey2", "words"),
+        accessToken: "refreshed-token",
+      }),
+    )
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isPicker).toBe(true)
+    })
+
+    await act(async () => {
+      await result.current.handlePick(result.current.entries[0])
+    })
+
+    expect(mockDownloadById).toHaveBeenLastCalledWith(
+      result.current.entries[0].fileId,
+      "refreshed-token",
+    )
+  })
+
   it("handleDecrypt does nothing when no backup was downloaded", async () => {
     mockListBackups.mockResolvedValue({
       success: true,

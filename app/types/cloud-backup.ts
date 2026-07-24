@@ -21,12 +21,14 @@ export type CloudBackupSessionResult =
   | { success: true; session: CloudBackupSession }
   | { success: false; reason: CloudBackupErrorReason }
 
+/** `accessToken` returns a token refreshed mid-call so the next Drive call skips the refresh;
+ *  optional because iCloud has none to hand back. */
 export type CloudBackupUploadResult =
-  | { success: true }
+  | { success: true; accessToken?: string }
   | { success: false; reason: CloudBackupErrorReason }
 
 export type CloudBackupDownloadResult =
-  | { success: true; content: string }
+  | { success: true; content: string; accessToken?: string }
   | { success: false; reason: CloudBackupErrorReason }
 
 export type CloudBackupListResult =

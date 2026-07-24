@@ -78,6 +78,11 @@ export const useCloudRestore = () => {
   const accessTokenRef = useRef<string | null>(null)
   const hasRunRef = useRef(false)
 
+  /** Keep a token a download refreshed mid-flight, so later picks skip the refresh. */
+  const rememberAccessToken = useCallback((token: string | undefined) => {
+    if (token) accessTokenRef.current = token
+  }, [])
+
   /** A missing backup is its own step with its own copy, so only a real failure carries a
    *  message. */
   const showFailure = useCallback(
@@ -122,13 +127,14 @@ export const useCloudRestore = () => {
           showFailure(result.reason)
           return
         }
+        rememberAccessToken(result.accessToken)
         await proceedWithBackup(result.content)
       } catch (err) {
         reportError(RestoreErrorContext.CloudDownload, err)
         setStep(CloudStep.Error)
       }
     },
-    [downloadById, proceedWithBackup, showFailure],
+    [downloadById, proceedWithBackup, showFailure, rememberAccessToken],
   )
 
   const loadCloudBackups = useCallback(async () => {
@@ -160,6 +166,7 @@ export const useCloudRestore = () => {
           showFailure(result.reason)
           return
         }
+        rememberAccessToken(result.accessToken)
         if (!parseBackupMetadata(result.content)) {
           setStep(CloudStep.NotFound)
           return
@@ -177,6 +184,7 @@ export const useCloudRestore = () => {
                 ? { kind: "not-found" }
                 : { kind: "failure", reason: result.reason }
             }
+            rememberAccessToken(result.accessToken)
             const metadata = parseBackupMetadata(result.content)
             if (!metadata) return { kind: "not-found" }
             return {
@@ -225,6 +233,7 @@ export const useCloudRestore = () => {
     downloadById,
     proceedWithBackup,
     showFailure,
+    rememberAccessToken,
   ])
 
   useEffect(() => {

@@ -458,7 +458,7 @@ describe("useGoogleDriveBackup", () => {
         })
       })
 
-      expect(uploadResult).toEqual({ success: true })
+      expect(uploadResult).toEqual({ success: true, accessToken: "refreshed-token" })
       expect(mockUploadAppDataFile).toHaveBeenLastCalledWith(
         expect.objectContaining({ accessToken: "refreshed-token" }),
       )
@@ -481,7 +481,11 @@ describe("useGoogleDriveBackup", () => {
         downloadResult = await result.current.downloadById("file-1", "token-abc")
       })
 
-      expect(downloadResult).toEqual({ success: true, content: '{"mnemonic":"words"}' })
+      expect(downloadResult).toEqual({
+        success: true,
+        content: '{"mnemonic":"words"}',
+        accessToken: "refreshed-token",
+      })
       expect(mockDownloadAppDataFile).toHaveBeenLastCalledWith(
         "file-1",
         "refreshed-token",
@@ -700,6 +704,7 @@ describe("useGoogleDriveBackup", () => {
       expect(downloadResult).toEqual({
         success: true,
         content: '{"mnemonic":"words"}',
+        accessToken: "token-abc",
       })
     })
 

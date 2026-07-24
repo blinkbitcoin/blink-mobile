@@ -80,12 +80,10 @@ export const useCloudBackup = ({
       return
     }
     const { session } = sessionResult
+    let { accessToken } = session
 
     if (session.existingFileId) {
-      const downloadResult = await downloadById(
-        session.existingFileId,
-        session.accessToken,
-      )
+      const downloadResult = await downloadById(session.existingFileId, accessToken)
 
       if (
         !downloadResult.success &&
@@ -93,6 +91,10 @@ export const useCloudBackup = ({
       ) {
         toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
         return
+      }
+
+      if (downloadResult.success && downloadResult.accessToken) {
+        accessToken = downloadResult.accessToken
       }
 
       const metadata = downloadResult.success
@@ -117,7 +119,7 @@ export const useCloudBackup = ({
       version,
     })
 
-    const result = await upload(payload, filename, session)
+    const result = await upload(payload, filename, { ...session, accessToken })
     if (!result.success) {
       toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
       return
