@@ -24,11 +24,10 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { CardStatus } from "@app/graphql/generated"
 import { toastShow } from "@app/utils/toast"
 
 import { useCardData } from "../hooks/use-card-data"
-import { isCardFrozen } from "../utils/card-display"
+import { isCardFrozen, isCardUsable } from "../utils/card-display"
 
 import { useCardBalance, useCardFreeze, useCardTransactions } from "./hooks"
 
@@ -116,8 +115,7 @@ const CardDashboardScreenContent: React.FC = () => {
 
   if (!card) return <EmptyScreen message={LL.CardFlow.CardDashboard.noCardAvailable()} />
 
-  const isUsable = card.status === CardStatus.Active || card.status === CardStatus.Locked
-  if (!isUsable)
+  if (!isCardUsable(card.status))
     return <EmptyScreen message={LL.CardFlow.CardDashboard.cardNotUsable()} />
 
   const cardNumber = card.lastFour
