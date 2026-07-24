@@ -119,6 +119,7 @@ const callDrive = async <T>(
 
 const DriveOperation = {
   SignIn: "sign-in",
+  Find: "find",
   Upload: "upload",
   Download: "download",
   List: "list",
@@ -151,14 +152,20 @@ export const useGoogleDriveBackup = () => {
 
   const startSession = useCallback(
     async (fileName: string): Promise<CloudBackupSessionResult> => {
+      let signedInToken: string
       try {
-        const signedInToken = await signIn()
+        signedInToken = await signIn()
+      } catch (err) {
+        reportDriveError(DriveOperation.SignIn, err)
+        return { success: false, reason: reasonFromError(err) }
+      }
+      try {
         const { value: existingFileId, token } = await callDrive(signedInToken, (t) =>
           findAppDataFile(fileName, t),
         )
         return { success: true, session: { accessToken: token, existingFileId } }
       } catch (err) {
-        reportDriveError(DriveOperation.SignIn, err)
+        reportDriveError(DriveOperation.Find, err)
         return { success: false, reason: reasonFromError(err) }
       }
     },

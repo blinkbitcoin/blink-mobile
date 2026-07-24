@@ -186,7 +186,7 @@ describe("useCloudBackup", () => {
     expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
   })
 
-  it("shows error toast on upload failure", async () => {
+  it("shows the resolved failure message on upload failure", async () => {
     mockUpload.mockResolvedValue({ success: false, reason: "auth" })
 
     const { result } = renderHook(() =>
@@ -198,7 +198,7 @@ describe("useCloudBackup", () => {
     })
 
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Upload failed" }),
+      expect.objectContaining({ message: "Sign-in failed: auth" }),
     )
     expect(mockCompleteBackup).not.toHaveBeenCalled()
   })
@@ -346,7 +346,7 @@ describe("useCloudBackup", () => {
     )
   })
 
-  it("aborts with upload-failed toast when existing-backup verification fails (non-NotFound)", async () => {
+  it("aborts with the resolved failure message when existing-backup verification fails (non-NotFound)", async () => {
     mockStartSession.mockResolvedValue(sessionOk(withExistingFile))
     mockDownloadById.mockResolvedValue({ success: false, reason: "transient" })
 
@@ -362,7 +362,7 @@ describe("useCloudBackup", () => {
     expect(mockConfirmDialog).not.toHaveBeenCalled()
     expect(mockUpload).not.toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Upload failed" }),
+      expect.objectContaining({ message: "Sign-in failed: transient" }),
     )
   })
 

@@ -947,7 +947,9 @@ describe("useCloudRestore error message", () => {
     expect(result.current.errorMessage).toBe("Resolved message for transient")
   })
 
-  it("falls back to unknown when every per-file download throws", async () => {
+  /** An unknown failure surfaces only after sign-in has already succeeded, so the error step
+   *  stays blank rather than misdirecting the user to a sign-in remedy. */
+  it("leaves the message empty when every per-file download throws", async () => {
     mockListBackups.mockResolvedValue({
       success: true,
       entries: [
@@ -963,7 +965,8 @@ describe("useCloudRestore error message", () => {
     await waitFor(() => {
       expect(result.current.hasError).toBe(true)
     })
-    expect(result.current.errorMessage).toBe("Resolved message for unknown")
+    expect(result.current.errorMessage).toBeNull()
+    expect(mockResolveErrorMessage).not.toHaveBeenCalled()
   })
 
   it("keeps the message empty when every backup is missing", async () => {

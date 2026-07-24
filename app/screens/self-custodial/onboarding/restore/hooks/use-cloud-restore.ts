@@ -85,12 +85,15 @@ export const useCloudRestore = () => {
   }, [])
 
   /** A missing backup is its own step with its own copy, so only a real failure carries a
-   *  message. */
+   *  message. `unknown` reaches the error step only after sign-in already succeeded, so its
+   *  signInFailed fallback would misdirect; it stays blank, matching the handlePick catch. */
   const showFailure = useCallback(
     (reason: CloudBackupErrorReason) => {
       const nextStep = STEP_FOR_REASON[reason]
       const isErrorStep = nextStep === CloudStep.Error
-      setErrorMessage(isErrorStep ? resolveErrorMessage(reason, LL) : null)
+      const isUnknown = reason === CloudBackupErrorReason.Unknown
+      const hasResolvableMessage = isErrorStep && !isUnknown
+      setErrorMessage(hasResolvableMessage ? resolveErrorMessage(reason, LL) : null)
       setStep(nextStep)
     },
     [resolveErrorMessage, LL],
