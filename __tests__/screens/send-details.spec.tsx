@@ -12,6 +12,7 @@ import {
   PaymentDetail,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import {
+  CreatePaymentDetailParams,
   DestinationDirection,
   PaymentDestination,
   ResolvedIntraledgerPaymentDestination,
@@ -104,12 +105,10 @@ const intraledgerValidDestination: ResolvedIntraledgerPaymentDestination = {
   handle: intraledgerHandle,
 }
 
-/* eslint @typescript-eslint/ban-ts-comment: "off" */
-// @ts-ignore-next-line no-implicit-any error
-const createIntraledgerPaymentDetail = ({
+const createIntraledgerPaymentDetail = <T extends WalletCurrency>({
   convertMoneyAmount,
   sendingWalletDescriptor,
-}) =>
+}: CreatePaymentDetailParams<T>) =>
   createIntraledgerPaymentDetails({
     handle: intraledgerHandle,
     recipientWalletId: intraledgerWalletId,
@@ -122,7 +121,6 @@ const intraledgerPaymentDestination: PaymentDestination = {
   valid: true,
   validDestination: intraledgerValidDestination,
   destinationDirection: DestinationDirection.Send,
-  // @ts-ignore-next-line no-implicit-any error
   createPaymentDetail: createIntraledgerPaymentDetail,
 }
 
