@@ -318,17 +318,6 @@ mutation deviceNotificationTokenCreate($input: DeviceNotificationTokenCreateInpu
   }
 }
 
-mutation feedbackSubmit($input: FeedbackSubmitInput!) {
-  feedbackSubmit(input: $input) {
-    errors {
-      message
-      __typename
-    }
-    success
-    __typename
-  }
-}
-
 mutation intraLedgerPaymentSend($input: IntraLedgerPaymentSendInput!) {
   intraLedgerPaymentSend(input: $input) {
     errors {

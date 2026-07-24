@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { View, Alert, ScrollView } from "react-native"
-import InAppReview from "react-native-in-app-review"
+import { View, ScrollView } from "react-native"
 import ViewShot, { type ViewShotRef } from "react-native-view-shot"
 
-import { useApolloClient } from "@apollo/client"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import {
@@ -11,21 +9,15 @@ import {
   SuccessIconAnimation,
 } from "@app/components/success-animation"
 import { SuccessActionComponent } from "@app/components/success-action"
-import { setFeedbackModalShown } from "@app/graphql/client-only-query"
-import {
-  useFeedbackModalShownQuery,
-  useSettingsScreenQuery,
-} from "@app/graphql/generated"
-import { useAppConfig, useScreenshot } from "@app/hooks"
+import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { useScreenshot } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { logAppFeedback } from "@app/utils/analytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { testProps } from "../../utils/testProps"
-import { SuggestionModal } from "./suggestion-modal"
 import { PaymentSendCompletedStatus } from "./use-send-payment"
 import LogoLightMode from "@app/assets/logo/blink-logo-light.svg"
 import LogoDarkMode from "@app/assets/logo/app-logo-dark.svg"
@@ -38,7 +30,6 @@ import {
   timeToMempool,
 } from "../transaction-detail-screen/format-time"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
-import { GaloyInstance } from "@app/config/galoy-instances"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { PaymentType } from "@blinkbitcoin/blink-client"
@@ -48,8 +39,6 @@ type StatusProcessed = "SUCCESS" | "PENDING" | "QUEUED"
 interface Props {
   route: RouteProp<RootStackParamList, "sendBitcoinCompleted">
 }
-
-const FEEDBACK_DELAY = 3000
 
 const processStatus = ({
   status,
@@ -90,57 +79,6 @@ const useSuccessMessage = (
 
     return includeUrl ? `${textContent} ${url}`.trim() : textContent
   }, [successAction, preimage])()
-}
-
-const useFeedbackHandler = () => {
-  const client = useApolloClient()
-  const { LL } = useI18nContext()
-  const { appConfig } = useAppConfig()
-  const [showSuggestionModal, setShowSuggestionModal] = useState(false)
-
-  const handleNegativeFeedback = useCallback(() => {
-    logAppFeedback({ isEnjoingApp: false })
-    setShowSuggestionModal(true)
-  }, [])
-
-  const handlePositiveFeedback = useCallback(() => {
-    logAppFeedback({ isEnjoingApp: true })
-    InAppReview.RequestInAppReview()
-  }, [])
-
-  const requestFeedback = useCallback(() => {
-    if (!shouldShowFeedback(appConfig)) return
-
-    if (InAppReview.isAvailable()) {
-      showFeedbackAlert(LL, handleNegativeFeedback, handlePositiveFeedback)
-      setFeedbackModalShown(client, true)
-    }
-  }, [LL, client, appConfig, handleNegativeFeedback, handlePositiveFeedback])
-
-  return { requestFeedback, showSuggestionModal, setShowSuggestionModal }
-}
-
-const shouldShowFeedback = (appConfig: {
-  token: string
-  galoyInstance: GaloyInstance
-}): boolean => {
-  return appConfig && appConfig.galoyInstance.id !== "Local"
-}
-
-const showFeedbackAlert = (
-  LL: TranslationFunctions,
-  onNegative: () => void,
-  onPositive: () => void,
-) => {
-  Alert.alert(
-    "",
-    LL.support.enjoyingApp(),
-    [
-      { text: LL.common.No(), onPress: onNegative },
-      { text: LL.common.yes(), onPress: onPositive },
-    ],
-    { cancelable: true },
-  )
 }
 
 const SuccessIconComponent: React.FC<{
@@ -327,7 +265,6 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "sendBitcoinCompleted">>()
   const { LL } = useI18nContext()
 
-  const feedbackShownData = useFeedbackModalShownQuery()
   const { data } = useSettingsScreenQuery({ fetchPolicy: "cache-first" })
   const { successIconDuration } = useRemoteConfig()
 
@@ -338,23 +275,12 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
   const noteMessage = successActionMessage || note?.trim() || ""
   const Logo = mode === "dark" ? LogoDarkMode : LogoLightMode
 
-  const { requestFeedback, showSuggestionModal, setShowSuggestionModal } =
-    useFeedbackHandler()
   const { isTakingScreenshot, captureAndShare } = useScreenshot(viewRef)
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSuccessIcon(false), successIconDuration)
     return () => clearTimeout(timer)
   }, [successIconDuration])
-
-  useEffect(() => {
-    const feedbackModalShown = feedbackShownData?.data?.feedbackModalShown
-
-    if (!feedbackModalShown) {
-      const feedbackTimeout = setTimeout(requestFeedback, FEEDBACK_DELAY)
-      return () => clearTimeout(feedbackTimeout)
-    }
-  }, [feedbackShownData?.data?.feedbackModalShown, requestFeedback])
 
   const handleNavigateHome = () => navigation.navigate("Primary")
 
@@ -408,12 +334,6 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
           )}
         </View>
       </ViewShot>
-
-      <SuggestionModal
-        navigation={navigation}
-        showSuggestionModal={showSuggestionModal}
-        setShowSuggestionModal={setShowSuggestionModal}
-      />
     </Screen>
   )
 }
