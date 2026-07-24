@@ -75,6 +75,37 @@ const signIn = async (): Promise<string> => {
   return accessToken
 }
 
+/** Not `reason`: 403 shares it but means a withheld permission, which a new token cannot fix. */
+const isDeadAccessToken = (err: unknown): boolean =>
+  err instanceof DriveError && err.status === 401
+
+/**
+ * A revoked token stays in the sign-in cache, so the SDK keeps handing back the same dead
+ * one. Clearing it forces a refresh, retried once. The working token comes back because the
+ * caller holds it for the rest of the session.
+ */
+const callDrive = async <T>(
+  token: string,
+  call: (token: string) => Promise<T>,
+): Promise<{ value: T; token: string }> => {
+  try {
+    return { value: await call(token), token }
+  } catch (err) {
+    if (!isDeadAccessToken(err)) throw err
+
+    let refreshed: string
+    try {
+      await GoogleSignin.clearCachedAccessToken(token)
+      refreshed = (await GoogleSignin.getTokens()).accessToken
+    } catch {
+      /** The 401 is the diagnosis; a failure to refresh only says the retry never ran. */
+      throw err
+    }
+
+    return { value: await call(refreshed), token: refreshed }
+  }
+}
+
 const DriveOperation = {
   SignIn: "sign-in",
   Upload: "upload",
@@ -105,9 +136,11 @@ export const useGoogleDriveBackup = () => {
   const startSession = useCallback(
     async (fileName: string): Promise<CloudBackupSessionResult> => {
       try {
-        const accessToken = await signIn()
-        const existingFileId = await findAppDataFile(fileName, accessToken)
-        return { success: true, session: { accessToken, existingFileId } }
+        const signedInToken = await signIn()
+        const { value: existingFileId, token } = await callDrive(signedInToken, (t) =>
+          findAppDataFile(fileName, t),
+        )
+        return { success: true, session: { accessToken: token, existingFileId } }
       } catch (err) {
         reportDriveError(DriveOperation.SignIn, err)
         return { success: false, reason: reasonFromError(err) }
@@ -124,12 +157,14 @@ export const useGoogleDriveBackup = () => {
     ): Promise<CloudBackupUploadResult> => {
       setLoading(true)
       try {
-        await uploadAppDataFile({
-          content,
-          fileName,
-          accessToken: session.accessToken,
-          existingId: session.existingFileId,
-        })
+        await callDrive(session.accessToken, (t) =>
+          uploadAppDataFile({
+            content,
+            fileName,
+            accessToken: t,
+            existingId: session.existingFileId,
+          }),
+        )
         return { success: true }
       } catch (err) {
         reportDriveError(DriveOperation.Upload, err)
@@ -145,7 +180,9 @@ export const useGoogleDriveBackup = () => {
     async (fileId: string, accessToken: string): Promise<CloudBackupDownloadResult> => {
       setLoading(true)
       try {
-        const content = await downloadAppDataFile(fileId, accessToken)
+        const { value: content } = await callDrive(accessToken, (t) =>
+          downloadAppDataFile(fileId, t),
+        )
         return { success: true, content }
       } catch (err) {
         reportDriveError(DriveOperation.Download, err)
@@ -160,9 +197,11 @@ export const useGoogleDriveBackup = () => {
   const listBackups = useCallback(
     async (filenamePrefix: string): Promise<CloudBackupListResult> => {
       try {
-        const accessToken = await signIn()
-        const entries = await listAppDataFiles(filenamePrefix, accessToken)
-        return { success: true, entries, accessToken }
+        const signedInToken = await signIn()
+        const { value: entries, token } = await callDrive(signedInToken, (t) =>
+          listAppDataFiles(filenamePrefix, t),
+        )
+        return { success: true, entries, accessToken: token }
       } catch (err) {
         reportDriveError(DriveOperation.List, err)
         return { success: false, reason: reasonFromError(err) }

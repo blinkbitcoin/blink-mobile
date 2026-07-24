@@ -17,6 +17,9 @@ export class DriveError extends Error {
   constructor(
     readonly reason: CloudBackupErrorReason,
     message: string,
+    /** Absent when the failure never reached Drive. Tells a dead token (401) from a
+     *  withheld permission (403), which share the auth reason but not the remedy. */
+    readonly status?: number,
   ) {
     super(message)
     this.name = "DriveError"
@@ -72,6 +75,7 @@ const assertOkOrThrow = async (
   throw new DriveError(
     classifyFailure(response.status, body),
     `Drive ${operation} failed (${response.status}): ${body}`,
+    response.status,
   )
 }
 
