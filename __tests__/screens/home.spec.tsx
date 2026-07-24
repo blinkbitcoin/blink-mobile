@@ -97,7 +97,19 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 }))
 
 jest.mock("@app/config/feature-flags-context", () => {
-  const actual = jest.requireActual("@app/config/feature-flags-context")
+  const actual = jest.requireActual<typeof import("@app/config/feature-flags-context")>(
+    "@app/config/feature-flags-context",
+  )
+  /**
+   * Typed against the real hook and spread from the real defaults so tsc fails
+   * when the mock misses a new remote-config key or keeps a removed one — a
+   * stale partial mock crashed the whole suite when #3977 landed.
+   */
+  const remoteConfig: ReturnType<typeof actual.useRemoteConfig> = {
+    ...actual.defaultRemoteConfig,
+    custodialDollarBalanceBlockedCountries: [],
+    selfCustodialDollarBalanceBlockedCountries: [],
+  }
   return {
     ...actual,
     useFeatureFlags: () =>
@@ -105,19 +117,7 @@ jest.mock("@app/config/feature-flags-context", () => {
         nonCustodialEnabled: false,
         stableBalanceEnabled: false,
       },
-    useRemoteConfig: () => ({
-      // Real defaults keep this mock complete when new remote-config keys land.
-      ...actual.defaultRemoteConfig,
-      loading: false,
-      remoteConfigReady: true,
-      feeReimbursementMemo: "fee reimbursement",
-      featureFlags: {
-        nonCustodialEnabled: false,
-        stableBalanceEnabled: false,
-      },
-      custodialDollarBalanceBlockedCountries: [],
-      selfCustodialDollarBalanceBlockedCountries: [],
-    }),
+    useRemoteConfig: () => remoteConfig,
   }
 })
 
@@ -1930,5 +1930,22 @@ describe("HomeScreen layout under font scaling (blink-wip#931)", () => {
     expect(getByTestId("home-username").props.maxFontSizeMultiplier).toBeLessThanOrEqual(
       1.5,
     )
+  })
+})
+
+describe("useRemoteConfig mock completeness", () => {
+  it("covers every real remote-config key so a new key cannot crash unrelated tests", () => {
+    const actual = jest.requireActual<typeof import("@app/config/feature-flags-context")>(
+      "@app/config/feature-flags-context",
+    )
+    const mocked = jest.requireMock<typeof import("@app/config/feature-flags-context")>(
+      "@app/config/feature-flags-context",
+    )
+
+    const missingKeys = Object.keys(actual.defaultRemoteConfig).filter(
+      (key) => !(key in mocked.useRemoteConfig()),
+    )
+
+    expect(missingKeys).toEqual([])
   })
 })
