@@ -1,16 +1,18 @@
 import * as React from "react"
-import { Linking, View } from "react-native"
+import { ActivityIndicator, Linking, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ScrollView } from "react-native-gesture-handler"
 import { useFragment } from "@apollo/client"
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyInfo } from "@app/components/atomic/galoy-info"
 import { TransactionDate } from "@app/components/transaction-date"
 import { useDescriptionDisplay } from "@app/components/transaction-item"
 import { DeepPartialObject } from "@app/components/transaction-item/index.types"
 import { WalletSummary } from "@app/components/wallet-summary"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useResolveTransactionAccount } from "@app/hooks/use-resolve-transaction-account"
 import {
   SettlementVia,
   TransactionFragment,
@@ -165,6 +167,13 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     return undefined
   }, [isSelfCustodial, wallets, txid])
 
+  const hasTxData = Boolean(tx) && Object.keys(tx).length > 0
+  const { status: resolveStatus, retry: retryResolve } = useResolveTransactionAccount({
+    txid,
+    hasTx: hasTxData || Boolean(selfCustodialPaymentType),
+    recipientUserId: route.params.recipientUserId,
+  })
+
   const description = useDescriptionDisplay({
     tx,
     bankName: galoyInstance.name,
@@ -233,9 +242,51 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
     }
   }, [txid, tx.settlementCurrency, latestBtcTxId, latestUsdTxId, markTxSeen])
 
-  // TODO: translation
-  if (!tx || Object.keys(tx).length === 0)
-    return <Text>{"No transaction found with this ID (should not happen)"}</Text>
+  if (!hasTxData) {
+    // Missing from the active account's cache — the resolver may be probing the
+    // other saved profiles for it (multi-account payment notifications, #3826).
+    const resolving =
+      resolveStatus === "idle" ||
+      resolveStatus === "resolving" ||
+      resolveStatus === "switching"
+    return (
+      <Screen unsafe preset="fixed">
+        <View style={[styles.outerContainer, { paddingBottom: insets.bottom }]}>
+          <View style={[styles.amountDetailsContainer, { paddingTop: insets.top }]}>
+            <View accessible={false} style={styles.closeIconContainer}>
+              <GaloyIconButton
+                name="close"
+                onPress={navigation.goBack}
+                iconOnly={true}
+                size={"large"}
+              />
+            </View>
+          </View>
+          <View style={styles.resolveContainer}>
+            {resolving ? (
+              <>
+                <ActivityIndicator size="large" />
+                <Text type="p1" style={styles.resolveText}>
+                  {LL.TransactionDetailScreen.findingAccount()}
+                </Text>
+              </>
+            ) : resolveStatus === "notFound" ? (
+              <Text type="p1" style={styles.resolveText}>
+                {LL.TransactionDetailScreen.txNotFoundInAccounts()}
+              </Text>
+            ) : (
+              <>
+                <Text type="p1" style={styles.resolveText}>
+                  {LL.TransactionDetailScreen.txLoadFailed()}
+                </Text>
+                <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={retryResolve} />
+              </>
+            )}
+          </View>
+        </View>
+      </Screen>
+    )
+  }
 
   const {
     id,
@@ -587,6 +638,18 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   txNotBroadcast: {
     marginBottom: 16,
+  },
+
+  resolveContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 24,
+    gap: 16,
+  },
+
+  resolveText: {
+    textAlign: "center",
   },
 
   container: {

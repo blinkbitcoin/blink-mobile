@@ -8270,6 +8270,23 @@ type RootTranslation = {
 		 * m​o​m​e​n​t​a​r​i​l​y
 		 */
 		momentarily: string
+		/**
+		 * F​i​n​d​i​n​g​ ​t​h​e​ ​a​c​c​o​u​n​t​ ​f​o​r​ ​t​h​i​s​ ​p​a​y​m​e​n​t​.​.​.
+		 */
+		findingAccount: string
+		/**
+		 * T​h​i​s​ ​p​a​y​m​e​n​t​ ​c​o​u​l​d​n​'​t​ ​b​e​ ​f​o​u​n​d​ ​i​n​ ​a​n​y​ ​a​c​c​o​u​n​t​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​I​t​ ​m​a​y​ ​b​e​l​o​n​g​ ​t​o​ ​a​n​ ​a​c​c​o​u​n​t​ ​t​h​a​t​ ​w​a​s​ ​l​o​g​g​e​d​ ​o​u​t​.
+		 */
+		txNotFoundInAccounts: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​t​h​i​s​ ​p​a​y​m​e​n​t​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		txLoadFailed: string
+		/**
+		 * S​w​i​t​c​h​e​d​ ​t​o​ ​{​i​d​e​n​t​i​f​i​e​r​}​ ​t​o​ ​s​h​o​w​ ​t​h​i​s​ ​p​a​y​m​e​n​t
+		 * @param {string} identifier
+		 */
+		switchedForPayment: RequiredParams<'identifier'>
 	}
 	FeeRatesScreen: {
 		/**
@@ -20923,6 +20940,22 @@ export type TranslationFunctions = {
 		 * momentarily
 		 */
 		momentarily: () => LocalizedString
+		/**
+		 * Finding the account for this payment...
+		 */
+		findingAccount: () => LocalizedString
+		/**
+		 * This payment couldn't be found in any account on this device. It may belong to an account that was logged out.
+		 */
+		txNotFoundInAccounts: () => LocalizedString
+		/**
+		 * Couldn't load this payment. Check your connection and try again.
+		 */
+		txLoadFailed: () => LocalizedString
+		/**
+		 * Switched to {identifier} to show this payment
+		 */
+		switchedForPayment: (arg: { identifier: string }) => LocalizedString
 	}
 	FeeRatesScreen: {
 		/**

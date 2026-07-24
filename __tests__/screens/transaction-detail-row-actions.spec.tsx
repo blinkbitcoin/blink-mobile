@@ -68,6 +68,12 @@ jest.mock("@app/components/transaction-item", () => ({
   useDescriptionDisplay: () => "some description",
 }))
 
+// These specs always render with a populated fragment; the multi-account
+// resolver (#3826) is exercised in transaction-detail-fallback.spec.tsx.
+jest.mock("@app/hooks/use-resolve-transaction-account", () => ({
+  useResolveTransactionAccount: () => ({ status: "resolved", retry: jest.fn() }),
+}))
+
 const mockUseFragment = jest.fn()
 jest.mock("@apollo/client", () => ({
   ...jest.requireActual("@apollo/client"),

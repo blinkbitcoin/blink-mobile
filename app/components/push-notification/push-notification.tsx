@@ -22,7 +22,16 @@ export const PushNotificationComponent = (): JSX.Element => {
           linkToScreen &&
           linkToScreen.startsWith("/")
         ) {
-          Linking.openURL("blink:" + linkToScreen)
+          // Forward the receiving account hint when the payload provides one so
+          // multi-account devices can resolve the tx with a single probe (#3826).
+          const recipientUserId = remoteMessage.data?.recipientUserId
+          const link =
+            typeof recipientUserId === "string" &&
+            recipientUserId &&
+            !linkToScreen.includes("?")
+              ? `${linkToScreen}?recipientUserId=${encodeURIComponent(recipientUserId)}`
+              : linkToScreen
+          Linking.openURL("blink:" + link)
         }
         // linkTo throws an error if the link is invalid
       } catch (error) {
