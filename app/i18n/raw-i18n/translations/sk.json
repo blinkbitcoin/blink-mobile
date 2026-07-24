@@ -3646,6 +3646,7 @@
       "uploadSuccess": "Záloha uložená do {provider}",
       "uploadFailed": "Nahranie zálohy zlyhalo",
       "signInFailed": "Prihlásenie do {provider} zlyhalo",
+      "storageAccessRequired": "Povoľte {provider: string} prístup k zálohe peňaženky a skúste to znova.",
       "cloudNotAvailable": "iCloud Drive nie je k dispozícii. Prihláste sa do iCloudu v Nastaveniach a zapnite iCloud Drive.",
       "networkError": "Chyba siete. Skontrolujte pripojenie a skúste to znova.",
       "existingBackupTitle": "Záloha nájdená",

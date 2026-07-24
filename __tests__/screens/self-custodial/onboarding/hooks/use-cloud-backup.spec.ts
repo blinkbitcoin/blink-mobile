@@ -1,4 +1,5 @@
 import { renderHook, act } from "@testing-library/react-native"
+import { Platform } from "react-native"
 
 import { useCloudBackup } from "@app/screens/self-custodial/onboarding/hooks/use-cloud-backup"
 
@@ -39,6 +40,12 @@ jest.mock("@app/utils/toast", () => ({
 const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: readonly unknown[]) => mockRecordError(...args),
+}))
+
+const mockLogBackupCompleted = jest.fn()
+jest.mock("@app/self-custodial/analytics", () => ({
+  logSelfCustodialBackupCompleted: (...args: readonly unknown[]) =>
+    mockLogBackupCompleted(...args),
 }))
 
 jest.mock("@app/utils/crypto", () => ({
@@ -167,6 +174,26 @@ describe("useCloudBackup", () => {
     expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
   })
 
+  /** The success path tags the analytics event by platform; on android that is google_drive. */
+  it("logs the google_drive backup method on android", async () => {
+    const originalOS = Platform.OS
+    Object.defineProperty(Platform, "OS", { value: "android", configurable: true })
+    mockUpload.mockResolvedValue({ success: true })
+
+    try {
+      const { result } = renderHook(() =>
+        useCloudBackup({ isEncrypted: false, password: "" }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+    } finally {
+      Object.defineProperty(Platform, "OS", { value: originalOS, configurable: true })
+    }
+
+    expect(mockLogBackupCompleted).toHaveBeenCalledWith({ backupMethod: "google_drive" })
+  })
+
   it("uploads encrypted backup when encryption enabled", async () => {
     mockUpload.mockResolvedValue({ success: true })
 
@@ -186,7 +213,7 @@ describe("useCloudBackup", () => {
     expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
   })
 
-  it("shows error toast on upload failure", async () => {
+  it("shows the resolved failure message on upload failure", async () => {
     mockUpload.mockResolvedValue({ success: false, reason: "auth" })
 
     const { result } = renderHook(() =>
@@ -198,7 +225,7 @@ describe("useCloudBackup", () => {
     })
 
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Upload failed" }),
+      expect.objectContaining({ message: "Sign-in failed: auth" }),
     )
     expect(mockCompleteBackup).not.toHaveBeenCalled()
   })
@@ -232,6 +259,22 @@ describe("useCloudBackup", () => {
       expect.objectContaining({ message: "Sign-in failed: unknown" }),
     )
     expect(mockUpload).not.toHaveBeenCalled()
+  })
+
+  it("stays silent when the user cancels the sign-in", async () => {
+    mockStartSession.mockResolvedValue({ success: false, reason: "cancelled" })
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockCompleteBackup).not.toHaveBeenCalled()
   })
 
   it("shows overwrite confirmation when backup exists", async () => {
@@ -298,7 +341,39 @@ describe("useCloudBackup", () => {
     )
   })
 
-  it("aborts with upload-failed toast when existing-backup verification fails (non-NotFound)", async () => {
+  /** Checking the existing backup can refresh a revoked token; the upload must reuse the fresh
+   *  one instead of the dead token the session started with. */
+  it("uploads with the token refreshed while checking the existing backup", async () => {
+    mockStartSession.mockResolvedValue(sessionOk(withExistingFile))
+    mockDownloadById.mockResolvedValue({
+      success: true,
+      content: JSON.stringify({
+        version: 1,
+        walletIdentifier: "test-pubkey-1234",
+        encrypted: false,
+        mnemonic: "youth indicate void",
+      }),
+      accessToken: "refreshed-token",
+    })
+    mockUpload.mockResolvedValue({ success: true })
+    mockConfirmDialog.mockResolvedValue(true)
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockUpload).toHaveBeenCalledWith(
+      expect.any(String),
+      "blink-spark-backup-blink-test-pubkey-1234.json",
+      { accessToken: "refreshed-token", existingFileId: "file-123" },
+    )
+  })
+
+  it("aborts with the resolved failure message when existing-backup verification fails (non-NotFound)", async () => {
     mockStartSession.mockResolvedValue(sessionOk(withExistingFile))
     mockDownloadById.mockResolvedValue({ success: false, reason: "transient" })
 
@@ -314,7 +389,7 @@ describe("useCloudBackup", () => {
     expect(mockConfirmDialog).not.toHaveBeenCalled()
     expect(mockUpload).not.toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Upload failed" }),
+      expect.objectContaining({ message: "Sign-in failed: transient" }),
     )
   })
 

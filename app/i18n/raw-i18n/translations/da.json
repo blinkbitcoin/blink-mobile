@@ -3646,6 +3646,7 @@
       "uploadSuccess": "Sikkerhedskopi gemt i {provider}",
       "uploadFailed": "Kunne ikke uploade sikkerhedskopi",
       "signInFailed": "Kunne ikke logge ind på {provider}",
+      "storageAccessRequired": "Giv {provider: string} adgang til din tegnebogs sikkerhedskopi, og prøv igen.",
       "cloudNotAvailable": "iCloud Drive er ikke tilgængelig. Log ind på iCloud i Indstillinger, og slå iCloud Drive til.",
       "networkError": "Netværksfejl. Tjek din forbindelse, og prøv igen.",
       "existingBackupTitle": "Sikkerhedskopi fundet",

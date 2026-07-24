@@ -3646,6 +3646,7 @@
       "uploadSuccess": "Το αντίγραφο ασφαλείας αποθηκεύτηκε στο {provider}",
       "uploadFailed": "Αποτυχία μεταφόρτωσης αντιγράφου ασφαλείας",
       "signInFailed": "Αποτυχία σύνδεσης στο {provider}",
+      "storageAccessRequired": "Επιτρέψτε στο {provider: string} πρόσβαση στο αντίγραφο ασφαλείας του πορτοφολιού σας και δοκιμάστε ξανά.",
       "cloudNotAvailable": "Το iCloud Drive δεν είναι διαθέσιμο. Συνδεθείτε στο iCloud από τις Ρυθμίσεις και ενεργοποιήστε το iCloud Drive.",
       "networkError": "Σφάλμα δικτύου. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.",
       "existingBackupTitle": "Βρέθηκε αντίγραφο ασφαλείας",

@@ -12006,6 +12006,11 @@ type RootTranslation = {
 			 */
 			signInFailed: RequiredParams<'provider'>
 			/**
+			 * A​l​l​o​w​ ​{​p​r​o​v​i​d​e​r​}​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​b​a​c​k​u​p​,​ ​t​h​e​n​ ​t​r​y​ ​a​g​a​i​n​.
+			 * @param {string} provider
+			 */
+			storageAccessRequired: RequiredParams<'provider'>
+			/**
 			 * i​C​l​o​u​d​ ​D​r​i​v​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​s​i​g​n​ ​i​n​ ​t​o​ ​i​C​l​o​u​d​ ​i​n​ ​S​e​t​t​i​n​g​s​ ​a​n​d​ ​e​n​a​b​l​e​ ​i​C​l​o​u​d​ ​D​r​i​v​e​.
 			 */
 			cloudNotAvailable: string
@@ -24806,6 +24811,10 @@ export type TranslationFunctions = {
 			 * Failed to sign in to {provider}
 			 */
 			signInFailed: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Allow {provider} access to your wallet backup, then try again.
+			 */
+			storageAccessRequired: (arg: { provider: string }) => LocalizedString
 			/**
 			 * iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.
 			 */
