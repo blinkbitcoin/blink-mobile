@@ -33,11 +33,18 @@ const HTTP_STATUS_TO_REASON: Readonly<Record<number, CloudBackupErrorReason>> = 
   429: CloudBackupErrorReason.Transient,
 }
 
-/** Google reports a withheld Drive scope inside a 403, which is otherwise a plain auth error. */
-const SCOPE_INSUFFICIENT_REASON = "ACCESS_TOKEN_SCOPE_INSUFFICIENT"
+/** A withheld Drive scope arrives inside a 403; the current API and the legacy shape spell it
+ *  differently, so both markers map to the permission remedy rather than a plain auth error. */
+const SCOPE_INSUFFICIENT_MARKERS = [
+  "ACCESS_TOKEN_SCOPE_INSUFFICIENT",
+  "insufficientPermissions",
+] as const
+
+const hasScopeInsufficientMarker = (body: string): boolean =>
+  SCOPE_INSUFFICIENT_MARKERS.some((marker) => body.includes(marker))
 
 const classifyFailure = (status: number, body: string): CloudBackupErrorReason => {
-  if (status === 403 && body.includes(SCOPE_INSUFFICIENT_REASON)) {
+  if (status === 403 && hasScopeInsufficientMarker(body)) {
     return CloudBackupErrorReason.PermissionDenied
   }
   const direct = HTTP_STATUS_TO_REASON[status]

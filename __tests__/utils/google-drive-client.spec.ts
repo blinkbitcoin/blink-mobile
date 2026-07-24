@@ -93,6 +93,22 @@ describe("google drive client", () => {
     expect(error.status).toBe(403)
   })
 
+  /** The legacy Drive error shape names the same withheld-scope cause `insufficientPermissions`,
+   *  so it must resolve to the permission remedy rather than the generic auth error. */
+  it("throws DriveError with reason='permission-denied' on a legacy insufficientPermissions 403", async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 403,
+      text: async () =>
+        '{"error":{"code":403,"errors":[{"reason":"insufficientPermissions","message":"Insufficient Permission"}]}}',
+    })
+
+    const error = await findAppDataFile("backup.json", "token").catch((e) => e)
+    expect(error).toBeInstanceOf(DriveError)
+    expect(error.reason).toBe(DriveErrorReason.PermissionDenied)
+    expect(error.status).toBe(403)
+  })
+
   /** The body feeds the scope-insufficient check, so an unreadable one must degrade to a
    *  plain status classification rather than throwing. */
   it("classifies by status alone when the error body cannot be read", async () => {
