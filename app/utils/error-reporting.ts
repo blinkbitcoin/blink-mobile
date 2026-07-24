@@ -19,7 +19,9 @@ export const ErrorReportClass = {
 export type ErrorReportClass = (typeof ErrorReportClass)[keyof typeof ErrorReportClass]
 
 export const CONNECTIVITY_PATTERNS: readonly RegExp[] = [
-  /unavailable/i,
+  // "unavailable" only in its transport forms — a bare match would swallow
+  // storage-layer defects like "AsyncStorage unavailable".
+  /code:? ?unavailable|service,? ?(is )?(currently )?unavailable|SERVICE_NOT_AVAILABLE/i,
   /dns error/i,
   /transport error/i,
   /timed? ?out/i,

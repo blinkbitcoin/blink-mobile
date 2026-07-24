@@ -28,6 +28,9 @@ describe("isConnectivityError", () => {
       label: "gRPC Unavailable",
       message: 'Failed to subscribe to server events: Status { code: Unavailable, message: "dns error" }',
     },
+    { label: "bare gRPC status", message: "status: Code: Unavailable" },
+    { label: "HTTP 503 text", message: "Drive upload failed (503): Service Unavailable" },
+    { label: "FCM service", message: "SERVICE_NOT_AVAILABLE" },
     { label: "dns error", message: "transport error: dns error: failed to lookup address" },
     { label: "transport error", message: "transport error: connection refused" },
     { label: "FCM timeout", message: "java.io.IOException: TIMEOUT" },
@@ -64,6 +67,10 @@ describe("isConnectivityError", () => {
     )
     expect(isConnectivityError(new Error("Unknown token payment dropped"))).toBe(false)
     expect(isConnectivityError(new Error("Quarantine write failed for key x"))).toBe(false)
+  })
+
+  it("does not treat storage-layer 'unavailable' as connectivity", () => {
+    expect(isConnectivityError(new Error("AsyncStorage unavailable"))).toBe(false)
   })
 })
 
