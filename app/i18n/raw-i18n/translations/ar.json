@@ -2062,7 +2062,7 @@
       "sendingLimit": "Reduced daily sending limit",
       "noOnchain": "No receiving bitcoin onchain",
       "recoveryOption": "استرداد الأموال عبر SMS أو البريد الإلكتروني",
-      "dailyLimit": "حد المعاملات اليومي USD 1,000",
+      "dailyLimit": "حد المعاملات اليومي USD 999",
       "onchainReceive": "استلام Bitcoin على السلسلة"
     }
   },
@@ -2636,7 +2636,7 @@
       "mainTitle": "مرحبًا بك في المستوى 1",
       "title": "ميزات جديدة تم فتحها لحسابك:",
       "receiveBitcoinDescription": "استلام Bitcoin باستخدام رقم هاتفك",
-      "dailyLimitDescription": "أرسل حتى USD 1,000 يومياً",
+      "dailyLimitDescription": "أرسل حتى USD 999 يومياً",
       "onchainDescription": "استلام المدفوعات على السلسلة"
     },
     "emailBenefits": {

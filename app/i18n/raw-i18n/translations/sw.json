@@ -2062,7 +2062,7 @@
       "sendingLimit": "Kikomo kidogo cha kutuma kila siku",
       "noOnchain": "Hakuna kupokea bitcoin kwenye onchain",
       "recoveryOption": "Rejesha fedha kupitia SMS au barua pepe",
-      "dailyLimit": "Kikomo cha muamala wa kila siku cha USD 1,000",
+      "dailyLimit": "Kikomo cha muamala wa kila siku cha USD 999",
       "onchainReceive": "Pokea Bitcoin kwenye mtandao mkuu"
     }
   },
@@ -2636,7 +2636,7 @@
       "mainTitle": "Karibu Kiwango cha 1",
       "title": "Vipengele vipya vimefunguliwa kwa akaunti yako:",
       "receiveBitcoinDescription": "Pokea Bitcoin kwa kutumia nambari yako ya simu",
-      "dailyLimitDescription": "Tuma hadi USD 1,000 kwa siku",
+      "dailyLimitDescription": "Tuma hadi USD 999 kwa siku",
       "onchainDescription": "Pokea malipo ya kwenye mtandao mkuu"
     },
     "emailBenefits": {

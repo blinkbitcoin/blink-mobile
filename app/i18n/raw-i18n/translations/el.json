@@ -2062,7 +2062,7 @@
       "sendingLimit": "Μειωμένο ημερήσιο όριο αποστολής",
       "noOnchain": "Καμία λήψη bitcoin on-chain",
       "recoveryOption": "Ανάκτηση κεφαλαίων μέσω SMS ή email",
-      "dailyLimit": "Ημερήσιο όριο συναλλαγών USD 1,000",
+      "dailyLimit": "Ημερήσιο όριο συναλλαγών USD 999",
       "onchainReceive": "Λήψη bitcoin onchain"
     }
   },
@@ -2636,7 +2636,7 @@
       "mainTitle": "Καλώς ήρθατε στο Επίπεδο 1",
       "title": "Νέες δυνατότητες ξεκλειδώθηκαν για τον λογαριασμό σας:",
       "receiveBitcoinDescription": "Λήψη Bitcoin χρησιμοποιώντας τον αριθμό τηλεφώνου σας",
-      "dailyLimitDescription": "Στείλτε έως USD 1,000 ανά ημέρα",
+      "dailyLimitDescription": "Στείλτε έως USD 999 ανά ημέρα",
       "onchainDescription": "Λήψη πληρωμών on-chain"
     },
     "emailBenefits": {

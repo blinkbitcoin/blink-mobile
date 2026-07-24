@@ -2062,7 +2062,7 @@
       "sendingLimit": "Batas pengiriman harian dikurangi",
       "noOnchain": "Tidak menerima bitcoin on-chain",
       "recoveryOption": "Pulihkan dana melalui SMS atau email",
-      "dailyLimit": "Batas transaksi harian USD 1,000",
+      "dailyLimit": "Batas transaksi harian USD 999",
       "onchainReceive": "Terima bitcoin onchain"
     }
   },
@@ -2636,7 +2636,7 @@
       "mainTitle": "Selamat Datang di Level 1",
       "title": "Fitur baru yang terbuka untuk akun Anda:",
       "receiveBitcoinDescription": "Terima Bitcoin menggunakan nomor telepon Anda",
-      "dailyLimitDescription": "Kirim hingga USD 1,000 per hari",
+      "dailyLimitDescription": "Kirim hingga USD 999 per hari",
       "onchainDescription": "Terima pembayaran on-chain"
     },
     "emailBenefits": {

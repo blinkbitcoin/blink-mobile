@@ -2062,7 +2062,7 @@
       "sendingLimit": "Günlük gönderim limitinin kısaltılması",
       "noOnchain": "Zincir üzerinde bitcoin alımı yok",
       "recoveryOption": "SMS veya e-posta ile bakiye kurtarma",
-      "dailyLimit": "Günlük USD 1,000 işlem limiti",
+      "dailyLimit": "Günlük USD 999 işlem limiti",
       "onchainReceive": "Bitcoin onchain olarak al"
     }
   },
@@ -2636,7 +2636,7 @@
       "mainTitle": "Seviye 1'e hoş geldiniz",
       "title": "Hesabınız için kilidi açılan yeni özellikler:",
       "receiveBitcoinDescription": "Telefon numaranızı kullanarak Bitcoin alın",
-      "dailyLimitDescription": "Günde USD 1,000'a kadar gönderin",
+      "dailyLimitDescription": "Günde USD 999'a kadar gönderin",
       "onchainDescription": "On-chain ödemeler alın"
     },
     "emailBenefits": {
