@@ -66,16 +66,16 @@ class BitcoinPriceWidgetTest {
         WorkManagerTestInitHelper.initializeTestWorkManager(context!!, config)
 
         // Wait for the work to be processed and check result is correct
-//        val widgetId =
-//            shadowAppWidgetManager!!.createWidget(
-//                BitcoinPriceWidget::class.java, R.layout.bitcoin_price_widget
-//            )
-//        val widgetView = shadowAppWidgetManager!!.getViewFor(widgetId)
-//
-//        Assert.assertEquals(
-//            "Loading…",
-//            (widgetView.findViewById<View?>(R.id.btc_price) as TextView).getText().toString()
-//        )
+        val widgetId =
+            shadowAppWidgetManager!!.createWidget(
+                BitcoinPriceWidget::class.java, R.layout.bitcoin_price_widget
+            )
+        val widgetView = shadowAppWidgetManager!!.getViewFor(widgetId)
+
+        Assert.assertEquals(
+            "21/everything",
+            (widgetView.findViewById<View?>(R.id.btc_price) as TextView).getText().toString()
+        )
     }
 
 }
