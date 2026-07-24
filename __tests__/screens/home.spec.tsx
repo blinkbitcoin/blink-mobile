@@ -3,6 +3,7 @@ import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
 import { fireEvent, render, waitFor } from "@testing-library/react-native"
 import { StyleSheet } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 import { HomeScreen } from "../../app/screens/home-screen"
 import { ContextForScreen } from "./helper"
@@ -658,6 +659,19 @@ describe("HomeScreen", () => {
     await flushEffects()
 
     expect(getByTestId("slide-up-handle")).toBeTruthy()
+  })
+
+  it("excludes the bottom safe-area edge the tab bar already reserves", async () => {
+    const { UNSAFE_getAllByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    const edges = UNSAFE_getAllByType(SafeAreaView).map((view) => view.props.edges)
+    expect(edges).toContainEqual(["top", "left", "right"])
+    expect(edges).not.toContainEqual(expect.arrayContaining(["bottom"]))
   })
 
   it.each([...iosCases, ...androidCases] satisfies ConvertButtonCase[])(

@@ -1,6 +1,7 @@
 import React from "react"
 import type { ReactTestInstance } from "react-test-renderer"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -40,6 +41,21 @@ describe("EarnMapScreen", () => {
     loadLocale("en")
     LL = i18nObject("en")
     mockNavigate.mockClear()
+  })
+  it("excludes the bottom safe-area edge on the loading screen", () => {
+    mockedUseQuizServer.mockReturnValue({
+      loading: true,
+      earnedSats: 0,
+      quizServerData: [],
+    })
+    const { UNSAFE_getAllByType } = render(
+      <ContextForScreen>
+        <EarnMapScreen />
+      </ContextForScreen>,
+    )
+
+    const edges = UNSAFE_getAllByType(SafeAreaView).map((view) => view.props.edges)
+    expect(edges).toContainEqual(["left", "right"])
   })
   it("closes the one-section-per-day modal when continuing without rewards", async () => {
     const futureSeconds = Math.floor(Date.now() / 1000) + 3600
