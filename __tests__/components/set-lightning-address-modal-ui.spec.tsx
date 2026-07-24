@@ -78,8 +78,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         itCannotBeChanged: () => "It cannot be changed later!",
         Errors: {
           tooShort: () => "Address must be at least 3 characters long",
-          backupRequired: () =>
-            "Back up your wallet before creating a Lightning address",
+          backupRequired: () => "Back up your wallet before creating a Lightning address",
         },
       },
     },

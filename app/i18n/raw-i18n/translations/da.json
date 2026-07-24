@@ -2593,7 +2593,8 @@
       "tooLong": "Adressen må maksimalt være 50 tegn lang",
       "invalidCharacter": "Adressen kan kun indeholde bogstaver, tal og understregninger",
       "addressUnavailable": "Beklager, denne adresse er allerede taget",
-      "unknownError": "Der opstod en ukendt fejl, prøv igen senere"
+      "unknownError": "Der opstod en ukendt fejl, prøv igen senere",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Modtag penge fra andre lightning tegnebøger bøger og {bankName: string} brugere med denne adresse.",
     "itCannotBeChanged": "Det kan ikke ændres senere."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Sikr dine midler",
     "modalDescription": "Vi anbefaler stærkt, at du sikkerhedskopierer din tegnebog for at forhindre et fuldstændigt tab af midler, hvis du mister denne enhed.",
     "secureMe": "Sikr tegnebog"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Dette er en ikke-depotkonto",

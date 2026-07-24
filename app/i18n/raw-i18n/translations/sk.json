@@ -2593,7 +2593,8 @@
       "tooLong": "Adresa môže mať maximálne 50 znakov",
       "invalidCharacter": "Adresa môže obsahovať iba písmená, číslice a podčiarkovníky.",
       "addressUnavailable": "Táto adresa je už obsadená",
-      "unknownError": "Došlo k neznámej chybe, skúste to prosím neskôr"
+      "unknownError": "Došlo k neznámej chybe, skúste to prosím neskôr",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Prijímajte peniaze z iných Lightning peňaženiek a od používateľov {bankName: string} s touto adresou.",
     "itCannotBeChanged": "Neskôr ju nie je možné zmeniť."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Zabezpečte svoje prostriedky",
     "modalDescription": "Dôrazne odporúčame zálohovať peňaženku, aby ste predišli úplnej strate prostriedkov v prípade straty tohto zariadenia.",
     "secureMe": "Zabezpečiť peňaženku"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Toto je nesvereneský účet",

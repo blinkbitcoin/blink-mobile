@@ -9,10 +9,7 @@ import {
   checkLightningAddressAvailable,
   registerLightningAddress,
 } from "@app/self-custodial/bridge"
-import {
-  BackupStatus,
-  useBackupState,
-} from "@app/self-custodial/providers/backup-state"
+import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 
 type UseRegisterLightningAddress = {

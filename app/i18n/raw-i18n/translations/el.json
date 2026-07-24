@@ -2593,7 +2593,8 @@
       "tooLong": "Η διεύθυνση πρέπει να είναι μέχρι 50 χαρακτήσρες",
       "invalidCharacter": "Η διεύθυνση μπορεί να περιέχει μόνο γράμματα, αριθμούς και κάτω παύλες",
       "addressUnavailable": "Λυπούμαστε, αυτή η διεύθυνση είναι κατειλημμένη ",
-      "unknownError": "Προέκυψε άγνωστο σφάλμα, παρακαλούμε δοκιμάστε ξανά αργότερα "
+      "unknownError": "Προέκυψε άγνωστο σφάλμα, παρακαλούμε δοκιμάστε ξανά αργότερα ",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Λάβετε χρήματα από άλλα πορτοφόλια lightning και {bankName: string} χρήστες με αυτή τη διεύθυνση.",
     "itCannotBeChanged": "Αυτό δεν μπορεί ν' αλλάξει αργότερα."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Ασφαλίστε τα κεφάλαιά σας",
     "modalDescription": "Σας συνιστούμε ανεπιφύλακτα να δημιουργήσετε αντίγραφο ασφαλείας του πορτοφολιού σας για να αποτρέψετε πλήρη απώλεια κεφαλαίων σε περίπτωση που χάσετε αυτήν τη συσκευή.",
     "secureMe": "Ασφάλιση πορτοφολιού"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Αυτός είναι ένας λογαριασμός μη φύλαξης",

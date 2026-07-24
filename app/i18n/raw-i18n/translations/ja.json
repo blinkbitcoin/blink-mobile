@@ -2593,7 +2593,8 @@
             "tooLong": "アドレスは50文字以上でなければなりません",
             "invalidCharacter": "アドレスにはアルファベット、数字、アンダースコアのみ使用できます",
             "addressUnavailable": "申し訳ありませんが、このアドレスは既に使われています",
-            "unknownError": "不明なエラーが発生しました。時間をあけてもう一度トライしてみてください"
+            "unknownError": "不明なエラーが発生しました。時間をあけてもう一度トライしてみてください",
+            "backupRequired": "Back up your wallet before creating a Lightning address"
         },
         "receiveMoney": "このアドレスで他のライトニング・ウォレットや{bankName: string}ユーザーからお金を受け取ります。",
         "itCannotBeChanged": "あとから変更することはできません"
@@ -3705,6 +3706,11 @@
         "modalTitle": "資金を保護してください",
         "modalDescription": "このデバイスを紛失した場合の資金の完全な喪失を防ぐために、ウォレットのバックアップを強くお勧めします。",
         "secureMe": "ウォレットを保護"
+    },
+    "BackupRequired": {
+        "modalTitle": "Back up your wallet first",
+        "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+        "backupNow": "Back up wallet"
     },
     "NonCustodialInfoBulletin": {
         "title": "これは非カストディアルアカウントです",

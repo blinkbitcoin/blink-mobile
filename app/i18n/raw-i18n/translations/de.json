@@ -2593,7 +2593,8 @@
             "tooLong": "Die Adresse darf nicht länger als 50 Zeichen sein",
             "invalidCharacter": "Die Adresse darf nur Buchstaben, Zahlen und Unterstriche beinhalten",
             "addressUnavailable": "Entschuldigung, diese Adresse ist schon vergeben",
-            "unknownError": "Ein unbekannter Fehler ist aufgetreten, bitte versuche es später erneut"
+            "unknownError": "Ein unbekannter Fehler ist aufgetreten, bitte versuche es später erneut",
+            "backupRequired": "Back up your wallet before creating a Lightning address"
         },
         "receiveMoney": "Empfange Geld von anderen Lightning Wallets und {bankName: string} Usern mit dieser Adresse.",
         "itCannotBeChanged": "Kann später nicht mehr geändert werden."
@@ -3705,6 +3706,11 @@
         "modalTitle": "Sichern Sie Ihre Mittel",
         "modalDescription": "Wir empfehlen dringend, Ihre Wallet zu sichern, um einen vollständigen Verlust Ihrer Mittel zu verhindern, falls Sie dieses Gerät verlieren.",
         "secureMe": "Wallet sichern"
+    },
+    "BackupRequired": {
+        "modalTitle": "Back up your wallet first",
+        "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+        "backupNow": "Back up wallet"
     },
     "NonCustodialInfoBulletin": {
         "title": "Dies ist ein nicht-verwahrtes Konto",

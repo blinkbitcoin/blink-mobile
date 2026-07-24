@@ -10,10 +10,7 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig, useClipboard } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import {
-  BackupStatus,
-  useBackupState,
-} from "@app/self-custodial/providers/backup-state"
+import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { AccountType } from "@app/types/wallet"
 import { getLightningAddress } from "@app/utils/pay-links"
 

@@ -2593,7 +2593,8 @@
       "tooLong": "Panjang alamat maksimum adalah 50 aksara",
       "invalidCharacter": "Alamat hanya boleh mengandungi huruf, nombor dan underscores sahaja",
       "addressUnavailable": "Maaf, alamat ini sudah ada pemiliknya ",
-      "unknownError": "Ada masalah yang belum dikenal pasti berlaku, sila cuba lagi sekali."
+      "unknownError": "Ada masalah yang belum dikenal pasti berlaku, sila cuba lagi sekali.",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Terima wang daripada dompet Lightning yang lain dan pengguna {bankName: string} dengan alamat ini.",
     "itCannotBeChanged": "Ia tak boleh ditukar selepas ini."
@@ -3705,6 +3706,11 @@
     "modalTitle": "Lindungi dana anda",
     "modalDescription": "Kami sangat mengesyorkan anda membuat sandaran dompet anda untuk mengelakkan kehilangan dana sepenuhnya sekiranya anda kehilangan peranti ini.",
     "secureMe": "Lindungi dompet"
+  },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
   },
   "NonCustodialInfoBulletin": {
     "title": "Ini ialah akaun bukan kustodial",
