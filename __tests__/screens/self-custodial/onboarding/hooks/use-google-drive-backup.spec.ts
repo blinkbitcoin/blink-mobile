@@ -27,6 +27,9 @@ const mockAddScopes = jest.fn(
 const mockGetTokens = jest.fn(() =>
   Promise.resolve({ accessToken: "test-access-token", idToken: "token" }),
 )
+const mockClearCachedAccessToken = jest.fn(
+  (..._args: readonly unknown[]): Promise<null> => Promise.resolve(null),
+)
 
 jest.mock("@react-native-google-signin/google-signin", () => ({
   GoogleSignin: {
@@ -36,6 +39,8 @@ jest.mock("@react-native-google-signin/google-signin", () => ({
     signIn: () => mockSignIn(),
     addScopes: (...args: readonly unknown[]) => mockAddScopes(...args),
     getTokens: () => mockGetTokens(),
+    clearCachedAccessToken: (...args: readonly unknown[]) =>
+      mockClearCachedAccessToken(...args),
   },
 }))
 
@@ -81,6 +86,7 @@ describe("useGoogleDriveBackup", () => {
       accessToken: "test-access-token",
       idToken: "token",
     })
+    mockClearCachedAccessToken.mockResolvedValue(null)
   })
 
   it("returns initial state", () => {
@@ -279,6 +285,7 @@ describe("useGoogleDriveBackup", () => {
         new DriveError(
           DriveErrorReason.PermissionDenied,
           'Drive query failed (403): {"reason":"ACCESS_TOKEN_SCOPE_INSUFFICIENT"}',
+          403,
         ),
       )
 
@@ -300,6 +307,148 @@ describe("useGoogleDriveBackup", () => {
 
       expect(mockAddScopes).not.toHaveBeenCalled()
       expect(sessionResult).toMatchObject({ success: true })
+    })
+  })
+
+  /** Revoking access server-side leaves the dead token in the sign-in cache, so Drive kept
+   *  answering 401 with a token the SDK still handed back as valid. */
+  describe("stale access token", () => {
+    const unauthorized = () =>
+      new DriveError(DriveErrorReason.Auth, "Drive query failed (401)", 401)
+
+    it("clears the cached token and retries once with a fresh one", async () => {
+      mockFindAppDataFile
+        .mockRejectedValueOnce(unauthorized())
+        .mockResolvedValueOnce("existing-id")
+      mockGetTokens
+        .mockResolvedValueOnce({ accessToken: "test-access-token", idToken: "token" })
+        .mockResolvedValueOnce({ accessToken: "refreshed-token", idToken: "token" })
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+      let sessionResult:
+        | Awaited<ReturnType<typeof result.current.startSession>>
+        | undefined
+      await act(async () => {
+        sessionResult = await result.current.startSession("backup.json")
+      })
+
+      expect(mockClearCachedAccessToken).toHaveBeenCalledWith("test-access-token")
+      expect(sessionResult).toEqual({
+        success: true,
+        session: { accessToken: "refreshed-token", existingFileId: "existing-id" },
+      })
+    })
+
+    it("hands the refreshed token to the session", async () => {
+      mockListAppDataFiles.mockRejectedValueOnce(unauthorized()).mockResolvedValueOnce([])
+      mockGetTokens
+        .mockResolvedValueOnce({ accessToken: "test-access-token", idToken: "token" })
+        .mockResolvedValueOnce({ accessToken: "refreshed-token", idToken: "token" })
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+      let listResult: Awaited<ReturnType<typeof result.current.listBackups>> | undefined
+      await act(async () => {
+        listResult = await result.current.listBackups("prefix-")
+      })
+
+      expect(listResult).toMatchObject({ success: true, accessToken: "refreshed-token" })
+    })
+
+    it("gives up when the refreshed token is rejected too", async () => {
+      mockFindAppDataFile
+        .mockRejectedValueOnce(unauthorized())
+        .mockRejectedValueOnce(unauthorized())
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+      let sessionResult:
+        | Awaited<ReturnType<typeof result.current.startSession>>
+        | undefined
+      await act(async () => {
+        sessionResult = await result.current.startSession("backup.json")
+      })
+
+      expect(mockClearCachedAccessToken).toHaveBeenCalledTimes(1)
+      expect(sessionResult).toEqual({ success: false, reason: DriveErrorReason.Auth })
+    })
+
+    /** A 403 is a withheld permission: a new token cannot fix it, so retrying is wasted. */
+    it("does not retry a 403", async () => {
+      mockFindAppDataFile.mockRejectedValueOnce(
+        new DriveError(DriveErrorReason.Auth, "Drive query failed (403)", 403),
+      )
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+      await act(async () => {
+        await result.current.startSession("backup.json")
+      })
+
+      expect(mockClearCachedAccessToken).not.toHaveBeenCalled()
+      expect(mockFindAppDataFile).toHaveBeenCalledTimes(1)
+    })
+
+    /** Losing the 401 to the refresh machinery's own error would hide the diagnosis. */
+    it("keeps the original 401 when the token refresh itself fails", async () => {
+      mockFindAppDataFile.mockRejectedValueOnce(unauthorized())
+      mockClearCachedAccessToken.mockRejectedValueOnce(new Error("sign-in required"))
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+      let sessionResult:
+        | Awaited<ReturnType<typeof result.current.startSession>>
+        | undefined
+      await act(async () => {
+        sessionResult = await result.current.startSession("backup.json")
+      })
+
+      expect(sessionResult).toEqual({ success: false, reason: DriveErrorReason.Auth })
+      expect(mockFindAppDataFile).toHaveBeenCalledTimes(1)
+    })
+
+    it("retries an upload with a fresh token", async () => {
+      mockUploadAppDataFile
+        .mockRejectedValueOnce(unauthorized())
+        .mockResolvedValueOnce(undefined)
+      mockGetTokens.mockResolvedValueOnce({
+        accessToken: "refreshed-token",
+        idToken: "token",
+      })
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+      let uploadResult: Awaited<ReturnType<typeof result.current.upload>> | undefined
+      await act(async () => {
+        uploadResult = await result.current.upload('{"test": true}', "backup.json", {
+          accessToken: "test-token",
+          existingFileId: undefined,
+        })
+      })
+
+      expect(uploadResult).toEqual({ success: true })
+      expect(mockUploadAppDataFile).toHaveBeenLastCalledWith(
+        expect.objectContaining({ accessToken: "refreshed-token" }),
+      )
+    })
+
+    it("retries a download with a fresh token", async () => {
+      mockDownloadAppDataFile
+        .mockRejectedValueOnce(unauthorized())
+        .mockResolvedValueOnce('{"mnemonic":"words"}')
+      mockGetTokens.mockResolvedValueOnce({
+        accessToken: "refreshed-token",
+        idToken: "token",
+      })
+
+      const { result } = renderHook(() => useGoogleDriveBackup())
+      let downloadResult:
+        | Awaited<ReturnType<typeof result.current.downloadById>>
+        | undefined
+      await act(async () => {
+        downloadResult = await result.current.downloadById("file-1", "token-abc")
+      })
+
+      expect(downloadResult).toEqual({ success: true, content: '{"mnemonic":"words"}' })
+      expect(mockDownloadAppDataFile).toHaveBeenLastCalledWith(
+        "file-1",
+        "refreshed-token",
+      )
     })
   })
 
@@ -538,9 +687,11 @@ describe("useGoogleDriveBackup", () => {
       expect(mockRecordError).toHaveBeenCalledTimes(1)
     })
 
-    it("returns auth reason on 401", async () => {
+    /** Carries no status, so it is not a refreshable token failure and passes straight
+     *  through; the retry path has its own tests. */
+    it("returns auth reason for an auth error with no status", async () => {
       mockDownloadAppDataFile.mockRejectedValueOnce(
-        new DriveError(DriveErrorReason.Auth, "Drive download failed (401)"),
+        new DriveError(DriveErrorReason.Auth, "Drive download failed (auth)"),
       )
 
       const { result } = renderHook(() => useGoogleDriveBackup())

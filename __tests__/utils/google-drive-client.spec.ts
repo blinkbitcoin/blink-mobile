@@ -90,6 +90,7 @@ describe("google drive client", () => {
     const error = await findAppDataFile("backup.json", "token").catch((e) => e)
     expect(error).toBeInstanceOf(DriveError)
     expect(error.reason).toBe(DriveErrorReason.PermissionDenied)
+    expect(error.status).toBe(403)
   })
 
   /** The body feeds the scope-insufficient check, so an unreadable one must degrade to a
@@ -106,6 +107,17 @@ describe("google drive client", () => {
     const error = await findAppDataFile("backup.json", "token").catch((e) => e)
     expect(error).toBeInstanceOf(DriveError)
     expect(error.reason).toBe(DriveErrorReason.Auth)
+  })
+
+  it("exposes the http status on the error", async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 401,
+      text: async () => "Unauthorized",
+    })
+
+    const error = await findAppDataFile("backup.json", "token").catch((e) => e)
+    expect(error.status).toBe(401)
   })
 
   it("throws DriveError with reason='transient' on 429", async () => {
