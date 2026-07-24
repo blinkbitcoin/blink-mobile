@@ -46,6 +46,18 @@ platform :android do
       flags: "--no-daemon --stacktrace --info",
       properties: env_props,
     )
+    # Non-fatal on purpose: the upload needs a Firebase credential the pipeline does not
+    # carry yet, and a failed upload must not stop the release from shipping.
+    begin
+      gradle(
+        task: "uploadCrashlyticsSymbolFile",
+        build_type: "Release",
+        flags: "--no-daemon --stacktrace",
+        properties: env_props,
+      )
+    rescue => e
+      UI.important("Crashlytics native symbol upload failed (non-fatal): #{e.message}")
+    end
   end
 
   desc "Deploy a new version to the Google Play"
