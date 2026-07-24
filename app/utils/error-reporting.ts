@@ -64,10 +64,7 @@ export const classifyError = (
 
 const recordedDedupKeys = new Set<string>()
 
-export const recordAppError = (
-  error: Error,
-  options?: RecordAppErrorOptions,
-): void => {
+export const recordAppError = (error: Error, options?: RecordAppErrorOptions): void => {
   const errorClass = classifyError(error, options)
   crashlytics().log(`[${errorClass}] ${error.message}`)
   if (errorClass !== ErrorReportClass.Defect) return
