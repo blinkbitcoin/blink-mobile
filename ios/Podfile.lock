@@ -1667,11 +1667,9 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-in-app-review (4.3.3):
-    - React-Core
-  - react-native-maps (1.26.0):
-    - react-native-maps/Maps (= 1.26.0)
-  - react-native-maps/Generated (1.26.0):
+  - react-native-maps (1.27.2):
+    - react-native-maps/Maps (= 1.27.2)
+  - react-native-maps/Generated (1.27.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1692,7 +1690,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-maps/Maps (1.26.0):
+  - react-native-maps/Maps (1.27.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2874,7 +2872,6 @@ DEPENDENCIES:
   - "react-native-geetest-module (from `../node_modules/@galoymoney/react-native-geetest-module`)"
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
-  - react-native-in-app-review (from `../node_modules/react-native-in-app-review`)
   - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-nfc-manager (from `../node_modules/react-native-nfc-manager`)
   - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
@@ -3086,8 +3083,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/geolocation"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
-  react-native-in-app-review:
-    :path: "../node_modules/react-native-in-app-review"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
   react-native-nfc-manager:
@@ -3264,7 +3259,7 @@ SPEC CHECKSUMS:
   GT3Captcha-iOS: aeb6fed2e8594099821430a89208679e5a55b740
   GTMAppAuth: 217a876b249c3c585a54fd6f73e6b58c4f5c4238
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  hermes-engine: ed70ba9c642f6c0b724975bbdb5963a590e55cfe
+  hermes-engine: 279f513ab8a0b243075521bab024d1a502133c2c
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   NitroModules: 4b3ee576b2ee9967dfcdd4fe755832a0ab837556
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
@@ -3314,8 +3309,7 @@ SPEC CHECKSUMS:
   react-native-geetest-module: cecd5dfca2c7f815a8e724c11137b35c92e900d3
   react-native-geolocation: 98d3d27936fabcf57779578b5e7056939763e0b6
   react-native-image-picker: 91e8eac0c800912ef8f86ff7d489df29ab81f168
-  react-native-in-app-review: b3d1eed3d1596ebf6539804778272c4c65e4a400
-  react-native-maps: 565cc9cbc5403d1d5e5c8a3df45151571c9b72d7
+  react-native-maps: 1b51692f53553d3f61765a6a3f0ac1c0c983e16e
   react-native-nfc-manager: f74a1e52807a916d27c2f428633e474cf661d611
   react-native-quick-base64: 6568199bb2ac8e72ecdfdc73a230fbc5c1d3aac4
   react-native-safe-area-context: f660c52c843d3a1801ee62f0f336b17ea5fd9b7a
@@ -3359,7 +3353,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 01edc8d202005315c06ca3826d1eaad2c619cae7
   ReactCommon: ced9cfa50957cb9e6b7a1a7cd4ee20f5da6fa3a4
   ReactNativeCameraKit: 1a06006322ddc7966a419df6217331e50236375d
-  ReactNativeDependencies: b7d5d7edb10dcf4157e0d1c2a49ca015d04ed02e
+  ReactNativeDependencies: 455d82b281005b1b3b91662dd59e436088d1ce85
   RNBootSplash: 5e5bb0963e855048a8c51396756d4c772006b6e1
   RNCAsyncStorage: a455ed0edb854f0c8471b3049935680d5868796a
   RNCClipboard: ee9d1bdca545c481f20cd976b738da771c2ec63d
