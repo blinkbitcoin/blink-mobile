@@ -46,6 +46,22 @@ platform :android do
       flags: "--no-daemon --stacktrace --info",
       properties: env_props,
     )
+    # Skip when GOOGLE_APPLICATION_CREDENTIALS is unset, or set but pointing at a missing
+    # file, so ordinary builds don't pay for a doomed upload; when it resolves, a failure
+    # surfaces loudly.
+    creds = ENV["GOOGLE_APPLICATION_CREDENTIALS"].to_s
+    if creds.empty?
+      UI.important("Skipping Crashlytics native symbol upload: GOOGLE_APPLICATION_CREDENTIALS is not set")
+    elsif !File.exist?(creds)
+      UI.important("Skipping Crashlytics native symbol upload: GOOGLE_APPLICATION_CREDENTIALS does not point to an existing file")
+    else
+      gradle(
+        task: "uploadCrashlyticsSymbolFile",
+        build_type: "Release",
+        flags: "--no-daemon --stacktrace --info",
+        properties: env_props,
+      )
+    end
   end
 
   desc "Deploy a new version to the Google Play"
