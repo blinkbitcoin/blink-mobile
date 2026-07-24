@@ -63,6 +63,16 @@ const ensureDriveScope = async (response: SignInResponse): Promise<void> => {
   )
 }
 
+/** Stop before getTokens() when the user dismissed the sheet, so backing out is not filed
+ *  as an opaque defect. */
+const ensureSignInCompleted = (response: SignInResponse): void => {
+  if (response.type === "success") return
+  throw new DriveError(
+    CloudBackupErrorReason.Cancelled,
+    `Drive sign-in did not complete (${response.type})`,
+  )
+}
+
 const signIn = async (): Promise<string> => {
   configureGoogleSignIn()
   if (Platform.OS === "android") {
@@ -70,6 +80,7 @@ const signIn = async (): Promise<string> => {
   }
   await GoogleSignin.signOut().catch(() => {})
   const response = await GoogleSignin.signIn()
+  ensureSignInCompleted(response)
   await ensureDriveScope(response)
   const { accessToken } = await GoogleSignin.getTokens()
   return accessToken
@@ -118,11 +129,16 @@ type DriveOperation = (typeof DriveOperation)[keyof typeof DriveOperation]
 const reasonFromError = (err: unknown): CloudBackupErrorReason =>
   err instanceof DriveError ? err.reason : CloudBackupErrorReason.Unknown
 
+/** A withheld scope or a dismissed sign-in is the user's choice, not a defect, so it stays
+ *  out of the crash reports it would otherwise flood. */
+const USER_CHOICE_REASONS: ReadonlySet<CloudBackupErrorReason> = new Set([
+  CloudBackupErrorReason.PermissionDenied,
+  CloudBackupErrorReason.Cancelled,
+])
+
 const reportDriveError = (operation: DriveOperation, err: unknown): void => {
   if (err instanceof DriveError) {
-    /** A withheld scope is the user's choice, not a defect, so it stays out of the crash
-     *  reports it would otherwise flood. */
-    if (err.reason === CloudBackupErrorReason.PermissionDenied) return
+    if (USER_CHOICE_REASONS.has(err.reason)) return
     crashlytics().recordError(err)
     return
   }

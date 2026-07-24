@@ -33,6 +33,7 @@ const STEP_FOR_REASON: Readonly<Record<CloudBackupErrorReason, CloudStep>> = {
   [CloudBackupErrorReason.NotFound]: CloudStep.NotFound,
   [CloudBackupErrorReason.Auth]: CloudStep.Error,
   [CloudBackupErrorReason.PermissionDenied]: CloudStep.Error,
+  [CloudBackupErrorReason.Cancelled]: CloudStep.Error,
   [CloudBackupErrorReason.Transient]: CloudStep.Error,
   [CloudBackupErrorReason.Unknown]: CloudStep.Error,
 }

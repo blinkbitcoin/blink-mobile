@@ -298,15 +298,52 @@ describe("useGoogleDriveBackup", () => {
       expect(mockRecordError).not.toHaveBeenCalled()
     })
 
-    /** Defensive: an unexpected response shape must not trap the user in a re-prompt loop. */
+    /** Defensive: a successful response with no scope list must not trap the user in a
+     *  re-prompt loop. */
     it("skips the check when the response carries no scope list", async () => {
-      mockSignIn.mockResolvedValueOnce({ type: "cancelled", data: null })
+      mockSignIn.mockResolvedValueOnce({ type: "success", data: {} })
       mockFindAppDataFile.mockResolvedValueOnce(undefined)
 
       const sessionResult = await startSession()
 
       expect(mockAddScopes).not.toHaveBeenCalled()
       expect(sessionResult).toMatchObject({ success: true })
+    })
+  })
+
+  /** A dismissed sign-in sheet is the user backing out, not a failure: it must stop before
+   *  getTokens() and stay out of the crash reports. */
+  describe("cancelled sign-in", () => {
+    const startSession = async () => {
+      const { result } = renderHook(() => useGoogleDriveBackup())
+      let sessionResult:
+        | Awaited<ReturnType<typeof result.current.startSession>>
+        | undefined
+      await act(async () => {
+        sessionResult = await result.current.startSession("backup.json")
+      })
+      return sessionResult
+    }
+
+    it("returns cancelled and never reaches getTokens when the sheet is dismissed", async () => {
+      mockSignIn.mockResolvedValueOnce({ type: "cancelled", data: null })
+
+      const sessionResult = await startSession()
+
+      expect(sessionResult).toEqual({
+        success: false,
+        reason: DriveErrorReason.Cancelled,
+      })
+      expect(mockAddScopes).not.toHaveBeenCalled()
+      expect(mockGetTokens).not.toHaveBeenCalled()
+    })
+
+    it("does not report a cancelled sign-in to crashlytics", async () => {
+      mockSignIn.mockResolvedValueOnce({ type: "cancelled", data: null })
+
+      await startSession()
+
+      expect(mockRecordError).not.toHaveBeenCalled()
     })
   })
 

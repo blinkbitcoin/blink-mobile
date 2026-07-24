@@ -852,6 +852,17 @@ describe("useCloudRestore error message", () => {
     expect(result.current.errorMessage).toBe("Resolved message for permission-denied")
   })
 
+  it("routes a cancelled sign-in to the error step with its resolved message", async () => {
+    listBackupsFailing("cancelled")
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(result.current.errorMessage).toBe("Resolved message for cancelled")
+  })
+
   it("leaves the message empty when the reason lands on not-found", async () => {
     listBackupsFailing("not-found")
 
