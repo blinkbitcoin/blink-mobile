@@ -2700,6 +2700,7 @@ const en: BaseTranslation = {
       invalidCharacter: "Address can only contain letters, numbers, and underscores",
       addressUnavailable: "Sorry, this address is already taken",
       unknownError: "An unknown error occurred, please try again later",
+      backupRequired: "Back up your wallet before creating a Lightning address",
     },
     receiveMoney:
       "Receive money from other lightning wallets and {bankName: string} users with this address.",
@@ -3883,6 +3884,12 @@ const en: BaseTranslation = {
     modalDescription:
       "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
     secureMe: "Secure wallet",
+  },
+  BackupRequired: {
+    modalTitle: "Back up your wallet first",
+    modalDescription:
+      "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    backupNow: "Back up wallet",
   },
   NonCustodialInfoBulletin: {
     title: "This is a non-custodial account",

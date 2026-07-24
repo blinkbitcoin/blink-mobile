@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { BackupRequiredModal } from "@app/components/backup-required-modal"
 import { SetLightningAddressModal } from "@app/components/set-lightning-address-modal"
 import { SetSelfCustodialLightningAddressModal } from "@app/screens/settings-screen/self-custodial/set-lightning-address-modal"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
@@ -9,6 +10,10 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig, useClipboard } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import {
+  BackupStatus,
+  useBackupState,
+} from "@app/self-custodial/providers/backup-state"
 import { AccountType } from "@app/types/wallet"
 import { getLightningAddress } from "@app/utils/pay-links"
 
@@ -93,16 +98,22 @@ const CustodialLightningAddressRow: React.FC = () => {
 
 const SelfCustodialLightningAddressRow: React.FC = () => {
   const address = useSelfCustodialLightningAddress()
+  const { backupState } = useBackupState()
+  const isBackupRequired = backupState.status !== BackupStatus.Completed
 
   return (
     <LightningAddressRow
       address={address}
-      renderModal={({ isVisible, toggleModal }) => (
-        <SetSelfCustodialLightningAddressModal
-          isVisible={isVisible}
-          toggleModal={toggleModal}
-        />
-      )}
+      renderModal={({ isVisible, toggleModal }) =>
+        isBackupRequired ? (
+          <BackupRequiredModal isVisible={isVisible} onClose={toggleModal} />
+        ) : (
+          <SetSelfCustodialLightningAddressModal
+            isVisible={isVisible}
+            toggleModal={toggleModal}
+          />
+        )
+      }
     />
   )
 }

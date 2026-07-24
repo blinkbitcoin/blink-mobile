@@ -181,6 +181,9 @@ export const SetLightningAddressModalUI = ({
     case SetUsernameError.UNKNOWN_ERROR:
       errorMessage = LL.SetAddressModal.Errors.unknownError()
       break
+    case SetUsernameError.BACKUP_REQUIRED:
+      errorMessage = LL.SetAddressModal.Errors.backupRequired()
+      break
   }
 
   return (

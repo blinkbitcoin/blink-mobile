@@ -9,6 +9,10 @@ import {
   checkLightningAddressAvailable,
   registerLightningAddress,
 } from "@app/self-custodial/bridge"
+import {
+  BackupStatus,
+  useBackupState,
+} from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 
 type UseRegisterLightningAddress = {
@@ -23,6 +27,7 @@ export const useRegisterLightningAddress = (
   onRegistered: () => void,
 ): UseRegisterLightningAddress => {
   const { sdk, updateCurrentSelfCustodialAccount } = useSelfCustodialWallet()
+  const { backupState } = useBackupState()
   const guard = useInFlightGuard()
   const [lnAddress, setLnAddressValue] = useState("")
   const [error, setError] = useState<SetUsernameError | undefined>()
@@ -35,6 +40,10 @@ export const useRegisterLightningAddress = (
 
   const register = async () => {
     await guard.run(async () => {
+      if (backupState.status !== BackupStatus.Completed) {
+        setError(SetUsernameError.BACKUP_REQUIRED)
+        return
+      }
       const validation = validateUsername(lnAddress)
       if (!validation.valid) {
         setError(validation.error)
