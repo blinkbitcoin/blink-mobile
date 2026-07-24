@@ -39,10 +39,15 @@ export const isConnectivityError = (err: unknown): boolean => {
   return CONNECTIVITY_PATTERNS.some((pattern) => pattern.test(text))
 }
 
-export const toError = (err: unknown): Error =>
-  err instanceof Error
-    ? err
-    : new Error(typeof err === "string" ? err : JSON.stringify(err))
+export const toError = (err: unknown): Error => {
+  if (err instanceof Error) return err
+  if (typeof err === "string") return new Error(err)
+  try {
+    return new Error(JSON.stringify(err))
+  } catch {
+    return new Error(String(err))
+  }
+}
 
 export type RecordAppErrorOptions = {
   /** Caller-declared expected device/user state → breadcrumb only, never recordError. */

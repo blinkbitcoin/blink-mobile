@@ -8,6 +8,14 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
 }))
 
+const loadFreshLogErrorModule = () => {
+  let mod: typeof import("@app/utils/log-error") | undefined
+  jest.isolateModules(() => {
+    mod = require("@app/utils/log-error")
+  })
+  return mod!
+}
+
 describe("logError", () => {
   let consoleErrorSpy: jest.SpyInstance
 
@@ -42,6 +50,26 @@ describe("logError", () => {
 
     expect(mockRecordError).not.toHaveBeenCalled()
     expect(mockLog).toHaveBeenCalledWith("[transient] [compliance] ipapi timeout")
+  })
+
+  it("forwards dedupKey so repeated failures record only once per session", () => {
+    const fresh = loadFreshLogErrorModule()
+
+    fresh.logError({
+      scope: "remote-config",
+      error: new Error("fetch exploded"),
+      dedupKey: "remote-config-fetch",
+    })
+    fresh.logError({
+      scope: "remote-config",
+      error: new Error("fetch exploded again"),
+      dedupKey: "remote-config-fetch",
+    })
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
+    expect((mockRecordError.mock.calls[0][0] as Error).message).toBe(
+      "[remote-config] fetch exploded",
+    )
   })
 
   it("downgrades caller-declared expected states to a breadcrumb", () => {

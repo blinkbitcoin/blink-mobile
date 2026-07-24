@@ -203,7 +203,7 @@ describe("PersistentStateProvider", () => {
       galoyInstance: { id: "Main" },
       galoyAuthToken: "old-token",
     })
-    mockSaveJson.mockRejectedValueOnce(new Error("disk full"))
+    mockSaveJson.mockRejectedValueOnce(new Error("saveJson timed out"))
 
     render(
       <PersistentStateProvider>
@@ -224,7 +224,7 @@ describe("PersistentStateProvider", () => {
       expect(mockRecordError).toHaveBeenCalledTimes(1)
     })
     expect(mockRecordError.mock.calls[0][0]).toBeInstanceOf(Error)
-    expect(mockRecordError.mock.calls[0][0].message).toBe("disk full")
+    expect(mockRecordError.mock.calls[0][0].message).toBe("saveJson timed out")
 
     // The in-memory update survives the failed persist, so the app keeps working.
     expect(screen.getByTestId("token").props.children).toBe("new-token")

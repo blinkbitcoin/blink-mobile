@@ -133,17 +133,19 @@ describe("self-custodial account-index", () => {
 
   describe("listSelfCustodialAccounts — read failure", () => {
     it("returns read-failed and reports to crashlytics when AsyncStorage rejects", async () => {
-      const transientError = new Error("AsyncStorage unavailable")
-      mockGetItem.mockRejectedValueOnce(transientError)
+      // Transport-shaped message on purpose: alwaysRecord must keep storage
+      // read failures recorded even when they look like connectivity blips.
+      const storageError = new Error("AsyncStorage read timed out")
+      mockGetItem.mockRejectedValueOnce(storageError)
 
       const result = await listSelfCustodialAccounts()
 
       expect(result).toEqual({
         status: StorageReadStatus.ReadFailed,
-        error: transientError,
+        error: storageError,
       })
       expect(mockRecordError).toHaveBeenCalledTimes(1)
-      expect(mockRecordError.mock.calls[0][0]).toBe(transientError)
+      expect(mockRecordError.mock.calls[0][0]).toBe(storageError)
     })
 
     it("returns read-failed and reports to crashlytics when JSON.parse throws on the canonical key", async () => {
