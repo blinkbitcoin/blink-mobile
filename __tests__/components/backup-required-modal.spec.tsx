@@ -34,13 +34,8 @@ const mockGaloyIcon = jest.fn<null, [Record<string, unknown>]>(() => null)
 jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: (props: Record<string, unknown>) => {
     mockGaloyIcon(props)
-    return null
+    return React.createElement("View", { testID: `galoy-icon-${props.name}` })
   },
-}))
-
-jest.mock("@app/components/atomic/galoy-icon-button", () => ({
-  GaloyIconButton: ({ onPress }: { onPress: () => void }) =>
-    React.createElement("Pressable", { onPress, testID: "close-button" }),
 }))
 
 jest.mock("@app/components/atomic/galoy-primary-button", () => ({
@@ -137,6 +132,22 @@ describe("BackupRequiredModal", () => {
 
     expect(onClose).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupMethod")
+    // the modal must be dismissed before the backup screen is pushed
+    expect(onClose.mock.invocationCallOrder[0]).toBeLessThan(
+      mockNavigate.mock.invocationCallOrder[0],
+    )
+  })
+
+  it("closes without navigating when dismissed via the close icon", () => {
+    const onClose = jest.fn()
+    const { getByTestId } = render(
+      <BackupRequiredModal isVisible={true} onClose={onClose} />,
+    )
+
+    fireEvent.press(getByTestId("galoy-icon-close"))
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("uses primary color for warning icon", () => {

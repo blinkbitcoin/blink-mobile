@@ -86,6 +86,19 @@ describe("useRegisterLightningAddress", () => {
     expect(result.current.loading).toBe(false)
   })
 
+  it("refuses to register while the backup is still pending", async () => {
+    mockBackupStatus = "pending"
+    const { result } = renderHook(() => useRegisterLightningAddress(jest.fn()))
+
+    act(() => result.current.setLnAddress("alice"))
+    await act(async () => {
+      await result.current.register()
+    })
+
+    expect(result.current.error).toBe(SetUsernameError.BACKUP_REQUIRED)
+    expect(mockRegister).not.toHaveBeenCalled()
+  })
+
   it("reports an unknown error when the SDK is not connected", async () => {
     mockSdk = null
     const { result } = renderHook(() => useRegisterLightningAddress(jest.fn()))

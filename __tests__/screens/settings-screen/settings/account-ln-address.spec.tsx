@@ -140,6 +140,32 @@ describe("AccountLNAddress (self-custodial)", () => {
     expect(mockCopyToClipboard).not.toHaveBeenCalled()
   })
 
+  it("also gates address creation while the backup is still pending", () => {
+    mockBackupStatus = "pending"
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
+
+    render(<AccountLNAddress />)
+
+    act(() => (lastRowProps().action as () => void)())
+
+    expect(mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(true)
+    expect(mockScModal).not.toHaveBeenCalled()
+  })
+
+  it("closes the backup-required modal through its onClose prop", () => {
+    mockBackupStatus = "none"
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
+
+    render(<AccountLNAddress />)
+
+    act(() => (lastRowProps().action as () => void)())
+    expect(mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(true)
+
+    act(() => (mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.onClose as () => void)())
+
+    expect(mockBackupRequiredModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
+  })
+
   it("still copies an existing address on press when backup is not completed", () => {
     mockBackupStatus = "none"
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: SC_ADDRESS })
