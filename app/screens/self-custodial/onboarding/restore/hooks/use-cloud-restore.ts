@@ -47,7 +47,7 @@ type DownloadedBackup = { entry: CloudBackupEntry; content: string }
 type FileOutcome =
   | { kind: "success"; backup: DownloadedBackup }
   | { kind: "not-found" }
-  | { kind: "failure" }
+  | { kind: "failure"; reason: CloudBackupErrorReason }
 
 const RestoreErrorContext = {
   CloudDownload: "Cloud download",
@@ -60,7 +60,12 @@ type RestoreErrorContext = (typeof RestoreErrorContext)[keyof typeof RestoreErro
 export const useCloudRestore = () => {
   const { LL } = useI18nContext()
   const { appConfig } = useAppConfig()
-  const { listBackups, downloadById, loading: cloudLoading } = usePlatformCloudBackup()
+  const {
+    listBackups,
+    downloadById,
+    resolveErrorMessage,
+    loading: cloudLoading,
+  } = usePlatformCloudBackup()
   const { restore, status: restoreStatus } = useRestoreWallet()
 
   const [step, setStep] = useState<CloudStep>(CloudStep.Loading)
@@ -68,8 +73,21 @@ export const useCloudRestore = () => {
   const [backupContent, setBackupContent] = useState<string | null>(null)
   const [password, setPassword] = useState("")
   const [passwordError, setPasswordError] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const accessTokenRef = useRef<string | null>(null)
   const hasRunRef = useRef(false)
+
+  /** A missing backup is its own step with its own copy, so only a real failure carries a
+   *  message. */
+  const showFailure = useCallback(
+    (reason: CloudBackupErrorReason) => {
+      const nextStep = STEP_FOR_REASON[reason]
+      const isErrorStep = nextStep === CloudStep.Error
+      setErrorMessage(isErrorStep ? resolveErrorMessage(reason, LL) : null)
+      setStep(nextStep)
+    },
+    [resolveErrorMessage, LL],
+  )
 
   const proceedWithBackup = useCallback(
     async (content: string) => {
@@ -86,6 +104,7 @@ export const useCloudRestore = () => {
 
   const handlePick = useCallback(
     async (entry: CloudBackupEntry) => {
+      setErrorMessage(null)
       const accessToken = accessTokenRef.current
       if (!accessToken) {
         reportError(
@@ -99,7 +118,7 @@ export const useCloudRestore = () => {
       try {
         const result = await downloadById(entry.fileId, accessToken)
         if (!result.success) {
-          setStep(STEP_FOR_REASON[result.reason])
+          showFailure(result.reason)
           return
         }
         await proceedWithBackup(result.content)
@@ -108,7 +127,7 @@ export const useCloudRestore = () => {
         setStep(CloudStep.Error)
       }
     },
-    [downloadById, proceedWithBackup],
+    [downloadById, proceedWithBackup, showFailure],
   )
 
   const loadCloudBackups = useCallback(async () => {
@@ -116,12 +135,13 @@ export const useCloudRestore = () => {
     setPassword("")
     setPasswordError(null)
     setBackupContent(null)
+    setErrorMessage(null)
 
     try {
       const prefix = getCloudBackupFilenamePrefix(appConfig.galoyInstance.name)
       const listResult = await listBackups(prefix)
       if (!listResult.success) {
-        setStep(STEP_FOR_REASON[listResult.reason])
+        showFailure(listResult.reason)
         return
       }
 
@@ -136,7 +156,7 @@ export const useCloudRestore = () => {
       if (files.length === 1) {
         const result = await downloadById(files[0].id, token)
         if (!result.success) {
-          setStep(STEP_FOR_REASON[result.reason])
+          showFailure(result.reason)
           return
         }
         if (!parseBackupMetadata(result.content)) {
@@ -154,7 +174,7 @@ export const useCloudRestore = () => {
             if (!result.success) {
               return result.reason === CloudBackupErrorReason.NotFound
                 ? { kind: "not-found" }
-                : { kind: "failure" }
+                : { kind: "failure", reason: result.reason }
             }
             const metadata = parseBackupMetadata(result.content)
             if (!metadata) return { kind: "not-found" }
@@ -167,16 +187,23 @@ export const useCloudRestore = () => {
             }
           } catch (err) {
             reportError(RestoreErrorContext.PerFileDownload, err)
-            return { kind: "failure" }
+            return { kind: "failure", reason: CloudBackupErrorReason.Unknown }
           }
         }),
       )
 
       const downloaded = outcomes.flatMap((o) => (o.kind === "success" ? [o.backup] : []))
-      const hasNonNotFoundFailure = outcomes.some((o) => o.kind === "failure")
+      const failureReasons = outcomes.flatMap((o) =>
+        o.kind === "failure" ? [o.reason] : [],
+      )
 
       if (downloaded.length === 0) {
-        setStep(hasNonNotFoundFailure ? CloudStep.Error : CloudStep.NotFound)
+        const [firstFailureReason] = failureReasons
+        if (firstFailureReason) {
+          showFailure(firstFailureReason)
+          return
+        }
+        setStep(CloudStep.NotFound)
         return
       }
 
@@ -191,7 +218,13 @@ export const useCloudRestore = () => {
       reportError(RestoreErrorContext.CloudDownload, err)
       setStep(CloudStep.Error)
     }
-  }, [appConfig.galoyInstance.name, listBackups, downloadById, proceedWithBackup])
+  }, [
+    appConfig.galoyInstance.name,
+    listBackups,
+    downloadById,
+    proceedWithBackup,
+    showFailure,
+  ])
 
   useEffect(() => {
     if (hasRunRef.current) return
@@ -240,6 +273,7 @@ export const useCloudRestore = () => {
     password,
     setPassword,
     passwordError,
+    errorMessage,
     loadCloudBackups,
     handlePick,
     handleDecrypt,

@@ -7,6 +7,10 @@ const mockDownloadById = jest.fn()
 const mockRestore = jest.fn()
 const mockRecordError = jest.fn()
 
+const mockResolveErrorMessage = jest.fn(
+  (reason: string) => `Resolved message for ${reason}`,
+)
+
 jest.mock("@app/hooks", () => ({
   useAppConfig: () => ({
     appConfig: { galoyInstance: { name: "Main" } },
@@ -19,6 +23,7 @@ jest.mock(
     usePlatformCloudBackup: () => ({
       listBackups: mockListBackups,
       downloadById: mockDownloadById,
+      resolveErrorMessage: mockResolveErrorMessage,
       loading: false,
     }),
   }),
@@ -122,12 +127,12 @@ const buildEncryptedBackup = (walletIdentifier: string, mnemonic: string) =>
     salt: "salt",
   })
 
-describe("useCloudRestore", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockRestore.mockResolvedValue(undefined)
-  })
+beforeEach(() => {
+  jest.clearAllMocks()
+  mockRestore.mockResolvedValue(undefined)
+})
 
+describe("useCloudRestore", () => {
   it("shows not-found when no backups are listed", async () => {
     mockListBackups.mockResolvedValue({
       success: true,
@@ -744,5 +749,243 @@ describe("useCloudRestore", () => {
     })
 
     expect(mockRestore).toHaveBeenCalledWith("words 2")
+  })
+
+  it("handleDecrypt does nothing when no backup was downloaded", async () => {
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [],
+      accessToken: "token",
+    })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isNotFound).toBe(true)
+    })
+
+    await act(async () => {
+      await result.current.handleDecrypt()
+    })
+
+    expect(mockRestore).not.toHaveBeenCalled()
+    expect(result.current.passwordError).toBeNull()
+  })
+
+  it("handlePick reports instead of downloading when no access token was captured", async () => {
+    mockListBackups.mockResolvedValue({ success: false, reason: "auth" })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    mockRecordError.mockClear()
+
+    await act(async () => {
+      await result.current.handlePick({
+        fileId: "file-1",
+        metadata: {
+          version: 1,
+          walletIdentifier: "pubkey1",
+          createdAt: 0,
+          encrypted: false,
+        },
+      })
+    })
+
+    expect(mockDownloadById).not.toHaveBeenCalled()
+    expect(mockRecordError).toHaveBeenCalled()
+    expect(result.current.hasError).toBe(true)
+  })
+
+  it("handlePick reports a thrown download to crashlytics", async () => {
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [
+        { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
+        { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
+      ],
+      accessToken: "token",
+    })
+    mockDownloadById.mockImplementation((fileId: string) =>
+      Promise.resolve({
+        success: true,
+        content: buildPlainBackup(fileId === "file-1" ? "pubkey1" : "pubkey2", "words"),
+      }),
+    )
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isPicker).toBe(true)
+    })
+
+    mockDownloadById.mockRejectedValue(new Error("boom"))
+    await act(async () => {
+      await result.current.handlePick(result.current.entries[0])
+    })
+
+    expect(mockRecordError).toHaveBeenCalled()
+    expect(result.current.hasError).toBe(true)
+    expect(result.current.errorMessage).toBeNull()
+  })
+})
+
+describe("useCloudRestore error message", () => {
+  const listBackupsFailing = (reason: string) => {
+    mockListBackups.mockResolvedValue({ success: false, reason })
+  }
+
+  it("resolves a message for a reason that lands on the error step", async () => {
+    listBackupsFailing("permission-denied")
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(mockResolveErrorMessage).toHaveBeenCalledWith(
+      "permission-denied",
+      expect.anything(),
+    )
+    expect(result.current.errorMessage).toBe("Resolved message for permission-denied")
+  })
+
+  it("leaves the message empty when the reason lands on not-found", async () => {
+    listBackupsFailing("not-found")
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isNotFound).toBe(true)
+    })
+    expect(result.current.errorMessage).toBeNull()
+    expect(mockResolveErrorMessage).not.toHaveBeenCalled()
+  })
+
+  it("resolves a message when the only backup fails to download", async () => {
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [{ id: "file-1", name: "blink-spark-backup-main-pubkey1.json" }],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({ success: false, reason: "auth" })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(result.current.errorMessage).toBe("Resolved message for auth")
+  })
+
+  it("resolves a message from the first failure when every backup fails to download", async () => {
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [
+        { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
+        { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
+      ],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({ success: false, reason: "transient" })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(result.current.errorMessage).toBe("Resolved message for transient")
+  })
+
+  it("falls back to unknown when every per-file download throws", async () => {
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [
+        { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
+        { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
+      ],
+      accessToken: "token",
+    })
+    mockDownloadById.mockRejectedValue(new Error("boom"))
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.hasError).toBe(true)
+    })
+    expect(result.current.errorMessage).toBe("Resolved message for unknown")
+  })
+
+  it("keeps the message empty when every backup is missing", async () => {
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [
+        { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
+        { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
+      ],
+      accessToken: "token",
+    })
+    mockDownloadById.mockResolvedValue({ success: false, reason: "not-found" })
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isNotFound).toBe(true)
+    })
+    expect(result.current.errorMessage).toBeNull()
+  })
+
+  it("resolves a message when the picked backup fails to download", async () => {
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [
+        { id: "file-1", name: "blink-spark-backup-main-pubkey1.json" },
+        { id: "file-2", name: "blink-spark-backup-main-pubkey2.json" },
+      ],
+      accessToken: "token",
+    })
+    mockDownloadById.mockImplementation((fileId: string) =>
+      Promise.resolve({
+        success: true,
+        content: buildPlainBackup(fileId === "file-1" ? "pubkey1" : "pubkey2", "words 1"),
+      }),
+    )
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.isPicker).toBe(true)
+    })
+
+    mockDownloadById.mockResolvedValue({ success: false, reason: "permission-denied" })
+    await act(async () => {
+      await result.current.handlePick(result.current.entries[0])
+    })
+
+    expect(result.current.errorMessage).toBe("Resolved message for permission-denied")
+  })
+
+  it("clears the message when the user retries", async () => {
+    listBackupsFailing("permission-denied")
+
+    const { result } = renderHook(() => useCloudRestore())
+
+    await waitFor(() => {
+      expect(result.current.errorMessage).not.toBeNull()
+    })
+
+    mockListBackups.mockResolvedValue({
+      success: true,
+      entries: [],
+      accessToken: "token",
+    })
+    await act(async () => {
+      await result.current.loadCloudBackups()
+    })
+
+    expect(result.current.errorMessage).toBeNull()
+    expect(result.current.isNotFound).toBe(true)
   })
 })
