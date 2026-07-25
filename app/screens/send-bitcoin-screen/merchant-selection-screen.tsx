@@ -61,6 +61,8 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
       resolveRequestIdRef.current = requestId
       setSelectedMerchantId(merchant.id)
       setResolvingMerchantId(merchant.id)
+      const isCurrentRequest = () =>
+        requestId === resolveRequestIdRef.current && isActiveRef.current
 
       if (!bitcoinNetwork) {
         setResolvingMerchantId(null)
@@ -81,7 +83,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
           },
           sdk: sdk ?? null,
         })
-        if (requestId !== resolveRequestIdRef.current || !isActiveRef.current) return
+        if (!isCurrentRequest()) return
 
         logParseDestinationResult(destination)
 
@@ -92,7 +94,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
 
         navigation.replace("sendBitcoinDestination", { payment: merchant.lnurl })
       } catch (err: unknown) {
-        if (requestId !== resolveRequestIdRef.current || !isActiveRef.current) return
+        if (!isCurrentRequest()) return
 
         setSelectedMerchantId(null)
         if (err instanceof Error) {
@@ -100,7 +102,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
           Alert.alert(err.toString(), "", [{ text: LL.common.ok() }])
         }
       } finally {
-        if (requestId === resolveRequestIdRef.current && isActiveRef.current) {
+        if (isCurrentRequest()) {
           setResolvingMerchantId(null)
         }
       }

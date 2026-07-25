@@ -44,6 +44,7 @@ export const parseDestination = async ({
 
   if (parsedDestination.paymentType === MerchantPaymentType) {
     const { merchants } = parsedDestination
+    const [merchant] = merchants
 
     if (merchants.length > 1) {
       return {
@@ -56,22 +57,21 @@ export const parseDestination = async ({
       } as const
     }
 
-    const [merchant] = merchants
-    if (!merchant) {
-      // Defensive only: when paymentType is Merchant, blink-client returns merchant values.
-      return {
-        valid: false,
-        invalidReason: InvalidDestinationReason.UnknownDestination,
-        invalidPaymentDestination: parsedDestination,
-      } as const
+    if (merchant) {
+      return resolveLnurlDestination({
+        parsedLnurlDestination: merchantChoiceToLnurlDestination(merchant),
+        lnurlDomains,
+        accountDefaultWalletQuery,
+        myWalletIds,
+      })
     }
 
-    return resolveLnurlDestination({
-      parsedLnurlDestination: merchantChoiceToLnurlDestination(merchant),
-      lnurlDomains,
-      accountDefaultWalletQuery,
-      myWalletIds,
-    })
+    // Defensive only: when paymentType is Merchant, blink-client returns merchant values.
+    return {
+      valid: false,
+      invalidReason: InvalidDestinationReason.UnknownDestination,
+      invalidPaymentDestination: parsedDestination,
+    } as const
   }
 
   switch (parsedDestination.paymentType) {
