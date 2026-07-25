@@ -14,6 +14,7 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { logParseDestinationResult } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
 import { useScanContext } from "@app/hooks/use-scan-context"
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 
 import { resolveMerchantChoiceDestination } from "./payment-destination/merchant"
 import { isSendDestination, MerchantChoice } from "./payment-destination/index.types"
@@ -40,6 +41,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
   const { myWalletIds, bitcoinNetwork, lnurlDomains } = useScanContext()
   const { displayCurrency } = useDisplayCurrency()
   const { sdk } = useSelfCustodialWallet()
+  const { run: runMerchantSelection } = useInFlightGuard()
   const [accountDefaultWalletQuery] = useAccountDefaultWalletLazyQuery({
     fetchPolicy: "no-cache",
   })
@@ -55,57 +57,60 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
 
   const handleMerchantPress = useCallback(
     async (merchant: MerchantChoice) => {
-      if (resolvingMerchantId) return
+      await runMerchantSelection(async () => {
+        const payment = merchant.lnurl
+        const requestId = resolveRequestIdRef.current + 1
+        resolveRequestIdRef.current = requestId
+        setSelectedMerchantId(merchant.id)
+        setResolvingMerchantId(merchant.id)
+        const isCurrentRequest = () =>
+          requestId === resolveRequestIdRef.current && isActiveRef.current
+        const openLnurlDestination = () =>
+          navigation.replace("sendBitcoinDestination", { payment })
 
-      const requestId = resolveRequestIdRef.current + 1
-      resolveRequestIdRef.current = requestId
-      setSelectedMerchantId(merchant.id)
-      setResolvingMerchantId(merchant.id)
-      const isCurrentRequest = () =>
-        requestId === resolveRequestIdRef.current && isActiveRef.current
-
-      if (!bitcoinNetwork) {
-        setResolvingMerchantId(null)
-        navigation.replace("sendBitcoinDestination", { payment: merchant.lnurl })
-        return
-      }
-
-      try {
-        const destination = await resolveMerchantChoiceDestination({
-          merchant,
-          params: {
-            rawInput: merchant.lnurl,
-            myWalletIds,
-            bitcoinNetwork,
-            lnurlDomains,
-            accountDefaultWalletQuery,
-            displayCurrency,
-          },
-          sdk: sdk ?? null,
-        })
-        if (!isCurrentRequest()) return
-
-        logParseDestinationResult(destination)
-
-        if (isSendDestination(destination)) {
-          navigation.replace("sendBitcoinDetails", { paymentDestination: destination })
+        if (!bitcoinNetwork) {
+          setResolvingMerchantId(null)
+          openLnurlDestination()
           return
         }
 
-        navigation.replace("sendBitcoinDestination", { payment: merchant.lnurl })
-      } catch (err: unknown) {
-        if (!isCurrentRequest()) return
+        try {
+          const destination = await resolveMerchantChoiceDestination({
+            merchant,
+            params: {
+              rawInput: payment,
+              myWalletIds,
+              bitcoinNetwork,
+              lnurlDomains,
+              accountDefaultWalletQuery,
+              displayCurrency,
+            },
+            sdk: sdk ?? null,
+          })
+          if (!isCurrentRequest()) return
 
-        setSelectedMerchantId(null)
-        if (err instanceof Error) {
+          logParseDestinationResult(destination)
+
+          if (isSendDestination(destination)) {
+            navigation.replace("sendBitcoinDetails", { paymentDestination: destination })
+            return
+          }
+
+          openLnurlDestination()
+        } catch (err: unknown) {
+          if (!isCurrentRequest()) return
+
+          setSelectedMerchantId(null)
+          if (!(err instanceof Error)) return
+
           crashlytics().recordError(err)
           Alert.alert(err.toString(), "", [{ text: LL.common.ok() }])
+        } finally {
+          if (isCurrentRequest()) {
+            setResolvingMerchantId(null)
+          }
         }
-      } finally {
-        if (isCurrentRequest()) {
-          setResolvingMerchantId(null)
-        }
-      }
+      })
     },
     [
       LL.common,
@@ -116,16 +121,16 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
       accountDefaultWalletQuery,
       displayCurrency,
       sdk,
-      resolvingMerchantId,
+      runMerchantSelection,
     ],
   )
 
   const renderMerchant = useCallback(
     ({ item, index }: { item: MerchantChoice; index: number }) => {
       const isSelected = item.id === selectedMerchantId
-      const title = item.title || item.companyName
+      const title = item.title || item.companyName || LL.MerchantSelectionScreen.title()
       const description = item.description
-      const accessibilityLabel = `${title}. ${description}`
+      const accessibilityLabel = [title, description].filter(Boolean).join(". ")
 
       return (
         <Pressable
@@ -174,6 +179,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
     [
       colors._green,
       colors.primary,
+      LL.MerchantSelectionScreen,
       handleMerchantPress,
       resolvingMerchantId,
       selectedMerchantId,

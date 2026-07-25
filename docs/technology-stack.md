@@ -69,7 +69,6 @@
 | lnurl-pay | ^5.0.2 | LNURL payment requests |
 | @noble/hashes | ^1.8.0 | Cryptographic hash utilities used by payment parsing |
 | @scure/base | ^1.1.9 | Base encoding utilities used by payment parsing |
-| bip21 | - | Bitcoin URI parsing |
 | bip39 | ^3.1.0 | Mnemonic phrases |
 
 ## Native Capabilities
