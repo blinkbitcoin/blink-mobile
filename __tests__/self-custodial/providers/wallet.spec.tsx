@@ -101,6 +101,7 @@ jest.mock("@app/config/feature-flags-context", () => ({
     nonCustodialEnabled: true,
     stableBalanceEnabled: mockStableBalanceEnabled,
   }),
+  useRemoteConfig: () => ({ selfCustodialDepositClaimLeewayVbyte: 1 }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -357,11 +358,12 @@ describe("SelfCustodialWalletProvider", () => {
       expect(result.current.status).toBe(ActiveWalletStatus.Ready)
     })
 
-    expect(mockInitSdk).toHaveBeenCalledWith(
-      "word1 word2 word3",
-      "/tmp/test-self-custodial-uuid",
-      mockSparkNetwork.Regtest,
-    )
+    expect(mockInitSdk).toHaveBeenCalledWith({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/tmp/test-self-custodial-uuid",
+      network: mockSparkNetwork.Regtest,
+      leewaySatPerVbyte: 1,
+    })
   })
 
   it("handles refresh error gracefully", async () => {

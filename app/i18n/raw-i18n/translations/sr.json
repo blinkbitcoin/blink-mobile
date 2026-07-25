@@ -2279,7 +2279,6 @@
     "notConfirmed": "Уплата је послата\nали још није потврђена\n\nСтатус уплате можете проверити\nу трансакцијама",
     "note": "Напомена или ознака",
     "success": "Уплата је успешно послата",
-    "suggestionInput": "Enter your suggestion",
     "max": "Max",
     "maxAmount": "Max Amount",
     "title": "Пошаљи биткоин",
@@ -2319,6 +2318,10 @@
     "sdkGenericError": "Nije moguće proceniti naknade. Pokušajte sa drugim iznosom."
   },
   "SettingsScreen": {
+    "createAddress": "Направи адресу",
+    "donationButton": "Дугме за донације",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "QR код за штампање",
     "staticQrCopied": "Линк вашег статичног QR кода је копиран",
     "setByOs": "Подешено од стране ОС-а",
@@ -2327,7 +2330,6 @@
     "apiDashboard": "API приступ и контролна табла",
     "pos": "Продајно место",
     "posCopied": "Линк вашег продајног места је копиран",
-    "setYourLightningAddress": "Подесите своју Lightning адресу",
     "activated": "Активирано",
     "addressScreen": "Начини за примање плаћања",
     "nonCustodialAccount": "Не-кастодијални налог",
@@ -2525,7 +2527,31 @@
     "receivingAccount": "Рачун за примање",
     "sendingAccount": "Рачун за слање",
     "txNotBroadcast": "Your transaction is currently pending and will be broadcasted to the Bitcoin network in a moment.",
-    "momentarily": "ускоро"
+    "momentarily": "ускоро",
+    "findingAccount": "Тражење налога за ову уплату...",
+    "txNotFoundInAccounts": "Ова уплата није пронађена ни на једном налогу на овом уређају. Можда припада налогу који је одјављен.",
+    "txLoadFailed": "Ову уплату није могуће учитати. Проверите везу и покушајте поново.",
+    "switchedForPayment": "Пребачено на {identifier: string} ради приказа ове уплате"
+  },
+  "FeeRatesScreen": {
+    "title": "Стопе накнада",
+    "send": "Пошаљи",
+    "receive": "Прими",
+    "transfer": "Пренос",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "Onchain приоритетно (што пре)",
+    "onchainStandard": "Onchain стандардно (~4ч)",
+    "onchainEconomy": "Onchain економично",
+    "lightningTransactions": "Lightning трансакције",
+    "onchainBelowThreshold": "Onchain испод {threshold: string} SAT",
+    "onchainAboveThreshold": "Onchain изнад {threshold: string} SAT",
+    "transferFee": "Накнада за пренос",
+    "noFee": "без накнаде",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} накнада за рутирање",
+    "fromApprox": "од ~{fee: string}",
+    "satAmount": "{amount: string} SAT",
+    "error": "Тренутно није могуће преузети накнаде"
   },
   "TransactionLimitsScreen": {
     "receive": "Прими",
@@ -2700,6 +2726,8 @@
   },
   "common": {
     "country": "Земља",
+    "registered": "Регистровано",
+    "detected": "Откривено",
     "unknown": "Непознато",
     "enabled": "Омогућено",
     "switch": "Прекидач",
@@ -2719,6 +2747,7 @@
     "anonymousUser": "Анонимни корисник",
     "blinkToBlink": "Blink na Blink",
     "transactionLimits": "Ограничења трансакција",
+    "feeRates": "Стопе накнада",
     "activateWallet": "Активирајте новчаник",
     "amountRequired": "Износ је обавезан",
     "back": "Назад",
@@ -2732,6 +2761,7 @@
     "bitcoinPrice": "Цена Биткоина",
     "btcAccount": "„Биткоин“ Рачун",
     "cancel": "Откажи",
+    "card": "Картица",
     "close": "Затвори",
     "confirm": "Потврди",
     "convert": "Конвертуј",
@@ -2799,6 +2829,7 @@
     "total": "Укупно",
     "transactions": "Трансакције",
     "transactionsError": "Грешка при учитавању трансакција",
+    "transfer": "Пренос",
     "tryAgain": "Покушај поново",
     "type": "Тип",
     "usdAccount": "„Долар“ Рачун",
@@ -2815,6 +2846,7 @@
     "problemMaybeReauth": "Дошло је до проблема са вашим захтевом. Молимо вас покушајте поново за један минут. Уколико проблем и даље постоји, препоручујемо да се одјавите и поново пријавите. Можете се одјавити преко Подешавања > Налог > Одјави се",
     "warning": "Упозорење",
     "continue": "Настави",
+    "skip": "Прескочи",
     "correct": "Тачно",
     "recommended": "Препоручено",
     "expirationTime": "Време истека",
@@ -2870,11 +2902,9 @@
     "email": "Е-пошта",
     "sms": "SMS",
     "faq": "FAQ",
-    "enjoyingApp": "Enjoying the app?",
     "statusPage": "Страница стања",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Thank you for the feedback, would you like to suggest an improvement?",
     "defaultEmailSubject": "{bankName: string} - Подршка",
     "defaultSupportMessage": "Хеј, треба ми помоћ у вези са {bankName: string}, користим верзију {version: string} на оперативном систему {os: string}.",
     "emailCopied": "адреса е-поште {email: string} је копирана у клипборд",
@@ -3044,6 +3074,66 @@
       "limitUpdateSuccess": "Ограничење успешно ажурирано",
       "limitUpdateError": "Ажурирање ограничења није успело",
       "limitMustBePositive": "Ограничење мора бити веће од нуле"
+    },
+    "CardFeeSchedule": {
+      "title": "Распоред накнада Blink картице",
+      "effectiveDate": "Важи од 1. јула 2026.",
+      "sections": {
+        "cardFees": "Накнаде за картицу",
+        "transactionFees": "Накнаде за трансакције",
+        "overdraft": "Прекорачење (финансирани режим)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Годишња накнада",
+          "subtitle": "Ослобођена прве године од датума издавања картице",
+          "value": "{amount: string} / годишње"
+        },
+        "cardReplacement": {
+          "title": "Замена картице"
+        },
+        "usdTransactionFee": {
+          "title": "Накнада за трансакцију у USD",
+          "subtitle": "Примењује се на сваку трансакцију у америчким доларима"
+        },
+        "foreignTransactionFee": {
+          "title": "Накнада за инострану трансакцију",
+          "subtitle": "Примењује се на сваку трансакцију у валути различитој од америчког долара"
+        },
+        "maximumOverdraft": {
+          "title": "Максимално прекорачење",
+          "subtitle": "Мора се вратити у року од 7 дана"
+        },
+        "lateRepaymentFee": {
+          "title": "Накнада за закаснело враћање",
+          "subtitle": "Наплаћује се ако се прекорачење не врати у року од 7 дана"
+        }
+      },
+      "btcConversion": {
+        "title": "Конверзија BTC",
+        "body": "Када трансакција захтева конверзију BTC у USD, конверзија се извршава по важећем курсу, који може укључивати маржу која одражава трошак конверзије."
+      },
+      "feesUpdateNotice": {
+        "text": "Накнаде се с времена на време могу ажурирати. Blink ће обавестити најмање 30 дана унапред пре него што било која промена накнада ступи на снагу, у складу са",
+        "linkText": "Уговором о коришћењу картице"
+      },
+      "creditModeNotice": "Кредитни режим тренутно није активан. Ако се Кредитни режим активира, важеће каматне стопе, накнаде и обелодањивања права наплате биће достављени пре активације.",
+      "additionalDetails": {
+        "title": "Додатни детаљи о накнадама",
+        "overdraft": {
+          "label": "Прекорачење",
+          "text": ". У одређеним околностима може се одобрити трансакција која доводи до тога да стање ваше картице падне испод нуле. Максимално прекорачење је {maxOverdraft: string}. Прекорачење морате вратити у року од 7 дана преносом додатних средстава на стање ваше картице."
+        },
+        "foreignCurrency": {
+          "label": "Страна валута",
+          "text": ". Ако извршите трансакцију у страној валути, мрежа картице је конвертује у USD користећи сопствене процедуре конверзије. Курс на датум обраде може се разликовати од датума трансакције."
+        },
+        "noHiddenFees": {
+          "label": "Без скривених накнада",
+          "text": ". Нема накнада за отварање налога, неактивност, упите о стању нити за затварање ваше картице."
+        }
+      },
+      "backButton": "Назад"
     },
     "CardDetails": {
       "title": "Detalji kartice",
@@ -3390,6 +3480,7 @@
         "perYear": "годишње",
         "status": {
           "label": "Статус",
+          "specialOfferLabel": "Посебна понуда",
           "paymentPending": "Плаћање на Чекању",
           "firstYearFree": "Прва година бесплатно"
         },
@@ -3403,7 +3494,11 @@
           "cardholderAgreement": "Уговор власника картице",
           "and": "и"
         },
-        "renew": "Разумем да ће се моја претплата аутоматски обновити за 1 годину"
+        "feeSchedule": {
+          "text": "Прегледао сам и слажем се са",
+          "linkText": "Ценовником накнада за Blink Card"
+        },
+        "renew": "Разумем да ће се моја претплата аутоматски обновити за {months: number} месеци"
       },
       "CardIntroducing": {
         "title": "Представљамо",
@@ -3465,13 +3560,29 @@
         "buttonText": "Пошаљи пријаву",
         "select": "изабери"
       },
+      "Acknowledgement": {
+        "title": "Услови и одредбе",
+        "acceptButton": "Прихвати",
+        "eSignConsent": {
+          "text": "Прихватам",
+          "linkText": "сагласност за електронски потпис"
+        },
+        "privacyAndTerms": {
+          "text": "Прихватам",
+          "privacyPolicyLinkText": "Политику приватности издаваоца",
+          "and": ", и",
+          "cardTermsLinkText": "Услове картице Blink"
+        },
+        "certifyAccuracy": "Потврђујем да су подаци које сам дао тачни и да ћу се придржавати свих правила и захтева повезаних са мојом картицом Blink Visa",
+        "acknowledgeSolicitation": "Признајем да подношење захтева за картицу Blink Visa не представља неовлашћено обраћање"
+      },
       "CardPreapproved": {
         "title": "Претходно сте одобрени за Blink Visa картицу!",
         "buttonText": "Затвори"
       },
       "CardProcessing": {
         "title": "Обрађујемо вашу пријаву",
-        "subtitle": "Процењено време чекања: {waitTime: string}",
+        "subtitle": "Обавестићемо те чим будемо спремни",
         "buttonText": "Затвори"
       }
     }
@@ -3499,6 +3610,7 @@
       },
       "Phrase": {
         "headerTitle": "Резервна фраза",
+        "authDescription": "Аутентификујте се да бисте видели своју резервну фразу",
         "sparkCompatible": "Ова резервна фраза ради у сваком {sparkCompatibleLink}",
         "sparkCompatibleLink": "новчанику компатибилном са Spark",
         "copiedToast": "Резервна фраза копирана у међуспремник",
@@ -3538,6 +3650,7 @@
       "uploadSuccess": "Резервна копија сачувана у {provider}",
       "uploadFailed": "Отпремање резервне копије није успело",
       "signInFailed": "Пријављивање на {provider} није успело",
+      "storageAccessRequired": "Дозволите {provider: string} приступ резервној копији новчаника, па покушајте поново.",
       "cloudNotAvailable": "iCloud Drive није доступан. Пријавите се на iCloud у Подешавањима и омогућите iCloud Drive.",
       "networkError": "Грешка мреже. Проверите везу и покушајте поново.",
       "existingBackupTitle": "Резервна копија пронађена",
@@ -3549,13 +3662,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Контактирајте подршку",
+      "body": "Нешто је пошло по злу, али не брините, ваша средства су безбедна. Обратите се подршци за помоћ.\n\nОве информације могу помоћи подршци да реши ваш случај:",
+      "reasonLabel": "Разлог",
+      "accountIdLabel": "ID налога",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Корисничко име",
+      "emailLabel": "Имејл",
+      "phoneLabel": "Број телефона",
+      "appVersionLabel": "Верзија апликације",
+      "platformLabel": "Платформа",
+      "countryLabel": "Држава",
+      "emailSubject": "Захтев за подршку при миграцији",
+      "emailDescribeProblem": "Опишите проблем:",
+      "emailAccountInfo": "Подаци о налогу за подршку:",
+      "contactUsCta": "Контактирајте нас",
+      "copy": "Копирај"
+    },
+    "migrateNowModal": {
+      "title": "Мигрирајте сада на не-кастодијални налог",
+      "body": "Више не можете примати средства на свој кастодијални налог. Blink је укинуо кастодијалну услугу у вашем региону и овај налог ће бити деактивиран до краја дана {date}.\n\nМигрирајте сада на не-кастодијални налог.",
+      "migrateCta": "Мигрирај сада"
+    },
+    "reminderBulletin": {
+      "title": "Важно",
+      "body": "Пређите на не-кастодијални налог путем вођене миграције или подигните средства пре {date}. Примање престаје {receiveStopsDate}.",
+      "migrateCta": "Мигрирај"
+    },
+    "offboardBulletin": {
+      "title": "Важно",
+      "body": "Ваш налог је регистрован у региону у ком не можемо да нудимо налоге. Подигните своја средства пре 31. августа. Пријем се зауставља 10. августа."
+    },
+    "dollarBalanceModal": {
+      "title": "Ne možemo da migriramo vaš dolarski saldo",
+      "body": "Prvo ispraznite svoj dolarski saldo. Možete ga preneti na svoj Bitcoin saldo u Blinku ili na drugo mesto."
+    },
+    "balancesOverview": {
+      "title": "Премести свој салдо",
+      "body": "Безбедно премести своја средства на свој нови налог.",
+      "currentBitcoinBalance": "Тренутни Bitcoin салдо",
+      "currentDollarBalance": "Тренутни доларски салдо",
+      "newBitcoinBalance": "Нови Bitcoin салдо",
+      "newDollarBalance": "Нови доларски салдо",
+      "dollarBalanceNotAvailable": "није доступно",
+      "networkFee": "Мрежна накнада: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Мрежна накнада: <bold>{fee: string}</bold> (сноси Blink)",
+      "retryCta": "Покушај поново",
+      "approveCta": "Одобри",
+      "contactSupportCta": "Контактирај подршку"
+    },
+    "migrationRequiredTitle": "Време је за надоградњу",
+    "keepReceivingTitle": "Наставите да примате као и обично",
+    "keepReceivingBody": "Ваша Lightning адреса биће пренета на ваш нови non-custodial налог.",
+    "keepReceivingLnAddressLabel": "Ваша LN адреса",
+    "keepReceivingCta": "Одлично",
+    "receivingDisabledToast": "Примање је тренутно онемогућено.",
+    "downloadHistoryTitle": "Преузмите историју трансакција",
+    "downloadHistoryBody": "Ваш нови налог почиње испочетка. Ако желите да сачувате евиденцију својих трансакција, преузмите их сада као CSV.",
+    "downloadHistoryDownloadCta": "Преузми",
+    "apiServiceTitle": "API услуга није доступна",
+    "apiServiceBody": "Приметили смо да имате активне API кључеве. Blink не може да пружи API у non-custodial режиму.\n\nАко зависите од Blink API-ја, контактирајте нас што пре и даћемо све од себе да вам помогнемо са глатким прелазом.",
+    "apiServiceContactCta": "Контактирајте нас",
+    "apiServiceContinueCta": "Ипак настави",
+    "resumeFailed": "Нешто је пошло по злу при наставку миграције. Молимо започните је поново.",
+    "migrationRequiredBody": "Време је да мигрирате свој кастодијални налог на не-кастодијални налог.",
+    "migrationRequiredForcedBody": "Време је да мигрирате свој кастодијални налог на не-кастодијални налог. То је обавезно из регулаторних разлога.\n\nБез бриге, non-custodial ће ти дугорочно бити бољи.",
+    "migrationGateTitle": "Налог није доступан",
+    "migrationGateBody": "Из регулаторних разлога не можемо да пружамо custodial налоге у твом региону. Пренеси своја средства на non-custodial налог уз Blink пратећи следеће кораке или нас контактирај на <link>{email}</link>",
+    "bitcoinBalance": "Стање Bitcoin-а",
+    "dollarBalance": "Стање у доларима",
     "moveToNonCustodial": "Пребаци на non-custodial",
     "explainerTitle": "Шта значи пребацити на non-custodial?",
-    "explainerStep1": "Креираћете non-custodial налог на Spark протоколу, <link>сазнајте више овде</link>",
-    "explainerStep2": "Пребацујемо ваша средства на ваш нови non-custodial налог, а ваш тренутни налог ће бити обрисан",
-    "explainerStep3": "Наставите да користите Blink као и обично",
-    "letsMove": "Идемо",
-    "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди."
+    "explainerCheck1": "Креираћете non-custodial налог на Spark протоколу",
+    "explainerCheck2": "Пребацујемо твоја средства на твој нови non-custodial налог",
+    "explainerCheck3": "Твој тренутни налог и сви његови подаци, укључујући историју трансакција, биће затворени",
+    "explainerCheck4": "Blink API неће бити доступан",
+    "explainerCheck5": "Са твог налога биће наплаћена мрежна накнада Spark",
+    "explainerCta": "Разумем",
+    "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди.",
+    "clockOutOfSync": {
+      "body": "Датум и време вашег уређаја нису усклађени. Подесите их на аутоматски да бисте наставили.",
+      "retryCta": "Покушај поново"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Под старатељством",
@@ -3605,6 +3794,11 @@
     "modalDescription": "Preporučujemo da napravite rezervnu kopiju novčanika kako biste sprečili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
     "secureMe": "Obezbedi novčanik"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Ово је не-кастодијални налог",
+    "body": "Да бисте сазнали више, прочитајте наш блог пост",
+    "cta": "Прочитај"
+  },
   "StableBalance": {
     "title": "Стабилан салдо",
     "description": "Држите салдо у USD покретан USDB на Spark.",
@@ -3652,10 +3846,10 @@
     "lightningPayment": "Lightning плаћање",
     "onchainDeposit": "On-chain депозит",
     "onchainWithdrawal": "On-chain повлачење",
-    "conversionFromBitcoin": "Конверзија из Биткоина",
-    "conversionToBitcoin": "Конверзија у Биткоин",
-    "conversionFromToken": "Конверзија из {token}",
-    "conversionToToken": "Конверзија у {token}",
+    "transferFromBitcoinBalance": "Пренос са Bitcoin стања",
+    "transferToBitcoinBalance": "Пренос на Bitcoin стање",
+    "transferFromTokenBalance": "Пренос са {token} стања",
+    "transferToTokenBalance": "Пренос на {token} стање",
     "tokenTransfer": "{token} пренос",
     "payTo": "Плати на {address}",
     "payment": "Плаћање"

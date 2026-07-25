@@ -1,8 +1,14 @@
 import { it } from "@jest/globals"
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
+}))
+
 import {
   formatCardValidThruDisplay,
   formatDateFromNow,
+  formatDayAndMonth,
   formatDuration,
   formatMonth,
   formatShortDate,
@@ -314,6 +320,18 @@ describe("date utils", () => {
     it("returns ISO format", () => {
       expect(formatDateFromNow({ years: 5, format: "iso" })).toBe("2031-03-12")
     })
+
+    it("advances by months without truncating to whole years", () => {
+      expect(formatDateFromNow({ months: 6, locale: "en-US" })).toBe("Sep 12, 2026")
+    })
+
+    it("treats 12 months the same as one year", () => {
+      expect(formatDateFromNow({ months: 12, locale: "en-US" })).toBe("Mar 12, 2027")
+    })
+
+    it("rolls months over into the following year", () => {
+      expect(formatDateFromNow({ months: 18, locale: "en-US" })).toBe("Sep 12, 2027")
+    })
   })
 
   describe("formatDuration", () => {
@@ -343,6 +361,54 @@ describe("date utils", () => {
 
     it("formats days with narrow display", () => {
       expect(formatDuration(3, { unit: "day", locale: "en-US" })).toBe("3d")
+    })
+  })
+
+  describe("formatDayAndMonth", () => {
+    const AUG_31_2026_NOON_UTC = Date.UTC(2026, 7, 31, 12) / 1000
+
+    it("formats the day and long month for the given locale", () => {
+      expect(
+        formatDayAndMonth({
+          timestampSeconds: AUG_31_2026_NOON_UTC,
+          locale: "es",
+          timezone: "UTC",
+        }),
+      ).toBe("31 de agosto")
+    })
+
+    it("defaults to en-US when no locale is provided", () => {
+      expect(
+        formatDayAndMonth({ timestampSeconds: AUG_31_2026_NOON_UTC, timezone: "UTC" }),
+      ).toBe("August 31")
+    })
+
+    it("renders the date in the backend-defined timezone", () => {
+      const shortlyPastMidnightUtc = Date.UTC(2026, 8, 1, 0, 30) / 1000
+
+      expect(
+        formatDayAndMonth({
+          timestampSeconds: shortlyPastMidnightUtc,
+          locale: "en-US",
+          timezone: "America/El_Salvador",
+        }),
+      ).toBe("August 31")
+    })
+
+    it("falls back to the device timezone and reports when the timezone is malformed", () => {
+      mockReportError.mockClear()
+
+      const formatted = formatDayAndMonth({
+        timestampSeconds: AUG_31_2026_NOON_UTC,
+        locale: "en-US",
+        timezone: "Not/A_Timezone",
+      })
+
+      expect(formatted).toContain("August")
+      expect(mockReportError).toHaveBeenCalledWith(
+        "formatDayAndMonth timezone",
+        expect.any(Error),
+      )
     })
   })
 })

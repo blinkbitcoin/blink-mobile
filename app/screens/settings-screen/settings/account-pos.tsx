@@ -1,39 +1,30 @@
 import React from "react"
 import { Linking } from "react-native"
-
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useSettingsScreenQuery } from "@app/graphql/generated"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { useAppConfig } from "@app/hooks"
-import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useI18nContext } from "@app/i18n/i18n-react"
-import { AccountType } from "@app/types/wallet"
-
-import { SettingsRow } from "../row"
 import { useTheme } from "@rn-vui/themed"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { getPosUrl } from "@app/utils/pay-links"
+
+import { SettingsRow } from "../row"
+import { usePayLinks } from "./use-pay-links"
+
 export const AccountPOS: React.FC = () => {
-  const { appConfig } = useAppConfig()
   const {
     theme: { colors },
   } = useTheme()
-  const posUrl = appConfig.galoyInstance.posUrl
-
   const { LL } = useI18nContext()
-  const isAuthed = useIsAuthed()
-  const { activeAccount } = useAccountRegistry()
+  const { username, loading } = usePayLinks()
 
-  const { data, loading } = useSettingsScreenQuery({ skip: !isAuthed })
-  if (activeAccount?.type === AccountType.SelfCustodial) return null
-  if (!data?.me?.username) return null
+  if (!username) return null
 
-  const pos = `${posUrl}/${data.me.username}`
+  const pos = getPosUrl(username)
 
   return (
     <SettingsRow
       loading={loading}
       title={LL.SettingsScreen.pos()}
-      subtitleShorter={data.me.username.length > 22}
+      subtitleShorter={username.length > 22}
       leftGaloyIcon="calculator"
       rightIcon={<GaloyIcon name="arrow-square-out" size={20} color={colors.primary} />}
       action={() => {

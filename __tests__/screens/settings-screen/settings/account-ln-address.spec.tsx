@@ -56,7 +56,9 @@ jest.mock("@rn-vui/themed", () => ({
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
-      SettingsScreen: { setYourLightningAddress: () => "Set your lightning address" },
+      SettingsScreen: {
+        createAddress: () => "Create address",
+      },
       GaloyAddressScreen: { copiedLightningAddressToClipboard: () => "Copied" },
     },
   }),
@@ -79,12 +81,12 @@ describe("AccountLNAddress (self-custodial)", () => {
     })
   })
 
-  it("prompts to set an address and opens the modal when none is registered", () => {
+  it("prompts to create an address and opens the modal when none is registered", () => {
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
 
     render(<AccountLNAddress />)
 
-    expect(lastRowProps().title).toBe("Set your lightning address")
+    expect(lastRowProps().title).toBe("Create address")
     expect(lastRowProps().rightIcon).toBeUndefined()
     expect(mockScModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
 
@@ -133,7 +135,7 @@ describe("AccountLNAddress (custodial)", () => {
     })
   })
 
-  it("prompts to set an address and opens the custodial modal when there is no username", () => {
+  it("prompts to create an address and opens the custodial modal when there is no username", () => {
     mockSettingsScreenQuery.mockReturnValue({
       data: { me: { username: null } },
       loading: false,
@@ -141,7 +143,7 @@ describe("AccountLNAddress (custodial)", () => {
 
     render(<AccountLNAddress />)
 
-    expect(lastRowProps().title).toBe("Set your lightning address")
+    expect(lastRowProps().title).toBe("Create address")
     expect(lastRowProps().rightIcon).toBeUndefined()
     expect(mockCustodialModal.mock.calls.at(-1)?.[0]?.isVisible).toBe(false)
 

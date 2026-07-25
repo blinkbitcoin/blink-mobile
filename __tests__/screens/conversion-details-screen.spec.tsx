@@ -14,6 +14,10 @@ import { ThemeProvider } from "@rn-vui/themed"
 
 import { ConversionDetailsScreen } from "@app/screens/conversion-flow/conversion-details-screen"
 import {
+  armMigrationConversion,
+  resetMigrationConversionArmed,
+} from "@app/screens/account-migration/hooks/use-migration-conversion"
+import {
   WalletCurrency,
   ConversionScreenDocument,
   RealtimePriceDocument,
@@ -1211,6 +1215,177 @@ describe("Percentage selector functionality", () => {
       },
       { timeout: 3000 },
     )
+  })
+
+  const pressChipAndSettle = async (
+    getByTestId: ReturnType<typeof render>["getByTestId"],
+    percent: number,
+  ) => {
+    await act(async () => {
+      fireEvent.press(getByTestId(`convert-${percent}%`))
+    })
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+    await waitFor(() => {
+      expect(getByTestId(`convert-${percent}%`).props.accessibilityState?.selected).toBe(
+        true,
+      )
+    })
+  }
+
+  it("draws the pressed chip and leaves the others unpressed", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("convert-50%")).toBeTruthy()
+    })
+
+    await pressChipAndSettle(getByTestId, 50)
+
+    expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(false)
+  })
+
+  it("clears the pressed chip when a wallet toggle recalculates the amount", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%")).toBeTruthy()
+    })
+
+    await pressChipAndSettle(getByTestId, 100)
+
+    await act(async () => {
+      fireEvent.press(getByTestId("wallet-toggle-button"))
+    })
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(false)
+    })
+  })
+
+  it("clears the pressed chip when the amount is typed by hand", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%")).toBeTruthy()
+    })
+
+    await pressChipAndSettle(getByTestId, 100)
+
+    await act(async () => {
+      pressKeys(getByTestId, ["5"])
+    })
+
+    await waitFor(() => {
+      expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(false)
+    })
+  })
+})
+
+describe("Migration conversion prefill", () => {
+  const buildMocks = () =>
+    createGraphQLMocks({
+      btcBalance: 100000,
+      usdBalance: 50000,
+    })
+
+  beforeEach(() => {
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+    resetMigrationConversionArmed()
+  })
+
+  /**
+   * Reaching the convert from the migration arms a flag; the screen then opens USD to BTC
+   * and drives the full-balance chip automatically, so the whole dollar balance is ready to
+   * confirm without the user touching anything. A plain convert with both balances leaves
+   * the amount empty and Next disabled (see the initial-render suite), so an enabled Next
+   * here is the prefill having fired.
+   */
+  it("prefills the whole dollar balance when armed by the migration", async () => {
+    armMigrationConversion()
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("next-button").props.accessibilityState?.disabled).toBe(false)
+      },
+      { timeout: 3000 },
+    )
+
+    /** The 100% chip stays visibly pressed once the amount settles, so the migration user
+     *  sees the whole balance is the active selection. */
+    expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(true)
+  })
+
+  it("locks the amount controls to the full balance during a migration conversion", async () => {
+    armMigrationConversion()
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("convert-100%").props.accessibilityState?.disabled).toBe(false)
+      },
+      { timeout: 3000 },
+    )
+
+    expect(getByTestId("wallet-toggle-button").props.accessibilityState?.disabled).toBe(
+      true,
+    )
+    expect(getByTestId("convert-25%").props.accessibilityState?.disabled).toBe(true)
+    expect(getByTestId("convert-50%").props.accessibilityState?.disabled).toBe(true)
+    expect(getByTestId("convert-75%").props.accessibilityState?.disabled).toBe(true)
+    expect(getByTestId("Key 5").props.accessibilityState?.disabled).toBe(true)
   })
 })
 

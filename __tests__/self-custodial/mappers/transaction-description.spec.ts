@@ -29,12 +29,14 @@ const createTx = (
 const mockLL = {
   TransactionDescription: {
     payTo: jest.fn(({ address }: { address: string }) => `Pay to ${address}`),
-    conversionFromToken: jest.fn(
-      ({ token }: { token: string }) => `Convert from ${token}`,
+    transferFromTokenBalance: jest.fn(
+      ({ token }: { token: string }) => `Transfer from ${token} Balance`,
     ),
-    conversionToToken: jest.fn(({ token }: { token: string }) => `Convert to ${token}`),
-    conversionFromBitcoin: jest.fn(() => "Convert from Bitcoin"),
-    conversionToBitcoin: jest.fn(() => "Convert to Bitcoin"),
+    transferToTokenBalance: jest.fn(
+      ({ token }: { token: string }) => `Transfer to ${token} Balance`,
+    ),
+    transferFromBitcoinBalance: jest.fn(() => "Transfer from Bitcoin balance"),
+    transferToBitcoinBalance: jest.fn(() => "Transfer to Bitcoin balance"),
     tokenTransfer: jest.fn(({ token }: { token: string }) => `${token} transfer`),
     lightningPayment: jest.fn(() => "Lightning payment"),
     sparkTransfer: jest.fn(() => "Spark transfer"),
@@ -71,38 +73,38 @@ describe("getTransactionDescription", () => {
     expect(getTransactionDescription(tx, mockLL)).toBe("Pay to user@wallet.com")
   })
 
-  it("returns conversionFromToken for send conversion with token", () => {
+  it("returns transferFromTokenBalance for send conversion with token", () => {
     const tx = createTx({
       isConversion: true,
       tokenTicker: "USDB",
       direction: TransactionDirection.Send,
     })
-    expect(getTransactionDescription(tx, mockLL)).toBe("Convert from USD")
+    expect(getTransactionDescription(tx, mockLL)).toBe("Transfer from USD Balance")
   })
 
-  it("returns conversionToToken for receive conversion with token", () => {
+  it("returns transferToTokenBalance for receive conversion with token", () => {
     const tx = createTx({
       isConversion: true,
       tokenTicker: "USDB",
       direction: TransactionDirection.Receive,
     })
-    expect(getTransactionDescription(tx, mockLL)).toBe("Convert to USD")
+    expect(getTransactionDescription(tx, mockLL)).toBe("Transfer to USD Balance")
   })
 
-  it("returns conversionFromBitcoin for send conversion without token", () => {
+  it("returns transferFromBitcoinBalance for send conversion without token", () => {
     const tx = createTx({
       isConversion: true,
       direction: TransactionDirection.Send,
     })
-    expect(getTransactionDescription(tx, mockLL)).toBe("Convert from Bitcoin")
+    expect(getTransactionDescription(tx, mockLL)).toBe("Transfer from Bitcoin balance")
   })
 
-  it("returns conversionToBitcoin for receive conversion without token", () => {
+  it("returns transferToBitcoinBalance for receive conversion without token", () => {
     const tx = createTx({
       isConversion: true,
       direction: TransactionDirection.Receive,
     })
-    expect(getTransactionDescription(tx, mockLL)).toBe("Convert to Bitcoin")
+    expect(getTransactionDescription(tx, mockLL)).toBe("Transfer to Bitcoin balance")
   })
 
   it("returns tokenTransfer when tokenTicker present (no conversion)", () => {

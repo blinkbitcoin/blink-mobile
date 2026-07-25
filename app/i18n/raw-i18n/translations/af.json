@@ -2279,7 +2279,6 @@
     "notConfirmed": "Betaling is gestuur\nmaar nog nie bevestig nie\n\nJy kan die vordering van die betaling\nopvolg in Transaksies. ",
     "note": "Nota of beskrywing",
     "success": "Betaling was suksesvol gestuur",
-    "suggestionInput": "Voer jou voorstelle in",
     "max": "Maksimum",
     "maxAmount": "Maksimum bedrag",
     "title": "Stuur Bitcoin",
@@ -2319,6 +2318,10 @@
     "sdkGenericError": "Kan nie fooie skat nie. Probeer asseblief 'n ander bedrag."
   },
   "SettingsScreen": {
+    "createAddress": "Skep adres",
+    "donationButton": "Skenkingsknoppie",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Drukbare statiese QR",
     "staticQrCopied": "Jou statiese QR-kodeskakel is gekopieer",
     "setByOs": "Gestel deur bedryfstelsel",
@@ -2327,7 +2330,6 @@
     "apiDashboard": "API-toegang en kontroleskerm",
     "pos": "Punt van Verkoop",
     "posCopied": "Jou punt van verkoop-skakel is gekopieer",
-    "setYourLightningAddress": "Stel jou Lightning-adres",
     "activated": "Geaktiveer ",
     "addressScreen": "Maniere om betaal te word",
     "nonCustodialAccount": "Nie-bewaarrekening",
@@ -2525,7 +2527,31 @@
     "receivingAccount": "Rekening waarin onvang word",
     "sendingAccount": "Rekening waaruit gestuur word",
     "txNotBroadcast": "Jou transaksie is hangend en sal na die BItcoin-netwerk uitgesaai word binne oomblikke.",
-    "momentarily": "oombliklik"
+    "momentarily": "oombliklik",
+    "findingAccount": "Soek tans die rekening vir hierdie betaling...",
+    "txNotFoundInAccounts": "Hierdie betaling kon in geen rekening op hierdie toestel gevind word nie. Dit behoort dalk aan 'n rekening wat uitgeteken is.",
+    "txLoadFailed": "Kon nie hierdie betaling laai nie. Kontroleer jou verbinding en probeer weer.",
+    "switchedForPayment": "Oorgeskakel na {identifier: string} om hierdie betaling te wys"
+  },
+  "FeeRatesScreen": {
+    "title": "Fooitariewe",
+    "send": "Stuur",
+    "receive": "Ontvang",
+    "transfer": "Oordrag",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "Onchain prioriteit (so gou moontlik)",
+    "onchainStandard": "Onchain standaard (~4u)",
+    "onchainEconomy": "Onchain ekonomies",
+    "lightningTransactions": "Lightning-transaksies",
+    "onchainBelowThreshold": "Onchain onder {threshold: string} SAT",
+    "onchainAboveThreshold": "Onchain bo {threshold: string} SAT",
+    "transferFee": "Oordragfooi",
+    "noFee": "geen fooi",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} roeteringsfooi",
+    "fromApprox": "vanaf ~{fee: string}",
+    "satAmount": "{amount: string} SAT",
+    "error": "Kan nie nou fooie verkry nie"
   },
   "TransactionLimitsScreen": {
     "receive": "Ontvang",
@@ -2700,6 +2726,8 @@
   },
   "common": {
     "country": "Land",
+    "registered": "Geregistreer",
+    "detected": "Bespeur",
     "unknown": "Onbekend",
     "enabled": "Geaktiveer",
     "switch": "Skakelaar",
@@ -2719,6 +2747,7 @@
     "anonymousUser": "Anonieme gebruiker",
     "blinkToBlink": "Blink na Blink",
     "transactionLimits": "Transaksielimiete ",
+    "feeRates": "Fooitariewe",
     "activateWallet": "Aktiveer beursie",
     "amountRequired": "Bedrag word benodig",
     "back": "Terug ",
@@ -2732,6 +2761,7 @@
     "bitcoinPrice": "Bitcoin-prys ",
     "btcAccount": "Bitcoin-rekening",
     "cancel": "Kanselleer ",
+    "card": "Kaart",
     "close": "Maak toe",
     "confirm": "Bevestig",
     "convert": "Ruil",
@@ -2799,6 +2829,7 @@
     "total": "Totaal",
     "transactions": "Transaksies",
     "transactionsError": "Fout - kan nie transaksies laai nie",
+    "transfer": "Oordrag",
     "tryAgain": "Probeer weer",
     "type": "Tipe",
     "usdAccount": "Dollar-rekening",
@@ -2815,6 +2846,7 @@
     "problemMaybeReauth": "Daar was 'n probleem met jou versoek. Probeer asseblief weer oor 1 minuut. Indien die probleem voortduur, beveel ons aan dat jy uitteken en dan weer intteken. Gaan na Verstellings > Rekening > Teken uit",
     "warning": "Waarskuwing",
     "continue": "Gaan voort",
+    "skip": "Slaan oor",
     "correct": "Korrek",
     "recommended": "Aanbeveel",
     "expirationTime": "Vervaltyd",
@@ -2870,11 +2902,9 @@
     "email": "E-pos",
     "sms": "SMS",
     "faq": "FAQ",
-    "enjoyingApp": "Geniet jy die toep?",
     "statusPage": "Statusbladsy",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Dankie vir die terugvoer, wil jy 'n verbetering voorstel?",
     "defaultEmailSubject": "{bankName: string} - Ondersteuning",
     "defaultSupportMessage": "Hi daar! Ek benodig hulp met {bankName: string}, ek gebruik weergawe {version: string} op {os: string}. ",
     "emailCopied": "e-pos {email: string} oorgedra na knipbord",
@@ -3044,6 +3074,66 @@
       "limitUpdateSuccess": "Limiet suksesvol opgedateer",
       "limitUpdateError": "Kon limiet nie opdateer nie",
       "limitMustBePositive": "Limiet moet groter as nul wees"
+    },
+    "CardFeeSchedule": {
+      "title": "Blink-kaart fooiskedule",
+      "effectiveDate": "Geldig vanaf 1 Julie 2026",
+      "sections": {
+        "cardFees": "Kaartfooie",
+        "transactionFees": "Transaksiefooie",
+        "overdraft": "Oortrekking (befondsde modus)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Jaarlikse fooi",
+          "subtitle": "Kwytgeskeld vir die eerste jaar vanaf die datum van kaartuitreiking",
+          "value": "{amount: string} / jaar"
+        },
+        "cardReplacement": {
+          "title": "Kaartvervanging"
+        },
+        "usdTransactionFee": {
+          "title": "USD-transaksiefooi",
+          "subtitle": "Van toepassing op elke transaksie in Amerikaanse dollar"
+        },
+        "foreignTransactionFee": {
+          "title": "Buitelandse transaksiefooi",
+          "subtitle": "Van toepassing op elke transaksie in 'n ander geldeenheid as Amerikaanse dollar"
+        },
+        "maximumOverdraft": {
+          "title": "Maksimum oortrekking",
+          "subtitle": "Moet binne 7 dae terugbetaal word"
+        },
+        "lateRepaymentFee": {
+          "title": "Laat-terugbetalingsfooi",
+          "subtitle": "Gehef indien die oortrekking nie binne 7 dae terugbetaal word nie"
+        }
+      },
+      "btcConversion": {
+        "title": "BTC-omskakeling",
+        "body": "Wanneer 'n transaksie omskakeling van BTC na USD vereis, word die omskakeling teen die heersende wisselkoers uitgevoer, wat 'n marge kan insluit wat die koste van omskakeling weerspieël."
+      },
+      "feesUpdateNotice": {
+        "text": "Fooie kan van tyd tot tyd bygewerk word. Blink sal ten minste 30 dae kennis gee voordat enige fooiveranderinge in werking tree, in ooreenstemming met die",
+        "linkText": "Kaarthouerooreenkoms"
+      },
+      "creditModeNotice": "Kredietmodus is tans nie aktief nie. As Kredietmodus geaktiveer word, sal die toepaslike rentekoerse, fooie en faktureringsregte-openbaarmakings voor aktivering verskaf word.",
+      "additionalDetails": {
+        "title": "Bykomende fooibesonderhede",
+        "overdraft": {
+          "label": "Oortrekking",
+          "text": ". In sekere omstandighede kan 'n transaksie goedgekeur word wat jou kaartsaldo onder nul laat val. Die maksimum oortrekking is {maxOverdraft: string}. Jy moet die oortrekking binne 7 dae terugbetaal deur bykomende fondse na jou kaartsaldo oor te dra."
+        },
+        "foreignCurrency": {
+          "label": "Buitelandse geldeenheid",
+          "text": ". As jy 'n transaksie in 'n buitelandse geldeenheid doen, skakel die kaartnetwerk dit na USD om met sy eie omskakelingsprosedures. Die koers op die verwerkingsdatum kan verskil van die transaksiedatum."
+        },
+        "noHiddenFees": {
+          "label": "Geen verborge fooie nie",
+          "text": ". Daar is geen fooie vir rekeningopstelling, onaktiwiteit, saldo-navrae of om jou kaart te sluit nie."
+        }
+      },
+      "backButton": "Terug"
     },
     "CardDetails": {
       "title": "Kaartbesonderhede",
@@ -3390,6 +3480,7 @@
         "perYear": "per jaar",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Spesiale aanbod",
           "paymentPending": "Betaling Hangende",
           "firstYearFree": "Eerste jaar gratis"
         },
@@ -3403,7 +3494,11 @@
           "cardholderAgreement": "Kaarthouer-ooreenkoms",
           "and": "en"
         },
-        "renew": "Ek verstaan dat my intekening outomaties oor 1 jaar hernu sal word"
+        "feeSchedule": {
+          "text": "Ek het nagegaan en stem in tot die",
+          "linkText": "Blink Card-fooiskedule"
+        },
+        "renew": "Ek verstaan dat my intekening outomaties oor {months: number} maande sal hernu"
       },
       "CardIntroducing": {
         "title": "Bekendstelling",
@@ -3465,13 +3560,29 @@
         "buttonText": "Dien aansoek in",
         "select": "kies"
       },
+      "Acknowledgement": {
+        "title": "Bepalings en voorwaardes",
+        "acceptButton": "Aanvaar",
+        "eSignConsent": {
+          "text": "Ek aanvaar die",
+          "linkText": "E-Sign-toestemming"
+        },
+        "privacyAndTerms": {
+          "text": "Ek aanvaar die",
+          "privacyPolicyLinkText": "Uitreiker se Privaatheidsbeleid",
+          "and": ", en",
+          "cardTermsLinkText": "Blink-kaartvoorwaardes"
+        },
+        "certifyAccuracy": "Ek bevestig dat die inligting wat ek verskaf het akkuraat is en dat ek alle reëls en vereistes met betrekking tot my Blink Visa-kaart sal nakom",
+        "acknowledgeSolicitation": "Ek erken dat die aansoek om die Blink Visa-kaart nie ongemagtigde werwing uitmaak nie"
+      },
       "CardPreapproved": {
         "title": "Jy is vooraf goedgekeur vir die Blink Visa-kaart!",
         "buttonText": "Sluit"
       },
       "CardProcessing": {
         "title": "Verwerk jou aansoek",
-        "subtitle": "Geskatte wagtyd: {waitTime: string}",
+        "subtitle": "Ons sal jou in kennis stel sodra ons gereed is",
         "buttonText": "Sluit"
       }
     }
@@ -3499,6 +3610,7 @@
       },
       "Phrase": {
         "headerTitle": "Rugsteunfrase",
+        "authDescription": "Bevestig om jou rugsteunfrase te sien",
         "sparkCompatible": "Hierdie rugsteunfrase werk in enige {sparkCompatibleLink}",
         "sparkCompatibleLink": "Spark-versoenbare beursie",
         "copiedToast": "Rugsteunfrase na knipbord gekopieer",
@@ -3538,6 +3650,7 @@
       "uploadSuccess": "Rugsteun gestoor in {provider}",
       "uploadFailed": "Kon nie rugsteun oplaai nie",
       "signInFailed": "Kon nie by {provider} aanmeld nie",
+      "storageAccessRequired": "Gee {provider: string} toegang tot jou beursie se rugsteun, en probeer dan weer.",
       "cloudNotAvailable": "iCloud Drive is nie beskikbaar nie. Meld asseblief in Instellings by iCloud aan en aktiveer iCloud Drive.",
       "networkError": "Netwerkfout. Maak asseblief seker van jou verbinding en probeer weer.",
       "existingBackupTitle": "Rugsteun gevind",
@@ -3549,13 +3662,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Kontak ondersteuning",
+      "body": "Iets het verkeerd geloop, maar moenie bekommerd wees nie, jou fondse is veilig. Kontak asseblief ondersteuning vir hulp.\n\nJy mag dalk hierdie inligting nodig hê om ondersteuning te help om jou saak op te los:",
+      "reasonLabel": "Rede",
+      "accountIdLabel": "Rekening-ID",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Gebruikersnaam",
+      "emailLabel": "E-pos",
+      "phoneLabel": "Telefoonnommer",
+      "appVersionLabel": "Toepassingweergawe",
+      "platformLabel": "Platform",
+      "countryLabel": "Land",
+      "emailSubject": "Migrasie-ondersteuningsversoek",
+      "emailDescribeProblem": "Beskryf die probleem:",
+      "emailAccountInfo": "Rekeninginligting vir ondersteuning:",
+      "contactUsCta": "Kontak ons",
+      "copy": "Kopieer"
+    },
+    "migrateNowModal": {
+      "title": "Migreer nou na 'n nie-bewaarrekening",
+      "body": "Jy kan nie meer fondse in jou bewaarrekening ontvang nie. Blink het die bewaardiens in jou streek gestaak en hierdie rekening sal teen die einde van {date} gedeaktiveer word.\n\nMigreer nou na 'n nie-bewaarrekening.",
+      "migrateCta": "Migreer nou"
+    },
+    "reminderBulletin": {
+      "title": "Belangrik",
+      "body": "Skuif na 'n nie-bewaarrekening via begeleide migrasie, of onttrek jou fondse, voor {date}. Ontvangs stop op {receiveStopsDate}.",
+      "migrateCta": "Migreer"
+    },
+    "offboardBulletin": {
+      "title": "Belangrik",
+      "body": "Jou rekening is geregistreer in 'n streek waar ons nie rekeninge kan aanbied nie. Onttrek jou fondse voor 31 Augustus. Ontvangs stop 10 Augustus."
+    },
+    "dollarBalanceModal": {
+      "title": "Ons kan nie jou dollarsaldo migreer nie",
+      "body": "Maak eers jou dollarsaldo leeg. Jy kan dit na jou Bitcoin-saldo in Blink of elders oordra."
+    },
+    "balancesOverview": {
+      "title": "Skuif jou saldo",
+      "body": "Skuif jou fondse veilig na jou nuwe rekening.",
+      "currentBitcoinBalance": "Huidige Bitcoin-saldo",
+      "currentDollarBalance": "Huidige Dollar-saldo",
+      "newBitcoinBalance": "Nuwe Bitcoin-saldo",
+      "newDollarBalance": "Nuwe Dollar-saldo",
+      "dollarBalanceNotAvailable": "nie beskikbaar nie",
+      "networkFee": "Netwerkfooi: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Netwerkfooi: <bold>{fee: string}</bold> (deur Blink gedek)",
+      "retryCta": "Probeer weer",
+      "approveCta": "Keur goed",
+      "contactSupportCta": "Kontak ondersteuning"
+    },
+    "migrationRequiredTitle": "Tyd om op te gradeer",
+    "keepReceivingTitle": "Ontvang steeds soos gewoonlik",
+    "keepReceivingBody": "Jou Lightning-adres sal na jou nuwe nie-bewaarde rekening oorgedra word.",
+    "keepReceivingLnAddressLabel": "Jou LN-adres",
+    "keepReceivingCta": "Lekker",
+    "receivingDisabledToast": "Ontvangs is tans gedeaktiveer.",
+    "downloadHistoryTitle": "Laai jou transaksiegeskiedenis af",
+    "downloadHistoryBody": "Jou nuwe rekening begin vars. As jy 'n rekord van jou transaksies wil hou, laai dit nou as CSV af.",
+    "downloadHistoryDownloadCta": "Laai af",
+    "apiServiceTitle": "API-diens nie beskikbaar nie",
+    "apiServiceBody": "Ons let op dat jy aktiewe API-sleutels het. Blink kan nie die API in nie-bewaarende modus verskaf nie.\n\nAs jy van Blink se API afhanklik is, kontak ons gou en ons sal ons bes doen om 'n gladde oorgang te help.",
+    "apiServiceContactCta": "Kontak ons",
+    "apiServiceContinueCta": "Gaan tog voort",
+    "resumeFailed": "Iets het verkeerd geloop met die hervatting van jou migrasie. Begin dit asseblief weer.",
+    "migrationRequiredBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer.",
+    "migrationRequiredForcedBody": "Dit is tyd om jou bewaarrekening na 'n nie-bewaarrekening te migreer. Dit word om regulatoriese redes vereis.\n\nGeen rede tot kommer nie, nie-bewaring sal op die lange duur beter vir jou wees.",
+    "migrationGateTitle": "Rekening nie toeganklik nie",
+    "migrationGateBody": "Om regulatoriese redes kan ons nie bewaarde rekeninge in jou streek verskaf nie. Dra jou fondse oor na 'n nie-bewaarde rekening by Blink deur die volgende stappe te volg of kontak ons by <link>{email}</link>",
+    "bitcoinBalance": "Bitcoin-saldo",
+    "dollarBalance": "Dollar-saldo",
     "moveToNonCustodial": "Skuif na nie-bewaarde",
     "explainerTitle": "Wat beteken dit om na nie-bewaarde te skuif?",
-    "explainerStep1": "Jy sal 'n nie-bewaarde rekening op die Spark-protokol skep, <link>leer meer hier</link>",
-    "explainerStep2": "Ons dra jou fondse oor na jou nuwe nie-bewaarde rekening en jou huidige rekening sal verwyder word",
-    "explainerStep3": "Gebruik Blink voort soos gewoonlik",
-    "letsMove": "Kom ons gaan",
-    "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees."
+    "explainerCheck1": "Jy sal 'n nie-bewaarde rekening op die Spark-protokol skep",
+    "explainerCheck2": "Ons dra jou fondse oor na jou nuwe nie-bewaarde rekening",
+    "explainerCheck3": "Jou huidige rekening en al sy data, insluitend transaksiegeskiedenis, sal gesluit word",
+    "explainerCheck4": "Blink API sal nie beskikbaar wees nie",
+    "explainerCheck5": "Jou rekening sal met 'n Spark-netwerkfooi belas word",
+    "explainerCta": "Ek verstaan",
+    "transferringFunds": "Jou fondse word oorgedra. Dit behoort binne 'n paar sekondes klaar te wees.",
+    "clockOutOfSync": {
+      "body": "Die datum en tyd van jou toestel is nie in sinkronisasie nie. Stel dit op outomaties om voort te gaan.",
+      "retryCta": "Probeer weer"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Bewaard",
@@ -3605,6 +3794,11 @@
     "modalDescription": "Ons beveel sterk aan dat u u beursie rugsteun om 'n algehele verlies van fondse te voorkom indien u hierdie toestel verloor.",
     "secureMe": "Beveilig beursie"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Hierdie is 'n nie-bewaarrekening",
+    "body": "Lees ons blogpos om meer te wete te kom",
+    "cta": "Lees"
+  },
   "StableBalance": {
     "title": "Stabiele balans",
     "description": "Hou 'n USD-balans aangedryf deur USDB op Spark.",
@@ -3652,10 +3846,10 @@
     "lightningPayment": "Lightning-betaling",
     "onchainDeposit": "On-chain Deposito",
     "onchainWithdrawal": "On-chain Onttrekking",
-    "conversionFromBitcoin": "Omskakeling van Bitcoin",
-    "conversionToBitcoin": "Omskakeling na Bitcoin",
-    "conversionFromToken": "Omskakeling van {token}",
-    "conversionToToken": "Omskakeling na {token}",
+    "transferFromBitcoinBalance": "Oordrag vanaf Bitcoin-balans",
+    "transferToBitcoinBalance": "Oordrag na Bitcoin-balans",
+    "transferFromTokenBalance": "Oordrag vanaf {token} balans",
+    "transferToTokenBalance": "Oordrag na {token} balans",
     "tokenTransfer": "{token}-oordrag",
     "payTo": "Betaal aan {address}",
     "payment": "Betaling"

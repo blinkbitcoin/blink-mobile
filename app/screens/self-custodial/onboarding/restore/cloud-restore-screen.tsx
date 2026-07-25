@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react"
+import React, { useEffect, useLayoutEffect } from "react"
 import { ActivityIndicator, View } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
@@ -26,22 +26,30 @@ export const CloudRestoreScreen: React.FC = () => {
     isLoading,
     hasError,
     isNotFound,
+    isCancelled,
     isPicker,
     isPassword,
     entries,
     password,
     setPassword,
     passwordError,
+    errorMessage,
     loadCloudBackups,
     handlePick,
     handleDecrypt,
   } = useCloudRestore()
+
+  const hasErrorMessage = errorMessage !== null
 
   useLayoutEffect(() => {
     navigation.setOptions({
       title: isPicker ? LL.RestoreScreen.pickBackupTitle() : "",
     })
   }, [isPicker, navigation, LL])
+
+  useEffect(() => {
+    if (isCancelled) navigation.goBack()
+  }, [isCancelled, navigation])
 
   if (isLoading) {
     return (
@@ -83,6 +91,11 @@ export const CloudRestoreScreen: React.FC = () => {
         </Text>
         {isNotFound && (
           <Text style={styles.description}>{LL.RestoreScreen.noBackupDescription()}</Text>
+        )}
+        {hasErrorMessage && (
+          <Text style={styles.description} {...testProps("restore-error-description")}>
+            {errorMessage}
+          </Text>
         )}
       </OnboardingScreenLayout>
     )

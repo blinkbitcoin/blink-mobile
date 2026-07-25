@@ -16,6 +16,7 @@ declare module "@rn-vui/themed" {
     _lighterGrey: string
     _lightBlue: string
     _darkGrey: string
+    _cardPill: string
     _blue: string
     _orange: string
     _sky: string

@@ -27,18 +27,6 @@ LogBox.ignoreAllLogs(true)
  */
 const APP_NAME = "GaloyApp"
 
-// Should we show storybook instead of our app?
-//
-// ⚠️ Leave this as `false` when checking into git.
-const SHOW_STORYBOOK = false
-
-let RootComponent = () => <App />
-
-if (__DEV__ && SHOW_STORYBOOK) {
-  // Only include Storybook if we're in dev mode
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { StorybookUIRoot } = require("./.storybook/index.ts")
-  RootComponent = StorybookUIRoot
-}
+const RootComponent = () => <App />
 
 AppRegistry.registerComponent(APP_NAME, () => RootComponent)

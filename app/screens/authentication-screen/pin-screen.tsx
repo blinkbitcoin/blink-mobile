@@ -2,13 +2,15 @@ import * as React from "react"
 import { useEffect, useState } from "react"
 import { Alert, Text, View } from "react-native"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button } from "@rn-vui/base"
 import { makeStyles } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+
+import { useUnlockScreen } from "./unlock-screen"
+
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -26,8 +28,8 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, "pin">>()
 
   const { logout } = useLogout()
-  const { screenPurpose } = route.params
-  const { setAppUnlocked } = useAuthenticationContext()
+  const { screenPurpose, isResume = false } = route.params
+  const { completeUnlock } = useUnlockScreen({ isResume })
   const { LL } = useI18nContext()
   const [enteredPIN, setEnteredPIN] = useState("")
   const [helperText, setHelperText] = useState(
@@ -47,11 +49,12 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const handleCompletedPinForAuthenticatePin = async (newEnteredPIN: string) => {
     if (newEnteredPIN === (await KeyStoreWrapper.getPinOrEmptyString())) {
       KeyStoreWrapper.resetPinAttempts()
-      setAppUnlocked()
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Primary" }],
-      })
+      completeUnlock(() =>
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Primary" }],
+        }),
+      )
     } else if (pinAttempts < MAX_PIN_ATTEMPTS - 1) {
       const newPinAttempts = pinAttempts + 1
       KeyStoreWrapper.setPinAttempts(newPinAttempts.toString())

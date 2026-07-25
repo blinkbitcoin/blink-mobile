@@ -2350,7 +2350,6 @@ const en: BaseTranslation = {
       "Payment has been sent\nbut is not confirmed yet\n\nYou can check the status\nof the payment in Transactions",
     note: "Note or label",
     success: "Payment successful",
-    suggestionInput: "Enter your suggestion",
     max: "Max",
     maxAmount: "Max Amount",
     title: "Send Bitcoin",
@@ -2401,7 +2400,10 @@ const en: BaseTranslation = {
     apiDashboard: "API access and dashboard",
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
-    setYourLightningAddress: "Set your lightning address",
+    createAddress: "Create address",
+    donationButton: "Donation Button",
+    btcpayServer: "BTCPay Server",
+    woocommerce: "WooCommerce",
     activated: "Activated",
     addressScreen: "Ways to get paid",
     nonCustodialAccount: "Non-custodial account",
@@ -2614,10 +2616,10 @@ const en: BaseTranslation = {
     lightningPayment: "Lightning Payment",
     onchainDeposit: "On-chain Deposit",
     onchainWithdrawal: "On-chain Withdrawal",
-    conversionFromBitcoin: "Conversion from Bitcoin",
-    conversionToBitcoin: "Conversion to Bitcoin",
-    conversionFromToken: "Conversion from {token: string}",
-    conversionToToken: "Conversion to {token: string}",
+    transferFromBitcoinBalance: "Transfer from Bitcoin Balance",
+    transferToBitcoinBalance: "Transfer to Bitcoin Balance",
+    transferFromTokenBalance: "Transfer from {token: string} Balance",
+    transferToTokenBalance: "Transfer to {token: string} Balance",
     tokenTransfer: "{token: string} Transfer",
     payTo: "Pay to {address: string}",
     payment: "Payment",
@@ -2632,6 +2634,31 @@ const en: BaseTranslation = {
     txNotBroadcast:
       "Your transaction is queued. It should appear in the mempool {countdown: string}.",
     momentarily: "momentarily",
+    findingAccount: "Finding the account for this payment...",
+    txNotFoundInAccounts:
+      "This payment couldn't be found in any account on this device. It may belong to an account that was logged out.",
+    txLoadFailed: "Couldn't load this payment. Check your connection and try again.",
+    switchedForPayment: "Switched to {identifier: string} to show this payment",
+  },
+  FeeRatesScreen: {
+    title: "Fee rates",
+    send: "Send",
+    receive: "Receive",
+    transfer: "Transfer",
+    lightning: "Lightning",
+    intraledger: "Intraledger",
+    onchainPriority: "Onchain priority (asap)",
+    onchainStandard: "Onchain standard (~4h)",
+    onchainEconomy: "Onchain economy",
+    lightningTransactions: "Lightning transactions",
+    onchainBelowThreshold: "Onchain below {threshold: string} SAT",
+    onchainAboveThreshold: "Onchain above {threshold: string} SAT",
+    transferFee: "Transfer fee",
+    noFee: "no fee",
+    lightningSendFee: "{fee: string} + ~{routingFee: string} routing fee",
+    fromApprox: "from ~{fee: string}",
+    satAmount: "{amount: string} SAT",
+    error: "Unable to fetch fees at this time",
   },
   TransactionLimitsScreen: {
     receive: "Receive",
@@ -2820,6 +2847,8 @@ const en: BaseTranslation = {
   },
   common: {
     country: "Country",
+    registered: "Registered",
+    detected: "Detected",
     unknown: "Unknown",
     enabled: "Enabled",
     switch: "Switch",
@@ -2839,6 +2868,7 @@ const en: BaseTranslation = {
     anonymousUser: "Anon user",
     blinkToBlink: "Blink to Blink",
     transactionLimits: "Transaction limits",
+    feeRates: "Fee rates",
     activateWallet: "Activate Wallet",
     amountRequired: "Amount is required",
     back: "Back",
@@ -2852,6 +2882,7 @@ const en: BaseTranslation = {
     bitcoinPrice: "Bitcoin Price",
     btcAccount: "Bitcoin Balance",
     cancel: "Cancel",
+    card: "Card",
     close: "Close",
     confirm: "Confirm",
     convert: "Convert",
@@ -2920,6 +2951,7 @@ const en: BaseTranslation = {
     total: "Total",
     transactions: "Transactions",
     transactionsError: "Error loading transactions",
+    transfer: "Transfer",
     tryAgain: "Try Again",
     type: "Type",
     usdAccount: "Dollar Balance",
@@ -2937,6 +2969,7 @@ const en: BaseTranslation = {
       "There was a problem with your request. Please retry in one minute. If the problem persist, we recommend that you log out and log back in. You can log out by going into Settings > Account > Log out",
     warning: "Warning",
     continue: "Continue",
+    skip: "Skip",
     correct: "Correct",
     recommended: "Recommended",
     expirationTime: "Expiration Time",
@@ -2993,11 +3026,9 @@ const en: BaseTranslation = {
     email: "Email",
     sms: "SMS",
     faq: "FAQ",
-    enjoyingApp: "Enjoying the app?",
     statusPage: "Status page",
     telegram: "Telegram",
     mattermost: "Mattermost",
-    thankYouText: "Thank you for the feedback, would you like to suggest an improvement?",
     defaultEmailSubject: "{bankName: string} - Support",
     defaultSupportMessage:
       "Hey there! I need some help with {bankName: string}, I'm using the version {version: string} on {os: string}.",
@@ -3155,6 +3186,67 @@ const en: BaseTranslation = {
       noCardAvailable: "No cards available",
       cardUpdateError: "Could not update card status",
       cardNotUsable: "This card is not currently available for use",
+    },
+    CardFeeSchedule: {
+      title: "Blink Card Fee Schedule",
+      effectiveDate: "Effective July 1, 2026",
+      sections: {
+        cardFees: "Card fees",
+        transactionFees: "Transaction fees",
+        overdraft: "Overdraft (funded mode)",
+      },
+      fees: {
+        annualFee: {
+          title: "Annual fee",
+          subtitle: "Waived for the first year from the date of Card issuance",
+          value: "{amount: string} / year",
+        },
+        cardReplacement: {
+          title: "Card Replacement",
+        },
+        usdTransactionFee: {
+          title: "USD transaction fee",
+          subtitle: "Applied to each transaction in U.S. dollars",
+        },
+        foreignTransactionFee: {
+          title: "Foreign transaction fee",
+          subtitle: "Applied to each transaction in a currency other than U.S. dollars",
+        },
+        maximumOverdraft: {
+          title: "Maximum overdraft",
+          subtitle: "Must be repaid within 7 days",
+        },
+        lateRepaymentFee: {
+          title: "Late Repayment Fee",
+          subtitle: "Charged if overdraft is not repaid within 7 days",
+        },
+      },
+      btcConversion: {
+        title: "BTC Conversion",
+        body: "When a transaction requires conversion of BTC to USD, the conversion is executed at the prevailing exchange rate, which may include a spread reflecting the cost of conversion.",
+      },
+      feesUpdateNotice: {
+        text: "Fees may be updated from time to time. Blink will provide at least 30 days' notice before any fee changes take effect, in accordance with the",
+        linkText: "Cardholder Agreement",
+      },
+      creditModeNotice:
+        "Credit Mode is not currently active. If Credit Mode is activated, the applicable interest rates, fees, and billing rights disclosures will be provided before activation.",
+      additionalDetails: {
+        title: "Additional fee details",
+        overdraft: {
+          label: "Overdraft",
+          text: ". In certain circumstances, a transaction may be approved that causes your Card Balance to fall below zero. The maximum overdraft is {maxOverdraft: string}. You must repay the overdraft within 7 days by transferring additional funds to your Card Balance.",
+        },
+        foreignCurrency: {
+          label: "Foreign currency",
+          text: ". If you make a transaction in a foreign currency, the card network converts it to USD using its own conversion procedures. The rate on the processing date may differ from the transaction date.",
+        },
+        noHiddenFees: {
+          label: "No hidden fees",
+          text: ". There are no fees for account setup, inactivity, balance inquiries, or closing your card.",
+        },
+      },
+      backButton: "Back",
     },
     CardDetails: {
       title: "Card details",
@@ -3577,6 +3669,7 @@ const en: BaseTranslation = {
         perYear: "per year",
         status: {
           label: "Status",
+          specialOfferLabel: "Special offer",
           paymentPending: "Payment Pending",
           firstYearFree: "First year free",
         },
@@ -3590,7 +3683,11 @@ const en: BaseTranslation = {
           cardholderAgreement: "Cardholder Agreement",
           and: "and",
         },
-        renew: "I understand that my subscription will automatically renew in 1 year",
+        feeSchedule: {
+          text: "I have reviewed and agree to the",
+          linkText: "Blink Card Fee Schedule",
+        },
+        renew: "I understand my subscription will automatically renew in {months: number} months",
       },
       LoadingCard: {
         title: "We're working on your card",
@@ -3621,13 +3718,31 @@ const en: BaseTranslation = {
         buttonText: "Submit application",
         select: "Select",
       },
+      Acknowledgement: {
+        title: "Terms and conditions",
+        acceptButton: "Accept",
+        eSignConsent: {
+          text: "I accept the",
+          linkText: "E-Sign Consent",
+        },
+        privacyAndTerms: {
+          text: "I accept the",
+          privacyPolicyLinkText: "Issuer's Privacy Policy",
+          and: ", and",
+          cardTermsLinkText: "Blink Card Terms",
+        },
+        certifyAccuracy:
+          "I certify that the information I have provided is accurate and that I will abide by all the rules and requirements related to my Blink Visa Card",
+        acknowledgeSolicitation:
+          "I acknowledge that applying for the Blink Visa Card does not constitute unauthorized solicitation",
+      },
       CardPreapproved: {
         title: "You have been pre-approved for the Blink Visa card!",
         buttonText: "Close",
       },
       CardProcessing: {
         title: "Processing your application",
-        subtitle: "Estimated wait time: {waitTime: string}",
+        subtitle: "We will notify you once we are ready",
         buttonText: "Close",
       },
     },
@@ -3678,6 +3793,7 @@ const en: BaseTranslation = {
       uploadSuccess: "Backup saved to {provider: string}",
       uploadFailed: "Failed to upload backup",
       signInFailed: "Failed to sign in to {provider: string}",
+      storageAccessRequired: "Allow {provider: string} access to your wallet backup, then try again.",
       cloudNotAvailable: "iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.",
       networkError: "Network error. Please check your connection and try again.",
     },
@@ -3691,6 +3807,7 @@ const en: BaseTranslation = {
       },
       Phrase: {
         headerTitle: "Backup phrase",
+        authDescription: "Authenticate to view your backup phrase",
         sparkCompatible:
           "This backup phrase works in any {sparkCompatibleLink: string}",
         sparkCompatibleLink: "Spark-compatible wallet",
@@ -3718,14 +3835,95 @@ const en: BaseTranslation = {
   AccountMigration: {
     moveToNonCustodial: "Move to non-custodial",
     explainerTitle: "What does it mean to move to non-custodial?",
-    explainerStep1:
-      "You will create a non-custodial account on the Spark protocol, <link>learn more here</link>",
-    explainerStep2:
-      "We transfer your funds into your new non-custodial account, and your current account will be deleted",
-    explainerStep3: "Continue using Blink as usual",
-    letsMove: "Let's move",
+    explainerCheck1: "You will create a non-custodial account on the Spark protocol",
+    explainerCheck2: "We transfer your funds into your new non-custodial account",
+    explainerCheck3:
+      "Your current account and all its data including transaction history will be closed",
+    explainerCheck4: "Blink API will not be available",
+    explainerCheck5: "Your account will be deducted with a Spark network fee",
+    explainerCta: "I understand",
     transferringFunds:
       "Transferring your funds. It should be done in a few seconds.",
+    clockOutOfSync: {
+      body: "Your device's date and time are out of sync. Set them to automatic to continue.",
+      retryCta: "Try again",
+    },
+    migrationRequiredTitle: "Time to upgrade",
+    migrationRequiredBody:
+      "It's time to migrate your custodial account to a non-custodial account.",
+    migrationRequiredForcedBody:
+      "It's time to migrate your custodial account to a non-custodial account. It's required for regulatory reasons.\n\nNo need to worry, non-custodial will be better for you in the long term.",
+    migrationGateTitle: "Account not accessible",
+    migrationGateBody:
+      "For regulatory reasons we cannot provide custodial accounts in your region. Transfer your funds to a non-custodial account with Blink by following the next steps or contact us at <link>{email}</link>",
+    bitcoinBalance: "Bitcoin balance",
+    dollarBalance: "Dollar balance",
+    keepReceivingTitle: "Keep receiving as usual",
+    keepReceivingBody:
+      "Your lightning address will be transferred to your new non-custodial account.",
+    keepReceivingLnAddressLabel: "Your LN address",
+    keepReceivingCta: "Nice",
+    receivingDisabledToast: "Receiving is currently disabled.",
+    downloadHistoryTitle: "Download your transaction history",
+    downloadHistoryBody:
+      "Your new account will start fresh. If you want to keep record of your transactions, download them as CSV now.",
+    downloadHistoryDownloadCta: "Download",
+    apiServiceTitle: "API service not available",
+    apiServiceBody:
+      "We note that you have active API keys. Blink can't provide the API in non-custodial mode.\n\nIf you are dependent on Blink's API, contact us promptly and we will do our best to assist a smooth transition.",
+    apiServiceContactCta: "Contact us",
+    apiServiceContinueCta: "Continue anyways",
+    resumeFailed: "Something went wrong resuming your migration. Please start it again.",
+    balancesOverview: {
+      title: "Move your balance",
+      body: "Safely move your funds to your new account.",
+      currentBitcoinBalance: "Current Bitcoin Balance",
+      currentDollarBalance: "Current Dollar Balance",
+      newBitcoinBalance: "New Bitcoin Balance",
+      newDollarBalance: "New Dollar Balance",
+      dollarBalanceNotAvailable: "not available",
+      networkFee: "Network fee: <bold>{fee: string}</bold>",
+      networkFeeCoveredByBlink: "Network fee: <bold>{fee: string}</bold> (covered by Blink)",
+      retryCta: "Try again",
+      approveCta: "Approve",
+      contactSupportCta: "Contact support",
+    },
+    dollarBalanceModal: {
+      title: "We cannot migrate your Dollar Balance",
+      body: "Empty your Dollar Balance first. You can transfer to your Bitcoin Balance in Blink or elsewhere.",
+    },
+    migrateNowModal: {
+      title: "Migrate now to a non-custodial account",
+      body: "You can no longer receive funds to your custodial account. Blink has discontinued custodial service in your region and this account will be inactivated by the end of {date: string}.\n\nMigrate now to a non-custodial account.",
+      migrateCta: "Migrate now",
+    },
+    reminderBulletin: {
+      title: "Important",
+      body: "Move to a non-custodial account via guided migration, or withdraw, before {date: string}. Receiving stops {receiveStopsDate: string}.",
+      migrateCta: "Migrate",
+    },
+    offboardBulletin: {
+      title: "Important",
+      body: "Your account is registered in a region where we cannot offer accounts. Withdraw your funds before August 31. Receiving stops August 10.",
+    },
+    contactSupport: {
+      title: "Contact support",
+      body: "Something went wrong but don't worry your funds are safe, please contact support for assistance.\n\nYou may need this information to help support resolve your case:",
+      reasonLabel: "Reason",
+      accountIdLabel: "Account ID",
+      pubKeyLabel: "pubKey",
+      usernameLabel: "Username",
+      emailLabel: "Email",
+      phoneLabel: "Phone number",
+      appVersionLabel: "App version",
+      platformLabel: "Platform",
+      countryLabel: "Country",
+      emailSubject: "Migration support request",
+      emailDescribeProblem: "Describe the problem:",
+      emailAccountInfo: "Account information for support:",
+      contactUsCta: "Contact us",
+      copy: "Copy",
+    },
   },
   AccountTypeSelectionScreen: {
     descriptionDefault: "Please choose your preferred type of Blink.",
@@ -3777,6 +3975,11 @@ const en: BaseTranslation = {
     modalDescription:
       "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
     secureMe: "Secure wallet",
+  },
+  NonCustodialInfoBulletin: {
+    title: "This is a non-custodial account",
+    body: "To learn more read our blog post",
+    cta: "Read",
   },
   SelfCustodialOffline: {
     title: "Wallet is offline",

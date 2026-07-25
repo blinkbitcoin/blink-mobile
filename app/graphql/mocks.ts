@@ -16,6 +16,7 @@ import {
   MyLnUpdatesDocument,
   OnChainAddressCurrentDocument,
   PaymentRequestDocument,
+  FeeRatesDocument,
   RealtimePriceDocument,
   ScanningQrCodeScreenDocument,
   SendBitcoinConfirmationScreenDocument,
@@ -30,7 +31,6 @@ import {
 } from "./generated"
 
 // TODO: put in __tests__ folder?
-// will it work for storybooks?
 // should not be in production build
 // no harm but will increase bundle size
 
@@ -418,6 +418,27 @@ const mocks = [
             __typename: "ConsumerAccount",
             id: "84b26b88-89b0-5c6f-9d3d-fbead08f79d8",
             displayCurrency: "EUR",
+          },
+        },
+      },
+    },
+  },
+  {
+    request: {
+      query: FeeRatesDocument,
+    },
+    result: {
+      data: {
+        globals: {
+          __typename: "Globals",
+          feesInformation: {
+            __typename: "FeesInformation",
+            deposit: {
+              __typename: "DepositFeesInformation",
+              minBankFee: "2500",
+              minBankFeeThreshold: "1000000",
+              ratio: "50",
+            },
           },
         },
       },

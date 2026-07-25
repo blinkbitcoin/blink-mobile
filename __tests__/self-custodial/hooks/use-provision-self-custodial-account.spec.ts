@@ -1,0 +1,85 @@
+import { renderHook } from "@testing-library/react-native"
+
+import { useProvisionSelfCustodialAccount } from "@app/self-custodial/hooks/use-provision-self-custodial-account"
+
+const mockCreateWallet = jest.fn()
+const mockReloadSelfCustodialAccounts = jest.fn()
+const mockNetwork = "regtest"
+
+jest.mock("react-native-quick-crypto", () => ({
+  randomUUID: () => "provisioned-account-id",
+}))
+
+jest.mock("@app/self-custodial/bridge", () => ({
+  ...jest.requireActual("@app/self-custodial/bridge"),
+  selfCustodialCreateWallet: (accountId: string, network: string) =>
+    mockCreateWallet(accountId, network),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockNetwork,
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({
+    reloadSelfCustodialAccounts: mockReloadSelfCustodialAccounts,
+  }),
+}))
+
+describe("useProvisionSelfCustodialAccount", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockCreateWallet.mockResolvedValue(undefined)
+    mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
+  })
+
+  it("creates the wallet, refreshes the registry, and returns the new account id", async () => {
+    const { result } = renderHook(() => useProvisionSelfCustodialAccount())
+
+    const accountId = await result.current.provision()
+
+    expect(accountId).toBe("provisioned-account-id")
+    expect(mockCreateWallet).toHaveBeenCalledWith("provisioned-account-id", mockNetwork)
+    expect(mockReloadSelfCustodialAccounts).toHaveBeenCalledTimes(1)
+  })
+
+  it("refreshes the registry only after the wallet is created", async () => {
+    const order: string[] = []
+    mockCreateWallet.mockImplementation(async () => {
+      order.push("create")
+    })
+    mockReloadSelfCustodialAccounts.mockImplementation(async () => {
+      order.push("reload")
+    })
+
+    const { result } = renderHook(() => useProvisionSelfCustodialAccount())
+    await result.current.provision()
+
+    expect(order).toEqual(["create", "reload"])
+  })
+
+  it("propagates a creation failure without refreshing the registry", async () => {
+    mockCreateWallet.mockRejectedValue(new Error("create failed"))
+
+    const { result } = renderHook(() => useProvisionSelfCustodialAccount())
+
+    await expect(result.current.provision()).rejects.toThrow("create failed")
+    expect(mockReloadSelfCustodialAccounts).not.toHaveBeenCalled()
+  })
+
+  it("runs beforeCreate with the new id before the wallet exists", async () => {
+    const order: string[] = []
+    const beforeCreate = jest.fn(async (accountId: string) => {
+      order.push(`before:${accountId}`)
+    })
+    mockCreateWallet.mockImplementation(async () => {
+      order.push("create")
+    })
+
+    const { result } = renderHook(() => useProvisionSelfCustodialAccount())
+    await result.current.provision(beforeCreate)
+
+    expect(beforeCreate).toHaveBeenCalledWith("provisioned-account-id")
+    expect(order).toEqual(["before:provisioned-account-id", "create"])
+  })
+})

@@ -133,7 +133,6 @@ af, ar, ca, cs, da, de, el, en, es, fr, hr, hu, hy, it, ja, ko, ms, nl, no, pl, 
 | detox | E2E testing |
 | @wdio/cli | WebDriverIO |
 | appium | Mobile automation |
-| @storybook/react-native | Component documentation |
 
 ## Build & Development
 
@@ -182,8 +181,6 @@ yarn tsc            # TypeScript check
 yarn dev:codegen    # Generate GraphQL types
 yarn update-translations  # Update i18n
 
-# Storybook
-yarn storybook      # Component docs
 ```
 
 ## Environment Configuration

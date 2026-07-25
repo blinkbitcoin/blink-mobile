@@ -2279,7 +2279,6 @@
     "notConfirmed": "Okusasula kuweerezeddwa\nnaye tnenakakasibwa\n\nOsobola okukebera embeera\nyo kusasula mu Mpanyisiganya",
     "note": "W'etegereza oba lamba",
     "success": "Okusasula kusindikiddwa bulungi",
-    "suggestionInput": "Ssaamu ekiteeso kyo",
     "max": "Ekisinga obunene",
     "maxAmount": "Omuwendo ogusinga obunene",
     "title": "Sindika Bitcoin",
@@ -2319,6 +2318,10 @@
     "sdkGenericError": "Tesobola kusoma ssente z'obukozi. Gezaako omuwendo omulala."
   },
   "SettingsScreen": {
+    "createAddress": "Kola endagiriro",
+    "donationButton": "Bbatani y'okuwaayo",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Koodi ya QR etali ya kukyukakyuka eyinza okwokyebwaamu",
     "staticQrCopied": "Enyunga yo etakyuuka eya QR code ekoppeddwa",
     "setByOs": "Eteekebwawo OS",
@@ -2327,7 +2330,6 @@
     "apiDashboard": "Okuyingira mu API ne dashiboodi",
     "pos": "Ekifo we Batunda",
     "posCopied": "Ennyunga ku kifo kyo eky'okutunda ekoppeddwa",
-    "setYourLightningAddress": "Kola Endagiriro yo eya Lightning",
     "activated": "Ekoleddwa",
     "addressScreen": "Engeri y'okusasulwa",
     "nonCustodialAccount": "Akawunti etakuumibwa",
@@ -2525,7 +2527,31 @@
     "receivingAccount": "Akawunti Efuna",
     "sendingAccount": "Akawunti Esindika",
     "txNotBroadcast": "Empanyisiganya yo eri mu lunnyiriri. Kisaanye okulabika mu mempool {countdown: string}.",
-    "momentarily": "akaseera katono"
+    "momentarily": "akaseera katono",
+    "findingAccount": "Tunoonya akawunti y'okusasula kuno...",
+    "txNotFoundInAccounts": "Okusasula kuno tekuzuuliddwa mu kawunti yonna ku kyuma kino. Kuyinza okuba nga kwa kawunti eyaggibwamu.",
+    "txLoadFailed": "Tetusobodde kutikka kusasula kuno. Kebera omutimbagano gwo oddemu ogezeeko.",
+    "switchedForPayment": "Tukyusizza ku {identifier: string} okulaga okusasula kuno"
+  },
+  "FeeRatesScreen": {
+    "title": "Emiwendo gy'ebisale",
+    "send": "Sindika",
+    "receive": "Funa",
+    "transfer": "Weereza",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "Onchain eyasooka (mangu ddala)",
+    "onchainStandard": "Onchain eya bulijjo (~4h)",
+    "onchainEconomy": "Onchain ey'omuwendo omutono",
+    "lightningTransactions": "Emirimu gya Lightning",
+    "onchainBelowThreshold": "Onchain wansi wa {threshold: string} SAT",
+    "onchainAboveThreshold": "Onchain waggulu wa {threshold: string} SAT",
+    "transferFee": "Ekisale ky'okuweereza",
+    "noFee": "tewali kisale",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} ekisale ky'okutambuza",
+    "fromApprox": "okuva ku ~{fee: string}",
+    "satAmount": "{amount: string} SAT",
+    "error": "Tetusobodde kufuna bisale mu kiseera kino"
   },
   "TransactionLimitsScreen": {
     "receive": "Funa",
@@ -2700,6 +2726,8 @@
   },
   "common": {
     "country": "Eggwanga",
+    "registered": "Ewandiisiddwa",
+    "detected": "Ezuuliddwa",
     "unknown": "Tekimanyiddwa",
     "enabled": "Esobozeseddwa",
     "switch": "Swichi",
@@ -2719,6 +2747,7 @@
     "anonymousUser": "Omukozesa atamanyiddwa",
     "blinkToBlink": "Blink okutuuka ku Blink",
     "transactionLimits": "Ekomo ku mpaanyisiganya",
+    "feeRates": "Emiwendo gy'ebisale",
     "activateWallet": "Tandika okukozesa Waleti",
     "amountRequired": "Omuwendo gwetagisa",
     "back": "Ddayo",
@@ -2732,6 +2761,7 @@
     "bitcoinPrice": "Okulamula kwa Bitcoin",
     "btcAccount": "Akawunti ya Bitcoin",
     "cancel": "Sazaamu",
+    "card": "Kaadi",
     "close": "Ggalawo",
     "confirm": "Kakasa",
     "convert": "Kyusa",
@@ -2799,6 +2829,7 @@
     "total": "Omugatte",
     "transactions": "Empaanyisiganya",
     "transactionsError": "Ensobi mu kutikka empaanyisiganya",
+    "transfer": "Weereza",
     "tryAgain": "Ddamu ogezeeko",
     "type": "Kika",
     "usdAccount": "Akawunti ya Dola",
@@ -2815,6 +2846,7 @@
     "problemMaybeReauth": "Waabaddewo obuzibu mu kusaba kwo. Nsaba oddemu okugezaako mu ddakiika emu. Singa ekizibu kisigalawo, tukukubiriza okufuluma n’oddamu okuyingira Osobola okufuluma ng’ogenda mu Ensengeka > Akawunti > Fuluma",
     "warning": "Okulabula",
     "continue": "Weyongereyeko",
+    "skip": "Buuka",
     "correct": "Kituufu",
     "recommended": "Ekisingayo okusiimibwa",
     "expirationTime": "Obudde Obw'okuggwa",
@@ -2870,11 +2902,9 @@
     "email": "Email",
     "sms": "SMS",
     "faq": "FAQ",
-    "enjoyingApp": "Onyumirwa omukutu?",
     "statusPage": "Omuko gw'embeera",
     "telegram": "Telegram",
     "mattermost": "Ekisinga obukulu",
-    "thankYouText": "Webale nnyo endowooza yo, wandyagadde okuteesa ku nnongoosereza?",
     "defaultEmailSubject": "{bankName: string} - Okuwagira",
     "defaultSupportMessage": "Ab'eyo! Nze nneetaaga obuyambi ku {bankName: string}, nkozesa enkyusa {type: string} ku {os: string}.",
     "emailCopied": "email {email: string} ekoppedwa ku clipboard",
@@ -3044,6 +3074,66 @@
       "limitUpdateSuccess": "Kkomo ekyusiddwa obulungi",
       "limitUpdateError": "Kkomo tesobodde kukyusibwa",
       "limitMustBePositive": "Kkomo erina okusinga zeero"
+    },
+    "CardFeeSchedule": {
+      "title": "Enteekera y'ebisale bya kaadi ya Blink",
+      "effectiveDate": "Etandika ku Julaayi 1, 2026",
+      "sections": {
+        "cardFees": "Ebisale bya kaadi",
+        "transactionFees": "Ebisale by'entambula",
+        "overdraft": "Okusukkirira (enkola ey'ensimbi)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Ekisale ky'omwaka",
+          "subtitle": "Kisonyiyiddwa omwaka ogusooka okuva ku lunaku kaadi lwe yaweebwa",
+          "value": "{amount: string} / omwaka"
+        },
+        "cardReplacement": {
+          "title": "Okuzza kaadi"
+        },
+        "usdTransactionFee": {
+          "title": "Ekisale ky'entambula mu USD",
+          "subtitle": "Kikozesebwa ku buli ntambula mu ddoola za Amerika"
+        },
+        "foreignTransactionFee": {
+          "title": "Ekisale ky'entambula ey'ebweru",
+          "subtitle": "Kikozesebwa ku buli ntambula mu ssente ezitali ddoola za Amerika"
+        },
+        "maximumOverdraft": {
+          "title": "Okusukkirira okusinga obungi",
+          "subtitle": "Kiteekwa okusasulwa mu nnaku 7"
+        },
+        "lateRepaymentFee": {
+          "title": "Ekisale ky'okusasula mu kkerezo",
+          "subtitle": "Kisasulwa singa okusukkirira tekusasulwa mu nnaku 7"
+        }
+      },
+      "btcConversion": {
+        "title": "Okukyusa BTC",
+        "body": "Entambula bw'eyetaagisa okukyusa BTC okudda mu USD, okukyusa kukolebwa ku muwendo gw'okuwanyisiganya oguliwo, oguyinza okuli n'omugabo ogulaga omuwendo gw'okukyusa."
+      },
+      "feesUpdateNotice": {
+        "text": "Ebisale biyinza okukyusibwa okuva ku kiseera okutuuka ku kiseera. Blink ajja kuwa obubaka nga wakyasigadde ennaku 30 nga tebinnaba kufuuka bikyukakyuka byonna eby'ebisale, okusinziira ku",
+        "linkText": "Endagaano y'omukozesa wa kaadi"
+      },
+      "creditModeNotice": "Enkola ya Kredit tekyakola kati. Singa Enkola ya Kredit ekola, emiwendo gy'amagoba, ebisale, n'okubikkula ku ddembe ly'okusasula biraweebwa nga tekinnaba kukola.",
+      "additionalDetails": {
+        "title": "Ebisingawo ku bisale",
+        "overdraft": {
+          "label": "Okusukkirira",
+          "text": ". Mu mbeera ezimu, entambula eyinza okukkirizibwa ereeta ssente eziri ku kaadi yo okukka wansi wa ziro. Okusukkirira okusinga obungi ye {maxOverdraft: string}. Oteekwa okusasula okusukkirira mu nnaku 7 nga otambuza ssente ezongerezeddwa ku ssente eziri ku kaadi yo."
+        },
+        "foreignCurrency": {
+          "label": "Ssente z'ebweru",
+          "text": ". Bw'okola entambula mu ssente z'ebweru, omukutu gwa kaadi gukyusa mu USD nga gukozesa enkola zaagwo ez'okukyusa. Omuwendo ku lunaku olw'okukola guyinza okuba ogw'enjawulo ku lunaku lw'entambula."
+        },
+        "noHiddenFees": {
+          "label": "Tewali bisale bikweke",
+          "text": ". Tewali bisale ku kutandikawo akkaawunti, obutakola, okubuuza ku ssente eziriwo, oba okuggalawo kaadi yo."
+        }
+      },
+      "backButton": "Ddayo"
     },
     "CardDetails": {
       "title": "Ebikwata ku kaadi",
@@ -3390,6 +3480,7 @@
         "perYear": "buli mwaka",
         "status": {
           "label": "Embeera",
+          "specialOfferLabel": "Ekirabo eky'enjawulo",
           "paymentPending": "Okusasula Kulindirira",
           "firstYearFree": "Omwaka ogusooka ogw'obwereere"
         },
@@ -3403,7 +3494,11 @@
           "cardholderAgreement": "Endagaano y'Omukozesa Kaadi",
           "and": "ne"
         },
-        "renew": "Ntegeera nti obuwandiisi bwange bujja kuddamu okuwandiisibwa mu mwaka 1"
+        "feeSchedule": {
+          "text": "Nkakasizza era nkkiriza",
+          "linkText": "Oluwendo lw'ebisale bya Blink Card"
+        },
+        "renew": "Ntegeera nti okwewandiisa kwange kujja kuddaabirizibwa okwokwokka nga wayiseewo emyezi {months: number}"
       },
       "CardIntroducing": {
         "title": "Okwanjula",
@@ -3465,13 +3560,29 @@
         "buttonText": "Sindika esabibu",
         "select": "londa"
       },
+      "Acknowledgement": {
+        "title": "Ebiragiro n'embeera",
+        "acceptButton": "Kkiriza",
+        "eSignConsent": {
+          "text": "Nkkiriza",
+          "linkText": "okukkiriza okussaako omukono ogwa elekitulooniki"
+        },
+        "privacyAndTerms": {
+          "text": "Nkkiriza",
+          "privacyPolicyLinkText": "Enkola y'eby'ekyama ey'omuwi",
+          "and": ", ne",
+          "cardTermsLinkText": "Ebiragiro bya kaadi ya Blink"
+        },
+        "certifyAccuracy": "Nkakasa nti amawulire ge mpadeeyo matuufu era nti nnaagobereranga amateeka gonna n'ebyetaagisa ebikwata ku kaadi yange eya Blink Visa",
+        "acknowledgeSolicitation": "Ntegeera nti okusaba kaadi ya Blink Visa tekitegeeza kusaba okutakkirizibwa"
+      },
       "CardPreapproved": {
         "title": "Okakasiddwa okusookera ku kaadi ya Blink Visa!",
         "buttonText": "Ggalawo"
       },
       "CardProcessing": {
         "title": "Tukola ku sabiibu yo",
-        "subtitle": "Obudde obw'okulinda obusuubirwa: {waitTime: string}",
+        "subtitle": "Tujja kukumanyisa nga tumaze okuteekateeka",
         "buttonText": "Ggala"
       }
     }
@@ -3499,6 +3610,7 @@
       },
       "Phrase": {
         "headerTitle": "Ebigambo by'enkalakkalira",
+        "authDescription": "Kakasa okulaba ebigambo byo eby'enkalakkalira",
         "sparkCompatible": "Ekigambo kino eky'okukoppa kikola mu {sparkCompatibleLink} yonna",
         "sparkCompatibleLink": "nsawo eyekuvaanyizibwa ne Spark",
         "copiedToast": "Ekigambo eky'okukoppa kiwanduukuliddwa ku lutimbe",
@@ -3538,6 +3650,7 @@
       "uploadSuccess": "Kopi eterekedwa mu {provider}",
       "uploadFailed": "Enteeka y'ekopi teeyasoboka",
       "signInFailed": "Okuyingira mu {provider} kukomye",
+      "storageAccessRequired": "Kkiriza {provider: string} okuyingira ku kopi ya wallet yo, oluvannyuma ogezeeko nate.",
       "cloudNotAvailable": "iCloud Drive teweza. Yingira mu iCloud mu Settings era okkirize iCloud Drive.",
       "networkError": "Ensobi y'omukutu. Kebera enkolagana yo era oddemu okugezaako.",
       "existingBackupTitle": "Kopi efuniddwa",
@@ -3549,13 +3662,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Tuukirire ab'obuyambi",
+      "body": "Waliwo ekitagenze bulungi, naye tofaayo, ssente zo nnywevu. Tuukirira ab'obuyambi bakuyambe.\n\nOyinza okwetaaga ebikwata ku bino okuyamba ab'obuyambi okugonjoola ensonga yo:",
+      "reasonLabel": "Ensonga",
+      "accountIdLabel": "ID ya akawunti",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Erinnya ly'omukozesa",
+      "emailLabel": "Email",
+      "phoneLabel": "Ennamba y'essimu",
+      "appVersionLabel": "Ekika kya app",
+      "platformLabel": "Pulatifomu",
+      "countryLabel": "Ensi",
+      "emailSubject": "Okusaba obuyambi ku kutambuza akawunti",
+      "emailDescribeProblem": "Nnyonnyola ekizibu:",
+      "emailAccountInfo": "Ebikwata ku akawunti eby'obuyambi:",
+      "contactUsCta": "Tutuukirire",
+      "copy": "Koppa"
+    },
+    "migrateNowModal": {
+      "title": "Kyusa kaakano ogende ku akawunti etakuumibwa",
+      "body": "Tokyasobola kufuna ssente ku akawunti yo ekuumibwa. Blink evuddeyo mu mpeereza y'okukuuma ssente mu kitundu kyo, era akawunti eno ejja kuggalwawo nga {date} ewedde.\n\nKyusa kaakano ogende ku akawunti etakuumibwa.",
+      "migrateCta": "Kyusa kaakano"
+    },
+    "reminderBulletin": {
+      "title": "Kikulu",
+      "body": "Kyusa ogende ku akawunti etakuumibwa ng'oyita mu ntambuza erungamizibwa, oba oggyeyo ssente zo, nga {date} tennatuuka. Okufuna kukoma nga {receiveStopsDate}.",
+      "migrateCta": "Kyusa"
+    },
+    "offboardBulletin": {
+      "title": "Kikulu",
+      "body": "Akkawunti yo ewandiisiddwa mu kitundu gye tutasobola kuwaayo kkawunti. Ggyamu ssente zo nga tennatuuka nga 31 Agusito. Okufuna kuyimirira nga 10 Agusito."
+    },
+    "dollarBalanceModal": {
+      "title": "Tetusobola kutambuza ssente zo eza doola",
+      "body": "Sooka omalewo ssente zo eza doola. Osobola okuzisindika ku ssente zo eza Bitcoin mu Blink oba awalala."
+    },
+    "balancesOverview": {
+      "title": "Tambuza ssente zo",
+      "body": "Tambuza ssente zo mu bukuumi ku kawunti yo empya.",
+      "currentBitcoinBalance": "Ssente za Bitcoin eziriwo kati",
+      "currentDollarBalance": "Ssente za ddoola eziriwo kati",
+      "newBitcoinBalance": "Ssente za Bitcoin empya",
+      "newDollarBalance": "Ssente za ddoola empya",
+      "dollarBalanceNotAvailable": "tezeewo",
+      "networkFee": "Ssente z'omukutu: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Ssente z'omukutu: <bold>{fee: string}</bold> (zisasulwa Blink)",
+      "retryCta": "Ddamu ogezeeko",
+      "approveCta": "Kkiriza",
+      "contactSupportCta": "Tuukirira obuyambi"
+    },
+    "migrationRequiredTitle": "Ekiseera ky'okuzza omu maaso",
+    "keepReceivingTitle": "Weyongere okufuna nga bulijjo",
+    "keepReceivingBody": "Endagiriro yo eya Lightning ejja kusengulwa mu kawunti yo empya eya non-custodial.",
+    "keepReceivingLnAddressLabel": "Endagiriro yo eya LN",
+    "keepReceivingCta": "Kirungi",
+    "receivingDisabledToast": "Okufuna kaakati tekusoboka.",
+    "downloadHistoryTitle": "Sika ebyafaayo by'ensimbi zo",
+    "downloadHistoryBody": "Akaawunti yo empya ejja kutandika bupya. Bw'oba oyagala okukuuma ebiwandiiko by'ensimbi zo, bisike kati nga CSV.",
+    "downloadHistoryDownloadCta": "Sika",
+    "apiServiceTitle": "Empeereza ya API tekolawo",
+    "apiServiceBody": "Tulaba nti olina ebisumuluzo bya API ebikola. Blink tesobola kuwa API mu ngeri ya non-custodial.\n\nBw'oba weesigamye ku API ya Blink, tukwatagane naffe amangu era tujja kukola kyonna ekisoboka okuyamba mu nkyukakyuka enteefu.",
+    "apiServiceContactCta": "Tukwatagane naffe",
+    "apiServiceContinueCta": "Weeyongereyo wadde kiri kityo",
+    "resumeFailed": "Waliwo ekitagenze bulungi nga tuddamu okukyusa kwo. Bambi ddamu okitandike.",
+    "migrationRequiredBody": "Kiseera ky'okujja akawunti yo ekuumibwa ogigirre mu akawunti etakuumibwa.",
+    "migrationRequiredForcedBody": "Kiseera ky'okujja akawunti yo ekuumibwa ogigirre mu akawunti etakuumibwa. Kyetaagisa olw'ensonga z'amateeka.\n\nTeweeraliikirira, non-custodial ejja kuba nnungi gy'oli mu kiseera ekiwanvu.",
+    "migrationGateTitle": "Akawunti tesobola kutuukirirwa",
+    "migrationGateBody": "Olw'ensonga z'amateeka tetusobola kuwa bakawunti za custodial mu kitundu kyo. Tambuza ssente zo ku kawunti eya non-custodial ne Blink ng'ogoberera emitendera egiddako oba otuukirire ku <link>{email}</link>",
+    "bitcoinBalance": "Bbalansi ya Bitcoin",
+    "dollarBalance": "Bbalansi ya doola",
     "moveToNonCustodial": "Tuuka ku non-custodial",
     "explainerTitle": "Kitegeeza ki okutuuka ku non-custodial?",
-    "explainerStep1": "Ojja okukola akawunti ya non-custodial ku Spark protocol, <link>yiga ebisingawo wano</link>",
-    "explainerStep2": "Tutwala ssente zo ku akawunti yo empya eya non-custodial n'akawunti yo eriwo ejja kusazibwamu",
-    "explainerStep3": "Weyongere okukozesa Blink nga bulijjo",
-    "letsMove": "Ka tugende",
-    "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono."
+    "explainerCheck1": "Ojja okukola akawunti ya non-custodial ku Spark protocol",
+    "explainerCheck2": "Tutambuza ssente zo mu kawunti yo empya eya non-custodial",
+    "explainerCheck3": "Akawunti yo eya kati n'ebiwandiiko byayo byonna omuli n'ebyafaayo by'ensimbi bijja kuggalwa",
+    "explainerCheck4": "Blink API tejja kubaawo",
+    "explainerCheck5": "Ku kawunti yo kujja kusalibwako ssente z'omukutu gwa Spark",
+    "explainerCta": "Ntegedde",
+    "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono.",
+    "clockOutOfSync": {
+      "body": "Ennaku n'obudde bw'ekyuma kyo tebituukagana. Bisseeko ku otomatiki osobole okweyongerayo.",
+      "retryCta": "Ddamu ogezaako"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Eterekeddwa",
@@ -3605,6 +3794,11 @@
     "modalDescription": "Tukutegeeza nnyo okukola backup ya wallet yo okusobola okuziyiza okufiirwa ssente zo zonna bw'onooba ofiirwa device eno.",
     "secureMe": "Kuuma wallet"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Eno ye akawunti etakuumibwa",
+    "body": "Okumanya ebisingawo, soma blog yaffe",
+    "cta": "Soma"
+  },
   "StableBalance": {
     "title": "Bbaalansi ennywevu",
     "description": "Kuuma bbaalansi mu USD n'obuyambi bwa USDB ku Spark.",
@@ -3652,10 +3846,10 @@
     "lightningPayment": "Okusasula Lightning",
     "onchainDeposit": "Okuteeka On-chain",
     "onchainWithdrawal": "Okuggya On-chain",
-    "conversionFromBitcoin": "Okukyusa okuva mu Bitcoin",
-    "conversionToBitcoin": "Okukyusa okudda mu Bitcoin",
-    "conversionFromToken": "Okukyusa okuva mu {token}",
-    "conversionToToken": "Okukyusa okudda mu {token}",
+    "transferFromBitcoinBalance": "Okuseesengula okuva mu Bitcoin Balance",
+    "transferToBitcoinBalance": "Okuseesengula okudda mu Bitcoin Balance",
+    "transferFromTokenBalance": "Okuseesengula okuva mu {token} balance",
+    "transferToTokenBalance": "Okuseesengula okudda mu {token} balance",
     "tokenTransfer": "Okukyusa {token}",
     "payTo": "Sasula {address}",
     "payment": "Okusasula"

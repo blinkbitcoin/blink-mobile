@@ -2279,7 +2279,6 @@
     "notConfirmed": "Pembayaran telah dikirim\ntapi belum dikonfirmasi\n\nAnda dapat memeriksa status\npembayaran di Transaksi",
     "note": "Catatan atau label",
     "success": "Pembayaran berhasil dikirim",
-    "suggestionInput": "Masukkan saran Anda",
     "max": "Maks",
     "maxAmount": "Jumlah Maksimum",
     "title": "Kirim Bitcoin",
@@ -2319,6 +2318,10 @@
     "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda."
   },
   "SettingsScreen": {
+    "createAddress": "Buat alamat",
+    "donationButton": "Tombol donasi",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Kode QR Statis yang Dapat Dicetak",
     "staticQrCopied": "Tautan kode QR statis Anda telah disalin",
     "setByOs": "Ditentukan oleh OS",
@@ -2327,7 +2330,6 @@
     "apiDashboard": "Akses API dan dasbor",
     "pos": "Tempat Penjualan",
     "posCopied": "Tautan tempat penjualan Anda telah disalin",
-    "setYourLightningAddress": "Atur Alamat Lightning Anda",
     "activated": "Diaktifkan",
     "addressScreen": "Cara menerima pembayaran",
     "nonCustodialAccount": "Akun non-kustodial",
@@ -2525,7 +2527,31 @@
     "receivingAccount": "Akun Penerima",
     "sendingAccount": "Akun Pengirim",
     "txNotBroadcast": "Transaksi Anda sedang antri. Itu akan muncul di mempool {countdown: string}.",
-    "momentarily": "sebentar lagi"
+    "momentarily": "sebentar lagi",
+    "findingAccount": "Mencari akun untuk pembayaran ini...",
+    "txNotFoundInAccounts": "Pembayaran ini tidak ditemukan di akun mana pun di perangkat ini. Mungkin milik akun yang telah keluar.",
+    "txLoadFailed": "Tidak dapat memuat pembayaran ini. Periksa koneksi Anda dan coba lagi.",
+    "switchedForPayment": "Beralih ke {identifier: string} untuk menampilkan pembayaran ini"
+  },
+  "FeeRatesScreen": {
+    "title": "Tarif biaya",
+    "send": "Kirim",
+    "receive": "Terima",
+    "transfer": "Transfer",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "Onchain prioritas (secepatnya)",
+    "onchainStandard": "Onchain standar (~4 jam)",
+    "onchainEconomy": "Onchain ekonomis",
+    "lightningTransactions": "Transaksi Lightning",
+    "onchainBelowThreshold": "Onchain di bawah {threshold: string} SAT",
+    "onchainAboveThreshold": "Onchain di atas {threshold: string} SAT",
+    "transferFee": "Biaya transfer",
+    "noFee": "tanpa biaya",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} biaya routing",
+    "fromApprox": "mulai ~{fee: string}",
+    "satAmount": "{amount: string} SAT",
+    "error": "Tidak dapat mengambil biaya saat ini"
   },
   "TransactionLimitsScreen": {
     "receive": "Terima",
@@ -2700,6 +2726,8 @@
   },
   "common": {
     "country": "Negara",
+    "registered": "Terdaftar",
+    "detected": "Terdeteksi",
     "unknown": "Tidak diketahui",
     "enabled": "Diaktifkan",
     "switch": "Sakelar",
@@ -2719,6 +2747,7 @@
     "anonymousUser": "Pengguna anonim",
     "blinkToBlink": "Blink ke Blink",
     "transactionLimits": "Batas Transaksi",
+    "feeRates": "Tarif biaya",
     "activateWallet": "Aktifkan Dompet",
     "amountRequired": "Jumlah diperlukan",
     "back": "Kembali",
@@ -2732,6 +2761,7 @@
     "bitcoinPrice": "Harga Bitcoin",
     "btcAccount": "Akun Bitcoin",
     "cancel": "Batal",
+    "card": "Kartu",
     "close": "Tutup",
     "confirm": "Konfirmasi",
     "convert": "Konversi",
@@ -2799,6 +2829,7 @@
     "total": "Total",
     "transactions": "Transaksi",
     "transactionsError": "Kesalahan memuat transaksi",
+    "transfer": "Transfer",
     "tryAgain": "Coba Lagi",
     "type": "Tipe",
     "usdAccount": "Akun Dolar",
@@ -2815,6 +2846,7 @@
     "problemMaybeReauth": "Ada masalah dengan permintaan Anda. Silakan coba lagi dalam satu menit. Jika masalah berlanjut, kami sarankan Anda keluar dan masuk kembali. Anda dapat keluar melalui Pengaturan > Akun > Keluar",
     "warning": "Peringatan",
     "continue": "Lanjutkan",
+    "skip": "Lewati",
     "correct": "Benar",
     "recommended": "Direkomendasikan",
     "expirationTime": "Waktu Kedaluwarsa",
@@ -2870,11 +2902,9 @@
     "email": "Email",
     "sms": "SMS",
     "faq": "FAQ",
-    "enjoyingApp": "Enjoying the app?",
     "statusPage": "Status Page",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Terima kasih atas masukan Anda, apakah Anda ingin menyarankan perbaikan?",
     "defaultEmailSubject": "{bankName: string} - Dukungan",
     "defaultSupportMessage": "Halo! Saya membutuhkan bantuan dengan {bankName: string}, saya menggunakan versi {version: string} pada {os: string}.",
     "emailCopied": "email {email: string} disalin ke clipboard",
@@ -3044,6 +3074,66 @@
       "limitUpdateSuccess": "Batas berhasil diperbarui",
       "limitUpdateError": "Gagal memperbarui batas",
       "limitMustBePositive": "Batas harus lebih besar dari nol"
+    },
+    "CardFeeSchedule": {
+      "title": "Jadwal biaya Kartu Blink",
+      "effectiveDate": "Berlaku mulai 1 Juli 2026",
+      "sections": {
+        "cardFees": "Biaya kartu",
+        "transactionFees": "Biaya transaksi",
+        "overdraft": "Cerukan (mode terdanai)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Biaya tahunan",
+          "subtitle": "Dibebaskan untuk tahun pertama sejak tanggal penerbitan Kartu",
+          "value": "{amount: string} / tahun"
+        },
+        "cardReplacement": {
+          "title": "Penggantian kartu"
+        },
+        "usdTransactionFee": {
+          "title": "Biaya transaksi USD",
+          "subtitle": "Dikenakan pada setiap transaksi dalam dolar AS"
+        },
+        "foreignTransactionFee": {
+          "title": "Biaya transaksi luar negeri",
+          "subtitle": "Dikenakan pada setiap transaksi dalam mata uang selain dolar AS"
+        },
+        "maximumOverdraft": {
+          "title": "Cerukan maksimum",
+          "subtitle": "Harus dilunasi dalam 7 hari"
+        },
+        "lateRepaymentFee": {
+          "title": "Biaya pembayaran terlambat",
+          "subtitle": "Dikenakan jika cerukan tidak dilunasi dalam 7 hari"
+        }
+      },
+      "btcConversion": {
+        "title": "Konversi BTC",
+        "body": "Ketika transaksi memerlukan konversi BTC ke USD, konversi dilakukan pada nilai tukar yang berlaku, yang mungkin mencakup spread yang mencerminkan biaya konversi."
+      },
+      "feesUpdateNotice": {
+        "text": "Biaya dapat diperbarui dari waktu ke waktu. Blink akan memberikan pemberitahuan setidaknya 30 hari sebelum perubahan biaya berlaku, sesuai dengan",
+        "linkText": "Perjanjian Pemegang Kartu"
+      },
+      "creditModeNotice": "Mode Kredit saat ini tidak aktif. Jika Mode Kredit diaktifkan, suku bunga, biaya, dan pengungkapan hak penagihan yang berlaku akan diberikan sebelum aktivasi.",
+      "additionalDetails": {
+        "title": "Detail biaya tambahan",
+        "overdraft": {
+          "label": "Cerukan",
+          "text": ". Dalam keadaan tertentu, transaksi dapat disetujui yang menyebabkan saldo Kartu Anda turun di bawah nol. Cerukan maksimum adalah {maxOverdraft: string}. Anda harus melunasi cerukan dalam 7 hari dengan mentransfer dana tambahan ke saldo Kartu Anda."
+        },
+        "foreignCurrency": {
+          "label": "Mata uang asing",
+          "text": ". Jika Anda melakukan transaksi dalam mata uang asing, jaringan kartu mengonversinya ke USD menggunakan prosedur konversinya sendiri. Nilai tukar pada tanggal pemrosesan dapat berbeda dari tanggal transaksi."
+        },
+        "noHiddenFees": {
+          "label": "Tanpa biaya tersembunyi",
+          "text": ". Tidak ada biaya untuk pembukaan akun, ketidakaktifan, pemeriksaan saldo, atau penutupan kartu Anda."
+        }
+      },
+      "backButton": "Kembali"
     },
     "CardDetails": {
       "title": "Detail kartu",
@@ -3390,6 +3480,7 @@
         "perYear": "per tahun",
         "status": {
           "label": "Status",
+          "specialOfferLabel": "Penawaran khusus",
           "paymentPending": "Pembayaran Tertunda",
           "firstYearFree": "Tahun pertama gratis"
         },
@@ -3403,7 +3494,11 @@
           "cardholderAgreement": "Perjanjian Pemegang Kartu",
           "and": "dan"
         },
-        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam 1 tahun"
+        "feeSchedule": {
+          "text": "Saya telah meninjau dan menyetujui",
+          "linkText": "Jadwal Biaya Blink Card"
+        },
+        "renew": "Saya memahami bahwa langganan saya akan diperpanjang secara otomatis dalam {months: number} bulan"
       },
       "CardIntroducing": {
         "title": "Memperkenalkan",
@@ -3465,13 +3560,29 @@
         "buttonText": "Kirim aplikasi",
         "select": "pilih"
       },
+      "Acknowledgement": {
+        "title": "Syarat dan ketentuan",
+        "acceptButton": "Terima",
+        "eSignConsent": {
+          "text": "Saya menerima",
+          "linkText": "Persetujuan Tanda Tangan Elektronik"
+        },
+        "privacyAndTerms": {
+          "text": "Saya menerima",
+          "privacyPolicyLinkText": "Kebijakan Privasi penerbit",
+          "and": ", dan",
+          "cardTermsLinkText": "Ketentuan Kartu Blink"
+        },
+        "certifyAccuracy": "Saya menyatakan bahwa informasi yang saya berikan akurat dan bahwa saya akan mematuhi semua aturan dan persyaratan terkait Kartu Blink Visa saya",
+        "acknowledgeSolicitation": "Saya mengakui bahwa mengajukan permohonan Kartu Blink Visa bukan merupakan permintaan yang tidak sah"
+      },
       "CardPreapproved": {
         "title": "Anda telah disetujui sebelumnya untuk kartu Blink Visa!",
         "buttonText": "Tutup"
       },
       "CardProcessing": {
         "title": "Memproses aplikasi Anda",
-        "subtitle": "Perkiraan waktu tunggu: {waitTime: string}",
+        "subtitle": "Kami akan memberi tahu Anda setelah kami siap",
         "buttonText": "Tutup"
       }
     }
@@ -3499,6 +3610,7 @@
       },
       "Phrase": {
         "headerTitle": "Frasa cadangan",
+        "authDescription": "Autentikasi untuk melihat frasa cadangan Anda",
         "sparkCompatible": "Frasa cadangan ini berfungsi di {sparkCompatibleLink} mana pun",
         "sparkCompatibleLink": "dompet yang kompatibel dengan Spark",
         "copiedToast": "Frasa cadangan disalin ke papan klip",
@@ -3538,6 +3650,7 @@
       "uploadSuccess": "Cadangan disimpan ke {provider}",
       "uploadFailed": "Gagal mengunggah cadangan",
       "signInFailed": "Gagal masuk ke {provider}",
+      "storageAccessRequired": "Izinkan akses {provider: string} ke cadangan dompet Anda, lalu coba lagi.",
       "cloudNotAvailable": "iCloud Drive tidak tersedia. Silakan masuk ke iCloud di Pengaturan dan aktifkan iCloud Drive.",
       "networkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
       "existingBackupTitle": "Cadangan ditemukan",
@@ -3549,13 +3662,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Hubungi dukungan",
+      "body": "Terjadi kesalahan, tetapi jangan khawatir, dana Anda aman. Silakan hubungi dukungan untuk mendapatkan bantuan.\n\nAnda mungkin memerlukan informasi ini untuk membantu dukungan menyelesaikan kasus Anda:",
+      "reasonLabel": "Alasan",
+      "accountIdLabel": "ID akun",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Nama pengguna",
+      "emailLabel": "Email",
+      "phoneLabel": "Nomor telepon",
+      "appVersionLabel": "Versi aplikasi",
+      "platformLabel": "Platform",
+      "countryLabel": "Negara",
+      "emailSubject": "Permintaan dukungan migrasi",
+      "emailDescribeProblem": "Jelaskan masalahnya:",
+      "emailAccountInfo": "Informasi akun untuk dukungan:",
+      "contactUsCta": "Hubungi kami",
+      "copy": "Salin"
+    },
+    "migrateNowModal": {
+      "title": "Migrasikan sekarang ke akun non-kustodial",
+      "body": "Anda tidak dapat lagi menerima dana di akun kustodial Anda. Blink telah menghentikan layanan kustodial di wilayah Anda dan akun ini akan dinonaktifkan pada akhir {date}.\n\nMigrasikan sekarang ke akun non-kustodial.",
+      "migrateCta": "Migrasi sekarang"
+    },
+    "reminderBulletin": {
+      "title": "Penting",
+      "body": "Beralihlah ke akun non-kustodial melalui migrasi terpandu, atau tarik dana Anda, sebelum {date}. Penerimaan berhenti pada {receiveStopsDate}.",
+      "migrateCta": "Migrasi"
+    },
+    "offboardBulletin": {
+      "title": "Penting",
+      "body": "Akun Anda terdaftar di wilayah yang tidak dapat kami tawari akun. Tarik dana Anda sebelum 31 Agustus. Penerimaan berhenti pada 10 Agustus."
+    },
+    "dollarBalanceModal": {
+      "title": "Kami tidak dapat memigrasikan Saldo Dolar Anda",
+      "body": "Kosongkan Saldo Dolar Anda terlebih dahulu. Anda dapat mentransfernya ke Saldo Bitcoin di Blink atau ke tempat lain."
+    },
+    "balancesOverview": {
+      "title": "Pindahkan saldo Anda",
+      "body": "Pindahkan dana Anda dengan aman ke akun baru Anda.",
+      "currentBitcoinBalance": "Saldo Bitcoin saat ini",
+      "currentDollarBalance": "Saldo Dolar saat ini",
+      "newBitcoinBalance": "Saldo Bitcoin baru",
+      "newDollarBalance": "Saldo Dolar baru",
+      "dollarBalanceNotAvailable": "tidak tersedia",
+      "networkFee": "Biaya jaringan: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Biaya jaringan: <bold>{fee: string}</bold> (ditanggung oleh Blink)",
+      "retryCta": "Coba lagi",
+      "approveCta": "Setujui",
+      "contactSupportCta": "Hubungi dukungan"
+    },
+    "migrationRequiredTitle": "Saatnya memutakhirkan",
+    "keepReceivingTitle": "Terus terima seperti biasa",
+    "keepReceivingBody": "Alamat Lightning Anda akan dipindahkan ke akun non-custodial baru Anda.",
+    "keepReceivingLnAddressLabel": "Alamat LN Anda",
+    "keepReceivingCta": "Bagus",
+    "receivingDisabledToast": "Penerimaan saat ini dinonaktifkan.",
+    "downloadHistoryTitle": "Unduh riwayat transaksi Anda",
+    "downloadHistoryBody": "Akun baru Anda akan dimulai dari awal. Jika Anda ingin menyimpan catatan transaksi Anda, unduh sekarang sebagai CSV.",
+    "downloadHistoryDownloadCta": "Unduh",
+    "apiServiceTitle": "Layanan API tidak tersedia",
+    "apiServiceBody": "Kami melihat bahwa Anda memiliki kunci API aktif. Blink tidak dapat menyediakan API dalam mode non-custodial.\n\nJika Anda bergantung pada API Blink, hubungi kami segera dan kami akan berusaha sebaik mungkin untuk membantu transisi yang mulus.",
+    "apiServiceContactCta": "Hubungi kami",
+    "apiServiceContinueCta": "Tetap lanjutkan",
+    "resumeFailed": "Terjadi kesalahan saat melanjutkan migrasi Anda. Silakan mulai lagi dari awal.",
+    "migrationRequiredBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial.",
+    "migrationRequiredForcedBody": "Saatnya memigrasikan akun kustodial Anda ke akun non-kustodial. Ini diperlukan karena alasan regulasi.\n\nTidak perlu khawatir, non-custodial akan lebih baik untukmu dalam jangka panjang.",
+    "migrationGateTitle": "Akun tidak dapat diakses",
+    "migrationGateBody": "Karena alasan regulasi, kami tidak dapat menyediakan akun custodial di wilayahmu. Transfer danamu ke akun non-custodial dengan Blink dengan mengikuti langkah berikut atau hubungi kami di <link>{email}</link>",
+    "bitcoinBalance": "Saldo Bitcoin",
+    "dollarBalance": "Saldo dolar",
     "moveToNonCustodial": "Pindah ke non-custodial",
     "explainerTitle": "Apa artinya pindah ke non-custodial?",
-    "explainerStep1": "Anda akan membuat akun non-custodial di protokol Spark, <link>pelajari lebih lanjut di sini</link>",
-    "explainerStep2": "Kami mentransfer dana Anda ke akun non-custodial baru dan akun Anda saat ini akan dihapus",
-    "explainerStep3": "Terus gunakan Blink seperti biasa",
-    "letsMove": "Ayo mulai",
-    "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik."
+    "explainerCheck1": "Anda akan membuat akun non-custodial di protokol Spark",
+    "explainerCheck2": "Kami memindahkan dana Anda ke akun non-custodial baru Anda",
+    "explainerCheck3": "Akun Anda saat ini dan semua datanya termasuk riwayat transaksi akan ditutup",
+    "explainerCheck4": "Blink API tidak akan tersedia",
+    "explainerCheck5": "Akun Anda akan dikenakan biaya jaringan Spark",
+    "explainerCta": "Saya mengerti",
+    "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik.",
+    "clockOutOfSync": {
+      "body": "Tanggal dan waktu perangkat Anda tidak sinkron. Atur ke otomatis untuk melanjutkan.",
+      "retryCta": "Coba lagi"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Kustodian",
@@ -3605,6 +3794,11 @@
     "modalDescription": "Kami sangat menyarankan Anda untuk mencadangkan dompet Anda untuk mencegah kehilangan total dana jika Anda kehilangan perangkat ini.",
     "secureMe": "Amankan dompet"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Ini adalah akun non-kustodial",
+    "body": "Untuk mempelajari lebih lanjut, baca postingan blog kami",
+    "cta": "Baca"
+  },
   "StableBalance": {
     "title": "Saldo stabil",
     "description": "Simpan saldo dalam USD didukung USDB di Spark.",
@@ -3652,10 +3846,10 @@
     "lightningPayment": "Pembayaran Lightning",
     "onchainDeposit": "Deposit On-chain",
     "onchainWithdrawal": "Penarikan On-chain",
-    "conversionFromBitcoin": "Konversi dari Bitcoin",
-    "conversionToBitcoin": "Konversi ke Bitcoin",
-    "conversionFromToken": "Konversi dari {token}",
-    "conversionToToken": "Konversi ke {token}",
+    "transferFromBitcoinBalance": "Transfer dari Saldo Bitcoin",
+    "transferToBitcoinBalance": "Transfer ke Saldo Bitcoin",
+    "transferFromTokenBalance": "Transfer dari saldo {token}",
+    "transferToTokenBalance": "Transfer ke saldo {token}",
     "tokenTransfer": "Transfer {token}",
     "payTo": "Bayar ke {address}",
     "payment": "Pembayaran"

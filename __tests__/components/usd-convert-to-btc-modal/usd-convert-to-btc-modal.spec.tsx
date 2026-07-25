@@ -8,13 +8,8 @@ import { toUsdMoneyAmount } from "@app/types/amounts"
 import { ThemeProvider } from "@rn-vui/themed"
 
 const mockFormatMoneyAmount = jest.fn(
-  ({
-    moneyAmount,
-    isApproximate,
-  }: {
-    moneyAmount: { amount: number; currency: string }
-    isApproximate?: boolean
-  }) => `${isApproximate ? "~ " : ""}${moneyAmount.currency}:${moneyAmount.amount}`,
+  ({ moneyAmount }: { moneyAmount: { amount: number; currency: string } }) =>
+    `${moneyAmount.currency}:${moneyAmount.amount}`,
 )
 
 const mockConvertMoneyAmount = jest.fn((_moneyAmount: unknown, toCurrency: string) => ({
@@ -91,44 +86,16 @@ describe("UsdConvertToBtcModal", () => {
     })
   })
 
-  it("renders the title and body", () => {
-    const { getByText } = renderModal()
-
-    expect(getByText("Dollar Balance is not available in your region")).toBeTruthy()
-    expect(getByText("Transfer from Dollar Balance to Bitcoin Balance")).toBeTruthy()
-  })
-
-  it("renders the You have and You get labels", () => {
-    const { getByText } = renderModal()
-
-    expect(getByText("You have")).toBeTruthy()
-    expect(getByText("You get")).toBeTruthy()
-  })
-
-  it("shows the USD wallet balance as the You have value (not approximate)", () => {
-    const { getByText } = renderModal()
-
-    expect(mockFormatMoneyAmount).toHaveBeenCalledWith({ moneyAmount: usdBalance })
-    expect(getByText("USD:10001")).toBeTruthy()
-  })
-
-  it("converts the balance to BTC and renders it as an approximate You get value", () => {
-    const { getByText } = renderModal()
-
-    expect(mockConvertMoneyAmount).toHaveBeenCalledWith(usdBalance, WalletCurrency.Btc)
-    expect(mockFormatMoneyAmount).toHaveBeenCalledWith({
-      moneyAmount: { amount: 129184, currency: WalletCurrency.Btc, currencyCode: "BTC" },
-      isApproximate: true,
-    })
-    expect(getByText("~ BTC:129184")).toBeTruthy()
-  })
-
-  it("triggers the conversion when Transfer is pressed", () => {
+  it("converts the full balance between the account's own wallets on Transfer", () => {
     const { getByText } = renderModal()
 
     fireEvent.press(getByText("Transfer"))
 
-    expect(mockExecute).toHaveBeenCalledTimes(1)
+    expect(mockExecute).toHaveBeenCalledWith({
+      fromWallet: { id: "usd-wallet-id", currency: WalletCurrency.Usd },
+      toWallet: { id: "btc-wallet-id", currency: WalletCurrency.Btc },
+      fromAmount: usdBalance.amount,
+    })
   })
 
   it("renders the error box when the conversion reports an error", () => {
@@ -141,18 +108,6 @@ describe("UsdConvertToBtcModal", () => {
     const { getByText } = renderModal()
 
     expect(getByText("Insufficient balance")).toBeTruthy()
-  })
-
-  it("renders nothing when isVisible is false", () => {
-    const { queryByText } = renderModal({ isVisible: false })
-
-    expect(queryByText("Dollar Balance is not available in your region")).toBeNull()
-  })
-
-  it("shows the warning icon", () => {
-    const { getByTestId } = renderModal()
-
-    expect(getByTestId("icon-warning")).toBeTruthy()
   })
 
   it("cannot be dismissed: it renders no close icon", () => {

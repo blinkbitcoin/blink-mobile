@@ -11,15 +11,10 @@ import {
   Invoice,
   InvoiceType,
 } from "@app/screens/receive-bitcoin-screen/payment/index.types"
-
-const DEFAULT_OVER_FEE = 5000
+import { DepositFeesInformation, formatDepositFees } from "@app/utils/deposit-fees"
 
 type FeesInformation = {
-  deposit: {
-    minBankFee: string
-    minBankFeeThreshold: string
-    ratio: string
-  }
+  deposit: DepositFeesInformation
 }
 
 type ContextualInfoProps = {
@@ -136,18 +131,6 @@ const formatExpirationTime = (minutes: number): string => {
     unit: "minute",
     unitDisplay: "narrow",
   }).format(minutes)
-}
-
-const formatDepositFees = (deposit: FeesInformation["deposit"]) => {
-  const fee = Number(deposit.minBankFee).toLocaleString("en-US")
-  const threshold = new Intl.NumberFormat("en-US", { notation: "compact" }).format(
-    Number(deposit.minBankFeeThreshold),
-  )
-  const computedOverFee = Math.round(
-    (Number(deposit.minBankFeeThreshold) * Number(deposit.ratio)) / 10000,
-  )
-  const overFee = (computedOverFee || DEFAULT_OVER_FEE).toLocaleString("en-US")
-  return { fee, threshold, overFee }
 }
 
 const useStyles = makeStyles(({ colors }) => ({

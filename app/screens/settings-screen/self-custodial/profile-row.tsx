@@ -7,6 +7,7 @@ import { ListItem, makeStyles, Overlay, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-icon-button"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -48,6 +49,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const { activeAccount, setActiveAccountId } = useAccountRegistry()
   const { lightningAddress: liveLightningAddress, wallets: liveWallets } =
     useSelfCustodialWallet()
+  const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const { state: deleteState, deleteWallet } = useDeleteAccount()
   const network = useSparkNetwork()
 
@@ -112,7 +114,11 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
     }
 
     setProbingBalance(true)
-    const result = await probeSelfCustodialAccountWallets(accountId, network)
+    const result = await probeSelfCustodialAccountWallets(
+      accountId,
+      network,
+      selfCustodialDepositClaimLeewayVbyte,
+    )
     setProbingBalance(false)
 
     switch (result.status) {

@@ -2279,7 +2279,6 @@
         "notConfirmed": "Le paiement a été envoyé\nmais n'est pas encore confirmé\n\nVous pouvez vérifier l'état du paiement dans Transactions",
         "note": "Note optionnelle",
         "success": "Le paiement a été envoyé avec succès",
-        "suggestionInput": "Saisissez votre suggestion",
         "max": "Max",
         "maxAmount": "Montant max",
         "title": "Envoyer des bitcoins",
@@ -2319,6 +2318,10 @@
         "sdkGenericError": "Impossible d'estimer les frais. Essayez un montant différent."
     },
     "SettingsScreen": {
+        "createAddress": "Créer une adresse",
+        "donationButton": "Bouton de don",
+        "btcpayServer": "BTCPay Server",
+        "woocommerce": "WooCommerce",
         "staticQr": "QR statique imprimable",
         "staticQrCopied": "Votre lien de QR code statique a été copié",
         "setByOs": "Défini par le système",
@@ -2327,7 +2330,6 @@
         "apiDashboard": "Accès API et tableau de bord",
         "pos": "Point de vente",
         "posCopied": "Votre lien de point de vente a été copié",
-        "setYourLightningAddress": "Définir votre adresse Lightning",
         "activated": "Activé",
         "addressScreen": "Moyens de se faire payer",
         "nonCustodialAccount": "Compte non-custodial",
@@ -2525,7 +2527,31 @@
         "receivingAccount": "Solde destinataire",
         "sendingAccount": "Solde expéditeur",
         "txNotBroadcast": "Votre transaction est actuellement en attente et sera transmise au réseau Bitcoin dans un moment.",
-        "momentarily": "dans un instant"
+        "momentarily": "dans un instant",
+        "findingAccount": "Recherche du compte associé à ce paiement...",
+        "txNotFoundInAccounts": "Ce paiement est introuvable dans les comptes de cet appareil. Il appartient peut-être à un compte déconnecté.",
+        "txLoadFailed": "Impossible de charger ce paiement. Vérifiez votre connexion et réessayez.",
+        "switchedForPayment": "Passage à {identifier: string} pour afficher ce paiement"
+    },
+    "FeeRatesScreen": {
+        "title": "Taux de frais",
+        "send": "Envoyer",
+        "receive": "Recevoir",
+        "transfer": "Transférer",
+        "lightning": "Lightning",
+        "intraledger": "Intraledger",
+        "onchainPriority": "Onchain prioritaire (dès que possible)",
+        "onchainStandard": "Onchain standard (~4h)",
+        "onchainEconomy": "Onchain économique",
+        "lightningTransactions": "Transactions Lightning",
+        "onchainBelowThreshold": "Onchain en dessous de {threshold: string} SAT",
+        "onchainAboveThreshold": "Onchain au-dessus de {threshold: string} SAT",
+        "transferFee": "Frais de transfert",
+        "noFee": "aucuns frais",
+        "lightningSendFee": "{fee: string} + ~{routingFee: string} de frais de routage",
+        "fromApprox": "à partir de ~{fee: string}",
+        "satAmount": "{amount: string} SAT",
+        "error": "Impossible de récupérer les frais pour le moment"
     },
     "TransactionLimitsScreen": {
         "receive": "Recevoir",
@@ -2700,6 +2726,8 @@
     },
     "common": {
         "country": "Pays",
+        "registered": "Enregistré",
+        "detected": "Détecté",
         "unknown": "Inconnu",
         "enabled": "Activé",
         "switch": "Interrupteur",
@@ -2719,6 +2747,7 @@
         "anonymousUser": "Utilisateur anonyme",
         "blinkToBlink": "Blink à Blink",
         "transactionLimits": "Limite de transaction",
+        "feeRates": "Taux de frais",
         "activateWallet": "Activer le portefeuille",
         "amountRequired": "Un montant est requis",
         "back": "Retour",
@@ -2732,6 +2761,7 @@
         "bitcoinPrice": "Prix Bitcoin",
         "btcAccount": "Solde Bitcoin",
         "cancel": "Annuler",
+        "card": "Carte",
         "close": "Fermer",
         "confirm": "Confirmer",
         "convert": "Convertir",
@@ -2800,6 +2830,7 @@
         "total": "Total",
         "transactions": "Transactions",
         "transactionsError": "Erreur de chargement des transactions",
+        "transfer": "Transférer",
         "tryAgain": "Essayer à nouveau",
         "type": "Type",
         "usdAccount": "Solde Dollar",
@@ -2816,6 +2847,7 @@
         "problemMaybeReauth": "Il y a eu un problème avec votre demande. Merci de réessayer dans une minute. Si le problème persiste, nous vous conseillons de vous déconnecter et de vous connecter à nouveau. Vous pouvez vous déconnecter en allant dans Réglages > Compte > Déconnexion",
         "warning": "Alerte",
         "continue": "Continuer",
+        "skip": "Ignorer",
         "correct": "Correct",
         "recommended": "Recommandé",
         "expirationTime": "Délai d'expiration",
@@ -2870,11 +2902,9 @@
         "email": "E-mail",
         "sms": "SMS",
         "faq": "FAQ",
-        "enjoyingApp": "Vous aimez l’application ?",
         "statusPage": "Page de configuration",
         "telegram": "Telegram",
         "mattermost": "Mattermost",
-        "thankYouText": "Merci pour votre retour, souhaiteriez-vous suggérer une amélioration ?",
         "defaultEmailSubject": "Aide {bankName: string} ",
         "defaultSupportMessage": "Bonjour ! J’ai besoin d’aide avec {bankName: string}, j’utilise la version {version: string} sur {os: string}.",
         "emailCopied": "e-mail {email: string} copié dans le presse-papier",
@@ -3016,6 +3046,66 @@
         "networkVisa": "Visa",
         "cardFrozenTitle": "Carte gelée",
         "cardFrozenSubtitle": "La carte est temporairement désactivée",
+        "CardFeeSchedule": {
+            "title": "Grille tarifaire de la carte Blink",
+            "effectiveDate": "En vigueur à compter du 1er juillet 2026",
+            "sections": {
+                "cardFees": "Frais de carte",
+                "transactionFees": "Frais de transaction",
+                "overdraft": "Découvert (mode financé)"
+            },
+            "fees": {
+                "annualFee": {
+                    "title": "Frais annuels",
+                    "subtitle": "Offerts la première année à compter de la date d'émission de la carte",
+                    "value": "{amount: string} / an"
+                },
+                "cardReplacement": {
+                    "title": "Remplacement de carte"
+                },
+                "usdTransactionFee": {
+                    "title": "Frais de transaction en USD",
+                    "subtitle": "Appliqués à chaque transaction en dollars américains"
+                },
+                "foreignTransactionFee": {
+                    "title": "Frais de transaction à l'étranger",
+                    "subtitle": "Appliqués à chaque transaction dans une devise autre que le dollar américain"
+                },
+                "maximumOverdraft": {
+                    "title": "Découvert maximum",
+                    "subtitle": "Doit être remboursé sous 7 jours"
+                },
+                "lateRepaymentFee": {
+                    "title": "Frais de remboursement tardif",
+                    "subtitle": "Facturés si le découvert n'est pas remboursé sous 7 jours"
+                }
+            },
+            "btcConversion": {
+                "title": "Conversion BTC",
+                "body": "Lorsqu'une transaction nécessite la conversion de BTC en USD, la conversion est exécutée au taux de change en vigueur, qui peut inclure une marge reflétant le coût de la conversion."
+            },
+            "feesUpdateNotice": {
+                "text": "Les frais peuvent être mis à jour de temps à autre. Blink fournira un préavis d'au moins 30 jours avant que tout changement de frais ne prenne effet, conformément à l'",
+                "linkText": "Accord du titulaire de la carte"
+            },
+            "creditModeNotice": "Le Mode Crédit n'est pas actif actuellement. Si le Mode Crédit est activé, les taux d'intérêt, frais et informations sur les droits de facturation applicables seront fournis avant l'activation.",
+            "additionalDetails": {
+                "title": "Détails supplémentaires des frais",
+                "overdraft": {
+                    "label": "Découvert",
+                    "text": ". Dans certaines circonstances, une transaction peut être approuvée qui fait passer le solde de votre carte en dessous de zéro. Le découvert maximum est de {maxOverdraft: string}. Vous devez rembourser le découvert sous 7 jours en transférant des fonds supplémentaires sur le solde de votre carte."
+                },
+                "foreignCurrency": {
+                    "label": "Devise étrangère",
+                    "text": ". Si vous effectuez une transaction dans une devise étrangère, le réseau de la carte la convertit en USD selon ses propres procédures de conversion. Le taux à la date de traitement peut différer de la date de la transaction."
+                },
+                "noHiddenFees": {
+                    "label": "Aucuns frais cachés",
+                    "text": ". Il n'y a aucuns frais pour l'ouverture de compte, l'inactivité, les demandes de solde ou la fermeture de votre carte."
+                }
+            },
+            "backButton": "Retour"
+        },
         "CardDetails": {
             "title": "Détails de la carte",
             "cardNumber": "Numéro de carte",
@@ -3390,6 +3480,7 @@
                 "perYear": "par an",
                 "status": {
                     "label": "Statut",
+                    "specialOfferLabel": "Offre spéciale",
                     "paymentPending": "Paiement en Attente",
                     "firstYearFree": "Première année gratuite"
                 },
@@ -3403,7 +3494,11 @@
                     "cardholderAgreement": "Accord du Titulaire de la Carte",
                     "and": "et"
                 },
-                "renew": "Je comprends que mon abonnement sera automatiquement renouvelé dans 1 an"
+                "feeSchedule": {
+                    "text": "J'ai examiné et j'accepte le",
+                    "linkText": "Barème des Frais de Blink Card"
+                },
+                "renew": "Je comprends que mon abonnement se renouvellera automatiquement dans {months: number} mois"
             },
             "CardIntroducing": {
                 "title": "Présentation",
@@ -3465,13 +3560,29 @@
                 "buttonText": "Soumettre la demande",
                 "select": "sélectionner"
             },
+            "Acknowledgement": {
+                "title": "Conditions générales",
+                "acceptButton": "Accepter",
+                "eSignConsent": {
+                    "text": "J'accepte le",
+                    "linkText": "Consentement à la signature électronique"
+                },
+                "privacyAndTerms": {
+                    "text": "J'accepte le",
+                    "privacyPolicyLinkText": "la Politique de confidentialité de l'émetteur",
+                    "and": ", et les",
+                    "cardTermsLinkText": "Conditions de la carte Blink"
+                },
+                "certifyAccuracy": "Je certifie que les informations que j'ai fournies sont exactes et que je respecterai toutes les règles et exigences liées à ma carte Blink Visa",
+                "acknowledgeSolicitation": "Je reconnais que demander la carte Blink Visa ne constitue pas une sollicitation non autorisée"
+            },
             "CardPreapproved": {
                 "title": "Vous avez été pré-approuvé pour la carte Blink Visa !",
                 "buttonText": "Fermer"
             },
             "CardProcessing": {
                 "title": "Traitement de votre demande",
-                "subtitle": "Temps d'attente estimé : {waitTime: string}",
+                "subtitle": "Nous vous préviendrons dès que nous serons prêts",
                 "buttonText": "Fermer"
             }
         }
@@ -3499,6 +3610,7 @@
             },
             "Phrase": {
                 "headerTitle": "Phrase de sauvegarde",
+                "authDescription": "Authentifiez-vous pour voir votre phrase de sauvegarde",
                 "sparkCompatible": "Cette phrase de sauvegarde fonctionne dans tout {sparkCompatibleLink}",
                 "sparkCompatibleLink": "portefeuille compatible Spark",
                 "copiedToast": "Phrase de sauvegarde copiée dans le presse-papier",
@@ -3538,6 +3650,7 @@
             "uploadSuccess": "Sauvegarde enregistrée dans {provider}",
             "uploadFailed": "Échec du téléchargement de la sauvegarde",
             "signInFailed": "Échec de la connexion à {provider}",
+            "storageAccessRequired": "Autorisez l'accès de {provider: string} à la sauvegarde de votre portefeuille, puis réessayez.",
             "cloudNotAvailable": "iCloud Drive n'est pas disponible. Veuillez vous connecter à iCloud dans les Réglages et activer iCloud Drive.",
             "networkError": "Erreur réseau. Veuillez vérifier votre connexion et réessayer.",
             "existingBackupTitle": "Sauvegarde trouvée",
@@ -3549,13 +3662,89 @@
         }
     },
     "AccountMigration": {
+        "contactSupport": {
+            "title": "Contacter le support",
+            "body": "Une erreur s'est produite, mais ne vous inquiétez pas, vos fonds sont en sécurité. Veuillez contacter le support pour obtenir de l'aide.\n\nCes informations peuvent aider le support à résoudre votre cas :",
+            "reasonLabel": "Motif",
+            "accountIdLabel": "ID du compte",
+            "pubKeyLabel": "pubKey",
+            "usernameLabel": "Nom d'utilisateur",
+            "emailLabel": "E-mail",
+            "phoneLabel": "Numéro de téléphone",
+            "appVersionLabel": "Version de l'application",
+            "platformLabel": "Plateforme",
+            "countryLabel": "Pays",
+            "emailSubject": "Demande de support pour la migration",
+            "emailDescribeProblem": "Décrivez le problème :",
+            "emailAccountInfo": "Informations du compte pour le support :",
+            "contactUsCta": "Contactez-nous",
+            "copy": "Copier"
+        },
+        "migrateNowModal": {
+            "title": "Migrez maintenant vers un compte non-custodial",
+            "body": "Vous ne pouvez plus recevoir de fonds sur votre compte custodial. Blink a mis fin au service custodial dans votre région et ce compte sera inactivé à la fin du {date}.\n\nMigrez maintenant vers un compte non-custodial.",
+            "migrateCta": "Migrer maintenant"
+        },
+        "reminderBulletin": {
+            "title": "Important",
+            "body": "Passez à un compte non-custodial via la migration guidée, ou retirez vos fonds, avant le {date}. La réception s'arrête le {receiveStopsDate}.",
+            "migrateCta": "Migrer"
+        },
+        "offboardBulletin": {
+            "title": "Important",
+            "body": "Votre compte est enregistré dans une région où nous ne pouvons pas proposer de comptes. Retirez vos fonds avant le 31 août. La réception s'arrête le 10 août."
+        },
+        "dollarBalanceModal": {
+            "title": "Nous ne pouvons pas migrer votre solde en dollars",
+            "body": "Videz d'abord votre solde en dollars. Vous pouvez le transférer vers votre solde Bitcoin dans Blink ou ailleurs."
+        },
+        "balancesOverview": {
+            "title": "Déplacez votre solde",
+            "body": "Déplacez vos fonds en toute sécurité vers votre nouveau compte.",
+            "currentBitcoinBalance": "Solde Bitcoin actuel",
+            "currentDollarBalance": "Solde en dollars actuel",
+            "newBitcoinBalance": "Nouveau solde Bitcoin",
+            "newDollarBalance": "Nouveau solde en dollars",
+            "dollarBalanceNotAvailable": "non disponible",
+            "networkFee": "Frais de réseau : <bold>{fee: string}</bold>",
+            "networkFeeCoveredByBlink": "Frais de réseau : <bold>{fee: string}</bold> (pris en charge par Blink)",
+            "retryCta": "Réessayer",
+            "approveCta": "Approuver",
+            "contactSupportCta": "Contacter le support"
+        },
+        "migrationRequiredTitle": "Il est temps de passer à la version supérieure",
+        "keepReceivingTitle": "Continuez à recevoir comme d'habitude",
+        "keepReceivingBody": "Votre adresse Lightning sera transférée vers votre nouveau compte non-custodial.",
+        "keepReceivingLnAddressLabel": "Votre adresse LN",
+        "keepReceivingCta": "Parfait",
+        "receivingDisabledToast": "La réception est actuellement désactivée.",
+        "downloadHistoryTitle": "Téléchargez votre historique de transactions",
+        "downloadHistoryBody": "Votre nouveau compte démarrera à zéro. Si vous souhaitez conserver une trace de vos transactions, téléchargez-les maintenant au format CSV.",
+        "downloadHistoryDownloadCta": "Télécharger",
+        "apiServiceTitle": "Service API non disponible",
+        "apiServiceBody": "Nous remarquons que vous avez des clés API actives. Blink ne peut pas fournir l'API en mode non-custodial.\n\nSi vous dépendez de l'API de Blink, contactez-nous rapidement et nous ferons de notre mieux pour faciliter une transition en douceur.",
+        "apiServiceContactCta": "Contactez-nous",
+        "apiServiceContinueCta": "Continuer quand même",
+        "resumeFailed": "Une erreur s'est produite lors de la reprise de votre migration. Veuillez la recommencer.",
+        "migrationRequiredBody": "Il est temps de migrer votre compte custodial vers un compte non-custodial.",
+        "migrationRequiredForcedBody": "Il est temps de migrer votre compte custodial vers un compte non-custodial. C'est requis pour des raisons réglementaires.\n\nPas d'inquiétude, le non-custodial sera meilleur pour vous à long terme.",
+        "migrationGateTitle": "Compte non accessible",
+        "migrationGateBody": "Pour des raisons réglementaires, nous ne pouvons pas fournir de comptes custodial dans votre région. Transférez vos fonds vers un compte non-custodial avec Blink en suivant les étapes suivantes ou contactez-nous à <link>{email}</link>",
+        "bitcoinBalance": "Solde Bitcoin",
+        "dollarBalance": "Solde en dollars",
         "moveToNonCustodial": "Passer au non-custodial",
         "explainerTitle": "Que signifie passer au non-custodial ?",
-        "explainerStep1": "Vous allez créer un compte non-custodial sur le protocole Spark, <link>en savoir plus ici</link>",
-        "explainerStep2": "Nous transférons vos fonds vers votre nouveau compte non-custodial et votre compte actuel sera supprimé",
-        "explainerStep3": "Continuez à utiliser Blink comme d'habitude",
-        "letsMove": "Allons-y",
-        "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes."
+        "explainerCheck1": "Vous allez créer un compte non-custodial sur le protocole Spark",
+        "explainerCheck2": "Nous transférons vos fonds vers votre nouveau compte non-custodial",
+        "explainerCheck3": "Votre compte actuel et toutes ses données, y compris l'historique des transactions, seront fermés",
+        "explainerCheck4": "L'API de Blink ne sera pas disponible",
+        "explainerCheck5": "Des frais de réseau Spark seront déduits de votre compte",
+        "explainerCta": "Je comprends",
+        "transferringFunds": "Transfert de vos fonds en cours. Cela devrait être terminé en quelques secondes.",
+        "clockOutOfSync": {
+            "body": "La date et l'heure de votre appareil sont désynchronisées. Réglez-les sur automatique pour continuer.",
+            "retryCta": "Réessayer"
+        }
     },
     "AccountTypeSelectionScreen": {
         "custodialLabel": "Sous garde",
@@ -3605,6 +3794,11 @@
         "modalDescription": "Nous vous recommandons vivement de sauvegarder votre portefeuille pour éviter une perte totale de fonds en cas de perte de cet appareil.",
         "secureMe": "Sécuriser le portefeuille"
     },
+    "NonCustodialInfoBulletin": {
+        "title": "Ceci est un compte non-custodial",
+        "body": "Pour en savoir plus, lisez notre article de blog",
+        "cta": "Lire"
+    },
     "StableBalance": {
         "title": "Solde stable",
         "description": "Conservez un solde en USD propulsé par USDB sur Spark.",
@@ -3652,10 +3846,10 @@
         "lightningPayment": "Paiement Lightning",
         "onchainDeposit": "Dépôt On-chain",
         "onchainWithdrawal": "Retrait On-chain",
-        "conversionFromBitcoin": "Conversion depuis Bitcoin",
-        "conversionToBitcoin": "Conversion en Bitcoin",
-        "conversionFromToken": "Conversion depuis {token}",
-        "conversionToToken": "Conversion en {token}",
+        "transferFromBitcoinBalance": "Transfert depuis le solde Bitcoin",
+        "transferToBitcoinBalance": "Transfert vers le solde Bitcoin",
+        "transferFromTokenBalance": "Transfert depuis le solde {token}",
+        "transferToTokenBalance": "Transfert vers le solde {token}",
         "tokenTransfer": "Transfert {token}",
         "payTo": "Payer à {address}",
         "payment": "Paiement"

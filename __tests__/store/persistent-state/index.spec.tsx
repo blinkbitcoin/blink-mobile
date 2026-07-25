@@ -47,7 +47,7 @@ const TestConsumer: React.FC = () => {
 describe("PersistentStateProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockSaveJson.mockResolvedValue(true)
+    mockSaveJson.mockResolvedValue(undefined)
     mockSaveString.mockResolvedValue(true)
   })
 
@@ -194,6 +194,39 @@ describe("PersistentStateProvider", () => {
       "persistentState",
       expect.objectContaining(defaultPersistentState),
     )
+  })
+
+  it("reports a failed save to crashlytics instead of crashing, keeping the update in memory", async () => {
+    mockLoadJson.mockResolvedValue({
+      schemaVersion: 6,
+      galoyInstance: { id: "Main" },
+      galoyAuthToken: "old-token",
+    })
+    mockSaveJson.mockRejectedValueOnce(new Error("disk full"))
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    // The write rejected, but the guard swallows it: surfaced to crashlytics, never thrown.
+    await waitFor(() => {
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+    })
+    expect(mockRecordError.mock.calls[0][0]).toBeInstanceOf(Error)
+    expect(mockRecordError.mock.calls[0][0].message).toBe("disk full")
+
+    // The in-memory update survives the failed persist, so the app keeps working.
+    expect(screen.getByTestId("token").props.children).toBe("new-token")
   })
 
   describe("migration failure handling", () => {

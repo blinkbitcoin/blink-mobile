@@ -2,12 +2,15 @@ import * as React from "react"
 import { Alert, DevSettings, Linking, View, Share } from "react-native"
 import DeviceInfo from "react-native-device-info"
 import { ScrollView } from "react-native-gesture-handler"
-import InAppReview from "react-native-in-app-review"
 import { InAppBrowser } from "react-native-inappbrowser-reborn"
 
 import { gql, useApolloClient } from "@apollo/client"
 import { GaloyInput } from "@app/components/atomic/galoy-input"
-import { GALOY_INSTANCES, possibleGaloyInstanceNames } from "@app/config"
+import {
+  GALOY_INSTANCES,
+  possibleGaloyInstanceNames,
+  SPARK_EXPLORER_TX_URL,
+} from "@app/config"
 import {
   testBulletinsStore,
   useTestBulletins,
@@ -23,7 +26,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button, Text, makeStyles } from "@rn-vui/themed"
 
-import { Screen } from "../../components/screen"
+import { Screen } from "@app/components/screen"
 import { usePriceConversion, useSaveSessionProfile } from "@app/hooks"
 import useLogout from "../../hooks/use-logout"
 import { addDeviceToken } from "../../utils/notifications"
@@ -75,9 +78,6 @@ export const DeveloperScreen: React.FC = () => {
   }, [accountId, currentGaloyInstance.fiatUrl, currentGaloyInstance.kycUrl])
 
   const [newToken, setNewToken] = React.useState(token)
-  const [hasFlowFinishedSuccessfully, setHasFlowFinishedSuccessfully] = React.useState<
-    undefined | boolean
-  >(undefined)
 
   const [newGraphqlUri, setNewGraphqlUri] = React.useState(
     currentGaloyInstance.id === "Custom" ? currentGaloyInstance.graphqlUri : "",
@@ -199,6 +199,7 @@ export const DeveloperScreen: React.FC = () => {
           lnAddressHostname: newLnAddressHostname,
           name: "Custom", // TODO: make configurable
           blockExplorer: "https://mempool.space/tx/", // TODO make configurable
+          sparkExplorer: SPARK_EXPLORER_TX_URL,
         },
         token: newToken || "",
       })
@@ -293,16 +294,6 @@ export const DeveloperScreen: React.FC = () => {
               navigate("webView", {
                 url: urlWebView,
               })
-            }
-          />
-          <Text>InAppReview available: {String(InAppReview.isAvailable())}</Text>
-          <Text>result InAppReview: {String(hasFlowFinishedSuccessfully)}</Text>
-          <Button
-            title="Rate us"
-            containerStyle={styles.button}
-            {...testProps("Rate us")}
-            onPress={() =>
-              InAppReview.RequestInAppReview().then(setHasFlowFinishedSuccessfully)
             }
           />
           <Text style={styles.textHeader}>Trigger Bulletins</Text>

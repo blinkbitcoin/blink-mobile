@@ -11,6 +11,10 @@ import { testProps } from "@app/utils/testProps"
 
 import { StatusPill, type StatusPillVariant } from "../status-pill"
 
+/** The 32pt balance sits directly under the fixed-size home header chrome;
+ *  uncapped Dynamic Type makes it overrun the username row above. */
+const MAX_BALANCE_FONT_SIZE_MULTIPLIER = 1.4
+
 const Loader = () => {
   const styles = useStyles()
   return (
@@ -66,7 +70,12 @@ export const BalanceHeader: React.FC<Props> = ({
     <View {...testProps("balance-header")} style={styles.balanceHeaderContainer}>
       {hideAmount ? (
         <TouchableOpacity onPress={switchMemoryHideAmount}>
-          <Text style={styles.balanceHiddenText}>****</Text>
+          <Text
+            style={styles.balanceHiddenText}
+            maxFontSizeMultiplier={MAX_BALANCE_FONT_SIZE_MULTIPLIER}
+          >
+            ****
+          </Text>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity onPress={switchMemoryHideAmount}>
@@ -86,6 +95,7 @@ export const BalanceHeader: React.FC<Props> = ({
                 {...testProps("balance-value")}
                 style={styles.primaryBalanceText}
                 allowFontScaling
+                maxFontSizeMultiplier={MAX_BALANCE_FONT_SIZE_MULTIPLIER}
                 adjustsFontSizeToFit
               >
                 {formattedBalance}

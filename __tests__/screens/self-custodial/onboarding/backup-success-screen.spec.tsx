@@ -17,23 +17,27 @@ jest.mock("@app/components/success-animation/success-icon-animation", () => {
 })
 
 jest.mock("@app/components/success-animation/success-text-animation", () => {
+  const { useEffect } = jest.requireActual("react")
   const { View } = jest.requireActual("react-native")
-  return {
-    CompletedTextAnimation: ({
-      children,
-      onComplete,
-    }: {
-      children: React.ReactNode
-      onComplete?: () => void
-    }) => {
-      if (onComplete) setTimeout(onComplete, 0)
-      return <View>{children}</View>
-    },
+  const CompletedTextAnimation = ({
+    children,
+    onComplete,
+  }: {
+    children: React.ReactNode
+    onComplete?: () => void
+  }) => {
+    /** Firing from an effect keeps the callback inside React's act() scope. */
+    useEffect(() => {
+      onComplete?.()
+    }, [onComplete])
+    return <View>{children}</View>
   }
+  return { CompletedTextAnimation }
 })
 
 const mockClearCheckpoint = jest.fn()
 jest.mock("@app/screens/account-migration/hooks", () => ({
+  ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => ({
     clearCheckpoint: mockClearCheckpoint,
   }),
@@ -131,18 +135,24 @@ describe("BackupSuccessScreen", () => {
     await flushEffects()
   })
 
-  it("navigates to home after animation completes", async () => {
+  it("holds the screen after the animation and then navigates home", async () => {
+    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
     render(
       <ContextForScreen>
         <BackupSuccessScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
-    await act(async () => {
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 50)
-      })
+    act(() => {
+      jest.advanceTimersByTime(0)
     })
+    expect(mockDispatch).not.toHaveBeenCalled()
+
+    act(() => {
+      jest.advanceTimersByTime(2000)
+    })
+    jest.useRealTimers()
 
     expect(mockDispatch).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -152,19 +162,20 @@ describe("BackupSuccessScreen", () => {
     )
   })
 
-  it("clears migration checkpoint on navigation", async () => {
+  it("leaves any pending migration checkpoint untouched", async () => {
+    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
     render(
       <ContextForScreen>
         <BackupSuccessScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
-    await act(async () => {
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 50)
-      })
+    act(() => {
+      jest.advanceTimersByTime(2000)
     })
+    jest.useRealTimers()
 
-    expect(mockClearCheckpoint).toHaveBeenCalled()
+    expect(mockClearCheckpoint).not.toHaveBeenCalled()
   })
 })

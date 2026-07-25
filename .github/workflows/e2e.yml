@@ -21,7 +21,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@v2
 
       # Caching
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             node_modules
@@ -155,7 +155,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@v2
 
       # Caching
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             node_modules

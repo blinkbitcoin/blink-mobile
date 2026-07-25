@@ -2279,7 +2279,6 @@
     "notConfirmed": "Platba bola odoslaná\nale ešte nie je potvrdená\n\nStav platby môžete skontrolovať v sekcii Transakcie",
     "note": "Poznámka alebo štítok",
     "success": "Platba bola úspešne odoslaná",
-    "suggestionInput": "Zadajte svoj návrh",
     "max": "Maximum",
     "maxAmount": "Maximálna suma",
     "title": "Odoslať Bitcoin",
@@ -2319,6 +2318,10 @@
     "sdkGenericError": "Nie je možné odhadnúť poplatky. Skúste inú sumu."
   },
   "SettingsScreen": {
+    "createAddress": "Vytvoriť adresu",
+    "donationButton": "Darovacie tlačidlo",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Vytlačiteľný statický QR kód",
     "staticQrCopied": "Odkaz na váš statický QR kód bol skopírovaný",
     "setByOs": "Prevzaté z OS",
@@ -2327,7 +2330,6 @@
     "apiDashboard": "API prístup a dashboard",
     "pos": "Terminál PoS",
     "posCopied": "Váš Terminál PoS bol skopírovaný",
-    "setYourLightningAddress": "Nastavte svoju Lightning adresu",
     "activated": "Aktivované",
     "addressScreen": "Spôsoby, ako dostať zaplatené",
     "nonCustodialAccount": "Nesvereneský účet",
@@ -2525,7 +2527,31 @@
     "receivingAccount": "Prijímajúci zostatok",
     "sendingAccount": "Odosielajúci zostatok",
     "txNotBroadcast": "Vaša transakcia je zaradená do frontu. Mala by sa objaviť v mempoole {countdown: string}.",
-    "momentarily": "momentálne"
+    "momentarily": "momentálne",
+    "findingAccount": "Hľadá sa účet pre túto platbu...",
+    "txNotFoundInAccounts": "Táto platba sa nenašla v žiadnom účte v tomto zariadení. Môže patriť k odhlásenému účtu.",
+    "txLoadFailed": "Túto platbu sa nepodarilo načítať. Skontrolujte pripojenie a skúste to znova.",
+    "switchedForPayment": "Prepnuté na {identifier: string} na zobrazenie tejto platby"
+  },
+  "FeeRatesScreen": {
+    "title": "Sadzby poplatkov",
+    "send": "Odoslať",
+    "receive": "Prijať",
+    "transfer": "Prevod",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "Onchain prioritný (čo najskôr)",
+    "onchainStandard": "Onchain štandardný (~4h)",
+    "onchainEconomy": "Onchain ekonomický",
+    "lightningTransactions": "Lightning transakcie",
+    "onchainBelowThreshold": "Onchain pod {threshold: string} SAT",
+    "onchainAboveThreshold": "Onchain nad {threshold: string} SAT",
+    "transferFee": "Poplatok za prevod",
+    "noFee": "bez poplatku",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} smerovací poplatok",
+    "fromApprox": "od ~{fee: string}",
+    "satAmount": "{amount: string} SAT",
+    "error": "Momentálne nie je možné načítať poplatky"
   },
   "TransactionLimitsScreen": {
     "receive": "Prijať",
@@ -2700,6 +2726,8 @@
   },
   "common": {
     "country": "Krajina",
+    "registered": "Registrované",
+    "detected": "Zistené",
     "unknown": "Neznáme",
     "enabled": "Povolený",
     "switch": "Prepínač",
@@ -2719,6 +2747,7 @@
     "anonymousUser": "Anonym",
     "blinkToBlink": "Blink na Blink",
     "transactionLimits": "Transakčné limity",
+    "feeRates": "Sadzby poplatkov",
     "activateWallet": "Aktivovať peňaženku",
     "amountRequired": "Suma je povinná",
     "back": "Späť",
@@ -2732,6 +2761,7 @@
     "bitcoinPrice": "Cena bitcoinu",
     "btcAccount": "Bitcoinový zostatok",
     "cancel": "Zrušiť",
+    "card": "Karta",
     "close": "Zatvoriť",
     "confirm": "Potvrdiť",
     "convert": "Konvertovať",
@@ -2799,6 +2829,7 @@
     "total": "Celkovo",
     "transactions": "Transakcie",
     "transactionsError": "Chyba pri načítaní transakcií",
+    "transfer": "Prevod",
     "tryAgain": "Skúsiť znova",
     "type": "Typ",
     "usdAccount": "Dolárový zostatok",
@@ -2815,6 +2846,7 @@
     "problemMaybeReauth": "Vyskytol sa problém s vašou požiadavkou. Skúste to prosím znova o minútu. Ak problém pretrváva, odporúčame odhlásiť sa a prihlásiť sa znova. Odhlásiť sa môžete v Nastavenia > Účet > Odhlásiť.",
     "warning": "Upozornenie",
     "continue": "Pokračovať",
+    "skip": "Preskočiť",
     "correct": "Správne",
     "recommended": "Odporúčané",
     "expirationTime": "Čas expirácie",
@@ -2870,11 +2902,9 @@
     "email": "E-mail",
     "sms": "SMS",
     "faq": "FAQ",
-    "enjoyingApp": "Páči sa vám aplikácia?",
     "statusPage": "Stav",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Ďakujeme za spätnú väzbu, chcete nám nechať návrh na zlepšenie?",
     "defaultEmailSubject": "{bankName: string} - Podpora",
     "defaultSupportMessage": "Dobrý deň! Potrebujem pomoc s {bankName: string}, používam verziu {version: string} na {os: string}.",
     "emailCopied": "e-mail {email: string} skopírovaný do schránky",
@@ -3044,6 +3074,66 @@
       "limitUpdateSuccess": "Limit bol úspešne aktualizovaný",
       "limitUpdateError": "Nepodarilo sa aktualizovať limit",
       "limitMustBePositive": "Limit musí byť väčší ako nula"
+    },
+    "CardFeeSchedule": {
+      "title": "Sadzobník poplatkov karty Blink",
+      "effectiveDate": "Platné od 1. júla 2026",
+      "sections": {
+        "cardFees": "Poplatky za kartu",
+        "transactionFees": "Transakčné poplatky",
+        "overdraft": "Prečerpanie (financovaný režim)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Ročný poplatok",
+          "subtitle": "Odpustený na prvý rok od dátumu vydania karty",
+          "value": "{amount: string} / rok"
+        },
+        "cardReplacement": {
+          "title": "Výmena karty"
+        },
+        "usdTransactionFee": {
+          "title": "Poplatok za transakciu v USD",
+          "subtitle": "Účtuje sa za každú transakciu v amerických dolároch"
+        },
+        "foreignTransactionFee": {
+          "title": "Poplatok za zahraničnú transakciu",
+          "subtitle": "Účtuje sa za každú transakciu v inej mene ako americký dolár"
+        },
+        "maximumOverdraft": {
+          "title": "Maximálne prečerpanie",
+          "subtitle": "Musí byť splatené do 7 dní"
+        },
+        "lateRepaymentFee": {
+          "title": "Poplatok za oneskorenú splátku",
+          "subtitle": "Účtuje sa, ak prečerpanie nie je splatené do 7 dní"
+        }
+      },
+      "btcConversion": {
+        "title": "Konverzia BTC",
+        "body": "Ak transakcia vyžaduje konverziu BTC na USD, konverzia sa vykonáva pri aktuálnom výmennom kurze, ktorý môže zahŕňať rozpätie odrážajúce náklady na konverziu."
+      },
+      "feesUpdateNotice": {
+        "text": "Poplatky sa môžu z času na čas aktualizovať. Blink poskytne oznámenie najmenej 30 dní vopred, než akékoľvek zmeny poplatkov nadobudnú účinnosť, v súlade so",
+        "linkText": "Zmluvou s držiteľom karty"
+      },
+      "creditModeNotice": "Kreditný režim momentálne nie je aktívny. Ak sa Kreditný režim aktivuje, príslušné úrokové sadzby, poplatky a informácie o fakturačných právach budú poskytnuté pred aktiváciou.",
+      "additionalDetails": {
+        "title": "Ďalšie podrobnosti o poplatkoch",
+        "overdraft": {
+          "label": "Prečerpanie",
+          "text": ". Za určitých okolností môže byť schválená transakcia, ktorá spôsobí pokles zostatku vašej karty pod nulu. Maximálne prečerpanie je {maxOverdraft: string}. Prečerpanie musíte splatiť do 7 dní prevodom ďalších prostriedkov na zostatok vašej karty."
+        },
+        "foreignCurrency": {
+          "label": "Cudzia mena",
+          "text": ". Ak vykonáte transakciu v cudzej mene, karetná sieť ju prevedie na USD pomocou vlastných konverzných postupov. Kurz v deň spracovania sa môže líšiť od dátumu transakcie."
+        },
+        "noHiddenFees": {
+          "label": "Žiadne skryté poplatky",
+          "text": ". Neúčtujú sa žiadne poplatky za založenie účtu, nečinnosť, dopyty na zostatok ani za zrušenie karty."
+        }
+      },
+      "backButton": "Späť"
     },
     "CardDetails": {
       "title": "Detaily karty",
@@ -3390,6 +3480,7 @@
         "perYear": "za rok",
         "status": {
           "label": "Stav",
+          "specialOfferLabel": "Špeciálna ponuka",
           "paymentPending": "Platba Čaká",
           "firstYearFree": "Prvý rok zadarmo"
         },
@@ -3403,7 +3494,11 @@
           "cardholderAgreement": "Zmluvou držiteľa karty",
           "and": "a"
         },
-        "renew": "Rozumiem, že moje predplatné sa automaticky obnoví za 1 rok"
+        "feeSchedule": {
+          "text": "Skontroloval som a súhlasím s dokumentom",
+          "linkText": "Sadzobník poplatkov Blink Card"
+        },
+        "renew": "Rozumiem, že moje predplatné sa automaticky obnoví o {months: number} mesiacov"
       },
       "CardIntroducing": {
         "title": "Predstavujeme",
@@ -3465,13 +3560,29 @@
         "buttonText": "Odoslať žiadosť",
         "select": "vybrať"
       },
+      "Acknowledgement": {
+        "title": "Zmluvné podmienky",
+        "acceptButton": "Prijať",
+        "eSignConsent": {
+          "text": "Súhlasím s",
+          "linkText": "súhlasom s elektronickým podpisom"
+        },
+        "privacyAndTerms": {
+          "text": "Súhlasím s",
+          "privacyPolicyLinkText": "zásadami ochrany osobných údajov vydavateľa",
+          "and": " a",
+          "cardTermsLinkText": "podmienkami karty Blink"
+        },
+        "certifyAccuracy": "Potvrdzujem, že informácie, ktoré som poskytol, sú presné a že budem dodržiavať všetky pravidlá a požiadavky týkajúce sa mojej karty Blink Visa",
+        "acknowledgeSolicitation": "Beriem na vedomie, že žiadosť o kartu Blink Visa nepredstavuje neoprávnené oslovenie"
+      },
       "CardPreapproved": {
         "title": "Boli ste predbežne schválení pre kartu Blink Visa!",
         "buttonText": "Zavrieť"
       },
       "CardProcessing": {
         "title": "Spracúvame vašu žiadosť",
-        "subtitle": "Odhadovaný čas čakania: {waitTime: string}",
+        "subtitle": "Dáme ti vedieť, hneď ako budeme pripravení",
         "buttonText": "Zavrieť"
       }
     }
@@ -3499,6 +3610,7 @@
       },
       "Phrase": {
         "headerTitle": "Zálohovacia fráza",
+        "authDescription": "Overte sa, aby ste zobrazili svoju zálohovaciu frázu",
         "sparkCompatible": "Táto záložná fráza funguje v akejkoľvek {sparkCompatibleLink}",
         "sparkCompatibleLink": "peňaženke kompatibilnej so Spark",
         "copiedToast": "Záložná fráza skopírovaná do schránky",
@@ -3538,6 +3650,7 @@
       "uploadSuccess": "Záloha uložená do {provider}",
       "uploadFailed": "Nahranie zálohy zlyhalo",
       "signInFailed": "Prihlásenie do {provider} zlyhalo",
+      "storageAccessRequired": "Povoľte {provider: string} prístup k zálohe peňaženky a skúste to znova.",
       "cloudNotAvailable": "iCloud Drive nie je k dispozícii. Prihláste sa do iCloudu v Nastaveniach a zapnite iCloud Drive.",
       "networkError": "Chyba siete. Skontrolujte pripojenie a skúste to znova.",
       "existingBackupTitle": "Záloha nájdená",
@@ -3549,13 +3662,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Kontaktovať podporu",
+      "body": "Niečo sa pokazilo, ale nebojte sa, vaše prostriedky sú v bezpečí. Obráťte sa prosím na podporu.\n\nTieto informácie môžu podpore pomôcť vyriešiť váš prípad:",
+      "reasonLabel": "Dôvod",
+      "accountIdLabel": "ID účtu",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Používateľské meno",
+      "emailLabel": "E-mail",
+      "phoneLabel": "Telefónne číslo",
+      "appVersionLabel": "Verzia aplikácie",
+      "platformLabel": "Platforma",
+      "countryLabel": "Krajina",
+      "emailSubject": "Žiadosť o podporu pri migrácii",
+      "emailDescribeProblem": "Popíšte problém:",
+      "emailAccountInfo": "Informácie o účte pre podporu:",
+      "contactUsCta": "Kontaktujte nás",
+      "copy": "Kopírovať"
+    },
+    "migrateNowModal": {
+      "title": "Prejdite teraz na nesverenecký účet",
+      "body": "Na svoj zverenský účet už nemôžete prijímať prostriedky. Blink ukončil zverenskú službu vo vašom regióne a tento účet bude deaktivovaný do konca dňa {date}.\n\nPrejdite teraz na nesverenecký účet.",
+      "migrateCta": "Migrovať teraz"
+    },
+    "reminderBulletin": {
+      "title": "Dôležité",
+      "body": "Prejdite na nesverenecký účet pomocou riadenej migrácie alebo si vyberte prostriedky pred {date}. Prijímanie sa skončí {receiveStopsDate}.",
+      "migrateCta": "Migrovať"
+    },
+    "offboardBulletin": {
+      "title": "Dôležité",
+      "body": "Váš účet je registrovaný v regióne, kde nemôžeme ponúkať účty. Vyberte si svoje prostriedky pred 31. augustom. Prijímanie sa zastaví 10. augusta."
+    },
+    "dollarBalanceModal": {
+      "title": "Váš dolárový zostatok nemôžeme migrovať",
+      "body": "Najprv vyprázdnite svoj dolárový zostatok. Môžete ho previesť na svoj bitcoinový zostatok v Blinku alebo inam."
+    },
+    "balancesOverview": {
+      "title": "Presuňte svoj zostatok",
+      "body": "Bezpečne presuňte svoje prostriedky na svoj nový účet.",
+      "currentBitcoinBalance": "Aktuálny zostatok Bitcoinu",
+      "currentDollarBalance": "Aktuálny dolárový zostatok",
+      "newBitcoinBalance": "Nový zostatok Bitcoinu",
+      "newDollarBalance": "Nový dolárový zostatok",
+      "dollarBalanceNotAvailable": "nie je k dispozícii",
+      "networkFee": "Sieťový poplatok: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Sieťový poplatok: <bold>{fee: string}</bold> (hradí Blink)",
+      "retryCta": "Skúsiť znova",
+      "approveCta": "Schváliť",
+      "contactSupportCta": "Kontaktovať podporu"
+    },
+    "migrationRequiredTitle": "Čas na upgrade",
+    "keepReceivingTitle": "Prijímajte platby ako zvyčajne",
+    "keepReceivingBody": "Vaša Lightning adresa bude prenesená na váš nový non-custodial účet.",
+    "keepReceivingLnAddressLabel": "Vaša LN adresa",
+    "keepReceivingCta": "Skvelé",
+    "receivingDisabledToast": "Prijímanie je momentálne zakázané.",
+    "downloadHistoryTitle": "Stiahnite si históriu transakcií",
+    "downloadHistoryBody": "Váš nový účet začne odznova. Ak si chcete uchovať záznam o svojich transakciách, stiahnite si ich teraz ako CSV.",
+    "downloadHistoryDownloadCta": "Stiahnuť",
+    "apiServiceTitle": "Služba API nie je dostupná",
+    "apiServiceBody": "Všimli sme si, že máte aktívne API kľúče. Blink nemôže poskytovať API v non-custodial režime.\n\nAk ste závislí od API Blinku, kontaktujte nás čo najskôr a urobíme maximum pre hladký prechod.",
+    "apiServiceContactCta": "Kontaktujte nás",
+    "apiServiceContinueCta": "Napriek tomu pokračovať",
+    "resumeFailed": "Pri pokračovaní migrácie sa niečo pokazilo. Začnite ju, prosím, znova.",
+    "migrationRequiredBody": "Je čas migrovať váš zverenský účet na nesverenecký účet.",
+    "migrationRequiredForcedBody": "Je čas migrovať váš zverenský účet na nesverenecký účet. Je to vyžadované z regulačných dôvodov.\n\nNeboj sa, non-custodial pre teba bude z dlhodobého hľadiska lepší.",
+    "migrationGateTitle": "Účet nie je prístupný",
+    "migrationGateBody": "Z regulačných dôvodov nemôžeme vo tvojom regióne poskytovať custodial účty. Preveď svoje prostriedky na non-custodial účet v Blink podľa nasledujúcich krokov alebo nás kontaktuj na <link>{email}</link>",
+    "bitcoinBalance": "Zostatok Bitcoinu",
+    "dollarBalance": "Zostatok v dolároch",
     "moveToNonCustodial": "Prejsť na non-custodial",
     "explainerTitle": "Čo znamená prejsť na non-custodial?",
-    "explainerStep1": "Vytvoríte non-custodial účet na protokole Spark, <link>zistiť viac tu</link>",
-    "explainerStep2": "Prevedieme vaše prostriedky na váš nový non-custodial účet a váš súčasný účet bude vymazaný",
-    "explainerStep3": "Pokračujte v používaní Blink ako zvyčajne",
-    "letsMove": "Poďme na to",
-    "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd."
+    "explainerCheck1": "Vytvoríte non-custodial účet na protokole Spark",
+    "explainerCheck2": "Prevedieme tvoje prostriedky na tvoj nový non-custodial účet",
+    "explainerCheck3": "Tvoj súčasný účet a všetky jeho údaje vrátane histórie transakcií budú uzavreté",
+    "explainerCheck4": "Blink API nebude k dispozícii",
+    "explainerCheck5": "Z tvojho účtu bude stiahnutý sieťový poplatok Spark",
+    "explainerCta": "Rozumiem",
+    "transferringFunds": "Prevádzame vaše prostriedky. Malo by to byť hotové za niekoľko sekúnd.",
+    "clockOutOfSync": {
+      "body": "Dátum a čas vášho zariadenia nie sú synchronizované. Nastavte ich na automatické, aby ste mohli pokračovať.",
+      "retryCta": "Skúsiť znova"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Spravovaný",
@@ -3605,6 +3794,11 @@
     "modalDescription": "Dôrazne odporúčame zálohovať peňaženku, aby ste predišli úplnej strate prostriedkov v prípade straty tohto zariadenia.",
     "secureMe": "Zabezpečiť peňaženku"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Toto je nesvereneský účet",
+    "body": "Ak sa chcete dozvedieť viac, prečítajte si náš blogový príspevok",
+    "cta": "Čítať"
+  },
   "StableBalance": {
     "title": "Stabilný zostatok",
     "description": "Udržiavajte zostatok v USD poháňaný USDB na Spark.",
@@ -3652,10 +3846,10 @@
     "lightningPayment": "Lightning platba",
     "onchainDeposit": "On-chain vklad",
     "onchainWithdrawal": "On-chain výber",
-    "conversionFromBitcoin": "Konverzia z Bitcoinu",
-    "conversionToBitcoin": "Konverzia na Bitcoin",
-    "conversionFromToken": "Konverzia z {token}",
-    "conversionToToken": "Konverzia na {token}",
+    "transferFromBitcoinBalance": "Prevod z Bitcoin zostatku",
+    "transferToBitcoinBalance": "Prevod na Bitcoin zostatok",
+    "transferFromTokenBalance": "Prevod z {token} zostatku",
+    "transferToTokenBalance": "Prevod na {token} zostatok",
     "tokenTransfer": "{token} prevod",
     "payTo": "Zaplatiť na {address}",
     "payment": "Platba"

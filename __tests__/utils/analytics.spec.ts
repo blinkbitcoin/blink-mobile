@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import {
   logAddPhoneAttempt,
-  logAppFeedback,
   logAttemptCreateDeviceAccount,
   logConversionAttempt,
   logConversionResult,
@@ -271,24 +270,6 @@ describe("analytics helpers", () => {
         message: "raw string",
         type: "warning",
         is_translated: false,
-      })
-    })
-  })
-
-  describe("logAppFeedback", () => {
-    it("maps isEnjoingApp to is_enjoying_app", () => {
-      logAppFeedback({ isEnjoingApp: true })
-
-      expect(mockLogEvent).toHaveBeenCalledWith("app_feedback", {
-        is_enjoying_app: true,
-      })
-    })
-
-    it("preserves false", () => {
-      logAppFeedback({ isEnjoingApp: false })
-
-      expect(mockLogEvent).toHaveBeenCalledWith("app_feedback", {
-        is_enjoying_app: false,
       })
     })
   })

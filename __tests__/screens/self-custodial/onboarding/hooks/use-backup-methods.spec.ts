@@ -35,16 +35,23 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
 }))
 
+let mockIdentityPubkey: string | null = "test-pubkey-1234"
+const mockLoadMnemonic = jest.fn()
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
-  useWalletMnemonic: () => "youth indicate void",
+  useLoadWalletMnemonic: () => mockLoadMnemonic,
 }))
 
-let mockIdentityPubkey: string | null = "test-pubkey-1234"
-jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
-  useSelfCustodialAccountInfo: () => ({
-    identityPubkey: mockIdentityPubkey,
-    lightningAddress: null,
-  }),
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => "regtest",
+}))
+
+jest.mock("@app/self-custodial/bridge", () => ({
+  deriveWalletIdentityPubkey: () => mockIdentityPubkey,
+}))
+
+const mockCompleteBackup = jest.fn()
+jest.mock("@app/screens/self-custodial/onboarding/hooks/use-complete-backup", () => ({
+  useCompleteBackup: () => mockCompleteBackup,
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -62,16 +69,12 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
-const mockSetBackupCompleted = jest.fn()
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupMethod: {
     Cloud: "cloud",
     Keychain: "keychain",
     Manual: "manual",
   },
-  useBackupState: () => ({
-    setBackupCompleted: mockSetBackupCompleted,
-  }),
 }))
 
 let mockSelfCustodialEntries: Array<{ id: string; lightningAddress: string | null }> = []
@@ -88,6 +91,7 @@ describe("useBackupMethods", () => {
     jest.clearAllMocks()
     mockLoading = false
     mockIdentityPubkey = "test-pubkey-1234"
+    mockLoadMnemonic.mockResolvedValue("youth indicate void")
     mockSelfCustodialEntries = [{ id: "self-custodial-1", lightningAddress: null }]
     Object.defineProperty(Platform, "OS", { configurable: true, value: originalPlatform })
   })
@@ -103,6 +107,18 @@ describe("useBackupMethods", () => {
   })
 
   describe("handleCredentialBackup", () => {
+    it("reads the phrase only on the credential tap, never eagerly on mount", async () => {
+      const { result } = renderHook(() => useBackupMethods())
+      expect(mockLoadMnemonic).not.toHaveBeenCalled()
+
+      mockSave.mockResolvedValue({ success: true })
+      await act(async () => {
+        await result.current.handleCredentialBackup()
+      })
+
+      expect(mockLoadMnemonic).toHaveBeenCalledTimes(1)
+    })
+
     it("bails out with a failure toast when identityPubkey is missing", async () => {
       mockIdentityPubkey = null
       const { result } = renderHook(() => useBackupMethods())
@@ -118,6 +134,20 @@ describe("useBackupMethods", () => {
       expect(mockNavigate).not.toHaveBeenCalled()
     })
 
+    it("bails out with a failure toast when the phrase cannot be read", async () => {
+      mockLoadMnemonic.mockResolvedValue("")
+      const { result } = renderHook(() => useBackupMethods())
+
+      await act(async () => {
+        await result.current.handleCredentialBackup()
+      })
+
+      expect(mockSave).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Failed to save backup" }),
+      )
+    })
+
     it("saves with the identity pubkey and navigates to success on completion", async () => {
       mockSave.mockResolvedValue({ success: true })
       const { result } = renderHook(() => useBackupMethods())
@@ -127,11 +157,10 @@ describe("useBackupMethods", () => {
       })
 
       expect(mockSave).toHaveBeenCalledWith("test-pubkey-1234", "youth indicate void")
-      expect(mockSetBackupCompleted).toHaveBeenCalledWith("keychain")
       expect(mockToastShow).toHaveBeenCalledWith(
         expect.objectContaining({ type: "success", message: "Backup saved" }),
       )
-      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+      expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "keychain" })
     })
 
     it("stays silent when the user cancels", async () => {
@@ -144,7 +173,7 @@ describe("useBackupMethods", () => {
 
       expect(mockToastShow).not.toHaveBeenCalled()
       expect(mockNavigate).not.toHaveBeenCalled()
-      expect(mockSetBackupCompleted).not.toHaveBeenCalled()
+      expect(mockCompleteBackup).not.toHaveBeenCalled()
     })
 
     it("shows the unavailable toast when no provider is configured", async () => {

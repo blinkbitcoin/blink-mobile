@@ -41,6 +41,7 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
 const TEST_ACCOUNT_ID = "account-123"
 const TEST_MNEMONIC = "abandon abandon abandon abandon abandon abandon"
 const FAKE_SDK = { id: "sdk-instance" }
+const TEST_LEEWAY = 4
 
 const sampleWallets = [
   {
@@ -68,6 +69,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     const result = await probeSelfCustodialAccountWallets(
       TEST_ACCOUNT_ID,
       Network.Regtest,
+      TEST_LEEWAY,
     )
 
     expect(result).toEqual({ status: ProbeAccountWalletsStatus.NoMnemonic })
@@ -87,13 +89,15 @@ describe("probeSelfCustodialAccountWallets", () => {
     const result = await probeSelfCustodialAccountWallets(
       TEST_ACCOUNT_ID,
       Network.Regtest,
+      TEST_LEEWAY,
     )
 
-    expect(mockInitSdk).toHaveBeenCalledWith(
-      TEST_MNEMONIC,
-      `/storage/spark/${TEST_ACCOUNT_ID}`,
-      Network.Regtest,
-    )
+    expect(mockInitSdk).toHaveBeenCalledWith({
+      mnemonic: TEST_MNEMONIC,
+      storageDir: `/storage/spark/${TEST_ACCOUNT_ID}`,
+      network: Network.Regtest,
+      leewaySatPerVbyte: TEST_LEEWAY,
+    })
     expect(mockGetSnapshot).toHaveBeenCalledWith(FAKE_SDK)
     expect(result).toEqual({
       status: ProbeAccountWalletsStatus.Ok,
@@ -110,7 +114,7 @@ describe("probeSelfCustodialAccountWallets", () => {
       rawTransactionCount: 0,
     })
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest)
+    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest, TEST_LEEWAY)
 
     expect(mockDisconnectSdk).toHaveBeenCalledWith(FAKE_SDK)
   })
@@ -123,6 +127,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     const result = await probeSelfCustodialAccountWallets(
       TEST_ACCOUNT_ID,
       Network.Regtest,
+      TEST_LEEWAY,
     )
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
@@ -139,6 +144,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     const result = await probeSelfCustodialAccountWallets(
       TEST_ACCOUNT_ID,
       Network.Regtest,
+      TEST_LEEWAY,
     )
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
@@ -156,6 +162,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     const result = await probeSelfCustodialAccountWallets(
       TEST_ACCOUNT_ID,
       Network.Regtest,
+      TEST_LEEWAY,
     )
 
     expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
@@ -178,6 +185,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     const result = await probeSelfCustodialAccountWallets(
       TEST_ACCOUNT_ID,
       Network.Regtest,
+      TEST_LEEWAY,
     )
 
     expect(result).toEqual({
@@ -197,7 +205,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     const disconnectError = new Error("SQLite handle locked")
     mockDisconnectSdk.mockRejectedValueOnce(disconnectError)
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest)
+    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest, TEST_LEEWAY)
 
     expect(mockRecordError).toHaveBeenCalledWith(disconnectError)
   })
@@ -212,7 +220,7 @@ describe("probeSelfCustodialAccountWallets", () => {
     })
     mockDisconnectSdk.mockRejectedValueOnce("native handle invalid")
 
-    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest)
+    await probeSelfCustodialAccountWallets(TEST_ACCOUNT_ID, Network.Regtest, TEST_LEEWAY)
 
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({

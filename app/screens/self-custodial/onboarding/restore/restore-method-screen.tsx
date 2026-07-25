@@ -92,7 +92,7 @@ export const RestoreMethodScreen: React.FC = () => {
     >
       <IconHero
         icon="cloud"
-        iconColor={colors.success}
+        iconColor={colors._green}
         title={LL.RestoreScreen.title()}
         subtitle={LL.RestoreScreen.description()}
       />

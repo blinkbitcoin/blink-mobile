@@ -6,6 +6,7 @@ import { CloudBackupPicker } from "@app/screens/self-custodial/onboarding/restor
 import type { CloudBackupEntry } from "@app/screens/self-custodial/onboarding/restore/hooks/use-cloud-restore"
 
 import { ContextForScreen } from "../../../helper"
+import { flushEffects } from "../../../../helpers/flush-effects"
 
 type BuildEntryArgs = {
   fileId: string
@@ -31,7 +32,7 @@ const buildEntry = ({
 })
 
 describe("CloudBackupPicker", () => {
-  it("renders walletIdentifier as the only line when no lightning address is set", () => {
+  it("renders walletIdentifier as the only line when no lightning address is set", async () => {
     const entries = [buildEntry({ fileId: "file-1", walletIdentifier: "pubkey-1" })]
     const onSelect = jest.fn()
 
@@ -40,12 +41,13 @@ describe("CloudBackupPicker", () => {
         <CloudBackupPicker entries={entries} onSelect={onSelect} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByText("pubkey-1")).toBeTruthy()
     expect(queryAllByText("pubkey-1")).toHaveLength(1)
   })
 
-  it("renders lightning address as the title and identifier as subtitle when present", () => {
+  it("renders lightning address as the title and identifier as subtitle when present", async () => {
     const entries = [
       buildEntry({
         fileId: "file-1",
@@ -60,12 +62,13 @@ describe("CloudBackupPicker", () => {
         <CloudBackupPicker entries={entries} onSelect={onSelect} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByText("alice@blink.sv")).toBeTruthy()
     expect(getByText("pubkey-1")).toBeTruthy()
   })
 
-  it("renders one row per entry", () => {
+  it("renders one row per entry", async () => {
     const entries = [
       buildEntry({
         fileId: "file-1",
@@ -86,13 +89,14 @@ describe("CloudBackupPicker", () => {
         <CloudBackupPicker entries={entries} onSelect={onSelect} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByTestId("cloud-backup-entry-file-1")).toBeTruthy()
     expect(getByTestId("cloud-backup-entry-file-2")).toBeTruthy()
     expect(getByTestId("cloud-backup-entry-file-3")).toBeTruthy()
   })
 
-  it("invokes onSelect with the chosen entry when a row is pressed", () => {
+  it("invokes onSelect with the chosen entry when a row is pressed", async () => {
     const entries = [
       buildEntry({
         fileId: "file-1",
@@ -108,6 +112,7 @@ describe("CloudBackupPicker", () => {
         <CloudBackupPicker entries={entries} onSelect={onSelect} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     fireEvent.press(getByTestId("cloud-backup-entry-file-2"))
 
@@ -115,7 +120,7 @@ describe("CloudBackupPicker", () => {
     expect(onSelect).toHaveBeenCalledWith(entries[1])
   })
 
-  it("renders no rows when entries is empty", () => {
+  it("renders no rows when entries is empty", async () => {
     const onSelect = jest.fn()
 
     const { queryByTestId } = render(
@@ -123,11 +128,12 @@ describe("CloudBackupPicker", () => {
         <CloudBackupPicker entries={[]} onSelect={onSelect} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(queryByTestId(/^cloud-backup-entry-/)).toBeNull()
   })
 
-  it("renders the formatted createdAt date when present", () => {
+  it("renders the formatted createdAt date when present", async () => {
     const createdAt = new Date("2026-03-15T10:00:00Z").getTime()
     const entries = [
       buildEntry({ fileId: "file-1", walletIdentifier: "pubkey-1", createdAt }),
@@ -139,11 +145,12 @@ describe("CloudBackupPicker", () => {
         <CloudBackupPicker entries={entries} onSelect={jest.fn()} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(getByText(new RegExp(formattedDate.replace(/\//g, "\\/")))).toBeTruthy()
   })
 
-  it("hides the createdAt row when the timestamp is 0 (legacy backup)", () => {
+  it("hides the createdAt row when the timestamp is 0 (legacy backup)", async () => {
     const entries = [
       buildEntry({ fileId: "file-1", walletIdentifier: "pubkey-1", createdAt: 0 }),
     ]
@@ -154,6 +161,7 @@ describe("CloudBackupPicker", () => {
         <CloudBackupPicker entries={entries} onSelect={jest.fn()} />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(queryByText(new RegExp(legacyFormatted.replace(/\//g, "\\/")))).toBeNull()
   })

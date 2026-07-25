@@ -2279,7 +2279,6 @@
     "notConfirmed": "El pagament s'ha enviat\nperò encara no està confirmat\n\nPots consultar l'estat\ndel pagament a Transaccions",
     "note": "Nota o etiqueta",
     "success": "El pagament s'ha enviat correctament",
-    "suggestionInput": "Escriu la teva sugerencia",
     "max": "Max",
     "maxAmount": "Import màxim",
     "title": "Envia Bitcoin",
@@ -2319,6 +2318,10 @@
     "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent."
   },
   "SettingsScreen": {
+    "createAddress": "Crea una adreça",
+    "donationButton": "Botó de donació",
+    "btcpayServer": "BTCPay Server",
+    "woocommerce": "WooCommerce",
     "staticQr": "Codi QR estàtic imprimible",
     "staticQrCopied": "S'ha copiat l'enllaç del teu codi QR estàtic",
     "setByOs": "Establert pel sistema operatiu",
@@ -2327,7 +2330,6 @@
     "apiDashboard": "Accés a l'API i tauler de control",
     "pos": "Punt de venda",
     "posCopied": "S'ha copiat l'enllaç del teu punt de venda",
-    "setYourLightningAddress": "Configura la teva adreça Lightning",
     "activated": "Activat",
     "addressScreen": "Maneres de cobrar",
     "nonCustodialAccount": "Compte no custodi",
@@ -2525,7 +2527,31 @@
     "receivingAccount": "Compte receptor",
     "sendingAccount": "Compte d'enviament",
     "txNotBroadcast": "La teva transacció està en cua. Hauria d'aparèixer a la mempool {countdown: string}.",
-    "momentarily": "momentàniament"
+    "momentarily": "momentàniament",
+    "findingAccount": "S'està cercant el compte d'aquest pagament...",
+    "txNotFoundInAccounts": "Aquest pagament no s'ha trobat en cap compte d'aquest dispositiu. Pot pertànyer a un compte desconnectat.",
+    "txLoadFailed": "No s'ha pogut carregar aquest pagament. Comprova la connexió i torna-ho a provar.",
+    "switchedForPayment": "S'ha canviat a {identifier: string} per mostrar aquest pagament"
+  },
+  "FeeRatesScreen": {
+    "title": "Tarifes de comissions",
+    "send": "Enviar",
+    "receive": "Rebre",
+    "transfer": "Transferència",
+    "lightning": "Lightning",
+    "intraledger": "Intraledger",
+    "onchainPriority": "Onchain prioritari (al més aviat possible)",
+    "onchainStandard": "Onchain estàndard (~4h)",
+    "onchainEconomy": "Onchain econòmic",
+    "lightningTransactions": "Transaccions Lightning",
+    "onchainBelowThreshold": "Onchain per sota de {threshold: string} SAT",
+    "onchainAboveThreshold": "Onchain per sobre de {threshold: string} SAT",
+    "transferFee": "Comissió de transferència",
+    "noFee": "sense comissió",
+    "lightningSendFee": "{fee: string} + ~{routingFee: string} de comissió d'encaminament",
+    "fromApprox": "des de ~{fee: string}",
+    "satAmount": "{amount: string} SAT",
+    "error": "No es poden obtenir les comissions en aquest moment"
   },
   "TransactionLimitsScreen": {
     "receive": "Rebre",
@@ -2700,6 +2726,8 @@
   },
   "common": {
     "country": "País",
+    "registered": "Registrat",
+    "detected": "Detectat",
     "unknown": "Desconegut",
     "enabled": "Habilitat",
     "switch": "Interruptor",
@@ -2719,6 +2747,7 @@
     "anonymousUser": "Usuari anònim",
     "blinkToBlink": "Blink a Blink",
     "transactionLimits": "Límits de transacció",
+    "feeRates": "Tarifes de comissions",
     "activateWallet": "Activa el moneder",
     "amountRequired": "L'import és necessari",
     "back": "Enrere",
@@ -2732,6 +2761,7 @@
     "bitcoinPrice": "Preu de Bitcoin",
     "btcAccount": "Compte Bitcoin",
     "cancel": "Cancela",
+    "card": "Targeta",
     "close": "Tanca",
     "confirm": "Confirma",
     "convert": "Converteix",
@@ -2799,6 +2829,7 @@
     "total": "Total",
     "transactions": "Transaccions",
     "transactionsError": "S'ha produït un error en carregar les transaccions",
+    "transfer": "Transferència",
     "tryAgain": "Torna-ho a intentar",
     "type": "Tipus",
     "usdAccount": "Compte Dòlar",
@@ -2815,6 +2846,7 @@
     "problemMaybeReauth": "Hi va haver un problema amb la teva sol·licitud. Si us plau, torna a intentar-ho en un minut. Si el problema persisteix, et recomanem que tanquis la sessió i tornis a iniciar-la. Pots tancar la sessió anant a Configuració > Compte > Tancar sessió",
     "warning": "Advertència",
     "continue": "Continua",
+    "skip": "Omet",
     "correct": "Correcte",
     "recommended": "Recomanat",
     "expirationTime": "Temps d'expiració",
@@ -2870,11 +2902,9 @@
     "email": "Correu electrònic",
     "sms": "SMS",
     "faq": "FAQ",
-    "enjoyingApp": "Gaudint de l'aplicació?",
     "statusPage": "Pàgina d'estat",
     "telegram": "Telegram",
     "mattermost": "Mattermost",
-    "thankYouText": "Gràcies pels comentaris, vols suggerir una millora?",
     "defaultEmailSubject": "{bankName: string} - Suport",
     "defaultSupportMessage": "Hola! Necessito ajuda amb {bankName: string}, utilitzo la versió {version: string} de {os: string}.",
     "emailCopied": "l'adreça electrònica {email: string} s'ha copiat al porta-retalls",
@@ -3044,6 +3074,66 @@
       "limitUpdateSuccess": "Límit actualitzat correctament",
       "limitUpdateError": "No s'ha pogut actualitzar el límit",
       "limitMustBePositive": "El límit ha de ser superior a zero"
+    },
+    "CardFeeSchedule": {
+      "title": "Programa de tarifes de la targeta Blink",
+      "effectiveDate": "Vigent des de l'1 de juliol de 2026",
+      "sections": {
+        "cardFees": "Tarifes de la targeta",
+        "transactionFees": "Tarifes de transacció",
+        "overdraft": "Descobert (mode finançat)"
+      },
+      "fees": {
+        "annualFee": {
+          "title": "Tarifa anual",
+          "subtitle": "Exempta el primer any des de la data d'emissió de la targeta",
+          "value": "{amount: string} / any"
+        },
+        "cardReplacement": {
+          "title": "Reemplaçament de targeta"
+        },
+        "usdTransactionFee": {
+          "title": "Tarifa de transacció en USD",
+          "subtitle": "Aplicada a cada transacció en dòlars dels EUA"
+        },
+        "foreignTransactionFee": {
+          "title": "Tarifa de transacció estrangera",
+          "subtitle": "Aplicada a cada transacció en una moneda diferent del dòlar dels EUA"
+        },
+        "maximumOverdraft": {
+          "title": "Descobert màxim",
+          "subtitle": "S'ha de reemborsar en un termini de 7 dies"
+        },
+        "lateRepaymentFee": {
+          "title": "Tarifa per pagament tardà",
+          "subtitle": "Es cobra si el descobert no es reemborsa en un termini de 7 dies"
+        }
+      },
+      "btcConversion": {
+        "title": "Conversió de BTC",
+        "body": "Quan una transacció requereix la conversió de BTC a USD, la conversió s'executa al tipus de canvi vigent, que pot incloure un marge que reflecteix el cost de la conversió."
+      },
+      "feesUpdateNotice": {
+        "text": "Les tarifes es poden actualitzar de tant en tant. Blink avisarà amb almenys 30 dies d'antelació abans que qualsevol canvi de tarifes entri en vigor, d'acord amb l'",
+        "linkText": "Acord del titular de la targeta"
+      },
+      "creditModeNotice": "El Mode Crèdit no està actiu actualment. Si s'activa el Mode Crèdit, els tipus d'interès, les tarifes i les divulgacions de drets de facturació aplicables es proporcionaran abans de l'activació.",
+      "additionalDetails": {
+        "title": "Detalls addicionals de tarifes",
+        "overdraft": {
+          "label": "Descobert",
+          "text": ". En determinades circumstàncies, es pot aprovar una transacció que faci que el saldo de la teva targeta caigui per sota de zero. El descobert màxim és de {maxOverdraft: string}. Has de reemborsar el descobert en un termini de 7 dies transferint fons addicionals al saldo de la teva targeta."
+        },
+        "foreignCurrency": {
+          "label": "Moneda estrangera",
+          "text": ". Si fas una transacció en una moneda estrangera, la xarxa de la targeta la converteix a USD amb els seus propis procediments de conversió. El tipus a la data de processament pot diferir de la data de la transacció."
+        },
+        "noHiddenFees": {
+          "label": "Sense tarifes ocultes",
+          "text": ". No hi ha tarifes per obertura de compte, inactivitat, consultes de saldo ni per tancar la teva targeta."
+        }
+      },
+      "backButton": "Enrere"
     },
     "CardDetails": {
       "title": "Detalls de la targeta",
@@ -3390,6 +3480,7 @@
         "perYear": "per any",
         "status": {
           "label": "Estat",
+          "specialOfferLabel": "Oferta especial",
           "paymentPending": "Pagament Pendent",
           "firstYearFree": "Primer any gratuït"
         },
@@ -3403,7 +3494,11 @@
           "cardholderAgreement": "Acord del Titular de la Targeta",
           "and": "i"
         },
-        "renew": "Entenc que la meva subscripció es renovarà automàticament en 1 any"
+        "feeSchedule": {
+          "text": "He revisat i accepto la",
+          "linkText": "Taula de Tarifes de Blink Card"
+        },
+        "renew": "Entenc que la meva subscripció es renovarà automàticament en {months: number} mesos"
       },
       "CardIntroducing": {
         "title": "Presentant",
@@ -3465,13 +3560,29 @@
         "buttonText": "Enviar sol·licitud",
         "select": "seleccionar"
       },
+      "Acknowledgement": {
+        "title": "Termes i condicions",
+        "acceptButton": "Accepta",
+        "eSignConsent": {
+          "text": "Accepto el",
+          "linkText": "Consentiment de signatura electrònica"
+        },
+        "privacyAndTerms": {
+          "text": "Accepto el",
+          "privacyPolicyLinkText": "Política de privadesa de l'emissor",
+          "and": ", i",
+          "cardTermsLinkText": "Condicions de la targeta Blink"
+        },
+        "certifyAccuracy": "Certifico que la informació que he proporcionat és exacta i que compliré totes les normes i requisits relacionats amb la meva targeta Blink Visa",
+        "acknowledgeSolicitation": "Reconec que sol·licitar la targeta Blink Visa no constitueix una sol·licitud no autoritzada"
+      },
       "CardPreapproved": {
         "title": "Has estat preaprovat per a la targeta Blink Visa!",
         "buttonText": "Tancar"
       },
       "CardProcessing": {
         "title": "Processant la teva sol·licitud",
-        "subtitle": "Temps d'espera estimat: {waitTime: string}",
+        "subtitle": "T'avisarem quan estiguem preparats",
         "buttonText": "Tancar"
       }
     }
@@ -3499,6 +3610,7 @@
       },
       "Phrase": {
         "headerTitle": "Frase de còpia de seguretat",
+        "authDescription": "Confirma la teva identitat per veure la teva frase de còpia de seguretat",
         "sparkCompatible": "Aquesta frase de còpia de seguretat funciona en qualsevol {sparkCompatibleLink}",
         "sparkCompatibleLink": "cartera compatible amb Spark",
         "copiedToast": "Frase de còpia de seguretat copiada al porta-retalls",
@@ -3538,6 +3650,7 @@
       "uploadSuccess": "Còpia de seguretat desada a {provider}",
       "uploadFailed": "Error en pujar la còpia de seguretat",
       "signInFailed": "No s'ha pogut iniciar sessió a {provider}",
+      "storageAccessRequired": "Permet a {provider: string} l'accés a la còpia de seguretat de la teva cartera i torna-ho a provar.",
       "cloudNotAvailable": "iCloud Drive no està disponible. Inicia sessió a iCloud des de Configuració i activa iCloud Drive.",
       "networkError": "Error de xarxa. Comprova la connexió i torna-ho a provar.",
       "existingBackupTitle": "Còpia de seguretat trobada",
@@ -3549,13 +3662,89 @@
     }
   },
   "AccountMigration": {
+    "contactSupport": {
+      "title": "Contacta amb suport",
+      "body": "Alguna cosa ha anat malament, però no et preocupis, els teus fons estan segurs. Contacta amb suport per obtenir ajuda.\n\nPotser necessitaràs aquesta informació per ajudar el suport a resoldre el teu cas:",
+      "reasonLabel": "Motiu",
+      "accountIdLabel": "ID del compte",
+      "pubKeyLabel": "pubKey",
+      "usernameLabel": "Nom d'usuari",
+      "emailLabel": "Correu electrònic",
+      "phoneLabel": "Número de telèfon",
+      "appVersionLabel": "Versió de l'aplicació",
+      "platformLabel": "Plataforma",
+      "countryLabel": "País",
+      "emailSubject": "Sol·licitud de suport de migració",
+      "emailDescribeProblem": "Descriu el problema:",
+      "emailAccountInfo": "Informació del compte per al suport:",
+      "contactUsCta": "Contacta'ns",
+      "copy": "Copiar"
+    },
+    "migrateNowModal": {
+      "title": "Migra ara a un compte no custodi",
+      "body": "Ja no pots rebre fons al teu compte custodial. Blink ha discontinuat el servei de custòdia a la teva regió i aquest compte quedarà inactivat al final del {date}.\n\nMigra ara a un compte no custodi.",
+      "migrateCta": "Migra ara"
+    },
+    "reminderBulletin": {
+      "title": "Important",
+      "body": "Passa a un compte no custodi mitjançant la migració guiada, o retira els teus fons, abans del {date}. La recepció s'atura el {receiveStopsDate}.",
+      "migrateCta": "Migra"
+    },
+    "offboardBulletin": {
+      "title": "Important",
+      "body": "El teu compte està registrat en una regió on no podem oferir comptes. Retira els teus fons abans del 31 d'agost. La recepció s'atura el 10 d'agost."
+    },
+    "dollarBalanceModal": {
+      "title": "No podem migrar el teu saldo en dòlars",
+      "body": "Primer buida el teu saldo en dòlars. Pots transferir-lo al teu saldo en bitcoins a Blink o en un altre lloc."
+    },
+    "balancesOverview": {
+      "title": "Mou el teu saldo",
+      "body": "Mou els teus fons de manera segura al teu nou compte.",
+      "currentBitcoinBalance": "Saldo de Bitcoin actual",
+      "currentDollarBalance": "Saldo en dòlars actual",
+      "newBitcoinBalance": "Nou saldo de Bitcoin",
+      "newDollarBalance": "Nou saldo en dòlars",
+      "dollarBalanceNotAvailable": "no disponible",
+      "networkFee": "Comissió de xarxa: <bold>{fee: string}</bold>",
+      "networkFeeCoveredByBlink": "Comissió de xarxa: <bold>{fee: string}</bold> (coberta per Blink)",
+      "retryCta": "Torna-ho a provar",
+      "approveCta": "Aprovar",
+      "contactSupportCta": "Contacta amb suport"
+    },
+    "migrationRequiredTitle": "Hora d'actualitzar",
+    "keepReceivingTitle": "Continua rebent com sempre",
+    "keepReceivingBody": "La teva adreça Lightning es transferirà al teu nou compte no custodial.",
+    "keepReceivingLnAddressLabel": "La teva adreça LN",
+    "keepReceivingCta": "Genial",
+    "receivingDisabledToast": "La recepció està desactivada actualment.",
+    "downloadHistoryTitle": "Baixa el teu historial de transaccions",
+    "downloadHistoryBody": "El teu compte nou començarà de zero. Si vols conservar un registre de les teves transaccions, baixa-les ara com a CSV.",
+    "downloadHistoryDownloadCta": "Baixa",
+    "apiServiceTitle": "Servei d'API no disponible",
+    "apiServiceBody": "Observem que tens claus API actives. Blink no pot oferir l'API en mode no custodial.\n\nSi depens de l'API de Blink, contacta'ns aviat i farem tot el possible per ajudar-te en una transició fluida.",
+    "apiServiceContactCta": "Contacta'ns",
+    "apiServiceContinueCta": "Continua igualment",
+    "resumeFailed": "Alguna cosa ha fallat en reprendre la migració. Si us plau, torna-la a començar.",
+    "migrationRequiredBody": "És hora de migrar el teu compte custodial a un compte no custodi.",
+    "migrationRequiredForcedBody": "És hora de migrar el teu compte custodial a un compte no custodi. És obligatori per motius reguladors.\n\nNo et preocupis, la modalitat no custodial serà millor per a tu a llarg termini.",
+    "migrationGateTitle": "Compte no accessible",
+    "migrationGateBody": "Per motius reguladors no podem oferir comptes custodials a la teva regió. Transfereix els teus fons a un compte no custodial amb Blink seguint els passos següents o contacta amb nosaltres a <link>{email}</link>",
+    "bitcoinBalance": "Saldo de Bitcoin",
+    "dollarBalance": "Saldo en dòlars",
     "moveToNonCustodial": "Passa a no custodial",
     "explainerTitle": "Què significa passar a no custodial?",
-    "explainerStep1": "Crearàs un compte no custodial al protocol Spark, <link>més informació aquí</link>",
-    "explainerStep2": "Transferirem els teus fons al teu nou compte no custodial i el teu compte actual serà eliminat",
-    "explainerStep3": "Continua fent servir Blink com sempre",
-    "letsMove": "Anem-hi",
-    "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons."
+    "explainerCheck1": "Crearàs un compte no custodial al protocol Spark",
+    "explainerCheck2": "Transferim els teus fons al teu nou compte no custodial",
+    "explainerCheck3": "El teu compte actual i totes les seves dades, inclòs l'historial de transaccions, es tancaran",
+    "explainerCheck4": "L'API de Blink no estarà disponible",
+    "explainerCheck5": "Es descomptarà una comissió de xarxa de Spark del teu compte",
+    "explainerCta": "Ho entenc",
+    "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons.",
+    "clockOutOfSync": {
+      "body": "La data i l'hora del teu dispositiu no estan sincronitzades. Configura-les en automàtic per continuar.",
+      "retryCta": "Torna-ho a provar"
+    }
   },
   "AccountTypeSelectionScreen": {
     "custodialLabel": "Custodiat",
@@ -3605,6 +3794,11 @@
     "modalDescription": "Et recomanem fermament que facis una còpia de seguretat de la teva cartera per evitar una pèrdua total de fons en cas que perdis aquest dispositiu.",
     "secureMe": "Assegurar cartera"
   },
+  "NonCustodialInfoBulletin": {
+    "title": "Aquest és un compte no custodi",
+    "body": "Per saber-ne més, llegeix la nostra entrada del blog",
+    "cta": "Llegeix"
+  },
   "StableBalance": {
     "title": "Balanç estable",
     "description": "Mantén un balanç denominat en USD amb USDB a Spark.",
@@ -3652,10 +3846,10 @@
     "lightningPayment": "Pagament Lightning",
     "onchainDeposit": "Dipòsit On-chain",
     "onchainWithdrawal": "Retirada On-chain",
-    "conversionFromBitcoin": "Conversió des de Bitcoin",
-    "conversionToBitcoin": "Conversió a Bitcoin",
-    "conversionFromToken": "Conversió des de {token}",
-    "conversionToToken": "Conversió a {token}",
+    "transferFromBitcoinBalance": "Transferència des del saldo de Bitcoin",
+    "transferToBitcoinBalance": "Transferència al saldo de Bitcoin",
+    "transferFromTokenBalance": "Transferència des del saldo de {token}",
+    "transferToTokenBalance": "Transferència al saldo de {token}",
     "tokenTransfer": "Transferència {token}",
     "payTo": "Pagar a {address}",
     "payment": "Pagament"

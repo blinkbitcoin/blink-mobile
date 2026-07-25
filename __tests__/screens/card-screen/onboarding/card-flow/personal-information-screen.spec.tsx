@@ -52,6 +52,10 @@ describe("CardPersonalInformationScreen", () => {
     jest.clearAllMocks()
   })
 
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
   it("renders without crashing", async () => {
     const { toJSON } = render(
       <ContextForScreen>
@@ -139,5 +143,34 @@ describe("CardPersonalInformationScreen", () => {
     await act(async () => {})
 
     expect(getByText("Select")).toBeTruthy()
+  })
+
+  it("navigates to the acknowledgement screen once all fields are selected", async () => {
+    jest.useFakeTimers()
+
+    const { getByText, getByTestId } = render(
+      <ContextForScreen>
+        <CardPersonalInformationScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+
+    await act(async () => {
+      fireEvent.press(getByTestId("Select your occupation"))
+      fireEvent.press(getByTestId("Select your salary range"))
+      fireEvent.press(getByTestId("Select purpose"))
+      fireEvent.press(getByTestId("Select your spending range"))
+    })
+
+    await act(async () => {
+      fireEvent.press(getByText("Submit application"))
+    })
+
+    await act(async () => {
+      jest.advanceTimersByTime(500)
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingAcknowledgementScreen")
   })
 })

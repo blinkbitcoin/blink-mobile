@@ -25,8 +25,10 @@ jest.mock("@app/components/atomic/galoy-icon", () => ({
   },
 }))
 
+const mockCurrencyKeyboard = jest.fn()
 jest.mock("@app/components/currency-keyboard", () => ({
-  CurrencyKeyboard: () => {
+  CurrencyKeyboard: (props: { disabled?: boolean }) => {
+    mockCurrencyKeyboard(props)
     const ReactNative = jest.requireActual("react-native")
     return <ReactNative.View testID="currency-keyboard" />
   },
@@ -61,5 +63,13 @@ describe("AmountInputScreenUI", () => {
     const { getByTestId } = render(<AmountInputScreenUI onKeyPress={mockOnKeyPress} />)
 
     expect(getByTestId("currency-keyboard")).toBeTruthy()
+  })
+
+  it("passes the disabled flag through to the keyboard", () => {
+    render(<AmountInputScreenUI onKeyPress={mockOnKeyPress} disabled />)
+
+    expect(mockCurrencyKeyboard).toHaveBeenCalledWith(
+      expect.objectContaining({ disabled: true }),
+    )
   })
 })

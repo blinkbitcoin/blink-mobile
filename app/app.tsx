@@ -34,6 +34,7 @@ import "./i18n/mapping"
 import { AppStateWrapper } from "./navigation/app-state"
 import { NavigationContainerWrapper } from "./navigation/navigation-container-wrapper"
 import { RootStack } from "./navigation/root-navigator"
+import { MigrationBlockerProvider } from "./screens/account-migration/hooks/use-migration-blocker"
 import { ErrorScreen } from "./screens/error-screen"
 import { PersistentStateProvider } from "./store/persistent-state"
 import { detectDefaultLocale } from "./utils/locale-detector"
@@ -63,21 +64,23 @@ export const App = () => (
                   <BackupStateProvider>
                     <AutoConvertStatusProvider>
                       <ActionsProvider>
-                        <NavigationContainerWrapper>
-                          <ErrorBoundary FallbackComponent={ErrorScreen}>
-                            <RootSiblingParent>
-                              <NotificationsProvider>
-                                <AppStateWrapper />
-                                <PushNotificationComponent />
-                                <AutoConvertListenerMount />
-                                <RootStack />
-                                <NetworkErrorComponent />
-                                <ActionModals />
-                              </NotificationsProvider>
-                              <GaloyToast />
-                            </RootSiblingParent>
-                          </ErrorBoundary>
-                        </NavigationContainerWrapper>
+                        <MigrationBlockerProvider>
+                          <NavigationContainerWrapper>
+                            <ErrorBoundary FallbackComponent={ErrorScreen}>
+                              <RootSiblingParent>
+                                <NotificationsProvider>
+                                  <AppStateWrapper />
+                                  <PushNotificationComponent />
+                                  <AutoConvertListenerMount />
+                                  <RootStack />
+                                  <NetworkErrorComponent />
+                                  <ActionModals />
+                                </NotificationsProvider>
+                                <GaloyToast />
+                              </RootSiblingParent>
+                            </ErrorBoundary>
+                          </NavigationContainerWrapper>
+                        </MigrationBlockerProvider>
                       </ActionsProvider>
                     </AutoConvertStatusProvider>
                   </BackupStateProvider>

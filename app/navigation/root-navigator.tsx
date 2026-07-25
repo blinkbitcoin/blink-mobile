@@ -45,6 +45,7 @@ import { DefaultWalletScreen } from "@app/screens/settings-screen/default-wallet
 import { DisplayCurrencyScreen } from "@app/screens/settings-screen/display-currency-screen"
 import { NotificationSettingsScreen } from "@app/screens/settings-screen/notifications-screen"
 import { ThemeScreen } from "@app/screens/settings-screen/theme-screen"
+import { FeeRatesScreen } from "@app/screens/settings-screen/fee-rates-screen"
 import { TransactionLimitsScreen } from "@app/screens/settings-screen/transaction-limits-screen"
 import {
   TotpLoginValidateScreen,
@@ -68,6 +69,7 @@ import {
   LoginMethodScreen,
 } from "../screens/authentication-screen"
 import { PinScreen } from "../screens/authentication-screen/pin-screen"
+import { unlockScreenOptions } from "../screens/authentication-screen/unlock-screen"
 import { DeveloperScreen } from "../screens/developer-screen"
 import { EarnMapScreen } from "../screens/earns-map-screen"
 import { EarnQuiz, EarnSection } from "../screens/earns-screen"
@@ -94,6 +96,7 @@ import { OfflineGate } from "@app/self-custodial/components"
 import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unavailable"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
+import { CardFeeScheduleScreen } from "@app/screens/card-screen/card-fee-schedule-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { headerCloseControl } from "@app/components/header-close-control"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
@@ -119,6 +122,7 @@ import {
   CardSubscriptionScreen,
   LoadingCardScreen,
   CardPersonalInformationScreen,
+  CardAcknowledgementScreen,
   CardPreapprovedScreen,
   CardProcessingScreen,
   CardApprovedScreen,
@@ -146,8 +150,14 @@ import {
   CloudRestoreScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
 import {
+  MigrationBalancesOverviewScreen,
+  MigrationContactSupportScreen,
+  MigrationDownloadHistoryScreen,
+  MigrationEntryScreen,
   MigrationExplainerScreen,
-  TransferringFundsScreen,
+  MigrationGate,
+  MigrationKeepReceivingScreen,
+  MigrationTransferringFundsScreen,
 } from "@app/screens/account-migration"
 import {
   OnboardingStackParamList,
@@ -156,6 +166,9 @@ import {
   PrimaryStackParamList,
   RootStackParamList,
 } from "./stack-param-lists"
+import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
+import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
+import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
 import { useNavigation } from "@react-navigation/native"
@@ -177,8 +190,22 @@ const ScanningQRCodeGated = withOfflineGate(ScanningQRCodeScreen)
 const SendBitcoinDestinationGated = withOfflineGate(SendBitcoinDestinationScreen)
 const SendBitcoinDetailsGated = withOfflineGate(SendBitcoinDetailsScreen)
 const SendBitcoinConfirmationGated = withOfflineGate(SendBitcoinConfirmationScreen)
-const ReceiveGated = withOfflineGate(ReceiveScreen)
-const RedeemBitcoinDetailGated = withOfflineGate(RedeemBitcoinDetailScreen)
+const ReceiveOfflineGated = withOfflineGate(ReceiveScreen)
+const ReceiveGated: React.FC = () => (
+  <WindDownReceiveGate>
+    <ReceiveOfflineGated />
+  </WindDownReceiveGate>
+)
+const RedeemBitcoinDetailOfflineGated = withOfflineGate(RedeemBitcoinDetailScreen)
+/** An incoming-funds path, so it sits behind the receive block like receiveBitcoin: a
+ *  voucher scanned while receiving is disabled meets the migrate prompt, not a server error. */
+const RedeemBitcoinDetailGated: React.FC<
+  React.ComponentProps<typeof RedeemBitcoinDetailOfflineGated>
+> = (props) => (
+  <WindDownReceiveGate>
+    <RedeemBitcoinDetailOfflineGated {...props} />
+  </WindDownReceiveGate>
+)
 const ConversionDetailsGated = withOfflineGate(ConversionDetailsScreen)
 const ConversionConfirmationGated = withOfflineGate(ConversionConfirmationScreen)
 const UnclaimedDepositsGated = withOfflineGate(UnclaimedDepositsScreen)
@@ -208,6 +235,7 @@ export const RootStack = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerShadowVisible: false,
         headerLeft: headerBackControl(),
       }}
       initialRouteName={hasAccount ? "authenticationCheck" : "getStarted"}
@@ -230,12 +258,12 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="authenticationCheck"
         component={AuthenticationCheckScreen}
-        options={{ headerShown: false }}
+        options={unlockScreenOptions}
       />
       <RootNavigator.Screen
         name="authentication"
         component={AuthenticationScreen}
-        options={{ headerShown: false }}
+        options={unlockScreenOptions}
       />
       <RootNavigator.Screen
         name="login"
@@ -252,7 +280,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="pin"
         component={PinScreen}
-        options={{ headerShown: false }}
+        options={unlockScreenOptions}
       />
       <RootNavigator.Screen
         name="Primary"
@@ -488,7 +516,6 @@ export const RootStack = () => {
         component={SwitchAccount}
         options={{
           title: LL.common.accounts(),
-          headerShadowVisible: false,
         }}
       />
       <RootNavigator.Screen
@@ -510,6 +537,13 @@ export const RootStack = () => {
         component={TransactionLimitsScreen}
         options={{
           title: LL.common.transactionLimits(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="feeRatesScreen"
+        component={FeeRatesScreen}
+        options={{
+          title: LL.FeeRatesScreen.title(),
         }}
       />
       <RootNavigator.Screen
@@ -594,6 +628,13 @@ export const RootStack = () => {
         component={CardDashboardScreen}
         options={{
           title: LL.CardFlow.CardDashboard.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="cardFeeScheduleScreen"
+        component={CardFeeScheduleScreen}
+        options={{
+          title: LL.CardFlow.CardFeeSchedule.title(),
         }}
       />
       <RootNavigator.Screen
@@ -727,6 +768,14 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
+        name="cardOnboardingAcknowledgementScreen"
+        component={CardAcknowledgementScreen}
+        options={{
+          title: "",
+          headerRight: headerCloseControl(),
+        }}
+      />
+      <RootNavigator.Screen
         name="cardOnboardingProcessingScreen"
         component={CardProcessingScreen}
         options={{
@@ -809,14 +858,44 @@ export const RootStack = () => {
         options={{ title: LL.StableBalance.settingsTitle() }}
       />
       <RootNavigator.Screen
+        name="accountMigrationStart"
+        component={MigrationGate}
+        options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationEntry"
+        component={MigrationEntryScreen}
+        options={{ headerShown: false }}
+      />
+      <RootNavigator.Screen
         name="accountMigrationExplainer"
         component={MigrationExplainerScreen}
         options={{ title: "" }}
       />
       <RootNavigator.Screen
+        name="accountMigrationKeepReceiving"
+        component={MigrationKeepReceivingScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationDownloadHistory"
+        component={MigrationDownloadHistoryScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationBalancesOverview"
+        component={MigrationBalancesOverviewScreen}
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <RootNavigator.Screen
         name="accountMigrationTransferringFunds"
-        component={TransferringFundsScreen}
-        options={{ headerShown: false }}
+        component={MigrationTransferringFundsScreen}
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+      <RootNavigator.Screen
+        name="accountMigrationContactSupport"
+        component={MigrationContactSupportScreen}
+        options={{ title: "", gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialRestoreMethod"
@@ -854,6 +933,7 @@ export const OnboardingNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerShadowVisible: false,
       }}
     >
       <Onboarding.Screen
@@ -908,6 +988,7 @@ export const ContactNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerShadowVisible: false,
         headerLeft: headerBackControl(),
       }}
       initialRouteName="peopleHome"
@@ -965,6 +1046,7 @@ export const PhoneLoginNavigator = () => {
         headerStyle: styles.headerStyle,
         headerTitleStyle: styles.title,
         headerTintColor: colors.black,
+        headerShadowVisible: false,
         headerLeft: headerBackControl(),
       }}
     >
@@ -1003,8 +1085,13 @@ export const PrimaryNavigator = () => {
   const insets = useSafeAreaInsets()
 
   const { LL } = useI18nContext()
-  // The cacheId is updated after every mutation that affects current user data (balanace, contacts, ...)
-  // It's used to re-mount this component and thus reset what's cached in Apollo (and React)
+
+  /** A migration the server finished but this device never swapped away from is completed
+   *  here, before any screen renders, since no screen in the flow is mounted to do it. */
+  useResumeCompletedMigration()
+
+  const migrationBlocker = useMigrationBlocker()
+  if (migrationBlocker.isVisible) return <MigrationGate />
 
   return (
     <Tab.Navigator
