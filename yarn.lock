@@ -2634,11 +2634,6 @@
     "@formatjs/intl-localematcher" "0.5.4"
     tslib "^2.4.0"
 
-"@galoymoney/react-native-geetest-module@^0.1.3":
-  version "0.1.5"
-  resolved "https://registry.npmjs.org/@galoymoney/react-native-geetest-module/-/react-native-geetest-module-0.1.5.tgz#b7fcaa713318493b552676e2994f933f3fbecf5b"
-  integrity sha512-U7PbibBI2oDhBsF3AUPKS51Eg7XvdJfi6Tz1gZu20LorGNmas9CIB207KpJBSS+TVQEVslxh0Y70y6EsAS5S6Q==
-
 "@graphql-codegen/add@^5.0.2":
   version "5.0.2"
   resolved "https://registry.npmjs.org/@graphql-codegen/add/-/add-5.0.2.tgz#71b3ae0465a4537172dddb84531b6967ca5545f2"
