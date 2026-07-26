@@ -1837,6 +1837,10 @@
   resolved "https://registry.yarnpkg.com/@blinkbitcoin/blink-client/-/blink-client-0.6.0.tgz#2d404c0c24f3ea65ac52ed63c49750d0accd10ce"
   integrity sha512-ikW6liGeFAoi3SJB9i+C5d2QICVhEzdP9lJYdMZnEaL1WoitRO4uiG1n6vQTFEQwg0Q0OOeBK1Qoa3rNKbcF2Q==
 
+"@blinkbitcoin/react-native-geetest-module@git+https://github.com/kngako/react-native-geetest-module.git#ef7c0bd86574556e3ff96e0313b92d86856046d9":
+  version "0.1.5"
+  resolved "git+https://github.com/kngako/react-native-geetest-module.git#ef7c0bd86574556e3ff96e0313b92d86856046d9"
+
 "@breeztech/breez-sdk-spark-react-native@0.15.0":
   version "0.15.0"
   resolved "https://registry.yarnpkg.com/@breeztech/breez-sdk-spark-react-native/-/breez-sdk-spark-react-native-0.15.0.tgz#2d52247fb320eb9cc420cdf170f2b71c45f5427d"
