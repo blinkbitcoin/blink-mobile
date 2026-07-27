@@ -41,7 +41,9 @@ export const ApiKeyCreateScreen: React.FC = () => {
     { label: LL.ApiScreen.expiryNever(), value: null },
   ]
 
-  const canSubmit = name.trim().length > 0 && (readEnabled || receiveEnabled) && !loading
+  const hasName = name.trim().length > 0
+  const hasScope = readEnabled || receiveEnabled
+  const canSubmit = hasName && hasScope && !loading
 
   const createApiKey = async () => {
     setHasError(false)
