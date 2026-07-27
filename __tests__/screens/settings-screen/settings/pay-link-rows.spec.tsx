@@ -38,19 +38,24 @@ jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({ theme: { colors: { primary: "#fc5805", black: "#000" } } }),
 }))
 
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      SettingsScreen: {
-        pos: () => "Point of Sale",
-        staticQr: () => "Printable static QR",
-        donationButton: () => "Donation Button",
-        btcpayServer: () => "BTCPay Server",
-        woocommerce: () => "Woocommerce",
+// The labels come from the real English source rather than literals so the mock
+// cannot drift away from the copy the rows actually render.
+jest.mock("@app/i18n/i18n-react", () => {
+  const { SettingsScreen } = jest.requireActual("@app/i18n/en").default
+  return {
+    useI18nContext: () => ({
+      LL: {
+        SettingsScreen: {
+          pos: () => SettingsScreen.pos,
+          staticQr: () => SettingsScreen.staticQr,
+          donationButton: () => SettingsScreen.donationButton,
+          btcpayServer: () => SettingsScreen.btcpayServer,
+          woocommerce: () => SettingsScreen.woocommerce,
+        },
       },
-    },
-  }),
-}))
+    }),
+  }
+})
 
 import { AccountPOS } from "@app/screens/settings-screen/settings/account-pos"
 import { AccountStaticQR } from "@app/screens/settings-screen/settings/account-static-qr"
@@ -115,6 +120,11 @@ describe("ways to get paid rows", () => {
       render(<AccountDonationButton />)
       pressRow()
       expect(Linking.openURL).toHaveBeenCalledWith("https://donation-button.blink.sv/bob")
+    })
+
+    it("donation button row is labelled with the donate copy", () => {
+      render(<AccountDonationButton />)
+      expect(lastRowProps().title).toBe("Donate Button")
     })
   })
 
