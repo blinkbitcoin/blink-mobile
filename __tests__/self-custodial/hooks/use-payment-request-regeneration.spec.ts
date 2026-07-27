@@ -1,7 +1,11 @@
 import { renderHook, act, waitFor } from "@testing-library/react-native"
-import { WalletCurrency } from "@app/graphql/generated"
 
 import { flushEffects } from "../../helpers/flush-effects"
+import {
+  applyPaymentRequestDefaults,
+  btcAmount,
+  mockSdk,
+} from "../../helpers/self-custodial-payment-request"
 import { usePaymentRequest } from "@app/self-custodial/hooks/use-payment-request"
 
 const mockReceiveLightning = jest.fn()
@@ -51,55 +55,19 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
 }))
 
-const btcWallet = {
-  id: "btc-w1",
-  walletCurrency: WalletCurrency.Btc,
-  balance: { amount: 1000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
-  transactions: [],
-}
-
-const usdWallet = {
-  id: "usd-w1",
-  walletCurrency: WalletCurrency.Usd,
-  balance: { amount: 500, currency: WalletCurrency.Usd, currencyCode: "USD" },
-  transactions: [],
-}
-
-const mockSdk = { id: "mock-sdk" }
-
-const btcAmount = (amount: number) => ({
-  amount,
-  currency: WalletCurrency.Btc,
-  currencyCode: "BTC",
-})
-
 describe("usePaymentRequest invoice regeneration", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockSelfCustodialWallet.mockReturnValue({
-      sdk: mockSdk,
-      lastReceivedPaymentId: null,
-    })
-    mockActiveWallet.mockReturnValue({ wallets: [btcWallet, usdWallet], isReady: true })
-    mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1test..." })
-    mockReceiveOnchain.mockResolvedValue({ address: "bc1qtest..." })
-    mockConvertMoneyAmount.mockImplementation(
-      (amount: { amount: number }, currency: string) => ({
-        amount: amount.amount,
-        currency,
-        currencyCode: currency,
-      }),
-    )
-    mockFormatMoneyAmount.mockImplementation(
-      ({ moneyAmount }: { moneyAmount: { amount: number } }) => `$${moneyAmount.amount}`,
-    )
-    mockAddPendingAutoConvert.mockResolvedValue(undefined)
-    mockFetchAutoConvertMinSats.mockResolvedValue(undefined)
-    mockUseReceiveAssetMode.mockReturnValue({
-      assetMode: "bitcoin",
-      setAssetMode: jest.fn(),
-      isToggleDisabled: false,
-      loading: false,
+    applyPaymentRequestDefaults({
+      receiveLightning: mockReceiveLightning,
+      receiveOnchain: mockReceiveOnchain,
+      selfCustodialWallet: mockSelfCustodialWallet,
+      activeWallet: mockActiveWallet,
+      convertMoneyAmount: mockConvertMoneyAmount,
+      addPendingAutoConvert: mockAddPendingAutoConvert,
+      fetchAutoConvertMinSats: mockFetchAutoConvertMinSats,
+      useReceiveAssetMode: mockUseReceiveAssetMode,
+      formatMoneyAmount: mockFormatMoneyAmount,
     })
   })
 
@@ -188,6 +156,88 @@ describe("usePaymentRequest invoice regeneration", () => {
       expect(mockReceiveLightning).toHaveBeenCalledTimes(2)
     })
     expect(mockReceiveLightning.mock.calls[1][0]?.amount?.amount).toBe(5000)
+  })
+
+  it("applies an amount edit made while a generation is in flight", async () => {
+    let resolveFirst: (value: { invoice: string }) => void = () => {}
+    mockReceiveLightning
+      .mockImplementationOnce(
+        () =>
+          new Promise<{ invoice: string }>((resolve) => {
+            resolveFirst = resolve
+          }),
+      )
+      .mockResolvedValue({ invoice: "lnbc1withamount..." })
+
+    const { result } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Loading")
+    })
+
+    act(() => {
+      result.current?.setAmount(btcAmount(5000))
+    })
+    expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      resolveFirst({ invoice: "lnbc1first..." })
+    })
+
+    await waitFor(() => {
+      expect(mockReceiveLightning).toHaveBeenCalledTimes(2)
+    })
+    expect(mockReceiveLightning.mock.calls[1][0]?.amount?.amount).toBe(5000)
+  })
+
+  it("regenerates when the sdk instance is replaced", async () => {
+    const { result, rerender } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: { id: "reconnected-sdk" },
+      lastReceivedPaymentId: null,
+    })
+    mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1newsession..." })
+    rerender({})
+
+    await waitFor(() => {
+      expect(mockReceiveLightning).toHaveBeenCalledTimes(2)
+    })
+    await waitFor(() => {
+      expect(result.current?.pr?.info?.data?.getCopyableInvoiceFn()).toBe(
+        "lnbc1newsession...",
+      )
+    })
+  })
+
+  it("does not regenerate while an auto-convert is settling", async () => {
+    mockUseReceiveAssetMode.mockReturnValue({
+      assetMode: "dollar",
+      setAssetMode: jest.fn(),
+      isToggleDisabled: false,
+      loading: false,
+    })
+
+    const { result, rerender } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: mockSdk,
+      lastReceivedPaymentId: "payment-abc-123",
+    })
+    rerender({})
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Converting")
+    })
+
+    setMemoTo(result, "too late")
+    await flushEffects()
+
+    expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
+    expect(result.current?.state).toBe("Converting")
   })
 
   it("does not regenerate when nothing changed", async () => {

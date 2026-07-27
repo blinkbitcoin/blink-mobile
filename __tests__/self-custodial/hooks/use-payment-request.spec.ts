@@ -2,6 +2,13 @@ import { renderHook, act, waitFor } from "@testing-library/react-native"
 import { WalletCurrency } from "@app/graphql/generated"
 
 import { flushEffects } from "../../helpers/flush-effects"
+import {
+  applyPaymentRequestDefaults,
+  btcAmount,
+  btcWallet,
+  mockSdk,
+  usdWallet,
+} from "../../helpers/self-custodial-payment-request"
 import { usePaymentRequest } from "@app/self-custodial/hooks/use-payment-request"
 
 const mockReceiveLightning = jest.fn()
@@ -51,55 +58,19 @@ jest.mock("@app/hooks/use-display-currency", () => ({
   useDisplayCurrency: () => ({ formatMoneyAmount: mockFormatMoneyAmount }),
 }))
 
-const btcWallet = {
-  id: "btc-w1",
-  walletCurrency: WalletCurrency.Btc,
-  balance: { amount: 1000, currency: WalletCurrency.Btc, currencyCode: "BTC" },
-  transactions: [],
-}
-
-const usdWallet = {
-  id: "usd-w1",
-  walletCurrency: WalletCurrency.Usd,
-  balance: { amount: 500, currency: WalletCurrency.Usd, currencyCode: "USD" },
-  transactions: [],
-}
-
-const mockSdk = { id: "mock-sdk" }
-
-const btcAmount = (amount: number) => ({
-  amount,
-  currency: WalletCurrency.Btc,
-  currencyCode: "BTC",
-})
-
 describe("usePaymentRequest", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockSelfCustodialWallet.mockReturnValue({
-      sdk: mockSdk,
-      lastReceivedPaymentId: null,
-    })
-    mockActiveWallet.mockReturnValue({ wallets: [btcWallet, usdWallet], isReady: true })
-    mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1test..." })
-    mockReceiveOnchain.mockResolvedValue({ address: "bc1qtest..." })
-    mockConvertMoneyAmount.mockImplementation(
-      (amount: { amount: number }, currency: string) => ({
-        amount: amount.amount,
-        currency,
-        currencyCode: currency,
-      }),
-    )
-    mockFormatMoneyAmount.mockImplementation(
-      ({ moneyAmount }: { moneyAmount: { amount: number } }) => `$${moneyAmount.amount}`,
-    )
-    mockAddPendingAutoConvert.mockResolvedValue(undefined)
-    mockFetchAutoConvertMinSats.mockResolvedValue(undefined)
-    mockUseReceiveAssetMode.mockReturnValue({
-      assetMode: "bitcoin",
-      setAssetMode: jest.fn(),
-      isToggleDisabled: false,
-      loading: false,
+    applyPaymentRequestDefaults({
+      receiveLightning: mockReceiveLightning,
+      receiveOnchain: mockReceiveOnchain,
+      selfCustodialWallet: mockSelfCustodialWallet,
+      activeWallet: mockActiveWallet,
+      convertMoneyAmount: mockConvertMoneyAmount,
+      addPendingAutoConvert: mockAddPendingAutoConvert,
+      fetchAutoConvertMinSats: mockFetchAutoConvertMinSats,
+      useReceiveAssetMode: mockUseReceiveAssetMode,
+      formatMoneyAmount: mockFormatMoneyAmount,
     })
   })
 
