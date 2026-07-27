@@ -2038,7 +2038,7 @@ const en: BaseTranslation = {
     satAccumulated: "Sats accumulated",
     satsEarned: "{formattedNumber | sats} earned",
     sectionsCompleted: "You've completed",
-    title: "Earn",
+    title: "Learn",
     unlockQuestion: "To unlock, answer the question:",
     youEarned: "You Earned",
     registerTitle: "Need to upgrade your account",

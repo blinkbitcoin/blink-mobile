@@ -6305,7 +6305,7 @@ type RootTranslation = {
 		 */
 		sectionsCompleted: string
 		/**
-		 * E​a​r​n
+		 * L​e​a​r​n
 		 */
 		title: string
 		/**
@@ -19263,7 +19263,7 @@ export type TranslationFunctions = {
 		 */
 		sectionsCompleted: () => LocalizedString
 		/**
-		 * Earn
+		 * Learn
 		 */
 		title: () => LocalizedString
 		/**

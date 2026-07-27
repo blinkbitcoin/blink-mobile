@@ -2003,7 +2003,7 @@
         "satAccumulated": "累計 sats",
         "satsEarned": "{formattedNumber | sats}を獲得しました",
         "sectionsCompleted": "完了しました",
-        "title": "獲得する",
+        "title": "学ぶ",
         "unlockQuestion": "アンロックするには、質問に答えてください：",
         "youEarned": "獲得額",
         "registerTitle": "ウォレットのアップグレードが必要です",
