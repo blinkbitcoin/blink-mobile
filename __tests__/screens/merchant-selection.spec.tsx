@@ -24,6 +24,7 @@ let mockSparkNetwork = "MAINNET"
 const mockFocusCleanups: Array<() => void> = []
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  log: jest.fn(),
   recordError: mockRecordError,
 }))
 
