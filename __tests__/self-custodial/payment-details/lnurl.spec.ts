@@ -247,6 +247,23 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
         expect.objectContaining({ comment: "dinner" }),
       )
     })
+
+    it("truncates the comment to the length the destination allows", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({ lnurlParams: baseLnurlParams({ commentAllowed: 10 }) }),
+      )
+      if (!detail.canSetMemo) throw new Error("expected canSetMemo")
+      const updated = detail.setMemo("a note far longer than the destination accepts")
+      if (!updated.canGetFee) throw new Error("expected canGetFee")
+
+      await updated.getFee({} as never)
+
+      expect(mockPrepareLnurl).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.objectContaining({ comment: "a note far" }),
+      )
+    })
   })
 
   describe("prepareLnurl options (currency-aware shape)", () => {

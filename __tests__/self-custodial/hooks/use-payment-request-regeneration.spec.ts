@@ -6,6 +6,7 @@ import {
   btcAmount,
   mockSdk,
 } from "../../helpers/self-custodial-payment-request"
+import { Invoice } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 import { usePaymentRequest } from "@app/self-custodial/hooks/use-payment-request"
 
 const mockReceiveLightning = jest.fn()
@@ -140,6 +141,88 @@ describe("usePaymentRequest invoice regeneration", () => {
         "lnbc1second...",
       )
     })
+  })
+
+  // Same race as above, but on the path where the in-flight call rejects: the pending edit
+  // has to survive a failed attempt rather than only a successful one.
+  it("applies a memo edit made while a failing generation is in flight", async () => {
+    let rejectSecond: (err: Error) => void = () => {}
+    mockReceiveLightning
+      .mockImplementationOnce(() => Promise.reject(new Error("sdk down")))
+      .mockImplementationOnce(
+        () =>
+          new Promise<{ invoice: string }>((_resolve, reject) => {
+            rejectSecond = reject
+          }),
+      )
+      .mockResolvedValue({ invoice: "lnbc1third..." })
+
+    const { result } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Error")
+    })
+
+    setMemoTo(result, "din")
+    await waitFor(() => {
+      expect(mockReceiveLightning).toHaveBeenCalledTimes(2)
+    })
+
+    setMemoTo(result, "dinner")
+    await act(async () => {
+      rejectSecond(new Error("still down"))
+    })
+
+    await waitFor(() => {
+      expect(mockReceiveLightning).toHaveBeenCalledTimes(3)
+    })
+    expect(mockReceiveLightning.mock.calls[2][0]).toEqual(
+      expect.objectContaining({ memo: "dinner" }),
+    )
+  })
+
+  it("regenerates the invoice when the asset mode is toggled", async () => {
+    const { result, rerender } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+    expect(mockAddPendingAutoConvert).not.toHaveBeenCalled()
+
+    mockUseReceiveAssetMode.mockReturnValue({
+      assetMode: "dollar",
+      setAssetMode: jest.fn(),
+      isToggleDisabled: false,
+      loading: false,
+    })
+    mockReceiveLightning.mockResolvedValue({ invoice: "lnbc1dollar..." })
+    rerender({})
+
+    await waitFor(() => {
+      expect(mockReceiveLightning).toHaveBeenCalledTimes(2)
+    })
+    await waitFor(() => {
+      expect(mockAddPendingAutoConvert).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  // The existing invoice is still the one the PayCode screen falls back to, so coming back
+  // to an unchanged Lightning tab must not burn a second invoice.
+  it("does not regenerate when the type leaves and returns to Lightning", async () => {
+    const { result } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.state).toBe("Created")
+    })
+
+    act(() => {
+      result.current?.setType(Invoice.PayCode)
+    })
+    await flushEffects()
+    expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
+
+    act(() => {
+      result.current?.setType(Invoice.Lightning)
+    })
+    await flushEffects()
+    expect(mockReceiveLightning).toHaveBeenCalledTimes(1)
   })
 
   it("regenerates the invoice when the amount changes", async () => {

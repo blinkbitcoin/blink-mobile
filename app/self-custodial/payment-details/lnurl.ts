@@ -170,10 +170,18 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   const isUsdSend = sendingWalletDescriptor.currency === WalletCurrency.Usd
   const payRequest = lnurlParamsToPayRequest(lnurlParams, lnurl)
 
+  // `commentAllowed` is a maximum length, not a flag. The note field accepts more
+  // characters than a destination typically allows, and since the note is now what fills
+  // the comment an over-long one would have the pay request rejected outright.
+  const comment =
+    lnurlParams.commentAllowed && memo
+      ? memo.slice(0, lnurlParams.commentAllowed)
+      : undefined
+
   const prepareOptions = {
     amount: toSdkSendAmount(settlementAmount.amount, sendingWalletDescriptor.currency),
     payRequest,
-    comment: lnurlParams.commentAllowed && memo ? memo : undefined,
+    comment,
     tokenIdentifier: resolveSendTokenIdentifier(sendingWalletDescriptor.currency),
     conversionOptions: isUsdSend
       ? {
