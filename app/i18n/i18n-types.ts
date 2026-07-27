@@ -7517,6 +7517,139 @@ type RootTranslation = {
 		 */
 		sdkGenericError: string
 	}
+	ApiScreen: {
+		/**
+		 * A​P​I​ ​k​e​y​s
+		 */
+		keysGroupTitle: string
+		/**
+		 * N​o​ ​A​P​I​ ​k​e​y​s​ ​y​e​t
+		 */
+		noKeys: string
+		/**
+		 * C​r​e​a​t​e​ ​A​P​I​ ​k​e​y
+		 */
+		createKey: string
+		/**
+		 * N​e​w​ ​A​P​I​ ​k​e​y
+		 */
+		createTitle: string
+		/**
+		 * A​P​I​ ​k​e​y​ ​c​r​e​a​t​e​d
+		 */
+		keyCreatedTitle: string
+		/**
+		 * K​e​y​ ​n​a​m​e
+		 */
+		keyName: string
+		/**
+		 * e​.​g​.​ ​B​T​C​P​a​y​ ​S​e​r​v​e​r
+		 */
+		keyNamePlaceholder: string
+		/**
+		 * R​e​a​d
+		 */
+		scopeRead: string
+		/**
+		 * V​i​e​w​ ​b​a​l​a​n​c​e​ ​a​n​d​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y
+		 */
+		scopeReadDescription: string
+		/**
+		 * R​e​c​e​i​v​e
+		 */
+		scopeReceive: string
+		/**
+		 * C​r​e​a​t​e​ ​i​n​v​o​i​c​e​s​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​p​a​y​m​e​n​t​s
+		 */
+		scopeReceiveDescription: string
+		/**
+		 * W​r​i​t​e
+		 */
+		scopeWrite: string
+		/**
+		 * K​e​y​s​ ​t​h​a​t​ ​c​a​n​ ​s​e​n​d​ ​p​a​y​m​e​n​t​s​ ​c​a​n​ ​o​n​l​y​ ​b​e​ ​c​r​e​a​t​e​d​ ​o​n​ ​d​a​s​h​b​o​a​r​d​.​b​l​i​n​k​.​s​v
+		 */
+		writeScopeDashboardOnly: string
+		/**
+		 * E​x​p​i​r​e​s
+		 */
+		expiry: string
+		/**
+		 * 3​0​ ​d​a​y​s
+		 */
+		expiry30Days: string
+		/**
+		 * 9​0​ ​d​a​y​s
+		 */
+		expiry90Days: string
+		/**
+		 * N​e​v​e​r
+		 */
+		expiryNever: string
+		/**
+		 * E​x​p​i​r​e​s​ ​{​d​a​t​e​}
+		 * @param {string} date
+		 */
+		expiresOn: RequiredParams<'date'>
+		/**
+		 * N​e​v​e​r​ ​e​x​p​i​r​e​s
+		 */
+		neverExpires: string
+		/**
+		 * R​e​v​o​k​e​d
+		 */
+		revoked: string
+		/**
+		 * E​x​p​i​r​e​d​ ​{​d​a​t​e​}
+		 * @param {string} date
+		 */
+		expired: RequiredParams<'date'>
+		/**
+		 * E​x​p​i​r​e​d
+		 */
+		expiredNoDate: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​o​n​l​y​ ​t​i​m​e​ ​t​h​e​ ​k​e​y​ ​i​s​ ​s​h​o​w​n​.​ ​C​o​p​y​ ​o​r​ ​s​h​a​r​e​ ​i​t​ ​n​o​w​ ​a​n​d​ ​s​t​o​r​e​ ​i​t​ ​s​a​f​e​l​y​.
+		 */
+		secretWarning: string
+		/**
+		 * A​P​I​ ​k​e​y​ ​c​o​p​i​e​d​ ​—​ ​c​l​i​p​b​o​a​r​d​ ​c​l​e​a​r​s​ ​i​n​ ​1​ ​m​i​n​u​t​e
+		 */
+		secretCopied: string
+		/**
+		 * R​e​v​o​k​e​ ​A​P​I​ ​k​e​y​?
+		 */
+		revokeTitle: string
+		/**
+		 * "​{​n​a​m​e​}​"​ ​w​i​l​l​ ​s​t​o​p​ ​w​o​r​k​i​n​g​ ​i​m​m​e​d​i​a​t​e​l​y​.​ ​T​h​i​s​ ​c​a​n​n​o​t​ ​b​e​ ​u​n​d​o​n​e​.
+		 * @param {string} name
+		 */
+		revokeBody: RequiredParams<'name'>
+		/**
+		 * R​e​v​o​k​e
+		 */
+		revoke: string
+		/**
+		 * A​P​I​ ​k​e​y​ ​r​e​v​o​k​e​d
+		 */
+		revokeSuccess: string
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​c​r​e​a​t​e​ ​t​h​e​ ​A​P​I​ ​k​e​y​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		createError: string
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​r​e​v​o​k​e​ ​t​h​e​ ​A​P​I​ ​k​e​y​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		revokeError: string
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​A​P​I​ ​k​e​y​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
+		 */
+		loadError: string
+		/**
+		 * D​o​n​e
+		 */
+		done: string
+	}
 	SettingsScreen: {
 		/**
 		 * P​r​i​n​t​a​b​l​e​ ​s​t​a​t​i​c​ ​Q​R
@@ -20478,6 +20611,136 @@ export type TranslationFunctions = {
 		 * Unable to estimate fees. Please try a different amount.
 		 */
 		sdkGenericError: () => LocalizedString
+	}
+	ApiScreen: {
+		/**
+		 * API keys
+		 */
+		keysGroupTitle: () => LocalizedString
+		/**
+		 * No API keys yet
+		 */
+		noKeys: () => LocalizedString
+		/**
+		 * Create API key
+		 */
+		createKey: () => LocalizedString
+		/**
+		 * New API key
+		 */
+		createTitle: () => LocalizedString
+		/**
+		 * API key created
+		 */
+		keyCreatedTitle: () => LocalizedString
+		/**
+		 * Key name
+		 */
+		keyName: () => LocalizedString
+		/**
+		 * e.g. BTCPay Server
+		 */
+		keyNamePlaceholder: () => LocalizedString
+		/**
+		 * Read
+		 */
+		scopeRead: () => LocalizedString
+		/**
+		 * View balance and transaction history
+		 */
+		scopeReadDescription: () => LocalizedString
+		/**
+		 * Receive
+		 */
+		scopeReceive: () => LocalizedString
+		/**
+		 * Create invoices and receive payments
+		 */
+		scopeReceiveDescription: () => LocalizedString
+		/**
+		 * Write
+		 */
+		scopeWrite: () => LocalizedString
+		/**
+		 * Keys that can send payments can only be created on dashboard.blink.sv
+		 */
+		writeScopeDashboardOnly: () => LocalizedString
+		/**
+		 * Expires
+		 */
+		expiry: () => LocalizedString
+		/**
+		 * 30 days
+		 */
+		expiry30Days: () => LocalizedString
+		/**
+		 * 90 days
+		 */
+		expiry90Days: () => LocalizedString
+		/**
+		 * Never
+		 */
+		expiryNever: () => LocalizedString
+		/**
+		 * Expires {date}
+		 */
+		expiresOn: (arg: { date: string }) => LocalizedString
+		/**
+		 * Never expires
+		 */
+		neverExpires: () => LocalizedString
+		/**
+		 * Revoked
+		 */
+		revoked: () => LocalizedString
+		/**
+		 * Expired {date}
+		 */
+		expired: (arg: { date: string }) => LocalizedString
+		/**
+		 * Expired
+		 */
+		expiredNoDate: () => LocalizedString
+		/**
+		 * This is the only time the key is shown. Copy or share it now and store it safely.
+		 */
+		secretWarning: () => LocalizedString
+		/**
+		 * API key copied — clipboard clears in 1 minute
+		 */
+		secretCopied: () => LocalizedString
+		/**
+		 * Revoke API key?
+		 */
+		revokeTitle: () => LocalizedString
+		/**
+		 * "{name}" will stop working immediately. This cannot be undone.
+		 */
+		revokeBody: (arg: { name: string }) => LocalizedString
+		/**
+		 * Revoke
+		 */
+		revoke: () => LocalizedString
+		/**
+		 * API key revoked
+		 */
+		revokeSuccess: () => LocalizedString
+		/**
+		 * Could not create the API key. Please try again.
+		 */
+		createError: () => LocalizedString
+		/**
+		 * Could not revoke the API key. Please try again.
+		 */
+		revokeError: () => LocalizedString
+		/**
+		 * Could not load your API keys. Please try again later.
+		 */
+		loadError: () => LocalizedString
+		/**
+		 * Done
+		 */
+		done: () => LocalizedString
 	}
 	SettingsScreen: {
 		/**
