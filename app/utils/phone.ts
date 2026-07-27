@@ -9,8 +9,10 @@ export const parseValidPhoneNumber = (
   countryCode?: CountryCode,
 ): PhoneNumber | null => {
   try {
-    // extract: false stops libphonenumber from pulling a phone number out of
-    // surrounding text, e.g. lightning addresses like 0777491011@bitzed.xyz
+    /**
+     * extract: false stops libphonenumber from pulling a phone number out of
+     * surrounding text, e.g. lightning addresses like 0777491011@bitzed.xyz
+     */
     const parsed = parsePhoneNumber(input, {
       defaultCountry: countryCode,
       extract: false,

@@ -651,9 +651,11 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       const handle = item?.handle?.trim() ?? ""
       const displayHandle =
         handle && !handle.includes("@") ? `${handle}@${lnAddressHostname}` : handle
-      // parse the raw handle: a phone contact should enter the phone flow, but a
-      // handle that is already a lightning address never should, even when its
-      // local part looks like a phone number
+      /**
+       * parse the raw handle: a phone contact should enter the phone flow, but a
+       * handle that is already a lightning address never should, even when its
+       * local part looks like a phone number
+       */
       const parsePhone = parseValidPhone(handle)
 
       if (parsePhone?.isValid() && activeInputRef.current === InputType.Search) {
