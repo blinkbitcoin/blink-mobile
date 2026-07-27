@@ -1314,412 +1314,412 @@
                 }
             },
             "LightningWhatDoesItSolve": {
-                "title": "Lightning: What does it solve?",
+                "title": "Lightning : quel problème résout-il ?",
                 "questions": {
                     "bitcoinDrawbacks": {
                         "answers": [
-                            "It takes too long to confirm transactions",
-                            "It is difficult to use",
-                            "It is not a trusted intermediary"
+                            "La confirmation des transactions prend trop de temps",
+                            "Il est difficile à utiliser",
+                            "Ce n'est pas un intermédiaire de confiance"
                         ],
                         "feedback": [
-                            "Correct! Great job! You may be pleased to hear that solutions have been deployed to improve the settlement time of Bitcoin payments to a few seconds.&#x20",
-                            "Wrong! But you are forgiven, Bitcoin is actually very easy to use. Try again",
-                            "Wrong! But don't worry, Bitcoin actually allows anyone to send value without a trusted intermediary. Try again!"
+                            "Exact ! Bravo ! Vous serez peut-être content d'apprendre que des solutions ont été déployées pour réduire le temps de règlement des paiements en bitcoin à quelques secondes.",
+                            "Faux ! Mais on vous pardonne, le Bitcoin est en réalité très facile à utiliser. Réessayez.",
+                            "Faux ! Mais ne vous inquiétez pas, le Bitcoin permet justement à n'importe qui d'envoyer de la valeur sans intermédiaire de confiance. Réessayez !"
                         ],
-                        "question": "What is a drawback of Bitcoin's design",
-                        "text": "Bitcoin, the world's most widely used and valuable digital currency, allows anyone to send value without a trusted intermediary.\n\nThere are, however, some drawbacks to bitcoin's design which prioritizes security and decentralization at the cost of scalability.\n\nTransactions confirmed on the bitcoin blockchain take up to one hour before they are irreversible.\n\nMicropayments, or payments less than a few cents, are inconsistently confirmed, and fees render such transactions unviable on the network today.\n\nCurrently, Bitcoin's blockchain can process around 3 transactions per second. This is generally seen as an impediment for Bitcoin to become a currency that facilitates the everyday retail transactions of millions around the world.\n",
-                        "title": "Drawbacks of Bitcoin"
+                        "question": "Quel est un inconvénient de la conception du Bitcoin ?",
+                        "text": "Le Bitcoin, la monnaie numérique la plus utilisée et la plus valorisée au monde, permet à n'importe qui d'envoyer de la valeur sans intermédiaire de confiance.\n\nSa conception présente néanmoins certains inconvénients, car elle privilégie la sécurité et la décentralisation au détriment de la scalabilité.\n\nLes transactions confirmées sur la blockchain Bitcoin mettent jusqu'à une heure avant de devenir irréversibles.\n\nLes micropaiements, c'est-à-dire les paiements de quelques centimes, sont confirmés de façon inégale, et les frais rendent aujourd'hui ce type de transaction peu viable sur le réseau.\n\nActuellement, la blockchain Bitcoin peut traiter environ 3 transactions par seconde. C'est généralement considéré comme un frein à ce que le Bitcoin devienne une monnaie facilitant les transactions quotidiennes de millions de personnes à travers le monde.\n",
+                        "title": "Les inconvénients du Bitcoin"
                     },
                     "blocksizeWars": {
                         "answers": [
-                            "Whether or not to increase the blocksize",
-                            "Whether or not to censor certain transactions",
-                            "Whether or not to change the consensus algorithm to proof of stake"
+                            "Savoir s'il fallait augmenter la taille des blocs",
+                            "Savoir s'il fallait censurer certaines transactions",
+                            "Savoir s'il fallait passer à un algorithme de consensus par preuve d'enjeu"
                         ],
                         "feedback": [
-                            "Correct. The users ultimately prevailed in preserving the decentralization and censorship-resistance of the Bitcoin network, showing that Bitcoin is controlled by users, not corporations",
-                            "Not quite. Both sides were publicly in favor of preserving censorship-resistance, however companies in the Bitcoin ecosystem were willing to accept some centralization in exchange for quick wins in scalability. Try again",
-                            "Haha, but no. While there are some dubious voices that demand the abolishment of proof of work in favor of proof of stake, this was never a debate in Bitcoin, and never will be. Try again."
+                            "Exact. Les utilisateurs ont finalement gagné, préservant ainsi la décentralisation et la résistance à la censure du réseau Bitcoin, montrant que le Bitcoin est contrôlé par ses utilisateurs, et non par des entreprises.",
+                            "Pas tout à fait. Les deux camps affirmaient publiquement vouloir préserver la résistance à la censure, mais les entreprises de l'écosystème Bitcoin étaient prêtes à accepter une certaine centralisation en échange de gains rapides en scalabilité. Réessayez.",
+                            "Haha, mais non. Certaines voix douteuses réclament l'abandon de la preuve de travail au profit de la preuve d'enjeu, mais cela n'a jamais été un débat au sein du Bitcoin, et ne le sera jamais. Réessayez."
                         ],
-                        "question": "What was the contention in the Blocksize Wars",
-                        "text": "These drawbacks lead to a debate within the Bitcoin community about the best way to scale the Bitcoin network, often dubbed the Blocksize Wars.\n\nCompanies in the Bitcoin ecosystem argued that increasing the blocksize, which is the maximum size of a block of transactions on the blockchain, would allow more transactions to be processed per second, making the network more efficient and able to handle a larger volume of transactions.\n\nBitcoin users on the other side of the debate argued that increasing the blocksize would centralize the network, as it would require more expensive and powerful computers to process the larger blocks, and could potentially lead to Bitcoin becoming prone to censorship.\n\nThe users ultimately prevailed in preserving the decentralization and censorship-resistance of the Bitcoin network and demonstrated that Bitcoin is controlled by users, not corporations. This also meant that scaling Bitcoin would require a different enigneering solution than merely increasing the blocksize.\n",
-                        "title": "The Blocksize Wars"
+                        "question": "Quel était l'enjeu de la « guerre de la taille des blocs » (Blocksize Wars) ?",
+                        "text": "Ces inconvénients ont donné lieu à un débat au sein de la communauté Bitcoin sur la meilleure façon de faire évoluer le réseau, souvent surnommé la « guerre de la taille des blocs » (Blocksize Wars).\n\nLes entreprises de l'écosystème Bitcoin soutenaient qu'augmenter la taille des blocs, c'est-à-dire la taille maximale d'un bloc de transactions sur la blockchain, permettrait de traiter davantage de transactions par seconde, rendant le réseau plus efficace et capable de gérer un volume plus important de transactions.\n\nDe l'autre côté du débat, les utilisateurs de Bitcoin soutenaient qu'augmenter la taille des blocs centraliserait le réseau, car cela nécessiterait des ordinateurs plus chers et plus puissants pour traiter les blocs plus volumineux, ce qui pourrait rendre le Bitcoin plus vulnérable à la censure.\n\nLes utilisateurs ont finalement gagné, préservant la décentralisation et la résistance à la censure du réseau Bitcoin, et démontrant que le Bitcoin est contrôlé par ses utilisateurs, et non par des entreprises. Cela signifiait aussi que faire évoluer le Bitcoin nécessiterait une solution technique différente d'une simple augmentation de la taille des blocs.\n",
+                        "title": "La guerre de la taille des blocs"
                     },
                     "lightningNetwork": {
                         "answers": [
-                            "It allows users to make small, near instant payments at low cost",
-                            "It helps users preserve the decentralization of the Bitcoin network",
-                            "It ensures that every transaction is added to the Bitcoin blockchain"
+                            "Il permet d'effectuer de petits paiements quasi instantanés à faible coût",
+                            "Il aide les utilisateurs à préserver la décentralisation du réseau Bitcoin",
+                            "Il garantit que chaque transaction est ajoutée à la blockchain Bitcoin"
                         ],
                         "feedback": [
-                            "Correct! The Lightning Network allows users to make small, near instant payments at low cost, and it eliminates the need for every transaction to be added to the Bitcoin blockchain. Congrats! As a fun fact, the Lightning Network has helped increase the adoption of Bitcoin by allowing it to process more transactions per second and handle higher volumes of transactions",
-                            "Incorrect! The Lightning Network is actually a scaling solution built on top of the Bitcoin protocol. Try again",
-                            "Incorrect! The Lightning Network actually eliminates the need for every transaction to be added to the Bitcoin blockchain, as it allows for smaller payments to be made off-chain."
+                            "Exact ! Le Lightning Network permet d'effectuer de petits paiements quasi instantanés à faible coût, et évite d'avoir à ajouter chaque transaction à la blockchain Bitcoin. Bravo ! Anecdote : le Lightning Network a contribué à accroître l'adoption du Bitcoin en lui permettant de traiter davantage de transactions par seconde et de gérer des volumes plus importants.",
+                            "Incorrect ! Le Lightning Network est en réalité une solution de scalabilité construite au-dessus du protocole Bitcoin. Réessayez.",
+                            "Incorrect ! Le Lightning Network évite justement d'avoir à ajouter chaque transaction à la blockchain Bitcoin, en permettant d'effectuer de petits paiements hors chaîne (off-chain)."
                         ],
-                        "question": "What does the Lightning Network do",
-                        "text": "While users prevailed and preserved the decentralization of the Bitcoin network, a solution to scale Bitcoin proposed by researchers Tadge Dryja and Joseph Poon, called the Lightning Network, started to gain traction and was launched in 2017.\n\nThe Lightning Network, often referred to as just Lightning or LN, is a scaling solution built on top of the Bitcoin protocol. It facilitates smaller, near instant payments between users at very low cost and eliminates the need for every transaction to be added to the Bitcoin blockchain whilst ensuring that the value being transacted abides by the rules of the Bitcoin network.\n",
-                        "title": "The Lightning Network"
+                        "question": "Que fait le Lightning Network ?",
+                        "text": "Alors que les utilisateurs avaient gagné et préservé la décentralisation du réseau Bitcoin, une solution pour faire évoluer le Bitcoin, proposée par les chercheurs Tadge Dryja et Joseph Poon et appelée le Lightning Network, a commencé à gagner du terrain et a été lancée en 2017.\n\nLe Lightning Network, souvent appelé simplement Lightning ou LN, est une solution de scalabilité construite au-dessus du protocole Bitcoin. Il facilite les petits paiements quasi instantanés entre utilisateurs à très faible coût, et évite d'avoir à ajouter chaque transaction à la blockchain Bitcoin, tout en garantissant que la valeur échangée respecte les règles du réseau Bitcoin.\n",
+                        "title": "Le Lightning Network"
                     },
                     "instantPayments": {
                         "answers": [
-                            "A matter of seconds",
+                            "Quelques secondes",
                             "10 minutes",
-                            "1 hour"
+                            "1 heure"
                         ],
                         "feedback": [
-                            "Correct! This makes the Lightning Network a great option for situations where you need to make a payment immediately, such as retail transactions or peer-to-peer payments",
-                            "Incorrect! On the Bitcoin network, transactions are grouped into blocks that are added to the blockchain about every 10 minutes. However, on the Lightning Network, payments do not need to wait for block confirmations to be considered secure. Try again",
-                            "Incorrect! On the Bitcoin network, payments are considered secure after they have been confirmed by six blocks, or about an hour. However, on the Lightning Network, payments do not need to wait for block confirmations to be considered secure."
+                            "Exact ! Cela fait du Lightning Network une excellente option pour les situations où un paiement immédiat est nécessaire, comme les transactions de commerce ou les paiements entre particuliers.",
+                            "Incorrect ! Sur le réseau Bitcoin, les transactions sont regroupées en blocs ajoutés à la blockchain environ toutes les 10 minutes. Mais sur le Lightning Network, les paiements n'ont pas besoin d'attendre de confirmation de bloc pour être considérés comme sécurisés. Réessayez.",
+                            "Incorrect ! Sur le réseau Bitcoin, les paiements sont considérés comme sécurisés après avoir été confirmés par six blocs, soit environ une heure. Mais sur le Lightning Network, les paiements n'ont pas besoin d'attendre de confirmation de bloc pour être considérés comme sécurisés."
                         ],
-                        "question": "How long does it take for a payment to be considered secure on the Lightning Network",
-                        "text": "In the Bitcoin network, transactions are grouped together in blocks, and new blocks are added to the blockchain about every 10 minutes. When a payment is made using Bitcoin, it is considered secure after it has been confirmed by six blocks, or about an hour.\n\nOn the Lightning Network, payments do not have to wait for block confirmations to be considered secure. Instead, they are instant and completed all at once in a matter of few seconds.\n\nThis makes it possible to use the Lightning Network for retail transactions, peer-to-peer payments, or any other situation where you need to make a payment immediately.\n",
-                        "title": "Instant Payments"
+                        "question": "Combien de temps faut-il pour qu'un paiement soit considéré comme sécurisé sur le Lightning Network ?",
+                        "text": "Sur le réseau Bitcoin, les transactions sont regroupées en blocs, et de nouveaux blocs sont ajoutés à la blockchain environ toutes les 10 minutes. Lorsqu'un paiement est effectué en bitcoin, il est considéré comme sécurisé après avoir été confirmé par six blocs, soit environ une heure.\n\nSur le Lightning Network, les paiements n'ont pas besoin d'attendre de confirmation de bloc pour être considérés comme sécurisés. Ils sont au contraire instantanés et finalisés d'un coup, en quelques secondes.\n\nCela permet d'utiliser le Lightning Network pour les transactions de commerce, les paiements entre particuliers, ou toute autre situation nécessitant un paiement immédiat.\n",
+                        "title": "Des paiements instantanés"
                     },
                     "micropayments": {
                         "answers": [
-                            "A payment for a small amount of money, often less than a dollar",
-                            "A payment that requires a minimum amount and fixed fee",
-                            "A payment made using the Lightning Network"
+                            "Un paiement d'un faible montant, souvent inférieur à un dollar",
+                            "Un paiement nécessitant un montant minimum et des frais fixes",
+                            "Un paiement effectué via le Lightning Network"
                         ],
                         "feedback": [
-                            "Exactly! These types of payments can be difficult to make using traditional financial systems or the Bitcoin network, as they often have minimum amounts that can be transferred and fixed fees that can make small payments impractical",
-                            "Nope**.** While traditional financial systems may require a minimum amount and fixed fee for payments, the Lightning Network allows for the possibility of making very small payments without these limitations",
-                            "Not quite! While the Lightning Network does allow for the possibility of making micropayments, a micropayment is not defined as a payment made using the Lightning Network. Try again!"
+                            "Exactement ! Ce type de paiement peut être difficile à réaliser avec les systèmes financiers traditionnels ou le réseau Bitcoin, qui imposent souvent des montants minimums et des frais fixes rendant les petits paiements peu pratiques.",
+                            "Non. Les systèmes financiers traditionnels peuvent exiger un montant minimum et des frais fixes pour les paiements, mais le Lightning Network permet d'effectuer des paiements très faibles sans ces contraintes.",
+                            "Pas tout à fait ! Le Lightning Network permet bien de faire des micropaiements, mais un micropaiement n'est pas défini comme un paiement effectué via le Lightning Network. Réessayez !"
                         ],
-                        "question": "What is a micropayment",
-                        "text": "Micropayments refer to very small financial transactions, often for amounts less than a dollar. These types of payments can be difficult to make using traditional financial systems, as they often have minimum amounts that can be transferred and fixed fees that can make small payments impractical.\n\nThe Lightning Network allows for the possibility of making micropayments using Bitcoin. It enables users to send very small amounts of Bitcoin, down to 1 sat, without the risk of losing control of their funds to a third party (called \"custodial risk\").&#x20;\n\nIn contrast, the Bitcoin blockchain currently has minimum transaction amounts and fees that make micropayments impractical. The Lightning Network allows for minimal payments denominated in Bitcoin, using actual Bitcoin transactions. This opens up the possibility of creating new markets and making small payments more practical.\n",
-                        "title": "Micropayments"
+                        "question": "Qu'est-ce qu'un micropaiement ?",
+                        "text": "Les micropaiements désignent des transactions financières très faibles, souvent inférieures à un dollar. Ce type de paiement peut être difficile à réaliser avec les systèmes financiers traditionnels, qui imposent souvent des montants minimums et des frais fixes rendant les petits paiements peu pratiques.\n\nLe Lightning Network permet d'effectuer des micropaiements en bitcoin. Il permet d'envoyer des montants très faibles de bitcoin, jusqu'à 1 sat, sans risquer de perdre le contrôle de ses fonds au profit d'un tiers (ce qu'on appelle le « risque de dépositaire »).\n\nÀ l'inverse, la blockchain Bitcoin impose actuellement des montants minimums et des frais qui rendent les micropaiements peu pratiques. Le Lightning Network permet des paiements minimes libellés en bitcoin, en utilisant de véritables transactions Bitcoin. Cela ouvre la voie à la création de nouveaux marchés et rend les petits paiements plus pratiques.\n",
+                        "title": "Les micropaiements"
                     },
                     "scalability": {
                         "answers": [
-                            "To meet the demand for retail and automated payments",
-                            "To make Bitcoin more attractive to investors",
-                            "To get the required licences for interoperability with financial institutions"
+                            "Pour répondre à la demande de paiements commerciaux et automatisés",
+                            "Pour rendre le Bitcoin plus attractif pour les investisseurs",
+                            "Pour obtenir les licences nécessaires à l'interopérabilité avec les institutions financières"
                         ],
                         "feedback": [
-                            "That's right. The Lightning Network helps the Bitcoin network achieve scalability by allowing users to conduct nearly unlimited transactions off-chain on a second layer",
-                            "That's not it! While improving the attractiveness of Bitcoin to investors could be a benefit of improving scalability, it is not the main reason why scalability is important for the Bitcoin network",
-                            "Try again! **** Obtaining required licenses for interoperability with financial institutions may be a goal for some organizations working with Bitcoin, but it is not directly related to the concept of scalability."
+                            "C'est exact. Le Lightning Network aide le réseau Bitcoin à atteindre la scalabilité en permettant aux utilisateurs d'effectuer un nombre quasi illimité de transactions hors chaîne, sur une seconde couche.",
+                            "Ce n'est pas ça ! Rendre le Bitcoin plus attractif pour les investisseurs pourrait être un bénéfice de l'amélioration de la scalabilité, mais ce n'est pas la raison principale de son importance pour le réseau Bitcoin.",
+                            "Réessayez ! Obtenir les licences nécessaires à l'interopérabilité avec les institutions financières peut être un objectif pour certaines organisations travaillant avec le Bitcoin, mais cela n'est pas directement lié au concept de scalabilité."
                         ],
-                        "question": "Why is scalability important for the Bitcoin network",
-                        "text": "Scalability refers to the ability of a system, such as a network or platform, to handle a large amount of usage or traffic without experiencing issues or slowdowns.\n\nScalability is important for Bitcoin because the network will need to be able to support a much higher volume of transactions in order to meet the demand of retail and automated payments.\n\nThe Lightning Network allows users to conduct nearly unlimited transactions between each other outside of the Bitcoin blockchain, or off-chain.\n\nThis means that transactions can be conducted without the need for each one to be recorded on the blockchain, which helps to reduce the load on the network and allows it to handle more transactions.\n",
-                        "title": "Scalability"
+                        "question": "Pourquoi la scalabilité est-elle importante pour le réseau Bitcoin ?",
+                        "text": "La scalabilité désigne la capacité d'un système, comme un réseau ou une plateforme, à gérer un usage ou un trafic important sans rencontrer de problèmes ou de ralentissements.\n\nLa scalabilité est importante pour le Bitcoin, car le réseau devra pouvoir supporter un volume de transactions bien plus élevé pour répondre à la demande de paiements commerciaux et automatisés.\n\nLe Lightning Network permet aux utilisateurs d'effectuer un nombre quasi illimité de transactions entre eux en dehors de la blockchain Bitcoin, c'est-à-dire hors chaîne (off-chain).\n\nCela signifie que les transactions peuvent avoir lieu sans que chacune ait besoin d'être enregistrée sur la blockchain, ce qui réduit la charge sur le réseau et lui permet de gérer davantage de transactions.\n",
+                        "title": "La scalabilité"
                     },
                     "paymentChannels": {
                         "answers": [
-                            "By pushing bitcoin from one side of the channel to the other each time a payment is made",
-                            "By broadcasting every transaction immediately to the Bitcoin blockchain as soon as it happens",
-                            "By paying a commission to a 3rd party payment provider"
+                            "En déplaçant des bitcoins d'un côté du canal à l'autre à chaque paiement",
+                            "En diffusant immédiatement chaque transaction sur la blockchain Bitcoin dès qu'elle a lieu",
+                            "En payant une commission à un prestataire de paiement tiers"
                         ],
                         "feedback": [
-                            "That's right! Think of moving bitcoin in a Lightning channel like moving beads on an abacus. Each side keeps track of how much is on their side until it's time to settle on the Bitcoin blockchain. Good job",
-                            "Quite the opposite! Payment channels in Lightning avoid broadcasting every transaction by aggregating them. Try again",
-                            "Uhm no, actually payments in Lightning Network save the users fees for not settling every transaction on the blockchain. Try again!"
+                            "C'est exact ! Imaginez déplacer des bitcoins dans un canal Lightning comme déplacer des perles sur un boulier. Chaque côté garde une trace de ce qu'il détient, jusqu'au moment du règlement final sur la blockchain Bitcoin. Bien joué.",
+                            "C'est plutôt l'inverse ! Les canaux de paiement Lightning évitent justement de diffuser chaque transaction, en les regroupant. Réessayez.",
+                            "Euh non, en réalité les paiements sur le Lightning Network font économiser des frais aux utilisateurs, justement parce que chaque transaction n'est pas réglée sur la blockchain. Réessayez !"
                         ],
-                        "question": "How do payment channels in the Lightning Network allow users to pay each other",
-                        "text": "The Lightning Network consists of thousands of two party payment channels.\n\nYou may think of a Lightning channel like opening a tab at your local bar. Instead of pulling out your wallet and paying each time you order a drink, it makes sense to save time, energy and fees by tallying all your drinks together at the end of the night and making the final settlement in one payment.\n\nLightning works similar. Each time a payment is made from person A to person B, bitcoin are pushed from one side of the channel to the other. Two users can pay one another back and forth as many times as they like, almost instantly and with close to no fees.\n",
-                        "title": "How does Lighning work?"
+                        "question": "Comment les canaux de paiement du Lightning Network permettent-ils aux utilisateurs de se payer mutuellement ?",
+                        "text": "Le Lightning Network est constitué de milliers de canaux de paiement entre deux parties.\n\nVous pouvez imaginer un canal Lightning comme une ardoise ouverte dans votre bar habituel. Plutôt que de sortir votre portefeuille et de payer à chaque commande, il est plus simple de gagner du temps, de l'énergie et des frais en additionnant toutes vos consommations à la fin de la soirée, pour un règlement final unique.\n\nLightning fonctionne de façon similaire. Chaque fois qu'un paiement est effectué de la personne A vers la personne B, des bitcoins sont déplacés d'un côté du canal à l'autre. Deux utilisateurs peuvent se payer mutuellement autant de fois qu'ils le souhaitent, quasi instantanément et pratiquement sans frais.\n",
+                        "title": "Comment fonctionne Lightning ?"
                     },
                     "routing": {
                         "answers": [
-                            "By using a network of intermediaries to route payments between users",
-                            "By using teleportation to instantly transfer bitcoin from one user to another",
-                            "By using a virtual reality simulation to simulate the transfer of bitcoin between users"
+                            "En utilisant un réseau d'intermédiaires pour acheminer les paiements entre utilisateurs",
+                            "En utilisant la téléportation pour transférer instantanément des bitcoins d'un utilisateur à un autre",
+                            "En utilisant une simulation de réalité virtuelle pour simuler le transfert de bitcoins entre utilisateurs"
                         ],
                         "feedback": [
-                            "Correct! This is like delivering a package from one person to another by passing it along a series of friendly postmen! Congrats",
-                            "Hah no, this isn't science-fiction from Star Trek, but real world cryptographic engineering! Try again",
-                            "May I interest you for a simulation of a simulation? Jokes aside, this isn't it. Try again!"
+                            "Exact ! C'est comme livrer un colis d'une personne à une autre en le faisant passer par une chaîne de facteurs sympathiques ! Bravo.",
+                            "Ha non, on n'est pas dans la science-fiction de Star Trek, mais dans une véritable ingénierie cryptographique ! Réessayez.",
+                            "Puis-je vous intéresser à une simulation de simulation ? Blague à part, ce n'est pas ça. Réessayez !"
                         ],
-                        "question": "How does the Lightning Network allow users to pay each other if they are not directly connected through a payment channel",
-                        "text": "You may be thinking that setting up a payment channel with hundreds of businesses could be tedious, but no. The beauty of the Lightning Network is that it is a network of channels stitched together.\n\nLet us say Bob convinced his friend Carol to also join the Lightning Network. Alice has a channel with Bob, and Bob has a channel with Carol. Alice and Carol can then pay each other by “routing” through Bob.\n\nSome pretty clever cryptographic tricks guarantee that Bob cannot steal the money while it’s passing through him.\n\nWhen you make a payment on the Lightning Network, your node searches for a path of channels between you and your destination. This is what’s referred to as routing. This is of course all done automatically by the involved Lightning nodes, enabling it to happen in the blink of an eye.\n",
-                        "title": "Routing"
+                        "question": "Comment le Lightning Network permet-il à des utilisateurs de se payer mutuellement s'ils ne sont pas directement reliés par un canal de paiement ?",
+                        "text": "Vous vous dites peut-être qu'ouvrir un canal de paiement avec des centaines d'entreprises serait fastidieux, mais non. La beauté du Lightning Network réside dans le fait qu'il s'agit d'un réseau de canaux reliés entre eux.\n\nDisons que Bob a convaincu son amie Carole de rejoindre elle aussi le Lightning Network. Alice a un canal avec Bob, et Bob a un canal avec Carole. Alice et Carole peuvent alors se payer mutuellement en « acheminant » leur paiement via Bob.\n\nDes astuces cryptographiques assez ingénieuses garantissent que Bob ne peut pas voler l'argent qui transite par lui.\n\nLorsque vous effectuez un paiement sur le Lightning Network, votre nœud recherche un chemin de canaux entre vous et votre destination. C'est ce qu'on appelle le routage. Tout cela est bien sûr effectué automatiquement par les nœuds Lightning impliqués, ce qui permet que cela se produise en un clin d'œil.\n",
+                        "title": "Le routage"
                     }
                 }
             },
             "BitcoinCriticismsFallaciesI": {
-                "title": "Bitcoin Criticisms & Fallacies I",
+                "title": "Critiques et idées reçues sur le Bitcoin I",
                 "questions": {
                     "itsaBubble": {
                         "answers": [
-                            "It has consistently gone up",
-                            "It has consistently gone down",
-                            "It has gone up and down randomly"
+                            "Il a constamment augmenté",
+                            "Il a constamment baissé",
+                            "Il a fluctué de façon aléatoire"
                         ],
                         "feedback": [
-                            "Well done! You seem to have a good grasp on the overall trend of bitcoin's exchange rate. Despite some fluctuations, it has consistently been on the rise. Keep up the good work",
-                            "I'm sorry, that's not quite right. While the exchange rate of bitcoin has certainly had its ups and downs, the overall trend has not been consistently downward. Try again",
-                            "Sorry, that's incorrect. While the exchange rate of bitcoin has certainly had its ups and downs, the overall trend has not been completely random. Keep trying!"
+                            "Bien joué ! Vous semblez bien comprendre la tendance globale du taux de change du bitcoin. Malgré quelques fluctuations, il n'a cessé d'augmenter. Continuez comme ça.",
+                            "Désolé, ce n'est pas tout à fait ça. Le taux de change du bitcoin a certes connu des hauts et des bas, mais la tendance globale n'a pas été constamment baissière. Réessayez.",
+                            "Dommage, ce n'est pas correct. Le taux de change du bitcoin a certes connu des hauts et des bas, mais la tendance globale n'a rien eu de complètement aléatoire. Continuez à essayer !"
                         ],
-                        "question": "How has the exchange rate of bitcoin trended over time",
-                        "text": "Over the years, bitcoin has often been called a bubble by various people. While its price has had several significant declines that may have warranted this label, the overall trend for bitcoin has been consistently upward.\n\nCritics who have proclaimed the death of bitcoin after each market cycle have been proven wrong, as the nascent digital money has continued to thrive despite their predictions. As these critics run out of analogies to use, it has become clear that their accusations are unfounded.\n",
-                        "title": "Is bitcoin a bubble?"
+                        "question": "Comment le taux de change du bitcoin a-t-il évolué au fil du temps ?",
+                        "text": "Au fil des années, le bitcoin a souvent été qualifié de bulle par différentes personnes. Son prix a certes connu plusieurs baisses importantes qui ont pu justifier cette étiquette, mais la tendance globale du bitcoin a été constamment haussière.\n\nLes critiques qui ont proclamé la mort du bitcoin après chaque cycle de marché se sont trompés, cette monnaie numérique naissante ayant continué de prospérer malgré leurs prédictions. À mesure que ces critiques manquent d'analogies à utiliser, il devient clair que leurs accusations sont infondées.\n",
+                        "title": "Le bitcoin est-il une bulle ?"
                     },
                     "itstooVolatile": {
                         "answers": [
-                            "Buyers and sellers reaching agreements in real-time",
-                            "Government intervention",
-                            "The phase of the moon"
+                            "Les accords conclus en temps réel entre acheteurs et vendeurs",
+                            "L'intervention des gouvernements",
+                            "La phase de la lune"
                         ],
                         "feedback": [
-                            "You're correct! The primary factor influencing the volatility of bitcoin's price is actually the agreements reached in real-time between buyers and sellers",
-                            "I'm sorry, that's not quite right. While government intervention can certainly affect the price of bitcoin, it is not the primary factor influencing its volatility",
-                            "Sorry, that's incorrect. While the phase of the moon may have some strange effects on certain things, it does not play a significant role in the volatility of bitcoin's exchange rate. Keep trying!"
+                            "C'est exact ! Le principal facteur influençant la volatilité du prix du bitcoin est bien les accords conclus en temps réel entre acheteurs et vendeurs.",
+                            "Désolé, ce n'est pas tout à fait ça. L'intervention des gouvernements peut certes affecter le prix du bitcoin, mais ce n'est pas le principal facteur de sa volatilité.",
+                            "Dommage, ce n'est pas correct. La phase de la lune peut avoir d'étranges effets sur certaines choses, mais elle ne joue pas de rôle significatif dans la volatilité du taux de change du bitcoin. Continuez à essayer !"
                         ],
-                        "question": "What is the primary factor influencing the volatility of bitcoin's exchange rate",
-                        "text": "It is subjective to expect bitcoin to maintain a specific price range, as it is traded around the clock, every day of the year, across the world. There are no requirements for registration, bank holidays, circuit breakers, or bailouts in the bitcoin market, which operates as a truly free market.\n\nAny and all volatility in bitcoin's price is the result of buyers and sellers reaching agreements in real-time without interference from governments. As bitcoin continues its journey towards becoming a primary global store of value in the Information Age, it is unrealistic to assume that its progress would be linear.\n\nAs adoption of bitcoin increases, it becomes less risky and potential upside decreases, leading to a decrease in volatility.\n",
-                        "title": "It's too volatile!"
+                        "question": "Quel est le principal facteur influençant la volatilité du taux de change du bitcoin ?",
+                        "text": "Il est subjectif d'attendre du bitcoin qu'il maintienne une fourchette de prix précise, puisqu'il s'échange 24 heures sur 24, tous les jours de l'année, partout dans le monde. Le marché du bitcoin ne connaît ni obligation d'inscription, ni jours fériés bancaires, ni coupe-circuits, ni plans de sauvetage : c'est un marché véritablement libre.\n\nToute la volatilité du prix du bitcoin résulte des accords conclus en temps réel entre acheteurs et vendeurs, sans intervention des gouvernements. Alors que le bitcoin poursuit sa marche vers le statut de réserve de valeur mondiale majeure à l'ère de l'information, il serait irréaliste de supposer que sa progression sera linéaire.\n\nÀ mesure que l'adoption du bitcoin augmente, il devient moins risqué et son potentiel de hausse diminue, ce qui entraîne une baisse de sa volatilité.\n",
+                        "title": "C'est trop volatil !"
                     },
                     "itsnotBacked": {
                         "answers": [
-                            "The credibility of its monetary properties",
-                            "Rarity",
-                            "The color purple"
+                            "La crédibilité de ses propriétés monétaires",
+                            "La rareté",
+                            "La couleur violette"
                         ],
                         "feedback": [
-                            "Spot on! According to Parker Lewis, the only thing that backs any money is the credibility of its monetary properties",
-                            "That's not quite right. While rarity can certainly contribute to the value of money, it is not the only thing that backs it. Try again",
-                            "That's incorrect. While the color purple may be a beautiful and regal choice for a currency, it does not actually play a role in backing money."
+                            "En plein dans le mille ! Selon Parker Lewis, la seule chose qui garantit une monnaie, c'est la crédibilité de ses propriétés monétaires.",
+                            "Ce n'est pas tout à fait ça. La rareté peut certes contribuer à la valeur d'une monnaie, mais ce n'est pas la seule chose qui la garantit. Réessayez.",
+                            "Ce n'est pas correct. Le violet est peut-être un choix élégant et royal pour une monnaie, mais il ne joue aucun rôle dans sa garantie."
                         ],
-                        "question": "What is the only thing that backs any money, according to Parker Lewis",
-                        "text": "The idea of backed money is contradictory, as the backing itself would then be considered money. Part of the value of money comes from its rarity. Bitcoin does not need to be backed by something else that is rare because it is inherently scarce.\n\nVerifiable and auditable through independent means, bitcoin is free of counterparty risk. There is no third party that must be trusted to keep and secure commodities or assets. If anything, it is possible that the future will be backed by bitcoin.\n\nAs Parker Lewis stated, \"Ultimately, bitcoin is backed by something, and it's the only thing that backs any money: the credibility of its monetary properties.\"\n",
-                        "title": "Should money be backed by something?"
+                        "question": "Selon Parker Lewis, quelle est la seule chose qui garantit une monnaie ?",
+                        "text": "L'idée d'une monnaie « garantie » est contradictoire, car ce qui la garantirait serait alors lui-même considéré comme de la monnaie. Une partie de la valeur d'une monnaie vient de sa rareté. Le bitcoin n'a pas besoin d'être garanti par autre chose de rare, car il est intrinsèquement rare.\n\nVérifiable et auditable par des moyens indépendants, le bitcoin est exempt de risque de contrepartie. Aucun tiers n'a besoin d'être digne de confiance pour conserver et sécuriser des matières premières ou des actifs. Si quelque chose devait garantir l'avenir, ce pourrait bien être le bitcoin lui-même.\n\nComme l'a déclaré Parker Lewis : « En définitive, le bitcoin est garanti par quelque chose, et c'est la seule chose qui garantit une monnaie quelle qu'elle soit : la crédibilité de ses propriétés monétaires. »\n",
+                        "title": "Une monnaie doit-elle être garantie par quelque chose ?"
                     },
                     "willbecomeObsolete": {
                         "answers": [
-                            "No, it is not possible for bitcoin to become obsolete because it represents absolute scarcity and has a dominant position in the market.",
-                            "Yes, it is possible that bitcoin could become obsolete if a more secure or widely used digital monetary network is developed.",
-                            "that, but let's be real here - who's going to invent a digital currency that's more scarce than absolute scarcity? That's like trying to invent a circle that's rounder than round. Good luck with that"
+                            "Non, il n'est pas possible que le bitcoin devienne obsolète, car il représente une rareté absolue et occupe une position dominante sur le marché.",
+                            "Oui, il est possible que le bitcoin devienne obsolète si un réseau monétaire numérique plus sûr ou plus largement utilisé venait à être développé.",
+                            "ça, mais soyons honnêtes - qui va inventer une monnaie numérique plus rare que la rareté absolue ? C'est comme essayer d'inventer un cercle plus rond que rond. Bonne chance avec ça"
                         ],
                         "feedback": [
-                            "bitcoin to become obsolete because it represents absolute scarcity and has a dominant position in the market.",
-                            "Well, you're not wrong about that, but let's be real here - who's going to invent a digital currency that's more scarce than absolute scarcity? That's like trying to invent a circle that's rounder than round. Good luck with that",
-                            "Uh oh, looks like you're playing it safe but not quite hitting the mark. While it's true that no one can predict the future, it's pretty clear that bitcoin has a solid grip on the digital monetary network game. Try again."
+                            "le bitcoin devienne obsolète, car il représente une rareté absolue et occupe une position dominante sur le marché.",
+                            "Vous n'avez pas tort sur ce point, mais soyons honnêtes : qui va inventer une monnaie numérique plus rare que la rareté absolue ? C'est comme essayer d'inventer un cercle plus rond que rond. Bonne chance avec ça.",
+                            "Oh oh, on dirait que vous jouez la prudence sans vraiment viser juste. Il est vrai que personne ne peut prédire l'avenir, mais il est assez clair que le bitcoin a une emprise solide sur le jeu des réseaux monétaires numériques. Réessayez."
                         ],
-                        "question": "Is it possible that bitcoin becomes obsolete one day",
-                        "text": "Bitcoin represents a unique discovery of absolute scarcity, similar to the discovery of fire, electricity, or the field of mathematics.\n\nIt is not logical or possible to compete with bitcoin in terms of scarcity, as there is no level of scarcity higher than absolute scarcity. Criticisms of bitcoin's perceived limitations or drawbacks assume that there are no trade-offs in terms of security and incentive design, or that bitcoin's current form does not already provide significant benefits to millions of users.\n\nAs a rapidly growing, unrestricted network with a 99.98% uptime over more than a decade, having processed trillions of dollars in value and secured by billions of dollars in hardware, it is unlikely that bitcoin will be displaced as the dominant digital monetary network at this point.\n\nAs Michael Saylor stated, \"There's never been an example of a $100B monster digital network that was vanquished once it got to that dominant position.\"\n",
-                        "title": "Will bitcoin become obsolete one day?"
+                        "question": "Est-il possible que le bitcoin devienne obsolète un jour ?",
+                        "text": "Le bitcoin représente une découverte unique de rareté absolue, comparable à la découverte du feu, de l'électricité ou du domaine des mathématiques.\n\nIl n'est ni logique ni possible de rivaliser avec le bitcoin en matière de rareté, puisqu'il n'existe aucun niveau de rareté supérieur à la rareté absolue. Les critiques portant sur les limites ou inconvénients perçus du bitcoin supposent qu'il n'existe aucun compromis en matière de sécurité et de conception incitative, ou que sa forme actuelle n'apporte pas déjà des bénéfices considérables à des millions d'utilisateurs.\n\nEn tant que réseau en croissance rapide et sans restriction, affichant une disponibilité de 99,98 % sur plus d'une décennie, ayant traité des billions de dollars de valeur et sécurisé par des milliards de dollars de matériel, il est peu probable que le bitcoin soit détrôné en tant que réseau monétaire numérique dominant à ce stade.\n\nComme l'a déclaré Michael Saylor : « Il n'y a jamais eu d'exemple d'un réseau numérique monstre à 100 milliards de dollars qui ait été vaincu une fois qu'il a atteint cette position dominante. »\n",
+                        "title": "Le bitcoin deviendra-t-il obsolète un jour ?"
                     },
                     "toomuchEnergy": {
                         "answers": [
-                            "It helps to even out the distribution of energy consumption around the world.",
-                            "It increases the distribution of energy consumption around the world.",
-                            "It decreases the distribution of energy consumption around the world."
+                            "Il aide à uniformiser la répartition de la consommation d'énergie dans le monde.",
+                            "Il augmente la répartition de la consommation d'énergie dans le monde.",
+                            "Il diminue la répartition de la consommation d'énergie dans le monde."
                         ],
                         "feedback": [
-                            "You got it right. Did you know that bitcoin's fixed energy price helps to incentivize the use of renewable energy sources in areas where they may not have been economically viable before",
-                            "Well, I see you're a fan of chaos and global energy inequality, but this answer is wrong",
-                            "Looks like you're trying to save the world one energy imbalance at a time. This answer is clearly incorrect."
+                            "C'est la bonne réponse. Saviez-vous que le prix fixe de l'énergie pour le bitcoin encourage l'utilisation de sources d'énergie renouvelables dans des zones où elles n'auraient peut-être pas été économiquement viables auparavant ?",
+                            "On dirait que vous êtes fan du chaos et des inégalités énergétiques mondiales, mais cette réponse est fausse.",
+                            "On dirait que vous essayez de sauver le monde un déséquilibre énergétique à la fois. Cette réponse est clairement incorrecte."
                         ],
-                        "question": "How does bitcoin impact global energy consumption",
-                        "text": "Bitcoin is a decentralized digital currency that is accessible to users around the world and is resistant to censorship due to its Proof of Work mechanism.\n\nWith an estimated four billion people currently living under authoritarianism, bitcoin provides a way for individuals to send, receive, save, and transport wealth. It is important to consider the amount of energy that a monetary network like this should consume and to carefully evaluate who is best equipped to make decisions about this.\n\nOne way to think about the impact of bitcoin on global energy consumption is to imagine a topographic map of the world, with local electricity costs represented by the peaks and troughs. Adding bitcoin to the mix is like pouring a glass of water over the map - it settles in the troughs, smoothing them out. This is because bitcoin is a global buyer of energy at a fixed price, which helps to even out the distribution of energy consumption around the world.\n",
-                        "title": "Is bitcoin's energy consumption excessive?"
+                        "question": "Quel est l'impact du bitcoin sur la consommation mondiale d'énergie ?",
+                        "text": "Le bitcoin est une monnaie numérique décentralisée, accessible aux utilisateurs du monde entier, et résistante à la censure grâce à son mécanisme de preuve de travail.\n\nAvec environ quatre milliards de personnes vivant actuellement sous des régimes autoritaires, le bitcoin offre aux individus un moyen d'envoyer, de recevoir, d'épargner et de transporter de la richesse. Il est important de réfléchir à la quantité d'énergie qu'un réseau monétaire de ce type devrait consommer, et d'évaluer soigneusement qui est le mieux placé pour en décider.\n\nUne façon d'appréhender l'impact du bitcoin sur la consommation mondiale d'énergie consiste à imaginer une carte topographique du monde, où les coûts locaux de l'électricité seraient représentés par des pics et des creux. Ajouter le bitcoin à cette carte revient à y verser un verre d'eau : il se répand dans les creux et les nivelle. En effet, le bitcoin est un acheteur mondial d'énergie à prix fixe, ce qui aide à uniformiser la répartition de la consommation d'énergie dans le monde.\n",
+                        "title": "La consommation d'énergie du bitcoin est-elle excessive ?"
                     },
                     "strandedEnergy": {
                         "answers": [
-                            "By using it to power onsite equipment that generates hashes to produce bitcoin",
-                            "By selling it on the bitcoin market",
-                            "By creating a new form of renewable energy"
+                            "En l'utilisant pour alimenter des équipements sur site qui génèrent des empreintes (hashs) pour produire du bitcoin",
+                            "En la vendant sur le marché du bitcoin",
+                            "En créant une nouvelle forme d'énergie renouvelable"
                         ],
                         "feedback": [
-                            "Congratulations! You've correctly identified the use of excess energy in bitcoin mining. Did you know that this process can be done in any location, even in areas where there is no local demand for the energy being generated",
-                            "I see you're a fan of making money through unconventional means. Too bad that's not what this lesson is about. Try again",
-                            "It looks like you're trying to save the world one renewable energy source at a time. While that's admirable, unfortunately that's not the right answer."
+                            "Bravo ! Vous avez correctement identifié l'usage de l'énergie excédentaire dans le minage de bitcoin. Saviez-vous que ce processus peut être réalisé n'importe où, même dans des zones où il n'existe aucune demande locale pour l'énergie produite ?",
+                            "On dirait que vous aimez gagner de l'argent par des moyens peu conventionnels. Dommage, ce n'est pas le sujet de cette leçon. Réessayez.",
+                            "On dirait que vous essayez de sauver le monde une source d'énergie renouvelable à la fois. C'est admirable, mais malheureusement ce n'est pas la bonne réponse."
                         ],
-                        "question": "How can excess energy be used through bitcoin mining",
-                        "text": "Exactly**.** Bitcoin mining provides a portable solution for utilizing energy assets in regions where there is no local demand or means of transportation. By using onsite equipment to generate hashes, it is possible to produce bitcoin, which can then be held for future value appreciation or sold on the highly liquid and globally accessible bitcoin market.\n",
-                        "title": "Wait, are you telling me that bitcoin can be used to tap into stranded energy?"
+                        "question": "Comment l'énergie excédentaire peut-elle être utilisée grâce au minage de bitcoin ?",
+                        "text": "Exactement. Le minage de bitcoin offre une solution portable pour exploiter des actifs énergétiques dans des régions où il n'existe ni demande locale ni moyen de transport. En utilisant des équipements sur site pour générer des empreintes (hashs), il est possible de produire du bitcoin, qui peut ensuite être conservé en vue d'une future appréciation de sa valeur, ou vendu sur le marché du bitcoin, hautement liquide et accessible mondialement.\n",
+                        "title": "Attendez, vous êtes en train de me dire que le bitcoin peut exploiter de l'énergie autrement perdue ?"
                     }
                 }
             },
             "BitcoinCriticismsFallaciesII": {
-                "title": "Bitcoin Criticisms & Fallacies II",
+                "title": "Critiques et idées reçues sur le Bitcoin II",
                 "questions": {
                     "internetDependent": {
                         "answers": [
-                            "By sending a transaction via SMS",
-                            "By posting a message on a social media platform",
-                            "By sending an email"
+                            "En envoyant une transaction par SMS",
+                            "En publiant un message sur un réseau social",
+                            "En envoyant un e-mail"
                         ],
                         "feedback": [
-                            "You've identified a way to send bitcoin transactions even when the internet is down. Good thinking",
-                            "Well, it looks like you're trying to stay connected in the digital age even during an internet outage, but that's incorrect",
-                            "I see you're trying to stay connected through traditional means, but unfortunately sending an email might not be the most reliable way to send bitcoin transactions during an internet outage. Try again!"
+                            "Vous avez identifié un moyen d'envoyer des transactions Bitcoin même quand Internet est coupé. Bien vu.",
+                            "On dirait que vous cherchez à rester connecté à l'ère numérique même pendant une coupure d'Internet, mais ce n'est pas correct.",
+                            "On dirait que vous essayez de rester connecté par des moyens traditionnels, mais malheureusement, envoyer un e-mail n'est pas la façon la plus fiable d'envoyer des transactions Bitcoin pendant une coupure d'Internet. Réessayez !"
                         ],
-                        "question": "How can bitcoin transactions be sent in the event of an internet disruption",
-                        "text": "There is a risk, of course, that internet access may be lost due to infrastructure failures, natural disasters, or intentional outages. However, it is possible to transact bitcoin using offline methods and other communication networks.\n\nFor instance, a signed bitcoin transaction can be transmitted to a single node and broadcast to the network for inclusion in a block by miners. There are various ways to do this, such as sending a transaction via SMS, using a physical wallet with a one-time use tamper-evident private key, or receiving blocks via satellite. These options allow for bitcoin to be used even in the event of an internet disruption.\n",
-                        "title": "Bitcoin is too dependent on the Internet"
+                        "question": "Comment les transactions Bitcoin peuvent-elles être envoyées en cas de coupure d'Internet ?",
+                        "text": "Il existe bien sûr un risque de perte d'accès à Internet en cas de défaillance des infrastructures, de catastrophe naturelle ou de coupure intentionnelle. Il est cependant possible d'effectuer des transactions en bitcoin en utilisant des méthodes hors ligne et d'autres réseaux de communication.\n\nPar exemple, une transaction Bitcoin signée peut être transmise à un seul nœud et diffusée au réseau pour être incluse dans un bloc par les mineurs. Il existe plusieurs façons de faire cela, comme envoyer une transaction par SMS, utiliser un portefeuille physique doté d'une clé privée inviolable à usage unique, ou recevoir des blocs par satellite. Ces options permettent d'utiliser le bitcoin même en cas de coupure d'Internet.\n",
+                        "title": "Le Bitcoin dépend trop d'Internet"
                     },
                     "forcrimeOnly": {
                         "answers": [
                             "Non",
                             "Oui",
-                            "It depends on the individual circumstances"
+                            "Cela dépend des circonstances individuelles"
                         ],
                         "feedback": [
-                            "Well done! You've correctly identified that it is not accurate to claim that bitcoin's properties have led to an overall increase in criminal activity.",
-                            "I see you're a fan of sensational headlines and jumping to conclusions. Unfortunately, that's not based in reality",
-                            "It looks like you're trying to take a balanced approach, but is not accurate to make this claim regardless of individual circumstances. Try again."
+                            "Bien joué ! Vous avez correctement identifié qu'il n'est pas exact d'affirmer que les propriétés du Bitcoin ont entraîné une hausse globale de l'activité criminelle.",
+                            "On dirait que vous aimez les titres sensationnalistes et les conclusions hâtives. Malheureusement, ce n'est pas fondé sur la réalité.",
+                            "On dirait que vous essayez d'adopter une approche nuancée, mais cette affirmation n'est pas exacte, quelles que soient les circonstances individuelles. Réessayez."
                         ],
-                        "question": "Is it accurate to claim that bitcoin's properties have led to an overall increase in criminal activity",
-                        "text": "Bitcoin is a neutral tool for exchanging value, and it has no inherent beliefs, opinions, or values. Its meaning is determined by how it is used. It is not accurate to claim that bitcoin's properties have led to an overall increase in criminal activity.\n\nCrime does not stem from access to tools, but rather from individual circumstances. If bitcoin is useful, it can be used by anyone, including criminals. If it is not useful, it cannot be used by anyone, including criminals.\n\nAs Parker Lewis stated, \"There is nothing inherent about the tools used to facilitate crimes that makes them criminal in themselves. Despite criminal use, no one is calling for the ban of roads, the internet, mail, etc.\"\n",
-                        "title": "Bitcoin is for Criminals"
+                        "question": "Est-il exact d'affirmer que les propriétés du Bitcoin ont entraîné une hausse globale de l'activité criminelle ?",
+                        "text": "Le Bitcoin est un outil neutre pour échanger de la valeur : il n'a en soi ni croyances, ni opinions, ni valeurs. Sa signification dépend de l'usage qui en est fait. Il n'est pas exact d'affirmer que les propriétés du Bitcoin ont entraîné une hausse globale de l'activité criminelle.\n\nLa criminalité ne découle pas de l'accès à des outils, mais des circonstances individuelles. Si le bitcoin est utile, il peut être utilisé par n'importe qui, y compris des criminels. S'il n'est pas utile, il ne peut être utilisé par personne, y compris par des criminels.\n\nComme l'a déclaré Parker Lewis : « Il n'y a rien d'intrinsèquement criminel dans les outils utilisés pour faciliter des crimes. Malgré leur usage criminel, personne ne réclame l'interdiction des routes, d'Internet, du courrier postal, etc. »\n",
+                        "title": "Le Bitcoin, c'est pour les criminels"
                     },
                     "ponziScheme": {
                         "answers": [
-                            "It is a form of money",
-                            "It is a ponzi scheme",
-                            "It is an open-source investment scheme"
+                            "C'est une forme de monnaie",
+                            "C'est une chaîne de Ponzi",
+                            "C'est un dispositif d'investissement open source"
                         ],
                         "feedback": [
-                            "Congratulations! You've earned some sats for correctly identifying that bitcoin is a form of money. Did you know that bitcoin was the first decentralized digital currency to be created, and it operates without a central bank or single administrator",
-                            "Ah hah! You fell for the old ponzi scheme trick! Just kidding, but seriously, that's not what bitcoin is",
-                            "Nope, sorry! Bitcoin isn't an open-source investment scheme. But hey, at least you're learning about it, right?"
+                            "Bravo ! Vous avez gagné des sats pour avoir correctement identifié que le bitcoin est une forme de monnaie. Saviez-vous que le bitcoin a été la première monnaie numérique décentralisée créée, et qu'il fonctionne sans banque centrale ni administrateur unique ?",
+                            "Ah ah ! Vous êtes tombé dans le vieux piège de la chaîne de Ponzi ! Blague à part, ce n'est pas ce qu'est le bitcoin.",
+                            "Non, dommage ! Le bitcoin n'est pas un dispositif d'investissement open source. Mais bon, au moins vous apprenez, non ?"
                         ],
-                        "question": "Which of the following statements is true about bitcoin",
-                        "text": "Calling bitcoin a ponzi scheme shows a lack of understanding of both bitcoin and the definition of a ponzi scheme. A ponzi scheme involves promises of above-market returns to investors, but as a permissionless network, bitcoin does not have a central authority that can make such promises.\n\nAdditionally, bitcoin is not an investment scheme, it is a form of money. Unlike opaque investment opportunities that may be promoted to unsuspecting individuals, bitcoin's code is open-source and its supply can be independently verified at all times.\n",
-                        "title": "Bitcoin is a Ponzi Scheme"
+                        "question": "Laquelle des affirmations suivantes est vraie à propos du bitcoin ?",
+                        "text": "Qualifier le bitcoin de chaîne de Ponzi témoigne d'une incompréhension à la fois du bitcoin et de la définition d'une chaîne de Ponzi. Une chaîne de Ponzi repose sur la promesse de rendements supérieurs au marché faite aux investisseurs, mais en tant que réseau sans permission, le bitcoin n'a pas d'autorité centrale capable de faire de telles promesses.\n\nDe plus, le bitcoin n'est pas un dispositif d'investissement, c'est une forme de monnaie. Contrairement aux opportunités d'investissement opaques parfois promues auprès de personnes non averties, le code du bitcoin est open source et son offre peut être vérifiée de manière indépendante à tout moment.\n",
+                        "title": "Le Bitcoin est une chaîne de Ponzi"
                     },
                     "bitcoinisTooSlow": {
                         "answers": [
-                            "Credit card payments go through multiple parties before reaching the merchant, while bitcoin payments go directly to the recipient without intermediaries",
-                            "Credit card payments are final once they are confirmed, while bitcoin payments can be reversed",
-                            "but at least you're learning about bitcoin"
+                            "Les paiements par carte de crédit passent par plusieurs intermédiaires avant d'atteindre le commerçant, tandis que les paiements en bitcoin vont directement au destinataire sans intermédiaire",
+                            "Les paiements par carte de crédit sont définitifs une fois confirmés, tandis que les paiements en bitcoin peuvent être annulés",
+                            "mais au moins vous apprenez des choses sur le bitcoin"
                         ],
                         "feedback": [
-                            "Congratulations! You've unlocked the ultimate bitcoin payment mastery. You seem to understand that bitcoin operates without a central bank or single administrator",
-                            "Uh oh, looks like you might have gotten the wrong answer, but at least you're learning about bitcoin",
-                            "Nope, sorry! Credit card payments are being censored all the time, but good try. Keep learning about bitcoin!"
+                            "Bravo ! Vous avez débloqué la maîtrise ultime des paiements en bitcoin. Vous semblez comprendre que le bitcoin fonctionne sans banque centrale ni administrateur unique.",
+                            "Oh oh, on dirait que vous vous êtes trompé de réponse, mais au moins vous apprenez des choses sur le bitcoin.",
+                            "Non, dommage ! Les paiements par carte de crédit sont censurés en permanence, mais belle tentative. Continuez à apprendre sur le bitcoin !"
                         ],
-                        "question": "What is the main difference between paying with a credit card and paying with bitcoin on-chain",
-                        "text": "Paying with bitcoin is not the same as using a credit card to make a purchase. When you use a credit card, your payment goes through multiple parties before reaching the merchant's bank account after days or even weeks of processing.\n\nIn contrast, when you pay with bitcoin on the main blockchain, you are sending actual money directly to the recipient without any intermediaries. This means there is no risk of censorship and the transaction is considered final once it has been confirmed by six blocks on the blockchain.\n\nThe proper comparison would be between bitcoin base layer and the Fed as currency issuer and as a clearing mechanism.\n\nSince the advent of the Lightning Network, the \"Bitcoin is too slow\" criticism has largely fallen silent.\n",
-                        "title": "Bitcoin is too slow"
+                        "question": "Quelle est la principale différence entre payer par carte de crédit et payer en bitcoin on-chain ?",
+                        "text": "Payer en bitcoin n'est pas la même chose que payer par carte de crédit. Avec une carte de crédit, votre paiement passe par plusieurs intermédiaires avant d'atteindre le compte bancaire du commerçant, après plusieurs jours, voire plusieurs semaines de traitement.\n\nÀ l'inverse, lorsque vous payez en bitcoin sur la blockchain principale, vous envoyez de l'argent réel directement au destinataire, sans aucun intermédiaire. Cela signifie qu'il n'y a aucun risque de censure, et la transaction est considérée comme définitive dès qu'elle a été confirmée par six blocs sur la blockchain.\n\nLa comparaison pertinente serait entre la couche de base du Bitcoin et la Fed, en tant qu'émettrice de monnaie et mécanisme de compensation.\n\nDepuis l'avènement du Lightning Network, la critique « le Bitcoin est trop lent » s'est largement estompée.\n",
+                        "title": "Le Bitcoin est trop lent"
                     },
                     "supplyLimit": {
                         "answers": [
-                            "Through a decentralized consensus process in which every transaction is independently validated by nodes on the network",
-                            "Through a centralized process in which a single authority controls the issuance of new coins",
-                            "By fixing the maximum supply at an arbitrary number, such as 100 million"
+                            "Grâce à un processus de consensus décentralisé où chaque transaction est validée indépendamment par les nœuds du réseau",
+                            "Grâce à un processus centralisé où une autorité unique contrôle l'émission de nouvelles pièces",
+                            "En fixant l'offre maximale à un nombre arbitraire, comme 100 millions"
                         ],
                         "feedback": [
-                            "Congratulations! You've unlocked the ultimate bitcoin supply mastery. Did you know that the decentralized nature of the bitcoin network allows for greater transparency, as every transaction is independently validated by nodes on the network",
-                            "Nope, sorry! Bitcoin's supply isn't controlled by a central authority. Try again",
-                            "Uh oh, looks like you might have gotten the wrong answer. The maximum supply of bitcoin is fixed at 21 million, not 100 million. But at least you're learning about bitcoin!"
+                            "Bravo ! Vous avez débloqué la maîtrise ultime de l'offre de bitcoin. Saviez-vous que la nature décentralisée du réseau Bitcoin permet une plus grande transparence, chaque transaction étant validée indépendamment par les nœuds du réseau ?",
+                            "Non, dommage ! L'offre de bitcoin n'est contrôlée par aucune autorité centrale. Réessayez.",
+                            "Oh oh, on dirait que vous vous êtes trompé de réponse. L'offre maximale de bitcoin est fixée à 21 millions, pas 100 millions. Mais au moins vous apprenez des choses sur le bitcoin !"
                         ],
-                        "question": "How is the supply of bitcoin protected from being corrupted",
-                        "text": "Bitcoin's decentralized nature allows for its supply to be independently validated by each node on the network, ensuring that it cannot be corrupted. This is achieved through a consensus process in which every transaction that has been confirmed on the bitcoin network is independently validated.\n\nWhile anyone can fork the code and make changes to the rules, it is unlikely that this version of the code would be adopted by the wider network. The decentralized consensus process and the incorruptible supply of bitcoin are crucial to its appeal as a form of money.\n\nThe maximum supply of bitcoin is fixed at 21 million, and any attempt to increase this limit would require consensus from a significant portion of the bitcoin network, which is highly unlikely to happen.\n",
-                        "title": "Bitcoin's Supply Limit Could Be Corrupted"
+                        "question": "Comment l'offre de bitcoin est-elle protégée contre toute corruption ?",
+                        "text": "La nature décentralisée du Bitcoin permet à son offre d'être validée indépendamment par chaque nœud du réseau, garantissant qu'elle ne puisse pas être corrompue. Cela est rendu possible par un processus de consensus dans lequel chaque transaction confirmée sur le réseau Bitcoin est validée indépendamment.\n\nBien que n'importe qui puisse forker le code et modifier les règles, il est peu probable qu'une telle version soit adoptée par l'ensemble du réseau. Le processus de consensus décentralisé et l'offre incorruptible du bitcoin sont essentiels à son attrait en tant que forme de monnaie.\n\nL'offre maximale de bitcoin est fixée à 21 millions, et toute tentative d'augmenter cette limite nécessiterait le consensus d'une part importante du réseau Bitcoin, ce qui est extrêmement improbable.\n",
+                        "title": "La limite d'offre du Bitcoin pourrait-elle être corrompue ?"
                     },
                     "governmentBan": {
                         "answers": [
-                            "No, because the decentralized nature of the bitcoin network makes it difficult to enforce a ban",
-                            "Yes, by preventing the generation of random numbers",
-                            "Yes, by shutting down the internet"
+                            "Non, car la nature décentralisée du réseau Bitcoin rend une interdiction difficile à faire appliquer",
+                            "Oui, en empêchant la génération de nombres aléatoires",
+                            "Oui, en coupant Internet"
                         ],
                         "feedback": [
-                            "Correct. The decentralized nature of the bitcoin network makes it difficult to enforce a ban",
-                            "Nope, silly! While it is technically possible for governments to ban bitcoin, it would be nearly impossible to enforce such a ban. Try again",
-                            "Uh oh, looks like you might have gotten the wrong answer. Shutting down the internet wouldn't necessarily stop people from using bitcoin."
+                            "Exact. La nature décentralisée du réseau Bitcoin rend une interdiction difficile à faire appliquer.",
+                            "Non, voyons ! Il est techniquement possible pour les gouvernements d'interdire le bitcoin, mais il serait presque impossible de faire appliquer une telle interdiction. Réessayez.",
+                            "Oh oh, on dirait que vous vous êtes trompé de réponse. Couper Internet n'empêcherait pas nécessairement les gens d'utiliser le bitcoin."
                         ],
-                        "question": "Can governments effectively ban bitcoin",
-                        "text": "It is technically possible for governments to ban bitcoin, but enforcing such a ban would be difficult due to the decentralized nature of the bitcoin network.\n\nBitcoin relies on private keys, which are simply random numbers, to control access to transactions recorded on the blockchain. These private keys can be generated and stored anywhere, making them largely undectectable.\n\nAdditionally, the infrastructure required to access the bitcoin network is relatively simple and widely available, making it easy for people to trustlessly verify transactions.\n\nAs Saifedean Ammous said, \"Banning bitcoin is not much different from trying to ban math. It will just prove its utility & drive more people to it.\"\n",
-                        "title": "Governments Will Ban Bitcoin"
+                        "question": "Les gouvernements peuvent-ils interdire efficacement le bitcoin ?",
+                        "text": "Il est techniquement possible pour les gouvernements d'interdire le bitcoin, mais faire appliquer une telle interdiction serait difficile en raison de la nature décentralisée du réseau Bitcoin.\n\nLe Bitcoin repose sur des clés privées, qui ne sont que des nombres aléatoires, pour contrôler l'accès aux transactions enregistrées sur la blockchain. Ces clés privées peuvent être générées et stockées n'importe où, ce qui les rend en grande partie indétectables.\n\nDe plus, l'infrastructure nécessaire pour accéder au réseau Bitcoin est relativement simple et largement disponible, ce qui permet aux gens de vérifier les transactions sans avoir à faire confiance à un tiers.\n\nComme l'a dit Saifedean Ammous : « Interdire le bitcoin ne serait pas très différent de tenter d'interdire les mathématiques. Cela ne ferait que prouver son utilité et attirer davantage de gens vers lui. »\n",
+                        "title": "Les gouvernements vont interdire le Bitcoin"
                     }
                 }
             },
             "BitcoinCriticismsFallaciesIII": {
-                "title": "Bitcoin Criticisms & Fallacies III",
+                "title": "Critiques et idées reçues sur le Bitcoin III",
                 "questions": {
                     "concentratedOwnership": {
                         "answers": [
-                            "Yes, but these wallets belong to exchanges that have millions of customers",
-                            "Yes, and these wallets belong to individuals who have hoarded large amounts of bitcoin",
-                            "No, the vast majority of bitcoin is evenly distributed among a large number of users"
+                            "Oui, mais ces portefeuilles appartiennent à des plateformes d'échange qui comptent des millions de clients",
+                            "Oui, et ces portefeuilles appartiennent à des individus qui ont thésaurisé de grandes quantités de bitcoin",
+                            "Non, la grande majorité du bitcoin est répartie équitablement entre un grand nombre d'utilisateurs"
                         ],
                         "feedback": [
-                            "Congratulations! You've unlocked the ultimate bitcoin wallet mastery. Did you know that it is generally considered best practice to keep bitcoin in a self-hosted wallet for security and privacy reasons",
-                            "Nope, sorry! While it is technically true that a small number of wallets hold the majority of all bitcoin, these wallets don't necessarily belong to individuals who have hoarded large amounts of bitcoin. Keep learning about bitcoin",
-                            "Uh oh, looks like you might have gotten the wrong answer. The distribution of bitcoin among users is not necessarily even. But at least you're learning about bitcoin!"
+                            "Bravo ! Vous avez débloqué la maîtrise ultime des portefeuilles bitcoin. Saviez-vous qu'il est généralement recommandé de conserver ses bitcoins dans un portefeuille auto-hébergé, pour des raisons de sécurité et de confidentialité ?",
+                            "Non, dommage ! Il est techniquement vrai qu'un petit nombre de portefeuilles détient la majorité du bitcoin, mais ces portefeuilles n'appartiennent pas nécessairement à des individus ayant thésaurisé de grandes quantités de bitcoin. Continuez à apprendre sur le bitcoin.",
+                            "Oh oh, on dirait que vous vous êtes trompé de réponse. La répartition du bitcoin entre les utilisateurs n'est pas nécessairement équitable. Mais au moins vous apprenez des choses sur le bitcoin !"
                         ],
-                        "question": "Is it true that a small number of wallets hold the majority of all bitcoin",
-                        "text": "It is often said that a small number of wallets hold the majority of all bitcoin. While this is technically true, it is important to note that these wallets are typically owned by exchanges that have millions of customers.\n\nMany people choose to leave their bitcoin on an exchange, but it is generally considered best practice to keep bitcoin in a personal wallet for security and privacy reasons.\n\nIt is also worth noting that a single bitcoin address can contain bitcoin belonging to multiple users, and a single user can control multiple wallets. To maintain privacy, it is recommended to generate a new address for each receiving transaction instead of reusing the same address.\n",
-                        "title": "Bitcoin Ownership Is Concentrated on a Few Users"
+                        "question": "Est-il vrai qu'un petit nombre de portefeuilles détient la majorité de tous les bitcoins ?",
+                        "text": "On dit souvent qu'un petit nombre de portefeuilles détient la majorité de tous les bitcoins. C'est techniquement vrai, mais il est important de noter que ces portefeuilles appartiennent généralement à des plateformes d'échange comptant des millions de clients.\n\nBeaucoup de gens choisissent de laisser leurs bitcoins sur une plateforme d'échange, mais il est généralement recommandé de les conserver dans un portefeuille personnel, pour des raisons de sécurité et de confidentialité.\n\nIl faut aussi noter qu'une seule adresse bitcoin peut contenir des bitcoins appartenant à plusieurs utilisateurs, et qu'un seul utilisateur peut contrôler plusieurs portefeuilles. Pour préserver sa confidentialité, il est recommandé de générer une nouvelle adresse pour chaque transaction de réception plutôt que de réutiliser la même adresse.\n",
+                        "title": "La propriété du Bitcoin est concentrée entre peu d'utilisateurs"
                     },
                     "centralizedMining": {
                         "answers": [
-                            "No, because they have a strong incentive to follow the rules of the network and maintain the integrity of the blockchain",
-                            "Yes, because they have a majority of the hashing power",
-                            "Yes, but only if they are acting in their own self-interest"
+                            "Non, car ils ont une forte incitation à respecter les règles du réseau et à préserver l'intégrité de la blockchain",
+                            "Oui, car ils détiennent la majorité de la puissance de hachage",
+                            "Oui, mais seulement s'ils agissent dans leur propre intérêt"
                         ],
                         "feedback": [
-                            "Yep, that's right. Did you know that the decentralized nature of the bitcoin network ensures that no single entity, including mining pools, can disrupt the network or censor transactions",
-                            "Nope, sorry! While mining pools do have a significant amount of hashing power, individual miners are extremely mobile and can trivially direct their hashrate to an honest mining pool",
-                            "Incorrect. While it is true that mining pools have an incentive to act in their own self-interest, this does not mean that they can disrupt the bitcoin network or censor transactions."
+                            "Oui, c'est exact. Saviez-vous que la nature décentralisée du réseau Bitcoin garantit qu'aucune entité, pas même un pool de minage, ne peut perturber le réseau ou censurer des transactions ?",
+                            "Non, dommage ! Les pools de minage détiennent bien une part importante de la puissance de hachage, mais les mineurs individuels sont extrêmement mobiles et peuvent facilement rediriger leur puissance vers un pool de minage honnête.",
+                            "Incorrect. Les pools de minage ont bien intérêt à agir dans leur propre intérêt, mais cela ne signifie pas qu'ils peuvent perturber le réseau Bitcoin ou censurer des transactions."
                         ],
-                        "question": "Can mining pools disrupt the bitcoin network or censor transactions",
-                        "text": "Some people believe that mining pools, which are groups of miners that work together to increase their chances of finding a block, could potentially disrupt the bitcoin network or censor transactions.\n\nHowever, this concern stems from a lack of understanding of the incentives of miners and their role in the network. In reality, miners have a strong incentive to follow the rules of the network and maintain the integrity of the blockchain, as their own profits depend on it.\n\nAs Jimmy Song said, \"A majority of hashing power can't: take coins you already possess away, change the rules of bitcoin, or hurt you without hurting themselves.\"\n",
-                        "title": "Bitcoin Mining Is Centralized"
+                        "question": "Les pools de minage peuvent-ils perturber le réseau Bitcoin ou censurer des transactions ?",
+                        "text": "Certaines personnes pensent que les pools de minage, ces groupes de mineurs qui s'associent pour augmenter leurs chances de trouver un bloc, pourraient potentiellement perturber le réseau Bitcoin ou censurer des transactions.\n\nCette inquiétude provient toutefois d'une incompréhension des incitations des mineurs et de leur rôle dans le réseau. En réalité, les mineurs ont une forte incitation à respecter les règles du réseau et à préserver l'intégrité de la blockchain, car leurs propres profits en dépendent.\n\nComme l'a dit Jimmy Song : « Une majorité de la puissance de hachage ne peut pas : vous retirer des pièces que vous possédez déjà, changer les règles du bitcoin, ou vous nuire sans se nuire à elle-même. »\n",
+                        "title": "Le minage du Bitcoin est centralisé"
                     },
                     "tooExpensive": {
                         "answers": [
-                            "By comparing the entire market capitalization of bitcoin to that of other asset classes",
-                            "By comparing the unit price of one bitcoin to the unit price of another asset, such as gold",
-                            "By consulting a crystal ball and going with your gut feeling"
+                            "En comparant la capitalisation boursière totale du bitcoin à celle d'autres classes d'actifs",
+                            "En comparant le prix unitaire d'un bitcoin au prix unitaire d'un autre actif, comme l'or",
+                            "En consultant une boule de cristal et en se fiant à son instinct"
                         ],
                         "feedback": [
-                            "Congratulations, you're on the right track! It's important to consider the entire market cap of bitcoin when comparing it to other assets. Did you know that the total market cap of bitcoin reached over $1 trillion in 2021",
-                            "Uh oh, it looks like you might have fallen for the unit bias trap! Better luck next time",
-                            "Sorry, consulting a crystal ball might work for predicting the weather, but it's not a reliable way to assess the value of bitcoin. Better luck next time!"
+                            "Bravo, vous êtes sur la bonne voie ! Il est important de considérer la capitalisation boursière totale du bitcoin quand on le compare à d'autres actifs. Saviez-vous que la capitalisation boursière totale du bitcoin a dépassé 1 000 milliards de dollars en 2021 ?",
+                            "Oh oh, on dirait que vous êtes tombé dans le piège du « biais de l'unité » ! Ce sera pour une prochaine fois.",
+                            "Dommage, consulter une boule de cristal peut fonctionner pour prédire la météo, mais ce n'est pas un moyen fiable d'évaluer la valeur du bitcoin. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "How can you accurately compare the value of bitcoin to other assets",
-                        "text": "One common misconception about bitcoin is that it is too expensive to purchase.\n\nHowever, this belief is based on unit bias, as it is more accurate to compare the entire market capitalization of bitcoin to other assets rather than just the unit price of a single bitcoin.\n\nIt's also worth noting that a single bitcoin can be divided into 100 million smaller units called satoshis. As the saying goes, \"you can buy a fraction of a bitcoin!\"\n",
-                        "title": "Bitcoin is too expensive"
+                        "question": "Comment comparer précisément la valeur du bitcoin à celle d'autres actifs ?",
+                        "text": "Une idée reçue courante sur le bitcoin est qu'il serait trop cher à l'achat.\n\nOr, cette croyance repose sur le « biais de l'unité » : il est plus juste de comparer la capitalisation boursière totale du bitcoin à celle d'autres actifs, plutôt que le simple prix unitaire d'un bitcoin.\n\nIl faut aussi noter qu'un seul bitcoin peut être divisé en 100 millions de plus petites unités appelées satoshis. Comme on dit : « on peut acheter une fraction de bitcoin ! »\n",
+                        "title": "Le Bitcoin est trop cher"
                     },
                     "prohibitivelyHigh": {
                         "answers": [
-                            "The efficiency and reliability of the bitcoin network as a settlement layer",
-                            "The use of secondary layers such as lightning, liquid, or federated side-chains for smaller transactions",
-                            "The fact that bitcoin is still a relatively new technology and has not yet reached its full potential"
+                            "L'efficacité et la fiabilité du réseau Bitcoin en tant que couche de règlement",
+                            "L'utilisation de couches secondaires comme Lightning, Liquid ou des side-chains fédérées pour les petites transactions",
+                            "Le fait que le bitcoin soit encore une technologie relativement récente n'ayant pas encore atteint son plein potentiel"
                         ],
                         "feedback": [
-                            "Congratulations, you've hit the nail on the head! The efficiency and reliability of the bitcoin network certainly play a role in keeping transaction fees low. Did you know that the bitcoin network can process up to 7 transactions per second, making it faster than some traditional payment systems",
-                            "Nice try, but it looks like you're missing a key piece of information. Try again",
-                            "Sorry, but being a newer technology does not necessarily equate to lower transaction fees. Better luck next time!"
+                            "Bravo, vous avez tapé dans le mille ! L'efficacité et la fiabilité du réseau Bitcoin jouent certainement un rôle dans le maintien de frais de transaction bas. Saviez-vous que le réseau Bitcoin peut traiter jusqu'à 7 transactions par seconde, ce qui le rend plus rapide que certains systèmes de paiement traditionnels ?",
+                            "Belle tentative, mais il vous manque une information clé. Réessayez.",
+                            "Dommage, être une technologie plus récente n'implique pas nécessairement des frais de transaction plus bas. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "What is the main reason that transaction fees on the main layer of bitcoin remain relatively low compared to traditional financial systems",
-                        "text": "Another misconception about bitcoin is that its transaction costs are prohibitively high.\n\nHowever, confirmed transactions on the main layer of bitcoin provide a level of finality that is unmatched in the traditional financial system. While it is true that transaction fees may occasionally spike due to the limited capacity of each block, the bitcoin network remains an efficient and reliable settlement layer for high-value transactions.\n\nIn fact, according to Saifedean Ammous, \"between October 2010 and July 2021, the average daily transaction fees came up to around 0.02% of the value of the transactions.\"\n\nIn addition, smaller transactions, including microtransactions, are often migrated to secondary layers such as lightning, liquid, or federated side-chains where fees are significantly lower than those offered by retail banks.\n",
-                        "title": "Bitcoin transaction costs are prohibitively high"
+                        "question": "Quelle est la principale raison pour laquelle les frais de transaction sur la couche principale du Bitcoin restent relativement bas par rapport aux systèmes financiers traditionnels ?",
+                        "text": "Une autre idée reçue sur le bitcoin est que ses frais de transaction seraient prohibitifs.\n\nOr, les transactions confirmées sur la couche principale du Bitcoin offrent un niveau de finalité inégalé dans le système financier traditionnel. Il est vrai que les frais de transaction peuvent parfois grimper en raison de la capacité limitée de chaque bloc, mais le réseau Bitcoin reste une couche de règlement efficace et fiable pour les transactions de grande valeur.\n\nEn réalité, selon Saifedean Ammous, « entre octobre 2010 et juillet 2021, les frais de transaction quotidiens moyens représentaient environ 0,02 % de la valeur des transactions. »\n\nDe plus, les transactions plus modestes, y compris les microtransactions, sont souvent transférées vers des couches secondaires comme Lightning, Liquid ou des side-chains fédérées, où les frais sont nettement inférieurs à ceux pratiqués par les banques traditionnelles.\n",
+                        "title": "Les frais de transaction du Bitcoin sont prohibitifs"
                     },
                     "willBeHoarded": {
                         "answers": [
-                            "No, holding bitcoin is a way to hedge against future uncertainty and does not necessarily mean it is not being used",
-                            "Yes, holding bitcoin is the same thing as hoarding bitcoin",
-                            "It depends on the individual's intentions and financial goals"
+                            "Non, détenir du bitcoin est un moyen de se prémunir contre l'incertitude future et ne signifie pas nécessairement qu'il n'est pas utilisé",
+                            "Oui, détenir du bitcoin revient exactement à le thésauriser",
+                            "Cela dépend des intentions et des objectifs financiers de chacun"
                         ],
                         "feedback": [
-                            "Congratulations, you're on the right track! As Pierre Rochard pointed out, 'all bitcoin are always held by someone, payments only change who is holding it.' Well done",
-                            "Uh oh, it looks like you might have fallen for the hoarding misconception! Holding bitcoin is a common way to hedge against future uncertainty and does not necessarily mean it is not being used",
-                            "Sorry, but the distinction between holding and hoarding bitcoin is not dependent on an individual's intentions and financial goals. Better luck next time!"
+                            "Bravo, vous êtes sur la bonne voie ! Comme l'a souligné Pierre Rochard : « Tous les bitcoins sont toujours détenus par quelqu'un, les paiements ne font que changer qui les détient. » Bien joué.",
+                            "Oh oh, on dirait que vous êtes tombé dans le piège de l'idée reçue sur la thésaurisation ! Détenir du bitcoin est un moyen courant de se prémunir contre l'incertitude future, et ne signifie pas nécessairement qu'il n'est pas utilisé.",
+                            "Dommage, mais la distinction entre détenir et thésauriser du bitcoin ne dépend pas des intentions ou des objectifs financiers de chacun. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "Is holding bitcoin the same thing as hoarding bitcoin",
-                        "text": "There is a common belief that the fixed supply of bitcoin incentivizes hoarding, or the act of holding onto bitcoin rather than spending it in the economy.\n\nHowever, this logic has a few flaws. First, saving, or the act of setting aside income for future use, is often conflated with hoarding. In fact, saving is a necessary precursor to significant investment and can be seen as a responsible financial practice.\n\nSecond, holding onto bitcoin, or any form of money, is a common way to hedge against future uncertainty and does not necessarily mean that it is not being used.\n\nAs Pierre Rochard pointed out, \"all bitcoin are always held by someone, payments only change who is holding it.\" In other words, the act of holding bitcoin is itself a use of bitcoin.\n",
-                        "title": "The Misconception of Bitcoin Hoarding"
+                        "question": "Détenir du bitcoin, est-ce la même chose que le thésauriser ?",
+                        "text": "Une idée reçue répandue veut que l'offre fixe du bitcoin encourage la thésaurisation, c'est-à-dire le fait de conserver son bitcoin plutôt que de le dépenser dans l'économie.\n\nCe raisonnement comporte cependant quelques failles. D'abord, l'épargne, c'est-à-dire le fait de mettre de côté des revenus pour un usage futur, est souvent confondue avec la thésaurisation. En réalité, épargner est un préalable nécessaire à tout investissement significatif, et peut être vu comme une pratique financière responsable.\n\nEnsuite, conserver du bitcoin, comme n'importe quelle forme de monnaie, est un moyen courant de se prémunir contre l'incertitude future, et ne signifie pas nécessairement qu'il n'est pas utilisé.\n\nComme l'a souligné Pierre Rochard : « Tous les bitcoins sont toujours détenus par quelqu'un, les paiements ne font que changer qui les détient. » Autrement dit, le fait même de détenir du bitcoin est déjà un usage du bitcoin.\n",
+                        "title": "L'idée reçue sur la thésaurisation du Bitcoin"
                     },
                     "canBeDuplicated": {
                         "answers": [
-                            "The code is heavily scrutinized and rigorously developed, ensuring its security and transparency",
-                            "The fact that it is open source allows for a meritocracy and encourages the \"hive mind\" to build solutions",
-                            "It is backed by a large and influential group of investors"
+                            "Le code est intensément scruté et développé avec rigueur, ce qui garantit sa sécurité et sa transparence",
+                            "Le fait qu'il soit open source permet une méritocratie et encourage l'« intelligence collective » à construire des solutions",
+                            "Il est soutenu par un groupe d'investisseurs vaste et influent"
                         ],
                         "feedback": [
-                            "That's exactly right! The code of bitcoin is indeed heavily scrutinized and rigorously developed, which adds to its value. In fact, @BTCSchellingPt noted that Bitcoin Core is probably one of the most heavily scrutinized code bases in the world",
-                            "Nice try, but the value of bitcoin lies not only in its code but also in the community and infrastructure surrounding it. Better luck next time",
-                            "Sorry, the value of bitcoin is not solely determined by the backing of a group of investors. Better luck next time!"
+                            "C'est exactement ça ! Le code du bitcoin est en effet intensément scruté et développé avec rigueur, ce qui contribue à sa valeur. D'ailleurs, @BTCSchellingPt a noté que Bitcoin Core est probablement l'une des bases de code les plus scrutées au monde.",
+                            "Belle tentative, mais la valeur du bitcoin ne réside pas seulement dans son code, mais aussi dans la communauté et l'infrastructure qui l'entourent. Ce sera pour une prochaine fois.",
+                            "Dommage, la valeur du bitcoin n'est pas uniquement déterminée par le soutien d'un groupe d'investisseurs. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "What is the main reason that bitcoin is considered valuable despite the fact that its code can be copied by anyone",
-                        "text": "One argument against the value of bitcoin is that it is not scarce because there are thousands of other cryptocurrencies available and because anyone can copy the code and create their own version.\n\nHowever, this overlooks the fact that bitcoin is more than just a piece of code. It is an open source protocol for transferring value that attracts people and resources due to its transparency and rigorous development process.\n\nAs @BTCSchellingPt noted, \"open source is very much a meritocracy. You've got the hive mind building solutions. You get all that scrutiny and that comes back to security. Bitcoin Core is probably one of the most heavily scrutinized code bases in the world.\"\n\nIn other words, the value of bitcoin lies not only in its code, but also in the community and infrastructure that surrounds it.\n",
-                        "title": "Bitcoin is not scarce because there are thousands of cryptocurrencies"
+                        "question": "Quelle est la principale raison pour laquelle le bitcoin est considéré comme précieux, malgré le fait que son code puisse être copié par n'importe qui ?",
+                        "text": "Un argument souvent avancé contre la valeur du bitcoin est qu'il ne serait pas rare, puisqu'il existe des milliers d'autres cryptomonnaies et que n'importe qui peut copier le code pour créer sa propre version.\n\nMais cela néglige le fait que le bitcoin est bien plus qu'un simple bout de code. C'est un protocole open source de transfert de valeur, qui attire des personnes et des ressources grâce à sa transparence et à la rigueur de son processus de développement.\n\nComme l'a noté @BTCSchellingPt : « L'open source est vraiment une méritocratie. On a l'intelligence collective qui construit des solutions. On bénéficie de tout ce contrôle, ce qui renforce la sécurité. Bitcoin Core est probablement l'une des bases de code les plus scrutées au monde. »\n\nAutrement dit, la valeur du bitcoin ne réside pas seulement dans son code, mais aussi dans la communauté et l'infrastructure qui l'entourent.\n",
+                        "title": "Le Bitcoin n'est pas rare car il existe des milliers de cryptomonnaies"
                     }
                 }
             },
