@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Số dư đô la không khả dụng tại khu vực của bạn"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Cảnh báo quyền riêng tư",
+    "body": "Số dư và giao dịch Bitcoin trên Spark vốn có tính riêng tư. Rất tiếc, điều này không áp dụng cho các giao dịch chuyển và số dư đô la không lưu ký dựa trên stablecoin USDB. Bất kỳ ai biết địa chỉ Lightning của bạn đều có thể xem số dư đô la và lịch sử của bạn.",
+    "acknowledge": "Đã hiểu"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Số dư đô la không khả dụng tại khu vực của bạn",
     "body": "Chuyển từ Số dư Đô la sang Số dư Bitcoin",

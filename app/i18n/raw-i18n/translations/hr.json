@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Upozorenje o privatnosti",
+    "body": "Bitcoin saldi i transakcije na Sparku po svojoj su prirodi privatni. Nažalost, to se ne odnosi na dolarske prijenose i salde bez skrbništva koji se oslanjaju na stablecoin USDB. Svatko tko zna vašu Lightning adresu može vidjeti vaš dolarski saldo i povijest.",
+    "acknowledge": "Razumijem"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolarski saldo nije dostupan u vašoj regiji",
     "body": "Prebacite s dolarskog stanja na Bitcoin stanje",

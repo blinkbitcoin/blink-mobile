@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "El saldo en dòlars no està disponible a la teva regió"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Advertiment de privadesa",
+    "body": "Els saldos i les transaccions de Bitcoin a Spark són privats per naturalesa. Malauradament, això no s'aplica a les transferències i els saldos en dòlars no custodis que depenen de l'stablecoin USDB. Qualsevol persona que conegui la teva adreça Lightning pot consultar el teu saldo en dòlars i el teu historial.",
+    "acknowledge": "Entesos"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "El saldo en dòlars no està disponible a la teva regió",
     "body": "Transfereix del saldo en dòlars al saldo en Bitcoin",

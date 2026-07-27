@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Peringatan privasi",
+    "body": "Saldo dan transaksi Bitcoin di Spark bersifat privat secara alami. Sayangnya, hal ini tidak berlaku untuk transfer dan saldo dolar non-kustodial yang mengandalkan stablecoin USDB. Siapa pun yang mengetahui alamat Lightning Anda dapat melihat saldo dolar dan riwayat Anda.",
+    "acknowledge": "Saya mengerti"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Saldo dolar tidak tersedia di wilayah Anda",
     "body": "Transfer dari Saldo Dolar ke Saldo Bitcoin",

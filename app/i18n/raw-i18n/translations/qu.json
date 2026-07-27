@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Dólar saldoqa mana kapunchu suyuykipi"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Pakasqa kaymanta willakuy",
+    "body": "Spark nisqapi Bitcoin saldokunapas rantikuykunapas sapallanpaqmi kanku. Ichaqa, chayqa manam mana waqaychasqa dólar apachiykunapaqchu nitaq saldokunapaqchu, USDB stablecoin nisqapim sayanku. Pipas Lightning tinkunaykita yachaqqa dólar saldoykitapas ñawpaq ruwasqaykikunatapas qhawayta atinmi.",
+    "acknowledge": "Yacharqanim"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Dólar saldoqa mana kapunchu suyuykipi",
     "body": "Dólar saldomanta Bitcoin saldoman apachiy",

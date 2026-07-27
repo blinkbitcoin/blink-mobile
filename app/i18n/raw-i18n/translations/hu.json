@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "A dolláregyenleg nem érhető el a régiódban"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Adatvédelmi figyelmeztetés",
+    "body": "A Bitcoin-egyenlegek és -tranzakciók a Sparkon természetüknél fogva priváták. Sajnos ez nem vonatkozik a nem letétkezelt dolláregyenlegekre és -átutalásokra, amelyek az USDB stabilérmére épülnek. Bárki, aki ismeri a Lightning címedet, megtekintheti a dolláregyenlegedet és az előzményeidet.",
+    "acknowledge": "Tudomásul vettem"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "A dolláregyenleg nem érhető el a régiódban",
     "body": "Utald át a dolláregyenlegről a Bitcoin-egyenlegre",

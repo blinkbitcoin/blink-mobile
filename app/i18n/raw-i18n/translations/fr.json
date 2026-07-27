@@ -2464,6 +2464,11 @@
     "DollarBalanceRestriction": {
         "modalTitle": "Le solde en dollars n'est pas disponible dans votre région"
     },
+    "UsdbPrivacyWarning": {
+        "title": "Avertissement de confidentialité",
+        "body": "Les soldes et les transactions Bitcoin sur Spark sont privés par nature. Malheureusement, cela ne s'applique pas aux transferts et aux soldes en dollars non-custodial qui reposent sur le stablecoin USDB. Toute personne connaissant votre adresse Lightning peut consulter votre solde en dollars et votre historique.",
+        "acknowledge": "J'ai compris"
+    },
     "ConvertDollarToBitcoinModal": {
         "title": "Le solde en dollars n'est pas disponible dans votre région",
         "body": "Transférez du solde en dollars vers le solde en Bitcoin",

@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Okulabula ku by'ekyama",
+    "body": "Bbalansi n'ebikolwa bya Bitcoin ku Spark bya kyama mu butonde bwabyo. Naye kino tekikwata ku kutambuza n'obbalansi za doola ezitakuumibwa ezeesigama ku ssente enywevu USDB. Buli muntu amanyi endagiriro yo eya Lightning asobola okulaba bbalansi yo eya doola n'ebyafaayo byo.",
+    "acknowledge": "Ntegedde"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Bbalansi ya doola teriiwo mu kitundu kyo",
     "body": "Tambuza okuva ku bbalansi ya doola okudda ku bbalansi ya Bitcoin",

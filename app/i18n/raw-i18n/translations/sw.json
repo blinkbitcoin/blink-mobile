@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Salio la dola haipatikani katika eneo lako"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Onyo la faragha",
+    "body": "Salio na miamala ya Bitcoin kwenye Spark ni ya faragha kwa asili. Kwa bahati mbaya, hii haitumiki kwa uhamisho na salio la dola lisilo la udhamini linalotegemea sarafu tulivu ya USDB. Mtu yeyote anayejua anwani yako ya Lightning anaweza kuona salio lako la dola na historia yako.",
+    "acknowledge": "Nimeelewa"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Salio la dola haipatikani katika eneo lako",
     "body": "Hamisha kutoka Salio la Dola hadi Salio la Bitcoin",

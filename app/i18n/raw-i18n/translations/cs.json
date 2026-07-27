@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Dolarový zůstatek není ve vašem regionu k dispozici"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Upozornění na soukromí",
+    "body": "Bitcoinové zůstatky a transakce v síti Spark jsou ze své podstaty soukromé. Bohužel to neplatí pro nesvěřenské dolarové převody a zůstatky, které se opírají o stablecoin USDB. Kdokoli, kdo zná vaši Lightning adresu, si může zobrazit váš dolarový zůstatek i historii.",
+    "acknowledge": "Beru na vědomí"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolarový zůstatek není ve vašem regionu k dispozici",
     "body": "Převeďte z dolarového zůstatku na bitcoinový zůstatek",

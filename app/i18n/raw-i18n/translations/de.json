@@ -2464,6 +2464,11 @@
     "DollarBalanceRestriction": {
         "modalTitle": "Dollar-Guthaben ist in deiner Region nicht verfügbar"
     },
+    "UsdbPrivacyWarning": {
+        "title": "Datenschutzwarnung",
+        "body": "Bitcoin-Guthaben und -Transaktionen auf Spark sind von Natur aus privat. Leider gilt das nicht für nicht-verwahrte Dollar-Überweisungen und -Guthaben, die auf dem Stablecoin USDB beruhen. Wer deine Lightning Adresse kennt, kann dein Dollar-Guthaben und deinen Verlauf einsehen.",
+        "acknowledge": "Verstanden"
+    },
     "ConvertDollarToBitcoinModal": {
         "title": "Dollar-Guthaben ist in deiner Region nicht verfügbar",
         "body": "Übertrage vom Dollar-Guthaben auf das Bitcoin-Guthaben",

@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Baki dolar tidak tersedia di rantau anda"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Amaran privasi",
+    "body": "Baki dan transaksi Bitcoin di Spark bersifat peribadi secara semula jadi. Malangnya, ini tidak terpakai pada pemindahan dan baki dolar bukan kustodial yang bergantung pada stablecoin USDB. Sesiapa yang mengetahui alamat Lightning anda boleh melihat baki dolar dan sejarah anda.",
+    "acknowledge": "Saya faham"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Baki dolar tidak tersedia di rantau anda",
     "body": "Pindahkan daripada Baki Dolar ke Baki Bitcoin",

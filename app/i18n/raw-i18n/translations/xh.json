@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Isilumkiso sabucala",
+    "body": "Iibhalansi kunye neentengiselwano zeBitcoin kwiSpark zibucala ngokwemvelo. Ngelishwa, oku akusebenzi kwiindluliselo neebhalansi zedola ezingagcinwanga ezixhomekeke kwistablecoin i-USDB. Nabani na owaziyo idilesi yakho ye-Lightning unokujonga ibhalansi yakho yedola kunye nembali yakho.",
+    "acknowledge": "Ndiyaqonda"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Ibhalansi yedola ayifumaneki kummandla wakho",
     "body": "Dlulisa kwiBhalansi yeDola ukuya kwiBhalansi yeBitcoin",

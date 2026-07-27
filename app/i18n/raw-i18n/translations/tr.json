@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Gizlilik uyarısı",
+    "body": "Spark üzerindeki Bitcoin bakiyeleri ve işlemleri doğası gereği gizlidir. Ne yazık ki bu, USDB stabil kripto parasına dayanan saklamasız Dolar transferleri ve bakiyeleri için geçerli değildir. Lightning adresinizi bilen herkes Dolar bakiyenizi ve geçmişinizi görüntüleyebilir.",
+    "acknowledge": "Anladım"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolar bakiyesi bölgenizde kullanılamıyor",
     "body": "Dolar Bakiyesinden Bitcoin Bakiyesine aktarın",

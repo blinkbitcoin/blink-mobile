@@ -2464,6 +2464,11 @@
     "DollarBalanceRestriction": {
         "modalTitle": "ドル残高はあなたの地域ではご利用いただけません"
     },
+    "UsdbPrivacyWarning": {
+        "title": "プライバシーに関する警告",
+        "body": "Spark上のビットコイン残高と取引は、その性質上プライベートです。残念ながら、これはUSDBステーブルコインに依存する非カストディアルのドル送金と残高には当てはまりません。あなたのLightningアドレスを知っている人は、あなたのドル残高と履歴を閲覧できます。",
+        "acknowledge": "確認しました"
+    },
     "ConvertDollarToBitcoinModal": {
         "title": "ドル残高はあなたの地域ではご利用いただけません",
         "body": "ドル残高からビットコイン残高へ移動",

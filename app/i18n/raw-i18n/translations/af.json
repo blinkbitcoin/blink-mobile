@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Dollar-saldo is nie beskikbaar in jou streek nie"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Privaatheidswaarskuwing",
+    "body": "Bitcoin-saldo's en -transaksies op Spark is van nature privaat. Ongelukkig geld dit nie vir nie-bewaar Dollar-oorbetalings en -saldo's wat op die USDB-stabielmunt staatmaak nie. Enigiemand wat jou Lightning-adres ken, kan jou Dollar-saldo en -geskiedenis opsoek.",
+    "acknowledge": "Erken"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Dollar-saldo is nie beskikbaar in jou streek nie",
     "body": "Dra oor van Dollar-saldo na Bitcoin-saldo",

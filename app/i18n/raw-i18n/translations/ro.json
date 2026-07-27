@@ -2464,6 +2464,11 @@
   "DollarBalanceRestriction": {
     "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta"
   },
+  "UsdbPrivacyWarning": {
+    "title": "Avertisment de confidențialitate",
+    "body": "Soldurile și tranzacțiile Bitcoin pe Spark sunt private prin natura lor. Din păcate, acest lucru nu se aplică transferurilor și soldurilor în dolari non-custodiale care se bazează pe stablecoin-ul USDB. Oricine îți cunoaște adresa Lightning îți poate vedea soldul în dolari și istoricul.",
+    "acknowledge": "Am înțeles"
+  },
   "ConvertDollarToBitcoinModal": {
     "title": "Soldul în dolari nu este disponibil în regiunea ta",
     "body": "Transferă din soldul în dolari în soldul în Bitcoin",
