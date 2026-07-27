@@ -37,7 +37,7 @@ jest.mock("@app/utils/analytics", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
   __esModule: true,
-  default: () => ({ recordError: mockRecordError }),
+  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({

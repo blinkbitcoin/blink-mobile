@@ -2,8 +2,8 @@ import {
   PaymentDetails,
   PaymentMethod,
   type BreezSdkInterface,
-  type GetInfoResponse,
   type Payment,
+  type TokenBalance,
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
@@ -19,8 +19,7 @@ import { mapSelfCustodialTransactions } from "../mappers/transaction"
 
 const TRANSACTIONS_PER_PAGE = 20
 
-const getStableBalance = (info: GetInfoResponse): number => {
-  const token = findUsdbToken(info)
+const getStableBalance = (token: TokenBalance | undefined): number => {
   if (!token) return 0
   const decimals = token.tokenMetadata?.decimals ?? 0
   return tokenBaseUnitsToCents(Number(token.balance), decimals)
@@ -115,12 +114,27 @@ export const getSelfCustodialWalletSnapshot = async (
     if (!hasMore) break
   }
 
+  const usdbToken = findUsdbToken(info)
+  if (
+    !usdbToken &&
+    transactions.some((tx) => tx.amount.currency === WalletCurrency.Usd)
+  ) {
+    // The expected-state breadcrumb above covers fresh wallets; a wallet WITH USD
+    // history but no token entry would silently show a 0 stable balance.
+    recordErrorOnce(
+      "spark-token-missing-with-usd-history",
+      new Error(
+        "USDB token absent from getInfo but USD transactions exist; stable balance shown as 0",
+      ),
+    )
+  }
+
   return {
     wallets: buildWallets(
       {
         identityPubkey: info.identityPubkey,
         btcBalance: Number(info.balanceSats),
-        stableBalance: getStableBalance(info),
+        stableBalance: getStableBalance(usdbToken),
       },
       transactions,
     ),

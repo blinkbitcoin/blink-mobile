@@ -31,7 +31,7 @@ import {
 } from "@app/types/amounts"
 import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { reportError } from "@app/utils/error-logging"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -306,7 +306,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       })
     } catch (err) {
       if (err instanceof Error) {
-        crashlytics().recordError(err)
+        reportError("send-bitcoin-confirmation", err)
 
         if (isIdempotencyConflict(err)) {
           // The server already processed a first attempt of this payment, so it may well

@@ -517,6 +517,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           scope: "remote-config",
           error: err,
           context: { stage: "fetchAndActivate" },
+          dedupKey: "remote-config-fetch",
         })
       } finally {
         setRemoteConfigReady(true)

@@ -12,6 +12,16 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: Error[]) => mockRecordError(...args),
 }))
 
+// The recordError dedup Set lives in @app/utils/error-reporting; reload the module
+// graph to reset it between dedup-sensitive tests (same pattern as is-online.spec.ts).
+const loadFreshLoggingModule = () => {
+  let mod: typeof import("@app/self-custodial/logging") | undefined
+  jest.isolateModules(() => {
+    mod = require("@app/self-custodial/logging")
+  })
+  return mod!
+}
+
 describe("logSdkEvent", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -49,13 +59,41 @@ describe("logSdkEvent", () => {
   })
 
   it("logs error to console and crashlytics recordError", () => {
-    logSdkEvent(SdkLogLevel.Error, "error message")
+    const fresh = loadFreshLoggingModule()
+    fresh.logSdkEvent(SdkLogLevel.Error, "error message")
 
     expect(console.error).toHaveBeenCalledWith("[SparkSDK] error message")
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: "[SparkSDK] error message" }),
     )
-    expect(mockLog).not.toHaveBeenCalled()
+    expect(mockLog).toHaveBeenCalledWith("[defect] [SparkSDK] error message")
+  })
+
+  it("downgrades connectivity-class error lines to breadcrumbs", () => {
+    const fresh = loadFreshLoggingModule()
+    fresh.logSdkEvent(
+      SdkLogLevel.Error,
+      'Failed to subscribe to server events: Status { code: Unavailable, message: "dns error" }',
+    )
+
+    expect(mockRecordError).not.toHaveBeenCalled()
+    expect(mockLog).toHaveBeenCalledWith(expect.stringContaining("[transient]"))
+  })
+
+  it("records a repeated defect line only once per session", () => {
+    const fresh = loadFreshLoggingModule()
+    fresh.logSdkEvent(SdkLogLevel.Error, "state corrupted")
+    fresh.logSdkEvent(SdkLogLevel.Error, "state corrupted")
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
+  })
+
+  it("dedups defect lines that differ only by digits (retry counters, ports)", () => {
+    const fresh = loadFreshLoggingModule()
+    fresh.logSdkEvent(SdkLogLevel.Error, "claim failed for leaf 12 (attempt 1)")
+    fresh.logSdkEvent(SdkLogLevel.Error, "claim failed for leaf 98 (attempt 2)")
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
   })
 })
 

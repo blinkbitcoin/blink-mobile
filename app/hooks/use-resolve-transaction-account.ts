@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { gql, useApolloClient } from "@apollo/client"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import {
   TransactionByIdForWalletQuery,
@@ -12,6 +11,7 @@ import {
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { DefaultAccountId } from "@app/types/wallet"
+import { recordAppError } from "@app/utils/error-reporting"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { toastShow } from "@app/utils/toast"
 import { withTimeout } from "@app/utils/with-timeout"
@@ -250,8 +250,14 @@ export const useResolveTransactionAccount = ({
 
     let cancelled = false
 
+    /**
+     * `alwaysRecord` because a ProbeNetworkError's class name matches the connectivity
+     * heuristic, which would otherwise downgrade a genuine probe defect (e.g. "ownership
+     * probe returned no account") to a breadcrumb. Recording every probe failure keeps the
+     * long-standing behaviour; only the reporting boundary changed.
+     */
     const recordProbeError = (err: unknown) => {
-      if (err instanceof Error) crashlytics().recordError(err)
+      if (err instanceof Error) recordAppError(err, { alwaysRecord: true })
     }
 
     const run = async () => {
