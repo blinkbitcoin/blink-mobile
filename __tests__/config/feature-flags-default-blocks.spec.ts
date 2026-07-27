@@ -99,7 +99,13 @@ describe("defaultRemoteConfig: compliance country lists", () => {
     assertCanonical(defaultRemoteConfig.offboardOnlyCountries)
   })
 
-  it("offboardOnlyCountries defaults to the UAE, Nepal and Algeria", () => {
-    expect(defaultRemoteConfig.offboardOnlyCountries).toEqual(["AE", "NP", "DZ"])
+  it("offboardOnlyCountries defaults to the UAE, Nepal, Algeria, China and Myanmar", () => {
+    expect(defaultRemoteConfig.offboardOnlyCountries).toEqual([
+      "AE",
+      "NP",
+      "DZ",
+      "CN",
+      "MM",
+    ])
   })
 })
