@@ -1724,272 +1724,272 @@
                 }
             },
             "BitcoinAndEconomicsI": {
-                "title": "Bitcoin and Economics I",
+                "title": "Le Bitcoin et l'économie I",
                 "questions": {
                     "scarcity": {
                         "answers": [
-                            "A resource that is limited in quantity or availability and can lead to competition for possession",
-                            "A resource that is abundant and easy to come by",
-                            "A resource that can only be obtained through time travel"
+                            "Une ressource limitée en quantité ou en disponibilité, pouvant entraîner une compétition pour se l'approprier",
+                            "Une ressource abondante et facile à obtenir",
+                            "Une ressource qu'on ne peut obtenir qu'en voyageant dans le temps"
                         ],
                         "feedback": [
-                            "Remark:** Correct! Good job, you understood the concept of scarcity. Scarcity can lead to competition and can affect the value of goods and services in a free market",
-                            "Wrong! Sorry to burst your bubble, but if something is easy to come by, it can't be scarce",
-                            "Wrong! Time travel is a great idea for a sci-fi movie, but it doesn't have anything to do with scarce resources."
+                            "Exact ! Bien joué, vous avez compris le concept de rareté. La rareté peut entraîner de la compétition et affecter la valeur des biens et services sur un marché libre.",
+                            "Faux ! Désolé de casser votre lancée, mais si quelque chose est facile à obtenir, ce n'est pas rare.",
+                            "Faux ! Le voyage dans le temps est une excellente idée pour un film de science-fiction, mais cela n'a rien à voir avec les ressources rares."
                         ],
-                        "question": "What is a scarce resource",
-                        "text": "When there are not enough resources to go around, people and organizations compete for them.\n\nThis competition is often reflected in the price of goods and services in a free market. If the demand for a particular resource increases faster than the supply, it can become scarce and more valuable.\n\nMoney is often used as a way to buy things because it is easy to trade and is valuable because it is scarce. Bitcoin is a digital form of money that has a fixed supply, which makes it rare and valuable.\n\nThe idea that there is never enough of something to go around is a basic principle of economics, but it is often ignored in political decisions.\n",
-                        "title": "How limited resources are allocated and competed for"
+                        "question": "Qu'est-ce qu'une ressource rare ?",
+                        "text": "Lorsqu'il n'y a pas assez de ressources pour tout le monde, les individus et les organisations se les disputent.\n\nCette compétition se reflète souvent dans le prix des biens et services sur un marché libre. Si la demande pour une ressource donnée augmente plus vite que l'offre, elle peut devenir rare et prendre de la valeur.\n\nLa monnaie sert souvent à acheter des choses car elle est facile à échanger et précieuse parce qu'elle est rare. Le bitcoin est une forme de monnaie numérique à offre fixe, ce qui le rend rare et précieux.\n\nL'idée qu'il n'y a jamais assez de quelque chose pour tout le monde est un principe économique fondamental, mais il est souvent ignoré dans les décisions politiques.\n",
+                        "title": "Comment les ressources limitées sont allouées et disputées"
                     },
                     "monetaryPremium": {
                         "answers": [
-                            "The difference in value between something's use as money and its value for its other uses",
-                            "An extra fee added to the price of goods and services",
-                            "A monetary premium has nothing to do with paying extra for things"
+                            "La différence de valeur entre l'usage d'un bien comme monnaie et sa valeur pour ses autres usages",
+                            "Des frais supplémentaires ajoutés au prix des biens et services",
+                            "Une prime monétaire n'a rien à voir avec le fait de payer plus cher"
                         ],
                         "feedback": [
-                            "Congratulations! You know your stuff when it comes to monetary premiums. A monetary premium is the additional value that something can have when it is used as a substitute for money. Good job",
-                            "Sorry, wrong answer! A monetary premium has nothing to do with paying extra for things",
-                            "Nope! A monetary premium is not a discount, it's actually the opposite."
+                            "Bravo ! Vous maîtrisez le sujet des primes monétaires. Une prime monétaire est la valeur supplémentaire qu'un bien peut acquérir lorsqu'il est utilisé en substitut de la monnaie. Bien joué.",
+                            "Dommage, mauvaise réponse ! Une prime monétaire n'a rien à voir avec le fait de payer plus cher.",
+                            "Non ! Une prime monétaire n'est pas une remise, c'est même l'inverse."
                         ],
-                        "question": "What is a monetary premium",
-                        "text": "If the value of money is not based on its scarcity, it may not be as reliable as a way to store wealth. In this case, other things that are scarce, such as assets or resources, may become more valuable and be used as a substitute for money.\n\nThis additional value is known as a monetary premium. When the usual form of money is not working well, people may turn to other things that are rare or hard to obtain as a way to exchange value.\n\nSome historical forms of money had no other use or value besides being used as a way to trade for other things. The difference between the value of something as money and its value for its other uses is the monetary premium.\n",
-                        "title": "Monetary Premium"
+                        "question": "Qu'est-ce qu'une prime monétaire ?",
+                        "text": "Si la valeur d'une monnaie ne repose pas sur sa rareté, elle peut se révéler moins fiable comme réserve de richesse. Dans ce cas, d'autres biens rares, comme des actifs ou des ressources, peuvent gagner en valeur et servir de substitut à la monnaie.\n\nCette valeur supplémentaire est appelée « prime monétaire ». Lorsque la forme habituelle de monnaie fonctionne mal, les gens peuvent se tourner vers d'autres biens rares ou difficiles à obtenir pour échanger de la valeur.\n\nCertaines formes historiques de monnaie n'avaient aucun autre usage ou valeur que celui de servir à l'échange. La différence entre la valeur d'un bien en tant que monnaie et sa valeur pour ses autres usages, c'est la prime monétaire.\n",
+                        "title": "La prime monétaire"
                     },
                     "greshamsLaw": {
                         "answers": [
-                            "A law that explains how people tend to use different types of currency in different ways when they are in circulation together",
-                            "A law that says people will always choose to spend the more valuable currency when given a choice",
-                            "Gresham's Law actually explains the opposite behavior"
+                            "Une loi qui explique comment les gens utilisent différemment plusieurs types de monnaie lorsqu'ils circulent en même temps",
+                            "Une loi qui dit que les gens choisissent toujours de dépenser la monnaie la plus précieuse lorsqu'ils ont le choix",
+                            "La loi de Gresham explique en réalité le comportement inverse"
                         ],
                         "feedback": [
-                            "Good job, you understood Gresham's Law. This law explains how people tend to save the more valuable currency and spend the less valuable one when given the choice. Interesting fact: Gresham's Law can also apply to \"fiat\" currency, which is not backed by a physical commodity like gold or silver",
-                            "Sorry, wrong answer! Gresham's Law actually explains the opposite behavior",
-                            "Ha! That's a funny answer, but unfortunately it's not correct."
+                            "Bien joué, vous avez compris la loi de Gresham. Cette loi explique que les gens ont tendance à épargner la monnaie la plus précieuse et à dépenser la moins précieuse lorsqu'ils ont le choix. Anecdote : la loi de Gresham peut aussi s'appliquer à la monnaie fiduciaire, qui n'est adossée à aucune matière première physique comme l'or ou l'argent.",
+                            "Dommage, mauvaise réponse ! La loi de Gresham explique en réalité le comportement inverse.",
+                            "Ha ! C'est une réponse amusante, mais malheureusement ce n'est pas la bonne."
                         ],
-                        "question": "What is Gresham's Law",
-                        "text": "Gresham's Law is a concept that explains how people tend to use different types of currency in different ways when they are in circulation together.\n\nIf two forms of currency are given equal value by a government or other authority, but one is made of a more valuable material, people will be more likely to save the more valuable currency and spend the less valuable one.\n\nThis can happen when a government debases its currency, or makes it worth less, by decreasing the amount of valuable material it contains. The result is that people lose trust in the debased currency and prefer to hold onto the more valuable one instead.\n\nThis principle can also apply to \"fiat\" currency, which is not backed by a physical commodity like gold or silver, if the supply of the currency is increased in a way that makes it worth less.\n\nIn recent years, the emergence of bitcoin as a digital currency has led to a trend of people saving in bitcoin and spending their traditional currency, or \"fiat,\" more quickly. This is because bitcoin is seen as having a higher long-term value and being more stable than fiat currencies.\n",
-                        "title": "Gresham's Law"
+                        "question": "Qu'est-ce que la loi de Gresham ?",
+                        "text": "La loi de Gresham est un concept qui explique comment les gens ont tendance à utiliser différemment plusieurs types de monnaie lorsqu'ils circulent en même temps.\n\nSi deux formes de monnaie reçoivent une valeur égale de la part d'un gouvernement ou d'une autre autorité, mais que l'une est faite d'un matériau plus précieux, les gens auront davantage tendance à épargner la monnaie la plus précieuse et à dépenser la moins précieuse.\n\nCela peut se produire lorsqu'un gouvernement dévalue sa monnaie, c'est-à-dire la rend moins précieuse, en réduisant la quantité de matériau précieux qu'elle contient. Résultat : les gens perdent confiance dans la monnaie dévaluée et préfèrent conserver la plus précieuse.\n\nCe principe peut aussi s'appliquer à la monnaie fiduciaire, qui n'est adossée à aucune matière première physique comme l'or ou l'argent, si l'offre de cette monnaie augmente d'une façon qui la rend moins précieuse.\n\nCes dernières années, l'émergence du bitcoin en tant que monnaie numérique a conduit à une tendance où les gens épargnent en bitcoin et dépensent plus rapidement leur monnaie traditionnelle, ou « fiduciaire ». Cela s'explique par le fait que le bitcoin est perçu comme ayant une valeur à long terme plus élevée et une meilleure stabilité que les monnaies fiduciaires.\n",
+                        "title": "La loi de Gresham"
                     },
                     "thiersLaw": {
                         "answers": [
-                            "A law that discusses what might happen if people and businesses refuse to accept or use a lower quality form of currency",
-                            "A law that says people will always choose the more valuable currency when given a choice",
-                            "A law that says people will always choose the less valuable currency when given a choice"
+                            "Une loi qui décrit ce qui pourrait se produire si les gens et les entreprises refusent d'accepter ou d'utiliser une monnaie de moindre qualité",
+                            "Une loi qui dit que les gens choisiront toujours la monnaie la plus précieuse lorsqu'ils ont le choix",
+                            "Une loi qui dit que les gens choisiront toujours la monnaie la moins précieuse lorsqu'ils ont le choix"
                         ],
                         "feedback": [
-                            "Correct! Good job, you understood Thier's Law. This law discusses what might happen if people and businesses refuse to accept a lower quality form of currency. Interesting fact: Thier's Law suggests that if a government tries to force people to use a lower quality currency by making it legal tender, it will be ignored",
-                            "Wrong answer! Gresham's Law explains this behavior, not Thier's Law",
-                            "Sorry, try again! Thier's Law is not about always choosing the less valuable currency."
+                            "Exact ! Bien joué, vous avez compris la loi de Thiers. Cette loi décrit ce qui pourrait se produire si les gens et les entreprises refusent d'accepter une monnaie de moindre qualité. Anecdote : la loi de Thiers suggère que si un gouvernement tente de forcer les gens à utiliser une monnaie de moindre qualité en la rendant cours légal, cette obligation sera ignorée.",
+                            "Mauvaise réponse ! C'est la loi de Gresham qui explique ce comportement, pas la loi de Thiers.",
+                            "Dommage, réessayez ! La loi de Thiers ne consiste pas à toujours choisir la monnaie la moins précieuse."
                         ],
-                        "question": "What is Thier's Law",
-                        "text": "Thier's Law is a concept that discusses what might happen if people and businesses refused to accept or use a lower quality form of currency.\n\nInstead of disappearing from circulation, the higher quality form of money might be traded at a premium, or for a higher value than its face value.\n\nThier's Law suggests that if a government tries to force people to use a lower quality currency by making it legal tender, it will be ignored.\n\nIn other words, people and businesses may choose not to accept the lower quality currency and instead prefer to use the higher quality one or other forms of payment.\n",
-                        "title": "Thier's Law"
+                        "question": "Qu'est-ce que la loi de Thiers ?",
+                        "text": "La loi de Thiers est un concept qui décrit ce qui pourrait se produire si les gens et les entreprises refusaient d'accepter ou d'utiliser une monnaie de moindre qualité.\n\nPlutôt que de disparaître de la circulation, la monnaie de meilleure qualité pourrait s'échanger avec une prime, c'est-à-dire à une valeur supérieure à sa valeur faciale.\n\nLa loi de Thiers suggère que si un gouvernement tente de forcer les gens à utiliser une monnaie de moindre qualité en la rendant cours légal, cette obligation sera ignorée.\n\nAutrement dit, les gens et les entreprises peuvent choisir de ne pas accepter la monnaie de moindre qualité et préférer utiliser celle de meilleure qualité, ou d'autres moyens de paiement.\n",
+                        "title": "La loi de Thiers"
                     },
                     "cantillonEffect": {
                         "answers": [
-                            "A phenomenon that occurs when new money is introduced into an economy, causing some prices to increase more than others and leading to an uneven distribution of wealth.",
-                            "A mysterious force that causes people to turn into cantaloupes whenever they eat too much fruit.",
-                            "A dance move that involves spinning around in circles while holding a bunch of cantaloupes."
+                            "Un phénomène qui se produit lorsque de la nouvelle monnaie est introduite dans une économie, faisant augmenter certains prix plus que d'autres et entraînant une répartition inégale de la richesse.",
+                            "Une force mystérieuse qui transforme les gens en cantaloups lorsqu'ils mangent trop de fruits.",
+                            "Un pas de danse qui consiste à tourner en rond en tenant une botte de cantaloups."
                         ],
                         "feedback": [
-                            "Congratulations, you are correct! The Cantillon Effect is indeed a process that can influence the distribution of wealth in an economy. Good job",
-                            "Sorry, but the Cantillon Effect doesn't have anything to do with fruit transformation. Better luck next time",
-                            "Sorry, but the Cantillon Effect is not a dance move, no matter how much you love cantaloupes. Better luck next time!"
+                            "Bravo, c'est la bonne réponse ! L'effet Cantillon est en effet un processus qui peut influencer la répartition de la richesse dans une économie. Bien joué.",
+                            "Dommage, mais l'effet Cantillon n'a rien à voir avec la transformation des fruits. Ce sera pour une prochaine fois.",
+                            "Dommage, mais l'effet Cantillon n'est pas un pas de danse, même si vous adorez les cantaloups. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "What is the Cantillon Effect",
-                        "text": "The Cantillon Effect is a phenomenon that occurs when new money is introduced into an economy.\n\nWhen new money is added, it tends to go to certain people or businesses first, and these initial recipients have an advantage over others because they get to use the new money before prices go up.\n\nThis causes the prices of some goods and services to increase more than others, which means that the people who get the new money first benefit while those who get it later are disadvantaged.\n\nThis effect was first described by economist Richard Cantillon in the context of commodity money, such as gold and silver, but it is even more relevant today in the age of fiat money.\n\nWhen a government or central bank creates a lot of new fiat money, it can lead to increased prices and uneven distribution of wealth, as some people and businesses are able to access credit more easily and benefit from rising asset prices.\n",
-                        "title": "The **** Cantillon Effect"
+                        "question": "Qu'est-ce que l'effet Cantillon ?",
+                        "text": "L'effet Cantillon est un phénomène qui se produit lorsque de la nouvelle monnaie est introduite dans une économie.\n\nLorsque de la nouvelle monnaie est créée, elle a tendance à parvenir d'abord à certaines personnes ou entreprises, et ces premiers bénéficiaires disposent d'un avantage sur les autres, car ils peuvent utiliser cette nouvelle monnaie avant que les prix n'augmentent.\n\nCela fait augmenter le prix de certains biens et services plus que d'autres, ce qui signifie que les personnes qui reçoivent la nouvelle monnaie en premier en profitent, tandis que celles qui la reçoivent plus tard sont désavantagées.\n\nCet effet a été décrit pour la première fois par l'économiste Richard Cantillon dans le contexte de la monnaie-marchandise, comme l'or et l'argent, mais il est encore plus pertinent aujourd'hui à l'ère de la monnaie fiduciaire.\n\nLorsqu'un gouvernement ou une banque centrale crée beaucoup de nouvelle monnaie fiduciaire, cela peut entraîner une hausse des prix et une répartition inégale de la richesse, certaines personnes et entreprises pouvant accéder plus facilement au crédit et profiter de la hausse des prix des actifs.\n",
+                        "title": "Le **** Effet Cantillon"
                     },
                     "schellingPoint": {
                         "answers": [
-                            "A solution that people tend to choose by default in the absence of communication",
-                            "A type of point system used in online multiplayer games",
-                            "A point on the earth's surface where all the planet's magnetic forces are balanced"
+                            "Une solution que les gens ont tendance à choisir par défaut en l'absence de communication",
+                            "Un système de points utilisé dans les jeux en ligne multijoueurs",
+                            "Un point à la surface de la Terre où toutes les forces magnétiques de la planète s'équilibrent"
                         ],
                         "feedback": [
-                            "You got it right. Did you know that a Schelling point can occur in multiplayer cooperative games and communication networks, and can be facilitated by standardized protocols like money",
-                            "Wrong! But at least you're thinking about points. Maybe try again and focus on communication this time",
-                            "Ha! You're off by a whole planet. Maybe try again and focus on the concept of default choices in the absence of communication."
+                            "C'est la bonne réponse. Saviez-vous qu'un point de Schelling peut se produire dans les jeux coopératifs multijoueurs et les réseaux de communication, et peut être facilité par des protocoles standardisés comme la monnaie ?",
+                            "Faux ! Mais au moins vous pensez aux points. Réessayez en vous concentrant cette fois sur la communication.",
+                            "Ha ! Vous vous êtes trompé d'une planète entière. Réessayez en vous concentrant sur le concept de choix par défaut en l'absence de communication."
                         ],
-                        "question": "What is a Schelling point",
-                        "text": "A Schelling point is a solution that people tend to choose by default, without communicating with each other.\n\nThis can happen in multiplayer cooperative games, where you have to anticipate the choices of others. If you make the wrong choice, you might face consequences or miss out on benefits.\n\nCommunication works the same way - it's like a multiplayer cooperative game played with others in the same network. We use standardized protocols (like email, spoken language, or money) to communicate efficiently with as many people as possible, with as little friction as possible. This can lead to increased trade, knowledge exchange, and innovation.\n\nIn the digital world, people tend to choose the same option (the Schelling point) when exchanging value. This is because they expect that others will also choose it.\n\nThe option that becomes the Schelling point is the one that communicates price signals most accurately, allowing market participants to coordinate with each other.\n\nBitcoin is a protocol for exchanging value that has several advantages over traditional currencies (called \"fiat\"). For example, it has a fixed supply and its value has generally increased over time, while fiat currencies often lose value. Additionally, the bitcoin network is permissionless, global, and indestructible. All of these factors make bitcoin a natural Schelling point for money.\n",
-                        "title": "Schelling Point"
+                        "question": "Qu'est-ce qu'un point de Schelling ?",
+                        "text": "Un point de Schelling est une solution que les gens ont tendance à choisir par défaut, sans se concerter entre eux.\n\nCela peut se produire dans les jeux coopératifs multijoueurs, où il faut anticiper les choix des autres. Si vous faites le mauvais choix, vous pouvez en subir les conséquences ou manquer des bénéfices.\n\nLa communication fonctionne de la même façon : c'est comme un jeu coopératif multijoueur joué avec d'autres personnes du même réseau. Nous utilisons des protocoles standardisés (comme l'e-mail, le langage parlé ou la monnaie) pour communiquer efficacement avec le plus de monde possible, avec le moins de friction possible. Cela peut favoriser le commerce, l'échange de connaissances et l'innovation.\n\nDans le monde numérique, les gens ont tendance à choisir la même option (le point de Schelling) lorsqu'ils échangent de la valeur, car ils s'attendent à ce que les autres la choisissent aussi.\n\nL'option qui devient le point de Schelling est celle qui transmet le plus fidèlement les signaux de prix, permettant aux acteurs du marché de se coordonner entre eux.\n\nLe Bitcoin est un protocole d'échange de valeur qui présente plusieurs avantages par rapport aux monnaies traditionnelles (dites « fiduciaires »). Par exemple, son offre est fixe et sa valeur a généralement augmenté avec le temps, alors que les monnaies fiduciaires en perdent souvent. De plus, le réseau Bitcoin est sans permission, mondial et indestructible. Tous ces facteurs font du bitcoin un point de Schelling naturel pour la monnaie.\n",
+                        "title": "Le point de Schelling"
                     }
                 }
             },
             "BitcoinAndEconomicsII": {
-                "title": "Bitcoin and Economics II",
+                "title": "Le Bitcoin et l'économie II",
                 "questions": {
                     "opportunityCost": {
                         "answers": [
-                            "The cost of not being able to do something else when you choose to do one thing",
-                            "A type of cost that only applies to business owners",
-                            "The cost of buying a new car"
+                            "Le coût de ne pas pouvoir faire autre chose lorsqu'on choisit de faire une chose",
+                            "Un type de coût qui ne s'applique qu'aux chefs d'entreprise",
+                            "Le coût d'achat d'une nouvelle voiture"
                         ],
                         "feedback": [
-                            "Congratulations! You got it right. Did you know that opportunity cost can help you make better financial decisions by considering the trade-offs involved in different options",
-                            "Wrong! Opportunity cost applies to anyone who makes a choice, not just business owners. Maybe try again and think about the trade-offs involved in decision-making",
-                            "Ha! That's not quite right. The cost of buying a new car is a specific type of expense, not the same thing as opportunity cost. Maybe try again and think about the concept of trade-offs in decision-making."
+                            "Bravo, c'est la bonne réponse ! Saviez-vous que le coût d'opportunité peut vous aider à prendre de meilleures décisions financières, en tenant compte des compromis entre différentes options ?",
+                            "Faux ! Le coût d'opportunité s'applique à quiconque fait un choix, pas seulement aux chefs d'entreprise. Réessayez en pensant aux compromis impliqués dans la prise de décision.",
+                            "Ha ! Ce n'est pas tout à fait ça. Le coût d'achat d'une voiture est une dépense spécifique, pas la même chose que le coût d'opportunité. Réessayez en pensant au concept de compromis dans la prise de décision."
                         ],
-                        "question": "What is opportunity cost",
-                        "text": "Opportunity cost is the idea that when you choose to do one thing, you can't do something else instead. In other words, every time you make a financial decision, you have to trade off one option for another.\n\nBitcoin can help you make better financial decisions in the long term because it's a good way to store value (like saving money). This means that if you choose to invest in bitcoin, you might have to give up using that money for other things or opportunities. But if you hold onto your bitcoin, it has the potential to increase in value over time.\n\nThis is especially important right now because the traditional monetary system (called \"fiat\") is not a reliable way to save money - it's designed in a way that causes the value of money to go down over time. So, it's important to make careful financial decisions to preserve your wealth.\n",
-                        "title": "Opportunity Cost"
+                        "question": "Qu'est-ce que le coût d'opportunité ?",
+                        "text": "Le coût d'opportunité est l'idée que, lorsque vous choisissez de faire une chose, vous ne pouvez pas en faire une autre à la place. Autrement dit, chaque décision financière implique de renoncer à une option au profit d'une autre.\n\nLe bitcoin peut vous aider à prendre de meilleures décisions financières sur le long terme, car c'est un bon moyen de conserver de la valeur (comme épargner de l'argent). Cela signifie que si vous choisissez d'investir en bitcoin, vous devrez peut-être renoncer à utiliser cet argent pour d'autres choses ou opportunités. Mais si vous conservez votre bitcoin, il a le potentiel de prendre de la valeur avec le temps.\n\nC'est particulièrement important aujourd'hui, car le système monétaire traditionnel (la monnaie « fiduciaire ») n'est pas un moyen fiable d'épargner : il est conçu de telle sorte que la valeur de la monnaie diminue avec le temps. Il est donc important de prendre des décisions financières réfléchies pour préserver sa richesse.\n",
+                        "title": "Le coût d'opportunité"
                     },
                     "timePreference": {
                         "answers": [
-                            "The amount of value you place on the present versus the future",
-                            "A preference for doing things at a specific time of day",
-                            "A preference for traveling through time"
+                            "L'importance que l'on accorde au présent par rapport au futur",
+                            "Une préférence pour faire les choses à un moment précis de la journée",
+                            "Une préférence pour voyager dans le temps"
                         ],
                         "feedback": [
-                            "Congratulations! You got it right. Did you know that there are many factors that can influence your time preference, such as personal safety, tax rates, property rights, and the ability to store value reliably",
-                            "Wrong! Time preference has to do with decision-making, not a specific time of day. Maybe try again and think about how the time horizon you're operating on can affect your choices",
-                            "Ha! Time travel is still just science fiction, sorry. Maybe try again and think about how the time horizon you're operating on can affect your choices."
+                            "Bravo, c'est la bonne réponse ! Saviez-vous que de nombreux facteurs peuvent influencer votre préférence temporelle, comme la sécurité personnelle, les taux d'imposition, les droits de propriété, et la capacité à conserver la valeur de manière fiable ?",
+                            "Faux ! La préférence temporelle concerne la prise de décision, pas un moment précis de la journée. Réessayez en pensant à la façon dont votre horizon temporel peut influencer vos choix.",
+                            "Ha ! Le voyage dans le temps reste de la pure science-fiction, désolé. Réessayez en pensant à la façon dont votre horizon temporel peut influencer vos choix."
                         ],
-                        "question": "What is time preference",
-                        "text": "Time preference is the idea that the amount of time you have to wait for something to happen can affect the decisions you make.\n\nFor example, if you value the present more than the future, you might be more likely to choose something that gives you immediate gratification.\n\nOn the other hand, if you value the future more, you might be willing to wait longer for something that has a bigger benefit in the long term.\n\nThere are many factors that can influence your time preference, such as your personal safety, tax rates, property rights, and the ability to store value reliably.\n\nThe \"hardness\" of money (how well it holds its value over time) is also important because it can encourage people to save, plan, and invest for the future. It's important to note that time preference is not a fixed thing - it can change based on the incentives in your environment.\n",
-                        "title": "Time Preference"
+                        "question": "Qu'est-ce que la préférence temporelle ?",
+                        "text": "La préférence temporelle est l'idée que le temps qu'il faut attendre pour qu'une chose se produise peut influencer les décisions que l'on prend.\n\nPar exemple, si vous valorisez davantage le présent que le futur, vous serez plus enclin à choisir quelque chose qui vous procure une gratification immédiate.\n\nÀ l'inverse, si vous valorisez davantage le futur, vous serez peut-être prêt à attendre plus longtemps pour quelque chose offrant un bénéfice plus important à long terme.\n\nDe nombreux facteurs peuvent influencer votre préférence temporelle, comme votre sécurité personnelle, les taux d'imposition, les droits de propriété, et la capacité à conserver la valeur de manière fiable.\n\nLa « dureté » de la monnaie (sa capacité à conserver sa valeur dans le temps) est également importante, car elle peut encourager les gens à épargner, à planifier et à investir pour l'avenir. Il faut noter que la préférence temporelle n'est pas figée : elle peut évoluer selon les incitations de votre environnement.\n",
+                        "title": "La préférence temporelle"
                     },
                     "impossibleTrinity": {
                         "answers": [
-                            "As perfectly mobile capital, Bitcoin alters the logic of sovereign nations to direct international monetary policy by making capital controls impossible to enforce.",
-                            "Due to its fixed supply, the existence of Bitcoin makes it easier for sovereign nations to set fixed exchange rates.",
-                            "Governments will restrict discussion of the Mundell-Fleming Trilemma because speech is easier to censor than cross-border payments."
+                            "En tant que capital parfaitement mobile, le Bitcoin bouleverse la logique des nations souveraines pour piloter leur politique monétaire internationale, en rendant les contrôles des capitaux impossibles à faire appliquer.",
+                            "En raison de son offre fixe, l'existence du Bitcoin facilite la fixation de taux de change fixes par les nations souveraines.",
+                            "Les gouvernements restreindront les discussions sur le trilemme de Mundell-Fleming, car la parole est plus facile à censurer que les paiements transfrontaliers."
                         ],
                         "feedback": [
-                            "enforce.",
-                            "The 21 million cap is indeed quite fascinating, but the existence of Bitcoin actually makes it more difficult for nations to set fixed exchange rates. Try again",
-                            "While that's entirely possible of course, that's not the most likeliest outcome here. Try again!"
+                            "appliquer.",
+                            "Le plafond de 21 millions est en effet fascinant, mais l'existence du Bitcoin rend en réalité plus difficile la fixation de taux de change fixes par les nations. Réessayez.",
+                            "C'est bien sûr tout à fait possible, mais ce n'est pas le résultat le plus probable ici. Réessayez !"
                         ],
-                        "question": "How does the existence of Bitcoin affect the Mundell-Fleming-Trilemma?",
-                        "text": "The Impossible Trinity, also known as the Mundell-Fleming Trilemma, is a concept that explains the trade-offs involved in setting international monetary policy for a sovereign nation.\n\nIt says that a country can only choose two of the following three options: fixed exchange rates, free capital flows, and independent monetary policy.\n\n  These three options cannot be pursued at the same time. This is because a country's capital flows, or the movement of money in and out of the country, can be influenced by the value of its currency and its monetary policy, which sets the rules for how much money is in circulation.\n\n  As capital becomes more mobile and can move freely across borders, it is harder for a country to control and direct its capital flows. The rise of bitcoin, a digital currency that is borderless and immune to changes in value, may further challenge a country's ability to set monetary policy.\n",
-                        "title": "The Impossible Trinity"
+                        "question": "Comment l'existence du Bitcoin affecte-t-elle le trilemme de Mundell-Fleming ?",
+                        "text": "La « Trinité impossible », aussi appelée trilemme de Mundell-Fleming, est un concept qui explique les compromis liés à la définition de la politique monétaire internationale d'une nation souveraine.\n\nIl énonce qu'un pays ne peut choisir que deux des trois options suivantes : des taux de change fixes, la libre circulation des capitaux, et une politique monétaire indépendante.\n\n  Ces trois options ne peuvent pas être poursuivies simultanément. En effet, les flux de capitaux d'un pays, c'est-à-dire les mouvements d'argent entrants et sortants, peuvent être influencés par la valeur de sa monnaie et sa politique monétaire, laquelle fixe les règles régissant la quantité de monnaie en circulation.\n\n  À mesure que le capital devient plus mobile et peut circuler librement entre les frontières, il devient plus difficile pour un pays de contrôler et de diriger ses flux de capitaux. L'essor du bitcoin, une monnaie numérique sans frontières et insensible aux variations de valeur, pourrait encore davantage remettre en question la capacité d'un pays à définir sa politique monétaire.\n",
+                        "title": "La Trinité impossible"
                     },
                     "jevonsParadox": {
                         "answers": [
-                            "The phenomenon of increased consumption of a resource due to increased efficiency",
-                            "A type of fruit named after an economist",
-                            "A paradox that states that the more we have of something, the less we want it"
+                            "Le phénomène d'augmentation de la consommation d'une ressource en raison d'une meilleure efficacité",
+                            "Un type de fruit portant le nom d'un économiste",
+                            "Un paradoxe selon lequel plus on possède quelque chose, moins on le désire"
                         ],
                         "feedback": [
-                            "Correct! Well done, you have a firm understanding of the Jevons Paradox. Fun fact: The phenomenon is named after William Stanley Jevons, an English economist who first described it in the 19th century",
-                            "Wrong! Sorry, there is no such thing as a Jevons fruit. You'll have to find your sustenance elsewhere",
-                            "Sorry, that's not quite right. The Jevons Paradox actually states that increased efficiency can lead to increased consumption, not decreased desire for a resource. But hey, at least you're thinking paradoxically!"
+                            "Exact ! Bravo, vous maîtrisez bien le paradoxe de Jevons. Anecdote : ce phénomène doit son nom à William Stanley Jevons, un économiste anglais qui l'a décrit pour la première fois au XIXe siècle.",
+                            "Faux ! Désolé, il n'existe pas de fruit Jevons. Il faudra chercher votre nourriture ailleurs.",
+                            "Dommage, ce n'est pas tout à fait ça. Le paradoxe de Jevons énonce en réalité qu'une meilleure efficacité peut entraîner une consommation accrue, et non une baisse du désir pour une ressource. Mais au moins, vous pensez de façon paradoxale !"
                         ],
-                        "question": "What is the Jevons Paradox",
-                        "text": "The Jevons Paradox is a phenomenon that occurs when we use more of a resource, even when we are using it more efficiently. This happens because increased efficiency often leads to lower costs, which can increase demand for the resource.\n\nOne example of this is the use of coal as an energy source. In the late 1700s, people thought that coal deposits were running out, but James Watt's steam engine made it possible to use coal more efficiently. This led to an increase in the demand for coal, even though it was being used more efficiently. The relationship between energy and money is also important to consider.\n\nSome people have proposed using energy as a measure of value for money, but this has not been successful in practice. Bitcoin, on the other hand, uses a system called proof of work, which incentivizes people to use energy efficiently in order to earn rewards.\n\nWhile some people criticize the use of energy in this way, it is important to remember that humans are constantly finding new ways to generate energy, and we should not assume that energy is a fixed or limited resource.\n",
-                        "title": "Jevons Paradox"
+                        "question": "Qu'est-ce que le paradoxe de Jevons ?",
+                        "text": "Le paradoxe de Jevons est un phénomène qui se produit lorsqu'on consomme davantage d'une ressource, même en l'utilisant plus efficacement. Cela s'explique par le fait qu'une meilleure efficacité entraîne souvent une baisse des coûts, ce qui peut augmenter la demande pour cette ressource.\n\nUn exemple de ce phénomène est l'utilisation du charbon comme source d'énergie. À la fin du XVIIIe siècle, on pensait que les gisements de charbon s'épuisaient, mais la machine à vapeur de James Watt a permis d'utiliser le charbon plus efficacement. Cela a entraîné une hausse de la demande de charbon, bien qu'il soit utilisé plus efficacement. La relation entre l'énergie et la monnaie mérite aussi d'être considérée.\n\nCertains ont proposé d'utiliser l'énergie comme mesure de la valeur de la monnaie, mais cela n'a pas fonctionné en pratique. Le Bitcoin, en revanche, utilise un système appelé preuve de travail, qui incite les gens à utiliser l'énergie efficacement afin de gagner des récompenses.\n\nBien que certains critiquent cet usage de l'énergie, il faut se rappeler que les humains trouvent constamment de nouvelles façons de produire de l'énergie, et qu'on ne devrait pas supposer que l'énergie est une ressource fixe ou limitée.\n",
+                        "title": "Le paradoxe de Jevons"
                     },
                     "powerLaws": {
                         "answers": [
-                            "A power law in economics",
-                            "A type of pasta dish",
-                            "A way to fold laundry"
+                            "Une loi de puissance en économie",
+                            "Un type de plat de pâtes",
+                            "Une façon de plier le linge"
                         ],
                         "feedback": [
-                            "Good job! The Pareto principle, also known as the 80/20 rule, is a power law that explains how a small amount of something (like 20% of producers) can have a big impact (like 80% of the market share).",
-                            "Sorry, but it looks like you need to brush up on your economics and not your culinary skills. The Pareto principle is not a type of pasta, although it might be a tasty way to remember it",
-                            "I'm afraid you're going to have to put away the laundry and pay a little more attention to economics. The Pareto principle is not a way to fold clothes, but it is a useful way to understand how small changes in one thing can lead to bigger changes in another."
+                            "Bien joué ! Le principe de Pareto, aussi appelé la règle des 80/20, est une loi de puissance qui explique comment une petite proportion d'un ensemble (comme 20 % des producteurs) peut avoir un impact important (comme 80 % des parts de marché).",
+                            "Dommage, on dirait qu'il faut réviser vos connaissances en économie, pas en cuisine. Le principe de Pareto n'est pas un type de pâtes, même si ce serait une façon savoureuse de s'en souvenir.",
+                            "Il va falloir ranger le linge et prêter un peu plus attention à l'économie. Le principe de Pareto n'est pas une façon de plier les vêtements, mais c'est un moyen utile de comprendre comment de petits changements dans un domaine peuvent entraîner de plus grands changements dans un autre."
                         ],
-                        "question": "What is the Pareto principle, also known as the 80/20 rule, an example of",
-                        "text": "Power laws are a way to understand how two things are related. When one thing changes, the other thing changes in a way that is related to the first change. Power laws can show up in different areas, like language, biology, and space. Small changes in one thing can often lead to bigger changes in the other thing.\n\nIn economics, power laws are often shown in graphs. One example of a power law is the Pareto principle, which says that about 80% of the results come from 20% of the things that cause them. In a market, this might mean that 20% of the producers make up 80% of the market.\n\nPower laws can also be seen in other parts of bitcoin, like how much power mining pools have or how many hardware wallets different companies sell. They can also be seen in how bitcoin is distributed among different addresses.\n",
-                        "title": "Power Laws"
+                        "question": "Le principe de Pareto, aussi appelé la règle des 80/20, est un exemple de quoi ?",
+                        "text": "Les lois de puissance permettent de comprendre comment deux choses sont liées entre elles. Quand l'une change, l'autre change d'une façon liée au premier changement. On retrouve les lois de puissance dans différents domaines, comme la langue, la biologie ou l'espace. De petits changements dans un domaine peuvent souvent entraîner de plus grands changements dans un autre.\n\nEn économie, les lois de puissance sont souvent représentées sous forme de graphiques. Le principe de Pareto en est un exemple : il énonce qu'environ 80 % des résultats proviennent de 20 % des causes. Sur un marché, cela peut signifier que 20 % des producteurs représentent 80 % du marché.\n\nLes lois de puissance se retrouvent aussi dans d'autres aspects du bitcoin, comme la puissance détenue par les pools de minage ou le nombre de portefeuilles matériels vendus par différentes entreprises. On les observe également dans la façon dont le bitcoin est réparti entre les différentes adresses.\n",
+                        "title": "Les lois de puissance"
                     },
                     "winnerTakeAll": {
                         "answers": [
-                            "Because it is the most liquid and the best way to store value",
-                            "Because it tastes the best",
-                            "Because it has the prettiest color"
+                            "Parce que c'est la monnaie la plus liquide et le meilleur moyen de conserver de la valeur",
+                            "Parce qu'elle a le meilleur goût",
+                            "Parce qu'elle a la plus jolie couleur"
                         ],
                         "feedback": [
-                            "You got it right. The main reason that people usually agree on using one type of money in a certain area is because it is the most liquid and the best way to store value",
-                            "I'm afraid you might be confusing money with your favorite flavor of ice cream. Try again",
-                            "Sorry, but the color of money is not the most important factor in determining which type to use. Better luck next time!"
+                            "C'est la bonne réponse. La principale raison pour laquelle les gens s'accordent généralement sur un seul type de monnaie dans une zone donnée, c'est qu'elle est la plus liquide et le meilleur moyen de conserver de la valeur.",
+                            "Vous confondez peut-être la monnaie avec votre parfum de glace préféré. Réessayez.",
+                            "Dommage, mais la couleur de la monnaie n'est pas le facteur le plus important pour déterminer quel type utiliser. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "What is the main reason that people usually agree on using one type of money in a certain area",
-                        "text": "The concept of winner-take-all effects is when only one product or service is the best and everyone wants to use it. This can happen in markets where a small advantage can lead to getting all of the business.\n\nMoney is a network like this, where only one type of money is used in a certain area because it is the most useful and has the most options for trading with other people. This happens because people want to use the money that will give them the most options and be the most useful in a lot of different situations.\n\nMoney is also a good way to store value over a long time. When it comes to monetary systems, people usually agree on using one type of money because it is the most liquid, or easiest to use, and it is the best way to store value.\n",
-                        "title": "Winner-Take-All Effects"
+                        "question": "Quelle est la principale raison pour laquelle les gens s'accordent généralement à utiliser un seul type de monnaie dans une zone donnée ?",
+                        "text": "Le concept d'effet « le gagnant remporte tout » désigne une situation où un seul produit ou service est le meilleur et où tout le monde veut l'utiliser. Cela peut se produire sur des marchés où un petit avantage suffit à capter toute l'activité.\n\nLa monnaie est un réseau de ce type : un seul type de monnaie est utilisé dans une zone donnée parce qu'il est le plus utile et offre le plus d'options d'échange avec les autres. Cela s'explique par le fait que les gens veulent utiliser la monnaie qui leur offrira le plus d'options et sera la plus utile dans le plus grand nombre de situations.\n\nLa monnaie est aussi un bon moyen de conserver de la valeur sur le long terme. En matière de systèmes monétaires, les gens s'accordent généralement sur un seul type de monnaie, car c'est le plus liquide, c'est-à-dire le plus facile à utiliser, et c'est le meilleur moyen de conserver de la valeur.\n",
+                        "title": "Les effets « le gagnant remporte tout »"
                     }
                 }
             },
             "BitcoinAndEconomicsIII": {
-                "title": "Bitcoin and Economics III",
+                "title": "Le Bitcoin et l'économie III",
                 "questions": {
                     "unitBias": {
                         "answers": [
-                            "The belief that one unit of something is always the right amount to use when comparing it to other things",
-                            "The belief that one type of currency is better than all others",
-                            "The belief that all units of something should be the same size"
+                            "La croyance qu'une unité d'une chose est toujours la bonne quantité de référence pour la comparer à d'autres choses",
+                            "La croyance qu'un type de monnaie est meilleur que tous les autres",
+                            "La croyance que toutes les unités d'une chose devraient avoir la même taille"
                         ],
                         "feedback": [
-                            "Yep! Unit bias is the belief that one unit of something is always the right amount to use when comparing it to other things. However, this is not always true and can lead to faulty reasoning. Good job",
-                            "I'm afraid you're mistaken. Unit bias is not about believing that one type of currency is better than all others. Maybe you should stick to counting your coins instead of trying to determine the value of currency",
-                            "Sorry, but unit bias is not about the size of units. Don't worry, though – you can still have fun with different sizes of units by playing with building blocks or LEGO bricks."
+                            "Exact ! Le biais de l'unité est la croyance qu'une unité d'une chose est toujours la bonne quantité de référence pour la comparer à d'autres choses. Ce n'est pourtant pas toujours vrai, et cela peut mener à un raisonnement erroné. Bien joué.",
+                            "Vous faites erreur. Le biais de l'unité n'a rien à voir avec la croyance qu'un type de monnaie est meilleur que tous les autres. Mieux vaut peut-être se contenter de compter ses pièces plutôt que d'évaluer la valeur d'une monnaie.",
+                            "Dommage, le biais de l'unité n'a rien à voir avec la taille des unités. Mais rassurez-vous, vous pouvez toujours vous amuser avec des unités de tailles différentes en jouant aux Lego."
                         ],
-                        "question": "What is unit bias",
-                        "text": "Unit bias is a type of thinking that assumes that one unit of something is the right amount to use when comparing it to other things.\n\nThis is not always true, especially when it comes to bitcoin. To understand how bitcoin compares to other stores of value, you need to look at the total amount of bitcoin that is available and its value, not just the price of one unit. Bitcoin is very small and can be divided into very small amounts, down to 8 decimal places. This means that you can buy a very small part of a bitcoin if you want.\n\nPeople sometimes think that other cryptocurrencies are cheaper than bitcoin because they cost less per unit, but this is not always true. Bitcoin is a special type of digital money because it is limited in supply and cannot be made in larger amounts.\n\nThis makes it a good way to store value because the value does not decrease over time. When you look at bitcoin in this way, you can see that it is just a small part of the total amount of non-government wealth in the world.\n",
-                        "title": "Unit Bias"
+                        "question": "Qu'est-ce que le biais de l'unité ?",
+                        "text": "Le biais de l'unité est un raisonnement qui suppose qu'une unité d'une chose est la bonne quantité de référence pour la comparer à d'autres choses.\n\nCe n'est pas toujours vrai, surtout dans le cas du bitcoin. Pour comprendre comment le bitcoin se compare à d'autres réserves de valeur, il faut regarder la quantité totale de bitcoin disponible et sa valeur, pas seulement le prix d'une unité. Le bitcoin est très petit et peut être divisé en montants infimes, jusqu'à 8 décimales. Cela signifie que vous pouvez acheter une toute petite fraction de bitcoin si vous le souhaitez.\n\nLes gens pensent parfois que d'autres cryptomonnaies sont moins chères que le bitcoin parce qu'elles coûtent moins par unité, mais ce n'est pas toujours vrai. Le bitcoin est une forme particulière de monnaie numérique, car son offre est limitée et ne peut pas être augmentée.\n\nCela en fait un bon moyen de conserver de la valeur, car celle-ci ne diminue pas avec le temps. Vu sous cet angle, on constate que le bitcoin ne représente qu'une petite part de la richesse mondiale non gouvernementale totale.\n",
+                        "title": "Le biais de l'unité"
                     },
                     "veblenGood": {
                         "answers": [
-                            "A type of good that people want more of when the price goes up",
-                            "A type of food that tastes better when it is expensive",
-                            "A type of good that people want more of when they have more money to spend"
+                            "Un type de bien que l'on désire davantage quand son prix augmente",
+                            "Un type d'aliment qui a meilleur goût quand il est cher",
+                            "Un type de bien que l'on désire davantage quand on a plus d'argent à dépenser"
                         ],
                         "feedback": [
-                            "Exactly! A Veblen good is a type of good that people want more of when the price goes up. This is unusual because most people want things more when they have more money to spend",
-                            "I'm sorry, but a Veblen good is not a type of food. Maybe you should stick to eating your favorite foods instead of trying to understand economics",
-                            "I'm afraid you're mistaken. A Veblen good is not a type of good that people want more of when they have more money to spend. Maybe you should pay more attention to economics instead of just spending your money!"
+                            "Exactement ! Un bien de Veblen est un type de bien que l'on désire davantage quand son prix augmente. C'est inhabituel, car la plupart des gens désirent davantage les choses quand ils ont plus d'argent à dépenser.",
+                            "Désolé, un bien de Veblen n'est pas un type d'aliment. Mieux vaut peut-être se contenter de manger ses plats préférés plutôt que de comprendre l'économie.",
+                            "Vous faites erreur. Un bien de Veblen n'est pas un type de bien que l'on désire davantage quand on a plus d'argent à dépenser. Peut-être devriez-vous prêter plus attention à l'économie plutôt que de simplement dépenser votre argent !"
                         ],
-                        "question": "What is a Veblen good",
-                        "text": "Veblen goods are things that people want more of when the price goes up. Normal goods are things that people usually want more of when they have more money to spend.\n\nVeblen goods are unusual because people want them more when they cost more. These are often luxury goods that are hard to get or that are made in limited quantities. This is done to make them seem special or rare.\n\nSome people might want to buy bitcoin because it is a status symbol, but the main reason people will probably want to buy it is because there is a limited amount of it.\n\nWhen more people want to buy bitcoin, the price goes up and it becomes easier to use. When it is easy to use, more people want to use it. This creates a cycle where the demand for bitcoin increases, the price goes up, and it becomes easier to use.\n",
-                        "title": "Veblen Good"
+                        "question": "Qu'est-ce qu'un bien de Veblen ?",
+                        "text": "Les biens de Veblen sont des biens que l'on désire davantage quand leur prix augmente. Les biens normaux, eux, sont généralement davantage désirés quand on dispose de plus d'argent à dépenser.\n\nLes biens de Veblen sont inhabituels, car on les désire davantage quand ils coûtent plus cher. Il s'agit souvent de biens de luxe difficiles à obtenir ou fabriqués en quantités limitées, précisément pour paraître spéciaux ou rares.\n\nCertaines personnes voudront peut-être acheter du bitcoin parce que c'est un symbole de statut, mais la raison principale pour laquelle les gens voudront probablement en acheter, c'est que sa quantité est limitée.\n\nQuand davantage de personnes veulent acheter du bitcoin, son prix augmente et il devient plus facile à utiliser. Quand il est facile à utiliser, davantage de gens veulent l'utiliser. Cela crée un cycle où la demande de bitcoin augmente, son prix augmente, et il devient plus facile à utiliser.\n",
+                        "title": "Le bien de Veblen"
                     },
                     "malinvestment": {
                         "answers": [
-                            "Distorted price signals",
-                            "Aliens from outer space",
-                            "A lack of unicorns in the economy"
+                            "Des signaux de prix faussés",
+                            "Des extraterrestres venus de l'espace",
+                            "Un manque de licornes dans l'économie"
                         ],
                         "feedback": [
-                            "Correct answer! You're on the right track. When prices are not accurate, it can lead to money being put into things that are not very productive. Good job",
-                            "Wrong answer! But at least you're thinking outside the box. Maybe the aliens are controlling the price signals from their spaceship... or maybe not. Better luck next time",
-                            "Sorry, but unicorns do not have the power to control the economy. Although, it would be pretty cool if they did. Better luck next time."
+                            "Bonne réponse ! Vous êtes sur la bonne voie. Quand les prix ne sont pas exacts, cela peut conduire à investir de l'argent dans des choses peu productives. Bien joué.",
+                            "Mauvaise réponse ! Mais au moins vous sortez des sentiers battus. Peut-être que les extraterrestres contrôlent les signaux de prix depuis leur vaisseau spatial... ou peut-être pas. Ce sera pour une prochaine fois.",
+                            "Dommage, mais les licornes n'ont pas le pouvoir de contrôler l'économie. Même si ce serait plutôt cool si c'était le cas. Ce sera pour une prochaine fois."
                         ],
-                        "question": "What is the main cause of malinvestment",
-                        "text": "Malinvestment is when the prices of things are not accurate, which leads to money being put into things that are not very productive. This happens because it is hard to predict the future and make good choices about what to do with money.\n\nWhen the market is not working correctly, it is like trying to use a compass when you are not sure where you are. An example of this is when companies can't pay back their loans and have to borrow more money just to stay alive. This is like being a \"zombie\" company.\n\nWhen the government is in charge of these decisions, they might make mistakes because they don't have a good way to tell what is a good investment and what is not. This can lead to things like building a subway without enough trains or building a dam without enough power lines.\n",
-                        "title": "Malinvestment"
+                        "question": "Quelle est la principale cause du mauvais investissement (malinvestment) ?",
+                        "text": "Le mauvais investissement (malinvestment) se produit lorsque les prix des choses ne sont pas exacts, ce qui conduit à investir de l'argent dans des activités peu productives. Cela s'explique par la difficulté à prédire l'avenir et à faire de bons choix quant à l'usage de son argent.\n\nQuand le marché ne fonctionne pas correctement, c'est comme essayer d'utiliser une boussole sans savoir où l'on se trouve. Un exemple typique est celui d'entreprises incapables de rembourser leurs prêts et qui doivent en emprunter davantage juste pour survivre : ce sont des entreprises « zombies ».\n\nQuand c'est le gouvernement qui prend ces décisions, il peut se tromper, faute de moyen fiable pour distinguer un bon investissement d'un mauvais. Cela peut mener à des situations comme construire un métro sans avoir assez de rames, ou un barrage sans assez de lignes électriques.\n",
+                        "title": "Le mauvais investissement"
                     },
                     "asymmetricPayoff": {
                         "answers": [
-                            "When the potential upside is disproportionately greater than the downside risk",
-                            "When the potential upside and downside are equal",
-                            "When the potential upside is a talking llama and the downside is a mute giraffe"
+                            "Lorsque le potentiel de gain est disproportionnellement plus élevé que le risque de perte",
+                            "Lorsque le potentiel de gain et le risque de perte sont égaux",
+                            "Lorsque le potentiel de gain est un lama parlant et le risque de perte une girafe muette"
                         ],
                         "feedback": [
-                            "Correct answer! You got it! An asymmetric payoff means that the potential for gain is much greater than the potential for loss. Good job",
-                            "Wrong answer! An asymmetric payoff means that the potential for gain or loss is uneven, not equal. Better luck next time",
-                            "Wrong answer! While a talking llama and mute giraffe might make for an interesting investment, they do not define an asymmetric payoff. Better luck next time."
+                            "Bonne réponse ! Vous avez compris ! Un gain asymétrique signifie que le potentiel de gain est bien plus élevé que le potentiel de perte. Bien joué.",
+                            "Mauvaise réponse ! Un gain asymétrique signifie que le potentiel de gain ou de perte est inégal, pas égal. Ce sera pour une prochaine fois.",
+                            "Mauvaise réponse ! Un lama parlant et une girafe muette feraient peut-être un investissement intéressant, mais ils ne définissent pas un gain asymétrique. Ce sera pour une prochaine fois."
                         ],
-                        "question": "What is an asymmetric payoff in the context of investment decisions",
-                        "text": "When we make decisions about investing our money, we try to predict what might happen and how much money we could make or lose. Sometimes, the amount of money we can make or lose is not equal.\n\nFor example, if we invest in something that has a big chance of making us a lot of money, but only a small chance of losing a little bit of money, we might call this an \"asymmetric payoff.\" This means that the potential upside (how much we can make) is much bigger than the potential downside (how much we can lose).\n\nOne example of this is bitcoin. Bitcoin's potential outcomes are similar to an option, meaning it either succeeds or fails. If it experiences a catastrophic event, the risk of losing money is minimized.\n\nHowever, the potential upside is much greater, as bitcoin's total addressable market has the potential to be a primary global store of wealth.\n\nAsymmetry in payoffs, or uneven potential outcomes, only occurs when there is uneven understanding or information about an investment. If everyone fully understood bitcoin, it would already be widely used as a form of currency.\n\nCurrently, not everyone is aware of bitcoin's potential as a superior monetary option, so the potential for it to increase in value depends on the demand for it increasing without a corresponding increase in the supply.\n",
-                        "title": "Asymmetric Payoff"
+                        "question": "Qu'est-ce qu'un gain asymétrique dans le contexte des décisions d'investissement ?",
+                        "text": "Lorsque nous décidons d'investir notre argent, nous essayons de prédire ce qui pourrait se passer et combien nous pourrions gagner ou perdre. Parfois, ces montants potentiels de gain et de perte ne sont pas égaux.\n\nPar exemple, si nous investissons dans quelque chose qui a une forte chance de nous rapporter beaucoup d'argent, mais seulement une faible chance de nous en faire perdre un peu, on peut parler de « gain asymétrique ». Cela signifie que le potentiel de gain (combien on peut gagner) est bien plus important que le potentiel de perte (combien on peut perdre).\n\nLe bitcoin en est un exemple. Ses résultats potentiels ressemblent à ceux d'une option : soit il réussit, soit il échoue. En cas d'événement catastrophique, le risque de perte financière est minimisé.\n\nEn revanche, son potentiel de gain est bien plus important, le marché total adressable du bitcoin ayant le potentiel de devenir une réserve de richesse mondiale majeure.\n\nUne asymétrie de gain, ou des résultats potentiels inégaux, ne se produit que lorsqu'il existe une compréhension ou une information inégale à propos d'un investissement. Si tout le monde comprenait pleinement le bitcoin, il serait déjà largement utilisé comme forme de monnaie.\n\nActuellement, tout le monde n'a pas conscience du potentiel du bitcoin en tant qu'option monétaire supérieure ; son potentiel de hausse de valeur dépend donc d'une demande croissante sans augmentation correspondante de l'offre.\n",
+                        "title": "Le gain asymétrique"
                     },
                     "ansoffMatrix": {
                         "answers": [
-                            "It helps identify potential growth strategies for the bitcoin protocol",
-                            "It helps determine the optimal temperature for storing bitcoin",
-                            "It helps calculate the potential return on investment for bitcoin mining operations"
+                            "Elle aide à identifier des stratégies de croissance potentielles pour le protocole Bitcoin",
+                            "Elle aide à déterminer la température optimale pour stocker du bitcoin",
+                            "Elle aide à calculer le retour sur investissement potentiel des opérations de minage de bitcoin"
                         ],
                         "feedback": [
-                            "Correct answer! You got it! The Ansoff Matrix can be used to outline growth strategies for the bitcoin protocol, such as developing and selling it to different markets. Good job",
-                            "Nope! Storage temperature for bitcoin private keys is not a real issue, and it is not related to the Ansoff Matrix. Better luck next time",
-                            "Wrong answer! While calculating potential returns on investment is important for bitcoin miners, it is not directly related to the Ansoff Matrix. Better luck next time."
+                            "Bonne réponse ! Vous avez compris ! La matrice d'Ansoff peut servir à esquisser des stratégies de croissance pour le protocole Bitcoin, comme le développer et le proposer à différents marchés. Bien joué.",
+                            "Non ! La température de stockage des clés privées Bitcoin n'est pas un vrai enjeu, et cela n'a rien à voir avec la matrice d'Ansoff. Ce sera pour une prochaine fois.",
+                            "Mauvaise réponse ! Calculer le retour sur investissement potentiel est important pour les mineurs de bitcoin, mais cela n'est pas directement lié à la matrice d'Ansoff. Ce sera pour une prochaine fois."
                         ],
-                        "question": "How is the Ansoff Matrix relevant to the growth and potential of bitcoin",
-                        "text": "The Ansoff Matrix is a tool that helps companies think about how they can grow and make more money. It helps them figure out what to do with a product or service they have, and how to sell it to different groups of people.\n\nIn the case of bitcoin, it is a product that is like a type of digital money. It has the potential to be used by a lot of people in a lot of different ways. The people who work on bitcoin, like the people who write the code and help others understand how to use it, are trying to increase the number of people who use it and make it easier for them to do so.\n\nBitcoin can be used to save money and protect it from being taken away, or it can be used to send and receive small amounts of money quickly, without having to go through a lot of steps. As more people start using bitcoin, it has the potential to grow and become more popular.\n\nIt is also possible for people and companies to use bitcoin as part of their financial plans, to help protect their money from losing value. While the main reason people might use bitcoin now is to protect their wealth, the payment use case has been growing fast since the inception of the Lightning Network and other use cases may emerge.\n",
-                        "title": "Ansoff Matrix"
+                        "question": "En quoi la matrice d'Ansoff est-elle pertinente pour la croissance et le potentiel du bitcoin ?",
+                        "text": "La matrice d'Ansoff est un outil qui aide les entreprises à réfléchir à la façon de croître et de générer davantage de revenus. Elle les aide à déterminer quoi faire d'un produit ou service existant, et comment le vendre à différents groupes de personnes.\n\nDans le cas du bitcoin, il s'agit d'un produit qui s'apparente à une forme de monnaie numérique. Il a le potentiel d'être utilisé par un grand nombre de personnes, de nombreuses façons différentes. Les personnes qui travaillent sur le bitcoin, comme celles qui écrivent le code ou aident les autres à comprendre comment l'utiliser, cherchent à augmenter le nombre de ses utilisateurs et à leur en faciliter l'usage.\n\nLe bitcoin peut servir à épargner de l'argent et à le protéger contre la confiscation, ou à envoyer et recevoir rapidement de petites sommes, sans passer par de nombreuses étapes. À mesure que davantage de personnes commencent à l'utiliser, il a le potentiel de croître et de gagner en popularité.\n\nIl est aussi possible pour des particuliers et des entreprises d'intégrer le bitcoin à leurs stratégies financières, pour protéger leur argent d'une perte de valeur. Si la principale raison d'utiliser le bitcoin aujourd'hui est de protéger sa richesse, l'usage pour les paiements croît rapidement depuis la création du Lightning Network, et d'autres usages pourraient encore émerger.\n",
+                        "title": "La matrice d'Ansoff"
                     }
                 }
             }
