@@ -28,3 +28,15 @@ const extractPayment = (event: PaymentEvent): { id: string } | null => {
 
 export const extractPaymentId = (event: PaymentEvent): string | null =>
   extractPayment(event)?.id ?? null
+
+/**
+ * Identity of a payment event for scheduling deduplication. The tag is part
+ * of the key because the same payment id arrives first as PaymentPending and
+ * later as PaymentSucceeded - settlement changes leaf state, so it must be
+ * distinguishable from the pending event it follows. Duplicate deliveries of
+ * the same event stay deduplicated.
+ */
+export const paymentEventKey = (event: PaymentEvent): string | null => {
+  const id = extractPaymentId(event)
+  return id ? `${event.tag}:${id}` : null
+}

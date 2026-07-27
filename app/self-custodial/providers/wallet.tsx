@@ -55,6 +55,10 @@ type SelfCustodialWalletContextValue = ActiveWalletState & {
   connectedAccountId: string | null
   lightningAddress: string | null
   isStableBalanceActive?: boolean
+  /** Tag-aware `${tag}:${id}` key of the last payment event (dedupe that must
+   * distinguish Pending from Succeeded for the same payment). */
+  lastPaymentEventKey: string | null
+  /** The payment id alone, for consumers that look payments up by id. */
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
   loadingMore: boolean
@@ -75,6 +79,7 @@ const defaultState: SelfCustodialWalletContextValue = {
   sdk: null,
   connectedAccountId: null,
   lightningAddress: null,
+  lastPaymentEventKey: null,
   lastReceivedPaymentId: null,
   hasMoreTransactions: false,
   loadingMore: false,
@@ -103,6 +108,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     sdk,
     connectedAccountId,
     sdkStableBalanceActive,
+    lastPaymentEventKey,
     lastReceivedPaymentId,
     hasMoreTransactions,
     loadingMore,
@@ -175,6 +181,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       connectedAccountId,
       lightningAddress,
       isStableBalanceActive,
+      lastPaymentEventKey,
       lastReceivedPaymentId,
       hasMoreTransactions,
       loadingMore,
@@ -192,6 +199,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       connectedAccountId,
       lightningAddress,
       isStableBalanceActive,
+      lastPaymentEventKey,
       lastReceivedPaymentId,
       hasMoreTransactions,
       loadingMore,
