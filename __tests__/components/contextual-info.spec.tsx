@@ -173,7 +173,14 @@ describe("ContextualInfo", () => {
           type={Invoice.OnChain}
           canSetExpirationTime={false}
           feesInformation={{
-            deposit: { minBankFee: "2500", minBankFeeThreshold: "1000000", ratio: "50" },
+            deposit: {
+              minBankFee: "2500",
+              minBankFeeThreshold: "1000000",
+              tiers: [
+                { maxAmount: "1000000", amount: "2500" },
+                { maxAmount: null, amount: "5000" },
+              ],
+            },
           }}
         />,
       )
@@ -185,14 +192,21 @@ describe("ContextualInfo", () => {
       ).toBeTruthy()
     })
 
-    it("renders a zero over-threshold fee when the ratio is zero", () => {
+    it("renders a zero over-threshold fee when the unbounded tier is free", () => {
       const { getByText } = render(
         <ContextualInfo
           {...defaultProps}
           type={Invoice.OnChain}
           canSetExpirationTime={false}
           feesInformation={{
-            deposit: { minBankFee: "2500", minBankFeeThreshold: "1000000", ratio: "0" },
+            deposit: {
+              minBankFee: "2500",
+              minBankFeeThreshold: "1000000",
+              tiers: [
+                { maxAmount: "1000000", amount: "2500" },
+                { maxAmount: null, amount: "0" },
+              ],
+            },
           }}
         />,
       )
@@ -211,7 +225,14 @@ describe("ContextualInfo", () => {
           type={Invoice.OnChain}
           canSetExpirationTime={false}
           feesInformation={{
-            deposit: { minBankFee: "2500", minBankFeeThreshold: "1000000", ratio: "50" },
+            deposit: {
+              minBankFee: "2500",
+              minBankFeeThreshold: "1000000",
+              tiers: [
+                { maxAmount: "1000000", amount: "2500" },
+                { maxAmount: null, amount: "5000" },
+              ],
+            },
           }}
         />,
       )

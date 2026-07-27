@@ -885,13 +885,25 @@ export type CurrencyConversionEstimation = {
   readonly usdCentAmount: Scalars['CentAmount']['output'];
 };
 
+export type DepositFeeTier = {
+  readonly __typename: 'DepositFeeTier';
+  readonly amount: Scalars['String']['output'];
+  /** highest amount this tier applies to, null when unbounded */
+  readonly maxAmount?: Maybe<Scalars['String']['output']>;
+};
+
 export type DepositFeesInformation = {
   readonly __typename: 'DepositFeesInformation';
   readonly minBankFee: Scalars['String']['output'];
   /** below this amount minBankFee will be charged */
   readonly minBankFeeThreshold: Scalars['String']['output'];
-  /** ratio to charge as basis points above minBankFeeThreshold amount */
+  /**
+   * ratio to charge as basis points above minBankFeeThreshold amount
+   * @deprecated fees are a flat amount per tier, use tiers
+   */
   readonly ratio: Scalars['String']['output'];
+  /** amount charged per tier, in ascending order of maxAmount */
+  readonly tiers: ReadonlyArray<DepositFeeTier>;
 };
 
 export type DeviceNotificationTokenCreateInput = {
@@ -3703,7 +3715,7 @@ export type LnUsdInvoiceCreateMutation = { readonly __typename: 'Mutation', read
 export type PaymentRequestQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PaymentRequestQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly network: Network, readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly ratio: string } } } | null, readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
+export type PaymentRequestQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly network: Network, readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly tiers: ReadonlyArray<{ readonly __typename: 'DepositFeeTier', readonly maxAmount?: string | null, readonly amount: string }> } } } | null, readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
 
 export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -3915,7 +3927,7 @@ export type AccountUpdateDisplayCurrencyMutation = { readonly __typename: 'Mutat
 export type FeeRatesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FeeRatesQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly ratio: string } } } | null };
+export type FeeRatesQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly tiers: ReadonlyArray<{ readonly __typename: 'DepositFeeTier', readonly maxAmount?: string | null, readonly amount: string }> } } } | null };
 
 export type LanguageQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -7657,7 +7669,10 @@ export const PaymentRequestDocument = gql`
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+        }
       }
     }
   }
@@ -9068,7 +9083,10 @@ export const FeeRatesDocument = gql`
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+        }
       }
     }
   }
@@ -10076,6 +10094,7 @@ export type ResolversTypes = {
   Currency: ResolverTypeWrapper<Currency>;
   CurrencyConversionEstimation: ResolverTypeWrapper<CurrencyConversionEstimation>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
+  DepositFeeTier: ResolverTypeWrapper<DepositFeeTier>;
   DepositFeesInformation: ResolverTypeWrapper<DepositFeesInformation>;
   DeviceNotificationTokenCreateInput: DeviceNotificationTokenCreateInput;
   DisplayCurrency: ResolverTypeWrapper<Scalars['DisplayCurrency']['output']>;
@@ -10379,6 +10398,7 @@ export type ResolversParentTypes = {
   Currency: Currency;
   CurrencyConversionEstimation: CurrencyConversionEstimation;
   DateTime: Scalars['DateTime']['output'];
+  DepositFeeTier: DepositFeeTier;
   DepositFeesInformation: DepositFeesInformation;
   DeviceNotificationTokenCreateInput: DeviceNotificationTokenCreateInput;
   DisplayCurrency: Scalars['DisplayCurrency']['output'];
@@ -11017,10 +11037,17 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
   name: 'DateTime';
 }
 
+export type DepositFeeTierResolvers<ContextType = any, ParentType extends ResolversParentTypes['DepositFeeTier'] = ResolversParentTypes['DepositFeeTier']> = {
+  amount?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  maxAmount?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type DepositFeesInformationResolvers<ContextType = any, ParentType extends ResolversParentTypes['DepositFeesInformation'] = ResolversParentTypes['DepositFeesInformation']> = {
   minBankFee?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   minBankFeeThreshold?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   ratio?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tiers?: Resolver<ReadonlyArray<ResolversTypes['DepositFeeTier']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -12073,6 +12100,7 @@ export type Resolvers<ContextType = any> = {
   Currency?: CurrencyResolvers<ContextType>;
   CurrencyConversionEstimation?: CurrencyConversionEstimationResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
+  DepositFeeTier?: DepositFeeTierResolvers<ContextType>;
   DepositFeesInformation?: DepositFeesInformationResolvers<ContextType>;
   DisplayCurrency?: GraphQLScalarType;
   Email?: EmailResolvers<ContextType>;

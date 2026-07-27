@@ -2,10 +2,15 @@ const DEFAULT_MIN_BANK_FEE = 2500
 const DEFAULT_THRESHOLD = 1_000_000
 const DEFAULT_OVER_FEE = 5000
 
+export type DepositFeeTier = {
+  maxAmount?: string | null
+  amount: string
+}
+
 export type DepositFeesInformation = {
   minBankFee: string
   minBankFeeThreshold: string
-  ratio: string
+  tiers?: readonly DepositFeeTier[] | null
 }
 
 export type FormattedDepositFees = {
@@ -16,9 +21,10 @@ export type FormattedDepositFees = {
 
 /**
  * Derives the displayed onchain deposit fees from `globals.feesInformation`.
- * `ratio` is in basis points; every field falls back to its default only when
- * the API value is not numeric — a zero ratio is a legitimate "no fee" and is
- * kept as 0.
+ * Fees are a flat amount per tier; the tier with no `maxAmount` is the
+ * unbounded one charged above the threshold. Every field falls back to its
+ * default only when the API value is not numeric — a zero amount is a
+ * legitimate "no fee" and is kept as 0.
  */
 export const formatDepositFees = (
   deposit: DepositFeesInformation,
@@ -31,11 +37,10 @@ export const formatDepositFees = (
   const threshold = new Intl.NumberFormat("en-US", { notation: "compact" }).format(
     Number.isFinite(parsedThreshold) ? parsedThreshold : DEFAULT_THRESHOLD,
   )
-  const computedOverFee = Math.round(
-    (Number(deposit.minBankFeeThreshold) * Number(deposit.ratio)) / 10000,
-  )
+  const unboundedTier = deposit.tiers?.find((tier) => !tier.maxAmount)
+  const parsedOverFee = Number(unboundedTier?.amount)
   const overFee = (
-    Number.isFinite(computedOverFee) ? computedOverFee : DEFAULT_OVER_FEE
+    Number.isFinite(parsedOverFee) ? parsedOverFee : DEFAULT_OVER_FEE
   ).toLocaleString("en-US")
   return { fee, threshold, overFee }
 }

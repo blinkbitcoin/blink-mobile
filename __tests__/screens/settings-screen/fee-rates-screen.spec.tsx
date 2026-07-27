@@ -187,7 +187,14 @@ describe("FeeRatesScreen", () => {
                   __typename: "DepositFeesInformation",
                   minBankFee: "2500",
                   minBankFeeThreshold: "1000000",
-                  ratio: "50",
+                  tiers: [
+                    {
+                      __typename: "DepositFeeTier",
+                      maxAmount: "1000000",
+                      amount: "2500",
+                    },
+                    { __typename: "DepositFeeTier", maxAmount: null, amount: "5000" },
+                  ],
                 },
               },
             },
@@ -204,8 +211,8 @@ describe("FeeRatesScreen", () => {
     expect(queryByText("Unable to fetch fees at this time")).toBeNull()
   })
 
-  it("renders a zero over-threshold fee when the API reports a zero ratio", async () => {
-    const zeroRatioMocks = [
+  it("renders a zero over-threshold fee when the unbounded tier is free", async () => {
+    const zeroOverFeeMocks = [
       {
         request: { query: FeeRatesDocument },
         result: {
@@ -218,7 +225,14 @@ describe("FeeRatesScreen", () => {
                   __typename: "DepositFeesInformation",
                   minBankFee: "2500",
                   minBankFeeThreshold: "1000000",
-                  ratio: "0",
+                  tiers: [
+                    {
+                      __typename: "DepositFeeTier",
+                      maxAmount: "1000000",
+                      amount: "2500",
+                    },
+                    { __typename: "DepositFeeTier", maxAmount: null, amount: "0" },
+                  ],
                 },
               },
             },
@@ -227,7 +241,7 @@ describe("FeeRatesScreen", () => {
       },
     ]
 
-    const { findByText } = renderWithApolloMocks(zeroRatioMocks)
+    const { findByText } = renderWithApolloMocks(zeroOverFeeMocks)
 
     expect(await findByText("2,500 SAT")).toBeTruthy()
     expect(await findByText("0 SAT")).toBeTruthy()

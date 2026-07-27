@@ -118,7 +118,11 @@ describe("useWalletResolution", () => {
         globals: {
           network: Network.Mainnet,
           feesInformation: {
-            deposit: { minBankFee: "0", minBankFeeThreshold: "0", ratio: "0" },
+            deposit: {
+              minBankFee: "0",
+              minBankFeeThreshold: "0",
+              tiers: [{ maxAmount: null, amount: "0" }],
+            },
           },
         },
       },

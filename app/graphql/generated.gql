@@ -1311,7 +1311,11 @@ query feeRates {
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+          __typename
+        }
         __typename
       }
       __typename
@@ -1604,7 +1608,11 @@ query paymentRequest {
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+          __typename
+        }
         __typename
       }
       __typename
