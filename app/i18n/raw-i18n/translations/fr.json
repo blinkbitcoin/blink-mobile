@@ -2003,7 +2003,7 @@
         "satAccumulated": "Sats accumulés",
         "satsEarned": "{formattedNumber | sats} gagnés",
         "sectionsCompleted": "Vous avez terminé",
-        "title": "Quiz",
+        "title": "Apprendre",
         "unlockQuestion": "Pour dévérouiller, répondez à la question :",
         "youEarned": "Vous avez gagné",
         "registerTitle": "Besoin de mettre à jour votre compte",
@@ -3832,7 +3832,7 @@
         "noAccountTitle": "Compte custodial requis",
         "noAccountDescription": "{featureName} nécessite un compte custodial Blink.",
         "featureCircles": "Cercles",
-        "featureEarn": "Gagner",
+        "featureEarn": "Apprendre",
         "featureCard": "Carte"
     },
     "WalletCreationScreen": {

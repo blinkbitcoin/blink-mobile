@@ -2003,7 +2003,7 @@
     "satAccumulated": "Sats acumulați",
     "satsEarned": "{formattedNumber | sats} câștigați",
     "sectionsCompleted": "Ați finalizat",
-    "title": "Câștigați",
+    "title": "Învață",
     "unlockQuestion": "Pentru a debloca, răspundeți la întrebarea:",
     "youEarned": "Ați câștigat",
     "registerTitle": "Trebuie să faceți upgrade contului",
@@ -3832,7 +3832,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Învață",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

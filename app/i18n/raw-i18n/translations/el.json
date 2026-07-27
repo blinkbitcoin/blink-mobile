@@ -2003,7 +2003,7 @@
     "satAccumulated": "Συσσωρευμένα sats ",
     "satsEarned": "{formattedNumber | sats} earned",
     "sectionsCompleted": "Ολοκληρώσατε",
-    "title": "Κερδίστε ",
+    "title": "Μάθηση",
     "unlockQuestion": "Για να ξεκλειδώσετε, απαντήστε στην ερώτηση:",
     "youEarned": "Έχετε κερδίσει",
     "registerTitle": "Χρειάζεται να αναβαθμίσετε τον λογαριασμό σας",
@@ -3832,7 +3832,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Μάθηση",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

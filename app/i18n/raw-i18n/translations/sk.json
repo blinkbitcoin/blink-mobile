@@ -2003,7 +2003,7 @@
     "satAccumulated": "Nahromadené sats",
     "satsEarned": "{formattedNumber | sats} zarobené",
     "sectionsCompleted": "Dokončili ste",
-    "title": "Získajte saty",
+    "title": "Učiť sa",
     "unlockQuestion": "Na odomknutie odpovedzte na otázku:",
     "youEarned": "Získali ste",
     "registerTitle": "Potrebujete upgradovať účet",
@@ -3832,7 +3832,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Učiť sa",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

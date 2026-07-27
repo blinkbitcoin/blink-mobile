@@ -2003,7 +2003,7 @@
     "satAccumulated": "IiSats ziqokelelene",
     "satsEarned": "{formattedNumber | sats} efunyenweyo",
     "sectionsCompleted": "Ugqibile",
-    "title": "Zuza",
+    "title": "Funda",
     "unlockQuestion": "Ukuvula, phendula umbuzo:",
     "youEarned": "Uzuzile",
     "registerTitle": "Need to upgrade your account",
@@ -3832,7 +3832,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Funda",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

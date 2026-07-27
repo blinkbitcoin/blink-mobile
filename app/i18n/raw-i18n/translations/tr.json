@@ -2003,7 +2003,7 @@
     "satAccumulated": "Biriktirilen satsler",
     "satsEarned": "{formattedNumber | sats} earned",
     "sectionsCompleted": "Tamamladınız",
-    "title": "Kazan",
+    "title": "Öğren",
     "unlockQuestion": "Kilidi açmak için soruya cevap ver:",
     "youEarned": "Kazandınız",
     "registerTitle": "Hesabınızı güncellemeniz gerekiyor",
@@ -3832,7 +3832,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Öğren",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

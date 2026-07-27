@@ -2003,7 +2003,7 @@
     "satAccumulated": "Sats acumulats",
     "satsEarned": "{formattedNumber | sats} guanyats",
     "sectionsCompleted": "Has completat",
-    "title": "Guanya",
+    "title": "Aprendre",
     "unlockQuestion": "Per desbloquejar, respon la pregunta:",
     "youEarned": "Has guanyat",
     "registerTitle": "Necessites actualitzar el teu compte",
@@ -3832,7 +3832,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Aprendre",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

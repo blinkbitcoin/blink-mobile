@@ -2003,7 +2003,7 @@
     "satAccumulated": "Sat akumulirani",
     "satsEarned": "{formattedNumber | sats} osvojeno",
     "sectionsCompleted": "Završili ste",
-    "title": "Zaradi",
+    "title": "Učenje",
     "unlockQuestion": "Za otključavanje odgovorite na pitanje:",
     "youEarned": "Zaradio si",
     "registerTitle": "Morate nadograditi svoj račun",
@@ -3832,7 +3832,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Učenje",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

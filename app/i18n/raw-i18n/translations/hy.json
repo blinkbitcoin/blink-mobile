@@ -2003,7 +2003,7 @@
     "satAccumulated": "Սատերը կուտակվել են",
     "satsEarned": "{formattedNumber | sats} վաստակել եք",
     "sectionsCompleted": "Դուք ավարտել եք",
-    "title": "Վաստակել",
+    "title": "Սովորել",
     "unlockQuestion": "Բացելու համար՝ պատասխանեք հարցին",
     "youEarned": "Դուք վաստակեցիք",
     "registerTitle": "Հարկավոր է թարմացնել Ձեր հաշիվը։ ",
@@ -3832,7 +3832,7 @@
     "noAccountTitle": "Պահառու հաշիվ է պահանջվում",
     "noAccountDescription": "{featureName: string}-ի համար անհրաժեշտ է Blink պահառու հաշիվ։",
     "featureCircles": "Circles",
-    "featureEarn": "Վաստակել",
+    "featureEarn": "Սովորել",
     "featureCard": "Քարտ"
   },
   "WalletCreationScreen": {

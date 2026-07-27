@@ -2003,7 +2003,7 @@
     "satAccumulated": "Sats verzameld",
     "satsEarned": "{formattedNumber | sats} verdiend",
     "sectionsCompleted": "Je hebt voltooid",
-    "title": "Verdien",
+    "title": "Leren",
     "unlockQuestion": "Beantwoord de vraag om te ontgrendelen:",
     "youEarned": "Jij hebt verdiend",
     "registerTitle": "U moet uw account upgraden",
@@ -3832,7 +3832,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Leren",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {
