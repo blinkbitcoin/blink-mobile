@@ -135,6 +135,38 @@ describe("mapSelfCustodialTransaction", () => {
     expect(result.sourceAccountType).toBe(AccountType.SelfCustodial)
   })
 
+  it("prefers the LNURL comment over the invoice description for the memo", () => {
+    const result = mapSelfCustodialTransaction(
+      createPayment({
+        details: {
+          tag: "Lightning",
+          inner: {
+            description: "Payment to esaudeveloper",
+            lnurlPayInfo: { comment: "Dinner with Andrej" },
+          },
+        },
+      }),
+    )
+
+    expect(result.memo).toBe("Dinner with Andrej")
+  })
+
+  it("falls back to the invoice description when there is no LNURL comment", () => {
+    const result = mapSelfCustodialTransaction(
+      createPayment({
+        details: {
+          tag: "Lightning",
+          inner: {
+            description: "Payment to esaudeveloper",
+            lnurlPayInfo: { comment: undefined },
+          },
+        },
+      }),
+    )
+
+    expect(result.memo).toBe("Payment to esaudeveloper")
+  })
+
   it("scales token payment fees from base units to USD cents and tags them as USD", () => {
     const result = mapSelfCustodialTransaction(
       createPayment({
