@@ -18,6 +18,9 @@ jest.mock("@app/graphql/generated", () => ({
   useLanguageQuery: (opts: unknown) => mockUseLanguageQuery(opts),
   useUserUpdateLanguageMutation: () => [jest.fn(), { loading: false }],
   useExportCsvSettingLazyQuery: () => [jest.fn(), { loading: false }],
+  // AccountPOS reads the display currency to build its terminal link.
+  useDisplayCurrencyQuery: () => ({ data: undefined, loading: false }),
+  useAccountUpdateDisplayCurrencyMutation: () => [jest.fn(), { loading: false }],
 }))
 
 jest.mock("@react-navigation/native", () => ({
