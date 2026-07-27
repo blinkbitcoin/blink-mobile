@@ -50,8 +50,12 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
             </View>
           )}
           <View style={styles.textColumn}>
-            <Text style={styles.titleStyle}>{title}</Text>
-            <Text style={styles.bodyText}>{text}</Text>
+            <Text type="p3" bold>
+              {title}
+            </Text>
+            <Text type="p3" style={styles.bodyText}>
+              {text}
+            </Text>
           </View>
           {dismissAction && (
             <GaloyIconButton
@@ -115,12 +119,6 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "flex-start",
     justifyContent: "center",
   },
-  titleStyle: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: "400",
-    color: colors.black,
-  },
   leftIconContainer: {
     justifyContent: "flex-start",
     flexDirection: "row",
@@ -135,9 +133,6 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
   },
   bodyText: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: "400",
     color: colors.grey2,
   },
   buttonActionContainer: {
