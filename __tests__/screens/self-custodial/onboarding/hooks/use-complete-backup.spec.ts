@@ -76,7 +76,11 @@ describe("useCompleteBackup", () => {
 
     await result.current({ method: "manual" })
 
-    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "manual")
+    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith(
+      "migration-uuid",
+      "manual",
+      undefined,
+    )
     expect(mockSetBackupCompleted).not.toHaveBeenCalled()
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.ChooseExperience)
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
@@ -150,7 +154,7 @@ describe("useCompleteBackup", () => {
 
     result.current({ method: "keychain", message: "All set" })
 
-    expect(mockSetBackupCompleted).toHaveBeenCalledWith("keychain")
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("keychain", undefined)
     expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
       reBackup: false,
@@ -207,7 +211,7 @@ describe("useCompleteBackup", () => {
 
     result.current({ method: "manual" })
 
-    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
     expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
       reBackup: true,
