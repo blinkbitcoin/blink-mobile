@@ -116,7 +116,7 @@ const useStyles = makeStyles(({ colors }) => ({
   textColumn: {
     flex: 1,
     flexDirection: "column",
-    alignItems: "flex-start",
+    alignItems: "stretch",
     justifyContent: "center",
   },
   leftIconContainer: {
