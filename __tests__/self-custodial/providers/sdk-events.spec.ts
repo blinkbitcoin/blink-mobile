@@ -2,6 +2,7 @@ import { SdkEvent_Tags as SdkEventTags } from "@breeztech/breez-sdk-spark-react-
 
 import {
   extractPaymentId,
+  paymentEventKey,
   REFRESH_EVENTS,
   PAYMENT_RECEIVED_EVENTS,
 } from "@app/self-custodial/providers/sdk-events"
@@ -79,6 +80,34 @@ describe("sdk-events", () => {
 
     it("returns null when inner is not an object", () => {
       expect(extractPaymentId({ tag: "Synced", inner: "string" })).toBeNull()
+    })
+  })
+
+  describe("paymentEventKey", () => {
+    it("keys the same payment id differently for Pending and Succeeded", () => {
+      // Settlement changes leaf state, so a Pending -> Succeeded transition
+      // must produce a distinct key or the bundle refresh never reschedules.
+      const pending = paymentEventKey({
+        tag: "PaymentPending",
+        inner: { payment: { id: "pay-123" } },
+      })
+      const succeeded = paymentEventKey({
+        tag: "PaymentSucceeded",
+        inner: { payment: { id: "pay-123" } },
+      })
+
+      expect(pending).toBe("PaymentPending:pay-123")
+      expect(succeeded).toBe("PaymentSucceeded:pay-123")
+      expect(pending).not.toBe(succeeded)
+    })
+
+    it("is stable for a duplicate delivery of the same event", () => {
+      const event = { tag: "PaymentSucceeded", inner: { payment: { id: "pay-1" } } }
+      expect(paymentEventKey(event)).toBe(paymentEventKey(event))
+    })
+
+    it("returns null when the event carries no payment", () => {
+      expect(paymentEventKey({ tag: "Synced" })).toBeNull()
     })
   })
 })
