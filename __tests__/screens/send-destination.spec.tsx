@@ -450,6 +450,19 @@ describe("SendBitcoinDestinationScreen", () => {
       input: "newuser",
       expectPhoneNotAllowed: false,
     },
+    {
+      // https://github.com/blinkbitcoin/blink-wip/issues/917 — the local part
+      // is a valid phone number for the detected country (SV in this suite),
+      // but user@domain input must be treated as a lightning address
+      name: "accepts lightning addresses whose local part is a valid phone number",
+      input: "70000000@bitzed.xyz",
+      expectPhoneNotAllowed: false,
+    },
+    {
+      name: "accepts lightning addresses with alphanumeric local parts",
+      input: "u66474248@rurbit.mooo.com",
+      expectPhoneNotAllowed: false,
+    },
   ])("$name", async ({ input, expectPhoneNotAllowed }) => {
     parseDestinationMock.mockResolvedValue({
       valid: true,
@@ -486,6 +499,162 @@ describe("SendBitcoinDestinationScreen", () => {
     expect(parseDestinationMock).toHaveBeenCalled()
 
     await flushEffects()
+  })
+
+  it("routes a tapped phone-number contact into the phone flow", async () => {
+    mockedDestinationData = {
+      ...mockedDestinationData,
+      me: {
+        ...mockedDestinationData.me,
+        contacts: [
+          {
+            id: "contact-id",
+            handle: "+50370000000",
+            username: "+50370000000",
+            alias: null,
+            transactionsCount: 1,
+          },
+        ],
+      },
+    }
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Lnurl,
+        lnurl: "lnurl",
+        isMerchant: false,
+        lnurlParams: createLnurlPayParams("+50370000000"),
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+
+    fireEvent.press(screen.getByText("+50370000000@blink.sv"))
+    await flushAsync()
+
+    // the phone contact is validated as its international phone number,
+    // not as handle@domain
+    expect(parseDestinationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ rawInput: "+50370000000" }),
+    )
+  })
+
+  it("treats a tapped lightning-address contact as a lightning address", async () => {
+    mockedDestinationData = {
+      ...mockedDestinationData,
+      me: {
+        ...mockedDestinationData.me,
+        contacts: [
+          {
+            id: "contact-id",
+            handle: "70000000@bitzed.xyz",
+            username: null,
+            alias: null,
+            transactionsCount: 1,
+          },
+        ],
+      },
+    }
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Lnurl,
+        lnurl: "lnurl",
+        isMerchant: false,
+        lnurlParams: createLnurlPayParams("70000000@bitzed.xyz"),
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+
+    fireEvent.press(screen.getByText("70000000@bitzed.xyz"))
+    await flushAsync()
+
+    // the phone-valid local part must not divert the contact into the phone flow
+    expect(parseDestinationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ rawInput: "70000000@bitzed.xyz" }),
+    )
+  })
+
+  it("validates a lightning address handed over via route params as a destination", async () => {
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Lnurl,
+        lnurl: "lnurl",
+        isMerchant: false,
+        lnurlParams: createLnurlPayParams("70000000@bitzed.xyz"),
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    const { rerender } = render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+    // let the phone input publish its detected country before the param arrives,
+    // mirroring a QR scan handoff on a fully mounted screen
+    await flushAsync()
+
+    rerender(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen
+          route={{
+            ...sendBitcoinDestination,
+            params: { payment: "70000000@bitzed.xyz", username: "" },
+          }}
+        />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+
+    expect(parseDestinationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ rawInput: "70000000@bitzed.xyz" }),
+    )
+  })
+
+  it("routes a phone number handed over via route params to the phone input", async () => {
+    const { rerender } = render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+
+    rerender(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen
+          route={{
+            ...sendBitcoinDestination,
+            params: { payment: "+50370000000", username: "" },
+          }}
+        />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+
+    expect(parseDestinationMock).not.toHaveBeenCalled()
+    // the phone input shows the national number; +503 lives in the country picker
+    expect(screen.getByLabelText("telephoneNumber").props.value).toBe("70000000")
   })
 
   it.each([
