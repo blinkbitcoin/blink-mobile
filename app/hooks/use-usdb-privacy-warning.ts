@@ -7,8 +7,8 @@ import {
 } from "@app/store/persistent-state/usdb-privacy-warning-acknowledged"
 
 type UsdbPrivacyWarningProps = {
-  /** Whether the caller is in a context that exposes the user to public USDB activity:
-   *  a self-custodial account with Dollar selected on Receive, or the transfer flow. */
+  /** Whether the caller is in a context that exposes the user to public USDB activity.
+   *  Callers own that judgement; the hook only decides whether it has been acknowledged. */
   enabled: boolean
 }
 

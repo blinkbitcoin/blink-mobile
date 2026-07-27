@@ -2381,3 +2381,64 @@ describe("Self-custodial percentage chip happy-path", () => {
     )
   })
 })
+
+describe("USDB privacy warning trigger", () => {
+  const selfCustodialActiveWallet = {
+    isSelfCustodial: true,
+    isReady: true,
+    needsBackendAuth: false,
+    wallets: [
+      {
+        id: "self-custodial-btc-id",
+        walletCurrency: WalletCurrency.Btc,
+        balance: { amount: 200000, currency: WalletCurrency.Btc },
+        transactions: [],
+      },
+      {
+        id: "self-custodial-usd-id",
+        walletCurrency: WalletCurrency.Usd,
+        balance: { amount: 50000, currency: WalletCurrency.Usd },
+        transactions: [],
+      },
+    ],
+    status: "Ready",
+    accountType: "SelfCustodial",
+  }
+
+  const buildMocks = () => createGraphQLMocks({ btcBalance: 200000, usdBalance: 50000 })
+
+  it("warns a self-custodial user entering the transfer flow", async () => {
+    mockUseActiveWallet.mockReturnValue(selfCustodialActiveWallet)
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: { minFromAmount: 1, minToAmount: null },
+      loading: false,
+      error: null,
+    })
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { findByText } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    expect(await findByText("Privacy warning")).toBeTruthy()
+  })
+
+  it("does not warn a custodial user entering the transfer flow", async () => {
+    mockUseActiveWallet.mockReturnValue(defaultActiveWallet)
+
+    const Wrapper = createTestWrapper(buildMocks())
+    const { queryByText, getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    expect(queryByText("Privacy warning")).toBeNull()
+  })
+})
