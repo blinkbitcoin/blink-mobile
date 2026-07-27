@@ -67,6 +67,11 @@ jest.mock("@app/i18n/i18n-react", () => ({
           overFee: string
         }) =>
           `Deposit fee: ${fee} SAT for amounts under ${threshold} SAT or ${overFee} SAT for deposits over ${threshold} SAT`,
+        depositFeeTiers: ({ tiers }: { tiers: string }) => `Deposit fees: ${tiers}`,
+        depositFeeTierUpTo: ({ fee, max }: { fee: string; max: string }) =>
+          `${fee} SAT up to ${max} SAT`,
+        depositFeeTierAbove: ({ fee, min }: { fee: string; min: string }) =>
+          `${fee} SAT above ${min} SAT`,
         autoConvertMinAmount: ({
           minSats,
           minFiat,
@@ -173,7 +178,14 @@ describe("ContextualInfo", () => {
           type={Invoice.OnChain}
           canSetExpirationTime={false}
           feesInformation={{
-            deposit: { minBankFee: "2500", minBankFeeThreshold: "1000000", ratio: "50" },
+            deposit: {
+              minBankFee: "2500",
+              minBankFeeThreshold: "1000000",
+              tiers: [
+                { maxAmount: "1000000", amount: "2500" },
+                { maxAmount: null, amount: "5000" },
+              ],
+            },
           }}
         />,
       )
@@ -185,14 +197,21 @@ describe("ContextualInfo", () => {
       ).toBeTruthy()
     })
 
-    it("renders a zero over-threshold fee when the ratio is zero", () => {
+    it("renders a zero over-threshold fee when the unbounded tier is free", () => {
       const { getByText } = render(
         <ContextualInfo
           {...defaultProps}
           type={Invoice.OnChain}
           canSetExpirationTime={false}
           feesInformation={{
-            deposit: { minBankFee: "2500", minBankFeeThreshold: "1000000", ratio: "0" },
+            deposit: {
+              minBankFee: "2500",
+              minBankFeeThreshold: "1000000",
+              tiers: [
+                { maxAmount: "1000000", amount: "2500" },
+                { maxAmount: null, amount: "0" },
+              ],
+            },
           }}
         />,
       )
@@ -204,6 +223,33 @@ describe("ContextualInfo", () => {
       ).toBeTruthy()
     })
 
+    it("names every tier when the API returns more than two", () => {
+      const { getByText } = render(
+        <ContextualInfo
+          {...defaultProps}
+          type={Invoice.OnChain}
+          canSetExpirationTime={false}
+          feesInformation={{
+            deposit: {
+              minBankFee: "2500",
+              minBankFeeThreshold: "1000000",
+              tiers: [
+                { maxAmount: "1000000", amount: "2500" },
+                { maxAmount: "5000000", amount: "4000" },
+                { maxAmount: null, amount: "5000" },
+              ],
+            },
+          }}
+        />,
+      )
+
+      expect(
+        getByText(
+          "Deposit fees: 2,500 SAT up to 1M SAT, 4,000 SAT up to 5M SAT, 5,000 SAT above 5M SAT",
+        ),
+      ).toBeTruthy()
+    })
+
     it("renders warning icon", () => {
       const { getByTestId } = render(
         <ContextualInfo
@@ -211,7 +257,14 @@ describe("ContextualInfo", () => {
           type={Invoice.OnChain}
           canSetExpirationTime={false}
           feesInformation={{
-            deposit: { minBankFee: "2500", minBankFeeThreshold: "1000000", ratio: "50" },
+            deposit: {
+              minBankFee: "2500",
+              minBankFeeThreshold: "1000000",
+              tiers: [
+                { maxAmount: "1000000", amount: "2500" },
+                { maxAmount: null, amount: "5000" },
+              ],
+            },
           }}
         />,
       )

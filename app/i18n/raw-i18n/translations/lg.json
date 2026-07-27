@@ -2163,6 +2163,9 @@
     "lightningInvoice": "Invoisi ya lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ssente z'okuteekawo: {fee} SAT ku muwendo gw'okuwandiika {threshold} SAT oba {overFee} SAT ku biteekawo ebisukka {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Omuwendo ogutasukka mu {minSats: number} sats / {minFiat: string} tegusobola kukyusibwa mu Doola nga byekka. Ojja kufuna Bitcoin.",
     "autoConvertFailed": "Okusasula kutuuse naye okukyusa kulemye.",
     "pleaseWaitForConversion": "Lindako okutuusa ng'okukyusa kuwedde"
@@ -2546,6 +2549,7 @@
     "lightningTransactions": "Emirimu gya Lightning",
     "onchainBelowThreshold": "Onchain wansi wa {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain waggulu wa {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Ekisale ky'okuweereza",
     "noFee": "tewali kisale",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} ekisale ky'okutambuza",

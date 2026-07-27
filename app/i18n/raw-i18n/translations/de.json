@@ -2163,6 +2163,9 @@
         "lightningInvoice": "Lightning-Rechnung",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Einzahlungsgebühr: {fee} SAT für Beträge unter {threshold} SAT oder {overFee} SAT für Einzahlungen über {threshold} SAT",
+        "depositFeeTiers": "Deposit fees: {tiers: string}",
+        "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+        "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
         "autoConvertMinAmount": "Beträge unter {minSats: number} Sats / {minFiat: string} können nicht automatisch in Dollar umgewandelt werden. Du erhältst stattdessen Bitcoin.",
         "autoConvertFailed": "Zahlung empfangen, aber die Umwandlung ist fehlgeschlagen.",
         "pleaseWaitForConversion": "Bitte warte, bis die Umwandlung abgeschlossen ist"
@@ -2546,6 +2549,7 @@
         "lightningTransactions": "Lightning-Transaktionen",
         "onchainBelowThreshold": "Onchain unter {threshold: string} SAT",
         "onchainAboveThreshold": "Onchain über {threshold: string} SAT",
+        "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "Übertragungsgebühr",
         "noFee": "keine Gebühr",
         "lightningSendFee": "{fee: string} + ~{routingFee: string} Routing-Gebühr",

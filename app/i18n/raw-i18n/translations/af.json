@@ -2163,6 +2163,9 @@
     "lightningInvoice": "Lightning-faktuur",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Deposito-fooi: {fee} SAT vir bedrae onder {threshold} SAT of {overFee} SAT vir deposito's oor {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Bedrae onder {minSats: number} sats / {minFiat: string} kan nie outomaties na Dollar omgeskakel word nie. Jy sal eerder Bitcoin ontvang.",
     "autoConvertFailed": "Betaling ontvang maar die omskakeling het misluk.",
     "pleaseWaitForConversion": "Wag asseblief totdat die omskakeling voltooi is"
@@ -2546,6 +2549,7 @@
     "lightningTransactions": "Lightning-transaksies",
     "onchainBelowThreshold": "Onchain onder {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain bo {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Oordragfooi",
     "noFee": "geen fooi",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} roeteringsfooi",

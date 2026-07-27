@@ -3715,7 +3715,7 @@ export type LnUsdInvoiceCreateMutation = { readonly __typename: 'Mutation', read
 export type PaymentRequestQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PaymentRequestQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly network: Network, readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly ratio: string } } } | null, readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
+export type PaymentRequestQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly network: Network, readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly tiers: ReadonlyArray<{ readonly __typename: 'DepositFeeTier', readonly maxAmount?: string | null, readonly amount: string }> } } } | null, readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> } } | null };
 
 export type MyLnUpdatesSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
@@ -3927,7 +3927,7 @@ export type AccountUpdateDisplayCurrencyMutation = { readonly __typename: 'Mutat
 export type FeeRatesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FeeRatesQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly ratio: string } } } | null };
+export type FeeRatesQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly tiers: ReadonlyArray<{ readonly __typename: 'DepositFeeTier', readonly maxAmount?: string | null, readonly amount: string }> } } } | null };
 
 export type LanguageQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -7669,7 +7669,10 @@ export const PaymentRequestDocument = gql`
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+        }
       }
     }
   }
@@ -9080,7 +9083,10 @@ export const FeeRatesDocument = gql`
       deposit {
         minBankFee
         minBankFeeThreshold
-        ratio
+        tiers {
+          maxAmount
+          amount
+        }
       }
     }
   }

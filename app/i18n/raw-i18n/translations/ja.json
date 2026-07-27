@@ -2163,6 +2163,9 @@
         "lightningInvoice": "Lightningインボイス",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "入金手数料：{threshold} SAT未満は{fee} SAT、{threshold} SAT以上の入金は{overFee} SAT",
+        "depositFeeTiers": "Deposit fees: {tiers: string}",
+        "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+        "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
         "autoConvertMinAmount": "{minSats: number} sats / {minFiat: string}未満の金額はドルに自動変換できません。代わりにビットコインを受け取ります。",
         "autoConvertFailed": "支払いは受け取りましたが、変換に失敗しました。",
         "pleaseWaitForConversion": "変換が完了するまでお待ちください"
@@ -2546,6 +2549,7 @@
         "lightningTransactions": "ライトニング取引",
         "onchainBelowThreshold": "オンチェーン {threshold: string} SAT未満",
         "onchainAboveThreshold": "オンチェーン {threshold: string} SAT超",
+        "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "振替手数料",
         "noFee": "手数料なし",
         "lightningSendFee": "{fee: string} + ~{routingFee: string} ルーティング手数料",

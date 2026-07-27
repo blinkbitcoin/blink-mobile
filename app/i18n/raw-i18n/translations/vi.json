@@ -2163,6 +2163,9 @@
     "lightningInvoice": "Hóa đơn lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Phí nạp tiền: {fee} SAT cho số tiền dưới {threshold} SAT hoặc {overFee} SAT cho các khoản nạp trên {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Số tiền dưới {minSats: number} sats / {minFiat: string} không thể chuyển đổi tự động sang Đô la. Bạn sẽ nhận Bitcoin thay thế.",
     "autoConvertFailed": "Đã nhận thanh toán nhưng chuyển đổi thất bại.",
     "pleaseWaitForConversion": "Vui lòng đợi cho đến khi quá trình chuyển đổi hoàn tất"
@@ -2546,6 +2549,7 @@
     "lightningTransactions": "Giao dịch Lightning",
     "onchainBelowThreshold": "Onchain dưới {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain trên {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Phí chuyển khoản",
     "noFee": "miễn phí",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} phí định tuyến",

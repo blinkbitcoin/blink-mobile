@@ -2163,6 +2163,9 @@
     "lightningInvoice": "Factură lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Taxă de depunere: {fee} SAT pentru sume sub {threshold} SAT sau {overFee} SAT pentru depuneri peste {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Sumele sub {minSats: number} sats / {minFiat: string} nu pot fi convertite automat în Dolari. Veți primi Bitcoin în schimb.",
     "autoConvertFailed": "Plata primită, dar conversia a eșuat.",
     "pleaseWaitForConversion": "Vă rugăm să așteptați până când conversia este finalizată"
@@ -2546,6 +2549,7 @@
     "lightningTransactions": "Tranzacții Lightning",
     "onchainBelowThreshold": "Onchain sub {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain peste {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Taxă de transfer",
     "noFee": "fără taxă",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} taxă de rutare",

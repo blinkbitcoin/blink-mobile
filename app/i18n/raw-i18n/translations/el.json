@@ -2163,6 +2163,9 @@
     "lightningInvoice": "Τιμολόγιο lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Χρέωση κατάθεσης: {fee} SAT για ποσά κάτω από {threshold} SAT ή {overFee} SAT για καταθέσεις πάνω από {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Ποσά κάτω από {minSats: number} sats / {minFiat: string} δεν μπορούν να μετατραπούν αυτόματα σε Δολάρια. Θα λάβετε Bitcoin.",
     "autoConvertFailed": "Η πληρωμή ελήφθη αλλά η μετατροπή απέτυχε.",
     "pleaseWaitForConversion": "Παρακαλούμε περιμένετε μέχρι να ολοκληρωθεί η μετατροπή"
@@ -2546,6 +2549,7 @@
     "lightningTransactions": "Συναλλαγές Lightning",
     "onchainBelowThreshold": "Onchain κάτω από {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain πάνω από {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Τέλος μεταφοράς",
     "noFee": "χωρίς τέλη",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} τέλος δρομολόγησης",
