@@ -192,7 +192,9 @@ describe("ways to get paid rows", () => {
       expect(lastRowProps().loading).toBe(true)
     })
 
-    it("does not gate the rows that carry no currency", () => {
+    // A guard against the gate spreading: the printable QR link has no currency in it,
+    // so it has no reason to wait for one.
+    it("leaves the printable QR row tappable meanwhile", () => {
       mockUseEffectiveDisplayCurrency.mockReturnValue({
         displayCurrency: "USD",
         loading: true,

@@ -18,7 +18,10 @@ jest.mock("@app/graphql/generated", () => ({
   useLanguageQuery: (opts: unknown) => mockUseLanguageQuery(opts),
   useUserUpdateLanguageMutation: () => [jest.fn(), { loading: false }],
   useExportCsvSettingLazyQuery: () => [jest.fn(), { loading: false }],
-  // AccountPOS reads the display currency to build its terminal link.
+  // AccountPOS reads the display currency to build its terminal link. That query is
+  // the one exception to the skip rule this suite guards: use-effective-display-currency
+  // keeps it unauthed-safe with fetchPolicy "cache-only" instead of skip, so it never
+  // reaches the network for a logged-out user either.
   useDisplayCurrencyQuery: () => ({ data: undefined, loading: false }),
   useAccountUpdateDisplayCurrencyMutation: () => [jest.fn(), { loading: false }],
 }))
