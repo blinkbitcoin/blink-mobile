@@ -2601,6 +2601,11 @@ const en: BaseTranslation = {
   DollarBalanceRestriction: {
     modalTitle: "Dollar Balance is not available in your region",
   },
+  UsdbPrivacyWarning: {
+    title: "Privacy warning",
+    body: "Bitcoin balances and transactions on Spark are private by nature. Unfortunately, this does not apply to non-custodial Dollar transfers and balances relying on the USDB stablecoin. Anyone who knows your LN address can look up your Dollar balance and history.",
+    acknowledge: "Acknowledged",
+  },
   ConvertDollarToBitcoinModal: {
     title: "Dollar Balance is not available in your region",
     body: "Transfer from Dollar Balance to Bitcoin Balance",

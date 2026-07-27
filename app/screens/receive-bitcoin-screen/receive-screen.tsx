@@ -15,10 +15,12 @@ import { ReceiveAmountRow } from "@app/components/receive-amount-row"
 import { Screen } from "@app/components/screen"
 import { SetLightningAddressModal } from "@app/components/set-lightning-address-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
+import { UsdbPrivacyWarningModal } from "@app/components/usdb-privacy-warning-modal"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useNotificationPermission, usePriceConversion } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
+import { useUsdbPrivacyWarning } from "@app/hooks/use-usdb-privacy-warning"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
@@ -207,6 +209,12 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
     : !isDollarBalanceRestricted
 
+  /** Keyed off the selected currency rather than the toggle press, so the warning also
+   *  reaches users whose receive screen opens in Dollar mode by default. */
+  const usdbPrivacyWarning = useUsdbPrivacyWarning({
+    enabled: isSelfCustodial && amountRowCurrency === WalletCurrency.Usd,
+  })
+
   return (
     <Screen
       preset="scroll"
@@ -379,6 +387,11 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
         isVisible={isTrialModalVisible}
         closeModal={closeTrialModal}
         beforeSubmit={markReopenUpgradeModal}
+      />
+
+      <UsdbPrivacyWarningModal
+        isVisible={usdbPrivacyWarning.isVisible}
+        onAcknowledge={usdbPrivacyWarning.acknowledge}
       />
     </Screen>
   )

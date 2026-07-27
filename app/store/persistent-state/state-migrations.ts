@@ -111,6 +111,7 @@ type PersistentState_14 = {
   selfCustodialLanguageByAccountId?: Record<string, string>
   themeByAccountId?: Record<string, "system" | "light" | "dark">
   defaultAccountModalShownByAccountId?: Record<string, boolean>
+  usdbPrivacyWarningAcknowledgedByAccountId?: Record<string, boolean>
   stablesatsRestrictedCustodial?: boolean
   stableTokenTransferBlocked?: boolean
   stablesatsTransferBlocked?: boolean

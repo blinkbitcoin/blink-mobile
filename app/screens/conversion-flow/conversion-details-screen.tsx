@@ -52,6 +52,8 @@ import {
 } from "@app/components/transfer-amount-input"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useUsdbPrivacyWarning } from "@app/hooks/use-usdb-privacy-warning"
+import { UsdbPrivacyWarningModal } from "@app/components/usdb-privacy-warning-modal"
 import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
 import { convertDirectionFromCurrency } from "@app/types/payment"
 import { AccountType } from "@app/types/wallet"
@@ -128,6 +130,10 @@ const ConversionDetailsScreenContent = ({
     wallets: activeWallets,
   } = useActiveWallet()
   const isSelfCustodialBooting = accountType === AccountType.SelfCustodial && !isReady
+
+  /** Both transfer directions move value across the dollar balance, so entering the flow at
+   *  all is what warrants the warning — no need to wait for a direction to be chosen. */
+  const usdbPrivacyWarning = useUsdbPrivacyWarning({ enabled: isSelfCustodial })
 
   const { data } = useConversionScreenQuery({
     fetchPolicy: "cache-and-network",
@@ -846,6 +852,11 @@ const ConversionDetailsScreenContent = ({
           testID="next-button"
         />
       </View>
+
+      <UsdbPrivacyWarningModal
+        isVisible={usdbPrivacyWarning.isVisible}
+        onAcknowledge={usdbPrivacyWarning.acknowledge}
+      />
     </Screen>
   )
 }

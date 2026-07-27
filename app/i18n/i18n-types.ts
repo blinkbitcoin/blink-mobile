@@ -8160,6 +8160,20 @@ type RootTranslation = {
 		 */
 		modalTitle: string
 	}
+	UsdbPrivacyWarning: {
+		/**
+		 * P​r​i​v​a​c​y​ ​w​a​r​n​i​n​g
+		 */
+		title: string
+		/**
+		 * B​i​t​c​o​i​n​ ​b​a​l​a​n​c​e​s​ ​a​n​d​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​o​n​ ​S​p​a​r​k​ ​a​r​e​ ​p​r​i​v​a​t​e​ ​b​y​ ​n​a​t​u​r​e​.​ ​U​n​f​o​r​t​u​n​a​t​e​l​y​,​ ​t​h​i​s​ ​d​o​e​s​ ​n​o​t​ ​a​p​p​l​y​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​D​o​l​l​a​r​ ​t​r​a​n​s​f​e​r​s​ ​a​n​d​ ​b​a​l​a​n​c​e​s​ ​r​e​l​y​i​n​g​ ​o​n​ ​t​h​e​ ​U​S​D​B​ ​s​t​a​b​l​e​c​o​i​n​.​ ​A​n​y​o​n​e​ ​w​h​o​ ​k​n​o​w​s​ ​y​o​u​r​ ​L​N​ ​a​d​d​r​e​s​s​ ​c​a​n​ ​l​o​o​k​ ​u​p​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​a​n​d​ ​h​i​s​t​o​r​y​.
+		 */
+		body: string
+		/**
+		 * A​c​k​n​o​w​l​e​d​g​e​d
+		 */
+		acknowledge: string
+	}
 	ConvertDollarToBitcoinModal: {
 		/**
 		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
@@ -21065,6 +21079,20 @@ export type TranslationFunctions = {
 		 * Dollar Balance is not available in your region
 		 */
 		modalTitle: () => LocalizedString
+	}
+	UsdbPrivacyWarning: {
+		/**
+		 * Privacy warning
+		 */
+		title: () => LocalizedString
+		/**
+		 * Bitcoin balances and transactions on Spark are private by nature. Unfortunately, this does not apply to non-custodial Dollar transfers and balances relying on the USDB stablecoin. Anyone who knows your LN address can look up your Dollar balance and history.
+		 */
+		body: () => LocalizedString
+		/**
+		 * Acknowledged
+		 */
+		acknowledge: () => LocalizedString
 	}
 	ConvertDollarToBitcoinModal: {
 		/**
