@@ -423,7 +423,7 @@
                             "Sim. O Bitcoin geralmente é hackeado nos feriados, quando os bancos tradicionais estão fechados."
                         ],
                         "feedback": [
-                            "Isso está correto. A rede bitcoin nunca foi comprometida. No entanto, é importante fazer você usar uma carteira digital segura (como Galoy!) para manter seus bitcoins pessoais seguros o tempo todo.",
+                            "Isso está correto. A rede bitcoin nunca foi comprometida. No entanto, é importante fazer você usar uma carteira digital segura para manter seus bitcoins pessoais seguros o tempo todo.",
                             "Errado. Por favor, tente novamente.",
                             "Não bobo, você sabe que não é a resposta correta."
                         ],
@@ -2049,7 +2049,7 @@
         "login": "Entrar",
         "loginOrRestore": "Entrar / Restaurar",
         "logBackInWith": "Faça login novamente com",
-        "headline": "Carteira desenvolvida pela Galoy",
+        "headline": "Carteira desenvolvida pela Blink",
         "startTrialAccount": "Comece com uma conta teste",
         "startWithTrialAccount": "Comece com uma conta teste",
         "registerPhoneAccount": "Registe um número de telefone",
