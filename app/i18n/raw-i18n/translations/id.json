@@ -2003,7 +2003,7 @@
     "satAccumulated": "Sats terkumpul",
     "satsEarned": "{formattedNumber | sats} diperoleh",
     "sectionsCompleted": "Anda telah menyelesaikan",
-    "title": "Dapatkan",
+    "title": "Belajar",
     "unlockQuestion": "Untuk membuka, jawab pertanyaannya:",
     "youEarned": "Anda Mendapatkan",
     "registerTitle": "Perlu memperbaharui akun Anda",
@@ -3836,7 +3836,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Belajar",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

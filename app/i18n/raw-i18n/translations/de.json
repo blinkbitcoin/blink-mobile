@@ -2003,7 +2003,7 @@
         "satAccumulated": "Sats gesammelt",
         "satsEarned": "{formattedNumber | sats} earned",
         "sectionsCompleted": "Du bist fertig",
-        "title": "Verdienen",
+        "title": "Lernen",
         "unlockQuestion": "Beantworte folgende Frage zum Entsperren:",
         "youEarned": "Du hast",
         "registerTitle": "Account Upgrade benötigt",
@@ -3836,7 +3836,7 @@
         "noAccountTitle": "Custodial-Konto erforderlich",
         "noAccountDescription": "{featureName} benötigt ein Blink custodial-Konto.",
         "featureCircles": "Circles",
-        "featureEarn": "Verdienen",
+        "featureEarn": "Lernen",
         "featureCard": "Karte"
     },
     "WalletCreationScreen": {

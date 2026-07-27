@@ -2003,7 +2003,7 @@
     "satAccumulated": "การรวบรวม sats เสร็จสิ้น",
     "satsEarned": "ได้รับ {formattedNumber | sats}",
     "sectionsCompleted": "คุณทำแบบทดสอบเสร็จสิ้น",
-    "title": "รับเงิน",
+    "title": "เรียนรู้",
     "unlockQuestion": "ตอบคำถามเพื่อปลดล็อค:",
     "youEarned": "คุณได้รับ",
     "registerTitle": "Need to upgrade your account",
@@ -3836,7 +3836,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "เรียนรู้",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

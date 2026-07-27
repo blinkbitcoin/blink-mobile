@@ -6305,7 +6305,7 @@ type RootTranslation = {
 		 */
 		sectionsCompleted: string
 		/**
-		 * E​a​r​n
+		 * L​e​a​r​n
 		 */
 		title: string
 		/**
@@ -12952,7 +12952,7 @@ type RootTranslation = {
 		 */
 		featureCircles: string
 		/**
-		 * E​a​r​n
+		 * L​e​a​r​n
 		 */
 		featureEarn: string
 		/**
@@ -19286,7 +19286,7 @@ export type TranslationFunctions = {
 		 */
 		sectionsCompleted: () => LocalizedString
 		/**
-		 * Earn
+		 * Learn
 		 */
 		title: () => LocalizedString
 		/**
@@ -25775,7 +25775,7 @@ export type TranslationFunctions = {
 		 */
 		featureCircles: () => LocalizedString
 		/**
-		 * Earn
+		 * Learn
 		 */
 		featureEarn: () => LocalizedString
 		/**

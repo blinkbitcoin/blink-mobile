@@ -2003,7 +2003,7 @@
     "satAccumulated": "Kuskanchik sats",
     "satsEarned": "{formattedNumber | sats} kuskan.",
     "sectionsCompleted": "Ima sumaq kani",
-    "title": "Kuskan",
+    "title": "Yachay",
     "unlockQuestion": "Qhipaqaqmi, chaymantam yanapaqmi, chaymantam riyqanichu:",
     "youEarned": "Kuskan",
     "registerTitle": "Need to upgrade your account",
@@ -3836,7 +3836,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Yachay",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

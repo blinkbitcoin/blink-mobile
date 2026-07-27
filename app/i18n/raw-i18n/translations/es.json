@@ -2003,7 +2003,7 @@
         "satAccumulated": "Satoshis acumulados",
         "satsEarned": "{formattedNumber | sats} ganados",
         "sectionsCompleted": "Has completado",
-        "title": "Ganar",
+        "title": "Aprender",
         "unlockQuestion": "Para desbloquear, responda la pregunta:",
         "youEarned": "Has Ganado",
         "registerTitle": "Necesitas actualizar tu cuenta",
@@ -3836,7 +3836,7 @@
         "noAccountTitle": "Cuenta custodial requerida",
         "noAccountDescription": "{featureName} requiere una cuenta custodial de Blink.",
         "featureCircles": "Círculos",
-        "featureEarn": "Aprende",
+        "featureEarn": "Aprender",
         "featureCard": "Tarjeta"
     },
     "WalletCreationScreen": {
