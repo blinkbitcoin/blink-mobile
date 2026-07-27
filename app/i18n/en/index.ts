@@ -2401,7 +2401,7 @@ const en: BaseTranslation = {
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
     createAddress: "Create address",
-    donationButton: "Donation Button",
+    donationButton: "Donate Button",
     btcpayServer: "BTCPay Server",
     woocommerce: "WooCommerce",
     activated: "Activated",

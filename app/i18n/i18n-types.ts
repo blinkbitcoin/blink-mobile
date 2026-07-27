@@ -7528,7 +7528,7 @@ type RootTranslation = {
 		 */
 		createAddress: string
 		/**
-		 * D​o​n​a​t​i​o​n​ ​B​u​t​t​o​n
+		 * D​o​n​a​t​e​ ​B​u​t​t​o​n
 		 */
 		donationButton: string
 		/**
@@ -20444,7 +20444,7 @@ export type TranslationFunctions = {
 		 */
 		createAddress: () => LocalizedString
 		/**
-		 * Donation Button
+		 * Donate Button
 		 */
 		donationButton: () => LocalizedString
 		/**

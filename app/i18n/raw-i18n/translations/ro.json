@@ -2319,7 +2319,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Creează adresă",
-    "donationButton": "Buton de donație",
+    "donationButton": "Buton de donare",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Cod QR static imprimabil",

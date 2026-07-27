@@ -2319,7 +2319,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Направи адресу",
-    "donationButton": "Дугме за донације",
+    "donationButton": "Дугме за донирање",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "QR код за штампање",

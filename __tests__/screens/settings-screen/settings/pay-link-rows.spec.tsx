@@ -44,7 +44,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       SettingsScreen: {
         pos: () => "Point of Sale",
         staticQr: () => "Printable static QR",
-        donationButton: () => "Donation Button",
+        donationButton: () => "Donate Button",
         btcpayServer: () => "BTCPay Server",
         woocommerce: () => "Woocommerce",
       },

@@ -2319,7 +2319,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Skep adres",
-    "donationButton": "Skenkingsknoppie",
+    "donationButton": "Skenk-knoppie",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Drukbare statiese QR",

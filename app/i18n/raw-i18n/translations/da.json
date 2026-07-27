@@ -2319,7 +2319,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Opret adresse",
-    "donationButton": "Donationsknap",
+    "donationButton": "Donér-knap",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Printbar statisk QR",
