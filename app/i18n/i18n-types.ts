@@ -7285,6 +7285,16 @@ type RootTranslation = {
 		 */
 		phoneNotAllowed: string
 	}
+	MerchantSelectionScreen: {
+		/**
+		 * C​h​o​o​s​e​ ​p​a​y​m​e​n​t​ ​o​p​t​i​o​n
+		 */
+		title: string
+		/**
+		 * N​o​ ​p​a​y​m​e​n​t​ ​o​p​t​i​o​n​s​ ​a​r​e​ ​a​v​a​i​l​a​b​l​e​.
+		 */
+		empty: string
+	}
 	SendBitcoinScreen: {
 		/**
 		 * T​r​a​n​s​a​c​t​i​o​n​ ​s​h​o​u​l​d​ ​b​e​ ​s​u​b​m​i​t​t​e​d​ ​t​o​ ​m​e​m​p​o​o​l
@@ -20238,6 +20248,16 @@ export type TranslationFunctions = {
 		 * This field does not accept phone numbers
 		 */
 		phoneNotAllowed: () => LocalizedString
+	}
+	MerchantSelectionScreen: {
+		/**
+		 * Choose payment option
+		 */
+		title: () => LocalizedString
+		/**
+		 * No payment options are available.
+		 */
+		empty: () => LocalizedString
 	}
 	SendBitcoinScreen: {
 		/**

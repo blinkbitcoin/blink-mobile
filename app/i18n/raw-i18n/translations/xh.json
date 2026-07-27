@@ -2264,6 +2264,10 @@
     "invalidPhoneNumber": "Faka inombolo yomnxeba esebenzayo",
     "phoneNotAllowed": "Eli candelo alamkeli iinombolo zomnxeba"
   },
+  "MerchantSelectionScreen": {
+    "title": "Khetha indlela yokuhlawula",
+    "empty": "Akukho ndlela zokuhlawula zikhoyo."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Intlawulo kufuneka ithunyelwe kwi-mempool",
     "amount": "Isixa",

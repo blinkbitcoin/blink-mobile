@@ -2264,6 +2264,10 @@
     "invalidPhoneNumber": "Geçerli bir cep telefonu numarası girin",
     "phoneNotAllowed": "Bu alan telefon numarası kabul etmez"
   },
+  "MerchantSelectionScreen": {
+    "title": "Ödeme seçeneği seçin",
+    "empty": "Kullanılabilir ödeme seçeneği yok."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "İşlem mempool'a gönderilmelidir",
     "amount": "Miktar",

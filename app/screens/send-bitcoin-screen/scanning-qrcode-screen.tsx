@@ -37,7 +37,10 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
-import { DestinationDirection } from "./payment-destination/index.types"
+import {
+  DestinationDirection,
+  isMerchantChoiceDestination,
+} from "./payment-destination/index.types"
 import { resolveDestination } from "./payment-destination/resolve-destination"
 
 const { width: screenWidth } = Dimensions.get("window")
@@ -164,6 +167,13 @@ export const ScanningQRCodeScreen: React.FC = () => {
         logParseDestinationResult(destination)
 
         if (destination.valid) {
+          if (isMerchantChoiceDestination(destination)) {
+            navigation.replace("merchantSelection", {
+              merchants: destination.validDestination.merchants,
+            })
+            return
+          }
+
           if (destination.destinationDirection === DestinationDirection.Send) {
             navigation.replace("sendBitcoinDetails", {
               paymentDestination: destination,

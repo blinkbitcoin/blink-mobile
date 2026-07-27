@@ -2264,6 +2264,10 @@
     "invalidPhoneNumber": "Masukkan nomor ponsel yang valid",
     "phoneNotAllowed": "Kolom ini tidak menerima nomor telepon"
   },
+  "MerchantSelectionScreen": {
+    "title": "Pilih opsi pembayaran",
+    "empty": "Tidak ada opsi pembayaran yang tersedia."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi akan dikirim ke mempool",
     "amount": "Jumlah",
