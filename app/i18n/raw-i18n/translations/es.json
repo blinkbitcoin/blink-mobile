@@ -2319,7 +2319,7 @@
     },
     "SettingsScreen": {
         "createAddress": "Crear dirección",
-        "donationButton": "Botón de donar",
+        "donationButton": "Botón Donar",
         "btcpayServer": "BTCPay Server",
         "woocommerce": "WooCommerce",
         "staticQr": "QR estático imprimible",
