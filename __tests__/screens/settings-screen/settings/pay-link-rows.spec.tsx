@@ -34,6 +34,11 @@ jest.mock("@app/graphql/generated", () => ({
   useSettingsScreenQuery: () => mockSettingsScreenQuery(),
 }))
 
+const mockUseEffectiveDisplayCurrency = jest.fn()
+jest.mock("@app/hooks/use-effective-display-currency", () => ({
+  useEffectiveDisplayCurrency: () => mockUseEffectiveDisplayCurrency(),
+}))
+
 jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({ theme: { colors: { primary: "#fc5805", black: "#000" } } }),
 }))
@@ -95,6 +100,10 @@ describe("ways to get paid rows", () => {
     jest.spyOn(Linking, "openURL").mockResolvedValue(true)
     mockSettingsScreenQuery.mockReturnValue({ data: undefined, loading: false })
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null })
+    mockUseEffectiveDisplayCurrency.mockReturnValue({
+      displayCurrency: "EUR",
+      loading: false,
+    })
   })
 
   // The POS and its printable QR are served by the terminal for custodial accounts
@@ -105,7 +114,9 @@ describe("ways to get paid rows", () => {
     it("POS", () => {
       render(<AccountPOS />)
       pressRow()
-      expect(Linking.openURL).toHaveBeenCalledWith("https://terminal.blinkbtc.com/bob")
+      expect(Linking.openURL).toHaveBeenCalledWith(
+        "https://terminal.blinkbtc.com/bob?display=EUR",
+      )
     })
 
     it("printable QR", () => {
@@ -134,7 +145,9 @@ describe("ways to get paid rows", () => {
     it("POS", () => {
       render(<AccountPOS />)
       pressRow()
-      expect(Linking.openURL).toHaveBeenCalledWith("https://terminal.blinkbtc.com/alice")
+      expect(Linking.openURL).toHaveBeenCalledWith(
+        "https://terminal.blinkbtc.com/alice?display=EUR",
+      )
     })
 
     it("printable QR", () => {
@@ -169,6 +182,37 @@ describe("ways to get paid rows", () => {
       )
 
       expect(mockSettingsRow).not.toHaveBeenCalled()
+    })
+  })
+
+  // The terminal defaults to USD, so the POS link carries the display currency the
+  // merchant already picked in the app. Until it is known the row stays in its
+  // loading state rather than opening a link built from the USD fallback.
+  describe("the POS link waits for the display currency", () => {
+    beforeEach(asCustodial)
+
+    it("keeps the row loading while the currency is resolving", () => {
+      mockUseEffectiveDisplayCurrency.mockReturnValue({
+        displayCurrency: "USD",
+        loading: true,
+      })
+
+      render(<AccountPOS />)
+
+      expect(lastRowProps().loading).toBe(true)
+    })
+
+    // A guard against the gate spreading: the printable QR link has no currency in it,
+    // so it has no reason to wait for one.
+    it("leaves the printable QR row tappable meanwhile", () => {
+      mockUseEffectiveDisplayCurrency.mockReturnValue({
+        displayCurrency: "USD",
+        loading: true,
+      })
+
+      render(<AccountStaticQR />)
+
+      expect(lastRowProps().loading).toBe(false)
     })
   })
 
