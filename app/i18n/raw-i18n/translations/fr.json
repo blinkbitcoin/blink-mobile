@@ -434,222 +434,222 @@
                 }
             },
             "TheOriginsOfMoney": {
-                "title": "The Origins of Money",
+                "title": "Les origines de la monnaie",
                 "questions": {
                     "originsOfMoney": {
                         "answers": [
-                            "To store and transfer wealth",
-                            "To serve as a form of entertainment",
-                            "To act as a status symbol"
+                            "Conserver et transférer de la richesse",
+                            "Servir de divertissement",
+                            "Servir de symbole de statut social"
                         ],
                         "feedback": [
-                            "Congratulations! You hit the nail on the head. Collectibles have long been used as a medium for storing and transferring wealth, much like how Bitcoin is used today as a decentralized digital currency",
-                            "Sorry, but collectibles aren't just for show - they have a deeper purpose",
-                            "While collectibles may serve as a status symbol for some, there's more to it than just showing off."
+                            "Bravo, vous avez tapé dans le mille ! Les objets de collection ont longtemps servi à conserver et transférer de la richesse, un peu comme le Bitcoin est utilisé aujourd'hui en tant que monnaie numérique décentralisée.",
+                            "Dommage, les objets de collection ne servent pas juste à impressionner : ils avaient un rôle plus profond.",
+                            "Les objets de collection ont pu servir de symbole de statut pour certains, mais leur rôle allait bien au-delà de la simple ostentation."
                         ],
-                        "question": "What is the primary and ultimate evolutionary function of collectibles",
-                        "text": "The earliest human societies engaged in trade through barter, but this method had several limitations. One issue was the \"double coincidence of wants\" problem, where two people needed to desire the same item at the same time in order to complete a trade.\n\nTo overcome this issue, humans began to collect and value certain items for their rarity and symbolic significance, such as shells, animal teeth, and flint.\n\nThese collectibles served as a way for early humans to store and transfer wealth, providing an evolutionary advantage over other species such as Homo neanderthalensis.\n",
-                        "title": "The origins of money"
+                        "question": "Quelle est la fonction évolutive première des objets de collection ?",
+                        "text": "Les premières sociétés humaines pratiquaient le troc, mais cette méthode avait plusieurs limites. L'une d'elles était le problème de la « double coïncidence des besoins » : il fallait que deux personnes désirent chacune ce que l'autre possédait, au même moment, pour qu'un échange soit possible.\n\nPour contourner ce problème, les humains ont commencé à collectionner et à valoriser certains objets pour leur rareté et leur signification symbolique, comme les coquillages, les dents d'animaux ou le silex.\n\nCes objets de collection ont permis aux premiers humains de conserver et de transférer de la richesse, leur donnant un avantage évolutif sur d'autres espèces comme l'Homme de Neandertal.\n",
+                        "title": "Les origines de la monnaie"
                     },
                     "primitiveMoney": {
                         "answers": [
-                            "To store value",
-                            "To serve as a form of entertainment",
-                            "To act as a medium of exchange"
+                            "Conserver de la valeur",
+                            "Servir de divertissement",
+                            "Servir de moyen d'échange"
                         ],
                         "feedback": [
-                            "Congratulations! You're right on the money (pun intended). Collectibles served as a store of value in paleolithic societies, much like how Bitcoin and other cryptocurrencies are used today as a digital store of value",
-                            "Sorry, collectibles might be fun to collect, but they had a more practical purpose in ancient societies",
-                            "Collectibles were not used as frequently as modern currency, so they didn't quite play the same role as a medium of exchange."
+                            "Bravo, vous avez visé juste (sans mauvais jeu de mots) ! Les objets de collection servaient de réserve de valeur dans les sociétés paléolithiques, un peu comme le Bitcoin et les autres cryptomonnaies servent aujourd'hui de réserve de valeur numérique.",
+                            "Dommage, les objets de collection étaient peut-être amusants à rassembler, mais ils avaient un usage plus pratique dans les sociétés anciennes.",
+                            "Les objets de collection n'étaient pas utilisés aussi fréquemment que la monnaie moderne, ils ne jouaient donc pas vraiment le rôle d'un moyen d'échange."
                         ],
-                        "question": "What was the primary role of collectibles in paleolithic societies",
-                        "text": "Collectibles served as a precursor to money by allowing trade between different groups and facilitating the transfer of wealth between generations. Although they were not used as frequently as modern money in paleolithic societies, collectibles still served as a store of value and could sometimes even facilitate trade.\n\nPrimitive forms of money, such as collectibles, had a low velocity compared to modern currency and might only be transferred a few times during an individual's lifetime. However, durable collectibles that were passed down through generations had substantial value at each transfer and sometimes made trade possible.\n",
-                        "title": "Primitive forms of money"
+                        "question": "Quel était le rôle principal des objets de collection dans les sociétés paléolithiques ?",
+                        "text": "Les objets de collection ont préfiguré la monnaie en permettant les échanges entre différents groupes et en facilitant le transfert de richesse entre les générations. Bien qu'ils n'aient pas été utilisés aussi souvent que la monnaie moderne dans les sociétés paléolithiques, ils servaient déjà de réserve de valeur et pouvaient parfois faciliter le commerce.\n\nCes formes primitives de monnaie avaient une vélocité bien plus faible que la monnaie moderne, et pouvaient n'être transférées que quelques fois au cours de la vie d'un individu. Cependant, les objets de collection durables transmis de génération en génération conservaient une valeur importante à chaque transfert, ce qui rendait parfois le commerce possible.\n",
+                        "title": "Les formes primitives de monnaie"
                     },
                     "anticipatingDemand": {
                         "answers": [
-                            "The ability to buy collectibles at a lower price before they became widely sought after",
-                            "The ability to trade collectibles for other useful items",
-                            "The ability to impress others with their collection of rare and valuable items"
+                            "Pouvoir acheter des objets de collection à bas prix avant qu'ils ne deviennent très recherchés",
+                            "Pouvoir échanger des objets de collection contre d'autres biens utiles",
+                            "Pouvoir impressionner les autres avec sa collection d'objets rares et précieux"
                         ],
                         "feedback": [
-                            "Congratulations, you are correct! It seems that the concept of \"buy low, sell high\" is not a modern invention, as early humans also sought to acquire collectibles at a lower cost before their demand and trade value increased. Fun fact: this principle also applies to bitcoin, where early adopters were able to acquire bitcoins at a much lower price before their value skyrocketed",
-                            "Sorry, that is not the correct answer. While being able to trade collectibles for other useful items may have been a benefit of correctly anticipating demand, it was not the main advantage",
-                            "I'm afraid that is not the correct answer. While having a collection of rare and valuable items may have been a source of pride and admiration, it was not the main advantage"
+                            "Bravo, c'est la bonne réponse ! Le principe « acheter bas, vendre haut » n'est pas une invention moderne : les premiers humains cherchaient déjà à acquérir des objets de collection à moindre coût avant que leur demande et leur valeur d'échange n'augmentent. Anecdote : ce principe s'applique aussi au bitcoin, dont les premiers adopteurs ont pu acquérir des unités à un prix bien plus bas avant que sa valeur n'explose.",
+                            "Dommage, ce n'est pas la bonne réponse. Pouvoir échanger des objets de collection contre d'autres biens utiles était sans doute un avantage lié à une bonne anticipation de la demande, mais ce n'était pas le principal.",
+                            "Ce n'est malheureusement pas la bonne réponse. Posséder une collection d'objets rares et précieux pouvait être une source de fierté et d'admiration, mais ce n'était pas le principal avantage."
                         ],
-                        "question": "What was the main advantage of being able to anticipate future demand for collectible items in early human societies",
-                        "text": "The choice of which items to collect or create posed a significant problem for early humans, as they had to anticipate which objects would be desired by others. The ability to correctly predict which items would be in demand for their collectible value gave a significant advantage to the owner in terms of their ability to trade and accumulate wealth.\n\nSome Native American tribes, such as the Narragansetts, even focused on producing collectibles that had little practical use, but were valuable in trade.\n\nThe earlier a collectible is anticipated to be in future demand, the greater the advantage its possessor has, as it can be obtained at a lower cost before it becomes widely sought after and its trade value increases as the number of people demanding it grows.\n",
-                        "title": "Anticipating Demand"
+                        "question": "Quel était le principal avantage de pouvoir anticiper la demande future pour des objets de collection dans les premières sociétés humaines ?",
+                        "text": "Le choix des objets à collectionner ou à fabriquer posait un problème important aux premiers humains, qui devaient anticiper ce que les autres allaient désirer. Savoir prédire correctement quels objets seraient recherchés pour leur valeur de collection donnait un avantage considérable à leur possesseur, en termes de commerce et d'accumulation de richesse.\n\nCertaines tribus amérindiennes, comme les Narragansetts, se sont même spécialisées dans la production d'objets de collection ayant peu d'usage pratique, mais très recherchés dans les échanges.\n\nPlus tôt un objet de collection est identifié comme étant susceptible d'être demandé dans le futur, plus grand est l'avantage pour son possesseur : il peut être obtenu à moindre coût avant de devenir très recherché, et sa valeur d'échange augmente à mesure que le nombre de personnes qui le convoitent augmente.\n",
+                        "title": "Anticiper la demande"
                     },
                     "nashEquilibrium": {
                         "answers": [
-                            "A concept that helps societies decide on a single store of value",
-                            "A type of dance that promotes trade and the division of labor",
-                            "A musical instrument that makes it easier to conduct trade and specialize in different tasks"
+                            "Un concept qui aide les sociétés à converger vers une seule réserve de valeur",
+                            "Une forme de danse qui favorise le commerce et la division du travail",
+                            "Un instrument de musique qui facilite le commerce et la spécialisation des tâches"
                         ],
                         "feedback": [
-                            "Congratulations, you are correct! A Nash Equilibrium is a concept in game theory that refers to a situation in which no player can gain an advantage by changing their strategy. In the context of choosing a store of value, achieving a Nash Equilibrium means that society has converged on a single store of value, which greatly facilitates trade and the division of labor. Fun fact: Bitcoin is often cited as an example of a Nash Equilibrium, as it has become the dominant cryptocurrency due to its perceived value and widespread adoption",
-                            "Sorry, that is not the correct answer. While a Nash Equilibrium has nothing to do with dance, it is an important concept in game theory that can benefit society",
-                            "I'm afraid that is not the correct answer. While music can bring people together and facilitate cooperation, a Nash Equilibrium has nothing to do with musical instruments. It is a concept in game theory that refers to a situation in which no player can gain an advantage by changing their strategy."
+                            "Bravo, c'est la bonne réponse ! Un équilibre de Nash est un concept de théorie des jeux qui désigne une situation où aucun joueur n'a intérêt à changer de stratégie. Appliqué au choix d'une réserve de valeur, atteindre un équilibre de Nash signifie que la société a convergé vers une seule réserve de valeur, ce qui facilite grandement le commerce et la division du travail. Anecdote : le Bitcoin est souvent cité comme exemple d'équilibre de Nash, étant devenu la cryptomonnaie dominante grâce à la valeur qu'on lui perçoit et à son adoption massive.",
+                            "Dommage, ce n'est pas la bonne réponse. Un équilibre de Nash n'a rien à voir avec la danse, mais c'est un concept important de théorie des jeux qui peut bénéficier à la société.",
+                            "Ce n'est malheureusement pas la bonne réponse. La musique peut rapprocher les gens et faciliter la coopération, mais un équilibre de Nash n'a rien à voir avec un instrument de musique. C'est un concept de théorie des jeux qui désigne une situation où aucun joueur n'a intérêt à changer de stratégie."
                         ],
-                        "question": "What is a Nash Equilibrium and how does it benefit society",
-                        "text": "Acquiring an item with the expectation that it will be desired as a future store of value can accelerate its adoption for that purpose. This process can create a feedback loop that drives societies towards adopting a single store of value.\n\nIn game theory, this is known as a \"Nash Equilibrium\". Reaching a Nash Equilibrium for a store of value can greatly benefit a society, as it makes trade and the division of labor easier and paves the way for the development of civilization.\n",
-                        "title": "The Key to Facilitating Trade"
+                        "question": "Qu'est-ce qu'un équilibre de Nash et en quoi bénéficie-t-il à la société ?",
+                        "text": "Acquérir un objet en anticipant qu'il sera recherché comme future réserve de valeur peut accélérer son adoption à cette fin. Ce processus peut créer une boucle de rétroaction qui pousse les sociétés à adopter une réserve de valeur commune.\n\nEn théorie des jeux, on appelle cela un « équilibre de Nash ». Atteindre un équilibre de Nash pour une réserve de valeur peut grandement bénéficier à une société, en facilitant le commerce et la division du travail, et en ouvrant la voie au développement de la civilisation.\n",
+                        "title": "La clé pour faciliter le commerce"
                     },
                     "singleStoreOfValue": {
                         "answers": [
-                            "To increase the purchasing power of their savings",
-                            "To learn about other cultures and societies",
-                            "To show off their wealth and status"
+                            "Pour augmenter le pouvoir d'achat de leur épargne",
+                            "Pour découvrir d'autres cultures et sociétés",
+                            "Pour afficher leur richesse et leur statut"
                         ],
                         "feedback": [
-                            "Correct! Merchants and traders had an incentive to promote the adoption of a foreign store of value in their own society because it increased the purchasing power of their savings. This not only benefited the merchants, but also the society as a whole, as the adoption of a single store of value reduced the cost of completing trade with other societies and increased trade-based wealth. Fun fact: Bitcoin is an example of a store of value that has been adopted by many societies, and its widespread adoption has increased its purchasing power and facilitated trade",
-                            "Sorry, that is not the correct answer. While learning about other cultures and societies may have been a side benefit of promoting the adoption of a foreign store of value, it was not the main reason",
-                            "I'm afraid that is not the correct answer. While showing off wealth and status may have been a motivation for some individuals, it was not the main reason for why merchants and traders had an incentive to promote the adoption of a foreign store of value in their own society."
+                            "Exact ! Les marchands avaient intérêt à promouvoir l'adoption d'une réserve de valeur étrangère dans leur société, car cela augmentait le pouvoir d'achat de leur épargne. Cela profitait non seulement aux marchands, mais aussi à l'ensemble de la société : l'adoption d'une réserve de valeur commune réduisait le coût du commerce avec d'autres sociétés et augmentait la richesse issue des échanges. Anecdote : le Bitcoin est un exemple de réserve de valeur adoptée par de nombreuses sociétés, et cette adoption massive a augmenté son pouvoir d'achat et facilité le commerce.",
+                            "Dommage, ce n'est pas la bonne réponse. Découvrir d'autres cultures a pu être un bénéfice secondaire, mais ce n'était pas la raison principale.",
+                            "Ce n'est malheureusement pas la bonne réponse. Afficher sa richesse et son statut a pu motiver certains individus, mais ce n'était pas la raison principale pour laquelle les marchands avaient intérêt à promouvoir l'adoption d'une réserve de valeur étrangère."
                         ],
-                        "question": "Why did merchants and traders in early human societies have an incentive to promote the adoption of a foreign store of value in their own society",
-                        "text": "As human societies and trade routes developed over time, stores of value that emerged in different societies began to compete with each other. Merchants and traders had to decide whether to save their profits in the store of value of their own society or in the store of value of the society they were trading with, or a combination of both.\n\nHolding savings in a foreign store of value gave merchants the ability to complete trade more easily in that society, and also gave them an incentive to promote the adoption of that store of value in their own society, as it would increase the purchasing power of their savings.\n\nWhen two societies adopt the same store of value, they see a significant reduction in the cost of trading with each other and an increase in trade-based wealth. In the 19th century, most of the world converged on a single store of value – gold – and this period saw the greatest increase in trade in history.\n",
-                        "title": "The Benefits of Converging on a Single Store of Value"
+                        "question": "Pourquoi les marchands des premières sociétés humaines avaient-ils intérêt à promouvoir l'adoption d'une réserve de valeur étrangère dans leur propre société ?",
+                        "text": "À mesure que les sociétés humaines et les routes commerciales se sont développées, les réserves de valeur apparues dans différentes sociétés ont commencé à se faire concurrence. Les marchands devaient choisir d'épargner leurs profits dans la réserve de valeur de leur propre société, dans celle de la société avec laquelle ils commerçaient, ou une combinaison des deux.\n\nDétenir son épargne dans une réserve de valeur étrangère permettait aux marchands de commercer plus facilement dans cette société, tout en les incitant à promouvoir l'adoption de cette réserve de valeur dans leur propre société, puisque cela augmentait le pouvoir d'achat de leur épargne.\n\nLorsque deux sociétés adoptent la même réserve de valeur, le coût du commerce entre elles diminue fortement et la richesse issue des échanges augmente. Au XIXe siècle, la majeure partie du monde a convergé vers une seule réserve de valeur — l'or — et cette période a connu la plus forte croissance du commerce de l'histoire.\n",
+                        "title": "Les bénéfices de converger vers une seule réserve de valeur"
                     }
                 }
             },
             "AttributesOfAGoodStoreOfValue": {
-                "title": "Attributes of a good Store of Value",
+                "title": "Les attributs d'une bonne réserve de valeur",
                 "questions": {
                     "whatIsGoodSOV": {
                         "answers": [
-                            "Durability, portability, interchangeability, verifiability, divisibility, scarcity, long history, and resistance to censorship",
-                            "Tastiness, cuteness, softness, and Instagram-ability",
-                            "Rarity, beauty, and sentimental value"
+                            "Durabilité, portabilité, fongibilité, vérifiabilité, divisibilité, rareté, longue histoire et résistance à la censure",
+                            "Bon goût, mignonnerie, douceur et « instagrammabilité »",
+                            "Rareté, beauté et valeur sentimentale"
                         ],
                         "feedback": [
-                            "Yes! A good store of value should have attributes such as durability, portability, interchangeability, verifiability, divisibility, scarcity, a long history, and resistance to censorship. These characteristics make it easier to use as a medium of exchange and store of value, and increase its demand over time",
-                            "Sorry, that is not the correct answer. While tastiness, cuteness, softness, and Instagram-ability may be desirable qualities in other contexts, they are not typically considered important attributes for a store of value",
-                            "I'm afraid that is not the correct answer. While rarity, beauty, and sentimental value may make an item valuable to a particular individual, they are not typically considered important attributes for a store of value that is widely accepted and used as a medium of exchange."
+                            "Exact ! Une bonne réserve de valeur doit présenter des attributs comme la durabilité, la portabilité, la fongibilité, la vérifiabilité, la divisibilité, la rareté, une longue histoire et une résistance à la censure. Ces caractéristiques en facilitent l'usage comme moyen d'échange et réserve de valeur, et augmentent sa demande avec le temps.",
+                            "Dommage, ce n'est pas la bonne réponse. Le bon goût, la mignonnerie, la douceur ou l'« instagrammabilité » peuvent être des qualités désirables dans d'autres contextes, mais ce ne sont pas des attributs déterminants pour une réserve de valeur.",
+                            "Ce n'est malheureusement pas la bonne réponse. La rareté, la beauté et la valeur sentimentale peuvent rendre un objet précieux pour un individu en particulier, mais ce ne sont pas des attributs déterminants pour une réserve de valeur largement acceptée et utilisée comme moyen d'échange."
                         ],
-                        "question": "What are some attributes that make a good store of value",
-                        "text": "When stores of value compete with each other, the attributes that make a good store of value allow it to outperform its competitors and increase demand over time.\n\nMany goods have been used as stores of value but certain attributes are particularly desirable and allow these goods to be more successful.\n\nAn ideal store of value should be durable, portable, interchangeable, verifiable, divisible, scarce, have a long history, and resistant to censorship.\n",
-                        "title": "Some stores of value are better than others"
+                        "question": "Quels sont les attributs d'une bonne réserve de valeur ?",
+                        "text": "Lorsque des réserves de valeur se font concurrence, les attributs qui font d'une réserve de valeur une bonne réserve de valeur lui permettent de surpasser ses concurrentes et d'augmenter sa demande avec le temps.\n\nDe nombreux biens ont servi de réserve de valeur, mais certains attributs sont particulièrement recherchés et permettent à ces biens de mieux s'imposer.\n\nUne réserve de valeur idéale doit être durable, portable, fongible, vérifiable, divisible, rare, disposer d'une longue histoire et résister à la censure.\n",
+                        "title": "Certaines réserves de valeur valent mieux que d'autres"
                     },
                     "durability": {
                         "answers": [
-                            "The network that secures the currency",
-                            "The physical manifestation of the currency",
-                            "The institution that issues the currency"
+                            "Le réseau qui sécurise la monnaie",
+                            "La forme physique de la monnaie",
+                            "L'institution qui émet la monnaie"
                         ],
                         "feedback": [
-                            "You got it right. The network that secures the currency is an important factor in determining its durability, especially for digital currencies like bitcoin. Did you know that bitcoin has displayed a high level of \"anti-fragility\" despite attempts to regulate it and attacks by hackers? That's quite impressive for a currency that's still in its early stages",
-                            "Nope, sorry! The physical manifestation of the currency is actually not as important as the institution that issues it or the network that secures it. Don't worry though, you're not alone in making this mistake. Even the Ancient Greeks used to mint their coins out of perishable materials like bronze and copper",
-                            "Close, but not quite! The institution that issues the currency is actually an important factor in determining its durability. But hey, at least you're not alone in this mistake. There have been many governments and currencies that have come and gone over the centuries."
+                            "Bien joué. Le réseau qui sécurise une monnaie est un facteur important de sa durabilité, en particulier pour les monnaies numériques comme le bitcoin. Saviez-vous que le bitcoin a fait preuve d'une grande « antifragilité » malgré les tentatives de régulation et les attaques de pirates ? C'est plutôt impressionnant pour une monnaie encore jeune.",
+                            "Non, dommage ! La forme physique d'une monnaie compte en réalité moins que l'institution qui l'émet ou le réseau qui la sécurise. Rassurez-vous, vous n'êtes pas seul à faire cette erreur : même les Grecs de l'Antiquité frappaient leurs pièces dans des matériaux périssables comme le bronze ou le cuivre.",
+                            "Presque ! L'institution qui émet une monnaie est en réalité un facteur important de sa durabilité. Mais rassurez-vous, vous n'êtes pas seul : de nombreux gouvernements et monnaies ont vu le jour puis disparu au fil des siècles."
                         ],
-                        "question": "Which of the following is an important factor in determining the durability of a good store of value",
-                        "text": "The good used as money should not be perishable or easily destroyed. Gold is known for its durability and is often considered the \"king\" in this regard.\n\nA large portion of the gold that has ever been mined or minted, including the gold of the Pharaohs, still exists today and is likely to remain available for many more years. Gold coins that were used as money in ancient times still hold significant value today.\n\nFiat currencies and bitcoins are digital records that may take physical form, such as paper bills. However, it is not the physical manifestation of these currencies that should be considered for their durability, but rather the durability of the institution that issues them.\n\nMany governments and their currencies have come and gone over the centuries, while others, such as the US dollar and British pound, have survived for a longer period of time. Bitcoins have no issuing authority, so their durability depends on the network that secures them. While it is still early to draw strong conclusions about the durability of bitcoins, there are signs that the network has displayed a high level of \"anti-fragility\" despite attempts to regulate it and attacks by hackers.\n",
-                        "title": "Durability is an important attribute for a good store of value"
+                        "question": "Lequel des éléments suivants est un facteur important pour déterminer la durabilité d'une bonne réserve de valeur ?",
+                        "text": "Le bien utilisé comme monnaie ne doit pas être périssable ni facilement détruit. L'or est réputé pour sa durabilité et souvent considéré comme le « roi » en la matière.\n\nUne grande partie de l'or jamais extrait ou frappé, y compris l'or des pharaons, existe encore aujourd'hui et devrait le rester encore longtemps. Les pièces d'or utilisées comme monnaie dans l'Antiquité conservent une valeur importante de nos jours.\n\nLes monnaies fiduciaires et les bitcoins sont des enregistrements numériques qui peuvent prendre une forme physique, comme des billets de banque. Mais ce n'est pas leur forme physique qu'il faut considérer pour évaluer leur durabilité, plutôt la durabilité de l'institution qui les émet.\n\nDe nombreux gouvernements et leurs monnaies ont disparu au fil des siècles, tandis que d'autres, comme le dollar américain ou la livre sterling, ont survécu plus longtemps. Le bitcoin n'a aucune autorité émettrice : sa durabilité dépend donc du réseau qui le sécurise. Bien qu'il soit encore tôt pour tirer des conclusions fermes sur la durabilité du bitcoin, certains signes montrent que son réseau a fait preuve d'une grande « antifragilité » malgré les tentatives de régulation et les attaques de pirates.\n",
+                        "title": "La durabilité est un attribut important pour une bonne réserve de valeur"
                     },
                     "portability": {
                         "answers": [
-                            "Its physical form",
-                            "Its ability to be easily transported and stored",
-                            "Its ability to facilitate long-distance trade"
+                            "Sa forme physique",
+                            "Sa capacité à être facilement transportée et stockée",
+                            "Sa capacité à faciliter le commerce sur de longues distances"
                         ],
                         "feedback": [
-                            "You got it right. The physical form of the good is not a factor that makes it portable. In fact, digital currencies like bitcoin are the most portable stores of value because they can be easily stored on a small device and transmitted quickly across long distances. Did you know that private keys representing hundreds of millions of dollars can be stored on a tiny USB drive and easily carried anywhere with bitcoin? That's pretty impressive",
-                            "Sorry, that's incorrect! The ability to be easily transported and stored is actually an important factor that makes a good store of value portable. But don't worry, it's a common mistake. After all, who wouldn't want to carry around a cow as a store of value? It would make for a pretty impressive conversation starter at least",
-                            "Oops, that's not the right answer! The ability to facilitate long-distance trade is actually an important factor that makes a good store of value portable. But hey, at least you're not alone in this mistake. It's easy to see how someone might think that cows are the perfect portable store of value, given their ability to produce milk and beef."
+                            "Bien joué. La forme physique d'un bien n'est pas ce qui le rend portable. Les monnaies numériques comme le bitcoin sont d'ailleurs les réserves de valeur les plus portables, car elles peuvent être stockées facilement sur un petit appareil et transmises rapidement sur de longues distances. Saviez-vous que des clés privées représentant des centaines de millions de dollars peuvent tenir sur une simple clé USB et être emportées partout avec le bitcoin ? Plutôt impressionnant.",
+                            "Dommage, c'est incorrect ! La capacité à être facilement transportée et stockée est justement un facteur important de portabilité pour une réserve de valeur. Rassurez-vous, c'est une erreur fréquente. Après tout, qui ne voudrait pas se balader avec une vache comme réserve de valeur ? Ça ferait au moins un bon sujet de conversation.",
+                            "Oups, ce n'est pas la bonne réponse ! La capacité à faciliter le commerce sur de longues distances est justement un facteur important de portabilité pour une réserve de valeur. Mais rassurez-vous, vous n'êtes pas seul à vous tromper : on comprend qu'on puisse penser que les vaches sont la réserve de valeur portable idéale, vu leur capacité à produire du lait et de la viande."
                         ],
-                        "question": "Which of the following is NOT a factor that makes a good store of value portable",
-                        "text": "\n\"Portability\" refers to how easy it is to move or transport a good from one place to another.\n\nBitcoins are highly portable, allowing for easy storage on a small USB drive and quick transmission across long distances. Similarly, fiat currencies are also digital and therefore portable, but government regulations and capital controls can make large transfers of value difficult or impossible.\n\nOn the other hand, gold, being physical in form and very dense, is the least portable store of value, with the majority of bullion never being transported and the transfer of physical gold being costly, risky, and time-consuming.\n",
-                        "title": "The good must be easy to transport and store"
+                        "question": "Lequel des éléments suivants n'est PAS un facteur qui rend une réserve de valeur portable ?",
+                        "text": "\nLa « portabilité » désigne la facilité avec laquelle un bien peut être déplacé ou transporté d'un endroit à un autre.\n\nLe bitcoin est hautement portable : il peut être stocké facilement sur une petite clé USB et transmis rapidement sur de longues distances. Les monnaies fiduciaires sont elles aussi numériques et donc portables, mais les réglementations gouvernementales et les contrôles des capitaux peuvent rendre les transferts importants difficiles, voire impossibles.\n\nL'or, en revanche, de par sa forme physique et sa forte densité, est la réserve de valeur la moins portable : la majorité des lingots ne sont jamais transportés, et le transfert d'or physique est coûteux, risqué et long.\n",
+                        "title": "Le bien doit être facile à transporter et à stocker"
                     },
                     "fungibility": {
                         "answers": [
-                            "The shape and quality of diamonds are irregular",
-                            "Gold is more valuable than diamonds",
-                            "Gold is more abundant than diamonds"
+                            "La forme et la qualité des diamants sont irrégulières",
+                            "L'or a plus de valeur que les diamants",
+                            "L'or est plus abondant que les diamants"
                         ],
                         "feedback": [
-                            "Exactly**!** The irregular shape and quality of diamonds makes them less interchangeable than gold, which is why gold is considered more fungible. Did you also know that bitcoin is considered fungible at the network level, but its traceability on the blockchain can sometimes lead to it being treated as non-fungible by merchants or exchanges",
-                            "Wrong answer! Gold may be more valuable than diamonds, but that's not the main reason it's considered more fungible. Looks like you need to brush up on your fungibility knowledge",
-                            "Nope, sorry! While gold may be more abundant than diamonds, that's not the main reason it's considered more fungible. Better luck next time!"
+                            "Exactement ! La forme et la qualité irrégulières des diamants les rendent moins interchangeables que l'or, ce qui explique pourquoi l'or est jugé plus fongible. Saviez-vous que le bitcoin est considéré comme fongible au niveau du réseau, mais que sa traçabilité sur la blockchain peut parfois amener des commerçants ou des plateformes d'échange à le traiter comme non fongible ?",
+                            "Mauvaise réponse ! L'or a peut-être plus de valeur que les diamants, mais ce n'est pas la raison principale pour laquelle il est jugé plus fongible. On dirait qu'il faut réviser la notion de fongibilité.",
+                            "Non, dommage ! L'or est peut-être plus abondant que les diamants, mais ce n'est pas la raison principale pour laquelle il est jugé plus fongible. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "What is the main reason that gold is considered more fungible than diamonds",
-                        "text": "\n\"Fungibility\" means that one unit of a currency is interchangeable with another unit of the same currency. This is an important attribute for a good store of value.\n\nGold is a highly fungible store of value, as when melted down, an ounce of gold is essentially indistinguishable from any other. Fiat currencies, on the other hand, may not always be completely fungible, as their issuing institutions may treat different denominations differently.\n\nLike gold, units of bitcoin are fungible, but there are some nuances to it. We'll dive into this in a later chapter.\n",
-                        "title": "One specimen should be interchangeable with another of equal quantity"
+                        "question": "Quelle est la principale raison pour laquelle l'or est considéré comme plus fongible que les diamants ?",
+                        "text": "\nLa « fongibilité » signifie qu'une unité d'une monnaie est interchangeable avec une autre unité de cette même monnaie. C'est un attribut important pour une bonne réserve de valeur.\n\nL'or est une réserve de valeur hautement fongible : une fois fondue, une once d'or est pratiquement indiscernable de n'importe quelle autre. Les monnaies fiduciaires, en revanche, ne sont pas toujours parfaitement fongibles, car les institutions émettrices peuvent traiter différemment certaines coupures.\n\nComme l'or, les unités de bitcoin sont fongibles, mais avec certaines nuances. Nous y reviendrons dans un chapitre ultérieur.\n",
+                        "title": "Un exemplaire doit être interchangeable avec un autre de quantité égale"
                     },
                     "verifiability": {
                         "answers": [
-                            "By using cryptographic signatures",
-                            "By checking for gold-plated tungsten",
-                            "By checking for features on banknotes to prevent counterfeiting"
+                            "Grâce à des signatures cryptographiques",
+                            "En vérifiant la présence de tungstène plaqué or",
+                            "En vérifiant les éléments de sécurité des billets pour éviter la contrefaçon"
                         ],
                         "feedback": [
-                            "Congratulations! You are correct. Bitcoin can be verified with mathematical certainty using cryptographic signatures",
-                            "Sorry, but that's not quite right. Better luck next time",
-                            "Wrong! Bitcoin is purely digital and doesn't utilize banknotes. Try again!"
+                            "Bravo, c'est la bonne réponse ! Le bitcoin peut être vérifié avec une certitude mathématique grâce aux signatures cryptographiques.",
+                            "Dommage, ce n'est pas tout à fait ça. Ce sera pour une prochaine fois.",
+                            "Faux ! Le bitcoin est purement numérique et n'utilise pas de billets. Réessayez !"
                         ],
-                        "question": "How can bitcoin be verified",
-                        "text": "It is important for a good store of value to be easily verifiable as authentic. This increases confidence in trade and the likelihood that a transaction will be completed.\n\nBoth fiat currencies and gold are generally easy to verify, but they are not foolproof. Counterfeit bills and gold-plated tungsten have been used to deceive people in the past.\n\nOn the other hand, the use of cryptography makes verification very easy for bitcoin and makes counterfeiting impossible.\n",
-                        "title": "The good must be easy to quickly identify and verify as authentic"
+                        "question": "Comment le bitcoin peut-il être vérifié ?",
+                        "text": "Il est important qu'une bonne réserve de valeur puisse être facilement vérifiée comme authentique. Cela renforce la confiance dans les échanges et augmente la probabilité qu'une transaction aboutisse.\n\nLes monnaies fiduciaires comme l'or sont généralement faciles à vérifier, mais elles ne sont pas infaillibles : des faux billets ou du tungstène plaqué or ont déjà servi à tromper des gens par le passé.\n\nLe bitcoin, à l'inverse, utilise la cryptographie pour rendre la vérification très simple et la contrefaçon impossible.\n",
+                        "title": "Le bien doit pouvoir être identifié et vérifié rapidement comme authentique"
                     },
                     "divisibility": {
                         "answers": [
-                            "Gold",
-                            "Bitcoin",
-                            "Fiat currency"
+                            "L'or",
+                            "Le bitcoin",
+                            "La monnaie fiduciaire"
                         ],
                         "feedback": [
-                            "You are correct. Gold is difficult divide into small quantities for everyday trade. Did you know that gold has been used as a store of value for thousands of years due to its rarity and durability",
-                            "Sorry, but that's not quite right. Bitcoin is highly divisible into its base unit 'satoshi', and it can even be divided into milli-satoshis (1/1000 of a satoshi) on the Lightning Network",
-                            "Nope**.** While fiat currencies are not as divisible as bitcoin, they are easily divisible into smaller denominations."
+                            "C'est la bonne réponse. L'or est difficile à diviser en petites quantités pour un usage quotidien. Saviez-vous que l'or sert de réserve de valeur depuis des milliers d'années grâce à sa rareté et sa durabilité ?",
+                            "Dommage, ce n'est pas tout à fait ça. Le bitcoin est hautement divisible jusqu'à son unité de base, le « satoshi », et peut même être divisé en milli-satoshis (1/1000 de satoshi) sur le Lightning Network.",
+                            "Non. Les monnaies fiduciaires sont moins divisibles que le bitcoin, mais elles se divisent tout de même facilement en coupures plus petites."
                         ],
-                        "question": "Which of the following is NOT a good store of value due to its difficulty in being easily divided for day-to-day trade",
-                        "text": "The ability to divide a good is an important attribute for it to be a good store of value.\n\nImagine you have a $100 bill and want to buy a pack of chewing gum that costs 10 cents. The success of the trade depends on the seller having $99.90 in change available in that moment.\n\nIn societies where trade is prevalent, the ability to divide a good into smaller quantities allows for more precise exchange and can make it easier to use in day-to-day transactions.\n\nBitcoin is particularly useful in this regard, as it can be divided down to a hundred millionth of a unit and transmitted in tiny and exact amounts.\n\nFiat currencies are typically divisible down to pocket change, which has little purchasing power, making fiat divisible enough in practice.\n\nGold, while physically divisible, can be difficult to use in small quantities for everyday trade.\n",
-                        "title": "The good must be easy to subdivide"
+                        "question": "Lequel des éléments suivants n'est PAS une bonne réserve de valeur en raison de la difficulté à le diviser facilement pour un usage quotidien ?",
+                        "text": "La capacité à diviser un bien est un attribut important pour qu'il soit une bonne réserve de valeur.\n\nImaginez que vous ayez un billet de 100 $ et que vous vouliez acheter un paquet de chewing-gum à 10 centimes. La réussite de l'échange dépend du fait que le vendeur ait 99,90 $ de monnaie disponible à ce moment précis.\n\nDans les sociétés où le commerce est courant, la capacité à diviser un bien en plus petites quantités permet des échanges plus précis et facilite son usage au quotidien.\n\nLe bitcoin est particulièrement utile à cet égard, puisqu'il peut être divisé jusqu'au centmillionième d'unité et transmis en montants infimes et exacts.\n\nLes monnaies fiduciaires sont généralement divisibles jusqu'à la petite monnaie, dont le pouvoir d'achat est faible, ce qui les rend suffisamment divisibles en pratique.\n\nL'or, bien que physiquement divisible, peut être difficile à utiliser en petites quantités pour un usage quotidien.\n",
+                        "title": "Le bien doit être facile à subdiviser"
                     },
                     "scarce": {
                         "answers": [
-                            "Scarcity",
-                            "Abundance",
-                            "Ease of production"
+                            "La rareté",
+                            "L'abondance",
+                            "La facilité de production"
                         ],
                         "feedback": [
-                            "Congratulations! You are correct. Did you know that there will only ever be a maximum of 21 million bitcoins in circulation, making it a scarce and valuable asset",
-                            "Sorry, but abundance is not the most important attribute for a store of value. Better luck next time",
-                            "Sorry, but ease of production is not the most important attribute for a store of value. Better luck next time!"
+                            "Bravo, c'est la bonne réponse ! Saviez-vous qu'il n'y aura jamais plus de 21 millions de bitcoins en circulation, ce qui en fait un actif rare et précieux ?",
+                            "Dommage, l'abondance n'est pas l'attribut le plus important pour une réserve de valeur. Ce sera pour une prochaine fois.",
+                            "Dommage, la facilité de production n'est pas l'attribut le plus important pour une réserve de valeur. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "What is the most important attribute of a store of value",
-                        "text": "A good store of value should have a limited supply, or be scarce.\n\nThis is because scarcity can create value, as people often desire rare or hard-to-obtain items. Bitcoin, for instance, is designed to have a maximum of 21 million units, which gives each owner a known percentage of the total possible supply.\n\nIn contrast, the supply of gold can potentially increase through new mining methods, and fiat currencies are often prone to inflation, leading to a decline in value over time.\n",
-                        "title": "A monetary good must scarce"
+                        "question": "Quel est l'attribut le plus important d'une réserve de valeur ?",
+                        "text": "Une bonne réserve de valeur doit avoir une offre limitée, autrement dit être rare.\n\nEn effet, la rareté peut créer de la valeur, car les gens désirent souvent des objets rares ou difficiles à obtenir. Le bitcoin, par exemple, est conçu pour ne jamais dépasser 21 millions d'unités, ce qui donne à chaque détenteur un pourcentage connu de l'offre totale possible.\n\nÀ l'inverse, l'offre d'or peut potentiellement augmenter grâce à de nouvelles méthodes d'extraction, et les monnaies fiduciaires sont souvent sujettes à l'inflation, ce qui entraîne une baisse de valeur avec le temps.\n",
+                        "title": "Un bien monétaire doit être rare"
                     },
                     "establishedHistory": {
                         "answers": [
-                            "The new arrival has a significant advantage over the established good",
-                            "The established good has a longer history of being valued by society",
-                            "The new arrival is cheaper to produce"
+                            "Le nouvel arrivant présente un avantage significatif par rapport au bien établi",
+                            "Le bien établi a une plus longue histoire de reconnaissance par la société",
+                            "Le nouvel arrivant est moins coûteux à produire"
                         ],
                         "feedback": [
-                            "You are correct. A long-established store of value is less likely to be displaced by a new arrival unless the new arrival has a significant advantage over the established good",
-                            "Sorry, but this is actually the reason that a long-established store of value is less likely to be displaced. Better luck next time",
-                            "Nope, wrong. Did you not pay attention in the previous lesson on scarcity?"
+                            "C'est la bonne réponse. Une réserve de valeur bien établie a peu de chances d'être supplantée par un nouvel arrivant, à moins que celui-ci ne présente un avantage significatif par rapport au bien établi.",
+                            "Dommage, c'est en réalité la raison pour laquelle une réserve de valeur bien établie a peu de chances d'être supplantée. Ce sera pour une prochaine fois.",
+                            "Non, faux. Vous n'avez pas suivi la leçon précédente sur la rareté ?"
                         ],
-                        "question": "What is the main reason that a long-established store of value could be displaced by a new arrival",
-                        "text": "This is because a well-established store of value is less likely to be displaced by a newcomer, unless it has a significant advantage over the established good.\n\nAdditionally, people are creatures of habit and will keep using what they already know.\n\nGold, for example, has a long history of being valued and has maintained its value over time. In contrast, fiat currencies, which are a relatively recent invention, have a tendency to lose value over time due to inflation.\n\nBitcoin, although it has only been around for a short time, has shown resilience in the market and is likely to continue to be valued.\n",
-                        "title": "An established history of being valued by society"
+                        "question": "Quelle est la principale raison pour laquelle une réserve de valeur bien établie pourrait être supplantée par un nouvel arrivant ?",
+                        "text": "En effet, une réserve de valeur bien établie a peu de chances d'être supplantée par un nouvel arrivant, à moins que celui-ci ne présente un avantage significatif par rapport au bien établi.\n\nDe plus, les gens sont des créatures d'habitude et ont tendance à continuer d'utiliser ce qu'ils connaissent déjà.\n\nL'or, par exemple, a une longue histoire de reconnaissance et a conservé sa valeur au fil du temps. À l'inverse, les monnaies fiduciaires, invention relativement récente, ont tendance à perdre de la valeur avec le temps à cause de l'inflation.\n\nLe bitcoin, bien que relativement récent, a fait preuve de résilience sur le marché et devrait continuer à être valorisé.\n",
+                        "title": "Une histoire établie de reconnaissance par la société"
                     },
                     "censorshipResistance": {
                         "answers": [
-                            "Its decentralized, peer-to-peer network",
-                            "Its physical nature",
-                            "Its regulation by states"
+                            "Son réseau décentralisé de pair à pair",
+                            "Sa nature physique",
+                            "Sa régulation par les États"
                         ],
                         "feedback": [
-                            "You are correct. The decentralized, peer-to-peer network of Bitcoin allows for transactions to be made without permission, making it a censorship-resistant good",
-                            "No. In fact, physical goods often require permission to cross borders and can easily be confiscated. Better luck next time",
-                            "Sorry, but the opposite is actually true. The fiat banking system, which is regulated by states, requires human intervention to report and prevent certain uses of monetary goods, making it prone to censorship. Try again!"
+                            "C'est la bonne réponse. Le réseau décentralisé de pair à pair du Bitcoin permet d'effectuer des transactions sans permission, ce qui en fait un bien résistant à la censure.",
+                            "Non. Les biens physiques nécessitent souvent une autorisation pour franchir les frontières et peuvent facilement être confisqués. Ce sera pour une prochaine fois.",
+                            "Dommage, c'est en réalité l'inverse. Le système bancaire traditionnel, régulé par les États, nécessite une intervention humaine pour signaler et empêcher certains usages des biens monétaires, ce qui le rend sujet à la censure. Réessayez !"
                         ],
-                        "question": "Which of the following is the reason that Bitcoin is considered a censorship-resistant good",
-                        "text": "Censorship-resistance is an attribute that has become increasingly important in the digital age, as it refers to the difficulty that external parties, such as corporations or governments, have in preventing an individual from using a particular good.\n\nThis attribute is particularly valuable for individuals living under regimes that enforce capital controls or prohibit certain forms of trade. Bitcoin is often cited as being a censorship-resistant good due to its decentralized, peer-to-peer network, which allows for transactions to be made without human intervention or permission.\n\nIn contrast, the fiat banking system is regulated by states and requires human intervention to report and prevent certain uses of monetary goods, such as capital controls.\n\nGold, although it is not issued by states, can be difficult to transmit at a distance and is therefore more subject to state regulation.\n",
-                        "title": "No permission required"
+                        "question": "Laquelle des raisons suivantes explique pourquoi le Bitcoin est considéré comme résistant à la censure ?",
+                        "text": "La résistance à la censure est un attribut devenu de plus en plus important à l'ère numérique : elle désigne la difficulté qu'ont des tiers, comme des entreprises ou des gouvernements, à empêcher un individu d'utiliser un bien donné.\n\nCet attribut est particulièrement précieux pour les personnes vivant sous des régimes qui imposent des contrôles des capitaux ou interdisent certaines formes de commerce. Le Bitcoin est souvent cité comme un bien résistant à la censure grâce à son réseau décentralisé de pair à pair, qui permet d'effectuer des transactions sans intervention humaine ni permission.\n\nÀ l'inverse, le système bancaire traditionnel est régulé par les États et nécessite une intervention humaine pour signaler et empêcher certains usages des biens monétaires, comme les contrôles des capitaux.\n\nL'or, bien qu'il ne soit pas émis par des États, peut être difficile à transmettre à distance et reste donc davantage soumis à la régulation étatique.\n",
+                        "title": "Aucune permission requise"
                     }
                 }
             },
