@@ -6866,6 +6866,23 @@ type RootTranslation = {
 		 */
 		depositFee: RequiredParams<'fee' | 'overFee' | 'threshold' | 'threshold'>
 		/**
+		 * D​e​p​o​s​i​t​ ​f​e​e​s​:​ ​{​t​i​e​r​s​}
+		 * @param {string} tiers
+		 */
+		depositFeeTiers: RequiredParams<'tiers'>
+		/**
+		 * {​f​e​e​}​ ​S​A​T​ ​u​p​ ​t​o​ ​{​m​a​x​}​ ​S​A​T
+		 * @param {string} fee
+		 * @param {string} max
+		 */
+		depositFeeTierUpTo: RequiredParams<'fee' | 'max'>
+		/**
+		 * {​f​e​e​}​ ​S​A​T​ ​a​b​o​v​e​ ​{​m​i​n​}​ ​S​A​T
+		 * @param {string} fee
+		 * @param {string} min
+		 */
+		depositFeeTierAbove: RequiredParams<'fee' | 'min'>
+		/**
 		 * A​m​o​u​n​t​s​ ​b​e​l​o​w​ ​{​m​i​n​S​a​t​s​}​ ​S​A​T​ ​/​ ​{​m​i​n​F​i​a​t​}​ ​c​a​n​'​t​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​i​n​s​t​e​a​d​.
 		 * @param {string} minFiat
 		 * @param {number} minSats
@@ -8339,6 +8356,12 @@ type RootTranslation = {
 		 * @param {string} threshold
 		 */
 		onchainAboveThreshold: RequiredParams<'threshold'>
+		/**
+		 * O​n​c​h​a​i​n​ ​b​e​t​w​e​e​n​ ​{​l​o​w​e​r​}​ ​a​n​d​ ​{​u​p​p​e​r​}​ ​S​A​T
+		 * @param {string} lower
+		 * @param {string} upper
+		 */
+		onchainBetweenThresholds: RequiredParams<'lower' | 'upper'>
 		/**
 		 * T​r​a​n​s​f​e​r​ ​f​e​e
 		 */
@@ -19814,6 +19837,18 @@ export type TranslationFunctions = {
 		 */
 		depositFee: (arg: { fee: string, overFee: string, threshold: string }) => LocalizedString
 		/**
+		 * Deposit fees: {tiers}
+		 */
+		depositFeeTiers: (arg: { tiers: string }) => LocalizedString
+		/**
+		 * {fee} SAT up to {max} SAT
+		 */
+		depositFeeTierUpTo: (arg: { fee: string, max: string }) => LocalizedString
+		/**
+		 * {fee} SAT above {min} SAT
+		 */
+		depositFeeTierAbove: (arg: { fee: string, min: string }) => LocalizedString
+		/**
 		 * Amounts below {minSats} SAT / {minFiat} can't be converted to Dollar automatically. You'll receive Bitcoin instead.
 		 */
 		autoConvertMinAmount: (arg: { minFiat: string, minSats: number }) => LocalizedString
@@ -21237,6 +21272,10 @@ export type TranslationFunctions = {
 		 * Onchain above {threshold} SAT
 		 */
 		onchainAboveThreshold: (arg: { threshold: string }) => LocalizedString
+		/**
+		 * Onchain between {lower} and {upper} SAT
+		 */
+		onchainBetweenThresholds: (arg: { lower: string, upper: string }) => LocalizedString
 		/**
 		 * Transfer fee
 		 */

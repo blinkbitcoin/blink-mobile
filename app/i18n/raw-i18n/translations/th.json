@@ -2163,6 +2163,9 @@
     "lightningInvoice": "ใบแจ้งหนี้ lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "ค่าธรรมเนียมการฝาก: {fee} SAT สำหรับจำนวนต่ำกว่า {threshold} SAT หรือ {overFee} SAT สำหรับการฝากมากกว่า {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "จำนวนต่ำกว่า {minSats: number} satoshi / {minFiat: string} ไม่สามารถแปลงเป็นดอลลาร์อัตโนมัติได้ คุณจะได้รับ Bitcoin แทน",
     "autoConvertFailed": "รับการชำระเงินแล้ว แต่การแปลงล้มเหลว",
     "pleaseWaitForConversion": "โปรดรอจนกว่าการแปลงจะเสร็จสิ้น"
@@ -2546,6 +2549,7 @@
     "lightningTransactions": "ธุรกรรม Lightning",
     "onchainBelowThreshold": "Onchain ต่ำกว่า {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain มากกว่า {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "ค่าธรรมเนียมการโอน",
     "noFee": "ไม่มีค่าธรรมเนียม",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} ค่าธรรมเนียมการกำหนดเส้นทาง",

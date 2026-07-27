@@ -2163,6 +2163,9 @@
     "lightningInvoice": "Lightning számla",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Befizetési díj: {fee} SAT az {threshold} SAT alatti összegekre vagy {overFee} SAT az {threshold} SAT feletti befizetésekre",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "A {minSats: number} satoshi / {minFiat: string} alatti összegek nem konvertálhatók automatikusan Dollárra. Bitcoint fogsz kapni helyette.",
     "autoConvertFailed": "Fizetés beérkezett, de a konverzió nem sikerült.",
     "pleaseWaitForConversion": "Kérjük, várjon, amíg a konverzió befejeződik"
@@ -2546,6 +2549,7 @@
     "lightningTransactions": "Lightning tranzakciók",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT alatt",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT felett",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Átutalási díj",
     "noFee": "díjmentes",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} útválasztási díj",

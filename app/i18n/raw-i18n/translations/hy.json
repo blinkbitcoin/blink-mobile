@@ -2163,6 +2163,9 @@
     "lightningInvoice": "lightning վճարման հարցում",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ավանդի վճար: {fee} SAT մինչև {threshold} SAT գումարների համար կամ {overFee} SAT {threshold} SAT-ից բարձր ավանդների համար",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "{minSats: number} սաթ / {minFiat: string}-ից պակաս գումարները չեն կարող ավտոմատ կերպով փոխարկվել Դոլարի։ Դուք կստանաք Bitcoin։",
     "autoConvertFailed": "Վճարումը ստացվեց, սակայն փոխարկումը չհաջողվեց։",
     "pleaseWaitForConversion": "Խնդրում ենք սպասել, մինչև փոխարկումն ավարտվի"
@@ -2546,6 +2549,7 @@
     "lightningTransactions": "Lightning գործարքներ",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT-ից ցածր",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT-ից բարձր",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Փոխանցման վճար",
     "noFee": "առանց վճարի",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} երթուղավորման վճար",

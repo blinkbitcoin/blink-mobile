@@ -211,6 +211,49 @@ describe("FeeRatesScreen", () => {
     expect(queryByText("Unable to fetch fees at this time")).toBeNull()
   })
 
+  it("renders a row per tier when the API returns more than two", async () => {
+    const threeTierMocks = [
+      {
+        request: { query: FeeRatesDocument },
+        result: {
+          data: {
+            globals: {
+              __typename: "Globals",
+              feesInformation: {
+                __typename: "FeesInformation",
+                deposit: {
+                  __typename: "DepositFeesInformation",
+                  minBankFee: "2500",
+                  minBankFeeThreshold: "1000000",
+                  tiers: [
+                    {
+                      __typename: "DepositFeeTier",
+                      maxAmount: "1000000",
+                      amount: "2500",
+                    },
+                    {
+                      __typename: "DepositFeeTier",
+                      maxAmount: "5000000",
+                      amount: "4000",
+                    },
+                    { __typename: "DepositFeeTier", maxAmount: null, amount: "5000" },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+    ]
+
+    const { findByText } = renderWithApolloMocks(threeTierMocks)
+
+    expect(await findByText("Onchain below 1M SAT")).toBeTruthy()
+    expect(await findByText("Onchain between 1M and 5M SAT")).toBeTruthy()
+    expect(await findByText("Onchain above 5M SAT")).toBeTruthy()
+    expect(await findByText("4,000 SAT")).toBeTruthy()
+  })
+
   it("renders a zero over-threshold fee when the unbounded tier is free", async () => {
     const zeroOverFeeMocks = [
       {

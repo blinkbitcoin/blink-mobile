@@ -2163,6 +2163,9 @@
     "lightningInvoice": "Invois lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Yuran deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit melebihi {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats / {minFiat: string} tidak boleh ditukar kepada Dolar secara automatik. Anda akan menerima Bitcoin.",
     "autoConvertFailed": "Pembayaran diterima tetapi penukaran gagal.",
     "pleaseWaitForConversion": "Sila tunggu sehingga penukaran selesai"
@@ -2546,6 +2549,7 @@
     "lightningTransactions": "Transaksi Lightning",
     "onchainBelowThreshold": "Onchain bawah {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain atas {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Caj pindahan",
     "noFee": "tiada caj",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} caj penghalaan",

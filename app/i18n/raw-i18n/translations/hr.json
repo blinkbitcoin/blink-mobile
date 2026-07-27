@@ -2163,6 +2163,9 @@
     "lightningInvoice": "Lightning račun",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Naknada za polog: {fee} SAT za iznose ispod {threshold} SAT ili {overFee} SAT za pologe iznad {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Iznosi manji od {minSats: number} satoshija / {minFiat: string} ne mogu se automatski pretvoriti u Dolare. Primit ćete Bitcoin.",
     "autoConvertFailed": "Uplata primljena, ali konverzija nije uspjela.",
     "pleaseWaitForConversion": "Pričekajte dok se konverzija ne dovrši"
@@ -2546,6 +2549,7 @@
     "lightningTransactions": "Lightning transakcije",
     "onchainBelowThreshold": "Onchain ispod {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain iznad {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Naknada za prijenos",
     "noFee": "bez naknade",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} naknada za usmjeravanje",

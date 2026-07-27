@@ -2205,6 +2205,9 @@ const en: BaseTranslation = {
     bitcoinOnchain: "Bitcoin onchain",
     depositFee:
       "Deposit fee: {fee: string} SAT for amounts under {threshold: string} SAT or {overFee: string} SAT for deposits over {threshold} SAT",
+    depositFeeTiers: "Deposit fees: {tiers: string}",
+    depositFeeTierUpTo: "{fee: string} SAT up to {max: string} SAT",
+    depositFeeTierAbove: "{fee: string} SAT above {min: string} SAT",
     autoConvertMinAmount:
       "Amounts below {minSats: number} SAT / {minFiat: string} can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
     autoConvertFailed: "Payment received but the conversion failed.",
@@ -2653,6 +2656,8 @@ const en: BaseTranslation = {
     lightningTransactions: "Lightning transactions",
     onchainBelowThreshold: "Onchain below {threshold: string} SAT",
     onchainAboveThreshold: "Onchain above {threshold: string} SAT",
+    onchainBetweenThresholds:
+      "Onchain between {lower: string} and {upper: string} SAT",
     transferFee: "Transfer fee",
     noFee: "no fee",
     lightningSendFee: "{fee: string} + ~{routingFee: string} routing fee",
