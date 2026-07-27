@@ -80,8 +80,8 @@ const buildLnurlDetail = <T extends WalletCurrency>({
     lnurlParams: destination.lnurlParams,
     unitOfAccountAmount: toBtcMoneyAmount(destination.lnurlParams.min || 0),
     isMerchant: destination.isMerchant,
-    destinationSpecifiedMemo: destination.lnurlParams.description,
     ...params,
+    destinationSpecifiedMemo: destination.lnurlParams.description,
   })
 
 const buildSparkDetail = <T extends WalletCurrency>({

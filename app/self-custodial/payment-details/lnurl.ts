@@ -170,10 +170,18 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   const isUsdSend = sendingWalletDescriptor.currency === WalletCurrency.Usd
   const payRequest = lnurlParamsToPayRequest(lnurlParams, lnurl)
 
+  // `commentAllowed` is a maximum length, not a flag. The note field accepts more
+  // characters than a destination typically allows, and since the note is now what fills
+  // the comment an over-long one would have the pay request rejected outright.
+  const comment =
+    lnurlParams.commentAllowed && memo
+      ? memo.slice(0, lnurlParams.commentAllowed)
+      : undefined
+
   const prepareOptions = {
     amount: toSdkSendAmount(settlementAmount.amount, sendingWalletDescriptor.currency),
     payRequest,
-    comment: lnurlParams.commentAllowed && memo ? memo : undefined,
+    comment,
     tokenIdentifier: resolveSendTokenIdentifier(sendingWalletDescriptor.currency),
     conversionOptions: isUsdSend
       ? {
@@ -225,12 +233,20 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
       }
     : { canSendPayment: false, canGetFee: false }
 
+  // Both memos are overwritten because the LNURL description supplied by the destination
+  // otherwise keeps winning the `memo` resolution above, leaving the note field frozen on
+  // the destination's own text and sending it as the comment. Mirrors the custodial LNURL
+  // details in app/screens/send-bitcoin-screen/payment-details/lightning.ts.
+  // Consequence, also intentional and shared with custodial: once the user edits the note
+  // the destination description is gone, so clearing the field sends no comment at all
+  // rather than falling back to it.
   const setMemo: PaymentDetailSetMemo<T> = {
     canSetMemo: true,
     setMemo: (newMemo) =>
       createSelfCustodialLnurlPaymentDetails({
         ...paramsWithKey,
         senderSpecifiedMemo: newMemo,
+        destinationSpecifiedMemo: newMemo,
       }),
   }
 

@@ -111,7 +111,14 @@ const extractMemo = (payment: Payment): string | undefined => {
   if (!payment.details) return undefined
 
   if (PaymentDetails.Lightning.instanceOf(payment.details)) {
-    return payment.details.inner.description ?? undefined
+    /**
+     * For an LNURL/Lightning-address send the invoice description carries the destination's
+     * own advertised text, while the sender's note travels as the LUD-12 comment and is what
+     * the SDK stores in lnurlPayInfo.comment. The comment is the user's own note, so it wins
+     * over the destination description for history display, matching custodial behaviour.
+     */
+    const { lnurlPayInfo, description } = payment.details.inner
+    return lnurlPayInfo?.comment ?? description ?? undefined
   }
 
   if (PaymentDetails.Spark.instanceOf(payment.details)) {

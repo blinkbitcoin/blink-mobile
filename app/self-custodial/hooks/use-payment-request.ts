@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
+import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { recordAppError } from "@app/utils/error-reporting"
@@ -35,6 +37,34 @@ import { useSelfCustodialWallet } from "../providers/wallet"
 
 import { useReceiveAssetMode } from "./use-receive-asset-mode"
 import type { InvoiceData, SelfCustodialPaymentRequestState } from "./types"
+
+/**
+ * The identity of a generation: the sdk instance plus a key covering everything else the
+ * invoice is derived from. Two generations are the same when both halves match, so adding
+ * a new input means extending `key` — there is no field-by-field comparison to forget.
+ */
+type GenerationInputs = {
+  sdk: BreezSdkInterface | null
+  key: string
+}
+
+const buildGenerationKey = (parts: {
+  type: InvoiceType
+  memo: string
+  amount: MoneyAmount<WalletOrDisplayCurrency> | undefined
+  assetMode: ReceiveAssetMode
+}): string =>
+  // Serialised rather than joined so a memo containing the separator cannot make two
+  // different generations look alike.
+  JSON.stringify([
+    parts.type,
+    parts.memo,
+    parts.amount ? `${parts.amount.amount}-${parts.amount.currencyCode}` : null,
+    parts.assetMode,
+  ])
+
+const isSameGeneration = (a: GenerationInputs | null, b: GenerationInputs): boolean =>
+  a !== null && a.sdk === b.sdk && a.key === b.key
 
 export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => {
   const { sdk, lastReceivedPaymentId, lightningAddress } = useSelfCustodialWallet()
@@ -98,17 +128,29 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     [amount, convertMoneyAmount],
   )
 
-  const generateRequest = useCallback(async () => {
-    if (!sdk || !isReady || isAssetModeLoading || !typeInitialized) return
-    if (type === Invoice.OnChain || type === Invoice.PayCode) return
-    if (
-      requestStateRef.current === PaymentRequestState.Loading ||
-      requestStateRef.current === PaymentRequestState.Converting ||
-      requestStateRef.current === PaymentRequestState.Paid
-    ) {
-      return
-    }
-    setRequestState(PaymentRequestState.Loading)
+  // The inputs a Lightning invoice is derived from. When any of them change, the invoice
+  // on screen is stale and has to be replaced. The sdk is part of it because a reconnect
+  // or account switch hands back a new instance whose invoices belong to a new session.
+  const generation: GenerationInputs = useMemo(
+    () => ({ sdk, key: buildGenerationKey({ type, memo, amount, assetMode }) }),
+    [sdk, type, memo, amount, assetMode],
+  )
+  const generationRef = useRef(generation)
+  generationRef.current = generation
+
+  // Holds what was last *attempted*, not what succeeded: recording the attempt is what
+  // keeps a failed generation from being retried in a loop, while a change that lands
+  // mid-flight leaves this mismatched and is picked up once the in-flight call settles.
+  const attemptedRef = useRef<GenerationInputs | null>(null)
+  const isGeneratingRef = useRef(false)
+
+  // Lets the settle handler below re-enter the newest generateRequest, whose runGeneration
+  // closure carries the current memo and amount, instead of the one it was created with.
+  const generateRequestRef = useRef<(attempt: GenerationInputs) => void>(() => {})
+
+  /** Performs the SDK call itself; guards and bookkeeping live in generateRequest. */
+  const runGeneration = useCallback(async () => {
+    if (!sdk) return
 
     try {
       const convertMoneyAmount = convertMoneyAmountRef.current
@@ -157,7 +199,51 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
       )
       setRequestState(PaymentRequestState.Error)
     }
-  }, [sdk, isReady, isAssetModeLoading, typeInitialized, type, memo, amount, assetMode])
+  }, [sdk, memo, amount, assetMode])
+
+  /**
+   * Guards and bookkeeping around runGeneration. `attempt` is the generation the caller
+   * observed, so the key recorded and the memo/amount the closure actually sends come from
+   * the same render rather than being paired implicitly through the ref.
+   *
+   * The busy flag is cleared from a `.finally` rather than a `try/finally` inside one async
+   * function because assigning a ref after an await trips eslint's require-atomic-updates —
+   * keep the two split.
+   */
+  const generateRequest = useCallback(
+    async (attempt: GenerationInputs) => {
+      if (!sdk || !isReady || isAssetModeLoading || !typeInitialized) return
+      if (type === Invoice.OnChain || type === Invoice.PayCode) return
+      if (isGeneratingRef.current) return
+      if (
+        requestStateRef.current === PaymentRequestState.Converting ||
+        requestStateRef.current === PaymentRequestState.Paid
+      ) {
+        return
+      }
+      attemptedRef.current = attempt
+      isGeneratingRef.current = true
+      setRequestState(PaymentRequestState.Loading)
+
+      return runGeneration().finally(() => {
+        isGeneratingRef.current = false
+        // Anything the user changed while this call was in flight is picked up here rather
+        // than by the effect below, so the retry does not depend on React happening to
+        // re-run that effect after this flag is cleared rather than before.
+        if (!isSameGeneration(attemptedRef.current, generationRef.current)) {
+          generateRequestRef.current(generationRef.current)
+        }
+      })
+    },
+    [sdk, isReady, isAssetModeLoading, typeInitialized, type, runGeneration],
+  )
+
+  generateRequestRef.current = generateRequest
+
+  /** Forces a fresh invoice regardless of whether anything changed (retry button). */
+  const regenerateInvoice = useCallback(() => {
+    generateRequestRef.current(generationRef.current)
+  }, [])
 
   const setMemo = useCallback(() => {
     setMemoState(memoChangeText || "")
@@ -197,8 +283,9 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
   }, [typeInitialized, canUsePaycode, assetMode, amount, memoChangeText, memo])
 
   useEffect(() => {
-    generateRequest()
-  }, [generateRequest])
+    if (isSameGeneration(attemptedRef.current, generation)) return
+    generateRequest(generation)
+  }, [generation, generateRequest])
 
   useEffect(() => {
     if (!sdk) return
@@ -342,7 +429,7 @@ export const usePaymentRequest = (): SelfCustodialPaymentRequestState | null => 
     setAmount,
     switchReceivingWallet,
     setExpirationTime: () => {},
-    regenerateInvoice: generateRequest,
+    regenerateInvoice,
     expiresInSeconds: null,
     expirationTime: 0,
     canSetExpirationTime: false,
