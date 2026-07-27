@@ -225,12 +225,17 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
       }
     : { canSendPayment: false, canGetFee: false }
 
+  // Both memos are overwritten because the LNURL description supplied by the destination
+  // otherwise keeps winning the `memo` resolution above, leaving the note field frozen on
+  // the destination's own text and sending it as the comment. Mirrors the custodial LNURL
+  // details in app/screens/send-bitcoin-screen/payment-details/lightning.ts.
   const setMemo: PaymentDetailSetMemo<T> = {
     canSetMemo: true,
     setMemo: (newMemo) =>
       createSelfCustodialLnurlPaymentDetails({
         ...paramsWithKey,
         senderSpecifiedMemo: newMemo,
+        destinationSpecifiedMemo: newMemo,
       }),
   }
 
