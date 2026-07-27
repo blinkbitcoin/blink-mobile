@@ -179,7 +179,7 @@ const creationBlockedDefault = [
  * migration nudges. Ops empties the remote list after the withdrawal deadline, which is
  * what retires the bulletin — the client never compares dates.
  */
-const offboardOnlyDefault = ["AE", "NP", "DZ"]
+const offboardOnlyDefault = ["AE", "NP", "DZ", "CN", "MM"]
 
 export const defaultRemoteConfig: RemoteConfig = {
   deviceAccountEnabledRestAuth: false,
