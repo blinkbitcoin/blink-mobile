@@ -654,442 +654,442 @@
                 }
             },
             "TheEvolutionOfMoneyI": {
-                "title": "The Evolution of Money I",
+                "title": "L'évolution de la monnaie I",
                 "questions": {
                     "evolutionMoney": {
                         "answers": [
-                            "The use of money as a way to exchange goods and services",
-                            "The history of money's development",
-                            "The exclusive power of governments to create money"
+                            "L'utilisation de la monnaie comme moyen d'échanger des biens et services",
+                            "L'histoire du développement de la monnaie",
+                            "Le pouvoir exclusif des gouvernements de créer de la monnaie"
                         ],
                         "feedback": [
-                            "Congrats, you got it right! It's interesting to note that the use of money as a medium of exchange has become more important in modern times due to the rise of electronic payment methods",
-                            "Wrong! But it's good that you're interested in the history of money. Try again",
-                            "Sorry, that's incorrect. It's true that governments do have a lot of control over the creation and issuance of money, but that's not the main focus of modern monetary economics. Try again!"
+                            "Bravo, c'est la bonne réponse ! Il est intéressant de noter que l'usage de la monnaie comme moyen d'échange a pris encore plus d'importance de nos jours avec l'essor des moyens de paiement électroniques.",
+                            "Faux ! Mais c'est bien de s'intéresser à l'histoire de la monnaie. Réessayez.",
+                            "Dommage, ce n'est pas correct. Il est vrai que les gouvernements ont un grand contrôle sur la création et l'émission de la monnaie, mais ce n'est pas l'objet principal de l'économie monétaire moderne. Réessayez !"
                         ],
-                        "question": "What is the main focus of modern monetary economics",
-                        "text": "In modern times, many people in the field of monetary economics focus on the idea that money is mainly used as a way to exchange goods and services.\n\nIn the past century, however, governments have had the exclusive power to create money and have often made it difficult for money to hold its value. This lead people to believe that the main purpose of money is to be used for exchange.\n\nSome have argued that Bitcoin is not a good form of money because its value tends to change too much to be used effectively in transactions.\n\nHowever, this way of thinking is backwards. Throughout history, the use of money has developed in stages, with its value as a store of value coming before its use as a medium of exchange.\n",
-                        "title": "The Evolution of Money"
+                        "question": "Quel est l'objet principal de l'économie monétaire moderne ?",
+                        "text": "De nos jours, de nombreux économistes spécialisés en économie monétaire se concentrent sur l'idée que la monnaie sert principalement à échanger des biens et des services.\n\nPourtant, au cours du siècle dernier, les gouvernements ont eu le pouvoir exclusif de créer de la monnaie et ont souvent eu du mal à lui faire conserver sa valeur. Cela a conduit à croire que le rôle principal de la monnaie est d'être utilisée pour l'échange.\n\nCertains ont avancé que le Bitcoin n'est pas une bonne forme de monnaie car sa valeur varie trop pour être utilisée efficacement dans les transactions.\n\nPourtant, ce raisonnement est à l'envers. Tout au long de l'histoire, l'usage de la monnaie s'est développé par étapes, sa fonction de réserve de valeur précédant son usage comme moyen d'échange.\n",
+                        "title": "L'évolution de la monnaie"
                     },
                     "collectible": {
                         "answers": [
-                            "Shells, beads, and gold",
-                            "Coins made of copper and silver",
-                            "Paper bills with pictures of famous leaders"
+                            "Les coquillages, les perles et l'or",
+                            "Les pièces en cuivre et en argent",
+                            "Les billets de banque à l'effigie de grands dirigeants"
                         ],
                         "feedback": [
-                            "Congratulations, you got it right! It's interesting to note that shells, beads, and gold were all valued for their appearance or special qualities before becoming widely used as money",
-                            "Sorry, that's incorrect. Copper and silver coins were not used as money in the very beginning of its evolution",
-                            "Wrong! But at least you're thinking about the more modern forms of money. Paper bills with pictures of famous leaders were not used in the very beginning of money's evolution."
+                            "Bravo, c'est la bonne réponse ! Il est intéressant de noter que les coquillages, les perles et l'or ont d'abord été valorisés pour leur apparence ou leurs qualités particulières, avant de devenir largement utilisés comme monnaie.",
+                            "Dommage, ce n'est pas correct. Les pièces en cuivre et en argent n'ont pas été utilisées comme monnaie dès les tout premiers débuts de son évolution.",
+                            "Faux ! Mais au moins vous pensez à des formes de monnaie plus modernes. Les billets à l'effigie de grands dirigeants n'ont pas été utilisés dès les tout premiers débuts de l'évolution de la monnaie."
                         ],
-                        "question": "What were some examples of early forms of money that were valued for their appearance or special qualities",
-                        "text": "Throughout history, money has gone through four stages of development. In the very beginning, people only wanted money because of its special qualities, and it was mostly seen as a decorative item or a collectible.;\n\nExamples of this include shells, beads, and gold, which were all collectibles before becoming widely used as money.\n",
-                        "title": "Four Stages of Money: Collectible"
+                        "question": "Quels sont des exemples de formes primitives de monnaie valorisées pour leur apparence ou leurs qualités particulières ?",
+                        "text": "Tout au long de l'histoire, la monnaie a traversé quatre étapes de développement. Au tout début, les gens ne désiraient la monnaie que pour ses qualités particulières, et elle était surtout perçue comme un objet décoratif ou de collection.\n\nOn peut citer comme exemples les coquillages, les perles et l'or, qui étaient tous des objets de collection avant de devenir largement utilisés comme monnaie.\n",
+                        "title": "Les quatre étapes de la monnaie : objet de collection"
                     },
                     "storeOfValue": {
                         "answers": [
-                            "The number of people who want it as a store of value",
-                            "The weather",
-                            "The color of the store of value"
+                            "Le nombre de personnes qui la désirent comme réserve de valeur",
+                            "La météo",
+                            "La couleur de la réserve de valeur"
                         ],
                         "feedback": [
-                            "Nice work! The purchasing power of a store of value is determined by the number of people who want to use it as a way to store value. As more people want to use it for this purpose, the value of the store of value increases",
-                            "Sorry, the weather is definitely a factor in many things, but it's not quite the right answer for this question. Maybe try looking at other factors that could affect the value of a store of value",
-                            "I'm sorry to say that the color of a store of value probably doesn't have much of an effect on its purchasing power. It's definitely an interesting idea though! Maybe try considering other characteristics that could affect the value of a store of value."
+                            "Bien joué ! Le pouvoir d'achat d'une réserve de valeur est déterminé par le nombre de personnes qui souhaitent l'utiliser à cette fin. Plus ce nombre augmente, plus la valeur de la réserve de valeur augmente.",
+                            "Dommage, la météo est certes un facteur important dans bien des domaines, mais ce n'est pas la bonne réponse ici. Essayez de considérer d'autres facteurs qui pourraient affecter la valeur d'une réserve de valeur.",
+                            "Désolé, mais la couleur d'une réserve de valeur n'a probablement pas beaucoup d'effet sur son pouvoir d'achat. C'est tout de même une idée intéressante ! Essayez de considérer d'autres caractéristiques qui pourraient affecter la valeur d'une réserve de valeur."
                         ],
-                        "question": "What determines the purchasing power of a store of value",
-                        "text": "The store of value is the second stage of money's evolution. When enough people want money because of its special qualities, it becomes a way to keep and save value over time, to transport hard earned wealth into the future.\n\nAs more people recognize a good as a good way to store value, the good's value increases as more people want it for this purpose.\n\nEventually, the value of a store of value will stop increasing as it becomes widely held and fewer new people want it as a store of value.\n",
-                        "title": "Four Stages of Money: Store of Value"
+                        "question": "Qu'est-ce qui détermine le pouvoir d'achat d'une réserve de valeur ?",
+                        "text": "La réserve de valeur est la deuxième étape de l'évolution de la monnaie. Lorsque suffisamment de personnes désirent une monnaie pour ses qualités particulières, elle devient un moyen de conserver de la valeur dans le temps, pour transporter une richesse durement acquise vers l'avenir.\n\nÀ mesure que davantage de personnes reconnaissent un bien comme un bon moyen de conserver de la valeur, la valeur de ce bien augmente, car de plus en plus de gens le désirent à cette fin.\n\nFinalement, la valeur d'une réserve de valeur cesse d'augmenter à mesure qu'elle devient largement détenue et que de moins en moins de nouvelles personnes la recherchent comme réserve de valeur.\n",
+                        "title": "Les quatre étapes de la monnaie : réserve de valeur"
                     },
                     "mediumOfExchange": {
                         "answers": [
-                            "The first time bitcoin had market value",
-                            "The invention of pineapple as a pizza topping",
-                            "again"
+                            "La première fois que le bitcoin a eu une valeur de marché",
+                            "L'invention de l'ananas comme garniture de pizza",
+                            "encore"
                         ],
                         "feedback": [
-                            "You got it right. Bitcoin Pizza Day is celebrated to mark the first time that bitcoin had market value, which was when Laszlo Hanyecz traded 10,000 bitcoins for two pizzas. It's an important event in the evolution of bitcoin",
-                            "While pineapple is a beautiful fruit, it has no place on a real pizza! Apart from this side note, your answer is wrong. Try again",
-                            "Sorry, the best pizza recipe is a matter of personal preference. While pizza is always delicious, it's not the focus of Bitcoin Pizza Day. Maybe try considering the significance of the event in the history of bitcoin."
+                            "C'est la bonne réponse. Le Bitcoin Pizza Day célèbre la première fois que le bitcoin a eu une valeur de marché, lorsque Laszlo Hanyecz a échangé 10 000 bitcoins contre deux pizzas. C'est un événement important dans l'évolution du bitcoin.",
+                            "L'ananas est un beau fruit, mais il n'a rien à faire sur une vraie pizza ! Ceci dit, votre réponse est fausse. Réessayez.",
+                            "Dommage, la meilleure recette de pizza est une question de goût personnel. La pizza est toujours délicieuse, mais ce n'est pas l'objet du Bitcoin Pizza Day. Essayez plutôt de considérer l'importance de cet événement dans l'histoire du bitcoin."
                         ],
-                        "question": "What is Bitcoin Pizza Day celebrated for",
-                        "text": "When money is used to store value, its value becomes stable eventually. And when the value of money is stable, it becomes the best option to facilitate trade as it's easy to use and doesn't have the coordination burden of barter.\n\nIn the early days of Bitcoin in 2010, some people did not recognize the opportunity cost to use Bitcoin as a medium of exchange rather than a nascent store of value.\n\nThere is a famous story about Laszlo Hanyecz who traded 10,000 bitcoins (which were worth about $165 million at the time of this writing) for just two pizzas. When Laszlo acquired those pizzas, it marked the first time that bitcoin had market value.\n\nToday, Laszlo's pizza is celebrated globally on May 22 as Bitcoin Pizza Day as an important step and milestone in the evolution of bitcoin as money.\n",
-                        "title": "Four Stages of Money: Medium of Exchange"
+                        "question": "Que célèbre le « Bitcoin Pizza Day » ?",
+                        "text": "Lorsque la monnaie sert à conserver de la valeur, celle-ci finit par se stabiliser. Et lorsque la valeur de la monnaie est stable, elle devient la meilleure option pour faciliter le commerce, car elle est facile à utiliser et n'a pas la contrainte de coordination du troc.\n\nAux débuts du Bitcoin en 2010, certaines personnes n'ont pas perçu le coût d'opportunité qu'il y avait à utiliser le Bitcoin comme moyen d'échange plutôt que comme réserve de valeur naissante.\n\nIl existe une histoire célèbre à propos de Laszlo Hanyecz, qui a échangé 10 000 bitcoins (qui valaient environ 165 millions de dollars au moment de la rédaction de ce texte) contre seulement deux pizzas. Lorsque Laszlo a obtenu ces pizzas, cela a marqué la première fois que le bitcoin avait une valeur de marché.\n\nAujourd'hui, la pizza de Laszlo est célébrée dans le monde entier le 22 mai, à l'occasion du Bitcoin Pizza Day, comme une étape importante dans l'évolution du bitcoin en tant que monnaie.\n",
+                        "title": "Les quatre étapes de la monnaie : moyen d'échange"
                     },
                     "unitOfAccount": {
                         "answers": [
-                            "When merchants are willing to accept it as payment without considering the exchange rate with other currencies",
-                            "When it is used to buy ice cream",
-                            "When it is used to play games with friends"
+                            "Lorsque les commerçants acceptent de le recevoir en paiement sans tenir compte du taux de change avec d'autres monnaies",
+                            "Lorsqu'il sert à acheter une glace",
+                            "Lorsqu'il sert à jouer avec des amis"
                         ],
                         "feedback": [
-                            "Congrats! For bitcoin to be considered a unit of account, it needs to be widely accepted as a form of payment without regard to its exchange rate with other currencies. This means that merchants would be willing to accept it as payment without considering the value of bitcoin in terms of other currencie",
-                            "I'm sorry, but while ice cream is delicious, it's not quite the right answer. Maybe try considering other factors that could affect the acceptance of bitcoin as a unit of account",
-                            "Playing games with friends is always fun, but unfortunately it's not the correct answer. Maybe try thinking about what it would take for bitcoin to be widely accepted as a form of payment.\""
+                            "Bravo ! Pour que le bitcoin soit considéré comme une unité de compte, il doit être largement accepté comme moyen de paiement sans tenir compte de son taux de change avec d'autres monnaies. Cela signifie que les commerçants accepteraient de le recevoir en paiement sans se soucier de sa valeur par rapport aux autres monnaies.",
+                            "Désolé, la glace est délicieuse, mais ce n'est pas tout à fait la bonne réponse. Essayez de considérer d'autres facteurs qui pourraient affecter l'acceptation du bitcoin comme unité de compte.",
+                            "Jouer avec des amis est toujours amusant, mais ce n'est malheureusement pas la bonne réponse. Essayez de réfléchir à ce qu'il faudrait pour que le bitcoin soit largement accepté comme moyen de paiement."
                         ],
-                        "question": "How can bitcoin be considered a unit of account",
-                        "text": "When money is commonly used for trading, goods are priced in terms of it. This means that most goods can be exchanged for money at a certain rate.\n\nIt is not accurate to say that many goods can be bought with bitcoin today. For example, while a cup of coffee might be available for purchase using bitcoin, the price listed is not the true value of bitcoin. Instead, it is the dollar price that the merchant wants, converted into bitcoin based on the current exchange rate between dollars and bitcoin.\n\nIf the value of bitcoin goes down in terms of dollars, the merchant will ask for more bitcoin to equal the same dollar amount.\n\nBitcoin can only be considered a unit of account (a standard way to measure the value of goods) when merchants are willing to accept it for payment without considering the exchange rate with other currencies.\n",
-                        "title": "Four Stages of Money: Unit of Account"
+                        "question": "Comment le bitcoin peut-il être considéré comme une unité de compte ?",
+                        "text": "Lorsqu'une monnaie est couramment utilisée pour le commerce, les biens sont exprimés en fonction de sa valeur. Cela signifie que la plupart des biens peuvent être échangés contre cette monnaie à un certain taux.\n\nIl n'est pas exact de dire que de nombreux biens peuvent être achetés en bitcoin aujourd'hui. Par exemple, même si un café peut être payé en bitcoin, le prix affiché ne reflète pas la véritable valeur du bitcoin. Il s'agit en réalité du prix en dollars souhaité par le commerçant, converti en bitcoin selon le taux de change actuel entre le dollar et le bitcoin.\n\nSi la valeur du bitcoin baisse par rapport au dollar, le commerçant demandera davantage de bitcoins pour obtenir le même montant en dollars.\n\nLe bitcoin ne peut être considéré comme une unité de compte (un moyen standard de mesurer la valeur des biens) que lorsque les commerçants acceptent de le recevoir en paiement sans tenir compte du taux de change avec d'autres monnaies.\n",
+                        "title": "Les quatre étapes de la monnaie : unité de compte"
                     },
                     "partlyMonetized": {
                         "answers": [
-                            "A good that is not yet widely used as a unit of account",
-                            "A currency that is only accepted in certain countries",
-                            "A good that is used as a medium of exchange but not for storing value or measuring the value of goods"
+                            "Un bien qui n'est pas encore largement utilisé comme unité de compte",
+                            "Une monnaie qui n'est acceptée que dans certains pays",
+                            "Un bien utilisé comme moyen d'échange, mais pas pour conserver de la valeur ou mesurer la valeur d'autres biens"
                         ],
                         "feedback": [
-                            "Congratulations! You've chosen the correct answer. A partly monetized good is one that is not yet widely accepted as a unit of account, which means it is not commonly used as a standard way to measure the value of other goods. This can include goods like gold, which is often used to store value but not typically used for everyday transactions",
-                            "That's a creative answer, but unfortunately not quite right. Better luck next time",
-                            "Not quite correct, but close! Keep thinking."
+                            "Bravo, vous avez choisi la bonne réponse ! Un bien partiellement monétisé est un bien qui n'est pas encore largement accepté comme unité de compte, c'est-à-dire qu'il n'est pas couramment utilisé comme moyen standard de mesurer la valeur d'autres biens. C'est le cas par exemple de l'or, souvent utilisé pour conserver de la valeur mais rarement utilisé pour les transactions quotidiennes.",
+                            "C'est une réponse créative, mais malheureusement pas tout à fait juste. Ce sera pour une prochaine fois.",
+                            "Pas tout à fait exact, mais vous y êtes presque ! Continuez à réfléchir."
                         ],
-                        "question": "What is the meaning of the term \"partly monetized\"",
-                        "text": "Goods that are not widely accepted as a unit of account may be considered \"partly monetized\" because they are used for some purposes related to money, but not all.\n\nGold is an example of a partly monetized good that is used to store value but is not widely used as a medium of exchange or unit of account. In some countries, different goods may be used for different purposes related to money, such as one good being used as a medium of exchange and another being used as a store of value or unit of account.\n\nThe dollar is an example of a good that is widely used for all three purposes of money in the United States, while the peso was an example of a good that was used as a medium of exchange in Argentina but was not a good store of value because of its volatility and regular loss of purchasing power.\n",
-                        "title": "Partial Monetization"
+                        "question": "Que signifie le terme « partiellement monétisé » ?",
+                        "text": "Les biens qui ne sont pas largement acceptés comme unité de compte peuvent être considérés comme « partiellement monétisés », car ils remplissent certaines fonctions monétaires, mais pas toutes.\n\nL'or est un exemple de bien partiellement monétisé : il sert à conserver de la valeur, mais n'est pas largement utilisé comme moyen d'échange ou unité de compte. Dans certains pays, différents biens peuvent servir à différentes fonctions monétaires, l'un servant de moyen d'échange et un autre de réserve de valeur ou d'unité de compte.\n\nLe dollar est un exemple de bien largement utilisé pour les trois fonctions de la monnaie aux États-Unis, tandis que le peso a pu servir de moyen d'échange en Argentine sans pour autant être une bonne réserve de valeur, en raison de sa volatilité et de sa perte régulière de pouvoir d'achat.\n",
+                        "title": "Monétisation partielle"
                     },
                     "monetizationStage": {
                         "answers": [
-                            "It is in the process of becoming more widely accepted as money",
-                            "It is currently being used as a way to trade goods and services, like other currencies.",
-                            "It has already completed the process of becoming more widely accepted as money and is now being used as a form of currency."
+                            "Il est en train de devenir plus largement accepté comme monnaie",
+                            "Il est actuellement utilisé pour échanger des biens et services, comme les autres monnaies.",
+                            "Il a déjà achevé son processus d'acceptation plus large en tant que monnaie et est désormais utilisé comme forme de monnaie à part entière."
                         ],
                         "feedback": [
-                            "Bingo! You're right on the money (pun intended) with this answer. Did you know that the process of Bitcoin becoming more widely accepted as money is similar to the process gold went through to become a widely accepted form of currency",
-                            "Ha! You must have missed the part about it taking several years for Bitcoin to reach this stage. Keep reading",
-                            "Sorry to break it to you, but Bitcoin is still in the process of becoming more widely accepted as money. Better luck next time!"
+                            "Bingo ! Vous avez visé juste (sans mauvais jeu de mots) avec cette réponse. Saviez-vous que le processus par lequel le Bitcoin devient plus largement accepté comme monnaie ressemble à celui qu'a connu l'or pour devenir une monnaie largement acceptée ?",
+                            "Ha ! Vous avez dû manquer le passage expliquant qu'il faudra plusieurs années au Bitcoin pour atteindre cette étape. Continuez votre lecture.",
+                            "Désolé de vous l'apprendre, mais le Bitcoin est encore en train de devenir plus largement accepté comme monnaie. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "What is the current stage of Bitcoin's evolution",
-                        "text": "Bitcoin is currently changing from the first stage of being used as money to the second stage. It may take several years for Bitcoin to be used as a way to trade goods and services, like other currencies.\n\nThe process of Bitcoin becoming more widely accepted as money is uncertain, as the same process took a long time for gold and no one alive has seen a good become money in the same way that is happening with Bitcoin. There is not a lot of experience with this process, but developments around the world are very promising and happening faster in the interconnected digital age.\n",
-                        "title": "Bitcoin is in the stage of monetization"
+                        "question": "Quelle est l'étape actuelle de l'évolution du Bitcoin ?",
+                        "text": "Le Bitcoin est actuellement en train de passer de la première à la deuxième étape de son usage comme monnaie. Il pourrait falloir plusieurs années avant que le Bitcoin ne soit utilisé pour échanger des biens et services, comme les autres monnaies.\n\nLe processus par lequel le Bitcoin devient plus largement accepté comme monnaie reste incertain : ce même processus a pris beaucoup de temps pour l'or, et personne de vivant n'a assisté à la monétisation d'un bien de la même manière que ce qui se produit avec le Bitcoin. On a peu de recul sur ce processus, mais les développements à travers le monde sont très prometteurs et se produisent plus rapidement dans notre ère numérique interconnectée.\n",
+                        "title": "Le Bitcoin est en phase de monétisation"
                     }
                 }
             },
             "TheEvolutionOfMoneyII": {
-                "title": "The Evolution of Money II",
+                "title": "L'évolution de la monnaie II",
                 "questions": {
                     "notFromGovernment": {
                         "answers": [
-                            "Money is the most tradable good in any given market.",
-                            "Money is a government creation.",
-                            "Money is a magical substance created by fairies."
+                            "La monnaie est le bien le plus échangeable sur un marché donné.",
+                            "La monnaie est une création des gouvernements.",
+                            "La monnaie est une substance magique créée par des fées."
                         ],
                         "feedback": [
-                            "Correct. It's interesting to think about how different societies throughout history have used different items as a form of currency, from seashells to cattle to gold. But ultimately, it's the willingness of people to trade and accept an item as payment that determines its value as money",
-                            "Nope, sorry! Looks like the government isn't as powerful as we thought they were. Better luck next time",
-                            "Sorry, but it looks like the tooth fairy is the only one making magic money these days. Better luck with your next answer!"
+                            "Exact. Il est intéressant de constater que différentes sociétés, à travers l'histoire, ont utilisé différents objets comme monnaie, des coquillages au bétail en passant par l'or. Mais au final, c'est la volonté des gens d'échanger et d'accepter un objet en paiement qui détermine sa valeur en tant que monnaie.",
+                            "Non, dommage ! On dirait que les gouvernements ne sont pas aussi puissants qu'on le pensait. Ce sera pour une prochaine fois.",
+                            "Dommage, mais on dirait que seule la petite souris fabrique de la monnaie magique de nos jours. Bonne chance pour la prochaine réponse !"
                         ],
-                        "question": "What is money",
-                        "text": "There is a popular misconception that money is a government creation and cannot exist without government. This is false.\n\nThe history of money goes back thousands of years to times when governments did not exist, but money did.\n\nThis proves that money is emergent and simply the most tradable good in a market. It is not a government creation and certainly does not require a government to make money work.\n",
-                        "title": "Money is not a government creation"
+                        "question": "Qu'est-ce que la monnaie ?",
+                        "text": "Une idée reçue très répandue veut que la monnaie soit une création des gouvernements et ne puisse exister sans eux. C'est faux.\n\nL'histoire de la monnaie remonte à des milliers d'années, à une époque où les gouvernements n'existaient pas, mais où la monnaie, elle, existait déjà.\n\nCela prouve que la monnaie est un phénomène émergent, simplement le bien le plus échangeable sur un marché. Elle n'est pas une création des gouvernements et n'a certainement pas besoin d'un gouvernement pour fonctionner.\n",
+                        "title": "La monnaie n'est pas une création des gouvernements"
                     },
                     "primaryFunction": {
                         "answers": [
-                            "To improve the workings of small barter networks.",
-                            "To facilitate large scale trade networks.",
-                            "To reduce the need for credit."
+                            "Améliorer le fonctionnement des petits réseaux de troc.",
+                            "Faciliter les réseaux commerciaux à grande échelle.",
+                            "Réduire le besoin de crédit."
                         ],
                         "feedback": [
-                            "Congratulations! It's interesting to think about how money has evolved over time, from its early use as a means of facilitating trade in small communities to its current role as a medium of exchange in modern economies",
-                            "Sorry, looks like you got it backwards! Better luck with your next guess",
-                            "Wrong! Credit has been around for almost as long as money, and it's likely here to stay. Better luck with your next answer."
+                            "Bravo ! Il est intéressant de voir comment la monnaie a évolué au fil du temps, de son usage initial pour faciliter le commerce dans de petites communautés jusqu'à son rôle actuel de moyen d'échange dans les économies modernes.",
+                            "Dommage, on dirait que vous avez inversé la réponse ! Bonne chance pour la suivante.",
+                            "Faux ! Le crédit existe depuis presque aussi longtemps que la monnaie, et il est probablement là pour rester. Bonne chance pour la prochaine réponse."
                         ],
-                        "question": "What was the primary function of money",
-                        "text": "Primitive money existed long before large scale trade networks. Archeologists found that early humans used valuable tools like arrowheads, collectibles like cowry shells and commodities like barley as primitive money.\n\nThe main advantage and primary function of these primitive moneys was to improve the workings of even small barter networks. Primitive moneys achieved this by eliminating the need to match coincidences of wants, interests, supply or skill. They also greatly reduced the need for credit, which, in the absence of writing in prehistoric times, was difficult to keep track of.\n",
-                        "title": "The primary function of money"
+                        "question": "Quelle était la fonction première de la monnaie ?",
+                        "text": "La monnaie primitive existait bien avant les réseaux commerciaux à grande échelle. Les archéologues ont découvert que les premiers humains utilisaient comme monnaie primitive des outils précieux tels que des pointes de flèches, des objets de collection comme les cauris, ou des denrées comme l'orge.\n\nL'avantage principal et la fonction première de ces monnaies primitives était d'améliorer le fonctionnement même des petits réseaux de troc. Elles y parvenaient en éliminant le besoin de faire coïncider les désirs, intérêts, l'offre ou les compétences des uns et des autres. Elles réduisaient aussi fortement le besoin de crédit, difficile à suivre en l'absence d'écriture à l'époque préhistorique.\n",
+                        "title": "La fonction première de la monnaie"
                     },
                     "monetaryMetals": {
                         "answers": [
-                            "Their ability to withstand time and wear.",
-                            "Their rarity and difficulty to produce.",
-                            "Their colorful and decorative appearance."
+                            "Leur capacité à résister au temps et à l'usure.",
+                            "Leur rareté et la difficulté à les produire.",
+                            "Leur apparence colorée et décorative."
                         ],
                         "feedback": [
-                            "Correct! It's impressive to think about how certain materials, like metal, have been able to hold value over centuries and even millennia. Good work",
-                            "Nice try, but not quite right. Better luck with your next answer",
-                            "Sorry, looks like you were a little off the mark this time. Maybe try focusing on the functional aspects of money rather than its aesthetic appeal."
+                            "Exact ! Il est impressionnant de constater que certains matériaux, comme le métal, ont pu conserver leur valeur pendant des siècles, voire des millénaires. Bien joué.",
+                            "Belle tentative, mais ce n'est pas tout à fait ça. Bonne chance pour la prochaine réponse.",
+                            "Dommage, vous n'étiez pas tout à fait dans le mille cette fois. Essayez de vous concentrer sur les aspects fonctionnels de la monnaie plutôt que sur son apparence esthétique."
                         ],
-                        "question": "What made metals valuable as a form of money",
-                        "text": "Metals were difficult to make, which made them rare. They also lasted longer than other materials like shells, grains, and beads. This made them valuable and easy to carry, or portable.\n\nAs technology improved, especially in the production of metal, humans were able to create more advanced, better forms of money.\n",
-                        "title": "Monetary Metals"
+                        "question": "Qu'est-ce qui a rendu les métaux précieux en tant que forme de monnaie ?",
+                        "text": "Les métaux étaient difficiles à produire, ce qui les rendait rares. Ils duraient aussi plus longtemps que d'autres matériaux comme les coquillages, les grains ou les perles. Cela les rendait précieux et faciles à transporter, donc portables.\n\nÀ mesure que la technologie progressait, en particulier dans la production des métaux, les humains ont pu créer des formes de monnaie plus avancées et plus performantes.\n",
+                        "title": "Les métaux monétaires"
                     },
                     "stockToFlow": {
                         "answers": [
-                            "A measure of the rate at which new units of a monetary good are introduced into the existing supply.",
-                            "A measure of a company's financial stability.",
-                            "A ratio used to compare the value of different currencies."
+                            "Une mesure du rythme auquel de nouvelles unités d'un bien monétaire sont introduites dans l'offre existante.",
+                            "Une mesure de la stabilité financière d'une entreprise.",
+                            "Un ratio utilisé pour comparer la valeur de différentes monnaies."
                         ],
                         "feedback": [
-                            "That's right! The Stock to Flow ratio can be a useful tool for understanding the stability and scarcity of a particular currency or commodity. Good job",
-                            "Sorry, looks like you're mixing up your business jargon. Better luck with your next answer",
-                            "Wrong! But hey, at least you're thinking about the global economy. Better luck with your next guess."
+                            "C'est exact ! Le ratio stock-sur-flux est un outil utile pour comprendre la stabilité et la rareté d'une monnaie ou d'une matière première donnée. Bien joué.",
+                            "Dommage, on dirait que vous confondez le jargon économique. Bonne chance pour la prochaine réponse.",
+                            "Faux ! Mais au moins, vous pensez à l'économie mondiale. Bonne chance pour la suivante."
                         ],
-                        "question": "What is the Stock to Flow ratio",
-                        "text": "The Stock to Flow ratio is a measure of the rate at which new units of money are added to the existing supply.\n\nTo calculate it, you divide the existing amount of money by the amount produced each year.\n\nFor something to be a good way to save value, it should become more valuable when people want to use it to save, but the people who make it should not be able to add too much of it, which would make it less valuable.\n",
-                        "title": "Understanding the Stock to Flow Ratio"
+                        "question": "Qu'est-ce que le ratio stock-sur-flux (Stock to Flow) ?",
+                        "text": "Le ratio stock-sur-flux mesure le rythme auquel de nouvelles unités de monnaie s'ajoutent à l'offre existante.\n\nPour le calculer, on divise la quantité de monnaie existante par la quantité produite chaque année.\n\nPour qu'un bien soit un bon moyen de conserver de la valeur, il doit gagner en valeur lorsque les gens souhaitent l'utiliser pour épargner, mais ceux qui le produisent ne doivent pas pouvoir en ajouter trop, ce qui le rendrait moins précieux.\n",
+                        "title": "Comprendre le ratio stock-sur-flux"
                     },
                     "hardMoney": {
                         "answers": [
-                            "The difficulty of producing new units of a monetary good.",
-                            "The value of money compared to other currencies.",
-                            "The amount of money in circulation."
+                            "La difficulté à produire de nouvelles unités d'un bien monétaire.",
+                            "La valeur de la monnaie par rapport à d'autres monnaies.",
+                            "La quantité de monnaie en circulation."
                         ],
                         "feedback": [
-                            "That's it! **** It's interesting to think about how the hardness of money can change over time as technology advances and what was once difficult to produce becomes easier. Good job",
-                            "Sorry, looks like you got it backwards! Better luck with your next guess",
-                            "Wrong! The hardness of money has more to do with its production than its quantity. Better luck with your next answer."
+                            "C'est ça ! Il est intéressant de constater que la dureté de la monnaie peut évoluer avec le temps, à mesure que la technologie progresse et que ce qui était autrefois difficile à produire devient plus facile. Bien joué.",
+                            "Dommage, on dirait que vous avez inversé la réponse ! Bonne chance pour la suivante.",
+                            "Faux ! La dureté de la monnaie a plus à voir avec sa production qu'avec sa quantité. Bonne chance pour la prochaine réponse."
                         ],
-                        "question": "What is the hardness of money",
-                        "text": "The difficulty of producing new units of money compared to other forms of money is called its hardness. This can change over time as technology improves and what was once difficult to produce could become easier.\n\nIn precolonial Ghana (Africa), aggry beads (made of glass) were used as money. Glassmaking was an expensive craft in that region, which gave the aggry beads a high stock-to-flow ratio and made them rather scarce.\n\nIn the 16th century, European explorers discovered the high value ascribed to these beads by the west Africans and began importing them in mass quantities; as European glassmaking technology made them extremely cheap to produce.\n\nSlowly but surely, the Europeans used these cheaply produced beads to acquire most of the precious resources of Africa. The net effect of this incursion into Africa was the transference its vast natural resource wealth to Europeans and the conversion of aggry beads from hard money to soft money.\n\nAs societies continued to evolve, they began to move away from artifact money like stones and glass beads and towards monetary metals.\n",
-                        "title": "Hard Money and Easy Money"
+                        "question": "Qu'est-ce que la « dureté » de la monnaie ?",
+                        "text": "La difficulté à produire de nouvelles unités d'une monnaie, comparée à d'autres formes de monnaie, s'appelle sa « dureté ». Celle-ci peut évoluer avec le temps, à mesure que la technologie progresse et que ce qui était autrefois difficile à produire devient plus facile.\n\nDans le Ghana précolonial (Afrique), les perles aggrey (faites de verre) servaient de monnaie. La fabrication du verre était un artisanat coûteux dans cette région, ce qui donnait aux perles aggrey un ratio stock-sur-flux élevé et les rendait plutôt rares.\n\nAu XVIe siècle, des explorateurs européens ont découvert la grande valeur que les Africains de l'Ouest accordaient à ces perles et ont commencé à en importer en masse, la technologie européenne du verre les rendant extrêmement bon marché à produire.\n\nPeu à peu, les Européens ont utilisé ces perles bon marché pour s'emparer de la majeure partie des ressources précieuses de l'Afrique. L'effet net de cette incursion en Afrique fut le transfert de son immense richesse naturelle vers les Européens, et la transformation des perles aggrey de monnaie dure en monnaie molle.\n\nÀ mesure que les sociétés continuaient d'évoluer, elles ont commencé à délaisser les monnaies-objets comme les pierres et les perles de verre au profit des métaux monétaires.\n",
+                        "title": "Monnaie dure et monnaie facile"
                     }
                 }
             },
             "TheEvolutionOfMoneyIII": {
-                "title": "The Evolution of Money III",
+                "title": "L'évolution de la monnaie III",
                 "questions": {
                     "convergingOnGold": {
                         "answers": [
-                            "Because it cannot be destroyed or synthesized from other materials.",
-                            "Because it is abundant and easy to find.",
-                            "Because it is the most attractive and visually appealing metal."
+                            "Parce qu'il ne peut être détruit ni synthétisé à partir d'autres matériaux.",
+                            "Parce qu'il est abondant et facile à trouver.",
+                            "Parce que c'est le métal le plus attrayant visuellement."
                         ],
                         "feedback": [
-                            "Exactly**.** It's interesting to think about how the qualities of different materials, such as gold's durability and rarity, can make them more valuable and desirable as a form of money. Good job",
-                            "Sorry, looks like you got it backwards! Better luck with your next guess",
-                            "Wrong! While gold may have a certain aesthetic appeal, it's ultimately its functional qualities that make it a valuable form of money. Better luck with your next answer."
+                            "Exactement. Il est intéressant de constater que les qualités de différents matériaux, comme la durabilité et la rareté de l'or, peuvent les rendre plus précieux et désirables en tant que forme de monnaie. Bien joué.",
+                            "Dommage, on dirait que vous avez inversé la réponse ! Bonne chance pour la suivante.",
+                            "Faux ! L'or a peut-être un certain attrait esthétique, mais ce sont finalement ses qualités fonctionnelles qui en font une forme de monnaie précieuse. Bonne chance pour la prochaine réponse."
                         ],
-                        "question": "Why did the free market choose gold as a form of money",
-                        "text": "From all monetary metals, the free market ultimately chose gold as a form of money because it has two important qualities that keep its value stable over long periods of time and across many regions of the world:\n\n1\\) Gold cannot be destroyed, and\n\n2\\) Gold cannot be made from other materials.\n",
-                        "title": "Convergence on Gold"
+                        "question": "Pourquoi le marché libre a-t-il choisi l'or comme forme de monnaie ?",
+                        "text": "Parmi tous les métaux monétaires, le marché libre a fini par choisir l'or comme forme de monnaie, car il possède deux qualités importantes qui maintiennent sa valeur stable sur de longues périodes et dans de nombreuses régions du monde :\n\n1\\) L'or ne peut pas être détruit, et\n\n2\\) L'or ne peut pas être fabriqué à partir d'autres matériaux.\n",
+                        "title": "La convergence vers l'or"
                     },
                     "originsOfPaperMoney": {
                         "answers": [
-                            "To allow for the convenient exchange of gold in place of physically transporting it",
-                            "To represent a promise to pay a debt",
-                            "To transport large amounts of gold"
+                            "Permettre un échange pratique de l'or sans avoir à le transporter physiquement",
+                            "Représenter une promesse de rembourser une dette",
+                            "Transporter de grandes quantités d'or"
                         ],
                         "feedback": [
-                            "Congratulations! You're a gold exchange genius! Did you know that these paper notes were also known as \"bearer instruments,\" which means that they could be traded and redeemed by anyone in possession of them",
-                            "Oh no, it looks like you've got a case of promissory confusion! Better luck next time",
-                            "Transporting gold in paper form? That's a bold move."
+                            "Bravo ! Vous êtes un génie de l'échange de l'or ! Saviez-vous que ces billets de papier étaient aussi appelés « instruments au porteur », ce qui signifie qu'ils pouvaient être échangés et remboursés par quiconque les détenait ?",
+                            "Oh non, on dirait que vous confondez tout ça avec des promesses de paiement ! Ce sera pour une prochaine fois.",
+                            "Transporter de l'or sous forme de papier ? Voilà une idée audacieuse."
                         ],
-                        "question": "What were paper notes used for during the expansion of trade routes",
-                        "text": "Gold can be made into coins or bars of a specific weight and purity. When trade routes expanded, it became riskier to transport large amounts of gold.\n\nAs a solution, paper notes from trusted banks that could be exchanged for gold were used. In 900 CE, Chinese merchants initiated the use of paper currency to avoid having to carry thousands of coins over long distances. They started trading paper receipts from custodians where they had deposited money or goods.\n\nIn the beginning these paper notes were personally registered, but they soon became a written order to pay the amount to whomever had it in their possession (bearer instrument). These notes can be seen as a predecessor to today's banknotes.\n",
-                        "title": "The Origins of Paper Money Backed by Gold"
+                        "question": "À quoi servaient les billets de papier lors de l'expansion des routes commerciales ?",
+                        "text": "L'or peut être transformé en pièces ou en lingots d'un poids et d'une pureté déterminés. Quand les routes commerciales se sont étendues, transporter de grandes quantités d'or est devenu plus risqué.\n\nEn guise de solution, on a utilisé des billets de papier émis par des banques de confiance et échangeables contre de l'or. Vers l'an 900, des marchands chinois ont commencé à utiliser une monnaie papier pour éviter de transporter des milliers de pièces sur de longues distances. Ils échangeaient des reçus de papier émis par des dépositaires chez qui ils avaient déposé de l'argent ou des biens.\n\nAu départ, ces billets de papier étaient nominatifs, mais ils sont vite devenus un ordre écrit de payer la somme à quiconque le détenait (instrument au porteur). Ces billets peuvent être vus comme les ancêtres des billets de banque actuels.\n",
+                        "title": "Les origines de la monnaie papier adossée à l'or"
                     },
                     "fractionalReserve": {
                         "answers": [
-                            "To allow people to earn money from their gold",
-                            "To make it easier for banks to hold large amounts of gold",
-                            "To make it easier for banks to make loans"
+                            "Pour permettre aux gens de tirer un revenu de leur or",
+                            "Pour faciliter la détention de grandes quantités d'or par les banques",
+                            "Pour faciliter l'octroi de prêts par les banques"
                         ],
                         "feedback": [
-                            "Congratulations! You're a banking history expert! Did you know that Fractional Reserve Banking is a system in which banks are allowed to hold only a fraction of the deposits they receive as reserves, while using the rest to make loans",
-                            "Hmm, it looks like you're a little off the mark. Better luck next time",
-                            "Sorry, but it looks like you're mixing up your banking systems. Better luck next time!"
+                            "Bravo ! Vous êtes un expert de l'histoire bancaire ! Saviez-vous que le système de réserve fractionnaire est un système dans lequel les banques ne sont autorisées à conserver qu'une fraction des dépôts reçus en réserve, et utilisent le reste pour accorder des prêts ?",
+                            "Hmm, vous n'êtes pas tout à fait dans le mille. Ce sera pour une prochaine fois.",
+                            "Dommage, on dirait que vous confondez les systèmes bancaires. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "Why did Fractional Reserve Banking develop",
-                        "text": "Fractional Reserve Banking is a system in which banks are allowed to hold only a fraction of the deposits they receive as reserves, while using the rest to make loans.\n\nOne reason this system developed is because people wanted to earn money from their gold, rather than paying to store it.\n\nThey could do this by allowing a bank or vault to lend out their gold and receiving interest payment in return.\n\nIf more people deposited their gold than wanted to take it back, the bank could make more profit by using the same gold as collateral for multiple loans, hence keeping only a fraction of loans in reserve.\n",
-                        "title": "The Invention of Fractional Reserve Banking"
+                        "question": "Pourquoi le système de réserve fractionnaire s'est-il développé ?",
+                        "text": "Le système de réserve fractionnaire permet aux banques de ne conserver qu'une fraction des dépôts reçus en réserve, en utilisant le reste pour accorder des prêts.\n\nCe système s'est développé en partie parce que les gens voulaient tirer un revenu de leur or plutôt que de payer pour le stocker.\n\nIls pouvaient y parvenir en laissant une banque ou un coffre prêter leur or, en échange d'un paiement d'intérêts.\n\nSi plus de gens déposaient leur or que n'en réclamaient en retour, la banque pouvait accroître ses profits en utilisant ce même or comme garantie pour plusieurs prêts à la fois, ne conservant ainsi qu'une fraction des prêts en réserve.\n",
+                        "title": "L'invention de la réserve fractionnaire"
                     },
                     "bankRun": {
                         "answers": [
-                            "A sudden drain of deposits en masse, leading to systemic fears and drying up of liquidity",
-                            "A nice vacation for everyone",
-                            "A sudden increase in the price of gasoline"
+                            "Un retrait massif et soudain des dépôts, entraînant des craintes systémiques et un assèchement des liquidités",
+                            "De belles vacances pour tout le monde",
+                            "Une hausse soudaine du prix de l'essence"
                         ],
                         "feedback": [
-                            "masse, leading to systemic fears and drying up of liquidity",
-                            "Sorry, taking a vacation isn't quite the outcome we're looking for here. Better luck next time",
-                            "Gas prices might fluctuate for a variety of reasons, but this particular scenario doesn't have much to do with it. Try again!"
+                            "masse, entraînant des craintes systémiques et un assèchement des liquidités",
+                            "Dommage, des vacances ne sont pas vraiment la conséquence recherchée ici. Ce sera pour une prochaine fois.",
+                            "Le prix de l'essence peut fluctuer pour de nombreuses raisons, mais ce scénario n'y est pour pas grand-chose. Réessayez !"
                         ],
-                        "question": "What is a potential outcome of banks issuing more paper notes than they held deposits",
-                        "text": "Banks sometimes issued more paper notes than they had deposits, which could cause problems in the economy. If people started to doubt the solvency of a bank, they might rush to withdraw their money all at once before others do. This is called a bank run.\n\nThe sudden loss of deposits from the bank run could reveal that the bank was using too much leverage through Fractional Reserve Banking. This could cause a lack of liquidity and bring the whole financial system to a stop.\n",
-                        "title": "Problems of Fractional Reserve Banking"
+                        "question": "Quelle conséquence potentielle peut survenir lorsque les banques émettent plus de billets qu'elles n'ont de dépôts ?",
+                        "text": "Les banques émettaient parfois plus de billets qu'elles n'avaient de dépôts, ce qui pouvait poser des problèmes à l'économie. Si les gens commençaient à douter de la solvabilité d'une banque, ils pouvaient se précipiter pour retirer leur argent tous en même temps, avant les autres. C'est ce qu'on appelle une « ruée bancaire ».\n\nLa perte soudaine de dépôts causée par la ruée bancaire pouvait révéler que la banque utilisait un effet de levier excessif via la réserve fractionnaire. Cela pouvait provoquer un manque de liquidités et paralyser tout le système financier.\n",
+                        "title": "Les problèmes de la réserve fractionnaire"
                     },
                     "modernCentralBanking": {
                         "answers": [
-                            "To create a unified national currency and provide a backup plan for other banks",
-                            "To sell ice cream and provide a place for people to play games",
-                            "To act as a personal stylist and wardrobe consultant for the royal family"
+                            "Créer une monnaie nationale unifiée et servir de filet de sécurité pour les autres banques",
+                            "Vendre des glaces et offrir un lieu où jouer",
+                            "Servir de styliste personnel et de conseiller vestimentaire pour la famille royale"
                         ],
                         "feedback": [
-                            "Congratulations, you got it right! Did you know that central banks also act as the \"lender of last resort,\" meaning they can give out money when needed to make sure people's deposits are secure",
-                            "I'm sorry, but central banks do not sell ice cream or provide a place for people to play games. They have much more important responsibilities",
-                            "I'm afraid you are mistaken. Central banks do not act as personal stylists or wardrobe consultants for the royal family. Try again!"
+                            "Bravo, c'est la bonne réponse ! Saviez-vous que les banques centrales agissent aussi comme « prêteur en dernier ressort », c'est-à-dire qu'elles peuvent fournir de l'argent en cas de besoin pour garantir la sécurité des dépôts ?",
+                            "Désolé, mais les banques centrales ne vendent pas de glaces et n'offrent pas de lieu pour jouer. Elles ont des responsabilités bien plus importantes.",
+                            "Vous faites erreur. Les banques centrales ne servent pas de stylistes personnels ni de conseillers vestimentaires pour la famille royale. Réessayez !"
                         ],
-                        "question": "What is the purpose of a central bank",
-                        "text": "To counter the problem of bank runs, governments created their own banks called \"central banks.\"\n\nThese central banks have the special power to create money. They act as a backup plan for when commercial banks run out of reserves and need extra money to stay open.\n\nBecause of this function, central banks are also called the \"lenders of last resort,\" meaning they can create and give out money when commercial banks need liquidity to service withdrawals.\n",
-                        "title": "Modern Central Banking"
+                        "question": "Quel est le rôle d'une banque centrale ?",
+                        "text": "Pour contrer le problème des ruées bancaires, les gouvernements ont créé leurs propres banques, appelées « banques centrales ».\n\nCes banques centrales disposent du pouvoir spécial de créer de la monnaie. Elles servent de filet de sécurité lorsque les banques commerciales épuisent leurs réserves et ont besoin d'argent supplémentaire pour rester ouvertes.\n\nEn raison de cette fonction, les banques centrales sont aussi appelées « prêteurs en dernier ressort » : elles peuvent créer et distribuer de l'argent lorsque les banques commerciales ont besoin de liquidités pour honorer les retraits.\n",
+                        "title": "Les banques centrales modernes"
                     },
                     "goldBacked": {
                         "answers": [
-                            "It made it difficult for governments to borrow money",
-                            "It made it hard for people to save money in the bank",
-                            "It required governments to hold a petting zoo in their treasury"
+                            "Il rendait difficile l'emprunt d'argent pour les gouvernements",
+                            "Il rendait difficile l'épargne en banque pour les particuliers",
+                            "Il obligeait les gouvernements à entretenir un zoo pour enfants dans leur trésor"
                         ],
                         "feedback": [
-                            "Yep! The gold standard made it difficult for governments to borrow money because they had to hold a certain amount of gold in reserve in order to issue a certain amount of currency",
-                            "I'm sorry, but the gold standard did not make it hard for people to save money in the bank. It was actually a problem for citizens because it did not provide any guarantee that their deposits in the bank would be safe, as the value of their money was dependent on the government's ability to maintain its gold reserves",
-                            "An amusing idea, but nonsense nevertheless! Try again."
+                            "Exact ! L'étalon-or rendait difficile l'emprunt d'argent pour les gouvernements, car ils devaient détenir une certaine quantité d'or en réserve pour émettre une certaine quantité de monnaie.",
+                            "Désolé, mais l'étalon-or ne rendait pas l'épargne en banque difficile pour les particuliers. Le vrai problème pour les citoyens était plutôt qu'il n'offrait aucune garantie sur la sécurité de leurs dépôts, puisque la valeur de leur monnaie dépendait de la capacité du gouvernement à maintenir ses réserves d'or.",
+                            "Une idée amusante, mais absurde ! Réessayez."
                         ],
-                        "question": "What was the main problem with the gold standard system for governments and citizens",
-                        "text": "In the past, some governments linked the value of their currency to a specific amount of gold, a system known as a \"gold standard.\" This meant that the government had to hold a certain amount of gold in reserve in order to issue a certain amount of currency.\n\nThis system limited the government's ability to borrow money because they could not simply print more currency to cover the cost of borrowing. Governments often borrowed money to finance wars or other expensive projects, but the gold standard made it difficult for them to do so without first accumulating enough gold to back the new currency they wanted to issue.\n\nThe gold standard was also problematic for citizens because it did not provide any guarantee that their deposits in the bank would be safe, as the value of their money was dependent on the government's ability to maintain its gold reserves.\n",
-                        "title": "From Gold to Gold-Backed"
+                        "question": "Quel était le principal problème du système d'étalon-or pour les gouvernements et les citoyens ?",
+                        "text": "Par le passé, certains gouvernements liaient la valeur de leur monnaie à une quantité précise d'or, un système connu sous le nom d'« étalon-or ». Cela signifiait que le gouvernement devait détenir une certaine quantité d'or en réserve pour émettre une certaine quantité de monnaie.\n\nCe système limitait la capacité des gouvernements à emprunter, car ils ne pouvaient pas simplement imprimer davantage de monnaie pour couvrir le coût de leurs emprunts. Les gouvernements empruntaient souvent pour financer des guerres ou d'autres projets coûteux, mais l'étalon-or rendait cela difficile sans avoir préalablement accumulé assez d'or pour adosser la nouvelle monnaie qu'ils voulaient émettre.\n\nL'étalon-or posait aussi problème aux citoyens, car il n'offrait aucune garantie que leurs dépôts en banque seraient en sécurité, la valeur de leur monnaie dépendant de la capacité du gouvernement à maintenir ses réserves d'or.\n",
+                        "title": "De l'or à la monnaie adossée à l'or"
                     },
                     "brettonWoods": {
                         "answers": [
-                            "To link the value of other countries' currencies to the value of gold through the US dollar",
-                            "To create a new global currency made out of chocolate coins",
-                            "To establish a network of trampoline parks in every major city"
+                            "Lier la valeur des monnaies des autres pays à la valeur de l'or par l'intermédiaire du dollar américain",
+                            "Créer une nouvelle monnaie mondiale faite de pièces en chocolat",
+                            "Établir un réseau de parcs à trampolines dans chaque grande ville"
                         ],
                         "feedback": [
-                            "That's right. The Bretton Woods system was established after World War II in order to address global economic instability and high levels of debt. It linked the value of other countries' currencies to the value of the US dollar, which was itself pegged to the value of gold at a fixed exchange rate",
-                            "Sweet idea, but not very practical. Or would you prefer your money to melt away even faster? Try again",
-                            "Trampoline parks would have surely made for a great distraction of the public from the strange machinations of the Bretton Woods system. Have you considered applying as an advisor at the IMF or World Bank? Try again!"
+                            "C'est exact. Le système de Bretton Woods a été établi après la Seconde Guerre mondiale pour répondre à l'instabilité économique mondiale et au niveau élevé d'endettement. Il liait la valeur des monnaies des autres pays à celle du dollar américain, lui-même arrimé à la valeur de l'or à un taux de change fixe.",
+                            "Douce idée, mais pas très pratique. À moins que vous ne préfériez voir votre argent fondre encore plus vite ? Réessayez.",
+                            "Des parcs à trampolines auraient sûrement fait une belle distraction face aux étranges rouages du système de Bretton Woods. Avez-vous pensé à postuler comme conseiller au FMI ou à la Banque mondiale ? Réessayez !"
                         ],
-                        "question": "What was the main purpose of the Bretton Woods system",
-                        "text": "After World War I and II, many countries were financially exhausted and did not have a lot of money. The United States had a lot of gold because they sold a lot of weapons and other military equipment to other countries during the wars. As a result, the United States controlled about two-thirds of the world's gold.\n\nIn order to fix the global economy, a new system was created where countries would link their own currencies to the value of the US dollar.\n\nThe US dollar, in turn, would be linked to the value of gold. This meant that the value of other countries' currencies would be based on the value of the US dollar, which was based on the amount of gold the United States had.\n",
-                        "title": "The Bretton Woods System"
+                        "question": "Quel était l'objectif principal du système de Bretton Woods ?",
+                        "text": "Après les Première et Seconde Guerres mondiales, de nombreux pays étaient financièrement épuisés et manquaient d'argent. Les États-Unis, eux, disposaient de beaucoup d'or, ayant vendu de grandes quantités d'armes et de matériel militaire à d'autres pays pendant les guerres. Résultat, les États-Unis contrôlaient environ les deux tiers de l'or mondial.\n\nPour redresser l'économie mondiale, un nouveau système a été mis en place, dans lequel les pays lieraient leur propre monnaie à la valeur du dollar américain.\n\nLe dollar américain, à son tour, serait lié à la valeur de l'or. Cela signifiait que la valeur des monnaies des autres pays reposait sur celle du dollar américain, elle-même fondée sur la quantité d'or détenue par les États-Unis.\n",
+                        "title": "Le système de Bretton Woods"
                     },
                     "globalReserve": {
                         "answers": [
-                            "A type of money that is widely used in international trade and financial transactions",
-                            "A currency made out of rainbow-colored paper and glitter",
-                            "The currency of the nation that pays the biggest share of the World Trade Organization's budget"
+                            "Une monnaie largement utilisée dans le commerce international et les transactions financières",
+                            "Une monnaie faite de papier multicolore et de paillettes",
+                            "La monnaie du pays qui paie la plus grande part du budget de l'Organisation mondiale du commerce"
                         ],
                         "feedback": [
-                            "Correct! A global reserve currency is a type of money that is widely used in international trade and financial transactions. It is the preferred or most in-demand currency for settling transactions, as it is generally stable and widely accepted",
-                            "While most banknotes are made of colorful pieces of paper with strings of glitter as security features in them, this is not what defines a global reserve currency. Try again",
-                            "Surely this would benefit the WTO's funding immensely, but this is not how the global reserve currency is defined or chosen. Try again!"
+                            "Exact ! Une monnaie de réserve mondiale est une monnaie largement utilisée dans le commerce international et les transactions financières. C'est la monnaie préférée ou la plus demandée pour régler les transactions, car elle est généralement stable et largement acceptée.",
+                            "La plupart des billets sont certes faits de papier coloré, parfois avec des éléments de sécurité brillants, mais ce n'est pas ce qui définit une monnaie de réserve mondiale. Réessayez.",
+                            "Cela profiterait sûrement énormément au financement de l'OMC, mais ce n'est pas ainsi que la monnaie de réserve mondiale est définie ou choisie. Réessayez !"
                         ],
-                        "question": "What is a global reserve currency",
-                        "text": "A global reserve currency is a type of money that is widely used in international trade and financial transactions. It is the preferred or most in-demand currency for settling transactions, as it is generally stable and widely accepted.\n\nChanges to the global reserve currency can have significant geopolitical implications, as it can affect the balance of power between countries.\n\nThe dominant global reserve currency has typically had a lifespan of several decades, with the US dollar serving as the dominant global reserve currency for much of the 20th century.\n",
-                        "title": "The Global Reserve Currency"
+                        "question": "Qu'est-ce qu'une monnaie de réserve mondiale ?",
+                        "text": "Une monnaie de réserve mondiale est une monnaie largement utilisée dans le commerce international et les transactions financières. C'est la monnaie préférée ou la plus demandée pour régler les transactions, car elle est généralement stable et largement acceptée.\n\nUn changement de monnaie de réserve mondiale peut avoir d'importantes implications géopolitiques, car cela peut affecter l'équilibre des pouvoirs entre les pays.\n\nLa monnaie de réserve mondiale dominante a généralement une durée de vie de plusieurs décennies : le dollar américain a ainsi été la monnaie de réserve mondiale dominante pendant une grande partie du XXe siècle.\n",
+                        "title": "La monnaie de réserve mondiale"
                     }
                 }
             },
             "TheEvolutionOfMoneyIV": {
-                "title": "The Evolution of Money IV",
+                "title": "L'évolution de la monnaie IV",
                 "questions": {
                     "nixonShock": {
                         "answers": [
-                            "It ended and was replaced by a new monetary system based on floating exchange rates",
-                            "It became a popular TV game show",
-                            "It was turned into a giant roller coaster ride"
+                            "Il a pris fin et a été remplacé par un nouveau système monétaire basé sur des taux de change flottants",
+                            "Il est devenu un jeu télévisé populaire",
+                            "Il a été transformé en gigantesque montagnes russes"
                         ],
                         "feedback": [
-                            "Correct! In 1971, President Nixon directed the US Treasury Secretary to stop allowing foreign governments to exchange their dollars for gold",
-                            "Not quite, but a game show version of the Bretton Woods system sounds like it could be entertaining",
-                            "I see what you did there, but this isn't the correct answer here. Try again!"
+                            "Exact ! En 1971, le président Nixon a ordonné au secrétaire au Trésor américain de cesser de permettre aux gouvernements étrangers d'échanger leurs dollars contre de l'or.",
+                            "Pas tout à fait, mais un jeu télévisé sur le système de Bretton Woods pourrait être divertissant.",
+                            "Je vois ce que vous avez fait là, mais ce n'est pas la bonne réponse. Réessayez !"
                         ],
-                        "question": "What happened to the Bretton Woods system in 1971",
-                        "text": "The Bretton Woods system was a monetary system established after World War II in order to address global economic instability and high levels of debt.\n\nUnder this system, many countries pegged their own currencies to the value of the US dollar, which was itself pegged to the value of gold at a fixed exchange rate. This meant that the value of other countries' currencies was indirectly tied to the value of gold through the US dollar.\n\nIn 1971, United States President Richard Nixon directed the US Treasury to stop allowing foreign governments to exchange their dollars for gold, a process known as \"convertibility.\"\n\nThe sudden end of convertibility of dollars for gold shocked the world and became known as the Nixon Shock, effectively ending the Bretton Woods system fixed exchange rates. It marked the beginning of a new monetary system based on floating exchange rates.\n",
-                        "title": "The Nixon Shock"
+                        "question": "Qu'est-il arrivé au système de Bretton Woods en 1971 ?",
+                        "text": "Le système de Bretton Woods était un système monétaire établi après la Seconde Guerre mondiale pour répondre à l'instabilité économique mondiale et au niveau élevé d'endettement.\n\nDans ce système, de nombreux pays arrimaient leur propre monnaie à la valeur du dollar américain, lui-même arrimé à la valeur de l'or à un taux de change fixe. Cela signifiait que la valeur des monnaies des autres pays était indirectement liée à celle de l'or, par l'intermédiaire du dollar américain.\n\nEn 1971, le président américain Richard Nixon a ordonné au Trésor américain de cesser de permettre aux gouvernements étrangers d'échanger leurs dollars contre de l'or, un processus appelé « convertibilité ».\n\nLa fin soudaine de la convertibilité des dollars en or a choqué le monde et est devenue connue sous le nom de « choc Nixon », mettant fin de fait aux taux de change fixes du système de Bretton Woods. Cela a marqué le début d'un nouveau système monétaire basé sur des taux de change flottants.\n",
+                        "title": "Le choc Nixon"
                     },
                     "fiatEra": {
                         "answers": [
-                            "A currency issued by a government decree",
-                            "A type of currency that is only accepted by merchants who love pizza",
-                            "A currency made out of precious gems and metals"
+                            "Une monnaie émise par décret gouvernemental",
+                            "Un type de monnaie acceptée uniquement par les commerçants qui adorent la pizza",
+                            "Une monnaie faite de pierres précieuses et de métaux"
                         ],
                         "feedback": [
-                            "Good job. Fiat money, such as Federal Reserve notes, is a type of currency issued by a government that is not directly exchangeable for a fixed amount of something else, like gold or silver. Its value comes from the fact that the government says it is valuable and people trust that they will be able to use it to buy things",
-                            "Not quite, but a currency that is only accepted by pizza-loving merchants sounds like it could be a delicious way to pay for things",
-                            "Nope, but a currency made out of precious gems and metals would definitely be shiny and eye-catching."
+                            "Bien joué. La monnaie fiduciaire, comme les billets de la Réserve fédérale, est une monnaie émise par un gouvernement qui n'est pas directement échangeable contre une quantité fixe d'autre chose, comme de l'or ou de l'argent. Sa valeur vient du fait que le gouvernement déclare qu'elle a de la valeur, et que les gens ont confiance en leur capacité à l'utiliser pour acheter des choses.",
+                            "Pas tout à fait, mais une monnaie acceptée uniquement par les commerçants amateurs de pizza serait une délicieuse façon de payer.",
+                            "Non, mais une monnaie faite de pierres précieuses et de métaux serait certainement brillante et attirerait l'œil."
                         ],
-                        "question": "What does the word \"fiat\" mean when it is used to talk about money",
-                        "text": "\"Fiat\" is a word that comes from Latin and means \"let it be done.\" When it is used to talk about money, it means that a government is creating a currency by decree alone.\n\nSince the Nixon Shock, fiat money is not backed by gold or silver and neither can it be directly converted for a fixed amount of gold, as it used to be before.\n\nThis means that their value comes from the fact that the government says they are valuable and that people trust that they will be able to use them to buy things.\n\nIn addition, governments often make it a law (legal tender) that merchants have to accept this type of fiat currency and that it is the only type of currency that can be used to pay taxes.\n",
-                        "title": "The Fiat Era"
+                        "question": "Que signifie le mot « fiat » lorsqu'il est utilisé pour parler de monnaie ?",
+                        "text": "« Fiat » est un mot d'origine latine qui signifie « qu'il en soit ainsi ». Lorsqu'il est utilisé pour parler de monnaie, cela signifie qu'un gouvernement crée une monnaie par simple décret.\n\nDepuis le choc Nixon, la monnaie fiduciaire n'est plus adossée à l'or ou à l'argent, et ne peut plus être directement convertie contre une quantité fixe d'or, comme c'était le cas auparavant.\n\nCela signifie que sa valeur vient du fait que le gouvernement déclare qu'elle a de la valeur, et que les gens font confiance à leur capacité à l'utiliser pour acheter des choses.\n\nDe plus, les gouvernements imposent souvent par la loi (cours légal) que les commerçants doivent accepter ce type de monnaie fiduciaire, et que c'est le seul type de monnaie pouvant être utilisé pour payer les impôts.\n",
+                        "title": "L'ère de la monnaie fiduciaire"
                     },
                     "digitalFiat": {
                         "answers": [
-                            "A government issued money that exists only in digital form, like on a computer or phone",
-                            "A type of currency that can only be used to buy things in the internet",
-                            "A currency that can only be sent by email"
+                            "Une monnaie émise par un gouvernement qui n'existe que sous forme numérique, par exemple sur un ordinateur ou un téléphone",
+                            "Un type de monnaie utilisable uniquement pour acheter des choses sur Internet",
+                            "Une monnaie qui ne peut être envoyée que par e-mail"
                         ],
                         "feedback": [
-                            "Good job. Digital fiat is a type of money that exists only in digital form, like on a computer or phone. It is a digital representation of physical cash, such as paper money or coins, and is becoming increasingly popular due to its lower costs, faster speeds, and increased capabilities for surveillance",
-                            "Not quite. While digital fiat is digital like the internet, it is also widely accepted at brick and mortar merchants. Try again",
-                            "Nope, you guessed wrong. The use of such a currency would be extremely limited and doesn't exist to our knowledge. Try again!"
+                            "Bien joué. La monnaie fiduciaire numérique est une monnaie qui n'existe que sous forme numérique, par exemple sur un ordinateur ou un téléphone. C'est une représentation numérique de l'argent liquide physique, comme les billets ou les pièces, et elle gagne en popularité grâce à ses coûts plus faibles, sa rapidité et ses capacités accrues de surveillance.",
+                            "Pas tout à fait. La monnaie fiduciaire numérique est numérique comme Internet, mais elle est aussi largement acceptée chez les commerçants physiques. Réessayez.",
+                            "Non, ce n'est pas la bonne réponse. L'usage d'une telle monnaie serait extrêmement limité et n'existe pas, à notre connaissance. Réessayez !"
                         ],
-                        "question": "What is digital fiat",
-                        "text": "Digital fiat is a type of money that exists only in digital form, like on a computer or phone. It is a digital representation of physical cash, such as paper money or coins.\n\nDigital fiat became possible with the proliferation of digital communication networks, like the internet, and the growth of consumer devices like computers and phones that can connect to these networks. Standardized payment protocols, which are established ways of making payments online, also played a role in the emergence of digital fiat.\n\nDigital fiat is increasingly replacing physical fiat due to its lower costs, faster speeds, and increased capabilities for surveillance. In other words, it is cheaper and faster to use digital fiat and it is easier to track transactions made with digital fiat.\n",
-                        "title": "Digital Fiat"
+                        "question": "Qu'est-ce que la monnaie fiduciaire numérique ?",
+                        "text": "La monnaie fiduciaire numérique est une monnaie qui n'existe que sous forme numérique, par exemple sur un ordinateur ou un téléphone. C'est une représentation numérique de l'argent liquide physique, comme les billets ou les pièces.\n\nLa monnaie fiduciaire numérique est devenue possible grâce à la multiplication des réseaux de communication numériques, comme Internet, et à la diffusion d'appareils grand public comme les ordinateurs et les téléphones capables de s'y connecter. Des protocoles de paiement standardisés, c'est-à-dire des façons établies d'effectuer des paiements en ligne, ont également joué un rôle dans l'émergence de la monnaie fiduciaire numérique.\n\nLa monnaie fiduciaire numérique remplace de plus en plus la monnaie fiduciaire physique, grâce à ses coûts plus faibles, sa rapidité et ses capacités accrues de surveillance. Autrement dit, il est moins cher et plus rapide d'utiliser de la monnaie fiduciaire numérique, et plus facile de suivre les transactions effectuées avec elle.\n",
+                        "title": "La monnaie fiduciaire numérique"
                     },
                     "plasticCredit": {
                         "answers": [
-                            "A type of payment card that allows people to borrow money to pay for things",
-                            "A card that grants the holder special powers, like the ability to fly",
-                            "A card that allows people to pay for things by waving their hand over a sensor"
+                            "Un type de carte de paiement qui permet d'emprunter de l'argent pour payer des achats",
+                            "Une carte qui confère à son détenteur des pouvoirs spéciaux, comme la capacité de voler",
+                            "Une carte qui permet de payer en agitant la main au-dessus d'un capteur"
                         ],
                         "feedback": [
-                            "Correct. A credit card is a type of payment card that allows people to borrow money from the credit card company to pay for things now, rather than saving up money to pay for things later. There are about three billion credit cards in use around the world today",
-                            "Not quite, but a credit card that grants special powers like the ability to fly sounds like it could be a lot of fun",
-                            "Nope, but a credit card that allows people to pay for things by waving their hand over a sensor sounds like something out of a science fiction movie, not real life."
+                            "Exact. Une carte de crédit est un type de carte de paiement qui permet d'emprunter de l'argent à l'émetteur de la carte pour payer des achats immédiatement, plutôt que d'économiser pour payer plus tard. On estime à environ trois milliards le nombre de cartes de crédit en circulation dans le monde aujourd'hui.",
+                            "Pas tout à fait, mais une carte de crédit qui confère des pouvoirs spéciaux comme voler aurait l'air très amusante.",
+                            "Non, mais une carte de crédit permettant de payer en agitant la main au-dessus d'un capteur semble tout droit sortie d'un film de science-fiction, pas de la vraie vie."
                         ],
-                        "question": "What is a credit card",
-                        "text": "The credit card is a type of payment card that allows people to borrow money to pay for things. When people use credit cards, they are borrowing money from the credit card company to pay for things now, rather than saving up money to pay for things later.\n\nThis has gradually normalized the act of borrowing for consumption, something that impacts the time preference of users. Instead of waiting to save up the money, the invention of credit cards has made it more common for people to borrow money to buy things they want right away\n\nToday, there are about three billion credit cards in use around the world.\n",
-                        "title": "Plastic Credit"
+                        "question": "Qu'est-ce qu'une carte de crédit ?",
+                        "text": "La carte de crédit est un type de carte de paiement qui permet d'emprunter de l'argent pour payer des achats. En utilisant une carte de crédit, on emprunte de l'argent à l'émetteur de la carte pour payer des achats immédiatement, plutôt que d'économiser pour payer plus tard.\n\nCela a progressivement normalisé l'emprunt pour la consommation, ce qui affecte la préférence temporelle des utilisateurs. Plutôt que d'attendre d'avoir économisé l'argent nécessaire, l'invention de la carte de crédit a rendu plus courant le fait d'emprunter pour acheter immédiatement ce que l'on souhaite.\n\nAujourd'hui, on estime à environ trois milliards le nombre de cartes de crédit en circulation dans le monde.\n",
+                        "title": "Le crédit en plastique"
                     },
                     "doubleSpendProblem": {
                         "answers": [
-                            "The ability to ensure that the same digital unit of money cannot be spent more than once by its owner",
-                            "The desire to create a digital currency that could only be spent on Mars",
-                            "The idea of rewarding honesty and making dishonesty very costly"
+                            "La capacité de garantir qu'une même unité monétaire numérique ne puisse pas être dépensée plus d'une fois par son propriétaire",
+                            "La volonté de créer une monnaie numérique utilisable uniquement sur Mars",
+                            "L'idée de récompenser l'honnêteté et de rendre la malhonnêteté très coûteuse"
                         ],
                         "feedback": [
-                            "Good job. In the digital world, where it is easy to copy things, it is important to make sure that the same digital unit of money (like a digital coin) cannot be spent more than once by its owner. This was a key factor in the creation of Bitcoin, as it is important for a monetary system that works without a central authority (like a government)",
-                            "Not quite, but a digital currency that could only be spent on Mars sounds like it could be a fun way to support the colonization of the red planet",
-                            "Nope, but the idea of rewarding honesty and making dishonesty very costly is a key factor in the creation of any monetary system, as it helps to ensure trust and cooperation among participants."
+                            "Bien joué. Dans le monde numérique, où il est facile de copier les choses, il est important de garantir qu'une même unité monétaire numérique (comme une pièce numérique) ne puisse pas être dépensée plus d'une fois par son propriétaire. Ce fut un facteur clé dans la création du Bitcoin, essentiel pour un système monétaire fonctionnant sans autorité centrale (comme un gouvernement).",
+                            "Pas tout à fait, mais une monnaie numérique utilisable uniquement sur Mars serait une façon amusante de soutenir la colonisation de la planète rouge.",
+                            "Non, mais l'idée de récompenser l'honnêteté et de rendre la malhonnêteté très coûteuse est un facteur clé dans la création de tout système monétaire, car cela contribue à garantir la confiance et la coopération entre les participants."
                         ],
-                        "question": "What was a key factor in the creation of Bitcoin",
-                        "text": "In the digital world, it is easy to copy things, so it is important to make sure that the same digital unit of money cannot be spent more than once by its owner.\n\nIn a monetary system with a central authority (like a government), this problem is trivially solved by keeping a ledger of transactions managed by the central authority. However, this normally represents a single point of failure from both availability and trust viewpoints.\n\nIn a decentralized system, the double-spending problem is significantly harder to solve. Many people have tried to create digital money that is not controlled by a government, but they have all had their own unique challenges.\n\nSatoshi Nakamoto took all of these lessons into account and was the first to solve the double spending problem with the implementation of Bitcoin by creating a decentralized system that rewards honesty and makes it very costly to be dishonest.\n",
-                        "title": "The Double Spending Problem"
+                        "question": "Quel a été un facteur clé dans la création du Bitcoin ?",
+                        "text": "Dans le monde numérique, il est facile de copier les choses, il est donc important de garantir qu'une même unité monétaire numérique ne puisse pas être dépensée plus d'une fois par son propriétaire.\n\nDans un système monétaire avec une autorité centrale (comme un gouvernement), ce problème se résout facilement en tenant un registre des transactions géré par cette autorité centrale. Cependant, cela représente généralement un point de défaillance unique, tant du point de vue de la disponibilité que de la confiance.\n\nDans un système décentralisé, le problème de la double dépense est nettement plus difficile à résoudre. De nombreuses personnes ont tenté de créer une monnaie numérique non contrôlée par un gouvernement, mais chacune s'est heurtée à ses propres défis.\n\nSatoshi Nakamoto a tiré les leçons de toutes ces tentatives et a été le premier à résoudre le problème de la double dépense grâce à la mise en œuvre du Bitcoin, en créant un système décentralisé qui récompense l'honnêteté et rend la malhonnêteté très coûteuse.\n",
+                        "title": "Le problème de la double dépense"
                     },
                     "satoshisBreakthrough": {
                         "answers": [
-                            "The double spending problem",
-                            "The problem of double coincidence of wants",
-                            "The halving problem"
+                            "Le problème de la double dépense",
+                            "Le problème de la double coïncidence des besoins",
+                            "Le problème du halving"
                         ],
                         "feedback": [
-                            "Good job. Bitcoin uses a proof-of-work consensus mechanism where transactions are batched into blocks and chained together to a blockchain. This way, every user knows that every coin is only spent once",
-                            "Not quite. The double coincidence of wants is a problem of barter that can be solved with money. Try again",
-                            "Hah no. The halving in bitcoin is not a problem, but part of the solution that Satoshi designed! More on that in Chapter 302. Try again!"
+                            "Bien joué. Le Bitcoin utilise un mécanisme de consensus par preuve de travail, où les transactions sont regroupées en blocs et enchaînées pour former une blockchain. Ainsi, chaque utilisateur sait que chaque pièce n'est dépensée qu'une seule fois.",
+                            "Pas tout à fait. La double coïncidence des besoins est un problème du troc que la monnaie permet de résoudre. Réessayez.",
+                            "Ah non. Le halving du bitcoin n'est pas un problème, mais fait partie de la solution conçue par Satoshi ! On en reparle au chapitre 302. Réessayez !"
                         ],
-                        "question": "Which problem did Satoshi have to solve to create Bitcoin",
-                        "text": "Satoshi's solution to the double spending problem was a breakthrough in computer science and distributed systems. Until Bitcoin, many believed that it would be unsolvable.\n\nHis solution allowed Satoshi to develop a new electronic cash system that for the first time made it possible for people to send digital money directly to each other, without needing a bank or other organization to help.\n",
-                        "title": "Satoshi's Breakthrough"
+                        "question": "Quel problème Satoshi a-t-il dû résoudre pour créer le Bitcoin ?",
+                        "text": "La solution de Satoshi au problème de la double dépense a constitué une avancée majeure en informatique et en systèmes distribués. Avant le Bitcoin, beaucoup pensaient que ce problème était insoluble.\n\nCette solution a permis à Satoshi de développer un nouveau système de cash électronique qui a rendu possible, pour la première fois, l'envoi direct d'argent numérique entre particuliers, sans avoir besoin d'une banque ou d'une autre organisation intermédiaire.\n",
+                        "title": "La percée de Satoshi"
                     },
                     "nativelyDigital": {
                         "answers": [
-                            "Digital fiat money is based on a product from the industrial age, while Bitcoin is a purpose-built money for the digital age",
-                            "Digital fiat money is open-source, while Bitcoin is a closed system",
-                            "Digital fiat money is designed to increase in value over time, while Bitcoin is designed to lose value"
+                            "La monnaie fiduciaire numérique repose sur un produit de l'ère industrielle, tandis que le Bitcoin est une monnaie conçue spécifiquement pour l'ère numérique",
+                            "La monnaie fiduciaire numérique est open-source, tandis que le Bitcoin est un système fermé",
+                            "La monnaie fiduciaire numérique est conçue pour prendre de la valeur avec le temps, tandis que le Bitcoin est conçu pour en perdre"
                         ],
                         "feedback": [
-                            "for the digital age",
-                            "It seems you got things mixed up. It's actually the other way around. Try again",
-                            "Sorry, that's not quite right. Bitcoin is likely to increase in value over time due to its strictly fixed supply and growing deman, while inflation decreases the value of fiat currencies quite reliably."
+                            "pour l'ère numérique",
+                            "On dirait que vous avez tout mélangé. C'est en réalité l'inverse. Réessayez.",
+                            "Dommage, ce n'est pas tout à fait ça. Le Bitcoin devrait prendre de la valeur avec le temps grâce à son offre strictement limitée et à une demande croissante, tandis que l'inflation fait baisser la valeur des monnaies fiduciaires de façon assez fiable."
                         ],
-                        "question": "What is the main difference between digital fiat money and Bitcoin",
-                        "text": "Digital fiat money is a digital version of a product that was designed for the industrial age. It has all of the same problems and limitations as the original product. It is a closed system that is heavily controlled and designed to lose value over time.\n\nBitcoin is a type of digital money that was specifically designed for the digital age. It can be improved and updated, and anyone can see and change the code that it is based on. It benefits from the ideas and creativity of anyone who works on it.\n",
-                        "title": "Purpose-built for the Digital Age"
+                        "question": "Quelle est la principale différence entre la monnaie fiduciaire numérique et le Bitcoin ?",
+                        "text": "La monnaie fiduciaire numérique est une version numérique d'un produit conçu pour l'ère industrielle. Elle hérite des mêmes problèmes et limitations que le produit d'origine. C'est un système fermé, fortement contrôlé, et conçu pour perdre de la valeur avec le temps.\n\nLe Bitcoin est un type de monnaie numérique spécifiquement conçu pour l'ère numérique. Il peut être amélioré et mis à jour, et n'importe qui peut consulter et modifier le code sur lequel il repose. Il profite ainsi des idées et de la créativité de quiconque y contribue.\n",
+                        "title": "Conçu spécifiquement pour l'ère numérique"
                     },
                     "CBDCs": {
                         "answers": [
-                            "To provide surveillance and censorship capabilities to the issuer",
-                            "To compete with Bitcoin as a store of value",
-                            "To create a decentralized and permissionless digital currency"
+                            "Fournir à l'émetteur des capacités de surveillance et de censure",
+                            "Concurrencer le Bitcoin en tant que réserve de valeur",
+                            "Créer une monnaie numérique décentralisée et sans permission"
                         ],
                         "feedback": [
-                            "That's correct! CBDCs are like the Big Brother of digital currencies, designed to provide surveillance and censorship capabilities to the issuer. Creepy, but correct",
-                            "Haha, sorry but no. While Bitcoin and CBDCs are both digital currencies, they have very different purposes and characteristics. CBDCs are issued and backed by central banks, while Bitcoin is decentralized and not controlled by any government or financial institution",
-                            "Oh boy, that's a creative answer but unfortunately not quite right. CBDCs are not designed to be decentralized or permissionless like Bitcoin. In fact, they are issued and backed by central banks, and their main purpose is to be the ultimate tool for control in the digital age. Better luck next time!"
+                            "C'est exact ! Les MNBC sont un peu le Big Brother des monnaies numériques, conçues pour donner à l'émetteur des capacités de surveillance et de censure. Flippant, mais exact.",
+                            "Haha, désolé mais non. Bitcoin et les MNBC sont toutes deux des monnaies numériques, mais avec des objectifs et des caractéristiques très différents. Les MNBC sont émises et garanties par des banques centrales, tandis que le Bitcoin est décentralisé et n'est contrôlé par aucun gouvernement ni institution financière.",
+                            "Oh là là, réponse créative mais malheureusement pas la bonne. Les MNBC ne sont pas conçues pour être décentralisées ou sans permission comme le Bitcoin. En réalité, elles sont émises et garanties par des banques centrales, et leur objectif principal est d'être l'outil de contrôle ultime à l'ère numérique. Ce sera pour une prochaine fois !"
                         ],
-                        "question": "What is the main purpose of central bank digital currencies (CBDCs)",
-                        "text": "Central bank digital currencies (CBDCs) are digital versions of traditional currency that are issued and backed by a central bank.\n\nCBDCs are not decentralized or permissionless like Bitcoin, and are instead intended to compete with other forms of digital payment methods for market dominance.\n\nOne of the main reasons for the development of CBDCs is the surveillance and censorship capabilities they provide the issuer.\n\nAdditionally, in an age of negative real interest rates (when the inflation rate is higher than the interest rate), the widespread adoption of CBDCs often goes hand in hand with the phasing out of physical cash, which can lead to the devaluation of the currency in real terms.\n",
-                        "title": "Central Bank Digital Currencies"
+                        "question": "Quel est l'objectif principal des monnaies numériques de banque centrale (MNBC) ?",
+                        "text": "Les monnaies numériques de banque centrale (MNBC) sont des versions numériques de la monnaie traditionnelle, émises et garanties par une banque centrale.\n\nContrairement au Bitcoin, les MNBC ne sont ni décentralisées ni sans permission : elles visent plutôt à concurrencer d'autres moyens de paiement numériques pour dominer le marché.\n\nL'une des principales raisons du développement des MNBC réside dans les capacités de surveillance et de censure qu'elles offrent à l'émetteur.\n\nDe plus, dans un contexte de taux d'intérêt réels négatifs (lorsque le taux d'inflation dépasse le taux d'intérêt), l'adoption massive des MNBC va souvent de pair avec la disparition progressive de l'argent liquide physique, ce qui peut entraîner une dévaluation réelle de la monnaie.\n",
+                        "title": "Les monnaies numériques de banque centrale"
                     }
                 }
             },
