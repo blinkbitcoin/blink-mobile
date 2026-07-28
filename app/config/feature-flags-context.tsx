@@ -39,7 +39,6 @@ const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
 const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const NonCustodialEnabledKey = "nonCustodialEnabled"
 const StableBalanceEnabledKey = "stableBalanceEnabled"
-const DollarRestrictionCacheEnabledKey = "dollarRestrictionCacheEnabled"
 const AutoConvertMaxAttemptsKey = "autoConvertMaxAttempts"
 const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
 const AutoConvertPollIntervalMsKey = "autoConvertPollIntervalMs"
@@ -107,7 +106,6 @@ type RemoteConfig = {
   [BackupNudgeModalThresholdKey]: number
   [NonCustodialEnabledKey]: boolean
   [StableBalanceEnabledKey]: boolean
-  [DollarRestrictionCacheEnabledKey]: boolean
   [AutoConvertMaxAttemptsKey]: number
   [AutoConvertPollMaxAttemptsKey]: number
   [AutoConvertPollIntervalMsKey]: number
@@ -209,7 +207,6 @@ export const defaultRemoteConfig: RemoteConfig = {
   backupNudgeModalThreshold: 21000,
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
-  dollarRestrictionCacheEnabled: true,
   autoConvertMaxAttempts: 3,
   autoConvertPollMaxAttempts: 30,
   autoConvertPollIntervalMs: 500,
@@ -390,10 +387,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(StableBalanceEnabledKey)
           .asBoolean()
 
-        const dollarRestrictionCacheEnabled = remoteConfigInstance()
-          .getValue(DollarRestrictionCacheEnabledKey)
-          .asBoolean()
-
         const autoConvertMaxAttempts = remoteConfigInstance()
           .getValue(AutoConvertMaxAttemptsKey)
           .asNumber()
@@ -496,7 +489,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           backupNudgeModalThreshold,
           nonCustodialEnabled,
           stableBalanceEnabled,
-          dollarRestrictionCacheEnabled,
           autoConvertMaxAttempts,
           autoConvertPollMaxAttempts,
           autoConvertPollIntervalMs,

@@ -123,12 +123,10 @@ jest.mock("@app/config/feature-flags-context", () => {
 
 jest.mock("@app/hooks/use-transfer-blocked", () => ({
   useTransferBlocked: () => mockTransferBlockedOverride,
-  useTransferBlockedSync: () => undefined,
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockDollarBalanceRestrictedOverride,
-  useDollarBalanceRestrictionSync: () => undefined,
 }))
 
 type ForcedConversionParams = {

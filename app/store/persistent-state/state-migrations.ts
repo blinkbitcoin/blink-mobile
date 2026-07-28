@@ -136,8 +136,40 @@ type PersistentState_15 = {
   completedQuizIdsByAccountId?: Record<string, string[]>
 }
 
-const migrate15ToCurrent = (state: PersistentState_15): Promise<PersistentState> =>
+type PersistentState_16 = {
+  schemaVersion: 16
+  galoyInstance: GaloyInstanceInput
+  galoyAuthToken: string
+  activeAccountId?: string
+  selfCustodialDefaultWalletCurrency?: "BTC" | "USD"
+  selfCustodialDefaultWalletCurrencyByAccountId?: Record<string, "BTC" | "USD">
+  selfCustodialDisplayCurrencyByAccountId?: Record<string, string>
+  selfCustodialLanguageByAccountId?: Record<string, string>
+  themeByAccountId?: Record<string, "system" | "light" | "dark">
+  defaultAccountModalShownByAccountId?: Record<string, boolean>
+  // Quiz progress for accounts the backend keeps no quiz record for (self-custodial).
+  completedQuizIdsByAccountId?: Record<string, string[]>
+}
+
+const migrate16ToCurrent = (state: PersistentState_16): Promise<PersistentState> =>
   Promise.resolve(state)
+
+/**
+ * Drops the four persisted region latches. A determined restriction must no longer
+ * outlive the session that set it, so the fields are discarded rather than carried
+ * forward: a user previously latched into a restricted region is re-evaluated live on
+ * the next launch, with no action on their part.
+ */
+const migrate15ToCurrent = (state: PersistentState_15): Promise<PersistentState> => {
+  const {
+    stablesatsRestrictedCustodial,
+    stableTokenTransferBlocked,
+    stablesatsTransferBlocked,
+    stableTokenRestricted,
+    ...withoutLatches
+  } = state
+  return migrate16ToCurrent({ ...withoutLatches, schemaVersion: 16 })
+}
 
 const migrate14ToCurrent = (state: PersistentState_14): Promise<PersistentState> =>
   migrate15ToCurrent({ ...state, schemaVersion: 15 })
@@ -264,6 +296,7 @@ type StateMigrations = {
   13: (state: PersistentState_13) => Promise<PersistentState>
   14: (state: PersistentState_14) => Promise<PersistentState>
   15: (state: PersistentState_15) => Promise<PersistentState>
+  16: (state: PersistentState_16) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -280,12 +313,13 @@ const stateMigrations: StateMigrations = {
   13: migrate13ToCurrent,
   14: migrate14ToCurrent,
   15: migrate15ToCurrent,
+  16: migrate16ToCurrent,
 }
 
-export type PersistentState = PersistentState_15
+export type PersistentState = PersistentState_16
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 15,
+  schemaVersion: 16,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -312,7 +346,7 @@ export const migratePersistentState = async (
   if (!data || !(data.schemaVersion in stateMigrations)) {
     return { status: MigrationStatus.NoData }
   }
-  const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 =
+  const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 =
     data.schemaVersion
   try {
     const migration = stateMigrations[schemaVersion]
