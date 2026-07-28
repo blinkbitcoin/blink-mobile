@@ -41,7 +41,6 @@ const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const BackupNudgeModalCooldownMsKey = "backupNudgeModalCooldownMs"
 const NonCustodialEnabledKey = "nonCustodialEnabled"
 const StableBalanceEnabledKey = "stableBalanceEnabled"
-const DollarRestrictionCacheEnabledKey = "dollarRestrictionCacheEnabled"
 const BtcMapPlacesEnabledKey = "btcMapPlacesEnabled"
 const AutoConvertMaxAttemptsKey = "autoConvertMaxAttempts"
 const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
@@ -113,7 +112,6 @@ type RemoteConfig = {
   [BackupNudgeModalCooldownMsKey]: number
   [NonCustodialEnabledKey]: boolean
   [StableBalanceEnabledKey]: boolean
-  [DollarRestrictionCacheEnabledKey]: boolean
   [BtcMapPlacesEnabledKey]: boolean
   [AutoConvertMaxAttemptsKey]: number
   [AutoConvertPollMaxAttemptsKey]: number
@@ -222,7 +220,6 @@ export const defaultRemoteConfig: RemoteConfig = {
   backupNudgeModalCooldownMs: 24 * 60 * 60 * 1000,
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
-  dollarRestrictionCacheEnabled: true,
   /** Kill switch for the map's merchant data, which comes from BTC Map — a third
    *  party we do not control. If the feed starts serving something harmful or
    *  simply wrong, turning this off empties the map without an app release. */
@@ -425,10 +422,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(StableBalanceEnabledKey)
           .asBoolean()
 
-        const dollarRestrictionCacheEnabled = remoteConfigInstance()
-          .getValue(DollarRestrictionCacheEnabledKey)
-          .asBoolean()
-
         const btcMapPlacesEnabled = remoteConfigInstance()
           .getValue(BtcMapPlacesEnabledKey)
           .asBoolean()
@@ -545,7 +538,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           backupNudgeModalCooldownMs,
           nonCustodialEnabled,
           stableBalanceEnabled,
-          dollarRestrictionCacheEnabled,
           btcMapPlacesEnabled,
           autoConvertMaxAttempts,
           autoConvertPollMaxAttempts,

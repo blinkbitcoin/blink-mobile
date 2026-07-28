@@ -52,20 +52,14 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
-import {
-  useDollarBalanceRestricted,
-  useDollarBalanceRestrictionSync,
-} from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceRestricted } from "@app/hooks/use-dollar-balance-restricted"
 import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
 import { MigrateNowModal } from "@app/components/migrate-now-modal"
 import { MigrationReminderBulletin } from "@app/components/migration-reminder-bulletin"
 import { OffboardOnlyBulletin } from "@app/components/offboard-only-bulletin"
 /** Deep import on purpose: keeps the migration hooks barrel out of the home graph. */
 import { useWindDownHomeNudges } from "@app/screens/account-migration/hooks/use-wind-down-home-nudges"
-import {
-  useTransferBlocked,
-  useTransferBlockedSync,
-} from "@app/hooks/use-transfer-blocked"
+import { useTransferBlocked } from "@app/hooks/use-transfer-blocked"
 import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
 import {
   useNonCustodialConversionLimits,
@@ -461,10 +455,8 @@ export const HomeScreen: React.FC = () => {
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
   const [isRestrictionModalVisible, setIsRestrictionModalVisible] = React.useState(false)
   const isDollarBalanceRestricted = useDollarBalanceRestricted()
-  useDollarBalanceRestrictionSync()
 
   const isTransferBlocked = useTransferBlocked()
-  useTransferBlockedSync()
 
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
