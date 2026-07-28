@@ -260,8 +260,15 @@ const stateMigrations: StateMigrations = {
 
 export type PersistentState = PersistentState_14
 
+/**
+ * The one place the current schema version is written down. Bumping
+ * `PersistentState` above without bumping this fails to compile, and nothing
+ * else — app code or tests — should spell the number out.
+ */
+export const CURRENT_SCHEMA_VERSION: PersistentState["schemaVersion"] = 14
+
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 14,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -288,8 +295,7 @@ export const migratePersistentState = async (
   if (!data || !(data.schemaVersion in stateMigrations)) {
     return { status: MigrationStatus.NoData }
   }
-  const schemaVersion: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 =
-    data.schemaVersion
+  const schemaVersion: keyof StateMigrations = data.schemaVersion
   try {
     const migration = stateMigrations[schemaVersion]
     const state = await migration(data)

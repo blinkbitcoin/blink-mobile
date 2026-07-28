@@ -137,17 +137,23 @@ const mockUpdateState = jest.fn()
 const mockSaveToken = jest.fn()
 const mockState = { activeAccountId: undefined as string | undefined }
 
-jest.mock("@app/store/persistent-state", () => ({
-  usePersistentStateContext: () => ({
-    persistentState: {
-      activeAccountId: mockState.activeAccountId,
-      galoyAuthToken: "",
-      galoyInstance: { id: "Main" },
-      schemaVersion: 9,
-    },
-    updateState: mockUpdateState,
-  }),
-}))
+jest.mock("@app/store/persistent-state", () => {
+  const { CURRENT_SCHEMA_VERSION } = jest.requireActual<
+    typeof import("@app/store/persistent-state/state-migrations")
+  >("@app/store/persistent-state/state-migrations")
+
+  return {
+    usePersistentStateContext: () => ({
+      persistentState: {
+        activeAccountId: mockState.activeAccountId,
+        galoyAuthToken: "",
+        galoyInstance: { id: "Main" },
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+      },
+      updateState: mockUpdateState,
+    }),
+  }
+})
 
 jest.mock("@app/hooks/use-app-config", () => ({
   useAppConfig: () => ({

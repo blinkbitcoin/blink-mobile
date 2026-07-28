@@ -6,7 +6,10 @@ import {
   PersistentStateProvider,
   PersistentStateContext,
 } from "@app/store/persistent-state"
-import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
+import {
+  CURRENT_SCHEMA_VERSION,
+  defaultPersistentState,
+} from "@app/store/persistent-state/state-migrations"
 
 const mockLoadJson = jest.fn()
 const mockSaveJson = jest.fn()
@@ -85,7 +88,7 @@ describe("PersistentStateProvider", () => {
     })
 
     expect(screen.getByTestId("token").props.children).toBe("saved-token")
-    expect(screen.getByTestId("schema").props.children).toBe(14)
+    expect(screen.getByTestId("schema").props.children).toBe(CURRENT_SCHEMA_VERSION)
   })
 
   it("falls back to default state when no persisted data exists", async () => {

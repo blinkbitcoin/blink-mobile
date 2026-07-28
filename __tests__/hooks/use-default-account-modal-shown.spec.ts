@@ -1,7 +1,10 @@
 import { act, renderHook } from "@testing-library/react-native"
 
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
-import { PersistentState } from "@app/store/persistent-state/state-migrations"
+import {
+  CURRENT_SCHEMA_VERSION,
+  PersistentState,
+} from "@app/store/persistent-state/state-migrations"
 
 const mockUpdateState = jest.fn()
 let mockPersistentState: PersistentState
@@ -14,7 +17,7 @@ jest.mock("@app/store/persistent-state", () => ({
 }))
 
 const baseState: PersistentState = {
-  schemaVersion: 14,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }

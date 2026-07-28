@@ -1,5 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native"
 
+import { CURRENT_SCHEMA_VERSION } from "@app/store/persistent-state/state-migrations"
 import { AccountType } from "@app/types/wallet"
 
 const mockUseIsAuthed = jest.fn()
@@ -14,7 +15,7 @@ const mockUseAccountUpdateDisplayCurrencyMutation = jest.fn(
 )
 const mockUpdateState = jest.fn()
 let mockPersistentState = {
-  schemaVersion: 12,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
   activeAccountId: undefined as string | undefined,
@@ -51,7 +52,7 @@ describe("useEffectiveDisplayCurrency", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockPersistentState = {
-      schemaVersion: 12,
+      schemaVersion: CURRENT_SCHEMA_VERSION,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
       activeAccountId: undefined,
