@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Sehemu moja kwa siku!",
     "availableTomorrow": "Rudi kesho ili kuendelea kujifunza kuhusu Bitcoin!",
     "motivatingBadger": "Chunguza masomo haya na upate mapato kadri unavyojifunza",
+    "motivatingBadgerNoRewards": "Chunguza masomo haya na ujifunze kuhusu Bitcoin",
     "continueNoRewards": "Endelea (Bila Zawadi)",
     "somethingNotRight": "Kuna tatizo fulani...",
     "defaultErrorMessage": "{errorMessage: string} Tafadhali jaribu tena baadaye.\nAu, bofya kuendelea kujifunza bila zawadi.",

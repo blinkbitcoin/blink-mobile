@@ -2045,6 +2045,7 @@
         "oneSectionADay": "1日1セクション！",
         "availableTomorrow": "明日また戻ってきて、学びながらsatsを獲得しましょう。\n\nまたは、「続ける」をタップして報酬なしで学習を続けることもできます。",
         "motivatingBadger": "レッスンを掘り進めて、学びながら稼ごう",
+        "motivatingBadgerNoRewards": "レッスンを掘り進めて、ビットコインについて学ぼう",
         "continueNoRewards": "続ける（報酬なし）",
         "somethingNotRight": "問題が発生しました...",
         "defaultErrorMessage": "{errorMessage: string} 後でもう一度お試しください。\nまたは、タップして報酬なしで学習を続けることもできます。",

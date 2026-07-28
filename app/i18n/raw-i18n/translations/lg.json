@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Ku lunaku lw'ekitundu!",
     "availableTomorrow": "Komawo enkya ogende mu maaso n'okuyiga ku Bitcoin!",
     "motivatingBadger": "Sima ekkubo lyo mu misomo gino ofune nga bw'oyiga",
+    "motivatingBadgerNoRewards": "Sima ekkubo lyo mu misomo gino oyige ku Bitcoin",
     "continueNoRewards": "Weyongereyeko (Tewali Mpeera)",
     "somethingNotRight": "Waliwo ekitali kituufu...",
     "defaultErrorMessage": "{errorMessage: string} Tukusaba oddemu ogezeeko oluvannyuma.\nOba, nyiga okweyongerayo okusoma nga tofuna mpeera.",

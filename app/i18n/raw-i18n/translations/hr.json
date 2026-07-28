@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Jedna sekcija dnevno!",
     "availableTomorrow": "Vratite se sutra i nastavite zarađivati satove dok učite.\n\nIli kliknite nastavi za nastavak učenja bez nagrada.",
     "motivatingBadger": "Prokopajte se kroz ove lekcije i zarađujte dok učite",
+    "motivatingBadgerNoRewards": "Prokopajte se kroz ove lekcije i naučite više o Bitcoinu",
     "continueNoRewards": "Nastavi (bez nagrada)",
     "somethingNotRight": "Nešto nije u redu...",
     "defaultErrorMessage": "{errorMessage: string} Molimo pokušajte ponovo kasnije.\nIli kliknite nastavi za nastavak učenja bez nagrada.",

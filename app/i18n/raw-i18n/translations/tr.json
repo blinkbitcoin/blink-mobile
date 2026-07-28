@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Günde bir bölüm!",
     "availableTomorrow": "Bitcoin hakkında daha fazla şey öğrenmek için yarın tekrar gel!",
     "motivatingBadger": "Bu derslerde yolunuzu kazın ve öğrendikçe kazanın",
+    "motivatingBadgerNoRewards": "Bu derslerde yolunuzu kazın ve Bitcoin hakkında bilgi edinin",
     "continueNoRewards": "Devam et (Ödülsüz)",
     "somethingNotRight": "Bir Şeyler Doğru Değil...",
     "defaultErrorMessage": "{errorMessage: string} Lütfen daha sonra tekrar deneyin.\nVeya ödülsüz olarak öğrenmeye devam etmek için tıklayın.",

@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Icandelo elinye ngosuku!",
     "availableTomorrow": "Buya ngomso ukuqhubeka uzuza iiSats ngelixa ufunda.\n\nOkanye, cofa qhubeka ukuze uqhubeke ufunda ngaphandle kwemivuzo.",
     "motivatingBadger": "Mba indlela yakho kwezi zifundo kwaye uzuze ngelixa ufunda",
+    "motivatingBadgerNoRewards": "Mba indlela yakho kwezi zifundo kwaye ufunde ngeBitcoin",
     "continueNoRewards": "Qhubeka (Ngaphandle kweMivuzo)",
     "somethingNotRight": "Kukho into engahambi kakuhle...",
     "defaultErrorMessage": "{errorMessage: string} Nceda uzame kwakhona emva kwethuba.\nOkanye, cofa ukuqhubeka ukuze uqhubeke ufunda ngaphandle kwemivuzo.",

@@ -2045,6 +2045,7 @@
         "oneSectionADay": "Uma seção por dia!",
         "availableTomorrow": "Volte amanhã para continuar aprendendo sobre o Bitcoin!",
         "motivatingBadger": "Explore estas lições e ganhe enquanto aprende",
+        "motivatingBadgerNoRewards": "Explore estas lições e aprenda sobre o Bitcoin",
         "continueNoRewards": "Continuar (Sem Recompensas)",
         "somethingNotRight": "Algo Não Está Certo...",
         "defaultErrorMessage": "{errorMessage: string} Por favor, tente novamente mais tarde.\nOu clique para continuar aprendendo sem recompensas.",

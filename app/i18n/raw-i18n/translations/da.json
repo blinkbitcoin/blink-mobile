@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Ét afsnit om dagen!",
     "availableTomorrow": "This section will be available tomorrow!",
     "motivatingBadger": "Dig your way through these lessons and earn as you learn",
+    "motivatingBadgerNoRewards": "Grav dig gennem disse lektioner og lær om Bitcoin",
     "continueNoRewards": "Fortsæt (ingen belønning)",
     "somethingNotRight": "Noget er ikke helt rigtigt...",
     "defaultErrorMessage": "{errorMessage: string} Prøv venligst igen senere.\nEller klik for at fortsætte med at lære uden belønning.",
