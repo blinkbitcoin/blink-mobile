@@ -7,6 +7,7 @@ import Carousel from "react-native-reanimated-carousel"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { PaginationItem } from "@app/components/pagination"
 import { useLevel } from "@app/graphql/level-context"
+import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-account"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RouteProp, useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -169,6 +170,7 @@ export const EarnSection = ({ route }: Props) => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "earnsSection">>()
 
   const { isAtLeastLevelOne } = useLevel()
+  const isSelfCustodial = useIsSelfCustodialAccount()
 
   const { LL } = useI18nContext()
   const quizQuestionsContent = getQuizQuestionsContent({ LL })
@@ -210,7 +212,9 @@ export const EarnSection = ({ route }: Props) => {
   }, [navigation, sectionTitle])
 
   const open = async (id: string) => {
-    if (!isAtLeastLevelOne) {
+    // Registering a phone number only unlocks rewards, which a self-custodial
+    // account cannot receive anyway — send them straight to the lesson.
+    if (!isSelfCustodial && !isAtLeastLevelOne) {
       Alert.alert(LL.EarnScreen.registerTitle(), LL.EarnScreen.registerContent(), [
         {
           text: LL.common.cancel(),

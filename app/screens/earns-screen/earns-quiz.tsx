@@ -22,6 +22,8 @@ import { Button } from "@rn-vui/base"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-account"
+import { useQuizCompletions } from "@app/hooks/use-quiz-completions"
 import { CloseCross } from "../../components/close-cross"
 import { Screen } from "../../components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -239,6 +241,8 @@ export const EarnQuiz = ({ route }: Props) => {
 
   const [permutation] = useState<ZeroTo2[]>(shuffle([0, 1, 2]))
 
+  const isSelfCustodial = useIsSelfCustodialAccount()
+  const { markQuizCompleted } = useQuizCompletions()
   const { quizServerData } = useQuizServer()
 
   const { id, isAvailable } = route.params
@@ -360,6 +364,13 @@ export const EarnQuiz = ({ route }: Props) => {
       if (hasTriedClaim) return
       if (recordedAnswer.indexOf(0) !== -1 && !completed && !quizClaimLoading) {
         setHasTriedClaim(true)
+
+        // No backend quiz record to claim against — progress lives on the device.
+        if (isSelfCustodial) {
+          markQuizCompleted(id)
+          return
+        }
+
         const { data } = await claimQuizWrapper({ skipRewards: !isAvailable })
 
         if (data?.quizClaim?.errors?.length) {
@@ -393,6 +404,9 @@ export const EarnQuiz = ({ route }: Props) => {
     quizClaimLoading,
     hasTriedClaim,
     isAvailable,
+    isSelfCustodial,
+    markQuizCompleted,
+    id,
   ])
 
   const closeModal = () => {

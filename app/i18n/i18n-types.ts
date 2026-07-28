@@ -6339,6 +6339,10 @@ type RootTranslation = {
 		 */
 		motivatingBadger: string
 		/**
+		 * D​i​g​ ​y​o​u​r​ ​w​a​y​ ​t​h​r​o​u​g​h​ ​t​h​e​s​e​ ​l​e​s​s​o​n​s​ ​a​n​d​ ​l​e​a​r​n​ ​a​b​o​u​t​ ​B​i​t​c​o​i​n
+		 */
+		motivatingBadgerNoRewards: string
+		/**
 		 * C​o​n​t​i​n​u​e​ ​(​N​o​ ​R​e​w​a​r​d​s​)
 		 */
 		continueNoRewards: string
@@ -19480,6 +19484,10 @@ export type TranslationFunctions = {
 		 * Dig your way through these lessons and earn as you learn
 		 */
 		motivatingBadger: () => LocalizedString
+		/**
+		 * Dig your way through these lessons and learn about Bitcoin
+		 */
+		motivatingBadgerNoRewards: () => LocalizedString
 		/**
 		 * Continue (No Rewards)
 		 */

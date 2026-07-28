@@ -2046,6 +2046,7 @@ const en: BaseTranslation = {
     oneSectionADay: "One section a day!",
     availableTomorrow: "Come back tomorrow to continue earning sats while learning.\n\nOr, click continue to keep learning without rewards.",
     motivatingBadger: "Dig your way through these lessons and earn as you learn",
+    motivatingBadgerNoRewards: "Dig your way through these lessons and learn about Bitcoin",
     continueNoRewards: "Continue (No Rewards)",
     somethingNotRight: "Something's Not Right...",
     defaultErrorMessage: "{errorMessage: string} Please try again later.\nOr, click to continue to keep learning without rewards.",
