@@ -29,17 +29,6 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
-jest.mock("react-native-gesture-handler", () => {
-  const RNs = jest.requireActual<typeof import("react-native")>("react-native")
-  const ReactNs = jest.requireActual<typeof import("react")>("react")
-  return {
-    ScrollView: ({ children }: { children?: React.ReactNode }) =>
-      ReactNs.createElement(RNs.View, null, children),
-    TouchableOpacity: RNs.TouchableOpacity,
-    TouchableWithoutFeedback: RNs.TouchableOpacity,
-  }
-})
-
 jest.mock("react-native-modal", () => {
   const MockedModal = ({
     isVisible,
