@@ -39,14 +39,14 @@ export const ChooseExperienceScreen: React.FC = () => {
   const options: OptionCard<AccountMode>[] = [
     {
       key: AccountMode.Enhanced,
-      icon: "map-pin",
+      icon: "location",
       title: LLScreen.enhancedLabel(),
       description: LLScreen.enhancedDescription(),
       testID: "mode-enhanced",
     },
     {
       key: AccountMode.Anon,
-      icon: "eye-slash",
+      icon: "location-slash",
       title: LLScreen.anonLabel(),
       description: LLScreen.anonDescription(),
       testID: "mode-anon",
@@ -86,7 +86,7 @@ export const ChooseExperienceScreen: React.FC = () => {
       }
     >
       <IconHero
-        icon="map-pin"
+        icon="location"
         iconColor={colors.primary}
         title={LLScreen.title()}
         subtitle={LLScreen.subtitle()}

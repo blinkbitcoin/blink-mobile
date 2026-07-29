@@ -1,7 +1,7 @@
 import React from "react"
 import { Pressable, Text } from "react-native"
 
-import { fireEvent, render } from "@testing-library/react-native"
+import { fireEvent, render, within } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
@@ -76,7 +76,7 @@ describe("ChooseExperienceScreen", () => {
     const iconHeroMock = IconHero as unknown as jest.Mock
     const props = iconHeroMock.mock.calls[0][0]
 
-    expect(props.icon).toBe("map-pin")
+    expect(props.icon).toBe("location")
     expect(props.title).toBe(LL.ChooseExperienceScreen.title())
   })
 
@@ -85,6 +85,15 @@ describe("ChooseExperienceScreen", () => {
 
     expect(getByTestId("mode-enhanced")).toBeTruthy()
     expect(getByTestId("mode-anon")).toBeTruthy()
+  })
+
+  it("marks Enhanced with the location icon and Anon with its slashed pair", async () => {
+    const { getByTestId } = await renderScreen()
+
+    expect(within(getByTestId("mode-enhanced")).getByTestId("icon-location")).toBeTruthy()
+    expect(
+      within(getByTestId("mode-anon")).getByTestId("icon-location-slash"),
+    ).toBeTruthy()
   })
 
   it("defaults to Enhanced when the user continues without changing the selection", async () => {
