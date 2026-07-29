@@ -81,7 +81,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
   const isContinueDisabled =
     !selected || detectingCountry || (isCreateMode && detectingRegion)
 
-  const cardOptions: OptionCard[] = []
+  const cardOptions: OptionCard<AccountOption>[] = []
   if (showCustodial) {
     cardOptions.push({
       key: AccountOption.Custodial,
@@ -127,7 +127,7 @@ export const AccountTypeSelectionScreen: React.FC = () => {
             <OptionCardGroup
               options={cardOptions}
               selectedKey={selected}
-              onSelect={(key) => setSelected(key as AccountOption)}
+              onSelect={setSelected}
             />
           )}
         </View>

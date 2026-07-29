@@ -255,8 +255,6 @@ export type RootStackParamList = {
       | {
           route: typeof ChooseExperienceContinueRoute.BackupSuccess
           accountId: string
-          reBackup?: boolean
-          message?: string
         }
       | {
           route: typeof ChooseExperienceContinueRoute.BalancesOverview
