@@ -62,7 +62,7 @@
     "@apollo/client": "^3.9.11",
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@blinkbitcoin/blink-client": "0.6.0",
-    "@blinkbitcoin/react-native-geetest-module": "git+https://github.com/kngako/react-native-geetest-module.git#1c9ce863642970a09364c7601cca897a23d81465",
+    "@blinkbitcoin/react-native-geetest-module": "0.1.2",
     "@breeztech/breez-sdk-spark-react-native": "0.15.0",
     "@expo/react-native-action-sheet": "^4.0.1",
     "@formatjs/intl-getcanonicallocales": "^2.3.0",
