@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Kunci API",
+    "noKeys": "Belum ada kunci API",
+    "createKey": "Buat kunci API",
+    "createTitle": "Kunci API baru",
+    "keyCreatedTitle": "Kunci API dibuat",
+    "keyName": "Nama kunci",
+    "keyNamePlaceholder": "mis. BTCPay Server",
+    "scopeRead": "Baca",
+    "scopeReadDescription": "Lihat saldo dan riwayat transaksi",
+    "scopeReceive": "Terima",
+    "scopeReceiveDescription": "Buat faktur dan terima pembayaran",
+    "scopeWrite": "Tulis",
+    "writeScopeDashboardOnly": "Kunci yang dapat mengirim pembayaran hanya bisa dibuat di dashboard.blink.sv",
+    "expiry": "Kedaluwarsa",
+    "expiry30Days": "30 hari",
+    "expiry90Days": "90 hari",
+    "expiryNever": "Tidak pernah",
+    "expiresOn": "Kedaluwarsa pada {date: string}",
+    "neverExpires": "Tidak pernah kedaluwarsa",
+    "revoked": "Dicabut",
+    "expired": "Kedaluwarsa pada {date: string}",
+    "expiredNoDate": "Kedaluwarsa",
+    "secretWarning": "Ini satu-satunya kali kunci ditampilkan. Salin atau bagikan sekarang dan simpan dengan aman.",
+    "secretCopied": "Kunci API disalin. Papan klip dibersihkan dalam 1 menit",
+    "revokeTitle": "Cabut kunci API?",
+    "revokeBody": "\"{name: string}\" akan langsung berhenti berfungsi. Tindakan ini tidak dapat dibatalkan.",
+    "revoke": "Cabut",
+    "revokeSuccess": "Kunci API dicabut",
+    "createError": "Tidak dapat membuat kunci API. Silakan coba lagi.",
+    "revokeError": "Tidak dapat mencabut kunci API. Silakan coba lagi.",
+    "loadError": "Tidak dapat memuat kunci API Anda. Silakan coba lagi nanti.",
+    "done": "Selesai"
+  },
   "GaloyAddressScreen": {
     "title": "Terima pembayaran dengan menggunakan:",
     "buttonTitle": "Tetapkan alamat anda",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sats terkumpul",
     "satsEarned": "{formattedNumber | sats} diperoleh",
     "sectionsCompleted": "Anda telah menyelesaikan",
-    "title": "Dapatkan",
+    "title": "Belajar",
     "unlockQuestion": "Untuk membuka, jawab pertanyaannya:",
     "youEarned": "Anda Mendapatkan",
     "registerTitle": "Perlu memperbaharui akun Anda",
@@ -2049,7 +2083,7 @@
     "login": "Masuk",
     "loginOrRestore": "Masuk / Pulihkan",
     "logBackInWith": "Masuk kembali dengan",
-    "headline": "Dompet didukung oleh Galoy",
+    "headline": "Dompet didukung oleh Blink",
     "startTrialAccount": "Mulai dengan akun percobaan",
     "startWithTrialAccount": "Mulai dengan akun percobaan",
     "registerPhoneAccount": "Daftar akun telepon",
@@ -2163,6 +2197,9 @@
     "lightningInvoice": "Faktur lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Biaya deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit di atas {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats / {minFiat: string} tidak dapat dikonversi ke Dolar secara otomatis. Anda akan menerima Bitcoin.",
     "autoConvertFailed": "Pembayaran diterima tetapi konversi gagal.",
     "pleaseWaitForConversion": "Mohon tunggu sampai konversi selesai"
@@ -2260,6 +2297,10 @@
     "pastedClipboardSuccess": "Berhasil ditempel dari papan klip",
     "invalidPhoneNumber": "Masukkan nomor ponsel yang valid",
     "phoneNotAllowed": "Kolom ini tidak menerima nomor telepon"
+  },
+  "MerchantSelectionScreen": {
+    "title": "Pilih opsi pembayaran",
+    "empty": "Tidak ada opsi pembayaran yang tersedia."
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi akan dikirim ke mempool",
@@ -2546,6 +2587,7 @@
     "lightningTransactions": "Transaksi Lightning",
     "onchainBelowThreshold": "Onchain di bawah {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain di atas {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Biaya transfer",
     "noFee": "tanpa biaya",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} biaya routing",
@@ -2596,7 +2638,8 @@
       "tooLong": "Alamat harus memiliki maksimal 50 karakter",
       "invalidCharacter": "Alamat hanya boleh berisi huruf, angka, dan garis bawah",
       "addressUnavailable": "Maaf, alamat ini sudah digunakan",
-      "unknownError": "Terjadi kesalahan yang tidak diketahui, silakan coba lagi nanti"
+      "unknownError": "Terjadi kesalahan yang tidak diketahui, silakan coba lagi nanti",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Terima uang dari dompet Lightning lainnya dan pengguna {bankName: string} dengan alamat ini.",
     "itCannotBeChanged": "Ini tidak dapat diubah nanti."
@@ -3794,6 +3837,11 @@
     "modalDescription": "Kami sangat menyarankan Anda untuk mencadangkan dompet Anda untuk mencegah kehilangan total dana jika Anda kehilangan perangkat ini.",
     "secureMe": "Amankan dompet"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Ini adalah akun non-kustodial",
     "body": "Untuk mempelajari lebih lanjut, baca postingan blog kami",
@@ -3832,7 +3880,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Belajar",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Khóa API",
+    "noKeys": "Chưa có khóa API nào",
+    "createKey": "Tạo khóa API",
+    "createTitle": "Khóa API mới",
+    "keyCreatedTitle": "Đã tạo khóa API",
+    "keyName": "Tên khóa",
+    "keyNamePlaceholder": "ví dụ: BTCPay Server",
+    "scopeRead": "Đọc",
+    "scopeReadDescription": "Xem số dư và lịch sử giao dịch",
+    "scopeReceive": "Nhận",
+    "scopeReceiveDescription": "Tạo hóa đơn và nhận thanh toán",
+    "scopeWrite": "Ghi",
+    "writeScopeDashboardOnly": "Các khóa có thể gửi thanh toán chỉ có thể được tạo trên dashboard.blink.sv",
+    "expiry": "Hết hạn",
+    "expiry30Days": "30 ngày",
+    "expiry90Days": "90 ngày",
+    "expiryNever": "Không bao giờ",
+    "expiresOn": "Hết hạn vào {date: string}",
+    "neverExpires": "Không bao giờ hết hạn",
+    "revoked": "Đã thu hồi",
+    "expired": "Đã hết hạn vào {date: string}",
+    "expiredNoDate": "Đã hết hạn",
+    "secretWarning": "Đây là lần duy nhất khóa được hiển thị. Hãy sao chép hoặc chia sẻ ngay bây giờ và lưu trữ an toàn.",
+    "secretCopied": "Đã sao chép khóa API. Bảng nhớ tạm sẽ được xóa sau 1 phút",
+    "revokeTitle": "Thu hồi khóa API?",
+    "revokeBody": "\"{name: string}\" sẽ ngừng hoạt động ngay lập tức. Không thể hoàn tác thao tác này.",
+    "revoke": "Thu hồi",
+    "revokeSuccess": "Đã thu hồi khóa API",
+    "createError": "Không thể tạo khóa API. Vui lòng thử lại.",
+    "revokeError": "Không thể thu hồi khóa API. Vui lòng thử lại.",
+    "loadError": "Không thể tải các khóa API của bạn. Vui lòng thử lại sau.",
+    "done": "Xong"
+  },
   "GaloyAddressScreen": {
     "title": "Receive payment by using:",
     "buttonTitle": "Set your address",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sats đã tích lũy",
     "satsEarned": "{formattedNumber | sats} kiếm được",
     "sectionsCompleted": "Bạn vừa hoàn thành",
-    "title": "Kiếm được",
+    "title": "Học",
     "unlockQuestion": "Để mở khóa, hãy trả lời câu hỏi:",
     "youEarned": "Bạn đã kiếm được",
     "registerTitle": "Need to upgrade your account",
@@ -2049,7 +2083,7 @@
     "login": "Đăng nhập",
     "loginOrRestore": "Đăng nhập / Khôi phục",
     "logBackInWith": "Log back in with",
-    "headline": "Ví được cung cấp bởi Galoy",
+    "headline": "Ví được cung cấp bởi Blink",
     "startTrialAccount": "Start with a trial account",
     "startWithTrialAccount": "Start with trial account",
     "registerPhoneAccount": "Register phone account",
@@ -2163,6 +2197,9 @@
     "lightningInvoice": "Hóa đơn lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Phí nạp tiền: {fee} SAT cho số tiền dưới {threshold} SAT hoặc {overFee} SAT cho các khoản nạp trên {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Số tiền dưới {minSats: number} sats / {minFiat: string} không thể chuyển đổi tự động sang Đô la. Bạn sẽ nhận Bitcoin thay thế.",
     "autoConvertFailed": "Đã nhận thanh toán nhưng chuyển đổi thất bại.",
     "pleaseWaitForConversion": "Vui lòng đợi cho đến khi quá trình chuyển đổi hoàn tất"
@@ -2260,6 +2297,10 @@
     "pastedClipboardSuccess": "Đã dán từ bộ nhớ tạm",
     "invalidPhoneNumber": "Nhập số điện thoại di động hợp lệ",
     "phoneNotAllowed": "Trường này không chấp nhận số điện thoại"
+  },
+  "MerchantSelectionScreen": {
+    "title": "Chọn tùy chọn thanh toán",
+    "empty": "Không có tùy chọn thanh toán nào."
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Giao dịch sẽ được gửi vào mempool",
@@ -2546,6 +2587,7 @@
     "lightningTransactions": "Giao dịch Lightning",
     "onchainBelowThreshold": "Onchain dưới {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain trên {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Phí chuyển khoản",
     "noFee": "miễn phí",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} phí định tuyến",
@@ -2596,7 +2638,8 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
-      "unknownError": "An unknown error occurred, please try again later"
+      "unknownError": "An unknown error occurred, please try again later",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Receive money from other lightning wallets and {bankName: string} users with this address.",
     "itCannotBeChanged": "It can't be changed later."
@@ -3794,6 +3837,11 @@
     "modalDescription": "Chúng tôi khuyến nghị bạn sao lưu ví để ngăn chặn mất hoàn toàn tiền trong trường hợp bạn mất thiết bị này.",
     "secureMe": "Bảo mật ví"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Đây là tài khoản không lưu ký",
     "body": "Để tìm hiểu thêm, hãy đọc bài viết trên blog của chúng tôi",
@@ -3832,7 +3880,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Học",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

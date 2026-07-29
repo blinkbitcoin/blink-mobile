@@ -8,7 +8,8 @@ import React, {
 } from "react"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
+
+import { recordAppError } from "@app/utils/error-reporting"
 
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
@@ -21,6 +22,7 @@ import {
 
 import { getLightningAddress } from "../bridge"
 import { useSdkLifecycle } from "../hooks/use-sdk-lifecycle"
+import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 import { setSelfCustodialLightningAddress } from "../storage/account-index"
 
 const LightningAddressOperation = {
@@ -37,9 +39,9 @@ const reportLightningAddressError = (
   err: unknown,
 ): void => {
   const message = err instanceof Error ? err.message : String(err)
-  crashlytics().recordError(
-    new Error(`Lightning address ${operation} failed: ${message}`),
-  )
+  recordAppError(new Error(`Lightning address ${operation} failed: ${message}`), {
+    expected: classifySdkError(err) === SelfCustodialErrorCode.NetworkError,
+  })
 }
 
 type SelfCustodialWalletContextValue = ActiveWalletState & {

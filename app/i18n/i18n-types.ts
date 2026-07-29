@@ -6305,7 +6305,7 @@ type RootTranslation = {
 		 */
 		sectionsCompleted: string
 		/**
-		 * E​a​r​n
+		 * L​e​a​r​n
 		 */
 		title: string
 		/**
@@ -6866,6 +6866,23 @@ type RootTranslation = {
 		 */
 		depositFee: RequiredParams<'fee' | 'overFee' | 'threshold' | 'threshold'>
 		/**
+		 * D​e​p​o​s​i​t​ ​f​e​e​s​:​ ​{​t​i​e​r​s​}
+		 * @param {string} tiers
+		 */
+		depositFeeTiers: RequiredParams<'tiers'>
+		/**
+		 * {​f​e​e​}​ ​S​A​T​ ​u​p​ ​t​o​ ​{​m​a​x​}​ ​S​A​T
+		 * @param {string} fee
+		 * @param {string} max
+		 */
+		depositFeeTierUpTo: RequiredParams<'fee' | 'max'>
+		/**
+		 * {​f​e​e​}​ ​S​A​T​ ​a​b​o​v​e​ ​{​m​i​n​}​ ​S​A​T
+		 * @param {string} fee
+		 * @param {string} min
+		 */
+		depositFeeTierAbove: RequiredParams<'fee' | 'min'>
+		/**
 		 * A​m​o​u​n​t​s​ ​b​e​l​o​w​ ​{​m​i​n​S​a​t​s​}​ ​S​A​T​ ​/​ ​{​m​i​n​F​i​a​t​}​ ​c​a​n​'​t​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​D​o​l​l​a​r​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.​ ​Y​o​u​'​l​l​ ​r​e​c​e​i​v​e​ ​B​i​t​c​o​i​n​ ​i​n​s​t​e​a​d​.
 		 * @param {string} minFiat
 		 * @param {number} minSats
@@ -7268,6 +7285,16 @@ type RootTranslation = {
 		 */
 		phoneNotAllowed: string
 	}
+	MerchantSelectionScreen: {
+		/**
+		 * C​h​o​o​s​e​ ​p​a​y​m​e​n​t​ ​o​p​t​i​o​n
+		 */
+		title: string
+		/**
+		 * N​o​ ​p​a​y​m​e​n​t​ ​o​p​t​i​o​n​s​ ​a​r​e​ ​a​v​a​i​l​a​b​l​e​.
+		 */
+		empty: string
+	}
 	SendBitcoinScreen: {
 		/**
 		 * T​r​a​n​s​a​c​t​i​o​n​ ​s​h​o​u​l​d​ ​b​e​ ​s​u​b​m​i​t​t​e​d​ ​t​o​ ​m​e​m​p​o​o​l
@@ -7490,6 +7517,139 @@ type RootTranslation = {
 		 */
 		sdkGenericError: string
 	}
+	ApiScreen: {
+		/**
+		 * A​P​I​ ​k​e​y​s
+		 */
+		keysGroupTitle: string
+		/**
+		 * N​o​ ​A​P​I​ ​k​e​y​s​ ​y​e​t
+		 */
+		noKeys: string
+		/**
+		 * C​r​e​a​t​e​ ​A​P​I​ ​k​e​y
+		 */
+		createKey: string
+		/**
+		 * N​e​w​ ​A​P​I​ ​k​e​y
+		 */
+		createTitle: string
+		/**
+		 * A​P​I​ ​k​e​y​ ​c​r​e​a​t​e​d
+		 */
+		keyCreatedTitle: string
+		/**
+		 * K​e​y​ ​n​a​m​e
+		 */
+		keyName: string
+		/**
+		 * e​.​g​.​ ​B​T​C​P​a​y​ ​S​e​r​v​e​r
+		 */
+		keyNamePlaceholder: string
+		/**
+		 * R​e​a​d
+		 */
+		scopeRead: string
+		/**
+		 * V​i​e​w​ ​b​a​l​a​n​c​e​ ​a​n​d​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y
+		 */
+		scopeReadDescription: string
+		/**
+		 * R​e​c​e​i​v​e
+		 */
+		scopeReceive: string
+		/**
+		 * C​r​e​a​t​e​ ​i​n​v​o​i​c​e​s​ ​a​n​d​ ​r​e​c​e​i​v​e​ ​p​a​y​m​e​n​t​s
+		 */
+		scopeReceiveDescription: string
+		/**
+		 * W​r​i​t​e
+		 */
+		scopeWrite: string
+		/**
+		 * K​e​y​s​ ​t​h​a​t​ ​c​a​n​ ​s​e​n​d​ ​p​a​y​m​e​n​t​s​ ​c​a​n​ ​o​n​l​y​ ​b​e​ ​c​r​e​a​t​e​d​ ​o​n​ ​d​a​s​h​b​o​a​r​d​.​b​l​i​n​k​.​s​v
+		 */
+		writeScopeDashboardOnly: string
+		/**
+		 * E​x​p​i​r​e​s
+		 */
+		expiry: string
+		/**
+		 * 3​0​ ​d​a​y​s
+		 */
+		expiry30Days: string
+		/**
+		 * 9​0​ ​d​a​y​s
+		 */
+		expiry90Days: string
+		/**
+		 * N​e​v​e​r
+		 */
+		expiryNever: string
+		/**
+		 * E​x​p​i​r​e​s​ ​{​d​a​t​e​}
+		 * @param {string} date
+		 */
+		expiresOn: RequiredParams<'date'>
+		/**
+		 * N​e​v​e​r​ ​e​x​p​i​r​e​s
+		 */
+		neverExpires: string
+		/**
+		 * R​e​v​o​k​e​d
+		 */
+		revoked: string
+		/**
+		 * E​x​p​i​r​e​d​ ​{​d​a​t​e​}
+		 * @param {string} date
+		 */
+		expired: RequiredParams<'date'>
+		/**
+		 * E​x​p​i​r​e​d
+		 */
+		expiredNoDate: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​o​n​l​y​ ​t​i​m​e​ ​t​h​e​ ​k​e​y​ ​i​s​ ​s​h​o​w​n​.​ ​C​o​p​y​ ​o​r​ ​s​h​a​r​e​ ​i​t​ ​n​o​w​ ​a​n​d​ ​s​t​o​r​e​ ​i​t​ ​s​a​f​e​l​y​.
+		 */
+		secretWarning: string
+		/**
+		 * A​P​I​ ​k​e​y​ ​c​o​p​i​e​d​ ​—​ ​c​l​i​p​b​o​a​r​d​ ​c​l​e​a​r​s​ ​i​n​ ​1​ ​m​i​n​u​t​e
+		 */
+		secretCopied: string
+		/**
+		 * R​e​v​o​k​e​ ​A​P​I​ ​k​e​y​?
+		 */
+		revokeTitle: string
+		/**
+		 * "​{​n​a​m​e​}​"​ ​w​i​l​l​ ​s​t​o​p​ ​w​o​r​k​i​n​g​ ​i​m​m​e​d​i​a​t​e​l​y​.​ ​T​h​i​s​ ​c​a​n​n​o​t​ ​b​e​ ​u​n​d​o​n​e​.
+		 * @param {string} name
+		 */
+		revokeBody: RequiredParams<'name'>
+		/**
+		 * R​e​v​o​k​e
+		 */
+		revoke: string
+		/**
+		 * A​P​I​ ​k​e​y​ ​r​e​v​o​k​e​d
+		 */
+		revokeSuccess: string
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​c​r​e​a​t​e​ ​t​h​e​ ​A​P​I​ ​k​e​y​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		createError: string
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​r​e​v​o​k​e​ ​t​h​e​ ​A​P​I​ ​k​e​y​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		revokeError: string
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​A​P​I​ ​k​e​y​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
+		 */
+		loadError: string
+		/**
+		 * D​o​n​e
+		 */
+		done: string
+	}
 	SettingsScreen: {
 		/**
 		 * P​r​i​n​t​a​b​l​e​ ​s​t​a​t​i​c​ ​Q​R
@@ -7528,7 +7688,7 @@ type RootTranslation = {
 		 */
 		createAddress: string
 		/**
-		 * D​o​n​a​t​i​o​n​ ​B​u​t​t​o​n
+		 * D​o​n​a​t​e​ ​B​u​t​t​o​n
 		 */
 		donationButton: string
 		/**
@@ -8340,6 +8500,12 @@ type RootTranslation = {
 		 */
 		onchainAboveThreshold: RequiredParams<'threshold'>
 		/**
+		 * O​n​c​h​a​i​n​ ​b​e​t​w​e​e​n​ ​{​l​o​w​e​r​}​ ​a​n​d​ ​{​u​p​p​e​r​}​ ​S​A​T
+		 * @param {string} lower
+		 * @param {string} upper
+		 */
+		onchainBetweenThresholds: RequiredParams<'lower' | 'upper'>
+		/**
 		 * T​r​a​n​s​f​e​r​ ​f​e​e
 		 */
 		transferFee: string
@@ -8518,6 +8684,10 @@ type RootTranslation = {
 			 * A​n​ ​u​n​k​n​o​w​n​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d​,​ ​p​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r
 			 */
 			unknownError: string
+			/**
+			 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​b​e​f​o​r​e​ ​c​r​e​a​t​i​n​g​ ​a​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
+			 */
+			backupRequired: string
 		}
 		/**
 		 * R​e​c​e​i​v​e​ ​m​o​n​e​y​ ​f​r​o​m​ ​o​t​h​e​r​ ​l​i​g​h​t​n​i​n​g​ ​w​a​l​l​e​t​s​ ​a​n​d​ ​{​b​a​n​k​N​a​m​e​}​ ​u​s​e​r​s​ ​w​i​t​h​ ​t​h​i​s​ ​a​d​d​r​e​s​s​.
@@ -12610,6 +12780,20 @@ type RootTranslation = {
 		 */
 		secureMe: string
 	}
+	BackupRequired: {
+		/**
+		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​f​i​r​s​t
+		 */
+		modalTitle: string
+		/**
+		 * Y​o​u​r​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s​ ​i​s​ ​p​e​r​m​a​n​e​n​t​l​y​ ​l​i​n​k​e​d​ ​t​o​ ​t​h​i​s​ ​w​a​l​l​e​t​.​ ​B​a​c​k​ ​u​p​ ​y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​p​h​r​a​s​e​ ​f​i​r​s​t​,​ ​s​o​ ​y​o​u​ ​n​e​v​e​r​ ​l​o​s​e​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​a​d​d​r​e​s​s​ ​a​n​d​ ​f​u​n​d​s​.
+		 */
+		modalDescription: string
+		/**
+		 * B​a​c​k​ ​u​p​ ​w​a​l​l​e​t
+		 */
+		backupNow: string
+	}
 	NonCustodialInfoBulletin: {
 		/**
 		 * T​h​i​s​ ​i​s​ ​a​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
@@ -12929,7 +13113,7 @@ type RootTranslation = {
 		 */
 		featureCircles: string
 		/**
-		 * E​a​r​n
+		 * L​e​a​r​n
 		 */
 		featureEarn: string
 		/**
@@ -19263,7 +19447,7 @@ export type TranslationFunctions = {
 		 */
 		sectionsCompleted: () => LocalizedString
 		/**
-		 * Earn
+		 * Learn
 		 */
 		title: () => LocalizedString
 		/**
@@ -19814,6 +19998,18 @@ export type TranslationFunctions = {
 		 */
 		depositFee: (arg: { fee: string, overFee: string, threshold: string }) => LocalizedString
 		/**
+		 * Deposit fees: {tiers}
+		 */
+		depositFeeTiers: (arg: { tiers: string }) => LocalizedString
+		/**
+		 * {fee} SAT up to {max} SAT
+		 */
+		depositFeeTierUpTo: (arg: { fee: string, max: string }) => LocalizedString
+		/**
+		 * {fee} SAT above {min} SAT
+		 */
+		depositFeeTierAbove: (arg: { fee: string, min: string }) => LocalizedString
+		/**
 		 * Amounts below {minSats} SAT / {minFiat} can't be converted to Dollar automatically. You'll receive Bitcoin instead.
 		 */
 		autoConvertMinAmount: (arg: { minFiat: string, minSats: number }) => LocalizedString
@@ -20186,6 +20382,16 @@ export type TranslationFunctions = {
 		 */
 		phoneNotAllowed: () => LocalizedString
 	}
+	MerchantSelectionScreen: {
+		/**
+		 * Choose payment option
+		 */
+		title: () => LocalizedString
+		/**
+		 * No payment options are available.
+		 */
+		empty: () => LocalizedString
+	}
 	SendBitcoinScreen: {
 		/**
 		 * Transaction should be submitted to mempool
@@ -20406,6 +20612,136 @@ export type TranslationFunctions = {
 		 */
 		sdkGenericError: () => LocalizedString
 	}
+	ApiScreen: {
+		/**
+		 * API keys
+		 */
+		keysGroupTitle: () => LocalizedString
+		/**
+		 * No API keys yet
+		 */
+		noKeys: () => LocalizedString
+		/**
+		 * Create API key
+		 */
+		createKey: () => LocalizedString
+		/**
+		 * New API key
+		 */
+		createTitle: () => LocalizedString
+		/**
+		 * API key created
+		 */
+		keyCreatedTitle: () => LocalizedString
+		/**
+		 * Key name
+		 */
+		keyName: () => LocalizedString
+		/**
+		 * e.g. BTCPay Server
+		 */
+		keyNamePlaceholder: () => LocalizedString
+		/**
+		 * Read
+		 */
+		scopeRead: () => LocalizedString
+		/**
+		 * View balance and transaction history
+		 */
+		scopeReadDescription: () => LocalizedString
+		/**
+		 * Receive
+		 */
+		scopeReceive: () => LocalizedString
+		/**
+		 * Create invoices and receive payments
+		 */
+		scopeReceiveDescription: () => LocalizedString
+		/**
+		 * Write
+		 */
+		scopeWrite: () => LocalizedString
+		/**
+		 * Keys that can send payments can only be created on dashboard.blink.sv
+		 */
+		writeScopeDashboardOnly: () => LocalizedString
+		/**
+		 * Expires
+		 */
+		expiry: () => LocalizedString
+		/**
+		 * 30 days
+		 */
+		expiry30Days: () => LocalizedString
+		/**
+		 * 90 days
+		 */
+		expiry90Days: () => LocalizedString
+		/**
+		 * Never
+		 */
+		expiryNever: () => LocalizedString
+		/**
+		 * Expires {date}
+		 */
+		expiresOn: (arg: { date: string }) => LocalizedString
+		/**
+		 * Never expires
+		 */
+		neverExpires: () => LocalizedString
+		/**
+		 * Revoked
+		 */
+		revoked: () => LocalizedString
+		/**
+		 * Expired {date}
+		 */
+		expired: (arg: { date: string }) => LocalizedString
+		/**
+		 * Expired
+		 */
+		expiredNoDate: () => LocalizedString
+		/**
+		 * This is the only time the key is shown. Copy or share it now and store it safely.
+		 */
+		secretWarning: () => LocalizedString
+		/**
+		 * API key copied — clipboard clears in 1 minute
+		 */
+		secretCopied: () => LocalizedString
+		/**
+		 * Revoke API key?
+		 */
+		revokeTitle: () => LocalizedString
+		/**
+		 * "{name}" will stop working immediately. This cannot be undone.
+		 */
+		revokeBody: (arg: { name: string }) => LocalizedString
+		/**
+		 * Revoke
+		 */
+		revoke: () => LocalizedString
+		/**
+		 * API key revoked
+		 */
+		revokeSuccess: () => LocalizedString
+		/**
+		 * Could not create the API key. Please try again.
+		 */
+		createError: () => LocalizedString
+		/**
+		 * Could not revoke the API key. Please try again.
+		 */
+		revokeError: () => LocalizedString
+		/**
+		 * Could not load your API keys. Please try again later.
+		 */
+		loadError: () => LocalizedString
+		/**
+		 * Done
+		 */
+		done: () => LocalizedString
+	}
 	SettingsScreen: {
 		/**
 		 * Printable static QR
@@ -20444,7 +20780,7 @@ export type TranslationFunctions = {
 		 */
 		createAddress: () => LocalizedString
 		/**
-		 * Donation Button
+		 * Donate Button
 		 */
 		donationButton: () => LocalizedString
 		/**
@@ -21238,6 +21574,10 @@ export type TranslationFunctions = {
 		 */
 		onchainAboveThreshold: (arg: { threshold: string }) => LocalizedString
 		/**
+		 * Onchain between {lower} and {upper} SAT
+		 */
+		onchainBetweenThresholds: (arg: { lower: string, upper: string }) => LocalizedString
+		/**
 		 * Transfer fee
 		 */
 		transferFee: () => LocalizedString
@@ -21408,6 +21748,10 @@ export type TranslationFunctions = {
 			 * An unknown error occurred, please try again later
 			 */
 			unknownError: () => LocalizedString
+			/**
+			 * Back up your wallet before creating a Lightning address
+			 */
+			backupRequired: () => LocalizedString
 		}
 		/**
 		 * Receive money from other lightning wallets and {bankName} users with this address.
@@ -25434,6 +25778,20 @@ export type TranslationFunctions = {
 		 */
 		secureMe: () => LocalizedString
 	}
+	BackupRequired: {
+		/**
+		 * Back up your wallet first
+		 */
+		modalTitle: () => LocalizedString
+		/**
+		 * Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.
+		 */
+		modalDescription: () => LocalizedString
+		/**
+		 * Back up wallet
+		 */
+		backupNow: () => LocalizedString
+	}
 	NonCustodialInfoBulletin: {
 		/**
 		 * This is a non-custodial account
@@ -25736,7 +26094,7 @@ export type TranslationFunctions = {
 		 */
 		featureCircles: () => LocalizedString
 		/**
-		 * Earn
+		 * Learn
 		 */
 		featureEarn: () => LocalizedString
 		/**

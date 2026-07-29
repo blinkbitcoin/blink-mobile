@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Kunci API",
+    "noKeys": "Belum ada kunci API",
+    "createKey": "Cipta kunci API",
+    "createTitle": "Kunci API baharu",
+    "keyCreatedTitle": "Kunci API dicipta",
+    "keyName": "Nama kunci",
+    "keyNamePlaceholder": "cth. BTCPay Server",
+    "scopeRead": "Baca",
+    "scopeReadDescription": "Lihat baki dan sejarah transaksi",
+    "scopeReceive": "Terima",
+    "scopeReceiveDescription": "Cipta invois dan terima pembayaran",
+    "scopeWrite": "Tulis",
+    "writeScopeDashboardOnly": "Kunci yang boleh menghantar pembayaran hanya boleh dicipta di dashboard.blink.sv",
+    "expiry": "Tamat tempoh",
+    "expiry30Days": "30 hari",
+    "expiry90Days": "90 hari",
+    "expiryNever": "Tidak pernah",
+    "expiresOn": "Tamat tempoh pada {date: string}",
+    "neverExpires": "Tidak pernah tamat tempoh",
+    "revoked": "Dibatalkan",
+    "expired": "Tamat tempoh pada {date: string}",
+    "expiredNoDate": "Tamat tempoh",
+    "secretWarning": "Ini satu-satunya kali kunci ditunjukkan. Salin atau kongsikannya sekarang dan simpan dengan selamat.",
+    "secretCopied": "Kunci API disalin. Papan keratan dikosongkan dalam 1 minit",
+    "revokeTitle": "Batalkan kunci API?",
+    "revokeBody": "\"{name: string}\" akan berhenti berfungsi serta-merta. Tindakan ini tidak boleh dibatalkan.",
+    "revoke": "Batalkan",
+    "revokeSuccess": "Kunci API dibatalkan",
+    "createError": "Tidak dapat mencipta kunci API. Sila cuba lagi.",
+    "revokeError": "Tidak dapat membatalkan kunci API. Sila cuba lagi.",
+    "loadError": "Tidak dapat memuatkan kunci API anda. Sila cuba lagi kemudian.",
+    "done": "Selesai"
+  },
   "GaloyAddressScreen": {
     "title": "Terima Bayaran Dengan Menggunakan:",
     "buttonTitle": "Tetapkan Alamat LN Anda",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "sats telah dikumpul",
     "satsEarned": "{format nombor dalam |sats: string} telah diperolehi",
     "sectionsCompleted": "Dah selesai",
-    "title": "Dapat",
+    "title": "Belajar",
     "unlockQuestion": "Untuk membuka kunci, sila jawab soalan:",
     "youEarned": "Anda telah memperolehi",
     "registerTitle": "Anda perlulah naik taraf akaun anda",
@@ -2049,7 +2083,7 @@
     "login": "Log masuk",
     "loginOrRestore": "Log masuk / Pulihkan",
     "logBackInWith": "Log masuk semula dengan",
-    "headline": "Dompet dikuasakan oleh Galoy",
+    "headline": "Dompet dikuasakan oleh Blink",
     "startTrialAccount": "Mulakan dengan akaun percubaan",
     "startWithTrialAccount": "Mulakan dengan akaun percubaan",
     "registerPhoneAccount": "Daftarkan nombor telefon",
@@ -2163,6 +2197,9 @@
     "lightningInvoice": "Invois lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Yuran deposit: {fee} SAT untuk jumlah di bawah {threshold} SAT atau {overFee} SAT untuk deposit melebihi {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats / {minFiat: string} tidak boleh ditukar kepada Dolar secara automatik. Anda akan menerima Bitcoin.",
     "autoConvertFailed": "Pembayaran diterima tetapi penukaran gagal.",
     "pleaseWaitForConversion": "Sila tunggu sehingga penukaran selesai"
@@ -2260,6 +2297,10 @@
     "pastedClipboardSuccess": "Ditampal dari clipboard",
     "invalidPhoneNumber": "Masukkan nombor telefon bimbit yang sah",
     "phoneNotAllowed": "Ruangan ini tidak menerima nombor telefon"
+  },
+  "MerchantSelectionScreen": {
+    "title": "Pilih pilihan pembayaran",
+    "empty": "Tiada pilihan pembayaran tersedia."
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi sepatutnya dihantar ke mempool",
@@ -2546,6 +2587,7 @@
     "lightningTransactions": "Transaksi Lightning",
     "onchainBelowThreshold": "Onchain bawah {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain atas {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Caj pindahan",
     "noFee": "tiada caj",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} caj penghalaan",
@@ -2596,7 +2638,8 @@
       "tooLong": "Panjang alamat maksimum adalah 50 aksara",
       "invalidCharacter": "Alamat hanya boleh mengandungi huruf, nombor dan underscores sahaja",
       "addressUnavailable": "Maaf, alamat ini sudah ada pemiliknya ",
-      "unknownError": "Ada masalah yang belum dikenal pasti berlaku, sila cuba lagi sekali."
+      "unknownError": "Ada masalah yang belum dikenal pasti berlaku, sila cuba lagi sekali.",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Terima wang daripada dompet Lightning yang lain dan pengguna {bankName: string} dengan alamat ini.",
     "itCannotBeChanged": "Ia tak boleh ditukar selepas ini."
@@ -3794,6 +3837,11 @@
     "modalDescription": "Kami sangat mengesyorkan anda membuat sandaran dompet anda untuk mengelakkan kehilangan dana sepenuhnya sekiranya anda kehilangan peranti ini.",
     "secureMe": "Lindungi dompet"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Ini ialah akaun bukan kustodial",
     "body": "Untuk mengetahui lebih lanjut, baca catatan blog kami",
@@ -3832,7 +3880,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Belajar",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

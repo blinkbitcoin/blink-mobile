@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { recordAppError } from "@app/utils/error-reporting"
 
 import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
@@ -48,7 +48,9 @@ const isEntry = (value: unknown): value is SelfCustodialAccountEntry => {
 const toReadFailed = (err: unknown): ReadIndexResult => {
   const error =
     err instanceof Error ? err : new Error(`Account index read failed: ${err}`)
-  crashlytics().recordError(error)
+  // Registry read failures can wipe account bookkeeping; never downgrade them
+  // even when the message looks connectivity-shaped ("AsyncStorage unavailable").
+  recordAppError(error, { alwaysRecord: true })
   return { status: StorageReadStatus.ReadFailed, error }
 }
 

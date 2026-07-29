@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Izitshixo ze-API",
+    "noKeys": "Akukho zitshixo ze-API okwangoku",
+    "createKey": "Yenza isitshixo se-API",
+    "createTitle": "Isitshixo se-API esitsha",
+    "keyCreatedTitle": "Isitshixo se-API senziwe",
+    "keyName": "Igama lesitshixo",
+    "keyNamePlaceholder": "umz. BTCPay Server",
+    "scopeRead": "Funda",
+    "scopeReadDescription": "Jonga ibhalansi kunye nembali yentengiselwano",
+    "scopeReceive": "Yamkela",
+    "scopeReceiveDescription": "Yenza ii-invoyisi kwaye wamkele iintlawulo",
+    "scopeWrite": "Bhala",
+    "writeScopeDashboardOnly": "Izitshixo ezinokuthumela iintlawulo zingenziwa kuphela ku-dashboard.blink.sv",
+    "expiry": "Iphelelwa",
+    "expiry30Days": "Iintsuku ezingama-30",
+    "expiry90Days": "Iintsuku ezingama-90",
+    "expiryNever": "Ayihlali",
+    "expiresOn": "Iphelelwa nge-{date: string}",
+    "neverExpires": "Ayipheleli",
+    "revoked": "Irhoxisiwe",
+    "expired": "Iphelelwe nge-{date: string}",
+    "expiredNoDate": "Iphelelwe",
+    "secretWarning": "Eli lelona xesha kuphela isitshixo esiboniswa ngalo. Sikhuphele okanye usabelane ngoku kwaye usigcine ngokukhuselekileyo.",
+    "secretCopied": "Isitshixo se-API sikhutshelwe. Ibhodi yokukhuphela iza kucocwa emva komzuzu omnye",
+    "revokeTitle": "Rhoxisa isitshixo se-API?",
+    "revokeBody": "\"{name: string}\" iza kuyeka ukusebenza ngokukhawuleza. Oku akunakuguqulwa.",
+    "revoke": "Rhoxisa",
+    "revokeSuccess": "Isitshixo se-API sirhoxisiwe",
+    "createError": "Ayikwazanga ukwenza isitshixo se-API. Nceda uzame kwakhona.",
+    "revokeError": "Ayikwazanga ukurhoxisa isitshixo se-API. Nceda uzame kwakhona.",
+    "loadError": "Ayikwazanga ukulayisha izitshixo zakho ze-API. Nceda uzame kamva.",
+    "done": "Kwenziwe"
+  },
   "GaloyAddressScreen": {
     "title": "Receive payment by using:",
     "buttonTitle": "Set your address",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "IiSats ziqokelelene",
     "satsEarned": "{formattedNumber | sats} efunyenweyo",
     "sectionsCompleted": "Ugqibile",
-    "title": "Zuza",
+    "title": "Funda",
     "unlockQuestion": "Ukuvula, phendula umbuzo:",
     "youEarned": "Uzuzile",
     "registerTitle": "Need to upgrade your account",
@@ -2049,7 +2083,7 @@
     "login": "Ngena",
     "loginOrRestore": "Ngena / Buyisela",
     "logBackInWith": "Ngena kwakhona nge",
-    "headline": "Isipaji siqhutywa nguGaloy",
+    "headline": "Isipaji siqhutywa nguBlink",
     "startTrialAccount": "Start with a trial account",
     "startWithTrialAccount": "Start with trial account",
     "registerPhoneAccount": "Register phone account",
@@ -2163,6 +2197,9 @@
     "lightningInvoice": "I-invoyisi ye-lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Imali yokufaka: {fee} SAT kwimali engaphantsi kwe-{threshold} SAT okanye {overFee} SAT kwimali efakwe engaphezulu kwe-{threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Amaxabiso angaphantsi kwe-{minSats: number} sats / {minFiat: string} awanakho ukuguqulelwa ngokuzenzekelayo kwi-Dollar. Uya kufumana i-Bitcoin endaweni yoko.",
     "autoConvertFailed": "Intlawulo ifumenekile kodwa ukuguqulwa kusilele.",
     "pleaseWaitForConversion": "Nceda linda de ukuguqulwa kugqitywe"
@@ -2260,6 +2297,10 @@
     "pastedClipboardSuccess": "Incanyathiselwe kwibhodi eqhotyoshwayo",
     "invalidPhoneNumber": "Faka inombolo yomnxeba esebenzayo",
     "phoneNotAllowed": "Eli candelo alamkeli iinombolo zomnxeba"
+  },
+  "MerchantSelectionScreen": {
+    "title": "Khetha indlela yokuhlawula",
+    "empty": "Akukho ndlela zokuhlawula zikhoyo."
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Intlawulo kufuneka ithunyelwe kwi-mempool",
@@ -2546,6 +2587,7 @@
     "lightningTransactions": "Iintengiselwano ze-Lightning",
     "onchainBelowThreshold": "I-Onchain ngaphantsi kwe-{threshold: string} SAT",
     "onchainAboveThreshold": "I-Onchain ngaphezulu kwe-{threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Umrhumo wokudlulisela",
     "noFee": "akukho mrhumo",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} umrhumo wokuthumela",
@@ -2596,7 +2638,8 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
-      "unknownError": "An unknown error occurred, please try again later"
+      "unknownError": "An unknown error occurred, please try again later",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Receive money from other lightning wallets and {bankName: string} users with this address.",
     "itCannotBeChanged": "It can't be changed later."
@@ -3794,6 +3837,11 @@
     "modalDescription": "Siyakucebisa kakhulu ukuba wenze isipele songeno lwengxowa yakho ukukhusela ukuphulukana ngokupheleleyo neemali zakho xa uphulukana nale divayisi.",
     "secureMe": "Khuseleka ingxowa"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Le yiakhawunti engagcinwanga",
     "body": "Ukufunda okungakumbi, funda ipowusti yebhlog yethu",
@@ -3832,7 +3880,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Funda",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

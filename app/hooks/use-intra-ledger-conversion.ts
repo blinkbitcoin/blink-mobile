@@ -1,5 +1,5 @@
 import { useState } from "react"
-import crashlytics from "@react-native-firebase/crashlytics"
+import { recordAppError } from "@app/utils/error-reporting"
 
 import {
   HomeAuthedDocument,
@@ -90,7 +90,7 @@ export const useIntraLedgerConversion = ({
         const { status, failure } = await sendIntraLedger(request)
 
         if (!status) {
-          crashlytics().recordError(new Error("Conversion failed"))
+          recordAppError(new Error("Conversion failed"))
           setErrorMessage(LL.common.error())
           triggerHapticFeedback("notificationError")
           return
@@ -112,7 +112,7 @@ export const useIntraLedgerConversion = ({
         triggerHapticFeedback("notificationError")
       } catch (err) {
         if (err instanceof Error) {
-          crashlytics().recordError(err)
+          recordAppError(err)
           setErrorMessage(err.message)
           triggerHapticFeedback("notificationError")
         }

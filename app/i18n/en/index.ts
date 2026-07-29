@@ -2038,7 +2038,7 @@ const en: BaseTranslation = {
     satAccumulated: "Sats accumulated",
     satsEarned: "{formattedNumber | sats} earned",
     sectionsCompleted: "You've completed",
-    title: "Earn",
+    title: "Learn",
     unlockQuestion: "To unlock, answer the question:",
     youEarned: "You Earned",
     registerTitle: "Need to upgrade your account",
@@ -2205,6 +2205,9 @@ const en: BaseTranslation = {
     bitcoinOnchain: "Bitcoin onchain",
     depositFee:
       "Deposit fee: {fee: string} SAT for amounts under {threshold: string} SAT or {overFee: string} SAT for deposits over {threshold} SAT",
+    depositFeeTiers: "Deposit fees: {tiers: string}",
+    depositFeeTierUpTo: "{fee: string} SAT up to {max: string} SAT",
+    depositFeeTierAbove: "{fee: string} SAT above {min: string} SAT",
     autoConvertMinAmount:
       "Amounts below {minSats: number} SAT / {minFiat: string} can't be converted to Dollar automatically. You'll receive Bitcoin instead.",
     autoConvertFailed: "Payment received but the conversion failed.",
@@ -2330,6 +2333,10 @@ const en: BaseTranslation = {
     invalidPhoneNumber: "Enter a valid mobile number",
     phoneNotAllowed: "This field does not accept phone numbers",
   },
+  MerchantSelectionScreen: {
+    title: "Choose payment option",
+    empty: "No payment options are available.",
+  },
   SendBitcoinScreen: {
     willBeSentToMempoolBy: "Transaction should be submitted to mempool",
     amount: "Amount",
@@ -2391,6 +2398,43 @@ const en: BaseTranslation = {
     sdkNetworkError: "Network error. Please check your connection and try again.",
     sdkGenericError: "Unable to estimate fees. Please try a different amount.",
   },
+  ApiScreen: {
+    keysGroupTitle: "API keys",
+    noKeys: "No API keys yet",
+    createKey: "Create API key",
+    createTitle: "New API key",
+    keyCreatedTitle: "API key created",
+    keyName: "Key name",
+    keyNamePlaceholder: "e.g. BTCPay Server",
+    scopeRead: "Read",
+    scopeReadDescription: "View balance and transaction history",
+    scopeReceive: "Receive",
+    scopeReceiveDescription: "Create invoices and receive payments",
+    scopeWrite: "Write",
+    writeScopeDashboardOnly:
+      "Keys that can send payments can only be created on dashboard.blink.sv",
+    expiry: "Expires",
+    expiry30Days: "30 days",
+    expiry90Days: "90 days",
+    expiryNever: "Never",
+    expiresOn: "Expires {date: string}",
+    neverExpires: "Never expires",
+    revoked: "Revoked",
+    expired: "Expired {date: string}",
+    expiredNoDate: "Expired",
+    secretWarning:
+      "This is the only time the key is shown. Copy or share it now and store it safely.",
+    secretCopied: "API key copied — clipboard clears in 1 minute",
+    revokeTitle: "Revoke API key?",
+    revokeBody:
+      "\"{name: string}\" will stop working immediately. This cannot be undone.",
+    revoke: "Revoke",
+    revokeSuccess: "API key revoked",
+    createError: "Could not create the API key. Please try again.",
+    revokeError: "Could not revoke the API key. Please try again.",
+    loadError: "Could not load your API keys. Please try again later.",
+    done: "Done",
+  },
   SettingsScreen: {
     staticQr: "Printable static QR",
     staticQrCopied: "Your static QR code link has been copied",
@@ -2401,7 +2445,7 @@ const en: BaseTranslation = {
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
     createAddress: "Create address",
-    donationButton: "Donation Button",
+    donationButton: "Donate Button",
     btcpayServer: "BTCPay Server",
     woocommerce: "WooCommerce",
     activated: "Activated",
@@ -2653,6 +2697,8 @@ const en: BaseTranslation = {
     lightningTransactions: "Lightning transactions",
     onchainBelowThreshold: "Onchain below {threshold: string} SAT",
     onchainAboveThreshold: "Onchain above {threshold: string} SAT",
+    onchainBetweenThresholds:
+      "Onchain between {lower: string} and {upper: string} SAT",
     transferFee: "Transfer fee",
     noFee: "no fee",
     lightningSendFee: "{fee: string} + ~{routingFee: string} routing fee",
@@ -2704,6 +2750,7 @@ const en: BaseTranslation = {
       invalidCharacter: "Address can only contain letters, numbers, and underscores",
       addressUnavailable: "Sorry, this address is already taken",
       unknownError: "An unknown error occurred, please try again later",
+      backupRequired: "Back up your wallet before creating a Lightning address",
     },
     receiveMoney:
       "Receive money from other lightning wallets and {bankName: string} users with this address.",
@@ -3976,6 +4023,12 @@ const en: BaseTranslation = {
       "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
     secureMe: "Secure wallet",
   },
+  BackupRequired: {
+    modalTitle: "Back up your wallet first",
+    modalDescription:
+      "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    backupNow: "Back up wallet",
+  },
   NonCustodialInfoBulletin: {
     title: "This is a non-custodial account",
     body: "To learn more read our blog post",
@@ -4077,7 +4130,7 @@ const en: BaseTranslation = {
     noAccountDescription:
       "{featureName: string} requires a Blink custodial account.",
     featureCircles: "Circles",
-    featureEarn: "Earn",
+    featureEarn: "Learn",
     featureCard: "Card",
   },
   FeatureUnavailable: {

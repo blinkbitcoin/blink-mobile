@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "مفاتيح API",
+    "noKeys": "لا توجد مفاتيح API بعد",
+    "createKey": "إنشاء مفتاح API",
+    "createTitle": "مفتاح API جديد",
+    "keyCreatedTitle": "تم إنشاء مفتاح API",
+    "keyName": "اسم المفتاح",
+    "keyNamePlaceholder": "مثال: BTCPay Server",
+    "scopeRead": "قراءة",
+    "scopeReadDescription": "عرض الرصيد وسجل المعاملات",
+    "scopeReceive": "استلام",
+    "scopeReceiveDescription": "إنشاء الفواتير واستلام المدفوعات",
+    "scopeWrite": "كتابة",
+    "writeScopeDashboardOnly": "لا يمكن إنشاء المفاتيح القادرة على إرسال المدفوعات إلا على dashboard.blink.sv",
+    "expiry": "ينتهي",
+    "expiry30Days": "30 يومًا",
+    "expiry90Days": "90 يومًا",
+    "expiryNever": "أبدًا",
+    "expiresOn": "ينتهي في {date: string}",
+    "neverExpires": "لا ينتهي أبدًا",
+    "revoked": "مُلغى",
+    "expired": "انتهى في {date: string}",
+    "expiredNoDate": "منتهي",
+    "secretWarning": "هذه هي المرة الوحيدة التي يُعرض فيها المفتاح. انسخه أو شاركه الآن واحفظه في مكان آمن.",
+    "secretCopied": "تم نسخ مفتاح API. ستُمسح الحافظة خلال دقيقة واحدة",
+    "revokeTitle": "إلغاء مفتاح API؟",
+    "revokeBody": "\"{name: string}\" سيتوقف عن العمل فورًا. لا يمكن التراجع عن هذا.",
+    "revoke": "إلغاء",
+    "revokeSuccess": "تم إلغاء مفتاح API",
+    "createError": "تعذّر إنشاء مفتاح API. يرجى المحاولة مرة أخرى.",
+    "revokeError": "تعذّر إلغاء مفتاح API. يرجى المحاولة مرة أخرى.",
+    "loadError": "تعذّر تحميل مفاتيح API الخاصة بك. يرجى المحاولة لاحقًا.",
+    "done": "تم"
+  },
   "GaloyAddressScreen": {
     "title": "Receive payment by using:",
     "buttonTitle": "Set your address",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "ساتس تم تجميعها",
     "satsEarned": "{formattedNumber | sats}\nحصلت عليها",
     "sectionsCompleted": "لقد أتممت",
-    "title": "إكسب",
+    "title": "تعلّم",
     "unlockQuestion": "لتفتح القفل، قم بلإجابة عن السؤال:",
     "youEarned": "لقد كسبت",
     "registerTitle": "Need to upgrade your account",
@@ -2049,7 +2083,7 @@
     "login": "تسجيل الدخول",
     "loginOrRestore": "تسجيل الدخول / استعادة",
     "logBackInWith": "Log back in with",
-    "headline": "المحفظة مشغلة بواسطة Galoy",
+    "headline": "المحفظة مشغلة بواسطة Blink",
     "startTrialAccount": "Start with a trial account",
     "startWithTrialAccount": "Start with trial account",
     "registerPhoneAccount": "Register phone account",
@@ -2163,6 +2197,9 @@
     "lightningInvoice": "فاتورة lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "رسوم الإيداع: {fee} SAT للمبالغ تحت {threshold} SAT أو {overFee} SAT للإيداعات فوق {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "لا يمكن تحويل المبالغ الأقل من {minSats: number} ساتوشي / {minFiat: string} إلى دولار تلقائيًا. ستتلقى بيتكوين بدلاً من ذلك.",
     "autoConvertFailed": "تم استلام الدفعة لكن فشل التحويل.",
     "pleaseWaitForConversion": "يرجى الانتظار حتى اكتمال التحويل"
@@ -2260,6 +2297,10 @@
     "pastedClipboardSuccess": "تم اللصق من الحافظة",
     "invalidPhoneNumber": "أدخل رقم هاتف محمول صالح",
     "phoneNotAllowed": "هذا الحقل لا يقبل أرقام الهواتف"
+  },
+  "MerchantSelectionScreen": {
+    "title": "اختر خيار الدفع",
+    "empty": "لا توجد خيارات دفع متاحة."
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "يجب إرسال المعاملة إلى mempool",
@@ -2546,6 +2587,7 @@
     "lightningTransactions": "معاملات Lightning",
     "onchainBelowThreshold": "Onchain أقل من {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain أكثر من {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "رسوم التحويل",
     "noFee": "بدون رسوم",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} رسوم توجيه",
@@ -2596,7 +2638,8 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
-      "unknownError": "An unknown error occurred, please try again later"
+      "unknownError": "An unknown error occurred, please try again later",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Receive money from other lightning wallets and {bankName: string} users with this address.",
     "itCannotBeChanged": "It can't be changed later."
@@ -3794,6 +3837,11 @@
     "modalDescription": "نوصي بشدة بعمل نسخة احتياطية لمحفظتك لمنع فقدان كامل للأموال في حال فقدت هذا الجهاز.",
     "secureMe": "تأمين المحفظة"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "هذا حساب غير حافظ",
     "body": "لمعرفة المزيد، اقرأ منشور مدونتنا",
@@ -3832,7 +3880,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "تعلّم",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

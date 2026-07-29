@@ -1,3 +1,4 @@
+import type { Operation } from "@apollo/client"
 import type { NetworkError } from "@apollo/client/errors"
 
 /**
@@ -22,6 +23,7 @@ const noRetryOperations = [
   "lnNoAmountUsdInvoicePaymentSend",
 
   "onChainPaymentSend",
+  "onChainPaymentSendAll",
   "onChainUsdPaymentSend",
   "onChainUsdPaymentSendAsBtcDenominated",
   "onChainTxFee",
@@ -42,6 +44,25 @@ const noRetryOperations = [
 ]
 
 const UNAUTHORIZED_STATUS = 401
+
+const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"
+
+/**
+ * Whether the operation's context carries an X-Idempotency-Key header. Such an operation
+ * must never be transport-retried: the server may have already processed the first
+ * attempt, and a replay with the same key is rejected with 409 Conflict, masking a
+ * successful payment as a failure. The header lookup is case-insensitive so a future
+ * casing change cannot silently disable this gate.
+ */
+export const hasIdempotencyKey = (operation: Operation): boolean => {
+  const headers = operation.getContext().headers as Record<string, unknown> | undefined
+  if (!headers) {
+    return false
+  }
+  return Object.keys(headers).some(
+    (key) => key.toLowerCase() === IDEMPOTENCY_KEY_HEADER && Boolean(headers[key]),
+  )
+}
 
 /**
  * Whether the RetryLink should resend a failed operation. It resends only when there is a

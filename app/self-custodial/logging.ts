@@ -1,12 +1,12 @@
 import crashlytics from "@react-native-firebase/crashlytics"
 
-const reportedDedupKeys = new Set<string>()
+import { RecordAppErrorOptions, recordAppError } from "@app/utils/error-reporting"
 
-export const recordErrorOnce = (dedupKey: string, error: Error): void => {
-  if (reportedDedupKeys.has(dedupKey)) return
-  reportedDedupKeys.add(dedupKey)
-  crashlytics().recordError(error)
-}
+export const recordErrorOnce = (
+  dedupKey: string,
+  error: Error,
+  options?: Pick<RecordAppErrorOptions, "expected">,
+): void => recordAppError(error, { dedupKey, ...options })
 
 export const SdkLogLevel = {
   Debug: "debug",
@@ -29,6 +29,10 @@ const sdkLogLevelMap: Record<string, SdkLogLevel> = {
 const toSdkLogLevel = (level: string): SdkLogLevel =>
   sdkLogLevelMap[level.toLowerCase()] ?? SdkLogLevel.Info
 
+// SDK retry loops repeat the same line with varying counters/ports; normalize digits
+// so each distinct message shape records at most one non-fatal per session.
+const sdkErrorDedupKey = (msg: string): string => msg.replace(/\d+/g, "#").slice(0, 200)
+
 const logDispatch: Record<SdkLogLevel, (msg: string) => void> = {
   [SdkLogLevel.Debug]: (msg) => console.debug(msg),
   [SdkLogLevel.Info]: (msg) => {
@@ -41,7 +45,7 @@ const logDispatch: Record<SdkLogLevel, (msg: string) => void> = {
   },
   [SdkLogLevel.Error]: (msg) => {
     console.error(msg)
-    crashlytics().recordError(new Error(msg))
+    recordAppError(new Error(msg), { dedupKey: sdkErrorDedupKey(msg) })
   },
 }
 

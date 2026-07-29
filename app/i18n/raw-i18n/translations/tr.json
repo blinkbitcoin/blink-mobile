@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API anahtarları",
+    "noKeys": "Henüz API anahtarı yok",
+    "createKey": "API anahtarı oluştur",
+    "createTitle": "Yeni API anahtarı",
+    "keyCreatedTitle": "API anahtarı oluşturuldu",
+    "keyName": "Anahtar adı",
+    "keyNamePlaceholder": "ör. BTCPay Server",
+    "scopeRead": "Okuma",
+    "scopeReadDescription": "Bakiyeyi ve işlem geçmişini görüntüle",
+    "scopeReceive": "Alma",
+    "scopeReceiveDescription": "Fatura oluştur ve ödeme al",
+    "scopeWrite": "Yazma",
+    "writeScopeDashboardOnly": "Ödeme gönderebilen anahtarlar yalnızca dashboard.blink.sv üzerinde oluşturulabilir",
+    "expiry": "Sona erer",
+    "expiry30Days": "30 gün",
+    "expiry90Days": "90 gün",
+    "expiryNever": "Asla",
+    "expiresOn": "{date: string} tarihinde sona erer",
+    "neverExpires": "Asla sona ermez",
+    "revoked": "İptal edildi",
+    "expired": "{date: string} tarihinde sona erdi",
+    "expiredNoDate": "Süresi doldu",
+    "secretWarning": "Anahtar yalnızca bu bir kez gösterilir. Şimdi kopyalayın veya paylaşın ve güvenli bir yerde saklayın.",
+    "secretCopied": "API anahtarı kopyalandı. Pano 1 dakika içinde temizlenir",
+    "revokeTitle": "API anahtarı iptal edilsin mi?",
+    "revokeBody": "\"{name: string}\" hemen çalışmayı durduracak. Bu işlem geri alınamaz.",
+    "revoke": "İptal et",
+    "revokeSuccess": "API anahtarı iptal edildi",
+    "createError": "API anahtarı oluşturulamadı. Lütfen tekrar deneyin.",
+    "revokeError": "API anahtarı iptal edilemedi. Lütfen tekrar deneyin.",
+    "loadError": "API anahtarlarınız yüklenemedi. Lütfen daha sonra tekrar deneyin.",
+    "done": "Tamam"
+  },
   "GaloyAddressScreen": {
     "title": "Şunu kullanarak ödeme alın:",
     "buttonTitle": "Adresinizi belirleyin",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Biriktirilen satsler",
     "satsEarned": "{formattedNumber | sats} earned",
     "sectionsCompleted": "Tamamladınız",
-    "title": "Kazan",
+    "title": "Öğren",
     "unlockQuestion": "Kilidi açmak için soruya cevap ver:",
     "youEarned": "Kazandınız",
     "registerTitle": "Hesabınızı güncellemeniz gerekiyor",
@@ -2049,7 +2083,7 @@
     "login": "Giriş yap",
     "loginOrRestore": "Giriş yap / Geri yükle",
     "logBackInWith": "Şununla tekrar giriş yap",
-    "headline": "Cüzdan Galoy tarafından çalıştırılmakta",
+    "headline": "Cüzdan Blink tarafından çalıştırılmakta",
     "startTrialAccount": "Bir deneme hesabı ile başla",
     "startWithTrialAccount": "Denem hesabı ile başla",
     "registerPhoneAccount": "Telefon numaranı kaydet",
@@ -2163,6 +2197,9 @@
     "lightningInvoice": "Lightning faturası",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Yatırma ücreti: {threshold} SAT altındaki tutarlar için {fee} SAT veya {threshold} SAT üzerindeki yatırmalar için {overFee} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "{minSats: number} sats / {minFiat: string} altındaki tutarlar otomatik olarak Dolara çevrilemez. Bunun yerine Bitcoin alacaksınız.",
     "autoConvertFailed": "Ödeme alındı ancak dönüşüm başarısız oldu.",
     "pleaseWaitForConversion": "Lütfen dönüştürme tamamlanana kadar bekleyin"
@@ -2260,6 +2297,10 @@
     "pastedClipboardSuccess": "Panodan yapıştırıldı",
     "invalidPhoneNumber": "Geçerli bir cep telefonu numarası girin",
     "phoneNotAllowed": "Bu alan telefon numarası kabul etmez"
+  },
+  "MerchantSelectionScreen": {
+    "title": "Ödeme seçeneği seçin",
+    "empty": "Kullanılabilir ödeme seçeneği yok."
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "İşlem mempool'a gönderilmelidir",
@@ -2546,6 +2587,7 @@
     "lightningTransactions": "Lightning işlemleri",
     "onchainBelowThreshold": "Onchain {threshold: string} SAT altı",
     "onchainAboveThreshold": "Onchain {threshold: string} SAT üzeri",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Transfer ücreti",
     "noFee": "ücretsiz",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} yönlendirme ücreti",
@@ -2596,7 +2638,8 @@
       "tooLong": "Adres en fazla 50 karakter uzunluğunda olabilir",
       "invalidCharacter": "Adres yalnızca harf, sayı ve alttan çizgi içerebilir",
       "addressUnavailable": "Üzgünüm, bu adres çoktan alındı",
-      "unknownError": "Bilinmeyen bir hata yaşandı, lütfen daha sonra tekrar deneyin"
+      "unknownError": "Bilinmeyen bir hata yaşandı, lütfen daha sonra tekrar deneyin",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Bu adresle diğer lightning cüzdanlarından ve {bankName: string} kullanıcılarından para alın.",
     "itCannotBeChanged": "Bu daha sonra değiştirilebilir."
@@ -3794,6 +3837,11 @@
     "modalDescription": "Cüzdanınızı yedeklemenizi şiddetle tavsiye ederiz. Bu cihazı kaybetmeniz durumunda fonlarınızın tamamen kaybolmasını önlemek için.",
     "secureMe": "Cüzdanı güvenceye al"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Bu, saklamasız bir hesaptır",
     "body": "Daha fazla bilgi için blog yazımızı okuyun",
@@ -3832,7 +3880,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Öğren",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Ebisumuluzo bya API",
+    "noKeys": "Tewali bisumuluzo bya API kati",
+    "createKey": "Kola ekisumuluzo kya API",
+    "createTitle": "Ekisumuluzo kya API ekipya",
+    "keyCreatedTitle": "Ekisumuluzo kya API kikoleddwa",
+    "keyName": "Erinnya ly'ekisumuluzo",
+    "keyNamePlaceholder": "okugeza. BTCPay Server",
+    "scopeRead": "Okusoma",
+    "scopeReadDescription": "Laba ssente eziriwo n'ebyafaayo by'ebikolwa",
+    "scopeReceive": "Okufuna",
+    "scopeReceiveDescription": "Kola inivoyisi era ofune ebisasulo",
+    "scopeWrite": "Okuwandiika",
+    "writeScopeDashboardOnly": "Ebisumuluzo ebisobola okusindika ebisasulo bikolerwa ku dashboard.blink.sv yokka",
+    "expiry": "Kiggwaako",
+    "expiry30Days": "Ennaku 30",
+    "expiry90Days": "Ennaku 90",
+    "expiryNever": "Tekiggwaako",
+    "expiresOn": "Kiggwaako ku {date: string}",
+    "neverExpires": "Tekiggwaako",
+    "revoked": "Kijjeemuddwa",
+    "expired": "Kyaggwaako ku {date: string}",
+    "expiredNoDate": "Kiggweeko",
+    "secretWarning": "Kino kye kiseera kyokka ekisumuluzo we kirabikira. Kikoppe oba kigabane kati era okitereke bulungi.",
+    "secretCopied": "Ekisumuluzo kya API kikoppeddwa. Eby'okukwatako bijjibwawo mu dakiika 1",
+    "revokeTitle": "Ojjemu ekisumuluzo kya API?",
+    "revokeBody": "\"{name: string}\" kijja kulekera awo okukola mangu ago. Kino tekiyinza kudizibwa.",
+    "revoke": "Jjamu",
+    "revokeSuccess": "Ekisumuluzo kya API kijjeemuddwa",
+    "createError": "Ekisumuluzo kya API tekisoboye kukolebwa. Gezaako nate.",
+    "revokeError": "Ekisumuluzo kya API tekisoboye kujjibwamu. Gezaako nate.",
+    "loadError": "Ebisumuluzo byo bya API tebisoboye kutikkulwa. Gezaako oluvannyuma.",
+    "done": "Kimaze"
+  },
   "GaloyAddressScreen": {
     "title": "Funa okusasula nga okozesa:",
     "buttonTitle": "Teeketeeka endagiriro yo",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sats ezikuŋŋaanyiziddwa",
     "satsEarned": "{formattedNumber | sats} earned",
     "sectionsCompleted": "Omaze",
-    "title": "Kolera Empeera",
+    "title": "Yiga",
     "unlockQuestion": "Okugulawo, ddamu ekibuuzo:",
     "youEarned": "Okolede Empeera",
     "registerTitle": "W'etaaga okwongera omutindo gwa akawunti yo",
@@ -2049,7 +2083,7 @@
     "login": "Yingira",
     "loginOrRestore": "Yingira / Zzaawo",
     "logBackInWith": "Ddamu oyingire ne",
-    "headline": "Waleti ewagidwa Galoy",
+    "headline": "Waleti ewagidwa Blink",
     "startTrialAccount": "Tandika ne akawunti y'okugezesa",
     "startWithTrialAccount": "Tandika ne akawunti y'okugezesa",
     "registerPhoneAccount": "Wandiisa essimu ya akawunti",
@@ -2163,6 +2197,9 @@
     "lightningInvoice": "Invoisi ya lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ssente z'okuteekawo: {fee} SAT ku muwendo gw'okuwandiika {threshold} SAT oba {overFee} SAT ku biteekawo ebisukka {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Omuwendo ogutasukka mu {minSats: number} sats / {minFiat: string} tegusobola kukyusibwa mu Doola nga byekka. Ojja kufuna Bitcoin.",
     "autoConvertFailed": "Okusasula kutuuse naye okukyusa kulemye.",
     "pleaseWaitForConversion": "Lindako okutuusa ng'okukyusa kuwedde"
@@ -2260,6 +2297,10 @@
     "pastedClipboardSuccess": "Guteekedwa ku lutimbe",
     "invalidPhoneNumber": "Yingiza ennamba y'essimu entuufu",
     "phoneNotAllowed": "Ekifo kino tekikkiriza nnamba za ssimu"
+  },
+  "MerchantSelectionScreen": {
+    "title": "Londa enkola y'okusasula",
+    "empty": "Tewali nkola za kusasula ziriwo."
   },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Okuwaanyisa kulina okuweebwayo mu mempool",
@@ -2546,6 +2587,7 @@
     "lightningTransactions": "Emirimu gya Lightning",
     "onchainBelowThreshold": "Onchain wansi wa {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain waggulu wa {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Ekisale ky'okuweereza",
     "noFee": "tewali kisale",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} ekisale ky'okutambuza",
@@ -2596,7 +2638,8 @@
       "tooLong": "Endagiriro eteekwa ennyo okuba n'ennukuta 50",
       "invalidCharacter": "Endagiriro esobola okubaamu ennukuta, ennamba, n'okuggumiza",
       "addressUnavailable": "Tusonyiwe, eno endagiriro yatwaliddwa dda",
-      "unknownError": "Ensobi etamanyiddwa etuseewo, tukusaba okugezaako nate oluvannyuma"
+      "unknownError": "Ensobi etamanyiddwa etuseewo, tukusaba okugezaako nate oluvannyuma",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Funa ssente okuva mu waleti za laddu endala ne {bankName: string} abakozesa ne ndagiriro eno.",
     "itCannotBeChanged": "Tekisobola kukyusibwa oluvannyuma."
@@ -3794,6 +3837,11 @@
     "modalDescription": "Tukutegeeza nnyo okukola backup ya wallet yo okusobola okuziyiza okufiirwa ssente zo zonna bw'onooba ofiirwa device eno.",
     "secureMe": "Kuuma wallet"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Eno ye akawunti etakuumibwa",
     "body": "Okumanya ebisingawo, soma blog yaffe",
@@ -3832,7 +3880,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Yiga",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

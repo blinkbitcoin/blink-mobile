@@ -11,6 +11,7 @@ const mockProbeWallet = jest.fn()
 const mockGetSessionProfiles = jest.fn()
 const mockToastShow = jest.fn()
 const mockRecordError = jest.fn()
+const mockCrashlyticsLog = jest.fn()
 
 let mockClient: Record<string, unknown> = {}
 jest.mock("@apollo/client", () => ({
@@ -61,6 +62,7 @@ jest.mock("@app/utils/toast", () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
+  log: (...args: unknown[]) => mockCrashlyticsLog(...args),
 }))
 
 const TXID = "tx-target"

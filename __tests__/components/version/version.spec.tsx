@@ -22,7 +22,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
         unknown: () => "Unknown",
       },
       GetStartedScreen: {
-        headline: () => "Bitcoin is money",
+        headline: () => "Wallet powered by Blink",
       },
     },
   }),
@@ -57,6 +57,15 @@ describe("VersionComponent", () => {
     const { getByText } = render(<VersionComponent />)
 
     expect(getByText(/Registered: US · Detected: SE/)).toBeTruthy()
+  })
+
+  it("shows the headline below the countries", () => {
+    mockUsePhoneCountryCode.mockReturnValue("US")
+    mockUseIpCountryCode.mockReturnValue("SE")
+
+    const { getByText } = render(<VersionComponent />)
+
+    expect(getByText(/Wallet powered by Blink/)).toBeTruthy()
   })
 
   it("shows unknown as registered country when there is no phone-derived country", () => {

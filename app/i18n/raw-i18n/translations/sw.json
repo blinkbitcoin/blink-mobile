@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Funguo za API",
+    "noKeys": "Bado hakuna funguo za API",
+    "createKey": "Unda ufunguo wa API",
+    "createTitle": "Ufunguo mpya wa API",
+    "keyCreatedTitle": "Ufunguo wa API umeundwa",
+    "keyName": "Jina la ufunguo",
+    "keyNamePlaceholder": "k.m. BTCPay Server",
+    "scopeRead": "Soma",
+    "scopeReadDescription": "Angalia salio na historia ya miamala",
+    "scopeReceive": "Pokea",
+    "scopeReceiveDescription": "Unda ankara na upokee malipo",
+    "scopeWrite": "Andika",
+    "writeScopeDashboardOnly": "Funguo zinazoweza kutuma malipo zinaweza kuundwa tu kwenye dashboard.blink.sv",
+    "expiry": "Inaisha",
+    "expiry30Days": "Siku 30",
+    "expiry90Days": "Siku 90",
+    "expiryNever": "Kamwe",
+    "expiresOn": "Inaisha tarehe {date: string}",
+    "neverExpires": "Haiishi kamwe",
+    "revoked": "Imebatilishwa",
+    "expired": "Iliisha tarehe {date: string}",
+    "expiredNoDate": "Imeisha",
+    "secretWarning": "Hii ndiyo mara pekee ufunguo unaonyeshwa. Nakili au shiriki sasa na uhifadhi kwa usalama.",
+    "secretCopied": "Ufunguo wa API umenakiliwa. Ubao wa kunakili utafutwa baada ya dakika 1",
+    "revokeTitle": "Batilisha ufunguo wa API?",
+    "revokeBody": "\"{name: string}\" utaacha kufanya kazi mara moja. Kitendo hiki hakiwezi kutenduliwa.",
+    "revoke": "Batilisha",
+    "revokeSuccess": "Ufunguo wa API umebatilishwa",
+    "createError": "Imeshindwa kuunda ufunguo wa API. Tafadhali jaribu tena.",
+    "revokeError": "Imeshindwa kubatilisha ufunguo wa API. Tafadhali jaribu tena.",
+    "loadError": "Imeshindwa kupakia funguo zako za API. Tafadhali jaribu tena baadaye.",
+    "done": "Imekamilika"
+  },
   "GaloyAddressScreen": {
     "title": "Pokea malipo kwa kutumia:",
     "buttonTitle": "Weka anwani yako",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sats kusanyiko",
     "satsEarned": "{formattedNumber | sats} earned",
     "sectionsCompleted": "Umekamilisha",
-    "title": "Pata",
+    "title": "Jifunze",
     "unlockQuestion": "Ili kufungua, jibu swali:",
     "youEarned": "Umechuma",
     "registerTitle": "Unahitaji kuboresha akaunti yako",
@@ -2049,7 +2083,7 @@
     "login": "Ingia",
     "loginOrRestore": "Ingia / Rejesha",
     "logBackInWith": "Ingia tena na",
-    "headline": "Pochi limewezeshwa na Galoy.",
+    "headline": "Pochi limewezeshwa na Blink",
     "startTrialAccount": "Anza na akaunti ya majaribio",
     "startWithTrialAccount": "Anza na akaunti ya majaribio",
     "registerPhoneAccount": "Jisajili akaunti ya simu",
@@ -2163,6 +2197,9 @@
     "lightningInvoice": "Ankara ya lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Ada ya amana: {fee} SAT kwa kiasi chini ya {threshold} SAT au {overFee} SAT kwa amana zaidi ya {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Viwango vilivyo chini ya sats {minSats: number} / {minFiat: string} haviwezi kubadilishwa kwa Dola kiotomatiki. Utapokea Bitcoin badala yake.",
     "autoConvertFailed": "Malipo yamepokelewa lakini ubadilishaji umeshindwa.",
     "pleaseWaitForConversion": "Tafadhali subiri hadi ubadilishaji ukamilike"
@@ -2261,6 +2298,10 @@
     "invalidPhoneNumber": "Ingiza nambari sahihi ya simu ya mkononi",
     "phoneNotAllowed": "Sehemu hii haikubali nambari za simu"
   },
+  "MerchantSelectionScreen": {
+    "title": "Chagua chaguo la malipo",
+    "empty": "Hakuna chaguo za malipo zinazopatikana."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Muamala unapaswa kuwasilishwa kwenye mempool",
     "amount": "Kiasi",
@@ -2319,7 +2360,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Unda anwani",
-    "donationButton": "Kitufe cha mchango",
+    "donationButton": "Kitufe cha kuchangia",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Msimbo Tuli wa QR unaoweza kuchapishwa",
@@ -2546,6 +2587,7 @@
     "lightningTransactions": "Miamala ya Lightning",
     "onchainBelowThreshold": "Onchain chini ya {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain zaidi ya {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Ada ya uhamisho",
     "noFee": "hakuna ada",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} ada ya uelekezaji",
@@ -2596,7 +2638,8 @@
       "tooLong": "Anwani lazima iwe na herufi si zaidi ya 50",
       "invalidCharacter": "Anwani inaweza kuwa na herufi, nambari, na alama ya chini pekee",
       "addressUnavailable": "Samahani, anwani hii tayari imetumika",
-      "unknownError": "Kuna hitilafu isiyofahamika, tafadhali jaribu tena baadaye"
+      "unknownError": "Kuna hitilafu isiyofahamika, tafadhali jaribu tena baadaye",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Pokea pesa kutoka kwa mkoba mwingine wa umeme na watumiaji wa {bankName: string} na anwani hii.",
     "itCannotBeChanged": "Haitaweza kubadilishwa baadaye."
@@ -3794,6 +3837,11 @@
     "modalDescription": "Tunakushauri sana uhifadhi pochi yako ili kuzuia kupoteza fedha zako zote iwapo utapoteza kifaa hiki.",
     "secureMe": "Linda pochi"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Hii ni akaunti isiyo ya udhamini",
     "body": "Ili kujifunza zaidi, soma chapisho letu la blogu",
@@ -3832,7 +3880,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Jifunze",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

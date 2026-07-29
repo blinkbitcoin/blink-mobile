@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "API-nøgler",
+    "noKeys": "Ingen API-nøgler endnu",
+    "createKey": "Opret API-nøgle",
+    "createTitle": "Ny API-nøgle",
+    "keyCreatedTitle": "API-nøgle oprettet",
+    "keyName": "Nøglenavn",
+    "keyNamePlaceholder": "f.eks. BTCPay Server",
+    "scopeRead": "Læs",
+    "scopeReadDescription": "Se saldo og transaktionshistorik",
+    "scopeReceive": "Modtag",
+    "scopeReceiveDescription": "Opret fakturaer og modtag betalinger",
+    "scopeWrite": "Skriv",
+    "writeScopeDashboardOnly": "Nøgler, der kan sende betalinger, kan kun oprettes på dashboard.blink.sv",
+    "expiry": "Udløber",
+    "expiry30Days": "30 dage",
+    "expiry90Days": "90 dage",
+    "expiryNever": "Aldrig",
+    "expiresOn": "Udløber {date: string}",
+    "neverExpires": "Udløber aldrig",
+    "revoked": "Tilbagekaldt",
+    "expired": "Udløb {date: string}",
+    "expiredNoDate": "Udløbet",
+    "secretWarning": "Dette er den eneste gang, nøglen vises. Kopiér eller del den nu, og opbevar den sikkert.",
+    "secretCopied": "API-nøgle kopieret. Udklipsholderen ryddes om 1 minut",
+    "revokeTitle": "Tilbagekald API-nøgle?",
+    "revokeBody": "\"{name: string}\" holder straks op med at virke. Dette kan ikke fortrydes.",
+    "revoke": "Tilbagekald",
+    "revokeSuccess": "API-nøgle tilbagekaldt",
+    "createError": "API-nøglen kunne ikke oprettes. Prøv igen.",
+    "revokeError": "API-nøglen kunne ikke tilbagekaldes. Prøv igen.",
+    "loadError": "Dine API-nøgler kunne ikke indlæses. Prøv igen senere.",
+    "done": "Færdig"
+  },
   "GaloyAddressScreen": {
     "title": "Modtag betaling via:",
     "buttonTitle": "Indtast din adresse",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sats akkumuleret",
     "satsEarned": "{formattedNumber | sats} optjent",
     "sectionsCompleted": "Du har fuldført",
-    "title": "Optjen",
+    "title": "Lær",
     "unlockQuestion": "For at låse op, besvar spørgsmålet:",
     "youEarned": "Du har tjent",
     "registerTitle": "Din konto skal opgraderes",
@@ -2049,7 +2083,7 @@
     "login": "Log ind",
     "loginOrRestore": "Log ind / Gendan",
     "logBackInWith": "Log ind igen med",
-    "headline": "Tegnebogen er drevet af Galoy",
+    "headline": "Tegnebogen er drevet af Blink",
     "startTrialAccount": "Start med en prøvekonto",
     "startWithTrialAccount": "Start med en prøvekonto",
     "registerPhoneAccount": "Registrer telefonkonto",
@@ -2163,6 +2197,9 @@
     "lightningInvoice": "Lightning-faktura",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Indbetalingsgebyr: {fee} SAT for beløb under {threshold} SAT eller {overFee} SAT for indbetalinger over {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Beløb under {minSats: number} sats / {minFiat: string} kan ikke automatisk konverteres til Dollar. Du modtager Bitcoin i stedet.",
     "autoConvertFailed": "Betaling modtaget, men konverteringen mislykkedes.",
     "pleaseWaitForConversion": "Vent venligst, indtil konverteringen er færdig"
@@ -2261,6 +2298,10 @@
     "invalidPhoneNumber": "Indtast et gyldigt mobilnummer",
     "phoneNotAllowed": "Dette felt accepterer ikke telefonnumre"
   },
+  "MerchantSelectionScreen": {
+    "title": "Vælg betalingsmulighed",
+    "empty": "Der er ingen betalingsmuligheder tilgængelige."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaktionen skulle nu blive tilføjet til mempool",
     "amount": "Beløb",
@@ -2319,7 +2360,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Opret adresse",
-    "donationButton": "Donationsknap",
+    "donationButton": "Donér-knap",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Printbar statisk QR",
@@ -2546,6 +2587,7 @@
     "lightningTransactions": "Lightning-transaktioner",
     "onchainBelowThreshold": "Onchain under {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain over {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Overførselsgebyr",
     "noFee": "intet gebyr",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} routinggebyr",
@@ -2596,7 +2638,8 @@
       "tooLong": "Adressen må maksimalt være 50 tegn lang",
       "invalidCharacter": "Adressen kan kun indeholde bogstaver, tal og understregninger",
       "addressUnavailable": "Beklager, denne adresse er allerede taget",
-      "unknownError": "Der opstod en ukendt fejl, prøv igen senere"
+      "unknownError": "Der opstod en ukendt fejl, prøv igen senere",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Modtag penge fra andre lightning tegnebøger bøger og {bankName: string} brugere med denne adresse.",
     "itCannotBeChanged": "Det kan ikke ændres senere."
@@ -3794,6 +3837,11 @@
     "modalDescription": "Vi anbefaler stærkt, at du sikkerhedskopierer din tegnebog for at forhindre et fuldstændigt tab af midler, hvis du mister denne enhed.",
     "secureMe": "Sikr tegnebog"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Dette er en ikke-depotkonto",
     "body": "Læs vores blogindlæg for at lære mere",
@@ -3832,7 +3880,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Lær",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

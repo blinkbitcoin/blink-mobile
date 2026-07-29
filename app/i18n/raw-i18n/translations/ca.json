@@ -1,4 +1,38 @@
 {
+  "ApiScreen": {
+    "keysGroupTitle": "Claus API",
+    "noKeys": "Encara no hi ha cap clau API",
+    "createKey": "Crea una clau API",
+    "createTitle": "Nova clau API",
+    "keyCreatedTitle": "Clau API creada",
+    "keyName": "Nom de la clau",
+    "keyNamePlaceholder": "p. ex. BTCPay Server",
+    "scopeRead": "Lectura",
+    "scopeReadDescription": "Veure el saldo i l'historial de transaccions",
+    "scopeReceive": "Rebre",
+    "scopeReceiveDescription": "Crear factures i rebre pagaments",
+    "scopeWrite": "Escriptura",
+    "writeScopeDashboardOnly": "Les claus que poden enviar pagaments només es poden crear a dashboard.blink.sv",
+    "expiry": "Caduca",
+    "expiry30Days": "30 dies",
+    "expiry90Days": "90 dies",
+    "expiryNever": "Mai",
+    "expiresOn": "Caduca el {date: string}",
+    "neverExpires": "No caduca mai",
+    "revoked": "Revocada",
+    "expired": "Va caducar el {date: string}",
+    "expiredNoDate": "Caducada",
+    "secretWarning": "Aquesta és l'única vegada que es mostra la clau. Copia-la o comparteix-la ara i desa-la en un lloc segur.",
+    "secretCopied": "Clau API copiada. El porta-retalls s'esborra en 1 minut",
+    "revokeTitle": "Voleu revocar la clau API?",
+    "revokeBody": "\"{name: string}\" deixarà de funcionar immediatament. Això no es pot desfer.",
+    "revoke": "Revoca",
+    "revokeSuccess": "Clau API revocada",
+    "createError": "No s'ha pogut crear la clau API. Torna-ho a provar.",
+    "revokeError": "No s'ha pogut revocar la clau API. Torna-ho a provar.",
+    "loadError": "No s'han pogut carregar les teves claus API. Torna-ho a provar més tard.",
+    "done": "Fet"
+  },
   "GaloyAddressScreen": {
     "title": "Rep el pagament utilitzant:",
     "buttonTitle": "Estableix la teva adreça",
@@ -2003,7 +2037,7 @@
     "satAccumulated": "Sats acumulats",
     "satsEarned": "{formattedNumber | sats} guanyats",
     "sectionsCompleted": "Has completat",
-    "title": "Guanya",
+    "title": "Aprendre",
     "unlockQuestion": "Per desbloquejar, respon la pregunta:",
     "youEarned": "Has guanyat",
     "registerTitle": "Necessites actualitzar el teu compte",
@@ -2049,7 +2083,7 @@
     "login": "Inicia sessió",
     "loginOrRestore": "Iniciar sessió / Restaurar",
     "logBackInWith": "Torna a iniciar sessió amb",
-    "headline": "Moneder desenvolupat per Galoy",
+    "headline": "Moneder desenvolupat per Blink",
     "startTrialAccount": "Comença amb un compte de prova",
     "startWithTrialAccount": "començar amb el compte de prova",
     "registerPhoneAccount": "Registra el compte de telèfon",
@@ -2163,6 +2197,9 @@
     "lightningInvoice": "Factura lightning",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Comissió de dipòsit: {fee} SAT per a imports inferiors a {threshold} SAT o {overFee} SAT per a dipòsits superiors a {threshold} SAT",
+    "depositFeeTiers": "Deposit fees: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
     "autoConvertMinAmount": "Les quantitats inferiors a {minSats: number} sats / {minFiat: string} no es poden convertir a Dòlar automàticament. Rebràs Bitcoin.",
     "autoConvertFailed": "Pagament rebut però la conversió ha fallat.",
     "pleaseWaitForConversion": "Si us plau, espera fins que la conversió s'hagi completat"
@@ -2261,6 +2298,10 @@
     "invalidPhoneNumber": "Introdueix un número de mòbil vàlid",
     "phoneNotAllowed": "Aquest camp no accepta números de telèfon"
   },
+  "MerchantSelectionScreen": {
+    "title": "Tria una opció de pagament",
+    "empty": "No hi ha opcions de pagament disponibles."
+  },
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "La transacció s'ha d'enviar a la mempool.",
     "amount": "Import",
@@ -2319,7 +2360,7 @@
   },
   "SettingsScreen": {
     "createAddress": "Crea una adreça",
-    "donationButton": "Botó de donació",
+    "donationButton": "Botó Donar",
     "btcpayServer": "BTCPay Server",
     "woocommerce": "WooCommerce",
     "staticQr": "Codi QR estàtic imprimible",
@@ -2546,6 +2587,7 @@
     "lightningTransactions": "Transaccions Lightning",
     "onchainBelowThreshold": "Onchain per sota de {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain per sobre de {threshold: string} SAT",
+    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
     "transferFee": "Comissió de transferència",
     "noFee": "sense comissió",
     "lightningSendFee": "{fee: string} + ~{routingFee: string} de comissió d'encaminament",
@@ -2596,7 +2638,8 @@
       "tooLong": "L'adreça pot ser com a màxim de 50 caràcters",
       "invalidCharacter": "L'adreça només pot contenir lletres, números i guions baixos",
       "addressUnavailable": "Ho sentim, aquesta adreça ja està presa",
-      "unknownError": "S'ha produït un error desconegut. Torna-ho a provar més tard"
+      "unknownError": "S'ha produït un error desconegut. Torna-ho a provar més tard",
+      "backupRequired": "Back up your wallet before creating a Lightning address"
     },
     "receiveMoney": "Rep diners d'altres moneders lightning i usuaris de {bankName: string} amb aquesta adreça.",
     "itCannotBeChanged": "No es pot canviar més endavant."
@@ -3794,6 +3837,11 @@
     "modalDescription": "Et recomanem fermament que facis una còpia de seguretat de la teva cartera per evitar una pèrdua total de fons en cas que perdis aquest dispositiu.",
     "secureMe": "Assegurar cartera"
   },
+  "BackupRequired": {
+    "modalTitle": "Back up your wallet first",
+    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+    "backupNow": "Back up wallet"
+  },
   "NonCustodialInfoBulletin": {
     "title": "Aquest és un compte no custodi",
     "body": "Per saber-ne més, llegeix la nostra entrada del blog",
@@ -3832,7 +3880,7 @@
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
     "featureCircles": "Circles",
-    "featureEarn": "Earn",
+    "featureEarn": "Aprendre",
     "featureCard": "Card"
   },
   "WalletCreationScreen": {

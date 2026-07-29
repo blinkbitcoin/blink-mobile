@@ -1,4 +1,38 @@
 {
+    "ApiScreen": {
+        "keysGroupTitle": "API-Schlüssel",
+        "noKeys": "Noch keine API-Schlüssel",
+        "createKey": "API-Schlüssel erstellen",
+        "createTitle": "Neuer API-Schlüssel",
+        "keyCreatedTitle": "API-Schlüssel erstellt",
+        "keyName": "Schlüsselname",
+        "keyNamePlaceholder": "z. B. BTCPay Server",
+        "scopeRead": "Lesen",
+        "scopeReadDescription": "Guthaben und Transaktionsverlauf ansehen",
+        "scopeReceive": "Empfangen",
+        "scopeReceiveDescription": "Invoices erstellen und Zahlungen empfangen",
+        "scopeWrite": "Schreiben",
+        "writeScopeDashboardOnly": "Schlüssel, die Zahlungen senden können, können nur auf dashboard.blink.sv erstellt werden",
+        "expiry": "Läuft ab",
+        "expiry30Days": "30 Tage",
+        "expiry90Days": "90 Tage",
+        "expiryNever": "Nie",
+        "expiresOn": "Läuft am {date: string} ab",
+        "neverExpires": "Läuft nie ab",
+        "revoked": "Widerrufen",
+        "expired": "Abgelaufen am {date: string}",
+        "expiredNoDate": "Abgelaufen",
+        "secretWarning": "Der Schlüssel wird nur dieses eine Mal angezeigt. Kopiere oder teile ihn jetzt und bewahre ihn sicher auf.",
+        "secretCopied": "API-Schlüssel kopiert. Die Zwischenablage wird in 1 Minute geleert",
+        "revokeTitle": "API-Schlüssel widerrufen?",
+        "revokeBody": "\"{name: string}\" funktioniert sofort nicht mehr. Dies kann nicht rückgängig gemacht werden.",
+        "revoke": "Widerrufen",
+        "revokeSuccess": "API-Schlüssel widerrufen",
+        "createError": "Der API-Schlüssel konnte nicht erstellt werden. Bitte versuche es erneut.",
+        "revokeError": "Der API-Schlüssel konnte nicht widerrufen werden. Bitte versuche es erneut.",
+        "loadError": "Deine API-Schlüssel konnten nicht geladen werden. Bitte versuche es später erneut.",
+        "done": "Fertig"
+    },
     "GaloyAddressScreen": {
         "title": "Erhalte Zahlungen durch:",
         "buttonTitle": "Wähle deine Adresse",
@@ -2003,7 +2037,7 @@
         "satAccumulated": "Sats gesammelt",
         "satsEarned": "{formattedNumber | sats} earned",
         "sectionsCompleted": "Du bist fertig",
-        "title": "Verdienen",
+        "title": "Lernen",
         "unlockQuestion": "Beantworte folgende Frage zum Entsperren:",
         "youEarned": "Du hast",
         "registerTitle": "Account Upgrade benötigt",
@@ -2049,7 +2083,7 @@
         "login": "Anmelden",
         "loginOrRestore": "Anmelden / Wiederherstellen",
         "logBackInWith": "Wieder einloggen mit",
-        "headline": "Wallet zur Verfügung gestellt von Galoy",
+        "headline": "Wallet zur Verfügung gestellt von Blink",
         "startTrialAccount": "Mit einem Demo-Account beginnen",
         "startWithTrialAccount": "Mit Demo-Account starten",
         "registerPhoneAccount": "Telefon-Account registrieren",
@@ -2163,6 +2197,9 @@
         "lightningInvoice": "Lightning-Rechnung",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Einzahlungsgebühr: {fee} SAT für Beträge unter {threshold} SAT oder {overFee} SAT für Einzahlungen über {threshold} SAT",
+        "depositFeeTiers": "Deposit fees: {tiers: string}",
+        "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
+        "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
         "autoConvertMinAmount": "Beträge unter {minSats: number} Sats / {minFiat: string} können nicht automatisch in Dollar umgewandelt werden. Du erhältst stattdessen Bitcoin.",
         "autoConvertFailed": "Zahlung empfangen, aber die Umwandlung ist fehlgeschlagen.",
         "pleaseWaitForConversion": "Bitte warte, bis die Umwandlung abgeschlossen ist"
@@ -2260,6 +2297,10 @@
         "pastedClipboardSuccess": "Aus Zwischenablage eingefügt",
         "invalidPhoneNumber": "Gib eine gültige Mobilnummer ein",
         "phoneNotAllowed": "Dieses Feld akzeptiert keine Telefonnummern"
+    },
+    "MerchantSelectionScreen": {
+        "title": "Zahlungsoption auswählen",
+        "empty": "Es sind keine Zahlungsoptionen verfügbar."
     },
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "Transaktion sollte an den Mempool übermittelt werden",
@@ -2546,6 +2587,7 @@
         "lightningTransactions": "Lightning-Transaktionen",
         "onchainBelowThreshold": "Onchain unter {threshold: string} SAT",
         "onchainAboveThreshold": "Onchain über {threshold: string} SAT",
+        "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
         "transferFee": "Übertragungsgebühr",
         "noFee": "keine Gebühr",
         "lightningSendFee": "{fee: string} + ~{routingFee: string} Routing-Gebühr",
@@ -2596,7 +2638,8 @@
             "tooLong": "Die Adresse darf nicht länger als 50 Zeichen sein",
             "invalidCharacter": "Die Adresse darf nur Buchstaben, Zahlen und Unterstriche beinhalten",
             "addressUnavailable": "Entschuldigung, diese Adresse ist schon vergeben",
-            "unknownError": "Ein unbekannter Fehler ist aufgetreten, bitte versuche es später erneut"
+            "unknownError": "Ein unbekannter Fehler ist aufgetreten, bitte versuche es später erneut",
+            "backupRequired": "Back up your wallet before creating a Lightning address"
         },
         "receiveMoney": "Empfange Geld von anderen Lightning Wallets und {bankName: string} Usern mit dieser Adresse.",
         "itCannotBeChanged": "Kann später nicht mehr geändert werden."
@@ -3794,6 +3837,11 @@
         "modalDescription": "Wir empfehlen dringend, Ihre Wallet zu sichern, um einen vollständigen Verlust Ihrer Mittel zu verhindern, falls Sie dieses Gerät verlieren.",
         "secureMe": "Wallet sichern"
     },
+    "BackupRequired": {
+        "modalTitle": "Back up your wallet first",
+        "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
+        "backupNow": "Back up wallet"
+    },
     "NonCustodialInfoBulletin": {
         "title": "Dies ist ein nicht-verwahrtes Konto",
         "body": "Lies unseren Blogbeitrag, um mehr zu erfahren",
@@ -3832,7 +3880,7 @@
         "noAccountTitle": "Custodial-Konto erforderlich",
         "noAccountDescription": "{featureName} benötigt ein Blink custodial-Konto.",
         "featureCircles": "Circles",
-        "featureEarn": "Verdienen",
+        "featureEarn": "Lernen",
         "featureCard": "Karte"
     },
     "WalletCreationScreen": {

@@ -27,9 +27,9 @@ import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { logParseDestinationResult } from "@app/utils/analytics"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import Clipboard from "@react-native-clipboard/clipboard"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -37,7 +37,10 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "../../components/screen"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
-import { DestinationDirection } from "./payment-destination/index.types"
+import {
+  DestinationDirection,
+  isMerchantChoiceDestination,
+} from "./payment-destination/index.types"
 import { resolveDestination } from "./payment-destination/resolve-destination"
 
 const { width: screenWidth } = Dimensions.get("window")
@@ -164,6 +167,13 @@ export const ScanningQRCodeScreen: React.FC = () => {
         logParseDestinationResult(destination)
 
         if (destination.valid) {
+          if (isMerchantChoiceDestination(destination)) {
+            navigation.replace("merchantSelection", {
+              merchants: destination.validDestination.merchants,
+            })
+            return
+          }
+
           if (destination.destinationDirection === DestinationDirection.Send) {
             navigation.replace("sendBitcoinDetails", {
               paymentDestination: destination,
@@ -252,7 +262,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
-          crashlytics().recordError(err)
+          reportError("scanning-qrcode", err)
           Alert.alert(err.toString(), "", [
             {
               text: LL.common.ok(),
@@ -295,7 +305,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
       processInvoice(data)
     } catch (err: unknown) {
       if (err instanceof Error) {
-        crashlytics().recordError(err)
+        reportError("scanning-qrcode", err)
         Alert.alert(err.toString())
       }
     }
@@ -322,7 +332,7 @@ export const ScanningQRCodeScreen: React.FC = () => {
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        crashlytics().recordError(err)
+        reportError("scanning-qrcode", err)
         Alert.alert(err.toString())
       }
     }
