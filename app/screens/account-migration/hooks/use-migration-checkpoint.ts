@@ -23,7 +23,7 @@ export const useMigrationCheckpoint = () => {
 
   /** Without a provisioned account, resume from the explainer so it gets provisioned. */
   const resolveDestination = useCallback(
-    () => resolveCheckpointRoute(accountId ? checkpoint : null),
+    () => resolveCheckpointRoute(accountId ? checkpoint : null, accountId),
     [checkpoint, accountId],
   )
 
@@ -38,6 +38,10 @@ export const useMigrationCheckpoint = () => {
       navigation.navigate(destination.name, destination.params)
       return
     }
+    if (destination.name === "selfCustodialChooseExperience") {
+      navigation.navigate(destination.name, destination.params)
+      return
+    }
     navigation.navigate(destination.name)
   }, [resolveDestination, navigation])
 
@@ -45,6 +49,10 @@ export const useMigrationCheckpoint = () => {
   const replaceToCheckpoint = useCallback(() => {
     const destination = resolveDestination()
     if (destination.name === "acceptTermsAndConditions") {
+      navigation.replace(destination.name, destination.params)
+      return
+    }
+    if (destination.name === "selfCustodialChooseExperience") {
       navigation.replace(destination.name, destination.params)
       return
     }

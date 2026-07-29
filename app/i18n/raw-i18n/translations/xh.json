@@ -3804,6 +3804,15 @@
     "createFailed": "Ayikwazanga ukudala iwallet. Nceda zama kwakhona.",
     "selfCustodialDisabled": "I-non-custodial ayifumaneki okwexeshana."
   },
+  "ChooseExperienceScreen": {
+    "title": "Khetha amava akho",
+    "subtitle": "Ukhetho lwakho lugqiba ukuba yeyiphi imisebenzi efumanekayo. Ukufumana ubumfihlo obuphezulu, khetha i-Anon.\n\nUngatshintsha phakathi kweemowudi kamva.",
+    "enhancedLabel": "Enhanced\nEngagciniwe",
+    "enhancedDescription": "Usetyenziso lujonga indawo okuyo ukuze umisele ummandla wakho.",
+    "anonLabel": "Anon\nEngagciniwe",
+    "anonDescription": "Akukho zikhangelo. Akukho datha yommandla. Ibhalansi ye-Bitcoin kuphela.",
+    "continueButton": "Qhubeka"
+  },
   "UnsupportedRegionScreen": {
     "title": "Ummandla ongaxhaswanga",
     "description": "Ngelishwa asikwazi ukunceda abasebenzisi abavela kummandla wakho wangoku."

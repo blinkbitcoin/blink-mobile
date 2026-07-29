@@ -168,6 +168,26 @@ describe("migration-checkpoint-storage", () => {
         Object.defineProperty(Platform, "OS", { value: original })
       }
     })
+
+    it("resumes onto the mode screen carrying the provisioned account", () => {
+      expect(
+        resolveCheckpointRoute(MigrationCheckpoint.ChooseExperience, "acc-1"),
+      ).toEqual({
+        name: "selfCustodialChooseExperience",
+        params: {
+          onContinue: {
+            route: "accountMigrationBalancesOverview",
+            accountId: "acc-1",
+          },
+        },
+      })
+    })
+
+    it("falls back to the explainer when the mode checkpoint has no account", () => {
+      expect(resolveCheckpointRoute(MigrationCheckpoint.ChooseExperience)).toEqual({
+        name: "accountMigrationExplainer",
+      })
+    })
   })
 
   describe("loadCheckpoint", () => {

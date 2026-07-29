@@ -3804,6 +3804,15 @@
         "createFailed": "Wallet konnte nicht erstellt werden. Bitte erneut versuchen.",
         "selfCustodialDisabled": "Nicht-verwahrend ist vorübergehend nicht verfügbar."
     },
+    "ChooseExperienceScreen": {
+        "title": "Wähle dein Erlebnis",
+        "subtitle": "Deine Wahl bestimmt, welche Funktionen verfügbar sind. Für maximale Privatsphäre wähle Anon.\n\nDu kannst später zwischen den Modi wechseln.",
+        "enhancedLabel": "Enhanced\nSelbstverwahrt",
+        "enhancedDescription": "Die App prüft deinen Standort, um deine Region festzulegen.",
+        "anonLabel": "Anon\nSelbstverwahrt",
+        "anonDescription": "Keine Prüfungen. Keine Regionsdaten. Nur Bitcoin-Guthaben.",
+        "continueButton": "Weiter"
+    },
     "UnsupportedRegionScreen": {
         "title": "Nicht unterstützte Region",
         "description": "Leider können wir keine Nutzer aus deiner aktuellen Region bedienen."

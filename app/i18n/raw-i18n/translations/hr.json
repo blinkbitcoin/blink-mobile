@@ -3804,6 +3804,15 @@
     "createFailed": "Neuspjelo stvaranje novčanika. Molimo pokušajte ponovno.",
     "selfCustodialDisabled": "Nekustodijska opcija je privremeno nedostupna."
   },
+  "ChooseExperienceScreen": {
+    "title": "Odaberite svoje iskustvo",
+    "subtitle": "Vaš izbor određuje koje su značajke dostupne. Za maksimalnu privatnost odaberite Anon.\n\nKasnije možete mijenjati načine rada.",
+    "enhancedLabel": "Enhanced\nBez skrbništva",
+    "enhancedDescription": "Aplikacija provjerava vašu lokaciju kako bi postavila vašu regiju.",
+    "anonLabel": "Anon\nBez skrbništva",
+    "anonDescription": "Bez provjera. Bez podataka o regiji. Samo saldo u Bitcoinu.",
+    "continueButton": "Nastavi"
+  },
   "UnsupportedRegionScreen": {
     "title": "Nepodržana regija",
     "description": "Nažalost ne možemo pružati uslugu korisnicima iz vaše trenutne regije."

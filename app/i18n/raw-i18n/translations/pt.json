@@ -3804,6 +3804,15 @@
         "createFailed": "Falha ao criar a carteira. Por favor, tente novamente.",
         "selfCustodialDisabled": "O modo não custodial está temporariamente indisponível."
     },
+    "ChooseExperienceScreen": {
+        "title": "Escolha sua experiência",
+        "subtitle": "Sua escolha define quais recursos estão disponíveis. Para máxima privacidade, escolha Anon.\n\nVocê pode alternar entre os modos mais tarde.",
+        "enhancedLabel": "Enhanced\nNão custodiada",
+        "enhancedDescription": "O app verifica sua localização para definir sua região.",
+        "anonLabel": "Anon\nNão custodiada",
+        "anonDescription": "Sem verificações. Sem dados de região. Apenas saldo em Bitcoin.",
+        "continueButton": "Continuar"
+    },
     "UnsupportedRegionScreen": {
         "title": "Região não suportada",
         "description": "Infelizmente não podemos atender utilizadores da sua região atual."

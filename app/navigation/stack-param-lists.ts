@@ -15,18 +15,26 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
-import { AccountTypeMode } from "@app/types/account"
+import { AccountMode, AccountTypeMode } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
 
+export const ChooseExperienceContinueRoute = {
+  AcceptTerms: "acceptTermsAndConditions",
+  BackupSuccess: "selfCustodialBackupSuccess",
+  BalancesOverview: "accountMigrationBalancesOverview",
+} as const
+export type ChooseExperienceContinueRoute =
+  (typeof ChooseExperienceContinueRoute)[keyof typeof ChooseExperienceContinueRoute]
+
 export type RootStackParamList = {
   getStarted: undefined
   accountTypeSelection: { mode: AccountTypeMode }
   unsupportedRegion: undefined
-  selfCustodialWalletCreation: undefined
+  selfCustodialWalletCreation: { mode?: AccountMode } | undefined
   liteDeviceAccount: {
     appCheckToken: string
   }
@@ -217,6 +225,22 @@ export type RootStackParamList = {
     successMessage?: string
   }
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
+  selfCustodialChooseExperience: {
+    /** The onward step. Restore and migration pass the account id (mode stored now); creation
+     *  has none yet, so the mode rides to wallet creation instead. */
+    onContinue:
+      | { route: typeof ChooseExperienceContinueRoute.AcceptTerms }
+      | {
+          route: typeof ChooseExperienceContinueRoute.BackupSuccess
+          accountId: string
+          reBackup?: boolean
+          message?: string
+        }
+      | {
+          route: typeof ChooseExperienceContinueRoute.BalancesOverview
+          accountId: string
+        }
+  }
   accountMigrationEntry: undefined
   accountMigrationStart: undefined
   accountMigrationExplainer: undefined
@@ -284,4 +308,7 @@ export type PrimaryStackParamList = {
 
 export type NewAccountFlowParamsList = {
   flow: "phone" | "trial" | "selfCustodial" | "migration"
+  /** The self-custodial region mode chosen before terms, carried through to wallet
+   *  creation, which stores it against the account it provisions. */
+  mode?: AccountMode
 }

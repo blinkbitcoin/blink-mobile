@@ -1,3 +1,4 @@
+import { ChooseExperienceContinueRoute } from "@app/navigation/stack-param-lists"
 import { loadJson, remove, saveJson } from "@app/utils/storage"
 
 /** Values are persisted to AsyncStorage: do not rename them. */
@@ -6,6 +7,7 @@ export enum MigrationCheckpoint {
   BackupMethod = "backupMethod",
   CloudBackup = "cloudBackup",
   BackupAlerts = "backupAlerts",
+  ChooseExperience = "chooseExperience",
   BalancesOverview = "balancesOverview",
 }
 
@@ -31,12 +33,26 @@ type CheckpointDestination =
       params?: undefined
     }
   | { name: "acceptTermsAndConditions"; params: { flow: "migration" } }
+  | {
+      name: "selfCustodialChooseExperience"
+      params: {
+        onContinue: {
+          route: typeof ChooseExperienceContinueRoute.BalancesOverview
+          accountId: string
+        }
+      }
+    }
 
 const STORAGE_KEY_PREFIX = "migrationCheckpoint"
 
 const CHECKPOINT_EXPIRATION_MS = 48 * 60 * 60 * 1000 // 48h
 
-const CHECKPOINT_DESTINATION_MAP: Record<MigrationCheckpoint, CheckpointDestination> = {
+/** The mode screen resolves dynamically (it needs the provisioned account id), so it is
+ *  handled in resolveCheckpointRoute rather than this static map. */
+const CHECKPOINT_DESTINATION_MAP: Record<
+  Exclude<MigrationCheckpoint, MigrationCheckpoint.ChooseExperience>,
+  CheckpointDestination
+> = {
   [MigrationCheckpoint.TermsAndConditions]: {
     name: "acceptTermsAndConditions",
     params: { flow: "migration" },
@@ -74,8 +90,25 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
 
 export const resolveCheckpointRoute = (
   checkpoint: MigrationCheckpoint | null,
+  accountId?: string | null,
 ): CheckpointDestination => {
   if (!checkpoint) return DEFAULT_DESTINATION
+
+  if (checkpoint === MigrationCheckpoint.ChooseExperience) {
+    /** Resume onto the mode screen with the provisioned account so its continue can advance
+     *  to the balances overview; without an id (never expected past provisioning) fall back
+     *  to the explainer to re-provision. */
+    if (!accountId) return DEFAULT_DESTINATION
+    return {
+      name: "selfCustodialChooseExperience",
+      params: {
+        onContinue: {
+          route: ChooseExperienceContinueRoute.BalancesOverview,
+          accountId,
+        },
+      },
+    }
+  }
 
   return CHECKPOINT_DESTINATION_MAP[checkpoint]
 }

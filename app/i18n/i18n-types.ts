@@ -12666,6 +12666,40 @@ type RootTranslation = {
 		 */
 		createFailed: string
 	}
+	ChooseExperienceScreen: {
+		/**
+		 * C​h​o​o​s​e​ ​y​o​u​r​ ​e​x​p​e​r​i​e​n​c​e
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​c​h​o​i​c​e​ ​d​e​c​i​d​e​s​ ​w​h​i​c​h​ ​f​e​a​t​u​r​e​s​ ​a​r​e​ ​a​v​a​i​l​a​b​l​e​.​ ​F​o​r​ ​m​a​x​i​m​u​m​ ​p​r​i​v​a​c​y​ ​c​h​o​o​s​e​ ​A​n​o​n​.​
+	​
+	​Y​o​u​ ​c​a​n​ ​s​w​i​t​c​h​ ​b​e​t​w​e​e​n​ ​t​h​e​ ​m​o​d​e​s​ ​l​a​t​e​r​.
+		 */
+		subtitle: string
+		/**
+		 * E​n​h​a​n​c​e​d​
+	​N​o​n​-​c​u​s​t​o​d​i​a​l
+		 */
+		enhancedLabel: string
+		/**
+		 * T​h​e​ ​a​p​p​ ​c​h​e​c​k​s​ ​y​o​u​r​ ​l​o​c​a​t​i​o​n​ ​t​o​ ​s​e​t​ ​y​o​u​r​ ​r​e​g​i​o​n​.
+		 */
+		enhancedDescription: string
+		/**
+		 * A​n​o​n​
+	​N​o​n​-​c​u​s​t​o​d​i​a​l
+		 */
+		anonLabel: string
+		/**
+		 * N​o​ ​c​h​e​c​k​s​.​ ​N​o​ ​r​e​g​i​o​n​ ​d​a​t​a​.​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​o​n​l​y​.
+		 */
+		anonDescription: string
+		/**
+		 * C​o​n​t​i​n​u​e
+		 */
+		continueButton: string
+	}
 	UnsupportedRegionScreen: {
 		/**
 		 * U​n​s​u​p​p​o​r​t​e​d​ ​r​e​g​i​o​n
@@ -25667,6 +25701,40 @@ export type TranslationFunctions = {
 		 * Failed to create wallet. Please try again.
 		 */
 		createFailed: () => LocalizedString
+	}
+	ChooseExperienceScreen: {
+		/**
+		 * Choose your experience
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your choice decides which features are available. For maximum privacy choose Anon.
+
+	You can switch between the modes later.
+		 */
+		subtitle: () => LocalizedString
+		/**
+		 * Enhanced
+	Non-custodial
+		 */
+		enhancedLabel: () => LocalizedString
+		/**
+		 * The app checks your location to set your region.
+		 */
+		enhancedDescription: () => LocalizedString
+		/**
+		 * Anon
+	Non-custodial
+		 */
+		anonLabel: () => LocalizedString
+		/**
+		 * No checks. No region data. Bitcoin Balance only.
+		 */
+		anonDescription: () => LocalizedString
+		/**
+		 * Continue
+		 */
+		continueButton: () => LocalizedString
 	}
 	UnsupportedRegionScreen: {
 		/**

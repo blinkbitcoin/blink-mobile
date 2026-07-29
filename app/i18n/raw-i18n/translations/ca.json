@@ -3804,6 +3804,15 @@
     "createFailed": "No s'ha pogut crear la cartera. Si us plau, torna-ho a provar.",
     "selfCustodialDisabled": "El mode no custodial està temporalment no disponible."
   },
+  "ChooseExperienceScreen": {
+    "title": "Tria la teva experiència",
+    "subtitle": "La teva elecció decideix quines funcions estan disponibles. Per a la màxima privadesa, tria Anon.\n\nPots canviar de mode més tard.",
+    "enhancedLabel": "Enhanced\nNo custodiat",
+    "enhancedDescription": "L'aplicació comprova la teva ubicació per definir la teva regió.",
+    "anonLabel": "Anon\nNo custodiat",
+    "anonDescription": "Sense comprovacions. Sense dades de regió. Només saldo en Bitcoin.",
+    "continueButton": "Continuar"
+  },
   "UnsupportedRegionScreen": {
     "title": "Regió no admesa",
     "description": "Malauradament, no podem atendre usuaris de la vostra regió actual."

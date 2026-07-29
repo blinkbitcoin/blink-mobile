@@ -330,6 +330,29 @@ describe("useMigrationCheckpoint", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationBalancesOverview")
   })
 
+  it("resumes onto the mode screen carrying the provisioned account", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.ChooseExperience,
+      savedAt: Date.now(),
+      accountId: "sc-account-1",
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.navigateToCheckpoint()
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      onContinue: {
+        route: "accountMigrationBalancesOverview",
+        accountId: "sc-account-1",
+      },
+    })
+  })
+
   it("replaces the current screen when resuming through replaceToCheckpoint", async () => {
     mockLoadCheckpoint.mockResolvedValue({
       step: MigrationCheckpoint.TermsAndConditions,

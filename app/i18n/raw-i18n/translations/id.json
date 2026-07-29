@@ -3804,6 +3804,15 @@
     "createFailed": "Gagal membuat dompet. Silakan coba lagi.",
     "selfCustodialDisabled": "Non-kustodial sementara tidak tersedia."
   },
+  "ChooseExperienceScreen": {
+    "title": "Pilih pengalaman Anda",
+    "subtitle": "Pilihan Anda menentukan fitur mana yang tersedia. Untuk privasi maksimal, pilih Anon.\n\nAnda dapat beralih antar mode nanti.",
+    "enhancedLabel": "Enhanced\nNon-kustodian",
+    "enhancedDescription": "Aplikasi memeriksa lokasi Anda untuk menetapkan wilayah Anda.",
+    "anonLabel": "Anon\nNon-kustodian",
+    "anonDescription": "Tanpa pemeriksaan. Tanpa data wilayah. Hanya saldo Bitcoin.",
+    "continueButton": "Lanjutkan"
+  },
   "UnsupportedRegionScreen": {
     "title": "Wilayah tidak didukung",
     "description": "Sayangnya kami tidak dapat melayani pengguna dari wilayah Anda saat ini."

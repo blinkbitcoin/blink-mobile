@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from "react"
 import { ActivityIndicator, View } from "react-native"
+import { RouteProp, useRoute } from "@react-navigation/native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 
 import { CreationStatus, useCreateWallet } from "./hooks/use-create-wallet"
@@ -12,14 +14,16 @@ import { CreationStatus, useCreateWallet } from "./hooks/use-create-wallet"
 export const WalletCreationScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
+  const route = useRoute<RouteProp<RootStackParamList, "selfCustodialWalletCreation">>()
+  const mode = route.params?.mode
   const { status, create } = useCreateWallet()
   const autoTriggeredRef = useRef(false)
 
   useEffect(() => {
     if (autoTriggeredRef.current) return
     autoTriggeredRef.current = true
-    create()
-  }, [create])
+    create(mode)
+  }, [create, mode])
 
   if (status === CreationStatus.Error) {
     return (
@@ -36,7 +40,7 @@ export const WalletCreationScreen: React.FC = () => {
           <View style={styles.ctaContainer}>
             <GaloyPrimaryButton
               title={LL.WalletCreationScreen.retry()}
-              onPress={create}
+              onPress={() => create(mode)}
               {...testProps("retry-button")}
             />
           </View>
