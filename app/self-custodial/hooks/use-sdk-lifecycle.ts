@@ -179,12 +179,17 @@ export const useSdkLifecycle = (
       setStatus(ActiveWalletStatus.Unavailable)
       setWallets([])
       setAllTransactions([])
+      // Stable Balance is per-account user settings read from the connected SDK, so it
+      // is cleared alongside the wallets: keeping the previous account's value shows the
+      // home balance toggle on an account that never enabled it.
+      setSdkStableBalanceActive(undefined)
       return
     }
 
     setStatus(ActiveWalletStatus.Loading)
     setWallets([])
     setAllTransactions([])
+    setSdkStableBalanceActive(undefined)
 
     let mounted = true
     abortRef.current = false

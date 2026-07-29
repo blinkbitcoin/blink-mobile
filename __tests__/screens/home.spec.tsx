@@ -18,6 +18,7 @@ import {
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
 import { ConvertDirection } from "@app/types/payment"
+import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet"
 
 let currentMocks: MockedResponse[] = []
 
@@ -125,6 +126,68 @@ jest.mock("@app/hooks/use-transfer-blocked", () => ({
   useTransferBlocked: () => mockTransferBlockedOverride,
   useTransferBlockedSync: () => undefined,
 }))
+
+// eslint-disable-next-line prefer-const
+let mockAccountRegistryOverride: Record<string, unknown> | null = null
+
+/** Merged over the real registry (and always calling it) so the provider the screen
+ *  helper mounts keeps working and the hook order never changes between renders. */
+jest.mock("@app/hooks/use-account-registry", () => {
+  const actual = jest.requireActual<typeof import("@app/hooks/use-account-registry")>(
+    "@app/hooks/use-account-registry",
+  )
+  return {
+    ...actual,
+    useAccountRegistry: () => {
+      const real = actual.useAccountRegistry()
+      return mockAccountRegistryOverride
+        ? { ...real, ...mockAccountRegistryOverride }
+        : real
+    },
+  }
+})
+
+// eslint-disable-next-line prefer-const
+let mockUnseenTxOverride: {
+  hasUnseenBtcTx: boolean
+  hasUnseenUsdTx: boolean
+} | null = null
+
+jest.mock("@app/hooks/use-transaction-seen-state", () => {
+  const actual = jest.requireActual<
+    typeof import("@app/hooks/use-transaction-seen-state")
+  >("@app/hooks/use-transaction-seen-state")
+  return {
+    ...actual,
+    useTransactionSeenState: (
+      ...args: Parameters<typeof actual.useTransactionSeenState>
+    ) => {
+      const real = actual.useTransactionSeenState(...args)
+      return mockUnseenTxOverride ? { ...real, ...mockUnseenTxOverride } : real
+    },
+  }
+})
+
+const mockWalletOverviewProps = jest.fn<
+  void,
+  [{ showBtcNotification?: boolean; showUsdNotification?: boolean }]
+>()
+
+/** Passthrough spy: the real rows still render; the spy only records the per-account
+ *  notification props so the seen-state gating can be asserted. */
+jest.mock("@app/components/wallet-overview/wallet-overview", () => {
+  const ReactActual = jest.requireActual<typeof import("react")>("react")
+  const actual = jest.requireActual<
+    typeof import("@app/components/wallet-overview/wallet-overview")
+  >("@app/components/wallet-overview/wallet-overview")
+  return {
+    __esModule: true,
+    default: (props: React.ComponentProps<typeof actual.default>) => {
+      mockWalletOverviewProps(props)
+      return ReactActual.createElement(actual.default, props)
+    },
+  }
+})
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockDollarBalanceRestrictedOverride,
@@ -745,6 +808,8 @@ const runRestrictionInvariantCase = async ({
 const resetHomeScreenMocks = () => {
   currentMocks = []
   mockActiveWalletOverride = null
+  mockAccountRegistryOverride = null
+  mockUnseenTxOverride = null
   mockDollarBalanceRestrictedOverride = false
   mockMigratePromptVisible = false
   mockCanReopen = false
@@ -1930,6 +1995,221 @@ describe("HomeScreen layout under font scaling (blink-wip#931)", () => {
     expect(getByTestId("home-username").props.maxFontSizeMultiplier).toBeLessThanOrEqual(
       1.5,
     )
+  })
+})
+
+describe("HomeScreen account switching", () => {
+  const custodialAccount = {
+    id: DefaultAccountId.Custodial,
+    type: AccountType.Custodial,
+    label: "Blink",
+    selected: true,
+    status: AccountStatus.Available,
+  }
+
+  const selfCustodialAccount = {
+    id: "self-custodial-jurisdiction-b",
+    type: AccountType.SelfCustodial,
+    label: "satoshi@blink.sv",
+    selected: false,
+    status: AccountStatus.Available,
+  }
+
+  /** The switch has landed in the registry but Breez has not connected yet, so
+   *  `isSelfCustodial` is still false while the custodial session stays cached. This is
+   *  also the permanent state of an account whose mnemonic is missing from the keystore. */
+  const connectingSelfCustodialWallet = {
+    wallets: [],
+    status: "unavailable",
+    accountType: "self-custodial",
+    isReady: false,
+    isSelfCustodial: false,
+    needsBackendAuth: false,
+  }
+
+  const lastWalletOverviewProps = () => {
+    const calls = mockWalletOverviewProps.mock.calls
+    expect(calls.length).toBeGreaterThan(0)
+    return calls[calls.length - 1][0]
+  }
+
+  beforeEach(resetHomeScreenMocks)
+
+  it("keeps the previous account's balance off a self-custodial home while it connects", async () => {
+    mockAccountRegistryOverride = {
+      accounts: [custodialAccount, selfCustodialAccount],
+      activeAccount: selfCustodialAccount,
+    }
+    mockActiveWalletOverride = connectingSelfCustodialWallet
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    // The custodial balance and identity belong to another account: show the
+    // skeleton until the self-custodial wallet reports its own.
+    expect(queryByTestId("balance-value")).toBeNull()
+    expect(queryByTestId("home-username")).toBeNull()
+  })
+
+  it("does not ask a connecting self-custodial account to create a Blink account", async () => {
+    mockActiveWalletOverride = connectingSelfCustodialWallet
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <IsAuthedContextProvider value={false}>
+          <HomeScreen />
+        </IsAuthedContextProvider>
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(getByTestId("receive"))
+
+    // A self-custodial account is unauthed by design — that is not a missing wallet.
+    expect(mockNavigate).toHaveBeenCalledWith("receiveBitcoin")
+  })
+
+  it("lets a trial custodial user reach the switcher when another account exists", async () => {
+    mockAccountRegistryOverride = {
+      accounts: [custodialAccount, selfCustodialAccount],
+      activeAccount: custodialAccount,
+    }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.Zero,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    await waitFor(() => expect(getByTestId("home-username")).toBeTruthy())
+    fireEvent.press(getByTestId("home-username"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("profileScreen")
+  })
+
+  it("keeps the header inert when there is no other account to switch to", async () => {
+    mockAccountRegistryOverride = {
+      accounts: [custodialAccount],
+      activeAccount: custodialAccount,
+    }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.Zero,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    await waitFor(() => expect(getByTestId("home-username")).toBeTruthy())
+    fireEvent.press(getByTestId("home-username"))
+
+    expect(mockNavigate).not.toHaveBeenCalledWith("profileScreen")
+  })
+
+  it("closes a modal the previous account opened when the active account changes", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockAccountRegistryOverride = {
+      accounts: [custodialAccount, selfCustodialAccount],
+      activeAccount: custodialAccount,
+    }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.Two,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId, rerender } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer"))
+    expect(mockDollarBalanceModalVisible).toBe(true)
+
+    mockAccountRegistryOverride = {
+      accounts: [custodialAccount, selfCustodialAccount],
+      activeAccount: selfCustodialAccount,
+    }
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(0)
+    rerender(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    // The screen survives the switch, so the restriction explanation opened for the
+    // custodial account must not carry over to the next one.
+    expect(mockDollarBalanceModalVisible).toBe(false)
+  })
+
+  it("keeps the custodial unseen-transaction dots off a self-custodial account", async () => {
+    /** The seen-state hook falls back to the custodial home cache whenever the
+     *  transaction list it is handed is empty — which it always is off the custodial
+     *  account — and keys "seen" on an empty account id shared by every self-custodial
+     *  account, so the home screen has to gate its result. */
+    mockUnseenTxOverride = { hasUnseenBtcTx: true, hasUnseenUsdTx: true }
+    mockAccountRegistryOverride = {
+      accounts: [custodialAccount, selfCustodialAccount],
+      activeAccount: selfCustodialAccount,
+    }
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(0)
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(lastWalletOverviewProps().showBtcNotification).toBe(false)
+    expect(lastWalletOverviewProps().showUsdNotification).toBe(false)
+  })
+
+  it("still shows the unseen-transaction dots on the custodial account they belong to", async () => {
+    mockUnseenTxOverride = { hasUnseenBtcTx: true, hasUnseenUsdTx: true }
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(lastWalletOverviewProps().showBtcNotification).toBe(true)
+    expect(lastWalletOverviewProps().showUsdNotification).toBe(true)
   })
 })
 
