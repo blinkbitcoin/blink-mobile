@@ -28,8 +28,10 @@
  * same treatment.
  */
 
-// Derived from whatever lib the TS config resolves rather than written out, so
-// this keeps compiling when the `Intl.LocalesArgument` typings move again.
+/**
+ * Derived from whatever lib the TS config resolves rather than written out, so
+ * this keeps compiling when the `Intl.LocalesArgument` typings move again.
+ */
 type LocalesArgument = Parameters<typeof Number.prototype.toLocaleString>[0]
 
 const installDeviceLocale = (locale: string): (() => void) => {
@@ -39,17 +41,19 @@ const installDeviceLocale = (locale: string): (() => void) => {
   const orDeviceLocale = (locales: LocalesArgument): LocalesArgument =>
     locales === undefined ? locale : locales
 
-  // Proxies rather than wrapper functions: the receiver a number method is
-  // called on, and NumberFormat's prototype, statics (supportedLocalesOf) and
-  // `instanceof`, all keep working through them untouched.
+  /**
+   * Proxies rather than wrapper functions: the receiver a number method is
+   * called on, and NumberFormat's prototype, statics (supportedLocalesOf) and
+   * `instanceof`, all keep working through them untouched.
+   */
   const patchedToLocaleString = new Proxy(originalToLocaleString, {
     apply: (target, value, [locales, options]) =>
       Reflect.apply(target, value, [orDeviceLocale(locales), options]),
   })
 
   const PatchedNumberFormat = new Proxy(OriginalNumberFormat, {
-    construct: (target, [locales, options]) =>
-      new target(orDeviceLocale(locales), options),
+    construct: (target, [locales, options], newTarget) =>
+      Reflect.construct(target, [orDeviceLocale(locales), options], newTarget),
     apply: (target, _thisArg, [locales, options]) =>
       target(orDeviceLocale(locales), options),
   })

@@ -34,6 +34,15 @@ import { createCache } from "@app/graphql/cache"
 import { DisplayCurrency as DisplayCurrencyType } from "@app/types/amounts"
 import { withDeviceLocale } from "../helpers/device-locale"
 
+/**
+ * The amount being typed is grouped by the device's locale (the bare
+ * toLocaleString() in formatNumberPadNumber), so every "100,000 SAT" in this
+ * file is really an en-US expectation. State it, or the file asserts whatever
+ * locale the machine running it is set to. The device-locale suite at the
+ * bottom of the file nests its own locales on top of this one.
+ */
+withDeviceLocale("en-US")
+
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
   usePersistentStateContext: () => ({
@@ -155,10 +164,12 @@ const calculateExpectedSatsFromUsd = (usdCents: number): number => {
   return sats
 }
 
-// Converted amounts are formatted by formatCurrencyHelper
-// (@app/hooks/use-display-currency), which pins "en-US" whatever the device is
-// set to — so this stays "en-US" even in the device-locale suite at the bottom
-// of the file, which is the point of that suite.
+/**
+ * Converted amounts are formatted by formatCurrencyHelper
+ * (@app/hooks/use-display-currency), which pins "en-US" whatever the device is
+ * set to, so this stays "en-US" even in the device-locale suite at the bottom
+ * of the file, which is the point of that suite.
+ */
 const formatNumber = (amount: number, fractionDigits: number) =>
   Intl.NumberFormat("en-US", {
     minimumFractionDigits: fractionDigits,
@@ -636,12 +647,6 @@ const defaultActiveWallet = {
 const defaultLimits = { limits: null, loading: false, error: null }
 
 loadLocale("en")
-
-// The amount being typed is grouped by the device's locale (the bare
-// toLocaleString() in formatNumberPadNumber), so every "100,000 SAT" below is
-// really an en-US expectation. State it, or the file asserts whatever locale
-// the machine running it is set to.
-withDeviceLocale("en-US")
 
 beforeEach(() => {
   jest.clearAllMocks()
