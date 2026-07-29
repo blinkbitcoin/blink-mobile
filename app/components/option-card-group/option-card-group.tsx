@@ -1,0 +1,92 @@
+import React from "react"
+import { Pressable, View } from "react-native"
+
+import { makeStyles, Text } from "@rn-vui/themed"
+
+import { testProps } from "@app/utils/testProps"
+
+import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
+
+export type OptionCard = {
+  key: string
+  icon: IconNamesType
+  title: string
+  description: string
+  testID?: string
+}
+
+type OptionCardGroupProps = {
+  options: OptionCard[]
+  selectedKey: string | null
+  onSelect: (key: string) => void
+}
+
+/** A row of mutually exclusive cards (icon, title, description); tapping one selects it. */
+export const OptionCardGroup: React.FC<OptionCardGroupProps> = ({
+  options,
+  selectedKey,
+  onSelect,
+}) => {
+  const styles = useStyles()
+
+  return (
+    <View style={styles.grid}>
+      {options.map((option) => (
+        <Pressable
+          key={option.key}
+          style={[styles.card, selectedKey === option.key && styles.cardSelected]}
+          onPress={() => onSelect(option.key)}
+          {...(option.testID ? testProps(option.testID) : {})}
+        >
+          <View style={styles.iconContainer}>
+            <GaloyIcon name={option.icon} size={20} />
+          </View>
+          <Text style={styles.cardTitle}>{option.title}</Text>
+          <Text style={styles.cardDescription}>{option.description}</Text>
+        </Pressable>
+      ))}
+    </View>
+  )
+}
+
+const useStyles = makeStyles(({ colors }) => ({
+  grid: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  card: {
+    flex: 1,
+    maxWidth: "50%",
+    backgroundColor: colors.grey5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "transparent",
+    paddingHorizontal: 14,
+    paddingVertical: 30,
+    alignItems: "center",
+    gap: 10,
+  },
+  cardSelected: {
+    borderColor: colors.primary,
+    backgroundColor: colors.grey6,
+  },
+  iconContainer: {
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    lineHeight: 20,
+    color: colors.black,
+    textAlign: "center",
+  },
+  cardDescription: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: colors.grey2,
+    textAlign: "center",
+  },
+}))
