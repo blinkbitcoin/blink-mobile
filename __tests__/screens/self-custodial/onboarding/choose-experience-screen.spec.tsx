@@ -15,12 +15,7 @@ import { flushEffects } from "../../../helpers/flush-effects"
 const mockNavigate = jest.fn()
 type OnContinue =
   | { route: "acceptTermsAndConditions" }
-  | {
-      route: "selfCustodialBackupSuccess"
-      accountId: string
-      reBackup?: boolean
-      message?: string
-    }
+  | { route: "selfCustodialBackupSuccess"; accountId: string }
   | { route: "accountMigrationBalancesOverview"; accountId: string }
 let mockOnContinue: OnContinue = {
   route: "selfCustodialBackupSuccess",
@@ -109,21 +104,16 @@ describe("ChooseExperienceScreen", () => {
     expect(mockSetAccountMode).toHaveBeenCalledWith("sc-account-1", AccountMode.Anon)
   })
 
-  it("forwards to the backup success screen with its params", async () => {
+  it("forwards to the backup success screen", async () => {
     mockOnContinue = {
       route: "selfCustodialBackupSuccess",
       accountId: "sc-account-1",
-      reBackup: true,
-      message: "All set",
     }
     const { getByTestId } = await renderScreen()
 
     fireEvent.press(getByTestId(continueTestId))
 
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
-      reBackup: true,
-      message: "All set",
-    })
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
   it("forwards to the migration balances overview during a migration", async () => {

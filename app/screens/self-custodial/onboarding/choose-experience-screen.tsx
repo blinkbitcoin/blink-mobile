@@ -36,7 +36,7 @@ export const ChooseExperienceScreen: React.FC = () => {
 
   const [selected, setSelected] = useState<AccountMode>(AccountMode.Enhanced)
 
-  const options: OptionCard[] = [
+  const options: OptionCard<AccountMode>[] = [
     {
       key: AccountMode.Enhanced,
       icon: "map-pin",
@@ -68,10 +68,7 @@ export const ChooseExperienceScreen: React.FC = () => {
     setAccountMode(onContinue.accountId, selected)
 
     if (onContinue.route === ChooseExperienceContinueRoute.BackupSuccess) {
-      navigation.navigate("selfCustodialBackupSuccess", {
-        reBackup: onContinue.reBackup,
-        message: onContinue.message,
-      })
+      navigation.navigate("selfCustodialBackupSuccess")
       return
     }
     navigation.navigate("accountMigrationBalancesOverview")
@@ -99,7 +96,7 @@ export const ChooseExperienceScreen: React.FC = () => {
         <OptionCardGroup
           options={options}
           selectedKey={selected}
-          onSelect={(key) => setSelected(key as AccountMode)}
+          onSelect={setSelected}
         />
       </View>
     </OnboardingScreenLayout>

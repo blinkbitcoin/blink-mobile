@@ -7,26 +7,27 @@ import { testProps } from "@app/utils/testProps"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
-export type OptionCard = {
-  key: string
+export type OptionCard<Key extends string = string> = {
+  key: Key
   icon: IconNamesType
   title: string
   description: string
   testID?: string
 }
 
-type OptionCardGroupProps = {
-  options: OptionCard[]
-  selectedKey: string | null
-  onSelect: (key: string) => void
+type OptionCardGroupProps<Key extends string> = {
+  options: OptionCard<Key>[]
+  selectedKey: Key | null
+  onSelect: (key: Key) => void
 }
 
-/** A row of mutually exclusive cards (icon, title, description); tapping one selects it. */
-export const OptionCardGroup: React.FC<OptionCardGroupProps> = ({
+/** A row of mutually exclusive cards (icon, title, description); tapping one selects it.
+ *  Generic over the key union so callers get their own type back from onSelect. */
+export const OptionCardGroup = <Key extends string>({
   options,
   selectedKey,
   onSelect,
-}) => {
+}: OptionCardGroupProps<Key>) => {
   const styles = useStyles()
 
   return (
