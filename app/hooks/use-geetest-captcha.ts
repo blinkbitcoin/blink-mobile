@@ -5,7 +5,7 @@ import { gql } from "@apollo/client"
 import { useCaptchaCreateChallengeMutation } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { logStartCaptcha } from "@app/utils/analytics"
-import GeetestModule from "@galoymoney/react-native-geetest-module"
+import GeetestModule from "@blinkbitcoin/react-native-geetest-module"
 
 type GeetestValidationData = {
   geetestChallenge: string
