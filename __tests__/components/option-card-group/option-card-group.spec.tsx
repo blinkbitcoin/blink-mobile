@@ -1,6 +1,7 @@
 import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
 
+import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { OptionCard, OptionCardGroup } from "@app/components/option-card-group"
 
 const mockCardDefaultBg = "#1d1d1d"
@@ -24,7 +25,7 @@ jest.mock("@rn-vui/themed", () => ({
 }))
 
 jest.mock("@app/components/atomic/galoy-icon", () => ({
-  GaloyIcon: () => React.createElement("View", { testID: "galoy-icon" }),
+  GaloyIcon: jest.fn(() => React.createElement("View", { testID: "galoy-icon" })),
 }))
 
 jest.mock("@app/utils/testProps", () => ({
@@ -108,5 +109,30 @@ describe("OptionCardGroup", () => {
     )
 
     expect(getByText("Only")).toBeTruthy()
+  })
+
+  it("renders icons at the 20px default size", () => {
+    const galoyIconMock = GaloyIcon as unknown as jest.Mock
+    galoyIconMock.mockClear()
+
+    render(<OptionCardGroup options={options} selectedKey={null} onSelect={jest.fn()} />)
+
+    const iconProps = galoyIconMock.mock.calls.map((call) => call[0])
+    expect(iconProps).toEqual([
+      expect.objectContaining({ name: "cloud", size: 20 }),
+      expect.objectContaining({ name: "key-outline", size: 20 }),
+    ])
+  })
+
+  it("honors a per-card icon size over the default", () => {
+    const galoyIconMock = GaloyIcon as unknown as jest.Mock
+    galoyIconMock.mockClear()
+
+    const sized: OptionCard[] = [{ ...options[0], iconSize: 32 }]
+    render(<OptionCardGroup options={sized} selectedKey={null} onSelect={jest.fn()} />)
+
+    expect(galoyIconMock.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ name: "cloud", size: 32 }),
+    )
   })
 })

@@ -73,5 +73,17 @@ describe("GaloyIcon", () => {
         renderWithTheme(<GaloyIcon name="limits" size={24} />).toJSON(),
       ).not.toBeNull()
     })
+
+    it("renders the location icon", () => {
+      expect(
+        renderWithTheme(<GaloyIcon name="location" size={24} />).toJSON(),
+      ).not.toBeNull()
+    })
+
+    it("renders the slashed location icon", () => {
+      expect(
+        renderWithTheme(<GaloyIcon name="location-slash" size={24} />).toJSON(),
+      ).not.toBeNull()
+    })
   })
 })
