@@ -110,6 +110,8 @@ import DonationButton from "@app/assets/icons-redesign/donation-button.svg"
 import Woocommerce from "@app/assets/icons-redesign/woocommerce.svg"
 import CaretUpCircle from "@app/assets/icons-redesign/caret-up-circle.svg"
 import Limits from "@app/assets/icons-redesign/limits.svg"
+import Location from "@app/assets/icons-redesign/location.svg"
+import LocationSlash from "@app/assets/icons-redesign/location-slash.svg"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -242,6 +244,8 @@ const customSvgMap = {
   "woocommerce": Woocommerce,
   "caret-up-circle": CaretUpCircle,
   "limits": Limits,
+  "location": Location,
+  "location-slash": LocationSlash,
 } as const
 
 export const icons = { ...phosphorIconMap, ...customSvgMap } as const

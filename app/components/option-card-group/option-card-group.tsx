@@ -7,9 +7,13 @@ import { testProps } from "@app/utils/testProps"
 
 import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 
+const DEFAULT_ICON_SIZE = 20
+
 export type OptionCard<Key extends string = string> = {
   key: Key
   icon: IconNamesType
+  /** Per-card icon render size in px; falls back to the 20px default. */
+  iconSize?: number
   title: string
   description: string
   testID?: string
@@ -40,7 +44,7 @@ export const OptionCardGroup = <Key extends string>({
           {...(option.testID ? testProps(option.testID) : {})}
         >
           <View style={styles.iconContainer}>
-            <GaloyIcon name={option.icon} size={20} />
+            <GaloyIcon name={option.icon} size={option.iconSize ?? DEFAULT_ICON_SIZE} />
           </View>
           <Text style={styles.cardTitle}>{option.title}</Text>
           <Text style={styles.cardDescription}>{option.description}</Text>
