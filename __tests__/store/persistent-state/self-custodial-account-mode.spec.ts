@@ -29,7 +29,11 @@ describe("withSelfCustodialAccountMode", () => {
       activeAccountId: DefaultAccountId.Custodial,
     }
 
-    const next = withSelfCustodialAccountMode(state, "provisioned-sc-1", AccountMode.Enhanced)
+    const next = withSelfCustodialAccountMode(
+      state,
+      "provisioned-sc-1",
+      AccountMode.Enhanced,
+    )
 
     expect(next.selfCustodialAccountModeByAccountId).toEqual({
       "provisioned-sc-1": AccountMode.Enhanced,
