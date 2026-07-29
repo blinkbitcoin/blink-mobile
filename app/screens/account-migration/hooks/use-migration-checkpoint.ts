@@ -1,6 +1,6 @@
 import { useCallback } from "react"
 
-import { useNavigation } from "@react-navigation/native"
+import { CommonActions, StackActions, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -27,36 +27,21 @@ export const useMigrationCheckpoint = () => {
     [checkpoint, accountId],
   )
 
-  /** Resumes at the checkpoint's screen, forwarding the terms screen its flow param.
+  /** Resumes at the checkpoint's screen, forwarding whatever params it resolved with.
+   *  Dispatch takes the destination as one typed object; the navigate/replace overloads
+   *  cannot, as they need each route name paired with its own params type.
    *  Dollars received after provisioning are caught by the backend, which re-validates an
    *  empty USD wallet on both migrationStart and migrationCommit. The API-key warning has
    *  no such backstop: the backend only refuses callers authenticating WITH an API key,
    *  never accounts that merely hold one, so that precondition stays client-side. */
   const navigateToCheckpoint = useCallback(() => {
-    const destination = resolveDestination()
-    if (destination.name === "acceptTermsAndConditions") {
-      navigation.navigate(destination.name, destination.params)
-      return
-    }
-    if (destination.name === "selfCustodialChooseExperience") {
-      navigation.navigate(destination.name, destination.params)
-      return
-    }
-    navigation.navigate(destination.name)
+    navigation.dispatch(CommonActions.navigate(resolveDestination()))
   }, [resolveDestination, navigation])
 
   /** Same as navigateToCheckpoint but replacing the current screen (skip guards). */
   const replaceToCheckpoint = useCallback(() => {
     const destination = resolveDestination()
-    if (destination.name === "acceptTermsAndConditions") {
-      navigation.replace(destination.name, destination.params)
-      return
-    }
-    if (destination.name === "selfCustodialChooseExperience") {
-      navigation.replace(destination.name, destination.params)
-      return
-    }
-    navigation.replace(destination.name)
+    navigation.dispatch(StackActions.replace(destination.name, destination.params))
   }, [resolveDestination, navigation])
 
   return {
