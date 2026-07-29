@@ -3889,6 +3889,15 @@
     "createFailed": "Tekisobose okukola wallet. Tugezeeyo nate.",
     "selfCustodialDisabled": "Tekikola kati ku non-custodial."
   },
+  "ChooseExperienceScreen": {
+    "title": "Londa engeri gy'oyagala",
+    "subtitle": "Ky'olonda kye kisalawo ebikozesebwa ebiriwo. Okusinga obwekusifu, londa Anon.\n\nOsobola okukyusa wakati w'engeri oluvannyuma.",
+    "enhancedLabel": "Enhanced\nYeefuga",
+    "enhancedDescription": "App ekebera we oli okuteekawo ekitundu kyo.",
+    "anonLabel": "Anon\nYeefuga",
+    "anonDescription": "Tewali kukebera. Tewali data ya kitundu. Bitcoin balansi yokka.",
+    "continueButton": "Weyongerayo"
+  },
   "UnsupportedRegionScreen": {
     "title": "Ekitundu ekitawagirwa",
     "description": "Eky'embi, tetusobola kuweereza bakozesa abava mu kitundu kyo eky'okaakano."

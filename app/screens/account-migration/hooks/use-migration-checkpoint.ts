@@ -23,7 +23,7 @@ export const useMigrationCheckpoint = () => {
 
   /** Without a provisioned account, resume from the explainer so it gets provisioned. */
   const resolveDestination = useCallback(
-    () => resolveCheckpointRoute(accountId ? checkpoint : null),
+    () => resolveCheckpointRoute(accountId ? checkpoint : null, accountId),
     [checkpoint, accountId],
   )
 

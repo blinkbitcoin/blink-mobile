@@ -3889,6 +3889,15 @@
         "createFailed": "ウォレットの作成に失敗しました。もう一度お試しください。",
         "selfCustodialDisabled": "ノンカストディアルは一時的に利用できません。"
     },
+    "ChooseExperienceScreen": {
+        "title": "エクスペリエンスを選択",
+        "subtitle": "選択内容によって利用できる機能が決まります。プライバシーを最大限に高めるには Anon を選択してください。\n\nモードは後で切り替えられます。",
+        "enhancedLabel": "Enhanced\nノンカストディアル",
+        "enhancedDescription": "アプリが位置情報を確認して地域を設定します。",
+        "anonLabel": "Anon\nノンカストディアル",
+        "anonDescription": "チェックなし。地域データなし。Bitcoin 残高のみ。",
+        "continueButton": "続行"
+    },
     "UnsupportedRegionScreen": {
         "title": "未対応の地域",
         "description": "申し訳ございませんが、現在の地域のユーザーにはサービスをご提供できません。"

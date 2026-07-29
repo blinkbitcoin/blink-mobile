@@ -9,7 +9,10 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  ChooseExperienceContinueRoute,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { logSelfCustodialRestoreCompleted } from "@app/self-custodial/analytics"
 import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
@@ -76,7 +79,12 @@ export const useRestoreWallet = () => {
             activateAccount(lookup.id)
             reinitSdk()
             logSelfCustodialRestoreCompleted()
-            navigation.navigate("selfCustodialBackupSuccess")
+            navigation.navigate("selfCustodialChooseExperience", {
+              onContinue: {
+                route: ChooseExperienceContinueRoute.BackupSuccess,
+                accountId: lookup.id,
+              },
+            })
             return
           }
 
@@ -93,7 +101,9 @@ export const useRestoreWallet = () => {
           activateAccount(accountId)
           reinitSdk()
           logSelfCustodialRestoreCompleted()
-          navigation.navigate("selfCustodialBackupSuccess")
+          navigation.navigate("selfCustodialChooseExperience", {
+            onContinue: { route: ChooseExperienceContinueRoute.BackupSuccess, accountId },
+          })
         } catch (err) {
           reportError("Wallet restore", err)
           setStatus(RestoreWalletStatus.Error)

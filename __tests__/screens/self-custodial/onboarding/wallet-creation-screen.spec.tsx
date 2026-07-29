@@ -2,9 +2,15 @@ import React from "react"
 import { render, waitFor, fireEvent } from "@testing-library/react-native"
 
 import { WalletCreationScreen } from "@app/screens/self-custodial/onboarding/wallet-creation-screen"
+import { AccountMode } from "@app/types/account"
 
 const mockCreate = jest.fn()
 let mockStatus = "idle"
+let mockRouteParams: { mode?: AccountMode } | undefined = { mode: AccountMode.Enhanced }
+
+jest.mock("@react-navigation/native", () => ({
+  useRoute: () => ({ params: mockRouteParams }),
+}))
 
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-create-wallet", () => ({
   CreationStatus: { Idle: "idle", Creating: "creating", Error: "error" },
@@ -63,12 +69,21 @@ describe("WalletCreationScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockStatus = "idle"
+    mockRouteParams = { mode: AccountMode.Enhanced }
   })
 
-  it("calls create on mount", () => {
+  it("creates on mount with the chosen mode from the route", () => {
     render(<WalletCreationScreen />)
 
     expect(mockCreate).toHaveBeenCalledTimes(1)
+    expect(mockCreate).toHaveBeenCalledWith(AccountMode.Enhanced)
+  })
+
+  it("creates with no mode when the route carries none", () => {
+    mockRouteParams = undefined
+    render(<WalletCreationScreen />)
+
+    expect(mockCreate).toHaveBeenCalledWith(undefined)
   })
 
   it("shows loading state when creating", () => {

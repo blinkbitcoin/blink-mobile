@@ -3889,6 +3889,15 @@
     "createFailed": "Kon nie tronk skep nie. Probeer asseblief weer.",
     "selfCustodialDisabled": "Nie-bewaring is tydelik onbeskikbaar."
   },
+  "ChooseExperienceScreen": {
+    "title": "Kies jou ervaring",
+    "subtitle": "Jou keuse bepaal watter kenmerke beskikbaar is. Kies Anon vir maksimum privaatheid.\n\nJy kan later tussen die modusse wissel.",
+    "enhancedLabel": "Enhanced\nSelf-bewaard",
+    "enhancedDescription": "Die app kontroleer jou ligging om jou streek te stel.",
+    "anonLabel": "Anon\nSelf-bewaard",
+    "anonDescription": "Geen kontroles nie. Geen streekdata nie. Slegs Bitcoin-saldo.",
+    "continueButton": "Gaan voort"
+  },
   "UnsupportedRegionScreen": {
     "title": "Nie-ondersteunde streek",
     "description": "Ongelukkig kan ons nie gebruikers uit jou huidige streek bedien nie."
