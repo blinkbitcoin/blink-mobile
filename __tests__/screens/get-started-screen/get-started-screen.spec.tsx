@@ -40,6 +40,15 @@ jest.mock("@app/hooks/use-account-type-options", () => ({
   useAccountTypeOptions: () => mockUseAccountTypeOptions(),
 }))
 
+let mockIsAnonMode = false
+const mockPromptEnhancedMode = jest.fn()
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+jest.mock("@app/components/enhanced-mode-prompt", () => ({
+  useEnhancedModePrompt: () => ({ promptEnhancedMode: mockPromptEnhancedMode }),
+}))
+
 jest.mock("@app/hooks/use-creation-block", () => ({
   useCreationBlock: () => ({
     isCreationBlocked: mockIsCreationBlocked,
@@ -149,6 +158,7 @@ describe("GetStartedScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockCanGoBack.mockReturnValue(false)
+    mockIsAnonMode = false
     mockIsCreationBlocked.mockReturnValue(false)
     mockRegionLoading.mockReturnValue(false)
     mockUseFeatureFlags.mockReturnValue({
@@ -246,6 +256,16 @@ describe("GetStartedScreen", () => {
       "acceptTermsAndConditions",
       expect.anything(),
     )
+  })
+
+  it("offers the Enhanced prompt instead of creating an account in Anon mode", () => {
+    mockIsAnonMode = true
+
+    const { getByTestId } = render(<GetStartedScreen />)
+    fireEvent.press(getByTestId("create-account-button"))
+
+    expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("routes directly to trial T&C when non-custodial is off but custodial is allowed", () => {
