@@ -47,6 +47,15 @@ jest.mock("@app/hooks/use-account-type-options", () => ({
 
 const mockIsCreationBlocked = jest.fn()
 const mockRegionLoading = jest.fn(() => false)
+let mockIsAnonMode = false
+const mockPromptEnhancedMode = jest.fn()
+jest.mock("@app/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+jest.mock("@app/components/enhanced-mode-prompt", () => ({
+  useEnhancedModePrompt: () => ({ promptEnhancedMode: mockPromptEnhancedMode }),
+}))
+
 jest.mock("@app/hooks/use-creation-block", () => ({
   useCreationBlock: () => ({
     isCreationBlocked: mockIsCreationBlocked,
@@ -114,6 +123,7 @@ jest.mock("@app/screens/phone-auth-screen", () => ({
 describe("AccountTypeSelectionScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsAnonMode = false
     mockIsCreationBlocked.mockReturnValue(false)
     mockRegionLoading.mockReturnValue(false)
     mockMode.mockReturnValue("create")
@@ -153,6 +163,17 @@ describe("AccountTypeSelectionScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
       onContinue: { route: "acceptTermsAndConditions" },
     })
+  })
+
+  it("offers the Enhanced prompt instead of creating in Anon mode", () => {
+    mockIsAnonMode = true
+    const { getByTestId } = render(<AccountTypeSelectionScreen />)
+
+    fireEvent.press(getByTestId("self-custodial-option"))
+    fireEvent.press(getByTestId("continue-button"))
+
+    expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("navigates to T&C with trial flow when custodial selected in create mode", () => {

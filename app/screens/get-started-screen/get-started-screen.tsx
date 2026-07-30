@@ -3,14 +3,18 @@ import { Pressable, View } from "react-native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAppConfig } from "@app/hooks"
 import {
   useAccountTypeOptions,
   ACCOUNT_OPTION_TO_FLOW,
+  AccountOption,
 } from "@app/hooks/use-account-type-options"
 import { useCreationBlock } from "@app/hooks/use-creation-block"
+import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { ChooseExperienceContinueRoute } from "@app/navigation/stack-param-lists"
 import theme from "@app/rne-theme/theme"
 import { AccountTypeMode } from "@app/types/account"
 import { logGetStartedAction } from "@app/utils/analytics"
@@ -51,6 +55,8 @@ export const GetStartedScreen: React.FC = () => {
   const { deviceAccountEnabled, nonCustodialEnabled } = useFeatureFlags()
   const { options, defaultSelected, loading: detectingCountry } = useAccountTypeOptions()
   const { isCreationBlocked, loading: detectingRegion } = useCreationBlock()
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const { promptEnhancedMode } = useEnhancedModePrompt()
   const canCreateAccount = options.length > 0
   const isCreateAccountDisabled = !canCreateAccount || detectingCountry || detectingRegion
 
@@ -58,6 +64,12 @@ export const GetStartedScreen: React.FC = () => {
 
   const handleCreateAccount = () => {
     if (!canCreateAccount) return
+
+    /** Creation needs a region determination, which Anon refuses: offer the switch. */
+    if (isAnonMode) {
+      promptEnhancedMode()
+      return
+    }
 
     if (options.every((option) => isCreationBlocked(option))) {
       navigation.navigate("unsupportedRegion")
@@ -68,6 +80,14 @@ export const GetStartedScreen: React.FC = () => {
       action: "create_device_account",
       createDeviceAccountEnabled: Boolean(appCheckToken),
     })
+
+    /** The shortcut must still pass through the mode choice. */
+    if (defaultSelected === AccountOption.SelfCustodial) {
+      navigation.navigate("selfCustodialChooseExperience", {
+        onContinue: { route: ChooseExperienceContinueRoute.AcceptTerms },
+      })
+      return
+    }
 
     if (defaultSelected) {
       navigation.navigate("acceptTermsAndConditions", {

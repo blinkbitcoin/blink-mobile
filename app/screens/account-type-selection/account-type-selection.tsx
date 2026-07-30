@@ -13,6 +13,8 @@ import {
   useAccountTypeOptions,
 } from "@app/hooks/use-account-type-options"
 import { useCreationBlock } from "@app/hooks/use-creation-block"
+import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
+import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   ChooseExperienceContinueRoute,
@@ -40,6 +42,8 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     loading: detectingCountry,
   } = useAccountTypeOptions(mode)
   const { isCreationBlocked, loading: detectingRegion } = useCreationBlock()
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const { promptEnhancedMode } = useEnhancedModePrompt()
   const [selected, setSelected] = useState<AccountOption | null>(defaultSelected)
 
   useEffect(() => {
@@ -50,6 +54,11 @@ export const AccountTypeSelectionScreen: React.FC = () => {
     if (!selected) return
 
     if (isCreateMode) {
+      /** Creation needs a region determination, which Anon refuses: offer the switch. */
+      if (isAnonMode) {
+        promptEnhancedMode()
+        return
+      }
       if (isCreationBlocked(selected)) {
         navigation.navigate("unsupportedRegion")
         return
