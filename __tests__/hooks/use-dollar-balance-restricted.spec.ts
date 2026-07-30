@@ -2,7 +2,10 @@ import { renderHook } from "@testing-library/react-native"
 
 import { getStableTokenRestricted } from "@app/store/persistent-state/stable-token-restriction"
 import { getStablesatsRestricted } from "@app/store/persistent-state/stablesats-restriction"
-import { PersistentState } from "@app/store/persistent-state/state-migrations"
+import {
+  CURRENT_SCHEMA_VERSION,
+  PersistentState,
+} from "@app/store/persistent-state/state-migrations"
 import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
@@ -48,7 +51,7 @@ import {
 } from "@app/hooks/use-dollar-balance-restricted"
 
 const baseState: PersistentState = {
-  schemaVersion: 14,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }

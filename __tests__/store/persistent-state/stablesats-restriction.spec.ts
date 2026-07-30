@@ -2,10 +2,13 @@ import {
   getStablesatsRestricted,
   withStablesatsRestricted,
 } from "@app/store/persistent-state/stablesats-restriction"
-import { PersistentState } from "@app/store/persistent-state/state-migrations"
+import {
+  CURRENT_SCHEMA_VERSION,
+  PersistentState,
+} from "@app/store/persistent-state/state-migrations"
 
 const baseState: PersistentState = {
-  schemaVersion: 14,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }

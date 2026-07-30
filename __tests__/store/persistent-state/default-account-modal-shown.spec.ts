@@ -2,11 +2,14 @@ import {
   getDefaultAccountModalShown,
   withDefaultAccountModalShown,
 } from "@app/store/persistent-state/default-account-modal-shown"
-import { PersistentState } from "@app/store/persistent-state/state-migrations"
+import {
+  CURRENT_SCHEMA_VERSION,
+  PersistentState,
+} from "@app/store/persistent-state/state-migrations"
 import { DefaultAccountId } from "@app/types/wallet"
 
 const baseState: PersistentState = {
-  schemaVersion: 14,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }

@@ -2,11 +2,14 @@ import {
   getSelfCustodialLanguage,
   withSelfCustodialLanguage,
 } from "@app/store/persistent-state/self-custodial-language"
-import { PersistentState } from "@app/store/persistent-state/state-migrations"
+import {
+  CURRENT_SCHEMA_VERSION,
+  PersistentState,
+} from "@app/store/persistent-state/state-migrations"
 import { DefaultAccountId } from "@app/types/wallet"
 
 const baseState: PersistentState = {
-  schemaVersion: 14,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }

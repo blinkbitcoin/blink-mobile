@@ -1,4 +1,5 @@
 import {
+  CURRENT_SCHEMA_VERSION,
   migratePersistentState,
   MigrationStatus,
 } from "../app/store/persistent-state/state-migrations"
@@ -33,7 +34,7 @@ it("migration from 5 to current returns ok with the migrated state", async () =>
   expect(result).toEqual({
     status: MigrationStatus.Ok,
     state: {
-      schemaVersion: 14,
+      schemaVersion: CURRENT_SCHEMA_VERSION,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "myToken",
     },

@@ -14,12 +14,13 @@ import { createCache } from "../../app/graphql/cache"
 import { IsAuthedContextProvider } from "../../app/graphql/is-authed-context"
 import { AccountRegistryProvider } from "../../app/hooks/use-account-registry"
 import { PersistentStateContext } from "../../app/store/persistent-state"
+import { CURRENT_SCHEMA_VERSION } from "../../app/store/persistent-state/state-migrations"
 
 const PersistentStateWrapper: React.FC<PropsWithChildren> = ({ children }) => (
   <PersistentStateContext.Provider
     value={{
       persistentState: {
-        schemaVersion: 14,
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         galoyInstance: {
           id: "Main",
         },

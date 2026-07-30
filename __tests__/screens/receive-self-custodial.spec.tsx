@@ -25,6 +25,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { WalletCurrency } from "@app/graphql/generated"
 import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
+import { CURRENT_SCHEMA_VERSION } from "@app/store/persistent-state/state-migrations"
 import {
   AccountType,
   ActiveWalletStatus,
@@ -307,7 +308,7 @@ const baseSelfCustodialWallet = {
 }
 
 const basePersistentState = {
-  schemaVersion: 8,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   galoyInstance: { id: "Main" as const },
   galoyAuthToken: "",
 }

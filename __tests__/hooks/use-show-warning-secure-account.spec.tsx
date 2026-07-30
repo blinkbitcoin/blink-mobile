@@ -13,18 +13,24 @@ import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { useShowWarningSecureAccount } from "@app/screens/settings-screen/account/show-warning-secure-account-hook"
 import { renderHook } from "@testing-library/react-hooks"
 
-jest.mock("@app/store/persistent-state", () => ({
-  ...jest.requireActual("@app/store/persistent-state"),
-  usePersistentStateContext: () => ({
-    persistentState: {
-      schemaVersion: 12,
-      galoyInstance: { id: "Main" },
-      galoyAuthToken: "",
-    },
-    updateState: jest.fn(),
-    resetState: jest.fn(),
-  }),
-}))
+jest.mock("@app/store/persistent-state", () => {
+  const { CURRENT_SCHEMA_VERSION } = jest.requireActual<
+    typeof import("@app/store/persistent-state/state-migrations")
+  >("@app/store/persistent-state/state-migrations")
+
+  return {
+    ...jest.requireActual("@app/store/persistent-state"),
+    usePersistentStateContext: () => ({
+      persistentState: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        galoyInstance: { id: "Main" },
+        galoyAuthToken: "",
+      },
+      updateState: jest.fn(),
+      resetState: jest.fn(),
+    }),
+  }
+})
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({

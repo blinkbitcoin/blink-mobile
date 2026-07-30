@@ -1,6 +1,9 @@
 import { renderHook } from "@testing-library/react-native"
 
-import { PersistentState } from "@app/store/persistent-state/state-migrations"
+import {
+  CURRENT_SCHEMA_VERSION,
+  PersistentState,
+} from "@app/store/persistent-state/state-migrations"
 import { AccountType } from "@app/types/wallet"
 
 const mockUseDeviceLocation = jest.fn()
@@ -39,7 +42,7 @@ import {
 } from "@app/hooks/use-transfer-blocked"
 
 const baseState: PersistentState = {
-  schemaVersion: 14,
+  schemaVersion: CURRENT_SCHEMA_VERSION,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
