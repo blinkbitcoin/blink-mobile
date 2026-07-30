@@ -25,7 +25,7 @@ import {
 } from "@app/screens/account-migration/hooks"
 import { useCustodialOwnerId } from "@app/screens/account-migration/hooks/use-custodial-owner-id"
 import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/use-ensure-migration-started"
-import { armMigrationConversion } from "@app/screens/account-migration/hooks/use-migration-conversion"
+import { armMigrationConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { useMigrationStatus } from "@app/screens/account-migration/hooks/use-migration-status"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
@@ -46,15 +46,18 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  /** The commit screen must never present unknown balances as zeros: until the preview
-   *  is ready, its area holds a spinner and Approve stays off. */
-  const preview = useMigrationBalancesPreview()
-  const { openSupport } = useContactSupport()
   const {
     accountId: selfCustodialAccountId,
     loading: checkpointLoading,
     saveCheckpoint,
   } = useMigrationCheckpoint()
+  /** The commit screen must never present unknown balances as zeros: until the preview
+   *  is ready, its area holds a spinner and Approve stays off. */
+  const preview = useMigrationBalancesPreview({
+    provisionedAccountId: selfCustodialAccountId,
+    isProvisionedAccountLoading: checkpointLoading,
+  })
+  const { openSupport } = useContactSupport()
   const isFocused = useIsFocused()
 
   /** The commit point has no return path: the gesture is disabled on the
@@ -221,7 +224,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
               bitcoinFiat={preview.newBitcoinFiat}
               dollarLabel={LLOverview.newDollarBalance()}
               dollarValue={preview.newDollarBalance}
-              isDollarValueMuted={preview.isNewDollarBalanceRestricted}
+              isDollarValueMuted={preview.isNewDollarBalanceUnavailable}
             />
           </ScrollView>
         ) : (
