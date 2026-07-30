@@ -22,12 +22,7 @@ import { ConvertDirection } from "@app/types/payment"
 
 let currentMocks: MockedResponse[] = []
 
-/** Mocked wholesale: the real module warns at load time when no API key is configured. */
-jest.mock("@app/utils/ip-country-lookup", () => ({
-  DEFAULT_ADAPTERS: [],
-  resolveIpCountryCode: jest.fn(async () => undefined),
-  resolveIpCountryCodeCached: jest.fn(async () => undefined),
-}))
+jest.mock("@app/utils/ip-country-lookup")
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
@@ -141,19 +136,35 @@ jest.mock("@app/config/feature-flags-context", () => {
   }
 })
 
+let mockIsAnonMode = false
+
 jest.mock("@app/hooks/use-transfer-blocked", () => ({
   useTransferBlocked: () => mockTransferBlockedOverride,
-  useTransferBlock: () => ({
-    isBlocked: mockTransferBlockedOverride,
+  useTransferGated: () => mockIsAnonMode || mockTransferBlockedOverride,
+  useTransferGate: () => ({
+    isGated: mockIsAnonMode || mockTransferBlockedOverride,
     isRegionPending: mockTransferRegionPendingOverride,
   }),
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => mockDollarBalanceRestrictedOverride,
-  useDollarBalanceRestriction: () => ({
-    isRestricted: mockDollarBalanceRestrictedOverride,
+  useDollarBalanceGated: () => mockIsAnonMode || mockDollarBalanceRestrictedOverride,
+  useDollarBalanceGate: () => ({
+    isGated: mockIsAnonMode || mockDollarBalanceRestrictedOverride,
     isRegionPending: mockRegionPendingOverride,
+  }),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
+const mockPromptEnhancedMode = jest.fn()
+jest.mock("@app/components/enhanced-mode-prompt", () => ({
+  useEnhancedModePrompt: () => ({
+    promptEnhancedMode: mockPromptEnhancedMode,
+    isEnhancedModePromptVisible: false,
   }),
 }))
 
@@ -835,6 +846,7 @@ const resetHomeScreenMocks = () => {
   mockTransferBlockedOverride = false
   mockDollarBalanceModalVisible = false
   mockForcedConversionParams = null
+  mockIsAnonMode = false
   jest.clearAllMocks()
   mockUseNonCustodialConversionLimits.mockReturnValue({
     limits: null,
@@ -1214,6 +1226,34 @@ describe("HomeScreen", () => {
     mockActiveWalletOverride = null
   })
 
+  it("opens the Enhanced Mode prompt from the disabled transfer button in Anon mode", async () => {
+    mockIsAnonMode = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByTestId("transfer")).toBeTruthy()
+
+    fireEvent.press(getByTestId("transfer"))
+
+    expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
+    expect(mockDollarBalanceModalVisible).toBe(false)
+
+    mockActiveWalletOverride = null
+  })
+
   it("keeps the transfer button inert and unexplained while the region is still resolving", async () => {
     mockRegionPendingOverride = true
     mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
@@ -1236,6 +1276,7 @@ describe("HomeScreen", () => {
 
     expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
     expect(mockDollarBalanceModalVisible).toBe(false)
+    expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
 
     mockActiveWalletOverride = null
   })

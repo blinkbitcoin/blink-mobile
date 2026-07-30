@@ -9,8 +9,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { headerRightNoGlass } from "@app/components/header-no-glass"
+import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { Screen } from "@app/components/screen"
 import { SettingsCard } from "./settings-card"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -104,6 +106,8 @@ export const SettingsScreen: React.FC = () => {
   const isSelfCustodialMode = activeAccount?.type === AccountType.SelfCustodial
   const shouldShowSettingsBanner =
     isSelfCustodialMode && backupState.status !== BackupStatus.Completed
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const { promptEnhancedMode } = useEnhancedModePrompt()
 
   const items = {
     account: [
@@ -180,6 +184,8 @@ export const SettingsScreen: React.FC = () => {
         <SettingsGroup
           name={LL.SettingsScreen.addressScreen()}
           items={items.waysToGetPaid}
+          disabled={isAnonMode}
+          onDisabledPress={promptEnhancedMode}
         />
         {isAtLeastLevelOne && !isSelfCustodialMode && (
           <SettingsGroup

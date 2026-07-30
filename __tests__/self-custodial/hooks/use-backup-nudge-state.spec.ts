@@ -31,11 +31,8 @@ jest.mock("@app/config/feature-flags-context", () => ({
 const SATS_PER_USD_CENT = 10
 
 jest.mock("@app/components/balance-header/use-total-balance", () => ({
-  useTotalBalance: (
-    wallets: Array<{ walletCurrency: string; balance: number }>,
-    options?: { applyDollarRestriction?: boolean },
-  ) => {
-    mockUseTotalBalance(wallets, options)
+  useTotalBalance: (wallets: Array<{ walletCurrency: string; balance: number }>) => {
+    mockUseTotalBalance(wallets)
     return {
       satsBalance: wallets.reduce((sum, w) => {
         if (w.walletCurrency === "BTC") return sum + w.balance
@@ -341,16 +338,26 @@ describe("useBackupNudgeState", () => {
     expect(mockReportError).toHaveBeenCalledWith("Nudge dismiss read", expect.any(Error))
   })
 
-  // A dollar-restricted region hides the stable-token balance from the display,
-  // but the funds are still on the device and still unbacked.
-  it("measures the balance without the dollar-display restriction", async () => {
+  // A region gate hides the stable-token balance from the display, but the funds
+  // are still on the device and still unbacked.
+  it("measures the stable-token balance the region gate hides", async () => {
+    mockActiveWallet.mockReturnValue({
+      accountType: "self-custodial",
+      isReady: true,
+      wallets: [
+        { id: "btc-1", walletCurrency: "BTC", balance: { amount: 3000 } },
+        { id: "usd-1", walletCurrency: "USD", balance: { amount: 2000 } },
+      ],
+    })
+
     renderHook(() => useBackupNudgeState())
 
     await act(async () => {})
 
     expect(mockUseTotalBalance).toHaveBeenCalledWith(
-      expect.any(Array),
-      expect.objectContaining({ applyDollarRestriction: false }),
+      expect.arrayContaining([
+        expect.objectContaining({ walletCurrency: "USD", balance: 2000 }),
+      ]),
     )
   })
 

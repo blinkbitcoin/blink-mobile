@@ -21,14 +21,21 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
-const mockUseDollarBalanceRestriction = jest.fn()
+const mockIsRestricted = jest.fn()
+let mockIsRegionPending = false
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestriction: () => mockUseDollarBalanceRestriction(),
+  useDollarBalanceRestricted: () => mockIsRestricted(),
+  useDollarBalanceGated: () => mockIsAnonMode || mockIsRestricted(),
+  useDollarBalanceGate: () => ({
+    isGated: mockIsAnonMode || mockIsRestricted(),
+    isRegionPending: mockIsRegionPending,
+  }),
 }))
 
-const UNRESTRICTED = { isRestricted: false, isRegionPending: false }
-const REGION_PENDING = { isRestricted: false, isRegionPending: true }
-const RESTRICTED = { isRestricted: true, isRegionPending: false }
+let mockIsAnonMode = false
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
 
 const mockDisplayCurrency = jest.fn()
 jest.mock("@app/hooks/use-display-currency", () => ({
@@ -90,7 +97,9 @@ describe("WalletOverview", () => {
   beforeEach(() => {
     loadLocale("en")
     jest.clearAllMocks()
-    mockUseDollarBalanceRestriction.mockReturnValue(UNRESTRICTED)
+    mockIsAnonMode = false
+    mockIsRegionPending = false
+    mockIsRestricted.mockReturnValue(false)
     mockDisplayCurrency.mockReturnValue("USD")
   })
 
@@ -170,20 +179,80 @@ describe("WalletOverview", () => {
       expect(getAllByText("display-amount").length).toBeGreaterThanOrEqual(1)
     })
 
-    it("shows the restriction label when the dollar balance is restricted", async () => {
-      mockUseDollarBalanceRestriction.mockReturnValue(RESTRICTED)
+    it("keeps showing the amount when the restricted balance is not empty", async () => {
+      mockIsRestricted.mockReturnValue(true)
+      const onRestrictedTap = jest.fn()
 
-      const { getByText } = renderOverview({ onRestrictedTap: jest.fn() })
+      const { getByTestId, queryByText } = renderOverview({ onRestrictedTap })
+      await flushEffects()
+
+      expect(queryByText("not available in your region")).toBeNull()
+      expect(getByTestId("stablesats-balance")).toBeTruthy()
+
+      fireEvent.press(getByTestId("stablesats-balance"))
+      expect(onRestrictedTap).toHaveBeenCalledTimes(1)
+    })
+
+    it("shows the restriction label when the restricted balance is empty", async () => {
+      mockIsRestricted.mockReturnValue(true)
+      const emptyUsdWallets: readonly WalletBalance[] = [
+        { id: "btc-id", walletCurrency: WalletCurrency.Btc, balance: 174726 },
+        { id: "usd-id", walletCurrency: WalletCurrency.Usd, balance: 0 },
+      ]
+
+      const { getByText } = renderOverview({
+        wallets: emptyUsdWallets,
+        onRestrictedTap: jest.fn(),
+      })
       await flushEffects()
 
       expect(getByText("not available in your region")).toBeTruthy()
     })
 
-    it("shows neither the dollar amount nor the restriction label while the region is still resolving", async () => {
-      mockDisplayCurrency.mockReturnValue("EUR")
-      mockUseDollarBalanceRestriction.mockReturnValue(REGION_PENDING)
+    it("shows the Anon mode label when the mode is Anon and the balance is empty", async () => {
+      mockIsAnonMode = true
+      const emptyUsdWallets: readonly WalletBalance[] = [
+        { id: "btc-id", walletCurrency: WalletCurrency.Btc, balance: 174726 },
+        { id: "usd-id", walletCurrency: WalletCurrency.Usd, balance: 0 },
+      ]
 
-      const { getByText, queryByText } = renderOverview({ onRestrictedTap: jest.fn() })
+      const { getByText, queryByText } = renderOverview({
+        wallets: emptyUsdWallets,
+        onRestrictedTap: jest.fn(),
+      })
+      await flushEffects()
+
+      expect(getByText("not available in Anon mode")).toBeTruthy()
+      expect(queryByText("not available in your region")).toBeNull()
+    })
+
+    it("keeps showing the amount in Anon mode when the balance is not empty", async () => {
+      mockIsAnonMode = true
+      const onRestrictedTap = jest.fn()
+
+      const { getByTestId, queryByText } = renderOverview({ onRestrictedTap })
+      await flushEffects()
+
+      expect(queryByText("not available in Anon mode")).toBeNull()
+      expect(getByTestId("stablesats-balance")).toBeTruthy()
+
+      fireEvent.press(getByTestId("stablesats-balance"))
+      expect(onRestrictedTap).toHaveBeenCalledTimes(1)
+    })
+
+    it("shows neither the dollar amount nor the unavailable label while the region is still resolving", async () => {
+      mockDisplayCurrency.mockReturnValue("EUR")
+      mockIsRestricted.mockReturnValue(true)
+      mockIsRegionPending = true
+      const emptyUsdWallets: readonly WalletBalance[] = [
+        { id: "btc-id", walletCurrency: WalletCurrency.Btc, balance: 174726 },
+        { id: "usd-id", walletCurrency: WalletCurrency.Usd, balance: 0 },
+      ]
+
+      const { getByText, queryByText } = renderOverview({
+        wallets: emptyUsdWallets,
+        onRestrictedTap: jest.fn(),
+      })
       await flushEffects()
 
       expect(queryByText("usd-underlying")).toBeNull()
@@ -193,7 +262,7 @@ describe("WalletOverview", () => {
 
     it("shows the dollar amount once the pending region resolves to no restriction", async () => {
       mockDisplayCurrency.mockReturnValue("EUR")
-      mockUseDollarBalanceRestriction.mockReturnValue(REGION_PENDING)
+      mockIsRegionPending = true
 
       const { getByText, queryByText, rerender } = renderOverview({
         onRestrictedTap: jest.fn(),
@@ -202,29 +271,34 @@ describe("WalletOverview", () => {
 
       expect(queryByText("usd-underlying")).toBeNull()
 
-      mockUseDollarBalanceRestriction.mockReturnValue(UNRESTRICTED)
+      mockIsRegionPending = false
       rerender(overviewTree({ onRestrictedTap: jest.fn() }))
       await flushEffects()
 
       expect(getByText("usd-underlying")).toBeTruthy()
     })
+
+    it("routes the gated dollar tap to onRestrictedTap in Anon mode", async () => {
+      mockIsAnonMode = true
+      const onRestrictedTap = jest.fn()
+      const emptyUsdWallets: readonly WalletBalance[] = [
+        { id: "btc-id", walletCurrency: WalletCurrency.Btc, balance: 174726 },
+        { id: "usd-id", walletCurrency: WalletCurrency.Usd, balance: 0 },
+      ]
+
+      const { getByText } = renderOverview({ wallets: emptyUsdWallets, onRestrictedTap })
+      await flushEffects()
+
+      fireEvent.press(getByText("not available in Anon mode"))
+
+      expect(onRestrictedTap).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
   })
 
   describe("interactions", () => {
-    it("opens the restriction explanation when the restricted dollar row is pressed", async () => {
-      mockUseDollarBalanceRestriction.mockReturnValue(RESTRICTED)
-      const onRestrictedTap = jest.fn()
-
-      const { getByText } = renderOverview({ onRestrictedTap })
-      await flushEffects()
-
-      fireEvent.press(getByText("not available in your region"))
-
-      expect(onRestrictedTap).toHaveBeenCalled()
-    })
-
     it("does not open the restriction explanation while the region is still resolving", async () => {
-      mockUseDollarBalanceRestriction.mockReturnValue(REGION_PENDING)
+      mockIsRegionPending = true
       const onRestrictedTap = jest.fn()
 
       const { getByText } = renderOverview({ onRestrictedTap })
