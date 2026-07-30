@@ -1,7 +1,6 @@
 import { WalletBalance, getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
 import { usePriceConversion } from "@app/hooks"
 import {
   addMoneyAmounts,
@@ -20,8 +19,6 @@ export const useTotalBalance = (
 } => {
   const { formatMoneyAmount } = useDisplayCurrency()
   const { convertMoneyAmount } = usePriceConversion()
-  const { isRestricted: isDollarBalanceRestricted, isRegionPending } =
-    useDollarBalanceRestriction()
 
   // TODO: check that there are 2 wallets.
   // otherwise fail (account with more/less 2 wallets will not be working with the current mobile app)
@@ -33,17 +30,15 @@ export const useTotalBalance = (
     toBtcMoneyAmount(btcWallet?.balance),
     DisplayCurrency,
   )
-  /** An unresolved region counts the dollars out of every figure, not just out of the
-   *  loader: `satsBalance` feeds thresholds that are read without consulting `isLoading`
-   *  (the backup nudge), so leaving the dollars in would arm a nudge against a total that
-   *  drops the moment the verdict lands. */
-  const isDollarBalanceUnavailable = isDollarBalanceRestricted || isRegionPending
-  const usdAmount = isDollarBalanceUnavailable
-    ? convertMoneyAmount?.(toUsdMoneyAmount(0), DisplayCurrency)
-    : convertMoneyAmount?.(toUsdMoneyAmount(usdWallet?.balance), DisplayCurrency)
+  /** Held money always counts, gated or not: gates limit actions, not existence. Nothing
+   *  here depends on the region verdict, so the total never flips when it lands and the
+   *  pending window needs no hold. */
+  const usdAmount = convertMoneyAmount?.(
+    toUsdMoneyAmount(usdWallet?.balance),
+    DisplayCurrency,
+  )
 
-  const isPriceConversionPending = !convertMoneyAmount
-  const isLoading = isPriceConversionPending || isRegionPending
+  const isLoading = !convertMoneyAmount
 
   if (!btcAmount || !usdAmount) {
     return {

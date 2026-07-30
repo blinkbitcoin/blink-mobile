@@ -45,14 +45,19 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
-import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
+import {
+  useDollarBalanceGate,
+  useDollarBalanceRestricted,
+} from "@app/hooks/use-dollar-balance-restricted"
 import { useDollarBalanceForcedConversion } from "@app/hooks/use-dollar-balance-forced-conversion"
+import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
+import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
 import { MigrateNowModal } from "@app/components/migrate-now-modal"
 import { MigrationReminderBulletin } from "@app/components/migration-reminder-bulletin"
 import { OffboardOnlyBulletin } from "@app/components/offboard-only-bulletin"
 /** Deep import on purpose: keeps the migration hooks barrel out of the home graph. */
 import { useWindDownHomeNudges } from "@app/screens/account-migration/hooks/use-wind-down-home-nudges"
-import { useTransferBlock } from "@app/hooks/use-transfer-blocked"
+import { useTransferGate } from "@app/hooks/use-transfer-blocked"
 import { useSelfCustodialNetworkMismatchToast } from "@app/self-custodial/hooks/use-network-mismatch-toast"
 import { useNonCustodialConversionLimits } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
@@ -399,11 +404,14 @@ export const HomeScreen: React.FC = () => {
   const [isStablesatModalVisible, setIsStablesatModalVisible] = React.useState(false)
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = React.useState(false)
   const [isRestrictionModalVisible, setIsRestrictionModalVisible] = React.useState(false)
-  const { isRestricted: isDollarBalanceRestricted, isRegionPending } =
-    useDollarBalanceRestriction()
+  /** Region-only: the forced-conversion escape must not fire in Anon Mode. */
+  const isDollarBalanceRestricted = useDollarBalanceRestricted()
+  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const { promptEnhancedMode, isEnhancedModePromptVisible } = useEnhancedModePrompt()
 
-  const { isBlocked: isTransferBlocked, isRegionPending: isTransferRegionPending } =
-    useTransferBlock()
+  const { isGated: isTransferGated, isRegionPending: isTransferRegionPending } =
+    useTransferGate()
 
   const restrictedUsdWallet = getUsdWallet(dataAuthed?.me?.defaultAccount?.wallets)
   const restrictedBtcWallet = getBtcWallet(dataAuthed?.me?.defaultAccount?.wallets)
@@ -481,12 +489,21 @@ export const HomeScreen: React.FC = () => {
     isUpgradeModalVisible ||
     isRestrictionModalVisible ||
     isStablesatModalVisible ||
+    isEnhancedModePromptVisible ||
     modalVisible
   const shouldShowMigrateNowPrompt =
     migrateNowPrompt.isVisible && !isAnotherHomeModalVisible
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
+  /** Anon outranks the region explanation: its remedy is switching modes. */
+  const onGatedDollarTap = () => {
+    if (isAnonMode) {
+      promptEnhancedMode()
+      return
+    }
+    setIsRestrictionModalVisible(true)
+  }
   const openUpgradeModal = React.useCallback(() => {
     setIsUpgradeModalVisible(true)
   }, [])
@@ -632,28 +649,27 @@ export const HomeScreen: React.FC = () => {
     levelAccount === AccountLevel.Three ||
     (isIos && satsBalance > 0)
 
-  /** A transfer-blocked country must not hide the button while the dollar
-   *  balance is restricted: the disabled button is the user's entry point to
-   *  the restriction explanation (WalletOverview greys the row from the same
-   *  hook). Only the iOS zero-balance gate may hide it in that state.
+  /** A gated transfer must not hide the button while the dollar balance is gated too:
+   *  the disabled button is the user's entry point to the explanation (WalletOverview
+   *  greys the row from the same hook). Only the iOS zero-balance gate may hide it in
+   *  that state.
    *
    *  Visibility also holds on the pending region, like every other gated surface here.
    *  Reading an unresolved region as allowed would offer the button and then take it
-   *  away once the verdict lands, in a transfer-blocked but dollar-allowed country. The
-   *  hold costs a frame: the settings query behind the country is cache-first and the
-   *  phone parse is synchronous. */
+   *  away once the verdict lands, for a user whose transfers are region-gated but whose
+   *  dollar balance is not. Anon resolves no region, so nothing pends there. The hold
+   *  costs a frame: the settings query behind the country is cache-first and the phone
+   *  parse is synchronous. */
   const shouldShowTransferButton =
     passesIosGate &&
     !isTransferRegionPending &&
-    (!isTransferBlocked || isDollarBalanceRestricted)
+    (!isTransferGated || isDollarBalanceGated)
 
   /** Disabled while the region resolves so a fast tap cannot reach the gated flow before
    *  the verdict lands; the explanation waits, since it would be wrong for a user who
-   *  turns out to be unrestricted. */
-  const isTransferDisabled = isDollarBalanceRestricted || isRegionPending
-  const onTransferDisabledPress = isRegionPending
-    ? undefined
-    : () => setIsRestrictionModalVisible(true)
+   *  turns out to be ungated. */
+  const isTransferDisabled = isDollarBalanceGated || isRegionPending
+  const onTransferDisabledPress = isRegionPending ? undefined : onGatedDollarTap
 
   if (shouldShowTransferButton) {
     buttons.unshift({
@@ -811,7 +827,7 @@ export const HomeScreen: React.FC = () => {
         <WalletOverview
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
-          onRestrictedTap={() => setIsRestrictionModalVisible(true)}
+          onRestrictedTap={onGatedDollarTap}
           wallets={wallets}
           hasCard={hasCard}
           cardLastFour={cardLastFour}

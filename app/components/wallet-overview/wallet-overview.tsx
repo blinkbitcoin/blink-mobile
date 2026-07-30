@@ -9,7 +9,8 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
+import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
@@ -78,11 +79,14 @@ const WalletOverview: React.FC<Props> = ({
   showBtcNotification = false,
   showUsdNotification = false,
 }) => {
-  const { isRestricted: isDollarBalanceRestricted, isRegionPending } =
-    useDollarBalanceRestriction()
+  const { isGated: isDollarRowUnavailable, isRegionPending } = useDollarBalanceGate()
+  const { isAnonMode } = useSelfCustodialAccountMode()
   const { hideAmount, switchMemoryHideAmount } = useHideAmount()
 
   const { LL } = useI18nContext()
+  const unavailableLabel = isAnonMode
+    ? LL.StablesatsRestriction.anonModeWalletLabel()
+    : LL.StablesatsRestriction.walletLabel()
   const isAuthed = useIsAuthed()
   const {
     theme: { colors },
@@ -101,6 +105,11 @@ const WalletOverview: React.FC<Props> = ({
   const hasWallets = wallets && wallets.length > 0
   const { data } = useWalletOverviewScreenQuery({ skip: !isAuthed || hasWallets })
   const resolvedWallets = hasWallets ? wallets : data?.me?.defaultAccount?.wallets
+
+  const hasUsdBalance = (getUsdWallet(resolvedWallets)?.balance ?? 0) > 0
+  /** A gated balance still shows its amount (the row stays disabled); the label only
+   *  stands in when there is nothing to show. */
+  const showsUnavailableLabel = isDollarRowUnavailable && !hasUsdBalance
 
   if (isAuthed || hasWallets) {
     const btcWallet = getBtcWallet(resolvedWallets)
@@ -149,7 +158,7 @@ const WalletOverview: React.FC<Props> = ({
    *  user their balance at launch. The explanation waits too, since it would be wrong for
    *  a user who turns out to be unrestricted. */
   const isDollarBalanceLoading = loading || isRegionPending
-  const isDollarRowInert = isDollarBalanceRestricted || isRegionPending
+  const isDollarRowInert = isDollarRowUnavailable || isRegionPending
   const onDollarBalanceRestrictedPress = isRegionPending ? undefined : onRestrictedTap
 
   return (
@@ -233,11 +242,10 @@ const WalletOverview: React.FC<Props> = ({
             </View>
             {isDollarBalanceLoading ? (
               <Loader />
-            ) : isDollarBalanceRestricted ? (
+            ) : showsUnavailableLabel ? (
               <View style={[styles.hideableArea, styles.restrictionLabel]}>
                 <Text type="p2" style={styles.restrictionLabelText}>
-                  {/* Shared across custodial and self-custodial restricted accounts: the copy is identical, so both reuse the Stablesats key. */}
-                  {LL.StablesatsRestriction.walletLabel()}
+                  {unavailableLabel}
                 </Text>
               </View>
             ) : (
