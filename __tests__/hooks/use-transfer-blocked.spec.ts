@@ -6,17 +6,17 @@ const mockUseDeviceLocation = jest.fn()
 const mockUseRemoteConfig = jest.fn()
 const mockUseActiveWallet = jest.fn()
 
-/** Mocked wholesale: the real module warns at load time when no API key is configured. */
-jest.mock("@app/utils/ip-country-lookup", () => ({
-  DEFAULT_ADAPTERS: [],
-  resolveIpCountryCode: jest.fn(async () => undefined),
-  resolveIpCountryCodeCached: jest.fn(async () => undefined),
-}))
+jest.mock("@app/utils/ip-country-lookup")
 
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
   ...jest.requireActual("@app/hooks/use-device-location"),
   default: () => mockUseDeviceLocation(),
+}))
+
+let mockIsAnonMode = false
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -27,10 +27,11 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockUseActiveWallet(),
 }))
 
-import { useTransferBlock, useTransferBlocked } from "@app/hooks/use-transfer-blocked"
+import { useTransferGate, useTransferGated } from "@app/hooks/use-transfer-blocked"
 
 const setup = (): void => {
   jest.clearAllMocks()
+  mockIsAnonMode = false
   mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
   mockUseRemoteConfig.mockReturnValue({
     custodialTransferBlockedCountries: ["DE"],
@@ -39,9 +40,10 @@ const setup = (): void => {
   mockUseActiveWallet.mockReturnValue({ accountType: AccountType.SelfCustodial })
 }
 
-const read = () => renderHook(() => useTransferBlocked()).result.current
+/** Outside Anon (the setup default), the gate reduces to the region policy. */
+const read = () => renderHook(() => useTransferGated()).result.current
 
-describe("useTransferBlocked", () => {
+describe("useTransferGated — region policy", () => {
   beforeEach(setup)
 
   it("blocks a self-custodial transfer when the country is in the self-custodial list", () => {
@@ -80,25 +82,52 @@ describe("useTransferBlocked", () => {
     expect(read()).toBe(false)
   })
 
-  describe("while the region is still resolving", () => {
-    const readBlock = () => renderHook(() => useTransferBlock()).result.current
+  describe("useTransferGated", () => {
+    const readGated = () => renderHook(() => useTransferGated()).result.current
 
-    it("reports the region as pending without claiming a block", () => {
+    it("gates in Anon mode with no region resolved at all", () => {
+      mockIsAnonMode = true
+      expect(readGated()).toBe(true)
+    })
+
+    it("gates in a blocked region outside Anon mode", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "FR" })
+      expect(readGated()).toBe(true)
+    })
+
+    it("does not gate when neither Anon nor the region applies", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "AR" })
+      expect(readGated()).toBe(false)
+    })
+  })
+
+  describe("while the region is still resolving", () => {
+    const readGate = () => renderHook(() => useTransferGate()).result.current
+
+    it("reports the region as pending without claiming a gate", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: true })
 
-      expect(readBlock()).toEqual({ isBlocked: false, isRegionPending: true })
+      expect(readGate()).toEqual({ isGated: false, isRegionPending: true })
     })
 
-    it("blocks once the region resolves to a blocked country", () => {
+    it("gates once the region resolves to a blocked country", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "FR", loading: false })
 
-      expect(readBlock()).toEqual({ isBlocked: true, isRegionPending: false })
+      expect(readGate()).toEqual({ isGated: true, isRegionPending: false })
     })
 
-    it("settles unblocked once the region resolves to an allowed country", () => {
+    it("settles ungated once the region resolves to an allowed country", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "AR", loading: false })
 
-      expect(readBlock()).toEqual({ isBlocked: false, isRegionPending: false })
+      expect(readGate()).toEqual({ isGated: false, isRegionPending: false })
+    })
+
+    /** Anon gates on the mode alone, so no region resolves and nothing pends. */
+    it("never pends in Anon mode", () => {
+      mockIsAnonMode = true
+      mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, loading: false })
+
+      expect(readGate()).toEqual({ isGated: true, isRegionPending: false })
     })
   })
 })

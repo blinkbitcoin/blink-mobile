@@ -221,10 +221,10 @@ const SelfCustodialDefaultWallet: React.FC = () => {
 }
 
 export const DefaultWalletScreen: React.FC = () => {
-  const { isRestricted, isRegionPending } = useDollarBalanceRestrictionGuard()
+  const { isGated, isRegionPending } = useDollarBalanceRestrictionGuard()
 
   /** A refusal is already navigating the user away, so there is nothing to render. */
-  if (isRestricted) return null
+  if (isGated) return null
 
   /** The wait is not a refusal: rendering the picker before the verdict would offer a
    *  dollar default the region may be about to withdraw. */

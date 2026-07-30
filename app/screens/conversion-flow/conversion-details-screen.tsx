@@ -107,7 +107,7 @@ export const ConversionDetailsScreen = () => {
   const dollarBalanceGuard = useDollarBalanceRestrictionGuard({ enabled: isGuardEnabled })
   const transferGuard = useTransferBlockedGuard({ enabled: isGuardEnabled })
 
-  const isRefused = dollarBalanceGuard.isRestricted || transferGuard.isBlocked
+  const isRefused = dollarBalanceGuard.isGated || transferGuard.isGated
   const isRegionPending =
     dollarBalanceGuard.isRegionPending || transferGuard.isRegionPending
 

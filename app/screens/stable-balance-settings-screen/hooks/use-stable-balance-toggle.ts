@@ -2,7 +2,7 @@ import { useCallback, useState } from "react"
 
 import type { BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
-import { useDollarBalanceRestriction } from "@app/hooks/use-dollar-balance-restricted"
+import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
 import { logSelfCustodialStableBalanceActivated } from "@app/self-custodial/analytics"
 import { activateStableBalance } from "@app/self-custodial/bridge"
 import { SparkToken } from "@app/self-custodial/config"
@@ -39,8 +39,7 @@ export const useStableBalanceToggle = ({
   refreshStableBalanceActive,
   LL,
 }: Params): StableBalanceToggleControls => {
-  const { isRestricted: isDollarBalanceRestricted, isRegionPending } =
-    useDollarBalanceRestriction()
+  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
   const [busy, setBusy] = useState(false)
   const [pendingValue, setPendingValue] = useState<boolean | null>(null)
   const [switchKey, setSwitchKey] = useState(0)
@@ -54,7 +53,7 @@ export const useStableBalanceToggle = ({
       /** Activation is region-gated or a restricted user could loop fee-paying
        *  conversions: activate, auto-convert to the token, get force-converted back.
        *  Deactivation stays allowed so an already-active balance can be freed. */
-      const isActivationBlocked = activate && isDollarBalanceRestricted
+      const isActivationBlocked = activate && isDollarBalanceGated
       if (isActivationBlocked) {
         toastShow({
           message: (tr) => tr.DollarBalanceRestriction.modalTitle(),
@@ -105,7 +104,7 @@ export const useStableBalanceToggle = ({
     [
       sdk,
       busy,
-      isDollarBalanceRestricted,
+      isDollarBalanceGated,
       isRegionPending,
       refreshStableBalanceActive,
       refreshWallets,

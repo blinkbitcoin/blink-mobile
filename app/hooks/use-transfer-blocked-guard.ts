@@ -2,7 +2,7 @@ import { useEffect } from "react"
 
 import { CommonActions, useNavigation } from "@react-navigation/native"
 
-import { useTransferBlock } from "./use-transfer-blocked"
+import { useTransferGate } from "./use-transfer-blocked"
 
 type UseTransferBlockedGuardOptions = {
   /** Turns the guard off for a caller that must let a blocked-transfer user through (the
@@ -11,9 +11,9 @@ type UseTransferBlockedGuardOptions = {
 }
 
 export type TransferBlockedGuard = {
-  /** A resolved block. The guard is already resetting to Primary, so the caller renders
-   *  nothing rather than flash a screen the user is being taken off. */
-  isBlocked: boolean
+  /** A resolved block, region or Anon. The guard is already resetting to Primary, so the
+   *  caller renders nothing rather than flash a screen the user is being taken off. */
+  isGated: boolean
   /** The verdict has not landed yet. Kept apart from the block because the two owe the
    *  user different things: a block owes them nothing, a wait owes them a loader. */
   isRegionPending: boolean
@@ -22,10 +22,10 @@ export type TransferBlockedGuard = {
 export const useTransferBlockedGuard = ({
   enabled = true,
 }: UseTransferBlockedGuardOptions = {}): TransferBlockedGuard => {
-  const { isBlocked, isRegionPending } = useTransferBlock()
+  const { isGated, isRegionPending } = useTransferGate()
   const navigation = useNavigation()
 
-  const shouldLeaveScreen = enabled && isBlocked
+  const shouldLeaveScreen = enabled && isGated
 
   useEffect(() => {
     if (!shouldLeaveScreen) return
@@ -33,7 +33,7 @@ export const useTransferBlockedGuard = ({
   }, [shouldLeaveScreen, navigation])
 
   return {
-    isBlocked: shouldLeaveScreen,
+    isGated: shouldLeaveScreen,
     isRegionPending: enabled && isRegionPending,
   }
 }
