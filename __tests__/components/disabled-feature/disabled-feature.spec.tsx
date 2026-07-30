@@ -11,7 +11,7 @@ type RenderedNode = {
 }
 
 describe("DisabledFeature", () => {
-  it("renders children unchanged when not disabled", () => {
+  it("keeps children interactive and undimmed when not disabled", () => {
     const { getByText, toJSON } = render(
       <DisabledFeature disabled={false}>
         <Text>child-content</Text>
@@ -20,14 +20,13 @@ describe("DisabledFeature", () => {
 
     expect(getByText("child-content")).toBeTruthy()
 
-    const tree = toJSON() as RenderedNode | null
-    // No outer accessible/focusable wrapper: the children render at the top.
-    expect(tree?.props.accessible).toBeFalsy()
-    expect(tree?.props.focusable).toBeFalsy()
-    expect(tree?.props.style).toBeUndefined()
+    const tree = toJSON() as RenderedNode
+    expect(tree.props.style).toBeFalsy()
+    const innerView = tree.children?.[0] as RenderedNode
+    expect(innerView.props.pointerEvents).toBe("box-none")
   })
 
-  it("wraps children in an accessible View with opacity 0.5 when disabled", () => {
+  it("dims the content with opacity 0.5 when disabled", () => {
     const { toJSON, getByText } = render(
       <DisabledFeature disabled={true}>
         <Text>inner</Text>
@@ -37,8 +36,6 @@ describe("DisabledFeature", () => {
     expect(getByText("inner")).toBeTruthy()
 
     const tree = toJSON() as RenderedNode
-    expect(tree.props.accessible).toBe(true)
-    expect(tree.props.focusable).toBe(true)
     expect(tree.props.style).toEqual(expect.objectContaining({ opacity: 0.5 }))
   })
 
@@ -52,6 +49,27 @@ describe("DisabledFeature", () => {
     const tree = toJSON() as RenderedNode
     const innerView = tree.children?.[0] as RenderedNode
     expect(innerView.props.pointerEvents).toBe("none")
+  })
+
+  it("keeps the same tree shape across a disabled toggle, so children never remount", () => {
+    const { toJSON, rerender } = render(
+      <DisabledFeature disabled={false}>
+        <Text>stable</Text>
+      </DisabledFeature>,
+    )
+    const enabledTree = toJSON() as RenderedNode
+
+    rerender(
+      <DisabledFeature disabled={true}>
+        <Text>stable</Text>
+      </DisabledFeature>,
+    )
+    const disabledTree = toJSON() as RenderedNode
+
+    expect(disabledTree.type).toBe(enabledTree.type)
+    expect((disabledTree.children?.[0] as RenderedNode).type).toBe(
+      (enabledTree.children?.[0] as RenderedNode).type,
+    )
   })
 
   it("calls onDisabledPress when the wrapper is tapped", () => {
