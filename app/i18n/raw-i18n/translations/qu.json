@@ -2512,8 +2512,11 @@
   "EnhancedModePrompt": {
     "title": "Kay ruray Enhanced modota munan",
     "body": "Anon modopi kachkanki, Blink mana region-niykita riqsinchu, chaymi wakin ruraykunaqa mana kanchu. Enhanced-man tikray kiti qhawayta ruranapaq, hinaspa region-niykipaq llapan ruraykunata kichananpaq.",
-    "switchButton": "Enhanced-man tikray",
-    "switched": "Enhanced mana waqaychasqa modoman tikrasqa"
+    "switchButton": "Enhanced-man tikray"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Enhanced mana waqaychasqa modoman tikrasqa",
+    "anon": "Anon mana waqaychasqa modoman tikrasqa"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dólar saldoqa mana kapunchu suyuykipi"

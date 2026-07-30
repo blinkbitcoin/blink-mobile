@@ -2512,8 +2512,11 @@
   "EnhancedModePrompt": {
     "title": "Ова функција захтева Enhanced режим",
     "body": "У Anon сте режиму, Blink не зна ваш регион, па неке функције нису доступне. Пребаците се на Enhanced да би се извршила провера локације и откључале све функције за ваш регион.",
-    "switchButton": "Пребаци на Enhanced",
-    "switched": "Пребачено на Enhanced режим без старатељства"
+    "switchButton": "Пребаци на Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Пребачено на Enhanced режим без старатељства",
+    "anon": "Пребачено на Anon режим без старатељства"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Доларски салдо није доступан у вашем региону"

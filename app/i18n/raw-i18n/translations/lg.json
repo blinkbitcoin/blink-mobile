@@ -2512,8 +2512,11 @@
   "EnhancedModePrompt": {
     "title": "Ekintu kino kyetaaga modu ya Enhanced",
     "body": "Oli mu modu ya Anon, Blink temanyi kitundu kyo, n'olwekyo ebintu ebimu tebiriiwo. Kyusa ku Enhanced okukola okukebera ekifo n'okusumulula ebintu byonna eby'ekitundu kyo.",
-    "switchButton": "Kyusa ku Enhanced",
-    "switched": "Okyusizza ku modu ya Enhanced eyeefuga"
+    "switchButton": "Kyusa ku Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Okyusizza ku modu ya Enhanced eyeefuga",
+    "anon": "Okyusizza ku modu ya Anon eyeefuga"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo"

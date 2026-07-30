@@ -30,9 +30,10 @@ jest.mock("@app/hooks/use-self-custodial-account-mode", () => ({
   }),
 }))
 
-const mockToastShow = jest.fn()
-jest.mock("@app/utils/toast", () => ({
-  toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
+const mockNavigate = jest.fn()
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
 import {
@@ -96,7 +97,7 @@ describe("EnhancedModePrompt", () => {
     expect(mockSetActiveAccountMode).not.toHaveBeenCalled()
   })
 
-  it("switches to Enhanced, closes, and confirms with a success toast", () => {
+  it("switches to Enhanced, closes, and hands off to the success screen", () => {
     const { getByTestId, getByText, queryByText } = renderWithProvider()
 
     fireEvent.press(getByTestId("open-prompt"))
@@ -104,15 +105,12 @@ describe("EnhancedModePrompt", () => {
 
     expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Enhanced)
     expect(queryByText(LL.EnhancedModePrompt.title())).toBeNull()
-    expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "success" }),
-    )
-
-    const { message } = mockToastShow.mock.calls[0][0]
-    expect(message(LL)).toBe(LL.EnhancedModePrompt.switched())
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialModeSwitchSuccess", {
+      mode: AccountMode.Enhanced,
+    })
   })
 
-  it("closes without writing or toasting when the active account can no longer switch", () => {
+  it("closes without writing or navigating when the active account can no longer switch", () => {
     mockIsAnonMode = false
 
     const { getByTestId, getByText, queryByText } = renderWithProvider()
@@ -121,7 +119,7 @@ describe("EnhancedModePrompt", () => {
     fireEvent.press(getByText(LL.EnhancedModePrompt.switchButton()))
 
     expect(mockSetActiveAccountMode).not.toHaveBeenCalled()
-    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
     expect(queryByText(LL.EnhancedModePrompt.title())).toBeNull()
   })
 

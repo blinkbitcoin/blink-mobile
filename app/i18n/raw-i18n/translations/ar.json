@@ -2512,8 +2512,11 @@
   "EnhancedModePrompt": {
     "title": "هذه الميزة تتطلب وضع Enhanced",
     "body": "أنت في وضع Anon، لا يعرف Blink منطقتك، لذا بعض الميزات غير متاحة. بدّل إلى Enhanced لإجراء فحص الموقع وفتح جميع الميزات لمنطقتك.",
-    "switchButton": "التبديل إلى Enhanced",
-    "switched": "تم التبديل إلى وضع Enhanced المحفوظ ذاتيًا"
+    "switchButton": "التبديل إلى Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "تم التبديل إلى وضع Enhanced المحفوظ ذاتيًا",
+    "anon": "تم التبديل إلى وضع Anon المحفوظ ذاتيًا"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "رصيد الدولار غير متاح في منطقتك"

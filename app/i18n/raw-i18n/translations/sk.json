@@ -2512,8 +2512,11 @@
   "EnhancedModePrompt": {
     "title": "Táto funkcia vyžaduje režim Enhanced",
     "body": "Ste v režime Anon, Blink nepozná váš región, takže niektoré funkcie nie sú dostupné. Prepnite na Enhanced, aby prebehla kontrola polohy a odomkli sa všetky funkcie pre váš región.",
-    "switchButton": "Prepnúť na Enhanced",
-    "switched": "Prepnuté na režim Enhanced s vlastnou správou"
+    "switchButton": "Prepnúť na Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Prepnuté na režim Enhanced s vlastnou správou",
+    "anon": "Prepnuté na režim Anon s vlastnou správou"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolárový zostatok nie je vo vašom regióne k dispozícii"

@@ -2512,8 +2512,11 @@
   "EnhancedModePrompt": {
     "title": "ฟีเจอร์นี้ต้องใช้โหมด Enhanced",
     "body": "คุณอยู่ในโหมด Anon Blink ไม่ทราบภูมิภาคของคุณ ฟีเจอร์บางอย่างจึงใช้งานไม่ได้ สลับไปใช้ Enhanced เพื่อตรวจสอบตำแหน่งและปลดล็อกฟีเจอร์ทั้งหมดสำหรับภูมิภาคของคุณ",
-    "switchButton": "สลับไปใช้ Enhanced",
-    "switched": "สลับไปใช้โหมด Enhanced ควบคุมด้วยตัวเองแล้ว"
+    "switchButton": "สลับไปใช้ Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "สลับไปใช้โหมด Enhanced ควบคุมด้วยตัวเองแล้ว",
+    "anon": "สลับไปใช้โหมด Anon ควบคุมด้วยตัวเองแล้ว"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "ยอดเงินดอลลาร์ไม่พร้อมใช้งานในภูมิภาคของคุณ"

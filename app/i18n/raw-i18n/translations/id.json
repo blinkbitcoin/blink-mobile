@@ -2512,8 +2512,11 @@
   "EnhancedModePrompt": {
     "title": "Fitur ini memerlukan mode Enhanced",
     "body": "Anda dalam mode Anon, Blink tidak mengetahui wilayah Anda, jadi beberapa fitur tidak tersedia. Beralih ke Enhanced untuk menjalankan pemeriksaan lokasi dan membuka semua fitur untuk wilayah Anda.",
-    "switchButton": "Beralih ke Enhanced",
-    "switched": "Beralih ke mode Enhanced non-kustodian"
+    "switchButton": "Beralih ke Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Beralih ke mode Enhanced non-kustodian",
+    "anon": "Beralih ke mode Anon non-kustodian"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda"

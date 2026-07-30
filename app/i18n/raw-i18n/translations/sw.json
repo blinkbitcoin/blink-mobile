@@ -2512,8 +2512,11 @@
   "EnhancedModePrompt": {
     "title": "Kipengele hiki kinahitaji hali ya Enhanced",
     "body": "Uko katika hali ya Anon, Blink haijui eneo lako, hivyo baadhi ya vipengele havipatikani. Badilisha kwenda Enhanced ili ukaguzi wa mahali ufanyike na vipengele vyote vya eneo lako vifunguliwe.",
-    "switchButton": "Badilisha kwenda Enhanced",
-    "switched": "Umebadilisha kwenda hali ya Enhanced isiyohifadhiwa"
+    "switchButton": "Badilisha kwenda Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Umebadilisha kwenda hali ya Enhanced isiyohifadhiwa",
+    "anon": "Umebadilisha kwenda hali ya Anon isiyohifadhiwa"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Salio la dola haipatikani katika eneo lako"

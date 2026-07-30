@@ -2,9 +2,11 @@ import React, { createContext, useCallback, useContext, useMemo, useState } from
 
 import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { AccountMode } from "@app/types/account"
 import { testProps } from "@app/utils/testProps"
-import { toastShow } from "@app/utils/toast"
+import { useNavigation } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "../atomic/galoy-icon"
@@ -34,16 +36,15 @@ const EnhancedModePromptModal: React.FC<PromptModalProps> = ({ onDismiss }) => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { isAnonMode, setActiveAccountMode } = useSelfCustodialAccountMode()
 
   const switchToEnhanced = () => {
     /** Only an Anon account can switch, and only a real write may confirm success. */
     if (isAnonMode) {
       setActiveAccountMode(AccountMode.Enhanced)
-      toastShow({
-        message: (translations) => translations.EnhancedModePrompt.switched(),
-        type: "success",
-        LL,
+      navigation.navigate("selfCustodialModeSwitchSuccess", {
+        mode: AccountMode.Enhanced,
       })
     }
     onDismiss()
@@ -75,7 +76,7 @@ const EnhancedModePromptModal: React.FC<PromptModalProps> = ({ onDismiss }) => {
 }
 
 /** Hosts the single Anon-gate prompt. The modal mounts only while visible: nothing on
- *  the startup path, and closing removes the native window so the toast shows. */
+ *  the startup path, and closing removes the native window over the success screen. */
 export const EnhancedModePromptProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {

@@ -2512,8 +2512,11 @@
   "EnhancedModePrompt": {
     "title": "Ciri ini memerlukan mod Enhanced",
     "body": "Anda dalam mod Anon, Blink tidak mengetahui wilayah anda, jadi sesetengah ciri tidak tersedia. Tukar kepada Enhanced untuk menjalankan semakan lokasi dan membuka semua ciri untuk wilayah anda.",
-    "switchButton": "Tukar kepada Enhanced",
-    "switched": "Bertukar kepada mod Enhanced bukan kustodian"
+    "switchButton": "Tukar kepada Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Bertukar kepada mod Enhanced bukan kustodian",
+    "anon": "Bertukar kepada mod Anon bukan kustodian"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Baki dolar tidak tersedia di rantau anda"

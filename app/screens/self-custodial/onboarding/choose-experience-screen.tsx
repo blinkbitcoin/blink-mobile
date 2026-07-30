@@ -107,8 +107,12 @@ export const ChooseExperienceScreen: React.FC = () => {
         return
       }
       const isModeUnchanged = selected === accountMode
-      if (!isModeUnchanged) setActiveAccountMode(selected)
-      navigation.goBack()
+      if (isModeUnchanged) {
+        navigation.goBack()
+        return
+      }
+      setActiveAccountMode(selected)
+      navigation.replace("selfCustodialModeSwitchSuccess", { mode: selected })
       return
     }
 

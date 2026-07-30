@@ -2512,8 +2512,11 @@
   "EnhancedModePrompt": {
     "title": "Olu phawu lufuna imo ye-Enhanced",
     "body": "Ukwimo ye-Anon, uBlink akawazi ummandla wakho, ngoko amanye amaphawu awafumaneki. Tshintshela kwi-Enhanced ukuze kwenziwe ukhangelo lwendawo kuvulwe onke amaphawu ommandla wakho.",
-    "switchButton": "Tshintshela kwi-Enhanced",
-    "switched": "Utshintshele kwimo ye-Enhanced engagciniwe"
+    "switchButton": "Tshintshela kwi-Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Utshintshele kwimo ye-Enhanced engagciniwe",
+    "anon": "Utshintshele kwimo ye-Anon engagciniwe"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho"

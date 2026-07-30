@@ -2512,8 +2512,11 @@
   "EnhancedModePrompt": {
     "title": "Այս գործառույթը պահանջում է Enhanced ռեժիմ",
     "body": "Դուք Anon ռեժիմում եք, Blink-ը չգիտի ձեր տարածաշրջանը, ուստի որոշ գործառույթներ հասանելի չեն։ Անցեք Enhanced-ի՝ գտնվելու վայրի ստուգում կատարելու և ձեր տարածաշրջանի բոլոր գործառույթները բացելու համար։",
-    "switchButton": "Անցնել Enhanced-ի",
-    "switched": "Անցաք ինքնապահառությամբ Enhanced ռեժիմի"
+    "switchButton": "Անցնել Enhanced-ի"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Անցաք ինքնապահառությամբ Enhanced ռեժիմի",
+    "anon": "Անցաք ինքնապահառությամբ Anon ռեժիմի"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Դոլարային մնացորդը հասանելի չէ ձեր տարածաշրջանում"
