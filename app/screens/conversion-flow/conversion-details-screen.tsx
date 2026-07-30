@@ -36,7 +36,10 @@ import { Screen } from "@app/components/screen"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
 import { useTransferBlockedGuard } from "@app/hooks/use-transfer-blocked-guard"
-import { useConsumeMigrationConversionArmed } from "@app/screens/account-migration/hooks/use-migration-conversion"
+import {
+  DrainConversionReturn,
+  useConsumeDrainConversionArmed,
+} from "@app/screens/conversion-flow/drain-conversion"
 import { resolveInitialConvertWallets } from "@app/screens/conversion-flow/migration-convert-wallets"
 import { CurrencyInput } from "@app/components/currency-input"
 import {
@@ -91,27 +94,30 @@ const ANIMATION_CONFIG = {
 const FULL_BALANCE_PERCENTAGE = 100
 
 export const ConversionDetailsScreen = () => {
-  const isMigrationConversion = useConsumeMigrationConversionArmed()
+  const drainConversion = useConsumeDrainConversionArmed()
+  const isDrainConversion = drainConversion !== null
 
-  /** A migration conversion waives the region restriction that would otherwise bounce a
-   *  restricted user home: emptying the dollar balance is the one way for them to migrate,
-   *  and the gate arming the flag (not a deep-linkable param) is what confirms it. */
+  /** A drain conversion waives the region restriction that would otherwise bounce a
+   *  restricted user home: emptying the dollar balance is the one way to migrate or to
+   *  switch to Anon Mode, and the flow arming the flag (not a deep-linkable param) is
+   *  what confirms it. */
   const isDollarBalanceRestricted = useDollarBalanceRestrictionGuard({
-    enabled: !isMigrationConversion,
+    enabled: !isDrainConversion,
   })
-  const isTransferBlocked = useTransferBlockedGuard({ enabled: !isMigrationConversion })
+  const isTransferBlocked = useTransferBlockedGuard({ enabled: !isDrainConversion })
   if (isDollarBalanceRestricted || isTransferBlocked) return null
 
-  return <ConversionDetailsScreenContent isMigrationConversion={isMigrationConversion} />
+  return <ConversionDetailsScreenContent drainConversion={drainConversion} />
 }
 
 type ConversionDetailsScreenContentProps = {
-  isMigrationConversion: boolean
+  drainConversion: DrainConversionReturn | null
 }
 
 const ConversionDetailsScreenContent = ({
-  isMigrationConversion,
+  drainConversion,
 }: ConversionDetailsScreenContentProps) => {
+  const isDrainConversion = drainConversion !== null
   const {
     theme: { colors },
   } = useTheme()
@@ -173,8 +179,8 @@ const ConversionDetailsScreenContent = ({
     selfCustodialWalletsForConvert?.usd ?? getUsdWallet(data?.me?.defaultAccount?.wallets)
 
   const initialWallets = useMemo(
-    () => resolveInitialConvertWallets(btcWallet, usdWallet, isMigrationConversion),
-    [btcWallet, usdWallet, isMigrationConversion],
+    () => resolveInitialConvertWallets(btcWallet, usdWallet, isDrainConversion),
+    [btcWallet, usdWallet, isDrainConversion],
   )
 
   const {
@@ -401,14 +407,14 @@ const ConversionDetailsScreenContent = ({
 
   /** Prefills the whole dollar balance once, so a migration user lands with 100% ready to
    *  confirm; reuses the chip path so it shows the spinner instead of flashing up from zero. */
-  const hasPrefilledMigrationAmountRef = useRef(false)
+  const hasPrefilledDrainAmountRef = useRef(false)
   useEffect(() => {
-    if (!isMigrationConversion || hasPrefilledMigrationAmountRef.current || !fromWallet) {
+    if (!isDrainConversion || hasPrefilledDrainAmountRef.current || !fromWallet) {
       return
     }
-    hasPrefilledMigrationAmountRef.current = true
+    hasPrefilledDrainAmountRef.current = true
     applyBalancePercentage(FULL_BALANCE_PERCENTAGE)
-  }, [isMigrationConversion, fromWallet, applyBalancePercentage])
+  }, [isDrainConversion, fromWallet, applyBalancePercentage])
 
   const handleSetMoneyAmount = useCallback(
     (amount: MoneyAmount<WalletOrDisplayCurrency>) => setMoneyAmount(amount),
@@ -612,8 +618,8 @@ const ConversionDetailsScreenContent = ({
     conversionGuard.hasQuoteError ||
     isSelfCustodialBooting
 
-  const isWalletToggleDisabled = !canToggleWallet || uiLocked || isMigrationConversion
-  const migrationLockedPercentages = isMigrationConversion
+  const isWalletToggleDisabled = !canToggleWallet || uiLocked || isDrainConversion
+  const drainLockedPercentages = isDrainConversion
     ? PERCENTAGE_OPTIONS.filter((percentage) => percentage !== FULL_BALANCE_PERCENTAGE)
     : undefined
 
@@ -626,7 +632,7 @@ const ConversionDetailsScreenContent = ({
     navigation.navigate("conversionConfirmation", {
       fromWalletCurrency: fromWallet.walletCurrency,
       moneyAmount,
-      isMigrationConversion,
+      drainConversion,
     })
   }
 
@@ -794,7 +800,7 @@ const ConversionDetailsScreenContent = ({
           isLocked={isPercentageSelectorLocked}
           loadingPercent={loadingPercent}
           selectedPercent={selectedPercent}
-          disabledOptions={migrationLockedPercentages}
+          disabledOptions={drainLockedPercentages}
           onSelect={setAmountToBalancePercentage}
           testIdPrefix="convert"
           containerStyle={styles.percentageContainer}
@@ -806,7 +812,7 @@ const ConversionDetailsScreenContent = ({
         >
           <AmountInputScreen
             inputValues={inputValues}
-            disabled={isMigrationConversion}
+            disabled={isDrainConversion}
             convertMoneyAmount={convertMoneyAmount}
             onAmountChange={handleSetMoneyAmount}
             onSetFormattedAmount={onSetFormattedValues}

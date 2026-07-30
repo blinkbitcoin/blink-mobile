@@ -8,7 +8,7 @@ import { ContextForScreen } from "../helper"
 
 const mockPopToTop = jest.fn()
 const mockReplace = jest.fn()
-let mockRouteParams: { returnToMigration?: boolean } | undefined
+let mockRouteParams: { returnTo?: "migration" | "modeSelection" } | undefined
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -52,7 +52,7 @@ describe("ConversionSuccessScreen", () => {
   })
 
   it("hands off to the migration entry for a migration conversion", () => {
-    mockRouteParams = { returnToMigration: true }
+    mockRouteParams = { returnTo: "migration" }
 
     renderScreen()
 
@@ -61,6 +61,21 @@ describe("ConversionSuccessScreen", () => {
     })
 
     expect(mockReplace).toHaveBeenCalledWith("accountMigrationEntry")
+    expect(mockPopToTop).not.toHaveBeenCalled()
+  })
+
+  it("hands back to the mode selection for an Anon-switch conversion", () => {
+    mockRouteParams = { returnTo: "modeSelection" }
+
+    renderScreen()
+
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY)
+    })
+
+    expect(mockReplace).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+      entry: "settings",
+    })
     expect(mockPopToTop).not.toHaveBeenCalled()
   })
 
