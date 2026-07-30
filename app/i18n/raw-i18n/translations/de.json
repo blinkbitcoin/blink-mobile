@@ -2429,6 +2429,7 @@
         "apiAcess": "API Zugriff",
         "apiDocumentation": "API-Dokumentation",
         "apiDashboard": "API-Zugang und Dashboard",
+        "mode": "Modus",
         "pos": "Point of Sale",
         "posCopied": "Ihr Point of Sale Link wurde kopiert",
         "activated": "Aktiviert",
@@ -2560,7 +2561,18 @@
         "removedAccount": "Du hast das Konto {identifier: string} entfernt."
     },
     "StablesatsRestriction": {
-        "walletLabel": "in deiner Region nicht verfügbar"
+        "walletLabel": "in deiner Region nicht verfügbar",
+        "anonModeWalletLabel": "im Anon-Modus nicht verfügbar"
+    },
+    "AnonModeConvertModal": {
+        "title": "Übertrage zuerst dein Dollar-Guthaben",
+        "body": "Der Anon-Modus unterstützt nur das Bitcoin-Guthaben. Übertrage dein Dollar-Guthaben auf dein Bitcoin-Guthaben, um zu wechseln."
+    },
+    "EnhancedModePrompt": {
+        "title": "Diese Funktion benötigt den Enhanced-Modus",
+        "body": "Du bist im Anon-Modus, Blink kennt deine Region nicht, daher sind einige Funktionen nicht verfügbar. Wechsle zu Enhanced, um eine Standortprüfung durchzuführen und alle Funktionen für deine Region freizuschalten.",
+        "switchButton": "Zu Enhanced wechseln",
+        "switched": "Zum selbstverwahrten Enhanced-Modus gewechselt"
     },
     "DollarBalanceRestriction": {
         "modalTitle": "Dollar-Guthaben ist in deiner Region nicht verfügbar"
@@ -2686,7 +2698,6 @@
         "letsGo": "Los geht's!",
         "stayInTrialMode": "Im Demo-Modus bleiben",
         "upgradeToLevel": "Auf Level {level: number} upgraden",
-        "notNow": "Nicht jetzt",
         "setUpLevelAccount": "Level-{level: number}-Konto einrichten"
     },
     "SetAddressModal": {
@@ -2864,6 +2875,7 @@
         "bitcoinPrice": "Bitcoin Preis",
         "btcAccount": "Bitcoin-Guthaben",
         "cancel": "Abbrechen",
+        "notNow": "Nicht jetzt",
         "card": "Karte",
         "close": "Schließen",
         "confirm": "Bestätigen",

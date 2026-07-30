@@ -2429,6 +2429,7 @@
     "apiAcess": "Tích hợp API",
     "apiDocumentation": "Tài liệu API",
     "apiDashboard": "Truy cập và bảng điều khiển API",
+    "mode": "Chế độ",
     "pos": "Điểm bán hàng",
     "posCopied": "Liên kết điểm bán hàng của bạn đã được sao chép",
     "activated": "Đã kích hoạt",
@@ -2560,7 +2561,18 @@
     "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "không khả dụng tại khu vực của bạn"
+    "walletLabel": "không khả dụng tại khu vực của bạn",
+    "anonModeWalletLabel": "không khả dụng ở chế độ Anon"
+  },
+  "AnonModeConvertModal": {
+    "title": "Hãy chuyển số dư Đô la của bạn trước",
+    "body": "Chế độ Anon chỉ hỗ trợ số dư Bitcoin. Hãy chuyển số dư Đô la của bạn sang số dư Bitcoin để chuyển chế độ."
+  },
+  "EnhancedModePrompt": {
+    "title": "Tính năng này cần chế độ Enhanced",
+    "body": "Bạn đang ở chế độ Anon, Blink không biết khu vực của bạn nên một số tính năng không khả dụng. Chuyển sang Enhanced để chạy kiểm tra vị trí và mở khóa mọi tính năng cho khu vực của bạn.",
+    "switchButton": "Chuyển sang Enhanced",
+    "switched": "Đã chuyển sang chế độ Enhanced phi lưu ký"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Số dư đô la không khả dụng tại khu vực của bạn"
@@ -2686,7 +2698,6 @@
     "letsGo": "Let's go!",
     "stayInTrialMode": "Stay in trial mode",
     "upgradeToLevel": "Nâng cấp lên Cấp {level: number}",
-    "notNow": "Không phải bây giờ",
     "setUpLevelAccount": "Thiết lập tài khoản Cấp {level: number}"
   },
   "SetAddressModal": {
@@ -2864,6 +2875,7 @@
     "bitcoinPrice": "Giá Bitcoin",
     "btcAccount": "Số dư Bitcoin",
     "cancel": "Hủy",
+    "notNow": "Không phải bây giờ",
     "card": "Thẻ",
     "close": "Đóng",
     "confirm": "Xác nhận",

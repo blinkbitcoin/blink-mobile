@@ -2429,6 +2429,7 @@
     "apiAcess": "تكامل API",
     "apiDocumentation": "وثائق API",
     "apiDashboard": "الوصول إلى API ولوحة التحكم",
+    "mode": "الوضع",
     "pos": "نقطة البيع",
     "posCopied": "تم نسخ رابط نقطة البيع الخاص بك",
     "activated": "تم التفعيل",
@@ -2560,7 +2561,18 @@
     "removedAccount": "لقد أزلت الحساب {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "غير متاح في منطقتك"
+    "walletLabel": "غير متاح في منطقتك",
+    "anonModeWalletLabel": "غير متاح في وضع Anon"
+  },
+  "AnonModeConvertModal": {
+    "title": "حوّل رصيدك بالدولار أولًا",
+    "body": "وضع Anon يدعم رصيد Bitcoin فقط. حوّل رصيدك بالدولار إلى رصيد Bitcoin للتبديل."
+  },
+  "EnhancedModePrompt": {
+    "title": "هذه الميزة تتطلب وضع Enhanced",
+    "body": "أنت في وضع Anon، لا يعرف Blink منطقتك، لذا بعض الميزات غير متاحة. بدّل إلى Enhanced لإجراء فحص الموقع وفتح جميع الميزات لمنطقتك.",
+    "switchButton": "التبديل إلى Enhanced",
+    "switched": "تم التبديل إلى وضع Enhanced المحفوظ ذاتيًا"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "رصيد الدولار غير متاح في منطقتك"
@@ -2686,7 +2698,6 @@
     "letsGo": "Let's go!",
     "stayInTrialMode": "Stay in trial mode",
     "upgradeToLevel": "الترقية إلى المستوى {level: number}",
-    "notNow": "ليس الآن",
     "setUpLevelAccount": "إعداد حساب المستوى {level: number}"
   },
   "SetAddressModal": {
@@ -2864,6 +2875,7 @@
     "bitcoinPrice": "سعر البيتكوين",
     "btcAccount": "حساب البيتكوين",
     "cancel": "إلغاء",
+    "notNow": "ليس الآن",
     "card": "بطاقة",
     "close": "إغلاق",
     "confirm": "تأكيد",

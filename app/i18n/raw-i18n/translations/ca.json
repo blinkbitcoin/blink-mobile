@@ -2429,6 +2429,7 @@
     "apiAcess": "Accès API",
     "apiDocumentation": "Documentació de l'API",
     "apiDashboard": "Accés a l'API i tauler de control",
+    "mode": "Mode",
     "pos": "Punt de venda",
     "posCopied": "S'ha copiat l'enllaç del teu punt de venda",
     "activated": "Activat",
@@ -2560,7 +2561,18 @@
     "removedAccount": "Has eliminat el compte {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "no està disponible a la teva regió"
+    "walletLabel": "no està disponible a la teva regió",
+    "anonModeWalletLabel": "no disponible en mode Anon"
+  },
+  "AnonModeConvertModal": {
+    "title": "Transfereix primer el teu saldo en dòlars",
+    "body": "El mode Anon només admet el saldo en Bitcoin. Transfereix el teu saldo en dòlars al teu saldo en Bitcoin per canviar."
+  },
+  "EnhancedModePrompt": {
+    "title": "Aquesta funció necessita el mode Enhanced",
+    "body": "Ets en mode Anon, Blink no coneix la teva regió, així que algunes funcions no estan disponibles. Canvia a Enhanced per executar una comprovació d'ubicació i desbloquejar totes les funcions per a la teva regió.",
+    "switchButton": "Canvia a Enhanced",
+    "switched": "Has canviat al mode Enhanced no custodiat"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "El saldo en dòlars no està disponible a la teva regió"
@@ -2686,7 +2698,6 @@
     "letsGo": "Anem!",
     "stayInTrialMode": "Mantenir-se en mode de prova",
     "upgradeToLevel": "Actualitza al nivell {level: number}",
-    "notNow": "Ara no",
     "setUpLevelAccount": "Configura un compte de nivell {level: number}"
   },
   "SetAddressModal": {
@@ -2864,6 +2875,7 @@
     "bitcoinPrice": "Preu de Bitcoin",
     "btcAccount": "Compte Bitcoin",
     "cancel": "Cancela",
+    "notNow": "Ara no",
     "card": "Targeta",
     "close": "Tanca",
     "confirm": "Confirma",
