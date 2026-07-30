@@ -53,6 +53,12 @@ jest.mock("react-native-inappbrowser-reborn", () => ({
   default: { open: jest.fn(() => Promise.resolve()) },
 }))
 
+const mockOpenExternalUrl = jest.fn()
+jest.mock("@app/utils/external", () => ({
+  ...jest.requireActual("@app/utils/external"),
+  openExternalUrl: (...args: unknown[]) => mockOpenExternalUrl(...args),
+}))
+
 jest.mock("@app/screens/settings-screen/group", () => {
   const { View } = jest.requireActual("react-native")
   return {
@@ -294,13 +300,22 @@ describe("BackupPhraseScreen", () => {
       await flushEffects()
 
       expect(
-        getByText(
-          LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
-            sparkCompatibleLink:
-              LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink(),
-          }),
-        ),
+        getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
       ).toBeTruthy()
+    })
+
+    it("opens the spark-compatible link from the info banner", () => {
+      const { getByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+
+      fireEvent.press(
+        getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
+      )
+
+      expect(mockOpenExternalUrl).toHaveBeenCalledWith("https://example.com")
     })
 
     it("renders the do-not-share warning card", () => {

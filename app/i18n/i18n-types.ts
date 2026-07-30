@@ -12277,7 +12277,7 @@ type RootTranslation = {
 				 */
 				testBackup: string
 				/**
-				 * D​o​ ​n​o​t​ ​s​h​o​w​ ​t​h​i​s​ ​t​o​ ​a​n​y​o​n​e​ ​i​n​c​l​u​d​i​n​g​ ​s​u​p​p​o​r​t
+				 * D​o​ ​n​o​t​ ​s​h​o​w​ ​t​h​i​s​ ​t​o​ ​a​n​y​o​n​e​,​ ​i​n​c​l​u​d​i​n​g​ ​s​u​p​p​o​r​t
 				 */
 				doNotShareWarning: string
 			}
@@ -25305,7 +25305,7 @@ export type TranslationFunctions = {
 				 */
 				testBackup: () => LocalizedString
 				/**
-				 * Do not show this to anyone including support
+				 * Do not show this to anyone, including support
 				 */
 				doNotShareWarning: () => LocalizedString
 			}

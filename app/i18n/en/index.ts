@@ -3866,7 +3866,7 @@ const en: BaseTranslation = {
         savedConfirm: "I have saved it",
         copy: "Copy",
         testBackup: "Test your backup",
-        doNotShareWarning: "Do not show this to anyone including support",
+        doNotShareWarning: "Do not show this to anyone, including support",
       },
       Confirm: {
         headerTitle: "Confirm backup phrase",

@@ -7,10 +7,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
-import { Card } from "@app/components/card"
 import { headerRightNoGlass } from "@app/components/header-no-glass/header-no-glass"
-import { InfoBanner } from "@app/components/info-banner"
+import { WarningCard } from "@app/components/warning-card"
 import { Screen } from "@app/components/screen"
+import { SparkCompatibleInfo } from "@app/components/spark-compatible-info"
 import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { reportError } from "@app/utils/error-logging"
@@ -25,6 +25,9 @@ import { SettingsGroup } from "@app/screens/settings-screen/group"
 import { useBackupPhrase } from "../hooks"
 
 const WORDS_PER_CARD = 3
+
+// The clear tertiary button has no padding, so its hit area is the text bounds.
+const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
 type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase">
 
@@ -71,15 +74,13 @@ export const BackupPhraseScreen: React.FC = () => {
           title={copyLabel}
           onPress={handleCopy}
           containerStyle={styles.headerButton}
+          hitSlop={HEADER_BUTTON_HIT_SLOP}
           {...testProps("backup-phrase-copy")}
+          accessibilityLabel={copyLabel}
         />
       )),
     )
   }, [navigation, copyLabel, handleCopy, styles])
-
-  const infoText = LL.BackupScreen.ManualBackup.Phrase.sparkCompatible({
-    sparkCompatibleLink: LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink(),
-  })
 
   const renderWord = (word: string, index: number) => (
     <View key={index} style={styles.wordRow}>
@@ -91,10 +92,7 @@ export const BackupPhraseScreen: React.FC = () => {
   return (
     <Screen preset="fixed">
       <ScrollView contentContainerStyle={styles.content}>
-        <Card
-          type="warning"
-          title={LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()}
-        />
+        <WarningCard title={LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()} />
 
         <View style={styles.seedWords}>
           <SettingsGroup
@@ -111,9 +109,7 @@ export const BackupPhraseScreen: React.FC = () => {
           />
         </View>
 
-        <InfoBanner>
-          <Text style={styles.infoText}>{infoText}</Text>
-        </InfoBanner>
+        <SparkCompatibleInfo />
       </ScrollView>
 
       <View style={styles.buttonsContainer}>
@@ -162,10 +158,6 @@ const useStyles = makeStyles(({ colors }) => ({
   wordText: {
     fontSize: 14,
     lineHeight: 20,
-  },
-  infoText: {
-    fontSize: 12,
-    lineHeight: 18,
   },
   buttonsContainer: {
     gap: 10,
