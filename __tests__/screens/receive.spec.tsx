@@ -165,7 +165,8 @@ jest.mock("@app/hooks", () => {
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceRestricted: () => false,
-  useDollarBalanceRestriction: () => ({ isRestricted: false, isRegionPending: false }),
+  useDollarBalanceGate: () => ({ isGated: false, isRegionPending: false }),
+  useDollarBalanceGated: () => false,
 }))
 
 jest.mock("@app/hooks/use-device-location", () => ({
