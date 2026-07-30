@@ -41,9 +41,15 @@ jest.mock("@app/graphql/generated", () => ({
   useSettingsScreenQuery: (...args: unknown[]) => mockUseSettingsScreenQuery(...args),
 }))
 
+let mockIsAnonMode = false
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
 describe("useDeviceLocation", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsAnonMode = false
     mockResolveIpCountryCode.mockResolvedValue(undefined)
     mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
     mockParsePhoneNumber.mockImplementation(
@@ -244,6 +250,77 @@ describe("useDeviceLocation", () => {
     expect(result.current.detectionFailed).toBe(true)
   })
 
+  describe("anon mode", () => {
+    it("resolves nothing and issues no lookup, even with a phone available", async () => {
+      mockIsAnonMode = true
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+      mockUseSettingsScreenQuery.mockReturnValue({
+        data: { me: { phone: "+4915112345678" } },
+      })
+
+      const { result } = renderHook(() => useDeviceLocation())
+
+      await act(async () => {})
+
+      expect(result.current).toEqual({
+        countryCode: undefined,
+        loading: false,
+        detectionFailed: false,
+        source: undefined,
+      })
+      expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
+      expect(mockParsePhoneNumber).not.toHaveBeenCalled()
+    })
+
+    it("does not run the IP fallback for a phone-less account", async () => {
+      mockIsAnonMode = true
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+
+      renderHook(() => useDeviceLocation())
+
+      await act(async () => {})
+
+      expect(mockResolveIpCountryCode).not.toHaveBeenCalled()
+    })
+
+    it("stays inert on a query error", () => {
+      mockIsAnonMode = true
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: undefined,
+        error: new Error("Apollo cache error"),
+      })
+
+      const { result } = renderHook(() => useDeviceLocation())
+
+      expect(result.current.loading).toBe(false)
+      expect(result.current.countryCode).toBeUndefined()
+      expect(result.current.detectionFailed).toBe(false)
+    })
+
+    it("detects normally for a custodial flow even while Anon is active", async () => {
+      mockIsAnonMode = true
+      mockUseCountryCodeQuery.mockReturnValue({
+        data: { countryCode: "SV" },
+        error: undefined,
+      })
+      mockResolveIpCountryCode.mockResolvedValue("DE")
+
+      const { result } = renderHook(() => useDeviceLocation({ isCustodialFlow: true }))
+
+      await act(async () => {})
+
+      expect(result.current.countryCode).toBe("DE")
+      expect(result.current.loading).toBe(false)
+      expect(mockResolveIpCountryCode).toHaveBeenCalled()
+    })
+  })
+
   it("marks detection failed on Apollo query error (falls back to SV)", () => {
     mockUseCountryCodeQuery.mockReturnValue({
       data: undefined,
@@ -281,6 +358,7 @@ describe("useDeviceLocation", () => {
 describe("useIpCountryCode", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsAnonMode = false
     mockResolveIpCountryCode.mockResolvedValue(undefined)
   })
 
@@ -373,6 +451,7 @@ describe("useIpCountryLookup", () => {
 describe("usePhoneCountryCode", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsAnonMode = false
     mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
     mockParsePhoneNumber.mockImplementation(
       jest.requireActual("libphonenumber-js/mobile").parsePhoneNumber,
@@ -407,6 +486,18 @@ describe("usePhoneCountryCode", () => {
     const { result } = renderHook(() => usePhoneCountryCode())
 
     expect(result.current).toBeUndefined()
+  })
+
+  it("resolves nothing in Anon Mode even with a cached phone", () => {
+    mockIsAnonMode = true
+    mockUseSettingsScreenQuery.mockReturnValue({
+      data: { me: { phone: "+4915112345678" } },
+    })
+
+    const { result } = renderHook(() => usePhoneCountryCode())
+
+    expect(result.current).toBeUndefined()
+    expect(mockParsePhoneNumber).not.toHaveBeenCalled()
   })
 })
 

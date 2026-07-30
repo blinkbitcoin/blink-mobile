@@ -4,6 +4,7 @@ import DeviceInfo from "react-native-device-info"
 
 import { useIpCountryCode, usePhoneCountryCode } from "@app/hooks/use-device-location"
 import { useSecretMenuTrigger } from "@app/hooks/use-secret-menu-trigger"
+import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles } from "@rn-vui/themed"
 
@@ -20,8 +21,14 @@ const useStyles = makeStyles(({ colors }) => ({
 export const VersionComponent = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
-  const registeredCountry = usePhoneCountryCode() ?? LL.common.unknown()
-  const detectedCountry = useIpCountryCode(true) ?? LL.common.unknown()
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const phoneCountry = usePhoneCountryCode()
+  const ipCountry = useIpCountryCode(true)
+  const unknown = LL.common.unknown()
+  /** Anon Mode never resolves a region, so the footer states none instead of detecting one. */
+  const countryLine = isAnonMode
+    ? `${LL.common.country()}: ${unknown}`
+    : `${LL.common.registered()}: ${phoneCountry ?? unknown} · ${LL.common.detected()}: ${ipCountry ?? unknown}`
   const handleSecretMenuTap = useSecretMenuTrigger()
 
   const readableVersion = DeviceInfo.getReadableVersion()
@@ -31,8 +38,7 @@ export const VersionComponent = () => {
       <Text {...testProps("Version Build Text")} style={styles.version}>
         {readableVersion}
         {"\n"}
-        {LL.common.registered()}: {registeredCountry} · {LL.common.detected()}:{" "}
-        {detectedCountry}
+        {countryLine}
         {"\n"}
         {LL.GetStartedScreen.headline()}
       </Text>

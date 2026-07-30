@@ -99,7 +99,8 @@ export const useRequestPhoneCodeRegistration = (): UseRequestPhoneCodeReturn => 
     >()
 
   const { data } = useSupportedCountriesQuery()
-  const { countryCode: detectedCountryCode } = useDeviceLocation()
+  const { countryCode: detectedCountryCode, loading: loadingDetectedCountryCode } =
+    useDeviceLocation({ isCustodialFlow: true })
 
   const { isWhatsAppSupported, isSmsSupported, allSupportedCountries } = useMemo(() => {
     const currentCountry = data?.globals?.supportedCountries.find(
@@ -123,13 +124,14 @@ export const useRequestPhoneCodeRegistration = (): UseRequestPhoneCodeReturn => 
     }
   }, [data?.globals, countryCode])
 
-  // setting default country code from IP
+  /** One-shot advance once detection settles, so a late re-settle cannot yank an
+   *  in-progress captcha or request back to the input step. */
   useEffect(() => {
-    if (detectedCountryCode) {
-      setCountryCode(detectedCountryCode)
-      setStatus(RequestPhoneCodeStatus.InputtingPhoneNumber)
-    }
-  }, [detectedCountryCode])
+    if (status !== RequestPhoneCodeStatus.LoadingCountryCode) return
+    if (loadingDetectedCountryCode) return
+    if (detectedCountryCode) setCountryCode(detectedCountryCode)
+    setStatus(RequestPhoneCodeStatus.InputtingPhoneNumber)
+  }, [status, detectedCountryCode, loadingDetectedCountryCode])
 
   const setPhoneNumber = (number: string) => {
     if (status === RequestPhoneCodeStatus.RequestingCode) {

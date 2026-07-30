@@ -10,13 +10,19 @@ const mockUseIpCountryCode = jest.fn()
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
   usePhoneCountryCode: () => mockUsePhoneCountryCode(),
-  useIpCountryCode: () => mockUseIpCountryCode(),
+  useIpCountryCode: (enabled: boolean) => mockUseIpCountryCode(enabled),
+}))
+
+let mockIsAnonMode = false
+jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
+  useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       common: {
+        country: () => "Country",
         registered: () => "Registered",
         detected: () => "Detected",
         unknown: () => "Unknown",
@@ -51,6 +57,7 @@ describe("VersionComponent", () => {
     mockUsePhoneCountryCode.mockReset()
     mockUseIpCountryCode.mockReset()
     mockNavigate.mockClear()
+    mockIsAnonMode = false
   })
 
   it("shows the registered and detected countries below the version", () => {
@@ -136,5 +143,26 @@ describe("VersionComponent", () => {
 
       expect(mockNavigate).not.toHaveBeenCalled()
     })
+  })
+
+  it("enables the ip lookup outside Anon mode", () => {
+    mockUsePhoneCountryCode.mockReturnValue("US")
+    mockUseIpCountryCode.mockReturnValue("SE")
+
+    render(<VersionComponent />)
+
+    expect(mockUseIpCountryCode).toHaveBeenCalledWith(true)
+  })
+
+  it("states no country in Anon mode", () => {
+    mockIsAnonMode = true
+    mockUsePhoneCountryCode.mockReturnValue(undefined)
+    mockUseIpCountryCode.mockReturnValue(undefined)
+
+    const { getByText, queryByText } = render(<VersionComponent />)
+
+    expect(getByText(/Country: Unknown/)).toBeTruthy()
+    expect(queryByText(/Registered:/)).toBeNull()
+    expect(queryByText(/Detected:/)).toBeNull()
   })
 })
