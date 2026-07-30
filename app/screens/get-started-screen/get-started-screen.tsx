@@ -3,7 +3,6 @@ import { Pressable, View } from "react-native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
-import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { useAppConfig } from "@app/hooks"
 import {
@@ -13,7 +12,6 @@ import {
 } from "@app/hooks/use-account-type-options"
 import { useCreationBlock } from "@app/hooks/use-creation-block"
 import { useSecretMenuTrigger } from "@app/hooks/use-secret-menu-trigger"
-import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import theme from "@app/rne-theme/theme"
 import { AccountTypeMode } from "@app/types/account"
@@ -60,8 +58,6 @@ export const GetStartedScreen: React.FC = () => {
   const { deviceAccountEnabled, nonCustodialEnabled } = useFeatureFlags()
   const { options, defaultSelected, loading: detectingCountry } = useAccountTypeOptions()
   const { isCreationBlocked, loading: detectingRegion } = useCreationBlock()
-  const { isAnonMode } = useSelfCustodialAccountMode()
-  const { promptEnhancedMode } = useEnhancedModePrompt()
   const canCreateAccount = options.length > 0
   const isCreateAccountDisabled = !canCreateAccount || detectingCountry || detectingRegion
 
@@ -69,12 +65,6 @@ export const GetStartedScreen: React.FC = () => {
 
   const handleCreateAccount = () => {
     if (!canCreateAccount) return
-
-    /** Creation needs a region determination, which Anon refuses: offer the switch. */
-    if (isAnonMode) {
-      promptEnhancedMode()
-      return
-    }
 
     if (options.every((option) => isCreationBlocked(option))) {
       navigation.navigate("unsupportedRegion")
