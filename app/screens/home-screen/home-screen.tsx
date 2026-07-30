@@ -827,7 +827,7 @@ export const HomeScreen: React.FC = () => {
         <WalletOverview
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
-          onRestrictedTap={onGatedDollarTap}
+          onGatedTap={onGatedDollarTap}
           wallets={wallets}
           hasCard={hasCard}
           cardLastFour={cardLastFour}

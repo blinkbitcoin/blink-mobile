@@ -61,7 +61,7 @@ gql`
 type Props = {
   loading: boolean
   setIsStablesatModalVisible: (value: boolean) => void
-  onRestrictedTap?: () => void
+  onGatedTap?: () => void
   wallets?: readonly WalletBalance[]
   hasCard?: boolean
   cardLastFour?: string | null
@@ -72,7 +72,7 @@ type Props = {
 const WalletOverview: React.FC<Props> = ({
   loading,
   setIsStablesatModalVisible,
-  onRestrictedTap,
+  onGatedTap,
   wallets,
   hasCard = false,
   cardLastFour,
@@ -159,7 +159,7 @@ const WalletOverview: React.FC<Props> = ({
    *  a user who turns out to be unrestricted. */
   const isDollarBalanceLoading = loading || isRegionPending
   const isDollarRowInert = isDollarRowUnavailable || isRegionPending
-  const onDollarBalanceRestrictedPress = isRegionPending ? undefined : onRestrictedTap
+  const onDollarGatedPress = isRegionPending ? undefined : onGatedTap
 
   return (
     <View style={styles.container}>
@@ -212,10 +212,7 @@ const WalletOverview: React.FC<Props> = ({
 
       <View style={styles.separator} />
 
-      <DisabledFeature
-        disabled={isDollarRowInert}
-        onDisabledPress={onDollarBalanceRestrictedPress}
-      >
+      <DisabledFeature disabled={isDollarRowInert} onDisabledPress={onDollarGatedPress}>
         <Pressable
           onPressIn={() => setPressedUsd(true)}
           onPressOut={() => setPressedUsd(false)}
