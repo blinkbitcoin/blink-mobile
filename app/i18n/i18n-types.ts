@@ -8576,10 +8576,16 @@ type RootTranslation = {
 		 * S​w​i​t​c​h​ ​t​o​ ​E​n​h​a​n​c​e​d
 		 */
 		switchButton: string
+	}
+	ModeSwitchSuccessScreen: {
 		/**
 		 * S​w​i​t​c​h​e​d​ ​t​o​ ​E​n​h​a​n​c​e​d​ ​N​o​n​-​c​u​s​t​o​d​i​a​l​ ​M​o​d​e
 		 */
-		switched: string
+		enhanced: string
+		/**
+		 * S​w​i​t​c​h​e​d​ ​t​o​ ​A​n​o​n​ ​N​o​n​-​c​u​s​t​o​d​i​a​l​ ​M​o​d​e
+		 */
+		anon: string
 	}
 	DollarBalanceRestriction: {
 		/**
@@ -22055,10 +22061,16 @@ export type TranslationFunctions = {
 		 * Switch to Enhanced
 		 */
 		switchButton: () => LocalizedString
+	}
+	ModeSwitchSuccessScreen: {
 		/**
 		 * Switched to Enhanced Non-custodial Mode
 		 */
-		switched: () => LocalizedString
+		enhanced: () => LocalizedString
+		/**
+		 * Switched to Anon Non-custodial Mode
+		 */
+		anon: () => LocalizedString
 	}
 	DollarBalanceRestriction: {
 		/**

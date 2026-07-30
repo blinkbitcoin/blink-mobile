@@ -2571,8 +2571,11 @@
   "EnhancedModePrompt": {
     "title": "Deze functie vereist de Enhanced-modus",
     "body": "Je bent in Anon-modus, Blink kent je regio niet, dus sommige functies zijn niet beschikbaar. Schakel over naar Enhanced om een locatiecontrole uit te voeren en alle functies voor je regio te ontgrendelen.",
-    "switchButton": "Overschakelen naar Enhanced",
-    "switched": "Overgeschakeld naar zelfbeheerde Enhanced-modus"
+    "switchButton": "Overschakelen naar Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Overgeschakeld naar zelfbeheerde Enhanced-modus",
+    "anon": "Overgeschakeld naar zelfbeheerde Anon-modus"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dollar-saldo is niet beschikbaar in jouw regio"

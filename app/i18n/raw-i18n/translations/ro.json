@@ -2571,8 +2571,11 @@
   "EnhancedModePrompt": {
     "title": "Această funcție necesită modul Enhanced",
     "body": "Ești în modul Anon, Blink nu îți cunoaște regiunea, așa că unele funcții nu sunt disponibile. Treci la Enhanced pentru a rula o verificare a locației și a debloca toate funcțiile pentru regiunea ta.",
-    "switchButton": "Treci la Enhanced",
-    "switched": "Ai trecut la modul Enhanced fără custodie"
+    "switchButton": "Treci la Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Ai trecut la modul Enhanced fără custodie",
+    "anon": "Ai trecut la modul Anon fără custodie"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta"

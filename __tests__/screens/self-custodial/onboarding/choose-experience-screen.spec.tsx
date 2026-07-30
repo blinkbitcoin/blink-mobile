@@ -15,6 +15,7 @@ import { flushEffects } from "../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+const mockNavReplace = jest.fn()
 const mockUnsubscribe = jest.fn()
 type BeforeRemoveEvent = {
   data: { action: { type: string } }
@@ -45,6 +46,7 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
     goBack: mockGoBack,
+    replace: mockNavReplace,
     addListener: mockAddListener,
   }),
   useRoute: () => ({ params: mockRouteParams }),
@@ -285,7 +287,7 @@ describe("ChooseExperienceScreen", () => {
     expect(mockSetAccountMode).not.toHaveBeenCalled()
   })
 
-  it("stores the active account's mode and returns when entered without params (settings)", async () => {
+  it("stores the active account's mode and confirms it when entered from settings", async () => {
     mockRouteParams = { entry: "settings" }
     const { getByTestId } = await renderScreen()
 
@@ -293,7 +295,10 @@ describe("ChooseExperienceScreen", () => {
     fireEvent.press(getByTestId(continueTestId))
 
     expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Enhanced)
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavReplace).toHaveBeenCalledWith("selfCustodialModeSwitchSuccess", {
+      mode: AccountMode.Enhanced,
+    })
+    expect(mockGoBack).not.toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockSetAccountMode).not.toHaveBeenCalled()
   })
@@ -327,7 +332,9 @@ describe("ChooseExperienceScreen", () => {
     fireEvent.press(getByTestId(continueTestId))
 
     expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Anon)
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavReplace).toHaveBeenCalledWith("selfCustodialModeSwitchSuccess", {
+      mode: AccountMode.Anon,
+    })
   })
 
   it("preselects the stored mode of the account being restored", async () => {
@@ -363,7 +370,9 @@ describe("ChooseExperienceScreen", () => {
     fireEvent.press(getByTestId(continueTestId))
 
     expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Anon)
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavReplace).toHaveBeenCalledWith("selfCustodialModeSwitchSuccess", {
+      mode: AccountMode.Anon,
+    })
   })
 
   it("refreshes the wallet balance on the settings entry", async () => {
@@ -477,7 +486,9 @@ describe("ChooseExperienceScreen", () => {
     fireEvent.press(getByTestId(continueTestId))
 
     expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Anon)
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockNavReplace).toHaveBeenCalledWith("selfCustodialModeSwitchSuccess", {
+      mode: AccountMode.Anon,
+    })
   })
 
   /**

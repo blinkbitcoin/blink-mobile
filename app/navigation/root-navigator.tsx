@@ -146,6 +146,7 @@ import {
   ChooseExperienceScreen,
   WalletCreationScreen,
 } from "@app/screens/self-custodial/onboarding"
+import { ModeSwitchSuccessScreen } from "@app/screens/self-custodial/mode-switch-success-screen"
 import {
   RestoreMethodScreen,
   RestorePhraseScreen,
@@ -917,6 +918,11 @@ export const RootStack = () => {
         name="selfCustodialChooseExperience"
         component={ChooseExperienceScreen}
         options={chooseExperienceOptions}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialModeSwitchSuccess"
+        component={ModeSwitchSuccessScreen}
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialWalletCreation"

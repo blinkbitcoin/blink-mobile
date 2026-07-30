@@ -2571,8 +2571,11 @@
     "EnhancedModePrompt": {
         "title": "Diese Funktion benötigt den Enhanced-Modus",
         "body": "Du bist im Anon-Modus, Blink kennt deine Region nicht, daher sind einige Funktionen nicht verfügbar. Wechsle zu Enhanced, um eine Standortprüfung durchzuführen und alle Funktionen für deine Region freizuschalten.",
-        "switchButton": "Zu Enhanced wechseln",
-        "switched": "Zum selbstverwahrten Enhanced-Modus gewechselt"
+        "switchButton": "Zu Enhanced wechseln"
+    },
+    "ModeSwitchSuccessScreen": {
+        "enhanced": "Zum selbstverwahrten Enhanced-Modus gewechselt",
+        "anon": "Zum selbstverwahrten Anon-Modus gewechselt"
     },
     "DollarBalanceRestriction": {
         "modalTitle": "Dollar-Guthaben ist in deiner Region nicht verfügbar"

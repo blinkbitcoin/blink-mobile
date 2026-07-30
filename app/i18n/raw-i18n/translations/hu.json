@@ -2571,8 +2571,11 @@
   "EnhancedModePrompt": {
     "title": "Ehhez a funkcióhoz Enhanced mód szükséges",
     "body": "Anon módban vagy, a Blink nem ismeri a régiódat, ezért néhány funkció nem érhető el. Válts Enhanced módra a helyellenőrzés futtatásához és a régiódban elérhető összes funkció feloldásához.",
-    "switchButton": "Váltás Enhanced módra",
-    "switched": "Átváltva önrendelkező Enhanced módra"
+    "switchButton": "Váltás Enhanced módra"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Átváltva önrendelkező Enhanced módra",
+    "anon": "Átváltva önrendelkező Anon módra"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "A dolláregyenleg nem érhető el a régiódban"

@@ -2571,8 +2571,11 @@
     "EnhancedModePrompt": {
         "title": "Questa funzione richiede la modalità Enhanced",
         "body": "Sei in modalità Anon, Blink non conosce la tua regione, quindi alcune funzioni non sono disponibili. Passa a Enhanced per eseguire un controllo della posizione e sbloccare tutte le funzioni per la tua regione.",
-        "switchButton": "Passa a Enhanced",
-        "switched": "Passato alla modalità Enhanced non custodita"
+        "switchButton": "Passa a Enhanced"
+    },
+    "ModeSwitchSuccessScreen": {
+        "enhanced": "Passato alla modalità Enhanced non custodita",
+        "anon": "Passato alla modalità Anon non custodita"
     },
     "DollarBalanceRestriction": {
         "modalTitle": "Il saldo in dollari non è disponibile nella tua regione"

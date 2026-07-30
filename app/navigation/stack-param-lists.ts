@@ -296,6 +296,7 @@ export type RootStackParamList = {
               accountId: string
             }
       }
+  selfCustodialModeSwitchSuccess: { mode: AccountMode }
   accountMigrationEntry: undefined
   accountMigrationStart: undefined
   accountMigrationExplainer: undefined

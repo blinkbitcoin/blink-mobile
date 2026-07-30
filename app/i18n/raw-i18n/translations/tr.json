@@ -2571,8 +2571,11 @@
   "EnhancedModePrompt": {
     "title": "Bu özellik Enhanced modu gerektirir",
     "body": "Anon modundasın, Blink bölgeni bilmiyor, bu yüzden bazı özellikler kullanılamıyor. Konum denetimi yapılması ve bölgen için tüm özelliklerin açılması için Enhanced moduna geç.",
-    "switchButton": "Enhanced moduna geç",
-    "switched": "Emanetsiz Enhanced moduna geçildi"
+    "switchButton": "Enhanced moduna geç"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Emanetsiz Enhanced moduna geçildi",
+    "anon": "Emanetsiz Anon moduna geçildi"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor"

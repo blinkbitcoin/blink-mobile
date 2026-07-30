@@ -2571,8 +2571,11 @@
   "EnhancedModePrompt": {
     "title": "Hierdie funksie benodig Enhanced-modus",
     "body": "Jy is in Anon-modus, Blink ken nie jou streek nie, dus is sommige funksies nie beskikbaar nie. Skakel oor na Enhanced om 'n liggingkontrole uit te voer en al die funksies vir jou streek te ontsluit.",
-    "switchButton": "Skakel oor na Enhanced",
-    "switched": "Oorgeskakel na Enhanced Self-bewaarde modus"
+    "switchButton": "Skakel oor na Enhanced"
+  },
+  "ModeSwitchSuccessScreen": {
+    "enhanced": "Oorgeskakel na Enhanced Self-bewaarde modus",
+    "anon": "Oorgeskakel na Anon Self-bewaarde modus"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dollar-saldo is nie beskikbaar in jou streek nie"
