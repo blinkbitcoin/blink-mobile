@@ -10,7 +10,7 @@ import {
   ChooseExperienceEntry,
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
-import { ACCOUNT_MODE_NAMES } from "@app/types/account"
+import { AccountMode, ACCOUNT_MODE_NAMES } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
 import { SettingsRow } from "../row"
@@ -25,9 +25,9 @@ export const AccountModeSetting: React.FC = () => {
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
   if (!isSelfCustodial) return null
 
-  const title = accountMode
-    ? `${LL.SettingsScreen.mode()}: ${ACCOUNT_MODE_NAMES[accountMode]}`
-    : LL.SettingsScreen.mode()
+  /** An account that never chose behaves as Enhanced, so the row reads that default. */
+  const displayedMode = accountMode ?? AccountMode.Enhanced
+  const title = `${LL.SettingsScreen.mode()}: ${ACCOUNT_MODE_NAMES[displayedMode]}`
   const openModeSelection = () =>
     navigation.navigate("selfCustodialChooseExperience", {
       entry: ChooseExperienceEntry.Settings,
