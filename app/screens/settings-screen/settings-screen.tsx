@@ -29,6 +29,7 @@ import { PhoneSetting } from "./account/settings/phone"
 import { SettingsGroup } from "./group"
 import { DefaultWallet } from "./settings/account-default-wallet"
 import { AccountLevelSetting } from "./settings/account-level"
+import { AccountModeSetting } from "./settings/account-mode"
 import { AccountLNAddress } from "./settings/account-ln-address"
 import { PhoneLnAddress } from "./settings/phone-ln-address"
 import { AccountPOS } from "./settings/account-pos"
@@ -112,6 +113,7 @@ export const SettingsScreen: React.FC = () => {
   const items = {
     account: [
       AccountLevelSetting,
+      AccountModeSetting,
       TxLimits,
       FeeRatesSetting,
       SwitchAccountSetting,

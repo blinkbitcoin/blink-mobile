@@ -9,6 +9,7 @@ import {
 } from "@app/components/success-animation"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conversion"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles } from "@rn-vui/themed"
@@ -23,21 +24,25 @@ export const ConversionSuccessScreen = () => {
   const route = useRoute<RouteProp<RootStackParamList, "conversionSuccess">>()
 
   const { LL } = useI18nContext()
-  const returnToMigration = route.params?.returnToMigration
+  const returnTo = route.params?.returnTo
 
   useEffect(() => {
-    /** A migration conversion resumes via the migration entry (as the Settings row does); a
-     *  standalone one returns to Home. */
+    /** A drain conversion resumes the flow that demanded it (migration entry, or the mode
+     *  selection for the Anon switch); a standalone one returns to Home. */
     const continueAfterSuccess = () => {
-      if (returnToMigration) {
+      if (returnTo === DrainConversionReturn.Migration) {
         navigation.replace("accountMigrationEntry")
+        return
+      }
+      if (returnTo === DrainConversionReturn.ModeSelection) {
+        navigation.replace("selfCustodialChooseExperience", { entry: "settings" })
         return
       }
       navigation.popToTop()
     }
     const timeout = setTimeout(continueAfterSuccess, CALLBACK_DELAY)
     return () => clearTimeout(timeout)
-  }, [navigation, returnToMigration])
+  }, [navigation, returnTo])
 
   return (
     <Screen preset="scroll" style={styles.screen}>

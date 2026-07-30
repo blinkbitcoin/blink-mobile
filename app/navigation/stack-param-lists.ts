@@ -12,6 +12,7 @@ import {
 } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import { PaymentDetail } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { PaymentSendCompletedStatus } from "@app/screens/send-bitcoin-screen/use-send-payment"
+import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conversion"
 import { AccountMode, AccountTypeMode } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
@@ -35,13 +36,25 @@ export const ChooseExperienceContinueRoute = {
 export type ChooseExperienceContinueRoute =
   (typeof ChooseExperienceContinueRoute)[keyof typeof ChooseExperienceContinueRoute]
 
+/** The onward step the onboarding entries carry. Derived off the route params so the two
+ *  cannot drift, and null on the settings entry, which has no onward step at all. */
+export type ChooseExperienceContinue = Extract<
+  RootStackParamList["selfCustodialChooseExperience"],
+  { onContinue: unknown }
+>["onContinue"]
+
 /** Whether the mode screen can offer a way back. Creation arrives from the account type
- *  screen with nothing provisioned yet, so leaving costs the user nothing. Restore and
- *  migration arrive after the account is already activated, and only the screen ahead
- *  resets to Primary: going back there strands a live account on an onboarding screen. */
+ *  screen with nothing provisioned yet, and settings opens it over a live session, so both
+ *  have somewhere coherent to return to. Restore and migration arrive after the account is
+ *  already activated, and only the screen ahead resets to Primary: going back there strands
+ *  a live account on an onboarding screen. */
 export const canGoBackFromChooseExperience = (
-  onContinue: RootStackParamList["selfCustodialChooseExperience"]["onContinue"],
-): boolean => onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
+  onContinue: ChooseExperienceContinue | null,
+): boolean => {
+  if (!onContinue) return true
+
+  return onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
+}
 
 export type RootStackParamList = {
   getStarted: undefined
@@ -96,15 +109,15 @@ export type RootStackParamList = {
   conversionConfirmation: {
     fromWalletCurrency: WalletCurrency
     moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
-    /** Where a completed migration convert lands (back in the flow, not Home). Navigation-only,
+    /** Where a completed drain convert lands (back in its flow, not Home). Navigation-only,
      *  never a privilege: the region waiver comes from the armed flag, not this forgeable param. */
-    isMigrationConversion?: boolean
+    drainConversion?: DrainConversionReturn | null
   }
   conversionSuccess:
     | {
-        /** Set when the conversion was a migration step, so the success screen returns to the
-         *  migration flow instead of Home. */
-        returnToMigration?: boolean
+        /** Set when the conversion drained a balance for a flow, so the success screen
+         *  returns there instead of Home. */
+        returnTo?: DrainConversionReturn
       }
     | undefined
   sendBitcoinCompleted: {
@@ -255,20 +268,24 @@ export type RootStackParamList = {
     successMessage?: string
   }
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
-  selfCustodialChooseExperience: {
-    /** The onward step. Restore and migration pass the account id (mode stored now); creation
-     *  has none yet, so the mode rides to wallet creation instead. */
-    onContinue:
-      | { route: typeof ChooseExperienceContinueRoute.AcceptTerms }
-      | {
-          route: typeof ChooseExperienceContinueRoute.BackupSuccess
-          accountId: string
-        }
-      | {
-          route: typeof ChooseExperienceContinueRoute.BalancesOverview
-          accountId: string
-        }
-  }
+  /** The settings entry applies the choice to the active account and returns. The
+   *  onboarding entries declare their onward step: restore and migration pass the
+   *  account id (mode stored now); creation has none yet, so the mode rides to wallet
+   *  creation instead. */
+  selfCustodialChooseExperience:
+    | { entry: "settings" }
+    | {
+        onContinue:
+          | { route: typeof ChooseExperienceContinueRoute.AcceptTerms }
+          | {
+              route: typeof ChooseExperienceContinueRoute.BackupSuccess
+              accountId: string
+            }
+          | {
+              route: typeof ChooseExperienceContinueRoute.BalancesOverview
+              accountId: string
+            }
+      }
   accountMigrationEntry: undefined
   accountMigrationStart: undefined
   accountMigrationExplainer: undefined
