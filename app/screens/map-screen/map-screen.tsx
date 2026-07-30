@@ -128,7 +128,7 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
 
   // Flow when location permissions are denied
   React.useEffect(() => {
-    if (countryCode && lastRegion && !isInitializing && !loading && !initialLocation) {
+    if (lastRegion && !isInitializing && !loading && !initialLocation) {
       // User has used map before, so we use their last viewed coords
       if (lastRegion.region) {
         const { latitude, longitude, latitudeDelta, longitudeDelta } = lastRegion.region
@@ -145,8 +145,10 @@ export const MapScreen: React.FC<Props> = ({ navigation }) => {
         const countryCodesToCoords: {
           data: Record<CountryCode, { lat: number; lng: number }>
         } = JSON.parse(JSON.stringify(countryCodes))
-        const countryCoords: { lat: number; lng: number } =
-          countryCodesToCoords.data[countryCode]
+        /** No resolved country (e.g. Anon Mode) falls through to the default coords. */
+        const countryCoords: { lat: number; lng: number } | undefined = countryCode
+          ? countryCodesToCoords.data[countryCode]
+          : undefined
         if (countryCoords) {
           const region: Region = {
             latitude: countryCoords.lat,

@@ -7,6 +7,8 @@ import { useCountryCodeQuery, useSettingsScreenQuery } from "@app/graphql/genera
 import { resolveIpCountryCodeCached } from "@app/utils/ip-country-lookup"
 import { logError } from "@app/utils/log-error"
 
+import { useSelfCustodialAccountMode } from "./use-self-custodial-account-mode"
+
 const DEFAULT_COUNTRY_CODE: CountryCode = "SV"
 
 export const LocationSource = {
@@ -28,10 +30,29 @@ type DeviceLocation = {
   source: LocationSource | undefined
 }
 
-const useDeviceLocation = (): DeviceLocation => {
+const NO_LOCATION: DeviceLocation = {
+  countryCode: undefined,
+  loading: false,
+  detectionFailed: false,
+  source: undefined,
+}
+
+type DeviceLocationOptions = {
+  /** Custodial flows (phone auth) sit outside the self-custodial Anon rule and keep
+   *  detecting normally even while an Anon account is the active one. */
+  isCustodialFlow?: boolean
+}
+
+/** Anon Mode never resolves a location: the guard lives here so no consumer can leak a lookup. */
+const useDeviceLocation = ({
+  isCustodialFlow = false,
+}: DeviceLocationOptions = {}): DeviceLocation => {
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const isDetectionBlocked = isAnonMode && !isCustodialFlow
   const client = useApolloClient()
-  const { data, error } = useCountryCodeQuery()
+  const { data, error } = useCountryCodeQuery({ skip: isDetectionBlocked })
   const { data: settingsData } = useSettingsScreenQuery({
+    skip: isDetectionBlocked,
     fetchPolicy: "cache-first",
   })
 
@@ -42,8 +63,20 @@ const useDeviceLocation = (): DeviceLocation => {
 
   const userPhone = settingsData?.me?.phone
 
+  /** Entering Anon discards prior results; leaving re-arms loading for the fresh resolve. */
   useEffect(() => {
-    if (!userPhone) return
+    if (isDetectionBlocked) {
+      setCountryCode(undefined)
+      setSource(undefined)
+      setDetectionFailed(false)
+      setLoading(false)
+      return
+    }
+    setLoading(true)
+  }, [isDetectionBlocked])
+
+  useEffect(() => {
+    if (isDetectionBlocked || !userPhone) return
     setSource(LocationSource.Phone)
     try {
       const parsed = parsePhoneNumber(userPhone)
@@ -71,9 +104,10 @@ const useDeviceLocation = (): DeviceLocation => {
       })
     }
     setLoading(false)
-  }, [userPhone, client])
+  }, [isDetectionBlocked, userPhone, client])
 
   useEffect(() => {
+    if (isDetectionBlocked) return
     if (error && !userPhone) {
       setCountryCode(DEFAULT_COUNTRY_CODE)
       setSource(LocationSource.Ip)
@@ -85,14 +119,17 @@ const useDeviceLocation = (): DeviceLocation => {
         context: { source: "country-code-query" },
       })
     }
-  }, [error, userPhone])
+  }, [isDetectionBlocked, error, userPhone])
 
   useEffect(() => {
-    if (!data || userPhone) return
+    if (isDetectionBlocked || !data || userPhone) return
     setSource(LocationSource.Ip)
+    /** A lookup still in flight when Anon starts must not write state or the cache. */
+    let active = true
     const getLocation = async () => {
       const cached = data.countryCode as CountryCode | undefined
       const ipCountryCode = await resolveIpCountryCodeCached()
+      if (!active) return
       if (ipCountryCode) {
         setCountryCode(ipCountryCode)
         setDetectionFailed(false)
@@ -104,7 +141,12 @@ const useDeviceLocation = (): DeviceLocation => {
       setLoading(false)
     }
     getLocation()
-  }, [data, client, userPhone])
+    return () => {
+      active = false
+    }
+  }, [isDetectionBlocked, data, client, userPhone])
+
+  if (isDetectionBlocked) return NO_LOCATION
 
   return {
     countryCode,
@@ -115,8 +157,12 @@ const useDeviceLocation = (): DeviceLocation => {
 }
 
 export const usePhoneCountryCode = (): CountryCode | undefined => {
-  const { data } = useSettingsScreenQuery({ fetchPolicy: "cache-first" })
-  const phone = data?.me?.phone
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const { data } = useSettingsScreenQuery({
+    skip: isAnonMode,
+    fetchPolicy: "cache-first",
+  })
+  const phone = isAnonMode ? undefined : data?.me?.phone
 
   return useMemo(() => {
     if (!phone) return undefined
@@ -136,11 +182,13 @@ type IpCountryLookup = {
 }
 
 export const useIpCountryLookup = (enabled: boolean): IpCountryLookup => {
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const isLookupEnabled = enabled && !isAnonMode
   const [ipCountryCode, setIpCountryCode] = useState<CountryCode | undefined>()
   const [hasLookupFinished, setHasLookupFinished] = useState(false)
 
   useEffect(() => {
-    if (!enabled) {
+    if (!isLookupEnabled) {
       setIpCountryCode(undefined)
       setHasLookupFinished(false)
       return undefined
@@ -154,15 +202,16 @@ export const useIpCountryLookup = (enabled: boolean): IpCountryLookup => {
     return () => {
       active = false
     }
-  }, [enabled])
+  }, [isLookupEnabled])
 
-  const isLookupSettled = !enabled || hasLookupFinished
+  const isLookupSettled = !isLookupEnabled || hasLookupFinished
 
-  /** Both fields derive from `enabled` in the same render: the effect clears the stored
-   *  country a commit later, and returning it in between would leak a stale country as a
-   *  settled verdict on the render where the lookup disables. */
+  /** Both fields derive from `isLookupEnabled` in the same render: the effect clears the
+   *  stored country a commit later, and returning it in between would leak a stale country
+   *  as a settled verdict on the render where the lookup disables (e.g. entering Anon
+   *  right after a resolve). */
   return {
-    countryCode: enabled ? ipCountryCode : undefined,
+    countryCode: isLookupEnabled ? ipCountryCode : undefined,
     isSettled: isLookupSettled,
   }
 }

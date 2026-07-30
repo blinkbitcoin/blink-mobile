@@ -166,12 +166,7 @@ jest.mock("@apollo/client", () => {
   }
 })
 
-/** Mocked wholesale: the real module warns at load time when no API key is configured. */
-jest.mock("@app/utils/ip-country-lookup", () => ({
-  DEFAULT_ADAPTERS: [],
-  resolveIpCountryCode: jest.fn(async () => undefined),
-  resolveIpCountryCodeCached: jest.fn(async () => undefined),
-}))
+jest.mock("@app/utils/ip-country-lookup")
 
 /** The fake Apollo client above has no writeQuery, so the real updateCountryCode would throw and warn on every device-location render. */
 jest.mock("@app/graphql/client-only-query", () => ({
