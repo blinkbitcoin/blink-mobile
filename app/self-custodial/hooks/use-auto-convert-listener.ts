@@ -348,8 +348,11 @@ export const useAutoConvertListener = (): void => {
 
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return
-    /** Skipped before the done-mark so leaving Anon Mode still gets its replay. */
-    if (isAnonMode) return
+    /** An Anon interval re-arms the replay, so exit picks up every pending record. */
+    if (isAnonMode) {
+      initialReplayDoneRef.current = false
+      return
+    }
     if (initialReplayDoneRef.current) return
     initialReplayDoneRef.current = true
 
