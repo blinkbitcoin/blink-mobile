@@ -11,6 +11,7 @@ import {
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
 import { addBounded } from "@app/utils/bounded-collections"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
@@ -222,6 +223,7 @@ const findPaidAmountForInvoice = async (
 export const useAutoConvertListener = (): void => {
   const wallet = useSelfCustodialWallet()
   const { sdk, lastReceivedPaymentId, refreshWallets } = wallet
+  const { isAnonMode } = useSelfCustodialAccountMode()
   // Defaults unknown to not-active so existing records still process.
   const isStableBalanceActive = wallet.isStableBalanceActive ?? false
   const { convertMoneyAmount } = usePriceConversion()
@@ -298,6 +300,8 @@ export const useAutoConvertListener = (): void => {
 
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return
+    /** Anon Mode receives stay bitcoin: pending records wait until the mode is off. */
+    if (isAnonMode) return
     if (!lastReceivedPaymentId) return
     if (processedPaymentIdsRef.current.has(lastReceivedPaymentId)) return
     addBounded(
@@ -334,10 +338,18 @@ export const useAutoConvertListener = (): void => {
     }
 
     run().catch((err) => reportError("auto-convert-listener live run", err))
-  }, [sdk, lastReceivedPaymentId, convertMoneyAmount, processWithInFlightLock])
+  }, [
+    sdk,
+    lastReceivedPaymentId,
+    convertMoneyAmount,
+    isAnonMode,
+    processWithInFlightLock,
+  ])
 
   useEffect(() => {
     if (!sdk || !convertMoneyAmount) return
+    /** Skipped before the done-mark so leaving Anon Mode still gets its replay. */
+    if (isAnonMode) return
     if (initialReplayDoneRef.current) return
     initialReplayDoneRef.current = true
 
@@ -389,5 +401,11 @@ export const useAutoConvertListener = (): void => {
     }
 
     replay().catch((err) => reportError("auto-convert-listener replay", err))
-  }, [sdk, convertMoneyAmount, processWithInFlightLock, autoConvertMaxAttempts])
+  }, [
+    sdk,
+    convertMoneyAmount,
+    isAnonMode,
+    processWithInFlightLock,
+    autoConvertMaxAttempts,
+  ])
 }
