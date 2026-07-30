@@ -2370,6 +2370,7 @@
     "apiAcess": "API prístup",
     "apiDocumentation": "API dokumentácia",
     "apiDashboard": "API prístup a dashboard",
+    "mode": "Režim",
     "pos": "Terminál PoS",
     "posCopied": "Váš Terminál PoS bol skopírovaný",
     "activated": "Aktivované",
@@ -2501,7 +2502,18 @@
     "removedAccount": "Odstránili ste účet {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "nie je vo vašom regióne k dispozícii"
+    "walletLabel": "nie je vo vašom regióne k dispozícii",
+    "anonModeWalletLabel": "nedostupné v režime Anon"
+  },
+  "AnonModeConvertModal": {
+    "title": "Najprv preveďte svoj dolárový zostatok",
+    "body": "Režim Anon podporuje iba bitcoinový zostatok. Preveďte svoj dolárový zostatok na bitcoinový, aby ste mohli prepnúť."
+  },
+  "EnhancedModePrompt": {
+    "title": "Táto funkcia vyžaduje režim Enhanced",
+    "body": "Ste v režime Anon, Blink nepozná váš región, takže niektoré funkcie nie sú dostupné. Prepnite na Enhanced, aby prebehla kontrola polohy a odomkli sa všetky funkcie pre váš región.",
+    "switchButton": "Prepnúť na Enhanced",
+    "switched": "Prepnuté na režim Enhanced s vlastnou správou"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolárový zostatok nie je vo vašom regióne k dispozícii"
@@ -2627,7 +2639,6 @@
     "letsGo": "Poďme na to!",
     "stayInTrialMode": "Zostať v skúšobnom režime",
     "upgradeToLevel": "Inovovať na Úroveň {level: number}",
-    "notNow": "Teraz nie",
     "setUpLevelAccount": "Nastaviť účet Úrovne {level: number}"
   },
   "SetAddressModal": {
@@ -2805,6 +2816,7 @@
     "bitcoinPrice": "Cena bitcoinu",
     "btcAccount": "Bitcoinový zostatok",
     "cancel": "Zrušiť",
+    "notNow": "Teraz nie",
     "card": "Karta",
     "close": "Zatvoriť",
     "confirm": "Potvrdiť",

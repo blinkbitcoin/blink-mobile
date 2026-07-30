@@ -2370,6 +2370,7 @@
     "apiAcess": "API-integration",
     "apiDocumentation": "API-dokumentation",
     "apiDashboard": "API-adgang og dashboard",
+    "mode": "Tilstand",
     "pos": "Kasseterminal",
     "posCopied": "Dit kasseterminal-link er blevet kopieret",
     "activated": "Aktiveret",
@@ -2501,7 +2502,18 @@
     "removedAccount": "Du fjernede kontoen {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "ikke tilgængelig i din region"
+    "walletLabel": "ikke tilgængelig i din region",
+    "anonModeWalletLabel": "ikke tilgængelig i Anon-tilstand"
+  },
+  "AnonModeConvertModal": {
+    "title": "Overfør først din dollarsaldo",
+    "body": "Anon-tilstand understøtter kun Bitcoin-saldoen. Overfør din dollarsaldo til din Bitcoin-saldo for at skifte."
+  },
+  "EnhancedModePrompt": {
+    "title": "Denne funktion kræver Enhanced-tilstand",
+    "body": "Du er i Anon-tilstand, Blink kender ikke din region, så nogle funktioner er ikke tilgængelige. Skift til Enhanced for at køre et positionstjek og låse op for alle funktioner i din region.",
+    "switchButton": "Skift til Enhanced",
+    "switched": "Skiftet til Enhanced selvforvaltet tilstand"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dollar-saldo er ikke tilgængelig i din region"
@@ -2627,7 +2639,6 @@
     "letsGo": "Lad os komme i gang!",
     "stayInTrialMode": "Bliv i prøvetilstand",
     "upgradeToLevel": "Opgrader til niveau {level: number}",
-    "notNow": "Ikke nu",
     "setUpLevelAccount": "Opsæt niveau {level: number} konto"
   },
   "SetAddressModal": {
@@ -2805,6 +2816,7 @@
     "bitcoinPrice": "Bitcoin Pris",
     "btcAccount": "Bitcoin-konto",
     "cancel": "Annuller",
+    "notNow": "Ikke nu",
     "card": "Kort",
     "close": "Luk",
     "confirm": "Bekræft",

@@ -2370,6 +2370,7 @@
         "apiAcess": "Accesso API",
         "apiDocumentation": "Documentazione API",
         "apiDashboard": "Accesso API e dashboard",
+        "mode": "Modalità",
         "pos": "Punto di vendita",
         "posCopied": "Il link del tuo punto vendita è stato copiato",
         "activated": "Attivato",
@@ -2501,7 +2502,18 @@
         "removedAccount": "Hai rimosso l'account {identifier: string}."
     },
     "StablesatsRestriction": {
-        "walletLabel": "non è disponibile nella tua regione"
+        "walletLabel": "non è disponibile nella tua regione",
+        "anonModeWalletLabel": "non disponibile in modalità Anon"
+    },
+    "AnonModeConvertModal": {
+        "title": "Trasferisci prima il tuo saldo in dollari",
+        "body": "La modalità Anon supporta solo il saldo Bitcoin. Trasferisci il tuo saldo in dollari sul saldo Bitcoin per passare."
+    },
+    "EnhancedModePrompt": {
+        "title": "Questa funzione richiede la modalità Enhanced",
+        "body": "Sei in modalità Anon, Blink non conosce la tua regione, quindi alcune funzioni non sono disponibili. Passa a Enhanced per eseguire un controllo della posizione e sbloccare tutte le funzioni per la tua regione.",
+        "switchButton": "Passa a Enhanced",
+        "switched": "Passato alla modalità Enhanced non custodita"
     },
     "DollarBalanceRestriction": {
         "modalTitle": "Il saldo in dollari non è disponibile nella tua regione"
@@ -2627,7 +2639,6 @@
         "letsGo": "Andiamo!",
         "stayInTrialMode": "Rimani in modalità di prova",
         "upgradeToLevel": "Passa al Livello {level: number}",
-        "notNow": "Non ora",
         "setUpLevelAccount": "Configura account Livello {level: number}"
     },
     "SetAddressModal": {
@@ -2805,6 +2816,7 @@
         "bitcoinPrice": "Prezzo del Bitcoin",
         "btcAccount": "Conto Bitcoin",
         "cancel": "Cancella",
+        "notNow": "Non ora",
         "card": "Carta",
         "close": "Chiudi",
         "confirm": "Conferma",

@@ -2370,6 +2370,7 @@
     "apiAcess": "Okutuuka ku API",
     "apiDocumentation": "Ebiwandiiko bya API",
     "apiDashboard": "Okuyingira mu API ne dashiboodi",
+    "mode": "Modu",
     "pos": "Ekifo we Batunda",
     "posCopied": "Ennyunga ku kifo kyo eky'okutunda ekoppeddwa",
     "activated": "Ekoleddwa",
@@ -2501,7 +2502,18 @@
     "removedAccount": "Oggyewo akawunti {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "teriiwo mu kitundu kyo"
+    "walletLabel": "teriiwo mu kitundu kyo",
+    "anonModeWalletLabel": "tekiriiwo mu modu ya Anon"
+  },
+  "AnonModeConvertModal": {
+    "title": "Sooka okyuse ssente zo eza Doola",
+    "body": "Modu ya Anon ekola ku balansi ya Bitcoin yokka. Kyusa balansi yo eya Doola ku balansi ya Bitcoin okusobola okukyuka."
+  },
+  "EnhancedModePrompt": {
+    "title": "Ekintu kino kyetaaga modu ya Enhanced",
+    "body": "Oli mu modu ya Anon, Blink temanyi kitundu kyo, n'olwekyo ebintu ebimu tebiriiwo. Kyusa ku Enhanced okukola okukebera ekifo n'okusumulula ebintu byonna eby'ekitundu kyo.",
+    "switchButton": "Kyusa ku Enhanced",
+    "switched": "Okyusizza ku modu ya Enhanced eyeefuga"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo"
@@ -2627,7 +2639,6 @@
     "letsGo": "Ka tugende!",
     "stayInTrialMode": "Sigala mu nkola ey'okugezesa",
     "upgradeToLevel": "Yimusa eri Omutendera {level: number}",
-    "notNow": "Si kati",
     "setUpLevelAccount": "Teekateeka akawunti ey'Omutendera {level: number}"
   },
   "SetAddressModal": {
@@ -2805,6 +2816,7 @@
     "bitcoinPrice": "Okulamula kwa Bitcoin",
     "btcAccount": "Akawunti ya Bitcoin",
     "cancel": "Sazaamu",
+    "notNow": "Si kati",
     "card": "Kaadi",
     "close": "Ggalawo",
     "confirm": "Kakasa",

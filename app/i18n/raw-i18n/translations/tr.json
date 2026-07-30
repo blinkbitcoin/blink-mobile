@@ -2370,6 +2370,7 @@
     "apiAcess": "API Erişimi",
     "apiDocumentation": "API dokümantasyonu",
     "apiDashboard": "API erişimi ve kontrol paneli",
+    "mode": "Mod",
     "pos": "Satış Noktası",
     "posCopied": "Satış noktası bağlantınız kopyalandı",
     "activated": "Aktive edildi",
@@ -2501,7 +2502,18 @@
     "removedAccount": "{identifier: string} hesabını kaldırdınız."
   },
   "StablesatsRestriction": {
-    "walletLabel": "bölgenizde kullanılamıyor"
+    "walletLabel": "bölgenizde kullanılamıyor",
+    "anonModeWalletLabel": "Anon modunda kullanılamaz"
+  },
+  "AnonModeConvertModal": {
+    "title": "Önce Dolar bakiyeni aktar",
+    "body": "Anon modu yalnızca Bitcoin bakiyesini destekler. Geçiş yapmak için Dolar bakiyeni Bitcoin bakiyene aktar."
+  },
+  "EnhancedModePrompt": {
+    "title": "Bu özellik Enhanced modu gerektirir",
+    "body": "Anon modundasın, Blink bölgeni bilmiyor, bu yüzden bazı özellikler kullanılamıyor. Konum denetimi yapılması ve bölgen için tüm özelliklerin açılması için Enhanced moduna geç.",
+    "switchButton": "Enhanced moduna geç",
+    "switched": "Emanetsiz Enhanced moduna geçildi"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor"
@@ -2627,7 +2639,6 @@
     "letsGo": "Haydi!",
     "stayInTrialMode": "Deneme modunda kal",
     "upgradeToLevel": "Seviye {level: number}'e yükselt",
-    "notNow": "Şimdi değil",
     "setUpLevelAccount": "Seviye {level: number} hesabını kur"
   },
   "SetAddressModal": {
@@ -2805,6 +2816,7 @@
     "bitcoinPrice": "Bitcoin fiyatı",
     "btcAccount": "Bitcoin Bakiyesi",
     "cancel": "İptal",
+    "notNow": "Şimdi değil",
     "card": "Kart",
     "close": "Kapat",
     "confirm": "Onayla",

@@ -191,7 +191,7 @@ export const EmailRegistrationInitiateScreen: React.FC<
           />
           {onboarding && (
             <GaloySecondaryButton
-              title={LL.UpgradeAccountModal.notNow()}
+              title={LL.common.notNow()}
               onPress={onboardingNavigate}
               containerStyle={styles.secondaryButtonContainer}
             />

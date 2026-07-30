@@ -221,7 +221,7 @@ export const SetLightningAddressScreen: React.FC<{
         />
         {onboarding && (
           <GaloySecondaryButton
-            title={LL.UpgradeAccountModal.notNow()}
+            title={LL.common.notNow()}
             onPress={navigateSupportAllowBack}
             containerStyle={styles.secondaryButtonContainer}
           />

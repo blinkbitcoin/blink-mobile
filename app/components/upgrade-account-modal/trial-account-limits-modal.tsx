@@ -61,7 +61,7 @@ export const TrialAccountLimitsModal: React.FC<TrialAccountLimitsModalProps> = (
       }
       primaryButtonTitle={LL.UpgradeAccountModal.upgradeToLevel({ level: UPGRADE_TO })}
       primaryButtonOnPress={navigateToPhoneLogin}
-      secondaryButtonTitle={LL.UpgradeAccountModal.notNow()}
+      secondaryButtonTitle={LL.common.notNow()}
       secondaryButtonOnPress={closeModal}
     />
   )

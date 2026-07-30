@@ -2370,6 +2370,7 @@
         "apiAcess": "API連携",
         "apiDocumentation": "APIドキュメント",
         "apiDashboard": "APIアクセスとダッシュボード",
+        "mode": "モード",
         "pos": "ポイント・オブ・セール",
         "posCopied": "ポイント・オブ・セールのリンクをコピーしました",
         "activated": "アクティベーション",
@@ -2501,7 +2502,18 @@
         "removedAccount": "アカウント {identifier: string} を削除しました。"
     },
     "StablesatsRestriction": {
-        "walletLabel": "あなたの地域ではご利用いただけません"
+        "walletLabel": "あなたの地域ではご利用いただけません",
+        "anonModeWalletLabel": "Anon モードでは利用できません"
+    },
+    "AnonModeConvertModal": {
+        "title": "まずドル残高を移してください",
+        "body": "Anon モードは Bitcoin 残高のみに対応しています。切り替えるには、ドル残高を Bitcoin 残高に移してください。"
+    },
+    "EnhancedModePrompt": {
+        "title": "この機能には Enhanced モードが必要です",
+        "body": "Anon モードでは Blink はお住まいの地域を把握していないため、一部の機能は利用できません。Enhanced に切り替えると位置チェックが実行され、地域で利用できるすべての機能が解放されます。",
+        "switchButton": "Enhanced に切り替える",
+        "switched": "Enhanced ノンカストディアルモードに切り替えました"
     },
     "DollarBalanceRestriction": {
         "modalTitle": "ドル残高はあなたの地域ではご利用いただけません"
@@ -2627,7 +2639,6 @@
         "letsGo": "レッツゴー！",
         "stayInTrialMode": "トライアルモードを続ける",
         "upgradeToLevel": "レベル{level: number}にアップグレード",
-        "notNow": "今はしない",
         "setUpLevelAccount": "レベル{level: number}アカウントを設定"
     },
     "SetAddressModal": {
@@ -2805,6 +2816,7 @@
         "bitcoinPrice": "ビットコイン価格",
         "btcAccount": "ビットコインウォレット",
         "cancel": "キャンセル",
+        "notNow": "今はしない",
         "card": "カード",
         "close": "閉じる",
         "confirm": "承認する",

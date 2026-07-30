@@ -2370,6 +2370,7 @@
     "apiAcess": "Πρόσβαση μέσω API",
     "apiDocumentation": "Τεκμηρίωση API",
     "apiDashboard": "Πρόσβαση API και πίνακας ελέγχου",
+    "mode": "Λειτουργία",
     "pos": "Σημείο πώλησης",
     "posCopied": "Ο σύνδεσμος του σημείου πώλησής σας έχει αντιγραφεί",
     "activated": "Ενεργοποιήθηκε ",
@@ -2501,7 +2502,18 @@
     "removedAccount": "Αφαιρέσατε τον λογαριασμό {identifier: string}."
   },
   "StablesatsRestriction": {
-    "walletLabel": "δεν είναι διαθέσιμο στην περιοχή σου"
+    "walletLabel": "δεν είναι διαθέσιμο στην περιοχή σου",
+    "anonModeWalletLabel": "μη διαθέσιμο σε λειτουργία Anon"
+  },
+  "AnonModeConvertModal": {
+    "title": "Μετάφερε πρώτα το υπόλοιπό σου σε δολάρια",
+    "body": "Η λειτουργία Anon υποστηρίζει μόνο το υπόλοιπο Bitcoin. Μετάφερε το υπόλοιπό σου σε δολάρια στο υπόλοιπο Bitcoin για να αλλάξεις."
+  },
+  "EnhancedModePrompt": {
+    "title": "Αυτή η δυνατότητα απαιτεί τη λειτουργία Enhanced",
+    "body": "Βρίσκεσαι σε λειτουργία Anon, το Blink δεν γνωρίζει την περιοχή σου, οπότε ορισμένες δυνατότητες δεν είναι διαθέσιμες. Άλλαξε σε Enhanced για να γίνει έλεγχος τοποθεσίας και να ξεκλειδωθούν όλες οι δυνατότητες για την περιοχή σου.",
+    "switchButton": "Αλλαγή σε Enhanced",
+    "switched": "Άλλαξες σε λειτουργία Enhanced χωρίς θεματοφυλακή"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "Το υπόλοιπο δολαρίων δεν είναι διαθέσιμο στην περιοχή σου"
@@ -2627,7 +2639,6 @@
     "letsGo": "Πάμε! ",
     "stayInTrialMode": "Μείνετε σε δοκιμαστική λειτουργία",
     "upgradeToLevel": "Αναβάθμιση σε Επίπεδο {level: number}",
-    "notNow": "Όχι τώρα",
     "setUpLevelAccount": "Ρύθμιση λογαριασμού Επιπέδου {level: number}"
   },
   "SetAddressModal": {
@@ -2805,6 +2816,7 @@
     "bitcoinPrice": "Τιμή του Bitcoin",
     "btcAccount": "Λογαριασμός Bitcoin ",
     "cancel": "Ακύρωση",
+    "notNow": "Όχι τώρα",
     "card": "Κάρτα",
     "close": "Κλείσιμο",
     "confirm": "Επιβεβαιώστε ",

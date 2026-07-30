@@ -2370,6 +2370,7 @@
     "apiAcess": "API hozzáférés",
     "apiDocumentation": "API dokumentáció",
     "apiDashboard": "API hozzáférés és kezelőpanel",
+    "mode": "Mód",
     "pos": "Értékesítési pont",
     "posCopied": "Az értékesítési pont hivatkozásod másolva lett",
     "activated": "Aktiválva",
@@ -2501,7 +2502,18 @@
     "removedAccount": "Eltávolítottad a(z) {identifier: string} fiókot."
   },
   "StablesatsRestriction": {
-    "walletLabel": "nem érhető el a régiódban"
+    "walletLabel": "nem érhető el a régiódban",
+    "anonModeWalletLabel": "Anon módban nem érhető el"
+  },
+  "AnonModeConvertModal": {
+    "title": "Először utald át a dolláregyenleged",
+    "body": "Az Anon mód csak a Bitcoin-egyenleget támogatja. Utald át a dolláregyenleged a Bitcoin-egyenlegedre a váltáshoz."
+  },
+  "EnhancedModePrompt": {
+    "title": "Ehhez a funkcióhoz Enhanced mód szükséges",
+    "body": "Anon módban vagy, a Blink nem ismeri a régiódat, ezért néhány funkció nem érhető el. Válts Enhanced módra a helyellenőrzés futtatásához és a régiódban elérhető összes funkció feloldásához.",
+    "switchButton": "Váltás Enhanced módra",
+    "switched": "Átváltva önrendelkező Enhanced módra"
   },
   "DollarBalanceRestriction": {
     "modalTitle": "A dolláregyenleg nem érhető el a régiódban"
@@ -2627,7 +2639,6 @@
     "letsGo": "Gyerünk!",
     "stayInTrialMode": "Maradj próbaverzióban",
     "upgradeToLevel": "Frissítés {level: number}. szintre",
-    "notNow": "Most nem",
     "setUpLevelAccount": "{level: number}. szintű fiók beállítása"
   },
   "SetAddressModal": {
@@ -2805,6 +2816,7 @@
     "bitcoinPrice": "Bitcoin Ár",
     "btcAccount": "Bitcoin Egyenleg",
     "cancel": "Mégse",
+    "notNow": "Most nem",
     "card": "Kártya",
     "close": "Bezárás",
     "confirm": "Megerősítés",
