@@ -50,6 +50,11 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   }),
 }))
 
+const mockRefreshWallets = jest.fn()
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => ({ refreshWallets: mockRefreshWallets }),
+}))
+
 const mockArmModeSelectionConversion = jest.fn()
 jest.mock("@app/screens/conversion-flow/drain-conversion", () => ({
   ...jest.requireActual("@app/screens/conversion-flow/drain-conversion"),
@@ -124,6 +129,7 @@ describe("ChooseExperienceScreen", () => {
     mockStoredModes = {}
     mockUsdBalance = 0
     mockWalletReady = true
+    mockRefreshWallets.mockResolvedValue(undefined)
     mockRouteParams = {
       onContinue: { route: "selfCustodialBackupSuccess", accountId: "sc-account-1" },
     }
@@ -322,6 +328,30 @@ describe("ChooseExperienceScreen", () => {
     )
     expect(mockSetActiveAccountMode).not.toHaveBeenCalled()
     expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  it("resumes with Anon preselected when returning from the drain conversion", async () => {
+    mockRouteParams = { entry: "settings", initialMode: AccountMode.Anon }
+    mockAccountMode = AccountMode.Enhanced
+    const { getByTestId } = await renderScreen()
+
+    fireEvent.press(getByTestId(continueTestId))
+
+    expect(mockSetActiveAccountMode).toHaveBeenCalledWith(AccountMode.Anon)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  it("refreshes the wallet balance on the settings entry", async () => {
+    mockRouteParams = { entry: "settings" }
+    await renderScreen()
+
+    expect(mockRefreshWallets).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not refresh the wallet balance on onboarding entries", async () => {
+    await renderScreen()
+
+    expect(mockRefreshWallets).not.toHaveBeenCalled()
   })
 
   it("does not mount the conversion modal until the gate demands it", async () => {

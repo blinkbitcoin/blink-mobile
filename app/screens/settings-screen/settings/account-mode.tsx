@@ -6,7 +6,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  ChooseExperienceEntry,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { ACCOUNT_MODE_NAMES } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
@@ -26,7 +29,9 @@ export const AccountModeSetting: React.FC = () => {
     ? `${LL.SettingsScreen.mode()}: ${ACCOUNT_MODE_NAMES[accountMode]}`
     : LL.SettingsScreen.mode()
   const openModeSelection = () =>
-    navigation.navigate("selfCustodialChooseExperience", { entry: "settings" })
+    navigation.navigate("selfCustodialChooseExperience", {
+      entry: ChooseExperienceEntry.Settings,
+    })
 
   return <SettingsRow title={title} leftGaloyIcon="location" action={openModeSelection} />
 }

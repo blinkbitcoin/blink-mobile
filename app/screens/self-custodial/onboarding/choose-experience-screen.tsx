@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -17,6 +17,7 @@ import {
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { armModeSelectionConversion } from "@app/screens/conversion-flow/drain-conversion"
+import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountMode } from "@app/types/account"
 import { testProps } from "@app/utils/testProps"
 
@@ -39,10 +40,15 @@ export const ChooseExperienceScreen: React.FC = () => {
   const { accountMode, getModeFor, setAccountMode, setActiveAccountMode } =
     useSelfCustodialAccountMode()
   const { wallets, isReady: isWalletReady } = useActiveWallet()
+  const { refreshWallets } = useSelfCustodialWallet()
   const [isConvertModalVisible, setIsConvertModalVisible] = useState(false)
 
   /** Null on the settings entry; the onboarding entries carry their onward step. */
   const onContinue = "entry" in route.params ? null : route.params.onContinue
+  const isSettingsEntry = onContinue === null
+  /** Carried back by the drain conversion, so the interrupted switch resumes selected. */
+  const settingsInitialMode =
+    "entry" in route.params ? route.params.initialMode ?? null : null
 
   /** Settings preselects the active account's mode; a restore that already knows its
    *  account honors that account's stored mode. Re-entry (a back press out of the next
@@ -52,8 +58,13 @@ export const ChooseExperienceScreen: React.FC = () => {
     onContinue && "accountId" in onContinue ? getModeFor(onContinue.accountId) : null
   const initialMode = onContinue
     ? storedOnboardingMode ?? AccountMode.Enhanced
-    : accountMode ?? AccountMode.Enhanced
+    : settingsInitialMode ?? accountMode ?? AccountMode.Enhanced
   const [selected, setSelected] = useState<AccountMode>(initialMode)
+
+  /** The settings gate decides on the live balance, so it is refreshed on entry. */
+  useEffect(() => {
+    if (isSettingsEntry) refreshWallets().catch(() => undefined)
+  }, [isSettingsEntry, refreshWallets])
 
   const usdWallet = wallets.find((wallet) => wallet.walletCurrency === WalletCurrency.Usd)
   const hasDollarBalance = (usdWallet?.balance.amount ?? 0) > 0

@@ -31,6 +31,12 @@ export const ChooseExperienceContinueRoute = {
 export type ChooseExperienceContinueRoute =
   (typeof ChooseExperienceContinueRoute)[keyof typeof ChooseExperienceContinueRoute]
 
+export const ChooseExperienceEntry = {
+  Settings: "settings",
+} as const
+export type ChooseExperienceEntry =
+  (typeof ChooseExperienceEntry)[keyof typeof ChooseExperienceEntry]
+
 export type RootStackParamList = {
   getStarted: undefined
   accountTypeSelection: { mode: AccountTypeMode }
@@ -231,7 +237,11 @@ export type RootStackParamList = {
    *  account id (mode stored now); creation has none yet, so the mode rides to wallet
    *  creation instead. */
   selfCustodialChooseExperience:
-    | { entry: "settings" }
+    | {
+        entry: typeof ChooseExperienceEntry.Settings
+        /** Set when returning from the drain conversion, so the switch resumes preselected. */
+        initialMode?: AccountMode
+      }
     | {
         onContinue:
           | { route: typeof ChooseExperienceContinueRoute.AcceptTerms }

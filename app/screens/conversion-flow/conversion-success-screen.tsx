@@ -8,13 +8,38 @@ import {
   CompletedTextAnimation,
 } from "@app/components/success-animation"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  ChooseExperienceEntry,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conversion"
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import { AccountMode } from "@app/types/account"
+import {
+  CommonActions,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 const CALLBACK_DELAY = 3000
+
+/** Rebuilds the path the drain came from, with the Anon switch preselected to resume it. */
+const MODE_SELECTION_RETURN = CommonActions.reset({
+  index: 2,
+  routes: [
+    { name: "Primary" },
+    { name: "settings" },
+    {
+      name: "selfCustodialChooseExperience",
+      params: {
+        entry: ChooseExperienceEntry.Settings,
+        initialMode: AccountMode.Anon,
+      },
+    },
+  ],
+})
 
 export const ConversionSuccessScreen = () => {
   const styles = useStyles()
@@ -35,7 +60,7 @@ export const ConversionSuccessScreen = () => {
         return
       }
       if (returnTo === DrainConversionReturn.ModeSelection) {
-        navigation.replace("selfCustodialChooseExperience", { entry: "settings" })
+        navigation.dispatch(MODE_SELECTION_RETURN)
         return
       }
       navigation.popToTop()
