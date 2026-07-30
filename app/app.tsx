@@ -40,6 +40,7 @@ import { PersistentStateProvider } from "./store/persistent-state"
 import { detectDefaultLocale } from "./utils/locale-detector"
 import "./utils/logs"
 import { ActionModals, ActionsProvider } from "./components/actions"
+import { EnhancedModePromptProvider } from "./components/enhanced-mode-prompt"
 
 // Lazy load only the default locale instead of all 27 locales
 // This reduces startup time by 3-5 seconds on Android
@@ -68,14 +69,16 @@ export const App = () => (
                           <NavigationContainerWrapper>
                             <ErrorBoundary FallbackComponent={ErrorScreen}>
                               <RootSiblingParent>
-                                <NotificationsProvider>
-                                  <AppStateWrapper />
-                                  <PushNotificationComponent />
-                                  <AutoConvertListenerMount />
-                                  <RootStack />
-                                  <NetworkErrorComponent />
-                                  <ActionModals />
-                                </NotificationsProvider>
+                                <EnhancedModePromptProvider>
+                                  <NotificationsProvider>
+                                    <AppStateWrapper />
+                                    <PushNotificationComponent />
+                                    <AutoConvertListenerMount />
+                                    <RootStack />
+                                    <NetworkErrorComponent />
+                                    <ActionModals />
+                                  </NotificationsProvider>
+                                </EnhancedModePromptProvider>
                                 <GaloyToast />
                               </RootSiblingParent>
                             </ErrorBoundary>
