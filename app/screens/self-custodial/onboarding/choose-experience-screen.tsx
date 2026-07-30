@@ -32,14 +32,14 @@ export const ChooseExperienceScreen: React.FC = () => {
   const LLScreen = LL.ChooseExperienceScreen
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "selfCustodialChooseExperience">>()
-  const { getAccountMode, setAccountMode } = useSelfCustodialAccountMode()
+  const { getModeFor, setAccountMode } = useSelfCustodialAccountMode()
 
   const { onContinue } = route.params
   const isAccountPending = onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
   /** Re-entry (a back press out of the next screen, or a migration resume onto this
    *  screen) must not silently downgrade a deliberate Anon to the Enhanced default, so
    *  seed from what the account already stored. Creation has no account to read yet. */
-  const storedMode = isAccountPending ? undefined : getAccountMode(onContinue.accountId)
+  const storedMode = isAccountPending ? null : getModeFor(onContinue.accountId)
 
   const [selected, setSelected] = useState<AccountMode>(
     storedMode ?? AccountMode.Enhanced,

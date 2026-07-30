@@ -19,3 +19,9 @@ export const AccountMode = {
 } as const
 
 export type AccountMode = (typeof AccountMode)[keyof typeof AccountMode]
+
+/** Product mode names, never localized. */
+export const ACCOUNT_MODE_NAMES: Record<AccountMode, string> = {
+  [AccountMode.Enhanced]: "Enhanced",
+  [AccountMode.Anon]: "Anon",
+}
