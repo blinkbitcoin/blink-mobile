@@ -734,6 +734,34 @@ describe("useAutoConvertListener — mount replay", () => {
     })
   })
 
+  it("re-arms the replay after an Anon interval so every pending record is picked up", async () => {
+    const sdk = makeSdk({
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [makeLightningPayment("lnbc1pending")],
+      }),
+    })
+    setupDefaults(sdk)
+    mockListPendingAutoConverts.mockResolvedValue([])
+
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await waitFor(() => {
+      expect(mockListPendingAutoConverts).toHaveBeenCalledTimes(1)
+    })
+
+    mockIsAnonMode = true
+    rerender({})
+
+    mockIsAnonMode = false
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbc1pending" }),
+    ])
+    rerender({})
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
+  })
+
   it("skips a pending record whose Lightning payment isn't in the recent history", async () => {
     const sdk = makeSdk({ listPayments: jest.fn().mockResolvedValue({ payments: [] }) })
     setupDefaults(sdk)
