@@ -36,6 +36,12 @@ export const ChooseExperienceContinueRoute = {
 export type ChooseExperienceContinueRoute =
   (typeof ChooseExperienceContinueRoute)[keyof typeof ChooseExperienceContinueRoute]
 
+export const ChooseExperienceEntry = {
+  Settings: "settings",
+} as const
+export type ChooseExperienceEntry =
+  (typeof ChooseExperienceEntry)[keyof typeof ChooseExperienceEntry]
+
 /** The onward step the onboarding entries carry. Derived off the route params so the two
  *  cannot drift, and null on the settings entry, which has no onward step at all. */
 export type ChooseExperienceContinue = Extract<
@@ -273,7 +279,11 @@ export type RootStackParamList = {
    *  account id (mode stored now); creation has none yet, so the mode rides to wallet
    *  creation instead. */
   selfCustodialChooseExperience:
-    | { entry: "settings" }
+    | {
+        entry: typeof ChooseExperienceEntry.Settings
+        /** Set when returning from the drain conversion, so the switch resumes preselected. */
+        initialMode?: AccountMode
+      }
     | {
         onContinue:
           | { route: typeof ChooseExperienceContinueRoute.AcceptTerms }
