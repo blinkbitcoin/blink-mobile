@@ -58,10 +58,10 @@ describe("AccountModeSetting", () => {
     expect(toJSON()).toBeNull()
   })
 
-  it("shows the bare row for a self-custodial account that has not chosen a mode", () => {
+  it("reads the Enhanced default for an account that has not chosen a mode", () => {
     const { getByText } = renderRow()
 
-    fireEvent.press(getByText("Mode"))
+    fireEvent.press(getByText("Mode: Enhanced"))
 
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
       entry: "settings",
