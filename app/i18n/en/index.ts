@@ -2647,7 +2647,7 @@ const en: BaseTranslation = {
   },
   AnonModeConvertModal: {
     title: "Transfer your Dollar Balance first",
-    body: "Anon mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.",
+    body: "Anon Mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.",
   },
   EnhancedModePrompt: {
     title: "This feature needs Enhanced Mode",
