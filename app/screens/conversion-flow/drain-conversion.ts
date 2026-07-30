@@ -1,5 +1,3 @@
-import { useEffect, useRef } from "react"
-
 /**
  * A one-shot flag armed right before sending the user into the convert screen to drain
  * their dollar balance (migration, or the switch to Anon Mode): the screen prefills USD
@@ -10,6 +8,8 @@ import { useEffect, useRef } from "react"
  * so a restricted user could forge an origin param and slip past the restriction outside
  * the flow.
  */
+import { useEffect, useRef } from "react"
+
 /** Who armed the drain decides where the flow returns once the conversion settles. */
 export const DrainConversionReturn = {
   Migration: "migration",
