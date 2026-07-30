@@ -8559,7 +8559,7 @@ type RootTranslation = {
 		 */
 		title: string
 		/**
-		 * A​n​o​n​ ​m​o​d​e​ ​s​u​p​p​o​r​t​s​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​o​n​l​y​.​ ​T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​t​o​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​t​o​ ​s​w​i​t​c​h​.
+		 * A​n​o​n​ ​M​o​d​e​ ​s​u​p​p​o​r​t​s​ ​t​h​e​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​o​n​l​y​.​ ​T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​t​o​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​B​a​l​a​n​c​e​ ​t​o​ ​s​w​i​t​c​h​.
 		 */
 		body: string
 	}
@@ -22038,7 +22038,7 @@ export type TranslationFunctions = {
 		 */
 		title: () => LocalizedString
 		/**
-		 * Anon mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.
+		 * Anon Mode supports the Bitcoin Balance only. Transfer your Dollar Balance to your Bitcoin Balance to switch.
 		 */
 		body: () => LocalizedString
 	}
