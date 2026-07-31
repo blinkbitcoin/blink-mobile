@@ -41,6 +41,7 @@ import { detectDefaultLocale } from "./utils/locale-detector"
 import "./utils/logs"
 import { ActionModals, ActionsProvider } from "./components/actions"
 import { EnhancedModePromptProvider } from "./components/enhanced-mode-prompt"
+import { RestrictedRegionProvider } from "./components/restricted-region"
 
 // Lazy load only the default locale instead of all 27 locales
 // This reduces startup time by 3-5 seconds on Android
@@ -70,14 +71,16 @@ export const App = () => (
                             <ErrorBoundary FallbackComponent={ErrorScreen}>
                               <RootSiblingParent>
                                 <EnhancedModePromptProvider>
-                                  <NotificationsProvider>
-                                    <AppStateWrapper />
-                                    <PushNotificationComponent />
-                                    <AutoConvertListenerMount />
-                                    <RootStack />
-                                    <NetworkErrorComponent />
-                                    <ActionModals />
-                                  </NotificationsProvider>
+                                  <RestrictedRegionProvider>
+                                    <NotificationsProvider>
+                                      <AppStateWrapper />
+                                      <PushNotificationComponent />
+                                      <AutoConvertListenerMount />
+                                      <RootStack />
+                                      <NetworkErrorComponent />
+                                      <ActionModals />
+                                    </NotificationsProvider>
+                                  </RestrictedRegionProvider>
                                 </EnhancedModePromptProvider>
                                 <GaloyToast />
                               </RootSiblingParent>
