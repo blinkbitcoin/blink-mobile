@@ -212,8 +212,10 @@ export const EarnSection = ({ route }: Props) => {
   }, [navigation, sectionTitle])
 
   const open = async (id: string) => {
-    // Registering a phone number only unlocks rewards, which a self-custodial
-    // account cannot receive anyway — send them straight to the lesson.
+    /**
+     * Registering a phone number only unlocks rewards, which a self-custodial
+     * account cannot receive anyway — send them straight to the lesson.
+     */
     if (!isSelfCustodial && !isAtLeastLevelOne) {
       Alert.alert(LL.EarnScreen.registerTitle(), LL.EarnScreen.registerContent(), [
         {

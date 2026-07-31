@@ -96,8 +96,10 @@ const EarnMapScreenContent: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "Earn">>()
   const { LL } = useI18nContext()
   const isSelfCustodial = useIsSelfCustodialAccount()
-  // Rewards are paid out of the custodial backend, so self-custodial accounts
-  // get the lessons only.
+  /**
+   * Rewards are paid out of the custodial backend, so self-custodial accounts get
+   * the lessons only.
+   */
   const rewardsAvailable = !isSelfCustodial
   const quizQuestionsContent = getQuizQuestionsContent({ LL })
   const sections = Object.keys(earnSections) as EarnSectionType[]
@@ -420,8 +422,10 @@ export const EarnMapScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const isSelfCustodial = useIsSelfCustodialAccount()
 
-  // The lessons and quizzes are bundled with the app, so a self-custodial
-  // account can work through them without a custodial backend behind it.
+  /**
+   * The lessons and quizzes are bundled with the app, so a self-custodial account
+   * can work through them without a custodial backend behind it.
+   */
   if (isSelfCustodial) return <EarnMapScreenContent />
 
   return (

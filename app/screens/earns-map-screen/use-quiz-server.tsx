@@ -1,3 +1,5 @@
+import { useMemo } from "react"
+
 import { gql, WatchQueryFetchPolicy } from "@apollo/client"
 import { Quiz, useMyQuizQuestionsQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -46,16 +48,21 @@ export const useQuizServer = (
     skip: !isAuthed || isSelfCustodial,
   })
 
-  let quizServerData: Quiz[]
-
-  if (isSelfCustodial) {
-    quizServerData = allQuizIds.map((id) => ({
+  const selfCustodialQuizData = useMemo<Quiz[]>(() => {
+    const completedIds = new Set(completedQuizIds)
+    return allQuizIds.map((id) => ({
       __typename: "Quiz",
       id,
       amount: 0,
-      completed: completedQuizIds.includes(id),
+      completed: completedIds.has(id),
       notBefore: undefined,
     }))
+  }, [completedQuizIds])
+
+  let quizServerData: Quiz[]
+
+  if (isSelfCustodial) {
+    quizServerData = selfCustodialQuizData
   } else if (isAuthed) {
     quizServerData = data?.me?.defaultAccount.quiz.slice() ?? []
   } else {
