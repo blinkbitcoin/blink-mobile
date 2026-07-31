@@ -182,6 +182,16 @@ jest.mock("@app/components/enhanced-mode-prompt", () => ({
   }),
 }))
 
+let mockIsRestrictedRegion = false
+jest.mock("@app/components/restricted-region", () => ({
+  ...jest.requireActual("@app/components/restricted-region"),
+  useRestrictedRegion: () => ({
+    isRestrictedRegion: mockIsRestrictedRegion,
+    isRestrictedRegionModalVisible: false,
+    presentRestrictedRegionModal: jest.fn(),
+  }),
+}))
+
 /** The fake Apollo client above has no writeQuery, so the real updateCountryCode would throw and warn on every device-location render. */
 jest.mock("@app/graphql/client-only-query", () => ({
   ...jest.requireActual("@app/graphql/client-only-query"),
@@ -297,6 +307,7 @@ describe("Settings Screen", () => {
     jest.clearAllMocks()
     // clearAllMocks does not reset return values, so re-arm the default explicitly
     mockUseIsAuthed.mockReturnValue(true)
+    mockIsRestrictedRegion = false
     loadLocale("en")
     testState = createTestState()
   })
@@ -455,6 +466,32 @@ describe("Settings Screen", () => {
     expect(elements.length).toBeGreaterThan(0)
 
     await flushEffects()
+  })
+
+  it("shows the restricted-region banner while the region is restricted", async () => {
+    mockIsRestrictedRegion = true
+
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    expect(await screen.findByTestId("restricted-region-banner")).toBeTruthy()
+
+    await flushEffects()
+  })
+
+  it("hides the restricted-region banner outside a restricted region", async () => {
+    render(
+      <ContextForScreen>
+        <LoggedInWithUsername mock={mocksWithUsername} />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(screen.queryByTestId("restricted-region-banner")).toBeNull()
   })
 
   it("shows phone ln address when phone is verified", async () => {
