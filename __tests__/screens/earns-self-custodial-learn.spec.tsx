@@ -13,7 +13,7 @@ import { EarnQuiz } from "@app/screens/earns-screen/earns-quiz"
 import { EarnSection } from "@app/screens/earns-screen/earns-section"
 import { earnSections } from "@app/screens/earns-screen/sections"
 
-import { ContextForScreen } from "./helper"
+import { ContextForScreen, findPressableParent } from "./helper"
 
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => {
@@ -110,17 +110,6 @@ const localQuizzes = (completedIds: string[] = []) =>
     notBefore: undefined,
   }))
 
-const findPressableParent = (node: ReactTestInstance | null): ReactTestInstance => {
-  let current: ReactTestInstance | null = node
-  while (current && !current.props?.onPress) {
-    current = current.parent
-  }
-  if (!current) {
-    throw new Error("Pressable parent not found")
-  }
-  return current
-}
-
 const buildQuizRoute = (
   params: RootStackParamList["earnsQuiz"],
 ): RouteProp<RootStackParamList, "earnsQuiz"> => ({
@@ -147,8 +136,10 @@ describe("learn screens on a self-custodial account", () => {
     LL = i18nObject("en")
     mockUseIsAuthed.mockReturnValue(false)
     mockUseIsSelfCustodialAccount.mockReturnValue(true)
-    // Self-custodial accounts never reach level one, which is the custodial
-    // phone-verification level that unlocks rewards.
+    /**
+     * Self-custodial accounts never reach level one, which is the custodial
+     * phone-verification level that unlocks rewards.
+     */
     mockUseLevel.mockReturnValue({ isAtLeastLevelOne: false })
     mockedUseQuizServer.mockReturnValue({
       loading: false,
