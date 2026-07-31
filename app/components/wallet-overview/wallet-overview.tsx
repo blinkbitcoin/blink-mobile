@@ -4,6 +4,7 @@ import { Pressable, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import { DisabledFeature } from "@app/components/disabled-feature"
+import { useRestrictedRegion } from "@app/components/restricted-region"
 import { useWalletOverviewScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
@@ -80,7 +81,9 @@ const WalletOverview: React.FC<Props> = ({
   showBtcNotification = false,
   showUsdNotification = false,
 }) => {
-  const { isGated: isDollarRowUnavailable, isRegionPending } = useDollarBalanceGate()
+  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
+  const { isRestrictedRegion } = useRestrictedRegion()
+  const isDollarRowUnavailable = isDollarBalanceGated || isRestrictedRegion
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { hideAmount, toggleHideAmount } = useHideAmount()
 
