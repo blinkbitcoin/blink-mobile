@@ -39,7 +39,7 @@ export const Notification: React.FC<StatefulNotification> = ({
       <View style={styles.container}>
         {icon ? (
           <GaloyIcon
-            name={icon?.toLowerCase().replace("_", "-") as IconNamesType}
+            name={icon.toLowerCase().replace("_", "-") as IconNamesType}
             color={isAcknowledged ? colors.grey2 : colors.black}
             size={26}
           />
@@ -51,7 +51,7 @@ export const Notification: React.FC<StatefulNotification> = ({
             size={26}
           />
         )}
-        <View>
+        <View style={styles.content} testID="notification-content">
           <Text type="p2" style={styles.text}>
             {title}
           </Text>
@@ -77,6 +77,13 @@ const useStyles = makeStyles(
       flexDirection: "row",
       columnGap: 12,
       alignItems: "center",
+    },
+    /**
+     * Without flex: 1 the text column sizes to its content inside the row,
+     * pushing long titles and bodies past the screen edge instead of wrapping.
+     */
+    content: {
+      flex: 1,
     },
     text: {
       color: isAcknowledged ? colors.grey2 : colors.black,
