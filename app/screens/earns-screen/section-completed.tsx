@@ -88,11 +88,11 @@ export const SectionCompleted: React.FC<Props> = ({ route }) => {
           type="solid"
           buttonStyle={styles.buttonStyle}
           titleStyle={styles.titleStyle}
-          onPress={() => navigation.navigate("Earn")}
+          onPress={() => navigation.popTo("Primary")}
         />
       </View>
       <View style={styles.bottomView} />
-      <CloseCross color={colors._white} onPress={() => navigation.navigate("Earn")} />
+      <CloseCross color={colors._white} onPress={() => navigation.popTo("Primary")} />
     </Screen>
   )
 }

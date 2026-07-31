@@ -411,7 +411,7 @@ export const EarnQuiz = ({ route }: Props) => {
 
   const closeModal = () => {
     setShowModal(false)
-    navigation.navigate("Earn")
+    navigation.popTo("Primary")
   }
 
   const close = async () => {
