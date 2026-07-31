@@ -93,8 +93,8 @@ export const RestrictedRegionProvider: React.FC<React.PropsWithChildren> = ({
     <RestrictedRegionContext.Provider value={contextValue}>
       {children}
       {isCustodialBlock && <RestrictedRegionScreen />}
-      {/** Mounted for the whole restricted session (dismiss keeps its exit animation),
-       *   and off the tree entirely for everyone else. */}
+      {/** Mounted for the whole restricted session so a user dismiss keeps its exit
+       *   animation (a clearing region unmounts it outright); off the tree otherwise. */}
       {isRestrictedRegion && !isCustodialBlock && (
         <RestrictedRegionModal isVisible={isModalVisible} onDismiss={dismissModal} />
       )}
