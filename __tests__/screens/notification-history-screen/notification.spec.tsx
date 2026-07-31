@@ -68,6 +68,14 @@ describe("Notification", () => {
     expect(getByTestId("galoy-icon-bell")).toBeTruthy()
   })
 
+  it("maps every underscore of the icon enum to the dashed icon name", () => {
+    const { getByTestId } = renderNotification(
+      makeNotification({ icon: Icon.WarningWithBackground }),
+    )
+
+    expect(getByTestId("galoy-icon-warning-with-background")).toBeTruthy()
+  })
+
   it("falls back to the default ionicon when the notification has no icon", () => {
     const { queryAllByTestId } = renderNotification(makeNotification())
 

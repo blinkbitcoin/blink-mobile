@@ -39,7 +39,7 @@ export const Notification: React.FC<StatefulNotification> = ({
       <View style={styles.container}>
         {icon ? (
           <GaloyIcon
-            name={icon.toLowerCase().replace("_", "-") as IconNamesType}
+            name={icon.toLowerCase().replace(/_/g, "-") as IconNamesType}
             color={isAcknowledged ? colors.grey2 : colors.black}
             size={26}
           />
