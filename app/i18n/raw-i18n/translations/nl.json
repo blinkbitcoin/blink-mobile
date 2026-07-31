@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Eén sectie per dag!",
     "availableTomorrow": "Kom morgen terug om verder te verdienen terwijl je leert.\n\nOf klik op doorgaan om te blijven leren zonder beloningen.",
     "motivatingBadger": "Graaf je een weg door deze lessen en verdien terwijl je leert",
+    "motivatingBadgerNoRewards": "Graaf je een weg door deze lessen en leer over Bitcoin",
     "continueNoRewards": "Doorgaan (Zonder beloningen)",
     "somethingNotRight": "Er klopt iets niet...",
     "defaultErrorMessage": "{errorMessage: string} Probeer het later opnieuw.\nOf klik op doorgaan om te blijven leren zonder beloningen.",

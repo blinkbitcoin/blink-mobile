@@ -2045,6 +2045,7 @@
     "oneSectionADay": "قسم واحد في اليوم!",
     "availableTomorrow": "عُد غدًا لمواصلة كسب sats أثناء التعلم.\n\nأو انقر على متابعة لمواصلة التعلم بدون مكافآت.",
     "motivatingBadger": "شق طريقك عبر هذه الدروس واكسب أثناء تعلمك",
+    "motivatingBadgerNoRewards": "شق طريقك عبر هذه الدروس وتعلّم عن البيتكوين",
     "continueNoRewards": "متابعة (بدون مكافآت)",
     "somethingNotRight": "هناك خطأ ما...",
     "defaultErrorMessage": "{errorMessage: string} يرجى المحاولة مرة أخرى لاحقًا.\nأو انقر للمتابعة لمواصلة التعلم بدون مكافآت.",

@@ -39,7 +39,7 @@ import {
 } from "@app/hooks/use-transfer-blocked"
 
 const baseState: PersistentState = {
-  schemaVersion: 14,
+  schemaVersion: 15,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }

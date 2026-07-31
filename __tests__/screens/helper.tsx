@@ -1,4 +1,5 @@
 import React, { PropsWithChildren } from "react"
+import type { ReactTestInstance } from "react-test-renderer"
 
 import { MockedProvider } from "@apollo/client/testing"
 import mocks from "@app/graphql/mocks"
@@ -19,7 +20,7 @@ const PersistentStateWrapper: React.FC<PropsWithChildren> = ({ children }) => (
   <PersistentStateContext.Provider
     value={{
       persistentState: {
-        schemaVersion: 14,
+        schemaVersion: 15,
         galoyInstance: {
           id: "Main",
         },
@@ -32,6 +33,19 @@ const PersistentStateWrapper: React.FC<PropsWithChildren> = ({ children }) => (
     <>{children}</>
   </PersistentStateContext.Provider>
 )
+
+export const findPressableParent = (
+  node: ReactTestInstance | null,
+): ReactTestInstance => {
+  let current: ReactTestInstance | null = node
+  while (current && !current.props?.onPress) {
+    current = current.parent
+  }
+  if (!current) {
+    throw new Error("Pressable parent not found")
+  }
+  return current
+}
 
 const Stack = createNativeStackNavigator()
 

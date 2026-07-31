@@ -2045,6 +2045,7 @@
     "oneSectionADay": "¡Huk rakiy sapa p'unchaw!",
     "availableTomorrow": "Paqarin kutimuy sats ganaspa yachaspa qatipanaykipaq.\n\nUtaq, Qatiy ñit'iy premiokunamanta mana yachaqanaykipaq.",
     "motivatingBadger": "Kay yachaqanakunata t'uquy, yachaspa ganaspa",
+    "motivatingBadgerNoRewards": "Kay yachaqanakunata t'uquy, Bitcoinmanta yachaspa",
     "continueNoRewards": "Qatiy (Mana Premiokunawan)",
     "somethingNotRight": "Imapas mana allinchu...",
     "defaultErrorMessage": "{errorMessage: string} Ama hina kaspa qhipaman watiqmanta ruwamuy.\nUtaq, qatiy ñit'iy premiokunawanmanta mana yachaspa qatipanapaq.",

@@ -2045,6 +2045,7 @@
     "oneSectionADay": "O secțiune pe zi!",
     "availableTomorrow": "Reveniți mâine pentru a continua să învățați despre Bitcoin!",
     "motivatingBadger": "Săpați-vă drumul prin aceste lecții și câștigați pe măsură ce învățați",
+    "motivatingBadgerNoRewards": "Săpați-vă drumul prin aceste lecții și învățați despre Bitcoin",
     "continueNoRewards": "Continuă (Fără Recompense)",
     "somethingNotRight": "Ceva nu este în regulă...",
     "defaultErrorMessage": "{errorMessage: string} Vă rugăm să încercați din nou mai târziu.\nSau, faceți clic pentru a continua să învățați fără recompense.",

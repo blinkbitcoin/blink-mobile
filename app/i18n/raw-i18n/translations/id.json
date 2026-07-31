@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Satu bagian sehari!",
     "availableTomorrow": "Kembali lagi besok untuk melanjutkan belajar tentang Bitcoin!",
     "motivatingBadger": "Gali jalan Anda melalui pelajaran ini dan dapatkan saat Anda belajar.",
+    "motivatingBadgerNoRewards": "Gali jalan Anda melalui pelajaran ini dan pelajari tentang Bitcoin.",
     "continueNoRewards": "Lanjutkan (Tanpa Hadiah)",
     "somethingNotRight": "Ada yang Tidak Beres...",
     "defaultErrorMessage": "{errorMessage: string} Silakan coba lagi nanti.\nAtau, klik untuk melanjutkan belajar tanpa hadiah.",

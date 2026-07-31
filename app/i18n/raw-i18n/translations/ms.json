@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Satu bahagian sehari!",
     "availableTomorrow": "Kembali esok untuk terus mendapat sats sambil belajar.\n\nAtau, klik teruskan untuk terus belajar tanpa ganjaran.",
     "motivatingBadger": "Gali melalui pelajaran ini dan dapatkan ganjaran sambil belajar",
+    "motivatingBadgerNoRewards": "Gali melalui pelajaran ini dan pelajari tentang Bitcoin",
     "continueNoRewards": "Teruskan (Tanpa Ganjaran)",
     "somethingNotRight": "Sesuatu Tidak Kena...",
     "defaultErrorMessage": "{errorMessage: string} Sila cuba lagi kemudian.\nAtau, klik untuk terus belajar tanpa ganjaran.",

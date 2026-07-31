@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Mỗi ngày một phần!",
     "availableTomorrow": "Hãy quay lại vào ngày mai để tiếp tục kiếm sats trong khi học.\n\nHoặc nhấn tiếp tục để tiếp tục học mà không có phần thưởng.",
     "motivatingBadger": "Đào qua các bài học này và kiếm tiền trong khi học",
+    "motivatingBadgerNoRewards": "Đào qua các bài học này và tìm hiểu về Bitcoin",
     "continueNoRewards": "Tiếp tục (Không có Phần thưởng)",
     "somethingNotRight": "Có gì đó không đúng...",
     "defaultErrorMessage": "{errorMessage: string} Vui lòng thử lại sau.\nHoặc nhấn tiếp tục để tiếp tục học mà không có phần thưởng.",

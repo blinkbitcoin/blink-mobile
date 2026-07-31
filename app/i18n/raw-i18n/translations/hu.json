@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Naponta csak egy fejezet lehetséges!",
     "availableTomorrow": "Gyere vissza holnap, hogy folytathasd a tanulást!",
     "motivatingBadger": "Haladj végig ezeken a leckéken, és keress a tanulás során",
+    "motivatingBadgerNoRewards": "Haladj végig ezeken a leckéken, és tanulj a Bitcoinról",
     "continueNoRewards": "Folytatás (jutalom nélkül)",
     "somethingNotRight": "Valami nem stimmel...",
     "defaultErrorMessage": "{errorMessage: string} Kérjük, próbáld újra később.\nVagy kattints a folytatásra, hogy jutalom nélkül tanulhass tovább.",

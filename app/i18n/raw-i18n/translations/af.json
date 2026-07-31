@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Een afdeling per dag!",
     "availableTomorrow": "Kom môre terug om voort te gaan met sats verdien terwyl jy leer.\n\nOf, klik voortgaan om aan te hou leer sonder belonings.",
     "motivatingBadger": "Grawe jou pad deur hierdie lesse en verdien terwyl jy leer",
+    "motivatingBadgerNoRewards": "Grawe jou pad deur hierdie lesse en leer meer oor Bitcoin",
     "continueNoRewards": "Gaan voort (Geen belonings)",
     "somethingNotRight": "Iets is nie reg nie...",
     "defaultErrorMessage": "{errorMessage: string} Probeer asseblief later weer.\nOf, klik om voort te gaan om aan te hou leer sonder belonings.",

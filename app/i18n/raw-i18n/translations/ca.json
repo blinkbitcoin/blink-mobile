@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Una secció al dia!",
     "availableTomorrow": "Torna demà per continuar aprenent sobre Bitcoin!",
     "motivatingBadger": "Fes el teu camí a través d'aquestes lliçons i guanya mentre aprens.",
+    "motivatingBadgerNoRewards": "Fes el teu camí a través d'aquestes lliçons i aprèn sobre Bitcoin.",
     "continueNoRewards": "Continua (Sense recompenses)",
     "somethingNotRight": "Alguna cosa no va bé...",
     "defaultErrorMessage": "{errorMessage: string} Si us plau, intenta-ho més tard.\nO bé, fes clic per continuar aprenent sense recompenses.",

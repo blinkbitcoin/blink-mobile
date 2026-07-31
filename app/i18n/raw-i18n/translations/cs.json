@@ -2045,6 +2045,7 @@
     "oneSectionADay": "Jedna sekce denně!",
     "availableTomorrow": "Vraťte se zítra a pokračujte ve vydělávání satů při učení.\n\nNebo klikněte na pokračovat a učte se dál bez odměn.",
     "motivatingBadger": "Prokopejte se těmito lekcemi a vydělávejte při učení",
+    "motivatingBadgerNoRewards": "Prokopejte se těmito lekcemi a učte se o Bitcoinu",
     "continueNoRewards": "Pokračovat (bez odměn)",
     "somethingNotRight": "Něco není v pořádku...",
     "defaultErrorMessage": "{errorMessage: string} Zkuste to prosím později.\nNebo klikněte na pokračovat a učte se dál bez odměn.",

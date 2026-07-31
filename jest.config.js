@@ -1,3 +1,10 @@
+// Jest only defaults NODE_ENV to "test" when it is unset, so a shell that
+// exports NODE_ENV=development leaks into the run. react-native-gesture-handler
+// keys its dev-only "must be used as a descendant of GestureHandlerRootView"
+// guard off NODE_ENV, which makes screen tests throw on such machines while
+// passing in CI. Pin it here, before any transform or module load happens.
+process.env.NODE_ENV = "test"
+
 module.exports = {
   preset: "@react-native/jest-preset",
   setupFiles: [
