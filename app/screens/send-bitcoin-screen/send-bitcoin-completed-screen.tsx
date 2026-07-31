@@ -81,9 +81,13 @@ const useSuccessMessage = (
   }, [successAction, preimage])()
 }
 
-/** iOS reaches the background through "inactive", Android straight from "active". */
-const useOnLeaveForeground = (onLeaveForeground: () => void) => {
+const STALE_BACKGROUND_MS = 30_000
+
+/** iOS reaches the background through "inactive", Android straight from "active".
+ *  Quick trips (opening a link, locking the phone) keep the receipt on return. */
+const useOnStaleBackgroundReturn = (onStaleReturn: () => void) => {
   const appState = useRef(AppState.currentState)
+  const backgroundedAt = useRef<number | null>(null)
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
@@ -93,13 +97,23 @@ const useOnLeaveForeground = (onLeaveForeground: () => void) => {
       const isLeavingForeground =
         (previousAppState === "active" || previousAppState === "inactive") &&
         nextAppState === "background"
-
       if (isLeavingForeground) {
-        onLeaveForeground()
+        backgroundedAt.current = Date.now()
+        return
+      }
+
+      const isReturningToForeground =
+        previousAppState === "background" && nextAppState === "active"
+      if (!isReturningToForeground || backgroundedAt.current === null) return
+
+      const isStale = Date.now() - backgroundedAt.current >= STALE_BACKGROUND_MS
+      backgroundedAt.current = null
+      if (isStale) {
+        onStaleReturn()
       }
     })
     return () => subscription.remove()
-  }, [onLeaveForeground])
+  }, [onStaleReturn])
 }
 
 const SuccessIconComponent: React.FC<{
@@ -310,13 +324,13 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
   const handleNavigateHome = useCallback(() => navigation.popToTop(), [navigation])
 
   /** A covered receipt (e.g. under the app-lock screen) must not steal navigation. */
-  const handleLeaveForeground = useCallback(() => {
+  const handleStaleReturn = useCallback(() => {
     if (navigation.isFocused()) {
       handleNavigateHome()
     }
   }, [navigation, handleNavigateHome])
 
-  useOnLeaveForeground(handleLeaveForeground)
+  useOnStaleBackgroundReturn(handleStaleReturn)
 
   if (showSuccessIcon) {
     return (

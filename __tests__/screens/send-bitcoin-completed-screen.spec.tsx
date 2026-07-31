@@ -66,12 +66,15 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
+let mockAppStateCurrentState = "active"
 const mockAppStateListeners: Array<(state: string) => void> = []
 const mockAppStateSubscriptionRemovals: jest.Mock[] = []
 jest.mock("react-native/Libraries/AppState/AppState", () => ({
   __esModule: true,
   default: {
-    currentState: "active",
+    get currentState() {
+      return mockAppStateCurrentState
+    },
     addEventListener: (_event: string, handler: (state: string) => void) => {
       mockAppStateListeners.push(handler)
       const remove = jest.fn()
@@ -670,11 +673,15 @@ describe("SendBitcoinCompletedScreen", () => {
     })
   })
 
-  describe("dismiss on app background", () => {
+  describe("dismiss after a stale background trip", () => {
+    const STALE_TRIP_MS = 31_000
+    const QUICK_TRIP_MS = 5_000
+
     beforeEach(() => {
       mockNavigate.mockClear()
       mockPopToTop.mockClear()
       mockIsFocused.mockReturnValue(true)
+      mockAppStateCurrentState = "active"
       mockAppStateListeners.length = 0
       mockAppStateSubscriptionRemovals.length = 0
     })
@@ -683,6 +690,12 @@ describe("SendBitcoinCompletedScreen", () => {
       const notify = mockAppStateListeners[mockAppStateListeners.length - 1]
       act(() => {
         notify(nextState)
+      })
+    }
+
+    const advanceTime = (ms: number) => {
+      act(() => {
+        jest.advanceTimersByTime(ms)
       })
     }
 
@@ -696,31 +709,45 @@ describe("SendBitcoinCompletedScreen", () => {
       return view
     }
 
-    it("dismisses to home when the app transitions from active to background", async () => {
+    it("dismisses to home when returning from a stale background trip", async () => {
       await renderSuccess()
 
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
       expect(mockPopToTop).not.toHaveBeenCalled()
 
-      triggerAppStateChange("background")
+      triggerAppStateChange("active")
 
       expect(mockPopToTop).toHaveBeenCalledTimes(1)
       expect(mockNavigate).not.toHaveBeenCalled()
     })
 
-    it("dismisses to home when the app backgrounds through the iOS inactive state", async () => {
+    it("dismisses when the stale trip started through the iOS inactive state", async () => {
       await renderSuccess()
 
       triggerAppStateChange("inactive")
-      expect(mockPopToTop).not.toHaveBeenCalled()
+      triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
+
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
+
+    it("keeps the receipt on a quick background trip", async () => {
+      await renderSuccess()
 
       triggerAppStateChange("background")
-      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+      advanceTime(QUICK_TRIP_MS)
+      triggerAppStateChange("active")
+
+      expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
     it("does not dismiss while the app stays in the foreground", async () => {
       await renderSuccess()
 
       triggerAppStateChange("inactive")
+      advanceTime(STALE_TRIP_MS)
       triggerAppStateChange("active")
 
       expect(mockPopToTop).not.toHaveBeenCalled()
@@ -731,16 +758,17 @@ describe("SendBitcoinCompletedScreen", () => {
       mockIsFocused.mockReturnValue(false)
 
       triggerAppStateChange("background")
+      advanceTime(STALE_TRIP_MS)
+      triggerAppStateChange("active")
 
       expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
-    it("does not dismiss when the app returns to the foreground", async () => {
+    it("does not dismiss when mounted while the app was already backgrounded", async () => {
+      mockAppStateCurrentState = "background"
       await renderSuccess()
 
-      triggerAppStateChange("background")
-      mockPopToTop.mockClear()
-
+      advanceTime(STALE_TRIP_MS)
       triggerAppStateChange("active")
 
       expect(mockPopToTop).not.toHaveBeenCalled()
