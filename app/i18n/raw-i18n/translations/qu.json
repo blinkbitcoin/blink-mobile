@@ -2518,6 +2518,13 @@
     "enhanced": "Enhanced mana waqaychasqa modoman tikrasqa",
     "anon": "Anon mana waqaychasqa modoman tikrasqa"
   },
+  "RestrictedRegion": {
+    "title": "Hark'asqa suyu tarisqa",
+    "body": "Tinkuyniykiqa hark'asqa suyumanta hamusqan rikch'akun. Blinkqa mana atinchu kay kitimanta serviciokunata quyta. Qullqiykikunaqa mana chhikachasqachu.",
+    "bodyReturn": "Kay suyumanta lluqsiptiykiqa, tukuy ruwaykunam kaqmanta allin kanqa.",
+    "learnMore": "Astawan yachay",
+    "contactSupport": "Yanapaqwan rimanakuy"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Dólar saldoqa mana kapunchu suyuykipi"
   },

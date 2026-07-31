@@ -2518,6 +2518,13 @@
     "enhanced": "Okyusizza ku modu ya Enhanced eyeefuga",
     "anon": "Okyusizza ku modu ya Anon eyeefuga"
   },
+  "RestrictedRegion": {
+    "title": "Ekitundu ekikugirwa kizuuliddwa",
+    "body": "Okuyunga kwo kulabika nga kuva mu kitundu ekikugirwa. Blink tesobola kuwa buweereza okuva mu kifo kino. Ssente zo tezikoseddwa.",
+    "bodyReturn": "Bw'onoova mu kitundu kino, byonna bijja kudda mu nkola eya bulijjo.",
+    "learnMore": "Manya ebisingawo",
+    "contactSupport": "Tuukirira abayambi"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo"
   },

@@ -2518,6 +2518,13 @@
     "enhanced": "Utshintshele kwimo ye-Enhanced engagciniwe",
     "anon": "Utshintshele kwimo ye-Anon engagciniwe"
   },
+  "RestrictedRegion": {
+    "title": "Kufunyenwe ummandla onezithintelo",
+    "body": "Uqhagamshelo lwakho lubonakala luvela kummandla onezithintelo. UBlink akakwazi ukunikezela ngeenkonzo kule ndawo. Iibhalansi zakho azichaphazelekanga.",
+    "bodyReturn": "Wakuba uwushiyile lo mmandla, yonke imisebenzi iya kubuyela esiqhelweni.",
+    "learnMore": "Funda okungakumbi",
+    "contactSupport": "Qhagamshelana nenkxaso"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho"
   },

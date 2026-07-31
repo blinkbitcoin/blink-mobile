@@ -2518,6 +2518,13 @@
     "enhanced": "Prepnuté na režim Enhanced s vlastnou správou",
     "anon": "Prepnuté na režim Anon s vlastnou správou"
   },
+  "RestrictedRegion": {
+    "title": "Zistený obmedzený región",
+    "body": "Zdá sa, že vaše pripojenie pochádza z obmedzeného regiónu. Blink z tohto miesta nemôže poskytovať služby. Vaše zostatky nie sú dotknuté.",
+    "bodyReturn": "Keď tento región opustíte, všetko sa vráti do normálu.",
+    "learnMore": "Zistiť viac",
+    "contactSupport": "Kontaktovať podporu"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolárový zostatok nie je vo vašom regióne k dispozícii"
   },

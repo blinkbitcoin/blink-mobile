@@ -2518,6 +2518,13 @@
     "enhanced": "Emanetsiz Enhanced moduna geçildi",
     "anon": "Emanetsiz Anon moduna geçildi"
   },
+  "RestrictedRegion": {
+    "title": "Kısıtlı bölge tespit edildi",
+    "body": "Bağlantınız kısıtlı bir bölgeden geliyor gibi görünüyor. Blink bu konumdan hizmet sunamıyor. Bakiyeleriniz etkilenmez.",
+    "bodyReturn": "Bu bölgeden ayrıldığınızda tüm işlevler normale dönecek.",
+    "learnMore": "Daha fazla bilgi",
+    "contactSupport": "Destekle iletişime geçin"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor"
   },

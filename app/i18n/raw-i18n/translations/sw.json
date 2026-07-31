@@ -2518,6 +2518,13 @@
     "enhanced": "Umebadilisha kwenda hali ya Enhanced isiyohifadhiwa",
     "anon": "Umebadilisha kwenda hali ya Anon isiyohifadhiwa"
   },
+  "RestrictedRegion": {
+    "title": "Eneo lenye vikwazo limegunduliwa",
+    "body": "Muunganisho wako unaonekana kutoka eneo lenye vikwazo. Blink haiwezi kutoa huduma kutoka mahali hapa. Salio zako hazijaathirika.",
+    "bodyReturn": "Ukiondoka katika eneo hili, huduma zote zitarejea kawaida.",
+    "learnMore": "Jifunze zaidi",
+    "contactSupport": "Wasiliana na usaidizi"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Salio la dola haipatikani katika eneo lako"
   },
