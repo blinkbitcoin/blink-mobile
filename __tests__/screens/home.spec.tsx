@@ -1138,31 +1138,6 @@ describe("HomeScreen", () => {
     mockActiveWalletOverride = null
   })
 
-  it("suppresses the forced conversion while the region is sanctioned", async () => {
-    mockIsRestrictedRegion = true
-    mockDollarBalanceRestrictedOverride = true
-    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
-    currentMocks = generateHomeMock({
-      level: AccountLevel.One,
-      network: Network.Mainnet,
-      btcBalance: 1000,
-      usdBalance: 5000,
-    })
-
-    const { queryByTestId } = render(
-      <ContextForScreen>
-        <HomeScreen />
-      </ContextForScreen>,
-    )
-
-    await flushEffects()
-
-    expect(mockForcedConversionParams?.isRestricted).toBe(false)
-    expect(queryByTestId("sc-convert-modal")).toBeNull()
-
-    mockActiveWalletOverride = null
-  })
-
   it("treats a self-custodial limits response without a minimum as any positive cent", async () => {
     mockDollarBalanceRestrictedOverride = true
     mockUseNonCustodialConversionLimits.mockReturnValue({
@@ -1386,32 +1361,6 @@ describe("HomeScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
 
     mockActiveWalletOverride = null
-  })
-
-  it("opens the restricted-region modal from the disabled transfer button when sanctioned", async () => {
-    mockIsRestrictedRegion = true
-    currentMocks = generateHomeMock({
-      level: AccountLevel.One,
-      network: Network.Mainnet,
-      btcBalance: 1000,
-      usdBalance: 5000,
-    })
-
-    const { getByTestId } = render(
-      <ContextForScreen>
-        <HomeScreen />
-      </ContextForScreen>,
-    )
-
-    await flushEffects()
-
-    expect(getByTestId("transfer")).toBeTruthy()
-
-    fireEvent.press(getByTestId("transfer"))
-
-    expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
-    expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
-    expect(mockDollarBalanceModalVisible).toBe(false)
   })
 
   it("Slide-up handle triggers navigation to transaction history", async () => {
@@ -2726,5 +2675,87 @@ describe("useRemoteConfig mock completeness", () => {
     )
 
     expect(missingKeys).toEqual([])
+  })
+})
+
+describe("HomeScreen restricted region", () => {
+  beforeEach(resetHomeScreenMocks)
+
+  it("opens the restricted-region modal from the disabled transfer button when sanctioned", async () => {
+    mockIsRestrictedRegion = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(getByTestId("transfer", { includeHiddenElements: true })).toBeTruthy()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
+    expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
+    expect(mockDollarBalanceModalVisible).toBe(false)
+  })
+
+  it("prefers the Enhanced prompt over the sanctions modal when both would apply", async () => {
+    mockIsAnonMode = true
+    mockIsRestrictedRegion = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+    expect(mockPromptEnhancedMode).toHaveBeenCalledTimes(1)
+    expect(mockPresentRestrictedRegionModal).not.toHaveBeenCalled()
+
+    mockActiveWalletOverride = null
+  })
+
+  it("suppresses the forced conversion while the region is sanctioned", async () => {
+    mockIsRestrictedRegion = true
+    mockDollarBalanceRestrictedOverride = true
+    mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(mockForcedConversionParams?.isRestricted).toBe(false)
+    expect(queryByTestId("sc-convert-modal")).toBeNull()
+
+    mockActiveWalletOverride = null
   })
 })

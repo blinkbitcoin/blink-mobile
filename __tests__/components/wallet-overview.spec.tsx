@@ -304,9 +304,11 @@ describe("WalletOverview", () => {
       await flushEffects()
 
       expect(queryByText("not available in your region")).toBeNull()
-      expect(getByTestId("stablesats-balance")).toBeTruthy()
+      expect(
+        getByTestId("stablesats-balance", { includeHiddenElements: true }),
+      ).toBeTruthy()
 
-      fireEvent.press(getByTestId("stablesats-balance"))
+      fireEvent.press(getByTestId("stablesats-balance", { includeHiddenElements: true }))
       expect(onGatedTap).toHaveBeenCalledTimes(1)
     })
 
