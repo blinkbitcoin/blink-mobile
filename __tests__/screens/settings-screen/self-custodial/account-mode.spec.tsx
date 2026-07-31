@@ -22,6 +22,16 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: { type: mockActiveAccountType } }),
 }))
 
+let mockIsRestrictedRegion = false
+const mockPresentRestrictedRegionModal = jest.fn()
+jest.mock("@app/components/restricted-region", () => ({
+  useRestrictedRegion: () => ({
+    isRestrictedRegion: mockIsRestrictedRegion,
+    isRestrictedRegionModalVisible: false,
+    presentRestrictedRegionModal: mockPresentRestrictedRegionModal,
+  }),
+}))
+
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
 }))
@@ -48,6 +58,7 @@ describe("AccountModeSetting", () => {
     jest.clearAllMocks()
     mockAccountMode = null
     mockActiveAccountType = AccountType.SelfCustodial
+    mockIsRestrictedRegion = false
   })
 
   it("renders nothing for a custodial account", () => {
@@ -91,5 +102,18 @@ describe("AccountModeSetting", () => {
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
       entry: "settings",
     })
+  })
+
+  it("blocks the mode switch behind the restricted-region modal while restricted", () => {
+    mockIsRestrictedRegion = true
+    mockAccountMode = AccountMode.Enhanced
+
+    const { getByLabelText } = renderRow()
+
+    /** The gated row leaves the accessibility tree; the gate stands in for it. */
+    fireEvent.press(getByLabelText("Mode: Enhanced"))
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockPresentRestrictedRegionModal).toHaveBeenCalledTimes(1)
   })
 })

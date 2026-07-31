@@ -10,6 +10,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
+import {
+  RestrictedRegionBanner,
+  useRestrictedRegion,
+} from "@app/components/restricted-region"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
@@ -109,6 +113,13 @@ export const SettingsScreen: React.FC = () => {
     isSelfCustodialMode && backupState.status !== BackupStatus.Completed
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { promptEnhancedMode } = useEnhancedModePrompt()
+  const { isRestrictedRegion, presentRestrictedRegionModal } = useRestrictedRegion()
+
+  const isWaysToGetPaidDisabled = isAnonMode || isRestrictedRegion
+  /** Anon comes first: with no lookup running, the region can never read as restricted. */
+  const onWaysToGetPaidDisabledPress = isAnonMode
+    ? promptEnhancedMode
+    : presentRestrictedRegionModal
 
   const items = {
     account: [
@@ -172,6 +183,7 @@ export const SettingsScreen: React.FC = () => {
   return (
     <Screen keyboardShouldPersistTaps="handled">
       <ScrollView contentContainerStyle={styles.outer}>
+        {isRestrictedRegion && <RestrictedRegionBanner />}
         <AccountBanner />
         {shouldShowSettingsBanner && (
           <SettingsCard
@@ -186,8 +198,8 @@ export const SettingsScreen: React.FC = () => {
         <SettingsGroup
           name={LL.SettingsScreen.addressScreen()}
           items={items.waysToGetPaid}
-          disabled={isAnonMode}
-          onDisabledPress={promptEnhancedMode}
+          disabled={isWaysToGetPaidDisabled}
+          onDisabledPress={onWaysToGetPaidDisabledPress}
         />
         {isAtLeastLevelOne && !isSelfCustodialMode && (
           <SettingsGroup
