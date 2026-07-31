@@ -2578,6 +2578,13 @@
     "enhanced": "Átváltva önrendelkező\nEnhanced módra",
     "anon": "Átváltva önrendelkező\nIncognito módra"
   },
+  "RestrictedRegion": {
+    "title": "Korlátozott régió észlelve",
+    "body": "Úgy tűnik, a kapcsolatod korlátozott régióból érkezik. A Blink erről a helyről nem tud szolgáltatásokat nyújtani. Az egyenlegeidet ez nem érinti.",
+    "bodyReturn": "Amint elhagyod ezt a régiót, minden funkció visszaáll a normál működésre.",
+    "learnMore": "Tudj meg többet",
+    "contactSupport": "Kapcsolatfelvétel az ügyfélszolgálattal"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "A dolláregyenleg nem érhető el a régiódban"
   },

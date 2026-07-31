@@ -2578,6 +2578,13 @@
     "enhanced": "Oorgeskakel na Enhanced\nSelf-bewaarde modus",
     "anon": "Oorgeskakel na Incognito\nSelf-bewaarde modus"
   },
+  "RestrictedRegion": {
+    "title": "Beperkte streek bespeur",
+    "body": "Jou verbinding blyk van 'n beperkte streek af te kom. Blink kan nie dienste vanaf hierdie ligging lewer nie. Jou saldo's word nie geraak nie.",
+    "bodyReturn": "Sodra jy hierdie streek verlaat, sal alle funksies weer normaal werk.",
+    "learnMore": "Lees meer",
+    "contactSupport": "Kontak ondersteuning"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Dollar-saldo is nie beskikbaar in jou streek nie"
   },

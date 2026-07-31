@@ -8593,6 +8593,28 @@ type RootTranslation = {
 		 */
 		anon: string
 	}
+	RestrictedRegion: {
+		/**
+		 * R​e​s​t​r​i​c​t​e​d​ ​r​e​g​i​o​n​ ​d​e​t​e​c​t​e​d
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​p​p​e​a​r​s​ ​t​o​ ​b​e​ ​f​r​o​m​ ​a​ ​r​e​s​t​r​i​c​t​e​d​ ​r​e​g​i​o​n​.​ ​B​l​i​n​k​ ​c​a​n​n​o​t​ ​p​r​o​v​i​d​e​ ​s​e​r​v​i​c​e​s​ ​f​r​o​m​ ​t​h​i​s​ ​l​o​c​a​t​i​o​n​.​ ​Y​o​u​r​ ​b​a​l​a​n​c​e​s​ ​a​r​e​ ​u​n​a​f​f​e​c​t​e​d​.
+		 */
+		body: string
+		/**
+		 * O​n​c​e​ ​y​o​u​ ​l​e​a​v​e​ ​t​h​i​s​ ​r​e​g​i​o​n​,​ ​a​l​l​ ​f​u​n​c​t​i​o​n​a​l​i​t​y​ ​w​i​l​l​ ​r​e​t​u​r​n​ ​t​o​ ​n​o​r​m​a​l​.
+		 */
+		bodyReturn: string
+		/**
+		 * L​e​a​r​n​ ​m​o​r​e
+		 */
+		learnMore: string
+		/**
+		 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+		 */
+		contactSupport: string
+	}
 	DollarBalanceRestriction: {
 		/**
 		 * D​o​l​l​a​r​ ​B​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​i​n​ ​y​o​u​r​ ​r​e​g​i​o​n
@@ -22083,6 +22105,28 @@ export type TranslationFunctions = {
 	Non-custodial Mode
 		 */
 		anon: () => LocalizedString
+	}
+	RestrictedRegion: {
+		/**
+		 * Restricted region detected
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your connection appears to be from a restricted region. Blink cannot provide services from this location. Your balances are unaffected.
+		 */
+		body: () => LocalizedString
+		/**
+		 * Once you leave this region, all functionality will return to normal.
+		 */
+		bodyReturn: () => LocalizedString
+		/**
+		 * Learn more
+		 */
+		learnMore: () => LocalizedString
+		/**
+		 * Contact support
+		 */
+		contactSupport: () => LocalizedString
 	}
 	DollarBalanceRestriction: {
 		/**

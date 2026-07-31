@@ -2578,6 +2578,13 @@
         "enhanced": "Mudou para o modo Enhanced\nnão custodiado",
         "anon": "Mudou para o modo Incognito\nnão custodiado"
     },
+    "RestrictedRegion": {
+        "title": "Região restrita detectada",
+        "body": "Sua conexão parece vir de uma região restrita. A Blink não pode fornecer serviços a partir deste local. Seus saldos não são afetados.",
+        "bodyReturn": "Assim que você sair desta região, todas as funcionalidades voltarão ao normal.",
+        "learnMore": "Saiba mais",
+        "contactSupport": "Falar com o suporte"
+    },
     "DollarBalanceRestriction": {
         "modalTitle": "O saldo em dólares não está disponível na sua região"
     },

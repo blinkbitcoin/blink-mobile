@@ -2578,6 +2578,13 @@
     "enhanced": "Đã chuyển sang chế độ Enhanced\nphi lưu ký",
     "anon": "Đã chuyển sang chế độ Incognito\nphi lưu ký"
   },
+  "RestrictedRegion": {
+    "title": "Đã phát hiện khu vực bị hạn chế",
+    "body": "Kết nối của bạn có vẻ đến từ một khu vực bị hạn chế. Blink không thể cung cấp dịch vụ từ vị trí này. Số dư của bạn không bị ảnh hưởng.",
+    "bodyReturn": "Khi bạn rời khỏi khu vực này, mọi chức năng sẽ trở lại bình thường.",
+    "learnMore": "Tìm hiểu thêm",
+    "contactSupport": "Liên hệ hỗ trợ"
+  },
   "DollarBalanceRestriction": {
     "modalTitle": "Số dư đô la không khả dụng tại khu vực của bạn"
   },

@@ -2718,6 +2718,13 @@ const en: BaseTranslation = {
     enhanced: "Switched to Enhanced\nNon-custodial Mode",
     anon: "Switched to Incognito\nNon-custodial Mode",
   },
+  RestrictedRegion: {
+    title: "Restricted region detected",
+    body: "Your connection appears to be from a restricted region. Blink cannot provide services from this location. Your balances are unaffected.",
+    bodyReturn: "Once you leave this region, all functionality will return to normal.",
+    learnMore: "Learn more",
+    contactSupport: "Contact support",
+  },
   DollarBalanceRestriction: {
     modalTitle: "Dollar Balance is not available in your region",
   },
