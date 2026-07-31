@@ -51,10 +51,11 @@ jest.mock("react-native-view-shot", () => {
 })
 
 const mockNavigate = jest.fn()
+const mockPopToTop = jest.fn()
 const mockIsFocused = jest.fn(() => true)
 const mockNavigation = {
   navigate: mockNavigate,
-  popToTop: jest.fn(),
+  popToTop: mockPopToTop,
   isFocused: mockIsFocused,
 }
 jest.mock("@react-navigation/native", () => {
@@ -672,6 +673,7 @@ describe("SendBitcoinCompletedScreen", () => {
   describe("dismiss on app background", () => {
     beforeEach(() => {
       mockNavigate.mockClear()
+      mockPopToTop.mockClear()
       mockIsFocused.mockReturnValue(true)
       mockAppStateListeners.length = 0
       mockAppStateSubscriptionRemovals.length = 0
@@ -694,53 +696,54 @@ describe("SendBitcoinCompletedScreen", () => {
       return view
     }
 
-    it("navigates home when the app transitions from active to background", async () => {
+    it("dismisses to home when the app transitions from active to background", async () => {
       await renderSuccess()
 
-      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockPopToTop).not.toHaveBeenCalled()
 
       triggerAppStateChange("background")
 
-      expect(mockNavigate).toHaveBeenCalledWith("Primary")
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
 
-    it("navigates home when the app backgrounds through the iOS inactive state", async () => {
+    it("dismisses to home when the app backgrounds through the iOS inactive state", async () => {
       await renderSuccess()
 
       triggerAppStateChange("inactive")
-      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockPopToTop).not.toHaveBeenCalled()
 
       triggerAppStateChange("background")
-      expect(mockNavigate).toHaveBeenCalledWith("Primary")
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
     })
 
-    it("does not navigate home while the app stays in the foreground", async () => {
+    it("does not dismiss while the app stays in the foreground", async () => {
       await renderSuccess()
 
       triggerAppStateChange("inactive")
       triggerAppStateChange("active")
 
-      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
-    it("does not navigate home when the screen is covered by another screen", async () => {
+    it("does not dismiss when the screen is covered by another screen", async () => {
       await renderSuccess()
       mockIsFocused.mockReturnValue(false)
 
       triggerAppStateChange("background")
 
-      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
-    it("does not navigate home when the app returns to the foreground", async () => {
+    it("does not dismiss when the app returns to the foreground", async () => {
       await renderSuccess()
 
       triggerAppStateChange("background")
-      mockNavigate.mockClear()
+      mockPopToTop.mockClear()
 
       triggerAppStateChange("active")
 
-      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
     it("removes the app state subscription on unmount", async () => {

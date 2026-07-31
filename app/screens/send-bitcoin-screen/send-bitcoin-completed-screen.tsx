@@ -307,10 +307,7 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     return () => clearTimeout(timer)
   }, [successIconDuration])
 
-  const handleNavigateHome = useCallback(
-    () => navigation.navigate("Primary"),
-    [navigation],
-  )
+  const handleNavigateHome = useCallback(() => navigation.popToTop(), [navigation])
 
   /** A covered receipt (e.g. under the app-lock screen) must not steal navigation. */
   const handleLeaveForeground = useCallback(() => {
