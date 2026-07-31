@@ -24,7 +24,6 @@ import { light, dark } from "@app/rne-theme/colors"
 
 const screenshotState = { isTakingScreenshot: false }
 const mockCaptureAndShare = jest.fn()
-const mockNavigate = jest.fn()
 
 jest.mock("@app/hooks", () => ({
   ...jest.requireActual("@app/hooks"),
@@ -32,11 +31,6 @@ jest.mock("@app/hooks", () => ({
     isTakingScreenshot: screenshotState.isTakingScreenshot,
     captureAndShare: mockCaptureAndShare,
   }),
-}))
-
-jest.mock("@react-navigation/native", () => ({
-  ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
 jest.mock("react-native-view-shot", () => {
@@ -144,6 +138,46 @@ const SuccessAction = ({
   route: RouteProp<RootStackParamList, "sendBitcoinCompleted">
 }) => <MockedScreen route={route} />
 
+const timedRoute = {
+  key: "sendBitcoinCompleted",
+  name: "sendBitcoinCompleted",
+  params: {
+    status: "SUCCESS",
+    currencyAmount: "$0.03",
+    satAmount: "25 SAT",
+    currencyFeeAmount: "$0.00",
+    satFeeAmount: "0 SAT",
+    destination: "alice",
+    paymentType: "lightning",
+    createdAt: 1747691078,
+  },
+} as const
+
+const STALE_TRIP_MS = 31_000
+const QUICK_TRIP_MS = 5_000
+
+const triggerAppStateChange = (nextState: AppStateStatus) => {
+  expect(mockAppStateListeners).toHaveLength(1)
+  act(() => {
+    mockAppStateListeners[0](nextState)
+  })
+}
+
+const advanceTime = (ms: number) => {
+  act(() => {
+    jest.advanceTimersByTime(ms)
+  })
+}
+
+const renderSuccess = () => {
+  render(
+    <ContextForScreen>
+      <Success />
+    </ContextForScreen>,
+  )
+  screen.getByTestId("Success Text")
+}
+
 describe("SendBitcoinCompletedScreen", () => {
   let LL: ReturnType<typeof i18nObject>
 
@@ -153,8 +187,6 @@ describe("SendBitcoinCompletedScreen", () => {
     loadLocale("en")
     LL = i18nObject("en")
     screenshotState.isTakingScreenshot = false
-    mockCaptureAndShare.mockClear()
-    mockNavigate.mockClear()
   })
 
   afterEach(() => {
@@ -563,21 +595,6 @@ describe("SendBitcoinCompletedScreen", () => {
     expect(screen.queryByText(LL.SendBitcoinScreen.noteLabel())).toBeNull()
   })
 
-  const timedRoute = {
-    key: "sendBitcoinCompleted",
-    name: "sendBitcoinCompleted",
-    params: {
-      status: "SUCCESS",
-      currencyAmount: "$0.03",
-      satAmount: "25 SAT",
-      currencyFeeAmount: "$0.00",
-      satFeeAmount: "0 SAT",
-      destination: "alice",
-      paymentType: "lightning",
-      createdAt: 1747691078,
-    },
-  } as const
-
   describe("transaction time", () => {
     it("renders the time as a wall-clock date", () => {
       render(
@@ -649,7 +666,7 @@ describe("SendBitcoinCompletedScreen", () => {
 
       fireEvent.press(screen.getByTestId("close"))
 
-      expect(mockNavigate).toHaveBeenCalledWith("Primary")
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
     })
 
     it("shares the receipt from the share button", () => {
@@ -686,35 +703,10 @@ describe("SendBitcoinCompletedScreen", () => {
   })
 
   describe("dismiss after a stale background trip", () => {
-    const STALE_TRIP_MS = 31_000
-    const QUICK_TRIP_MS = 5_000
-
     beforeEach(() => {
       mockAppStateCurrentState = "active"
       mockAppStateListeners.length = 0
     })
-
-    const triggerAppStateChange = (nextState: AppStateStatus) => {
-      expect(mockAppStateListeners).toHaveLength(1)
-      act(() => {
-        mockAppStateListeners[0](nextState)
-      })
-    }
-
-    const advanceTime = (ms: number) => {
-      act(() => {
-        jest.advanceTimersByTime(ms)
-      })
-    }
-
-    const renderSuccess = () => {
-      render(
-        <ContextForScreen>
-          <Success />
-        </ContextForScreen>,
-      )
-      screen.getByTestId("Success Text")
-    }
 
     it("dismisses to home when returning from a stale background trip", () => {
       renderSuccess()
@@ -772,6 +764,8 @@ describe("SendBitcoinCompletedScreen", () => {
     })
 
     it("does not dismiss when mounted while the app was already backgrounded", () => {
+      /** The screen never reads AppState.currentState, so what carries this case is the
+       *  absence of a preceding "background" event rather than the state set here. */
       mockAppStateCurrentState = "background"
       renderSuccess()
 
@@ -779,15 +773,6 @@ describe("SendBitcoinCompletedScreen", () => {
       triggerAppStateChange("active")
 
       expect(mockPopToTop).not.toHaveBeenCalled()
-    })
-
-    it("dismisses to home when the close button is pressed", () => {
-      renderSuccess()
-      advanceTime(2300)
-
-      fireEvent.press(screen.getByTestId("close"))
-
-      expect(mockPopToTop).toHaveBeenCalledTimes(1)
     })
 
     it("removes the app state listener on unmount", () => {
@@ -801,25 +786,10 @@ describe("SendBitcoinCompletedScreen", () => {
   })
 
   describe("ViewShot background color for screenshot", () => {
-    const successRoute = {
-      key: "sendBitcoinCompleted",
-      name: "sendBitcoinCompleted",
-      params: {
-        status: "SUCCESS",
-        currencyAmount: "$0.03",
-        satAmount: "25 SAT",
-        currencyFeeAmount: "$0.00",
-        satFeeAmount: "0 SAT",
-        destination: "testuser",
-        paymentType: "lightning",
-        createdAt: 1747691078,
-      },
-    } as const
-
     it("has white background in light mode for screenshot capture", async () => {
       render(
         <ContextForScreenWithTheme mode="light">
-          <SuccessAction route={successRoute} />
+          <SuccessAction route={timedRoute} />
         </ContextForScreenWithTheme>,
       )
 
@@ -836,7 +806,7 @@ describe("SendBitcoinCompletedScreen", () => {
     it("has dark background in dark mode for screenshot capture", async () => {
       render(
         <ContextForScreenWithTheme mode="dark">
-          <SuccessAction route={successRoute} />
+          <SuccessAction route={timedRoute} />
         </ContextForScreenWithTheme>,
       )
 

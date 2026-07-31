@@ -98,10 +98,12 @@ const useOnStaleBackgroundReturn = (onStaleReturn: () => void) => {
         backgroundedAt.current = Date.now()
         return
       }
-      if (nextAppState !== "active" || backgroundedAt.current === null) return
+      const tripStartedAt = backgroundedAt.current
+      const isReturningToForeground = nextAppState === "active" && tripStartedAt !== null
+      if (!isReturningToForeground) return
 
-      const isStale = Date.now() - backgroundedAt.current >= STALE_BACKGROUND_MS
       backgroundedAt.current = null
+      const isStale = Date.now() - tripStartedAt >= STALE_BACKGROUND_MS
       if (isStale) {
         onStaleReturnRef.current()
       }
@@ -317,7 +319,13 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
 
   const handleNavigateHome = useCallback(() => navigation.popToTop(), [navigation])
 
-  /** A covered receipt (e.g. under the app-lock screen) must not steal navigation. */
+  /** A covered receipt must not steal navigation: on a second background trip taken from
+   *  the app-lock screen, popping would tear the lock off the stack and expose Home while
+   *  the app is still locked. The first trip is never covered, because AppStateWrapper
+   *  raises the lock only after awaiting the keystore, so this synchronous listener always
+   *  runs first. That relock has to stay asynchronous: were it to push the lock before this
+   *  runs, the receipt would survive underneath and the isResume goBack would land the user
+   *  right back on it. */
   const handleStaleReturn = useCallback(() => {
     if (navigation.isFocused()) {
       handleNavigateHome()
