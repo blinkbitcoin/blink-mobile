@@ -19,7 +19,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen"
 
 import { ContextForScreen, ContextForScreenWithTheme } from "./helper"
-import { Linking, View, ViewStyle } from "react-native"
+import { AppStateStatus, Linking, View, ViewStyle } from "react-native"
 import { light, dark } from "@app/rne-theme/colors"
 
 const screenshotState = { isTakingScreenshot: false }
@@ -66,22 +66,28 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
-let mockAppStateCurrentState = "active"
-const mockAppStateListeners: Array<(state: string) => void> = []
-const mockAppStateSubscriptionRemovals: jest.Mock[] = []
+let mockAppStateCurrentState: AppStateStatus = "active"
+const mockAppStateListeners: Array<(state: AppStateStatus) => void> = []
 jest.mock("react-native/Libraries/AppState/AppState", () => ({
   __esModule: true,
   default: {
     get currentState() {
       return mockAppStateCurrentState
     },
-    addEventListener: (_event: string, handler: (state: string) => void) => {
+    addEventListener: (event: string, handler: (state: AppStateStatus) => void) => {
+      if (event !== "change") {
+        throw new Error(`Trying to subscribe to unknown event: ${event}`)
+      }
       mockAppStateListeners.push(handler)
-      const remove = jest.fn()
-      mockAppStateSubscriptionRemovals.push(remove)
-      return { remove }
+      return {
+        remove: () => {
+          const index = mockAppStateListeners.indexOf(handler)
+          if (index !== -1) {
+            mockAppStateListeners.splice(index, 1)
+          }
+        },
+      }
     },
-    removeEventListener: jest.fn(),
   },
 }))
 
@@ -142,11 +148,17 @@ describe("SendBitcoinCompletedScreen", () => {
   let LL: ReturnType<typeof i18nObject>
 
   beforeEach(() => {
+    jest.clearAllMocks()
+    mockIsFocused.mockReturnValue(true)
     loadLocale("en")
     LL = i18nObject("en")
     screenshotState.isTakingScreenshot = false
     mockCaptureAndShare.mockClear()
     mockNavigate.mockClear()
+  })
+
+  afterEach(() => {
+    jest.clearAllTimers()
   })
 
   it("renders the Success state correctly", async () => {
@@ -678,18 +690,14 @@ describe("SendBitcoinCompletedScreen", () => {
     const QUICK_TRIP_MS = 5_000
 
     beforeEach(() => {
-      mockNavigate.mockClear()
-      mockPopToTop.mockClear()
-      mockIsFocused.mockReturnValue(true)
       mockAppStateCurrentState = "active"
       mockAppStateListeners.length = 0
-      mockAppStateSubscriptionRemovals.length = 0
     })
 
-    const triggerAppStateChange = (nextState: string) => {
-      const notify = mockAppStateListeners[mockAppStateListeners.length - 1]
+    const triggerAppStateChange = (nextState: AppStateStatus) => {
+      expect(mockAppStateListeners).toHaveLength(1)
       act(() => {
-        notify(nextState)
+        mockAppStateListeners[0](nextState)
       })
     }
 
@@ -699,18 +707,17 @@ describe("SendBitcoinCompletedScreen", () => {
       })
     }
 
-    const renderSuccess = async () => {
-      const view = render(
+    const renderSuccess = () => {
+      render(
         <ContextForScreen>
           <Success />
         </ContextForScreen>,
       )
-      await waitFor(() => screen.findByTestId("Success Text"))
-      return view
+      screen.getByTestId("Success Text")
     }
 
-    it("dismisses to home when returning from a stale background trip", async () => {
-      await renderSuccess()
+    it("dismisses to home when returning from a stale background trip", () => {
+      renderSuccess()
 
       triggerAppStateChange("background")
       advanceTime(STALE_TRIP_MS)
@@ -722,8 +729,8 @@ describe("SendBitcoinCompletedScreen", () => {
       expect(mockNavigate).not.toHaveBeenCalled()
     })
 
-    it("dismisses when the stale trip started through the iOS inactive state", async () => {
-      await renderSuccess()
+    it("dismisses when the stale trip started through the iOS inactive state", () => {
+      renderSuccess()
 
       triggerAppStateChange("inactive")
       triggerAppStateChange("background")
@@ -733,8 +740,8 @@ describe("SendBitcoinCompletedScreen", () => {
       expect(mockPopToTop).toHaveBeenCalledTimes(1)
     })
 
-    it("keeps the receipt on a quick background trip", async () => {
-      await renderSuccess()
+    it("keeps the receipt on a quick background trip", () => {
+      renderSuccess()
 
       triggerAppStateChange("background")
       advanceTime(QUICK_TRIP_MS)
@@ -743,8 +750,8 @@ describe("SendBitcoinCompletedScreen", () => {
       expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
-    it("does not dismiss while the app stays in the foreground", async () => {
-      await renderSuccess()
+    it("does not dismiss while the app stays in the foreground", () => {
+      renderSuccess()
 
       triggerAppStateChange("inactive")
       advanceTime(STALE_TRIP_MS)
@@ -753,8 +760,8 @@ describe("SendBitcoinCompletedScreen", () => {
       expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
-    it("does not dismiss when the screen is covered by another screen", async () => {
-      await renderSuccess()
+    it("does not dismiss when the screen is covered by another screen", () => {
+      renderSuccess()
       mockIsFocused.mockReturnValue(false)
 
       triggerAppStateChange("background")
@@ -764,9 +771,9 @@ describe("SendBitcoinCompletedScreen", () => {
       expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
-    it("does not dismiss when mounted while the app was already backgrounded", async () => {
+    it("does not dismiss when mounted while the app was already backgrounded", () => {
       mockAppStateCurrentState = "background"
-      await renderSuccess()
+      renderSuccess()
 
       advanceTime(STALE_TRIP_MS)
       triggerAppStateChange("active")
@@ -774,16 +781,22 @@ describe("SendBitcoinCompletedScreen", () => {
       expect(mockPopToTop).not.toHaveBeenCalled()
     })
 
-    it("removes the app state subscription on unmount", async () => {
-      const { unmount } = await renderSuccess()
+    it("dismisses to home when the close button is pressed", () => {
+      renderSuccess()
+      advanceTime(2300)
 
-      const remove =
-        mockAppStateSubscriptionRemovals[mockAppStateSubscriptionRemovals.length - 1]
-      expect(remove).not.toHaveBeenCalled()
+      fireEvent.press(screen.getByTestId("close"))
 
-      unmount()
+      expect(mockPopToTop).toHaveBeenCalledTimes(1)
+    })
 
-      expect(remove).toHaveBeenCalled()
+    it("removes the app state listener on unmount", () => {
+      renderSuccess()
+      expect(mockAppStateListeners).toHaveLength(1)
+
+      screen.unmount()
+
+      expect(mockAppStateListeners).toHaveLength(0)
     })
   })
 
