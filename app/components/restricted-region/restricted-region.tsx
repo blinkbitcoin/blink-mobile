@@ -58,8 +58,8 @@ export const RestrictedRegionProvider: React.FC<React.PropsWithChildren> = ({
 }) => {
   const { activeAccount } = useAccountRegistry()
   const isRestrictedRegion = useEvaluateRestrictedRegion(activeAccount?.type)
-  const isCustodialBlock =
-    isRestrictedRegion && activeAccount?.type === AccountType.Custodial
+  const isCustodialAccount = activeAccount?.type === AccountType.Custodial
+  const isCustodialBlock = isRestrictedRegion && isCustodialAccount
 
   const [isModalVisible, setIsModalVisible] = useState(false)
   const hasPresentedRef = useRef(false)
