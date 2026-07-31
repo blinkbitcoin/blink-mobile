@@ -81,6 +81,27 @@ const useSuccessMessage = (
   }, [successAction, preimage])()
 }
 
+/** iOS reaches the background through "inactive", Android straight from "active". */
+const useOnLeaveForeground = (onLeaveForeground: () => void) => {
+  const appState = useRef(AppState.currentState)
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      const previousAppState = appState.current
+      appState.current = nextAppState
+
+      const isLeavingForeground =
+        (previousAppState === "active" || previousAppState === "inactive") &&
+        nextAppState === "background"
+
+      if (isLeavingForeground) {
+        onLeaveForeground()
+      }
+    })
+    return () => subscription.remove()
+  }, [onLeaveForeground])
+}
+
 const SuccessIconComponent: React.FC<{
   status: StatusProcessed
   arrivalAtMempoolEstimate: number | undefined
@@ -291,16 +312,14 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     [navigation],
   )
 
-  const appState = useRef(AppState.currentState)
-  useEffect(() => {
-    const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (appState.current === "active" && nextAppState === "background") {
-        handleNavigateHome()
-      }
-      appState.current = nextAppState
-    })
-    return () => subscription.remove()
-  }, [handleNavigateHome])
+  /** A covered receipt (e.g. under the app-lock screen) must not steal navigation. */
+  const handleLeaveForeground = useCallback(() => {
+    if (navigation.isFocused()) {
+      handleNavigateHome()
+    }
+  }, [navigation, handleNavigateHome])
+
+  useOnLeaveForeground(handleLeaveForeground)
 
   if (showSuccessIcon) {
     return (

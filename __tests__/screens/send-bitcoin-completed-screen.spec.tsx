@@ -51,7 +51,12 @@ jest.mock("react-native-view-shot", () => {
 })
 
 const mockNavigate = jest.fn()
-const mockNavigation = { navigate: mockNavigate, popToTop: jest.fn() }
+const mockIsFocused = jest.fn(() => true)
+const mockNavigation = {
+  navigate: mockNavigate,
+  popToTop: jest.fn(),
+  isFocused: mockIsFocused,
+}
 jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native")
   return {
@@ -61,13 +66,16 @@ jest.mock("@react-navigation/native", () => {
 })
 
 const mockAppStateListeners: Array<(state: string) => void> = []
+const mockAppStateSubscriptionRemovals: jest.Mock[] = []
 jest.mock("react-native/Libraries/AppState/AppState", () => ({
   __esModule: true,
   default: {
     currentState: "active",
     addEventListener: (_event: string, handler: (state: string) => void) => {
       mockAppStateListeners.push(handler)
-      return { remove: jest.fn() }
+      const remove = jest.fn()
+      mockAppStateSubscriptionRemovals.push(remove)
+      return { remove }
     },
     removeEventListener: jest.fn(),
   },
@@ -664,7 +672,9 @@ describe("SendBitcoinCompletedScreen", () => {
   describe("dismiss on app background", () => {
     beforeEach(() => {
       mockNavigate.mockClear()
+      mockIsFocused.mockReturnValue(true)
       mockAppStateListeners.length = 0
+      mockAppStateSubscriptionRemovals.length = 0
     })
 
     const triggerAppStateChange = (nextState: string) => {
@@ -674,13 +684,18 @@ describe("SendBitcoinCompletedScreen", () => {
       })
     }
 
-    it("navigates home when the app transitions from active to background", async () => {
-      render(
+    const renderSuccess = async () => {
+      const view = render(
         <ContextForScreen>
           <Success />
         </ContextForScreen>,
       )
       await waitFor(() => screen.findByTestId("Success Text"))
+      return view
+    }
+
+    it("navigates home when the app transitions from active to background", async () => {
+      await renderSuccess()
 
       expect(mockNavigate).not.toHaveBeenCalled()
 
@@ -689,20 +704,55 @@ describe("SendBitcoinCompletedScreen", () => {
       expect(mockNavigate).toHaveBeenCalledWith("Primary")
     })
 
-    it("does not navigate home for transitions other than active to background", async () => {
-      render(
-        <ContextForScreen>
-          <Success />
-        </ContextForScreen>,
-      )
-      await waitFor(() => screen.findByTestId("Success Text"))
+    it("navigates home when the app backgrounds through the iOS inactive state", async () => {
+      await renderSuccess()
 
-      // active -> inactive should be ignored
       triggerAppStateChange("inactive")
-      // inactive -> background is not an active -> background transition
+      expect(mockNavigate).not.toHaveBeenCalled()
+
+      triggerAppStateChange("background")
+      expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    })
+
+    it("does not navigate home while the app stays in the foreground", async () => {
+      await renderSuccess()
+
+      triggerAppStateChange("inactive")
+      triggerAppStateChange("active")
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("does not navigate home when the screen is covered by another screen", async () => {
+      await renderSuccess()
+      mockIsFocused.mockReturnValue(false)
+
       triggerAppStateChange("background")
 
       expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("does not navigate home when the app returns to the foreground", async () => {
+      await renderSuccess()
+
+      triggerAppStateChange("background")
+      mockNavigate.mockClear()
+
+      triggerAppStateChange("active")
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("removes the app state subscription on unmount", async () => {
+      const { unmount } = await renderSuccess()
+
+      const remove =
+        mockAppStateSubscriptionRemovals[mockAppStateSubscriptionRemovals.length - 1]
+      expect(remove).not.toHaveBeenCalled()
+
+      unmount()
+
+      expect(remove).toHaveBeenCalled()
     })
   })
 
