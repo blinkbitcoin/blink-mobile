@@ -465,11 +465,7 @@ export const HomeScreen: React.FC = () => {
   const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { promptEnhancedMode, isEnhancedModePromptVisible } = useEnhancedModePrompt()
-  const {
-    isRestrictedRegion,
-    isRestrictedRegionModalVisible,
-    presentRestrictedRegionModal,
-  } = useRestrictedRegion()
+  const { isRestrictedRegion, presentRestrictedRegionModal } = useRestrictedRegion()
 
   const { isGated: isTransferGated, isRegionPending: isTransferRegionPending } =
     useTransferGate()
@@ -554,7 +550,6 @@ export const HomeScreen: React.FC = () => {
     isRestrictionModalVisible ||
     isStablesatModalVisible ||
     isEnhancedModePromptVisible ||
-    isRestrictedRegionModalVisible ||
     isRestrictedRegion ||
     modalVisible
   const shouldShowMigrateNowPrompt =
