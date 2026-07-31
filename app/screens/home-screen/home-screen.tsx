@@ -465,7 +465,11 @@ export const HomeScreen: React.FC = () => {
   const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { promptEnhancedMode, isEnhancedModePromptVisible } = useEnhancedModePrompt()
-  const { isRestrictedRegion, presentRestrictedRegionModal } = useRestrictedRegion()
+  const {
+    isRestrictedRegion,
+    isRestrictedRegionEvaluationPending,
+    presentRestrictedRegionModal,
+  } = useRestrictedRegion()
 
   const { isGated: isTransferGated, isRegionPending: isTransferRegionPending } =
     useTransferGate()
@@ -543,7 +547,8 @@ export const HomeScreen: React.FC = () => {
     navigation.navigate("accountMigrationEntry")
   }, [dismissMigrateNowPrompt, navigation])
   /** The migrate-now push is the lowest-priority nudge: two native modals cannot
-   *  present at once on iOS, so it waits while any other home modal is up. */
+   *  present at once on iOS, so it waits while any other home modal is up — or may
+   *  still arrive, which is what the pending region evaluation signals. */
   const isAnotherHomeModalVisible =
     isConvertModalVisible ||
     isUpgradeModalVisible ||
@@ -551,6 +556,7 @@ export const HomeScreen: React.FC = () => {
     isStablesatModalVisible ||
     isEnhancedModePromptVisible ||
     isRestrictedRegion ||
+    isRestrictedRegionEvaluationPending ||
     modalVisible
   const shouldShowMigrateNowPrompt =
     migrateNowPrompt.isVisible && !isAnotherHomeModalVisible

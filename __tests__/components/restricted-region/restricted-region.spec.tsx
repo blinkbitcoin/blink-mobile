@@ -12,24 +12,45 @@ import { AccountType } from "@app/types/wallet"
 jest.mock("@app/utils/ip-country-lookup")
 
 let mockIpCountry: string | undefined
-const mockUseIpCountryCode = jest.fn<string | undefined, [boolean]>(() => mockIpCountry)
+let mockIpSettled = true
+const mockUseIpCountryLookup = jest.fn<
+  { countryCode: string | undefined; isSettled: boolean },
+  [boolean]
+>(() => ({ countryCode: mockIpCountry, isSettled: mockIpSettled }))
 jest.mock("@app/hooks/use-device-location", () => ({
   ...jest.requireActual("@app/hooks/use-device-location"),
-  useIpCountryCode: (enabled: boolean) => mockUseIpCountryCode(enabled),
+  useIpCountryLookup: (enabled: boolean) => mockUseIpCountryLookup(enabled),
+  /** The wrapper resolves through the module-internal binding, so it must be mocked
+   *  alongside the lookup or a consumer of it would hit the real hook. */
+  useIpCountryCode: (enabled: boolean) => mockUseIpCountryLookup(enabled).countryCode,
 }))
 
 let mockActiveAccountType: AccountType | undefined = AccountType.SelfCustodial
+let mockRegistryHydrating = false
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({
     activeAccount: mockActiveAccountType ? { type: mockActiveAccountType } : undefined,
+    loading: mockRegistryHydrating,
   }),
 }))
 
+let mockRemoteConfigReady = true
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({
     custodialCreationBlockedCountries: ["CU", "IR"],
     selfCustodialCreationBlockedCountries: ["KP"],
   }),
+  useFeatureFlags: () => ({ remoteConfigReady: mockRemoteConfigReady }),
+}))
+
+const mockGateHold = jest.fn()
+const mockGateRelease = jest.fn()
+jest.mock("@app/navigation/boot-splash-gate", () => ({
+  bootSplashGate: {
+    hold: (maxHoldMs: number) => mockGateHold(maxHoldMs),
+    release: () => mockGateRelease(),
+    whenReleased: () => Promise.resolve(),
+  },
 }))
 
 const mockModal = jest.fn()
@@ -64,10 +85,15 @@ jest.mock("@app/components/restricted-region/restricted-region-screen", () => {
 })
 
 const Consumer = () => {
-  const { isRestrictedRegion, presentRestrictedRegionModal } = useRestrictedRegion()
+  const {
+    isRestrictedRegion,
+    isRestrictedRegionEvaluationPending,
+    presentRestrictedRegionModal,
+  } = useRestrictedRegion()
   return (
     <Pressable testID="present" onPress={presentRestrictedRegionModal}>
       <Text testID="restricted-value">{String(isRestrictedRegion)}</Text>
+      <Text testID="pending-value">{String(isRestrictedRegionEvaluationPending)}</Text>
     </Pressable>
   )
 }
@@ -83,7 +109,10 @@ describe("RestrictedRegionProvider", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockIpCountry = undefined
+    mockIpSettled = true
     mockActiveAccountType = AccountType.SelfCustodial
+    mockRegistryHydrating = false
+    mockRemoteConfigReady = true
   })
 
   it("resolves unrestricted when the session country is clean", () => {
@@ -114,7 +143,7 @@ describe("RestrictedRegionProvider", () => {
     expect(getByTestId("restricted-value").props.children).toBe("false")
   })
 
-  it("blocks a custodial account with the full screen instead of the modal", () => {
+  it("blocks a custodial account with the full screen while children stay mounted", () => {
     mockActiveAccountType = AccountType.Custodial
     mockIpCountry = "CU"
 
@@ -122,6 +151,7 @@ describe("RestrictedRegionProvider", () => {
 
     expect(getByTestId("restricted-screen")).toBeTruthy()
     expect(queryByTestId("restricted-modal")).toBeNull()
+    expect(getByTestId("restricted-value")).toBeTruthy()
   })
 
   it("evaluates nothing without an active account", () => {
@@ -131,7 +161,72 @@ describe("RestrictedRegionProvider", () => {
     const { getByTestId } = renderWithProvider()
 
     expect(getByTestId("restricted-value").props.children).toBe("false")
-    expect(mockUseIpCountryCode).toHaveBeenCalledWith(false)
+    expect(mockUseIpCountryLookup).toHaveBeenCalledWith(false)
+    expect(mockGateRelease).toHaveBeenCalled()
+    expect(mockGateHold).not.toHaveBeenCalled()
+  })
+
+  it("holds the splash while the account type is still unknown", () => {
+    mockActiveAccountType = undefined
+    mockRegistryHydrating = true
+
+    const { getByTestId } = renderWithProvider()
+
+    expect(mockGateHold).toHaveBeenCalledWith(2000)
+    expect(mockGateRelease).not.toHaveBeenCalled()
+    expect(getByTestId("restricted-value")).toBeTruthy()
+  })
+
+  it("holds the splash while a custodial evaluation is pending, children mounted", () => {
+    mockActiveAccountType = AccountType.Custodial
+    mockIpSettled = false
+
+    const { getByTestId } = renderWithProvider()
+
+    expect(mockGateHold).toHaveBeenCalledWith(2000)
+    expect(mockGateRelease).not.toHaveBeenCalled()
+    expect(getByTestId("restricted-value")).toBeTruthy()
+    expect(getByTestId("pending-value").props.children).toBe("true")
+  })
+
+  it("holds the splash while remote config has not resolved for a custodial account", () => {
+    mockActiveAccountType = AccountType.Custodial
+    mockRemoteConfigReady = false
+
+    renderWithProvider()
+
+    expect(mockGateHold).toHaveBeenCalledWith(2000)
+    expect(mockGateRelease).not.toHaveBeenCalled()
+  })
+
+  it("never holds the splash for a known self-custodial account", () => {
+    mockIpSettled = false
+
+    const { getByTestId } = renderWithProvider()
+
+    expect(mockGateHold).not.toHaveBeenCalled()
+    expect(mockGateRelease).toHaveBeenCalled()
+    expect(getByTestId("pending-value").props.children).toBe("true")
+  })
+
+  it("releases the splash once the custodial evaluation settles", () => {
+    mockActiveAccountType = AccountType.Custodial
+    mockIpSettled = false
+    const { getByTestId, rerender } = renderWithProvider()
+
+    expect(mockGateRelease).not.toHaveBeenCalled()
+
+    mockIpCountry = "CU"
+    mockIpSettled = true
+    rerender(
+      <RestrictedRegionProvider>
+        <Consumer />
+      </RestrictedRegionProvider>,
+    )
+
+    expect(mockGateRelease).toHaveBeenCalled()
+    expect(getByTestId("restricted-screen")).toBeTruthy()
+    expect(getByTestId("pending-value").props.children).toBe("false")
   })
 
   it("presents the modal once per restricted session", () => {
@@ -183,6 +278,7 @@ describe("RestrictedRegionProvider", () => {
     const { getByTestId } = render(<Consumer />)
 
     expect(getByTestId("restricted-value").props.children).toBe("false")
+    expect(getByTestId("pending-value").props.children).toBe("false")
     expect(() => fireEvent.press(getByTestId("present"))).not.toThrow()
   })
 })
