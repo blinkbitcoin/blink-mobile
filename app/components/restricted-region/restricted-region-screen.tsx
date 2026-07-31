@@ -30,9 +30,11 @@ export const RestrictedRegionScreen: React.FC = () => {
   const { openSupport } = useContactSupport()
 
   const wallets = data?.me?.defaultAccount?.wallets
-  const hasBalances = wallets !== undefined
-  const btcAmount = toBtcMoneyAmount(getBtcWallet(wallets)?.balance ?? NaN)
-  const usdAmount = toUsdMoneyAmount(getUsdWallet(wallets)?.balance ?? NaN)
+  const btcWallet = getBtcWallet(wallets)
+  const usdWallet = getUsdWallet(wallets)
+  const hasBalances = btcWallet !== undefined && usdWallet !== undefined
+  const btcAmount = toBtcMoneyAmount(btcWallet?.balance ?? NaN)
+  const usdAmount = toUsdMoneyAmount(usdWallet?.balance ?? NaN)
 
   const btcFiat = moneyAmountToDisplayCurrencyString({
     moneyAmount: btcAmount,

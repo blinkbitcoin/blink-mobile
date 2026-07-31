@@ -127,6 +127,22 @@ describe("RestrictedRegionScreen", () => {
     expect(queryByText(LL.common.btcAccount())).toBeNull()
   })
 
+  it("hides the balance rows when one wallet is missing", () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      data: {
+        me: {
+          defaultAccount: {
+            wallets: [{ id: "btc-1", walletCurrency: "BTC", balance: 21493 }],
+          },
+        },
+      },
+    })
+
+    const { queryByText } = renderScreen()
+
+    expect(queryByText(LL.common.btcAccount())).toBeNull()
+  })
+
   it("hides the balance rows while the query has no data yet", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue({ data: undefined })
 
