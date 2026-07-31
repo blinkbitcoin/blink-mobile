@@ -9,12 +9,16 @@ import { TouchableOpacity, View } from "react-native"
 import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
+import { useEnhancedModePrompt } from "@app/components/enhanced-mode-prompt"
+import { useRestrictedRegion } from "@app/components/restricted-region"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { AccountLevel, useLevel } from "@app/graphql/level-context"
 import { useAppConfig, useClipboard } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useSelfCustodialAccountMode } from "@app/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { testProps } from "@app/utils/testProps"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
@@ -88,17 +92,33 @@ const SelfCustodialAccountBanner: React.FC = () => {
   const { LL } = useI18nContext()
   const { lightningAddress } = useSelfCustodialWallet()
   const { copyToClipboard } = useClipboard()
+  const { isAnonMode } = useSelfCustodialAccountMode()
+  const { promptEnhancedMode } = useEnhancedModePrompt()
+  const { isRestrictedRegion, presentRestrictedRegionModal } = useRestrictedRegion()
 
   if (!lightningAddress) return null
 
-  const handleCopy = () =>
+  const isCopyGated = isAnonMode || isRestrictedRegion
+
+  /** The address is Blink-served, so copying is gated like every other served surface:
+   *  the tap explains the block instead of handing out an address that cannot receive. */
+  const handlePress = () => {
+    if (isAnonMode) {
+      promptEnhancedMode()
+      return
+    }
+    if (isRestrictedRegion) {
+      presentRestrictedRegionModal()
+      return
+    }
     copyToClipboard({
       content: lightningAddress,
       message: LL.GaloyAddressScreen.copiedLightningAddressToClipboard(),
     })
+  }
 
   return (
-    <TouchableOpacity onPress={handleCopy} style={styles.outer}>
+    <TouchableOpacity onPress={handlePress} style={styles.outer}>
       <View style={styles.iconContainer}>
         <AccountIcon size={25} />
       </View>
@@ -110,7 +130,12 @@ const SelfCustodialAccountBanner: React.FC = () => {
           {LL.SettingsScreen.nonCustodialAccount()}
         </Text>
       </View>
-      <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+      <View
+        style={isCopyGated && styles.gatedCopyIcon}
+        {...testProps("account-banner-copy")}
+      >
+        <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+      </View>
     </TouchableOpacity>
   )
 }
@@ -148,5 +173,8 @@ const useStyles = makeStyles((theme) => ({
   },
   subtitle: {
     color: theme.colors.grey2,
+  },
+  gatedCopyIcon: {
+    opacity: 0.5,
   },
 }))
