@@ -9,6 +9,8 @@ import {
   resolveIpCountryCodeCached,
 } from "@app/utils/ip-country-lookup"
 
+import { reportError } from "@app/utils/error-logging"
+
 jest.mock("axios")
 jest.mock("@app/utils/error-logging", () => ({
   reportError: jest.fn(),
@@ -88,10 +90,17 @@ describe("resolveIpCountryCodeCached", () => {
     mutableConfig.IPAPI_API_KEY = ""
   })
 
-  /** One sequential test: the cache is module state, so the phases (failure
-   *  retries, concurrent dedupe, cached reuse) must run in a known order. */
+  /** One sequential test: the cache is module state, so the phases (rejection
+   *  absorption, failure retries, concurrent dedupe, cached reuse) must run in a
+   *  known order. */
   it("shares one lookup per session, retrying failures and caching successes", async () => {
     mockedAxios.get.mockRejectedValue(new Error("offline"))
+    ;(reportError as jest.Mock).mockImplementation(() => {
+      throw new Error("reporter not ready")
+    })
+    await expect(resolveIpCountryCodeCached()).resolves.toBeUndefined()
+    ;(reportError as jest.Mock).mockReset()
+
     await expect(resolveIpCountryCodeCached()).resolves.toBeUndefined()
 
     mockedAxios.get.mockReset()
