@@ -3,6 +3,7 @@ import { Linking } from "react-native"
 
 import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
+import theme from "@app/rne-theme/theme"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -55,7 +56,7 @@ const walletsData = {
 
 const renderScreen = () =>
   render(
-    <ThemeProvider>
+    <ThemeProvider theme={theme}>
       <TypesafeI18n locale="en">
         <RestrictedRegionScreen />
       </TypesafeI18n>
@@ -81,6 +82,14 @@ describe("RestrictedRegionScreen", () => {
     expect(getByText("21,493 sats ($22.42)")).toBeTruthy()
     expect(getByText(LL.common.usdAccount())).toBeTruthy()
     expect(getByText("$0.20")).toBeTruthy()
+  })
+
+  it("renders the native sat amount bold and the fiat conversion plain", () => {
+    const { getByText } = renderScreen()
+
+    expect(getByText("21,493 sats")).toHaveStyle({ fontWeight: "700" })
+    expect(getByText("($22.42)")).toHaveStyle({ fontWeight: "400" })
+    expect(getByText("$0.20")).toHaveStyle({ fontWeight: "700" })
   })
 
   it("renders the bitcoin balance without parentheses when no fiat resolves", () => {
