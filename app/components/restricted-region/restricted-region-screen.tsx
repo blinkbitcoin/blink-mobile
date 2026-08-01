@@ -36,13 +36,9 @@ export const RestrictedRegionScreen: React.FC = () => {
   const btcAmount = toBtcMoneyAmount(btcWallet?.balance ?? NaN)
   const usdAmount = toUsdMoneyAmount(usdWallet?.balance ?? NaN)
 
-  const btcFiat = moneyAmountToDisplayCurrencyString({
-    moneyAmount: btcAmount,
-    isApproximate: true,
-  })
-  const bitcoinBalance = `${formatMoneyAmount({ moneyAmount: btcAmount })}${
-    btcFiat ? ` (${btcFiat})` : ""
-  }`
+  const btcFiat = moneyAmountToDisplayCurrencyString({ moneyAmount: btcAmount })
+  const bitcoinNativeBalance = formatMoneyAmount({ moneyAmount: btcAmount })
+  const hasBtcFiat = Boolean(btcFiat)
   const dollarBalance = moneyAmountToDisplayCurrencyString({ moneyAmount: usdAmount })
 
   /** A native modal, not an in-tree overlay: nothing renders above it, the Android back
@@ -57,31 +53,60 @@ export const RestrictedRegionScreen: React.FC = () => {
     >
       <View style={styles.overlay} {...testProps("restricted-region-screen")}>
         <SafeAreaView style={styles.safeArea}>
-          <View style={styles.content}>
-            <GaloyIcon name="warning" size={80} color={colors.warning} />
-            <Text type="h1" bold style={styles.title}>
-              {LL.RestrictedRegion.title()}
-            </Text>
-            <Text style={styles.body}>
-              {LL.RestrictedRegion.body()}
-              {"\n\n"}
-              {LL.RestrictedRegion.bodyReturn()}
-            </Text>
-
-            {hasBalances && (
-              <View style={styles.balances}>
-                <View style={styles.balanceRow}>
-                  <Text style={styles.balanceLabel}>{LL.common.btcAccount()}</Text>
-                  <Text bold>{bitcoinBalance}</Text>
-                </View>
-                <View style={styles.balanceRow}>
-                  <Text style={styles.balanceLabel}>{LL.common.usdAccount()}</Text>
-                  <Text bold>{dollarBalance}</Text>
-                </View>
-              </View>
-            )}
+          <View style={styles.headerSpacer} />
+          <View style={styles.hero}>
+            <GaloyIcon
+              name="warning"
+              size={32}
+              color={colors.primary}
+              backgroundColor={colors.grey5}
+              containerSize={44}
+            />
+            <View style={styles.heroText}>
+              <Text type="h2" bold style={styles.title}>
+                {LL.RestrictedRegion.title()}
+              </Text>
+              <Text type="p2" style={styles.body}>
+                {LL.RestrictedRegion.body()}
+                {"\n\n"}
+                {LL.RestrictedRegion.bodyReturn()}
+              </Text>
+            </View>
           </View>
 
+          {hasBalances && (
+            <View style={styles.balances}>
+              <View style={styles.balanceRow}>
+                <Text type="p3" style={styles.balanceLabel}>
+                  {LL.common.btcAccount()}
+                </Text>
+                {hasBtcFiat ? (
+                  <Text type="p3" style={styles.balanceValue}>
+                    <Text type="p3" bold style={styles.balanceValueBold}>
+                      {`${bitcoinNativeBalance} `}
+                    </Text>
+                    <Text type="p3" style={styles.balanceValue}>
+                      {`(${btcFiat})`}
+                    </Text>
+                  </Text>
+                ) : (
+                  <Text type="p3" bold style={styles.balanceValueBold}>
+                    {bitcoinNativeBalance}
+                  </Text>
+                )}
+              </View>
+              <View style={styles.balanceRow}>
+                <Text type="p3" style={styles.balanceLabel}>
+                  {LL.common.usdAccount()}
+                </Text>
+                <Text type="p3" bold style={styles.balanceValueBold}>
+                  {dollarBalance}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          <View style={styles.spacer} />
           <View style={styles.actions}>
             <GaloyPrimaryButton
               title={LL.RestrictedRegion.contactSupport()}
@@ -108,39 +133,59 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   safeArea: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingBottom: 16,
   },
-  content: {
-    flex: 1,
-    justifyContent: "center",
+  headerSpacer: {
+    height: 60,
+  },
+  hero: {
     alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    rowGap: 14,
+  },
+  heroText: {
+    alignSelf: "stretch",
+    alignItems: "center",
+    paddingHorizontal: 28,
+    rowGap: 8,
   },
   title: {
-    marginTop: 20,
     textAlign: "center",
+    fontWeight: "700",
   },
   body: {
-    marginTop: 16,
-    fontSize: 16,
     lineHeight: 22,
     textAlign: "center",
     color: colors.black,
   },
   balances: {
-    marginTop: 28,
     alignSelf: "stretch",
+    paddingHorizontal: 45,
     rowGap: 10,
   },
   balanceRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   balanceLabel: {
+    lineHeight: 20,
     color: colors.grey2,
   },
+  balanceValue: {
+    lineHeight: 20,
+  },
+  balanceValueBold: {
+    lineHeight: 20,
+    fontWeight: "700",
+  },
+  spacer: {
+    flex: 1,
+  },
   actions: {
-    rowGap: 6,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
+    rowGap: 10,
   },
 }))
