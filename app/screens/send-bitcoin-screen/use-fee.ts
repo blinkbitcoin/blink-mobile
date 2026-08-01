@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 
 import { gql } from "@apollo/client"
 import {
+  GraphQlApplicationError,
   WalletCurrency,
   useLnInvoiceFeeProbeMutation,
   useLnNoAmountInvoiceFeeProbeMutation,
@@ -22,6 +23,7 @@ type FeeType =
   | {
       status: "loading" | "error" | "unset"
       amount?: undefined | null
+      errors?: readonly GraphQlApplicationError[]
     }
   | {
       amount: WalletAmount<WalletCurrency>
@@ -31,6 +33,7 @@ type FeeType =
   | {
       amount?: WalletAmount<WalletCurrency>
       status: "error"
+      errors?: readonly GraphQlApplicationError[]
     }
 
 gql`
@@ -143,6 +146,7 @@ const useFee = <T extends WalletCurrency>(getFeeFn?: GetFee<T> | null): FeeType 
           return setFee({
             status: "error",
             amount: feeResponse.amount,
+            errors: feeResponse.errors,
           })
         }
 

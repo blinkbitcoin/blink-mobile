@@ -54,6 +54,22 @@ const toPrepareOptions = (params: PrepareParams) => ({
 const asGetFeeAmount = <T extends WalletCurrency>(feeSats: number) =>
   toBtcMoneyAmount(feeSats) as unknown as WalletAmount<T>
 
+/**
+ * A fee quote the SDK could not produce. The classified code travels in `errors` so the
+ * confirmation screen can name the cause — an unclassified failure leaves the user staring
+ * at a generic "unable to calculate fee" with a disabled slider and no way forward.
+ */
+const feeFailure = <T extends WalletCurrency>(
+  scope: string,
+  err: unknown,
+): SelfCustodialFeeResult<T> => {
+  reportError(scope, err)
+  return {
+    amount: undefined,
+    errors: [{ __typename: "GraphQLApplicationError", message: classifySdkError(err) }],
+  }
+}
+
 export const createGetFee = <T extends WalletCurrency>(
   params: PrepareParams,
 ): GetFee<T> => {
@@ -65,8 +81,8 @@ export const createGetFee = <T extends WalletCurrency>(
         prepared.conversionEstimate?.amountAdjustment,
       )
       return { amount: asGetFeeAmount<T>(feeSats), amountAdjustment }
-    } catch {
-      return { amount: undefined }
+    } catch (err) {
+      return feeFailure<T>("Self-custodial Lightning fee", err)
     }
   }
 }
@@ -75,15 +91,20 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
   params: PrepareParams,
   feeTier: FeeTierOption,
 ): GetFee<T> => {
-  return async () => {
+  return async (): Promise<SelfCustodialFeeResult<T>> => {
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       const fees = extractOnchainFees(prepared)
-      if (!fees) return { amount: undefined }
+      if (!fees) {
+        return feeFailure<T>(
+          "Self-custodial onchain fee",
+          new Error("prepareSend returned no BitcoinAddress fee quote"),
+        )
+      }
 
       return { amount: asGetFeeAmount<T>(fees[feeTier]) }
-    } catch {
-      return { amount: undefined }
+    } catch (err) {
+      return feeFailure<T>("Self-custodial onchain fee", err)
     }
   }
 }
