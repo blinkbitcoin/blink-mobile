@@ -400,7 +400,14 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
               pending={false}
               onChain={settlementVia?.__typename === "SettlementViaOnChain"}
             />
-            <Text type="h2">{spendOrReceiveText}</Text>
+            {/* Pinned to one line: this heading is short in every locale, and
+                leaving it unbounded lets Android re-break it after the first
+                word on a re-layout. The container height is already fixed by
+                the first measure pass, so the wrapped word lands outside it and
+                is clipped — "You spent" silently renders as "You". */}
+            <Text type="h2" numberOfLines={1}>
+              {spendOrReceiveText}
+            </Text>
             <Text type="h1">{displayAmount}</Text>
           </View>
         </View>
