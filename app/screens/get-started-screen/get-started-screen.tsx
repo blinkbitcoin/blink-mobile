@@ -33,6 +33,14 @@ export const GetStartedScreen: React.FC = () => {
 
   const styles = useStyles()
 
+  /** Reached through "Add account" this screen sits on top of an existing session, so it
+   *  owes the user a way back. A first install — and every flow that resets the stack to
+   *  this screen, like logout or account deletion — has nothing to return to. */
+  const canGoBack = navigation.canGoBack()
+  React.useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: canGoBack })
+  }, [navigation, canGoBack])
+
   const [secretMenuCounter, setSecretMenuCounter] = React.useState(0)
   React.useEffect(() => {
     if (secretMenuCounter > 2) {
@@ -111,7 +119,7 @@ export const GetStartedScreen: React.FC = () => {
     )
 
   return (
-    <Screen headerShown={false}>
+    <Screen headerShown={canGoBack}>
       <View style={styles.container}>
         {NonProdInstanceHint}
         <View style={styles.logoWrapper} pointerEvents="box-none">

@@ -246,7 +246,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="getStarted"
         component={GetStartedScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, title: "" }}
       />
       <RootNavigator.Screen
         name="accountTypeSelection"

@@ -4,13 +4,19 @@ import { fireEvent, render } from "@testing-library/react-native"
 import { GetStartedScreen } from "@app/screens/get-started-screen/get-started-screen"
 
 const mockNavigate = jest.fn()
+const mockSetOptions = jest.fn()
+const mockCanGoBack = jest.fn(() => false)
 const mockUseFeatureFlags = jest.fn()
 const mockUseAccountTypeOptions = jest.fn()
 const mockIsCreationBlocked = jest.fn()
 const mockRegionLoading = jest.fn(() => false)
 
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    setOptions: mockSetOptions,
+    canGoBack: mockCanGoBack,
+  }),
 }))
 
 jest.mock("@react-navigation/native-stack", () => ({
@@ -109,8 +115,13 @@ jest.mock("@app/components/screen", () => {
   const ReactActual = jest.requireActual("react")
   const { View } = jest.requireActual("react-native")
   return {
-    Screen: ({ children }: { children: React.ReactNode }) =>
-      ReactActual.createElement(View, null, children),
+    Screen: ({
+      children,
+      headerShown,
+    }: {
+      children: React.ReactNode
+      headerShown?: boolean
+    }) => ReactActual.createElement(View, { testID: "screen", headerShown }, children),
   }
 })
 
@@ -137,6 +148,7 @@ jest.mock("@app/assets/logo/blink-logo-light.svg", () => "AppLogoLight")
 describe("GetStartedScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockCanGoBack.mockReturnValue(false)
     mockIsCreationBlocked.mockReturnValue(false)
     mockRegionLoading.mockReturnValue(false)
     mockUseFeatureFlags.mockReturnValue({
@@ -149,6 +161,22 @@ describe("GetStartedScreen", () => {
       selfCustodialTemporarilyDisabled: false,
       loading: false,
     })
+  })
+
+  it("hides the header on a first install, where there is no account to return to", () => {
+    const { getByTestId } = render(<GetStartedScreen />)
+
+    expect(mockSetOptions).toHaveBeenCalledWith({ headerShown: false })
+    expect(getByTestId("screen").props.headerShown).toBe(false)
+  })
+
+  it("shows the header back arrow when opened over an existing account", () => {
+    mockCanGoBack.mockReturnValue(true)
+
+    const { getByTestId } = render(<GetStartedScreen />)
+
+    expect(mockSetOptions).toHaveBeenCalledWith({ headerShown: true })
+    expect(getByTestId("screen").props.headerShown).toBe(true)
   })
 
   it("disables Create new account when no options are available", () => {
