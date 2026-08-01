@@ -401,6 +401,38 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       const result = await detail.getFee({} as never)
       expect(result.amount).toBeUndefined()
     })
+
+    // Without the classified code the confirmation screen can only show its generic
+    // "unable to calculate fee", which names no cause and leaves the slider disabled.
+    it("carries the classified code in errors when prepareLnurl throws", async () => {
+      mockPrepareLnurl.mockRejectedValue({ tag: "LnurlError", inner: ["bad callback"] })
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      const result = await detail.getFee({} as never)
+      expect(result.errors).toEqual([
+        {
+          __typename: "GraphQLApplicationError",
+          message: SelfCustodialErrorCode.InvalidInput,
+        },
+      ])
+    })
+
+    it("falls back to the Generic code for an unclassified throw", async () => {
+      mockPrepareLnurl.mockRejectedValue(new Error("boom"))
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      const result = await detail.getFee({} as never)
+      expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.Generic)
+    })
+
+    it("leaves errors unset on a successful quote", async () => {
+      mockPrepareLnurl.mockResolvedValue({})
+      mockExtractLnurlFee.mockReturnValue(5)
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canGetFee) throw new Error("expected canGetFee")
+      const result = await detail.getFee({} as never)
+      expect(result.errors).toBeUndefined()
+    })
   })
 
   describe("sendPaymentMutation", () => {
